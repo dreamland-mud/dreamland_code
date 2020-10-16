@@ -7,6 +7,18 @@
 #include "skillmanager.h"
 #include "pcharacter.h"
 #include "interp.h"
+#include "skillgroup.h"
+
+GROUP(none);
+
+void print_see_also(Skill *skill, PCharacter *ch, ostream &buf) 
+{
+    SkillGroupReference &group = skill->getGroup( );
+
+    // 'См. также справка|help травы|herbs' - с гипер-ссылкой на справку.
+    buf << endl << "См. также {W{lRсправка{lEhelp{lx {hh" << skill->getNameFor(ch) << "{x." << endl;
+}
+  
 
 CMDRUN( showskill )
 {
@@ -33,6 +45,7 @@ CMDRUN( showskill )
     }
     
     skill->show( pch, buf );
+    print_see_also(skill, pch, buf);
     ch->send_to( buf );
 }
 

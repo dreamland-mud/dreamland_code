@@ -6,7 +6,8 @@
 #include "languagemanager.h"
 #include "word.h"
 
-#include "skillgroup.h"                                                       
+#include "skillgroup.h"
+#include "skill_utils.h"
 #include "behavior_utils.h"
 #include "pcharacter.h"
 #include "pcrace.h"
@@ -133,21 +134,17 @@ void Language::practice( PCharacter *ch ) const
     learned = max( learned, SKILL_ADEPT );
 }
 
-void Language::show( PCharacter *ch, std::ostream & buf ) 
+void Language::show( PCharacter *ch, std::ostream & buf ) const
 {
-    Races::iterator r;
-    Classes::iterator c;
+    Races::const_iterator r;
+    Classes::const_iterator c;
     WordList perfect, unperfect;
-    WordList::iterator n;
+    WordList::const_iterator n;
     DLString userName;
 
-    buf << "Язык '{W" << getName( ) << "{x'"
-        << " '{W" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{W" 
-        << getGroup()->getNameFor(ch) 
-        << "{x'"
-        << endl;
-    
+    buf << "{" << SKILL_HEADER_BG << "Язык " << print_names_for(this, ch)
+        << print_group_for(this, ch) << ".{x" << endl;
+
     for (r = races.begin( ); r != races.end( ); r++) {
         Race *race = raceManager->findExisting( r->first );
     
@@ -172,13 +169,14 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     }
     
     if (!perfect.empty( )) {
+        buf << SKILL_INFO_PAD;
         for (n = perfect.begin( ); n != perfect.end( ); ) {
             userName = *n;
 
             if (n == perfect.begin( ))
                 userName.upperFirstCharacter( );
 
-            buf << "{w" << userName  << "{x";
+            buf << "{W" << userName  << "{x";
 
             if (++n != perfect.end( ))
                 buf << ", ";
@@ -188,10 +186,10 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     }
 
     if (!unperfect.empty( )) {
-        buf << "Неполные знания доступны ";
+        buf << SKILL_INFO_PAD << "Неполные знания доступны ";
         
         for (n = unperfect.begin( ); n != unperfect.end( ); ) {
-            buf << "{w" << *n << "{x";
+            buf << "{W" << *n << "{x";
 
             if (++n != unperfect.end( ))
                 buf << ", ";
@@ -203,10 +201,12 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     if (visible( ch )) {
         int learned = getLearned( ch );
         
-        buf << "Тебе язык доступен с уровня {W" << getLevel( ch ) << "{x";
+        buf << SKILL_INFO_PAD << "Тебе язык доступен с уровня {C" << getLevel( ch ) << "{x";
 
-        if (learned > 0)
-            buf << ", изучен на {W" << learned << "%{x";
+        if (learned > 1)
+            buf << ", изучен на {" << skill_learned_colour(this, ch) << learned << "%{x";
+        else
+            buf << ", пока не изучен";
         
         buf << "." << endl;
     }

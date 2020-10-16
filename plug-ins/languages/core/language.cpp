@@ -49,6 +49,20 @@ DLString LanguageHelp::getTitle(const DLString &label) const
     return buf.str();
 }
 
+void LanguageHelp::getRawText( Character *ch, ostringstream &in ) const
+{
+    const Language *lang = command ? command.getDynamicPointer<Language>() : 0;
+    if (!lang)
+        return;
+
+    in << "%PAUSE%";
+    lang->show(ch->getPC(), in);
+    in << "%RESUME%";
+
+    in << endl
+       << *this;
+}
+
 /*--------------------------------------------------------------------
  * Language
  *-------------------------------------------------------------------*/

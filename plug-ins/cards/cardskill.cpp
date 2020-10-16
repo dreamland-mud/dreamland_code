@@ -81,17 +81,15 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
 void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
-    SkillGroupReference &group = const_cast<CardSkill *>(this)->getGroup();
+    buf << print_what(this) << " Колоды "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl;
 
-    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
-        << " Колоды '{c" << getName( ) << "{x' или '{c" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{c"  << group->getNameFor(ch) << "{x'" 
-        << endl;
+    buf << print_wait_and_mana(this, ch);
     
-    print_wait_and_mana(this, ch, buf);     
-    buf << endl;
-    
-    buf << "Появляется у карт, начиная с {C" 
+    buf << SKILL_INFO_PAD 
+        << "Появляется у карт, начиная с {C" 
         << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
         << "{x"; 
 
@@ -105,8 +103,6 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
     }
     
     buf << "." << endl; 
-
-    print_see_also(this, ch, buf);
 }
 
 

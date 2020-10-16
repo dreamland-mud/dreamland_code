@@ -108,20 +108,17 @@ bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
     if (verbose)
         ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-               "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
+               "Учителя можно найти, прочитав справку по этому умению.", 
                mob, getNameFor( ch ).c_str( ) );
     return false;
 }
 
 void CraftSkill::show( PCharacter *ch, std::ostream &buf ) const
 {
-    SkillGroupReference &group = const_cast<CraftSkill *>(this)->getGroup();
-
-    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
-        << " '{c" << getName( ) << "{x' или"
-        << " '{c" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{c" << group->getNameFor(ch) << "{x'." 
-        << endl << endl;
+    buf << print_what(this) << " "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl;
 
     StringList pnames; 
     CraftProfessions::const_iterator sp;
@@ -132,9 +129,7 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf ) const
     }
 
     if (!pnames.empty())
-        buf << "Доступно профессии " << pnames.wrap("{W", "{x").join(", ") << "." << endl;
-
-    print_see_also(this, ch, buf);
+        buf << SKILL_INFO_PAD << "Доступно профессии " << pnames.wrap("{W", "{x").join(", ") << "." << endl;
 } 
 
 static void mprog_skill( Character *ch, Character *actor, const char *skill, bool success, Character *victim )

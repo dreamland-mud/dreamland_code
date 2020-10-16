@@ -90,16 +90,12 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
 void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
 {
+    buf << print_what(this) << " "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl;
+
     Races::const_iterator i;
-    SkillGroupReference &group = const_cast<RaceAptitude *>(this)->getGroup();
-
-    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
-        << " '{c" << getName( ) << "{x' или" 
-        << " '{c" << getRussianName( ) << "{x'"
-        << ", входит в группу '{hg{c" << group->getNameFor(ch) << "{x'."
-        << endl << endl;
-
-
     StringList rnames;
     for (i = races.begin( ); i != races.end( ); i++) {
         Race *race = raceManager->findExisting(i->first);
@@ -107,7 +103,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
             rnames.push_back(race->getNameFor(ch, ch));
     }
 
-    buf << "Особенность ";
+    buf << SKILL_INFO_PAD << "Особенность ";
     switch (rnames.size( )) {
     case 0:  buf << "неизвестной расы"; break;
     case 1:  buf << "расы "; break;
@@ -115,14 +111,12 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
     }
     buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
 
-    print_wait_and_mana(this, ch, buf);    
+    buf << print_wait_and_mana(this, ch);
     
-    if (!visible( ch )) {
-        print_see_also(this, ch, buf);
+    if (!visible( ch ))
         return;
-    }
         
-    buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
+    buf << SKILL_INFO_PAD << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
 
     if (available( ch )) {
         int learned = ch->getSkillData(getIndex()).learned;
@@ -131,7 +125,6 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
     }
 
     buf << "." << endl;
-    print_see_also(this, ch, buf);
 }
 
 const SkillRaceInfo *
