@@ -160,6 +160,9 @@ public:
     DLString getShortDescr( char );
     bool hasOwner( const Character * ) const;
 
+    /** Return value of a given property or an empty string if not found. */
+    DLString getProperty(const DLString &key) const;
+
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
 
     /** Return instance or index data value[0], depending on item type. */

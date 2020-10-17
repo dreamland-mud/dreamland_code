@@ -478,6 +478,19 @@ int Object::getWeightMultiplier( ) const
     return item_type == ITEM_CONTAINER ? value4() : 100;
 }
 
+DLString Object::getProperty(const DLString &key) const
+{
+    Properties::const_iterator p = properties.find(key);
+    if (p != properties.end())
+        return p->second;
+    
+    p = pIndexData->properties.find(key);
+    if (p != pIndexData->properties.end())
+        return p->second;
+    
+    return DLString::emptyString;
+}
+
 static bool get_value0_from_proto(const Object *obj)
 {
     switch (obj->item_type) {

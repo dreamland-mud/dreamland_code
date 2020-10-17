@@ -2182,10 +2182,11 @@ CMDRUNP( help )
  * cast 'identify', shop item properties
  *----------------------------------------------------------------*/
 
-void lore_fmt_affect( Affect *paf, ostringstream &buf )
+void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
 {
     int b = paf->bitvector,
         d = paf->duration;
+    bool adaptive;
 
     if (paf->modifier != 0) {
         switch (paf->location) {
@@ -2223,13 +2224,20 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
                 /* FALL THROUGH */
 
             default:
-                buf << "Изменяет " << apply_flags.message(paf->location ) 
-                    << " на " << paf->modifier;
+                adaptive = obj->item_type == ITEM_RECIPE && obj->getProperty("levelAdaptive") == "true";
+
+                // Don't display exact modifier for level-adaptive affects, as it changes with level.
+                buf << "Изменяет " << apply_flags.message(paf->location );
+                if (!adaptive)
+                    buf << " на " << paf->modifier;
 
                 if (d > -1)
                     buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
             
-                buf << endl;                
+                buf << "." << endl;
+
+                if (adaptive)
+                    buf << "Точные свойства этого рецепта зависят от уровня того, кто его использует." << endl;
                 break;
         }
     }
@@ -2489,8 +2497,8 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     if (!obj->enchanted)
         for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
-            lore_fmt_affect( paf, buf );
+            lore_fmt_affect( obj, paf, buf );
 
     for (paf = obj->affected; paf != 0; paf = paf->next)
-        lore_fmt_affect( paf, buf );
+        lore_fmt_affect( obj, paf, buf );
 }

@@ -51,7 +51,7 @@ DLString quality_percent( int ); /* XXX */
 /* From act_info.cpp */
 void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showName );
 void lore_fmt_wear( int type, int wear, ostringstream &buf );
-void lore_fmt_affect( Affect *paf, ostringstream &buf );
+void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf );
 
 SPELL_DECL(AcuteVision);
 VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -1033,10 +1033,10 @@ SKILL_RUNP( lore )
 
   if (!obj->enchanted)
       for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
-          lore_fmt_affect( paf, ostr );
+          lore_fmt_affect( obj, paf, ostr );
 
   for (paf = obj->affected; paf != 0; paf = paf->next)
-          lore_fmt_affect( paf, ostr );
+          lore_fmt_affect( obj, paf, ostr );
 
       ch->send_to(ostr);
 
