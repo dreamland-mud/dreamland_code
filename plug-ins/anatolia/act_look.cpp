@@ -659,6 +659,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
 
     if (nVict) 
         if (nVict->position == nVict->start_pos 
+            && !nVict->on
             && nVict->getLongDescr( ) 
             && nVict->getLongDescr( )[0])
         {
