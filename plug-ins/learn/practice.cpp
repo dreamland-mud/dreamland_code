@@ -265,7 +265,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     adept = skill->getAdept( ch );
 
     if (learned >= adept) {
-        ch->printf( "Ты уже слишком хорошо владеешь умением {W%s{x, практиковаться бессмысленно.", sname );
+        ch->printf( "Ты уже слишком хорошо владеешь умением {W%s{x, практиковаться бессмысленно.\r\n", sname );
         ch->printf( "Чтобы овладеть умением еще лучше, просто применяй его почаще.\r\n", sname );        
         return;
     }
