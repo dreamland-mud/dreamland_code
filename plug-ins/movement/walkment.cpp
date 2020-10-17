@@ -36,8 +36,20 @@ Walkment::Walkment( Character *ch )
             : Movement( ch )
 {
     silence = false;
-    boat_type = boat_get_type( horse ? horse : ch );
-    boat = boat_object_find( horse ? horse : ch );
+
+    Character *whoHasBoat;
+
+    // For a rider, their horse needs to swim.
+    if (horse)
+        whoHasBoat = horse;
+    // For a pet we assume they travel together in master's boat.
+    else if (ch->master && !ch->master->is_npc() && ch->master->getPC()->pet == ch)
+        whoHasBoat = ch->master;
+    else
+        whoHasBoat = ch;
+
+    boat_type = boat_get_type(whoHasBoat);
+    boat = boat_object_find(whoHasBoat);
 }
 
 bool Walkment::moveAtomic( )
@@ -403,6 +415,7 @@ bool Walkment::checkWater( Character *wch )
          && to_room->sector_type != SECT_WATER_NOSWIM)
         return true;
     
+    // For a rider, we'll only check horse's ability to swim.
     if (MOUNTED(wch))
         return true;
 
