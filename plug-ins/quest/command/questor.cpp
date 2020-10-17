@@ -27,6 +27,7 @@
 #include "questregistrator.h"
 #include "questexceptions.h"
 #include "xmlattributequestdata.h"
+#include "objquestbehavior.h"
 
 #include "questor.h"
 #include "def.h"
@@ -624,4 +625,18 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
 
     tell_fmt("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'.", client, ch, (*q)->getShortDescr().c_str());
     tell_raw(client, ch, "Приходи позже или выбери что-то другое.");
+}
+
+void Questor::give( Character *victim, Object *obj )
+{
+    obj_from_char(obj);
+    obj_to_char(obj, victim);
+
+    if (!victim->is_npc() && obj->behavior && obj->behavior.getDynamicPointer<ObjQuestBehavior>()) {
+        tell_fmt("Нет нужды передавать %3$O4 мне в руки.", victim, ch, obj);
+        tell_fmt("Если ты закончил%1$Gо||а мое задание, просто набери {y{hc{lRзадание сдать{lEquest complete{x.", victim, ch);
+    }
+
+    victim->pecho("%^C1 возвращает тебе %O4.", ch, obj);
+    victim->recho(ch, "%^C1 возвращает %O4 %C3.", ch, obj, victim);
 }

@@ -24,7 +24,7 @@
 #include "occupations.h"
 #include "act.h"
 #include "merc.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "mercdb.h"
 
 #include "cquest.h"
@@ -464,19 +464,35 @@ void CQuest::doStat( PCharacter *ch )
         if (!qb)
             continue;
 
+        bool foundSelf = false;
         XMLAttributeStatistic::StatRecordList &records = s->second;
         
         buf << "{W\"" << qb->getShortDescr( ) << "\"{x" << endl;
 
+        // Print top 5 achievers for the current quest type.
         for (r = records.begin( ); r != records.end( ) && cnt < 5; cnt++) {
             last = r->second;
             buf << dlprintf( "          {W%4d{w ", last ); 
 
-            for ( ; r != records.end( ) && r->second == last; r++)
+            for ( ; r != records.end( ) && r->second == last; r++) {
                 buf << r->first << " ";
+
+                if (r->first == ch->getName())
+                    foundSelf = true;
+            }
 
             buf << "{x" << endl;
         }
+
+        // Output your own position in the list, unless you're part of the top 5.
+        if (!foundSelf)
+            for (; r != records.end(); r++, cnt++)
+                if (r->first == ch->getName()) {
+                    buf << "               {W....{w " << endl;
+                    buf << dlprintf( "          {W%4d{w %s (%dе место)\r\n", 
+                                     r->second, r->first.c_str(), cnt+1);
+                    break;
+                }
         
         buf << endl;
     }
