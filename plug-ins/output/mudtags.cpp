@@ -540,15 +540,14 @@ void VisibilityTags::run( ostringstream &out )
         if (*p != '{') {
             c = *p;
 
-            if (c != '\n' && c != '\r')
-                if (!rlang_tag_work( )
-                     || !clang_tag_work( )
-                     || !nlang_tag_work( )
-                     || !slang_tag_work( )
-                     || !align_tag_work( )
-                     || !sex_tag_work( )
-                     || !time_tag_work( )
-                     || !invis_tag_work( ))
+            if (!rlang_tag_work( )
+                    || !clang_tag_work( )
+                    || !nlang_tag_work( )
+                    || !slang_tag_work( )
+                    || !align_tag_work( )
+                    || !sex_tag_work( )
+                    || !time_tag_work( )
+                    || !invis_tag_work( ))
             continue;
            
             html_escape( out );
