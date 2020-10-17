@@ -49,6 +49,8 @@ protected:
     virtual void damage( PCharacter * );
     virtual  int getUpdateAmount( PCharacter * );
     virtual bool isOverflow( PCharacter * );
+    DLString showDots(PCharacter *) const;
+    DLString showPercent(PCharacter *) const;
 
     static bool isVampire( PCharacter * );
 
@@ -57,7 +59,9 @@ protected:
     XML_VARIABLE XMLInteger resetAmount;     
     XML_VARIABLE XMLInteger damageLimit;     
     XML_VARIABLE XMLInteger activeLimit;     
-    XML_VARIABLE XMLInteger minValue, maxValue;     
+    XML_VARIABLE XMLInteger minValue, maxValue; 
+
+    XML_VARIABLE XMLString what;    
 
     XML_VARIABLE XMLString  msgStop, msgStart;
     XML_VARIABLE XMLString  msgActive;

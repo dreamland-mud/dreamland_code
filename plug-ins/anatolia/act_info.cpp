@@ -228,9 +228,9 @@ static DLString show_money( int g, int s )
     ostringstream buf;
 
     if (g > 0 || s > 0)
-        buf << (g > 0 ? "%1$d золот%1$Iая|ые|ых" : "")
+        buf << (g > 0 ? "{Y%1$d{x золот%1$Iая|ые|ых" : "")
             << (g * s == 0 ? "" : " и ")
-            << (s > 0 ? "%2$d серебрян%2$Iая|ые|ых" : "")
+            << (s > 0 ? "{W%2$d{x серебрян%2$Iая|ые|ых" : "")
             << " моне%" << (s == 0 ? "1" : "2") << "$Iта|ты|т.";
     else
         buf << "нет денег.";
@@ -307,7 +307,7 @@ CMDRUNP( oscore )
     Room *room = 0;
     PCharacter *pch = ch->getPC( );
 
-    buf << fmt( 0, "Ты %1$s%2$s{x, уровень %3$d",
+    buf << fmt( 0, "Ты {W%1$s%2$s{x, уровень {C%3$d{w",
                    ch->seeName( ch, '1' ).c_str( ),
                    ch->is_npc( ) ? "" : ch->getPC( )->getParsedTitle( ).c_str( ),
                    ch->getRealLevel( ));
@@ -321,17 +321,17 @@ CMDRUNP( oscore )
     if (ch->getRealLevel( ) != ch->get_trust( ))
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
-    buf << "{WРаса:{x " << ch->getRace( )->getNameFor( ch, ch )
-	<< " {WРазмер:{x " << size_table.message( ch->size )    
-        << "  {WПол:{x " << sex_table.message( ch->getSex( ) )
-        << "  {WКласс:{x " << ch->getProfession( )->getNameFor( ch );
+    buf << "{wРаса:{W " << ch->getRace( )->getNameFor( ch, ch )
+	<< "  {wРазмер:{W " << size_table.message( ch->size )    
+        << "  {wПол:{W " << sex_table.message( ch->getSex( ) )
+        << "  {wКласс:{W " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
         room = get_room_index( ch->getPC()->getHometown( )->getAltar() );
     else
         room = get_room_index( ROOM_VNUM_TEMPLE );
     
-    buf << "  {WДом:{x " << (room ? room->area->name : "Потерян" ) << endl
+    buf << "  {wДом:{W " << (room ? room->area->name : "Потерян" ) << "{x" << endl
         << dlprintf( "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
@@ -342,7 +342,7 @@ CMDRUNP( oscore )
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-    buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
+    buf << dlprintf( "Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r",
                 ch->carry_number, ch->canCarryNumber( ),
                 ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
@@ -374,7 +374,7 @@ CMDRUNP( oscore )
 
     }
 
-    buf << dlprintf( "У тебя %d очков опыта, и %s\n\r",
+    buf << dlprintf( "У тебя {W%d{x очков опыта, и %s\n\r",
                   ch->exp.getValue( ),
                   show_money( ch->gold, ch->silver ).c_str( ) );
 
@@ -388,7 +388,7 @@ CMDRUNP( oscore )
         int qtime = qd ? qd->getTime( ) : 0;
         bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
         
-        buf << fmt( 0, "У тебя {W%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
+        buf << fmt( 0, "У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
                        pch->getQuestPoints() );
         if (qtime == 0)
             buf << "У тебя сейчас нет задания.";
@@ -399,20 +399,33 @@ CMDRUNP( oscore )
 
         buf << endl;
 
-        if (ch->getProfession( ) != prof_samurai)
-            buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
-        else 
-            buf << fmt(0, "Тебя убили уже %1$d ра%1$Iз|за|з.", ch->getPC()->death.getValue());
-	    
-        if (ch->getPC()->guarding != 0)
-            buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+        bool newline = false;
 
-        if (ch->getPC()->guarded_by != 0)
+        if (ch->getProfession( ) != prof_samurai) {
+            if (ch->wimpy > 0) {
+                buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
+                newline = true;
+            }
+        } else {
+            buf << fmt(0, "Тебя убили уже {r%1$d{x ра%1$Iз|за|з.", ch->getPC()->death.getValue());
+            newline = true;
+        }
+	    
+        if (ch->getPC()->guarding != 0) {
+            buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+            newline = true;
+        }
+
+        if (ch->getPC()->guarded_by != 0) {
             buf << dlprintf( "Ты охраняешься: %s.", ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
+            newline = true;
+        }
         
-        buf << endl;
+        if (newline)
+            buf << endl;
     }
 
+    // Report current desire status, as progress bar or percents.
     if (!ch->is_npc( )) {
         ostringstream dbuf;
 
@@ -426,7 +439,7 @@ CMDRUNP( oscore )
         }
 
         if (!dbuf.str( ).empty( ))
-            buf << dbuf.str( ); 
+            buf << dbuf.str( ) << endl;
     }
     
     buf << msgtable_lookup( msg_positions, ch->position );
@@ -437,12 +450,12 @@ CMDRUNP( oscore )
     buf << endl;
 
     /* print AC values */
-    buf << dlprintf( "Защита от укола %d, от удара %d, от разрезания %d, от экзотики %d.\n\r",
+    buf << dlprintf( "Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r",
             GET_AC(ch,AC_PIERCE),
             GET_AC(ch,AC_BASH),
             GET_AC(ch,AC_SLASH),
             GET_AC(ch,AC_EXOTIC));
-    buf << dlprintf( "{lRТочность{lEHitroll{lx: %d  {lRУрон{lEDamroll{lx: %d  {lRЗащита от заклинаний{lESaves vs Spell{lx: %d\n\r",
+    buf << dlprintf( "{lRТочность{lEHitroll{lx: {C%d{x  {lRУрон{lEDamroll{lx: {C%d{x  {lRЗащита от заклинаний{lESaves vs Spell{lx: {C%d{x\n\r",
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
     buf << dlprintf( "У тебя %s характер.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
@@ -1781,17 +1794,21 @@ CMDRUNP( score )
         CLR_FRAME);
     }
 
+    // Report only active desires in 'score'.
     for (int i = 0; i < desireManager->size( ); i++) {
-        ostringstream buf;
+        Desire *desire = desireManager->find(i);
+        if (desire->isActive(ch->getPC())) {
+            ostringstream buf;
         
-        desireManager->find( i )->report( ch->getPC( ), buf );
+            desire->report(ch->getPC(), buf);
 
-        if (!buf.str( ).empty( )) {
-            ekle = 1;
-            ch->printf( "     %s| {w%-64s%s|\r\n", 
-                        CLR_FRAME,
-                        buf.str( ).c_str( ),
-                        CLR_FRAME );
+            if (!buf.str( ).empty( )) {
+                ekle = 1;
+                ch->printf( "     %s| {w%-64s%s|\r\n", 
+                            CLR_FRAME,
+                            buf.str( ).c_str( ),
+                            CLR_FRAME );
+            }
         }
     }
 
