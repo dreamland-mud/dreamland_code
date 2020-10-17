@@ -482,8 +482,7 @@ CMDRUNP( oscore )
         if (ch->getReligion( ) == god_none)
             buf << "Ты не веришь в бога.  ";
         else
-            buf << dlprintf( "Твоя религия: {C%s{x.  ",
-                        ch->getReligion( )->getShortDescr( ).c_str( ) );
+            buf << dlprintf( "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
         buf << dlprintf("Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
 
