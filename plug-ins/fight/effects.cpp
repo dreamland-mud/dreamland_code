@@ -74,6 +74,13 @@ using std::max;
 DESIRE(thirst);
 DESIRE(hunger);
 
+/** Display decay message for items in inventory/eq or on the floor. */
+static void show_effect_message(Object *obj, const DLString &msg)
+{
+    if (obj->carried_by || obj->in_room)
+        obj->getRoom()->echo(POS_RESTING, msg.c_str(), obj);
+}
+
 void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_flag )
 {
         if ( target == TARGET_ROOM ) /* nail objects on the floor */
@@ -134,25 +141,25 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 case ITEM_CONTAINER:
                 case ITEM_CORPSE_PC:
                 case ITEM_CORPSE_NPC:
-                        msg = "$o1 дымится и медлено растворяется.";
+                        msg = "%1$^O1 дым%1$nится|ятся и медленно растворя%1$nется|ются.";
                         break;
                 case ITEM_ARMOR:
-                        msg = "$o1 {gпокрывается {yокалиной.{x";
+                        msg = "%1$^O1 {gпокрыва%1$nется|ются {yокалиной.{x";
                         break;
                 case ITEM_CLOTHING:
-                        msg = "$o1 рассыпается на клочки.";
+                        msg = "%1$^O1 рассыпа%1$nется|ются на клочки.";
                         break;
                 case ITEM_STAFF:
                 case ITEM_WAND:
                         chance -= 10;
-                        msg = "$o1 переламывается пополам.";
+                        msg = "%1$^O1 переламыва%1$nется|ются пополам.";
                         break;
                 case ITEM_SCROLL:
                 case ITEM_SPELLBOOK:
                 case ITEM_TEXTBOOK:
                 case ITEM_RECIPE:
                         chance += 10;
-                        msg = "$o1 обращается в пепел.";
+                        msg = "%1$^O1 обраща%1$nется|ются в пепел.";
                         break;
                 }
 
@@ -161,10 +168,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 if ( number_percent() > chance )
                         return;
 
-                if ( obj->carried_by != 0 )
-                        act_p(msg,obj->carried_by,obj,0,TO_ALL,POS_RESTING);
-                else if ( obj->in_room != 0 && obj->in_room->people != 0 )
-                        act(msg,obj->in_room->people,obj,0,TO_ALL);
+                show_effect_message(obj, msg);
 
                 if ( obj->item_type == ITEM_ARMOR )  /* etch it */
                 {
@@ -305,11 +309,11 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             default:
                 return;
             case ITEM_POTION:
-                msg = "$o1 покрывается инеем и взрывается!";
+                msg = "%1$^O1 покрыва%1$nется|ются инеем и взрыва%1$nется|ются!";
                 chance += 25;
                 break;
             case ITEM_DRINK_CON:
-                msg = "$o1 покрывается инеем и взрывается!";
+                msg = "%1$^O1 покрыва%1$nется|ются инеем и взрыва%1$nется|ются!";
                 chance += 5;
                 break;
         }
@@ -319,10 +323,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         if (number_percent() > chance)
             return;
 
-        if (obj->carried_by != 0)
-            act_p(msg,obj->carried_by,obj,0,TO_ALL,POS_RESTING);
-        else if (obj->in_room != 0 && obj->in_room->people != 0)
-            act_p(msg,obj->in_room->people,obj,0,TO_ALL,POS_RESTING);
+        show_effect_message(obj, msg);
 
         extract_obj(obj);
         return;
@@ -410,7 +411,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 
         if  (material_is_flagged( obj, MAT_MELTING ))  {
           chance += 30;
-          msg = "$o1 тает и испаряется!";
+          msg = "%1$^O1 та%1$nет|ют и испаря%1$nется|ются!";
         }
         else
         switch ( obj->item_type )
@@ -418,11 +419,11 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         default:
             return;
         case ITEM_CONTAINER:
-            msg = "$o1 вспыхивает ярким пламенем и сгорает!";
+            msg = "%1$^O1 вспыхива%1$nет|ют ярким пламенем и сгора%1$nет|ют!";
             break;
         case ITEM_POTION:
             chance += 25;
-            msg = "$o1 закипает и взрывается!";
+            msg = "%1$^O1 закипа%1$nет|ют и взрыва%1$nется|ются!";
             break;
         case ITEM_SCROLL:
         case ITEM_PARCHMENT:
@@ -430,20 +431,20 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         case ITEM_RECIPE:
         case ITEM_TEXTBOOK:
             chance += 50;
-            msg = "$o1 трескается и сгорает!";
+            msg = "%1$^O1 треска%1$nется|ются и сгора%1$nет|ют!";
             break;
         case ITEM_STAFF:
             chance += 10;
-            msg = "$o1 дымится и обугливается!";
+            msg = "%1$^O1 дым%1$nится|ятся и обуглива%1$nется|ются!";
             break;
         case ITEM_WAND:
-            msg = "$o1 искрится и шипит!";
+            msg = "%1$^O1 искр%1$nится|ятся и шип%1$nит|ят!";
             break;
         case ITEM_FOOD:
-            msg = "$o1 зажаривается и чернеет!";
+            msg = "%1$^O1 зажарива%1$nется|ются и черне%1$nет|ют!";
             break;
         case ITEM_PILL:
-            msg = "$o1 тает!";
+            msg = "%1$^O1 та%1$nет|ют!";
             break;
         }
 
@@ -452,10 +453,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         if (number_percent() > chance)
             return;
 
-        if (obj->carried_by != 0)
-            act_p( msg, obj->carried_by, obj, 0, TO_ALL,POS_RESTING);
-        else if (obj->in_room != 0 && obj->in_room->people != 0)
-            act_p(msg,obj->in_room->people,obj,0,TO_ALL,POS_RESTING);
+        show_effect_message(obj, msg);
 
         if (obj->contains)
         {
@@ -650,11 +648,11 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
            case ITEM_WAND:
            case ITEM_STAFF:
                 chance += 10;
-                msg = "$o1 с треском взрывается!";
+                msg = "%1$^O1 с треском взрыва%1$nется|ются!";
                 break;
            case ITEM_JEWELRY:
                 chance -= 10;
-                msg = "$o1 плавится.";
+                msg = "%1$^O1 плав%1$nится|ятся.";
         }
         
         chance = URANGE(5,chance,95);
@@ -662,10 +660,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         if (number_percent() > chance)
             return;
 
-        if (obj->carried_by != 0)
-            act_p(msg,obj->carried_by,obj,0,TO_ALL,POS_RESTING);
-        else if (obj->in_room != 0 && obj->in_room->people != 0)
-            act_p(msg,obj->in_room->people,obj,0,TO_ALL,POS_RESTING);
+        show_effect_message(obj, msg);
 
         extract_obj(obj);
         return;
@@ -753,29 +748,29 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 case ITEM_CORPSE_PC:
                 case ITEM_CORPSE_NPC:
                         chance += 50;
-                        msg = "$o1 наполняется песком и исчезает.";
+                        msg = "%1$^O1 наполня%1$nется|ются песком и исчеза%1$nет|ют.";
                         break;
                 case ITEM_ARMOR:
                         chance -=10;
-                        msg = "$o1 царапается песком.";
+                        msg = "%1$^O1 царапа%1$nется|ются песком.";
                         break;
                 case ITEM_CLOTHING:
-                        msg = "$o1 разрывается песком.";
+                        msg = "%1$^O1 разрыва%1$nется|ются песком.";
                         break;
                 case ITEM_WAND:
                         chance = 50;
-                        msg = "$o1 рассыпается в пыль.";
+                        msg = "%1$^O1 рассыпа%1$nется|ются в пыль.";
                         break;
                 case ITEM_SCROLL:
                 case ITEM_SPELLBOOK:
                 case ITEM_RECIPE:
                 case ITEM_TEXTBOOK:
                         chance += 20;
-                        msg = "$o1 покрывается слоем песка.";
+                        msg = "%1$^O1 покрыва%1$nется|ются слоем песка.";
                         break;
                 case ITEM_POTION:
                         chance +=10;
-                        msg = "$o1 разбивается на кусочки под ударом песка.";
+                        msg = "%1$^O1 разбива%1$nется|ются на кусочки под ударом песка.";
                         break;
                 }
 
@@ -784,10 +779,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 if ( number_percent() > chance )
                         return;
 
-                if ( obj->carried_by != 0 )
-                        act_p(msg,obj->carried_by,obj,0,TO_ALL,POS_RESTING);
-                else if ( obj->in_room != 0 && obj->in_room->people != 0 )
-                        act_p(msg,obj->in_room->people,obj,0,TO_ALL,POS_RESTING);
+                show_effect_message(obj, msg);
 
                 if ( obj->item_type == ITEM_ARMOR )  /* etch it */
                 {
@@ -935,13 +927,13 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 if  (material_is_flagged( obj, MAT_MELTING ))  
                 {
                         chance += 30;
-                        msg = "$o1 разбивается и испаряется!";
+                        msg = "%1$^O1 разбива%1$nется|ются и испаря%1$nется|ются!";
                 }
                 else
                 if  (material_is_flagged( obj, MAT_FRAGILE ))  
                 {
                         chance += 30;
-                        msg = "$o1 разлетается на множество мелких осколков";
+                        msg = "%1$^O1 разлета%1$nется|ются на множество мелких осколков";
                 }
                 else
                 switch ( obj->item_type )
@@ -950,21 +942,21 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                                 return;
                         case ITEM_POTION:
                                 chance += 25;
-                                msg = "$o1 разбивается и содержимое выливается на землю!";
+                                msg = "%1$^O1 разбива%1$nется|ются и содержимое выливается на землю!";
                                 break;
                         case ITEM_SCROLL:
                         case ITEM_SPELLBOOK:
                         case ITEM_RECIPE:
                         case ITEM_TEXTBOOK:
                                 chance += 50;
-                                msg = "$o1 разрывается на клочки!";
+                                msg = "%1$^O1 разрыва%1$nется|ются на клочки!";
                                 break;
                         case ITEM_DRINK_CON:
-                                msg = "$o1 разбивается и содержимое выливается на землю!";
+                                msg = "%1$^O1 разбива%1$nется|ются и содержимое выливается на землю!";
                                 chance += 5;
                                 break;
                         case ITEM_PILL:
-                                msg = "$o1 разлетается на мелкие кусочки!";
+                                msg = "%1$^O1 разлета%1$nется|ются на мелкие кусочки!";
                                 break;
                 }
 
@@ -973,10 +965,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 if (number_percent() > chance)
                         return;
 
-                if (obj->carried_by != 0)
-                        act_p( msg, obj->carried_by, obj, 0, TO_ALL,POS_RESTING);
-                else if (obj->in_room != 0 && obj->in_room->people != 0)
-                        act_p(msg,obj->in_room->people,obj,0,TO_ALL,POS_RESTING);
+                show_effect_message(obj, msg);
 
                 if (obj->contains)
                 {
