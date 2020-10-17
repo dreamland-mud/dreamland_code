@@ -251,7 +251,7 @@ void Thunderbolt::fight( Character *ch )
             dam = dice(level,4) + 12;
             if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
                 dam /= 2;
-            damage( ch, victim, dam, gsn_lightning_bolt, DAM_LIGHTNING , false, DAMF_SPELL);
+            damage_nocatch( ch, victim, dam, gsn_lightning_bolt, DAM_LIGHTNING , false, DAMF_SPELL);
             break;
         }
     }
@@ -282,9 +282,7 @@ int dam;
                 ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
         act_p( "Перчатки $C2 обжигают твое лицо!",
                 ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
-        damage( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
-        if ( ch == 0 || ch->fighting == 0 )
-          return;
+        damage_nocatch( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam/2, TARGET_CHAR );
     }
 }
@@ -319,9 +317,7 @@ int dam;
                 ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
         act_p( "Нарукавники $C2 обжигают тебя!",
                 ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
-        damage( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
-        if ( ch == 0 || ch->fighting == 0 )
-          return;
+        damage_nocatch( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam, TARGET_CHAR );
   }
   return;
@@ -357,9 +353,7 @@ int dam;
         act_p( "Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
         act_p( "Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
 
-        damage( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
-        if ( ch == 0 || ch->fighting == 0 )
-          return;
+        damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level,dam, TARGET_CHAR );
   }
   return;
@@ -491,10 +485,10 @@ void LionClaw::fight( Character *ch )
      act_p("{WКогти на мгновение показались из Львиной Лапы $c2.{x",
                 ch,0,0,TO_ROOM,POS_DEAD);
      
-     one_hit(ch, ch->fighting, secondary);
-     one_hit(ch, ch->fighting, secondary);
-     one_hit(ch, ch->fighting, secondary);
-     one_hit(ch, ch->fighting, secondary);
+     one_hit_nocatch(ch, ch->fighting, secondary);
+     one_hit_nocatch(ch, ch->fighting, secondary);
+     one_hit_nocatch(ch, ch->fighting, secondary);
+     one_hit_nocatch(ch, ch->fighting, secondary);
     
      return;
    }

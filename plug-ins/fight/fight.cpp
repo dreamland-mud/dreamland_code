@@ -165,12 +165,16 @@ void violence_update( )
         ch->setLastFightTime( );
         UNSET_DEATH_TIME(ch);
 
-        for( obj = ch->carrying; obj; obj = obj_next )
-        {
-            obj_next = obj->next_content;
+        // Item fight progs (in behaviors) will throw exception if victim is killed.
+        try {
+            for (obj = ch->carrying; obj; obj = obj_next) {
+                obj_next = obj->next_content;
 
-            if( ch->fighting && obj_is_worn(obj))
-                oprog_fight( obj, ch );
+                if( ch->fighting && obj_is_worn(obj))
+                    oprog_fight( obj, ch );
+            }
+        } catch (const VictimDeathException &vde) {
+            continue;
         }
 
         /*
