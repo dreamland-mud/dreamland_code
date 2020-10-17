@@ -50,10 +50,69 @@ bool DefaultDesire::canEat( PCharacter *ch )
     return true;
 }
 
+/** Display current desire status as 0..10 coloured dots. */
+DLString DefaultDesire::showDots(PCharacter *ch) const
+{
+    ostringstream dots;
+    int maxDots = 10;
+    int current = ch->desires[getIndex( )];
+    int progress = current * maxDots / maxValue;
+    progress = URANGE(1, progress, maxDots);
+
+    char color = progress <= 4 ? 'R' : progress <= 7 ? 'Y' : 'G';
+    dots << "{" << color;
+
+    int i;
+    for (i = 1; i <= progress; i++)
+        dots << "*";
+    for (; i <= maxDots; i++)
+        dots << " ";
+
+    dots << "{x";
+
+    return dots.str();
+}
+
+/** Display current desire status as X%. */
+DLString DefaultDesire::showPercent(PCharacter *ch) const
+{
+    ostringstream buf;
+    int current = ch->desires[getIndex( )];
+    int progress = current * 100 / maxValue;
+    progress = URANGE(1, progress, 100);
+
+    char color = progress <= 40 ? 'R' : progress <= 70 ? 'Y' : 'G';
+
+    buf << "{" << color << progress << "%{w";
+    return buf.str();
+}
+
 void DefaultDesire::report( PCharacter *ch, ostringstream &buf )
 {
-    if (isActive( ch ) && !msgReport.empty( ))
+    if (!applicable(ch))
+        return;
+        
+    if (msgReport.empty())
+        return;
+
+    // Show simple text message when the desire is activated, e.g. "You're hungry."
+    if (isActive(ch)) {
         buf << fmt( NULL, msgReport.c_str( ), ch );
+        return;
+    }
+
+    if (what.empty())
+        return;
+
+    // Draw player desire status as progress bar or percents.
+    buf << "Насыщение " << what.ruscase('5') << " ";
+
+    if (IS_SET(ch->config, CONFIG_SCREENREADER))
+        buf << showPercent(ch);
+    else
+        buf << "[" << showDots(ch) << "]";
+
+    buf << ".";
 }
 
 bool DefaultDesire::isActive( PCharacter *ch )
