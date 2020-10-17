@@ -84,15 +84,15 @@ static void loot_transform( Object *obj, Character *ch )
         break;
     case ITEM_WEAPON:
         if (ch->is_npc( ))
-            obj->condition = number_range( 30, 80 );
+            obj->condition = min(obj->condition, number_range( 30, 80 ));
         break;
     case ITEM_ARMOR:
         if (ch->is_npc( ))
-            obj->condition = number_range( 10, 70 );
+            obj->condition = min(obj->condition, number_range( 10, 70 ));
         break;
     case ITEM_FOOD:
         if (ch->is_npc( ))
-            obj->condition = number_range( 10, 50 );
+            obj->condition = min(obj->condition, number_range( 10, 50 ));
         break;
     }
 }
