@@ -105,7 +105,7 @@ SKILL_RUNP( track )
                     if (oprog_track(obj, ch, arg.c_str(), d))
                         return;
 
-                ch->pecho("Следы %s ведут %s.", arg.c_str(), dirs[d].leave);
+                ch->pecho("Следы %N2 ведут %s.", arg.c_str(), dirs[d].leave);
                 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) 
                     open_door_extra( ch, d, pexit );

@@ -30,11 +30,12 @@ class Affect;
 typedef map<DLString, DLString> Properties;
 
 struct RoomHistoryEntry {
-    RoomHistoryEntry( DLString n, int w )
-            : name( n ), went( w )
+    RoomHistoryEntry( DLString n, DLString rn, int w )
+            : name( n ), rname(rn), went( w )
     {
     }
     DLString name;
+    DLString rname;
     int went;
 };
 
