@@ -343,7 +343,7 @@ CMDRUNP( brandish )
 
     staff->value2(staff->value2() - 1);
     if (staff->value2() <= 0) {
-        ch->recho( "%1$O1 %2$C2 темне%1$nет|ют и исчеза%1$nет|ют.", staff, ch );
+        ch->recho( "%1$^O1 %2$C2 темне%1$nет|ют и исчеза%1$nет|ют.", staff, ch );
         ch->pecho( "Тво%1$Gе|й|я|и %1$O1 темне%1$nет|ют и исчеза%1$nет|ют.", staff );
         extract_obj( staff );
     }
@@ -470,7 +470,7 @@ CMDRUNP( zap )
 
     wand->value2(wand->value2() - 1);
     if (wand->value2() <= 0) {
-        ch->recho( "%1$O1 %2$C2 развалива%1$nется|ются на куски.", wand, ch );
+        ch->recho( "%1$^O1 %2$C2 развалива%1$nется|ются на куски.", wand, ch );
         ch->pecho( "Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски.", wand );
         extract_obj( wand );
     }
