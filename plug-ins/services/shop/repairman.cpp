@@ -14,13 +14,13 @@
 
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "skillreference.h"
 
 #include "act.h"
 #include "interp.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "vnum.h"
@@ -97,7 +97,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     
     cost = getRepairCost( obj );
 
-    if (cost > client->gold) {
+    if (cost > client->gold) { // TODO take silver into account.
         say_act( client, ch, "У тебя не хватит денег, чтоб оплатить ремонт этой вещи.");
         return;
     }
@@ -179,14 +179,20 @@ bool Repairman::canRepair( Object *obj, Character *client )
     }
 
     if (obj->condition >= 100) {
-        say_fmt( "%2$^O1 не нужда%2$nется|ются в ремонте.", ch, obj );
+        say_fmt( "{1%2$^O1{2 не нужда%2$nется|ются в ремонте.", ch, obj );
         return false;
     }
 
     if (obj->cost == 0) {
-        say_fmt( "%2$^O1 ничего не стоит, а значит я не смогу оценить починку.", ch, obj );
-        say_act( client, ch, "Ты случайно не из ямы для пожертвований ее вытащил{Sfа{Sx?");        
-           return false;
+        say_fmt( "{1%2$^O1{2 ничего не стоит, а значит я не смогу оценить починку.", ch, obj );
+        say_fmt( "Ты, случайно, не из ямы для пожертвований %2$P2 вытащил%3$Gо||а?", ch, obj, client);
+        return false;
+    }
+
+    if (IS_OBJ_STAT(obj, ITEM_NODROP)) {
+        say_fmt("Ты не сможешь передать мне {1%2$O4{2 для починки.", ch, obj);
+        say_fmt("Попробуй сперва избавить эту вещь от проклятия.", ch);
+        return false;
     }
 
     return true;
