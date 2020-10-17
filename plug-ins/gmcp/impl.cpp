@@ -12,6 +12,7 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "directions.h"
+#include "door_utils.h"
 #include "stats_apply.h"
 #include "loadsave.h"
 #include "telnet.h"
@@ -20,7 +21,6 @@
 #include "so.h"
 #include "def.h"
 
-static const char *dir_name[] = {"n","e","s","w","u","d"};
 static const char C_IAC = static_cast<char>(IAC);
 static const char C_SB = static_cast<char>(SB);
 static const char C_GMCP  = static_cast<char>(GMCP);
@@ -96,7 +96,7 @@ GMCPCOMMAND_RUN(charToRoom)
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         Room *room = direction_target(ch->in_room, door);
         if (room && ch->can_see(room)) 
-            data["exits"][DLString(dir_name[door])] = room->vnum;
+            data["exits"][DLString(dir_name_small[door])] = room->vnum;
     }
 
     send(args.d, "Room", "Info", json_to_string(data));
