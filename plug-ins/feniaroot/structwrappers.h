@@ -278,10 +278,10 @@ public:
     SkillWrapper() { }
     SkillWrapper(const DLString &);            
     virtual void setSelf(Scripting::Object *) { }
+    Skill * getTarget() const;
     
 protected:
     XML_VARIABLE XMLString name;
-    Skill * getTarget() const;
 };
 
 class FeniaSkill : public PluginNativeImpl<FeniaSkill>, 

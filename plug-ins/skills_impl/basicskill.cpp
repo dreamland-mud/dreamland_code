@@ -91,6 +91,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 {
     PCharacter *pch;
     int chance, xp;
+    const Skill *thiz = static_cast<const Skill *>(this);
     
     if (ch->is_npc( ))
         return;
@@ -158,9 +159,8 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         
         if (number_percent( ) >= chance)
             return;
-            
-        act_p("{GТеперь ты гораздо лучше владеешь искусством '$t'!{x",
-                pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+
+        pch->pecho("{GТеперь ты гораздо лучше владеешь искусством '%K'!{x", thiz);
             
         data.learned++;
     }
@@ -175,8 +175,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         if (number_percent( ) >= chance)
             return;
 
-        act_p("{GТы учишься на своих ошибках, и твое умение '$t' совершенствуется.{x",
-                pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+        pch->pecho("{GТы учишься на своих ошибках, и твое умение '%K' совершенствуется.{x", thiz);
         
         data.learned += number_range( 1, wis_mod );
         data.learned = min( (int)data.learned, getMaximum( pch ) );
@@ -189,8 +188,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         xp += data.learned / 4;
 
     if (data.learned >= getMaximum( pch )) {
-        act_p("{WТеперь ты {Cмастерски{W владеешь искусством {C$t{W!{x",
-              pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+        pch->pecho("{WТеперь ты {Cмастерски{W владеешь искусством {C%K{W!{x", thiz);
         
         xp += 98 * getRating( pch );
     }
