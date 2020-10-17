@@ -1723,35 +1723,17 @@ VOID_SPELL(RulerAura)::run( Character *ch, Character *, int sn, int level )
 
     if (!ch->isAffected(sn))
     {
-      ch->send_to("Теперь ты чувствуешь себя более информированным, правя Миром.\n\r");
+      ch->pecho("Теперь ты чувствуешь себя более информированн%Gым|ым|ой, правя Миром.", ch);
 
-      af.where = TO_IMMUNE;
+      af.where    = TO_DETECTS;
       af.type = sn;
       af.duration = level / 4;
       af.level = ch->getModifyLevel();
-      af.bitvector = IMM_CHARM;
-      af.location = 0;
-      af.modifier = 0;
+      af.bitvector = DETECT_FADE | ACUTE_VISION | DETECT_IMP_INVIS | DETECT_INVIS | DETECT_HIDDEN;
       affect_to_char(ch, &af);
-
-
-      af.where                = TO_DETECTS;
-      af.modifier = ch->applyCurse( level / 8 );
-      af.location = APPLY_NONE;
-      af.bitvector = DETECT_FADE;
-      affect_to_char(ch, &af);
-
-      af.where     = TO_DETECTS;
-      af.location  = APPLY_NONE;
-      af.modifier  = 0;
-      af.bitvector = ACUTE_VISION;
-      affect_to_char( ch, &af );
-
     }
   else
       ch->send_to("Ты и так уже знаешь многое в этом мире, неподвластное другим.\n\r");
- return;
-
 }
 
 
