@@ -13,6 +13,10 @@
 #include "merc.h"
 #include "mercdb.h"
 
+const char SKILL_HEADER_BG = 'W';
+const char SKILL_HEADER_FG = 'Y';
+const char *SKILL_INFO_PAD = "  {W*{x ";
+
 GROUP(none);
 GROUP(fightmaster);
 GROUP(defensive);
@@ -133,9 +137,52 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
     return 'x';
 }
 
-void print_wait_and_mana(const Skill *skill, Character *ch, ostream &buf)
+DLString print_names_for(const Skill *skill, Character *ch)
 {
-    bool empty = true;
+    bool rus = ch->getConfig( ).ruskills;
+    const char *format = "'{%c%s{%c' или '{%c%s{%c'";
+
+    if (rus)
+        return fmt(0, format, 
+            SKILL_HEADER_FG, skill->getRussianName().c_str(), SKILL_HEADER_BG, 
+            SKILL_HEADER_FG, skill->getName().c_str(), SKILL_HEADER_BG);
+    else
+        return fmt(0, format, 
+            SKILL_HEADER_FG, skill->getName().c_str(), SKILL_HEADER_BG, 
+            SKILL_HEADER_FG, skill->getRussianName().c_str(), SKILL_HEADER_BG);
+}
+
+DLString print_what(const Skill *skill)
+{
+    ostringstream buf;
+
+    buf << "{" << SKILL_HEADER_BG
+        << skill_what(skill).ruscase('1').upperFirstCharacter();
+
+    return buf.str();
+}
+
+DLString print_group_for(const Skill *skill, Character *ch)
+{
+    ostringstream buf;
+    SkillGroupReference &group = const_cast<Skill *>(skill)->getGroup();
+
+    if (group != group_none)
+        buf << "{" << SKILL_HEADER_BG << ", входит в группу "
+            << "'{hg{" << SKILL_HEADER_FG << group->getNameFor(ch) << "{hx"
+            << "{" << SKILL_HEADER_BG << "'{x";
+
+    return buf.str();
+}
+
+DLString print_wait_and_mana(const Skill *skill, Character *ch)
+{
+    const char *pad = SKILL_INFO_PAD;
+    bool empty = true; // Contains any meaningful output besides padding and new lines?
+    ostringstream buf;
+
+    buf << pad;
+
     int beat = skill->getBeats() / dreamland->getPulsePerSecond();
     if (beat > 0) {
         buf << fmt(0, "Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. ", beat);
@@ -157,31 +204,20 @@ void print_wait_and_mana(const Skill *skill, Character *ch, ostream &buf)
     if (!empty)
         buf << endl;
     
-    empty = true;
-
     if (spell && spell->isCasted() && spell->getTarget() != 0) {
-        buf << "Целью служит {W" << target_table.messages(spell->getTarget(), true) << "{x. ";
+        buf << pad << "Целью служит {W" << target_table.messages(spell->getTarget(), true) << "{x. " << endl;
         empty = false;
     }
 
     // TODO: expose spell position and show it here.
     // TODO: show if it's ranged or not.
-    if (!empty)
-        buf << endl;
+
+    if (empty) 
+        return DLString::emptyString;
+
+    return buf.str();
 }
 
-void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf) 
-{
-    SkillGroupReference &group = (const_cast<Skill *>(skill))->getGroup( );
-
-    // 'См. также справка|help травы|herbs' - с гипер-ссылкой на справку.
-    // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
-    buf << endl << "См. также {W{lRсправка{lEhelp{lx {hh" << skill->getNameFor(ch) << "{x";
-    if (group != group_none)
-       buf << " и команду {y{hc{lRгруппаум{lEglist{lx " << group->getNameFor(ch) << "{x";
-    buf << "." << endl;
-}
-  
 bool skill_is_spell(const Skill *skill)
 {
     return skill->getSpell( ) && skill->getSpell( )->isCasted( );

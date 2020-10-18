@@ -128,7 +128,7 @@ void CPractice::pracShow( PCharacter *ch )
         
         category = cm_iter->first;
         category.upperFirstCharacter( );
-        buf << "{Y" << category << ":{x" << endl;
+        buf << "{W" << category << ":{x" << endl;
         
         for (i = 0; i < cm_iter->second.size( ); i++) {
             info = cm_iter->second[i];

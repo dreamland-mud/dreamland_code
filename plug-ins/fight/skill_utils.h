@@ -33,13 +33,17 @@ Skill * skillref_to_pointer(const XMLSkillReference &);
  */
 char skill_learned_colour(const Skill *, PCharacter *ch);
 
-/**
- * Print line 'See also help <skill>' to the buffer.
- */
-void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf);
+/** Return rus and eng names for the skill, ordered according to 'config ruskill'. */
+DLString print_names_for(const Skill *skill, Character *ch);
 
-/** Print wait state and mana cost for a skill. */
-void print_wait_and_mana(const Skill *skill, Character *ch, ostream &buf);
+/** Return "Skill" or "Spell" string for the help header. */
+DLString print_what(const Skill *skill);
+
+/** Return skill group name with a hyper-link. */
+DLString print_group_for(const Skill *skill, Character *ch);
+
+/** Print wait state, targets and mana cost for a skill. */
+DLString print_wait_and_mana(const Skill *skill, Character *ch);
 
 bool skill_is_spell(const Skill *skill);
 DLString skill_what(const Skill *skill);
@@ -64,5 +68,11 @@ int skill_level(Skill &skill, Character *ch);
  *  Return skill level bonus from affects with APPLY_LEVEL and TO_SKILLS.
  */
 int skill_level_bonus(Skill &skill, Character *ch);
+
+
+// Skill help formatting colours.
+extern const char SKILL_HEADER_BG;
+extern const char SKILL_HEADER_FG;
+extern const char *SKILL_INFO_PAD;
 
 #endif

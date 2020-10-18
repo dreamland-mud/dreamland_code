@@ -68,7 +68,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         buf << "        {y{lR" << rcmd << " сорт имя|уровень|изучено{lE" << cmd << " sort name|level|learned{lx{w: сортировать " << what << endl;
         buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <название группы>{w: все " << what << " из этой группы" << endl
             << "" << endl
-            << "См. также {W{lR? умения{lE? skills{lx{w, {W{lR? группаумений{lE? glist{lx{w." << endl;
+            << "См. также {W{lR? умения{lE? skills{lx{w." << endl;
 
         return false;
     }

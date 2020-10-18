@@ -28,7 +28,7 @@ PROF(vampire);
 HOMETOWN(frigate);
 GROUP(none);
 
-const DLString GenericSkill::CATEGORY = "Профессиональные умения";
+const DLString GenericSkill::CATEGORY = "Классовые умения";
 
 GenericSkill::GenericSkill( ) 
                 : raceAffect( 0, &affect_flags ),
@@ -218,7 +218,7 @@ int GenericSkill::getLevel( Character *ch ) const
 }
 
 /*
- * Для чаров возвращает процент разученности скила, с учетом всех скилов-предков.
+ * Для чаров возвращает процент разученности скила.
  * Для мобов возвращает dice * level + bonus
  */
 int GenericSkill::getLearned( Character *ch ) const
@@ -245,11 +245,7 @@ int GenericSkill::getLearned( Character *ch ) const
     return learnedAux( pch, adept );
 }
 
-/*
- * вспомогательная процедура для getLearned
- * находит минимально разученный скил среди всех предков
- * (без учета скилов, разученных > 75 или совпадающих с расовыми аффектами)
- */
+/* TODO: is this aux method still required? */
 int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
 {
     const SkillRaceBonus *rb;
@@ -331,34 +327,28 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
     if (verbose)
         ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-               "Для большей информации используй команду {y{hc{lRумение %2$s{lEslook %2$s{x.",
+               "Учителя можно найти, прочитав справку по этому умению.",
                mob, getNameFor( ch ).c_str( ) );
     return false;
 }
 
 /*
- * Печатает разную инфу: группу, цену в s.p., дерево предков, список потомков etc
- * Используется в showskill.
+ * Печатает разную инфу: группу, затраты на выполнение, раскачку, где учить.
+ * Используется в showskill и в справке по умению.
  */
 void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
-    const DLString what = skill_what(this).ruscase('1');
-    SkillGroupReference &group = const_cast<GenericSkill *>(this)->getGroup();
+    const char *pad = SKILL_INFO_PAD;
 
-    buf << what.upperFirstCharacter()
-        << " '{c" << getName( ) << "{x' или"
-        << " '{c" << getRussianName( ) << "{x'";
-    if (group != group_none)
-        buf << ", входит в группу '{hg{c" << group->getNameFor(ch) << "{x'";
-    buf << "." << endl;
-    
-    print_wait_and_mana(this, ch, buf);            
-    buf << endl;
-    
+    buf << print_what(this) << " "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl
+        << print_wait_and_mana(this, ch);
+
     if (!visible( ch )) {
         if (!classes.empty())
-            buf << "Недоступно для твоей профессии." << endl;
-        print_see_also(this, ch, buf);
+            buf << pad << "Недоступно для твоей профессии." << endl;
         return;
     }
 
@@ -366,19 +356,18 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
     int percent = data.learned;
     if (temporary_skill_active(this, ch)) {
         if (data.origin == SKILL_DREAM)
-            buf << "Приснилось тебе";
+            buf << pad << "Приснилось тебе";
         else
-            buf << "Досталось тебе";
+            buf << pad << "Досталось тебе";
         buf << " разученное до {C" << percent << "%{x"
             << skill_effective_bonus(this, ch) << "." << endl;
-        print_see_also(this, ch, buf);
         return;
     }
 
     if (!available(ch)) {
-        buf << "Станет доступно тебе на уровне {C" << getLevel(ch) << "{x." << endl;
+        buf << pad << "Станет доступно тебе на уровне {C" << getLevel(ch) << "{x." << endl;
     } else {
-        buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x, ";
+        buf << pad << "Доступно тебе с уровня {C" << getLevel(ch) << "{x, ";
         if (percent < 2) 
             buf << "пока не изучено";
         else 
@@ -386,25 +375,26 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         
         buf << skill_effective_bonus(this, ch) << "." << endl;
     }
-    
+
+    const DLString what = skill_what(this).ruscase('1');
+    SkillGroupReference &group = const_cast<GenericSkill *>(this)->getGroup();
+
     if (group->getPracticer() == 0) {
         // '...в твоей гильдии' - с гипер-ссылкой на справку.
-        buf << "Это " << what << " можно выучить в твоей {g{hh44гильдии{x." << endl;
+        buf << pad << "Это " << what << " можно выучить в твоей {g{hh44гильдии{x." << endl;
     } else {
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
         MOB_INDEX_DATA *pMob = get_mob_index(group->getPracticer());
         if (pMob)
-            buf << "Это " << what << " можно выучить у "
+            buf << pad << "Это " << what << " можно выучить у "
                 << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "
                 << "(зона {g{hh" << pMob->area->name << "{x)." << endl;
     }
     
     if (ch->getHometown() == home_frigate)
-        buf << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
+        buf << pad << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
     else if (ch->getModifyLevel() < 20)
-        buf << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
-
-    print_see_also(this, ch, buf);
+        buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
 }
 
 /*

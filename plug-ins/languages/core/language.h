@@ -42,6 +42,9 @@ public:
     virtual DLString getTitle(const DLString &label) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
+
+protected:
+    virtual void getRawText( Character *, ostringstream & ) const;
 };
 
 inline const DLString & LanguageHelp::getType( ) const
