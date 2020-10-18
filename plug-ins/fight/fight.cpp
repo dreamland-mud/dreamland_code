@@ -159,8 +159,18 @@ void violence_update( )
             continue;
         }
 
-//        if ( !victim->is_npc() )
-          ch->last_fought = victim;
+        // If ch is fighting with a victim, ensure that the victim fights back.
+        if (victim->fighting == 0) {
+            set_fighting(victim, ch);
+
+            if (victim->fighting == ch) {
+                victim->pecho("Ты вступаешь в битву с %C5.", ch);
+                ch->pecho("%^C1 вступает с тобой в битву!", victim);
+                ch->recho(victim, "%^C1 вступает в битву с %C5.", victim, ch);
+            }
+        }
+
+        ch->last_fought = victim;
 
         ch->setLastFightTime( );
         UNSET_DEATH_TIME(ch);

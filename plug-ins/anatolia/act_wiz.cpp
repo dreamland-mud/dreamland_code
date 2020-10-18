@@ -2805,7 +2805,8 @@ CMDWIZP( peace )
             rch->act.removeBit(ACT_AGGRESSIVE);
     }
 
-    ch->send_to("Мир, дружба, жвачка.\n\r");
+    ch->pecho("Ты наполняешь комнату миром и спокойствием.");
+    ch->recho("%^C1 жестом прекращает войны и агрессию вокруг.", ch);
     return;
 }
 
@@ -4194,4 +4195,5 @@ extern "C"
         return ppl;
     }
 }
+
 
