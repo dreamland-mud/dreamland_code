@@ -74,7 +74,6 @@ Character * get_char_room( Character *ch, Room *room, const DLString &constArgum
 
 /*
  * Find a char in the room.
- * Chronos uses in act_move.c
  */
 Character *get_char_room( Character *ch, Room *room, const char *argument, int *number, bool fSeenOnly )
 {
