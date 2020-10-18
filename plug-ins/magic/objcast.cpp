@@ -50,6 +50,7 @@ CLAN(battlerager);
 GSN(scrolls);
 GSN(staves);
 GSN(wands);
+GSN(none);
 short get_wear_level( Character *ch, Object *obj );
 
 static bool oprog_quaff( Object *obj, Character *ch )
@@ -114,14 +115,68 @@ CMDRUNP( quaff )
 /*
  * 'recite' skill command
  */
+static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spell, const DLString &args,
+                             int &successfulSpells, int &successfulTargets)
+{
+    ostringstream errBuf;
+    SpellTarget::Pointer t = spell->locateTargets( ch, args, errBuf );
+    if (t->castFar && t->door != -1) {
+        ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
+        return;
+    }
+
+    if (t->error != 0) {
+        switch (t->error) {
+        case TARGET_ERR_CAST_ON_WHOM:
+            ch->pecho("Ты зачитываешь одно из заклинаний с %O2, но оно не находит, на кого подействовать.", scroll);
+            break;
+        case TARGET_ERR_CAST_ON_WHAT:
+            ch->pecho("Ты зачитываешь одно из заклинаний с %O2, но оно не находит, на что подействовать.", scroll);
+            break;
+        default:
+            ch->send_to(errBuf);
+            break;
+        }
+
+        return;
+    }
+
+    act_p( "$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM,POS_RESTING );
+    act_p( "Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR,POS_RESTING );
+
+    successfulTargets++;
+
+    if (number_percent( ) >= gsn_scrolls->getEffective( ch )) {
+        act("Ты не совлада$gло|л|ла с произношением.", ch, 0, 0, TO_CHAR);
+        gsn_scrolls->improve( ch, false );
+        return;
+    }
+
+    gsn_scrolls->improve( ch, true );
+
+    bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
+    if (offensive && t->victim && is_safe( ch, t->victim ))
+        return;
+
+    try {
+        if (!spell->spellbane( ch, t->victim )) {
+            successfulSpells++;
+            spell->run( ch, t, scroll->value0() );
+
+            if (offensive)
+                attack_caster( ch, t->victim );
+        }
+    } catch (const VictimDeathException &vde) {
+        return;
+    }
+
+    if (ch->is_adrenalined() || ch->fighting != 0) 
+        ch->setWait(4);
+}
 
 CMDRUNP( recite )
 {
-    std::vector<SpellTarget::Pointer> targets;
-    SpellTarget::Pointer t;
-    Spell::Pointer spell;
     Object *scroll;
-    bool found;
     DLString args = argument, arg1;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
@@ -146,93 +201,32 @@ CMDRUNP( recite )
         return;
     }
     
-    found = false;
+    int successfulSpells = 0, successfulTargets = 0;
+    int totalSpells = 0;
 
     for (int i = 1; i <= 4; i++) {
-        std::basic_ostringstream<char> buf;
         int sn = scroll->valueByIndex(i);
-        
-        if (sn > 0) {
-            spell = SkillManager::getThis( )->find( sn )->getSpell( );
+        if (sn < 0)
+            continue;
 
-            if (spell) { 
-                t = spell->locateTargets( ch, args, buf );
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        if (!skill || skill->getIndex() == gsn_none)
+            continue;
 
-                if (t->castFar && t->door != -1) {
-                    ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
-                    return;
-                }
-
-                if (t->error != 0) {
-                    switch (t->error) {
-                    case TARGET_ERR_CAST_ON_WHOM:
-                        ch->println("Зачитать свиток на кого?");
-                        break;
-                    case TARGET_ERR_CAST_ON_WHAT:
-                        ch->println("Зачитать свиток на что?");
-                        break;
-                    default:
-                        ch->send_to(buf);
-                        break;
-                    }
-                    return;
-                }
-
-                targets.push_back( t );
-                found = true;
-                continue;
-            }
+        Spell::Pointer spell = skill->getSpell( );
+        if (!spell) {
+            LogStream::sendWarning() << "Scroll [" << scroll->pIndexData->vnum << "] has invalid spell for " << i << endl;
+            continue;
         }
 
-        targets.push_back( SpellTarget::Pointer( ) );
-    }
-    
-    if (!found) {
-        ch->send_to( "На кого или на что ты хочешь зачитать этот свиток?\r\n" );
-        return;
-    }
-    
-    act_p( "$c1 зачитывает $o4.", ch, scroll, 0, TO_ROOM,POS_RESTING );
-    act_p( "Ты зачитываешь $o4.", ch, scroll, 0, TO_CHAR,POS_RESTING );
-
-    if (number_percent( ) >= gsn_scrolls->getEffective( ch )) {
-        act("Ты не совлада$gло|л|ла с произношением.", ch, 0, 0, TO_CHAR);
-        gsn_scrolls->improve( ch, false );
-    }
-    else {
-        bool offensive;
-        
-        for (int i = 1; i <= 4; i++) {
-            t = targets[i - 1];
-
-            if (!t)
-                continue;
-            
-            spell = SkillManager::getThis( )->find( scroll->valueByIndex(i) )->getSpell( );
-            offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-
-            if (offensive && t->victim && is_safe( ch, t->victim ))
-                continue;
-            
-            if (!spell->spellbane( ch, t->victim )) {
-                try {
-                    spell->run( ch, t, scroll->value0() );
-
-                    if (offensive)
-                        attack_caster( ch, t->victim );
-                } catch (const VictimDeathException &e) {
-                    break;
-                }
-            }
-        }
-        
-        gsn_scrolls->improve( ch, true );
-
-        if (ch->is_adrenalined() || ch->fighting != 0) 
-             ch->setWaitViolence( 2 );
+        totalSpells++;
+        recite_one_spell(ch, scroll, spell, args, successfulSpells, successfulTargets);
     }
 
-    extract_obj( scroll );
+    if (successfulSpells > 0) {
+        ch->pecho("%^O1 превращается в пыль.", scroll);
+        extract_obj( scroll );
+    }
 }
 
 
