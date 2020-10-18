@@ -25,6 +25,7 @@
 #include "behavior_utils.h"
 #include "room.h"
 #include "skillreference.h"
+#include "door_utils.h"
 
 #include "wiznet.h"
 #include "act.h"
@@ -33,10 +34,6 @@
 
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
-const char *dir_name[] = {"N","E","S","W","U","D"};
-const char *dir_name_small[] = {"n","e","s","w","u","d"};
-const char *ru_dir_name[] = {"С","В","Ю","З","П","О"};
-const char *ru_dir_name_small[] = {"с","в","ю","з","п","о"};
 const char * sunlight_ru [4] = { "темно", "светает", "светло", "сумерки" };    
 
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
@@ -259,7 +256,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) {
                     doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
                 } else {
-                    doors << (ruexits ? ru_dir_name[door] : dir_name[door]);
+                    doors << (ruexits ? ru_dir_name_big[door] : dir_name_big[door]);
                 }
             }
             if (doors.str( ).empty( ))

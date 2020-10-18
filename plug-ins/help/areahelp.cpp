@@ -70,9 +70,16 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     if (!empty())
        in << *this << endl;
-    
+
     if (str_cmp(area->speedwalk, "")) {
-        in << "{yКак добраться{x: " << area->speedwalk << endl;
+        in << "{yКак добраться{x: ";
+
+        // For speedwalks that only contain run path, surround it with {hs tags.
+        RegExp simpleSpeedwalkRE("^[0-9nsewud]+$");
+        if (simpleSpeedwalkRE.match(area->speedwalk))
+            in << "{y{hs" << area->speedwalk << "{x" << endl;
+        else
+            in << area->speedwalk << endl;
 
         // If 'speedwalk' field contains something resembling a run path,
         // and not just text, explain the starting point.
@@ -80,7 +87,6 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
         if (speedwalkRE.match(area->speedwalk))
            in << "{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x" << endl;
     }
-
 }
 
 /** Get self-help article for this area, either a real one or automatically created. */

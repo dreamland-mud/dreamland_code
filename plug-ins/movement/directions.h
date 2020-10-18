@@ -19,6 +19,8 @@ struct direction_t {
     const char * leave;
     const char * enter;
     const char * where;
+    const char * rname_extra_1;
+    const char * rname_extra_2;
 };
 
 extern const struct direction_t dirs [];

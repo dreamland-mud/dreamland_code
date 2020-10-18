@@ -7,6 +7,7 @@
 #include "exitsmovement.h"
 #include "directions.h"
 #include "movetypes.h"
+#include "door_utils.h"
 
 #include "char.h"
 #include "commandtemplate.h"
@@ -20,14 +21,12 @@
 
 static bool isBigLetter( char c )
 {
-    return c == 'N' || c == 'S' || c == 'D' || c == 'U' || c == 'E' || c == 'W' ||
-           c == 'С' || c == 'Ю' || c == 'О' || c == 'П' || c == 'В' || c == 'З';
+    return door_is_big(c) || door_is_big_ru(c);
 }
 
 static bool isSmallLetter( char c )
 {
-    return c == 'n' || c == 's' || c == 'd' || c == 'u' || c == 'e' || c == 'w' ||
-           c == 'с' || c == 'ю' || c == 'о' || c == 'п' || c == 'в' || c == 'з';
+    return door_is_small(c) || door_is_small_ru(c);
 }
 
 /*-----------------------------------------------------------------------------

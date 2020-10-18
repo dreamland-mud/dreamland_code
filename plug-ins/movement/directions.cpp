@@ -45,12 +45,12 @@ char const extra_move_rtpm [] =
 };
 
 const struct direction_t dirs [] = {
-    { DIR_NORTH, DIR_SOUTH, "north", "север",  "на север",  "с севера",  "на севере"  },
-    { DIR_EAST,  DIR_WEST,  "east",  "восток", "на восток", "с востока", "на востоке" },
-    { DIR_SOUTH, DIR_NORTH, "south", "юг",     "на юг",     "с юга",     "на юге"     },
-    { DIR_WEST,  DIR_EAST,  "west",  "запад",  "на запад",  "с запада",  "на западе"  },
-    { DIR_UP,    DIR_DOWN,  "up",    "вверх",  "вверх",     "сверху",    "наверху"    },
-    { DIR_DOWN,  DIR_UP,    "down",  "вниз",   "вниз",      "снизу",     "внизу"      },
+    { DIR_NORTH, DIR_SOUTH, "north", "север",  "на север",  "с севера",  "на севере",  0, 0 },
+    { DIR_EAST,  DIR_WEST,  "east",  "восток", "на восток", "с востока", "на востоке", 0, 0 },
+    { DIR_SOUTH, DIR_NORTH, "south", "юг",     "на юг",     "с юга",     "на юге",     0, 0 },
+    { DIR_WEST,  DIR_EAST,  "west",  "запад",  "на запад",  "с запада",  "на западе",  0, 0 },
+    { DIR_UP,    DIR_DOWN,  "up",    "вверх",  "вверх",     "сверху",    "наверху",    "подняться", "^" },
+    { DIR_DOWN,  DIR_UP,    "down",  "вниз",   "вниз",      "снизу",     "внизу",      "опуститься", "v"},
 };
 
 int direction_lookup( char c )
@@ -69,17 +69,28 @@ int direction_lookup( const char *arg )
         return -1;
         
     for (door = 0; door < DIR_SOMEWHERE; door++) {
-        if (arg[0] == dirs[door].name[0] || arg[0] == dirs[door].rname[0]) {
+        const direction_t &dir = dirs[door];
+
+        if (arg[0] == dir.name[0] || arg[0] == dir.rname[0]) {
             if (arg[1] == 0) // neswup свюз
                 return door;
-            else if (arg[1] == dirs[door].rname[1] && arg[2] == 0) // вв вн
+            else if (arg[1] == dir.rname[1] && arg[2] == 0) // вв вн
                 return door;
         }
 
-        if (!str_prefix( arg, dirs[door].name ))
+        if (dir.rname_extra_1 && arg[1] == 0 && arg[0] == dir.rname_extra_1[0]) // о, п
             return door;
 
-        if (!str_prefix( arg, dirs[door].rname ))
+        if (dir.rname_extra_2 && arg[1] == 0 && arg[0] == dir.rname_extra_2[0]) // ^, v
+            return door;
+
+        if (!str_prefix( arg, dir.name ))
+            return door;
+
+        if (!str_prefix( arg, dir.rname ))
+            return door;
+
+        if (dir.rname_extra_1 && !str_prefix( arg, dir.rname_extra_1 ))
             return door;
     }
     
