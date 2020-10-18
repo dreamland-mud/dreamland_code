@@ -24,6 +24,11 @@ public:
      * with provided strings.
      */
     StringList wrap(const DLString &before, const DLString &after) const;
+
+    /** 
+     * Return a space-separated string of entries, long entries surrounded by single quotes.
+     */
+    DLString toString() const;
 };
 
 #endif

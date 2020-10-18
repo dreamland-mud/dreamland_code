@@ -23,11 +23,16 @@ bool StringList::superListOf(const StringList& smallerList) const
 
     // Make sure that all words in the smaller list have a match in the bigger list (this).
     // Order needs to be preserved,  i.e. 'a b' doesn't match 'bbb aaa', but 'a b' matches 'aaa xxx bbb'.
-    for (size_t i = 0, j = 0; i < this->size() && j < smallerList.size(); i++) 
-       if (smallerList[j].strPrefix(at(i))) {
+    for (size_t i = 0, j = 0; i < this->size() && j < smallerList.size(); i++) {
+        if (smallerList[j].strPrefix(at(i))) {
             matchesFound++;
             j++;
-       }
+        }
+
+        // First words in both lists need to match.
+        if (i == 0 && j == 0)
+            return false;
+    }
 
     return smallerList.size() == matchesFound;
 }
@@ -58,3 +63,13 @@ StringList StringList::wrap(const DLString &before, const DLString &after) const
     return result;
 }
 
+DLString StringList::toString() const
+{
+    DLString result;
+
+    for (const_iterator s = begin( ); s != end( ); s++) 
+        result << s->quote( ) << " ";
+        
+    result.stripWhiteSpace( );
+    return result;
+}

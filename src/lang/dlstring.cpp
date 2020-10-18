@@ -334,7 +334,7 @@ DLString DLString::getOneArgument( )
 
     cEnd = ' ';
 
-    if (*i == '\'' || *i == '"' || *i == '!')
+    if (dl_is_arg_separator(*i))
         cEnd = *i++;
     
     while (i != end( )) {
