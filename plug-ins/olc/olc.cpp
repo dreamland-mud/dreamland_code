@@ -20,11 +20,14 @@
 #include <affect.h>
 #include <object.h>
 #include <pcharacter.h>
+#include "pcharactermanager.h"
 #include <npcharacter.h>
 #include <commandmanager.h>
+#include "profession.h"
 #include "race.h"
 #include "clanreference.h"
 #include "room.h"
+#include "summoncreaturespell.h"
 
 #include "olc.h"
 #include "olcflags.h"
@@ -39,6 +42,7 @@
 #include "act.h"
 #include "save.h"
 #include "act_move.h"
+#include "../anatolia/handler.h"
 #include "vnum.h"
 #include "mercdb.h"
 #include "comm.h"
@@ -50,6 +54,7 @@ GSN(enchant_weapon);
 GSN(enchant_armor);
 GSN(none);
 CLAN(none);
+PROF(necromancer);
 
 using namespace std;
 
@@ -599,6 +604,24 @@ static DLString find_word_mention(const char *text, const list<RussianString> &w
     return DLString::emptyString;
 }
 
+static bool mob_is_changed(NPCharacter *mob) {
+    int vnum = mob->pIndexData->vnum;
+    int dn = mob->damage[DICE_NUMBER];
+    int dt = mob->damage[DICE_TYPE];
+
+    if (vnum == 24 && (dn != 13 || dt != 9)) // adamantite golem
+        return true;
+    if (vnum == 23 && (dn != 11 || dt != 5)) // iron golem
+        return true;
+    if (vnum == 21 && (dn != 3 || dt != 10)) // lesser golem
+        return true;
+    if (vnum == 22 && (dn != 8 || dt != 4)) // stone golem
+        return true;
+
+    return false;    
+}
+
+
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;
@@ -881,6 +904,50 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
+    if (arg == "golemocide") {
+        ostringstream buf;
+        Integer vnum;
+
+        if (args.empty() || !Integer::tryParse(vnum, args)) {
+            ch->println("abc golemocide <vnum>");
+            return;
+        }
+
+        Character *wch_next;
+        for (Character *wch = char_list; wch; wch = wch_next) {
+            SummonedCreature::Pointer creature;
+            wch_next = wch->next;
+
+            if (wch->master)
+                continue;
+
+            if (wch->is_npc() && wch->getNPC()->pIndexData->vnum == vnum) {
+                if (wch->carrying)
+                    buf << "Ignoring mob in room [" << wch->in_room->vnum << "] with inventory." << endl;
+                else if (mob_is_changed(wch->getNPC()))
+                    buf << "Ignoring upgraded mob in room [" << wch->in_room->vnum << "]" << endl;
+                else if (wch->getNPC()->behavior && (creature = wch->getNPC()->behavior.getDynamicPointer<SummonedCreature>())) {
+                    PCMemoryInterface *owner = PCharacterManager::find(creature->creatorName);
+                    if (!owner) {
+                        buf << "Mob in room [" << wch->in_room->vnum << "] extracted, no owner " << creature->creatorName << endl;
+                        extract_char(wch);
+                        continue;
+                    }
+
+                    if (owner->getProfession() != prof_necromancer) {
+                        buf << "Mob in room [" << wch->in_room->vnum << "] extracted, owner " << owner->getName() << " has remorted." << endl;
+                        extract_char(wch);
+                        continue;
+                    }
+
+                    buf << "Ignoring mob in room [" << wch->in_room->vnum << "] with active owner " << owner->getName() << endl;
+                }
+            }
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
 }
 
 

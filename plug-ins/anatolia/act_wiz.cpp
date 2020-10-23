@@ -4069,6 +4069,7 @@ CMDWIZP( memory )
                 vnumCounts[wch->getNPC()->pIndexData->vnum]++;
         }
 
+        buf << "Mob instances that exceed the count of " << cutoff << ":" << endl;
         for (auto &entry: vnumCounts)
             if (entry.second >= cutoff) {
                 MOB_INDEX_DATA *pMob = get_mob_index(entry.first);
