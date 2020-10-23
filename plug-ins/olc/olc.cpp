@@ -904,6 +904,38 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
+    if (arg == "mobwipe") {
+        Integer count;
+        int killed = 0;
+
+        if (args.empty() || !Integer::tryParse(count, args)) {
+            ch->println("abc mobwipe <max count>");
+            return;
+        }
+
+        Character *wch_next;
+        for (Character *wch = char_list; wch; wch = wch_next) {
+            wch_next = wch->next;
+
+            if (!wch->is_npc() || wch->master || wch->leader)
+                continue;
+
+            NPCharacter *mob = wch->getNPC();
+            if (mob->pIndexData->count < count)
+                continue;
+            if (mob->behavior && mob->behavior.getDynamicPointer<SummonedCreature>())
+                continue;
+            if (mob->behavior && mob->behavior->hasDestiny())
+                continue;
+
+            extract_char(wch);
+            killed++;
+        }
+
+        ch->pecho("Убито %d мобов.", killed);
+        return;
+    }
+
     if (arg == "golemocide") {
         ostringstream buf;
         Integer vnum;
