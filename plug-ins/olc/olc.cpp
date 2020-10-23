@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <algorithm>
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
 #include "regexp.h"
@@ -38,6 +39,7 @@
 #include "handler.h"
 #include "act.h"
 #include "save.h"
+#include "mudtags.h"
 #include "act_move.h"
 #include "vnum.h"
 #include "mercdb.h"
@@ -599,6 +601,168 @@ static DLString find_word_mention(const char *text, const list<RussianString> &w
     return DLString::emptyString;
 }
 
+static DLString eraseNewLine(const DLString &original)
+{
+    DLString s = original;
+    s.erase(s.find_last_not_of('\r') + 1);
+    s.erase(s.find_last_not_of('\n') + 1);
+    return s;
+}
+
+static DLString eraseExtraSpaces(const DLString &original)
+{
+    DLString s = original;
+
+    // TODO retain only one space between characters, numbers or punctuation marks.
+    return s;
+}
+
+static list<DLString> splitToList(const DLString &s)
+{
+    list<DLString> result;
+
+    char buf[1024];
+    istringstream is(s);
+
+    while (is.getline(buf, sizeof(buf)))
+        result.push_back(
+            eraseNewLine(buf));
+
+    return result;
+}
+
+static list<DLString> convertForMe(const list<DLString> &lines, Character *looker)
+{
+    list<DLString> result;
+
+    for (auto &line: lines) {
+        ostringstream out;
+        mudtags_convert(line.c_str(), out, TAGS_CONVERT_VIS|TAGS_ENFORCE_NOCOLOR|TAGS_ENFORCE_WEB, looker);
+        result.push_back(out.str());
+    }
+
+    return result;
+}
+
+static bool stringIsBlank(const DLString &s)
+{
+    for (DLString::size_type i = 0; i < s.size(); i++)
+        if (!dl_isspace(s.at(i)))
+            return false;
+
+    return true;
+}
+
+struct TextFlattener {
+    TextFlattener(const DLString &source, Character *looker) 
+    {
+        lines = splitToList(source);
+        visLines = convertForMe(lines, looker);
+        this->looker = looker;
+    }
+
+    void process() 
+    {
+        buf.clear();
+
+        list<DLString>::const_iterator l, v;
+
+        for (l = lines.begin(), v = visLines.begin(); l != lines.end(); ) {
+            line = *l;
+            visLine = *v;
+            if (++l == lines.end()) {
+                nextLine = LAST_LINE;
+                nextVisLine = LAST_LINE;
+            } else {
+                nextLine = *l;
+                nextVisLine = *(++v);
+            }
+
+            looker->printf("Processing line: [%s]\r\n", line.c_str());
+            buf << eraseExtraSpaces(line);
+
+            if (needsLineBreak()) {
+                buf << endl;
+                looker->println(" >>> BREAK");
+            } 
+            else {
+                buf << " ";
+                looker->println(" >>> SPACE");
+            }
+        }
+    }
+
+    DLString getResult() 
+    {
+        return buf.str();
+    }
+
+private:
+    bool needsLineBreak()
+    {
+        if (endsInPunctuationMark())
+            return true;
+        if (nextLineBeginsWithSpace())
+            return true;
+        if (stringIsBlank(visLine))
+            return true;
+
+        return false;
+    }
+
+    bool nextLineBeginsWithSpace() 
+    {
+        if (nextVisLine == LAST_LINE)
+            return false;
+
+        int s;
+        for (s = 0; s < nextVisLine.size(); s++)
+            if (!dl_isspace(nextVisLine.at(s)))
+                break;
+
+        // Any spaces in the beginning of the line: assume it's a new paragraph.
+        if (s > 0)
+            return true;
+
+        return false;
+    }
+
+
+    bool endsInPunctuationMark()
+    {
+        if (visLine.empty())
+            return false;
+        
+        int s;
+        for (s = visLine.size() - 1; s >= 0; s--) {
+            LogStream::sendNotice() << "::" << " s=" << s << endl;
+            if (!dl_isspace(visLine.at(s)))
+                break;
+        }
+
+        if (s < 0)
+            return false;
+
+        char c = visLine.at(s);
+        return c == '.' || c == '?' || c == '!' || c == ':';
+    }
+
+    static DLString LAST_LINE;
+
+    list<DLString> lines;    
+    list<DLString> visLines;
+    ostringstream buf;
+
+    DLString line;
+    DLString nextLine;
+    DLString visLine;
+    DLString nextVisLine;
+
+    Character *looker;
+};
+
+DLString TextFlattener::LAST_LINE = DLString::emptyString;
+
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;
@@ -881,6 +1045,14 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
+    if (arg == "line") {
+        TextFlattener flat(ch->in_room->description, ch);
+        flat.process();
+        ch->println("Результат обработки текста:");
+        ch->send_to(flat.getResult());
+        ch->println("----------");
+        return;
+    }
 }
 
 
