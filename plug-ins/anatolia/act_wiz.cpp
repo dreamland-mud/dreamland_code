@@ -4057,6 +4057,27 @@ CMDWIZP( memory )
     sprintf( buf, "Perms   %5d blocks  of %7d bytes.\n\r",
         nAllocPerm, sAllocPerm );
     ch->send_to(buf);
+
+
+    {
+        ostringstream buf;
+        map<int, int> vnumCounts;
+        int cutoff = 100;
+
+        for (Character *wch = char_list; wch; wch = wch->next) {
+            if (wch->is_npc())
+                vnumCounts[wch->getNPC()->pIndexData->vnum]++;
+        }
+
+        for (auto &entry: vnumCounts)
+            if (entry.second >= cutoff) {
+                MOB_INDEX_DATA *pMob = get_mob_index(entry.first);
+                if (pMob)
+                    buf << fmt(0, "[{W%6d{x] {C%4d{x %N1", entry.first, entry.second, pMob->short_descr) << endl;
+            }
+
+        page_to_char(buf.str().c_str(), ch);
+    }
 }
 
 CMDWIZP( dump )
