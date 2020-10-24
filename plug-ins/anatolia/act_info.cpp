@@ -2250,11 +2250,13 @@ CMDRUNP( help )
                 page_to_char( help->getText( ch ).c_str( ), ch );
                 return;
             }
+            ch->send_to( "Нет подсказки по данному слову.\n\r");
+            bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+            return;
         }
 
-        ch->send_to( "Нет подсказки по данному слову.\n\r");
-        bugTracker->reportNohelp( ch, origArgument.c_str( ) );
-        return;
+        // Restore original argument without the dot, assume it was a typo.
+        strcpy(argument, origArgument.substitute('.', ' ').c_str());
     }
     
     // Поиск по строке без чисел.
