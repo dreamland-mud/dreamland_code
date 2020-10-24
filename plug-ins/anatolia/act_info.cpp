@@ -408,7 +408,10 @@ CMDRUNP( oscore )
                 newline = true;
             }
         } else {
-            buf << fmt(0, "Тебя убили уже {r%1$d{x ра%1$Iз|за|з.", ch->getPC()->death.getValue());
+            if (ch->getPC()->death > 0)
+                buf << fmt(0, "Тебя убили уже {r%1$d{x ра%1$Iз|за|з.", ch->getPC()->death.getValue());
+            else
+                buf << "Тебя еще ни разу не убивали.";
             newline = true;
         }
 	    
@@ -2054,9 +2057,12 @@ private:
     void searchArticle(const HelpArticle::Pointer &a) 
     {
         int d;
+        StringSet keywords; // contains main keywords and additional ones.
+        keywords.insert(a->getAllKeywords().begin(), a->getAllKeywords().end());
+        keywords.insert(a->aka.begin(), a->aka.end());
 
         // See if any of the article's keywords matches the input.
-        for (auto &keyword: a->getAllKeywords()) {
+        for (auto &keyword: keywords) {
             DLString kw = keyword;
             kw.replaces("'", "");
             kw.toLower(); 
