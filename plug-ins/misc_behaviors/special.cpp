@@ -931,23 +931,37 @@ bool spec_nasty( NPCharacter *ch )
     if ( (victim = ch->fighting) == 0)
         return false;   /* let's be paranoid.... */
 
-    switch ( number_bits(2) )
-    {
-        case 0:  act_p( "$c1 разрезает твой кошелек и тянет оттуда золотые монетки!",
-                     ch, 0, victim, TO_VICT,POS_RESTING);
-                 act_p( "Ты разрезаешь кошелек $C2 и крадешь золото.",
-                     ch, 0, victim, TO_CHAR,POS_RESTING);
-                 act_p( "БА! Да у $C2 выпотрошили кошелек!",
-                     ch, 0, victim, TO_NOTVICT,POS_RESTING);
-                 gold = victim->gold / 10;  /* steal 10% of his gold */
-                 victim->gold -= gold;
-                 ch->gold     += gold;
-                 return true;
+    switch (number_bits(2)) {
+    case 0:
+        if (ch->can_see(victim)) {
+            /* steal 10% of his gold */                
+            if (victim->gold > 10)
+                gold = victim->gold / 10;
+            else
+                gold = victim->gold;
 
-        case 1:  interpret_raw( ch, "flee");
-                 return true;
+            if (gold > 0) {
+                victim->gold -= gold;
+                ch->gold += gold;
 
-        default: return false;
+                act_p("$c1 разрезает твой кошелек и тянет оттуда золотые монетки!",
+                    ch, 0, victim, TO_VICT, POS_RESTING);
+                act_p("Ты разрезаешь кошелек $C2 и крадешь золото.",
+                    ch, 0, victim, TO_CHAR, POS_RESTING);
+                act_p("БА! Да у $C2 выпотрошили кошелек!",
+                    ch, 0, victim, TO_NOTVICT, POS_RESTING);
+            }
+            
+            return true;
+        }
+
+        /* FALLTHROUGH */
+    case 1:
+        interpret_raw(ch, "flee");
+        return true;
+
+    default:
+        return false;
     }
 }
 
