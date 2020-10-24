@@ -89,6 +89,12 @@ DLString DefaultDesire::showPercent(PCharacter *ch) const
 
 void DefaultDesire::report( PCharacter *ch, ostringstream &buf )
 {
+    if (ch->getRealLevel( ) <  HUNGER_MIN_LEVEL)
+        return;
+
+    if (ch->is_immortal())
+        return;
+
     if (!applicable(ch))
         return;
         
