@@ -1599,13 +1599,8 @@ CMDRUNP( examine )
         show_char_to_char_1( victim, ch, true );
         return;
     }
-    
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 ) {
-        oprog_examine( obj, ch, argument );
-        return;
-    }
 
-    ch->println( "Ты не видишь этого тут." );
+    do_look_into(ch, arg);
 }
 
 
