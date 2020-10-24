@@ -2198,23 +2198,23 @@ private:
 
         // Reduce "help skill bash" to just "help bash".
         if (!argRest.empty()) {
-            if (arg_oneof_strict(arg1, "умение", "навык", "skill")) {
+            if (arg_oneof(arg1, "умение", "навык", "skill")) {
                 preferredLabels.insert("skill");
                 preferredLabels.insert("spell");
             }
-            else if (arg_oneof_strict(arg1, "заклинание", "spell"))
+            else if (arg_oneof(arg1, "заклинание", "spell"))
                 preferredLabels.insert("spell");
-            else if (arg_oneof_strict(arg1, "класс", "class"))
+            else if (arg_oneof(arg1, "класс", "class"))
                 preferredLabels.insert("class");
-            else if (arg_oneof_strict(arg1, "раса", "race"))
+            else if (arg_oneof(arg1, "раса", "race"))
                 preferredLabels.insert("race");
-            else if (arg_oneof_strict(arg1, "команда", "command"))
+            else if (arg_oneof(arg1, "команда", "command"))
                 preferredLabels.insert("cmd");
-            else if (arg_oneof_strict(arg1, "зона", "area", "zone"))
+            else if (arg_oneof(arg1, "зона", "area", "zone"))
                 preferredLabels.insert("area");
-            else if (arg_oneof_strict(arg1, "религия", "religion"))
+            else if (arg_oneof(arg1, "религия", "religion"))
                 preferredLabels.insert("religion");
-            else if (arg_oneof_strict(arg1, "клан", "clan"))
+            else if (arg_oneof(arg1, "клан", "clan"))
                 preferredLabels.insert("clan");
         }
     }
