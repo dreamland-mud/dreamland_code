@@ -688,6 +688,12 @@ ShopTrader::Pointer find_keeper( Character *ch )
         do_say( keeper, "Подожди немного, мне сейчас не до тебя." );
         return null;
     }
+
+    if (!ch->can_see(keeper)) {
+        do_say(keeper, "Ты же меня не видишь, торговать у нас не получится.");
+        return null;
+    }
+
 /*    
     if (ch->getCurrStat( STAT_CHA ) < 18) {
         switch (number_range( 1, 10 )) {
