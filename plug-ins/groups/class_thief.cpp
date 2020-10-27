@@ -536,7 +536,7 @@ SKILL_RUNP( steal )
             ostringstream ostr;
             bonus_thief_skills->reportAction(ch->getPC(), ostr);
             ch->send_to(ostr);
-            percent = 1;
+            percent = max(1, percent-number_range(20,25));
         }
 
         if ( is_safe( ch, victim )
@@ -1034,31 +1034,27 @@ SKILL_RUNP( backstab )
         return;
 
     BackstabOneHit bs( ch, victim );
-    bool fBonus = false;
+    int bsBonus, hasteBonus = 0;
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
         ch->send_to(ostr);
-        fBonus = true;
+        bsBonus+= number_range(20,25);
+        hasteBonus+= number_range(20,25);
     }
 
-    Chance bsChance(ch, gsn_backstab->getEffective(ch)-1, 100);
+    Chance bsChance(ch, gsn_backstab->getEffective(ch)-1+bsBonus, 100);
 
     try {
         if (!IS_AWAKE(victim)
-                || fBonus
                 || bsChance.reroll())
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
 			
             if (IS_QUICK(ch)) {
-                    int haste_chance;
-                    if (fBonus)
-                        haste_chance = 100;
-                    else
-                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
+                    int haste_chance = hasteBonus + gsn_backstab->getEffective( ch ) * 4 / 10;
 
                     if (Chance(ch, haste_chance-1, 100).reroll()) {
                         if (ch->fighting == victim)
@@ -1069,7 +1065,7 @@ SKILL_RUNP( backstab )
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
                 dual_chance = 0;
-            else if (fBonus && dual_percent > 50)
+            else if (bsBonus > 0 && dual_percent > 50)
                 dual_chance = 100;
             else
                 dual_chance =  dual_percent * 8 / 10;
@@ -1091,7 +1087,7 @@ SKILL_RUNP( backstab )
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
                 dual_chance = 0;
-            else if (fBonus && dual_percent > 50)
+            else if (bsBonus > 0 && dual_percent > 50)
                 dual_chance = 100;
             else
                 dual_chance =  dual_percent * 8 / 10;
@@ -1172,18 +1168,18 @@ SKILL_RUNP( circle )
     ch->setWait( gsn_circle->getBeats( )  );
 
     CircleOneHit circ( ch, victim );
-    bool fBonus = false;
+    int circleBonus = 0;
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
         ch->send_to(ostr);
-        fBonus = true;
+        circleBonus+= number_range(20,25);
     }
 
 
     try {
-        if (ch->is_npc() || fBonus || number_percent( ) < gsn_circle->getEffective( ch ))
+        if (ch->is_npc() || number_percent( ) < min(100,circleBonus + gsn_circle->getEffective( ch )))
         {
                 circ.hit( );
                 gsn_circle->improve( ch, true, victim );
@@ -1281,16 +1277,14 @@ SKILL_RUNP( blackjack )
         if (victim->isAffected(gsn_backguard))
             chance /= 2;
 
-        bool fBonus = false;
-
         if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
             ostringstream ostr;
             bonus_thief_skills->reportAction(ch->getPC(), ostr);
             ch->send_to(ostr);
-            fBonus = true;
+            chance += number_range(15,20);
         }
 
-        if (fBonus || Chance(ch, chance * k / 100, 100).reroll())
+        if (Chance(ch, chance * k / 100, 100).reroll())
         {
                 act_p("Ты бьешь $C4 по голове мешочком со свинцом.",
                         ch,0,victim,TO_CHAR,POS_RESTING);
