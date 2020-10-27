@@ -152,6 +152,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     qdata = attributes->getAttr<XMLAttributeQuestData>( "questdata" );
     qdata->setTime( time );
     qdata->rememberVictory( quest->getName( ) );
+    qdata->rememberLastQuest(quest->getName());
     
     attributes->eraseAttribute( "quest" );
     PCharacterManager::save( client );
@@ -556,7 +557,6 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     if (arg_oneof(arg, "any", "любое", "любой")) {
         try {
             QuestManager::getThis( )->generate( client, ch );
-            attr->rememberLastQuest("");
             attr->setStartTime();
             PCharacterManager::save( client );
 
@@ -596,7 +596,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
    
     if (attr->getLastQuestCount((*q)->getName()) >= 5) {
         tell_fmt("Я уже заметил%2$Gо||а, что тебе очень нравятся такие задания, %1$C1.", client, ch);
-        tell_raw(client, ch, "Но попробуй свои силы в чем-то еще.");
+        tell_raw(client, ch, "Но попробуй добиться успеха в чем-то еще.");
         return;
     }
     
@@ -604,7 +604,6 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         try {
             client->getAttributes( ).addAttribute( 
                          (*q)->createQuest(client, ch), "quest" );
-            attr->rememberLastQuest((*q)->getName());
             attr->setStartTime();
             PCharacterManager::save( client );
 
