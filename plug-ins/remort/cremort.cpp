@@ -23,6 +23,7 @@
 #include "race.h"
 #include "room.h"
 #include "remortdata.h"
+#include "hometown.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -35,6 +36,7 @@
 #include "def.h"
 
 CLAN(flowers);
+HOMETOWN(frigate);
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 
 const        short        CONVERT_PRACTICE_QP = 3;
@@ -92,6 +94,7 @@ CMDRUN( remort )
     new_ch->setPassword( pch->getPassword( ) );
     new_ch->setRussianName( pch->getRussianName( ).getFullForm( ) );
     new_ch->setSex( pch->getSex( ) );
+    new_ch->setHometown(home_frigate);
     new_ch->prompt = pch->prompt;
     new_ch->batle_prompt = pch->batle_prompt;
     new_ch->add_comm = pch->add_comm;
