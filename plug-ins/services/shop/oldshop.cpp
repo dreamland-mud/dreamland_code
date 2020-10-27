@@ -496,31 +496,36 @@ CMDRUN( list )
 /*----------------------------------------------------------------------------
  * 'value' command
  *---------------------------------------------------------------------------*/
-static void value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Pointer trader, Object *obj)
+static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Pointer trader, Object *obj, bool verbose)
 {
     if (!keeper->can_see(obj)) {
-        ch->pecho("%^C1 не видит %O4.", keeper, obj);
-        return;
+        if (verbose)
+            ch->pecho("%^C1 не видит %O4.", keeper, obj);
+        return false;
     }
 
     if (!can_drop_obj( ch, obj )) {
-        ch->pecho("Ты не сможешь избавиться от %O2.", obj);
-        return;
+        if (verbose)
+            ch->pecho("Ты не сможешь избавиться от %O2.", obj);
+        return false;
     }
 
     int cost = get_cost( keeper, obj, false, trader );
     if (cost <= 0) {
-        ch->pecho("%^C1 не интересуется %O5.", keeper, obj);
-        return;
+        if (verbose)
+            ch->pecho("%^C1 не интересуется %O5.", keeper, obj);
+        return false;
     }
 
     int gold = cost/100;
     int silver = cost - gold * 100;
 
-    if ( dreamland->getBalanceMerchantBank() < (gold + 1) )
+    if (dreamland->getBalanceMerchantBank() < (gold + 1))
         tell_fmt("Я дал%2$Gо||а бы тебе %3$d серебра и %4$d золота за %5$O4, но у меня нет денег.", ch, keeper, silver, gold, obj);
     else
         tell_fmt("Я дам тебе %3$d серебра и %4$d золота за %5$O4.", ch, keeper, silver, gold, obj);
+
+    return true;
 }
 
 CMDRUN( value )
@@ -542,14 +547,21 @@ CMDRUN( value )
     keeper = trader->getChar( );
 
     if (arg_is_all(arg)) {
+        bool saidSomething = false;
+
         if (!ch->carrying) {
             tell_fmt("Но у тебя же ничего нет!", ch, keeper);
             return;
         }
 
         for (obj = ch->carrying; obj; obj = obj->next_content) {
-            value_one_item(ch, keeper, trader, obj);
+            if (value_one_item(ch, keeper, trader, obj, false))
+                saidSomething = true;
         }
+
+        if (!saidSomething)
+            tell_fmt("Я не вижу у тебя ничего, что могло бы меня заинтересовать.", ch, keeper);
+
         return;
     }
 
@@ -558,7 +570,7 @@ CMDRUN( value )
         return;
     }
 
-    value_one_item(ch, keeper, trader, obj);
+    value_one_item(ch, keeper, trader, obj, true);
 }
 
 /*----------------------------------------------------------------------------
