@@ -22,6 +22,7 @@
 #include "act.h"
 #include "merc.h"
 #include "messengers.h"
+#include "replay.h"
 #include "websocketrpc.h"
 #include "descriptor.h"
 #include "def.h"
@@ -411,8 +412,10 @@ void XMLAttributeConfirm::run( Character *ch )
     }
     
     if (!reason.getValue( ).empty( )) 
-        buf << reason.getValue( ) << endl;
-    
+        buf << reason.getValue( );
+
+    remember_history_private(ch->getPC(), buf.str());
+    buf << endl;
     ch->send_to( buf );
 
     ch->getPC( )->getAttributes( ).eraseAttribute( "confirm" );
