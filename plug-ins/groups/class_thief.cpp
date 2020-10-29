@@ -1127,6 +1127,7 @@ SKILL_RUNP( circle )
 {
     Character *victim;
     Character *person;
+    Object *obj;
 
     if ( MOUNTED(ch) )
     {
@@ -1146,9 +1147,9 @@ SKILL_RUNP( circle )
             return;
     }
 
-    if ( get_eq_char(ch,wear_wield) == 0
-            || (attack_table[get_eq_char(ch,wear_wield)->value3()].damage != DAM_PIERCE 
-            && get_eq_char(ch,wear_wield)->value0() != WEAPON_DAGGER))
+    if ( (obj = get_eq_char(ch,wear_wield)) == 0
+            || (attack_table[obj->value3()].damage != DAM_PIERCE 
+            && obj->value0() != WEAPON_DAGGER))
     {
             ch->send_to("Вооружись для этого кинжалом или другим колющим оружием.\n\r");
             return;
