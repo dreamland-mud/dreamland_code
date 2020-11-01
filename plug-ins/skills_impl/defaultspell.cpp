@@ -441,6 +441,12 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                     
                     result->range = std::max( 0, getMaxRange( ch ) - maxrange );
                     result->castFar = true;
+
+                } else if (result->door >= 0 && result->door < DIR_SOMEWHERE) {
+                    // Victim not found, but a range spell was likely casted.
+                    buf << "Ты не видишь " << dirs[result->door].where << " никого с таким именем." << endl;
+                    result->error = TARGET_ERR_CHAR_NOT_FOUND;
+                    return result;
                 }
             }
             else 
