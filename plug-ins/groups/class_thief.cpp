@@ -995,9 +995,9 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    if ( attack_table[obj->value3()].damage != DAM_PIERCE )
+    if ( attack_table[obj->value3()].damage != DAM_PIERCE && obj->value0() != WEAPON_DAGGER )
     {
-            ch->send_to("Чтоб ударить сзади, нужно вооружится колющим оружием.\n\r");
+            ch->send_to("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием.\n\r");
             return;
     }
 
@@ -1034,7 +1034,7 @@ SKILL_RUNP( backstab )
         return;
 
     BackstabOneHit bs( ch, victim );
-    int bsBonus, hasteBonus = 0;
+    int bsBonus = 0, hasteBonus = 0;
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
@@ -1127,6 +1127,7 @@ SKILL_RUNP( circle )
 {
     Character *victim;
     Character *person;
+    Object *obj;
 
     if ( MOUNTED(ch) )
     {
@@ -1146,10 +1147,11 @@ SKILL_RUNP( circle )
             return;
     }
 
-    if ( get_eq_char(ch,wear_wield) == 0
-            || attack_table[get_eq_char(ch,wear_wield)->value3()].damage != DAM_PIERCE)
+    if ( (obj = get_eq_char(ch,wear_wield)) == 0
+            || (attack_table[obj->value3()].damage != DAM_PIERCE 
+            && obj->value0() != WEAPON_DAGGER))
     {
-            ch->send_to("Вооружись для этого колющим оружием.\n\r");
+            ch->send_to("Вооружись для этого кинжалом или другим колющим оружием.\n\r");
             return;
     }
 
