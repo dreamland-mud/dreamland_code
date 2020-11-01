@@ -22,9 +22,11 @@
 #include "skillreference.h"
 
 #include "loadsave.h"
+#include "immunity.h"
 #include "damageflags.h"
 #include "save.h"
 #include "interp.h"
+#include "fight.h"
 #include "act.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -33,6 +35,7 @@
 
 WEARLOC(hold);
 PROF(vampire);
+GSN(none);
 GSN(poison);
 GSN(poured_liquid);
 RACE(felar);
@@ -637,7 +640,7 @@ CMDRUN( drink )
         af.bitvector = AFF_POISON;
         affect_join( ch, &af );
     }
-    
+
     if (obj->value0() > 0)
         obj->value1(obj->value1() - amount);
 
@@ -653,6 +656,12 @@ CMDRUN( drink )
     for (Object *o = ch->carrying; o; o = o->next_content)
         if (oprog_drink_near(o, obj, ch, liquid->getName().c_str(), amount))
             return;
+
+    if (IS_OBJ_STAT(obj, ITEM_BLESS) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
+        ch->pecho("Святость %O2 обжигает твои внутренности!", obj);
+        ch->recho("Лицо %^C2 искажается гримасой боли.", ch);
+        rawdamage(ch, ch, DAM_HOLY, ch->hit / 100 + 1, true);
+    }
 }
 
 
