@@ -560,6 +560,18 @@ static bool oprog_drink_near( Object *obj, Object *drink, Character *ch, const c
     return false;
 }
 
+/** Called for everyone around the drinker. */
+static bool mprog_drink_near( Character *drinker, Object *obj, const char *liq, int amount )
+{
+    for (auto &rch: drinker->in_room->getPeople()) {
+        if (rch != drinker) {
+            FENIA_CALL(rch, "DrinkNear", "OCsi", obj, drinker, liq, amount);
+            FENIA_NDX_CALL(rch->getNPC( ), "DrinkNear", "COCsi", rch, obj, drinker, liq, amount);
+        }
+    }
+
+    return false;
+}
 
 CMDRUN( drink )
 {
@@ -656,6 +668,9 @@ CMDRUN( drink )
     for (Object *o = ch->carrying; o; o = o->next_content)
         if (oprog_drink_near(o, obj, ch, liquid->getName().c_str(), amount))
             return;
+
+    if (mprog_drink_near( ch, obj, liquid->getName( ).c_str( ), amount ))
+        return;
 
     if (IS_OBJ_STAT(obj, ITEM_BLESS) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
         ch->pecho("Святость %O2 обжигает твои внутренности!", obj);
