@@ -911,16 +911,8 @@ bool can_see_god(Character *ch, Character *god)
 
 bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg )
 {
-    if (is_name(arg.c_str(), pObj->name))
-        return true;
-
-    RussianString rs(pObj->short_descr);
-    DLString descr = rs.decline(Grammar::Case::MAX).colourStrip();
-    
-    if (is_name(arg.c_str(), descr.c_str()))
-        return true;
-
-    return false;
+    DLString allnames = russian_case_all_forms(pObj->short_descr) + " " + pObj->name;    
+    return is_name(arg.c_str(), allnames.c_str());
 }
 
 /** Return true if character can access object by the name. */

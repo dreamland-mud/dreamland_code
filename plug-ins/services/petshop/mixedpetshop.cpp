@@ -154,11 +154,9 @@ bool MixedPetShopRoom::lookupMixedList( MixedList &list, MixedEntry &e, Characte
         int count = 0;
 
         for (i = list.begin( ); i != list.end( ); i++) {
-            RussianString rs(i->short_descr);
-            DLString descr = rs.decline(Grammar::Case::MAX).colourStrip();
+            DLString allnames = russian_case_all_forms(i->short_descr) + " " + i->name;
 
-            if (!is_name( arg.c_str( ), descr.c_str())
-                && !is_name( arg.c_str( ), i->name.c_str( ) ))
+            if (!is_name( arg.c_str( ), allnames.c_str()))
                 continue;
 
             if (++count == number) {
