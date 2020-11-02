@@ -426,7 +426,7 @@ void char_update( )
 
         if ((ch->position == POS_INCAP && number_range(0, 1) == 0)
             || ch->position == POS_MORTAL
-            || ch->position == POS_DEAD)
+            || (ch->position == POS_DEAD && !ch->isDead()))
         {
             room_to_save( ch );
             rawdamage( ch, ch, DAM_NONE, 1, false );
