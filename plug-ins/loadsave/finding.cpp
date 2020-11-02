@@ -981,3 +981,12 @@ bool text_match_with_highlight(const DLString &text, const DLString &args, ostri
 
     return found;
 }
+
+NPCharacter * find_mob_with_act( Room *room, bitstring_t act )
+{    
+    for (Character* rch = room->people; rch != 0; rch = rch->next_in_room )
+       if (rch->is_npc() && IS_SET(rch->act, act))
+          return rch->getNPC( );
+    return NULL;
+}
+

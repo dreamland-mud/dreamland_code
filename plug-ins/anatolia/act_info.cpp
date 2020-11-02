@@ -127,14 +127,6 @@ bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 DLString quality_percent( int ); /* XXX */
 DLString help_article_disambig(const HelpArticle *help);
 
-NPCharacter * find_mob_with_act( Room *room, bitstring_t act )
-{    
-    for (Character* rch = room->people; rch != 0; rch = rch->next_in_room )
-       if (rch->is_npc() && IS_SET(rch->act, act))
-          return rch->getNPC( );
-    return NULL;
-}
-
 CMDRUNP( rules )
 {
     do_help(ch,"worldrules");
@@ -1292,59 +1284,6 @@ CMDRUNP( request )
         affect_to_char ( ch,&af );
 
         return;
-}
-
-
-
-CMDRUNP( identify )
-{
-    Object *obj;
-    Character *rch;
-    int cost = 20;
-
-    if ( ch->is_npc( ) ) {
-        ch->send_to( "У тебя же лапки!!!\n\r");
-        return;
-    }
-    
-    if ( ( obj = get_obj_carry( ch, argument ) ) == 0 )
-    {
-       ch->send_to( "У тебя нет этого.\n\r");
-       return;
-    }
-
-    rch = find_mob_with_act( ch->in_room, ACT_SAGE );
-
-    if (!rch)
-    {
-       ch->send_to("Тут никто ничего толкового не скажет об этой вещи.\n\r");
-       return;
-    }
-   
-    int remorts = ch->getPC()->getRemorts( ).size( );
-    //add guru checks?
-    if ( remorts == 0) {
-        cost = round ((ch->getRealLevel( ) - cost) * 0.66);
-        cost = URANGE (0, cost, 20);
-    }
-
-
-    if (ch->is_immortal( )) {
-        act_p( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
-    }
-    else if (ch->gold < cost) {
-        tell_fmt("У тебя даже %3$d золот%3$Iого|ых|ых нету, чтобы мне заплатить!", ch, rch, cost );
-        return;
-    }
-    else {
-       ch->gold -= cost;
-       if ( cost > 0 ) ch->send_to("Твой кошелек становится значительно легче.\n\r");
-    }
-
-    act_p( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM,POS_RESTING );
-    
-    if (gsn_identify->getSpell( ))
-        gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );
 }
 
 
