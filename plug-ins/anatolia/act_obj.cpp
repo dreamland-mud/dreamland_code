@@ -759,13 +759,17 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
 {
     switch (container->item_type) {
     case ITEM_CONTAINER:
+        if (IS_SET(container->value1(), CONT_LOCKED)) {
+            ch->pecho("%1$^O1 заперт%1$Gо||а на ключ, попробуй отпереть.", container);
+            return false;
+        }
         if (IS_SET(container->value1(), CONT_CLOSED)) {
-            ch->println( "Тут закрыто." );
+            ch->pecho("%1$^O1 закрыт%1$Gо||а, попробуй открыть.", container);
             return false;
         }
 
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            ch->println( "Тебе не удалось нашарить ни одного кармана." );
+            ch->pecho( "Тебе не удалось нашарить ни одного кармана на %O6.", container );
             return false;
         }
 
@@ -775,17 +779,15 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
         return true;
 
     default:
-        ch->println("Это не контейнер.");
+        ch->pecho("Ты пытаешься что-то положить в %O4, но это не контейнер.", container);
         return false;
     }
-
-
 }
 
 static bool can_put_money_into( Character *ch, Object *container )
 {
     if (container->item_type != ITEM_CONTAINER) {
-        ch->pecho("%^O1 не контейнер.", container);
+        ch->pecho("Ты пытаешься положить деньги в %O4, но это не контейнер.", container);
         return false;
     }
 

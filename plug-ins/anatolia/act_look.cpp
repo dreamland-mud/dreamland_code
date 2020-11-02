@@ -48,6 +48,7 @@
 #include "directions.h"
 #include "attract.h"
 #include "occupations.h"
+#include "terrains.h"
 #include "move_utils.h"
 #include "act_lock.h"
 #include "../anatolia/handler.h"
@@ -1667,8 +1668,13 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 {
     ContainerKeyhole( ch, obj ).doExamine( );
 
+    if (IS_SET(obj->value1(), CONT_LOCKED)) {
+        ch->pecho("%1$^O1 заперт%1$Gо||а на ключ, сперва отопри.", obj);
+        return true;
+    }
+
     if (IS_SET(obj->value1(), CONT_CLOSED)) {
-        ch->println( "Тут закрыто." );
+        ch->pecho("%1$^O1 закрыт%1$Gо||а, сперва открой.", obj);
         return true;
     }
     
@@ -1680,6 +1686,13 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     }
     
     const char *p = pocket.c_str( );
+    const char *where;
+    if (obj->in_room)
+        where = terrains[obj->in_room->sector_type].where;
+    else if (obj->wear_loc == wear_none)
+        where = "в твоих руках";
+    else
+        where = "в твоей экипировке";
 
     if (IS_SET(obj->value1(),CONT_PUT_ON|CONT_PUT_ON2)) {
         if (!pocket.empty( ))
@@ -1695,7 +1708,7 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
                 ch->pecho( "В кармане %1$O2 с надписью '%2$s' ты видишь:", obj, p );
         }
         else {
-            ch->pecho( "%1$^O1 содерж%1$nит|ат:", obj );
+            ch->pecho( "%1$^O1 %2s содерж%1$nит|ат:", obj, where );
         }
     }
 

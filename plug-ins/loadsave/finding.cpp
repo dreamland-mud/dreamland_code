@@ -425,18 +425,7 @@ Object *get_obj_here( Character *ch, char *argument )
         int number = number_argument( argument, arg );
         long long id = get_arg_id( argument );
 
-        // At first look in room...
-        for ( obj = ch->in_room->contents; obj != 0; obj = obj->next_content )
-        {
-                if ( ( ch->can_see( obj ) || ch->can_hear( obj ) )
-                        && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-                {
-                        if (id || ++count == number )
-                                return obj;
-                }
-        }
-
-        // ... then inventory ...
+        // At first look in inventory ...
         for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
         {
                 if ( obj->wear_loc == wear_none
@@ -448,10 +437,21 @@ Object *get_obj_here( Character *ch, char *argument )
                 }
         }
 
-        // ... and equipment, at last!
+        // ... then equipment
         for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
         {
                 if ( obj->wear_loc != wear_none
+                        && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
+                {
+                        if (id || ++count == number )
+                                return obj;
+                }
+        }
+
+        // ... then the floor.
+        for ( obj = ch->in_room->contents; obj != 0; obj = obj->next_content )
+        {
+                if ( ( ch->can_see( obj ) || ch->can_hear( obj ) )
                         && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
                 {
                         if (id || ++count == number )
