@@ -91,6 +91,24 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLSt
     return false;
 }            
 
+static bool get_mob_resets( MOB_INDEX_DATA *pMob, AREA_DATA *&pArea, DLString &where )
+{
+    for (Room *room = room_list; room; room = room->rnext) {
+        for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next) {
+            switch(pReset->command) {
+            case 'M':
+                if (pReset->arg1 == pMob->vnum) {
+                    pArea = room->area;
+                    where = room->name;
+                    return true;
+                }
+            }
+        }                
+    }
+
+    return false;
+}
+
 static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AREA_DATA *&pArea, DLString &where )
 {
     // First look for obj resets in the same area it's from.
@@ -597,23 +615,7 @@ public:
 PluginInitializer<SearcherDumpTask> initSearcherDumpTask;
 
 /* Example syntax:
- * searcher armor level > 50 and level < 60 and wearloc='neck' and vuln != ''
- * searcher armor level > 50 and level < 60 and extra='nodrop'
- *
- * Fields:
- *  level, lvl
- *  wearloc
- *  type
- *  str,int,wis,dex,con,cha
- *  hr,dr,hp,mana,svs,mov,heal_gain,mana_gain,size,age
- *  vuln,res,imm,det,aff
- *  material
- *  extra
- *  where : area,room
- * 
- *  Operands:
- *      and or () >= <= == !=
- *      in like contains
+ * searcher q type='armor' ad level > 50 and level < 60 and wearloc='neck' and vuln != ''
  */
 CMDRUNP(searcher)
 {
@@ -822,5 +824,71 @@ CMDRUNP(searcher)
         return;
     }
 
-    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\nsearcher q <item query>\nsearcher wq <weapon query>\n");
+
+    if (arg_oneof(arg, "mquery")) {
+
+        if (args.empty()) {
+            ch->println("Usage: searcher mq <query string>\nSee 'help searcher' for details.");
+            return;
+        }
+    
+        try {
+            Profiler prof;
+            int cnt = 0;
+            int maxLevel = LEVEL_MORTAL * 2;
+            vector<list<DLString> > output(maxLevel+1);
+            DLString lineFormat = 
+                web_cmd(ch, "medit $1", "%5d") + " {C%3d{x %-20.20s {D%s{x\n";
+
+            prof.start();
+
+            for (int i = 0; i < MAX_KEY_HASH; i++)
+            for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+                if (pMob->level > maxLevel)
+                    continue;
+
+                if (searcher_parse(pMob, args.c_str())) {
+                    DLString line = 
+                        fmt(NULL, lineFormat.c_str(), 
+                                    pMob->vnum,
+                                    pMob->level, 
+                                    russian_case(pMob->short_descr, '1').c_str(),
+                                    pMob->area->name);
+
+                    DLString where;
+                    AREA_DATA *pArea;
+                    if (IS_SET(pMob->area->area_flag, AREA_HIDDEN) || !get_mob_resets(pMob, pArea, where)) {
+                        line.colourstrip();
+                        line = "{D" + line + "{x";
+                    }
+
+                    output[pMob->level].push_back(line);
+                    cnt++;
+                }
+            } 
+    
+            ostringstream buf;
+            buf << fmt(0, "{W%5s %3s %-20.20s %s{x\n", 
+                            "VNUM", "LVL", "NAME", "AREA");
+            for (size_t lvl = 0; lvl < output.size(); lvl++) {
+                const list<DLString> &lines = output[lvl];
+                for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
+                    buf << *l;
+            }
+
+            prof.stop();
+            buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+     
+            page_to_char(buf.str().c_str(), ch);
+        } catch (const Exception &ex) {
+            ch->println(ex.what());
+        }
+
+        return;
+    }
+
+    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\n"
+               "searcher q <item query>\n"
+               "searcher wq <weapon query>\n"
+               "searcher mq <mob query>\n");
 }
