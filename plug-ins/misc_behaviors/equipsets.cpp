@@ -6,6 +6,7 @@
 #include "pcharacter.h"
 #include "character.h"
 #include "object.h"
+#include "skill.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -31,8 +32,8 @@ PROF(necromancer);
 /*--------------------------------------------------------------------------
  * EquipSet
  *-------------------------------------------------------------------------*/
-EquipSet::EquipSet(int size, bool noDoubleNeck_, bool noDoubleWrist_) 
-                      : totalSetSize(size), noDoubleNeck(noDoubleNeck_), noDoubleWrist(noDoubleWrist_)
+EquipSet::EquipSet(int sn_, int size, bool noDoubleNeck_, bool noDoubleWrist_) 
+                      : sn(sn_), totalSetSize(size), noDoubleNeck(noDoubleNeck_), noDoubleWrist(noDoubleWrist_)
 {
 }
  
@@ -42,7 +43,7 @@ void EquipSet::equip( Character *victim )
     if (hasAffect(victim)) 
         return;
 
-    if (!isComplete(victim)) 
+    if (!isComplete(victim, true)) 
         return;
 
     addAffect(victim);    
@@ -54,17 +55,16 @@ void EquipSet::remove( Character *victim )
     if (!hasAffect(victim))
         return;
 
-    if (isComplete(victim))
+    if (isComplete(victim, false))
         return;
 
     removeAffect(victim);
 }
 
-bool EquipSet::isComplete(Character *ch) const
+bool EquipSet::isComplete(Character *ch, bool verbose) const
 {
     GlobalArray slots(wearlocationManager);
     int wornSetSize = 0;
-
     
     if (totalSetSize <= 0)
         return false;
@@ -97,16 +97,20 @@ bool EquipSet::isComplete(Character *ch) const
             wornSetSize--;
     }
     
-    ch->pecho("Надето предметов из {hh67комплекта{x: {C%d{x из {c%d{x.", wornSetSize, totalSetSize);
+    bool complete = wornSetSize >= totalSetSize;
 
-    return wornSetSize >= totalSetSize;
+    if (verbose && !complete)
+        ch->pecho("Ты надел%Gо||а уже {c%d{x из {C%d{x предметов {hh67комплекта{x '{C%N1{x'.",
+                   ch, wornSetSize, totalSetSize, skillManager->find(sn)->getRussianName().c_str());
+
+    return complete;
 }
 
 /*--------------------------------------------------------------------------
  * SidheArmorSet
  *-------------------------------------------------------------------------*/
 SidheArmorSet::SidheArmorSet()
-                : EquipSet(5, true, true), sn(gsn_sidhe_armor)
+                : EquipSet(gsn_sidhe_armor, 5, true, true)
 {
 }
 
@@ -161,7 +165,7 @@ void SidheArmorSet::removeAffect(Character *ch) const
  * TravellersJoySet 
  *-------------------------------------------------------------------------*/
 TravellersJoySet::TravellersJoySet()
-                : EquipSet(4, true, true), sn(gsn_travellers_joy)
+                : EquipSet(gsn_travellers_joy, 4, true, true)
 {
 }
 
@@ -228,7 +232,7 @@ void TravellersJoySet::fight( Character *ch )
  * NorivaMyrvaleSet 
  *-------------------------------------------------------------------------*/
 NorivaMyrvaleSet::NorivaMyrvaleSet()
-                : EquipSet(12, false, false), sn(gsn_myrvale_noriva)
+                : EquipSet(gsn_myrvale_noriva, 12, false, false)
 {
 }
 
@@ -269,7 +273,7 @@ void NorivaMyrvaleSet::removeAffect(Character *ch) const
  * ReykarisShevaleSet 
  *-------------------------------------------------------------------------*/
 ReykarisShevaleSet::ReykarisShevaleSet()
-                : EquipSet(9, false, false), sn(gsn_shevale_reykaris)
+                : EquipSet(gsn_shevale_reykaris, 9, false, false)
 {
 }
 
@@ -310,7 +314,7 @@ void ReykarisShevaleSet::removeAffect(Character *ch) const
  * MorrisDancerSet 
  *-------------------------------------------------------------------------*/
 MorrisDancerSet::MorrisDancerSet()
-                : EquipSet(4, true, true), sn(gsn_morris_dancer)
+                : EquipSet(gsn_morris_dancer, 4, true, true)
 {
 }
 
