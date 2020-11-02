@@ -37,6 +37,7 @@ public:
         typedef ::Pointer<ClanHealerHunter> Pointer;
     
         void speech( Character *wch, const char *speech );
+        void tell( Character *wch, const char *speech );
 };
 
 class ClanAreaHunter: public ClanArea {

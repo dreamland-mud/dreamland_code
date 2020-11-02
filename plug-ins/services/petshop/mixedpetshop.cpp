@@ -9,6 +9,7 @@
 #include "attract.h"
 #include "occupations.h"
 
+#include "grammar_entities_impl.h"
 #include "object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -153,7 +154,10 @@ bool MixedPetShopRoom::lookupMixedList( MixedList &list, MixedEntry &e, Characte
         int count = 0;
 
         for (i = list.begin( ); i != list.end( ); i++) {
-            if (!is_name( arg.c_str( ), i->short_descr.ruscase( '7' ).c_str( ) )
+            RussianString rs(i->short_descr);
+            DLString descr = rs.decline(Grammar::Case::MAX).colourStrip();
+
+            if (!is_name( arg.c_str( ), descr.c_str())
                 && !is_name( arg.c_str( ), i->name.c_str( ) ))
                 continue;
 

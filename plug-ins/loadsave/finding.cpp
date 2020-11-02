@@ -6,6 +6,7 @@
 #include "loadsave.h"
 #include "save.h"
 
+#include "grammar_entities_impl.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -906,6 +907,20 @@ bool can_see_god(Character *ch, Character *god)
         return false;
 
     return true;
+}
+
+bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg )
+{
+    if (is_name(arg.c_str(), pObj->name))
+        return true;
+
+    RussianString rs(pObj->short_descr);
+    DLString descr = rs.decline(Grammar::Case::MAX).colourStrip();
+    
+    if (is_name(arg.c_str(), descr.c_str()))
+        return true;
+
+    return false;
 }
 
 /** Return true if character can access object by the name. */

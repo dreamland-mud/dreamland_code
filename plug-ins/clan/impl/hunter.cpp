@@ -18,6 +18,7 @@
 
 #include "commonattributes.h"
 #include "char.h"
+#include "util/regexp.h"
 
 #include "commandtemplate.h"
 #include "summoncreaturespell.h"
@@ -52,6 +53,8 @@
 
 #define OBJ_VNUM_HUNTER_PIT           110
 
+bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg );
+
 GSN(hunter_pit);
 GSN(hunter_beacon);
 GSN(hunter_snare);
@@ -67,6 +70,11 @@ CLAN(flowers);
 /*--------------------------------------------------------------------------
  * Hunter's Cleric 
  *-------------------------------------------------------------------------*/
+void ClanHealerHunter::tell( Character *ach, const char *msg )
+{
+    speech(ach, msg);
+}
+
 void ClanHealerHunter::speech( Character *ach, const char *speech )
 {
     PCharacter *wch;
@@ -75,22 +83,24 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
     int vnum = 0;
     ClanAreaHunter::Weapons::iterator i;
     ClanAreaHunter::Pointer clanArea;
-    DLString msg( speech ), trouble( "trouble" );
+    RegExp trouble("^(trouble|потеряла?) *(.*)$");
     
     if (!( wch = ach->getPC( ) ))
         return;
-
-    if (!trouble.strPrefix( msg ))
-        return;
-    
-    msg.erase( 0, trouble.length( ) );
-
     if (!getClanArea( ))
         return;
     if (!( clanArea = getClanArea( ).getDynamicPointer<ClanAreaHunter>( ) ))
         return;
-    if (!( vnum = clanArea->vnumByString( msg ) ))
+
+    RegExp::MatchVector matches = trouble.subexpr(speech);
+    if (matches.empty())
         return;
+
+    DLString itemName = matches.at(1);
+    if (!( vnum = clanArea->vnumByString( itemName ) )) {
+        do_say(ch, "Я не понимаю, что именно ты хочешь вернуть?");
+        return;
+    }
    
     if (wch->getClan( ) != clanArea->getClan( )) {
         do_say(ch, "Тебе придется сильно постараться!");
@@ -111,12 +121,13 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
             obj = clanArea->createArmor( wch );
         else
             obj = clanArea->createWeapon( wch, vnum );
+
+        obj_to_char( obj, wch );
         
-        interpret_fmt( ch, "emote создает %s.", obj->getShortDescr( '4' ).c_str( ) );
-        interpret_fmt( ch, "say Я дам тебе другой %s.", obj->getShortDescr( '4' ).c_str( ) );
+        ch->recho("%^C1 создает %O4.", ch, obj);        
+        say_fmt("Я дам тебе друг%3$Gое|ой|ую %3$#O4.", ch, wch, obj);        
         act( "$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
         act( "$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
-        obj_to_char( obj, wch );
         do_say( ch, "Будь внимательней! Не потеряй снова!" );
         return;
     }
@@ -124,12 +135,11 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
     if (( carrier = obj->getCarrier( ) )) {
         if (carrier == wch) {
             do_say( ch, "Это шутка такая? Давай посмеемся вместе!" );
-            interpret_raw( ch, "smite", wch->getNameP( ));
         }
         else {
-            interpret_raw( ch, "say", "%s находится у %s!",
+            interpret_raw( ch, "say", "{1%s{2 находится у %s!",
                             obj->getShortDescr( '1' ).c_str( ),
-                            wch->sees( carrier, '4' ).c_str( ) );
+                            wch->sees( carrier, '2' ).c_str( ) );
             interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
                             wch->sees( carrier, '1' ).c_str( ),
                             carrier->in_room->area->name,
@@ -137,7 +147,7 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
         }
     }
     else {
-        interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
+        interpret_raw( ch, "say", "{1%s{2 находится в зоне %s около %s!",
                         obj->getShortDescr( '1' ).c_str( ),
                         obj->getRoom( )->area->name, 
                         obj->getRoom( )->name );
@@ -216,7 +226,7 @@ void ClanGuardHunter::createEquipment( PCharacter *wch )
     obj_to_char( armor, wch );
 
     do_say( ch, "Помни! Если оружие будет утеряно, то найти его поможет клановый лекарь!" );
-    do_say( ch, "Просто скажи ему 'trouble' и имя вещи... Например, 'troublearmor'." );
+    do_say( ch, "Просто скажи ему '{lRпотерял{Sfа{Sx{lEtrouble{lx{g' и имя вещи. Например, '{lRпотерял{Sfа{Sx жакет{lEtrouble armor{x'." );
 }
 
 /*--------------------------------------------------------------------------
@@ -229,7 +239,7 @@ HunterEquip::HunterEquip( )
 
 void HunterEquip::config( PCharacter *wch )
 {
-    obj->fmtShortDescr( obj->getShortDescr( ), wch->getNameP( ) );
+    obj->fmtShortDescr( obj->getShortDescr( ), wch->getNameP('2').c_str() );
     obj->setOwner( wch->getNameP( ) );
     obj->from = str_dup( wch->getNameP( ) );
     obj->level = wch->getRealLevel( );
@@ -238,7 +248,7 @@ void HunterEquip::config( PCharacter *wch )
     if (obj->pIndexData->extra_descr) {
         char buf[MAX_STRING_LENGTH];
 
-        sprintf( buf, obj->pIndexData->extra_descr->description, wch->getNameP( ) );
+        sprintf( buf, obj->pIndexData->extra_descr->description, wch->getNameP('1').c_str() );
         obj->addExtraDescr( obj->pIndexData->extra_descr->keyword, buf );
     }
 }   
@@ -572,14 +582,15 @@ Object * ClanAreaHunter::createWeapon( PCharacter *wch, int vnum )
 
 int ClanAreaHunter::vnumByString( const DLString& msg )
 {
-    Weapons::iterator i;
+    list<OBJ_INDEX_DATA *> items;
+    items.push_back(get_obj_index(armorVnum));
+    for (auto &w: weapons) 
+        items.push_back(get_obj_index(w.second));
 
-    if (msg == "armor" || msg == "armour")
-        return armorVnum;
-    else
-        for (i = weapons.begin( ); i != weapons.end( ); i++) 
-            if (msg == i->first) 
-                return i->second;
+    for (auto *pObj: items) {
+        if (pObj && obj_index_has_name(pObj, msg))
+            return pObj->vnum;
+    }
 
     return 0;
 }
