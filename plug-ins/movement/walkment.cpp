@@ -393,19 +393,31 @@ bool Walkment::checkAir( Character *wch )
     if (MOUNTED(wch))
         return true;
 
-    if (is_flying( wch ))
-        return true;
-
     if (wch->is_immortal( ) || wch->is_mirror( ))
         return true;
 
     if (IS_GHOST(wch))
         return true;
-    
+
+    bool would_fly = false;
+
+    if (can_fly( wch )) {
+        would_fly = true;
+
+        if (!ch->posFlags.isSet(POS_FLY_DOWN))
+            return true;
+    }
+
     rc = RC_MOVE_AIR;
-    msgSelfParty( wch, 
-                  "Ты не умеешь летать.", 
-                  "%2$^C1 не умеет летать." );
+
+    if (would_fly)
+        msgSelfParty(wch, 
+                    "Сначала тебе надо {y{hcвзлететь{x.", 
+                    "%2$^C1 долж%2$Gно|ен|на сначала взлететь.");
+    else
+        msgSelfParty( wch, 
+                    "Ты не умеешь летать.", 
+                    "%2$^C1 не умеет летать." );
     return false;
 }
 
