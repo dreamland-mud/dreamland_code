@@ -28,6 +28,8 @@
 
 GSN(haggle);
 RELIG(fili);
+bool can_afford(Character *ch, int gold, int silver, int number);
+void deduct_cost(Character *ch, int cost);
 
 static void mprog_repair( Character *mob, Character *client, Object *obj, int cost )
 {
@@ -97,7 +99,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     
     cost = getRepairCost( obj );
 
-    if (cost > client->gold) { // TODO take silver into account.
+    if (!can_afford(client, cost, 0, 1)) {
         say_act( client, ch, "У тебя не хватит денег, чтоб оплатить ремонт этой вещи.");
         return;
     }
@@ -116,7 +118,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
 
     client->setWaitViolence( 1 );
 
-    client->gold -= cost;
+    deduct_cost(client, cost * 100);
     ch->gold += cost;
 
     act("$C1 берет $o4 y $c2, восстанавливает и возвращает $c3.",client,obj,ch,TO_ROOM);
@@ -144,24 +146,30 @@ void Repairman::doEstimate( Character *client, const DLString &cArgs )
     }
 
     if ((obj = get_obj_carry(client, arg.c_str( ))) == 0) {
-        say_act( client, ch, "У тебя нет этого");
+        say_act( client, ch, "У тебя нет этого.");
         return;
     }
     
     if (!canRepair( obj, client ))
         return;
     
-    tell_fmt( "Восстановление этой вещи будет стоить %3$d.", 
-               client, ch, getRepairCost( obj ) );
+    int cost = getRepairCost(obj);
+
+    if (cost > 0)
+        tell_fmt( "Ремонт этой вещи будет стоить %3$d золот%3$Iую|ые|ых монет%3$Iу|ы|.", 
+                client, ch, cost);
+    else
+        tell_fmt("Я, так и быть, отремонтирую тебе эту вещь бесплатно.", client, ch);
 }
 
+/** Return cost of repair in gold. */
 int Repairman::getRepairCost( Object *obj )
 {
     int cost;
     
     cost = obj->level * 10 + (obj->cost * (100 - obj->condition)) / 100;
     cost /= 100;
-    return cost;
+    return max(0, cost);
 }
 
 bool Repairman::canRepair( Object *obj, Character *client )

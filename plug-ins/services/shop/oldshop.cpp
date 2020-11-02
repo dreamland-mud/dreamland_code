@@ -63,6 +63,13 @@ void obj_to_keeper( Object *obj, NPCharacter *ch );
 Object *get_obj_keeper( Character *ch, ShopTrader::Pointer, const DLString &constArguments );
 void deduct_cost(Character *ch, int cost);
 
+bool can_afford(Character *ch, int gold, int silver, int number)
+{
+    int cost = gold * 100 + silver;
+
+    return (ch->silver + ch->gold * 100) >= (cost * number);
+}
+
 static bool  
 mprog_sell( Character *ch, Character *buyer, Object *obj, int cost, int number )
 {
@@ -185,7 +192,7 @@ CMDRUN( buy )
         return;
     }
 
-    if ( ( ch->silver + ch->gold * 100) < cost * number )
+    if (!can_afford(ch, 0, cost, number))
     {
         if ( number > 1 )
             act_p( "$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",
