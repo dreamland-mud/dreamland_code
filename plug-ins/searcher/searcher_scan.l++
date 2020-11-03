@@ -12,6 +12,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "grammar_entities_impl.h"
 #include "searcher_val.h"    
 #include "searcher_parse.h++"
 #include "pcharacter.h"
@@ -96,6 +97,17 @@ L	    ([A-Za-z_]|{RL})
 "FENIA"     return T_FENIA;
 "LEARNED"   return T_LEARNED;
 "MATERIAL"  return T_MATERIAL;
+"FORM"      return T_FORM;
+"PARTS"     return T_PARTS;
+"ACT"       return T_ACT;
+"OFF"       return T_OFF;
+"GROUP"     return T_GROUP;
+"SPEC"      return T_SPEC;
+"ALIGNMENT" return T_ALIGN;
+"ALIGN"     return T_ALIGN;
+"RACE"      return T_RACE;
+"SEX"       return T_SEX;
+"NUMBER"    return T_NUMBER;
 
 
 "<="	    return T_LEQ;
@@ -111,15 +123,74 @@ L	    ([A-Za-z_]|{RL})
 
 %%
 
+// Create a list of all fenia triggers.
+static DLString fenia_triggers(Scripting::Object *wrapper)
+{
+    WrapperBase *base = get_wrapper(wrapper);
+    if (base) {
+        StringSet feniaTriggers, feniaMisc;
+        base->collectTriggers(feniaTriggers, feniaMisc);
+        return feniaTriggers.toString();
+    }
+
+    return DLString::emptyString;
+}
+
+// Clear all fields between the searches.
+void SearcherParam::init()
+{
+    result = false;
+
+    // Common fields.
+    name = "";
+    vnum = level = 0;
+    hr = dr = hp = mana = move = saves = armor = size = 0;
+    str = inta = wis = dex = con = cha = 0;
+    heal_gain = mana_gain = 0;
+    det = aff = imm = res = vuln = "";
+    material = "";
+    fenia = "";
+    damage = "";
+
+    // Mobile fields.
+    pMob = 0;
+    form = parts = "";
+    act = off = "";
+    group = 0;
+    spec = "";
+    alignment = 0;
+    race = sex = number = "";
+
+    // Item fields.
+    pObj = 0;
+    limit = -1;
+    extra = wear = itemtype = "";
+    age = 0;
+    slevel = 0;
+    learned = "";
+    ed = false;
+
+    // Weapon fields.
+    wclass = wflags = "";
+    ave = 0; d1 = 0; d2 = 0;
+}
+
+/** Populate global searcher parameters and launch obj or weapon search for the given user query. */
 bool searcher_parse(struct obj_index_data *pObj, const char *args)
 {
     YY_BUFFER_STATE yybuf;
     
     yybuf = yy_scan_string( args );
 
+    p.init();
+
     p.pObj = pObj;
+
+    p.vnum = pObj->vnum;
+    p.level = pObj->level;
+    p.limit = pObj->limit;
     
-    p.name = russian_case(pObj->short_descr, '7').colourStrip() + " " + pObj->name;
+    p.name = russian_case_all_forms(pObj->short_descr) + " " + pObj->name;
     p.ed = (pObj->extra_descr != NULL);
     p.extra = extra_flags.names(pObj->extra_flags);
 
@@ -129,15 +200,8 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
 
     p.itemtype = item_table.name(pObj->item_type);
 
-    p.hr = p.dr = p.hp = p.mana = p.move = p.saves = p.armor = p.size = p.age = 0;
-    p.str = p.inta = p.wis = p.dex = p.con = p.cha = 0;
-    p.heal_gain = p.mana_gain = 0;
-    p.det = p.aff = p.imm = p.res = p.vuln = "";
-    p.wclass = p.wflags = "";
-    p.ave = 0; p.d1 = 0; p.d2 = 0;
-    p.damage = "";
-    p.learned = "";
-    p.slevel = 0;
+    p.material = pObj->material;
+    p.fenia = fenia_triggers(pObj->wrapper);
 
     for (Affect *paf = pObj->affected; paf; paf = paf->next) {
         int m = paf->modifier;
@@ -197,16 +261,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         p.d1 = pObj->value[1];
         p.d2 = pObj->value[2];
         p.ave = (1 + p.d2) * p.d1 / 2; 
-        p.damage = weapon_flags.name(pObj->value[3]).c_str();        
-    }
-
-    WrapperBase *base = get_wrapper(pObj->wrapper);
-    if (base) {
-        StringSet feniaTriggers, feniaMisc;
-        base->collectTriggers(feniaTriggers, feniaMisc);
-        p.fenia = feniaTriggers.toString();
-    } else {
-        p.fenia = "";
+        p.damage = weapon_flags.name(pObj->value[3]);
     }
 
     if (searcher_yyparse( ) != 0) {
@@ -217,3 +272,56 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     yy_delete_buffer( yybuf );
     return p.result;
 }	
+
+/** Populate global searcher parameters and launch mob search for the given user query. */
+bool searcher_parse(struct mob_index_data *pMob, const char *args)
+{
+    YY_BUFFER_STATE yybuf;
+    
+    yybuf = yy_scan_string( args );
+
+    p.init();
+
+    p.name = russian_case_all_forms(pMob->short_descr) + " " + pMob->player_name;
+    p.vnum = pMob->vnum;
+    p.level = pMob->level;
+    p.hr = pMob->hitroll;
+    p.dr = pMob->damage[DICE_BONUS];
+    p.hp = 0; // TODO discuss
+    p.mana = 0; // TODO discuss
+    p.move = 0; // TODO discuss
+    p.saves = 0; // not set during creation
+    p.armor = pMob->ac[0]; // show AC vs pierce
+    p.size = pMob->size;
+    // TODO: stats computed during creation, discuss
+    // heal_gain, mana_gain not set in index data
+    
+    p.aff = affect_flags.names(pMob->affected_by);
+    p.vuln = vuln_flags.names(pMob->vuln_flags);
+    p.res = res_flags.names(pMob->res_flags);
+    p.imm = imm_flags.names(pMob->imm_flags);
+    p.det = detect_flags.names(pMob->detection);
+    p.material = pMob->material;
+    p.fenia = fenia_triggers(pMob->wrapper);
+    p.damage = weapon_flags.name(pMob->dam_type);
+
+    p.pMob = pMob;
+    p.form = form_flags.names(pMob->form);
+    p.parts = part_flags.names(pMob->parts);
+    p.act = act_flags.names(pMob->act);
+    p.off = off_flags.names(pMob->off_flags);
+    p.group = pMob->group;
+    p.spec = pMob->spec_fun.name;
+    p.alignment = pMob->alignment; // NO_ALIGN act bit needs to be queried separately.
+    p.race = DLString(pMob->race).toLower();
+    p.sex = sex_table.name(pMob->sex);
+    p.number = pMob->gram_number.toString();
+
+    if (searcher_yyparse( ) != 0) {
+        yy_delete_buffer( yybuf );
+        throw Exception( "Syntax error." );
+    }
+
+    yy_delete_buffer( yybuf );
+    return p.result;
+}
