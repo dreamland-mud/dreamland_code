@@ -7,6 +7,7 @@
 #include "rainbowinfo.h"
 #include "mobiles.h"
 #include "objects.h"
+#include "objectbehaviorplugin.h"
 
 extern "C"
 {

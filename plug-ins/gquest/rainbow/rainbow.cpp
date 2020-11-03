@@ -359,6 +359,7 @@ Object * RainbowGQuest::createPiece( int number )
     piece = create_object( pObjIndex, 0 );
     behavior->setObj( piece );
     behavior->config( number );
+    behavior->setQuest(*this);
     piece->behavior.setPointer( *behavior );
 
     return piece;

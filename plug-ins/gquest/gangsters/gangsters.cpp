@@ -588,6 +588,7 @@ Object * Gangsters::createKey( )
         
     key = create_object( pObjIndex, 0 );
     behavior->setObj( key );
+    behavior->setQuest(*this);
     key->behavior.setPointer( *behavior );
 
     return key;
