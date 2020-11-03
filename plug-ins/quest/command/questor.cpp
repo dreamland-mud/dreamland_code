@@ -563,7 +563,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             if(!rated_as_guru(client)){
                tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
             if(IS_TOTAL_NEWBIE(client)){
-               tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+               tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка перерождение{lEhelp remort{x){G, это бесплатно!");
             }
             }
             
