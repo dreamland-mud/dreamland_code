@@ -668,11 +668,13 @@ SKILL_RUNP( throwspear )
                 return;            
         }
 
+    // This limitation seems pretty arbitrary, spears can be thrown with shield/dual. Commenting for now.
+    /*
         if ( get_eq_char(ch,wear_second_wield) || get_eq_char(ch,wear_shield) )
         {
                 ch->send_to("Твоя вторая рука дожна быть свободна!\n\r");
                 return;            
-        }
+        } */
 
         ch->setWait(gsn_spear->getBeats( ) );
 
