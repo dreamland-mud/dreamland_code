@@ -35,6 +35,7 @@
 #include "handler.h"
 #include "gsn_plugin.h"
 #include "profflags.h"
+#include "liquidflags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -501,12 +502,23 @@ LiquidWrapper::LiquidWrapper( const DLString &n )
 
 Scripting::Register LiquidWrapper::wrap( const DLString &name )
 {
+    if (!liquidManager->findExisting(name))
+        throw Scripting::Exception("Liquid not found");
+
     LiquidWrapper::Pointer hw( NEW, name );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( hw );
 
     return Scripting::Register( sobj );
+}
+
+Liquid * LiquidWrapper::getTarget() const
+{
+    Liquid *liq = liquidManager->find(name);
+    if (!liq)
+        throw Scripting::Exception("Liquid not found");
+    return liq;
 }
 
 NMI_INVOKE( LiquidWrapper, api, "(): печатает этот api" )
@@ -520,39 +532,43 @@ NMI_INVOKE( LiquidWrapper, api, "(): печатает этот api" )
 
 NMI_GET( LiquidWrapper, name, "английское название" ) 
 {
-    return liquidManager->find( name )->getName( );
+    return getTarget()->getName( );
 }
 NMI_GET( LiquidWrapper, short_descr, "русское название с цветами и падежами" ) 
 {
-    return liquidManager->find( name )->getShortDescr( );
+    return getTarget()->getShortDescr( );
 }
 NMI_GET( LiquidWrapper, color, "прилагательное цвета с падежами" ) 
 {
-    return liquidManager->find( name )->getColor( );
+    return getTarget()->getColor( );
 }
 NMI_GET( LiquidWrapper, sip_size, "размер глотка" ) 
 {
-    return liquidManager->find( name )->getSipSize( );
+    return getTarget()->getSipSize( );
 }
 NMI_GET( LiquidWrapper, flags, "флаги жидкости (таблица .tables.liquid_flags)" ) 
 {
-    return Scripting::Register( (int)liquidManager->find( name )->getFlags( ).getValue( ) );;
+    return Scripting::Register( (int)getTarget()->getFlags( ).getValue( ) );;
 }
 NMI_GET( LiquidWrapper, index, "внутренний порядковый номер" ) 
 {
-    return liquidManager->find( name )->getIndex( );
+    return getTarget()->getIndex( );
 }
 NMI_GET( LiquidWrapper, hunger, "как хорошо утоляет голод" ) 
 {
-    return liquidManager->find( name )->getDesires( )[desire_hunger];
+    return getTarget()->getDesires( )[desire_hunger];
 }
 NMI_GET( LiquidWrapper, thirst, "как хорошо утоляет жажду" ) 
 {
-    return liquidManager->find( name )->getDesires( )[desire_thirst];
+    return getTarget()->getDesires( )[desire_thirst];
 }
 NMI_GET( LiquidWrapper, full, "как хорошо насыщает" ) 
 {
-    return liquidManager->find( name )->getDesires( )[desire_full];
+    return getTarget()->getDesires( )[desire_full];
+}
+NMI_INVOKE( LiquidWrapper, isBooze, "алкоголь ли это" ) 
+{
+    return getTarget()->getFlags().isSet(LIQF_BEER|LIQF_LIQUOR|LIQF_WINE);
 }
 
 /*----------------------------------------------------------------------

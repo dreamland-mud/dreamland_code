@@ -55,6 +55,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/ai \
 -I$(top_srcdir)/plug-ins/craft \
 -I$(top_srcdir)/plug-ins/religion \
+-I$(top_srcdir)/plug-ins/liquid \
 -I$(top_srcdir)/plug-ins/skills_impl  \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/services/core \
@@ -67,6 +68,7 @@ $(INCLUDES_SRC)
 libfeniaroot_la_LIBADD = \
 $(LIBADD_AI) \
 ../alignment/libalignment.la \
+../liquid/libliquid.la \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la \
 ../updates/libupdates.la \
