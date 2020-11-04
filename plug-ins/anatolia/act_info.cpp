@@ -282,7 +282,7 @@ const char * msgtable_lookup( const msgtable_t &table, int value )
 
 msgtable_t msg_positions = {
     { POS_DEAD,     "Ты ТРУП!!!"                  },
-    { POS_MORTAL,   "Ты присмерти."               },
+    { POS_MORTAL,   "Ты при смерти."               },
     { POS_INCAP,    "Ты в беспомощном состоянии." },
     { POS_STUNNED,  "Тебя оглушили."              },
     { POS_SLEEPING, "Ты спишь."                   },

@@ -310,6 +310,8 @@ void char_update( )
 
         // No timer or affect update will happen in chat rooms.
         bool frozen = IS_SET(ch->in_room->room_flags, ROOM_CHAT);
+        // Special mobs don't get their HP or position updated automatically.
+        bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
 
         if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
             act_p("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM,POS_RESTING);
@@ -370,7 +372,7 @@ void char_update( )
 
         SET_BIT(ch->affected_by, ch->getRace( )->getAff( ) );
 
-        if (ch->position == POS_STUNNED) {
+        if (ch->position == POS_STUNNED && !noupdate) {
             update_pos( ch );
             room_to_save( ch );
         }
@@ -414,7 +416,7 @@ void char_update( )
             }
         }
 
-        if (!frozen && !ch->isDead())
+        if (!frozen && !ch->isDead() && !noupdate)
             char_update_affects( ch );
 
         if (!ch->is_npc( )
@@ -428,11 +430,13 @@ void char_update( )
             || ch->position == POS_MORTAL
             || (ch->position == POS_DEAD && !ch->isDead()))
         {
-            room_to_save( ch );
-            rawdamage( ch, ch, DAM_NONE, 1, false );
+            if (!noupdate) {
+                room_to_save( ch );
+                rawdamage( ch, ch, DAM_NONE, 1, false );
+            }
         }
 
-        if (ch->position <= POS_STUNNED && ch->hit > 0) {
+        if (ch->position <= POS_STUNNED && ch->hit > 0 && !noupdate) {
             room_to_save( ch );
             update_pos( ch );
         }

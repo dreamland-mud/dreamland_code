@@ -20,6 +20,7 @@
 
 #include "object.h"
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "desire.h"
 #include "race.h"
 
@@ -58,6 +59,9 @@ void CharacterParamsUpdateTask::run( Character *ch )
         return;
 
     if (IS_SET(ch->in_room->room_flags, ROOM_CHAT))
+        return;
+
+    if (ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE))
         return;
 
     try {

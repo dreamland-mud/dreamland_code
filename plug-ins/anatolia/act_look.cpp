@@ -703,7 +703,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         break;
         
     case POS_MORTAL:   
-        buf << "присмерти." << endl;   
+        buf << "при смерти." << endl;   
         break;
         
     case POS_INCAP:    
