@@ -13,7 +13,7 @@
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
 
-Tested on clean Ubuntu 18.04 and gcc-9. You can either follow these instructions and create a local build environment,
+Tested on clean Ubuntu 18.04/20.04 and gcc-9. You can either follow these instructions and create a local build environment,
 or build a ready-to-use Docker container, as described in [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker) README file.
 
 ## (optional) Install gcc-9 compiler
