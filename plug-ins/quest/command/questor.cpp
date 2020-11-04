@@ -74,7 +74,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         if (client->getAttributes( ).isAvailable( "quest" )) 
             tell_raw( client, ch, "Твое задание невозможно выполнить." );
         else
-            tell_fmt( "Тебе нужно сначала получить (request) задание, %1$C1.", client, ch );
+            tell_fmt( "Тебе нужно сначала {yпопросить{x{le (quest request){x задание, %1$C1.", client, ch );
             
         return;
     }
@@ -353,7 +353,7 @@ void QuestScrollBehavior::createDescription( PCharacter *ch )
     bufEmpty << "Ты держишь в руках свиток из желтого пергамента, все надписи на котором размыты так, " << endl
              << "что невозможно что-либо разобрать." << endl;
 
-    bufInfo << "Ты держишь в руках свиток из желтого пергамента, испрещенный загадочными значками." << endl
+    bufInfo << "Ты держишь в руках свиток из желтого пергамента, испещренный загадочными значками." << endl
             << "Значки выведены аккуратным почерком, и, по-видимому, для их написания использовались особые чернила." << endl
             << "Из пометок рядом со значками ты понимаешь, что они содержат ";
             
@@ -453,7 +453,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
     ch->send_to( buf );
     if(extract) {
-        act("Чернила меркнут, и $o1 рассыпается трухой..", ch, obj, 0, TO_CHAR);
+        act("Чернила меркнут, и $o1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
         extract_obj( obj );
     }
     return true;

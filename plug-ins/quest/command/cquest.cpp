@@ -100,7 +100,7 @@ COMMAND(CQuest, "quest")
         return;
 
     if (IS_GHOST( pch )) {
-        pch->send_to("Наслажденье жизнью недоступно призракам.\r\n");
+        pch->send_to("Наслаждение жизнью недоступно призракам.\r\n");
         return;
     }
 
@@ -153,7 +153,7 @@ COMMAND(CQuest, "quest")
         trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
 
         if (!trader) {
-            pch->send_to( "Здесь нет торговца квестовыми благами.\r\n" );
+            pch->send_to( "Здесь нет торговца квестовыми наградами.\r\n" );
             see_also( pch );
             return;
         }
@@ -220,7 +220,7 @@ COMMAND(CQuest, "quest")
             case QCMD_REQUEST:
             case QCMD_FIND:
             case QCMD_COMPLETE:
-                pch->println("Эта команда недоступна, пока ты на корабле.");
+                pch->println("Эта команда недоступна пока ты на корабле.");
                 pch->println("Список текущих квестов показывает команда {y{lRквест{lEquest{x.");
                 break;
         }
@@ -350,7 +350,7 @@ void CQuest::doTime( PCharacter *ch )
             if (time > 1) 
                 buf << "До того, как ты снова сможешь получить задание, {Y"
                     << time <<  "{x минут"
-                    << GET_COUNT(time, "а", "ы", "") << endl;
+                    << GET_COUNT(time, "а.", "ы.", ".") << endl;
             else if (time == 1) 
                 buf <<"Осталось меньше минуты до того, как ты снова сможешь получить задание." << endl;
         }
@@ -452,7 +452,7 @@ void CQuest::doStat( PCharacter *ch )
     
     stat = XMLAttributeStatistic::gatherAll( "questdata" );
 
-    buf << "{wЛучшие квестодеятели Мира Грез: {x" << endl;
+    buf << "{wЛучшие квестодеятели Мира Мечты: {x" << endl;
 
     for (s = stat.begin( ); s != stat.end( ); s++) {
         XMLAttributeStatistic::StatRecordList::iterator r;
