@@ -437,7 +437,7 @@ NMI_INVOKE( ObjectWrapper, getRoom, "(): комната, в которой на�
         return Register();
 }
 
-static void obj_from_anywhere( ::Object *obj )
+void obj_from_anywhere( ::Object *obj )
 {
     if (obj->in_room)
         obj_from_room( obj );

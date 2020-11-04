@@ -76,6 +76,7 @@ void password_set( PCMemoryInterface *pci, const DLString &plainText );
 const char *ttype_name( int ttype );
 DLString regfmt(Character *to, const RegisterList &argv);
 list< ::Object *> get_objs_list_type( Character *ch, int type, ::Object *list );
+void obj_from_anywhere( ::Object *obj );
 
 using namespace std;
 using namespace Scripting;
@@ -2206,11 +2207,9 @@ NMI_INVOKE(CharacterWrapper, give, "(vict,vnum|obj): дать персонажу
         item = create_object(pObj, 0);
     } else {
         item = arg2item(arg2);
-        if (item->carried_by != target)
-            throw Scripting::Exception("Object you're trying to give is not carried by this character.");
-        obj_from_char(item);
     }
 
+    obj_from_anywhere(item);
     obj_to_char(item, vict);
 
     vict->pecho("%^C1 дает тебе %O4.", target, item);
