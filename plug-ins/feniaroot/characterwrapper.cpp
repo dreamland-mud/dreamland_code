@@ -1560,6 +1560,17 @@ NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag]): 
     return Register(saves_spell(level, target, dam_type, caster, dam_flag));	
 }
 
+NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от пилюли или зелья")
+{
+    checkTarget();
+    ::Object *item = argnum2item(args, 1);
+
+    if (item->item_type != ITEM_POTION && item->item_type != ITEM_PILL)
+        throw Scripting::Exception("Object is not a pill or a potion");
+
+    spell_by_item(target, item);
+    return Register();
+}
 
 NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane[,verbose]]]): скастовать заклинания на всю комнату, на vict или с аргументом")
 {
