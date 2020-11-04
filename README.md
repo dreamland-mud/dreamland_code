@@ -13,7 +13,7 @@
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
 Как собирать и запускать:
-* Из-под Ubuntu 18.04 (реальная или виртуальная машина): пользуйтесь инструкцией ниже.
+* Из-под Ubuntu 18.04, 20.04 (реальная или виртуальная машина): пользуйтесь инструкцией ниже.
 * Из-под Windows 10: следуя [этой инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/WSL-and-VS-Code) для Windows Subsystem for Linux и редактора VS Code
 * Из-под окружения Docker: собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
 * Из-под онлайн сред разработки в браузере: [Goorm Online IDE](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE) или же https://gitpod.io.
