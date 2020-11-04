@@ -5,6 +5,9 @@
 #include "logstream.h"
 #include "profiler.h"
 #include "update_areas.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -25,6 +28,11 @@
 #include "def.h"
 
 WEARLOC(none);
+
+static void rprog_reset( Room *room )
+{
+    FENIA_VOID_CALL( room, "Reset", "" );
+}
 
 /*
  * Repopulate areas periodically.
@@ -476,7 +484,7 @@ void reset_room(Room *pRoom)
             break;
         }
     }
-
+    
     dreamland->resetOption( DL_SAVE_OBJS );
     dreamland->resetOption( DL_SAVE_MOBS );
 
@@ -485,6 +493,8 @@ void reset_room(Room *pRoom)
 
     if (changedObj)
         save_items( pRoom );
+
+    rprog_reset(pRoom);
 }
 
 /*
