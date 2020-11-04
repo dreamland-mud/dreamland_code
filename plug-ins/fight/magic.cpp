@@ -64,7 +64,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 
 #include "dreamland.h"
@@ -196,15 +196,22 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
     Spell::Pointer spell; 
     Skill *skill;
 
-    if (!target)
-        return false;
-    
     if (!( skill = SkillManager::getThis( )->find( sn ) ))
         return false;
 
     if (!( spell = skill->getSpell( ) ))
         return false;
-    
+
+    return spell_nocatch(spell, level, ch, target, flags);
+}
+
+bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget::Pointer target, int flags )
+{
+    if (!target || !spell)
+        return false;
+
+    Skill::Pointer skill = spell->getSkill();
+
     if (IS_SET(flags, FSPELL_OBSTACLES)) {
         if ((ch->isAffected( gsn_garble ) || ch->isAffected( gsn_deafen )) && chance( 50 ))
             return false;
@@ -227,17 +234,29 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
             ch->mana -= mana;
     }
 
+    bool fForbidCasting = false;
+    bool fForbidReaction = false;
+    bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
+
     if (IS_SET(flags, FSPELL_VERBOSE))
         spell->utter( ch );
 
     if (IS_SET(flags, FSPELL_WAIT)) 
         ch->setWait( spell->getBeats( ) );
 
+    if (IS_SET(flags, FSPELL_CHECK_SAFE) && offensive && target->victim) {
+        if (is_safe(ch, target->victim))
+            return false;
+    }
+
+    if (IS_SET(flags, FSPELL_CHECK_GROUP) && offensive && target->victim) {
+        if (is_same_group(ch, target->victim))
+            return false;
+    }
+
     if (IS_SET(flags, FSPELL_BANE) && spell->spellbane( ch, target->victim ))
         return false;
    
-    bool fForbidCasting = false;
-
     if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
         if (target->type == SpellTarget::CHAR && target->victim)
             fForbidCasting = mprog_spell( target->victim, ch, skill, true );
@@ -250,9 +269,16 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
 
     if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
         if (target->type == SpellTarget::CHAR && target->victim)
-            mprog_spell( target->victim, ch, skill, false );
+            fForbidReaction = mprog_spell( target->victim, ch, skill, false );
 
         mprog_cast( ch, target, skill, false );
+    }
+
+    if (fForbidReaction)
+        return true;
+
+    if (IS_SET(flags, FSPELL_ATTACK_CASTER) && offensive && target->victim) {
+        attack_caster(ch, target->victim);
     }
 
     return true;

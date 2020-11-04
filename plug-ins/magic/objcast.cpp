@@ -154,24 +154,19 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
 
     gsn_scrolls->improve( ch, true );
 
-    bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-    if (offensive && t->victim && is_safe( ch, t->victim ))
-        return;
-
     try {
-        if (!spell->spellbane( ch, t->victim )) {
-            successfulSpells++;
-            spell->run( ch, t, scroll->value0() );
+        bitstring_t recite_flags = FSPELL_BANE|FSPELL_CHECK_SAFE|FSPELL_ATTACK_CASTER;
 
-            if (offensive)
-                attack_caster( ch, t->victim );
+        if (::spell_nocatch(spell, scroll->value0(), ch, t, recite_flags)) {
+            successfulSpells++;
         }
+
+        if (ch->is_adrenalined() || ch->fighting != 0) 
+            ch->setWait(4);        
+
     } catch (const VictimDeathException &vde) {
         return;
     }
-
-    if (ch->is_adrenalined() || ch->fighting != 0) 
-        ch->setWait(4);
 }
 
 CMDRUNP( recite )
@@ -286,42 +281,33 @@ CMDRUNP( brandish )
             
             level = staff->value0();
             offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-            t = spell->getTarget( );
+            t = spell->getTarget( );            
 
             try {
                 if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ )) {
-                    spell->run( ch, str_empty, sn, level );
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, str_empty), 0);
                     gsn_staves->improve( ch, true );
                 }
                 else if (IS_SET( t, TAR_ROOM|TAR_PEOPLE )) {
-                    spell->run( ch, ch->in_room, sn, level );
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch->in_room), 0);
                     gsn_staves->improve( ch, true );
                 }
                 else if (IS_SET( t, TAR_CHAR_SELF )) {
-                    spell->run( ch, ch, sn, level );
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch), 0);
                     gsn_staves->improve( ch, true, ch );
                 }
                 else if (IS_SET( t, TAR_CHAR_ROOM )) {
+                    bitstring_t brandish_flags = 
+                        FSPELL_BANE|FSPELL_ATTACK_CASTER|FSPELL_CHECK_GROUP|FSPELL_CHECK_SAFE;
+
                     for (vch = ch->in_room->people; vch; vch = vch_next) {
                         vch_next = vch->next_in_room;
-                        
-                        if (offensive) {
-                            if (is_safe( ch, vch ) || is_same_group( ch, vch ))
-                                continue;
 
-                            if (!spell->spellbane( ch, vch )) {
-                                spell->run( ch, vch, sn, level );
-                                attack_caster( ch, vch );
-                            }
-                            
-                            yell_panic( ch, vch,
-                                        "Помогите! Кто-то размахивает около меня посохом!",
-                                        "Помогите! %1$^C1 пугает меня посохом!" );
-                        }
-                        else {
-                            if (!spell->spellbane( ch, vch ))
-                                spell->run( ch, vch, sn, level );
-                        }
+                        if (::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, vch), brandish_flags))
+                            if (offensive)
+                                yell_panic( ch, vch,
+                                            "Помогите! Кто-то размахивает около меня посохом!",
+                                            "Помогите! %1$^C1 пугает меня посохом!" );
 
                         gsn_staves->improve( ch, true, vch );
                     }
@@ -437,23 +423,14 @@ CMDRUNP( zap )
             gsn_wands->improve( ch, false, victim );
         }
         else {
-            bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-                
-            if (offensive && victim && is_safe( ch, victim ))
-                return;
-
             try {
-                if (!spell->spellbane( ch, victim )) {
-                    spell->run( ch, target, wand->value0() );
+                bitstring_t zap_flags = FSPELL_CHECK_SAFE|FSPELL_BANE|FSPELL_ATTACK_CASTER;
 
-                    if (offensive)
-                        attack_caster( ch, victim );
-                }
-                
-                if (offensive)
-                    yell_panic( ch, victim,
-                                "Помогите! Кто-то размахивает около меня волшебным жезлом!",
-                                "Помогите! %1$^C1 пугает меня своим жезлом!" );
+                if (::spell_nocatch(spell, wand->value0(), ch, target, zap_flags))
+                    if (spell->getSpellType( ) == SPELL_OFFENSIVE)
+                        yell_panic( ch, victim,
+                                    "Помогите! Кто-то размахивает около меня волшебным жезлом!",
+                                    "Помогите! %1$^C1 пугает меня своим жезлом!" );
 
             } catch (const VictimDeathException &e) {
             }
