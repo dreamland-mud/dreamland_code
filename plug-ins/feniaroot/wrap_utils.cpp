@@ -185,6 +185,13 @@ PCMemoryInterface * argnum2memory(const RegisterList &args, int num)
     return pci;
 }
 
+::Object *argnum2item(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return arg2item(reg);
+}
+
+
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
 {
     Register a = argnum(args, num);

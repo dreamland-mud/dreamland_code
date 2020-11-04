@@ -2191,6 +2191,52 @@ NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желу�
     return Register( );
 }
 
+NMI_INVOKE(CharacterWrapper, give, "(vict,vnum|obj): дать персонажу vict предмет obj, создав его, если указан внум")
+{
+    checkTarget( );
+    Character *vict = argnum2character(args, 1);
+    Register arg2 = argnum(args, 2);
+    ::Object *item;
+
+    if (arg2.type == Register::NUMBER) {
+        OBJ_INDEX_DATA *pObj = get_obj_index(arg2.toNumber());
+        if (!pObj)
+            throw Scripting::Exception("Object with this vnum does not exist.");
+
+        item = create_object(pObj, 0);
+    } else {
+        item = arg2item(arg2);
+        if (item->carried_by != target)
+            throw Scripting::Exception("Object you're trying to give is not carried by this character.");
+        obj_from_char(item);
+    }
+
+    obj_to_char(item, vict);
+
+    vict->pecho("%^C1 дает тебе %O4.", target, item);
+    vict->recho("%^C1 дает %C3 %O4.", target, vict, item);
+
+    return Register();
+}
+
+NMI_INVOKE(CharacterWrapper, giveBack, "(vict,obj): вернуть персонажу vict предмет obj")
+{
+    checkTarget( );
+    Character *vict = argnum2character(args, 1);
+    ::Object *item = argnum2item(args, 2);
+
+    if (item->carried_by != target)
+        throw Scripting::Exception("Object you're trying to give back is not carried by this character.");
+    
+    obj_from_char(item);
+    obj_to_char(item, vict);
+
+    vict->pecho("%^C1 возвращает тебе %O4.", target, item);
+    vict->recho("%^C1 возвращает %C3 %O4.", target, vict, item);
+
+    return Register();
+}
+
 NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long): установить аттрибут для рестринга результатов заклинаний")
 {
     checkTarget( );
