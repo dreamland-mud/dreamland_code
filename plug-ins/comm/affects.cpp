@@ -328,7 +328,7 @@ CMDRUNP( affects )
     list<AffectOutput>::iterator o;
     int flags = FSHOW_LINES|FSHOW_TIME|FSHOW_COLOR|FSHOW_EMPTY;
 
-    if (ch->getConfig( ).ruskills)
+    if ((IS_CHARMED(ch) ? ch->master : ch)->getConfig().ruskills)
         SET_BIT(flags, FSHOW_RUSSIAN);
    
     // Keep track of res, vuln, hp/mana gain that are permanent (either from race affects or from items). 
