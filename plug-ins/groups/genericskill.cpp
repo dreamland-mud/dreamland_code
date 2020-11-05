@@ -139,23 +139,29 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
     if (ch->is_npc( ))
         return true;
 
+    // Vampires have a restriction that spells are only available in vamp form.
+    if (ch->getProfession( ) != prof_vampire)
+        return true;
+
+    if (!spell)
+        return true;
+
+    if (IS_VAMPIRE(ch))
+        return true;
+
+    // Race bonuses are always accessible.
     rb = getRaceBonus( ch );
     if (rb && !rb->isProfessional( ))
         return true;
 
-    if (ch->getProfession( ) == prof_vampire) {
-        if (spell && !IS_VAMPIRE( ch )) {
-            if (message)
-                ch->send_to("Для этого необходимо превратиться в вампира!\n\r");
-
-            return false;
-        }
-        else
-            return true;
-    }
-    else
+    // Dreamt or bonus skills area always accessible.
+    if (temporary_skill_active(this, ch))
         return true;
 
+    if (message)
+        ch->send_to("Для этого необходимо превратиться в вампира!\n\r");
+
+    return false;
 }
 
 bool GenericSkill::availableForAll( ) const
