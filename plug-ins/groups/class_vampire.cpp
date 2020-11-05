@@ -448,28 +448,22 @@ SKILL_RUNP( vampire )
         duration = level / 10 ;
         duration += 5;
 
-        /* haste + dex, infrared */
-        af.where     = TO_AFFECTS;
         af.type      = gsn_vampire;
         af.level     = level;
         af.duration  = duration;
-        af.location  = APPLY_DEX;
-        af.modifier  = 1 + (level /20);
-        af.bitvector = AFF_HASTE | AFF_INFRARED;
-        affect_to_char( ch, &af );
 
-        /* giant strength + berserk */
-        af.where     = TO_AFFECTS;
+        /* giant strength + negative, charm immunity */
+        af.where     = TO_IMMUNE;
         af.location  = APPLY_STR;
         af.modifier  = 1 + (level / 20);
-        af.bitvector = AFF_BERSERK;
+        af.bitvector = IMM_NEGATIVE | IMM_CHARM;
         affect_to_char( ch, &af );
 
-        /* sneak */
+        /* haste + dex, infrared, berserk, sneak */
         af.where     = TO_AFFECTS;
-        af.location  = APPLY_NONE;
-        af.modifier  = 0;
-        af.bitvector = AFF_SNEAK;
+        af.location  = APPLY_DEX;
+        af.modifier  = 1 + (level /20);
+        af.bitvector = AFF_HASTE | AFF_INFRARED|AFF_BERSERK|AFF_SNEAK;
         affect_to_char( ch, &af );
 
         /* size + vuln light, holy */
@@ -485,13 +479,6 @@ SKILL_RUNP( vampire )
         af.modifier  = ch->damroll * 4 / 3;
         af.bitvector = RES_COLD | RES_LIGHTNING;
         affect_to_char( ch, &af );
-
-        /* negative, charm immunity */
-        af.where = TO_IMMUNE;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = IMM_NEGATIVE | IMM_CHARM;
-        affect_to_char(ch, &af);
 
         /* vampire flag */
         af.where     = TO_ACT_FLAG;

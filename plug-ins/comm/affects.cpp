@@ -257,26 +257,6 @@ struct PermanentAffects {
         my_mgain = ch->mana_gain;
     }
 
-    void stripBitsFromAffects(Affect *paf) {
-        switch(paf->where) {
-        case TO_AFFECTS: 
-            REMOVE_BIT(my_aff, paf->bitvector);
-            break;
-        case TO_IMMUNE:        
-            REMOVE_BIT(my_imm, paf->bitvector);
-            break;
-        case TO_RESIST:        
-            REMOVE_BIT(my_res, paf->bitvector);
-            break;
-        case TO_VULN:        
-            REMOVE_BIT(my_vuln, paf->bitvector);
-            break;
-        case TO_DETECTS: 
-            REMOVE_BIT(my_det, paf->bitvector);
-            break;
-        }
-    }
-    
     void printAll() const {
         print("У тебя иммунитет к", my_imm, imm_flags, '2');
         print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
@@ -331,7 +311,7 @@ CMDRUNP( affects )
     if ((IS_CHARMED(ch) ? ch->master : ch)->getConfig().ruskills)
         SET_BIT(flags, FSHOW_RUSSIAN);
    
-    // Keep track of res, vuln, hp/mana gain that are permanent (either from race affects or from items). 
+    // Keep track of res, vuln, hp/mana gain. 
     PermanentAffects permAff(ch);
  
     for (Affect* paf = ch->affected; paf != 0; paf = paf->next ) {
@@ -339,10 +319,6 @@ CMDRUNP( affects )
             output.push_back( AffectOutput( paf, flags ) );
         
         output.back( ).format_affect( paf );
-
-        // Remove bits that are added via an affect, so that in the end
-        // only permanent bits remain.
-        permAff.stripBitsFromAffects(paf);
     }
     
     if (HAS_SHADOW(ch))
