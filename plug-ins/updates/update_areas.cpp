@@ -540,13 +540,13 @@ void reset_room(Room *pRoom, int flags)
 /*
  * Reset one area.
  */
-void reset_area( AREA_DATA *pArea )
+void reset_area( AREA_DATA *pArea, int flags )
 {
     const char *resetmsg;
     static const char *default_resetmsg = "Ты слышишь мелодичный перезвон колокольчиков.";        
 
     for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++)
-        reset_room( i->second );
+        reset_room( i->second, flags );
     
     if (pArea->behavior) 
         pArea->behavior->update( );

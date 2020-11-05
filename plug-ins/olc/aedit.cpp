@@ -291,7 +291,7 @@ AEDIT(reset, "сбросить", "сбросить арию, обновив вс
     AREA_DATA *original = get_area_data(vnum);
 
     if (original) {
-        reset_area(original);
+        reset_area(original, FRESET_ALWAYS);
         stc("Ария сброшена.\n\r", ch);
         return false;
     }
