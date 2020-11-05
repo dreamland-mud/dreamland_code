@@ -54,10 +54,7 @@ struct AllSkillsList : public std::list<SkillInfo> {
     SkillGroup *group;
     bool fSpells;
     bool (*criteria) ( SkillInfo, SkillInfo );
-    bool fUsableOnly;
     bool fRussian;
-    bool fShowHint;
-    bool fCurrentProfAll;
 };
 
 #endif

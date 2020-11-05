@@ -47,14 +47,6 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
     levLow = 1;
     levHigh = MAX_LEVEL;
     criteria = &SkillInfo::cmp_by_level;
-    fUsableOnly = false;
-    fShowHint = false;
-    fCurrentProfAll = false;
-
-    if (arg1.empty( )) {
-        arg1 = "now";
-        fShowHint = true;
-    }
 
     if (arg_oneof( arg1, "help", "?", "помощь", "справка" )) {
         DLString what = fSpells ? "заклинания" : "умения";
@@ -73,13 +65,11 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         return false;
     }
 
-    if (arg_is_all( arg1 )) {
-    }
-    else if (arg_oneof_strict( arg1, "now", "сейчас" )) {
-        fUsableOnly = true;
-    }
-    else if (arg_oneof( arg1, "current", "текущие" )) {
-        fCurrentProfAll = true;
+    if (arg1.empty()) {
+        levHigh = ch->getLevel();
+    } 
+    else if (arg_is_all( arg1 )) {
+        // do nothing
     }
     else if (arg1.isNumber( )) {
         try {
@@ -130,22 +120,12 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 void AllSkillsList::make( Character *ch )
 {
     SkillInfo info;
-    int savedLevel = ch->getLevel();
-
-    if (fCurrentProfAll)
-        ch->setLevel(MAX_LEVEL);
 
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );
         Spell::Pointer spell = skill->getSpell( );
 
         if (!skill->visible( ch ))
-            continue;
-
-        if (fUsableOnly && !skill->usable( ch, false ))
-            continue;
-
-        if (fCurrentProfAll && !skill->usable( ch, false ))
             continue;
 
         if (fSpells != (spell && spell->isCasted( )))
@@ -187,9 +167,6 @@ void AllSkillsList::make( Character *ch )
 
         push_back( info );
     }
-
-    if (fCurrentProfAll)
-        ch->setLevel(savedLevel);
 
     sort( criteria );
 }
@@ -282,6 +259,5 @@ void AllSkillsList::display( std::ostream & buf )
     if (!firstColumn) 
         buf << "                    |         |" << endl;
 
-    if (fShowHint)
-        buf << endl << "См. также {W{lR" << rcmd << "{lE" << cmd << "{lx ?{w." << endl;
+    buf << endl << "См. также {W{lR" << rcmd << "{lE" << cmd << "{lx ?{w." << endl;
 }
