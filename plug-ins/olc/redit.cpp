@@ -1187,7 +1187,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
             return;
         }
-        reset_room(pRoom);
+        reset_room(pRoom, FRESET_ALWAYS);
         
         stc("Room reset.\n\r", ch);
         return;

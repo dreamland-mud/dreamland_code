@@ -88,6 +88,10 @@ static Object * get_obj_here_vnum( Room *room, int vnum )
             return result;
     }
 
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (rch->is_npc() && (result = get_obj_list_vnum(rch->carrying, vnum )))
+            return result;
+
     return NULL;
 }
 
@@ -100,6 +104,35 @@ static RESET_DATA * find_mob_reset(Room *pRoom, NPCharacter *mob)
 
     return 0;
 }
+
+static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
+{
+    int count = 0;
+
+    for (Character *rch = room->people; rch; rch = rch->next_in_room ) {
+        if (rch->is_npc() && rch->getNPC()->pIndexData == pMob) {
+            count++;
+            if (limit > 0 && count >= limit)
+                return count;
+        }
+    }
+
+    return count;
+}
+
+static int count_mob_area(AREA_DATA *pArea, MOB_INDEX_DATA *pMob, int limit)
+{
+    int count = 0;
+
+    for (auto &r: pArea->rooms) {
+        count += count_mob_room(r.second, pMob, limit);
+        if (limit > 0 && count >= limit)
+            return count;
+    }
+
+    return count;
+}
+
 
 /** Equip an item if required by reset configuration. */
 static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob, bool verbose)
@@ -119,6 +152,46 @@ static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob
             wloc->equip(obj);
         }
     }
+}
+
+/** Create item inside of a container (P), based on the args: arg2 max count, arg4 min count. */
+static bool create_item_for_container(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, Object *obj_to)
+{
+    int limit;
+
+    if (!obj_to)
+        return false;
+
+    // TODO: review this nonsense.
+    if ( pReset->arg2 > 50 )         /* old format */
+        limit = 6;
+    else if (pReset->arg2 == -1 || pReset->arg2 == 0)     /* no limit */
+        limit = 999;
+    else
+        limit = pReset->arg2;
+
+    int count = count_obj_list(pObjIndex, obj_to->contains);
+
+    if (count > limit)
+        return false;
+
+    if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit)
+        return false;
+    
+    while (count < pReset->arg4)
+    {
+        Object *obj = create_object( pObjIndex, 0 );
+        obj->reset_obj = obj_to->getID();
+        obj_to_obj( obj, obj_to );
+        count++;
+
+        if (pObjIndex->count >= limit)
+            break;
+    }
+
+    /* fix object lock state! */
+    obj_to->value1(obj_to->pIndexData->value[1]);
+    return true;
 }
 
 /** Create an item for inventory or equipment for a given mob, based on reset data. */
@@ -160,7 +233,6 @@ static bool reset_mob_item(RESET_DATA *myReset, NPCharacter *mob)
         return false;
 
     Object *self = get_obj_list_vnum(mob->carrying, pObjIndex->vnum);
-    // TODO handle 'P' resets inside 'E'/'G' resets
     if (self) {
         reset_obj_location(myReset, self, mob, true);
         return false;
@@ -236,16 +308,24 @@ static bool reset_room_mobs(Room *pRoom)
     return changed;
 }
 
-void reset_room(Room *pRoom)
+void reset_room(Room *pRoom, int flags)
 {
     RESET_DATA *pReset;
     EXTRA_EXIT_DATA *eexit;
     NPCharacter *mob;
     bool last;
-    short level;
     int iExit;
     bool changedMob, changedObj;
     
+    // Only create chests and their content if there's no one in the area or during 'redit reset'.
+    bool loadFloorItems;
+    if (IS_SET(flags, FRESET_ALWAYS))
+        loadFloorItems = true;
+    else if (pRoom->area->nplayer > 0 && !IS_SET(pRoom->area->area_flag, AREA_POPULAR))
+        loadFloorItems = false;
+    else
+        loadFloorItems = true;
+
     if (weather_info.sky == SKY_RAINING 
         && !IS_SET(pRoom->room_flags, ROOM_INDOORS) ) 
     {
@@ -281,7 +361,6 @@ void reset_room(Room *pRoom)
 
     mob     = 0;
     last    = true;
-    level    = 0;
     changedMob = changedObj = false;
 
     dreamland->removeOption( DL_SAVE_OBJS );
@@ -299,7 +378,7 @@ void reset_room(Room *pRoom)
         EXIT_DATA *pexit;
         Object *obj = 0;
         Object *obj_to = 0;
-        int count = 0, limit;
+        int roomCount, areaCount;
         
         switch ( pReset->command )
         {
@@ -315,28 +394,17 @@ void reset_room(Room *pRoom)
                 continue;
             }
 
-            if (pReset->arg2 != -1 && pMobIndex->count >= pReset->arg2 )
-            {
+            areaCount = count_mob_area(pRoom->area, pMobIndex, pReset->arg2);
+            if (pReset->arg2 != -1 && areaCount >= pReset->arg2) {
                 last = false;
                 break;
             }
 
-            count = 0;
-
-            for (Character *vch = pRoom->people; vch; vch = vch->next_in_room )
-                if (vch->is_npc() && vch->getNPC()->pIndexData == pMobIndex )
-                {
-                    count++;
-
-                    if ( count >= pReset->arg4 )
-                    {
-                        last = false;
-                        break;
-                    }
-                }
-
-            if ( count >= pReset->arg4 ) 
+            roomCount = count_mob_room(pRoom, pMobIndex, pReset->arg4);
+            if (roomCount >= pReset->arg4) {
+                last = false;
                 break;
+            }
 
             mob = create_mobile( pMobIndex );
 
@@ -346,7 +414,6 @@ void reset_room(Room *pRoom)
 
             char_to_room( mob, pRoom );
             changedMob = true;
-            level = URANGE( 0, mob->getRealLevel( ) - 2, LEVEL_HERO - 1 );
             last  = true;
             break;
 
@@ -357,21 +424,23 @@ void reset_room(Room *pRoom)
                 continue;
             }
 
-            if ((pRoom->area->nplayer > 0 && !IS_SET(pRoom->area->area_flag, AREA_POPULAR))
-                || count_obj_list( pObjIndex, pRoom->contents ) > 0 )
-            {
+            if (!loadFloorItems) {
                 last = false;
                 break;
             }
 
-            if ( ( pObjIndex->limit != -1 )
-                && ( pObjIndex->count >= pObjIndex->limit ) )
-            {
+            roomCount = count_obj_list(pObjIndex, pRoom->contents);
+            if (roomCount > 0) {
                 last = false;
                 break;
             }
 
-            obj = create_object( pObjIndex, min(number_fuzzy(level), LEVEL_HERO - 1) );
+            if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit) {
+                last = false;
+                break;
+            }
+
+            obj = create_object( pObjIndex, 0 );
             obj->cost = 0;
             obj->reset_room = pRoom->vnum;
             obj_to_room( obj, pRoom );
@@ -392,48 +461,20 @@ void reset_room(Room *pRoom)
                 continue;
             }
 
-            if ( pReset->arg2 > 50 )         /* old format */
-                limit = 6;
-            else if ( pReset->arg2 == -1 )     /* no limit */
-                limit = 999;
-            else
-                limit = pReset->arg2;
+            obj_to = get_obj_here_vnum(pRoom, pObjToIndex->vnum);
 
-            if ((pRoom->area->nplayer > 0 && !IS_SET(pRoom->area->area_flag, AREA_POPULAR))
-                || ( obj_to = get_obj_here_vnum( pRoom, pObjToIndex->vnum ) ) == 0
-                || ( obj_to->in_room == 0 && !last )
-                || ( pObjIndex->count >= limit && number_range(0,4) != 0 )
-                || ( count = count_obj_list(pObjIndex,obj_to->contains) )
-                            > pReset->arg4 )
-            {
+            if (!obj_to || (obj_to->in_room && !loadFloorItems)) {
                 last = false;
                 break;
             }
 
-            if ( ( pObjIndex->limit != -1 )
-                && ( pObjIndex->count >= pObjIndex->limit ) )
-            {
-                last = false;
-                LogStream::sendNotice( ) << "Reseting area: [P] OBJ limit reached: " << pObjIndex->area->name << endl;
-                break;
-            }
-
-            while (count < pReset->arg4)
-            {
-                obj = create_object( pObjIndex, number_fuzzy(obj_to->level) );
-                obj->reset_obj = obj_to->getID();
-                obj_to_obj( obj, obj_to );
+            if (create_item_for_container(pReset, pObjIndex, obj_to)) {
                 changedObj = true;
-                count++;
-
-                if ( pObjIndex->count >= limit )
-                    break;
+                last = true;
+            } else {
+                last = false;
             }
 
-            /* fix object lock state! */
-            obj_to->value1(obj_to->pIndexData->value[1]);
-            last = true;
-            
             break;
 
         case 'G':
@@ -444,7 +485,7 @@ void reset_room(Room *pRoom)
                 continue;
             }
 
-            if ( !last )
+            if (!last)
                 break;
 
             if ( mob == 0 )
@@ -454,8 +495,7 @@ void reset_room(Room *pRoom)
                 break;
             }
 
-            obj = create_item_for_mob(pReset, pObjIndex, mob, false);
-            if (!obj)
+            if (!create_item_for_mob(pReset, pObjIndex, mob, false))
                 break;
 
             changedMob = true;
