@@ -28,14 +28,14 @@ public:
 
         virtual void run( Character*, const DLString& constArguments );
         
-private:
-        void doRequest( Character * );
-        void doAccept( Character *, DLString& );
-        void doReject( Character *, DLString& );
-        void doDelete( Character *, DLString& );
-        void doList( Character *, DLString & );
-        void doShow( Character *, DLString& );
-        void usage( Character * );
+        static void doRequest( Character * );
+        static void doAccept( Character *, DLString& );
+        static void doReject( Character *, DLString& );
+        static void doDelete( Character *, DLString& );
+        static void doList( Character *, bool newOnly );
+        static void doUnread( Character * );
+        static void doShow( Character *, DLString& );
+        static void usage( Character * );
         
         static const DLString COMMAND_NAME;
 };
