@@ -269,10 +269,12 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
     }
 
     // Add last remaining letter from the path.
-    if (cnt > 1)
-        collated << cnt;
-    collated << last_letter;
-    
+    if (isSmallLetter(last_letter)) {
+        if (cnt > 1)
+            collated << cnt;
+        collated << last_letter;
+    }
+        
     if (ch->isCoder())
         ch->printf("Развернутый маршрут: %s\r\n", path.c_str());
 
