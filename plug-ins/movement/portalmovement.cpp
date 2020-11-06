@@ -162,8 +162,8 @@ bool PortalMovement::checkClosedDoor( Character *wch )
         return true;
 
     msgSelfParty( wch, 
-                  "%4$^O1: тут закрыто.",
-                  "%4$^O1: тут закрыто." );
+                  "Тут закрыто, попробуй {y{hcоткрыть %4$N4{x.",
+                  "Тут закрыто, попробуй {y{hcоткрыть %4$N4{x." );
     return false;
 }
 
