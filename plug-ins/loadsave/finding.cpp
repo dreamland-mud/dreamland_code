@@ -327,7 +327,7 @@ Object *get_obj_carry( Character *ch, char *argument )
         for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
         {
                 if ( obj->wear_loc == wear_none
-                        && ( ch->can_see( obj ) )
+                        && (ch->can_see( obj ) || ch->can_hear( obj ))
                         && ((id && obj->getID( ) == id) 
                              || (!id && obj_has_name( obj, arg, ch ))))
                 {
