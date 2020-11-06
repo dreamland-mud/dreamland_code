@@ -724,6 +724,19 @@ ClanHealerBattlerager::ClanHealerBattlerager( ) : healPets( false )
 {
 }
 
+static bool has_curse(Character *wch)
+{
+    if (IS_AFFECTED(wch,AFF_CURSE))
+        return true;
+
+    for (Object *obj = wch->carrying; obj; obj = obj->next_content)
+        if ((IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_NOREMOVE))
+            &&  !IS_OBJ_STAT(obj,ITEM_NOUNCURSE))
+            return true;
+
+    return false;
+}
+
 void ClanHealerBattlerager::speech( Character *wch, const char *speech )
 {
     if (!speech[0] || str_cmp( speech, "aid me wiseman" ))
@@ -738,8 +751,12 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
         return;
     }
 
-    if (!IS_AFFECTED(wch,AFF_BLIND) && !IS_AFFECTED(wch,AFF_PLAGUE)
-         && !IS_AFFECTED(wch,AFF_POISON) && !IS_AFFECTED(wch,AFF_CURSE) )
+    bool cursed = has_curse(wch);
+
+    if (!cursed
+        && !IS_AFFECTED(wch,AFF_BLIND) 
+        && !IS_AFFECTED(wch,AFF_PLAGUE)
+        && !IS_AFFECTED(wch,AFF_POISON))
     {
         do_say(ch, "Ты не нуждаешься в моей помощи.");
         return;
@@ -764,7 +781,7 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
     if (IS_AFFECTED(wch,AFF_POISON))
         ::spell( gsn_cure_poison, ch->getModifyLevel( ), ch, wch, FSPELL_NOTRIGGER );
 
-    if (IS_AFFECTED(wch,AFF_CURSE))
+    if (cursed)
         ::spell( gsn_remove_curse, ch->getModifyLevel( ), ch, wch, FSPELL_NOTRIGGER );
 }
 
