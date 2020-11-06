@@ -2442,7 +2442,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
             keyhole->doLore( buf );
         break;
     case ITEM_KEYRING:
-        buf << "Нанизано " << obj->value1() << " ключей из возможных " << obj->value0() << "." << endl;
+        buf << fmt(0, "Нанизан%1$I|ы|о %1$d ключ%1$I|а|ей из возможных %2$d.", count_obj_in_obj(obj), obj->value0()) << endl;
         break;
     case ITEM_LOCKPICK:
         if (obj->value0() == Keyhole::LOCK_VALUE_BLANK) {
