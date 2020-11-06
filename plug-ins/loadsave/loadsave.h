@@ -23,8 +23,13 @@ class NPCharacter;
 struct mob_index_data;
 struct obj_index_data;
 
+#define FCREATE_NOCOUNT   (A)
+#define FCREATE_NOAFFECTS (B)
+
 NPCharacter *        create_mobile        ( mob_index_data *pMobIndex );
 NPCharacter *        create_mobile_nocount( mob_index_data * );
+NPCharacter *        create_mobile_org( mob_index_data *pMobIndex, int flags );
+void create_mob_affects(NPCharacter *mob);
 void                clone_mobile        ( NPCharacter *parent, NPCharacter *clone);
 Object *        create_object        ( obj_index_data *pObjIndex, short level );
 Object *        create_object_nocount ( obj_index_data *pObjIndex, short level );

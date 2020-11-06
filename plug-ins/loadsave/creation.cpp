@@ -53,16 +53,15 @@ static void override_description(NPCharacter *mob, const char *protoField, Sette
 /*
  * Create an instance of a mobile.
  */
-NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count );
 NPCharacter *create_mobile( MOB_INDEX_DATA *pMobIndex )
 {
-    return create_mobile_org( pMobIndex, true );
+    return create_mobile_org( pMobIndex, 0 );
 }
 NPCharacter *create_mobile_nocount( MOB_INDEX_DATA *pMobIndex )
 {
-    return create_mobile_org( pMobIndex, false );
+    return create_mobile_org( pMobIndex, FCREATE_NOCOUNT );
 }
-NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
+NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
 {
         NPCharacter *mob;
         int i;
@@ -163,52 +162,8 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
                 mob->perm_stat[STAT_CON] += (mob->size - SIZE_MEDIUM) / 2;
 
                 /* let's get some spell action */
-                if (IS_AFFECTED(mob,AFF_SANCTUARY))
-                {
-                    af.type      = gsn_sanctuary; 
-                    af.bitvector = AFF_SANCTUARY;
-                    af.where     = TO_AFFECTS;
-                    af.level     = mob->getRealLevel( );
-                    af.duration  = -1;
-                    affect_to_char( mob, &af );
-                }
-
-                if (IS_AFFECTED(mob,AFF_HASTE))
-                {
-                        af.where         = TO_AFFECTS;
-                        af.type      = gsn_haste; 
-                        af.level     = mob->getRealLevel( );
-                        af.duration  = -1;
-                        af.location  = APPLY_DEX;
-                        af.modifier  = 1 + (mob->getRealLevel( ) >= 18) + (mob->getRealLevel( ) >= 25) +
-                                (mob->getRealLevel( ) >= 32);
-                        af.bitvector = AFF_HASTE;
-                        affect_to_char( mob, &af );
-                }
-
-                if (IS_AFFECTED(mob,AFF_PROTECT_EVIL))
-                {
-                        af.where         = TO_AFFECTS;
-                        af.type         = gsn_protection_evil;
-                        af.level         = mob->getRealLevel( );
-                        af.duration         = -1;
-                        af.location         = APPLY_SAVES;
-                        af.modifier         = -1;
-                        af.bitvector = AFF_PROTECT_EVIL;
-                        affect_to_char(mob,&af);
-                }
-
-                if (IS_AFFECTED(mob,AFF_PROTECT_GOOD))
-                {
-                        af.where         = TO_AFFECTS;
-                        af.type      = gsn_protection_good; 
-                        af.level     = mob->getRealLevel( );
-                        af.duration  = -1;
-                        af.location  = APPLY_SAVES;
-                        af.modifier  = -1;
-                        af.bitvector = AFF_PROTECT_GOOD;
-                        affect_to_char(mob,&af);
-                }
+                if (!IS_SET(flags, FCREATE_NOAFFECTS))
+                    create_mob_affects(mob);
         }
         else /* read in old format and convert */
         {
@@ -271,7 +226,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
         /* link the mob to the world list */
         char_to_list( mob, &char_list );
 
-        if (count)
+        if (!IS_SET(flags, FCREATE_NOCOUNT))
             pMobIndex->count++;
         
         /* assign behavior */        
@@ -281,7 +236,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
             MobileBehaviorManager::assignBasic( mob );
         
         /* fenia mobprog initialization */
-        if (count) {
+        if (!IS_SET(flags, FCREATE_NOCOUNT)) {
             WrapperBase *w = get_wrapper(pMobIndex->wrapper);
             if (w) {
                 static Scripting::IdRef initId( "init" );
@@ -296,6 +251,65 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
         }
         
         return mob;
+}
+
+/** Transform affect bits from the prototype into real affects. Not called for mobs read from disk. */
+void create_mob_affects(NPCharacter *mob)
+{
+    if (IS_AFFECTED(mob,AFF_SANCTUARY))
+    {
+        Affect af;
+
+        af.type      = gsn_sanctuary; 
+        af.bitvector = AFF_SANCTUARY;
+        af.where     = TO_AFFECTS;
+        af.level     = mob->getRealLevel( );
+        af.duration  = -1;
+        affect_to_char( mob, &af );
+    }
+
+    if (IS_AFFECTED(mob,AFF_HASTE))
+    {
+        Affect af;
+
+        af.where         = TO_AFFECTS;
+        af.type      = gsn_haste; 
+        af.level     = mob->getRealLevel( );
+        af.duration  = -1;
+        af.location  = APPLY_DEX;
+        af.modifier  = 1 + (mob->getRealLevel( ) >= 18) + (mob->getRealLevel( ) >= 25) +
+                (mob->getRealLevel( ) >= 32);
+        af.bitvector = AFF_HASTE;
+        affect_to_char( mob, &af );
+    }
+
+    if (IS_AFFECTED(mob,AFF_PROTECT_EVIL))
+    {
+        Affect af;
+
+        af.where         = TO_AFFECTS;
+        af.type         = gsn_protection_evil;
+        af.level         = mob->getRealLevel( );
+        af.duration         = -1;
+        af.location         = APPLY_SAVES;
+        af.modifier         = -1;
+        af.bitvector = AFF_PROTECT_EVIL;
+        affect_to_char(mob,&af);
+    }
+
+    if (IS_AFFECTED(mob,AFF_PROTECT_GOOD))
+    {
+        Affect af;
+
+        af.where         = TO_AFFECTS;
+        af.type      = gsn_protection_good; 
+        af.level     = mob->getRealLevel( );
+        af.duration  = -1;
+        af.location  = APPLY_SAVES;
+        af.modifier  = -1;
+        af.bitvector = AFF_PROTECT_GOOD;
+        affect_to_char(mob,&af);
+    }
 }
 
 /* duplicate a mobile exactly -- except inventory */

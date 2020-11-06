@@ -1125,6 +1125,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
     NPCharacter *pet;
     bool fMatch;
     int percent;
+    bitstring_t create_flags = FCREATE_NOAFFECTS | FCREATE_NOCOUNT;
 
     /* first entry had BETTER be the vnum or we barf */
     word = feof(fp) ? "End" : fread_word(fp);
@@ -1136,15 +1137,15 @@ void fread_pet( PCharacter *ch, FILE *fp )
             if (get_mob_index(vnum) == 0)
         {
                 bug("Fread_pet: bad vnum %d.",vnum);
-            pet = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+            pet = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
         }
             else
-                pet = create_mobile_nocount(get_mob_index(vnum));
+                pet = create_mobile_org(get_mob_index(vnum), create_flags);
     }
     else
     {
         bug("Fread_pet: no vnum in file.",0);
-        pet = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+        pet = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
     }
 
     for ( ; ; )
@@ -1368,6 +1369,7 @@ NPCharacter * fread_mob( FILE *fp )
     const char *word;
     NPCharacter *mob;
     bool fMatch;
+    bitstring_t create_flags = FCREATE_NOAFFECTS | FCREATE_NOCOUNT;
 
     // first entry had BETTER be the vnum or we barf
     word = feof(fp) ? "End" : fread_word(fp);
@@ -1380,15 +1382,15 @@ NPCharacter * fread_mob( FILE *fp )
             if ( get_mob_index (vnum ) == 0 )
             {
                     bug("Fread_mob: bad vnum %d.",vnum);
-                    mob = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+                    mob = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
             }
             else
-                    mob = create_mobile_nocount(get_mob_index(vnum));
+                    mob = create_mobile_org(get_mob_index(vnum), create_flags);
     }
     else
     {
             bug("Fread_mob: no vnum in file.",0);
-            mob = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+            mob = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
     }
     
     mob->pIndexData->count++;
