@@ -22,6 +22,7 @@
 #include "object.h"
 #include "race.h"
 
+#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "vnum.h"
@@ -37,6 +38,17 @@ WEARLOC(stuck_in);
 RELIG(chronos);
 PROF(mobile);
 
+
+typedef void(NPCharacter::*SetterMethod)(const DLString &);
+/** Override proto descriptions if there's some formatting present. */
+static void override_description(NPCharacter *mob, const char *protoField, SetterMethod method)
+{
+    if (strchr(protoField, '%')) {
+        DLString result = fmt(0, protoField, mob);
+        if (result != protoField)
+            (mob->*method)(result);
+    }
+}
 
 /*
  * Create an instance of a mobile.
@@ -133,6 +145,11 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
                 mob->size                = pMobIndex->size;
                 mob->material                = str_dup(pMobIndex->material);
                 mob->extracted                = false;
+
+                override_description(mob, pMobIndex->player_name, &NPCharacter::setName);
+                override_description(mob, pMobIndex->short_descr, &NPCharacter::setShortDescr);
+                override_description(mob, pMobIndex->long_descr, &NPCharacter::setLongDescr);
+                override_description(mob, pMobIndex->description, &NPCharacter::setDescription);
 
                 /* computed on the spot */
 
