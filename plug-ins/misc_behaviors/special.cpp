@@ -813,28 +813,6 @@ bool spec_guard( NPCharacter *ch )
     {
         v_next = victim->next_in_room;
 
-        if (IS_SET( ch->in_room->area->area_flag, AREA_HOMETOWN )
-                && number_percent() < 2
-                && !victim->is_immortal( ))
-        {
-            do_say( ch, "Я Вас знаю?");
-
-            Room *room = NULL;
-            
-            if (!victim->is_npc())
-                room = get_room_index( victim->getPC()->getHometown( )->getRecall() );
-
-            if (!room || ch->in_room->area != room->area)
-            {
-                do_say( ch, "Я не знаю тебя. Уходи прочь!");
-            }
-            else
-            {
-                do_say(ch, "Ну ладно, мой друг. Я попытаюсь вспомнить.");
-                interpret( ch, "smile");
-            }
-        }
-
         if ( !victim->is_npc()
                 && ( IS_SET(victim->act, PLR_WANTED)
                         || victim->isAffected(gsn_jail ) ) )
