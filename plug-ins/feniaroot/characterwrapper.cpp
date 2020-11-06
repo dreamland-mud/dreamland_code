@@ -1012,7 +1012,7 @@ NMI_INVOKE( CharacterWrapper, psay, "(ch, format, args...): произносит
     Character *ch= args2character(args);
     myArgs.pop_front();
 
-    DLString msg = regfmt(target, myArgs).c_str();
+    DLString msg = regfmt(ch, myArgs).c_str();
     ch->pecho("%^C1 произносит '{g%s{x'", target, msg.c_str());
     return Register();
 }
