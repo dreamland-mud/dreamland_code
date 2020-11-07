@@ -223,6 +223,9 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
              && target->victim->in_room != ch->in_room
              && !ch->can_see( target->victim ))
             return false;
+
+        if (spell->getPosition() > ch->position)
+            return false;
     }
     
     if (IS_SET(flags, FSPELL_MANA)) {
