@@ -92,7 +92,7 @@ void ArcadianDrinkBehavior::pour( Character *ch, Object *destination, int amount
 
 void ArcadianDrinkBehavior::fill( Character *ch, Object *source, int amount )
 {
-    if (!hasSameEffect( source ))
+    if (!source || !hasSameEffect( source ))
         cleanup( );
 }
 

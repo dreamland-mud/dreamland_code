@@ -41,6 +41,7 @@ GSN(poured_liquid);
 RACE(felar);
 RACE(cat);
 RACE(satyr);
+LIQ(none);
 LIQ(water);
 LIQ(valerian_tincture);
 
@@ -70,50 +71,66 @@ CMDRUN( fill )
         return;
     }
 
-    if (arg1.empty( )) {
-        fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
-    }
-    else {
-        if (( fountain = get_obj_here( ch, arg1.c_str( ) ) ))
-            if (fountain->item_type != ITEM_FOUNTAIN)
-                fountain = 0;
-    }
-
-    if (!fountain) {
-        ch->send_to("Здесь нет источника!\n\r");
-        return;
-    }
-
     if (obj->item_type != ITEM_DRINK_CON) {
         ch->pecho( "Ты не можешь наполнить %O4.", obj );
         return;
     }
 
+    if (arg1.empty( )) {
+        fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
+        if (!fountain && ch->in_room->liquid == liq_none) {
+            ch->send_to("Здесь нет источника!\n\r");
+            return;
+        }
+    }
+    else {
+        fountain = get_obj_here( ch, arg1.c_str( ) );
+        if (!fountain) {
+            ch->println("Здесь нет такого источника.");
+            return;
+        }
+
+        if (fountain->item_type != ITEM_FOUNTAIN) {
+            ch->pecho("%^O1 - не фонтан.", fountain);
+            return;
+        } 
+    }
+
     if (drink_is_closed( obj, ch ))
         return;
 
-    if (obj->value1() != 0 && obj->value2() != fountain->value2()) {
-        ch->pecho("В %O4 налита другая жидкость.", obj);
+    if (fountain)
+        liq = liquidManager->find( fountain->value2() );
+    else
+        liq = ch->in_room->liquid.getElement();
+
+    const char *liqname = liq->getShortDescr().c_str();
+
+    if (obj->value1() != 0 && obj->value2() != liq->getIndex()) {
+        ch->pecho("Ты пытаешься наполнить %O4 %N5, но туда уже налита другая жидкость.", 
+                  obj, liqname);
         return;
     }
 
     if (obj->value1() >= obj->value0()) {
         ch->pecho("%1$^O1 уже наполн%1$Gено|ен|на|ны до краев.", obj);
         return;
-    }
+    }    
     
-    liq = liquidManager->find( fountain->value2() );
-    ch->pecho( "Ты наполняешь %O4 %N5 из %O2.",
-               obj, liq->getShortDescr( ).c_str( ), fountain );
-    ch->recho( "%^C1 наполняет %O4 %N5 из %O2.",
-               ch, obj, liq->getShortDescr( ).c_str( ), fountain );
+    if (fountain) {
+        ch->pecho( "Ты наполняешь %O4 %N5 из %O2.", obj, liqname, fountain );
+        ch->recho( "%^C1 наполняет %O4 %N5 из %O2.",ch, obj, liqname, fountain );
+    } else {
+        ch->pecho("Ты зачерпываешь %N4 и наполняешь %O4.", liqname, obj);
+        ch->recho("%^C1 зачерпывает %N4 и наполняет %O4.", ch, liqname, obj);
+    }
 
     amount = obj->value0() - obj->value1();
-    obj->value2(fountain->value2());
+    obj->value2(liq->getIndex());
     obj->value1(obj->value0());
 
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
-        drink->fill( ch, fountain, amount );
+        drink->fill( ch, fountain, amount ); // fountain can be null here
 }
 
 /*
