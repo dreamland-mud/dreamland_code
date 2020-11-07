@@ -159,6 +159,11 @@ bool BasicMobileBehavior::isLastFought( Character *wch )
     return !wch->is_npc( ) && wch->getName( ) == lastFought.getValue( );
 }
 
+void BasicMobileBehavior::rememberFought(Character *victim)
+{
+    memoryFought.remember(victim);
+}
+
 void BasicMobileBehavior::setLastFought( Character *wch )
 {
     if (!wch->is_npc( )) {

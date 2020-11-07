@@ -51,6 +51,8 @@ public:
     virtual bool canCancel( Character * );
     virtual bool isAfterCharm( ) const;
 
+    void rememberFought(Character *victim);
+
 protected:
     Character * getMaster( Character * );
     int beforeSpell;

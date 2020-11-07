@@ -8,8 +8,8 @@
 #include "json/json.h"
 
 #include "logstream.h"
-#include "mobilebehavior.h"
 #include "mobilebehaviormanager.h"
+#include "basicmobilebehavior.h"
 
 #include "skill.h"
 #include "skillmanager.h"
@@ -1464,6 +1464,22 @@ NMI_INVOKE( CharacterWrapper, clearBehavior, "(): сбросить поведе�
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, rememberFought, "(ch): запомнить персонажа ch как будто с ним сражались" )
+{
+    checkTarget();
+    CHK_PC
+
+    if (!target->getNPC()->behavior)
+        return Register(false);
+
+    BasicMobileBehavior::Pointer ai = target->getNPC()->behavior.getDynamicPointer<BasicMobileBehavior>();
+    if (!ai)
+        return Register(false);
+
+    Character *ch = args2character(args);
+    ai->rememberFought(ch);
+    return Register(true);
+}
 
 NMI_INVOKE( CharacterWrapper, get_random_room, "(): случайная комната, куда можно зайти" )
 {
