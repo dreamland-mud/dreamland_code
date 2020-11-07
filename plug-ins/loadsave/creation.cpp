@@ -41,13 +41,16 @@ PROF(mobile);
 
 typedef void(NPCharacter::*SetterMethod)(const DLString &);
 /** Override proto descriptions if there's some formatting present. */
-static void override_description(NPCharacter *mob, const char *protoField, SetterMethod method)
+static void override_description(NPCharacter *mob, const char *cProtoField, SetterMethod method)
 {
-    if (strchr(protoField, '%')) {
-        DLString result = fmt(0, protoField, mob);
-        if (result != protoField)
-            (mob->*method)(result);
-    }
+    DLString protoField(cProtoField);
+
+    if (protoField.find("%1") == DLString::npos)
+        return;
+
+    DLString result = fmt(0, cProtoField, mob);
+    if (result != protoField)
+        (mob->*method)(result);
 }
 
 /*
