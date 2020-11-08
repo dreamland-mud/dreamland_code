@@ -28,7 +28,7 @@
  * Rainbow Scenario
  *-------------------------------------------------------------------------*/
 
-bool RainbowScenario::checkArea( AREA_DATA *area ) const
+bool RainbowScenario::checkArea( AreaIndexData *area ) const
 {
     if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_NOQUEST|AREA_HOMETOWN|AREA_NOGATE))
         return false;

@@ -148,7 +148,7 @@ void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms, const Vn
         throw QuestCannotStartException( );
 }
 
-RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct area_data *targetArea)
+RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct AreaIndexData *targetArea)
 {
     RoomList result;
 
@@ -164,7 +164,7 @@ RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct area_data *targ
     return result;
 }
 
-RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct area_data *targetArea)
+RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct AreaIndexData *targetArea)
 {
     RoomList result;
 
@@ -184,7 +184,7 @@ AreaList RoomQuestModel::findAreas(PCharacter *pch)
 {
     AreaList result;
 
-    for (AREA_DATA *area = area_first; area; area = area->next) {
+    for (AreaIndexData *area = area_first; area; area = area->next) {
         if (area->low_range > pch->getRealLevel())
             continue;
         if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HIDDEN|AREA_NOQUEST) )

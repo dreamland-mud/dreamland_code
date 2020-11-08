@@ -24,10 +24,10 @@
 
 void load_mobile(FILE *, MOB_INDEX_DATA *);
 void load_object(FILE *, OBJ_INDEX_DATA *);
-void load_area_header(FILE *, AREA_DATA *);
+void load_area_header(FILE *, AreaIndexData *);
 void save_mobile(FILE *, const MOB_INDEX_DATA *);
 void save_object(FILE *, const OBJ_INDEX_DATA *);
-void save_area_header(FILE *, const AREA_DATA *);
+void save_area_header(FILE *, const AreaIndexData *);
 
 using namespace std;
 
@@ -303,7 +303,7 @@ int XMLObjIndexData::getVnum() const
     return vnum;
 }
 
-area_data * XMLObjIndexData::getArea() const
+AreaIndexData * XMLObjIndexData::getArea() const
 {
     return area;
 }
@@ -318,7 +318,7 @@ int XMLMobIndexData::getVnum() const
     return vnum;
 }
 
-area_data * XMLMobIndexData::getArea() const
+AreaIndexData * XMLMobIndexData::getArea() const
 {
     return area;
 }
@@ -338,7 +338,7 @@ int XMLRoomIndexData::getVnum() const
     return room->vnum;
 }
 
-area_data * XMLRoomIndexData::getArea() const
+AreaIndexData * XMLRoomIndexData::getArea() const
 {
     return room->area;
 }

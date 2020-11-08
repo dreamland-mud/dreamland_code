@@ -84,7 +84,7 @@ bool Movement::canLeave( Character *wch )
     return true;
 }
 
-static int get_area_help_id(AREA_DATA *area)
+static int get_area_help_id(AreaIndexData *area)
 {
     DLString aname(area->name);
     aname.colourstrip();

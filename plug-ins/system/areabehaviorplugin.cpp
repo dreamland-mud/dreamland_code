@@ -11,7 +11,7 @@
 #include "def.h"
 
 void AreaBehaviorPlugin::initialization( ) {
-    AREA_DATA *area;
+    AreaIndexData *area;
 
     for (area = area_first; area; area = area->next) {
         if (!area->behavior)
@@ -25,7 +25,7 @@ void AreaBehaviorPlugin::initialization( ) {
 }
 
 void AreaBehaviorPlugin::destruction( ) {
-    AREA_DATA *area;
+    AreaIndexData *area;
 
     /* XXX */
     if (dreamland->isShutdown( ))
@@ -42,7 +42,7 @@ void AreaBehaviorPlugin::destruction( ) {
     }
 }
 
-bool area_is_mansion(area_data *area)
+bool area_is_mansion(AreaIndexData *area)
 {
     // TODO remove obsolete check after flag is set everywhere.
     if (!str_prefix("ht", area->area_file->file_name))
@@ -51,7 +51,7 @@ bool area_is_mansion(area_data *area)
     return IS_SET(area->area_flag, AREA_MANSION);
 }
 
-bool area_is_clan(area_data *area)
+bool area_is_clan(AreaIndexData *area)
 {
     // TODO remove obsolete check after flag is set everywhere.
     static const DLString CLAN_AREA_TYPE = DLString("ClanArea");
@@ -61,17 +61,17 @@ bool area_is_clan(area_data *area)
     return IS_SET(area->area_flag, AREA_CLAN);
 }
 
-bool area_is_hometown(area_data *area)
+bool area_is_hometown(AreaIndexData *area)
 {
     return IS_SET(area->area_flag, AREA_HOMETOWN);
 }
 
-bool area_has_levels(area_data *area)
+bool area_has_levels(AreaIndexData *area)
 {
     return area->high_range > 0 || area->low_range > 0;
 }
 
-DLString area_danger_long(area_data *area)
+DLString area_danger_long(AreaIndexData *area)
 {
     bitstring_t flags = area->area_flag;
 
@@ -90,7 +90,7 @@ DLString area_danger_long(area_data *area)
     return DLString::emptyString;
 }
 
-DLString area_danger_short(area_data *area)
+DLString area_danger_short(AreaIndexData *area)
 {
     bitstring_t flags = area->area_flag;
 

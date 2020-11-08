@@ -416,7 +416,7 @@ MEDIT(fenia)
 
 MEDIT(create)
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
 
     value = atoi(argument);
@@ -1219,7 +1219,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     NPCharacter *mob;
     MOB_INDEX_DATA *pMob;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
     char arg1[MAX_STRING_LENGTH];
 

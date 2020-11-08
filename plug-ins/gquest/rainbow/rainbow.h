@@ -17,7 +17,7 @@ class PCharacter;
 class NPCharacter;
 class Object;
 class Room;
-struct area_data;
+struct AreaIndexData;
 class RainbowScenario;
 class RainbowMob;
 

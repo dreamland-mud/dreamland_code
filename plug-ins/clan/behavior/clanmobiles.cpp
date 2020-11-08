@@ -38,7 +38,7 @@ CLAN(none);
 ClanArea::Pointer ClanMobile::getClanArea( )
 {
     ClanArea::Pointer clanArea;
-    AREA_DATA *area;
+    AreaIndexData *area;
 
     area = getChar( )->pIndexData->area;
 

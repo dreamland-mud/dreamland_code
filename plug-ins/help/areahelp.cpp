@@ -24,7 +24,7 @@ void AreaHelp::save() const
 DLString AreaHelp::getTitle(const DLString &label) const
 {
     ostringstream buf;
-    AREA_DATA *area = areafile->area;
+    AreaIndexData *area = areafile->area;
 
     if (!label.empty() || !titleAttribute.empty() || !selfHelp)
         return MarkupHelpArticle::getTitle(label);
@@ -41,7 +41,7 @@ DLString AreaHelp::getTitle(const DLString &label) const
 
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    AREA_DATA *area = areafile->area;
+    AreaIndexData *area = areafile->area;
     
     if (!selfHelp) {
         MarkupHelpArticle::getRawText(ch, in);
@@ -90,7 +90,7 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 }
 
 /** Get self-help article for this area, either a real one or automatically created. */
-AreaHelp * area_selfhelp(AREA_DATA *area)
+AreaHelp * area_selfhelp(AreaIndexData *area)
 {
     for (auto &article: area->helps) {
         AreaHelp *ahelp = article.getDynamicPointer<AreaHelp>();

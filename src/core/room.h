@@ -21,7 +21,7 @@
 #include "liquid.h"
 #include "roombehavior.h"
 
-struct area_data;
+struct AreaIndexData;
 struct extra_descr_data;
 struct exit_data;
 struct extra_exit_data;
@@ -85,7 +85,7 @@ public:
     Character *        people;
     Object *        contents;
     extra_descr_data *        extra_descr;
-    area_data *        area;
+    AreaIndexData *        area;
     exit_data *        exit        [6];
     exit_data *        old_exit[6];
     extra_exit_data * extra_exit;

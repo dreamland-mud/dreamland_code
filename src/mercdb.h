@@ -66,7 +66,7 @@ class Room;
 struct mob_index_data;
 struct obj_index_data;
 struct extra_descr_data;
-struct area_data;
+struct AreaIndexData;
 
 #define        MAX_KEY_HASH                 1024
 
@@ -79,7 +79,7 @@ extern int                newmobs;
 extern int                newobjs;
 extern mob_index_data         * mob_index_hash          [MAX_KEY_HASH];
 extern obj_index_data         * obj_index_hash          [MAX_KEY_HASH];
-extern area_data         * area_first;
+extern AreaIndexData         * area_first;
 extern Room * room_list;
 
 extern int        top_affect;
@@ -94,7 +94,7 @@ extern int        top_room;
 // MOC_SKIP_BEGIN
 struct area_file {
     struct area_file *next;
-    struct area_data *area;
+    struct AreaIndexData *area;
     char *file_name;
 };
 

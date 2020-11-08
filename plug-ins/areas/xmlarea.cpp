@@ -44,7 +44,7 @@ XMLAreaHeader::fromXML(const XMLNode::Pointer &parent)
 }
 
 void
-XMLAreaHeader::init(area_data *a)
+XMLAreaHeader::init(AreaIndexData *a)
 {
     if(a->name) name.setValue(a->name);
     if(a->credits) credits.setValue(a->credits);
@@ -79,13 +79,13 @@ XMLAreaHeader::init(area_data *a)
     loaded = true;
 }
 
-area_data *
+AreaIndexData *
 XMLAreaHeader::compat( )
 {
     if(!loaded)
         return 0;
 
-    AREA_DATA *a = new AREA_DATA;
+    AreaIndexData *a = new AreaIndexData;
     
     a->age                = 15;
     a->nplayer        = 0;
@@ -135,7 +135,7 @@ XMLArea::XMLArea( ) : mobiles(false), objects(false), rooms(false)
 void
 XMLArea::init(area_file *af)
 {
-    AREA_DATA *area = af->area;
+    AreaIndexData *area = af->area;
 
     if(!area)
         return;
@@ -180,7 +180,7 @@ XMLArea::init(area_file *af)
 }
 
 void
-XMLArea::load_helps(AREA_DATA *a)
+XMLArea::load_helps(AreaIndexData *a)
 {
     XMLListBase<XMLAreaHelp>::const_iterator h;
     bool selfHelpExists = false;
@@ -225,7 +225,7 @@ XMLArea::load_helps(AREA_DATA *a)
 }
 
 void
-XMLArea::load_rooms(AREA_DATA *a)
+XMLArea::load_rooms(AreaIndexData *a)
 {
     XMLMapBase<XMLRoom>::iterator rit;
     for(rit = rooms.begin( ); rit != rooms.end( ); rit++) {
@@ -257,7 +257,7 @@ XMLArea::load_rooms(AREA_DATA *a)
 }
 
 void
-XMLArea::load_mobiles(AREA_DATA *a)
+XMLArea::load_mobiles(AreaIndexData *a)
 {
     XMLMapBase<XMLMobileFactory>::iterator mit;
     int i = 0;
@@ -286,7 +286,7 @@ XMLArea::load_mobiles(AREA_DATA *a)
 }
 
 void
-XMLArea::load_objects(AREA_DATA *a)
+XMLArea::load_objects(AreaIndexData *a)
 {
     XMLMapBase<XMLObjectFactory>::iterator oit;
     for(oit = objects.begin( ); oit != objects.end( ); oit++) {
@@ -329,7 +329,7 @@ XMLArea::load(const DLString &fname)
     fromXML(doc->getFirstNode( ));
     
     area_file *af = new_area_file(fname.c_str( ));
-    AREA_DATA *a = areadata.compat( );
+    AreaIndexData *a = areadata.compat( );
 
     if(a) {
         af->area = a;

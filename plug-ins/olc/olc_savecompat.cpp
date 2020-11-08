@@ -409,7 +409,7 @@ void save_object(FILE * fp, const OBJ_INDEX_DATA * pObjIndex)
 }
 
 
-void save_helps(FILE *fp, AREA_DATA *pArea)
+void save_helps(FILE *fp, AreaIndexData *pArea)
 {
     HelpArticles::const_iterator a;
 
@@ -545,7 +545,7 @@ void save_room(FILE *fp, Room *pRoomIndex)
 }
 
 // Saves all rooms in area
-void save_rooms(FILE * fp, AREA_DATA * pArea)
+void save_rooms(FILE * fp, AreaIndexData * pArea)
 {
     fprintf(fp, "#ROOMS\n");
 
@@ -557,7 +557,7 @@ void save_rooms(FILE * fp, AREA_DATA * pArea)
 }
 
 // Saves all mobiles in area
-void save_mobiles(FILE * fp, AREA_DATA * pArea)
+void save_mobiles(FILE * fp, AreaIndexData * pArea)
 {
     MOB_INDEX_DATA *pMobIndex;
 
@@ -575,7 +575,7 @@ void save_mobiles(FILE * fp, AREA_DATA * pArea)
 }
 
 // Saves all objects in area
-void save_objects(FILE * fp, AREA_DATA * pArea)
+void save_objects(FILE * fp, AreaIndexData * pArea)
 {
     OBJ_INDEX_DATA *pObjIndex;
 
@@ -595,7 +595,7 @@ void save_objects(FILE * fp, AREA_DATA * pArea)
 // This function is obsolete.  It it not needed but has been left here
 // for historical reasons.  It is used currently for the same reason.
 // I don't think it's obsolete in ROM -- Hugin.
-void save_door_resets(FILE * fp, AREA_DATA * pArea)
+void save_door_resets(FILE * fp, AreaIndexData * pArea)
 {
     Room *pRoomIndex;
     EXIT_DATA *pExit;
@@ -621,7 +621,7 @@ void save_door_resets(FILE * fp, AREA_DATA * pArea)
 // Name:          save_resets
 // Purpose:       Saves the #RESETS section of an area file.
 // Called by:     save_area(olc_save.c)
-void save_resets(FILE * fp, AREA_DATA * pArea)
+void save_resets(FILE * fp, AreaIndexData * pArea)
 {
     RESET_DATA *pReset;
     Room *pRoom;
@@ -666,7 +666,7 @@ void save_resets(FILE * fp, AREA_DATA * pArea)
 
 
     
-void save_area_header(FILE *fp, const AREA_DATA *pArea)
+void save_area_header(FILE *fp, const AreaIndexData *pArea)
 {
     fprintf(fp, "#AREADATA\n");
 
@@ -705,7 +705,7 @@ void save_area_header(FILE *fp, const AREA_DATA *pArea)
 // Name:          save_area
 // Purpose:       Save an area, note that this format is new.
 // Called by:     do_asave(olc_save.c).
-void save_area(AREA_DATA * pArea)
+void save_area(AreaIndexData * pArea)
 {
     FILE *fp;
     char buf[200];
@@ -763,7 +763,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     "Save areas in original format.")
 {
     char arg1[MAX_INPUT_LENGTH];
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
 
     if (!ch) {

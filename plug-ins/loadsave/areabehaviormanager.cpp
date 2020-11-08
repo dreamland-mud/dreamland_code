@@ -12,7 +12,7 @@
 #include "merc.h"
 #include "def.h"
 
-void AreaBehaviorManager::parse( AREA_DATA * pArea, FILE *fp ) {
+void AreaBehaviorManager::parse( AreaIndexData * pArea, FILE *fp ) {
     char letter;
     char *word;
     
@@ -37,7 +37,7 @@ void AreaBehaviorManager::parse( AREA_DATA * pArea, FILE *fp ) {
     free_string( word );
 }
 
-void AreaBehaviorManager::save( const AREA_DATA *pArea, FILE *fp ) {
+void AreaBehaviorManager::save( const AreaIndexData *pArea, FILE *fp ) {
     std::basic_ostringstream<char> ostr;
      
     if (!pArea->behavior)

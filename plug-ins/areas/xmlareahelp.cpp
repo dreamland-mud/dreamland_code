@@ -60,7 +60,7 @@ public:
 
     virtual void initialization( )
     {
-        struct area_data *area;
+        struct AreaIndexData *area;
 
         for (area = area_first; area; area = area->next) {
             HelpArticles::iterator a;
@@ -92,7 +92,7 @@ public:
 
     virtual void destruction( )
     {
-        struct area_data *area;
+        struct AreaIndexData *area;
 
         for (area = area_first; area; area = area->next) {
             HelpArticles::iterator a;

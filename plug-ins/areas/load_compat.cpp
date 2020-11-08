@@ -56,7 +56,7 @@ LIQ(water);
 
 FILE *                        fpArea;
 char                        strArea[MAX_INPUT_LENGTH];
-AREA_DATA                *Serarea;        /* currently read area */
+AreaIndexData                *Serarea;        /* currently read area */
 
 RESET_DATA               *reset_first = 0;
 RESET_DATA               *reset_last = 0;
@@ -81,7 +81,7 @@ void        fix_resets( void );
 void        fix_door_levels( bool );
 
 bool 
-__lowrangecmp__(AREA_DATA *l, AREA_DATA *r)
+__lowrangecmp__(AreaIndexData *l, AreaIndexData *r)
 {
     return l->min_vnum < r->min_vnum;
 }
@@ -89,8 +89,8 @@ __lowrangecmp__(AREA_DATA *l, AREA_DATA *r)
 void
 vnumck()
 {
-    AREA_DATA *area;
-    typedef list<AREA_DATA *> alist;
+    AreaIndexData *area;
+    typedef list<AreaIndexData *> alist;
     alist areas;
     
     LogStream::sendNotice() << "Checking vnum ranges..." << endl;
@@ -176,7 +176,7 @@ vnumck()
     }
 }
 
-void load_area_header(FILE *fp, AREA_DATA *pArea)
+void load_area_header(FILE *fp, AreaIndexData *pArea)
 {
 #ifdef KEY
 #undef KEY
@@ -267,9 +267,9 @@ void load_area_header(FILE *fp, AREA_DATA *pArea)
 
 void new_load_area( FILE *fp )
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     
-    pArea                = new AREA_DATA;
+    pArea                = new AreaIndexData;
     pArea->age                = 15;
     pArea->nplayer        = 0;
     pArea->empty        = false;
@@ -1091,7 +1091,7 @@ void load_aflag( FILE *fp )
 /*--------------------------------------------------------------------------
  * assigning levels for locked passable doors
  *-------------------------------------------------------------------------*/
-static int get_obj_reset_level( AREA_DATA *pArea, int keyVnum )
+static int get_obj_reset_level( AreaIndexData *pArea, int keyVnum )
 {
     int mobVnum = -1;
     int level = 200;

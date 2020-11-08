@@ -27,7 +27,7 @@ OLCStateArea::OLCStateArea() : vnum( -1 ), area_flag(0, &area_flags)
     /*fromXML will!*/
 }
 
-OLCStateArea::OLCStateArea(AREA_DATA *original) : area_flag(0, &area_flags)
+OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
 {
     if (original) {
         if(original->area_file->file_name)
@@ -94,10 +94,10 @@ OLCStateArea::~OLCStateArea()
 
 void OLCStateArea::commit() 
 {
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
     
     if(!original) {
-        original = new AREA_DATA;
+        original = new AreaIndexData;
         original->next = NULL;
         original->area_file = new_area_file( file_name.getValue( ).c_str( ) );
         original->area_file->area = original;
@@ -153,7 +153,7 @@ void OLCStateArea::statePrompt(Descriptor *d)
 
 bool OLCStateArea::checkOverlap(int lower, int upper)
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
 
     for (pArea = area_first; pArea; pArea = pArea->next) {
         if(pArea->vnum == vnum)
@@ -193,7 +193,7 @@ AEDIT(show, "показать", "показать все поля")
     if (!behavior.empty( ))
         ptc(ch, "Behavior:\r\n%s", behavior.c_str( ));
 
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
     if (original) {
         DLString buf;
 
@@ -217,7 +217,7 @@ AEDIT(show, "показать", "показать все поля")
 AEDIT(helps, "справка", "создать или посмотреть справку по зоне")
 {
     DLString arg = argument;
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
 
     if (!original) {
         stc("Сперва сохрани новую арию.", ch);
@@ -288,7 +288,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
 
 AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
 {
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
 
     if (original) {
         reset_area(original, FRESET_ALWAYS);
@@ -302,7 +302,7 @@ AEDIT(reset, "сбросить", "сбросить арию, обновив вс
 
 AEDIT(create, "создать", "создать новую арию")
 {
-    OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
+    OLCStateArea::Pointer ae(NEW, (AreaIndexData *)NULL);
     ae->attach(ch);
     ae->findCommand(ch, "show")->run(ch, "");
 
@@ -707,7 +707,7 @@ AEDIT(dump, "вывод", "(отладка) вывести внутреннее 
 CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
         "Online area editor.")
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
     char arg[MAX_STRING_LENGTH];
 
@@ -728,7 +728,7 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 stc("Insuficiente seguridad para crear areas.\n\r", ch);
                 return;
             }
-            OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
+            OLCStateArea::Pointer ae(NEW, (AreaIndexData *)NULL);
             ae->attach(ch);
             ae->findCommand(ch, "show")->run(ch, "");
             stc("Ария создана.\r\n", ch);

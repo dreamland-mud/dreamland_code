@@ -45,7 +45,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     "Save areas.")
 {
     char arg1[MAX_INPUT_LENGTH];
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
 
     if (!ch) {

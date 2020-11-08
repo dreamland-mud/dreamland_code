@@ -163,7 +163,7 @@ SKILL_RUNP(fade)
 SPELL_DECL(EvilSpirit);
 VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
 {
-    AREA_DATA *pArea = room->area;
+    AreaIndexData *pArea = room->area;
     Affect af, af2;
 
     if (IS_RAFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))

@@ -64,7 +64,7 @@ void free_reset_data(RESET_DATA * pReset)
     return;
 }
 
-void init_area(AREA_DATA *pArea) 
+void init_area(AreaIndexData *pArea) 
 {
     top_area++;
     pArea->next = NULL;
@@ -87,15 +87,15 @@ void init_area(AREA_DATA *pArea)
     pArea->vnum = top_area - 1;
 }
 
-AREA_DATA *new_area(void)
+AreaIndexData *new_area(void)
 {
-    AREA_DATA *pArea;
-    pArea = new AREA_DATA; 
+    AreaIndexData *pArea;
+    pArea = new AreaIndexData; 
     init_area(pArea);
     return pArea;
 }
 
-void free_area(AREA_DATA * pArea)
+void free_area(AreaIndexData * pArea)
 {
     free_string(pArea->name);
     free_string(pArea->authors);

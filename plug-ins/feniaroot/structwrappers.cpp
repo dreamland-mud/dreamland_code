@@ -51,9 +51,9 @@ DESIRE(full);
  *----------------------------------------------------------------------*/
 NMI_INIT(AreaWrapper, "area, зона");
 
-static AREA_DATA *find_area( const DLString &filename )
+static AreaIndexData *find_area( const DLString &filename )
 {
-    AREA_DATA *area;
+    AreaIndexData *area;
 
     for (area = area_first; area; area = area->next)
         if (filename == area->area_file->file_name)

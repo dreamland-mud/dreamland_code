@@ -21,7 +21,7 @@
 ClanArea::Pointer ClanRoom::getClanArea( )
 {
     ClanArea::Pointer clanArea;
-    AREA_DATA *area;
+    AreaIndexData *area;
 
     area = getRoom( )->area;
 

@@ -99,7 +99,7 @@ bool BasicMobileBehavior::canAggress( Character *victim )
 bool BasicMobileBehavior::canAggressNormal( Character *victim )
 {
     int recall;
-    AREA_DATA *area;
+    AreaIndexData *area;
     
     if (!canAggress( victim ))
         return false;

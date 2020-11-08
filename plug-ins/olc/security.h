@@ -12,7 +12,7 @@
 #include "webeditor.h"
 
 class Character;
-struct area_data;
+struct AreaIndexData;
 
 class XMLVnumRange : public XMLVariableContainer {
 XML_OBJECT

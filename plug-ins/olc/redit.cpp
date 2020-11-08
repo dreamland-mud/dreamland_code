@@ -121,7 +121,7 @@ REDIT(sector, "местность", "установить тип местнос�
 REDIT(rlist, "ксписок", "список всех комнат в данной арии")
 {
     Room *pRoomIndex;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     ostringstream buf;
     char arg[MAX_INPUT_LENGTH];
     int col = 0;
@@ -156,7 +156,7 @@ REDIT(rlist, "ксписок", "список всех комнат в данно
 REDIT(mlist, "мсписок", "список всех мобов в данной арии, по имени или all")
 {
     MOB_INDEX_DATA *pMobIndex;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     ostringstream buf1;
     char arg[MAX_INPUT_LENGTH];
     bool fAll, found;
@@ -200,7 +200,7 @@ REDIT(mlist, "мсписок", "список всех мобов в данной
 REDIT(olist, "псписок", "список всех предметов в данной арии, по имени, типу или all")
 {
     OBJ_INDEX_DATA *pObjIndex;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     ostringstream buf1;
     char arg[MAX_INPUT_LENGTH];
     bool fAll, found;
@@ -679,7 +679,7 @@ REDIT(ed, "экстра", "редактор экстра-описаний (ed he
 Room *
 OLCStateRoom::redit_create(PCharacter *ch, char *argument)
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     Room *pRoom;
     int value;
 

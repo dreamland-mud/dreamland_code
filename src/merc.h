@@ -134,7 +134,6 @@ typedef map<DLString, DLString> Properties;
 typedef struct        extra_descr_data        EXTRA_DESCR_DATA;
 typedef struct        obj_index_data                OBJ_INDEX_DATA;
 typedef struct        mob_index_data                MOB_INDEX_DATA;
-typedef struct        area_data                AREA_DATA;
 typedef struct        exit_data                EXIT_DATA;
 typedef struct        extra_exit_data        EXTRA_EXIT_DATA;
 typedef struct        kill_data                KILL_DATA;
@@ -354,7 +353,7 @@ struct        mob_index_data
     Grammar::Number     gram_number;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;
-    AREA_DATA *                area;
+    AreaIndexData *                area;
     DLString smell;
     Properties properties;
 };
@@ -402,7 +401,7 @@ struct        obj_index_data
     Grammar::MultiGender gram_gender;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;
-    AREA_DATA *                area;
+    AreaIndexData *                area;
     DLString smell;
     DLString sound;
     Properties properties;
@@ -488,11 +487,11 @@ struct        reset_data
 /*
  * Area definition.
  */
-struct        area_data
+struct        AreaIndexData
 {
-    area_data( );
+    AreaIndexData( );
     
-    AREA_DATA *                next;
+    AreaIndexData *                next;
     char *                name;
     char *                altname;
     char *                authors;
@@ -562,8 +561,8 @@ struct        area_data
 /*
  * Global variables.
  */
-extern                AREA_DATA        *area_first;
-extern                AREA_DATA        *area_last;
+extern                AreaIndexData        *area_first;
+extern                AreaIndexData        *area_last;
 
 extern                Character          *        char_list;
 extern                Character          *        newbie_list;

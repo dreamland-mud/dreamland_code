@@ -29,7 +29,7 @@ void string_show(Character * ch, char *strch);
 
 #define MAX_MOB 1                /* Default maximum number for resetting mobs */
 
-AREA_DATA *get_area_data(int vnum);
+AreaIndexData *get_area_data(int vnum);
 void add_reset(Room * room, RESET_DATA * pReset, int index);
 
 bool show_help(Character * ch, const char *argument);
@@ -43,8 +43,8 @@ void show_fenia_triggers(Character *, Scripting::Object *wrapper);
 // mem.c - memory prototypes.
 RESET_DATA *new_reset_data();
 void free_reset_data(RESET_DATA * pReset);
-AREA_DATA *new_area();
-void free_area(AREA_DATA * pArea);
+AreaIndexData *new_area();
+void free_area(AreaIndexData * pArea);
 EXIT_DATA *new_exit();
 void free_exit(EXIT_DATA * pExit);
 EXTRA_DESCR_DATA *new_extra_descr();

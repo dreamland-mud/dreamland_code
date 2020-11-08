@@ -42,7 +42,7 @@ bool InvasionScenario::checkRoom( Room *room )
         && !IS_SET(room->room_flags, ROOM_NEWBIES_ONLY|ROOM_GODS_ONLY|ROOM_NOWHERE);
 }
 
-bool InvasionScenario::checkArea( AREA_DATA *area )
+bool InvasionScenario::checkArea( AreaIndexData *area )
 {
     if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_NOQUEST|AREA_HIDDEN))
         return false;
@@ -78,7 +78,7 @@ void InvasionSparseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 void InvasionDenseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 {
     Room *room;
-    typedef map<AREA_DATA *, vector<Room *> > RoomsByArea;
+    typedef map<AreaIndexData *, vector<Room *> > RoomsByArea;
     RoomsByArea goodRooms;
     int areaCnt;
     

@@ -50,7 +50,7 @@ Gangsters::~Gangsters( )
 
 void Gangsters::create( const Config& )  
 {
-    AREA_DATA *area;
+    AreaIndexData *area;
     AreaList areaList;
     
     for (area = area_first; area; area = area->next) {
@@ -757,7 +757,7 @@ DLString Gangsters::lairHint( )
     return "";
 }
 
-void Gangsters::populateArea( AREA_DATA *area, RoomList &mobRooms, int numPortal )
+void Gangsters::populateArea( AreaIndexData *area, RoomList &mobRooms, int numPortal )
 {
     int number;
     

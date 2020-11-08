@@ -33,7 +33,7 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     if (areas.empty())
         throw QuestCannotStartException();
 
-    struct area_data *targetArea = areas[number_range(0, areas.size() - 1)];
+    struct AreaIndexData *targetArea = areas[number_range(0, areas.size() - 1)];
 
     RoomList rooms = findVictimRooms(pch, targetArea);
     if (rooms.size() < 5)
@@ -223,7 +223,7 @@ const QuestMobileAppearence & BigQuestScenario::getRandomMobile() const
     return mobiles[number_range(0, mobiles.size() - 1)];    
 }
 
-void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct area_data *targetArea, int mobsTotal) const
+void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct AreaIndexData *targetArea, int mobsTotal) const
 {
     XMLStringVector::const_iterator s;
 

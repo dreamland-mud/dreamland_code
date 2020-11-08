@@ -42,7 +42,7 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
-static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLString &where )
+static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, DLString &where )
 {
     int mobVnum = -1;
     for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next) {
@@ -91,7 +91,7 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLSt
     return false;
 }            
 
-static bool get_mob_resets( MOB_INDEX_DATA *pMob, AREA_DATA *&pArea, DLString &where )
+static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLString &where )
 {
     for (Room *room = room_list; room; room = room->rnext) {
         for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next) {
@@ -109,7 +109,7 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AREA_DATA *&pArea, DLString &w
     return false;
 }
 
-static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AREA_DATA *&pArea, DLString &where )
+static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLString &where )
 {
     // First look for obj resets in the same area it's from.
     for (auto &pair: pObj->area->rooms) {
@@ -323,7 +323,7 @@ public:
 
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
-            AREA_DATA *pArea;
+            AreaIndexData *pArea;
             useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
@@ -442,7 +442,7 @@ public:
 
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
-            AREA_DATA *pArea;
+            AreaIndexData *pArea;
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
@@ -571,7 +571,7 @@ public:
 
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
-            AREA_DATA *pArea;
+            AreaIndexData *pArea;
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
@@ -709,7 +709,7 @@ CMDRUNP(searcher)
                                     pObj->area->name);
 
                     DLString where;
-                    AREA_DATA *pArea;
+                    AreaIndexData *pArea;
                     if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
@@ -790,7 +790,7 @@ CMDRUNP(searcher)
                                     p.wflags.c_str());
 
                     DLString where;
-                    AREA_DATA *pArea;
+                    AreaIndexData *pArea;
                     if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
@@ -856,7 +856,7 @@ CMDRUNP(searcher)
                                     pMob->area->name);
 
                     DLString where;
-                    AREA_DATA *pArea;
+                    AreaIndexData *pArea;
                     if (IS_SET(pMob->area->area_flag, AREA_HIDDEN) || !get_mob_resets(pMob, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";

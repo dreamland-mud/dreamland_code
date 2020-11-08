@@ -19,7 +19,7 @@ public:
     typedef ::Pointer<OLCStateArea> Pointer;
 
     OLCStateArea();
-    OLCStateArea(AREA_DATA *o);
+    OLCStateArea(AreaIndexData *o);
     virtual ~OLCStateArea();
     
     virtual void commit();

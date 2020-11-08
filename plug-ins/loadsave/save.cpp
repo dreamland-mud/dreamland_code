@@ -102,8 +102,8 @@
 #include "vnum.h"
 #include "def.h"
 
-extern AREA_DATA *                area_first;
-extern AREA_DATA *                area_last;
+extern AreaIndexData *                area_first;
+extern AreaIndexData *                area_last;
 
 GSN(none);
 GSN(doppelganger);
@@ -1590,7 +1590,7 @@ NPCharacter * fread_mob( FILE *fp )
 
                     if ( !str_cmp( word, "RZone" ) )
                     {
-                            AREA_DATA *pArea;
+                            AreaIndexData *pArea;
                             char *rznm = fread_string( fp );
                             DLString zoneName(rznm);
                             free_string(rznm);

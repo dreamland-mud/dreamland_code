@@ -67,7 +67,7 @@ enum {
 
 static int next_index_data( Character *ch, Room *r, int ndx_type )
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     
     if (!r)
         return -1;
@@ -156,9 +156,9 @@ void show_fenia_triggers(Character *ch, Scripting::Object *wrapper)
 }
 
 /** Find area with given vnum. */
-AREA_DATA *get_area_data(int vnum)
+AreaIndexData *get_area_data(int vnum)
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
 
     for (pArea = area_first; pArea; pArea = pArea->next) {
         if (pArea->vnum == vnum)
@@ -544,7 +544,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
         "List areas.")
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
 
     const DLString lineFormat = 
             "[" + web_cmd(ch, "aedit $1", "%3d") 

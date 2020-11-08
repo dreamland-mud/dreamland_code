@@ -800,7 +800,7 @@ OEDIT(cost)
 
 OEDIT(create)
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
 
     value = atoi(argument);
@@ -1095,7 +1095,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     Object *obj;
     OBJ_INDEX_DATA *pObj;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     char arg1[MAX_STRING_LENGTH];
     int value;
 

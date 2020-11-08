@@ -114,8 +114,8 @@ OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
 Room *        room_index_hash                [MAX_KEY_HASH];
 char *                        string_hash                [MAX_KEY_HASH];
 
-AREA_DATA *                area_first;
-AREA_DATA *                area_last;
+AreaIndexData *                area_first;
+AreaIndexData *                area_last;
 
 char                        str_empty        [1];
 
@@ -169,7 +169,7 @@ new_area_file(const char *name)
     return rc;
 }
 
-area_data::area_data( ) : behavior( AreaBehavior::NODE_NAME )
+AreaIndexData::AreaIndexData( ) : behavior( AreaBehavior::NODE_NAME )
 {
 }
 

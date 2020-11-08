@@ -41,7 +41,7 @@ void area_update( )
 {
 //    ProfilerBlock be("area_update");
 
-    for (AREA_DATA *pArea = area_first; pArea != 0; pArea = pArea->next )
+    for (AreaIndexData *pArea = area_first; pArea != 0; pArea = pArea->next )
     {
         if ( ++pArea->age < 3 )
             continue;
@@ -120,7 +120,7 @@ static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
     return count;
 }
 
-static int count_mob_area(AREA_DATA *pArea, MOB_INDEX_DATA *pMob, int limit)
+static int count_mob_area(AreaIndexData *pArea, MOB_INDEX_DATA *pMob, int limit)
 {
     int count = 0;
 
@@ -540,7 +540,7 @@ void reset_room(Room *pRoom, int flags)
 /*
  * Reset one area.
  */
-void reset_area( AREA_DATA *pArea, int flags )
+void reset_area( AreaIndexData *pArea, int flags )
 {
     const char *resetmsg;
     static const char *default_resetmsg = "Ты слышишь мелодичный перезвон колокольчиков.";        

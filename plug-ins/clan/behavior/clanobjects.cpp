@@ -39,7 +39,7 @@ ClanObject::~ClanObject( )
 ClanArea::Pointer ClanObject::getClanArea( )
 {
     ClanArea::Pointer clanArea;
-    AREA_DATA *area;
+    AreaIndexData *area;
 
     area = obj->pIndexData->area;
 

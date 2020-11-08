@@ -3497,8 +3497,8 @@ CMDWIZP( smite )
 CMDWIZP( popularity )
 {
     ostringstream buf;
-    AREA_DATA *area;
-    extern AREA_DATA *area_first;
+    AreaIndexData *area;
+    extern AreaIndexData *area_first;
     int i;
     bool fAll;
 
