@@ -406,6 +406,9 @@ void load_resets( FILE *fp ) {
             
             pReset->arg3 = wear_loc;
             break;
+        case 'R':
+            warn("...Random reset not supported: %c %d %d", letter, pReset->arg1, pReset->arg2);
+            break;
         default:
             pReset->arg3 = fread_number( fp );
             break;
@@ -1206,7 +1209,7 @@ load_areas( )
                         else if ( !str_cmp( word, "FLAG" ) )         load_aflag(fpArea);
                         else
                         {
-                                LogStream::sendError( ) << "Boot_db: bad section name." << endl;
+                                LogStream::sendError( ) << "Boot_db: bad section name " << word << endl;
                                 fread_letter( fpArea );
                         }
                 }

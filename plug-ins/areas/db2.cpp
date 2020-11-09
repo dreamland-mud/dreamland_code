@@ -78,6 +78,9 @@
 
 GSN(none);
 
+bool dup_mob_vnum( int vnum );
+bool dup_obj_vnum( int vnum );
+
 /*
  * parse one mobile. no explicit side effects
  */
@@ -89,6 +92,7 @@ load_mobile(FILE *fp, MOB_INDEX_DATA *pMobIndex)
 {
     Race *race;
     MobileBehavior::Pointer shopper;
+    const char *word;
 
     pMobIndex->wrapper                = 0;
 
@@ -132,8 +136,9 @@ load_mobile(FILE *fp, MOB_INDEX_DATA *pMobIndex)
     pMobIndex->damage[DICE_TYPE]    = fread_number( fp );
                                       fread_letter( fp );
     pMobIndex->damage[DICE_BONUS]   = fread_number( fp );
-    if (( pMobIndex->dam_type = weapon_flags.value(fread_word(fp)) ) == NO_FLAG) 
-        throw FileFormatException("load_mobile %d bad dam_type", pMobIndex->vnum);
+    word = fread_word(fp);
+    if (( pMobIndex->dam_type = weapon_flags.value(word) ) == NO_FLAG) 
+        throw FileFormatException("load_mobile %d bad dam_type %s", pMobIndex->vnum, word);
 
     /* read armor class */
     pMobIndex->ac[AC_PIERCE]        = fread_number( fp ) * 10;
@@ -269,7 +274,7 @@ load_mobiles( FILE *fp )
         if ( vnum == 0 )
             break;
 
-        if ( get_mob_index( vnum ) != NULL ) 
+        if (dup_mob_vnum( vnum )) 
             throw FileFormatException("load_mobiles: vnum %d duplicated", vnum);
         
         pMobIndex = new MOB_INDEX_DATA;
@@ -503,7 +508,7 @@ load_objects( FILE *fp )
         if ( vnum == 0 )
             break;
 
-        if ( get_obj_index( vnum ) != NULL ) 
+        if (dup_obj_vnum(vnum)) 
             throw FileFormatException("load_objects: vnum %d duplicated", vnum);
         
         pObjIndex = new OBJ_INDEX_DATA;
