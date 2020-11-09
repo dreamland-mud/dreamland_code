@@ -378,7 +378,7 @@ void reset_room(Room *pRoom, int flags)
         EXIT_DATA *pexit;
         Object *obj = 0;
         Object *obj_to = 0;
-        int roomCount, areaCount;
+        int roomCount, worldCount;
         
         switch ( pReset->command )
         {
@@ -394,8 +394,8 @@ void reset_room(Room *pRoom, int flags)
                 continue;
             }
 
-            areaCount = count_mob_area(pRoom->area, pMobIndex, pReset->arg2);
-            if (pReset->arg2 != -1 && areaCount >= pReset->arg2) {
+            worldCount = pMobIndex->count; // FIXME: global count should consider room instances and charmed mobs
+            if (pReset->arg2 != -1 && worldCount >= pReset->arg2) {
                 last = false;
                 break;
             }

@@ -59,7 +59,6 @@ exit_data *exit_data::create()
 
 Room * RoomIndexData::create()
 {
-    LogStream::sendNotice() << "Creating instance of room " << vnum << endl;
     if (room) // FIXME allow multiple instances
         throw Exception("Attempt to create second instance of a room.");
 
