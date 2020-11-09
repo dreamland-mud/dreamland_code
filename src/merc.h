@@ -83,6 +83,7 @@ class Character;
 class Object;
 class Affect;
 class Room;
+class RoomIndexData;
 class XMLDocument;
 class AreaBehavior;
 typedef ::Pointer<XMLDocument> XMLDocumentPointer;
@@ -429,6 +430,8 @@ struct        exit_data
         EXIT_DATA *        next;
         int                orig_door;
         int                level;
+
+        exit_data *create(); // Implemented in loadsave plugin.
 };
 
 struct        extra_exit_data
@@ -453,6 +456,8 @@ struct        extra_exit_data
         char *                description;
         char *                room_description;
         int                level;
+
+        extra_exit_data *create(); // Implemented in loadsave plugin.
 };
 
 
@@ -516,6 +521,7 @@ struct        AreaIndexData
     int                        security;
     int                        vnum;
     map<int, Room *>    rooms;
+    map<int, RoomIndexData *>    roomIndexes;
 };
 
 /*
@@ -575,7 +581,7 @@ extern                KILL_DATA                kill_table        [];
 extern                TIME_INFO_DATA                time_info;
 extern                WEATHER_DATA                weather_info;
 
-extern                Room *                        room_index_hash                [];
+extern                RoomIndexData *                        room_index_hash                [];
 extern                int                        top_vnum_room;
 extern                int                        top_vnum_mob;
 extern                int                        top_vnum_obj;

@@ -19,25 +19,36 @@
 
 CLAN(none);
 PROF(none);
+LIQ(none);
 
-Room::Room( ) : 
-                next( 0 ), rnext( 0 ),
-                aff_next( 0 ), reset_first( 0 ), reset_last( 0 ),
-                people( 0 ), contents( 0 ), extra_descr( 0 ),
-                area( 0 ), extra_exit( 0 ),
-                name( 0 ), description( 0 ), owner( 0 ),
-                vnum( 0 ), room_flags( 0 ), room_flags_default( 0 ),
-                light( 0 ), sector_type( 0 ),
-                heal_rate( 0 ), heal_rate_default( 0 ),
-                mana_rate( 0 ), mana_rate_default( 0 ),
-                clan( clan_none ),  
-                guilds( professionManager ),
-                affected( 0 ), affected_by( 0 ),
-                liquid( "none" ),
-                behavior( RoomBehavior::NODE_NAME )
+RoomIndexData::RoomIndexData()
+        : next(0), reset_first( 0 ), reset_last( 0 ),
+          extra_descr(0), extra_exit(0),
+          name(&str_empty[0]), description(&str_empty[0]), 
+          vnum(0), room_flags(0),
+          sector_type(0), heal_rate(100), mana_rate(100),
+          clan( clan_none ),  guilds( professionManager ),
+          liquid( liq_none ), area(0), room(0)
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
-        exit[i] = old_exit[i] = 0;
+        exit[i] = 0;
+}
+
+Room::Room( ) : 
+                rnext( 0 ), aff_next( 0 ), 
+                people( 0 ), contents( 0 ), extra_descr( 0 ),
+                area( 0 ), extra_exit( 0 ),
+                name(&str_empty[0]), description(&str_empty[0]), 
+                owner(&str_empty[0]),
+                vnum( 0 ), room_flags( 0 ), 
+                light( 0 ), sector_type( 0 ),
+                heal_rate( 100 ), mana_rate( 100 ), 
+                affected( 0 ), affected_by( 0 ),
+                behavior( RoomBehavior::NODE_NAME ),
+                pIndexData(0)
+{
+    for (int i = 0; i < DIR_SOMEWHERE; i++) 
+        exit[i] = 0;
 }
 
 bool Room::isOwner( Character *ch ) const
@@ -86,10 +97,10 @@ bool Room::isCommon( )
     if (IS_SET(area->area_flag, AREA_WIZLOCK))
         return false;
 
-    if (clan != clan_none)
+    if (pIndexData->clan != clan_none)
         return false;
     
-    if (!guilds.empty( ))
+    if (!pIndexData->guilds.empty( ))
         return false;
     
     if (behavior && !behavior->isCommon( ))

@@ -49,6 +49,38 @@ struct RoomHistory : public list<RoomHistoryEntry> {
     static const unsigned int MAX_SIZE;
 };
 
+struct RoomIndexData : public virtual DLObject, public WrapperTarget {
+    RoomIndexData();
+
+    Room * create(); // Implemented in loadsave plugin.
+
+    RoomIndexData *next;
+    reset_data *reset_first;
+    reset_data *reset_last;
+    extra_descr_data *        extra_descr;
+    exit_data *        exit        [6];
+    extra_exit_data * extra_exit;
+
+    char *        name;
+    char *        description;
+    int         vnum;
+    int         room_flags;
+    int         sector_type;
+    int         heal_rate;
+    int         mana_rate;
+    ClanReference clan;
+    GlobalBitvector guilds;
+    LiquidReference liquid;
+    Properties properties;
+    ::Pointer<XMLDocument> behavior;
+
+    Scripting::Register init;
+
+    AreaIndexData *area;
+
+    Room *room; // FIXME wil be replaces with a list of instances
+};
+
 class Room : public virtual DLObject, public WrapperTarget {
 public:
     Room( );
@@ -57,6 +89,8 @@ public:
     bool isPrivate( ) const;
     int  getCapacity( ) const;
     bool isCommon( );
+    inline long long getID( ) const;
+    inline void setID( long long );
 
     // room affects
     void affectModify( Affect *paf, bool fAdd );
@@ -77,41 +111,46 @@ public:
     list<Character*> getPeople( );
 
 public:
-    Room *        next;
+    // FIXME add getters, values need to be taken from proto if not changed.
+
     Room *        rnext;
     Room *        aff_next;
-    reset_data *reset_first;
-    reset_data *reset_last;
-    Character *        people;
-    Object *        contents;
-    extra_descr_data *        extra_descr;
-    AreaIndexData *        area;
-    exit_data *        exit        [6];
-    exit_data *        old_exit[6];
+    Character *   people;
+    Object *      contents;
+    extra_descr_data *extra_descr;
+    AreaIndexData *area;
+    exit_data *   exit[6];
     extra_exit_data * extra_exit;
-    char *        name;
-    char *        description;
-    char *        owner;
-    int                vnum;
+    char *     name;    
+    char *     description;
+    char *     owner;
+    int        vnum;
     int        room_flags;
-    int        room_flags_default;
-    int                light;
-    int                sector_type;
-    int                heal_rate;
-    int                heal_rate_default;
-    int         mana_rate;
-    int         mana_rate_default;
-    ClanReference clan;
-    GlobalBitvector guilds;
+    int        light;
+    int        sector_type;
+    int        heal_rate;
+    int        mana_rate;
     RoomHistory history;
-    Affect        *affected;
+    Affect      *affected;
     int        affected_by;
-    LiquidReference liquid;
-    Properties properties;
 
     XMLPersistentStreamable<RoomBehavior> behavior;
     Scripting::Register init;
+
+    RoomIndexData *pIndexData;
+
+protected:
+    long long ID;
 };
+
+long long Room::getID( ) const
+{
+    return ID;
+}
+void Room::setID( long long id )
+{
+    ID = id;
+}
 
 
 /*

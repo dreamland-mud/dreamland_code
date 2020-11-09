@@ -59,7 +59,7 @@ public:
         try {
             Ptr::fromXML( parent );
         
-        } catch (ExceptionXMLClassAllocate e) {
+        } catch (const ExceptionXMLClassAllocate &e) {
             setPointer( new Stub( parent ) );
         }
     }

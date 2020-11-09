@@ -63,6 +63,7 @@ class Object;
 class NPCharacter;
 class Character;
 class Room;
+class RoomIndexData;
 struct mob_index_data;
 struct obj_index_data;
 struct extra_descr_data;
@@ -127,7 +128,8 @@ void free_mem(void *, int);
 
 mob_index_data *        get_mob_index        ( int vnum );
 obj_index_data *        get_obj_index        ( int vnum );
-Room *        get_room_index        ( int vnum );
+RoomIndexData *        get_room_index        ( int vnum );
+Room * get_room_instance(int vnum);
 
 char *        get_extra_descr        ( const char *name, extra_descr_data *ed );
 extra_descr_data *new_extra_descr( );

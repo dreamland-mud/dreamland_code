@@ -111,7 +111,7 @@ Room* room_list = 0;
  */
 MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
-Room *        room_index_hash                [MAX_KEY_HASH];
+RoomIndexData *        room_index_hash                [MAX_KEY_HASH];
 char *                        string_hash                [MAX_KEY_HASH];
 
 AreaIndexData *                area_first;
@@ -226,8 +226,6 @@ void free_extra_exit(EXTRA_EXIT_DATA *eexit)
 }
 
 
-
-
 /*
  * Get an extra description from a list.
  */
@@ -295,9 +293,9 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
  * Translates room virtual number to its room index struct.
  * Hash table lookup.
  */
-Room *get_room_index( int vnum )
+RoomIndexData *get_room_index( int vnum )
 {
-    Room *pRoomIndex;
+    RoomIndexData *pRoomIndex;
 
     for ( pRoomIndex  = room_index_hash[vnum % MAX_KEY_HASH];
           pRoomIndex != 0;
@@ -313,7 +311,14 @@ Room *get_room_index( int vnum )
     return 0;
 }
 
-
+// FIXME: should look up by vnum and instance.
+Room *get_room_instance(int vnum)
+{
+    RoomIndexData *pRoomIndex = get_room_index(vnum);
+    if (pRoomIndex)
+        return pRoomIndex->room;
+    return 0;
+}
 
 /*
  * Free a string.
