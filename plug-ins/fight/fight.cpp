@@ -125,6 +125,14 @@ static bool oprog_fight( Object *obj, Character *ch )
     return false;
 }
 
+static bool oprog_fight_carry( Object *obj, Character *ch )
+{
+    FENIA_CALL( obj, "FightCarry", "C", ch );
+    FENIA_NDX_CALL( obj, "FightCarry", "OC", obj, ch );
+    return false;
+}
+
+
 /*
  * Control the fights going on.
  * Called periodically by update_handler.
@@ -180,8 +188,14 @@ void violence_update( )
             for (obj = ch->carrying; obj; obj = obj_next) {
                 obj_next = obj->next_content;
 
-                if( ch->fighting && obj_is_worn(obj))
-                    oprog_fight( obj, ch );
+                // onFight is only called for items in meaningful wearlocations.
+                // Use onFightCarry to describe fighting behavior in inventory, hair, tail etc.
+                if( ch->fighting) {
+                    if (obj_is_worn(obj))
+                        oprog_fight( obj, ch );
+                    else
+                        oprog_fight_carry(obj, ch);
+                }
             }
         } catch (const VictimDeathException &vde) {
             continue;
