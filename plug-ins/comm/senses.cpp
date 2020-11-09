@@ -132,8 +132,8 @@ CMDRUNP( smell )
         if (rprog_smell( ch->in_room, ch, argument ))
             return;
 
-        Properties::const_iterator p = ch->in_room->properties.find( "smell" );
-        if (p != ch->in_room->properties.end( )) {
+        Properties::const_iterator p = ch->in_room->pIndexData->properties.find( "smell" );
+        if (p != ch->in_room->pIndexData->properties.end( )) {
             ch->println(p->second);
             return;
         }

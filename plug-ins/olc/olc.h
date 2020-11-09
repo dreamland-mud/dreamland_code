@@ -30,7 +30,7 @@ void string_show(Character * ch, char *strch);
 #define MAX_MOB 1                /* Default maximum number for resetting mobs */
 
 AreaIndexData *get_area_data(int vnum);
-void add_reset(Room * room, RESET_DATA * pReset, int index);
+void add_reset(RoomIndexData * room, RESET_DATA * pReset, int index);
 
 bool show_help(Character * ch, const char *argument);
 void show_fenia_triggers(Character *, Scripting::Object *wrapper);
@@ -49,7 +49,7 @@ EXIT_DATA *new_exit();
 void free_exit(EXIT_DATA * pExit);
 EXTRA_DESCR_DATA *new_extra_descr();
 void free_extra_descr(EXTRA_DESCR_DATA * pExtra);
-Room *new_room_index();
+RoomIndexData *new_room_index();
 void free_room_index(Room * pRoom);
 Affect *new_affect();
 void free_affect(Affect * pAf);
@@ -60,6 +60,8 @@ void free_mob_index(MOB_INDEX_DATA * pMob);
 // Defined in db.cpp
 EXTRA_EXIT_DATA *new_extra_exit();
 void free_extra_exit(EXTRA_EXIT_DATA *eeit);
+void delete_extra_exit(EXTRA_EXIT_DATA *eed, EXTRA_EXIT_DATA *prev_exit, EXTRA_EXIT_DATA *&list);
+EXTRA_EXIT_DATA * find_extra_exit(const char *argument, EXTRA_EXIT_DATA *&list, EXTRA_EXIT_DATA *&prev_exit);
 
 #define stc(t, c) (c)->send_to((t))
 #define IS_NPC(c) (c)->is_npc()
@@ -69,8 +71,8 @@ const char * get_skill_name( int sn, bool verbose = true );
 int olc_handler(Descriptor *d, char *argument);
 void ptc(Character *c, const char *fmt, ...);
 
-int next_obj_index( Character *ch, Room *r );
-int next_room( Character *ch, Room *r );
-int next_mob_index( Character *ch, Room *r );
+int next_obj_index( Character *ch, RoomIndexData *r );
+int next_room( Character *ch, RoomIndexData *r );
+int next_mob_index( Character *ch, RoomIndexData *r );
 
 #endif /* __OLC_H__ */

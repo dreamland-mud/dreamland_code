@@ -421,7 +421,7 @@ protected:
         if (( point = ch->getClan( )->getRecallVnum( ) ) <= 0)
             point = ch->getPC( )->getHometown( )->getRecall( );
 
-        if (point <= 0 || !( to_room = get_room_index( point ) )) {
+        if (point <= 0 || !( to_room = get_room_instance( point ) )) {
             msgSelf( ch, "You are completely lost." );
             return false;
         }

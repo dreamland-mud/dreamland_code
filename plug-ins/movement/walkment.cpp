@@ -365,10 +365,10 @@ bool Walkment::checkGuild( Character *wch )
     if (wch->is_npc( ))
         return true;
     
-    if (to_room->guilds.empty( ))
+    if (to_room->pIndexData->guilds.empty( ))
         return true;
 
-    if (!to_room->guilds.isSet( wch->getProfession( ) )) {
+    if (!to_room->pIndexData->guilds.isSet( wch->getProfession( ) )) {
         msgSelfParty( wch, 
                       "Ты не можешь войти в чужую гильдию.", 
                       "%2$^C1 не может войти в чужую гильдию." );

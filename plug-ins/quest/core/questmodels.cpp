@@ -140,7 +140,7 @@ void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms, const Vn
     Room *r;
     
     for (VnumList::const_iterator v = vnums.begin( ); v != vnums.end( ); v++)
-        if (( r = get_room_index( *v ) ))
+        if (( r = get_room_instance( *v ) ))
             if (checkRoomClient( pch, r ))
                 rooms.push_back( r );
 
@@ -272,7 +272,7 @@ struct PortalFunc {
             return false;
         }
 
-        return model->checkRoomForTraverse(pch, get_room_index( portal->value3() ));
+        return model->checkRoomForTraverse(pch, get_room_instance( portal->value3() ));
     }
 
     PCharacter *pch;

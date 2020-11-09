@@ -37,23 +37,19 @@ OLCStateExtraExit::OLCStateExtraExit( )
 {
 }
 
-OLCStateExtraExit::OLCStateExtraExit( Room *pRoom, const DLString &name )
+OLCStateExtraExit::OLCStateExtraExit( RoomIndexData *pRoom, const DLString &name )
 {
     room.setValue(pRoom->vnum);
     keyword.setValue(name); 
     
-    EXTRA_EXIT_DATA *eexit;
-    const char *k = name.c_str( );
+    EXTRA_EXIT_DATA *prev_exit;
+    EXTRA_EXIT_DATA *eexit = find_extra_exit(name.c_str(), pRoom->extra_exit, prev_exit);
     
-    for (eexit = pRoom->extra_exit; eexit; eexit = eexit->next)
-        if (is_name(k, eexit->keyword))
-            break;
-
     if(!eexit)
         return;
 
-    if(eexit->u1.to_room)
-        to_room.setValue( eexit->u1.to_room->vnum );
+    if(eexit->u1.vnum)
+        to_room.setValue( eexit->u1.vnum );
     
     info.setValue( eexit->exit_info_default );
     key.setValue( eexit->key );
@@ -82,19 +78,15 @@ OLCStateExtraExit::~OLCStateExtraExit( )
 void
 OLCStateExtraExit::commit( )
 {
-    Room *pRoom = get_room_index(room.getValue( ));
+    RoomIndexData *pRoom = get_room_index(room.getValue( ));
     
     if(!pRoom)
         return;
 
     SET_BIT(pRoom->area->area_flag, AREA_CHANGED);
 
-    EXTRA_EXIT_DATA *eexit;
-    const char *k = keyword.getValue( ).c_str( );
-
-    for (eexit = pRoom->extra_exit; eexit; eexit = eexit->next)
-        if (is_name(k, eexit->keyword))
-            break;
+    EXTRA_EXIT_DATA *prev_exit;
+    EXTRA_EXIT_DATA *eexit = find_extra_exit(keyword.c_str(), pRoom->extra_exit, prev_exit);
     
     if(!eexit) {
         eexit = new_extra_exit( );
@@ -102,7 +94,7 @@ OLCStateExtraExit::commit( )
         pRoom->extra_exit = eexit;
     }
 
-    eexit->u1.to_room = get_room_index( to_room.getValue( ) );
+    eexit->u1.vnum = to_room;
     
     eexit->exit_info ^= info.getValue( ) ^ eexit->exit_info_default;
     eexit->exit_info_default = info.getValue( );
@@ -124,6 +116,13 @@ OLCStateExtraExit::commit( )
     eexit->short_desc_to = str_dup( short_desc_to.getValue( ).c_str( ) );
     eexit->description = str_dup( description.getValue( ).c_str( ) );
     eexit->room_description = str_dup( room_description.getValue( ).c_str( ) );
+
+    EXTRA_EXIT_DATA *eexit0 = find_extra_exit(keyword.c_str(), pRoom->room->extra_exit, prev_exit);
+    delete_extra_exit(eexit0, prev_exit, pRoom->room->extra_exit);
+    eexit0 = eexit->create();
+    eexit0->u1.to_room = get_room_instance(eexit0->u1.vnum);
+    eexit0->next = pRoom->room->extra_exit;
+    pRoom->room->extra_exit = eexit0;
 }
 
 void
@@ -173,7 +172,7 @@ EEEDIT(show)
 void OLCStateExtraExit::show(PCharacter *ch)
 {
     OBJ_INDEX_DATA *obj;
-    Room *r;
+    RoomIndexData *r;
 
     ptc(ch, "{CDescription:{x %s {D(desc help){x\n%s\n", 
         web_edit_button(ch, "desc", "web").c_str(), description.getValue( ).c_str( ));
@@ -194,6 +193,8 @@ void OLCStateExtraExit::show(PCharacter *ch)
     if (r)
         ptc(ch, "Target:     [{W%d{x] ({G%s{x)\n", 
                 r->vnum, r->name);
+    else
+        ptc(ch, "Target:     none\n");
     
     ptc(ch, "Size:       [{W%s{x] {D(? size){x\n", 
             size_table.name(max_size_pass.getValue( )).c_str());
@@ -248,7 +249,7 @@ EEEDIT(key)
 
 EEEDIT(target)
 {
-    Room *r;
+    RoomIndexData *r;
     
     if(!*argument || !is_number(argument) || 
             !(r = get_room_index(atoi(argument)))) {

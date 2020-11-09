@@ -345,7 +345,9 @@ XMLExitDir::init(const exit_data *ex)
     flags.setValue(ex->exit_info_default);
     //if(ex->key > 0)
         key.setValue(ex->key);
-    target.setValue(ex->u1.to_room ? ex->u1.to_room->vnum : -1);
+
+    Room *to_room = get_room_instance(ex->u1.vnum);
+    target.setValue(to_room ? to_room->vnum : -1);
 }
 
 exit_data *
@@ -375,7 +377,9 @@ XMLExtraExit::init(const extra_exit_data *ex)
     flags.setValue(ex->exit_info_default);
     //if(ex->key > 0)
         key.setValue(ex->key);
-    target.setValue(ex->u1.to_room ? ex->u1.to_room->vnum : -1);
+
+    Room *to_room = get_room_instance(ex->u1.vnum);
+    target.setValue(to_room ? to_room->vnum : -1);
 
     short_desc_from.setValue(ex->short_desc_from);
     short_desc_to.setValue(ex->short_desc_to);

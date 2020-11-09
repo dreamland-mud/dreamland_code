@@ -153,7 +153,7 @@ void RainbowGQuest::cleanup( )
     LogStream::sendNotice( ) << "Rainbow cleanup." << endl;
 
     for (i = 0; i < roomVnums.size( ); i++)
-        REMOVE_BIT(get_room_index(roomVnums[i])->area->area_flag, AREA_NOGATE);
+        REMOVE_BIT(get_room_instance(roomVnums[i])->area->area_flag, AREA_NOGATE);
         
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;

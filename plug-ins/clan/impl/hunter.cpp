@@ -812,7 +812,7 @@ bool HunterTrapObject::checkPrevent( Character *victim )
 
 bool HunterTrapObject::checkRoom( Room *r )
 {
-    if (r->clan != clan_none && r->clan != clan_hunter)
+    if (r->pIndexData->clan != clan_none && r->pIndexData->clan != clan_hunter)
         return false;
     
     if (IS_SET(r->room_flags, ROOM_SAFE | ROOM_LAW | ROOM_NO_DAMAGE))

@@ -45,7 +45,7 @@ bool ClanPetShopStorage::canServeClient( Character *client )
     if (client->is_npc( ))
         return false;
 
-    if (client->getClan( ) == room->clan) 
+    if (client->getClan( ) == room->pIndexData->clan) 
         return true;
 
     clanArea = getClanArea( );

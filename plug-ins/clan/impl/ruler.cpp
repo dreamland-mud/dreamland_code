@@ -1652,7 +1652,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
             list<Room *> repops;
 
             for (Room *room = room_list; room; room = room->rnext)
-                for (RESET_DATA *pReset = room->reset_first; pReset; pReset = pReset->next)
+                for (RESET_DATA *pReset = room->pIndexData->reset_first; pReset; pReset = pReset->next)
                     if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum) 
                         repops.push_back( room );
             
@@ -1981,7 +1981,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
         && victim->in_room->vnum >= 4343
         && victim->in_room->vnum <= 4369)
     {
-        if ( ( location = get_room_index( 4283 ) ) == 0 )
+        if ( ( location = get_room_instance( 4283 ) ) == 0 )
         {
             victim->send_to("Мда... Освобождать-то тебя - некуда.\n\r");
             return;

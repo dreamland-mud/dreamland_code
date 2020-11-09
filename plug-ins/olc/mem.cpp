@@ -17,6 +17,7 @@
 #include "room.h"
 #include "affect.h"
 
+#include "olc.h"
 #include "clanreference.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -142,38 +143,10 @@ void free_exit(EXIT_DATA * pExit)
     return;
 }
 
-Room *new_room_index(void)
+RoomIndexData *new_room_index(void)
 {
-    Room *pRoom;
-    int door;
-
     top_room++;
-
-    pRoom = new Room;
-
-    pRoom->next = NULL;
-    pRoom->people = NULL;
-    pRoom->contents = NULL;
-    pRoom->extra_descr = NULL;
-    pRoom->area = NULL;
-    pRoom->extra_exit = NULL;
-
-    for (door = 0; door < DIR_SOMEWHERE; door++)
-        pRoom->exit[door] = NULL;
-
-    pRoom->name = &str_empty[0];
-    pRoom->description = &str_empty[0];
-    pRoom->vnum = 0;
-    pRoom->room_flags = 0;
-    pRoom->light = 0;
-    pRoom->sector_type = 0;
-    pRoom->owner = &str_empty[0];
-    pRoom->clan = clan_none;
-    pRoom->heal_rate = 100;
-    pRoom->mana_rate = 100;
-    pRoom->heal_rate_default = 100;
-    pRoom->mana_rate_default = 100;
-    return pRoom;
+    return new RoomIndexData;
 }
 
 OBJ_INDEX_DATA *new_obj_index(void)
@@ -307,3 +280,32 @@ void free_affect(Affect *paf)
 {
     ddeallocate(paf);
 }
+
+
+EXTRA_EXIT_DATA * find_extra_exit(const char *argument, EXTRA_EXIT_DATA *&list, EXTRA_EXIT_DATA *&prev_exit)
+{
+    EXTRA_EXIT_DATA *eed;
+    prev_exit = 0;
+
+    for (eed = list; eed; eed = eed->next) {
+        if (is_name(argument, eed->keyword))
+            break;
+        prev_exit = eed;
+    }
+
+    return eed;
+}
+
+void delete_extra_exit(EXTRA_EXIT_DATA *eed, EXTRA_EXIT_DATA *prev_exit, EXTRA_EXIT_DATA *&list)
+{
+    if (!eed)
+        return;
+        
+    if (!prev_exit)
+        list = eed->next;
+    else
+        prev_exit->next = eed->next;
+
+    free_extra_exit(eed);
+}
+

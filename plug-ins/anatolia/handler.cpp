@@ -401,7 +401,7 @@ void extract_dead_player( PCharacter *ch, int flags )
     undig( ch );
     ch->dismount( );
     
-    if (( altar = get_room_index( ch->getHometown( )->getAltar( ) ) )) {
+    if (( altar = get_room_instance( ch->getHometown( )->getAltar( ) ) )) {
         char_from_room( ch );
         char_to_room( ch, altar );
     }

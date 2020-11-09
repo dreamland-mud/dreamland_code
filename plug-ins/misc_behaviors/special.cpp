@@ -620,7 +620,7 @@ bool spec_mayor( NPCharacter *ch )
         return false;
 
     if (!cabinet)
-        cabinet = get_room_index( 3138 );
+        cabinet = get_room_instance( 3138 );
 
     room = cabinet; 
     

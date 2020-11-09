@@ -259,7 +259,7 @@ bool MagicJar::area( )
         || carrier->is_npc( )
         || IS_SET(carrier->in_room->room_flags, 
                   ROOM_SAFE|ROOM_SOLITARY|ROOM_PRIVATE)
-        || !carrier->in_room->guilds.empty( ))
+        || !carrier->in_room->pIndexData->guilds.empty( ))
     {
         extract_obj( obj );
         return true;

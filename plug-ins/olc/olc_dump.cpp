@@ -44,7 +44,7 @@ dump_mob(Character *ch, MOB_INDEX_DATA *m)
 }
 
 void
-dump_room(Character *ch, Room *r)
+dump_room(Character *ch, RoomIndexData *r)
 {
     XMLStreamableBase<XMLRoom> it("room");
     ostringstream os;
@@ -61,7 +61,7 @@ CMD(olcdump, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     DLString constArguments = argument;
 
     if(constArguments.empty()) {
-        dump_room(ch, ch->in_room);
+        dump_room(ch, ch->in_room->pIndexData);
         return;
     }
         

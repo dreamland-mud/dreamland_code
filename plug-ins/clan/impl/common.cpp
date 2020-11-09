@@ -54,7 +54,7 @@ protected:
             return false;
         }
         
-        if (!( to_room = get_room_index( point ) )) {
+        if (!( to_room = get_room_instance( point ) )) {
             msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
             return false;
         }

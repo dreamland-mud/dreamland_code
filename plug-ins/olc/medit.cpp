@@ -19,7 +19,7 @@
 #include "comm.h"
 #include "merc.h"
 #include "interp.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "mercdb.h"
 
@@ -396,7 +396,7 @@ MEDIT(show)
             mob.behavior->save( ostr );
             ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
             
-        } catch (ExceptionXMLError e) {
+        } catch (const ExceptionXMLError &e) {
             ptc(ch, "Behavior is BUGGY.\r\n");
         }
     }
@@ -995,7 +995,7 @@ MEDIT(hitroll)
 MEDIT(list)
 {
     int i, cnt;
-    Room *pRoom;
+    RoomIndexData *pRoom;
     RESET_DATA *pReset;
     char buf[MAX_STRING_LENGTH];
     ostringstream buffer;
@@ -1249,7 +1249,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
     else if (!str_cmp(arg1, "create")) {
         if (!str_cmp(argument, "next")) {
-            value = next_mob_index(ch, ch->in_room);
+            value = next_mob_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
                 ch->println("Все внумы в этой зоне уже заняты!");
                 return;

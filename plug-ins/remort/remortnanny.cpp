@@ -69,7 +69,7 @@ void RemortNanny::run( int oldState, int newState, Descriptor *d )
     if (ch->getRemorts( ).points == 0)
         return;
 
-    if (!( izba = get_room_index( ROOM_VNUM_REMORT ) )) {
+    if (!( izba = get_room_instance( ROOM_VNUM_REMORT ) )) {
         LogStream::sendError( ) << "Zero remort room!" << endl;
         return;
     }
@@ -193,7 +193,7 @@ void RemortWitch::tell( Character *victim, const char *msg )
         }
 
         transfer_char( client, 0, 
-                       get_room_index( client->getRealLevel( ) == 1 ? ROOM_VNUM_HARBOUR : ROOM_VNUM_TEMPLE ),
+                       get_room_instance( client->getRealLevel( ) == 1 ? ROOM_VNUM_HARBOUR : ROOM_VNUM_TEMPLE ),
                        "%1$^C1 вылетает в печную трубу.", 
                        "Ты вылетаешь в печную трубу прочь!", 
                        "%1$^C1 падает с неба." );

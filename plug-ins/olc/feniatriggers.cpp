@@ -104,7 +104,7 @@ static Register get_wrapper_for_index_data(int vnum, const DLString &type)
     if (type == "obj") {
         w = WrapperManager::getThis()->getWrapper(get_obj_index(vnum));
     } else if (type == "room") {
-        w = WrapperManager::getThis()->getWrapper(get_room_index(vnum));
+        w = WrapperManager::getThis()->getWrapper(get_room_instance(vnum));
     } else if (type == "mob") {
         w = WrapperManager::getThis()->getWrapper(get_mob_index(vnum));
     }

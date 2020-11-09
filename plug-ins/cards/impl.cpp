@@ -64,7 +64,7 @@ public:
                 continue;
             if (IS_SET(mob->in_room->room_flags, ROOM_SAFE|ROOM_NO_DAMAGE))
                 continue;
-            if (mob->in_room->clan != clan_none)
+            if (mob->in_room->pIndexData->clan != clan_none)
                 continue;
             if (mob->behavior && mob->behavior->hasDestiny( )) 
                 continue;

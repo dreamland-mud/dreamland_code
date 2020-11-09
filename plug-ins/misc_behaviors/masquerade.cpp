@@ -148,7 +148,7 @@ void CatsEye::get( Character *victim ) {
 bool CatsEye::drop( Character *victim ) { 
     Room *room;
 
-    room = get_room_index( recall.getValue( ) );
+    room = get_room_instance( recall.getValue( ) );
     if (!room) {
         log("wrong recall for cat's eye: " << recall.getValue( ));
         return false;

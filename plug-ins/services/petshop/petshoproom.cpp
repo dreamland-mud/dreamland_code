@@ -24,7 +24,7 @@ PetShopStorage::Pointer PetShopRoom::getStorage( )
     Room *storageRoom;
     PetShopStorage::Pointer storage;
 
-    if (( storageRoom = get_room_index( storageVnum ) ) == NULL) {
+    if (( storageRoom = get_room_instance( storageVnum ) ) == NULL) {
         LogStream::sendError( ) << getType( ) << ": zero room for storage " << storageVnum << endl;
         return storage;
     }

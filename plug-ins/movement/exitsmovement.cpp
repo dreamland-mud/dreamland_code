@@ -101,7 +101,7 @@ bool ExitsMovement::findTargetRoom( )
         int targetVnum = (rc.empty( ) || !rc.isNumber( ) ? 0 : rc.toInt( ));
 
         if (targetVnum != 0) {
-            to_room = get_room_index(targetVnum);
+            to_room = get_room_instance(targetVnum);
         }
     }
 

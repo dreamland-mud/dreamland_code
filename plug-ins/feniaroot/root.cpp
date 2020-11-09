@@ -293,7 +293,7 @@ NMI_INVOKE( Root, get_room_index , "(vnum): возвращает комнату 
         throw Scripting::NotEnoughArgumentsException( );
         
     vnum = args.front( ).toNumber( );
-    room = ::get_room_index( vnum );
+    room = ::get_room_instance( vnum );
     
     return WrapperManager::getThis( )->getWrapper( room ); 
 }

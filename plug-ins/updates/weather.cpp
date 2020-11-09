@@ -237,10 +237,9 @@ void sunlight_update( )
             newTime = sunlight_en[weather_info.sunlight];
     }
 
-    for(int i=0;i<MAX_KEY_HASH;i++)
-        for(Room *r = room_index_hash[i]; r; r = r->next) {
-            FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
-        }
+    for (Room *r = room_list; r; r = r->rnext) {
+        FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
+    }
 }
 
 DLString sunlight( )

@@ -168,7 +168,7 @@ NMI_GET( HometownWrapper, recall, "vnum комнаты возврата (recall)
 
 NMI_GET( HometownWrapper, areaname, "полное название арии" ) 
 {
-    Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
+    Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
         return Scripting::Register( room->area->name );
@@ -178,7 +178,7 @@ NMI_GET( HometownWrapper, areaname, "полное название арии" )
 
 NMI_GET( HometownWrapper, altname, "альтернативное название арии" ) 
 {
-    Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
+    Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
         return Scripting::Register( room->area->altname );
@@ -188,7 +188,7 @@ NMI_GET( HometownWrapper, altname, "альтернативное названи�
 
 NMI_GET( HometownWrapper, credits, "оригинальное англ название арии" ) 
 {
-    Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
+    Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
         return Scripting::Register( room->area->credits );

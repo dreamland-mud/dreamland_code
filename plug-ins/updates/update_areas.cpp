@@ -95,7 +95,7 @@ static Object * get_obj_here_vnum( Room *room, int vnum )
     return NULL;
 }
 
-static RESET_DATA * find_mob_reset(Room *pRoom, NPCharacter *mob)
+static RESET_DATA * find_mob_reset(RoomIndexData *pRoom, NPCharacter *mob)
 {
     RESET_DATA *pReset;
     for (pReset = pRoom->reset_first; pReset != 0; pReset = pReset->next)
@@ -257,11 +257,11 @@ static bool reset_one_mob(NPCharacter *mob)
     // Find room where this mob was created and corresponding reset for it.
     // Reset may not be exact, p.ex. when several guards are reset in the same room with different equipment.
     // Such situations should be avoided in general, by creating different vnums for guards.
-    Room *home = get_room_index(mob->reset_room);
+    Room *home = get_room_instance(mob->reset_room);
     if (!home)
         return false;
 
-    RESET_DATA *myReset = find_mob_reset(home, mob);
+    RESET_DATA *myReset = find_mob_reset(home->pIndexData, mob);
     if (!myReset)
         return false;
    
@@ -370,7 +370,7 @@ void reset_room(Room *pRoom, int flags)
     if (reset_room_mobs(pRoom))
         changedMob = true;
 
-    for ( pReset = pRoom->reset_first; pReset != 0; pReset = pReset->next )
+    for ( pReset = pRoom->pIndexData->reset_first; pReset != 0; pReset = pReset->next )
     {
         MOB_INDEX_DATA *pMobIndex;
         OBJ_INDEX_DATA *pObjIndex;

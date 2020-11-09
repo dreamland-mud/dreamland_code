@@ -177,7 +177,7 @@ bool PCharacter::load( )
         }
     }
     
-    if (!get_room_index( start_room )) {
+    if (!get_room_instance( start_room )) {
         if (is_immortal( ))
             start_room = ROOM_VNUM_CHAT;
         else
@@ -215,7 +215,7 @@ bool PCharacter::load( )
     clear_fenia_skills( this );
     
     // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
-    char_to_room(this, get_room_index(ROOM_VNUM_LIMBO));
+    char_to_room(this, get_room_instance(ROOM_VNUM_LIMBO));
    
     /* Now add back spell effects. */
     for (Affect *af = affected; af != 0; af = af->next)

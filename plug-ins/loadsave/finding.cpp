@@ -819,7 +819,7 @@ Object * get_obj_room_unique( Room *room, int itype, Character *ch )
 Object *find_pit_in_room(int roomVnum)
 {
     Object *pit = 0;
-    Room *pitRoom = get_room_index(roomVnum);
+    Room *pitRoom = get_room_instance(roomVnum);
     if (pitRoom)
         for (pit = pitRoom->contents;
              pit && !IS_PIT(pit);

@@ -222,7 +222,7 @@ bool BasicMobileBehavior::backHome( bool fAlways )
             return false;
     }
     
-    home = get_room_index( homeVnum );
+    home = get_room_instance( homeVnum );
 
     if (!home) {
         LogStream::sendError( ) << "Mob " << ch->pIndexData->vnum << " from " << ch->in_room->vnum << ": wrong home " << homeVnum << endl;
@@ -350,7 +350,7 @@ bool BasicMobileBehavior::spell( Character *caster, int sn, bool before )
         }
         
         if (beforeSpell != ch->in_room->vnum) 
-            remember( get_room_index( beforeSpell ) );
+            remember( get_room_instance( beforeSpell ) );
 
         return false;
     }

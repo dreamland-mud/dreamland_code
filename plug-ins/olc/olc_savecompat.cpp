@@ -427,7 +427,7 @@ void save_helps(FILE *fp, AreaIndexData *pArea)
     fprintf(fp, "0 $~\n\n\n\n");
 }
     
-void save_room(FILE *fp, Room *pRoomIndex)
+void save_room(FILE *fp, RoomIndexData *pRoomIndex)
 {
     EXTRA_DESCR_DATA *pEd;
     EXTRA_EXIT_DATA *peexit;
@@ -485,9 +485,11 @@ void save_room(FILE *fp, Room *pRoomIndex)
                 fprintf(fp, "%d ", locks);
                 if(locks == 6)
                     fprintf(fp, "%s ", pflag(pExit->exit_info_default));
+
+                Room *to_room = get_room_instance(pExit->u1.vnum);
                 fprintf(fp, "%d %d\n", 
                         (pExit->key > 0 ? pExit->key : -1), 
-                        pExit->u1.to_room ? pExit->u1.to_room->vnum : -1);
+                        to_room ? to_room->vnum : -1);
             }
         }
     }
@@ -505,10 +507,11 @@ void save_room(FILE *fp, Room *pRoomIndex)
         fprintf(fp, "%s~\n", fix_string(peexit->short_desc_from));
         fprintf(fp, "%s~\n", fix_string(peexit->short_desc_to));
         fprintf(fp, "%s~\n", fix_string(peexit->room_description));
+        Room *to_room = get_room_instance(peexit->u1.vnum);
         fprintf(fp, "%s %d %d %d\n",
                 pflag(peexit->exit_info_default),
                 (peexit->key > 0 ? peexit->key : -1),
-                peexit->u1.to_room ? peexit->u1.to_room->vnum : 0,
+                to_room ? to_room->vnum : 0,
                 peexit->max_size_pass);
         fprintf(fp, "%d %d %d %d\n",
                 peexit->moving_from,
@@ -529,9 +532,9 @@ void save_room(FILE *fp, Room *pRoomIndex)
                    fix_string(pEd->description));
     }
 
-    if (pRoomIndex->mana_rate_default != 100 || pRoomIndex->heal_rate_default != 100)
-        fprintf(fp, "M %d H %d\n", pRoomIndex->mana_rate_default,
-                   pRoomIndex->heal_rate_default);
+    if (pRoomIndex->mana_rate != 100 || pRoomIndex->heal_rate != 100)
+        fprintf(fp, "M %d H %d\n", pRoomIndex->mana_rate,
+                   pRoomIndex->heal_rate);
 
     if (pRoomIndex->liquid != liq_none && pRoomIndex->liquid != liq_water) 
         fprintf(fp, "X liquid '%s'\n", pRoomIndex->liquid->getName( ).c_str( ));
@@ -549,8 +552,8 @@ void save_rooms(FILE * fp, AreaIndexData * pArea)
 {
     fprintf(fp, "#ROOMS\n");
 
-    for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++) {
-        save_room(fp, i->second);
+    for (auto &i: pArea->roomIndexes) {
+        save_room(fp, i.second);
     }
 
     fprintf(fp, "#0\n\n\n\n");
@@ -597,16 +600,16 @@ void save_objects(FILE * fp, AreaIndexData * pArea)
 // I don't think it's obsolete in ROM -- Hugin.
 void save_door_resets(FILE * fp, AreaIndexData * pArea)
 {
-    Room *pRoomIndex;
+    RoomIndexData *pRoomIndex;
     EXIT_DATA *pExit;
     int door;
 
-    for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++) {
-        pRoomIndex = i->second;
+    for (auto &i: pArea->roomIndexes) {
+        pRoomIndex = i.second;
 
         for (door = 0; door < DIR_SOMEWHERE; door++) {
             if ((pExit = pRoomIndex->exit[door])
-                && pExit->u1.to_room
+                && get_room_instance(pExit->u1.vnum)
                 && (IS_SET(pExit->exit_info_default, EX_CLOSED)
                     || IS_SET(pExit->exit_info_default, EX_LOCKED))) 
             {
@@ -624,14 +627,14 @@ void save_door_resets(FILE * fp, AreaIndexData * pArea)
 void save_resets(FILE * fp, AreaIndexData * pArea)
 {
     RESET_DATA *pReset;
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     fprintf(fp, "#RESETS\n");
 
     save_door_resets(fp, pArea);
 
-    for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++) {
-        pRoom = i->second;
+    for (auto &i: pArea->roomIndexes) {
+        pRoom = i.second;
 
         for (pReset = pRoom->reset_first; pReset; pReset = pReset->next)
             switch(pReset->command) {

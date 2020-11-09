@@ -229,7 +229,7 @@ Affect * fread_Affc( FILE *fp )
             paf->global.fromString( globalString );
         }
 
-    } catch (FileFormatException e) {
+    } catch (const FileFormatException &e) {
         ddeallocate( paf );
         throw e;
     }
@@ -1324,7 +1324,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 break;
             } else if (!str_cmp( word, "Room" )) {
                     int rvnum = fread_number( fp );
-                    pet->in_room = get_room_index( rvnum );
+                    pet->in_room = get_room_instance( rvnum );
                     if (!pet->in_room) {
                         LogStream::sendError( ) << "fread_pet: invalid room " << rvnum << " for " << ch->getName( ) << endl;
                     } 
@@ -1573,7 +1573,7 @@ NPCharacter * fread_mob( FILE *fp )
     
             case 'R':
                     if (!str_cmp( word, "Room" )) {
-                        mob->in_room = get_room_index( fread_number( fp ) );
+                        mob->in_room = get_room_instance( fread_number( fp ) );
                         fMatch = true;
                         break;
                     }
@@ -1648,7 +1648,7 @@ NPCharacter * fread_mob( FILE *fp )
             }
         }
 
-    } catch (FileFormatException e) {
+    } catch (const FileFormatException &e) {
         extract_mob_baddrop( mob );
         throw e;
     }
@@ -2098,7 +2098,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             }
         }
     
-    } catch (FileFormatException e) {
+    } catch (const FileFormatException &e) {
         extract_obj( obj );
         throw e;
     }

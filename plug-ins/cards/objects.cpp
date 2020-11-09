@@ -590,7 +590,7 @@ Room * CardBehavior::findHorribleRoom( PCharacter *pch )
     static const int size = sizeof(badRooms) / sizeof(*badRooms);
     Room *room;
     
-    room = get_room_index( badRooms[number_range( 0, size - 1 )] );
+    room = get_room_instance( badRooms[number_range( 0, size - 1 )] );
     
     return (room ? room : get_random_room( pch ));
 }

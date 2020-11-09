@@ -328,7 +328,7 @@ const char * XMLMobIndexData::getIndexType() const
     return "mob";
 }
 
-XMLRoomIndexData::XMLRoomIndexData(Room *room)
+XMLRoomIndexData::XMLRoomIndexData(RoomIndexData *room)
 {
     this->room = room;
 }

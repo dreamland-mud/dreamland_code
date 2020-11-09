@@ -158,7 +158,7 @@ void Gangsters::cleanup( bool performance )
     }
     
     if (!mobRoomVnums.empty( ))
-        REMOVE_BIT(get_room_index( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
+        REMOVE_BIT(get_room_instance( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
     
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
@@ -177,7 +177,7 @@ void Gangsters::cleanup( bool performance )
         extract_char( ch );
     }
     
-    wipeRoom( get_room_index( GangstersInfo::getThis( )->vnumLair ) );
+    wipeRoom( get_room_instance( GangstersInfo::getThis( )->vnumLair ) );
 }
 
 void Gangsters::destroy( ) 
@@ -472,7 +472,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
     Room *room = NULL;
 
     for (unsigned int i = 0; i < mobRoomVnums.size( ); i++) {
-        room = get_room_index( mobRoomVnums[i] );
+        room = get_room_instance( mobRoomVnums[i] );
         
         if (informerRoom.getValue( ) == room->name)
             continue;
@@ -740,7 +740,7 @@ Room * Gangsters::recursiveWalk( Room *room, int depth, int maxDepth )
 Room * Gangsters::pickRandomRoom( )
 {
     int i = number_range( 0, mobRoomVnums.size( ) - 1 );
-    return get_room_index( mobRoomVnums[i] );
+    return get_room_instance( mobRoomVnums[i] );
 }
 
 DLString Gangsters::lairHint( ) 
@@ -748,7 +748,7 @@ DLString Gangsters::lairHint( )
     if (!portalRoomVnums.empty( )) {
         int i = number_range(0, portalRoomVnums.size( ) - 1);
         int vnum = portalRoomVnums[i];
-        Room *room = get_room_index( vnum );
+        Room *room = get_room_instance( vnum );
 
         if (room && (room = recursiveWalk( room, 0, number_range( 1, 2 ) )))
             return room->name;
@@ -787,7 +787,7 @@ void Gangsters::populateLair( )
     Room *lair;
     int number;
 
-    lair = get_room_index( GangstersInfo::getThis( )->vnumLair );
+    lair = get_room_instance( GangstersInfo::getThis( )->vnumLair );
     wipeRoom( lair );
     char_to_room( createChef( ), lair );
 

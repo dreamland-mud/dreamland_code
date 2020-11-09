@@ -45,7 +45,7 @@ void ClanArea::createAltar( )
 
     container = create_object( get_obj_index( altarVnum ), 100 );
     item = create_object( get_obj_index( itemVnum ), 100 );
-    room = get_room_index( roomVnum );
+    room = get_room_instance( roomVnum );
 
     obj_to_obj( item, container );
     obj_to_room( container, room );

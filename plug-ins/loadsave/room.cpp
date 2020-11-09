@@ -7,13 +7,99 @@
 #include "affect.h"
 #include "character.h"
 #include "core/object.h"
+#include "feniamanager.h"
 
+#include "dreamland.h"
+#include "roombehaviormanager.h"
 #include "loadsave.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
 
 WEARLOC(none);
+
+extra_exit_data * extra_exit_data::create()
+{
+    EXTRA_EXIT_DATA *peexit = new EXTRA_EXIT_DATA;
+
+    peexit->description = str_dup(description);
+    peexit->exit_info_default = peexit->exit_info = exit_info_default;
+    peexit->key = key;
+    peexit->u1.vnum = u1.vnum;
+    peexit->level = level;
+
+    peexit->keyword = str_dup(keyword);
+    peexit->short_desc_from = str_dup(short_desc_from);
+    peexit->short_desc_to = str_dup(short_desc_to);
+    peexit->room_description = str_dup(room_description);
+    peexit->max_size_pass = max_size_pass;
+
+    peexit->moving_from = moving_from;
+    peexit->moving_mode_from = moving_mode_from;
+    peexit->moving_to = moving_to;
+    peexit->moving_mode_to = moving_mode_to;
+
+    return peexit;
+}        
+
+exit_data *exit_data::create()
+{
+    EXIT_DATA *pexit = (EXIT_DATA*)alloc_perm(sizeof(EXIT_DATA));
+
+    pexit->keyword = str_dup(keyword);
+    pexit->short_descr = str_dup(short_descr);
+    pexit->description = str_dup(description);
+    pexit->exit_info_default = pexit->exit_info = exit_info_default;
+    pexit->key = key;
+    pexit->u1.vnum = u1.vnum; 
+    pexit->level = 0;
+
+    return pexit;
+}
+
+Room * RoomIndexData::create()
+{
+    LogStream::sendNotice() << "Creating instance of room " << vnum << endl;
+    if (room) // FIXME allow multiple instances
+        throw Exception("Attempt to create second instance of a room.");
+
+    room = new Room;
+    
+    room->area = area;
+    room->extra_descr = extra_descr;
+    room->name = name;
+    room->description = description;
+    room->vnum = vnum;
+    room->room_flags = room_flags;
+    room->sector_type = sector_type;
+    room->heal_rate = heal_rate;
+    room->mana_rate = mana_rate;
+    room->pIndexData = this;    
+    room->setID( dreamland->genID( ) );    
+
+    RoomBehaviorManager::assign(room);
+
+    for (int i = 0; i < DIR_SOMEWHERE; i++)
+        if (exit[i])
+            room->exit[i] = exit[i]->create();
+
+    for (EXTRA_EXIT_DATA *eexit = extra_exit; eexit; eexit = eexit->next) {
+        EXTRA_EXIT_DATA *newExit = eexit->create();
+        newExit->next = room->extra_exit;
+        room->extra_exit = newExit;
+    }
+
+    room->rnext = room_list;
+    room_list = room;
+
+    room->area->rooms[vnum] = room;
+
+    if (FeniaManager::wrapperManager)
+        FeniaManager::wrapperManager->linkWrapper( room );    
+
+    return room;
+}
+
 
 /*
  * Apply or remove an affect to a room.

@@ -212,7 +212,7 @@ static void corpse_place( Object *corpse, Character *ch )
         return;
 
     if (!ch->is_npc( ) && ch->getModifyLevel( ) < GHOST_MIN_LEVEL) 
-        corpse_room = get_room_index( ch->getPC()->getHometown( )->getAltar( ) );
+        corpse_room = get_room_instance( ch->getPC()->getHometown( )->getAltar( ) );
     
     if (!corpse_room)
         corpse_room = ch->in_room;
@@ -350,7 +350,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
         body_vnum = corpse->value3();
     }
     else {
-        body_room = get_room_index( ROOM_VNUM_LIMBO );
+        body_room = get_room_instance( ROOM_VNUM_LIMBO );
     }
 
     obj        = create_object( get_obj_index( vnum ), 0 );

@@ -145,7 +145,7 @@ void RatGod::exorcism( Character *victim, const char *msg ) {
     if (pexit && pexit->u1.to_room)
         to_room = pexit->u1.to_room;
     else
-        to_room = get_room_index( ROOM_VNUM_TEMPLE );
+        to_room = get_room_instance( ROOM_VNUM_TEMPLE );
     
     transfer_char( victim, ch, to_room,
                    "%1$^C1 улетучивается.",

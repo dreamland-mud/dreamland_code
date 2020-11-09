@@ -70,7 +70,7 @@ struct BroadTraverse {
         if (head == tail)
             complete( head - 1, true );
 
-        register NodesEntry *i;
+        NodesEntry *i;
         for (i = begin; i != tail; i++) 
             TraverseTraits::unmark( i->node );
 
@@ -81,7 +81,7 @@ struct BroadTraverse {
         if (tail == end)
             return;
 
-        register NodeType * node = hook.target( head->node );
+        NodeType * node = hook.target( head->node );
 
         if (TraverseTraits::marked( node ))
             return;

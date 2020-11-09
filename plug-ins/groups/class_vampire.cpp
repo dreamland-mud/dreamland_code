@@ -399,7 +399,7 @@ SKILL_RUNP( dig )
     
     ch->dismount( );
     char_from_room( ch );
-    char_to_room( ch, get_room_index( ROOM_VNUM_GRAVE ) );
+    char_to_room( ch, get_room_instance( ROOM_VNUM_GRAVE ) );
     ch->was_in_room = room;
     SET_BIT(ch->act, PLR_DIGGED);
     ch->position = POS_RESTING;

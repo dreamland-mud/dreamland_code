@@ -87,7 +87,7 @@ Room * get_random_room( Character *ch )
 
     for ( ; ; )
     {
-        room = get_room_index( number_range( 200, 39999 ) ); /* old stuff, but appears all new interesting areas lie beyond this limit */
+        room = get_room_instance( number_range( 200, 39999 ) ); /* old stuff, but appears all new interesting areas lie beyond this limit */
         if ( room != 0 )
         if ( ch->can_see(room)
         &&   !room->isPrivate()
@@ -117,7 +117,7 @@ Room * get_random_room_vanish( Character *ch )
         if (IS_SET(room->room_flags, ROOM_NO_VANISH|ROOM_SAFE)) 
             continue;
         
-        if (room->clan != clan_none && room->clan != ch->getClan( )) 
+        if (room->pIndexData->clan != clan_none && room->pIndexData->clan != ch->getClan( )) 
             continue;
         
         if (room->isPrivate( )) 

@@ -49,7 +49,7 @@ bool PortalMovement::findTargetRoom( )
     int targetVnum = (rc.empty( ) || !rc.isNumber( ) ? 0 : rc.toInt( ));
 
     if (targetVnum != 0) {
-        to_room = get_room_index( targetVnum );
+        to_room = get_room_instance( targetVnum );
     }
     else if (IS_SET(portal->value2(),GATE_RANDOM) || portal->value3() == -1) {
         to_room = get_random_room( ch );
@@ -59,7 +59,7 @@ bool PortalMovement::findTargetRoom( )
         to_room = get_random_room( ch );
     }
     else {
-        to_room = get_room_index( portal->value3() );
+        to_room = get_room_instance( portal->value3() );
     }
 
     if (to_room == 0) {

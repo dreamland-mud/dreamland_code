@@ -192,7 +192,7 @@ NMI_GET( RoomWrapper, description, "описание комнаты" )
 NMI_GET( RoomWrapper, clan, "имя клана, которому принадлежит комната" )
 {
     checkTarget();
-    return Register( target->clan->getShortName( ) );
+    return Register( target->pIndexData->clan->getShortName( ) );
 }
 
 static Scripting::Register get_direction( Room *r, int dir )
@@ -731,7 +731,7 @@ NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, ко�
     
     checkTarget( );
     
-    for (pReset = target->reset_first; pReset; pReset = pReset->next)
+    for (pReset = target->pIndexData->reset_first; pReset; pReset = pReset->next)
         if (pReset->command == 'M')
             rc->push_back( Register( pReset->arg1 ) );
 

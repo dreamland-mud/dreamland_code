@@ -130,7 +130,7 @@ XMLRoom::XMLRoom() :
 }
 
 void 
-XMLRoom::init(Room *room)
+XMLRoom::init(RoomIndexData *room)
 {
     name.setValue(room->name);
     description.setValue(room->description);
@@ -161,8 +161,8 @@ XMLRoom::init(Room *room)
         extraDescr.back( ).setValue(pEd->description);
     }
 
-    manaRate.setValue(room->mana_rate_default);
-    healRate.setValue(room->heal_rate_default);
+    manaRate.setValue(room->mana_rate);
+    healRate.setValue(room->heal_rate);
 
     if (room->liquid != liq_none && room->liquid != liq_water) 
         liquid.setValue(room->liquid->getName( ));
@@ -170,31 +170,28 @@ XMLRoom::init(Room *room)
     RESET_DATA *pReset;
     for (pReset = room->reset_first; pReset; pReset = pReset->next)
         resets.push_back(*pReset);
-    
-    if(!room->behavior.isEmpty( )) {
-        XMLNode::Pointer node(NEW);
-        room->behavior.toXML(node);
-        node->setName("behavior");
-        behavior.setNode(node);
-    }
+
+    if(!room->behavior.isEmpty( ))
+        behavior.setNode(room->behavior->getFirstNode( ));
 
     for (Properties::const_iterator p = room->properties.begin( ); p != room->properties.end( ); p++)
         properties.insert( *p );
 }
 
-Room *
+RoomIndexData *
 XMLRoom::compat(int vnum)
 {
-    Room *room;
+    RoomIndexData *room;
     
-    room = new Room( );
-    room->wrapper = 0;
+    room = new RoomIndexData;
 
     room->vnum = vnum;
     room->name = str_dup(name.getValue( ).c_str( ));
     room->description = str_dup(description.getValue( ).c_str( ));
-    room->room_flags_default = room->room_flags = flags.getValue( );
+    room->room_flags = flags.getValue( );
     room->sector_type = sector.getValue( );
+    room->mana_rate = manaRate.getValue( );
+    room->heal_rate = healRate.getValue( );
 
     if(!clan.getValue( ).empty( ))
         room->clan.setName(clan.getValue( ));
@@ -213,8 +210,6 @@ XMLRoom::compat(int vnum)
             pExit->orig_door = door;
         } else
             pExit = NULL;
-
-        room->old_exit[door] = pExit;
     }
 
     XMLMapBase<XMLExtraExit>::reverse_iterator eeit;
@@ -233,9 +228,6 @@ XMLRoom::compat(int vnum)
         pEd->next = room->extra_descr;
         room->extra_descr = pEd;
     }
-
-    room->mana_rate_default = room->mana_rate = manaRate.getValue( );
-    room->heal_rate_default = room->heal_rate = healRate.getValue( );
 
     if(!liquid.getValue( ).empty( ))
         room->liquid.setName(liquid.getValue( ));
@@ -272,11 +264,14 @@ XMLRoom::compat(int vnum)
     
     }
 
-    if(behavior.getNode( ))
-        room->behavior.fromXML(behavior.getNode( ));
+    if(behavior.getNode( )) {
+        room->behavior.construct( );
+        XMLNode::Pointer p = behavior.getNode( );
+        room->behavior->appendChild(p);
+    }
 
     for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
         room->properties.insert( *p );
-
+    
     return room;
 }

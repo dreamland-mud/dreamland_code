@@ -78,7 +78,7 @@ CMDRUN( fill )
 
     if (arg1.empty( )) {
         fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
-        if (!fountain && ch->in_room->liquid == liq_none) {
+        if (!fountain && ch->in_room->pIndexData->liquid == liq_none) {
             ch->send_to("Здесь нет источника!\n\r");
             return;
         }
@@ -102,7 +102,7 @@ CMDRUN( fill )
     if (fountain)
         liq = liquidManager->find( fountain->value2() );
     else
-        liq = ch->in_room->liquid.getElement();
+        liq = ch->in_room->pIndexData->liquid.getElement();
 
     const char *liqname = liq->getShortDescr().c_str();
 
@@ -214,8 +214,8 @@ static void pour_out( Character *ch, Object * out )
 	return;
 
     if (IS_WATER( room )) {
-        ch->pecho( "Ты переворачиваешь %O4, выливая %N4 в %N4.", out, liqShort.c_str( ), room->liquid->getShortDescr( ).c_str( ) );
-        ch->recho( "%^C1 переворачивает %O4, выливая %N4 в %N4.", ch, out, liqShort.c_str( ), room->liquid->getShortDescr( ).c_str( ) );
+        ch->pecho( "Ты переворачиваешь %O4, выливая %N4 в %N4.", out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
+        ch->recho( "%^C1 переворачивает %O4, выливая %N4 в %N4.", ch, out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
     }
     else if (room->sector_type == SECT_AIR) {
         act( "Ты переворачиваешь $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_CHAR );

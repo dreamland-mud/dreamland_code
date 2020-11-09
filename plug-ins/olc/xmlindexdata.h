@@ -23,14 +23,14 @@ public:
 
 class XMLRoomIndexData : public XMLIndexData {
 public:
-    XMLRoomIndexData(Room *room);
+    XMLRoomIndexData(RoomIndexData *room);
 
     virtual int getVnum() const;
     virtual AreaIndexData * getArea() const;
     virtual const char * getIndexType() const;
 
 protected:
-    Room *room;    
+    RoomIndexData *room;    
 };
 
 class XMLMobIndexData : public XMLVariable, public mob_index_data, public XMLIndexData {

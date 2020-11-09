@@ -287,8 +287,8 @@ bool ClanGuard::checkPush( PCharacter* wch )
     {
         actPush( wch );
 
-        if (!( location = get_room_index( wch->getHometown( )->getRecall( ) ) )) 
-            location = get_room_index( 1 ); // В limbo потвор
+        if (!( location = get_room_instance( wch->getHometown( )->getRecall( ) ) )) 
+            location = get_room_instance( 1 ); // В limbo потвор
         
         transfer_char( wch, ch, location,
                        NULL, NULL, "%1$^C1 внезапно появляется." );

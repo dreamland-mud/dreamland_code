@@ -34,7 +34,7 @@
 #include "websocketrpc.h"
 #include "act.h"
 #include "mercdb.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 
 #include "olc.h"
 #include "security.h"
@@ -405,7 +405,7 @@ OEDIT(show)
             pObj->behavior->save( ostr );
             ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
             
-        } catch (ExceptionXMLError e) {
+        } catch (const ExceptionXMLError &e) {
             ptc(ch, "Behavior is BUGGY.\r\n");
         }
     }
@@ -1000,7 +1000,7 @@ OEDIT(copy)
 OEDIT(list)
 {
     int i, cnt;
-    Room *pRoom;
+    RoomIndexData *pRoom;
     OBJ_INDEX_DATA *pObj;
     RESET_DATA *pReset;
     char buf[MAX_STRING_LENGTH];
@@ -1124,7 +1124,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     } else if (!str_cmp(arg1, "create")) {
         if (!str_cmp(argument, "next")) {
-            value = next_obj_index(ch, ch->in_room);
+            value = next_obj_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
                 ch->println("Все внумы в этой зоне уже заняты!");
                 return;

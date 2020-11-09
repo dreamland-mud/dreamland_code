@@ -210,12 +210,12 @@ void GlobalQuest::exorcism( Character *ch ) const
         recall_vnum = player->getClan( )->getRecallVnum( );
 
         if (recall_vnum <= 0)
-        recall = get_room_index( player->getHometown( )->getRecall( ) );
+        recall = get_room_instance( player->getHometown( )->getRecall( ) );
         else 
-        recall = get_room_index( recall_vnum );
+        recall = get_room_instance( recall_vnum );
    
         if (!recall)
-        recall = get_room_index( ROOM_VNUM_TEMPLE );
+        recall = get_room_instance( ROOM_VNUM_TEMPLE );
 
         transfer_char( ch, ch, recall,
                    NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате." );
@@ -239,12 +239,12 @@ void GlobalQuest::exorcism( Character *ch ) const
     recall_vnum = actor->getClan( )->getRecallVnum( );
 
     if (recall_vnum <= 0)
-        recall = get_room_index( actor->getPC( )->getHometown( )->getRecall( ) );
+        recall = get_room_instance( actor->getPC( )->getHometown( )->getRecall( ) );
     else 
-        recall = get_room_index( recall_vnum );
+        recall = get_room_instance( recall_vnum );
    
     if (!recall)
-        recall = get_room_index( ROOM_VNUM_TEMPLE );
+        recall = get_room_instance( ROOM_VNUM_TEMPLE );
 
     transfer_char( ch, ch, recall,
                    NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате." );
@@ -265,7 +265,7 @@ void GlobalQuest::wipeRoom( Room *room ) const
     }
     
     pit = find_pit_in_room(ROOM_VNUM_ALTAR);
-    office = get_room_index( ROOM_VNUM_LOST_PROPERTY_OFFICE );
+    office = get_room_instance( ROOM_VNUM_LOST_PROPERTY_OFFICE );
     
     for (Object *obj = room->contents; obj; obj = obj_next) {
         int v = obj->pIndexData->vnum;
@@ -283,12 +283,12 @@ void GlobalQuest::wipeRoom( Room *room ) const
         }
 
         if (v == OBJ_VNUM_CORPSE_PC) {
-            Room *pitRoom = get_room_index( obj->value3() );
+            Room *pitRoom = get_room_instance( obj->value3() );
 
             if (pitRoom) 
                 obj_to_room( obj, pitRoom );
             else
-                obj_to_room( obj, get_room_index( ROOM_VNUM_ALTAR ) );
+                obj_to_room( obj, get_room_instance( ROOM_VNUM_ALTAR ) );
 
             continue;
         }

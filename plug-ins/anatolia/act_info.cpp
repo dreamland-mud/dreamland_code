@@ -320,9 +320,9 @@ CMDRUNP( oscore )
         << "  {wКласс:{W " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
-        room = get_room_index( ch->getPC()->getHometown( )->getAltar() );
+        room = get_room_instance( ch->getPC()->getHometown( )->getAltar() );
     else
-        room = get_room_index( ROOM_VNUM_TEMPLE );
+        room = get_room_instance( ROOM_VNUM_TEMPLE );
     
     buf << "  {wДом:{W " << (room ? room->area->name : "Потерян" ) << "{x" << endl
         << dlprintf( "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
@@ -1504,7 +1504,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
 	if (arg_oneof(arg, "hometown", "дом")) {
-        Room *room = get_room_index(pch->getHometown()->getAltar());
+        Room *room = get_room_instance(pch->getHometown()->getAltar());
         ch->pecho("Твой дом - %s.", room ? room->area->name : "потерян");
         return;
     } 
@@ -1605,7 +1605,7 @@ CMDRUNP( score )
     
     XMLAttributeTimer::Pointer qd = pch->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );
     int age = pch->age.getYears( );
-    Room *room = get_room_index( pch->getHometown( )->getAltar( ) );
+    Room *room = get_room_instance( pch->getHometown( )->getAltar( ) );
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
     ostringstream name;

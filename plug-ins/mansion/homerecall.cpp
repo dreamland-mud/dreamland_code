@@ -114,7 +114,7 @@ protected:
             return false;
         }
 
-        if (!( to_room = get_room_index( vnum ) )) {
+        if (!( to_room = get_room_instance( vnum ) )) {
             msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
             return false;
         }
@@ -190,7 +190,7 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
         return;
     }
    
-    Room *target =  get_room_index( vnum );
+    Room *target =  get_room_instance( vnum );
     if (!target) {
         ch->println( "Комнаты с таким номером не существует." );
         return;
@@ -209,7 +209,7 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
 
 static void print_room( int vnum, ostringstream &buf )
 {
-    Room *room = get_room_index( vnum );
+    Room *room = get_room_instance( vnum );
     if (!room) {
         buf << "[" << vnum << "] не существует!" << endl;
         return;
@@ -289,7 +289,7 @@ void HomeRecall::doList( PCharacter *ch )
             continue;
         
         point = attr->getPoint( );
-        room = get_room_index( point );
+        room = get_room_instance( point );
         
         sprintf( buf, "%-15s [%-5d] %-25.25s (%s)\r\n", 
                  i->second->getName( ).c_str( ), point, 
@@ -302,7 +302,7 @@ void HomeRecall::doList( PCharacter *ch )
 
 static void print_room_mortal( int vnum, ostringstream &buf )
 {
-    Room *room = get_room_index( vnum );
+    Room *room = get_room_instance( vnum );
     if (!room) {
         buf << "не существует!" << endl;
         return;

@@ -125,7 +125,7 @@ static Room * find_location( Character *ch, char *arg )
     Object *obj;
 
     if ( is_number(arg) )
-        return get_room_index( atoi( arg ) );
+        return get_room_instance( atoi( arg ) );
 
     if ( ( victim = get_char_world( ch, arg ) ) != 0 )
         return victim->in_room;
@@ -915,7 +915,7 @@ CMDWIZP( stat )
         location->name,
         location->area->name ,
         location->owner,
-        location->clan->getShortName( ).c_str( ) );
+        location->pIndexData->clan->getShortName( ).c_str( ) );
     ch->send_to(buf);
 
     sprintf( buf,

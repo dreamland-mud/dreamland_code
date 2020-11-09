@@ -151,7 +151,7 @@ NMI_INVOKE(ObjIndexWrapper, create, "(): создать экземпляр пр�
 
     checkTarget( );
     obj = ::create_object( target , target->level );
-    obj_to_room( obj, get_room_index( ROOM_VNUM_FENIA_STORAGE ) );
+    obj_to_room( obj, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
     return WrapperManager::getThis( )->getWrapper( obj );
 }
 

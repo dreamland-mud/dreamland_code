@@ -87,7 +87,7 @@ CMDRUN( find )
         return;
     }
     
-    if (!(toRoom = get_room_index( target )))
+    if (!(toRoom = get_room_instance( target )))
         return;
     
     for (Room *r = room_list; r; r = r->rnext)

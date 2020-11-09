@@ -7,13 +7,14 @@
 
 #include <stdio.h>
 
+class RoomIndexData;
 class Room;
 
 class RoomBehaviorManager {
 public:        
-        static void parse( Room *, FILE * );
-        static void save( const Room *, FILE * );
-        static void setAll( );
+        static void parse( RoomIndexData *, FILE * );
+        static void save( const RoomIndexData *, FILE * );
+        static void assign(Room *);
 };
 
 #endif

@@ -304,7 +304,7 @@ protected:
         else
             point = ch->leader->getPC( )->getHometown( )->getRecall( );
 
-        if (!( to_room = get_room_index( point ) )) {
+        if (!( to_room = get_room_instance( point ) )) {
             ch->pecho( "Ты окончательно заблудил%1$Gось|ся|ась.", ch );
             return false;
         }

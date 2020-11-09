@@ -329,15 +329,15 @@ CMDRUNP( quit )
     }
 
     if (!pch->is_immortal( )  
-            && pch->in_room->clan != clan_none 
-            && pch->getClan() != pch->in_room->clan)
+            && pch->in_room->pIndexData->clan != clan_none 
+            && pch->getClan() != pch->in_room->pIndexData->clan)
     {
         if (!fAuto && !fForced) {
             pch->send_to("Ты не можешь этого сделать - здесь не твоя территория!\n\r");
             return;
         }
         
-        transfer_char( pch, 0, get_room_index( ROOM_VNUM_TEMPLE ) );
+        transfer_char( pch, 0, get_room_instance( ROOM_VNUM_TEMPLE ) );
         if (pch->pet)
             transfer_char( pch->pet, 0, pch->in_room );
     }

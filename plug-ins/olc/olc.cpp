@@ -65,7 +65,7 @@ enum {
     NDX_MOB,
 };
 
-static int next_index_data( Character *ch, Room *r, int ndx_type )
+static int next_index_data( Character *ch, RoomIndexData *r, int ndx_type )
 {
     AreaIndexData *pArea;
     
@@ -99,17 +99,17 @@ static int next_index_data( Character *ch, Room *r, int ndx_type )
     return -1;
 }
     
-int next_room( Character *ch, Room *r )
+int next_room( Character *ch, RoomIndexData *r )
 {
     return next_index_data( ch, r, NDX_ROOM );
 }
 
-int next_obj_index( Character *ch, Room *r )
+int next_obj_index( Character *ch, RoomIndexData *r )
 {
     return next_index_data( ch, r, NDX_OBJ );
 }
 
-int next_mob_index( Character *ch, Room *r )
+int next_mob_index( Character *ch, RoomIndexData *r )
 {
     return next_index_data( ch, r, NDX_MOB );
 }
@@ -169,14 +169,14 @@ AreaIndexData *get_area_data(int vnum)
 
 void display_resets(Character * ch)
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     RESET_DATA *pReset;
     MOB_INDEX_DATA *pMob = NULL;
     char buf[MAX_STRING_LENGTH];
     char final[MAX_STRING_LENGTH];
     int iReset = 0;
 
-    pRoom = ch->in_room;
+    pRoom = ch->in_room->pIndexData;
 
     final[0] = '\0';
 
@@ -191,7 +191,7 @@ void display_resets(Character * ch)
         MOB_INDEX_DATA *pMobIndex;
         OBJ_INDEX_DATA *pObjIndex;
         OBJ_INDEX_DATA *pObjToIndex;
-        Room *pRoomIndex;
+        RoomIndexData *pRoomIndex;
 
         final[0] = '\0';
         sprintf(final, "[%2d] ", ++iReset);
@@ -360,7 +360,7 @@ CMD(edit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 //    do_help(ch, "olc");
 }
 
-void add_reset(Room * room, RESET_DATA * pReset, int index)
+void add_reset(RoomIndexData * room, RESET_DATA * pReset, int index)
 {
     RESET_DATA *reset;
     int iReset = 0;
@@ -417,7 +417,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     if (arg1[0] == '\0') {
-        if (ch->in_room->reset_first) {
+        if (ch->in_room->pIndexData->reset_first) {
             stc("Resets: M = mobile, R = room, O = object\n\r", ch);
             display_resets(ch);
         }
@@ -426,12 +426,12 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     if (is_number(arg1)) {
-        Room *pRoom = ch->in_room;
+        RoomIndexData *pRoom = ch->in_room->pIndexData;
 
         if (!str_cmp(arg2, "delete")) {
             int insert_loc = atoi(arg1);
 
-            if (!ch->in_room->reset_first) {
+            if (!ch->in_room->pIndexData->reset_first) {
                 stc("No resets in this area.\n\r", ch);
                 return;
             }
@@ -527,7 +527,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                         pReset->command = 'E';
                 }
             }
-            add_reset(ch->in_room, pReset, atoi(arg1));
+            add_reset(ch->in_room->pIndexData, pReset, atoi(arg1));
             SET_BIT(ch->in_room->area->area_flag, AREA_CHANGED);
             stc("Reset added.\n\r", ch);
         }
@@ -587,23 +587,6 @@ static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
     return line;
 }
 
-
-static DLString find_word_mention(const char *text, const list<RussianString> &words)
-{
-    DLString t = text;
-    t.colourStrip();
-    t.toLower();
-
-    for (const auto &word: words)
-        for (int c = Grammar::Case::NONE; c < Grammar::Case::MAX; c++) {
-            DLString myword = word.decline(c);
-            if (t.isName(myword))
-                return myword;
-        }
-
-    return DLString::emptyString;
-}
-
 static bool mob_is_changed(NPCharacter *mob) {
     int vnum = mob->pIndexData->vnum;
     int dn = mob->damage[DICE_NUMBER];
@@ -627,73 +610,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     DLString args = argument;
     DLString arg = args.getOneArgument();
 
-    if (arg == "water") {
-        ostringstream buf;
-        const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] {W%-29s{x ({C%s{x)";
-
-        list<RussianString> water, air;
-        water.push_back(RussianString("вод|а|ы|е|у|ой|е"));
-        water.push_back(RussianString("водоем||а|у||ом|е" ));
-        water.push_back(RussianString("водопад||а|у||ом|е" ));
-        water.push_back(RussianString("озер|о|а|у|о|ом|е"));
-        water.push_back(RussianString("болот|о|а|у|о|ом|е"));
-        water.push_back(RussianString("мор|е|я|ю|е|ем|е" ));
-        water.push_back(RussianString("рек|а|и|е|у|ой|е" ));
-        water.push_back(RussianString("причал||а|у||ом|е" ));
-        water.push_back(RussianString("лодк|а|и|е|у|ой|е" ));
-        water.push_back(RussianString("трясин|а|ы|е|у|ой|е" ));
-        water.push_back(RussianString("верф|ь|и|и|ь|ью|и" ));
-        water.push_back(RussianString("набережн|ая|ой|ой|ую|ой|ой"));
-        water.push_back(RussianString("корабл|ь|я|ю|ь|ем|я"));
-
-        air.push_back(RussianString("облак|о|а|у|о|ом|е"));
-        air.push_back(RussianString("облак|а|ов|ам|а|ами|ов"));
-        air.push_back(RussianString("туч|а|и|е|у|ей|е" ));
-        air.push_back(RussianString("туч|и||ам|и|ами|ах" ));
-
-        buf << "Всех неводные комнаты с упоминанием воды, без флагов indoors и near_water:" << endl;
-
-        for (Room *room = room_list; room; room = room->rnext) {
-            if (IS_SET(room->room_flags, ROOM_INDOORS|ROOM_NEAR_WATER|ROOM_MANSION))
-                continue;
-            if (room->sector_type == SECT_UNDERWATER)
-                continue;
-            if (IS_WATER(room))
-                continue;
-
-            if (!room->isCommon() && room->clan == clan_none)
-                continue;
-
-            if (!str_cmp(room->area->area_file->file_name, "galeon.are"))
-                continue;
-
-            DLString myword;
-
-            if (room->sector_type == SECT_AIR)
-                myword = find_word_mention(room->description, air);
-            else
-                myword = find_word_mention(room->description, water);
-
-            if (!myword.empty()) {
-                buf << dlprintf(lineFormat.c_str(), room->vnum, room->name, myword.c_str()) << endl;
-                continue;
-            }
-
-            if (room->sector_type == SECT_AIR)
-                myword = find_word_mention(room->name, air);
-            else
-                myword = find_word_mention(room->name, water);
-
-            if (!myword.empty())
-                buf << dlprintf(lineFormat.c_str(), room->vnum, room->name, myword.c_str()) << endl;
-        }
-
-        
-
-        page_to_char( buf.str( ).c_str( ), ch );
-        return;
-    }
-
     if (arg == "eexit") {
         ostringstream abuf, cbuf, mbuf;
         abuf << endl << "Экстравыходы везде:" << endl;
@@ -705,7 +621,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             ostringstream *buf;
             if (IS_SET(room->room_flags, ROOM_MANSION) || !str_prefix("ht", room->area->area_file->file_name))
                 buf = &mbuf;
-            else if (room->clan != clan_none)
+            else if (room->pIndexData->clan != clan_none)
                 buf = &cbuf;
             else
                 buf = &abuf;
@@ -780,56 +696,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "rlim") {
-        
-        if (args.empty( )) {
-            for (Object *obj = object_list; obj; obj = obj->next) {
-                    if (obj->pIndexData->limit < 0)
-                        continue;
-                    if (obj->in_room == NULL)
-                        continue;
-                    if (obj->pIndexData->area == obj->in_room->area)
-                        continue;
-                    if (obj->timestamp > 0)
-                        continue;
-                    
-                    ch->printf("Found %s [%d] in [%d] %s\r\n", 
-                            obj->getShortDescr('1').c_str( ), obj->pIndexData->vnum,
-                            obj->in_room->vnum, obj->in_room->area->name);
-            }
-
-            return;
-        }
-
-        if (!is_number( args.c_str( )))
-            return;
-
-        Room *r = get_room_index( atoi( args.c_str( ) ) );
-        if (!r) {
-            ch->println("Room vnum not found.");
-            return;
-        }
-
-        for (Object *obj = r->contents; obj; obj = obj->next_content) {
-                if (obj->pIndexData->limit < 0)
-                    continue;
-                if (obj->in_room == NULL)
-                    continue;
-                if (obj->pIndexData->area == obj->in_room->area)
-                    continue;
-                if (obj->timestamp > 0)
-                    continue;
-
-                obj->timestamp = 1531034011;
-                save_items( obj->in_room );
-                ch->printf("Marking %s [%d] in [%d] %s\r\n", 
-                        obj->getShortDescr('1').c_str( ), obj->pIndexData->vnum,
-                            obj->in_room->vnum, obj->in_room->area->name);
-        }
-        ch->println("Done marking limits.");
-        return;
-    }
-
     if (arg == "mobname") {
         int cnt = 0, hcnt = 0, rcnt = 0;
         ostringstream buf, hbuf, rbuf;
@@ -892,7 +758,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             return;
         }
 
-        room = get_room_index(vnum);
+        room = get_room_instance(vnum);
         if (!room) {
             ch->printf("Room vnum [%d] not found.\r\n", vnum.getValue());
             return;
