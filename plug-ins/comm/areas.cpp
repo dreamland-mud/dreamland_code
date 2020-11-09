@@ -94,7 +94,8 @@ CMDRUNP( areas )
         AreaHelp *ahelp = area_selfhelp(pArea);
         int hid = ahelp && !help_is_empty(*ahelp) ? ahelp->getID() : 0;
         if (hid > 0) {
-            str << fmt(ch, web_cmd(ch, "help " + DLString(hid), nameFmt).c_str(), pArea->name);
+            DLString aname = pArea->name;
+            str << fmt(ch, web_cmd(ch, "help " + DLString(hid), nameFmt).c_str(), aname.colourStrip().c_str());
         } else {            
             str << fmt(ch, nameFmt, pArea->name);
         }

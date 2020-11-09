@@ -16,7 +16,8 @@ DLString web_cmd(Descriptor *d, const DLString &cmd, const DLString &seeFmt)
     if (!is_websock(d))
         return seeFmt;
 
-    buf << "[cmd=" << cmd.colourStrip() << ",see=" << seeFmt << ",nonce=" << d->websock.nonce << "]";
+
+    buf << "[cmd=" << cmd.colourStrip() << ",see=" << seeFmt.colourStrip() << ",nonce=" << d->websock.nonce << "]";
     return buf.str();
 }
 
