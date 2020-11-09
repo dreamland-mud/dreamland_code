@@ -112,21 +112,21 @@ vnumck()
             throw FileFormatException(
                 "%s: min vnum is higher then max.", aname);
         
-        for(hashi = 0;hashi < MAX_KEY_HASH;hashi++)
-            for(room = room_index_hash[hashi]; room; room = room->next) {
-                if(room->area != *i)
-                    continue;
-                
-                if(room->vnum < l || room->vnum > h)
-                    throw FileFormatException(
-                            "%s: room %d out of allocated range.", 
-                            aname, room->vnum);
-                
-                if(minused > room->vnum)
-                    minused = room->vnum;
-                if(maxused < room->vnum)
-                    maxused = room->vnum;
-            }
+        for (auto &r: roomIndexMap) {
+            room = r.second;
+            if(room->area != *i)
+                continue;
+            
+            if(room->vnum < l || room->vnum > h)
+                throw FileFormatException(
+                        "%s: room %d out of allocated range.", 
+                        aname, room->vnum);
+            
+            if(minused > room->vnum)
+                minused = room->vnum;
+            if(maxused < room->vnum)
+                maxused = room->vnum;
+        }
         
         for(hashi = 0;hashi < MAX_KEY_HASH;hashi++)
             for(mob = mob_index_hash[hashi]; mob; mob = mob->next) {
@@ -571,19 +571,21 @@ void fix_resets()
         }
     }
 
-    for(int i=0;i<MAX_KEY_HASH;i++)
-        for(RoomIndexData *pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
-            for(pReset = pRoom->reset_first;pReset;pReset = pReset->next) 
-                switch (pReset->command) {
-                case 'G': case 'O':
-                case 'E': case 'P':
-                    if (!( get_obj_index( pReset->arg1 ) )) {
-                        bad_reset( "Load_resets: %c: bad obj: %d.", pReset->command, pReset->arg1 );
-                        break;
-                    }
-                    get_obj_index( pReset->arg1 )->reset_num++;
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *pRoom = r.second;
+
+        for(pReset = pRoom->reset_first;pReset;pReset = pReset->next) 
+            switch (pReset->command) {
+            case 'G': case 'O':
+            case 'E': case 'P':
+                if (!( get_obj_index( pReset->arg1 ) )) {
+                    bad_reset( "Load_resets: %c: bad obj: %d.", pReset->command, pReset->arg1 );
                     break;
                 }
+                get_obj_index( pReset->arg1 )->reset_num++;
+                break;
+            }
+    }
 }
 
 
@@ -604,7 +606,6 @@ void load_rooms( FILE *fp )
         int vnum;
         char letter;
         int door;
-        int iHash;
 
         letter        = fread_letter( fp );
         if ( letter != '#' )
@@ -779,12 +780,10 @@ void load_rooms( FILE *fp )
         if (IS_WATER(pRoomIndex) && pRoomIndex->liquid == liq_none)
             pRoomIndex->liquid = liq_water;
 
-        iHash                        = vnum % MAX_KEY_HASH;
-        pRoomIndex->next        = room_index_hash[iHash];
-        room_index_hash[iHash]        = pRoomIndex;
         top_room++;
         top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
+        roomIndexMap[vnum] = pRoomIndex;
         pRoomIndex->area->roomIndexes[vnum] = pRoomIndex;
 
         // Create new single room instance for this index (FIXME)
@@ -893,92 +892,79 @@ void load_specials( FILE *fp )
  */
 void fix_exits( bool verbose )
 {
-        RoomIndexData *pRoomIndex;
         Room *to_room = 0;
         EXIT_DATA *pexit;
         EXIT_DATA *pexit_rev = 0;
         EXTRA_EXIT_DATA *peexit;
-        int iHash;
         int door;
         static const int rev_dir [] = { 2, 3, 0, 1, 5, 4 };
 
         LogStream::sendNotice( ) << "Fixing exits..." << endl;
 
-        for ( iHash = 0; iHash < MAX_KEY_HASH; iHash++ )
-        {
-                for ( pRoomIndex  = room_index_hash[iHash];
-                                        pRoomIndex != 0;
-                                        pRoomIndex  = pRoomIndex->next )
-                {
-                        bool fexit;
+        for (auto &r: roomIndexMap) {
+            bool fexit;
 
-                        fexit = false;
-                        Room *room = pRoomIndex->room; // FIXME all instances will be linked
+            fexit = false;
+            RoomIndexData *pRoomIndex = r.second;
+            Room *room = pRoomIndex->room; // FIXME all instances will be linked
 
-                        for ( door = 0; door <= 5; door++ )
-                        {
-                                if ( ( pexit = room->exit[door] ) != 0 )
-                                {
-                                        if ( pexit->u1.vnum <= 0
-                                                || get_room_instance(pexit->u1.vnum) == 0 )
-                                        {
-                                                pexit->u1.to_room = 0;
-                                        }
-                                        else
-                                        {
-                                                fexit = true;
-                                                pexit->u1.to_room = get_room_instance( pexit->u1.vnum );
-                                        }
-                                }
-                        }
+            for ( door = 0; door <= 5; door++ )
+            {
+                    if ( ( pexit = room->exit[door] ) != 0 )
+                    {
+                            if ( pexit->u1.vnum <= 0
+                                    || get_room_instance(pexit->u1.vnum) == 0 )
+                            {
+                                    pexit->u1.to_room = 0;
+                            }
+                            else
+                            {
+                                    fexit = true;
+                                    pexit->u1.to_room = get_room_instance( pexit->u1.vnum );
+                            }
+                    }
+            }
 
-                        peexit = room->extra_exit;
-                        while ( peexit )
-                        {
-                                if ( peexit->u1.vnum <= 0
-                                        || get_room_instance(peexit->u1.vnum) == 0 )
-                                {
-                                        peexit->u1.to_room = 0;
-                                }
-                                else
-                                {
-                                        fexit = true;
-                                        peexit->u1.to_room = get_room_instance( peexit->u1.vnum );
-                                }
+            peexit = room->extra_exit;
+            while ( peexit )
+            {
+                    if ( peexit->u1.vnum <= 0
+                            || get_room_instance(peexit->u1.vnum) == 0 )
+                    {
+                            peexit->u1.to_room = 0;
+                    }
+                    else
+                    {
+                            fexit = true;
+                            peexit->u1.to_room = get_room_instance( peexit->u1.vnum );
+                    }
 
-                                peexit = peexit->next;
-                        }
+                    peexit = peexit->next;
+            }
 
-                        if ( !fexit )
-                                SET_BIT(room->room_flags,ROOM_NO_MOB);
-                
-                }
+            if ( !fexit )
+                    SET_BIT(room->room_flags,ROOM_NO_MOB);
         }
 
-        for ( iHash = 0; iHash < MAX_KEY_HASH; iHash++ )
-        {
-                for ( pRoomIndex  = room_index_hash[iHash];
-                                        pRoomIndex != 0;
-                                        pRoomIndex  = pRoomIndex->next )
-                {
-                        for ( door = 0; door <= 5; door++ )
-                        {
-                                Room *room = pRoomIndex->room;
+        for (auto &r: roomIndexMap) {
+            RoomIndexData *pRoomIndex = r.second;
+            Room *room = pRoomIndex->room;
 
-                                if ( ( pexit     = room->exit[door]       ) != 0
-                                        && ( to_room   = pexit->u1.to_room            ) != 0
-                                        && ( pexit_rev = to_room->exit[rev_dir[door]] ) != 0
-                                        && pexit_rev->u1.to_room != room
-                                        && ( room->vnum < 1200 || room->vnum > 1299 ))
-                                {
-                                    if (verbose)
-                                        LogStream::sendWarning( ) << "Fix_exits: " << room->vnum << ':'
-                                                << door << " -> " << to_room->vnum << ':' << rev_dir[door] << " -> "
-                                                << ( pexit_rev->u1.to_room == 0 ? 0 : pexit_rev->u1.to_room->vnum )
-                                                << '.' << endl;
-                                }
-                        }
-                }
+            for ( door = 0; door <= 5; door++ )
+            {
+                    if ( ( pexit     = room->exit[door]       ) != 0
+                            && ( to_room   = pexit->u1.to_room            ) != 0
+                            && ( pexit_rev = to_room->exit[rev_dir[door]] ) != 0
+                            && pexit_rev->u1.to_room != room
+                            && ( room->vnum < 1200 || room->vnum > 1299 ))
+                    {
+                        if (verbose)
+                            LogStream::sendWarning( ) << "Fix_exits: " << room->vnum << ':'
+                                    << door << " -> " << to_room->vnum << ':' << rev_dir[door] << " -> "
+                                    << ( pexit_rev->u1.to_room == 0 ? 0 : pexit_rev->u1.to_room->vnum )
+                                    << '.' << endl;
+                    }
+            }
         }
 
         return;
@@ -1074,8 +1060,9 @@ static int get_obj_reset_level( AreaIndexData *pArea, int keyVnum )
     if (keyVnum <= 0 || !get_obj_index( keyVnum ))
         return pArea->low_range;
 
-    for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
-        for (RoomIndexData *pRoomIndex  = room_index_hash[iHash]; pRoomIndex != 0; pRoomIndex  = pRoomIndex->next)
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *pRoomIndex  = r.second;
+        
         for(RESET_DATA *pReset = pRoomIndex->reset_first;pReset;pReset = pReset->next)
             switch(pReset->command) {
                 case 'M':
@@ -1105,6 +1092,7 @@ static int get_obj_reset_level( AreaIndexData *pArea, int keyVnum )
                     }
                     break;
             }
+    }
     
     return (level == 200 ? pArea->low_range : level);
 }            
@@ -1308,12 +1296,6 @@ bool dup_obj_vnum( int vnum )
 
 bool dup_room_vnum( int vnum )
 {
-    RoomIndexData *pRoom;
-
-    for (pRoom = room_index_hash[vnum % MAX_KEY_HASH]; pRoom; pRoom = pRoom->next)
-        if ( pRoom->vnum == vnum )
-            return true;
-
-    return false;
+    return roomIndexMap.find(vnum) != roomIndexMap.end();
 }
 

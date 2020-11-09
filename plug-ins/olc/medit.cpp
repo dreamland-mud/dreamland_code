@@ -994,7 +994,7 @@ MEDIT(hitroll)
 
 MEDIT(list)
 {
-    int i, cnt;
+    int cnt;
     RoomIndexData *pRoom;
     RESET_DATA *pReset;
     char buf[MAX_STRING_LENGTH];
@@ -1006,18 +1006,19 @@ MEDIT(list)
     buffer << buf;
     
     cnt = 0;
-    for(i=0;i<MAX_KEY_HASH;i++)
-        for(pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
-            for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
-                switch(pReset->command) {
-                    case 'M':
-                        if(pReset->arg1 == mob.vnum) {
-                            snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-                                    pReset->command, pRoom->vnum, pRoom->name);
-                            buffer << buf;
-                            cnt++;
-                        }
-                }
+    for (auto &r: roomIndexMap) {
+        pRoom = r.second;
+        for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
+            switch(pReset->command) {
+                case 'M':
+                    if(pReset->arg1 == mob.vnum) {
+                        snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
+                                pReset->command, pRoom->vnum, pRoom->name);
+                        buffer << buf;
+                        cnt++;
+                    }
+            }
+    }
 
     snprintf(buf, sizeof(buf), "Total {W%d{x resets found.\n\r", cnt);
     buffer << buf;

@@ -738,8 +738,6 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
         return 0;
     }
 
-    int iHash;
-
     pRoom = new_room_index();
     pRoom->vnum = value;
     pRoom->area = get_vnum_area(value);
@@ -747,10 +745,7 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
     if (value > top_vnum_room)
         top_vnum_room = value;
 
-    iHash = (int) value % MAX_KEY_HASH;
-    pRoom->next = room_index_hash[iHash];
-    room_index_hash[iHash] = pRoom;
-
+    roomIndexMap[value] = pRoom;
     pRoom->area->roomIndexes[value] = pRoom;
 
     pRoom->create();

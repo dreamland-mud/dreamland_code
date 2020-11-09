@@ -111,7 +111,7 @@ Room* room_list = 0;
  */
 MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
-RoomIndexData *        room_index_hash                [MAX_KEY_HASH];
+RoomIndexMap roomIndexMap;
 char *                        string_hash                [MAX_KEY_HASH];
 
 AreaIndexData *                area_first;
@@ -295,15 +295,9 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
  */
 RoomIndexData *get_room_index( int vnum )
 {
-    RoomIndexData *pRoomIndex;
-
-    for ( pRoomIndex  = room_index_hash[vnum % MAX_KEY_HASH];
-          pRoomIndex != 0;
-          pRoomIndex  = pRoomIndex->next )
-    {
-        if ( pRoomIndex->vnum == vnum )
-            return pRoomIndex;
-    }
+    auto r = roomIndexMap.find(vnum);
+    if (r != roomIndexMap.end())
+        return r->second;
 
     if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
         throw FileFormatException( "get_room_index: vnum %d not found on world startup", vnum );

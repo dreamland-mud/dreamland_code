@@ -229,7 +229,7 @@ XMLArea::load_rooms(AreaIndexData *a)
 {
     XMLMapBase<XMLRoom>::iterator rit;
     for(rit = rooms.begin( ); rit != rooms.end( ); rit++) {
-        int iHash, vnum = rit->first.toInt( );
+        int vnum = rit->first.toInt( );
         
         if (dup_room_vnum( vnum ))
             throw FileFormatException("Load_rooms: vnum %d duplicated", vnum);
@@ -240,12 +240,10 @@ XMLArea::load_rooms(AreaIndexData *a)
         if(3000 <= vnum && vnum < 3400)
             SET_BIT(room->room_flags, ROOM_LAW);
 
-        iHash = vnum % MAX_KEY_HASH;
-        room->next = room_index_hash[iHash];
-        room_index_hash[iHash] = room;
         top_room++;
         top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
+        roomIndexMap[vnum] = room;
         room->area->roomIndexes[vnum] = room;
 
         // Create new single room instance for this index (FIXME)

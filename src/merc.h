@@ -581,7 +581,9 @@ extern                KILL_DATA                kill_table        [];
 extern                TIME_INFO_DATA                time_info;
 extern                WEATHER_DATA                weather_info;
 
-extern                RoomIndexData *                        room_index_hash                [];
+typedef map<int, RoomIndexData *> RoomIndexMap;
+extern RoomIndexMap roomIndexMap;
+
 extern                int                        top_vnum_room;
 extern                int                        top_vnum_mob;
 extern                int                        top_vnum_obj;
