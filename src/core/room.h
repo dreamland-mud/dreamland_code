@@ -114,7 +114,6 @@ public:
     // FIXME add getters, values need to be taken from proto if not changed.
 
     Room *        rnext;
-    Room *        aff_next;
     Character *   people;
     Object *      contents;
     extra_descr_data *extra_descr;

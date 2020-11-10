@@ -1187,15 +1187,14 @@ void light_update( PCharacter *ch )
 
 void room_update( void )
 {
-    Room *room;
-    Room *room_next;
+    RoomSet tempAffected;
 
-    for ( room = top_affected_room; room ; room = room_next )
-    {
+    // Create temporary set to avoid removing set elements from inside the loop.
+    tempAffected.insert(roomAffected.begin(), roomAffected.end());    
+
+    for (auto room: tempAffected) {
         Affect *paf;
         Affect *paf_next;
-
-        room_next = room->aff_next;
 
         for ( paf = room->affected; paf != 0; paf = paf_next )
         {
@@ -1219,19 +1218,14 @@ void room_update( void )
                 room->affectRemove( paf );
             }
         }
-
     }
 }
 
 void room_affect_update( )
 {
-    Room *room;
-    Room *room_next;
     Affect *paf;
 
-    for (room = top_affected_room; room; room = room_next) {
-        room_next = room->aff_next;
-        
+    for (auto room: roomAffected) {        
         if (!room->people)
             continue;
         

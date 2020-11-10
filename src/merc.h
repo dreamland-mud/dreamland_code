@@ -575,13 +575,19 @@ extern                Character          *        newbie_list;
 extern                Object          *        object_list;
 
 extern                AUCTION_DATA          *        auction;
-extern                Room   *        top_affected_room;
+
+typedef set<Room *> RoomSet;
+
+/** A small collection of rooms with affects on them, to avoid going through the whole list in updates. */
+extern RoomSet roomAffected;
 
 extern                KILL_DATA                kill_table        [];
 extern                TIME_INFO_DATA                time_info;
 extern                WEATHER_DATA                weather_info;
 
 typedef map<int, RoomIndexData *> RoomIndexMap;
+
+/** Map of all room prototypes by vnum, for quick access. */
 extern RoomIndexMap roomIndexMap;
 
 extern                int                        top_vnum_room;

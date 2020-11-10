@@ -35,7 +35,7 @@ RoomIndexData::RoomIndexData()
 }
 
 Room::Room( ) : 
-                rnext( 0 ), aff_next( 0 ), 
+                rnext( 0 ),
                 people( 0 ), contents( 0 ), extra_descr( 0 ),
                 area( 0 ), extra_exit( 0 ),
                 name(&str_empty[0]), description(&str_empty[0]), 

@@ -101,7 +101,8 @@ TIME_INFO_DATA                time_info;
 WEATHER_DATA                weather_info;
 
 AUCTION_DATA        *        auction = new auction_data( );
-Room        *        top_affected_room = 0;
+
+RoomSet roomAffected;
 
 
 Room* room_list = 0;

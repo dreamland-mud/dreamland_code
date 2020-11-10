@@ -160,16 +160,7 @@ void Room::affectTo( Affect *paf )
     Room *pRoomIndex;
 
     if (!affected) {
-        if (top_affected_room) {
-            for ( pRoomIndex  = top_affected_room; pRoomIndex->aff_next != 0; pRoomIndex  = pRoomIndex->aff_next )
-                continue;
-                
-            pRoomIndex->aff_next = this;        
-        }
-        else 
-            top_affected_room = this;
-
-        aff_next = 0;
+        roomAffected.insert(this);
     }
 
     paf_new = dallocate( Affect );
@@ -242,30 +233,12 @@ void Room::affectRemove( Affect *paf )
         }
     }
 
-    if (!affected) {
-        Room *prev;
-
-        if (top_affected_room  == this)
-            top_affected_room = aff_next;
-        else {
-            for(prev = top_affected_room; prev->aff_next; prev = prev->aff_next )
-                if ( prev->aff_next == this ) {
-                    prev->aff_next = aff_next;
-                    break;
-                }
-
-            if ( prev == 0 ) {
-                bug( "Affect_remove_room: cannot find room.", 0 );
-                return;
-            }
-        }
-        
-        aff_next = 0;
-     }
-
     ddeallocate( paf );
 
     affectCheck( where, vector );
+
+    if (!affected)
+        roomAffected.erase(this);
 }
 
 /*
