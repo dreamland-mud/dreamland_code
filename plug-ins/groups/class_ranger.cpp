@@ -1404,7 +1404,6 @@ SKILL_RUNP( camouflage )
                 act_p("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM,POS_RESTING);
                 return;
         }
-        ch->send_to("Ты пытаешься замаскироваться.\n\r");
 
         int k = ch->getLastFightDelay( );
 
@@ -1424,11 +1423,14 @@ SKILL_RUNP( camouflage )
         if ( ch->is_npc()
                 || number_percent( ) < gsn_camouflage->getEffective( ch ) * k / 100 )
         {
+                ch->println("Ты маскируешься на местности.");
                 SET_BIT(ch->affected_by, AFF_CAMOUFLAGE);
                 gsn_camouflage->improve( ch, true );
         }
-        else
+        else {
+                ch->println("Твоя попытка замаскироваться закончилась неудачей.");
                 gsn_camouflage->improve( ch, false );
+        }
 
         return;
 }

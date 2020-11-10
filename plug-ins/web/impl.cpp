@@ -665,6 +665,7 @@ Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
     mark_affect( ch, active, AFF_FLYING, 'f' );
     mark_affect( ch, active, AFF_PASS_DOOR, 'p' );
     mark_affect( ch, active, AFF_FADE, 'F' );
+    mark_affect( ch, active, AFF_CAMOUFLAGE, 'c' );
 
     if (active.empty( ))
         return Json::Value( );
