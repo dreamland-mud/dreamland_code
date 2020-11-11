@@ -109,19 +109,17 @@ public:
     void echo( int, const char *, ... ) const;
     void echoAround( int, const char *, ... ) const;
     list<Character*> getPeople( );
-
-public:
-    // FIXME add getters, values need to be taken from proto if not changed.
+    
+    extra_descr_data *getExtraDescr();
+    const char *getName() const;
+    const char *getDescription() const;
 
     Room *        rnext;
     Character *   people;
     Object *      contents;
-    extra_descr_data *extra_descr;
     AreaIndexData *area;
     exit_data *   exit[6];
     extra_exit_data * extra_exit;
-    char *     name;    
-    char *     description;
     char *     owner;
     int        vnum;
     int        room_flags;
@@ -157,7 +155,6 @@ void Room::setID( long long id )
  */
 
 #define IS_ROOM_AFFECTED(room, sn)         (IS_SET((room)->affected_by, (sn)))
-#define IS_RAFFECTED(room, sn)         (IS_SET((room)->affected_by, (sn)))
 #define IS_WATER( var )                (((var)->sector_type == SECT_WATER_SWIM) || \
                                  ((var)->sector_type == SECT_WATER_NOSWIM) )
 #define IS_NATURE(var)          ((var)->sector_type == SECT_FIELD || \

@@ -642,14 +642,14 @@ bool spec_mayor( NPCharacter *ch )
     }
 
     if (room != ch->in_room) {
-        LogStream::sendNotice( ) << "Mayor: has to be in  " << room->name 
-                                 << " while he is in " << ch->in_room->name 
+        LogStream::sendNotice( ) << "Mayor: has to be in  " << room->getName() 
+                                 << " while he is in " << ch->in_room->getName() 
                                  << " pos[ " << pos << "] = " << path[pos] << endl;
         
         transfer_char( ch, ch, room,
                       "%1$^C1 вынимает часы из жилетного кармана и восклицает: '{gАх, боже мой! Я опаздываю.{x'"
                       "%1$^C1 убегает с озабоченным видом." );
-        LogStream::sendNotice( ) << "Mayor: now in room " << ch->in_room->name << endl;
+        LogStream::sendNotice( ) << "Mayor: now in room " << ch->in_room->getName() << endl;
     }
 
     switch ( path[pos] )
@@ -851,7 +851,7 @@ bool spec_guard( NPCharacter *ch )
         ch->setClan( clan_ruler );
         interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
                         victim->getNameP(), 
-                        ch->in_room->name, 
+                        ch->in_room->getName(), 
                         ch->in_room->area->name);
 
         if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )

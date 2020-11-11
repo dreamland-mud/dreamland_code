@@ -615,7 +615,7 @@ CMDRUNP( sacrifice )
                 }
                 
                 act( "$c1 приносит в жертву богам все, что находится $T.", ch, 0, terrains[ch->in_room->sector_type].where, TO_ROOM );
-                wiznet( WIZ_SACCING, 0, 0, "%^C1 sends up all items in %s as a burnt offering.", ch, ch->in_room->name );
+                wiznet( WIZ_SACCING, 0, 0, "%^C1 sends up all items in %s as a burnt offering.", ch, ch->in_room->getName() );
 
                 if (silver==0) {
                     return;

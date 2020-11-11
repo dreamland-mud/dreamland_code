@@ -296,7 +296,7 @@ CMDRUNP( quit )
 
     if (!fForced
         && !pch->is_immortal()
-        && IS_RAFFECTED( pch->in_room, AFF_ROOM_ESPIRIT ))
+        && IS_ROOM_AFFECTED( pch->in_room, AFF_ROOM_ESPIRIT ))
     {
         pch->send_to( "Злые духи в этой зоне не отпускают тебя.\n\r");
         return;

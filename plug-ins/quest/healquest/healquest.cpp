@@ -80,7 +80,7 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
     assign<PatientBehavior>( patient );
     save_mobs( patient->in_room );
     mobName  = patient->getShortDescr( );
-    roomName = patient->in_room->name;
+    roomName = patient->in_room->getName();
     areaName = patient->in_room->area->name;
 
     setTime( pch, time );
@@ -89,7 +89,7 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
     tell_fmt( "{W%3$#^C1{G чем-то серьезно бол%3$Gьно|ен|ьна и нуждается в помощи лекаря.",
                pch, questman, patient );
     tell_fmt( "Место, где %3$P2 видели в последний раз - {W%4$s{x.",
-              pch, questman, patient, patient->in_room->name );
+              pch, questman, patient, patient->in_room->getName() );
     tell_fmt( "Это находится в районе под названием {W{hh%3$s{x.", 
               pch, questman, patient->in_room->area->name );
     tell_fmt( "Поторопись, пока болезнь не доконала %3$P2!", pch, questman, patient );

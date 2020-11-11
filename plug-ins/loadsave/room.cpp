@@ -65,9 +65,6 @@ Room * RoomIndexData::create()
     room = new Room;
     
     room->area = area;
-    room->extra_descr = extra_descr;
-    room->name = name;
-    room->description = description;
     room->vnum = vnum;
     room->room_flags = room_flags;
     room->sector_type = sector_type;

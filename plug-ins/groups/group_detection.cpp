@@ -449,11 +449,11 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
         {
             if (ch->is_immortal() && in_obj->in_room != 0)
                 sprintf( buf, "находится в %s [Комната %d]\n\r",
-                    in_obj->in_room->name, in_obj->in_room->vnum);
+                    in_obj->in_room->getName(), in_obj->in_room->vnum);
             else
                 sprintf( buf, "находится в %s\n\r",
                     in_obj->in_room == 0
-                        ? "somewhere" : in_obj->in_room->name );
+                        ? "somewhere" : in_obj->in_room->getName() );
         }
 
         buf[0] = Char::upper(buf[0]);

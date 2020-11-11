@@ -362,7 +362,7 @@ void InterpretHandler::normalPrompt( Character *ch )
         case 'r' :
             if (ch->in_room != 0) {
                 if (can_see_room_details(ch)) {
-                    out << ch->in_room->name;
+                    out << ch->in_room->getName();
                 } else {
                     out << "темнота";
                 }

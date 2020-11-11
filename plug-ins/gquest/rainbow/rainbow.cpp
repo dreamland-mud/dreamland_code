@@ -281,7 +281,7 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
         
         str << dlprintf("%s%-30s%s из %s%s",
                      GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
-                     GQChannel::NORMAL, ch->in_room->name, GQChannel::NORMAL);
+                     GQChannel::NORMAL, ch->in_room->getName(), GQChannel::NORMAL);
         if (t <= 5)
             str << " ({hh" << ch->in_room->area->name << "{hx)" << GQChannel::NORMAL;
         

@@ -102,7 +102,7 @@ NMI_GET( RoomWrapper, vnum , "номер комнаты в арии")
 NMI_GET( RoomWrapper, name , "название комнаты")
 {
     checkTarget( );
-    return Register( target->name );
+    return Register( target->getName() );
 }
 
 NMI_GET( RoomWrapper, areaname , "имя арии")
@@ -186,7 +186,7 @@ NMI_GET( RoomWrapper, light, "количество источников свет
 NMI_GET( RoomWrapper, description, "описание комнаты" )
 {
     checkTarget( );
-    return Register( target->description );
+    return Register( target->getDescription() );
 }
 
 NMI_GET( RoomWrapper, clan, "имя клана, которому принадлежит комната" )

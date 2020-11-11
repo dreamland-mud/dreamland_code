@@ -89,7 +89,7 @@ GMCPCOMMAND_RUN(charToRoom)
 
     Json::Value data;
     data["num"] = ch->in_room->vnum;
-    data["name"] = DLString(ch->in_room->name).colourStrip();
+    data["name"] = DLString(ch->in_room->getName()).colourStrip();
     data["area"] = DLString(ch->in_room->area->name).colourStrip();
     data["map"] = ASCII_MAPS + ch->in_room->area->area_file->file_name + ".html";
     

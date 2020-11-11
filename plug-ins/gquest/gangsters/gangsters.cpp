@@ -453,7 +453,7 @@ void Gangsters::createFirstHint( MobileList &people )
     name = informer->getNameP('1');
     name.upperFirstCharacter( );
     informerName = name;
-    informerRoom = informer->in_room->name;
+    informerRoom = informer->in_room->getName();
 
     buf << name        << " сообщил" << GET_SEX( informer, "", "о", "а" );
     
@@ -463,7 +463,7 @@ void Gangsters::createFirstHint( MobileList &people )
     }
     
     buf << ", что видел" << GET_SEX( informer, "", "о", "а" )
-        << " бандитов возле местности под названием " << informer->in_room->name << ". ";
+        << " бандитов возле местности под названием " << informer->in_room->getName() << ". ";
     setHint( buf.str( ) );
 }            
 
@@ -474,7 +474,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
     for (unsigned int i = 0; i < mobRoomVnums.size( ); i++) {
         room = get_room_instance( mobRoomVnums[i] );
         
-        if (informerRoom.getValue( ) == room->name)
+        if (informerRoom.getValue( ) == room->getName())
             continue;
 
         for (Character *ch = room->people; ch; ch = ch->next_in_room) {
@@ -497,7 +497,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
             
             name.upperFirstCharacter( );
             buf        << name << " столкнул" << GET_SEX( ch, "ся", "ось", "ась" )
-                << " с гангстерами возле " << room->name << ".";
+                << " с гангстерами возле " << room->getName() << ".";
 
             return room;
         }
@@ -506,7 +506,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
     /* cannot find mob, give hint only about a room they're in */
     if (room) 
         buf << "Гангстеры были также замечены неподалеку от " 
-            << room->name << ".";
+            << room->getName() << ".";
     
     return room;
 }
@@ -647,7 +647,7 @@ void Gangsters::resetKeys( )
         }
         
         obj_to_char( createKey( ), mob );
-        log("new key to mob in room " << mob->in_room->name ); 
+        log("new key to mob in room " << mob->in_room->getName() ); 
     }
 }
 
@@ -684,7 +684,7 @@ Object * Gangsters::createPortal( RoomList &portalRooms )
 
     obj_to_room( portal, room );
     portalRoomVnums.push_back( room->vnum );
-    log("put portal in " << room->name);
+    log("put portal in " << room->getName());
 
     return portal;
 }
@@ -751,7 +751,7 @@ DLString Gangsters::lairHint( )
         Room *room = get_room_instance( vnum );
 
         if (room && (room = recursiveWalk( room, 0, number_range( 1, 2 ) )))
-            return room->name;
+            return room->getName();
     }
     
     return "";
@@ -777,7 +777,7 @@ void Gangsters::populateArea( AreaIndexData *area, RoomList &mobRooms, int numPo
             key = createKey( );
             keyCount++;
             obj_to_char( key, mob );
-            log("key to mob in room " << mob->in_room->name ); 
+            log("key to mob in room " << mob->in_room->getName() ); 
         }
     }
 }

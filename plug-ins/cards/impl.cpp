@@ -78,7 +78,7 @@ public:
             LogStream::sendNotice( ) 
                 << "CARDS autoset " << mob->getNameP( '1' ) << " [" 
                 << mob->pIndexData->vnum << "] in room " 
-                << mob->in_room->name << " [" << mob->in_room->vnum << "]" << endl;
+                << mob->in_room->getName() << " [" << mob->in_room->vnum << "]" << endl;
         }
     }
     virtual void after( )

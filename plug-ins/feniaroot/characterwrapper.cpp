@@ -1951,7 +1951,7 @@ NMI_INVOKE( CharacterWrapper, canRecall, "(): может ли прямо сей�
 
     if (IS_SET(target->in_room->room_flags, ROOM_NO_RECALL))
         return false; 
-    if (IS_RAFFECTED(target->in_room, AFF_ROOM_CURSE))
+    if (IS_ROOM_AFFECTED(target->in_room, AFF_ROOM_CURSE))
         return false;
     if (IS_AFFECTED(target, AFF_CURSE))
         return false;

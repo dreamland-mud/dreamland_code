@@ -1160,7 +1160,7 @@ struct ExtraDescList : public list<EDInfo> {
 
         for (count = 1, i = begin( ); i != end( ); i++, count++)
             if (count == number) {
-                EXTRA_DESCR_DATA *sourceEdList = i->source ? i->source->pIndexData->extra_descr : i->sourceRoom->extra_descr;
+                EXTRA_DESCR_DATA *sourceEdList = i->source ? i->source->pIndexData->extra_descr : i->sourceRoom->getExtraDescr();
                 buf << "{x";
                 webManipManager->decorateExtraDescr( buf, i->description.c_str( ), sourceEdList, ch );
                 buf << endl;
@@ -1188,7 +1188,7 @@ static bool do_look_extradescr( Character *ch, const char *arg, int number )
     
     edlist.putObjects( ch->carrying );
     edlist.putObjects( ch->in_room->contents );
-    edlist.putDescriptions( ch->in_room->extra_descr, 0, ch->in_room );
+    edlist.putDescriptions( ch->in_room->getExtraDescr(), 0, ch->in_room );
 
     return edlist.output( );
 }
@@ -1220,7 +1220,7 @@ rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Character *ch, const DLS
         return;
     }
     
-    buf << "{" << CLR_RNAME(ch) << room->name << "{x";
+    buf << "{" << CLR_RNAME(ch) << room->getName() << "{x";
 
     if (ch->getConfig( ).holy) 
         buf << " {" << CLR_RVNUM(ch) << "[Room " << room->vnum
@@ -1233,14 +1233,14 @@ rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Character *ch, const DLS
     if (!fBrief)
     {
         ostringstream rbuf;
-        const char *dsc = room->description;
+        const char *dsc = room->getDescription();
 
         if (*dsc == '.')
             ++dsc;
         else
             rbuf << " ";
         
-        webManipManager->decorateExtraDescr( rbuf, dsc, room->extra_descr, ch );
+        webManipManager->decorateExtraDescr( rbuf, dsc, room->getExtraDescr(), ch );
 
         for (EXTRA_EXIT_DATA *peexit = room->extra_exit;
                                 peexit;
@@ -1272,7 +1272,7 @@ static void do_look_move( Character *ch, bool fBrief )
         if (eyes_darkened( ch ))
             ch->println( "Здесь слишком темно ... " );
         else
-            ch->printf( "{W%s{x\r\n", ch->in_room->name );
+            ch->printf( "{W%s{x\r\n", ch->in_room->getName() );
         return;
     }
 
@@ -1856,7 +1856,7 @@ CMDRUNP( exits )
             if (room->isDark( ) && !cfg.holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << "Дорога ведет в темноту и неизвестность...";
             else
-                buf << room->name;
+                buf << room->getName();
 
             if (ch->is_immortal())
                 buf << " (room " << room->vnum << ")";

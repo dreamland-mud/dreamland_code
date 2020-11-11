@@ -143,14 +143,14 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
             interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
                             wch->sees( carrier, '1' ).c_str( ),
                             carrier->in_room->area->name,
-                            carrier->in_room->name );
+                            carrier->in_room->getName() );
         }
     }
     else {
         interpret_raw( ch, "say", "{1%s{2 находится в зоне %s около %s!",
                         obj->getShortDescr( '1' ).c_str( ),
                         obj->getRoom( )->area->name, 
-                        obj->getRoom( )->name );
+                        obj->getRoom()->getName() );
     }
 }
 
@@ -716,11 +716,11 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
         {
             if (ch->is_immortal() && in_obj->in_room != 0)
                 sprintf( buf, "находится в %s [Комната %d]\n\r",
-                    in_obj->in_room->name, in_obj->in_room->vnum);
+                    in_obj->in_room->getName(), in_obj->in_room->vnum);
             else
                 sprintf( buf, "находится в %s\n\r",
                     in_obj->in_room == 0
-                        ? "somewhere" : in_obj->in_room->name );
+                        ? "somewhere" : in_obj->in_room->getName() );
         }
 
         buf[0] = Char::upper(buf[0]);
@@ -874,7 +874,7 @@ void HunterTrapObject::log( Character *ch, const char *verb )
 {
     wiznet( WIZ_FLAGS, 0, 110, 
             "Охотничьи ловушки: %^C1 %s %O4 в [%d] '%s'",
-            ch, verb, obj, ch->in_room->vnum, ch->in_room->name );
+            ch, verb, obj, ch->in_room->vnum, ch->in_room->getName() );
 }
 
 /*
@@ -985,7 +985,7 @@ void HunterBeaconTrap::greet( Character *victim )
 
     clantalk( *clan_hunter, 
               "Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s.",
-              obj->in_room->name, victim->getNameP( '2' ).c_str( ) );
+              obj->in_room->getName(), victim->getNameP( '2' ).c_str( ) );
     
     log( victim, "активизирует" );
 

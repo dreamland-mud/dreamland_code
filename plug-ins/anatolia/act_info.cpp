@@ -631,7 +631,7 @@ static void format_where( Character *ch, Character *victim )
                 victim,
                 fPK  ? "({rPK{x)"  : "    ",
                 fAfk ? "[{CAFK{x]" : "     ",
-                victim->in_room->name );
+                victim->in_room->getName() );
 }
 
 static bool rprog_where( Character *ch, const char *arg )

@@ -84,9 +84,6 @@ OLCStateRoom::commit( )
     RoomIndexData *pRoom = get_room_index(room);
     if (pRoom && pRoom->room) {
         // FIXME: Room should have getters instead.
-        pRoom->room->name = pRoom->name;
-        pRoom->room->description = pRoom->description;
-        pRoom->room->extra_descr = pRoom->extra_descr;
         pRoom->room->room_flags = pRoom->room_flags;
         pRoom->room->sector_type = pRoom->sector_type;
         pRoom->room->heal_rate = pRoom->heal_rate;
@@ -343,7 +340,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
             ptc(ch, "-{G%-5s{x ->   [{W%5u{x] %s\n\r",
                       DLString(dirs[door].name).capitalize( ).c_str( ),
                       to_room ? to_room->vnum : 0,
-                      to_room ? to_room->name : "");
+                      to_room ? to_room->getName() : "");
 
             if(pexit->key > 0)
                 ptc(ch, "            Key: [{W%7u{x]\n\r", pexit->key);
@@ -924,7 +921,6 @@ REDIT(heal, "здоровье", "установить скорость восс�
     if (is_number(argument)) {
         int i = atoi(argument);
         pRoom->heal_rate = i;
-        pRoom->room->heal_rate = pRoom->heal_rate;
         stc("Heal rate set.\n\r", ch);
         return true;
     }
@@ -942,7 +938,6 @@ REDIT(mana, "мана", "установить скорость восстано�
     if (is_number(argument)) {
         int i = atoi(argument);
         pRoom->mana_rate = i;
-        pRoom->room->mana_rate = pRoom->mana_rate;
         stc("Mana rate set.\n\r", ch);
         return true;
     }

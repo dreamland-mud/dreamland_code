@@ -1278,7 +1278,7 @@ DLString ItemKeyhole::getDescription( )
 
     buf << obj->getShortDescr( );
     if (obj->getCarrier( ) == 0)
-        buf << " из '" << obj->getRoom( )->name << "'";
+        buf << " из '" << obj->getRoom()->getName() << "'";
 
     return buf;
 }
@@ -1400,9 +1400,9 @@ DLString DoorKeyhole::getDescription( )
 {
     DLString buf;
     
-    buf << "двер|ь|и|и|ь|ью|и из '" << room->name << "'";
+    buf << "двер|ь|и|и|ь|ью|и из '" << room->getName() << "'";
     if (to_room)
-        buf <<  " в '" << to_room->name << "'";
+        buf <<  " в '" << to_room->getName() << "'";
 
     return buf;
 }

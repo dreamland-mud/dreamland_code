@@ -138,171 +138,6 @@ static Room * find_location( Character *ch, char *arg )
 
 
 
-CMDWIZP( objlist )
-{
-FILE *fp;
-Object *obj;
-Affect *paf;
-Liquid *liquid;
-int currLevel, SetL = 0;
-char arg[MAX_STRING_LENGTH];
-
-   if ( (fp=fopen( "objlist.txt", "w+" ) ) == 0 )
-   {
-        ch->send_to("Ошибка: не могу открыть файл objlist.txt.\n\r");
-        return;
-   }
-
-   argument = one_argument( argument, arg );
-   if ((SetL = atoi(arg))==0)
-     SetL = 110;
-
-  for(currLevel=SetL; currLevel>=0; currLevel-- ) {
-   fprintf( fp, "\n======= УРОВЕНЬ %d ========\n", currLevel );
-   for( obj=object_list; obj!=0; obj = obj->next )
-   {
-/*     if ( obj->pIndexData->affected != 0 )                */
-       if ( obj->level==currLevel )        
-     {
-       fprintf( fp, "\n#Объект: %s (Vnum : %d) \n", obj->getShortDescr( ) ,obj->pIndexData->vnum);
-    fprintf( fp,
-        "Объект: '%s', тип: %s, флаги: %s.\nВес: %d, цена: %d, уровень: %d.\n",
-
-        obj->getName( ),
-        item_table.message(obj->item_type).c_str( ),
-        extra_flags.messages( obj->extra_flags ).c_str( ),
-        obj->weight / 10,
-        obj->cost,
-        obj->level
-        );
-
-    switch ( obj->item_type )
-    {
-    case ITEM_SCROLL:
-    case ITEM_POTION:
-    case ITEM_PILL:
-        fprintf( fp, "Заклинания %d уровня:", obj->value0() );
-
-        if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value1())->getName().c_str());
-        }
-
-        if ( obj->value2() >= 0 && obj->value2() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value2())->getName().c_str());
-        }
-
-        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
-        }
-
-        if (obj->value4() >= 0 && obj->value4() < SkillManager::getThis( )->size())
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value4())->getName().c_str());
-        }
-
-        fprintf( fp,".\n");
-        break;
-
-    case ITEM_WAND:
-    case ITEM_STAFF:
-        fprintf(fp, "%d зарядов уровня %d", obj->value2(), obj->value0());
-
-        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
-        }
-
-        fprintf( fp,".\n");
-        break;
-
-    case ITEM_DRINK_CON:
-        liquid = liquidManager->find( obj->value2() );
-        fprintf(fp,"Содержит жидкость цвета %s, это %s.\n",
-                    liquid->getColor( ).ruscase( '2' ).c_str( ),
-                    liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
-        break;
-
-    case ITEM_CONTAINER:
-        fprintf(fp,"Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n",
-            obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
-        if (obj->value4() != 100)
-        {
-            fprintf(fp,"Уменьшение веса: %d%%\n",
-                obj->value4());
-        }
-        break;
-                
-    case ITEM_WEAPON:
-         fprintf(fp,"Тип оружия: %s\n", 
-                    weapon_class.name(obj->value0()).c_str( ));
-                
-        if (obj->pIndexData->new_format)
-            fprintf(fp,"Урон %dd%d (среднее %d).\n",
-                obj->value1(),obj->value2(), weapon_ave(obj));
-        else
-            fprintf( fp, "Урон от %d до %d (среднее %d).\n",
-                    obj->value1(), obj->value2(),
-                    ( obj->value1() + obj->value2() ) / 2 );
-        if (obj->value4())  /* weapon flags */
-        {
-            fprintf(fp,"Флаги оружия: %s\n",weapon_type2.messages(obj->value4()).c_str( ));
-        }
-        break;
-
-    case ITEM_ARMOR:
-        fprintf( fp,
-        "Класс брони: %d колющее, %d удары, %d режущее, %d экзотика.\n",
-            obj->value0(), obj->value1(), obj->value2(), obj->value3() );
-        break;
-    }
-       for (auto &paf: obj->pIndexData->affected)
-       {
-            fprintf( fp, "  Изменяет %s на %d.\n",
-                apply_flags.message( paf->location ).c_str( ), paf->modifier );
-            if (paf->bitvector)
-            {
-                switch(paf->where)
-                {
-                    case TO_AFFECTS:
-                        fprintf(fp,"   Дает аффект %s.\n",
-                            affect_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_OBJECT:
-                        fprintf(fp,"   Добавляет флаг %s.\n",
-                            extra_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_IMMUNE:
-                        fprintf(fp,"   Дает иммунитет к %s.\n",
-                            imm_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_RESIST:
-                        fprintf(fp,"   Дает сопротивляемость к %s.\n\r",
-                            res_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_VULN:
-                        fprintf(fp,"   Дает уязвимость к %s.\n\r",
-                            vuln_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_DETECTS:
-                        fprintf(fp,"   Adds %s detection.\n\r",
-                            detect_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    default:
-                        fprintf(fp,"   Неизвестный битовый флаг %d: %d\n\r",
-                            paf->where,paf->bitvector);
-                        break;
-                }
-            }
-       }
-     }
-   }
-  }
-   fclose( fp );
-   return;
-}
 
 struct limit_info {
     DLString description;
@@ -353,7 +188,7 @@ CMDWIZP( limited )
                                                 obj->carried_by->getNameP( ));
                                 if ( obj->in_room != 0 )
                                         sprintf(buf, "В комнате %-20s [%d]\n\r",
-                                                obj->in_room->name, obj->in_room->vnum);
+                                                obj->in_room->getName(), obj->in_room->vnum);
                                 if ( obj->in_obj != 0 )
                                         sprintf(buf, "Внутри %-20s [%d] \n\r",
                                                 obj->in_obj->getShortDescr( '1' ).c_str( ),
@@ -911,7 +746,7 @@ CMDWIZP( stat )
     }
 
     sprintf( buf, "Имя: '%s'\n\rЗона: '%s'\n\rВладелец: '%s' Клан: '%s'\n\r",
-        location->name,
+        location->getName(),
         location->area->name ,
         location->owner,
         location->pIndexData->clan->getShortName( ).c_str( ) );
@@ -929,15 +764,15 @@ CMDWIZP( stat )
     sprintf( buf,
         "Флаги: %s.\n\rОписание:\n\r%s",
         room_flags.names(location->room_flags).c_str( ),
-        location->description );
+        location->getDescription() );
     ch->send_to(buf);
 
-    if ( location->extra_descr != 0 )
+    if ( location->getExtraDescr() != 0 )
     {
         EXTRA_DESCR_DATA *ed;
 
         ch->send_to("Ключевые слова экстра-описания: '");
-        for ( ed = location->extra_descr; ed; ed = ed->next )
+        for ( ed = location->getExtraDescr(); ed; ed = ed->next )
         {
             ch->send_to(ed->keyword);
             if ( ed->next != 0 )
@@ -1759,8 +1594,8 @@ CMDWIZP( rwhere )
     }
 
     for (Room *r = room_list; r; r = r->rnext)
-        if (is_name(argument, r->name)) {
-            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->name, r->area->name);
+        if (is_name(argument, r->getName())) {
+            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->area->name);
             found = true;
         }
 
@@ -1823,7 +1658,7 @@ CMDWIZP( owhere )
                 sprintf( buf, "%3d) %s на полу в %s [Комната %d]\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ),
-                        in_obj->in_room->name,
+                        in_obj->in_room->getName(),
                         in_obj->in_room->vnum );
         else
                 sprintf( buf, "%3d) %s черт его знает где.\n\r",
@@ -1884,12 +1719,12 @@ CMDWIZP( mwhere )
                             count, 
                             victim->getPC( )->getNameP( ),
                             victim->getNameP('1').c_str( ),
-                            victim->in_room->name, victim->in_room->vnum);
+                            victim->in_room->getName(), victim->in_room->vnum);
                 else
                     sprintf(buf,"%3d) %s находится в %s [%d]\n\r",
                             count, 
                             victim->getNameP( ),
-                            victim->in_room->name, victim->in_room->vnum);
+                            victim->in_room->getName(), victim->in_room->vnum);
 
                 buffer << buf;
             }
@@ -1922,7 +1757,7 @@ CMDWIZP( mwhere )
                 victim->is_npc() ? victim->getNPC()->pIndexData->vnum : 0,
                 victim->is_npc() ? victim->getNameP( '1' ).c_str( ) : victim->getNameP( ),
                 victim->in_room->vnum,
-                victim->in_room->name );
+                victim->in_room->getName() );
         buffer << buf;
     }
 
@@ -1957,37 +1792,6 @@ CMDWIZP( shutdown )
         d->close( );
     }
 }
-
-CMDWIZP( protect )
-{
-    Character *victim;
-
-    if (argument[0] == '\0')
-    {
-        ch->send_to("Protect whom from snooping?\n\r");
-        return;
-    }
-
-    if ((victim = get_char_world(ch,argument)) == 0)
-    {
-        ch->send_to("You can't find them.\n\r");
-        return;
-    }
-
-    if (IS_SET(victim->comm,COMM_SNOOP_PROOF))
-    {
-        act_p("$C1 is no longer snoop-proof.",ch,0,victim,TO_CHAR,POS_DEAD);
-        victim->send_to("Your snoop-proofing was just removed.\n\r");
-        victim->comm.removeBit(COMM_SNOOP_PROOF);
-    }
-    else
-    {
-        act_p("$C1 is now snoop-proof.",ch,0,victim,TO_CHAR,POS_DEAD);
-        victim->send_to("You are now immune to snooping.\n\r");
-        victim->comm.setBit(COMM_SNOOP_PROOF);
-    }
-}
-
 
 
 CMDWIZP( snoop )
@@ -3784,7 +3588,7 @@ CMDWIZP( olevel )
                 in_obj->carried_by->in_room->vnum );
         else if (in_obj->in_room != 0 && ch->can_see(in_obj->in_room))
             sprintf( buf, "%3d) [%d] %s is in %s [Room %d]\n\r",
-                number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ),in_obj->in_room->name,
+                number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ),in_obj->in_room->getName(),
                 in_obj->in_room->vnum);
         else
             sprintf( buf, "%3d) [%d]%s is somewhere\n\r",number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ));
@@ -3829,7 +3633,7 @@ CMDWIZP( mlevel )
                 victim->is_npc() ? victim->getNPC()->pIndexData->vnum : 0,
                 victim->getNameP( '1' ).c_str(),
                 victim->in_room->vnum,
-                victim->in_room->name );
+                victim->in_room->getName() );
             buffer << buf;
         }
     }
@@ -4039,7 +3843,6 @@ CMDWIZP( memory )
     sprintf( buf, "ExDes   %5d\n\r", top_ed        ); ch->send_to(buf);
     sprintf( buf, "Exits   %5d\n\r", top_exit      ); ch->send_to(buf);
     sprintf( buf, "Helps   %5ld\n\r", helpManager->getArticles( ).size( ) ); ch->send_to(buf);
-//    sprintf( buf, "Socials %5d\n\r", SocialManager::getThis( )->getSocialCount( ) ); ch->send_to(buf);
     sprintf( buf, "Mobs    %5d(%d new format)\n\r", top_mob_index,newmobs );
     ch->send_to(buf);
     sprintf( buf, "(in use)%5d\n\r", mobile_count  ); ch->send_to(buf);
@@ -4054,143 +3857,6 @@ CMDWIZP( memory )
     sprintf( buf, "Perms   %5d blocks  of %7d bytes.\n\r",
         nAllocPerm, sAllocPerm );
     ch->send_to(buf);
-
-
-    {
-        ostringstream buf;
-        map<int, int> vnumCounts;
-        int cutoff = 100;
-
-        for (Character *wch = char_list; wch; wch = wch->next) {
-            if (wch->is_npc())
-                vnumCounts[wch->getNPC()->pIndexData->vnum]++;
-        }
-
-        buf << "Mob instances that exceed the count of " << cutoff << ":" << endl;
-        for (auto &entry: vnumCounts)
-            if (entry.second >= cutoff) {
-                MOB_INDEX_DATA *pMob = get_mob_index(entry.first);
-                if (pMob)
-                    buf << fmt(0, "[{W%6d{x] {C%4d{x %N1", entry.first, entry.second, pMob->short_descr) << endl;
-            }
-
-        page_to_char(buf.str().c_str(), ch);
-    }
-}
-
-CMDWIZP( dump )
-{
-    int count,count2,num_pcs,aff_count;
-    Character *fch;
-    MOB_INDEX_DATA *pMobIndex;
-    Object *obj;
-    OBJ_INDEX_DATA *pObjIndex;
-    Room *room;
-    EXIT_DATA *exit;
-    Descriptor *d;
-    Affect *af;
-    FILE *fp;
-    int vnum,nMatch = 0;
-
-    /* open file */
-    fp = fopen("mem.dmp","w");
-
-    /* report use of data structures */
-
-    num_pcs = 0;
-    aff_count = 0;
-
-    /* mobile prototypes */
-    fprintf(fp,"MobProt        %4d (%8ld bytes)\n",
-        top_mob_index, top_mob_index * (sizeof(*pMobIndex)));
-
-    /* mobs */
-    count = 0;  count2 = 0;
-    for (fch = char_list; fch != 0; fch = fch->next)
-    {
-        count++;
-        if (fch->getPC( ) != 0)
-            num_pcs++;
-        aff_count += fch->affected.size();
-    }
-
-    fprintf(fp,"Mobs        %4d (%8ld bytes), %2d free (%ld bytes)\n",
-        count, count * (sizeof(*fch)), count2, count2 * (sizeof(*fch)));
-
-    /* descriptors */
-    count = 0; count2 = 0;
-    for (d = descriptor_list; d != 0; d = d->next)
-        count++;
-
-    fprintf(fp, "Descs        %4d (%8ld bytes), %2d free (%ld bytes)\n",
-        count, count * (sizeof(*d)), count2, count2 * (sizeof(*d)));
-
-    /* object prototypes */
-    for ( vnum = 0; nMatch < top_obj_index; vnum++ )
-        if ( ( pObjIndex = get_obj_index( vnum ) ) != 0 )
-        {
-            aff_count += pObjIndex->affected.size();
-            nMatch++;
-        }
-
-    fprintf(fp,"ObjProt        %4d (%8ld bytes)\n",
-        top_obj_index, top_obj_index * (sizeof(*pObjIndex)));
-
-
-    /* objects */
-    count = 0;  count2 = 0;
-    for (obj = object_list; obj != 0; obj = obj->next)
-    {
-        count++;
-        aff_count += obj->affected.size();
-    }
-
-    /* rooms */
-    fprintf(fp,"Rooms        %4d (%8ld bytes)\n",
-        top_room, top_room * (sizeof(*room)));
-
-     /* exits */
-    fprintf(fp,"Exits        %4d (%8ld bytes)\n",
-        top_exit, top_exit * (sizeof(*exit)));
-
-    fclose(fp);
-
-    /* start printing out mobile data */
-    fp = fopen("mob.dmp","w");
-
-    fprintf(fp,"\nMobile Analysis\n");
-    fprintf(fp,  "---------------\n");
-    nMatch = 0;
-    for (vnum = 0; nMatch < top_mob_index; vnum++)
-        if ((pMobIndex = get_mob_index(vnum)) != 0)
-        {
-            nMatch++;
-            fprintf(fp,"#%-4d %3d active %3d killed     %s\n",
-                pMobIndex->vnum,pMobIndex->count,
-                pMobIndex->killed,
-                russian_case( pMobIndex->short_descr, '1' ).c_str( ));
-        }
-    fclose(fp);
-
-    /* start printing out object data */
-    fp = fopen("obj.dmp","w");
-
-    fprintf(fp,"\nObject Analysis\n");
-    fprintf(fp,  "---------------\n");
-    nMatch = 0;
-    for (vnum = 0; nMatch < top_obj_index; vnum++)
-        if ((pObjIndex = get_obj_index(vnum)) != 0)
-        {
-            nMatch++;
-            fprintf(fp,"#%-4d %3d active %3d reset      %s\n",
-                pObjIndex->vnum,pObjIndex->count,
-                pObjIndex->reset_num,
-                russian_case( pObjIndex->short_descr, '1' ).c_str( ));
-        }
-
-    /* close file */
-    fclose(fp);
-    ch->println( "MUD statistics dumped." );
 }
 
 

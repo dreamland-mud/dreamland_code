@@ -87,14 +87,14 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     name = victim->getShortDescr( );
     name.upperFirstCharacter( );
     victimName = name;
-    victimRoom = victim->in_room->name;
+    victimRoom = victim->in_room->getName();
     victimArea = victim->in_room->area->name;
     
     name = thief->getShortDescr( );
     name.upperFirstCharacter( );
     thiefName = name;
     thiefArea = thief->in_room->area->name;
-    thiefRoom = thief->in_room->name;
+    thiefRoom = thief->in_room->getName();
     thiefSex = thief->getSex( );
 
     itemName = item->getShortDescr( );
@@ -130,7 +130,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     }
 
     tell_raw( pch, questman, "Пострадавшего ищи в районе {W%s{G ({W{hh%s{hx{G).", 
-                  victim->in_room->name, victim->in_room->area->name );
+                  victim->in_room->getName(), victim->in_room->area->name );
     tell_fmt("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.", 
               pch, questman, time );
     
@@ -481,7 +481,7 @@ DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
         return "";
 
     if (depth >= 2) 
-        return room->name;
+        return room->getName();
 
     for (int d = 0; d < DIR_SOMEWHERE; d++) {
         Room *r;
@@ -503,7 +503,7 @@ DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
                 return getRoomHint( r, room, depth + 1 );
     }
 
-    return room->name;
+    return room->getName();
 }
 
 /*

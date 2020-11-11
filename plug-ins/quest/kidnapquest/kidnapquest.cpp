@@ -44,13 +44,13 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
 
         king = createKing( pch );
         kingVnum = king->pIndexData->vnum;
-        kingRoom = king->in_room->name;
+        kingRoom = king->in_room->getName();
         kingArea = king->in_room->area->name;
         kingName = king->getShortDescr( );
 
         room = findRefuge( pch, king );
         princeArea = room->area->name;
-        princeRoom = room->name;
+        princeRoom = room->getName();
 
         prince = createPrince( king, room );
         princeName = prince->getShortDescr( );
@@ -215,7 +215,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         tell_raw( ch, questman, 
              "Последний раз {W%s{G видели неподалеку от {W%s{G.", 
              russian_case( princeName, '4' ).c_str( ),
-             room->name );
+             room->getName() );
     else
         tell_raw( ch, questman, 
              "Последний раз {W%s{G видели в местности {W{hh%s{hx{G.", 

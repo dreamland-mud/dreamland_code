@@ -656,7 +656,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
 
     bool clean = true;
 
-  if (IS_RAFFECTED(room,AFF_ROOM_CURSE))
+  if (IS_ROOM_AFFECTED(room,AFF_ROOM_CURSE))
         {
          clean = false;
          room->affectStrip( gsn_cursed_lands);
@@ -664,7 +664,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
          act_p("Это место очищается от проклятья.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
         }
-  if (IS_RAFFECTED(room,AFF_ROOM_POISON))
+  if (IS_ROOM_AFFECTED(room,AFF_ROOM_POISON))
         {
          clean = false;
          room->affectStrip( gsn_deadly_venom);
@@ -672,7 +672,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
          act_p("Ядовитые пары, окружавшие это место, рассеиваются.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
         }
-  if (IS_RAFFECTED(room,AFF_ROOM_SLEEP))
+  if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLEEP))
         {
          clean = false;
          ch->send_to("Это место пробуждается от таинственного сна.\n\r");
@@ -680,7 +680,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_mysterious_dream);
         }
-  if (IS_RAFFECTED(room,AFF_ROOM_PLAGUE))
+  if (IS_ROOM_AFFECTED(room,AFF_ROOM_PLAGUE))
         {
          clean = false;
          ch->send_to("Это место очищается от болезней.\n\r");
@@ -688,7 +688,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_black_death);
         }
-  if (IS_RAFFECTED(room,AFF_ROOM_SLOW))
+  if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLOW))
         {
          clean = false;
          ch->send_to("Летаргический туман, окружавший это место, рассеивается.\n\r");

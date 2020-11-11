@@ -224,41 +224,40 @@ CMDWIZP( set )
   hset( ch, NULL );
 }
 
-void hset( Character* ch, char* ) {
-  char buf[MAX_STRING_LENGTH];
-  char buf1[MAX_STRING_LENGTH];
-  int i = 0;
+void hset(Character *ch, char *)
+{
+    ostringstream buf;
+    int i = 0;
 
-  buf[0] = '\0';
-  while( tab_set[i].name ) {
-    sprintf( buf1, "  {Cset {y%-5s{x help   {C[{x %s {C]{x\n\r", tab_set[i].name, tab_set[i].help );
-    strcat( buf, buf1 );
-    i++;
-  }
-  sprintf( buf1, "%s:\n\r%s", "Синтаксис", buf );
-  ch->send_to(buf1);
+    buf << "Синтаксис:" << endl;
+    while (tab_set[i].name) {
+        buf << dlprintf("  {Cset {y%-5s{x help   {C[{x %s {C]{x\n\r", tab_set[i].name, tab_set[i].help);
+        i++;
+    }
+    ch->send_to(buf);
 }
 
-void mset( Character* ch, char* argument ) {
-  char arg[MAX_INPUT_LENGTH];
-  int i = 0;
+void mset(Character *ch, char *argument)
+{
+    char arg[MAX_INPUT_LENGTH];
+    int i = 0;
 
-  argument = one_argument( argument, arg );
-  if( arg[0] ) {
-    while( tab_set_mob[i].name ) {
-      if( !str_prefix( arg, tab_set_mob[i].name ) ) {
-        if( tab_set_mob[i].func ) {
-          tab_set_mob[i].func( ch, argument );
-          return;
-        } else {
-          ch->send_to("Извините, но данная возможность находится в стадии разработки.\n\r");
-          return;
+    argument = one_argument(argument, arg);
+    if (arg[0]) {
+        while (tab_set_mob[i].name) {
+            if (!str_prefix(arg, tab_set_mob[i].name)) {
+                if (tab_set_mob[i].func) {
+                    tab_set_mob[i].func(ch, argument);
+                    return;
+                } else {
+                    ch->send_to("Извините, но данная возможность находится в стадии разработки.\n\r");
+                    return;
+                }
+            }
+            i++;
         }
-      }
-      i++;
     }
-  }
-  chg_mob_help( ch, NULL );
+    chg_mob_help(ch, NULL);
 }
 
 void chg_mob_str( Character* ch, char* argument ) {
@@ -896,30 +895,25 @@ void chg_mob_practice( Character* ch, char* argument ) {
   }
 }
 
-void chg_mob_help( Character* ch, char* argument ) {
-  char buf[MAX_STRING_LENGTH];
-  char buf1[MAX_STRING_LENGTH];
-  int i = 0;
+void chg_mob_help(Character *ch, char *argument)
+{
+    ostringstream buf;
+    int i = 0;
 
-  buf[0] = '\0';
-  while( tab_set_mob[i].name ) {
-    sprintf( buf1, "  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r",
-             tab_set_mob[i].name,
-             tab_set_mob[i].inc_dec ? "[+/-]" : "     ",
-             IS_SET( tab_set_mob[i].DS, S_V ) &&
-             IS_SET( tab_set_mob[i].DS, S_S ) ?
-               "{C<{xчис{C/{xназв{C>{x" :
-               IS_SET( tab_set_mob[i].DS, S_V ) ?
-                 "{C<{x число  {C>{x" :
-                 IS_SET( tab_set_mob[i].DS, S_S ) ?
-                   "{C<{x  назв. {C>{x" :
-                   "          ",
-             tab_set_mob[i].help );
-    strcat( buf, buf1 );
-    i++;
-  }
-  sprintf( buf1, "%s:\n\r%s", "Синтаксис", buf );
-  ch->send_to(buf1);
+    buf << "Синтаксис:" << endl;
+    while (tab_set_mob[i].name) {
+        buf << dlprintf("  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r",
+                tab_set_mob[i].name,
+                tab_set_mob[i].inc_dec ? "[+/-]" : "     ",
+                IS_SET(tab_set_mob[i].DS, S_V) &&
+                        IS_SET(tab_set_mob[i].DS, S_S)
+                    ? "{C<{xчис{C/{xназв{C>{x"
+                    : IS_SET(tab_set_mob[i].DS, S_V) ? "{C<{x число  {C>{x" : IS_SET(tab_set_mob[i].DS, S_S) ? "{C<{x  назв. {C>{x" : "          ",
+                tab_set_mob[i].help);
+        i++;
+    }
+
+    ch->send_to(buf);
 }
 
 void chg_mob_killer( Character* ch, char* argument ) {
@@ -1128,7 +1122,7 @@ void oset( Character* ch, char* argument )
                     obj->behavior.setPointer( p.getDynamicPointer<ObjectBehavior>( ) );
                     obj->behavior->setObj( obj );
                 }
-            } catch (ExceptionClassNotFound e) {
+            } catch (const ExceptionClassNotFound &e) {
                 LogStream::sendError( ) << e.what( ) << endl;
                 ch->send_to( e.what( ) );
                 return;

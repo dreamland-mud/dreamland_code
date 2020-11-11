@@ -68,7 +68,7 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, 
                 if (pReset->arg1 == vnum) { 
                     // Object is on the floor, return success.
                     pArea = room->area;
-                    where = room->name;
+                    where = room->getName();
                     return true;
                 }
                 break; 
@@ -79,7 +79,7 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, 
                     if (in) {
                         // Return success.
                         pArea = room->area;
-                        where = room->name;
+                        where = room->getName();
                         return true;
                     }
                 }
@@ -99,7 +99,7 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLStrin
             case 'M':
                 if (pReset->arg1 == pMob->vnum) {
                     pArea = room->area;
-                    where = room->name;
+                    where = room->getName();
                     return true;
                 }
             }

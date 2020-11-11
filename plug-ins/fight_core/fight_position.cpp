@@ -168,7 +168,7 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
                 (IS_VIOLENT(victim) ? "повторно" : ""),
                 (victim->is_mirror( ) ? "зеркало" : ""),
                 victim,
-                ch->in_room->name,
+                ch->in_room->getName(),
                 ch->in_room->vnum );
     
     set_violent( ch );

@@ -166,7 +166,7 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
     AreaIndexData *pArea = room->area;
     Affect af, af2;
 
-    if (IS_RAFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
+    if (IS_ROOM_AFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
     {
         ch->send_to("Эта зона полностью под контролем злых духов.\n\r");
         return;

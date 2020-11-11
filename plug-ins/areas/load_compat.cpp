@@ -1119,7 +1119,7 @@ void fix_door_levels( bool verbose )
             
             if (verbose)
                 LogStream::sendNotice( )
-                    << "[" << r->vnum << "] " << r->name << " " << d << ": "
+                    << "[" << r->vnum << "] " << r->getName() << " " << d << ": "
                     << "level " <<  ex->level << endl;
         }
 
@@ -1133,7 +1133,7 @@ void fix_door_levels( bool verbose )
 
             if (verbose)
                 LogStream::sendNotice( )
-                    << "[" << r->vnum << "] " << r->name << " extra: "
+                    << "[" << r->vnum << "] " << r->getName() << " extra: "
                     << "level " <<  ex->level << endl;
         }
     }

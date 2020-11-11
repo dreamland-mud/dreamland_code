@@ -36,9 +36,8 @@ RoomIndexData::RoomIndexData()
 
 Room::Room( ) : 
                 rnext( 0 ),
-                people( 0 ), contents( 0 ), extra_descr( 0 ),
-                area( 0 ), extra_exit( 0 ),
-                name(&str_empty[0]), description(&str_empty[0]), 
+                people( 0 ), contents( 0 ),
+                area( 0 ), extra_exit( 0 ),                
                 owner(&str_empty[0]),
                 vnum( 0 ), room_flags( 0 ), 
                 light( 0 ), sector_type( 0 ),
@@ -49,6 +48,21 @@ Room::Room( ) :
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
         exit[i] = 0;
+}
+
+extra_descr_data * Room::getExtraDescr()
+{
+    return pIndexData->extra_descr;
+}
+
+const char * Room::getName() const
+{
+    return pIndexData->name;
+}
+
+const char * Room::getDescription() const
+{
+    return pIndexData->description;
 }
 
 bool Room::isOwner( Character *ch ) const

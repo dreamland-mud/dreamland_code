@@ -626,7 +626,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             else
                 buf = &abuf;
             for (EXTRA_EXIT_DATA *eexit = room->extra_exit; eexit; eexit = eexit->next) {
-                (*buf) << dlprintf(lineFormat.c_str(), room->vnum, room->name, eexit->keyword) << endl;
+                (*buf) << dlprintf(lineFormat.c_str(), room->vnum, room->getName(), eexit->keyword) << endl;
             }
         }
         
@@ -765,7 +765,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         }
         
         ch->printf("Loading room objects for '%s' [%d], check logs for details.\r\n", 
-                    room->name, room->vnum);
+                    room->getName(), room->vnum);
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
     }
