@@ -49,6 +49,17 @@ struct RoomHistory : public list<RoomHistoryEntry> {
     static const unsigned int MAX_SIZE;
 };
 
+struct ExtraExitList: public list<extra_exit_data *> {
+    /** Return an exit that matches the given keyword. */
+    extra_exit_data *find(const DLString &keyword) const;
+
+    /** 
+     * Remove matching exit from list and free its memory. 
+     * Returns true if found.
+     */
+    bool findAndDestroy(const DLString &keyword);
+};
+
 struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     RoomIndexData();
 
@@ -59,7 +70,7 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     reset_data *reset_last;
     extra_descr_data *        extra_descr;
     exit_data *        exit        [6];
-    extra_exit_data * extra_exit;
+    ExtraExitList extra_exits;
 
     char *        name;
     char *        description;
@@ -135,7 +146,7 @@ public:
     Object *      contents;
     AreaIndexData *area;
     exit_data *   exit[6];
-    extra_exit_data * extra_exit;
+    ExtraExitList extra_exits;
     char *     owner;
     int        vnum;
     int        room_flags;

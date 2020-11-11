@@ -228,7 +228,7 @@ CMDRUNP( open )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         open_door_extra( ch, DIR_SOMEWHERE, (void *)peexit );
@@ -390,7 +390,7 @@ CMDRUNP( close )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
@@ -599,7 +599,7 @@ CMDRUNP( lock )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
@@ -844,7 +844,7 @@ CMDRUNP( unlock )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
@@ -931,7 +931,7 @@ Keyhole::Pointer Keyhole::locate( Character *ch, Object *key )
                 if (!room->exit[d]->u1.to_room || ch->can_see( room->exit[d] ))
                     return DoorKeyhole::Pointer( NEW, ch, room, d, key );
 
-        for (EXTRA_EXIT_DATA *ex = room->extra_exit; ex; ex = ex->next)
+        for (auto &ex: room->extra_exits)
             if (ex->key == keyVnum)
                 if (ch->can_see( ex ))
                     return ExtraExitKeyhole::Pointer( NEW, ch, room, ex, key );
@@ -961,7 +961,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
     bool canBeDoor = direction_lookup(arg.c_str()) >= 0;
     Keyhole::Pointer null;
 
-    if (( peexit = get_extra_exit( arg.c_str( ), ch->in_room->extra_exit ) )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
                 && ch->can_see( peexit ))
     {
         return ExtraExitKeyhole::Pointer( NEW, ch, ch->in_room, peexit );

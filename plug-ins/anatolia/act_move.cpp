@@ -1039,7 +1039,7 @@ CMDRUNP( enter )
         portal = get_obj_room_type( ch, ITEM_PORTAL );
     else {
         portal = get_obj_list( ch, argument, ch->in_room->contents );
-        peexit = get_extra_exit( argument, ch->in_room->extra_exit );
+        peexit = ch->in_room->extra_exits.find(argument);
     }
 
     if (portal == 0 && peexit == 0) {

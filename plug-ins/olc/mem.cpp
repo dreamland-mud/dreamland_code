@@ -277,30 +277,3 @@ void free_affect(Affect *paf)
 }
 
 
-EXTRA_EXIT_DATA * find_extra_exit(const char *argument, EXTRA_EXIT_DATA *&list, EXTRA_EXIT_DATA *&prev_exit)
-{
-    EXTRA_EXIT_DATA *eed;
-    prev_exit = 0;
-
-    for (eed = list; eed; eed = eed->next) {
-        if (is_name(argument, eed->keyword))
-            break;
-        prev_exit = eed;
-    }
-
-    return eed;
-}
-
-void delete_extra_exit(EXTRA_EXIT_DATA *eed, EXTRA_EXIT_DATA *prev_exit, EXTRA_EXIT_DATA *&list)
-{
-    if (!eed)
-        return;
-        
-    if (!prev_exit)
-        list = eed->next;
-    else
-        prev_exit->next = eed->next;
-
-    free_extra_exit(eed);
-}
-

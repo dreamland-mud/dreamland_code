@@ -137,7 +137,7 @@ void ExitsMovement::randomizeExits( )
         }
     }
     
-    for (EXTRA_EXIT_DATA *pee = from_room->extra_exit; pee; pee = pee->next) {
+    for (auto &pee: from_room->extra_exits) {
         if (!ch->can_see( pee ))
             continue;
 

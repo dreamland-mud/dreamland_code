@@ -76,11 +76,8 @@ Room * RoomIndexData::create()
         if (exit[i])
             room->exit[i] = exit[i]->create();
 
-    for (EXTRA_EXIT_DATA *eexit = extra_exit; eexit; eexit = eexit->next) {
-        EXTRA_EXIT_DATA *newExit = eexit->create();
-        newExit->next = room->extra_exit;
-        room->extra_exit = newExit;
-    }
+    for (auto &eexit: extra_exits)
+        room->extra_exits.push_back(eexit->create());
 
     room->rnext = room_list;
     room_list = room;

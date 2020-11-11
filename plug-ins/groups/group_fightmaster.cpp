@@ -95,7 +95,9 @@ SKILL_RUNP( bashdoor )
                 ch->send_to("Сначала закончи сражение.\n\r");
                 return;
         }
-        if ( ( ( peexit = get_extra_exit( arg, room->extra_exit ) ) == 0 || !ch->can_see( peexit ) )
+
+        peexit = room->extra_exits.find(arg);
+        if ((!peexit || !ch->can_see( peexit ))
              && ( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) < 0)
         {
                 ch->send_to("Но тут нечего выбивать!\n\r");

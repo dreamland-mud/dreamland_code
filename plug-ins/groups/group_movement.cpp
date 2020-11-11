@@ -77,7 +77,7 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                 return;
         }
         
-        if ( ((peexit = get_extra_exit( arg, room->extra_exit )) && ch->can_see(peexit)) ||
+        if ( ((peexit = room->extra_exits.find(arg)) && ch->can_see(peexit)) ||
              (door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY)) >= 0) 
         {
                 EXIT_DATA *pexit = 0;
@@ -375,7 +375,7 @@ public:
 protected:
     virtual bool findTargetRoom( )
     {
-        peexit = get_extra_exit( arg, from_room->extra_exit );
+        peexit = from_room->extra_exits.find(arg);
         door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
 
         if ((!peexit || !ch->can_see( peexit )) && door < 0) {

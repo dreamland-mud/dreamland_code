@@ -1242,9 +1242,7 @@ rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Character *ch, const DLS
         
         webManipManager->decorateExtraDescr( rbuf, dsc, room->getExtraDescr(), ch );
 
-        for (EXTRA_EXIT_DATA *peexit = room->extra_exit;
-                                peexit;
-                                peexit = peexit->next)
+        for (auto &peexit: room->extra_exits)
             if (ch->can_see( peexit ))
                 rbuf << rprog_eexit_descr(room, peexit, ch, peexit->room_description);
 
@@ -1417,7 +1415,7 @@ static void do_look_object( Character *ch, Object *obj )
 
 static bool do_look_extraexit( Character *ch, const char *arg3 )
 {
-    EXTRA_EXIT_DATA * peexit = get_extra_exit( arg3, ch->in_room->extra_exit );
+    EXTRA_EXIT_DATA * peexit = ch->in_room->extra_exits.find(arg3);
 
     if (!peexit)
         return false;
@@ -1883,7 +1881,7 @@ CMDRUNP( exits )
     found = false;
     buf.str("");
 
-    for (EXTRA_EXIT_DATA *eexit = ch->in_room->extra_exit; eexit; eexit = eexit->next) {
+    for (auto &eexit: ch->in_room->extra_exits) {
         if (ch->can_see(eexit)) {
             StringList names = name_list(eexit->keyword);
             DLString name, nameRus;

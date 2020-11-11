@@ -486,14 +486,7 @@ void save_room(FILE *fp, RoomIndexData *pRoomIndex)
         }
     }
 
-    list<EXTRA_EXIT_DATA *> eelist;
-    for(peexit = pRoomIndex->extra_exit; peexit; peexit = peexit->next)
-        eelist.push_back(peexit);
-    
-    while(!eelist.empty()) {
-        peexit = eelist.back();
-        eelist.pop_back();
-
+    for(auto &peexit: pRoomIndex->extra_exits) {
         fprintf(fp, "D6\n%s~\n", fix_string(peexit->description));
         fprintf(fp, "%s~\n", fix_string(peexit->keyword));
         fprintf(fp, "%s~\n", fix_string(peexit->short_desc_from));

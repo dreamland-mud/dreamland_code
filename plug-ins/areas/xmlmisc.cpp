@@ -20,8 +20,6 @@ using namespace std;
 
 GSN(none);
 
-EXTRA_EXIT_DATA * new_extra_exit();
-
 /*********************************************************************
  * XMLOptionalString
  *********************************************************************/
@@ -394,13 +392,12 @@ XMLExtraExit::init(const extra_exit_data *ex)
 extra_exit_data *
 XMLExtraExit::compat( )
 {
-    EXTRA_EXIT_DATA *peexit = new_extra_exit();
+    EXTRA_EXIT_DATA *peexit = new EXTRA_EXIT_DATA;
     
     peexit->description = str_dup(description.getValue( ).c_str( ));
     peexit->exit_info_default = peexit->exit_info = flags.getValue( );
     peexit->key = key.getValue( );
     peexit->u1.vnum = target.getValue( );
-    peexit->level = 0;
 
     peexit->short_desc_from = str_dup( short_desc_from.getValue( ).c_str( ));
     peexit->short_desc_to = str_dup( short_desc_to.getValue( ).c_str( ));

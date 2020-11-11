@@ -338,27 +338,12 @@ void reset_room(Room *pRoom, int flags)
 
     for(iExit = 0; iExit < DIR_SOMEWHERE; iExit++) {
         EXIT_DATA *pExit = pRoom->exit[iExit];
-        if(pExit) {
-            if(IS_SET(pExit->exit_info_default, EX_LOCKED)) {
-                if(!IS_SET(pExit->exit_info, EX_LOCKED))
-                    SET_BIT(pExit->exit_info, EX_LOCKED);
-            } else {
-                if(IS_SET(pExit->exit_info, EX_LOCKED))
-                    REMOVE_BIT(pExit->exit_info, EX_LOCKED);
-            }
-            if(IS_SET(pExit->exit_info_default, EX_CLOSED)) {
-                if(!IS_SET(pExit->exit_info, EX_CLOSED))
-                    SET_BIT(pExit->exit_info, EX_CLOSED);
-            } else {
-                if(IS_SET(pExit->exit_info, EX_CLOSED))
-                    REMOVE_BIT(pExit->exit_info, EX_CLOSED);
-            }
-        }
+        if (pExit)
+            pExit->reset();
     }
 
-    for(eexit = pRoom->extra_exit; eexit; eexit = eexit->next) {
-        eexit->exit_info = eexit->exit_info_default;
-    }
+    for(auto &eexit: pRoom->extra_exits)
+        eexit->reset();
 
     mob     = 0;
     last    = true;

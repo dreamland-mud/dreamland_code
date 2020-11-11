@@ -57,11 +57,6 @@ OBJ_INDEX_DATA *new_obj_index();
 void free_obj_index(OBJ_INDEX_DATA * pObj);
 MOB_INDEX_DATA *new_mob_index();
 void free_mob_index(MOB_INDEX_DATA * pMob);
-// Defined in db.cpp
-EXTRA_EXIT_DATA *new_extra_exit();
-void free_extra_exit(EXTRA_EXIT_DATA *eeit);
-void delete_extra_exit(EXTRA_EXIT_DATA *eed, EXTRA_EXIT_DATA *prev_exit, EXTRA_EXIT_DATA *&list);
-EXTRA_EXIT_DATA * find_extra_exit(const char *argument, EXTRA_EXIT_DATA *&list, EXTRA_EXIT_DATA *&prev_exit);
 
 #define stc(t, c) (c)->send_to((t))
 #define IS_NPC(c) (c)->is_npc()

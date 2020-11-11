@@ -67,15 +67,15 @@ bool FleeMovement::findTargetRoom( )
     door = DIR_SOMEWHERE;
     pexit = NULL;
 
-    for (peexit = from_room->extra_exit; peexit; peexit = peexit->next) {
-        to_room = peexit->u1.to_room;
-        exit_info = peexit->exit_info;
+    for (auto &eexit: from_room->extra_exits) {
+        to_room = eexit->u1.to_room;
+        exit_info = eexit->exit_info;
 
         if (!canFlee( ch ) || (ch->mount && !canFlee( ch->mount )))
             continue;
 
         if (number_range( 0, count++ ) == 0) {
-            targetExtraExit = peexit;
+            targetExtraExit = eexit;
             targetDoor = door;
         }
     }

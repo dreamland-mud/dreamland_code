@@ -292,11 +292,9 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
         stc("{D(ed help){x\n\r", ch);
     }
 
-    if (pRoom->extra_exit) {
-        EXTRA_EXIT_DATA *eed;
-
+    if (!pRoom->extra_exits.empty()) {
         stc("Extra exits: {D(eexit help){x\r\n            ", ch);
-        for(eed = pRoom->extra_exit; eed; eed = eed->next) {
+        for(auto &eed: pRoom->extra_exits) {
             ptc(ch, "[%s] %s ", eed->keyword, web_edit_button(showWeb, ch, "eexit set", eed->keyword).c_str());
         }
         stc("{x\n\r", ch);
@@ -880,19 +878,13 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
     }
 
     if (is_name(command, "delete")) {    
-        EXTRA_EXIT_DATA *prev_exit;
-        EXTRA_EXIT_DATA *eed = find_extra_exit(argument, pRoom->extra_exit, prev_exit);
-
-        if (!eed) {
+        if (!pRoom->extra_exits.findAndDestroy(argument)) {
             stc("REdit:  Extra exit keyword not found.\n\r", ch);
             return false;
         }
 
-        delete_extra_exit(eed, prev_exit, pRoom->extra_exit);
-        eed = find_extra_exit(argument, pRoom->room->extra_exit, prev_exit);
-        if (eed)
-            delete_extra_exit(eed, prev_exit, pRoom->room->extra_exit);
-
+        // FIXME: need to destroy exit in all instances.
+        pRoom->room->extra_exits.findAndDestroy(argument);
         stc("Extra exit deleted.\n\r", ch);
         return true;
     }

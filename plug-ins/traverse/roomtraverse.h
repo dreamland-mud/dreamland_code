@@ -135,7 +135,7 @@ struct RoomRoadsIterator
             act( road );
         }
 
-        for (EXTRA_EXIT_DATA *eexit = room->extra_exit; eexit; eexit = eexit->next) {
+        for (auto &eexit: room->extra_exits) {
             if (!eexit->u1.to_room)
                 continue;
 

@@ -523,7 +523,7 @@ void fix_resets()
             pRoomIndex = get_room_index( pReset->arg1 );
 
             if ( pReset->arg2 == DIR_SOMEWHERE ) {
-                if ( pRoomIndex->extra_exit == 0 ) {
+                if ( pRoomIndex->extra_exits.empty() ) {
                     bad_reset( "Load_resets: 'D': room %d does not contain extra exits", pReset->arg1 );
                     break;
                 }
@@ -732,9 +732,7 @@ void load_rooms( FILE *fp )
                             peexit->moving_to = fread_number( fp );
                             peexit->moving_mode_to = fread_number( fp );
                             
-                            
-                            peexit->next = pRoomIndex->extra_exit;
-                            pRoomIndex->extra_exit= peexit;
+                            pRoomIndex->extra_exits.push_front(peexit);
                             break;
                     }
 
@@ -899,7 +897,6 @@ void fix_exits( bool verbose )
         Room *to_room = 0;
         EXIT_DATA *pexit;
         EXIT_DATA *pexit_rev = 0;
-        EXTRA_EXIT_DATA *peexit;
         int door;
         static const int rev_dir [] = { 2, 3, 0, 1, 5, 4 };
 
@@ -912,7 +909,7 @@ void fix_exits( bool verbose )
             RoomIndexData *pRoomIndex = r.second;
             Room *room = pRoomIndex->room; // FIXME all instances will be linked
 
-            for ( door = 0; door <= 5; door++ )
+            for ( door = 0; door < DIR_SOMEWHERE; door++ )
             {
                     if ( ( pexit = room->exit[door] ) != 0 )
                     {
@@ -924,13 +921,12 @@ void fix_exits( bool verbose )
                             else
                             {
                                     fexit = true;
-                                    pexit->u1.to_room = get_room_instance( pexit->u1.vnum );
+                                    pexit->resolve();
                             }
                     }
             }
 
-            peexit = room->extra_exit;
-            while ( peexit )
+            for (auto &peexit: room->extra_exits)
             {
                     if ( peexit->u1.vnum <= 0
                             || get_room_instance(peexit->u1.vnum) == 0 )
@@ -940,10 +936,8 @@ void fix_exits( bool verbose )
                     else
                     {
                             fexit = true;
-                            peexit->u1.to_room = get_room_instance( peexit->u1.vnum );
+                            peexit->resolve();
                     }
-
-                    peexit = peexit->next;
             }
 
             if ( !fexit )
@@ -1124,7 +1118,7 @@ void fix_door_levels( bool verbose )
                     << "level " <<  ex->level << endl;
         }
 
-        for (EXTRA_EXIT_DATA *ex = r->extra_exit; ex; ex = ex->next) {
+        for (auto &ex: r->extra_exits) {
             if (!IS_SET(ex->exit_info_default, EX_CLOSED))
                 continue;
             if (IS_SET(ex->exit_info_default, EX_NOPASS))

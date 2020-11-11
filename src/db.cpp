@@ -203,29 +203,43 @@ void free_extra_descr(EXTRA_DESCR_DATA *ed)
     delete ed;
 }
 
-EXTRA_EXIT_DATA * new_extra_exit()
+void exit_data::resolve()
 {
-    static EXTRA_EXIT_DATA eexit_zero;
-    EXTRA_EXIT_DATA *eexit;
-    
-    eexit = new EXTRA_EXIT_DATA;
-    *eexit = eexit_zero;
-    eexit->keyword = eexit->description = eexit->room_description = eexit->short_desc_to = eexit->short_desc_from = str_empty;
-    
-    return eexit;
+    u1.to_room = get_room_instance( u1.vnum );
 }
 
-void free_extra_exit(EXTRA_EXIT_DATA *eexit)
+void exit_data::reset()
 {
-    free_string(eexit->keyword);
-    free_string(eexit->short_desc_from);
-    free_string(eexit->short_desc_to);
-    free_string(eexit->description);
-    free_string(eexit->room_description);
-
-    delete eexit;
+    exit_info = exit_info_default;
 }
 
+extra_exit_data::extra_exit_data()
+    : exit_info(0), exit_info_default(0),
+      key(0), moving_mode_from(0), moving_mode_to(0),
+      max_size_pass(0), level(0)
+{
+    u1.to_room = 0;
+    keyword = description = room_description = short_desc_to = short_desc_from = str_empty;
+}
+
+extra_exit_data::~extra_exit_data()
+{
+    free_string(keyword);
+    free_string(short_desc_from);
+    free_string(short_desc_to);
+    free_string(description);
+    free_string(room_description);
+}
+
+void extra_exit_data::resolve()
+{
+    u1.to_room = get_room_instance( u1.vnum );
+}
+
+void extra_exit_data::reset()
+{
+    exit_info = exit_info_default;
+}
 
 /*
  * Get an extra description from a list.

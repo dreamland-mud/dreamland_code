@@ -150,8 +150,7 @@ XMLRoom::init(RoomIndexData *room)
             exits[dirs[pExit->orig_door].name].init(pExit);
     }
 
-    EXTRA_EXIT_DATA *peexit;
-    for(peexit = room->extra_exit; peexit; peexit = peexit->next)
+    for(auto &peexit: room->extra_exits)
         extraExits[peexit->keyword].init(peexit);
 
     EXTRA_DESCR_DATA *pEd;
@@ -216,8 +215,7 @@ XMLRoom::compat(int vnum)
     for(eeit = extraExits.rbegin( ); eeit != extraExits.rend( ); eeit++) {
         EXTRA_EXIT_DATA *peexit = eeit->second.compat( );
         peexit->keyword = str_dup(eeit->first.c_str( ));
-        peexit->next = room->extra_exit;
-        room->extra_exit = peexit;
+        room->extra_exits.push_front(peexit);
     }
 
     XMLListBase<XMLExtraDescr>::reverse_iterator edit;

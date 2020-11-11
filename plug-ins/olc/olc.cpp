@@ -625,7 +625,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 buf = &cbuf;
             else
                 buf = &abuf;
-            for (EXTRA_EXIT_DATA *eexit = room->extra_exit; eexit; eexit = eexit->next) {
+            for (auto &eexit: room->extra_exits) {
                 (*buf) << dlprintf(lineFormat.c_str(), room->vnum, room->getName(), eexit->keyword) << endl;
             }
         }

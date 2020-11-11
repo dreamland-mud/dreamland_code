@@ -21,9 +21,29 @@ CLAN(none);
 PROF(none);
 LIQ(none);
 
+extra_exit_data *ExtraExitList::find(const DLString &keyword) const
+{
+    for (auto &eexit: *this)
+        if (is_name(keyword.c_str(), eexit->keyword))
+            return eexit;
+
+    return 0;
+}
+
+bool ExtraExitList::findAndDestroy(const DLString &keyword)
+{
+    extra_exit_data *eexit = find(keyword);
+    if (!eexit)
+        return false;
+
+    remove(eexit);
+    delete eexit;
+    return true;
+}
+
 RoomIndexData::RoomIndexData()
         : next(0), reset_first( 0 ), reset_last( 0 ),
-          extra_descr(0), extra_exit(0),
+          extra_descr(0),
           name(&str_empty[0]), description(&str_empty[0]), 
           vnum(0), room_flags(0),
           sector_type(0), heal_rate(100), mana_rate(100),
@@ -37,14 +57,14 @@ RoomIndexData::RoomIndexData()
 Room::Room( ) : 
                 rnext( 0 ),
                 people( 0 ), contents( 0 ),
-                area( 0 ), extra_exit( 0 ),                
+                area( 0 ),
                 owner(&str_empty[0]),
                 vnum( 0 ), room_flags( 0 ), 
                 light( 0 ),
-                mod_heal_rate( 0 ), mod_mana_rate( 0 ), 
                 affected_by( 0 ),
                 behavior( RoomBehavior::NODE_NAME ),
-                pIndexData(0)
+                pIndexData(0),
+                mod_heal_rate( 0 ), mod_mana_rate( 0 ), ID(0)
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
         exit[i] = 0;

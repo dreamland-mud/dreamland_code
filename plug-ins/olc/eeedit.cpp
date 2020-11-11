@@ -42,8 +42,7 @@ OLCStateExtraExit::OLCStateExtraExit( RoomIndexData *pRoom, const DLString &name
     room.setValue(pRoom->vnum);
     keyword.setValue(name); 
     
-    EXTRA_EXIT_DATA *prev_exit;
-    EXTRA_EXIT_DATA *eexit = find_extra_exit(name.c_str(), pRoom->extra_exit, prev_exit);
+    EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(name);
     
     if(!eexit)
         return;
@@ -85,13 +84,11 @@ OLCStateExtraExit::commit( )
 
     SET_BIT(pRoom->area->area_flag, AREA_CHANGED);
 
-    EXTRA_EXIT_DATA *prev_exit;
-    EXTRA_EXIT_DATA *eexit = find_extra_exit(keyword.c_str(), pRoom->extra_exit, prev_exit);
+    EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(keyword);
     
     if(!eexit) {
-        eexit = new_extra_exit( );
-        eexit->next = pRoom->extra_exit;
-        pRoom->extra_exit = eexit;
+        eexit = new EXTRA_EXIT_DATA;
+        pRoom->extra_exits.push_front(eexit);
     }
 
     eexit->u1.vnum = to_room;
@@ -117,12 +114,11 @@ OLCStateExtraExit::commit( )
     eexit->description = str_dup( description.getValue( ).c_str( ) );
     eexit->room_description = str_dup( room_description.getValue( ).c_str( ) );
 
-    EXTRA_EXIT_DATA *eexit0 = find_extra_exit(keyword.c_str(), pRoom->room->extra_exit, prev_exit);
-    delete_extra_exit(eexit0, prev_exit, pRoom->room->extra_exit);
-    eexit0 = eexit->create();
-    eexit0->u1.to_room = get_room_instance(eexit0->u1.vnum);
-    eexit0->next = pRoom->room->extra_exit;
-    pRoom->room->extra_exit = eexit0;
+    // FIXME: need to update all instances
+    pRoom->room->extra_exits.findAndDestroy(keyword);
+    EXTRA_EXIT_DATA *eexit0 = eexit->create();
+    eexit0->resolve();
+    pRoom->room->extra_exits.push_front(eexit0);
 }
 
 void

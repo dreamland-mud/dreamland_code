@@ -431,12 +431,19 @@ struct        exit_data
         int                orig_door;
         int                level;
 
+        /** Resolve u1 from a virtual number to the real room. */
+        void resolve(); 
+
+        /** Restore exit flags to their original values. */
+        void reset();
+
         exit_data *create(); // Implemented in loadsave plugin.
 };
 
 struct        extra_exit_data
 {
-        EXTRA_EXIT_DATA *        next;
+        extra_exit_data();
+        virtual ~extra_exit_data();
         union
         {
                 Room *        to_room;
@@ -456,6 +463,12 @@ struct        extra_exit_data
         char *                description;
         char *                room_description;
         int                level;
+
+        /** Resolve u1 from a virtual number to the real room. */
+        void resolve(); 
+
+        /** Restore exit flags to their original values. */
+        void reset();
 
         extra_exit_data *create(); // Implemented in loadsave plugin.
 };

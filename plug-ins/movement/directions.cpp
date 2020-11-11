@@ -159,17 +159,6 @@ int find_exit( Character *ch, const char *arg, int flags )
     return door;
 }
 
-EXTRA_EXIT_DATA * get_extra_exit ( const char * name,EXTRA_EXIT_DATA * list )
-{
-        for( ; list != 0; list = list->next )
-        {
-                if ( is_name( (char *) name , list->keyword ) )
-                        return list;
-        }
-
-        return 0;
-}
-
 const char * direction_doorname(EXIT_DATA *pexit)
 {
     if (!pexit || !pexit->short_descr || !pexit->short_descr[0])
