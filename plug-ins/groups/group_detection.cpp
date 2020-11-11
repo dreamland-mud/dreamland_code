@@ -562,7 +562,6 @@ SKILL_RUNP( lore )
   char arg1[MAX_INPUT_LENGTH];
   Object *obj;
   char buf[MAX_STRING_LENGTH];
-  Affect *paf;
   int chance;
   int value0, value1, value2, value3;
   int mana, learned;
@@ -1032,10 +1031,10 @@ SKILL_RUNP( lore )
   ostr.str(std::string());
 
   if (!obj->enchanted)
-      for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
+      for (auto &paf: obj->pIndexData->affected)
           lore_fmt_affect( obj, paf, ostr );
 
-  for (paf = obj->affected; paf != 0; paf = paf->next)
+  for (auto &paf: obj->affected)
           lore_fmt_affect( obj, paf, ostr );
 
       ch->send_to(ostr);

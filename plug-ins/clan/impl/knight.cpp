@@ -342,8 +342,8 @@ bool KnightWeapon::death(Character *ch)
 
     ch->hit = 1;
 
-    while (ch->affected)
-        affect_remove(ch, ch->affected);
+    for (auto &paf: ch->affected.clone())
+        affect_remove(ch, paf);
 
     ch->unsetLastFightTime();
     SET_DEATH_TIME(ch);

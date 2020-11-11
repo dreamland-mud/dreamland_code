@@ -288,10 +288,8 @@ void HunterArmor::wear( Character *ch )
 {
     obj->level = ch->getRealLevel( );
 
-    if (obj->affected) {
-        Affect *paf;
-
-        for (paf = obj->affected; paf; paf = paf->next)
+    if (!obj->affected.empty()) {
+        for (auto &paf: obj->affected)
             addAffect( ch, paf );
     }
     else {
@@ -375,10 +373,8 @@ void HunterWeapon::wear( Character *ch )
             break;
         }
 
-    if (obj->affected) {
-        Affect *paf;
-
-        for (paf = obj->affected; paf; paf = paf->next)
+    if (!obj->affected.empty()) {
+        for (auto &paf: obj->affected)
             addAffect( ch, paf );
     }
     else {

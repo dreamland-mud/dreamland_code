@@ -1719,16 +1719,8 @@ NMI_INVOKE( CharacterWrapper, isAffected, "(skillName): находится ли 
 NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аффекты с именем skillName" )
 {
     checkTarget( );
-    Skill *skill;
-    
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
-
-    skill = skillManager->findExisting( args.front( ).toString( ) );
-    
-    if (!skill)
-        throw Scripting::IllegalArgumentException( );
-    
+    Skill *skill = args2skill(args);
+        
     affect_strip( target, skill->getIndex( ) );
     return Register( );
 }
@@ -2055,9 +2047,8 @@ NMI_GET( CharacterWrapper, affected, "список всех аффектов (Li
 {
     checkTarget();
     RegList::Pointer rc(NEW);
-    Affect *paf;
 
-    for (paf = target->affected; paf != 0; paf = paf->next) 
+    for (auto &paf: target->affected) 
         rc->push_back( AffectWrapper::wrap( *paf ) );
         
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();

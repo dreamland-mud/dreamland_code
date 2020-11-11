@@ -1106,30 +1106,30 @@ void UndefinedOneHit::damEffectMasterSword( )
             
     katana->cost = 0;
 
-    paf = katana->affected->affect_find(gsn_katana);
+    paf = katana->affected.find(gsn_katana, APPLY_HITROLL);
     if (!paf)
         return;
     
     if (paf->level == 120)
         return;
             
-            
     old_mod = paf->modifier;
     new_mod = min(paf->modifier+1, ch->getModifyLevel() / 3);
-            
-    //do not dull an already sharp katana            
-    if(new_mod > old_mod){  
-                
-    paf->modifier = new_mod;         
-    ch->hitroll += new_mod - old_mod;
-       
-    if (paf->next != 0) {
-        paf->next->modifier = new_mod;
-        ch->damroll += new_mod - old_mod;
+
+    //do not dull an already sharp katana
+    if (new_mod > old_mod) {
+
+        paf->modifier = new_mod;
+        ch->hitroll += new_mod - old_mod;
+
+        Affect *paf_dr = katana->affected.find(gsn_katana, APPLY_DAMROLL);
+        if (paf_dr) {
+            paf_dr->modifier = new_mod;
+            ch->damroll += new_mod - old_mod;
         }
     }
-            
-    act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana,0, TO_ROOM);
+
+    act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana, 0, TO_ROOM);
     act("$o1 в твоей $T руке загорается {Cголубым светом{x.", 
             ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);
 }

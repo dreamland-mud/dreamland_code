@@ -227,9 +227,10 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     if (IS_WEAPON_STAT(wield,WEAPON_POISON))
     {
         short level;
-        Affect *poison = 0, af;
+        Affect *poison, af;
 
-        if (!wield->affected || (poison = wield->affected->affect_find(gsn_poison)) == 0)
+        poison = wield->affected.find(gsn_poison);
+        if (!poison)
             level = wield->level;
         else
             level = poison->level;
@@ -301,10 +302,9 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     }
     
     if (IS_WEAPON_STAT(wield, WEAPON_SPELL)) {
-        Affect *waf;
         int lvl;
 
-        for (waf = wield->affected; waf; waf = waf->next) 
+        for (auto &waf: wield->affected) 
             if (IS_SET( waf->bitvector, WEAPON_SPELL ) 
                 && waf->where == TO_WEAPON
                 && number_range( 1, waf->modifier ) == 1) 

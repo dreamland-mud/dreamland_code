@@ -15,6 +15,7 @@
 #include "object.h"
 #include "wearlocation.h"
 #include "wearloc_codes.h"
+#include "affect.h"
 
 #include "dreamland.h"
 #include "loadsave.h"

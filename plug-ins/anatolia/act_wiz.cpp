@@ -258,9 +258,8 @@ char arg[MAX_STRING_LENGTH];
             obj->value0(), obj->value1(), obj->value2(), obj->value3() );
         break;
     }
-       for( paf=obj->pIndexData->affected; paf != 0; paf = paf->next )
+       for (auto &paf: obj->pIndexData->affected)
        {
-            if ( paf == 0 ) continue;
             fprintf( fp, "  Изменяет %s на %d.\n",
                 apply_flags.message( paf->location ).c_str( ), paf->modifier );
             if (paf->bitvector)
@@ -1011,7 +1010,6 @@ CMDWIZP( stat )
 {
         char buf[MAX_STRING_LENGTH];
         char arg[MAX_INPUT_LENGTH];
-        Affect *paf;
         Object *obj;
         Liquid *liquid;
 
@@ -1219,7 +1217,7 @@ CMDWIZP( stat )
                 ch->send_to("'\n\r");
         }
 
-    for ( paf = obj->affected; paf != 0; paf = paf->next )
+    for (auto &paf: obj->affected)
     {
         sprintf( buf, "Изменяет %s на %d, уровень %d",
             apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
@@ -1271,7 +1269,7 @@ CMDWIZP( stat )
     }
 
     if (!obj->enchanted)
-    for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
+    for (auto &paf: obj->pIndexData->affected)
     {
         sprintf( buf, "Изменяет %s на %d, уровень %d.\n\r",
             apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
@@ -1514,7 +1512,7 @@ static bool has_nopost(Character *ch)
             buf << "Спец-процедура " << spec_fun_name << "." << endl;
     }
     
-    for (Affect *paf = victim->affected; paf; paf = paf->next) {
+    for (auto &paf: victim->affected) {
         buf << "Аффект: '" << paf->type->getName( ) << "', ";
 
         if (paf->location != APPLY_NONE)
@@ -3664,7 +3662,6 @@ CMDWIZP( notitle )
 
 CMDWIZP( noaffect )
 {
-    Affect *paf,*paf_next;
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
 
@@ -3679,12 +3676,12 @@ CMDWIZP( noaffect )
         return;
     }
 
-    for ( paf = victim->affected; paf != 0; paf = paf_next )
-    {
-        paf_next        = paf->next;
+    AffectList affects = victim->affected.clone();
+    for (auto paf_iter = affects.cbegin(); paf_iter != affects.cend(); paf_iter++) {
+        Affect *paf = *paf_iter;
         if ( paf->duration >= 0 )
         {
-            if (paf->type->getAffect( ))
+            if (!affects.hasNext(paf_iter) && paf->type->getAffect( ))
                 paf->type->getAffect( )->remove( victim );
 
             affect_remove( victim, paf );
@@ -4114,8 +4111,7 @@ CMDWIZP( dump )
         count++;
         if (fch->getPC( ) != 0)
             num_pcs++;
-        for (af = fch->affected; af != 0; af = af->next)
-            aff_count++;
+        aff_count += fch->affected.size();
     }
 
     fprintf(fp,"Mobs        %4d (%8ld bytes), %2d free (%ld bytes)\n",
@@ -4133,8 +4129,7 @@ CMDWIZP( dump )
     for ( vnum = 0; nMatch < top_obj_index; vnum++ )
         if ( ( pObjIndex = get_obj_index( vnum ) ) != 0 )
         {
-            for (af = pObjIndex->affected; af != 0; af = af->next)
-                aff_count++;
+            aff_count += pObjIndex->affected.size();
             nMatch++;
         }
 
@@ -4147,8 +4142,7 @@ CMDWIZP( dump )
     for (obj = object_list; obj != 0; obj = obj->next)
     {
         count++;
-        for (af = obj->affected; af != 0; af = af->next)
-            aff_count++;
+        aff_count += obj->affected.size();
     }
 
     /* rooms */

@@ -478,10 +478,11 @@ SKILL_RUNP( manacles )
                 act_p("$c1 бросает быстрый взгляд на руки $C4.",
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-                if ( victim->isAffected(gsn_manacles) )
+                Affect *paf = victim->affected.find(gsn_manacles);
+
+                if (paf)
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_manacles) : 0;
 
                         if ( paf->duration >= 0 )
                         {
@@ -1077,7 +1078,7 @@ SKILL_RUNP( suspect )
         if ( arg == 0
                 || arg[0] == '\0' )
         {
-                Affect *paf = victim->affected ? victim->affected->affect_find (gsn_suspect) : 0;
+                Affect *paf = victim->affected.find (gsn_suspect);
 
                 if ( paf != 0 )   
                 {
@@ -1236,10 +1237,11 @@ SKILL_RUNP( jail )
                 act_p("$c1 пристально смотрит на $C4.",
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-                if ( victim->isAffected(gsn_jail) )
+                Affect *paf = victim->affected.find (gsn_jail);
+                if (paf)
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_jail) : 0;
+                        
 
                         if ( paf->duration >= 0 )
                         {
@@ -1421,10 +1423,11 @@ SKILL_RUNP( dismiss )
                 act_p("$c1 роется в личном деле $C4.",
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-                if ( victim->isAffected(gsn_dismiss) )
+                Affect *paf = victim->affected.find (gsn_dismiss);
+
+                if (paf)
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_dismiss) : 0;
 
                         if ( paf->duration >= 0 )
                         {

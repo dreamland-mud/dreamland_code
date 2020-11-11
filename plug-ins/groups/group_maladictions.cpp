@@ -221,7 +221,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
     {
         Affect *paf;
 
-        paf = obj->affected ? obj->affected->affect_find(gsn_bless) : 0;
+        paf = obj->affected.find(gsn_bless);
         if (!savesDispel(level,paf != 0 ? paf->level : obj->level,0))
         {
             if (paf != 0)
@@ -851,17 +851,17 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
         else if (!IS_AFFECTED( it, AFF_CURSE )) {
             Affect af;
             
-            af.where = TO_AFFECTS;
             af.type  = sn;
             af.level = level;
             af.duration = 2 * level;
             af.location = APPLY_HITROLL;
             af.modifier = -1 * (level / 5);
-            af.bitvector = AFF_CURSE;
             affect_to_char( it, &af );
             
             af.location  = APPLY_SAVING_SPELL;
             af.modifier  = level / 8;
+            af.where = TO_AFFECTS;
+            af.bitvector = AFF_CURSE;
             affect_to_char( it, &af );
 
             it->send_to("Ты чувствуешь себя отвратительно.\n\r");

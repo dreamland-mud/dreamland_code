@@ -360,10 +360,6 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     // However, allow weapon level as low as 80+ for heroes.
     weaponLevelDiff = max(1, ch->getModifyLevel() / 5); 
     if (victim->getModifyLevel() - wield->level > weaponLevelDiff) {
-        notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), weapon level %d, diff %d.",
-                ch->getNameP('1').c_str(), ch->getModifyLevel(),
-                victim->getNameP('1').c_str(), victim->getModifyLevel(),
-                wield->level, weaponLevelDiff);
         return false;
     }
 
@@ -371,10 +367,6 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     chance = 1 + learned / 30; 
     chance += (ch->getModifyLevel() - victim->getModifyLevel()) / 2;
     chance = max(1, chance);
-    notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), learned %d, chance %d, level diff %d.",
-            ch->getNameP('1').c_str(), ch->getModifyLevel(),
-            victim->getNameP('1').c_str(), victim->getModifyLevel(),
-            learned, chance, (ch->getModifyLevel() - victim->getModifyLevel()) / 2);
 
     // Dice roll failed, learn from mistakes.
     if (number_percent() > chance) {
@@ -390,10 +382,6 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     act_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
     dam *= ch->getPC( )->curse / 100;
-    notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), damage %d, victim hp %d/%d.",
-            ch->getNameP('1').c_str(), ch->getModifyLevel(),
-            victim->getNameP('1').c_str(), victim->getModifyLevel(),
-            dam, victim->hit, victim->max_hit);
     damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
     gsn_mortal_strike->improve( ch, true, victim );
     return true;

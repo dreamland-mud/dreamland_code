@@ -79,28 +79,8 @@ OLCStateObject::~OLCStateObject( )
 
 void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
 {
-    Affect *af, **my_af = &obj.affected;
-    list<Affect *> afflist;
-    for(af = original->affected; af; af = af->next)
-        afflist.push_back(af);
-
-    while(!afflist.empty()) {
-        af = afflist.back();
-        afflist.pop_back();
-        
-        *my_af = dallocate( Affect );
-        (*my_af)->where    =af->where; 
-        (*my_af)->type     =af->type; 
-        (*my_af)->level    =af->level;
-        (*my_af)->duration =af->duration;
-        (*my_af)->location =af->location;
-        (*my_af)->modifier =af->modifier;
-        (*my_af)->bitvector=af->bitvector;
-        (*my_af)->global.setRegistry(af->global.getRegistry());
-        (*my_af)->global.set(af->global);
-        my_af = &(*my_af)->next;
-    }
-    *my_af = 0;
+    for (auto &paf: original->affected)
+        obj.affected.push_back(paf->clone());
     
     obj.item_type    = original->item_type;
     obj.extra_flags  = original->extra_flags;
@@ -176,13 +156,9 @@ void OLCStateObject::commit()
     original->extra_descr = obj.extra_descr;
     obj.extra_descr = 0;
     
-    Affect *af, *af_next;
-    for(af = original->affected; af; af = af_next) {
-        af_next = af->next;
-        ddeallocate( af );
-    }
-    original->affected = obj.affected;
-    obj.affected = 0;
+    original->affected.deallocate();
+    original->affected.assign(obj.affected.begin(), obj.affected.end());
+    obj.affected.clear();
     
     for(o = object_list; o; o = o->next)
         if(o->pIndexData == original) {
@@ -268,8 +244,7 @@ OEDIT(show)
 {
     OBJ_INDEX_DATA *pObj;
     char buf[MAX_STRING_LENGTH];
-    Affect *paf;
-    int cnt;
+    int cnt = 0;
     bool showWeb = !arg_oneof_strict(argument, "noweb");
 
     EDIT_OBJ(ch, pObj);
@@ -340,7 +315,7 @@ OEDIT(show)
               web_edit_button(showWeb, ch, "long", "web").c_str(), pObj->description);
     stc(buf, ch);
 
-    for (cnt = 0, paf = pObj->affected; paf; paf = paf->next) {
+    for (auto &paf: pObj->affected) {
         if (cnt == 0) {
             stc("Number Modifier Location Where      What\n\r", ch);
             stc("------ -------- -------- ---------- ---------------------------\n\r", ch);
@@ -394,7 +369,7 @@ OEDIT(show)
         stc(buf, ch);
         cnt++;
     }
-    if (pObj->affected)
+    if (!pObj->affected.empty())
         stc("{D          ? apply_flags  ? affwhere_flags{x\r\n", ch);
 
     show_obj_values(ch, pObj);
@@ -583,8 +558,7 @@ OEDIT(addaffect)
         pAf->global.setRegistry(skillGroupManager);
         pAf->global.set(group->getIndex());
     }
-    pAf->next = pObj->affected;
-    pObj->affected = pAf;
+    pObj->affected.push_front(pAf);
 
     stc("Affect added.\n\r", ch);
     return true;
@@ -596,10 +570,8 @@ OEDIT(delaffect)
 {
     OBJ_INDEX_DATA *pObj;
     Affect *pAf;
-    Affect *pAf_next;
     char affect[MAX_STRING_LENGTH];
     int value;
-    int cnt = 0;
 
     EDIT_OBJ(ch, pObj);
 
@@ -617,30 +589,19 @@ OEDIT(delaffect)
         return false;
     }
 
-    if (!(pAf = pObj->affected)) {
-        stc("OEdit:  Non-existant affect.\n\r", ch);
+    if (pObj->affected.empty()) {
+        stc("OEdit: No affects found.\n\r", ch);
         return false;
     }
 
-    if (value == 0) {                /* First case: Remove first affect */
-        pAf = pObj->affected;
-        pObj->affected = pAf->next;
-        free_affect(pAf);
-    }
-    else {                        /* Affect to remove is not the first */
-        while ((pAf_next = pAf->next) && (++cnt < value))
-            pAf = pAf_next;
-
-        if (pAf_next) {                /* See if it's the next affect */
-            pAf->next = pAf_next->next;
-            free_affect(pAf_next);
-        }
-        else {                        /* Doesn't exist */
-            stc("No such affect.\n\r", ch);
-            return false;
-        }
+    pAf = pObj->affected.get(value);
+    if (!pAf) {
+        stc("No such affect.\n\r", ch);
+        return false;
     }
 
+    pObj->affected.remove(pAf);
+    ddeallocate(pAf);
     stc("Affect removed.\n\r", ch);
     return true;
 }

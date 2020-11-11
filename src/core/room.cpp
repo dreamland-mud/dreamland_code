@@ -43,7 +43,7 @@ Room::Room( ) :
                 vnum( 0 ), room_flags( 0 ), 
                 light( 0 ), sector_type( 0 ),
                 heal_rate( 100 ), mana_rate( 100 ), 
-                affected( 0 ), affected_by( 0 ),
+                affected_by( 0 ),
                 behavior( RoomBehavior::NODE_NAME ),
                 pIndexData(0)
 {

@@ -26,7 +26,7 @@ WEARLOC(stuck_in);
 void affect_remove_obj( Object *obj, Affect *paf )
 {
     int where, vector;
-    if ( obj->affected == NULL )
+    if ( obj->affected.empty())
     {
         bug( "Affect_remove_object: no affect.", 0 );
         return;
@@ -50,29 +50,7 @@ void affect_remove_obj( Object *obj, Affect *paf )
             break;
         }
 
-    if ( paf == obj->affected )
-    {
-        obj->affected    = paf->next;
-    }
-    else
-    {
-        Affect *prev;
-
-        for ( prev = obj->affected; prev != NULL; prev = prev->next )
-        {
-            if ( prev->next == paf )
-            {
-                prev->next = paf->next;
-                break;
-            }
-        }
-        if ( prev == NULL )
-        {
-            bug( "Affect_remove_object: cannot find paf.", 0 );
-            return;
-        }
-    }
-
+    obj->affected.remove(paf);
     ddeallocate( paf );
 
     if (obj->carried_by != NULL && obj->wear_loc != wear_none)
@@ -81,13 +59,7 @@ void affect_remove_obj( Object *obj, Affect *paf )
 
 void affect_to_obj( Object *obj, Affect *paf )
 {
-    Affect *paf_new;
-
-    paf_new = dallocate( Affect );
-
-    *paf_new            = *paf;
-    paf_new->next       = obj->affected;
-    obj->affected                = paf_new;
+    obj->affected.push_front(paf->clone());
 
     if (paf->bitvector)
         switch (paf->where)
@@ -104,9 +76,7 @@ void affect_to_obj( Object *obj, Affect *paf )
 
 void affect_enhance( Object *obj, Affect *newAff )
 {
-    Affect *paf;
-    
-    for (paf = obj->affected; paf != 0; paf = paf->next) {
+    for (auto &paf: obj->affected) {
         if (paf->location != newAff->location)
             continue;
         
@@ -127,11 +97,11 @@ void affect_enhance( Object *obj, Affect *newAff )
 void affect_enchant( Object *obj )
 {
     if (!obj->enchanted) {
-        Affect af, *paf;
+        Affect af;
 
         obj->enchanted = true;
 
-        for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next) {
+        for (auto &paf: obj->pIndexData->affected) {
             af = *paf;
             
             af.type = paf->type;
@@ -286,13 +256,12 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
 /* fix object affects when removing one */
 void affect_check(Character *ch,int where,int vector)
 {
-        Affect *paf;
         Object *obj;
 
         if (where == TO_OBJECT || where == TO_WEAPON || vector == 0)
                 return;
 
-        for (paf = ch->affected; paf != 0; paf = paf->next)
+        for (auto &paf: ch->affected)
                 if (paf->where == where && ( ( paf->bitvector & vector ) > 0 ) )
                 {
                         switch (where)
@@ -329,7 +298,7 @@ void affect_check(Character *ch,int where,int vector)
                 if (obj->wear_loc == wear_none || obj->wear_loc == wear_stuck_in)
                         continue;
 
-                for ( paf = obj->affected; paf != 0; paf = paf->next )
+                for (auto &paf: obj->affected)
                         if ( paf->where == where && ( ( paf->bitvector & vector ) > 0 ) )
                         {
                                 switch (where)
@@ -364,7 +333,7 @@ void affect_check(Character *ch,int where,int vector)
                 if (obj->enchanted)
                         continue;
 
-                for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
+                for (auto &paf: obj->pIndexData->affected)
                         if (paf->where == where && ( ( paf->bitvector & vector ) > 0 ))
                         {
                                 switch (where)
@@ -433,21 +402,16 @@ void affect_check(Character *ch,int where,int vector)
  */
 void affect_to_char( Character *ch, Affect *paf )
 {
-        Affect *paf_new;
         bool need_saving = false;
 
-        paf_new = dallocate( Affect );
-
-        *paf_new                = *paf;
-        paf_new->next        = ch->affected;
-        ch->affected        = paf_new;
+        ch->affected.push_front(paf->clone());
 
         need_saving = ch->is_npc( )
-                && paf_new->where == TO_AFFECTS
-                && IS_SET( paf_new->bitvector, AFF_CHARM )
+                && paf->where == TO_AFFECTS
+                && IS_SET( paf->bitvector, AFF_CHARM )
                 && ch->in_room;
 
-        affect_modify( ch, paf_new, true );
+        affect_modify( ch, paf, true );
 
         if ( need_saving )
                 save_mobs( ch->in_room );
@@ -464,7 +428,7 @@ void affect_remove( Character *ch, Affect *paf )
         int vector;
         bool need_saving = false;
 
-        if ( ch->affected == 0 )
+        if ( ch->affected.empty())
         {
                 bug( "Affect_remove: no affect.", 0 );
                 return;
@@ -480,32 +444,7 @@ void affect_remove( Character *ch, Affect *paf )
                 && IS_SET( vector, AFF_CHARM )
                 && ch->in_room;
 
-        if ( paf == ch->affected )
-        {
-                ch->affected        = paf->next;
-        }
-        else
-        {
-                Affect *prev;
-
-                for ( prev = ch->affected; prev != 0; prev = prev->next )
-                {
-                        if ( prev->next == paf )
-                        {
-                                prev->next = paf->next;
-                                break;
-                        }
-                }
-
-                if ( prev == 0 )
-                {
-                        char bugbuf[MAX_STRING_LENGTH];
-                        sprintf( bugbuf, "%s: Affect_remove: cannot find paf.", ch->getNameP() );
-                        bug( bugbuf, 0 );
-                        return;
-                }
-        }
-
+        ch->affected.remove(paf);
         ddeallocate( paf );
 
         affect_check(ch,where,vector);
@@ -521,17 +460,14 @@ void affect_remove( Character *ch, Affect *paf )
  */
 void affect_strip( Character *ch, int sn )
 {
-        Affect *paf;
-        Affect *paf_next;
+    for (auto &paf: ch->affected.findAll(sn))
+        affect_remove( ch, paf );
+}
 
-        for ( paf = ch->affected; paf != 0; paf = paf_next )
-        {
-                paf_next = paf->next;
-                if ( paf->type == sn )
-                        affect_remove( ch, paf );
-        }
-
-        return;
+void affect_strip( Object *obj, int sn )
+{
+    for (auto &paf: obj->affected.findAll(sn))
+        affect_remove_obj( obj, paf );
 }
 
 /*
@@ -539,34 +475,16 @@ void affect_strip( Character *ch, int sn )
  */
 void affect_bit_strip(Character *ch, int where, int bits)
 {
-    Affect *paf, *paf_next;
-
-    for (paf = ch->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-
-        if (paf->where == where && (paf->bitvector & bits))
-            affect_remove(ch, paf);
-    }
+    for (auto &paf: ch->affected.findAllWithBits(where, bits))
+        affect_remove(ch, paf);
 }
-
-bool affect_bit_check( Affect *paf_list, short where, int bits )
-{
-    for (Affect *paf = paf_list; paf; paf = paf->next)
-        if (paf->where == where && (paf->bitvector & bits))
-            return true;
-
-    return false;
-}
-
 
 /*
  * Add or enhance an affect.
  */
 void affect_join( Character *ch, Affect *paf )
 {
-    Affect *paf_old;
-
-    for ( paf_old = ch->affected; paf_old != 0; paf_old = paf_old->next )
+    for (auto &paf_old: ch->affected)
     {
         if ( paf_old->type == paf->type )
         {

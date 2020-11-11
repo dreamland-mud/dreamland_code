@@ -463,8 +463,8 @@ void death_cry( Character *ch, int part )
 
 void reset_dead_player( PCharacter *victim )
 {
-    while (victim->affected)
-        affect_remove( victim, victim->affected );
+    for (auto &paf: victim->affected.clone())
+        affect_remove( victim, paf );
 
     victim->affected_by    = 0;
     victim->add_affected_by = 0;

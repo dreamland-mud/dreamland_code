@@ -387,11 +387,11 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
 /*-------------------------------------------------------------------------
  * AffectsWebPromptListener
  *------------------------------------------------------------------------*/
-static Bitstring zero_affect_bitstring( int where, Affect *list, const Bitstring &bits )
+static Bitstring zero_affect_bitstring( int where, AffectList &list, const Bitstring &bits )
 {
     Bitstring zero;
 
-    for (Affect *paf = list; paf; paf = paf->next) {
+    for (auto &paf: list) {
         if (paf->duration != 0)
             continue;
         if (paf->where != where)
@@ -481,7 +481,7 @@ Json::Value AffectsWebPromptListener::jsonMalad( Descriptor *d, Character *ch )
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
         
         if (paf->type == gsn_blindness) 
@@ -553,7 +553,7 @@ Json::Value AffectsWebPromptListener::jsonClan( Descriptor *d, Character *ch )
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
         
         if (paf->type == gsn_resistance) 
@@ -629,7 +629,7 @@ Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
         
         if (paf->type == gsn_invisibility) 
@@ -680,7 +680,7 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
 
         if (paf->type == gsn_stardust) 
@@ -757,7 +757,7 @@ Json::Value AffectsWebPromptListener::jsonEnhance( Descriptor *d, Character *ch 
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
 
         if (paf->type == gsn_haste) 

@@ -2385,7 +2385,6 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     Skill *skill;
     Liquid *liquid;
     const char *mat;
-    Affect *paf;
     Keyhole::Pointer keyhole;
 
     buf << "{W" << obj->getShortDescr( '1' ) << "{x";
@@ -2567,9 +2566,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     lore_fmt_wear( obj->item_type, obj->wear_flags, buf );
 
     if (!obj->enchanted)
-        for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
+        for (auto &paf: obj->pIndexData->affected)
             lore_fmt_affect( obj, paf, buf );
 
-    for (paf = obj->affected; paf != 0; paf = paf->next)
+    for (auto &paf: obj->affected)
         lore_fmt_affect( obj, paf, buf );
 }

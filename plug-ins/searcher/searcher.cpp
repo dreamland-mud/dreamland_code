@@ -267,7 +267,7 @@ public:
             DLString aff,det,imm,res,vuln;
             DLString align;
 
-            for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+            for (auto &paf: pObj->affected) {
                 int m = paf->modifier;
 
                 switch (paf->location) {
@@ -410,7 +410,7 @@ public:
             int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
             DLString align;
 
-            for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+            for (auto &paf: pObj->affected) {
                 int m = paf->modifier;
 
                 switch (paf->location) {

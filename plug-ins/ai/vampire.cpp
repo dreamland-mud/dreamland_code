@@ -77,12 +77,8 @@ struct BasicMobileBehavior::VampVictims : public vector<Character *> {
     }
     inline bool mustSuck( Character *wch )
     {
-        Affect *paf;
+        Affect *paf = wch->affected.find(gsn_vampiric_touch);
 
-        for (paf = wch->affected; paf; paf = paf->next)
-            if (paf->type == gsn_vampiric_touch)
-                break;
-        
         if (!paf && number_percent( ) < 30)
             return true;
         if (paf && paf->duration == 0)

@@ -465,13 +465,12 @@ SKILL_RUNP( camp )
 AFFECT_DECL(Camp);
 VOID_AFFECT(Camp)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    if (!paf->next || paf->next->type != gsn_camp)
-        return;
-
-    buf << fmt( 0, "Здесь разбит лагерь, который в течение {W%1$d{x ча%1$Iса|сов|сов "
-                   "улучшает восстановление здоровья на {W%2$d{x и маны на {W%3$d{x.",
-                   paf->duration, paf->modifier, paf->next->modifier )
-        << endl;
+    if (paf->location == APPLY_ROOM_HEAL)
+        buf << fmt( 0, "Разбитый здесь лагерь улучшит восстановление здоровья на {W%2$d{x в течение {W%1$d{x ча%1$Iса|сов|сов.",
+                    paf->duration, paf->modifier) << endl;
+    else if (paf->location == APPLY_ROOM_MANA)
+        buf << fmt( 0, "Разбитый здесь лагерь улучшит восстановление маны на {W%2$d{x в течение {W%1$d{x ча%1$Iса|сов|сов.",
+                    paf->duration, paf->modifier) << endl;
 }
 
 
@@ -986,8 +985,6 @@ SKILL_RUNP( forest )
 
 BOOL_SKILL( forest )::run( Character *ch, int type ) 
 {
-    Affect* paf;
-
     if (ch->in_room->sector_type != SECT_FOREST
         && ch->in_room->sector_type != SECT_HILLS
         && ch->in_room->sector_type != SECT_MOUNTAIN) 
@@ -996,7 +993,7 @@ BOOL_SKILL( forest )::run( Character *ch, int type )
     if (ch->is_npc( ))
         return gsn_forest_fighting->usable( ch );
 
-    for (paf = ch->affected; paf; paf = paf->next) 
+    for (auto &paf: ch->affected) 
         if (paf->type == gsn_forest_fighting
             && paf->modifier == type)
         {

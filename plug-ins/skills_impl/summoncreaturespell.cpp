@@ -64,7 +64,7 @@ NPCharacter * SummonCreatureSpell::createMobileAux(
     mob->damage[DICE_BONUS] = dice_bonus;
 
     // Make sure all permanent affect on the mob have non-zero level.
-    for (Affect *paf = mob->affected; paf; paf = paf->next) {
+    for (auto &paf: mob->affected) {
         if (paf->duration == -1)
             paf->level = mob->getRealLevel();
     }

@@ -202,8 +202,7 @@ Affect * fread_Affc( FILE *fp )
         paf->modifier        = fread_number(fp);
         paf->location        = fread_number(fp);
         paf->bitvector        = fread_number(fp);
-        paf->next        = NULL;
-        
+
         globalString    = fread_dlstring_to_eol(fp);
         globalString.substitute('\r', ' ').substitute('\n', ' ');
         globalString.stripWhiteSpace( );        
@@ -299,7 +298,7 @@ void fwrite_char( PCharacter *ch, FILE *fp )
 {
 
         fprintf( fp, "#%s\n",  "PLAYER"        );
-        for (Affect* paf = ch->affected; paf != 0; paf = paf->next )
+        for (auto &paf: ch->affected)
             fwrite_affect( fp, paf );
 
         fprintf( fp, "End\n\n" );
@@ -308,8 +307,6 @@ void fwrite_char( PCharacter *ch, FILE *fp )
 /* write a pet */
 void fwrite_pet( NPCharacter *pet, FILE *fp)
 {
-        Affect *paf;
-
         fprintf(fp,"#PET\n");
 
         fprintf(fp,"Vnum %d\n",pet->pIndexData->vnum);
@@ -392,7 +389,7 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
                 pet->mod_stat[STAT_WIS], pet->mod_stat[STAT_DEX],
                 pet->mod_stat[STAT_CON], pet->mod_stat[STAT_CHA]);
 
-        for ( paf = pet->affected; paf != 0; paf = paf->next )
+        for (auto &paf: pet->affected)
             fwrite_affect( fp, paf );
 
         fprintf(fp,"End\n");
@@ -403,8 +400,6 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
 /* write a mobile */
 void fwrite_mob( NPCharacter *mob, FILE *fp)
 {
-        Affect *paf;
-
         if ( mob->in_room == 0 )
         {
                 bug( "Write_mobile: mobile not in room! ", 0 );
@@ -507,7 +502,7 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
                 mob->mod_stat[STAT_WIS], mob->mod_stat[STAT_DEX],
                 mob->mod_stat[STAT_CON], mob->mod_stat[STAT_CHA]);
 
-        for ( paf = mob->affected; paf != 0; paf = paf->next )
+        for (auto &paf: mob->affected)
             fwrite_affect( fp, paf );
 
         fprintf(fp,"End\n");
@@ -561,7 +556,6 @@ void fwrite_obj( Character *ch, Object *obj, FILE *fp, int iNest )
 void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 {
         EXTRA_DESCR_DATA *ed;
-        Affect *paf;
 
     /*
      * Slick recursion to write lists backwards,
@@ -689,7 +683,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                         break;
                 }
 
-                for ( paf = obj->affected; paf != 0; paf = paf->next )
+                for (auto &paf: obj->affected)
                     fwrite_affect( fp, paf );
 
                 for ( ed = obj->extra_descr; ed != 0; ed = ed->next )
@@ -710,7 +704,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 if ( obj->contains != 0 )
                         fwrite_obj( ch, obj->contains, fp, iNest + 1 );
         }
-        catch(Exception e)
+        catch(const Exception &e)
         {
                 char buf[MAX_STRING_LENGTH];
 
@@ -808,9 +802,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             if (!str_cmp(word, "Affc"))
             {
                 Affect *paf = fread_Affc( fp );
-
-                paf->next       = ch->affected;
-                ch->affected    = paf;
+                ch->affected.push_front(paf);
                 fMatch = true;
                 break;
             }
@@ -1180,8 +1172,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 Affect *paf = fread_Affc( fp );
                 
                 if (!pet->isAffected(paf->type)) {
-                    paf->next       = pet->affected;
-                    pet->affected   = paf;
+                    pet->affected.push_front(paf);
                 }
                 fMatch          = true;
                 break;
@@ -1394,15 +1385,7 @@ NPCharacter * fread_mob( FILE *fp )
     }
     
     mob->pIndexData->count++;
-
-    while ( mob->affected )
-    {
-            Affect *paf = mob->affected->next;
-
-            ddeallocate ( mob->affected );
-
-            mob->affected = paf;
-    }
+    mob->affected.deallocate();
 
     try {
         for ( ; ; )
@@ -1795,8 +1778,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     if (!str_cmp(word,"Affc"))
                     {
                             Affect *paf = fread_Affc( fp );
-                            paf->next       = obj->affected;
-                            obj->affected   = paf;
+                            obj->affected.push_front(paf);
                             fMatch          = true;
                             break;
                     }

@@ -38,7 +38,7 @@ Object::Object( ) :
                 short_descr( 0 ), description( 0 ), material( 0 ), 
                 next( 0 ), prev( 0 ),
                 next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
-                carried_by( 0 ), extra_descr( 0 ), affected( 0 ), pIndexData( 0 ),
+                carried_by( 0 ), extra_descr( 0 ), pIndexData( 0 ),
                 in_room( 0 ), enchanted( 0 ),
                 item_type( 0 ),
                 extra_flags( 0 ), wear_flags( 0 ), 
@@ -57,14 +57,9 @@ Object::Object( ) :
 
 void Object::extract( )
 {
-        Affect* paf_next;
         EXTRA_DESCR_DATA* ed_next;
         
-        for( Affect* paf = affected; paf != 0; paf = paf_next )
-        {
-                paf_next = paf->next;
-                ddeallocate( paf );
-        }
+        affected.deallocate();
 
         for( EXTRA_DESCR_DATA* ed = extra_descr; ed != 0; ed = ed_next )
         {
@@ -88,7 +83,6 @@ void Object::extract( )
         on = 0;
         carried_by = 0;
         extra_descr = 0;
-        affected = 0;
         pIndexData = 0;
         in_room = 0;
         enchanted = 0;
@@ -129,14 +123,9 @@ void Object::extract( )
 
 Object::~Object( )
 {
-    Affect *paf, *paf_next;
     EXTRA_DESCR_DATA *ed, *ed_next;
 
-        for (paf = affected; paf != 0; paf = paf_next)
-        {
-                paf_next = paf->next;
-                ddeallocate( paf );
-        }
+    affected.deallocate();
 
         for (ed = extra_descr; ed != 0; ed = ed_next )
         {
@@ -423,13 +412,7 @@ int Object::getTrueWeight( ) const
 
 bool Object::isAffected( int sn ) const
 {
-    Affect *paf;
-
-    for (paf = affected; paf != 0; paf = paf->next) 
-        if (paf->type == sn)
-            return true;
-
-    return false;
+    return affected.find(sn) != 0;
 }
 
 bool Object::hasOwner( const Character *ch ) const

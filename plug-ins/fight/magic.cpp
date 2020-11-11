@@ -125,7 +125,7 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
     }
     
     if (ch)
-        for (Affect *paf = ch->affected; paf; paf = paf->next)
+        for (auto &paf: ch->affected)
             if (paf->type->getAffect( ))
                 paf->type->getAffect( )->saves( ch, victim, save, dam_type, paf );
 
@@ -406,9 +406,7 @@ bool savesDispel( int dis_level, int spell_level, int duration)
 
 bool checkDispel( int dis_level, Character *victim, int sn)
 {
-    Affect *af;
-
-    for (af = victim->affected; af != 0; af = af->next) {
+    for (auto af: victim->affected.clone()) {
         if (af->type != sn) 
             continue;
 

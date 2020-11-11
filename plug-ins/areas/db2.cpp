@@ -415,8 +415,7 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
             paf->modifier           = fread_number( fp );
             paf->bitvector          = 0;
 
-            paf->next               = pObjIndex->affected;
-            pObjIndex->affected     = paf;
+            pObjIndex->affected.push_front(paf);
             top_affect++;
         } else if (letter == 'F') {
             paf                     = dallocate( Affect );
@@ -439,8 +438,7 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
             paf->modifier           = fread_number(fp);
             paf->bitvector          = fread_flag(fp);
 
-            paf->next               = pObjIndex->affected;
-            pObjIndex->affected     = paf;
+            pObjIndex->affected.push_front(paf);
             top_affect++;
         } else if ( letter == 'E' ) {
             EXTRA_DESCR_DATA *ed;

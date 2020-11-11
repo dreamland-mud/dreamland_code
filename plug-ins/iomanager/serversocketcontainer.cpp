@@ -49,7 +49,7 @@ DLString ServerSocketContainer::getNodeName( ) const
 
 ServerSocket * ServerSocketContainer::findSocket(int desc)
 {
-    for (auto elem: elements) {
+    for (auto &elem: elements) {
         ServerSocket *sock = elem.getStaticPointer<ServerSocket>();
         if (sock && sock->getFD() == desc)
             return sock;

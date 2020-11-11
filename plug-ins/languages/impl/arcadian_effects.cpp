@@ -288,7 +288,7 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
         return;
     }
 
-    for (Affect *paf = victim->affected; paf; paf = paf->next)
+    for (auto &paf: victim->affected)
         if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_SLEEP)) {
             slevel += paf->level;
             scount++;

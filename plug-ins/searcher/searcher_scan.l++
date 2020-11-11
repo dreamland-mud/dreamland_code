@@ -203,7 +203,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     p.material = pObj->material;
     p.fenia = fenia_triggers(pObj->wrapper);
 
-    for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+    for (auto &paf: pObj->affected) {
         int m = paf->modifier;
 
         switch (paf->location) {

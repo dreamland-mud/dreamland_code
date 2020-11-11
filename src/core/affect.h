@@ -28,8 +28,6 @@ XML_OBJECT;
 public:
         typedef ::Pointer<Affect> Pointer;
 
-public:
-        Affect* next;
         short where;
         XMLSkillReference type;
         short level;
@@ -43,7 +41,7 @@ public:
         Affect( );
         virtual ~Affect( );
         
-        Affect* affect_find( int );
+        Affect *clone() const;
         Character *getOwner( ) const;
 };
 

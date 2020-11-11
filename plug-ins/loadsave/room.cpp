@@ -156,40 +156,31 @@ void Room::affectModify( Affect *paf, bool fAdd )
  */
 void Room::affectTo( Affect *paf )
 {
-    Affect *paf_new;
-    Room *pRoomIndex;
-
-    if (!affected) {
+    if (affected.empty()) {
         roomAffected.insert(this);
     }
 
-    paf_new = dallocate( Affect );
+    affected.push_front(paf->clone());
 
-    *paf_new                = *paf;
-    paf_new->next        = affected;
-    affected        = paf_new;
-
-    affectModify( paf_new, true );
+    affectModify( paf, true );
 }
 
 void Room::affectCheck( int where, int vector )
 {
-    Affect *paf;
-
     if (vector == 0)
         return;
 
-    for (paf = affected; paf != 0; paf = paf->next)
+    for (auto &paf: affected)
         if (paf->where == where && paf->bitvector == vector)
         {
             switch (where)
             {
                 case TO_ROOM_AFFECTS:
-                      SET_BIT(affected_by,vector);
+                    SET_BIT(affected_by,vector);
                     break;
                 case TO_ROOM_FLAGS:
-                            SET_BIT(room_flags, vector);
-                        break;
+                    SET_BIT(room_flags, vector);
+                    break;
                 case TO_ROOM_CONST:
                     break;
             }
@@ -205,7 +196,7 @@ void Room::affectRemove( Affect *paf )
     int where;
     int vector;
 
-    if ( affected == 0 )
+    if (affected.empty())
     {
         bug( "Affect_remove_room: no affect.", 0 );
         return;
@@ -215,29 +206,12 @@ void Room::affectRemove( Affect *paf )
     where = paf->where;
     vector = paf->bitvector;
 
-    if (paf == affected) {
-        affected        = paf->next;
-    }
-    else {
-        Affect *prev;
-
-        for (prev = affected; prev != 0; prev = prev->next)
-            if (prev->next == paf) {
-                prev->next = paf->next;
-                break;
-            }
-
-        if (prev == 0) {
-            bug( "Affect_remove_room: cannot find paf.", 0 );
-            return;
-        }
-    }
-
+    affected.remove(paf);
     ddeallocate( paf );
 
     affectCheck( where, vector );
 
-    if (!affected)
+    if (affected.empty())
         roomAffected.erase(this);
 }
 
@@ -246,15 +220,8 @@ void Room::affectRemove( Affect *paf )
  */
 void Room::affectStrip( int sn )
 {
-    Affect *paf;
-    Affect *paf_next;
-
-    for (paf = affected; paf != 0; paf = paf_next )
-    {
-        paf_next = paf->next;
-        if ( paf->type == sn )
-            affectRemove( paf );
-    }
+    for (auto &paf: affected.findAll(sn))
+        affectRemove( paf );
 }
 
 
@@ -263,9 +230,7 @@ void Room::affectStrip( int sn )
  */
 void Room::affectJoin( Affect *paf )
 {
-    Affect *paf_old;
-
-    for ( paf_old = affected; paf_old != 0; paf_old = paf_old->next )
+    for (auto &paf_old: affected)
     {
         if ( paf_old->type == paf->type )
         {
@@ -279,7 +244,6 @@ void Room::affectJoin( Affect *paf )
     }
 
     affectTo( paf );
-    return;
 }
 
 
@@ -288,15 +252,7 @@ void Room::affectJoin( Affect *paf )
  */
 bool Room::isAffected( int sn ) const
 {
-    Affect *paf;
-
-    for ( paf = affected; paf != 0; paf = paf->next )
-    {
-        if ( paf->type == sn )
-            return true;
-    }
-
-    return false;
+    return affected.find(sn) != 0;
 }
 
 /** Whether an item can contribute to the light in the room. */

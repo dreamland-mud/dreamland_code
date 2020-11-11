@@ -63,12 +63,10 @@ void follower_add( Character *ch, Character *mch )
 
 static void afprog_stopfol( Character *ch )
 {
-    Affect *paf, *paf_next;
-
-    for (paf = ch->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-
-        if (paf->type->getAffect( ))
+    AffectList affects = ch->affected.clone();
+    for (auto paf_iter = affects.cbegin(); paf_iter != affects.cend(); paf_iter++) {
+        Affect *paf = *paf_iter;
+        if (!affects.hasNext(paf_iter) && paf->type->getAffect( ))
             paf->type->getAffect( )->stopfol( ch, paf );
     }
 }

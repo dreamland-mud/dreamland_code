@@ -13,12 +13,12 @@
 #include "race.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "clanreference.h"
 
 #include "fight.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "gsn_plugin.h"
 #include "effects.h"
 #include "stats_apply.h"
@@ -297,10 +297,9 @@ void MissileOneHit::damApplyDamroll( )
 
 void MissileOneHit::damApplyMissile( )
 {
-    Affect *paf;
     int bonus = 0;
 
-    for (paf = missile->affected; paf != 0; paf = paf->next)
+    for (auto &paf: missile->affected)
         if (paf->location == APPLY_DAMROLL)
             bonus += paf->modifier;
 
@@ -319,10 +318,9 @@ void MissileOneHit::calcTHAC0( )
 
 void MissileOneHit::thacApplyMissile( )
 {
-    Affect *paf;
     int bonus = 0;
 
-    for (paf = missile->affected; paf != 0; paf = paf->next)
+    for (auto &paf: missile->affected)
         if (paf->location == APPLY_HITROLL)
             bonus += paf->modifier;
 
@@ -372,7 +370,8 @@ void MissileOneHit::damEffectFunkyWeapon( )
         short level;
         Affect *poison, af;
 
-        if (!missile->affected || (poison = missile->affected->affect_find(gsn_poison)) == 0)
+        poison = missile->affected.find(gsn_poison);
+        if (!poison)
             level = missile->level;
         else
             level = poison->level;

@@ -21,6 +21,7 @@
 #include "wearlocation.h"
 #include "nounholder.h"
 #include "russianstring.h"
+#include "affectlist.h"
 
 class Character;
 
@@ -65,7 +66,7 @@ public:
     Object            *  on;
     Character          *  carried_by;
     EXTRA_DESCR_DATA  *  extra_descr;
-    Affect            *  affected;
+    AffectList  affected;
     OBJ_INDEX_DATA    *  pIndexData;
     Room              *  in_room;
     bool                enchanted;

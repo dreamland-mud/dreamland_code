@@ -202,7 +202,6 @@ void save_mobile(FILE * fp, const MOB_INDEX_DATA * pMobIndex)
 void save_object(FILE * fp, const OBJ_INDEX_DATA * pObjIndex)
 {
     char letter;
-    Affect *pAf;
     EXTRA_DESCR_DATA *pEd;
 
     fprintf(fp, "%s~\n", pObjIndex->name);
@@ -338,15 +337,8 @@ void save_object(FILE * fp, const OBJ_INDEX_DATA * pObjIndex)
         letter = 'R';
 
     fprintf(fp, "%c\n", letter);
-
-    list<Affect *> afflist;
-    for (pAf = pObjIndex->affected; pAf; pAf = pAf->next)
-        afflist.push_back(pAf);
     
-    while (!afflist.empty()) {
-        pAf = afflist.back();
-        afflist.pop_back();
-
+    for (auto &pAf: pObjIndex->affected) {
         if(pAf->where == TO_OBJECT)
             fprintf(fp, "A\n%d %d\n", pAf->location, pAf->modifier);
         else {

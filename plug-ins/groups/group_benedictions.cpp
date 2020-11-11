@@ -109,7 +109,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
     {
         Affect *paf;
 
-        paf = obj->affected ? obj->affected->affect_find(gsn_curse) : 0;
+        paf = obj->affected.find(gsn_curse);
         if (!savesDispel(level,paf != 0 ? paf->level : obj->level,0))
         {
             if (paf != 0)

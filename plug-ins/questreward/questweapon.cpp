@@ -34,10 +34,10 @@ void QuestWeapon::equip( Character *ch )
 
     obj->level = ch->getRealLevel( );
 
-    if( obj->affected )
-      for(Affect *paf = obj->affected; paf; paf = paf->next)
+    if (!obj->affected.empty()) {
+      for (auto &paf: obj->affected)
         addAffect( ch, paf );
-    else {
+    } else {
       Affect af;
 
       af.where = TO_OBJECT;

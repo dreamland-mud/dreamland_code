@@ -160,7 +160,6 @@ OBJ_INDEX_DATA *new_obj_index(void)
 
     pObj->next = NULL;
     pObj->extra_descr = NULL;
-    pObj->affected = NULL;
     pObj->area = NULL;
     pObj->name = str_dup("no name");
     pObj->short_descr = str_dup("(no short description)");
@@ -186,16 +185,12 @@ OBJ_INDEX_DATA *new_obj_index(void)
 void free_obj_index(OBJ_INDEX_DATA * pObj)
 {
     EXTRA_DESCR_DATA *pExtra;
-    Affect *pAf, *pAfNext;
 
     free_string(pObj->name);
     free_string(pObj->short_descr);
     free_string(pObj->description);
 
-    for (pAf = pObj->affected; pAf; pAf = pAfNext) {
-        pAfNext = pAf->next;
-        ddeallocate(pAf);
-    }
+    pObj->affected.deallocate();
 
     for (pExtra = pObj->extra_descr; pExtra; pExtra = pExtra->next) {
         free_extra_descr(pExtra);

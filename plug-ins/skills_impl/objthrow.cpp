@@ -118,10 +118,9 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
 {
     EXIT_DATA *pExit;
     Room *dest_room;
-    Affect *paf;
     int damroll=0,hitroll=0;
     
-    for ( paf = arrow->affected; paf != 0; paf = paf->next )
+    for (auto &paf: arrow->affected)
     {
             if ( paf->location == APPLY_DAMROLL )
                     damroll += paf->modifier;
@@ -218,7 +217,8 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
         short level;
         Affect *poison, af;
 
-        if (!arrow->affected || (poison = arrow->affected->affect_find(gsn_poison)) == 0)
+        poison = arrow->affected.find(gsn_poison);
+        if (!poison)
             level = arrow->level;
         else
             level = poison->level;

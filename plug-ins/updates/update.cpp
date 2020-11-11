@@ -690,7 +690,6 @@ void obj_update( void )
     Object *obj_next;
     Room *room;
     Character *carrier;
-    Affect *paf, *paf_next;
 
     for ( obj = object_list; obj != 0; obj = obj_next )
     {
@@ -728,9 +727,10 @@ void obj_update( void )
             continue;
 
         /* go through affects and decrement */
-        for ( paf = obj->affected; paf != 0; paf = paf_next )
-        {
-            paf_next    = paf->next;
+        AffectList affects = obj->affected.clone();
+        for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
+            Affect *paf = *paf_iter;
+
             if ( paf->duration > 0 )
             {
                 paf->duration--;
@@ -738,7 +738,7 @@ void obj_update( void )
                     paf->level--;  /* spell strength fades with time */
 
                 // Issue periodic message or action.
-                if (paf->type->getAffect( )) 
+                if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
                     paf->type->getAffect( )->update( obj, paf );
 
                 room_to_save( obj );
@@ -747,19 +747,11 @@ void obj_update( void )
                 ;
             else
             {
-                AffectHandler::Pointer ah;
-
-                if ( paf_next == 0 
-                        || paf_next->type != paf->type
-                        || paf_next->duration > 0 )
-                {
-                    ah = paf->type->getAffect( );
-                }
-
                 room_to_save( obj );
 
-                if (ah)
-                    ah->remove( obj );
+                if (!affects.hasNext(paf_iter))
+                    if (paf->type->getAffect())
+                        paf->type->getAffect()->remove( obj );
 
                 affect_remove_obj( obj, paf );
             }
@@ -1192,13 +1184,11 @@ void room_update( void )
     // Create temporary set to avoid removing set elements from inside the loop.
     tempAffected.insert(roomAffected.begin(), roomAffected.end());    
 
-    for (auto room: tempAffected) {
-        Affect *paf;
-        Affect *paf_next;
+    for (auto &room: tempAffected) {
+        AffectList affects = room->affected.clone();
+        for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
+            Affect *paf = *paf_iter;
 
-        for ( paf = room->affected; paf != 0; paf = paf_next )
-        {
-            paf_next        = paf->next;
             if ( paf->duration > 0 )
             {
                 paf->duration--;
@@ -1207,13 +1197,9 @@ void room_update( void )
                 ;
             else
             {
-                if ( paf_next == 0
-                        ||   paf_next->type != paf->type
-                        ||   paf_next->duration > 0 )
-                {
+                if (!affects.hasNext(paf_iter))
                     if (paf->type->getAffect( ))
                         paf->type->getAffect( )->remove( room );
-                }
 
                 room->affectRemove( paf );
             }
@@ -1223,20 +1209,18 @@ void room_update( void )
 
 void room_affect_update( )
 {
-    Affect *paf;
-
-    for (auto room: roomAffected) {        
+    for (auto &room: roomAffected) {        
         if (!room->people)
             continue;
         
-        for (paf = room->affected; paf; paf = paf->next) {
-            if (!paf->type->getAffect( )) 
-                continue;
-
+        for (auto paf_iter = room->affected.cbegin(); paf_iter != room->affected.cend(); paf_iter++) {
+            Affect *paf = *paf_iter;
+            
             if (paf->level == 1)
                 paf->level = 2;
 
-            paf->type->getAffect( )->update( room, paf );
+            if (!room->affected.hasNext(paf_iter) && paf->type->getAffect( )) 
+                paf->type->getAffect( )->update( room, paf );
         }
     }
 }
@@ -1423,16 +1407,11 @@ void idle_update( PCharacter *ch )
 
 void char_update_affects( Character *ch )
 {
-    Affect *paf;
-    list<Affect *> affects;
-    list<Affect *>::iterator paf_iter, paf_next;
-    
-    for (paf = ch->affected; paf != 0; paf = paf->next)
-        affects.push_back( paf );
-    
+    AffectList affects = ch->affected.clone();
+   
     try {    
-        for (paf_iter = affects.begin( ); paf_iter != affects.end( ); paf_iter++) {
-            paf = *paf_iter;
+        for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
+            Affect *paf = *paf_iter;
 
             if ( paf->duration > 0 )
             {
@@ -1443,7 +1422,7 @@ void char_update_affects( Character *ch )
                 if (number_range(0,4) == 0 && paf->level > 0)
                     paf->level--;
                 
-                if (paf->type->getAffect( )) 
+                if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
                     paf->type->getAffect( )->update( ch, paf );
             }
             else if ( paf->duration < 0 )
@@ -1451,16 +1430,10 @@ void char_update_affects( Character *ch )
             else
             {
                 room_to_save( ch );
-                paf_next = paf_iter;
-                paf_next++;
 
-                if (paf_next == affects.end( ) 
-                    || (*paf_next)->type != paf->type 
-                    || (*paf_next)->duration > 0)
-                {
+                if (!affects.hasNext(paf_iter))
                     if (paf->type->getAffect( )) 
                         paf->type->getAffect( )->remove( ch );
-                }
 
                 affect_remove( ch, paf );
             }
@@ -1475,15 +1448,13 @@ void char_update_affects( Character *ch )
  */
 static bool check_native_weapon( Character *ch, Object *obj )
 {
-    Affect *paf;
-
     if (!ch->is_npc( )
         || ch->getNPC( )->pIndexData->area != obj->pIndexData->area)
     {
         return false;
     }
 
-    for (paf = ch->affected; paf; paf = paf->next)
+    for (auto &paf: ch->affected)
         if (paf->location == APPLY_STR && paf->modifier < 0)
             return false;
     

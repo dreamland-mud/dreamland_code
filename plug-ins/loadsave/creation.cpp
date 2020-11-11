@@ -245,7 +245,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 static Scripting::IdRef initId( "init" );
                 try {
                     w->call(initId, "C", mob);
-                } catch (Exception e) {
+                } catch (const Exception &e) {
                     LogStream::sendError( ) 
                             << "create_mobile #" << pMobIndex->vnum 
                             << ": " <<  e.what( ) << endl;
@@ -319,7 +319,6 @@ void create_mob_affects(NPCharacter *mob)
 void clone_mobile(NPCharacter *parent, NPCharacter *clone)
 {
     int i;
-    Affect *paf;
 
     if (parent == 0 || clone == 0)
         return;
@@ -388,7 +387,7 @@ void clone_mobile(NPCharacter *parent, NPCharacter *clone)
         clone->damage[i]        = parent->damage[i];
 
     /* now add the affects */
-    for (paf = parent->affected; paf != 0; paf = paf->next)
+    for (auto &paf: parent->affected)
         affect_to_char(clone,paf);
 
 }
@@ -495,7 +494,7 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
                 static Scripting::IdRef initId( "init" );
                 try {
                     w->call(initId, "O", obj);
-                } catch (Exception e) {
+                } catch (const Exception &e) {
                     LogStream::sendError( ) 
                             << "create_object #" << pObjIndex->vnum 
                             << ": " <<  e.what( ) << endl;
@@ -510,7 +509,6 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
 void clone_object(Object *parent, Object *clone)
 {
     int i;
-    Affect *paf;
     EXTRA_DESCR_DATA *ed,*ed_new;
 
     if (parent == 0 || clone == 0)
@@ -547,7 +545,7 @@ void clone_object(Object *parent, Object *clone)
     /* affects */
     clone->enchanted        = parent->enchanted;
 
-    for (paf = parent->affected; paf != 0; paf = paf->next)
+    for (auto &paf: parent->affected)
         affect_to_obj( clone, paf);
 
     /* extended desc */

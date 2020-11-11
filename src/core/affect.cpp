@@ -17,7 +17,7 @@
 
 
 Affect::Affect( )
-        :         where( 0 ), level( 0 ),
+        :       where( 0 ), level( 0 ),
                 duration( 0 ), location( 0 ), modifier( 0 ),
                 bitvector( 0 )
 {
@@ -27,19 +27,23 @@ Affect::~Affect( )
 {
 }
 
-/* find an effect in an affect list */
-Affect* Affect::affect_find( int sn )
+Affect * Affect::clone() const
 {
-        for( Affect* paf_find = this;
-                paf_find != 0;
-                paf_find = paf_find->next )
-        {
-                if( paf_find->type == sn )
-                {
-                        return paf_find;
-                }
-        }
-        return 0;
+    Affect *paf;
+
+    paf = dallocate( Affect );
+    paf->where    = where; 
+    paf->type     = type; 
+    paf->level    = level;
+    paf->duration = duration;
+    paf->location = location;
+    paf->modifier = modifier;
+    paf->bitvector= bitvector;
+    paf->global.setRegistry(global.getRegistry());
+    paf->global.set(global);
+
+    return paf;
+
 }
 
 Character * Affect::getOwner( ) const

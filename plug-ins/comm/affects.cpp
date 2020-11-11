@@ -314,7 +314,7 @@ CMDRUNP( affects )
     // Keep track of res, vuln, hp/mana gain. 
     PermanentAffects permAff(ch);
  
-    for (Affect* paf = ch->affected; paf != 0; paf = paf->next ) {
+    for (auto &paf: ch->affected) {
         if (output.empty( ) || output.back( ).type != paf->type) 
             output.push_back( AffectOutput( paf, flags ) );
         

@@ -30,7 +30,6 @@ void ValentinePrise::equip( Character *ch )
 { 
     int level;
     Affect af;
-    Affect *paf;
     std::vector<int> locs; 
 
     obj->level = 1;
@@ -51,14 +50,10 @@ void ValentinePrise::equip( Character *ch )
     locs.push_back( APPLY_SAVES );
 
     for (unsigned int i = 0; i < locs.size( ); i++) {
-        for( paf = obj->affected; paf; paf = paf->next ) {
-            if (paf->location == locs[i]) {
-                addAffect( paf, level );
-                break;
-            }
-        }
-
-        if (!paf) {
+        Affect *paf = obj->affected.find(af.type, locs[i]);
+        if (paf) {
+            addAffect( paf, level );
+        } else {
             af.location = locs[i];
             addAffect( &af, level );
             affect_to_obj( obj, &af );

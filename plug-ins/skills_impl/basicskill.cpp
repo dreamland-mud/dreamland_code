@@ -237,7 +237,7 @@ int BasicSkill::getEffective( Character *ch ) const
 
     // Historical anti-bonus from anathema spell.
     if (IS_AFFECTED(ch, AFF_CURSE)) 
-        for (Affect *paf =ch-> affected; paf; paf=paf->next) 
+        for (auto &paf: ch->affected) 
             if (paf->type == gsn_anathema && paf->location == APPLY_LEVEL) 
                 result = result * 4 / (4 - paf->modifier/3);
 

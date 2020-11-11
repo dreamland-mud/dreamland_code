@@ -77,11 +77,11 @@
 #include "mobilespecial.h"
 #include "helpmanager.h"
 #include "autoflags.h"
+#include "affectlist.h"
 
 class NPCharacter;
 class Character;
 class Object;
-class Affect;
 class Room;
 class RoomIndexData;
 class XMLDocument;
@@ -381,7 +381,7 @@ struct        obj_index_data
     OBJ_INDEX_DATA *        next;
     OBJ_INDEX_DATA *        rnext;
     EXTRA_DESCR_DATA *        extra_descr;
-    Affect *        affected;
+    AffectList        affected;
     bool                new_format;
     char *                name;
     char *                short_descr;

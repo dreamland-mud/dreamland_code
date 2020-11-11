@@ -192,7 +192,6 @@ XMLObjIndexData::XMLObjIndexData()
 
     next = NULL;
     extra_descr = NULL;
-    affected = NULL;
     area = NULL;
     name = str_dup("no name");
     short_descr = str_dup("(no short description)");
@@ -254,16 +253,12 @@ void
 XMLObjIndexData::clear()
 {
     EXTRA_DESCR_DATA *pExtra, *pExtraNext;
-    Affect *pAf, *pAfNext;
 
     free_string(name);
     free_string(short_descr);
     free_string(description);
 
-    for (pAf = affected; pAf; pAf = pAfNext) {
-        pAfNext = pAf->next;
-        ddeallocate(pAf);
-    }
+    affected.deallocate();
 
     for (pExtra = extra_descr; pExtra; pExtra = pExtraNext) {
         pExtraNext = pExtra->next;

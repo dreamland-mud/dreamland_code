@@ -320,19 +320,14 @@ static void pour_out( Character *ch, Object * out, Character *victim )
     
     if (sips >= 5) {
         if (liq_water == liquid) {
-            Affect *paf, *paf_next;
             bool rc = false;
 
-            for (paf = victim->affected; paf; paf = paf_next) {
-                paf_next = paf->next;
+            for (auto &paf: victim->affected.findAll(gsn_poured_liquid)) {
+                paf->duration -= sips / 5;
+                rc = true;
 
-                if (paf->type == gsn_poured_liquid) {
-                    paf->duration -= sips / 5;
-                    rc = true;
-
-                    if (paf->duration < 0) 
-                        affect_remove( victim, paf );
-                }
+                if (paf->duration < 0) 
+                    affect_remove( victim, paf );
             }
 
             if (rc) 

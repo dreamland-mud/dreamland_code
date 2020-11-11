@@ -36,8 +36,8 @@
 #include "race.h"
 #include "racelanguage.h"
 #include "religion.h"
+#include "affectlist.h"
 
-class Affect;
 class PCharacter;
 class NPCharacter;
 class Object;
@@ -238,7 +238,7 @@ public:
     Character *                        fighting;
     Character *                        last_fought;
     Descriptor *                desc;
-    Affect *                        affected;
+    AffectList                  affected;
     Object *                        carrying;
     Object *                        on;
     Room *                        in_room;

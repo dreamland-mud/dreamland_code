@@ -218,7 +218,7 @@ bool PCharacter::load( )
     char_to_room(this, get_room_instance(ROOM_VNUM_LIMBO));
    
     /* Now add back spell effects. */
-    for (Affect *af = affected; af != 0; af = af->next)
+    for (auto &af: affected)
         affect_modify( this, af, true );
     
     /* Now start adding back the effects from items. Some of the items may add their own affects via onEquip progs,

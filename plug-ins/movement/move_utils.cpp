@@ -17,7 +17,7 @@
 #include "affect.h"
 #include "skill.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "clanreference.h"
 
 #include "act.h"
@@ -153,15 +153,11 @@ bool can_fly( Character *ch )
         if (obj->wear_loc == wear_none || obj->wear_loc == wear_stuck_in)
             continue;
         
-        if (affect_bit_check( obj->affected,
-                              TO_AFFECTS,
-                              AFF_FLYING ))
+        if (!obj->affected.findAllWithBits(TO_AFFECTS, AFF_FLYING ).empty())
             return true;
         
         if (!obj->enchanted)
-            if (affect_bit_check( obj->pIndexData->affected,
-                                  TO_AFFECTS,
-                                  AFF_FLYING ))
+            if (!obj->pIndexData->affected.findAllWithBits(TO_AFFECTS, AFF_FLYING ).empty())
                 return true;
     }
     

@@ -108,7 +108,7 @@ static bool afprog_smell( Character *victim, Character *ch, char *argument )
 {
     bool rc = false;
     
-    for (Affect *paf = victim->affected; paf; paf = paf->next) 
+    for (auto &paf: victim->affected) 
         if (paf->type->getAffect( ))
             if (paf->type->getAffect( )->smell( victim, ch, paf ))
                 rc = true;

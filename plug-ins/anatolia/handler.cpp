@@ -288,12 +288,10 @@ void reboot_anatolia( void )
 
 void eyes_blinded_msg( Character *ch )
 {
-    Affect *paf;
-
     if (!IS_AFFECTED(ch, AFF_BLIND))
         return;
 
-    for (paf = ch->affected; paf; paf = paf->next) 
+    for (auto &paf: ch->affected) 
         if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_BLIND)) {
             if (paf->type == gsn_fire_breath)
                 ch->println( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );

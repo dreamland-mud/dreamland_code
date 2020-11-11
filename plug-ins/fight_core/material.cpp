@@ -69,7 +69,7 @@ bool material_is_typed( Object *obj, int type )
 
     material_parse( obj, result );
     
-    for (auto mat: result)
+    for (auto &mat: result)
         if (IS_SET( mat->type, type ))
             return true;
 
@@ -82,7 +82,7 @@ bool material_is_flagged( Object *obj, int flags )
 
     material_parse( obj, result );
     
-    for (auto mat: result)
+    for (auto &mat: result)
         if (IS_SET( mat->flags, flags ))
             return true;
 
@@ -96,7 +96,7 @@ int material_swims( Object *obj )
 
     material_parse( obj, result );
     
-    for (auto mat: result)
+    for (auto &mat: result)
         swim += mat->floats;
     
     if (swim > 0)
@@ -114,7 +114,7 @@ int material_burns( Object *obj )
 
     material_parse( obj, result );
     
-    for (auto mat: result)
+    for (auto &mat: result)
         if (mat->burns < 0)
             return mat->burns;
         else if (mat->burns > max_burn)
@@ -131,7 +131,7 @@ int material_immune( Object *obj, Character *ch )
 
     material_parse( obj, result );
     
-    for (auto mat: result)
+    for (auto &mat: result)
         SET_BIT( bits, mat->vuln );
     
     immune_from_flags( ch, bits, res );

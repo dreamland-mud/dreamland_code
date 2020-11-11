@@ -30,8 +30,7 @@ XMLObjectFactory::init(const obj_index_data *obj)
     extra_flags.setValue(obj->extra_flags);
     wear_flags.setValue(obj->wear_flags);
 
-    Affect *pAf;
-    for (pAf = obj->affected; pAf; pAf = pAf->next) {
+    for (auto &pAf: obj->affected) {
         XMLAffect aff;
         aff.init(pAf);
         affects.push_back(aff);
@@ -90,8 +89,7 @@ XMLObjectFactory::compat(obj_index_data *obj)
     for(ait = affects.rbegin( ); ait != affects.rend( ); ait++) {
         Affect *pAf = ait->compat( );
         pAf->level = obj->level;
-        pAf->next = obj->affected;
-        obj->affected = pAf;
+        obj->affected.push_front(pAf);
     }
 
     XMLListBase<XMLExtraDescr>::reverse_iterator eit;

@@ -128,7 +128,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     /* find the bonuses */
 
     if (!obj->enchanted)
-        for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
+        for (auto &paf: obj->pIndexData->affected)
         {
             if ( paf->location == APPLY_AC )
             {
@@ -140,7 +140,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
                     fail += 20;
             }
 
-    for ( paf = obj->affected; paf != 0; paf = paf->next )
+    for (auto &paf: obj->affected)
     {
         if ( paf->location == APPLY_AC )
           {
@@ -176,19 +176,10 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 
     if (result < (fail / 3)) /* item disenchanted */
     {
-        Affect *paf_next;
-
         act("$o1 на миг ярко вспыхивает... но затем угасает.", ch,obj,0,TO_ALL);
         obj->enchanted = true;
-
         /* remove all affects */
-        for (paf = obj->affected; paf != 0; paf = paf_next)
-        {
-            paf_next = paf->next;
-            ddeallocate( paf );
-        }
-
-        obj->affected = 0;
+        obj->affected.deallocate();
 
         /* clear all flags */
         obj->extra_flags = obj->pIndexData->extra_flags;
@@ -298,7 +289,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     /* find the bonuses */
 
     if (!obj->enchanted)
-            for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
+            for (auto &paf: obj->pIndexData->affected)
             {
             if ( paf->location == APPLY_HITROLL )
             {
@@ -316,7 +307,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
                     fail += 25;
             }
 
-    for ( paf = obj->affected; paf != 0; paf = paf->next )
+    for (auto &paf: obj->affected)
     {
         if ( paf->location == APPLY_HITROLL )
           {
@@ -359,18 +350,11 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
 
    if (result < (fail / 2)) /* item disenchanted */
     {
-        Affect *paf_next;
-
         act("$o1 на миг ярко вспыхивает... но затем угасает.", ch,obj,0,TO_ALL);
         obj->enchanted = true;
 
         /* remove all affects */
-        for (paf = obj->affected; paf != 0; paf = paf_next)
-        {
-            paf_next = paf->next;
-            ddeallocate( paf );
-        }
-        obj->affected = 0;
+        obj->affected.deallocate();
 
         /* clear all flags */
         obj->extra_flags = obj->pIndexData->extra_flags;

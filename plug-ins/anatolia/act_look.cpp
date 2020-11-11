@@ -459,8 +459,8 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
 {
 	ostringstream buf;
 		
-    for (Affect *paf = room->affected; paf != 0; paf = paf->next)
-        if (paf->type->getAffect( ))
+    for (auto &paf: room->affected)
+        if (paf->type->getAffect())
             paf->type->getAffect( )->toStream( buf, paf );
 
     if (!buf.str().empty())
@@ -1303,14 +1303,8 @@ static void do_look_into( Character *ch, char *arg2 )
 
 static void afprog_look( Character *looker, Character *victim )
 {
-    Affect *paf, *paf_next;
-    
-    for (paf = victim->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-
-        if (paf->type->getAffect( ))
-            paf->type->getAffect( )->look( looker, victim, paf );
-    }
+    for (auto &paf: victim->affected.findAllWithHandler())
+        paf->type->getAffect( )->look( looker, victim, paf );
 }
 
 static void mprog_look(Character *looker, Character *victim)

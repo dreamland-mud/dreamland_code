@@ -382,7 +382,7 @@ void save_room_objects( Room *room )
         for (i = items.begin( ); i != items.end( ); i++)
             fwrite_obj_0( NULL, *i, fp, 0 );
     }
-    catch(Exception e)
+    catch(const Exception &e)
     {
             sprintf (fname,"{RSave_room: filling {Cvnum %d{R FAILED!!!!!!!!", room->vnum);
             bug(fname,0);

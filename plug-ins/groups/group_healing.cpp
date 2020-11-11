@@ -236,7 +236,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     }
 
     if (IS_AFFECTED(victim, AFF_PLAGUE)
-        && victim->affected && (paf = victim->affected->affect_find(gsn_plague)) != NULL)
+        && (paf = victim->affected.find(gsn_plague)) != NULL)
     {
         affect_join( ch, paf );
         ch->send_to( "Ты чувствуешь жар и лихорадку.\r\n" );
@@ -245,7 +245,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     }
 
     if ( IS_AFFECTED(victim, AFF_POISON)
-        && victim->affected && (paf = victim->affected->affect_find(gsn_poison)) != NULL)
+        && (paf = victim->affected.find(gsn_poison)) != NULL)
     {
         affect_join( ch, paf );
         ch->send_to( "Ты чувствуешь себя очень болезненно.\r\n" );

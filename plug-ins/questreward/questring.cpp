@@ -24,10 +24,9 @@ void QuestRing::equip( Character *ch )
 {
     obj->level = ch->getRealLevel( );
     
-    if( obj->affected ) {
+    if (!obj->affected.empty()) {
         // Updated existing affects to match player level.
-        Affect *paf;
-        for (paf = obj->affected; paf; paf = paf->next)
+        for (auto &paf: obj->affected)
             addAffect(ch, paf);
     }
     else {

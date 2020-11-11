@@ -20,13 +20,13 @@
 #include "clanreference.h"
 #include "liquid.h"
 #include "roombehavior.h"
+#include "affectlist.h"
 
 struct AreaIndexData;
 struct extra_descr_data;
 struct exit_data;
 struct extra_exit_data;
 struct reset_data;
-class Affect;
 typedef map<DLString, DLString> Properties;
 
 struct RoomHistoryEntry {
@@ -130,7 +130,7 @@ public:
     int        heal_rate;
     int        mana_rate;
     RoomHistory history;
-    Affect      *affected;
+    AffectList affected;
     int        affected_by;
 
     XMLPersistentStreamable<RoomBehavior> behavior;

@@ -338,18 +338,18 @@ int ExitsMovement::getPassDoorLevel( Character *wch )
     if (wch->getRace( )->getAff( ).isSet( AFF_PASS_DOOR ))
         return wch->getModifyLevel( ) * 11 / 10; 
 
-    for (Affect *paf = wch->affected; paf; paf = paf->next)
+    for (auto &paf: wch->affected)
         if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
             castLevel = max( castLevel, (int)paf->level );
 
     for (Object *obj = wch->carrying; obj; obj = obj->next_content)
         if (obj->wear_loc != wear_none) {
-            for (Affect *paf = obj->affected; paf; paf = paf->next)
+            for (auto &paf: obj->affected)
                 if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
                     eqLevel = max( eqLevel, obj->level );
 
             if (!obj->enchanted)
-                for (Affect *paf = obj->pIndexData->affected; paf; paf = paf->next)
+                for (auto &paf: obj->pIndexData->affected)
                     if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
                         eqLevel = max( eqLevel, obj->level );
         }

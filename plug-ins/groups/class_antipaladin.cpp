@@ -300,26 +300,26 @@ void ShadowBlade::fight( Character *ch )
         int coef = 100 - bonus;
         int vhp = (victim->hit * coef) / max( 1, (int)victim->max_hit );
         
-        if (number_percent( ) > vhp && ++castCnt >= 100) {
+        if (number_percent( ) > vhp && ++castCnt >= 50) {
             const struct blade_param *p = find_blade_param( level );
-            Affect *paf;
-            int oldMod;
             
             castCnt = 0;
             
             if (++castChance > 80)
                 castChance = 80;
             
-            if (obj->affected && ( paf = obj->affected->affect_find( gsn_shadowblade ) )) {
-                oldMod = paf->modifier;
-                paf->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
-                ch->hitroll += paf->modifier - oldMod;
+            Affect *paf_hr = obj->affected.find( gsn_shadowblade, APPLY_HITROLL );
+            if (paf_hr) {
+                int oldMod = paf_hr->modifier;
+                paf_hr->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
+                ch->hitroll += paf_hr->modifier - oldMod;
+            }
 
-                if (paf->next != 0 && paf->next->type == gsn_shadowblade) {
-                    oldMod = paf->next->modifier;
-                    paf->next->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
-                    ch->damroll += paf->next->modifier - oldMod;
-                }
+            Affect *paf_dr = obj->affected.find( gsn_shadowblade, APPLY_DAMROLL );
+            if (paf_dr) {
+                int oldMod = paf_dr->modifier;
+                paf_dr->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
+                ch->damroll += paf_dr->modifier - oldMod;
             }
             
             obj->value1(std::max( obj->value1(), p->value1 ));
