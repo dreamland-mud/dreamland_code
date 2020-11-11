@@ -78,9 +78,6 @@ bool BasicMobileBehavior::canAggress( Character *victim )
     if (dreamland->hasOption( DL_BUILDPLOT ))
         return false;
 
-    if (victim->is_immortal( ))
-        return false;
-        
     if (is_safe_nomessage( ch, victim ))
         return false;
         
