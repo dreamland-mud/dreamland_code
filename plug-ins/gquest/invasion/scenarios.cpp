@@ -121,7 +121,7 @@ bool InvasionLocustScenario::checkRoom( Room *room )
     if (IS_SET(room->room_flags, ROOM_INDOORS))
         return false;
         
-    switch (room->sector_type) {
+    switch (room->getSectorType()) {
     case SECT_FIELD: case SECT_FOREST: case SECT_HILLS: case SECT_MOUNTAIN:
         return InvasionScenario::checkRoom( room );
     default:
@@ -160,7 +160,7 @@ bool InvasionFootballScenario::checkRoom( Room *room )
     if (IS_SET(room->room_flags, ROOM_INDOORS))
         return false;
         
-    switch (room->sector_type) {
+    switch (room->getSectorType()) {
     case SECT_FIELD: case SECT_HILLS: case SECT_MOUNTAIN: 
         return InvasionScenario::checkRoom( room );
     default:

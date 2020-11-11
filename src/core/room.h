@@ -110,9 +110,25 @@ public:
     void echoAround( int, const char *, ... ) const;
     list<Character*> getPeople( );
     
-    extra_descr_data *getExtraDescr();
-    const char *getName() const;
-    const char *getDescription() const;
+    bool hasExits() const;
+    
+    /** Shorthand to return prototype's extra descriptions. */
+    inline extra_descr_data *getExtraDescr();
+
+    /** Shorthand to return prototype's room name. */
+    inline const char *getName() const;
+
+    /** Shorthand to return prototype's room description. */
+    inline const char *getDescription() const;
+
+    /** Calculate current heal rate (100% is the default). */
+    int getHealRate() const;
+
+    /** Calculate current mana rate (100% is the default). */
+    int getManaRate() const;
+
+    /** Shorthand to return prototype's sector type. */
+    inline int getSectorType() const;
 
     Room *        rnext;
     Character *   people;
@@ -124,9 +140,7 @@ public:
     int        vnum;
     int        room_flags;
     int        light;
-    int        sector_type;
-    int        heal_rate;
-    int        mana_rate;
+
     RoomHistory history;
     AffectList affected;
     int        affected_by;
@@ -137,17 +151,45 @@ public:
     RoomIndexData *pIndexData;
 
 protected:
+    /** How much default heal rate is changed by affects. */
+    int mod_heal_rate;
+
+    /** How much default heal rate is changed by affects. */
+    int mod_mana_rate;
+
     long long ID;
 };
 
-long long Room::getID( ) const
+inline long long Room::getID( ) const
 {
     return ID;
 }
-void Room::setID( long long id )
+
+inline void Room::setID( long long id )
 {
     ID = id;
 }
+
+inline extra_descr_data * Room::getExtraDescr()
+{
+    return pIndexData->extra_descr;
+}
+
+inline const char * Room::getName() const
+{
+    return pIndexData->name;
+}
+
+inline const char * Room::getDescription() const
+{
+    return pIndexData->description;
+}
+
+inline int Room::getSectorType() const
+{
+    return pIndexData->sector_type;
+}
+
 
 
 /*
@@ -155,11 +197,11 @@ void Room::setID( long long id )
  */
 
 #define IS_ROOM_AFFECTED(room, sn)         (IS_SET((room)->affected_by, (sn)))
-#define IS_WATER( var )                (((var)->sector_type == SECT_WATER_SWIM) || \
-                                 ((var)->sector_type == SECT_WATER_NOSWIM) )
-#define IS_NATURE(var)          ((var)->sector_type == SECT_FIELD || \
-                                  (var)->sector_type == SECT_FOREST || \
-                                  (var)->sector_type == SECT_HILLS || \
-                                  (var)->sector_type == SECT_MOUNTAIN)
+#define IS_WATER( var )                (((var)->getSectorType() == SECT_WATER_SWIM) || \
+                                 ((var)->getSectorType() == SECT_WATER_NOSWIM) )
+#define IS_NATURE(var)          ((var)->getSectorType() == SECT_FIELD || \
+                                  (var)->getSectorType() == SECT_FOREST || \
+                                  (var)->getSectorType() == SECT_HILLS || \
+                                  (var)->getSectorType() == SECT_MOUNTAIN)
 
 #endif

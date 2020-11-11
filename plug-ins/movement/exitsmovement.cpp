@@ -361,8 +361,8 @@ int ExitsMovement::getMoveCost( Character *wch )
 {
     int move;
     
-    move = terrains[from_room->sector_type].move
-            + terrains[to_room->sector_type].move;
+    move = terrains[from_room->getSectorType()].move
+            + terrains[to_room->getSectorType()].move;
 
     move /= 2;  /* i.e. the average */
 
@@ -381,7 +381,7 @@ void ExitsMovement::setWaitstate( )
     int waittime = 0;
     
     waittime += movetypes[movetype].wait;
-    waittime += terrains[from_room->sector_type].wait;
+    waittime += terrains[from_room->getSectorType()].wait;
     
     ch->setWait( waittime );
 }
@@ -461,7 +461,7 @@ int ExitsMovement::adjustMovetype( Character *wch )
     if (IS_GHOST( wch ))
         return MOVETYPE_FLYING;
 
-    if (from_room->sector_type == SECT_WATER_NOSWIM || to_room->sector_type == SECT_WATER_NOSWIM)
+    if (from_room->getSectorType() == SECT_WATER_NOSWIM || to_room->getSectorType() == SECT_WATER_NOSWIM)
         switch (boat_type) {
         case BOAT_INV:
         case BOAT_EQ:

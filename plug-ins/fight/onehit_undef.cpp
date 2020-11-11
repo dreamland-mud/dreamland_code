@@ -942,11 +942,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     // everyone else:                           75 / 95 / 100 
     
     if ( ch->getProfession( ) == prof_ranger ) {                    
-            if ( ( ch->in_room->sector_type != SECT_HILLS ) &&
-                 ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
-                 ( ch->in_room->sector_type != SECT_FOREST ) &&
-                 ( ch->in_room->sector_type != SECT_FIELD ) )
-                        return;
+            if (!IS_NATURE(ch->in_room))
+                return;
             msgVictStun = "{W$c1 сотрясает землю мощным ударом, обездвиживая тебя!{x";
             msgCharStun = "{WТы сотрясаешь землю мощным ударом, обездвиживая $C4!{x";
             msgVictBlind = "{y$c1 внезапной серией ударов поднимает вихрь листьев, ослепляя тебя!{x";

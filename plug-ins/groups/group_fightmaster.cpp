@@ -1286,7 +1286,7 @@ SKILL_RUNP( dirt )
 
         /* terrain */
 
-        switch(ch->in_room->sector_type)
+        switch(ch->in_room->getSectorType())
         {
         case(SECT_INSIDE):                chance -= 20;        break;
         case(SECT_CITY):                chance -= 10;        break;

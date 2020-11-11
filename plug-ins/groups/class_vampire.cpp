@@ -348,17 +348,17 @@ SKILL_RUNP( dig )
         return;
     }
 
-    if (room->sector_type == SECT_AIR) {
+    if (room->getSectorType() == SECT_AIR) {
         ch->send_to("Копать в воздухе? И как ты себе это представляешь?\r\n");
         return;
     }
 
-    if (room->sector_type == SECT_CITY) {
+    if (room->getSectorType() == SECT_CITY) {
         ch->send_to("Здесь слишком твердая почва.\r\n");
         return;
     }
     
-    if (room->sector_type == SECT_INSIDE || IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
+    if (room->getSectorType() == SECT_INSIDE || IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
     {
         ch->send_to("Здесь неподходящее место для копания могилы.\r\n");
         return;

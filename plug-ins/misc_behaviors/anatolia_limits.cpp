@@ -452,11 +452,9 @@ void GiantStrengthArmor::remove( Character *ch )
  */
 void RoseShield::fight( Character *ch )
 {
-  if (!( (ch->in_room->sector_type != SECT_FIELD) ||
-       (ch->in_room->sector_type != SECT_FOREST) ||
-       (ch->in_room->sector_type != SECT_MOUNTAIN) ||
-       (ch->in_room->sector_type != SECT_HILLS) ) )
+  if (!IS_NATURE(ch->in_room))
   return;
+
   if (get_eq_char(ch,wear_shield) != obj )
   return;
 

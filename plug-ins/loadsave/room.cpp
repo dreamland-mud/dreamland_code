@@ -67,9 +67,6 @@ Room * RoomIndexData::create()
     room->area = area;
     room->vnum = vnum;
     room->room_flags = room_flags;
-    room->sector_type = sector_type;
-    room->heal_rate = heal_rate;
-    room->mana_rate = mana_rate;
     room->pIndexData = this;    
     room->setID( dreamland->genID( ) );    
 
@@ -143,8 +140,8 @@ void Room::affectModify( Affect *paf, bool fAdd )
         return;
 
     case APPLY_ROOM_NONE:                                        break;
-    case APPLY_ROOM_HEAL:        heal_rate += mod;                break;
-    case APPLY_ROOM_MANA:        mana_rate += mod;                break;
+    case APPLY_ROOM_HEAL:        mod_heal_rate += mod;                break;
+    case APPLY_ROOM_MANA:        mod_mana_rate += mod;                break;
     }
 }
 

@@ -147,7 +147,7 @@ bool FullDesire::isOverflow( PCharacter *ch )
  */
 int ThirstDesire::getUpdateAmount( PCharacter *ch )
 {
-    if (ch->in_room->sector_type == SECT_DESERT)
+    if (ch->in_room->getSectorType() == SECT_DESERT)
         return -3;
     else
         return -1;

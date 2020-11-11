@@ -259,7 +259,7 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
 
         dam = level + dice(3, 8);
 
-        switch (room->sector_type) {
+        switch (room->getSectorType()) {
         case SECT_MOUNTAIN: dam *= 4; break;
         case SECT_CITY:            dam *= 3; break;
         case SECT_INSIDE:   dam *= 2; break;

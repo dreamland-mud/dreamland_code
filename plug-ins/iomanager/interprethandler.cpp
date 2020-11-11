@@ -349,7 +349,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'S':
             if (ch->in_room && can_see_room_details(ch)) {
-                int sector = ch->in_room->sector_type;
+                int sector = ch->in_room->getSectorType();
                 bool indoors = IS_SET(ch->in_room->room_flags, ROOM_INDOORS);
                 out << (indoors ? "(" : "")
                     << "{" << sector_type_color(sector) <<  sector_table.message(sector) << "{w"

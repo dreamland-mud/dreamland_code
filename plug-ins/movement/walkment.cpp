@@ -387,7 +387,7 @@ bool Walkment::checkGuild( Character *wch )
 
 bool Walkment::checkAir( Character *wch )
 {
-    if (from_room->sector_type != SECT_AIR && to_room->sector_type != SECT_AIR)
+    if (from_room->getSectorType() != SECT_AIR && to_room->getSectorType() != SECT_AIR)
         return true;
 
     if (MOUNTED(wch))
@@ -423,8 +423,8 @@ bool Walkment::checkAir( Character *wch )
 
 bool Walkment::checkWater( Character *wch )
 {
-    if (from_room->sector_type != SECT_WATER_NOSWIM
-         && to_room->sector_type != SECT_WATER_NOSWIM)
+    if (from_room->getSectorType() != SECT_WATER_NOSWIM
+         && to_room->getSectorType() != SECT_WATER_NOSWIM)
         return true;
     
     // For a rider, we'll only check horse's ability to swim.
@@ -533,10 +533,7 @@ bool Walkment::checkMovepoints( Character *wch )
 bool Walkment::applyCamouflage( Character *wch )
 {
     if (IS_AFFECTED(wch, AFF_CAMOUFLAGE)
-            && to_room->sector_type != SECT_FIELD
-            && to_room->sector_type != SECT_FOREST
-            && to_room->sector_type != SECT_MOUNTAIN
-            && to_room->sector_type != SECT_HILLS)
+            && !IS_NATURE(to_room))
     {
         strip_camouflage( wch );
     }        

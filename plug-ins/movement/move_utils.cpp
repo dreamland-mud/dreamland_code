@@ -70,10 +70,7 @@ void strip_camouflage( Character *ch )
 void check_camouflage( Character *ch, Room *to_room )
 {
     if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE)
-            && to_room->sector_type != SECT_FIELD
-            && to_room->sector_type != SECT_FOREST
-            && to_room->sector_type != SECT_MOUNTAIN
-            && to_room->sector_type != SECT_HILLS )
+            && !IS_NATURE(to_room))
     {
             strip_camouflage( ch );
     }        

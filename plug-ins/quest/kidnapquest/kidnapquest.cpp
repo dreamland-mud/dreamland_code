@@ -309,7 +309,7 @@ bool KidnapQuest::checkRoomClient( PCharacter *pch, Room * room )
     if (!ClientQuestModel::checkRoomClient( pch, room ))
         return false;
         
-    if (IS_WATER(room) || room->sector_type == SECT_AIR)
+    if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
         return false;
     
     if (!kingArea.empty( ) && kingArea == room->area->name)

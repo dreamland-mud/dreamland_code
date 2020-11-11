@@ -82,12 +82,9 @@ void
 OLCStateRoom::commit( )
 {
     RoomIndexData *pRoom = get_room_index(room);
+    // FIXME: update all instances.
     if (pRoom && pRoom->room) {
-        // FIXME: Room should have getters instead.
         pRoom->room->room_flags = pRoom->room_flags;
-        pRoom->room->sector_type = pRoom->sector_type;
-        pRoom->room->heal_rate = pRoom->heal_rate;
-        pRoom->room->mana_rate = pRoom->mana_rate;
     }
 }
 
@@ -119,7 +116,8 @@ REDIT(sector, "местность", "установить тип местнос�
     EDIT_ROOM(ch, pRoom);
 
     if (flagValueEdit(sector_table, pRoom->sector_type)) {
-        if (IS_WATER(pRoom) && pRoom->liquid == liq_none)
+        if ((pRoom->sector_type == SECT_WATER_NOSWIM || pRoom->sector_type == SECT_WATER_SWIM)
+            && pRoom->liquid == liq_none)
             pRoom->liquid = liq_water;
         return true;
     }

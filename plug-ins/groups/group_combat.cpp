@@ -200,9 +200,9 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
         
         int dam;
 
-        if ( (ch->in_room->sector_type != SECT_HILLS)
-                && (ch->in_room->sector_type != SECT_MOUNTAIN)
-                && (ch->in_room->sector_type != SECT_DESERT) )
+        if ( (ch->in_room->getSectorType() != SECT_HILLS)
+                && (ch->in_room->getSectorType() != SECT_MOUNTAIN)
+                && (ch->in_room->getSectorType() != SECT_DESERT) )
         {
                 ch->println("Здесь недостаточно песка, чтобы сформировать кулак.");
                 ch->wait = 0;
@@ -385,10 +385,9 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
         int dam,hp_dam,dice_dam;
         int hpch;
 
-        if ( ch->in_room->sector_type == SECT_AIR
-                || ch->in_room->sector_type == SECT_INSIDE
-                || ch->in_room->sector_type == SECT_WATER_SWIM
-                || ch->in_room->sector_type == SECT_WATER_NOSWIM )
+        if ( ch->in_room->getSectorType() == SECT_AIR
+                || ch->in_room->getSectorType() == SECT_INSIDE
+                || IS_WATER(ch->in_room))
         {
                 ch->send_to("Здесь нет ни крупицы песка!\n\r");
                 ch->wait = 0;

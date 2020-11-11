@@ -755,10 +755,10 @@ CMDWIZP( stat )
     sprintf( buf,
         "Vnum: %d  Сектор: %d  Свет: %d  Лечение: %d  Мана: %d\n\r",
         location->vnum,
-        location->sector_type,
+        location->getSectorType(),
         location->light,
-        location->heal_rate,
-        location->mana_rate );
+        location->getHealRate(),
+        location->getManaRate() );
     ch->send_to(buf);
 
     sprintf( buf,

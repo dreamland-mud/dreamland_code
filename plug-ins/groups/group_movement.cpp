@@ -220,8 +220,8 @@ SKILL_RUNP( hide )
                 return;
         }
 
-        int forest = ch->in_room->sector_type == SECT_FOREST ? 60 : 0;
-        forest += ch->in_room->sector_type == SECT_FIELD ? 60 : 0;
+        int forest = ch->in_room->getSectorType() == SECT_FOREST ? 60 : 0;
+        forest += ch->in_room->getSectorType() == SECT_FIELD ? 60 : 0;
 
         int k = ch->getLastFightDelay( );
 

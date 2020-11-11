@@ -661,7 +661,7 @@ Object * Gangsters::createPortal( RoomList &portalRooms )
     room = portalRooms[i]; 
     portalRooms.erase( portalRooms.begin( ) + i );
     
-    switch (room->sector_type) {
+    switch (room->getSectorType()) {
     case SECT_FOREST:
     case SECT_FIELD:
     case SECT_DESERT:
@@ -826,7 +826,7 @@ bool Gangsters::isPoliceman( Character *ch )
 
 bool Gangsters::checkRoom( Room *const pRoomIndex )
 {
-    if (pRoomIndex->sector_type == SECT_AIR || IS_WATER(pRoomIndex))
+    if (pRoomIndex->getSectorType() == SECT_AIR || IS_WATER(pRoomIndex))
         return false;
     
     if (IS_SET(pRoomIndex->room_flags, ROOM_SAFE|ROOM_NO_QUEST|ROOM_NO_MOB))

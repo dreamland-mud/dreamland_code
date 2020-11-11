@@ -439,7 +439,7 @@ bool is_safe_spell(Character *ch, Character *victim, bool area )
     if (is_same_group(ch,victim) && area)
         return true;
 
-    if (ch == victim && area && ch->in_room->sector_type == SECT_INSIDE)
+    if (ch == victim && area && ch->in_room->getSectorType() == SECT_INSIDE)
         return true;
 
     if ((RIDDEN(ch) == victim || MOUNTED(ch) == victim) && area)

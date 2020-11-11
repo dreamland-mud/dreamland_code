@@ -130,7 +130,7 @@ bool StaffQuest::checkRoomClient( PCharacter *pch, Room *room )
     if (room->area->high_range + 20 < pch->getModifyLevel( ))
         return false;
 
-    if (IS_WATER(room) || room->sector_type == SECT_AIR)
+    if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
         return false;
 
     if (!ItemQuestModel::checkRoomClient( pch, room ))

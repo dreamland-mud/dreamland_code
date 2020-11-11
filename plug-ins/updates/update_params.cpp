@@ -138,7 +138,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
              gain = 0;
         }
     
-    gain = gain * ch->in_room->heal_rate / 100;
+    gain = gain * ch->in_room->getHealRate() / 100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
         gain = gain * ch->on->value3() / 100;
@@ -220,7 +220,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
              gain = 0;
         }
 
-    gain = gain * min(400, ch->in_room->mana_rate) / 100;
+    gain = gain * min(400, ch->in_room->getManaRate()) / 100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
         gain = gain * min(400, ch->on->value4()) / 100;
@@ -287,7 +287,7 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
         }
     }
 
-    gain = gain * ch->in_room->heal_rate/100;
+    gain = gain * ch->in_room->getHealRate() / 100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
         gain = gain * ch->on->value3() / 100;

@@ -73,7 +73,7 @@ SKILL_RUNP( searchstones )
         return;
     }
     
-    switch (ch->in_room->sector_type) {
+    switch (ch->in_room->getSectorType()) {
     default:                chance = 0; break;
     case SECT_MOUNTAIN: chance = 100; break;
     case SECT_HILLS:    chance = 80; break;

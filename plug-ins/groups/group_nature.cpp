@@ -168,7 +168,7 @@ static bool has_water_around( Character *ch )
     if (IS_WATER(ch->in_room))
         return true;
 
-    if (ch->in_room->sector_type == SECT_UNDERWATER)
+    if (ch->in_room->getSectorType() == SECT_UNDERWATER)
         return true;
 
     if (!IS_OUTSIDE(ch))
@@ -212,11 +212,11 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     int dam;
     PCharacter *victim;
 
-    if (ch->in_room->sector_type == SECT_INSIDE ||
-        ch->in_room->sector_type == SECT_CITY ||
-        ch->in_room->sector_type == SECT_DESERT ||
-        ch->in_room->sector_type == SECT_WATER_NOSWIM ||
-        ch->in_room->sector_type == SECT_AIR)
+    if (ch->in_room->getSectorType() == SECT_INSIDE ||
+        ch->in_room->getSectorType() == SECT_CITY ||
+        ch->in_room->getSectorType() == SECT_DESERT ||
+        ch->in_room->getSectorType() == SECT_WATER_NOSWIM ||
+        ch->in_room->getSectorType() == SECT_AIR)
     {
         ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
         return;
@@ -258,11 +258,11 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     int dam;
     Affect todex;
 
-    if (ch->in_room->sector_type == SECT_INSIDE ||
-        ch->in_room->sector_type == SECT_CITY ||
-        ch->in_room->sector_type == SECT_DESERT ||
-        ch->in_room->sector_type == SECT_WATER_NOSWIM ||
-        ch->in_room->sector_type == SECT_AIR)
+    if (ch->in_room->getSectorType() == SECT_INSIDE ||
+        ch->in_room->getSectorType() == SECT_CITY ||
+        ch->in_room->getSectorType() == SECT_DESERT ||
+        ch->in_room->getSectorType() == SECT_WATER_NOSWIM ||
+        ch->in_room->getSectorType() == SECT_AIR)
     {
         ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
         return;

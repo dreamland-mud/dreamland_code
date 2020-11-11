@@ -263,7 +263,7 @@ CMDRUNP( brandish )
      ch->setWaitViolence( 2 );
 
     if (staff->value2() > 0) {
-        const char *terrain = terrains[ch->in_room->sector_type].hit;
+        const char *terrain = terrains[ch->in_room->getSectorType()].hit;
         
         act( "$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
         act( "Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );

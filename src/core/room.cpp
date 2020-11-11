@@ -40,8 +40,8 @@ Room::Room( ) :
                 area( 0 ), extra_exit( 0 ),                
                 owner(&str_empty[0]),
                 vnum( 0 ), room_flags( 0 ), 
-                light( 0 ), sector_type( 0 ),
-                heal_rate( 100 ), mana_rate( 100 ), 
+                light( 0 ),
+                mod_heal_rate( 0 ), mod_mana_rate( 0 ), 
                 affected_by( 0 ),
                 behavior( RoomBehavior::NODE_NAME ),
                 pIndexData(0)
@@ -50,19 +50,14 @@ Room::Room( ) :
         exit[i] = 0;
 }
 
-extra_descr_data * Room::getExtraDescr()
+int Room::getHealRate() const
 {
-    return pIndexData->extra_descr;
+    return pIndexData->heal_rate + mod_heal_rate;
 }
 
-const char * Room::getName() const
+int Room::getManaRate() const
 {
-    return pIndexData->name;
-}
-
-const char * Room::getDescription() const
-{
-    return pIndexData->description;
+    return pIndexData->mana_rate + mod_mana_rate;
 }
 
 bool Room::isOwner( Character *ch ) const
@@ -71,6 +66,14 @@ bool Room::isOwner( Character *ch ) const
         return false;
 
     return is_name( ch->getNameP( ), owner );
+}
+
+bool Room::hasExits() const
+{
+    for (int i = 0; i < DIR_SOMEWHERE; i++)
+        if (exit[i] != 0)
+            return true;
+    return false;
 }
 
 bool Room::isPrivate( ) const
@@ -136,7 +139,7 @@ bool Room::isDark( ) const
     if (IS_SET(room_flags, ROOM_DARK))
         return true;
     
-    if (sector_type == SECT_INSIDE || sector_type == SECT_CITY)
+    if (getSectorType() == SECT_INSIDE || getSectorType() == SECT_CITY)
         return false;
 
     if (weather_info.sunlight == SUN_LIGHT || weather_info.sunlight == SUN_RISE)

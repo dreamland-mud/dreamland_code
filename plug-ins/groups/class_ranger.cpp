@@ -339,11 +339,7 @@ SKILL_RUNP( herbs )
     }
   ch->setWait( gsn_herbs->getBeats( )  );
 
-  if ((ch->in_room->sector_type == SECT_FIELD
-       || ch->in_room->sector_type == SECT_FOREST
-       || ch->in_room->sector_type == SECT_HILLS
-       || ch->in_room->sector_type == SECT_MOUNTAIN)
-      && number_percent() < gsn_herbs->getEffective( ch ))
+  if (IS_NATURE(ch->in_room) && number_percent() < gsn_herbs->getEffective( ch ))
     {
       Affect af;
       af.where  = TO_AFFECTS;
@@ -413,13 +409,7 @@ SKILL_RUNP( camp )
         return;
   }
 
-  if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE)      ||
-       IS_SET(ch->in_room->room_flags, ROOM_PRIVATE)   ||
-       IS_SET(ch->in_room->room_flags, ROOM_SOLITARY)  ||
-         ( ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS ) )
+  if (!IS_NATURE(ch->in_room))
   {
     ch->println("Здесь недостаточно растительности для разбивки лагеря.");
     return;
@@ -528,26 +518,13 @@ TYPE_SPELL(NPCharacter *, BearCall)::createMobile( Character *ch, int level ) co
 
 TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const 
 {
-  if ( ch->in_room != 0 && IS_SET(ch->in_room->room_flags, ROOM_NO_MOB) )
+  if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
      ch->send_to( "Здесь медведи не услышат тебя.\n\r");
      return false;
   }
 
-  if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE)      ||
-       IS_SET(ch->in_room->room_flags, ROOM_PRIVATE)   ||
-       IS_SET(ch->in_room->room_flags, ROOM_SOLITARY)  ||
-       (ch->in_room->exit[0] == 0 &&
-          ch->in_room->exit[1] == 0 &&
-          ch->in_room->exit[2] == 0 &&
-          ch->in_room->exit[3] == 0 &&
-          ch->in_room->exit[4] == 0 &&
-          ch->in_room->exit[5] == 0) ||
-
-         ( ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS ) )
+  if (!ch->in_room->hasExits() || !IS_NATURE(ch->in_room))
   {
     ch->send_to( "Медведи не пришли к тебе на помощь.\n\r");
     return false;
@@ -610,26 +587,13 @@ TYPE_SPELL(NPCharacter *, LionCall)::createMobile( Character *ch, int level ) co
 
 TYPE_SPELL(bool, LionCall)::canSummonHere( Character *ch ) const 
 {
-  if ( ch->in_room != 0 && IS_SET(ch->in_room->room_flags, ROOM_NO_MOB) )
+  if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
      ch->send_to( "Здесь львы не услышат тебя.\n\r");
      return false;
   }
 
-  if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE)      ||
-       IS_SET(ch->in_room->room_flags, ROOM_PRIVATE)   ||
-       IS_SET(ch->in_room->room_flags, ROOM_SOLITARY)  ||
-       (ch->in_room->exit[0] == 0 &&
-          ch->in_room->exit[1] == 0 &&
-          ch->in_room->exit[2] == 0 &&
-          ch->in_room->exit[3] == 0 &&
-          ch->in_room->exit[4] == 0 &&
-          ch->in_room->exit[5] == 0) ||
-
-         ( ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS ) )
+  if (!ch->in_room->hasExits() || !IS_NATURE(ch->in_room))
   {
     ch->send_to( "Львы не пришли к тебе на помощь.\n\r");
     return false;
@@ -752,9 +716,9 @@ SKILL_RUNP( makearrow )
         return;
     }
 
-    if ( ch->in_room->sector_type != SECT_FIELD
-            && ch->in_room->sector_type != SECT_FOREST
-            && ch->in_room->sector_type != SECT_HILLS )
+    if ( ch->in_room->getSectorType() != SECT_FIELD
+            && ch->in_room->getSectorType() != SECT_FOREST
+            && ch->in_room->getSectorType() != SECT_HILLS )
     {
         ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
         return;
@@ -845,9 +809,9 @@ SKILL_RUNP( makebow )
       return;
     }
 
-  if ( ch->in_room->sector_type != SECT_FIELD &&
-       ch->in_room->sector_type != SECT_FOREST &&
-       ch->in_room->sector_type != SECT_HILLS )
+  if ( ch->in_room->getSectorType() != SECT_FIELD &&
+       ch->in_room->getSectorType() != SECT_FOREST &&
+       ch->in_room->getSectorType() != SECT_HILLS )
   {
     ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
     return;
@@ -985,9 +949,9 @@ SKILL_RUNP( forest )
 
 BOOL_SKILL( forest )::run( Character *ch, int type ) 
 {
-    if (ch->in_room->sector_type != SECT_FOREST
-        && ch->in_room->sector_type != SECT_HILLS
-        && ch->in_room->sector_type != SECT_MOUNTAIN) 
+    if (ch->in_room->getSectorType() != SECT_FOREST
+        && ch->in_room->getSectorType() != SECT_HILLS
+        && ch->in_room->getSectorType() != SECT_MOUNTAIN) 
         return false;
     
     if (ch->is_npc( ))
@@ -1129,10 +1093,7 @@ SKILL_RUNP( tiger )
         ch->send_to("Ты слишком миролюбив для этого.\n\r");
         return;
     }
-    if (ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS )
+    if (!IS_NATURE(ch->in_room))
   {
     ch->send_to("Нет никого, кто услышал бы твой призыв.\n\r");
     return;
@@ -1393,9 +1354,9 @@ SKILL_RUNP( camouflage )
                 return;
         }
 
-        if ( ch->in_room->sector_type != SECT_FOREST
-                && ch->in_room->sector_type != SECT_HILLS
-                && ch->in_room->sector_type != SECT_MOUNTAIN )
+        if ( ch->in_room->getSectorType() != SECT_FOREST
+                && ch->in_room->getSectorType() != SECT_HILLS
+                && ch->in_room->getSectorType() != SECT_MOUNTAIN )
         {
                 ch->send_to("Здесь негде укрыться.\n\r");
                 act_p("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM,POS_RESTING);

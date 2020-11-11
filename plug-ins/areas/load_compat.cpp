@@ -780,7 +780,8 @@ void load_rooms( FILE *fp )
             }
         }
 
-        if (IS_WATER(pRoomIndex) && pRoomIndex->liquid == liq_none)
+        if ((pRoomIndex->sector_type == SECT_WATER_NOSWIM || pRoomIndex->sector_type == SECT_WATER_SWIM) 
+                && pRoomIndex->liquid == liq_none)
             pRoomIndex->liquid = liq_water;
 
         top_room++;

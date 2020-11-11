@@ -761,7 +761,7 @@ void obj_update( void )
             continue;
         
         if (!obj->in_obj 
-            && room->sector_type == SECT_DESERT
+            && room->getSectorType() == SECT_DESERT
             && material_is_flagged( obj, MAT_MELTING ))
         {
             if (carrier) {
@@ -782,7 +782,7 @@ void obj_update( void )
         
         if (obj->item_type == ITEM_POTION
             && !obj->in_obj
-            && room->sector_type == SECT_DESERT
+            && room->getSectorType() == SECT_DESERT
             && material_is_flagged( obj, MAT_FRAGILE ))
         {
             if (carrier) {

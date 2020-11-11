@@ -169,10 +169,7 @@ bool ButcherQuest::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *vi
     if (room->area->low_range > pch->getModifyLevel( ))
         return false;
     
-    if (!(room->sector_type == SECT_FIELD 
-           || room->sector_type == SECT_FOREST
-           || room->sector_type == SECT_HILLS 
-           || room->sector_type == SECT_MOUNTAIN))
+    if (!IS_NATURE(room))
         return false;
 
     return VictimQuestModel::checkRoomVictim( pch, room, victim );

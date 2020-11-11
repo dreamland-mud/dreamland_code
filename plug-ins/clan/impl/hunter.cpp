@@ -1167,7 +1167,7 @@ bool HunterSnareTrap::checkRoom( Room *r )
     if (!HunterTrapObject::checkRoom( r ))
         return false;
 
-    switch (r->sector_type) {
+    switch (r->getSectorType()) {
     case SECT_FOREST:
     case SECT_HILLS:
     case SECT_FIELD:
@@ -1313,7 +1313,7 @@ bool HunterShovel::checkRoom( Room *r )
     if (!HunterTrapObject::checkRoom( r ))
         return false;
 
-    switch (r->sector_type) {
+    switch (r->getSectorType()) {
     case SECT_FOREST:
     case SECT_HILLS:
     case SECT_FIELD:

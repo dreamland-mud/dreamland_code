@@ -150,7 +150,7 @@ NMI_GET( RoomWrapper, items, "список (List) всех предметов н
 NMI_GET( RoomWrapper, sector_type , "значение типа местности (таблица .sector_table)")
 {
     checkTarget( );
-    return Register( target->sector_type );
+    return Register( target->getSectorType() );
 }
 
 NMI_GET( RoomWrapper, affected_by, "биты аффектов на комнате (таблица .tables.affect_flags)" )
@@ -583,7 +583,7 @@ struct FeniaDoorFunc {
             return false;
         
         Room *toRoom = exit->u1.to_room;
-        bitstring_t mysector = (1 << toRoom->sector_type);
+        bitstring_t mysector = (1 << toRoom->getSectorType());
 
         if (sectorsAllow != 0 && !IS_SET(sectorsAllow, mysector))
             return false;

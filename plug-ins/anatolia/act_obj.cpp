@@ -1188,9 +1188,9 @@ static int drop_obj( Character *ch, Object *obj )
         ch->pecho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
     }
     else if (!IS_WATER( ch->in_room ) 
-             && ch->in_room->sector_type != SECT_AIR
-             && ch->in_room->sector_type != SECT_FOREST
-             && ch->in_room->sector_type != SECT_DESERT
+             && ch->in_room->getSectorType() != SECT_AIR
+             && ch->in_room->getSectorType() != SECT_FOREST
+             && ch->in_room->getSectorType() != SECT_DESERT
              && obj->pIndexData->vnum == OBJ_VNUM_POTION_VIAL
 //             && material_is_flagged( obj, MAT_FRAGILE )
              && chance( 40 ))

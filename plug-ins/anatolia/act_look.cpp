@@ -1682,7 +1682,7 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     const char *p = pocket.c_str( );
     const char *where;
     if (obj->in_room)
-        where = terrains[obj->in_room->sector_type].where;
+        where = terrains[obj->in_room->getSectorType()].where;
     else if (obj->wear_loc == wear_none)
         where = "в твоих руках";
     else
