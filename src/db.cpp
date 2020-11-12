@@ -104,8 +104,7 @@ AUCTION_DATA        *        auction = new auction_data( );
 
 RoomSet roomAffected;
 
-
-Room* room_list = 0;
+RoomVector roomInstances;
 
 /*
  * Locals.

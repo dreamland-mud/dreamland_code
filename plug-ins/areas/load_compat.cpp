@@ -1099,7 +1099,7 @@ void fix_door_levels( bool verbose )
 {
     LogStream::sendNotice( ) << "Assigning door levels..." << endl;
 
-    for (Room *r = room_list; r; r = r->rnext) {
+    for (auto &r: roomInstances) {
         for (int d = 0; d < DIR_SOMEWHERE; d++) {
             EXIT_DATA *ex = r->exit[d];
 
@@ -1187,6 +1187,7 @@ load_areas( )
                         }
 
                         word = fread_word( fpArea );
+                        notice("...loading section %s", word);
 
                         if (word[0] == '$')  
                             break;

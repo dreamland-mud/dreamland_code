@@ -1485,17 +1485,16 @@ NMI_INVOKE( CharacterWrapper, get_random_room, "(): случайная комн�
 {
     checkTarget( );
     
-    std::vector<Room *> rooms;
-    Room *r;
+    RoomVector rooms;
     
-    for (r = room_list; r; r = r->rnext)
+    for (auto &r: roomInstances)
         if (target->canEnter(r) && !r->isPrivate())
             rooms.push_back(r);
     
     if (rooms.empty())
         return Register( );
     else {
-        r = rooms[::number_range(0, rooms.size() - 1)];
+        Room *r = rooms[::number_range(0, rooms.size() - 1)];
         return WrapperManager::getThis( )->getWrapper(r); 
     }
 }

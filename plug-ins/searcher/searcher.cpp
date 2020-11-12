@@ -93,7 +93,7 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, 
 
 static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLString &where )
 {
-    for (Room *room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         for(RESET_DATA *pReset = room->pIndexData->reset_first;pReset;pReset = pReset->next) {
             switch(pReset->command) {
             case 'M':
@@ -119,7 +119,7 @@ static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLStrin
     }
 
     // Scan resets for each room.
-    for (Room *room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (room->area != pObj->area && get_obj_resets_in_room(room, pObj->vnum, pArea, where))
             return true;
     }

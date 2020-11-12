@@ -53,7 +53,7 @@ WrappersPlugin::linkTargets()
         if (obj->wrapper)
             wrapper_cast<ObjectWrapper>(obj->wrapper)->setTarget( obj );
         
-    for (Room *room = room_list; room; room = room->rnext)
+    for (auto &room: roomInstances)
         if (room->wrapper)
             wrapper_cast<RoomWrapper>(room->wrapper)->setTarget( room );
 

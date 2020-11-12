@@ -104,10 +104,10 @@ Room * get_random_room( Character *ch )
 
 Room * get_random_room_vanish( Character *ch )
 {
-    Room *room, *target = NULL;
+    Room *target = NULL;
     int count = 0;
 
-    for (room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (room->area != ch->in_room->area || room == ch->in_room)
             continue;
         

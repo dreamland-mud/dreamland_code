@@ -652,7 +652,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         cbuf << endl << "Экстравыходы в кланах:" << endl;
 
         const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] %-35s{x [{C%s{x]";
-        for (Room *room = room_list; room; room = room->rnext) {
+        for (auto &room: roomInstances) {
             ostringstream *buf;
             if (IS_SET(room->room_flags, ROOM_MANSION) || !str_prefix("ht", room->area->area_file->file_name))
                 buf = &mbuf;

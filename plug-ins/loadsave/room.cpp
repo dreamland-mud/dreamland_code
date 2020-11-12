@@ -79,8 +79,8 @@ Room * RoomIndexData::create()
     for (auto &eexit: extra_exits)
         room->extra_exits.push_back(eexit->create());
 
-    room->rnext = room_list;
-    room_list = room;
+    room->position = roomInstances.size();
+    roomInstances.push_back(room);
 
     room->area->rooms[vnum] = room;
 

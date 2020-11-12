@@ -531,17 +531,16 @@ NMI_INVOKE( Root, makeShort , "(s1,s2,...,s6): конструирует стро
 
 NMI_INVOKE(Root, get_random_room, "(): произвольная комната из числа общедоступных" )
 {
-    std::vector<Room *> rooms;
-    Room *r;
+    RoomVector rooms;
     
-    for (r = room_list; r; r = r->rnext)
+    for (auto &r: roomInstances)
         if (r->isCommon() && !r->isPrivate())
             rooms.push_back(r);
 
     if (rooms.empty())
         return Register( );
     else {
-        r = rooms[::number_range(0, rooms.size() - 1)];
+        Room *r = rooms[::number_range(0, rooms.size() - 1)];
         return WrapperManager::getThis( )->getWrapper(r); 
     }
 }
@@ -704,11 +703,9 @@ NMI_GET( Root, obj_index_list, "список (List) всех прототипо�
     return Register(listObj);
 }
 
-extern Room *room_list;
-
 NMI_GET( Root, room_list , "список всех комнат, поле комнаты rnext указывает на следующую") 
 {
-    return WrapperManager::getThis( )->getWrapper(room_list); 
+    return WrapperManager::getThis( )->getWrapper(roomInstances.front()); 
 }
 
 NMI_GET( Root, char_list , "список всех чаров, поле чара next указывает на следующего") 

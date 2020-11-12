@@ -65,7 +65,6 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
 
     Room * create(); // Implemented in loadsave plugin.
 
-    RoomIndexData *next;
     reset_data *reset_first;
     reset_data *reset_last;
     extra_descr_data *        extra_descr;
@@ -141,7 +140,9 @@ public:
     /** Shorthand to return prototype's sector type. */
     inline int getSectorType() const;
 
-    Room *        rnext;
+    /** This room's position in the global roomInstances vector. Needed for backward compat. */
+    int position;
+
     Character *   people;
     Object *      contents;
     AreaIndexData *area;

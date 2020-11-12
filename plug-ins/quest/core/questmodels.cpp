@@ -127,7 +127,7 @@ Room * RoomQuestModel::getRandomRoom( RoomList &rooms )
 
 void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms )
 {
-    for (Room * r = room_list; r; r = r->rnext)
+    for (auto &r: roomInstances)
         if (checkRoomClient( pch, r ))
             rooms.push_back( r );
 
@@ -152,7 +152,7 @@ RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct AreaIndexData *
 {
     RoomList result;
 
-    for (Room * r = room_list; r; r = r->rnext) {
+    for (auto &r: roomInstances) {
         if (r->area != targetArea)
             continue;
         if (!checkRoomClient( pch, r ))
@@ -168,7 +168,7 @@ RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct AreaIndexData *
 {
     RoomList result;
 
-    for (Room * r = room_list; r; r = r->rnext) {
+    for (auto &r: roomInstances) {
         if (r->area != targetArea)
             continue;
         if (!checkRoomVictim( pch, r, NULL ))

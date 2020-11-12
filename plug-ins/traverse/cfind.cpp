@@ -90,7 +90,7 @@ CMDRUN( find )
     if (!(toRoom = get_room_instance( target )))
         return;
     
-    for (Room *r = room_list; r; r = r->rnext)
+    for (auto &r: roomInstances)
         REMOVE_BIT(r->room_flags, ROOM_MARKER);
     
     FindComplete complete( toRoom, elements );

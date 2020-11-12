@@ -1654,7 +1654,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
             ostringstream buf;
             list<Room *> repops;
 
-            for (Room *room = room_list; room; room = room->rnext)
+            for (auto &room: roomInstances)
                 for (RESET_DATA *pReset = room->pIndexData->reset_first; pReset; pReset = pReset->next)
                     if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum) 
                         repops.push_back( room );

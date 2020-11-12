@@ -42,7 +42,7 @@ bool ExtraExitList::findAndDestroy(const DLString &keyword)
 }
 
 RoomIndexData::RoomIndexData()
-        : next(0), reset_first( 0 ), reset_last( 0 ),
+        : reset_first( 0 ), reset_last( 0 ),
           extra_descr(0),
           name(&str_empty[0]), description(&str_empty[0]), 
           vnum(0), room_flags(0),
@@ -55,7 +55,7 @@ RoomIndexData::RoomIndexData()
 }
 
 Room::Room( ) : 
-                rnext( 0 ),
+                position( -1 ),
                 people( 0 ), contents( 0 ),
                 area( 0 ),
                 owner(&str_empty[0]),

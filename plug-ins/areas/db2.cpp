@@ -276,7 +276,9 @@ load_mobiles( FILE *fp )
 
         if (dup_mob_vnum( vnum )) 
             throw FileFormatException("load_mobiles: vnum %d duplicated", vnum);
-        
+
+        notice("...loading mob %d", vnum);
+
         pMobIndex = new MOB_INDEX_DATA;
         *pMobIndex = zeroMobIndex;
         pMobIndex->vnum = vnum;
@@ -311,7 +313,6 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
     char letter;
 
     pObjIndex->wrapper                = 0;
-    pObjIndex->rnext                = 0;
 
     pObjIndex->new_format       = true;
     pObjIndex->reset_num        = 0;

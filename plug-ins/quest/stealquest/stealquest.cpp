@@ -434,11 +434,10 @@ bool StealQuest::isBonus( OBJ_INDEX_DATA *pObjIndex, PCharacter *pch )
 
 Room * StealQuest::findHideaway( PCharacter *pch, NPCharacter *thief )
 {
-    Room *room;
-    std::vector<Room *> places, places1, places2;
-    std::vector<Room *>::iterator r;
+    RoomVector places, places1, places2;
+    RoomVector::iterator r;
 
-    for (room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (room->area != thief->in_room->area)
             continue;
         

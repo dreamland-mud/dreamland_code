@@ -59,9 +59,7 @@ bool InvasionScenario::checkArea( AreaIndexData *area )
  *-------------------------------------------------------------------------*/
 void InvasionSparseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 {
-    Room *room;
-    
-    for (room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (!checkArea( room->area ))
             continue;
         
@@ -77,12 +75,11 @@ void InvasionSparseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
  *-------------------------------------------------------------------------*/
 void InvasionDenseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 {
-    Room *room;
     typedef map<AreaIndexData *, vector<Room *> > RoomsByArea;
     RoomsByArea goodRooms;
     int areaCnt;
     
-    for (room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (!checkArea( room->area )) 
             continue;
             

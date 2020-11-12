@@ -379,7 +379,6 @@ typedef list<Object *> ObjectList;
 struct        obj_index_data
 {
     OBJ_INDEX_DATA *        next;
-    OBJ_INDEX_DATA *        rnext;
     EXTRA_DESCR_DATA *        extra_descr;
     AffectList        affected;
     bool                new_format;
@@ -602,6 +601,9 @@ typedef map<int, RoomIndexData *> RoomIndexMap;
 
 /** Map of all room prototypes by vnum, for quick access. */
 extern RoomIndexMap roomIndexMap;
+
+typedef vector<Room *> RoomVector;
+extern RoomVector roomInstances;
 
 extern                int                        top_vnum_room;
 extern                int                        top_vnum_mob;

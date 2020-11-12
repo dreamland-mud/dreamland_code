@@ -63,7 +63,6 @@ void Gangsters::create( const Config& )
     }
     
     while (!areaList.empty( )) {
-        Room *room;
         int msize;
         int areaIndex;
         MobileList people;
@@ -76,7 +75,7 @@ void Gangsters::create( const Config& )
         mobRoomVnums.clear( );
         portalRoomVnums.clear( );
         
-        for (room = room_list; room; room = room->rnext) {
+        for (auto &room: roomInstances) {
             if (room->area != area) 
                 continue;
                 

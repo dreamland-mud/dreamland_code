@@ -469,7 +469,7 @@ void char_update( )
 
 void diving_update( )
 {
-    for (Room *r = room_list; r; r = r->rnext) {
+    for (auto &r: roomInstances) {
         FENIA_VOID_CALL(r, "DiveUpdate", "");
         FENIA_VOID_CALL(r, "Spec", "");
     }

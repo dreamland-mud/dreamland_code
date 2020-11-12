@@ -237,7 +237,7 @@ void sunlight_update( )
             newTime = sunlight_en[weather_info.sunlight];
     }
 
-    for (Room *r = room_list; r; r = r->rnext) {
+    for (auto &r: roomInstances) {
         FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
     }
 }
