@@ -20,6 +20,8 @@ cache: ccache
 
 
 before_script:
+  - locale-gen ru_RU.KOI8-R
+  - update-locale
   - ccache -M 2G # default ccache limit of 500Mb is not enough for our cache of 800Mb
 
 script: 
