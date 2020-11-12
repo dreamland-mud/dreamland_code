@@ -678,3 +678,15 @@ DLString &DLString::cutSize( size_t s )
     return *this;
 }
 
+static locale LOCALE_RU = locale("ru_RU.koi8r");
+
+int DLString::compareRussian(const DLString &other) const
+{
+    const collate<char> &col = use_facet<collate<char>>(LOCALE_RU);
+
+    const char *pb1 = data();
+    const char *pb2 = other.data();
+
+    return col.compare(pb1, pb1 + size(),
+                        pb2, pb2 + other.size());
+}

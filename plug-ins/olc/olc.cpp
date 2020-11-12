@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <algorithm>
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
 #include "regexp.h"
@@ -541,10 +542,44 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 }
 
+static bool area_cmp_filename(const AreaIndexData *a, const AreaIndexData *b)
+{
+    return strcmp(a->area_file->file_name, b->area_file->file_name) < 0;
+}
+
+static bool area_cmp_vnum(const AreaIndexData *a, const AreaIndexData *b)
+{
+    return a->min_vnum < b->min_vnum;
+}
+
+static bool area_cmp_name(const AreaIndexData *a, const AreaIndexData *b) 
+{
+    DLString name1 = DLString(a->name).colourStrip();
+    DLString name2 = DLString(b->name).colourStrip();
+    return name1.compareRussian(name2) < 0;
+}
+
 CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
         "List areas.")
 {
-    AreaIndexData *pArea;
+    vector<AreaIndexData *> areas;
+    DLString args(argument);
+    DLString arg = args.getOneArgument();
+
+    for (AreaIndexData *pArea = area_first; pArea; pArea = pArea->next) {
+        areas.push_back(pArea);
+    }
+
+    if (arg_has_oneof(arg, "vnum", "внум")) 
+        sort(areas.begin(), areas.end(), area_cmp_vnum);
+    else if (arg_has_oneof(arg, "name", "имя"))
+        sort(areas.begin(), areas.end(), area_cmp_name);
+    else if (arg_has_oneof(arg, "file", "файл"))
+        sort(areas.begin(), areas.end(), area_cmp_filename);
+    else if (!arg.empty()) {
+        ch->println("Формат:\r\nalist - список всех арий\r\nalist vnum|name|file - список арий, отсортированный по критерию");
+        return;
+    }
 
     const DLString lineFormat = 
             "[" + web_cmd(ch, "aedit $1", "%3d") 
@@ -553,7 +588,7 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     ptc(ch, "[%3s] %-29s   (%5s-%5s) %-17s %s\n\r",
       "Num", "Area Name", "lvnum", "uvnum", "Filename", "Help");
 
-    for (pArea = area_first; pArea; pArea = pArea->next) {
+    for (auto &pArea: areas) {
         DLString hedit = "";
         AreaHelp *ahelp = area_selfhelp(pArea);
         if (ahelp && ahelp->getID() > 0) {

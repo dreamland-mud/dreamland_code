@@ -339,6 +339,9 @@ public:
         DLString ruscase( char gram_case ) const;
         DLString quote( ) const;
         DLString &cutSize( size_t );
+
+        /** Compares strings using facets of the default locale. */
+        int compareRussian(const DLString &other) const;
 };
 
 #endif
