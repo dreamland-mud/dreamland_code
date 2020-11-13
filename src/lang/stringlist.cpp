@@ -34,7 +34,7 @@ bool StringList::superListOf(const StringList& smallerList) const
             return false;
     }
 
-    return smallerList.size() == matchesFound;
+    return (int)smallerList.size() == matchesFound;
 }
 
 DLString StringList::join(const DLString &delim) const

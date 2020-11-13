@@ -19,6 +19,7 @@ class DLString : public std::string
 {
 public:
         static const DLString emptyString;
+        static const locale LOCALE_RU;
 
 public:
         inline DLString( ) : string( )
@@ -342,6 +343,9 @@ public:
 
         /** Compares strings using facets of the default locale. */
         int compareRussian(const DLString &other) const;
+
+        /** Init RU locale for string comparisons. */
+        static locale initLocale();
 };
 
 #endif

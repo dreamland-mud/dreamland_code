@@ -19,6 +19,8 @@ using std::basic_istringstream;
 
 const DLString DLString::emptyString;
 
+const locale DLString::LOCALE_RU = DLString::initLocale();
+
 bool DLString::strPrefix( const DLString& str ) const
 {
     if (length( ) > str.length( ))
@@ -678,8 +680,6 @@ DLString &DLString::cutSize( size_t s )
     return *this;
 }
 
-static locale LOCALE_RU = locale("ru_RU.koi8r");
-
 int DLString::compareRussian(const DLString &other) const
 {
     const collate<char> &col = use_facet<collate<char>>(LOCALE_RU);
@@ -689,4 +689,14 @@ int DLString::compareRussian(const DLString &other) const
 
     return col.compare(pb1, pb1 + size(),
                         pb2, pb2 + other.size());
+}
+
+locale DLString::initLocale()
+{
+    try {
+        return locale("ru_RU.koi8r");
+    } catch (const exception &ex) {
+        LogStream::sendError() << "Failed to initialize RU locale, falling back to default: " << ex.what() << endl;
+        return locale();
+    }
 }
