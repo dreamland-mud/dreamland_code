@@ -48,6 +48,7 @@
 sudo apt-get update
 sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util libfl-dev bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
+sudo apt-get install -y locales && locale-gen ru_RU.KOI8-R && update-locale
 ```
 
 На Ubuntu 18.04, возможно, понадобится установить более свежую версию компилятора и сделать ее версией по умолчанию:
