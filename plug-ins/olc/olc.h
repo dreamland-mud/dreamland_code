@@ -43,8 +43,6 @@ void show_fenia_triggers(Character *, Scripting::Object *wrapper);
 // mem.c - memory prototypes.
 RESET_DATA *new_reset_data();
 void free_reset_data(RESET_DATA * pReset);
-AreaIndexData *new_area();
-void free_area(AreaIndexData * pArea);
 EXIT_DATA *new_exit();
 void free_exit(EXIT_DATA * pExit);
 EXTRA_DESCR_DATA *new_extra_descr();
@@ -54,9 +52,7 @@ void free_room_index(Room * pRoom);
 Affect *new_affect();
 void free_affect(Affect * pAf);
 OBJ_INDEX_DATA *new_obj_index();
-void free_obj_index(OBJ_INDEX_DATA * pObj);
 MOB_INDEX_DATA *new_mob_index();
-void free_mob_index(MOB_INDEX_DATA * pMob);
 
 #define stc(t, c) (c)->send_to((t))
 #define IS_NPC(c) (c)->is_npc()

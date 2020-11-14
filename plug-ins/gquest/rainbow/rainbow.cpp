@@ -85,7 +85,7 @@ void RainbowGQuest::create( const Config& config )
         
         mob = ch->getNPC( );
         
-        if (scenario->checkArea( mob->in_room->area )
+        if (scenario->checkArea( mob->in_room->areaIndex() )
             && scenario->checkRoom( mob->in_room )
             && scenario->checkMobile( mob ))
         {
@@ -283,7 +283,7 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
                      GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
                      GQChannel::NORMAL, ch->in_room->getName(), GQChannel::NORMAL);
         if (t <= 5)
-            str << " ({hh" << ch->in_room->area->name << "{hx)" << GQChannel::NORMAL;
+            str << " ({hh" << ch->in_room->areaName() << "{hx)" << GQChannel::NORMAL;
         
         str << endl;
     }

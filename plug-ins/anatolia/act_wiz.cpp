@@ -747,7 +747,7 @@ CMDWIZP( stat )
 
     sprintf( buf, "Имя: '%s'\n\rЗона: '%s'\n\rВладелец: '%s' Клан: '%s'\n\r",
         location->getName(),
-        location->area->name ,
+        location->areaName() ,
         location->owner,
         location->pIndexData->clan->getShortName( ).c_str( ) );
     ch->send_to(buf);
@@ -1595,7 +1595,7 @@ CMDWIZP( rwhere )
 
     for (auto &r: roomInstances)
         if (is_name(argument, r->getName())) {
-            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->area->name);
+            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->areaName());
             found = true;
         }
 

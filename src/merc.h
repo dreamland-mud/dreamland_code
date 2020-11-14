@@ -504,36 +504,48 @@ struct        reset_data
 /*
  * Area definition.
  */
-struct        AreaIndexData
-{
-    AreaIndexData( );
-    
-    AreaIndexData *                next;
-    char *                name;
-    char *                altname;
-    char *                authors;
-    char *                credits;
-    char *              translator;
-    char *              speedwalk;
-    int                age;
-    int                nplayer;
-    int                low_range;
-    int                high_range;
-    int                 min_vnum;
-    int                max_vnum;
-    bool                empty;
-    unsigned long        count;
-    char *                resetmsg;
-    int                area_flag;
-    struct area_file *        area_file;
+struct Area;
+struct AreaIndexData {
+    AreaIndexData();
+
+    Area *create();
+
+    AreaIndexData *next;
+    char *name;
+    char *altname;
+    char *authors;
+    char *credits;
+    char *translator;
+    char *speedwalk;
+    int low_range;
+    int high_range;
+    int min_vnum;
+    int max_vnum;
+    unsigned long count;
+    char *resetmsg;
+    int area_flag;
+    struct area_file *area_file;
     XMLPersistentStreamable<AreaBehavior> behavior;
     HelpArticles helps;
-    
+
     /*OLC*/
-    int                        security;
-    int                        vnum;
-    map<int, Room *>    rooms;
-    map<int, RoomIndexData *>    roomIndexes;
+    int security;
+    int vnum;
+    map<int, RoomIndexData *> roomIndexes;
+
+    // FIXME: support multiple named instances.
+    Area *area;
+};
+struct Area {
+    Area();
+
+    bool empty;
+    int age;
+    int nplayer;
+    int area_flag;
+    map<int, Room *> rooms;
+
+    AreaIndexData *pIndexData;
 };
 
 /*
@@ -604,6 +616,9 @@ extern RoomIndexMap roomIndexMap;
 
 typedef vector<Room *> RoomVector;
 extern RoomVector roomInstances;
+
+typedef vector<Area *> AreaVector;
+extern AreaVector areaInstances;
 
 extern                int                        top_vnum_room;
 extern                int                        top_vnum_mob;

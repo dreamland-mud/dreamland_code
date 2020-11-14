@@ -95,7 +95,6 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
 SPELL_DECL(EnchantArmor);
 VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level ) 
 { 
-    Affect *paf;
     Affect af;
     int result, fail;
     int ac_bonus, add_ac;

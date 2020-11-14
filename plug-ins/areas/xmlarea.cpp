@@ -87,13 +87,7 @@ XMLAreaHeader::compat( )
 
     AreaIndexData *a = new AreaIndexData;
     
-    a->age                = 15;
-    a->nplayer        = 0;
-    a->empty        = false;
-    a->count        = 0;
-    a->next        = 0;
     a->vnum                = top_area++;
-
 
     a->name = str_dup(name.getValue( ).c_str( ));
     a->credits = str_dup(credits.getValue( ).c_str( ));
@@ -116,8 +110,7 @@ XMLAreaHeader::compat( )
         a->resetmsg = str_dup(resetMessage.getValue( ).c_str( ));
     else
         a->resetmsg = 0;
-    
-    
+        
     if(behavior.getNode( )) {
         a->behavior.fromXML(behavior.getNode( ));
         if(a->behavior)
@@ -235,7 +228,7 @@ XMLArea::load_rooms(AreaIndexData *a)
             throw FileFormatException("Load_rooms: vnum %d duplicated", vnum);
 
         RoomIndexData *room = rit->second.compat(vnum);
-        room->area = a;
+        room->areaIndex = a;
         
         if(3000 <= vnum && vnum < 3400)
             SET_BIT(room->room_flags, ROOM_LAW);
@@ -244,7 +237,7 @@ XMLArea::load_rooms(AreaIndexData *a)
         top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
         roomIndexMap[vnum] = room;
-        room->area->roomIndexes[vnum] = room;
+        room->areaIndex->roomIndexes[vnum] = room;
 
         // Create new single room instance for this index (FIXME)
         room->create();        
@@ -327,24 +320,27 @@ XMLArea::load(const DLString &fname)
     AreaIndexData *a = areadata.compat( );
 
     try {
-    if(a) {
-        af->area = a;
-        a->area_file = af;
+        if (a) {
+            // Create new single area instance for this index (FIXME)
+            a->create();
 
-        load_rooms(a);
-        load_mobiles(a);
-        load_objects(a);
-        load_helps(a);
-        
-        if ( area_first == 0 )
-            area_first = a;
-        
-        if ( area_last  != 0 )
-            area_last->next = a;
-        
-        area_last = a;
-        a->next = 0;
-    }
+            af->area = a;
+            a->area_file = af;
+
+            load_rooms(a);
+            load_mobiles(a);
+            load_objects(a);
+            load_helps(a);
+
+            if (area_first == 0)
+                area_first = a;
+
+            if (area_last != 0)
+                area_last->next = a;
+
+            area_last = a;
+            a->next = 0;
+        }
     } catch (const Exception &ex) {
         LogStream::sendFatal() << ex.what() << endl;
         throw ex;

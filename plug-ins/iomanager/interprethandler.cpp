@@ -384,7 +384,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'z' :
             if ( ch->is_immortal() && ch->in_room != 0 )
-                out << ch->in_room->area->name;
+                out << ch->in_room->areaName();
             else
                 out << " ";
             break;
@@ -417,8 +417,7 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     prompt["args"][0]["max_move"] = ch->max_move.getValue();
     prompt["args"][0]["vnum"] = ch->in_room ? ch->in_room->vnum : 0;
     prompt["args"][0]["area"] = DLString(
-            ch->in_room && ch->in_room->area && ch->in_room->area->area_file && ch->in_room->area->area_file->file_name ?
-                    ch->in_room->area->area_file->file_name : "");
+            ch->in_room ? ch->in_room->areaIndex()->area_file->file_name : "");
 
     // Call various web prompt handlers to write out complex stuff defined in other plugins,
     // such as group information, weather, time etc.

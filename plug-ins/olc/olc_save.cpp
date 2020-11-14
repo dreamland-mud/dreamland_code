@@ -145,7 +145,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     // Save area being edited, if authorized
     if (!str_cmp(arg1, "area")) {
-        pArea = ch->in_room->area;
+        pArea = ch->in_room->areaIndex();
 
         if (!pArea || !OLCState::can_edit(ch, pArea)) {
             stc("У вас нет прав изменять эту арию.\n\r", ch);

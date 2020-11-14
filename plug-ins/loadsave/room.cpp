@@ -64,7 +64,7 @@ Room * RoomIndexData::create()
 
     room = new Room;
     
-    room->area = area;
+    room->area = areaIndex->area; // FIXME point to relevant instance
     room->vnum = vnum;
     room->room_flags = room_flags;
     room->pIndexData = this;    

@@ -107,13 +107,13 @@ NMI_GET( RoomWrapper, name , "название комнаты")
 NMI_GET( RoomWrapper, areaname , "имя арии")
 {
     checkTarget( );
-    return Register( target->area->name );
+    return Register( target->areaName() );
 }
 
 NMI_GET( RoomWrapper, area, "экземпляр Area для этой комнаты")
 {
     checkTarget( );
-    return AreaWrapper::wrap( target->area->area_file->file_name );
+    return AreaWrapper::wrap( target->areaIndex()->area_file->file_name );
 }
 
 NMI_GET(RoomWrapper, rnext, "следующая комната в списке room_list")

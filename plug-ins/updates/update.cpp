@@ -1034,8 +1034,8 @@ void update_handler( void )
 
             for (ch = char_list; ch != 0; ch = ch->next)
                 if (!ch->is_npc() && ch->in_room != 0)
-                    ch->in_room->area->count =
-                        min(ch->in_room->area->count+1,5000000UL);
+                    ch->in_room->areaIndex()->count =
+                        min(ch->in_room->areaIndex()->count+1,5000000UL);
         }
     }
     

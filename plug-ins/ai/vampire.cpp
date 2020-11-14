@@ -47,7 +47,7 @@ struct BasicMobileBehavior::VampVictims : public vector<Character *> {
             return false;
 
         // Don't get distracted on a hunt.
-        if (ch->zone && ch->in_room->area != ch->zone && vamp->hasLastFought())
+        if (ch->zone && ch->in_room->areaIndex() != ch->zone && vamp->hasLastFought())
             return false;
 
         return true;

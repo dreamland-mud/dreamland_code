@@ -72,7 +72,7 @@ bool RoomQuestModel::checkRoom( PCharacter *ch, Room *room )
 
 bool RoomQuestModel::checkRoomClient( PCharacter *pch, Room *room ) 
 {
-    if (room->area->low_range > pch->getModifyLevel( ))
+    if (room->areaIndex()->low_range > pch->getModifyLevel( ))
         return false;
 
     if (!checkRoom( pch, room ))
@@ -153,7 +153,7 @@ RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct AreaIndexData *
     RoomList result;
 
     for (auto &r: roomInstances) {
-        if (r->area != targetArea)
+        if (r->areaIndex() != targetArea)
             continue;
         if (!checkRoomClient( pch, r ))
             continue;
@@ -169,7 +169,7 @@ RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct AreaIndexData *
     RoomList result;
 
     for (auto &r: roomInstances) {
-        if (r->area != targetArea)
+        if (r->areaIndex() != targetArea)
             continue;
         if (!checkRoomVictim( pch, r, NULL ))
             continue;
@@ -494,7 +494,7 @@ bool VictimQuestModel::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if ((IS_EVIL(mob) && IS_EVIL(pch)) || (IS_GOOD(mob) && IS_GOOD(pch)))
         return false;
 
-    if (mob->in_room->area != mob->pIndexData->area)
+    if (mob->in_room->areaIndex() != mob->pIndexData->area)
         return false;
 
     if (mob->getRealLevel( ) != mob->pIndexData->level)

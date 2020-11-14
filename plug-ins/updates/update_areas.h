@@ -5,12 +5,12 @@
 #ifndef UPDATE_AREAS_H
 #define UPDATE_AREAS_H
 
-struct AreaIndexData;
+struct Area;
 class Room;
 
 #define FRESET_ALWAYS (A)
 
-void reset_area( AreaIndexData *pArea, int flags = 0 );
+void reset_area( Area *pArea, int flags = 0 );
 void area_update( );
 void reset_room( Room *pRoom, int flags = 0 );
 

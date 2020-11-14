@@ -46,7 +46,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     customer = getRandomClient( pch );
     customerName = customer->getNameP( '1' );
     customerName = customerName.upperFirstCharacter( );
-    customerArea = customer->in_room->area->name;
+    customerArea = customer->in_room->areaName();
     assign<SteakCustomer>( customer );
     save_mobs( customer->in_room );
 
@@ -147,7 +147,7 @@ bool ButcherQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if (!IS_SET(mob->form, FORM_EDIBLE))
         return false;
 
-    if (mob->in_room->area != mob->pIndexData->area)
+    if (mob->in_room->areaIndex() != mob->pIndexData->area)
         return false;
     
     return ButcherQuestRegistrator::getThis( )->races.hasElement( mob->getRace( )->getName( ) );
@@ -166,7 +166,7 @@ bool ButcherQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 
 bool ButcherQuest::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *victim )
 {
-    if (room->area->low_range > pch->getModifyLevel( ))
+    if (room->areaIndex()->low_range > pch->getModifyLevel( ))
         return false;
     
     if (!IS_NATURE(room))

@@ -171,7 +171,7 @@ NMI_GET( HometownWrapper, areaname, "полное название арии" )
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->area->name );
+        return Scripting::Register( room->areaName() );
     else
         return Scripting::Register( DLString::emptyString );
 }
@@ -181,7 +181,7 @@ NMI_GET( HometownWrapper, altname, "альтернативное названи�
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->area->altname );
+        return Scripting::Register( room->areaIndex()->altname );
     else
         return Scripting::Register( DLString::emptyString );
 }
@@ -191,7 +191,7 @@ NMI_GET( HometownWrapper, credits, "оригинальное англ назва
     Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->area->credits );
+        return Scripting::Register( room->areaIndex()->credits );
     else
         return Scripting::Register( DLString::emptyString );
 }

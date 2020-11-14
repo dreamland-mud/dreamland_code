@@ -319,7 +319,7 @@ void load_room_mobiles( Room *room, char *path, bool remove_after )
                     buggy = true;
                     break;
                 
-                } catch (FileFormatException e) {
+                } catch (const FileFormatException &e) {
                     LogStream::sendError( ) << "Load_room_mobiles: " << e.what( ) << endl;
                     buggy = true;
                     break;

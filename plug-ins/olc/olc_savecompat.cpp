@@ -422,7 +422,6 @@ void save_helps(FILE *fp, AreaIndexData *pArea)
 void save_room(FILE *fp, RoomIndexData *pRoomIndex)
 {
     EXTRA_DESCR_DATA *pEd;
-    EXTRA_EXIT_DATA *peexit;
     EXIT_DATA *pExit;
     int door;
     
@@ -843,7 +842,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     // Save area being edited, if authorized
     if (!str_cmp(arg1, "area")) {
-        pArea = ch->in_room->area;
+        pArea = ch->in_room->areaIndex();
 
         if (!pArea || !OLCState::can_edit(ch, pArea)) {
             stc("У вас нет прав изменять эту арию\n\r", ch);

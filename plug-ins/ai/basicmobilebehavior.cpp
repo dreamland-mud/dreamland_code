@@ -248,7 +248,7 @@ bool BasicMobileBehavior::isHomesick( )
     if (ch->position <= POS_SLEEPING)
         return false;
         
-    if (ch->zone == 0 || ch->in_room->area == ch->zone)
+    if (ch->zone == 0 || ch->in_room->areaIndex() == ch->zone)
         return false;
 
     if (ch->switchedFrom)

@@ -417,18 +417,18 @@ OEDIT(where)
                     room->vnum,
                     wch->getNameP('2').c_str( ), 
                     room->getName(), 
-                    room->area->name);
+                    room->areaName());
         else if (o->in_room)
             ptc(ch, "[%5d]   на полу в %s (%s)\r\n", 
                     room->vnum,
                     room->getName(), 
-                    room->area->name);
+                    room->areaName());
         else if (o->in_obj)
             ptc(ch, "[%5d]   внутри %s в %s (%s)\r\n", 
                     room->vnum,
                     o->in_obj->getShortDescr('2').c_str( ),
                     room->getName(),
-                    room->area->name);
+                    room->areaName());
     }
 
     return true;

@@ -62,7 +62,7 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     
     pRoom = victim->in_room;
     roomName.setValue( pRoom->getName() );
-    areaName.setValue( pRoom->area->name );
+    areaName.setValue( pRoom->areaName() );
     mobName.setValue( victim->getShortDescr( ) );
 
     wiznet( "", "%s [%d] Lev %d, Qmode %d",
@@ -86,7 +86,7 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     }
 
     tell_fmt( "Место, где %3$P2 видели в последний раз - {W%4$s{G!",  pch, questman, victim, pRoom->getName() );
-    tell_fmt( "Это находится в районе под названием {W{hh%3$s{hx{G.",  pch, questman, pRoom->area->name );
+    tell_fmt( "Это находится в районе под названием {W{hh%3$s{hx{G.",  pch, questman, pRoom->areaName() );
     tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания.",  pch, questman, time );
 }
 

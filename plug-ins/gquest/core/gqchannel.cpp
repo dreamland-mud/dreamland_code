@@ -30,7 +30,7 @@ GQChannel::~GQChannel( )
     thisClass = NULL;
 }
     
-void GQChannel::zecho( GlobalQuest *gquest, AreaIndexData *area, const DLString& msg ) 
+void GQChannel::zecho( GlobalQuest *gquest, Area *area, const DLString& msg ) 
 {
     Descriptor *d;
     Character *ch;

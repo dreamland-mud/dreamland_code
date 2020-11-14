@@ -12,7 +12,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "wearlocation.h"
 #include "wearloc_codes.h"
 #include "affect.h"
@@ -42,7 +42,7 @@ void area_update( )
 {
 //    ProfilerBlock be("area_update");
 
-    for (AreaIndexData *pArea = area_first; pArea != 0; pArea = pArea->next )
+    for (auto &pArea: areaInstances)
     {
         if ( ++pArea->age < 3 )
             continue;
@@ -55,7 +55,7 @@ void area_update( )
                 || pArea->age >= 31)
         {
             reset_area( pArea );
-            wiznet( WIZ_RESETS, 0, 0, "%s has just been reset.", pArea->name );
+            wiznet( WIZ_RESETS, 0, 0, "%s has just been reset.", pArea->pIndexData->name );
 
             pArea->age = number_range( 0, 3 );
             if (IS_SET(pArea->area_flag, AREA_POPULAR))
@@ -116,19 +116,6 @@ static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
             if (limit > 0 && count >= limit)
                 return count;
         }
-    }
-
-    return count;
-}
-
-static int count_mob_area(AreaIndexData *pArea, MOB_INDEX_DATA *pMob, int limit)
-{
-    int count = 0;
-
-    for (auto &r: pArea->rooms) {
-        count += count_mob_room(r.second, pMob, limit);
-        if (limit > 0 && count >= limit)
-            return count;
     }
 
     return count;
@@ -299,7 +286,8 @@ static bool reset_room_mobs(Room *pRoom)
         NPCharacter *mob = rch->getNPC();
         if (mob->reset_room == 0)
             continue;
-        if (mob->zone != 0 && mob->in_room->area != mob->zone)
+        // FIXME: zone should point to area instance.
+        if (mob->zone != 0 && mob->in_room->areaIndex() != mob->zone)
             continue;
 
         if (reset_one_mob(mob))
@@ -395,7 +383,7 @@ void reset_room(Room *pRoom, int flags)
             mob = create_mobile( pMobIndex );
 
             /* set area */
-            mob->zone = pRoom->area;
+            mob->zone = pRoom->areaIndex();
             mob->reset_room = pRoom->vnum;
 
             char_to_room( mob, pRoom );
@@ -526,7 +514,7 @@ void reset_room(Room *pRoom, int flags)
 /*
  * Reset one area.
  */
-void reset_area( AreaIndexData *pArea, int flags )
+void reset_area( Area *pArea, int flags )
 {
     const char *resetmsg;
     static const char *default_resetmsg = "Ты слышишь мелодичный перезвон колокольчиков.";        
@@ -534,11 +522,11 @@ void reset_area( AreaIndexData *pArea, int flags )
     for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++)
         reset_room( i->second, flags );
     
-    if (pArea->behavior) 
-        pArea->behavior->update( );
+    if (pArea->pIndexData->behavior) 
+        pArea->pIndexData->behavior->update( );
 
-    if (pArea->resetmsg)
-        resetmsg = pArea->resetmsg;
+    if (pArea->pIndexData->resetmsg)
+        resetmsg = pArea->pIndexData->resetmsg;
     else
         resetmsg = default_resetmsg;
 

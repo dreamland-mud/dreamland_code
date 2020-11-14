@@ -226,7 +226,7 @@ Json::Value LocationWebPromptListener::jsonZone( Descriptor *d, Character *ch )
     if (!canSeeLocation( ch ))
         return Json::Value( );
 
-    return Json::Value( DLString( ch->in_room->area->name ).colourStrip( ) );
+    return Json::Value( DLString( ch->in_room->areaName() ).colourStrip( ) );
 }
 
 Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )

@@ -106,6 +106,8 @@ RoomSet roomAffected;
 
 RoomVector roomInstances;
 
+AreaVector areaInstances;
+
 /*
  * Locals.
  */
@@ -169,7 +171,39 @@ new_area_file(const char *name)
     return rc;
 }
 
-AreaIndexData::AreaIndexData( ) : behavior( AreaBehavior::NODE_NAME )
+AreaIndexData::AreaIndexData()
+    : next(0),
+      name(&str_empty[0]), altname(&str_empty[0]),
+      authors(&str_empty[0]), credits(&str_empty[0]),
+      translator(&str_empty[0]), speedwalk(&str_empty[0]),
+      low_range(0), high_range(0),
+      min_vnum(0), max_vnum(0),
+      count(0),
+      resetmsg(0),
+      area_flag(0),
+      behavior(AreaBehavior::NODE_NAME),
+      security(9), vnum(0),
+      area(0)
+{
+}
+
+Area * AreaIndexData::create()
+{
+    if (area) // FIXME allow multiple instances
+        throw Exception("Attempt to create second instance of an area.");
+
+    area = new Area;
+    area->pIndexData = this;
+    area->area_flag = area_flag;
+
+    areaInstances.push_back(area);
+    
+    return area;
+}
+
+Area::Area()
+    : empty(true), age(15), nplayer(0),
+      area_flag(0), pIndexData(0)
 {
 }
 

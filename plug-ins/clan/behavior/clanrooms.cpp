@@ -23,7 +23,7 @@ ClanArea::Pointer ClanRoom::getClanArea( )
     ClanArea::Pointer clanArea;
     AreaIndexData *area;
 
-    area = getRoom( )->area;
+    area = getRoom( )->areaIndex();
 
     if (area->behavior) 
         clanArea = area->behavior.getDynamicPointer<ClanArea>( );

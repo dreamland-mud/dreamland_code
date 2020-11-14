@@ -324,7 +324,7 @@ CMDRUNP( oscore )
     else
         room = get_room_instance( ROOM_VNUM_TEMPLE );
     
-    buf << "  {wДом:{W " << (room ? room->area->name : "Потерян" ) << "{x" << endl
+    buf << "  {wДом:{W " << (room ? room->areaName() : "Потерян" ) << "{x" << endl
         << dlprintf( "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
@@ -672,7 +672,7 @@ CMDRUNP( where )
     if (arg.empty( ) || fPKonly)
     {
         ch->printf( "Ты находишься в местности {W{hh%s{x. Недалеко от тебя:\r\n",
-                     ch->in_room->area->name );
+                     ch->in_room->areaName() );
         found = false;
 
         for ( d = descriptor_list; d; d = d->next )
@@ -1505,7 +1505,7 @@ static void do_score_args(Character *ch, const DLString &arg)
     } 
 	if (arg_oneof(arg, "hometown", "дом")) {
         Room *room = get_room_instance(pch->getHometown()->getAltar());
-        ch->pecho("Твой дом - %s.", room ? room->area->name : "потерян");
+        ch->pecho("Твой дом - %s.", room ? room->areaName() : "потерян");
         return;
     } 
 	if (arg_oneof(arg, "religion", "религия")) {
@@ -1711,7 +1711,7 @@ CMDRUNP( score )
             CLR_FRAME,
 
             CLR_CAPT,
-            room ? room->area->name : "Потерян",
+            room ? room->areaName() : "Потерян",
             CLR_BAR,
             msgtable_lookup( msg_positions, ch->position ),
             CLR_FRAME,

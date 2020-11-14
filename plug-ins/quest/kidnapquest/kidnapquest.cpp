@@ -45,11 +45,11 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
         king = createKing( pch );
         kingVnum = king->pIndexData->vnum;
         kingRoom = king->in_room->getName();
-        kingArea = king->in_room->area->name;
+        kingArea = king->in_room->areaName();
         kingName = king->getShortDescr( );
 
         room = findRefuge( pch, king );
-        princeArea = room->area->name;
+        princeArea = room->areaName();
         princeRoom = room->getName();
 
         prince = createPrince( king, room );
@@ -220,7 +220,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         tell_raw( ch, questman, 
              "Последний раз {W%s{G видели в местности {W{hh%s{hx{G.", 
              russian_case( princeName, '4' ).c_str( ),
-             room->area->name );
+             room->areaName() );
      
     hint++;
     wiznet( "find", "success, attempt #%d", hint.getValue( ) );
@@ -312,7 +312,7 @@ bool KidnapQuest::checkRoomClient( PCharacter *pch, Room * room )
     if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
         return false;
     
-    if (!kingArea.empty( ) && kingArea == room->area->name)
+    if (!kingArea.empty( ) && kingArea == room->areaName())
         return false;
 
     return true;

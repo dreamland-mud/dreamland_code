@@ -23,6 +23,7 @@
 #include "affectlist.h"
 
 struct AreaIndexData;
+struct Area;
 struct extra_descr_data;
 struct exit_data;
 struct extra_exit_data;
@@ -86,7 +87,7 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
 
     Scripting::Register init;
 
-    AreaIndexData *area;
+    AreaIndexData *areaIndex;
 
     Room *room; // FIXME wil be replaces with a list of instances
 };
@@ -140,12 +141,15 @@ public:
     /** Shorthand to return prototype's sector type. */
     inline int getSectorType() const;
 
+    inline AreaIndexData *areaIndex() const;
+    const char * areaName() const;
+
     /** This room's position in the global roomInstances vector. Needed for backward compat. */
     int position;
 
     Character *   people;
     Object *      contents;
-    AreaIndexData *area;
+    Area *area;
     exit_data *   exit[6];
     ExtraExitList extra_exits;
     char *     owner;
@@ -202,7 +206,10 @@ inline int Room::getSectorType() const
     return pIndexData->sector_type;
 }
 
-
+inline AreaIndexData *Room::areaIndex() const
+{
+    return pIndexData->areaIndex;
+}
 
 /*
  * room macros

@@ -65,48 +65,6 @@ void free_reset_data(RESET_DATA * pReset)
     return;
 }
 
-void init_area(AreaIndexData *pArea) 
-{
-    top_area++;
-    pArea->next = NULL;
-    pArea->name = str_dup("New area");
-    pArea->area_flag = AREA_ADDED;
-    pArea->security = 9;
-    pArea->authors = str_dup("");
-    pArea->altname = str_dup("None");
-    pArea->translator = str_dup("None");
-    pArea->speedwalk = str_dup("");
-    pArea->min_vnum = 0;
-    pArea->max_vnum = 0;
-    pArea->low_range = 0;
-    pArea->high_range = 0;
-    pArea->age = 0;
-    pArea->nplayer = 0;
-    pArea->empty = true;
-    pArea->credits = str_dup("None");
-    pArea->resetmsg = str_dup("");
-    pArea->vnum = top_area - 1;
-}
-
-AreaIndexData *new_area(void)
-{
-    AreaIndexData *pArea;
-    pArea = new AreaIndexData; 
-    init_area(pArea);
-    return pArea;
-}
-
-void free_area(AreaIndexData * pArea)
-{
-    free_string(pArea->name);
-    free_string(pArea->authors);
-    free_string(pArea->altname);
-    free_string(pArea->translator);
-    free_string(pArea->speedwalk);
-    delete pArea;
-    return;
-}
-
 EXIT_DATA *new_exit(void)
 {
     EXIT_DATA *pExit;
@@ -182,23 +140,6 @@ OBJ_INDEX_DATA *new_obj_index(void)
     return pObj;
 }
 
-void free_obj_index(OBJ_INDEX_DATA * pObj)
-{
-    EXTRA_DESCR_DATA *pExtra;
-
-    free_string(pObj->name);
-    free_string(pObj->short_descr);
-    free_string(pObj->description);
-
-    pObj->affected.deallocate();
-
-    for (pExtra = pObj->extra_descr; pExtra; pExtra = pExtra->next) {
-        free_extra_descr(pExtra);
-    }
-    
-    delete pObj;
-}
-
 MOB_INDEX_DATA *new_mob_index(void)
 {
     MOB_INDEX_DATA *pMob;
@@ -252,16 +193,6 @@ MOB_INDEX_DATA *new_mob_index(void)
     pMob->new_format = true;
     pMob->behavior = 0;
     return pMob;
-}
-
-void free_mob_index(MOB_INDEX_DATA * pMob)
-{
-    free_string(pMob->player_name);
-    free_string(pMob->short_descr);
-    free_string(pMob->long_descr);
-    free_string(pMob->description);
-
-    delete pMob;
 }
 
 Affect *new_affect()

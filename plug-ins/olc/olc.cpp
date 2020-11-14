@@ -73,7 +73,7 @@ static int next_index_data( Character *ch, RoomIndexData *r, int ndx_type )
     if (!r)
         return -1;
 
-    pArea = r->area;
+    pArea = r->areaIndex;
     if (!pArea)
         return -1;
 
@@ -654,7 +654,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] %-35s{x [{C%s{x]";
         for (auto &room: roomInstances) {
             ostringstream *buf;
-            if (IS_SET(room->room_flags, ROOM_MANSION) || !str_prefix("ht", room->area->area_file->file_name))
+            if (IS_SET(room->room_flags, ROOM_MANSION) 
+                    || !str_prefix("ht", room->areaIndex()->area_file->file_name))
                 buf = &mbuf;
             else if (room->pIndexData->clan != clan_none)
                 buf = &cbuf;

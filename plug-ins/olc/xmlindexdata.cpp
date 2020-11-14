@@ -335,7 +335,7 @@ int XMLRoomIndexData::getVnum() const
 
 AreaIndexData * XMLRoomIndexData::getArea() const
 {
-    return room->area;
+    return room->areaIndex;
 }
 
 const char * XMLRoomIndexData::getIndexType() const

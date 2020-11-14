@@ -142,14 +142,14 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
                             wch->sees( carrier, '2' ).c_str( ) );
             interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
                             wch->sees( carrier, '1' ).c_str( ),
-                            carrier->in_room->area->name,
+                            carrier->in_room->areaName(),
                             carrier->in_room->getName() );
         }
     }
     else {
         interpret_raw( ch, "say", "{1%s{2 находится в зоне %s около %s!",
                         obj->getShortDescr( '1' ).c_str( ),
-                        obj->getRoom( )->area->name, 
+                        obj->getRoom( )->areaName(), 
                         obj->getRoom()->getName() );
     }
 }

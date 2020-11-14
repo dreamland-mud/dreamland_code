@@ -852,7 +852,7 @@ bool spec_guard( NPCharacter *ch )
         interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
                         victim->getNameP(), 
                         ch->in_room->getName(), 
-                        ch->in_room->area->name);
+                        ch->in_room->areaName());
 
         if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
                 && !is_safe_nomessage( ch, victim ))

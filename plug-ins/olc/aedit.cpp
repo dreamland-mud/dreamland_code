@@ -36,8 +36,6 @@ OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
             name      = original->name;
         if(original->name)
             credits   = original->credits;
-        age       = original->age;
-        nplayer   = original->nplayer;
         low_range = original->low_range;
         high_range= original->high_range;
         min_vnum  = original->min_vnum;
@@ -80,8 +78,6 @@ OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
         max_vnum = 0;
         low_range = 0;
         high_range = 0;
-        age = 0;
-        nplayer = 0;
         credits = "None";
         resetmsg = "";
         file_name.setValue( DLString( "area" ) + DLString( vnum ) + ".are" );
@@ -98,14 +94,13 @@ void OLCStateArea::commit()
     
     if(!original) {
         original = new AreaIndexData;
-        original->next = NULL;
         original->area_file = new_area_file( file_name.getValue( ).c_str( ) );
         original->area_file->area = original;
-        original->empty = true;
-        original->count = 0;
 
         area_last->next = original;
         area_last = original;
+
+        original->create();
     }
     else {
         free_string(original->area_file->file_name);
@@ -121,8 +116,6 @@ void OLCStateArea::commit()
 
     original->name      = str_dup( name.getValue( ).c_str( ) );
     original->credits   = str_dup( credits.getValue( ).c_str( ) );
-    original->age       = age;
-    original->nplayer   = nplayer;
     original->low_range = low_range;
     original->high_range= high_range;
     original->min_vnum  = min_vnum;
@@ -144,6 +137,9 @@ void OLCStateArea::commit()
         } catch (const Exception &e) {
             LogStream::sendError( ) << e.what( ) << endl;
         }
+
+    // FIXME update all instances
+    original->area->area_flag = area_flag;
 }
 
 void OLCStateArea::statePrompt(Descriptor *d) 
@@ -180,8 +176,6 @@ AEDIT(show, "показать", "показать все поля")
     ptc(ch, "File:       [%s]\n\r", file_name.getValue( ).c_str( ));
     ptc(ch, "Vnums:      [%u-%u]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
     ptc(ch, "Levels:     [%u-%u]\n\r", low_range.getValue( ), high_range.getValue( ));
-    ptc(ch, "Age:        [%d]\n\r", age.getValue( ));
-    ptc(ch, "Players:    [%d]\n\r", nplayer.getValue( ));
     ptc(ch, "Security:   [%d]\n\r", security.getValue( ));
     ptc(ch, "Authors:    [%s]\n\r", authors.getValue( ).c_str( ));
     ptc(ch, "Credits:    [%s]\n\r", credits.getValue( ).c_str( ));
@@ -291,7 +285,8 @@ AEDIT(reset, "сбросить", "сбросить арию, обновив вс
     AreaIndexData *original = get_area_data(vnum);
 
     if (original) {
-        reset_area(original, FRESET_ALWAYS);
+        // FIXME reset either all instances or the current one.
+        reset_area(original->area, FRESET_ALWAYS);
         stc("Ария сброшена.\n\r", ch);
         return false;
     }
@@ -414,24 +409,6 @@ AEDIT(file, "файл", "установить имя файла, в которы
     stc("Filename set.\n\r", ch);
     return true;
 }
-
-AEDIT(age, "возраст", "установить текущий возраст арии (как скоро наступит автосброс)")
-{
-    char age[MAX_STRING_LENGTH];
-
-    one_argument(argument, age);
-
-    if (!is_number(age) || !*age) {
-        stc("Syntax:  age [#xage]\n\r", ch);
-        return false;
-    }
-
-    this->age = atoi(age);
-
-    stc("Age set.\n\r", ch);
-    return true;
-}
-
 
 AEDIT(security, "права", "установить уровень доступа к арии, 0..9")
 {
@@ -711,7 +688,7 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     int value;
     char arg[MAX_STRING_LENGTH];
 
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
 
     argument = one_argument(argument, arg);
     if (is_number(arg)) {

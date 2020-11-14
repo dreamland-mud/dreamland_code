@@ -114,7 +114,7 @@ vnumck()
         
         for (auto &r: roomIndexMap) {
             room = r.second;
-            if(room->area != *i)
+            if(room->areaIndex != *i)
                 continue;
             
             if(room->vnum < l || room->vnum > h)
@@ -270,24 +270,12 @@ void new_load_area( FILE *fp )
     AreaIndexData *pArea;
     
     pArea                = new AreaIndexData;
-    pArea->age                = 15;
-    pArea->nplayer        = 0;
-    pArea->empty        = false;
-    pArea->count        = 0;
-    pArea->resetmsg        = 0;
-    pArea->area_flag        = 0;
     pArea->authors      = str_dup("");
     pArea->altname      = str_dup("");
     pArea->name         = str_dup("");
     pArea->credits      = str_dup("");
     pArea->translator   = str_dup("");
     pArea->speedwalk    = str_dup("");
-    pArea->security        = 9;
-    pArea->min_vnum        = 0;
-    pArea->max_vnum        = 0;
-    pArea->low_range    = 0;
-    pArea->high_range   = 0;
-    pArea->behavior.clear( );
 
     load_area_header(fp, pArea);
 
@@ -306,7 +294,9 @@ void new_load_area( FILE *fp )
     Serarea = pArea;
 
     top_area++;
-    
+
+    // Create new single area instance for this index (FIXME)
+    pArea->create();
 
     return;
 }
@@ -624,7 +614,7 @@ void load_rooms( FILE *fp )
             throw FileFormatException( "Load_rooms: vnum %d duplicated in %s", vnum, strArea );
         
         pRoomIndex = new RoomIndexData;
-        pRoomIndex->area        = area_last;
+        pRoomIndex->areaIndex        = area_last;
         pRoomIndex->vnum        = vnum;
         pRoomIndex->name        = fread_string( fp );
         pRoomIndex->description        = fread_string( fp );
@@ -786,7 +776,7 @@ void load_rooms( FILE *fp )
         top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
         roomIndexMap[vnum] = pRoomIndex;
-        pRoomIndex->area->roomIndexes[vnum] = pRoomIndex;
+        pRoomIndex->areaIndex->roomIndexes[vnum] = pRoomIndex;
 
         // Create new single room instance for this index (FIXME)
         pRoomIndex->create();
@@ -1082,7 +1072,7 @@ static int get_obj_reset_level( AreaIndexData *pArea, int keyVnum )
                         if (in->item_type == ITEM_CONTAINER
                             && IS_SET(in->value[1], CONT_LOCKED))
                         {
-                            level = min( get_obj_reset_level( pRoomIndex->area, in->value[2] ), 
+                            level = min( get_obj_reset_level( pRoomIndex->areaIndex, in->value[2] ), 
                                          level );
                         }
                         else
@@ -1110,7 +1100,7 @@ void fix_door_levels( bool verbose )
             if (IS_SET(ex->exit_info_default, EX_NOPASS))
                 continue;
             
-            ex->level = get_obj_reset_level( r->area, ex->key );
+            ex->level = get_obj_reset_level( r->area->pIndexData, ex->key );
             
             if (verbose)
                 LogStream::sendNotice( )
@@ -1124,7 +1114,7 @@ void fix_door_levels( bool verbose )
             if (IS_SET(ex->exit_info_default, EX_NOPASS))
                 continue;
             
-            ex->level = get_obj_reset_level( r->area, ex->key );
+            ex->level = get_obj_reset_level( r->area->pIndexData, ex->key );
 
             if (verbose)
                 LogStream::sendNotice( )

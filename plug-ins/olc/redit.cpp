@@ -27,7 +27,7 @@
 #include "interp.h"
 #include "clanreference.h"
 #include "profession.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act_move.h"
 #include "update_areas.h"
 #include "websocketrpc.h"
@@ -134,9 +134,9 @@ REDIT(rlist, "ксписок", "список всех комнат в данно
 
     one_argument(argument, arg);
 
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
 
-    if (pArea->rooms.empty( )) {
+    if (pArea->roomIndexes.empty( )) {
         stc("Комната(комнаты) в этой арии не обнаружены.\n\r", ch);
         return false;
     }
@@ -175,7 +175,7 @@ REDIT(mlist, "мсписок", "список всех мобов в данной
     }
 
     one_argument(argument, arg);
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
     fAll = !str_cmp(arg, "all");
     found = false;
 
@@ -219,7 +219,7 @@ REDIT(olist, "псписок", "список всех предметов в да
     }
 
     one_argument(argument, arg);
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
     fAll = !str_cmp(arg, "all");
     found = false;
 
@@ -263,7 +263,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
 
     ptc(ch, "Name:       [{W%s{x] %s\n\rArea:       [{W%5d{x] %s\n\r",
               pRoom->name, web_edit_button(showWeb, ch, "name", "web").c_str(),
-              pRoom->area->vnum, pRoom->area->name);
+              pRoom->areaIndex->vnum, pRoom->areaIndex->name);
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
     ptc(ch, "Clan:       [{W%s{x] ", pRoom->clan->getName( ).c_str( ));
     ptc(ch, "Guilds: [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
@@ -469,7 +469,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             free_exit(to_room->exit[rev]);
             to_room->exit[rev] = NULL;
             
-            if(pRoom->area != to_room->area)
+            if(pRoom->areaIndex->area != to_room->area) // FIXME instances
                 SET_BIT(to_room->area->area_flag, AREA_CHANGED);
             stc("Exit unlinked from remote side.\n\r", ch);
         }
@@ -539,7 +539,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         to_room->exit[door]->u1.to_room = pRoom->room;
         to_room->pIndexData->exit[door]->orig_door = to_room->exit[door]->orig_door = door;
 
-        if(pRoom->area != to_room->area)
+        if(pRoom->areaIndex->area != to_room->area) // FIXME instances
             SET_BIT(to_room->area->area_flag, AREA_CHANGED);
 
         stc("Two-way link established.\n\r", ch);
@@ -733,13 +733,13 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
 
     pRoom = new_room_index();
     pRoom->vnum = value;
-    pRoom->area = get_vnum_area(value);
+    pRoom->areaIndex = get_vnum_area(value);
 
     if (value > top_vnum_room)
         top_vnum_room = value;
 
     roomIndexMap[value] = pRoom;
-    pRoom->area->roomIndexes[value] = pRoom;
+    pRoom->areaIndex->roomIndexes[value] = pRoom;
 
     pRoom->create();
 
@@ -1187,7 +1187,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if(!pRoom)
             return;
 
-        SET_BIT(pRoom->area->area_flag, AREA_CHANGED);
+        SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
         
     } else if(is_number(arg1)) {
         pRoom = get_room_index(atoi(arg1));

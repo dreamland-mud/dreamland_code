@@ -42,10 +42,10 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
-static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, DLString &where )
+static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, DLString &where )
 {
     int mobVnum = -1;
-    for(RESET_DATA *pReset = room->pIndexData->reset_first;pReset;pReset = pReset->next) {
+    for(RESET_DATA *pReset = pRoom->reset_first;pReset;pReset = pReset->next) {
         switch(pReset->command) {
             case 'M':
                 // Remember potential carrier in the room.
@@ -58,7 +58,7 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, 
                     MOB_INDEX_DATA *pMob = get_mob_index( mobVnum );
                     if (pMob) {
                         // Return success
-                        pArea = room->area;
+                        pArea = pRoom->areaIndex;
                         where = russian_case(pMob->short_descr, '1');
                         return true;
                     }
@@ -67,8 +67,8 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, 
             case 'O':
                 if (pReset->arg1 == vnum) { 
                     // Object is on the floor, return success.
-                    pArea = room->area;
-                    where = room->getName();
+                    pArea = pRoom->areaIndex;
+                    where = pRoom->name;
                     return true;
                 }
                 break; 
@@ -78,8 +78,8 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, 
                     OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
                     if (in) {
                         // Return success.
-                        pArea = room->area;
-                        where = room->getName();
+                        pArea = pRoom->areaIndex;
+                        where = pRoom->name;
                         return true;
                     }
                 }
@@ -93,13 +93,14 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AreaIndexData *&pArea, 
 
 static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLString &where )
 {
-    for (auto &room: roomInstances) {
-        for(RESET_DATA *pReset = room->pIndexData->reset_first;pReset;pReset = pReset->next) {
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *pRoom = r.second;
+        for(RESET_DATA *pReset = pRoom->reset_first;pReset;pReset = pReset->next) {
             switch(pReset->command) {
             case 'M':
                 if (pReset->arg1 == pMob->vnum) {
-                    pArea = room->area;
-                    where = room->getName();
+                    pArea = pRoom->areaIndex;
+                    where = pRoom->name;
                     return true;
                 }
             }
@@ -112,15 +113,17 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLStrin
 static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLString &where )
 {
     // First look for obj resets in the same area it's from.
-    for (auto &pair: pObj->area->rooms) {
-        Room *room = pair.second;
-        if (get_obj_resets_in_room(room, pObj->vnum, pArea, where))
+    for (auto &pair: pObj->area->roomIndexes) {
+        RoomIndexData *pRoom = pair.second;
+
+        if (get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where))
             return true;
     }
 
     // Scan resets for each room.
-    for (auto &room: roomInstances) {
-        if (room->area != pObj->area && get_obj_resets_in_room(room, pObj->vnum, pArea, where))
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *pRoom = r.second;
+        if (pRoom->areaIndex != pObj->area && get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where))
             return true;
     }
 

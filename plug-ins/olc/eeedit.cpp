@@ -82,7 +82,7 @@ OLCStateExtraExit::commit( )
     if(!pRoom)
         return;
 
-    SET_BIT(pRoom->area->area_flag, AREA_CHANGED);
+    SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
 
     EXTRA_EXIT_DATA *eexit = pRoom->extra_exits.find(keyword);
     

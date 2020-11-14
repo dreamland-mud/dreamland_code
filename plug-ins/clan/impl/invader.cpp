@@ -163,7 +163,7 @@ SKILL_RUNP(fade)
 SPELL_DECL(EvilSpirit);
 VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
 {
-    AreaIndexData *pArea = room->area;
+    Area *pArea = room->area;
     Affect af, af2;
 
     if (IS_ROOM_AFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
@@ -201,9 +201,9 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
     af.modifier = 0;
     af.bitvector = AFF_ROOM_ESPIRIT;
 
-    for (map<int, Room *>::iterator i = pArea->rooms.begin(); i != pArea->rooms.end(); i++)
+    for (auto r: pArea->rooms)
     {
-        room = i->second;
+        Room *room = r.second;
         room->affectTo(&af);
         act("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
     }

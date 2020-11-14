@@ -48,7 +48,7 @@ RoomIndexData::RoomIndexData()
           vnum(0), room_flags(0),
           sector_type(0), heal_rate(100), mana_rate(100),
           clan( clan_none ),  guilds( professionManager ),
-          liquid( liq_none ), area(0), room(0)
+          liquid( liq_none ), areaIndex(0), room(0)
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
         exit[i] = 0;
@@ -95,6 +95,12 @@ bool Room::hasExits() const
             return true;
     return false;
 }
+
+const char * Room::areaName() const
+{
+    return pIndexData->areaIndex->name;
+}
+
 
 bool Room::isPrivate( ) const
 {

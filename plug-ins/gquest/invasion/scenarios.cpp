@@ -59,8 +59,10 @@ bool InvasionScenario::checkArea( AreaIndexData *area )
  *-------------------------------------------------------------------------*/
 void InvasionSparseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 {
+    // FIXME: scenarios should only check default area instances.
+    
     for (auto &room: roomInstances) {
-        if (!checkArea( room->area ))
+        if (!checkArea( room->areaIndex() ))
             continue;
         
         if (!checkRoom( room ))
@@ -80,13 +82,13 @@ void InvasionDenseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
     int areaCnt;
     
     for (auto &room: roomInstances) {
-        if (!checkArea( room->area )) 
+        if (!checkArea( room->areaIndex() )) 
             continue;
             
         if (!checkRoom( room ))
             continue;
         
-        goodRooms[room->area].push_back( room );
+        goodRooms[room->areaIndex()].push_back( room );
     }
 
     areaCnt = std::max( 3, number_range( mobCnt / 20, mobCnt / 7 ) );

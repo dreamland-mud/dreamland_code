@@ -574,7 +574,7 @@ MEDIT(where)
         ptc(ch, "[%5d]    %-30s (%s)\r\n", 
                 wch->in_room->vnum,
                 wch->in_room->getName(), 
-                wch->in_room->area->name);
+                wch->in_room->areaName());
     }
 
     return true;

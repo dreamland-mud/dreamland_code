@@ -90,8 +90,8 @@ GMCPCOMMAND_RUN(charToRoom)
     Json::Value data;
     data["num"] = ch->in_room->vnum;
     data["name"] = DLString(ch->in_room->getName()).colourStrip();
-    data["area"] = DLString(ch->in_room->area->name).colourStrip();
-    data["map"] = ASCII_MAPS + ch->in_room->area->area_file->file_name + ".html";
+    data["area"] = DLString(ch->in_room->areaName()).colourStrip();
+    data["map"] = ASCII_MAPS + ch->in_room->areaIndex()->area_file->file_name + ".html";
     
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         Room *room = direction_target(ch->in_room, door);

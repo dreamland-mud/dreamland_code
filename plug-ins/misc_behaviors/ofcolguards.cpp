@@ -24,7 +24,7 @@ bool OfcolMarshal::specFight( )
     
     BasicMobileDestiny::specFight();
 
-    if (ch->in_room->area != ch->zone) 
+    if (ch->in_room->areaIndex() != ch->zone) 
         return BasicMobileDestiny::specFight();
 
     if (number_percent() < 25) 
@@ -105,9 +105,7 @@ bool OfcolGuard::specFight()
 {
     Character *ach, *ach_next;
     
-    interpret_raw(ch, "say", "Сражаюсь");
-    
-    if (ch->in_room->area != ch->zone) 
+    if (ch->in_room->areaIndex() != ch->zone) 
         return BasicMobileDestiny::specFight();
 
     if (number_percent( ) < 25) 
