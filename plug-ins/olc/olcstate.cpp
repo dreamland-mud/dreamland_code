@@ -214,9 +214,7 @@ bool OLCState::can_edit( Character *ch, AreaIndexData *pArea )
 /* returns corresponding area pointer for mob/room/obj vnum */
 AreaIndexData *OLCState::get_vnum_area(int vnum)
 {
-    AreaIndexData *pArea;
-
-    for (pArea = area_first; pArea; pArea = pArea->next)
+    for(auto &pArea: areaIndexes)
         if (vnum >= pArea->min_vnum && vnum <= pArea->max_vnum)
             return pArea;
         

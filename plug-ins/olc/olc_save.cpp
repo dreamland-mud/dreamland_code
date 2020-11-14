@@ -120,7 +120,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         stc("Saved zones:\n\r", ch);
         sprintf(buf, "None.\n\r");
 
-        for (pArea = area_first; pArea; pArea = pArea->next) {
+        for(auto &pArea: areaIndexes) {
             /* Builder must be assigned this area. */
             if (!OLCState::can_edit(ch, pArea))
                 continue;

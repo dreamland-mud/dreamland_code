@@ -510,7 +510,6 @@ struct AreaIndexData {
 
     Area *create();
 
-    AreaIndexData *next;
     char *name;
     char *altname;
     char *authors;
@@ -591,9 +590,6 @@ struct Area {
 /*
  * Global variables.
  */
-extern                AreaIndexData        *area_first;
-extern                AreaIndexData        *area_last;
-
 extern                Character          *        char_list;
 extern                Character          *        newbie_list;
 extern                Object          *        object_list;
@@ -619,6 +615,9 @@ extern RoomVector roomInstances;
 
 typedef vector<Area *> AreaVector;
 extern AreaVector areaInstances;
+
+typedef vector<AreaIndexData *> AreaIndexVector;
+extern AreaIndexVector areaIndexes;
 
 extern                int                        top_vnum_room;
 extern                int                        top_vnum_mob;

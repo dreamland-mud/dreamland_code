@@ -59,7 +59,8 @@ CMDRUNP( areas )
     buf << "Название                Сложность        Название                Сложность" << endl
         << "-------------------------------------------------------------------------------" << endl;
 
-    for (pArea = area_first; pArea; pArea = pArea->next) {
+    for(auto &pArea: areaIndexes) {
+
         if (IS_SET(pArea->area_flag, AREA_HIDDEN|AREA_SYSTEM)) 
             continue;
         

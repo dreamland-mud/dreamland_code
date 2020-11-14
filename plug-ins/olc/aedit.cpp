@@ -97,8 +97,7 @@ void OLCStateArea::commit()
         original->area_file = new_area_file( file_name.getValue( ).c_str( ) );
         original->area_file->area = original;
 
-        area_last->next = original;
-        area_last = original;
+        areaIndexes.push_back(original);
 
         original->create();
     }
@@ -149,9 +148,7 @@ void OLCStateArea::statePrompt(Descriptor *d)
 
 bool OLCStateArea::checkOverlap(int lower, int upper)
 {
-    AreaIndexData *pArea;
-
-    for (pArea = area_first; pArea; pArea = pArea->next) {
+    for(auto &pArea: areaIndexes) {
         if(pArea->vnum == vnum)
             continue;
             

@@ -11,9 +11,7 @@
 #include "def.h"
 
 void AreaBehaviorPlugin::initialization( ) {
-    AreaIndexData *area;
-
-    for (area = area_first; area; area = area->next) {
+    for(auto &area: areaIndexes) {
         if (!area->behavior)
             continue;
         
@@ -25,13 +23,11 @@ void AreaBehaviorPlugin::initialization( ) {
 }
 
 void AreaBehaviorPlugin::destruction( ) {
-    AreaIndexData *area;
-
     /* XXX */
     if (dreamland->isShutdown( ))
         return;
 
-    for (area = area_first; area; area = area->next) {
+    for(auto &area: areaIndexes) {
         if (!area->behavior)
             continue;
         

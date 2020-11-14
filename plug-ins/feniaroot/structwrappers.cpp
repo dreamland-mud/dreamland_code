@@ -53,9 +53,7 @@ NMI_INIT(AreaWrapper, "area, зона");
 
 static AreaIndexData *find_area( const DLString &filename )
 {
-    AreaIndexData *area;
-
-    for (area = area_first; area; area = area->next)
+    for(auto &area: areaIndexes)
         if (filename == area->area_file->file_name)
             return area;
 

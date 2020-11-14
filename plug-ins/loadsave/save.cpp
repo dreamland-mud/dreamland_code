@@ -102,9 +102,6 @@
 #include "vnum.h"
 #include "def.h"
 
-extern AreaIndexData *                area_first;
-extern AreaIndexData *                area_last;
-
 GSN(none);
 GSN(doppelganger);
 GSN(dispel_affects);
@@ -1573,12 +1570,11 @@ NPCharacter * fread_mob( FILE *fp )
 
                     if ( !str_cmp( word, "RZone" ) )
                     {
-                            AreaIndexData *pArea;
                             char *rznm = fread_string( fp );
                             DLString zoneName(rznm);
                             free_string(rznm);
 
-                            for ( pArea = area_first; pArea != 0; pArea = pArea->next )
+                            for(auto &pArea: areaIndexes)
                                     if ( !str_cmp( zoneName.c_str(), pArea->area_file->file_name ) )
                                     {
                                             mob->zone = pArea;

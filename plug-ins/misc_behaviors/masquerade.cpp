@@ -97,8 +97,9 @@ bool RoamingPortal::area( )
     vnum = obj->pIndexData->vnum;
     area = NULL;
     room = NULL;
+    count = 0;
     
-    for (count = 0, pArea = area_first; pArea; pArea = pArea->next) {
+    for(auto &pArea: areaIndexes) {
         if (IS_SET(pArea->area_flag, AREA_NOQUEST))
             continue;
 

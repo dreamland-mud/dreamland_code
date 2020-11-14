@@ -3296,30 +3296,6 @@ CMDWIZP( smite )
   return;
 }
 
-CMDWIZP( popularity )
-{
-    ostringstream buf;
-    AreaIndexData *area;
-    extern AreaIndexData *area_first;
-    int i;
-    bool fAll;
-
-    fAll = !str_cmp( argument, "all" );
-    buf << "Area popularity statistics (in char * ticks)" << endl;
-
-    for (area = area_first, i = 1; area != 0; area = area->next) {
-        if (fAll || area->count > 0) {
-            buf << fmt( 0, "%-30.30s %-5.5d", 
-                           area->name, min( (long unsigned int)0xffff, area->count ) );
-            if (i++ % 2 == 0)
-                buf << endl;
-        }
-    }
-
-    buf << endl;
-    page_to_char( buf.str( ).c_str( ), ch );
-}
-
 CMDWIZP( ititle )
 {
     char arg[MAX_INPUT_LENGTH];

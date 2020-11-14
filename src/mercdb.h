@@ -80,7 +80,6 @@ extern int                newmobs;
 extern int                newobjs;
 extern mob_index_data         * mob_index_hash          [MAX_KEY_HASH];
 extern obj_index_data         * obj_index_hash          [MAX_KEY_HASH];
-extern AreaIndexData         * area_first;
 
 extern int        top_affect;
 extern int        top_area;

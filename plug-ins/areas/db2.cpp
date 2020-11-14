@@ -282,7 +282,7 @@ load_mobiles( FILE *fp )
         pMobIndex = new MOB_INDEX_DATA;
         *pMobIndex = zeroMobIndex;
         pMobIndex->vnum = vnum;
-        pMobIndex->area        = area_last;
+        pMobIndex->area = areaIndexes.back();
         load_mobile(fp, pMobIndex);
         newmobs++;
         
@@ -489,7 +489,7 @@ load_objects( FILE *fp )
     static OBJ_INDEX_DATA zeroObjIndex;
     OBJ_INDEX_DATA *pObjIndex = NULL;
 
-    if ( area_last == 0 ) {
+    if (areaIndexes.empty()) {
         LogStream::sendFatal( ) << "Load_resets: no #AREA seen yet." << endl;
         exit( 1 );
     }
@@ -513,7 +513,7 @@ load_objects( FILE *fp )
         pObjIndex = new OBJ_INDEX_DATA;
         *pObjIndex = zeroObjIndex;
         pObjIndex->vnum = vnum;
-        pObjIndex->area        = area_last;
+        pObjIndex->area  = areaIndexes.back();
         load_object(fp, pObjIndex);
 
         newobjs++;

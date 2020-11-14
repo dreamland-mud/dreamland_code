@@ -56,7 +56,6 @@ LIQ(water);
 
 FILE *                        fpArea;
 char                        strArea[MAX_INPUT_LENGTH];
-AreaIndexData                *Serarea;        /* currently read area */
 
 RESET_DATA               *reset_first = 0;
 RESET_DATA               *reset_last = 0;
@@ -89,13 +88,12 @@ __lowrangecmp__(AreaIndexData *l, AreaIndexData *r)
 void
 vnumck()
 {
-    AreaIndexData *area;
     typedef list<AreaIndexData *> alist;
     alist areas;
     
     LogStream::sendNotice() << "Checking vnum ranges..." << endl;
 
-    for(area = area_first; area; area = area->next)
+    for(auto &area: areaIndexes)
         areas.push_back(area);
 
     areas.sort( ptr_fun(__lowrangecmp__) );
@@ -283,15 +281,7 @@ void new_load_area( FILE *fp )
     area_file_list->area= pArea;
     pArea->vnum                = top_area;
 
-    if ( area_first == 0 )
-        area_first = pArea;
-    
-    if ( area_last  != 0 )
-        area_last->next = pArea;
-    
-    area_last        = pArea;
-    pArea->next        = 0;
-    Serarea = pArea;
+    areaIndexes.push_back(pArea);
 
     top_area++;
 
@@ -351,7 +341,7 @@ void load_resets( FILE *fp ) {
     DLString a;
     int wear_loc;
 
-    if ( area_last == 0 )
+    if (areaIndexes.empty())
     {
         throw FileFormatException( "Load_resets: no #AREA seen yet in %s", strArea );
     }
@@ -589,7 +579,7 @@ void load_rooms( FILE *fp )
 {
     RoomIndexData *pRoomIndex;
 
-    if ( area_last == 0 )
+    if (areaIndexes.empty())
     {
         throw FileFormatException( "Load_resets: no #AREA seen yet in %s.", strArea );
     }
@@ -614,7 +604,7 @@ void load_rooms( FILE *fp )
             throw FileFormatException( "Load_rooms: vnum %d duplicated in %s", vnum, strArea );
         
         pRoomIndex = new RoomIndexData;
-        pRoomIndex->areaIndex        = area_last;
+        pRoomIndex->areaIndex   = areaIndexes.back();
         pRoomIndex->vnum        = vnum;
         pRoomIndex->name        = fread_string( fp );
         pRoomIndex->description        = fread_string( fp );
@@ -1024,16 +1014,12 @@ void load_olimits(FILE *fp)
 
 void load_resetmsg( FILE *fp )
 {
-    Serarea->resetmsg        = fread_string(fp);
-    
-    return;
+    areaIndexes.back()->resetmsg = fread_string(fp);
 }
 
 void load_aflag( FILE *fp )
 {
-    Serarea->area_flag        = fread_flag(fp);
-    
-    return;
+    areaIndexes.back()->area_flag = fread_flag(fp);
 }
 
 
@@ -1199,8 +1185,6 @@ load_areas( )
                                 fread_letter( fpArea );
                         }
                 }
-
-                Serarea = 0;
 
                 fpArea = 0;
         }

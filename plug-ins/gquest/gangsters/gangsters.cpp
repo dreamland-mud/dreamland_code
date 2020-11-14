@@ -50,10 +50,9 @@ Gangsters::~Gangsters( )
 
 void Gangsters::create( const Config& )  
 {
-    AreaIndexData *area;
     AreaList areaList;
     
-    for (area = area_first; area; area = area->next) {
+    for(auto &area: areaIndexes) {
         if (area->low_range <= minLevel 
             && !IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HOMETOWN|AREA_HIDDEN
                                         |AREA_NOQUEST|AREA_NOGATE) ) 
@@ -67,6 +66,7 @@ void Gangsters::create( const Config& )
         int areaIndex;
         MobileList people;
         RoomList mobRooms, portalRooms;
+        AreaIndexData *area;
 
         areaIndex = number_range(0, areaList.size( ) - 1);
         area = areaList[ areaIndex ];

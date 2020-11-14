@@ -318,6 +318,7 @@ XMLArea::load(const DLString &fname)
     
     area_file *af = new_area_file(fname.c_str( ));
     AreaIndexData *a = areadata.compat( );
+    areaIndexes.push_back(a);
 
     try {
         if (a) {
@@ -331,15 +332,6 @@ XMLArea::load(const DLString &fname)
             load_mobiles(a);
             load_objects(a);
             load_helps(a);
-
-            if (area_first == 0)
-                area_first = a;
-
-            if (area_last != 0)
-                area_last->next = a;
-
-            area_last = a;
-            a->next = 0;
         }
     } catch (const Exception &ex) {
         LogStream::sendFatal() << ex.what() << endl;

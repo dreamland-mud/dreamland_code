@@ -108,6 +108,8 @@ RoomVector roomInstances;
 
 AreaVector areaInstances;
 
+AreaIndexVector areaIndexes;
+
 /*
  * Locals.
  */
@@ -115,9 +117,6 @@ MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
 RoomIndexMap roomIndexMap;
 char *                        string_hash                [MAX_KEY_HASH];
-
-AreaIndexData *                area_first;
-AreaIndexData *                area_last;
 
 char                        str_empty        [1];
 
@@ -172,8 +171,7 @@ new_area_file(const char *name)
 }
 
 AreaIndexData::AreaIndexData()
-    : next(0),
-      name(&str_empty[0]), altname(&str_empty[0]),
+    : name(&str_empty[0]), altname(&str_empty[0]),
       authors(&str_empty[0]), credits(&str_empty[0]),
       translator(&str_empty[0]), speedwalk(&str_empty[0]),
       low_range(0), high_range(0),

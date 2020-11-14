@@ -755,7 +755,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     if (!ch) {
         save_area_list();
-        for (pArea = area_first; pArea; pArea = pArea->next) {
+        for(auto &pArea: areaIndexes) {
             REMOVE_BIT(pArea->area_flag, AREA_CHANGED);
             save_area(pArea);
         }
@@ -795,7 +795,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     // Save the world, only authorized areas
     if (!str_cmp("world", arg1)) {
         save_area_list();
-        for (pArea = area_first; pArea; pArea = pArea->next) {
+        for(auto &pArea: areaIndexes) {
             if (!OLCState::can_edit(ch, pArea))
                 continue;
 
@@ -817,7 +817,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         stc("Saved zones:\n\r", ch);
         sprintf(buf, "None.\n\r");
 
-        for (pArea = area_first; pArea; pArea = pArea->next) {
+        for(auto &pArea: areaIndexes) {
             /* Builder must be assigned this area. */
             if (!OLCState::can_edit(ch, pArea))
                 continue;

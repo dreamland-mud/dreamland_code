@@ -159,9 +159,7 @@ void show_fenia_triggers(Character *ch, Scripting::Object *wrapper)
 /** Find area with given vnum. */
 AreaIndexData *get_area_data(int vnum)
 {
-    AreaIndexData *pArea;
-
-    for (pArea = area_first; pArea; pArea = pArea->next) {
+    for(auto &pArea: areaIndexes) {
         if (pArea->vnum == vnum)
             return pArea;
     }
@@ -566,7 +564,7 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     DLString args(argument);
     DLString arg = args.getOneArgument();
 
-    for (AreaIndexData *pArea = area_first; pArea; pArea = pArea->next) {
+    for(auto &pArea: areaIndexes) {
         areas.push_back(pArea);
     }
 

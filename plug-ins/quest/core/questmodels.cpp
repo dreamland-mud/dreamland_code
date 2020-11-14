@@ -184,7 +184,7 @@ AreaList RoomQuestModel::findAreas(PCharacter *pch)
 {
     AreaList result;
 
-    for (AreaIndexData *area = area_first; area; area = area->next) {
+    for(auto &area: areaIndexes) {
         if (area->low_range > pch->getRealLevel())
             continue;
         if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HIDDEN|AREA_NOQUEST) )
