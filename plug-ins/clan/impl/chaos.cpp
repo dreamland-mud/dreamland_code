@@ -30,6 +30,7 @@
 #include "act.h"
 #include "act_move.h"
 #include "interp.h"
+#include "weapons.h"
 #include "gsn_plugin.h"
 #include "handler.h"
 #include "merc.h"
@@ -134,39 +135,26 @@ bool ChaosBlade::death( Character *ch )
 }
 
 SPELL_DECL(ChaosBlade);
-VOID_SPELL(ChaosBlade)::run( Character *ch, char *, int sn, int level ) 
-{ 
-  Object *blade;
-  Affect af;
+VOID_SPELL(ChaosBlade)::run(Character *ch, char *, int sn, int level)
+{
+    Object *blade;
 
-  blade = create_object( get_obj_index(OBJ_VNUM_CHAOS_BLADE),level);
-  ch->send_to("Ты взмахиваешь руками и создаешь Клинок Хаоса!\n\r");
-  act_p("$c1 взмахивает руками и создает Клинок Хаоса!",
-         ch,0,0,TO_ROOM,POS_RESTING);
+    blade = create_object(get_obj_index(OBJ_VNUM_CHAOS_BLADE), level);
+    ch->send_to("Ты взмахиваешь руками и создаешь Клинок Хаоса!\n\r");
+    act_p("$c1 взмахивает руками и создает Клинок Хаоса!",
+          ch, 0, 0, TO_ROOM, POS_RESTING);
 
-  blade->timer = level * 2;
-  blade->value2(ch->applyCurse( ( ch->getModifyLevel() / 10 ) + 3 ));
-  blade->level = ch->getRealLevel( );
+    blade->timer = level * 2;
+    blade->level = ch->getRealLevel();
 
-  af.where        = TO_OBJECT;
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
-  af.modifier     = ch->applyCurse( level / 6 );
-  af.bitvector    = 0;
+    WeaponGenerator()
+        .item(blade)
+        .assignValues(number_range(2, 3))
+        .assignHitroll(number_range(2, 3), sn)
+        .assignDamroll(number_range(2, 3), sn);
 
-  af.location     = APPLY_HITROLL;
-  affect_to_obj( blade, &af);
-
-  af.location     = APPLY_DAMROLL;
-  affect_to_obj( blade, &af);
-
-  obj_to_char(blade,ch);
-
+    obj_to_char(blade, ch);
 }
-
-
-
 
 SPELL_DECL(Confuse);
 VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level ) 

@@ -39,6 +39,7 @@
 #include "vnum.h"
 #include "mercdb.h"
 #include "fight.h"
+#include "weapons.h"
 #include "act_move.h"
 #include "handler.h"
 #include "magic.h"
@@ -99,8 +100,6 @@ void ClanGuardKnight::actPush(PCharacter *wch)
 void ClanGuardKnight::actInvited(PCharacter *wch, Object *obj)
 {
     do_say(ch, "{WНу что ж! Будь как дома - но не забывай, что ты в гостях!{x");
-    //    act( "$C1 забирает $o4 у $c2.", wch, obj, ch, TO_ROOM );
-    //    act( "$C1 забирает у тебя $o4.", wch, obj, ch, TO_CHAR );
 }
 
 void ClanGuardKnight::actIntruder(PCharacter *)
@@ -380,10 +379,8 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
     int sword_vnum;
     Object *sword;
     char arg[MAX_INPUT_LENGTH];
-    Affect af;
 
     target_name = one_argument(target_name, arg);
-    sword_vnum = 0;
 
     if (arg_oneof(arg, "sword", "меч"))
         sword_vnum = OBJ_VNUM_DRAGONSWORD;
@@ -402,47 +399,19 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
     sword = create_object(get_obj_index(sword_vnum), level);
     sword->timer = level * 2;
     sword->cost = 0;
-    if (level <= 30)
-        sword->value2(4);
-    else if (level > 30 && level <= 40)
-        sword->value2(5);
-    else if (level > 40 && level <= 50)
-        sword->value2(6);
-    else if (level > 50 && level <= 60)
-        sword->value2(7);
-    else if (level > 60 && level <= 70)
-        sword->value2(9);
-    else if (level > 70 && level <= 80)
-        sword->value2(10);
-    else
-        sword->value2(11);
     sword->level = ch->getRealLevel();
 
-    af.where = TO_OBJECT;
-    af.type = sn;
-    af.level = level;
-    af.duration = -1;
-    af.modifier = ch->applyCurse(level / 5);
-    af.bitvector = 0;
+    WeaponGenerator()
+        .item(sword)
+        .assignValues(2)
+        .assignHitroll(2, sn)
+        .assignDamroll(3, sn);
 
-    af.location = APPLY_HITROLL;
-    affect_to_obj(sword, &af);
-
-    af.location = APPLY_DAMROLL;
-    affect_to_obj(sword, &af);
-
-    if (IS_GOOD(ch))
-        SET_BIT(sword->extra_flags, (ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
-    else if (IS_NEUTRAL(ch))
-        SET_BIT(sword->extra_flags, (ITEM_ANTI_GOOD | ITEM_ANTI_EVIL));
-    else if (IS_EVIL(ch))
-        SET_BIT(sword->extra_flags, (ITEM_ANTI_NEUTRAL | ITEM_ANTI_GOOD));
+    SET_BIT(sword->extra_flags, (ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
     obj_to_char(sword, ch);
 
-    act_p("Ты взмахиваешь руками и создаешь $o4!",
-          ch, sword, 0, TO_CHAR, POS_RESTING);
-    act_p("$c1 взмахивает руками и создает $o4!",
-          ch, sword, 0, TO_ROOM, POS_RESTING);
+    act("Ты взмахиваешь руками и создаешь $o4!", ch, sword, 0, TO_CHAR);
+    act("$c1 взмахивает руками и создает $o4!", ch, sword, 0, TO_ROOM);
 }
 
 SPELL_DECL(GoldenAura);

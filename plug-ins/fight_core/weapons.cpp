@@ -7,12 +7,17 @@
 #include "skill.h"
 #include "skillreference.h"
 #include "logstream.h"
-#include "object.h"
+#include "core/object.h"
 #include "character.h"
+#include "room.h"
+#include "affect.h"
 #include "configurable.h"
 
+#include "weapons.h"
 #include "math_utils.h"
 #include "itemflags.h"
+#include "affectflags.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "def.h"
 
@@ -175,14 +180,10 @@ float weapon_ave_bonus(bitnumber_t wclass)
     return ave_bonus_by_class[wclass].asFloat();
 }
 
-int weapon_value1(int level, int tier, bitnumber_t wclass)
+int weapon_value1(int level, int tier, int value2)
 {
     int ave = weapon_ave(level, tier);
     if (ave <= 0)
-        return 0;
-
-    int value2 = weapon_value2(wclass);
-    if (value2 <= 0)
         return 0;
 
     // Calculate value1 based on desired average damage and fixed value2.
@@ -216,4 +217,67 @@ int weapon_damroll(int level, int tier)
     }
 
     return one_tier[index].asInt();
+}
+
+WeaponGenerator & WeaponGenerator::item(Object *obj)
+{
+    this->obj = obj;
+    return *this;
+}
+
+WeaponGenerator & WeaponGenerator::assignValues(int tier)
+{    
+    bitnumber_t wclass = obj->value0();
+    int value2 = weapon_value2(wclass);
+    int value1 = weapon_value1(obj->level, tier, value2);
+
+    obj->value1(value1);
+    obj->value2(value2);
+    return *this;
+}
+
+WeaponGenerator & WeaponGenerator::assignHitroll(int tier, int sn)
+{
+    sn = sn < 0 ? gsn_none : sn;
+    Affect *paf = obj->affected.find(sn, APPLY_HITROLL);
+
+    if (!paf) {
+        Affect af;
+
+        af.where = TO_OBJECT;
+        af.type = sn;
+        af.level = obj->level;
+        af.duration = -1;
+        af.bitvector = 0;
+        af.location = APPLY_HITROLL;
+        affect_to_obj(obj, &af);
+
+        paf = obj->affected.front();
+    }
+
+    paf->modifier = weapon_damroll(obj->level, tier);
+    return *this;
+}
+
+WeaponGenerator & WeaponGenerator::assignDamroll(int tier, int sn)
+{
+    sn = sn < 0 ? gsn_none : sn;
+    Affect *paf = obj->affected.find(sn, APPLY_DAMROLL);
+
+    if (!paf) {
+        Affect af;
+
+        af.where = TO_OBJECT;
+        af.type = sn;
+        af.level = obj->level;
+        af.duration = -1;
+        af.bitvector = 0;
+        af.location = APPLY_DAMROLL;
+        affect_to_obj(obj, &af);
+
+        paf = obj->affected.front();
+    }
+
+    paf->modifier = weapon_damroll(obj->level, tier);
+    return *this;
 }

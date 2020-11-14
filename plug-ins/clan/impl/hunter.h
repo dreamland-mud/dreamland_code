@@ -86,7 +86,6 @@ protected:
         void fight_axe( Character * );
         void fight_mace( Character * );
         void fight_sword( Character * );
-        void addAffect( Character *, Affect * );
 };
 
 class HunterArmor : public HunterEquip {

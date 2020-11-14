@@ -23,16 +23,8 @@ void QuestWeapon::wear( Character *ch )
 
 void QuestWeapon::equip( Character *ch ) 
 {
-    short level = ch->getModifyLevel();
-    bitnumber_t wclass = obj->value0();
-    const int tier = 2;
-
-    obj->value1(
-        weapon_value1(level, tier, wclass));
-    obj->value2(
-        weapon_value2(wclass));
-
-    obj->level = ch->getRealLevel( );
+    obj->level = ch->getModifyLevel();
+    WeaponGenerator().item(obj).assignValues(2);
 
     if (!obj->affected.empty()) {
       for (auto &paf: obj->affected)

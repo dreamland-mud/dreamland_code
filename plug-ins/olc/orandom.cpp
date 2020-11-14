@@ -44,8 +44,8 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         for (int t = minTier; t <= maxTier; t++) {
             buf << dlprintf("{CTier %1d: {y%7s{x  ", t, weapon_class.name(f).c_str());
             for (int l = minLevel; l <= maxLevel; l++) {
-                int v1 = weapon_value1(l, t, f);
                 int v2 = weapon_value2(f);
+                int v1 = weapon_value1(l, t, v2);
                 int ave = weapon_ave(l, t);
                 int real_ave = dice_ave(v1, v2);
                 int dr = weapon_damroll(l, t);

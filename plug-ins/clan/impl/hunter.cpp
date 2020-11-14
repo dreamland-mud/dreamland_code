@@ -37,6 +37,7 @@
 #include "magic.h"
 #include "save.h"
 #include "material.h"
+#include "weapons.h"
 #include "damage.h"
 #include "merc.h"
 #include "gsn_plugin.h"
@@ -342,73 +343,12 @@ void HunterArmor::delete_( Character *ch )
  *-------------------------------------------------------------------------*/
 void HunterWeapon::wear( Character *ch )
 {
-    int i;
-    
-    struct weapon_param {
-        int level;
-        int value1, value2;
-    };
-    static const struct weapon_param params [] = {
-        { 10,  8,  3 },
-        { 15,  9,  3 },
-        { 20, 10,  4 },
-        { 30, 10,  5 },
-        { 40, 10,  6 },
-        { 50, 10,  7 },
-        { 55, 10,  8 },
-        { 60, 12,  7 },
-        { 70, 12,  8 },
-        { 80, 12,  9 },
-        { 90, 12, 10 },
-        {200, 12, 11 },
-    };
-    static const int size = sizeof(params) / sizeof(*params); 
-
     obj->level = ch->getRealLevel( );
-
-    for (i = 0; i < size; i++) 
-        if (obj->level <= params[i].level) {
-            obj->value1(params[i].value1);
-            obj->value2(params[i].value2);
-            break;
-        }
-
-    if (!obj->affected.empty()) {
-        for (auto &paf: obj->affected)
-            addAffect( ch, paf );
-    }
-    else {
-        Affect af;
-
-        af.where = TO_OBJECT;
-        af.type  = -1;
-        af.duration = -1;
-        af.bitvector = 0;
-
-        af.location = APPLY_HITROLL;
-        addAffect( ch, &af );        
-        affect_to_obj( obj, &af );
-
-        af.location = APPLY_DAMROLL;
-        addAffect( ch, &af );        
-        affect_to_obj( obj, &af );
-    }
-}
-
-void HunterWeapon::addAffect( Character *ch, Affect *paf ) 
-{  
-    int level = ch->getModifyLevel( );
-
-    switch( paf->location ) {
-    case APPLY_DAMROLL:
-        paf->level = level;
-        paf->modifier = level / 7;
-        return;
-    case APPLY_HITROLL:
-        paf->level = level;
-        paf->modifier = level / 5;
-        return;
-    }
+    WeaponGenerator()
+        .item(obj)
+        .assignValues(2)
+        .assignHitroll(IS_GOOD(ch) ? 2 : 3)
+        .assignDamroll(IS_EVIL(ch) ? 2 : 3);
 }
 
 void HunterWeapon::fight( Character *ch )
