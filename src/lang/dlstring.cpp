@@ -696,7 +696,6 @@ locale DLString::initLocale()
     try {
         return locale("ru_RU.koi8r");
     } catch (const exception &ex) {
-        LogStream::sendError() << "Failed to initialize RU locale, falling back to default: " << ex.what() << endl;
         return locale();
     }
 }
