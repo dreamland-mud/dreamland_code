@@ -79,6 +79,7 @@ static bool mprog_stopfol( Character *ch, Character *master )
     return false;
 }
 
+
 void follower_stop( Character *ch )
 {
     Character *master = ch->master;
@@ -86,10 +87,24 @@ void follower_stop( Character *ch )
     if (master == NULL)
         return;
 
-    if (IS_CHARMED(ch)) { /* XXX causes double affect_strip */
+    if (IS_CHARMED(ch)) {
         REMOVE_BIT( ch->affected_by, AFF_CHARM );
-        affect_strip( ch, gsn_charm_person );
     }
+
+    if (ch->isAffected(gsn_charm_person)) {
+        // Affect remove handler will call follower_clear().
+        affect_strip( ch, gsn_charm_person );
+    } else {
+        follower_clear(ch);
+    }
+}
+
+void follower_clear( Character * ch )
+{
+    Character *master = ch->master;
+
+    if (master == NULL)
+        return;
 
     if (master->can_see( ch )) 
        act( "$c1 теперь не следует за тобой.", ch, 0, master, TO_VICT );

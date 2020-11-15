@@ -126,9 +126,9 @@ VOID_AFFECT(CharmPerson)::remove( Character *victim )
 {
     DefaultAffectHandler::remove( victim );
     
-    victim->stop_follower( );
+    follower_clear(victim);
 
-    if(victim->is_npc() 
+    if (victim->is_npc() 
         && victim->position == POS_SLEEPING
         && !IS_AFFECTED(victim, AFF_SLEEP))
         victim->position = victim->getNPC()->default_pos;
