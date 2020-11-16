@@ -195,6 +195,8 @@ public:
                 continue;
             if (area_is_clan(pMob->area))
                 continue;
+            if (IS_SET(pMob->area->area_flag, AREA_SYSTEM))
+                continue;
 
             DLString type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
             if (type.find("Pet") == DLString::npos && type != "Rat")
