@@ -346,19 +346,31 @@ public:
             a["level"] = pObj->level;
             a["wearloc"] = wearloc;
             a["itemtype"] = itemtype;
-            a["hr"] = hr;
-            a["dr"] = dr;
-            a["hp"] = hp;
-            a["mana"] = mana;
-            a["move"] = move;
-            a["saves"] = svs;
-            a["stat_str"] = str;
-            a["stat_int"] = inta;
-            a["stat_wis"] = wis;
-            a["stat_dex"] = dex;
-            a["stat_con"] = con;
-            a["stat_cha"] = cha;
-            a["align"] = align;
+
+            // For 'noident' items only a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
+                a["hr"] = hr;
+                a["dr"] = dr;
+                a["hp"] = hp;
+                a["mana"] = mana;
+                a["move"] = move;
+                a["saves"] = svs;
+                a["stat_str"] = str;
+                a["stat_int"] = inta;
+                a["stat_wis"] = wis;
+                a["stat_dex"] = dex;
+                a["stat_con"] = con;
+                a["stat_cha"] = cha;
+                a["align"] = align;
+            } else {
+                a["hr"] = a["dr"] = a["hp"] = 
+                a["mana"] = a["move"] = a["saves"] = 
+                a["stat_str"] = a["stat_int"] = 
+                a["stat_wis"] = a["stat_dex"] = 
+                a["stat_con"] = a["stat_cha"] = 
+                a["align"] = "-";
+            }
+
             a["area"] = area;
             a["where"] = where;
             a["limit"] = pObj->limit;
@@ -464,21 +476,34 @@ public:
             w["name"] = name;
             w["level"] = pObj->level;
             w["wclass"] = weaponClass;
-            w["special"] = special;
-            w["d1"] = d1;
-            w["d2"] = d2;
-            w["ave"] = ave;
-            w["hr"] = hr;
-            w["dr"] = dr;
-            w["hp"] = hp;
-            w["mana"] = mana;
-            w["saves"] = svs;
-            w["stat_str"] = str;
-            w["stat_int"] = inta;
-            w["stat_wis"] = wis;
-            w["stat_dex"] = dex;
-            w["stat_con"] = con;
-            w["align"] = align;
+
+            // For 'noident' items only show a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
+                w["special"] = special;
+                w["d1"] = d1;
+                w["d2"] = d2;
+                w["ave"] = ave;
+                w["hr"] = hr;
+                w["dr"] = dr;
+                w["hp"] = hp;
+                w["mana"] = mana;
+                w["saves"] = svs;
+                w["stat_str"] = str;
+                w["stat_int"] = inta;
+                w["stat_wis"] = wis;
+                w["stat_dex"] = dex;
+                w["stat_con"] = con;
+                w["align"] = align;
+            } else {
+                w["special"] = 
+                w["d1"] = w["d2"] = w["ave"] = 
+                w["hr"] = w["dr"] = w["hp"] = 
+                w["mana"] = w["saves"] = 
+                w["stat_str"] = w["stat_int"] = 
+                w["stat_wis"] = w["stat_dex"] = 
+                w["stat_con"] = w["align"] = "-";
+            }
+
             w["area"] = area;
             w["where"] = where;
             w["limit"] = pObj->limit;
@@ -593,9 +618,16 @@ public:
             wand["name"] = name;
             wand["level"] = pObj->level;
             wand["itemtype"] = itemtype;
-            wand["spellLevel"] = spellLevel;
-            wand["charges"] = charges;
-            wand["spells"] = spells;
+
+            // For 'noident' items only show a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
+                wand["spellLevel"] = spellLevel;
+                wand["charges"] = charges;
+                wand["spells"] = spells;
+            } else {
+                wand["spellLevel"] = wand["charges"] = wand["spells"] = "-";
+            }
+
             wand["area"] = area;
             wand["where"] = where;
             wand["limit"] = pObj->limit;

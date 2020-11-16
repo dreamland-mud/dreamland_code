@@ -2407,6 +2407,10 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     else
         buf << "ничего не весит";
 
+    lim = obj->pIndexData->limit;
+    if (lim != -1 && lim < 100)
+        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
+
     if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
         buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
         return;
@@ -2430,10 +2434,6 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
     if (extra)
         buf << "Особые свойства: " << extra_flags.messages(extra, true ) << endl;
-
-    lim = obj->pIndexData->limit;
-    if (lim != -1 && lim < 100)
-        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
 
     switch (obj->item_type) {
     case ITEM_KEY:
