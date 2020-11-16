@@ -104,6 +104,12 @@ CONFIGURABLE_LOADED(fight, weapon_value2)
     weapon_value2_by_class = value;
 }
 
+Json::Value weapon_ave_penalty;
+CONFIGURABLE_LOADED(fight, weapon_ave_penalty)
+{
+    weapon_ave_penalty = value;
+}
+
 Json::Value ave_bonus_by_class;
 CONFIGURABLE_LOADED(fight, ave_bonus)
 {
@@ -138,7 +144,7 @@ int weapon_ave(struct obj_index_data *pWield)
         return 0;
 }
 
-int weapon_ave(int level, int tier)
+int weapon_ave(int level, int tier, bitnumber_t wclass)
 {
     if (tier <= 0 || tier > (int)weapon_ave_tiers.size()) {
         bug("weapon_ave: invalid tier %d for level %d", tier, level);
@@ -152,6 +158,9 @@ int weapon_ave(int level, int tier)
 
     Json::Value &one_tier = weapon_ave_tiers[tier-1];
     int index = level / 5;
+    int penalty = weapon_ave_penalty[wclass].asInt();
+    index = max(0, index + penalty);
+
     if (index >= (int)one_tier.size()) {
         bug("weapon_ave: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
         return 0;
@@ -180,9 +189,9 @@ float weapon_ave_bonus(bitnumber_t wclass)
     return ave_bonus_by_class[wclass].asFloat();
 }
 
-int weapon_value1(int level, int tier, int value2)
+int weapon_value1(int level, int tier, int value2, bitnumber_t wclass)
 {
-    int ave = weapon_ave(level, tier);
+    int ave = weapon_ave(level, tier, wclass);
     if (ave <= 0)
         return 0;
 
@@ -197,7 +206,7 @@ int weapon_value1(int level, int tier, int value2)
     return value1 + value1_adjustment;
 }
 
-int weapon_damroll(int level, int tier)
+int weapon_damroll(int level, int tier, bitnumber_t wclass)
 {
     if (tier <= 0 || tier > (int)weapon_damroll_tiers.size()) {
         bug("weapon_damroll: invalid tier %d for level %d", tier, level);
@@ -211,6 +220,9 @@ int weapon_damroll(int level, int tier)
 
     Json::Value &one_tier = weapon_damroll_tiers[tier-1];
     int index = level / 5;
+    int penalty = weapon_ave_penalty[wclass].asInt();
+    index = max(0, index + penalty);
+
     if (index >= (int)one_tier.size()) {
         bug("weapon_damroll: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
         return 0;
@@ -229,7 +241,7 @@ WeaponGenerator & WeaponGenerator::assignValues(int tier)
 {    
     bitnumber_t wclass = obj->value0();
     int value2 = weapon_value2(wclass);
-    int value1 = weapon_value1(obj->level, tier, value2);
+    int value1 = weapon_value1(obj->level, tier, value2, wclass);
 
     obj->value1(value1);
     obj->value2(value2);
@@ -239,6 +251,7 @@ WeaponGenerator & WeaponGenerator::assignValues(int tier)
 WeaponGenerator & WeaponGenerator::assignHitroll(int tier, int sn)
 {
     sn = sn < 0 ? gsn_none : sn;
+    bitnumber_t wclass = obj->value0();
     Affect *paf = obj->affected.find(sn, APPLY_HITROLL);
 
     if (!paf) {
@@ -255,13 +268,14 @@ WeaponGenerator & WeaponGenerator::assignHitroll(int tier, int sn)
         paf = obj->affected.front();
     }
 
-    paf->modifier = weapon_damroll(obj->level, tier);
+    paf->modifier = weapon_damroll(obj->level, tier, wclass);
     return *this;
 }
 
 WeaponGenerator & WeaponGenerator::assignDamroll(int tier, int sn)
 {
     sn = sn < 0 ? gsn_none : sn;
+    bitnumber_t wclass = obj->value0();
     Affect *paf = obj->affected.find(sn, APPLY_DAMROLL);
 
     if (!paf) {
@@ -278,6 +292,6 @@ WeaponGenerator & WeaponGenerator::assignDamroll(int tier, int sn)
         paf = obj->affected.front();
     }
 
-    paf->modifier = weapon_damroll(obj->level, tier);
+    paf->modifier = weapon_damroll(obj->level, tier, wclass);
     return *this;
 }

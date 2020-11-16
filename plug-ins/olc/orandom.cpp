@@ -45,10 +45,10 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
             buf << dlprintf("{CTier %1d: {y%7s{x  ", t, weapon_class.name(f).c_str());
             for (int l = minLevel; l <= maxLevel; l++) {
                 int v2 = weapon_value2(f);
-                int v1 = weapon_value1(l, t, v2);
-                int ave = weapon_ave(l, t);
+                int v1 = weapon_value1(l, t, v2, f);
+                int ave = weapon_ave(l, t, f);
                 int real_ave = dice_ave(v1, v2);
-                int dr = weapon_damroll(l, t);
+                int dr = weapon_damroll(l, t, f);
 
                 if (l != minLevel)
                     buf << dlprintf("%15s ", "");
