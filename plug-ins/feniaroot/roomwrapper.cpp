@@ -116,17 +116,6 @@ NMI_GET( RoomWrapper, area, "экземпляр Area для этой комна�
     return AreaWrapper::wrap( target->areaIndex()->area_file->file_name );
 }
 
-NMI_GET(RoomWrapper, rnext, "следующая комната в списке room_list")
-{
-    checkTarget();
-
-    int nextIndex = target->position + 1;
-    if (nextIndex >= roomInstances.size())
-        return Register();
-
-    return WrapperManager::getThis( )->getWrapper(roomInstances.at(nextIndex));
-}
-
 NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комнате")
 {
     checkTarget();

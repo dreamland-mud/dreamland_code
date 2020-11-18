@@ -712,11 +712,6 @@ NMI_GET( Root, rooms , "список всех комнат")
     return wrap(list);
 }
 
-NMI_GET( Root, room_list , "список всех комнат, поле комнаты rnext указывает на следующую") 
-{
-    return WrapperManager::getThis( )->getWrapper(roomInstances.front()); 
-}
-
 NMI_GET( Root, char_list , "список всех чаров, поле чара next указывает на следующего") 
 {
     return WrapperManager::getThis( )->getWrapper(char_list); 
