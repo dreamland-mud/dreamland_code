@@ -71,7 +71,7 @@ DreamLand::DreamLand( )
           rebootCounter( -1 ),
           workingOptions( 0, &dreamland_flags ),
           options( DEFAULT_OPTIONS, &dreamland_flags ),
-          dbEnv( new DbEnvContext( ) )
+          feniaDbEnv( new DbEnvContext( ) )
 {
         checkDuplicate( dreamland );
         dreamland = this;
@@ -134,7 +134,7 @@ DreamLand::~DreamLand( )
         servletManager.clear( );
         socketManager.clear( );
 
-        getDbEnv( )->close( );
+        getFeniaDbEnv( )->close( );
         
         dreamland = 0;
 }
@@ -228,7 +228,7 @@ void DreamLand::load( bool recursive )
             LogStream::redirect(new FileLogStream(logFile.getPath( )));
         }
 
-        getDbEnv( )->open( DLFile( getBasePath( ), feniaDbDir ).getPath( ) );
+        getFeniaDbEnv( )->open( DLFile( getBasePath( ), feniaDbDir ).getPath( ) );
         
         feniaManager->open( );
         feniaManager->load( );

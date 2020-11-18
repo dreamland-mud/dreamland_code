@@ -61,6 +61,6 @@ FeniaManager::~FeniaManager()
 DbEnvContext *
 FeniaManager::getDbEnv( ) const
 {
-    return dreamland->getDbEnv( );
+    return dreamland->getFeniaDbEnv( );
 }
 
