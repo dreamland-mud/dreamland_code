@@ -48,6 +48,13 @@ Register wrap( Room * wt )
     return WrapperManager::getThis( )->getWrapper( wt ); 
 }
 
+Register wrap( RegList::Pointer &list )
+{
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(list);
+    return Register(listObj);
+}
+
 const Register & get_unique_arg( const RegisterList &args )
 {
     if (args.empty( ))

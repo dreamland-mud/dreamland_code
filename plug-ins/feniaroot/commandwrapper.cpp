@@ -49,7 +49,7 @@ CommandWrapper::run( Character * ch, const DLString &arg )
 
     try {
         func.toFunction()->invoke(Register(self), args);
-    } catch (::Exception e) {
+    } catch (const ::Exception &e) {
         ch->send_to( e.what( ) );
     }
 }

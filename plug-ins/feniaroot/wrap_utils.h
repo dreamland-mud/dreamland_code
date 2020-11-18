@@ -11,6 +11,7 @@
 
 using Scripting::Register;
 using Scripting::RegisterList;
+class RegList;
 class Object;
 class Character;
 class PCharacter;
@@ -27,6 +28,7 @@ Register wrap( struct obj_index_data * );
 Register wrap( Character * );
 Register wrap( struct mob_index_data * );
 Register wrap( Room * );
+Register wrap( ::Pointer<RegList> & );
 
 const Register & get_unique_arg( const RegisterList & );
 

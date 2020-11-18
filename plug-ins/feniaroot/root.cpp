@@ -697,10 +697,19 @@ NMI_GET( Root, obj_index_list, "список (List) всех прототипо�
     for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[iHash]; pObj; pObj = pObj->next)
             list->push_back(wrap(pObj)); 
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(list);
-    return Register(listObj);
+
+    return wrap(list);
+}
+
+NMI_GET( Root, rooms , "список всех комнат") 
+{
+    RegList::Pointer list(NEW);
+
+    for (auto &r: roomIndexMap) {
+        list->push_back(wrap(r.second->room));
+    }
+
+    return wrap(list);
 }
 
 NMI_GET( Root, room_list , "список всех комнат, поле комнаты rnext указывает на следующую") 
@@ -720,10 +729,8 @@ NMI_GET( Root, mob_index_list, "список (List) всех прототипо�
     for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next)
             list->push_back(wrap(pMob)); 
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(list);
-    return Register(listObj);
+
+    return wrap(list);
 }
 
 NMI_SET( Root, hour , "текущий час суток, 0..23") 
@@ -840,10 +847,8 @@ NMI_GET( Root, hometowns, "список всех хометаунов")
         if (ht->isValid( )) 
             list->push_back( HometownWrapper::wrap( ht->getName( ) ) );
     }
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+
+    return wrap(list);
 }
 
 NMI_INVOKE( Root, Hometown, "(name): конструктор для хометауна по имени" )
@@ -894,10 +899,8 @@ NMI_GET( Root, professions, "список всех профессий, дост�
         if (prof->isValid( ) && prof->isPlayed( )) 
             list->push_back( Register::handler<ProfessionWrapper>(prof->getName()) );
     }
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+
+    return wrap(list);
 }
 
 NMI_INVOKE( Root, Profession, "(name): конструктор для профессии (класса) по имени" )
@@ -949,9 +952,7 @@ NMI_GET( Root, religions, "список всех религий")
                  Register::handler<ReligionWrapper>(religion->getName()));
     }
     
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 
@@ -976,9 +977,7 @@ NMI_GET( Root, races, "список всех рас")
             list->push_back( RaceWrapper::wrap( race->getName( ) ) );
     }
     
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 NMI_GET( Root, pcraces, "список рас, доступных игрокам") 
@@ -993,9 +992,7 @@ NMI_GET( Root, pcraces, "список рас, доступных игрокам"
             list->push_back( RaceWrapper::wrap( race->getName( ) ) );
     }
     
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 NMI_INVOKE( Root, Race, "(name): конструктор для расы по имени" )
@@ -1098,9 +1095,7 @@ NMI_GET( Root, players, "список (List) всех игроков")
         if (d->connected == CON_PLAYING && d->character)
             list->push_back( wrap( d->character->getPC( ) ) );
 
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 NMI_GET( Root, feniadbStats, "статистика базы данных скриптовых объектов")
@@ -1173,9 +1168,7 @@ NMI_INVOKE(Root, spells, "(targets): вернуть названия всех з
         spells->push_back(Register(skill->getName()));
     }
 
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(spells);
-    return Register(listObj);
+    return wrap(spells);
 }
 
 NMI_INVOKE(Root, skills, "(group): вернуть названия всех умений, принадлежащих этой группе (olchelp prac)")
@@ -1192,8 +1185,6 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
             skills->push_back(Register(skill->getName()));
     }
 
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(skills);
-    return Register(listObj);
+    return wrap(skills);    
 }
 
