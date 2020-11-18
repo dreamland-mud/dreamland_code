@@ -360,6 +360,15 @@ Room *get_room_instance(int vnum)
     return 0;
 }
 
+AreaIndexData * get_area_index(const DLString &filename)
+{
+    for(auto &area: areaIndexes)
+        if (filename == area->area_file->file_name)
+            return area;
+            
+    return 0;
+}
+
 /*
  * Free a string.
  * Null is legal here to simplify callers.

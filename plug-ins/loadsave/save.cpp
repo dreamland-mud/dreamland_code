@@ -1573,14 +1573,12 @@ NPCharacter * fread_mob( FILE *fp )
                             char *rznm = fread_string( fp );
                             DLString zoneName(rznm);
                             free_string(rznm);
-
-                            for(auto &pArea: areaIndexes)
-                                    if ( !str_cmp( zoneName.c_str(), pArea->area_file->file_name ) )
-                                    {
-                                            mob->zone = pArea;
-                                            fMatch = true;
-                                            break;
-                                    }
+                            AreaIndexData *pArea = get_area_index(zoneName);
+                            if (pArea) {
+                                mob->zone = pArea;
+                                fMatch = true;
+                                break;
+                            }
                     }
 
                     KEY("RRoom", mob->reset_room, fread_number(fp));

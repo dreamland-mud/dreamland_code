@@ -51,18 +51,18 @@ DESIRE(full);
  *----------------------------------------------------------------------*/
 NMI_INIT(AreaWrapper, "area, зона");
 
-static AreaIndexData *find_area( const DLString &filename )
-{
-    for(auto &area: areaIndexes)
-        if (filename == area->area_file->file_name)
-            return area;
-
-    throw Scripting::Exception( "Area " + filename + " not found." );
-}
-
 AreaWrapper::AreaWrapper( const DLString &n )
                   : filename( n )
 {
+}
+
+AreaIndexData * AreaWrapper::getTarget() const
+{
+    AreaIndexData *pArea = get_area_index(filename);
+    if (!pArea)
+        throw Scripting::Exception( "Area " + filename + " not found." );
+
+    return pArea;
 }
 
 Scripting::Register AreaWrapper::wrap( const DLString &filename )
@@ -90,22 +90,22 @@ NMI_GET( AreaWrapper, filename, "название файла зоны" )
 
 NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" ) 
 {
-    return Scripting::Register( find_area( filename )->name );
+    return Scripting::Register( getTarget()->name );
 }
 
 NMI_GET( AreaWrapper, area_flag, "флаги зоны (таблица .tables.area_flags)" ) 
 {
-    return Scripting::Register((int)(find_area( filename )->area_flag));
+    return Scripting::Register((int)(getTarget()->area_flag));
 }
 
 NMI_GET( AreaWrapper, min_vnum, "нижняя граница диапазона vnum-ов зоны" ) 
 {
-    return Scripting::Register((int)(find_area( filename )->min_vnum));
+    return Scripting::Register((int)(getTarget()->min_vnum));
 }
 
 NMI_GET( AreaWrapper, max_vnum, "верхняя граница диапазона vnum-ов зоны" ) 
 {
-    return Scripting::Register((int)(find_area( filename )->max_vnum));
+    return Scripting::Register((int)(getTarget()->max_vnum));
 }
 /*----------------------------------------------------------------------
  * Hometown

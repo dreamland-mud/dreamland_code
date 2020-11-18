@@ -23,6 +23,7 @@ using Scripting::NativeHandler;
  * Area
  *----------------------------------------------------------------------*/
 class Area;
+class AreaIndexData;
 
 class AreaWrapper : public PluginNativeImpl<AreaWrapper>, 
                         public NativeHandler,
@@ -41,6 +42,9 @@ public:
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString filename;
+
+protected:
+    AreaIndexData * getTarget() const;
 };
 
 /*----------------------------------------------------------------------

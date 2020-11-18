@@ -128,6 +128,7 @@ mob_index_data *        get_mob_index        ( int vnum );
 obj_index_data *        get_obj_index        ( int vnum );
 RoomIndexData *        get_room_index        ( int vnum );
 Room * get_room_instance(int vnum);
+AreaIndexData * get_area_index(const DLString &filename);
 
 char *        get_extra_descr        ( const char *name, extra_descr_data *ed );
 extra_descr_data *new_extra_descr( );
