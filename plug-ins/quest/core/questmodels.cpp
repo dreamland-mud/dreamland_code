@@ -152,13 +152,9 @@ RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct AreaIndexData *
 {
     RoomList result;
 
-    for (auto &r: roomInstances) {
-        if (r->areaIndex() != targetArea)
-            continue;
-        if (!checkRoomClient( pch, r ))
-            continue;
-
-        result.push_back(r);
+    for (auto &r: targetArea->area->rooms) {
+        if (checkRoomClient( pch, r.second ))
+            result.push_back(r.second);
     }
 
     return result;
@@ -168,13 +164,9 @@ RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct AreaIndexData *
 {
     RoomList result;
 
-    for (auto &r: roomInstances) {
-        if (r->areaIndex() != targetArea)
-            continue;
-        if (!checkRoomVictim( pch, r, NULL ))
-            continue;
-
-        result.push_back(r);
+    for (auto &r: targetArea->area->rooms) {
+        if (checkRoomVictim( pch, r.second, NULL ))
+            result.push_back(r.second);
     }
 
     return result;

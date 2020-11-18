@@ -162,10 +162,10 @@ NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, 
     
     checkTarget( );
     
-    for (auto &room: roomInstances)
-        for (pReset = room->pIndexData->reset_first; pReset; pReset = pReset->next)
+    for (auto &r: roomIndexMap)
+        for (pReset = r.second->reset_first; pReset; pReset = pReset->next)
             if (pReset->command == 'M' && pReset->arg1 == target->vnum)
-                rc->push_back( Register( room->vnum ) );
+                rc->push_back( Register( r.first ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate( );
     obj->setHandler( rc );

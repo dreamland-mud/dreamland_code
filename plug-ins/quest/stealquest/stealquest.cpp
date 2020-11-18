@@ -437,14 +437,9 @@ Room * StealQuest::findHideaway( PCharacter *pch, NPCharacter *thief )
     RoomVector places, places1, places2;
     RoomVector::iterator r;
 
-    for (auto &room: roomInstances) {
-        if (room->area != thief->in_room->area)
-            continue;
-        
-        if (!checkRoom( pch, room ))
-            continue;
-        
-        places.push_back( room );
+    for (auto &r: thief->in_room->area->rooms) {
+        if (checkRoom( pch, r.second ))
+            places.push_back( r.second );
     }
     
     for (r = places.begin( ); r != places.end( ); r++) {

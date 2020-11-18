@@ -1652,23 +1652,23 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
         
         if (IS_SET(mob->pIndexData->area->area_flag, AREA_HOMETOWN)) {
             ostringstream buf;
-            list<Room *> repops;
+            list<RoomIndexData *> repops;
 
-            for (auto &room: roomInstances)
-                for (RESET_DATA *pReset = room->pIndexData->reset_first; pReset; pReset = pReset->next)
+            for (auto &r: roomIndexMap)
+                for (RESET_DATA *pReset = r.second->reset_first; pReset; pReset = pReset->next)
                     if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum) 
-                        repops.push_back( room );
+                        repops.push_back( r.second );
             
             if (repops.size( ) == 1) {
                 ch->printf( "%s обитает в местности под названием %s (%s).\r\n",
                             mob->getNameP( '1' ).c_str( ), 
-                            repops.front( )->getName(), repops.front( )->areaName() );
+                            repops.front( )->name, repops.front( )->areaIndex->name );
             }
             else if (repops.size( ) > 0) {
                 act( "$C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
 
-                for (list<Room *>::iterator r = repops.begin( ); r != repops.end( ); r++)
-                    ch->printf( "    %s  (%s)\r\n", (*r)->getName(), (*r)->areaName() );
+                for (auto &r: repops)
+                    ch->printf( "    %s  (%s)\r\n", r->name, r->areaIndex->name);
             }
         }
     }
