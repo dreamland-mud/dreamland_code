@@ -104,16 +104,16 @@ CONFIGURABLE_LOADED(fight, weapon_value2)
     weapon_value2_by_class = value;
 }
 
+Json::Value weapon_level_penalty;
+CONFIGURABLE_LOADED(fight, weapon_level_penalty)
+{
+    weapon_level_penalty = value;
+}
+
 Json::Value weapon_ave_penalty;
 CONFIGURABLE_LOADED(fight, weapon_ave_penalty)
 {
     weapon_ave_penalty = value;
-}
-
-Json::Value ave_bonus_by_class;
-CONFIGURABLE_LOADED(fight, ave_bonus)
-{
-    ave_bonus_by_class = value;
 }
 
 Json::Value weapon_ave_tiers;
@@ -144,6 +144,14 @@ int weapon_ave(struct obj_index_data *pWield)
         return 0;
 }
 
+static int get_tier_index(int level, bitnumber_t wclass)
+{
+    int index = level / 5;
+    int penalty = weapon_level_penalty[wclass].asInt();
+    index = max(0, index + penalty);
+    return index;
+}
+
 int weapon_ave(int level, int tier, bitnumber_t wclass)
 {
     if (tier <= 0 || tier > (int)weapon_ave_tiers.size()) {
@@ -156,17 +164,21 @@ int weapon_ave(int level, int tier, bitnumber_t wclass)
         return 0;
     }
 
-    Json::Value &one_tier = weapon_ave_tiers[tier-1];
-    int index = level / 5;
-    int penalty = weapon_ave_penalty[wclass].asInt();
-    index = max(0, index + penalty);
+    if (wclass < 0 || wclass >= (int)weapon_ave_penalty.size()) {
+        bug("weapon_ave: invalid weapon class %d", wclass);
+        return 0;
+    }
 
+    Json::Value &one_tier = weapon_ave_tiers[tier-1];
+    int index = get_tier_index(level, wclass);
     if (index >= (int)one_tier.size()) {
         bug("weapon_ave: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
         return 0;
     }
 
-    return one_tier[index].asInt();
+    float multiplier = weapon_ave_penalty[wclass].asFloat();
+    int ave = one_tier[index].asInt();
+    return (int)(multiplier * ave);
 }
 
 int weapon_value2(bitnumber_t wclass)
@@ -177,16 +189,6 @@ int weapon_value2(bitnumber_t wclass)
     }
 
     return weapon_value2_by_class[wclass].asInt();
-}
-
-float weapon_ave_bonus(bitnumber_t wclass) 
-{
-    if (wclass < 0 || wclass >= (int)ave_bonus_by_class.size()) {
-        bug("weapon_ave_bonus: invalid weapon class %d", wclass);
-        return 0;
-    }
-
-    return ave_bonus_by_class[wclass].asFloat();
 }
 
 int weapon_value1(int level, int tier, int value2, bitnumber_t wclass)
@@ -219,9 +221,7 @@ int weapon_damroll(int level, int tier, bitnumber_t wclass)
     }
 
     Json::Value &one_tier = weapon_damroll_tiers[tier-1];
-    int index = level / 5;
-    int penalty = weapon_ave_penalty[wclass].asInt();
-    index = max(0, index + penalty);
+    int index = get_tier_index(level, wclass);
 
     if (index >= (int)one_tier.size()) {
         bug("weapon_damroll: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
