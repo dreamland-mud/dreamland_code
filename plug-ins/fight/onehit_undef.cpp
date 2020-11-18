@@ -25,6 +25,7 @@
 #include "dreamland.h"
 #include "debug_utils.h"
 #include "fight.h"
+#include "weapons.h"
 #include "material.h"
 #include "immunity.h"
 #include "../anatolia/handler.h"
@@ -1070,9 +1071,6 @@ void UndefinedOneHit::damApplyMasterSword( )
 
 void UndefinedOneHit::damEffectMasterSword( ) 
 {
-    Affect *paf;
-    int old_mod;
-    int new_mod;
     Object *katana = wield;
 
     if (weapon_sn != gsn_sword)
@@ -1103,28 +1101,13 @@ void UndefinedOneHit::damEffectMasterSword( )
             
     katana->cost = 0;
 
-    paf = katana->affected.find(gsn_katana, APPLY_HITROLL);
-    if (!paf)
-        return;
-    
-    if (paf->level == 120)
-        return;
-            
-    old_mod = paf->modifier;
-    new_mod = min(paf->modifier+1, ch->getModifyLevel() / 3);
-
-    //do not dull an already sharp katana
-    if (new_mod > old_mod) {
-
-        paf->modifier = new_mod;
-        ch->hitroll += new_mod - old_mod;
-
-        Affect *paf_dr = katana->affected.find(gsn_katana, APPLY_DAMROLL);
-        if (paf_dr) {
-            paf_dr->modifier = new_mod;
-            ch->damroll += new_mod - old_mod;
-        }
-    }
+    WeaponGenerator()
+        .item(katana)
+        .skill(gsn_katana)
+        .hitrollTier(1)
+        .damrollTier(1)
+        .incrementHitroll()
+        .incrementDamroll();
 
     act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana, 0, TO_ROOM);
     act("$o1 в твоей $T руке загорается {Cголубым светом{x.", 

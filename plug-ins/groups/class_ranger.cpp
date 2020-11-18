@@ -43,6 +43,7 @@
 #include "mercdb.h"
 #include "magic.h"
 #include "fight.h"
+#include "weapons.h"
 #include "stats_apply.h"
 #include "directions.h"
 #include "onehit.h"
@@ -794,76 +795,59 @@ SKILL_RUNP( makearrow )
  * 'make bow' skill command
  */
 
-SKILL_RUNP( makebow )
+SKILL_RUNP(makebow)
 {
-  Object *bow;
-  Affect tohit,todam;
-  int mana,wait;
+    Object *bow;
+    int mana, wait;
 
-  if (ch->is_npc()) 
-      return;
+    if (ch->is_npc())
+        return;
 
-  if (!gsn_make_bow->usable( ch ))
-    {
-      ch->send_to("Ты не знаешь как изготовить лук.\n\r");
-      return;
+    if (!gsn_make_bow->usable(ch)) {
+        ch->send_to("Ты не знаешь как изготовить лук.\n\r");
+        return;
     }
 
-  if ( ch->in_room->getSectorType() != SECT_FIELD &&
-       ch->in_room->getSectorType() != SECT_FOREST &&
-       ch->in_room->getSectorType() != SECT_HILLS )
-  {
-    ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
-    return;
-  }
-
-  mana = gsn_make_bow->getMana( );
-  wait = gsn_make_bow->getBeats( );
-
-  if ( ch->mana < mana )
-  {
-     ch->send_to( "У тебя не хватает энергии для изготовления лука.\n\r");
-     return;
-  }
-  ch->mana -= mana;
-  ch->setWait( wait );
-
-  if ( number_percent( ) > gsn_make_bow->getEffective( ch ) )
-   {
-        ch->send_to( "Ты пытаешься изготовить лук... но он ломается.\n\r");
-        gsn_make_bow->improve( ch, false );
+    if (ch->in_room->getSectorType() != SECT_FIELD &&
+        ch->in_room->getSectorType() != SECT_FOREST &&
+        ch->in_room->getSectorType() != SECT_HILLS) {
+        ch->send_to("Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
         return;
-   }
-  ch->send_to( "Ты изготавливаешь лук.\n\r");
-  gsn_make_bow->improve( ch, true );
+    }
 
-  bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel() );
-  bow->level = ch->getRealLevel( );
-  bow->value1(4 + ch->getModifyLevel() / 15);
-  bow->value2(4 + ch->getModifyLevel() / 15);
+    mana = gsn_make_bow->getMana();
+    wait = gsn_make_bow->getBeats();
 
-  tohit.where                    = TO_OBJECT;
-  tohit.type               = gsn_make_arrow;
-  tohit.level              = ch->getModifyLevel();
-  tohit.duration           = -1;
-  tohit.location           = APPLY_HITROLL;
-  tohit.modifier           = ch->getModifyLevel() / 10;
-  tohit.bitvector          = 0;
-  affect_to_obj( bow, &tohit);
+    if (ch->mana < mana) {
+        ch->send_to("У тебя не хватает энергии для изготовления лука.\n\r");
+        return;
+    }
+    ch->mana -= mana;
+    ch->setWait(wait);
 
-  todam.where                   = TO_OBJECT;
-  todam.type               = gsn_make_arrow;
-  todam.level              = ch->getModifyLevel();
-  todam.duration           = -1;
-  todam.location           = APPLY_DAMROLL;
-  todam.modifier           = ch->getModifyLevel() / 10;
-  todam.bitvector          = 0;
-  affect_to_obj( bow, &todam);
+    if (number_percent() > gsn_make_bow->getEffective(ch)) {
+        ch->send_to("Ты пытаешься изготовить лук... но он ломается.\n\r");
+        gsn_make_bow->improve(ch, false);
+        return;
+    }
+    ch->send_to("Ты изготавливаешь лук.\n\r");
+    gsn_make_bow->improve(ch, true);
 
-  obj_to_char(bow,ch);
+    bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel());
+    bow->level = ch->getRealLevel();
+
+    WeaponGenerator()
+        .item(bow)
+        .skill(gsn_make_arrow)
+        .valueTier(4)
+        .hitrollTier(IS_GOOD(ch) ? 2 : 3)
+        .damrollTier(IS_EVIL(ch) ? 2 : 3)
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
+
+    obj_to_char(bow, ch);
 }
-
-
 
 /*
  *  From SoG
@@ -1393,49 +1377,29 @@ SKILL_RUNP( camouflage )
         return;
 }
 
-
-
-
-
-
 SPELL_DECL(RangerStaff);
-VOID_SPELL(RangerStaff)::run( Character *ch, char *, int sn, int level ) 
-{ 
-  Object *staff;
-  Affect tohit;
-  Affect todam;
+VOID_SPELL(RangerStaff)::run(Character *ch, char *, int sn, int level)
+{
+    Object *staff;
 
-  staff = create_object( get_obj_index(OBJ_VNUM_RANGER_STAFF),level);
-  ch->send_to("Ты создаешь посох рейнджера!\n\r");
-  act_p("$c1 создает посох рейнджера!",ch,0,0,TO_ROOM,POS_RESTING);
+    staff = create_object(get_obj_index(OBJ_VNUM_RANGER_STAFF), level);
+    ch->send_to("Ты создаешь посох рейнджера!\n\r");
+    act_p("$c1 создает посох рейнджера!", ch, 0, 0, TO_ROOM, POS_RESTING);
 
-  staff->value1(4 + level / 15);
-  staff->value2(4 + level / 15);
+    staff->timer = level;
+    staff->level = ch->getModifyLevel();
 
-  tohit.where                   = TO_OBJECT;
-  tohit.type               = sn;
-  tohit.level              = ch->getModifyLevel();
-  tohit.duration           = -1;
-  tohit.location           = APPLY_HITROLL;
-  tohit.modifier           = 2 + level/5;
-  tohit.bitvector          = 0;
-  affect_to_obj( staff, &tohit);
+    WeaponGenerator()
+        .item(staff)
+        .skill(sn)
+        .valueTier(3)
+        .hitrollTier(IS_GOOD(ch) ? 2 : 3)
+        .damrollTier(IS_EVIL(ch) ? 2 : 3)
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
 
-  todam.where                   = TO_OBJECT;
-  todam.type               = sn;
-  todam.level              = ch->getModifyLevel();
-  todam.duration           = -1;
-  todam.location           = APPLY_DAMROLL;
-  todam.modifier           = 2 + level/5;
-  todam.bitvector          = 0;
-  affect_to_obj( staff, &todam);
-
-
-  staff->timer = level;
-  staff->level = ch->getModifyLevel();
-
-  obj_to_char(staff,ch);
-
+    obj_to_char(staff, ch);
 }
 
 /*

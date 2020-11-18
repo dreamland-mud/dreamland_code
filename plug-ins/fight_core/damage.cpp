@@ -396,7 +396,7 @@ void Damage::inflictDamage( )
     // log damages
     if (!ch->is_immortal( ) && !ch->is_npc( ) && dam > 2000) 
         wiznet( WIZ_DAMAGES, 0, 0, "%^C1 : повреждения более 2000 : %d", ch, dam );
-    
+
     victim->hit -= dam;
     
     if (victim->is_immortal( ))

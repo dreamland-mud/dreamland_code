@@ -403,9 +403,12 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
 
     WeaponGenerator()
         .item(sword)
-        .assignValues(2)
-        .assignHitroll(2, sn)
-        .assignDamroll(3, sn);
+        .valueTier(2)
+        .hitrollTier(2)
+        .damrollTier(3)
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
 
     SET_BIT(sword->extra_flags, (ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
     obj_to_char(sword, ch);

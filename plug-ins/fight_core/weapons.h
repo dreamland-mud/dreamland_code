@@ -42,12 +42,45 @@ int weapon_ave(int level, int tier, bitnumber_t wclass);
 int weapon_damroll(int level, int tier, bitnumber_t wclass);
 
 struct WeaponGenerator {
-    WeaponGenerator & item(Object *obj);
-    WeaponGenerator & assignValues(int tier);
-    WeaponGenerator & assignHitroll(int tier, int sn = -1);
-    WeaponGenerator & assignDamroll(int tier, int sn = -1);
+    WeaponGenerator();
+
+    WeaponGenerator & item(Object *obj) { this->obj = obj; return *this; }
+    WeaponGenerator & skill(int sn) { this->sn = sn; return *this; }
+    WeaponGenerator & valueTier(int tier) { this->valTier = tier; return *this; }
+    WeaponGenerator & hitrollTier(int tier) { this->hrTier = tier; return *this; }
+    WeaponGenerator & damrollTier(int tier) { this->drTier = tier; return *this; }
+    WeaponGenerator & hitrollStartPenalty(float coef) { this->hrCoef = coef; return *this; }
+    WeaponGenerator & damrollStartPenalty(float coef) { this->drCoef = coef; return *this; }
+    WeaponGenerator & hitrollMinStartValue(int minValue) { this->hrMinValue = minValue; return *this; }
+    WeaponGenerator & damrollMinStartValue(int minValue)  { this->drMinValue = minValue; return *this; }
+    
+    const WeaponGenerator & assignValues() const;
+    
+    const WeaponGenerator & assignHitroll() const;
+    const WeaponGenerator & assignDamroll() const;
+    
+    const WeaponGenerator & assignStartingHitroll() const;
+    const WeaponGenerator & assignStartingDamroll() const;
+    
+    const WeaponGenerator & incrementHitroll() const;
+    const WeaponGenerator & incrementDamroll() const;
 
 private:
+    void setAffect(int location, int modifier) const;
+    int maxDamroll() const;
+    int maxHitroll() const;
+    int minDamroll() const;
+    int minHitroll() const;
+
+    int sn;
+    int valTier;
+    int hrTier;
+    int drTier;
+    float hrCoef;
+    float drCoef;
+    int hrMinValue;
+    int drMinValue;
+
     Object *obj;    
 };
 

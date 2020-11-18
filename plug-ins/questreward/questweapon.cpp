@@ -24,7 +24,10 @@ void QuestWeapon::wear( Character *ch )
 void QuestWeapon::equip( Character *ch ) 
 {
     obj->level = ch->getModifyLevel();
-    WeaponGenerator().item(obj).assignValues(2);
+    WeaponGenerator()
+      .item(obj)
+      .valueTier(2)
+      .assignValues();
 
     if (!obj->affected.empty()) {
       for (auto &paf: obj->affected)

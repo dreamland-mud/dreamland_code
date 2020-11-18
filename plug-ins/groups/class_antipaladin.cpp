@@ -36,6 +36,7 @@
 #include "onehit.h"
 #include "onehit_weapon.h"
 #include "damage_impl.h"
+#include "weapons.h"
 #include "vnum.h"
 #include "merc.h"
 #include "act.h"
@@ -250,39 +251,6 @@ ShadowBlade::ShadowBlade( )
 { 
 }
 
-struct blade_param {
-    int min_level;
-    int value1, value2;
-    int min_hr, min_dr;
-    int max_hr, max_dr;
-};
-
-static const struct blade_param  blade_params [] = 
-{
-//    lvl   v1   v2     min hr/dr    max hr/dr
-    { 30,   6,   6,     4,  4,       10, 10,   }, 
-    { 40,   7,   7,     5,  5,       11, 11,   },
-    { 50,   8,   8,     6,  6,       12, 12,   },
-    { 60,   9,   10,    7,  7,       13, 13,   },
-    { 70,   10,  10,    8,  8,       16, 16,   },
-    { 75,   10,  11,    8,  8,       17, 17,   },
-    { 80,   10,  11,    9,  9,       18, 18,   },
-    { 85,   11,  12,    9,  9,       19, 19,   },
-    { 90,   12,  12,    10, 10,      21, 21,   },
-    { 95,   12,  13,    11, 11,      23, 23,   },
-    { 0 },
-};
-
-static const struct blade_param * find_blade_param( int lvl )
-{
-    int i;
-    for (i = 0; blade_params[i+1].min_level; i++) 
-        if (blade_params[i+1].min_level >= lvl)
-            break;
-    
-    return &blade_params[i];
-}
-
 void ShadowBlade::fight( Character *ch )
 {
     int level;
@@ -301,30 +269,26 @@ void ShadowBlade::fight( Character *ch )
         int vhp = (victim->hit * coef) / max( 1, (int)victim->max_hit );
         
         if (number_percent( ) > vhp && ++castCnt >= 50) {
-            const struct blade_param *p = find_blade_param( level );
-            
             castCnt = 0;
             
             if (++castChance > 80)
                 castChance = 80;
-            
-            Affect *paf_hr = obj->affected.find( gsn_shadowblade, APPLY_HITROLL );
-            if (paf_hr) {
-                int oldMod = paf_hr->modifier;
-                paf_hr->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
-                ch->hitroll += paf_hr->modifier - oldMod;
-            }
 
-            Affect *paf_dr = obj->affected.find( gsn_shadowblade, APPLY_DAMROLL );
-            if (paf_dr) {
-                int oldMod = paf_dr->modifier;
-                paf_dr->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
-                ch->damroll += paf_dr->modifier - oldMod;
-            }
-            
-            obj->value1(std::max( obj->value1(), p->value1 ));
-            obj->value2(std::max( obj->value2(), p->value2 ));
             obj->level = ch->getModifyLevel( );
+            WeaponGenerator()
+                .item(obj)
+                .skill(gsn_shadowblade)
+                .valueTier(2)
+                .hitrollTier(3)
+                .damrollTier(1)
+                .hitrollMinStartValue(3)
+                .damrollMinStartValue(4)
+                .hitrollStartPenalty(0.5)
+                .damrollStartPenalty(0.5)
+                .assignValues()
+                .incrementHitroll()
+                .incrementDamroll();
+
             act("{cСлабое {Cсияние{c окутывает $o4.{x", ch, obj, 0, TO_CHAR);
         }
     }
@@ -516,12 +480,10 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
 SPELL_DECL(ShadowBlade);
 VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level ) 
 {
-    Affect af;
     int cnt;
     Object *obj, *blade;
     OBJ_INDEX_DATA *pObjIndex;
     ShadowBlade::Pointer bhv;
-    const struct blade_param *param;
 
     for (cnt = 0, obj = object_list; obj; obj = obj->next)
         if (obj->behavior) {
@@ -548,25 +510,21 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     blade->level = ch->getModifyLevel( );
     bhv = blade->behavior.getDynamicPointer<ShadowBlade>( );
     bhv->owner = ch->getName( );
-    
-    param = find_blade_param( ch->getModifyLevel( ) );
-    blade->value1(param->value1);
-    blade->value2(param->value2);
 
-    af.where = TO_OBJECT;
-    af.type = sn;
-    af.level = level;
-    af.duration = -1;
-    af.bitvector = 0;
+    WeaponGenerator()
+        .item(blade)
+        .skill(gsn_shadowblade)
+        .valueTier(2)
+        .hitrollTier(3)
+        .damrollTier(1)
+        .hitrollMinStartValue(3)
+        .damrollMinStartValue(4)
+        .hitrollStartPenalty(0.5)
+        .damrollStartPenalty(0.5)
+        .assignValues()
+        .assignStartingHitroll()
+        .assignStartingDamroll();
 
-    af.location = APPLY_HITROLL;
-    af.modifier = param->min_hr;
-    affect_to_obj( blade, &af );
-
-    af.location = APPLY_DAMROLL;
-    af.modifier = param->min_dr;
-    affect_to_obj( blade, &af );
-    
     obj_to_char( blade, ch );
 
     act( "Ты создаешь $o4!", ch, blade, NULL, TO_CHAR );

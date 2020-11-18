@@ -149,9 +149,13 @@ VOID_SPELL(ChaosBlade)::run(Character *ch, char *, int sn, int level)
 
     WeaponGenerator()
         .item(blade)
-        .assignValues(number_range(2, 3))
-        .assignHitroll(number_range(2, 3), sn)
-        .assignDamroll(number_range(2, 3), sn);
+        .skill(sn)
+        .valueTier(number_range(2, 3))
+        .hitrollTier(number_range(2, 3))
+        .damrollTier(number_range(2, 3))
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
 
     obj_to_char(blade, ch);
 }

@@ -231,67 +231,121 @@ int weapon_damroll(int level, int tier, bitnumber_t wclass)
     return one_tier[index].asInt();
 }
 
-WeaponGenerator & WeaponGenerator::item(Object *obj)
+WeaponGenerator::WeaponGenerator()
 {
-    this->obj = obj;
-    return *this;
+    sn = gsn_none;
+    valTier = hrTier = drTier = 5;
+    hrCoef = drCoef = 0;
+    hrMinValue = drMinValue = 0;
 }
 
-WeaponGenerator & WeaponGenerator::assignValues(int tier)
+const WeaponGenerator & WeaponGenerator::assignValues() const
 {    
     bitnumber_t wclass = obj->value0();
     int value2 = weapon_value2(wclass);
-    int value1 = weapon_value1(obj->level, tier, value2, wclass);
+    int value1 = weapon_value1(obj->level, valTier, value2, wclass);
 
     obj->value1(value1);
     obj->value2(value2);
     return *this;
 }
 
-WeaponGenerator & WeaponGenerator::assignHitroll(int tier, int sn)
+int WeaponGenerator::maxDamroll() const
 {
-    sn = sn < 0 ? gsn_none : sn;
-    bitnumber_t wclass = obj->value0();
-    Affect *paf = obj->affected.find(sn, APPLY_HITROLL);
+    return weapon_damroll(obj->level, drTier, obj->value0());
+}
 
-    if (!paf) {
-        Affect af;
+int WeaponGenerator::maxHitroll() const
+{
+    return weapon_damroll(obj->level, hrTier, obj->value0());
+}
 
-        af.where = TO_OBJECT;
-        af.type = sn;
-        af.level = obj->level;
-        af.duration = -1;
-        af.bitvector = 0;
-        af.location = APPLY_HITROLL;
-        affect_to_obj(obj, &af);
+int WeaponGenerator::minDamroll() const
+{
+    return max( drMinValue, (int)(drCoef * maxDamroll()));
+}
 
-        paf = obj->affected.front();
-    }
+int WeaponGenerator::minHitroll() const
+{
+    return max( hrMinValue, (int)(hrCoef * maxHitroll()));
+}
 
-    paf->modifier = weapon_damroll(obj->level, tier, wclass);
+const WeaponGenerator & WeaponGenerator::assignHitroll() const
+{
+    setAffect(APPLY_HITROLL, maxHitroll());
     return *this;
 }
 
-WeaponGenerator & WeaponGenerator::assignDamroll(int tier, int sn)
+const WeaponGenerator & WeaponGenerator::assignDamroll() const
 {
-    sn = sn < 0 ? gsn_none : sn;
-    bitnumber_t wclass = obj->value0();
-    Affect *paf = obj->affected.find(sn, APPLY_DAMROLL);
+    setAffect(APPLY_DAMROLL, maxDamroll());
+    return *this;
+}
+
+const WeaponGenerator & WeaponGenerator::assignStartingHitroll() const
+{
+    setAffect(APPLY_HITROLL, minHitroll());
+    return *this;
+}
+
+const WeaponGenerator & WeaponGenerator::assignStartingDamroll() const
+{
+    setAffect(APPLY_DAMROLL, minDamroll());
+    return *this;
+}
+
+const WeaponGenerator & WeaponGenerator::incrementHitroll() const
+{
+    Affect *paf_hr = obj->affected.find( sn, APPLY_HITROLL );
+    if (paf_hr) {
+        int oldMod = paf_hr->modifier;
+        int min_hr = minHitroll();
+        int max_hr = maxHitroll();
+        paf_hr->modifier = URANGE( min_hr, oldMod + 1, max_hr );
+
+        if (obj->carried_by && (obj->wear_loc == wear_wield || obj->wear_loc == wear_second_wield)) {
+            obj->carried_by->hitroll += paf_hr->modifier - oldMod;
+        }
+    }
+
+    return *this;
+}
+
+const WeaponGenerator & WeaponGenerator::incrementDamroll() const
+{
+    Affect *paf_dr = obj->affected.find( sn, APPLY_DAMROLL );
+    if (paf_dr) {
+        int oldMod = paf_dr->modifier;
+        int min_dr = minDamroll();
+        int max_dr = maxDamroll();
+        paf_dr->modifier = URANGE( min_dr, oldMod + 1, max_dr );
+
+        if (obj->carried_by && (obj->wear_loc == wear_wield || obj->wear_loc == wear_second_wield)) {
+            obj->carried_by->damroll += paf_dr->modifier - oldMod;
+        }
+    }
+    
+    return *this;
+}
+
+void WeaponGenerator::setAffect(int location, int modifier) const
+{
+    int skill = sn < 0 ? gsn_none : sn;
+    Affect *paf = obj->affected.find(sn, location);
 
     if (!paf) {
         Affect af;
 
         af.where = TO_OBJECT;
-        af.type = sn;
+        af.type = skill;
         af.level = obj->level;
         af.duration = -1;
         af.bitvector = 0;
-        af.location = APPLY_DAMROLL;
+        af.location = location;
         affect_to_obj(obj, &af);
 
         paf = obj->affected.front();
     }
 
-    paf->modifier = weapon_damroll(obj->level, tier, wclass);
-    return *this;
+    paf->modifier = modifier;
 }

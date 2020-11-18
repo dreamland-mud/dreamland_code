@@ -33,6 +33,7 @@
 #include "mercdb.h"
 #include "magic.h"
 #include "fight.h"
+#include "weapons.h"
 #include "vnum.h"
 #include "merc.h"
 #include "effects.h"
@@ -415,7 +416,7 @@ SKILL_RUNP( katana )
 
         if ( ch->isAffected(gsn_katana) )
         {
-                ch->send_to("Но у тебя уже есть катана!\n\r");
+                ch->pecho("Ты совсем недавно уже изготавливал%Gо||а катану.", ch);
                 return;
         }
         
@@ -464,38 +465,25 @@ SKILL_RUNP( katana )
 
         if ( !ch->is_npc() && number_percent() < gsn_katana->getEffective( ch ) )
         {
-                af.where  = TO_AFFECTS;
-                af.type        = gsn_katana;
-                af.level        = ch->getModifyLevel();
-                af.duration        = ch->getModifyLevel();
-                af.modifier        = 0;
-                af.bitvector         = 0;
-                af.location        = 0;
-                affect_to_char(ch,&af);
+                postaffect_to_char(ch, gsn_katana, ch->getModifyLevel());
 
                 katana = create_object( get_obj_index( OBJ_VNUM_KATANA_SWORD), ch->getModifyLevel() );
                 katana->cost  = 0;
                 katana->level = ch->getRealLevel( );
                 ch->mana -= mana;
 
-                af.where        = TO_OBJECT;
-                af.type         = gsn_katana;
-                af.level        = ch->getModifyLevel();
-                af.duration        = -1;
-                af.location        = APPLY_DAMROLL;
-                af.modifier        = ch->getModifyLevel() / 10;
-                af.bitvector        = 0;
-                affect_to_obj( katana, &af );
+                WeaponGenerator()
+                    .item(katana)
+                    .skill(gsn_katana)
+                    .valueTier(2)
+                    .hitrollTier(1)
+                    .damrollTier(1)
+                    .hitrollStartPenalty(0.35)
+                    .damrollStartPenalty(0.35)
+                    .assignValues()
+                    .assignStartingHitroll()
+                    .assignStartingDamroll();
 
-                af.location        = APPLY_HITROLL;
-                affect_to_obj( katana, &af );
-
-                if (ch->getModifyLevel() < 70 )
-                        katana->value2(10);
-                else
-                {
-                        katana->value2(10 + (ch->getModifyLevel()-70)/7);
-                }
                 sprintf( buf,katana->pIndexData->extra_descr->description,ch->getNameP( ) );
                 katana->extra_descr = new_extra_descr();
                 katana->extra_descr->keyword =str_dup(katana->pIndexData->extra_descr->keyword );
@@ -513,7 +501,7 @@ SKILL_RUNP( katana )
         }
         else
         {
-                ch->send_to("Ты разрушаешь это.\n\r");
+                act("Ты разрушаешь $o4.",ch,part,0,TO_CHAR);
                 extract_obj(part);
                 ch->mana -= mana / 2;
                 gsn_katana->improve( ch, false );

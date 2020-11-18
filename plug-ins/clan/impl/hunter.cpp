@@ -346,9 +346,12 @@ void HunterWeapon::wear( Character *ch )
     obj->level = ch->getRealLevel( );
     WeaponGenerator()
         .item(obj)
-        .assignValues(2)
-        .assignHitroll(IS_GOOD(ch) ? 2 : 3)
-        .assignDamroll(IS_EVIL(ch) ? 2 : 3);
+        .valueTier(2)
+        .hitrollTier(IS_GOOD(ch) ? 2 : 3)
+        .damrollTier(IS_EVIL(ch) ? 2 : 3)
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
 }
 
 void HunterWeapon::fight( Character *ch )
