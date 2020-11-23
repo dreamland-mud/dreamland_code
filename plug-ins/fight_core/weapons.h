@@ -65,6 +65,8 @@ struct WeaponGenerator {
     const WeaponGenerator & incrementHitroll() const;
     const WeaponGenerator & incrementDamroll() const;
 
+    const WeaponGenerator & assignNames() const;
+
 private:
     void setAffect(int location, int modifier) const;
     int maxDamroll() const;

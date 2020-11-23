@@ -3,9 +3,13 @@
 #include "olcstate.h"
 #include "security.h"
 #include "argparser.h"
+#include "core/object.h"
 #include "weapons.h"
 #include "math_utils.h"
 #include "comm.h"
+#include "interp.h"
+#include "loadsave.h"
+#include "mercdb.h"
 #include "act.h"
 #include "def.h"
 
@@ -37,6 +41,31 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     int maxTier  = myargs.tier == -1  ? 5 : myargs.tier;
     bitnumber_t minFlag  = myargs.wclass == -1 ? 0 : myargs.wclass;
     bitnumber_t maxFlag  = myargs.wclass == -1 ? WEAPON_MAX-1 : myargs.wclass;
+    bool create = myargs.level != -1 && myargs.tier != -1 && myargs.wclass != -1;
+
+    if (create) {
+        ch->printf("{WСоздаю оружие типа '%s' уровня %d и крутости %d.{x\r\n", 
+            weapon_class.message(myargs.wclass).c_str(), myargs.level, myargs.tier);
+
+        Object *obj = create_object(get_obj_index(104), 0);
+        obj->value0(myargs.wclass);
+        obj->level = myargs.level;
+        obj->setShortDescr(str_empty);
+        obj_to_char(obj, ch);
+
+        WeaponGenerator()
+            .item(obj)
+            .hitrollTier(myargs.tier)
+            .damrollTier(myargs.tier)
+            .valueTier(myargs.tier)
+            .assignHitroll()
+            .assignDamroll()
+            .assignValues()
+            .assignNames();
+
+        interpret_fmt(ch, "stat obj %lld", obj->getID());
+        return;
+    }
 
     buf << dlprintf("{C%15s{x {WLVL  V1  V2  AVE  REAL  DR{x\r\n", "");
 

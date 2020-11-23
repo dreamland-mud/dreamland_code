@@ -4,6 +4,7 @@
  */
 #include <math.h>
 #include "jsoncpp/json/json.h"
+#include "grammar_entities_impl.h"
 #include "skill.h"
 #include "skillreference.h"
 #include "logstream.h"
@@ -18,6 +19,7 @@
 #include "itemflags.h"
 #include "affectflags.h"
 #include "loadsave.h"
+#include "dl_math.h"
 #include "merc.h"
 #include "def.h"
 
@@ -126,6 +128,12 @@ Json::Value weapon_damroll_tiers;
 CONFIGURABLE_LOADED(fight, weapon_damroll_tiers)
 {
     weapon_damroll_tiers = value;
+}
+
+Json::Value weapon_names;
+CONFIGURABLE_LOADED(fight, weapon_names)
+{
+    weapon_names = value;
 }
 
 int weapon_ave(Object *wield)
@@ -346,4 +354,26 @@ void WeaponGenerator::setAffect(int location, int modifier) const
     }
 
     paf->modifier = modifier;
+}
+
+const WeaponGenerator & WeaponGenerator::assignNames() const
+{
+    DLString wclass = weapon_class.name(obj->value0());
+    Json::Value &names = weapon_names[wclass];
+
+    if (names.empty()) {
+        warn("Weapon generator: no names defined for type %s.", wclass.c_str());
+        return *this;
+    }
+
+    int index = number_range(0, names.size() - 1);
+    Json::Value &entry = names[index];
+
+    obj->setName(entry["name"].asCString());
+    obj->setShortDescr(entry["short"].asCString());
+    obj->setDescription(entry["long"].asCString());
+    obj->gram_gender = MultiGender(entry["gender"].asCString());
+    // TODO: set material and flags.
+
+    return *this;
 }
