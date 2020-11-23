@@ -92,11 +92,10 @@ void follower_stop( Character *ch )
     }
 
     if (ch->isAffected(gsn_charm_person)) {
-        // Affect remove handler will call follower_clear().
         affect_strip( ch, gsn_charm_person );
-    } else {
-        follower_clear(ch);
-    }
+    } 
+    
+    follower_clear(ch);
 }
 
 void follower_clear( Character * ch )
