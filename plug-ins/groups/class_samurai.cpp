@@ -311,7 +311,6 @@ ch->send_to("Ты пытаешься, но не можешь. Попробуй �
 SKILL_RUNP( harakiri )
 {
     int chance;
-    Affect  af;
 
     if ( MOUNTED(ch) )
     {
@@ -347,8 +346,6 @@ SKILL_RUNP( harakiri )
 
     if (number_percent() < chance)
     {
-        Affect af;
-
         ch->setWaitViolence( 1 );
 
         ch->hit = 1;
@@ -364,28 +361,13 @@ SKILL_RUNP( harakiri )
         interpret_raw( ch, "sleep" );
         SET_BIT(ch->act,PLR_HARA_KIRI);
 
-               af.where     = TO_AFFECTS;
-               af.type      = gsn_hara_kiri;
-               af.level     = ch->getModifyLevel();
-               af.duration  = 10;
-               af.location  = APPLY_NONE;
-               af.modifier  = 0;
-               af.bitvector = 0;
-               affect_to_char( ch, &af );
+        postaffect_to_char(ch, gsn_hara_kiri, 10);
     }
 
     else
     {
         ch->setWaitViolence( 2 );
-
-               af.where     = TO_AFFECTS;
-               af.type      = gsn_hara_kiri;
-               af.level     = ch->getModifyLevel();
-               af.duration  = 0;
-               af.location  = APPLY_NONE;
-               af.modifier  = 0;
-               af.bitvector = 0;
-               affect_to_char( ch, &af );
+        postaffect_to_char(ch, gsn_hara_kiri, 0);
 
         ch->send_to("Ты не можешь отрезать себе палец. Ведь это не так легко!.\n\r");
         gsn_hara_kiri->improve( ch, false );
@@ -608,13 +590,13 @@ void SamuraiGuildmaster::doFirstEnchant( Character *victim, Object *katana )
 {
     Affect af;
 
-    af.where        = TO_WEAPON;
+    af.bitvector.setTable(&weapon_type2);
     af.type        = gsn_none;
     af.level        = 100;
     af.duration        = -1;
     af.modifier        = 0;
-    af.bitvector= WEAPON_KATANA;
-    af.location        = APPLY_NONE;
+    af.bitvector.setValue(WEAPON_KATANA);
+    
     affect_to_obj( katana, &af );
     
     say_act( victim, ch, "Как только ты вооружишься этим, ты почувствуешь, что сила ее постоянно увеличивается." );

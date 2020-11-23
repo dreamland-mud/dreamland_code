@@ -300,7 +300,6 @@ static bool reset_room_mobs(Room *pRoom)
 void reset_room(Room *pRoom, int flags)
 {
     RESET_DATA *pReset;
-    EXTRA_EXIT_DATA *eexit;
     NPCharacter *mob;
     bool last;
     int iExit;

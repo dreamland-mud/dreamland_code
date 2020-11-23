@@ -487,7 +487,7 @@ SKILL_RUNP( manacles )
                         if ( paf->duration >= 0 )
                         {
                                 sprintf (buf,"$C1 закован на %d час%s."
-                                        ,paf->duration
+                                        ,paf->duration.getValue()
                                         ,GET_COUNT(paf->duration, "","а","ов"));
                         }
                         else
@@ -590,16 +590,7 @@ SKILL_RUNP( manacles )
 
                 if (success)
                 {
-                        Affect af;
-
-                        af.where                        = TO_AFFECTS;
-                        af.type                                = gsn_manacles;
-                        af.level                        = ch->getPC()->getClanLevel();
-                        af.duration                = duration;
-                        af.bitvector        = 0;
-                        af.modifier                = 0;
-                        af.location                = APPLY_NONE;
-                        affect_to_char ( victim, &af);
+                        postaffect_to_char(victim, gsn_manacles, duration);
 
                         act_p("Ты успешно заковываешь $C4 в кандалы!",
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1083,7 +1074,7 @@ SKILL_RUNP( suspect )
                 if ( paf != 0 )   
                 {
                         sprintf (buf,"Повестка $C2 действительна в течении %d час%s."
-                                ,paf->duration
+                                ,paf->duration.getValue()
                                 ,GET_COUNT(paf->duration, "а","ов","ов"));
 
                         victim->send_to ("Ты чувствуешь - тебя ждут в Суде.\n\r");
@@ -1134,17 +1125,7 @@ SKILL_RUNP( suspect )
 
         if ( !victim->isAffected(gsn_suspect) )
         {
-                Affect af;
-
-                af.where                        = TO_AFFECTS;
-                af.type                                = gsn_suspect;
-                af.level                        = ch->getPC()->getClanLevel();
-                af.duration                = value;
-                af.bitvector        = 0;
-                af.modifier                = 0;
-                af.location                = APPLY_NONE;
-
-                affect_to_char ( victim, &af);
+                postaffect_to_char(victim, gsn_suspect, value);
 
                 act_p ("Ты посылаешь повестку $C4.", ch, 0, victim,
                         TO_CHAR, POS_RESTING );
@@ -1246,7 +1227,7 @@ SKILL_RUNP( jail )
                         if ( paf->duration >= 0 )
                         {
                                 sprintf (buf,"$C1 в тюряге на %d час%s."
-                                        ,paf->duration
+                                        ,paf->duration.getValue()
                                         ,GET_COUNT(paf->duration, "","а","ов"));
                         }
                         else
@@ -1319,16 +1300,7 @@ SKILL_RUNP( jail )
                         affect_strip ( victim, gsn_jail );
                 }
 
-                Affect af;
-
-                af.where                        = TO_AFFECTS;
-                af.type                                = gsn_jail;
-                af.level                        = ch->getPC()->getClanLevel();
-                af.duration                = duration;
-                af.bitvector        = 0;
-                af.modifier                = 0;
-                af.location                = APPLY_NONE;
-                affect_to_char ( victim, &af);
+                postaffect_to_char(victim, gsn_jail, duration);
 
                 act_p("Ты приговариваешь $C4 к тюремному заключению!",
                                         ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1432,7 +1404,7 @@ SKILL_RUNP( dismiss )
                         if ( paf->duration >= 0 )
                         {
                                 sprintf (buf,"$C1 лише$Gно|н|на своих Рулерских прав на %d час%s."
-                                        ,paf->duration
+                                        ,paf->duration.getValue()
                                         ,GET_COUNT(paf->duration, "","а","ов"));
                         }
                         else
@@ -1497,16 +1469,7 @@ SKILL_RUNP( dismiss )
                         affect_strip ( victim, gsn_dismiss );
                 }
 
-                Affect af;
-
-                af.where                        = TO_AFFECTS;
-                af.type                                = gsn_dismiss;
-                af.level                        = ch->getPC()->getClanLevel();
-                af.duration                = duration;
-                af.bitvector        = 0;
-                af.modifier                = 0;
-                af.location                = APPLY_NONE;
-                affect_to_char ( victim, &af);
+                postaffect_to_char(victim, gsn_dismiss, duration);
 
                 act_p("Ты лишаешь $C4 права вершить суд!",
                                         ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1728,11 +1691,11 @@ VOID_SPELL(RulerAura)::run( Character *ch, Character *, int sn, int level )
     {
       ch->pecho("Теперь ты чувствуешь себя более информированн%Gым|ым|ой, правя Миром.", ch);
 
-      af.where    = TO_DETECTS;
+      af.bitvector.setTable(&detect_flags);
       af.type = sn;
       af.duration = level / 4;
       af.level = ch->getModifyLevel();
-      af.bitvector = DETECT_FADE | ACUTE_VISION | DETECT_IMP_INVIS | DETECT_INVIS | DETECT_HIDDEN;
+      af.bitvector.setValue(DETECT_FADE | ACUTE_VISION | DETECT_IMP_INVIS | DETECT_INVIS | DETECT_HIDDEN);
       affect_to_char(ch, &af);
     }
   else
@@ -1773,25 +1736,22 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
   badge = create_object( get_obj_index(OBJ_VNUM_DEPUTY_BADGE),level);
   badge->level = ch->getRealLevel( );
 
-  af.where        = TO_OBJECT;
   af.type         = sn;
   af.level        = level;
   af.duration     = -1;
-  af.modifier     = ch->applyCurse( level );
-  af.bitvector    = 0;
 
-  af.location     = APPLY_HIT;
+  af.modifier     = ch->applyCurse( level );
+  af.location = APPLY_HIT;
   affect_to_obj( badge, &af);
 
-  af.location     = APPLY_MANA;
+  af.location = APPLY_MANA;
   affect_to_obj( badge, &af);
 
   af.modifier     = ch->applyCurse( level / 8 );
-
-  af.location     = APPLY_HITROLL;
+  af.location = APPLY_HITROLL;
   affect_to_obj( badge, &af);
 
-  af.location     = APPLY_DAMROLL;
+  af.location = APPLY_DAMROLL;
   affect_to_obj( badge, &af);
 
 
@@ -1826,36 +1786,23 @@ VOID_SPELL(ShieldOfRuler)::run( Character *ch, char *target_name, int sn, int le
   shield->cost  = 0;
   obj_to_char(shield, ch);
 
-  af.where        = TO_OBJECT;
   af.type         = sn;
   af.level        = level;
   af.duration     = -1;
+
   af.modifier     = ch->applyCurse( level / 8 );
-  af.bitvector    = 0;
-
-  af.location     = APPLY_HITROLL;
+  af.location = APPLY_HITROLL;
   affect_to_obj( shield, &af);
 
-  af.location     = APPLY_DAMROLL;
+  af.location = APPLY_DAMROLL;
   affect_to_obj( shield, &af);
 
-
-  af.where        = TO_OBJECT;
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
   af.modifier     = ch->applyCurse( -level * 2 );
-  af.bitvector    = 0;
-  af.location     = APPLY_AC;
+  af.location = APPLY_AC;
   affect_to_obj( shield, &af);
 
-  af.where        = TO_OBJECT;
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
   af.modifier     = ch->applyCurse( max( 1, level /  30 ) );
-  af.bitvector    = 0;
-  af.location     = APPLY_CHA;
+  af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
   act_p("Ты взмахиваешь руками и создаешь $o4!",
@@ -1911,14 +1858,7 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
 
   stalker = create_mobile( get_mob_index(MOB_VNUM_STALKER) );
 
-  af.where                = TO_AFFECTS;
-  af.type               = sn;
-  af.level              = level;
-  af.duration           = 6;
-  af.bitvector          = 0;
-  af.modifier           = 0;
-  af.location           = APPLY_NONE;
-  affect_to_char(ch, &af);
+  postaffect_to_char(ch, sn, 6);
 
   for (i=0;i < stat_table.size; i++)
     {
@@ -2002,7 +1942,7 @@ VOID_AFFECT(Jail)::update( Character *ch, Affect *paf )
     if ( paf->duration < 3) {
         clantalk(*clan_ruler, "%s выйдет на свободу через %d час%s",
                 ch->getNameP( '1' ).c_str(),
-                paf->duration,
+                paf->duration.getValue(),
                 GET_COUNT(paf->duration, "","а","ов"));
     }
 }
@@ -2042,7 +1982,7 @@ VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf )
     if ( paf->duration < 3) {
         clantalk(*clan_ruler, "Повестка в суд для %s истекает через %d час%s",
                 ch->getNameP( '2' ).c_str(),
-                paf->duration,
+                paf->duration.getValue(),
                 GET_COUNT(paf->duration, "","а","ов"));
     }
 }

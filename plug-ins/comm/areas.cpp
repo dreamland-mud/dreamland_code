@@ -13,7 +13,6 @@ CMDRUNP( areas )
 {
     ostringstream buf, areaBuf, clanBuf, mansionBuf;
     int acnt = 0, ccnt = 0, mcnt = 0;
-    AreaIndexData *pArea;
     int minLevel, maxLevel, level;
     DLString arguments( argument ), args, arg1, arg2;
     

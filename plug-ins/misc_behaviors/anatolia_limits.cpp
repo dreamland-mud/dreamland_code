@@ -126,11 +126,11 @@ void HasteBracers::equip( Character *ch )
   short level = ch->getModifyLevel();
 
   if( !( ch->isAffected(gsn_haste ) || ch->isAffected(gsn_transform ) ) ) {
-      af.where = TO_AFFECTS;
+      af.bitvector.setTable(&affect_flags);
       af.type = gsn_haste;
       af.duration = -2;
       af.level = level;
-      af.bitvector = AFF_HASTE;
+      af.bitvector.setValue(AFF_HASTE);
       af.location = APPLY_DEX;
       af.modifier = 1 + ( level >= 18 ) + ( level >= 30) + ( level >= 45 );
       affect_to_char(ch, &af);
@@ -389,12 +389,12 @@ void FlyingBoots::equip( Character *ch )
     if (ch->isAffected(gsn_fly))
         return;
 
-    af.where = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type = gsn_fly;
     af.duration = -2;
     af.level = ch->getModifyLevel();
-    af.bitvector = AFF_FLYING;
-    af.location = 0;
+    af.bitvector.setValue(AFF_FLYING);
+    
     af.modifier = 0;
     affect_to_char(ch, &af);
 }
@@ -426,11 +426,10 @@ void GiantStrengthArmor::equip( Character *ch )
     Affect af;
     short level = ch->getModifyLevel();
     
-    af.where = TO_AFFECTS;
     af.type = gsn_giant_strength;
     af.duration = -2;
     af.level = ch->getModifyLevel();
-    af.bitvector = 0;
+    
     af.location = APPLY_STR;
     af.modifier = 1 + ( level >= 18) + ( level >= 30) + ( level >= 45);
     affect_join(ch, &af);

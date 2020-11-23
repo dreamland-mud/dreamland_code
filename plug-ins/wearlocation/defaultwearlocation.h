@@ -28,6 +28,7 @@ public:
     virtual const DLString & getName( ) const;
     virtual void setName( const DLString & );
     virtual bool isValid( ) const;
+    virtual bool givesAffects() const;
     virtual void loaded( );
     virtual void unloaded( );
     

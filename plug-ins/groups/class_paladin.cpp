@@ -50,7 +50,6 @@ RACE(demon);
 SKILL_RUNP( layhands )
 {
     Character *victim;
-    Affect af;
 
     if ( ch->is_npc() || !gsn_lay_hands->usable( ch ) )
     {
@@ -70,14 +69,7 @@ SKILL_RUNP( layhands )
 
     ch->setWait( gsn_lay_hands->getBeats( ) );
 
-    af.type = gsn_lay_hands;
-    af.where = TO_AFFECTS;
-    af.level = ch->getModifyLevel();
-    af.duration = 2;
-    af.location = APPLY_NONE;
-    af.modifier = 0;
-    af.bitvector = 0;
-    affect_to_char ( ch, &af );
+    postaffect_to_char(ch, gsn_lay_hands, 2);
 
     victim->hit = min( victim->hit + ch->getModifyLevel() * 5, (int)victim->max_hit );
     update_pos( victim );
@@ -146,25 +138,23 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         act_p("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR, POS_RESTING);
 
         if (!ch->isAffected(gsn_weaken)) {
-            af.where = TO_AFFECTS;
             af.type = gsn_weaken;
             af.level = lvl;
             af.duration = lvl / 15;
             af.location = APPLY_STR;
             af.modifier = -1 * (lvl / 4);
-            af.bitvector = 0;
             affect_to_char(ch, &af);
             ch->send_to("Ты чувствуешь, как сила уходит из тебя.\n\r");
             act_p("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
         }
         else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
-            af.where = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type = gsn_curse;
             af.level = lvl;
             af.duration = lvl / 10;
             af.location = APPLY_HITROLL;
             af.modifier = -1 * (lvl / 7);
-            af.bitvector = AFF_CURSE;
+            af.bitvector.setValue(AFF_CURSE);
             affect_to_char(ch, &af);
             af.location = APPLY_SAVING_SPELL;
             af.modifier = lvl / 7;
@@ -178,13 +168,11 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
                 ch->setWaitViolence( 1 );
             }
             else {
-                af.where = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.type = gsn_sleep;
                 af.level = lvl;
                 af.duration = 3;
-                af.location = APPLY_NONE;
-                af.modifier = 0;
-                af.bitvector = AFF_SLEEP;
+                af.bitvector.setValue(AFF_SLEEP);
                 affect_join(ch, &af);
 
                 if (IS_AWAKE(ch)) {
@@ -207,14 +195,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 
     ch->send_to("Благословение Богов снизошло на тебя!\n\r");
 
-    af.where = TO_AFFECTS;
-    af.type = sn;
-    af.level = ch->getRealLevel( );
-    af.location = APPLY_NONE;
-    af.modifier = 0;
-    af.bitvector = 0;
-    af.duration = number_fuzzy(1 + ch->getRealLevel( ) / 8);
-    affect_to_char(ch, &af);
+    postaffect_to_char(ch, sn, number_fuzzy(1 + ch->getRealLevel( ) / 8));
 
     // random effects 
     sn = -1;
@@ -329,21 +310,13 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 { 
     Character *victim, *victim_next;
 
-    Affect af;
-
     if ( ch->isAffected(sn ) )
     {
         ch->send_to("Это заклинание использовалось совсем недавно.");
         return;
     }
-    af.where         = TO_AFFECTS;
-    af.type      = sn;
-    af.level         = level;
-    af.duration  = 5;
-    af.modifier  = 0;
-    af.location  = 0;
-    af.bitvector = 0;
-    affect_to_char( ch, &af );
+
+    postaffect_to_char(ch, sn, 5);
 
     for (victim = room->people; victim != 0; victim = victim_next)
     {

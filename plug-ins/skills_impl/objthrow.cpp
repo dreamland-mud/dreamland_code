@@ -228,13 +228,13 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
             victim->send_to("Ты чувствуешь как яд растекается по твоим венам.");
             act_p("$c1 отравле$gно|н|на ядом от $o2.", victim,arrow,0,TO_ROOM,POS_RESTING);
 
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level     = level * 3/4;
             af.duration  = level / 2;
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1;
-            af.bitvector = AFF_POISON;
+            af.bitvector.setValue(AFF_POISON);
             affect_join( victim, &af );
         }
 
@@ -267,17 +267,13 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     {
         Affect af;
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level     = ch->getModifyLevel();
         af.duration  = -1;
-        af.location  = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         af.modifier  = - (dam / 20);
-
-        if (victim->is_npc())
-            af.bitvector = 0;
-        else
-            af.bitvector = AFF_CORRUPTION;
+        af.bitvector.setValue(AFF_CORRUPTION);
 
         affect_join( victim, &af );
 

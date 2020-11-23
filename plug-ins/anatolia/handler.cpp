@@ -291,19 +291,18 @@ void eyes_blinded_msg( Character *ch )
     if (!IS_AFFECTED(ch, AFF_BLIND))
         return;
 
-    for (auto &paf: ch->affected) 
-        if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_BLIND)) {
-            if (paf->type == gsn_fire_breath)
-                ch->println( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
-            else if (paf->type == gsn_sand_storm)
-                ch->println( "Песок в глазах мешает тебе что-либо разглядеть." );
-            else if (paf->type == gsn_dirt_kicking)
-                ch->println( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
-            else
-                continue;
+    for (auto &paf: ch->affected.findAllWithBits(&affect_flags, AFF_BLIND)) {
+        if (paf->type == gsn_fire_breath)
+            ch->println( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
+        else if (paf->type == gsn_sand_storm)
+            ch->println( "Песок в глазах мешает тебе что-либо разглядеть." );
+        else if (paf->type == gsn_dirt_kicking)
+            ch->println( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
+        else
+            continue;
 
-            return;
-        }
+        return;
+    }
 
     ch->println( "Твои глаза слепы, ты ничего не видишь!" );
 }

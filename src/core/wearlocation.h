@@ -32,6 +32,7 @@ public:
 
     virtual const DLString &getName( ) const;
     virtual bool isValid( ) const;
+    virtual bool givesAffects() const;
     
     virtual const DLString &getRibName( ) const;
     virtual const DLString &getPurpose( ) const;

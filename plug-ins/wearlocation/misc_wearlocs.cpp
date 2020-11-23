@@ -351,7 +351,5 @@ int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
 
 bool obj_is_worn(Object *obj)
 {
-    return obj->wear_loc != wear_none 
-            && obj->wear_loc != wear_tail
-            && obj->wear_loc != wear_hair;
+    return obj->wear_loc->givesAffects();
 }

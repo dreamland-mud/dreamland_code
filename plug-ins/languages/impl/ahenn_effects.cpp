@@ -62,7 +62,6 @@ bool InspirationWE::run( PCharacter *ch, Character *victim ) const
 {
     Affect af;
 
-    af.where    = TO_AFFECTS;
     af.type     = gsn_inspiration;
     af.level    = ch->getModifyLevel( );
     af.duration = af.level / 3;

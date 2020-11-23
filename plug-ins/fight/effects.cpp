@@ -175,7 +175,6 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         int i;
                         Affect af;
 
-                        af.where    = TO_OBJECT;
                         af.location = APPLY_AC;
                         af.level    = level;
                         af.duration = -1;
@@ -258,13 +257,11 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                    victim,0,0,TO_ROOM,POS_RESTING);
             act_p("Холод окутывает тебя и проникает до самых костей.",
                    victim,0,0,TO_CHAR,POS_RESTING);
-            af.where     = TO_AFFECTS;
             af.type      = gsn_chill_touch;
             af.level     = level;
             af.duration  = 6;
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier = min(-1, -level / 12);
-            af.bitvector = 0;
             affect_join( victim, &af );
         }
 
@@ -361,13 +358,13 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             act_p("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!",
                    victim,0,0,TO_CHAR,POS_RESTING);
         
-            af.where        = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type         = gsn_fire_breath;
             af.level        = level;
             af.duration     = number_range(0,level/50);
-            af.location     = APPLY_HITROLL;
+            af.location = APPLY_HITROLL;
             af.modifier     = -4;
-            af.bitvector    = AFF_BLIND;
+            af.bitvector.setValue(AFF_BLIND);
 
             affect_to_char(victim,&af);
         }
@@ -521,13 +518,13 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
             victim->send_to("Ты чувствуешь, как яд растекается по твоим венам.\n\r");
             act_p("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM,POS_RESTING);
 
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level     = level;
             af.duration  = level / 2;
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1;
-            af.bitvector = AFF_POISON;
+            af.bitvector.setValue(AFF_POISON);
             affect_join( victim, &af );
         }
 
@@ -696,13 +693,13 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         act_p("Твои глаза слезятся от попавшего в них песка... ты ничего не видишь!",
                                 victim,0,0,TO_CHAR,POS_RESTING);
         
-                        af.where        = TO_AFFECTS;
+                        af.bitvector.setTable(&affect_flags);
                         af.type         = gsn_sand_storm;
                         af.level        = level;
                         af.duration     = number_range(0,level/10);
-                        af.location     = APPLY_HITROLL;
+                        af.location = APPLY_HITROLL;
                         af.modifier     = -4;
-                        af.bitvector    = AFF_BLIND;
+                        af.bitvector.setValue(AFF_BLIND);
 
                         affect_to_char(victim,&af);
                 }
@@ -786,7 +783,6 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         int i;
                         Affect af;
 
-                        af.where    = TO_OBJECT;
                         af.location = APPLY_AC;
                         af.level    = level;
                         af.duration = -1;
@@ -868,13 +864,13 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                         act_p("$c1 теперь ничего не слышит!",victim,0,0,TO_ROOM,POS_RESTING);
                         act_p("Ты ничего не слышишь!",victim,0,0,TO_CHAR,POS_RESTING);
         
-                        af.where        = TO_AFFECTS;
+                        af.bitvector.setTable(&affect_flags);
                         af.type         = gsn_scream;
                         af.level        = level;
                         af.duration     = 0;
-                        af.location     = APPLY_NONE;
+                        
                         af.modifier     = 0;
-                        af.bitvector    = AFF_SCREAM;
+                        af.bitvector.setValue(AFF_SCREAM);
 
                         affect_to_char(victim,&af);
                 }

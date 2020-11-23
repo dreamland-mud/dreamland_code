@@ -14,6 +14,7 @@ public:
 
     virtual bool equip( Character *ch, Object *obj );
     virtual void unequip( Character *ch, Object *obj );
+    virtual bool givesAffects() const { return false; }
 };
 
 class ShieldWearloc : public DefaultWearlocation {
@@ -42,6 +43,7 @@ public:
     virtual void unequip( Character *ch, Object *obj );
     virtual bool matches( Character *ch );
     virtual int canWear( Character *ch, Object *obj, int flags );
+    virtual bool givesAffects() const { return false; }
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
@@ -88,6 +90,8 @@ public:
     virtual bool equip( Character *ch, Object *obj );
     virtual void unequip( Character *ch, Object *obj );
     virtual int canWear( Character *ch, Object *obj, int flags );
+    virtual bool givesAffects() const { return false; }
+    
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );

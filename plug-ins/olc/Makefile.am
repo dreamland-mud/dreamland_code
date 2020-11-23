@@ -17,7 +17,6 @@ mem.cpp \
 olc_act.cpp \
 olc_impl.cpp \
 olc_save.cpp \
-olc_savecompat.cpp \
 olc_dump.cpp \
 olcstate.cpp \
 onlinecreation.cpp \

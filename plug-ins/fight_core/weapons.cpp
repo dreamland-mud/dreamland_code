@@ -336,11 +336,9 @@ void WeaponGenerator::setAffect(int location, int modifier) const
     if (!paf) {
         Affect af;
 
-        af.where = TO_OBJECT;
         af.type = skill;
         af.level = obj->level;
         af.duration = -1;
-        af.bitvector = 0;
         af.location = location;
         affect_to_obj(obj, &af);
 

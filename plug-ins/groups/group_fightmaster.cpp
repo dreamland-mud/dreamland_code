@@ -940,21 +940,19 @@ BOOL_SKILL( concentrate )::run( Character *ch )
     Affect af;
     int level = skill_level(*gsn_concentrate, ch);
 
-    af.where        = TO_AFFECTS;
     af.type         = gsn_concentrate;
     af.level        = level;
     af.duration     = number_fuzzy( level / 8);
     af.modifier     = max( 1, level / 8 );
-    af.bitvector    = 0;
 
-    af.location        = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_to_char(ch,&af);
 
-    af.location        = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_to_char(ch,&af);
 
     af.modifier        = max( 1, level / 10 );
-    af.location        = APPLY_AC;
+    af.location = APPLY_AC;
     affect_to_char(ch,&af);
 
     if (ch->position > POS_SITTING)
@@ -1151,22 +1149,22 @@ BOOL_SKILL( berserk )::run( Character *ch )
     ch->hit += level * 2;
     ch->hit = min(ch->hit, ch->max_hit);
 
-    af.where        = TO_AFFECTS;
     af.type         = gsn_berserk;
     af.level        = level;
     af.duration     = number_fuzzy( level / 8);
 
     af.modifier        = max( 1, level / 5 );
-    af.location        = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_to_char(ch,&af);
 
-    af.location        = APPLY_DAMROLL;
-    af.bitvector       = AFF_BERSERK;
+    af.location = APPLY_DAMROLL;
+    af.bitvector.setTable(&affect_flags);
+    af.bitvector.setValue(AFF_BERSERK);
     affect_to_char(ch,&af);
 
     af.modifier        = max( 10, 10 * ( level / 5 ) );
-    af.location        = APPLY_AC;
-    af.bitvector         = 0;
+    af.location = APPLY_AC;
+    af.bitvector.clear();
     affect_to_char(ch,&af);
     return true;
 }
@@ -1346,13 +1344,13 @@ BOOL_SKILL( dirt )::run( Character *ch, Character *victim )
 
     victim->pecho("Ты ничего не видишь!");
 
-    af.where        = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type         = gsn_dirt_kicking;
     af.level         = ch->getModifyLevel();
     af.duration        = 0;
-    af.location        = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     af.modifier        = -4;
-    af.bitvector         = AFF_BLIND;
+    af.bitvector.setValue(AFF_BLIND);
 
     affect_to_char(victim,&af);
     return true;
@@ -1407,16 +1405,14 @@ SKILL_RUNP( warcry )
     
     int level = skill_level(*gsn_warcry, ch);
 
-    af.where        = TO_AFFECTS;
     af.type      = gsn_warcry;
     af.level         = level;
     af.duration  = 6 + level / 2;
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     af.modifier  = level / 8;
-    af.bitvector = 0;
     affect_to_char( ch, &af );
 
-    af.location  = APPLY_SAVING_SPELL;
+    af.location = APPLY_SAVING_SPELL;
     af.modifier  = 0 - level / 8;
     affect_to_char( ch, &af );
 

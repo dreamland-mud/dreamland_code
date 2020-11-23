@@ -26,6 +26,11 @@ const DLString &Liquid::getName( ) const
     return name;
 }
 
+const DLString &Liquid::getRussianName( ) const
+{
+    return getShortDescr();
+}
+
 bool Liquid::isValid( ) const
 {
     return false;

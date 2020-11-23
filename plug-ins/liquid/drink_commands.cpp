@@ -337,7 +337,6 @@ static void pour_out( Character *ch, Object * out, Character *victim )
             Affect af;
             
             af.type = gsn_poured_liquid;
-            af.where = TO_LIQUIDS;
             af.duration = sips / 5;
             af.global.setRegistry( liquidManager );
             af.global.set( liquid->getIndex( ) );
@@ -657,11 +656,11 @@ CMDRUN( drink )
 
         act( "$c1 хватается за горло и задыхается.",ch,0,0,TO_ROOM );
         ch->send_to("Ты хватаешься за горло и задыхаешься.\n\r");
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = gsn_poison;
         af.level     = number_fuzzy(amount);
         af.duration  = 3 * amount;
-        af.bitvector = AFF_POISON;
+        af.bitvector.setValue(AFF_POISON);
         affect_join( ch, &af );
     }
 

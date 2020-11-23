@@ -21,6 +21,7 @@ public:
     inline void setBit( bitstring_t );
     inline void removeBit( bitstring_t );
     inline void toggleBit( bitstring_t );
+    inline void changeBit(bitstring_t value, bool fAdd);
     
     inline bool isSetBitNumber( bitnumber_t ) const;
     inline void setBitNumber( bitnumber_t );
@@ -71,6 +72,13 @@ inline void Bitstring::setBit( bitstring_t bit )
 inline void Bitstring::toggleBit( bitstring_t bit )
 {
     value ^= bit;
+}
+inline void Bitstring::changeBit(bitstring_t value, bool fAdd)
+{
+    if (fAdd)
+        setBit(value);
+    else
+        removeBit(value);
 }
 inline bool Bitstring::isSetBitNumber( bitnumber_t number ) const
 {

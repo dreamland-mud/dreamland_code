@@ -35,10 +35,8 @@ void ValentinePrise::equip( Character *ch )
     obj->level = 1;
     level = ch->getModifyLevel( );
    
-    af.where = TO_OBJECT;
     af.type  = -1;
     af.duration = -1;
-    af.bitvector = 0;
 
     locs.push_back( APPLY_AC );
     locs.push_back( APPLY_CHA );

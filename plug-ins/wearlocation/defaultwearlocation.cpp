@@ -51,6 +51,11 @@ bool DefaultWearlocation::isValid( ) const
     return true;
 }
 
+bool DefaultWearlocation::givesAffects() const
+{
+    return true;
+}
+
 void DefaultWearlocation::setName( const DLString &name )
 {
     this->name = name;
@@ -261,12 +266,12 @@ void DefaultWearlocation::affectsOnUnequip( Character *ch, Object *obj )
     if (!obj->enchanted)
         for (auto &paf: obj->pIndexData->affected) {
             affect_modify( ch, paf, false );
-            affect_check(ch,paf->where,paf->bitvector);
+            affect_check(ch, paf);
         }
 
     for (auto &paf: obj->affected) {
         affect_modify( ch, paf, false );
-        affect_check(ch,paf->where,paf->bitvector);        
+        affect_check(ch, paf);
     }
 }
 

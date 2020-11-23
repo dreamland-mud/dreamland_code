@@ -237,17 +237,24 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
             }
             break;
         }
-    
-        if (paf->bitvector > 0) {    
-            bitstring_t b = paf->bitvector;
 
-            switch(paf->where) {
-            case TO_DETECTS: p.det << detect_flags.names(b) << " "; break;
-            case TO_AFFECTS: p.aff << affect_flags.names(b) << " "; break;
-            case TO_IMMUNE:  p.imm << imm_flags.names(b) << " "; break;
-            case TO_RESIST:  p.res << res_flags.names(b) << " "; break;
-            case TO_VULN:    p.vuln << vuln_flags.names(b) << " "; break;
-            }
+        const FlagTable *table = paf->bitvector.getTable();
+        if (table) {    
+            DLString *pStr = 0;
+
+            if (table == &detect_flags)
+                pStr = &p.det;
+            else if (table == &affect_flags)
+                pStr = &p.aff;
+            else if (table == &imm_flags)
+                pStr = &p.imm;
+            else if (table == &res_flags)
+                pStr = &p.res;
+            else if (table == &vuln_flags)
+                pStr = &p.vuln;
+
+            if (pStr)
+                (*pStr) << table->names(paf->bitvector) << " ";
         }
     }
 

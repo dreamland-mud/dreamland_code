@@ -47,10 +47,6 @@ EXIT_DATA *new_exit();
 void free_exit(EXIT_DATA * pExit);
 EXTRA_DESCR_DATA *new_extra_descr();
 void free_extra_descr(EXTRA_DESCR_DATA * pExtra);
-RoomIndexData *new_room_index();
-void free_room_index(Room * pRoom);
-Affect *new_affect();
-void free_affect(Affect * pAf);
 OBJ_INDEX_DATA *new_obj_index();
 MOB_INDEX_DATA *new_mob_index();
 

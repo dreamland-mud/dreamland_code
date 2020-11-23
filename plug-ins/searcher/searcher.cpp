@@ -294,16 +294,23 @@ public:
                 case APPLY_SAVING_SPELL:  svs+=m; break;
                 }
                 
-                if (paf->bitvector) {
-                    bitstring_t b = paf->bitvector;
+                const FlagTable *table = paf->bitvector.getTable();
+                if (table) {    
+                    DLString *pStr = 0;
 
-                    switch(paf->where) {
-                    case TO_DETECTS: det << detect_flags.names(b) << " "; break;
-                    case TO_AFFECTS: aff << affect_flags.names(b) << " "; break;
-                    case TO_IMMUNE:  imm << imm_flags.names(b) << " "; break;
-                    case TO_RESIST:  res << res_flags.names(b) << " "; break;
-                    case TO_VULN:    vuln << vuln_flags.names(b) << " "; break;
-                    }
+                    if (table == &detect_flags)
+                        pStr = &det;
+                    else if (table == &affect_flags)
+                        pStr = &aff;
+                    else if (table == &imm_flags)
+                        pStr = &imm;
+                    else if (table == &res_flags)
+                        pStr = &res;
+                    else if (table == &vuln_flags)
+                        pStr = &vuln;
+
+                    if (pStr)
+                        (*pStr) << table->names(paf->bitvector) << " ";
                 }
             }
 

@@ -82,12 +82,11 @@ VOID_SPELL(Armor)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where         = TO_AFFECTS;
     af.type      = sn;
     af.level         = level;
     af.duration  = 7 + level / 6;
     af.modifier  = -1 * max(20,10 + level / 4); /* af.modifier  = -20;*/
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     affect_to_char( victim, &af );
     
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
@@ -117,19 +116,16 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
-    af.where         = TO_AFFECTS;
+
     af.type      = sn;
     af.level     = level;
     af.duration  = level;
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     af.modifier  = -( int )(level * 1.5);
-    af.bitvector = 0;
     affect_to_char( victim, &af );
     act_p( "Кожа $c2 покрывается корой.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
     victim->println("Прочная защитная кора покрывает твою кожу.");
-    return;
-
 }
 
 enum {
@@ -231,7 +227,6 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
         return;
     }
 
-    af.where     = TO_AFFECTS;
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 6;
@@ -286,13 +281,13 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
                ch,0,victim,TO_CHAR,POS_RESTING);
       return;
     }
-  af.where        = TO_AFFECTS;
+  
   af.type      = sn;
   af.level     = level;
   af.duration  = level;
-  af.location  = APPLY_AC;
+  af.location = APPLY_AC;
   af.modifier  = - (2 * level);
-  af.bitvector = 0;
+  
   affect_to_char( victim, &af );
   act_p( "Кожа $c2 становится тверже драконьей.",
           victim,0,0,TO_ROOM,POS_RESTING );
@@ -315,13 +310,13 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
           act_p("Силовое поле уже окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
-    af.where         = TO_AFFECTS;
+    
     af.type      = sn;
     af.level         = level;
     af.duration  = 24;
     af.modifier  = -60;
-    af.location  = APPLY_AC;
-    af.bitvector = 0;
+    af.location = APPLY_AC;
+    
     affect_to_char( victim, &af );
     victim->send_to("Силовое поле окружает тебя.\n\r");
     if ( ch != victim )
@@ -340,12 +335,12 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
         return;
     }
 
-    af.where = TO_RESIST;
+    af.bitvector.setTable(&res_flags);
     af.type = sn;
     af.duration = level / 10;
     af.level = ch->getModifyLevel();
-    af.bitvector = RES_COLD|RES_NEGATIVE;
-    af.location = 0;
+    af.bitvector.setValue(RES_COLD|RES_NEGATIVE);
+    
     af.modifier = 0;
     affect_to_char(ch, &af);
     
@@ -364,12 +359,12 @@ VOID_SPELL(SpellResistance)::run( Character *ch, Character *victim, int sn, int 
         {
                 ch->send_to("Ты обретаешь сопротивляемость к магии!\n\r");
 
-                af.where = TO_RESIST;
+                af.bitvector.setTable(&res_flags);
                 af.type = sn;
                 af.duration = level / 10;
                 af.level = ch->getModifyLevel();
-                af.bitvector = RES_SPELL;
-                af.location = 0;
+                af.bitvector.setValue(RES_SPELL);
+                
                 af.modifier = 0;
                 affect_to_char(ch, &af);
         }
@@ -398,11 +393,11 @@ VOID_SPELL(MassSanctuary)::run( Character *ch, Room *room, int sn, int level )
         if (has_sanctuary_msg( ch, gch ))
             continue;
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = gsn_sanctuary;
         af.level     = level;
         af.duration  = number_fuzzy( level/6 );
-        af.bitvector = AFF_SANCTUARY;
+        af.bitvector.setValue(AFF_SANCTUARY);
         affect_to_char( gch, &af );
 
         act("{WБелая аура{x окружает тебя.", gch, 0, 0, TO_CHAR);
@@ -444,13 +439,13 @@ VOID_SPELL(ProtectionCold)::run( Character *ch, Character *victim, int sn, int l
           act("$C1 уже защище$Gно|н|на ледяным щитом.", ch,0,victim,TO_CHAR);
         return;
     }
-    af.where     = TO_AFFECTS;
+    
     af.type      = gsn_protection_cold;
     af.level     = level;
     af.duration  = 24;
-    af.location  = APPLY_SAVING_SPELL;
+    af.location = APPLY_SAVING_SPELL;
     af.modifier  = -1;
-    af.bitvector = 0;
+    
     affect_to_char( victim, &af );
     victim->send_to("Твоя защищенность от воздействия низких температур повышается.\n\r");
     if ( ch != victim )
@@ -485,13 +480,13 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = (10 + level / 5);
-    af.location  = APPLY_SAVING_SPELL;
+    af.location = APPLY_SAVING_SPELL;
     af.modifier  = -1;
-    af.bitvector = AFF_PROTECT_EVIL;
+    af.bitvector.setValue(AFF_PROTECT_EVIL);
     affect_to_char( victim, &af );
     victim->send_to("Ты получаешь защиту от злых существ.\n\r");
     if ( ch != victim )
@@ -526,13 +521,13 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = (10 + level / 5);
-    af.location  = APPLY_SAVING_SPELL;
+    af.location = APPLY_SAVING_SPELL;
     af.modifier  = -1;
-    af.bitvector = AFF_PROTECT_GOOD;
+    af.bitvector.setValue(AFF_PROTECT_GOOD);
     affect_to_char( victim, &af );
     victim->send_to("Ты получаешь защиту от добрых существ.\n\r");
     if ( ch != victim )
@@ -575,13 +570,13 @@ VOID_SPELL(ProtectionHeat)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    
     af.type      = gsn_protection_heat;
     af.level     = level;
     af.duration  = 24;
-    af.location  = APPLY_SAVING_SPELL;
+    af.location = APPLY_SAVING_SPELL;
     af.modifier  = -1;
-    af.bitvector = 0;
+    
     affect_to_char( victim, &af );
     victim->send_to("Твоя защищенность от воздействия высоких температур повышается.\n\r");
     if ( ch != victim )
@@ -600,12 +595,12 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
     {
       ch->send_to("Ты приобретаешь сопротивляемость к темной магии и молитвам.\n\r");
 
-      af.where = TO_RESIST;
+      af.bitvector.setTable(&res_flags);
       af.type = sn;
       af.duration = level / 4;
       af.level = ch->getModifyLevel();
-      af.bitvector = RES_NEGATIVE;
-      af.location = 0;
+      af.bitvector.setValue(RES_NEGATIVE);
+      
       af.modifier = 0;
       affect_to_char(ch, &af);
     }
@@ -630,13 +625,13 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
       return;
   }
 
-  af.where        = TO_AFFECTS;
+  
   af.type      = sn;
   af.level     = level;
   af.duration  = number_fuzzy( level / 30 ) + 3;
-  af.location  = APPLY_AC;
+  af.location = APPLY_AC;
   af.modifier  = -20;
-  af.bitvector = 0;
+  
   affect_to_char( victim, &af );
   if (chance(1)) {
       act_p( "Предохранительный щит окружает $c4.",victim,0,0,TO_ROOM,POS_RESTING);
@@ -656,12 +651,12 @@ VOID_SPELL(Resilience)::run( Character *ch, Character *victim, int sn, int level
     if (!ch->isAffected(sn)) {
       ch->println("Ты приобретаешь устойчивость к энергетическим атакам.");
 
-      af.where = TO_RESIST;
+      af.bitvector.setTable(&res_flags);
       af.type = sn;
       af.duration = level / 10;
       af.level = ch->getModifyLevel();
-      af.bitvector = RES_ENERGY;
-      af.location = 0;
+      af.bitvector.setValue(RES_ENERGY);
+      
       af.modifier = 0;
       affect_to_char(ch, &af);
     }
@@ -678,11 +673,11 @@ VOID_SPELL(Sanctuary)::run( Character *ch, Character *victim, int sn, int level 
     if (has_sanctuary_msg( ch, victim ))
         return;
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 6;
-    af.bitvector = AFF_SANCTUARY;
+    af.bitvector.setValue(AFF_SANCTUARY);
     affect_to_char( victim, &af );
     act("{WБелая аура{x окружает $c4.", victim, 0, 0, TO_ROOM);
     act("{WБелая аура{x окружает тебя.", victim, 0, 0, TO_CHAR);
@@ -696,7 +691,6 @@ VOID_SPELL(Stardust)::run( Character *ch, Character *victim, int sn, int level )
     if (has_sanctuary_msg( ch, victim ))
         return;
 
-    af.where     = TO_AFFECTS;
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 6;
@@ -719,13 +713,13 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    
     af.type      = sn;
     af.level     = level;
     af.duration  = (8 + level / 3);
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     af.modifier  = -1 * max(20,10 + level / 3); /* af.modifier  = -20;*/
-    af.bitvector = 0;
+    
     affect_to_char( victim, &af );
 
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
@@ -754,13 +748,13 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    
     af.type      = sn;
     af.level     = level;
     af.duration  = (10 + level / 5);
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     af.modifier  = -1 * max(40,20 + level / 2);  /*af.modifier=-40;*/
-    af.bitvector = 0;
+    
     affect_to_char( victim, &af );
     act_p( "Кожа $c2 становится тверже камня.",
             victim, 0, 0, TO_ROOM,POS_RESTING);

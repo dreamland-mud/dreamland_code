@@ -35,12 +35,12 @@ list<Affect *> AffectList::findAll(int type) const
 }
 
 /** Find all affects where bitvector matches this one. */
-list<Affect *> AffectList::findAllWithBits(int where, int bits) const
+list<Affect *> AffectList::findAllWithBits(const FlagTable *table, int bits) const
 {
     list<Affect *> result;
 
     for (auto &paf: *this)
-        if (paf->where == where && (paf->bitvector & bits))
+        if (paf->bitvector.getTable() == table && (paf->bitvector & bits))
             result.push_back(paf);
 
     return result;

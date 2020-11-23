@@ -183,13 +183,9 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
         victim->send_to("Тебя сконфузили!\n\r");
         act_p("$c1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM,POS_RESTING);
 
-        af.where                = TO_AFFECTS;
         af.type      = sn;
         af.level     = level;
         af.duration  = level / 50;
-        af.modifier  = 0;
-        af.location  = 0;
-        af.bitvector = 0;
         affect_to_char(victim,&af);
 
         for ( rch = ch->in_room->people; rch != 0; rch = rch->next_in_room )
@@ -230,13 +226,11 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
 
   if (!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_SPELL))
     {
-      af.where                    = TO_AFFECTS;
       af.type               = sn;
       af.level              = level;
       af.duration           = level;
-      af.location           = APPLY_CHA;
+      af.location = APPLY_CHA;
       af.modifier           = ch->applyCurse( - ( 5 + level / 10 ) );
-      af.bitvector          = 0;
       affect_to_char(victim,&af);
       
       act("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!", victim, 0, 0, TO_ROOM);
@@ -354,14 +348,9 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
   act("$c1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
   act("$c1 меняет свой облик, подражая $C3!", ch,0,victim,TO_NOTVICT);
 
-  af.where                 = TO_AFFECTS;
   af.type               = sn;
   af.level              = level;
-  af.duration           = (2 * level)/3;
-  af.location           = APPLY_NONE;
-  af.modifier           = 0;
-  af.bitvector          = 0;
-
+  af.duration           = (2 * level)/3;  
   affect_to_char(ch,&af);
   ch->doppel = victim;
 
@@ -422,7 +411,6 @@ SPELL_DECL(Mirror);
 VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         Affect af;
-        Affect toCaster;
         int mirrors,new_mirrors;
         Character *tmp_vict, *gch;
         char long_buf[MAX_STRING_LENGTH];
@@ -454,20 +442,9 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 return;
         }
 
-        toCaster.where     = TO_AFFECTS;
-        toCaster.level     = level;
-        toCaster.modifier  = 0;
-        toCaster.location  = 0;
-        toCaster.bitvector = 0;
-        toCaster.type = sn;
-        toCaster.duration = 2;
-        affect_to_char(ch,&toCaster);
+        postaffect_to_char(ch, sn, 2);
 
-        af.where     = TO_AFFECTS;
         af.level     = level;
-        af.modifier  = 0;
-        af.location  = 0;
-        af.bitvector = 0;
         
         tmp_vict = victim->getDoppel( );
 
@@ -510,6 +487,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 af.type = gsn_doppelganger;
                 af.duration = level;
                 affect_to_char(mch,&af);
+
                 af.type = gsn_mirror;
                 af.duration = -1;
                 affect_to_char(mch,&af);
@@ -529,7 +507,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 SPELL_DECL(Randomizer);
 VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Affect af,af2;
+    Affect af;
 
     if ( ch->isAffected(sn ) )
     {
@@ -551,41 +529,24 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
   if (number_bits(1) == 0)
     {
       ch->send_to("Несмотря на твои усилия, окружающий мир противостоит Хаосу.\n\r");
-      af2.where     = TO_AFFECTS;
-      af2.type      = sn;
-      af2.level            = ch->getModifyLevel();
-      af2.duration  = level / 10;
-      af2.modifier  = 0;
-      af2.location  = APPLY_NONE;
-      af2.bitvector = 0;
-      affect_to_char( ch, &af2 );
+      postaffect_to_char(ch, sn, level / 10);
       return;
     }
 
-    af.where     = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = level / 15;
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = AFF_ROOM_RANDOMIZER;
+    af.bitvector.setValue(AFF_ROOM_RANDOMIZER);
     room->affectTo( &af );
 
-    af2.where     = TO_AFFECTS;
-    af2.type      = sn;
-    af2.level          = ch->getModifyLevel();
-    af2.duration  = level / 5;
-    af2.modifier  = 0;
-    af2.location  = APPLY_NONE;
-    af2.bitvector = 0;
-    affect_to_char( ch, &af2 );
+    postaffect_to_char(ch, sn, level / 5);
+
     ch->send_to("Окружающее тебя пространство теперь находится под властью Хаоса!\n\r");
     ch->send_to("Использование Магических Сил Хаоса опустошает тебя.\n\r");
     ch->hit -= min(200, ch->hit/2);
     act_p("Магические Силы Хаоса изменяют окружающий мир.",
            ch,0,0,TO_ROOM,POS_RESTING);
-    return;
-
 }
 
 

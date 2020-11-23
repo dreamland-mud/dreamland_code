@@ -18,7 +18,7 @@ public:
     
     bool toXML( XMLNode::Pointer& ) const;
     void fromXML( const XMLNode::Pointer& ) ;
-
+    
     inline XMLFlags & operator = ( bitstring_t bit ) { 
         setValue( bit );
         return *this;
@@ -50,6 +50,7 @@ public:
 
     bool toXML( XMLNode::Pointer& ) const;
     void fromXML( const XMLNode::Pointer& ) ;
+    void clear();
     
 protected:
     static const DLString ATTRIBUTE_TABLE;

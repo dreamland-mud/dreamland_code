@@ -80,6 +80,7 @@ GSN(none);
 
 bool dup_mob_vnum( int vnum );
 bool dup_obj_vnum( int vnum );
+const FlagTable * affect_where_to_table(int where);
 
 /*
  * parse one mobile. no explicit side effects
@@ -403,18 +404,18 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
 
     for ( ; ; ) {
         char letter;
+        int where;
 
         letter = fread_letter( fp );
 
         if ( letter == 'A' ) {
             paf                     = dallocate( Affect );
-            paf->where                    = TO_OBJECT;
+            where                    = TO_OBJECT;
             paf->type.assign( gsn_none );
             paf->level              = pObjIndex->level;
             paf->duration           = -1;
             paf->location           = fread_number( fp );
             paf->modifier           = fread_number( fp );
-            paf->bitvector          = 0;
 
             pObjIndex->affected.push_front(paf);
             top_affect++;
@@ -423,11 +424,11 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
             
             letter                     = fread_letter(fp);
             switch (letter) {
-            case 'A': paf->where    = TO_AFFECTS;   break;
-            case 'I': paf->where    = TO_IMMUNE;    break;
-            case 'R': paf->where    = TO_RESIST;    break;
-            case 'V': paf->where    = TO_VULN;            break;
-            case 'D': paf->where    = TO_DETECTS;   break;
+            case 'A': where    = TO_AFFECTS;   break;
+            case 'I': where    = TO_IMMUNE;    break;
+            case 'R': where    = TO_RESIST;    break;
+            case 'V': where    = TO_VULN;            break;
+            case 'D': where    = TO_DETECTS;   break;
             default:
                 throw FileFormatException("load_object %d bad 'where' on flag set", pObjIndex->vnum);
             }
@@ -437,7 +438,8 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
             paf->duration           = -1;
             paf->location           = fread_number(fp);
             paf->modifier           = fread_number(fp);
-            paf->bitvector          = fread_flag(fp);
+            paf->bitvector.setTable(affect_where_to_table(where));
+            paf->bitvector.setValue(fread_flag(fp));
 
             pObjIndex->affected.push_front(paf);
             top_affect++;

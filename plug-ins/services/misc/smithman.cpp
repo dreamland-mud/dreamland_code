@@ -192,8 +192,6 @@ bool HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     else if (level < 90)        { hr = 6; dr = 6; }
     else                        { hr = 10; dr = 10; }
     
-    af.where = TO_OBJECT;
-    af.bitvector = 0;
     af.duration = -1;
     af.type = 0;
     af.level = level;

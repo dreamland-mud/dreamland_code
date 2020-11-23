@@ -45,7 +45,7 @@ void stop_fighting( Character *ch, bool fBoth )
 
             if (IS_AFFECTED(fch, AFF_SLEEP)) {
                 REMOVE_BIT(fch->affected_by, AFF_SLEEP);
-                affect_bit_strip(fch, TO_AFFECTS, AFF_SLEEP);
+                affect_bit_strip(fch, &affect_flags, AFF_SLEEP);
             }
 
             update_pos( fch );
@@ -92,7 +92,7 @@ void set_fighting( Character *ch, Character *victim )
     
     if (IS_AFFECTED(ch, AFF_SLEEP)) {
         REMOVE_BIT(ch->affected_by, AFF_SLEEP);
-        affect_bit_strip(ch, TO_AFFECTS, AFF_SLEEP);
+        affect_bit_strip(ch, &affect_flags, AFF_SLEEP);
     }
     
     if (dismount_attacked( ch ))

@@ -762,7 +762,6 @@ void load_rooms( FILE *fp )
                 && pRoomIndex->liquid == liq_none)
             pRoomIndex->liquid = liq_water;
 
-        top_room++;
         top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
         roomIndexMap[vnum] = pRoomIndex;

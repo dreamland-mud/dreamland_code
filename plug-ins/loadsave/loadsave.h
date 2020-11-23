@@ -19,6 +19,7 @@ class Room;
 class Character;
 class PCharacter;
 class NPCharacter;
+class FlagTable;
 
 struct mob_index_data;
 struct obj_index_data;
@@ -41,12 +42,12 @@ void        affect_remove_obj( Object *, Affect *paf );
 void        affect_enchant   ( Object *obj );
 void        affect_enhance   ( Object *obj, Affect * );
 void        affect_modify    ( Character *ch, Affect *paf, bool fAdd );
-void        affect_check         ( Character *ch, int where, int vector);
+void        affect_check         ( Character *ch, Affect *old_paf);
 void        affect_to_char         ( Character *ch, Affect *paf );
 void        affect_remove         ( Character *ch, Affect *paf );
 void        affect_strip         ( Character *ch, int sn );
 void        affect_strip         ( Object *obj, int sn );
-void        affect_bit_strip ( Character *ch, int where, int bits);
+void        affect_bit_strip ( Character *ch, const FlagTable *table, int bits);
 void        affect_join         ( Character *ch, Affect *paf );
 void        postaffect_to_char( Character *ch, int sn, int duration );
 

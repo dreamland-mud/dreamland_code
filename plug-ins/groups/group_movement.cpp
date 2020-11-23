@@ -179,13 +179,12 @@ SKILL_RUNP( sneak )
     if ( number_percent( ) < gsn_sneak->getEffective( ch ))
     {
         gsn_sneak->improve( ch, true );
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = gsn_sneak;
         af.level     = ch->getModifyLevel();
         af.duration  = ch->getModifyLevel();
-        af.location  = APPLY_NONE;
-        af.modifier  = 0;
-        af.bitvector = AFF_SNEAK;
+        
+        af.bitvector.setValue(AFF_SNEAK);
         affect_to_char( ch, &af );
         ch->send_to("Ты начинаешь скрытно передвигаться.\n\r");
     } else {

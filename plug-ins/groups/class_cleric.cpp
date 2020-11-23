@@ -26,7 +26,7 @@
 SPELL_DECL(MindLight);
 VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Affect af,af2;
+    Affect af;
 
     if ( room->isAffected( sn ))
     {
@@ -34,28 +34,18 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
 
-    af.where     = TO_ROOM_CONST;
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 30;
-    af.location  = APPLY_ROOM_MANA;
+    af.location.setTable(&apply_room_table);
+    af.location = APPLY_ROOM_MANA;
     af.modifier  = level;
-    af.bitvector = 0;
     room->affectTo( &af );
 
-    af2.where     = TO_AFFECTS;
-    af2.type      = sn;
-    af2.level         = level;
-    af2.duration  = level / 10;
-    af2.modifier  = 0;
-    af2.location  = APPLY_NONE;
-    af2.bitvector = 0;
-    affect_to_char( ch, &af2 );
+    postaffect_to_char(ch, sn, level/10);
     ch->send_to("Ты наполняешь воздух энергетической силой, заставляя его мерцать.\n\r");
     act_p("$c1 наполняет воздух энергетической силой, заставляя его мерцать.",
            ch,0,0,TO_ROOM,POS_RESTING);
-    return;
-
 }
 
 AFFECT_DECL(MindLight);

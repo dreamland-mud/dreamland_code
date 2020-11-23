@@ -47,6 +47,11 @@ public:
     XMLEnumerationNoEmpty( int, const FlagTable * );
     
     bool toXML( XMLNode::Pointer& ) const;
+
+    inline XMLEnumerationNoEmpty & operator = ( int value ) { 
+        setValue( value );
+        return *this;
+    }
 };
 
 

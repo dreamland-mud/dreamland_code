@@ -233,7 +233,6 @@ XMLArea::load_rooms(AreaIndexData *a)
         if(3000 <= vnum && vnum < 3400)
             SET_BIT(room->room_flags, ROOM_LAW);
 
-        top_room++;
         top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
         roomIndexMap[vnum] = room;

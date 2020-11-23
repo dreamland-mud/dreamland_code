@@ -342,16 +342,7 @@ SKILL_RUNP( herbs )
 
   if (IS_NATURE(ch->in_room) && number_percent() < gsn_herbs->getEffective( ch ))
     {
-      Affect af;
-      af.where  = TO_AFFECTS;
-      af.type         = gsn_herbs;
-      af.level         = ch->getModifyLevel();
-      af.duration = 5;
-      af.location = APPLY_NONE;
-      af.modifier = 0;
-      af.bitvector = 0;
-
-      affect_to_char(ch,&af);
+      postaffect_to_char(ch, gsn_herbs, 5);
 
       ch->send_to("Ты собираешь целебные травы.\n\r");
       act_p("$c1 собирает какие-то травы.",ch,0,0,TO_ROOM,POS_RESTING);
@@ -388,7 +379,7 @@ SKILL_RUNP( herbs )
 
 SKILL_RUNP( camp )
 {
-  Affect af,af2;
+  Affect af2;
 
   if (ch->is_npc() || !gsn_camp->usable( ch ) )
     {
@@ -429,28 +420,21 @@ SKILL_RUNP( camp )
   act("Ты разбиваешь лагерь.", ch, 0, 0, TO_CHAR);
   act("$c1 разбивает лагерь.", ch, 0, 0, TO_ROOM);
 
-  af.where                = TO_AFFECTS;
-  af.type               = gsn_camp;
-  af.level              = ch->getModifyLevel();
-  af.duration           = 12;
-  af.bitvector          = 0;
-  af.modifier           = 0;
-  af.location           = APPLY_NONE;
-  affect_to_char(ch, &af);
+  
+  postaffect_to_char(ch, gsn_camp, 12);
 
-  af2.where                = TO_ROOM_CONST;
+
   af2.type              = gsn_camp;
   af2.level              = ch->getModifyLevel();
   af2.duration           = ch->getModifyLevel() / 20;
-  af2.bitvector          = 0;
   af2.modifier           = 2 * ch->getModifyLevel();
-  af2.location           = APPLY_ROOM_HEAL;
+  af2.location.setTable(&apply_room_table);
+  af2.location = APPLY_ROOM_HEAL;
   ch->in_room->affectTo( &af2);
 
   af2.modifier           = ch->getModifyLevel();
-  af2.location           = APPLY_ROOM_MANA;
+  af2.location = APPLY_ROOM_MANA;
   ch->in_room->affectTo( &af2);
-
 }
 
 AFFECT_DECL(Camp);
@@ -615,38 +599,34 @@ static Object * create_arrow( int color, int level )
     arrow = create_object(get_obj_index(OBJ_VNUM_RANGER_ARROW), 0 );
     arrow->level = level;
 
-    tohit.where                     = TO_OBJECT;
     tohit.type               = gsn_make_arrow;
     tohit.level              = level;
     tohit.duration           = -1;
-    tohit.location           = APPLY_HITROLL;
+    tohit.location = APPLY_HITROLL;
     tohit.modifier           = level / 10;
-    tohit.bitvector          = 0;
     affect_to_obj( arrow, &tohit);
 
-    todam.where                     = TO_OBJECT;
     todam.type               = gsn_make_arrow;
     todam.level              = level;
     todam.duration           = -1;
-    todam.location           = APPLY_DAMROLL;
+    todam.location = APPLY_DAMROLL;
     todam.modifier           = level / 10;
-    todam.bitvector          = 0;
     affect_to_obj( arrow, &todam);
 
     if (color != 0 && color != gsn_make_arrow)
     {
         Affect saf;
 
-        saf.where               = TO_WEAPON;
+        saf.bitvector.setTable(&weapon_type2);
         saf.type               = color;
         saf.level              = level;
         saf.duration           = -1;
-        saf.location           = 0;
+        
         saf.modifier           = 0;
 
         if ( color == gsn_green_arrow )
         {
-            saf.bitvector        = WEAPON_POISON;
+            saf.bitvector.setValue(WEAPON_POISON);
             str_name = "green зеленая";
             str_long = "{GЗеленая";
             str_short = "{Gзелен|ая|ой|ой|ую|ой|ой";
@@ -655,7 +635,7 @@ static Object * create_arrow( int color, int level )
         }
         else if (color == gsn_red_arrow)
         {
-            saf.bitvector        = WEAPON_FLAMING;
+            saf.bitvector.setValue(WEAPON_FLAMING);
             str_name = "red красная";
             str_long = "{RКрасная";
             str_short = "{Rкрасн|ая|ой|ой|ую|ой|ой";
@@ -664,7 +644,7 @@ static Object * create_arrow( int color, int level )
         }
         else if (color == gsn_white_arrow)
         {
-            saf.bitvector        = WEAPON_FROST;
+            saf.bitvector.setValue(WEAPON_FROST);
             str_name = "white белая";
             str_long = "{WБелая";
             str_short = "{Wбел|ая|ой|ой|ую|ой|ой";
@@ -673,7 +653,7 @@ static Object * create_arrow( int color, int level )
         }
         else
         {
-            saf.bitvector        = WEAPON_SHOCKING;
+            saf.bitvector.setValue(WEAPON_SHOCKING);
             str_name = "blue голубая";
             str_long = "{CГолубая";
             str_short = "{Cголуб|ая|ой|ой|ую|ой|ой";
@@ -910,12 +890,9 @@ SKILL_RUNP( forest )
     if (ch->isAffected(gsn_forest_fighting))
         affect_strip(ch, gsn_forest_fighting);
     
-    af.where          = TO_AFFECTS;
     af.type           = gsn_forest_fighting;
     af.level          = ch->getModifyLevel();
     af.duration         = (6 + ch->getModifyLevel() / 2);
-    af.location  = APPLY_NONE;
-    af.bitvector = 0;
 
     if (attack) {
         af.modifier  = FOREST_ATTACK; 
@@ -1116,22 +1093,22 @@ SKILL_RUNP( tiger )
                ch,0,0,TO_ROOM,POS_RESTING);
         gsn_tiger_power->improve( ch, true );
 
-        af.where        = TO_AFFECTS;
         af.type                = gsn_tiger_power;
         af.level        = ch->getModifyLevel();
         af.duration        = number_fuzzy( ch->getModifyLevel() / 8);
 
         af.modifier        = max( 1, ch->getModifyLevel() / 5 );
-        af.location        = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         affect_to_char(ch,&af);
 
-        af.location        = APPLY_DAMROLL;
-        af.bitvector         = AFF_BERSERK;
+        af.location = APPLY_DAMROLL;
+        af.bitvector.setTable(&affect_flags);
+        af.bitvector.setValue(AFF_BERSERK);
         affect_to_char(ch,&af);
 
         af.modifier        = max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
-        af.location        = APPLY_AC;
-        af.bitvector    = 0;
+        af.location = APPLY_AC;
+        af.bitvector.clear();
         affect_to_char(ch,&af);
     }
 

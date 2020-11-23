@@ -63,6 +63,7 @@
 
 #include "skill.h"
 #include "skillmanager.h"
+#include "skillgroup.h"
 #include "spell.h"
 #include "affecthandler.h"
 #include "mobilebehavior.h"
@@ -1105,7 +1106,6 @@ CMDRUNP( request )
         char arg2 [MAX_INPUT_LENGTH];
         Character *victim;
         Object  *obj;
-        Affect af;
 
         if ( ch->isAffected(gsn_gratitude))
         {
@@ -1273,17 +1273,7 @@ CMDRUNP( request )
         ch->hit = max( (int)ch->hit, 0 );
 
         act_p("Ты чувствуешь благодарность за доверие $C2.", ch, 0, victim,TO_CHAR,POS_RESTING);
-
-        af.type = gsn_gratitude;
-        af.where = TO_AFFECTS;
-        af.level = ch->getModifyLevel();
-        af.duration = ch->getModifyLevel() / 10;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = 0;
-        affect_to_char ( ch,&af );
-
-        return;
+        postaffect_to_char(ch, gsn_gratitude, ch->getModifyLevel() / 10);
 }
 
 
@@ -2257,38 +2247,33 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
 {
     int b = paf->bitvector,
         d = paf->duration;
+    const FlagTable *table = paf->bitvector.getTable();
     bool adaptive;
 
     if (paf->modifier != 0) {
         switch (paf->location) {
             case APPLY_NONE:
             case APPLY_LEARNED:
-                if (!paf->global.empty()) {
-                    switch(paf->where) {
-                        case TO_SKILLS:
-                        case TO_SKILL_GROUPS:
-                            buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                                << " знание "
-                                << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка")
-                                << " " << paf->global.toRussianString().quote() 
-                                << " на " << (int)abs(paf->modifier) << endl;
-                            break;
-                    }
+                if (paf->global.getRegistry() == skillManager 
+                    || paf->global.getRegistry() == skillGroupManager) 
+                {
+                    buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                        << " знание "
+                        << (paf->global.getRegistry() == skillGroupManager ? "группы" : "навыка")
+                        << " " << paf->global.toRussianString().quote() 
+                        << " на " << (int)abs(paf->modifier) << endl;
                 }
                 break;
 
             case APPLY_LEVEL:
-                if (!paf->global.empty()) {
-                    switch(paf->where) {
-                        case TO_SKILLS:
-                        case TO_SKILL_GROUPS:
-                            buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                                << " уровень умения "
-                                << (paf->where == TO_SKILL_GROUPS ? "группы" : "")
-                                << " " << paf->global.toRussianString().quote() 
-                                << " на " << (int)abs(paf->modifier) << endl;
-                            break;
-                    }
+                if (paf->global.getRegistry() == skillManager 
+                    || paf->global.getRegistry() == skillGroupManager) 
+                {
+                    buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                        << " уровень умения "
+                        << (paf->global.getRegistry() == skillGroupManager ? "группы" : "")
+                        << " " << paf->global.toRussianString().quote() 
+                        << " на " << (int)abs(paf->modifier) << endl;
                     return;
                 }
 
@@ -2314,25 +2299,17 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
     }
 
     if (b) {
-        switch(paf->where) {
-            case TO_AFFECTS:
-                buf << "Добавляет аффект " << affect_flags.messages(b ) << endl;
-                break;
-            case TO_IMMUNE:
-                buf << "Добавляет иммунитет к " << imm_flags.messages(b ) << endl;
-                break;
-            case TO_RESIST:
-                buf << "Добавляет сопротивляемость к " << imm_flags.messages(b ) << endl;
-                break;
-            case TO_VULN:
-                buf << "Добавляет уязвимость к " << imm_flags.messages(b ) << endl;
-                break;
-            case TO_DETECTS:
-                buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
-                break;
-        }
+        if (table == &affect_flags)
+            buf << "Добавляет аффект " << affect_flags.messages(b ) << endl;
+        else if (table == &imm_flags)
+            buf << "Добавляет иммунитет к " << imm_flags.messages(b ) << endl;
+        else if (table == &res_flags)
+            buf << "Добавляет сопротивляемость к " << imm_flags.messages(b ) << endl;
+        else if (table == &vuln_flags)
+            buf << "Добавляет уязвимость к " << imm_flags.messages(b ) << endl;
+        else if (table == &detect_flags)
+            buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
     }
-
 }
 
 void lore_fmt_wear( int type, int wear, ostringstream &buf )
@@ -2396,6 +2373,10 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         << "{W" << item_table.message(obj->item_type ) << "{x, "
         << "уровня {W" << obj->level << "{x" << endl;
 
+    lim = obj->pIndexData->limit;
+    if (lim != -1 && lim < 100)
+        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
+
     if (obj_is_special(obj))
         buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
 
@@ -2406,10 +2387,6 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
     else
         buf << "ничего не весит";
-
-    lim = obj->pIndexData->limit;
-    if (lim != -1 && lim < 100)
-        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
 
     if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
         buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;

@@ -731,7 +731,7 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
         return 0;
     }
 
-    pRoom = new_room_index();
+    pRoom = new RoomIndexData;
     pRoom->vnum = value;
     pRoom->areaIndex = get_vnum_area(value);
 

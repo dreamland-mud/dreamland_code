@@ -30,7 +30,6 @@ extern int top_reset;
 extern int top_area;
 extern int top_exit;
 extern int top_ed;
-extern int top_room;
 
 EXIT_DATA *exit_free;
 RESET_DATA *reset_free;
@@ -99,12 +98,6 @@ void free_exit(EXIT_DATA * pExit)
     pExit->next = exit_free;
     exit_free = pExit;
     return;
-}
-
-RoomIndexData *new_room_index(void)
-{
-    top_room++;
-    return new RoomIndexData;
 }
 
 OBJ_INDEX_DATA *new_obj_index(void)
@@ -194,17 +187,4 @@ MOB_INDEX_DATA *new_mob_index(void)
     pMob->behavior = 0;
     return pMob;
 }
-
-Affect *new_affect()
-{
-    Affect *paf_new;
-    paf_new = dallocate( Affect );
-    return paf_new;
-}
-
-void free_affect(Affect *paf)
-{
-    ddeallocate(paf);
-}
-
 

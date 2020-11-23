@@ -264,8 +264,8 @@ void create_mob_affects(NPCharacter *mob)
         Affect af;
 
         af.type      = gsn_sanctuary; 
-        af.bitvector = AFF_SANCTUARY;
-        af.where     = TO_AFFECTS;
+        af.bitvector.setValue(AFF_SANCTUARY);
+        af.bitvector.setTable(&affect_flags);
         af.level     = mob->getRealLevel( );
         af.duration  = -1;
         affect_to_char( mob, &af );
@@ -275,14 +275,14 @@ void create_mob_affects(NPCharacter *mob)
     {
         Affect af;
 
-        af.where         = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = gsn_haste; 
         af.level     = mob->getRealLevel( );
         af.duration  = -1;
-        af.location  = APPLY_DEX;
-        af.modifier  = 1 + (mob->getRealLevel( ) >= 18) + (mob->getRealLevel( ) >= 25) +
+        af.location = APPLY_DEX;
+        af.modifier = 1 + (mob->getRealLevel( ) >= 18) + (mob->getRealLevel( ) >= 25) +
                 (mob->getRealLevel( ) >= 32);
-        af.bitvector = AFF_HASTE;
+        af.bitvector.setValue(AFF_HASTE);
         affect_to_char( mob, &af );
     }
 
@@ -290,13 +290,13 @@ void create_mob_affects(NPCharacter *mob)
     {
         Affect af;
 
-        af.where         = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type         = gsn_protection_evil;
         af.level         = mob->getRealLevel( );
         af.duration         = -1;
-        af.location         = APPLY_SAVES;
-        af.modifier         = -1;
-        af.bitvector = AFF_PROTECT_EVIL;
+        af.location = APPLY_SAVES; 
+        af.modifier = -1;
+        af.bitvector.setValue(AFF_PROTECT_EVIL);
         affect_to_char(mob,&af);
     }
 
@@ -304,13 +304,13 @@ void create_mob_affects(NPCharacter *mob)
     {
         Affect af;
 
-        af.where         = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = gsn_protection_good; 
         af.level     = mob->getRealLevel( );
         af.duration  = -1;
-        af.location  = APPLY_SAVES;
-        af.modifier  = -1;
-        af.bitvector = AFF_PROTECT_GOOD;
+        af.location = APPLY_SAVES; 
+        af.modifier = -1;
+        af.bitvector.setValue(AFF_PROTECT_GOOD);
         affect_to_char(mob,&af);
     }
 }

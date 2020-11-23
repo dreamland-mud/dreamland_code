@@ -88,7 +88,6 @@ extern int        top_exit;
 extern int        top_mob_index;
 extern int        top_obj_index;
 extern int        top_reset;
-extern int        top_room;
 
 // MOC_SKIP_BEGIN
 struct area_file {

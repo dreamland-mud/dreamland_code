@@ -30,6 +30,11 @@ bool Wearlocation::isValid( ) const
     return false;
 }
 
+bool Wearlocation::givesAffects() const
+{
+    return false;
+}
+
 const DLString &Wearlocation::getRibName( ) const
 {
     return DLString::emptyString;

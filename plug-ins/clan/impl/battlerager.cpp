@@ -60,11 +60,11 @@ void BattleragerPoncho::wear( Character *ch )
     if (ch->isAffected(gsn_haste ) || ch->isAffected(gsn_transform )) 
         return;
 
-    af.where = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type = gsn_haste;
     af.duration = -2;
     af.level = level;
-    af.bitvector = AFF_HASTE;
+    af.bitvector.setValue(AFF_HASTE);
     af.location = APPLY_DEX;
     af.modifier = 1 + ( level >= 18 ) + ( level >= 30 ) + ( level >= 45 );
     affect_to_char(ch, &af);
@@ -266,15 +266,7 @@ SKILL_RUNP( trophy )
 
     if (!ch->is_npc() && number_percent() < gsn_trophy->getEffective( ch ))
     {
-        af.where  = TO_AFFECTS;
-        af.type        = gsn_trophy;
-        af.level        = ch->getModifyLevel();
-        af.duration        = ch->getModifyLevel() / 2;
-        af.modifier        = 0;
-        af.bitvector         = 0;
-
-        af.location        = 0;
-        affect_to_char(ch,&af);
+        postaffect_to_char(ch, gsn_trophy, ch->getModifyLevel() / 2);
 
         if ( trophy_vnum != 0 )
         {
@@ -289,25 +281,23 @@ SKILL_RUNP( trophy )
             trophy->cost  = 0;
             trophy->level = ch->getRealLevel( );
             ch->mana     -= mana;
-            af.where        = TO_OBJECT;
+
             af.type         = gsn_trophy;
             af.level        = level;
             af.duration        = -1;
-            af.location        = APPLY_DAMROLL;
+            af.location = APPLY_DAMROLL;
             af.modifier   = ch->applyCurse( ch->getModifyLevel( ) / 5 );
-            af.bitvector        = 0;
             affect_to_obj( trophy, &af );
 
-            af.location        = APPLY_HITROLL;
+            af.location = APPLY_HITROLL;
             af.modifier   = ch->applyCurse( ch->getModifyLevel( ) / 5 );
-            af.bitvector        = 0;
             affect_to_obj( trophy, &af );
 
-            af.location        = APPLY_INT;
+            af.location = APPLY_INT;
             af.modifier        = level > 20 ? -2 : -1;
             affect_to_obj( trophy, &af );
 
-            af.location        = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier        = level > 20 ? 2 : 1;
             affect_to_obj( trophy, &af );
 
@@ -441,21 +431,21 @@ SKILL_RUNP( bloodthirst )
                ch,0,0,TO_ROOM,POS_RESTING);
         gsn_bloodthirst->improve( ch, true );
 
-        af.where        = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type                = gsn_bloodthirst;
         af.level        = ch->getModifyLevel();
         af.duration        = 2 + ch->getModifyLevel() / 18;
         af.modifier        = ch->applyCurse( 5 + ch->getModifyLevel( ) / 4 );
-        af.bitvector         = AFF_BLOODTHIRST;
+        af.bitvector.setValue(AFF_BLOODTHIRST);
 
-        af.location        = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         affect_to_char(ch,&af);
 
-        af.location        = APPLY_DAMROLL;
+        af.location = APPLY_DAMROLL;
         affect_to_char(ch,&af);
 
         af.modifier        = ch->applyCurse( -min( ch->getModifyLevel( ) - 5, 35 ) );
-        af.location        = APPLY_AC;
+        af.location = APPLY_AC;
         affect_to_char(ch,&af);
     }
 
@@ -488,13 +478,11 @@ SKILL_RUNP( spellbane )
 
         ch->setWait( gsn_spellbane->getBeats( )  );
 
-        af.where        = TO_AFFECTS;
         af.type                = gsn_spellbane;
         af.level        = ch->getModifyLevel();
         af.duration        = ch->getModifyLevel() / 3;
-        af.location        = APPLY_SAVING_SPELL;
+        af.location = APPLY_SAVING_SPELL;
         af.modifier        = ch->applyCurse( -ch->getModifyLevel( ) / 4 );
-        af.bitvector        = 0;
 
         affect_to_char(ch,&af);
 
@@ -533,17 +521,7 @@ SKILL_RUNP( resistance )
         if ((!ch->is_npc() && number_percent() < gsn_resistance->getEffective( ch ))
           || ch->is_npc() )
     {
-      Affect af;
-
-      af.where        = TO_AFFECTS;
-      af.type         = gsn_resistance;
-      af.level         = ch->getModifyLevel();
-      af.duration = ch->getModifyLevel() / 6;
-      af.location = APPLY_NONE;
-      af.modifier = 0;
-      af.bitvector = 0;
-
-      affect_to_char(ch,&af);
+        postaffect_to_char(ch, gsn_resistance, ch->getModifyLevel() / 6);
       ch->mana -= mana;
 
       act_p("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR,POS_RESTING);
@@ -598,26 +576,26 @@ SKILL_RUNP( truesight )
     {
       Affect af;
 
-      af.where  = TO_DETECTS;
+      af.bitvector.setTable(&detect_flags);
       af.type         = gsn_truesight;
       af.level         = ch->getModifyLevel();
       af.duration = ch->getModifyLevel() / 2 + 5;
-      af.location = APPLY_NONE;
+      
       af.modifier = 0;
-      af.bitvector = DETECT_HIDDEN;
+      af.bitvector.setValue(DETECT_HIDDEN);
       affect_to_char(ch, &af);
 
-      af.bitvector = DETECT_INVIS;
+      af.bitvector.setValue(DETECT_INVIS);
       affect_to_char(ch, &af);
 
-      af.bitvector = DETECT_IMP_INVIS;
+      af.bitvector.setValue(DETECT_IMP_INVIS);
       affect_to_char(ch,&af);
 
 // Нечего ! Корвин.
-//      af.bitvector = ACUTE_VISION;
+//      af.bitvector.setValue(ACUTE_VISION);
 //      affect_to_char(ch,&af);
 
-      af.bitvector = DETECT_MAGIC;
+      af.bitvector.setValue(DETECT_MAGIC);
       affect_to_char(ch,&af);
 
       ch->mana -= mana; 
@@ -686,13 +664,13 @@ SKILL_RUNP( bandage )
                 update_pos( ch );
                 ch->println( "Тебе становится лучше!" );
 
-                af.where        = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.type                = gsn_bandage;
                 af.level        = ch->getModifyLevel();
                 af.duration        = ch->getModifyLevel() / 10;
                 af.modifier        = ch->applyCurse( min( 15, ch->getModifyLevel( ) / 2 ) );
-                af.bitvector         = AFF_REGENERATION;
-                af.location        = 0;
+                af.bitvector.setValue(AFF_REGENERATION);
+                
                 affect_to_char(ch,&af);
         }
         else

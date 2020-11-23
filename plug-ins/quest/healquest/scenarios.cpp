@@ -93,14 +93,14 @@ void HealScenario::infect( NPCharacter *patient, int time, int level )  const
     Affect af;
     
     if (bit.getTable( ) == &detect_flags)
-        af.where = TO_DETECTS;
+        af.bitvector.setTable(&detect_flags);
     else
-        af.where = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
 
     af.type      = malady;
     af.level     = level;
     af.duration  = time;
-    af.bitvector = bit;
+    af.bitvector.setValue(bit);
 
     affect_to_char( patient, &af );
 }

@@ -127,7 +127,6 @@ int                        top_exit;
 int                        top_mob_index;
 int                        top_obj_index;
 int                        top_reset;
-int                        top_room;
 
 int                        top_vnum_room;
 int                        top_vnum_mob;

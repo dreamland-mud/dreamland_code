@@ -240,7 +240,7 @@ SKILL_RUNP( settraps )
         if ( ch->is_npc()
                 || number_percent( ) <  ( gsn_settraps->getEffective( ch ) * 0.7 ) )
         {
-                Affect af,af2;
+                Affect af;
 
                 gsn_settraps->improve( ch, true );
 
@@ -256,28 +256,15 @@ SKILL_RUNP( settraps )
                         return;
                 }
 
-                af.where     = TO_ROOM_AFFECTS;
+                af.bitvector.setTable(&raffect_flags);
                 af.type      = gsn_settraps;
                 af.level     = ch->getModifyLevel();
                 af.duration  = ch->getModifyLevel() / 40;
-                af.location  = APPLY_NONE;
-                af.modifier  = 0;
-                af.bitvector = AFF_ROOM_THIEF_TRAP;
+                af.bitvector.setValue(AFF_ROOM_THIEF_TRAP);
                 ch->in_room->affectTo( &af );
 
-                af2.where     = TO_AFFECTS;
-                af2.type      = gsn_settraps;
-                af2.level            = ch->getModifyLevel();
-
-                if ( ch->is_adrenalined() )
-                        af2.duration  = 1;
-                else
-                        af2.duration = ch->getModifyLevel() / 10;
-
-                af2.modifier  = 0;
-                af2.location  = APPLY_NONE;
-                af2.bitvector = 0;
-                affect_to_char( ch, &af2 );
+                postaffect_to_char(ch, gsn_settraps, 
+                        ch->is_adrenalined() ? 1 : ch->getModifyLevel() / 10);
 
                 ch->send_to( "Ты устраиваешь ловушку в комнате.\n\r");
 
@@ -421,13 +408,13 @@ SKILL_RUNP( envenom )
         if (percent < skill)
         {
 
-            af.where     = TO_WEAPON;
+            af.bitvector.setTable(&weapon_type2);
             af.type      = gsn_poison;
             af.level     = ch->getModifyLevel() * percent / 100;
             af.duration  = ch->getModifyLevel() * percent / 100;
-            af.location  = 0;
+            
             af.modifier  = 0;
-            af.bitvector = WEAPON_POISON;
+            af.bitvector.setValue(WEAPON_POISON);
             affect_to_obj( obj, &af);
 
             if ( !IS_AFFECTED( ch, AFF_SNEAK ) )
@@ -1297,12 +1284,10 @@ SKILL_RUNP( blackjack )
                 gsn_blackjack->improve( ch, true, victim );
 
                 af.type = gsn_blackjack;
-                af.where = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.level = ch->getModifyLevel();
                 af.duration = ch->getModifyLevel() / 50 + 1;
-                af.location = APPLY_NONE;
-                af.modifier = 0;
-                af.bitvector = AFF_SLEEP;
+                af.bitvector.setValue(AFF_SLEEP);
                 affect_join ( victim,&af );
 
                 set_violent( ch, victim, true );

@@ -44,16 +44,15 @@ static Object * create_stone( int level )
     stone->value1(4 + level / 15);
     stone->value2(4 + level / 30);
 
-    af.where                  = TO_OBJECT;
     af.type               = gsn_search_stones;
     af.level              = level;
     af.duration           = -1;
     af.modifier           = level / 10;
 
-    af.location           = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_to_obj( stone, &af );
 
-    af.location           = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_to_obj( stone, &af );
 
     return stone;
@@ -208,20 +207,20 @@ SKILL_RUNP( throwstone )
 
     if (number_percent( ) <= gsn_flaming_stone->getEffective( ch )) {
         Affect saf;
-        saf.where               = TO_WEAPON;
+        saf.bitvector.setTable(&weapon_type2);
         saf.type               = gsn_flaming_stone;
-        saf.level              = level;
+        saf.level              = ch->getModifyLevel();
         saf.duration           = -1;
-        saf.bitvector        = WEAPON_FLAMING;
+        saf.bitvector.setValue(WEAPON_FLAMING);
         affect_to_obj( stone, &saf);
 
     } else if (number_percent( ) <= gsn_freezing_stone->getEffective( ch )) {
         Affect saf;
-        saf.where               = TO_WEAPON;
+        saf.bitvector.setTable(&weapon_type2);
         saf.type               = gsn_freezing_stone;
-        saf.level              = level;
+        saf.level              = ch->getModifyLevel();
         saf.duration           = -1;
-        saf.bitvector        = WEAPON_FROST;
+        saf.bitvector.setValue(WEAPON_FROST);
         affect_to_obj( stone, &saf);
     }
 

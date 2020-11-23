@@ -216,27 +216,27 @@ XMLExtraDescr::fromXML(const XMLNode::Pointer &parent)
 /*********************************************************************
  * XMLApply
  *********************************************************************/
-XMLApply::XMLApply( ) : where(APPLY_NONE)
+XMLApply::XMLApply( ) : location(APPLY_NONE)
 {
 }
 
 bool
 XMLApply::toXML(XMLNode::Pointer &parent) const
 {
-    if(where == APPLY_NONE && getValue() == 0)
+    if(location == APPLY_NONE && getValue() == 0)
         return false;
 
     if(!XMLIntegerNoEmpty::toXML(parent))
         return false;
 
-    parent->insertAttribute("to", apply_flags.name(where));
+    parent->insertAttribute("to", apply_flags.name(location));
     return true;
 }
 
 void 
 XMLApply::fromXML(const XMLNode::Pointer &parent) 
 {
-    where = apply_flags.value(parent->getAttribute("to"));
+    location = apply_flags.value(parent->getAttribute("to"));
     XMLIntegerNoEmpty::fromXML(parent);
 }
 
@@ -246,36 +246,11 @@ XMLApply::fromXML(const XMLNode::Pointer &parent)
 void
 XMLAffect::init(Affect *pAf)
 {
-    switch(pAf->where) {
-    case TO_AFFECTS:
-        bits.setTable(&affect_flags);
-        break;
-    case TO_IMMUNE:
-        bits.setTable(&imm_flags);
-        break;
-    case TO_RESIST:
-        bits.setTable(&res_flags);
-        break;
-    case TO_VULN:
-        bits.setTable(&vuln_flags);
-        break;
-    case TO_DETECTS:
-        bits.setTable(&detect_flags);
-        break;
-    case TO_LOCATIONS:
-    case TO_LIQUIDS:
-    case TO_SKILLS:
-    case TO_SKILL_GROUPS:
-        global.setRegistry(pAf->global.getRegistry());
-        global.set(pAf->global);
-        break;
-    default:
-        LogStream::sendError() << "incorrect pAf->where in area file" << endl;
-    case TO_OBJECT:
-        bits.setTable(NULL);
-    }
-    bits.setValue(pAf->bitvector);
-    apply.where = pAf->location;
+    bits.setTable(pAf->bitvector.getTable());
+    bits.setValue(pAf->bitvector.getValue());
+    global.setRegistry(pAf->global.getRegistry());
+    global.set(pAf->global);
+    apply.location = pAf->location;
     apply.setValue(pAf->modifier);
 }
 
@@ -285,43 +260,15 @@ XMLAffect::compat()
     Affect *paf = dallocate( Affect );
     
     paf->type.assign(gsn_none);
-    paf->where = TO_OBJECT;
     paf->duration = -1;
-    
-    if(bits.getTable( ) == NULL) 
-        ;
-    else if(bits.getTable( ) == &affect_flags)
-        paf->where = TO_AFFECTS;
-    else if(bits.getTable( ) == &imm_flags)
-        paf->where = TO_IMMUNE;
-    else if(bits.getTable( ) == &res_flags)
-        paf->where = TO_RESIST;
-    else if(bits.getTable( ) == &vuln_flags)
-        paf->where = TO_VULN;
-    else if(bits.getTable( ) == &detect_flags)
-        paf->where = TO_DETECTS;
-    else
-        LogStream::sendError() << "incorrect pAf->where in area file" << endl;
-
-    // TODO: is there a better way to do it?
-    if (global.getRegistry()) {
-        if (global.getRegistry() == liquidManager)
-            paf->where = TO_LIQUIDS;
-        else if (global.getRegistry() == wearlocationManager)
-            paf->where = TO_LOCATIONS;
-        else if (global.getRegistry() == skillManager)
-            paf->where = TO_SKILLS;
-        else if (global.getRegistry() == skillGroupManager)
-            paf->where = TO_SKILL_GROUPS;
-        else
-            LogStream::sendError() << "Incorrect pAf->global.registry in area file: " << global.getRegistry()->getRegistryName() << endl;
-    }
-
-    paf->bitvector = bits.getValue( );    
-    paf->location = apply.where;
-    paf->modifier = apply.getValue( );
+    paf->bitvector.setTable(bits.getTable());
+    paf->bitvector.setValue(bits.getValue());
     paf->global.setRegistry(global.getRegistry());
     paf->global.set(global);
+    paf->location.setTable(&apply_flags);
+    paf->location = apply.location;
+    paf->modifier = apply.getValue( );
+
     return paf;
 }
 

@@ -164,7 +164,7 @@ SPELL_DECL(EvilSpirit);
 VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
 {
     Area *pArea = room->area;
-    Affect af, af2;
+    Affect af;
 
     if (IS_ROOM_AFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
     {
@@ -184,22 +184,13 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
         return;
     }
 
-    af2.where = TO_AFFECTS;
-    af2.type = sn;
-    af2.level = ch->getModifyLevel();
-    af2.duration = level / 5;
-    af2.modifier = 0;
-    af2.location = APPLY_NONE;
-    af2.bitvector = 0;
-    affect_to_char(ch, &af2);
+    postaffect_to_char(ch, sn, level / 5);
 
-    af.where = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type = sn;
     af.level = ch->getModifyLevel();
     af.duration = level / 25;
-    af.location = APPLY_NONE;
-    af.modifier = 0;
-    af.bitvector = AFF_ROOM_ESPIRIT;
+    af.bitvector.setValue(AFF_ROOM_ESPIRIT);
 
     for (auto r: pArea->rooms)
     {
@@ -247,7 +238,6 @@ VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
 {
     Character *vch;
     Object *light;
-    Affect af;
 
     if (ch->isAffected(sn))
     {
@@ -274,14 +264,7 @@ VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
             damage_to_obj(vch, light, light, light->condition / 2 + number_range(1, light->condition));
         }
 
-    af.where = TO_AFFECTS;
-    af.type = sn;
-    af.level = level;
-    af.duration = 2;
-    af.modifier = 0;
-    af.location = APPLY_NONE;
-    af.bitvector = 0;
-    affect_to_char(ch, &af);
+    postaffect_to_char(ch, sn, 2);
 }
 
 SPELL_DECL_T(Nightwalker, SummonCreatureSpell);
@@ -350,14 +333,14 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
     af.level = level;
     af.duration = 24;
 
-    af.where = TO_DETECTS;
-    af.bitvector = DETECT_GOOD | DETECT_FADE;
+    af.bitvector.setTable(&detect_flags);
+    af.bitvector.setValue(DETECT_GOOD | DETECT_FADE);
     af.location = APPLY_SAVING_SPELL;
     af.modifier = ch->applyCurse(0 - level / 9);
     affect_to_char(victim, &af);
 
-    af.where = TO_AFFECTS;
-    af.bitvector = IS_AFFECTED(victim, AFF_PROTECT_GOOD) ? 0 : AFF_PROTECT_GOOD;
+    af.bitvector.setTable(&affect_flags);
+    af.bitvector.setValue(IS_AFFECTED(victim, AFF_PROTECT_GOOD) ? 0 : AFF_PROTECT_GOOD);
     af.modifier = ch->applyCurse(-level * 5 / 2);
     af.location = APPLY_AC;
     affect_to_char(victim, &af);
@@ -419,13 +402,9 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
     Affect af;
     Character *vch;
 
-    af.where = TO_AFFECTS;
     af.type = gsn_evil_spirit;
     af.level = paf->level;
     af.duration = number_range(1, (af.level / 30));
-    af.location = APPLY_NONE;
-    af.modifier = 0;
-    af.bitvector = 0;
 
     for (vch = room->people; vch; vch = vch->next_in_room)
     {

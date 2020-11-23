@@ -253,12 +253,10 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
         affect_strip( victim, gsn_poison );
     }
    
-    af.where            = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type             = sn;
     af.level            = level;
-    af.location         = APPLY_NONE;
-    af.modifier         = 0;
-
+    
     if (!removed && victim->max_hit == victim->hit) {
         act_p( "Кажется, $C1 абсолютно здоро$Gво|в|ва", ch, 0, victim, TO_CHAR, POS_RESTING);
         af.duration = 1;
@@ -276,7 +274,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
         update_pos( victim );
 
         af.duration         = hp / 100;
-        af.bitvector        = AFF_REGENERATION;
+        af.bitvector.setValue(AFF_REGENERATION);
     }
 
     affect_join( ch, &af );

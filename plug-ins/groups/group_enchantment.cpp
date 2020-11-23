@@ -76,16 +76,12 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
     af.level         = level / 2;
     af.duration         = level / 8;
 
-    af.where         = TO_WEAPON;
-    af.location         = 0;
-    af.modifier         = 0;
-    af.bitvector = WEAPON_HOLY;
+    af.bitvector.setTable(&weapon_type2);
+    af.bitvector.setValue(WEAPON_HOLY);
     affect_to_obj( obj, &af);
 
-    af.where     = TO_OBJECT;
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL;
+    af.bitvector.setTable(&extra_flags);
+    af.bitvector.setValue(ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL);
     affect_to_obj( obj, &af );
 
     ch->pecho("Ты благословляешь %1$O4 для священной битвы.", obj);
@@ -218,13 +214,11 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     
     affect_enchant( obj );
 
-    af.where     = TO_OBJECT;
-    af.bitvector = 0;
     af.type      = sn;
     af.level     = level;
 
     af.duration  = -1;
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     af.modifier  = add_ac;
     affect_enhance( obj, &af );
     
@@ -236,7 +230,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 
         if (add_hr > 0) {
             af.duration  = 200;
-            af.location  = APPLY_HITROLL;
+            af.location = APPLY_HITROLL;
             af.modifier  = add_hr;
 
             affect_enhance( obj, &af );
@@ -244,7 +238,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 
         if (add_dr > 0) {
             af.duration  = 200;
-            af.location  = APPLY_DAMROLL;
+            af.location = APPLY_DAMROLL;
             af.modifier  = add_dr;
 
             affect_enhance( obj, &af );
@@ -256,7 +250,6 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 SPELL_DECL(EnchantWeapon);
 VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level ) 
 { 
-    Affect *paf;
     Affect af;
     int result, fail;
     int hit_bonus, dam_bonus, added;
@@ -393,17 +386,15 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     
     affect_enchant( obj );
 
-    af.where     = TO_OBJECT;
-    af.bitvector = 0;
     af.type      = sn;
     af.level     = level;
     af.duration  = -1;
     af.modifier  = added;
 
-    af.location  = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_enhance( obj, &af );
 
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_enhance( obj, &af );
 }
 
@@ -417,13 +408,11 @@ VOID_SPELL(Fireproof)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
 
-    af.where     = TO_OBJECT;
+    af.bitvector.setTable(&extra_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = number_fuzzy(level / 4);
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = ITEM_BURN_PROOF;
+    af.bitvector.setValue(ITEM_BURN_PROOF);
     affect_to_obj( obj, &af);
 
     act("Огнеупорная аура окружает $o4.",ch,obj,0,TO_ALL);
@@ -472,18 +461,16 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     af.level     = level;
     af.duration  = level / 4;
 
-    af.where     = TO_WEAPON;
-    af.type      = number_bits(2) ? gsn_flamestrike : gsn_fireball;
-    af.location  = 0;
+    af.bitvector.setTable(&weapon_type2);
+    af.type      = number_bits(2) ? gsn_flamestrike : gsn_fireball;    
     af.modifier  = 10;
-    af.bitvector = WEAPON_SPELL;
+    af.bitvector.setValue(WEAPON_SPELL);
     affect_to_obj( obj, &af );
         
-    af.where     = TO_OBJECT;
-    af.type      = sn;
-    af.location  = APPLY_NONE;
+    af.bitvector.setTable(&extra_flags);
+    af.type      = sn;    
     af.modifier  = 0;
-    af.bitvector = ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL;
+    af.bitvector.setValue(ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL);
     affect_to_obj( obj, &af );
 
     act_p("Ты взываешь к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_CHAR, POS_RESTING);
@@ -528,19 +515,16 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
     if (IS_WEAPON_STAT(obj, WEAPON_FADING))        chance /= 2;
      
     if (number_percent() < chance) {    
-        af.where        = TO_WEAPON;
         af.type         = sn;
         af.level        = level / 2;
         af.duration        = level / 4;
-        af.location        = 0;
-        af.modifier        = 0;
-        af.bitvector        = WEAPON_VAMPIRIC;
+        
+        af.bitvector.setTable(&weapon_type2);
+        af.bitvector.setValue(WEAPON_VAMPIRIC);
         affect_to_obj( obj, &af);
         
-        af.where     = TO_OBJECT;
-        af.location  = APPLY_NONE;
-        af.modifier  = 0;
-        af.bitvector = ITEM_ANTI_GOOD|ITEM_ANTI_NEUTRAL;
+        af.bitvector.setTable(&extra_flags);
+        af.bitvector.setValue(ITEM_ANTI_GOOD|ITEM_ANTI_NEUTRAL);
         affect_to_obj( obj, &af );
         
         act_p("Ты передаешь $o3 свою жажду чужой жизни...", ch, obj, 0, TO_CHAR, POS_RESTING);
@@ -765,13 +749,13 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
 
-    af.where        = TO_WEAPON;
+    af.bitvector.setTable(&weapon_type2);
     af.type         = sn;
     af.level        = level / 2;
     af.duration     = level / 4;
-    af.location     = 0;
+    
     af.modifier     = 0;
-    af.bitvector    = WEAPON_FROST;
+    af.bitvector.setValue(WEAPON_FROST);
     affect_to_obj( obj, &af );
     
     act_p("Ты отдаешь $o4 во власть холода.", ch, obj, 0, TO_CHAR, POS_RESTING);

@@ -133,23 +133,23 @@ void SidheArmorSet::addAffect(Character *ch) const
     af.level     = ch->getModifyLevel();
     af.duration  = -2;
 
-    af.where     = TO_AFFECTS;
-    af.bitvector = IS_EVIL(ch) ? AFF_PROTECT_GOOD : AFF_PROTECT_EVIL;
+    af.bitvector.setTable(&affect_flags);
+    af.bitvector.setValue(IS_EVIL(ch) ? AFF_PROTECT_GOOD : AFF_PROTECT_EVIL);
 
     af.modifier  =  10;
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_to_char(ch, &af);
 
-    af.where     = TO_RESIST;
-    af.bitvector = ch->getRace()->getVuln().isSet(VULN_IRON) ? RES_IRON : 0;
+    af.bitvector.setTable(&res_flags);
+    af.bitvector.setValue(ch->getRace()->getVuln().isSet(VULN_IRON) ? RES_IRON : 0);
     af.modifier  =  20;
-    af.location  = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_to_char(ch, &af);
 
-    af.where     = TO_VULN;
-    af.bitvector = IS_EVIL(ch) ? VULN_HOLY : VULN_NEGATIVE;
+    af.bitvector.setTable(&vuln_flags);
+    af.bitvector.setValue(IS_EVIL(ch) ? VULN_HOLY : VULN_NEGATIVE);
     af.modifier  =  150;
-    af.location  = APPLY_HIT;
+    af.location = APPLY_HIT;
     affect_to_char(ch, &af);
 
     ch->pecho("{WНа{wб{Wо{wр{W си{wдх{Wийск{wо{Wй б{wр{Wони на{wч{Wина{wет{W светиться ровным се{wр{Wе{wбр{Wист{wы{Wм светом.{x");
@@ -181,31 +181,29 @@ void TravellersJoySet::addAffect(Character *ch) const
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = -2;
-    af.where     = TO_AFFECTS;
-    af.bitvector = 0;
 
     af.modifier  =  8;
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_to_char(ch, &af);
 
     af.modifier  =  12;
-    af.location  = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_to_char(ch, &af);
 
     af.modifier  =  35;
-    af.location  = APPLY_HIT;
+    af.location = APPLY_HIT;
     affect_to_char(ch, &af);
 
     af.modifier  =  2;
-    af.location  = APPLY_DEX;
+    af.location = APPLY_DEX;
     affect_to_char(ch, &af);
 
     af.modifier  =  2;
-    af.location  = APPLY_STR;
+    af.location = APPLY_STR;
     affect_to_char(ch, &af);
 
     af.modifier  =  2;
-    af.location  = APPLY_CON;
+    af.location = APPLY_CON;
     affect_to_char(ch, &af);
 
     ch->pecho("{CКомплект одежд путешественника начинает светиться ровным голубоватым светом.{x");
@@ -254,10 +252,10 @@ void NorivaMyrvaleSet::addAffect(Character *ch) const
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = -2;
-    af.where     = TO_RESIST;
-    af.bitvector = RES_WEAPON | RES_SPELL;
+    af.bitvector.setTable(&res_flags);
+    af.bitvector.setValue(RES_WEAPON | RES_SPELL);
     af.modifier  = 3;
-    af.location  = APPLY_LEVEL;
+    af.location = APPLY_LEVEL;
     affect_to_char(ch, &af);
     ch->pecho("{gПеред твоими глазами на мгновение возникает изображение ладони над пылающим кольцом.{x");
     ch->pecho("{gСила мир'вейл Норива пронизывает тебя.{x");
@@ -295,10 +293,10 @@ void ReykarisShevaleSet::addAffect(Character *ch) const
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = -2;
-    af.where     = TO_RESIST;
-    af.bitvector = RES_WEAPON | RES_SPELL;
+    af.bitvector.setTable(&res_flags);
+    af.bitvector.setValue(RES_WEAPON | RES_SPELL);
     af.modifier  = 3;
-    af.location  = APPLY_LEVEL;
+    af.location = APPLY_LEVEL;
     affect_to_char(ch, &af);
     ch->pecho("{DПеред тобой возникает ухмыляющийся череп. В его пустых глазницах пылает жуткое {rкрасноватое{D пламя.{x");
     ch->pecho("{DСила ши'вейл Рейкарис пронизывает тебя.{x");
@@ -330,27 +328,25 @@ void MorrisDancerSet::addAffect(Character *ch) const
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = -2;
-    af.where     = TO_AFFECTS;
-    af.bitvector = 0;
 
     af.modifier  =  5;
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_to_char(ch, &af);
 
     af.modifier  =  7;
-    af.location  = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_to_char(ch, &af);
 
     af.modifier  =  50;
-    af.location  = APPLY_HIT;
+    af.location = APPLY_HIT;
     affect_to_char(ch, &af);
 
     af.modifier  =  50;
-    af.location  = APPLY_MANA;
+    af.location = APPLY_MANA;
     affect_to_char(ch, &af);
 
     af.modifier  =  5;
-    af.location  = APPLY_CHA;
+    af.location = APPLY_CHA;
     affect_to_char(ch, &af);
 
     ch->pecho("{WТвои ноги неудержимо пускаются в пляс!{x");

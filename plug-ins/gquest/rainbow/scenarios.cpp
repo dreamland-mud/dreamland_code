@@ -146,15 +146,15 @@ void RainbowDefaultScenario::onQuestFinish( PCharacter *ch ) const
 {
     Affect af;
 
-    af.where = TO_RESIST;
+    af.bitvector.setTable(&res_flags);
     af.type = SkillManager::getThis( )->lookup( "rainbow shield" );
     af.duration = 180;
     af.level = 106;
-    af.bitvector = RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
+    af.bitvector.setValue(RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
                    |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
                    |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
-                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON|RES_MITHRIL;
-    af.location = 0;
+                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON|RES_MITHRIL);
+    
     af.modifier = 0;
     affect_join(ch, &af);
     
@@ -226,15 +226,15 @@ void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const
 {
     Affect af;
 
-    af.where = TO_RESIST;
+    af.bitvector.setTable(&res_flags);
     af.type = SkillManager::getThis( )->lookup( "demonic mantle" );
     af.duration = 180;
     af.level = 106;
-    af.bitvector = RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
+    af.bitvector.setValue(RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
                    |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
                    |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
-                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON|RES_MITHRIL;
-    af.location = 0;
+                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON|RES_MITHRIL);
+    
     af.modifier = 0;
     affect_join(ch, &af);
    

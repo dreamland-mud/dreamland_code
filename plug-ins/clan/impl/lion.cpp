@@ -228,31 +228,29 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
 
   ch->hit += ch->getPC()->perm_hit / 2;
 
-  af.where     = TO_AFFECTS;
   af.type      = sn;
   af.level     = level; 
   af.duration  = 3 + level / 30;
-  af.location  = APPLY_HIT;
+  af.location = APPLY_HIT;
   af.modifier  = ch->getPC()->perm_hit / 2;
-  af.bitvector = 0;
   affect_to_char(ch,&af);
 
-  af.where     = TO_AFFECTS;
+  af.bitvector.setTable(&affect_flags);
   af.type      = sn;
   af.level     = level;
   af.duration  = 3 + level / 30;
-  af.location  = APPLY_DEX;
+  af.location = APPLY_DEX;
   af.modifier  = -(1 + level / 20);
-  af.bitvector = AFF_SLOW;
+  af.bitvector.setValue(AFF_SLOW);
   affect_to_char( ch, &af );
 
-  af.where     = TO_AFFECTS;
+  af.bitvector.setTable(&affect_flags);
   af.type      = sn;
   af.level     = level;
   af.duration  = 3 + level / 30;
-  af.location  = APPLY_DAMROLL;
+  af.location = APPLY_DAMROLL;
   af.modifier  = level / 2;
-  af.bitvector = AFF_BERSERK;
+  af.bitvector.setValue(AFF_BERSERK);
   affect_to_char( ch, &af );
 
   act_p("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.",
@@ -349,35 +347,23 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   shield->cost  = 0;
   obj_to_char(shield, ch);
   
-  af.where        = TO_OBJECT;
   af.type         = sn;
   af.level        = level;
   af.duration     = -1;
+
   af.modifier     = level / 8;
-  af.bitvector    = 0;
-
-  af.location     = APPLY_HITROLL;
+  af.location = APPLY_HITROLL;
   affect_to_obj( shield, &af);
 
-  af.location     = APPLY_DAMROLL;
+  af.location = APPLY_DAMROLL;
   affect_to_obj( shield, &af);
 
-  af.where        = TO_OBJECT;
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
   af.modifier     = -level/2;
-  af.bitvector    = 0;
-  af.location     = APPLY_AC;
+  af.location = APPLY_AC;
   affect_to_obj( shield, &af);
 
-  af.where        = TO_OBJECT;
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
   af.modifier     = max(1,level /  30);
-  af.bitvector    = 0;
-  af.location     = APPLY_CHA;
+  af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
   act_p( "Ты создаешь $o4!",ch,shield,0,TO_CHAR,POS_RESTING );
@@ -408,13 +394,10 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where                = TO_AFFECTS;
     af.type               = sn;
     af.level              = level; 
     af.duration           = max( 6, ch->getPC( )->getClanLevel( ) * 2 );
-    af.bitvector          = 0;
-    af.modifier           = 0;
-    af.location           = APPLY_NONE;
+    
     affect_to_char(ch, &af);  
 
     ch->println( "Ты защищаешь себя от ловушек Охотников." );
@@ -430,13 +413,13 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
                 return;
         }
 
-        af.where     = TO_ROOM_AFFECTS;
+        af.bitvector.setTable(&raffect_flags);
         af.type      = sn;
         af.level     = level;
         af.duration  = max( 1, ch->getPC( )->getClanLevel( ) * 1 );
-        af.location  = APPLY_NONE;
+        
         af.modifier  = 0;
-        af.bitvector = AFF_ROOM_PREVENT;
+        af.bitvector.setValue(AFF_ROOM_PREVENT);
         room->affectTo( &af );
 
         ch->send_to( "Ты защищаешь местность от ловушек Охотников и от их мести.\n\r");

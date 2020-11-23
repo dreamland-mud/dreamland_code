@@ -317,60 +317,48 @@ OEDIT(show)
 
     for (auto &paf: pObj->affected) {
         if (cnt == 0) {
-            stc("Number Modifier Location Where      What\n\r", ch);
-            stc("------ -------- -------- ---------- ---------------------------\n\r", ch);
+            stc("Number  Location  Modifier  Table/Registry  Bits\n\r", ch);
+            stc("------  --------  --------  --------------  ---------------------------\n\r", ch);
         }
-        sprintf(buf, "[%4d] %-8d %-8.8s", cnt,
-                  paf->modifier,
-                  apply_flags.name(paf->location).c_str());
-       
-        if (paf->bitvector || !paf->global.empty()) { 
-            sprintf(buf+strlen(buf), " %-10.10s ",
-                      affwhere_flags.name(paf->where).c_str());
 
-            switch(paf->where) {
-                case TO_DETECTS:
-                    strcat(buf, detect_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? detect_flags){x");
-                    break;
-                case TO_AFFECTS:
-                    strcat(buf, affect_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? affect_flags){x");
-                    break;
-                case TO_IMMUNE:
-                    strcat(buf, imm_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? imm_flags){x");
-                    break;
-                case TO_RESIST:
-                    strcat(buf, res_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? res_flags){x");
-                    break;
-                case TO_VULN:
-                    strcat(buf, vuln_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? vuln_flags){x");
-                    break;
-                case TO_LIQUIDS:
-                    strcat(buf, paf->global.toString().c_str());
+        sprintf(buf, "[%4d]  %-8.8s  %8d", cnt,
+                  paf->location.name().c_str(),
+                  paf->modifier.getValue());
+       
+        const FlagTable *table = paf->bitvector.getTable();
+        const GlobalRegistryBase *registry = paf->global.getRegistry();
+
+        if ((table && paf->bitvector.getValue()) || registry) { 
+            sprintf(buf+strlen(buf), "  %-14.14s  ",
+                      registry ? registry->getRegistryName().c_str() : paf->bitvector.getTableName().c_str());
+
+            if (registry) {
+                sprintf(buf+strlen(buf), "%s", paf->global.toString().c_str());
+
+                if (registry == liquidManager) {
                     strcat(buf, " {D(? liquid){x");
-                    break;
-                case TO_SKILLS:
-                    strcat(buf, paf->global.toString().c_str());
-                    break;
-                case TO_SKILL_GROUPS:
-                    strcat(buf, paf->global.toString().c_str());
-                    strcat(buf, " {D(? group){x");
-                    break;
-                default:
-                    sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
-                    break;
+                } else if (registry == skillManager) {
+                                        
+                } else if (registry == skillGroupManager) {
+                    strcat(buf, " {D(? practicer){x");
+                } else if (registry == wearlocationManager) {
+                    strcat(buf, " {D(? wearloc){x");
+                } else {
+                    strcat(buf, "<unknown registry>");
+                }
+
+            } else {
+                strcat(buf, paf->bitvector.names().c_str());
+                sprintf(buf+strlen(buf), " {D(? %s){x", paf->bitvector.getTableName().c_str());
             }
         }
+
         strcat(buf, "\n\r");
         stc(buf, ch);
         cnt++;
     }
     if (!pObj->affected.empty())
-        stc("{D          ? apply_flags  ? affwhere_flags{x\r\n", ch);
+        stc("{D        ? apply_flags{x\r\n", ch);
 
     show_obj_values(ch, pObj);
 
@@ -439,18 +427,18 @@ OEDIT(addaffect)
     OBJ_INDEX_DATA *pObj;
     Affect *pAf;
     char buf[MAX_STRING_LENGTH];
-    int where = 0, mod = 0, loc;
+    int mod = 0, loc;
+    const FlagTable *table = 0;
+    GlobalRegistryBase *registry = 0;
     bitstring_t bit = 0;
-    Liquid *liq = 0;
-    Skill *skill = 0;
-    SkillGroup *group = 0;
+    list<GlobalRegistryElement *> elements;
 
     EDIT_OBJ(ch, pObj);
 
     argument = one_argument(argument, buf);
 
     if (!*buf) {
-        stc("Syntax:  addaffect [location] [#mod] [where] [bit]\n\r", ch);
+        stc("Syntax:  addaffect [location] [#mod] [table] [bit]\n\r", ch);
         return false;
     }
 
@@ -468,96 +456,48 @@ OEDIT(addaffect)
     mod = atoi(buf);
 
     argument = one_argument(argument, buf);
+
     if(*buf) {
-        if ((where = affwhere_flags.value( buf )) == NO_FLAG) {
-            stc("Valid where fields are:\n\r", ch);
-            show_help(ch, "affwhere");
+        table = FlagTableRegistry::getTable(buf);
+        if (!table) {
+            auto r = registryMap.find(buf);
+            registry = r == registryMap.end() ? 0 : const_cast<GlobalRegistryBase *>(r->second);
+        }
+
+        if (!table && !registry) {
+            stc("Valid table names are:\r\n", ch);
+            stc("    detect_flags, affect_flags, vuln_flags, res_flags, imm_flags, weapon_type2, extra_flags\r\n", ch);
+            stc("    skill, skillGroup, liquid, wearlocation\r\n", ch);
             return false;
         }
-        switch(where) {
-            case TO_DETECTS:
-                bit = detect_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid detects are:\n\r", ch);
-                    show_help(ch, "detect" );
-                    return false;
-                }
-                break;
-            case TO_AFFECTS:
-                bit = affect_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid affects are:\n\r", ch);
-                    show_help(ch, "affect" );
-                    return false;
-                }
-                break;
-            case TO_IMMUNE:
-                bit = imm_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid immun bits are:\n\r", ch);
-                    show_help(ch, "imm" );
-                    return false;
-                }
-                break;
-            case TO_RESIST:
-                bit = res_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid resist bits are:\n\r", ch);
-                    show_help(ch, "res" );
-                    return false;
-                }
-                break;
-            case TO_VULN:
-                bit = vuln_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid vulnerable bits are:\n\r", ch);
-                    show_help(ch, "vuln" );
-                    return false;
-                }
-                break;
-            // TODO: this doesn't allow to have several values in a single affect.
-            case TO_LIQUIDS:
-                if (!( liq = liquidManager->findExisting( argument ) )) {
-                    stc("Жидкость с таким названием не найдена, см. olchelp liquid.\n", ch);
-                    return false;
-                }
-                break;
-            case TO_SKILLS:
-                if (!(skill = skillManager->findExisting(argument))) {
-                    stc("Умение с таким названием не найдено.\n", ch);
-                    return false;
-                }
-                break;
-            case TO_SKILL_GROUPS:
-                if (!(group = skillGroupManager->findExisting(argument))) {
-                    stc("Группа умений с таким названием не найдена, см. olchelp group.\n", ch);
-                    return false;
-                }
-                break;
-            default:
-                stc("This affect location is  not supported now.\n\r", ch);
+
+        if (table) {
+            bit = table->bitstring(argument);
+            if (bit == NO_FLAG) {
+                ptc(ch, "Invalid flag, see 'olchelp %s' for the list of values.\r\n", buf);
                 return false;
+            }
+        } else {
+            elements = registry->findAll(argument);
+            if (elements.empty()) {
+                ptc(ch, "Elements with names \"%s\" not found in %s.\r\n", argument, buf);
+                return false;
+            }
         }
     }
 
-    pAf = new_affect();
+    pAf = dallocate(Affect);
     pAf->location = loc;
+    pAf->location.setTable(&apply_flags);
     pAf->modifier = mod;
     pAf->type = -1;
     pAf->duration = -1;
-    pAf->where = where;
-    pAf->bitvector = bit;
+    pAf->bitvector.setTable(table);
+    pAf->bitvector.setValue(bit);
+    pAf->global.setRegistry(registry);
+    for (auto &e: elements)
+        pAf->global.set(e->getIndex());
 
-    if (liq) {
-        pAf->global.setRegistry(liquidManager);
-        pAf->global.set(liq->getIndex());
-    } else if (skill) {
-        pAf->global.setRegistry(skillManager);
-        pAf->global.set(skill->getIndex());
-    } else if (group) {
-        pAf->global.setRegistry(skillGroupManager);
-        pAf->global.set(group->getIndex());
-    }
     pObj->affected.push_front(pAf);
 
     stc("Affect added.\n\r", ch);

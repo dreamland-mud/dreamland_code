@@ -118,6 +118,8 @@ DESIRE(bloodlust);
 WEARLOC(none);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool limit_check_on_load( Object *obj );
+const FlagTable * affect_where_to_table(int where);
+int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry);
 
 static DLString id_to_string(long long id)
 {
@@ -185,6 +187,7 @@ Affect * fread_Affc( FILE *fp )
     int sn;
     char *word = fread_word( fp );
     DLString globalString;
+    int where;
 
     sn = SkillManager::getThis( )->lookup( word );
     convert_skill( sn );
@@ -193,12 +196,14 @@ Affect * fread_Affc( FILE *fp )
 
     try {
         paf->type = sn;
-        paf->where        = fread_number(fp); 
+        where        = fread_number(fp); 
         paf->level        = fread_number(fp);
         paf->duration        = fread_number(fp);
-        paf->modifier        = fread_number(fp);
+        paf->modifier        = fread_number(fp);        
+        paf->location.setTable(&apply_flags);
         paf->location        = fread_number(fp);
-        paf->bitvector        = fread_number(fp);
+        paf->bitvector.setTable(affect_where_to_table(where));
+        paf->bitvector.setValue(fread_number(fp));
 
         globalString    = fread_dlstring_to_eol(fp);
         globalString.substitute('\r', ' ').substitute('\n', ' ');
@@ -211,16 +216,16 @@ Affect * fread_Affc( FILE *fp )
             paf->ownerName = globalString.getOneArgument( );
         }
 
-        if (paf->where == TO_LOCATIONS) {
+        if (where == TO_LOCATIONS) {
             paf->global.setRegistry( wearlocationManager );
             paf->global.fromString( globalString );
-        } else if (paf->where == TO_LIQUIDS) {
+        } else if (where == TO_LIQUIDS) {
             paf->global.setRegistry( liquidManager );
             paf->global.fromString( globalString );
-        } else if (paf->where == TO_SKILLS) {
+        } else if (where == TO_SKILLS) {
             paf->global.setRegistry( skillManager );
             paf->global.fromString( globalString );
-        } else if (paf->where == TO_SKILL_GROUPS) {
+        } else if (where == TO_SKILL_GROUPS) {
             paf->global.setRegistry( skillGroupManager );
             paf->global.fromString( globalString );
         }
@@ -238,14 +243,14 @@ void fwrite_affect( FILE *fp, Affect *paf )
     if (paf->type == gsn_doppelganger)
         return;
 
-    fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10d %s %s\n",
+    fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10lld %s %s\n",
             paf->type->getName( ).c_str( ),
-            paf->where,
-            paf->level,
-            paf->duration,
-            paf->modifier,
-            paf->location,
-            paf->bitvector,
+            affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
+            paf->level.getValue(),
+            paf->duration.getValue(),
+            paf->modifier.getValue(),
+            paf->location.getValue(),
+            paf->bitvector.getValue(),
             paf->ownerName.c_str( ),
             paf->global.toString( ).c_str( ));
 }
@@ -1168,9 +1173,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
             {
                 Affect *paf = fread_Affc( fp );
                 
-                if (!pet->isAffected(paf->type)) {
-                    pet->affected.push_front(paf);
-                }
+                pet->affected.push_front(paf);
                 fMatch          = true;
                 break;
             }

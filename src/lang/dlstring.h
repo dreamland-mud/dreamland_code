@@ -39,6 +39,11 @@ public:
                 assign( value );
         }
 
+        inline DLString( char value )
+        {
+                assign(value);
+        }
+        
         inline DLString( short value )
         {
                 assign( value );

@@ -94,13 +94,12 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
       ch->send_to("Кассандра использовалась совсем недавно.\n\r" );
       return;
     }
-  af.where                = TO_AFFECTS;
+
   af.type      = sn;
   af.level     = level;
   af.duration  = level;
-  af.location  = APPLY_AC;
+  af.location = APPLY_AC;
   af.modifier  = -30;
-  af.bitvector = 0;
   affect_to_char( ch, &af );
   act_p( "Таинственный щит окружает $c4.",ch, 0,0,TO_ROOM,POS_RESTING);
   ch->send_to("Таинственный щит окружает тебя.\n\r");
@@ -155,11 +154,9 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
       return;
     }
 
-  af.where                = TO_AFFECTS;
   af.type = sn;
   af.level = level;
   af.duration = ch->getModifyLevel() / 3;
-  af.bitvector = 0;
 
   af.modifier = max( ch->getModifyLevel() / 10, 2 );
   af.location = APPLY_HITROLL;

@@ -59,6 +59,7 @@
 
 #include "skill.h"
 #include "skillmanager.h"
+#include "skillgroup.h"
 #include "affecthandler.h"
 
 #include "plugininitializer.h"
@@ -115,6 +116,7 @@ void do_mload                ( Character *, char * );
 void do_oload                ( Character *, char * );
 
 RELIG(none);
+GSN(none);
 
 /*
  * Local functions.
@@ -839,7 +841,104 @@ CMDWIZP( stat )
 
 }
 
+static void format_affect_duration(Affect *paf, ostringstream &buf)
+{
+    if (paf->duration >= 0)
+        buf << fmt(0, " в течение %1$d час%1$Iа|ов|ов", paf->duration);
+    else
+        buf << " постоянно";    
+}
 
+static void format_affect_level(Affect *paf, ostringstream &buf)
+{
+    if (paf->level >= 0)
+        buf << ", уровень " << paf->level;
+}
+
+static void format_affect(Affect *paf, ostringstream &buf)
+{
+    int b = paf->bitvector;
+    int mod = paf->modifier;
+    const FlagTable *table = paf->bitvector.getTable();
+    const GlobalRegistryBase *registry = paf->global.getRegistry();
+    bool empty = true;
+
+    buf << "Аффект";
+    if (paf->type != gsn_none) 
+        buf << " " << paf->type->getRussianName().quote();
+    buf << ": ";
+
+    if (registry) {
+        if (registry == skillManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "знание навыка" : "уровень умения")
+                << " " << paf->global.toRussianString().quote() 
+                << " на " << (int)abs(mod);
+        } else if (registry == skillGroupManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "знание группы" : "уровень умения группы")
+                << " " << paf->global.toRussianString().quote() 
+                << " на " << (int)abs(mod);
+        } else if (registry == liquidManager) {
+            buf << "добавляет запах " << paf->global.toRussianString('2', ',').colourStrip();
+        } else if (registry == wearlocationManager) {
+            buf << "отнимает конечность " << paf->global.toString(',');
+        } else {
+            buf << "неизвестный вектор";
+        }
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        return;
+    }
+
+    if (table && b != 0) {
+        buf << "добавляет ";
+        if (table == &affect_flags)
+            buf << "аффект ";
+        else if (table == &imm_flags)
+            buf << "иммунитет к ";
+        else if (table == &res_flags)
+            buf << "сопротивляемость к ";
+        else if (table == &vuln_flags)
+            buf << "уязвимость к ";
+        else if (table == &detect_flags)
+            buf << "обнаружение ";
+        else if (table == &raffect_flags)
+            buf << "флаги комнаты ";
+        else if (table == &weapon_type2)
+            buf << "флаги оружия ";
+        else if (table == &extra_flags)
+            buf << "флаги предмета ";
+        else if (table == &plr_flags)
+            buf << "флаги персонажа ";
+        else
+            buf << "не пойми что";
+
+        buf << table->messages(b);
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        empty = false;
+    }
+
+    if (paf->modifier != 0 && paf->location != APPLY_NONE) {
+        if (!empty)
+            buf << "        ";
+        buf << "изменяет " << paf->location.message()
+            << " на " << paf->modifier;
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        empty = false;
+    }
+
+    if (empty)
+        buf << " (ничего)." << endl;
+}
 
 /* NOTCOMMAND */ void do_ostat( Character *ch, char *argument )
 {
@@ -1052,116 +1151,30 @@ CMDWIZP( stat )
                 ch->send_to("'\n\r");
         }
 
+    ostringstream ostr;
     for (auto &paf: obj->affected)
-    {
-        sprintf( buf, "Изменяет %s на %d, уровень %d",
-            apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
-        ch->send_to(buf);
-        if ( paf->duration > -1)
-            sprintf(buf,", %d часов.\n\r",paf->duration);
-        else
-            sprintf(buf,".\n\r");
-        ch->send_to(buf);
-        if (paf->bitvector)
-        {
-            switch(paf->where)
-            {
-                case TO_AFFECTS:
-                    sprintf(buf,"Дает аффект %s.\n",
-                        affect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_WEAPON:
-                    sprintf(buf,"Добавляет флаги оружия %s.\n",
-                        weapon_type2.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_OBJECT:
-                    sprintf(buf,"Добавляет флаги объекта %s.\n",
-                        extra_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_IMMUNE:
-                    sprintf(buf,"Дает иммунитет к %s.\n",
-                        imm_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_RESIST:
-                    sprintf(buf,"Дает сопротивляемость к %s.\n\r",
-                        res_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_VULN:
-                    sprintf(buf,"Дает уязвимость к %s.\n\r",
-                        vuln_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_DETECTS:
-                    sprintf(buf,"Дает обнаружение %s.\n\r",
-                        detect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                default:
-                    sprintf(buf,"Неизвестный битовый флаг %d: %d\n\r",
-                        paf->where,paf->bitvector);
-                    break;
-            }
-            ch->send_to(buf);
-        }
-    }
+        format_affect(paf, ostr);
 
     if (!obj->enchanted)
-    for (auto &paf: obj->pIndexData->affected)
-    {
-        sprintf( buf, "Изменяет %s на %d, уровень %d.\n\r",
-            apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
+        for (auto &paf: obj->pIndexData->affected)
+            format_affect(paf, ostr);
+
+    ch->send_to(ostr);
+
+    sprintf(buf,"Состояние : %d (%s) ", obj->condition, obj->get_cond_alias() );        
+    ch->send_to(buf);
+    
+    if (obj->behavior) {
+        ostringstream ostr;
+        
+        sprintf(buf, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
         ch->send_to(buf);
-        if (paf->bitvector)
-        {
-            switch(paf->where)
-            {
-                case TO_AFFECTS:
-                    sprintf(buf,"Дает аффект %s.\n",
-                        affect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_OBJECT:
-                    sprintf(buf,"Добавляет флаги объекта %s.\n",
-                        extra_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_IMMUNE:
-                    sprintf(buf,"Дает иммунитет к %s.\n",
-                        imm_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_RESIST:
-                    sprintf(buf,"Дает сопротивляемость к %s.\n\r",
-                        res_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_VULN:
-                    sprintf(buf,"Дает уязвимость к %s.\n\r",
-                        vuln_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_DETECTS:
-                    sprintf(buf,"Дает обнаружение %s.\n\r",
-                        detect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                default:
-                    sprintf(buf,"Неизвестный битовый флаг %d: %d\n\r",
-                        paf->where,paf->bitvector);
-                    break;
-            }
-            ch->send_to(buf);
-        }
+
+        obj->behavior.toStream( ostr );
+        ch->send_to( ostr );
     }
 
-        sprintf(buf,"Состояние : %d (%s) ", obj->condition,
-        obj->get_cond_alias() );        
-        ch->send_to(buf);
-        
-        if (obj->behavior) {
-            ostringstream ostr;
-            
-            sprintf(buf, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
-            ch->send_to(buf);
-
-            obj->behavior.toStream( ostr );
-            ch->send_to( ostr );
-        }
-
-        ch->send_to("\n\r");
-        return;
+    ch->send_to("\n\r");
 }
 
 
@@ -1346,48 +1359,9 @@ static bool has_nopost(Character *ch)
         if (spec_fun_name != 0)
             buf << "Спец-процедура " << spec_fun_name << "." << endl;
     }
-    
-    for (auto &paf: victim->affected) {
-        buf << "Аффект: '" << paf->type->getName( ) << "', ";
 
-        if (paf->location != APPLY_NONE)
-            buf << "изменяет " << apply_flags.name( paf->location ) << " "
-                << "на " << paf->modifier << ", ";
-                
-        if (paf->bitvector != 0) {
-            const FlagTable *table = 0;
-            switch(paf->where) {
-            case TO_AFFECTS: table = &affect_flags; break;
-            case TO_IMMUNE: 
-            case TO_RESIST:
-            case TO_VULN:    table = &imm_flags; break;
-            case TO_DETECTS: table = &detect_flags; break;
-            }
-
-            if (table)
-                buf << "adds '" << table->names( paf->bitvector ) << "' "
-                    << "to " << affwhere_flags.name( paf->where ) << ", ";
-        }
-
-        if (!paf->global.empty( )) {
-            switch(paf->where) {
-            case TO_LIQUIDS:   buf << "smell of " << paf->global.toString( ) << ", "; break;
-            case TO_LOCATIONS: buf << "no rib "   << paf->global.toString( ) << ", "; break;
-            case TO_SKILLS:    
-                buf << "skill " << (paf->location == APPLY_LEVEL ? "level" : "learned")
-                    << " " << paf->global.toString() << " by " << paf->modifier << ", "; 
-                break;
-            case TO_SKILL_GROUPS:    
-                buf << "skill group " << (paf->location == APPLY_LEVEL ? "level" : "learned")
-                    << " " << paf->global.toString() << " by " << paf->modifier << ", "; 
-                break;
-            }
-        }
-             
-        
-        buf << "for " << paf->duration << " hours, level " << paf->level << endl;
-    }
-
+    for (auto &paf: victim->affected)
+        format_affect(paf, buf);
         
     if (pc) {
         if (pc->getLastAccessTime( ).getTime( ) != 0)
@@ -3803,36 +3777,6 @@ CMDWIZP( merchant )
         sprintf(buf,"Состояние всемирного банка : {Y%ld gold{x\n\r",
                 dreamland->getBalanceMerchantBank());
         ch->send_to(buf);
-}
-
-
-extern int nHitString, sHitString, nDups, sDups;
-
-extern int memAllocCount, memAllocSize;
-
-CMDWIZP( memory )
-{
-    char buf[MAX_STRING_LENGTH];
-
-    sprintf( buf, "Affects %5d\n\r", top_affect    ); ch->send_to(buf);
-    sprintf( buf, "Areas   %5d\n\r", top_area      ); ch->send_to(buf);
-    sprintf( buf, "ExDes   %5d\n\r", top_ed        ); ch->send_to(buf);
-    sprintf( buf, "Exits   %5d\n\r", top_exit      ); ch->send_to(buf);
-    sprintf( buf, "Helps   %5ld\n\r", helpManager->getArticles( ).size( ) ); ch->send_to(buf);
-    sprintf( buf, "Mobs    %5d(%d new format)\n\r", top_mob_index,newmobs );
-    ch->send_to(buf);
-    sprintf( buf, "(in use)%5d\n\r", mobile_count  ); ch->send_to(buf);
-    sprintf( buf, "Objs    %5d(%d new format)\n\r", top_obj_index,newobjs );
-    ch->send_to(buf);
-    sprintf( buf, "Resets  %5d\n\r", top_reset     ); ch->send_to(buf);
-    sprintf( buf, "Rooms   %5d\n\r", top_room      ); ch->send_to(buf);
-
-    sprintf( buf, "Allocs  %5d calls   of %7d bytes.\n\r",
-        memAllocCount, memAllocSize);
-    ch->send_to(buf);
-    sprintf( buf, "Perms   %5d blocks  of %7d bytes.\n\r",
-        nAllocPerm, sAllocPerm );
-    ch->send_to(buf);
 }
 
 

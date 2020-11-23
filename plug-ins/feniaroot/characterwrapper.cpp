@@ -1655,14 +1655,12 @@ NMI_INVOKE( CharacterWrapper, affectAdd, "(.Affect): повесить новый
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
 
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
 
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_to_char( target, &af );
+    affect_to_char( target, &(aw->getTarget()) );
 
     return Register( );
 }
@@ -1671,14 +1669,12 @@ NMI_INVOKE( CharacterWrapper, affectJoin, "(.Affect): повесить новы�
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
 
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
 
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_join( target, &af );
+    affect_join( target, &(aw->getTarget()) );
 
     return Register( );
 }
@@ -1692,9 +1688,10 @@ NMI_INVOKE( CharacterWrapper, affectBitStrip, "(where,bit): снять все а
     if (args.size( ) != 2)
         throw Scripting::NotEnoughArgumentsException( );
     
+    // FIXME: change affectBitStrip in existing codesources.
     where = args.front( ).toNumber( );
     bits = args.back( ).toNumber( );
-    affect_bit_strip( target, where, bits );
+    affect_bit_strip( target, &affect_flags, bits );
     return Register( ); 
 }
 
@@ -1780,7 +1777,6 @@ NMI_INVOKE( CharacterWrapper, addDarkShroud, "(): повесить темную 
     
     checkTarget( );
 
-    af.where     = TO_AFFECTS;
     af.type      = gsn_dark_shroud;
     af.level     = target->getRealLevel( );
     af.duration  = -1;
@@ -1997,11 +1993,11 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
     victim->add_follower( target );
     victim->leader = target;
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = gsn_charm_person;
     af.level     = target->getRealLevel( );
     af.duration  = duration;
-    af.bitvector = AFF_CHARM;
+    af.bitvector.setValue(AFF_CHARM);
     affect_to_char( victim, &af );
 
     return Register( );

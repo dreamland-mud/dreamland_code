@@ -114,13 +114,13 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level         = level;
     af.duration  = 10 + level / 5;
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     af.modifier  = 2 * level;
-    af.bitvector = AFF_FAERIE_FIRE;
+    af.bitvector.setValue(AFF_FAERIE_FIRE);
     affect_to_char( victim, &af );
     victim->send_to("Тебя окружает {MРозовая аура{x.\n\r");
     act_p( "$c4 окружает {MРозовая аура{x.",

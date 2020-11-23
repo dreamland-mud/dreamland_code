@@ -1039,13 +1039,13 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         act_p( msgCharBlind, ch, 0, victim, TO_CHAR,POS_RESTING);
         if ( !IS_AFFECTED(victim,AFF_BLIND) )
         {
-            baf.where    = TO_AFFECTS;
+            baf.bitvector.setTable(&affect_flags);
             baf.type     = gsn_critical_strike;
             baf.level    = ch->getModifyLevel();
-            baf.location     = APPLY_HITROLL;
+            baf.location = APPLY_HITROLL;
             baf.modifier     = -1 * ch->getModifyLevel() / 10;
             baf.duration     = number_range(1,5);
-            baf.bitvector    = AFF_BLIND;
+            baf.bitvector.setValue(AFF_BLIND);
             affect_to_char( victim, &baf );
         }
         dam += dam * number_range( 1, 2 );  // +100-200% damage          
@@ -1412,7 +1412,6 @@ void UndefinedOneHit::damEffectSlice( )
     act( "Твоя отрубленная рука падает на землю.", victim, 0, 0, TO_CHAR );
 
     /* affect */
-    af.where = TO_LOCATIONS;
     af.type  = gsn_slice;
     af.level = ch->getModifyLevel( );
     af.duration = timer;

@@ -29,6 +29,7 @@ public:
     virtual ~Liquid( );
 
     virtual const DLString &getName( ) const;
+    virtual const DLString &getRussianName( ) const;
     virtual bool isValid( ) const;
     
     virtual const DLString &getShortDescr( ) const;

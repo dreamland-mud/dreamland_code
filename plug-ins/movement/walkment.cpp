@@ -556,7 +556,7 @@ bool Walkment::applyWeb( Character *wch )
         chance *= 2;
 
     if (number_percent( ) < chance) {
-        affect_bit_strip(wch, TO_DETECTS, ADET_WEB);
+        affect_bit_strip(wch, &detect_flags, ADET_WEB);
         affect_strip(wch, gsn_web);
         msgSelfRoom( wch,
                      "Ты разрываешь сети, которые мешали тебе покинуть это место.",

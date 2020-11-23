@@ -91,6 +91,19 @@ Room * RoomIndexData::create()
 }
 
 
+static int zero;
+
+static int & room_flag_by_table(Room *room, const FlagTable *table)
+{
+    if (table == &raffect_flags)
+        return room->affected_by;
+    else if (table == &room_flags)
+        return room->room_flags;
+
+    return zero;
+}
+
+
 /*
  * Apply or remove an affect to a room.
  */
@@ -100,40 +113,22 @@ void Room::affectModify( Affect *paf, bool fAdd )
 
     mod = paf->modifier;
 
-    if ( fAdd )
+    if (fAdd)
     {
-        switch (paf->where)
-        {
-        case TO_ROOM_AFFECTS:
-              SET_BIT(affected_by, paf->bitvector);
-            break;
-        case TO_ROOM_FLAGS:
-              SET_BIT(room_flags, paf->bitvector);
-            break;
-        case TO_ROOM_CONST:
-            break;
-        }
+        int &flag = room_flag_by_table(this, paf->bitvector.getTable());
+        SET_BIT(flag, paf->bitvector.getValue());
     }
     else
     {
-        switch (paf->where)
-        {
-        case TO_ROOM_AFFECTS:
-              REMOVE_BIT(affected_by, paf->bitvector);
-            break;
-        case TO_ROOM_FLAGS:
-              REMOVE_BIT(room_flags, paf->bitvector);
-            break;
-        case TO_ROOM_CONST:
-            break;
-        }
+        int &flag = room_flag_by_table(this, paf->bitvector.getTable());
+        REMOVE_BIT(flag, paf->bitvector.getValue());
         mod = 0 - mod;
     }
 
     switch ( paf->location )
     {
     default:
-        bug( "Affect_modify_room: unknown location %d.", paf->location );
+        bug( "Affect_modify_room: unknown location %d.", paf->location.getValue() );
         return;
 
     case APPLY_ROOM_NONE:                                        break;
@@ -156,27 +151,16 @@ void Room::affectTo( Affect *paf )
     affectModify( paf, true );
 }
 
-void Room::affectCheck( int where, int vector )
+void Room::affectCheck( const FlagTable *table, int vector )
 {
     if (vector == 0)
         return;
 
+    int &flag = room_flag_by_table(this, table);
+
     for (auto &paf: affected)
-        if (paf->where == where && paf->bitvector == vector)
-        {
-            switch (where)
-            {
-                case TO_ROOM_AFFECTS:
-                    SET_BIT(affected_by,vector);
-                    break;
-                case TO_ROOM_FLAGS:
-                    SET_BIT(room_flags, vector);
-                    break;
-                case TO_ROOM_CONST:
-                    break;
-            }
-            return;
-        }
+        if (paf->bitvector.getTable() == table && paf->bitvector.isSet(vector))
+            SET_BIT(flag, vector);
 }
 
 /*
@@ -184,9 +168,6 @@ void Room::affectCheck( int where, int vector )
  */
 void Room::affectRemove( Affect *paf )
 {
-    int where;
-    int vector;
-
     if (affected.empty())
     {
         bug( "Affect_remove_room: no affect.", 0 );
@@ -194,16 +175,15 @@ void Room::affectRemove( Affect *paf )
     }
 
     affectModify( paf, false );
-    where = paf->where;
-    vector = paf->bitvector;
 
     affected.remove(paf);
-    ddeallocate( paf );
 
-    affectCheck( where, vector );
+    affectCheck(paf->bitvector.getTable(), paf->bitvector.getValue());
 
     if (affected.empty())
         roomAffected.erase(this);
+
+    ddeallocate( paf );
 }
 
 /*

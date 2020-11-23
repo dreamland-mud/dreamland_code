@@ -304,12 +304,10 @@ VOID_SPELL(Dragonplate)::run(Character *ch, char *target_name, int sn, int level
     plate->cost = 0;
     plate->level = ch->getRealLevel();
 
-    af.where = TO_OBJECT;
     af.type = sn;
     af.level = level;
     af.duration = -1;
     af.modifier = ch->applyCurse(level / 8);
-    af.bitvector = 0;
 
     af.location = APPLY_HITROLL;
     affect_to_obj(plate, &af);
@@ -440,32 +438,20 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
             continue;
         }
 
-        af.where = TO_AFFECTS;
         af.type = sn;
         af.level = level;
         af.duration = 6 + level;
-        af.modifier = 0;
-        af.location = APPLY_NONE;
-        af.bitvector = AFF_PROTECT_EVIL;
-        if (!IS_AFFECTED(vch, AFF_PROTECT_EVIL))
-            affect_to_char(vch, &af);
 
+        af.bitvector.setTable(&affect_flags);
+        af.bitvector.setValue(AFF_PROTECT_EVIL);        
         af.modifier = ch->applyCurse(level / 8);
         af.location = APPLY_HITROLL;
-        af.bitvector = 0;
         affect_to_char(vch, &af);
 
+        af.bitvector.setTable(&detect_flags);
+        af.bitvector.setValue(DETECT_FADE|DETECT_EVIL);
         af.modifier = ch->applyCurse(0 - level / 8);
         af.location = APPLY_SAVING_SPELL;
-        affect_to_char(vch, &af);
-
-        af.where = TO_DETECTS;
-        af.modifier = ch->applyCurse(level / 8);
-        af.location = APPLY_NONE;
-        af.bitvector = DETECT_FADE;
-        affect_to_char(vch, &af);
-
-        af.bitvector = DETECT_EVIL;
         affect_to_char(vch, &af);
 
         vch->send_to("{YЗолотая аура{x окружает тебя.\n\r");
@@ -485,13 +471,11 @@ VOID_SPELL(HolyArmor)::run(Character *ch, Character *, int sn, int level)
         return;
     }
 
-    af.where = TO_AFFECTS;
     af.type = sn;
     af.level = level;
     af.duration = level;
     af.location = APPLY_AC;
     af.modifier = ch->applyCurse(-max(10, 10 * (level / 5)));
-    af.bitvector = 0;
     affect_to_char(ch, &af);
     act_p("Священные силы защищают $c4 от повреждений.",
           ch, 0, 0, TO_ROOM, POS_RESTING);

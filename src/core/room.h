@@ -107,7 +107,7 @@ public:
     void affectModify( Affect *paf, bool fAdd );
     void affectTo( Affect *paf );
     void affectJoin( Affect *paf );
-    void affectCheck( int where, int vector );
+    void affectCheck( const FlagTable *table, int vector );
     void affectRemove( Affect *paf );
     void affectStrip( int sn );
     bool isAffected( int sn ) const;

@@ -41,22 +41,18 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
     staff->value1(4 + level / 15);
     staff->value2(4 + level / 15);
 
-    tohit.where                   = TO_OBJECT;
     tohit.type               = sn;
     tohit.level              = ch->getModifyLevel();
     tohit.duration           = -1;
-    tohit.location           = APPLY_HITROLL;
+    tohit.location = APPLY_HITROLL;
     tohit.modifier           = 2 + level/5;
-    tohit.bitvector          = 0;
     affect_to_obj( staff, &tohit);
 
-    todam.where                   = TO_OBJECT;
     todam.type               = sn;
     todam.level              = ch->getModifyLevel();
     todam.duration           = -1;
-    todam.location           = APPLY_DAMROLL;
+    todam.location = APPLY_DAMROLL;
     todam.modifier           = 2 + level/5;
-    todam.bitvector          = 0;
     affect_to_obj( staff, &todam);
 
     staff->timer = level;

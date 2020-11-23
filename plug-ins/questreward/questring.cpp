@@ -39,10 +39,8 @@ void QuestRing::equip( Character *ch )
 
         Affect af;
 
-        af.where = TO_OBJECT;
         af.type  = -1;
         af.duration = -1;
-        af.bitvector = 0;
 
         for (int i = 0; applies[i] != -1; i++) {
             af.location = applies[i];

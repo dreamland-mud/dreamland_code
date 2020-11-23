@@ -206,9 +206,6 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
         af.type    = sn;
         af.level   = level;
         af.duration = level / 20;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = 0;
         affect_to_char(victim, &af );
         if (ch != victim)
             act_p("Ты создаешь экран Магической Силы вокруг $C2.", ch, 0, victim, TO_CHAR,POS_RESTING);
@@ -218,9 +215,6 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
         af.type        = sn;
         af.level    = level;
         af.duration = level / 15;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = 0;
         affect_join( victim, &af );
 
         victim->send_to("Магическая Сила полностью изолирует тебя от внешнего мира.\n\r");
@@ -246,13 +240,13 @@ VOID_SPELL(ShockingTrap)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
 
-    af.where     = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = level / 40;
-    af.location  = APPLY_NONE;
+    
     af.modifier  = 0;
-    af.bitvector = AFF_ROOM_SHOCKING;
+    af.bitvector.setValue(AFF_ROOM_SHOCKING);
     room->affectTo( &af );
 
     postaffect_to_char( ch, sn, level / 10 );
@@ -304,13 +298,11 @@ VOID_SPELL(WitchCurse)::run( Character *ch, Character *victim, int sn, int level
 
     ch->hit -=(2 * level);
 
-    af.where                = TO_AFFECTS;
     af.type             = gsn_witch_curse;
     af.level            = level;
     af.duration         = 24;
-    af.location         = APPLY_HIT;
+    af.location = APPLY_HIT;
     af.modifier         = - level;
-    af.bitvector        = 0;
     affect_to_char(victim,&af);
 
     act("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_CHAR);
@@ -332,13 +324,12 @@ VOID_AFFECT(WitchCurse)::update( Character *ch, Affect *paf )
     if (paf->level <= 1)
         return;
 
-    witch.where = paf->where;
     witch.type  = paf->type;
     witch.level = paf->level;
     witch.duration = paf->duration;
+    witch.location.setTable(paf->location.getTable());
     witch.location = paf->location;
     witch.modifier = paf->modifier * 2;
-    witch.bitvector = 0;
 
     affect_remove(ch, paf);
     affect_to_char( ch ,&witch);
@@ -368,13 +359,13 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
 
-    af.where     = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = level / 40;
-    af.location  = APPLY_NONE;
+    
     af.modifier  = 0;
-    af.bitvector = AFF_ROOM_L_SHIELD;
+    af.bitvector.setValue(AFF_ROOM_L_SHIELD);
     room->affectTo( &af );
 
     postaffect_to_char( ch, sn, level / 10 );
@@ -467,15 +458,15 @@ void EnergyShield::equip( Character *ch )
     if (ch->isAffected(gsn_make_shield))
         return;
 
-    af.where = TO_RESIST;
+    af.bitvector.setTable(&res_flags);
     af.type = gsn_make_shield;
     af.duration = -2;
     af.level = ch->getModifyLevel();
 
     if (isColdShield( ))
-        af.bitvector = RES_COLD;
+        af.bitvector.setValue(RES_COLD);
     else if (isFireShield( )) 
-        af.bitvector = RES_FIRE;
+        af.bitvector.setValue(RES_FIRE);
     else
         return;
    

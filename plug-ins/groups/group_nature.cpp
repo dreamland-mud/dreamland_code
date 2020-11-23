@@ -111,11 +111,11 @@ SKILL_RUNP( tame )
         ch->add_follower( victim );
         victim->leader = ch;
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = gsn_tame;
         af.level     = ch->getModifyLevel( );
         af.duration  = -1;
-        af.bitvector = AFF_CHARM;
+        af.bitvector.setValue(AFF_CHARM);
         affect_to_char( victim, &af );
         
         act("$C1 теперь полностью подчиняется твоей воле.", ch, 0, victim, TO_CHAR);
@@ -285,7 +285,6 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     todex.duration = level / 10;
     todex.location = APPLY_DEX;
     todex.modifier = -1;
-    todex.bitvector = 0;
     affect_join( victim, &todex);
 
     damage_nocatch(ch, victim, ch->getModifyLevel(), gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);

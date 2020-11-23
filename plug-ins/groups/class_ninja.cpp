@@ -535,13 +535,11 @@ BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
     mod = -1 * (level/20 + skill/20 + 1);
     
     Affect af;
-    af.where    = TO_AFFECTS;
     af.type     = gsn_nerve;
     af.level    = level;
     af.duration = level / 20;
     af.location = APPLY_STR;
     af.modifier = mod;
-    af.bitvector = 0;
 
     affect_to_char(victim,&af);
     return true;
@@ -600,13 +598,11 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 {      
     Affect af;
 
-    af.where         = TO_AFFECTS;
     af.type         = gsn_endure;
     af.level         = ch->getModifyLevel();
     af.duration   = ch->getModifyLevel() / 4;
     af.location = APPLY_SAVING_SPELL;
     af.modifier = modifier;    
-    af.bitvector = 0;
 
     affect_to_char(ch,&af);
 
@@ -1050,22 +1046,18 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
         if (!victim->isAffected(gsn_caltraps)) {
             Affect tohit,todam,todex;
 
-            tohit.where     = TO_AFFECTS;
             tohit.type      = gsn_caltraps;
             tohit.level     = level;
             tohit.duration  = -1;
-            tohit.location  = APPLY_HITROLL;
+            tohit.location = APPLY_HITROLL;
             tohit.modifier  = mod;
-            tohit.bitvector = 0;
             affect_to_char( victim, &tohit );
 
-            todam.where = TO_AFFECTS;
             todam.type = gsn_caltraps;
             todam.level = level;
             todam.duration = -1;
             todam.location = APPLY_DAMROLL;
             todam.modifier = mod;
-            todam.bitvector = 0;
             affect_to_char( victim, &todam);
 
             todex.type = gsn_caltraps;
@@ -1073,7 +1065,6 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             todex.duration = -1;
             todex.location = APPLY_DEX;
             todex.modifier = mod/2;
-            todex.bitvector = 0;
             affect_to_char( victim, &todex);
 
             act_p("Острые шипы вонзаются в ступни $C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1527,12 +1518,10 @@ SKILL_RUNP( strangle )
                 gsn_strangle->improve( ch, true, victim );
         
                 af.type = gsn_strangle;
-                af.where = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.level = ch->getModifyLevel();
                 af.duration = ch->getModifyLevel() / 50 + 1;
-                af.location = APPLY_NONE;
-                af.modifier = 0;
-                af.bitvector = AFF_SLEEP;
+                af.bitvector.setValue(AFF_SLEEP);
                 affect_join ( victim,&af );
                 
                 set_violent( ch, victim, true );

@@ -67,16 +67,14 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
         return;
     }
 
-    af.where        = TO_AFFECTS;
     af.type         = sn;
     af.level        = level;
     af.duration     = 5 + level/2;
-    af.location     = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     af.modifier     = (level / 8) * strength;
-    af.bitvector    = 0;
     affect_to_char(victim, &af);
 
-    af.location     = APPLY_SAVING_SPELL;
+    af.location = APPLY_SAVING_SPELL;
     af.modifier     = 0 - (level / 8) * strength;
     affect_to_char(victim, &af);
 
@@ -110,7 +108,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
         Affect *paf;
 
         paf = obj->affected.find(gsn_curse);
-        if (!savesDispel(level,paf != 0 ? paf->level : obj->level,0))
+        if (!savesDispel(level,paf != 0 ? (int)paf->level : obj->level,0))
         {
             if (paf != 0)
                 affect_remove_obj( obj, paf);
@@ -128,26 +126,26 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
     // let's check, may be a permanet affect
     if (number_percent() < level/4 )
     {  // permanet
-      af.where        = TO_OBJECT;
+      af.bitvector.setTable(&extra_flags);
       af.type                = sn;
       af.level        = level;
       af.duration        = -1;
-      af.location        = APPLY_SAVES;
+      af.location = APPLY_SAVES;
       af.modifier        = -1;
-      af.bitvector        = ITEM_BLESS;
+      af.bitvector.setValue(ITEM_BLESS);
       affect_to_obj( obj, &af);
             act_p("$o1 начинает светиться ровным голубым светом.",
             ch,obj,0,TO_ALL,POS_RESTING);
     }
     else // not a permanent effect
     {
-      af.where                = TO_OBJECT;
+      af.bitvector.setTable(&extra_flags);
       af.type                = sn;
       af.level                = level;
       af.duration        = (6 + level / 2);
-      af.location        = APPLY_SAVES;
+      af.location = APPLY_SAVES;
       af.modifier        = ch->isAffected( gsn_inspiration ) ? -3 : -1;
-      af.bitvector        = ITEM_BLESS;
+      af.bitvector.setValue(ITEM_BLESS);
       affect_to_obj( obj, &af);
       act_p("Священная аура окружает $o4.",ch,obj,0,TO_ALL,POS_RESTING);
     }
@@ -167,16 +165,14 @@ VOID_SPELL(Bless)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where     = TO_AFFECTS;
     af.type      = sn;
     af.level         = level;
     af.duration  = (6 + level / 2);
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     af.modifier  = level / 8;
-    af.bitvector = 0;
     affect_to_char( victim, &af );
 
-    af.location  = APPLY_SAVING_SPELL;
+    af.location = APPLY_SAVING_SPELL;
     af.modifier  = 0 - level / 8;
     affect_to_char( victim, &af );
     victim->send_to("Ты чувствуешь божественное благословение.\n\r");
@@ -235,7 +231,6 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
               stop_fighting(vch,false);
 
 
-            af.where = TO_AFFECTS;
             af.type = sn;
             af.level = level;
             af.duration = level/4;
@@ -244,9 +239,10 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
               af.modifier = -5;
             else
               af.modifier = -2;
-            af.bitvector = AFF_CALM;
             affect_to_char(vch,&af);
 
+            af.bitvector.setTable(&affect_flags);
+            af.bitvector.setValue(AFF_CALM);
             af.location = APPLY_DAMROLL;
             affect_to_char(vch,&af);
             
@@ -292,21 +288,19 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where     = TO_AFFECTS;
     af.type          = sn;
     af.level         = level;
     af.duration         = level / 3;
-    af.modifier  = level / 6;
-    af.bitvector = 0;
 
-    af.location  = APPLY_HITROLL;
+    af.modifier  = level / 6;
+    af.location = APPLY_HITROLL;
     affect_to_char(victim,&af);
 
-    af.location  = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_to_char(victim,&af);
 
     af.modifier  = 10 * (level / 12);
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     affect_to_char(victim,&af);
 
     victim->send_to("Дикая ярость наполняет тебя!\n\r");
@@ -331,11 +325,10 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
             continue;
 
         if( !gch->isAffected(gsn_armor ) ) {
-            af.where     = TO_AFFECTS;
             af.type      = gsn_armor;
             af.level     = level;
             af.duration  = level;
-            af.location  = APPLY_AC;
+            af.location = APPLY_AC;
             af.modifier  = -20;
             affect_to_char( gch, &af );
 
@@ -358,11 +351,10 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
           continue;
         }
 
-        af.where     = TO_AFFECTS;
         af.type      = gsn_shield;
         af.level     = level;
         af.duration  = level;
-        af.location  = APPLY_AC;
+        af.location = APPLY_AC;
         af.modifier   = -20;
         affect_to_char( gch, &af );
 
@@ -376,7 +368,7 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
 SPELL_DECL(HealingLight);
 VOID_SPELL(HealingLight)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Affect af,af2;
+    Affect af;
 
     if ( room->isAffected( sn ))
     {
@@ -384,28 +376,18 @@ VOID_SPELL(HealingLight)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
 
-    af.where     = TO_ROOM_CONST;
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 25;
-    af.location  = APPLY_ROOM_HEAL;
+    af.location.setTable(&apply_room_table);
+    af.location = APPLY_ROOM_HEAL;
     af.modifier  = level;
-    af.bitvector = 0;
     room->affectTo( &af );
 
-    af2.where     = TO_AFFECTS;
-    af2.type      = sn;
-    af2.level         = level;
-    af2.duration  = level / 10;
-    af2.modifier  = 0;
-    af2.location  = APPLY_NONE;
-    af2.bitvector = 0;
-    affect_to_char( ch, &af2 );
+    postaffect_to_char(ch, sn, level / 10);
     ch->send_to("Комната освещается излечивающим светом.\n\r");
     act_p("$c1 освещает комнату излечивающим светом.",
            ch,0,0,TO_ROOM,POS_RESTING);
-    return;
-
 }
 
 AFFECT_DECL(HealingLight);
@@ -530,16 +512,15 @@ VOID_SPELL(Inspire)::run( Character *ch, Room *room, int sn, int level )
               continue;
             }
 
-            af.where     = TO_AFFECTS;
             af.type      = sn;
             af.level     = level;
             af.duration  = 6 + level;
-            af.location  = APPLY_HITROLL;
+
+            af.location = APPLY_HITROLL;
             af.modifier  = level/12;
-            af.bitvector = 0;
             affect_to_char( gch, &af );
 
-            af.location  = APPLY_SAVING_SPELL;
+            af.location = APPLY_SAVING_SPELL;
             af.modifier  = 0 - level/12;
             affect_to_char( gch, &af );
 
@@ -729,16 +710,16 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
 
     if (!IS_AFFECTED(victim, AFF_CURSE) && !saves_spell( level, victim, DAM_HOLY, ch, DAMF_SPELL ) )
     {
-        af.where         = TO_AFFECTS;
         af.type      = sn;
         af.level     = level;
         af.duration  = 2*level;
-        af.location  = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         af.modifier  = -1 * (level / 8);
-        af.bitvector = AFF_CURSE;
         affect_to_char( victim, &af );
 
-        af.location  = APPLY_SAVING_SPELL;
+        af.bitvector.setTable(&affect_flags);
+        af.bitvector.setValue(AFF_CURSE);
+        af.location = APPLY_SAVING_SPELL;
         af.modifier  = level / 8;
         affect_to_char( victim, &af );
 

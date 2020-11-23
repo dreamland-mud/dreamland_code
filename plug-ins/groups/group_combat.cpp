@@ -160,13 +160,11 @@ VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level
     {
         act_p("$c1 замерзает от ледяного прикосновения.",
                victim,0,0,TO_ROOM,POS_RESTING);
-        af.where     = TO_AFFECTS;
         af.type      = sn;
         af.level     = level;
         af.duration  = 6;
-        af.location  = APPLY_STR;
+        af.location = APPLY_STR;
         af.modifier  = -1;
-        af.bitvector = 0;
         affect_join( victim, &af );
     }
     else
@@ -485,13 +483,13 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
     }
     else {
         if ( (number_percent() < chance) && (!victim->isAffected(gsn_weaken)) ) {
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_weaken;
             af.level     = level;
             af.duration  = (4 + level / 12);
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1 * (2 + level / 12);
-            af.bitvector = AFF_WEAKEN;
+            af.bitvector.setValue(AFF_WEAKEN);
             affect_to_char( victim, &af );
             victim->send_to("Ты чувствуешь, как {Dтемная магия{x отнимает у тебя последние силы!\n\r");
             act_p("$c1 слабеет на глазах.",victim,0,0,TO_ROOM,POS_RESTING);            

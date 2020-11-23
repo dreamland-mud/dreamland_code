@@ -35,10 +35,8 @@ void QuestWeapon::equip( Character *ch )
     } else {
       Affect af;
 
-      af.where = TO_OBJECT;
       af.type  = -1;
       af.duration = -1;
-      af.bitvector = 0;
 
       if( !IS_GOOD( ch ) ) {
         af.location = APPLY_STR;

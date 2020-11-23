@@ -648,14 +648,12 @@ NMI_INVOKE( ObjectWrapper, affectAdd, "(aff): повесить на предме
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
     
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
     
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_to_obj( target, &af );
+    affect_to_obj( target, &(aw->getTarget()) );
 
     return Register( );
 }
@@ -664,14 +662,12 @@ NMI_INVOKE( ObjectWrapper, affectJoin, "(aff): усилить существую
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
     
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
     
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_enhance( target, &af );
+    affect_enhance( target, &(aw->getTarget()) );
 
     return Register( );
 }

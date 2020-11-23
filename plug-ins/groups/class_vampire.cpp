@@ -154,13 +154,13 @@ void VampiricBiteOneHit::postDamageEffects( )
     Affect af;
     int level = ch->getModifyLevel();
     if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
-    	af.where     = TO_AFFECTS;
+    	af.bitvector.setTable(&affect_flags);
     	af.type      = gsn_corruption;
    	    af.level     = level;
     	af.duration  = level / 10;
-    	af.location  = APPLY_HITROLL;
+    	af.location = APPLY_HITROLL;
     	af.modifier  = - (level / 10);
-    	af.bitvector = AFF_CORRUPTION;
+    	af.bitvector.setValue(AFF_CORRUPTION);
         affect_join( victim, &af );	
 	    
     	act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
@@ -453,38 +453,38 @@ SKILL_RUNP( vampire )
         af.duration  = duration;
 
         /* giant strength + negative, charm immunity */
-        af.where     = TO_IMMUNE;
-        af.location  = APPLY_STR;
+        af.bitvector.setTable(&imm_flags);
+        af.location = APPLY_STR;
         af.modifier  = 1 + (level / 20);
-        af.bitvector = IMM_NEGATIVE | IMM_CHARM;
+        af.bitvector.setValue(IMM_NEGATIVE | IMM_CHARM);
         affect_to_char( ch, &af );
 
         /* haste + dex, infrared, berserk, sneak */
-        af.where     = TO_AFFECTS;
-        af.location  = APPLY_DEX;
+        af.bitvector.setTable(&affect_flags);
+        af.location = APPLY_DEX;
         af.modifier  = 1 + (level /20);
-        af.bitvector = AFF_HASTE | AFF_INFRARED|AFF_BERSERK|AFF_SNEAK;
+        af.bitvector.setValue(AFF_HASTE | AFF_INFRARED|AFF_BERSERK|AFF_SNEAK);
         affect_to_char( ch, &af );
 
         /* size + vuln light, holy */
-        af.where     = TO_VULN;
-        af.location  = APPLY_SIZE;
+        af.bitvector.setTable(&vuln_flags);
+        af.location = APPLY_SIZE;
         af.modifier  = 1 + (level / 50 );
-        af.bitvector = VULN_LIGHT | VULN_HOLY;
+        af.bitvector.setValue(VULN_LIGHT | VULN_HOLY);
         affect_to_char( ch, &af );
 
         /* damroll + resist cold, lighting */
-        af.where     = TO_RESIST;
-        af.location  = APPLY_DAMROLL;
+        af.bitvector.setTable(&res_flags);
+        af.location = APPLY_DAMROLL;
         af.modifier  = ch->damroll * 4 / 3;
-        af.bitvector = RES_COLD | RES_LIGHTNING;
+        af.bitvector.setValue(RES_COLD | RES_LIGHTNING);
         affect_to_char( ch, &af );
 
         /* vampire flag */
-        af.where     = TO_ACT_FLAG;
-        af.location  = APPLY_NONE;
+        af.bitvector.setTable(&plr_flags);
+        af.location = APPLY_NONE;
         af.modifier  = 0;
-        af.bitvector = PLR_VAMPIRE;
+        af.bitvector.setValue(PLR_VAMPIRE);
         affect_to_char( ch, &af );
 
 	ch->pecho( "Превращаясь в кровожадн%1$Gого|ого|ую вампир%1$Gа|а|шу, ты чувствуешь прилив силы.", ch );
@@ -566,16 +566,16 @@ void sucking( Character *ch, Character *victim )
         RawDamage( ch, victim, DAM_OTHER, hp_gain ).hit( true );
 
     	// corrupt victim	
-   	Affect af;
+   	    Affect af;
     	int level = ch->getModifyLevel();
     	if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
-    		af.where     = TO_AFFECTS;
+    		af.bitvector.setTable(&affect_flags);
     		af.type      = gsn_corruption;
-   		af.level     = level;
+   		    af.level     = level;
     		af.duration  = level / 10;
-    		af.location  = APPLY_HITROLL;
+    		af.location = APPLY_HITROLL;
     		af.modifier  = - (level / 10);
-    		af.bitvector = AFF_CORRUPTION;
+    		af.bitvector.setValue(AFF_CORRUPTION);
         	affect_join( victim, &af );	
 	    	
 		if (!IS_AWAKE( victim )) {
@@ -940,12 +940,10 @@ SKILL_RUNP( touch )
         gsn_vampiric_touch->improve( ch, true, victim );
 
         af.type = gsn_vampiric_touch;
-        af.where = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.level = ch->getModifyLevel();
         af.duration = ch->getModifyLevel() / 50 + 1;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = AFF_SLEEP;
+        af.bitvector.setValue(AFF_SLEEP);
         affect_join ( victim,&af );
 
         if (IS_AWAKE(victim))
@@ -1180,10 +1178,10 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         af.type = gsn_bonedagger;
         af.level = ch->getModifyLevel( );
         af.duration = 1;
-        af.location = APPLY_NONE;
+        
         af.modifier = 0;
-        af.where = TO_DETECTS;
-        af.bitvector = ADET_WEB;
+        af.bitvector.setTable(&detect_flags);
+        af.bitvector.setValue(ADET_WEB);
         affect_to_char( victim, &af );
         
         bd.hit( );
@@ -1228,13 +1226,13 @@ SKILL_RUNP( sense )
     {
       Affect af;
 
-      af.where  = TO_DETECTS;
+      af.bitvector.setTable(&detect_flags);
       af.type         = gsn_sense_life;
       af.level         = ch->getModifyLevel();
       af.duration = ch->getModifyLevel();
-      af.location = APPLY_NONE;
+      
       af.modifier = 0;
-      af.bitvector = DETECT_LIFE;
+      af.bitvector.setValue(DETECT_LIFE);
       affect_to_char(ch, &af);
 
       ch->mana -= mana;
@@ -1279,13 +1277,10 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
     act_p("На зов $c2 слетается стая летучих мышей и окружает $s живым облаком.", ch, 0, 0, TO_ROOM, POS_RESTING);
     act_p("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR, POS_RESTING);
 
-    af.where            = TO_AFFECTS;
     af.type            = sn;
     af.level            = level;
     af.duration            = 1 + level / 10;
-    af.bitvector    = 0;
-    af.modifier            = 0;
-    af.location            = APPLY_NONE;
+    
     affect_to_char(ch, &af);
 }
 

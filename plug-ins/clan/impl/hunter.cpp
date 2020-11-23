@@ -296,10 +296,8 @@ void HunterArmor::wear( Character *ch )
     else {
         Affect af;
 
-        af.where = TO_OBJECT;
         af.type  = -1;
         af.duration = -1;
-        af.bitvector = 0;
 
         af.location = APPLY_AC;
         addAffect( ch, &af );
@@ -1371,13 +1369,13 @@ struct HunterPitDamage : public Damage {
                 act("Ты чувствуешь, как яд распространяется по твоим венам.", ch, 0, 0, TO_CHAR);
                 act("$c1 отравле$gно|н|на ядом от $o2.", ch, obj, 0, TO_ROOM);
 
-                af.where     = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.type      = gsn_poison;
                 af.level     = obj->level;
                 af.duration  = obj->level / 4;
-                af.location  = APPLY_STR;
+                af.location = APPLY_STR;
                 af.modifier  = max( 1, obj->level / 20 );
-                af.bitvector = AFF_POISON;
+                af.bitvector.setValue(AFF_POISON);
                 affect_join( ch, &af );
             }
         }
@@ -1527,7 +1525,6 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
         return;
     }
 
-    af.where                = TO_AFFECTS;
     af.type             = sn;
     af.level            = level;
     af.duration         = max( 6, ch->getPC( )->getClanLevel( ) * 2 );

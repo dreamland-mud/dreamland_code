@@ -338,20 +338,16 @@ int ExitsMovement::getPassDoorLevel( Character *wch )
     if (wch->getRace( )->getAff( ).isSet( AFF_PASS_DOOR ))
         return wch->getModifyLevel( ) * 11 / 10; 
 
-    for (auto &paf: wch->affected)
-        if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
-            castLevel = max( castLevel, (int)paf->level );
+    for (auto &paf: wch->affected.findAllWithBits(&affect_flags, AFF_PASS_DOOR))
+        castLevel = max( castLevel, (int)paf->level );
 
     for (Object *obj = wch->carrying; obj; obj = obj->next_content)
-        if (obj->wear_loc != wear_none) {
-            for (auto &paf: obj->affected)
-                if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
-                    eqLevel = max( eqLevel, obj->level );
+        if (obj->wear_loc->givesAffects()) {
+            if (obj->affected.findAllWithBits(&affect_flags, AFF_PASS_DOOR).size() > 0)
+                eqLevel = max( eqLevel, obj->level );
 
-            if (!obj->enchanted)
-                for (auto &paf: obj->pIndexData->affected)
-                    if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
-                        eqLevel = max( eqLevel, obj->level );
+            if (!obj->enchanted && obj->pIndexData->affected.findAllWithBits(&affect_flags, AFF_PASS_DOOR).size() > 0)
+                eqLevel = max( eqLevel, obj->level );
         }
 
     return max( 0, max( eqLevel, castLevel ) );

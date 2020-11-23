@@ -33,6 +33,7 @@ public:
     inline int size( ) const;
     void outputAll( ostringstream &, int, int ) const;
     GlobalRegistryElement * find( int ndx );
+    list<GlobalRegistryElement *> findAll(const DLString &arguments);
     
     template <typename Comparator>
     inline void sortIndexes( SortedIndexes &, Comparator );

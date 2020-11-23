@@ -387,14 +387,14 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
 /*-------------------------------------------------------------------------
  * AffectsWebPromptListener
  *------------------------------------------------------------------------*/
-static Bitstring zero_affect_bitstring( int where, AffectList &list, const Bitstring &bits )
+static Bitstring zero_affect_bitstring( const FlagTable *table, AffectList &list, const Bitstring &bits )
 {
     Bitstring zero;
 
     for (auto &paf: list) {
         if (paf->duration != 0)
             continue;
-        if (paf->where != where)
+        if (paf->bitvector.getTable() != table)
             continue;
 
         if (bits.isSet( paf->bitvector ))
@@ -824,7 +824,7 @@ Json::Value AffectsWebPromptListener::jsonDetect( Descriptor *d, Character *ch )
 
     Json::Value det;
     det["a"] = active;
-    Bitstring zeroDetects = zero_affect_bitstring( TO_DETECTS, ch->affected, reported_det );
+    Bitstring zeroDetects = zero_affect_bitstring( &detect_flags, ch->affected, reported_det );
     det["z"] = det_to_string( zeroDetects );
     return det;
 }

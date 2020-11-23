@@ -301,18 +301,18 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
         af.type      = sn;
         af.level     = level;
         af.duration  = 1 + level / 30;
-        af.location  = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         af.modifier  = -1 * ( level / 6);
         affect_to_char( victim, &af );
 
-        af.location  = APPLY_DAMROLL;
+        af.location = APPLY_DAMROLL;
         af.modifier  = -1 * ( level / 6);
         affect_to_char( victim, &af );
 
-        af.location  = APPLY_DEX;
+        af.location = APPLY_DEX;
         af.modifier  = -1 - level / 40;
-        af.where     = TO_DETECTS;
-        af.bitvector = ADET_WEB;
+        af.bitvector.setTable(&detect_flags);
+        af.bitvector.setValue(ADET_WEB);
         affect_to_char( victim, &af );
 
         victim->send_to("Густая паутина опутывает тебя!\n\r");
