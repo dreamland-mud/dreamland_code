@@ -5,6 +5,7 @@
 #include <math.h>
 #include "jsoncpp/json/json.h"
 #include "grammar_entities_impl.h"
+#include "stringlist.h"
 #include "skill.h"
 #include "skillreference.h"
 #include "logstream.h"
@@ -16,8 +17,12 @@
 
 #include "weapons.h"
 #include "math_utils.h"
+#include "material.h"
+#include "material-table.h"
+#include "attacks.h"
 #include "itemflags.h"
 #include "affectflags.h"
+#include "damageflags.h"
 #include "loadsave.h"
 #include "dl_math.h"
 #include "merc.h"
@@ -104,6 +109,12 @@ Json::Value weapon_value2_by_class;
 CONFIGURABLE_LOADED(fight, weapon_value2)
 {
     weapon_value2_by_class = value;
+}
+
+Json::Value weapon_damtype;
+CONFIGURABLE_LOADED(fight, weapon_damtype)
+{
+    weapon_damtype = value;
 }
 
 Json::Value weapon_level_penalty;
@@ -369,11 +380,91 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     int index = number_range(0, names.size() - 1);
     Json::Value &entry = names[index];
 
+    // Config item names and gram gender. 
     obj->setName(entry["name"].asCString());
     obj->setShortDescr(entry["short"].asCString());
     obj->setDescription(entry["long"].asCString());
     obj->gram_gender = MultiGender(entry["gender"].asCString());
-    // TODO: set material and flags.
+
+    // Set up 'two handed' weapon flag: 2 - two hands, 1 - one hand, 0 - either.
+    DLString twohand = entry["twohand"].asString();
+    if (twohand == "2" || (twohand.empty() && chance(10))) {
+        obj->value4(obj->value4() | WEAPON_TWO_HANDS);
+    }
+
+    // Set weight: 0.4 kg by default in OLC, 2kg for two hand.
+    // TODO: Weight is very approximate, doesn't depend on weapon type.
+    if (IS_SET(obj->value4(), WEAPON_TWO_HANDS))
+        obj->weight *= 5;
+
+    // Set up provided material or default.
+    obj->setMaterial(findMaterial(entry).c_str());
 
     return *this;
 }
+
+const WeaponGenerator & WeaponGenerator::assignDamageType() const
+{
+    DLString wclass = weapon_class.name(obj->value0());
+    Json::Value &entry = weapon_damtype[wclass];
+
+    if (entry.empty()) {
+        warn("Weapon generator: no damage types defined for type %s.", wclass.c_str());
+        return *this;
+    }
+
+    StringSet attacks = StringSet().fromString(entry["attacks"].asString()); // frbite, divine, etc
+    StringSet damtypes = StringSet().fromString(entry["damtypes"].asString()); // bash, pierce, etc
+    bool any = damtypes.count("any") > 0;
+    vector<int> result;
+
+    for (int a = 0; attack_table[a].name != 0; a++) {
+        const attack_type &attack = attack_table[a];
+        if (any 
+            || attacks.count(attack.name) > 0
+            || damtypes.count(damage_table.name(attack.damage)) > 0)
+        {
+            result.push_back(a);
+        }
+    }
+
+    if (result.empty()) {
+        warn("Weapon generator: no matching damtype found for %s.", wclass.c_str());
+        return *this;
+    }
+
+    obj->value3(
+        result.at(number_range(0, result.size() - 1)));
+
+    return *this;
+}
+
+/** Look up material based on suggested names or types. 
+ *  Return 'metal' if nothing found.
+ */
+DLString WeaponGenerator::findMaterial(Json::Value &entry) const
+{
+    // Find by exact name, e.g. "fish".
+    DLString mname = entry["material"].asString();
+    const material_t *material = material_by_name(mname);
+    if (material)
+        return material->name;
+
+    // Find a random material name for each of requested types.
+    StringList materials;
+    for (auto &mtype: entry["mtypes"]) {
+        bitstring_t type = material_types.bitstring(mtype.asString());
+        auto withType = materials_by_type(type);
+
+        if (!withType.empty())
+            materials.push_back(
+                withType.at(number_range(0, withType.size() - 1))->name);
+    }
+
+    // Concatenate two or more material names, e.g. "pine, steel".
+    if (!materials.empty())
+        return materials.join(", ");
+
+    return "metal";
+}
+

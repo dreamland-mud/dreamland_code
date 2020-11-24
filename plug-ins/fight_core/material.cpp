@@ -9,31 +9,21 @@
 
 #include "immunity.h"
 
-#include <jsoncpp/json/json.h>
-#include "configurable.h"
 #include "damageflags.h"
 #include "material.h"
+#include "material-table.h"
+#include "def.h"
 
-struct material_t {
-    DLString name;
-    int burns;
-    int floats;
-    json_flag<&material_types> type;
-    json_flag<&material_flags> flags;
-    json_flag<&imm_flags> vuln;
-    DLString rname;
-
-    void fromJson(const Json::Value &value) 
-    {
-        name = value["name"].asString();
-        burns = value["burns"].asInt();
-        floats = value["floats"].asInt();
-        type.fromJson(value["type"]);
-        flags.fromJson(value["flags"]);
-        vuln.fromJson(value["vuln"]);
-        rname = value["rname"].asString();
-    }
-};
+void material_t::fromJson(const Json::Value &value) 
+{
+    name = value["name"].asString();
+    burns = value["burns"].asInt();
+    floats = value["floats"].asInt();
+    type.fromJson(value["type"]);
+    flags.fromJson(value["flags"]);
+    vuln.fromJson(value["vuln"]);
+    rname = value["rname"].asString();
+}
 
 json_vector<material_t> material_table;
 CONFIGURABLE_LOADED(fight, material)
@@ -137,4 +127,27 @@ int material_immune( Object *obj, Character *ch )
     immune_from_flags( ch, bits, res );
 
     return immune_resolve( res );
+}
+
+const material_t * material_by_name(const DLString &name)
+{
+    if (name.empty())
+        return 0;
+
+    for (auto &m: material_table)
+        if (m.name == name)
+            return &m;
+
+    return 0;
+}
+
+vector<const material_t *> materials_by_type(bitstring_t type)
+{
+    vector<const material_t *> result;
+
+    for (auto &m: material_table)
+        if (m.type.isSet(type))
+            result.push_back(&m);
+
+    return result;
 }

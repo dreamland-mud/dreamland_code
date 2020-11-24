@@ -61,7 +61,8 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
             .assignHitroll()
             .assignDamroll()
             .assignValues()
-            .assignNames();
+            .assignNames()
+            .assignDamageType();
 
         interpret_fmt(ch, "stat obj %lld", obj->getID());
         return;

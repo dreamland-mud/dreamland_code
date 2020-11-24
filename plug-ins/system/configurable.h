@@ -25,7 +25,7 @@ public:
 
     virtual void initialization();
     virtual void destruction();
-    virtual void loaded(Json::Value) { }
+    virtual void loaded(Json::Value &) { }
     virtual void unloaded() { }
 
     void refresh(const DLString &text);
@@ -66,7 +66,7 @@ public:
         path = DLFile(folder,file).getPath();
     }
 
-    virtual void loaded(Json::Value) {  }
+    virtual void loaded(Json::Value &) {  }
 
 protected:
     virtual void initialization( ) 
@@ -98,7 +98,7 @@ PluginInitializer<CONFIGURABLE(x)> config_ ##x## _init(INITPRIO_NORMAL);
 
 #define CONFIGURABLE_LOADED(collection,x) \
 CONFIGURABLE_DECL(collection,x) \
-template <> void CONFIGURABLE(x)::loaded( Json::Value value )
+template <> void CONFIGURABLE(x)::loaded( Json::Value &value )
 
 template <typename S>
 struct json_vector : public vector<S> {

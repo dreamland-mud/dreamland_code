@@ -9,6 +9,7 @@ class Character;
 class Object;
 class Skill;
 struct obj_index_data;
+namespace Json { struct Value; }
 
 Object * get_wield( Character *ch, bool secondary );
 int         get_weapon_sn( Character *ch, bool secondary );
@@ -66,9 +67,11 @@ struct WeaponGenerator {
     const WeaponGenerator & incrementDamroll() const;
 
     const WeaponGenerator & assignNames() const;
+    const WeaponGenerator & assignDamageType() const;
 
 private:
     void setAffect(int location, int modifier) const;
+    DLString findMaterial(Json::Value &entry) const;
     int maxDamroll() const;
     int maxHitroll() const;
     int minDamroll() const;
