@@ -294,6 +294,8 @@ bool BasicMobileBehavior::canAggressVampire( Character *wch )
         return false;
     if (wch->is_npc( ) && IS_SET(wch->act, ACT_UNDEAD|ACT_VAMPIRE))
         return false;
+    if (wch->is_immortal() && !wch->getPC()->getAttributes().isAvailable("ai_aggress"))
+        return false;
     if (wch->getModifyLevel( ) > ch->getModifyLevel( ) + 8)
         return false;
     return true;
