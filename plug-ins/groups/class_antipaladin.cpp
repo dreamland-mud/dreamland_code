@@ -292,6 +292,18 @@ void ShadowBlade::fight( Character *ch )
     if (number_percent( ) > castChance)
         return;
 
+    if (int chance = gsn_improved_maladiction->getEffective( ch ))
+    {
+        if (number_percent( ) < chance) {
+            ch->println(level);
+            level += chance / 20;
+            ch->println(level);
+            gsn_improved_maladiction->improve( ch, true );
+        }
+        else
+            gsn_improved_maladiction->improve( ch, false );
+    }    
+
     switch (number_range( 1, 4 )) {
     case 1:
         if (!IS_SET(victim->imm_flags, IMM_POISON)) {
@@ -317,7 +329,7 @@ void ShadowBlade::fight( Character *ch )
     case 4:
         ch->pecho("{D%1$O1 вспыхива%1$nет|ют {xмертвенно-бледным{D светом.{x", obj );
         ch->recho("%1$^O1 %2$C2 вспыхива%1$nет|ют мертвенно-бледным светом.", obj, ch );
-        spell_nocatch( gsn_energy_drain, level + 2, ch, victim, FSPELL_BANE );        
+        spell_nocatch( gsn_energy_drain, level + 2, ch, victim, FSPELL_BANE );   
         break;
     }
 }
