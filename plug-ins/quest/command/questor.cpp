@@ -11,6 +11,7 @@
 #include "skillmanager.h"
 
 #include "wiznet.h"
+#include "skill_utils.h"
 #include "merc.h"
 #include "handler.h"
 #include "act.h"
@@ -303,6 +304,9 @@ void Questor::rewardScroll( PCharacter *client )
         Skill *skill = skillManager->find( sn );
 
         if (!skill->usable( client, false ))
+            continue;
+
+        if (temporary_skill_active(skill, client))
             continue;
         
         learned = skill->getLearned( client );
