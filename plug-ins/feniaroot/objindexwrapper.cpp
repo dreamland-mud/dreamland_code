@@ -10,6 +10,7 @@
 #include "loadsave.h"
 
 #include "objindexwrapper.h"
+#include "affectwrapper.h"
 #include "wrappermanager.h"
 #include "reglist.h"
 #include "register-impl.h"
@@ -186,6 +187,20 @@ NMI_INVOKE( ObjIndexWrapper, property, "(name, defaultValue): свойство �
         return defaultValue;
     else
         return Register(p->second);
+}
+
+NMI_GET( ObjIndexWrapper, affected, "список (List) всех аффектов на прототипе (структура .Affect)" )
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (auto &paf: target->affected) 
+        rc->push_back( AffectWrapper::wrap( *paf ) );
+        
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(rc);
+
+    return Register( sobj );
 }
 
 NMI_INVOKE( ObjIndexWrapper, api, "(): печатает этот API" )
