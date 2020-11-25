@@ -35,7 +35,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     findVictims( pch, games );
     pGameIndex  = getRandomMobIndex( games );
     raceName    = pGameIndex->race;
-    raceRusName = raceManager->find( raceName )->getMltName( );
+    raceRusName = pGameIndex->short_descr;
     areaName    = pGameIndex->area->name;
     
     if (rated_as_guru( pch ))
@@ -55,7 +55,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
 
     tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
     tell_raw( pch, questman, 
-        "{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G, обитающих в {W{hh%s{hx{G.", 
+        "{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G из местности {W{hh%s{hx{G.", 
         customerName.c_str( ),
         customerArea.c_str( ),
         ordered.getValue( ),
@@ -89,7 +89,7 @@ void ButcherQuest::info( std::ostream &buf, PCharacter *ch )
             << "{hx просит тебя доставить к столу "
             << ordered << " кус" << GET_COUNT(ordered.getValue( ), "ок", "ка", "ков")
             << " мяса " << raceRusName.ruscase( '2' ) 
-            << ", oбитающих в местности {hh" << areaName << "{hx." << endl;
+            << " из местности {hh" << areaName << "{hx." << endl;
             
         if (delivered > 0)
             buf << "Доставлено кусков: " << delivered << "." << endl;    
