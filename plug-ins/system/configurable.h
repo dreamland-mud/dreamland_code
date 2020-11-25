@@ -107,7 +107,6 @@ struct json_vector : public vector<S> {
         this->clear();
         this->resize(value.size());
         for (unsigned int i = 0; i < value.size(); i++) {
-            this->emplace(this->begin() + i);
             this->at(i).fromJson(value[i]);
         }
     }
