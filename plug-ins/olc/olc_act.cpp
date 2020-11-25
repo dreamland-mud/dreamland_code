@@ -36,6 +36,7 @@
 
 #include "olc.h"
 #include "loadsave.h"
+#include "material-table.h"
 #include "damageflags.h"
 #include "recipeflags.h"
 #include "religionflags.h"
@@ -61,6 +62,7 @@ int race_table;
 int class_table;
 int clan_table;
 int religion_table;
+int mat_table;
 
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
@@ -86,6 +88,8 @@ const struct olc_help_type help_table[] =
     {"drink_flags", &drink_flags, "Флаги емкости для жидкостей (поле value3)."},
     {"recipe_flags", &recipe_flags, "Флаги рецептов (поле value0 у рецепта)"},
     {"liquid", &liq_table, "Жидкости (поле value2 у емкостей и фонтанов)."},
+    {"material", &mat_table, "Материалы предметов и мобов."},
+
 
     {"{YМобы и персонажи{x", NULL, NULL},
     {"races", &race_table, "Список всех рас мобов."},
@@ -334,6 +338,22 @@ bool show_help(Character * ch, const char *cargument)
                 }
                 buf << endl;
                 ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &mat_table) {
+                ostringstream buf;
+                buf << fmt(0, "{G%-14s {W%15s %10s {m%13s {G%s\r\n",
+                             "NAME", "TYPES", "FLAGS", "VULN", "RUSSIAN");
+
+                for (auto &m: material_table)
+                    buf << fmt(0, "{g%-14s{x %15s %10s {m%13s {g%s{x\r\n",
+                                m.name.c_str(),
+                                m.type.names().c_str(),
+                                m.flags.names().c_str(),
+                                m.vuln.names().c_str(),
+                                m.rname.c_str());
+                buf << "See {y{hcfedit material{x for more details." << endl;
+                page_to_char(buf.str( ).c_str( ), ch);
                 return false;
             }
             else if (help_table[cnt].structure == &skill_table) {
