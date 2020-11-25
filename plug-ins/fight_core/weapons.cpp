@@ -381,7 +381,10 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     Json::Value &entry = names[index];
 
     // Config item names and gram gender. 
-    obj->setName(entry["name"].asCString());
+    StringList mynames(entry["name"].asString());
+    mynames.addUnique(wclass);
+    mynames.addUnique(weapon_class.message(obj->value0()));
+    obj->setName(mynames.join(" ").c_str());
     obj->setShortDescr(entry["short"].asCString());
     obj->setDescription(entry["long"].asCString());
     obj->gram_gender = MultiGender(entry["gender"].asCString());
@@ -413,8 +416,8 @@ const WeaponGenerator & WeaponGenerator::assignDamageType() const
         return *this;
     }
 
-    StringSet attacks = StringSet().fromString(entry["attacks"].asString()); // frbite, divine, etc
-    StringSet damtypes = StringSet().fromString(entry["damtypes"].asString()); // bash, pierce, etc
+    StringSet attacks = StringSet(entry["attacks"].asString()); // frbite, divine, etc
+    StringSet damtypes = StringSet(entry["damtypes"].asString()); // bash, pierce, etc
     bool any = damtypes.count("any") > 0;
     vector<int> result;
 

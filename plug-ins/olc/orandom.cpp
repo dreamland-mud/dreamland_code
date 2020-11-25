@@ -27,6 +27,10 @@ namespace TAO_PEGTL_NAMESPACE::mud {
 CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS, 
         "Random weapon generator.")
 {
+    vector<bitnumber_t> myclasses = {
+        WEAPON_EXOTIC, WEAPON_SWORD, WEAPON_DAGGER, WEAPON_SPEAR, WEAPON_MACE,
+        WEAPON_AXE, WEAPON_FLAIL, WEAPON_WHIP, WEAPON_POLEARM };
+
     pegtl::mud::MyArgs myargs = { -1, -1, -1 };
 
     if (!parse_input<pegtl::mud::grammar, pegtl::mud::MyArgs>(ch, argument, myargs)) {
@@ -34,59 +38,32 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
 
-    ostringstream buf;
-    int minLevel = myargs.level == -1 ? 1 : myargs.level;
-    int maxLevel = myargs.level == -1 ? MAX_LEVEL : myargs.level;
-    int minTier  = myargs.tier == -1  ? 1 : myargs.tier;
-    int maxTier  = myargs.tier == -1  ? 5 : myargs.tier;
-    bitnumber_t minFlag  = myargs.wclass == -1 ? 0 : myargs.wclass;
-    bitnumber_t maxFlag  = myargs.wclass == -1 ? WEAPON_MAX-1 : myargs.wclass;
-    bool create = myargs.level != -1 && myargs.tier != -1 && myargs.wclass != -1;
+    // Assign random level, tier and weapon class unless specified in parameters.
+    int level = myargs.level == -1 ? number_range(1, LEVEL_MORTAL) : myargs.level;
+    int tier = myargs.tier == -1  ? number_range(1, 5) : myargs.tier;
+    bitnumber_t wclass = myargs.wclass == -1 ? 
+        myclasses.at(number_range(0, myclasses.size() - 1)) : myargs.wclass;
 
-    if (create) {
-        ch->printf("{WСоздаю оружие типа '%s' уровня %d и крутости %d.{x\r\n", 
-            weapon_class.message(myargs.wclass).c_str(), myargs.level, myargs.tier);
+    ch->printf("{WСоздаю оружие типа '%s' уровня %d и крутости %d.{x\r\n", 
+        weapon_class.message(wclass).c_str(), level, tier);
 
-        Object *obj = create_object(get_obj_index(104), 0);
-        obj->value0(myargs.wclass);
-        obj->level = myargs.level;
-        obj->setShortDescr(str_empty);
-        obj_to_char(obj, ch);
+    Object *obj = create_object(get_obj_index(104), 0);
+    obj->value0(wclass);
+    obj->level = level;
+    obj->setShortDescr(str_empty); // pretend it's a restring, to allow value0-4 overrides.
+    obj_to_char(obj, ch);
 
-        WeaponGenerator()
-            .item(obj)
-            .hitrollTier(myargs.tier)
-            .damrollTier(myargs.tier)
-            .valueTier(myargs.tier)
-            .assignHitroll()
-            .assignDamroll()
-            .assignValues()
-            .assignNames()
-            .assignDamageType();
+    WeaponGenerator()
+        .item(obj)
+        .hitrollTier(tier)
+        .damrollTier(tier)
+        .valueTier(tier)
+        .assignHitroll()
+        .assignDamroll()
+        .assignValues()
+        .assignNames()
+        .assignDamageType();
 
-        interpret_fmt(ch, "stat obj %lld", obj->getID());
-        return;
-    }
-
-    buf << dlprintf("{C%15s{x {WLVL  V1  V2  AVE  REAL  DR{x\r\n", "");
-
-    for (bitnumber_t f = minFlag; f <= maxFlag; f++) {
-        for (int t = minTier; t <= maxTier; t++) {
-            buf << dlprintf("{CTier %1d: {y%7s{x  ", t, weapon_class.name(f).c_str());
-            for (int l = minLevel; l <= maxLevel; l++) {
-                int v2 = weapon_value2(f);
-                int v1 = weapon_value1(l, t, v2, f);
-                int ave = weapon_ave(l, t, f);
-                int real_ave = dice_ave(v1, v2);
-                int dr = weapon_damroll(l, t, f);
-
-                if (l != minLevel)
-                    buf << dlprintf("%15s ", "");
-                buf << dlprintf("{C%3d{w  %2d  %2d  %3d   %3d  %2d\r\n", l, v1, v2, ave, real_ave, dr);
-            }
-        }
-    }
-
-    page_to_char(buf.str().c_str(), ch);
+    interpret_fmt(ch, "stat obj %lld", obj->getID());
 }
 

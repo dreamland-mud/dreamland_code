@@ -1,5 +1,6 @@
 #include "stringlist.h"
 #include <sstream>
+#include <algorithm>
 
 StringList::StringList()
 {
@@ -72,4 +73,10 @@ DLString StringList::toString() const
         
     result.stripWhiteSpace( );
     return result;
+}
+
+void StringList::addUnique(const DLString &elem)
+{
+    if (find(begin(), end(), elem) == end())
+        push_back(elem);
 }

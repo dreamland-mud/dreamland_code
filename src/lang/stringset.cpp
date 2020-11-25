@@ -6,6 +6,16 @@
 #include "logstream.h"
 #include "integer.h"
 
+StringSet::StringSet()
+{
+
+}
+
+StringSet::StringSet(const DLString &constStr)
+{
+    fromString(constStr);
+}
+
 DLString StringSet::toString( ) const
 {
     const_iterator s;

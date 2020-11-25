@@ -10,6 +10,9 @@
 
 class StringSet : public std::set<DLString> {
 public:
+    StringSet();
+    StringSet(const DLString &);
+
     /** 
      * Return a space-separated string of entries,
      * long entries surrounded by single quotes.

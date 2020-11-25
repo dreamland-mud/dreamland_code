@@ -29,6 +29,9 @@ public:
      * Return a space-separated string of entries, long entries surrounded by single quotes.
      */
     DLString toString() const;
+
+    /** Adds new element unless already there. */
+    void addUnique(const DLString &elem);
 };
 
 #endif
