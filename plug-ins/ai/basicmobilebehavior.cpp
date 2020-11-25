@@ -17,7 +17,7 @@
 
 #include "dreamland.h"
 #include "interp.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "merc.h"
 #include "act.h"
 #include "mercdb.h"
@@ -260,8 +260,8 @@ bool BasicMobileBehavior::isHomesick( )
     if (IS_CHARMED(ch) || RIDDEN(ch))
         return false;
 
-    if (ch->getWrapper( ))
-        return false;
+//    if (ch->getWrapper( ))
+//        return false;
     
     return true;
 }
