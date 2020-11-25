@@ -22,6 +22,12 @@ void SteakCustomer::greet( Character *victim )
         act( "$c1 выжидающе смотрит на тебя.", ch, 0, victim, TO_VICT );
 }
 
+void SteakCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 
+{
+    if (ourHero( victim ) && getQuest( ) && !quest->isComplete( ))
+        buf << "{x({YТерпеливо ждёт{x) ";
+}
+
 bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
 {
     MOB_INDEX_DATA *orig;
@@ -40,7 +46,7 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
     }
 
     if (quest->raceName != orig->race) {
-        tell_fmt( "Хороший кусок, но я заказыва%2$Gло|л|ла мясо %3$s.",
+        tell_fmt( "Хороший кусок, но я заказыва%2$Gло|л|ла мясо %3$N2.",
                   hero, ch, quest->raceRusName.c_str( ) );
         return false;        
         
