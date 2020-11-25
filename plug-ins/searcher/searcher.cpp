@@ -798,7 +798,7 @@ CMDRUNP(searcher)
             int cnt = 0;
             vector<list<DLString> > output(MAX_LEVEL+1);
             DLString lineFormat = 
-                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%2d %2d %3d{x %-10s {%s%3d {%s%3d {%s%3d{x %-3s %1s {D%2d{w/{D%-2d{w %s{x\r\n";
+                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%2d %2d %3d{x %-10s {%s%3d {%s%3d {%s%3d{x %-3s %1s {D%2d{w/{D%-2d{w {c%3d{x %s{x\r\n";
 
             prof.start();
 
@@ -831,6 +831,7 @@ CMDRUNP(searcher)
                                     anti.join("").c_str(),
                                     aff.c_str(),
                                     countInGame, countProfiles,
+                                    pObj->weight, 
                                     p.wflags.c_str());
 
                     DLString where;
@@ -846,8 +847,8 @@ CMDRUNP(searcher)
             } 
     
             ostringstream buf;
-            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %-2s %-2s %3s %-10s %3s %3s %3s %-3s %1s %-5s %s{x\r\n",
-                            "VNUM", "LVL", "WCLASS", "NAME", "D1", "D2", "AVE", "DAMAGE", "HR", "DR", "HP", "ALG", "A", "CNT", "WFLAGS");
+            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %-2s %-2s %3s %-10s %3s %3s %3s %-3s %1s %-5s %3s %s{x\r\n",
+                            "VNUM", "LVL", "WCLASS", "NAME", "D1", "D2", "AVE", "DAMAGE", "HR", "DR", "HP", "ALG", "A", "CNT", "WGT", "WFLAGS");
             for (size_t lvl = 0; lvl < output.size(); lvl++) {
                 const list<DLString> &lines = output[lvl];
                 for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
