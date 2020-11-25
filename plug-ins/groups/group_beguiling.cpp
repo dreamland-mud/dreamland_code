@@ -108,7 +108,7 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
         af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level         = ch->getRealLevel( );
-        af.duration  = number_fuzzy( level / 5 );
+        af.duration  = ch->isCoder() ? 1 : number_fuzzy( level / 5 );
         
         af.bitvector.setValue(AFF_CHARM);
         affect_to_char( victim, &af );

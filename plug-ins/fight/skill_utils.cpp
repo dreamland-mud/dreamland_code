@@ -277,9 +277,5 @@ int skill_level_bonus(Skill &skill, Character *ch)
         slevel += number_range(1, 5);
     }
     
-    if (ch->is_immortal() && slevel > 0) 
-        ch->printf("Отладка: уровень умения %s %d -> %d.\r\n", 
-                    skill.getName().c_str(), ch->getModifyLevel(), slevel+ch->getModifyLevel());
-
     return slevel;
 }
