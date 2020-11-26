@@ -362,8 +362,24 @@ CMDRUN( sell )
 
     if (!IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) && roll < gsn_haggle->getEffective( ch ))
     {
+        silver = cost - (cost/100) * 100;
+        gold   = cost/100;
+
+        sprintf( buf2, "$C1 предлагает тебе %s%s%s за $o4.",
+                silver != 0 ? "%d серебра":"",    
+                ( silver != 0 && gold != 0 ) ? " и ":"",              
+                gold != 0 ? "%d золота":"");                      
+
+        if (silver != 0 && gold != 0)
+        sprintf( buf, buf2, silver, gold );
+        else if (silver != 0 )
+        sprintf( buf, buf2, silver );
+        else
+        sprintf( buf, buf2, gold );
+        act_p( buf, ch, obj, keeper, TO_CHAR, POS_RESTING );
+
         roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
-        ch->send_to("Ты торгуешься с продавцом.\n\r");
+        act_p( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
 
         cost += obj->cost / 2 * roll / 100;
         cost = min(cost,95 * get_cost(keeper,obj,true, trader) / 100);
