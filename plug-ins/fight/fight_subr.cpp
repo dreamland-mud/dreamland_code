@@ -35,21 +35,6 @@
 
 bool check_stun( Character *ch, Character *victim ) 
 {
-    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-    {
-        act_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
-            ch,0,victim,TO_CHAR,POS_FIGHTING);
-        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
-            ch,0,victim,TO_VICT,POS_FIGHTING);
-        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
-            ch,0,victim,TO_NOTVICT,POS_FIGHTING);
-
-        REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
-        
-        set_violent( ch, victim, false );
-        return true;
-    }
-
     if ( IS_AFFECTED(ch,AFF_STUN) )
     {
         act_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
@@ -64,6 +49,21 @@ bool check_stun( Character *ch, Character *victim )
 
         SET_BIT(ch->affected_by,AFF_WEAK_STUN);
 
+        set_violent( ch, victim, false );
+        return true;
+    }
+
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+    {
+        act_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
+            ch,0,victim,TO_CHAR,POS_FIGHTING);
+        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
+            ch,0,victim,TO_VICT,POS_FIGHTING);
+        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
+            ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+
+        REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
+        
         set_violent( ch, victim, false );
         return true;
     }
