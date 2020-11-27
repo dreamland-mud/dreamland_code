@@ -192,7 +192,8 @@ static bool sort_by_ave_distance(const weapon_value_t &w1, const weapon_value_t 
 /*--------------------------------------------------------------------------
  * WeaponCalculator
  *-------------------------------------------------------------------------*/
-WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass) : tier(tier), level(level), wclass(wclass) 
+WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, int index_bonus) 
+    : tier(tier), level(level), wclass(wclass), index_bonus(index_bonus)
 {
     calcValue2Range();
     calcAve();
@@ -204,7 +205,7 @@ int WeaponCalculator::getTierIndex() const
 {
     int index = level / 5;
     int penalty = weapon_level_penalty[wclass].asInt();
-    index = max(0, index + penalty);
+    index = max(0, index + penalty + index_bonus);
     return index;
 }
 
@@ -319,6 +320,7 @@ WeaponGenerator::WeaponGenerator()
     valTier = hrTier = drTier = 5;
     hrCoef = drCoef = 0;
     hrMinValue = drMinValue = 0;
+    hrIndexBonus = drIndexBonus = 0;
 }
 
 const WeaponGenerator & WeaponGenerator::assignValues() const
@@ -331,12 +333,12 @@ const WeaponGenerator & WeaponGenerator::assignValues() const
 
 int WeaponGenerator::maxDamroll() const
 {
-    return WeaponCalculator(drTier, obj->level, obj->value0()).getDamroll();
+    return WeaponCalculator(drTier, obj->level, obj->value0(), drIndexBonus).getDamroll();
 }
 
 int WeaponGenerator::maxHitroll() const
 {
-    return WeaponCalculator(hrTier, obj->level, obj->value0()).getDamroll();
+    return WeaponCalculator(hrTier, obj->level, obj->value0(), hrIndexBonus).getDamroll();
 }
 
 int WeaponGenerator::minDamroll() const

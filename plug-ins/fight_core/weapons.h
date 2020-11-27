@@ -26,7 +26,7 @@ int weapon_ave(struct obj_index_data *pWield);
 
 /** Weapon parameter calculator: figure out v1, v2 and damroll for given tier, level and weapon class. */
 struct WeaponCalculator {
-    WeaponCalculator(int tier, int level, bitnumber_t wclass);
+    WeaponCalculator(int tier, int level, bitnumber_t wclass, int index_bonus = 0);
 
     int getValue1() const { return value1; }
     int getValue2() const { return value2; }
@@ -51,6 +51,7 @@ private:
     int ave;
     int real_ave;
     int damroll;
+    int index_bonus;
 };
 
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
@@ -66,6 +67,8 @@ struct WeaponGenerator {
     WeaponGenerator & damrollStartPenalty(float coef) { this->drCoef = coef; return *this; }
     WeaponGenerator & hitrollMinStartValue(int minValue) { this->hrMinValue = minValue; return *this; }
     WeaponGenerator & damrollMinStartValue(int minValue)  { this->drMinValue = minValue; return *this; }
+    WeaponGenerator & hitrollIndexBonus(int bonus) { this->hrIndexBonus = bonus; return *this; }
+    WeaponGenerator & damrollIndexBonus(int bonus) { this->drIndexBonus = bonus; return *this; }
     
     const WeaponGenerator & assignValues() const;
     
@@ -97,6 +100,8 @@ private:
     float drCoef;
     int hrMinValue;
     int drMinValue;
+    int hrIndexBonus;
+    int drIndexBonus;
 
     Object *obj;    
 };
