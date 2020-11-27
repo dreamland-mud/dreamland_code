@@ -410,7 +410,7 @@ void HunterWeapon::fight_axe( Character *ch )
         act_p("$o1 раскалывает пополам твой щит.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         extract_obj( get_eq_char(victim,wear_shield) );
-    }else if(number_percent() < 10){
+    }else if(::chance(10)){
         act_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 с грохотом отскакивает от твоего щита.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
@@ -479,7 +479,7 @@ void HunterWeapon::fight_sword( Character *ch )
         act_p("$o1 уничтожает твое оружие.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 уничтожает  оружие $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         extract_obj( get_eq_char(victim,wear_wield) );
-    }else if(number_percent() < 10){
+    }else if(::chance(10)){
         act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 со звоном отскакивает от твоего оружия.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
