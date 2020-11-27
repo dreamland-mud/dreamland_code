@@ -333,8 +333,7 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
             affect_to_char( gch, &af );
 
             act("Священная броня окружает тебя.", gch, 0, 0, TO_CHAR);
-            if( ch != gch )
-                act("Священная броня окружает $C4.", ch, 0, gch, TO_CHAR);
+            act("Священная броня окружает $c4.", gch, 0, 0, TO_ROOM);
         } else {
             if( gch == ch)
                act("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
@@ -359,8 +358,7 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
         affect_to_char( gch, &af );
 
         act("Божественная энергия окружает тебя щитом.", gch, 0, 0, TO_CHAR);
-        if( ch != gch )
-            act("Божественная энергия окружает $C4 щитом.", ch, 0, gch, TO_CHAR);
+        act("Божественная энергия окружает $c4 щитом.", gch, 0, 0, TO_ROOM);
     }
 }
 
