@@ -1227,6 +1227,11 @@ void UndefinedOneHit::damEffectMasterHand()
         }
     } else if (diceroll < (chance / 2) && !IS_AFFECTED(victim, AFF_STUN)) {
         if (ch != victim) {
+
+            if(IS_AFFECTED(victim, AFF_WEAK_STUN)){
+                REMOVE_BIT(victim->affected_by,AFF_WEAK_STUN);
+            }
+
             SET_BIT(victim->affected_by, AFF_STUN);
 
             act("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x", ch, 0, victim, TO_CHAR);

@@ -1288,7 +1288,7 @@ SKILL_RUNP( throwdown )
                         ch,0,victim,TO_VICT,POS_RESTING);
                 act_p("$c1 бросает $C4 с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
-                victim->setWaitViolence( 2 + max(2, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR)) );
+                victim->setWaitViolence( 2 + URANGE (0, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR), 2) );
 
                 victim->position = POS_RESTING;
                 if (is_flying( victim )) {
