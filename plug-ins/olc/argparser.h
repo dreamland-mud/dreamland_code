@@ -73,15 +73,18 @@ namespace TAO_PEGTL_NAMESPACE::mud
     struct wclass  : word {};
     struct level_value : number {};
     struct tier_value : number {}; 
+    struct word_value : word {};
 
     struct args_wclass { bitnumber_t wclass; };
     struct args_level { int level; };
     struct args_tier { int tier; };
+    struct args_word { DLString word; };
 
     template< typename Rule > struct action {};
     template<> struct action< level_value > : bind_range< args_level, &args_level::level, 0, 110 > {};
     template<> struct action< tier_value > : bind_range< args_tier, &args_tier::tier, 1, 5 > {};
     template<> struct action< wclass > : bind_flag< args_wclass, &args_wclass::wclass, weapon_class > {};
+    template<> struct action< word_value > : bind< args_word, &args_word::word > {};
 }
 
 template< typename Grammar, typename Args > 
@@ -108,6 +111,7 @@ bool parse_input(PCharacter *ch, const DLString &_input, Args &args)
         buf << "Ошибка:" << endl 
             << in.line_at( p ) << endl
             << setw( p.column ) << "{R^{x" << endl;
+         buf << pe.message() << endl;
         ch->send_to(buf);
 
     } 

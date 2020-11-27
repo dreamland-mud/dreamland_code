@@ -22,26 +22,38 @@ int weapon_ave(Object *wield);
 /** Return average damage for a weapon prototype. */
 int weapon_ave(struct obj_index_data *pWield);
 
-/**
- * Weapon generator: calculate best value1 for a weapon of given class, level and v2.
- */
-int weapon_value1(int level, int tier, int value2, bitnumber_t wclass);
 
-/**
- * Weapon generator: return fixed value2 based on weapon class.
- */
-int weapon_value2(bitnumber_t wclass);
 
-/**
- * Weapon generator: return fixed average damage for a level and a tier.
- */
-int weapon_ave(int level, int tier, bitnumber_t wclass);
+/** Weapon parameter calculator: figure out v1, v2 and damroll for given tier, level and weapon class. */
+struct WeaponCalculator {
+    WeaponCalculator(int tier, int level, bitnumber_t wclass);
 
-/**
- * Weapon generator: return fixed damroll bonus for a level and a tier.
- */
-int weapon_damroll(int level, int tier, bitnumber_t wclass);
+    int getValue1() const { return value1; }
+    int getValue2() const { return value2; }
+    int getDamroll() const { return damroll; }
+    int getAve() const { return ave; }
+    int getRealAve() const { return real_ave; }
 
+private:
+    void calcValue2Range();
+    void calcAve();
+    void calcValues();
+    void calcDamroll();
+    int getTierIndex() const;
+
+    int tier;
+    int level;
+    bitnumber_t wclass;
+    int v2_min;
+    int v2_max;
+    int value1;
+    int value2;
+    int ave;
+    int real_ave;
+    int damroll;
+};
+
+/** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
     WeaponGenerator();
 

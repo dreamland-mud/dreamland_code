@@ -163,7 +163,44 @@ int weapon_ave(struct obj_index_data *pWield)
         return 0;
 }
 
-static int get_tier_index(int level, bitnumber_t wclass)
+/** Helper struct to keep interim result of value1/value2 calculations. 
+ *  A list of these structures will be sorted to find the one closest to requested ave.
+ */
+struct weapon_value_t {
+    weapon_value_t(int v1, int v2, int ave) {
+        this->v1 = v1;
+        this->v2 = v2;
+        this->ave = ave;
+        real_ave = dice_ave(v1, v2);
+    }
+
+    int distance() const { 
+        return abs(real_ave - ave); 
+    }
+
+    int v1;
+    int v2;
+    int real_ave;
+    int ave;
+};
+
+static bool sort_by_ave_distance(const weapon_value_t &w1, const weapon_value_t &w2)
+{
+    return w1.distance() <= w2.distance();
+}
+
+/*--------------------------------------------------------------------------
+ * WeaponCalculator
+ *-------------------------------------------------------------------------*/
+WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass) : tier(tier), level(level), wclass(wclass) 
+{
+    calcValue2Range();
+    calcAve();
+    calcValues();
+    calcDamroll();
+}
+
+int WeaponCalculator::getTierIndex() const
 {
     int index = level / 5;
     int penalty = weapon_level_penalty[wclass].asInt();
@@ -171,85 +208,111 @@ static int get_tier_index(int level, bitnumber_t wclass)
     return index;
 }
 
-int weapon_ave(int level, int tier, bitnumber_t wclass)
+/** Retrieve min and max value2 for a given weapon class. */
+void WeaponCalculator::calcValue2Range()
+{
+    if (wclass < 0 || wclass >= (int)weapon_value2_by_class.size()) {
+        bug("weapon_value2: invalid weapon class %d", wclass);
+        return;
+    }
+
+    Json::Value &entry = weapon_value2_by_class[wclass];
+    if (entry.isInt()) {
+        v2_min = v2_max = entry.asInt();
+        return;
+    }
+
+    if (entry.isArray() && entry.size() == 2) {
+        v2_min = entry[0].asInt();
+        v2_max = entry[1].asInt();
+        return;
+    }
+
+    bug("weapon_value2: invalid values provided for class %d", wclass);
+}
+
+/** Retrieve desired ave damage for this tier and weapon class. */
+void WeaponCalculator::calcAve() 
 {
     if (tier <= 0 || tier > (int)weapon_ave_tiers.size()) {
         bug("weapon_ave: invalid tier %d for level %d", tier, level);
-        return 0;
+        return;
     }
 
     if (level <= 0 || level > MAX_LEVEL) {
         bug("weapon_ave: invalid level %d for tier %d", level, tier);
-        return 0;
+        return;
     }
 
     if (wclass < 0 || wclass >= (int)weapon_ave_penalty.size()) {
-        bug("weapon_ave: invalid weapon class %d", wclass);
-        return 0;
+        bug("weapon_ave: invalid weapon class %d for penalty table", wclass);
+        return;
     }
 
     Json::Value &one_tier = weapon_ave_tiers[tier-1];
-    int index = get_tier_index(level, wclass);
+    int index = getTierIndex();
     if (index >= (int)one_tier.size()) {
         bug("weapon_ave: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
-        return 0;
+        return;
     }
 
     float multiplier = weapon_ave_penalty[wclass].asFloat();
-    int ave = one_tier[index].asInt();
-    return (int)(multiplier * ave);
+    int tier_ave = one_tier[index].asInt();
+    ave = (int)(multiplier * tier_ave);
 }
 
-int weapon_value2(bitnumber_t wclass)
+/** Calculate value1 and resulting value2 (between min and max) for the requested ave damage. */
+void WeaponCalculator::calcValues() 
 {
-    if (wclass < 0 || wclass >= (int)weapon_value2_by_class.size()) {
-        bug("weapon_value2: invalid weapon class %d", wclass);
-        return 0;
+    if (ave <= 0)
+        return;
+
+    // Calculate all possible v1 and v2, and their respective real average damage.
+    list<weapon_value_t> weapon_value_candidates;
+    for (int v2 = v2_min; v2 <= v2_max; v2++) {
+        float value1_float = 2 * ave / (v2 + 1);
+        int value1 = ceil(value1_float);
+
+        weapon_value_candidates.push_back(weapon_value_t(value1, v2, ave));
+        weapon_value_candidates.push_back(weapon_value_t(value1-1, v2, ave));
+        weapon_value_candidates.push_back(weapon_value_t(value1+1, v2, ave));
     }
 
-    return weapon_value2_by_class[wclass].asInt();
+    // Find the best v1/v2 combo that gives us a dice closest to the ave from json tables.
+    weapon_value_candidates.sort(sort_by_ave_distance);
+    const weapon_value_t &winner = weapon_value_candidates.front();    
+    value2 = winner.v2;
+    value1 = winner.v1;
+    real_ave = winner.real_ave;
 }
 
-int weapon_value1(int level, int tier, int value2, bitnumber_t wclass)
-{
-    int ave = weapon_ave(level, tier, wclass);
-    if (ave <= 0)
-        return 0;
-
-    // Calculate value1 based on desired average damage and fixed value2.
-    float value1_float = 2 * ave / (value2 + 1);
-    int value1 = ceil(value1_float);
-    // Calculate resulting average for a weapon with these values.
-    int real_ave = dice_ave(value1, value2);
-    // If resulting average differs from a desired one by more than 1, increase value1.
-    int value1_adjustment = real_ave + 1 < ave ? 1 : 0;
-
-    return value1 + value1_adjustment;
-}
-
-int weapon_damroll(int level, int tier, bitnumber_t wclass)
+/** Retrieve damroll for this tier and level. */
+void WeaponCalculator::calcDamroll() 
 {
     if (tier <= 0 || tier > (int)weapon_damroll_tiers.size()) {
         bug("weapon_damroll: invalid tier %d for level %d", tier, level);
-        return 0;
+        return;
     }
 
     if (level <= 0 || level > MAX_LEVEL) {
         bug("weapon_damroll: invalid level %d for tier %d", level, tier);
-        return 0;
+        return;
     }
 
     Json::Value &one_tier = weapon_damroll_tiers[tier-1];
-    int index = get_tier_index(level, wclass);
+    int index = getTierIndex();
 
     if (index >= (int)one_tier.size()) {
         bug("weapon_damroll: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
-        return 0;
+        return;
     }
 
-    return one_tier[index].asInt();
+    damroll = one_tier[index].asInt();
 }
 
+/*--------------------------------------------------------------------------
+ * WeaponGenerator
+ *-------------------------------------------------------------------------*/
 WeaponGenerator::WeaponGenerator()
 {
     sn = gsn_none;
@@ -260,23 +323,20 @@ WeaponGenerator::WeaponGenerator()
 
 const WeaponGenerator & WeaponGenerator::assignValues() const
 {    
-    bitnumber_t wclass = obj->value0();
-    int value2 = weapon_value2(wclass);
-    int value1 = weapon_value1(obj->level, valTier, value2, wclass);
-
-    obj->value1(value1);
-    obj->value2(value2);
+    WeaponCalculator calc(valTier, obj->level, obj->value0());
+    obj->value1(calc.getValue1());
+    obj->value2(calc.getValue2());
     return *this;
 }
 
 int WeaponGenerator::maxDamroll() const
 {
-    return weapon_damroll(obj->level, drTier, obj->value0());
+    return WeaponCalculator(drTier, obj->level, obj->value0()).getDamroll();
 }
 
 int WeaponGenerator::maxHitroll() const
 {
-    return weapon_damroll(obj->level, hrTier, obj->value0());
+    return WeaponCalculator(hrTier, obj->level, obj->value0()).getDamroll();
 }
 
 int WeaponGenerator::minDamroll() const
