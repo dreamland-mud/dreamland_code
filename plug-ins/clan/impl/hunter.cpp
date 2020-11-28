@@ -405,13 +405,17 @@ void HunterWeapon::fight_axe( Character *ch )
     /* and now the attack */
 
     if (number_percent() < chance){
-            ch->setWait( gsn_shield_cleave->getBeats( )  );
+            //ch->setWait( gsn_shield_cleave->getBeats( )  );
         act_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 раскалывает пополам твой щит.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         extract_obj( get_eq_char(victim,wear_shield) );
-    }else
-            ch->setWait( gsn_shield_cleave->getBeats( )  );
+    }else if(::chance(10)){
+        act_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
+        act_p("$o1 с грохотом отскакивает от твоего щита.",ch,obj,victim,TO_VICT,POS_DEAD);
+        act_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
+            //ch->setWait( gsn_shield_cleave->getBeats( )  );
+    }
 }
 
 /* stun */
@@ -430,7 +434,7 @@ void HunterWeapon::fight_mace( Character *ch )
         act_p("$o1 оглушает тебя.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 оглушает $C4.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         SET_BIT(victim->affected_by,AFF_WEAK_STUN);
-        ch->setWaitViolence( 2 );
+        victim->setWaitViolence( 2 );
     }
 }
 
@@ -470,16 +474,16 @@ void HunterWeapon::fight_sword( Character *ch )
     chance += obj->level - wield->level;
 
     if (number_percent() < chance){
-            ch->setWait( gsn_weapon_cleave->getBeats( )  );
+            //ch->setWait( gsn_weapon_cleave->getBeats( )  );
         act_p("$o1 уничтожает оружие $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 уничтожает твое оружие.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 уничтожает  оружие $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         extract_obj( get_eq_char(victim,wear_wield) );
-    }else{
+    }else if(::chance(10)){
         act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 со звоном отскакивает от твоего оружия.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
-            ch->setWait( gsn_weapon_cleave->getBeats( )  );
+            //ch->setWait( gsn_weapon_cleave->getBeats( )  );
     }
 }
 
