@@ -502,6 +502,9 @@ void water_float_update( )
         if (IS_SET( obj->extra_flags, ITEM_NOPURGE ))
             continue;
 
+        if (obj->pIndexData->limit > 0)
+            continue;
+
         // Don't drown items that reset in this location.
         if (obj->reset_room == obj->in_room->vnum)
             continue;
