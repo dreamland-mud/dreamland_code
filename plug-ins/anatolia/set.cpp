@@ -18,6 +18,7 @@
 #include "logstream.h"
 #include "skill.h"
 #include "skillmanager.h"
+#include "grammar_entities_impl.h"
 
 #include "commandtemplate.h"
 #include "xmlattributeticker.h"
@@ -27,6 +28,7 @@
 #include "pcharactermanager.h"
 #include "pcrace.h"
 #include "object.h"
+#include "objectbehaviormanager.h"
 
 #include "act_wiz.h"
 #include "act.h"
@@ -1088,7 +1090,8 @@ void oset( Character* ch, char* argument )
                 ch->send_to("  set obj <object> <field> <value>\n\r");
                 ch->send_to("  Field being one of:\n\r");
                 ch->send_to("    value0 value1 value2 value3 value4 (v1-v4) \n\r");
-                ch->send_to("    cost extra level material owner timer wear weight personal\n\r");
+                ch->send_to("    cost extra level material owner timer wear\n\r");
+                ch->send_to("    weight gender personal\n\r");
                 return;
         }
 
@@ -1108,29 +1111,51 @@ void oset( Character* ch, char* argument )
         {
             obj->setOwner( arg3 );
         }
-        else
-        if ( !str_cmp( arg2, "personal") )
+        else if (!str_cmp(arg2, "gender")) {
+            MultiGender mg(MultiGender::UNDEF);
+            mg.fromString(arg3);
+            if (mg == MultiGender::UNDEF) {
+              ch->println("Неправильное значение грам. рода, используй: neutral, female, male, plural или первые буквы n f m p.");
+              return;
+            }
+            
+            obj->gram_gender = mg;
+            obj->updateCachedNoun();
+            ch->pecho("%1$^O1 {Wизмене{Cн%1$Gо||а|ы.{x", obj);
+
+        } else if ( !str_cmp( arg2, "personal") )
         {
-            obj->setOwner( arg3 );
-            SET_BIT(obj->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
-            obj->setMaterial( "platinum" );
+            const DLString behaviorName = "PersonalQuestReward";
 
-            try {
-                AllocateClass::Pointer p = Class::allocateClass( "PersonalQuestReward" );
+            if (obj->behavior && obj->behavior->getType() == behaviorName) {
+                // Strip already existing personal item behavior.
+                ch->pecho("Удаляю поведение %s с предмета %O1.", behaviorName.c_str(), obj);
+                ObjectBehaviorManager::clear(obj);
 
-                if (p) {
-                    obj->behavior.setPointer( p.getDynamicPointer<ObjectBehavior>( ) );
-                    obj->behavior->setObj( obj );
+            } else {
+                // Allocate and assign new behavior and all related flags.
+                PCMemoryInterface *owner = PCharacterManager::find(arg3);
+                if (!owner) {
+                    ch->println("Персонаж не найден, укажи имя полностью.");
+                    return;
                 }
-            } catch (const ExceptionClassNotFound &e) {
-                LogStream::sendError( ) << e.what( ) << endl;
-                ch->send_to( e.what( ) );
-                return;
+
+                ch->pecho("Устанавливаю поведение %s и владельца %s на предмет %O1.",
+                          behaviorName.c_str(), arg3, obj);
+
+                ObjectBehaviorManager::assign(obj, behaviorName);
+                if (!obj->behavior) {
+                    ch->println("Произошла ошибка, проверь логи.");
+                    return;
+                }
+
+                obj->setOwner(owner->getName().c_str());
+                SET_BIT(obj->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
+                obj->setMaterial( "platinum" );
             }
         }
         else if (!str_cmp(arg2, "timestamp")) {
             obj->timestamp = atol(arg3);
-            return;
         }
         else
         {

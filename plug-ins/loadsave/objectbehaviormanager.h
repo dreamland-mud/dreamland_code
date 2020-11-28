@@ -7,12 +7,15 @@
 
 #include <stdio.h>
 
+class DLString;
 class Object;
 struct obj_index_data;
 
 class ObjectBehaviorManager {
 public:        
         static void assign( Object * );
+        static void assign( Object *obj, const DLString &behaviorClassName );
+        static void clear( Object * );
         static void parse( obj_index_data *, FILE * );
         static void parse( Object *, FILE * );
         static void save( const obj_index_data *, FILE * );
