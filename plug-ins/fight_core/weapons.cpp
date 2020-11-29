@@ -3,7 +3,9 @@
  * ruffina, 2004
  */
 #include <math.h>
-#include "jsoncpp/json/json.h"
+#include <algorithm>
+#include <random>
+#include "profiler.h"
 #include "grammar_entities_impl.h"
 #include "stringlist.h"
 #include "skill.h"
@@ -13,7 +15,6 @@
 #include "character.h"
 #include "room.h"
 #include "affect.h"
-#include "configurable.h"
 
 #include "weapons.h"
 #include "math_utils.h"
@@ -25,6 +26,7 @@
 #include "damageflags.h"
 #include "loadsave.h"
 #include "dl_math.h"
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 
@@ -105,6 +107,225 @@ int get_weapon_sn( Character *ch, bool secondary )
     return get_weapon_sn( get_wield( ch, secondary ) );
 }
 
+int weapon_ave(Object *wield)
+{
+    if (wield->item_type == ITEM_WEAPON)
+        return dice_ave(wield->value1(), wield->value2());
+    else
+        return 0;
+}
+
+int weapon_ave(struct obj_index_data *pWield)
+{
+    if (pWield->item_type == ITEM_WEAPON)
+        return dice_ave(pWield->value[1], pWield->value[2]);
+    else
+        return 0;
+}
+
+/*-----------------------------------------------------------------------------
+ * Weapon tiers
+ *-----------------------------------------------------------------------------*/
+void weapon_tier_t::fromJson(const Json::Value &value)
+{
+    num = value["num"].asInt();
+    rname = value["rname"].asString();
+    aura = value["aura"].asString();
+    colour = value["colour"].asString();
+    extra.fromJson(value["extra"]);
+    min_points = value["min_points"].asInt();
+    max_points = value["min_points"].asInt();
+}
+
+json_vector<weapon_tier_t> weapon_tier_table;
+CONFIGURABLE_LOADED(fight, weapon_tiers)
+{
+    weapon_tier_table.fromJson(value);
+}
+
+
+/*-----------------------------------------------------------------------------
+ * Other configuration tables for weapon generator.
+ *-----------------------------------------------------------------------------*/
+
+Json::Value weapon_prefix;
+CONFIGURABLE_LOADED(fight, weapon_prefix)
+{
+    weapon_prefix = value;
+}
+
+/** Helper structure to access prefix configuration. */
+struct prefix_info {
+    prefix_info(string name, int price, const Json::Value &entry) 
+            : name(name), price(price), entry(entry)
+    {        
+    }
+
+    string name;
+    int price;
+    const Json::Value &entry;
+};
+
+static bool sort_by_price(const prefix_info &p1, const prefix_info &p2)
+{
+    return p1.price <= p2.price;
+}
+
+/** This class can generate all combinations of prefixes that match given tier and its price range. */
+struct prefix_generator {
+    /** A mask that can hold boolean information about up to 64 prefixes. */
+    typedef long long int bucket_mask_t;
+
+    prefix_generator(int t) : tier(weapon_tier_table[t-1]) 
+    {
+        ProfilerBlock prof("generate prefixes", 10);
+
+        collectPrefixesForTier();
+        markExclusions();
+
+        minPrice = tier.min_points;
+        maxPrice = tier.max_points;
+
+        generateBuckets(0, 0, 0L);
+
+        notice("Weapon generator: found %d result buckets for tier %d and %d prefixes", 
+                buckets.size(), tier.num, prefixes.size());
+    }
+
+    /** Produces a single random prefix combination out of all generated ones. */
+    list<prefix_info> getSingleResult() const
+    {
+        list<prefix_info> result;
+        bucket_mask_t bucket = randomBucket();
+
+        for (unsigned int i = 0; i < prefixes.size(); i++)
+            if (IS_SET(bucket, 1 << i))
+                result.push_back(prefixes[i]);
+
+        return result;
+    }
+
+    int getResultSize() const
+    {
+        return buckets.size();
+    }
+
+private:
+
+    /** Choose a random set element. */
+    bucket_mask_t randomBucket() const 
+    {
+        vector<bucket_mask_t> random_sample;
+        sample(buckets.begin(), buckets.end(), 
+               back_inserter(random_sample), 1, mt19937{random_device{}()});
+        return random_sample.front();
+    }
+
+    /** Recursively produce masks were 1 marks an included prefix, 0 marks an excluded prefix.
+     *  Each mask denotes a combination of prefixes those total price matches prices for the tier. 
+     */
+    void generateBuckets(int currentTotal, long unsigned int index, bucket_mask_t currentMask) 
+    {
+        if (currentTotal >= minPrice && currentTotal <= maxPrice)
+            // Good combo, remember it and continue.
+            buckets.insert(currentMask);
+        else if (currentTotal > maxPrice) 
+            // Stop now: adding more prefixes will only make the price bigger.
+            return;
+
+        if (index >= prefixes.size())
+            // Stop now: reached the end of prefixes vector.
+            return;
+
+        // First check whether current prefix doesn't conflict with any prefix chosen earlier.
+        if (!IS_SET(currentMask, exclusions[index])) {
+            // Explore all further combinations that can happen if this prefix is included.
+            SET_BIT(currentMask, 1 << index);
+            generateBuckets(currentTotal + prefixes[index].price, index + 1, currentMask);
+        }
+
+        // Explore all further combinations that can happen if this prefix is excluded.
+        REMOVE_BIT(currentMask, 1 << index);
+        generateBuckets(currentTotal, index + 1, currentMask);
+    }
+
+    /** Creates a vector of all prefixes that are allowed for the tier, sorted by price in ascending order. */
+    void collectPrefixesForTier()
+    {
+        list<prefix_info> sorted;
+
+        if (!weapon_prefix.isObject()) {
+            bug("weapon_prefix is not a well-formed json object.");
+            return;
+        }
+
+        for (auto &key: weapon_prefix.getMemberNames()) {
+            for (auto &entry: weapon_prefix[key]) {
+                int threshold = entry.isMember("tier") ? entry["tier"].asInt() : WORST_TIER;
+                if (tier.num > threshold)
+                    continue;
+
+                int price = entry["price"].asInt();
+                sorted.push_back(prefix_info(key, price, entry));
+            }
+        }
+
+        sorted.sort(sort_by_price);
+        for (auto &p: sorted)
+            prefixes.push_back(p);
+    }
+
+    /** Creates a NxN matrix of prefix flags, marking those that are mutually exclusive.
+     *  For now only exclude different materials, but can be configured more flexibly in json.
+     */
+    void markExclusions() 
+    {
+        for (unsigned int i = 0; i < prefixes.size(); i++) {            
+            bucket_mask_t exclusion = 0L;
+            prefix_info &p = prefixes[i];
+
+            if (p.name == "material")
+                for (unsigned int j = 0; j < prefixes.size(); j++)
+                    if (i != j && prefixes[j].name == p.name)
+                        SET_BIT(exclusion, 1 << j);
+
+            exclusions.push_back(exclusion);
+        }
+    }
+
+    /** Keeps info about current tier. */
+    weapon_tier_t &tier;
+
+    /** Keeps all avaialble prefixes sorted by price. */
+    vector<prefix_info> prefixes;
+
+    /** Keeps all possible combination matching tier's price. If a bit M is set in a bucket mask, then prefix M is included. */
+    set<bucket_mask_t> buckets;
+
+    /** Keeps all exclusions for prefixes. If entry N has a bit M set, then prefixes N and M are mutually exclusive. */
+    vector<bucket_mask_t> exclusions;
+
+    int minPrice;
+    int maxPrice;
+};
+
+// Debug util: grab several good prefix combinations for the tier. 
+list<list<string>> random_weapon_prefixes(int tier, int count)
+{
+    list<list<string>> allNames;
+    prefix_generator gen(tier);
+
+    for (int i = 0; i < min(count, gen.getResultSize()); i++) {
+        list<string> names;
+        for (auto &pi: gen.getSingleResult())
+            names.push_back(pi.entry["value"].asString());
+        allNames.push_back(names);
+    }
+
+    return allNames;
+}
+
+
 Json::Value weapon_value2_by_class;
 CONFIGURABLE_LOADED(fight, weapon_value2)
 {
@@ -145,22 +366,6 @@ Json::Value weapon_names;
 CONFIGURABLE_LOADED(fight, weapon_names)
 {
     weapon_names = value;
-}
-
-int weapon_ave(Object *wield)
-{
-    if (wield->item_type == ITEM_WEAPON)
-        return dice_ave(wield->value1(), wield->value2());
-    else
-        return 0;
-}
-
-int weapon_ave(struct obj_index_data *pWield)
-{
-    if (pWield->item_type == ITEM_WEAPON)
-        return dice_ave(pWield->value[1], pWield->value[2]);
-    else
-        return 0;
 }
 
 /** Helper struct to keep interim result of value1/value2 calculations. 

@@ -4,8 +4,6 @@
 #include "jsoncpp/json/json.h"
 #include "configurable.h"
 
-namespace Json { class Value; }
-
 extern const FlagTable material_types;
 extern const FlagTable material_flags;
 extern const FlagTable imm_flags;

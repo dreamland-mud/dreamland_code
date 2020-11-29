@@ -1,3 +1,5 @@
+#include "jsoncpp/json/json.h"
+
 #include "olc.h"
 #include "olcflags.h"
 #include "olcstate.h"
@@ -12,6 +14,8 @@
 #include "mercdb.h"
 #include "act.h"
 #include "def.h"
+
+list<list<string>> random_weapon_prefixes(int tier, int count);
 
 namespace pegtl = TAO_PEGTL_NAMESPACE;
 
@@ -44,8 +48,8 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         ostringstream buf;
         int minLevel = myargs.level == -1 ? 1 : myargs.level;
         int maxLevel = myargs.level == -1 ? MAX_LEVEL : myargs.level;
-        int minTier  = myargs.tier == -1  ? 1 : myargs.tier;
-        int maxTier  = myargs.tier == -1  ? 5 : myargs.tier;
+        int minTier  = myargs.tier == -1  ? BEST_TIER : myargs.tier;
+        int maxTier  = myargs.tier == -1  ? WORST_TIER : myargs.tier;
         bitnumber_t minFlag  = myargs.wclass == -1 ? 0 : myargs.wclass;
         bitnumber_t maxFlag  = myargs.wclass == -1 ? WEAPON_MAX-1 : myargs.wclass;
 
@@ -68,11 +72,30 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
 
+    // Affix mode (-affix argument): display several possible flag combination for given tier.
+    if (arg_oneof(myargs.word, "affix", "prefix")) {
+        ostringstream buf;
+        int tier = myargs.tier == -1  ? number_range(BEST_TIER, WORST_TIER) : myargs.tier;
+        int count = 50;
+
+        auto allNames = random_weapon_prefixes(tier, count);        
+        ch->printf("{W%d случайных комбинаций префиксов для крутости %d:\r\n", allNames.size(), tier);
+
+        for (auto &names: allNames) {
+            for (auto &name: names)
+                buf << dlprintf("%9s ", name.c_str());
+            buf << endl;
+        }            
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
     // Generate mode (default): create item in player inventory.
 
     // Assign random level, tier and weapon class unless specified in parameters.
     int level = myargs.level == -1 ? number_range(1, LEVEL_MORTAL) : myargs.level;
-    int tier = myargs.tier == -1  ? number_range(1, 5) : myargs.tier;
+    int tier = myargs.tier == -1  ? number_range(BEST_TIER, WORST_TIER) : myargs.tier;
     bitnumber_t wclass = myargs.wclass == -1 ? 
         myclasses.at(number_range(0, myclasses.size() - 1)) : myargs.wclass;
 

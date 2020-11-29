@@ -5,11 +5,15 @@
 #ifndef WEAPONS_H
 #define WEAPONS_H
 
+#include <vector>
+#include "jsoncpp/json/json.h"
+#include "configurable.h"
+
 class Character;
 class Object;
 class Skill;
 struct obj_index_data;
-namespace Json { struct Value; }
+extern const FlagTable extra_flags;
 
 Object * get_wield( Character *ch, bool secondary );
 int         get_weapon_sn( Character *ch, bool secondary );
@@ -23,6 +27,23 @@ int weapon_ave(Object *wield);
 int weapon_ave(struct obj_index_data *pWield);
 
 
+/** Weapon tier: determines how cool is the weapon and all related tier settings. */
+struct weapon_tier_t {
+    int num;
+    DLString rname;
+    DLString aura;
+    DLString colour;
+    json_flag<&extra_flags> extra;
+    int min_points;
+    int max_points;
+
+    void fromJson(const Json::Value &value);
+};
+
+extern json_vector<weapon_tier_t> weapon_tier_table;
+
+#define BEST_TIER 1
+#define WORST_TIER 5
 
 /** Weapon parameter calculator: figure out v1, v2 and damroll for given tier, level and weapon class. */
 struct WeaponCalculator {

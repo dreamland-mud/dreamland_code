@@ -78,11 +78,11 @@
 #include "object.h"
 
 #include "wiznet.h"
-#include "def.h"
 #include "handler.h"
 #include "weapons.h"
 #include "act_move.h"
 #include "vnum.h"
+#include "def.h"
 
 /***************************************************************************
  ************************      auction.c      ******************************
