@@ -612,7 +612,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         buf << "({DНевидимо{x)";
 
     if (IS_AFFECTED(victim, AFF_IMP_INVIS))
-        buf << "(Improved)";
+        buf << "({DОчень невидимо{x)";
 
     if (IS_AFFECTED(victim, AFF_HIDE))
         buf << "({DУкрыто{x)";
@@ -740,7 +740,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         else if (victim->in_room == victim->fighting->in_room)
             buf << "с " << ch->sees( victim->fighting, '5') << ".";
         else
-            buf << "кем-то кто ушел...";
+            buf << "кем-то, кто ушел...";
 
         buf << endl;
         show_char_blindness( ch, victim, buf );
@@ -748,7 +748,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     if (HAS_SHADOW(victim))
-        buf << " ... отбрасывает странную тень." << endl;
+        buf << " ...отбрасывает странную тень." << endl;
     
     if (victim->death_ground_delay > 0) {
         DLString rc = rprog_show_end( victim->in_room, victim, ch );
