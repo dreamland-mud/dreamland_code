@@ -68,6 +68,9 @@ CMDRUN( remort )
     }
     
     if (argument.empty( )) {
+        pch->println("{RВнимание! Все вещи в твоем инвентаре и на тебе исчезнут с перерождением!{x");
+        pch->println("Вещи можно сохранить именном сундуке или собственном доме ({y{hc{lRсправка цены{lEhelp prices{x, {y{hc{lRсправка строительство{lEhelp building{x)");
+        pch->println("Обязательно прочитай {y{hc{lRсправка перерождение{lEhelp remort{x");
         pch->println("Если хочешь начать новую жизнь, набери {y{lRпереродиться{lEremort{x пароль.");
         return;
     }
