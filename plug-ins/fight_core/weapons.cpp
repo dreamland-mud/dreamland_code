@@ -5,6 +5,7 @@
 #include <math.h>
 #include <algorithm>
 #include <random>
+
 #include "profiler.h"
 #include "grammar_entities_impl.h"
 #include "stringlist.h"
@@ -17,6 +18,7 @@
 #include "affect.h"
 
 #include "weapons.h"
+#include "weapon-generator.h"
 #include "math_utils.h"
 #include "material.h"
 #include "material-table.h"
@@ -145,7 +147,7 @@ CONFIGURABLE_LOADED(fight, weapon_tiers)
 
 
 /*-----------------------------------------------------------------------------
- * Other configuration tables for weapon generator.
+ * Weapon prefixes
  *-----------------------------------------------------------------------------*/
 
 Json::Value weapon_prefix;
@@ -325,6 +327,9 @@ list<list<string>> random_weapon_prefixes(int tier, int count)
     return allNames;
 }
 
+/*-----------------------------------------------------------------------------
+ * Other configuration tables for weapon generator.
+ *-----------------------------------------------------------------------------*/
 
 Json::Value weapon_value2_by_class;
 CONFIGURABLE_LOADED(fight, weapon_value2)

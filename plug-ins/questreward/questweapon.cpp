@@ -11,7 +11,7 @@
 #include "object.h"
 #include "profflags.h"
 #include "act.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"

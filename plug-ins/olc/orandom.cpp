@@ -6,7 +6,7 @@
 #include "security.h"
 #include "argparser.h"
 #include "core/object.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "math_utils.h"
 #include "comm.h"
 #include "interp.h"

@@ -25,7 +25,7 @@
 #include "dreamland.h"
 #include "debug_utils.h"
 #include "fight.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "material.h"
 #include "immunity.h"
 #include "../anatolia/handler.h"

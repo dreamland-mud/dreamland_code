@@ -33,7 +33,7 @@
 #include "mercdb.h"
 #include "magic.h"
 #include "fight.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "vnum.h"
 #include "merc.h"
 #include "effects.h"

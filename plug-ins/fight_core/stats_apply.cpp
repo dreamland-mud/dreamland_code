@@ -15,8 +15,6 @@
 /*
  * Attribute bonus tables.
  */
-
-
 json_vector<str_app_type> str_app;
 CONFIGURABLE_LOADED(fight, str_app)
 {

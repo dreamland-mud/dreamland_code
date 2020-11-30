@@ -43,7 +43,7 @@
 #include "mercdb.h"
 #include "magic.h"
 #include "fight.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "stats_apply.h"
 #include "directions.h"
 #include "onehit.h"

@@ -36,7 +36,7 @@
 #include "onehit.h"
 #include "onehit_weapon.h"
 #include "damage_impl.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "vnum.h"
 #include "merc.h"
 #include "act.h"

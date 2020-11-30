@@ -37,7 +37,7 @@
 #include "magic.h"
 #include "save.h"
 #include "material.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "damage.h"
 #include "merc.h"
 #include "gsn_plugin.h"

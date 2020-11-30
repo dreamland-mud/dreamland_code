@@ -39,7 +39,7 @@
 #include "vnum.h"
 #include "mercdb.h"
 #include "fight.h"
-#include "weapons.h"
+#include "weapon-generator.h"
 #include "act_move.h"
 #include "handler.h"
 #include "magic.h"
