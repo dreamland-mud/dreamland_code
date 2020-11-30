@@ -434,7 +434,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     affect_to_obj( blade, &af );
 
     act( "Ты посвящаешь $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_CHAR );
-    act( "$c1 посвящаешь $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
+    act( "$c1 посвящает $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
 }
 
 /*
@@ -556,7 +556,7 @@ void AntipaladinGuildmaster::give( Character *victim, Object *obj )
         say_act( victim, ch, "Над этим клинком уже совершили защитный ритуал." );
     }
     else if (victim->is_npc( ) || victim->getPC( )->getQuestPoints() < price) {
-        say_act( victim, ch, "У тебя не хватит qp для оплаты ритуала." );
+        say_act( victim, ch, "У тебя не хватает квестовых очков для оплаты ритуала." );
     }
     else {
         victim->getPC( )->addQuestPoints(-price);
