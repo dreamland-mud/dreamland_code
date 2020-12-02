@@ -158,7 +158,8 @@ load_mobile(FILE *fp, MOB_INDEX_DATA *pMobIndex)
         throw FileFormatException("load_mobile %d bad start_pos", pMobIndex->vnum);
     if (( pMobIndex->default_pos = position_table.value(fread_word(fp)) ) == NO_FLAG)
         throw FileFormatException("load_mobile %d bad default_pos", pMobIndex->vnum);
-    if (( pMobIndex->sex = sex_table.value(fread_word(fp)) ) == NO_FLAG)
+    word = fread_word(fp);
+    if (( pMobIndex->sex = sex_table.value(!str_cmp(word, "none") ? "neutral" : word) ) == NO_FLAG)
         throw FileFormatException("load_mobile %d bad sex", pMobIndex->vnum);
 
     pMobIndex->wealth                = fread_number( fp );
@@ -447,6 +448,7 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
             EXTRA_DESCR_DATA *ed;
 
             ed                      = new_extra_descr();
+            fread_to_eol(fp); 
             ed->keyword             = fread_string( fp );
             ed->description         = fread_string( fp );
 

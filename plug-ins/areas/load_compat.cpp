@@ -396,7 +396,7 @@ void load_resets( FILE *fp ) {
         
         pReset->arg4        = (letter == 'P' || letter == 'M') ? fread_number(fp) : 0;
 
-                          fread_to_eol( fp );
+        fread_to_eol( fp );
         
         pReset->next = 0;
         if(!reset_first) 
@@ -502,6 +502,9 @@ void fix_resets()
         case 'D':
             pRoomIndex = get_room_index( pReset->arg1 );
 
+            notice("...checking D reset arg1=%d arg2=%d arg3=%d. Found room %s", pReset->arg1, pReset->arg2, pReset->arg3, pRoomIndex->name);
+
+            
             if ( pReset->arg2 == DIR_SOMEWHERE ) {
                 if ( pRoomIndex->extra_exits.empty() ) {
                     bad_reset( "Load_resets: 'D': room %d does not contain extra exits", pReset->arg1 );
@@ -510,11 +513,14 @@ void fix_resets()
             } else {
                 if ( pReset->arg2 < 0
                         || pReset->arg2 > 5
-                        || ( pexit = pRoomIndex->exit[pReset->arg2] ) == 0
-                        || !IS_SET( pexit->exit_info, EX_ISDOOR ) ) {
+                        || ( pexit = pRoomIndex->exit[pReset->arg2] ) == 0)
+                {
                     bad_reset( "Load_resets: 'D': exit %d from room %d not door", pReset->arg2, pRoomIndex->vnum );
                     break;
                 }
+
+                SET_BIT( pexit->exit_info, EX_ISDOOR );
+                SET_BIT( pexit->exit_info_default, EX_ISDOOR );
 
                 switch(pReset->arg3) {
                     default:
@@ -589,6 +595,7 @@ void load_rooms( FILE *fp )
         int vnum;
         char letter;
         int door;
+        const char *word;
 
         letter        = fread_letter( fp );
         if ( letter != '#' )
@@ -602,24 +609,22 @@ void load_rooms( FILE *fp )
 
         if (dup_room_vnum( vnum ))
             throw FileFormatException( "Load_rooms: vnum %d duplicated in %s", vnum, strArea );
-        
+
+        notice("...loading room %d", vnum);
+
         pRoomIndex = new RoomIndexData;
         pRoomIndex->areaIndex   = areaIndexes.back();
         pRoomIndex->vnum        = vnum;
         pRoomIndex->name        = fread_string( fp );
-        pRoomIndex->description        = fread_string( fp );
+        pRoomIndex->description = fread_string( fp );
         /* Area number */           fread_number( fp );
-        pRoomIndex->room_flags        = fread_flag( fp );
+        pRoomIndex->room_flags    = fread_flag( fp );
 
-        if ( 3000 <= vnum && vnum < 3400 )
-            SET_BIT(pRoomIndex->room_flags,ROOM_LAW);
-
-        pRoomIndex->sector_type        = fread_number( fp );
-
-        if( pRoomIndex->sector_type < 0 )
-        {
-            pRoomIndex->sector_type = 0;
-        }
+        word = fread_word(fp);
+        if (isdigit(word[0]))
+            pRoomIndex->sector_type = atoi(word);
+        else
+            pRoomIndex->sector_type = sector_table.value(word);
 
         for ( ; ; )
         {
@@ -650,6 +655,7 @@ void load_rooms( FILE *fp )
                     EXIT_DATA *pexit;
                     EXTRA_EXIT_DATA *peexit;
                     int locks;
+                    char flag;
 
                     door = fread_number( fp );
                     if ( door < 0 || door > 6 )
@@ -666,14 +672,23 @@ void load_rooms( FILE *fp )
                         case 4:
                         case 5:
                             pexit= ( EXIT_DATA* )alloc_perm( sizeof(*pexit) );
+                            fread_to_eol(fp);
                             pexit->description= fread_string( fp );
                             pexit->keyword= fread_string( fp );
-                            locks = fread_number( fp );
 
-                            if ( locks == 6 )
+                            pexit->exit_info = 0;
+                            locks = 0;
+
+                            flag = fread_letter(fp);
+                            
+                            if (flag == '6')
                                 pexit->exit_info = fread_flag( fp );
-                            else
-                                pexit->exit_info = 0;
+                            else if (isdigit(flag))
+                                locks = flag - '0';
+                            else {
+                                ungetc(letter, fp);
+                                pexit->exit_info = fread_flag( fp );
+                            }
 
                             pexit->key= fread_number( fp );
                             pexit->u1.vnum= fread_number( fp );
@@ -692,6 +707,9 @@ void load_rooms( FILE *fp )
                             if (pexit->keyword == &str_empty[0] && IS_SET(pexit->exit_info, EX_ISDOOR))
                                 pexit->keyword = str_dup("дверь");
 
+                            notice("...loaded exit %d to room %d with flags [%s], key [%d], keyword [%s]",
+                                   door, pexit->u1.vnum, exit_flags.names(pexit->exit_info).c_str(), 
+                                   pexit->key, pexit->keyword);
                             pRoomIndex->exit[door]= pexit;
                             break;
 
@@ -724,6 +742,7 @@ void load_rooms( FILE *fp )
                     EXTRA_DESCR_DATA *ed;
 
                     ed                = new_extra_descr();
+                    fread_to_eol(fp); 
                     ed->keyword        = fread_string( fp );
                     ed->description        = fread_string( fp );
                     
