@@ -2,8 +2,10 @@
 #define WEAPON_GENERATOR_H
 
 #include <vector>
+#include <list>
 #include <jsoncpp/json/json.h>
 #include "configurable.h"
+#include "flags.h"
 
 class Object;
 extern const FlagTable extra_flags;
@@ -59,8 +61,9 @@ private:
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
     WeaponGenerator();
+    virtual ~WeaponGenerator();
 
-    WeaponGenerator & item(Object *obj) { this->obj = obj; return *this; }
+    WeaponGenerator & item(Object *obj);
     WeaponGenerator & skill(int sn) { this->sn = sn; return *this; }
     WeaponGenerator & valueTier(int tier) { this->valTier = tier; return *this; }
     WeaponGenerator & hitrollTier(int tier) { this->hrTier = tier; return *this; }
@@ -71,7 +74,10 @@ struct WeaponGenerator {
     WeaponGenerator & damrollMinStartValue(int minValue)  { this->drMinValue = minValue; return *this; }
     WeaponGenerator & hitrollIndexBonus(int bonus) { this->hrIndexBonus = bonus; return *this; }
     WeaponGenerator & damrollIndexBonus(int bonus) { this->drIndexBonus = bonus; return *this; }
-    
+
+    WeaponGenerator &  randomNames();
+    WeaponGenerator &  randomAffixes();
+
     const WeaponGenerator & assignValues() const;
     
     const WeaponGenerator & assignHitroll() const;
@@ -84,15 +90,24 @@ struct WeaponGenerator {
     const WeaponGenerator & incrementDamroll() const;
 
     const WeaponGenerator & assignNames() const;
+    const WeaponGenerator & assignFlags() const;
     const WeaponGenerator & assignDamageType() const;
 
 private:
     void setAffect(int location, int modifier) const;
-    DLString findMaterial(Json::Value &entry) const;
+    void setName() const;
+    void setShortDescr() const;
+    DLString findMaterial() const;
     int maxDamroll() const;
     int maxHitroll() const;
     int minDamroll() const;
     int minHitroll() const;
+
+    Json::Value nameConfig;
+    Flags extraFlags;
+    Flags weaponFlags;
+    DLString materialName;
+    vector<DLString> adjectives;
 
     int sn;
     int valTier;
@@ -106,6 +121,7 @@ private:
     int drIndexBonus;
 
     Object *obj;    
+    DLString wclass;
 };
 
 

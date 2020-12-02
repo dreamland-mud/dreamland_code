@@ -187,7 +187,28 @@ struct prefix_generator {
 
         minPrice = tier.min_points;
         maxPrice = tier.max_points;
+        requirements = 0L;
+    }
 
+    /** Mark a certain prefix as forbidden in all combinations. */
+    void addExclusion(const DLString &name)
+    {
+        int index = getPrefixIndex(name);
+        if (index >= 0)
+            for (auto &ex: exclusions)
+                SET_BIT(ex, 1 << index);
+    }
+
+    /** Mark a certain prefix as required (always chosen). */
+    void addRequirement(const DLString &name)
+    {
+        int index = getPrefixIndex(name);
+        if (index >= 0)
+            SET_BIT(requirements, 1 << index);
+    }
+
+    void run() 
+    {
         generateBuckets(0, 0, 0L);
 
         notice("Weapon generator: found %d result buckets for tier %d and %d prefixes", 
@@ -213,6 +234,14 @@ struct prefix_generator {
     }
 
 private:
+
+    int getPrefixIndex(const DLString &name)
+    {
+        for (unsigned int i = 0; i < prefixes.size(); i++)
+            if (prefixes[i].entry["value"].asString() == name)
+                return i;
+        return -1;
+    }
 
     /** Choose a random set element. */
     bucket_mask_t randomBucket() const 
@@ -246,9 +275,12 @@ private:
             generateBuckets(currentTotal + prefixes[index].price, index + 1, currentMask);
         }
 
-        // Explore all further combinations that can happen if this prefix is excluded.
-        REMOVE_BIT(currentMask, 1 << index);
-        generateBuckets(currentTotal, index + 1, currentMask);
+        // First check whether current prefix is required and cannot be excluded.
+        if (!IS_SET(requirements, 1 << index)) {
+            // Explore all further combinations that can happen if this prefix is excluded.
+            REMOVE_BIT(currentMask, 1 << index);
+            generateBuckets(currentTotal, index + 1, currentMask);
+        }
     }
 
     /** Creates a vector of all prefixes that are allowed for the tier, sorted by price in ascending order. */
@@ -278,12 +310,13 @@ private:
     }
 
     /** Creates a NxN matrix of prefix flags, marking those that are mutually exclusive.
-     *  For now only exclude different materials, but can be configured more flexibly in json.
      */
     void markExclusions() 
     {
+        exclusions.resize(prefixes.size());
+
         for (unsigned int i = 0; i < prefixes.size(); i++) {            
-            bucket_mask_t exclusion = 0L;
+            bucket_mask_t &exclusion = exclusions[i];
             prefix_info &p = prefixes[i];
 
             if (p.name == "material")
@@ -291,7 +324,13 @@ private:
                     if (i != j && prefixes[j].name == p.name)
                         SET_BIT(exclusion, 1 << j);
 
-            exclusions.push_back(exclusion);
+            for (auto &excl: p.entry["excl"]) {
+                int index = getPrefixIndex(excl.asString());
+                if (index >= 0) {
+                    SET_BIT(exclusion, 1 << index);
+                    SET_BIT(exclusions[index], 1 << i);
+                }
+            }
         }
     }
 
@@ -303,6 +342,9 @@ private:
 
     /** Keeps all possible combination matching tier's price. If a bit M is set in a bucket mask, then prefix M is included. */
     set<bucket_mask_t> buckets;
+
+    /** Marks prefixes that need to always be included in the result. */
+    bucket_mask_t requirements;
 
     /** Keeps all exclusions for prefixes. If entry N has a bit M set, then prefixes N and M are mutually exclusive. */
     vector<bucket_mask_t> exclusions;
@@ -316,6 +358,7 @@ list<list<string>> random_weapon_prefixes(int tier, int count)
 {
     list<list<string>> allNames;
     prefix_generator gen(tier);
+    gen.run();
 
     for (int i = 0; i < min(count, gen.getResultSize()); i++) {
         list<string> names;
@@ -409,6 +452,11 @@ WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, int
     calcAve();
     calcValues();
     calcDamroll();
+}
+
+WeaponGenerator::~WeaponGenerator()
+{
+
 }
 
 int WeaponCalculator::getTierIndex() const
@@ -525,12 +573,21 @@ void WeaponCalculator::calcDamroll()
  * WeaponGenerator
  *-------------------------------------------------------------------------*/
 WeaponGenerator::WeaponGenerator()
+        : extraFlags(0, &extra_flags),
+          weaponFlags(0, &weapon_type2)
 {
     sn = gsn_none;
     valTier = hrTier = drTier = 5;
     hrCoef = drCoef = 0;
     hrMinValue = drMinValue = 0;
     hrIndexBonus = drIndexBonus = 0;
+}
+
+WeaponGenerator & WeaponGenerator::item(Object *obj)
+{ 
+     this->obj = obj; 
+     wclass = weapon_class.name(obj->value0());
+     return *this; 
 }
 
 const WeaponGenerator & WeaponGenerator::assignValues() const
@@ -639,48 +696,135 @@ void WeaponGenerator::setAffect(int location, int modifier) const
     paf->modifier = modifier;
 }
 
-const WeaponGenerator & WeaponGenerator::assignNames() const
+WeaponGenerator & WeaponGenerator::randomNames()
 {
-    DLString wclass = weapon_class.name(obj->value0());
-    Json::Value &names = weapon_names[wclass];
+    const Json::Value &configs = weapon_names[wclass];
 
-    if (names.empty()) {
+    if (configs.empty()) {
         warn("Weapon generator: no names defined for type %s.", wclass.c_str());
         return *this;
     }
 
-    int index = number_range(0, names.size() - 1);
-    Json::Value &entry = names[index];
+    int index = number_range(0, configs.size() - 1);
+    nameConfig = configs[index];
+    return *this;
+}
 
-    // Config item names and gram gender. 
-    StringList mynames(entry["name"].asString());
+WeaponGenerator & WeaponGenerator::randomAffixes()
+{
+    prefix_generator gen(valTier);
+
+    // Set exclusions or requirements based on chosen names and weapon flags.
+    DLString twohand = nameConfig["twohand"].asString();
+    if (twohand == "1")
+        gen.addExclusion("two_hands");
+    else if (twohand == "2")
+        gen.addRequirement("two_hands");
+
+    // Generate all combinations of prefixes.
+    gen.run();
+
+    if (gen.getResultSize() == 0) {
+        warn("Weapon generator: no prefixes found for tier %d.", valTier);
+        return *this;
+    }    
+
+    // Collect all configurations mandated by given set of prefixes: weapon flags, extra flags, materials.
+    auto result = gen.getSingleResult();
+    int minPrice = result.front().price;
+    int maxPrice = result.back().price;
+
+    for (auto &pinfo: result) {
+        const Json::Value &prefix = pinfo.entry;
+        const DLString &section = pinfo.name;
+        obj->carried_by->pecho("{DPrefix %s [%d]", prefix["value"].asCString(), pinfo.price);
+
+        if (section == "flag") {
+            extraFlags.setBits(prefix["extra"].asString());
+            weaponFlags.setBits(prefix["value"].asString());
+        } else if (section == "extra") {
+            extraFlags.setBits(prefix["value"].asString());
+        } else if (section == "material") {
+            materialName = prefix["value"].asString();
+        }
+
+        // Each adjective has a chance to be chosen, but the most expensive get an advantage.
+        for (auto &adj: prefix["adjectives"])
+            if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
+                adjectives.push_back(adj.asString());
+    }
+
+    obj->carried_by->pecho("{DExtras %s, weapon flags %s, material %s{x", 
+        extraFlags.names().c_str(), weaponFlags.names().c_str(), materialName.c_str());
+
+    return *this;
+}
+
+void WeaponGenerator::setName() const
+{
+    StringList mynames(nameConfig["name"].asString());
     mynames.addUnique(wclass);
     mynames.addUnique(weapon_class.message(obj->value0()));
     obj->setName(mynames.join(" ").c_str());
-    obj->setShortDescr(entry["short"].asCString());
-    obj->setDescription(entry["long"].asCString());
-    obj->gram_gender = MultiGender(entry["gender"].asCString());
+}
 
-    // Set up 'two handed' weapon flag: 2 - two hands, 1 - one hand, 0 - either.
-    DLString twohand = entry["twohand"].asString();
-    if (twohand == "2" || (twohand.empty() && chance(10))) {
-        obj->value4(obj->value4() | WEAPON_TWO_HANDS);
+void WeaponGenerator::setShortDescr() const
+{
+    DLString randomAdjective; 
+
+    if (!adjectives.empty()) {
+        int a = number_range(0, adjectives.size() - 1);
+        randomAdjective = adjectives[a];
     }
+
+    DLString colour = weapon_tier_table[valTier-1].colour;
+    DLString myshort;
+
+    if (!colour.empty())
+        myshort = "{" + colour;
+
+    if (!randomAdjective.empty())
+        myshort += randomAdjective + " ";
+
+    myshort += nameConfig["short"].asString();
+
+    if (!colour.empty())
+        myshort += "{x";
+
+    obj->setShortDescr(myshort.c_str());
+}
+
+const WeaponGenerator & WeaponGenerator::assignNames() const
+{
+    // Config item names and gram gender. 
+    setName();
+    setShortDescr();
+    obj->setDescription(nameConfig["long"].asCString());
+    obj->gram_gender = MultiGender(nameConfig["gender"].asCString());
+
+    // Set up provided material or default.
+    obj->setMaterial(findMaterial().c_str());
+
+    obj->properties["tier"] = valTier;
+    return *this;
+}
+
+const WeaponGenerator & WeaponGenerator::assignFlags() const
+{
+    SET_BIT(obj->extra_flags, extraFlags.getValue());
+    SET_BIT(obj->extra_flags, weapon_tier_table[valTier-1].extra.getValue());
+    obj->value4(obj->value4() | weaponFlags.getValue());
 
     // Set weight: 0.4 kg by default in OLC, 2kg for two hand.
     // TODO: Weight is very approximate, doesn't depend on weapon type.
     if (IS_SET(obj->value4(), WEAPON_TWO_HANDS))
         obj->weight *= 5;
 
-    // Set up provided material or default.
-    obj->setMaterial(findMaterial(entry).c_str());
-
     return *this;
 }
 
 const WeaponGenerator & WeaponGenerator::assignDamageType() const
 {
-    DLString wclass = weapon_class.name(obj->value0());
     Json::Value &entry = weapon_damtype[wclass];
 
     if (entry.empty()) {
@@ -717,17 +861,21 @@ const WeaponGenerator & WeaponGenerator::assignDamageType() const
 /** Look up material based on suggested names or types. 
  *  Return 'metal' if nothing found.
  */
-DLString WeaponGenerator::findMaterial(Json::Value &entry) const
+DLString WeaponGenerator::findMaterial() const
 {
+    // First analyze prefix requirements for material.
+    if (!materialName.empty())
+        return materialName;
+
     // Find by exact name, e.g. "fish".
-    DLString mname = entry["material"].asString();
+    DLString mname = nameConfig["material"].asString();
     const material_t *material = material_by_name(mname);
     if (material)
         return material->name;
 
     // Find a random material name for each of requested types.
     StringList materials;
-    for (auto &mtype: entry["mtypes"]) {
+    for (auto &mtype: nameConfig["mtypes"]) {
         bitstring_t type = material_types.bitstring(mtype.asString());
         auto withType = materials_by_type(type);
 

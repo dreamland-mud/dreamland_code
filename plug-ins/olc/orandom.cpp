@@ -39,7 +39,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     pegtl::mud::MyArgs myargs = { -1, -1, -1, "" };
 
     if (!parse_input<pegtl::mud::grammar, pegtl::mud::MyArgs>(ch, argument, myargs)) {
-        ch->println("Формат: {Worandom{x <weapon class> {Wl{x<level> {Wt{x<tier> [{W-{xtable]");
+        ch->println("Формат: {Worandom{x <weapon class> {Wl{x<level> {Wt{x<tier> [{W-{xtable|{W-{xaffix]");
         return;
     }
 
@@ -72,18 +72,19 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
 
-    // Affix mode (-affix argument): display several possible flag combination for given tier.
+    // Affix mode (-affix argument): display several possible flag combinations for given tier.
     if (arg_oneof(myargs.word, "affix", "prefix")) {
         ostringstream buf;
         int tier = myargs.tier == -1  ? number_range(BEST_TIER, WORST_TIER) : myargs.tier;
         int count = 50;
 
-        auto allNames = random_weapon_prefixes(tier, count);        
+        auto allNames = random_weapon_prefixes(tier, count);
         ch->printf("{W%d случайных комбинаций префиксов для крутости %d:\r\n", allNames.size(), tier);
 
         for (auto &names: allNames) {
-            for (auto &name: names)
-                buf << dlprintf("%9s ", name.c_str());
+            for (auto &name: names) {
+                buf << dlprintf("%9s{x ", name.c_str());
+            }
             buf << endl;
         }            
 
@@ -113,10 +114,13 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         .hitrollTier(tier)
         .damrollTier(tier)
         .valueTier(tier)
+        .randomNames()
+        .randomAffixes()
         .assignHitroll()
         .assignDamroll()
         .assignValues()
         .assignNames()
+        .assignFlags()
         .assignDamageType();
 
     interpret_fmt(ch, "stat obj %lld", obj->getID());
