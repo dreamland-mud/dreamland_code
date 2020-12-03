@@ -19,6 +19,7 @@
 
 #include "weapons.h"
 #include "weapon-generator.h"
+#include "morphology.h"
 #include "math_utils.h"
 #include "material.h"
 #include "material-table.h"
@@ -772,6 +773,8 @@ void WeaponGenerator::setShortDescr() const
 {
     DLString randomAdjective; 
 
+    obj->gram_gender = MultiGender(nameConfig["gender"].asCString());
+
     if (!adjectives.empty()) {
         int a = number_range(0, adjectives.size() - 1);
         randomAdjective = adjectives[a];
@@ -784,7 +787,7 @@ void WeaponGenerator::setShortDescr() const
         myshort = "{" + colour;
 
     if (!randomAdjective.empty())
-        myshort += randomAdjective + " ";
+        myshort += Morphology::adjective(randomAdjective, obj->gram_gender) + " ";
 
     myshort += nameConfig["short"].asString();
 
@@ -800,7 +803,6 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     setName();
     setShortDescr();
     obj->setDescription(nameConfig["long"].asCString());
-    obj->gram_gender = MultiGender(nameConfig["gender"].asCString());
 
     // Set up provided material or default.
     obj->setMaterial(findMaterial().c_str());
