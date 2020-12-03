@@ -121,6 +121,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         .assignValues()
         .assignNames()
         .assignFlags()
+        .assignAffects()
         .assignDamageType();
 
     interpret_fmt(ch, "stat obj %lld", obj->getID());

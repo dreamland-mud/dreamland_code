@@ -5,6 +5,8 @@
 #include <math.h>
 #include <algorithm>
 #include <random>
+#include <bitset>
+#include <unordered_set>
 
 #include "profiler.h"
 #include "grammar_entities_impl.h"
@@ -159,13 +161,14 @@ CONFIGURABLE_LOADED(fight, weapon_prefix)
 
 /** Helper structure to access prefix configuration. */
 struct prefix_info {
-    prefix_info(string name, int price, const Json::Value &entry) 
-            : name(name), price(price), entry(entry)
+    prefix_info(string name, int price, int stack, const Json::Value &entry) 
+            : name(name), price(price), stack(stack), entry(entry)
     {        
     }
 
     string name;
     int price;
+    int stack;
     const Json::Value &entry;
 };
 
@@ -176,8 +179,8 @@ static bool sort_by_price(const prefix_info &p1, const prefix_info &p2)
 
 /** This class can generate all combinations of prefixes that match given tier and its price range. */
 struct prefix_generator {
-    /** A mask that can hold boolean information about up to 64 prefixes. */
-    typedef long long int bucket_mask_t;
+    /** A mask that can hold boolean information about 100 affixes. */
+    typedef bitset<100> bucket_mask_t;
 
     prefix_generator(int t) : tier(weapon_tier_table[t-1]) 
     {
@@ -197,7 +200,7 @@ struct prefix_generator {
         int index = getPrefixIndex(name);
         if (index >= 0)
             for (auto &ex: exclusions)
-                SET_BIT(ex, 1 << index);
+                ex.set(index);
     }
 
     /** Mark a certain prefix as required (always chosen). */
@@ -205,7 +208,7 @@ struct prefix_generator {
     {
         int index = getPrefixIndex(name);
         if (index >= 0)
-            SET_BIT(requirements, 1 << index);
+            requirements.set(index);
     }
 
     void run() 
@@ -223,7 +226,7 @@ struct prefix_generator {
         bucket_mask_t bucket = randomBucket();
 
         for (unsigned int i = 0; i < prefixes.size(); i++)
-            if (IS_SET(bucket, 1 << i))
+            if (bucket.test(i))
                 result.push_back(prefixes[i]);
 
         return result;
@@ -242,6 +245,15 @@ private:
             if (prefixes[i].entry["value"].asString() == name)
                 return i;
         return -1;
+    }
+
+    list<int> getPrefixIndexes(const DLString &name)
+    {
+        list<int> result;
+        for (unsigned int i = 0; i < prefixes.size(); i++)
+            if (prefixes[i].entry["value"].asString() == name)
+                result.push_back(i);
+        return result;
     }
 
     /** Choose a random set element. */
@@ -269,17 +281,21 @@ private:
             // Stop now: reached the end of prefixes vector.
             return;
 
+        // Stop now: adding this or any subsequent price will still exceed maxPrice.
+        if (currentTotal + prefixes[index].price > maxPrice)
+            return;
+
         // First check whether current prefix doesn't conflict with any prefix chosen earlier.
-        if (!IS_SET(currentMask, exclusions[index])) {
+        if ((currentMask & exclusions[index]).none()) {
             // Explore all further combinations that can happen if this prefix is included.
-            SET_BIT(currentMask, 1 << index);
+            currentMask.set(index);
             generateBuckets(currentTotal + prefixes[index].price, index + 1, currentMask);
         }
 
         // First check whether current prefix is required and cannot be excluded.
-        if (!IS_SET(requirements, 1 << index)) {
+        if (!requirements.test(index)) {
             // Explore all further combinations that can happen if this prefix is excluded.
-            REMOVE_BIT(currentMask, 1 << index);
+            currentMask.reset(index);
             generateBuckets(currentTotal, index + 1, currentMask);
         }
     }
@@ -294,14 +310,23 @@ private:
             return;
         }
 
-        for (auto &key: weapon_prefix.getMemberNames()) {
-            for (auto &entry: weapon_prefix[key]) {
+        for (auto &section: weapon_prefix.getMemberNames()) {
+            for (auto &entry: weapon_prefix[section]) {
                 int threshold = entry.isMember("tier") ? entry["tier"].asInt() : WORST_TIER;
                 if (tier.num > threshold)
                     continue;
 
-                int price = entry["price"].asInt();
-                sorted.push_back(prefix_info(key, price, entry));
+                // See if negative counterpart has to be generated for this affix.
+                bool both = entry.isMember("both") ? entry["both"].asBool() : false;
+
+                // Decide how many times this affix has to be repeated, from 1 to 'stack'.
+                int stack = entry.isMember("stack") ? entry["stack"].asInt() : 1;
+                for (int s = 1; s <= stack; s++) {
+                    int price = entry["price"].asInt();                
+                    sorted.push_back(prefix_info(section, price * s, s, entry));
+                    if (both)
+                        sorted.push_back(prefix_info(section, -price * s, s, entry));
+                }
             }
         }
 
@@ -323,15 +348,23 @@ private:
             if (p.name == "material")
                 for (unsigned int j = 0; j < prefixes.size(); j++)
                     if (i != j && prefixes[j].name == p.name)
-                        SET_BIT(exclusion, 1 << j);
+                        exclusion.set(j);
 
             for (auto &excl: p.entry["excl"]) {
                 int index = getPrefixIndex(excl.asString());
                 if (index >= 0) {
-                    SET_BIT(exclusion, 1 << index);
-                    SET_BIT(exclusions[index], 1 << i);
+                    exclusion.set(index);
+                    exclusions[index].set(i);
                 }
             }
+        }
+
+        // Mark all stacked values such as +hr, -hr as mutually exclusive.
+        for (unsigned int i = 0; i < prefixes.size(); i++) {
+            const prefix_info &p = prefixes[i];
+            for (auto &same: getPrefixIndexes(p.entry["value"].asString()))
+                if (i != same)
+                    exclusions[i].set(same);
         }
     }
 
@@ -342,7 +375,7 @@ private:
     vector<prefix_info> prefixes;
 
     /** Keeps all possible combination matching tier's price. If a bit M is set in a bucket mask, then prefix M is included. */
-    set<bucket_mask_t> buckets;
+    unordered_set<bucket_mask_t> buckets;
 
     /** Marks prefixes that need to always be included in the result. */
     bucket_mask_t requirements;
@@ -352,6 +385,7 @@ private:
 
     int minPrice;
     int maxPrice;
+    bitnumber_t align;
 };
 
 // Debug util: grab several good prefix combinations for the tier. 
@@ -722,7 +756,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     else if (twohand == "2")
         gen.addRequirement("two_hands");
 
-    // Generate all combinations of prefixes.
+    // Generate all combinations of affixes.
     gen.run();
 
     if (gen.getResultSize() == 0) {
@@ -730,7 +764,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         return *this;
     }    
 
-    // Collect all configurations mandated by given set of prefixes: weapon flags, extra flags, materials.
+    // Collect all configurations mandated by given set of affixes: flags, material, affects.
     auto result = gen.getSingleResult();
     int minPrice = result.front().price;
     int maxPrice = result.back().price;
@@ -738,7 +772,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     for (auto &pinfo: result) {
         const Json::Value &prefix = pinfo.entry;
         const DLString &section = pinfo.name;
-        obj->carried_by->pecho("{DPrefix %s [%d]", prefix["value"].asCString(), pinfo.price);
+        obj->carried_by->pecho("{DAffix %s [%d]", prefix["value"].asCString(), pinfo.price);
 
         if (section == "flag") {
             extraFlags.setBits(prefix["extra"].asString());
@@ -749,10 +783,16 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             materialName = prefix["value"].asString();
         }
 
-        // Each adjective has a chance to be chosen, but the most expensive get an advantage.
+        // TODO collect data for suffixes, including hr/dr/ave tier bonuses.
+
+        // Each adjective or noun has a chance to be chosen, but the most expensive get an advantage.
         for (auto &adj: prefix["adjectives"])
             if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
                 adjectives.push_back(adj.asString());
+
+        for (auto &noun: prefix["nouns"])
+            if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
+                nouns.push_back(noun.asString());
     }
 
     obj->carried_by->pecho("{DExtras %s, weapon flags %s, material %s{x", 
@@ -771,13 +811,18 @@ void WeaponGenerator::setName() const
 
 void WeaponGenerator::setShortDescr() const
 {
-    DLString randomAdjective; 
+    DLString randomAdjective, randomNoun; 
 
     obj->gram_gender = MultiGender(nameConfig["gender"].asCString());
 
     if (!adjectives.empty()) {
         int a = number_range(0, adjectives.size() - 1);
         randomAdjective = adjectives[a];
+    }
+
+    if (!nouns.empty()) {
+        int n = number_range(0, nouns.size() - 1);
+        randomNoun = nouns[n];
     }
 
     DLString colour = weapon_tier_table[valTier-1].colour;
@@ -787,9 +832,12 @@ void WeaponGenerator::setShortDescr() const
         myshort = "{" + colour;
 
     if (!randomAdjective.empty())
-        myshort += Morphology::adjective(randomAdjective, obj->gram_gender) + " ";
+        myshort += Morphology::adjective(randomAdjective, obj->gram_gender) + " "; // леденящий
 
-    myshort += nameConfig["short"].asString();
+    myshort += nameConfig["short"].asString(); // буздыган
+
+    if (!randomNoun.empty())
+        myshort += " " + randomNoun; // боли
 
     if (!colour.empty())
         myshort += "{x";
@@ -808,6 +856,12 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     obj->setMaterial(findMaterial().c_str());
 
     obj->properties["tier"] = valTier;
+    return *this;
+}
+
+const WeaponGenerator & WeaponGenerator::assignAffects() const
+{
+    // TODO applya affects from suffixes.
     return *this;
 }
 

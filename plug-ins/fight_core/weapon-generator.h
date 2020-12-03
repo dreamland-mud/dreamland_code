@@ -92,6 +92,7 @@ struct WeaponGenerator {
     const WeaponGenerator & assignNames() const;
     const WeaponGenerator & assignFlags() const;
     const WeaponGenerator & assignDamageType() const;
+    const WeaponGenerator & assignAffects() const;
 
 private:
     void setAffect(int location, int modifier) const;
@@ -108,6 +109,7 @@ private:
     Flags weaponFlags;
     DLString materialName;
     vector<DLString> adjectives;
+    vector<DLString> nouns;
 
     int sn;
     int valTier;
