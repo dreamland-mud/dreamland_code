@@ -13,9 +13,9 @@ using namespace std;
 class DLString;
 class weapon_tier_t;
 
-/** Helper structure to access prefix configuration. */
-struct prefix_info {
-    prefix_info(const string &section, const string &affixName, int price, int stack, Json::Value entry);
+/** Helper structure to access affix configuration. */
+struct affix_info {
+    affix_info(const string &section, const string &affixName, int price, int stack, Json::Value entry);
 
     string section;
     string affixName;
@@ -28,10 +28,10 @@ struct prefix_info {
 /** A mask that can hold boolean information about 100 affixes. */
 typedef bitset<100> bucket_mask_t;
 
-/** This class can generate all combinations of prefixes that match given tier and its price range. */
-struct prefix_generator {
+/** This class can generate all combinations of affixes that match given tier and its price range. */
+struct affix_generator {
 
-    prefix_generator(int tier);
+    affix_generator(int tier);
 
     /** Remember align restriction. */
     void setAlign(int align);
@@ -44,8 +44,8 @@ struct prefix_generator {
 
     void run();
 
-    /** Produces a single random prefix combination out of all generated ones. */
-    list<prefix_info> getSingleResult() const;
+    /** Produces a single random affix combination out of all generated ones. */
+    list<affix_info> getSingleResult() const;
 
     int getResultSize() const;
 
@@ -58,12 +58,12 @@ private:
     /** Choose a random set element. */
     bucket_mask_t randomBucket() const;
 
-    /** Recursively produce masks were 1 marks an included prefix, 0 marks an excluded prefix.
-     *  Each mask denotes a combination of prefixes those total price matches prices for the tier. 
+    /** Recursively produce masks were 1 marks an included affix, 0 marks an excluded affix.
+     *  Each mask denotes a combination of affixes those total price matches prices for the tier. 
      */
     void generateBuckets(int currentTotal, long unsigned int index, bucket_mask_t currentMask);
 
-    /** Creates a vector of all prefixes that are allowed for the tier, sorted by price in ascending order. */
+    /** Creates a vector of all affixes that are allowed for the tier, sorted by price in ascending order. */
     void collectPrefixesForTier();
 
     bool checkRequirementConflict(const Json::Value &affix) const;
@@ -77,23 +77,23 @@ private:
     /** Expresses affix names from 'required' field as a bit mask. */
     void markRequirements();
 
-    /** Creates a NxN matrix of prefix flags, marking those that are mutually exclusive.
+    /** Creates a NxN matrix of affix flags, marking those that are mutually exclusive.
      */
     void markExclusions();
 
     /** Keeps info about current tier. */
     weapon_tier_t &tier;
 
-    /** Keeps all avaialble prefixes sorted by price. */
-    vector<prefix_info> prefixes;
+    /** Keeps all avaialble affixes sorted by price. */
+    vector<affix_info> affixes;
 
-    /** Keeps all possible combination matching tier's price. If a bit M is set in a bucket mask, then prefix M is included. */
+    /** Keeps all possible combination matching tier's price. If a bit M is set in a bucket mask, then affix M is included. */
     unordered_set<bucket_mask_t> buckets;
 
-    /** Marks prefixes that need to always be included in the result. */
+    /** Marks affixes that need to always be included in the result. */
     bucket_mask_t requirements;
 
-    /** Keeps all exclusions for prefixes. If entry N has a bit M set, then prefixes N and M are mutually exclusive. */
+    /** Keeps all exclusions for affixes. If entry N has a bit M set, then affixes N and M are mutually exclusive. */
     vector<bucket_mask_t> exclusions;
 
     int minPrice;

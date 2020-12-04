@@ -189,7 +189,7 @@ WeaponGenerator & WeaponGenerator::randomNames()
 
 WeaponGenerator & WeaponGenerator::randomAffixes()
 {
-    prefix_generator gen(valTier);
+    affix_generator gen(valTier);
 
     // Set exclusions or requirements based on chosen names and weapon flags.
     for (auto const &affixName: wclassConfig["forbids"])
@@ -212,7 +212,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     gen.run();
 
     if (gen.getResultSize() == 0) {
-        warn("Weapon generator: no prefixes found for tier %d.", valTier);
+        warn("Weapon generator: no affixes found for tier %d.", valTier);
         return *this;
     }    
 
@@ -222,27 +222,27 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     int maxPrice = result.back().price;
 
     for (auto &pinfo: result) {
-        const Json::Value &prefix = pinfo.entry;
+        const Json::Value &affix = pinfo.entry;
         const DLString &section = pinfo.section;
-        obj->carried_by->pecho("{DAffix %s [%d]", prefix["value"].asCString(), pinfo.price);
+        obj->carried_by->pecho("{DAffix %s [%d]", affix["value"].asCString(), pinfo.price);
 
         if (section == "flag") {
-            extraFlags.setBits(prefix["extra"].asString());
-            weaponFlags.setBits(prefix["value"].asString());
+            extraFlags.setBits(affix["extra"].asString());
+            weaponFlags.setBits(affix["value"].asString());
         } else if (section == "extra") {
-            extraFlags.setBits(prefix["value"].asString());
+            extraFlags.setBits(affix["value"].asString());
         } else if (section == "material") {
-            materialName = prefix["value"].asString();
+            materialName = affix["value"].asString();
         }
 
         // TODO collect data for suffixes, including hr/dr/ave tier bonuses.
 
         // Each adjective or noun has a chance to be chosen, but the most expensive get an advantage.
-        for (auto &adj: prefix["adjectives"])
+        for (auto &adj: affix["adjectives"])
             if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
                 adjectives.push_back(adj.asString());
 
-        for (auto &noun: prefix["nouns"])
+        for (auto &noun: affix["nouns"])
             if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
                 nouns.push_back(noun.asString());
     }
@@ -313,7 +313,7 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
 
 const WeaponGenerator & WeaponGenerator::assignAffects() const
 {
-    // TODO applya affects from suffixes.
+    // TODO apply affects from suffixes.
     return *this;
 }
 
