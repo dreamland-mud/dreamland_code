@@ -6,7 +6,10 @@
 #include "security.h"
 #include "argparser.h"
 #include "core/object.h"
-#include "weapon-generator.h"
+#include "weapongenerator.h"
+#include "weaponcalculator.h"
+#include "weapontier.h"
+#include "weaponaffixes.h"
 #include "math_utils.h"
 #include "comm.h"
 #include "interp.h"
@@ -15,7 +18,7 @@
 #include "act.h"
 #include "def.h"
 
-list<list<string>> random_weapon_prefixes(int tier, int count, int align);
+list<list<string>> random_weapon_affixes(int tier, int count, int align);
 
 namespace pegtl = TAO_PEGTL_NAMESPACE;
 
@@ -81,7 +84,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         int align = myargs.align == -1 ? ALIGN_NONE : myargs.align;
         int count = 50;
 
-        auto allNames = random_weapon_prefixes(tier, count, align);
+        auto allNames = random_weapon_affixes(tier, count, align);
         ch->printf("{W%d случайных комбинаций аффиксов для крутости %d и характера %d:\r\n", 
                     allNames.size(), tier, align);
 

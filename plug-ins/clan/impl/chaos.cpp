@@ -30,7 +30,7 @@
 #include "act.h"
 #include "act_move.h"
 #include "interp.h"
-#include "weapon-generator.h"
+#include "weapongenerator.h"
 #include "gsn_plugin.h"
 #include "handler.h"
 #include "merc.h"

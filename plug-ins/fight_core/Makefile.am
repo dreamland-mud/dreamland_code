@@ -24,6 +24,10 @@ damage_impl.cpp \
 character.cpp \
 stats_apply.cpp \
 weapons.cpp \
+weapontier.cpp \
+weaponaffixes.cpp \
+weaponcalculator.cpp \
+weapongenerator.cpp \
 material.cpp \
 fight_safe.cpp \
 immunity.cpp \

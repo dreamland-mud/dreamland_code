@@ -2,61 +2,10 @@
 #define WEAPON_GENERATOR_H
 
 #include <vector>
-#include <list>
 #include <jsoncpp/json/json.h>
-#include "configurable.h"
 #include "flags.h"
 
 class Object;
-extern const FlagTable extra_flags;
-
-/** Weapon tier: determines how cool is the weapon and all related tier settings. */
-struct weapon_tier_t {
-    int num;
-    DLString rname;
-    DLString aura;
-    DLString colour;
-    json_flag<&extra_flags> extra;
-    int min_points;
-    int max_points;
-
-    void fromJson(const Json::Value &value);
-};
-
-extern json_vector<weapon_tier_t> weapon_tier_table;
-
-#define BEST_TIER 1
-#define WORST_TIER 5
-
-/** Weapon parameter calculator: figure out v1, v2 and damroll for given tier, level and weapon class. */
-struct WeaponCalculator {
-    WeaponCalculator(int tier, int level, bitnumber_t wclass, int index_bonus = 0);
-
-    int getValue1() const { return value1; }
-    int getValue2() const { return value2; }
-    int getDamroll() const { return damroll; }
-    int getAve() const { return ave; }
-    int getRealAve() const { return real_ave; }
-
-private:
-    void calcValue2Range();
-    void calcAve();
-    void calcValues();
-    void calcDamroll();
-    int getTierIndex() const;
-
-    int tier;
-    int level;
-    bitnumber_t wclass;
-    int v2_min;
-    int v2_max;
-    int value1;
-    int value2;
-    int ave;
-    int real_ave;
-    int damroll;
-    int index_bonus;
-};
 
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
