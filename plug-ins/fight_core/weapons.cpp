@@ -161,15 +161,16 @@ CONFIGURABLE_LOADED(fight, weapon_prefix)
 
 /** Helper structure to access prefix configuration. */
 struct prefix_info {
-    prefix_info(string name, int price, int stack, const Json::Value &entry) 
-            : name(name), price(price), stack(stack), entry(entry)
+    prefix_info(const string &section, const string &affixName, int price, int stack, Json::Value entry) 
+            : section(section), affixName(affixName), price(price), stack(stack), entry(entry)
     {        
     }
 
-    string name;
+    string section;
+    string affixName;
     int price;
     int stack;
-    const Json::Value &entry;
+    Json::Value entry;
 };
 
 static bool sort_by_price(const prefix_info &p1, const prefix_info &p2)
@@ -184,35 +185,37 @@ struct prefix_generator {
 
     prefix_generator(int t) : tier(weapon_tier_table[t-1]) 
     {
-        ProfilerBlock prof("generate prefixes", 10);
-
-        collectPrefixesForTier();
-        markExclusions();
-
         minPrice = tier.min_points;
         maxPrice = tier.max_points;
+        align = ALIGN_NONE;
         requirements = 0L;
     }
 
-    /** Mark a certain prefix as forbidden in all combinations. */
-    void addExclusion(const DLString &name)
+    /** Remember align restriction. */
+    void setAlign(int align) 
     {
-        int index = getPrefixIndex(name);
-        if (index >= 0)
-            for (auto &ex: exclusions)
-                ex.set(index);
+        this->align = align;
     }
 
-    /** Mark a certain prefix as required (always chosen). */
-    void addRequirement(const DLString &name)
+    /** Mark a certain affix as forbidden in all combinations. */
+    void addForbidden(const DLString &name)
     {
-        int index = getPrefixIndex(name);
-        if (index >= 0)
-            requirements.set(index);
+        forbidden.insert(name);
+    }
+
+    /** Mark a certain affix as required (always chosen). */
+    void addRequired(const DLString &name)
+    {
+        required.insert(name);
     }
 
     void run() 
     {
+        ProfilerBlock prof("generate prefixes", 10);
+
+        collectPrefixesForTier();
+        markRequirements();
+        markExclusions();
         generateBuckets(0, 0, 0L);
 
         notice("Weapon generator: found %d result buckets for tier %d and %d prefixes", 
@@ -282,6 +285,7 @@ private:
             return;
 
         // Stop now: adding this or any subsequent price will still exceed maxPrice.
+        // TODO: measure if it gives any advantage in processing time.
         if (currentTotal + prefixes[index].price > maxPrice)
             return;
 
@@ -310,29 +314,113 @@ private:
             return;
         }
 
+        // Collect all affixes that are not forbidden or restricted by align or price.
         for (auto &section: weapon_prefix.getMemberNames()) {
-            for (auto &entry: weapon_prefix[section]) {
-                int threshold = entry.isMember("tier") ? entry["tier"].asInt() : WORST_TIER;
-                if (tier.num > threshold)
+            for (auto const &affix: weapon_prefix[section]) {
+
+                if (!checkTierThreshold(affix))
                     continue;
 
+                if (checkForbidden(affix))
+                    continue;
+
+                if (!checkAlign(affix))
+                    continue;
+
+                if (checkRequirementConflict(affix))
+                    continue;
+
+                int price = affix["price"].asInt();
+                DLString affixName = affix["value"].asString();
+                sorted.push_back(prefix_info(section, affixName, price, 1, affix));
+
+#if 0
                 // See if negative counterpart has to be generated for this affix.
-                bool both = entry.isMember("both") ? entry["both"].asBool() : false;
+                bool both = affix.isMember("both") ? affix["both"].asBool() : false;
 
                 // Decide how many times this affix has to be repeated, from 1 to 'stack'.
-                int stack = entry.isMember("stack") ? entry["stack"].asInt() : 1;
+                int stack = affix.isMember("stack") ? affix["stack"].asInt() : 1;
                 for (int s = 1; s <= stack; s++) {
-                    int price = entry["price"].asInt();                
-                    sorted.push_back(prefix_info(section, price * s, s, entry));
+                    int price = affix["price"].asInt();                
+                    sorted.push_back(prefix_info(section, price * s, s, affix));
                     if (both)
-                        sorted.push_back(prefix_info(section, -price * s, s, entry));
+                        sorted.push_back(prefix_info(section, -price * s, s, affix));
                 }
+#endif                
             }
         }
 
+        // Sort all by price in ascending order.
         sorted.sort(sort_by_price);
         for (auto &p: sorted)
             prefixes.push_back(p);
+
+        // Exclude affixes that conflict with required ones.
+        for (auto const &reqName: required) {
+            int r = getPrefixIndex(reqName);
+            
+            for (auto const &c: prefixes[r].entry["conflicts"]) {
+                DLString conflictName = c.asString();
+                prefixes.erase(
+                    remove_if(prefixes.begin(), prefixes.end(),
+                        [&conflictName](const prefix_info &pi) { return pi.affixName == conflictName; }),
+                    prefixes.end()
+                );
+            }
+        }
+
+        // TODO: exclude affixes based on align bonuses, preferences and probabilities.
+
+        for (auto &p: prefixes)
+            notice("...affix %s [%d]", p.affixName.c_str(), p.price);
+    }
+
+    bool checkRequirementConflict(const Json::Value &affix) const
+    {
+        for (auto const &conflictName: affix["conflicts"])
+            if (required.count(conflictName.asString()) > 0)
+                return true;
+
+        return false;
+    }
+
+    bool checkTierThreshold(const Json::Value &affix) const
+    {
+        int threshold = affix.isMember("tier") ? affix["tier"].asInt() : WORST_TIER;
+        return tier.num <= threshold;
+    }
+
+    bool checkForbidden(const Json::Value &affix) const
+    {
+        return forbidden.count(affix["value"].asString()) > 0;
+    }
+
+    bool checkAlign(const Json::Value &affix) const
+    {
+        if (align == ALIGN_NONE)
+            return true;
+
+        if (!affix.isMember("align"))
+            return true;
+
+        const Json::Value &range = affix["align"];
+        if (!range.isArray() || range.size() != 2) {
+            bug("weapon generator: invalid align range for affix %s", affix["value"].asCString());
+            return true;
+        }
+
+        int align_min = range[0].asInt();
+        int align_max = range[1].asInt();
+        return align_min <= align && align <= align_max;
+    }
+
+    /** Expresses affix names from 'required' field as a bit mask. */
+    void markRequirements()
+    {
+        for (auto const &reqName: required) {
+            int r = getPrefixIndex(reqName);
+            requirements.set(r);
+        }
     }
 
     /** Creates a NxN matrix of prefix flags, marking those that are mutually exclusive.
@@ -345,13 +433,13 @@ private:
             bucket_mask_t &exclusion = exclusions[i];
             prefix_info &p = prefixes[i];
 
-            if (p.name == "material")
+            if (p.section == "material")
                 for (unsigned int j = 0; j < prefixes.size(); j++)
-                    if (i != j && prefixes[j].name == p.name)
+                    if (i != j && prefixes[j].section == p.section)
                         exclusion.set(j);
 
-            for (auto &excl: p.entry["excl"]) {
-                int index = getPrefixIndex(excl.asString());
+            for (auto &conflictName: p.entry["conflicts"]) {
+                int index = getPrefixIndex(conflictName.asString());
                 if (index >= 0) {
                     exclusion.set(index);
                     exclusions[index].set(i);
@@ -359,6 +447,7 @@ private:
             }
         }
 
+#if 0
         // Mark all stacked values such as +hr, -hr as mutually exclusive.
         for (unsigned int i = 0; i < prefixes.size(); i++) {
             const prefix_info &p = prefixes[i];
@@ -366,6 +455,7 @@ private:
                 if (i != same)
                     exclusions[i].set(same);
         }
+#endif         
     }
 
     /** Keeps info about current tier. */
@@ -385,14 +475,21 @@ private:
 
     int minPrice;
     int maxPrice;
-    bitnumber_t align;
+    int align;
+
+    /** Pre-set forbidden affixes. */
+    set<DLString> forbidden;
+
+    /** Pre-set required affixes. */
+    set<DLString> required;
 };
 
 // Debug util: grab several good prefix combinations for the tier. 
-list<list<string>> random_weapon_prefixes(int tier, int count)
+list<list<string>> random_weapon_prefixes(int tier, int count, int align)
 {
     list<list<string>> allNames;
     prefix_generator gen(tier);
+    gen.setAlign(align);
     gen.run();
 
     for (int i = 0; i < min(count, gen.getResultSize()); i++) {
@@ -415,10 +512,10 @@ CONFIGURABLE_LOADED(fight, weapon_value2)
     weapon_value2_by_class = value;
 }
 
-Json::Value weapon_damtype;
-CONFIGURABLE_LOADED(fight, weapon_damtype)
+Json::Value weapon_classes;
+CONFIGURABLE_LOADED(fight, weapon_classes)
 {
-    weapon_damtype = value;
+    weapon_classes = value;
 }
 
 Json::Value weapon_level_penalty;
@@ -487,11 +584,6 @@ WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, int
     calcAve();
     calcValues();
     calcDamroll();
-}
-
-WeaponGenerator::~WeaponGenerator()
-{
-
 }
 
 int WeaponCalculator::getTierIndex() const
@@ -616,12 +708,21 @@ WeaponGenerator::WeaponGenerator()
     hrCoef = drCoef = 0;
     hrMinValue = drMinValue = 0;
     hrIndexBonus = drIndexBonus = 0;
+    align = ALIGN_NONE;
+}
+
+WeaponGenerator::~WeaponGenerator()
+{
+
 }
 
 WeaponGenerator & WeaponGenerator::item(Object *obj)
 { 
-     this->obj = obj; 
-     wclass = weapon_class.name(obj->value0());
+    this->obj = obj; 
+    wclass = weapon_class.name(obj->value0());
+    wclassConfig = weapon_classes[wclass];
+    if (wclass.empty())
+        warn("Weapon generator: no configuration defined for weapon class %s.", wclass.c_str());
      return *this; 
 }
 
@@ -750,11 +851,21 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     prefix_generator gen(valTier);
 
     // Set exclusions or requirements based on chosen names and weapon flags.
-    DLString twohand = nameConfig["twohand"].asString();
-    if (twohand == "1")
-        gen.addExclusion("two_hands");
-    else if (twohand == "2")
-        gen.addRequirement("two_hands");
+    for (auto const &affixName: wclassConfig["forbids"])
+        gen.addForbidden(affixName.asString());
+
+    for (auto const &affixName: wclassConfig["requires"])
+        gen.addRequired(affixName.asString());
+
+    for (auto const &affixName: nameConfig["forbids"])
+        gen.addForbidden(affixName.asString());
+
+    for (auto const &affixName: nameConfig["requires"])
+        gen.addRequired(affixName.asString());
+
+    // TODO: affix preferences setup and align bonus setup happens here.
+
+    gen.setAlign(align);
 
     // Generate all combinations of affixes.
     gen.run();
@@ -771,7 +882,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
     for (auto &pinfo: result) {
         const Json::Value &prefix = pinfo.entry;
-        const DLString &section = pinfo.name;
+        const DLString &section = pinfo.section;
         obj->carried_by->pecho("{DAffix %s [%d]", prefix["value"].asCString(), pinfo.price);
 
         if (section == "flag") {
@@ -881,15 +992,8 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
 
 const WeaponGenerator & WeaponGenerator::assignDamageType() const
 {
-    Json::Value &entry = weapon_damtype[wclass];
-
-    if (entry.empty()) {
-        warn("Weapon generator: no damage types defined for type %s.", wclass.c_str());
-        return *this;
-    }
-
-    StringSet attacks = StringSet(entry["attacks"].asString()); // frbite, divine, etc
-    StringSet damtypes = StringSet(entry["damtypes"].asString()); // bash, pierce, etc
+    StringSet attacks = StringSet(wclassConfig["attacks"].asString()); // frbite, divine, etc
+    StringSet damtypes = StringSet(wclassConfig["damtypes"].asString()); // bash, pierce, etc
     bool any = damtypes.count("any") > 0;
     vector<int> result;
 

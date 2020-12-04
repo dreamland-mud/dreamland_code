@@ -74,6 +74,7 @@ struct WeaponGenerator {
     WeaponGenerator & damrollMinStartValue(int minValue)  { this->drMinValue = minValue; return *this; }
     WeaponGenerator & hitrollIndexBonus(int bonus) { this->hrIndexBonus = bonus; return *this; }
     WeaponGenerator & damrollIndexBonus(int bonus) { this->drIndexBonus = bonus; return *this; }
+    WeaponGenerator & alignment(int align) { this->align = align; return *this; }
 
     WeaponGenerator &  randomNames();
     WeaponGenerator &  randomAffixes();
@@ -105,11 +106,13 @@ private:
     int minHitroll() const;
 
     Json::Value nameConfig;
+    Json::Value wclassConfig;
     Flags extraFlags;
     Flags weaponFlags;
     DLString materialName;
     vector<DLString> adjectives;
     vector<DLString> nouns;
+    int align;
 
     int sn;
     int valTier;

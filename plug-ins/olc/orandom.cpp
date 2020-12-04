@@ -15,17 +15,19 @@
 #include "act.h"
 #include "def.h"
 
-list<list<string>> random_weapon_prefixes(int tier, int count);
+list<list<string>> random_weapon_prefixes(int tier, int count, int align);
 
 namespace pegtl = TAO_PEGTL_NAMESPACE;
 
 namespace TAO_PEGTL_NAMESPACE::mud {
-    struct MyArgs : public args_level, public args_tier, public args_wclass, public args_word {};
+    struct MyArgs : 
+        public args_level, public args_align, public args_tier, public args_wclass, public args_word {};
 
     struct level   : seq< one<'l'>, level_value > {};
+    struct align   : seq< one<'a'>, align_value > {};
     struct tier    : seq< one<'t'>, tier_value > {};
     struct mode    : seq< one<'-'>, word_value > {};
-    struct anything: sor< level, tier, wclass, mode > {};
+    struct anything: sor< level, align, tier, wclass, mode > {};
     struct grammar : must< list_must< anything, spaces >, eof > {};
 }
 
@@ -36,10 +38,10 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         WEAPON_EXOTIC, WEAPON_SWORD, WEAPON_DAGGER, WEAPON_SPEAR, WEAPON_MACE,
         WEAPON_AXE, WEAPON_FLAIL, WEAPON_WHIP, WEAPON_POLEARM };
 
-    pegtl::mud::MyArgs myargs = { -1, -1, -1, "" };
+    pegtl::mud::MyArgs myargs = { -1, -1, -1, -1, "" };
 
     if (!parse_input<pegtl::mud::grammar, pegtl::mud::MyArgs>(ch, argument, myargs)) {
-        ch->println("Формат: {Worandom{x <weapon class> {Wl{x<level> {Wt{x<tier> [{W-{xtable|{W-{xaffix]");
+        ch->println("Формат: {Worandom{x <weapon class> {Wl{x<level> {Wt{x<tier> {Wa{x<align> [{W-{xtable|{W-{xaffix]");
         return;
     }
 
@@ -76,10 +78,12 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     if (arg_oneof(myargs.word, "affix", "prefix")) {
         ostringstream buf;
         int tier = myargs.tier == -1  ? number_range(BEST_TIER, WORST_TIER) : myargs.tier;
+        int align = myargs.align == -1 ? ALIGN_NONE : myargs.align;
         int count = 50;
 
-        auto allNames = random_weapon_prefixes(tier, count);
-        ch->printf("{W%d случайных комбинаций префиксов для крутости %d:\r\n", allNames.size(), tier);
+        auto allNames = random_weapon_prefixes(tier, count, align);
+        ch->printf("{W%d случайных комбинаций аффиксов для крутости %d и характера %d:\r\n", 
+                    allNames.size(), tier, align);
 
         for (auto &names: allNames) {
             for (auto &name: names) {
@@ -97,6 +101,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     // Assign random level, tier and weapon class unless specified in parameters.
     int level = myargs.level == -1 ? number_range(1, LEVEL_MORTAL) : myargs.level;
     int tier = myargs.tier == -1  ? number_range(BEST_TIER, WORST_TIER) : myargs.tier;
+    int align = myargs.align == -1 ? ALIGN_NONE : myargs.align;
     bitnumber_t wclass = myargs.wclass == -1 ? 
         myclasses.at(number_range(0, myclasses.size() - 1)) : myargs.wclass;
 
@@ -111,6 +116,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
 
     WeaponGenerator()
         .item(obj)
+        .alignment(align)
         .hitrollTier(tier)
         .damrollTier(tier)
         .valueTier(tier)
