@@ -136,3 +136,119 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     interpret_fmt(ch, "stat obj %lld", obj->getID());
 }
 
+
+/*--------------------------------------------------------------------------
+ * Weapon generator test suite.
+ *--------------------------------------------------------------------------*/
+
+static bool assert_affix_excluded(const affix_generator &gen, const unordered_set<string> &affixNames)
+{
+    auto const &affixes = gen.getAffixes();
+    auto it = find_if(affixes.begin(), affixes.end(), 
+                        [affixNames](const affix_info &ai) { return affixNames.count(ai.affixName) > 0; });
+
+    return it == affixes.end();
+}
+
+static bool assert_affix_excluded(const affix_generator &gen, const DLString &affixName)
+{
+    unordered_set<string> names {affixName};
+    return assert_affix_excluded(gen, names);
+}
+
+static bool assert_affix_included(const affix_generator &gen, const DLString &affixName)
+{
+    return !assert_affix_excluded(gen, affixName);
+}
+
+static bool assert_affix_included(const affix_generator &gen, const unordered_set<string> &affixNames)
+{
+    return !assert_affix_excluded(gen, affixNames);
+}
+
+static void show_title(Character *ch, const char *title)
+{
+    ptc(ch, " {C*{x %-50s    ", title);
+}
+
+static void show_result(Character *ch, bool success)
+{
+    if (success)
+        stc("{GOK{x", ch);
+    else
+        stc("{RFAIL{x", ch);
+
+    stc("\r\n", ch);
+}
+
+CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS, 
+        "Tests for the random weapon generator.")
+{
+    
+    ch->println("Running a set of weapon generator tests:");
+
+    {
+        show_title(ch, "Holy affix not selected for align < 350");
+        affix_generator gen(1);
+        gen.setAlign(349);
+        gen.setup();
+        show_result(ch, assert_affix_excluded(gen, "holy"));
+    }
+
+    {
+        show_title(ch, "Holy affix selected for align >= 350");
+        affix_generator gen(1);
+        gen.setAlign(350);
+        gen.setup();
+        show_result(ch, assert_affix_included(gen, "holy"));
+    }
+
+    {
+        show_title(ch, "Flaming conflicts with frost, fading, wood, ice");
+        affix_generator gen(1);
+        gen.addRequired("flaming");
+        gen.setup();
+        unordered_set<string> conflicts {"frost", "fading", "wood", "ice"};
+        show_result(ch, assert_affix_excluded(gen, conflicts));
+    }
+
+    {
+        show_title(ch, "Frost conflicts with flaming (indirect reference)");
+        affix_generator gen(1);
+        gen.addRequired("frost");
+        gen.setup();
+        show_result(ch, assert_affix_excluded(gen, "flaming"));
+    }
+
+    {
+        show_title(ch, "Shocking not selected for tier > 2");
+        affix_generator gen(3);
+        gen.setup();
+        show_result(ch, assert_affix_excluded(gen, "shocking"));
+    }
+
+    {
+        show_title(ch, "Shocking selected for tier <= 2");
+        affix_generator gen(2);
+        gen.setup();
+        show_result(ch, assert_affix_included(gen, "shocking"));
+    }
+
+    {
+        show_title(ch, "Align-restricted are there for no-align");
+        affix_generator gen(1);
+        gen.setup();
+        unordered_set<string> withAlign {"vorpal", "fading", "holy", "vampiric", "evil"};
+        show_result(ch, assert_affix_included(gen, withAlign));
+    }
+
+    {
+        show_title(ch, "Forbidden affixes not included");
+        affix_generator gen(5);
+        gen.addForbidden("two_hands");
+        gen.setup();
+        show_result(ch, assert_affix_excluded(gen, "two_hands"));
+    }
+
+
+}

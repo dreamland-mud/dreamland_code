@@ -21,9 +21,13 @@ CONFIGURABLE_LOADED(fight, weapon_affixes)
  *-----------------------------------------------------------------------------*/
 
 /** Helper structure to access affix configuration. */
-affix_info::affix_info(const string &section, const string &affixName, int price, int stack, Json::Value entry) 
+affix_info::affix_info(const string &section, const string &affixName, int price, int stack, const Json::Value &entry) 
             : section(section), affixName(affixName), price(price), stack(stack), entry(entry)
 {        
+}
+
+affix_info::~affix_info()
+{
 }
 
 static bool sort_by_price(const affix_info &p1, const affix_info &p2)
@@ -57,13 +61,20 @@ void affix_generator::addRequired(const DLString &name)
     required.insert(name);
 }
 
+void affix_generator::setup() 
+{
+    collectAffixesForTier();
+    markRequirements();
+    markExclusions();
+}
+
 void affix_generator::run() 
 {
     ProfilerBlock prof("generate affixes", 10);
 
-    collectPrefixesForTier();
-    markRequirements();
-    markExclusions();
+    if (affixes.empty())
+        setup();
+
     generateBuckets(0, 0, 0L);
 
     notice("Weapon generator: found %d result buckets for tier %d and %d affixes", 
@@ -88,7 +99,7 @@ int affix_generator::getResultSize() const
     return buckets.size();
 }
 
-int affix_generator::getPrefixIndex(const DLString &name)
+int affix_generator::getAffixIndex(const DLString &name)
 {
     for (unsigned int i = 0; i < affixes.size(); i++)
         if (affixes[i].entry["value"].asString() == name)
@@ -96,7 +107,7 @@ int affix_generator::getPrefixIndex(const DLString &name)
     return -1;
 }
 
-list<int> affix_generator::getPrefixIndexes(const DLString &name)
+list<int> affix_generator::getAffixIndexes(const DLString &name)
 {
     list<int> result;
     for (unsigned int i = 0; i < affixes.size(); i++)
@@ -119,19 +130,15 @@ bucket_mask_t affix_generator::randomBucket() const
  */
 void affix_generator::generateBuckets(int currentTotal, long unsigned int index, bucket_mask_t currentMask) 
 {
+    // Good combo, remember it and continue.
     if (currentTotal >= minPrice && currentTotal <= maxPrice)
-        // Good combo, remember it and continue.
         buckets.insert(currentMask);
-    else if (currentTotal > maxPrice) 
-        // Stop now: adding more affixes will only make the price bigger.
-        return;
 
+    // Stop now: reached the end of affixes vector.
     if (index >= affixes.size())
-        // Stop now: reached the end of affixes vector.
         return;
 
     // Stop now: adding this or any subsequent price will still exceed maxPrice.
-    // TODO: measure if it gives any advantage in processing time.
     if (currentTotal + affixes[index].price > maxPrice)
         return;
 
@@ -151,7 +158,7 @@ void affix_generator::generateBuckets(int currentTotal, long unsigned int index,
 }
 
 /** Creates a vector of all affixes that are allowed for the tier, sorted by price in ascending order. */
-void affix_generator::collectPrefixesForTier()
+void affix_generator::collectAffixesForTier()
 {
     list<affix_info> sorted;
 
@@ -202,23 +209,19 @@ void affix_generator::collectPrefixesForTier()
         affixes.push_back(p);
 
     // Exclude affixes that conflict with required ones.
+    set<string> toErase;
     for (auto const &reqName: required) {
-        int r = getPrefixIndex(reqName);
-        
-        for (auto const &c: affixes[r].entry["conflicts"]) {
-            DLString conflictName = c.asString();
-            affixes.erase(
-                remove_if(affixes.begin(), affixes.end(),
-                    [&conflictName](const affix_info &pi) { return pi.affixName == conflictName; }),
-                affixes.end()
-            );
+        int r = getAffixIndex(reqName);
+        for (auto &c: affixes[r].entry["conflicts"]) {
+            toErase.insert(c.asString());
         }
+    }
+    for (auto &affix: toErase) {
+        int a = getAffixIndex(affix);
+        affixes.erase(affixes.begin() + a);
     }
 
     // TODO: exclude affixes based on align bonuses, preferences and probabilities.
-
-    for (auto &p: affixes)
-        notice("...affix %s [%d]", p.affixName.c_str(), p.price);
 }
 
 bool affix_generator::checkRequirementConflict(const Json::Value &affix) const
@@ -264,7 +267,7 @@ bool affix_generator::checkAlign(const Json::Value &affix) const
 void affix_generator::markRequirements()
 {
     for (auto const &reqName: required) {
-        int r = getPrefixIndex(reqName);
+        int r = getAffixIndex(reqName);
         requirements.set(r);
     }
 }
@@ -285,7 +288,7 @@ void affix_generator::markExclusions()
                     exclusion.set(j);
 
         for (auto &conflictName: p.entry["conflicts"]) {
-            int index = getPrefixIndex(conflictName.asString());
+            int index = getAffixIndex(conflictName.asString());
             if (index >= 0) {
                 exclusion.set(index);
                 exclusions[index].set(i);
@@ -297,7 +300,7 @@ void affix_generator::markExclusions()
     // Mark all stacked values such as +hr, -hr as mutually exclusive.
     for (unsigned int i = 0; i < affixes.size(); i++) {
         const affix_info &p = affixes[i];
-        for (auto &same: getPrefixIndexes(p.entry["value"].asString()))
+        for (auto &same: getAffixIndexes(p.entry["value"].asString()))
             if (i != same)
                 exclusions[i].set(same);
     }

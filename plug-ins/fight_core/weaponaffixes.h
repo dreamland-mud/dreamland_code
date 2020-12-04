@@ -15,7 +15,8 @@ class weapon_tier_t;
 
 /** Helper structure to access affix configuration. */
 struct affix_info {
-    affix_info(const string &section, const string &affixName, int price, int stack, Json::Value entry);
+    affix_info(const string &section, const string &affixName, int price, int stack, const Json::Value &entry);
+    virtual ~affix_info();
 
     string section;
     string affixName;
@@ -42,6 +43,7 @@ struct affix_generator {
     /** Mark a certain affix as required (always chosen). */
     void addRequired(const DLString &name);
 
+    void setup();
     void run();
 
     /** Produces a single random affix combination out of all generated ones. */
@@ -49,11 +51,13 @@ struct affix_generator {
 
     int getResultSize() const;
 
+    const vector<affix_info> & getAffixes() const { return affixes; }
+
 private:
 
-    int getPrefixIndex(const DLString &name);
+    int getAffixIndex(const DLString &name);
 
-    list<int> getPrefixIndexes(const DLString &name);
+    list<int> getAffixIndexes(const DLString &name);
 
     /** Choose a random set element. */
     bucket_mask_t randomBucket() const;
@@ -64,7 +68,7 @@ private:
     void generateBuckets(int currentTotal, long unsigned int index, bucket_mask_t currentMask);
 
     /** Creates a vector of all affixes that are allowed for the tier, sorted by price in ascending order. */
-    void collectPrefixesForTier();
+    void collectAffixesForTier();
 
     bool checkRequirementConflict(const Json::Value &affix) const;
 
