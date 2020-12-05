@@ -37,7 +37,7 @@ Object *        create_object_nocount ( obj_index_data *pObjIndex, short level )
 Object *        create_object_org (obj_index_data *pObjIndex,short level,bool Count);
 void                clone_object         ( Object *parent, Object *clone );
 
-void        affect_to_obj    ( Object *, Affect *paf );
+void        affect_to_obj    ( Object *, const Affect *paf );
 void        affect_remove_obj( Object *, Affect *paf );
 void        affect_enchant   ( Object *obj );
 void        affect_enhance   ( Object *obj, Affect * );

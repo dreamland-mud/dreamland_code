@@ -84,7 +84,7 @@ void affect_remove_obj( Object *obj, Affect *paf )
     ddeallocate( paf );
 }
 
-void affect_to_obj( Object *obj, Affect *paf )
+void affect_to_obj( Object *obj, const Affect *paf )
 {
     obj->affected.push_front(paf->clone());
 

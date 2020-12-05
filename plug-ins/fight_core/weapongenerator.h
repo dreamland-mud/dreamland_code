@@ -2,8 +2,10 @@
 #define WEAPON_GENERATOR_H
 
 #include <vector>
+#include <list>
 #include <jsoncpp/json/json.h>
 #include "flags.h"
+#include "affect.h"
 
 class Object;
 
@@ -61,6 +63,7 @@ private:
     Flags extraFlags;
     Flags weaponFlags;
     DLString materialName;
+    list<Affect> affects;
     vector<DLString> adjectives;
     vector<DLString> nouns;
 

@@ -263,21 +263,29 @@ void affix_generator::collectAffixesForTier()
 
     // Keep preferred affixes, all others have a chance to get evicted.
     for (auto &ai: affixes) {
-        if (required.count(ai.affixName) > 0)
+        if (required.count(ai.affixName) > 0) {
+            warn("...%s required, staying", ai.affixName.c_str());
             continue;
+        }
 
-        if (preferences.count(ai.affixName) > 0)
+        if (preferences.count(ai.affixName) > 0) {
+            warn("...%s preferred, staying", ai.affixName.c_str());
             continue;
+        }
             
-        if (checkAlignBonus(ai))
+        if (checkAlignBonus(ai)) {
+            warn("...%s has align bonus, staying", ai.affixName.c_str());
             continue;
+        }
 
         if (!chance(retainChance))
             toErase.insert(ai.affixName);        
+        else
+            warn("...%s got lucky, staying", ai.affixName.c_str());
     }
     
     for (auto &affixName: toErase) {
-//      warn("...erasing %s", affixName.c_str());
+        warn("...erasing %s", affixName.c_str());
         int a;
         while ((a = getAffixIndex(affixName)) >= 0)
             affixes.erase(affixes.begin() + a);

@@ -7,10 +7,10 @@
 #include "grammar_entities_impl.h"
 #include "stringlist.h"
 #include "skill.h"
+#include "skillgroup.h"
 #include "skillreference.h"
 #include "core/object.h"
 #include "character.h"
-#include "affect.h"
 
 #include "damageflags.h"
 #include "morphology.h"
@@ -218,7 +218,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         gen.addPreference(affixName.asString());
 
     gen.setAlign(align);
-    gen.setRetainChance(80);
+    gen.setRetainChance(50);
 
     // Generate all combinations of affixes.
     gen.run();
@@ -239,21 +239,51 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         const DLString &section = pinfo.section;
         if (debug) obj->carried_by->pecho("{DAffix %s [%d]", affix["value"].asCString(), pinfo.price);
 
+        extraFlags.setBits(affix["extra"].asString());
+
         if (section == "flag") {
-            extraFlags.setBits(affix["extra"].asString());
-            weaponFlags.setBits(affix["value"].asString());
+            weaponFlags.setBits(pinfo.affixName);
         } else if (section == "extra") {
-            extraFlags.setBits(affix["value"].asString());
+            extraFlags.setBits(pinfo.affixName);
         } else if (section == "material") {
-            materialName = affix["value"].asString();
+            materialName = pinfo.affixName;
         } else if (section == "affects_by_tier") {
-            extraFlags.setBits(affix["extra"].asString());
             if (pinfo.normalizedName() == "hr")
                 hrIndexBonus += affix["step"].asInt() * pinfo.stack;
             else if (pinfo.normalizedName() == "dr")
                 drIndexBonus += affix["step"].asInt() * pinfo.stack;
             else if (pinfo.normalizedName() == "ave") 
                 aveIndexBonus += affix["step"].asInt() * pinfo.stack;
+        } else if (section == "affects_by_level") {
+            Affect af;
+            float mult = affix.isMember("mult") ? affix["mult"].asFloat() : 0;
+            int mod = affix.isMember("mod") ? affix["mod"].asInt() : 0;
+            af.modifier = mult * pinfo.stack * obj->level + mod;
+            af.location = apply_flags.value(pinfo.normalizedName());
+            af.type = gsn_none;
+            af.duration = -1;
+            af.level = obj->level;
+            affects.push_back(af);
+            notice("...created affect %s modifier %d", apply_flags.name(af.location).c_str(), af.modifier);
+        } else if (section == "affects_with_bits") {
+            Affect af;
+            af.bitvector.setTable(&affect_flags);
+            af.bitvector.setBits(pinfo.affixName);
+            af.type = gsn_none;
+            af.duration = -1;
+            af.level = obj->level;
+            affects.push_back(af);
+            notice("...created affect %s", af.bitvector.names().c_str());
+        } else if (section == "skill_group") {
+            Affect af;
+            af.global.setRegistry(skillGroupManager);
+            af.global.fromString(pinfo.affixName);
+            af.modifier = affix["mod"].asInt();
+            af.type = gsn_none;
+            af.duration = -1;
+            af.level = obj->level;
+            affects.push_back(af);
+            notice("...created skill group affect %s by %d", af.global.toString().c_str(), af.modifier);
         }
 
         // TODO collect data for other types of suffixes.
@@ -334,7 +364,9 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
 
 const WeaponGenerator & WeaponGenerator::assignAffects() const
 {
-    // TODO apply affects from suffixes.
+    for (auto &af: affects) {
+        affect_to_obj(obj, &af);
+    }
     return *this;
 }
 
