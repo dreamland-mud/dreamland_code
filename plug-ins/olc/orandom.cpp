@@ -18,7 +18,7 @@
 #include "act.h"
 #include "def.h"
 
-list<list<string>> random_weapon_affixes(int tier, int count, int align);
+list<list<string>> random_weapon_affixes(int tier, int count, int align, int chance);
 
 namespace pegtl = TAO_PEGTL_NAMESPACE;
 
@@ -84,7 +84,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         int align = myargs.align == -1 ? ALIGN_NONE : myargs.align;
         int count = 50;
 
-        auto allNames = random_weapon_affixes(tier, count, align);
+        auto allNames = random_weapon_affixes(tier, count, align, 80);
         ch->printf("{W%d случайных комбинаций аффиксов для крутости %d и характера %d:\r\n", 
                     allNames.size(), tier, align);
 
@@ -117,12 +117,10 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     obj->setShortDescr(str_empty); // pretend it's a restring, to allow value0-4 overrides.
     obj_to_char(obj, ch);
 
-    WeaponGenerator()
+    WeaponGenerator(true)
         .item(obj)
+        .tier(tier)
         .alignment(align)
-        .hitrollTier(tier)
-        .damrollTier(tier)
-        .valueTier(tier)
         .randomNames()
         .randomAffixes()
         .assignHitroll()
@@ -150,6 +148,16 @@ static bool assert_affix_excluded(const affix_generator &gen, const unordered_se
     return it == affixes.end();
 }
 
+static int count_affix(const affix_generator &gen, const DLString &affixName)
+{
+    int cnt = 0;
+    for (auto &ai: gen.getAffixes())
+        if (ai.affixName == affixName)
+            cnt++;
+
+    return cnt;
+}
+
 static bool assert_affix_excluded(const affix_generator &gen, const DLString &affixName)
 {
     unordered_set<string> names {affixName};
@@ -168,6 +176,7 @@ static bool assert_affix_included(const affix_generator &gen, const unordered_se
 
 static void show_title(Character *ch, const char *title)
 {
+    notice("TEST: %s", title);
     ptc(ch, " {C*{x %-50s    ", title);
 }
 
@@ -181,11 +190,45 @@ static void show_result(Character *ch, bool success)
     stc("\r\n", ch);
 }
 
+static void print_affixes(Character *ch, const affix_generator &gen)
+{
+    ptc(ch, "\r\n");
+    for (const affix_info &ai: gen.getAffixes())
+        ptc(ch, "...%13s [%d] x%d\r\n", ai.affixName.c_str(), ai.price, ai.stack);
+}
+
+static Object *item(Character *ch, bitnumber_t weaponClass)
+{
+    Object *obj = create_object(get_obj_index(104), 0);
+    obj->value0(weaponClass);
+    obj->level = ch->getModifyLevel();
+    obj->setShortDescr(str_empty); 
+    obj_to_char(obj, ch);
+    return obj;
+}
+
 CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS, 
         "Tests for the random weapon generator.")
 {
     
     ch->println("Running a set of weapon generator tests:");
+    {
+        show_title(ch, "Polearm is always two-handed.");
+        Object *obj = item(ch, WEAPON_POLEARM);
+        WeaponGenerator().item(obj).tier(1).randomAffixes().assignFlags();
+        show_result(ch, obj->value4() | WEAPON_TWO_HANDS);
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "Dagger is never two-handed or vorpal.");
+        Object *obj = item(ch, WEAPON_DAGGER);
+        WeaponGenerator().item(obj).tier(1).randomAffixes().assignFlags();
+        show_result(ch, !IS_WEAPON_STAT(obj, WEAPON_VORPAL | WEAPON_TWO_HANDS));
+        extract_obj(obj);
+    }
+
+    ch->println("Running a set of affix generator tests:");
 
     {
         show_title(ch, "Holy affix not selected for align < 350");
@@ -221,6 +264,15 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
+        show_title(ch, "Wood conflicts with all other materials.");
+        affix_generator gen(1);
+        gen.addRequired("wood");
+        gen.setup();
+        unordered_set<string> conflicts {"platinum", "titanium", "ice"};
+        show_result(ch, assert_affix_excluded(gen, conflicts));
+    }
+
+    {
         show_title(ch, "Shocking not selected for tier > 2");
         affix_generator gen(3);
         gen.setup();
@@ -235,7 +287,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
-        show_title(ch, "Align-restricted are there for no-align");
+        show_title(ch, "Align-restricted are kept for no align");
         affix_generator gen(1);
         gen.setup();
         unordered_set<string> withAlign {"vorpal", "fading", "holy", "vampiric", "evil"};
@@ -250,5 +302,55 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
         show_result(ch, assert_affix_excluded(gen, "two_hands"));
     }
 
+    {
+        show_title(ch, "Preferred affixes are always kept");
+        affix_generator gen(1);
+        unordered_set<string> mine {"vorpal", "fading", "holy", "vampiric", "evil"};
+        for (auto &affix: mine)
+            gen.addPreference(affix);
+        gen.setRetainChance(0);
+        gen.setup();
+        show_result(ch, assert_affix_included(gen, mine) && gen.getAffixes().size() == mine.size());
+    }
 
+    {
+        show_title(ch, "Vorpal, holy are kept for good align");
+        unordered_set<string> good {"vorpal", "holy"};
+        unordered_set<string> evil {"vampiric", "evil"};
+        affix_generator gen(1);
+        gen.setRetainChance(0);
+        gen.setAlign(1000);
+        gen.setup();
+        show_result(ch, assert_affix_included(gen, good) 
+                        && assert_affix_excluded(gen, evil));
+    }
+
+    {
+        show_title(ch, "Vorpal, holy are ignored for no align");
+        unordered_set<string> good {"vorpal", "holy"};
+        affix_generator gen(1);
+        gen.setRetainChance(0);
+        gen.setup();
+        show_result(ch, assert_affix_excluded(gen, good));
+    }
+
+    {
+        show_title(ch, "Two_hands requirement is kept.");
+        affix_generator gen(1);
+        gen.addRequired("two_hands");
+        gen.addForbidden("flaming");
+        gen.addPreference("vorpal");
+        gen.addPreference("sharp");
+        gen.setRetainChance(0);
+        gen.setup();
+        show_result(ch, assert_affix_included(gen, "two_hands"));
+    }
+
+    {
+        show_title(ch, "HR included more than once");
+        affix_generator gen(1);
+        gen.setRetainChance(100);
+        gen.setup();
+        show_result(ch, count_affix(gen, "hr") == 3 && count_affix(gen, "-hr") == 3);
+    }
 }

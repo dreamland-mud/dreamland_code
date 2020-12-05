@@ -9,10 +9,11 @@ class Object;
 
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
-    WeaponGenerator();
+    WeaponGenerator(bool debug = false);
     virtual ~WeaponGenerator();
 
     WeaponGenerator & item(Object *obj);
+    WeaponGenerator & tier(int tier);
     WeaponGenerator & skill(int sn) { this->sn = sn; return *this; }
     WeaponGenerator & valueTier(int tier) { this->valTier = tier; return *this; }
     WeaponGenerator & hitrollTier(int tier) { this->hrTier = tier; return *this; }
@@ -61,7 +62,6 @@ private:
     DLString materialName;
     vector<DLString> adjectives;
     vector<DLString> nouns;
-    int align;
 
     int sn;
     int valTier;
@@ -73,9 +73,12 @@ private:
     int drMinValue;
     int hrIndexBonus;
     int drIndexBonus;
+    int align;
 
     Object *obj;    
     DLString wclass;
+
+    bool debug;
 };
 
 

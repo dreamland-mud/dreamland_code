@@ -7,6 +7,9 @@
 #include "profiler.h"
 #include "logstream.h"
 #include "configurable.h"
+#include "alignment.h"
+#include "dl_math.h"
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 
@@ -21,13 +24,44 @@ CONFIGURABLE_LOADED(fight, weapon_affixes)
  *-----------------------------------------------------------------------------*/
 
 /** Helper structure to access affix configuration. */
-affix_info::affix_info(const string &section, const string &affixName, int price, int stack, const Json::Value &entry) 
-            : section(section), affixName(affixName), price(price), stack(stack), entry(entry)
-{        
+affix_info::affix_info(const string &section, int stack, const Json::Value &affix)
+{
+    this->section = section;
+    this->stack = stack;
+    this->affix = affix;
+
+    affixName = affix["value"].asString();
+    price = affix["price"].asInt() * stack;
+    alignBonus = ALIGN_NONE;
+
+    if (affix.isMember("align_bonus")) {
+        DLString bonus = affix["align_bonus"].asString();
+        alignBonus = align_table.value(bonus);
+    }
+
+    for (auto &c: affix["conflicts"])
+        conflicts.insert(c.asString());
 }
 
 affix_info::~affix_info()
 {
+}
+
+bool affix_info::equals(const affix_info &other) const
+{
+    return other.affixName == affixName
+            && other.price == price;
+}
+
+string affix_info::normalizedName() const
+{
+    if (affixName.empty())
+        return affixName;
+        
+    if (affixName.at(0) == '-' || affixName.at(0) == '+')
+        return affixName.substr(1);
+
+    return affixName;
 }
 
 static bool sort_by_price(const affix_info &p1, const affix_info &p2)
@@ -41,6 +75,20 @@ affix_generator::affix_generator(int t) : tier(weapon_tier_table[t-1])
     maxPrice = tier.max_points;
     align = ALIGN_NONE;
     requirements = 0L;
+    retainChance = 100;
+}
+
+string affix_generator::dump() const
+{
+    ostringstream buf;
+    buf << dlprintf("Tier %d, align %d, requirements %s, ", tier.num, align, requirements.to_string().c_str());
+    buf << dlprintf("%d affixes, %d requires, %d forbids, %d preferences, ", 
+                     affixes.size(), required.size(), forbidden.size(), preferences.size()) << endl;
+    buf << "Affixes: ";
+    for (auto const &pi: affixes)
+        buf << pi.affixName << " ";
+    buf << endl;
+    return buf.str();
 }
 
 /** Remember align restriction. */
@@ -59,6 +107,12 @@ void affix_generator::addForbidden(const DLString &name)
 void affix_generator::addRequired(const DLString &name)
 {
     required.insert(name);
+}
+
+/** Mark a certain affix as preferred (always included in initial set). */
+void affix_generator::addPreference(const DLString &name)
+{
+    preferences.insert(name);
 }
 
 void affix_generator::setup() 
@@ -99,21 +153,23 @@ int affix_generator::getResultSize() const
     return buckets.size();
 }
 
+list<affix_info *> affix_generator::getAffixes(const DLString &name)
+{
+    list<affix_info *> result;
+
+    for (auto &ai: affixes)
+        if (ai.affixName == name)
+            result.push_back(&ai);
+
+    return result;
+}
+
 int affix_generator::getAffixIndex(const DLString &name)
 {
     for (unsigned int i = 0; i < affixes.size(); i++)
-        if (affixes[i].entry["value"].asString() == name)
+        if (affixes[i].affixName == name)
             return i;
     return -1;
-}
-
-list<int> affix_generator::getAffixIndexes(const DLString &name)
-{
-    list<int> result;
-    for (unsigned int i = 0; i < affixes.size(); i++)
-        if (affixes[i].entry["value"].asString() == name)
-            result.push_back(i);
-    return result;
 }
 
 /** Choose a random set element. */
@@ -169,7 +225,7 @@ void affix_generator::collectAffixesForTier()
 
     // Collect all affixes that are not forbidden or restricted by align or price.
     for (auto &section: weapon_affixes.getMemberNames()) {
-        for (auto const &affix: weapon_affixes[section]) {
+        for (auto const &affix: weapon_affixes[section]["values"]) {
 
             if (!checkTierThreshold(affix))
                 continue;
@@ -180,55 +236,78 @@ void affix_generator::collectAffixesForTier()
             if (!checkAlign(affix))
                 continue;
 
-            if (checkRequirementConflict(affix))
-                continue;
-
-            int price = affix["price"].asInt();
-            DLString affixName = affix["value"].asString();
-            sorted.push_back(affix_info(section, affixName, price, 1, affix));
-
-#if 0
-            // See if negative counterpart has to be generated for this affix.
-            bool both = affix.isMember("both") ? affix["both"].asBool() : false;
-
             // Decide how many times this affix has to be repeated, from 1 to 'stack'.
             int stack = affix.isMember("stack") ? affix["stack"].asInt() : 1;
             for (int s = 1; s <= stack; s++) {
-                int price = affix["price"].asInt();                
-                sorted.push_back(affix_info(section, price * s, s, affix));
-                if (both)
-                    sorted.push_back(affix_info(section, -price * s, s, affix));
+                sorted.push_back(affix_info(section, s, affix));
             }
-#endif                
         }
     }
 
     // Sort all by price in ascending order.
     sorted.sort(sort_by_price);
-    for (auto &p: sorted)
+    for (auto &p: sorted) {
         affixes.push_back(p);
+    }
+
+    set<string> toErase;
 
     // Exclude affixes that conflict with required ones.
-    set<string> toErase;
     for (auto const &reqName: required) {
-        int r = getAffixIndex(reqName);
-        for (auto &c: affixes[r].entry["conflicts"]) {
-            toErase.insert(c.asString());
-        }
-    }
-    for (auto &affix: toErase) {
-        int a = getAffixIndex(affix);
-        affixes.erase(affixes.begin() + a);
+        for (auto const &req: getAffixes(reqName))
+            // For each of the 'required' affixes, compare them with all available ones.
+            for (auto const &affix: affixes)
+                if (checkMutualConflict(*req, affix))
+                    toErase.insert(affix.affixName);
     }
 
-    // TODO: exclude affixes based on align bonuses, preferences and probabilities.
+    // Keep preferred affixes, all others have a chance to get evicted.
+    for (auto &ai: affixes) {
+        if (required.count(ai.affixName) > 0)
+            continue;
+
+        if (preferences.count(ai.affixName) > 0)
+            continue;
+            
+        if (checkAlignBonus(ai))
+            continue;
+
+        if (!chance(retainChance))
+            toErase.insert(ai.affixName);        
+    }
+    
+    for (auto &affixName: toErase) {
+//      warn("...erasing %s", affixName.c_str());
+        int a;
+        while ((a = getAffixIndex(affixName)) >= 0)
+            affixes.erase(affixes.begin() + a);
+    }
 }
 
-bool affix_generator::checkRequirementConflict(const Json::Value &affix) const
+bool affix_generator::checkMutualConflict(const affix_info &a1, const affix_info &a2)
 {
-    for (auto const &conflictName: affix["conflicts"])
-        if (required.count(conflictName.asString()) > 0)
-            return true;
+    if (a1.equals(a2))
+        return false;
+
+    // Check if the affixes are mentioned in "conflicts" field of each other.
+    if (a1.conflicts.count(a2.affixName) > 0)
+        return true;
+
+    if (a2.conflicts.count(a1.affixName) > 0)
+        return true;
+    
+    // Check if section's "conflictsWith" field is applicable.
+    if (a1.section != a2.section)
+        return false;
+    if (!weapon_affixes[a1.section].isMember("conflictsWith"))
+        return false;
+
+    DLString mode = weapon_affixes[a1.section]["conflictsWith"].asString();
+    if (mode == "same_section")
+        return a1.affixName != a2.affixName;
+
+    if (mode == "same_value")
+        return a1.normalizedName() == a2.normalizedName();
 
     return false;
 }
@@ -263,12 +342,23 @@ bool affix_generator::checkAlign(const Json::Value &affix) const
     return align_min <= align && align <= align_max;
 }
 
+bool affix_generator::checkAlignBonus(const affix_info &ai) const
+{
+    if (align == ALIGN_NONE)
+        return false;
+
+    return ALIGN_NUMBER(align) == ai.alignBonus;
+}
+
 /** Expresses affix names from 'required' field as a bit mask. */
 void affix_generator::markRequirements()
 {
     for (auto const &reqName: required) {
         int r = getAffixIndex(reqName);
-        requirements.set(r);
+        if (r < 0)
+            warn("weapon generator: requirement %s not honoured", reqName.c_str());
+        else
+            requirements.set(r);
     }
 }
 
@@ -278,49 +368,32 @@ void affix_generator::markExclusions()
 {
     exclusions.resize(affixes.size());
 
-    for (unsigned int i = 0; i < affixes.size(); i++) {            
-        bucket_mask_t &exclusion = exclusions[i];
-        affix_info &p = affixes[i];
+    for (unsigned int a = 0; a < affixes.size(); a++) {
+        affix_info &affix = affixes[a];
 
-        if (p.section == "material")
-            for (unsigned int j = 0; j < affixes.size(); j++)
-                if (i != j && affixes[j].section == p.section)
-                    exclusion.set(j);
-
-        for (auto &conflictName: p.entry["conflicts"]) {
-            int index = getAffixIndex(conflictName.asString());
-            if (index >= 0) {
-                exclusion.set(index);
-                exclusions[index].set(i);
+        for (unsigned int o = 0; o < affixes.size(); o++) {
+            affix_info &other = affixes[o];
+            if (checkMutualConflict(affix, other)) {
+                exclusions[a].set(o);
+                exclusions[o].set(a);
             }
         }
     }
-
-#if 0
-    // Mark all stacked values such as +hr, -hr as mutually exclusive.
-    for (unsigned int i = 0; i < affixes.size(); i++) {
-        const affix_info &p = affixes[i];
-        for (auto &same: getAffixIndexes(p.entry["value"].asString()))
-            if (i != same)
-                exclusions[i].set(same);
-    }
-#endif         
 }
 
-
-
 // Debug util: grab several good affix combinations for the tier. 
-list<list<string>> random_weapon_affixes(int tier, int count, int align)
+list<list<string>> random_weapon_affixes(int tier, int count, int align, int chance)
 {
     list<list<string>> allNames;
     affix_generator gen(tier);
     gen.setAlign(align);
+    gen.setRetainChance(chance);
     gen.run();
 
     for (int i = 0; i < min(count, gen.getResultSize()); i++) {
         list<string> names;
         for (auto &pi: gen.getSingleResult())
-            names.push_back(pi.entry["value"].asString());
+            names.push_back(pi.affixName);
         allNames.push_back(names);
     }
 

@@ -40,9 +40,10 @@ CONFIGURABLE_LOADED(fight, weapon_names)
 /*--------------------------------------------------------------------------
  * WeaponGenerator
  *-------------------------------------------------------------------------*/
-WeaponGenerator::WeaponGenerator()
+WeaponGenerator::WeaponGenerator(bool debug)
         : extraFlags(0, &extra_flags),
-          weaponFlags(0, &weapon_type2)
+          weaponFlags(0, &weapon_type2),
+          debug(debug)
 {
     sn = gsn_none;
     valTier = hrTier = drTier = 5;
@@ -65,6 +66,12 @@ WeaponGenerator & WeaponGenerator::item(Object *obj)
     if (wclass.empty())
         warn("Weapon generator: no configuration defined for weapon class %s.", wclass.c_str());
      return *this; 
+}
+
+WeaponGenerator & WeaponGenerator::tier(int tier)
+{
+    valTier = hrTier = drTier = tier;
+    return *this;
 }
 
 const WeaponGenerator & WeaponGenerator::assignValues() const
@@ -198,18 +205,24 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     for (auto const &affixName: wclassConfig["requires"])
         gen.addRequired(affixName.asString());
 
+   for (auto const &affixName: wclassConfig["prefers"])
+        gen.addPreference(affixName.asString());
+
     for (auto const &affixName: nameConfig["forbids"])
         gen.addForbidden(affixName.asString());
 
     for (auto const &affixName: nameConfig["requires"])
         gen.addRequired(affixName.asString());
 
-    // TODO: affix preferences setup and align bonus setup happens here.
+   for (auto const &affixName: nameConfig["prefers"])
+        gen.addPreference(affixName.asString());
 
     gen.setAlign(align);
+    gen.setRetainChance(80);
 
     // Generate all combinations of affixes.
     gen.run();
+    LogStream::sendNotice() << gen.dump();
 
     if (gen.getResultSize() == 0) {
         warn("Weapon generator: no affixes found for tier %d.", valTier);
@@ -222,9 +235,9 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     int maxPrice = result.back().price;
 
     for (auto &pinfo: result) {
-        const Json::Value &affix = pinfo.entry;
+        const Json::Value &affix = pinfo.affix;
         const DLString &section = pinfo.section;
-        obj->carried_by->pecho("{DAffix %s [%d]", affix["value"].asCString(), pinfo.price);
+        if (debug) obj->carried_by->pecho("{DAffix %s [%d]", affix["value"].asCString(), pinfo.price);
 
         if (section == "flag") {
             extraFlags.setBits(affix["extra"].asString());
@@ -233,6 +246,9 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             extraFlags.setBits(affix["value"].asString());
         } else if (section == "material") {
             materialName = affix["value"].asString();
+        } else if (section == "affects_by_tier") {
+            extraFlags.setBits(affix["extra"].asString());
+            
         }
 
         // TODO collect data for suffixes, including hr/dr/ave tier bonuses.
@@ -247,7 +263,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
                 nouns.push_back(noun.asString());
     }
 
-    obj->carried_by->pecho("{DExtras %s, weapon flags %s, material %s{x", 
+    if (debug) obj->carried_by->pecho("{DExtras %s, weapon flags %s, material %s{x", 
         extraFlags.names().c_str(), weaponFlags.names().c_str(), materialName.c_str());
 
     return *this;

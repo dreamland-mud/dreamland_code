@@ -9,20 +9,31 @@
 #include <vector>
 #include <jsoncpp/json/json.h>
 
+#include "bitstring.h"
+
 using namespace std;
 class DLString;
 class weapon_tier_t;
 
+
 /** Helper structure to access affix configuration. */
 struct affix_info {
-    affix_info(const string &section, const string &affixName, int price, int stack, const Json::Value &entry);
+    affix_info(const string &section, int stack, const Json::Value &entry);
     virtual ~affix_info();
+
+    /** Two affix infos are equal if they represet the same name and price. */
+    bool equals(const affix_info &other) const;
+
+    /** Return affix name without initial '-' or '+'; */
+    string normalizedName() const;
 
     string section;
     string affixName;
     int price;
     int stack;
-    Json::Value entry;
+    set<string> conflicts;
+    bitnumber_t alignBonus;
+    Json::Value affix;
 };
 
 
@@ -43,6 +54,12 @@ struct affix_generator {
     /** Mark a certain affix as required (always chosen). */
     void addRequired(const DLString &name);
 
+    /** Mark a certain affix as preferred (always included in initial set). */
+    void addPreference(const DLString &name);
+
+    /** Decide probability an affix that is not preferred gets removed from initial set. */
+    void setRetainChance(int chance) { this->retainChance = chance; }
+
     void setup();
     void run();
 
@@ -53,11 +70,13 @@ struct affix_generator {
 
     const vector<affix_info> & getAffixes() const { return affixes; }
 
+    string dump() const;
+    
 private:
 
-    int getAffixIndex(const DLString &name);
+    list<affix_info *> getAffixes(const DLString &name);
 
-    list<int> getAffixIndexes(const DLString &name);
+    int getAffixIndex(const DLString &name);
 
     /** Choose a random set element. */
     bucket_mask_t randomBucket() const;
@@ -70,13 +89,15 @@ private:
     /** Creates a vector of all affixes that are allowed for the tier, sorted by price in ascending order. */
     void collectAffixesForTier();
 
-    bool checkRequirementConflict(const Json::Value &affix) const;
+    bool checkMutualConflict(const affix_info &a1, const affix_info &a2);
 
     bool checkTierThreshold(const Json::Value &affix) const;
 
     bool checkForbidden(const Json::Value &affix) const;
 
     bool checkAlign(const Json::Value &affix) const;
+
+    bool checkAlignBonus(const affix_info &ai) const;
 
     /** Expresses affix names from 'required' field as a bit mask. */
     void markRequirements();
@@ -104,11 +125,16 @@ private:
     int maxPrice;
     int align;
 
+    int retainChance;
+
     /** Pre-set forbidden affixes. */
     set<DLString> forbidden;
 
     /** Pre-set required affixes. */
     set<DLString> required;
+
+    /** Pre-set preferences. */
+    set<DLString> preferences;
 };
 
 #endif

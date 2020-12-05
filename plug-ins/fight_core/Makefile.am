@@ -6,6 +6,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system \
+-I$(top_srcdir)/plug-ins/alignment \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/occupations \
@@ -41,6 +42,7 @@ libfight_core_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../follow/core/libfollow_core.la \
 ../system/libsystem.la \
+../alignment/libalignment.la \
 ../occupations/liboccupations.la \
 ../system/libscheduler_task_round.la \
 ../interpret/libinterpret.la \
