@@ -49,7 +49,7 @@ WeaponGenerator::WeaponGenerator(bool debug)
     valTier = hrTier = drTier = 5;
     hrCoef = drCoef = 0;
     hrMinValue = drMinValue = 0;
-    hrIndexBonus = drIndexBonus = 0;
+    hrIndexBonus = drIndexBonus = aveIndexBonus = 0;
     align = ALIGN_NONE;
 }
 
@@ -76,7 +76,7 @@ WeaponGenerator & WeaponGenerator::tier(int tier)
 
 const WeaponGenerator & WeaponGenerator::assignValues() const
 {    
-    WeaponCalculator calc(valTier, obj->level, obj->value0());
+    WeaponCalculator calc(valTier, obj->level, obj->value0(), aveIndexBonus);
     obj->value1(calc.getValue1());
     obj->value2(calc.getValue2());
     return *this;
@@ -222,7 +222,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
     // Generate all combinations of affixes.
     gen.run();
-    LogStream::sendNotice() << gen.dump();
+    //LogStream::sendNotice() << gen.dump();
 
     if (gen.getResultSize() == 0) {
         warn("Weapon generator: no affixes found for tier %d.", valTier);
@@ -248,10 +248,15 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             materialName = affix["value"].asString();
         } else if (section == "affects_by_tier") {
             extraFlags.setBits(affix["extra"].asString());
-            
+            if (pinfo.normalizedName() == "hr")
+                hrIndexBonus += affix["step"].asInt() * pinfo.stack;
+            else if (pinfo.normalizedName() == "dr")
+                drIndexBonus += affix["step"].asInt() * pinfo.stack;
+            else if (pinfo.normalizedName() == "ave") 
+                aveIndexBonus += affix["step"].asInt() * pinfo.stack;
         }
 
-        // TODO collect data for suffixes, including hr/dr/ave tier bonuses.
+        // TODO collect data for other types of suffixes.
 
         // Each adjective or noun has a chance to be chosen, but the most expensive get an advantage.
         for (auto &adj: affix["adjectives"])

@@ -72,6 +72,8 @@ static bool sort_by_ave_distance(const weapon_value_t &w1, const weapon_value_t 
 WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, int index_bonus) 
     : tier(tier), level(level), wclass(wclass), index_bonus(index_bonus)
 {
+    v2_min = v2_max = value1 = value2 = 0;
+    ave = real_ave = damroll = 0;
     calcValue2Range();
     calcAve();
     calcValues();
@@ -130,7 +132,8 @@ void WeaponCalculator::calcAve()
     Json::Value &one_tier = weapon_ave_tiers[tier-1];
     int index = getTierIndex();
     if (index >= (int)one_tier.size()) {
-        bug("weapon_ave: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
+        bug("weapon_ave: tier %d of size %d doesn't have enough values for level %d+%d, index %d", 
+            tier, one_tier.size(), level, index_bonus, index);
         return;
     }
 
@@ -181,7 +184,8 @@ void WeaponCalculator::calcDamroll()
     int index = getTierIndex();
 
     if (index >= (int)one_tier.size()) {
-        bug("weapon_damroll: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
+        bug("weapon_damroll: tier %d of size %d doesn't have enough values for level %d+%d, index %d", 
+            tier, one_tier.size(), level, index_bonus, index);
         return;
     }
 

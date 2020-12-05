@@ -6,6 +6,9 @@
 #include "security.h"
 #include "argparser.h"
 #include "core/object.h"
+#include "affect.h"
+#include "skill.h"
+#include "skillreference.h"
 #include "weapongenerator.h"
 #include "weaponcalculator.h"
 #include "weapontier.h"
@@ -18,6 +21,7 @@
 #include "act.h"
 #include "def.h"
 
+GSN(none);
 list<list<string>> random_weapon_affixes(int tier, int count, int align, int chance);
 
 namespace pegtl = TAO_PEGTL_NAMESPACE;
@@ -213,7 +217,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     
     ch->println("Running a set of weapon generator tests:");
     {
-        show_title(ch, "Polearm is always two-handed.");
+        show_title(ch, "Polearm is always two-handed");
         Object *obj = item(ch, WEAPON_POLEARM);
         WeaponGenerator().item(obj).tier(1).randomAffixes().assignFlags();
         show_result(ch, obj->value4() | WEAPON_TWO_HANDS);
@@ -221,14 +225,45 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
-        show_title(ch, "Dagger is never two-handed or vorpal.");
+        show_title(ch, "Dagger is never two-handed or vorpal");
         Object *obj = item(ch, WEAPON_DAGGER);
         WeaponGenerator().item(obj).tier(1).randomAffixes().assignFlags();
         show_result(ch, !IS_WEAPON_STAT(obj, WEAPON_VORPAL | WEAPON_TWO_HANDS));
         extract_obj(obj);
     }
 
-    ch->println("Running a set of affix generator tests:");
+    {
+        show_title(ch, "AVE bonus of 1 pushes value1 to the next tier");
+        Object *obj = item(ch, WEAPON_DAGGER);
+        WeaponGenerator().item(obj).valueTier(5).valueIndexBonus(1).assignValues();
+        int v1 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(5).assignValues();
+        show_result(ch, v1 > obj->value1());
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "AVE bonus of -1 pulls value1 down to prev tier");
+        Object *obj = item(ch, WEAPON_DAGGER);
+        WeaponGenerator().item(obj).valueTier(5).valueIndexBonus(-1).assignValues();
+        int v1 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(5).assignValues();
+        show_result(ch, v1 < obj->value1());
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "HR bonus of 3 still works on LVL 100");
+        Object *obj = item(ch, WEAPON_DAGGER);
+        WeaponGenerator().item(obj).tier(1).hitrollIndexBonus(3).assignHitroll();
+        int hr3 = obj->affected.find(gsn_none, APPLY_HITROLL)->modifier;
+        WeaponGenerator().item(obj).tier(1).assignHitroll();
+        int hr = obj->affected.find(gsn_none, APPLY_HITROLL)->modifier;
+        show_result(ch, hr3 > hr);
+        extract_obj(obj);
+    }
+
+    ch->println("\r\nRunning a set of affix generator tests:");
 
     {
         show_title(ch, "Holy affix not selected for align < 350");
@@ -264,7 +299,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
-        show_title(ch, "Wood conflicts with all other materials.");
+        show_title(ch, "Wood conflicts with all other materials");
         affix_generator gen(1);
         gen.addRequired("wood");
         gen.setup();
@@ -335,7 +370,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
-        show_title(ch, "Two_hands requirement is kept.");
+        show_title(ch, "Two_hands requirement is kept");
         affix_generator gen(1);
         gen.addRequired("two_hands");
         gen.addForbidden("flaming");
