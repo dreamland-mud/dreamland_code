@@ -286,8 +286,6 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             notice("...created skill group affect %s by %d", af.global.toString().c_str(), af.modifier);
         }
 
-        // TODO collect data for other types of suffixes.
-
         // Each adjective or noun has a chance to be chosen, but the most expensive get an advantage.
         for (auto &adj: affix["adjectives"])
             if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
@@ -296,6 +294,13 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         for (auto &noun: affix["nouns"])
             if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
                 nouns.push_back(noun.asString());
+    }
+
+    // Additional flags configured for weapon class. 
+    for (auto const &flag: wclassConfig["flags"].getMemberNames()) {
+        int prob = wclassConfig["flags"][flag].asInt();
+        if (chance(prob))
+            weaponFlags.setBits(flag);
     }
 
     if (debug) obj->carried_by->pecho("{DExtras %s, weapon flags %s, material %s{x", 
