@@ -5,7 +5,7 @@
 
 /** Weapon parameter calculator: figure out v1, v2 and damroll for given tier, level and weapon class. */
 struct WeaponCalculator {
-    WeaponCalculator(int tier, int level, bitnumber_t wclass, int index_bonus = 0);
+    WeaponCalculator(int tier, int level, bitnumber_t wclass, float index_bonus = 0);
 
     int getValue1() const { return value1; }
     int getValue2() const { return value2; }
@@ -30,7 +30,7 @@ private:
     int ave;
     int real_ave;
     int damroll;
-    int index_bonus;
+    float index_bonus;
 };
 
 

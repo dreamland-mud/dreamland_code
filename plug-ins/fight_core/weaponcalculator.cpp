@@ -69,7 +69,7 @@ static bool sort_by_ave_distance(const weapon_value_t &w1, const weapon_value_t 
 /*--------------------------------------------------------------------------
  * WeaponCalculator
  *-------------------------------------------------------------------------*/
-WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, int index_bonus) 
+WeaponCalculator:: WeaponCalculator(int tier, int level, bitnumber_t wclass, float index_bonus) 
     : tier(tier), level(level), wclass(wclass), index_bonus(index_bonus)
 {
     v2_min = v2_max = value1 = value2 = 0;
@@ -84,7 +84,8 @@ int WeaponCalculator::getTierIndex() const
 {
     int index = level / 5;
     int penalty = weapon_level_penalty[wclass].asInt();
-    index = max(0, index + penalty + index_bonus);
+    int bonus = floor(index_bonus);
+    index = max(0, index + penalty + bonus);
     return index;
 }
 
@@ -109,6 +110,25 @@ void WeaponCalculator::calcValue2Range()
     }
 
     bug("weapon_value2: invalid values provided for class %d", wclass);
+}
+
+static float get_threshold_value(int index, float index_bonus, Json::Value &one_tier)
+{
+    // 'bonus' is a non-integer part of the index_bonus.
+    float bonus = index_bonus - floor(index_bonus);
+
+    // To apply this bonus, first find out adjancent value in the table.
+    int next_index = index + 1;
+    if (next_index >= (int)one_tier.size()) {
+        bug("weapon calc: bonus %f requested but there are not enough values near index %d", index_bonus, index);        
+        next_index = index;
+    }
+
+    int tier_value = one_tier[index].asInt();
+    int next_value = one_tier[next_index].asInt();
+
+    // Correctly apply bonuses such as 0.5 or -0.5, shifting table value towards the adjancent value.
+    return bonus * (next_value - tier_value) + tier_value;
 }
 
 /** Retrieve desired ave damage for this tier and weapon class. */
@@ -138,8 +158,7 @@ void WeaponCalculator::calcAve()
     }
 
     float multiplier = weapon_ave_penalty[wclass].asFloat();
-    int tier_ave = one_tier[index].asInt();
-    ave = (int)(multiplier * tier_ave);
+    ave = (int)(multiplier * get_threshold_value(index, index_bonus, one_tier));
 }
 
 /** Calculate value1 and resulting value2 (between min and max) for the requested ave damage. */
@@ -189,6 +208,6 @@ void WeaponCalculator::calcDamroll()
         return;
     }
 
-    damroll = one_tier[index].asInt();
+    damroll = (int)get_threshold_value(index, index_bonus, one_tier);
 }
 

@@ -280,8 +280,8 @@ void affix_generator::collectAffixesForTier()
 
         if (!chance(retainChance))
             toErase.insert(ai.affixName);        
-        else
-            warn("...%s got lucky, staying", ai.affixName.c_str());
+//        else
+//            warn("...%s got lucky, staying", ai.affixName.c_str());
     }
     
     for (auto &affixName: toErase) {

@@ -249,11 +249,11 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             materialName = pinfo.affixName;
         } else if (section == "affects_by_tier") {
             if (pinfo.normalizedName() == "hr")
-                hrIndexBonus += affix["step"].asInt() * pinfo.stack;
+                hrIndexBonus += affix["step"].asFloat() * pinfo.stack;
             else if (pinfo.normalizedName() == "dr")
-                drIndexBonus += affix["step"].asInt() * pinfo.stack;
+                drIndexBonus += affix["step"].asFloat() * pinfo.stack;
             else if (pinfo.normalizedName() == "ave") 
-                aveIndexBonus += affix["step"].asInt() * pinfo.stack;
+                aveIndexBonus += affix["step"].asFloat() * pinfo.stack;
         } else if (section == "affects_by_level") {
             Affect af;
             float mult = affix.isMember("mult") ? affix["mult"].asFloat() : 0;
@@ -292,7 +292,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
                 adjectives.push_back(adj.asString());
 
         for (auto &noun: affix["nouns"])
-            if (number_range(minPrice - 10, maxPrice) <= pinfo.price)
+            if (pinfo.price >= 0 && number_range(minPrice - 10, maxPrice) <= pinfo.price)
                 nouns.push_back(noun.asString());
     }
 

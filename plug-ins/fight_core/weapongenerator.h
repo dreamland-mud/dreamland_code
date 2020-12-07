@@ -24,9 +24,9 @@ struct WeaponGenerator {
     WeaponGenerator & damrollStartPenalty(float coef) { this->drCoef = coef; return *this; }
     WeaponGenerator & hitrollMinStartValue(int minValue) { this->hrMinValue = minValue; return *this; }
     WeaponGenerator & damrollMinStartValue(int minValue)  { this->drMinValue = minValue; return *this; }
-    WeaponGenerator & hitrollIndexBonus(int bonus) { this->hrIndexBonus = bonus; return *this; }
-    WeaponGenerator & damrollIndexBonus(int bonus) { this->drIndexBonus = bonus; return *this; }
-    WeaponGenerator & valueIndexBonus(int bonus) { this->aveIndexBonus = bonus; return *this; }
+    WeaponGenerator & hitrollIndexBonus(float bonus) { this->hrIndexBonus = bonus; return *this; }
+    WeaponGenerator & damrollIndexBonus(float bonus) { this->drIndexBonus = bonus; return *this; }
+    WeaponGenerator & valueIndexBonus(float bonus) { this->aveIndexBonus = bonus; return *this; }
     WeaponGenerator & alignment(int align) { this->align = align; return *this; }
 
     WeaponGenerator &  randomNames();
@@ -75,9 +75,9 @@ private:
     float drCoef;
     int hrMinValue;
     int drMinValue;
-    int hrIndexBonus;
-    int drIndexBonus;
-    int aveIndexBonus;
+    float hrIndexBonus;
+    float drIndexBonus;
+    float aveIndexBonus;
     int align;
 
     Object *obj;    

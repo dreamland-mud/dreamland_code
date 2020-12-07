@@ -181,7 +181,7 @@ static bool assert_affix_included(const affix_generator &gen, const unordered_se
 static void show_title(Character *ch, const char *title)
 {
     notice("TEST: %s", title);
-    ptc(ch, " {C*{x %-50s    ", title);
+    ptc(ch, " {C*{x %-52s    ", title);
 }
 
 static void show_result(Character *ch, bool success)
@@ -201,11 +201,11 @@ static void print_affixes(Character *ch, const affix_generator &gen)
         ptc(ch, "...%13s [%d] x%d\r\n", ai.affixName.c_str(), ai.price, ai.stack);
 }
 
-static Object *item(Character *ch, bitnumber_t weaponClass)
+static Object *item(Character *ch, bitnumber_t weaponClass, int level = -1)
 {
     Object *obj = create_object(get_obj_index(104), 0);
     obj->value0(weaponClass);
-    obj->level = ch->getModifyLevel();
+    obj->level = level == -1 ? ch->getModifyLevel() : level;
     obj->setShortDescr(str_empty); 
     obj_to_char(obj, ch);
     return obj;
@@ -233,7 +233,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
-        show_title(ch, "AVE bonus of 1 pushes value1 to the next tier");
+        show_title(ch, "AVE bonus of 1 pushes value1 to the next threshold");
         Object *obj = item(ch, WEAPON_DAGGER);
         WeaponGenerator().item(obj).valueTier(5).valueIndexBonus(1).assignValues();
         int v1 = obj->value1();
@@ -243,7 +243,43 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
-        show_title(ch, "AVE bonus of -1 pulls value1 down to prev tier");
+        show_title(ch, "AVE bonus of 0.5 gives value in between thresholds");
+        Object *obj = item(ch, WEAPON_DAGGER, 50);
+        WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(0.5).assignValues();
+        int v1_05 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(1).assignValues();
+        int v1_1 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(1).assignValues();
+        show_result(ch, obj->value1() < v1_05 && v1_05 < v1_1);
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "AVE bonus of -0.5 gives value in between thresholds");
+        Object *obj = item(ch, WEAPON_DAGGER, 50);
+        WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(-0.5).assignValues();
+        int v1_05 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(-1).assignValues();
+        int v1_1 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(1).assignValues();
+        show_result(ch, v1_1 < v1_05 && v1_05 < obj->value1());
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "AVE bonus of -1.5 gives value in between thresholds");
+        Object *obj = item(ch, WEAPON_DAGGER, 50);
+        WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(-1.5).assignValues();
+        int v1_15 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(-2).assignValues();
+        int v1_2 = obj->value1();
+        WeaponGenerator().item(obj).valueTier(1).assignValues();
+        show_result(ch, v1_2 < v1_15 && v1_15 < obj->value1());
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "AVE bonus of -1 pulls value1 down to prev threshold");
         Object *obj = item(ch, WEAPON_DAGGER);
         WeaponGenerator().item(obj).valueTier(5).valueIndexBonus(-1).assignValues();
         int v1 = obj->value1();
@@ -260,6 +296,32 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
         WeaponGenerator().item(obj).tier(1).assignHitroll();
         int hr = obj->affected.find(gsn_none, APPLY_HITROLL)->modifier;
         show_result(ch, hr3 > hr);
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "DR bonus of -1.5 gives value in between thresholds");
+        Object *obj = item(ch, WEAPON_DAGGER, 80);
+        WeaponGenerator().item(obj).damrollTier(1).damrollIndexBonus(-1.5).assignDamroll();
+        int dr_15 = obj->affected.find(gsn_none, APPLY_DAMROLL)->modifier;
+        WeaponGenerator().item(obj).damrollTier(1).damrollIndexBonus(-2).assignDamroll();
+        int dr_2 = obj->affected.find(gsn_none, APPLY_DAMROLL)->modifier;
+        WeaponGenerator().item(obj).damrollTier(1).assignDamroll();
+        int dr = obj->affected.find(gsn_none, APPLY_DAMROLL)->modifier;
+        show_result(ch, dr_2 < dr_15 && dr_15 < dr);
+        extract_obj(obj);
+    }
+
+    {
+        show_title(ch, "DR bonus of 0.5 gives value in between thresholds");
+        Object *obj = item(ch, WEAPON_DAGGER, 80);
+        WeaponGenerator().item(obj).damrollTier(1).damrollIndexBonus(0.5).assignDamroll();
+        int dr_05 = obj->affected.find(gsn_none, APPLY_DAMROLL)->modifier;
+        WeaponGenerator().item(obj).damrollTier(1).damrollIndexBonus(1).assignDamroll();
+        int dr_1 = obj->affected.find(gsn_none, APPLY_DAMROLL)->modifier;
+        WeaponGenerator().item(obj).damrollTier(1).assignDamroll();
+        int dr = obj->affected.find(gsn_none, APPLY_DAMROLL)->modifier;
+        show_result(ch, dr < dr_05 && dr_05 < dr_1);
         extract_obj(obj);
     }
 

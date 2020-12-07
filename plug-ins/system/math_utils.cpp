@@ -32,3 +32,11 @@ int dice_ave(int d1, int d2)
     return (d2 + 1) * d1 / 2;
 }
 
+int signum(float x)
+{
+    if (x < 0.0)
+        return -1;
+    if (x > 0.0)
+        return 1;
+    return 0;
+}
