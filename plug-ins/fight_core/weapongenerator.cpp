@@ -251,17 +251,24 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
         if (section == "flag") {
             weaponFlags.setBits(pinfo.affixName);
+
         } else if (section == "extra") {
             extraFlags.setBits(pinfo.affixName);
+
         } else if (section == "material") {
             materialName = pinfo.affixName;
+
         } else if (section == "affects_by_tier") {
-            if (pinfo.normalizedName() == "hr")
-                hrIndexBonus += affix["step"].asFloat() * pinfo.stack;
-            else if (pinfo.normalizedName() == "dr")
-                drIndexBonus += affix["step"].asFloat() * pinfo.stack;
-            else if (pinfo.normalizedName() == "ave") 
-                aveIndexBonus += affix["step"].asFloat() * pinfo.stack;
+            float bonus = affix["step"].asFloat() * pinfo.stack;
+            DLString aname = pinfo.normalizedName();
+
+            if (aname == "hr")
+                hrIndexBonus += bonus;
+            else if (aname == "dr")
+                drIndexBonus += bonus;
+            else if (aname == "ave") 
+                aveIndexBonus += bonus;
+
         } else if (section == "affects_by_level") {
             Affect af;
             float mult = affix.isMember("mult") ? affix["mult"].asFloat() : 0;
@@ -272,7 +279,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             af.duration = -1;
             af.level = obj->level;
             affects.push_back(af);
-            notice("...created affect %s modifier %d", apply_flags.name(af.location).c_str(), af.modifier);
+
         } else if (section == "affects_with_bits") {
             Affect af;
             af.bitvector.setTable(&affect_flags);
@@ -281,7 +288,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             af.duration = -1;
             af.level = obj->level;
             affects.push_back(af);
-            notice("...created affect %s", af.bitvector.names().c_str());
+
         } else if (section == "skill_group") {
             Affect af;
             af.global.setRegistry(skillGroupManager);
@@ -291,7 +298,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             af.duration = -1;
             af.level = obj->level;
             affects.push_back(af);
-            notice("...created skill group affect %s by %d", af.global.toString().c_str(), af.modifier);
+
         } else if (section == "player") {
             if (pinfo.affixName == "skillgroup") {
                 Affect af;
@@ -302,7 +309,27 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
                 af.duration = -1;
                 af.level = obj->level;
                 affects.push_back(af);
-                notice("...created player skill group affect %s by %d", af.global.toString().c_str(), af.modifier);
+            }
+
+        } else if (section == "affect_packs") {
+            for (auto const &affect: affix["affects"]) {
+                Affect af;
+                af.type = gsn_none;
+                af.duration = -1;
+                af.level = obj->level;
+
+                if (affect.isMember("apply")) {
+                    float mult = affect.isMember("mult") ? affect["mult"].asFloat() : 0;
+                    int mod = affect.isMember("mod") ? affect["mod"].asInt() : 0;
+                    af.modifier = mult * pinfo.stack * obj->level + mod;
+                    af.location = apply_flags.value(affect["apply"].asString());
+                    affects.push_back(af);
+
+                } else if (affect.isMember("table")) {
+                    af.bitvector.setTable(FlagTableRegistry::getTable(affect["table"].asString()));
+                    af.bitvector.setBits(affect["bits"].asString());
+                    affects.push_back(af);
+                }
             }
         }
 
@@ -497,7 +524,7 @@ static int get_random_skillgroup(PCharacter *pch)
         totalGroups.insert(skill->getGroup());
     }
 
-    int currentWeight;
+    int currentWeight = 0;
     int dice = number_range(0, totalWeight - 1);
     for (auto &group: totalGroups) {
         currentWeight += mygroups[group];
