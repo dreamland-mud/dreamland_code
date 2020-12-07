@@ -271,64 +271,45 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
         } else if (section == "affects_by_level") {
             Affect af;
-            float mult = affix.isMember("mult") ? affix["mult"].asFloat() : 0;
-            int mod = affix.isMember("mod") ? affix["mod"].asInt() : 0;
-            af.modifier = mult * pinfo.stack * obj->level + mod;
+            af.modifier = calcAffectModifier(affix, pinfo);
             af.location = apply_flags.value(pinfo.normalizedName());
-            af.type = gsn_none;
-            af.duration = -1;
-            af.level = obj->level;
-            affects.push_back(af);
+            rememberAffect(af);
 
         } else if (section == "affects_with_bits") {
             Affect af;
             af.bitvector.setTable(&affect_flags);
             af.bitvector.setBits(pinfo.affixName);
-            af.type = gsn_none;
-            af.duration = -1;
-            af.level = obj->level;
-            affects.push_back(af);
+            rememberAffect(af);
 
         } else if (section == "skill_group") {
             Affect af;
             af.global.setRegistry(skillGroupManager);
             af.global.fromString(pinfo.affixName);
-            af.modifier = affix["mod"].asInt();
-            af.type = gsn_none;
-            af.duration = -1;
-            af.level = obj->level;
-            affects.push_back(af);
+            af.modifier = calcAffectModifier(affix, pinfo);
+            rememberAffect(af);
 
         } else if (section == "player") {
             if (pinfo.affixName == "skillgroup") {
                 Affect af;
                 af.global.setRegistry(skillGroupManager);
                 af.global.set(get_random_skillgroup(pch));
-                af.modifier = affix["mod"].asInt();
-                af.type = gsn_none;
-                af.duration = -1;
-                af.level = obj->level;
-                affects.push_back(af);
+                af.modifier = calcAffectModifier(affix, pinfo);
+                rememberAffect(af);
             }
 
         } else if (section == "affect_packs") {
             for (auto const &affect: affix["affects"]) {
                 Affect af;
-                af.type = gsn_none;
-                af.duration = -1;
-                af.level = obj->level;
 
                 if (affect.isMember("apply")) {
-                    float mult = affect.isMember("mult") ? affect["mult"].asFloat() : 0;
-                    int mod = affect.isMember("mod") ? affect["mod"].asInt() : 0;
-                    af.modifier = mult * pinfo.stack * obj->level + mod;
+                    af.modifier = calcAffectModifier(affect, pinfo);
                     af.location = apply_flags.value(affect["apply"].asString());
-                    affects.push_back(af);
+                    rememberAffect(af);
 
                 } else if (affect.isMember("table")) {
                     af.bitvector.setTable(FlagTableRegistry::getTable(affect["table"].asString()));
                     af.bitvector.setBits(affect["bits"].asString());
-                    affects.push_back(af);
+                    rememberAffect(af);
                 }
             }
         }
@@ -358,6 +339,24 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         extraFlags.names().c_str(), weaponFlags.names().c_str(), materialName.c_str());
 
     return *this;
+}
+
+/** Add obj affect to the storage to be applied later. */
+void WeaponGenerator::rememberAffect(Affect &af)
+{
+    af.type = gsn_none;
+    af.duration = -1;
+    af.level = obj->level;
+
+    affects.push_back(af);
+}
+
+/** Guess affect modifier from json config as (mult * level * stack + mod). */
+int WeaponGenerator::calcAffectModifier(const Json::Value &afConfig, const affix_info &info) const
+{
+    float mult = afConfig.isMember("mult") ? afConfig["mult"].asFloat() : 0;
+    int mod = afConfig.isMember("mod") ? afConfig["mod"].asInt() : 0;
+    return mult * info.stack * obj->level + mod;
 }
 
 void WeaponGenerator::setName() const

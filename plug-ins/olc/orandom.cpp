@@ -92,8 +92,9 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         int tier = myargs.tier == -1  ? number_range(BEST_TIER, WORST_TIER) : myargs.tier;
         int align = myargs.align == -1 ? ALIGN_NONE : myargs.align;
         int count = 10;
+        int retainChance = 50;
 
-        auto allNames = random_weapon_affixes(tier, count, align, 50);
+        auto allNames = random_weapon_affixes(tier, count, align, retainChance);
         ch->printf("{W%d случайных комбинаций аффиксов для крутости %d и характера %d:\r\n", 
                     allNames.size(), tier, align);
 
@@ -128,6 +129,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
 
     WeaponGenerator(true)
         .item(obj)
+        .player(ch)
         .tier(tier)
         .alignment(align)
         .randomNames()

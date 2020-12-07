@@ -10,6 +10,7 @@
 
 class Object;
 class PCharacter;
+struct affix_info;
 
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
@@ -56,6 +57,8 @@ private:
     void setName() const;
     void setShortDescr() const;
     DLString findMaterial() const;
+    void rememberAffect(Affect &af);
+    int calcAffectModifier(const Json::Value &afConfig, const affix_info &info) const;
     int maxDamroll() const;
     int maxHitroll() const;
     int minDamroll() const;
