@@ -396,6 +396,34 @@ REDIT(fenia, "феня", "редактирование триггеров")
     return false;
 }
 
+void OLCStateRoom::delete_exit(RoomIndexData *pRoom, int door)
+{
+    // FIXME rework to delete all instances.
+    if (pRoom->exit[door]) {
+        free_exit(pRoom->exit[door]);
+        pRoom->exit[door] = NULL;
+    }
+
+    if (pRoom->room->exit[door]) {
+        free_exit(pRoom->room->exit[door]);
+        pRoom->room->exit[door] = NULL;
+    }
+}
+
+void OLCStateRoom::create_exit(RoomIndexData *sourceIndex, int door, RoomIndexData *destIndex)
+{
+    // FIXME rework to link all instances.
+    if (!sourceIndex->exit[door]) {
+        sourceIndex->exit[door] = new_exit();
+        sourceIndex->room->exit[door] = new_exit();
+    }
+
+    sourceIndex->exit[door]->u1.vnum = destIndex->vnum;
+    sourceIndex->exit[door]->orig_door = door;
+    sourceIndex->room->exit[door]->u1.to_room = destIndex->room;
+    sourceIndex->room->exit[door]->orig_door = door;
+}
+
 bool 
 OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 {
@@ -464,21 +492,15 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         to_room = pRoom->room->exit[door]->u1.to_room;
 
         if (to_room->exit[rev] && to_room->exit[rev]->u1.to_room == pRoom->room) {
-            free_exit(to_room->pIndexData->exit[rev]);
-            to_room->pIndexData->exit[rev] = NULL;
-            free_exit(to_room->exit[rev]);
-            to_room->exit[rev] = NULL;
+            delete_exit(to_room->pIndexData, rev);
             
-            if(pRoom->areaIndex->area != to_room->area) // FIXME instances
+            if (pRoom->areaIndex != to_room->areaIndex()) // FIXME instances
                 SET_BIT(to_room->areaIndex()->area_flag, AREA_CHANGED);
             stc("Exit unlinked from remote side.\n\r", ch);
         }
 
         // Remove this exit.
-        free_exit(pRoom->exit[door]);
-        pRoom->exit[door] = NULL;
-        free_exit(pRoom->room->exit[door]);
-        pRoom->room->exit[door] = NULL;
+        delete_exit(pRoom, door);
 
         stc("Exit unlinked.\n\r", ch);
         return true;
@@ -491,25 +513,25 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         }
 
         // Remove this exit.
-        free_exit(pRoom->exit[door]);
-        pRoom->exit[door] = NULL;
-        free_exit(pRoom->room->exit[door]);
-        pRoom->room->exit[door] = NULL;
+        delete_exit(pRoom, door);
 
         stc("Exit unlinked.\n\r", ch);
         return true;
     }
 
     if (!str_cmp(command, "link")) {
+        RoomIndexData *pRemoteRoom;
+
         if (arg[0] == '\0' || !is_number(arg)) {
             stc("Syntax:  [direction] link [vnum]\n\r", ch);
             return false;
         }
 
         value = atoi(arg);
+        pRemoteRoom = get_room_index(value);
 
-        if (!get_room_index(value)) {
-            stc("REdit:  Cannot link to non-existant room.\n\r", ch);
+        if (!pRemoteRoom) {
+            stc("REdit:  Cannot link to non-existent room.\n\r", ch);
             return false;
         }
 
@@ -518,29 +540,17 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             return false;
         }
 
-        if (get_room_index(value)->exit[dirs[door].rev]) {
+        if (pRemoteRoom->exit[dirs[door].rev]) {
             stc("REdit:  Remote side's exit already exists.\n\r", ch);
             return false;
         }
 
-        if (!pRoom->exit[door]) {
-            pRoom->exit[door] = new_exit();
-            pRoom->room->exit[door] = new_exit();
-        }
-
-        to_room = pRoom->room->exit[door]->u1.to_room = get_room_instance(value);
-        pRoom->exit[door]->orig_door = door;
-        pRoom->room->exit[door]->orig_door = door;
-
+        create_exit(pRoom, door, pRemoteRoom);
         door = dirs[door].rev;
-        to_room->pIndexData->exit[door] = new_exit();
-        to_room->exit[door] = new_exit();
-        to_room->pIndexData->exit[door]->u1.vnum = pRoom->vnum;
-        to_room->exit[door]->u1.to_room = pRoom->room;
-        to_room->pIndexData->exit[door]->orig_door = to_room->exit[door]->orig_door = door;
+        create_exit(pRemoteRoom, door, pRoom);
 
-        if(pRoom->areaIndex->area != to_room->area) // FIXME instances
-            SET_BIT(to_room->areaIndex()->area_flag, AREA_CHANGED);
+        if (pRoom->areaIndex != pRemoteRoom->areaIndex) // FIXME instances
+            SET_BIT(pRemoteRoom->areaIndex->area_flag, AREA_CHANGED);
 
         stc("Two-way link established.\n\r", ch);
         return true;
@@ -564,27 +574,22 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
     }
 
     if (!str_cmp(command, "room")) {
+        RoomIndexData *pRemoteRoom;
+
         if (arg[0] == '\0' || !is_number(arg)) {
             stc("Syntax:  [direction] room [vnum]\n\r", ch);
             return false;
         }
 
         value = atoi(arg);
+        pRemoteRoom = get_room_index(value);
 
-        if (!get_room_index(value)) {
-            stc("REdit:  Cannot link to non-existant room.\n\r", ch);
+        if (!pRemoteRoom) {
+            stc("REdit:  Cannot link to non-existent room.\n\r", ch);
             return false;
         }
 
-        if (!pRoom->exit[door]) {
-            pRoom->exit[door] = new_exit();
-            pRoom->room->exit[door] = new_exit();
-        }
-
-        pRoom->room->exit[door]->u1.to_room = get_room_instance(value);
-        pRoom->exit[door]->u1.vnum = value;
-        pRoom->exit[door]->orig_door = door;
-        pRoom->room->exit[door]->orig_door = door;
+        create_exit(pRoom, door, pRemoteRoom);
 
         stc("One-way link established.\n\r", ch);
         return true;

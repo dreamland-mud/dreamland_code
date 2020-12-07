@@ -34,6 +34,9 @@ public:
 
 private:
     virtual void statePrompt( Descriptor * );
+
+    static void create_exit(RoomIndexData *sourceIndex, int door, RoomIndexData *destIndex);
+    static void delete_exit(RoomIndexData *pRoom, int door);
 };
 
 #define REDIT(Cmd, rname, help) OLC_CMD(OLCStateRoom, Cmd, rname, help)
