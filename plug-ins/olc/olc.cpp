@@ -463,7 +463,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                      pRoom->reset_last = pRoom->reset_last->next);
             }
             free_reset_data(pReset);
-            SET_BIT(ch->in_room->area->area_flag, AREA_CHANGED);
+            SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
             stc("Reset deleted.\n\r", ch);
         }
         else if ((!str_cmp(arg2, "mob") && is_number(arg3))
@@ -527,7 +527,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 }
             }
             add_reset(ch->in_room->pIndexData, pReset, atoi(arg1));
-            SET_BIT(ch->in_room->area->area_flag, AREA_CHANGED);
+            SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
             stc("Reset added.\n\r", ch);
         }
         else {
