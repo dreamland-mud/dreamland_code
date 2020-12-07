@@ -9,6 +9,7 @@
 #include "affect.h"
 #include "skill.h"
 #include "skillreference.h"
+#include "skillgroup.h"
 #include "weapongenerator.h"
 #include "weaponcalculator.h"
 #include "weapontier.h"
@@ -22,6 +23,10 @@
 #include "def.h"
 
 GSN(none);
+GSN(bless);
+GSN(calm);
+GSN(frenzy);
+GROUP(benedictions);
 list<list<string>> random_weapon_affixes(int tier, int count, int align, int chance);
 
 namespace pegtl = TAO_PEGTL_NAMESPACE;
@@ -211,11 +216,37 @@ static Object *item(Character *ch, bitnumber_t weaponClass, int level = -1)
     return obj;
 }
 
+static bool has_affect(Object *obj, GlobalRegistryBase *registry, int regElementIndex)
+{
+    for (auto &af: obj->affected)
+        if (af->global.getRegistry() == registry && af->global.isSet(regElementIndex))
+            return true;
+    return false;
+}
+
 CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS, 
         "Tests for the random weapon generator.")
 {
     
     ch->println("Running a set of weapon generator tests:");
+
+    {
+        show_title(ch, "Players get skill group bonus from learned skills");
+        PCharacter dummy;
+        dummy.setLevel(100);
+        dummy.setProfession("cleric");
+        dummy.getSkillData(gsn_bless).learned = 100;
+        dummy.getSkillData(gsn_frenzy).learned = 100;
+        dummy.getSkillData(gsn_calm).learned = 100;
+
+        Object *obj = item(ch, WEAPON_MACE);
+        WeaponGenerator()
+            .item(obj).tier(1).player(&dummy).addRequirement("skillgroup")
+            .randomAffixes().assignAffects();
+        show_result(ch, has_affect(obj, skillGroupManager, group_benedictions));
+        extract_obj(obj);
+    }
+
     {
         show_title(ch, "Polearm is always two-handed");
         Object *obj = item(ch, WEAPON_POLEARM);
@@ -267,7 +298,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
 
     {
         show_title(ch, "AVE bonus of -0.5 gives value in between thresholds");
-        Object *obj = item(ch, WEAPON_DAGGER, 50);
+        Object *obj = item(ch, WEAPON_DAGGER, 40);
         WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(-0.5).assignValues();
         int v1_05 = obj->value1();
         WeaponGenerator().item(obj).valueTier(1).valueIndexBonus(-1).assignValues();
@@ -461,4 +492,32 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
         gen.setup();
         show_result(ch, count_affix(gen, "hr") == 3 && count_affix(gen, "-hr") == 3);
     }
+
+    {
+        show_title(ch, "Player-specific affixes not included by default");
+        affix_generator gen(1);
+        gen.setRetainChance(100);
+        gen.setup();
+        show_result(ch, assert_affix_excluded(gen, "skillgroup"));
+    }
+
+    {
+        show_title(ch, "Player-specific affixes included for a player");
+        PCharacter dummy;
+        affix_generator gen(1);
+        gen.setRetainChance(100);
+        gen.setPlayer(&dummy);
+        gen.setup();
+        show_result(ch, assert_affix_included(gen, "skillgroup"));
+    }
+
+    {
+        show_title(ch, "Required player affixes excluded by default");
+        affix_generator gen(1);
+        gen.addRequired("skillgroup");
+        gen.setRetainChance(100);
+        gen.setup();
+        show_result(ch, assert_affix_excluded(gen, "skillgroup"));
+    }
+
 }

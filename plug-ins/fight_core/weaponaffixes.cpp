@@ -76,6 +76,7 @@ affix_generator::affix_generator(int t) : tier(weapon_tier_table[t-1])
     align = ALIGN_NONE;
     requirements = 0L;
     retainChance = 100;
+    pch = 0;
 }
 
 string affix_generator::dump() const
@@ -225,7 +226,13 @@ void affix_generator::collectAffixesForTier()
 
     // Collect all affixes that are not forbidden or restricted by align or price.
     for (auto &section: weapon_affixes.getMemberNames()) {
-        for (auto const &affix: weapon_affixes[section]["values"]) {
+        const Json::Value &one_section = weapon_affixes[section];
+
+        // Exclude player-specific sections if no player is configured.
+        if (!checkPlayer(one_section))
+            continue;
+
+        for (auto const &affix: one_section["values"]) {
 
             if (!checkTierThreshold(affix))
                 continue;
@@ -264,17 +271,17 @@ void affix_generator::collectAffixesForTier()
     // Keep preferred affixes, all others have a chance to get evicted.
     for (auto &ai: affixes) {
         if (required.count(ai.affixName) > 0) {
-            warn("...%s required, staying", ai.affixName.c_str());
+//            warn("...%s required, staying", ai.affixName.c_str());
             continue;
         }
 
         if (preferences.count(ai.affixName) > 0) {
-            warn("...%s preferred, staying", ai.affixName.c_str());
+//            warn("...%s preferred, staying", ai.affixName.c_str());
             continue;
         }
             
         if (checkAlignBonus(ai)) {
-            warn("...%s has align bonus, staying", ai.affixName.c_str());
+//            warn("...%s has align bonus, staying", ai.affixName.c_str());
             continue;
         }
 
@@ -285,11 +292,23 @@ void affix_generator::collectAffixesForTier()
     }
     
     for (auto &affixName: toErase) {
-        warn("...erasing %s", affixName.c_str());
+//        warn("...erasing %s", affixName.c_str());
         int a;
         while ((a = getAffixIndex(affixName)) >= 0)
             affixes.erase(affixes.begin() + a);
     }
+}
+
+/** See if this section is player-specific, false by default. */
+bool affix_generator::checkPlayer(const Json::Value &one_section) const
+{
+    if (pch)
+        return true;
+
+    if (!one_section.isMember("needs_player"))
+        return true;
+
+    return !one_section["needs_player"].asBool();
 }
 
 bool affix_generator::checkMutualConflict(const affix_info &a1, const affix_info &a2)

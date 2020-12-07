@@ -3,11 +3,13 @@
 
 #include <vector>
 #include <list>
+#include <set>
 #include <jsoncpp/json/json.h>
 #include "flags.h"
 #include "affect.h"
 
 class Object;
+class PCharacter;
 
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
@@ -16,6 +18,7 @@ struct WeaponGenerator {
 
     WeaponGenerator & item(Object *obj);
     WeaponGenerator & tier(int tier);
+    WeaponGenerator & player(PCharacter *pch) { this->pch = pch; return *this; }
     WeaponGenerator & skill(int sn) { this->sn = sn; return *this; }
     WeaponGenerator & valueTier(int tier) { this->valTier = tier; return *this; }
     WeaponGenerator & hitrollTier(int tier) { this->hrTier = tier; return *this; }
@@ -28,9 +31,9 @@ struct WeaponGenerator {
     WeaponGenerator & damrollIndexBonus(float bonus) { this->drIndexBonus = bonus; return *this; }
     WeaponGenerator & valueIndexBonus(float bonus) { this->aveIndexBonus = bonus; return *this; }
     WeaponGenerator & alignment(int align) { this->align = align; return *this; }
-
-    WeaponGenerator &  randomNames();
-    WeaponGenerator &  randomAffixes();
+    WeaponGenerator & addRequirement(const DLString &req) { this->required.insert(req); return *this; }
+    WeaponGenerator & randomNames();
+    WeaponGenerator & randomAffixes();
 
     const WeaponGenerator & assignValues() const;
     
@@ -67,6 +70,7 @@ private:
     vector<DLString> adjectives;
     vector<DLString> nouns;
 
+    PCharacter *pch;
     int sn;
     int valTier;
     int hrTier;
@@ -79,6 +83,7 @@ private:
     float drIndexBonus;
     float aveIndexBonus;
     int align;
+    set<DLString> required; // Additional requirements set by test suite.
 
     Object *obj;    
     DLString wclass;

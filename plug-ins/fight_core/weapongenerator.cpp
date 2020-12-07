@@ -10,7 +10,7 @@
 #include "skillgroup.h"
 #include "skillreference.h"
 #include "core/object.h"
-#include "character.h"
+#include "pcharacter.h"
 
 #include "damageflags.h"
 #include "morphology.h"
@@ -24,6 +24,8 @@
 GSN(none);
 WEARLOC(wield);
 WEARLOC(second_wield);
+
+static int get_random_skillgroup(PCharacter *pch);
 
 Json::Value weapon_classes;
 CONFIGURABLE_LOADED(fight, weapon_classes)
@@ -45,6 +47,7 @@ WeaponGenerator::WeaponGenerator(bool debug)
           weaponFlags(0, &weapon_type2),
           debug(debug)
 {
+    pch = 0;
     sn = gsn_none;
     valTier = hrTier = drTier = 5;
     hrCoef = drCoef = 0;
@@ -198,6 +201,10 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 {
     affix_generator gen(valTier);
 
+    // Set requirements assigned directly to the generator (most likely from the tests).
+    for (auto const &reqName: required)
+        gen.addRequired(reqName);
+
     // Set exclusions or requirements based on chosen names and weapon flags.
     for (auto const &affixName: wclassConfig["forbids"])
         gen.addForbidden(affixName.asString());
@@ -205,7 +212,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     for (auto const &affixName: wclassConfig["requires"])
         gen.addRequired(affixName.asString());
 
-   for (auto const &affixName: wclassConfig["prefers"])
+    for (auto const &affixName: wclassConfig["prefers"])
         gen.addPreference(affixName.asString());
 
     for (auto const &affixName: nameConfig["forbids"])
@@ -214,9 +221,10 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     for (auto const &affixName: nameConfig["requires"])
         gen.addRequired(affixName.asString());
 
-   for (auto const &affixName: nameConfig["prefers"])
+    for (auto const &affixName: nameConfig["prefers"])
         gen.addPreference(affixName.asString());
 
+    gen.setPlayer(pch);
     gen.setAlign(align);
     gen.setRetainChance(50);
 
@@ -284,6 +292,18 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             af.level = obj->level;
             affects.push_back(af);
             notice("...created skill group affect %s by %d", af.global.toString().c_str(), af.modifier);
+        } else if (section == "player") {
+            if (pinfo.affixName == "skillgroup") {
+                Affect af;
+                af.global.setRegistry(skillGroupManager);
+                af.global.set(get_random_skillgroup(pch));
+                af.modifier = affix["mod"].asInt();
+                af.type = gsn_none;
+                af.duration = -1;
+                af.level = obj->level;
+                affects.push_back(af);
+                notice("...created player skill group affect %s by %d", af.global.toString().c_str(), af.modifier);
+            }
         }
 
         // Each adjective or noun has a chance to be chosen, but the most expensive get an advantage.
@@ -456,3 +476,34 @@ DLString WeaponGenerator::findMaterial() const
     return "metal";
 }
 
+// Helper function to get most popular/learned skill group for a player.
+static int get_random_skillgroup(PCharacter *pch)
+{
+    GlobalArray mygroups(skillGroupManager);
+    set<int> totalGroups;
+    int totalWeight = 0;
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        PCSkillData &myskill = pch->getSkillData(sn);
+
+        if (myskill.learned <= 1)
+            continue;
+        if (myskill.isTemporary())
+            continue;
+
+        Skill *skill = skillManager->find(sn);
+        mygroups[skill->getGroup()]++;
+        totalWeight++;
+        totalGroups.insert(skill->getGroup());
+    }
+
+    int currentWeight;
+    int dice = number_range(0, totalWeight - 1);
+    for (auto &group: totalGroups) {
+        currentWeight += mygroups[group];
+        if (currentWeight > dice)
+            return group;
+    }
+        
+    return -1;
+}

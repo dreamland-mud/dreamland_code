@@ -14,7 +14,7 @@
 using namespace std;
 class DLString;
 class weapon_tier_t;
-
+class PCharacter;
 
 /** Helper structure to access affix configuration. */
 struct affix_info {
@@ -60,6 +60,9 @@ struct affix_generator {
     /** Decide probability an affix that is not preferred gets removed from initial set. */
     void setRetainChance(int chance) { this->retainChance = chance; }
 
+    /** Will generate player-specific affixes for this player. */
+    void setPlayer(PCharacter *pch) { this->pch = pch; }
+
     void setup();
     void run();
 
@@ -89,6 +92,8 @@ private:
     /** Creates a vector of all affixes that are allowed for the tier, sorted by price in ascending order. */
     void collectAffixesForTier();
 
+    bool checkPlayer(const Json::Value &one_section) const;
+    
     bool checkMutualConflict(const affix_info &a1, const affix_info &a2);
 
     bool checkTierThreshold(const Json::Value &affix) const;
@@ -124,6 +129,7 @@ private:
     int minPrice;
     int maxPrice;
     int align;
+    PCharacter *pch;
 
     int retainChance;
 
