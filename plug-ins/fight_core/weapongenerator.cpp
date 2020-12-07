@@ -303,6 +303,10 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
             weaponFlags.setBits(flag);
     }
 
+    // Improve ave for two-handed weapons.
+    if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
+        aveIndexBonus++;
+
     if (debug) obj->carried_by->pecho("{DExtras %s, weapon flags %s, material %s{x", 
         extraFlags.names().c_str(), weaponFlags.names().c_str(), materialName.c_str());
 
@@ -383,9 +387,11 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
 
     // Set weight: 0.4 kg by default in OLC, 2kg for two hand.
     // TODO: Weight is very approximate, doesn't depend on weapon type.
-    if (IS_SET(obj->value4(), WEAPON_TWO_HANDS))
-        obj->weight *= 5;
+    if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
+        obj->weight = obj->pIndexData->weight * 5;
 
+    // Set standardized cost in silver.
+    obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
     return *this;
 }
 

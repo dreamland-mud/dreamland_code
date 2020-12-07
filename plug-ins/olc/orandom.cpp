@@ -233,6 +233,17 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     {
+        show_title(ch, "Higher tier weapons cost more");
+        Object *obj = item(ch, WEAPON_DAGGER);
+        WeaponGenerator().item(obj).tier(1).randomAffixes().assignFlags();
+        int cost_t1 = obj->cost;
+        WeaponGenerator().item(obj).tier(3).randomAffixes().assignFlags();
+        int cost_t3 = obj->cost;
+        show_result(ch, cost_t1 > cost_t3);
+        extract_obj(obj);
+    }
+
+    {
         show_title(ch, "AVE bonus of 1 pushes value1 to the next threshold");
         Object *obj = item(ch, WEAPON_DAGGER);
         WeaponGenerator().item(obj).valueTier(5).valueIndexBonus(1).assignValues();
