@@ -11,6 +11,7 @@
 
 #include "objindexwrapper.h"
 #include "affectwrapper.h"
+#include "structwrappers.h"
 #include "wrappermanager.h"
 #include "reglist.h"
 #include "register-impl.h"
@@ -72,6 +73,12 @@ ObjIndexWrapper::getTarget( ) const
 {
     checkTarget();
     return target;
+}
+
+NMI_GET( ObjIndexWrapper, area, "зона, в которой прописан предмет (.Area)") 
+{
+    checkTarget( );
+    return AreaWrapper::wrap(target->area->area_file->file_name);
 }
 
 NMI_GET( ObjIndexWrapper, material, "название материала, из которого сделан предмет") 
