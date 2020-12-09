@@ -2212,7 +2212,7 @@ CMDRUNP( help )
 
     // Several matches, display them all with numbers.
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
-    DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
+    DLString lineFormat = "[{C{hh%5d{x] %s\r\n";
     int firstId = -1;
     for (unsigned int a = 0; a < articles.size(); a++) {
 	    auto help = articles[a];
