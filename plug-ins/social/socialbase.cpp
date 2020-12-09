@@ -208,7 +208,7 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
                 ch->pecho( "Ты видишь только себя здесь, кто такой %s?", secondArgument.c_str( ));
             else
                 ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %s?", victim, secondArgument.c_str( ));
-            break;
+            return;
 
 
         case RC_VICT_VICT:
