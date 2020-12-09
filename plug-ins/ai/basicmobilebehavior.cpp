@@ -253,16 +253,17 @@ bool BasicMobileBehavior::isHomesick( )
 
     if (ch->switchedFrom)
         return false;
-
+    
     if (ch->fighting || hasLastFought( ))
         return false;
+
+    if (IS_ROOM_AFFECTED(ch->in_room, AFF_ROOM_CURSE))
+        return false;
     
-    if (IS_CHARMED(ch) || RIDDEN(ch))
+    // Prevent cursed mobs from recalling, but ignore 'native' curse set in mob index data.
+    if (ch->affected.findAllWithBits(&affect_flags, AFF_CURSE).size() > 0)
         return false;
 
-//    if (ch->getWrapper( ))
-//        return false;
-    
     return true;
 }
 
