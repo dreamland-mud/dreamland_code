@@ -111,7 +111,7 @@ void DefaultDesire::report( PCharacter *ch, ostringstream &buf )
         return;
 
     // Draw player desire status as progress bar or percents.
-    buf << "Насыщение " << what.ruscase('5') << " ";
+    buf << what << " ";
 
     if (IS_SET(ch->config, CONFIG_SCREENREADER))
         buf << showPercent(ch);
