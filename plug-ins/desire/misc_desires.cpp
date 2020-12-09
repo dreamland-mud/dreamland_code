@@ -82,11 +82,7 @@ int DrunkDesire::getUpdateAmount( PCharacter *ch )
 
 bool DrunkDesire::applicable( PCharacter *ch )
 {
-#ifdef DRUNK_SUPPORT    
-    return !isVampire( ch );
-#else
-    return false;
-#endif
+    return !isVampire(ch);
 }
 
 bool DrunkDesire::isActive( PCharacter *ch )
