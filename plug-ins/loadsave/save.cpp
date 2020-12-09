@@ -1849,13 +1849,18 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             
                             if (fPersonal) 
                                 convert_personal( obj );
-                            
-                            if (wear_loc != -1)
-                                obj->wear_loc.assign( wear_loc_flags.name( wear_loc ) );
 
-                            if (limit_check_on_load( obj ))
+                            if (limit_check_on_load( obj )) {
+                                // Limited item extracted: all nested items will be placed in character's inventory.
                                 if (fNest)
                                     rgObjNest[iNest] = 0;
+                                return;
+                            }
+
+                            // Assign wearlocation only after potentially extracting a limit; 
+                            // otherwise affects that were never applied yet will be unapplied during unequip.
+                            if (wear_loc != -1)
+                                obj->wear_loc.assign(wear_loc);
 
                             return;
                         }
@@ -2057,7 +2062,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     KEY( "Wt",                obj->weight,                fread_number( fp ) );
 
                     if (!str_cmp( word, "Wearloc" )) {
-                        obj->wear_loc.assign( wearlocationManager->find( fread_word( fp ) ) );
+                        Wearlocation *wearloc = wearlocationManager->find( fread_word( fp ) );
+                        wear_loc = wearloc ? wearloc->getIndex() : -1;
                         fMatch = true;
                         break;
                     }
