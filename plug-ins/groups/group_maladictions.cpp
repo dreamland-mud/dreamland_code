@@ -318,6 +318,19 @@ VOID_SPELL(CursedLands)::run( Character *ch, Room *room, int sn, int level )
 
 }
 
+AFFECT_DECL(CursedLands);
+VOID_AFFECT(CursedLands)::entry( Room *room, Character *ch, Affect *paf )
+{
+     act("{yАура проклятия повисла вокруг.{x",ch, 0, 0, TO_CHAR);
+}
+
+VOID_AFFECT(CursedLands)::toStream( ostringstream &buf, Affect *paf ) 
+{
+    buf << fmt( 0, "Аура проклятия исчезнет отсюда через {W%1$d{x ча%1$Iс|са|сов.",
+                   paf->duration )
+        << endl;
+}
+
 
 SPELL_DECL(DeadlyVenom);
 VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level ) 
