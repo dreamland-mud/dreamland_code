@@ -779,7 +779,7 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
         return true;
 
     default:
-        ch->pecho("Ты пытаешься что-то положить в %O4, но это не контейнер.", container);
+        ch->pecho("%^O1 не контейнер, туда ничего нельзя положить.", container);
         return false;
     }
 }
