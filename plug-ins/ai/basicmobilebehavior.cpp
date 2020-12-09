@@ -211,8 +211,9 @@ void BasicMobileBehavior::remember( Room *room )
 bool BasicMobileBehavior::backHome( bool fAlways )
 {
     Room *home;
+    int myHomeVnum = homeVnum != 0 ? homeVnum.getValue() : ch->reset_room;
 
-    if (homeVnum == 0) {
+    if (myHomeVnum == 0) {
         if (fAlways) {
             act( "$c1 ищет свой дом.", ch, 0, 0, TO_ROOM );
             extract_char( ch );
@@ -222,10 +223,10 @@ bool BasicMobileBehavior::backHome( bool fAlways )
             return false;
     }
     
-    home = get_room_instance( homeVnum );
+    home = get_room_instance( myHomeVnum );
 
     if (!home) {
-        LogStream::sendError( ) << "Mob " << ch->pIndexData->vnum << " from " << ch->in_room->vnum << ": wrong home " << homeVnum << endl;
+        LogStream::sendError( ) << "Mob " << ch->pIndexData->vnum << " from " << ch->in_room->vnum << ": wrong home " << myHomeVnum << endl;
         return false;
     }
     
@@ -248,8 +249,18 @@ bool BasicMobileBehavior::isHomesick( )
     if (ch->position <= POS_SLEEPING)
         return false;
         
-    if (ch->zone == 0 || ch->in_room->areaIndex() == ch->zone)
+    if (ch->zone == 0)
         return false;
+
+    if (ch->in_room->areaIndex() == ch->zone) {
+        // Mob in home zone and allowed to wander around.
+        if (!IS_SET(ch->act, ACT_SENTINEL))
+            return false;
+
+        // Sentinel mob in home zone, still in its native room.
+        if (ch->reset_room == ch->in_room->vnum)
+            return false;
+    }
 
     if (ch->switchedFrom)
         return false;
