@@ -164,14 +164,14 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     /* the moment of truth */
     if (result < (fail / 5))  /* item destroyed */
     {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 ярко вспыхива%1$nет|ют и испаря%1$nется|ются.", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 ярко вспыхива%1$nет|ют и испаря%1$nется|ются.", obj );
         extract_obj(obj);
         return;
     }
 
     if (result < (fail / 3)) /* item disenchanted */
     {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют... но затем угаса%1$nет|ют.", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют... но затем угаса%1$nет|ют.", obj );
         obj->enchanted = true;
         /* remove all affects */
         obj->affected.deallocate();
@@ -188,7 +188,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     }
     
     if (inspire) {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 на мгновение отража%1$nет|ют свет далеких звезд.", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на мгновение отража%1$nет|ют свет далеких звезд.", obj );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         add_ac = - number_range( 3, 5 );
     }
@@ -199,7 +199,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     }
     else  /* exceptional enchant */
     {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют {1{Yбриллиантово-золотым{2 светом!", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют {1{Yбриллиантово-золотым{2 светом!", obj );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         add_ac = -2 * (level / 5);
     }
@@ -334,7 +334,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     /* the moment of truth */
     if (result < (fail / 5))  /* item destroyed */
     {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 сильно вздрагива%1$nет|ют и взрыва%1$nется|ются!", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 сильно вздрагива%1$nет|ют и взрыва%1$nется|ются!", obj );
         extract_obj(obj);
         return;
     }
@@ -342,7 +342,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
 
    if (result < (fail / 2)) /* item disenchanted */
     {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют... но затем угаса%1$nет|ют.", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют... но затем угаса%1$nет|ют.", obj );
         obj->enchanted = true;
 
         /* remove all affects */
@@ -360,7 +360,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     }
     
     if (ch->isAffected( gsn_inspiration )) {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 на мгновение отража%1$nет|ют свет далеких звезд.", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на мгновение отража%1$nет|ют свет далеких звезд.", obj );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         added = number_range( 1, 3 );
     }
@@ -371,7 +371,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     }
     else  /* exceptional enchant */
     {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют {1{Cбриллиантово-голубым{2 светом!", obj );        
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют {1{Cбриллиантово-голубым{2 светом!", obj );        
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         added = 2;
     }
@@ -454,7 +454,7 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     }
 
     if (chance < 0) {
-        obj->in_room->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют яростным огнем... но затем угаса%1$nет|ют.", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют яростным огнем... но затем угаса%1$nет|ют.", obj );
         return;
     }
 
@@ -531,7 +531,7 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
         act_p("$c1 внимательно смотрит на $o4, е$gго|го|е глаза вспыхивают {rкрасным{x", ch, obj, 0, TO_ROOM, POS_RESTING);
     } 
     else
-        obj->in_room->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют багровым... но затем угаса%1$nет|ют.", obj );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют багровым... но затем угаса%1$nет|ют.", obj );
 
 }
 
