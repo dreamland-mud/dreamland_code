@@ -56,7 +56,7 @@ void OLCStateFile::changed( PCharacter *ch )
 
 void OLCStateFile::show( PCharacter *ch ) const
 {
-    ptc(ch, "{WКофигурационный файл {c%s{W:\r\n", path.c_str());
+    ptc(ch, "{WКонфигурационный файл {c%s{W:\r\n", path.c_str());
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n{R...{x\r\n", 
         web_edit_button(ch, "text", "web").c_str(),
         text.substr(0, 100).c_str());
@@ -87,7 +87,7 @@ FEDIT(show, "показать", "показать все поля")
 
 FEDIT(text, "текст", "редактировать текст справки")
 {
-    return editor(argument, text, ED_JSON);
+    return editor(argument, text, (editor_flags)(ED_JSON|ED_CALL_DONE));
 }
 
 FEDIT(commands, "команды", "показать список встроенных команд edit")
@@ -127,7 +127,7 @@ CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.
 
     if (arg_is_list(arg1)) {
         ostringstream buf;
-        const DLString lineFormat = "    " + web_cmd(ch, "fedit $1", "%s");
+        const DLString lineFormat = "    " + web_cmd(ch, "fedit $1|text web", "%s");
 
         if (arg2.empty()) {
             buf << "Все конфигурационные файлы для редактирования:" << endl;
