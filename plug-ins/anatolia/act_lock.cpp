@@ -668,21 +668,21 @@ static void unlock_door( Character *ch, int door )
             return;
     }
 
+    if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
+    {
+            ch->println( "Здесь уже не заперто." );
+            return;
+    }
+
     if ( pexit->key <= 0 )
     {
-            ch->println( "Здесь нет замочной скважины -- просто открой." );
+            ch->println( "К этой двери не существует ключа." );
             return;
     }
 
     if (!get_key_carry( ch, pexit->key))
     {
             ch->println( "У тебя нет ключа." );
-            return;
-    }
-
-    if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
-    {
-            ch->println( "Здесь уже не заперто." );
             return;
     }
 
@@ -738,21 +738,21 @@ CMDRUNP( unlock )
                     return;
             }
 
+            if (!IS_SET(obj->value1(),EX_LOCKED))
+            {
+                    ch->println( "Здесь уже не заперто." );
+                    return;
+            }
+
             if (obj->value4() <= 0)
             {
-                ch->println( "Здесь нет замочной скважины -- просто открой." );
+                ch->pecho( "К %O3 не существует ключа.", obj);
                 return;
             }
 
             if (!get_key_carry(ch,obj->value4()))
             {
                     ch->println( "У тебя нет ключа." );
-                    return;
-            }
-
-            if (!IS_SET(obj->value1(),EX_LOCKED))
-            {
-                    ch->println( "Здесь уже не заперто." );
                     return;
             }
 
@@ -770,15 +770,15 @@ CMDRUNP( unlock )
                     return;
             }
 
-            if ( obj->value2() < 0 )
-            {
-                    ch->println( "Здесь нет замочной скважины -- просто открой." );
-                    return;
-            }
-
             if ( !IS_SET(obj->value1(), CONT_LOCKED) )
             {
                     ch->println( "Здесь уже не заперто." );
+                    return;
+            }
+
+            if ( obj->value2() < 0 )
+            {
+                    ch->pecho( "К %O3 не существует ключа.", obj);
                     return;
             }
 
@@ -859,21 +859,21 @@ CMDRUNP( unlock )
                 return;
         }
 
+        if ( !IS_SET(peexit->exit_info, EX_LOCKED) )
+        {
+                ch->println( "Здесь уже не заперто." );
+                return;
+        }
+
         if ( peexit->key <= 0 )
         {
-                ch->println( "Здесь нет замочной скважины -- просто открой." );
+                ch->println( "К этой двери не существует ключа." );
                 return;
         }
 
         if (!get_key_carry( ch, peexit->key))
         {
                 ch->println( "У тебя нет ключа." );
-                return;
-        }
-
-        if ( !IS_SET(peexit->exit_info, EX_LOCKED) )
-        {
-                ch->println( "Здесь уже не заперто." );
                 return;
         }
 
