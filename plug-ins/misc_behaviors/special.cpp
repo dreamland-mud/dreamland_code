@@ -998,7 +998,7 @@ bool spec_assassinater( NPCharacter *ch )
         }
 
         do_say( ch, buf );
-        interpret_raw( ch, "assasinate", victim->getName( ).c_str( ) );
+        interpret_raw( ch, "assassinate", victim->getName( ).c_str( ) );
         return true;
 }
 

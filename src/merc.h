@@ -532,6 +532,8 @@ struct AreaIndexData {
     int vnum;
     map<int, RoomIndexData *> roomIndexes;
 
+    Scripting::Object *wrapper;
+
     // FIXME: support multiple named instances.
     Area *area;
 };

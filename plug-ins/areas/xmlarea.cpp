@@ -118,6 +118,9 @@ XMLAreaHeader::compat( )
     } else
         a->behavior.clear( );
 
+    if (FeniaManager::wrapperManager)
+        FeniaManager::wrapperManager->linkWrapper(a);
+
     return a;
 }
 

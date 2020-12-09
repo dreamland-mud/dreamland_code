@@ -180,6 +180,7 @@ AreaIndexData::AreaIndexData()
       area_flag(0),
       behavior(AreaBehavior::NODE_NAME),
       security(9), vnum(0),
+      wrapper(0),
       area(0)
 {
 }

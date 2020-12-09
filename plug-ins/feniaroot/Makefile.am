@@ -29,6 +29,7 @@ reglistext.cpp \
 tableswrapper.cpp \
 affectwrapper.cpp \
 structwrappers.cpp \
+areaindexwrapper.cpp \
 wrap_utils.cpp 
 
 libfeniaroot_la_MOC = \
@@ -43,6 +44,7 @@ wrappersplugin.h \
 xmlattributecodesource.h \
 tableswrapper.h \
 mobindexwrapper.h \
+areaindexwrapper.h \
 characterwrapper.h 
 
 

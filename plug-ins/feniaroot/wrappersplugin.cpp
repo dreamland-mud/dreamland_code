@@ -3,7 +3,7 @@
  * ruffina, 2004
  */
 
-#include "json/json.h"
+#include <jsoncpp/json/json.h>
 #include "iconvmap.h"
 
 #include "wrappersplugin.h"
@@ -13,6 +13,7 @@
 #include "nativeext.h"
 #include "mobindexwrapper.h"
 #include "objindexwrapper.h"
+#include "areaindexwrapper.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -66,6 +67,10 @@ WrappersPlugin::linkTargets()
         for(OBJ_INDEX_DATA *ondx = obj_index_hash[i]; ondx; ondx = ondx->next)
             if(ondx->wrapper)
                 wrapper_cast<ObjIndexWrapper>(ondx->wrapper)->setTarget( ondx );
+
+    for (auto &pArea: areaIndexes)
+        if (pArea->wrapper)
+            wrapper_cast<AreaIndexWrapper>(pArea->wrapper)->setTarget( pArea );
 }
 
 void
@@ -77,6 +82,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<CharacterWrapper>( );
     Class::regMoc<MobIndexWrapper>( );
     Class::regMoc<ObjIndexWrapper>( );
+    Class::regMoc<AreaIndexWrapper>( );
     Class::regMoc<AffectWrapper>( );
     Class::regMoc<CommandWrapper>( );
     Class::regMoc<TablesWrapper>( );
@@ -111,6 +117,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<RoomWrapper>("room", apiDump, true);     
     traitsAPIJson<MobIndexWrapper>("mob_index", apiDump, false);     
     traitsAPIJson<ObjIndexWrapper>("obj_index", apiDump, false);     
+    traitsAPIJson<AreaIndexWrapper>("area_index", apiDump, false);     
     traitsAPIJson<Root>("root", apiDump, true);     
     traitsAPIJson<AffectWrapper>("affect", apiDump, false);     
     traitsAPIJson<CommandWrapper>("command", apiDump, false);     
@@ -156,6 +163,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<TableWrapper>( );
     Class::unregMoc<CommandWrapper>( );
     Class::unregMoc<AffectWrapper>( );
+    Class::unregMoc<AreaIndexWrapper>( );
     Class::unregMoc<ObjIndexWrapper>( );
     Class::unregMoc<MobIndexWrapper>( );
     Class::unregMoc<CharacterWrapper>( );

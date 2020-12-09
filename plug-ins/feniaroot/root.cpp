@@ -42,6 +42,7 @@
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
 #include "objindexwrapper.h"
+#include "areaindexwrapper.h"
 #include "wrappermanager.h"
 #include "affectwrapper.h"
 #include "tableswrapper.h"
@@ -296,6 +297,16 @@ NMI_INVOKE( Root, get_room_index , "(vnum): возвращает комнату 
     room = ::get_room_instance( vnum );
     
     return WrapperManager::getThis( )->getWrapper( room ); 
+}
+
+NMI_INVOKE( Root, get_area_index , "(filename): возвращает зону с этим именем файла")
+{
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+        
+    AreaIndexData *pArea = ::get_area_index(args2string(args));
+    
+    return WrapperManager::getThis( )->getWrapper( pArea ); 
 }
 
 NMI_INVOKE( Root, min, "(a, b): минимальное из двух чисел a и b") 
