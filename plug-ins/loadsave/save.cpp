@@ -1831,15 +1831,16 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                         }
                         else
                         {
-                            if ( iNest == 0 || rgObjNest[iNest] == 0 )
-                            {
-                                    if ( ch != 0 )
-                                            obj_to_char( obj, ch );
-                                    else
-                                            obj_to_room( obj, room );
-                            }
+                            Object *container = 0;
+                            if (iNest > 0 && rgObjNest[iNest])
+                                container = rgObjNest[iNest-1];
+
+                            if (container)
+                                obj_to_obj(obj, container);
+                            else if (ch)
+                                obj_to_char(obj, ch);
                             else
-                                    obj_to_obj( obj, rgObjNest[iNest-1] );
+                                obj_to_room(obj, room);
 
                             ObjectBehaviorManager::parse( obj, fp );
                             
@@ -1852,7 +1853,10 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             if (wear_loc != -1)
                                 obj->wear_loc.assign( wear_loc_flags.name( wear_loc ) );
 
-                            limit_check_on_load( obj );
+                            if (limit_check_on_load( obj ))
+                                if (fNest)
+                                    rgObjNest[iNest] = 0;
+
                             return;
                         }
                     }
