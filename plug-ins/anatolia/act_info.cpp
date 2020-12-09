@@ -2213,6 +2213,7 @@ CMDRUNP( help )
     // Several matches, display them all with numbers.
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
     DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
+    int firstId = -1;
     for (unsigned int a = 0; a < articles.size(); a++) {
 	    auto help = articles[a];
         DLString title = help->getTitle(DLString::emptyString);
@@ -2228,12 +2229,15 @@ CMDRUNP( help )
             }
         }
 
+        if (firstId == -1)
+            firstId = help->getID();
+
         buf << fmt(0, lineFormat.c_str(), help->getID(), line.c_str());
     }
 
     buf << endl
-        << "Для уточнения поиска введи {yсправка {Wномер{x{Iw или нажми на ссылку{x." << endl;
-    
+        << "Для уточнения поиска смотри справку по нужному номеру, например, "
+        << "{y{hcсправка " << firstId << "{x." << endl;        
 
     ch->send_to(buf.str().c_str());
 }                  
