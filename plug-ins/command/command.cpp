@@ -13,6 +13,7 @@
 #include "npcharacter.h"
 #include "helpmanager.h"
 #include "skillreference.h"
+#include "room.h"
 
 #include "descriptor.h"
 #include "loadsave.h"
@@ -173,6 +174,11 @@ bool Command::dispatchOrder( const InterpretArguments &iargs )
     // prevent ghosts from doing a bunch of commands
     if (IS_GHOST( ch ) && !getExtra( ).isSet( CMD_GHOST )) {
         ch->send_to( "У тебя нет тела... А твой немощный дух не в состоянии тебе помочь.\n\r" );
+        return false;
+    }
+
+    if (getExtra().isSet(CMD_NO_DUNGEON) && IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON)) {
+        ch->println("Эта команда сейчас недоступна.");
         return false;
     }
 

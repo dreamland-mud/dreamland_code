@@ -91,6 +91,15 @@
 #define PULSE_AUCTION             (45 * dreamland->getPulsePerSecond( )) /* 60 seconds */
 #define AUC_TIMER_CUTOFF          24
 
+static bool buyer_can_trade()
+{
+    if (auction->buyer->in_room
+        && IS_SET(auction->buyer->in_room->areaIndex()->area_flag, AREA_DUNGEON))
+        return false;
+
+    return true;
+}
+
 void talk_auction(const char *argument)
 {
     DLString msg_en = DLString("{YAUCTION: ") + argument + "{x";
@@ -209,7 +218,7 @@ void auction_update (void)
             }
             case 3 : /* SOLD! */
 
-            if (auction->bet > 0)
+            if (auction->bet > 0 && buyer_can_trade())
             {
                 sprintf (buf, "%s получает %s{Y за %d золот%s{x.",
                     auction->buyer->getNameP( '1' ).c_str( ),
