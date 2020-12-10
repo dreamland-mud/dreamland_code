@@ -50,7 +50,7 @@ CLAN(invader);
  *-------------------------------------------------------------------------*/
 void ClanGuardInvader::actGreet(PCharacter *wch)
 {
-    do_say(ch, "Приветствую тебя, идущ{Smий{Sfая{Sx по Пути Тьмы.");
+    say_fmt("Приветствую тебя, идущ%2$Gее|ий|ая по Пути Тьмы.", ch, wch);
 }
 void ClanGuardInvader::actPush(PCharacter *wch)
 {
