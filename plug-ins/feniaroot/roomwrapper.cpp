@@ -12,11 +12,13 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
-#include "save.h"                                                               
+#include "save.h"
+#include "loadsave.h"                                                               
 #include "merc.h"
 #include "profiler.h"
 
 #include "structwrappers.h"
+#include "areaindexwrapper.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -110,10 +112,10 @@ NMI_GET( RoomWrapper, areaname , "имя арии")
     return Register( target->areaName() );
 }
 
-NMI_GET( RoomWrapper, area, "экземпляр Area для этой комнаты")
+NMI_GET( RoomWrapper, area, "экземпляр AreaIndex для этой комнаты")
 {
     checkTarget( );
-    return AreaWrapper::wrap( target->areaIndex()->area_file->file_name );
+    return WrapperManager::getThis()->getWrapper(target->areaIndex());
 }
 
 NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комнате")
@@ -126,10 +128,7 @@ NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комна
     for(rch = target->people; rch; rch = rch->next_in_room)
         rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
     
-    Scripting::Object *obj = &Scripting::Object::manager->allocate();
-    obj->setHandler(rc);
-
-    return Register( obj );
+    return wrap(rc);
 }
 
 NMI_GET( RoomWrapper, items, "список (List) всех предметов на полу" )
@@ -140,10 +139,19 @@ NMI_GET( RoomWrapper, items, "список (List) всех предметов н
     for (::Object *obj = target->contents; obj; obj = obj->next_content)
         rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
     
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( rc );
+    return wrap(rc);
+}
 
-    return Register( sobj );
+NMI_GET(RoomWrapper, players, "список (List) всех игроков в комнате")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for(Character *rch = target->people; rch; rch = rch->next_in_room)
+        if (!rch->is_npc())
+            rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+    
+    return wrap(rc);
 }
 
 NMI_GET( RoomWrapper, sector_type , "значение типа местности (таблица .sector_table)")
@@ -254,6 +262,19 @@ NMI_GET( RoomWrapper, down, "комната вниз отсюда или null")
 /*
  * METHODS
  */
+NMI_INVOKE(RoomWrapper, playersWithPosition, "(pos): список (List) всех игроков в комнате в определенном положении")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+    int pos = argnum2flag(args, 1, position_table);
+
+    for(Character *rch = target->people; rch; rch = rch->next_in_room)
+        if (!rch->is_npc() && rch->position == pos)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+    
+    return wrap(rc);
+}
+
 
 NMI_INVOKE( RoomWrapper, exits, "(ch): список номеров всех доступных выходов для персонажа ch")
 {
@@ -496,10 +517,7 @@ NMI_INVOKE(RoomWrapper, list_obj_type, "(type): поиск списка объе
         if (obj->item_type == itemType)
             rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
 
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( rc );
-
-    return Register( sobj );
+    return wrap(rc);
 }
 
 NMI_INVOKE( RoomWrapper, list_obj_vnum, "(vnum): поиск списка объектов в комнате по внуму" )
@@ -513,10 +531,7 @@ NMI_INVOKE( RoomWrapper, list_obj_vnum, "(vnum): поиск списка объ�
         if (obj->pIndexData->vnum == vnum)
             rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
 
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( rc );
-
-    return Register( sobj );
+    return wrap(rc);
 }
 
 NMI_INVOKE(RoomWrapper, get_mob_vnum, "(vnum): поиск первого моба в комнате по его внуму" )
@@ -549,10 +564,7 @@ NMI_INVOKE( RoomWrapper, list_mob_vnum, "(vnum): поиск списка моб�
         if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
             rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
 
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( rc );
-
-    return Register( sobj );
+    return wrap(rc);
 }
 
 NMI_INVOKE( RoomWrapper, count_enemies, "(ch): кол-во персонажей, сражающихся с ch")
@@ -687,10 +699,7 @@ NMI_INVOKE( RoomWrapper, traverse, "(depth, walker, sectorsAllow, sectorsDeny): 
 
     room_traverse( target, iter, complete, 10000 );
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate( );
-    obj->setHandler( rooms );
-
-    return Scripting::Register( obj );
+    return wrap(rooms);
 }
 
 NMI_INVOKE( RoomWrapper, traverseTo, "(target, walker, sectorsAllow, sectorsDeny): построит путь до цели target для чара walker, с разрешенными-запрещенными типами местности в виде битовых масок" )
@@ -717,10 +726,7 @@ NMI_INVOKE( RoomWrapper, traverseTo, "(target, walker, sectorsAllow, sectorsDeny
 
     room_traverse( target, iter, complete, 10000 );
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate( );
-    obj->setHandler( rooms );
-
-    return Scripting::Register( obj );
+    return wrap(rooms);
 }
 
 NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, которые ресетятся в этой комнате") 
@@ -734,10 +740,7 @@ NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, ко�
         if (pReset->command == 'M')
             rc->push_back( Register( pReset->arg1 ) );
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate( );
-    obj->setHandler( rc );
-
-    return Register( obj );
+    return wrap(rc);
 }    
 
 NMI_INVOKE( RoomWrapper, api, "(): печатает этот API" )

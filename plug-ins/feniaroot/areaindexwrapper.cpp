@@ -74,7 +74,19 @@ NMI_GET( AreaIndexWrapper, name, "название зоны")
     checkTarget( ); 
     return Register( target->name);
 }
-    
+
+NMI_GET( AreaIndexWrapper, filename, "название файла зоны") 
+{ 
+    checkTarget( ); 
+    return Register( target->area_file->file_name);
+}
+
+NMI_GET( AreaIndexWrapper, area_flag, "флаги зоны (таблица .tables.area_flags)" ) 
+{
+    checkTarget();
+    return Register((int)(target->area_flag));
+}
+
 NMI_GET( AreaIndexWrapper, low_range , "нижний диапазон уровней зоны") 
 { 
     checkTarget( ); 
