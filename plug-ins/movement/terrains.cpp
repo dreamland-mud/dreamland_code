@@ -43,28 +43,29 @@ Object * boat_object_find( Character *ch )
     return NULL;
 }
 
-int boat_get_type( Character *ch )
+int boat_get_types( Character *ch )
 {
     Object *boat;
+    int types = BOAT_NONE;
     
     if (ch->is_immortal( ) || ch->is_mirror( ))
-        return BOAT_FLY;
+        SET_BIT(types, BOAT_FLY);
 
     if (is_flying( ch ) || IS_GHOST(ch))
-        return BOAT_FLY;
+        SET_BIT(types, BOAT_FLY);
 
     if (IS_AFFECTED(ch, AFF_SWIM))
-        return BOAT_SWIM;
+        SET_BIT(types, BOAT_SWIM);
 
     boat = boat_object_find( ch );
+    if (boat) {
+        if (boat->wear_loc == wear_none)
+            SET_BIT(types, BOAT_INV);
+        else
+            SET_BIT(types, BOAT_EQ);
+    }
 
-    if (!boat)
-        return BOAT_NONE;
-
-    if (boat->wear_loc == wear_none)
-        return BOAT_INV;
-    else
-        return BOAT_EQ;
+    return types;
 }
 
 

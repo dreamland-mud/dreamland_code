@@ -157,7 +157,7 @@ void ExitsMovement::randomizeExits( )
 bool ExitsMovement::canMove( Character *wch )
 {
     return Walkment::canMove( wch )
-           && checkExtraExit( wch );
+           && checkExitFlags( wch );
 }
 
 int ExitsMovement::getDoorStatus(Character *wch)
@@ -241,46 +241,48 @@ static bool rprog_cant_walk( Room *room, Character *wch, const char *eename )
     return false;
 }
 
-bool ExitsMovement::checkExtraExit( Character *wch )
+bool ExitsMovement::checkExitFlags( Character *wch )
 {
-    int total_size;
-    
-    if (!peexit)
-        return true;
-    
-    if (rprog_cant_walk( from_room, wch, peexit->keyword ))
+    if (peexit && rprog_cant_walk( from_room, wch, peexit->keyword ))
         return false;
 
     if (MOUNTED(wch))
         return true;
-    
-    total_size = wch->size;
-    
-    if (rider) 
-        total_size += rider->size / 2;
-    
-    if (total_size > peexit->max_size_pass) {
-        msgSelfParty( wch, 
-                      "Чтобы это сделать, надо быть чуууточку поменьше размером.",
-                      "Вам с %2$C5 стоит быть чуточку поменьше размером." );
-        return false;
+
+    // For extra exits, check size of the walker and their horse.
+    if (peexit) {
+        int total_size = wch->size;
+        
+        if (rider) 
+            total_size += rider->size / 2;
+        
+        if (total_size > peexit->max_size_pass) {
+            msgSelfParty( wch, 
+                        "Чтобы это сделать, надо быть чуууточку поменьше размером.",
+                        "Вам с %2$C5 стоит быть чуточку поменьше размером." );
+            return false;
+        }
     }
-    
-    if (IS_SET(peexit->exit_info, EX_NOFLY) && is_flying( wch )) {
+
+    // All other flags are applicable to both extra and normal exits.
+
+    bool flying = is_flying( wch );
+
+    if (IS_SET(exit_info, EX_NOFLY) && flying) {
         msgSelfParty( wch, 
                       "Ты не сможешь здесь пролететь.",
                       "%2$^C1 не может здесь пролететь." );
         return false;
     }
 
-    if (IS_SET(peexit->exit_info, EX_NOWALK) && !is_flying( wch )) {
+    if (IS_SET(exit_info, EX_NOWALK) && !flying) {
         msgSelfParty( wch, 
                       "Ты не сможешь здесь пройти.",
                       "%2$^C1 не сможет здесь пройти." );
         return false;
     }
 
-    if (IS_SET(peexit->exit_info, EX_SWIM_ONLY) && boat_type == BOAT_NONE) {
+    if (IS_SET(exit_info, EX_SWIM_ONLY) && !IS_SET(boat_types, BOAT_SWIM)) {
         msgSelfParty( wch, 
                       "Здесь ты можешь только проплыть.",
                       "%2$^C1 сможет здесь только проплыть." );
@@ -457,15 +459,13 @@ int ExitsMovement::adjustMovetype( Character *wch )
     if (IS_GHOST( wch ))
         return MOVETYPE_FLYING;
 
-    if (from_room->getSectorType() == SECT_WATER_NOSWIM || to_room->getSectorType() == SECT_WATER_NOSWIM)
-        switch (boat_type) {
-        case BOAT_INV:
-        case BOAT_EQ:
+    if (from_room->getSectorType() == SECT_WATER_NOSWIM || to_room->getSectorType() == SECT_WATER_NOSWIM) {
+        if (IS_SET(boat_types, BOAT_INV|BOAT_EQ))
             return boat->value0();
 
-        case BOAT_FLY:
+        if (IS_SET(boat_types, BOAT_FLY))
             return MOVETYPE_FLYING;
-        }
+    }
     
     switch (movetype) {
     case MOVETYPE_WALK:

@@ -48,7 +48,7 @@ Walkment::Walkment( Character *ch )
     else
         whoHasBoat = ch;
 
-    boat_type = boat_get_type(whoHasBoat);
+    boat_types = boat_get_types(whoHasBoat);
     boat = boat_object_find(whoHasBoat);
 }
 
@@ -431,7 +431,7 @@ bool Walkment::checkWater( Character *wch )
     if (MOUNTED(wch))
         return true;
 
-    if (boat_type != BOAT_NONE) 
+    if (boat_types != BOAT_NONE) 
         return true;
     
     rc = RC_MOVE_WATER;
