@@ -15,8 +15,8 @@ class Room;
 
 void follower_die( Character * );
 void follower_add( Character *, Character * );
-void follower_stop( Character * );
-void follower_clear( Character * ch );
+void follower_stop( Character *, bool verbose = true );
+void follower_clear( Character * ch, bool verbose = true );
 
 bool is_same_group( Character *, Character * );
 Character *  follower_find( Character *, const char * );

@@ -80,7 +80,7 @@ static bool mprog_stopfol( Character *ch, Character *master )
 }
 
 
-void follower_stop( Character *ch )
+void follower_stop( Character *ch, bool verbose )
 {
     Character *master = ch->master;
 
@@ -95,20 +95,21 @@ void follower_stop( Character *ch )
         affect_strip( ch, gsn_charm_person );
     } 
     
-    follower_clear(ch);
+    follower_clear(ch, verbose);
 }
 
-void follower_clear( Character * ch )
+void follower_clear( Character * ch, bool verbose )
 {
     Character *master = ch->master;
 
     if (master == NULL)
         return;
 
-    if (master->can_see( ch )) 
+    if (verbose && master->can_see( ch ))
        act( "$c1 теперь не следует за тобой.", ch, 0, master, TO_VICT );
 
-    act( "Ты теперь не следуешь за $C5.", ch, 0, master, TO_CHAR );
+    if (verbose)
+        act( "Ты теперь не следуешь за $C5.", ch, 0, master, TO_CHAR );
 
     afprog_stopfol( ch );
 

@@ -23,7 +23,7 @@ struct obj_index_data;
 struct mob_index_data;
 class FlagTable;
 
-Register wrap( Object * );
+Register wrap( ::Object * );
 Register wrap( struct obj_index_data * );
 Register wrap( Character * );
 Register wrap( struct mob_index_data * );

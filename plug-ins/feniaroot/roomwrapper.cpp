@@ -262,6 +262,20 @@ NMI_GET( RoomWrapper, down, "комната вниз отсюда или null")
 /*
  * METHODS
  */
+NMI_INVOKE(RoomWrapper, saveItems, "сохраняет все предметы на полу в комнате на диск")
+{
+    checkTarget();
+    save_mobs(target);
+    return Register();
+}
+
+NMI_INVOKE(RoomWrapper, saveMobs, "сохраняет всех мобов в комнате на диск")
+{
+    checkTarget();
+    save_items(target);
+    return Register();
+}
+
 NMI_INVOKE(RoomWrapper, playersWithPosition, "(pos): список (List) всех игроков в комнате в определенном положении")
 {
     checkTarget();
@@ -476,23 +490,22 @@ NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg д�
     return Register( );
 }
 
-NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum): поиск первого объекта в комнате по его внуму" )
+NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum[,owner]): поиск первого объекта в комнате по его внуму (с владельцем owner)" )
 {
-    int vnum;
-    ::Object *obj;
-
     checkTarget( );
 
-    if (args.size( ) != 1)
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    vnum = args.front( ).toNumber( );
+    int vnum = argnum2number(args, 1);
+    DLString owner;
 
-    for (obj = target->contents; obj; obj = obj->next_content)
+    if (args.size() > 1)
+        owner = argnum2string(args, 2);
+
+    for (::Object *obj = target->contents; obj; obj = obj->next_content)
         if (obj->pIndexData->vnum == vnum)
-            return WrapperManager::getThis( )->getWrapper(obj); 
+            if (owner.empty() || owner == obj->getOwner())
+                return wrap(obj); 
 
-    return Register( );
+    return Register();
 }
 
 NMI_INVOKE(RoomWrapper, get_obj_type, "(type): поиск первого объекта в комнате по его типу (имя или номер из .tables.item_table)" )

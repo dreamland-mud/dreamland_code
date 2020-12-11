@@ -75,10 +75,10 @@ ObjIndexWrapper::getTarget( ) const
     return target;
 }
 
-NMI_GET( ObjIndexWrapper, area, "зона, в которой прописан предмет (.Area)") 
+NMI_GET( ObjIndexWrapper, area, "зона, в которой прописан предмет") 
 {
     checkTarget( );
-    return AreaWrapper::wrap(target->area->area_file->file_name);
+    return WrapperManager::getThis( )->getWrapper( target->area );
 }
 
 NMI_GET( ObjIndexWrapper, material, "название материала, из которого сделан предмет") 

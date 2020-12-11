@@ -28,6 +28,7 @@
 #include "subprofession.h"
 #include "profflags.h"
 #include "occupations.h"
+#include "follow_utils.h"
 #include "interp.h"
 #include "comm.h"
 #include "save.h"
@@ -198,9 +199,7 @@ NMI_GET( CharacterWrapper, inventory, "список всех предметов 
 	if (obj->wear_loc == wear_none)
 	    rc->push_back(wrap(obj));
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate();
-    obj->setHandler(rc);
-    return Register( obj );
+    return wrap(rc);
 }
 
 NMI_GET( CharacterWrapper, equipment, "список всех предметов в экипировке" )
@@ -212,10 +211,20 @@ NMI_GET( CharacterWrapper, equipment, "список всех предметов 
 	if (obj->wear_loc != wear_none)
             rc->push_back(wrap(obj));
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate();
-    obj->setHandler(rc);
-    return Register( obj );
+    return wrap(rc);
 }
+
+NMI_GET( CharacterWrapper, items, "список всех предметов в инвентаре или экипировке" )
+{
+    RegList::Pointer rc( NEW );
+    checkTarget( );
+    
+    for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
+        rc->push_back(wrap(obj));
+
+    return wrap(rc);
+}
+
 
 GETWRAP( on, "объект, мебель, на которой сидим" )
 
@@ -1442,10 +1451,15 @@ NMI_INVOKE( CharacterWrapper, add_follower, "(master): делает нас по�
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, stop_follower, "(): прекращает следование, снимает очарование" )
+NMI_INVOKE( CharacterWrapper, stop_follower, "([verbose]): прекращает следование, снимает очарование" )
 {
     checkTarget( );
-    target->stop_follower();
+
+    bool verbose = true;
+    if (args.size() > 0)
+        verbose = args.front().toBoolean();
+
+    follower_stop(target, verbose);
     return Register();
 }
 
@@ -1721,6 +1735,15 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аф�
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, affectRemoveAll, "(): снять все аффекты" )
+{
+    checkTarget();
+
+    for (auto &paf: target->affected.clone())
+        affect_remove( target, paf );
+
+    return Register();
+}
 
 NMI_INVOKE( CharacterWrapper, isVulnerable, "(damtype, damflag): есть ли уязвимость к типу повреждений из .tables.damage_table с флагом повреждений из .tables.damage_flags" )
 {
@@ -2046,10 +2069,7 @@ NMI_GET( CharacterWrapper, affected, "список всех аффектов (Li
     for (auto &paf: target->affected) 
         rc->push_back( AffectWrapper::wrap( *paf ) );
         
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
-    sobj->setHandler(rc);
-
-    return Register( sobj );
+    return wrap(rc);
 }
 
 NMI_GET( CharacterWrapper, hasDestiny, "моб имеет предназначение (квестовые и спец-мобы)" )
@@ -2297,6 +2317,13 @@ NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить мен�
     DLString action = argnum2string(args, 2);
     set_map_attribute_value(target->getPC(), "menu", number, action);
     return Register();
+}
+
+NMI_INVOKE(CharacterWrapper, hash, "(mod): вернуть ключ к хеш-таблице по модулю mod")
+{
+    checkTarget();
+    int mod = args2number(args);
+    return Register((int)(target->getID() % mod));
 }
  
 NMI_INVOKE( CharacterWrapper, api, "(): печатает этот api" )
