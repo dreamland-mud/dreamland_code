@@ -171,12 +171,12 @@ static bool has_water_around( Character *ch )
     if (ch->in_room->getSectorType() == SECT_UNDERWATER)
         return true;
 
+    if (IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER))
+        return true;
+
     if (!IS_OUTSIDE(ch))
         return false;
    
-    if (IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER))
-        return true;
- 
     if (weather_info.sky >= SKY_RAINING)
         return true;
 
