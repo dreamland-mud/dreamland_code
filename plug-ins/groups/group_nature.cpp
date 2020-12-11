@@ -174,10 +174,7 @@ static bool has_water_around( Character *ch )
     if (IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER))
         return true;
 
-    if (!IS_OUTSIDE(ch))
-        return false;
-   
-    if (weather_info.sky >= SKY_RAINING)
+    if (IS_OUTSIDE(ch) && weather_info.sky >= SKY_RAINING)
         return true;
 
     return false;

@@ -361,8 +361,9 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         }
 
-        buf << "Этому заклинанию не нужно указывать цель." << endl;
-        result->error = TARGET_ERR_NO_TARGET_NEEDED;
+        // Ignore specified target for room spells, to allow for scrolls with multiple target types.
+        result->type = SpellTarget::ROOM;
+        result->room = ch->in_room;
         return result;
     }
 
