@@ -35,6 +35,13 @@ static void rprog_reset( Room *room )
     FENIA_VOID_CALL( room, "Reset", "" );
 }
 
+// FIXME Area instance needs to be passed as a parameter, but 
+// we don't have area wrappers yet and AreaWrapper name is taken.
+static void aprog_update( Area *area )
+{
+    FENIA_NDX_VOID_CALL( area, "Update", "" );
+}
+
 /*
  * Repopulate areas periodically.
  */
@@ -44,6 +51,8 @@ void area_update( )
 
     for (auto &pArea: areaInstances)
     {
+        aprog_update(pArea);
+
         if ( ++pArea->age < 3 )
             continue;
 
