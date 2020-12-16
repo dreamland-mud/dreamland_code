@@ -30,6 +30,13 @@ XMLResetList::nodeFromXML(const XMLNode::Pointer &child)
     r.arg3 = 0;
     r.arg4 = 0;
 
+    r.flags.setBits(child->getAttribute("flags"));
+
+    if (child->hasAttribute("minTier"))
+        r.minTier = child->getAttribute("minTier").toInt();
+    if (child->hasAttribute("maxTier"))
+        r.maxTier = child->getAttribute("maxTier").toInt();
+
     if(child->getType( ) != XMLNode::XML_LEAF) {
         return false;
     } else if(t == "mob") {
@@ -42,10 +49,12 @@ XMLResetList::nodeFromXML(const XMLNode::Pointer &child)
         r.arg1 = child->getAttribute("vnum").toInt( );
     } else if(t == "put") {
         r.command = 'P';
-        r.arg1 = child->getAttribute("vnum").toInt( );    
-        r.arg2 = child->getAttribute("limit").toInt( );    
+        NumberSet vnums(child->getAttribute("vnum"));
+        r.arg1 = (*vnums.begin());
+        r.arg2 = child->getAttribute("limit").toInt( );    // should be called 'max count'
         r.arg3 = child->getAttribute("in").toInt( );    
-        r.arg4 = child->getAttribute("maxHere").toInt( );    
+        r.arg4 = child->getAttribute("maxHere").toInt( ); // should be called 'min count'        
+        r.vnums.insert(r.vnums.end(), vnums.begin(), vnums.end());
     } else if(t == "give") {
         r.command = 'G';
         r.arg1 = child->getAttribute("vnum").toInt( );
@@ -72,6 +81,13 @@ XMLResetList::toXML(XMLNode::Pointer &parent) const
     for (const_iterator r = begin( ); r != end( ); r++) {
         XMLNode::Pointer child(NEW);
         child->setType(XMLNode::XML_LEAF);
+
+        if (r->flags.getValue() > 0)
+            child->insertAttribute("flags", r->flags.names());
+        if (r->minTier > 0)
+            child->insertAttribute("minTier", r->minTier);
+        if (r->maxTier > 0)
+            child->insertAttribute("maxTier", r->maxTier);
 
         switch(r->command) {
         case 'M':
@@ -237,7 +253,7 @@ XMLRoom::compat(int vnum)
 
     XMLResetList::iterator rit;
     for(rit = resets.begin( ); rit != resets.end( ); rit++) {
-        RESET_DATA *pReset = (RESET_DATA*)alloc_mem(sizeof(RESET_DATA));
+        RESET_DATA *pReset = new reset_data();
 
         *pReset = *rit;
 

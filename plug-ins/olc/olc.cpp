@@ -462,14 +462,14 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                      pRoom->reset_last->next;
                      pRoom->reset_last = pRoom->reset_last->next);
             }
-            free_reset_data(pReset);
+            ddeallocate(pReset);
             SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
             stc("Reset deleted.\n\r", ch);
         }
         else if ((!str_cmp(arg2, "mob") && is_number(arg3))
                  || (!str_cmp(arg2, "obj") && is_number(arg3))) {
             if (!str_cmp(arg2, "mob")) {
-                pReset = new_reset_data();
+                pReset = new reset_data();
                 pReset->command = 'M';
                 if (get_mob_index(is_number(arg3) ? atoi(arg3) : 1) == NULL) {
                     stc("Монстр не существует.\n\r", ch);
@@ -481,7 +481,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 pReset->arg4 = is_number(arg5) ? atoi(arg5) : 1;        /* Min # */
             }
             else if (!str_cmp(arg2, "obj")) {
-                pReset = new_reset_data();
+                pReset = new reset_data();
                 pReset->arg1 = atoi(arg3);
                 if (!str_prefix(arg4, "inside")) {
                     pReset->command = 'P';
@@ -495,7 +495,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                     pReset->arg4 = is_number(arg7) ? atoi(arg7) : 1;
                 }
                 else if (!str_cmp(arg4, "room")) {
-                    pReset = new_reset_data();
+                    pReset = new reset_data();
                     pReset->command = 'O';
                     if (get_obj_index(atoi(arg3)) == NULL) {
                         stc("Предметов с таким номером не существует.\n\r", ch);
@@ -513,7 +513,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                         stc("Resets: '? wear-loc'\n\r", ch);
                         return;
                     }
-                    pReset = new_reset_data();
+                    pReset = new reset_data();
                     if (get_obj_index(atoi(arg3)) == NULL) {
                         stc("Предметов с таким номером не существует.\n\r", ch);
                         return;

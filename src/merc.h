@@ -74,6 +74,7 @@
 #include "fenia/register-decl.h"
 #include "grammar_entities.h"
 #include "areabehavior.h"
+#include "flags.h"
 #include "mobilespecial.h"
 #include "helpmanager.h"
 #include "autoflags.h"
@@ -491,12 +492,19 @@ struct        extra_exit_data
  */
 struct        reset_data
 {
+    reset_data();
+
     RESET_DATA *        next;
     char                command;
     int                arg1;
     int                arg2;
     int                arg3;
     int                arg4;
+
+    Flags flags;
+    int minTier;
+    int maxTier;
+    vector<int> vnums;
 };
 
 

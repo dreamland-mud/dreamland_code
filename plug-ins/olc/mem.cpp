@@ -26,43 +26,12 @@
 CLAN(none);
 
 // Globals
-extern int top_reset;
 extern int top_area;
 extern int top_exit;
 extern int top_ed;
 
 EXIT_DATA *exit_free;
-RESET_DATA *reset_free;
 void free_extra_descr(EXTRA_DESCR_DATA * pExtra);
-
-
-RESET_DATA *new_reset_data(void)
-{
-    RESET_DATA *pReset;
-
-    if (!reset_free) {
-        pReset = (RESET_DATA*)alloc_perm(sizeof(*pReset));
-        top_reset++;
-    }
-    else {
-        pReset = reset_free;
-        reset_free = reset_free->next;
-    }
-    pReset->next = NULL;
-    pReset->command = 'X';
-    pReset->arg1 = 0;
-    pReset->arg2 = 0;
-    pReset->arg3 = 0;
-    pReset->arg4 = 0;
-    return pReset;
-}
-
-void free_reset_data(RESET_DATA * pReset)
-{
-    pReset->next = reset_free;
-    reset_free = pReset;
-    return;
-}
 
 EXIT_DATA *new_exit(void)
 {

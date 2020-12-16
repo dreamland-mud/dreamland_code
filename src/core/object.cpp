@@ -479,7 +479,7 @@ static bool get_value0_from_proto(const Object *obj)
     switch (obj->item_type) {
         case ITEM_WEAPON: 
             // Always grab weapon's class from the proto, unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr();
+            return !obj->getRealShortDescr() && obj->getProperty("tier").empty();
         default:
             return false;
     }
@@ -491,7 +491,10 @@ static bool get_value1_from_proto(const Object *obj)
         case ITEM_WEAPON: 
             // Bypass object dices and return those from proto if the weapon is not enchanted, not
             // dynamically created (ranger staff, bow, arrow, stone) and not restringed (cleric's mace).
-            return !obj->getRealShortDescr() && !obj->enchanted && obj->level == obj->pIndexData->level;
+            return !obj->getRealShortDescr() 
+                    && !obj->enchanted 
+                    && obj->level == obj->pIndexData->level
+                    && obj->getProperty("tier").empty();
         default:
             return false;
     }
@@ -507,7 +510,7 @@ static bool get_value3_from_proto(const Object *obj)
     switch (obj->item_type) {
         case ITEM_WEAPON: 
             // Grab weapon damage type (pierce, slash) from proto unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr();
+            return !obj->getRealShortDescr() && obj->getProperty("tier").empty();
         default:
             return false;
     }

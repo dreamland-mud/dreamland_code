@@ -126,7 +126,6 @@ int                        top_ed;
 int                        top_exit;
 int                        top_mob_index;
 int                        top_obj_index;
-int                        top_reset;
 
 int                        top_vnum_room;
 int                        top_vnum_mob;
@@ -271,6 +270,14 @@ void extra_exit_data::reset()
 {
     exit_info = exit_info_default;
 }
+
+reset_data::reset_data()
+    : next(0), command('X'), 
+      arg1(0), arg2(0), arg3(0), arg4(0),
+      flags(0, &reset_flags), minTier(0), maxTier(0)
+{
+
+}      
 
 /*
  * Get an extra description from a list.

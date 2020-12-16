@@ -58,6 +58,16 @@ void NumberSet::fromStringSet( const StringSet &str )
         }
 }
 
+NumberSet::NumberSet()
+{
+}
+
+NumberSet::NumberSet(const DLString &str)
+{
+    StringSet sset(str);
+    fromStringSet(sset);
+}
+
 StringSet NumberSet::toStringSet( ) const
 {
     StringSet str;

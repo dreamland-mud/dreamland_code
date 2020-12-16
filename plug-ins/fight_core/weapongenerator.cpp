@@ -412,8 +412,6 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
 
     // Set up provided material or default.
     obj->setMaterial(findMaterial().c_str());
-
-    obj->properties["tier"] = valTier;
     return *this;
 }
 
@@ -438,6 +436,8 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
 
     // Set standardized cost in silver.
     obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
+
+    obj->properties["tier"] = valTier;
     return *this;
 }
 

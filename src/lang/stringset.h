@@ -28,6 +28,8 @@ public:
 
 class NumberSet : public std::set<int> {
 public:
+    NumberSet();
+    NumberSet(const DLString &);
     void fromStringSet( const StringSet & );
     StringSet toStringSet( ) const;
 };

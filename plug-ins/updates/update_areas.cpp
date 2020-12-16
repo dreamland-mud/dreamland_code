@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <algorithm>
 #include "logstream.h"
 #include "profiler.h"
 #include "update_areas.h"
@@ -18,6 +19,7 @@
 #include "affect.h"
 
 #include "dreamland.h"
+#include "weapongenerator.h"
 #include "loadsave.h"
 #include "wiznet.h"
 #include "gsn_plugin.h"
@@ -130,6 +132,35 @@ static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
     return count;
 }
 
+static void randomize_item(Object *obj, RESET_DATA *pReset)
+{
+    if (!pReset->flags.isSet(RESET_RAND_STAT))
+        return;
+
+    if (obj->pIndexData->item_type != ITEM_WEAPON) {
+        bug("rand_stat reset: %d not a weapon", obj->pIndexData->vnum);
+        return;
+    }
+    
+    if (pReset->minTier == 0 || pReset->maxTier == 0) {
+        bug("rand_stat reset: no tiers for vnum %d", obj->pIndexData->vnum);
+        return;
+    }
+
+    int tier = number_range(pReset->minTier, pReset->maxTier);
+    Character *mob = obj->getCarrier();
+
+    WeaponGenerator()
+        .item(obj)
+        .tier(tier)
+        .alignment(mob ? (int)mob->alignment : ALIGN_NONE)
+        .randomAffixes()
+        .assignHitroll()
+        .assignDamroll()
+        .assignValues()
+        .assignFlags()
+        .assignAffects();
+}
 
 /** Equip an item if required by reset configuration. */
 static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob, bool verbose)
@@ -151,43 +182,66 @@ static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob
     }
 }
 
-/** Create item inside of a container (P), based on the args: arg2 max count, arg4 min count. */
-static bool create_item_for_container(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, Object *obj_to)
+static int count_vnums_in_list(vector<int> &vnums, Object *list)
 {
-    int limit;
+    int count  = 0;
+    set<int> vnumSet;
+    for (auto &vnum: vnums)
+        vnumSet.insert(vnum);
 
+    for (Object *obj = list; obj; obj = obj->next_content)
+        if (vnumSet.count(obj->pIndexData->vnum) > 0)
+            count++;
+
+    return count;
+}
+
+/** Create item inside of a container (P), based on the args: arg2 max count, arg4 min count. */
+static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to)
+{
     if (!obj_to)
         return false;
 
-    // TODO: review this nonsense.
-    if ( pReset->arg2 > 50 )         /* old format */
-        limit = 6;
-    else if (pReset->arg2 == -1 || pReset->arg2 == 0)     /* no limit */
-        limit = 999;
-    else
-        limit = pReset->arg2;
+    int maxCount = pReset->arg2;
+    if (maxCount <= 0)     /* no limit */
+        maxCount = 999;
 
-    int count = count_obj_list(pObjIndex, obj_to->contains);
+    vector<int> vnums;
+    vnums.insert(vnums.end(), pReset->vnums.begin(), pReset->vnums.end());
+    int count = count_vnums_in_list(vnums, obj_to->contains);
+    int minCount = pReset->arg4;
 
-    if (count > limit)
-        return false;
+    // Reset either one item or a random item from the 'vnum' list, until desired
+    // count is reached or max limit exceeded on item prototypes.
+    while (count < minCount) {
+        int random_index = number_range(0, vnums.size() - 1);
+        int random_vnum = vnums.at(random_index);
+        OBJ_INDEX_DATA *pObjIndex = get_obj_index(random_vnum);
 
-    if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit)
-        return false;
-    
-    while (count < pReset->arg4)
-    {
-        Object *obj = create_object( pObjIndex, 0 );
+        if (!pObjIndex) {
+            bug("Reset_area: 'P' bad vnum %d.", random_vnum);
+            break;
+        }
+
+        if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit)
+            break;
+
+        if (pObjIndex->count >= maxCount)
+            break;
+
+        Object *obj = create_object(pObjIndex, 0);
         obj->reset_obj = obj_to->getID();
         obj_to_obj( obj, obj_to );
+        randomize_item(obj, pReset);
+
         count++;
 
-        if (pObjIndex->count >= limit)
-            break;
+        // If all but one vnums had a chance to reset but minCount still not reached,
+        // remaining spots will be filled by the last remaining vnum.
+        if (vnums.size() > 1)
+            vnums.erase(vnums.begin() + random_index);
     }
-
-    /* fix object lock state! */
-    obj_to->value1(obj_to->pIndexData->value[1]);
+    
     return true;
 }
 
@@ -212,6 +266,7 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 
     // Give and equip the item.
     obj_to_char( obj, mob );
+    randomize_item(obj, pReset);
         
     if (obj->pIndexData->limit != -1)
         if (verbose)
@@ -306,6 +361,39 @@ static bool reset_room_mobs(Room *pRoom)
     return changed;
 }
 
+struct ResetRules {
+    ResetRules(Room *pRoom, RESET_DATA *pReset, int flags) {
+        resetMobs = true;
+        resetFloorItems = true;
+        resetChestLocks = true;
+
+        // FRESET_ALWAYS overrides all other conditions and resets everything.
+        if (IS_SET(flags, FRESET_ALWAYS))
+            return;   
+
+        if (IS_SET(pReset->flags, RESET_NEVER)) {
+            resetMobs = false;
+            resetFloorItems = false;
+            resetChestLocks = false;
+            return;   
+        }
+
+        // Reset everything in dungeons unless marked with RESET_NEVER.
+        if (IS_SET(pRoom->area->area_flag, AREA_DUNGEON))
+            return;
+
+        // Only create chests and their content if there's no one in the area or during 'redit reset'.
+        if (pRoom->area->nplayer > 0 && !IS_SET(pRoom->area->area_flag, AREA_POPULAR)) {
+            resetFloorItems = false;
+            resetChestLocks = false;
+        }
+    }
+
+    bool resetMobs;
+    bool resetFloorItems;
+    bool resetChestLocks;
+};
+
 void reset_room(Room *pRoom, int flags)
 {
     RESET_DATA *pReset;
@@ -314,15 +402,6 @@ void reset_room(Room *pRoom, int flags)
     int iExit;
     bool changedMob, changedObj;
     
-    // Only create chests and their content if there's no one in the area or during 'redit reset'.
-    bool loadFloorItems;
-    if (IS_SET(flags, FRESET_ALWAYS))
-        loadFloorItems = true;
-    else if (pRoom->area->nplayer > 0 && !IS_SET(pRoom->area->area_flag, AREA_POPULAR))
-        loadFloorItems = false;
-    else
-        loadFloorItems = true;
-
     if (weather_info.sky == SKY_RAINING 
         && !IS_SET(pRoom->room_flags, ROOM_INDOORS) ) 
     {
@@ -361,6 +440,7 @@ void reset_room(Room *pRoom, int flags)
         Object *obj = 0;
         Object *obj_to = 0;
         int roomCount, worldCount;
+        ResetRules rules(pRoom, pReset, flags);
         
         switch ( pReset->command )
         {
@@ -369,6 +449,11 @@ void reset_room(Room *pRoom, int flags)
             break;
 
         case 'M':
+
+            if (!rules.resetMobs) {
+                last = false;
+                break;
+            }
 
             if ( ( pMobIndex = get_mob_index( pReset->arg1 ) ) == 0 )
             {
@@ -400,15 +485,15 @@ void reset_room(Room *pRoom, int flags)
             break;
 
         case 'O':
+            if (!rules.resetFloorItems) {
+                last = false;
+                break;
+            }
+
             if ( ( pObjIndex = get_obj_index( pReset->arg1 ) ) == 0 )
             {
                 bug( "Reset_area: 'O': bad vnum %d.", pReset->arg1 );
                 continue;
-            }
-
-            if (!loadFloorItems) {
-                last = false;
-                break;
             }
 
             roomCount = count_obj_list(pObjIndex, pRoom->contents);
@@ -426,17 +511,12 @@ void reset_room(Room *pRoom, int flags)
             obj->cost = 0;
             obj->reset_room = pRoom->vnum;
             obj_to_room( obj, pRoom );
+            randomize_item(obj, pReset);
             changedObj = true;
             last = true;
             break;
 
         case 'P':
-            if ( ( pObjIndex = get_obj_index( pReset->arg1 ) ) == 0 )
-            {
-                bug( "Reset_area: 'P': bad vnum %d.", pReset->arg1 );
-                continue;
-            }
-
             if ( ( pObjToIndex = get_obj_index( pReset->arg3 ) ) == 0 )
             {
                 bug( "Reset_area: 'P': bad vnum %d.", pReset->arg3 );
@@ -445,16 +525,27 @@ void reset_room(Room *pRoom, int flags)
 
             obj_to = get_obj_here_vnum(pRoom, pObjToIndex->vnum);
 
-            if (!obj_to || (obj_to->in_room && !loadFloorItems)) {
+            if (!obj_to) {
+                last = false;
+                break;
+            }
+                
+            if (obj_to->in_room && !rules.resetFloorItems) {
                 last = false;
                 break;
             }
 
-            if (create_item_for_container(pReset, pObjIndex, obj_to)) {
+            if (create_item_for_container(pReset, obj_to)) {
                 changedObj = true;
                 last = true;
             } else {
                 last = false;
+            }
+
+            if (rules.resetChestLocks) {
+                /* fix object lock state! */
+                obj_to->value1(obj_to->pIndexData->value[1]);
+                changedObj = true;
             }
 
             break;
@@ -467,8 +558,10 @@ void reset_room(Room *pRoom, int flags)
                 continue;
             }
 
-            if (!last)
+            if (!last) {
+                warn("Reset_area G/E breaking because last==false, room %d", pRoom->vnum);
                 break;
+            }
 
             if ( mob == 0 )
             {

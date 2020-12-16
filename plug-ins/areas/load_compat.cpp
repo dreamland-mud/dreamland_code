@@ -328,7 +328,6 @@ new_reset(RoomIndexData *pR, RESET_DATA *pReset)
     }
 
     pR->reset_last->next = NULL;
-    top_reset++;
 }
 
 
@@ -357,7 +356,7 @@ void load_resets( FILE *fp ) {
             continue;
         }
 
-        pReset                = ( RESET_DATA* )alloc_mem( sizeof(*pReset) );
+        pReset                =  new reset_data();
         pReset->command        = letter;
 
         /* if_flag */          fread_number( fp );

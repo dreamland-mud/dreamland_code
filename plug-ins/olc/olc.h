@@ -41,8 +41,6 @@ void show_fenia_triggers(Character *, Scripting::Object *wrapper);
 
 // Prototypes
 // mem.c - memory prototypes.
-RESET_DATA *new_reset_data();
-void free_reset_data(RESET_DATA * pReset);
 EXIT_DATA *new_exit();
 void free_exit(EXIT_DATA * pExit);
 EXTRA_DESCR_DATA *new_extra_descr();
