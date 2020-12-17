@@ -55,7 +55,7 @@ void follower_add( Character *ch, Character *mch )
     ch->master        = mch;
     ch->leader        = NULL;
 
-    if (ch->master->can_see( ch ))
+    if (ch->master->can_see( ch ) || (ch->master->getPC() && ch->master->getPC()->pet && ch->master->getPC()->pet == ch))
        act( "$c1 теперь следует за тобой.", ch, 0, mch, TO_VICT );
        
     act( "Ты теперь следуешь за $C5.",  ch, 0, mch, TO_CHAR );

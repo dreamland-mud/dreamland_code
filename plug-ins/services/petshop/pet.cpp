@@ -130,9 +130,10 @@ NPCharacter * Pet::create( PCharacter *client ) const
 
     char_to_room( pet, client->in_room );
     
-    pet->add_follower( client );
     pet->leader = client;
     client->pet = pet;
+    pet->add_follower( client );
+
 
     return pet;
 }
