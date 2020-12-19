@@ -182,8 +182,7 @@ XMLRoom::init(RoomIndexData *room)
     if (room->liquid != liq_none && room->liquid != liq_water) 
         liquid.setValue(room->liquid->getName( ));
 
-    RESET_DATA *pReset;
-    for (pReset = room->reset_first; pReset; pReset = pReset->next)
+    for (auto &pReset: room->resets)
         resets.push_back(*pReset);
 
     if(!room->behavior.isEmpty( ))
@@ -266,16 +265,7 @@ XMLRoom::compat(int vnum)
             pReset->arg3 = vnum;
         }
 
-        pReset->next = NULL;
-
-        if(!room->reset_first) {
-            room->reset_first = pReset;
-            room->reset_last = pReset;
-        } else {
-            room->reset_last->next = pReset;
-            room->reset_last = pReset;            
-        }
-    
+        room->resets.push_back(pReset);
     }
 
     if(behavior.getNode( )) {

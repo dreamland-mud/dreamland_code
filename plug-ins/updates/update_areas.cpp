@@ -109,8 +109,7 @@ static Object * get_obj_here_vnum( Room *room, int vnum )
 
 static RESET_DATA * find_mob_reset(RoomIndexData *pRoom, NPCharacter *mob)
 {
-    RESET_DATA *pReset;
-    for (pReset = pRoom->reset_first; pReset != 0; pReset = pReset->next)
+    for(auto &pReset: pRoom->resets) {
         if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum)
             return pReset;
 
@@ -431,7 +430,7 @@ void reset_room(Room *pRoom, int flags)
     if (reset_room_mobs(pRoom))
         changedMob = true;
 
-    for ( pReset = pRoom->pIndexData->reset_first; pReset != 0; pReset = pReset->next )
+    for(auto &pReset: pRoom->pIndexData->resets)
     {
         MOB_INDEX_DATA *pMobIndex;
         OBJ_INDEX_DATA *pObjIndex;

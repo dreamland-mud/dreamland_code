@@ -494,7 +494,6 @@ struct        reset_data
 {
     reset_data();
 
-    RESET_DATA *        next;
     char                command;
     int                arg1;
     int                arg2;
@@ -507,7 +506,7 @@ struct        reset_data
     vector<int> vnums;
 };
 
-
+typedef vector<reset_data *> ResetList;
 
 /*
  * Area definition.

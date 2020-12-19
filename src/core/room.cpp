@@ -42,8 +42,7 @@ bool ExtraExitList::findAndDestroy(const DLString &keyword)
 }
 
 RoomIndexData::RoomIndexData()
-        : reset_first( 0 ), reset_last( 0 ),
-          extra_descr(0),
+        : extra_descr(0),
           name(&str_empty[0]), description(&str_empty[0]), 
           vnum(0), room_flags(0),
           sector_type(0), heal_rate(100), mana_rate(100),

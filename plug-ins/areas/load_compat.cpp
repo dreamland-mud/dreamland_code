@@ -56,9 +56,7 @@ LIQ(water);
 
 FILE *                        fpArea;
 char                        strArea[MAX_INPUT_LENGTH];
-
-RESET_DATA               *reset_first = 0;
-RESET_DATA               *reset_last = 0;
+list<RESET_DATA *> areaResets;
 
 bool dup_room_vnum( int vnum );
 void area_update( void );
@@ -313,24 +311,6 @@ void load_helps( FILE *fp )
 }
 
 
-void
-new_reset(RoomIndexData *pR, RESET_DATA *pReset)
-{
-    if(!pR)
-        return;
-
-    if(!pR->reset_last) {
-        pR->reset_first = pReset;
-        pR->reset_last = pReset;
-    } else {
-        pR->reset_last->next = pReset;
-        pR->reset_last = pReset;
-    }
-
-    pR->reset_last->next = NULL;
-}
-
-
 /*
  * Snarf a reset section.
  */
@@ -395,15 +375,9 @@ void load_resets( FILE *fp ) {
         
         pReset->arg4        = (letter == 'P' || letter == 'M') ? fread_number(fp) : 0;
 
-        fread_to_eol( fp );
-        
-        pReset->next = 0;
-        if(!reset_first) 
-            reset_last = reset_first = pReset;
-        else {
-            reset_last->next = pReset;
-            reset_last = pReset;
-        }
+        areaResets.push_back(pReset);
+
+        fread_to_eol( fp );        
     }
 }
 
@@ -424,18 +398,15 @@ void bad_reset( const char *fmt, ... )
 void fix_resets()
 {
     char letter = '\0';
-    RESET_DATA *pReset, *pReset_next;
     int iLastRoom = 0, iLastObj = 0;
 
     LogStream::sendNotice() << "Fix_resets..." << endl;
 
-    for (pReset = reset_first; pReset; pReset = pReset_next)
+    for (auto &pReset: areaResets)
     {
         RoomIndexData *pRoomIndex;
         EXIT_DATA *pexit;
         OBJ_INDEX_DATA *temp_index;
-
-        pReset_next = pReset->next;
 
         /*
          * Validate parameters.
@@ -450,7 +421,7 @@ void fix_resets()
         case 'M':
             get_mob_index  ( pReset->arg1 );
             if( (pRoomIndex = get_room_index ( pReset->arg3 ))) {
-                new_reset(pRoomIndex, pReset);
+                pRoomIndex->resets.push_back(pReset);
                 iLastRoom = pReset->arg3;
             }
             else
@@ -462,7 +433,7 @@ void fix_resets()
                 break;
             }
             if( (pRoomIndex = get_room_index ( pReset->arg3 ))) {
-                new_reset(pRoomIndex, pReset);
+                pRoomIndex->resets.push_back(pReset);
                 iLastObj = pReset->arg3;
             }
             else
@@ -478,7 +449,7 @@ void fix_resets()
                 break;
             }
             if( (pRoomIndex = get_room_index ( iLastObj ))) {
-                new_reset(pRoomIndex, pReset);
+                pRoomIndex->resets.push_back(pReset);
             }
             else
                 bad_reset( "Load_resets: 'O': bad room: %d.", pReset->arg3 );
@@ -491,7 +462,7 @@ void fix_resets()
                 break;
             }
             if( (pRoomIndex = get_room_index ( iLastRoom ))) {
-                new_reset(pRoomIndex, pReset);
+                pRoomIndex->resets.push_back(pReset);
                 iLastObj = iLastRoom;
             }
             else
@@ -554,7 +525,7 @@ void fix_resets()
                 break;
             }
             
-            new_reset(pRoomIndex, pReset);
+            pRoomIndex->resets.push_back(pReset);
             break;
         }
     }
@@ -562,7 +533,7 @@ void fix_resets()
     for (auto &r: roomIndexMap) {
         RoomIndexData *pRoom = r.second;
 
-        for(pReset = pRoom->reset_first;pReset;pReset = pReset->next) 
+        for(auto &pReset: pRoom->resets) 
             switch (pReset->command) {
             case 'G': case 'O':
             case 'E': case 'P':
@@ -1054,7 +1025,7 @@ static int get_obj_reset_level( AreaIndexData *pArea, int keyVnum )
     for (auto &r: roomIndexMap) {
         RoomIndexData *pRoomIndex  = r.second;
         
-        for(RESET_DATA *pReset = pRoomIndex->reset_first;pReset;pReset = pReset->next)
+        for(auto &pReset: pRoomIndex->resets)
             switch(pReset->command) {
                 case 'M':
                     mobVnum = pReset->arg1;

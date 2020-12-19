@@ -45,7 +45,7 @@ static void csv_escape( DLString &name ) {
 static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, DLString &where )
 {
     int mobVnum = -1;
-    for(RESET_DATA *pReset = pRoom->reset_first;pReset;pReset = pReset->next) {
+    for(auto &pReset: pRoom->resets) {
         switch(pReset->command) {
             case 'M':
                 // Remember potential carrier in the room.
@@ -95,7 +95,7 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLStrin
 {
     for (auto &r: roomIndexMap) {
         RoomIndexData *pRoom = r.second;
-        for(RESET_DATA *pReset = pRoom->reset_first;pReset;pReset = pReset->next) {
+        for(auto &pReset: pRoom->resets) {
             switch(pReset->command) {
             case 'M':
                 if (pReset->arg1 == pMob->vnum) {

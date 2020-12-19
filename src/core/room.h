@@ -66,8 +66,6 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
 
     Room * create(); // Implemented in loadsave plugin.
 
-    reset_data *reset_first;
-    reset_data *reset_last;
     extra_descr_data *        extra_descr;
     exit_data *        exit        [6];
     ExtraExitList extra_exits;
@@ -90,6 +88,8 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     AreaIndexData *areaIndex;
 
     Room *room; // FIXME wil be replaces with a list of instances
+
+    ResetList resets;
 };
 
 class Room : public virtual DLObject, public WrapperTarget {

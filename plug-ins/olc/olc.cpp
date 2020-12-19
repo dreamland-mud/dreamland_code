@@ -169,7 +169,6 @@ AreaIndexData *get_area_data(int vnum)
 void display_resets(Character * ch)
 {
     RoomIndexData *pRoom;
-    RESET_DATA *pReset;
     MOB_INDEX_DATA *pMob = NULL;
     char buf[MAX_STRING_LENGTH];
     char final[MAX_STRING_LENGTH];
@@ -185,7 +184,7 @@ void display_resets(Character * ch)
            "==== ======== ======================== ======== ======== ===== ==========="
            "\n\r", ch);
 
-    for (pReset = pRoom->reset_first; pReset; pReset = pReset->next) {
+    for (auto &pReset: pRoom->resets) {
         OBJ_INDEX_DATA *pObj;
         MOB_INDEX_DATA *pMobIndex;
         OBJ_INDEX_DATA *pObjIndex;
@@ -361,33 +360,12 @@ CMD(edit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
 void add_reset(RoomIndexData * room, RESET_DATA * pReset, int index)
 {
-    RESET_DATA *reset;
-    int iReset = 0;
-
-    if (!room->reset_first) {
-        room->reset_first = pReset;
-        room->reset_last = pReset;
-        pReset->next = NULL;
-        return;
-    }
-    index--;
-
-    if (index == 0) {                /* First slot (1) selected. */
-        pReset->next = room->reset_first;
-        room->reset_first = pReset;
+    if (index < 0 || index >= room->resets.size()) {
+        room->resets.push_back(pReset);
         return;
     }
 
-    // If negative slot( <= 0 selected) then this will find the last.
-    for (reset = room->reset_first; reset->next; reset = reset->next) {
-        if (++iReset == index)
-            break;
-    }
-
-    pReset->next = reset->next;
-    reset->next = pReset;
-    if (!pReset->next)
-        room->reset_last = pReset;
+    room->resets.insert(room->resets.begin() + index, pReset);
 }
 
 CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
@@ -416,7 +394,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     if (arg1[0] == '\0') {
-        if (ch->in_room->pIndexData->reset_first) {
+        if (!ch->in_room->pIndexData->resets.empty()) {
             stc("Resets: M = mobile, R = room, O = object\n\r", ch);
             display_resets(ch);
         }
@@ -430,38 +408,19 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if (!str_cmp(arg2, "delete")) {
             int insert_loc = atoi(arg1);
 
-            if (!ch->in_room->pIndexData->reset_first) {
+            if (!pRoom->resets.empty()) {
                 stc("No resets in this area.\n\r", ch);
                 return;
             }
-            if (insert_loc - 1 <= 0) {
-                pReset = pRoom->reset_first;
-                pRoom->reset_first = pRoom->reset_first->next;
-                if (!pRoom->reset_first)
-                    pRoom->reset_last = NULL;
-            }
-            else {
-                int iReset = 0;
-                RESET_DATA *prev = NULL;
 
-                for (pReset = pRoom->reset_first; pReset; pReset = pReset->next) {
-                    if (++iReset == insert_loc)
-                        break;
-                    prev = pReset;
-                }
-                if (!pReset) {
-                    stc("Reset not found.\n\r", ch);
-                    return;
-                }
-                if (prev)
-                    prev->next = prev->next->next;
-                else
-                    pRoom->reset_first = pRoom->reset_first->next;
-
-                for (pRoom->reset_last = pRoom->reset_first;
-                     pRoom->reset_last->next;
-                     pRoom->reset_last = pRoom->reset_last->next);
+            insert_loc--;
+            if (insert_loc < 0 || insert_loc >= pRoom->resets.size()) {
+                stc("Reset with this number not found.\r\n", ch);
+                return;
             }
+
+            pReset = pRoom->resets.at(insert_loc);
+            pRoom->resets.erase(pRoom->resets.begin() + insert_loc);
             ddeallocate(pReset);
             SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
             stc("Reset deleted.\n\r", ch);

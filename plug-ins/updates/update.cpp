@@ -548,7 +548,6 @@ void water_float_update( )
  */
 static bool reset_check_obj( Object *obj )
 {
-    RESET_DATA *r;
     int mobVnum = -1;
     int v = obj->pIndexData->vnum;
     Room * room = obj->getRoom( );
@@ -559,7 +558,7 @@ static bool reset_check_obj( Object *obj )
     else
         mob = NULL;
     
-    for (r = room->pIndexData->reset_first; r; r = r->next)
+    for (auto &r: room->pIndexData->resets)
         switch (r->command) {
         case 'O':
             if (r->arg1 == v && obj->in_room) 

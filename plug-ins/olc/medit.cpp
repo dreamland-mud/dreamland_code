@@ -996,7 +996,6 @@ MEDIT(list)
 {
     int cnt;
     RoomIndexData *pRoom;
-    RESET_DATA *pReset;
     char buf[MAX_STRING_LENGTH];
     ostringstream buffer;
     
@@ -1008,7 +1007,7 @@ MEDIT(list)
     cnt = 0;
     for (auto &r: roomIndexMap) {
         pRoom = r.second;
-        for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
+        for(auto &pReset: pRoom->resets)
             switch(pReset->command) {
                 case 'M':
                     if(pReset->arg1 == mob.vnum) {

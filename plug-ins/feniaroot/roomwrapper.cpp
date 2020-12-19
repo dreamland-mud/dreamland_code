@@ -744,12 +744,11 @@ NMI_INVOKE( RoomWrapper, traverseTo, "(target, walker, sectorsAllow, sectorsDeny
 
 NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, которые ресетятся в этой комнате") 
 {
-    RESET_DATA *pReset;
     RegList::Pointer rc(NEW);
     
     checkTarget( );
     
-    for (pReset = target->pIndexData->reset_first; pReset; pReset = pReset->next)
+    for (auto &pReset: target->pIndexData->resets)
         if (pReset->command == 'M')
             rc->push_back( Register( pReset->arg1 ) );
 

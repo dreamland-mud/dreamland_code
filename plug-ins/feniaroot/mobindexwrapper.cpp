@@ -163,7 +163,7 @@ NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, 
     checkTarget( );
     
     for (auto &r: roomIndexMap)
-        for (pReset = r.second->reset_first; pReset; pReset = pReset->next)
+        for (auto &pReset: r.second->resets)
             if (pReset->command == 'M' && pReset->arg1 == target->vnum)
                 rc->push_back( Register( r.first ) );
 
