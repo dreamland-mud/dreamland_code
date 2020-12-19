@@ -74,6 +74,7 @@ const struct olc_help_type help_table[] =
     {"room_flags", &room_flags, "Флаги комнат (поле room_flags)."},
     {"sector_table", &sector_table, "Тип местности в комнате (поле sector_type)."},
     {"exit_flags", &exit_flags, "Флаги выходов и экстравыходов (поле exit_info)."},
+    {"reset_flags", &reset_flags, "Флаги ресетов."},
 
     {"{YПредметы{x", NULL, NULL},
     {"item_table", &item_table, "Типы предметов (поле item_type)."},

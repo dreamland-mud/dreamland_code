@@ -9,10 +9,53 @@
 #include "olcflags.h"
 #include "act.h"
 #include "websocketrpc.h"
+#include "weapontier.h"
 #include "comm.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+
+static DLString one_reset_flag(Character *ch, bitstring_t flag, int iReset, RESET_DATA *pReset)
+{
+    ostringstream buf;
+    DLString fname = reset_flags.names(flag);
+
+    buf << "{" << (pReset->flags.isSet(flag) ? "g" : "D") << fname << " ["
+        << web_cmd(
+                ch, 
+                "resets " + DLString(iReset) + " flag " + fname,
+                pReset->flags.isSet(flag) ? "X" : "-")
+        << "]{x";
+
+    return buf.str();
+}
+
+static DLString show_reset_flags(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex)
+{
+    ostringstream buf;
+
+    if (pObjIndex->item_type != ITEM_WEAPON) {
+        return "{g" + pReset->flags.names();
+    }
+
+    buf << one_reset_flag(ch, RESET_RAND_STAT, iReset, pReset)
+        << " "
+        << one_reset_flag(ch, RESET_RAND_ALL, iReset, pReset)
+        << " {";
+
+    if (pReset->flags.isSet(RESET_RAND_STAT|RESET_RAND_ALL))
+        buf << "g";
+    else
+        buf << "D";
+
+    buf << "{Iw<m i='reset " << iReset << " tier ' c='";
+    for (int t = BEST_TIER; t <= WORST_TIER; t++) 
+        buf << "$ " << t << ", ";
+    buf << "'>{Ix[tier " << pReset->minTier << "]{Iw</m>{Ix";
+
+    return buf.str();
+}
+
 
 static void display_resets(Character * ch)
 {
@@ -54,12 +97,13 @@ static void display_resets(Character * ch)
             }
 
             pMob = pMobIndex;
-            line = "M [" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24s %2d-%2d {x\n\r";
+            line = "M [" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24s %2d-%2d {g%s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1, 
                       russian_case(pMob->short_descr, '1').colourStrip( ).c_str( ),
                       pReset->arg2, 
-                      pReset->arg4);
+                      pReset->arg4,
+                      pReset->flags.names().c_str());
             break;
 
         case 'O':
@@ -73,10 +117,11 @@ static void display_resets(Character * ch)
                 continue;
             }
 
-            line = "O [" + web_cmd(ch, "oedit $1", "%5d") +"] %-24.24s{x\n\r";
+            line = "O [" + web_cmd(ch, "oedit $1", "%5d") +"] %-24.24s %s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1, 
-                      russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ));
+                      russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
+                      show_reset_flags(ch, iReset+1, pReset, pObj).c_str());
             break;
 
         case 'P':
@@ -92,12 +137,13 @@ static void display_resets(Character * ch)
                 continue;
             }
 
-            line = "          [" + web_cmd(ch, "oedit $1", "%5d") + "] %-24.24s %2d-%2d {x\n\r";
+            line = "  [" + web_cmd(ch, "oedit $1", "%5d") + "] %-24.24s %2d-%2d %s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1,
                       russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
                       pReset->arg2,
-                      pReset->arg4);
+                      pReset->arg4,
+                      show_reset_flags(ch, iReset+1, pReset, pObj).c_str());
             break;
 
         case 'G':
@@ -114,13 +160,14 @@ static void display_resets(Character * ch)
                 break;
             }
 
-            line = "          [" + web_cmd(ch, "oedit $1", "%5d") +"] %-24.24s %-8.8s {x\n\r";
+            line = "  [" + web_cmd(ch, "oedit $1", "%5d") +"] %-24.24s %-8.8s %s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1,
                       russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
                       (cmd == 'G') ?
                           wear_none.getName( ).c_str( )
-                          : wearlocationManager->find( pReset->arg3 )->getName( ).c_str( ));
+                          : wearlocationManager->find( pReset->arg3 )->getName( ).c_str( ),
+                      show_reset_flags(ch, iReset+1, pReset, pObj).c_str());
             break;
 
         case 'D':
@@ -156,6 +203,20 @@ static void add_reset(RoomIndexData * room, RESET_DATA * pReset, int index)
     room->resets.insert(room->resets.begin() + index, pReset);
 }
 
+static int find_reset(RoomIndexData *pRoom, const char *arg)
+{
+    int insert_loc = atoi(arg);
+
+    if (pRoom->resets.empty())
+        return -1;
+
+    insert_loc--;
+    if (insert_loc < 0 || insert_loc >= (int)pRoom->resets.size())
+        return -1;
+
+    return insert_loc;
+}
+
 CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
         "Online resets editor.")
 {
@@ -170,11 +231,6 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
-    argument = one_argument(argument, arg3);
-    argument = one_argument(argument, arg4);
-    argument = one_argument(argument, arg5);
-    argument = one_argument(argument, arg6);
-    argument = one_argument(argument, arg7);
     
     if (!OLCState::can_edit( ch, ch->in_room->vnum )) {
         stc("Resets: Invalid security for editing this area.\n\r", ch);
@@ -182,26 +238,21 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     if (arg1[0] == '\0') {
-        if (!ch->in_room->pIndexData->resets.empty()) {
+        if (!ch->in_room->pIndexData->resets.empty())
             display_resets(ch);
-        }
         else
             stc("No resets in this room.\n\r", ch);
+
+        return;
     }
 
     if (is_number(arg1)) {
         RoomIndexData *pRoom = ch->in_room->pIndexData;
 
         if (!str_cmp(arg2, "delete")) {
-            int insert_loc = atoi(arg1);
+            int insert_loc = find_reset(pRoom, arg1);
 
-            if (!pRoom->resets.empty()) {
-                stc("No resets in this area.\n\r", ch);
-                return;
-            }
-
-            insert_loc--;
-            if (insert_loc < 0 || insert_loc >= (int)pRoom->resets.size()) {
+            if (insert_loc < 0) {
                 stc("Reset with this number not found.\r\n", ch);
                 return;
             }
@@ -209,10 +260,67 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             pReset = pRoom->resets.at(insert_loc);
             pRoom->resets.erase(pRoom->resets.begin() + insert_loc);
             ddeallocate(pReset);
-            SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
+            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
             stc("Reset deleted.\n\r", ch);
+            return;
         }
-        else if ((!str_cmp(arg2, "mob") && is_number(arg3))
+
+        if (arg_oneof(arg2, "flag", "флаг")) {
+            int insert_loc = find_reset(pRoom, arg1);
+
+            if (insert_loc < 0) {
+                stc("Reset with this number not found.\r\n", ch);
+                return;
+            }
+
+            pReset = pRoom->resets.at(insert_loc);
+            bitnumber_t flags = reset_flags.bitstring(argument, false);
+            if (flags == NO_FLAG) {
+                stc("Flags no found, see {y{hcolchelp reset_flags{x.\r\n", ch);
+                return;
+            }
+
+            pReset->flags.toggleBit(flags);
+            if (pReset->flags.isSet(RESET_RAND_STAT|RESET_RAND_ALL) && pReset->minTier <= 0)
+                pReset->minTier = pReset->maxTier = WORST_TIER;
+
+            if (pReset->flags.getValue() != 0)
+                ptc(ch, "Flags for reset {W%d{x toggled to {g%s{x.\r\n", insert_loc+1, pReset->flags.names().c_str());
+            else
+                ptc(ch, "Flags for reset {W%d{x cleared.\r\n", insert_loc+1);
+
+            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            return;
+        }
+
+        if (arg_oneof(arg2, "tier", "тиер")) {
+            int insert_loc = find_reset(pRoom, arg1);
+
+            if (insert_loc < 0) {
+                stc("Reset with this number not found.\r\n", ch);
+                return;
+            }
+
+            int tier = atoi(argument);
+            if (tier < BEST_TIER || tier > WORST_TIER) {
+                ptc(ch, "Tier must be a number from %d to %d.\r\n", BEST_TIER, WORST_TIER);
+                return;
+            }
+
+            pReset = pRoom->resets.at(insert_loc);
+            pReset->minTier = pReset->maxTier = tier;
+            ptc(ch, "Tier for reset {W%d{x set to {g%d{x.\r\n", insert_loc+1, tier);
+            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            return;
+        }
+
+        argument = one_argument(argument, arg3);
+        argument = one_argument(argument, arg4);
+        argument = one_argument(argument, arg5);
+        argument = one_argument(argument, arg6);
+        argument = one_argument(argument, arg7);
+
+        if ((!str_cmp(arg2, "mob") && is_number(arg3))
                  || (!str_cmp(arg2, "obj") && is_number(arg3))) {
             if (!str_cmp(arg2, "mob")) {
                 pReset = new reset_data();
@@ -275,14 +383,17 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             add_reset(ch->in_room->pIndexData, pReset, atoi(arg1));
             SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
             stc("Reset added.\n\r", ch);
-        }
-        else {
-            stc("Syntax: RESET <number> OBJ <vnum> <wear_loc>\n\r", ch);
-            stc("        RESET <number> OBJ <vnum> inside <vnum> [limit] [count]\n\r", ch);
-            stc("        RESET <number> OBJ <vnum> room\n\r", ch);
-            stc("        RESET <number> MOB <vnum> [max # area] [max # room]\n\r", ch);
-            stc("        RESET <number> DELETE\n\r", ch);
+            return;
         }
     }
+
+
+    stc("Syntax: RESET <number> OBJ <vnum> <wear_loc>\n\r", ch);
+    stc("        RESET <number> OBJ <vnum> inside <vnum> [limit] [count]\n\r", ch);
+    stc("        RESET <number> OBJ <vnum> room\n\r", ch);
+    stc("        RESET <number> MOB <vnum> [max # area] [max # room]\n\r", ch);
+    stc("        RESET <number> DELETE\n\r", ch);
+    stc("        RESET <number> FLAG <flags to toggle>\n\r", ch);
+    stc("        RESET <number> TIER <1..5>\n\r", ch);
 }
 
