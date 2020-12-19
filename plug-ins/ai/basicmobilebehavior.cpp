@@ -268,6 +268,9 @@ bool BasicMobileBehavior::isHomesick( )
     if (ch->fighting || hasLastFought( ))
         return false;
 
+    if (IS_CHARMED(ch) || RIDDEN(ch))        
+        return false;
+
     if (IS_ROOM_AFFECTED(ch->in_room, AFF_ROOM_CURSE))
         return false;
     
