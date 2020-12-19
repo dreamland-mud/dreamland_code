@@ -107,13 +107,15 @@ static Object * get_obj_here_vnum( Room *room, int vnum )
     return NULL;
 }
 
-static RESET_DATA * find_mob_reset(RoomIndexData *pRoom, NPCharacter *mob)
+static int find_mob_reset(RoomIndexData *pRoom, NPCharacter *mob)
 {
-    for(auto &pReset: pRoom->resets) {
+    for (unsigned int i = 0; i < pRoom->resets.size(); i++) {
+        RESET_DATA *pReset = pRoom->resets[i];
         if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum)
-            return pReset;
+            return i;
+    }
 
-    return 0;
+    return -1;
 }
 
 static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
@@ -312,14 +314,14 @@ static bool reset_one_mob(NPCharacter *mob)
     if (!home)
         return false;
 
-    RESET_DATA *myReset = find_mob_reset(home->pIndexData, mob);
-    if (!myReset)
+    int myReset = find_mob_reset(home->pIndexData, mob);
+    if (myReset < 0)
         return false;
    
     // Update all inventory and equipment on the existing mob. 
-    RESET_DATA *pReset;
     bool changed = false;
-    for (pReset = myReset->next; pReset; pReset = pReset->next)
+    for (unsigned int i = myReset + 1; i < home->pIndexData->resets.size(); i++) {
+        RESET_DATA *pReset = home->pIndexData->resets[i];
         switch (pReset->command) {
         case 'E':
         case 'G':
@@ -330,6 +332,7 @@ static bool reset_one_mob(NPCharacter *mob)
         default:
             return changed;
         }
+    }
         
         
     return changed; 

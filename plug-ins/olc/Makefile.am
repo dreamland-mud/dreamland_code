@@ -3,6 +3,7 @@ lib_LTLIBRARIES = libolc.la
 libolc_la_SOURCES = \
 olcflags.cpp \
 olc.cpp \
+resets.cpp \
 xmlindexdata.cpp \
 redit.cpp \
 sedit.cpp \

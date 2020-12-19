@@ -506,8 +506,6 @@ struct        reset_data
     vector<int> vnums;
 };
 
-typedef vector<reset_data *> ResetList;
-
 /*
  * Area definition.
  */

@@ -30,7 +30,6 @@ void string_show(Character * ch, char *strch);
 #define MAX_MOB 1                /* Default maximum number for resetting mobs */
 
 AreaIndexData *get_area_data(int vnum);
-void add_reset(RoomIndexData * room, RESET_DATA * pReset, int index);
 
 bool show_help(Character * ch, const char *argument);
 void show_fenia_triggers(Character *, Scripting::Object *wrapper);

@@ -61,6 +61,8 @@ struct ExtraExitList: public list<extra_exit_data *> {
     bool findAndDestroy(const DLString &keyword);
 };
 
+typedef vector<reset_data *> ResetList;
+
 struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     RoomIndexData();
 

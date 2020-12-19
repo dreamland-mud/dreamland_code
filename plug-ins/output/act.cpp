@@ -435,6 +435,9 @@ DLString dlprintf( const char *fmt, ... )
         case 'l':
             word += (int) va_arg( arglist, int ); /* XXX */
             break;
+        case 'c':
+            word += (char) va_arg( arglist, int );
+            break;
         default:
             word += va_arg( arglist, int );
             break;
