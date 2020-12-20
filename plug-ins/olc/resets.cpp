@@ -86,6 +86,7 @@ static void display_resets(Character * ch)
         default:
             buf << fmt(0, "Bad reset command: %c.", pReset->command);
             break;
+
         case 'M':
             if (!(pMobIndex = get_mob_index(pReset->arg1))) {
                 buf << fmt(0, "Load Mobile - Bad Mob %d\n\r", pReset->arg1);
@@ -97,7 +98,9 @@ static void display_resets(Character * ch)
             }
 
             pMob = pMobIndex;
-            line = "M [" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24s %2d-%2d {g%s{x\n\r";
+            pObj = 0;
+
+            line = "M [" + web_cmd(ch, "medit $1", "%5d") + "] {G%-24.24s{x %2d-%2d {g%s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1, 
                       russian_case(pMob->short_descr, '1').colourStrip( ).c_str( ),
@@ -111,13 +114,16 @@ static void display_resets(Character * ch)
                 buf << fmt(0, "Load Object - Bad Object %d\n\r", pReset->arg1);
                 continue;
             }
+
             pObj = pObjIndex;
+            pMob = 0;
+
             if (!(pRoomIndex = get_room_index(pReset->arg3))) {
                 buf << fmt(0, "Load Object - Bad Room %d\n\r", pReset->arg3);
                 continue;
             }
 
-            line = "O [" + web_cmd(ch, "oedit $1", "%5d") +"] %-24.24s %s{x\n\r";
+            line = "O [" + web_cmd(ch, "oedit $1", "%5d") +"] {G%-24.24s{x %s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1, 
                       russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
@@ -136,6 +142,9 @@ static void display_resets(Character * ch)
                 buf << fmt(0, "Put Object - Bad To Object %d\n\r", pReset->arg3);
                 continue;
             }
+
+            if (pMob)
+                buf << "        ";
 
             line = "  [" + web_cmd(ch, "oedit $1", "%5d") + "] %-24.24s %2d-%2d %s{x\n\r";
             buf << fmt(0, line.c_str(),
@@ -160,7 +169,7 @@ static void display_resets(Character * ch)
                 break;
             }
 
-            line = "  [" + web_cmd(ch, "oedit $1", "%5d") +"] %-24.24s %-8.8s %s{x\n\r";
+            line = "  [" + web_cmd(ch, "oedit $1", "%5d") +"] %-24.24s {y%-8.8s{x %s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1,
                       russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
