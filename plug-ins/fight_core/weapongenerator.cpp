@@ -54,6 +54,7 @@ WeaponGenerator::WeaponGenerator(bool debug)
     hrMinValue = drMinValue = 0;
     hrIndexBonus = drIndexBonus = aveIndexBonus = 0;
     align = ALIGN_NONE;
+    retainChance = 50;
 }
 
 WeaponGenerator::~WeaponGenerator()
@@ -74,6 +75,37 @@ WeaponGenerator & WeaponGenerator::item(Object *obj)
 WeaponGenerator & WeaponGenerator::tier(int tier)
 {
     valTier = hrTier = drTier = tier;
+    return *this;
+}
+
+// Pick target tier according to each tier's chances, but no better than provided bestTier.
+WeaponGenerator & WeaponGenerator::randomTier(int bestTier) 
+{ 
+    int minTier = bestTier;
+    int maxTier = WORST_TIER;
+
+    for (int i = minTier - 1; i < maxTier; i++) {
+        weapon_tier_t &one_tier = weapon_tier_table[i];
+        if (chance(one_tier.chance)) {
+            tier(i+1);
+            break;
+        }
+    }
+
+    return *this;
+}
+
+WeaponGenerator & WeaponGenerator::randomWeaponClass()
+{
+    Json::Value::Members allClasses =  weapon_classes.getMemberNames();
+    if (allClasses.empty())
+        return *this;
+
+    unsigned int random_index = number_range(0, allClasses.size() - 1);
+    wclass = allClasses[random_index];
+    wclassConfig = weapon_classes[wclass];
+    obj->value0(weapon_class.value(wclass));
+
     return *this;
 }
 
@@ -165,6 +197,9 @@ const WeaponGenerator & WeaponGenerator::incrementDamroll() const
 
 void WeaponGenerator::setAffect(int location, int modifier) const
 {
+    if (modifier == 0)
+        return;
+
     int skill = sn < 0 ? gsn_none : sn;
     Affect *paf = obj->affected.find(sn, location);
 
@@ -201,9 +236,11 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 {
     affix_generator gen(valTier);
 
-    // Set requirements assigned directly to the generator (most likely from the tests).
+    // Set requirements and restrictions assigned directly to the generator.
     for (auto const &reqName: required)
         gen.addRequired(reqName);
+    for (auto const &fbdName: forbidden)
+        gen.addForbidden(fbdName);
 
     // Set exclusions or requirements based on chosen names and weapon flags.
     for (auto const &affixName: wclassConfig["forbids"])
@@ -226,11 +263,11 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
     gen.setPlayer(pch);
     gen.setAlign(align);
-    gen.setRetainChance(50);
+    gen.setRetainChance(retainChance);
 
     // Generate all combinations of affixes.
     gen.run();
-    //LogStream::sendNotice() << gen.dump();
+    LogStream::sendNotice() << gen.dump();
 
     if (gen.getResultSize() == 0) {
         warn("Weapon generator: no affixes found for tier %d.", valTier);
@@ -246,6 +283,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         const Json::Value &affix = pinfo.affix;
         const DLString &section = pinfo.section;
         if (debug) obj->carried_by->pecho("{DAffix %s [%d]", affix["value"].asCString(), pinfo.price);
+        notice("Affix %s [%d]", affix["value"].asCString(), pinfo.price);
 
         extraFlags.setBits(affix["extra"].asString());
 
@@ -383,11 +421,7 @@ void WeaponGenerator::setShortDescr() const
         randomNoun = nouns[n];
     }
 
-    DLString colour = weapon_tier_table[valTier-1].colour;
     DLString myshort;
-
-    if (!colour.empty())
-        myshort = "{" + colour;
 
     if (!randomAdjective.empty())
         myshort += Morphology::adjective(randomAdjective, obj->gram_gender) + " "; // леденящий
@@ -396,9 +430,6 @@ void WeaponGenerator::setShortDescr() const
 
     if (!randomNoun.empty())
         myshort += " " + randomNoun; // боли
-
-    if (!colour.empty())
-        myshort += "{x";
 
     obj->setShortDescr(myshort.c_str());
 }
@@ -415,11 +446,36 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
     return *this;
 }
 
+const WeaponGenerator & WeaponGenerator::assignColours() const
+{
+    DLString colour = weapon_tier_table[valTier-1].colour;
+    if (colour.empty())
+        return *this;
+
+    DLString myshort = obj->getShortDescr();
+    myshort = "{" + colour + myshort.colourStrip() + "{x";
+
+    obj->setShortDescr(myshort.c_str());
+    return *this;
+}
+
 const WeaponGenerator & WeaponGenerator::assignAffects() const
 {
     for (auto &af: affects) {
         affect_to_obj(obj, &af);
     }
+
+    obj->enchanted = true;
+    return *this;
+}
+
+const WeaponGenerator & WeaponGenerator::assignTimers() const
+{
+    weapon_tier_t &tier = weapon_tier_table[valTier - 1];
+
+    if (tier.weeks > 0)
+        obj->timer = tier.weeks * Date::SECOND_IN_WEEK / Date::SECOND_IN_MINUTE;
+
     return *this;
 }
 

@@ -75,6 +75,7 @@
 #include "grammar_entities.h"
 #include "areabehavior.h"
 #include "flags.h"
+#include "enumeration.h"
 #include "mobilespecial.h"
 #include "helpmanager.h"
 #include "autoflags.h"
@@ -501,8 +502,8 @@ struct        reset_data
     int                arg4;
 
     Flags flags;
-    int minTier;
-    int maxTier;
+    Enumeration rand;
+    int bestTier;
     vector<int> vnums;
 };
 

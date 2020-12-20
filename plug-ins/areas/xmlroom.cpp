@@ -32,10 +32,11 @@ XMLResetList::nodeFromXML(const XMLNode::Pointer &child)
 
     r.flags.setBits(child->getAttribute("flags"));
 
-    if (child->hasAttribute("minTier"))
-        r.minTier = child->getAttribute("minTier").toInt();
-    if (child->hasAttribute("maxTier"))
-        r.maxTier = child->getAttribute("maxTier").toInt();
+    if (child->hasAttribute("rand"))
+        r.rand.setValue(rand_table.value(child->getAttribute("rand")));
+
+    if (child->hasAttribute("bestTier"))
+        r.bestTier = child->getAttribute("bestTier").toInt();
 
     if(child->getType( ) != XMLNode::XML_LEAF) {
         return false;
@@ -84,10 +85,10 @@ XMLResetList::toXML(XMLNode::Pointer &parent) const
 
         if (r->flags.getValue() > 0)
             child->insertAttribute("flags", r->flags.names());
-        if (r->minTier > 0)
-            child->insertAttribute("minTier", r->minTier);
-        if (r->maxTier > 0)
-            child->insertAttribute("maxTier", r->maxTier);
+        if (r->rand.getValue() > 0)
+            child->insertAttribute("rand", r->rand.name());
+        if (r->bestTier > 0)
+            child->insertAttribute("bestTier", r->bestTier);
 
         switch(r->command) {
         case 'M':

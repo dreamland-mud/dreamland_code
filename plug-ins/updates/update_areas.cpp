@@ -21,6 +21,8 @@
 #include "dreamland.h"
 #include "weapongenerator.h"
 #include "loadsave.h"
+#include "material.h"
+#include "damageflags.h"
 #include "wiznet.h"
 #include "gsn_plugin.h"
 #include "descriptor.h"
@@ -135,32 +137,84 @@ static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
 
 static void randomize_item(Object *obj, RESET_DATA *pReset)
 {
-    if (!pReset->flags.isSet(RESET_RAND_STAT))
+    if (pReset->rand == RAND_NONE)
         return;
 
     if (obj->pIndexData->item_type != ITEM_WEAPON) {
-        bug("rand_stat reset: %d not a weapon", obj->pIndexData->vnum);
+        bug("random reset: %d not a weapon", obj->pIndexData->vnum);
         return;
     }
     
-    if (pReset->minTier == 0 || pReset->maxTier == 0) {
-        bug("rand_stat reset: no tiers for vnum %d", obj->pIndexData->vnum);
+    if (pReset->bestTier == 0) {
+        bug("random reset: no tiers for vnum %d", obj->pIndexData->vnum);
         return;
     }
 
-    int tier = number_range(pReset->minTier, pReset->maxTier);
     Character *mob = obj->getCarrier();
+    
+    WeaponGenerator gen;
+    gen.item(obj)
+        .randomTier(pReset->bestTier)
+        .alignment(mob ? (int)mob->alignment : ALIGN_NONE);
 
-    WeaponGenerator()
-        .item(obj)
-        .tier(tier)
-        .alignment(mob ? (int)mob->alignment : ALIGN_NONE)
-        .randomAffixes()
+    if (pReset->rand == RAND_ALL) {
+        gen.randomWeaponClass()
+           .randomNames();
+    }
+    else if (pReset->rand == RAND_STAT) {
+        // TODO should iterate through weapon flags and extra flags. A method of WeaponGenerator?
+        if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
+            gen.addRequirement("two_hands");
+        else
+            gen.addForbidden("two_hands");
+
+        if (material_is_flagged(obj, MAT_INDESTR))
+            gen.addRequirement("platinum");
+        else if (material_is_flagged(obj, MAT_TOUGH))
+            gen.addRequirement("titanium");
+        else if (material_is_typed(obj, MAT_WOOD))
+            gen.addRequirement("wood");
+        else if (material_is_flagged(obj, MAT_MELTING))
+            gen.addRequirement("ice");
+        else {
+            gen.addForbidden("platinum");
+            gen.addForbidden("titanium");
+            gen.addForbidden("wood");
+            gen.addForbidden("ice");
+        }
+        
+        if (IS_SET(obj->extra_flags, ITEM_ANTI_EVIL))
+            gen.addRequirement("anti_evil");
+        
+        if (IS_SET(obj->extra_flags, ITEM_ANTI_GOOD))
+            gen.addRequirement("anti_good");
+        
+        if (IS_SET(obj->extra_flags, ITEM_EVIL))
+            gen.addRequirement("evil");
+        
+        if (IS_SET(obj->extra_flags, ITEM_NOREMOVE))
+            gen.addRequirement("noremove");
+    }
+
+    gen.randomAffixes()
         .assignHitroll()
         .assignDamroll()
         .assignValues()
         .assignFlags()
-        .assignAffects();
+        .assignAffects()
+        .assignTimers();
+
+    if (pReset->rand == RAND_ALL) {
+        gen.assignNames();
+        gen.assignDamageType();
+    }
+
+    gen.assignColours();
+
+    notice("%s reset: item [%d] [%lld] tier %s created in room [%d]",
+            pReset->rand.name().c_str(),
+            obj->pIndexData->vnum, obj->getID(), 
+            obj->getProperty("tier").c_str(), obj->getRoom()->vnum);
 }
 
 /** Equip an item if required by reset configuration. */
@@ -398,7 +452,6 @@ struct ResetRules {
 
 void reset_room(Room *pRoom, int flags)
 {
-    RESET_DATA *pReset;
     NPCharacter *mob;
     bool last;
     int iExit;
@@ -561,7 +614,6 @@ void reset_room(Room *pRoom, int flags)
             }
 
             if (!last) {
-                warn("Reset_area G/E breaking because last==false, room %d", pRoom->vnum);
                 break;
             }
 

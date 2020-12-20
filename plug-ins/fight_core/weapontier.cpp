@@ -12,6 +12,8 @@ void weapon_tier_t::fromJson(const Json::Value &value)
     extra.fromJson(value["extra"]);
     min_points = value["min_points"].asInt();
     max_points = value["min_points"].asInt();
+    weeks = value["weeks"].asInt();
+    chance = value["chance"].asInt();
 }
 
 json_vector<weapon_tier_t> weapon_tier_table;

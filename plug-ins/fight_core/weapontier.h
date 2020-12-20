@@ -16,13 +16,16 @@ struct weapon_tier_t {
     json_flag<&extra_flags> extra;
     int min_points;
     int max_points;
+    int weeks;
+    int chance;
 
     void fromJson(const Json::Value &value);
 };
 
 extern json_vector<weapon_tier_t> weapon_tier_table;
 
-#define BEST_TIER 1
-#define WORST_TIER 5
+#define BEST_TIER    1
+#define DEFAULT_TIER 3
+#define WORST_TIER   5
 
 #endif

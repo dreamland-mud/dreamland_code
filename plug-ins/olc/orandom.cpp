@@ -138,6 +138,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         .assignDamroll()
         .assignValues()
         .assignNames()
+        .assignColours()
         .assignFlags()
         .assignAffects()
         .assignDamageType();

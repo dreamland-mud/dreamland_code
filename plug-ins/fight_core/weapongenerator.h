@@ -32,7 +32,11 @@ struct WeaponGenerator {
     WeaponGenerator & damrollIndexBonus(float bonus) { this->drIndexBonus = bonus; return *this; }
     WeaponGenerator & valueIndexBonus(float bonus) { this->aveIndexBonus = bonus; return *this; }
     WeaponGenerator & alignment(int align) { this->align = align; return *this; }
+    WeaponGenerator & setRetainChance(int retainChance) { this->retainChance = retainChance; return *this; }
+    WeaponGenerator & randomTier(int bestTier);
     WeaponGenerator & addRequirement(const DLString &req) { this->required.insert(req); return *this; }
+    WeaponGenerator & addForbidden(const DLString &fbd) { this->forbidden.insert(fbd); return *this; }
+    WeaponGenerator & randomWeaponClass();
     WeaponGenerator & randomNames();
     WeaponGenerator & randomAffixes();
 
@@ -48,9 +52,11 @@ struct WeaponGenerator {
     const WeaponGenerator & incrementDamroll() const;
 
     const WeaponGenerator & assignNames() const;
+    const WeaponGenerator & assignColours() const;
     const WeaponGenerator & assignFlags() const;
     const WeaponGenerator & assignDamageType() const;
     const WeaponGenerator & assignAffects() const;
+    const WeaponGenerator & assignTimers() const;
 
 private:
     void setAffect(int location, int modifier) const;
@@ -86,7 +92,15 @@ private:
     float drIndexBonus;
     float aveIndexBonus;
     int align;
-    set<DLString> required; // Additional requirements set by test suite.
+
+    // Additional requirements set by test suite.
+    set<DLString> required; 
+
+    // Forbidden affixes configured during area reset.
+    set<DLString> forbidden;
+
+    // A chance for random affix to remain in the initial set.
+    int retainChance; 
 
     Object *obj;    
     DLString wclass;
