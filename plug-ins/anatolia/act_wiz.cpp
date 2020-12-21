@@ -2251,20 +2251,27 @@ CMDWIZP( purge )
         return;
     }
 
-    if ( ( victim = get_char_world( ch, arg ) ) == 0 )
-    {
-        ch->send_to("Таких в мире сейчас нет.\n\r");
+    // Try to purge a mob in the room or an item in the room/inventory/equip.
+    if ((victim = get_char_room(ch, arg))) {
+        if (!victim->is_npc()) {
+            ch->send_to("Сначала научись рисовать и отрасти усики.\n\r");
+            return;
+        }
+
+        act( "$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT );
+        act( "Ты изничтожаешь $C4.", ch, 0, victim, TO_CHAR );
+        extract_char( victim );
         return;
     }
 
-    if ( !victim->is_npc() )
-    {
-          ch->send_to("Сначала научись рисовать и отрасти усики.\n\r");
-          return;
+    if ((obj = get_obj_here(ch, arg))) {
+        act( "$c1 изничтожает $o4.", ch, obj, 0, TO_ROOM );
+        act( "Ты изничтожаешь $o4.", ch, obj, 0, TO_CHAR );
+        extract_obj(obj);
+        return;
     }
 
-    act_p( "$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT,POS_RESTING );
-    extract_char( victim );
+    ch->println("Ты не видишь здесь моба или предмет с таким именем.");
 }
 
 
