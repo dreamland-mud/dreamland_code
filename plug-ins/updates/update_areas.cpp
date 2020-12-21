@@ -252,7 +252,7 @@ static int count_vnums_in_list(vector<int> &vnums, Object *list)
 }
 
 /** Create item inside of a container (P), based on the args: arg2 max count, arg4 min count. */
-static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to)
+static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to, bool isForced)
 {
     if (!obj_to)
         return false;
@@ -264,8 +264,13 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to)
     vector<int> vnums;
     vnums.insert(vnums.end(), pReset->vnums.begin(), pReset->vnums.end());
     int count = count_vnums_in_list(vnums, obj_to->contains);
-    int minCount = pReset->arg4;
+    int minCount = pReset->arg4;    
 
+    if (vnums.empty()) {
+        bug("Reset_area: 'P' empty list of vnums for %d", obj_to->pIndexData->vnum);
+        return false;
+    }
+    
     // Reset either one item or a random item from the 'vnum' list, until desired
     // count is reached or max limit exceeded on item prototypes.
     while (count < minCount) {
@@ -281,7 +286,7 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to)
         if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit)
             break;
 
-        if (pObjIndex->count >= maxCount)
+        if (pObjIndex->count >= maxCount && !isForced && number_range(0,4) != 0)
             break;
 
         Object *obj = create_object(pObjIndex, 0);
@@ -419,12 +424,13 @@ static bool reset_room_mobs(Room *pRoom)
 
 struct ResetRules {
     ResetRules(Room *pRoom, RESET_DATA *pReset, int flags) {
+        isForced = IS_SET(flags, FRESET_ALWAYS);
         resetMobs = true;
         resetFloorItems = true;
         resetChestLocks = true;
 
         // FRESET_ALWAYS overrides all other conditions and resets everything.
-        if (IS_SET(flags, FRESET_ALWAYS))
+        if (isForced)
             return;   
 
         if (IS_SET(pReset->flags, RESET_NEVER)) {
@@ -448,6 +454,7 @@ struct ResetRules {
     bool resetMobs;
     bool resetFloorItems;
     bool resetChestLocks;
+    bool isForced;
 };
 
 void reset_room(Room *pRoom, int flags)
@@ -590,7 +597,7 @@ void reset_room(Room *pRoom, int flags)
                 break;
             }
 
-            if (create_item_for_container(pReset, obj_to)) {
+            if (create_item_for_container(pReset, obj_to, rules.isForced)) {
                 changedObj = true;
                 last = true;
             } else {

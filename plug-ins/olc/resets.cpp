@@ -387,6 +387,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                     pReset->arg2 = is_number(arg6) ? atoi(arg6) : 1;
                     pReset->arg3 = is_number(arg5) ? atoi(arg5) : 1;
                     pReset->arg4 = is_number(arg7) ? atoi(arg7) : 1;
+                    pReset->vnums.push_back(pReset->arg1);
                 }
                 else if (!str_cmp(arg4, "room")) {
                     pReset = new reset_data();
