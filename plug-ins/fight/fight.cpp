@@ -88,6 +88,7 @@
 #include "magic.h"
 #include "vnum.h"
 #include "wearloc_utils.h"
+#include "defaultwearlocation.h"
 #include "skill_utils.h"
 
 #include "onehit_undef.h"
@@ -130,6 +131,13 @@ static bool oprog_fight_carry( Object *obj, Character *ch )
     FENIA_CALL( obj, "FightCarry", "C", ch );
     FENIA_NDX_CALL( obj, "FightCarry", "OC", obj, ch );
     return false;
+}
+
+static void wlprog_fight( Object *obj, Character *ch)
+{
+    DefaultWearlocation *wearloc = dynamic_cast<DefaultWearlocation *>(obj->wear_loc.getElement());
+    if (wearloc)
+        wearloc->triggersOnFight(ch, obj);
 }
 
 
@@ -207,6 +215,9 @@ void violence_update( )
                         oprog_fight( obj, ch );
                     else
                         oprog_fight_carry(obj, ch);
+
+                    if (obj_is_worn(obj)) 
+                        wlprog_fight(obj, ch);
                 }
             }
         } catch (const VictimDeathException &vde) {

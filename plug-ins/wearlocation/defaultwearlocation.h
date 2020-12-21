@@ -50,10 +50,16 @@ public:
     virtual bool wearAtomic( Character *ch, Object *obj, int flags );
 
     virtual void display( Character *, DisplayList & );
+    // TODO consider moving these two methods to the base class.
+    virtual bool displayFlags(Character *ch, Object *obj) { return true; }
+    virtual DLString displayName(Character *ch, Object *obj);
+
     virtual int canWear( Character *ch, Object *obj, int flags );
     virtual bool canWear( Character *ch, int flags );
     virtual bool canRemove( Character *ch, Object *obj, int flags );
     virtual bool canRemove( Character *ch, int flags );
+
+    virtual void triggersOnFight(Character *ch, Object *obj) { };
 
 protected:
     virtual void affectsOnEquip( Character *ch, Object *obj );

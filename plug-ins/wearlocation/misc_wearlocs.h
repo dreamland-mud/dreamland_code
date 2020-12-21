@@ -25,6 +25,17 @@ public:
     virtual int canWear( Character *ch, Object *obj, int flags );
 };
 
+class SheathWearloc : public DefaultWearlocation {
+XML_OBJECT    
+public:
+    typedef ::Pointer<SheathWearloc> Pointer;
+
+    virtual bool displayFlags(Character *ch, Object *obj);
+    virtual DLString displayName(Character *ch, Object *obj);
+    virtual void triggersOnFight(Character *ch, Object *obj);
+};
+
+
 class HorseWearloc : public DefaultWearlocation {
 XML_OBJECT    
 public:

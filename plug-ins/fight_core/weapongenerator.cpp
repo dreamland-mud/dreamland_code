@@ -432,6 +432,8 @@ void WeaponGenerator::setShortDescr() const
         myshort += " " + randomNoun; // боли
 
     obj->setShortDescr(myshort.c_str());
+
+    obj->properties["eqName"] = nameConfig["short"].asString(); // 'буздыган' in sheath wearloc
 }
 
 const WeaponGenerator & WeaponGenerator::assignNames() const
@@ -453,8 +455,10 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
         return *this;
 
     DLString myshort = obj->getShortDescr();
-    myshort = "{" + colour + myshort.colourStrip() + "{x";
+    if (obj->getProperty("eqName").empty())
+        obj->properties["eqName"] = myshort;
 
+    myshort = "{" + colour + myshort.colourStrip() + "{x";
     obj->setShortDescr(myshort.c_str());
     return *this;
 }

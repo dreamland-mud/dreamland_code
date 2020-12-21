@@ -215,6 +215,7 @@ static void randomize_item(Object *obj, RESET_DATA *pReset)
             pReset->rand.name().c_str(),
             obj->pIndexData->vnum, obj->getID(), 
             obj->getProperty("tier").c_str(), obj->getRoom()->vnum);
+
 }
 
 /** Equip an item if required by reset configuration. */

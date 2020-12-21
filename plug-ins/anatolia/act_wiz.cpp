@@ -1172,9 +1172,22 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         obj->behavior.toStream( ostr );
         ch->send_to( ostr );
+    } else {
+        ch->send_to("\n\r");
     }
 
-    ch->send_to("\n\r");
+    if (!obj->properties.empty()) {
+        ostringstream ostr;
+
+        ostr << "Свойства: ";
+        for (auto &prop: obj->properties)
+            ostr << "{g" << prop.first << "{x: \"" << prop.second << "\"  ";
+        ostr << endl;
+
+        ch->send_to(ostr);
+    }
+
+    
 }
 
 

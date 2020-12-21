@@ -15,6 +15,8 @@
 #include "mercdb.h"
 #include "def.h"
 
+WEARLOC(sheath);
+
 static char get_item_colour(RESET_DATA *pReset)
 {
     if (pReset->bestTier <= 0 || pReset->rand == RAND_NONE)
@@ -26,6 +28,26 @@ static char get_item_colour(RESET_DATA *pReset)
         return 'w';
     else
         return clr.at(0);
+}
+
+static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex)
+{
+    ostringstream buf;
+    Wearlocation *wearloc = 
+        (pReset->command == 'E' ? wearlocationManager->find(pReset->arg3) : wear_none.getElement());
+    DLString id = "reset " + DLString(iReset) + " wear";
+    DLString label = "{y[" + wearloc->getName() + "]";
+
+    StringList commands;
+    for (int i = 0; i < wearlocationManager->size(); i++) {
+        const DLString &wname = wearlocationManager->find(i)->getName();
+        DLString exclude = "tat_";
+        if (!exclude.strPrefix(wname))
+            commands.push_back("$ " + wname);
+    }
+
+    buf << web_menu(commands, id, label);        
+    return buf.str();
 }
 
 static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex)
@@ -41,9 +63,9 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
         commands.push_back("$ normal");
         commands.push_back("$ rand_stat");
         commands.push_back("$ rand_all");
-        DLString label = "{y[" + pReset->rand.message() + "]{x";
+        DLString label = "{y[" + pReset->rand.name() + "]";
 
-        buf << web_menu(commands, id, label);
+        buf << web_menu(commands, id, label) << " ";
     }
 
     if (pReset->rand != RAND_NONE) {
@@ -53,7 +75,7 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
         for (int t = BEST_TIER + 1; t <= WORST_TIER; t++)
             commands.push_back("$ " + DLString(t));
 
-        DLString label = "{y[tier " + DLString(pReset->bestTier) + "]{x";
+        DLString label = "{y[tier " + DLString(pReset->bestTier) + "]";
 
         buf << web_menu(commands, id, label);
     }
@@ -175,14 +197,12 @@ static void display_resets(Character * ch)
                 break;
             }
 
-            line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s {y%-8.8s{x %s{x\n\r";
+            line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s %s %s{x\n\r";
             buf << fmt(0, line.c_str(),
                       pReset->arg1,
                       get_item_colour(pReset),
                       russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
-                      (cmd == 'G') ?
-                          wear_none.getName( ).c_str( )
-                          : wearlocationManager->find( pReset->arg3 )->getName( ).c_str( ),
+                      show_reset_wearloc(ch, iReset+1, pReset, pObj).c_str(),
                       show_reset_rand(ch, iReset+1, pReset, pObj).c_str());
             break;
 
@@ -328,6 +348,16 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 ptc(ch, "Best tier for reset {W%d{x changed to {g%d{x.\r\n", insert_loc+1, pReset->bestTier);
             }
 
+            if (pReset->command == 'E') {
+                if (pReset->rand != RAND_NONE && pReset->arg3 == wear_wield) {
+                    pReset->arg3 = wear_sheath;
+                    stc("Changed wearlocation from 'wield' to 'sheath'.\r\n", ch);
+                } else if (pReset->rand == RAND_NONE && pReset->arg3 == wear_sheath) {
+                    pReset->arg3 = wear_wield;
+                    stc("Changed wearlocation from 'sheath' to 'wield'.\r\n", ch);
+                }
+            }
+
             SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
             __do_resets(ch, const_cast<char *>(""));
             return;
@@ -349,6 +379,43 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             pReset = pRoom->resets.at(insert_loc);
             pReset->bestTier = tier;
             ptc(ch, "Best tier for reset {W%d{x set to {g%d{x.\r\n", insert_loc+1, tier);
+            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            __do_resets(ch, const_cast<char *>(""));
+            return;
+        }
+
+        if (arg_oneof(arg2, "wearloc", "слот")) {
+            int insert_loc = find_reset(pRoom, arg1);
+            if (insert_loc < 0) {
+                stc("Reset with this number not found.\r\n", ch);
+                return;
+            }
+
+            pReset = pRoom->resets.at(insert_loc);
+            if (pReset->command != 'E' && pReset->command != 'G') {
+                ptc(ch, "Reset has to be a mob equipment or inventory reset.\r\n");
+                return;
+            }
+
+            Wearlocation *wearloc = wearlocationManager->findExisting(argument);
+            if (!wearloc) {
+                ptc(ch, "Wearloc slot '%s' not found, see {y{hcolchelp wearloc{x for a full list.\r\n", argument);
+                return;
+            }
+
+            pReset->arg3 = wearloc->getIndex();
+            ptc(ch, "Wearloc for %d is now %s.\r\n", insert_loc+1, wearloc->getName().c_str());
+
+            if (pReset->arg3 == wear_none) {                
+                if (pReset->command == 'E') {
+                    pReset->command = 'G';
+                    ptc(ch, "Also changing reset type from 'equip' to 'inventory'.\r\n");
+                }
+            } else if (pReset->command == 'G') {
+                pReset->command = 'E';
+                ptc(ch, "Also changing reset type from 'inventory' to 'equip'.\r\n");
+            }
+
             SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
             __do_resets(ch, const_cast<char *>(""));
             return;
@@ -405,7 +472,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                     Wearlocation *wl;
                     
                     if (!( wl = wearlocationManager->findExisting( arg4 ) )) {
-                        stc("Resets: '? wear-loc'\n\r", ch);
+                        stc("Resets: 'olchelp wearloc'\n\r", ch);
                         return;
                     }
                     pReset = new reset_data();
@@ -437,5 +504,6 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     stc("        RESET <number> FLAG <flags to toggle>\n\r", ch);
     stc("        RESET <number> RAND <normal|rand_stat|rand_all>\n\r", ch);
     stc("        RESET <number> TIER <1..5>\n\r", ch);
+    stc("        RESET <number> WEAR <slot>\n\r", ch);
 }
 

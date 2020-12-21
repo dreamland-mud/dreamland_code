@@ -465,3 +465,7 @@ void DefaultWearlocation::display( Character *ch, Wearlocation::DisplayList &eq 
         eq.push_back( make_pair( msgDisplay, (Object *)NULL ) );
 }
 
+DLString DefaultWearlocation::displayName(Character *ch, Object *obj)
+{
+    return obj->getShortDescr('1');
+}

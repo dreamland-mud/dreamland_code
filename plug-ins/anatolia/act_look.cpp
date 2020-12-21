@@ -39,6 +39,7 @@
 #include "liquid.h"
 #include "room.h"
 #include "desire.h"
+#include "defaultwearlocation.h"
 
 #include "descriptor.h"
 #include "webmanip.h"
@@ -214,7 +215,8 @@ DLString format_longdescr_to_char(const char *descr, Character *ch)
 DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
 {
     std::ostringstream buf;
-   
+    DefaultWearlocation *wearloc = 0;
+
     // Hide items without short description inside object lists.
     if (fShort && is_empty_descr( obj->getShortDescr( ) ))
             return "";
@@ -223,43 +225,50 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     if (!fShort && is_empty_descr( obj->getDescription( ) ))
         return "";
     
+    if (obj->wear_loc != wear_none)
+        wearloc = dynamic_cast<DefaultWearlocation *>(obj->wear_loc.getElement());
+
 #define FMT(cond, buf, ch, lng, color, letter)        \
     if (!(ch)->is_npc() && IS_SET((ch)->getPC()->config, CONFIG_SHORT_OBJFLAG))   \
         buf << color << ((cond) ? letter : ".");      \
     else if ((cond))                                  \
         buf << lng;                                   
 
-    FMT( true, buf, ch, "", "{x", "[" );
-    
-    FMT( IS_OBJ_STAT(obj, ITEM_INVIS), buf, ch,
-         "({DНевидимо{x) ", "{D", "Н" );
+    if (!wearloc || wearloc->displayFlags(ch, obj)) {
+        FMT( true, buf, ch, "", "{x", "[" );
         
-    FMT( CAN_DETECT(ch, DETECT_EVIL) && IS_OBJ_STAT(obj, ITEM_EVIL), buf, ch,
-         "({RКрасная Аура{x) ", "{R", "З" );
-        
-    FMT( CAN_DETECT(ch, DETECT_GOOD) && IS_OBJ_STAT(obj,ITEM_BLESS), buf, ch,
-        "({CГолубая Аура{x) ", "{C", "Б" );
+        FMT( IS_OBJ_STAT(obj, ITEM_INVIS), buf, ch,
+            "({DНевидимо{x) ", "{D", "Н" );
             
-    if (obj->item_type == ITEM_PORTAL) {
-        FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch, 
-            "(Магическое) ", "{w", "М" );
-    } else {
-        FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch,
-            "(Заколдовано) ", "{w", "М" );
+        FMT( CAN_DETECT(ch, DETECT_EVIL) && IS_OBJ_STAT(obj, ITEM_EVIL), buf, ch,
+            "({RКрасная Аура{x) ", "{R", "З" );
+            
+        FMT( CAN_DETECT(ch, DETECT_GOOD) && IS_OBJ_STAT(obj,ITEM_BLESS), buf, ch,
+            "({CГолубая Аура{x) ", "{C", "Б" );
+                
+        if (obj->item_type == ITEM_PORTAL) {
+            FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch, 
+                "(Магическое) ", "{w", "М" );
+        } else {
+            FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch,
+                "(Заколдовано) ", "{w", "М" );
+        }
+
+        FMT( IS_OBJ_STAT(obj, ITEM_GLOW), buf, ch,
+            "({MПылает{x) ", "{M", "П" ); 
+
+        FMT( IS_OBJ_STAT(obj, ITEM_HUM), buf, ch,   
+            "({cВибрирует{x) ", "{c", "В" );
+    
+        FMT( true, buf, ch, "", "{x", "] " );
     }
-
-    FMT( IS_OBJ_STAT(obj, ITEM_GLOW), buf, ch,
-        "({MПылает{x) ", "{M", "П" ); 
-
-    FMT( IS_OBJ_STAT(obj, ITEM_HUM), buf, ch,   
-        "({cВибрирует{x) ", "{c", "В" );
-   
-    FMT( true, buf, ch, "", "{x", "] " );
 #undef FMT
     
     if (fShort)
     {
-        buf << "{" << CLR_OBJ(ch) << obj->getShortDescr( '1' ) << "{x";
+        buf << "{" << CLR_OBJ(ch) 
+            << (wearloc ? wearloc->displayName(ch, obj) : obj->getShortDescr( '1' ))
+            << "{x";
 
         if (obj->pIndexData->vnum > 5)        /* money, gold, etc */
             if (obj->condition <= 99 )
@@ -1373,7 +1382,7 @@ static void do_look_object( Character *ch, Object *obj )
 
         for (int i = 0; i < wearlocationManager->size( ); i++) {
             Wearlocation *loc = wearlocationManager->find( i );
-            if (loc->matches( obj )) {
+            if (loc->matches( obj ) && !loc->getPurpose().empty()) {
                 buf << ", " << loc->getPurpose( ).toLower( );
                 break;
             }
@@ -1561,7 +1570,6 @@ CMDRUNP( read )
 CMDRUNP( examine )
 {
     char arg[MAX_INPUT_LENGTH];
-    Object *obj;
     Character *victim;
 
     if (eyes_blinded( ch )) {

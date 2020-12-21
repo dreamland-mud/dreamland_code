@@ -137,6 +137,35 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
     return RC_WEAR_OK;
 }
 
+/*
+ * sheath (random weapons wearloc)
+ */
+bool SheathWearloc::displayFlags(Character *ch, Object *obj)
+{
+    return false;
+}
+
+DLString SheathWearloc::displayName(Character *ch, Object *obj)
+{
+    DLString eqName = obj->getProperty("eqName");
+
+    if (!eqName.empty())
+        return eqName.ruscase('1');
+
+    return DefaultWearlocation::displayName(ch, obj);
+}
+
+void SheathWearloc::triggersOnFight(Character *ch, Object *obj)
+{
+    Object *wield = wear_wield->find(ch);
+    if (wield)
+        wear_wield->unequip(wield);
+
+    ch->pecho("Ты выхватываешь %O4 из-за спины.", obj);
+    ch->recho("%^C1 выхватывает %O4 из-за спины!", ch, obj);
+
+    obj->wear_loc = wear_wield;
+}
 
 /*
  * wield 

@@ -339,7 +339,7 @@ CMDRUNP( auction )
 
                             for (int i = 0; i < wearlocationManager->size( ); i++) {
                                 Wearlocation *loc = wearlocationManager->find( i );
-                                if (loc->matches( obj ))
+                                if (loc->matches( obj ) && !loc->getPurpose().empty())
                                     purposes[loc->getPurpose( )] = true;
                             }
                             for (p = purposes.begin( ); p != purposes.end( ); p++)
