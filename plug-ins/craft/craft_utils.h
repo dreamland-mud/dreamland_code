@@ -4,10 +4,8 @@
 #include "pointer.h"
 
 class XMLAttributeCraft;
-class PCharacter;
-class Character;
+class CharacterMemoryInterface;
 
-::Pointer<XMLAttributeCraft> craft_attr(PCharacter *ch);
-::Pointer<XMLAttributeCraft> craft_attr(Character *ch);
+::Pointer<XMLAttributeCraft> craft_attr(CharacterMemoryInterface *ch);
 
 #endif

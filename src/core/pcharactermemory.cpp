@@ -244,3 +244,28 @@ PCharacter * PCharacterMemory::getPlayer( )
 {
     return NULL;
 }
+
+NPCharacter * PCharacterMemory::getMobile( ) 
+{
+    return NULL;
+}
+
+PCSkills & PCharacterMemory::getSkills()
+{
+    return skills;        
+}
+
+void PCharacterMemory::setSkills(const PCSkills &skills)
+{
+    this->skills = skills;        
+}
+
+PCBonuses & PCharacterMemory::getBonuses()
+{
+    return bonuses;        
+}
+
+void PCharacterMemory::setBonuses(const PCBonuses &bonuses)
+{
+    this->bonuses = bonuses;        
+}

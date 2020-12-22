@@ -157,7 +157,6 @@ NMI_GET( MobIndexWrapper, area, "зона, в которой прописан м
 
 NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 
 {
-    RESET_DATA *pReset;
     RegList::Pointer rc(NEW);
     
     checkTarget( );

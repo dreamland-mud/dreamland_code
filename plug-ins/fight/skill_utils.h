@@ -4,6 +4,7 @@
 #include "dlstring.h"
 
 class Skill;
+class CharacterMemoryInterface;
 class Character;
 class PCharacter;
 class PCSkillData;
@@ -13,7 +14,7 @@ class XMLSkillReference;
  * Return true if this skill is a temporary one for the character
  * and is active at current day of the year.
  */
-bool temporary_skill_active( const Skill *skill, Character *ch );
+bool temporary_skill_active( const Skill *skill, CharacterMemoryInterface *ch );
 
 /**
  * Return true if this skill data corresponds to an active temporary skill.

@@ -23,12 +23,12 @@ GROUP(defensive);
 GSN(turlok_fury);
 GSN(athena_wisdom);
 
-bool temporary_skill_active( const Skill *skill, Character *ch )
+bool temporary_skill_active( const Skill *skill, CharacterMemoryInterface *mem )
 {
-    if (ch->is_npc())
+    if (!mem->getPCM())
         return false;
     
-    PCSkillData &data = ch->getPC()->getSkillData(skill->getIndex());
+    PCSkillData &data = mem->getPCM()->getSkills().get(skill->getIndex());
     return temporary_skill_active(data);
 }
 

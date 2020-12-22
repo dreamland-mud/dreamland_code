@@ -28,7 +28,7 @@ public:
 
     virtual void loaded( );
     virtual SkillGroupReference & getGroup( );
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
@@ -48,7 +48,7 @@ public:
 protected:
     static const DLString CATEGORY;
     
-    const SkillClanInfo *getClanInfo( Character * ) const;
+    const SkillClanInfo *getClanInfo( CharacterMemoryInterface * ) const;
 
     XML_VARIABLE MobSkillData mob;
 

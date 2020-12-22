@@ -31,7 +31,7 @@ SkillGroupReference & CardSkill::getGroup( )
     return group_card_pack;
 }
 
-bool CardSkill::visible( Character * ch ) const
+bool CardSkill::visible( CharacterMemoryInterface * ch ) const
 {
     return isCard( ch );
 }
@@ -109,14 +109,14 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
 /*---------------------------------------------------------------------------
  * 
  *---------------------------------------------------------------------------*/
-int CardSkill::findCardLevel( Character *ch ) 
+int CardSkill::findCardLevel( CharacterMemoryInterface *mem ) 
 {
     XMLAttributeCards::Pointer attr;
     
-    if (ch->is_npc( ))
+    if (!mem->getPCM())
         return -1;
     
-    attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
+    attr = mem->getPCM()->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
 
     if (!attr)
         return -1;
@@ -127,7 +127,7 @@ int CardSkill::findCardLevel( Character *ch )
     return attr->getLevel( );
 }
 
-bool CardSkill::isCard( Character *ch )
+bool CardSkill::isCard( CharacterMemoryInterface *mem )
 {
-    return findCardLevel( ch ) >= 0;
+    return findCardLevel( mem ) >= 0;
 }

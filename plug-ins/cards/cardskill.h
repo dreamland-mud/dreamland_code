@@ -20,7 +20,7 @@ public:
 
     virtual SkillGroupReference & getGroup( );
     
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
@@ -37,8 +37,8 @@ public:
     }
 
 protected:
-    static bool isCard( Character * );
-    static int findCardLevel( Character * );
+    static bool isCard( CharacterMemoryInterface * );
+    static int findCardLevel( CharacterMemoryInterface * );
 
     static const DLString CATEGORY;
 

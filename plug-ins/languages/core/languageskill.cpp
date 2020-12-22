@@ -35,19 +35,19 @@ HelpArticlePointer Language::getSkillHelp( ) const
 }
 
 
-bool Language::visible( Character * ch ) const
+bool Language::visible( CharacterMemoryInterface * ch ) const
 {
-    if (!Command::available( ch ))
+    if (Command::getLevel() > ch->get_trust())
         return false;
 
-    if (ch->is_immortal( ) && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
+    if (ch->getPCM() && ch->getLevel( ) >= LEVEL_IMMORTAL)
         return true;
     
-    if (ch->is_npc( ))
+    if (!ch->getPCM())
         return false;
 
-    const RaceLangInfo *race = getRaceInfo( ch->getPC( ) );
-    const ClassLangInfo *prof = getClassInfo( ch->getPC( ) );
+    const RaceLangInfo *race = getRaceInfo( ch );
+    const ClassLangInfo *prof = getClassInfo( ch );
     
     return   (prof && prof->available( ))
           || (race && race->available( ));

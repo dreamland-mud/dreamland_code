@@ -36,10 +36,13 @@ SkillGroupReference &CraftSkill::getGroup( )
     return group;
 }
 
-bool CraftSkill::visible( Character *ch ) const
+bool CraftSkill::visible( CharacterMemoryInterface *ch ) const
 {
+    if (!ch->getPCM())
+        return false;
+
     CraftProfessions::const_iterator sp;
-    XMLAttributeCraft::Pointer attr = craft_attr(ch);
+    XMLAttributeCraft::Pointer attr = craft_attr(ch->getPCM());
 
     if (!attr) 
         return false;

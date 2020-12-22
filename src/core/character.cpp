@@ -294,6 +294,16 @@ void Character::setSex( short sex )
     updateCachedNoun( );
 }
 
+PCharacter * Character::getPlayer( )
+{
+    return getPC();
+}
+
+NPCharacter * Character::getMobile( )
+{
+    return getNPC();
+}
+
 
 /*****************************************************************************
  * name and sex formatting

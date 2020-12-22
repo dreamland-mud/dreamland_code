@@ -24,11 +24,11 @@ RaceAptitude::RaceAptitude( )
 {
 }
 
-bool RaceAptitude::visible( Character * ch ) const
+bool RaceAptitude::visible( CharacterMemoryInterface * ch ) const
 {
     const SkillRaceInfo *ri;
 
-    if (ch->is_npc( ) && mob.visible( ch->getNPC( ), this ) == MPROF_ANY)
+    if (ch->getMobile( ) && mob.visible( ch->getMobile( ), this ) == MPROF_ANY)
         return true;
     
     ri = getRaceInfo( ch );
@@ -128,7 +128,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
 }
 
 const SkillRaceInfo *
-RaceAptitude::getRaceInfo( Character *ch ) const
+RaceAptitude::getRaceInfo( CharacterMemoryInterface *ch ) const
 {
     Races::const_iterator i = races.find( ch->getRace( )->getName( ) );
     

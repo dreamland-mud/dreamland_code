@@ -84,7 +84,7 @@ public:
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
     virtual SkillGroupReference & getGroup( );
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
@@ -122,8 +122,8 @@ protected:
     Word createPersonalWord( ) const;
     DLString getRandomEffectName( bool ) const;
     virtual void dream( const Word &, PCharacter * ) const = 0;
-    const RaceLangInfo * getRaceInfo( PCharacter * ) const;
-    const ClassLangInfo * getClassInfo( PCharacter * ) const;
+    const RaceLangInfo * getRaceInfo( CharacterMemoryInterface * ) const;
+    const ClassLangInfo * getClassInfo( CharacterMemoryInterface * ) const;
     WordContainer * locateWord( Word &, PCharacter *, const DLString & ) const;
 
     static const DLString CATEGORY;

@@ -36,7 +36,7 @@
 /*
  * ExoticSkill
  */
-bool ExoticSkill::visible( Character * ) const
+bool ExoticSkill::visible( CharacterMemoryInterface * ) const
 {
     return false;
 }

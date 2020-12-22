@@ -88,28 +88,32 @@ bool MobileProfession::isPlayed( ) const
     return false;
 }
 
-GlobalBitvector MobileProfession::toVector( Character *ch ) const
+GlobalBitvector MobileProfession::toVector( CharacterMemoryInterface *mem ) const
 {
-    checkTarget( ch );
+    checkTarget( mem );
     
-    GlobalBitvector bv = DefaultProfession::toVector( ch );
+    GlobalBitvector bv = DefaultProfession::toVector( mem );
 
-    if (IS_SET(ch->act, ACT_NECROMANCER))  bv.set( prof_necromancer );
-    if (IS_SET(ch->act, ACT_UNDEAD))       bv.set( prof_necromancer );
-    if (IS_SET(ch->act, ACT_WARRIOR))      bv.set( prof_warrior );
-    if (IS_SET(ch->act, ACT_THIEF))        bv.set( prof_thief );
-    if (IS_SET(ch->act, ACT_CLERIC))       bv.set( prof_cleric );
-    if (IS_SET(ch->act, ACT_MAGE))         bv.set( prof_warlock );
-    if (IS_SET(ch->act, ACT_MAGE))         bv.set( prof_witch );
-    if (IS_SET(ch->act, ACT_VAMPIRE))      bv.set( prof_vampire );
-    if (IS_SET(ch->act, ACT_RANGER))       bv.set( prof_ranger );
+    if (mem->getMobile()) {
+        NPCharacter *ch = mem->getMobile();
+        
+        if (IS_SET(ch->act, ACT_NECROMANCER))  bv.set( prof_necromancer );
+        if (IS_SET(ch->act, ACT_UNDEAD))       bv.set( prof_necromancer );
+        if (IS_SET(ch->act, ACT_WARRIOR))      bv.set( prof_warrior );
+        if (IS_SET(ch->act, ACT_THIEF))        bv.set( prof_thief );
+        if (IS_SET(ch->act, ACT_CLERIC))       bv.set( prof_cleric );
+        if (IS_SET(ch->act, ACT_MAGE))         bv.set( prof_warlock );
+        if (IS_SET(ch->act, ACT_MAGE))         bv.set( prof_witch );
+        if (IS_SET(ch->act, ACT_VAMPIRE))      bv.set( prof_vampire );
+        if (IS_SET(ch->act, ACT_RANGER))       bv.set( prof_ranger );
+    }
 
     return bv;
 }
 
-void MobileProfession::checkTarget( Character *ch ) const 
+void MobileProfession::checkTarget( CharacterMemoryInterface *ch ) const 
 {
-    if (!ch->is_npc( ))
+    if (ch->getPCM())
         throw Exception( ch->getName( ) + " has mobile profession!" );
 }
 

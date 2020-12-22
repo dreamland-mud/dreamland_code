@@ -97,6 +97,8 @@ public:
     virtual const PCharacter *getPC( ) const = 0;
     virtual const NPCharacter *getNPC( ) const = 0;
     virtual bool is_npc( ) const = 0;
+    virtual PCharacter * getPlayer( );
+    virtual NPCharacter * getMobile( );
     
     // set-get methods inherited from CharacterMemoryInterface
     virtual const DLString& getName( ) const ;

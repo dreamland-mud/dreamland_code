@@ -11,15 +11,15 @@ ClanOrgSkill::ClanOrgSkill( )
 {
 }
 
-bool ClanOrgSkill::visible( Character * ch ) const
+bool ClanOrgSkill::visible( CharacterMemoryInterface * ch ) const
 {
     if (!ClanSkill::visible( ch ))
         return false;
 
-    if (ch->is_npc( ))
+    if (!ch->getPCM())
         return false;
     
-    return (getOrgInfo( ch->getPC( ) ) != NULL);
+    return (getOrgInfo( ch->getPCM( ) ) != NULL);
 }
 
 bool ClanOrgSkill::available( Character * ch ) const
@@ -41,7 +41,7 @@ bool ClanOrgSkill::available( Character * ch ) const
 }
 
 const SkillOrgInfo * 
-ClanOrgSkill::getOrgInfo( PCharacter *pch ) const
+ClanOrgSkill::getOrgInfo( PCMemoryInterface *pch ) const
 {
     XMLStringAttribute::Pointer attr;
     Organizations::const_iterator o;

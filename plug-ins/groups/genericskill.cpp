@@ -85,7 +85,7 @@ void GenericSkill::unresolve( )
 /*
  * виден ли скилл этому чару в принципе, независимо от уровня.
  */
-bool GenericSkill::visible( Character *ch ) const
+bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
 {
     const SkillRaceBonus *rb; 
     const SkillClassInfo *ci;
@@ -93,8 +93,8 @@ bool GenericSkill::visible( Character *ch ) const
     if (hidden.getValue( ))
         return false;
 
-    if (ch->is_npc( )) {
-        switch (mob.visible( ch->getNPC( ), this )) {
+    if (mem->getMobile()) {
+        switch (mob.visible( mem->getMobile(), this )) {
         case MPROF_ANY:
             return true;
         case MPROF_NONE:
@@ -104,15 +104,15 @@ bool GenericSkill::visible( Character *ch ) const
         }
     }
     
-    rb = getRaceBonus( ch );
+    rb = getRaceBonus( mem );
     if (rb && rb->visible( ))
         return true;
     
-    ci = getClassInfo( ch );
+    ci = getClassInfo( mem );
     if (ci && ci->visible( ))
         return true;
 
-    if (temporary_skill_active(this, ch))
+    if (temporary_skill_active(this, mem))
         return true;
  
     return false;
@@ -409,7 +409,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
  * Мобы могут быть "многоклассовыми", в соотв-и со своими act-flags.
  */
 const SkillClassInfo *
-GenericSkill::getClassInfo( Character *ch ) const
+GenericSkill::getClassInfo( CharacterMemoryInterface *ch ) const
 {
     vector<int> proffi = ch->getProfession( )->toVector( ch ).toArray( );
     int minLevel = LEVEL_IMMORTAL;
@@ -428,36 +428,12 @@ GenericSkill::getClassInfo( Character *ch ) const
     return bestClass;
 }
 
-SkillClassInfo *
-GenericSkill::getClassInfo( PCharacter *ch ) 
-{
-    Classes::iterator iter = classes.find( ch->getProfession( )->getName( ) );
-
-    if (iter == classes.end( ) || iter->second.getClanAntiBonus( ch ))
-        return NULL;
-    else 
-        return &iter->second;
-}
-
-SkillClassInfo * 
-GenericSkill::getClassInfo( const DLString &className )
-{
-    GenericSkill::Classes::iterator c;
-
-    c = classes.find( className );
-
-    if (c == classes.end( ))
-        throw Exception( "Skill " + getName( ) + " declared as parent, "
-                         "doesnt have entry for " + className + "'" );
-
-    return &c->second;
-}
 
 /*
  * возвращает инфо о расовом бонусе для чара (if any)
  */
 const SkillRaceBonus *
-GenericSkill::getRaceBonus( Character *ch ) const
+GenericSkill::getRaceBonus( CharacterMemoryInterface *ch ) const
 {
     RaceBonuses::const_iterator i = raceBonuses.find( ch->getRace( )->getName( ) );
 
@@ -468,7 +444,7 @@ GenericSkill::getRaceBonus( Character *ch ) const
  * соответствует ли этот скил какому-либо расовому аффекту для чара?
  * (пример: sneak - AFF_SNEAK)
  */
-bool GenericSkill::isRaceAffect( Character *ch ) const
+bool GenericSkill::isRaceAffect( CharacterMemoryInterface *ch ) const
 {
     return ch->getRace( )->getAff( ).isSet( raceAffect.getValue( ) );
 }
@@ -495,7 +471,7 @@ SkillClassInfo::SkillClassInfo( )
  * для данной профессии
  */
 const SkillClanAntiBonus *
-SkillClassInfo::getClanAntiBonus( Character *ch ) const
+SkillClassInfo::getClanAntiBonus( CharacterMemoryInterface *ch ) const
 {
     ClanAntiBonuses::const_iterator i;
 

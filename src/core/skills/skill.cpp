@@ -75,7 +75,7 @@ const RussianString &Skill::getDammsg( ) const
     static RussianString dammsg("тупость");
     return dammsg;
 }
-bool Skill::visible( Character * ) const
+bool Skill::visible( CharacterMemoryInterface * ) const
 {
     return false;
 }
