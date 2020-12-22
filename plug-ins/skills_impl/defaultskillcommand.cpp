@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "skill.h"
+#include "character.h"
 #include "defaultskillcommand.h"
 #include "commandflags.h"
 #include "commandmanager.h"
