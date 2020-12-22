@@ -74,7 +74,7 @@ public:
             int vnum = wch->getNPC()->pIndexData->vnum;
             PCMemoryInterface *owner = PCharacterManager::find(creature->creatorName);
             if (!owner) {
-                notice("Mob %d in room [%d] [%s] extracted, no owner.", vnum, wch->in_room->vnum, wch->in_room->name);
+                notice("Mob %d in room [%d] [%s] extracted, no owner.", vnum, wch->in_room->vnum, wch->in_room->getName());
                 continue;
             }
 
@@ -88,7 +88,7 @@ public:
             Skill::Pointer skill = spell->getSkill();
             if (!skill->visible(owner)) {
                 notice("Mob %d in room [%d] [%s] extracted, owner %s (%s, clan %s) doesn't know skill %s.",
-                        vnum, wch->in_room->vnum, wch->in_room->name, 
+                        vnum, wch->in_room->vnum, wch->in_room->getName(), 
                         owner->getName().c_str(), owner->getProfession()->getName().c_str(),
                         owner->getClan()->getName().c_str(), skill->getName().c_str());
                 continue;
@@ -111,7 +111,7 @@ public:
             }
 
             notice("Mob %d moved from room [%d] [%s] to storage room [%d], owner %s offline for more than a day", 
-                    vnum, wch->in_room->vnum, wch->in_room->name,
+                    vnum, wch->in_room->vnum, wch->in_room->getName(),
                     rvnum, owner->getName().c_str());
         }
     }
