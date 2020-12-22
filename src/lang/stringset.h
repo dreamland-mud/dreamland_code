@@ -32,6 +32,7 @@ public:
     NumberSet(const DLString &);
     void fromStringSet( const StringSet & );
     StringSet toStringSet( ) const;
+    int randomNumber() const;
 };
 
 struct StringStorage {

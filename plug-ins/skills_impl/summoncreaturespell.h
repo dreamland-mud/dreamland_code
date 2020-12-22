@@ -8,6 +8,7 @@
 #include "xmlstring.h"
 #include "xmllonglong.h"
 #include "xmlinteger.h"
+#include "xmlstringlist.h"
 #include "spelltemplate.h"
 #include "mobilebehavior.h"
 
@@ -18,7 +19,9 @@ public:
 
     virtual void run( Character *, Character *, int, int );
     virtual void run( Character *, char *, int, int );
-
+    int getMobVnum() const { return mobVnum; }
+    const NumberSet & getStorageVnums() const { return storageVnums; }
+    
 protected:
     int countMobiles( Character * ) const;
     NPCharacter * createMobileAux( Character *, int, int, int, int, int, int ) const;
@@ -29,6 +32,7 @@ protected:
     XML_VARIABLE XMLInteger castMobCount;
     XML_VARIABLE XMLInteger postaffectDuration;
     XML_VARIABLE XMLInteger mobVnum;
+    XML_VARIABLE XMLNumberSet storageVnums;
     XML_VARIABLE XMLString msgStillAffected;
     XML_VARIABLE XMLString msgTooManyMobiles;
     XML_VARIABLE XMLString msgCreateAttemptSelf, msgCreateAttemptRoom, msgCreateAttemptArea;
