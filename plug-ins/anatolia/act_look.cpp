@@ -45,6 +45,7 @@
 #include "webmanip.h"
 #include "websocketrpc.h"
 #include "comm.h"
+#include "weapontier.h"
 #include "gsn_plugin.h"
 #include "directions.h"
 #include "attract.h"
@@ -209,6 +210,22 @@ DLString format_longdescr_to_char(const char *descr, Character *ch)
     return buf.str();
 }
 
+static void format_screenreader_flags(Object *obj, ostringstream &buf, Character *ch)
+{
+    if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER))
+        return;
+
+    DLString aura = get_tier_aura(obj);
+    if (!aura.empty()) {
+        buf << aura << " ";
+        return;
+    }
+
+    DLString myshort = obj->getShortDescr();
+    if (myshort.find('{') != DLString::npos)
+        buf << "(Яркое) ";
+}
+
 /*
  * Show object on the floor or in inventory/equipment/container...
  */
@@ -235,6 +252,8 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
         buf << lng;                                   
 
     if (!wearloc || wearloc->displayFlags(ch, obj)) {
+        format_screenreader_flags(obj, buf, ch);
+
         FMT( true, buf, ch, "", "{x", "[" );
         
         FMT( IS_OBJ_STAT(obj, ITEM_INVIS), buf, ch,

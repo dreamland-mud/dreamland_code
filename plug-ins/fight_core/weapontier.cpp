@@ -1,4 +1,7 @@
 #include "weapontier.h"
+#include "core/object.h"
+#include "merc.h"
+#include "def.h"
 
 /*-----------------------------------------------------------------------------
  * Weapon tiers
@@ -22,4 +25,27 @@ CONFIGURABLE_LOADED(fight, weapon_tiers)
     weapon_tier_table.fromJson(value);
 }
 
+int get_item_tier(Object *obj)
+{
+    DLString tierName = obj->getProperty("tier");
 
+    if (!tierName.isNumber())
+        return 0;
+
+    int tier = tierName.toInt();        
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        return 0;
+
+    return tier;
+}
+
+DLString get_tier_aura(Object *obj)
+{
+    int tier = get_item_tier(obj);
+    if (tier > 0) {
+        weapon_tier_t &one_tier = weapon_tier_table[tier - 1];
+        return one_tier.aura;
+    }
+
+    return DLString::emptyString;
+}
