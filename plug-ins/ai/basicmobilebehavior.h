@@ -50,6 +50,7 @@ public:
     virtual int  getOccupation( );
     virtual bool canCancel( Character * );
     virtual bool isAfterCharm( ) const;
+    virtual long long getLastCharmTime() const;
 
     void rememberFought(Character *victim);
 

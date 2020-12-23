@@ -12,6 +12,8 @@
 #include "spelltemplate.h"
 #include "mobilebehavior.h"
 
+class PCMemoryInterface;
+
 class SummonCreatureSpell : public virtual DefaultSpell {
 XML_OBJECT
 public:
@@ -78,7 +80,11 @@ public:
     typedef ::Pointer<SummonedCreature> Pointer;
     
     virtual void conjure( );
+    virtual bool hourly( );
 
+    SummonCreatureSpell::Pointer getMySpell() const;
+    PCMemoryInterface * getMyCreator() const;
+    
     XML_VARIABLE XMLLongLong creatorID;
     XML_VARIABLE XMLString creatorName;
 };

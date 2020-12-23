@@ -195,8 +195,13 @@ bool BasicMobileBehavior::isAfterCharm( ) const
     if (RIDDEN( ch ))
         return true;
         
-    return lastCharmTime.getValue( ) + AI_CHARM_RECOVER_TIME 
+    return getLastCharmTime() + AI_CHARM_RECOVER_TIME 
                     >= dreamland->getCurrentTime( );
+}
+
+long long BasicMobileBehavior::getLastCharmTime() const
+{
+    return lastCharmTime.getValue();
 }
 
 /*

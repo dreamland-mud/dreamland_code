@@ -16,6 +16,7 @@ public:
         typedef ::Pointer<QuestBag> Pointer;
         
         virtual bool canLock( Character * );
+        virtual bool hourly();
 };
 
 #endif

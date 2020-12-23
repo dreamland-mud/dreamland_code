@@ -29,8 +29,6 @@
 #include "vnum.h"
 #include "def.h"
 
-#define ROOM_VNUM_LOST_PROPERTY_OFFICE 3078
-
 
 GlobalQuest::GlobalQuest( )
 {
@@ -265,7 +263,7 @@ void GlobalQuest::wipeRoom( Room *room ) const
     }
     
     pit = find_pit_in_room(ROOM_VNUM_ALTAR);
-    office = get_room_instance( ROOM_VNUM_LOST_PROPERTY_OFFICE );
+    office = get_room_instance( ROOM_VNUM_BUREAU_2 );
     
     for (Object *obj = room->contents; obj; obj = obj_next) {
         int v = obj->pIndexData->vnum;

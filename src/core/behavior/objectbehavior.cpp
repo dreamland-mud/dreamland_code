@@ -83,6 +83,11 @@ bool ObjectBehavior::area( ) {
     return false;
 }
 
+bool ObjectBehavior::hourly()
+{
+    return false;
+}
+
 bool ObjectBehavior::extract( bool ) {
     obj = NULL; 
     return false;
