@@ -1,6 +1,7 @@
 
-#include "character.h"
+#include "npcharacter.h"
 #include "room.h"
+#include "core/object.h"
 #include "wearlocation.h"
 #include "../anatolia/handler.h"
 #include "olcstate.h"
@@ -10,7 +11,9 @@
 #include "act.h"
 #include "websocketrpc.h"
 #include "weapontier.h"
+#include "interp.h"
 #include "comm.h"
+#include "update_areas.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -326,6 +329,9 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
+        argument = one_argument(argument, arg3);
+        argument = one_argument(argument, arg4);
+
         if (arg_oneof(arg2, "rand", "ранд")) {
             int insert_loc = find_reset(pRoom, arg1);
             if (insert_loc < 0) {
@@ -334,7 +340,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
 
             pReset = pRoom->resets.at(insert_loc);
-            int rand = rand_table.value(argument, false);
+            int rand = rand_table.value(arg3, false);
             if (rand == NO_FLAG) {
                 stc("Rand value no found, see {y{hcolchelp rand_table{x.\r\n", ch);
                 return;
@@ -359,7 +365,8 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
 
             SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
-            __do_resets(ch, const_cast<char *>(""));
+            if (str_cmp(arg4, "quiet"))
+                __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
@@ -370,7 +377,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 return;
             }
 
-            int tier = atoi(argument);
+            int tier = atoi(arg3);
             if (tier < BEST_TIER || tier > WORST_TIER) {
                 ptc(ch, "Tier must be a number from %d to %d.\r\n", BEST_TIER, WORST_TIER);
                 return;
@@ -380,7 +387,8 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             pReset->bestTier = tier;
             ptc(ch, "Best tier for reset {W%d{x set to {g%d{x.\r\n", insert_loc+1, tier);
             SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
-            __do_resets(ch, const_cast<char *>(""));
+            if (str_cmp(arg4, "quiet"))
+                __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
@@ -397,7 +405,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 return;
             }
 
-            Wearlocation *wearloc = wearlocationManager->findExisting(argument);
+            Wearlocation *wearloc = wearlocationManager->findExisting(arg3);
             if (!wearloc) {
                 ptc(ch, "Wearloc slot '%s' not found, see {y{hcolchelp wearloc{x for a full list.\r\n", argument);
                 return;
@@ -417,12 +425,11 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
 
             SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
-            __do_resets(ch, const_cast<char *>(""));
+            if (str_cmp(arg4, "quiet"))
+                __do_resets(ch, const_cast<char *>(""));
             return;
         }
 
-        argument = one_argument(argument, arg3);
-        argument = one_argument(argument, arg4);
         argument = one_argument(argument, arg5);
         argument = one_argument(argument, arg6);
         argument = one_argument(argument, arg7);
@@ -507,3 +514,102 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     stc("        RESET <number> WEAR <slot>\n\r", ch);
 }
 
+// randomize <vnum> <rand_flag> [best_tier]
+CMD(randomize, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
+        "Weapon generator support command.")
+{
+    DLString args = argument;
+    DLString arg1 = args.getOneArgument();
+    DLString arg2 = args.getOneArgument();
+    DLString arg3 = args.getOneArgument();
+
+    if (arg1.empty() || arg2.empty()) {
+        ch->println("Usage: randomize <vnum> <rand_flag> [best_tier]");    
+        return;
+    }
+
+    Integer vnum;
+    if (!Integer::tryParse(vnum, arg1)) {
+        ch->println("Vnum is not a number.");
+        return;
+    }
+
+    OBJ_INDEX_DATA *pObjIndex = get_obj_index(vnum);
+    if (!pObjIndex) {
+        ch->printf("Item with vnum %d doesn't exist.\r\n", vnum.getValue());
+        return;
+    }
+
+    if (pObjIndex->item_type != ITEM_WEAPON) {
+        ch->printf("Item %s [%d] is not a weapon.\r\n", 
+                    russian_case(pObjIndex->short_descr, '1').c_str(), pObjIndex->vnum);
+        return;
+    }
+
+    bool success = false;
+    for (auto &r : roomIndexMap) {
+        RoomIndexData *pRoom = r.second;
+        int cnt = 0;
+
+        for (auto &pReset : pRoom->resets) {
+            cnt++;
+            switch (pReset->command) {
+            case 'G':
+            case 'E':
+            case 'O':
+            case 'P':
+                if (pReset->arg1 == pObjIndex->vnum) {
+                    ch->printf("{CChanging %c reset in room [%d] %s:{x\r\n", pReset->command, pRoom->vnum, pRoom->name);
+
+                    int old_value = pReset->rand;
+                    DLString rargs = DLString(pRoom->vnum) + " resets " + DLString(cnt) + " rand " + arg2 + " quiet";
+                    interpret_raw(ch, "at", rargs.c_str());
+                    success |= (old_value != pReset->rand);
+
+                    if (!arg3.empty()) {
+                        int old_value = pReset->bestTier;
+                        rargs = DLString(pRoom->vnum) + " resets " + DLString(cnt) + " tier " + arg3 + " quiet";
+                        interpret_raw(ch, "at", rargs.c_str());
+                        success |= (old_value != pReset->bestTier);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    if (success) {
+        Object *obj, *obj_next;
+        ostringstream buf;
+
+        ch->println("{CReviewing all item locations:{x");
+        
+        for (obj = object_list; obj; obj = obj_next) {
+            obj_next = obj->next;
+            if (obj->pIndexData != pObjIndex)
+                continue;
+
+            Room *room = obj->getRoom();
+
+            if (obj->reset_mob > 0 && obj->carried_by && obj->carried_by->getID() == obj->reset_mob) {
+                buf << "...destroyed at mob [" << obj->carried_by->getNPC()->pIndexData->vnum << "] "
+                    << "in room [" << room->vnum << "] " << room->getName() << endl;
+            }
+            else if (obj->reset_room > 0 && obj->in_room && obj->in_room->vnum == obj->reset_room) {
+                buf << "...destroyed in room [" << room->vnum << "] " << room->getName() << endl;
+            }
+            else if (obj->reset_obj > 9 && obj->in_obj && obj->in_obj->getID() == obj->reset_obj) {
+                buf << "...destroyed inside obj [" << obj->in_obj->pIndexData->vnum << "] in room "
+                    << room->vnum << "] " << room->getName() << endl;
+            } else {
+                buf << "Cannot destroy item " << obj->getID() << " not in reset location, room " << obj->getRoom()->vnum << endl;
+                continue;
+            }
+
+            extract_obj(obj);
+            reset_room(room, FRESET_ALWAYS);
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+    }
+}
