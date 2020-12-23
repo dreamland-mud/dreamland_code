@@ -57,7 +57,7 @@ bool PersonalQuestReward::hourly()
     if (!obj->in_room)
         return false;
 
-    if (IS_SET(obj->in_room->room_flags, ROOM_MANSION))
+    if (IS_SET(obj->in_room->room_flags, ROOM_MANSION|ROOM_GODS_ONLY))
         return false;
 
     if (obj->in_room->vnum == ROOM_VNUM_BUREAU_1 || 
