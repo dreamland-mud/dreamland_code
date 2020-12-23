@@ -595,7 +595,8 @@ CMDRUN( drink )
     arg = arguments.getOneArgument( );
 
     if (arg.empty( )) {
-        if (!( obj = get_obj_room_type( ch, ITEM_FOUNTAIN ) )) {
+        obj = get_obj_room_type( ch, ITEM_FOUNTAIN );
+        if (!obj && ch->in_room->pIndexData->liquid == liq_none) {
             ch->send_to("Выпить что?\n\r");
             return;
         }
@@ -607,29 +608,34 @@ CMDRUN( drink )
         }
     }
 
-    switch (obj->item_type) {
-    default:
-        ch->pecho("Ты не можешь пить из %O2.", obj);
-        return;
-
-    case ITEM_FOUNTAIN:
-        liquid = liquidManager->find( obj->value2() );
-        amount = liquid->getSipSize( ) * 3;
-        break;
-
-    case ITEM_DRINK_CON:
-        if (drink_is_closed( obj, ch ))
+    if (obj) {
+        switch (obj->item_type) {
+        default:
+            ch->pecho("Ты не можешь пить из %O2.", obj);
             return;
 
-        if (obj->value1() <= 0) {
-            ch->send_to("Здесь пусто.\n\r");
-            return;
+        case ITEM_FOUNTAIN:
+            liquid = liquidManager->find( obj->value2() );
+            amount = liquid->getSipSize( ) * 3;
+            break;
+
+        case ITEM_DRINK_CON:
+            if (drink_is_closed( obj, ch ))
+                return;
+
+            if (obj->value1() <= 0) {
+                ch->send_to("Здесь пусто.\n\r");
+                return;
+            }
+
+            liquid = liquidManager->find( obj->value2() );
+            amount = liquid->getSipSize( );
+            amount = min(amount, obj->value1());
+            break;
         }
-
-        liquid = liquidManager->find( obj->value2() );
-        amount = liquid->getSipSize( );
-        amount = min(amount, obj->value1());
-        break;
+    } else {
+        liquid = ch->in_room->pIndexData->liquid.getElement();
+        amount = liquid->getSipSize( ) * 3;
     }
     
     if (!ch->is_npc( ))
@@ -639,8 +645,13 @@ CMDRUN( drink )
     
     DLString buf = liquid->getShortDescr( ).ruscase( '4' );
 
-    act( "$c1 пьет $T из $o2.", ch,obj,buf.c_str( ),TO_ROOM );
-    act( "Ты пьешь $T из $o2.", ch,obj,buf.c_str( ),TO_CHAR );
+    if (obj) {
+        act( "$c1 пьет $T из $o2.", ch,obj,buf.c_str( ),TO_ROOM );
+        act( "Ты пьешь $T из $o2.", ch,obj,buf.c_str( ),TO_CHAR );
+    } else {
+        act( "$c1 зачерпывает и пьет $T.", ch, 0, buf.c_str( ),TO_ROOM );
+        act( "Ты зачерпываешь и пьешь $T.", ch, 0, buf.c_str( ),TO_CHAR );
+    }
 
     if (ch->fighting != 0)
          ch->setWaitViolence( 3 );
@@ -649,7 +660,7 @@ CMDRUN( drink )
         for (int i = 0; i < desireManager->size( ); i++)
             desireManager->find( i )->drink( ch->getPC( ), amount, liquid );
     
-    if (IS_SET( obj->value3(), DRINK_POISONED ) || obj->isAffected(gsn_poison))
+    if (obj && (IS_SET( obj->value3(), DRINK_POISONED ) || obj->isAffected(gsn_poison)))
     {
         /* The drink was poisoned ! */
         Affect af;
@@ -664,16 +675,16 @@ CMDRUN( drink )
         affect_join( ch, &af );
     }
 
-    if (obj->value0() > 0)
+    if (obj && obj->value0() > 0)
         obj->value1(obj->value1() - amount);
 
-    if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
+    if (obj && obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
         drink->drink( ch, amount );
 
     if (mprog_drink( ch, obj, liquid->getName( ).c_str( ), amount ))
         return;
 
-    if (oprog_drink( obj, ch, liquid->getName( ).c_str( ), amount ))
+    if (obj && oprog_drink( obj, ch, liquid->getName( ).c_str( ), amount ))
         return;
 
     for (Object *o = ch->carrying; o; o = o->next_content)
@@ -683,7 +694,7 @@ CMDRUN( drink )
     if (mprog_drink_near( ch, obj, liquid->getName( ).c_str( ), amount ))
         return;
 
-    if (IS_OBJ_STAT(obj, ITEM_BLESS) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
+    if (obj && IS_OBJ_STAT(obj, ITEM_BLESS) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
         ch->pecho("Святость %O2 обжигает твои внутренности!", obj);
         ch->recho("Лицо %^C2 искажается гримасой боли.", ch);
         rawdamage(ch, ch, DAM_HOLY, ch->hit / 100 + 1, true);
