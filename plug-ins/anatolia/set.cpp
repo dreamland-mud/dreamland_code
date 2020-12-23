@@ -1087,11 +1087,11 @@ void oset( Character* ch, char* argument )
         if ( arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0' )
         {
                 ch->send_to("Syntax:\n\r");
-                ch->send_to("  set obj <object> <field> <value>\n\r");
+                ch->send_to("  set obj <object> <field> <value> [<value>]\n\r");
                 ch->send_to("  Field being one of:\n\r");
                 ch->send_to("    value0 value1 value2 value3 value4 (v1-v4) \n\r");
                 ch->send_to("    cost extra level material owner timer wear\n\r");
-                ch->send_to("    weight gender personal\n\r");
+                ch->send_to("    weight gender personal property\n\r");
                 return;
         }
 
@@ -1105,6 +1105,17 @@ void oset( Character* ch, char* argument )
         if ( !str_cmp( arg2, "material") )
         {
             obj->setMaterial( arg3 );
+        }
+        else if (!str_cmp(arg2, "property")) {
+            DLString value = arg3;
+            DLString key = value.getOneArgument();
+
+            if (value.empty()) {
+                ch->println("Syntax: set obj <object> property <key> <value>");
+                return;
+            }
+
+            obj->properties[key] = value;
         }
         else
         if ( !str_cmp( arg2, "owner") )
