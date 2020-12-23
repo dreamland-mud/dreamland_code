@@ -254,6 +254,9 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     if (!wearloc || wearloc->displayFlags(ch, obj)) {
         format_screenreader_flags(obj, buf, ch);
 
+        if (obj->behavior)
+            obj->behavior->show(ch, buf);
+
         FMT( true, buf, ch, "", "{x", "[" );
         
         FMT( IS_OBJ_STAT(obj, ITEM_INVIS), buf, ch,
@@ -1688,7 +1691,10 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     ContainerKeyhole( ch, obj ).doExamine( );
 
     if (IS_SET(obj->value1(), CONT_LOCKED)) {
-        ch->pecho("%1$^O1 заперт%1$Gо||а на ключ, сперва отопри.", obj);
+        if (obj->behavior && !obj->behavior->canLock(ch) && obj->value2() <= 0)
+            ch->pecho("%^O1 -- чья-то личная собственность, отпереть сможет только хозяин или хозяйка.", obj);
+        else
+            ch->pecho("%1$^O1 заперт%1$Gо||а на ключ, сперва отопри.", obj);
         return true;
     }
 

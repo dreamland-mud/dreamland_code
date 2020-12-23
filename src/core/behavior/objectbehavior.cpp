@@ -79,6 +79,11 @@ bool ObjectBehavior::death( Character *victim ) {
 void ObjectBehavior::speech( Character *victim, const char *speech ) { 
 }
 
+void ObjectBehavior::show( Character *victim, ostringstream &buf )
+{
+
+}
+
 bool ObjectBehavior::area( ) { 
     return false;
 }

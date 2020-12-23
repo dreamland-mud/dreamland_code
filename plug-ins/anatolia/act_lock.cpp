@@ -782,13 +782,16 @@ CMDRUNP( unlock )
                     return;
             }
 
-            if ((obj->behavior && obj->behavior->canLock( ch ))
-                || get_key_carry( ch, obj->value2())) 
+            bool canLock = obj->behavior && obj->behavior->canLock( ch );
+
+            if (canLock || get_key_carry( ch, obj->value2())) 
             {
                 obj->value1(obj->value1() & ~CONT_LOCKED);
                 act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
                 act_p("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
-                
+            } else if (!canLock && obj->value2() <= 0) {
+                ch->pecho("%^O1 -- чья-то личная собственность, ключ есть только у хозяина или хозяйки.", obj);
+                return;
             } else {
                 ch->println( "У тебя нет ключа." );
                 return;

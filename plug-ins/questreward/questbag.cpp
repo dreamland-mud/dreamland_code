@@ -66,3 +66,8 @@ bool QuestBag::hourly()
     return true;
 }
 
+void QuestBag::show( Character *victim, ostringstream &buf )
+{
+    if (!obj->hasOwner(victim))
+        buf << "({YЛичное{x) ";
+}
