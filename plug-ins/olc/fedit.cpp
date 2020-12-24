@@ -159,5 +159,6 @@ CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.
     OLCStateFile::Pointer fe(NEW, cfg);
     fe->attach(ch);
     fe->show(ch);
+    fe->handle(ch->desc, const_cast<char *>("text web"));
 }
 

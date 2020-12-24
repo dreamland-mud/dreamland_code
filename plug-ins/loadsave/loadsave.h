@@ -40,7 +40,7 @@ void                clone_object         ( Object *parent, Object *clone );
 void        affect_to_obj    ( Object *, const Affect *paf );
 void        affect_remove_obj( Object *, Affect *paf );
 void        affect_enchant   ( Object *obj );
-void        affect_enhance   ( Object *obj, Affect * );
+void        affect_enhance   ( Object *obj, const Affect * );
 void        affect_modify    ( Character *ch, Affect *paf, bool fAdd );
 void        affect_check         ( Character *ch, Affect *old_paf);
 void        affect_to_char         ( Character *ch, Affect *paf );

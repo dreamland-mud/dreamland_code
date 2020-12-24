@@ -96,7 +96,7 @@ void affect_to_obj( Object *obj, const Affect *paf )
     }
 }
 
-void affect_enhance( Object *obj, Affect *newAff )
+void affect_enhance( Object *obj, const Affect *newAff )
 {
     for (auto &paf: obj->affected) {
         if (paf->location != newAff->location)

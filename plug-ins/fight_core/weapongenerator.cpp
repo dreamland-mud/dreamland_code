@@ -476,7 +476,7 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
 const WeaponGenerator & WeaponGenerator::assignAffects() const
 {
     for (auto &af: affects) {
-        affect_to_obj(obj, &af);
+        affect_enhance(obj, &af);
     }
 
     obj->enchanted = true;
