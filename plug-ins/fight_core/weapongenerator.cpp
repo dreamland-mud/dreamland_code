@@ -105,6 +105,7 @@ WeaponGenerator & WeaponGenerator::randomWeaponClass()
     wclass = allClasses[random_index];
     wclassConfig = weapon_classes[wclass];
     obj->value0(weapon_class.value(wclass));
+    obj->value4(0);
 
     return *this;
 }
