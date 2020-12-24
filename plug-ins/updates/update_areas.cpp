@@ -151,11 +151,14 @@ static void randomize_item(Object *obj, RESET_DATA *pReset)
     }
 
     Character *mob = obj->getCarrier();
-    
+    int align = ALIGN_NONE;
+    if (mob && !mob_has_occupation(mob->getNPC(), OCC_SHOPPER))
+        align = mob->alignment;
+
     WeaponGenerator gen;
     gen.item(obj)
         .randomTier(pReset->bestTier)
-        .alignment(mob ? (int)mob->alignment : ALIGN_NONE);
+        .alignment(align);
 
     if (pReset->rand == RAND_ALL) {
         gen.randomWeaponClass()
