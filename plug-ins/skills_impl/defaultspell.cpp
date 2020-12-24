@@ -267,14 +267,6 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     slevel += ch->getPC()->mod_level_groups[skill->getGroup()];
     slevel += ch->getPC()->mod_level_skills[skill->getIndex()];
     slevel += ch->getPC()->mod_level_all;
-    if (old_level != slevel && ch->isCoder()) 
-        ch->printf(">>> changing spell level from %d to %d.\n", old_level, slevel);
-
-    if (slevel > mlevel+5)
-        notice("DefaultSpell::getSpellLevel %s class %s clan %s: mlevel=%d slevel=%d old_level=%d range=%d",
-               ch->getName().c_str(), ch->getProfession()->getName().c_str(), ch->getClan()->getName().c_str(),
-               mlevel, slevel, old_level, range);
-
 
     return slevel;
 }

@@ -558,6 +558,8 @@ void clone_object(Object *parent, Object *clone)
         clone->extra_descr          = ed_new;
     }
 
+    for (auto &p: parent->properties)
+        clone->properties[p.first] = p.second;
 }
 
 

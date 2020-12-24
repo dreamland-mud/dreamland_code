@@ -283,7 +283,9 @@ CMDRUN( buy )
                 && (obj->pIndexData->limit < 0 
             || obj->pIndexData->limit > obj->pIndexData->count))
         {
-            t_obj = create_object( obj->pIndexData, obj->level );
+            t_obj = create_object(obj->pIndexData, 0);
+            clone_object(obj, t_obj);
+            REMOVE_BIT(t_obj->extra_flags, ITEM_INVENTORY);
         }
         else
         {
