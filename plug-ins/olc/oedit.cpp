@@ -426,18 +426,17 @@ OEDIT(addaffect)
 {
     OBJ_INDEX_DATA *pObj;
     Affect *pAf;
-    char buf[MAX_STRING_LENGTH];
     int mod = 0, loc;
     const FlagTable *table = 0;
     GlobalRegistryBase *registry = 0;
     bitstring_t bit = 0;
     list<GlobalRegistryElement *> elements;
+    DLString args = argument;
+    DLString buf = args.getOneArgument();
 
     EDIT_OBJ(ch, pObj);
 
-    argument = one_argument(argument, buf);
-
-    if (!*buf) {
+    if (buf.empty()) {
         stc("Syntax:  addaffect [location] [#mod] [table] [bit]\n\r", ch);
         return false;
     }
@@ -448,16 +447,17 @@ OEDIT(addaffect)
         return false;
     }
     
-    argument = one_argument(argument, buf);
-    if(!*buf || !is_number(buf)) {
+    buf = args.getOneArgument();
+    
+    if(buf.empty() || !buf.isNumber()) {
         stc("Number expected after location identifier\n\r", ch);
         return false;
     }
-    mod = atoi(buf);
+    mod = atoi(buf.c_str());
 
-    argument = one_argument(argument, buf);
+    buf = args.getOneArgument();
 
-    if(*buf) {
+    if(!buf.empty()) {
         table = FlagTableRegistry::getTable(buf);
         if (!table) {
             auto r = registryMap.find(buf);
@@ -472,15 +472,15 @@ OEDIT(addaffect)
         }
 
         if (table) {
-            bit = table->bitstring(argument);
+            bit = table->bitstring(args);
             if (bit == NO_FLAG) {
-                ptc(ch, "Invalid flag, see 'olchelp %s' for the list of values.\r\n", buf);
+                ptc(ch, "Invalid flag, see 'olchelp %s' for the list of values.\r\n", buf.c_str());
                 return false;
             }
         } else {
-            elements = registry->findAll(argument);
+            elements = registry->findAll(args);
             if (elements.empty()) {
-                ptc(ch, "Elements with names \"%s\" not found in %s.\r\n", argument, buf);
+                ptc(ch, "Elements with names \"%s\" not found in %s.\r\n", args.c_str(), buf.c_str());
                 return false;
             }
         }
