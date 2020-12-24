@@ -18,6 +18,7 @@
 #include "attacks.h"
 #include "loadsave.h"
 #include "dl_math.h"
+#include "math_utils.h"
 #include "merc.h"
 #include "def.h"
 
@@ -66,9 +67,12 @@ WeaponGenerator & WeaponGenerator::item(Object *obj)
 { 
     this->obj = obj; 
     wclass = weapon_class.name(obj->value0());
-    wclassConfig = weapon_classes[wclass];
-    if (wclass.empty())
+    
+    if (weapon_classes.isMember(wclass))
+        wclassConfig = weapon_classes[wclass];
+    else
         warn("Weapon generator: no configuration defined for weapon class %s.", wclass.c_str());
+
      return *this; 
 }
 
@@ -395,7 +399,12 @@ int WeaponGenerator::calcAffectModifier(const Json::Value &afConfig, const affix
 {
     float mult = afConfig.isMember("mult") ? afConfig["mult"].asFloat() : 0;
     int mod = afConfig.isMember("mod") ? afConfig["mod"].asInt() : 0;
-    return mult * info.stack * obj->level + mod;
+    int result = mult * info.stack * obj->level + mod;
+
+    if (result != 0)
+        return result;
+    else
+        return signum(mult) * 1; // return a minimum of +1/-1 when level is too small
 }
 
 void WeaponGenerator::setName() const
