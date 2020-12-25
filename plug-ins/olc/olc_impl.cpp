@@ -64,7 +64,7 @@ public:
 
     virtual int getPriority( ) const
     {
-        return SCDP_ROUND + 90;
+        return SCDP_IOWRITE + 10;
     }
 };
 

@@ -129,8 +129,6 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     // Save changed areas, only authorized areas
     if (!str_cmp("changed", arg1)) {
-        char buf[MAX_INPUT_LENGTH];
-
         save_xmlarea_list();
 
         stc("Saved zones:\n\r", ch);

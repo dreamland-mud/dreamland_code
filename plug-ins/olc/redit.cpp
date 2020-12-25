@@ -424,17 +424,34 @@ void OLCStateRoom::create_exit(RoomIndexData *sourceIndex, int door, RoomIndexDa
     sourceIndex->room->exit[door]->orig_door = door;
 }
 
+void OLCStateRoom::default_door_names(PCharacter *ch, int door)
+{
+    RoomIndexData *pRoom;
+
+    EDIT_ROOM(ch, pRoom);
+
+    if (!pRoom->exit[door]->keyword || !pRoom->exit[door]->keyword[0])
+        change_exit(ch, "name 'door дверь'", door);   
+
+    if (!pRoom->exit[door]->short_descr || !pRoom->exit[door]->short_descr[0])
+        change_exit(ch, "short двер|ь|и|и|ь|ью|и", door);
+}
+
 bool 
-OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
+OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
 {
     // FIXME think of approach to change index data and instance exits at the same time.
     RoomIndexData *pRoom;
     Room *to_room;
     char command[MAX_INPUT_LENGTH];
+    char argumentBuf[MAX_INPUT_LENGTH];
     char arg[MAX_INPUT_LENGTH];
+    char *argument;
     bitstring_t value;
 
     EDIT_ROOM(ch, pRoom);
+    strcpy(argumentBuf, cargument);
+    argument = argumentBuf;
 
     // Set the exit flags, needs full argument.
     // ----------------------------------------
@@ -443,7 +460,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             stc("Здесь нет двери.\n\r", ch);
             return false;
         }
-        
+
         TOGGLE_BIT(pRoom->exit[door]->exit_info_default, value);
         TOGGLE_BIT(pRoom->room->exit[door]->exit_info_default, value);
 
@@ -451,7 +468,11 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         pRoom->exit[door]->exit_info = pRoom->exit[door]->exit_info_default;
         pRoom->room->exit[door]->exit_info = pRoom->room->exit[door]->exit_info_default;
 
-        stc("Exit flag toggled.\n\r", ch);
+        ptc(ch, "Exit flags set to {g%s{x.\n\r", exit_flags.names(pRoom->exit[door]->exit_info_default).c_str());
+
+        if (IS_SET(pRoom->exit[door]->exit_info_default, EX_ISDOOR))
+            default_door_names(ch, door);
+
         return true;
     }
 
@@ -466,16 +487,18 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 
     if (arg_is_help(command)) {
         const char *name = dirs[door].name;
-        ptc(ch, "Syntax:\r\n%s delete         - удалить выход с обеих сторон\r\n", name);
+        ptc(ch, "Syntax:\r\n%s <флаги>        - установить флаги выхода ({y{hcolchelp exit{x)\r\n", name);
+        ptc(ch, "%s delete         - удалить выход с обеих сторон\r\n", name);
         ptc(ch, "%s unlink         - удалить выход только с этой стороны\r\n", name);
         ptc(ch, "%s link <vnum>    - создать двусторонний выход в указанную комнату\r\n", name);
         ptc(ch, "%s room <vnum>    - создать односторонний выход в указанную комнату\r\n", name);
         ptc(ch, "%s dig <vnum>     - вырыть новую комнату %s, с внумом vnum\r\n", name, dirs[door].leave);
         ptc(ch, "%s dig next       - вырыть новую комнату %s, со следующим свободным внумом\r\n", name, dirs[door].leave);
-        ptc(ch, "%s key <vnum>     - установить ключ для двери\r\n", name);
+        ptc(ch, "%s key <vnum>     - установить ключ, флаги и имена дверей по умолчанию\r\n", name);
         ptc(ch, "%s name <string>  - задать ключевые слова для двери\r\n", name);        
         ptc(ch, "%s short <string> - задать название для двери с падежами\r\n", name);        
         ptc(ch, "%s desc           - войти в редактор описания того, что видно по look <dir>\r\n", name);        
+        ptc(ch, "%s copy           - скопировать флаги,имена,ключ на дверь с другой стороны\r\n", name);
         return false;
     }
 
@@ -505,6 +528,50 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         stc("Exit unlinked.\n\r", ch);
         return true;
     }
+
+    if (!str_cmp(command, "copy")) {
+        int rev;
+
+        if (!pRoom->exit[door]) {
+            stc("REdit: Cannot copy a null exit.\n\r", ch);
+            return false;
+        }
+
+        rev = dirs[door].rev;
+        to_room = pRoom->room->exit[door]->u1.to_room;
+        if (!to_room || !to_room->exit[rev] || to_room->exit[rev]->u1.to_room != pRoom->room) {
+            stc("Выхода с другой стороны не существует, либо он не ведет обратно в эту комнату.\r\n", ch);
+            return false;
+        }
+
+        EXIT_DATA *src = pRoom->exit[door];
+        EXIT_DATA *srci = pRoom->room->exit[door];
+        EXIT_DATA *dst = to_room->pIndexData->exit[rev];
+        EXIT_DATA *dsti = to_room->exit[rev];
+
+        dst->exit_info_default = src->exit_info_default;
+        dst->exit_info = dst->exit_info_default;
+        dsti->exit_info_default = srci->exit_info_default;
+        dsti->exit_info = dsti->exit_info_default;
+
+        free_string(dst->keyword);
+        dst->keyword = str_dup(src->keyword);
+        free_string(dsti->keyword);
+        dsti->keyword = str_dup(srci->keyword);
+
+        free_string(dst->short_descr);
+        dst->short_descr = str_dup(src->short_descr);
+        free_string(dsti->short_descr);
+        dsti->short_descr = str_dup(srci->short_descr);
+
+        dst->key = dsti->key = src->key;
+
+        ptc(ch, "У выхода на {g%s{x в комнате [{W%d{x] {W%s{x установлены:\r\n", dirs[rev].name, to_room->vnum, to_room->getName());
+        ptc(ch, "    флаги выхода: {g%s{x\r\n", exit_flags.names(dst->exit_info_default).c_str());
+        ptc(ch, "    имена: '{g%s{x', '{g%s{x'\r\n", dst->keyword, dst->short_descr);
+        ptc(ch, "    ключ: {W%d{x\r\n", dst->key);
+        return true;
+    }   
 
     if (!str_cmp(command, "unlink")) {
         if (!pRoom->exit[door] || !pRoom->room->exit[door]) {
@@ -596,8 +663,9 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
     }
 
     if (!str_cmp(command, "key")) {
-        if (arg[0] == '\0' || !is_number(arg)) {
+        if (arg[0] == '\0' || (!is_number(arg) && !arg_is_clear(arg))) {
             stc("Syntax:  [direction] key [vnum]\n\r", ch);
+            stc("         [direction] key clear\n\r", ch);
             return false;
         }
 
@@ -606,22 +674,51 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             return false;
         }
 
-        value = atoi(arg);
+        if (arg_is_clear(arg)) {
+            if (pRoom->exit[door]->key <= 0) {
+                stc("У этой двери и так нет ключа.\r\n", ch);
+                return false;
+            }
 
-        if (!get_obj_index(value)) {
+            pRoom->exit[door]->key = 0;
+            pRoom->room->exit[door]->key = 0;
+            stc("Ключ удален.\r\n", ch);
+            return true;
+        }
+
+        value = atoi(arg);
+        OBJ_INDEX_DATA *pKey = get_obj_index(value);
+
+        if (!pKey) {
             stc("REdit:  Item doesn't exist.\n\r", ch);
             return false;
         }
 
-        if (get_obj_index(atoi(argument))->item_type != ITEM_KEY) {
-            stc("REdit:  Key doesn't exist.\n\r", ch);
+        if (pKey->item_type != ITEM_KEY) {
+            ptc(ch, "Item %d [%s] is not a key.\r\n", pKey->vnum, russian_case(pKey->short_descr, '1').c_str());
             return false;
         }
 
         pRoom->exit[door]->key = value;
         pRoom->room->exit[door]->key = value;
+        ptc(ch, "Exit key set to {W%d{x [{W%s{x].\r\n",
+            pKey->vnum, russian_case(pKey->short_descr, '1').c_str());
 
-        stc("Exit key set.\n\r", ch);
+        bitstring_t newflags = 0;
+
+        if (!IS_SET(pRoom->exit[door]->exit_info_default, EX_ISDOOR))
+            SET_BIT(newflags, EX_ISDOOR);
+        
+        if (!IS_SET(pRoom->exit[door]->exit_info_default, EX_CLOSED))
+            SET_BIT(newflags, EX_CLOSED);
+        
+        if (!IS_SET(pRoom->exit[door]->exit_info_default, EX_LOCKED))
+            SET_BIT(newflags, EX_LOCKED);
+
+        if (newflags != 0)
+            change_exit(ch, exit_flags.names(newflags).c_str(), door);
+
+        default_door_names(ch, door);
         return true;
     }
 
@@ -641,7 +738,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         free_string(pRoom->room->exit[door]->keyword);
         pRoom->room->exit[door]->keyword = str_dup(arg);
 
-        stc("Exit name set.\n\r", ch);
+        ptc(ch, "Exit name set to {g%s{x.\n\r", arg);
         return true;
     }
 
@@ -661,7 +758,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         free_string(pRoom->room->exit[door]->short_descr);
         pRoom->room->exit[door]->short_descr = str_dup(arg);
 
-        stc("Exit short description set.\n\r", ch);
+        ptc(ch, "Exit short description set to {g%s{x.\n\r", arg);
         return true;
     }
 

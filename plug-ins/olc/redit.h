@@ -25,7 +25,7 @@ public:
     template <typename T>
     bool cmd( PCharacter *, char * );
 
-    bool change_exit(PCharacter *, char *, int);
+    bool change_exit(PCharacter *, const char *, int);
     static RoomIndexData *redit_create(PCharacter *, char *);
     static void show(PCharacter *ch, RoomIndexData *, bool showWeb);
 
@@ -35,6 +35,7 @@ public:
 private:
     virtual void statePrompt( Descriptor * );
 
+    void default_door_names(PCharacter *, int);
     static void create_exit(RoomIndexData *sourceIndex, int door, RoomIndexData *destIndex);
     static void delete_exit(RoomIndexData *pRoom, int door);
 };
