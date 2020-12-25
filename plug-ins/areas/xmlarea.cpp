@@ -359,4 +359,10 @@ XMLArea::save(area_file *af)
     DLFileRead areaFile( dreamland->getAreaDir( ), af->file_name, ".xml" );
     ofstream os( areaFile.getPath( ).c_str( ) );
     doc->save(os);
+
+    if (!os) {
+        DLString msg = "Error saving area " + areaFile.getPath();
+        LogStream::sendSystem() << msg << endl;
+        throw ExceptionDBIO(msg);
+    }
 }
