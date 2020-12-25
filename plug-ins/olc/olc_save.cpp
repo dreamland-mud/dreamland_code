@@ -40,7 +40,9 @@ bool save_xmlarea(struct area_file *af, Character *ch)
         a.areadata.loaded = true;
         a.save(af);
     } catch (const ExceptionDBIO &ex) {
-        ch->printf("{RERROR:{x: %s\r\n", ex.what());
+        if (ch)
+            ch->printf("{RERROR:{x: %s\r\n", ex.what());
+
         return false;
     }
 
