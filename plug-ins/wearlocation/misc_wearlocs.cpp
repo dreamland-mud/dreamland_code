@@ -140,6 +140,11 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
 /*
  * sheath (random weapons wearloc)
  */
+bool SheathWearloc::matches( Character *ch )
+{
+    return true;
+}
+
 bool SheathWearloc::displayFlags(Character *ch, Object *obj)
 {
     return false;

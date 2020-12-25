@@ -30,6 +30,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<SheathWearloc> Pointer;
 
+    virtual bool matches( Character *ch );
     virtual bool displayFlags(Character *ch, Object *obj);
     virtual DLString displayName(Character *ch, Object *obj);
     virtual void triggersOnFight(Character *ch, Object *obj);
