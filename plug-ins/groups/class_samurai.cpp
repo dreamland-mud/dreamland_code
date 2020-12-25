@@ -451,7 +451,7 @@ SKILL_RUNP( katana )
 
                 katana = create_object( get_obj_index( OBJ_VNUM_KATANA_SWORD), ch->getModifyLevel() );
                 katana->cost  = 0;
-                katana->level = ch->getRealLevel( );
+                katana->level = ch->getModifyLevel();
                 ch->mana -= mana;
 
                 WeaponGenerator()
