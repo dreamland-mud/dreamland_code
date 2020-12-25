@@ -9,9 +9,6 @@
 #include <xmldocument.h>
 #include "stringset.h"
 #include "wrapperbase.h"
-#include "dlscheduler.h"
-#include "schedulertaskroundplugin.h"
-#include "plugininitializer.h"
 
 #include <skill.h>
 #include <spell.h>
@@ -223,6 +220,7 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     vector<AreaIndexData *> areas;
     DLString args(argument);
     DLString arg = args.getOneArgument();
+    DLString flagName;
 
     for(auto &pArea: areaIndexes) {
         areas.push_back(pArea);
@@ -234,8 +232,11 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         sort(areas.begin(), areas.end(), area_cmp_name);
     else if (arg_has_oneof(arg, "file", "файл"))
         sort(areas.begin(), areas.end(), area_cmp_filename);
+    else if (arg_has_oneof(arg, "flag", "флаг") && !args.empty())
+        flagName = args;
     else if (!arg.empty()) {
         ch->println("Формат:\r\nalist - список всех арий\r\nalist vnum|name|file - список арий, отсортированный по критерию");
+        ch->println("alist flag <name> - список всех арий с флагом name");
         return;
     }
 
@@ -247,6 +248,12 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
       "Num", "Area Name", "lvnum", "uvnum", "Filename", "Help");
 
     for (auto &pArea: areas) {
+        if (!flagName.empty()) {
+            DLString areaflags = area_flags.names(pArea->area_flag);
+            if (areaflags.find(flagName) == DLString::npos)
+                continue;
+        }
+            
         DLString hedit = "";
         AreaHelp *ahelp = area_selfhelp(pArea);
         if (ahelp && ahelp->getID() > 0) {
