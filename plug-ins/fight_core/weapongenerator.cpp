@@ -266,6 +266,17 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     for (auto const &affixName: nameConfig["prefers"])
         gen.addPreference(affixName.asString());
 
+    // Exclude hr/dr affixes that don't have non-zero values at this level and tier.
+    if (maxHitroll() <= 0) {
+        gen.addForbidden("hr");
+        gen.addForbidden("-hr");
+    }
+
+    if (maxDamroll() <= 0) {
+        gen.addForbidden("dr");
+        gen.addForbidden("-dr");
+    }
+
     gen.setPlayer(pch);
     gen.setAlign(align);
     gen.setRetainChance(retainChance);
