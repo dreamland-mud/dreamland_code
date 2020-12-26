@@ -616,7 +616,7 @@ bool spec_mayor( NPCharacter *ch )
         }
     }
 
-    if ( !move || ch->position < POS_STANDING )
+    if (!move || (ch->position < POS_STANDING && path[pos] != 'W'))
         return false;
 
     if (!cabinet)
@@ -1036,7 +1036,7 @@ bool spec_captain( NPCharacter *ch )
     if ( ch->fighting != 0 )
         return false;
 
-    if ( !move || ch->position < POS_SLEEPING )
+    if ( !move || (ch->position < POS_STANDING && path[pos] != 'W'))
         return false;
 
     switch ( path[pos] )
@@ -1091,7 +1091,7 @@ bool spec_captain( NPCharacter *ch )
 
     case 'C':
         interpret_raw( ch, "close", "gate" );
-        interpret_raw( ch, "lock", "gate" );
+//        interpret_raw( ch, "lock", "gate" );
         break;
 
     case 'n':

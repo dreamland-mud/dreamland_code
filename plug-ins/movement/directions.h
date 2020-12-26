@@ -44,6 +44,9 @@ Room * direction_target(Room *room, int door);
 /** Split direction.victim arguments. */
 bool direction_range_argument(const DLString &cargs, DLString &argDoor, DLString &argVict, int &door);
 
+/** Return door connecting two rooms. */
+int door_between_rooms(Room *src, Room *target);
+
 #define FEX_NONE     (0)
 #define FEX_NO_INVIS (A)
 #define FEX_DOOR     (B)
