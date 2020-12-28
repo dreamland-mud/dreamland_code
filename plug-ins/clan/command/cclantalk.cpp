@@ -113,7 +113,7 @@ COMMAND(CClanTalk, "cb")
 
     act_buf << "{" << ch->getClan( )->getColor( ) << "["
             << ch->getClan( )->getShortName( ) << "] " 
-            << "%1$C1: %2$s {x";
+            << "%1$C1:{x %2$s {x";
     act_str = act_buf.str( );
     
     if (dreamland->hasOption( DL_LOG_COMM ))
@@ -171,7 +171,7 @@ void clantalk( Clan &clan, const char *format, ... )
     va_end( ap );
 
     buf << "{" << clan.getColor( ) 
-        << "[" << clan.getShortName( ) << "] : "
+        << "[" << clan.getShortName( ) << "] :{x "
         << msg << "{x" << endl;
 
     for (Descriptor *d = descriptor_list; d != 0; d = d->next) 
