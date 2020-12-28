@@ -109,7 +109,7 @@ WeaponGenerator & WeaponGenerator::randomWeaponClass()
     wclass = allClasses[random_index];
     wclassConfig = weapon_classes[wclass];
     obj->value0(weapon_class.value(wclass));
-    obj->value4(0);
+    obj->extra_flags = 0;
 
     return *this;
 }
@@ -508,7 +508,7 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
 {
     SET_BIT(obj->extra_flags, extraFlags.getValue());
     SET_BIT(obj->extra_flags, weapon_tier_table[valTier-1].extra.getValue());
-    obj->value4(obj->value4() | weaponFlags.getValue());
+    obj->value4(weaponFlags.getValue());
 
     // Set weight: 0.4 kg by default in OLC, 2kg for two hand.
     // TODO: Weight is very approximate, doesn't depend on weapon type.
