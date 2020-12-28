@@ -224,20 +224,24 @@ static void randomize_item(Object *obj, RESET_DATA *pReset)
 /** Equip an item if required by reset configuration. */
 static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob, bool verbose)
 {
-    if (pReset->command == 'E' && obj->wear_loc == wear_none) {
-        Wearlocation *wloc = wearlocationManager->find( pReset->arg3 );
-        if (!wloc)
-            return;
+    if (pReset->command != 'E')
+        return;
 
-        // Equip an item back, removing an odd item that ended up in that slot, i.e. scavenged weapons.
-        if (verbose && obj->level <= mob->getRealLevel()) {
-            Object *worn = wloc->find(mob);
-            if (!worn || worn->pIndexData != obj->pIndexData)
-                wloc->wear(obj, F_WEAR_VERBOSE | F_WEAR_REPLACE);
-        }
-        else { // New mob and item.
-            wloc->equip(obj);
-        }
+    Wearlocation *wloc = wearlocationManager->find( pReset->arg3 );
+    if (!wloc)
+        return;
+    
+    if (obj->wear_loc == wloc->getIndex())
+        return;
+        
+    // Equip an item back, removing an odd item that ended up in that slot, i.e. scavenged weapons.
+    if (verbose && obj->level <= mob->getRealLevel()) {
+        Object *worn = wloc->find(mob);
+        if (!worn || worn->pIndexData != obj->pIndexData)
+            wloc->wear(obj, F_WEAR_VERBOSE | F_WEAR_REPLACE);
+    }
+    else { // New mob and item.
+        wloc->equip(obj);
     }
 }
 
