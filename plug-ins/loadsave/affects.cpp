@@ -10,6 +10,7 @@
 #include "liquid.h"
 #include "wearlocation.h"
 #include "affect.h"
+#include "affectmanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -26,7 +27,7 @@ Affect * Affect::clone() const
 {
     Affect *paf;
 
-    paf = dallocate( Affect );
+    paf = AffectManager::getThis()->getAffect();
     copyTo(*paf);
 
     return paf;
@@ -57,6 +58,9 @@ void Affect::copyTo(Affect &target) const
  */
 void affect_remove_obj( Object *obj, Affect *paf )
 {
+    if (paf->isExtracted())
+        return;
+
     if ( obj->affected.empty())
     {
         bug( "Affect_remove_object: no affect.", 0 );
@@ -81,7 +85,7 @@ void affect_remove_obj( Object *obj, Affect *paf )
     if (obj->carried_by != NULL && obj->wear_loc != wear_none)
         affect_check(obj->carried_by, paf);
 
-    ddeallocate( paf );
+    AffectManager::getThis()->extract(paf);
 }
 
 void affect_to_obj( Object *obj, const Affect *paf )
@@ -326,6 +330,9 @@ void affect_to_char( Character *ch, Affect *paf )
  */
 void affect_remove( Character *ch, Affect *paf )
 {
+        if (paf->isExtracted())
+            return;
+            
         bool need_saving = false;
 
         if ( ch->affected.empty())
@@ -348,7 +355,7 @@ void affect_remove( Character *ch, Affect *paf )
         if ( need_saving )
                 save_mobs( ch->in_room );
 
-        ddeallocate( paf );
+        AffectManager::getThis()->extract(paf);
 }
 
 /*

@@ -397,7 +397,7 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
     sword = create_object(get_obj_index(sword_vnum), level);
     sword->timer = level * 2;
     sword->cost = 0;
-    sword->level = ch->getRealLevel();
+    sword->level = ch->getModifyLevel();
 
     WeaponGenerator()
         .item(sword)

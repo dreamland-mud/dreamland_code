@@ -39,7 +39,6 @@
 #include "liquid.h"
 #include "room.h"
 #include "desire.h"
-#include "defaultwearlocation.h"
 
 #include "descriptor.h"
 #include "webmanip.h"
@@ -232,7 +231,7 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
 DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
 {
     std::ostringstream buf;
-    DefaultWearlocation *wearloc = 0;
+    Wearlocation *wearloc = obj->wear_loc.getElement();
 
     // Hide items without short description inside object lists.
     if (fShort && is_empty_descr( obj->getShortDescr( ) ))
@@ -242,16 +241,13 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     if (!fShort && is_empty_descr( obj->getDescription( ) ))
         return "";
     
-    if (obj->wear_loc != wear_none)
-        wearloc = dynamic_cast<DefaultWearlocation *>(obj->wear_loc.getElement());
-
 #define FMT(cond, buf, ch, lng, color, letter)        \
     if (!(ch)->is_npc() && IS_SET((ch)->getPC()->config, CONFIG_SHORT_OBJFLAG))   \
         buf << color << ((cond) ? letter : ".");      \
     else if ((cond))                                  \
         buf << lng;                                   
 
-    if (!wearloc || wearloc->displayFlags(ch, obj)) {
+    if (wearloc->displayFlags(ch, obj)) {
         format_screenreader_flags(obj, buf, ch);
 
         if (obj->behavior)
@@ -288,9 +284,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     
     if (fShort)
     {
-        buf << "{" << CLR_OBJ(ch) 
-            << (wearloc ? wearloc->displayName(ch, obj) : obj->getShortDescr( '1' ))
-            << "{x";
+        buf << "{" << CLR_OBJ(ch) << wearloc->displayName(ch, obj) << "{x";
 
         if (obj->pIndexData->vnum > 5)        /* money, gold, etc */
             if (obj->condition <= 99 )

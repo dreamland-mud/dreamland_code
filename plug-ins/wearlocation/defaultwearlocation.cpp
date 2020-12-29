@@ -295,18 +295,36 @@ void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
 /*-------------------------------------------------------------------
  * remove 
  *------------------------------------------------------------------*/
+const DLString MSG_SELF = "Ты снимаешь %2$O4.";
+
+const DLString &DefaultWearlocation::getMsgSelfRemove(Object *obj) const
+{
+    if (!msgSelfRemove.empty())
+        return msgSelfRemove;
+
+    return MSG_SELF;
+}
+
+const DLString MSG_ROOM = "%1$^C1 снимает %2$O4.";
+
+const DLString &DefaultWearlocation::getMsgRoomRemove(Object *obj) const
+{ 
+    if (!msgRoomRemove.empty())
+        return msgRoomRemove;
+
+    return MSG_ROOM;
+}
+
 bool DefaultWearlocation::remove( Object *obj, int flags )
 {
-    static const char *MSG_SELF = "Ты снимаешь %2$O4.";
-    static const char *MSG_ROOM = "%1$^C1 снимает %2$O4.";
     Character *ch = obj->carried_by;
     
     if (!canRemove( ch, obj, flags ))
         return false;
     
     if (IS_SET(flags, F_WEAR_VERBOSE)) {
-        ch->recho( msgRoomRemove.empty( ) ? MSG_ROOM : msgRoomRemove.c_str( ), ch, obj );
-        ch->pecho( msgSelfRemove.empty( ) ? MSG_SELF : msgSelfRemove.c_str( ), ch, obj );
+        ch->recho( getMsgRoomRemove(obj).c_str( ), ch, obj );
+        ch->pecho( getMsgSelfRemove(obj).c_str( ), ch, obj );
     }
     
     unequip( obj );
@@ -385,12 +403,22 @@ void DefaultWearlocation::triggersOnWear( Character *ch, Object *obj )
     oprog_wear( obj, ch );
 }
 
+const DLString &DefaultWearlocation::getMsgSelfWear(Object *obj) const
+{
+    return msgSelfWear;
+}
+
+const DLString &DefaultWearlocation::getMsgRoomWear(Object *obj) const
+{
+    return msgRoomWear;
+}
+
 bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
 {
     if (canWear( ch, flags )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho( msgSelfWear.c_str( ), ch, obj );
-            ch->recho( msgRoomWear.c_str( ), ch, obj );
+            ch->pecho( getMsgSelfWear(obj).c_str(), ch, obj );
+            ch->recho( getMsgRoomWear(obj).c_str( ), ch, obj );
         }
 
         triggersOnWear(ch, obj);
@@ -457,15 +485,15 @@ void DefaultWearlocation::display( Character *ch, Wearlocation::DisplayList &eq 
 
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content)
         if (obj->wear_loc == this) {
-            eq.push_back( make_pair( msgDisplay, obj ) ); 
+            eq.push_back( make_pair( displayLocation(ch, obj), obj ) ); 
             found = true;
         }
 
     if (!found && displayAlways && matches( ch ))
-        eq.push_back( make_pair( msgDisplay, (Object *)NULL ) );
+        eq.push_back( make_pair( displayLocation(ch, NULL), (Object *)NULL ) );
 }
 
-DLString DefaultWearlocation::displayName(Character *ch, Object *obj)
+DLString DefaultWearlocation::displayLocation(Character *ch, Object *obj)
 {
-    return obj->getShortDescr('1');
+    return msgDisplay;
 }

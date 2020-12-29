@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "xmlmisc.h"
+#include "affectmanager.h"
 #include "autoflags.h"
 #include "affectflags.h"
 #include "logstream.h"
@@ -257,7 +258,7 @@ XMLAffect::init(Affect *pAf)
 Affect *
 XMLAffect::compat()
 {
-    Affect *paf = dallocate( Affect );
+    Affect *paf = AffectManager::getThis()->getAffect();
     
     paf->type.assign(gsn_none);
     paf->duration = -1;

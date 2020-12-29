@@ -22,7 +22,7 @@
 #include "def.h"
 
 Affect::Affect()
-        : location(0, NULL)
+        : location(0, NULL), extracted(false)
 {
 }
 
@@ -34,5 +34,19 @@ Affect::~Affect( )
 Character * Affect::getOwner( ) const
 {
     return PCharacterManager::findPlayer( ownerName );
+}
+
+void Affect::extract() 
+{
+    type.assign(-1);
+    level = duration = modifier = 0;
+    bitvector.clear();
+    location.setTable(0);
+    location = 0;
+    global.clear();
+    global.setRegistry(0);
+    ownerName.clear();
+
+    extracted = true;
 }
 

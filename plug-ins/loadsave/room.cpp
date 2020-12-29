@@ -5,6 +5,7 @@
 #include "room.h"
 #include "affecthandler.h"
 #include "affect.h"
+#include "affectmanager.h"
 #include "character.h"
 #include "core/object.h"
 #include "feniamanager.h"
@@ -168,6 +169,9 @@ void Room::affectCheck( const FlagTable *table, int vector )
  */
 void Room::affectRemove( Affect *paf )
 {
+    if (paf->isExtracted())
+        return;
+
     if (affected.empty())
     {
         bug( "Affect_remove_room: no affect.", 0 );
@@ -183,7 +187,7 @@ void Room::affectRemove( Affect *paf )
     if (affected.empty())
         roomAffected.erase(this);
 
-    ddeallocate( paf );
+    AffectManager::getThis()->extract(paf);
 }
 
 /*

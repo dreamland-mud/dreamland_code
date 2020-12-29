@@ -145,7 +145,7 @@ VOID_SPELL(ChaosBlade)::run(Character *ch, char *, int sn, int level)
           ch, 0, 0, TO_ROOM, POS_RESTING);
 
     blade->timer = level * 2;
-    blade->level = ch->getRealLevel();
+    blade->level = ch->getModifyLevel();
 
     WeaponGenerator()
         .item(blade)

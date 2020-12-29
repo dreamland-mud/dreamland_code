@@ -814,7 +814,7 @@ SKILL_RUNP(makebow)
     gsn_make_bow->improve(ch, true);
 
     bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel());
-    bow->level = ch->getRealLevel();
+    bow->level = ch->getModifyLevel();
 
     WeaponGenerator()
         .item(bow)

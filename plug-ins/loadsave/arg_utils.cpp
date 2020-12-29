@@ -183,7 +183,7 @@ bool arg_is_paste( const DLString &arg )
 
 bool arg_is_web( const DLString &arg )
 {
-    return arg_oneof(arg, "web", "веб");
+    return arg_oneof_strict(arg, "web", "веб");
 }
 
 bool arg_is_money( const DLString &arg )

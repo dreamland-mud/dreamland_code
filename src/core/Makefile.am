@@ -13,6 +13,7 @@ AM_CPPFLAGS = -Wall
 libcore_la_SOURCES = \
 affect.cpp \
 affectlist.cpp \
+affectmanager.cpp \
 character.cpp \
 npcharacter.cpp \
 npcharactermanager.cpp \

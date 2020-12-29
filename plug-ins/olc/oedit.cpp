@@ -21,6 +21,7 @@
 #include <commandmanager.h>
 #include <object.h>
 #include <affect.h>
+#include "affectmanager.h"
 #include "room.h"
 #include "skillgroup.h"
 
@@ -486,7 +487,7 @@ OEDIT(addaffect)
         }
     }
 
-    pAf = dallocate(Affect);
+    pAf = AffectManager::getThis()->getAffect();
     pAf->location = loc;
     pAf->location.setTable(&apply_flags);
     pAf->modifier = mod;
@@ -541,7 +542,7 @@ OEDIT(delaffect)
     }
 
     pObj->affected.remove(pAf);
-    ddeallocate(pAf);
+    AffectManager::getThis()->extract(pAf);
     stc("Affect removed.\n\r", ch);
     return true;
 }

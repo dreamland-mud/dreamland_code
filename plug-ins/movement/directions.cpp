@@ -221,3 +221,20 @@ bool direction_range_argument(const DLString &cargs, DLString &argDoor, DLString
     argVict = cargs.substr(i+1);
     return true;
 }
+
+/**
+ * Return door connecting two rooms or -1.
+ */
+int door_between_rooms(Room *src, Room *target)
+{
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        if (src->exit[door] 
+            && src->exit[door]->u1.to_room == target
+            && direction_reverse(src, door))
+        {
+            return door;
+        }
+
+    return -1;
+}
+

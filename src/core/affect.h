@@ -27,6 +27,7 @@ class Character;
  * Store information about affect(s) applied to a character, object or room.
  */
 class Affect : public XMLVariableContainer {
+friend class AffectManager;    
 XML_OBJECT;
 public:
     typedef ::Pointer<Affect> Pointer;
@@ -66,6 +67,15 @@ public:
 
     /** (unused) Name of the person who created the affect.*/
     XML_VARIABLE XMLStringNoEmpty ownerName;
+
+    /** True if this affect is no longer valid and sits in the extract list. */
+    inline bool isExtracted() const { return extracted; }
+
+protected:
+    /** Clear and mark this affect as extracted before adding it to extract list. Used by AffectManager. */
+    void extract();
+
+    bool extracted;
 };
 
 #endif

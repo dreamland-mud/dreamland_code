@@ -353,7 +353,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         << print_wait_and_mana(this, ch);
 
     if (!visible( ch )) {
-        if (!classes.empty())
+        if (!classes.empty() && ch->getProfession() != prof_none)
             buf << pad << "Недоступно для твоей профессии." << endl;
         return;
     }

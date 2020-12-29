@@ -88,7 +88,6 @@
 #include "magic.h"
 #include "vnum.h"
 #include "wearloc_utils.h"
-#include "defaultwearlocation.h"
 #include "skill_utils.h"
 
 #include "onehit_undef.h"
@@ -135,9 +134,7 @@ static bool oprog_fight_carry( Object *obj, Character *ch )
 
 static void wlprog_fight( Object *obj, Character *ch)
 {
-    DefaultWearlocation *wearloc = dynamic_cast<DefaultWearlocation *>(obj->wear_loc.getElement());
-    if (wearloc)
-        wearloc->triggersOnFight(ch, obj);
+    obj->wear_loc->onFight(ch, obj);
 }
 
 

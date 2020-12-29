@@ -18,6 +18,7 @@
 #include "dreamland.h"
 #include "interp.h"
 #include "../anatolia/handler.h"
+#include "directions.h"
 #include "merc.h"
 #include "act.h"
 #include "mercdb.h"
@@ -237,7 +238,29 @@ bool BasicMobileBehavior::backHome( bool fAlways )
     
     if (home == ch->in_room)
         return false;
-    
+
+    // Wimpy mobs are not in a hurry to get back.
+    if (IS_SET(ch->act, ACT_WIMPY) && ch->getLastFightDelay() <= Date::SECOND_IN_HOUR)
+        return false;
+
+    // Check if standing in the adjancent room and can just walk back there.
+    int door = door_between_rooms(ch->in_room, home);
+    if (door >= 0) {
+        // See if it's safe to go back for a wimpy mob.
+        if (IS_SET(ch->act, ACT_WIMPY)) {
+            interpret_cmd(ch, "scan", "");
+            if (findMemoryFoughtRoom(home)) 
+                return false;
+        }
+
+        interpret_cmd(ch, dirs[door].name, "");
+        if (ch->in_room == home) {
+            ch->position = ch->default_pos;
+            homeVnum = 0;
+            return false;
+        }
+    }
+
     transfer_char( ch, 0, home,
                    "%1$^C1 молит Богов о возвращении.", 
                    NULL,
@@ -248,6 +271,14 @@ bool BasicMobileBehavior::backHome( bool fAlways )
     return false;
 }
 
+/** Find everyone we fought with recently in a given room. */
+bool BasicMobileBehavior::findMemoryFoughtRoom(Room *room)
+{
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (memoryFought.memorized(rch))
+            return true;
+    return false;
+}
 
 bool BasicMobileBehavior::isHomesick( ) 
 {

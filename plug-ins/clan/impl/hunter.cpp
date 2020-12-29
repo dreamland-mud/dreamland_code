@@ -341,7 +341,7 @@ void HunterArmor::delete_( Character *ch )
  *-------------------------------------------------------------------------*/
 void HunterWeapon::wear( Character *ch )
 {
-    obj->level = ch->getRealLevel( );
+    obj->level = ch->getModifyLevel();
     WeaponGenerator()
         .item(obj)
         .valueTier(2)

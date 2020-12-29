@@ -50,16 +50,12 @@ public:
     virtual bool wearAtomic( Character *ch, Object *obj, int flags );
 
     virtual void display( Character *, DisplayList & );
-    // TODO consider moving these two methods to the base class.
-    virtual bool displayFlags(Character *ch, Object *obj) { return true; }
-    virtual DLString displayName(Character *ch, Object *obj);
+    virtual DLString displayLocation(Character *ch, Object *obj);
 
     virtual int canWear( Character *ch, Object *obj, int flags );
     virtual bool canWear( Character *ch, int flags );
     virtual bool canRemove( Character *ch, Object *obj, int flags );
     virtual bool canRemove( Character *ch, int flags );
-
-    virtual void triggersOnFight(Character *ch, Object *obj) { };
 
 protected:
     virtual void affectsOnEquip( Character *ch, Object *obj );
@@ -71,6 +67,11 @@ protected:
     void triggersOnUnequip( Character *ch, Object *obj );
     
     void saveDrops( Character *ch );
+
+    virtual const DLString &getMsgSelfWear(Object *obj) const;
+    virtual const DLString &getMsgSelfRemove(Object *obj) const;
+    virtual const DLString &getMsgRoomWear(Object *obj) const;
+    virtual const DLString &getMsgRoomRemove(Object *obj) const;
 
     XML_VARIABLE XMLEnumerationNoEmpty itemType;
     XML_VARIABLE XMLFlagsNoEmpty       itemWear;

@@ -217,9 +217,6 @@ CMDRUNP( scan )
     int door, depth;
     int range;
 
-    if (ch->desc == 0)
-        return;
-
     if (ch->position < POS_SLEEPING) {
         ch->println( "Ты ничего не видишь, кроме звезд..." );
         return;
