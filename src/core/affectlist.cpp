@@ -1,8 +1,8 @@
 #include "affectlist.h"
 #include "affect.h"
+#include "affectmanager.h"
 #include "affecthandler.h"
 
-/* Find an effect in an affect list */
 Affect* AffectList::find( int sn ) const
 {
     for (auto &paf: *this)
@@ -12,7 +12,6 @@ Affect* AffectList::find( int sn ) const
     return 0;
 }
 
-/** Find effect with given type and location. */
 Affect * AffectList::find(int type, int location) const
 {
     for (auto &paf: *this)
@@ -22,7 +21,6 @@ Affect * AffectList::find(int type, int location) const
     return 0;
 }
 
-/** Find all affects with a given type. */
 list<Affect *> AffectList::findAll(int type) const
 {
     list<Affect *> result;
@@ -34,7 +32,6 @@ list<Affect *> AffectList::findAll(int type) const
     return result;
 }
 
-/** Find all affects where bitvector matches this one. */
 list<Affect *> AffectList::findAllWithBits(const FlagTable *table, int bits) const
 {
     list<Affect *> result;
@@ -46,7 +43,6 @@ list<Affect *> AffectList::findAllWithBits(const FlagTable *table, int bits) con
     return result;
 }
 
-/** Find all affects where AffectHandler exists and can be called. */
 list<Affect *> AffectList::findAllWithHandler() const
 {
     list<Affect *> result;
@@ -61,11 +57,10 @@ list<Affect *> AffectList::findAllWithHandler() const
 }
 
 
-/* Destroy all elements and clear the list. */
 void AffectList::deallocate()
 {
     while (!empty()) {
-        ddeallocate(back());
+        AffectManager::getThis()->extract(back());
         pop_back();
     }
 }
@@ -77,13 +72,13 @@ AffectList AffectList::clone() const
     return other;
 }
 
-/** Return false if this is the last affect of the same type in a row. */
 bool AffectList::hasNext(const_iterator &pos) const
 {
     const_iterator next = pos;
     next++;
 
     return (next != end()
+            && !(*next)->isExtracted()
             && (*next)->type == (*pos)->type
             && (*next)->duration == (*pos)->duration);
 }

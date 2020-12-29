@@ -80,7 +80,7 @@
 
 #include "pcharactermanager.h"
 #include "pcharactermemory.h"
-
+#include "affectmanager.h"
 #include "objectmanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -192,7 +192,7 @@ Affect * fread_Affc( FILE *fp )
     sn = SkillManager::getThis( )->lookup( word );
     convert_skill( sn );
 
-    paf = dallocate( Affect );
+    paf = AffectManager::getThis()->getAffect();
 
     try {
         paf->type = sn;
@@ -231,7 +231,7 @@ Affect * fread_Affc( FILE *fp )
         }
 
     } catch (const FileFormatException &e) {
-        ddeallocate( paf );
+        AffectManager::getThis()->extract(paf);
         throw e;
     }
 

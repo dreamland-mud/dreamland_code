@@ -63,7 +63,7 @@
 #include "mobilebehavior.h"
 #include "objectbehaviormanager.h"
 #include "objectbehavior.h"
-
+#include "affectmanager.h"
 #include "flags.h"
 #include "skillmanager.h"
 #include "liquid.h"
@@ -410,7 +410,7 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
         letter = fread_letter( fp );
 
         if ( letter == 'A' ) {
-            paf                     = dallocate( Affect );
+            paf                     = AffectManager::getThis()->getAffect();
             where                    = TO_OBJECT;
             paf->type.assign( gsn_none );
             paf->level              = pObjIndex->level;
@@ -421,7 +421,7 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
             pObjIndex->affected.push_front(paf);
             top_affect++;
         } else if (letter == 'F') {
-            paf                     = dallocate( Affect );
+            paf                     = AffectManager::getThis()->getAffect();
             
             letter                     = fread_letter(fp);
             switch (letter) {
