@@ -2162,10 +2162,7 @@ CMDRUNP( help )
         return;
 
     if (argument[0] == '\0') {
-        if (ch->getConfig( ).rucommands)
-            strcpy(argument, "summary_ru");
-        else
-            strcpy(argument, "summary_en");
+        strcpy(argument, "summary");
     }
 
     // Вариант 2.create? - needs exact match.
