@@ -271,7 +271,7 @@ NMI_GET( ProfessionWrapper, nameMlt, "русское название во мн�
     return professionManager->find( name )->getMltName( );
 }
 
-NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги профессии для этого персонажа (таблица .tables.prof_flags)" ) 
+NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги класса для этого персонажа (таблица .tables.prof_flags)" ) 
 {
     Character *ch = args2character(args);
     Profession *prof = professionManager->find( name );
@@ -298,7 +298,7 @@ NMI_GET( ProfessionWrapper, alignName, "русское имя подходяще
     return "любой";
 }
 
-NMI_GET( ProfessionWrapper, statPlus, "какие параметры увеличиваются у представителей этой профессии" ) 
+NMI_GET( ProfessionWrapper, statPlus, "какие параметры увеличиваются у представителей этого класса" ) 
 {
     Profession *prof = professionManager->find( name );
     int stat;
@@ -322,7 +322,7 @@ NMI_GET( ProfessionWrapper, statPlus, "какие параметры увели�
     return buf.str( );
 }
 
-NMI_INVOKE( ProfessionWrapper, goodSex, "(ch): проверить ограничения по полу на профессию для персонажа ch" )
+NMI_INVOKE( ProfessionWrapper, goodSex, "(ch): проверить ограничения по полу на класс для персонажа ch" )
 {
     CharacterWrapper *ch;
     
@@ -334,7 +334,7 @@ NMI_INVOKE( ProfessionWrapper, goodSex, "(ch): проверить огранич
     return prof->getSex( ).isSetBitNumber( ch->getTarget( )->getSex( ) );
 }
 
-NMI_INVOKE( ProfessionWrapper, goodRace, "(ch): проверить ограничения по расе на профессию для персонажа ch" )
+NMI_INVOKE( ProfessionWrapper, goodRace, "(ch): проверить ограничения по расе на класс для персонажа ch" )
 {
     CharacterWrapper *ch;
     
@@ -349,7 +349,7 @@ NMI_INVOKE( ProfessionWrapper, goodRace, "(ch): проверить ограни�
     return ch->getTarget( )->getRace( )->getPC( )->getClasses( )[prof->getIndex( )] > 0;
 }
 
-NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить ограничение на характер и этос на профессию для персонажа ch" )
+NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить ограничение на характер и этос на класс для персонажа ch" )
 {
     CharacterWrapper *ch;
     
@@ -885,7 +885,7 @@ NMI_GET( ReligionWrapper, ethos, "разрешенные этосы или пу�
     return Register((int)getTarget()->ethos.getValue());
 }
 
-NMI_GET( ReligionWrapper, classes, "разрешенные профессии или пустая строка (olchelp class)" ) 
+NMI_GET( ReligionWrapper, classes, "разрешенные классы или пустая строка (olchelp class)" ) 
 {
     return Register(getTarget()->classes.toString());
 }

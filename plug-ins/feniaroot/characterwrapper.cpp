@@ -1385,7 +1385,7 @@ NMI_INVOKE( CharacterWrapper, gainExp, "(exp): добавляет exp очков
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, getClass, "(): строка с названием профессии" )
+NMI_INVOKE( CharacterWrapper, getClass, "(): строка с названием класса" )
 {
     checkTarget();
     return Register( target->getProfession( )->getName( ).c_str( ) );

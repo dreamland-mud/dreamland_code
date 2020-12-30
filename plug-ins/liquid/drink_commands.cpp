@@ -56,6 +56,7 @@ CMDRUN( fill )
     Object *fountain = 0;
     Liquid *liq;
     DrinkContainer::Pointer drink;
+    RoomIndexData *pRoom = ch->in_room->pIndexData;
     DLString arguments = constArguments, arg, arg1;
 
     arg = arguments.getOneArgument( );
@@ -78,10 +79,11 @@ CMDRUN( fill )
 
     if (arg1.empty( )) {
         fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
-        if (!fountain && ch->in_room->pIndexData->liquid == liq_none) {
-            ch->send_to("Здесь нет источника!\n\r");
-            return;
-        }
+        if (!fountain && pRoom->liquid == liq_none)
+            if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
+                ch->send_to("Здесь нет источника!\n\r");
+                return;
+            }
     }
     else {
         fountain = get_obj_here( ch, arg1.c_str( ) );
@@ -101,8 +103,10 @@ CMDRUN( fill )
 
     if (fountain)
         liq = liquidManager->find( fountain->value2() );
+    else if (pRoom->liquid != liq_none)
+        liq = pRoom->liquid.getElement();
     else
-        liq = ch->in_room->pIndexData->liquid.getElement();
+        liq = liq_water.getElement();
 
     const char *liqname = liq->getShortDescr().c_str();
 
@@ -590,16 +594,18 @@ CMDRUN( drink )
     int amount;
     Liquid *liquid;
     DrinkContainer::Pointer drink;
+    RoomIndexData *pRoom = ch->in_room->pIndexData;
     DLString arguments = constArguments, arg;
-
+    
     arg = arguments.getOneArgument( );
 
     if (arg.empty( )) {
         obj = get_obj_room_type( ch, ITEM_FOUNTAIN );
-        if (!obj && ch->in_room->pIndexData->liquid == liq_none) {
-            ch->send_to("Выпить что?\n\r");
-            return;
-        }
+        if (!obj && pRoom->liquid == liq_none) 
+            if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
+                ch->send_to("Выпить что?\n\r");
+                return;
+            }
     }
     else {
         if (( obj = get_obj_here( ch, arg ) ) == 0) {
@@ -633,8 +639,11 @@ CMDRUN( drink )
             amount = min(amount, obj->value1());
             break;
         }
+    } else if (pRoom->liquid != liq_none) {
+        liquid = pRoom->liquid.getElement();
+        amount = liquid->getSipSize( ) * 3;
     } else {
-        liquid = ch->in_room->pIndexData->liquid.getElement();
+        liquid = liq_water.getElement();
         amount = liquid->getSipSize( ) * 3;
     }
     

@@ -41,6 +41,11 @@ const DLString &Clan::getPaddedName( ) const
 {
     return DLString::emptyString;
 }
+
+const DLString& Clan::getChannelPattern() const
+{
+    return DLString::emptyString;
+}
 const DLString & Clan::getTitle( PCMemoryInterface * ) const
 {
     return DLString::emptyString;

@@ -39,9 +39,6 @@ public:
     GenericSkill( );
     virtual ~GenericSkill( );
 
-    void resolve( );
-    void unresolve( );
-
     virtual void loaded( );
     virtual SkillGroupReference & getGroup( );
     virtual bool visible( CharacterMemoryInterface * ) const;
@@ -68,7 +65,6 @@ protected:
     static const DLString CATEGORY;                                             
     
     bool availableForAll( ) const;
-    int learnedAux( PCharacter *, int ) const;
     const SkillClassInfo * getClassInfo( CharacterMemoryInterface * ) const;
     const SkillRaceBonus *getRaceBonus( CharacterMemoryInterface * ) const;
     bool isRaceAffect( CharacterMemoryInterface * ) const;

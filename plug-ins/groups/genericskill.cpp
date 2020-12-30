@@ -74,14 +74,6 @@ bool GenericSkill::isProfessional() const
     return false;
 }
 
-void GenericSkill::resolve( ) 
-{
-}
-
-void GenericSkill::unresolve( )
-{
-}
-
 /*
  * виден ли скилл этому чару в принципе, независимо от уровня.
  */
@@ -229,51 +221,26 @@ int GenericSkill::getLevel( Character *ch ) const
  */
 int GenericSkill::getLearned( Character *ch ) const
 {
-    PCharacter *pch;
-    int adept;
-    
     if (!usable( ch ))
         return 0;
 
     if (ch->is_npc( )) 
         return mob.getLearned( ch->getNPC( ), this );
     
-    pch = ch->getPC( );
+    PCharacter *pch = ch->getPC( );
+    int percent = pch->getSkillData( getIndex( ) ).learned;
 
     if (isRaceAffect( pch ))
-        return pch->getSkillData( getIndex( ) ).learned;
+        return percent;
     
     if (temporary_skill_active(this, ch))
-        return pch->getSkillData( getIndex( ) ).learned;
+        return percent;
    
-    adept = pch->getProfession( )->getSkillAdept( );
-            
-    return learnedAux( pch, adept );
-}
-
-/* TODO: is this aux method still required? */
-int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
-{
-    const SkillRaceBonus *rb;
-    int percent, min;
-    
-    if (!available( pch )) {
-        LogStream::sendError( ) << "parent skill " << getName( ) << " is not available  for " << pch->getName( ) << endl;
-        return 0;
-    }
-        
-    min = 100;    
-    percent = pch->getSkillData( getIndex( ) ).learned;
-    
-    rb = getRaceBonus( pch );
-    
+    const SkillRaceBonus *rb = getRaceBonus( pch );
     if (rb) 
         percent = std::max( percent, rb->getBonus( ) );
     
-    if (isRaceAffect( pch ))
-        return min;
-    else
-        return URANGE( 1, percent, min );
+    return URANGE( 1, percent, 100 );
 }
 
 int GenericSkill::getMaximum( Character *ch ) const
@@ -354,7 +321,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 
     if (!visible( ch )) {
         if (!classes.empty() && ch->getProfession() != prof_none)
-            buf << pad << "Недоступно для твоей профессии." << endl;
+            buf << pad << "Недоступно для твоего класса." << endl;
         return;
     }
 
@@ -468,7 +435,7 @@ SkillClassInfo::SkillClassInfo( )
 
 /*
  * возвращает инфо о клановых запретах на использования скила 
- * для данной профессии
+ * для данного класса
  */
 const SkillClanAntiBonus *
 SkillClassInfo::getClanAntiBonus( CharacterMemoryInterface *ch ) const

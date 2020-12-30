@@ -904,7 +904,7 @@ REDIT(clan, "клан", "установить клановую принадле�
     return true;
 }
 
-REDIT(guilds, "гильдии", "установить гильдию для профессий или clear")
+REDIT(guilds, "гильдии", "установить гильдию для классов или clear")
 {
     RoomIndexData *pRoom;
     Profession *prof;
@@ -925,7 +925,7 @@ REDIT(guilds, "гильдии", "установить гильдию для пр
 
     prof = professionManager->findUnstrict( argument );
     if (!prof) {
-        stc("Guild (profession) not found.\n\r", ch);
+        stc("Guild (class) not found.\n\r", ch);
         return false;
     }
 

@@ -185,6 +185,12 @@ const DLString &DefaultClan::getPaddedName( ) const
 {
     return padName.getValue( );
 }
+
+const DLString& DefaultClan::getChannelPattern() const
+{
+    return channelPattern;
+}
+
 bool DefaultClan::isDispersed( ) const
 {
     return dispersed.getValue( );
