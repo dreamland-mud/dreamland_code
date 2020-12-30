@@ -236,14 +236,12 @@ struct BasicMobileBehavior::KillVictims : public BasicMobileBehavior::VampVictim
         int hisHit = HEALTH(wch);
         int sn = -1, snAttack = -1, snMalad = -1;
         
-        if (gsn_chain_lightning->usable( ch ) && myHit > 50)
+        if (gsn_chain_lightning->usable( ch ) && myHit > 50 && chance(75))
             snAttack = gsn_chain_lightning;
         else if (gsn_vampiric_blast->usable( ch ))
             snAttack = gsn_vampiric_blast;
         else if (gsn_dispel_good->usable( ch ) && IS_GOOD(wch))
             snAttack = gsn_dispel_good;
-        else if (gsn_colour_spray->usable( ch ))
-            snAttack = gsn_colour_spray;
         else if (gsn_burning_hands->usable( ch ))
             snAttack = gsn_burning_hands;
 
@@ -349,7 +347,7 @@ bool BasicMobileBehavior::aggressVampire( )
     if (!vtouch.attack( )) 
         if (number_bits( 1 ) || !vdispel.attack( ))
             if (number_bits( 1 ) || !vblind.attack( ))
-                if (number_percent( ) < 30 || !vsuck.attack( ))
+                if (number_percent( ) < 50 || !vsuck.attack( ))
                     if (number_percent( ) < 30 || !vbite.attack( ))
                         if (!vkill.attack( ))
                             return false;
