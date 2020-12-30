@@ -162,10 +162,6 @@ void SkillHelp::setSkill( Skill::Pointer skill )
             addAutoKeyword(cmd->getAliases().toSet());
             addAutoKeyword(cmd->getRussianAliases().toSet());
             if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
-/*                
-                labels.addTransient(
-                    cmd->getCommandCategory().names());
-*/                    
                 labels.addTransient("cmd");
             }
         }

@@ -13,7 +13,6 @@ public:
     typedef ::Pointer<GenericSkillLoader> Pointer;
     
     virtual void initialization( );
-    virtual void destruction( );
     
     virtual DLString getTableName( ) const
     {
@@ -29,8 +28,6 @@ protected:
     static const DLString TABLE_NAME;
     static const DLString NODE_NAME;
 
-    void resolveAll( );
-    void unresolveAll( );
     void dumpCSV();
 };
 
