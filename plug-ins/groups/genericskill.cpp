@@ -321,7 +321,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 
     if (!visible( ch )) {
         if (!classes.empty() && ch->getProfession() != prof_none)
-            buf << pad << "Недоступно для твоей профессии." << endl;
+            buf << pad << "Недоступно для твоего класса." << endl;
         return;
     }
 
@@ -435,7 +435,7 @@ SkillClassInfo::SkillClassInfo( )
 
 /*
  * возвращает инфо о клановых запретах на использования скила 
- * для данной профессии
+ * для данного класса
  */
 const SkillClanAntiBonus *
 SkillClassInfo::getClanAntiBonus( CharacterMemoryInterface *ch ) const

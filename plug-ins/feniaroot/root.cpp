@@ -881,7 +881,7 @@ NMI_INVOKE( Root, Area, "(filename): конструктор для зоны по
     return AreaWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск профессии по русскому или англ названию" )
+NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск класса по русскому или англ названию" )
 {
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
@@ -894,7 +894,7 @@ NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск про
     return Register::handler<ProfessionWrapper>(prof->getName());
 }
 
-NMI_GET( Root, professions, "список всех профессий, доступных игрокам") 
+NMI_GET( Root, professions, "список всех классов, доступных игрокам") 
 {
     RegList::Pointer list(NEW);
     Profession *prof;
@@ -909,7 +909,7 @@ NMI_GET( Root, professions, "список всех профессий, дост�
     return wrap(list);
 }
 
-NMI_INVOKE( Root, Profession, "(name): конструктор для профессии (класса) по имени" )
+NMI_INVOKE( Root, Profession, "(name): конструктор для класса по имени" )
 {
     DLString name = args2string(args);
     Profession *prof = professionManager->findExisting(name);

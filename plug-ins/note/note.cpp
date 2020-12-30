@@ -153,7 +153,7 @@ bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringst
         }
         else if (( prof = findProf( arg ) )) 
         {
-            ostr << "представители профессии {W" << prof->getName( ) << "{x";
+            ostr << "представители класса {W" << prof->getName( ) << "{x";
         }
         else if (( pci = PCharacterManager::find( arg ) ))
         {
