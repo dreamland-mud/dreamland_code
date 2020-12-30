@@ -41,7 +41,8 @@ public:
     virtual const DLString &getLongName( ) const;
     virtual const DLString &getColor( ) const;
     virtual const DLString &getPaddedName( ) const;
-
+    virtual const DLString &getChannelPattern( ) const;
+    
     virtual ClanData * getData( );
     virtual const ClanMembership * getMembership( ) const;
     virtual ClanMembership * getMembership( );
@@ -66,6 +67,7 @@ public:
 protected:
     XML_VARIABLE XMLString shortName, longName, padName;
     XML_VARIABLE XMLString color;
+    XML_VARIABLE XMLString channelPattern;
 
     XML_VARIABLE XMLBoolean channel, dispersed, diplomacy, hidden;
     XML_VARIABLE XMLInteger recallVnum;
