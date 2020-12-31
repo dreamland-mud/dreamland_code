@@ -507,7 +507,7 @@ bool BasicMobileBehavior::doWander( )
     if (IS_SET(ch->act, ACT_INDOORS) && !IS_SET( room->room_flags,ROOM_INDOORS))
         return false;
 
-    if (IS_SET(ch->form, FORM_FISH) && !(IS_WATER( room ) && (room)->getSectorType() == SECT_UNDERWATER))
+    if (IS_SET(ch->form, FORM_FISH) && !(IS_WATER( room ) || (room)->getSectorType() == SECT_UNDERWATER))
         return false;
 
     return move_char( ch, door );
