@@ -162,6 +162,7 @@ SKILL_RUNP( shoot )
     int range, range0 = ( ch->getModifyLevel() / 10) + 1;
     int master_shoots = 2;
     DLString argDoor, argVict;
+    ostringstream errbuf;
 
     if (!gsn_bow->usable( ch ))
     {
@@ -181,9 +182,9 @@ SKILL_RUNP( shoot )
     }
 
     range = range0;
-    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
+    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 )
     {
-            ch->send_to("Там таких нет.\n\r");
+            ch->send_to(errbuf);
             return;
     }
 
@@ -295,8 +296,10 @@ SKILL_RUNP( shoot )
     
     for (int i = 0; i < master_shoots; i++) {
         range = range0;
-        if (find_char( ch, argVict.c_str(), direction, &range) != victim)
+        if (find_char( ch, argVict.c_str(), direction, &range, errbuf) != victim) {
+            ch->send_to(errbuf);
             return; 
+        }
         
         if (!( arrow = find_arrow( ch, quiver ) ))
             return;

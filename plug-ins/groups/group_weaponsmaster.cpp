@@ -610,6 +610,7 @@ SKILL_RUNP( throwspear )
         int chance,direction;
         int range = ( ch->getModifyLevel() / 10) + 1;
         DLString argDoor, argVict;
+        ostringstream errbuf;
 
         if ( ch->is_npc() )
                 return; /* Mobs can't shoot spears */
@@ -631,8 +632,10 @@ SKILL_RUNP( throwspear )
                 return;
         }
 
-        if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
-                return;
+        if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 ) {
+            ch->send_to(errbuf);
+            return;
+        }
 
         if ( !victim->is_npc() && victim->desc == 0 )
         {

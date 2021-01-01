@@ -204,7 +204,7 @@ int count_users(Object *obj)
 }
 
 
-Character * find_char( Character *ch, const char *cArgument, int door, int *range, bool message )
+Character * find_char( Character *ch, const char *cArgument, int door, int *range, ostringstream &errbuf )
 {
     char argument[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
@@ -220,16 +220,6 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
     if ( (target = get_char_room(ch,dest_room,arg,&number)) != 0)
         return target;
 
-    if (door < 0 || door >= DIR_SOMEWHERE)
-    {
-        bug("In find_char wrong door: %d",door);
-
-        if (message)
-            ch->send_to("Ты не видишь этого здесь.\n\r");
-
-        return 0;
-    }
-    
     opdoor = dirs[door].rev;
 
     while (*range > 0)
@@ -247,9 +237,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
         if ( (bExit = dest_room->exit[opdoor]) == 0
             || bExit->u1.to_room != back_room)
         {
-            if (message)
-                ch->send_to("По выбранному направлению что-то препятствует тебе.\n\r");
-
+            errbuf << "Ты не сможешь добраться до них через односторонний проход." << endl;
             return 0;
         }
 
@@ -257,9 +245,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
             return target;
     }
     
-    if (message)
-        ch->send_to("Ты не видишь этого здесь.\n\r");
-
+    errbuf << "Ты не видишь " << dirs[door].where << " никого с таким именем." << endl;
     return 0;
 }
         

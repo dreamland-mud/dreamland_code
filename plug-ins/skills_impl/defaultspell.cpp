@@ -130,12 +130,12 @@ int DefaultSpell::getMaxRange( Character *ch ) const
  * Find a char for spell usage. Allowed syntax: vict, dir.vict, dir vict
  */
 Character * 
-DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, int *range )
+DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, int *range, ostringstream &errbuf )
 {
     DLString argDoor, argVict;
 
     if (direction_range_argument(argument, argDoor, argVict, *door)) {
-        return find_char(ch, argVict.c_str(), *door, range, false);
+        return find_char(ch, argVict.c_str(), *door, range, errbuf);
     }
     
     return get_char_room(ch, argVict.c_str());
@@ -417,7 +417,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             int maxrange = getMaxRange( ch );
             
             if (maxrange > 0) {
-                victim = getCharSpell( ch, arg, &result->door, &maxrange );
+                victim = getCharSpell( ch, arg, &result->door, &maxrange, buf );
 
                 if (victim) {
                     if (ch->isAffected(gsn_garble ) && number_percent( ) < 10)
@@ -437,7 +437,6 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
                 } else if (result->door >= 0 && result->door < DIR_SOMEWHERE) {
                     // Victim not found, but a range spell was likely casted.
-                    buf << "Ты не видишь " << dirs[result->door].where << " никого с таким именем." << endl;
                     result->error = TARGET_ERR_CHAR_NOT_FOUND;
                     return result;
                 }

@@ -151,6 +151,7 @@ SKILL_RUNP( throwstone )
     int range = ( ch->getModifyLevel() / 10) + 1;
     DLString args = argument;
     DLString argDoor, argVict;
+    ostringstream errbuf;
 
     if (chance <= 1) {
         ch->println("Ты не умеешь швыряться камнями.");
@@ -162,8 +163,10 @@ SKILL_RUNP( throwstone )
         return;
     }
 
-    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
+    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 ) {
+        ch->send_to(errbuf);
         return;
+    }
 
     if (victim == ch) {
         ch->println("Просто ударь себя этим камнем по лбу.");

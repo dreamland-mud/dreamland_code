@@ -31,7 +31,7 @@ int            count_users(Object *obj);
 void        get_money_here( Object *list, int &gold, int &silver );
 Object *    create_money( int gold, int silver );
 DLString    describe_money( int gold, int silver, const Grammar::Case &gcase );
-Character * find_char( Character *ch, const char *argument, int door, int *range, bool message = true );
+Character * find_char( Character *ch, const char *argument, int door, int *range, ostringstream &errbuf );
 
 void        write_bug_file( Character *ch, const DLString &filename, const char *txt );
 
