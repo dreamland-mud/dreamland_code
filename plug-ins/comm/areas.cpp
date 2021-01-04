@@ -46,14 +46,14 @@ CMDRUNP( areas )
     }
     
     if (level != -1) 
-        buf << "{YАрии мира Dream Land для уровня " << level << ":{x" << endl;
+        buf << "{YЗоны Мира Мечты для уровня " << level << ":{x" << endl;
     else if (!args.empty( ))
-        buf << "{YНайдены арии: {x" << endl;
+        buf << "{YНайдены зоны: {x" << endl;
     else if (minLevel != -1 && maxLevel != -1)
-        buf << "{YАрии мира Dream Land, для уровней " 
+        buf << "{YЗоны Мира Мечты для уровней " 
             << minLevel << " - " << maxLevel << ":{x" << endl;
     else
-        buf << "{YВсе арии мира Dream Land: {x" << endl;
+        buf << "{YВсе зоны Мира Мечты: {x" << endl;
     
     buf << "Название                Сложность        Название                Сложность" << endl
         << "-------------------------------------------------------------------------------" << endl;
@@ -132,7 +132,7 @@ CMDRUNP( areas )
         if (mcnt % 2)
             buf << endl;
     }
-    buf << endl << "Подробнее о каждой зоне смотри в {Wсправка название_зоны{x." << endl;
+    buf << endl << "Подробнее о каждой зоне читай в {Wсправка {Dназвание зоны{x, например {y{hcсправка мидгаард{x." << endl;
     page_to_char( buf.str( ).c_str( ), ch );        
 }
 
