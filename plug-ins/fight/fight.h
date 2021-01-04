@@ -13,7 +13,6 @@
 #include "fight_safe.h"
 #include "weapons.h"
 #include "attacks.h"
-#include "deathmanager.h"
 #include "damageflags.h"
 
 class Character;
