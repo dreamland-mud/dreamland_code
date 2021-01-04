@@ -127,7 +127,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     obj->setShortDescr(str_empty); // pretend it's a restring, to allow value0-4 overrides.
     obj_to_char(obj, ch);
 
-    WeaponGenerator(true)
+    WeaponGenerator()
         .item(obj)
         .player(ch)
         .tier(tier)

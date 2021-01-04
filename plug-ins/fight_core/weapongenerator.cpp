@@ -43,10 +43,9 @@ CONFIGURABLE_LOADED(fight, weapon_names)
 /*--------------------------------------------------------------------------
  * WeaponGenerator
  *-------------------------------------------------------------------------*/
-WeaponGenerator::WeaponGenerator(bool debug)
+WeaponGenerator::WeaponGenerator()
         : extraFlags(0, &extra_flags),
-          weaponFlags(0, &weapon_type2),
-          debug(debug)
+          weaponFlags(0, &weapon_type2)
 {
     pch = 0;
     sn = gsn_none;
@@ -294,12 +293,12 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     auto result = gen.getSingleResult();
     int minPrice = result.front().price;
     int maxPrice = result.back().price;
+    StringSet affixNames;
 
     for (auto &pinfo: result) {
         const Json::Value &affix = pinfo.affix;
         const DLString &section = pinfo.section;
-        if (debug) obj->carried_by->pecho("{DAffix %s [%d]", affix["value"].asCString(), pinfo.price);
-        notice("Affix %s [%d]", affix["value"].asCString(), pinfo.price);
+        affixNames.insert(affix["value"].asCString());
 
         extraFlags.setBits(affix["extra"].asString());
 
@@ -389,8 +388,8 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
         aveIndexBonus++;
 
-    if (debug) obj->carried_by->pecho("{DExtras %s, weapon flags %s, material %s{x", 
-        extraFlags.names().c_str(), weaponFlags.names().c_str(), materialName.c_str());
+    // Remember affixes choice on the item.
+    obj->properties["affixes"] = affixNames.toString();
 
     return *this;
 }

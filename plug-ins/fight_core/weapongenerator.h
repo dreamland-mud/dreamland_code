@@ -15,7 +15,7 @@ struct affix_info;
 
 /** Weapon generator: calculate and assign various weapon parameters based on requested input data. */
 struct WeaponGenerator {
-    WeaponGenerator(bool debug = false);
+    WeaponGenerator();
     virtual ~WeaponGenerator();
 
     WeaponGenerator & item(Object *obj);
@@ -105,8 +105,6 @@ private:
 
     Object *obj;    
     DLString wclass;
-
-    bool debug;
 };
 
 
