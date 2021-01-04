@@ -27,7 +27,6 @@
 #include "mercdb.h"
 #include "merc.h"
 #include "vnum.h"
-#include "deathmanager.h"
 #include "fight_safe.h"
 #include "fight_position.h"
 #include "fight_exception.h"
@@ -46,6 +45,12 @@ PROF(samurai);
 PROF(warrior);
 
 void do_visible( Character * );
+
+CharDeathEvent::CharDeathEvent(Character *victim, Character *killer) 
+{
+    this->victim = victim;
+    this->killer = killer;    
+}
 
 /*-----------------------------------------------------------------------------
  * Damage 
@@ -496,7 +501,7 @@ void Damage::handleDeath( )
     act_p( "$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM,POS_RESTING);
     victim->send_to("Тебя {RУБИЛИ{x!!\n\r\n\r");
     
-    DeathManager::getThis( )->handleDeath( killer, victim );
+    eventBus->publish(CharDeathEvent(victim, killer));
 }
 
 

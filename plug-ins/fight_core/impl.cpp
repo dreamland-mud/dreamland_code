@@ -5,7 +5,6 @@
 
 #include "so.h"
 #include "plugin.h"
-#include "deathmanager.h"
 #include "weaponrandomizer.h"
 
 extern "C"
@@ -14,7 +13,6 @@ extern "C"
     {
         SO::PluginList ppl;
 
-        Plugin::registerPlugin<DeathManager>( ppl );
         Plugin::registerPlugin<WeaponRandomizer>( ppl );
         return ppl;
     }

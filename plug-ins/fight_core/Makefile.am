@@ -33,8 +33,7 @@ weaponrandomizer.cpp \
 material.cpp \
 fight_safe.cpp \
 immunity.cpp \
-morphology.cpp \
-deathmanager.cpp
+morphology.cpp
 
 libfight_core_la_LIBADD = \
 ../output/liboutput.la \
