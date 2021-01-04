@@ -96,20 +96,7 @@ bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 
 void delete_player( PCharacter *victim ) 
 {
-    Object *obj;
-    Object *obj_next;
     DLString name = victim->getName( );
-
-    // удаляем из мира вещички энтого гуся
-    for ( obj = object_list; obj != 0; obj = obj_next ) {
-        obj_next = obj->next;
-
-        if (!obj->hasOwner( victim ))
-            continue;
-
-        if (obj->behavior)
-            obj->behavior->delete_( victim );
-    }
 
     victim->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "quiet count forced" );
     do_quit( victim, "" );

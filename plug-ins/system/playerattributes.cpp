@@ -8,13 +8,13 @@
 #include "xmlattributes.h"
 #include "pcharacter.h"
 
-template class EventHandler<ScoreArguments>;
-template class EventHandler<RemortArguments>;
-template class EventHandler<DeathArguments>;
-template class EventHandler<PromptArguments>;
-template class EventHandler<WhoisArguments>;
-template class EventHandler<StopFightArguments>;
-template class EventHandler<AfkArguments>;
+template class AttributeEventHandler<ScoreArguments>;
+template class AttributeEventHandler<RemortArguments>;
+template class AttributeEventHandler<DeathArguments>;
+template class AttributeEventHandler<PromptArguments>;
+template class AttributeEventHandler<WhoisArguments>;
+template class AttributeEventHandler<StopFightArguments>;
+template class AttributeEventHandler<AfkArguments>;
 
 bool RemortAttribute::handle( const RemortArguments &args )
 {

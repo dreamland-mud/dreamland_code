@@ -57,7 +57,7 @@
 
 using namespace Scripting;
 
-template class EventHandler<WebEditorSaveArguments>;
+template class AttributeEventHandler<WebEditorSaveArguments>;
 
 static IconvMap utf2koi("utf-8", "koi8-r//IGNORE");
 

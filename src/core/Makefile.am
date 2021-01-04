@@ -42,7 +42,8 @@ helpmanager.cpp \
 mobilespecial.cpp \
 dlfileloader.cpp \
 dlpluginmanager.cpp \
-bonus.cpp
+bonus.cpp \
+eventbus.cpp
 
 libcore_la_MOC = \
 affect.h \

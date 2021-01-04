@@ -11,7 +11,7 @@
 #include "xmlpersistent.h"
 
 template <typename ArgType>
-class EventHandler;
+class AttributeEventHandler;
 
 class XMLAttribute : public virtual XMLPolymorphVariable {
 friend class XMLAttributes;
@@ -23,9 +23,9 @@ public:
     template <typename ArgType>
     bool handleEvent( const ArgType &args )
     {
-        EventHandler<ArgType> *handler;
+        AttributeEventHandler<ArgType> *handler;
 
-        handler = dynamic_cast<EventHandler<ArgType> *>( this );
+        handler = dynamic_cast<AttributeEventHandler<ArgType> *>( this );
         
         if (handler)
             return handler->handle( args );
@@ -41,7 +41,7 @@ protected:
 extern template class XMLStub<XMLAttribute>;
 
 template <typename ArgType>
-class EventHandler : public virtual XMLAttribute {
+class AttributeEventHandler : public virtual XMLAttribute {
 public:
     virtual bool handle( const ArgType & ) { 
         return false;

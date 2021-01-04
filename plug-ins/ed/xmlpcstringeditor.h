@@ -29,7 +29,7 @@ public:
     reg_t defaultReg;
 };
 
-class XMLAttributeEditorState : public EventHandler<WebEditorSaveArguments>,
+class XMLAttributeEditorState : public AttributeEventHandler<WebEditorSaveArguments>,
                                 public XMLVariableContainer
 {
 XML_OBJECT

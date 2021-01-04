@@ -27,7 +27,7 @@ public:
     XML_VARIABLE XMLInteger security;
 };
 
-class XMLAttributeOLC : public EventHandler<WebEditorSaveArguments>, public XMLVariableContainer {
+class XMLAttributeOLC : public AttributeEventHandler<WebEditorSaveArguments>, public XMLVariableContainer {
 XML_OBJECT
 public:
     typedef ::Pointer<XMLAttributeOLC> Pointer;

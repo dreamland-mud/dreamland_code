@@ -98,7 +98,7 @@
 #include "loadsave.h"
 #include "fread_utils.h"
 #include "compatflags.h"
-
+#include "itemevents.h"
 #include "vnum.h"
 #include "def.h"
 
@@ -1847,6 +1847,9 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             if (FeniaManager::wrapperManager)
                                 FeniaManager::wrapperManager->linkWrapper( obj );
                             
+                            // Notify item load listeners such as weapon randomizer.
+                            eventBus->publish(ItemReadEvent(obj));
+
                             if (fPersonal) 
                                 convert_personal( obj );
 

@@ -19,14 +19,12 @@
 #include "affect.h"
 
 #include "dreamland.h"
-#include "weapongenerator.h"
 #include "loadsave.h"
-#include "material.h"
-#include "damageflags.h"
 #include "wiznet.h"
 #include "gsn_plugin.h"
 #include "descriptor.h"
 #include "occupations.h"
+#include "itemevents.h"
 #include "save.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -135,92 +133,6 @@ static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
     return count;
 }
 
-static void randomize_item(Object *obj, RESET_DATA *pReset)
-{
-    if (pReset->rand == RAND_NONE)
-        return;
-
-    if (obj->pIndexData->item_type != ITEM_WEAPON) {
-        bug("random reset: %d not a weapon", obj->pIndexData->vnum);
-        return;
-    }
-    
-    if (pReset->bestTier == 0) {
-        bug("random reset: no tiers for vnum %d", obj->pIndexData->vnum);
-        return;
-    }
-
-    Character *mob = obj->getCarrier();
-    int align = ALIGN_NONE;
-    if (mob && !mob_has_occupation(mob->getNPC(), OCC_SHOPPER))
-        align = mob->alignment;
-
-    WeaponGenerator gen;
-    gen.item(obj)
-        .randomTier(pReset->bestTier)
-        .alignment(align);
-
-    if (pReset->rand == RAND_ALL) {
-        gen.randomWeaponClass()
-           .randomNames();
-    }
-    else if (pReset->rand == RAND_STAT) {
-        // TODO should iterate through weapon flags and extra flags. A method of WeaponGenerator?
-        if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
-            gen.addRequirement("two_hands");
-        else
-            gen.addForbidden("two_hands");
-
-        if (material_is_flagged(obj, MAT_INDESTR))
-            gen.addRequirement("platinum");
-        else if (material_is_flagged(obj, MAT_TOUGH))
-            gen.addRequirement("titanium");
-        else if (material_is_typed(obj, MAT_WOOD))
-            gen.addRequirement("wood");
-        else if (material_is_flagged(obj, MAT_MELTING))
-            gen.addRequirement("ice");
-        else {
-            gen.addForbidden("platinum");
-            gen.addForbidden("titanium");
-            gen.addForbidden("wood");
-            gen.addForbidden("ice");
-        }
-        
-        if (IS_SET(obj->extra_flags, ITEM_ANTI_EVIL))
-            gen.addRequirement("anti_evil");
-        
-        if (IS_SET(obj->extra_flags, ITEM_ANTI_GOOD))
-            gen.addRequirement("anti_good");
-        
-        if (IS_SET(obj->extra_flags, ITEM_EVIL))
-            gen.addRequirement("evil");
-        
-        if (IS_SET(obj->extra_flags, ITEM_NOREMOVE))
-            gen.addRequirement("noremove");
-    }
-
-    gen.randomAffixes()
-        .assignHitroll()
-        .assignDamroll()
-        .assignValues()
-        .assignFlags()
-        .assignAffects()
-        .assignTimers();
-
-    if (pReset->rand == RAND_ALL) {
-        gen.assignNames();
-        gen.assignDamageType();
-    }
-
-    gen.assignColours();
-
-    notice("%s reset: item [%d] [%lld] tier %s created in room [%d]",
-            pReset->rand.name().c_str(),
-            obj->pIndexData->vnum, obj->getID(), 
-            obj->getProperty("tier").c_str(), obj->getRoom()->vnum);
-
-}
-
 /** Equip an item if required by reset configuration. */
 static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob, bool verbose)
 {
@@ -300,7 +212,7 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to, bool i
         Object *obj = create_object(pObjIndex, 0);
         obj->reset_obj = obj_to->getID();
         obj_to_obj( obj, obj_to );
-        randomize_item(obj, pReset);
+        eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
 
         count++;
 
@@ -334,7 +246,7 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 
     // Give and equip the item.
     obj_to_char( obj, mob );
-    randomize_item(obj, pReset);
+    eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
         
     if (obj->pIndexData->limit != -1)
         if (verbose)
@@ -581,7 +493,7 @@ void reset_room(Room *pRoom, int flags)
             obj->cost = 0;
             obj->reset_room = pRoom->vnum;
             obj_to_room( obj, pRoom );
-            randomize_item(obj, pReset);
+            eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
             changedObj = true;
             last = true;
             break;

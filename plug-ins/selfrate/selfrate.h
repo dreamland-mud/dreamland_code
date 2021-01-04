@@ -22,7 +22,7 @@ bool rated_as_newbie( PCMemoryInterface* );
 bool rated_as_expert( PCMemoryInterface* );
 bool rated_as_guru( PCMemoryInterface* );
 
-class XMLAttributeSelfRate : public EventHandler<WhoisArguments>,
+class XMLAttributeSelfRate : public AttributeEventHandler<WhoisArguments>,
                              public XMLVariableContainer {
 XML_OBJECT
 public:

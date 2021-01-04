@@ -7,6 +7,7 @@
 #include <jsoncpp/json/json.h>
 #include "flags.h"
 #include "affect.h"
+#include "plugin.h"
 
 class Object;
 class PCharacter;

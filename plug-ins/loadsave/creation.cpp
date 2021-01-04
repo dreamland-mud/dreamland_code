@@ -13,7 +13,6 @@
 #include "skillreference.h"
 #include "mobilebehaviormanager.h"
 #include "objectbehaviormanager.h"
-
 #include "objectmanager.h"
 #include "affect.h"
 #include "pcharacter.h"
@@ -22,6 +21,7 @@
 #include "object.h"
 #include "race.h"
 
+#include "itemevents.h"
 #include "act.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -502,6 +502,8 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
             }
         }
 
+        // Notify item creation listeners.
+        eventBus->publish(ItemCreatedEvent(obj, Count));
         return obj;
 }
 
