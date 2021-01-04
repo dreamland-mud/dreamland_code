@@ -16,7 +16,7 @@
 #include "scheduledxmlattribute.h"
 
 class XMLAttributeCards : 
-    public EventHandler<DeathArguments>, 
+    public AttributeEventHandler<DeathArguments>, 
     public XMLVariableContainer
 {
 XML_OBJECT

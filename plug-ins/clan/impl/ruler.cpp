@@ -269,8 +269,8 @@ bool ClanGuardRulerJailer::specFight( )
             ch->setClan( clan_ruler );
             interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
                             victim->getNameP(), 
-                            ch->in_room->name,
-                            ch->in_room->area->name);
+                            ch->in_room->getName(),
+                            ch->in_room->areaName());
 
 
             if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
@@ -478,15 +478,16 @@ SKILL_RUNP( manacles )
                 act_p("$c1 бросает быстрый взгляд на руки $C4.",
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-                if ( victim->isAffected(gsn_manacles) )
+                Affect *paf = victim->affected.find(gsn_manacles);
+
+                if (paf)
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_manacles) : 0;
 
                         if ( paf->duration >= 0 )
                         {
                                 sprintf (buf,"$C1 закован на %d час%s."
-                                        ,paf->duration
+                                        ,paf->duration.getValue()
                                         ,GET_COUNT(paf->duration, "","а","ов"));
                         }
                         else
@@ -589,16 +590,7 @@ SKILL_RUNP( manacles )
 
                 if (success)
                 {
-                        Affect af;
-
-                        af.where                        = TO_AFFECTS;
-                        af.type                                = gsn_manacles;
-                        af.level                        = ch->getPC()->getClanLevel();
-                        af.duration                = duration;
-                        af.bitvector        = 0;
-                        af.modifier                = 0;
-                        af.location                = APPLY_NONE;
-                        affect_to_char ( victim, &af);
+                        postaffect_to_char(victim, gsn_manacles, duration);
 
                         act_p("Ты успешно заковываешь $C4 в кандалы!",
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1077,12 +1069,12 @@ SKILL_RUNP( suspect )
         if ( arg == 0
                 || arg[0] == '\0' )
         {
-                Affect *paf = victim->affected ? victim->affected->affect_find (gsn_suspect) : 0;
+                Affect *paf = victim->affected.find (gsn_suspect);
 
                 if ( paf != 0 )   
                 {
                         sprintf (buf,"Повестка $C2 действительна в течении %d час%s."
-                                ,paf->duration
+                                ,paf->duration.getValue()
                                 ,GET_COUNT(paf->duration, "а","ов","ов"));
 
                         victim->send_to ("Ты чувствуешь - тебя ждут в Суде.\n\r");
@@ -1133,17 +1125,7 @@ SKILL_RUNP( suspect )
 
         if ( !victim->isAffected(gsn_suspect) )
         {
-                Affect af;
-
-                af.where                        = TO_AFFECTS;
-                af.type                                = gsn_suspect;
-                af.level                        = ch->getPC()->getClanLevel();
-                af.duration                = value;
-                af.bitvector        = 0;
-                af.modifier                = 0;
-                af.location                = APPLY_NONE;
-
-                affect_to_char ( victim, &af);
+                postaffect_to_char(victim, gsn_suspect, value);
 
                 act_p ("Ты посылаешь повестку $C4.", ch, 0, victim,
                         TO_CHAR, POS_RESTING );
@@ -1236,15 +1218,16 @@ SKILL_RUNP( jail )
                 act_p("$c1 пристально смотрит на $C4.",
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-                if ( victim->isAffected(gsn_jail) )
+                Affect *paf = victim->affected.find (gsn_jail);
+                if (paf)
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_jail) : 0;
+                        
 
                         if ( paf->duration >= 0 )
                         {
                                 sprintf (buf,"$C1 в тюряге на %d час%s."
-                                        ,paf->duration
+                                        ,paf->duration.getValue()
                                         ,GET_COUNT(paf->duration, "","а","ов"));
                         }
                         else
@@ -1317,16 +1300,7 @@ SKILL_RUNP( jail )
                         affect_strip ( victim, gsn_jail );
                 }
 
-                Affect af;
-
-                af.where                        = TO_AFFECTS;
-                af.type                                = gsn_jail;
-                af.level                        = ch->getPC()->getClanLevel();
-                af.duration                = duration;
-                af.bitvector        = 0;
-                af.modifier                = 0;
-                af.location                = APPLY_NONE;
-                affect_to_char ( victim, &af);
+                postaffect_to_char(victim, gsn_jail, duration);
 
                 act_p("Ты приговариваешь $C4 к тюремному заключению!",
                                         ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1421,15 +1395,16 @@ SKILL_RUNP( dismiss )
                 act_p("$c1 роется в личном деле $C4.",
                                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-                if ( victim->isAffected(gsn_dismiss) )
+                Affect *paf = victim->affected.find (gsn_dismiss);
+
+                if (paf)
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_dismiss) : 0;
 
                         if ( paf->duration >= 0 )
                         {
                                 sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя на %d час%s."
-                                        ,paf->duration
+                                        ,paf->duration.getValue()
                                         ,GET_COUNT(paf->duration, "","а","ов"));
                         }
                         else
@@ -1494,16 +1469,7 @@ SKILL_RUNP( dismiss )
                         affect_strip ( victim, gsn_dismiss );
                 }
 
-                Affect af;
-
-                af.where                        = TO_AFFECTS;
-                af.type                                = gsn_dismiss;
-                af.level                        = ch->getPC()->getClanLevel();
-                af.duration                = duration;
-                af.bitvector        = 0;
-                af.modifier                = 0;
-                af.location                = APPLY_NONE;
-                affect_to_char ( victim, &af);
+                postaffect_to_char(victim, gsn_dismiss, duration);
 
                 act_p("Ты лишаешь $C4 права вершить суд!",
                                         ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1592,8 +1558,8 @@ bool RulerSpecialGuard::specFight( )
     ch->setClan( clan_ruler );
     interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
                     victim->getNameP(), 
-                    ch->in_room->name, 
-                    ch->in_room->area->name);
+                    ch->in_room->getName(), 
+                    ch->in_room->areaName());
 
     if ( ( ch->getModifyLevel() + 20 > victim->getModifyLevel() )
             && !is_safe_nomessage ( ch, victim ) )
@@ -1649,23 +1615,23 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
         
         if (IS_SET(mob->pIndexData->area->area_flag, AREA_HOMETOWN)) {
             ostringstream buf;
-            list<Room *> repops;
+            list<RoomIndexData *> repops;
 
-            for (Room *room = room_list; room; room = room->rnext)
-                for (RESET_DATA *pReset = room->reset_first; pReset; pReset = pReset->next)
+            for (auto &r: roomIndexMap)
+                for (auto &pReset: r.second->resets)
                     if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum) 
-                        repops.push_back( room );
+                        repops.push_back( r.second );
             
             if (repops.size( ) == 1) {
                 ch->printf( "%s обитает в местности под названием %s (%s).\r\n",
                             mob->getNameP( '1' ).c_str( ), 
-                            repops.front( )->name, repops.front( )->area->name );
+                            repops.front( )->name, repops.front( )->areaIndex->name );
             }
             else if (repops.size( ) > 0) {
                 act( "$C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
 
-                for (list<Room *>::iterator r = repops.begin( ); r != repops.end( ); r++)
-                    ch->printf( "    %s  (%s)\r\n", (*r)->name, (*r)->area->name );
+                for (auto &r: repops)
+                    ch->printf( "    %s  (%s)\r\n", r->name, r->areaIndex->name);
             }
         }
     }
@@ -1723,35 +1689,17 @@ VOID_SPELL(RulerAura)::run( Character *ch, Character *, int sn, int level )
 
     if (!ch->isAffected(sn))
     {
-      ch->send_to("Аура Правителя защищает тебя от очарования и помогает видеть сквозь тень и камуфляж.\n\r");
+      ch->send_to("Аура Правителя помогает тебе видеть сквозь тень и камуфляж.\n\r");
 
-      af.where = TO_IMMUNE;
+      af.bitvector.setTable(&detect_flags);
       af.type = sn;
       af.duration = level / 4;
       af.level = ch->getModifyLevel();
-      af.bitvector = IMM_CHARM;
-      af.location = 0;
-      af.modifier = 0;
+      af.bitvector.setValue(DETECT_FADE | ACUTE_VISION | DETECT_IMP_INVIS | DETECT_INVIS | DETECT_HIDDEN);
       affect_to_char(ch, &af);
-
-
-      af.where                = TO_DETECTS;
-      af.modifier = ch->applyCurse( level / 8 );
-      af.location = APPLY_NONE;
-      af.bitvector = DETECT_FADE;
-      affect_to_char(ch, &af);
-
-      af.where     = TO_DETECTS;
-      af.location  = APPLY_NONE;
-      af.modifier  = 0;
-      af.bitvector = ACUTE_VISION;
-      affect_to_char( ch, &af );
-
     }
   else
       ch->send_to("Ты и так уже знаешь многое в этом мире, неподвластное другим.\n\r");
- return;
-
 }
 
 
@@ -1788,25 +1736,22 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
   badge = create_object( get_obj_index(OBJ_VNUM_DEPUTY_BADGE),level);
   badge->level = ch->getRealLevel( );
 
-  af.where        = TO_OBJECT;
   af.type         = sn;
   af.level        = level;
   af.duration     = -1;
-  af.modifier     = ch->applyCurse( level );
-  af.bitvector    = 0;
 
-  af.location     = APPLY_HIT;
+  af.modifier     = ch->applyCurse( level );
+  af.location = APPLY_HIT;
   affect_to_obj( badge, &af);
 
-  af.location     = APPLY_MANA;
+  af.location = APPLY_MANA;
   affect_to_obj( badge, &af);
 
   af.modifier     = ch->applyCurse( level / 8 );
-
-  af.location     = APPLY_HITROLL;
+  af.location = APPLY_HITROLL;
   affect_to_obj( badge, &af);
 
-  af.location     = APPLY_DAMROLL;
+  af.location = APPLY_DAMROLL;
   affect_to_obj( badge, &af);
 
 
@@ -1841,36 +1786,23 @@ VOID_SPELL(ShieldOfRuler)::run( Character *ch, char *target_name, int sn, int le
   shield->cost  = 0;
   obj_to_char(shield, ch);
 
-  af.where        = TO_OBJECT;
   af.type         = sn;
   af.level        = level;
   af.duration     = -1;
+
   af.modifier     = ch->applyCurse( level / 8 );
-  af.bitvector    = 0;
-
-  af.location     = APPLY_HITROLL;
+  af.location = APPLY_HITROLL;
   affect_to_obj( shield, &af);
 
-  af.location     = APPLY_DAMROLL;
+  af.location = APPLY_DAMROLL;
   affect_to_obj( shield, &af);
 
-
-  af.where        = TO_OBJECT;
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
   af.modifier     = ch->applyCurse( -level * 2 );
-  af.bitvector    = 0;
-  af.location     = APPLY_AC;
+  af.location = APPLY_AC;
   affect_to_obj( shield, &af);
 
-  af.where        = TO_OBJECT;
-  af.type         = sn;
-  af.level        = level;
-  af.duration     = -1;
   af.modifier     = ch->applyCurse( max( 1, level /  30 ) );
-  af.bitvector    = 0;
-  af.location     = APPLY_CHA;
+  af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
   act_p("Ты взмахиваешь руками и создаешь $o4!",
@@ -1926,14 +1858,7 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
 
   stalker = create_mobile( get_mob_index(MOB_VNUM_STALKER) );
 
-  af.where                = TO_AFFECTS;
-  af.type               = sn;
-  af.level              = level;
-  af.duration           = 6;
-  af.bitvector          = 0;
-  af.modifier           = 0;
-  af.location           = APPLY_NONE;
-  affect_to_char(ch, &af);
+  postaffect_to_char(ch, sn, 6);
 
   for (i=0;i < stat_table.size; i++)
     {
@@ -1999,7 +1924,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
         && victim->in_room->vnum >= 4343
         && victim->in_room->vnum <= 4369)
     {
-        if ( ( location = get_room_index( 4283 ) ) == 0 )
+        if ( ( location = get_room_instance( 4283 ) ) == 0 )
         {
             victim->send_to("Мда... Освобождать-то тебя - некуда.\n\r");
             return;
@@ -2017,7 +1942,7 @@ VOID_AFFECT(Jail)::update( Character *ch, Affect *paf )
     if ( paf->duration < 3) {
         clantalk(*clan_ruler, "%s выйдет на свободу через %d час%s",
                 ch->getNameP( '1' ).c_str(),
-                paf->duration,
+                paf->duration.getValue(),
                 GET_COUNT(paf->duration, "","а","ов"));
     }
 }
@@ -2057,7 +1982,7 @@ VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf )
     if ( paf->duration < 3) {
         clantalk(*clan_ruler, "Повестка в суд для %s истекает через %d час%s",
                 ch->getNameP( '2' ).c_str(),
-                paf->duration,
+                paf->duration.getValue(),
                 GET_COUNT(paf->duration, "","а","ов"));
     }
 }

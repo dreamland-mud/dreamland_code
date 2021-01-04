@@ -363,7 +363,7 @@ void KidnapPrince::banditsUnleash( PCharacter *hero )
             bandit->behavior->spec( );
         }
     }
-    catch (QuestCannotStartException e) {
+    catch (const QuestCannotStartException &e) {
         return;
     }
     

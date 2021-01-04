@@ -15,7 +15,7 @@
 #include "mobiles.h"
 
 class Room;
-struct area_data;
+struct AreaIndexData;
 
 /*---------------------------------------------------------------------------
  * InvasionScenario 
@@ -28,7 +28,7 @@ public:
     
     virtual bool canStart( );
     virtual bool checkRoom( Room * );
-    virtual bool checkArea( area_data * );
+    virtual bool checkArea( AreaIndexData * );
     virtual void collectRooms( vector<Room *> &, int ) = 0;
 
     inline const DLString& getStartMsg( );

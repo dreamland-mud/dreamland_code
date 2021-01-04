@@ -52,9 +52,15 @@ void GroupChannel::triggers( Character *ch, const DLString &msg ) const
 
     if (!ch->is_npc( ) && (!str_prefix( msg.c_str( ), "where are you?" )
                 || !str_prefix( msg.c_str( ), "где ты?" ))) {
-            NPCharacter *pet = ch->getPC( )->pet;
+        NPCharacter *pet = ch->getPC( )->pet;
     
-        if (pet && pet->position > POS_SLEEPING){
+        if (!pet)
+            return;
+
+        if (IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON))
+            return;
+
+        if (pet->position > POS_SLEEPING){
             if(IS_AFFECTED(pet, AFF_BLIND)){
             tell_raw( ch, pet, "%s, я ничего не вижу!",
                         GET_SEX( ch, "Хозяин", "Хозяин", "Хозяйка"));
@@ -66,7 +72,7 @@ void GroupChannel::triggers( Character *ch, const DLString &msg ) const
             else{   
             tell_raw( ch, pet, "%s, я нахожусь в {hh%s{hx - %s",
                         GET_SEX( ch, "Хозяин", "Хозяин", "Хозяйка"),
-                        pet->in_room->area->name, pet->in_room->name );
+                        pet->in_room->areaName(), pet->in_room->getName() );
             }
         }
     }

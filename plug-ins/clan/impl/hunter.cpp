@@ -18,6 +18,7 @@
 
 #include "commonattributes.h"
 #include "char.h"
+#include "util/regexp.h"
 
 #include "commandtemplate.h"
 #include "summoncreaturespell.h"
@@ -36,6 +37,7 @@
 #include "magic.h"
 #include "save.h"
 #include "material.h"
+#include "weapongenerator.h"
 #include "damage.h"
 #include "merc.h"
 #include "gsn_plugin.h"
@@ -52,6 +54,8 @@
 
 #define OBJ_VNUM_HUNTER_PIT           110
 
+bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg );
+
 GSN(hunter_pit);
 GSN(hunter_beacon);
 GSN(hunter_snare);
@@ -67,6 +71,11 @@ CLAN(flowers);
 /*--------------------------------------------------------------------------
  * Hunter's Cleric 
  *-------------------------------------------------------------------------*/
+void ClanHealerHunter::tell( Character *ach, const char *msg )
+{
+    speech(ach, msg);
+}
+
 void ClanHealerHunter::speech( Character *ach, const char *speech )
 {
     PCharacter *wch;
@@ -75,22 +84,24 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
     int vnum = 0;
     ClanAreaHunter::Weapons::iterator i;
     ClanAreaHunter::Pointer clanArea;
-    DLString msg( speech ), trouble( "trouble" );
+    RegExp trouble("^(trouble|потеряла?) *(.*)$");
     
     if (!( wch = ach->getPC( ) ))
         return;
-
-    if (!trouble.strPrefix( msg ))
-        return;
-    
-    msg.erase( 0, trouble.length( ) );
-
     if (!getClanArea( ))
         return;
     if (!( clanArea = getClanArea( ).getDynamicPointer<ClanAreaHunter>( ) ))
         return;
-    if (!( vnum = clanArea->vnumByString( msg ) ))
+
+    RegExp::MatchVector matches = trouble.subexpr(speech);
+    if (matches.empty())
         return;
+
+    DLString itemName = matches.at(1);
+    if (!( vnum = clanArea->vnumByString( itemName ) )) {
+        do_say(ch, "Я не понимаю, что именно ты хочешь вернуть?");
+        return;
+    }
    
     if (wch->getClan( ) != clanArea->getClan( )) {
         do_say(ch, "Тебе придется сильно постараться!");
@@ -111,12 +122,13 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
             obj = clanArea->createArmor( wch );
         else
             obj = clanArea->createWeapon( wch, vnum );
+
+        obj_to_char( obj, wch );
         
-        interpret_fmt( ch, "emote создает %s.", obj->getShortDescr( '4' ).c_str( ) );
-        interpret_fmt( ch, "say Я дам тебе другой %s.", obj->getShortDescr( '4' ).c_str( ) );
+        ch->recho("%^C1 создает %O4.", ch, obj);        
+        say_fmt("Я дам тебе друг%3$Gое|ой|ую %3$#O4.", ch, wch, obj);        
         act( "$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
         act( "$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
-        obj_to_char( obj, wch );
         do_say( ch, "Будь внимательней! Не потеряй снова!" );
         return;
     }
@@ -124,23 +136,22 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
     if (( carrier = obj->getCarrier( ) )) {
         if (carrier == wch) {
             do_say( ch, "Это шутка такая? Давай посмеемся вместе!" );
-            interpret_raw( ch, "smite", wch->getNameP( ));
         }
         else {
-            interpret_raw( ch, "say", "%s находится у %s!",
+            interpret_raw( ch, "say", "{1%s{2 находится у %s!",
                             obj->getShortDescr( '1' ).c_str( ),
-                            wch->sees( carrier, '4' ).c_str( ) );
+                            wch->sees( carrier, '2' ).c_str( ) );
             interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
                             wch->sees( carrier, '1' ).c_str( ),
-                            carrier->in_room->area->name,
-                            carrier->in_room->name );
+                            carrier->in_room->areaName(),
+                            carrier->in_room->getName() );
         }
     }
     else {
-        interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
+        interpret_raw( ch, "say", "{1%s{2 находится в зоне %s около %s!",
                         obj->getShortDescr( '1' ).c_str( ),
-                        obj->getRoom( )->area->name, 
-                        obj->getRoom( )->name );
+                        obj->getRoom( )->areaName(), 
+                        obj->getRoom()->getName() );
     }
 }
 
@@ -216,7 +227,7 @@ void ClanGuardHunter::createEquipment( PCharacter *wch )
     obj_to_char( armor, wch );
 
     do_say( ch, "Помни! Если оружие будет утеряно, то найти его поможет клановый лекарь!" );
-    do_say( ch, "Просто скажи ему 'trouble' и имя вещи... Например, 'troublearmor'." );
+    do_say( ch, "Просто скажи ему '{lRпотерял{Sfа{Sx{lEtrouble{lx{g' и имя вещи. Например, '{lRпотерял{Sfа{Sx жакет{lEtrouble armor{x'." );
 }
 
 /*--------------------------------------------------------------------------
@@ -229,7 +240,7 @@ HunterEquip::HunterEquip( )
 
 void HunterEquip::config( PCharacter *wch )
 {
-    obj->fmtShortDescr( obj->getShortDescr( ), wch->getNameP( ) );
+    obj->fmtShortDescr( obj->getShortDescr( ), wch->getNameP('2').c_str() );
     obj->setOwner( wch->getNameP( ) );
     obj->from = str_dup( wch->getNameP( ) );
     obj->level = wch->getRealLevel( );
@@ -238,7 +249,7 @@ void HunterEquip::config( PCharacter *wch )
     if (obj->pIndexData->extra_descr) {
         char buf[MAX_STRING_LENGTH];
 
-        sprintf( buf, obj->pIndexData->extra_descr->description, wch->getNameP( ) );
+        sprintf( buf, obj->pIndexData->extra_descr->description, wch->getNameP('1').c_str() );
         obj->addExtraDescr( obj->pIndexData->extra_descr->keyword, buf );
     }
 }   
@@ -278,19 +289,15 @@ void HunterArmor::wear( Character *ch )
 {
     obj->level = ch->getRealLevel( );
 
-    if (obj->affected) {
-        Affect *paf;
-
-        for (paf = obj->affected; paf; paf = paf->next)
+    if (!obj->affected.empty()) {
+        for (auto &paf: obj->affected)
             addAffect( ch, paf );
     }
     else {
         Affect af;
 
-        af.where = TO_OBJECT;
         af.type  = -1;
         af.duration = -1;
-        af.bitvector = 0;
 
         af.location = APPLY_AC;
         addAffect( ch, &af );
@@ -334,75 +341,15 @@ void HunterArmor::delete_( Character *ch )
  *-------------------------------------------------------------------------*/
 void HunterWeapon::wear( Character *ch )
 {
-    int i;
-    
-    struct weapon_param {
-        int level;
-        int value1, value2;
-    };
-    static const struct weapon_param params [] = {
-        { 10,  8,  3 },
-        { 15,  9,  3 },
-        { 20, 10,  4 },
-        { 30, 10,  5 },
-        { 40, 10,  6 },
-        { 50, 10,  7 },
-        { 55, 10,  8 },
-        { 60, 12,  7 },
-        { 70, 12,  8 },
-        { 80, 12,  9 },
-        { 90, 12, 10 },
-        {200, 12, 11 },
-    };
-    static const int size = sizeof(params) / sizeof(*params); 
-
-    obj->level = ch->getRealLevel( );
-
-    for (i = 0; i < size; i++) 
-        if (obj->level <= params[i].level) {
-            obj->value1(params[i].value1);
-            obj->value2(params[i].value2);
-            break;
-        }
-
-    if (obj->affected) {
-        Affect *paf;
-
-        for (paf = obj->affected; paf; paf = paf->next)
-            addAffect( ch, paf );
-    }
-    else {
-        Affect af;
-
-        af.where = TO_OBJECT;
-        af.type  = -1;
-        af.duration = -1;
-        af.bitvector = 0;
-
-        af.location = APPLY_HITROLL;
-        addAffect( ch, &af );        
-        affect_to_obj( obj, &af );
-
-        af.location = APPLY_DAMROLL;
-        addAffect( ch, &af );        
-        affect_to_obj( obj, &af );
-    }
-}
-
-void HunterWeapon::addAffect( Character *ch, Affect *paf ) 
-{  
-    int level = ch->getModifyLevel( );
-
-    switch( paf->location ) {
-    case APPLY_DAMROLL:
-        paf->level = level;
-        paf->modifier = level / 7;
-        return;
-    case APPLY_HITROLL:
-        paf->level = level;
-        paf->modifier = level / 5;
-        return;
-    }
+    obj->level = ch->getModifyLevel();
+    WeaponGenerator()
+        .item(obj)
+        .valueTier(2)
+        .hitrollTier(IS_GOOD(ch) ? 2 : 3)
+        .damrollTier(IS_EVIL(ch) ? 2 : 3)
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
 }
 
 void HunterWeapon::fight( Character *ch )
@@ -458,13 +405,17 @@ void HunterWeapon::fight_axe( Character *ch )
     /* and now the attack */
 
     if (number_percent() < chance){
-            ch->setWait( gsn_shield_cleave->getBeats( )  );
+            //ch->setWait( gsn_shield_cleave->getBeats( )  );
         act_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 раскалывает пополам твой щит.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         extract_obj( get_eq_char(victim,wear_shield) );
-    }else
-            ch->setWait( gsn_shield_cleave->getBeats( )  );
+    }else if(::chance(10)){
+        act_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
+        act_p("$o1 с грохотом отскакивает от твоего щита.",ch,obj,victim,TO_VICT,POS_DEAD);
+        act_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
+            //ch->setWait( gsn_shield_cleave->getBeats( )  );
+    }
 }
 
 /* stun */
@@ -483,7 +434,7 @@ void HunterWeapon::fight_mace( Character *ch )
         act_p("$o1 оглушает тебя.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 оглушает $C4.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         SET_BIT(victim->affected_by,AFF_WEAK_STUN);
-        ch->setWaitViolence( 2 );
+        victim->setWaitViolence( 2 );
     }
 }
 
@@ -523,16 +474,16 @@ void HunterWeapon::fight_sword( Character *ch )
     chance += obj->level - wield->level;
 
     if (number_percent() < chance){
-            ch->setWait( gsn_weapon_cleave->getBeats( )  );
+            //ch->setWait( gsn_weapon_cleave->getBeats( )  );
         act_p("$o1 уничтожает оружие $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 уничтожает твое оружие.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 уничтожает  оружие $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
         extract_obj( get_eq_char(victim,wear_wield) );
-    }else{
+    }else if(::chance(10)){
         act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         act_p("$o1 со звоном отскакивает от твоего оружия.",ch,obj,victim,TO_VICT,POS_DEAD);
         act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
-            ch->setWait( gsn_weapon_cleave->getBeats( )  );
+            //ch->setWait( gsn_weapon_cleave->getBeats( )  );
     }
 }
 
@@ -572,14 +523,15 @@ Object * ClanAreaHunter::createWeapon( PCharacter *wch, int vnum )
 
 int ClanAreaHunter::vnumByString( const DLString& msg )
 {
-    Weapons::iterator i;
+    list<OBJ_INDEX_DATA *> items;
+    items.push_back(get_obj_index(armorVnum));
+    for (auto &w: weapons) 
+        items.push_back(get_obj_index(w.second));
 
-    if (msg == "armor" || msg == "armour")
-        return armorVnum;
-    else
-        for (i = weapons.begin( ); i != weapons.end( ); i++) 
-            if (msg == i->first) 
-                return i->second;
+    for (auto *pObj: items) {
+        if (pObj && obj_index_has_name(pObj, msg))
+            return pObj->vnum;
+    }
 
     return 0;
 }
@@ -709,11 +661,11 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
         {
             if (ch->is_immortal() && in_obj->in_room != 0)
                 sprintf( buf, "находится в %s [Комната %d]\n\r",
-                    in_obj->in_room->name, in_obj->in_room->vnum);
+                    in_obj->in_room->getName(), in_obj->in_room->vnum);
             else
                 sprintf( buf, "находится в %s\n\r",
                     in_obj->in_room == 0
-                        ? "somewhere" : in_obj->in_room->name );
+                        ? "somewhere" : in_obj->in_room->getName() );
         }
 
         buf[0] = Char::upper(buf[0]);
@@ -801,7 +753,7 @@ bool HunterTrapObject::checkPrevent( Character *victim )
 
 bool HunterTrapObject::checkRoom( Room *r )
 {
-    if (r->clan != clan_none && r->clan != clan_hunter)
+    if (r->pIndexData->clan != clan_none && r->pIndexData->clan != clan_hunter)
         return false;
     
     if (IS_SET(r->room_flags, ROOM_SAFE | ROOM_LAW | ROOM_NO_DAMAGE))
@@ -867,7 +819,7 @@ void HunterTrapObject::log( Character *ch, const char *verb )
 {
     wiznet( WIZ_FLAGS, 0, 110, 
             "Охотничьи ловушки: %^C1 %s %O4 в [%d] '%s'",
-            ch, verb, obj, ch->in_room->vnum, ch->in_room->name );
+            ch, verb, obj, ch->in_room->vnum, ch->in_room->getName() );
 }
 
 /*
@@ -978,7 +930,7 @@ void HunterBeaconTrap::greet( Character *victim )
 
     clantalk( *clan_hunter, 
               "Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s.",
-              obj->in_room->name, victim->getNameP( '2' ).c_str( ) );
+              obj->in_room->getName(), victim->getNameP( '2' ).c_str( ) );
     
     log( victim, "активизирует" );
 
@@ -1160,7 +1112,7 @@ bool HunterSnareTrap::checkRoom( Room *r )
     if (!HunterTrapObject::checkRoom( r ))
         return false;
 
-    switch (r->sector_type) {
+    switch (r->getSectorType()) {
     case SECT_FOREST:
     case SECT_HILLS:
     case SECT_FIELD:
@@ -1306,7 +1258,7 @@ bool HunterShovel::checkRoom( Room *r )
     if (!HunterTrapObject::checkRoom( r ))
         return false;
 
-    switch (r->sector_type) {
+    switch (r->getSectorType()) {
     case SECT_FOREST:
     case SECT_HILLS:
     case SECT_FIELD:
@@ -1421,13 +1373,13 @@ struct HunterPitDamage : public Damage {
                 act("Ты чувствуешь, как яд распространяется по твоим венам.", ch, 0, 0, TO_CHAR);
                 act("$c1 отравле$gно|н|на ядом от $o2.", ch, obj, 0, TO_ROOM);
 
-                af.where     = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.type      = gsn_poison;
                 af.level     = obj->level;
                 af.duration  = obj->level / 4;
-                af.location  = APPLY_STR;
+                af.location = APPLY_STR;
                 af.modifier  = max( 1, obj->level / 20 );
-                af.bitvector = AFF_POISON;
+                af.bitvector.setValue(AFF_POISON);
                 affect_join( ch, &af );
             }
         }
@@ -1577,7 +1529,6 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
         return;
     }
 
-    af.where                = TO_AFFECTS;
     af.type             = sn;
     af.level            = level;
     af.duration         = max( 6, ch->getPC( )->getClanLevel( ) * 2 );

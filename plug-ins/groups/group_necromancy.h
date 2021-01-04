@@ -9,29 +9,6 @@
 #include "summoncreaturespell.h"
 #include "savedcreature.h"
 
-/*
-#include "wanderer.h"
-
-class NecroCreature : public SummonedCreature, public Wanderer {
-XML_OBJECT
-public:
-    typedef ::Pointer<NecroCreature> Pointer;
-
-    
-    virtual void entry( );
-    
-    bool startMoving( );
-    
-protected:
-    virtual bool canEnter( Room *const );
-    virtual bool specIdle( );
-
-public:
-    XML_VARIABLE XMLLongLong masterID;
-    XML_VARIABLE XMLInteger  masterRoomVnum;
-};
-*/
-
 class NecroCreature : public SummonedCreature, 
                       public SavedCreature,
                       public BasicMobileDestiny {

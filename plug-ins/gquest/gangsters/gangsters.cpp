@@ -50,10 +50,9 @@ Gangsters::~Gangsters( )
 
 void Gangsters::create( const Config& )  
 {
-    AREA_DATA *area;
     AreaList areaList;
     
-    for (area = area_first; area; area = area->next) {
+    for(auto &area: areaIndexes) {
         if (area->low_range <= minLevel 
             && !IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HOMETOWN|AREA_HIDDEN
                                         |AREA_NOQUEST|AREA_NOGATE) ) 
@@ -63,11 +62,11 @@ void Gangsters::create( const Config& )
     }
     
     while (!areaList.empty( )) {
-        Room *room;
         int msize;
         int areaIndex;
         MobileList people;
         RoomList mobRooms, portalRooms;
+        AreaIndexData *area;
 
         areaIndex = number_range(0, areaList.size( ) - 1);
         area = areaList[ areaIndex ];
@@ -76,10 +75,9 @@ void Gangsters::create( const Config& )
         mobRoomVnums.clear( );
         portalRoomVnums.clear( );
         
-        for (room = room_list; room; room = room->rnext) {
-            if (room->area != area) 
-                continue;
-                
+        for (auto &r: area->area->rooms) {  
+            Room *room = r.second;
+            
             if (checkRoom( room )) {
                 mobRooms.push_back( room );
                 mobRoomVnums.push_back( room->vnum );
@@ -158,7 +156,7 @@ void Gangsters::cleanup( bool performance )
     }
     
     if (!mobRoomVnums.empty( ))
-        REMOVE_BIT(get_room_index( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
+        REMOVE_BIT(get_room_instance( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
     
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
@@ -177,7 +175,7 @@ void Gangsters::cleanup( bool performance )
         extract_char( ch );
     }
     
-    wipeRoom( get_room_index( GangstersInfo::getThis( )->vnumLair ) );
+    wipeRoom( get_room_instance( GangstersInfo::getThis( )->vnumLair ) );
 }
 
 void Gangsters::destroy( ) 
@@ -453,7 +451,7 @@ void Gangsters::createFirstHint( MobileList &people )
     name = informer->getNameP('1');
     name.upperFirstCharacter( );
     informerName = name;
-    informerRoom = informer->in_room->name;
+    informerRoom = informer->in_room->getName();
 
     buf << name        << " сообщил" << GET_SEX( informer, "", "о", "а" );
     
@@ -463,7 +461,7 @@ void Gangsters::createFirstHint( MobileList &people )
     }
     
     buf << ", что видел" << GET_SEX( informer, "", "о", "а" )
-        << " бандитов возле местности под названием " << informer->in_room->name << ". ";
+        << " бандитов возле местности под названием " << informer->in_room->getName() << ". ";
     setHint( buf.str( ) );
 }            
 
@@ -472,9 +470,9 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
     Room *room = NULL;
 
     for (unsigned int i = 0; i < mobRoomVnums.size( ); i++) {
-        room = get_room_index( mobRoomVnums[i] );
+        room = get_room_instance( mobRoomVnums[i] );
         
-        if (informerRoom.getValue( ) == room->name)
+        if (informerRoom.getValue( ) == room->getName())
             continue;
 
         for (Character *ch = room->people; ch; ch = ch->next_in_room) {
@@ -483,7 +481,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
             if (!getActor( ch )->is_npc( ))
                 continue;
 
-            if (ch->getNPC()->pIndexData->area != room->area) 
+            if (ch->getNPC()->pIndexData->area != room->areaIndex()) 
                 continue;
             
             if (!ch->getRace( )->isPC( ))
@@ -497,7 +495,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
             
             name.upperFirstCharacter( );
             buf        << name << " столкнул" << GET_SEX( ch, "ся", "ось", "ась" )
-                << " с гангстерами возле " << room->name << ".";
+                << " с гангстерами возле " << room->getName() << ".";
 
             return room;
         }
@@ -506,7 +504,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
     /* cannot find mob, give hint only about a room they're in */
     if (room) 
         buf << "Гангстеры были также замечены неподалеку от " 
-            << room->name << ".";
+            << room->getName() << ".";
     
     return room;
 }
@@ -588,6 +586,7 @@ Object * Gangsters::createKey( )
         
     key = create_object( pObjIndex, 0 );
     behavior->setObj( key );
+    behavior->setQuest(*this);
     key->behavior.setPointer( *behavior );
 
     return key;
@@ -646,7 +645,7 @@ void Gangsters::resetKeys( )
         }
         
         obj_to_char( createKey( ), mob );
-        log("new key to mob in room " << mob->in_room->name ); 
+        log("new key to mob in room " << mob->in_room->getName() ); 
     }
 }
 
@@ -660,7 +659,7 @@ Object * Gangsters::createPortal( RoomList &portalRooms )
     room = portalRooms[i]; 
     portalRooms.erase( portalRooms.begin( ) + i );
     
-    switch (room->sector_type) {
+    switch (room->getSectorType()) {
     case SECT_FOREST:
     case SECT_FIELD:
     case SECT_DESERT:
@@ -683,7 +682,7 @@ Object * Gangsters::createPortal( RoomList &portalRooms )
 
     obj_to_room( portal, room );
     portalRoomVnums.push_back( room->vnum );
-    log("put portal in " << room->name);
+    log("put portal in " << room->getName());
 
     return portal;
 }
@@ -739,7 +738,7 @@ Room * Gangsters::recursiveWalk( Room *room, int depth, int maxDepth )
 Room * Gangsters::pickRandomRoom( )
 {
     int i = number_range( 0, mobRoomVnums.size( ) - 1 );
-    return get_room_index( mobRoomVnums[i] );
+    return get_room_instance( mobRoomVnums[i] );
 }
 
 DLString Gangsters::lairHint( ) 
@@ -747,16 +746,16 @@ DLString Gangsters::lairHint( )
     if (!portalRoomVnums.empty( )) {
         int i = number_range(0, portalRoomVnums.size( ) - 1);
         int vnum = portalRoomVnums[i];
-        Room *room = get_room_index( vnum );
+        Room *room = get_room_instance( vnum );
 
         if (room && (room = recursiveWalk( room, 0, number_range( 1, 2 ) )))
-            return room->name;
+            return room->getName();
     }
     
     return "";
 }
 
-void Gangsters::populateArea( AREA_DATA *area, RoomList &mobRooms, int numPortal )
+void Gangsters::populateArea( AreaIndexData *area, RoomList &mobRooms, int numPortal )
 {
     int number;
     
@@ -776,7 +775,7 @@ void Gangsters::populateArea( AREA_DATA *area, RoomList &mobRooms, int numPortal
             key = createKey( );
             keyCount++;
             obj_to_char( key, mob );
-            log("key to mob in room " << mob->in_room->name ); 
+            log("key to mob in room " << mob->in_room->getName() ); 
         }
     }
 }
@@ -786,7 +785,7 @@ void Gangsters::populateLair( )
     Room *lair;
     int number;
 
-    lair = get_room_index( GangstersInfo::getThis( )->vnumLair );
+    lair = get_room_instance( GangstersInfo::getThis( )->vnumLair );
     wipeRoom( lair );
     char_to_room( createChef( ), lair );
 
@@ -825,7 +824,7 @@ bool Gangsters::isPoliceman( Character *ch )
 
 bool Gangsters::checkRoom( Room *const pRoomIndex )
 {
-    if (pRoomIndex->sector_type == SECT_AIR || IS_WATER(pRoomIndex))
+    if (pRoomIndex->getSectorType() == SECT_AIR || IS_WATER(pRoomIndex))
         return false;
     
     if (IS_SET(pRoomIndex->room_flags, ROOM_SAFE|ROOM_NO_QUEST|ROOM_NO_MOB))

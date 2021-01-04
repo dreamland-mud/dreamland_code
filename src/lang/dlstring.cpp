@@ -19,6 +19,8 @@ using std::basic_istringstream;
 
 const DLString DLString::emptyString;
 
+const locale DLString::LOCALE_RU = DLString::initLocale();
+
 bool DLString::strPrefix( const DLString& str ) const
 {
     if (length( ) > str.length( ))
@@ -334,7 +336,7 @@ DLString DLString::getOneArgument( )
 
     cEnd = ' ';
 
-    if (*i == '\'' || *i == '"' || *i == '!')
+    if (dl_is_arg_separator(*i))
         cEnd = *i++;
     
     while (i != end( )) {
@@ -678,3 +680,22 @@ DLString &DLString::cutSize( size_t s )
     return *this;
 }
 
+int DLString::compareRussian(const DLString &other) const
+{
+    const collate<char> &col = use_facet<collate<char>>(LOCALE_RU);
+
+    const char *pb1 = data();
+    const char *pb2 = other.data();
+
+    return col.compare(pb1, pb1 + size(),
+                        pb2, pb2 + other.size());
+}
+
+locale DLString::initLocale()
+{
+    try {
+        return locale("ru_RU.koi8r");
+    } catch (const exception &ex) {
+        return locale();
+    }
+}

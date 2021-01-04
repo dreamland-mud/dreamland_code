@@ -28,7 +28,7 @@ PROF(vampire);
 HOMETOWN(frigate);
 GROUP(none);
 
-const DLString GenericSkill::CATEGORY = "Профессиональные умения";
+const DLString GenericSkill::CATEGORY = "Классовые умения";
 
 GenericSkill::GenericSkill( ) 
                 : raceAffect( 0, &affect_flags ),
@@ -74,18 +74,10 @@ bool GenericSkill::isProfessional() const
     return false;
 }
 
-void GenericSkill::resolve( ) 
-{
-}
-
-void GenericSkill::unresolve( )
-{
-}
-
 /*
  * виден ли скилл этому чару в принципе, независимо от уровня.
  */
-bool GenericSkill::visible( Character *ch ) const
+bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
 {
     const SkillRaceBonus *rb; 
     const SkillClassInfo *ci;
@@ -93,8 +85,8 @@ bool GenericSkill::visible( Character *ch ) const
     if (hidden.getValue( ))
         return false;
 
-    if (ch->is_npc( )) {
-        switch (mob.visible( ch->getNPC( ), this )) {
+    if (mem->getMobile()) {
+        switch (mob.visible( mem->getMobile(), this )) {
         case MPROF_ANY:
             return true;
         case MPROF_NONE:
@@ -104,15 +96,15 @@ bool GenericSkill::visible( Character *ch ) const
         }
     }
     
-    rb = getRaceBonus( ch );
+    rb = getRaceBonus( mem );
     if (rb && rb->visible( ))
         return true;
     
-    ci = getClassInfo( ch );
+    ci = getClassInfo( mem );
     if (ci && ci->visible( ))
         return true;
 
-    if (temporary_skill_active(this, ch))
+    if (temporary_skill_active(this, mem))
         return true;
  
     return false;
@@ -139,23 +131,29 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
     if (ch->is_npc( ))
         return true;
 
+    // Vampires have a restriction that spells are only available in vamp form.
+    if (ch->getProfession( ) != prof_vampire)
+        return true;
+
+    if (!spell)
+        return true;
+
+    if (IS_VAMPIRE(ch))
+        return true;
+
+    // Race bonuses are always accessible.
     rb = getRaceBonus( ch );
     if (rb && !rb->isProfessional( ))
         return true;
 
-    if (ch->getProfession( ) == prof_vampire) {
-        if (spell && !IS_VAMPIRE( ch )) {
-            if (message)
-                ch->send_to("Для этого необходимо превратиться в вампира!\n\r");
-
-            return false;
-        }
-        else
-            return true;
-    }
-    else
+    // Dreamt or bonus skills area always accessible.
+    if (temporary_skill_active(this, ch))
         return true;
 
+    if (message)
+        ch->send_to("Для этого необходимо превратиться в вампира!\n\r");
+
+    return false;
 }
 
 bool GenericSkill::availableForAll( ) const
@@ -218,60 +216,31 @@ int GenericSkill::getLevel( Character *ch ) const
 }
 
 /*
- * Для чаров возвращает процент разученности скила, с учетом всех скилов-предков.
+ * Для чаров возвращает процент разученности скила.
  * Для мобов возвращает dice * level + bonus
  */
 int GenericSkill::getLearned( Character *ch ) const
 {
-    PCharacter *pch;
-    int adept;
-    
     if (!usable( ch ))
         return 0;
 
     if (ch->is_npc( )) 
         return mob.getLearned( ch->getNPC( ), this );
     
-    pch = ch->getPC( );
+    PCharacter *pch = ch->getPC( );
+    int percent = pch->getSkillData( getIndex( ) ).learned;
 
     if (isRaceAffect( pch ))
-        return pch->getSkillData( getIndex( ) ).learned;
+        return percent;
     
     if (temporary_skill_active(this, ch))
-        return pch->getSkillData( getIndex( ) ).learned;
+        return percent;
    
-    adept = pch->getProfession( )->getSkillAdept( );
-            
-    return learnedAux( pch, adept );
-}
-
-/*
- * вспомогательная процедура для getLearned
- * находит минимально разученный скил среди всех предков
- * (без учета скилов, разученных > 75 или совпадающих с расовыми аффектами)
- */
-int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
-{
-    const SkillRaceBonus *rb;
-    int percent, min;
-    
-    if (!available( pch )) {
-        LogStream::sendError( ) << "parent skill " << getName( ) << " is not available  for " << pch->getName( ) << endl;
-        return 0;
-    }
-        
-    min = 100;    
-    percent = pch->getSkillData( getIndex( ) ).learned;
-    
-    rb = getRaceBonus( pch );
-    
+    const SkillRaceBonus *rb = getRaceBonus( pch );
     if (rb) 
         percent = std::max( percent, rb->getBonus( ) );
     
-    if (isRaceAffect( pch ))
-        return min;
-    else
-        return URANGE( 1, percent, min );
+    return URANGE( 1, percent, 100 );
 }
 
 int GenericSkill::getMaximum( Character *ch ) const
@@ -331,33 +300,28 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
     if (verbose)
         ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-               "Для большей информации используй команду {y{hc{lRумение %2$s{lEslook %2$s{x.",
+               "Учителя можно найти, прочитав справку по этому умению.",
                mob, getNameFor( ch ).c_str( ) );
     return false;
 }
 
 /*
- * Печатает разную инфу: группу, цену в s.p., дерево предков, список потомков etc
- * Используется в showskill.
+ * Печатает разную инфу: группу, затраты на выполнение, раскачку, где учить.
+ * Используется в showskill и в справке по умению.
  */
-void GenericSkill::show( PCharacter *ch, std::ostream & buf ) 
+void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
-    const DLString what = skill_what(this).ruscase('1'); 
+    const char *pad = SKILL_INFO_PAD;
 
-    buf << what.upperFirstCharacter()
-        << " '{c" << getName( ) << "{x' или"
-        << " '{c" << getRussianName( ) << "{x'";
-    if (getGroup() != group_none)
-        buf << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'";
-    buf << "." << endl;
-    
-    print_wait_and_mana(this, ch, buf);            
-    buf << endl;
-    
+    buf << print_what(this) << " "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl
+        << print_wait_and_mana(this, ch);
+
     if (!visible( ch )) {
-        if (!classes.empty())
-            buf << "Недоступно для твоей профессии." << endl;
-        print_see_also(this, ch, buf);
+        if (!classes.empty() && ch->getProfession() != prof_none)
+            buf << pad << "Недоступно для твоего класса." << endl;
         return;
     }
 
@@ -365,19 +329,18 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     int percent = data.learned;
     if (temporary_skill_active(this, ch)) {
         if (data.origin == SKILL_DREAM)
-            buf << "Приснилось тебе";
+            buf << pad << "Приснилось тебе";
         else
-            buf << "Досталось тебе";
+            buf << pad << "Досталось тебе";
         buf << " разученное до {C" << percent << "%{x"
             << skill_effective_bonus(this, ch) << "." << endl;
-        print_see_also(this, ch, buf);
         return;
     }
 
     if (!available(ch)) {
-        buf << "Станет доступно тебе на уровне {C" << getLevel(ch) << "{x." << endl;
+        buf << pad << "Станет доступно тебе на уровне {C" << getLevel(ch) << "{x." << endl;
     } else {
-        buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x, ";
+        buf << pad << "Доступно тебе с уровня {C" << getLevel(ch) << "{x, ";
         if (percent < 2) 
             buf << "пока не изучено";
         else 
@@ -385,25 +348,26 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         
         buf << skill_effective_bonus(this, ch) << "." << endl;
     }
-    
-    if (getGroup()->getPracticer() == 0) {
-        // '...в твоей гильдии (справка|help гильдии|guilds)' - с гипер-ссылкой на справку.
-        buf << "Это " << what << " можно выучить в твоей {gгильдии{x ({W{lRсправка гильдии{lEhelp guilds{x)." << endl;
+
+    const DLString what = skill_what(this).ruscase('1');
+    SkillGroupReference &group = const_cast<GenericSkill *>(this)->getGroup();
+
+    if (group->getPracticer() == 0) {
+        // '...в твоей гильдии' - с гипер-ссылкой на справку.
+        buf << pad << "Это " << what << " можно выучить в твоей {g{hh44гильдии{x." << endl;
     } else {
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
-        MOB_INDEX_DATA *pMob = get_mob_index(getGroup()->getPracticer());
+        MOB_INDEX_DATA *pMob = get_mob_index(group->getPracticer());
         if (pMob)
-            buf << "Это " << what << " можно выучить у "
+            buf << pad << "Это " << what << " можно выучить у "
                 << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "
                 << "(зона {g{hh" << pMob->area->name << "{x)." << endl;
     }
     
     if (ch->getHometown() == home_frigate)
-        buf << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
+        buf << pad << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
     else if (ch->getModifyLevel() < 20)
-        buf << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
-
-    print_see_also(this, ch, buf);
+        buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
 }
 
 /*
@@ -412,7 +376,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
  * Мобы могут быть "многоклассовыми", в соотв-и со своими act-flags.
  */
 const SkillClassInfo *
-GenericSkill::getClassInfo( Character *ch ) const
+GenericSkill::getClassInfo( CharacterMemoryInterface *ch ) const
 {
     vector<int> proffi = ch->getProfession( )->toVector( ch ).toArray( );
     int minLevel = LEVEL_IMMORTAL;
@@ -431,36 +395,12 @@ GenericSkill::getClassInfo( Character *ch ) const
     return bestClass;
 }
 
-SkillClassInfo *
-GenericSkill::getClassInfo( PCharacter *ch ) 
-{
-    Classes::iterator iter = classes.find( ch->getProfession( )->getName( ) );
-
-    if (iter == classes.end( ) || iter->second.getClanAntiBonus( ch ))
-        return NULL;
-    else 
-        return &iter->second;
-}
-
-SkillClassInfo * 
-GenericSkill::getClassInfo( const DLString &className )
-{
-    GenericSkill::Classes::iterator c;
-
-    c = classes.find( className );
-
-    if (c == classes.end( ))
-        throw Exception( "Skill " + getName( ) + " declared as parent, "
-                         "doesnt have entry for " + className + "'" );
-
-    return &c->second;
-}
 
 /*
  * возвращает инфо о расовом бонусе для чара (if any)
  */
 const SkillRaceBonus *
-GenericSkill::getRaceBonus( Character *ch ) const
+GenericSkill::getRaceBonus( CharacterMemoryInterface *ch ) const
 {
     RaceBonuses::const_iterator i = raceBonuses.find( ch->getRace( )->getName( ) );
 
@@ -471,7 +411,7 @@ GenericSkill::getRaceBonus( Character *ch ) const
  * соответствует ли этот скил какому-либо расовому аффекту для чара?
  * (пример: sneak - AFF_SNEAK)
  */
-bool GenericSkill::isRaceAffect( Character *ch ) const
+bool GenericSkill::isRaceAffect( CharacterMemoryInterface *ch ) const
 {
     return ch->getRace( )->getAff( ).isSet( raceAffect.getValue( ) );
 }
@@ -495,10 +435,10 @@ SkillClassInfo::SkillClassInfo( )
 
 /*
  * возвращает инфо о клановых запретах на использования скила 
- * для данной профессии
+ * для данного класса
  */
 const SkillClanAntiBonus *
-SkillClassInfo::getClanAntiBonus( Character *ch ) const
+SkillClassInfo::getClanAntiBonus( CharacterMemoryInterface *ch ) const
 {
     ClanAntiBonuses::const_iterator i;
 

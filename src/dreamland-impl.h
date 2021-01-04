@@ -174,9 +174,9 @@ inline const DLString& DreamLand::getVersion( ) const
     return version;
 }
 
-inline DbEnvContext * DreamLand::getDbEnv( ) const
+inline DbEnvContext * DreamLand::getFeniaDbEnv( ) const
 {
-    return dbEnv;
+    return feniaDbEnv;
 }
 
 inline bool DreamLand::hasOption( int opt ) const

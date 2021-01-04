@@ -36,6 +36,7 @@ bool match( const DLString &str, const DLString &pattern )
 %token T_HR T_DR T_HP T_MANA T_MOVE T_SAVES T_ARMOR T_STR T_INT T_WIS T_DEX T_CON T_CHA T_SIZE T_AGE
 %token T_AFF T_RES T_IMM T_VULN T_DET T_LIMIT T_HGAIN T_MGAIN T_SLEVEL
 %token T_WCLASS T_WFLAGS T_D1 T_D2 T_AVE T_DAMAGE T_FENIA T_LEARNED T_MATERIAL
+%token T_FORM T_PARTS T_ACT T_OFF T_GROUP T_SPEC T_ALIGN T_RACE T_SEX T_NUMBER
 
 %type <result> cond
 %type <str> str_expr
@@ -68,9 +69,9 @@ cond:	cond T_OR cond		    { $$ = $1 || $3;	    }
 
 num_expr:   
 	T_INTEGER
-    |	T_VNUM			    { $$ = p.pObj->vnum;		}
-    |	T_LVL               { $$ = p.pObj->level;		}
-    |	T_LIMIT             { $$ = p.pObj->limit;   }
+    |	T_VNUM			    { $$ = p.vnum;		}
+    |	T_LVL               { $$ = p.level;		}
+    |	T_LIMIT             { $$ = p.limit;   }
     |	T_SIZE              { $$ = p.size;   }
     |	T_AGE               { $$ = p.age;   }
     |	T_CHA               { $$ = p.cha;   }
@@ -91,7 +92,9 @@ num_expr:
     |	T_AVE               { $$ = p.ave;   }
     |   T_D1                { $$ = p.d1; }
     |   T_D2                { $$ = p.d2; }
-    |   T_SLEVEL            { $$ = p.slevel; }    
+    |   T_SLEVEL            { $$ = p.slevel; }
+    |   T_ALIGN             { $$ = p.alignment; }
+    |   T_GROUP             { $$ = p.group; }
     |	num_expr '+' num_expr	    { $$ = $1 + $3;		}
     |	num_expr '-' num_expr	    { $$ = $1 - $3;		}
     ;
@@ -112,7 +115,15 @@ str_expr:
     |	T_DAMAGE            { $$ = p.damage;}
     |   T_FENIA             { $$ = p.fenia;}
     |   T_LEARNED           { $$ = p.learned; }
-    |   T_MATERIAL          { $$ = DLString(p.pObj->material); }
+    |   T_MATERIAL          { $$ = p.material; }
+    |   T_FORM              { $$ = p.form; }
+    |   T_PARTS             { $$ = p.parts; }
+    |   T_ACT               { $$ = p.act; }
+    |   T_OFF               { $$ = p.off; }
+    |   T_SPEC              { $$ = p.spec; }
+    |   T_RACE              { $$ = p.race; }
+    |   T_SEX               { $$ = p.sex; }
+    |   T_NUMBER            { $$ = p.number; }
     ;
 
 %%

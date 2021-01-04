@@ -43,6 +43,7 @@
 #include "mercdb.h"
 #include "magic.h"
 #include "fight.h"
+#include "weapongenerator.h"
 #include "stats_apply.h"
 #include "directions.h"
 #include "onehit.h"
@@ -105,7 +106,7 @@ SKILL_RUNP( track )
                     if (oprog_track(obj, ch, arg.c_str(), d))
                         return;
 
-                ch->pecho("Следы %s ведут %s.", arg.c_str(), dirs[d].leave);
+                ch->pecho("Следы %N2 ведут %s.", arg.c_str(), dirs[d].leave);
                 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) 
                     open_door_extra( ch, d, pexit );
@@ -161,6 +162,7 @@ SKILL_RUNP( shoot )
     int range, range0 = ( ch->getModifyLevel() / 10) + 1;
     int master_shoots = 2;
     DLString argDoor, argVict;
+    ostringstream errbuf;
 
     if (!gsn_bow->usable( ch ))
     {
@@ -180,9 +182,9 @@ SKILL_RUNP( shoot )
     }
 
     range = range0;
-    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
+    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 )
     {
-            ch->send_to("Там таких нет.\n\r");
+            ch->send_to(errbuf);
             return;
     }
 
@@ -294,8 +296,10 @@ SKILL_RUNP( shoot )
     
     for (int i = 0; i < master_shoots; i++) {
         range = range0;
-        if (find_char( ch, argVict.c_str(), direction, &range) != victim)
+        if (find_char( ch, argVict.c_str(), direction, &range, errbuf) != victim) {
+            ch->send_to(errbuf);
             return; 
+        }
         
         if (!( arrow = find_arrow( ch, quiver ) ))
             return;
@@ -339,22 +343,9 @@ SKILL_RUNP( herbs )
     }
   ch->setWait( gsn_herbs->getBeats( )  );
 
-  if ((ch->in_room->sector_type == SECT_FIELD
-       || ch->in_room->sector_type == SECT_FOREST
-       || ch->in_room->sector_type == SECT_HILLS
-       || ch->in_room->sector_type == SECT_MOUNTAIN)
-      && number_percent() < gsn_herbs->getEffective( ch ))
+  if (IS_NATURE(ch->in_room) && number_percent() < gsn_herbs->getEffective( ch ))
     {
-      Affect af;
-      af.where  = TO_AFFECTS;
-      af.type         = gsn_herbs;
-      af.level         = ch->getModifyLevel();
-      af.duration = 5;
-      af.location = APPLY_NONE;
-      af.modifier = 0;
-      af.bitvector = 0;
-
-      affect_to_char(ch,&af);
+      postaffect_to_char(ch, gsn_herbs, 5);
 
       ch->send_to("Ты собираешь целебные травы.\n\r");
       act_p("$c1 собирает какие-то травы.",ch,0,0,TO_ROOM,POS_RESTING);
@@ -391,7 +382,7 @@ SKILL_RUNP( herbs )
 
 SKILL_RUNP( camp )
 {
-  Affect af,af2;
+  Affect af2;
 
   if (ch->is_npc() || !gsn_camp->usable( ch ) )
     {
@@ -413,13 +404,7 @@ SKILL_RUNP( camp )
         return;
   }
 
-  if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE)      ||
-       IS_SET(ch->in_room->room_flags, ROOM_PRIVATE)   ||
-       IS_SET(ch->in_room->room_flags, ROOM_SOLITARY)  ||
-         ( ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS ) )
+  if (!IS_NATURE(ch->in_room))
   {
     ch->println("Здесь недостаточно растительности для разбивки лагеря.");
     return;
@@ -438,40 +423,32 @@ SKILL_RUNP( camp )
   act("Ты разбиваешь лагерь.", ch, 0, 0, TO_CHAR);
   act("$c1 разбивает лагерь.", ch, 0, 0, TO_ROOM);
 
-  af.where                = TO_AFFECTS;
-  af.type               = gsn_camp;
-  af.level              = ch->getModifyLevel();
-  af.duration           = 12;
-  af.bitvector          = 0;
-  af.modifier           = 0;
-  af.location           = APPLY_NONE;
-  affect_to_char(ch, &af);
+  
+  postaffect_to_char(ch, gsn_camp, 12);
 
-  af2.where                = TO_ROOM_CONST;
+
   af2.type              = gsn_camp;
   af2.level              = ch->getModifyLevel();
   af2.duration           = ch->getModifyLevel() / 20;
-  af2.bitvector          = 0;
   af2.modifier           = 2 * ch->getModifyLevel();
-  af2.location           = APPLY_ROOM_HEAL;
+  af2.location.setTable(&apply_room_table);
+  af2.location = APPLY_ROOM_HEAL;
   ch->in_room->affectTo( &af2);
 
   af2.modifier           = ch->getModifyLevel();
-  af2.location           = APPLY_ROOM_MANA;
+  af2.location = APPLY_ROOM_MANA;
   ch->in_room->affectTo( &af2);
-
 }
 
 AFFECT_DECL(Camp);
 VOID_AFFECT(Camp)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    if (!paf->next || paf->next->type != gsn_camp)
-        return;
-
-    buf << fmt( 0, "Здесь разбит лагерь, который в течение {W%1$d{x ча%1$Iса|сов|сов "
-                   "улучшает восстановление здоровья на {W%2$d{x и маны на {W%3$d{x.",
-                   paf->duration, paf->modifier, paf->next->modifier )
-        << endl;
+    if (paf->location == APPLY_ROOM_HEAL)
+        buf << fmt( 0, "Разбитый здесь лагерь улучшит восстановление здоровья на {W%2$d{x в течение {W%1$d{x ча%1$Iса|сов|сов.",
+                    paf->duration, paf->modifier) << endl;
+    else if (paf->location == APPLY_ROOM_MANA)
+        buf << fmt( 0, "Разбитый здесь лагерь улучшит восстановление маны на {W%2$d{x в течение {W%1$d{x ча%1$Iса|сов|сов.",
+                    paf->duration, paf->modifier) << endl;
 }
 
 
@@ -529,26 +506,13 @@ TYPE_SPELL(NPCharacter *, BearCall)::createMobile( Character *ch, int level ) co
 
 TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const 
 {
-  if ( ch->in_room != 0 && IS_SET(ch->in_room->room_flags, ROOM_NO_MOB) )
+  if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
      ch->send_to( "Здесь медведи не услышат тебя.\n\r");
      return false;
   }
 
-  if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE)      ||
-       IS_SET(ch->in_room->room_flags, ROOM_PRIVATE)   ||
-       IS_SET(ch->in_room->room_flags, ROOM_SOLITARY)  ||
-       (ch->in_room->exit[0] == 0 &&
-          ch->in_room->exit[1] == 0 &&
-          ch->in_room->exit[2] == 0 &&
-          ch->in_room->exit[3] == 0 &&
-          ch->in_room->exit[4] == 0 &&
-          ch->in_room->exit[5] == 0) ||
-
-         ( ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS ) )
+  if (!ch->in_room->hasExits() || !IS_NATURE(ch->in_room))
   {
     ch->send_to( "Медведи не пришли к тебе на помощь.\n\r");
     return false;
@@ -611,26 +575,13 @@ TYPE_SPELL(NPCharacter *, LionCall)::createMobile( Character *ch, int level ) co
 
 TYPE_SPELL(bool, LionCall)::canSummonHere( Character *ch ) const 
 {
-  if ( ch->in_room != 0 && IS_SET(ch->in_room->room_flags, ROOM_NO_MOB) )
+  if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
      ch->send_to( "Здесь львы не услышат тебя.\n\r");
      return false;
   }
 
-  if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE)      ||
-       IS_SET(ch->in_room->room_flags, ROOM_PRIVATE)   ||
-       IS_SET(ch->in_room->room_flags, ROOM_SOLITARY)  ||
-       (ch->in_room->exit[0] == 0 &&
-          ch->in_room->exit[1] == 0 &&
-          ch->in_room->exit[2] == 0 &&
-          ch->in_room->exit[3] == 0 &&
-          ch->in_room->exit[4] == 0 &&
-          ch->in_room->exit[5] == 0) ||
-
-         ( ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS ) )
+  if (!ch->in_room->hasExits() || !IS_NATURE(ch->in_room))
   {
     ch->send_to( "Львы не пришли к тебе на помощь.\n\r");
     return false;
@@ -651,38 +602,34 @@ static Object * create_arrow( int color, int level )
     arrow = create_object(get_obj_index(OBJ_VNUM_RANGER_ARROW), 0 );
     arrow->level = level;
 
-    tohit.where                     = TO_OBJECT;
     tohit.type               = gsn_make_arrow;
     tohit.level              = level;
     tohit.duration           = -1;
-    tohit.location           = APPLY_HITROLL;
+    tohit.location = APPLY_HITROLL;
     tohit.modifier           = level / 10;
-    tohit.bitvector          = 0;
     affect_to_obj( arrow, &tohit);
 
-    todam.where                     = TO_OBJECT;
     todam.type               = gsn_make_arrow;
     todam.level              = level;
     todam.duration           = -1;
-    todam.location           = APPLY_DAMROLL;
+    todam.location = APPLY_DAMROLL;
     todam.modifier           = level / 10;
-    todam.bitvector          = 0;
     affect_to_obj( arrow, &todam);
 
     if (color != 0 && color != gsn_make_arrow)
     {
         Affect saf;
 
-        saf.where               = TO_WEAPON;
+        saf.bitvector.setTable(&weapon_type2);
         saf.type               = color;
         saf.level              = level;
         saf.duration           = -1;
-        saf.location           = 0;
+        
         saf.modifier           = 0;
 
         if ( color == gsn_green_arrow )
         {
-            saf.bitvector        = WEAPON_POISON;
+            saf.bitvector.setValue(WEAPON_POISON);
             str_name = "green зеленая";
             str_long = "{GЗеленая";
             str_short = "{Gзелен|ая|ой|ой|ую|ой|ой";
@@ -691,7 +638,7 @@ static Object * create_arrow( int color, int level )
         }
         else if (color == gsn_red_arrow)
         {
-            saf.bitvector        = WEAPON_FLAMING;
+            saf.bitvector.setValue(WEAPON_FLAMING);
             str_name = "red красная";
             str_long = "{RКрасная";
             str_short = "{Rкрасн|ая|ой|ой|ую|ой|ой";
@@ -700,7 +647,7 @@ static Object * create_arrow( int color, int level )
         }
         else if (color == gsn_white_arrow)
         {
-            saf.bitvector        = WEAPON_FROST;
+            saf.bitvector.setValue(WEAPON_FROST);
             str_name = "white белая";
             str_long = "{WБелая";
             str_short = "{Wбел|ая|ой|ой|ую|ой|ой";
@@ -709,7 +656,7 @@ static Object * create_arrow( int color, int level )
         }
         else
         {
-            saf.bitvector        = WEAPON_SHOCKING;
+            saf.bitvector.setValue(WEAPON_SHOCKING);
             str_name = "blue голубая";
             str_long = "{CГолубая";
             str_short = "{Cголуб|ая|ой|ой|ую|ой|ой";
@@ -753,9 +700,9 @@ SKILL_RUNP( makearrow )
         return;
     }
 
-    if ( ch->in_room->sector_type != SECT_FIELD
-            && ch->in_room->sector_type != SECT_FOREST
-            && ch->in_room->sector_type != SECT_HILLS )
+    if ( ch->in_room->getSectorType() != SECT_FIELD
+            && ch->in_room->getSectorType() != SECT_FOREST
+            && ch->in_room->getSectorType() != SECT_HILLS )
     {
         ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
         return;
@@ -831,76 +778,59 @@ SKILL_RUNP( makearrow )
  * 'make bow' skill command
  */
 
-SKILL_RUNP( makebow )
+SKILL_RUNP(makebow)
 {
-  Object *bow;
-  Affect tohit,todam;
-  int mana,wait;
+    Object *bow;
+    int mana, wait;
 
-  if (ch->is_npc()) 
-      return;
+    if (ch->is_npc())
+        return;
 
-  if (!gsn_make_bow->usable( ch ))
-    {
-      ch->send_to("Ты не знаешь как изготовить лук.\n\r");
-      return;
+    if (!gsn_make_bow->usable(ch)) {
+        ch->send_to("Ты не знаешь как изготовить лук.\n\r");
+        return;
     }
 
-  if ( ch->in_room->sector_type != SECT_FIELD &&
-       ch->in_room->sector_type != SECT_FOREST &&
-       ch->in_room->sector_type != SECT_HILLS )
-  {
-    ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
-    return;
-  }
-
-  mana = gsn_make_bow->getMana( );
-  wait = gsn_make_bow->getBeats( );
-
-  if ( ch->mana < mana )
-  {
-     ch->send_to( "У тебя не хватает энергии для изготовления лука.\n\r");
-     return;
-  }
-  ch->mana -= mana;
-  ch->setWait( wait );
-
-  if ( number_percent( ) > gsn_make_bow->getEffective( ch ) )
-   {
-        ch->send_to( "Ты пытаешься изготовить лук... но он ломается.\n\r");
-        gsn_make_bow->improve( ch, false );
+    if (ch->in_room->getSectorType() != SECT_FIELD &&
+        ch->in_room->getSectorType() != SECT_FOREST &&
+        ch->in_room->getSectorType() != SECT_HILLS) {
+        ch->send_to("Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
         return;
-   }
-  ch->send_to( "Ты изготавливаешь лук.\n\r");
-  gsn_make_bow->improve( ch, true );
+    }
 
-  bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel() );
-  bow->level = ch->getRealLevel( );
-  bow->value1(4 + ch->getModifyLevel() / 15);
-  bow->value2(4 + ch->getModifyLevel() / 15);
+    mana = gsn_make_bow->getMana();
+    wait = gsn_make_bow->getBeats();
 
-  tohit.where                    = TO_OBJECT;
-  tohit.type               = gsn_make_arrow;
-  tohit.level              = ch->getModifyLevel();
-  tohit.duration           = -1;
-  tohit.location           = APPLY_HITROLL;
-  tohit.modifier           = ch->getModifyLevel() / 10;
-  tohit.bitvector          = 0;
-  affect_to_obj( bow, &tohit);
+    if (ch->mana < mana) {
+        ch->send_to("У тебя не хватает энергии для изготовления лука.\n\r");
+        return;
+    }
+    ch->mana -= mana;
+    ch->setWait(wait);
 
-  todam.where                   = TO_OBJECT;
-  todam.type               = gsn_make_arrow;
-  todam.level              = ch->getModifyLevel();
-  todam.duration           = -1;
-  todam.location           = APPLY_DAMROLL;
-  todam.modifier           = ch->getModifyLevel() / 10;
-  todam.bitvector          = 0;
-  affect_to_obj( bow, &todam);
+    if (number_percent() > gsn_make_bow->getEffective(ch)) {
+        ch->send_to("Ты пытаешься изготовить лук... но он ломается.\n\r");
+        gsn_make_bow->improve(ch, false);
+        return;
+    }
+    ch->send_to("Ты изготавливаешь лук.\n\r");
+    gsn_make_bow->improve(ch, true);
 
-  obj_to_char(bow,ch);
+    bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel());
+    bow->level = ch->getModifyLevel();
+
+    WeaponGenerator()
+        .item(bow)
+        .skill(gsn_make_arrow)
+        .valueTier(3)
+        .hitrollTier(IS_GOOD(ch) ? 2 : 3)
+        .damrollTier(IS_EVIL(ch) ? 2 : 3)
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
+
+    obj_to_char(bow, ch);
 }
-
-
 
 /*
  *  From SoG
@@ -963,12 +893,9 @@ SKILL_RUNP( forest )
     if (ch->isAffected(gsn_forest_fighting))
         affect_strip(ch, gsn_forest_fighting);
     
-    af.where          = TO_AFFECTS;
     af.type           = gsn_forest_fighting;
     af.level          = ch->getModifyLevel();
     af.duration         = (6 + ch->getModifyLevel() / 2);
-    af.location  = APPLY_NONE;
-    af.bitvector = 0;
 
     if (attack) {
         af.modifier  = FOREST_ATTACK; 
@@ -986,17 +913,15 @@ SKILL_RUNP( forest )
 
 BOOL_SKILL( forest )::run( Character *ch, int type ) 
 {
-    Affect* paf;
-
-    if (ch->in_room->sector_type != SECT_FOREST
-        && ch->in_room->sector_type != SECT_HILLS
-        && ch->in_room->sector_type != SECT_MOUNTAIN) 
+    if (ch->in_room->getSectorType() != SECT_FOREST
+        && ch->in_room->getSectorType() != SECT_HILLS
+        && ch->in_room->getSectorType() != SECT_MOUNTAIN) 
         return false;
     
     if (ch->is_npc( ))
         return gsn_forest_fighting->usable( ch );
 
-    for (paf = ch->affected; paf; paf = paf->next) 
+    for (auto &paf: ch->affected) 
         if (paf->type == gsn_forest_fighting
             && paf->modifier == type)
         {
@@ -1132,10 +1057,7 @@ SKILL_RUNP( tiger )
         ch->send_to("Ты слишком миролюбив для этого.\n\r");
         return;
     }
-    if (ch->in_room->sector_type != SECT_FIELD &&
-           ch->in_room->sector_type != SECT_FOREST &&
-           ch->in_room->sector_type != SECT_MOUNTAIN &&
-           ch->in_room->sector_type != SECT_HILLS )
+    if (!IS_NATURE(ch->in_room))
   {
     ch->send_to("Нет никого, кто услышал бы твой призыв.\n\r");
     return;
@@ -1174,22 +1096,22 @@ SKILL_RUNP( tiger )
                ch,0,0,TO_ROOM,POS_RESTING);
         gsn_tiger_power->improve( ch, true );
 
-        af.where        = TO_AFFECTS;
         af.type                = gsn_tiger_power;
         af.level        = ch->getModifyLevel();
         af.duration        = number_fuzzy( ch->getModifyLevel() / 8);
 
         af.modifier        = max( 1, ch->getModifyLevel() / 5 );
-        af.location        = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         affect_to_char(ch,&af);
 
-        af.location        = APPLY_DAMROLL;
-        af.bitvector         = AFF_BERSERK;
+        af.location = APPLY_DAMROLL;
+        af.bitvector.setTable(&affect_flags);
+        af.bitvector.setValue(AFF_BERSERK);
         affect_to_char(ch,&af);
 
         af.modifier        = max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
-        af.location        = APPLY_AC;
-        af.bitvector    = 0;
+        af.location = APPLY_AC;
+        af.bitvector.clear();
         affect_to_char(ch,&af);
     }
 
@@ -1396,15 +1318,14 @@ SKILL_RUNP( camouflage )
                 return;
         }
 
-        if ( ch->in_room->sector_type != SECT_FOREST
-                && ch->in_room->sector_type != SECT_HILLS
-                && ch->in_room->sector_type != SECT_MOUNTAIN )
+        if ( ch->in_room->getSectorType() != SECT_FOREST
+                && ch->in_room->getSectorType() != SECT_HILLS
+                && ch->in_room->getSectorType() != SECT_MOUNTAIN )
         {
                 ch->send_to("Здесь негде укрыться.\n\r");
                 act_p("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM,POS_RESTING);
                 return;
         }
-        ch->send_to("Ты пытаешься замаскироваться.\n\r");
 
         int k = ch->getLastFightDelay( );
 
@@ -1424,58 +1345,41 @@ SKILL_RUNP( camouflage )
         if ( ch->is_npc()
                 || number_percent( ) < gsn_camouflage->getEffective( ch ) * k / 100 )
         {
+                ch->println("Ты маскируешься на местности.");
                 SET_BIT(ch->affected_by, AFF_CAMOUFLAGE);
                 gsn_camouflage->improve( ch, true );
         }
-        else
+        else {
+                ch->println("Твоя попытка замаскироваться закончилась неудачей.");
                 gsn_camouflage->improve( ch, false );
+        }
 
         return;
 }
 
-
-
-
-
-
 SPELL_DECL(RangerStaff);
-VOID_SPELL(RangerStaff)::run( Character *ch, char *, int sn, int level ) 
-{ 
-  Object *staff;
-  Affect tohit;
-  Affect todam;
+VOID_SPELL(RangerStaff)::run(Character *ch, char *, int sn, int level)
+{
+    Object *staff;
 
-  staff = create_object( get_obj_index(OBJ_VNUM_RANGER_STAFF),level);
-  ch->send_to("Ты создаешь посох рейнджера!\n\r");
-  act_p("$c1 создает посох рейнджера!",ch,0,0,TO_ROOM,POS_RESTING);
+    staff = create_object(get_obj_index(OBJ_VNUM_RANGER_STAFF), level);
+    ch->send_to("Ты создаешь посох рейнджера!\n\r");
+    act_p("$c1 создает посох рейнджера!", ch, 0, 0, TO_ROOM, POS_RESTING);
 
-  staff->value1(4 + level / 15);
-  staff->value2(4 + level / 15);
+    staff->timer = level;
+    staff->level = ch->getModifyLevel();
 
-  tohit.where                   = TO_OBJECT;
-  tohit.type               = sn;
-  tohit.level              = ch->getModifyLevel();
-  tohit.duration           = -1;
-  tohit.location           = APPLY_HITROLL;
-  tohit.modifier           = 2 + level/5;
-  tohit.bitvector          = 0;
-  affect_to_obj( staff, &tohit);
+    WeaponGenerator()
+        .item(staff)
+        .skill(sn)
+        .valueTier(3)
+        .hitrollTier(IS_GOOD(ch) ? 2 : 3)
+        .damrollTier(IS_EVIL(ch) ? 2 : 3)
+        .assignValues()
+        .assignHitroll()
+        .assignDamroll();
 
-  todam.where                   = TO_OBJECT;
-  todam.type               = sn;
-  todam.level              = ch->getModifyLevel();
-  todam.duration           = -1;
-  todam.location           = APPLY_DAMROLL;
-  todam.modifier           = 2 + level/5;
-  todam.bitvector          = 0;
-  affect_to_obj( staff, &todam);
-
-
-  staff->timer = level;
-  staff->level = ch->getModifyLevel();
-
-  obj_to_char(staff,ch);
-
+    obj_to_char(staff, ch);
 }
 
 /*

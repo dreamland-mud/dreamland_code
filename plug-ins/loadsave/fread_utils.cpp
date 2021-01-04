@@ -61,7 +61,7 @@ int fread_number( FILE *fp )
 
     if ( !isdigit(c) )
     {
-        bug("no number", 0);
+        bug("fread_number: bad number %c", c);
         throw FileFormatException( "Fread_number: bad format (%c no number).", c );
     }
 

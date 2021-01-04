@@ -78,11 +78,11 @@
 #include "object.h"
 
 #include "wiznet.h"
-#include "def.h"
 #include "handler.h"
 #include "weapons.h"
 #include "act_move.h"
 #include "vnum.h"
+#include "def.h"
 
 /***************************************************************************
  ************************      auction.c      ******************************
@@ -90,6 +90,15 @@
 
 #define PULSE_AUCTION             (45 * dreamland->getPulsePerSecond( )) /* 60 seconds */
 #define AUC_TIMER_CUTOFF          24
+
+static bool buyer_can_trade()
+{
+    if (auction->buyer->in_room
+        && IS_SET(auction->buyer->in_room->areaIndex()->area_flag, AREA_DUNGEON))
+        return false;
+
+    return true;
+}
 
 void talk_auction(const char *argument)
 {
@@ -209,7 +218,7 @@ void auction_update (void)
             }
             case 3 : /* SOLD! */
 
-            if (auction->bet > 0)
+            if (auction->bet > 0 && buyer_can_trade())
             {
                 sprintf (buf, "%s получает %s{Y за %d золот%s{x.",
                     auction->buyer->getNameP( '1' ).c_str( ),
@@ -330,7 +339,7 @@ CMDRUNP( auction )
 
                             for (int i = 0; i < wearlocationManager->size( ); i++) {
                                 Wearlocation *loc = wearlocationManager->find( i );
-                                if (loc->matches( obj ))
+                                if (loc->matches( obj ) && !loc->getPurpose().empty())
                                     purposes[loc->getPurpose( )] = true;
                             }
                             for (p = purposes.begin( ); p != purposes.end( ); p++)

@@ -55,13 +55,9 @@ VOID_SPELL(MagicConcentrate)::run( Character *ch, Character *, int sn, int level
       return;
   }
 
-  af.where                = TO_AFFECTS;
   af.type               = sn;
   af.level              = level;
   af.duration           = 7;
-  af.location           = APPLY_NONE;
-  af.modifier           = 0;
-  af.bitvector          = 0;
   affect_to_char(ch,&af);
 
   ch->send_to("Ты чувствуешь, как сверхмощная способность к разрушению заполняет все твое тело.\n\r");

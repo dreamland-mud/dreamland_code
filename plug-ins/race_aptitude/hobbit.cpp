@@ -44,16 +44,15 @@ static Object * create_stone( int level )
     stone->value1(4 + level / 15);
     stone->value2(4 + level / 30);
 
-    af.where                  = TO_OBJECT;
     af.type               = gsn_search_stones;
     af.level              = level;
     af.duration           = -1;
     af.modifier           = level / 10;
 
-    af.location           = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_to_obj( stone, &af );
 
-    af.location           = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_to_obj( stone, &af );
 
     return stone;
@@ -73,7 +72,7 @@ SKILL_RUNP( searchstones )
         return;
     }
     
-    switch (ch->in_room->sector_type) {
+    switch (ch->in_room->getSectorType()) {
     default:                chance = 0; break;
     case SECT_MOUNTAIN: chance = 100; break;
     case SECT_HILLS:    chance = 80; break;
@@ -152,6 +151,7 @@ SKILL_RUNP( throwstone )
     int range = ( ch->getModifyLevel() / 10) + 1;
     DLString args = argument;
     DLString argDoor, argVict;
+    ostringstream errbuf;
 
     if (chance <= 1) {
         ch->println("Ты не умеешь швыряться камнями.");
@@ -163,8 +163,10 @@ SKILL_RUNP( throwstone )
         return;
     }
 
-    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
+    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 ) {
+        ch->send_to(errbuf);
         return;
+    }
 
     if (victim == ch) {
         ch->println("Просто ударь себя этим камнем по лбу.");
@@ -208,20 +210,20 @@ SKILL_RUNP( throwstone )
 
     if (number_percent( ) <= gsn_flaming_stone->getEffective( ch )) {
         Affect saf;
-        saf.where               = TO_WEAPON;
+        saf.bitvector.setTable(&weapon_type2);
         saf.type               = gsn_flaming_stone;
-        saf.level              = level;
+        saf.level              = ch->getModifyLevel();
         saf.duration           = -1;
-        saf.bitvector        = WEAPON_FLAMING;
+        saf.bitvector.setValue(WEAPON_FLAMING);
         affect_to_obj( stone, &saf);
 
     } else if (number_percent( ) <= gsn_freezing_stone->getEffective( ch )) {
         Affect saf;
-        saf.where               = TO_WEAPON;
+        saf.bitvector.setTable(&weapon_type2);
         saf.type               = gsn_freezing_stone;
-        saf.level              = level;
+        saf.level              = ch->getModifyLevel();
         saf.duration           = -1;
-        saf.bitvector        = WEAPON_FROST;
+        saf.bitvector.setValue(WEAPON_FROST);
         affect_to_obj( stone, &saf);
     }
 

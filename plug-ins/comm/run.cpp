@@ -7,6 +7,7 @@
 #include "exitsmovement.h"
 #include "directions.h"
 #include "movetypes.h"
+#include "door_utils.h"
 
 #include "char.h"
 #include "commandtemplate.h"
@@ -20,14 +21,12 @@
 
 static bool isBigLetter( char c )
 {
-    return c == 'N' || c == 'S' || c == 'D' || c == 'U' || c == 'E' || c == 'W' ||
-           c == 'С' || c == 'Ю' || c == 'О' || c == 'П' || c == 'В' || c == 'З';
+    return door_is_big(c) || door_is_big_ru(c);
 }
 
 static bool isSmallLetter( char c )
 {
-    return c == 'n' || c == 's' || c == 'd' || c == 'u' || c == 'e' || c == 'w' ||
-           c == 'с' || c == 'ю' || c == 'о' || c == 'п' || c == 'в' || c == 'з';
+    return door_is_small(c) || door_is_small_ru(c);
 }
 
 /*-----------------------------------------------------------------------------
@@ -270,10 +269,12 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
     }
 
     // Add last remaining letter from the path.
-    if (cnt > 1)
-        collated << cnt;
-    collated << last_letter;
-    
+    if (isSmallLetter(last_letter)) {
+        if (cnt > 1)
+            collated << cnt;
+        collated << last_letter;
+    }
+        
     if (ch->isCoder())
         ch->printf("Развернутый маршрут: %s\r\n", path.c_str());
 

@@ -34,7 +34,8 @@ mobilebehaviormanager.cpp \
 objectbehaviormanager.cpp \
 areabehaviormanager.cpp \
 roombehaviormanager.cpp \
-fread_utils.cpp
+fread_utils.cpp \
+itemevents.cpp
 
 libloadsave_la_MOC = \
 savedcreature.h

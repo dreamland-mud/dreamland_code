@@ -53,7 +53,8 @@ list<HelpArticle::Pointer> help_find_by_keywords(const DLString &keywords)
     list<HelpArticle::Pointer> originals;
 
     for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-        if (is_name(keywords.c_str(), (*a)->getAllKeywordsString().c_str()))
+        if (is_name(keywords.c_str(), (*a)->getAllKeywordsString().c_str())
+            || is_name(keywords.c_str(), (*a)->aka.toString().c_str()))
             originals.push_back(*a);
     }
 

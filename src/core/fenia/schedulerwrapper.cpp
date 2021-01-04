@@ -71,7 +71,7 @@ FeniaProcess::process()
 
         rl.assign(args.begin(), args.end());
         fun.toFunction()->invoke(thiz, rl);
-    } catch(::Exception e) {
+    } catch(const ::Exception &e) {
         LogStream::sendWarning() << "oops in FeniaProcess::process(): " << e.what( ) << endl;
     }
 }

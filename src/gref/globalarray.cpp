@@ -69,7 +69,7 @@ void GlobalArray::applyBitvector(const GlobalBitvector &bv, int modifier)
 }
 
 
-StringList GlobalArray::toStringList(bool fRussian) const
+StringList GlobalArray::toStringList(bool fRussian, const DLString &joiner) const
 {
     StringList lines;
 
@@ -83,7 +83,7 @@ StringList GlobalArray::toStringList(bool fRussian) const
 
         GlobalRegistryElement *e = registry->find(sn);
         DLString line = fRussian ? e->getRussianName() : e->getName();
-        line << " на " << mod;
+        line << joiner << mod;
         lines.push_back(line);
     }
 

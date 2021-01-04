@@ -35,6 +35,15 @@ inline DLString Flags::messages( bool comma, char gcase ) const
         return DLString::emptyString;
 }
 
+inline void Flags::setBits(const DLString &names)
+{
+    if (table) {
+        bitstring_t values = table->bitstring(names);
+        if (values != NO_FLAG)
+            setBit(values);
+    }
+}
+
 /*----------------------------------------------------------------------
  * FlagsArray
  *---------------------------------------------------------------------*/

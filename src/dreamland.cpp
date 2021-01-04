@@ -50,6 +50,7 @@
 #include "helpmanager.h"
 #include "skillgroup.h"
 #include "bonus.h"
+#include "eventbus.h"
 
 #include "mercdb.h"
 #include "merc.h"
@@ -71,7 +72,7 @@ DreamLand::DreamLand( )
           rebootCounter( -1 ),
           workingOptions( 0, &dreamland_flags ),
           options( DEFAULT_OPTIONS, &dreamland_flags ),
-          dbEnv( new DbEnvContext( ) )
+          feniaDbEnv( new DbEnvContext( ) )
 {
         checkDuplicate( dreamland );
         dreamland = this;
@@ -102,6 +103,7 @@ DreamLand::DreamLand( )
         bonusManager.construct( );
         socketManager.construct( );
         servletManager.construct( );
+        eventBus.construct();
 
         basic_ostringstream<char> buf;
         buf << resetiosflags( ios::left );
@@ -133,8 +135,9 @@ DreamLand::~DreamLand( )
         bonusManager.clear( );
         servletManager.clear( );
         socketManager.clear( );
+        eventBus.clear();
 
-        getDbEnv( )->close( );
+        getFeniaDbEnv( )->close( );
         
         dreamland = 0;
 }
@@ -228,7 +231,7 @@ void DreamLand::load( bool recursive )
             LogStream::redirect(new FileLogStream(logFile.getPath( )));
         }
 
-        getDbEnv( )->open( DLFile( getBasePath( ), feniaDbDir ).getPath( ) );
+        getFeniaDbEnv( )->open( DLFile( getBasePath( ), feniaDbDir ).getPath( ) );
         
         feniaManager->open( );
         feniaManager->load( );

@@ -72,6 +72,12 @@ public:
             if (bv.bits[b])
                 remove( b );
     }
+    inline void change( const GlobalBitvector &bv, bool fSet )
+    {
+        for (unsigned int b = 0; b < bv.bits.size( ); b++)
+            if (bv.bits[b])
+                fSet ? set(b) : remove(b);
+    }
     
     inline void clear( )
     {
@@ -99,8 +105,8 @@ public:
     }
 
     void fromString( const DLString &source );
-    DLString toString( ) const;
-    DLString toRussianString( ) const;
+    DLString toString( char joiner = ' ' ) const;
+    DLString toRussianString( char gcase = '1', char joiner = ' ' ) const;
     vector<int> toArray( ) const;
 
 protected:

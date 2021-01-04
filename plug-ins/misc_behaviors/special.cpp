@@ -616,11 +616,11 @@ bool spec_mayor( NPCharacter *ch )
         }
     }
 
-    if ( !move || ch->position < POS_STANDING )
+    if (!move || (ch->position < POS_STANDING && path[pos] != 'W'))
         return false;
 
     if (!cabinet)
-        cabinet = get_room_index( 3138 );
+        cabinet = get_room_instance( 3138 );
 
     room = cabinet; 
     
@@ -642,14 +642,14 @@ bool spec_mayor( NPCharacter *ch )
     }
 
     if (room != ch->in_room) {
-        LogStream::sendNotice( ) << "Mayor: has to be in  " << room->name 
-                                 << " while he is in " << ch->in_room->name 
+        LogStream::sendNotice( ) << "Mayor: has to be in  " << room->getName() 
+                                 << " while he is in " << ch->in_room->getName() 
                                  << " pos[ " << pos << "] = " << path[pos] << endl;
         
         transfer_char( ch, ch, room,
                       "%1$^C1 вынимает часы из жилетного кармана и восклицает: '{gАх, боже мой! Я опаздываю.{x'"
                       "%1$^C1 убегает с озабоченным видом." );
-        LogStream::sendNotice( ) << "Mayor: now in room " << ch->in_room->name << endl;
+        LogStream::sendNotice( ) << "Mayor: now in room " << ch->in_room->getName() << endl;
     }
 
     switch ( path[pos] )
@@ -813,28 +813,6 @@ bool spec_guard( NPCharacter *ch )
     {
         v_next = victim->next_in_room;
 
-        if (IS_SET( ch->in_room->area->area_flag, AREA_HOMETOWN )
-                && number_percent() < 2
-                && !victim->is_immortal( ))
-        {
-            do_say( ch, "Я Вас знаю?");
-
-            Room *room = NULL;
-            
-            if (!victim->is_npc())
-                room = get_room_index( victim->getPC()->getHometown( )->getRecall() );
-
-            if (!room || ch->in_room->area != room->area)
-            {
-                do_say( ch, "Я не знаю тебя. Уходи прочь!");
-            }
-            else
-            {
-                do_say(ch, "Ну ладно, мой друг. Я попытаюсь вспомнить.");
-                interpret( ch, "smile");
-            }
-        }
-
         if ( !victim->is_npc()
                 && ( IS_SET(victim->act, PLR_WANTED)
                         || victim->isAffected(gsn_jail ) ) )
@@ -873,8 +851,8 @@ bool spec_guard( NPCharacter *ch )
         ch->setClan( clan_ruler );
         interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
                         victim->getNameP(), 
-                        ch->in_room->name, 
-                        ch->in_room->area->name);
+                        ch->in_room->getName(), 
+                        ch->in_room->areaName());
 
         if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
                 && !is_safe_nomessage( ch, victim ))
@@ -931,23 +909,37 @@ bool spec_nasty( NPCharacter *ch )
     if ( (victim = ch->fighting) == 0)
         return false;   /* let's be paranoid.... */
 
-    switch ( number_bits(2) )
-    {
-        case 0:  act_p( "$c1 разрезает твой кошелек и тянет оттуда золотые монетки!",
-                     ch, 0, victim, TO_VICT,POS_RESTING);
-                 act_p( "Ты разрезаешь кошелек $C2 и крадешь золото.",
-                     ch, 0, victim, TO_CHAR,POS_RESTING);
-                 act_p( "БА! Да у $C2 выпотрошили кошелек!",
-                     ch, 0, victim, TO_NOTVICT,POS_RESTING);
-                 gold = victim->gold / 10;  /* steal 10% of his gold */
-                 victim->gold -= gold;
-                 ch->gold     += gold;
-                 return true;
+    switch (number_bits(2)) {
+    case 0:
+        if (ch->can_see(victim)) {
+            /* steal 10% of his gold */                
+            if (victim->gold > 10)
+                gold = victim->gold / 10;
+            else
+                gold = victim->gold;
 
-        case 1:  interpret_raw( ch, "flee");
-                 return true;
+            if (gold > 0) {
+                victim->gold -= gold;
+                ch->gold += gold;
 
-        default: return false;
+                act_p("$c1 разрезает твой кошелек и тянет оттуда золотые монетки!",
+                    ch, 0, victim, TO_VICT, POS_RESTING);
+                act_p("Ты разрезаешь кошелек $C2 и крадешь золото.",
+                    ch, 0, victim, TO_CHAR, POS_RESTING);
+                act_p("БА! Да у $C2 выпотрошили кошелек!",
+                    ch, 0, victim, TO_NOTVICT, POS_RESTING);
+            }
+            
+            return true;
+        }
+
+        /* FALLTHROUGH */
+    case 1:
+        interpret_raw(ch, "flee");
+        return true;
+
+    default:
+        return false;
     }
 }
 
@@ -1006,7 +998,7 @@ bool spec_assassinater( NPCharacter *ch )
         }
 
         do_say( ch, buf );
-        interpret_raw( ch, "assasinate", victim->getName( ).c_str( ) );
+        interpret_raw( ch, "assassinate", victim->getName( ).c_str( ) );
         return true;
 }
 
@@ -1044,7 +1036,7 @@ bool spec_captain( NPCharacter *ch )
     if ( ch->fighting != 0 )
         return false;
 
-    if ( !move || ch->position < POS_SLEEPING )
+    if ( !move || (ch->position < POS_STANDING && path[pos] != 'W'))
         return false;
 
     switch ( path[pos] )
@@ -1099,7 +1091,7 @@ bool spec_captain( NPCharacter *ch )
 
     case 'C':
         interpret_raw( ch, "close", "gate" );
-        interpret_raw( ch, "lock", "gate" );
+//        interpret_raw( ch, "lock", "gate" );
         break;
 
     case 'n':

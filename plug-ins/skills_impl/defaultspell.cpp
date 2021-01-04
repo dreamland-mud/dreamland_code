@@ -130,12 +130,12 @@ int DefaultSpell::getMaxRange( Character *ch ) const
  * Find a char for spell usage. Allowed syntax: vict, dir.vict, dir vict
  */
 Character * 
-DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, int *range )
+DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, int *range, ostringstream &errbuf )
 {
     DLString argDoor, argVict;
 
     if (direction_range_argument(argument, argDoor, argVict, *door)) {
-        return find_char(ch, argVict.c_str(), *door, range, false);
+        return find_char(ch, argVict.c_str(), *door, range, errbuf);
     }
     
     return get_char_room(ch, argVict.c_str());
@@ -267,14 +267,6 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     slevel += ch->getPC()->mod_level_groups[skill->getGroup()];
     slevel += ch->getPC()->mod_level_skills[skill->getIndex()];
     slevel += ch->getPC()->mod_level_all;
-    if (old_level != slevel && ch->isCoder()) 
-        ch->printf(">>> changing spell level from %d to %d.\n", old_level, slevel);
-
-    if (slevel > mlevel+5)
-        notice("DefaultSpell::getSpellLevel %s class %s clan %s: mlevel=%d slevel=%d old_level=%d range=%d",
-               ch->getName().c_str(), ch->getProfession()->getName().c_str(), ch->getClan()->getName().c_str(),
-               mlevel, slevel, old_level, range);
-
 
     return slevel;
 }
@@ -361,8 +353,9 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         }
 
-        buf << "Этому заклинанию не нужно указывать цель." << endl;
-        result->error = TARGET_ERR_NO_TARGET_NEEDED;
+        // Ignore specified target for room spells, to allow for scrolls with multiple target types.
+        result->type = SpellTarget::ROOM;
+        result->room = ch->in_room;
         return result;
     }
 
@@ -424,7 +417,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             int maxrange = getMaxRange( ch );
             
             if (maxrange > 0) {
-                victim = getCharSpell( ch, arg, &result->door, &maxrange );
+                victim = getCharSpell( ch, arg, &result->door, &maxrange, buf );
 
                 if (victim) {
                     if (ch->isAffected(gsn_garble ) && number_percent( ) < 10)
@@ -441,6 +434,11 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                     
                     result->range = std::max( 0, getMaxRange( ch ) - maxrange );
                     result->castFar = true;
+
+                } else if (result->door >= 0 && result->door < DIR_SOMEWHERE) {
+                    // Victim not found, but a range spell was likely casted.
+                    result->error = TARGET_ERR_CHAR_NOT_FOUND;
+                    return result;
                 }
             }
             else 

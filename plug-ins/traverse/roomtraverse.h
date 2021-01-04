@@ -44,7 +44,7 @@ struct Road {
         case EEXIT:
             return value.eexit->u1.to_room;
         case PORTAL:
-            return get_room_index( value.portal->value3() );
+            return get_room_instance( value.portal->value3() );
         }
     }
 
@@ -135,7 +135,7 @@ struct RoomRoadsIterator
             act( road );
         }
 
-        for (EXTRA_EXIT_DATA *eexit = room->extra_exit; eexit; eexit = eexit->next) {
+        for (auto &eexit: room->extra_exits) {
             if (!eexit->u1.to_room)
                 continue;
 
@@ -155,7 +155,7 @@ struct RoomRoadsIterator
             if (IS_SET(obj->value2(), GATE_RANDOM|GATE_BUGGY)) 
                 continue;
 
-            if (get_room_index( obj->value3() ) == NULL)
+            if (get_room_instance( obj->value3() ) == NULL)
                 continue;
 
             if (!canGoPortal( room, obj ))

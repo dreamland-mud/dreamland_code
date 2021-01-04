@@ -135,7 +135,7 @@ bool RecallMovement::checkCurse( Character *wch )
     if (IS_AFFECTED(wch, AFF_CURSE))
         return false;
 
-    if (IS_RAFFECTED(from_room, AFF_ROOM_CURSE))
+    if (IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE))
         return false;
 
     return true;

@@ -18,6 +18,7 @@
 #include "logstream.h"
 #include "skill.h"
 #include "skillmanager.h"
+#include "grammar_entities_impl.h"
 
 #include "commandtemplate.h"
 #include "xmlattributeticker.h"
@@ -27,6 +28,7 @@
 #include "pcharactermanager.h"
 #include "pcrace.h"
 #include "object.h"
+#include "objectbehaviormanager.h"
 
 #include "act_wiz.h"
 #include "act.h"
@@ -224,41 +226,40 @@ CMDWIZP( set )
   hset( ch, NULL );
 }
 
-void hset( Character* ch, char* ) {
-  char buf[MAX_STRING_LENGTH];
-  char buf1[MAX_STRING_LENGTH];
-  int i = 0;
+void hset(Character *ch, char *)
+{
+    ostringstream buf;
+    int i = 0;
 
-  buf[0] = '\0';
-  while( tab_set[i].name ) {
-    sprintf( buf1, "  {Cset {y%-5s{x help   {C[{x %s {C]{x\n\r", tab_set[i].name, tab_set[i].help );
-    strcat( buf, buf1 );
-    i++;
-  }
-  sprintf( buf1, "%s:\n\r%s", "Синтаксис", buf );
-  ch->send_to(buf1);
+    buf << "Синтаксис:" << endl;
+    while (tab_set[i].name) {
+        buf << dlprintf("  {Cset {y%-5s{x help   {C[{x %s {C]{x\n\r", tab_set[i].name, tab_set[i].help);
+        i++;
+    }
+    ch->send_to(buf);
 }
 
-void mset( Character* ch, char* argument ) {
-  char arg[MAX_INPUT_LENGTH];
-  int i = 0;
+void mset(Character *ch, char *argument)
+{
+    char arg[MAX_INPUT_LENGTH];
+    int i = 0;
 
-  argument = one_argument( argument, arg );
-  if( arg[0] ) {
-    while( tab_set_mob[i].name ) {
-      if( !str_prefix( arg, tab_set_mob[i].name ) ) {
-        if( tab_set_mob[i].func ) {
-          tab_set_mob[i].func( ch, argument );
-          return;
-        } else {
-          ch->send_to("Извините, но данная возможность находится в стадии разработки.\n\r");
-          return;
+    argument = one_argument(argument, arg);
+    if (arg[0]) {
+        while (tab_set_mob[i].name) {
+            if (!str_prefix(arg, tab_set_mob[i].name)) {
+                if (tab_set_mob[i].func) {
+                    tab_set_mob[i].func(ch, argument);
+                    return;
+                } else {
+                    ch->send_to("Извините, но данная возможность находится в стадии разработки.\n\r");
+                    return;
+                }
+            }
+            i++;
         }
-      }
-      i++;
     }
-  }
-  chg_mob_help( ch, NULL );
+    chg_mob_help(ch, NULL);
 }
 
 void chg_mob_str( Character* ch, char* argument ) {
@@ -896,30 +897,25 @@ void chg_mob_practice( Character* ch, char* argument ) {
   }
 }
 
-void chg_mob_help( Character* ch, char* argument ) {
-  char buf[MAX_STRING_LENGTH];
-  char buf1[MAX_STRING_LENGTH];
-  int i = 0;
+void chg_mob_help(Character *ch, char *argument)
+{
+    ostringstream buf;
+    int i = 0;
 
-  buf[0] = '\0';
-  while( tab_set_mob[i].name ) {
-    sprintf( buf1, "  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r",
-             tab_set_mob[i].name,
-             tab_set_mob[i].inc_dec ? "[+/-]" : "     ",
-             IS_SET( tab_set_mob[i].DS, S_V ) &&
-             IS_SET( tab_set_mob[i].DS, S_S ) ?
-               "{C<{xчис{C/{xназв{C>{x" :
-               IS_SET( tab_set_mob[i].DS, S_V ) ?
-                 "{C<{x число  {C>{x" :
-                 IS_SET( tab_set_mob[i].DS, S_S ) ?
-                   "{C<{x  назв. {C>{x" :
-                   "          ",
-             tab_set_mob[i].help );
-    strcat( buf, buf1 );
-    i++;
-  }
-  sprintf( buf1, "%s:\n\r%s", "Синтаксис", buf );
-  ch->send_to(buf1);
+    buf << "Синтаксис:" << endl;
+    while (tab_set_mob[i].name) {
+        buf << dlprintf("  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r",
+                tab_set_mob[i].name,
+                tab_set_mob[i].inc_dec ? "[+/-]" : "     ",
+                IS_SET(tab_set_mob[i].DS, S_V) &&
+                        IS_SET(tab_set_mob[i].DS, S_S)
+                    ? "{C<{xчис{C/{xназв{C>{x"
+                    : IS_SET(tab_set_mob[i].DS, S_V) ? "{C<{x число  {C>{x" : IS_SET(tab_set_mob[i].DS, S_S) ? "{C<{x  назв. {C>{x" : "          ",
+                tab_set_mob[i].help);
+        i++;
+    }
+
+    ch->send_to(buf);
 }
 
 void chg_mob_killer( Character* ch, char* argument ) {
@@ -1091,10 +1087,11 @@ void oset( Character* ch, char* argument )
         if ( arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0' )
         {
                 ch->send_to("Syntax:\n\r");
-                ch->send_to("  set obj <object> <field> <value>\n\r");
+                ch->send_to("  set obj <object> <field> <value> [<value>]\n\r");
                 ch->send_to("  Field being one of:\n\r");
                 ch->send_to("    value0 value1 value2 value3 value4 (v1-v4) \n\r");
-                ch->send_to("    cost extra level material owner timer wear weight personal\n\r");
+                ch->send_to("    cost extra level material owner timer wear\n\r");
+                ch->send_to("    weight gender personal property\n\r");
                 return;
         }
 
@@ -1109,34 +1106,67 @@ void oset( Character* ch, char* argument )
         {
             obj->setMaterial( arg3 );
         }
+        else if (!str_cmp(arg2, "property")) {
+            DLString value = arg3;
+            DLString key = value.getOneArgument();
+
+            if (value.empty()) {
+                ch->println("Syntax: set obj <object> property <key> <value>");
+                return;
+            }
+
+            obj->properties[key] = value;
+        }
         else
         if ( !str_cmp( arg2, "owner") )
         {
             obj->setOwner( arg3 );
         }
-        else
-        if ( !str_cmp( arg2, "personal") )
+        else if (!str_cmp(arg2, "gender")) {
+            MultiGender mg(MultiGender::UNDEF);
+            mg.fromString(arg3);
+            if (mg == MultiGender::UNDEF) {
+              ch->println("Неправильное значение грам. рода, используй: neutral, female, male, plural или первые буквы n f m p.");
+              return;
+            }
+            
+            obj->gram_gender = mg;
+            obj->updateCachedNoun();
+            ch->pecho("%1$^O1 {Wизмене{Cн%1$Gо||а|ы.{x", obj);
+
+        } else if ( !str_cmp( arg2, "personal") )
         {
-            obj->setOwner( arg3 );
-            SET_BIT(obj->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
-            obj->setMaterial( "platinum" );
+            const DLString behaviorName = "PersonalQuestReward";
 
-            try {
-                AllocateClass::Pointer p = Class::allocateClass( "PersonalQuestReward" );
+            if (obj->behavior && obj->behavior->getType() == behaviorName) {
+                // Strip already existing personal item behavior.
+                ch->pecho("Удаляю поведение %s с предмета %O1.", behaviorName.c_str(), obj);
+                ObjectBehaviorManager::clear(obj);
 
-                if (p) {
-                    obj->behavior.setPointer( p.getDynamicPointer<ObjectBehavior>( ) );
-                    obj->behavior->setObj( obj );
+            } else {
+                // Allocate and assign new behavior and all related flags.
+                PCMemoryInterface *owner = PCharacterManager::find(arg3);
+                if (!owner) {
+                    ch->println("Персонаж не найден, укажи имя полностью.");
+                    return;
                 }
-            } catch (ExceptionClassNotFound e) {
-                LogStream::sendError( ) << e.what( ) << endl;
-                ch->send_to( e.what( ) );
-                return;
+
+                ch->pecho("Устанавливаю поведение %s и владельца %s на предмет %O1.",
+                          behaviorName.c_str(), arg3, obj);
+
+                ObjectBehaviorManager::assign(obj, behaviorName);
+                if (!obj->behavior) {
+                    ch->println("Произошла ошибка, проверь логи.");
+                    return;
+                }
+
+                obj->setOwner(owner->getName().c_str());
+                SET_BIT(obj->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
+                obj->setMaterial( "platinum" );
             }
         }
         else if (!str_cmp(arg2, "timestamp")) {
             obj->timestamp = atol(arg3);
-            return;
         }
         else
         {

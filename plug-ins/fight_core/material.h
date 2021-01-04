@@ -5,8 +5,6 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "def.h"
-
 class Object;
 class Character;
 

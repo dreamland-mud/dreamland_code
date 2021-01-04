@@ -21,6 +21,7 @@
 #include <commandmanager.h>
 #include <object.h>
 #include <affect.h>
+#include "affectmanager.h"
 #include "room.h"
 #include "skillgroup.h"
 
@@ -34,7 +35,7 @@
 #include "websocketrpc.h"
 #include "act.h"
 #include "mercdb.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 
 #include "olc.h"
 #include "security.h"
@@ -79,28 +80,8 @@ OLCStateObject::~OLCStateObject( )
 
 void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
 {
-    Affect *af, **my_af = &obj.affected;
-    list<Affect *> afflist;
-    for(af = original->affected; af; af = af->next)
-        afflist.push_back(af);
-
-    while(!afflist.empty()) {
-        af = afflist.back();
-        afflist.pop_back();
-        
-        *my_af = dallocate( Affect );
-        (*my_af)->where    =af->where; 
-        (*my_af)->type     =af->type; 
-        (*my_af)->level    =af->level;
-        (*my_af)->duration =af->duration;
-        (*my_af)->location =af->location;
-        (*my_af)->modifier =af->modifier;
-        (*my_af)->bitvector=af->bitvector;
-        (*my_af)->global.setRegistry(af->global.getRegistry());
-        (*my_af)->global.set(af->global);
-        my_af = &(*my_af)->next;
-    }
-    *my_af = 0;
+    for (auto &paf: original->affected)
+        obj.affected.push_back(paf->clone());
     
     obj.item_type    = original->item_type;
     obj.extra_flags  = original->extra_flags;
@@ -176,13 +157,9 @@ void OLCStateObject::commit()
     original->extra_descr = obj.extra_descr;
     obj.extra_descr = 0;
     
-    Affect *af, *af_next;
-    for(af = original->affected; af; af = af_next) {
-        af_next = af->next;
-        ddeallocate( af );
-    }
-    original->affected = obj.affected;
-    obj.affected = 0;
+    original->affected.deallocate();
+    original->affected.assign(obj.affected.begin(), obj.affected.end());
+    obj.affected.clear();
     
     for(o = object_list; o; o = o->next)
         if(o->pIndexData == original) {
@@ -268,8 +245,7 @@ OEDIT(show)
 {
     OBJ_INDEX_DATA *pObj;
     char buf[MAX_STRING_LENGTH];
-    Affect *paf;
-    int cnt;
+    int cnt = 0;
     bool showWeb = !arg_oneof_strict(argument, "noweb");
 
     EDIT_OBJ(ch, pObj);
@@ -340,62 +316,50 @@ OEDIT(show)
               web_edit_button(showWeb, ch, "long", "web").c_str(), pObj->description);
     stc(buf, ch);
 
-    for (cnt = 0, paf = pObj->affected; paf; paf = paf->next) {
+    for (auto &paf: pObj->affected) {
         if (cnt == 0) {
-            stc("Number Modifier Location Where      What\n\r", ch);
-            stc("------ -------- -------- ---------- ---------------------------\n\r", ch);
+            stc("Number  Location  Modifier  Table/Registry  Bits\n\r", ch);
+            stc("------  --------  --------  --------------  ---------------------------\n\r", ch);
         }
-        sprintf(buf, "[%4d] %-8d %-8.8s", cnt,
-                  paf->modifier,
-                  apply_flags.name(paf->location).c_str());
-       
-        if (paf->bitvector || !paf->global.empty()) { 
-            sprintf(buf+strlen(buf), " %-10.10s ",
-                      affwhere_flags.name(paf->where).c_str());
 
-            switch(paf->where) {
-                case TO_DETECTS:
-                    strcat(buf, detect_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? detect_flags){x");
-                    break;
-                case TO_AFFECTS:
-                    strcat(buf, affect_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? affect_flags){x");
-                    break;
-                case TO_IMMUNE:
-                    strcat(buf, imm_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? imm_flags){x");
-                    break;
-                case TO_RESIST:
-                    strcat(buf, res_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? res_flags){x");
-                    break;
-                case TO_VULN:
-                    strcat(buf, vuln_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(? vuln_flags){x");
-                    break;
-                case TO_LIQUIDS:
-                    strcat(buf, paf->global.toString().c_str());
+        sprintf(buf, "[%4d]  %-8.8s  %8d", cnt,
+                  paf->location.name().c_str(),
+                  paf->modifier.getValue());
+       
+        const FlagTable *table = paf->bitvector.getTable();
+        const GlobalRegistryBase *registry = paf->global.getRegistry();
+
+        if ((table && paf->bitvector.getValue()) || registry) { 
+            sprintf(buf+strlen(buf), "  %-14.14s  ",
+                      registry ? registry->getRegistryName().c_str() : paf->bitvector.getTableName().c_str());
+
+            if (registry) {
+                sprintf(buf+strlen(buf), "%s", paf->global.toString().c_str());
+
+                if (registry == liquidManager) {
                     strcat(buf, " {D(? liquid){x");
-                    break;
-                case TO_SKILLS:
-                    strcat(buf, paf->global.toString().c_str());
-                    break;
-                case TO_SKILL_GROUPS:
-                    strcat(buf, paf->global.toString().c_str());
-                    strcat(buf, " {D(? group){x");
-                    break;
-                default:
-                    sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
-                    break;
+                } else if (registry == skillManager) {
+                                        
+                } else if (registry == skillGroupManager) {
+                    strcat(buf, " {D(? practicer){x");
+                } else if (registry == wearlocationManager) {
+                    strcat(buf, " {D(? wearloc){x");
+                } else {
+                    strcat(buf, "<unknown registry>");
+                }
+
+            } else {
+                strcat(buf, paf->bitvector.names().c_str());
+                sprintf(buf+strlen(buf), " {D(? %s){x", paf->bitvector.getTableName().c_str());
             }
         }
+
         strcat(buf, "\n\r");
         stc(buf, ch);
         cnt++;
     }
-    if (pObj->affected)
-        stc("{D          ? apply_flags  ? affwhere_flags{x\r\n", ch);
+    if (!pObj->affected.empty())
+        stc("{D        ? apply_flags{x\r\n", ch);
 
     show_obj_values(ch, pObj);
 
@@ -405,7 +369,7 @@ OEDIT(show)
             pObj->behavior->save( ostr );
             ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
             
-        } catch (ExceptionXMLError e) {
+        } catch (const ExceptionXMLError &e) {
             ptc(ch, "Behavior is BUGGY.\r\n");
         }
     }
@@ -441,19 +405,19 @@ OEDIT(where)
             ptc(ch, "[%5d]   у %s в %s (%s)\r\n", 
                     room->vnum,
                     wch->getNameP('2').c_str( ), 
-                    room->name, 
-                    room->area->name);
+                    room->getName(), 
+                    room->areaName());
         else if (o->in_room)
             ptc(ch, "[%5d]   на полу в %s (%s)\r\n", 
                     room->vnum,
-                    room->name, 
-                    room->area->name);
+                    room->getName(), 
+                    room->areaName());
         else if (o->in_obj)
             ptc(ch, "[%5d]   внутри %s в %s (%s)\r\n", 
                     room->vnum,
                     o->in_obj->getShortDescr('2').c_str( ),
-                    room->name,
-                    room->area->name);
+                    room->getName(),
+                    room->areaName());
     }
 
     return true;
@@ -463,19 +427,18 @@ OEDIT(addaffect)
 {
     OBJ_INDEX_DATA *pObj;
     Affect *pAf;
-    char buf[MAX_STRING_LENGTH];
-    int where = 0, mod = 0, loc;
+    int mod = 0, loc;
+    const FlagTable *table = 0;
+    GlobalRegistryBase *registry = 0;
     bitstring_t bit = 0;
-    Liquid *liq = 0;
-    Skill *skill = 0;
-    SkillGroup *group = 0;
+    list<GlobalRegistryElement *> elements;
+    DLString args = argument;
+    DLString buf = args.getOneArgument();
 
     EDIT_OBJ(ch, pObj);
 
-    argument = one_argument(argument, buf);
-
-    if (!*buf) {
-        stc("Syntax:  addaffect [location] [#mod] [where] [bit]\n\r", ch);
+    if (buf.empty()) {
+        stc("Syntax:  addaffect [location] [#mod] [table] [bit]\n\r", ch);
         return false;
     }
 
@@ -485,106 +448,58 @@ OEDIT(addaffect)
         return false;
     }
     
-    argument = one_argument(argument, buf);
-    if(!*buf || !is_number(buf)) {
+    buf = args.getOneArgument();
+    
+    if(buf.empty() || !buf.isNumber()) {
         stc("Number expected after location identifier\n\r", ch);
         return false;
     }
-    mod = atoi(buf);
+    mod = atoi(buf.c_str());
 
-    argument = one_argument(argument, buf);
-    if(*buf) {
-        if ((where = affwhere_flags.value( buf )) == NO_FLAG) {
-            stc("Valid where fields are:\n\r", ch);
-            show_help(ch, "affwhere");
+    buf = args.getOneArgument();
+
+    if(!buf.empty()) {
+        table = FlagTableRegistry::getTable(buf);
+        if (!table) {
+            auto r = registryMap.find(buf);
+            registry = r == registryMap.end() ? 0 : const_cast<GlobalRegistryBase *>(r->second);
+        }
+
+        if (!table && !registry) {
+            stc("Valid table names are:\r\n", ch);
+            stc("    detect_flags, affect_flags, vuln_flags, res_flags, imm_flags, weapon_type2, extra_flags\r\n", ch);
+            stc("    skill, skillGroup, liquid, wearlocation\r\n", ch);
             return false;
         }
-        switch(where) {
-            case TO_DETECTS:
-                bit = detect_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid detects are:\n\r", ch);
-                    show_help(ch, "detect" );
-                    return false;
-                }
-                break;
-            case TO_AFFECTS:
-                bit = affect_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid affects are:\n\r", ch);
-                    show_help(ch, "affect" );
-                    return false;
-                }
-                break;
-            case TO_IMMUNE:
-                bit = imm_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid immun bits are:\n\r", ch);
-                    show_help(ch, "imm" );
-                    return false;
-                }
-                break;
-            case TO_RESIST:
-                bit = res_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid resist bits are:\n\r", ch);
-                    show_help(ch, "res" );
-                    return false;
-                }
-                break;
-            case TO_VULN:
-                bit = vuln_flags.bitstring( argument );
-                if(bit == NO_FLAG) {
-                    stc("Valid vulnerable bits are:\n\r", ch);
-                    show_help(ch, "vuln" );
-                    return false;
-                }
-                break;
-            // TODO: this doesn't allow to have several values in a single affect.
-            case TO_LIQUIDS:
-                if (!( liq = liquidManager->findExisting( argument ) )) {
-                    stc("Жидкость с таким названием не найдена, см. olchelp liquid.\n", ch);
-                    return false;
-                }
-                break;
-            case TO_SKILLS:
-                if (!(skill = skillManager->findExisting(argument))) {
-                    stc("Умение с таким названием не найдено.\n", ch);
-                    return false;
-                }
-                break;
-            case TO_SKILL_GROUPS:
-                if (!(group = skillGroupManager->findExisting(argument))) {
-                    stc("Группа умений с таким названием не найдена, см. olchelp group.\n", ch);
-                    return false;
-                }
-                break;
-            default:
-                stc("This affect location is  not supported now.\n\r", ch);
+
+        if (table) {
+            bit = table->bitstring(args);
+            if (bit == NO_FLAG) {
+                ptc(ch, "Invalid flag, see 'olchelp %s' for the list of values.\r\n", buf.c_str());
                 return false;
+            }
+        } else {
+            elements = registry->findAll(args);
+            if (elements.empty()) {
+                ptc(ch, "Elements with names \"%s\" not found in %s.\r\n", args.c_str(), buf.c_str());
+                return false;
+            }
         }
     }
 
-    pAf = new_affect();
+    pAf = AffectManager::getThis()->getAffect();
     pAf->location = loc;
+    pAf->location.setTable(&apply_flags);
     pAf->modifier = mod;
     pAf->type = -1;
     pAf->duration = -1;
-    pAf->where = where;
-    pAf->bitvector = bit;
+    pAf->bitvector.setTable(table);
+    pAf->bitvector.setValue(bit);
+    pAf->global.setRegistry(registry);
+    for (auto &e: elements)
+        pAf->global.set(e->getIndex());
 
-    if (liq) {
-        pAf->global.setRegistry(liquidManager);
-        pAf->global.set(liq->getIndex());
-    } else if (skill) {
-        pAf->global.setRegistry(skillManager);
-        pAf->global.set(skill->getIndex());
-    } else if (group) {
-        pAf->global.setRegistry(skillGroupManager);
-        pAf->global.set(group->getIndex());
-    }
-    pAf->next = pObj->affected;
-    pObj->affected = pAf;
+    pObj->affected.push_front(pAf);
 
     stc("Affect added.\n\r", ch);
     return true;
@@ -596,10 +511,8 @@ OEDIT(delaffect)
 {
     OBJ_INDEX_DATA *pObj;
     Affect *pAf;
-    Affect *pAf_next;
     char affect[MAX_STRING_LENGTH];
     int value;
-    int cnt = 0;
 
     EDIT_OBJ(ch, pObj);
 
@@ -617,30 +530,19 @@ OEDIT(delaffect)
         return false;
     }
 
-    if (!(pAf = pObj->affected)) {
-        stc("OEdit:  Non-existant affect.\n\r", ch);
+    if (pObj->affected.empty()) {
+        stc("OEdit: No affects found.\n\r", ch);
         return false;
     }
 
-    if (value == 0) {                /* First case: Remove first affect */
-        pAf = pObj->affected;
-        pObj->affected = pAf->next;
-        free_affect(pAf);
-    }
-    else {                        /* Affect to remove is not the first */
-        while ((pAf_next = pAf->next) && (++cnt < value))
-            pAf = pAf_next;
-
-        if (pAf_next) {                /* See if it's the next affect */
-            pAf->next = pAf_next->next;
-            free_affect(pAf_next);
-        }
-        else {                        /* Doesn't exist */
-            stc("No such affect.\n\r", ch);
-            return false;
-        }
+    pAf = pObj->affected.get(value);
+    if (!pAf) {
+        stc("No such affect.\n\r", ch);
+        return false;
     }
 
+    pObj->affected.remove(pAf);
+    AffectManager::getThis()->extract(pAf);
     stc("Affect removed.\n\r", ch);
     return true;
 }
@@ -800,7 +702,7 @@ OEDIT(cost)
 
 OEDIT(create)
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
 
     value = atoi(argument);
@@ -999,10 +901,9 @@ OEDIT(copy)
 
 OEDIT(list)
 {
-    int i, cnt;
-    Room *pRoom;
+    int cnt;
+    RoomIndexData *pRoom;
     OBJ_INDEX_DATA *pObj;
-    RESET_DATA *pReset;
     char buf[MAX_STRING_LENGTH];
     ostringstream buffer;
     
@@ -1014,21 +915,22 @@ OEDIT(list)
     buffer << buf;
     
     cnt = 0;
-    for(i=0;i<MAX_KEY_HASH;i++)
-        for(pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
-            for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
-                switch(pReset->command) {
-                    case 'G':
-                    case 'E':
-                    case 'O':
-                    case 'P':
-                        if(pReset->arg1 == pObj->vnum) {
-                            snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-                                    pReset->command, pRoom->vnum, pRoom->name);
-                            buffer << buf;
-                            cnt++;
-                        }
-                }
+    for (auto &r: roomIndexMap) {
+        pRoom = r.second;
+        for(auto &pReset: pRoom->resets)
+            switch(pReset->command) {
+                case 'G':
+                case 'E':
+                case 'O':
+                case 'P':
+                    if(pReset->arg1 == pObj->vnum) {
+                        snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
+                                pReset->command, pRoom->vnum, pRoom->name);
+                        buffer << buf;
+                        cnt++;
+                    }
+            }
+    }
 
     snprintf(buf, sizeof(buf), "Total {W%d{x resets found.\n\r", cnt);
     buffer << buf;
@@ -1095,7 +997,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     Object *obj;
     OBJ_INDEX_DATA *pObj;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     char arg1[MAX_STRING_LENGTH];
     int value;
 
@@ -1124,7 +1026,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     } else if (!str_cmp(arg1, "create")) {
         if (!str_cmp(argument, "next")) {
-            value = next_obj_index(ch, ch->in_room);
+            value = next_obj_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
                 ch->println("Все внумы в этой зоне уже заняты!");
                 return;

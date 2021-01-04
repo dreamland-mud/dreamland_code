@@ -1,4 +1,5 @@
 #include "websocketrpc.h"
+#include "stringlist.h"
 #include "pcharacter.h"
 #include "descriptor.h"
 
@@ -16,7 +17,8 @@ DLString web_cmd(Descriptor *d, const DLString &cmd, const DLString &seeFmt)
     if (!is_websock(d))
         return seeFmt;
 
-    buf << "[cmd=" << cmd.colourStrip() << ",see=" << seeFmt << ",nonce=" << d->websock.nonce << "]";
+
+    buf << "[cmd=" << cmd.colourStrip() << ",see=" << seeFmt.colourStrip() << ",nonce=" << d->websock.nonce << "]";
     return buf.str();
 }
 
@@ -46,4 +48,20 @@ bool is_websock( Character *ch )
 bool is_websock( Descriptor *d )
 {
     return d && d->websock.state == WS_ESTABLISHED;
+}
+
+DLString web_menu(const StringList &commands, const DLString &id, const DLString &label)
+{
+    ostringstream buf;
+
+    buf << "{Iw<m";
+
+    if (!id.empty())
+        buf << " i='" << id << "'";
+
+    buf << " c='" << commands.join(", ") << "'>{Ix"
+        << label
+        << "{Iw</m>{Ix";
+
+    return buf.str();
 }

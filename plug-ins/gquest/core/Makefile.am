@@ -19,6 +19,7 @@ globalquestinfo.cpp \
 globalquest.cpp \
 gqchannel.cpp \
 gqexceptions.cpp \
+gqobjects.cpp \
 xmlattributereward.cpp \
 xmlattributeglobalquest.cpp \
 impl.cpp 
@@ -27,6 +28,7 @@ libgquest_core_la_MOC = \
 globalquest.h \
 globalquestmanager.h \
 globalquestinfo.h \
+gqobjects.h \
 xmlattributereward.h \
 xmlattributeglobalquest.h 
 

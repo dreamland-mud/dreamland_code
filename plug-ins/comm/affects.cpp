@@ -1,4 +1,5 @@
 #include "commandtemplate.h"
+#include "skillgroup.h"
 #include "liquid.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -68,15 +69,20 @@ void AffectOutput::show_affect( ostringstream &buf, int flags )
     if (IS_SET(flags, FSHOW_RUSSIAN))
         f << "{Y%1$-23s{x";
     else
-        f << "{rАффект{y: {Y%1$-15s{x";
+        f << "{Y%1$-18s{x";
     
     if (IS_SET(flags, FSHOW_LINES|FSHOW_TIME)) 
         f << "{y:";
     
     if (IS_SET(flags, FSHOW_LINES))
         for (list<DLString>::iterator l = lines.begin( ); l != lines.end( ); l++) {
-            if (l != lines.begin( ))
-                f << "," << endl << "                        ";
+            if (l != lines.begin( )) {                
+                f << "," << endl;                
+                if (IS_SET(flags, FSHOW_RUSSIAN))
+                    f << "                        ";
+                else
+                    f << "                   ";
+            }
 
             f << "{y " << *l;
         }
@@ -139,93 +145,63 @@ DLString AffectOutput::format_affect_location( Affect *paf )
 
 DLString AffectOutput::format_affect_bitvector( Affect *paf )
 {
-    DLString buf;
+    ostringstream buf;
+    const FlagTable *table = paf->bitvector.getTable();
+    bitstring_t b = paf->bitvector;
 
-    if (paf->bitvector != 0) {
-        bitstring_t b = paf->bitvector;
+    if (table && b) {
         const char *word = 0;
         char gcase = '1';
-        const FlagTable *table = 0;
 
-        switch(paf->where) {
-        case TO_AFFECTS: 
-            table = &affect_flags;
+        if (table == &affect_flags) {
             word = "добавляет";
             gcase = '4';
-            break;
-        case TO_IMMUNE:        
-            table = &imm_flags;
+        } else if (table == &imm_flags) {
             word = "иммунитет к";
-            break;
-        case TO_RESIST:        
-            table = &imm_flags;
+        } else if (table == &res_flags) {
             word = "сопротивляемость к";
-            break;
-        case TO_VULN:        
-            table = &imm_flags;
+        } else if (table == &vuln_flags) {
             word = "уязвимость к";
-            break;
-        case TO_DETECTS: 
-            table = &detect_flags;
+        } else if (table == &detect_flags) {
             word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  "добавляет" : "обнаружение");
             gcase = (IS_SET(b, ADET_WEB|ADET_FEAR) ? '4': '2');
-            break;
         }
-
-        if (word && table)
+        
+        if (word)
             buf << word << " {m" << table->messages( b, true, gcase ) << "{y";
     }
 
-    return buf;
+    return buf.str();
 }
 
 DLString AffectOutput::format_affect_global( Affect *paf )
 {
     DLString buf;
+    const GlobalRegistryBase *registry = paf->global.getRegistry();
+    int mod = paf->modifier;
 
-    if (!paf->global.empty( )) {
-        ostringstream s;
-        vector<int> bits = paf->global.toArray( );
-        
-        switch (paf->where) {
-        case TO_LIQUIDS:
-            for (unsigned int i = 0; i < bits.size( ); i++) {
-                Liquid *liq = liquidManager->find( bits[i] );
-
-                if (!s.str( ).empty( ))
-                    s << ", ";
-
-                s << "{m" <<  liq->getShortDescr( ).ruscase( '2' ).colourStrip( ) << "{x";
-            }
-
-            buf << "запах " << s.str( );
-            break;
-
-        case TO_LOCATIONS:
+    if (registry) {
+        if (registry == skillManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "знание умения" : "уровень умения")
+                << " {m" << paf->global.toRussianString().quote() 
+                << "{y на {m" << (int)abs(mod) << "{y";
+        } else if (registry == skillGroupManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "знание группы" : "уровень умения группы")
+                << " {m" << paf->global.toRussianString().quote() 
+                << "{y на {m" << (int)abs(mod) << "{y";
+        } else if (registry == liquidManager) {
+            buf << "добавляет запах {m" << paf->global.toRussianString('2', ',').colourStrip() << "{x";
+        } else if (registry == wearlocationManager) {
             if (paf->global.isSet( wear_wrist_r ))
                 buf << "отрезанная правая рука";
             else if (paf->global.isSet( wear_wrist_l ))
                 buf << "отрезанная левая рука";
             else
                 buf << "отрезанная конечность";
-            break;
-
-        case TO_SKILLS:
-        case TO_SKILL_GROUPS:
-            if (paf->location == APPLY_LEVEL) {
-                buf << (paf->modifier >= 0 ? "повышает" : "понижает")
-                    << " уровень умений "
-                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "") << " {m" 
-                    << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
-                    << "{y на {m" << (int)abs(paf->modifier) << "{y";
-            } else if (paf->location == APPLY_NONE || paf->location == APPLY_LEARNED) {
-                buf << (paf->modifier >= 0 ? "повышает" : "понижает")
-                    << " знание "
-                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка") << " {m" 
-                    << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
-                    << "{y на {m" << (int)abs(paf->modifier) << "{y";
-            }
-            break;
+        } else {
+            buf << "неизвестный вектор";
         }
     }
 
@@ -257,26 +233,6 @@ struct PermanentAffects {
         my_mgain = ch->mana_gain;
     }
 
-    void stripBitsFromAffects(Affect *paf) {
-        switch(paf->where) {
-        case TO_AFFECTS: 
-            REMOVE_BIT(my_aff, paf->bitvector);
-            break;
-        case TO_IMMUNE:        
-            REMOVE_BIT(my_imm, paf->bitvector);
-            break;
-        case TO_RESIST:        
-            REMOVE_BIT(my_res, paf->bitvector);
-            break;
-        case TO_VULN:        
-            REMOVE_BIT(my_vuln, paf->bitvector);
-            break;
-        case TO_DETECTS: 
-            REMOVE_BIT(my_det, paf->bitvector);
-            break;
-        }
-    }
-    
     void printAll() const {
         print("У тебя иммунитет к", my_imm, imm_flags, '2');
         print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
@@ -328,21 +284,17 @@ CMDRUNP( affects )
     list<AffectOutput>::iterator o;
     int flags = FSHOW_LINES|FSHOW_TIME|FSHOW_COLOR|FSHOW_EMPTY;
 
-    if (ch->getConfig( ).ruskills)
+    if ((IS_CHARMED(ch) ? ch->master : ch)->getConfig().ruskills)
         SET_BIT(flags, FSHOW_RUSSIAN);
    
-    // Keep track of res, vuln, hp/mana gain that are permanent (either from race affects or from items). 
+    // Keep track of res, vuln, hp/mana gain. 
     PermanentAffects permAff(ch);
  
-    for (Affect* paf = ch->affected; paf != 0; paf = paf->next ) {
+    for (auto &paf: ch->affected) {
         if (output.empty( ) || output.back( ).type != paf->type) 
             output.push_back( AffectOutput( paf, flags ) );
         
         output.back( ).format_affect( paf );
-
-        // Remove bits that are added via an affect, so that in the end
-        // only permanent bits remain.
-        permAff.stripBitsFromAffects(paf);
     }
     
     if (HAS_SHADOW(ch))
@@ -373,21 +325,22 @@ CMDRUNP( affects )
     if (!ch->is_npc()) {
         PCharacter *pch = ch->getPC();
         bool rus = IS_SET(flags, FSHOW_RUSSIAN);
-        StringList learnedSkills = pch->mod_skills.toStringList(rus);
-        StringList learnedGroups = pch->mod_skill_groups.toStringList(rus);
-        StringList levelSkills = pch->mod_level_skills.toStringList(rus);
-        StringList levelGroups = pch->mod_level_groups.toStringList(rus);
+        const DLString joiner = " {yна{m ";
+        StringList learnedSkills = pch->mod_skills.toStringList(rus, joiner);
+        StringList learnedGroups = pch->mod_skill_groups.toStringList(rus, joiner);
+        StringList levelSkills = pch->mod_level_skills.toStringList(rus, joiner);
+        StringList levelGroups = pch->mod_level_groups.toStringList(rus, joiner);
 
         if (!learnedSkills.empty())
-            buf << "Изменено знание навыков: " << learnedSkills.wrap("", "%").join(", ") << "." << endl;
+            buf << "{yИзменено знание навыков: " << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!learnedGroups.empty())
-            buf << "Изменено знание групп навыков: " << learnedGroups.wrap("", "%").join(", ") << "." << endl;
+            buf << "{yИзменено знание групп навыков: " << learnedGroups.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!levelSkills.empty())
-            buf << "Изменен уровень навыков: " << levelSkills.join(", ") << "." << endl;
+            buf << "{yИзменен уровень навыков: " << levelSkills.wrap("{m", "{y").join(", ") << "." << endl;
         if (!levelGroups.empty())
-            buf << "Изменен уровень групп навыков: " << levelGroups.join(", ") << "." << endl;
+            buf << "{yИзменен уровень групп навыков: " << levelGroups.wrap("{m", "{y").join(", ") << "." << endl;
         if (pch->mod_level_all != 0)
-            buf << "Уровень всех навыков изменен на " << pch->mod_level_all << "." << endl;
+            buf << "{yУровень всех навыков изменен на {m" << pch->mod_level_all << "{y.{x" << endl;
     }
 
     if (IS_CHARMED(ch)) {

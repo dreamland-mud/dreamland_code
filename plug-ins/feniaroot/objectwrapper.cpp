@@ -437,7 +437,7 @@ NMI_INVOKE( ObjectWrapper, getRoom, "(): комната, в которой на�
         return Register();
 }
 
-static void obj_from_anywhere( ::Object *obj )
+void obj_from_anywhere( ::Object *obj )
 {
     if (obj->in_room)
         obj_from_room( obj );
@@ -630,13 +630,12 @@ NMI_GET( ObjectWrapper, affected, "список (List) всех аффектов
 {
     checkTarget();
     RegList::Pointer rc(NEW);
-    Affect *paf;
 
     if (!target->enchanted)
-        for (paf = target->pIndexData->affected; paf != 0; paf = paf->next) 
+        for (auto &paf: target->pIndexData->affected) 
             rc->push_back( AffectWrapper::wrap( *paf ) );
     
-    for (paf = target->affected; paf != 0; paf = paf->next) 
+    for (auto &paf: target->affected) 
         rc->push_back( AffectWrapper::wrap( *paf ) );
         
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();
@@ -649,14 +648,12 @@ NMI_INVOKE( ObjectWrapper, affectAdd, "(aff): повесить на предме
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
     
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
     
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_to_obj( target, &af );
+    affect_to_obj( target, &(aw->getTarget()) );
 
     return Register( );
 }
@@ -665,14 +662,12 @@ NMI_INVOKE( ObjectWrapper, affectJoin, "(aff): усилить существую
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
     
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
     
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_enhance( target, &af );
+    affect_enhance( target, &(aw->getTarget()) );
 
     return Register( );
 }
@@ -680,27 +675,9 @@ NMI_INVOKE( ObjectWrapper, affectJoin, "(aff): усилить существую
 NMI_INVOKE( ObjectWrapper, affectStrip, "(skill): снять с предмета все аффекты от умения по имени skill" )
 {
     checkTarget( );
-    Skill *skill;
-    int sn;
-    Affect *paf, *paf_next;
+    Skill *skill = args2skill(args);
     
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
-
-    skill = skillManager->findExisting( args.front( ).toString( ) );
-    
-    if (!skill)
-        throw Scripting::IllegalArgumentException( );
-    
-    sn = skill->getIndex( );
-
-    for (paf = target->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-
-        if (paf->type == sn)
-            affect_remove_obj( target, paf );
-    }
-    
+    affect_strip(target, skill->getIndex());
     return Register( );
 }
 
@@ -708,8 +685,8 @@ NMI_INVOKE( ObjectWrapper, affectStripAll, "(): снять все аффекты
 {
     checkTarget( );
     
-    while (target->affected)
-        affect_remove_obj( target, target->affected );
+    for (auto &paf: target->affected.clone())
+        affect_remove_obj( target, paf );
 
     return Register( );
 }

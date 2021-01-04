@@ -146,10 +146,10 @@ bool Character::canEnter( Room *room )
     if (!can_see( room ))
         return false;
         
-    if (room->clan != clan_none && room->clan != getClan( ))
+    if (room->pIndexData->clan != clan_none && room->pIndexData->clan != getClan( ))
         return false;
     
-    if (!room->guilds.empty( ) && !room->guilds.isSet( getProfession( ) ))
+    if (!room->pIndexData->guilds.empty( ) && !room->pIndexData->guilds.isSet( getProfession( ) ))
         return false;
     
     if (room->behavior && !room->behavior->canEnter( this ))

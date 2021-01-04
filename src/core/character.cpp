@@ -102,7 +102,7 @@ Character::~Character(void)
     if (carrying)
         LogStream::sendFatal() << "~Character: inventory not empty" << endl;
 
-    if (affected)
+    if (!affected.empty())
         LogStream::sendFatal() << "~Character: affected not empty" << endl;
 
     free_string(prefix);
@@ -136,7 +136,7 @@ void Character::init( )
     fighting = 0;
     last_fought = 0;
     desc = 0;
-    affected = 0;
+    affected.clear();
     carrying = 0;
     on = 0;
     in_room = 0;
@@ -217,16 +217,10 @@ void Character::init( )
 
 void Character::extract( )
 {
-    Affect *paf;
-    
     if (carrying)
         throw Exception( getName( ) + " extract: inventory not empty" );
     
-    while (affected) {
-        paf = affected->next;
-        ddeallocate( affected );
-        affected = paf;
-    }
+    affected.deallocate();
 
     init( );
 }
@@ -298,6 +292,16 @@ void Character::setSex( short sex )
 {
     this->sex.setValue( sex );
     updateCachedNoun( );
+}
+
+PCharacter * Character::getPlayer( )
+{
+    return getPC();
+}
+
+NPCharacter * Character::getMobile( )
+{
+    return getNPC();
 }
 
 
@@ -555,13 +559,7 @@ Character * Character::getDoppel( const Character *looker )
 
 bool Character::isAffected( int sn ) const
 {
-    Affect *paf;
-
-    for (paf = affected; paf != 0; paf = paf->next)
-        if (paf->type == sn)
-            return true;
-
-    return false;
+    return affected.find(sn) != 0;
 }
 
 void Character::dismount( )

@@ -50,6 +50,7 @@ CLAN(battlerager);
 GSN(scrolls);
 GSN(staves);
 GSN(wands);
+GSN(none);
 short get_wear_level( Character *ch, Object *obj );
 
 static bool oprog_quaff( Object *obj, Character *ch )
@@ -114,14 +115,63 @@ CMDRUNP( quaff )
 /*
  * 'recite' skill command
  */
+static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spell, const DLString &args,
+                             int &successfulSpells, int &successfulTargets)
+{
+    ostringstream errBuf;
+    SpellTarget::Pointer t = spell->locateTargets( ch, args, errBuf );
+    if (t->castFar && t->door != -1) {
+        ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
+        return;
+    }
+
+    if (t->error != 0) {
+        switch (t->error) {
+        case TARGET_ERR_CAST_ON_WHOM:
+            ch->pecho("Ты зачитываешь одно из заклинаний с %O2, но оно не находит, на кого подействовать.", scroll);
+            break;
+        case TARGET_ERR_CAST_ON_WHAT:
+            ch->pecho("Ты зачитываешь одно из заклинаний с %O2, но оно не находит, на что подействовать.", scroll);
+            break;
+        default:
+            ch->send_to(errBuf);
+            break;
+        }
+
+        return;
+    }
+
+    act_p( "$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM,POS_RESTING );
+    act_p( "Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR,POS_RESTING );
+
+    successfulTargets++;
+
+    if (number_percent( ) >= gsn_scrolls->getEffective( ch )) {
+        act("Ты не совлада$gло|л|ла с произношением.", ch, 0, 0, TO_CHAR);
+        gsn_scrolls->improve( ch, false );
+        return;
+    }
+
+    gsn_scrolls->improve( ch, true );
+
+    try {
+        bitstring_t recite_flags = FSPELL_BANE|FSPELL_CHECK_SAFE|FSPELL_ATTACK_CASTER;
+
+        if (::spell_nocatch(spell, scroll->value0(), ch, t, recite_flags)) {
+            successfulSpells++;
+        }
+
+        if (ch->is_adrenalined() || ch->fighting != 0) 
+            ch->setWait(4);        
+
+    } catch (const VictimDeathException &vde) {
+        return;
+    }
+}
 
 CMDRUNP( recite )
 {
-    std::vector<SpellTarget::Pointer> targets;
-    SpellTarget::Pointer t;
-    Spell::Pointer spell;
     Object *scroll;
-    bool found;
     DLString args = argument, arg1;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
@@ -146,93 +196,32 @@ CMDRUNP( recite )
         return;
     }
     
-    found = false;
+    int successfulSpells = 0, successfulTargets = 0;
+    int totalSpells = 0;
 
     for (int i = 1; i <= 4; i++) {
-        std::basic_ostringstream<char> buf;
         int sn = scroll->valueByIndex(i);
-        
-        if (sn > 0) {
-            spell = SkillManager::getThis( )->find( sn )->getSpell( );
+        if (sn < 0)
+            continue;
 
-            if (spell) { 
-                t = spell->locateTargets( ch, args, buf );
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        if (!skill || skill->getIndex() == gsn_none)
+            continue;
 
-                if (t->castFar && t->door != -1) {
-                    ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
-                    return;
-                }
-
-                if (t->error != 0) {
-                    switch (t->error) {
-                    case TARGET_ERR_CAST_ON_WHOM:
-                        ch->println("Зачитать свиток на кого?");
-                        break;
-                    case TARGET_ERR_CAST_ON_WHAT:
-                        ch->println("Зачитать свиток на что?");
-                        break;
-                    default:
-                        ch->send_to(buf);
-                        break;
-                    }
-                    return;
-                }
-
-                targets.push_back( t );
-                found = true;
-                continue;
-            }
+        Spell::Pointer spell = skill->getSpell( );
+        if (!spell) {
+            LogStream::sendWarning() << "Scroll [" << scroll->pIndexData->vnum << "] has invalid spell for " << i << endl;
+            continue;
         }
 
-        targets.push_back( SpellTarget::Pointer( ) );
-    }
-    
-    if (!found) {
-        ch->send_to( "На кого или на что ты хочешь зачитать этот свиток?\r\n" );
-        return;
-    }
-    
-    act_p( "$c1 зачитывает $o4.", ch, scroll, 0, TO_ROOM,POS_RESTING );
-    act_p( "Ты зачитываешь $o4.", ch, scroll, 0, TO_CHAR,POS_RESTING );
-
-    if (number_percent( ) >= gsn_scrolls->getEffective( ch )) {
-        act("Ты не совлада$gло|л|ла с произношением.", ch, 0, 0, TO_CHAR);
-        gsn_scrolls->improve( ch, false );
-    }
-    else {
-        bool offensive;
-        
-        for (int i = 1; i <= 4; i++) {
-            t = targets[i - 1];
-
-            if (!t)
-                continue;
-            
-            spell = SkillManager::getThis( )->find( scroll->valueByIndex(i) )->getSpell( );
-            offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-
-            if (offensive && t->victim && is_safe( ch, t->victim ))
-                continue;
-            
-            if (!spell->spellbane( ch, t->victim )) {
-                try {
-                    spell->run( ch, t, scroll->value0() );
-
-                    if (offensive)
-                        attack_caster( ch, t->victim );
-                } catch (const VictimDeathException &e) {
-                    break;
-                }
-            }
-        }
-        
-        gsn_scrolls->improve( ch, true );
-
-        if (ch->is_adrenalined() || ch->fighting != 0) 
-             ch->setWaitViolence( 2 );
+        totalSpells++;
+        recite_one_spell(ch, scroll, spell, args, successfulSpells, successfulTargets);
     }
 
-    extract_obj( scroll );
+    if (successfulSpells > 0) {
+        ch->pecho("%^O1 превращается в пыль.", scroll);
+        extract_obj( scroll );
+    }
 }
 
 
@@ -274,7 +263,7 @@ CMDRUNP( brandish )
      ch->setWaitViolence( 2 );
 
     if (staff->value2() > 0) {
-        const char *terrain = terrains[ch->in_room->sector_type].hit;
+        const char *terrain = terrains[ch->in_room->getSectorType()].hit;
         
         act( "$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
         act( "Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );
@@ -292,42 +281,33 @@ CMDRUNP( brandish )
             
             level = staff->value0();
             offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-            t = spell->getTarget( );
+            t = spell->getTarget( );            
 
             try {
                 if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ )) {
-                    spell->run( ch, str_empty, sn, level );
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, str_empty), 0);
                     gsn_staves->improve( ch, true );
                 }
                 else if (IS_SET( t, TAR_ROOM|TAR_PEOPLE )) {
-                    spell->run( ch, ch->in_room, sn, level );
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch->in_room), 0);
                     gsn_staves->improve( ch, true );
                 }
                 else if (IS_SET( t, TAR_CHAR_SELF )) {
-                    spell->run( ch, ch, sn, level );
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, ch), 0);
                     gsn_staves->improve( ch, true, ch );
                 }
                 else if (IS_SET( t, TAR_CHAR_ROOM )) {
+                    bitstring_t brandish_flags = 
+                        FSPELL_BANE|FSPELL_ATTACK_CASTER|FSPELL_CHECK_GROUP|FSPELL_CHECK_SAFE;
+
                     for (vch = ch->in_room->people; vch; vch = vch_next) {
                         vch_next = vch->next_in_room;
-                        
-                        if (offensive) {
-                            if (is_safe( ch, vch ) || is_same_group( ch, vch ))
-                                continue;
 
-                            if (!spell->spellbane( ch, vch )) {
-                                spell->run( ch, vch, sn, level );
-                                attack_caster( ch, vch );
-                            }
-                            
-                            yell_panic( ch, vch,
-                                        "Помогите! Кто-то размахивает около меня посохом!",
-                                        "Помогите! %1$^C1 пугает меня посохом!" );
-                        }
-                        else {
-                            if (!spell->spellbane( ch, vch ))
-                                spell->run( ch, vch, sn, level );
-                        }
+                        if (::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, vch), brandish_flags))
+                            if (offensive)
+                                yell_panic( ch, vch,
+                                            "Помогите! Кто-то размахивает около меня посохом!",
+                                            "Помогите! %1$^C1 пугает меня посохом!" );
 
                         gsn_staves->improve( ch, true, vch );
                     }
@@ -343,7 +323,7 @@ CMDRUNP( brandish )
 
     staff->value2(staff->value2() - 1);
     if (staff->value2() <= 0) {
-        ch->recho( "%1$O1 %2$C2 темне%1$nет|ют и исчеза%1$nет|ют.", staff, ch );
+        ch->recho( "%1$^O1 %2$C2 темне%1$nет|ют и исчеза%1$nет|ют.", staff, ch );
         ch->pecho( "Тво%1$Gе|й|я|и %1$O1 темне%1$nет|ют и исчеза%1$nет|ют.", staff );
         extract_obj( staff );
     }
@@ -443,23 +423,14 @@ CMDRUNP( zap )
             gsn_wands->improve( ch, false, victim );
         }
         else {
-            bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
-                
-            if (offensive && victim && is_safe( ch, victim ))
-                return;
-
             try {
-                if (!spell->spellbane( ch, victim )) {
-                    spell->run( ch, target, wand->value0() );
+                bitstring_t zap_flags = FSPELL_CHECK_SAFE|FSPELL_BANE|FSPELL_ATTACK_CASTER;
 
-                    if (offensive)
-                        attack_caster( ch, victim );
-                }
-                
-                if (offensive)
-                    yell_panic( ch, victim,
-                                "Помогите! Кто-то размахивает около меня волшебным жезлом!",
-                                "Помогите! %1$^C1 пугает меня своим жезлом!" );
+                if (::spell_nocatch(spell, wand->value0(), ch, target, zap_flags))
+                    if (spell->getSpellType( ) == SPELL_OFFENSIVE)
+                        yell_panic( ch, victim,
+                                    "Помогите! Кто-то размахивает около меня волшебным жезлом!",
+                                    "Помогите! %1$^C1 пугает меня своим жезлом!" );
 
             } catch (const VictimDeathException &e) {
             }
@@ -470,7 +441,7 @@ CMDRUNP( zap )
 
     wand->value2(wand->value2() - 1);
     if (wand->value2() <= 0) {
-        ch->recho( "%1$O1 %2$C2 развалива%1$nется|ются на куски.", wand, ch );
+        ch->recho( "%1$^O1 %2$C2 развалива%1$nется|ются на куски.", wand, ch );
         ch->pecho( "Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски.", wand );
         extract_obj( wand );
     }

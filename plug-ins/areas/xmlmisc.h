@@ -77,7 +77,7 @@ struct XMLApply : public XMLIntegerNoEmpty {
     bool toXML( XMLNode::Pointer& ) const;
     void fromXML( const XMLNode::Pointer& ) ;
 
-    bitstring_t where;
+    bitstring_t location;
 };
 
 class Affect;

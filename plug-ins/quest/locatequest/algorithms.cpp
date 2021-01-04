@@ -38,7 +38,7 @@ struct DoorFunc {
         if (IS_SET( room->area->area_flag, AREA_NOQUEST ))
             return false;
 
-        if (room->area->low_range > ch->getModifyLevel( ))
+        if (room->areaIndex()->low_range > ch->getModifyLevel( ))
             return false;
 
         if (!ch->canEnter( room ))

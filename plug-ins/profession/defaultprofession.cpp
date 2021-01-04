@@ -384,7 +384,7 @@ bool DefaultProfession::isPlayed( ) const
     return true;
 }
 
-GlobalBitvector DefaultProfession::toVector( Character * ) const
+GlobalBitvector DefaultProfession::toVector( CharacterMemoryInterface * ) const
 {
     GlobalBitvector bv( professionManager );
 

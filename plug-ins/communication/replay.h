@@ -28,8 +28,8 @@ bool replay_history_near( ostringstream &buf, PCharacter *ch, int limit );
 extern const int MAX_HISTORY_SIZE;
 extern const int DEFAULT_REPLAY_SIZE;
 
-class ReplayAttribute : public EventHandler<StopFightArguments>, 
-                        public EventHandler<AfkArguments>,
+class ReplayAttribute : public AttributeEventHandler<StopFightArguments>, 
+                        public AttributeEventHandler<AfkArguments>,
                         public XMLVariableContainer {
 XML_OBJECT
 public:

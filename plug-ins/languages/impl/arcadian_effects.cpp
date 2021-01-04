@@ -20,7 +20,7 @@
 #include "fight.h"
 #include "damage.h"
 #include "act.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "effects.h"
 #include "mercdb.h"
 #include "vnum.h"
@@ -256,11 +256,11 @@ void WineSleepWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     act( "Ты чувствуешь внезапный неодолимый приступ сонливости.", victim, 0, 0, TO_CHAR );
     act( "$c1 зевает во всю пасть и засыпает.", victim, 0, 0, TO_ROOM );
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = gsn_sleep;
     af.level     = ch->getModifyLevel( ) * bhv->getQuality( ) / 100;
     af.duration  = 1 + af.level / 50;
-    af.bitvector = AFF_SLEEP;
+    af.bitvector.setValue(AFF_SLEEP);
     affect_join( victim, &af );
     
     victim->position = POS_SLEEPING;
@@ -288,11 +288,10 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
         return;
     }
 
-    for (Affect *paf = victim->affected; paf; paf = paf->next)
-        if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_SLEEP)) {
-            slevel += paf->level;
-            scount++;
-        }
+    for (auto &paf: victim->affected.findAllWithBits(&affect_flags, AFF_SLEEP)) {
+        slevel += paf->level;
+        scount++;
+    }
 
     if (scount)
         slevel /= scount;
@@ -303,7 +302,7 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
         return;
     }
 
-    affect_bit_strip( victim, TO_AFFECTS, AFF_SLEEP );
+    affect_bit_strip( victim, &affect_flags, AFF_SLEEP );
     victim->position = POS_RESTING;
     update_pos( victim );
 
@@ -336,7 +335,7 @@ void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, C
     act( "$c1 выглядит невероятно умиротворенн$gым|ым|ой и спокойн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
     
     if (IS_AFFECTED( victim, AFF_BERSERK ))
-        affect_bit_strip( victim, TO_AFFECTS, AFF_BERSERK );
+        affect_bit_strip( victim, &affect_flags, AFF_BERSERK );
 
     if (victim->isAffected( gsn_frenzy ))
         affect_strip( victim, gsn_frenzy );
@@ -347,15 +346,16 @@ void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, C
     if (!IS_AFFECTED( victim, AFF_CALM )) {
         Affect af;
 
-        af.where     = TO_AFFECTS;
         af.type      = gsn_calm;
         af.level     = bhv->getQuality( );
         af.duration  = af.level / 4;
-        af.location  = APPLY_HITROLL;
+        
+        af.location = APPLY_HITROLL;
         af.modifier  = -5;
-        af.bitvector = AFF_CALM;
         affect_to_char(victim, &af);
 
+        af.bitvector.setTable(&affect_flags);
+        af.bitvector.setValue(AFF_CALM);
         af.location = APPLY_DAMROLL;
         affect_to_char(victim, &af);
     }
@@ -381,11 +381,10 @@ void BeerArmorWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     if (!goodVolume( amount ))
         return;
 
-    af.where         = TO_AFFECTS;
     af.type      = gsn_beer_armor;
     af.level         = ch->getModifyLevel( ) * bhv->getQuality( ) / 100;
     af.duration  = 10 + af.level / 5;
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     
     if (victim->isAffected( gsn_beer_armor )) {
         act( "Пивная пленка на твоей коже становится прочнее.", victim, 0, 0, TO_CHAR );

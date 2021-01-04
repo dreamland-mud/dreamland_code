@@ -7,8 +7,8 @@
 
 #include <sstream>
 #include <iomanip>
+#include <jsoncpp/json/json.h>
 
-#include "json/json.h"
 #include "logstream.h"
 #include "native.h"
 #include "dlfilestream.h"
@@ -25,6 +25,7 @@ struct api_details {
 };
 
 typedef map<string, api_details> API;
+typedef map<string, Json::Value> JsonAPI;
 
 template <typename TT>
 void traitsAPIAux( ostringstream &buf ) 
@@ -75,7 +76,7 @@ void traitsAPI( ostringstream &buf )
 }
 
 template <typename TT>
-void traitsAPIJsonAux( Json::Value &jsonArray, bool readOnly ) 
+void traitsAPIJsonAux( JsonAPI &api, bool readOnly ) 
 {
     typename TT::List *list = TT::List::begin();
     
@@ -84,7 +85,7 @@ void traitsAPIJsonAux( Json::Value &jsonArray, bool readOnly )
         details["help"] = list->getVal().help;
         details["ro"] = readOnly;
         details["name"] = list->getKey().name;
-        jsonArray.append(details);
+        api[list->getKey().name] = details;
     }
 }
 
@@ -92,13 +93,24 @@ template <typename T>
 void traitsAPIJson(const DLString &prefix, Json::Value &apiDump, bool splitMethodsAndFields)
 {
     typedef NativeTraits<T> Traits;
+    JsonAPI api;
     Json::Value fields;
     Json::Value methods;
-    Json::Value &fieldsOrMethods = splitMethodsAndFields ? fields : methods; 
 
-    traitsAPIJsonAux<typename Traits::Get>( fieldsOrMethods, true );
-    traitsAPIJsonAux<typename Traits::Set>( fieldsOrMethods, false );
-    traitsAPIJsonAux<typename Traits::Invoke>( methods, false );
+    traitsAPIJsonAux<typename Traits::Get>( api, true );
+    traitsAPIJsonAux<typename Traits::Set>( api, false );
+
+    for (auto &apiEntry: api)
+        if (splitMethodsAndFields)
+            fields.append(apiEntry.second);
+        else
+            methods.append(apiEntry.second);
+
+    api.clear();
+
+    traitsAPIJsonAux<typename Traits::Invoke>( api, false );
+    for (auto &apiEntry: api)
+        methods.append(apiEntry.second);
 
     if (splitMethodsAndFields) {
         apiDump[prefix + "_fields"] = fields;

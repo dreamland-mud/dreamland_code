@@ -31,7 +31,7 @@ SkillGroupReference & CardSkill::getGroup( )
     return group_card_pack;
 }
 
-bool CardSkill::visible( Character * ch ) const
+bool CardSkill::visible( CharacterMemoryInterface * ch ) const
 {
     return isCard( ch );
 }
@@ -79,17 +79,17 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
-void CardSkill::show( PCharacter *ch, std::ostream & buf ) 
+void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
-    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
-        << " Колоды '{c" << getName( ) << "{x' или '{c" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{c"  << getGroup()->getNameFor(ch) << "{x'" 
-        << endl;
+    buf << print_what(this) << " Колоды "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl;
+
+    buf << print_wait_and_mana(this, ch);
     
-    print_wait_and_mana(this, ch, buf);     
-    buf << endl;
-    
-    buf << "Появляется у карт, начиная с {C" 
+    buf << SKILL_INFO_PAD 
+        << "Появляется у карт, начиная с {C" 
         << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
         << "{x"; 
 
@@ -103,22 +103,20 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf )
     }
     
     buf << "." << endl; 
-
-    print_see_also(this, ch, buf);
 }
 
 
 /*---------------------------------------------------------------------------
  * 
  *---------------------------------------------------------------------------*/
-int CardSkill::findCardLevel( Character *ch ) 
+int CardSkill::findCardLevel( CharacterMemoryInterface *mem ) 
 {
     XMLAttributeCards::Pointer attr;
     
-    if (ch->is_npc( ))
+    if (!mem->getPCM())
         return -1;
     
-    attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
+    attr = mem->getPCM()->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
 
     if (!attr)
         return -1;
@@ -129,7 +127,7 @@ int CardSkill::findCardLevel( Character *ch )
     return attr->getLevel( );
 }
 
-bool CardSkill::isCard( Character *ch )
+bool CardSkill::isCard( CharacterMemoryInterface *mem )
 {
-    return findCardLevel( ch ) >= 0;
+    return findCardLevel( mem ) >= 0;
 }

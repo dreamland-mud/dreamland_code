@@ -8,8 +8,8 @@
 #include "json/json.h"
 
 #include "logstream.h"
-#include "mobilebehavior.h"
 #include "mobilebehaviormanager.h"
+#include "basicmobilebehavior.h"
 
 #include "skill.h"
 #include "skillmanager.h"
@@ -28,6 +28,7 @@
 #include "subprofession.h"
 #include "profflags.h"
 #include "occupations.h"
+#include "follow_utils.h"
 #include "interp.h"
 #include "comm.h"
 #include "save.h"
@@ -76,6 +77,7 @@ void password_set( PCMemoryInterface *pci, const DLString &plainText );
 const char *ttype_name( int ttype );
 DLString regfmt(Character *to, const RegisterList &argv);
 list< ::Object *> get_objs_list_type( Character *ch, int type, ::Object *list );
+void obj_from_anywhere( ::Object *obj );
 
 using namespace std;
 using namespace Scripting;
@@ -197,9 +199,7 @@ NMI_GET( CharacterWrapper, inventory, "список всех предметов 
 	if (obj->wear_loc == wear_none)
 	    rc->push_back(wrap(obj));
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate();
-    obj->setHandler(rc);
-    return Register( obj );
+    return wrap(rc);
 }
 
 NMI_GET( CharacterWrapper, equipment, "список всех предметов в экипировке" )
@@ -211,10 +211,20 @@ NMI_GET( CharacterWrapper, equipment, "список всех предметов 
 	if (obj->wear_loc != wear_none)
             rc->push_back(wrap(obj));
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate();
-    obj->setHandler(rc);
-    return Register( obj );
+    return wrap(rc);
 }
+
+NMI_GET( CharacterWrapper, items, "список всех предметов в инвентаре или экипировке" )
+{
+    RegList::Pointer rc( NEW );
+    checkTarget( );
+    
+    for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
+        rc->push_back(wrap(obj));
+
+    return wrap(rc);
+}
+
 
 GETWRAP( on, "объект, мебель, на которой сидим" )
 
@@ -1011,7 +1021,7 @@ NMI_INVOKE( CharacterWrapper, psay, "(ch, format, args...): произносит
     Character *ch= args2character(args);
     myArgs.pop_front();
 
-    DLString msg = regfmt(target, myArgs).c_str();
+    DLString msg = regfmt(ch, myArgs).c_str();
     ch->pecho("%^C1 произносит '{g%s{x'", target, msg.c_str());
     return Register();
 }
@@ -1375,7 +1385,7 @@ NMI_INVOKE( CharacterWrapper, gainExp, "(exp): добавляет exp очков
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, getClass, "(): строка с названием профессии" )
+NMI_INVOKE( CharacterWrapper, getClass, "(): строка с названием класса" )
 {
     checkTarget();
     return Register( target->getProfession( )->getName( ).c_str( ) );
@@ -1441,10 +1451,15 @@ NMI_INVOKE( CharacterWrapper, add_follower, "(master): делает нас по�
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, stop_follower, "(): прекращает следование, снимает очарование" )
+NMI_INVOKE( CharacterWrapper, stop_follower, "([verbose]): прекращает следование, снимает очарование" )
 {
     checkTarget( );
-    target->stop_follower();
+
+    bool verbose = true;
+    if (args.size() > 0)
+        verbose = args.front().toBoolean();
+
+    follower_stop(target, verbose);
     return Register();
 }
 
@@ -1463,22 +1478,37 @@ NMI_INVOKE( CharacterWrapper, clearBehavior, "(): сбросить поведе�
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, rememberFought, "(ch): запомнить персонажа ch как будто с ним сражались" )
+{
+    checkTarget();
+    CHK_PC
+
+    if (!target->getNPC()->behavior)
+        return Register(false);
+
+    BasicMobileBehavior::Pointer ai = target->getNPC()->behavior.getDynamicPointer<BasicMobileBehavior>();
+    if (!ai)
+        return Register(false);
+
+    Character *ch = args2character(args);
+    ai->rememberFought(ch);
+    return Register(true);
+}
 
 NMI_INVOKE( CharacterWrapper, get_random_room, "(): случайная комната, куда можно зайти" )
 {
     checkTarget( );
     
-    std::vector<Room *> rooms;
-    Room *r;
+    RoomVector rooms;
     
-    for (r = room_list; r; r = r->rnext)
+    for (auto &r: roomInstances)
         if (target->canEnter(r) && !r->isPrivate())
             rooms.push_back(r);
     
     if (rooms.empty())
         return Register( );
     else {
-        r = rooms[::number_range(0, rooms.size() - 1)];
+        Room *r = rooms[::number_range(0, rooms.size() - 1)];
         return WrapperManager::getThis( )->getWrapper(r); 
     }
 }
@@ -1559,6 +1589,17 @@ NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag]): 
     return Register(saves_spell(level, target, dam_type, caster, dam_flag));	
 }
 
+NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от пилюли или зелья")
+{
+    checkTarget();
+    ::Object *item = argnum2item(args, 1);
+
+    if (item->item_type != ITEM_POTION && item->item_type != ITEM_PILL)
+        throw Scripting::Exception("Object is not a pill or a potion");
+
+    spell_by_item(target, item);
+    return Register();
+}
 
 NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane[,verbose]]]): скастовать заклинания на всю комнату, на vict или с аргументом")
 {
@@ -1628,14 +1669,12 @@ NMI_INVOKE( CharacterWrapper, affectAdd, "(.Affect): повесить новый
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
 
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
 
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_to_char( target, &af );
+    affect_to_char( target, &(aw->getTarget()) );
 
     return Register( );
 }
@@ -1644,14 +1683,12 @@ NMI_INVOKE( CharacterWrapper, affectJoin, "(.Affect): повесить новы�
 {
     checkTarget( );
     AffectWrapper *aw;
-    Affect af;
 
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
 
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
-    aw->toAffect( af );
-    affect_join( target, &af );
+    affect_join( target, &(aw->getTarget()) );
 
     return Register( );
 }
@@ -1665,9 +1702,10 @@ NMI_INVOKE( CharacterWrapper, affectBitStrip, "(where,bit): снять все а
     if (args.size( ) != 2)
         throw Scripting::NotEnoughArgumentsException( );
     
+    // FIXME: change affectBitStrip in existing codesources.
     where = args.front( ).toNumber( );
     bits = args.back( ).toNumber( );
-    affect_bit_strip( target, where, bits );
+    affect_bit_strip( target, &affect_flags, bits );
     return Register( ); 
 }
 
@@ -1691,20 +1729,21 @@ NMI_INVOKE( CharacterWrapper, isAffected, "(skillName): находится ли 
 NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аффекты с именем skillName" )
 {
     checkTarget( );
-    Skill *skill;
-    
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
-
-    skill = skillManager->findExisting( args.front( ).toString( ) );
-    
-    if (!skill)
-        throw Scripting::IllegalArgumentException( );
-    
+    Skill *skill = args2skill(args);
+        
     affect_strip( target, skill->getIndex( ) );
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, affectRemoveAll, "(): снять все аффекты" )
+{
+    checkTarget();
+
+    for (auto &paf: target->affected.clone())
+        affect_remove( target, paf );
+
+    return Register();
+}
 
 NMI_INVOKE( CharacterWrapper, isVulnerable, "(damtype, damflag): есть ли уязвимость к типу повреждений из .tables.damage_table с флагом повреждений из .tables.damage_flags" )
 {
@@ -1761,7 +1800,6 @@ NMI_INVOKE( CharacterWrapper, addDarkShroud, "(): повесить темную 
     
     checkTarget( );
 
-    af.where     = TO_AFFECTS;
     af.type      = gsn_dark_shroud;
     af.level     = target->getRealLevel( );
     af.duration  = -1;
@@ -1931,7 +1969,7 @@ NMI_INVOKE( CharacterWrapper, canRecall, "(): может ли прямо сей�
 
     if (IS_SET(target->in_room->room_flags, ROOM_NO_RECALL))
         return false; 
-    if (IS_RAFFECTED(target->in_room, AFF_ROOM_CURSE))
+    if (IS_ROOM_AFFECTED(target->in_room, AFF_ROOM_CURSE))
         return false;
     if (IS_AFFECTED(target, AFF_CURSE))
         return false;
@@ -1978,11 +2016,11 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
     victim->add_follower( target );
     victim->leader = target;
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = gsn_charm_person;
     af.level     = target->getRealLevel( );
     af.duration  = duration;
-    af.bitvector = AFF_CHARM;
+    af.bitvector.setValue(AFF_CHARM);
     affect_to_char( victim, &af );
 
     return Register( );
@@ -2027,15 +2065,11 @@ NMI_GET( CharacterWrapper, affected, "список всех аффектов (Li
 {
     checkTarget();
     RegList::Pointer rc(NEW);
-    Affect *paf;
 
-    for (paf = target->affected; paf != 0; paf = paf->next) 
+    for (auto &paf: target->affected) 
         rc->push_back( AffectWrapper::wrap( *paf ) );
         
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
-    sobj->setHandler(rc);
-
-    return Register( sobj );
+    return wrap(rc);
 }
 
 NMI_GET( CharacterWrapper, hasDestiny, "моб имеет предназначение (квестовые и спец-мобы)" )
@@ -2191,6 +2225,50 @@ NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желу�
     return Register( );
 }
 
+NMI_INVOKE(CharacterWrapper, give, "(vict,vnum|obj): дать персонажу vict предмет obj, создав его, если указан внум")
+{
+    checkTarget( );
+    Character *vict = argnum2character(args, 1);
+    Register arg2 = argnum(args, 2);
+    ::Object *item;
+
+    if (arg2.type == Register::NUMBER) {
+        OBJ_INDEX_DATA *pObj = get_obj_index(arg2.toNumber());
+        if (!pObj)
+            throw Scripting::Exception("Object with this vnum does not exist.");
+
+        item = create_object(pObj, 0);
+    } else {
+        item = arg2item(arg2);
+    }
+
+    obj_from_anywhere(item);
+    obj_to_char(item, vict);
+
+    vict->pecho("%^C1 дает тебе %O4.", target, item);
+    vict->recho("%^C1 дает %C3 %O4.", target, vict, item);
+
+    return Register();
+}
+
+NMI_INVOKE(CharacterWrapper, giveBack, "(vict,obj): вернуть персонажу vict предмет obj")
+{
+    checkTarget( );
+    Character *vict = argnum2character(args, 1);
+    ::Object *item = argnum2item(args, 2);
+
+    if (item->carried_by != target)
+        throw Scripting::Exception("Object you're trying to give back is not carried by this character.");
+    
+    obj_from_char(item);
+    obj_to_char(item, vict);
+
+    vict->pecho("%^C1 возвращает тебе %O4.", target, item);
+    vict->recho("%^C1 возвращает %C3 %O4.", target, vict, item);
+
+    return Register();
+}
+
 NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long): установить аттрибут для рестринга результатов заклинаний")
 {
     checkTarget( );
@@ -2239,6 +2317,13 @@ NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить мен�
     DLString action = argnum2string(args, 2);
     set_map_attribute_value(target->getPC(), "menu", number, action);
     return Register();
+}
+
+NMI_INVOKE(CharacterWrapper, hash, "(mod): вернуть ключ к хеш-таблице по модулю mod")
+{
+    checkTarget();
+    int mod = args2number(args);
+    return Register((int)(target->getID() % mod));
 }
  
 NMI_INVOKE( CharacterWrapper, api, "(): печатает этот api" )

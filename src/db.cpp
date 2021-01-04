@@ -101,21 +101,22 @@ TIME_INFO_DATA                time_info;
 WEATHER_DATA                weather_info;
 
 AUCTION_DATA        *        auction = new auction_data( );
-Room        *        top_affected_room = 0;
 
+RoomSet roomAffected;
 
-Room* room_list = 0;
+RoomVector roomInstances;
+
+AreaVector areaInstances;
+
+AreaIndexVector areaIndexes;
 
 /*
  * Locals.
  */
 MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
-Room *        room_index_hash                [MAX_KEY_HASH];
+RoomIndexMap roomIndexMap;
 char *                        string_hash                [MAX_KEY_HASH];
-
-AREA_DATA *                area_first;
-AREA_DATA *                area_last;
 
 char                        str_empty        [1];
 
@@ -125,8 +126,6 @@ int                        top_ed;
 int                        top_exit;
 int                        top_mob_index;
 int                        top_obj_index;
-int                        top_reset;
-int                        top_room;
 
 int                        top_vnum_room;
 int                        top_vnum_mob;
@@ -169,7 +168,39 @@ new_area_file(const char *name)
     return rc;
 }
 
-area_data::area_data( ) : behavior( AreaBehavior::NODE_NAME )
+AreaIndexData::AreaIndexData()
+    : name(&str_empty[0]), altname(&str_empty[0]),
+      authors(&str_empty[0]), credits(&str_empty[0]),
+      translator(&str_empty[0]), speedwalk(&str_empty[0]),
+      low_range(0), high_range(0),
+      min_vnum(0), max_vnum(0),
+      count(0),
+      resetmsg(0),
+      area_flag(0),
+      behavior(AreaBehavior::NODE_NAME),
+      security(9), vnum(0),
+      wrapper(0),
+      area(0)
+{
+}
+
+Area * AreaIndexData::create()
+{
+    if (area) // FIXME allow multiple instances
+        throw Exception("Attempt to create second instance of an area.");
+
+    area = new Area;
+    area->pIndexData = this;
+    area->area_flag = area_flag;
+
+    areaInstances.push_back(area);
+    
+    return area;
+}
+
+Area::Area()
+    : empty(true), age(15), nplayer(0),
+      area_flag(0), pIndexData(0)
 {
 }
 
@@ -202,31 +233,53 @@ void free_extra_descr(EXTRA_DESCR_DATA *ed)
     delete ed;
 }
 
-EXTRA_EXIT_DATA * new_extra_exit()
+void exit_data::resolve()
 {
-    static EXTRA_EXIT_DATA eexit_zero;
-    EXTRA_EXIT_DATA *eexit;
-    
-    eexit = new EXTRA_EXIT_DATA;
-    *eexit = eexit_zero;
-    eexit->keyword = eexit->description = eexit->room_description = eexit->short_desc_to = eexit->short_desc_from = str_empty;
-    
-    return eexit;
+    u1.to_room = get_room_instance( u1.vnum );
 }
 
-void free_extra_exit(EXTRA_EXIT_DATA *eexit)
+void exit_data::reset()
 {
-    free_string(eexit->keyword);
-    free_string(eexit->short_desc_from);
-    free_string(eexit->short_desc_to);
-    free_string(eexit->description);
-    free_string(eexit->room_description);
-
-    delete eexit;
+    exit_info = exit_info_default;
 }
 
+extra_exit_data::extra_exit_data()
+    : exit_info(0), exit_info_default(0),
+      key(0), moving_mode_from(0), moving_mode_to(0),
+      max_size_pass(0), level(0)
+{
+    u1.to_room = 0;
+    keyword = description = room_description = short_desc_to = short_desc_from = str_empty;
+}
 
+extra_exit_data::~extra_exit_data()
+{
+    free_string(keyword);
+    free_string(short_desc_from);
+    free_string(short_desc_to);
+    free_string(description);
+    free_string(room_description);
+}
 
+void extra_exit_data::resolve()
+{
+    u1.to_room = get_room_instance( u1.vnum );
+}
+
+void extra_exit_data::reset()
+{
+    exit_info = exit_info_default;
+}
+
+reset_data::reset_data()
+    : command('X'), 
+      arg1(0), arg2(0), arg3(0), arg4(0),
+      flags(0, &reset_flags), 
+      rand(RAND_NONE, &rand_table),
+      bestTier(0)
+{
+
+}      
 
 /*
  * Get an extra description from a list.
@@ -295,17 +348,11 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
  * Translates room virtual number to its room index struct.
  * Hash table lookup.
  */
-Room *get_room_index( int vnum )
+RoomIndexData *get_room_index( int vnum )
 {
-    Room *pRoomIndex;
-
-    for ( pRoomIndex  = room_index_hash[vnum % MAX_KEY_HASH];
-          pRoomIndex != 0;
-          pRoomIndex  = pRoomIndex->next )
-    {
-        if ( pRoomIndex->vnum == vnum )
-            return pRoomIndex;
-    }
+    auto r = roomIndexMap.find(vnum);
+    if (r != roomIndexMap.end())
+        return r->second;
 
     if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
         throw FileFormatException( "get_room_index: vnum %d not found on world startup", vnum );
@@ -313,7 +360,23 @@ Room *get_room_index( int vnum )
     return 0;
 }
 
+// FIXME: should look up by vnum and instance.
+Room *get_room_instance(int vnum)
+{
+    RoomIndexData *pRoomIndex = get_room_index(vnum);
+    if (pRoomIndex)
+        return pRoomIndex->room;
+    return 0;
+}
 
+AreaIndexData * get_area_index(const DLString &filename)
+{
+    for(auto &area: areaIndexes)
+        if (filename == area->area_file->file_name)
+            return area;
+            
+    return 0;
+}
 
 /*
  * Free a string.

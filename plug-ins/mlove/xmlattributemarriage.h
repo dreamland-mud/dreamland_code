@@ -14,7 +14,7 @@
 #include "playerattributes.h"
 
 class XMLAttributeMarriage : 
-   public EventHandler<WhoisArguments>,
+   public AttributeEventHandler<WhoisArguments>,
    public XMLVariableContainer,
    public RemortAttribute
 {

@@ -97,7 +97,7 @@ void char_to_room( Character *ch, Room *pRoomIndex )
 
                 bug( "Char_to_room: 0.", 0 );
         
-                if ((room = get_room_index(ROOM_VNUM_TEMPLE)) != 0)
+                if ((room = get_room_instance(ROOM_VNUM_TEMPLE)) != 0)
                         char_to_room(ch,room);
         
                 return;

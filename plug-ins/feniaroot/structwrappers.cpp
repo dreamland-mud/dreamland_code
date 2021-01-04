@@ -35,6 +35,7 @@
 #include "handler.h"
 #include "gsn_plugin.h"
 #include "profflags.h"
+#include "liquidflags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -50,20 +51,18 @@ DESIRE(full);
  *----------------------------------------------------------------------*/
 NMI_INIT(AreaWrapper, "area, зона");
 
-static AREA_DATA *find_area( const DLString &filename )
-{
-    AREA_DATA *area;
-
-    for (area = area_first; area; area = area->next)
-        if (filename == area->area_file->file_name)
-            return area;
-
-    throw Scripting::Exception( "Area " + filename + " not found." );
-}
-
 AreaWrapper::AreaWrapper( const DLString &n )
                   : filename( n )
 {
+}
+
+AreaIndexData * AreaWrapper::getTarget() const
+{
+    AreaIndexData *pArea = get_area_index(filename);
+    if (!pArea)
+        throw Scripting::Exception( "Area " + filename + " not found." );
+
+    return pArea;
 }
 
 Scripting::Register AreaWrapper::wrap( const DLString &filename )
@@ -91,22 +90,22 @@ NMI_GET( AreaWrapper, filename, "название файла зоны" )
 
 NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" ) 
 {
-    return Scripting::Register( find_area( filename )->name );
+    return Scripting::Register( getTarget()->name );
 }
 
 NMI_GET( AreaWrapper, area_flag, "флаги зоны (таблица .tables.area_flags)" ) 
 {
-    return Scripting::Register((int)(find_area( filename )->area_flag));
+    return Scripting::Register((int)(getTarget()->area_flag));
 }
 
 NMI_GET( AreaWrapper, min_vnum, "нижняя граница диапазона vnum-ов зоны" ) 
 {
-    return Scripting::Register((int)(find_area( filename )->min_vnum));
+    return Scripting::Register((int)(getTarget()->min_vnum));
 }
 
 NMI_GET( AreaWrapper, max_vnum, "верхняя граница диапазона vnum-ов зоны" ) 
 {
-    return Scripting::Register((int)(find_area( filename )->max_vnum));
+    return Scripting::Register((int)(getTarget()->max_vnum));
 }
 /*----------------------------------------------------------------------
  * Hometown
@@ -167,30 +166,30 @@ NMI_GET( HometownWrapper, recall, "vnum комнаты возврата (recall)
 
 NMI_GET( HometownWrapper, areaname, "полное название арии" ) 
 {
-    Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
+    Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->area->name );
+        return Scripting::Register( room->areaName() );
     else
         return Scripting::Register( DLString::emptyString );
 }
 
 NMI_GET( HometownWrapper, altname, "альтернативное название арии" ) 
 {
-    Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
+    Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->area->altname );
+        return Scripting::Register( room->areaIndex()->altname );
     else
         return Scripting::Register( DLString::emptyString );
 }
 
 NMI_GET( HometownWrapper, credits, "оригинальное англ название арии" ) 
 {
-    Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
+    Room *room = get_room_instance( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-        return Scripting::Register( room->area->credits );
+        return Scripting::Register( room->areaIndex()->credits );
     else
         return Scripting::Register( DLString::emptyString );
 }
@@ -272,7 +271,7 @@ NMI_GET( ProfessionWrapper, nameMlt, "русское название во мн�
     return professionManager->find( name )->getMltName( );
 }
 
-NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги профессии для этого персонажа (таблица .tables.prof_flags)" ) 
+NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги класса для этого персонажа (таблица .tables.prof_flags)" ) 
 {
     Character *ch = args2character(args);
     Profession *prof = professionManager->find( name );
@@ -299,7 +298,7 @@ NMI_GET( ProfessionWrapper, alignName, "русское имя подходяще
     return "любой";
 }
 
-NMI_GET( ProfessionWrapper, statPlus, "какие параметры увеличиваются у представителей этой профессии" ) 
+NMI_GET( ProfessionWrapper, statPlus, "какие параметры увеличиваются у представителей этого класса" ) 
 {
     Profession *prof = professionManager->find( name );
     int stat;
@@ -323,7 +322,7 @@ NMI_GET( ProfessionWrapper, statPlus, "какие параметры увели�
     return buf.str( );
 }
 
-NMI_INVOKE( ProfessionWrapper, goodSex, "(ch): проверить ограничения по полу на профессию для персонажа ch" )
+NMI_INVOKE( ProfessionWrapper, goodSex, "(ch): проверить ограничения по полу на класс для персонажа ch" )
 {
     CharacterWrapper *ch;
     
@@ -335,7 +334,7 @@ NMI_INVOKE( ProfessionWrapper, goodSex, "(ch): проверить огранич
     return prof->getSex( ).isSetBitNumber( ch->getTarget( )->getSex( ) );
 }
 
-NMI_INVOKE( ProfessionWrapper, goodRace, "(ch): проверить ограничения по расе на профессию для персонажа ch" )
+NMI_INVOKE( ProfessionWrapper, goodRace, "(ch): проверить ограничения по расе на класс для персонажа ch" )
 {
     CharacterWrapper *ch;
     
@@ -350,7 +349,7 @@ NMI_INVOKE( ProfessionWrapper, goodRace, "(ch): проверить ограни�
     return ch->getTarget( )->getRace( )->getPC( )->getClasses( )[prof->getIndex( )] > 0;
 }
 
-NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить ограничение на характер и этос на профессию для персонажа ch" )
+NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить ограничение на характер и этос на класс для персонажа ch" )
 {
     CharacterWrapper *ch;
     
@@ -501,12 +500,23 @@ LiquidWrapper::LiquidWrapper( const DLString &n )
 
 Scripting::Register LiquidWrapper::wrap( const DLString &name )
 {
+    if (!liquidManager->findExisting(name))
+        throw Scripting::Exception("Liquid not found");
+
     LiquidWrapper::Pointer hw( NEW, name );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( hw );
 
     return Scripting::Register( sobj );
+}
+
+Liquid * LiquidWrapper::getTarget() const
+{
+    Liquid *liq = liquidManager->find(name);
+    if (!liq)
+        throw Scripting::Exception("Liquid not found");
+    return liq;
 }
 
 NMI_INVOKE( LiquidWrapper, api, "(): печатает этот api" )
@@ -520,39 +530,43 @@ NMI_INVOKE( LiquidWrapper, api, "(): печатает этот api" )
 
 NMI_GET( LiquidWrapper, name, "английское название" ) 
 {
-    return liquidManager->find( name )->getName( );
+    return getTarget()->getName( );
 }
 NMI_GET( LiquidWrapper, short_descr, "русское название с цветами и падежами" ) 
 {
-    return liquidManager->find( name )->getShortDescr( );
+    return getTarget()->getShortDescr( );
 }
 NMI_GET( LiquidWrapper, color, "прилагательное цвета с падежами" ) 
 {
-    return liquidManager->find( name )->getColor( );
+    return getTarget()->getColor( );
 }
 NMI_GET( LiquidWrapper, sip_size, "размер глотка" ) 
 {
-    return liquidManager->find( name )->getSipSize( );
+    return getTarget()->getSipSize( );
 }
 NMI_GET( LiquidWrapper, flags, "флаги жидкости (таблица .tables.liquid_flags)" ) 
 {
-    return Scripting::Register( (int)liquidManager->find( name )->getFlags( ).getValue( ) );;
+    return Scripting::Register( (int)getTarget()->getFlags( ).getValue( ) );;
 }
 NMI_GET( LiquidWrapper, index, "внутренний порядковый номер" ) 
 {
-    return liquidManager->find( name )->getIndex( );
+    return getTarget()->getIndex( );
 }
 NMI_GET( LiquidWrapper, hunger, "как хорошо утоляет голод" ) 
 {
-    return liquidManager->find( name )->getDesires( )[desire_hunger];
+    return getTarget()->getDesires( )[desire_hunger];
 }
 NMI_GET( LiquidWrapper, thirst, "как хорошо утоляет жажду" ) 
 {
-    return liquidManager->find( name )->getDesires( )[desire_thirst];
+    return getTarget()->getDesires( )[desire_thirst];
 }
 NMI_GET( LiquidWrapper, full, "как хорошо насыщает" ) 
 {
-    return liquidManager->find( name )->getDesires( )[desire_full];
+    return getTarget()->getDesires( )[desire_full];
+}
+NMI_INVOKE( LiquidWrapper, isBooze, "алкоголь ли это" ) 
+{
+    return getTarget()->getFlags().isSet(LIQF_BEER|LIQF_LIQUOR|LIQF_WINE);
 }
 
 /*----------------------------------------------------------------------
@@ -871,7 +885,7 @@ NMI_GET( ReligionWrapper, ethos, "разрешенные этосы или пу�
     return Register((int)getTarget()->ethos.getValue());
 }
 
-NMI_GET( ReligionWrapper, classes, "разрешенные профессии или пустая строка (olchelp class)" ) 
+NMI_GET( ReligionWrapper, classes, "разрешенные классы или пустая строка (olchelp class)" ) 
 {
     return Register(getTarget()->classes.toString());
 }

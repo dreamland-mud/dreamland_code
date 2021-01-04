@@ -25,6 +25,7 @@
 #include "dreamland.h"
 #include "debug_utils.h"
 #include "fight.h"
+#include "weapongenerator.h"
 #include "material.h"
 #include "immunity.h"
 #include "../anatolia/handler.h"
@@ -942,11 +943,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     // everyone else:                           75 / 95 / 100 
     
     if ( ch->getProfession( ) == prof_ranger ) {                    
-            if ( ( ch->in_room->sector_type != SECT_HILLS ) &&
-                 ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
-                 ( ch->in_room->sector_type != SECT_FOREST ) &&
-                 ( ch->in_room->sector_type != SECT_FIELD ) )
-                        return;
+            if (!IS_NATURE(ch->in_room))
+                return;
             msgVictStun = "{W$c1 сотрясает землю мощным ударом, обездвиживая тебя!{x";
             msgCharStun = "{WТы сотрясаешь землю мощным ударом, обездвиживая $C4!{x";
             msgVictBlind = "{y$c1 внезапной серией ударов поднимает вихрь листьев, ослепляя тебя!{x";
@@ -1041,13 +1039,13 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         act_p( msgCharBlind, ch, 0, victim, TO_CHAR,POS_RESTING);
         if ( !IS_AFFECTED(victim,AFF_BLIND) )
         {
-            baf.where    = TO_AFFECTS;
+            baf.bitvector.setTable(&affect_flags);
             baf.type     = gsn_critical_strike;
             baf.level    = ch->getModifyLevel();
-            baf.location     = APPLY_HITROLL;
+            baf.location = APPLY_HITROLL;
             baf.modifier     = -1 * ch->getModifyLevel() / 10;
             baf.duration     = number_range(1,5);
-            baf.bitvector    = AFF_BLIND;
+            baf.bitvector.setValue(AFF_BLIND);
             affect_to_char( victim, &baf );
         }
         dam += dam * number_range( 1, 2 );  // +100-200% damage          
@@ -1073,9 +1071,6 @@ void UndefinedOneHit::damApplyMasterSword( )
 
 void UndefinedOneHit::damEffectMasterSword( ) 
 {
-    Affect *paf;
-    int old_mod;
-    int new_mod;
     Object *katana = wield;
 
     if (weapon_sn != gsn_sword)
@@ -1106,30 +1101,15 @@ void UndefinedOneHit::damEffectMasterSword( )
             
     katana->cost = 0;
 
-    paf = katana->affected->affect_find(gsn_katana);
-    if (!paf)
-        return;
-    
-    if (paf->level == 120)
-        return;
-            
-            
-    old_mod = paf->modifier;
-    new_mod = min(paf->modifier+1, ch->getModifyLevel() / 3);
-            
-    //do not dull an already sharp katana            
-    if(new_mod > old_mod){  
-                
-    paf->modifier = new_mod;         
-    ch->hitroll += new_mod - old_mod;
-       
-    if (paf->next != 0) {
-        paf->next->modifier = new_mod;
-        ch->damroll += new_mod - old_mod;
-        }
-    }
-            
-    act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana,0, TO_ROOM);
+    WeaponGenerator()
+        .item(katana)
+        .skill(gsn_katana)
+        .hitrollTier(1)
+        .damrollTier(1)
+        .incrementHitroll()
+        .incrementDamroll();
+
+    act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana, 0, TO_ROOM);
     act("$o1 в твоей $T руке загорается {Cголубым светом{x.", 
             ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);
 }
@@ -1247,6 +1227,11 @@ void UndefinedOneHit::damEffectMasterHand()
         }
     } else if (diceroll < (chance / 2) && !IS_AFFECTED(victim, AFF_STUN)) {
         if (ch != victim) {
+
+            if(IS_AFFECTED(victim, AFF_WEAK_STUN)){
+                REMOVE_BIT(victim->affected_by,AFF_WEAK_STUN);
+            }
+
             SET_BIT(victim->affected_by, AFF_STUN);
 
             act("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x", ch, 0, victim, TO_CHAR);
@@ -1432,7 +1417,6 @@ void UndefinedOneHit::damEffectSlice( )
     act( "Твоя отрубленная рука падает на землю.", victim, 0, 0, TO_CHAR );
 
     /* affect */
-    af.where = TO_LOCATIONS;
     af.type  = gsn_slice;
     af.level = ch->getModifyLevel( );
     af.duration = timer;

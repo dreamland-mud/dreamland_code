@@ -21,24 +21,5 @@ int weapon_ave(Object *wield);
 /** Return average damage for a weapon prototype. */
 int weapon_ave(struct obj_index_data *pWield);
 
-/**
- * Weapon generator: calculate best value1 for a weapon of given class, level and tier.
- */
-int weapon_value1(int level, int tier, bitnumber_t wclass);
-
-/**
- * Weapon generator: return fixed value2 based on weapon class.
- */
-int weapon_value2(bitnumber_t wclass);
-
-/**
- * Weapon generator: return fixed average damage for a level and a tier.
- */
-int weapon_ave(int level, int tier);
-
-/**
- * Weapon generator: return fixed damroll bonus for a level and a tier.
- */
-int weapon_damroll(int level, int tier);
 
 #endif

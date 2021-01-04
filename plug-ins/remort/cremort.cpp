@@ -23,6 +23,7 @@
 #include "race.h"
 #include "room.h"
 #include "remortdata.h"
+#include "hometown.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -35,6 +36,7 @@
 #include "def.h"
 
 CLAN(flowers);
+HOMETOWN(frigate);
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 
 const        short        CONVERT_PRACTICE_QP = 3;
@@ -66,6 +68,9 @@ CMDRUN( remort )
     }
     
     if (argument.empty( )) {
+        pch->println("{RВнимание! Все вещи в твоем инвентаре и на тебе исчезнут с перерождением!{x");
+        pch->println("Вещи можно сохранить в именном сундуке или собственном доме ({y{hc{lRсправка цены{lEhelp prices{x, {y{hc{lRсправка строительство{lEhelp building{x)");
+        pch->println("Обязательно прочитай {y{hc{lRсправка перерождение{lEhelp remort{x");
         pch->println("Если хочешь начать новую жизнь, набери {y{lRпереродиться{lEremort{x пароль.");
         return;
     }
@@ -92,11 +97,13 @@ CMDRUN( remort )
     new_ch->setPassword( pch->getPassword( ) );
     new_ch->setRussianName( pch->getRussianName( ).getFullForm( ) );
     new_ch->setSex( pch->getSex( ) );
+    new_ch->setHometown(home_frigate);
     new_ch->prompt = pch->prompt;
     new_ch->batle_prompt = pch->batle_prompt;
     new_ch->add_comm = pch->add_comm;
     new_ch->config = pch->config;
     new_ch->act = pch->act;
+    REMOVE_BIT( new_ch->act, PLR_CONFIRMED|PLR_VAMPIRE|PLR_WANTED|PLR_NO_EXP|PLR_HOLYLIGHT|PLR_DIGGED|PLR_HARA_KIRI|PLR_BLINK_ON );
     new_ch->comm = pch->comm;
     new_ch->lines = pch->lines;
 

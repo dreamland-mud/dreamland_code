@@ -17,6 +17,7 @@ public:
         Questor( );
         
         virtual int getOccupation( );
+        virtual void give( Character *victim, Object *obj );
         
         virtual bool canGiveQuest( Character * );
         void doRequest( PCharacter *, const DLString & );

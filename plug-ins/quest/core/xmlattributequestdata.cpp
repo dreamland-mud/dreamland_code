@@ -93,6 +93,8 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
 bool XMLAttributeQuestData::handle( const RemortArguments &args ) 
 {
     setTime( 0 );
+    lastQuestCount = 0;
+    lastQuestType.clear();
     return XMLAttributeStatistic::handle( args );
 }
 

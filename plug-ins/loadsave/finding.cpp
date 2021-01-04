@@ -6,6 +6,7 @@
 #include "loadsave.h"
 #include "save.h"
 
+#include "grammar_entities_impl.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -74,7 +75,6 @@ Character * get_char_room( Character *ch, Room *room, const DLString &constArgum
 
 /*
  * Find a char in the room.
- * Chronos uses in act_move.c
  */
 Character *get_char_room( Character *ch, Room *room, const char *argument, int *number, bool fSeenOnly )
 {
@@ -327,7 +327,7 @@ Object *get_obj_carry( Character *ch, char *argument )
         for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
         {
                 if ( obj->wear_loc == wear_none
-                        && ( ch->can_see( obj ) )
+                        && (ch->can_see( obj ) || ch->can_hear( obj ))
                         && ((id && obj->getID( ) == id) 
                              || (!id && obj_has_name( obj, arg, ch ))))
                 {
@@ -426,18 +426,7 @@ Object *get_obj_here( Character *ch, char *argument )
         int number = number_argument( argument, arg );
         long long id = get_arg_id( argument );
 
-        // At first look in room...
-        for ( obj = ch->in_room->contents; obj != 0; obj = obj->next_content )
-        {
-                if ( ( ch->can_see( obj ) || ch->can_hear( obj ) )
-                        && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-                {
-                        if (id || ++count == number )
-                                return obj;
-                }
-        }
-
-        // ... then inventory ...
+        // At first look in inventory ...
         for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
         {
                 if ( obj->wear_loc == wear_none
@@ -449,10 +438,21 @@ Object *get_obj_here( Character *ch, char *argument )
                 }
         }
 
-        // ... and equipment, at last!
+        // ... then equipment
         for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
         {
                 if ( obj->wear_loc != wear_none
+                        && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
+                {
+                        if (id || ++count == number )
+                                return obj;
+                }
+        }
+
+        // ... then the floor.
+        for ( obj = ch->in_room->contents; obj != 0; obj = obj->next_content )
+        {
+                if ( ( ch->can_see( obj ) || ch->can_hear( obj ) )
                         && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
                 {
                         if (id || ++count == number )
@@ -819,7 +819,7 @@ Object * get_obj_room_unique( Room *room, int itype, Character *ch )
 Object *find_pit_in_room(int roomVnum)
 {
     Object *pit = 0;
-    Room *pitRoom = get_room_index(roomVnum);
+    Room *pitRoom = get_room_instance(roomVnum);
     if (pitRoom)
         for (pit = pitRoom->contents;
              pit && !IS_PIT(pit);
@@ -909,6 +909,12 @@ bool can_see_god(Character *ch, Character *god)
     return true;
 }
 
+bool obj_index_has_name( OBJ_INDEX_DATA *pObj, const DLString &arg )
+{
+    DLString allnames = russian_case_all_forms(pObj->short_descr) + " " + pObj->name;    
+    return is_name(arg.c_str(), allnames.c_str());
+}
+
 /** Return true if character can access object by the name. */
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
 {
@@ -982,3 +988,12 @@ bool text_match_with_highlight(const DLString &text, const DLString &args, ostri
 
     return found;
 }
+
+NPCharacter * find_mob_with_act( Room *room, bitstring_t act )
+{    
+    for (Character* rch = room->people; rch != 0; rch = rch->next_in_room )
+       if (rch->is_npc() && IS_SET(rch->act, act))
+          return rch->getNPC( );
+    return NULL;
+}
+

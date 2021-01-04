@@ -4,6 +4,7 @@
  */
 #include <sstream>
 #include "globalbitvector.h"
+#include "stringlist.h"
 
 const GlobalBitvector GlobalBitvector::emptyBitvector;
 
@@ -37,42 +38,38 @@ void GlobalBitvector::fromString( const DLString &source )
     }
 }
 
-DLString GlobalBitvector::toString( ) const
+DLString GlobalBitvector::toString( char joiner ) const
 {
-    ostringstream result; 
-
     if (!registry)
         return DLString::emptyString;
+
+    StringList result;
 
     for (unsigned int b = 0; b < bits.size( ); b++)
         if (bits[b]) {
             GlobalRegistryElement *e = registry->find(b);
             if (e)
-                result << e->getName().quote() << " ";
+                result.push_back(e->getName().quote());
         }
 
-    DLString r = result.str( );
-    r.stripRightWhiteSpace();
-    return r;
+    return result.join(joiner);
 }
 
-DLString GlobalBitvector::toRussianString( ) const
+DLString GlobalBitvector::toRussianString( char gcase, char joiner ) const
 {
-    ostringstream result; 
-
     if (!registry)
         return DLString::emptyString;
+
+    StringList result;
 
     for (unsigned int b = 0; b < bits.size( ); b++)
         if (bits[b]) {
             GlobalRegistryElement *e = registry->find(b);
             if (e)
-                result << e->getRussianName().quote() << " ";
+                result.push_back(e->getRussianName().ruscase(gcase).quote());
         }
 
-    DLString r = result.str( );
-    r.stripRightWhiteSpace();
-    return r;
+    return result.join(joiner);
 }
 
 vector<int> GlobalBitvector::toArray( ) const

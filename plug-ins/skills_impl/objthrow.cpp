@@ -118,10 +118,9 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
 {
     EXIT_DATA *pExit;
     Room *dest_room;
-    Affect *paf;
     int damroll=0,hitroll=0;
     
-    for ( paf = arrow->affected; paf != 0; paf = paf->next )
+    for (auto &paf: arrow->affected)
     {
             if ( paf->location == APPLY_DAMROLL )
                     damroll += paf->modifier;
@@ -218,7 +217,8 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
         short level;
         Affect *poison, af;
 
-        if (!arrow->affected || (poison = arrow->affected->affect_find(gsn_poison)) == 0)
+        poison = arrow->affected.find(gsn_poison);
+        if (!poison)
             level = arrow->level;
         else
             level = poison->level;
@@ -228,13 +228,13 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
             victim->send_to("Ты чувствуешь как яд растекается по твоим венам.");
             act_p("$c1 отравле$gно|н|на ядом от $o2.", victim,arrow,0,TO_ROOM,POS_RESTING);
 
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level     = level * 3/4;
             af.duration  = level / 2;
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1;
-            af.bitvector = AFF_POISON;
+            af.bitvector.setValue(AFF_POISON);
             affect_join( victim, &af );
         }
 
@@ -267,17 +267,13 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     {
         Affect af;
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level     = ch->getModifyLevel();
         af.duration  = -1;
-        af.location  = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         af.modifier  = - (dam / 20);
-
-        if (victim->is_npc())
-            af.bitvector = 0;
-        else
-            af.bitvector = AFF_CORRUPTION;
+        af.bitvector.setValue(AFF_CORRUPTION);
 
         affect_join( victim, &af );
 

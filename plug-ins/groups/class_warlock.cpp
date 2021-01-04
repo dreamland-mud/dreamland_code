@@ -59,7 +59,7 @@ SKILL_RUNP( blink )
 
     if (!ch->is_npc() && !gsn_blink->usable( ch ))
     {
-        ch->send_to("Что?\n\r");
+        ch->send_to("Это умение тебе недоступно.\n\r");
         return;
     }
 
@@ -94,7 +94,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
 
         if ( victim->fighting )
         {
-                ch->send_to("Ты не можешь сосредоточиться.. Жертва слишком быстро движется.\n\r");
+                ch->send_to("Ты не можешь прицелиться, жертва слишком быстро движется.\n\r");
                 return;
         }
 
@@ -196,7 +196,8 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (saves_spell( level, victim, DAM_OTHER,ch, DAMF_SPELL)) {
-        act_p("Легкая дрожь пронизывает $C4, но это быстро проходит.",
+        if (ch != victim)
+            act_p("Легкая дрожь пронизывает $C4, но это быстро проходит.",
                ch, 0, victim, TO_CHAR,POS_RESTING );
         victim->send_to("Легкая дрожь пронизывает тебя, но это быстро проходит.\n\r");
         return;
@@ -206,26 +207,20 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
         af.type    = sn;
         af.level   = level;
         af.duration = level / 20;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = 0;
         affect_to_char(victim, &af );
         if (ch != victim)
-            act_p("Ты создаешь экран Магической Силы вокруг $C2.", ch, 0, victim, TO_CHAR,POS_RESTING);
-        victim->send_to("Магическая Сила создает экран вокруг тебя.\n\r");
+            act_p("Ты создаешь изолирующий магию экран вокруг $C2.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        victim->send_to("Вокруг тебя внезапно воздвигается экран, изолирующий магию!\n\r");
     }
     else {
         af.type        = sn;
         af.level    = level;
         af.duration = level / 15;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = 0;
         affect_join( victim, &af );
 
-        victim->send_to("Магическая Сила полностью изолирует тебя от внешнего мира.\n\r");
+        victim->send_to("Изолирующий магию экран вокруг тебя усиливается!\n\r");
         if (ch != victim)
-            act_p("Магическая Сила полностью изолирует $C4 от внешнего мира.", ch, 0, victim, TO_CHAR,POS_RESTING);
+            act_p("Изолирующий магию экран вокруг $C2 усиливается.", ch, 0, victim, TO_CHAR,POS_RESTING);
     }
 }
 
@@ -246,13 +241,13 @@ VOID_SPELL(ShockingTrap)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
 
-    af.where     = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = level / 40;
-    af.location  = APPLY_NONE;
+    
     af.modifier  = 0;
-    af.bitvector = AFF_ROOM_SHOCKING;
+    af.bitvector.setValue(AFF_ROOM_SHOCKING);
     room->affectTo( &af );
 
     postaffect_to_char( ch, sn, level / 10 );
@@ -298,19 +293,17 @@ VOID_SPELL(WitchCurse)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
 
     if (victim->isAffected(gsn_witch_curse)) {
-        ch->println("Твой противник уже проклят ведьмами.");
+        ch->println("На этой жертве уже лежит ведьминское проклятие.");
         return;
     }
 
     ch->hit -=(2 * level);
 
-    af.where                = TO_AFFECTS;
     af.type             = gsn_witch_curse;
     af.level            = level;
     af.duration         = 24;
-    af.location         = APPLY_HIT;
+    af.location = APPLY_HIT;
     af.modifier         = - level;
-    af.bitvector        = 0;
     affect_to_char(victim,&af);
 
     act("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_CHAR);
@@ -327,18 +320,17 @@ VOID_AFFECT(WitchCurse)::update( Character *ch, Affect *paf )
 
     act_p("Проклятие ведьм безжалостно отбирает жизнь у $c2.",
           ch,0,0,TO_ROOM,POS_RESTING);
-    ch->send_to("Проклятие ведьм безжалостно отбирает у тебя жизнь.\n\r");
+    ch->send_to("{RПроклятие ведьм безжалостно отбирает у тебя жизнь!{x\n\r");
 
     if (paf->level <= 1)
         return;
 
-    witch.where = paf->where;
     witch.type  = paf->type;
     witch.level = paf->level;
     witch.duration = paf->duration;
+    witch.location.setTable(paf->location.getTable());
     witch.location = paf->location;
     witch.modifier = paf->modifier * 2;
-    witch.bitvector = 0;
 
     affect_remove(ch, paf);
     affect_to_char( ch ,&witch);
@@ -358,7 +350,7 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-        ch->send_to("Эта комната уже защищена щитом.\n\r");
+        ch->send_to("Эта комната уже защищена щитом молний.\n\r");
         return;
     }
 
@@ -368,20 +360,20 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
 
-    af.where     = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = level / 40;
-    af.location  = APPLY_NONE;
+    
     af.modifier  = 0;
-    af.bitvector = AFF_ROOM_L_SHIELD;
+    af.bitvector.setValue(AFF_ROOM_L_SHIELD);
     room->affectTo( &af );
 
     postaffect_to_char( ch, sn, level / 10 );
 
     ch->in_room->owner = str_dup( ch->getNameP( ) );
-    ch->send_to("Комната наполняется молниями.\n\r");
-    act_p("$c1 окружает себя молниями.",ch,0,0,TO_ROOM,POS_RESTING);
+    ch->send_to("Ты воздвигаешь вокруг себя щит молний.\n\r");
+    act_p("$c1 окружает себя щитом молний.",ch,0,0,TO_ROOM,POS_RESTING);
     return;
 
 }
@@ -402,8 +394,8 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
         room->affectStrip(paf->type);
     }
     else if (!ch->is_immortal( )) {
-        ch->send_to("Защитный щит комнаты блокирует тебя.\n\r");
-        act_p("$C1 заходит в комнату.",vch,0,ch,TO_CHAR,POS_RESTING);
+        ch->send_to("Щит молний, оберегающий это место, блокирует тебя.\n\r");
+        act_p("$C1 приближается к тебе.",vch,0,ch,TO_CHAR,POS_RESTING);
         interpret_raw( vch, "wake" );
 
         if (!is_safe_rspell(paf->level,ch)) {
@@ -421,7 +413,7 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
 
 VOID_AFFECT(LightningShield)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Здесь установлен волшебный щит, который просуществует еще {W%1$d{x ча%1$Iс|са|сов.",
+    buf << fmt( 0, "Здесь установлен щит молний, который просуществует еще {W%1$d{x ча%1$Iс|са|сов.",
                    paf->duration )
         << endl;
 }
@@ -467,15 +459,15 @@ void EnergyShield::equip( Character *ch )
     if (ch->isAffected(gsn_make_shield))
         return;
 
-    af.where = TO_RESIST;
+    af.bitvector.setTable(&res_flags);
     af.type = gsn_make_shield;
     af.duration = -2;
     af.level = ch->getModifyLevel();
 
     if (isColdShield( ))
-        af.bitvector = RES_COLD;
+        af.bitvector.setValue(RES_COLD);
     else if (isFireShield( )) 
-        af.bitvector = RES_FIRE;
+        af.bitvector.setValue(RES_FIRE);
     else
         return;
    
@@ -513,7 +505,7 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     else if (arg_oneof(arg, "fire", "огонь", "огня"))
         from = "огня";
     else {
-        ch->send_to("Выбери: от огня или холода он будет тебя защищать.\n\r");
+        ch->send_to("От чего ты хочешь защититься? Укажи {lrогонь или холод{lefire или cold{x в качестве параметра.\n\r");
         return;
     }
         

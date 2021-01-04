@@ -72,7 +72,7 @@ bool RoomQuestModel::checkRoom( PCharacter *ch, Room *room )
 
 bool RoomQuestModel::checkRoomClient( PCharacter *pch, Room *room ) 
 {
-    if (room->area->low_range > pch->getModifyLevel( ))
+    if (room->areaIndex()->low_range > pch->getModifyLevel( ))
         return false;
 
     if (!checkRoom( pch, room ))
@@ -127,7 +127,7 @@ Room * RoomQuestModel::getRandomRoom( RoomList &rooms )
 
 void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms )
 {
-    for (Room * r = room_list; r; r = r->rnext)
+    for (auto &r: roomInstances)
         if (checkRoomClient( pch, r ))
             rooms.push_back( r );
 
@@ -140,7 +140,7 @@ void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms, const Vn
     Room *r;
     
     for (VnumList::const_iterator v = vnums.begin( ); v != vnums.end( ); v++)
-        if (( r = get_room_index( *v ) ))
+        if (( r = get_room_instance( *v ) ))
             if (checkRoomClient( pch, r ))
                 rooms.push_back( r );
 
@@ -148,33 +148,25 @@ void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms, const Vn
         throw QuestCannotStartException( );
 }
 
-RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct area_data *targetArea)
+RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct AreaIndexData *targetArea)
 {
     RoomList result;
 
-    for (Room * r = room_list; r; r = r->rnext) {
-        if (r->area != targetArea)
-            continue;
-        if (!checkRoomClient( pch, r ))
-            continue;
-
-        result.push_back(r);
+    for (auto &r: targetArea->area->rooms) {
+        if (checkRoomClient( pch, r.second ))
+            result.push_back(r.second);
     }
 
     return result;
 }
 
-RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct area_data *targetArea)
+RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct AreaIndexData *targetArea)
 {
     RoomList result;
 
-    for (Room * r = room_list; r; r = r->rnext) {
-        if (r->area != targetArea)
-            continue;
-        if (!checkRoomVictim( pch, r, NULL ))
-            continue;
-
-        result.push_back(r);
+    for (auto &r: targetArea->area->rooms) {
+        if (checkRoomVictim( pch, r.second, NULL ))
+            result.push_back(r.second);
     }
 
     return result;
@@ -184,7 +176,7 @@ AreaList RoomQuestModel::findAreas(PCharacter *pch)
 {
     AreaList result;
 
-    for (AREA_DATA *area = area_first; area; area = area->next) {
+    for(auto &area: areaIndexes) {
         if (area->low_range > pch->getRealLevel())
             continue;
         if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HIDDEN|AREA_NOQUEST) )
@@ -272,7 +264,7 @@ struct PortalFunc {
             return false;
         }
 
-        return model->checkRoomForTraverse(pch, get_room_index( portal->value3() ));
+        return model->checkRoomForTraverse(pch, get_room_instance( portal->value3() ));
     }
 
     PCharacter *pch;
@@ -494,7 +486,7 @@ bool VictimQuestModel::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if ((IS_EVIL(mob) && IS_EVIL(pch)) || (IS_GOOD(mob) && IS_GOOD(pch)))
         return false;
 
-    if (mob->in_room->area != mob->pIndexData->area)
+    if (mob->in_room->areaIndex() != mob->pIndexData->area)
         return false;
 
     if (mob->getRealLevel( ) != mob->pIndexData->level)

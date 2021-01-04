@@ -217,9 +217,6 @@ CMDRUNP( scan )
     int door, depth;
     int range;
 
-    if (ch->desc == 0)
-        return;
-
     if (ch->position < POS_SLEEPING) {
         ch->println( "Ты ничего не видишь, кроме звезд..." );
         return;
@@ -358,6 +355,8 @@ CMDRUNP( stand )
                                 ch,obj,0,TO_ROOM,POS_DEAD);
                         return;
                 }
+
+                ch->on = obj;
         }
 
         switch ( ch->position.getValue( ) )
@@ -405,10 +404,15 @@ CMDRUNP( stand )
 
         case POS_RESTING:
         case POS_SITTING:
+        case POS_STANDING:
                 if (obj == 0)
                 {
-                        ch->println( "Ты встаешь." );
-                        act_p( "$c1 встает.", ch, 0, 0, TO_ROOM,POS_RESTING );
+                        if (ch->position == POS_STANDING) {
+                                ch->println( "Ты уже стоишь." );
+                        } else {
+                                ch->println( "Ты встаешь." );
+                                act_p( "$c1 встает.", ch, 0, 0, TO_ROOM,POS_RESTING );
+                        }
                         ch->on = 0;
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgStandRoom", "msgStandChar" )) {
@@ -432,16 +436,11 @@ CMDRUNP( stand )
                 ch->position = POS_STANDING;
                 break;
 
-        case POS_STANDING:
-                ch->println( "Ты уже стоишь." );
-                break;
-
         case POS_FIGHTING:
                 ch->println( "Ты уже сражаешься!" );
+                ch->on = 0;
                 break;
         }
-
-        return;
 }
 
 
@@ -1037,7 +1036,7 @@ CMDRUNP( enter )
         portal = get_obj_room_type( ch, ITEM_PORTAL );
     else {
         portal = get_obj_list( ch, argument, ch->in_room->contents );
-        peexit = get_extra_exit( argument, ch->in_room->extra_exit );
+        peexit = ch->in_room->extra_exits.find(argument);
     }
 
     if (portal == 0 && peexit == 0) {

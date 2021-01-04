@@ -41,6 +41,7 @@ public:
     virtual bool death( Character *killer ) { return false; }
     virtual bool kill( Character * ) { return false; }
     virtual bool area( ) { return false; }
+    virtual bool hourly( ) { return false; }
     virtual void speech( Character *victim, const char *speech ) { }
     virtual void tell ( Character *victim, const char *speech ) { }
     virtual void show( Character *victim, std::basic_ostringstream<char> &buf ) { }
@@ -65,6 +66,7 @@ public:
     virtual int  getExpBonus( Character * ) { return 0; }
     virtual bool canCancel( Character * ) { return false; }
     virtual bool isAfterCharm( ) const { return false; }
+    virtual long long getLastCharmTime() const { return 0; }
 
 protected:
     NPCharacter *ch;

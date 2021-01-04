@@ -111,11 +111,11 @@ SKILL_RUNP( tame )
         ch->add_follower( victim );
         victim->leader = ch;
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = gsn_tame;
         af.level     = ch->getModifyLevel( );
         af.duration  = -1;
-        af.bitvector = AFF_CHARM;
+        af.bitvector.setValue(AFF_CHARM);
         affect_to_char( victim, &af );
         
         act("$C1 теперь полностью подчиняется твоей воле.", ch, 0, victim, TO_CHAR);
@@ -168,16 +168,13 @@ static bool has_water_around( Character *ch )
     if (IS_WATER(ch->in_room))
         return true;
 
-    if (ch->in_room->sector_type == SECT_UNDERWATER)
+    if (ch->in_room->getSectorType() == SECT_UNDERWATER)
         return true;
 
-    if (!IS_OUTSIDE(ch))
-        return false;
-   
     if (IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER))
         return true;
- 
-    if (weather_info.sky >= SKY_RAINING)
+
+    if (IS_OUTSIDE(ch) && weather_info.sky >= SKY_RAINING)
         return true;
 
     return false;
@@ -212,11 +209,11 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     int dam;
     PCharacter *victim;
 
-    if (ch->in_room->sector_type == SECT_INSIDE ||
-        ch->in_room->sector_type == SECT_CITY ||
-        ch->in_room->sector_type == SECT_DESERT ||
-        ch->in_room->sector_type == SECT_WATER_NOSWIM ||
-        ch->in_room->sector_type == SECT_AIR)
+    if (ch->in_room->getSectorType() == SECT_INSIDE ||
+        ch->in_room->getSectorType() == SECT_CITY ||
+        ch->in_room->getSectorType() == SECT_DESERT ||
+        ch->in_room->getSectorType() == SECT_WATER_NOSWIM ||
+        ch->in_room->getSectorType() == SECT_AIR)
     {
         ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
         return;
@@ -258,11 +255,11 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     int dam;
     Affect todex;
 
-    if (ch->in_room->sector_type == SECT_INSIDE ||
-        ch->in_room->sector_type == SECT_CITY ||
-        ch->in_room->sector_type == SECT_DESERT ||
-        ch->in_room->sector_type == SECT_WATER_NOSWIM ||
-        ch->in_room->sector_type == SECT_AIR)
+    if (ch->in_room->getSectorType() == SECT_INSIDE ||
+        ch->in_room->getSectorType() == SECT_CITY ||
+        ch->in_room->getSectorType() == SECT_DESERT ||
+        ch->in_room->getSectorType() == SECT_WATER_NOSWIM ||
+        ch->in_room->getSectorType() == SECT_AIR)
     {
         ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
         return;
@@ -285,7 +282,6 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     todex.duration = level / 10;
     todex.location = APPLY_DEX;
     todex.modifier = -1;
-    todex.bitvector = 0;
     affect_join( victim, &todex);
 
     damage_nocatch(ch, victim, ch->getModifyLevel(), gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);

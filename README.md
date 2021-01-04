@@ -13,7 +13,7 @@
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
 Как собирать и запускать:
-* Из-под Ubuntu 18.04 (реальная или виртуальная машина): пользуйтесь инструкцией ниже.
+* Из-под Ubuntu 18.04, 20.04 (реальная или виртуальная машина): пользуйтесь инструкцией ниже.
 * Из-под Windows 10: следуя [этой инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/WSL-and-VS-Code) для Windows Subsystem for Linux и редактора VS Code
 * Из-под окружения Docker: собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
 * Из-под онлайн сред разработки в браузере: [Goorm Online IDE](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE) или же https://gitpod.io.
@@ -48,6 +48,7 @@
 sudo apt-get update
 sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util libfl-dev bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
+sudo apt-get install -y locales && locale-gen ru_RU.KOI8-R && update-locale
 ```
 
 На Ubuntu 18.04, возможно, понадобится установить более свежую версию компилятора и сделать ее версией по умолчанию:

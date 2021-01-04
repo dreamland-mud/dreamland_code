@@ -80,7 +80,7 @@
 
 #include "pcharactermanager.h"
 #include "pcharactermemory.h"
-
+#include "affectmanager.h"
 #include "objectmanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -98,12 +98,9 @@
 #include "loadsave.h"
 #include "fread_utils.h"
 #include "compatflags.h"
-
+#include "itemevents.h"
 #include "vnum.h"
 #include "def.h"
-
-extern AREA_DATA *                area_first;
-extern AREA_DATA *                area_last;
 
 GSN(none);
 GSN(doppelganger);
@@ -121,6 +118,8 @@ DESIRE(bloodlust);
 WEARLOC(none);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool limit_check_on_load( Object *obj );
+const FlagTable * affect_where_to_table(int where);
+int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry);
 
 static DLString id_to_string(long long id)
 {
@@ -188,22 +187,24 @@ Affect * fread_Affc( FILE *fp )
     int sn;
     char *word = fread_word( fp );
     DLString globalString;
+    int where;
 
     sn = SkillManager::getThis( )->lookup( word );
     convert_skill( sn );
 
-    paf = dallocate( Affect );
+    paf = AffectManager::getThis()->getAffect();
 
     try {
         paf->type = sn;
-        paf->where        = fread_number(fp); 
+        where        = fread_number(fp); 
         paf->level        = fread_number(fp);
         paf->duration        = fread_number(fp);
-        paf->modifier        = fread_number(fp);
+        paf->modifier        = fread_number(fp);        
+        paf->location.setTable(&apply_flags);
         paf->location        = fread_number(fp);
-        paf->bitvector        = fread_number(fp);
-        paf->next        = NULL;
-        
+        paf->bitvector.setTable(affect_where_to_table(where));
+        paf->bitvector.setValue(fread_number(fp));
+
         globalString    = fread_dlstring_to_eol(fp);
         globalString.substitute('\r', ' ').substitute('\n', ' ');
         globalString.stripWhiteSpace( );        
@@ -215,22 +216,22 @@ Affect * fread_Affc( FILE *fp )
             paf->ownerName = globalString.getOneArgument( );
         }
 
-        if (paf->where == TO_LOCATIONS) {
+        if (where == TO_LOCATIONS) {
             paf->global.setRegistry( wearlocationManager );
             paf->global.fromString( globalString );
-        } else if (paf->where == TO_LIQUIDS) {
+        } else if (where == TO_LIQUIDS) {
             paf->global.setRegistry( liquidManager );
             paf->global.fromString( globalString );
-        } else if (paf->where == TO_SKILLS) {
+        } else if (where == TO_SKILLS) {
             paf->global.setRegistry( skillManager );
             paf->global.fromString( globalString );
-        } else if (paf->where == TO_SKILL_GROUPS) {
+        } else if (where == TO_SKILL_GROUPS) {
             paf->global.setRegistry( skillGroupManager );
             paf->global.fromString( globalString );
         }
 
-    } catch (FileFormatException e) {
-        ddeallocate( paf );
+    } catch (const FileFormatException &e) {
+        AffectManager::getThis()->extract(paf);
         throw e;
     }
 
@@ -242,14 +243,14 @@ void fwrite_affect( FILE *fp, Affect *paf )
     if (paf->type == gsn_doppelganger)
         return;
 
-    fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10d %s %s\n",
+    fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10lld %s %s\n",
             paf->type->getName( ).c_str( ),
-            paf->where,
-            paf->level,
-            paf->duration,
-            paf->modifier,
-            paf->location,
-            paf->bitvector,
+            affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
+            paf->level.getValue(),
+            paf->duration.getValue(),
+            paf->modifier.getValue(),
+            paf->location.getValue(),
+            paf->bitvector.getValue(),
             paf->ownerName.c_str( ),
             paf->global.toString( ).c_str( ));
 }
@@ -299,7 +300,7 @@ void fwrite_char( PCharacter *ch, FILE *fp )
 {
 
         fprintf( fp, "#%s\n",  "PLAYER"        );
-        for (Affect* paf = ch->affected; paf != 0; paf = paf->next )
+        for (auto &paf: ch->affected)
             fwrite_affect( fp, paf );
 
         fprintf( fp, "End\n\n" );
@@ -308,8 +309,6 @@ void fwrite_char( PCharacter *ch, FILE *fp )
 /* write a pet */
 void fwrite_pet( NPCharacter *pet, FILE *fp)
 {
-        Affect *paf;
-
         fprintf(fp,"#PET\n");
 
         fprintf(fp,"Vnum %d\n",pet->pIndexData->vnum);
@@ -392,7 +391,7 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
                 pet->mod_stat[STAT_WIS], pet->mod_stat[STAT_DEX],
                 pet->mod_stat[STAT_CON], pet->mod_stat[STAT_CHA]);
 
-        for ( paf = pet->affected; paf != 0; paf = paf->next )
+        for (auto &paf: pet->affected)
             fwrite_affect( fp, paf );
 
         fprintf(fp,"End\n");
@@ -403,8 +402,6 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
 /* write a mobile */
 void fwrite_mob( NPCharacter *mob, FILE *fp)
 {
-        Affect *paf;
-
         if ( mob->in_room == 0 )
         {
                 bug( "Write_mobile: mobile not in room! ", 0 );
@@ -507,7 +504,7 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
                 mob->mod_stat[STAT_WIS], mob->mod_stat[STAT_DEX],
                 mob->mod_stat[STAT_CON], mob->mod_stat[STAT_CHA]);
 
-        for ( paf = mob->affected; paf != 0; paf = paf->next )
+        for (auto &paf: mob->affected)
             fwrite_affect( fp, paf );
 
         fprintf(fp,"End\n");
@@ -561,7 +558,6 @@ void fwrite_obj( Character *ch, Object *obj, FILE *fp, int iNest )
 void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 {
         EXTRA_DESCR_DATA *ed;
-        Affect *paf;
 
     /*
      * Slick recursion to write lists backwards,
@@ -689,7 +685,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                         break;
                 }
 
-                for ( paf = obj->affected; paf != 0; paf = paf->next )
+                for (auto &paf: obj->affected)
                     fwrite_affect( fp, paf );
 
                 for ( ed = obj->extra_descr; ed != 0; ed = ed->next )
@@ -710,7 +706,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 if ( obj->contains != 0 )
                         fwrite_obj( ch, obj->contains, fp, iNest + 1 );
         }
-        catch(Exception e)
+        catch(const Exception &e)
         {
                 char buf[MAX_STRING_LENGTH];
 
@@ -808,9 +804,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             if (!str_cmp(word, "Affc"))
             {
                 Affect *paf = fread_Affc( fp );
-
-                paf->next       = ch->affected;
-                ch->affected    = paf;
+                ch->affected.push_front(paf);
                 fMatch = true;
                 break;
             }
@@ -1125,6 +1119,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
     NPCharacter *pet;
     bool fMatch;
     int percent;
+    bitstring_t create_flags = FCREATE_NOAFFECTS | FCREATE_NOCOUNT;
 
     /* first entry had BETTER be the vnum or we barf */
     word = feof(fp) ? "End" : fread_word(fp);
@@ -1136,15 +1131,15 @@ void fread_pet( PCharacter *ch, FILE *fp )
             if (get_mob_index(vnum) == 0)
         {
                 bug("Fread_pet: bad vnum %d.",vnum);
-            pet = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+            pet = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
         }
             else
-                pet = create_mobile_nocount(get_mob_index(vnum));
+                pet = create_mobile_org(get_mob_index(vnum), create_flags);
     }
     else
     {
         bug("Fread_pet: no vnum in file.",0);
-        pet = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+        pet = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
     }
 
     for ( ; ; )
@@ -1178,10 +1173,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
             {
                 Affect *paf = fread_Affc( fp );
                 
-                if (!pet->isAffected(paf->type)) {
-                    paf->next       = pet->affected;
-                    pet->affected   = paf;
-                }
+                pet->affected.push_front(paf);
                 fMatch          = true;
                 break;
             }
@@ -1323,7 +1315,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 break;
             } else if (!str_cmp( word, "Room" )) {
                     int rvnum = fread_number( fp );
-                    pet->in_room = get_room_index( rvnum );
+                    pet->in_room = get_room_instance( rvnum );
                     if (!pet->in_room) {
                         LogStream::sendError( ) << "fread_pet: invalid room " << rvnum << " for " << ch->getName( ) << endl;
                     } 
@@ -1368,6 +1360,7 @@ NPCharacter * fread_mob( FILE *fp )
     const char *word;
     NPCharacter *mob;
     bool fMatch;
+    bitstring_t create_flags = FCREATE_NOAFFECTS | FCREATE_NOCOUNT;
 
     // first entry had BETTER be the vnum or we barf
     word = feof(fp) ? "End" : fread_word(fp);
@@ -1380,27 +1373,19 @@ NPCharacter * fread_mob( FILE *fp )
             if ( get_mob_index (vnum ) == 0 )
             {
                     bug("Fread_mob: bad vnum %d.",vnum);
-                    mob = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+                    mob = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
             }
             else
-                    mob = create_mobile_nocount(get_mob_index(vnum));
+                    mob = create_mobile_org(get_mob_index(vnum), create_flags);
     }
     else
     {
             bug("Fread_mob: no vnum in file.",0);
-            mob = create_mobile_nocount(get_mob_index(MOB_VNUM_FIDO));
+            mob = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
     }
     
     mob->pIndexData->count++;
-
-    while ( mob->affected )
-    {
-            Affect *paf = mob->affected->next;
-
-            ddeallocate ( mob->affected );
-
-            mob->affected = paf;
-    }
+    mob->affected.deallocate();
 
     try {
         for ( ; ; )
@@ -1571,7 +1556,7 @@ NPCharacter * fread_mob( FILE *fp )
     
             case 'R':
                     if (!str_cmp( word, "Room" )) {
-                        mob->in_room = get_room_index( fread_number( fp ) );
+                        mob->in_room = get_room_instance( fread_number( fp ) );
                         fMatch = true;
                         break;
                     }
@@ -1588,18 +1573,15 @@ NPCharacter * fread_mob( FILE *fp )
 
                     if ( !str_cmp( word, "RZone" ) )
                     {
-                            AREA_DATA *pArea;
                             char *rznm = fread_string( fp );
                             DLString zoneName(rznm);
                             free_string(rznm);
-
-                            for ( pArea = area_first; pArea != 0; pArea = pArea->next )
-                                    if ( !str_cmp( zoneName.c_str(), pArea->area_file->file_name ) )
-                                    {
-                                            mob->zone = pArea;
-                                            fMatch = true;
-                                            break;
-                                    }
+                            AreaIndexData *pArea = get_area_index(zoneName);
+                            if (pArea) {
+                                mob->zone = pArea;
+                                fMatch = true;
+                                break;
+                            }
                     }
 
                     KEY("RRoom", mob->reset_room, fread_number(fp));
@@ -1646,7 +1628,7 @@ NPCharacter * fread_mob( FILE *fp )
             }
         }
 
-    } catch (FileFormatException e) {
+    } catch (const FileFormatException &e) {
         extract_mob_baddrop( mob );
         throw e;
     }
@@ -1793,8 +1775,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     if (!str_cmp(word,"Affc"))
                     {
                             Affect *paf = fread_Affc( fp );
-                            paf->next       = obj->affected;
-                            obj->affected   = paf;
+                            obj->affected.push_front(paf);
                             fMatch          = true;
                             break;
                     }
@@ -1850,28 +1831,40 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                         }
                         else
                         {
-                            if ( iNest == 0 || rgObjNest[iNest] == 0 )
-                            {
-                                    if ( ch != 0 )
-                                            obj_to_char( obj, ch );
-                                    else
-                                            obj_to_room( obj, room );
-                            }
+                            Object *container = 0;
+                            if (iNest > 0 && rgObjNest[iNest])
+                                container = rgObjNest[iNest-1];
+
+                            if (container)
+                                obj_to_obj(obj, container);
+                            else if (ch)
+                                obj_to_char(obj, ch);
                             else
-                                    obj_to_obj( obj, rgObjNest[iNest-1] );
+                                obj_to_room(obj, room);
 
                             ObjectBehaviorManager::parse( obj, fp );
                             
                             if (FeniaManager::wrapperManager)
                                 FeniaManager::wrapperManager->linkWrapper( obj );
                             
+                            // Notify item load listeners such as weapon randomizer.
+                            eventBus->publish(ItemReadEvent(obj));
+
                             if (fPersonal) 
                                 convert_personal( obj );
-                            
-                            if (wear_loc != -1)
-                                obj->wear_loc.assign( wear_loc_flags.name( wear_loc ) );
 
-                            limit_check_on_load( obj );
+                            if (limit_check_on_load( obj )) {
+                                // Limited item extracted: all nested items will be placed in character's inventory.
+                                if (fNest)
+                                    rgObjNest[iNest] = 0;
+                                return;
+                            }
+
+                            // Assign wearlocation only after potentially extracting a limit; 
+                            // otherwise affects that were never applied yet will be unapplied during unequip.
+                            if (wear_loc != -1)
+                                obj->wear_loc.assign(wear_loc);
+
                             return;
                         }
                     }
@@ -2072,7 +2065,8 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     KEY( "Wt",                obj->weight,                fread_number( fp ) );
 
                     if (!str_cmp( word, "Wearloc" )) {
-                        obj->wear_loc.assign( wearlocationManager->find( fread_word( fp ) ) );
+                        Wearlocation *wearloc = wearlocationManager->find( fread_word( fp ) );
+                        wear_loc = wearloc ? wearloc->getIndex() : -1;
                         fMatch = true;
                         break;
                     }
@@ -2096,7 +2090,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             }
         }
     
-    } catch (FileFormatException e) {
+    } catch (const FileFormatException &e) {
         extract_obj( obj );
         throw e;
     }

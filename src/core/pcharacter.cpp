@@ -387,6 +387,8 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setRussianName( getRussianName( ).getFullForm( ) );
         mem->setReligion( getReligion( ) );
         mem->setDescription(getDescription());
+        mem->setSkills(getSkills());
+        mem->setBonuses(getBonuses());
 
         return mem;
 }
@@ -413,6 +415,8 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setRussianName( pcm->getRussianName( ).getFullForm( ) );
         setReligion( pcm->getReligion( ) );
         setDescription(pcm->getDescription());
+        setSkills(pcm->getSkills());
+        setBonuses(pcm->getBonuses());
 }
 
 /**************************************************************************
@@ -433,11 +437,6 @@ bool PCharacter::nodeFromXML( const XMLNode::Pointer& child )
 bool PCharacter::isOnline( ) const
 {
     return true;
-}
-
-PCharacter * PCharacter::getPlayer( ) 
-{
-    return this;
 }
 
 const DLString& PCharacter::getName( ) const 
@@ -742,6 +741,27 @@ int PCharacter::applyCurse( int def )
 {
     return (def * curse) / 100;
 }
+
+PCSkills & PCharacter::getSkills( )
+{
+    return skills;
+}
+
+void PCharacter::setSkills(const PCSkills &skills)
+{
+    this->skills = skills;        
+}
+
+PCBonuses & PCharacter::getBonuses()
+{
+    return bonuses;
+}
+
+void PCharacter::setBonuses(const PCBonuses &bonuses)
+{
+    this->bonuses = bonuses;        
+}
+
 
 /**************************************************************************
  *  visibility of things 

@@ -242,7 +242,7 @@ void load_creatures( )
     dreamland->resetOption( DL_SAVE_MOBS );
 
     for (set<int>::iterator m = room_markers.begin( ); m != room_markers.end( ); m++) {
-        save_mobs( get_room_index( *m ) );
+        save_mobs( get_room_instance( *m ) );
     }
     
     LogStream::sendNotice( ) <<  "Creatures loaded" << endl;

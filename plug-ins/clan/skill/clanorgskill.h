@@ -17,11 +17,11 @@ public:
     
     ClanOrgSkill( );
 
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     
 protected:
-    const SkillOrgInfo * getOrgInfo( PCharacter * ) const;
+    const SkillOrgInfo * getOrgInfo( PCMemoryInterface * ) const;
 
     XML_VARIABLE Organizations organizations;
 };

@@ -59,6 +59,7 @@
 
 #include "skill.h"
 #include "skillmanager.h"
+#include "skillgroup.h"
 #include "affecthandler.h"
 
 #include "plugininitializer.h"
@@ -115,6 +116,7 @@ void do_mload                ( Character *, char * );
 void do_oload                ( Character *, char * );
 
 RELIG(none);
+GSN(none);
 
 /*
  * Local functions.
@@ -125,7 +127,7 @@ static Room * find_location( Character *ch, char *arg )
     Object *obj;
 
     if ( is_number(arg) )
-        return get_room_index( atoi( arg ) );
+        return get_room_instance( atoi( arg ) );
 
     if ( ( victim = get_char_world( ch, arg ) ) != 0 )
         return victim->in_room;
@@ -138,172 +140,6 @@ static Room * find_location( Character *ch, char *arg )
 
 
 
-CMDWIZP( objlist )
-{
-FILE *fp;
-Object *obj;
-Affect *paf;
-Liquid *liquid;
-int currLevel, SetL = 0;
-char arg[MAX_STRING_LENGTH];
-
-   if ( (fp=fopen( "objlist.txt", "w+" ) ) == 0 )
-   {
-        ch->send_to("Ошибка: не могу открыть файл objlist.txt.\n\r");
-        return;
-   }
-
-   argument = one_argument( argument, arg );
-   if ((SetL = atoi(arg))==0)
-     SetL = 110;
-
-  for(currLevel=SetL; currLevel>=0; currLevel-- ) {
-   fprintf( fp, "\n======= УРОВЕНЬ %d ========\n", currLevel );
-   for( obj=object_list; obj!=0; obj = obj->next )
-   {
-/*     if ( obj->pIndexData->affected != 0 )                */
-       if ( obj->level==currLevel )        
-     {
-       fprintf( fp, "\n#Объект: %s (Vnum : %d) \n", obj->getShortDescr( ) ,obj->pIndexData->vnum);
-    fprintf( fp,
-        "Объект: '%s', тип: %s, флаги: %s.\nВес: %d, цена: %d, уровень: %d.\n",
-
-        obj->getName( ),
-        item_table.message(obj->item_type).c_str( ),
-        extra_flags.messages( obj->extra_flags ).c_str( ),
-        obj->weight / 10,
-        obj->cost,
-        obj->level
-        );
-
-    switch ( obj->item_type )
-    {
-    case ITEM_SCROLL:
-    case ITEM_POTION:
-    case ITEM_PILL:
-        fprintf( fp, "Заклинания %d уровня:", obj->value0() );
-
-        if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value1())->getName().c_str());
-        }
-
-        if ( obj->value2() >= 0 && obj->value2() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value2())->getName().c_str());
-        }
-
-        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
-        }
-
-        if (obj->value4() >= 0 && obj->value4() < SkillManager::getThis( )->size())
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value4())->getName().c_str());
-        }
-
-        fprintf( fp,".\n");
-        break;
-
-    case ITEM_WAND:
-    case ITEM_STAFF:
-        fprintf(fp, "%d зарядов уровня %d", obj->value2(), obj->value0());
-
-        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
-        {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
-        }
-
-        fprintf( fp,".\n");
-        break;
-
-    case ITEM_DRINK_CON:
-        liquid = liquidManager->find( obj->value2() );
-        fprintf(fp,"Содержит жидкость цвета %s, это %s.\n",
-                    liquid->getColor( ).ruscase( '2' ).c_str( ),
-                    liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
-        break;
-
-    case ITEM_CONTAINER:
-        fprintf(fp,"Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n",
-            obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
-        if (obj->value4() != 100)
-        {
-            fprintf(fp,"Уменьшение веса: %d%%\n",
-                obj->value4());
-        }
-        break;
-                
-    case ITEM_WEAPON:
-         fprintf(fp,"Тип оружия: %s\n", 
-                    weapon_class.name(obj->value0()).c_str( ));
-                
-        if (obj->pIndexData->new_format)
-            fprintf(fp,"Урон %dd%d (среднее %d).\n",
-                obj->value1(),obj->value2(), weapon_ave(obj));
-        else
-            fprintf( fp, "Урон от %d до %d (среднее %d).\n",
-                    obj->value1(), obj->value2(),
-                    ( obj->value1() + obj->value2() ) / 2 );
-        if (obj->value4())  /* weapon flags */
-        {
-            fprintf(fp,"Флаги оружия: %s\n",weapon_type2.messages(obj->value4()).c_str( ));
-        }
-        break;
-
-    case ITEM_ARMOR:
-        fprintf( fp,
-        "Класс брони: %d колющее, %d удары, %d режущее, %d экзотика.\n",
-            obj->value0(), obj->value1(), obj->value2(), obj->value3() );
-        break;
-    }
-       for( paf=obj->pIndexData->affected; paf != 0; paf = paf->next )
-       {
-            if ( paf == 0 ) continue;
-            fprintf( fp, "  Изменяет %s на %d.\n",
-                apply_flags.message( paf->location ).c_str( ), paf->modifier );
-            if (paf->bitvector)
-            {
-                switch(paf->where)
-                {
-                    case TO_AFFECTS:
-                        fprintf(fp,"   Дает аффект %s.\n",
-                            affect_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_OBJECT:
-                        fprintf(fp,"   Добавляет флаг %s.\n",
-                            extra_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_IMMUNE:
-                        fprintf(fp,"   Дает иммунитет к %s.\n",
-                            imm_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_RESIST:
-                        fprintf(fp,"   Дает сопротивляемость к %s.\n\r",
-                            res_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_VULN:
-                        fprintf(fp,"   Дает уязвимость к %s.\n\r",
-                            vuln_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    case TO_DETECTS:
-                        fprintf(fp,"   Adds %s detection.\n\r",
-                            detect_flags.messages(paf->bitvector).c_str( ));
-                        break;
-                    default:
-                        fprintf(fp,"   Неизвестный битовый флаг %d: %d\n\r",
-                            paf->where,paf->bitvector);
-                        break;
-                }
-            }
-       }
-     }
-   }
-  }
-   fclose( fp );
-   return;
-}
 
 struct limit_info {
     DLString description;
@@ -354,7 +190,7 @@ CMDWIZP( limited )
                                                 obj->carried_by->getNameP( ));
                                 if ( obj->in_room != 0 )
                                         sprintf(buf, "В комнате %-20s [%d]\n\r",
-                                                obj->in_room->name, obj->in_room->vnum);
+                                                obj->in_room->getName(), obj->in_room->vnum);
                                 if ( obj->in_obj != 0 )
                                         sprintf(buf, "Внутри %-20s [%d] \n\r",
                                                 obj->in_obj->getShortDescr( '1' ).c_str( ),
@@ -912,33 +748,33 @@ CMDWIZP( stat )
     }
 
     sprintf( buf, "Имя: '%s'\n\rЗона: '%s'\n\rВладелец: '%s' Клан: '%s'\n\r",
-        location->name,
-        location->area->name ,
+        location->getName(),
+        location->areaName() ,
         location->owner,
-        location->clan->getShortName( ).c_str( ) );
+        location->pIndexData->clan->getShortName( ).c_str( ) );
     ch->send_to(buf);
 
     sprintf( buf,
         "Vnum: %d  Сектор: %d  Свет: %d  Лечение: %d  Мана: %d\n\r",
         location->vnum,
-        location->sector_type,
+        location->getSectorType(),
         location->light,
-        location->heal_rate,
-        location->mana_rate );
+        location->getHealRate(),
+        location->getManaRate() );
     ch->send_to(buf);
 
     sprintf( buf,
         "Флаги: %s.\n\rОписание:\n\r%s",
         room_flags.names(location->room_flags).c_str( ),
-        location->description );
+        location->getDescription() );
     ch->send_to(buf);
 
-    if ( location->extra_descr != 0 )
+    if ( location->getExtraDescr() != 0 )
     {
         EXTRA_DESCR_DATA *ed;
 
         ch->send_to("Ключевые слова экстра-описания: '");
-        for ( ed = location->extra_descr; ed; ed = ed->next )
+        for ( ed = location->getExtraDescr(); ed; ed = ed->next )
         {
             ch->send_to(ed->keyword);
             if ( ed->next != 0 )
@@ -1005,13 +841,109 @@ CMDWIZP( stat )
 
 }
 
+static void format_affect_duration(Affect *paf, ostringstream &buf)
+{
+    if (paf->duration >= 0)
+        buf << fmt(0, " в течение %1$d час%1$Iа|ов|ов", paf->duration);
+    else
+        buf << " постоянно";    
+}
 
+static void format_affect_level(Affect *paf, ostringstream &buf)
+{
+    if (paf->level >= 0)
+        buf << ", уровень " << paf->level;
+}
+
+static void format_affect(Affect *paf, ostringstream &buf)
+{
+    int b = paf->bitvector;
+    int mod = paf->modifier;
+    const FlagTable *table = paf->bitvector.getTable();
+    const GlobalRegistryBase *registry = paf->global.getRegistry();
+    bool empty = true;
+
+    buf << "Аффект";
+    if (paf->type != gsn_none) 
+        buf << " " << paf->type->getRussianName().quote();
+    buf << ": ";
+
+    if (registry) {
+        if (registry == skillManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "знание навыка" : "уровень умения")
+                << " " << paf->global.toRussianString().quote() 
+                << " на " << (int)abs(mod);
+        } else if (registry == skillGroupManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "знание группы" : "уровень умения группы")
+                << " " << paf->global.toRussianString().quote() 
+                << " на " << (int)abs(mod);
+        } else if (registry == liquidManager) {
+            buf << "добавляет запах " << paf->global.toRussianString('2', ',').colourStrip();
+        } else if (registry == wearlocationManager) {
+            buf << "отнимает конечность " << paf->global.toString(',');
+        } else {
+            buf << "неизвестный вектор";
+        }
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        return;
+    }
+
+    if (table && b != 0) {
+        buf << "добавляет ";
+        if (table == &affect_flags)
+            buf << "аффект ";
+        else if (table == &imm_flags)
+            buf << "иммунитет к ";
+        else if (table == &res_flags)
+            buf << "сопротивляемость к ";
+        else if (table == &vuln_flags)
+            buf << "уязвимость к ";
+        else if (table == &detect_flags)
+            buf << "обнаружение ";
+        else if (table == &raffect_flags)
+            buf << "флаги комнаты ";
+        else if (table == &weapon_type2)
+            buf << "флаги оружия ";
+        else if (table == &extra_flags)
+            buf << "флаги предмета ";
+        else if (table == &plr_flags)
+            buf << "флаги персонажа ";
+        else
+            buf << "не пойми что";
+
+        buf << table->messages(b);
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        empty = false;
+    }
+
+    if (paf->modifier != 0 && paf->location != APPLY_NONE) {
+        if (!empty)
+            buf << "        ";
+        buf << "изменяет " << paf->location.message()
+            << " на " << paf->modifier;
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        empty = false;
+    }
+
+    if (empty)
+        buf << " (ничего)." << endl;
+}
 
 /* NOTCOMMAND */ void do_ostat( Character *ch, char *argument )
 {
         char buf[MAX_STRING_LENGTH];
         char arg[MAX_INPUT_LENGTH];
-        Affect *paf;
         Object *obj;
         Liquid *liquid;
 
@@ -1219,116 +1151,43 @@ CMDWIZP( stat )
                 ch->send_to("'\n\r");
         }
 
-    for ( paf = obj->affected; paf != 0; paf = paf->next )
-    {
-        sprintf( buf, "Изменяет %s на %d, уровень %d",
-            apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
-        ch->send_to(buf);
-        if ( paf->duration > -1)
-            sprintf(buf,", %d часов.\n\r",paf->duration);
-        else
-            sprintf(buf,".\n\r");
-        ch->send_to(buf);
-        if (paf->bitvector)
-        {
-            switch(paf->where)
-            {
-                case TO_AFFECTS:
-                    sprintf(buf,"Дает аффект %s.\n",
-                        affect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_WEAPON:
-                    sprintf(buf,"Добавляет флаги оружия %s.\n",
-                        weapon_type2.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_OBJECT:
-                    sprintf(buf,"Добавляет флаги объекта %s.\n",
-                        extra_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_IMMUNE:
-                    sprintf(buf,"Дает иммунитет к %s.\n",
-                        imm_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_RESIST:
-                    sprintf(buf,"Дает сопротивляемость к %s.\n\r",
-                        res_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_VULN:
-                    sprintf(buf,"Дает уязвимость к %s.\n\r",
-                        vuln_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_DETECTS:
-                    sprintf(buf,"Дает обнаружение %s.\n\r",
-                        detect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                default:
-                    sprintf(buf,"Неизвестный битовый флаг %d: %d\n\r",
-                        paf->where,paf->bitvector);
-                    break;
-            }
-            ch->send_to(buf);
-        }
-    }
+    ostringstream ostr;
+    for (auto &paf: obj->affected)
+        format_affect(paf, ostr);
 
     if (!obj->enchanted)
-    for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
-    {
-        sprintf( buf, "Изменяет %s на %d, уровень %d.\n\r",
-            apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
+        for (auto &paf: obj->pIndexData->affected)
+            format_affect(paf, ostr);
+
+    ch->send_to(ostr);
+
+    sprintf(buf,"Состояние : %d (%s) ", obj->condition, obj->get_cond_alias() );        
+    ch->send_to(buf);
+    
+    if (obj->behavior) {
+        ostringstream ostr;
+        
+        sprintf(buf, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
         ch->send_to(buf);
-        if (paf->bitvector)
-        {
-            switch(paf->where)
-            {
-                case TO_AFFECTS:
-                    sprintf(buf,"Дает аффект %s.\n",
-                        affect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_OBJECT:
-                    sprintf(buf,"Добавляет флаги объекта %s.\n",
-                        extra_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_IMMUNE:
-                    sprintf(buf,"Дает иммунитет к %s.\n",
-                        imm_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_RESIST:
-                    sprintf(buf,"Дает сопротивляемость к %s.\n\r",
-                        res_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_VULN:
-                    sprintf(buf,"Дает уязвимость к %s.\n\r",
-                        vuln_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                case TO_DETECTS:
-                    sprintf(buf,"Дает обнаружение %s.\n\r",
-                        detect_flags.messages(paf->bitvector).c_str( ));
-                    break;
-                default:
-                    sprintf(buf,"Неизвестный битовый флаг %d: %d\n\r",
-                        paf->where,paf->bitvector);
-                    break;
-            }
-            ch->send_to(buf);
-        }
+
+        obj->behavior.toStream( ostr );
+        ch->send_to( ostr );
+    } else {
+        ch->send_to("\n\r");
     }
 
-        sprintf(buf,"Состояние : %d (%s) ", obj->condition,
-        obj->get_cond_alias() );        
-        ch->send_to(buf);
-        
-        if (obj->behavior) {
-            ostringstream ostr;
-            
-            sprintf(buf, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
-            ch->send_to(buf);
+    if (!obj->properties.empty()) {
+        ostringstream ostr;
 
-            obj->behavior.toStream( ostr );
-            ch->send_to( ostr );
-        }
+        ostr << "Свойства: ";
+        for (auto &prop: obj->properties)
+            ostr << "{g" << prop.first << "{x: \"" << prop.second << "\"  ";
+        ostr << endl;
 
-        ch->send_to("\n\r");
-        return;
+        ch->send_to(ostr);
+    }
+
+    
 }
 
 
@@ -1513,48 +1372,9 @@ static bool has_nopost(Character *ch)
         if (spec_fun_name != 0)
             buf << "Спец-процедура " << spec_fun_name << "." << endl;
     }
-    
-    for (Affect *paf = victim->affected; paf; paf = paf->next) {
-        buf << "Аффект: '" << paf->type->getName( ) << "', ";
 
-        if (paf->location != APPLY_NONE)
-            buf << "изменяет " << apply_flags.name( paf->location ) << " "
-                << "на " << paf->modifier << ", ";
-                
-        if (paf->bitvector != 0) {
-            const FlagTable *table = 0;
-            switch(paf->where) {
-            case TO_AFFECTS: table = &affect_flags; break;
-            case TO_IMMUNE: 
-            case TO_RESIST:
-            case TO_VULN:    table = &imm_flags; break;
-            case TO_DETECTS: table = &detect_flags; break;
-            }
-
-            if (table)
-                buf << "adds '" << table->names( paf->bitvector ) << "' "
-                    << "to " << affwhere_flags.name( paf->where ) << ", ";
-        }
-
-        if (!paf->global.empty( )) {
-            switch(paf->where) {
-            case TO_LIQUIDS:   buf << "smell of " << paf->global.toString( ) << ", "; break;
-            case TO_LOCATIONS: buf << "no rib "   << paf->global.toString( ) << ", "; break;
-            case TO_SKILLS:    
-                buf << "skill " << (paf->location == APPLY_LEVEL ? "level" : "learned")
-                    << " " << paf->global.toString() << " by " << paf->modifier << ", "; 
-                break;
-            case TO_SKILL_GROUPS:    
-                buf << "skill group " << (paf->location == APPLY_LEVEL ? "level" : "learned")
-                    << " " << paf->global.toString() << " by " << paf->modifier << ", "; 
-                break;
-            }
-        }
-             
-        
-        buf << "for " << paf->duration << " hours, level " << paf->level << endl;
-    }
-
+    for (auto &paf: victim->affected)
+        format_affect(paf, buf);
         
     if (pc) {
         if (pc->getLastAccessTime( ).getTime( ) != 0)
@@ -1760,9 +1580,9 @@ CMDWIZP( rwhere )
         return;
     }
 
-    for (Room *r = room_list; r; r = r->rnext)
-        if (is_name(argument, r->name)) {
-            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->name, r->area->name);
+    for (auto &r: roomInstances)
+        if (is_name(argument, r->getName())) {
+            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->areaName());
             found = true;
         }
 
@@ -1825,7 +1645,7 @@ CMDWIZP( owhere )
                 sprintf( buf, "%3d) %s на полу в %s [Комната %d]\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ),
-                        in_obj->in_room->name,
+                        in_obj->in_room->getName(),
                         in_obj->in_room->vnum );
         else
                 sprintf( buf, "%3d) %s черт его знает где.\n\r",
@@ -1886,12 +1706,12 @@ CMDWIZP( mwhere )
                             count, 
                             victim->getPC( )->getNameP( ),
                             victim->getNameP('1').c_str( ),
-                            victim->in_room->name, victim->in_room->vnum);
+                            victim->in_room->getName(), victim->in_room->vnum);
                 else
                     sprintf(buf,"%3d) %s находится в %s [%d]\n\r",
                             count, 
                             victim->getNameP( ),
-                            victim->in_room->name, victim->in_room->vnum);
+                            victim->in_room->getName(), victim->in_room->vnum);
 
                 buffer << buf;
             }
@@ -1924,7 +1744,7 @@ CMDWIZP( mwhere )
                 victim->is_npc() ? victim->getNPC()->pIndexData->vnum : 0,
                 victim->is_npc() ? victim->getNameP( '1' ).c_str( ) : victim->getNameP( ),
                 victim->in_room->vnum,
-                victim->in_room->name );
+                victim->in_room->getName() );
         buffer << buf;
     }
 
@@ -1959,37 +1779,6 @@ CMDWIZP( shutdown )
         d->close( );
     }
 }
-
-CMDWIZP( protect )
-{
-    Character *victim;
-
-    if (argument[0] == '\0')
-    {
-        ch->send_to("Protect whom from snooping?\n\r");
-        return;
-    }
-
-    if ((victim = get_char_world(ch,argument)) == 0)
-    {
-        ch->send_to("You can't find them.\n\r");
-        return;
-    }
-
-    if (IS_SET(victim->comm,COMM_SNOOP_PROOF))
-    {
-        act_p("$C1 is no longer snoop-proof.",ch,0,victim,TO_CHAR,POS_DEAD);
-        victim->send_to("Your snoop-proofing was just removed.\n\r");
-        victim->comm.removeBit(COMM_SNOOP_PROOF);
-    }
-    else
-    {
-        act_p("$C1 is now snoop-proof.",ch,0,victim,TO_CHAR,POS_DEAD);
-        victim->send_to("You are now immune to snooping.\n\r");
-        victim->comm.setBit(COMM_SNOOP_PROOF);
-    }
-}
-
 
 
 CMDWIZP( snoop )
@@ -2475,20 +2264,27 @@ CMDWIZP( purge )
         return;
     }
 
-    if ( ( victim = get_char_world( ch, arg ) ) == 0 )
-    {
-        ch->send_to("Таких в мире сейчас нет.\n\r");
+    // Try to purge a mob in the room or an item in the room/inventory/equip.
+    if ((victim = get_char_room(ch, arg))) {
+        if (!victim->is_npc()) {
+            ch->send_to("Сначала научись рисовать и отрасти усики.\n\r");
+            return;
+        }
+
+        act( "$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT );
+        act( "Ты изничтожаешь $C4.", ch, 0, victim, TO_CHAR );
+        extract_char( victim );
         return;
     }
 
-    if ( !victim->is_npc() )
-    {
-          ch->send_to("Сначала научись рисовать и отрасти усики.\n\r");
-          return;
+    if ((obj = get_obj_here(ch, arg))) {
+        act( "$c1 изничтожает $o4.", ch, obj, 0, TO_ROOM );
+        act( "Ты изничтожаешь $o4.", ch, obj, 0, TO_CHAR );
+        extract_obj(obj);
+        return;
     }
 
-    act_p( "$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT,POS_RESTING );
-    extract_char( victim );
+    ch->println("Ты не видишь здесь моба или предмет с таким именем.");
 }
 
 
@@ -2805,7 +2601,8 @@ CMDWIZP( peace )
             rch->act.removeBit(ACT_AGGRESSIVE);
     }
 
-    ch->send_to("Мир, дружба, жвачка.\n\r");
+    ch->pecho("Ты наполняешь комнату миром и спокойствием.");
+    ch->recho("%^C1 жестом прекращает войны и агрессию вокруг.", ch);
     return;
 }
 
@@ -3493,30 +3290,6 @@ CMDWIZP( smite )
   return;
 }
 
-CMDWIZP( popularity )
-{
-    ostringstream buf;
-    AREA_DATA *area;
-    extern AREA_DATA *area_first;
-    int i;
-    bool fAll;
-
-    fAll = !str_cmp( argument, "all" );
-    buf << "Area popularity statistics (in char * ticks)" << endl;
-
-    for (area = area_first, i = 1; area != 0; area = area->next) {
-        if (fAll || area->count > 0) {
-            buf << fmt( 0, "%-30.30s %-5.5d", 
-                           area->name, min( (long unsigned int)0xffff, area->count ) );
-            if (i++ % 2 == 0)
-                buf << endl;
-        }
-    }
-
-    buf << endl;
-    page_to_char( buf.str( ).c_str( ), ch );
-}
-
 CMDWIZP( ititle )
 {
     char arg[MAX_INPUT_LENGTH];
@@ -3663,7 +3436,6 @@ CMDWIZP( notitle )
 
 CMDWIZP( noaffect )
 {
-    Affect *paf,*paf_next;
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
 
@@ -3678,12 +3450,12 @@ CMDWIZP( noaffect )
         return;
     }
 
-    for ( paf = victim->affected; paf != 0; paf = paf_next )
-    {
-        paf_next        = paf->next;
+    AffectList affects = victim->affected.clone();
+    for (auto paf_iter = affects.cbegin(); paf_iter != affects.cend(); paf_iter++) {
+        Affect *paf = *paf_iter;
         if ( paf->duration >= 0 )
         {
-            if (paf->type->getAffect( ))
+            if (!affects.hasNext(paf_iter) && paf->type->getAffect( ))
                 paf->type->getAffect( )->remove( victim );
 
             affect_remove( victim, paf );
@@ -3786,7 +3558,7 @@ CMDWIZP( olevel )
                 in_obj->carried_by->in_room->vnum );
         else if (in_obj->in_room != 0 && ch->can_see(in_obj->in_room))
             sprintf( buf, "%3d) [%d] %s is in %s [Room %d]\n\r",
-                number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ),in_obj->in_room->name,
+                number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ),in_obj->in_room->getName(),
                 in_obj->in_room->vnum);
         else
             sprintf( buf, "%3d) [%d]%s is somewhere\n\r",number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ));
@@ -3831,7 +3603,7 @@ CMDWIZP( mlevel )
                 victim->is_npc() ? victim->getNPC()->pIndexData->vnum : 0,
                 victim->getNameP( '1' ).c_str(),
                 victim->in_room->vnum,
-                victim->in_room->name );
+                victim->in_room->getName() );
             buffer << buf;
         }
     }
@@ -4028,155 +3800,6 @@ CMDWIZP( merchant )
 }
 
 
-extern int nHitString, sHitString, nDups, sDups;
-
-extern int memAllocCount, memAllocSize;
-
-CMDWIZP( memory )
-{
-    char buf[MAX_STRING_LENGTH];
-
-    sprintf( buf, "Affects %5d\n\r", top_affect    ); ch->send_to(buf);
-    sprintf( buf, "Areas   %5d\n\r", top_area      ); ch->send_to(buf);
-    sprintf( buf, "ExDes   %5d\n\r", top_ed        ); ch->send_to(buf);
-    sprintf( buf, "Exits   %5d\n\r", top_exit      ); ch->send_to(buf);
-    sprintf( buf, "Helps   %5ld\n\r", helpManager->getArticles( ).size( ) ); ch->send_to(buf);
-//    sprintf( buf, "Socials %5d\n\r", SocialManager::getThis( )->getSocialCount( ) ); ch->send_to(buf);
-    sprintf( buf, "Mobs    %5d(%d new format)\n\r", top_mob_index,newmobs );
-    ch->send_to(buf);
-    sprintf( buf, "(in use)%5d\n\r", mobile_count  ); ch->send_to(buf);
-    sprintf( buf, "Objs    %5d(%d new format)\n\r", top_obj_index,newobjs );
-    ch->send_to(buf);
-    sprintf( buf, "Resets  %5d\n\r", top_reset     ); ch->send_to(buf);
-    sprintf( buf, "Rooms   %5d\n\r", top_room      ); ch->send_to(buf);
-
-    sprintf( buf, "Allocs  %5d calls   of %7d bytes.\n\r",
-        memAllocCount, memAllocSize);
-    ch->send_to(buf);
-    sprintf( buf, "Perms   %5d blocks  of %7d bytes.\n\r",
-        nAllocPerm, sAllocPerm );
-    ch->send_to(buf);
-}
-
-CMDWIZP( dump )
-{
-    int count,count2,num_pcs,aff_count;
-    Character *fch;
-    MOB_INDEX_DATA *pMobIndex;
-    Object *obj;
-    OBJ_INDEX_DATA *pObjIndex;
-    Room *room;
-    EXIT_DATA *exit;
-    Descriptor *d;
-    Affect *af;
-    FILE *fp;
-    int vnum,nMatch = 0;
-
-    /* open file */
-    fp = fopen("mem.dmp","w");
-
-    /* report use of data structures */
-
-    num_pcs = 0;
-    aff_count = 0;
-
-    /* mobile prototypes */
-    fprintf(fp,"MobProt        %4d (%8ld bytes)\n",
-        top_mob_index, top_mob_index * (sizeof(*pMobIndex)));
-
-    /* mobs */
-    count = 0;  count2 = 0;
-    for (fch = char_list; fch != 0; fch = fch->next)
-    {
-        count++;
-        if (fch->getPC( ) != 0)
-            num_pcs++;
-        for (af = fch->affected; af != 0; af = af->next)
-            aff_count++;
-    }
-
-    fprintf(fp,"Mobs        %4d (%8ld bytes), %2d free (%ld bytes)\n",
-        count, count * (sizeof(*fch)), count2, count2 * (sizeof(*fch)));
-
-    /* descriptors */
-    count = 0; count2 = 0;
-    for (d = descriptor_list; d != 0; d = d->next)
-        count++;
-
-    fprintf(fp, "Descs        %4d (%8ld bytes), %2d free (%ld bytes)\n",
-        count, count * (sizeof(*d)), count2, count2 * (sizeof(*d)));
-
-    /* object prototypes */
-    for ( vnum = 0; nMatch < top_obj_index; vnum++ )
-        if ( ( pObjIndex = get_obj_index( vnum ) ) != 0 )
-        {
-            for (af = pObjIndex->affected; af != 0; af = af->next)
-                aff_count++;
-            nMatch++;
-        }
-
-    fprintf(fp,"ObjProt        %4d (%8ld bytes)\n",
-        top_obj_index, top_obj_index * (sizeof(*pObjIndex)));
-
-
-    /* objects */
-    count = 0;  count2 = 0;
-    for (obj = object_list; obj != 0; obj = obj->next)
-    {
-        count++;
-        for (af = obj->affected; af != 0; af = af->next)
-            aff_count++;
-    }
-
-    /* rooms */
-    fprintf(fp,"Rooms        %4d (%8ld bytes)\n",
-        top_room, top_room * (sizeof(*room)));
-
-     /* exits */
-    fprintf(fp,"Exits        %4d (%8ld bytes)\n",
-        top_exit, top_exit * (sizeof(*exit)));
-
-    fclose(fp);
-
-    /* start printing out mobile data */
-    fp = fopen("mob.dmp","w");
-
-    fprintf(fp,"\nMobile Analysis\n");
-    fprintf(fp,  "---------------\n");
-    nMatch = 0;
-    for (vnum = 0; nMatch < top_mob_index; vnum++)
-        if ((pMobIndex = get_mob_index(vnum)) != 0)
-        {
-            nMatch++;
-            fprintf(fp,"#%-4d %3d active %3d killed     %s\n",
-                pMobIndex->vnum,pMobIndex->count,
-                pMobIndex->killed,
-                russian_case( pMobIndex->short_descr, '1' ).c_str( ));
-        }
-    fclose(fp);
-
-    /* start printing out object data */
-    fp = fopen("obj.dmp","w");
-
-    fprintf(fp,"\nObject Analysis\n");
-    fprintf(fp,  "---------------\n");
-    nMatch = 0;
-    for (vnum = 0; nMatch < top_obj_index; vnum++)
-        if ((pObjIndex = get_obj_index(vnum)) != 0)
-        {
-            nMatch++;
-            fprintf(fp,"#%-4d %3d active %3d reset      %s\n",
-                pObjIndex->vnum,pObjIndex->count,
-                pObjIndex->reset_num,
-                russian_case( pObjIndex->short_descr, '1' ).c_str( ));
-        }
-
-    /* close file */
-    fclose(fp);
-    ch->println( "MUD statistics dumped." );
-}
-
-
 CMDWIZP( version )
 {
     ch->send_to( dreamland->getVersion( ) );
@@ -4194,4 +3817,5 @@ extern "C"
         return ppl;
     }
 }
+
 

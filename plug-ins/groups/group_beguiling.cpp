@@ -105,13 +105,12 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
 
         victim->leader = ch;
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level         = ch->getRealLevel( );
-        af.duration  = number_fuzzy( level / 5 );
-        af.location  = 0;
-        af.modifier  = 0;
-        af.bitvector = AFF_CHARM;
+        af.duration  = /*ch->isCoder() ? 1 : */number_fuzzy( level / 5 );
+        
+        af.bitvector.setValue(AFF_CHARM);
         affect_to_char( victim, &af );
 
         act_p( "$c1 очаровывает тебя!!!", ch, 0, victim, TO_VICT,POS_RESTING);
@@ -126,9 +125,9 @@ VOID_AFFECT(CharmPerson)::remove( Character *victim )
 {
     DefaultAffectHandler::remove( victim );
     
-    victim->stop_follower( );
+    follower_clear(victim);
 
-    if(victim->is_npc() 
+    if (victim->is_npc() 
         && victim->position == POS_SLEEPING
         && !IS_AFFECTED(victim, AFF_SLEEP))
         victim->position = victim->getNPC()->default_pos;
@@ -163,7 +162,7 @@ VOID_SPELL(LovePotion)::run( Character *ch, Character *, int sn, int level )
 
     Affect af;
 
-    af.where              = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type               = sn;
     af.level              = level;
     af.duration           = level / 5;
@@ -201,11 +200,11 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
     ch->add_follower( witch );
     ch->leader = witch;
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = gsn_charm_person;
     af.level     = ch->getModifyLevel( );
     af.duration  = number_fuzzy( witch->getModifyLevel( ) / 4);
-    af.bitvector = AFF_CHARM;
+    af.bitvector.setValue(AFF_CHARM);
     affect_to_char(ch, &af);
 }
 
@@ -259,7 +258,7 @@ bool MagicJar::area( )
         || carrier->is_npc( )
         || IS_SET(carrier->in_room->room_flags, 
                   ROOM_SAFE|ROOM_SOLITARY|ROOM_PRIVATE)
-        || !carrier->in_room->guilds.empty( ))
+        || !carrier->in_room->pIndexData->guilds.empty( ))
     {
         extract_obj( obj );
         return true;
@@ -351,13 +350,13 @@ VOID_SPELL(MysteriousDream)::run( Character *ch, Room *room, int sn, int level )
      return;
     }
 
-    af.where     = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type      = sn;
     af.level     = ch->getModifyLevel();
     af.duration  = level / 15;
-    af.location  = APPLY_NONE;
+    
     af.modifier  = 0;
-    af.bitvector = AFF_ROOM_SLEEP;
+    af.bitvector.setValue(AFF_ROOM_SLEEP);
     room->affectTo( &af );
 
     ch->send_to("Комната превращается в самое уютное место для сна.\n\r");
@@ -385,13 +384,13 @@ VOID_AFFECT(MysteriousDream)::update( Room *room, Affect *paf )
     Affect af;
     Character *vch;
 
-    af.where        = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type         = gsn_sleep;
     af.level         = paf->level - 1;
     af.duration        = number_range(1,((af.level/10)+1));
-    af.location        = APPLY_NONE;
+    
     af.modifier        = -5;
-    af.bitvector= AFF_SLEEP;
+    af.bitvector.setValue(AFF_SLEEP);
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
         if ( !saves_spell(af.level - 4,vch,DAM_CHARM, 0, DAMF_SPELL)
@@ -426,13 +425,12 @@ VOID_SPELL(Sleep)::run( Character *ch, Character *victim, int sn, int level )
             return;
     }
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = 1 + level/10;
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = AFF_SLEEP;
+    
+    af.bitvector.setValue(AFF_SLEEP);
     affect_join( victim, &af );
 
     if ( IS_AWAKE(victim) )
@@ -464,13 +462,11 @@ VOID_SPELL(Terangreal)::run( Character *ch, Character *victim, int sn, int level
     if (victim->is_npc())
         return;
 
-    af.where                = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = 10;
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = AFF_SLEEP;
+    af.bitvector.setValue(AFF_SLEEP);
     affect_join( victim, &af );
 
     if ( IS_AWAKE(victim) )

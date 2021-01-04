@@ -7,12 +7,12 @@
 
 #include <stdio.h>
 
-struct area_data;
+struct AreaIndexData;
 
 class AreaBehaviorManager {
 public:        
-        static void parse( area_data *, FILE * );
-        static void save( const area_data *, FILE * );
+        static void parse( AreaIndexData *, FILE * );
+        static void save( const AreaIndexData *, FILE * );
 };
 
 #endif

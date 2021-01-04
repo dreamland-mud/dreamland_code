@@ -10,4 +10,7 @@ std::string create_nonce(int len);
 /** Calculate average value of throwing a die. */
 int dice_ave(int d1, int d2);
 
+/** Returns -1 for negative, 1 for positive and 0 for zero. */
+int signum(float x);
+
 #endif

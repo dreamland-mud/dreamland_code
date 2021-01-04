@@ -23,33 +23,12 @@ const DLString SkillHelp::TYPE = "SkillHelp";
 
 void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    bool rus = ch->getConfig( ).ruskills;
-
-    in << skill_what(*skill).ruscase('1').upperFirstCharacter();
-    if (rus)
-        in << " '{c" << skill->getRussianName( ) << "{x' или" << " '{c" << skill->getName( ) << "{x'";
-    else
-        in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
-
-    SkillGroupReference &group = skill.getConstPointer<Skill>()->getGroup( );
-    const DLString &gname = group->getNameFor(ch);
-    if (group != group_none)
-        in << ", входит в группу '{hg{c" << gname << "{x'";
-    in << " " << editButton(ch) << endl;
-
-    print_wait_and_mana(*skill, ch, in);
+    in << "%PAUSE%";
+    skill->show(ch->getPC(), in);
+    in << "%RESUME%";
 
     in << endl
        << *this;
-    
-    // '... умение|slook herbs|травы'. - с гипер-ссылкой на команду
-    // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
-    if (skill->visible(ch)) {
-        in << "См. также команду {y{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
-        if (group != group_none)
-        in << ", {y{hc{lRгруппаум{lEglist{lx " << gname << "{x";
-        in << "." << endl;
-    }
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )
@@ -183,10 +162,6 @@ void SkillHelp::setSkill( Skill::Pointer skill )
             addAutoKeyword(cmd->getAliases().toSet());
             addAutoKeyword(cmd->getRussianAliases().toSet());
             if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
-/*                
-                labels.addTransient(
-                    cmd->getCommandCategory().names());
-*/                    
                 labels.addTransient("cmd");
             }
         }

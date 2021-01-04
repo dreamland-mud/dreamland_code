@@ -18,7 +18,7 @@
 #include "schedulertaskroundroom.h"
 #include "schedulerlist.h"
 #include "room.h"
-#include "mercdb.h"
+#include "merc.h"
 
 
 int SchedulerTaskRoundRoom::getPriority( ) const
@@ -28,6 +28,6 @@ int SchedulerTaskRoundRoom::getPriority( ) const
 
 void SchedulerTaskRoundRoom::run( )
 {
-    for( Room* room = room_list; room != 0; room = room->rnext )
+    for (auto &room: roomInstances)
         run( room );
 }

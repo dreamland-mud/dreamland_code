@@ -23,6 +23,7 @@ using Scripting::NativeHandler;
  * Area
  *----------------------------------------------------------------------*/
 class Area;
+class AreaIndexData;
 
 class AreaWrapper : public PluginNativeImpl<AreaWrapper>, 
                         public NativeHandler,
@@ -41,6 +42,9 @@ public:
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString filename;
+
+protected:
+    AreaIndexData * getTarget() const;
 };
 
 /*----------------------------------------------------------------------
@@ -185,6 +189,9 @@ public:
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
+
+protected:
+    Liquid * getTarget() const;
 };
 
 /*----------------------------------------------------------------------
@@ -278,10 +285,10 @@ public:
     SkillWrapper() { }
     SkillWrapper(const DLString &);            
     virtual void setSelf(Scripting::Object *) { }
+    Skill * getTarget() const;
     
 protected:
     XML_VARIABLE XMLString name;
-    Skill * getTarget() const;
 };
 
 class FeniaSkill : public PluginNativeImpl<FeniaSkill>, 

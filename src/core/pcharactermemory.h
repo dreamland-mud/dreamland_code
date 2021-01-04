@@ -28,6 +28,8 @@
 #include "hometown.h"
 #include "race.h"
 #include "religion.h"
+#include "pcskilldata.h"
+#include "bonus.h"
 
 /**
  * @author Igor S. Petrenko
@@ -110,6 +112,13 @@ public:
 
     virtual bool isOnline( ) const;
     virtual PCharacter * getPlayer( );
+    virtual NPCharacter * getMobile( );
+
+    virtual PCSkills & getSkills();
+    virtual void setSkills(const PCSkills &);
+
+    virtual PCBonuses & getBonuses();
+    virtual void setBonuses(const PCBonuses &);
 
 private:
     XML_VARIABLE XMLString name;
@@ -132,6 +141,8 @@ private:
     XML_VARIABLE XMLInteger questpoints;
     XML_VARIABLE XMLInteger security;
     XML_VARIABLE XMLRussianString russianName;
+    XML_VARIABLE PCSkills skills;
+    XML_VARIABLE PCBonuses bonuses;
 };
 
 #endif

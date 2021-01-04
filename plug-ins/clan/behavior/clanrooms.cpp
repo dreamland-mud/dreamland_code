@@ -21,9 +21,9 @@
 ClanArea::Pointer ClanRoom::getClanArea( )
 {
     ClanArea::Pointer clanArea;
-    AREA_DATA *area;
+    AreaIndexData *area;
 
-    area = getRoom( )->area;
+    area = getRoom( )->areaIndex();
 
     if (area->behavior) 
         clanArea = area->behavior.getDynamicPointer<ClanArea>( );
@@ -45,7 +45,7 @@ bool ClanPetShopStorage::canServeClient( Character *client )
     if (client->is_npc( ))
         return false;
 
-    if (client->getClan( ) == room->clan) 
+    if (client->getClan( ) == room->pIndexData->clan) 
         return true;
 
     clanArea = getClanArea( );

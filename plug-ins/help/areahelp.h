@@ -27,10 +27,10 @@ inline const DLString & AreaHelp::getType( ) const
     return TYPE;
 }
 
-struct area_data;
+struct AreaIndexData;
 
 /** Get self-help article for this area, either a real one or automatically created. */
-AreaHelp * area_selfhelp(struct area_data *area);
+AreaHelp * area_selfhelp(struct AreaIndexData *area);
 
 /** Return true if this article is empty or consists only of spaces. */
 bool help_is_empty(const HelpArticle &help);

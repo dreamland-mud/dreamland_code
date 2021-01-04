@@ -8,19 +8,20 @@ XML_OBJECT
 public:
         typedef ::Pointer<EquipSet> Pointer;
         
-        EquipSet(int, bool, bool);    
+        EquipSet(int sn, int totalSetSize, bool, bool);    
         virtual void equip( Character *victim );                           
         virtual void remove( Character *victim );
 
 protected:
-        bool isComplete(Character *) const;
+        bool isComplete(Character *, bool verbose) const;
         virtual bool hasAffect(Character *) const = 0;
         virtual void addAffect(Character *) const = 0;
         virtual void removeAffect(Character *) const = 0;
 
+        int sn;
         int totalSetSize;
         bool noDoubleNeck;
-        bool noDoubleWrist;
+        bool noDoubleWrist;        
 };
 
 class SidheArmorSet : public EquipSet {
@@ -33,8 +34,6 @@ protected:
         virtual bool hasAffect(Character *) const;
         virtual void addAffect(Character *) const;
         virtual void removeAffect(Character *) const;
-        
-        int sn;
 };
 
 class TravellersJoySet: public EquipSet {
@@ -48,8 +47,6 @@ protected:
         virtual bool hasAffect(Character *) const;
         virtual void addAffect(Character *) const;
         virtual void removeAffect(Character *) const;
-        
-        int sn;
 };
 
 class MorrisDancerSet: public EquipSet {
@@ -64,8 +61,6 @@ protected:
         virtual bool hasAffect(Character *) const;
         virtual void addAffect(Character *) const;
         virtual void removeAffect(Character *) const;
-        
-        int sn;
 };
 
 class NorivaMyrvaleSet: public EquipSet {
@@ -78,8 +73,6 @@ protected:
         virtual bool hasAffect(Character *) const;
         virtual void addAffect(Character *) const;
         virtual void removeAffect(Character *) const;
-        
-        int sn;
 };
 
 class ReykarisShevaleSet: public EquipSet {
@@ -92,8 +85,6 @@ protected:
         virtual bool hasAffect(Character *) const;
         virtual void addAffect(Character *) const;
         virtual void removeAffect(Character *) const;
-        
-        int sn;
 };
 
 #endif

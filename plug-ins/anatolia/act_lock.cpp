@@ -228,7 +228,7 @@ CMDRUNP( open )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         open_door_extra( ch, DIR_SOMEWHERE, (void *)peexit );
@@ -390,7 +390,7 @@ CMDRUNP( close )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
@@ -599,7 +599,7 @@ CMDRUNP( lock )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
@@ -668,21 +668,21 @@ static void unlock_door( Character *ch, int door )
             return;
     }
 
+    if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
+    {
+            ch->println( "Здесь уже не заперто." );
+            return;
+    }
+
     if ( pexit->key <= 0 )
     {
-            ch->println( "Здесь нет замочной скважины -- просто открой." );
+            ch->println( "К этой двери не существует ключа." );
             return;
     }
 
     if (!get_key_carry( ch, pexit->key))
     {
             ch->println( "У тебя нет ключа." );
-            return;
-    }
-
-    if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
-    {
-            ch->println( "Здесь уже не заперто." );
             return;
     }
 
@@ -738,21 +738,21 @@ CMDRUNP( unlock )
                     return;
             }
 
+            if (!IS_SET(obj->value1(),EX_LOCKED))
+            {
+                    ch->println( "Здесь уже не заперто." );
+                    return;
+            }
+
             if (obj->value4() <= 0)
             {
-                ch->println( "Здесь нет замочной скважины -- просто открой." );
+                ch->pecho( "К %O3 не существует ключа.", obj);
                 return;
             }
 
             if (!get_key_carry(ch,obj->value4()))
             {
                     ch->println( "У тебя нет ключа." );
-                    return;
-            }
-
-            if (!IS_SET(obj->value1(),EX_LOCKED))
-            {
-                    ch->println( "Здесь уже не заперто." );
                     return;
             }
 
@@ -770,25 +770,28 @@ CMDRUNP( unlock )
                     return;
             }
 
-            if ( obj->value2() < 0 )
-            {
-                    ch->println( "Здесь нет замочной скважины -- просто открой." );
-                    return;
-            }
-
             if ( !IS_SET(obj->value1(), CONT_LOCKED) )
             {
                     ch->println( "Здесь уже не заперто." );
                     return;
             }
 
-            if ((obj->behavior && obj->behavior->canLock( ch ))
-                || get_key_carry( ch, obj->value2())) 
+            if ( obj->value2() < 0 )
+            {
+                    ch->pecho( "К %O3 не существует ключа.", obj);
+                    return;
+            }
+
+            bool canLock = obj->behavior && obj->behavior->canLock( ch );
+
+            if (canLock || get_key_carry( ch, obj->value2())) 
             {
                 obj->value1(obj->value1() & ~CONT_LOCKED);
                 act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
                 act_p("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
-                
+            } else if (!canLock && obj->value2() <= 0) {
+                ch->pecho("%^O1 -- чья-то личная собственность, ключ есть только у хозяина или хозяйки.", obj);
+                return;
             } else {
                 ch->println( "У тебя нет ключа." );
                 return;
@@ -844,7 +847,7 @@ CMDRUNP( unlock )
         return;
     }
 
-    if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) != 0 )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
             && ch->can_see( peexit ) )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
@@ -859,21 +862,21 @@ CMDRUNP( unlock )
                 return;
         }
 
+        if ( !IS_SET(peexit->exit_info, EX_LOCKED) )
+        {
+                ch->println( "Здесь уже не заперто." );
+                return;
+        }
+
         if ( peexit->key <= 0 )
         {
-                ch->println( "Здесь нет замочной скважины -- просто открой." );
+                ch->println( "К этой двери не существует ключа." );
                 return;
         }
 
         if (!get_key_carry( ch, peexit->key))
         {
                 ch->println( "У тебя нет ключа." );
-                return;
-        }
-
-        if ( !IS_SET(peexit->exit_info, EX_LOCKED) )
-        {
-                ch->println( "Здесь уже не заперто." );
                 return;
         }
 
@@ -922,7 +925,7 @@ Keyhole::Pointer Keyhole::locate( Character *ch, Object *key )
     Keyhole::Pointer null;
     int keyVnum = key->pIndexData->vnum;
     
-    for (Room *room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (!ch->can_see( room ))
             continue;
 
@@ -931,7 +934,7 @@ Keyhole::Pointer Keyhole::locate( Character *ch, Object *key )
                 if (!room->exit[d]->u1.to_room || ch->can_see( room->exit[d] ))
                     return DoorKeyhole::Pointer( NEW, ch, room, d, key );
 
-        for (EXTRA_EXIT_DATA *ex = room->extra_exit; ex; ex = ex->next)
+        for (auto &ex: room->extra_exits)
             if (ex->key == keyVnum)
                 if (ch->can_see( ex ))
                     return ExtraExitKeyhole::Pointer( NEW, ch, room, ex, key );
@@ -961,7 +964,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
     bool canBeDoor = direction_lookup(arg.c_str()) >= 0;
     Keyhole::Pointer null;
 
-    if (( peexit = get_extra_exit( arg.c_str( ), ch->in_room->extra_exit ) )
+    if ((peexit = ch->in_room->extra_exits.find(arg))
                 && ch->can_see( peexit ))
     {
         return ExtraExitKeyhole::Pointer( NEW, ch, ch->in_room, peexit );
@@ -1278,7 +1281,7 @@ DLString ItemKeyhole::getDescription( )
 
     buf << obj->getShortDescr( );
     if (obj->getCarrier( ) == 0)
-        buf << " из '" << obj->getRoom( )->name << "'";
+        buf << " из '" << obj->getRoom()->getName() << "'";
 
     return buf;
 }
@@ -1400,9 +1403,9 @@ DLString DoorKeyhole::getDescription( )
 {
     DLString buf;
     
-    buf << "двер|ь|и|и|ь|ью|и из '" << room->name << "'";
+    buf << "двер|ь|и|и|ь|ью|и из '" << room->getName() << "'";
     if (to_room)
-        buf <<  " в '" << to_room->name << "'";
+        buf <<  " в '" << to_room->getName() << "'";
 
     return buf;
 }

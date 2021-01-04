@@ -38,8 +38,8 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
         throw e;
     }
 
-    areaName = eyed->in_room->area->name;
-    roomName = eyed->in_room->name;
+    areaName = eyed->in_room->areaName();
+    roomName = eyed->in_room->getName();
     objName  = eyed->getShortDescr( );
     
     time = number_range( 15, 25 ); 
@@ -127,10 +127,10 @@ void StaffQuest::destroy( )
 
 bool StaffQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
-    if (room->area->high_range + 20 < pch->getModifyLevel( ))
+    if (room->areaIndex()->high_range + 20 < pch->getModifyLevel( ))
         return false;
 
-    if (IS_WATER(room) || room->sector_type == SECT_AIR)
+    if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
         return false;
 
     if (!ItemQuestModel::checkRoomClient( pch, room ))

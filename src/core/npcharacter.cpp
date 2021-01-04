@@ -230,14 +230,13 @@ void NPCharacter::updateCachedNoun( )
 
 DLString NPCharacter::getNameP( char gram_case ) const
 {   
-    std::ostringstream buf;
-    
-    buf << toNoun( )->decline( gram_case );
+    DLString shortname = toNoun( )->decline( gram_case );
 
+    // Special case when we want to see all names at once, to search among them.
     if (gram_case == '7')
-        buf << " " << getName( );
+        return shortname.colourStrip() + " " + getName();
 
-    return buf.str( );
+    return shortname;
 }
 
 /****************************************************************************

@@ -160,13 +160,11 @@ VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level
     {
         act_p("$c1 замерзает от ледяного прикосновения.",
                victim,0,0,TO_ROOM,POS_RESTING);
-        af.where     = TO_AFFECTS;
         af.type      = sn;
         af.level     = level;
         af.duration  = 6;
-        af.location  = APPLY_STR;
+        af.location = APPLY_STR;
         af.modifier  = -1;
-        af.bitvector = 0;
         affect_join( victim, &af );
     }
     else
@@ -200,9 +198,9 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
         
         int dam;
 
-        if ( (ch->in_room->sector_type != SECT_HILLS)
-                && (ch->in_room->sector_type != SECT_MOUNTAIN)
-                && (ch->in_room->sector_type != SECT_DESERT) )
+        if ( (ch->in_room->getSectorType() != SECT_HILLS)
+                && (ch->in_room->getSectorType() != SECT_MOUNTAIN)
+                && (ch->in_room->getSectorType() != SECT_DESERT) )
         {
                 ch->println("Здесь недостаточно песка, чтобы сформировать кулак.");
                 ch->wait = 0;
@@ -385,10 +383,9 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
         int dam,hp_dam,dice_dam;
         int hpch;
 
-        if ( ch->in_room->sector_type == SECT_AIR
-                || ch->in_room->sector_type == SECT_INSIDE
-                || ch->in_room->sector_type == SECT_WATER_SWIM
-                || ch->in_room->sector_type == SECT_WATER_NOSWIM )
+        if ( ch->in_room->getSectorType() == SECT_AIR
+                || ch->in_room->getSectorType() == SECT_INSIDE
+                || IS_WATER(ch->in_room))
         {
                 ch->send_to("Здесь нет ни крупицы песка!\n\r");
                 ch->wait = 0;
@@ -486,13 +483,13 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
     }
     else {
         if ( (number_percent() < chance) && (!victim->isAffected(gsn_weaken)) ) {
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_weaken;
             af.level     = level;
             af.duration  = (4 + level / 12);
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1 * (2 + level / 12);
-            af.bitvector = AFF_WEAKEN;
+            af.bitvector.setValue(AFF_WEAKEN);
             affect_to_char( victim, &af );
             victim->send_to("Ты чувствуешь, как {Dтемная магия{x отнимает у тебя последние силы!\n\r");
             act_p("$c1 слабеет на глазах.",victim,0,0,TO_ROOM,POS_RESTING);            

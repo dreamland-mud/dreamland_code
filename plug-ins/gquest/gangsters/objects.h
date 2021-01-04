@@ -7,14 +7,14 @@
 #define GANG_OBJECTS_H
 
 #include "xmlboolean.h"
-#include "objectbehavior.h"
+#include "gqobjects.h"
 
 class Room;
 
 /*
  * key
  */
-class GangKey : public ObjectBehavior {
+class GangKey : public GlobalQuestObject {
 XML_OBJECT    
 public:
         typedef ::Pointer<GangKey> Pointer;

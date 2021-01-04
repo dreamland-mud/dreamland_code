@@ -82,7 +82,6 @@ COMMAND(CClanTalk, "cb")
 {
     Descriptor *d;
     DLString argument = constArguments;
-    ostringstream act_buf;
     DLString act_str;
 
     if (ch->getClan( ) == clan_none) {
@@ -110,11 +109,7 @@ COMMAND(CClanTalk, "cb")
     if (check_soap(ch))
         return;
 
-
-    act_buf << "{" << ch->getClan( )->getColor( ) << "["
-            << ch->getClan( )->getShortName( ) << "] " 
-            << "%1$C1: %2$s {x";
-    act_str = act_buf.str( );
+    act_str = ch->getClan()->getChannelPattern();
     
     if (dreamland->hasOption( DL_LOG_COMM ))
         LogStream::sendNotice( ) 

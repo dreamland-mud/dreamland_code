@@ -8,6 +8,7 @@
 #include "roomwrapper.h"
 #include "mobindexwrapper.h"
 #include "objindexwrapper.h"
+#include "areaindexwrapper.h"
 #include "subr.h"
 
 #include "fenia/register-impl.h"
@@ -17,6 +18,7 @@
 #include "character.h"
 #include "object.h"
 #include "merc.h"
+#include "mercdb.h"
 #include "def.h"
 
 void WrapperManager::initialization( )
@@ -76,6 +78,14 @@ Scripting::Register WrapperManager::getWrapper( obj_index_data *obj )
     return wrapperAux<ObjIndexWrapper>( OBJ_VNUM2ID( obj->vnum ), obj );
 }
 
+Scripting::Register WrapperManager::getWrapper( AreaIndexData *pArea )
+{
+    if (!pArea)
+        return Scripting::Register( );
+
+    return wrapperAux<AreaIndexWrapper>( AREA_VNUM2ID(pArea->min_vnum), pArea );
+}
+
 template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
 {
@@ -113,6 +123,10 @@ void WrapperManager::linkWrapper( mob_index_data *mob )
 void WrapperManager::linkWrapper( obj_index_data *obj )
 {
     linkAux<ObjIndexWrapper>( OBJ_VNUM2ID( obj->vnum ), obj );
+}
+void WrapperManager::linkWrapper( AreaIndexData *pArea )
+{
+    linkAux<AreaIndexWrapper>( AREA_VNUM2ID(pArea->min_vnum), pArea );
 }
 
 void WrapperManager::getTarget( const Scripting::Register &reg, Character *& ch )

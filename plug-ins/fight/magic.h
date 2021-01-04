@@ -59,6 +59,7 @@ class Character;
 class Object;
 class Room;
 class SpellTarget;
+class Spell;
 
 bool saves_spell( short level, Character *victim, int dam_type, Character *ch = NULL, bitstring_t dam_flag = 0 );
 void attack_caster( Character *caster, Character *victim );
@@ -70,6 +71,9 @@ void area_message( Character *ch, const DLString &msg, bool everywhere );
 #define    FSPELL_OBSTACLES (D)
 #define    FSPELL_MANA      (E)
 #define    FSPELL_NOTRIGGER (F)
+#define    FSPELL_ATTACK_CASTER (G)
+#define    FSPELL_CHECK_SAFE    (H)
+#define    FSPELL_CHECK_GROUP   (I)
 
 bool spell( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags = 0 );
 bool spell( int sn, int level, Character *ch, Character *victim, int flags = 0 );
@@ -78,6 +82,7 @@ bool spell( int sn, int level, Character *ch, Object *obj );
 bool spell( int sn, int level, Character *ch, Room *room );
 bool spell( int sn, int level, Character *ch, char *arg );
 bool spell_nocatch( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags = 0 );
+bool spell_nocatch( ::Pointer<Spell> &spell, int level, Character *ch, ::Pointer<SpellTarget> target, int flags );
 
 void spell_by_item( Character *ch, Object *obj );
 

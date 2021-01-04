@@ -35,7 +35,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     findVictims( pch, games );
     pGameIndex  = getRandomMobIndex( games );
     raceName    = pGameIndex->race;
-    raceRusName = raceManager->find( raceName )->getMltName( );
+    raceRusName = pGameIndex->short_descr;
     areaName    = pGameIndex->area->name;
     
     if (rated_as_guru( pch ))
@@ -46,7 +46,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     customer = getRandomClient( pch );
     customerName = customer->getNameP( '1' );
     customerName = customerName.upperFirstCharacter( );
-    customerArea = customer->in_room->area->name;
+    customerArea = customer->in_room->areaName();
     assign<SteakCustomer>( customer );
     save_mobs( customer->in_room );
 
@@ -55,7 +55,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
 
     tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
     tell_raw( pch, questman, 
-        "{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G, обитающих в {W{hh%s{hx{G.", 
+        "{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G из местности {W{hh%s{hx{G.", 
         customerName.c_str( ),
         customerArea.c_str( ),
         ordered.getValue( ),
@@ -89,7 +89,7 @@ void ButcherQuest::info( std::ostream &buf, PCharacter *ch )
             << "{hx просит тебя доставить к столу "
             << ordered << " кус" << GET_COUNT(ordered.getValue( ), "ок", "ка", "ков")
             << " мяса " << raceRusName.ruscase( '2' ) 
-            << ", oбитающих в местности {hh" << areaName << "{hx." << endl;
+            << " из местности {hh" << areaName << "{hx." << endl;
             
         if (delivered > 0)
             buf << "Доставлено кусков: " << delivered << "." << endl;    
@@ -147,7 +147,7 @@ bool ButcherQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if (!IS_SET(mob->form, FORM_EDIBLE))
         return false;
 
-    if (mob->in_room->area != mob->pIndexData->area)
+    if (mob->in_room->areaIndex() != mob->pIndexData->area)
         return false;
     
     return ButcherQuestRegistrator::getThis( )->races.hasElement( mob->getRace( )->getName( ) );
@@ -166,13 +166,10 @@ bool ButcherQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 
 bool ButcherQuest::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *victim )
 {
-    if (room->area->low_range > pch->getModifyLevel( ))
+    if (room->areaIndex()->low_range > pch->getModifyLevel( ))
         return false;
     
-    if (!(room->sector_type == SECT_FIELD 
-           || room->sector_type == SECT_FOREST
-           || room->sector_type == SECT_HILLS 
-           || room->sector_type == SECT_MOUNTAIN))
+    if (!IS_NATURE(room))
         return false;
 
     return VictimQuestModel::checkRoomVictim( pch, room, victim );

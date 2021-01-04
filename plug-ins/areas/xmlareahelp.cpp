@@ -60,9 +60,7 @@ public:
 
     virtual void initialization( )
     {
-        struct area_data *area;
-
-        for (area = area_first; area; area = area->next) {
+        for(auto &area: areaIndexes) {
             HelpArticles::iterator a;
             HelpArticles &articles = area->helps;
             DLString aname(area->name);
@@ -92,9 +90,7 @@ public:
 
     virtual void destruction( )
     {
-        struct area_data *area;
-
-        for (area = area_first; area; area = area->next) {
+        for(auto &area: areaIndexes) {
             HelpArticles::iterator a;
             HelpArticles &articles = area->helps;
 

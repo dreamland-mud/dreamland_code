@@ -10,9 +10,9 @@
 class VnumList;
 struct obj_index_data;
 struct mob_index_data;
-struct area_data;
+struct AreaIndexData;
 
-typedef vector<area_data *> AreaList;
+typedef vector<AreaIndexData *> AreaList;
 typedef vector<Room *> RoomList;
 
 /*
@@ -37,8 +37,8 @@ protected:
     bool targetRoomAccessible(PCharacter *, Room *);
     static Room * getRandomRoom( RoomList & );
     AreaList findAreas(PCharacter *);
-    RoomList findClientRooms(PCharacter *pch, struct area_data *targetArea);
-    RoomList findVictimRooms(PCharacter *pch, struct area_data *targetArea);
+    RoomList findClientRooms(PCharacter *pch, struct AreaIndexData *targetArea);
+    RoomList findVictimRooms(PCharacter *pch, struct AreaIndexData *targetArea);
 };
 
 /*

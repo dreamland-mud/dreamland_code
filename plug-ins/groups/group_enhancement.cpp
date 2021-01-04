@@ -68,13 +68,11 @@ BOOL_SKILL(giantstrength)::run( Character *victim, int slevel )
 {
     Affect af;
 
-    af.where     = TO_AFFECTS;
     af.type      = gsn_giant_strength;
     af.level     = slevel;
     af.duration  = (10 + slevel / 3);
-    af.location  = APPLY_STR;
+    af.location = APPLY_STR;
     af.modifier  = max(2, slevel / 10);
-    af.bitvector = 0;
     affect_to_char( victim, &af );
 
     victim->pecho("Ты становишься намного сильнее!");
@@ -110,16 +108,16 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     if (victim == ch)
       af.duration  = level/2;
     else
       af.duration  = level/4;
-    af.location  = APPLY_DEX;
+    af.location = APPLY_DEX;
     af.modifier  = max(2,level / 12 );
-    af.bitvector = AFF_HASTE;
+    af.bitvector.setValue(AFF_HASTE);
     affect_to_char( victim, &af );
     victim->send_to("Твои движения становятся намного быстрее.\n\r");
     act_p("Движения $c2 становятся намного быстрее.",
@@ -151,13 +149,13 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
     act_p( "Глаза $c2 загораются красным светом.\n\r",
             victim, 0, 0, TO_ROOM,POS_RESTING);
 
-    af.where         = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level         = level;
     af.duration  = 2 * level;
-    af.location  = APPLY_NONE;
+    
     af.modifier  = 0;
-    af.bitvector = AFF_INFRARED;
+    af.bitvector.setValue(AFF_INFRARED);
     affect_to_char( victim, &af );
     victim->send_to("Твои глаза загораются красным светом.\n\r");
     return;
@@ -184,13 +182,9 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
         return;
   }
 
-  af.where        = TO_AFFECTS;
   af.type        = sn;
   af.level        = level;
   af.duration        = level / 10 + 1;
-  af.location        = APPLY_NONE;
-  af.modifier        = 0;
-  af.bitvector        = 0;
   affect_to_char( victim, &af );
     
   victim->send_to("Ты концентрируешься на учебе.\n\r");

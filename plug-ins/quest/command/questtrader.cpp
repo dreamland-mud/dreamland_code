@@ -387,7 +387,7 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     keyring->condition = girth->condition;
     keyring->level = girth->level;
 
-    for (Affect *paf = girth->affected; paf != 0; paf = paf->next)
+    for (auto &paf: girth->affected)
         affect_to_obj( keyring, paf );
 
     for (EXTRA_DESCR_DATA *ed = girth->extra_descr; ed != 0; ed = ed->next)

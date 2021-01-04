@@ -28,12 +28,10 @@ bool FireproofWE::run( PCharacter *ch, Character *victim ) const
     Object *obj;
     Affect af;
 
-    af.where     = TO_OBJECT;
+    af.bitvector.setTable(&extra_flags);
     af.type      = gsn_fireproof;
     af.level     = ch->getModifyLevel( );
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = ITEM_BURN_PROOF;
+    af.bitvector.setValue(ITEM_BURN_PROOF);
 
     for (obj = victim->carrying; obj; obj = obj->next_content) {
         if (obj->wear_loc == wear_none)
@@ -72,18 +70,16 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
     
     affect_enchant( obj );
 
-    af.where     = TO_OBJECT;
-    af.bitvector = 0;
     af.type      = gsn_enchant_weapon;
     af.level     = ch->getModifyLevel( );
     af.duration  = number_range( af.level, 200 );
     af.modifier  = number_range( 1 + af.level / 10, 
                                  1 + af.level / 7 );
 
-    af.location  = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_enhance( obj, &af );
 
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_enhance( obj, &af );
 
     victim->hitroll += af.modifier;
@@ -97,7 +93,6 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
 {
     Affect af;
     
-    af.where         = TO_AFFECTS;
     af.type         = gsn_ancient_rage;
     af.level         = ch->getModifyLevel( );
     af.duration         = number_fuzzy( af.level / 8 );

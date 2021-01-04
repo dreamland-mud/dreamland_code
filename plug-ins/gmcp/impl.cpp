@@ -12,6 +12,7 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "directions.h"
+#include "door_utils.h"
 #include "stats_apply.h"
 #include "loadsave.h"
 #include "telnet.h"
@@ -20,7 +21,6 @@
 #include "so.h"
 #include "def.h"
 
-static const char *dir_name[] = {"n","e","s","w","u","d"};
 static const char C_IAC = static_cast<char>(IAC);
 static const char C_SB = static_cast<char>(SB);
 static const char C_GMCP  = static_cast<char>(GMCP);
@@ -89,14 +89,14 @@ GMCPCOMMAND_RUN(charToRoom)
 
     Json::Value data;
     data["num"] = ch->in_room->vnum;
-    data["name"] = DLString(ch->in_room->name).colourStrip();
-    data["area"] = DLString(ch->in_room->area->name).colourStrip();
-    data["map"] = ASCII_MAPS + ch->in_room->area->area_file->file_name + ".html";
+    data["name"] = DLString(ch->in_room->getName()).colourStrip();
+    data["area"] = DLString(ch->in_room->areaName()).colourStrip();
+    data["map"] = ASCII_MAPS + ch->in_room->areaIndex()->area_file->file_name + ".html";
     
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         Room *room = direction_target(ch->in_room, door);
         if (room && ch->can_see(room)) 
-            data["exits"][DLString(dir_name[door])] = room->vnum;
+            data["exits"][DLString(dir_name_small[door])] = room->vnum;
     }
 
     send(args.d, "Room", "Info", json_to_string(data));

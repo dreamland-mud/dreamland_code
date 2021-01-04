@@ -50,12 +50,12 @@ CLAN(invader);
  *-------------------------------------------------------------------------*/
 void ClanGuardInvader::actGreet(PCharacter *wch)
 {
-    do_say(ch, "Приветствую тебя, идущий темным путем.");
+    say_fmt("Приветствую тебя, идущ%2$Gее|ий|ая по Пути Тьмы.", ch, wch);
 }
 void ClanGuardInvader::actPush(PCharacter *wch)
 {
     act("$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR);
-    act("$C1 сверлит глазами $c4 и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM);
+    act("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM);
 }
 int ClanGuardInvader::getCast(Character *victim)
 {
@@ -121,26 +121,25 @@ SKILL_RUNP(fade)
 
     if (MOUNTED(ch))
     {
-        ch->send_to("Ты не можешь исчезнуть, когда в седле.\n\r");
+        ch->send_to("Ты не можешь спрятаться в тенях, когда в седле.\n\r");
         return;
     }
 
     if (RIDDEN(ch))
     {
-        ch->pecho("Ты не можешь исчезнуть, когда ты оседлан%Gо||а.", ch);
+        ch->pecho("Ты не можешь спрятаться в тенях, когда ты оседлан%Gо||а.", ch);
         return;
     }
 
     if (IS_AFFECTED(ch, AFF_FAERIE_FIRE))
     {
-        ch->send_to("Ты не можешь скрыться, когда светишься.\n\r");
+        ch->send_to("Ты не можешь спрятаться в тенях, когда светишься.\n\r");
         return;
     }
 
     if (!gsn_fade->usable(ch))
         return;
 
-    ch->send_to("Ты пытаешься исчезнуть.\n\r");
 
     int k = ch->getLastFightDelay();
 
@@ -152,21 +151,23 @@ SKILL_RUNP(fade)
     if (number_percent() < gsn_fade->getEffective(ch) * k / 100)
     {
         SET_BIT(ch->affected_by, AFF_FADE);
+        ch->send_to("Ты прячешься в тенях.\n\r");        
         gsn_fade->improve(ch, true);
     }
-    else
+    else {        
+        ch->send_to("Ты пытаешься спрятаться в тенях, но безуспешно.\n\r");        
         gsn_fade->improve(ch, false);
-
+    }
     return;
 }
 
 SPELL_DECL(EvilSpirit);
 VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
 {
-    AREA_DATA *pArea = room->area;
-    Affect af, af2;
+    Area *pArea = room->area;
+    Affect af;
 
-    if (IS_RAFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
+    if (IS_ROOM_AFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
     {
         ch->send_to("Эта зона полностью под контролем злых духов.\n\r");
         return;
@@ -180,30 +181,21 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
 
     if (IS_SET(room->room_flags, ROOM_LAW) || IS_SET(room->area->area_flag, AREA_HOMETOWN))
     {
-        ch->send_to("Святая аура в этой комнате не дает творить зло.\n\r");
+        ch->send_to("Аура Закона в этой комнате не дает творить зло.\n\r");
         return;
     }
 
-    af2.where = TO_AFFECTS;
-    af2.type = sn;
-    af2.level = ch->getModifyLevel();
-    af2.duration = level / 5;
-    af2.modifier = 0;
-    af2.location = APPLY_NONE;
-    af2.bitvector = 0;
-    affect_to_char(ch, &af2);
+    postaffect_to_char(ch, sn, level / 5);
 
-    af.where = TO_ROOM_AFFECTS;
+    af.bitvector.setTable(&raffect_flags);
     af.type = sn;
     af.level = ch->getModifyLevel();
     af.duration = level / 25;
-    af.location = APPLY_NONE;
-    af.modifier = 0;
-    af.bitvector = AFF_ROOM_ESPIRIT;
+    af.bitvector.setValue(AFF_ROOM_ESPIRIT);
 
-    for (map<int, Room *>::iterator i = pArea->rooms.begin(); i != pArea->rooms.end(); i++)
+    for (auto r: pArea->rooms)
     {
-        room = i->second;
+        Room *room = r.second;
         room->affectTo(&af);
         act("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
     }
@@ -216,16 +208,22 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int le
 
     if ((victim = get_char_world_doppel(ch, target_name)) == 0 || DIGGED(victim))
     {
-        ch->send_to("Тьма не может обнаружить такого персонажа.\n\r");
+        ch->send_to("Тьма не может обнаружить это существо.\n\r");
         return;
     }
 
-    if (is_safe_nomessage(ch, victim) || (victim->is_npc() && IS_SET(victim->act, ACT_NOEYE)))
+    if (is_safe_nomessage(ch, victim))
     {
-        ch->send_to("Извини, тьма тут бессильна.\n\r");
+        ch->send_to("Тьма не может проникнуть туда, где скрывается это существо.\n\r");
         return;
     }
 
+    if ( (victim->is_npc()) && (IS_SET(victim->act, ACT_NOEYE)) )
+    {
+        ch->send_to("Это существо защищено от твоего взора.\n\r");
+        return;
+    }
+   
     if (victim->isAffected(gsn_golden_aura))
     {
         if (saves_spell(level, victim, DAM_OTHER, ch, DAMF_SPELL))
@@ -235,7 +233,7 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int le
         }
 
         victim->pecho("На миг тебя окружает темнота, из которой на тебя смотрит огромный глаз.\n\r"
-                      "...И тихий звон {Wауры{x рождает имя - {D%#^C1{x.",
+                      "...И тихий звон {Yзолотой ауры{x рождает имя -- {D%#^C1{x.",
                       ch);
     }
 
@@ -247,7 +245,6 @@ VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
 {
     Character *vch;
     Object *light;
-    Affect af;
 
     if (ch->isAffected(sn))
     {
@@ -257,7 +254,7 @@ VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
 
     if (IS_SET(room->room_flags, ROOM_SAFE))
     {
-        ch->send_to("Тут нельзя даже такую мелочь, как эта.\n\r");
+        ch->send_to("В безопасных комнатах это запрещено.\n\r");
         return;
     }
 
@@ -274,14 +271,7 @@ VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
             damage_to_obj(vch, light, light, light->condition / 2 + number_range(1, light->condition));
         }
 
-    af.where = TO_AFFECTS;
-    af.type = sn;
-    af.level = level;
-    af.duration = 2;
-    af.modifier = 0;
-    af.location = APPLY_NONE;
-    af.bitvector = 0;
-    affect_to_char(ch, &af);
+    postaffect_to_char(ch, sn, 2);
 }
 
 SPELL_DECL_T(Nightwalker, SummonCreatureSpell);
@@ -350,14 +340,14 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
     af.level = level;
     af.duration = 24;
 
-    af.where = TO_DETECTS;
-    af.bitvector = DETECT_GOOD | DETECT_FADE;
+    af.bitvector.setTable(&detect_flags);
+    af.bitvector.setValue(DETECT_GOOD | DETECT_FADE);
     af.location = APPLY_SAVING_SPELL;
     af.modifier = ch->applyCurse(0 - level / 9);
     affect_to_char(victim, &af);
 
-    af.where = TO_AFFECTS;
-    af.bitvector = IS_AFFECTED(victim, AFF_PROTECT_GOOD) ? 0 : AFF_PROTECT_GOOD;
+    af.bitvector.setTable(&affect_flags);
+    af.bitvector.setValue(IS_AFFECTED(victim, AFF_PROTECT_GOOD) ? 0 : AFF_PROTECT_GOOD);
     af.modifier = ch->applyCurse(-level * 5 / 2);
     af.location = APPLY_AC;
     affect_to_char(victim, &af);
@@ -386,8 +376,8 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
 
     if (victim->isAffected(gsn_golden_aura) && saves_spell(level, victim, DAM_OTHER, ch, DAMF_SPELL))
     {
-        ch->send_to("Тьма пытается сделать это для тебя, но не может.\n\r");
-        victim->send_to("Около тебя появляется твоя тень, но тут же исчезает.\n\r");
+        ch->send_to("Твое заклинание не может пробиться через защиту от заклинаний противника.\n\r");
+        victim->send_to("Твоя золотая аура препятствует подлой попытке оживить твою тень!\n\r");
         return;
     }
 
@@ -419,13 +409,9 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
     Affect af;
     Character *vch;
 
-    af.where = TO_AFFECTS;
     af.type = gsn_evil_spirit;
     af.level = paf->level;
     af.duration = number_range(1, (af.level / 30));
-    af.location = APPLY_NONE;
-    af.modifier = 0;
-    af.bitvector = 0;
 
     for (vch = room->people; vch; vch = vch->next_in_room)
     {
@@ -460,7 +446,7 @@ COMMAND(CDarkLeague, "darkleague")
 
     if (pch->getClan() != clan_invader)
     {
-        pch->println("Ты не принадлежишь к клану Захватчиков.");
+        pch->println("Ты не принадлежишь к Кабалу Захватчиков.");
         return;
     }
 

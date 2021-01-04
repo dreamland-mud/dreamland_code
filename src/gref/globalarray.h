@@ -25,7 +25,7 @@ public:
     void applyBitvector(const GlobalBitvector &bitvector, int modifier);
 
     /** Generate a list of strings describing how much each element is affected: "xxx by 10, yyy by -5". */
-    StringList toStringList(bool fRussian) const;
+    StringList toStringList(bool fRussian, const DLString &joiner) const;
 
 protected:
     GlobalRegistryBase *registry;

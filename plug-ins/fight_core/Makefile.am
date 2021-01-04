@@ -6,6 +6,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system \
+-I$(top_srcdir)/plug-ins/alignment \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/occupations \
@@ -24,9 +25,15 @@ damage_impl.cpp \
 character.cpp \
 stats_apply.cpp \
 weapons.cpp \
+weapontier.cpp \
+weaponaffixes.cpp \
+weaponcalculator.cpp \
+weapongenerator.cpp \
+weaponrandomizer.cpp \
 material.cpp \
 fight_safe.cpp \
 immunity.cpp \
+morphology.cpp \
 deathmanager.cpp
 
 libfight_core_la_LIBADD = \
@@ -36,6 +43,7 @@ libfight_core_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../follow/core/libfollow_core.la \
 ../system/libsystem.la \
+../alignment/libalignment.la \
 ../occupations/liboccupations.la \
 ../system/libscheduler_task_round.la \
 ../interpret/libinterpret.la \

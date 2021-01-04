@@ -17,6 +17,7 @@
 #include "room.h"
 #include "affect.h"
 
+#include "olc.h"
 #include "clanreference.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -25,86 +26,12 @@
 CLAN(none);
 
 // Globals
-extern int top_reset;
 extern int top_area;
 extern int top_exit;
 extern int top_ed;
-extern int top_room;
 
 EXIT_DATA *exit_free;
-RESET_DATA *reset_free;
 void free_extra_descr(EXTRA_DESCR_DATA * pExtra);
-
-
-RESET_DATA *new_reset_data(void)
-{
-    RESET_DATA *pReset;
-
-    if (!reset_free) {
-        pReset = (RESET_DATA*)alloc_perm(sizeof(*pReset));
-        top_reset++;
-    }
-    else {
-        pReset = reset_free;
-        reset_free = reset_free->next;
-    }
-    pReset->next = NULL;
-    pReset->command = 'X';
-    pReset->arg1 = 0;
-    pReset->arg2 = 0;
-    pReset->arg3 = 0;
-    pReset->arg4 = 0;
-    return pReset;
-}
-
-void free_reset_data(RESET_DATA * pReset)
-{
-    pReset->next = reset_free;
-    reset_free = pReset;
-    return;
-}
-
-void init_area(AREA_DATA *pArea) 
-{
-    top_area++;
-    pArea->next = NULL;
-    pArea->name = str_dup("New area");
-    pArea->area_flag = AREA_ADDED;
-    pArea->security = 9;
-    pArea->authors = str_dup("");
-    pArea->altname = str_dup("None");
-    pArea->translator = str_dup("None");
-    pArea->speedwalk = str_dup("");
-    pArea->min_vnum = 0;
-    pArea->max_vnum = 0;
-    pArea->low_range = 0;
-    pArea->high_range = 0;
-    pArea->age = 0;
-    pArea->nplayer = 0;
-    pArea->empty = true;
-    pArea->credits = str_dup("None");
-    pArea->resetmsg = str_dup("");
-    pArea->vnum = top_area - 1;
-}
-
-AREA_DATA *new_area(void)
-{
-    AREA_DATA *pArea;
-    pArea = new AREA_DATA; 
-    init_area(pArea);
-    return pArea;
-}
-
-void free_area(AREA_DATA * pArea)
-{
-    free_string(pArea->name);
-    free_string(pArea->authors);
-    free_string(pArea->altname);
-    free_string(pArea->translator);
-    free_string(pArea->speedwalk);
-    delete pArea;
-    return;
-}
 
 EXIT_DATA *new_exit(void)
 {
@@ -142,40 +69,6 @@ void free_exit(EXIT_DATA * pExit)
     return;
 }
 
-Room *new_room_index(void)
-{
-    Room *pRoom;
-    int door;
-
-    top_room++;
-
-    pRoom = new Room;
-
-    pRoom->next = NULL;
-    pRoom->people = NULL;
-    pRoom->contents = NULL;
-    pRoom->extra_descr = NULL;
-    pRoom->area = NULL;
-    pRoom->extra_exit = NULL;
-
-    for (door = 0; door < DIR_SOMEWHERE; door++)
-        pRoom->exit[door] = NULL;
-
-    pRoom->name = &str_empty[0];
-    pRoom->description = &str_empty[0];
-    pRoom->vnum = 0;
-    pRoom->room_flags = 0;
-    pRoom->light = 0;
-    pRoom->sector_type = 0;
-    pRoom->owner = &str_empty[0];
-    pRoom->clan = clan_none;
-    pRoom->heal_rate = 100;
-    pRoom->mana_rate = 100;
-    pRoom->heal_rate_default = 100;
-    pRoom->mana_rate_default = 100;
-    return pRoom;
-}
-
 OBJ_INDEX_DATA *new_obj_index(void)
 {
     static OBJ_INDEX_DATA zeroObjIndex;
@@ -187,7 +80,6 @@ OBJ_INDEX_DATA *new_obj_index(void)
 
     pObj->next = NULL;
     pObj->extra_descr = NULL;
-    pObj->affected = NULL;
     pObj->area = NULL;
     pObj->name = str_dup("no name");
     pObj->short_descr = str_dup("(no short description)");
@@ -208,27 +100,6 @@ OBJ_INDEX_DATA *new_obj_index(void)
     pObj->limit = -1;
     pObj->level = 0;
     return pObj;
-}
-
-void free_obj_index(OBJ_INDEX_DATA * pObj)
-{
-    EXTRA_DESCR_DATA *pExtra;
-    Affect *pAf, *pAfNext;
-
-    free_string(pObj->name);
-    free_string(pObj->short_descr);
-    free_string(pObj->description);
-
-    for (pAf = pObj->affected; pAf; pAf = pAfNext) {
-        pAfNext = pAf->next;
-        ddeallocate(pAf);
-    }
-
-    for (pExtra = pObj->extra_descr; pExtra; pExtra = pExtra->next) {
-        free_extra_descr(pExtra);
-    }
-    
-    delete pObj;
 }
 
 MOB_INDEX_DATA *new_mob_index(void)
@@ -286,24 +157,3 @@ MOB_INDEX_DATA *new_mob_index(void)
     return pMob;
 }
 
-void free_mob_index(MOB_INDEX_DATA * pMob)
-{
-    free_string(pMob->player_name);
-    free_string(pMob->short_descr);
-    free_string(pMob->long_descr);
-    free_string(pMob->description);
-
-    delete pMob;
-}
-
-Affect *new_affect()
-{
-    Affect *paf_new;
-    paf_new = dallocate( Affect );
-    return paf_new;
-}
-
-void free_affect(Affect *paf)
-{
-    ddeallocate(paf);
-}

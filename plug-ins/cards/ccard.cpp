@@ -182,7 +182,7 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
         
         ch->printf( "[%5d] %-28s [%5d] %s\r\n",
                     mob->pIndexData->vnum, mob->getNameP( '1' ).c_str( ),
-                    mob->in_room->vnum, mob->in_room->name );
+                    mob->in_room->vnum, mob->in_room->getName() );
         cnt++;
     }
     

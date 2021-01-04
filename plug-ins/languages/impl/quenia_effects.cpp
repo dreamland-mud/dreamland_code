@@ -58,7 +58,6 @@ bool AccuracyWE::run( PCharacter *ch, Character *victim ) const
 {
     Affect af;
 
-    af.where    = TO_AFFECTS;
     af.type     = gsn_accuracy;
     af.level    = ch->getModifyLevel( );
     af.duration = af.level / 3;

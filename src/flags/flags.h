@@ -14,6 +14,7 @@ struct Flags : public FlagTableWrapper, public Bitstring {
 
     inline DLString names( ) const;
     inline DLString messages( bool comma = false, char gcase = '1' ) const;
+    inline void setBits(const DLString &names);
 
     static const Flags emptyFlags;
 };

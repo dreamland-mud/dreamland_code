@@ -194,7 +194,7 @@ void CGQuest::doNoExp( PCharacter *ch, DLString& arguments )
    
     try {
         attribute = ch->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" ); 
-    } catch (Exception e) {
+    } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
         return;
     }
@@ -494,7 +494,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
         if (!arguments.empty( )) {
             try {
                 time = arguments.getOneArgument( ).toInt( );
-            } catch (ExceptionBadType e) {         
+            } catch (const ExceptionBadType &e) {         
             } 
             
             if (time <= 0) {

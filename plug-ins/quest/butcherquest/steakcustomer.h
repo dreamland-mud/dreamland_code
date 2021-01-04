@@ -20,6 +20,7 @@ public:
     typedef ::Pointer<SteakCustomer> Pointer;
 
     virtual void greet( Character *victim );
+    virtual void show( Character *, std::basic_ostringstream<char> & );
 
 protected:
     virtual void deadAction( QuestPointer, PCMemoryInterface *, Character * );

@@ -45,7 +45,7 @@ void stop_fighting( Character *ch, bool fBoth )
 
             if (IS_AFFECTED(fch, AFF_SLEEP)) {
                 REMOVE_BIT(fch->affected_by, AFF_SLEEP);
-                affect_bit_strip(fch, TO_AFFECTS, AFF_SLEEP);
+                affect_bit_strip(fch, &affect_flags, AFF_SLEEP);
             }
 
             update_pos( fch );
@@ -92,7 +92,7 @@ void set_fighting( Character *ch, Character *victim )
     
     if (IS_AFFECTED(ch, AFF_SLEEP)) {
         REMOVE_BIT(ch->affected_by, AFF_SLEEP);
-        affect_bit_strip(ch, TO_AFFECTS, AFF_SLEEP);
+        affect_bit_strip(ch, &affect_flags, AFF_SLEEP);
     }
     
     if (dismount_attacked( ch ))
@@ -168,7 +168,7 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
                 (IS_VIOLENT(victim) ? "повторно" : ""),
                 (victim->is_mirror( ) ? "зеркало" : ""),
                 victim,
-                ch->in_room->name,
+                ch->in_room->getName(),
                 ch->in_room->vnum );
     
     set_violent( ch );

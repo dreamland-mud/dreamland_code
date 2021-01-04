@@ -75,7 +75,7 @@ XMLEditor::ToXMLState::marksToXML(XMLNode::Pointer& parent)
     for(i = ed.marks.begin(); i != ed.marks.end(); i++) {
         XMLNode::Pointer nmark( NEW, "mark" );
         iposToXML(nmark, i->second.data);
-        nmark->insertAttribute("name", i->first);
+        nmark->insertAttribute("name", (int)i->first);
         node->appendChild( nmark );
     }
     parent->appendChild( node );
@@ -459,7 +459,7 @@ XMLEditorRegisters::toXML(XMLNode::Pointer &parent) const
     for(i = begin(); i != end(); i++) {
         XMLNode::Pointer nreg( NEW, "reg" );
         nreg->setType( XMLNode::XML_NODE );
-        nreg->insertAttribute("name", i->first);
+        nreg->insertAttribute("name", (int)i->first);
 
         ostringstream ostr;
         reg_t::const_iterator li;

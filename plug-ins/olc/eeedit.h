@@ -18,7 +18,7 @@ public:
     typedef ::Pointer<OLCStateExtraExit> Pointer;
     
     OLCStateExtraExit( );
-    OLCStateExtraExit( Room *, const DLString &name );
+    OLCStateExtraExit( RoomIndexData *, const DLString &name );
     virtual ~OLCStateExtraExit( );
 
     virtual void commit( );

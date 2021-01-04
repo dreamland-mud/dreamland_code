@@ -36,6 +36,7 @@
 #include "onehit.h"
 #include "onehit_weapon.h"
 #include "damage_impl.h"
+#include "weapongenerator.h"
 #include "vnum.h"
 #include "merc.h"
 #include "act.h"
@@ -135,13 +136,9 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
         return;
   }
 
-  af.where                = TO_AFFECTS;
   af.type      = sn;
   af.level     = level;
   af.duration  = 10;
-  af.modifier  = 0;
-  af.location  = 0;
-  af.bitvector = 0;
   affect_to_char(victim,&af);
 
   act_p("$C1 теперь ничего не слышит!",ch,0,victim,TO_CHAR,POS_RESTING);
@@ -250,39 +247,6 @@ ShadowBlade::ShadowBlade( )
 { 
 }
 
-struct blade_param {
-    int min_level;
-    int value1, value2;
-    int min_hr, min_dr;
-    int max_hr, max_dr;
-};
-
-static const struct blade_param  blade_params [] = 
-{
-//    lvl   v1   v2     min hr/dr    max hr/dr
-    { 30,   6,   6,     4,  4,       10, 10,   }, 
-    { 40,   7,   7,     5,  5,       11, 11,   },
-    { 50,   8,   8,     6,  6,       12, 12,   },
-    { 60,   9,   10,    7,  7,       13, 13,   },
-    { 70,   10,  10,    8,  8,       16, 16,   },
-    { 75,   10,  11,    8,  8,       17, 17,   },
-    { 80,   10,  11,    9,  9,       18, 18,   },
-    { 85,   11,  12,    9,  9,       19, 19,   },
-    { 90,   12,  12,    10, 10,      21, 21,   },
-    { 95,   12,  13,    11, 11,      23, 23,   },
-    { 0 },
-};
-
-static const struct blade_param * find_blade_param( int lvl )
-{
-    int i;
-    for (i = 0; blade_params[i+1].min_level; i++) 
-        if (blade_params[i+1].min_level >= lvl)
-            break;
-    
-    return &blade_params[i];
-}
-
 void ShadowBlade::fight( Character *ch )
 {
     int level;
@@ -300,37 +264,43 @@ void ShadowBlade::fight( Character *ch )
         int coef = 100 - bonus;
         int vhp = (victim->hit * coef) / max( 1, (int)victim->max_hit );
         
-        if (number_percent( ) > vhp && ++castCnt >= 100) {
-            const struct blade_param *p = find_blade_param( level );
-            Affect *paf;
-            int oldMod;
-            
+        if (number_percent( ) > vhp && ++castCnt >= 50) {
             castCnt = 0;
             
             if (++castChance > 80)
                 castChance = 80;
-            
-            if (obj->affected && ( paf = obj->affected->affect_find( gsn_shadowblade ) )) {
-                oldMod = paf->modifier;
-                paf->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
-                ch->hitroll += paf->modifier - oldMod;
 
-                if (paf->next != 0 && paf->next->type == gsn_shadowblade) {
-                    oldMod = paf->next->modifier;
-                    paf->next->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
-                    ch->damroll += paf->next->modifier - oldMod;
-                }
-            }
-            
-            obj->value1(std::max( obj->value1(), p->value1 ));
-            obj->value2(std::max( obj->value2(), p->value2 ));
             obj->level = ch->getModifyLevel( );
+            WeaponGenerator()
+                .item(obj)
+                .skill(gsn_shadowblade)
+                .valueTier(2)
+                .hitrollTier(3)
+                .damrollTier(1)
+                .hitrollMinStartValue(3)
+                .damrollMinStartValue(4)
+                .hitrollStartPenalty(0.5)
+                .damrollStartPenalty(0.5)
+                .assignValues()
+                .incrementHitroll()
+                .incrementDamroll();
+
             act("{cСлабое {Cсияние{c окутывает $o4.{x", ch, obj, 0, TO_CHAR);
         }
     }
     
     if (number_percent( ) > castChance)
         return;
+
+    if (int chance = gsn_improved_maladiction->getEffective( ch ))
+    {
+        if (number_percent( ) < chance) {
+            level += chance / 20;
+            gsn_improved_maladiction->improve( ch, true );
+        }
+        else
+            gsn_improved_maladiction->improve( ch, false );
+    }    
 
     switch (number_range( 1, 4 )) {
     case 1:
@@ -357,7 +327,7 @@ void ShadowBlade::fight( Character *ch )
     case 4:
         ch->pecho("{D%1$O1 вспыхива%1$nет|ют {xмертвенно-бледным{D светом.{x", obj );
         ch->recho("%1$^O1 %2$C2 вспыхива%1$nет|ют мертвенно-бледным светом.", obj, ch );
-        spell( gsn_energy_drain, level + 2, ch, victim, FSPELL_BANE );        
+        spell_nocatch( gsn_energy_drain, level + 2, ch, victim, FSPELL_BANE );
         break;
     }
 }
@@ -454,17 +424,17 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
         return;
     }
 
-    af.where            = TO_WEAPON;
+    af.bitvector.setTable(&weapon_type2);
     af.type             = sn;
     af.level            = level / 2;
     af.duration         = level / 5;
-    af.location         = 0;
+    
     af.modifier         = 0;
-    af.bitvector        = WEAPON_FADING;
+    af.bitvector.setValue(WEAPON_FADING);
     affect_to_obj( blade, &af );
 
     act( "Ты посвящаешь $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_CHAR );
-    act( "$c1 посвящаешь $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
+    act( "$c1 посвящает $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
 }
 
 /*
@@ -516,12 +486,10 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
 SPELL_DECL(ShadowBlade);
 VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level ) 
 {
-    Affect af;
     int cnt;
     Object *obj, *blade;
     OBJ_INDEX_DATA *pObjIndex;
     ShadowBlade::Pointer bhv;
-    const struct blade_param *param;
 
     for (cnt = 0, obj = object_list; obj; obj = obj->next)
         if (obj->behavior) {
@@ -548,25 +516,21 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     blade->level = ch->getModifyLevel( );
     bhv = blade->behavior.getDynamicPointer<ShadowBlade>( );
     bhv->owner = ch->getName( );
-    
-    param = find_blade_param( ch->getModifyLevel( ) );
-    blade->value1(param->value1);
-    blade->value2(param->value2);
 
-    af.where = TO_OBJECT;
-    af.type = sn;
-    af.level = level;
-    af.duration = -1;
-    af.bitvector = 0;
+    WeaponGenerator()
+        .item(blade)
+        .skill(gsn_shadowblade)
+        .valueTier(2)
+        .hitrollTier(3)
+        .damrollTier(1)
+        .hitrollMinStartValue(3)
+        .damrollMinStartValue(4)
+        .hitrollStartPenalty(0.5)
+        .damrollStartPenalty(0.5)
+        .assignValues()
+        .assignStartingHitroll()
+        .assignStartingDamroll();
 
-    af.location = APPLY_HITROLL;
-    af.modifier = param->min_hr;
-    affect_to_obj( blade, &af );
-
-    af.location = APPLY_DAMROLL;
-    af.modifier = param->min_dr;
-    affect_to_obj( blade, &af );
-    
     obj_to_char( blade, ch );
 
     act( "Ты создаешь $o4!", ch, blade, NULL, TO_CHAR );
@@ -592,7 +556,7 @@ void AntipaladinGuildmaster::give( Character *victim, Object *obj )
         say_act( victim, ch, "Над этим клинком уже совершили защитный ритуал." );
     }
     else if (victim->is_npc( ) || victim->getPC( )->getQuestPoints() < price) {
-        say_act( victim, ch, "У тебя не хватит qp для оплаты ритуала." );
+        say_act( victim, ch, "У тебя не хватает квестовых очков для оплаты ритуала." );
     }
     else {
         victim->getPC( )->addQuestPoints(-price);
@@ -629,13 +593,13 @@ VOID_SPELL(PowerWordStun)::run( Character *ch, Character *victim, int sn, int le
             return;
         }
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level     = level;
         af.duration  = level / 50;
-        af.location  = APPLY_DEX;
+        af.location = APPLY_DEX;
         af.modifier  = -level / 25;
-        af.bitvector = AFF_STUN;
+        af.bitvector.setValue(AFF_STUN);
         affect_to_char( victim, &af );
 
         act("{r$c1 оглуше$gно|н|на{x.",victim, 0, 0,TO_ROOM);

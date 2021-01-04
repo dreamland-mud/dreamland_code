@@ -81,7 +81,7 @@ public:
 
 public:
     MOB_INDEX_DATA *        pIndexData;
-    AREA_DATA *                zone;
+    AreaIndexData *                zone;
     /** Room VNUM where this mob was reset. */
     int reset_room;
     

@@ -25,7 +25,7 @@ public:
 
     inline virtual SkillGroupReference & getGroup( );
 
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
@@ -34,7 +34,7 @@ public:
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 
-    virtual void show( PCharacter *, std::ostream & ); 
+    virtual void show( PCharacter *, std::ostream & ) const; 
 
     virtual const DLString & getCategory( ) const
     {
@@ -44,7 +44,7 @@ public:
 protected:
     static const DLString CATEGORY;                                             
 
-    const SkillRaceInfo *getRaceInfo( Character * ) const;
+    const SkillRaceInfo *getRaceInfo( CharacterMemoryInterface * ) const;
     
     XML_VARIABLE XMLSkillGroupReference group;
     XML_VARIABLE MobSkillData mob;

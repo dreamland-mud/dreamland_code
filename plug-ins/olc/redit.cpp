@@ -27,7 +27,7 @@
 #include "interp.h"
 #include "clanreference.h"
 #include "profession.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act_move.h"
 #include "update_areas.h"
 #include "websocketrpc.h"
@@ -42,7 +42,7 @@
 
 #include "def.h"
 
-#define EDIT_ROOM(Ch, Room)     ( Room = Ch->in_room )
+#define EDIT_ROOM(Ch, Room)     ( Room = Ch->in_room->pIndexData )
 
 CLAN(none);
 LIQ(none);
@@ -51,12 +51,14 @@ LIQ(water);
 OLC_STATE(OLCStateRoom);
 
 void
-OLCStateRoom::attach(PCharacter *ch, Room *pRoom)
+OLCStateRoom::attach(PCharacter *ch, RoomIndexData *pRoom)
 {
     originalRoom.setValue( ch->in_room->vnum );
+    room.setValue(pRoom->vnum);
     
-    if (ch->in_room != pRoom)
-        transfer_char( ch, ch, pRoom );
+    // FIXME transfer to default instance
+    if (ch->in_room->pIndexData != pRoom)
+        transfer_char( ch, ch, pRoom->room );
 
     OLCState::attach(ch);
 }
@@ -66,7 +68,7 @@ OLCStateRoom::detach(PCharacter *ch)
 {
     Room *pRoom;
 
-    pRoom = get_room_index(originalRoom.getValue( ));
+    pRoom = get_room_instance(originalRoom.getValue( ));
 
     if(!pRoom)
         return;
@@ -79,7 +81,11 @@ OLCStateRoom::detach(PCharacter *ch)
 void 
 OLCStateRoom::commit( )
 {
-    /*we are stateliess - no commit*/
+    RoomIndexData *pRoom = get_room_index(room);
+    // FIXME: update all instances.
+    if (pRoom && pRoom->room) {
+        pRoom->room->room_flags = pRoom->room_flags;
+    }
 }
 
 void
@@ -91,7 +97,7 @@ OLCStateRoom::statePrompt( Descriptor *d )
 void
 OLCStateRoom::changed( PCharacter *ch )
 {
-    SET_BIT(ch->in_room->area->area_flag, AREA_CHANGED);
+    SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
 }
 
 /*-------------------------------------------------------------------------
@@ -99,18 +105,19 @@ OLCStateRoom::changed( PCharacter *ch )
  *-------------------------------------------------------------------------*/
 REDIT(flags, "флаги", "установить или сбросить флаги комнаты (? room_flags)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     EDIT_ROOM(ch, pRoom);
     return flagBitsEdit(room_flags, pRoom->room_flags);
 }
 
 REDIT(sector, "местность", "установить тип местности (? sector_table)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     EDIT_ROOM(ch, pRoom);
 
     if (flagValueEdit(sector_table, pRoom->sector_type)) {
-        if (IS_WATER(pRoom) && pRoom->liquid == liq_none)
+        if ((pRoom->sector_type == SECT_WATER_NOSWIM || pRoom->sector_type == SECT_WATER_SWIM)
+            && pRoom->liquid == liq_none)
             pRoom->liquid = liq_water;
         return true;
     }
@@ -120,23 +127,22 @@ REDIT(sector, "местность", "установить тип местнос�
 
 REDIT(rlist, "ксписок", "список всех комнат в данной арии")
 {
-    Room *pRoomIndex;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     ostringstream buf;
     char arg[MAX_INPUT_LENGTH];
     int col = 0;
 
     one_argument(argument, arg);
 
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
 
-    if (pArea->rooms.empty( )) {
+    if (pArea->roomIndexes.empty( )) {
         stc("Комната(комнаты) в этой арии не обнаружены.\n\r", ch);
         return false;
     }
 
-    for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++) {
-        pRoomIndex = i->second;
+    for (auto &i: pArea->roomIndexes) {
+        RoomIndexData *pRoomIndex = i.second;
 
         buf << fmt( 0, "[%7d] %-17.17s",
                        pRoomIndex->vnum,
@@ -156,7 +162,7 @@ REDIT(rlist, "ксписок", "список всех комнат в данно
 REDIT(mlist, "мсписок", "список всех мобов в данной арии, по имени или all")
 {
     MOB_INDEX_DATA *pMobIndex;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     ostringstream buf1;
     char arg[MAX_INPUT_LENGTH];
     bool fAll, found;
@@ -169,7 +175,7 @@ REDIT(mlist, "мсписок", "список всех мобов в данной
     }
 
     one_argument(argument, arg);
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
     fAll = !str_cmp(arg, "all");
     found = false;
 
@@ -200,7 +206,7 @@ REDIT(mlist, "мсписок", "список всех мобов в данной
 REDIT(olist, "псписок", "список всех предметов в данной арии, по имени, типу или all")
 {
     OBJ_INDEX_DATA *pObjIndex;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     ostringstream buf1;
     char arg[MAX_INPUT_LENGTH];
     bool fAll, found;
@@ -213,7 +219,7 @@ REDIT(olist, "псписок", "список всех предметов в да
     }
 
     one_argument(argument, arg);
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
     fAll = !str_cmp(arg, "all");
     found = false;
 
@@ -245,7 +251,7 @@ REDIT(olist, "псписок", "список всех предметов в да
 }
 
 void
-OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
+OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
 {
     Object *obj;
     Character *rch;
@@ -257,7 +263,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
 
     ptc(ch, "Name:       [{W%s{x] %s\n\rArea:       [{W%5d{x] %s\n\r",
               pRoom->name, web_edit_button(showWeb, ch, "name", "web").c_str(),
-              pRoom->area->vnum, pRoom->area->name);
+              pRoom->areaIndex->vnum, pRoom->areaIndex->name);
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
     ptc(ch, "Clan:       [{W%s{x] ", pRoom->clan->getName( ).c_str( ));
     ptc(ch, "Guilds: [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
@@ -268,7 +274,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
     ptc(ch, "Flags:      [{W%s{x] {D(? room_flags){x\n\r",
               room_flags.names(pRoom->room_flags).c_str());
     ptc(ch, "Health:     [{W%d{x]%%\n\rMana:       [{W%d{x]%%\n\r",
-              pRoom->heal_rate_default, pRoom->mana_rate_default);
+              pRoom->heal_rate, pRoom->mana_rate);
     
     if (!pRoom->properties.empty( )) {
         ptc(ch, "Properties: {D(property){x\n\r");
@@ -286,11 +292,9 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
         stc("{D(ed help){x\n\r", ch);
     }
 
-    if (pRoom->extra_exit) {
-        EXTRA_EXIT_DATA *eed;
-
+    if (!pRoom->extra_exits.empty()) {
         stc("Extra exits: {D(eexit help){x\r\n            ", ch);
-        for(eed = pRoom->extra_exit; eed; eed = eed->next) {
+        for(auto &eed: pRoom->extra_exits) {
             ptc(ch, "[%s] %s ", eed->keyword, web_edit_button(showWeb, ch, "eexit set", eed->keyword).c_str());
         }
         stc("{x\n\r", ch);
@@ -298,7 +302,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
     
     stc("Characters: [{W", ch);
     fcnt = false;
-    for (rch = pRoom->people; rch; rch = rch->next_in_room) {
+    for (rch = pRoom->room->people; rch; rch = rch->next_in_room) {
         DLString names = rch->getNameP();
         ptc(ch, "%s ", names.getOneArgument().c_str());
         fcnt = true;
@@ -311,7 +315,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
 
     stc("Objects:    [{W", ch);
     fcnt = false;
-    for (obj = pRoom->contents; obj; obj = obj->next_content) {
+    for (obj = pRoom->room->contents; obj; obj = obj->next_content) {
         ptc(ch, "%s ", obj->getFirstName().c_str());
         fcnt = true;
     }
@@ -327,10 +331,12 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
         EXIT_DATA *pexit;
 
         if ((pexit = pRoom->exit[door])) {
+            Room *to_room = get_room_instance(pexit->u1.vnum);
+
             ptc(ch, "-{G%-5s{x ->   [{W%5u{x] %s\n\r",
                       DLString(dirs[door].name).capitalize( ).c_str( ),
-                      pexit->u1.to_room ? pexit->u1.to_room->vnum : 0,
-                      pexit->u1.to_room ? pexit->u1.to_room->name : "");
+                      to_room ? to_room->vnum : 0,
+                      to_room ? to_room->getName() : "");
 
             if(pexit->key > 0)
                 ptc(ch, "            Key: [{W%7u{x]\n\r", pexit->key);
@@ -358,7 +364,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
     if (pRoom->behavior) {
         try {
             std::basic_ostringstream<char> ostr;
-            pRoom->behavior.toStream( ostr );
+            pRoom->behavior->save( ostr );
             ptc(ch, "Behavior:\r\n{W%s{x\r\n", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
@@ -372,7 +378,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
 
 REDIT(show, "показать", "показать все поля")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     EDIT_ROOM(ch, pRoom);
 
     show(ch, pRoom, true);
@@ -382,7 +388,7 @@ REDIT(show, "показать", "показать все поля")
 
 REDIT(fenia, "феня", "редактирование триггеров")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     EDIT_ROOM(ch, pRoom);
     XMLRoomIndexData room(pRoom);
 
@@ -390,44 +396,83 @@ REDIT(fenia, "феня", "редактирование триггеров")
     return false;
 }
 
-bool 
-OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
+void OLCStateRoom::delete_exit(RoomIndexData *pRoom, int door)
 {
-    Room *pRoom, *pToRoom;
+    // FIXME rework to delete all instances.
+    if (pRoom->exit[door]) {
+        free_exit(pRoom->exit[door]);
+        pRoom->exit[door] = NULL;
+    }
+
+    if (pRoom->room->exit[door]) {
+        free_exit(pRoom->room->exit[door]);
+        pRoom->room->exit[door] = NULL;
+    }
+}
+
+void OLCStateRoom::create_exit(RoomIndexData *sourceIndex, int door, RoomIndexData *destIndex)
+{
+    // FIXME rework to link all instances.
+    if (!sourceIndex->exit[door]) {
+        sourceIndex->exit[door] = new_exit();
+        sourceIndex->room->exit[door] = new_exit();
+    }
+
+    sourceIndex->exit[door]->u1.vnum = destIndex->vnum;
+    sourceIndex->exit[door]->orig_door = door;
+    sourceIndex->room->exit[door]->u1.to_room = destIndex->room;
+    sourceIndex->room->exit[door]->orig_door = door;
+}
+
+void OLCStateRoom::default_door_names(PCharacter *ch, int door)
+{
+    RoomIndexData *pRoom;
+
+    EDIT_ROOM(ch, pRoom);
+
+    if (!pRoom->exit[door]->keyword || !pRoom->exit[door]->keyword[0])
+        change_exit(ch, "name 'door дверь'", door);   
+
+    if (!pRoom->exit[door]->short_descr || !pRoom->exit[door]->short_descr[0])
+        change_exit(ch, "short двер|ь|и|и|ь|ью|и", door);
+}
+
+bool 
+OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
+{
+    // FIXME think of approach to change index data and instance exits at the same time.
+    RoomIndexData *pRoom;
+    Room *to_room;
     char command[MAX_INPUT_LENGTH];
+    char argumentBuf[MAX_INPUT_LENGTH];
     char arg[MAX_INPUT_LENGTH];
+    char *argument;
     bitstring_t value;
 
     EDIT_ROOM(ch, pRoom);
+    strcpy(argumentBuf, cargument);
+    argument = argumentBuf;
 
     // Set the exit flags, needs full argument.
     // ----------------------------------------
     if ((value = exit_flags.bitstring( argument )) != NO_FLAG) {
-        //Room *pToRoom;
-        //int rev;
-
         if (!pRoom->exit[door]) {
             stc("Здесь нет двери.\n\r", ch);
             return false;
         }
 
-        // This room.
         TOGGLE_BIT(pRoom->exit[door]->exit_info_default, value);
+        TOGGLE_BIT(pRoom->room->exit[door]->exit_info_default, value);
+
         // Don't toggle exit_info because it can be changed by players.
         pRoom->exit[door]->exit_info = pRoom->exit[door]->exit_info_default;
+        pRoom->room->exit[door]->exit_info = pRoom->room->exit[door]->exit_info_default;
 
-        /*
-        // Connected room.
-        pToRoom = pRoom->exit[door]->u1.to_room;
-        rev = dirs[door].rev;
+        ptc(ch, "Exit flags set to {g%s{x.\n\r", exit_flags.names(pRoom->exit[door]->exit_info_default).c_str());
 
-        if (pToRoom->exit[rev] != NULL) {
-            TOGGLE_BIT(pToRoom->exit[rev]->exit_info_default, value);
-            TOGGLE_BIT(pToRoom->exit[rev]->exit_info, value);
-        }
-        */
+        if (IS_SET(pRoom->exit[door]->exit_info_default, EX_ISDOOR))
+            default_door_names(ch, door);
 
-        stc("Exit flag toggled.\n\r", ch);
         return true;
     }
 
@@ -442,64 +487,107 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 
     if (arg_is_help(command)) {
         const char *name = dirs[door].name;
-        ptc(ch, "Syntax:\r\n%s delete         - удалить выход с обеих сторон\r\n", name);
+        ptc(ch, "Syntax:\r\n%s <флаги>        - установить флаги выхода ({y{hcolchelp exit{x)\r\n", name);
+        ptc(ch, "%s delete         - удалить выход с обеих сторон\r\n", name);
         ptc(ch, "%s unlink         - удалить выход только с этой стороны\r\n", name);
         ptc(ch, "%s link <vnum>    - создать двусторонний выход в указанную комнату\r\n", name);
         ptc(ch, "%s room <vnum>    - создать односторонний выход в указанную комнату\r\n", name);
         ptc(ch, "%s dig <vnum>     - вырыть новую комнату %s, с внумом vnum\r\n", name, dirs[door].leave);
         ptc(ch, "%s dig next       - вырыть новую комнату %s, со следующим свободным внумом\r\n", name, dirs[door].leave);
-        ptc(ch, "%s key <vnum>     - установить ключ для двери\r\n", name);
+        ptc(ch, "%s key <vnum>     - установить ключ, флаги и имена дверей по умолчанию\r\n", name);
         ptc(ch, "%s name <string>  - задать ключевые слова для двери\r\n", name);        
         ptc(ch, "%s short <string> - задать название для двери с падежами\r\n", name);        
         ptc(ch, "%s desc           - войти в редактор описания того, что видно по look <dir>\r\n", name);        
+        ptc(ch, "%s copy           - скопировать флаги,имена,ключ на дверь с другой стороны\r\n", name);
         return false;
     }
 
     if (!str_cmp(command, "delete")) {
         int rev;
 
-        if (!pRoom->exit[door]) {
+        if (!pRoom->exit[door] || !pRoom->room->exit[door]) {
             stc("REdit:  Cannot delete a null exit.\n\r", ch);
             return false;
         }
 
         // Remove ToRoom Exit.
         rev = dirs[door].rev;
-        pToRoom = pRoom->exit[door]->u1.to_room;
+        to_room = pRoom->room->exit[door]->u1.to_room;
 
-        if (pToRoom->exit[rev] && pToRoom->exit[rev]->u1.to_room == pRoom) {
-            free_exit(pToRoom->exit[rev]);
-            pToRoom->exit[rev] = NULL;
+        if (to_room->exit[rev] && to_room->exit[rev]->u1.to_room == pRoom->room) {
+            delete_exit(to_room->pIndexData, rev);
             
-            if(pRoom->area != pToRoom->area)
-                SET_BIT(pToRoom->area->area_flag, AREA_CHANGED);
+            if (pRoom->areaIndex != to_room->areaIndex()) // FIXME instances
+                SET_BIT(to_room->areaIndex()->area_flag, AREA_CHANGED);
             stc("Exit unlinked from remote side.\n\r", ch);
         }
 
         // Remove this exit.
-        free_exit(pRoom->exit[door]);
-        pRoom->exit[door] = NULL;
+        delete_exit(pRoom, door);
 
         stc("Exit unlinked.\n\r", ch);
         return true;
     }
 
-    if (!str_cmp(command, "unlink")) {
+    if (!str_cmp(command, "copy")) {
+        int rev;
+
         if (!pRoom->exit[door]) {
+            stc("REdit: Cannot copy a null exit.\n\r", ch);
+            return false;
+        }
+
+        rev = dirs[door].rev;
+        to_room = pRoom->room->exit[door]->u1.to_room;
+        if (!to_room || !to_room->exit[rev] || to_room->exit[rev]->u1.to_room != pRoom->room) {
+            stc("Выхода с другой стороны не существует, либо он не ведет обратно в эту комнату.\r\n", ch);
+            return false;
+        }
+
+        EXIT_DATA *src = pRoom->exit[door];
+        EXIT_DATA *srci = pRoom->room->exit[door];
+        EXIT_DATA *dst = to_room->pIndexData->exit[rev];
+        EXIT_DATA *dsti = to_room->exit[rev];
+
+        dst->exit_info_default = src->exit_info_default;
+        dst->exit_info = dst->exit_info_default;
+        dsti->exit_info_default = srci->exit_info_default;
+        dsti->exit_info = dsti->exit_info_default;
+
+        free_string(dst->keyword);
+        dst->keyword = str_dup(src->keyword);
+        free_string(dsti->keyword);
+        dsti->keyword = str_dup(srci->keyword);
+
+        free_string(dst->short_descr);
+        dst->short_descr = str_dup(src->short_descr);
+        free_string(dsti->short_descr);
+        dsti->short_descr = str_dup(srci->short_descr);
+
+        dst->key = dsti->key = src->key;
+
+        ptc(ch, "У выхода на {g%s{x в комнате [{W%d{x] {W%s{x установлены:\r\n", dirs[rev].name, to_room->vnum, to_room->getName());
+        ptc(ch, "    флаги выхода: {g%s{x\r\n", exit_flags.names(dst->exit_info_default).c_str());
+        ptc(ch, "    имена: '{g%s{x', '{g%s{x'\r\n", dst->keyword, dst->short_descr);
+        ptc(ch, "    ключ: {W%d{x\r\n", dst->key);
+        return true;
+    }   
+
+    if (!str_cmp(command, "unlink")) {
+        if (!pRoom->exit[door] || !pRoom->room->exit[door]) {
             stc("REdit:  Cannot delete a null exit.\n\r", ch);
             return false;
         }
 
         // Remove this exit.
-        free_exit(pRoom->exit[door]);
-        pRoom->exit[door] = NULL;
+        delete_exit(pRoom, door);
 
         stc("Exit unlinked.\n\r", ch);
         return true;
     }
 
     if (!str_cmp(command, "link")) {
-        EXIT_DATA *pExit;
+        RoomIndexData *pRemoteRoom;
 
         if (arg[0] == '\0' || !is_number(arg)) {
             stc("Syntax:  [direction] link [vnum]\n\r", ch);
@@ -507,9 +595,10 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         }
 
         value = atoi(arg);
+        pRemoteRoom = get_room_index(value);
 
-        if (!get_room_index(value)) {
-            stc("REdit:  Cannot link to non-existant room.\n\r", ch);
+        if (!pRemoteRoom) {
+            stc("REdit:  Cannot link to non-existent room.\n\r", ch);
             return false;
         }
 
@@ -518,26 +607,17 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             return false;
         }
 
-        if (get_room_index(value)->exit[dirs[door].rev]) {
+        if (pRemoteRoom->exit[dirs[door].rev]) {
             stc("REdit:  Remote side's exit already exists.\n\r", ch);
             return false;
         }
 
-        if (!pRoom->exit[door]) {
-            pRoom->exit[door] = new_exit();
-        }
-
-        pToRoom = pRoom->exit[door]->u1.to_room = get_room_index(value);
-        pRoom->exit[door]->orig_door = door;
-
+        create_exit(pRoom, door, pRemoteRoom);
         door = dirs[door].rev;
-        pExit = new_exit();
-        pExit->u1.to_room = pRoom;
-        pExit->orig_door = door;
-        pToRoom->exit[door] = pExit;
+        create_exit(pRemoteRoom, door, pRoom);
 
-        if(pRoom->area != pToRoom->area)
-            SET_BIT(pToRoom->area->area_flag, AREA_CHANGED);
+        if (pRoom->areaIndex != pRemoteRoom->areaIndex) // FIXME instances
+            SET_BIT(pRemoteRoom->areaIndex->area_flag, AREA_CHANGED);
 
         stc("Two-way link established.\n\r", ch);
         return true;
@@ -551,7 +631,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             return false;
         }
 
-        Room *newRoom = redit_create(ch, arg);
+        RoomIndexData *newRoom = redit_create(ch, arg);
         if(!newRoom)
             return false;
     
@@ -561,31 +641,31 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
     }
 
     if (!str_cmp(command, "room")) {
+        RoomIndexData *pRemoteRoom;
+
         if (arg[0] == '\0' || !is_number(arg)) {
             stc("Syntax:  [direction] room [vnum]\n\r", ch);
             return false;
         }
 
         value = atoi(arg);
+        pRemoteRoom = get_room_index(value);
 
-        if (!get_room_index(value)) {
-            stc("REdit:  Cannot link to non-existant room.\n\r", ch);
+        if (!pRemoteRoom) {
+            stc("REdit:  Cannot link to non-existent room.\n\r", ch);
             return false;
         }
 
-        if (!pRoom->exit[door])
-            pRoom->exit[door] = new_exit();
-
-        pRoom->exit[door]->u1.to_room = get_room_index(value);
-        pRoom->exit[door]->orig_door = door;
+        create_exit(pRoom, door, pRemoteRoom);
 
         stc("One-way link established.\n\r", ch);
         return true;
     }
 
     if (!str_cmp(command, "key")) {
-        if (arg[0] == '\0' || !is_number(arg)) {
+        if (arg[0] == '\0' || (!is_number(arg) && !arg_is_clear(arg))) {
             stc("Syntax:  [direction] key [vnum]\n\r", ch);
+            stc("         [direction] key clear\n\r", ch);
             return false;
         }
 
@@ -594,21 +674,51 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             return false;
         }
 
-        value = atoi(arg);
+        if (arg_is_clear(arg)) {
+            if (pRoom->exit[door]->key <= 0) {
+                stc("У этой двери и так нет ключа.\r\n", ch);
+                return false;
+            }
 
-        if (!get_obj_index(value)) {
+            pRoom->exit[door]->key = 0;
+            pRoom->room->exit[door]->key = 0;
+            stc("Ключ удален.\r\n", ch);
+            return true;
+        }
+
+        value = atoi(arg);
+        OBJ_INDEX_DATA *pKey = get_obj_index(value);
+
+        if (!pKey) {
             stc("REdit:  Item doesn't exist.\n\r", ch);
             return false;
         }
 
-        if (get_obj_index(atoi(argument))->item_type != ITEM_KEY) {
-            stc("REdit:  Key doesn't exist.\n\r", ch);
+        if (pKey->item_type != ITEM_KEY) {
+            ptc(ch, "Item %d [%s] is not a key.\r\n", pKey->vnum, russian_case(pKey->short_descr, '1').c_str());
             return false;
         }
 
         pRoom->exit[door]->key = value;
+        pRoom->room->exit[door]->key = value;
+        ptc(ch, "Exit key set to {W%d{x [{W%s{x].\r\n",
+            pKey->vnum, russian_case(pKey->short_descr, '1').c_str());
 
-        stc("Exit key set.\n\r", ch);
+        bitstring_t newflags = 0;
+
+        if (!IS_SET(pRoom->exit[door]->exit_info_default, EX_ISDOOR))
+            SET_BIT(newflags, EX_ISDOOR);
+        
+        if (!IS_SET(pRoom->exit[door]->exit_info_default, EX_CLOSED))
+            SET_BIT(newflags, EX_CLOSED);
+        
+        if (!IS_SET(pRoom->exit[door]->exit_info_default, EX_LOCKED))
+            SET_BIT(newflags, EX_LOCKED);
+
+        if (newflags != 0)
+            change_exit(ch, exit_flags.names(newflags).c_str(), door);
+
+        default_door_names(ch, door);
         return true;
     }
 
@@ -625,8 +735,10 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 
         free_string(pRoom->exit[door]->keyword);
         pRoom->exit[door]->keyword = str_dup(arg);
+        free_string(pRoom->room->exit[door]->keyword);
+        pRoom->room->exit[door]->keyword = str_dup(arg);
 
-        stc("Exit name set.\n\r", ch);
+        ptc(ch, "Exit name set to {g%s{x.\n\r", arg);
         return true;
     }
 
@@ -643,8 +755,10 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 
         free_string(pRoom->exit[door]->short_descr);
         pRoom->exit[door]->short_descr = str_dup(arg);
+        free_string(pRoom->room->exit[door]->short_descr);
+        pRoom->room->exit[door]->short_descr = str_dup(arg);
 
-        stc("Exit short description set.\n\r", ch);
+        ptc(ch, "Exit short description set to {g%s{x.\n\r", arg);
         return true;
     }
 
@@ -656,6 +770,9 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
             }
             if(!sedit(pRoom->exit[door]->description))
                 return false;
+
+            free_string(pRoom->room->exit[door]->description);
+            pRoom->room->exit[door]->description = str_dup(pRoom->exit[door]->description);
 
             stc("REdit:  exit description set.\n\r", ch);
             return true;
@@ -669,18 +786,18 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 
 REDIT(ed, "экстра", "редактор экстра-описаний (ed help)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     EDIT_ROOM(ch, pRoom);
 
     return extraDescrEdit(pRoom->extra_descr);
 }
 
-Room *
+RoomIndexData *
 OLCStateRoom::redit_create(PCharacter *ch, char *argument)
 {
-    AREA_DATA *pArea;
-    Room *pRoom;
+    AreaIndexData *pArea;
+    RoomIndexData *pRoom;
     int value;
 
     EDIT_ROOM(ch, pRoom);
@@ -716,23 +833,17 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
         return 0;
     }
 
-    int iHash;
-
-    pRoom = new_room_index();
+    pRoom = new RoomIndexData;
     pRoom->vnum = value;
-    pRoom->area = get_vnum_area(value);
+    pRoom->areaIndex = get_vnum_area(value);
 
     if (value > top_vnum_room)
         top_vnum_room = value;
 
-    iHash = (int) value % MAX_KEY_HASH;
-    pRoom->next = room_index_hash[iHash];
-    room_index_hash[iHash] = pRoom;
+    roomIndexMap[value] = pRoom;
+    pRoom->areaIndex->roomIndexes[value] = pRoom;
 
-    pRoom->rnext = room_list;
-    room_list = pRoom;
-
-    pRoom->area->rooms[value] = pRoom;
+    pRoom->create();
 
     stc("Room created.\n\r", ch);
     return pRoom;
@@ -740,7 +851,7 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
 
 REDIT(create, "создать", "создать комнату с указанным внумом или next")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     
     pRoom = redit_create(ch, argument);
     
@@ -755,7 +866,7 @@ REDIT(create, "создать", "создать комнату с указанн
 
 REDIT(name, "имя", "установить название комнаты")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     EDIT_ROOM(ch, pRoom);
 
@@ -764,7 +875,7 @@ REDIT(name, "имя", "установить название комнаты")
 
 REDIT(clan, "клан", "установить клановую принадлежность или clear")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     Clan *clan;
 
     EDIT_ROOM(ch, pRoom);
@@ -793,9 +904,9 @@ REDIT(clan, "клан", "установить клановую принадле�
     return true;
 }
 
-REDIT(guilds, "гильдии", "установить гильдию для профессий или clear")
+REDIT(guilds, "гильдии", "установить гильдию для классов или clear")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     Profession *prof;
 
     EDIT_ROOM(ch, pRoom);
@@ -814,7 +925,7 @@ REDIT(guilds, "гильдии", "установить гильдию для пр
 
     prof = professionManager->findUnstrict( argument );
     if (!prof) {
-        stc("Guild (profession) not found.\n\r", ch);
+        stc("Guild (class) not found.\n\r", ch);
         return false;
     }
 
@@ -825,7 +936,7 @@ REDIT(guilds, "гильдии", "установить гильдию для пр
 
 REDIT(liquid, "жидкость", "установить жидкость для рек (? liquid)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
     Liquid *liq;
 
     EDIT_ROOM(ch, pRoom);
@@ -848,8 +959,7 @@ REDIT(liquid, "жидкость", "установить жидкость для 
 
 REDIT(eexit, "экстравыход", "редактор экстра-выходов (eexit help)")
 {
-    Room *pRoom;
-    EXTRA_EXIT_DATA *eed;
+    RoomIndexData *pRoom;
     char command[MAX_INPUT_LENGTH];
 
     EDIT_ROOM(ch, pRoom);
@@ -869,27 +979,14 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
         return false;
     }
 
-    if (is_name(command, "delete")) {
-        EXTRA_EXIT_DATA *pee = NULL;
-
-        for (eed = pRoom->extra_exit; eed; eed = eed->next) {
-            if (is_name(argument, eed->keyword))
-                break;
-            pee = eed;
-        }
-
-        if (!eed) {
+    if (is_name(command, "delete")) {    
+        if (!pRoom->extra_exits.findAndDestroy(argument)) {
             stc("REdit:  Extra exit keyword not found.\n\r", ch);
             return false;
         }
 
-        if (!pee)
-            pRoom->extra_exit = eed->next;
-        else
-            pee->next = eed->next;
-
-        free_extra_exit(eed);
-
+        // FIXME: need to destroy exit in all instances.
+        pRoom->room->extra_exits.findAndDestroy(argument);
         stc("Extra exit deleted.\n\r", ch);
         return true;
     }
@@ -900,7 +997,7 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
 
 REDIT(desc, "описание", "войти в редактор описания комнаты (desc help)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     EDIT_ROOM(ch, pRoom);
 
@@ -909,14 +1006,13 @@ REDIT(desc, "описание", "войти в редактор описания
 
 REDIT(heal, "здоровье", "установить скорость восстановления здоровья в комнате (100-400)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     EDIT_ROOM(ch, pRoom);
 
     if (is_number(argument)) {
         int i = atoi(argument);
-        pRoom->heal_rate += i - pRoom->heal_rate_default; 
-        pRoom->heal_rate_default = i;
+        pRoom->heal_rate = i;
         stc("Heal rate set.\n\r", ch);
         return true;
     }
@@ -927,14 +1023,13 @@ REDIT(heal, "здоровье", "установить скорость восс�
 
 REDIT(mana, "мана", "установить скорость восстановления маны в комнате (100-400)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     EDIT_ROOM(ch, pRoom);
 
     if (is_number(argument)) {
         int i = atoi(argument);
-        pRoom->mana_rate += i - pRoom->mana_rate_default; 
-        pRoom->mana_rate_default = i;
+        pRoom->mana_rate = i;
         stc("Mana rate set.\n\r", ch);
         return true;
     }
@@ -945,7 +1040,7 @@ REDIT(mana, "мана", "установить скорость восстано�
 
 REDIT(property, "свойства", "редактор свойств комнаты")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     EDIT_ROOM(ch, pRoom);
     DLString args = DLString( argument );
@@ -1043,10 +1138,10 @@ static bool redit_purge(Room *pRoom, PCharacter *ch, char *argument)
 
 REDIT(purge, "уничтожить", "очистить комнату, уничтожив сущности (purge help)")
 {
-    Room *pRoom;
+    RoomIndexData *pRoom;
 
     EDIT_ROOM(ch, pRoom);
-    redit_purge(pRoom, ch, argument);
+    redit_purge(pRoom->room, ch, argument);
     return false;
 }
 
@@ -1061,48 +1156,6 @@ REDIT(done, "готово", "выйти из редактора (не забыв
     commit();
     detach(ch);
     return true;
-}
-
-REDIT(behavior, "поведение", "войти в редактор поведения или clear (behavior help)")
-{
-    Room *pRoom;
-
-    EDIT_ROOM(ch, pRoom);
-
-    if (!*argument) {
-        XMLDocument::Pointer doc(NEW);
-
-        if (!pRoom->behavior.isEmpty()) {
-            XMLNode::Pointer node(NEW);
-            pRoom->behavior.toXML(node);
-            node->setName("behavior");
-            doc->appendChild(node);
-        }
-
-        if(!xmledit(doc))
-            return false;
-
-        if(doc->getDocumentElement()) {
-            pRoom->behavior.fromXML(doc->getDocumentElement());
-            pRoom->behavior->setRoom(pRoom);
-            stc("Поведение установлено.\r\n", ch);
-        } else {
-            stc("Пустое поведение? Используй behavior clear для очистки.\r\n", ch);
-        }
-
-        return true;
-    }
-
-    if (!str_cmp( argument, "clear" )) {
-        pRoom->behavior.clear( );
-        stc("Поведение очищено.\r\n", ch);
-        return true;
-    }
-
-    stc("Синтаксис:\r\n", ch);
-    stc("behavior       - перейти в текстовый редактор поведенияr\r\n", ch);
-    stc("behavior clear - очистить поведение\r\n", ch);
-    return false;
 }
 
 /*-------------------------------------------------------------------------
@@ -1156,12 +1209,12 @@ REDIT(down, "вниз", "редактор дверей")
 CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
         "Online room editor.")
 {
-    Room *pRoom, *pRoom2;
+    RoomIndexData *pRoom, *pRoom2;
     char arg1[MAX_STRING_LENGTH];
 
     argument = one_argument(argument, arg1);
 
-    pRoom = ch->in_room;
+    pRoom = ch->in_room->pIndexData;
 
     if (!str_cmp(arg1, "show")) {
         if(*argument && is_number(argument))
@@ -1187,7 +1240,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
             return;
         }
-        reset_room(pRoom);
+        reset_room(pRoom->room, FRESET_ALWAYS);
         
         stc("Room reset.\n\r", ch);
         return;
@@ -1199,7 +1252,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        Room *r = get_room_index(atoi(argument));
+        Room *r = get_room_instance(atoi(argument));
         if (!r) {
             stc("Комната с таким номером не найдена.\n\r", ch);
             return;
@@ -1221,7 +1274,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
         
-        redit_purge(pRoom, ch, argument);
+        redit_purge(pRoom->room, ch, argument);
         return;
 
     } else if (!str_cmp(arg1, "create")) {
@@ -1236,7 +1289,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if(!pRoom)
             return;
 
-        SET_BIT(pRoom->area->area_flag, AREA_CHANGED);
+        SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
         
     } else if(is_number(arg1)) {
         pRoom = get_room_index(atoi(arg1));

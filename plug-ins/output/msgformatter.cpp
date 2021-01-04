@@ -8,6 +8,7 @@
 #include "noun.h"
 #include "grammar_entities_impl.h"
 #include "character.h"
+#include "skill.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -253,6 +254,10 @@ again:
                 break;
             case 'S':
                 s += DLString(argStr()).getOneArgument();
+                state = 0;
+                break;
+            case 'K':
+                s += argSkill()->getNameFor(to);
                 state = 0;
                 break;
             case 'c': 

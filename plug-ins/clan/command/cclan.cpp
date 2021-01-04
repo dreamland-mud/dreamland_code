@@ -1300,10 +1300,13 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
         attr->run( victim->getPlayer( ) );
     else
         PCharacterManager::saveMemory( victim );
-
-    DLString what = fmt(0, "{W%s вступает в клан %s.{x", victim->getName().c_str(), clan.getShortName().c_str());
-    infonet(victim->getPlayer(), 0, "{CТихий голос из $o2: ", what.c_str());
-    send_discord_clan(what);
+    
+    if (victim->getLevel() <= LEVEL_MORTAL) {
+        DLString what = fmt(0, "{W%s вступает в клан %s.{x", victim->getName().c_str(), clan.getShortName().c_str());
+        infonet(victim->getPlayer(), 0, "{CТихий голос из $o2: ", what.c_str());
+        send_discord_clan(what);
+        send_telegram(what);
+    }
 }
 
 /* 

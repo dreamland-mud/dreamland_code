@@ -14,7 +14,7 @@
 #include "gqexceptions.h"
 
 class Room;
-struct area_data;
+struct AreaIndexData;
 class NPCharacter;
 class PCharacter;
 class Object;
@@ -29,7 +29,7 @@ public:
     typedef XMLVectorBase<XMLString> PieceDescriptions;
 
     virtual void canStart( ) const  = 0;
-    virtual bool checkArea( area_data * ) const;
+    virtual bool checkArea( AreaIndexData * ) const;
     virtual bool checkMobile( NPCharacter * ) const;
     virtual bool checkRoom( Room * ) const;
 

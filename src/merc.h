@@ -74,15 +74,18 @@
 #include "fenia/register-decl.h"
 #include "grammar_entities.h"
 #include "areabehavior.h"
+#include "flags.h"
+#include "enumeration.h"
 #include "mobilespecial.h"
 #include "helpmanager.h"
 #include "autoflags.h"
+#include "affectlist.h"
 
 class NPCharacter;
 class Character;
 class Object;
-class Affect;
 class Room;
+class RoomIndexData;
 class XMLDocument;
 class AreaBehavior;
 typedef ::Pointer<XMLDocument> XMLDocumentPointer;
@@ -134,7 +137,6 @@ typedef map<DLString, DLString> Properties;
 typedef struct        extra_descr_data        EXTRA_DESCR_DATA;
 typedef struct        obj_index_data                OBJ_INDEX_DATA;
 typedef struct        mob_index_data                MOB_INDEX_DATA;
-typedef struct        area_data                AREA_DATA;
 typedef struct        exit_data                EXIT_DATA;
 typedef struct        extra_exit_data        EXTRA_EXIT_DATA;
 typedef struct        kill_data                KILL_DATA;
@@ -354,7 +356,7 @@ struct        mob_index_data
     Grammar::Number     gram_number;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;
-    AREA_DATA *                area;
+    AreaIndexData *                area;
     DLString smell;
     Properties properties;
 };
@@ -379,9 +381,8 @@ typedef list<Object *> ObjectList;
 struct        obj_index_data
 {
     OBJ_INDEX_DATA *        next;
-    OBJ_INDEX_DATA *        rnext;
     EXTRA_DESCR_DATA *        extra_descr;
-    Affect *        affected;
+    AffectList        affected;
     bool                new_format;
     char *                name;
     char *                short_descr;
@@ -402,7 +403,7 @@ struct        obj_index_data
     Grammar::MultiGender gram_gender;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;
-    AREA_DATA *                area;
+    AreaIndexData *                area;
     DLString smell;
     DLString sound;
     Properties properties;
@@ -430,11 +431,20 @@ struct        exit_data
         EXIT_DATA *        next;
         int                orig_door;
         int                level;
+
+        /** Resolve u1 from a virtual number to the real room. */
+        void resolve(); 
+
+        /** Restore exit flags to their original values. */
+        void reset();
+
+        exit_data *create(); // Implemented in loadsave plugin.
 };
 
 struct        extra_exit_data
 {
-        EXTRA_EXIT_DATA *        next;
+        extra_exit_data();
+        virtual ~extra_exit_data();
         union
         {
                 Room *        to_room;
@@ -454,6 +464,14 @@ struct        extra_exit_data
         char *                description;
         char *                room_description;
         int                level;
+
+        /** Resolve u1 from a virtual number to the real room. */
+        void resolve(); 
+
+        /** Restore exit flags to their original values. */
+        void reset();
+
+        extra_exit_data *create(); // Implemented in loadsave plugin.
 };
 
 
@@ -475,48 +493,66 @@ struct        extra_exit_data
  */
 struct        reset_data
 {
-    RESET_DATA *        next;
+    reset_data();
+
     char                command;
     int                arg1;
     int                arg2;
     int                arg3;
     int                arg4;
+
+    Flags flags;
+    Enumeration rand;
+    int bestTier;
+    vector<int> vnums;
 };
-
-
 
 /*
  * Area definition.
  */
-struct        area_data
-{
-    area_data( );
-    
-    AREA_DATA *                next;
-    char *                name;
-    char *                altname;
-    char *                authors;
-    char *                credits;
-    char *              translator;
-    char *              speedwalk;
-    int                age;
-    int                nplayer;
-    int                low_range;
-    int                high_range;
-    int                 min_vnum;
-    int                max_vnum;
-    bool                empty;
-    unsigned long        count;
-    char *                resetmsg;
-    int                area_flag;
-    struct area_file *        area_file;
+struct Area;
+struct AreaIndexData {
+    AreaIndexData();
+
+    Area *create();
+
+    char *name;
+    char *altname;
+    char *authors;
+    char *credits;
+    char *translator;
+    char *speedwalk;
+    int low_range;
+    int high_range;
+    int min_vnum;
+    int max_vnum;
+    unsigned long count;
+    char *resetmsg;
+    int area_flag;
+    struct area_file *area_file;
     XMLPersistentStreamable<AreaBehavior> behavior;
     HelpArticles helps;
-    
+
     /*OLC*/
-    int                        security;
-    int                        vnum;
-    map<int, Room *>    rooms;
+    int security;
+    int vnum;
+    map<int, RoomIndexData *> roomIndexes;
+
+    Scripting::Object *wrapper;
+
+    // FIXME: support multiple named instances.
+    Area *area;
+};
+struct Area {
+    Area();
+
+    bool empty;
+    int age;
+    int nplayer;
+    int area_flag;
+    map<int, Room *> rooms;
+
+    AreaIndexData *pIndexData;
 };
 
 /*
@@ -562,21 +598,35 @@ struct        area_data
 /*
  * Global variables.
  */
-extern                AREA_DATA        *area_first;
-extern                AREA_DATA        *area_last;
-
 extern                Character          *        char_list;
 extern                Character          *        newbie_list;
 extern                Object          *        object_list;
 
 extern                AUCTION_DATA          *        auction;
-extern                Room   *        top_affected_room;
+
+typedef set<Room *> RoomSet;
+
+/** A small collection of rooms with affects on them, to avoid going through the whole list in updates. */
+extern RoomSet roomAffected;
 
 extern                KILL_DATA                kill_table        [];
 extern                TIME_INFO_DATA                time_info;
 extern                WEATHER_DATA                weather_info;
 
-extern                Room *                        room_index_hash                [];
+typedef map<int, RoomIndexData *> RoomIndexMap;
+
+/** Map of all room prototypes by vnum, for quick access. */
+extern RoomIndexMap roomIndexMap;
+
+typedef vector<Room *> RoomVector;
+extern RoomVector roomInstances;
+
+typedef vector<Area *> AreaVector;
+extern AreaVector areaInstances;
+
+typedef vector<AreaIndexData *> AreaIndexVector;
+extern AreaIndexVector areaIndexes;
+
 extern                int                        top_vnum_room;
 extern                int                        top_vnum_mob;
 extern                int                        top_vnum_obj;

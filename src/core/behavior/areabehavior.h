@@ -9,7 +9,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlpersistent.h"
 
-struct area_data;
+struct AreaIndexData;
 
 class AreaBehavior : public XMLVariableContainer {
 XML_OBJECT
@@ -19,16 +19,16 @@ public:
     AreaBehavior( );
     virtual ~AreaBehavior( );
 
-    virtual void setArea( area_data * );
+    virtual void setArea( AreaIndexData * );
     virtual void unsetArea( );
-    area_data * getArea( );
+    AreaIndexData * getArea( );
 
     inline virtual void update( ) { }
     
     static const DLString NODE_NAME;
 
 protected:
-    area_data *area;
+    AreaIndexData *area;
 };
 
 extern template class XMLStub<AreaBehavior>;

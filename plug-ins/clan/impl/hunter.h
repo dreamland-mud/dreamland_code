@@ -37,6 +37,7 @@ public:
         typedef ::Pointer<ClanHealerHunter> Pointer;
     
         void speech( Character *wch, const char *speech );
+        void tell( Character *wch, const char *speech );
 };
 
 class ClanAreaHunter: public ClanArea {
@@ -85,7 +86,6 @@ protected:
         void fight_axe( Character * );
         void fight_mace( Character * );
         void fight_sword( Character * );
-        void addAffect( Character *, Affect * );
 };
 
 class HunterArmor : public HunterEquip {

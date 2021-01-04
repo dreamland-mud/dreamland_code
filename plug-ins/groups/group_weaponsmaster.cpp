@@ -610,6 +610,7 @@ SKILL_RUNP( throwspear )
         int chance,direction;
         int range = ( ch->getModifyLevel() / 10) + 1;
         DLString argDoor, argVict;
+        ostringstream errbuf;
 
         if ( ch->is_npc() )
                 return; /* Mobs can't shoot spears */
@@ -631,8 +632,10 @@ SKILL_RUNP( throwspear )
                 return;
         }
 
-        if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
-                return;
+        if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 ) {
+            ch->send_to(errbuf);
+            return;
+        }
 
         if ( !victim->is_npc() && victim->desc == 0 )
         {
@@ -668,11 +671,13 @@ SKILL_RUNP( throwspear )
                 return;            
         }
 
+    // This limitation seems pretty arbitrary, spears can be thrown with shield/dual. Commenting for now.
+    /*
         if ( get_eq_char(ch,wear_second_wield) || get_eq_char(ch,wear_shield) )
         {
                 ch->send_to("Твоя вторая рука дожна быть свободна!\n\r");
                 return;            
-        }
+        } */
 
         ch->setWait(gsn_spear->getBeats( ) );
 

@@ -28,6 +28,7 @@ public:
     virtual const DLString & getName( ) const;
     virtual void setName( const DLString & );
     virtual bool isValid( ) const;
+    virtual bool givesAffects() const;
     virtual void loaded( );
     virtual void unloaded( );
     
@@ -49,6 +50,8 @@ public:
     virtual bool wearAtomic( Character *ch, Object *obj, int flags );
 
     virtual void display( Character *, DisplayList & );
+    virtual DLString displayLocation(Character *ch, Object *obj);
+
     virtual int canWear( Character *ch, Object *obj, int flags );
     virtual bool canWear( Character *ch, int flags );
     virtual bool canRemove( Character *ch, Object *obj, int flags );
@@ -64,6 +67,11 @@ protected:
     void triggersOnUnequip( Character *ch, Object *obj );
     
     void saveDrops( Character *ch );
+
+    virtual const DLString &getMsgSelfWear(Object *obj) const;
+    virtual const DLString &getMsgSelfRemove(Object *obj) const;
+    virtual const DLString &getMsgRoomWear(Object *obj) const;
+    virtual const DLString &getMsgRoomRemove(Object *obj) const;
 
     XML_VARIABLE XMLEnumerationNoEmpty itemType;
     XML_VARIABLE XMLFlagsNoEmpty       itemWear;

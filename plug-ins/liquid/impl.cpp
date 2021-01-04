@@ -12,7 +12,6 @@
 
 #include "defaultliquid.h"
 #include "drinkcontainer.h"
-#include "drink_commands.h"
 
 TABLE_LOADER(LiquidLoader, "liquids", "Liquid");
 
@@ -26,8 +25,6 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<DefaultLiquid> >( ppl );
         Plugin::registerPlugin<LiquidLoader>( ppl );
 
-        Plugin::registerPlugin<CPour>( ppl );
-        
         return ppl;
     }
 }

@@ -76,16 +76,12 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
     af.level         = level / 2;
     af.duration         = level / 8;
 
-    af.where         = TO_WEAPON;
-    af.location         = 0;
-    af.modifier         = 0;
-    af.bitvector = WEAPON_HOLY;
+    af.bitvector.setTable(&weapon_type2);
+    af.bitvector.setValue(WEAPON_HOLY);
     affect_to_obj( obj, &af);
 
-    af.where     = TO_OBJECT;
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL;
+    af.bitvector.setTable(&extra_flags);
+    af.bitvector.setValue(ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL);
     affect_to_obj( obj, &af );
 
     ch->pecho("Ты благословляешь %1$O4 для священной битвы.", obj);
@@ -95,7 +91,6 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
 SPELL_DECL(EnchantArmor);
 VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level ) 
 { 
-    Affect *paf;
     Affect af;
     int result, fail;
     int ac_bonus, add_ac;
@@ -128,7 +123,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     /* find the bonuses */
 
     if (!obj->enchanted)
-        for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
+        for (auto &paf: obj->pIndexData->affected)
         {
             if ( paf->location == APPLY_AC )
             {
@@ -140,7 +135,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
                     fail += 20;
             }
 
-    for ( paf = obj->affected; paf != 0; paf = paf->next )
+    for (auto &paf: obj->affected)
     {
         if ( paf->location == APPLY_AC )
           {
@@ -169,26 +164,17 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     /* the moment of truth */
     if (result < (fail / 5))  /* item destroyed */
     {
-        act("$o1 ярко вспыхивает... и испаряется!", ch,obj,0,TO_ALL);
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 ярко вспыхива%1$nет|ют и испаря%1$nется|ются.", obj );
         extract_obj(obj);
         return;
     }
 
     if (result < (fail / 3)) /* item disenchanted */
     {
-        Affect *paf_next;
-
-        act("$o1 на миг ярко вспыхивает... но затем угасает.", ch,obj,0,TO_ALL);
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют... но затем угаса%1$nет|ют.", obj );
         obj->enchanted = true;
-
         /* remove all affects */
-        for (paf = obj->affected; paf != 0; paf = paf_next)
-        {
-            paf_next = paf->next;
-            ddeallocate( paf );
-        }
-
-        obj->affected = 0;
+        obj->affected.deallocate();
 
         /* clear all flags */
         obj->extra_flags = obj->pIndexData->extra_flags;
@@ -202,7 +188,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     }
     
     if (inspire) {
-        act( "$o1 на мгновение отражает свет далеких звезд...", ch, obj, 0, TO_ALL );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на мгновение отража%1$nет|ют свет далеких звезд.", obj );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         add_ac = - number_range( 3, 5 );
     }
@@ -213,7 +199,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     }
     else  /* exceptional enchant */
     {
-        act("$o1 вспыхивает бриллиантово-золотым светом!", ch,obj,0,TO_ALL);
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют {1{Yбриллиантово-золотым{2 светом!", obj );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         add_ac = -2 * (level / 5);
     }
@@ -228,13 +214,11 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     
     affect_enchant( obj );
 
-    af.where     = TO_OBJECT;
-    af.bitvector = 0;
     af.type      = sn;
     af.level     = level;
 
     af.duration  = -1;
-    af.location  = APPLY_AC;
+    af.location = APPLY_AC;
     af.modifier  = add_ac;
     affect_enhance( obj, &af );
     
@@ -246,7 +230,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 
         if (add_hr > 0) {
             af.duration  = 200;
-            af.location  = APPLY_HITROLL;
+            af.location = APPLY_HITROLL;
             af.modifier  = add_hr;
 
             affect_enhance( obj, &af );
@@ -254,7 +238,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 
         if (add_dr > 0) {
             af.duration  = 200;
-            af.location  = APPLY_DAMROLL;
+            af.location = APPLY_DAMROLL;
             af.modifier  = add_dr;
 
             affect_enhance( obj, &af );
@@ -266,7 +250,6 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 SPELL_DECL(EnchantWeapon);
 VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level ) 
 { 
-    Affect *paf;
     Affect af;
     int result, fail;
     int hit_bonus, dam_bonus, added;
@@ -298,7 +281,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     /* find the bonuses */
 
     if (!obj->enchanted)
-            for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
+            for (auto &paf: obj->pIndexData->affected)
             {
             if ( paf->location == APPLY_HITROLL )
             {
@@ -316,7 +299,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
                     fail += 25;
             }
 
-    for ( paf = obj->affected; paf != 0; paf = paf->next )
+    for (auto &paf: obj->affected)
     {
         if ( paf->location == APPLY_HITROLL )
           {
@@ -351,7 +334,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     /* the moment of truth */
     if (result < (fail / 5))  /* item destroyed */
     {
-        act("$o1 сильно вздрагивает... и взрывается!", ch,obj,0,TO_ALL);
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 сильно вздрагива%1$nет|ют и взрыва%1$nется|ются!", obj );
         extract_obj(obj);
         return;
     }
@@ -359,18 +342,11 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
 
    if (result < (fail / 2)) /* item disenchanted */
     {
-        Affect *paf_next;
-
-        act("$o1 на миг ярко вспыхивает... но затем угасает.", ch,obj,0,TO_ALL);
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют... но затем угаса%1$nет|ют.", obj );
         obj->enchanted = true;
 
         /* remove all affects */
-        for (paf = obj->affected; paf != 0; paf = paf_next)
-        {
-            paf_next = paf->next;
-            ddeallocate( paf );
-        }
-        obj->affected = 0;
+        obj->affected.deallocate();
 
         /* clear all flags */
         obj->extra_flags = obj->pIndexData->extra_flags;
@@ -384,7 +360,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     }
     
     if (ch->isAffected( gsn_inspiration )) {
-        act( "$o1 на мгновение отражает свет далеких звезд..", ch, obj, 0, TO_ALL );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на мгновение отража%1$nет|ют свет далеких звезд.", obj );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         added = number_range( 1, 3 );
     }
@@ -395,7 +371,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     }
     else  /* exceptional enchant */
     {
-        act("$o1 загорается бриллиантово-голубым светом!", ch,obj,0,TO_ALL);
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют {1{Cбриллиантово-голубым{2 светом!", obj );        
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         added = 2;
     }
@@ -410,17 +386,15 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     
     affect_enchant( obj );
 
-    af.where     = TO_OBJECT;
-    af.bitvector = 0;
     af.type      = sn;
     af.level     = level;
     af.duration  = -1;
     af.modifier  = added;
 
-    af.location  = APPLY_DAMROLL;
+    af.location = APPLY_DAMROLL;
     affect_enhance( obj, &af );
 
-    af.location  = APPLY_HITROLL;
+    af.location = APPLY_HITROLL;
     affect_enhance( obj, &af );
 }
 
@@ -434,13 +408,11 @@ VOID_SPELL(Fireproof)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
 
-    af.where     = TO_OBJECT;
+    af.bitvector.setTable(&extra_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = number_fuzzy(level / 4);
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = ITEM_BURN_PROOF;
+    af.bitvector.setValue(ITEM_BURN_PROOF);
     affect_to_obj( obj, &af);
 
     act("Огнеупорная аура окружает $o4.",ch,obj,0,TO_ALL);
@@ -467,7 +439,7 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
         ||  IS_OBJ_STAT(obj,ITEM_DARK|ITEM_EVIL)
         ||  IS_OBJ_STAT(obj,ITEM_ANTI_GOOD) )
     {
-        act_p("Ты не можешь зажечь священный огонь в $o6.",ch,obj,0,TO_CHAR,POS_RESTING);
+        ch->send_to( "Священный огонь нельзя зажечь в темном, дьявольском или вампирическом оружии.\r\n" );
         return;
     }
     
@@ -482,25 +454,23 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     }
 
     if (chance < 0) {
-        ch->send_to( "Ничего не произошло.\r\n" );
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют яростным огнем... но затем угаса%1$nет|ют.", obj );
         return;
     }
 
     af.level     = level;
     af.duration  = level / 4;
 
-    af.where     = TO_WEAPON;
-    af.type      = number_bits(2) ? gsn_flamestrike : gsn_fireball;
-    af.location  = 0;
+    af.bitvector.setTable(&weapon_type2);
+    af.type      = number_bits(2) ? gsn_flamestrike : gsn_fireball;    
     af.modifier  = 10;
-    af.bitvector = WEAPON_SPELL;
+    af.bitvector.setValue(WEAPON_SPELL);
     affect_to_obj( obj, &af );
         
-    af.where     = TO_OBJECT;
-    af.type      = sn;
-    af.location  = APPLY_NONE;
+    af.bitvector.setTable(&extra_flags);
+    af.type      = sn;    
     af.modifier  = 0;
-    af.bitvector = ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL;
+    af.bitvector.setValue(ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL);
     affect_to_obj( obj, &af );
 
     act_p("Ты взываешь к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_CHAR, POS_RESTING);
@@ -531,7 +501,7 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
     } 
 
     if (IS_WEAPON_STAT(obj, WEAPON_VAMPIRIC)) {
-        act_p("$o1 уже жаждет чужой жизни.", ch, obj, 0, TO_CHAR, POS_RESTING );
+        act_p("$o1 уже жаждет чужой крови.", ch, obj, 0, TO_CHAR, POS_RESTING );
         return;
     }
 
@@ -545,26 +515,23 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
     if (IS_WEAPON_STAT(obj, WEAPON_FADING))        chance /= 2;
      
     if (number_percent() < chance) {    
-        af.where        = TO_WEAPON;
         af.type         = sn;
         af.level        = level / 2;
         af.duration        = level / 4;
-        af.location        = 0;
-        af.modifier        = 0;
-        af.bitvector        = WEAPON_VAMPIRIC;
+        
+        af.bitvector.setTable(&weapon_type2);
+        af.bitvector.setValue(WEAPON_VAMPIRIC);
         affect_to_obj( obj, &af);
         
-        af.where     = TO_OBJECT;
-        af.location  = APPLY_NONE;
-        af.modifier  = 0;
-        af.bitvector = ITEM_ANTI_GOOD|ITEM_ANTI_NEUTRAL;
+        af.bitvector.setTable(&extra_flags);
+        af.bitvector.setValue(ITEM_ANTI_GOOD|ITEM_ANTI_NEUTRAL);
         affect_to_obj( obj, &af );
         
-        act_p("Ты передаешь $o3 свою жажду чужой жизни...", ch, obj, 0, TO_CHAR, POS_RESTING);
+        act_p("Ты передаешь $o3 свою жажду крови.", ch, obj, 0, TO_CHAR, POS_RESTING);
         act_p("$c1 внимательно смотрит на $o4, е$gго|го|е глаза вспыхивают {rкрасным{x", ch, obj, 0, TO_ROOM, POS_RESTING);
     } 
-    else 
-        act_p("Неудача.", ch, obj, 0, TO_CHAR, POS_RESTING);
+    else
+        obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют багровым... но затем угаса%1$nет|ют.", obj );
 
 }
 
@@ -632,13 +599,13 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->value0() >= 3 * level / 2)
     {
-        ch->send_to("Тебе не хватает могущества для восстановления этих заклинаний.\n\r");
+        ch->send_to("Тебе не хватает могущества для восстановления зарядов этой вещи.\n\r");
         return;
     }
 
     if (obj->value1() == 0)
     {
-        ch->send_to("Эти заклинания больше не могут быть восстановлены.\n\r");
+        ch->send_to("Эту вещь больше не удастся зарядить.\n\r");
         return;
     }
 
@@ -654,8 +621,8 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     if (percent < chance / 2)
     {
-        act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_CHAR,POS_RESTING);
-        act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_ROOM,POS_RESTING);
+        ch->pecho( "%1$^O1 слабо вспыхива%1$nет|ют.", obj );
+        ch->recho( "%1$^O1 слабо вспыхива%1$nет|ют.", obj );
         obj->value2(max(obj->value1(),obj->value2()));
         obj->value1(0);
         return;
@@ -665,8 +632,8 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
     {
         int chargeback,chargemax;
 
-        act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_CHAR,POS_RESTING);
-        act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_CHAR,POS_RESTING);
+        ch->pecho( "%1$^O1 слабо вспыхива%1$nет|ют.", obj );
+        ch->recho( "%1$^O1 слабо вспыхива%1$nет|ют.", obj );
 
         chargemax = obj->value1() - obj->value2();
 
@@ -690,8 +657,8 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     else /* whoops! */
     {
-        act_p("$o1 ярко вспыхивает и взрывается!",ch,obj,0,TO_CHAR,POS_RESTING);
-        act_p("$o1 ярко вспыхивает и взрывается!",ch,obj,0,TO_ROOM,POS_RESTING);
+        ch->pecho( "%1$^O1 ярко вспыхива%1$nет|ют... и взрыва%1$nется|ются!", obj );
+        ch->recho( "%1$^O1 ярко вспыхива%1$nет|ют... и взрыва%1$nется|ются!", obj );
         extract_obj(obj);
     }
 
@@ -722,12 +689,12 @@ VOID_SPELL(WeaponMorph)::run( Character *ch, char *target_name, int sn, int leve
             || obj->value0() == WEAPON_ARROW
             || IS_WEAPON_STAT(obj,WEAPON_TWO_HANDS))
     {
-        ch->println("Ты не можешь создать булаву из этого оружия.");
+        ch->println("Из стрел или двуручного оружия создать булаву не удастся.");
         return;
     }
 
     if (obj->pIndexData->limit != -1) {
-        ch->println("Эта вещь - уникальна. Ты ничего не можешь сделать.");
+        ch->println("Уникальные артефакты нельзя трансформировать.");
         return;
     }
 
@@ -755,7 +722,7 @@ VOID_SPELL(WeaponMorph)::run( Character *ch, char *target_name, int sn, int leve
     obj->getRoom( )->echo( POS_RESTING, 
         "{W%1$^O1 окружа%1$nется|ются {Rярко-красной аурой{W и приобрета%1$nет|ют новую форму.{x", obj );
 
-    obj->setName( "mace булава" );
+    obj->setName( "mace большая булава" );
     obj->setShortDescr( fmt( 0, "Больш|ая|ой|ой|ую|ой|ой булав|а|ы|е|у|ой|е %C2", ch ).c_str( ) );
     obj->setDescription( fmt( 0, "Большая булава (mace) создана %C5 и забыта здесь.", ch ).c_str( ) );
     dress_created_item( sn, obj, ch, arg2 );
@@ -782,13 +749,13 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
 
-    af.where        = TO_WEAPON;
+    af.bitvector.setTable(&weapon_type2);
     af.type         = sn;
     af.level        = level / 2;
     af.duration     = level / 4;
-    af.location     = 0;
+    
     af.modifier     = 0;
-    af.bitvector    = WEAPON_FROST;
+    af.bitvector.setValue(WEAPON_FROST);
     affect_to_obj( obj, &af );
     
     act_p("Ты отдаешь $o4 во власть холода.", ch, obj, 0, TO_CHAR, POS_RESTING);

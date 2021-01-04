@@ -396,7 +396,7 @@ void Damage::inflictDamage( )
     // log damages
     if (!ch->is_immortal( ) && !ch->is_npc( ) && dam > 2000) 
         wiznet( WIZ_DAMAGES, 0, 0, "%^C1 : повреждения более 2000 : %d", ch, dam );
-    
+
     victim->hit -= dam;
     
     if (victim->is_immortal( ))
@@ -450,8 +450,12 @@ void Damage::handlePosition( )
      * Sleep spells and extremely wounded folks.
      * Don't call stop_fighting and wake up from selfdamage when you are not able to wake up
      */
-    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)) 
+    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)){ 
+        if(victim->position == POS_SLEEPING){
+            victim->println("Ты просыпаешься от внезапной боли.");
+        }
         stop_fighting( victim, false );
+    }
 }
 
 /*-----------------------------------------------------------------------------

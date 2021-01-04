@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "so.h"
 #include "mocregistrator.h"
 #include "xmlvariableregistrator.h"
@@ -12,12 +13,14 @@
 #include "defaultaffecthandler.h"
 #include "defaultskillgroup.h"
 #include "spellmanager.h"
+
 #include "summoncreaturespell.h"
 #include "transportspell.h"
 #include "sleepaffecthandler.h"
 #include "skillhelp.h"
 #include "skillgrouphelp.h"
 #include "xmlattributerestring.h"
+#include "def.h"
 
 TABLE_LOADER(SkillGroupLoader, "skill-groups", "SkillGroup");
 

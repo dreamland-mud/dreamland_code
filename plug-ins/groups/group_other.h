@@ -12,7 +12,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<ExoticSkill> Pointer;
 
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const;
     virtual int getLearned( Character *ch ) const;

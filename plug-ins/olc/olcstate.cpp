@@ -181,7 +181,7 @@ bool OLCState::can_edit( Character *ch, int vnum )
     return false;
 }
 
-bool OLCState::can_edit( Character *ch, AREA_DATA *pArea )
+bool OLCState::can_edit( Character *ch, AreaIndexData *pArea )
 {
     if (!ch->is_npc( )) {
         XMLAttributeOLC::Pointer attr;
@@ -212,11 +212,9 @@ bool OLCState::can_edit( Character *ch, AREA_DATA *pArea )
 }
 
 /* returns corresponding area pointer for mob/room/obj vnum */
-AREA_DATA *OLCState::get_vnum_area(int vnum)
+AreaIndexData *OLCState::get_vnum_area(int vnum)
 {
-    AREA_DATA *pArea;
-
-    for (pArea = area_first; pArea; pArea = pArea->next)
+    for(auto &pArea: areaIndexes)
         if (vnum >= pArea->min_vnum && vnum <= pArea->max_vnum)
             return pArea;
         
@@ -715,11 +713,20 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
     if (arg_is_copy(command)) 
         return editorCopy(original);
 
+    if (arg_oneof_strict(command, "pastedone")) {
+        bool rc = editorPaste(original, flags);
+        if (rc)
+            handle(ch->desc, "done");
+        return rc;
+    }
+
     if (arg_is_paste(command))
         return editorPaste(original, flags);
 
-    if (arg_is_web(command))
-        return editorWeb(original, lastCmd + " paste", flags);
+    if (arg_is_web(command)) {
+        DLString pasteCmd = IS_SET(flags, ED_CALL_DONE) ? "pastedone" : "paste";
+        return editorWeb(original, lastCmd + " " + pasteCmd, flags);
+    }
 
     if (arg_is_help(command)) {
         stc("Команды редактора:\n\r", ch);

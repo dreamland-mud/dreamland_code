@@ -56,7 +56,7 @@ void SocialManager::initialization( )
 void SocialManager::destruction( )
 {
     InterpretLayer::destruction( );
-    saveAll( );
+    //saveAll( );
     unloadAll( );
 }
 

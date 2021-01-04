@@ -10,6 +10,7 @@
 
 class Character;
 class Descriptor;
+class StringList;
 
 class WebSocketMessage : public XMLVariableContainer {
 XML_OBJECT
@@ -33,5 +34,7 @@ DLString web_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt);
 DLString web_edit_button(Character *ch, const DLString &editor, const DLString &args);
 DLString web_cmd(Descriptor *d, const DLString &cmd, const DLString &seeFmt);
 
+/** Create a menu drop-down with given list of commands. */
+DLString web_menu(const StringList &commands, const DLString &id, const DLString &label);
 
 #endif

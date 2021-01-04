@@ -6,6 +6,7 @@
 #define __MISC_WEARLOCS_H__
 
 #include "defaultwearlocation.h"
+#include "xmlmap.h"
 
 class StuckInWearloc : public DefaultWearlocation {
 XML_OBJECT    
@@ -14,6 +15,7 @@ public:
 
     virtual bool equip( Character *ch, Object *obj );
     virtual void unequip( Character *ch, Object *obj );
+    virtual bool givesAffects() const { return false; }
 };
 
 class ShieldWearloc : public DefaultWearlocation {
@@ -23,6 +25,42 @@ public:
 
     virtual int canWear( Character *ch, Object *obj, int flags );
 };
+
+struct SheathConfig : public XMLVariableContainer {
+XML_OBJECT    
+public:
+    typedef ::Pointer<SheathConfig> Pointer;
+
+    XML_VARIABLE XMLString msgDisplay;
+    XML_VARIABLE XMLString msgRoomWear;
+    XML_VARIABLE XMLString msgSelfWear;
+    XML_VARIABLE XMLString msgRoomRemove;
+    XML_VARIABLE XMLString msgSelfRemove;
+};
+
+class SheathWearloc : public DefaultWearlocation {
+XML_OBJECT    
+public:
+    typedef ::Pointer<SheathWearloc> Pointer;
+
+    virtual bool matches( Character *ch );
+    virtual bool displayFlags(Character *ch, Object *obj);
+    virtual DLString displayName(Character *ch, Object *obj);
+    virtual DLString displayLocation(Character *ch, Object *obj);
+    
+    virtual void onFight(Character *ch, Object *obj);
+
+protected:
+    virtual const DLString &getMsgSelfWear(Object *obj) const;
+    virtual const DLString &getMsgSelfRemove(Object *obj) const;
+    virtual const DLString &getMsgRoomWear(Object *obj) const;
+    virtual const DLString &getMsgRoomRemove(Object *obj) const;
+
+    const SheathConfig & getConfig(Object *obj) const;
+    
+    XML_VARIABLE XMLMapBase<SheathConfig> config;
+};
+
 
 class HorseWearloc : public DefaultWearlocation {
 XML_OBJECT    
@@ -42,6 +80,7 @@ public:
     virtual void unequip( Character *ch, Object *obj );
     virtual bool matches( Character *ch );
     virtual int canWear( Character *ch, Object *obj, int flags );
+    virtual bool givesAffects() const { return false; }
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
@@ -88,6 +127,8 @@ public:
     virtual bool equip( Character *ch, Object *obj );
     virtual void unequip( Character *ch, Object *obj );
     virtual int canWear( Character *ch, Object *obj, int flags );
+    virtual bool givesAffects() const { return false; }
+    
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );

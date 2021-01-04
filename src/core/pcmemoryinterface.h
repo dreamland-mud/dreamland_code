@@ -26,7 +26,11 @@ class HometownReference;
 class ProfessionReference;
 class ReligionReference;
 class PCharacter;
+class NPCharacter;
 class XMLAttributes;
+class PCSkills;
+class PCBonuses;
+class PCMemoryInterface;
 
 class CharacterMemoryInterface : public virtual DLObject {
 public:
@@ -56,6 +60,9 @@ public:
     virtual const char * getDescription( ) const  = 0;
     virtual void setDescription( const DLString& )  = 0; 
 
+    virtual PCharacter * getPlayer( ) = 0;
+    virtual NPCharacter * getMobile( ) = 0;
+    virtual PCMemoryInterface *getPCM() { return 0; }
 };
 
 /**
@@ -101,7 +108,13 @@ public:
     virtual void setRussianName( const DLString& )  = 0;
 
     virtual bool isOnline( ) const = 0;
-    virtual PCharacter * getPlayer( ) = 0;
+    virtual PCMemoryInterface *getPCM() { return this; }
+
+    virtual PCSkills & getSkills( ) = 0;
+    virtual void setSkills(const PCSkills &) = 0;
+
+    virtual PCBonuses & getBonuses() = 0;
+    virtual void setBonuses(const PCBonuses &) = 0;
 };
 
 

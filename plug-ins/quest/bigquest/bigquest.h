@@ -16,7 +16,7 @@
 #include "xmllimits.h"
 
 class BigQuestScenario;
-struct area_data;
+struct AreaIndexData;
 
 class BigQuest : public VictimQuestModel,
                  public ItemQuestModel {
@@ -62,7 +62,7 @@ public:
     virtual bool applicable( PCharacter * ) const;
     virtual int getPriority() const;
     const QuestMobileAppearence &getRandomMobile() const;
-    void onQuestStart(PCharacter *, NPCharacter *, struct area_data *, int) const;
+    void onQuestStart(PCharacter *, NPCharacter *, struct AreaIndexData *, int) const;
     void onQuestInfo(PCharacter *, int, ostream&) const;
 
     XML_VARIABLE XMLInteger priority;

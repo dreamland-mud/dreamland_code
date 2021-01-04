@@ -22,7 +22,7 @@ class NPCharacter;
 class Character;
 class Room;
 class Object;
-struct area_data;
+struct AreaIndexData;
 
 
 class GlobalQuest : public SchedulerTask, public XMLVariableContainer {
@@ -32,7 +32,7 @@ public:
     typedef vector<NPCharacter *> MobileList;
     typedef vector<Object *> ObjectList;
     typedef vector<Room *> RoomList;
-    typedef vector<area_data *>        AreaList;
+    typedef vector<AreaIndexData *>        AreaList;
     typedef GlobalQuestInfo::Config Config;
 
     GlobalQuest( );

@@ -18,7 +18,7 @@ AreaBehavior::AreaBehavior( ) {
 AreaBehavior::~AreaBehavior( ) {
 }
 
-void AreaBehavior::setArea( AREA_DATA *area ) {
+void AreaBehavior::setArea( AreaIndexData *area ) {
     this->area = area;
 }
 
@@ -26,7 +26,7 @@ void AreaBehavior::unsetArea( ) {
     area = NULL;
 }
     
-AREA_DATA * AreaBehavior::getArea( ) {
+AreaIndexData * AreaBehavior::getArea( ) {
     return area;
 }
 

@@ -49,7 +49,7 @@ CommandWrapper::run( Character * ch, const DLString &arg )
 
     try {
         func.toFunction()->invoke(Register(self), args);
-    } catch (::Exception e) {
+    } catch (const ::Exception &e) {
         ch->send_to( e.what( ) );
     }
 }
@@ -86,6 +86,8 @@ NMI_SET( CommandWrapper, name, "название команды" )
 { 
     name.setValue( arg.toString( ) );
     self->changed();
+    commandManager->unregistrate( Pointer( this ) );
+    commandManager->registrate( Pointer( this ) );
 }
 
 NMI_SET(CommandWrapper, rname, "русское название команды")
@@ -93,6 +95,8 @@ NMI_SET(CommandWrapper, rname, "русское название команды")
     russian.clear();
     russian.push_back(arg.toString());
     self->changed();
+    commandManager->unregistrate( Pointer( this ) );
+    commandManager->registrate( Pointer( this ) );
 }
 
 NMI_GET(CommandWrapper, rname, "русское название команды")

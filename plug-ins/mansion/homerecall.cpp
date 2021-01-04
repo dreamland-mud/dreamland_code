@@ -114,7 +114,7 @@ protected:
             return false;
         }
 
-        if (!( to_room = get_room_index( vnum ) )) {
+        if (!( to_room = get_room_instance( vnum ) )) {
             msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
             return false;
         }
@@ -149,7 +149,9 @@ protected:
                             "%1$^C1 растворил%1$Gось|ся|ась в воздухе.",
                             "%1$^C1 и %2$C1 растворяются в воздухе." );
         else
-            msgRoomNoParty( wch, "%1$^C1 появляется рядом с тобой." );
+            msgRoomNoParty( wch, 
+                            "%1$^C1 появляется рядом с тобой." ,
+                            "%1$^C1 и %2$C1 появляются рядом с тобой." );
     }
     virtual void msgOnStart( )
     {
@@ -188,7 +190,7 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
         return;
     }
    
-    Room *target =  get_room_index( vnum );
+    Room *target =  get_room_instance( vnum );
     if (!target) {
         ch->println( "Комнаты с таким номером не существует." );
         return;
@@ -199,21 +201,21 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
 
     if (label.empty( ))
         ch->printf( "Персонажу %s установлен основной дом в комнате [%d] %s.\r\n", 
-                pci->getName( ).c_str( ), vnum, target->name  );
+                pci->getName( ).c_str( ), vnum, target->getName()  );
     else
         ch->printf( "Персонажу %s установлен дом с меткой %s в комнате [%d] %s.\r\n", 
-                pci->getName( ).c_str( ), label.c_str( ), vnum, target->name  );
+                pci->getName( ).c_str( ), label.c_str( ), vnum, target->getName()  );
 }
 
 static void print_room( int vnum, ostringstream &buf )
 {
-    Room *room = get_room_index( vnum );
+    Room *room = get_room_instance( vnum );
     if (!room) {
         buf << "[" << vnum << "] не существует!" << endl;
         return;
     }
 
-    buf << "[" << vnum << "] " << room->name << " (" << room->area->name << ")" << endl;
+    buf << "[" << vnum << "] " << room->getName() << " (" << room->areaName() << ")" << endl;
 }
 
 void HomeRecall::doShow( PCharacter * ch, DLString &arg )
@@ -287,12 +289,12 @@ void HomeRecall::doList( PCharacter *ch )
             continue;
         
         point = attr->getPoint( );
-        room = get_room_index( point );
+        room = get_room_instance( point );
         
         sprintf( buf, "%-15s [%-5d] %-25.25s (%s)\r\n", 
                  i->second->getName( ).c_str( ), point, 
-                 (room ? room->name : "{Rnull!{x"),
-                 (room ? room->area->name : "") );
+                 (room ? room->getName() : "{Rnull!{x"),
+                 (room ? room->areaName() : "") );
 
         ch->send_to( buf );
     }
@@ -300,13 +302,13 @@ void HomeRecall::doList( PCharacter *ch )
 
 static void print_room_mortal( int vnum, ostringstream &buf )
 {
-    Room *room = get_room_index( vnum );
+    Room *room = get_room_instance( vnum );
     if (!room) {
         buf << "не существует!" << endl;
         return;
     }
 
-    buf << room->name << " (" << room->area->name << ")" << endl;
+    buf << room->getName() << " (" << room->areaName() << ")" << endl;
 }
 
 void HomeRecall::doListMortal( PCharacter * ch )

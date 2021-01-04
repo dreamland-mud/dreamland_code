@@ -85,7 +85,7 @@ void RainbowGQuest::create( const Config& config )
         
         mob = ch->getNPC( );
         
-        if (scenario->checkArea( mob->in_room->area )
+        if (scenario->checkArea( mob->in_room->areaIndex() )
             && scenario->checkRoom( mob->in_room )
             && scenario->checkMobile( mob ))
         {
@@ -153,7 +153,7 @@ void RainbowGQuest::cleanup( )
     LogStream::sendNotice( ) << "Rainbow cleanup." << endl;
 
     for (i = 0; i < roomVnums.size( ); i++)
-        REMOVE_BIT(get_room_index(roomVnums[i])->area->area_flag, AREA_NOGATE);
+        REMOVE_BIT(get_room_instance(roomVnums[i])->area->area_flag, AREA_NOGATE);
         
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
@@ -281,9 +281,9 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
         
         str << dlprintf("%s%-30s%s из %s%s",
                      GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
-                     GQChannel::NORMAL, ch->in_room->name, GQChannel::NORMAL);
+                     GQChannel::NORMAL, ch->in_room->getName(), GQChannel::NORMAL);
         if (t <= 5)
-            str << " ({hh" << ch->in_room->area->name << "{hx)" << GQChannel::NORMAL;
+            str << " ({hh" << ch->in_room->areaName() << "{hx)" << GQChannel::NORMAL;
         
         str << endl;
     }
@@ -359,6 +359,7 @@ Object * RainbowGQuest::createPiece( int number )
     piece = create_object( pObjIndex, 0 );
     behavior->setObj( piece );
     behavior->config( number );
+    behavior->setQuest(*this);
     piece->behavior.setPointer( *behavior );
 
     return piece;

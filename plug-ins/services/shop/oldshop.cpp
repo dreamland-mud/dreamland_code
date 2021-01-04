@@ -63,6 +63,27 @@ void obj_to_keeper( Object *obj, NPCharacter *ch );
 Object *get_obj_keeper( Character *ch, ShopTrader::Pointer, const DLString &constArguments );
 void deduct_cost(Character *ch, int cost);
 
+DLString format_coins(int gold, int silver)
+{
+    DLString format;
+
+    if (gold != 0)
+        format += "%1$d золота";
+    if (silver != 0 && gold != 0)
+        format += " и ";
+    if (silver != 0)
+        format += "%2$d серебра";
+
+    return fmt(0, format.c_str(), gold, silver);
+}
+
+bool can_afford(Character *ch, int gold, int silver, int number)
+{
+    int cost = gold * 100 + silver;
+
+    return (ch->silver + ch->gold * 100) >= (cost * number);
+}
+
 static bool  
 mprog_sell( Character *ch, Character *buyer, Object *obj, int cost, int number )
 {
@@ -185,7 +206,7 @@ CMDRUN( buy )
         return;
     }
 
-    if ( ( ch->silver + ch->gold * 100) < cost * number )
+    if (!can_afford(ch, 0, cost, number))
     {
         if ( number > 1 )
             act_p( "$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",
@@ -262,7 +283,9 @@ CMDRUN( buy )
                 && (obj->pIndexData->limit < 0 
             || obj->pIndexData->limit > obj->pIndexData->count))
         {
-            t_obj = create_object( obj->pIndexData, obj->level );
+            t_obj = create_object(obj->pIndexData, 0);
+            clone_object(obj, t_obj);
+            REMOVE_BIT(t_obj->extra_flags, ITEM_INVENTORY);
         }
         else
         {
@@ -290,8 +313,6 @@ CMDRUN( buy )
  *---------------------------------------------------------------------------*/
 CMDRUN( sell )
 {
-    char buf[MAX_STRING_LENGTH];
-    char buf2[MAX_STRING_LENGTH];
     NPCharacter *keeper;
     ShopTrader::Pointer trader;
     Object *obj;
@@ -355,8 +376,14 @@ CMDRUN( sell )
 
     if (!IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) && roll < gsn_haggle->getEffective( ch ))
     {
+        silver = cost - (cost/100) * 100;
+        gold   = cost/100;
+
+        ch->pecho("%^C1 предлагает тебе %s за %O4.", keeper, format_coins(gold, silver).c_str(), obj);
+
         roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
-        ch->send_to("Ты торгуешься с продавцом.\n\r");
+        ch->pecho("Ты торгуешься с %C5.", keeper);
+        ch->recho("%^C1 торгуется с %C5.", ch, keeper);
 
         cost += obj->cost / 2 * roll / 100;
         cost = min(cost,95 * get_cost(keeper,obj,true, trader) / 100);
@@ -375,19 +402,7 @@ CMDRUN( sell )
     silver = cost - (cost/100) * 100;
     gold   = cost/100;
 
-    sprintf( buf2, "Ты продаешь $o4 за %s%s%s.",
-                    silver != 0 ? "%d серебра":"",    
-                    ( silver != 0 && gold != 0 ) ? " и ":"",              
-                    gold != 0 ? "%d золота":"");                      
-
-    if (silver != 0 && gold != 0)
-        sprintf( buf, buf2, silver, gold );
-    else if (silver != 0 )
-        sprintf( buf, buf2, silver );
-    else
-        sprintf( buf, buf2, gold );
-
-    act_p( buf, ch, obj, 0, TO_CHAR,POS_RESTING );
+    ch->pecho("Ты продаешь %O4 за %s.", obj, format_coins(gold, silver).c_str());
 
     if ( cost <= keeper->silver )
         keeper->silver -= cost;
@@ -496,31 +511,38 @@ CMDRUN( list )
 /*----------------------------------------------------------------------------
  * 'value' command
  *---------------------------------------------------------------------------*/
-static void value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Pointer trader, Object *obj)
+static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Pointer trader, Object *obj, bool verbose)
 {
     if (!keeper->can_see(obj)) {
-        ch->pecho("%^C1 не видит %O4.", keeper, obj);
-        return;
+        if (verbose)
+            ch->pecho("%^C1 не видит %O4.", keeper, obj);
+        return false;
     }
 
     if (!can_drop_obj( ch, obj )) {
-        ch->pecho("Ты не сможешь избавиться от %O2.", obj);
-        return;
+        if (verbose)
+            ch->pecho("Ты не сможешь избавиться от %O2.", obj);
+        return false;
     }
 
     int cost = get_cost( keeper, obj, false, trader );
     if (cost <= 0) {
-        ch->pecho("%^C1 не интересуется %O5.", keeper, obj);
-        return;
+        if (verbose)
+            ch->pecho("%^C1 не интересуется %O5.", keeper, obj);
+        return false;
     }
 
     int gold = cost/100;
     int silver = cost - gold * 100;
 
-    if ( dreamland->getBalanceMerchantBank() < (gold + 1) )
-        tell_fmt("Я дал%2$Gо||а бы тебе %3$d серебра и %4$d золота за %5$O4, но у меня нет денег.", ch, keeper, silver, gold, obj);
+    if (dreamland->getBalanceMerchantBank() < (gold + 1))
+        tell_fmt("Я дал%2$Gо||а бы тебе %3s за %4$O4, но у меня нет денег.", 
+                 ch, keeper, format_coins(gold, silver).c_str(), obj);
     else
-        tell_fmt("Я дам тебе %3$d серебра и %4$d золота за %5$O4.", ch, keeper, silver, gold, obj);
+        tell_fmt("Я дам тебе %3s за %4$O4.", 
+                 ch, keeper, format_coins(gold, silver).c_str(), obj);
+
+    return true;
 }
 
 CMDRUN( value )
@@ -542,14 +564,21 @@ CMDRUN( value )
     keeper = trader->getChar( );
 
     if (arg_is_all(arg)) {
+        bool saidSomething = false;
+
         if (!ch->carrying) {
             tell_fmt("Но у тебя же ничего нет!", ch, keeper);
             return;
         }
 
         for (obj = ch->carrying; obj; obj = obj->next_content) {
-            value_one_item(ch, keeper, trader, obj);
+            if (value_one_item(ch, keeper, trader, obj, false))
+                saidSomething = true;
         }
+
+        if (!saidSomething)
+            tell_fmt("Я не вижу у тебя ничего, что могло бы меня заинтересовать.", ch, keeper);
+
         return;
     }
 
@@ -558,7 +587,7 @@ CMDRUN( value )
         return;
     }
 
-    value_one_item(ch, keeper, trader, obj);
+    value_one_item(ch, keeper, trader, obj, true);
 }
 
 /*----------------------------------------------------------------------------
@@ -676,6 +705,12 @@ ShopTrader::Pointer find_keeper( Character *ch )
         do_say( keeper, "Подожди немного, мне сейчас не до тебя." );
         return null;
     }
+
+    if (!ch->can_see(keeper)) {
+        do_say(keeper, "Ты же меня не видишь, торговать у нас не получится.");
+        return null;
+    }
+
 /*    
     if (ch->getCurrStat( STAT_CHA ) < 18) {
         switch (number_range( 1, 10 )) {

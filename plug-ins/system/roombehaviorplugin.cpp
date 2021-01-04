@@ -13,9 +13,7 @@
 
 void RoomBehaviorPlugin::initialization( ) 
 {
-    Room *room;
-
-    for (room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (!room->behavior)
             continue;
         
@@ -28,13 +26,11 @@ void RoomBehaviorPlugin::initialization( )
 
 void RoomBehaviorPlugin::destruction( ) 
 {
-    Room *room;
-
     /* XXX */
     if (dreamland->isShutdown( ))
         return;
 
-    for (room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (!room->behavior)
             continue;
         

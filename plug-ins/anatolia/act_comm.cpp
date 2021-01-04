@@ -96,20 +96,7 @@ bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 
 void delete_player( PCharacter *victim ) 
 {
-    Object *obj;
-    Object *obj_next;
     DLString name = victim->getName( );
-
-    // удаляем из мира вещички энтого гуся
-    for ( obj = object_list; obj != 0; obj = obj_next ) {
-        obj_next = obj->next;
-
-        if (!obj->hasOwner( victim ))
-            continue;
-
-        if (obj->behavior)
-            obj->behavior->delete_( victim );
-    }
 
     victim->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "quiet count forced" );
     do_quit( victim, "" );
@@ -296,7 +283,7 @@ CMDRUNP( quit )
 
     if (!fForced
         && !pch->is_immortal()
-        && IS_RAFFECTED( pch->in_room, AFF_ROOM_ESPIRIT ))
+        && IS_ROOM_AFFECTED( pch->in_room, AFF_ROOM_ESPIRIT ))
     {
         pch->send_to( "Злые духи в этой зоне не отпускают тебя.\n\r");
         return;
@@ -329,15 +316,15 @@ CMDRUNP( quit )
     }
 
     if (!pch->is_immortal( )  
-            && pch->in_room->clan != clan_none 
-            && pch->getClan() != pch->in_room->clan)
+            && pch->in_room->pIndexData->clan != clan_none 
+            && pch->getClan() != pch->in_room->pIndexData->clan)
     {
         if (!fAuto && !fForced) {
             pch->send_to("Ты не можешь этого сделать - здесь не твоя территория!\n\r");
             return;
         }
         
-        transfer_char( pch, 0, get_room_index( ROOM_VNUM_TEMPLE ) );
+        transfer_char( pch, 0, get_room_instance( ROOM_VNUM_TEMPLE ) );
         if (pch->pet)
             transfer_char( pch->pet, 0, pch->in_room );
     }
@@ -358,7 +345,7 @@ CMDRUNP( quit )
 
     if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
         wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 покину%1$Gло|л|ла этот мир.", pch );
-        infonet("{CТихий голос из $o2: {W$C1 покину$Gло|л|ла Dream Land.{x", pch, 0);
+        infonet(pch, 0, "{CТихий голос из $o2: ", "{W%1$C1 покину%1$Gло|л|ла Dream Land.{x", pch);
         send_discord_orb(fmt(0, "%1$^C1 покинул%1$Gо||а Dream Land.", pch));
     }
 	

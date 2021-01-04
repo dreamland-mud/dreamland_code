@@ -44,7 +44,6 @@
 
 /*
  * Well known room virtual numbers.
- * Defined in #ROOMS.
  */
 #define ROOM_VNUM_LIMBO                2
 #define ROOM_VNUM_JAIL                4
@@ -53,6 +52,9 @@
 #define ROOM_VNUM_TEMPLE        3001
 #define ROOM_VNUM_ALTAR                3054
 #define ROOM_VNUM_HARBOUR       40100
+#define ROOM_VNUM_BUREAU_1 3078 // historical lost&found room, before 2018
+#define ROOM_VNUM_BUREAU_2 3083 // new lost&found room
+#define ROOM_VNUM_BUREAU_3 3084 // storage room for old personal chests
 
 /*
  * Well known mob virtual numbers.

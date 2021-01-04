@@ -8,6 +8,7 @@
 #include "dl_ctype.h"
 #include "flexer.h"
 #include "grammar_entities_impl.h"
+#include "russianstring.h"
 
 /*
  * Compare strings, case insensitive.
@@ -273,6 +274,12 @@ bool is_name( const char *arg1, const char *arg2 )
 DLString russian_case( const DLString &description, char gram_case )
 {
     return Flexer::flex( description, Grammar::Case( gram_case ) + 1 );
+}
+
+DLString russian_case_all_forms(const DLString &string)
+{
+    RussianString rs(string);
+    return rs.decline(Grammar::Case::MAX).colourStrip();
 }
 
 /*

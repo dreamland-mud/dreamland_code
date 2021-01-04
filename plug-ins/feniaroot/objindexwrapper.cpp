@@ -10,6 +10,8 @@
 #include "loadsave.h"
 
 #include "objindexwrapper.h"
+#include "affectwrapper.h"
+#include "structwrappers.h"
 #include "wrappermanager.h"
 #include "reglist.h"
 #include "register-impl.h"
@@ -71,6 +73,12 @@ ObjIndexWrapper::getTarget( ) const
 {
     checkTarget();
     return target;
+}
+
+NMI_GET( ObjIndexWrapper, area, "зона, в которой прописан предмет") 
+{
+    checkTarget( );
+    return WrapperManager::getThis( )->getWrapper( target->area );
 }
 
 NMI_GET( ObjIndexWrapper, material, "название материала, из которого сделан предмет") 
@@ -151,7 +159,7 @@ NMI_INVOKE(ObjIndexWrapper, create, "(): создать экземпляр пр�
 
     checkTarget( );
     obj = ::create_object( target , target->level );
-    obj_to_room( obj, get_room_index( ROOM_VNUM_FENIA_STORAGE ) );
+    obj_to_room( obj, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
     return WrapperManager::getThis( )->getWrapper( obj );
 }
 
@@ -186,6 +194,20 @@ NMI_INVOKE( ObjIndexWrapper, property, "(name, defaultValue): свойство �
         return defaultValue;
     else
         return Register(p->second);
+}
+
+NMI_GET( ObjIndexWrapper, affected, "список (List) всех аффектов на прототипе (структура .Affect)" )
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (auto &paf: target->affected) 
+        rc->push_back( AffectWrapper::wrap( *paf ) );
+        
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(rc);
+
+    return Register( sobj );
 }
 
 NMI_INVOKE( ObjIndexWrapper, api, "(): печатает этот API" )

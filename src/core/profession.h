@@ -17,6 +17,7 @@
 #define PROF( name ) static ProfessionReference prof_##name( #name )
 
 class PCMemoryInterface;
+class CharacterMemoryInterface;
 class Room;
 class Flags;
 class EnumerationArray;
@@ -50,7 +51,7 @@ public:
     virtual int  getWearModifier( int ) const;
     virtual int getStat( bitnumber_t, Character * = NULL ) const;
     virtual const DLString & getTitle( const PCMemoryInterface * ) const;
-    virtual GlobalBitvector toVector( Character * = NULL ) const;
+    virtual GlobalBitvector toVector( CharacterMemoryInterface * = NULL ) const;
     virtual Flags getFlags( Character * = NULL ) const;
     
     virtual bool isPlayed( ) const;

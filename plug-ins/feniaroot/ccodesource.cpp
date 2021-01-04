@@ -481,7 +481,7 @@ CMDADM( codesource )
         try {
             cs.eval( thiz );
             ch->send_to("Ok.\r\n");
-        } catch( ::Exception e ) {
+        } catch(const ::Exception& e ) {
             ostringstream ostr;
             ostr << "Evaluation exception: " << e.what() << endl;
             ch->send_to(ostr);

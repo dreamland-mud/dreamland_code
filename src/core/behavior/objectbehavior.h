@@ -41,7 +41,9 @@ public:
     virtual void fight( Character *victim );
     virtual bool death( Character *victim );
     virtual void speech( Character *victim, const char *speech );
+    virtual void show( Character *victim, ostringstream &buf );
     virtual bool area( );
+    virtual bool hourly();
     virtual bool extract( bool );
     virtual bool save( ); 
     virtual void delete_( Character * ); 

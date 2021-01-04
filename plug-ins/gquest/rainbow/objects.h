@@ -6,11 +6,9 @@
 #ifndef RAINBOW_OBJECTS_H
 #define RAINBOW_OBJECTS_H
 
-#include "xmlinteger.h"
-#include "objectbehavior.h"
-#include "objectbehaviorplugin.h"
+#include "gqobjects.h"
 
-class RainbowPiece: public ObjectBehavior {
+class RainbowPiece: public GlobalQuestObject {
 XML_OBJECT    
 public:
         typedef ::Pointer<RainbowPiece> Pointer;

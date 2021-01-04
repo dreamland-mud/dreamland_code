@@ -50,6 +50,9 @@ public:
     virtual int  getOccupation( );
     virtual bool canCancel( Character * );
     virtual bool isAfterCharm( ) const;
+    virtual long long getLastCharmTime() const;
+
+    void rememberFought(Character *victim);
 
 protected:
     Character * getMaster( Character * );
@@ -85,6 +88,7 @@ protected:
     bool checkLastFoughtHiding();
     virtual bool isHomesick( );
     void remember( Room * );
+    bool findMemoryFoughtRoom(Room *room);
     XML_VARIABLE XMLIntegerNoEmpty homeVnum;
 
 /*

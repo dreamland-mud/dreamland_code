@@ -47,14 +47,6 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
     levLow = 1;
     levHigh = MAX_LEVEL;
     criteria = &SkillInfo::cmp_by_level;
-    fUsableOnly = false;
-    fShowHint = false;
-    fCurrentProfAll = false;
-
-    if (arg1.empty( )) {
-        arg1 = "now";
-        fShowHint = true;
-    }
 
     if (arg_oneof( arg1, "help", "?", "помощь", "справка" )) {
         DLString what = fSpells ? "заклинания" : "умения";
@@ -68,18 +60,16 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         buf << "        {y{lR" << rcmd << " сорт имя|уровень|изучено{lE" << cmd << " sort name|level|learned{lx{w: сортировать " << what << endl;
         buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <название группы>{w: все " << what << " из этой группы" << endl
             << "" << endl
-            << "См. также {W{lR? умения{lE? skills{lx{w, {W{lR? группаумений{lE? glist{lx{w." << endl;
+            << "См. также {W{lR? умения{lE? skills{lx{w." << endl;
 
         return false;
     }
 
-    if (arg_is_all( arg1 )) {
-    }
-    else if (arg_oneof_strict( arg1, "now", "сейчас" )) {
-        fUsableOnly = true;
-    }
-    else if (arg_oneof( arg1, "current", "текущие" )) {
-        fCurrentProfAll = true;
+    if (arg1.empty()) {
+        levHigh = ch->getLevel();
+    } 
+    else if (arg_is_all( arg1 )) {
+        // do nothing
     }
     else if (arg1.isNumber( )) {
         try {
@@ -130,22 +120,12 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 void AllSkillsList::make( Character *ch )
 {
     SkillInfo info;
-    int savedLevel = ch->getLevel();
-
-    if (fCurrentProfAll)
-        ch->setLevel(MAX_LEVEL);
 
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );
         Spell::Pointer spell = skill->getSpell( );
 
         if (!skill->visible( ch ))
-            continue;
-
-        if (fUsableOnly && !skill->usable( ch, false ))
-            continue;
-
-        if (fCurrentProfAll && !skill->usable( ch, false ))
             continue;
 
         if (fSpells != (spell && spell->isCasted( )))
@@ -180,11 +160,13 @@ void AllSkillsList::make( Character *ch )
         else
             info.mana = skill->getMana( );
 
+        if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+            info.help_id = skill->getSkillHelp()->getID();
+        else
+            info.help_id = 0;
+
         push_back( info );
     }
-
-    if (fCurrentProfAll)
-        ch->setLevel(savedLevel);
 
     sort( criteria );
 }
@@ -239,10 +221,15 @@ void AllSkillsList::display( std::ostream & buf )
         else if (firstColumn)
             buf << "       |";
 
-        if (bool_long_name)
-            buf << dlprintf( " {c%-30s{x|", info.name.c_str( ) );
+        if (info.help_id > 0)
+            buf << "{hh" << info.help_id << " ";
         else
-            buf << dlprintf( " {c%-18s{x|", info.name.c_str( ) );
+            buf << " ";
+            
+        if (bool_long_name)
+            buf << dlprintf( "{c%-30s{x|", info.name.c_str( ) );
+        else
+            buf << dlprintf( "{c%-18s{x|", info.name.c_str( ) );
 
         if (info.available)
             buf << dlprintf( " %s%3d{x(%s%3d{x)|", 
@@ -272,6 +259,5 @@ void AllSkillsList::display( std::ostream & buf )
     if (!firstColumn) 
         buf << "                    |         |" << endl;
 
-    if (fShowHint)
-        buf << endl << "См. также {W{lR" << rcmd << "{lE" << cmd << "{lx ?{w." << endl;
+    buf << endl << "См. также {W{lR" << rcmd << "{lE" << cmd << "{lx ?{w." << endl;
 }

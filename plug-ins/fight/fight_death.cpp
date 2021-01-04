@@ -84,15 +84,15 @@ static void loot_transform( Object *obj, Character *ch )
         break;
     case ITEM_WEAPON:
         if (ch->is_npc( ))
-            obj->condition = number_range( 30, 80 );
+            obj->condition = min(obj->condition, number_range( 30, 80 ));
         break;
     case ITEM_ARMOR:
         if (ch->is_npc( ))
-            obj->condition = number_range( 10, 70 );
+            obj->condition = min(obj->condition, number_range( 10, 70 ));
         break;
     case ITEM_FOOD:
         if (ch->is_npc( ))
-            obj->condition = number_range( 10, 50 );
+            obj->condition = min(obj->condition, number_range( 10, 50 ));
         break;
     }
 }
@@ -212,7 +212,7 @@ static void corpse_place( Object *corpse, Character *ch )
         return;
 
     if (!ch->is_npc( ) && ch->getModifyLevel( ) < GHOST_MIN_LEVEL) 
-        corpse_room = get_room_index( ch->getPC()->getHometown( )->getAltar( ) );
+        corpse_room = get_room_instance( ch->getPC()->getHometown( )->getAltar( ) );
     
     if (!corpse_room)
         corpse_room = ch->in_room;
@@ -350,7 +350,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
         body_vnum = corpse->value3();
     }
     else {
-        body_room = get_room_index( ROOM_VNUM_LIMBO );
+        body_room = get_room_instance( ROOM_VNUM_LIMBO );
     }
 
     obj        = create_object( get_obj_index( vnum ), 0 );
@@ -463,8 +463,8 @@ void death_cry( Character *ch, int part )
 
 void reset_dead_player( PCharacter *victim )
 {
-    while (victim->affected)
-        affect_remove( victim, victim->affected );
+    for (auto &paf: victim->affected.clone())
+        affect_remove( victim, paf );
 
     victim->affected_by    = 0;
     victim->add_affected_by = 0;

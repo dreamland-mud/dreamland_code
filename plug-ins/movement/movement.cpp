@@ -84,7 +84,7 @@ bool Movement::canLeave( Character *wch )
     return true;
 }
 
-static int get_area_help_id(AREA_DATA *area)
+static int get_area_help_id(AreaIndexData *area)
 {
     DLString aname(area->name);
     aname.colourstrip();
@@ -116,11 +116,11 @@ void Movement::place( Character *wch )
             && !eyes_blinded( wch )
             && !eyes_darkened( wch ))
     {
-        int helpId = get_area_help_id(to_room->area);
+        int helpId = get_area_help_id(to_room->areaIndex());
         if (helpId >= 0)
-            wch->printf("Ты попадаешь в местность '{c{hh%d%s{x'.\r\n\r\n", helpId, to_room->area->name);
+            wch->printf("Ты попадаешь в местность '{c{hh%d%s{x'.\r\n\r\n", helpId, to_room->areaName());
         else
-            wch->printf("Ты попадаешь в местность '{c{hh%s{x'.\r\n\r\n", to_room->area->name);
+            wch->printf("Ты попадаешь в местность '{c{hh%s{x'.\r\n\r\n", to_room->areaName());
     }
  
     interpret_raw( wch, "look", "move" );
@@ -130,24 +130,14 @@ void Movement::place( Character *wch )
 
 static void rafprog_leave( Room *room, Character *ch )
 {
-    Affect *paf, *paf_next;
-
-    for (paf = room->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-        if (paf->type->getAffect( ))
-            paf->type->getAffect( )->leave( room, ch, paf );
-    }
+    for (auto &paf: room->affected.findAllWithHandler())
+        paf->type->getAffect( )->leave( room, ch, paf );
 }
 
 static void rafprog_entry( Room *room, Character *ch )
 {
-    Affect *paf, *paf_next;
-
-    for (paf = room->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-        if (paf->type->getAffect( ))
-            paf->type->getAffect( )->entry( room, ch, paf );
-    }
+    for (auto &paf: room->affected.findAllWithHandler())
+        paf->type->getAffect( )->entry( room, ch, paf );
 }
 
 static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const char *movetype)
@@ -222,14 +212,8 @@ static void mprog_leave( Character *ch, Room *from_room, Room *to_room, const ch
 
 static void afprog_entry( Character *ch )
 {
-    Affect *paf, *paf_next;
-
-    for (paf = ch->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-
-        if (paf->type->getAffect( ))
-            paf->type->getAffect( )->entry( ch, paf );
-    }
+    for (auto &paf: ch->affected.findAllWithHandler())
+        paf->type->getAffect( )->entry( ch, paf );
 }
 
 static bool rprog_dive( Character *wch, int danger )

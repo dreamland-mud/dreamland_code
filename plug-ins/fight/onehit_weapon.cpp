@@ -227,9 +227,10 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     if (IS_WEAPON_STAT(wield,WEAPON_POISON))
     {
         short level;
-        Affect *poison = 0, af;
+        Affect *poison, af;
 
-        if (!wield->affected || (poison = wield->affected->affect_find(gsn_poison)) == 0)
+        poison = wield->affected.find(gsn_poison);
+        if (!poison)
             level = wield->level;
         else
             level = poison->level;
@@ -239,13 +240,13 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             msgWeaponRoom("%2$^C1 отравле%2$Gно|н|на ядом от %3$O2 %1$C2.");
             msgWeaponChar("%2$^C1 отравле%2$Gно|н|на ядом от %3$O2.");
 
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level     = level * 3/4;
             af.duration  = level / 2;
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1;
-            af.bitvector = AFF_POISON;
+            af.bitvector.setValue(AFF_POISON);
             affect_join( victim, &af );
         }
 
@@ -255,7 +256,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             poison->level = max(0,poison->level - 2);
             poison->duration = max(0,poison->duration - 1);
             if ( poison->level == 0 || poison->duration == 0 )
-                act_p("Яд с $o2 проходит.",ch,wield,0,TO_CHAR,POS_RESTING);
+                act_p("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR,POS_RESTING);
         }
     }
 
@@ -301,16 +302,13 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     }
     
     if (IS_WEAPON_STAT(wield, WEAPON_SPELL)) {
-        Affect *waf;
         int lvl;
 
-        for (waf = wield->affected; waf; waf = waf->next) 
-            if (IS_SET( waf->bitvector, WEAPON_SPELL ) 
-                && waf->where == TO_WEAPON
-                && number_range( 1, waf->modifier ) == 1) 
+        for (auto &waf: wield->affected.findAllWithBits(&weapon_type2, WEAPON_SPELL)) 
+            if (number_range( 1, waf->modifier ) == 1)
             {
                 act_p("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL, POS_RESTING);
-                lvl = std::min(ch->getModifyLevel(), waf->level);
+                lvl = std::min((int)ch->getModifyLevel(), (int)waf->level);
                 spell_nocatch( waf->type, lvl, ch, victim );
             }
     }

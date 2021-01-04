@@ -39,20 +39,20 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
                act_p("Кожа $C2 уже подобна камню.",ch,0,victim,TO_CHAR,POS_RESTING);
       return;
     }
-  af.where        = TO_AFFECTS;
+  
   af.type      = sn;
   af.level     = level;
   af.duration  = level / 5;
-  af.location  = APPLY_AC;
+  af.location = APPLY_AC;
   af.modifier  = -100;
-  af.where     = TO_RESIST;
-  af.bitvector = RES_PIERCE | RES_SLASH;
+  af.bitvector.setTable(&res_flags);
+  af.bitvector.setValue(RES_PIERCE | RES_SLASH);
   affect_to_char( victim, &af );
 
-  af.where     = TO_AFFECTS;
-  af.location  = APPLY_DEX;
+  af.bitvector.setTable(&affect_flags);
+  af.location = APPLY_DEX;
   af.modifier  = -(1 + level / 20);
-  af.bitvector = AFF_SLOW;
+  af.bitvector.setValue(AFF_SLOW);
   affect_to_char( ch, &af );
 
 

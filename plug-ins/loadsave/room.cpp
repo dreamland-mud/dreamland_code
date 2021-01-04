@@ -5,15 +5,105 @@
 #include "room.h"
 #include "affecthandler.h"
 #include "affect.h"
+#include "affectmanager.h"
 #include "character.h"
 #include "core/object.h"
+#include "feniamanager.h"
 
+#include "dreamland.h"
+#include "roombehaviormanager.h"
 #include "loadsave.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
 
 WEARLOC(none);
+
+extra_exit_data * extra_exit_data::create()
+{
+    EXTRA_EXIT_DATA *peexit = new EXTRA_EXIT_DATA;
+
+    peexit->description = str_dup(description);
+    peexit->exit_info_default = peexit->exit_info = exit_info_default;
+    peexit->key = key;
+    peexit->u1.vnum = u1.vnum;
+    peexit->level = level;
+
+    peexit->keyword = str_dup(keyword);
+    peexit->short_desc_from = str_dup(short_desc_from);
+    peexit->short_desc_to = str_dup(short_desc_to);
+    peexit->room_description = str_dup(room_description);
+    peexit->max_size_pass = max_size_pass;
+
+    peexit->moving_from = moving_from;
+    peexit->moving_mode_from = moving_mode_from;
+    peexit->moving_to = moving_to;
+    peexit->moving_mode_to = moving_mode_to;
+
+    return peexit;
+}        
+
+exit_data *exit_data::create()
+{
+    EXIT_DATA *pexit = (EXIT_DATA*)alloc_perm(sizeof(EXIT_DATA));
+
+    pexit->keyword = str_dup(keyword);
+    pexit->short_descr = str_dup(short_descr);
+    pexit->description = str_dup(description);
+    pexit->exit_info_default = pexit->exit_info = exit_info_default;
+    pexit->key = key;
+    pexit->u1.vnum = u1.vnum; 
+    pexit->level = 0;
+
+    return pexit;
+}
+
+Room * RoomIndexData::create()
+{
+    if (room) // FIXME allow multiple instances
+        throw Exception("Attempt to create second instance of a room.");
+
+    room = new Room;
+    
+    room->area = areaIndex->area; // FIXME point to relevant instance
+    room->vnum = vnum;
+    room->room_flags = room_flags;
+    room->pIndexData = this;    
+    room->setID( dreamland->genID( ) );    
+
+    RoomBehaviorManager::assign(room);
+
+    for (int i = 0; i < DIR_SOMEWHERE; i++)
+        if (exit[i])
+            room->exit[i] = exit[i]->create();
+
+    for (auto &eexit: extra_exits)
+        room->extra_exits.push_back(eexit->create());
+
+    room->position = roomInstances.size();
+    roomInstances.push_back(room);
+
+    room->area->rooms[vnum] = room;
+
+    if (FeniaManager::wrapperManager)
+        FeniaManager::wrapperManager->linkWrapper( room );    
+
+    return room;
+}
+
+
+static int zero;
+
+static int & room_flag_by_table(Room *room, const FlagTable *table)
+{
+    if (table == &raffect_flags)
+        return room->affected_by;
+    else if (table == &room_flags)
+        return room->room_flags;
+
+    return zero;
+}
+
 
 /*
  * Apply or remove an affect to a room.
@@ -24,45 +114,27 @@ void Room::affectModify( Affect *paf, bool fAdd )
 
     mod = paf->modifier;
 
-    if ( fAdd )
+    if (fAdd)
     {
-        switch (paf->where)
-        {
-        case TO_ROOM_AFFECTS:
-              SET_BIT(affected_by, paf->bitvector);
-            break;
-        case TO_ROOM_FLAGS:
-              SET_BIT(room_flags, paf->bitvector);
-            break;
-        case TO_ROOM_CONST:
-            break;
-        }
+        int &flag = room_flag_by_table(this, paf->bitvector.getTable());
+        SET_BIT(flag, paf->bitvector.getValue());
     }
     else
     {
-        switch (paf->where)
-        {
-        case TO_ROOM_AFFECTS:
-              REMOVE_BIT(affected_by, paf->bitvector);
-            break;
-        case TO_ROOM_FLAGS:
-              REMOVE_BIT(room_flags, paf->bitvector);
-            break;
-        case TO_ROOM_CONST:
-            break;
-        }
+        int &flag = room_flag_by_table(this, paf->bitvector.getTable());
+        REMOVE_BIT(flag, paf->bitvector.getValue());
         mod = 0 - mod;
     }
 
     switch ( paf->location )
     {
     default:
-        bug( "Affect_modify_room: unknown location %d.", paf->location );
+        bug( "Affect_modify_room: unknown location %d.", paf->location.getValue() );
         return;
 
     case APPLY_ROOM_NONE:                                        break;
-    case APPLY_ROOM_HEAL:        heal_rate += mod;                break;
-    case APPLY_ROOM_MANA:        mana_rate += mod;                break;
+    case APPLY_ROOM_HEAL:        mod_heal_rate += mod;                break;
+    case APPLY_ROOM_MANA:        mod_mana_rate += mod;                break;
     }
 }
 
@@ -71,54 +143,25 @@ void Room::affectModify( Affect *paf, bool fAdd )
  */
 void Room::affectTo( Affect *paf )
 {
-    Affect *paf_new;
-    Room *pRoomIndex;
-
-    if (!affected) {
-        if (top_affected_room) {
-            for ( pRoomIndex  = top_affected_room; pRoomIndex->aff_next != 0; pRoomIndex  = pRoomIndex->aff_next )
-                continue;
-                
-            pRoomIndex->aff_next = this;        
-        }
-        else 
-            top_affected_room = this;
-
-        aff_next = 0;
+    if (affected.empty()) {
+        roomAffected.insert(this);
     }
 
-    paf_new = dallocate( Affect );
+    affected.push_front(paf->clone());
 
-    *paf_new                = *paf;
-    paf_new->next        = affected;
-    affected        = paf_new;
-
-    affectModify( paf_new, true );
+    affectModify( paf, true );
 }
 
-void Room::affectCheck( int where, int vector )
+void Room::affectCheck( const FlagTable *table, int vector )
 {
-    Affect *paf;
-
     if (vector == 0)
         return;
 
-    for (paf = affected; paf != 0; paf = paf->next)
-        if (paf->where == where && paf->bitvector == vector)
-        {
-            switch (where)
-            {
-                case TO_ROOM_AFFECTS:
-                      SET_BIT(affected_by,vector);
-                    break;
-                case TO_ROOM_FLAGS:
-                            SET_BIT(room_flags, vector);
-                        break;
-                case TO_ROOM_CONST:
-                    break;
-            }
-            return;
-        }
+    int &flag = room_flag_by_table(this, table);
+
+    for (auto &paf: affected)
+        if (paf->bitvector.getTable() == table && paf->bitvector.isSet(vector))
+            SET_BIT(flag, vector);
 }
 
 /*
@@ -126,61 +169,25 @@ void Room::affectCheck( int where, int vector )
  */
 void Room::affectRemove( Affect *paf )
 {
-    int where;
-    int vector;
+    if (paf->isExtracted())
+        return;
 
-    if ( affected == 0 )
+    if (affected.empty())
     {
         bug( "Affect_remove_room: no affect.", 0 );
         return;
     }
 
     affectModify( paf, false );
-    where = paf->where;
-    vector = paf->bitvector;
 
-    if (paf == affected) {
-        affected        = paf->next;
-    }
-    else {
-        Affect *prev;
+    affected.remove(paf);
 
-        for (prev = affected; prev != 0; prev = prev->next)
-            if (prev->next == paf) {
-                prev->next = paf->next;
-                break;
-            }
+    affectCheck(paf->bitvector.getTable(), paf->bitvector.getValue());
 
-        if (prev == 0) {
-            bug( "Affect_remove_room: cannot find paf.", 0 );
-            return;
-        }
-    }
+    if (affected.empty())
+        roomAffected.erase(this);
 
-    if (!affected) {
-        Room *prev;
-
-        if (top_affected_room  == this)
-            top_affected_room = aff_next;
-        else {
-            for(prev = top_affected_room; prev->aff_next; prev = prev->aff_next )
-                if ( prev->aff_next == this ) {
-                    prev->aff_next = aff_next;
-                    break;
-                }
-
-            if ( prev == 0 ) {
-                bug( "Affect_remove_room: cannot find room.", 0 );
-                return;
-            }
-        }
-        
-        aff_next = 0;
-     }
-
-    ddeallocate( paf );
-
-    affectCheck( where, vector );
+    AffectManager::getThis()->extract(paf);
 }
 
 /*
@@ -188,15 +195,8 @@ void Room::affectRemove( Affect *paf )
  */
 void Room::affectStrip( int sn )
 {
-    Affect *paf;
-    Affect *paf_next;
-
-    for (paf = affected; paf != 0; paf = paf_next )
-    {
-        paf_next = paf->next;
-        if ( paf->type == sn )
-            affectRemove( paf );
-    }
+    for (auto &paf: affected.findAll(sn))
+        affectRemove( paf );
 }
 
 
@@ -205,9 +205,7 @@ void Room::affectStrip( int sn )
  */
 void Room::affectJoin( Affect *paf )
 {
-    Affect *paf_old;
-
-    for ( paf_old = affected; paf_old != 0; paf_old = paf_old->next )
+    for (auto &paf_old: affected)
     {
         if ( paf_old->type == paf->type )
         {
@@ -221,7 +219,6 @@ void Room::affectJoin( Affect *paf )
     }
 
     affectTo( paf );
-    return;
 }
 
 
@@ -230,15 +227,7 @@ void Room::affectJoin( Affect *paf )
  */
 bool Room::isAffected( int sn ) const
 {
-    Affect *paf;
-
-    for ( paf = affected; paf != 0; paf = paf->next )
-    {
-        if ( paf->type == sn )
-            return true;
-    }
-
-    return false;
+    return affected.find(sn) != 0;
 }
 
 /** Whether an item can contribute to the light in the room. */

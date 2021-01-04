@@ -39,7 +39,7 @@ ClanObject::~ClanObject( )
 ClanArea::Pointer ClanObject::getClanArea( )
 {
     ClanArea::Pointer clanArea;
-    AREA_DATA *area;
+    AreaIndexData *area;
 
     area = obj->pIndexData->area;
 
@@ -69,7 +69,7 @@ bool ClanItem::isHolded( ) const
     if (IS_SET(carrier->in_room->room_flags, ROOM_SAFE|ROOM_SOLITARY|ROOM_PRIVATE))
         return false;
      
-    if (!carrier->in_room->guilds.empty( ))
+    if (!carrier->in_room->pIndexData->guilds.empty( ))
         return false;
 
     if (carrier->getModifyLevel( ) < obj->level - 3)

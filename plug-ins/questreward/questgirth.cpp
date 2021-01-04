@@ -25,10 +25,9 @@ void QuestGirth::equip( Character *ch )
 {
     obj->level = ch->getRealLevel( );
     
-    if( obj->affected ) {
+    if (!obj->affected.empty()) {
         // Updated existing affects to match player level.
-        Affect *paf;
-        for (paf = obj->affected; paf; paf = paf->next)
+        for (auto &paf: obj->affected)
             addAffect(ch, paf);
     }
     else {
@@ -41,10 +40,8 @@ void QuestGirth::equip( Character *ch )
 
         Affect af;
 
-        af.where = TO_OBJECT;
         af.type  = -1;
         af.duration = -1;
-        af.bitvector = 0;
 
         for (int i = 0; applies[i] != -1; i++) {
             af.location = applies[i];
