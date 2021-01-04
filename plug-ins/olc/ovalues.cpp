@@ -32,6 +32,7 @@ static int skill_lookup( const DLString &name )
 void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 {
     char buf[MAX_STRING_LENGTH];
+    bool random;
 
     switch (obj->item_type) {
     default:
@@ -161,15 +162,24 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
 
     case ITEM_WEAPON:
+        random = obj->properties.count("random");
+
         ptc(ch, "[v0] Вид оружия:   %s {D(? weapon_class){x\n\r",
             weapon_class.name(obj->value[0]).c_str());
-        ptc(ch, "[v1] Число бросков кубика: [%u]\n\r", obj->value[1]);
-        ptc(ch, "[v2] Число граней кубика : [%u] {D(повреждения %ud%u, среднее %u = (v2+1)*v1/2){x\r\n", 
-                       obj->value[2], obj->value[1], obj->value[2], weapon_ave(obj));
+            
+        if (!random) {
+            ptc(ch, "[v1] Число бросков кубика: [%u]\n\r", obj->value[1]);
+            ptc(ch, "[v2] Число граней кубика : [%u] {D(повреждения %ud%u, среднее %u = (v2+1)*v1/2){x\r\n", 
+                        obj->value[2], obj->value[1], obj->value[2], weapon_ave(obj));
+        }
+
         ptc(ch, "[v3] Тип удара:    %s {D(? weapon_flags){x\n\r",
             weapon_flags.name(obj->value[3]).c_str());
-        ptc(ch, "[v4] Флаги оружия: %s {D(? weapon_type2){x\n\r",
-            weapon_type2.names(obj->value[4]).c_str());
+
+        if (!random) {
+            ptc(ch, "[v4] Флаги оружия: %s {D(? weapon_type2){x\n\r",
+                weapon_type2.names(obj->value[4]).c_str());
+        }
         break;
 
 

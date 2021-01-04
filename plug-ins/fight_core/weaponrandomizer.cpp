@@ -48,7 +48,7 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
         return;
     }
 
-    if (obj->getProperty("random") == rand_table.name(RAND_STAT) || pReset->rand == RAND_STAT) {
+    if (!obj->getProperty("random").empty() || pReset->rand == RAND_STAT) {
         randomizeWeaponStats(obj, pReset->bestTier);
         return;
     }
@@ -63,7 +63,7 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
     if (obj->item_type != ITEM_WEAPON)
         return;
 
-    if (obj->getProperty("random") != rand_table.name(RAND_STAT))
+    if (obj->getProperty("random").empty())
         return;
 
     if (!obj->getProperty("tier").empty())
@@ -157,7 +157,7 @@ void WeaponRandomizer::randomizeWeapon(Object *obj, int level, int bestTier) con
 int WeaponRandomizer::getAlign(Object *obj) const
 {
     Character *carrier = obj->getCarrier();
-    if (carrier->is_npc() && !mob_has_occupation(carrier->getNPC(), OCC_SHOPPER))
+    if (carrier && carrier->is_npc() && !mob_has_occupation(carrier->getNPC(), OCC_SHOPPER))
         return carrier->alignment;
 
     return ALIGN_NONE;

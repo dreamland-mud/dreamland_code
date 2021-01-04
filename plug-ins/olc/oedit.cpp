@@ -31,7 +31,7 @@
 #include "comm.h"
 #include "merc.h"
 #include "interp.h"
-
+#include "weapontier.h"
 #include "websocketrpc.h"
 #include "act.h"
 #include "mercdb.h"
@@ -288,16 +288,17 @@ OEDIT(show)
     if (!pObj->properties.empty( )) {
         ptc(ch, "Properties:\n\r");
         for (Properties::const_iterator p = pObj->properties.begin( ); p != pObj->properties.end( ); p++)
-            ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
+            ptc(ch, "{g%20s{x: %s\n\r", p->first.c_str( ), p->second.c_str( ));
     }
 
     ptc(ch, "Condition:   [%5d]\n\r", pObj->condition);
 
     ptc(ch, "Gender:      [%1s]\n\r", pObj->gram_gender.toString());
 
-    sprintf(buf, "Weight:      [%5d]\n\rCost:        [%5d]\n\r",
-              pObj->weight, pObj->cost);
-    stc(buf, ch);
+    ptc(ch, "Weight:      [%5d]\n\r", pObj->weight);
+    
+    if (!pObj->properties.count("random"))
+        ptc(ch, "Cost:        [%5d]\n\r", pObj->cost);
 
     if (pObj->extra_descr) {
         EXTRA_DESCR_DATA *ed;
@@ -544,6 +545,61 @@ OEDIT(delaffect)
     pObj->affected.remove(pAf);
     AffectManager::getThis()->extract(pAf);
     stc("Affect removed.\n\r", ch);
+    return true;
+}
+
+OEDIT(random)
+{
+    OBJ_INDEX_DATA *pObj;
+    DLString arg = DLString(argument).getOneArgument();
+    Integer bestTier;
+
+    EDIT_OBJ(ch, pObj);
+
+    if (pObj->item_type != ITEM_WEAPON) {
+        stc("Random stats can only be assigned to a weapon.\r\n", ch);
+        return false;
+    }
+
+    if (arg.empty()) {
+        stc("Usage:\r\nrandom <best tier> - mark this weapon as rand_stat\r\n", ch);
+        stc("random clear - make this weapon non-random\r\n", ch);
+        return false;
+    }
+
+    if (arg_is_clear(arg)) {
+        Properties::iterator p = pObj->properties.find("random");
+        if (p == pObj->properties.end()) {
+            stc("This weapon is not random.\r\n", ch);
+            return false;
+        }
+
+        pObj->properties.erase(p);
+        stc("This weapon is no longer random.\r\n", ch);
+
+        p = pObj->properties.find("bestTier");
+        if (p != pObj->properties.end()) {
+            pObj->properties.erase(p);
+            stc("bestTier property is removed.\r\n", ch);
+        }
+
+        return true;
+    }
+
+    if (!Integer::tryParse(bestTier, arg)) {
+        stc("Usage: random <best tier>r\n", ch);
+        return false;
+    }
+
+    while (!pObj->affected.empty()) {
+        Affect *paf = pObj->affected.front();
+        pObj->affected.remove(paf);
+        AffectManager::getThis()->extract(paf);
+    }
+
+    pObj->properties["random"] = "true";
+    pObj->properties["bestTier"] = bestTier.toString();
+    ptc(ch, "This weapon is now random, bestTier set to %d, affects removed.\r\n", bestTier.getValue());
     return true;
 }
 
