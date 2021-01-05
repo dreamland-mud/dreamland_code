@@ -7,6 +7,7 @@
 class Object;
 class ItemReadEvent;
 class ItemResetEvent;
+class ItemEditedEvent;
 
 /**
  * Global event listener that reacts to 'item is reset', 'item is read from a profile'
@@ -23,9 +24,11 @@ public:
 protected:    
     void eventItemRead(const ItemReadEvent &event) const;
     void eventItemReset(const ItemResetEvent &event) const;
+    void eventItemEdited(const ItemEditedEvent &event) const;
 
     void randomizeWeaponStats(Object *obj, int bestTierOverride = -1) const;
     void randomizeWeapon(Object *obj, int level, int bestTier) const;
+    void clearWeapon(Object *obj) const;
 
     int getAlign(Object *obj) const;
     int getTier(Object *obj, int bestTierOverride) const;

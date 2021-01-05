@@ -24,7 +24,9 @@
 #include "affectmanager.h"
 #include "room.h"
 #include "skillgroup.h"
+#include "eventbus.h"
 
+#include "itemevents.h"
 #include "oedit.h"
 #include "feniatriggers.h"
 #include "ovalues.h"
@@ -226,14 +228,17 @@ void OLCStateObject::commit()
     memcpy(original->value, obj.value, sizeof(obj.value));
     original->limit        = obj.limit;
 
-    for(o = object_list; o; o = o->next)
-        if(o->pIndexData == original) 
-            o->updateCachedNoun( );
-    
     original->properties.clear( );
     for (Properties::const_iterator p = obj.properties.begin( ); p != obj.properties.end( ); p++)
         original->properties.insert( *p );
     obj.properties.clear( );
+
+    for(o = object_list; o; o = o->next)
+        if(o->pIndexData == original) {
+            o->updateCachedNoun( );
+            eventBus->publish(ItemEditedEvent(o));
+        }
+    
 }
 
 void OLCStateObject::statePrompt(Descriptor *d)
@@ -591,12 +596,7 @@ OEDIT(random)
         return false;
     }
 
-    while (!pObj->affected.empty()) {
-        Affect *paf = pObj->affected.front();
-        pObj->affected.remove(paf);
-        AffectManager::getThis()->extract(paf);
-    }
-
+    pObj->affected.deallocate();
     pObj->properties["random"] = "true";
     pObj->properties["bestTier"] = bestTier.toString();
     ptc(ch, "This weapon is now random, bestTier set to %d, affects removed.\r\n", bestTier.getValue());

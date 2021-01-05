@@ -10,18 +10,21 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "merc.h"
+#include "mercdb.h"
 #include "def.h"
 
 void WeaponRandomizer::initialization() 
 {
     eventBus->subscribe(typeid(ItemResetEvent), Pointer(this));
     eventBus->subscribe(typeid(ItemReadEvent), Pointer(this));
+    eventBus->subscribe(typeid(ItemEditedEvent), Pointer(this));
 }
 
 void WeaponRandomizer::destruction() 
 {
     eventBus->unsubscribe(typeid(ItemResetEvent), Pointer(this));
     eventBus->unsubscribe(typeid(ItemReadEvent), Pointer(this));
+    eventBus->unsubscribe(typeid(ItemEditedEvent), Pointer(this));
 }
 
 void WeaponRandomizer::handleEvent(const type_index &eventType, const Event &event) const
@@ -30,6 +33,28 @@ void WeaponRandomizer::handleEvent(const type_index &eventType, const Event &eve
         eventItemRead(static_cast<const ItemReadEvent &>(event));
     else if (eventType == typeid(ItemResetEvent))
         eventItemReset(static_cast<const ItemResetEvent &>(event));
+    else if (eventType == typeid(ItemEditedEvent))
+        eventItemEdited(static_cast<const ItemEditedEvent &>(event));
+}
+
+// Called from 'oedit commit'. Need to re-roll items that just became 'rand_stat'
+// and viceversa.
+void WeaponRandomizer::eventItemEdited(const ItemEditedEvent &event) const
+{    
+    Object *obj = event.obj;
+
+    if (obj->item_type != ITEM_WEAPON)
+        return;
+
+    if (obj->getProperty("random").empty() && !obj->getProperty("tier").empty()) {
+        clearWeapon(obj);
+        return;
+    }
+
+    if (!obj->getProperty("random").empty() && obj->getProperty("tier").empty()) {
+        randomizeWeaponStats(obj);
+        return;
+    }
 }
 
 // Called when an item is created during area update:
@@ -70,6 +95,16 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
         return;
 
     randomizeWeaponStats(obj);
+}
+
+// Remove 'randomness' from a weapon.
+void WeaponRandomizer::clearWeapon(Object *obj) const
+{
+    obj->properties.clear();
+    obj->enchanted = false;
+    obj->affected.deallocate();
+    obj->timer = 0;
+    obj->setShortDescr(&str_empty[0]);
 }
 
 void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) const
