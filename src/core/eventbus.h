@@ -41,7 +41,7 @@ public:
     void publish(const Event &event) const;
 
 protected:
-    map<type_index, list<EventHandler::Pointer> > handlers;
+    map<string, list<EventHandler::Pointer> > handlers;
 };
 
 extern EventBus *eventBus;
