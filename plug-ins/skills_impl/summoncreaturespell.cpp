@@ -13,6 +13,7 @@
 
 #include "dreamland.h"
 #include "interp.h"
+#include "move_utils.h"
 #include "save.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -208,8 +209,9 @@ bool SummonedCreature::hourly( )
     int vnum = ch->pIndexData->vnum;
     PCMemoryInterface *owner = getMyCreator();
     if (!owner) {
-        notice("Mob %d in room [%d] [%s] extracted, no owner.", vnum, ch->in_room->vnum, ch->in_room->getName());
-        return false;
+        notice("[cleanup] Mob %d in room [%d] [%s] extracted, no owner.", vnum, ch->in_room->vnum, ch->in_room->getName());
+        extract_char(ch);
+        return true;
     }
 
     SummonCreatureSpell::Pointer spell = getMySpell();
@@ -220,10 +222,11 @@ bool SummonedCreature::hourly( )
 
     Skill::Pointer skill = spell->getSkill();
     if (!skill->visible(owner)) {
-        notice("Mob %d in room [%d] [%s] extracted, owner %s (%s, clan %s) doesn't know skill %s.",
+        notice("[cleanup] Mob %d in room [%d] [%s] extracted, owner %s (%s, clan %s) doesn't know skill %s.",
                 vnum, ch->in_room->vnum, ch->in_room->getName(), 
                 owner->getName().c_str(), owner->getProfession()->getName().c_str(),
                 owner->getClan()->getName().c_str(), skill->getName().c_str());
+        extract_char(ch);
         return true;
     }
 
@@ -243,9 +246,12 @@ bool SummonedCreature::hourly( )
         return false;
     }
     
-    notice("Mob %d moved from room [%d] [%s] to storage room [%d], owner %s offline for more than a day", 
+    notice("[cleanup] Mob %d moved from room [%d] [%s] to storage room [%d], owner %s offline for more than a day", 
             vnum, ch->in_room->vnum, ch->in_room->getName(),
             rvnum, owner->getName().c_str());
+
+    transfer_char( ch, ch, room,
+                    "%1$^C1 внезапно исчезает.", NULL, "%1$^C1 внезапно появляется." );
     return true;
 }
 

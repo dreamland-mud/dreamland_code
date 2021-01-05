@@ -8,9 +8,11 @@
 #include "class.h"
 #include "affect.h"
 #include "room.h"
+#include "loadsave.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "core/object.h"
+#include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
 
@@ -61,11 +63,13 @@ bool QuestBag::hourly()
     if (owner && owner->getLastAccessTime().getTime() >= 1529205799) // been here since 2018
         return false;
 
-    //obj->properties["oldRoom"] = obj->in_room->vnum;
-    notice("Chest %d %lld of %s transferred from room [%d] [%s] to storage.",
+    obj->properties["oldRoom"] = obj->in_room->vnum;
+    notice("[cleanup] Chest %d %lld of %s transferred from room [%d] [%s] to storage.",
             obj->pIndexData->vnum, obj->getID(), obj->getOwner(),
             obj->in_room->vnum, obj->in_room->getName());
 
+    obj_from_room(obj);
+    obj_to_room(obj, get_room_instance(ROOM_VNUM_BUREAU_3));
     return true;
 }
 

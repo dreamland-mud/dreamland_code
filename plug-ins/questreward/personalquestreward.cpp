@@ -11,6 +11,7 @@
 #include "room.h"
 #include "act.h"
 #include "loadsave.h"
+#include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
 
@@ -74,9 +75,11 @@ bool PersonalQuestReward::hourly()
     if (!obj->can_wear(ITEM_TAKE))
         return false;
 
-    notice("Item %d %lld of %s transferred from room [%d] [%s] to lost&found.",
+    notice("[cleanup] Item %d %lld of %s transferred from room [%d] [%s] to lost&found.",
             obj->pIndexData->vnum, obj->getID(), obj->getOwner(),
             obj->in_room->vnum, obj->in_room->getName());
+    obj_from_room(obj);
+    obj_to_room(obj, get_room_instance(ROOM_VNUM_BUREAU_2));
     return true;
 }
 
