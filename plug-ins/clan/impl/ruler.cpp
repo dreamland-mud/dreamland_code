@@ -71,7 +71,7 @@ void ClanGuardRulerPre::actGreet( PCharacter *wch )
 
 void ClanGuardRulerPre::actInvited( PCharacter *wch, Object *obj )
 {
-    do_say( ch, "Я вижу - тебя пригласили?" );
+    do_say( ch, "Тебя пригласили? Добро пожаловать!" );
 }
 
 void ClanGuardRulerPre::actPush( PCharacter *wch )
@@ -330,7 +330,7 @@ SKILL_RUNP( judge )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -424,7 +424,7 @@ SKILL_RUNP( manacles )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -451,7 +451,7 @@ SKILL_RUNP( manacles )
 
         if (victim->is_npc())
         {
-                ch->send_to("ОНО не властно над собой, не делай глупостей.\n\r" );
+                ch->send_to("Кандалы -- только для игроков.\n\r" );
                 return;
         }
 
@@ -522,7 +522,7 @@ SKILL_RUNP( manacles )
                 }
                 else
                 {
-                        act_p("Ты пытаешься освободить руки $C4 от оков, но находишь их СВОБОДЫМИ.",
+                        act_p("Ты пытаешься освободить руки $C4 от оков, но они уже свободны.",
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
                         act_p("$c1 делает вид, что снимает кандалы с твоих рук. К чему бы это...",
                                                 ch,0,victim,TO_VICT,POS_RESTING);
@@ -552,7 +552,7 @@ SKILL_RUNP( manacles )
 
                 if ( duration == 0 || duration <= -2 )
                 {
-                        ch->send_to ("Ты точно этого хочешь ?\n\r");
+                        ch->send_to ("Ты точно этого хочешь?\n\r");
                         return;
                 }
 
@@ -568,7 +568,7 @@ SKILL_RUNP( manacles )
                 }
                 else if ( victim->position <= POS_DEAD )
                 {
-                        ch->send_to( "Сковывать кандалами мертвых - какая низость.\n\r" );
+                        ch->send_to( "Сковывать кандалами мертвых -- какая низость.\n\r" );
                 }
                 else if ( victim->position >= POS_FIGHTING )
                 {
@@ -629,7 +629,7 @@ SKILL_RUNP( wanted )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -740,7 +740,7 @@ SKILL_RUNP( fine )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -794,7 +794,7 @@ SKILL_RUNP( fine )
 
                 if ( recepient == 0 || !(ch->can_see(recepient)) )
                 {
-                        ch->send_to("Ты не находишь того, кому собирался отдать собранный штаф.\n\r");
+                        ch->send_to("Ты не находишь того, кому собирался отдать собранный штраф.\n\r");
                         return;
                 }
         }
@@ -803,7 +803,7 @@ SKILL_RUNP( fine )
                 || ( ( recepient != 0 ) && recepient->is_npc() ) 
                 || victim == ch )
         {
-                ch->send_to ("Тебе не кажется, что ты занимаешь мышиной возней?\n\r");
+                ch->send_to ("Тебе не кажется, что ты занимаешься мышиной возней?\n\r");
                 return;
         }
 
@@ -896,7 +896,7 @@ SKILL_RUNP( confiscate )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -919,13 +919,13 @@ SKILL_RUNP( confiscate )
         if ( victim->is_npc()
                 || victim == ch )
         {
-                ch->send_to ("Тебе не кажется, что ты занимаешь мышиной возней?\n\r");
+                ch->send_to ("Тебе не кажется, что ты занимаешься мышиной возней?\n\r");
                 return;
         }
 
         if ( !victim->isAffected(gsn_manacles) )
         {
-                act_p ("И ты думаешь, что $C1 так просто отдаст тебе свои вещи?",
+                act_p ("И ты думаешь, что $C1 так просто отдаст тебе свои вещи? Сначала закуй в кандалы.",
                         ch, 0, victim, TO_CHAR, POS_RESTING);
                 return;
         }
@@ -1023,7 +1023,7 @@ SKILL_RUNP( suspect )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -1043,7 +1043,7 @@ SKILL_RUNP( suspect )
 
         if (victim->is_npc())
         {
-                ch->send_to("Это подневольное создание - им повестки не выдаются.\n\r");
+                ch->send_to("Повестки -- только для игроков.\n\r");
                 return;
         }
 
@@ -1164,7 +1164,7 @@ SKILL_RUNP( jail )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -1191,7 +1191,7 @@ SKILL_RUNP( jail )
 
         if (victim->is_npc())
         {
-                ch->send_to("ОНО не властно над собой, не делай глупостей.\n\r" );
+                ch->send_to("Только для игроков.\n\r" );
                 return;
         }
 
@@ -1291,7 +1291,7 @@ SKILL_RUNP( jail )
 
                 if ( duration == 0 || duration <= -2 )
                 {
-                        ch->send_to ("Ты точно этого хочешь ?\n\r");
+                        ch->send_to ("Ты точно этого хочешь?\n\r");
                         return;
                 }
 
@@ -1336,7 +1336,7 @@ SKILL_RUNP( dismiss )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -1363,7 +1363,7 @@ SKILL_RUNP( dismiss )
 
         if (victim->is_npc())
         {
-                ch->send_to("ОНО не властно над собой, не делай глупостей.\n\r" );
+                ch->send_to("Только для игроков.\n\r" );
                 return;
         }
 
@@ -1375,13 +1375,13 @@ SKILL_RUNP( dismiss )
 
         if ( victim->getPC()->getClan() != clan_ruler )
         {
-                ch->send_to( "Да ведь это даже не Рулер - чего его лишать то?\n\r" );
+                ch->send_to( "Лишить привилегий можно только других Правителей.\n\r" );
                 return;
         }
 
         if ( victim->getPC()->getClanLevel() >= ch->getPC()->getClanLevel() )
         {
-                ch->send_to( "Нет... Твоих полномочий тут явно недостаточно!\n\r" );
+                ch->send_to( "Твоих полномочий (кланового ранга) тут явно недостаточно.\n\r" );
                 return;
         }
 
@@ -1403,20 +1403,20 @@ SKILL_RUNP( dismiss )
 
                         if ( paf->duration >= 0 )
                         {
-                                sprintf (buf,"$C1 лише$Gно|н|на своих Рулерских прав на %d час%s."
+                                sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя на %d час%s."
                                         ,paf->duration.getValue()
                                         ,GET_COUNT(paf->duration, "","а","ов"));
                         }
                         else
                         {
-                                sprintf (buf,"$C1 лише$Gно|н|на своих Рулерских прав НАВСЕГДА.");
+                                sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя НАВСЕГДА.");
                         }
 
                         act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
                 }
                 else
                 {
-                        act_p("$C1 настоящий Рулер.",
+                        act_p("$C1 обладает полными привилегиями Правителя.",
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
                 }
         
@@ -1460,7 +1460,7 @@ SKILL_RUNP( dismiss )
 
                 if ( duration == 0 || duration <= -2 )
                 {
-                        ch->send_to ("Ты точно этого хочешь ?\n\r");
+                        ch->send_to ("Ты точно этого хочешь?\n\r");
                         return;
                 }
 
@@ -1514,11 +1514,11 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 
     for (rch = victim->in_room->people; rch; rch = rch->next_in_room) {
         if (rch->is_mirror() && rch->doppel == target) {
-            act( "Луч света, посланный $c5, отразившись от зеркала, поражает ТЕБЯ!",
+            act( "Луч света, посланный $c5, отражается от зеркала и поражает ТЕБЯ!",
                  ch, 0, target, TO_VICT );
-            act( "Луч света, посланный $c5, отразившись от зеркала, поражает $C4!",
+            act( "Луч света, посланный $c5, отражается от зеркала и поражает $C4!",
                  ch, 0, target, TO_NOTVICT );
-            act( "Луч света, посланный тобой, отразившись от зеркала, поражает $C4!",
+            act( "Луч света, посланный тобой, отражается от зеркала и поражает $C4!",
                  ch, 0, target, TO_CHAR );
 
             dam = dice( level, 5 );
@@ -1564,7 +1564,7 @@ bool RulerSpecialGuard::specFight( )
     if ( ( ch->getModifyLevel() + 20 > victim->getModifyLevel() )
             && !is_safe_nomessage ( ch, victim ) )
     {
-        sprintf( buf, "%s CRIMINAL! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+        sprintf( buf, "%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
                 victim->getNameP( ) );
         do_yell( ch, buf );
         multi_hit( ch, victim );
@@ -1592,7 +1592,7 @@ TYPE_SPELL(NPCharacter *, GuardCall)::createMobile( Character *ch, int level ) c
 VOID_SPELL(GuardCall)::run( Character *ch, char *target_name, int sn, int level ) 
 { 
     if ( ch->isAffected(gsn_dismiss ) ) {
-        ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+        ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
         return;
     }
     
@@ -1606,7 +1606,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
 
     if ( ch->isAffected(gsn_dismiss ) )
     {
-        ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+        ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
         return;
     }
 
@@ -1644,7 +1644,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
     }
     else {
         if (victim->is_mirror( )) 
-            ch->pecho( "%^C1 - это всего лишь зеркало, созданное %#^C5!",
+            ch->pecho( "%^C1 -- это всего лишь зеркало, созданное %#^C5!",
                        victim, victim->doppel );
         else 
             ch->pecho( "Ты замечаешь, что под обликом %1$^C2 скрывается %1$#^C1!",
@@ -1689,7 +1689,7 @@ VOID_SPELL(RulerAura)::run( Character *ch, Character *, int sn, int level )
 
     if (!ch->isAffected(sn))
     {
-      ch->pecho("Теперь ты чувствуешь себя более информированн%Gым|ым|ой, правя Миром.", ch);
+      ch->send_to("Аура Правителя помогает тебе видеть сквозь тень и камуфляж.\n\r");
 
       af.bitvector.setTable(&detect_flags);
       af.type = sn;
@@ -1715,7 +1715,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
   if ( (get_eq_char(ch, wear_neck_1)  != 0 ) &&
         (get_eq_char(ch, wear_neck_2)  != 0 ) )
   {
-    ch->send_to("Но у тебя уже что-то одето!\n\r");
+    ch->send_to("Но у тебя уже что-то надето на шею.\n\r");
     return;
   }
 
@@ -1756,8 +1756,8 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
 
   badge->timer = 200;
-  act_p("Ты одеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR,POS_RESTING);
-  act_p("$c1 одевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM,POS_RESTING);
+  act_p("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR,POS_RESTING);
+  act_p("$c1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM,POS_RESTING);
 
   obj_to_char(badge,ch);
   wear_obj( ch, badge, 0 );
@@ -1824,7 +1824,7 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
-                ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+                ch->send_to( "У тебя отобрали привилегии Правителя!\n\r" );
                 return;
         }
 
@@ -1917,7 +1917,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
     if (victim->isAffected(gsn_manacles ))
         affect_strip( victim, gsn_manacles );
 
-    act_p("$c1 искупи$gло|л|ла свою провинность и освобождается из под стражи.", victim, 0, 0, TO_ROOM, POS_RESTING);
+    act_p("$c1 искупи$gло|л|ла свою провинность и освобождается из-под стражи.", victim, 0, 0, TO_ROOM, POS_RESTING);
     act_p("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR, POS_RESTING);
 
     if (victim->in_room
@@ -2007,7 +2007,7 @@ bool Stalker::ourVictim( Character *vch )
 
 void Stalker::attackVictim( Character *vch )
 {
-    interpret_raw( ch, "yell", "%s, you criminal! Now you die!", victimName.getValue( ).c_str( ) );
+    interpret_raw( ch, "yell", "%s, пришло твое время умереть!", victimName.getValue( ).c_str( ) );
     multi_hit_nocatch( ch, vch );
 }
 
