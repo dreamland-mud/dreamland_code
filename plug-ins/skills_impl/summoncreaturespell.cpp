@@ -233,6 +233,9 @@ bool SummonedCreature::hourly( )
     if (spell->getStorageVnums().empty())
         return false;
 
+    if (spell->getStorageVnums().count(ch->in_room->vnum))
+        return false;
+
     if (owner->isOnline())
         return false;
 
