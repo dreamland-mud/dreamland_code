@@ -33,12 +33,12 @@ static char get_item_colour(RESET_DATA *pReset)
         return clr.at(0);
 }
 
-static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex)
+static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, RoomIndexData *pRoom)
 {
     ostringstream buf;
     Wearlocation *wearloc = 
         (pReset->command == 'E' ? wearlocationManager->find(pReset->arg3) : wear_none.getElement());
-    DLString id = "reset " + DLString(iReset) + " wear";
+    DLString id = "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset) + " wear";
     DLString label = "{y[" + wearloc->getName() + "]";
 
     StringList commands;
@@ -53,7 +53,7 @@ static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset
     return buf.str();
 }
 
-static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex)
+static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, RoomIndexData *pRoom)
 {
     ostringstream buf;
 
@@ -61,7 +61,7 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
         return DLString::emptyString;
 
     {
-        DLString id = "reset " + DLString(iReset) + " rand";
+        DLString id = "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset) + " rand";
         StringList commands;
         commands.push_back("$ normal");
         commands.push_back("$ rand_stat");
@@ -72,7 +72,7 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
     }
 
     if (pReset->rand != RAND_NONE) {
-        DLString id = "reset " + DLString(iReset) + " tier";
+        DLString id = "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset) + " tier";
 
         StringList commands;
         for (int t = BEST_TIER + 1; t <= WORST_TIER; t++)
@@ -86,15 +86,61 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
     return buf.str();
 }
 
-static void display_resets(Character * ch)
+struct filter_t {
+    filter_t() 
+    {
+        vnum = rand = -1;
+        pObj = 0;
+        pMob = 0;
+    }
+
+    filter_t(int vnum, int rand) : filter_t()
+    {
+        this->vnum = vnum;
+        this->rand = rand;
+        if (vnum > 0) {
+            pObj = get_obj_index(vnum);
+            /*pMob = get_mob_index(vnum); -- uncomment to filter by mob vnum */
+        } 
+    }
+
+    bool matches(RESET_DATA *pReset) const 
+    {
+        if (rand >= 0 && pReset->rand != rand)
+            return false;
+
+        if (!pMob && !pObj)
+            return true;
+
+        switch (pReset->command) {
+        case 'M':
+            if (pMob && pReset->arg1 == vnum)
+                return true;
+            break;
+
+        case 'G':
+        case 'E':
+        case 'O':
+        case 'P':
+            if (pObj && pReset->arg1 == vnum)
+                return true;
+            break;
+        }
+
+        return false;
+    }
+
+    int vnum;
+    int rand;
+    OBJ_INDEX_DATA *pObj;
+    MOB_INDEX_DATA *pMob;
+};
+
+static void display_resets(ostringstream &result, Character * ch, RoomIndexData *pRoom, const filter_t &f)
 {
     ostringstream buf;
-    RoomIndexData *pRoom;
     MOB_INDEX_DATA *pMob = NULL;
-
-    pRoom = ch->in_room->pIndexData;
-
-    buf << "Resets for room [{C" << web_cmd(ch, "redit $1", pRoom->vnum) << "{x] {W" << pRoom->name << "{x:" << endl;
+    bool found = false;
 
     for (unsigned int iReset = 0; iReset < pRoom->resets.size(); iReset++) {
         OBJ_INDEX_DATA *pObj;        
@@ -105,11 +151,14 @@ static void display_resets(Character * ch)
         RESET_DATA *pReset = pRoom->resets[iReset];
         char cmd = pReset->command;
         DLString line;
+        bool matches = f.matches(pReset);
 
-        char numColor = 'D';
-        if (cmd == 'M' || cmd == 'O' || cmd == 'R' || cmd == 'D')
-            numColor = 'W';
-        buf << fmt(0, "{%c%2d{x ", numColor, iReset+1);
+        if (matches) {
+            char numColor = 'D';
+            if (cmd == 'M' || cmd == 'O' || cmd == 'R' || cmd == 'D')
+                numColor = 'W';
+            buf << fmt(0, "{%c%2d{x ", numColor, iReset+1);
+        }
 
         switch (cmd) {
         default:
@@ -129,13 +178,16 @@ static void display_resets(Character * ch)
             pMob = pMobIndex;
             pObj = 0;
 
-            line = "M[" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24s{x %2d-%2d {g%s{x\n\r";
-            buf << fmt(0, line.c_str(),
-                      pReset->arg1, 
-                      russian_case(pMob->short_descr, '1').colourStrip( ).c_str( ),
-                      pReset->arg2, 
-                      pReset->arg4,
-                      pReset->flags.names().c_str());
+            if (matches) {
+                found = true;
+                line = "M[" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24s{x %2d-%2d {g%s{x\n\r";
+                buf << fmt(0, line.c_str(),
+                        pReset->arg1, 
+                        russian_case(pMob->short_descr, '1').colourStrip( ).c_str( ),
+                        pReset->arg2, 
+                        pReset->arg4,
+                        pReset->flags.names().c_str());
+            }
             break;
 
         case 'O':
@@ -152,12 +204,15 @@ static void display_resets(Character * ch)
                 continue;
             }
 
-            line = "O[" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s{x %s{x\n\r";
-            buf << fmt(0, line.c_str(),
-                      pReset->arg1, 
-                      get_item_colour(pReset),
-                      russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
-                      show_reset_rand(ch, iReset+1, pReset, pObj).c_str());
+            if (matches) {
+                found = true;
+                line = "O[" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s{x %s{x\n\r";
+                buf << fmt(0, line.c_str(),
+                        pReset->arg1, 
+                        get_item_colour(pReset),
+                        russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
+                        show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
+            }
             break;
 
         case 'P':
@@ -173,17 +228,20 @@ static void display_resets(Character * ch)
                 continue;
             }
 
-            if (pMob)
-                buf << "        ";
+            if (matches) {
+                if (pMob)
+                    buf << "        ";
 
-            line = "         [" + web_cmd(ch, "oedit $1", "%5d") + "] {%c%-24.24s %2d-%2d %s{x\n\r";
-            buf << fmt(0, line.c_str(),
-                      pReset->arg1,
-                      get_item_colour(pReset),
-                      russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
-                      pReset->arg2,
-                      pReset->arg4,
-                      show_reset_rand(ch, iReset+1, pReset, pObj).c_str());
+                found = true;
+                line = "         [" + web_cmd(ch, "oedit $1", "%5d") + "] {%c%-24.24s %2d-%2d %s{x\n\r";
+                buf << fmt(0, line.c_str(),
+                        pReset->arg1,
+                        get_item_colour(pReset),
+                        russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
+                        pReset->arg2,
+                        pReset->arg4,
+                        show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
+            }
             break;
 
         case 'G':
@@ -200,21 +258,27 @@ static void display_resets(Character * ch)
                 break;
             }
 
-            line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s %s %s{x\n\r";
-            buf << fmt(0, line.c_str(),
-                      pReset->arg1,
-                      get_item_colour(pReset),
-                      russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
-                      show_reset_wearloc(ch, iReset+1, pReset, pObj).c_str(),
-                      show_reset_rand(ch, iReset+1, pReset, pObj).c_str());
+            if (matches) {
+                found = true;
+                line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s %s %s{x\n\r";
+                buf << fmt(0, line.c_str(),
+                        pReset->arg1,
+                        get_item_colour(pReset),
+                        russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
+                        show_reset_wearloc(ch, iReset+1, pReset, pObj, pRoom).c_str(),
+                        show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
+            }
             break;
 
         case 'D':
-            pRoomIndex = get_room_index(pReset->arg1);
-            buf << fmt(0, "D [%5d] %s door reset to %s{x\n\r",
-                      pReset->arg1,
-                      DLString(dirs[pReset->arg2].name).capitalize( ).c_str( ),
-                      door_resets_table.name(pReset->arg3).c_str());
+            if (matches) {
+                found = true;
+                pRoomIndex = get_room_index(pReset->arg1);
+                buf << fmt(0, "D [%5d] %s door reset to %s{x\n\r",
+                        pReset->arg1,
+                        DLString(dirs[pReset->arg2].name).capitalize( ).c_str( ),
+                        door_resets_table.name(pReset->arg3).c_str());
+            }
             break;
 
         case 'R':
@@ -223,13 +287,19 @@ static void display_resets(Character * ch)
                 continue;
             }
 
-            buf << fmt(0, "R [%5d] Exits are randomized{x\n\r",
-                      pReset->arg1);
+            if (matches) {
+                found = true;
+                buf << fmt(0, "R [%5d] Exits are randomized{x\n\r",
+                        pReset->arg1);
+            }
             break;
         }
     }
 
-    page_to_char(buf.str().c_str(), ch);
+    if (found) {        
+        result << "Resets for room [{C" << web_cmd(ch, "redit $1", pRoom->vnum) << "{x] {W" << pRoom->name << "{x:" << endl;
+        result << buf.str();
+    }
 }
 
 static void add_reset(RoomIndexData * room, RESET_DATA * pReset, int index)
@@ -269,7 +339,6 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     RESET_DATA *pReset = NULL;
 
     argument = one_argument(argument, arg1);
-    argument = one_argument(argument, arg2);
     
     if (!OLCState::can_edit( ch, ch->in_room->vnum )) {
         stc("Resets: Invalid security for editing this area.\n\r", ch);
@@ -277,13 +346,59 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     if (arg1[0] == '\0') {
-        if (!ch->in_room->pIndexData->resets.empty())
-            display_resets(ch);
-        else
+        if (!ch->in_room->pIndexData->resets.empty()) {
+            ostringstream buf;
+            display_resets(buf, ch, ch->in_room->pIndexData, filter_t());
+            ch->send_to(buf);
+        } else {
             stc("No resets in this room.\n\r", ch);
+        }
 
         return;
     }
+
+    // Syntax: search <vnum>, search rand_stat, search <vnum> rand_stat
+    if (arg_oneof(arg1, "search", "поиск")) {
+        ostringstream buf;
+        DLString args = argument;
+        DLString argVnum = args.getOneArgument();
+        DLString argRand = argVnum;
+        int vnum = 0;
+        int rand = -1;
+
+        if (argVnum.isNumber()) {
+            argRand = args.getOneArgument();
+            vnum = argVnum.toInt();           
+        }
+        
+        if (!argRand.empty()) {
+            rand = rand_table.value(argRand, false);
+
+            if (rand == NO_FLAG) {
+                stc("Usage: resets search [<vnum>] [normal|rand_stat|rand_all]\r\n", ch);
+                return;
+            }
+
+            if (vnum == 0 && rand == RAND_NONE) {
+                stc("Output for 'normal' resets is too long, specify item vnum or rand.\r\n", ch);
+                return;
+            }
+        }
+
+        filter_t filter(vnum, rand);
+        if (vnum > 0 && !filter.pObj && !filter.pMob) {
+            stc("Can't find an item with this vnum.\r\n", ch);
+            return;
+        }
+
+        for (auto &r: roomIndexMap)
+            display_resets(buf, ch, r.second, filter);
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    argument = one_argument(argument, arg2);
 
     if (is_number(arg1)) {
         RoomIndexData *pRoom = ch->in_room->pIndexData;
@@ -512,6 +627,9 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     stc("        RESET <number> RAND <normal|rand_stat|rand_all>\n\r", ch);
     stc("        RESET <number> TIER <1..5>\n\r", ch);
     stc("        RESET <number> WEAR <slot>\n\r", ch);
+    stc("        RESET SEARCH <vnum>\n\r", ch);
+    stc("        RESET SEARCH <vnum> normal|rand_stat|rand_all \n\r", ch);
+    stc("        RESET SEARCH rand_stat|rand_all \n\r", ch);
 }
 
 // randomize <vnum> <rand_flag> [best_tier]
