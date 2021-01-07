@@ -79,6 +79,10 @@ struct SearcherParam {
     DLString wclass, wflags;
     // Weapon dices and average damage.
     int d1, d2, ave;
+    // Weapon is random?
+    bool random;
+    // Best tier for random weapon.
+    int tier;
 };
 extern SearcherParam p;
 
