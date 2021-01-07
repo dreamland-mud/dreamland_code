@@ -209,9 +209,13 @@ DLString format_longdescr_to_char(const char *descr, Character *ch)
     return buf.str();
 }
 
+// Translate colour coding (tier, unusual item) into auras when screenreader is on or colours are off.
 static void format_screenreader_flags(Object *obj, ostringstream &buf, Character *ch)
 {
-    if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER))
+    if (ch->is_npc())
+        return;
+
+    if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER) && ch->getPC()->getConfig().color)
         return;
 
     DLString aura = get_tier_aura(obj);
