@@ -40,6 +40,7 @@
 #include "act.h"
 #include "save.h"
 #include "act_move.h"
+#include "weapontier.h"
 #include "../anatolia/handler.h"
 #include "vnum.h"
 #include "mercdb.h"
@@ -472,21 +473,44 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     }
 
     if (arg == "rand_stat") {
+        ostringstream buf;
         int cnt = 0;
 
-        for (auto &r: roomIndexMap)
-            for (auto &pReset: r.second->resets)
+        for (auto &r: roomIndexMap) {
+            MOB_INDEX_DATA *pMob = 0;
+
+            for (auto &pReset: r.second->resets) {
+                if (pReset->command == 'M')
+                    pMob = get_mob_index(pReset->arg1);
+                else if (pReset->command == 'O')
+                    pMob = 0;
+
                 if (pReset->rand == RAND_STAT) {
                     OBJ_INDEX_DATA *pObj = get_obj_index(pReset->arg1);
+
+                    if (pReset->bestTier == 2) {
+                        buf << pObj->vnum << "#" 
+                            << russian_case(pObj->short_descr, '1') << "#"
+                            << (pMob ? pMob->vnum : 0) << "#"
+                            << (pMob ? russian_case(pMob->short_descr, '1') : "") << "#"
+                            << r.first << "#"
+                            << r.second->name << "#"
+                            << r.second->areaIndex->name 
+                            << endl;
+                    }
+
                     pObj->properties["random"] = "true";
-                    pObj->properties["bestTier"] = pReset->bestTier;
+                    pObj->properties["bestTier"] = max(pReset->bestTier, DEFAULT_TIER);
                     pReset->rand.setValue(RAND_NONE);
                     pReset->bestTier = 0;
                     SET_BIT(r.second->areaIndex->area_flag, AREA_CHANGED);
                     cnt++;
                 }
+            }
+        }
 
         ch->printf("Transferred %d rand_stat resets to item prototypes.\r\n", cnt);
+        ch->send_to(buf);
         return;
     }
 }
