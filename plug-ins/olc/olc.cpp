@@ -471,80 +471,22 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "mobwipe") {
-        Integer count;
-        int killed = 0;
+    if (arg == "rand_stat") {
+        int cnt = 0;
 
-        if (args.empty() || !Integer::tryParse(count, args)) {
-            ch->println("abc mobwipe <max count>");
-            return;
-        }
-
-        Character *wch_next;
-        for (Character *wch = char_list; wch; wch = wch_next) {
-            wch_next = wch->next;
-
-            if (!wch->is_npc() || wch->master || wch->leader)
-                continue;
-
-            NPCharacter *mob = wch->getNPC();
-            if (mob->pIndexData->count < count)
-                continue;
-            if (mob->behavior && mob->behavior.getDynamicPointer<SummonedCreature>())
-                continue;
-            if (mob->behavior && mob->behavior->hasDestiny())
-                continue;
-
-            extract_char(wch);
-            killed++;
-        }
-
-        ch->pecho("Убито %d мобов.", killed);
-        return;
-    }
-
-    if (arg == "golemocide") {
-        ostringstream buf;
-        Integer vnum;
-
-        if (args.empty() || !Integer::tryParse(vnum, args)) {
-            ch->println("abc golemocide <vnum>");
-            return;
-        }
-
-        Character *wch_next;
-        for (Character *wch = char_list; wch; wch = wch_next) {
-            SummonedCreature::Pointer creature;
-            wch_next = wch->next;
-
-            if (wch->master)
-                continue;
-
-            if (wch->is_npc() && wch->getNPC()->pIndexData->vnum == vnum) {
-                if (wch->carrying)
-                    buf << "Ignoring mob in room [" << wch->in_room->vnum << "] with inventory." << endl;
-                else if (mob_is_changed(wch->getNPC()))
-                    buf << "Ignoring upgraded mob in room [" << wch->in_room->vnum << "]" << endl;
-                else if (wch->getNPC()->behavior && (creature = wch->getNPC()->behavior.getDynamicPointer<SummonedCreature>())) {
-                    PCMemoryInterface *owner = PCharacterManager::find(creature->creatorName);
-                    if (!owner) {
-                        buf << "Mob in room [" << wch->in_room->vnum << "] extracted, no owner " << creature->creatorName << endl;
-                        extract_char(wch);
-                        continue;
-                    }
-
-                    if (owner->getProfession() != prof_necromancer) {
-                        buf << "Mob in room [" << wch->in_room->vnum << "] extracted, owner " << owner->getName() << " has remorted." << endl;
-                        extract_char(wch);
-                        continue;
-                    }
-
-                    buf << "Ignoring mob in room [" << wch->in_room->vnum << "] with active owner " << owner->getName() << endl;
+        for (auto &r: roomIndexMap)
+            for (auto &pReset: r.second->resets)
+                if (pReset->rand == RAND_STAT) {
+                    OBJ_INDEX_DATA *pObj = get_obj_index(pReset->arg1);
+                    pObj->properties["random"] = "true";
+                    pObj->properties["bestTier"] = pReset->bestTier;
+                    pReset->rand.setValue(RAND_NONE);
+                    pReset->bestTier = 0;
+                    SET_BIT(r.second->areaIndex->area_flag, AREA_CHANGED);
+                    cnt++;
                 }
-            }
-        }
 
-        page_to_char(buf.str().c_str(), ch);
+        ch->printf("Transferred %d rand_stat resets to item prototypes.\r\n", cnt);
         return;
     }
 }

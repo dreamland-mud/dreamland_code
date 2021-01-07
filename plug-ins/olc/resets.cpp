@@ -20,11 +20,15 @@
 
 WEARLOC(sheath);
 
-static char get_item_colour(RESET_DATA *pReset)
+static char get_item_colour(OBJ_INDEX_DATA *pObj, RESET_DATA *pReset)
 {
-    if (pReset->bestTier <= 0 || pReset->rand == RAND_NONE)
-        return 'w';
+    int bestTier = pReset->bestTier;
+    if (bestTier <= 0)
+        bestTier = get_item_tier(pObj);
     
+    if (bestTier <= 0)
+        return 'w';
+        
     weapon_tier_t &tier = weapon_tier_table[pReset->bestTier-1];
     DLString clr = tier.colour;
     if (clr.empty())
@@ -71,7 +75,7 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
         buf << web_menu(commands, id, label) << " ";
     }
 
-    if (pReset->rand != RAND_NONE) {
+    if (pReset->rand != RAND_NONE || pObjIndex->properties.count("random") > 0) {
         DLString id = "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset) + " tier";
 
         StringList commands;
@@ -209,7 +213,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                 line = "O[" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s{x %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1, 
-                        get_item_colour(pReset),
+                        get_item_colour(pObj, pReset),
                         russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
                         show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());
             }
@@ -236,7 +240,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                 line = "         [" + web_cmd(ch, "oedit $1", "%5d") + "] {%c%-24.24s %2d-%2d %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1,
-                        get_item_colour(pReset),
+                        get_item_colour(pObj, pReset),
                         russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
                         pReset->arg2,
                         pReset->arg4,
@@ -263,7 +267,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                 line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24s %s %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1,
-                        get_item_colour(pReset),
+                        get_item_colour(pObj, pReset),
                         russian_case(pObj->short_descr, '1').colourStrip( ).c_str( ),
                         show_reset_wearloc(ch, iReset+1, pReset, pObj, pRoom).c_str(),
                         show_reset_rand(ch, iReset+1, pReset, pObj, pRoom).c_str());

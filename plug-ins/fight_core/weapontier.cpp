@@ -25,10 +25,8 @@ CONFIGURABLE_LOADED(fight, weapon_tiers)
     weapon_tier_table.fromJson(value);
 }
 
-int get_item_tier(Object *obj)
+static int valid_tier(const DLString &tierName)
 {
-    DLString tierName = obj->getProperty("tier");
-
     if (!tierName.isNumber())
         return 0;
 
@@ -37,6 +35,21 @@ int get_item_tier(Object *obj)
         return 0;
 
     return tier;
+}
+
+int get_item_tier(Object *obj)
+{
+    DLString tierName = obj->getProperty("tier");
+    return valid_tier(tierName);
+}
+
+int get_item_tier(OBJ_INDEX_DATA *pObj)
+{
+    Properties::const_iterator p = pObj->properties.find("bestTier");
+    if (p == pObj->properties.end())
+        return 0;
+
+    return valid_tier(p->second);
 }
 
 DLString get_tier_aura(Object *obj)
