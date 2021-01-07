@@ -29,7 +29,7 @@ protected:
     void randomizeWeaponStats(Object *obj, int bestTierOverride = -1) const;
     void randomizeWeapon(Object *obj, int level, int bestTier) const;
     void clearWeapon(Object *obj) const;
-
+    void adjustTimer(Object *obj) const;
     int getAlign(Object *obj) const;
     int getTier(Object *obj, int bestTierOverride) const;
 };

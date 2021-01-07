@@ -88,6 +88,8 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
     if (obj->item_type != ITEM_WEAPON)
         return;
 
+    adjustTimer(obj);
+
     if (obj->getProperty("random").empty())
         return;
 
@@ -105,6 +107,23 @@ void WeaponRandomizer::clearWeapon(Object *obj) const
     obj->affected.deallocate();
     obj->timer = 0;
     obj->setShortDescr(&str_empty[0]);
+}
+
+void WeaponRandomizer::adjustTimer(Object *obj) const
+{
+    if (obj->timer > 0)
+        return;
+
+    if (obj->getProperty("tier").empty())
+        return;
+
+    WeaponGenerator gen;
+    gen.item(obj)
+        .tier(obj->getProperty("tier").toInt())
+        .assignTimers();
+
+    if (obj->timer > 0)
+        notice("rand: timer for obj %d %ld set to %d.", obj->pIndexData->vnum, obj->getID(), obj->timer);
 }
 
 void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) const
