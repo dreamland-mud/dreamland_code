@@ -694,31 +694,13 @@ bool spec_mayor( NPCharacter *ch )
         break;
 
     case 'E':
-        do_say(ch,"Настоящим обьявляю ворота Мидгаарда закрытыми!");
         break;
 
     case 'O':
-        interpret_raw( ch, "unlock", "gate" );
-        interpret_raw( ch, "open", "gate" );
-        interpret( ch, "emote отпирает ворота Мидгаарда и распахивает их.");
-        for( key=ch->in_room->contents; key!=0; key=key->next_content )
-          if ( key->pIndexData->vnum == 3379 )
-            break;
-        if ( key != 0 )
-          SET_BIT( key->wear_flags, ITEM_TAKE );
-        interpret_raw( ch, "get", "gatekey" );
+        interpret( ch, "emote широко распахивает ворота Мидгаарда.");
         break;
 
     case 'C':
-        interpret_raw( ch, "close", "gate" );
-        interpret_raw( ch, "lock", "gate" );
-/*        interpret_raw( ch, "drop", "key" ); */
-        interpret( ch, "emote запирает ворота Мидгаарда.");
-        for( key=ch->in_room->contents; key!=0; key=key->next_content )
-          if ( key->pIndexData->vnum == 3379 )
-            break;
-        if ( key != 0 )
-          REMOVE_BIT( key->wear_flags, ITEM_TAKE );
         break;
 
     case '.' :
