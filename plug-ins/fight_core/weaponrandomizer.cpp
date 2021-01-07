@@ -57,8 +57,17 @@ void WeaponRandomizer::eventItemEdited(const ItemEditedEvent &event) const
     }
 }
 
-// Called when an item is created during area update:
-// randomize rand_stat and rand_all weapons.
+static bool item_is_sold(Object *obj)
+{
+    Character *carrier = obj->getCarrier();
+    return carrier 
+            && carrier->is_npc() 
+            && mob_has_occupation(carrier->getNPC(), OCC_SHOPPER)
+            && IS_OBJ_STAT(obj, ITEM_INVENTORY);
+}
+
+// Called when an item is created or refreshed during area update:
+// randomize rand_stat and rand_all weapons. For shops, do a periodic refresh.
 void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
 {
     Object *obj = event.obj;
@@ -67,6 +76,17 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
 
     if (obj->item_type != ITEM_WEAPON)
         return;
+
+    // Refreshing existing item.
+    if (!obj->getProperty("tier").empty()) {
+        if (!item_is_sold(obj))        
+            return;
+
+        if (chance(90))
+            return;
+
+        obj->getCarrier()->recho("%^C1 проводит инвентаризацию.", obj->getCarrier());
+    }
 
     if (pReset->rand == RAND_ALL) {
         randomizeWeapon(obj, level, pReset->bestTier);

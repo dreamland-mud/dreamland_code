@@ -288,24 +288,6 @@ static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
     return line;
 }
 
-static bool mob_is_changed(NPCharacter *mob) {
-    int vnum = mob->pIndexData->vnum;
-    int dn = mob->damage[DICE_NUMBER];
-    int dt = mob->damage[DICE_TYPE];
-
-    if (vnum == 24 && (dn != 13 || dt != 9)) // adamantite golem
-        return true;
-    if (vnum == 23 && (dn != 11 || dt != 5)) // iron golem
-        return true;
-    if (vnum == 21 && (dn != 3 || dt != 10)) // lesser golem
-        return true;
-    if (vnum == 22 && (dn != 8 || dt != 4)) // stone golem
-        return true;
-
-    return false;    
-}
-
-
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;

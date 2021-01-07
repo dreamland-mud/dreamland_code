@@ -29,7 +29,7 @@ static char get_item_colour(OBJ_INDEX_DATA *pObj, RESET_DATA *pReset)
     if (bestTier <= 0)
         return 'w';
         
-    weapon_tier_t &tier = weapon_tier_table[pReset->bestTier-1];
+    weapon_tier_t &tier = weapon_tier_table[bestTier-1];
     DLString clr = tier.colour;
     if (clr.empty())
         return 'w';

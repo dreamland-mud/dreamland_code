@@ -237,17 +237,16 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
     obj = create_object(pObjIndex, 0);
     obj->reset_mob = mob->getID();
 
+    // Give and equip the item.
+    obj_to_char( obj, mob );
+    eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
+
     // Mark shop items with 'inventory' flag.
-    if (mob->behavior && IS_SET(mob->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
-    {
+    if (mob_has_occupation(mob, OCC_SHOPPER)) {
         if (pReset->command == 'G')
             SET_BIT( obj->extra_flags, ITEM_INVENTORY );
     }
 
-    // Give and equip the item.
-    obj_to_char( obj, mob );
-    eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
-        
     if (obj->pIndexData->limit != -1)
         if (verbose)
             mob->recho("Милость богов снисходит на %C2, принося с собой %O4.", mob, obj);
@@ -267,6 +266,8 @@ static bool reset_mob_item(RESET_DATA *myReset, NPCharacter *mob)
     Object *self = get_obj_list_vnum(mob->carrying, pObjIndex->vnum);
     if (self) {
         reset_obj_location(myReset, self, mob, true);
+        // Trigger potential refresh for rand_all and rand_stat items, e.g. in shops.
+        eventBus->publish(ItemResetEvent(self, self->level, myReset));
         return false;
     }
 
