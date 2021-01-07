@@ -739,7 +739,20 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     
     Affect af;
 
-    if ( victim->isAffected(sn ) || IS_SLOW(victim))
+    Affect *paf = victim->affected.find(gsn_haste);
+    if (paf && paf->duration > -2)
+    {
+        if (checkDispel(level,victim,gsn_haste))
+            return;
+        
+        if (victim != ch)
+            act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
+
+        victim->send_to("Твои движения замедляются, но лишь на мгновение.\n\r");
+        return;
+    }
+
+        if (IS_AFFECTED(victim, AFF_SLOW))
     {
         if (victim == ch)
           ch->send_to("Ты не можешь двигаться медленнее, чем сейчас!\n\r");
@@ -753,23 +766,10 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     ||  IS_SET(victim->imm_flags,IMM_SPELL))
     {
         if (victim != ch)
-            act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
+        act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
         victim->send_to("Ты чувствуешь себя немного сонно, но это сразу проходит.\n\r");
         return;
     }
-
-    if (IS_AFFECTED(victim,AFF_HASTE))
-    {
-        if (checkDispel(level,victim,gsn_haste))
-            return;
-        
-        if (victim != ch)
-            act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
-
-        victim->send_to("Твои движения замедляются, но лишь на мгновение.\n\r");
-        return;
-    }
-
 
     af.bitvector.setTable(&affect_flags);
     af.type      = sn;

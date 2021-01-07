@@ -57,7 +57,7 @@ void BattleragerPoncho::wear( Character *ch )
     Affect af;
     short level = ch->getModifyLevel( );
 
-    if (ch->isAffected(gsn_haste ) || ch->isAffected(gsn_transform )) 
+    if (ch->isAffected(gsn_haste )) 
         return;
 
     af.bitvector.setTable(&affect_flags);

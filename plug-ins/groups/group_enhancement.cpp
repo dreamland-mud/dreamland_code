@@ -86,17 +86,8 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
     
     Affect af;
 
-    if (victim->isAffected(sn) || IS_QUICK(victim))
-    {
-        if (victim == ch)
-          ch->send_to("Ты не можешь двигаться быстрее, чем сейчас!\n\r");
-        else
-          act_p("$C1 не может двигаться еще быстрее.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
-        return;
-    }
-
-    if (IS_AFFECTED(victim,AFF_SLOW))
+    Affect *paf = victim->affected.find(gsn_slow);
+    if (paf && paf->duration > -2)
     {
         if (checkDispel(level,victim, gsn_slow))
             return;
@@ -105,6 +96,16 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
             ch->send_to("Твоя попытка закончилась неудачей.\n\r");
 
         victim->send_to("Твои движения становятся быстрее... но лишь на мгновение.\n\r");
+        return;
+    }
+
+    if (IS_AFFECTED(victim, AFF_HASTE))
+    {
+        if (victim == ch)
+          ch->send_to("Ты не можешь двигаться быстрее, чем сейчас!\n\r");
+        else
+          act_p("$C1 не может двигаться еще быстрее.",
+                 ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
 

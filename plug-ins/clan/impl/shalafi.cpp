@@ -401,8 +401,6 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
   hp_modif = ch->applyCurse( min(30000 - ch->max_hit, ( int )( ch->max_hit / 1.6 ) ) );
   ch->hit += hp_modif;
 
-  if( ch->isAffected(gsn_haste ) ) affect_strip( ch, gsn_haste );
-
   af.type               = sn;
   af.level              = level;
   af.duration           = 24;
@@ -411,9 +409,11 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
   af.modifier           = hp_modif;
   affect_to_char(ch,&af);
 
-    af.location = APPLY_DEX;
-    af.modifier  = - (4 + level / 10);
-    affect_to_char( ch, &af );
+  af.location = APPLY_DEX;
+  af.modifier  = - (4 + level / 10);
+  af.bitvector.setTable(&affect_flags);
+  af.bitvector.setValue(AFF_SLOW);    
+  affect_to_char( ch, &af );
 
   ch->send_to("Прилив жизненной силы затмевает твой разум.\n\r");
 
