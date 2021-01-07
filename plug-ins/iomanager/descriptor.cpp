@@ -75,6 +75,7 @@ enum {
 const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet" };
 int ttype_lookup( const char *received )
 {
+    notice("telnet: checking %s as terminal type candidate", received);	
     for (int i = 0; i < TTYPE_MAX; i++) {
         const char *ttype = TTYPE_NAMES[i]; 
         if (strncmp(received, ttype, strlen(ttype)) == 0) {
@@ -286,7 +287,7 @@ int Descriptor::inputTelnet( unsigned char i )
             break;
 
         default:
-            LogStream::sendError() << "telnet: unknown state " << i << endl;
+            LogStream::sendError() << "telnet: unknown state " << telnet.state << ":" << i << endl;
             telnet.state = TNS_NORMAL;
     }
 
