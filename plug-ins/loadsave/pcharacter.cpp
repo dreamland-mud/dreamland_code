@@ -143,6 +143,9 @@ bool PCharacter::load( )
     for (int iNest = 0; iNest < MAX_NEST; iNest++ )
         rgObjNest[iNest] = 0;
 
+    // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
+    char_to_room(this, get_room_instance(ROOM_VNUM_LIMBO));
+   
     for ( ; ; ) {
         char letter;
         char *word;
@@ -214,9 +217,6 @@ bool PCharacter::load( )
 
     clear_fenia_skills( this );
     
-    // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
-    char_to_room(this, get_room_instance(ROOM_VNUM_LIMBO));
-   
     /* Now add back spell effects. */
     for (auto &af: affected)
         affect_modify( this, af, true );

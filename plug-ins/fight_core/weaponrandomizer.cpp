@@ -160,6 +160,10 @@ void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) c
     notice("rand_stat: created item [%d] [%lld] tier %s",
             obj->pIndexData->vnum, obj->getID(), 
             obj->getProperty("tier").c_str());
+
+    Character *carrier = obj->getCarrier();
+    if (carrier && !carrier->is_npc())
+        carrier->pecho(POS_DEAD, "%^O1 меняет свои характеристики на случайные.", obj);
 }
 
 // Full randomize of a weapon. Most often the weapon will be a fixed "stub" item w/o any properties.
