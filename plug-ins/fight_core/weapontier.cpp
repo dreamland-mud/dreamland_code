@@ -62,3 +62,9 @@ DLString get_tier_aura(Object *obj)
 
     return DLString::emptyString;
 }
+
+bool item_is_random(obj_index_data *pObj) 
+{
+    return pObj->properties.count("random") > 0;
+}
+

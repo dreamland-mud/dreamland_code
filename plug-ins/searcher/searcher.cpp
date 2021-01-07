@@ -25,8 +25,9 @@
 #include "merc.h"
 #include "act.h"
 #include "comm.h"
+#include "weapontier.h"
 #include "weapons.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -42,7 +43,7 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
-static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, DLString &where, int &rand )
+static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, DLString &where)
 {
     int mobVnum = -1;
     for(auto &pReset: pRoom->resets) {
@@ -56,21 +57,19 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                 // Found who carries the object.
                 if (pReset->arg1 == vnum && mobVnum > 0) {
                     MOB_INDEX_DATA *pMob = get_mob_index( mobVnum );
-                    if (pMob && pReset->rand != RAND_ALL) {
+                    if (pMob && pReset->rand == RAND_NONE) {
                         // Return success
                         pArea = pRoom->areaIndex;
                         where = russian_case(pMob->short_descr, '1');
-                        rand = pReset->rand;
                         return true;
                     }
                 }
                 break;
             case 'O':
-                if (pReset->arg1 == vnum && pReset->rand != RAND_ALL) { 
+                if (pReset->arg1 == vnum && pReset->rand == RAND_NONE) { 
                     // Object is on the floor, return success.
                     pArea = pRoom->areaIndex;
                     where = pRoom->name;
-                    rand = pReset->rand;
                     return true;
                 }
                 break; 
@@ -78,11 +77,10 @@ static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData
                 // Found where the object is placed.
                 if (pReset->arg1 == vnum) {
                     OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
-                    if (in && pReset->rand != RAND_ALL) {
+                    if (in && pReset->rand == RAND_NONE) {
                         // Return success.
                         pArea = pRoom->areaIndex;
                         where = pRoom->name;
-                        rand = pReset->rand;
                         return true;
                     }
                 }
@@ -113,13 +111,13 @@ static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLStrin
     return false;
 }
 
-static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLString &where, int &rand )
+static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLString &where )
 {
     // First look for obj resets in the same area it's from.
     for (auto &pair: pObj->area->roomIndexes) {
         RoomIndexData *pRoom = pair.second;
 
-        if (get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where, rand))
+        if (get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where))
             return true;
     }
 
@@ -127,7 +125,7 @@ static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLStrin
     for (auto &r: roomIndexMap) {
         RoomIndexData *pRoom = r.second;
         if (pRoom->areaIndex != pObj->area 
-                && get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where, rand))
+                && get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where))
             return true;
     }
 
@@ -256,6 +254,8 @@ public:
             // Ignore weapons, they're shown in another table.
             if (pObj->item_type == ITEM_WEAPON) 
                 continue;
+            if (item_is_random(pObj))
+                continue;
 
             // Quirk with light wearlocation.
             if (wear == 0) 
@@ -340,8 +340,7 @@ public:
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AreaIndexData *pArea;
-            int rand = 0;
-            useless = !get_obj_resets( pObj, pArea, where, rand );
+            useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
             if (area_is_clan(pArea))
@@ -359,8 +358,8 @@ public:
             a["wearloc"] = wearloc;
             a["itemtype"] = itemtype;
 
-            // For 'noident' and rand_stat items only return a subset of fields.
-            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT) && rand == RAND_NONE) {
+            // For 'noident' items only return a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
                 a["hr"] = hr;
                 a["dr"] = dr;
                 a["hp"] = hp;
@@ -386,7 +385,6 @@ public:
             a["area"] = area;
             a["where"] = where;
             a["limit"] = pObj->limit;
-            a["rand"] = rand_table.name(rand);
             dump.append(a);
         }
 
@@ -422,6 +420,8 @@ public:
                 continue;
             // Only dump weapons. An arrow can be 'held' so can't ignore non-wieldable ones.
             if (wear == 0 || pObj->item_type != ITEM_WEAPON)
+                continue;
+            if (item_is_random(pObj))
                 continue;
 
             // Format weapon class, special flags and damage.
@@ -473,8 +473,7 @@ public:
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AreaIndexData *pArea;
-            int rand = 0;
-            bool useless = !get_obj_resets( pObj, pArea, where, rand );
+            bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
             if (area_is_clan(pArea))
@@ -491,8 +490,8 @@ public:
             w["level"] = pObj->level;
             w["wclass"] = weaponClass;
 
-            // For 'noident' and rand_stat items only show a subset of fields.
-            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT) && rand == RAND_NONE) {
+            // For 'noident' items only show a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
                 w["special"] = special;
                 w["d1"] = d1;
                 w["d2"] = d2;
@@ -521,7 +520,6 @@ public:
             w["area"] = area;
             w["where"] = where;
             w["limit"] = pObj->limit;
-            w["rand"] = rand_table.name(rand);
             dump.append(w);
         }
 
@@ -617,8 +615,7 @@ public:
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AreaIndexData *pArea;
-            int rand = 0;
-            bool useless = !get_obj_resets( pObj, pArea, where, rand );
+            bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
             if (area_is_clan(pArea))
@@ -763,8 +760,7 @@ CMDRUNP(searcher)
 
                     DLString where;
                     AreaIndexData *pArea;
-                    int rand = 0;
-                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where, rand)) {
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
                     }
@@ -846,8 +842,7 @@ CMDRUNP(searcher)
 
                     DLString where;
                     AreaIndexData *pArea;
-                    int rand = 0;
-                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where, rand)) {
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
                     }
