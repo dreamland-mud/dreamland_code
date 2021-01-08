@@ -370,6 +370,11 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         int vnum = 0;
         int rand = -1;
 
+        if (argVnum.empty()) {
+            stc("Please specify item vnum or rand value.\r\n", ch);
+            return;
+        }
+
         if (argVnum.isNumber()) {
             argRand = args.getOneArgument();
             vnum = argVnum.toInt();           
