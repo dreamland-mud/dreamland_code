@@ -73,13 +73,11 @@ DLString args2string( const RegisterList &args )
     return get_unique_arg( args ).toString( );
 }
 
+// Return unquoted arguments, for methods that accept both [abc def] and ['abc def'].
 DLString args2word( const RegisterList &args )
 {
-    StringSet ss;
-    ss.fromString(get_unique_arg(args).toString());
-    if (ss.size() > 1 || ss.size() < 1)
-        throw Scripting::Exception("Expecting a single word or words in quotes");
-    return *(ss.begin());
+    DLString word = get_unique_arg(args).toString();
+    return word.substitute('\'', "");
 }
 
 Character * args2character( const RegisterList &args )
