@@ -1112,15 +1112,21 @@ public:
                 Json::Value h;
 
                 h["id"] = (*a)->getID();
+	    	    
+                if (!(*a)->aka.empty())
+                    h["kw"] = (*a)->getAllKeywordsString() + " " + (*a)->aka.toString();
+                else
+                    h["kw"] = (*a)->getAllKeywordsString();
 
-	    	    h["kw"] = (*a)->getAllKeywordsString();
+                for (auto &k: (*a)->getAllKeywords())
+                    h["kwList"].append(k);
+                
+                for (auto &k: (*a)->aka)
+                    h["kwList"].append(k);
 
-                for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
-                    h["kwList"].append(*k);
-
-                for (StringSet::const_iterator l = (*a)->labels.all.begin(); l != (*a)->labels.all.end(); l++) {
-                    h["labels"].append(*l);
-                    h["titles"][*l] = (*a)->getTitle(*l).colourStrip();
+                for (auto &l: (*a)->labels.all) {
+                    h["labels"].append(l);
+                    h["titles"][l] = (*a)->getTitle(l).colourStrip();
                 }
 
                 ostringstream textStream;
