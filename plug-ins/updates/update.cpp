@@ -201,6 +201,9 @@ bool is_bright_for_vampire( Character *ch )
 
     if (!IS_OUTSIDE(ch))
         return false;
+
+    if(ch->in_room->getSectorType() == SECT_UNDERWATER)
+        return false;
         
     if (ch->isAffected(gsn_dark_shroud)) 
         return false;
@@ -1131,6 +1134,10 @@ struct LightVampireDamage : public Damage {
         
         dam = max( 1, (ch->max_hit * n) / 500 );
 
+        if(ch->in_room->getSectorType() == SECT_FOREST) dam=dam/2;
+        if(ch->in_room->getSectorType() == SECT_INSIDE) dam=dam/2;
+        if(ch->in_room->getSectorType() == SECT_AIR) dam=dam+dam/2;
+
         protectRazer( );
     }
      
@@ -1156,8 +1163,16 @@ struct LightVampireDamage : public Damage {
             msg = "Лучи восходящего солнца тревожат тебя." ;
         else if (weather_info.sunlight == SUN_SET) 
             msg = "Закатные лучи тревожат тебя." ;
-    
+  
         act( msg.c_str( ), ch, 0, 0, TO_CHAR );
+
+        msg.clear();
+
+        if(ch->in_room->getSectorType() == SECT_FOREST) msg = "Листья деревьев частично защищают тебя от солнца.";
+        if(ch->in_room->getSectorType() == SECT_INSIDE) msg = "Тени в помещении помогают выдержать солнечный свет.";
+        if(ch->in_room->getSectorType() == SECT_AIR) msg = "В воздухе под открытым небом лучи солнца жалят тебя особенно сильно.";
+
+        if(!msg.empty()) act( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
         RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
