@@ -64,9 +64,10 @@ bool        check_bare_hands( Character *ch );
 void        check_bloodthirst( Character *ch );
 
 
-#define IS_QUICK(ch) (((ch)->is_npc() && IS_SET((ch)->getNPC()->off_flags,OFF_FAST)) \
-                      || (IS_AFFECTED((ch),AFF_HASTE) && !IS_AFFECTED((ch),AFF_SLOW)))
+#define IS_QUICK(ch) ((((ch)->is_npc() && IS_SET((ch)->getNPC()->off_flags,OFF_FAST)) \
+                      || IS_AFFECTED((ch),AFF_HASTE)) && !IS_AFFECTED((ch),AFF_SLOW))
 
-#define IS_SLOW(ch) ((IS_AFFECTED((ch),AFF_SLOW) && !IS_AFFECTED((ch),AFF_HASTE)))
+#define IS_SLOW(ch) (IS_AFFECTED((ch),AFF_SLOW) && !(((ch)->is_npc() && IS_SET((ch)->getNPC()->off_flags,OFF_FAST)) \
+                      || IS_AFFECTED((ch),AFF_HASTE)))
 
 #endif

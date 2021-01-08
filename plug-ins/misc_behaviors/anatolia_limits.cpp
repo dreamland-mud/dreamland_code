@@ -115,7 +115,7 @@ bool Excalibur::sac( Character *ch )
  */
 void HasteBracers::wear( Character *ch ) 
 {
-  if( !( ch->isAffected(gsn_haste ) || ch->isAffected(gsn_transform ) ) ) {
+  if( !( ch->isAffected(gsn_haste ) ) ) {
 //      ch->send_to("Предмет принимает форму твоих рук, плотно прилегая к коже.\n\r");
       ch->send_to("Твое тело наполняется удивительной легкостью.\n\r");
     }
@@ -125,7 +125,7 @@ void HasteBracers::equip( Character *ch )
   Affect af;
   short level = ch->getModifyLevel();
 
-  if( !( ch->isAffected(gsn_haste ) || ch->isAffected(gsn_transform ) ) ) {
+  if( !( ch->isAffected(gsn_haste ) ) ) {
       af.bitvector.setTable(&affect_flags);
       af.type = gsn_haste;
       af.duration = -2;
