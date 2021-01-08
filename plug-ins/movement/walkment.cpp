@@ -426,13 +426,6 @@ bool Walkment::checkWater( Character *wch )
     if (from_room->getSectorType() != SECT_WATER_NOSWIM
          && to_room->getSectorType() != SECT_WATER_NOSWIM)
         return true;
-
-            if ( (to_room->getSectorType() == SECT_UNDERWATER) && !IS_SET(boat_types, BOAT_SWIM) ) {
-        msgSelfParty( wch, 
-                      "Здесь ты можешь только проплыть.",
-                      "%2$^C1 сможет здесь только проплыть." );
-        return false;
-    }
     
     // For a rider, we'll only check horse's ability to swim.
     if (MOUNTED(wch))
