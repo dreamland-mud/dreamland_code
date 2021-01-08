@@ -19,6 +19,7 @@
 
 #include "so.h"
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "room.h"
 #include "object.h"
 #include "objectbehavior.h"
