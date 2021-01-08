@@ -48,11 +48,18 @@ int boat_get_types( Character *ch )
     Object *boat;
     int types = BOAT_NONE;
     
-    if (ch->is_immortal( ) || ch->is_mirror( ))
+    if (ch->is_immortal( ) || ch->is_mirror( )){
+        SET_BIT(types, BOAT_FLY);
+        SET_BIT(types, BOAT_SWIM);
+    }
+
+    if (is_flying( ch ))
         SET_BIT(types, BOAT_FLY);
 
-    if (is_flying( ch ) || IS_GHOST(ch))
+    if(IS_GHOST(ch)){
         SET_BIT(types, BOAT_FLY);
+        SET_BIT(types, BOAT_SWIM);
+    }
 
     if (IS_AFFECTED(ch, AFF_SWIM))
         SET_BIT(types, BOAT_SWIM);
