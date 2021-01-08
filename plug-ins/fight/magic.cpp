@@ -457,7 +457,7 @@ bool overcharmed( Character *ch )
     max_charm -= 28 - min( 28, ch->getCurrStat( STAT_CHA ) );
 
     if (max_charm <= 0) {
-        ch->println("Ты не в состоянии контролировать никого, кроме себя!");
+        ch->println("Твоего обаяния, интеллекта и опыта недостаточно, чтобы контролировать кого-либо.");
         return true;
     }
 
