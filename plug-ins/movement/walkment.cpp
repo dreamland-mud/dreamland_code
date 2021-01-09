@@ -426,36 +426,38 @@ bool Walkment::checkWater( Character *wch )
     // water_swim: can be ridden through even if the horse doesn't swim, can get through on foot
     // water_noswim: can be ridden through only if the horse swims, can get through with any boat
     // underwater: can't get through with any boat, swimming only     
-    
-    // If I understand correctly, this check made sense before, because the "boat" logic only applied
-    // to one sector flag. Now we have an opportunity to rewrite it correctly for all three.        
-    if (from_room->getSectorType() != SECT_WATER_NOSWIM
-         && to_room->getSectorType() != SECT_WATER_NOSWIM)
-        return true;
-/*            
-    if ( (to_room->getSectorType() == SECT_UNDERWATER) && !IS_SET(boat_types, BOAT_SWIM) ) {
-        msgSelfParty( wch, 
-                      "Здесь ты можешь только проплыть.",
-                      "%2$^C1 сможет здесь только проплыть." );
-        return false;
-    }
- */
-            
-    // For a rider, we'll only check horse's ability to swim.        
-    if (MOUNTED(wch))
-        return true;
 
-    // check underwater here
-    if (boat_types != BOAT_NONE) 
-        return true;
-    
-    // add separate movetypes for underwater.
-    // for water_swim horses could splash water around, fun!        
-    rc = RC_MOVE_WATER;
-    msgSelfParty( wch, 
-                  "Чтоб идти дальше тебе нужна лодка.",
-                  "%2$^C1 не умеет ходить по воде." );
-    return false;
+    if ( from_room->getSectorType() == SECT_UNDERWATER || 
+         to_room->getSectorType() == SECT_UNDERWATER ) {
+            if ( !IS_SET(boat_types, BOAT_SWIM ) {
+               msgSelfParty( wch, 
+                  "Здесь ты можешь только проплыть.",
+                  "%2$^C1 сможет здесь только проплыть." );
+                rc = RC_MOVE_WATER; // TODO: add RC_MOVE_UNDERWATER
+                return false;                     
+            }
+    }
+                
+    if ( from_room->getSectorType() == SECT_WATER_NOSWIM || 
+         to_room->getSectorType() == SECT_WATER_NOSWIM ) {
+                
+            // For a rider, we'll only check horse's ability to swim.        
+            if (MOUNTED(wch))
+               return true;
+            
+            // any boats will do
+            if (boat_types != BOAT_NONE) 
+               return true;
+            
+                rc = RC_MOVE_WATER;    
+            msgSelfParty( wch, 
+                  "Чтоб идти дальше тебе нужна лодка, способность плавать или полет.",
+                  "%2$^C1 не умеет перемещаться по воде." );
+            return false;                
+    }
+ 
+    // for water_swim horses could splash water around, fun!  
+    return true;
 }
 
 bool Walkment::checkRoomCapacity( Character *wch )
