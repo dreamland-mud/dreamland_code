@@ -951,17 +951,14 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             msgCharBlind = "{yТы внезапной серией ударов поднимаешь вихрь листьев, ослепляя $C4!{x";
             msgVictHeart = "{R$c1 призывает силу Природы, нанося тебе мощнейший удар прямо в сердце!{x";
             msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";                            
-            chance = 5;
             stun_chance = 85;
     }       
     if ( ch->getProfession( ) == prof_thief ) {
             if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
                         return;                
-            chance = 5;
             stun_chance = 65;        
     }
     if ( ch->getProfession( ) == prof_ninja ) {
-            chance = 5;
             stun_chance = 85;
     }   
     if ( ch->getProfession( ) == prof_samurai ) {
@@ -975,7 +972,6 @@ void UndefinedOneHit::damEffectCriticalStrike( )
                     msgVictStun = "{W$c1 обездвиживает тебя внезапным ударом пяткой в печень!{x"; 
                     msgCharStun = "{WТы обездвиживаешь $C4 внезапным ударом пяткой в печень!{x";                        
             }            
-            chance = 5;
             blind_chance = 85;
     }
                             
@@ -1031,7 +1027,9 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     if (diceroll < stun_chance) {
         act_p( msgVictStun, ch, 0, victim, TO_VICT,POS_RESTING);
         act_p( msgCharStun, ch, 0, victim, TO_CHAR,POS_RESTING);
-        victim->setWaitViolence( 2 );
+        // stun only in 15-35% chance, otherwise just damage
+        if (diceroll >= 50)
+                victim->setWaitViolence( 2 );
         dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage          
     }
     else if (diceroll < blind_chance) {
@@ -1163,7 +1161,7 @@ void UndefinedOneHit::damEffectMasterHand()
     diceroll = number_percent();
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-    skill_mod = 0.2;
+    skill_mod = 0.15;
     stat_mod = 0.01;
     level_mod = 0.01;
     quick_mod = 0.05;
@@ -1188,13 +1186,17 @@ void UndefinedOneHit::damEffectMasterHand()
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
 
     chance += skill * skill_mod;
-    chance += skill_level_bonus(*gsn_mastering_pound, ch);
     d.log(chance, "skill");
     chance += (ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON)) * stat_mod * 100;
     d.log(chance, "stats");
     chance += (level - victim->getModifyLevel()) * level_mod * 100;
     d.log(chance, "lvl");
 
+    if ( !victim->isAffected(gsn_nerve) ) {
+        chance = chance / 2;        
+        d.log(chance, "nerve");         
+    }
+            
     if (IS_AFFECTED(ch, AFF_WEAK_STUN)) {
         chance = chance / 2;
         d.log(chance, "stun");        
@@ -1215,6 +1217,9 @@ void UndefinedOneHit::damEffectMasterHand()
     if (diceroll > chance)
         return;
 
+    if ( (victim->isAffected(gsn_nerve)) && (number_percent() < 20) )
+        ch->send_to("С ослабленными нервными окончаниями оглушить противника становится легче.\n\r");        
+                
     if (!IS_AFFECTED(victim, AFF_WEAK_STUN)) {
         SET_BIT(victim->affected_by, AFF_WEAK_STUN);
         if (ch != victim) {
