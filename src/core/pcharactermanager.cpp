@@ -112,6 +112,7 @@ void PCharacterManager::update( PCharacter* pc )
         {
                 if( PCharacterMemory* pcm = dynamic_cast<PCharacterMemory*>( ipos->second ) )
                 {
+                        pcm->setSkills(pc->getSkills());
                         pc->setMemory( pcm );
                         ddeallocate( pcm );
                 }
