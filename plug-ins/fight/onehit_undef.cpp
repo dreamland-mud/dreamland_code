@@ -951,8 +951,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     if ( ch->getProfession( ) == prof_ranger ) {                    
             if (!IS_NATURE(ch->in_room))
                 return;
-            msgVictStun = "$c1 внезапно сотрясает землю мощным ударом!";
-            msgCharStun = "Ты сотрясаешь землю мощным ударом, заставая врасплох $C4!";               
+            msgVictBasic = "$c1 внезапно сотрясает землю мощным ударом!";
+            msgCharBasic = "Ты сотрясаешь землю мощным ударом, заставая врасплох $C4!";               
             msgVictStun = "{W$c1 сотрясает землю мощным ударом, обездвиживая тебя!{x";
             msgCharStun = "{WТы сотрясаешь землю мощным ударом, обездвиживая $C4!{x";
             msgVictBlind = "{y$c1 внезапной серией ударов поднимает вихрь листьев, ослепляя тебя!{x";
@@ -1206,8 +1206,8 @@ void UndefinedOneHit::damEffectMasterHand()
     chance += (level - victim->getModifyLevel()) * level_mod * 100;
     d.log(chance, "lvl");
 
-    if ( !victim->isAffected(gsn_nerve) ) {
-        chance = chance / 2;        
+    if ( victim->isAffected(gsn_nerve) ) {
+        chance = chance + 5;        
         d.log(chance, "nerve");         
     }
             
