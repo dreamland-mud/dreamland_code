@@ -31,6 +31,7 @@
 #include "def.h"
 
 WEARLOC(none);
+WEARLOC(wield);
 
 static void rprog_reset( Room *room )
 {
@@ -152,7 +153,10 @@ static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob
         if (!worn || worn->pIndexData != obj->pIndexData)
             wloc->wear(obj, F_WEAR_VERBOSE | F_WEAR_REPLACE);
     }
-    else { // New mob and item.
+    else { 
+        Object *worn = wloc->find(mob);
+        if (worn)
+            wloc->unequip(worn);
         wloc->equip(obj);
     }
 }
@@ -239,7 +243,6 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 
     // Give and equip the item.
     obj_to_char( obj, mob );
-    eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
 
     // Mark shop items with 'inventory' flag.
     if (mob_has_occupation(mob, OCC_SHOPPER)) {
@@ -256,31 +259,6 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
     return obj;
 }
 
-/** Recreate an item on a mob based on reset data, if it doesn't exist yet. */
-static bool reset_mob_item(RESET_DATA *myReset, NPCharacter *mob)
-{
-    OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
-    if (!pObjIndex)
-        return false;
-
-    Object *self = get_obj_list_vnum(mob->carrying, pObjIndex->vnum);
-    if (self) {
-        reset_obj_location(myReset, self, mob, true);
-        // Trigger potential refresh for rand_all and rand_stat items, e.g. in shops.
-        eventBus->publish(ItemResetEvent(self, self->level, myReset));
-        return false;
-    }
-
-    Object *newItem = create_item_for_mob(myReset, pObjIndex, mob, true);
-    if (newItem) {
-        wiznet(WIZ_RESETS, 0, 0, "Created [%d] %s for mob %s in [%d].", 
-               pObjIndex->vnum, newItem->getShortDescr('1').c_str(), 
-               mob->getNameP('1').c_str(), mob->in_room->vnum);
-        return true;
-    }
-
-    return false;
-}
 
 /** Recreate inventory and equipment for a mob, if an item has been
   * requested or stolen from it.
@@ -298,24 +276,99 @@ static bool reset_one_mob(NPCharacter *mob)
     if (myReset < 0)
         return false;
    
-    // Update all inventory and equipment on the existing mob. 
-    bool changed = false;
+    // Collect all resets for this mob, inventory and equipment.
+    list<RESET_DATA *> inventoryResets;
+    map<int, RESET_DATA *> equipResets;
+
     for (unsigned int i = myReset + 1; i < home->pIndexData->resets.size(); i++) {
         RESET_DATA *pReset = home->pIndexData->resets[i];
+        bool stop = false;
         switch (pReset->command) {
         case 'E':
+            equipResets[pReset->arg3] = pReset;
+            break;
+
         case 'G':
-            if (reset_mob_item(pReset, mob)) 
-                changed = true;
+            inventoryResets.push_back(pReset);
+            break;
+
+        case 'P':
             break;
 
         default:
-            return changed;
+            stop = true;
+            break;
         }
+
+        if (stop)
+            break;        
     }
+
+    bool changed = false;
+
+    // Restore missing pieces of inventory or equip.
+    for (auto &r: equipResets) {
+        RESET_DATA *myReset = r.second;
+
+        // Ignore items already in their correct place.
+        Wearlocation *wloc = wearlocationManager->find(myReset->arg3);
+        Object *worn = wloc->find(mob);
+        if (worn && worn->pIndexData->vnum == myReset->arg1) {
+            eventBus->publish(ItemResetEvent(worn, worn->level, myReset));
+            continue;
+        }        
         
-        
-    return changed; 
+        // Item can be in inventory (after disarm) or wielded (after being removed from a sheath).
+        Object *self = 0;
+        for (Object *obj = mob->carrying; obj; obj = obj->next_content)
+            if (obj->pIndexData->vnum == myReset->arg1
+                && (obj->wear_loc == wear_none || obj->wear_loc == wear_wield)) 
+            {
+                self = obj;
+                break;
+            }
+
+        if (self) {
+            reset_obj_location(myReset, self, mob, true);
+        } else {
+            OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
+            self = create_item_for_mob(myReset, pObjIndex, mob, true);
+        }
+
+        eventBus->publish(ItemResetEvent(self, self->level, myReset));        
+        changed = true;
+    }
+
+    for (auto &r: inventoryResets) {
+        RESET_DATA *myReset = r;
+
+        // Ignore items already in inventory.
+        Object *self = 0;
+        for (Object *obj = mob->carrying; obj; obj = obj->next_content)
+            if (obj->pIndexData->vnum == myReset->arg1 && obj->wear_loc == wear_none) {
+                self = obj;
+                break;
+            }
+
+        if (self) {
+            eventBus->publish(ItemResetEvent(self, self->level, myReset));
+            continue;
+        }
+
+        // Item could be worn, just remove it.
+        self = get_obj_list_vnum(mob->carrying, myReset->arg1);
+        if (self) {
+            self->wear_loc->unequip(self);
+        } else {
+            OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
+            create_item_for_mob(myReset, pObjIndex, mob, true);
+        }
+
+        eventBus->publish(ItemResetEvent(self, self->level, myReset));
+        changed = true;
+    }
+
+    return changed;
 }
 
 /** Recreate inventory and equipment for all NPC in the room. */
