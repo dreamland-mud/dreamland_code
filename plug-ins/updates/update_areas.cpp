@@ -335,8 +335,10 @@ static bool reset_one_mob(NPCharacter *mob)
             self = create_item_for_mob(myReset, pObjIndex, mob, true);
         }
 
-        eventBus->publish(ItemResetEvent(self, self->level, myReset));        
-        changed = true;
+        if (self) {
+            eventBus->publish(ItemResetEvent(self, self->level, myReset));        
+            changed = true;
+        }
     }
 
     for (auto &r: inventoryResets) {
@@ -364,8 +366,10 @@ static bool reset_one_mob(NPCharacter *mob)
             self = create_item_for_mob(myReset, pObjIndex, mob, true);
         }
 
-        eventBus->publish(ItemResetEvent(self, self->level, myReset));
-        changed = true;
+        if (self) {
+            eventBus->publish(ItemResetEvent(self, self->level, myReset));
+            changed = true;
+        }
     }
 
     return changed;
