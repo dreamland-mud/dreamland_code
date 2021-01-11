@@ -423,22 +423,41 @@ bool Walkment::checkAir( Character *wch )
 
 bool Walkment::checkWater( Character *wch )
 {
-    if (from_room->getSectorType() != SECT_WATER_NOSWIM
-         && to_room->getSectorType() != SECT_WATER_NOSWIM)
-        return true;
-    
-    // For a rider, we'll only check horse's ability to swim.
-    if (MOUNTED(wch))
-        return true;
+    // water_swim: can be ridden through even if the horse doesn't swim, can get through on foot
+    // water_noswim: can be ridden through only if the horse swims, can get through with any boat
+    // underwater: can't get through with any boat, swimming only     
 
-    if (boat_types != BOAT_NONE) 
-        return true;
-    
-    rc = RC_MOVE_WATER;
-    msgSelfParty( wch, 
-                  "Чтоб идти дальше тебе нужна лодка.",
-                  "%2$^C1 не умеет ходить по воде." );
-    return false;
+    if ( from_room->getSectorType() == SECT_UNDERWATER || 
+         to_room->getSectorType() == SECT_UNDERWATER ) {
+            if ( !IS_SET(boat_types, BOAT_SWIM ) {
+               msgSelfParty( wch, 
+                  "Здесь ты можешь только проплыть.",
+                  "%2$^C1 сможет здесь только проплыть." );
+                rc = RC_MOVE_WATER; // TODO: add RC_MOVE_UNDERWATER
+                return false;                     
+            }
+    }
+                
+    if ( from_room->getSectorType() == SECT_WATER_NOSWIM || 
+         to_room->getSectorType() == SECT_WATER_NOSWIM ) {
+                
+            // For a rider, we'll only check horse's ability to swim.        
+            if (MOUNTED(wch))
+               return true;
+            
+            // any boats will do
+            if (boat_types != BOAT_NONE) 
+               return true;
+            
+                rc = RC_MOVE_WATER;    
+            msgSelfParty( wch, 
+                  "Чтоб идти дальше тебе нужна лодка, способность плавать или полет.",
+                  "%2$^C1 не умеет перемещаться по воде." );
+            return false;                
+    }
+ 
+    // for water_swim horses could splash water around, fun!  
+    return true;
 }
 
 bool Walkment::checkRoomCapacity( Character *wch )
