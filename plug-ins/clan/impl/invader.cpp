@@ -248,7 +248,7 @@ VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
 
     if (ch->isAffected(sn))
     {
-        ch->send_to("У тебя не достаточно энергии для контроля над светом.\n\r");
+        ch->send_to("У тебя недостаточно энергии для контроля над светом.\n\r");
         return;
     }
 
@@ -383,7 +383,7 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
 
     act_p("Ты даешь жизнь тени $C2!", ch, 0, victim, TO_CHAR, POS_RESTING);
     act_p("$c1 дает жизнь тени $C2!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-    act_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_RESTING);
+    act_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_DEAD);
 
     victim->getPC()->shadow = 4 * ch->getModifyLevel() / 10;
 
