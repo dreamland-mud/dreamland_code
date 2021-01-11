@@ -2104,6 +2104,7 @@ private:
             return false;
 
         DLString fullKw = a->getAllKeywordsString() + " " + a->aka.toString();
+        fullKw = fullKw.substitute('\'', "");
         const char *lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
 
         if (is_name(lookup, fullKw.c_str()))
