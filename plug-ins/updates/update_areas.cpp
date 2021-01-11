@@ -276,6 +276,20 @@ static bool reset_one_mob(NPCharacter *mob)
     if (myReset < 0)
         return false;
    
+    // Restore mob to its starting position, in case it's different from the default one.
+    if (mob->in_room == home 
+        && mob->position == mob->pIndexData->default_pos
+        && mob->position != mob->pIndexData->start_pos)
+    {
+        mob->position = mob->pIndexData->start_pos;
+        switch (mob->position) {
+        case POS_RESTING: mob->recho("%^C1 садится отдыхать.", mob); break;
+        case POS_SITTING: mob->recho("%^C1 садится.", mob); break;
+        case POS_SLEEPING: mob->recho("%^C1 засыпает.", mob); break;
+        case POS_STANDING: mob->recho("%^C1 встает.", mob); break;
+        }
+    }
+
     // Collect all resets for this mob, inventory and equipment.
     list<RESET_DATA *> inventoryResets;
     map<int, RESET_DATA *> equipResets;

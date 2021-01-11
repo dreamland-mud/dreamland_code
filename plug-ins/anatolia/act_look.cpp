@@ -587,6 +587,31 @@ static DLString rprog_show_end( Room *room, Character *ch, Character *looker )
     return DLString::emptyString;
 }
 
+/** Decides if a long description can be displayed, or we need to specify position. 
+ *  Long descriptions are only shown if a mob is still it ins initial (starting) position
+ *  after area reset. Alternatively, for overridden descriptions, show it when a mob is standing.
+ */
+static bool can_show_long_descr(NPCharacter *nVict)
+{
+    if (nVict->position == nVict->start_pos 
+            && !nVict->on
+            && nVict->getLongDescr( ) 
+            && nVict->getLongDescr( )[0])
+    {
+        return true;
+    }
+
+    if (nVict->position == POS_STANDING
+        && !nVict->on
+        && nVict->getRealLongDescr()
+        && nVict->getRealLongDescr()[0])
+    {
+        return true;
+    }
+
+    return false;
+}
+
 /*
  * Show a character in the room ('look' or 'look auto')
  */
@@ -688,11 +713,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         buf << "({WЗ{wве{Wзд{wная {WП{wыль{x)";
 
     if (nVict) 
-        if (nVict->position == nVict->start_pos 
-            && !nVict->on
-            && nVict->getLongDescr( ) 
-            && nVict->getLongDescr( )[0])
-        {
+        if (can_show_long_descr(nVict)) {
             DLString longd = format_longdescr_to_char(nVict->getLongDescr(), ch);
             buf << "{" << CLR_MOB(ch);
             webManipManager->decorateCharacter(buf, longd, victim, ch);
