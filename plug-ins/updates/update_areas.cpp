@@ -361,7 +361,7 @@ static bool reset_one_mob(NPCharacter *mob)
             self->wear_loc->unequip(self);
         } else {
             OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
-            create_item_for_mob(myReset, pObjIndex, mob, true);
+            self = create_item_for_mob(myReset, pObjIndex, mob, true);
         }
 
         eventBus->publish(ItemResetEvent(self, self->level, myReset));
