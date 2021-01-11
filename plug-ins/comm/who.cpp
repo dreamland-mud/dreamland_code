@@ -128,9 +128,9 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
     
     switch (vict->getLevel( )) {
 
-    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{le{W IMPLEMENTOR {lr{WАДМИНИСТРАТОР{x",
-                                              "{le{W IMPLEMENTOR {lr{WАДМИНИСТРАТОР{x",
-                                              "{le{WIMPLEMENTRESS{lr{WАДМИНИСТРАТОР{x" );            
+    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{le{W IMPLEMENTOR {lr{W   ДЕМИУРГ   {x",
+                                              "{le{W IMPLEMENTOR {lr{W   ДЕМИУРГ   {x",
+                                              "{le{WIMPLEMENTRESS{lr{W  ДЕМИУРГИНЯ {x" );            
                         break;
 
     case MAX_LEVEL - 1: buf << GET_SEX( vict, "{le{С   СREATOR   {lr{С  ТВОРЯЩИЙ   {x",
@@ -163,16 +163,16 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
                                               "{le{G DEMIGODDESS {lr{G ПОЛУБОГИНЯ  {x" );            
                         break;
 
-    case MAX_LEVEL - 7: buf << GET_SEX( vict, "{le{G  ARCHANGEL  {lr{G  АРХАНГЕЛ   {x",
-                                              "{le{G  ARCHANGEL  {lr{G  АРХАНГЕЛ   {x",
-                                              "{le{G  ARCHANGEL  {lr{G  АРХАНГЕЛ   {x" );            
-                        break;
-            
-    case MAX_LEVEL - 8: buf << GET_SEX( vict, "{le{G    ANGEL    {lr{G    АНГЕЛ    {x",
+    case MAX_LEVEL - 7: buf << GET_SEX( vict, "{le{G    ANGEL    {lr{G    АНГЕЛ    {x",
                                               "{le{G    ANGEL    {lr{G    АНГЕЛ    {x",
                                               "{le{G    ANGEL    {lr{G    АНГЕЛ    {x" );            
                         break;
-            
+
+    case MAX_LEVEL - 8: buf << GET_SEX( vict, "{le{G   AVATAR    {lr{G   АВАТАР    {x",
+                                              "{le{G   AVATAR    {lr{G   АВАТАР    {x",
+                                              "{le{G   AVATAR    {lr{G   АВАТАР    {x" );            
+                        break;
+                        
     case MAX_LEVEL - 9: buf << GET_SEX( vict, "{le{y  LEGENDARY  {lr{G ЛЕГЕНДАРНЫЙ {x",
                                               "{le{y  LEGENDARY  {lr{G ЛЕГЕНДАРНЫЙ {x",
                                               "{le{y  LEGENDARY  {lr{y ЛЕГЕНДАРНАЯ {x" );            
