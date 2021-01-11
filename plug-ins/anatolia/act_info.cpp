@@ -2157,17 +2157,17 @@ private:
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
-    DLString origArgument( argument );
+    DLString origArgument = DLString(argument).stripWhiteSpace().substitute('\'', "");
 
     if (!ch->getPC())
         return;
 
-    if (argument[0] == '\0') {
+    if (origArgument.empty()) {
         strcpy(argument, "summary");
     }
 
     // Вариант 2.create? - needs exact match.
-    if (strchr( argument , '.')){
+    if (origArgument.size() > 1 && strchr( argument , '.')) {
         char argall[MAX_INPUT_LENGTH];
         int number = number_argument(argument, argall);
 
@@ -2190,15 +2190,16 @@ CMDRUNP( help )
     HelpFinder::ArticleArray articles = HelpFinder(ch, argument).getArticles();
     // No match, try fuzzy matching.
     if (articles.empty()) {
-        FuzzySearch fs(ch, argument);
-
-        if (!fs.hasResults()) {
-            ch->send_to( "Нет подсказки по данному слову.\n\r");
-            bugTracker->reportNohelp( ch, origArgument.c_str( ) );
-        } else {
-            fs.printResults(ch);
+        if (origArgument.size() > 1) {
+            FuzzySearch fs(ch, argument);
+            if (fs.hasResults()) {
+                fs.printResults(ch);
+                return;
+            }
         }
-
+        
+        ch->send_to( "Нет подсказки по данному слову.\n\r");
+        bugTracker->reportNohelp( ch, origArgument.c_str( ) );
         return;
     }
 
