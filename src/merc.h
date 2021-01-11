@@ -536,6 +536,7 @@ struct AreaIndexData {
     /*OLC*/
     int security;
     int vnum;
+    bool changed;
     map<int, RoomIndexData *> roomIndexes;
 
     Scripting::Object *wrapper;

@@ -316,7 +316,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
                 GenericHelp::Pointer help(NEW);
                 help->setContainer(hc);
                 hc->push_back(help);
-                help->setID(helpManager->getLastID() + 1);
+                help->setID(help_next_free_id());
                 helpManager->registrate(help);
 
                 OLCStateHelp::Pointer hedit(NEW, help.getPointer());

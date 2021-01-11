@@ -33,6 +33,7 @@ AreaIndexData *get_area_data(int vnum);
 
 bool show_help(Character * ch, const char *argument);
 void show_fenia_triggers(Character *, Scripting::Object *wrapper);
+int help_next_free_id();
 
 // Macros
 

@@ -178,7 +178,7 @@ AreaIndexData::AreaIndexData()
       resetmsg(0),
       area_flag(0),
       behavior(AreaBehavior::NODE_NAME),
-      security(9), vnum(0),
+      security(9), vnum(0), changed(false),
       wrapper(0),
       area(0)
 {

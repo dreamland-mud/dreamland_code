@@ -121,7 +121,7 @@ SKEDIT(help, "справка", "создать или посмотреть сп�
         if (!r->help)
             r->help.construct();
         r->help->setID(
-            helpManager->getLastID() + 1
+            help_next_free_id()
         );
         r->help->setSkill(BasicSkill::Pointer(r));
 

@@ -46,6 +46,7 @@ bool save_xmlarea(struct area_file *af, Character *ch)
         return false;
     }
 
+    af->area->changed = false;
     return true;
 }
 
@@ -60,12 +61,9 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         save_xmlarea_list();
         struct area_file *afile;
         
-        for (afile = area_file_list; afile; afile = afile->next) {
-            if(afile->area) {
-                REMOVE_BIT(afile->area->area_flag, AREA_CHANGED);
-            }
+        for (afile = area_file_list; afile; afile = afile->next)
             save_xmlarea(afile, ch);
-        }
+
         return;
     }
 
@@ -88,8 +86,6 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
 
-    // TODO: "changed" should be a transient field on the area_file, not an area flag
-
     // Save area of given vnum.
     if (is_number(arg1)) {
         if (!OLCState::can_edit(ch, pArea)) {
@@ -97,7 +93,6 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
         save_xmlarea_list();
-        REMOVE_BIT(pArea->area_flag, AREA_CHANGED);
         save_xmlarea(pArea->area_file, ch);
         return;
     }
@@ -112,8 +107,6 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             pArea = afile->area;
             if (!OLCState::can_edit(ch, pArea))
                 continue;
-
-            REMOVE_BIT(pArea->area_flag, AREA_CHANGED);
 
             if (!save_xmlarea(afile, ch))
                 success = false;
@@ -140,14 +133,11 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 continue;
 
             /* Save changed areas. */
-            if (IS_SET(pArea->area_flag, AREA_CHANGED)) {
-                REMOVE_BIT(pArea->area_flag, AREA_CHANGED);                
+            if (pArea->changed) {
                 if (save_xmlarea(pArea->area_file, ch)) {
                     ptc(ch, "%24s - '%s'\n\r", pArea->name, pArea->area_file->file_name);
                     success = true;
-                } else {
-                    SET_BIT(pArea->area_flag, AREA_CHANGED);                
-                }
+                } 
             }
         }
         if (!success)
@@ -172,7 +162,6 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         save_xmlarea_list();
 
-        REMOVE_BIT(pArea->area_flag, AREA_CHANGED);
         if (save_xmlarea(pArea->area_file, ch))
             stc("Area saved.\n\r", ch);
 

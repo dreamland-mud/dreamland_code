@@ -68,7 +68,6 @@ OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
         vnum = top_area - 1;
 
         name = "New area";
-        area_flag.setBit( AREA_ADDED );
         security = 9;
         authors = "None";
         translator = "None";
@@ -127,6 +126,7 @@ void OLCStateArea::commit()
     original->translator = str_dup( translator.getValue( ).c_str( ) );
     original->speedwalk = str_dup( speedwalk.getValue( ).c_str( ) );
     original->vnum = vnum;
+    original->changed = true;
 
     if (!behavior.empty( )) 
         try {
@@ -163,7 +163,9 @@ bool OLCStateArea::checkOverlap(int lower, int upper)
 
 void OLCStateArea::changed( PCharacter *ch )
 {
-    area_flag.setValue( area_flag.getValue( ) | AREA_CHANGED);
+    AreaIndexData *original = get_area_data(vnum);    
+    if (original)
+        original->changed = true;
 }
 
 // Area Editor Functions.
@@ -260,7 +262,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
             ahelp->setKeywordAttribute(kwd.toString());
 
             ahelp->setID(
-                helpManager->getLastID() + 1
+                help_next_free_id()
             );
             helpManager->unregistrate(AreaHelp::Pointer(ahelp));
             helpManager->registrate(AreaHelp::Pointer(ahelp));
@@ -359,7 +361,6 @@ AEDIT(flags, "флаги", "установить или сбросить фла�
     }
     
     area_flag.toggleBit( value );
-    area_flag.setBit( AREA_CHANGED );
     stc("Flag toggled.\n\r", ch);
     return true;
 }

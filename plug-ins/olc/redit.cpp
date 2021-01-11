@@ -97,7 +97,7 @@ OLCStateRoom::statePrompt( Descriptor *d )
 void
 OLCStateRoom::changed( PCharacter *ch )
 {
-    SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
+    ch->in_room->areaIndex()->changed = true;
 }
 
 /*-------------------------------------------------------------------------
@@ -518,7 +518,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
             delete_exit(to_room->pIndexData, rev);
             
             if (pRoom->areaIndex != to_room->areaIndex()) // FIXME instances
-                SET_BIT(to_room->areaIndex()->area_flag, AREA_CHANGED);
+                to_room->areaIndex()->changed = true;
             stc("Exit unlinked from remote side.\n\r", ch);
         }
 
@@ -617,7 +617,7 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         create_exit(pRemoteRoom, door, pRoom);
 
         if (pRoom->areaIndex != pRemoteRoom->areaIndex) // FIXME instances
-            SET_BIT(pRemoteRoom->areaIndex->area_flag, AREA_CHANGED);
+            pRemoteRoom->areaIndex->changed = true;
 
         stc("Two-way link established.\n\r", ch);
         return true;
@@ -1289,7 +1289,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if(!pRoom)
             return;
 
-        SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+        pRoom->areaIndex->changed = true;
         
     } else if(is_number(arg1)) {
         pRoom = get_room_index(atoi(arg1));

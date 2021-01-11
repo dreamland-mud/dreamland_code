@@ -164,6 +164,32 @@ AreaIndexData *get_area_data(int vnum)
     return 0;
 }
 
+/** Get next available help ID to use. Can potentially result in duplicates if a plugin 
+    containing some helps is unloaded when this function is being called.  */
+int help_next_free_id()
+{
+    list<int> ids;
+    for (auto &a: helpManager->getArticles())
+        ids.push_back(a->getID());
+
+    ids.sort();
+
+    int latest = 1;
+
+    for (auto &id: ids) {
+        if (id <= 0)
+            continue;
+            
+        if (id - latest > 1)
+            return latest + 1;
+
+        latest = id;
+    }
+
+    return helpManager->getLastID();
+}
+
+
 struct editor_table_entry {
     const char *arg, *cmd;
 } editor_table[] = {
@@ -429,7 +455,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     }
 
     if (arg == "maxhelp") {
-        ch->printf("Max help ID is %d.\r\n", helpManager->getLastID());
+        ch->printf("Max help ID is %d, next free id is %d.\r\n", 
+                    helpManager->getLastID(), help_next_free_id());
         return;
     }
 
@@ -484,8 +511,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                     pObj->properties["random"] = "true";
                     pObj->properties["bestTier"] = max(pReset->bestTier, DEFAULT_TIER);
                     pReset->rand.setValue(RAND_NONE);
-                    pReset->bestTier = 0;
-                    SET_BIT(r.second->areaIndex->area_flag, AREA_CHANGED);
+                    pReset->bestTier = 0;                    
+                    r.second->areaIndex->changed = true;
                     cnt++;
                 }
             }

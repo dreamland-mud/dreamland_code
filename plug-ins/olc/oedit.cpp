@@ -1140,7 +1140,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         obji = get_obj_index(value);
 
         if (obji) {
-            SET_BIT(pArea->area_flag, AREA_CHANGED);
+            pArea->changed = true;
             SET_BIT(obji->extra_flags, ITEM_DELETED);
             ptc(ch, "[%u] (%s) marked as deleted.\n\r", obji->vnum, obji->name);
         }
@@ -1198,6 +1198,6 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 void OLCStateObject::changed( PCharacter *ch )
 {
     if(obj.area)
-        SET_BIT(obj.area->area_flag, AREA_CHANGED);
+        obj.area->changed = true;
 }
 

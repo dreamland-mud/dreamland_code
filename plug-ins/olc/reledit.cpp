@@ -304,7 +304,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         rel->shortDescr = args.capitalize();
         rel->help.construct();
         rel->help->setID(
-            helpManager->getLastID() + 1
+            help_next_free_id()
         );
         
         ReligionLoader::getThis()->loadElement(rel);

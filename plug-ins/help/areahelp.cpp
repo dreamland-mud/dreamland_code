@@ -18,7 +18,7 @@ const DLString AreaHelp::TYPE = "AreaHelp";
 void AreaHelp::save() const
 {
     if (areafile)
-        SET_BIT(areafile->area->area_flag, AREA_CHANGED);
+        areafile->area->changed = true;
 }
 
 DLString AreaHelp::getTitle(const DLString &label) const

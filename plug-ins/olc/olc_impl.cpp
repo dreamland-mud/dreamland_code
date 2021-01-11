@@ -44,11 +44,8 @@ public:
         StringSet savedAreas;
 
         for(auto &pArea: areaIndexes) {
-            if (IS_SET(pArea->area_flag, AREA_CHANGED)) {
-                REMOVE_BIT(pArea->area_flag, AREA_CHANGED);
-                if (!save_xmlarea(pArea->area_file, 0)) 
-                    SET_BIT(pArea->area_flag, AREA_CHANGED);
-                else
+            if (pArea->changed) {
+                if (save_xmlarea(pArea->area_file, 0))
                     savedAreas.insert(pArea->area_file->file_name);
             }
         }

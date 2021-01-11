@@ -423,7 +423,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             pReset = pRoom->resets.at(insert_loc);
             pRoom->resets.erase(pRoom->resets.begin() + insert_loc);
             ddeallocate(pReset);
-            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            pRoom->areaIndex->changed = true;
             stc("Reset deleted.\n\r", ch);
             return;
         }
@@ -449,7 +449,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             else
                 ptc(ch, "Flags for reset {W%d{x cleared.\r\n", insert_loc+1);
 
-            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            pRoom->areaIndex->changed = true;
             return;
         }
 
@@ -488,7 +488,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 }
             }
 
-            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            pRoom->areaIndex->changed = true;
             if (str_cmp(arg4, "quiet"))
                 __do_resets(ch, const_cast<char *>(""));
             return;
@@ -510,7 +510,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             pReset = pRoom->resets.at(insert_loc);
             pReset->bestTier = tier;
             ptc(ch, "Best tier for reset {W%d{x set to {g%d{x.\r\n", insert_loc+1, tier);
-            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            pRoom->areaIndex->changed = true;
             if (str_cmp(arg4, "quiet"))
                 __do_resets(ch, const_cast<char *>(""));
             return;
@@ -548,7 +548,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 ptc(ch, "Also changing reset type from 'inventory' to 'equip'.\r\n");
             }
 
-            SET_BIT(pRoom->areaIndex->area_flag, AREA_CHANGED);
+            pRoom->areaIndex->changed = true;
             if (str_cmp(arg4, "quiet"))
                 __do_resets(ch, const_cast<char *>(""));
             return;
@@ -620,7 +620,7 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 }
             }
             add_reset(ch->in_room->pIndexData, pReset, atoi(arg1));
-            SET_BIT(ch->in_room->areaIndex()->area_flag, AREA_CHANGED);
+            pRoom->areaIndex->changed = true;
             stc("Reset added.\n\r", ch);
             return;
         }

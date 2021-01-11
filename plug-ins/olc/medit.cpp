@@ -1332,6 +1332,6 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 void OLCStateMobile::changed( PCharacter *ch )
 {
     if(mob.area)
-        SET_BIT(mob.area->area_flag, AREA_CHANGED);
+        mob.area->changed = true;
 }
 
