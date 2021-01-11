@@ -426,10 +426,13 @@ bool Walkment::checkWater( Character *wch )
     // water_swim: can be ridden through even if the horse doesn't swim, can get through on foot
     // water_noswim: can be ridden through only if the horse swims, can get through with any boat
     // underwater: can't get through with any boat, swimming only     
+    
+    // TODO: pets still inherit all boat_types from their master, so underwater restrictions
+    // don't really apply to them yet.
 
-    if ( from_room->getSectorType() == SECT_UNDERWATER || 
-         to_room->getSectorType() == SECT_UNDERWATER ) {
-            if ( !IS_SET(boat_types, BOAT_SWIM ) {
+    if (from_room->getSectorType() == SECT_UNDERWATER || 
+         to_room->getSectorType() == SECT_UNDERWATER) {
+            if (!IS_SET(boat_types, BOAT_SWIM)) {
                msgSelfParty( wch, 
                   "Здесь ты можешь только проплыть.",
                   "%2$^C1 сможет здесь только проплыть." );
@@ -449,7 +452,7 @@ bool Walkment::checkWater( Character *wch )
             if (boat_types != BOAT_NONE) 
                return true;
             
-                rc = RC_MOVE_WATER;    
+            rc = RC_MOVE_WATER;    
             msgSelfParty( wch, 
                   "Чтоб идти дальше тебе нужна лодка, способность плавать или полет.",
                   "%2$^C1 не умеет перемещаться по воде." );
