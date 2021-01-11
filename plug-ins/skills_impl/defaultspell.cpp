@@ -263,10 +263,9 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
 
     slevel = max( 1, slevel + get_int_app(ch).slevel );
 
-    int old_level = slevel;
     slevel += ch->getPC()->mod_level_groups[skill->getGroup()];
     slevel += ch->getPC()->mod_level_skills[skill->getIndex()];
-    slevel += ch->getPC()->mod_level_all;
+    slevel += ch->getPC()->mod_level_spell;
 
     return slevel;
 }

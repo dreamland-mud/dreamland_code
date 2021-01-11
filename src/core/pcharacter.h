@@ -304,8 +304,10 @@ public:
     GlobalArray            mod_level_skills;
     /** Bonus to spell/skill level for particular skill group. */
     GlobalArray            mod_level_groups;
-    /** General spell/skil level bonus. */
+    /** General spell/skill level bonus. */
     int                    mod_level_all;
+    /** Spell level bonus. */
+    int mod_level_spell;
 
     /** Amount of silver in the bank. */
     XML_VARIABLE XMLIntegerNoEmpty        bank_s;

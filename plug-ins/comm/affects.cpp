@@ -341,6 +341,8 @@ CMDRUNP( affects )
             buf << "{yИзменен уровень групп навыков: " << levelGroups.wrap("{m", "{y").join(", ") << "." << endl;
         if (pch->mod_level_all != 0)
             buf << "{yУровень всех навыков изменен на {m" << pch->mod_level_all << "{y.{x" << endl;
+        if (pch->mod_level_spell != 0)
+            buf << "{yУровень всех заклинаний изменен на {m" << pch->mod_level_spell << "{y.{x" << endl;
     }
 
     if (IS_CHARMED(ch)) {

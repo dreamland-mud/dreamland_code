@@ -255,7 +255,7 @@ void NorivaMyrvaleSet::addAffect(Character *ch) const
     af.bitvector.setTable(&res_flags);
     af.bitvector.setValue(RES_WEAPON | RES_SPELL);
     af.modifier  = 3;
-    af.location = APPLY_LEVEL;
+    af.location = APPLY_SPELL_LEVEL;
     affect_to_char(ch, &af);
     ch->pecho("{gПеред твоими глазами на мгновение возникает изображение ладони над пылающим кольцом.{x");
     ch->pecho("{gСила мир'вейл Норива пронизывает тебя.{x");
@@ -296,7 +296,7 @@ void ReykarisShevaleSet::addAffect(Character *ch) const
     af.bitvector.setTable(&res_flags);
     af.bitvector.setValue(RES_WEAPON | RES_SPELL);
     af.modifier  = 3;
-    af.location = APPLY_LEVEL;
+    af.location = APPLY_SPELL_LEVEL;
     affect_to_char(ch, &af);
     ch->pecho("{DПеред тобой возникает ухмыляющийся череп. В его пустых глазницах пылает жуткое {rкрасноватое{D пламя.{x");
     ch->pecho("{DСила ши'вейл Рейкарис пронизывает тебя.{x");

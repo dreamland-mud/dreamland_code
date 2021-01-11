@@ -233,7 +233,10 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         case APPLY_SAVING_SPELL:  p.saves+=m; break;
         case APPLY_HEAL_GAIN: p.heal_gain+=m; break;
         case APPLY_MANA_GAIN: p.mana_gain+=m; break;
-        case APPLY_LEVEL:     p.slevel+=m; break;
+        case APPLY_SPELL_LEVEL:
+        case APPLY_LEVEL: 
+            p.slevel+=m; 
+            break;
 
         case APPLY_LEARNED:
         case APPLY_NONE:

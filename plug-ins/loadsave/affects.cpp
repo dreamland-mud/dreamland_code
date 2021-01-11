@@ -251,6 +251,12 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
                 ch->getPC()->mod_level_all += mod;
         }
         break;
+
+    case APPLY_SPELL_LEVEL:
+        if (!ch->is_npc()) {
+            ch->getPC()->mod_level_spell += mod;
+        }
+        break;
     }
 }
 
