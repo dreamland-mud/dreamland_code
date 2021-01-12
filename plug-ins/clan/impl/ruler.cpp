@@ -365,7 +365,7 @@ SKILL_RUNP( judge )
         argument =  one_argument( argument, arg );
         if ( arg[0] == '\0' )
         {
-                ch->pecho("У %1$#C2 %2$s этос и %3$s характер.\n\r"
+                ch->pecho("У %1$#C2 %2$s этос и %3$s натура.\n\r"
                           "%1$#^P2 заслуги перед законом: %4$d.",
                           victim, 
                           ethos_table.message( victim->ethos, '1' ).c_str( ),

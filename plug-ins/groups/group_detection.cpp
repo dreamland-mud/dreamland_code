@@ -395,7 +395,7 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
                         msg = "$C1 относится к закону нейтрально.";
                         break;
                 case ETHOS_CHAOTIC:
-                        msg = "$C1 имеет хаотический характер.";
+                        msg = "$C1 имеет хаотический этос.";
                         break;
                 default:
                         msg = "$C1 понятия не имеет, как относиться к законам.";

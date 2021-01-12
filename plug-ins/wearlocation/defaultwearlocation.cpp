@@ -197,14 +197,14 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     if (obj->isAntiAligned( ch )) {
-        act( "Твой характер не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
+        act( "Твоя натура не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
         act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
         act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
         return false;
     }
     
     if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
-        act("Твой характер все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
+        act("Твоя натура все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
         act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
         act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
         return false;

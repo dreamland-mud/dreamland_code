@@ -176,7 +176,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
         
     in << *this << endl;
 
-    in << "{cХарактер{x  : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
+    in << "{cНатура{x    : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
 
     if (prof->getEthos( ).equalsToBitNumber( ETHOS_LAWFUL ))
         in << "{cЭтос{x      : " << "законопослушный" << endl;

@@ -575,21 +575,21 @@ NMI_GET( CharacterWrapper, flying, "true если мы GHOST, летаем ил�
     return false;
 }
 
-NMI_GET( CharacterWrapper, alignMin, "название самого злого характера для расы и класса персонажа" )
+NMI_GET( CharacterWrapper, alignMin, "название самой злой натуры для расы и класса персонажа" )
 {
     checkTarget( );
     CHK_NPC
     return align_min( target->getPC( ) );
 }
 
-NMI_GET( CharacterWrapper, alignMax, "название самого доброго характера для расы и класса персонажа" )
+NMI_GET( CharacterWrapper, alignMax, "название самой доброй натуры для расы и класса персонажа" )
 {
     checkTarget( );
     CHK_NPC
     return align_max( target->getPC( ) );
 }
 
-NMI_GET( CharacterWrapper, alignName, "название характера" )
+NMI_GET( CharacterWrapper, alignName, "название натуры" )
 {
     checkTarget( );
     return align_name( target );
@@ -694,7 +694,7 @@ INT_FIELD(position, "позиция (таблица .tables.position_table)")
 INT_FIELD(carry_weight, "вес который несет чар")
 INT_FIELD(carry_number, "количество вещей которое несет чар")
 INT_FIELD(saving_throw, "савесы")
-INT_FIELD(alignment, "характер, от -1000 до 1000")
+INT_FIELD(alignment, "натура, от -1000 до 1000")
 INT_FIELD(hitroll, "точность")
 INT_FIELD(damroll, "урон")
 INT_FIELD(wimpy, "трусость. при скольки hp чар будет убегать автоматически")

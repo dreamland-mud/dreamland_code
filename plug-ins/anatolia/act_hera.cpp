@@ -426,7 +426,7 @@ CMDRUNP( auction )
                         }
 
                         if (auction->item->pIndexData->limit != -1 && auction->item->isAntiAligned(ch)) {
-                            ch->pecho("Твой характер не позволит тебе владеть этим предметом.");
+                            ch->pecho("Твоя натура не позволит тебе владеть этим предметом.");
                             return;
                         }
 

@@ -279,23 +279,23 @@ NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги класса для эт
 }
 
 
-NMI_GET( ProfessionWrapper, ethos, "список подходящих мировоззрений" ) 
+NMI_GET( ProfessionWrapper, ethos, "список подходящих этосов" ) 
 {
     return professionManager->find( name )->getEthos( ).names( );
 }
 
-NMI_GET( ProfessionWrapper, alignName, "русское имя подходящего характера или 'любой'" ) 
+NMI_GET( ProfessionWrapper, alignName, "русское имя подходящей натуры или 'любая'" ) 
 {
     const Flags &a = professionManager->find( name )->getAlign( );
     
     if (a.equalsToBitNumber( N_ALIGN_EVIL ))
-        return "злой";
+        return "злая";
     if (a.equalsToBitNumber( N_ALIGN_GOOD ))
-        return "добрый";
+        return "добрая";
     if (a.equalsToBitNumber( N_ALIGN_NEUTRAL ))
         return "нейтр.";
 
-    return "любой";
+    return "любая";
 }
 
 NMI_GET( ProfessionWrapper, statPlus, "какие параметры увеличиваются у представителей этого класса" ) 
@@ -349,7 +349,7 @@ NMI_INVOKE( ProfessionWrapper, goodRace, "(ch): проверить ограни�
     return ch->getTarget( )->getRace( )->getPC( )->getClasses( )[prof->getIndex( )] > 0;
 }
 
-NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить ограничение на характер и этос на класс для персонажа ch" )
+NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить ограничение на натуру и этос на класс для персонажа ch" )
 {
     CharacterWrapper *ch;
     
@@ -875,7 +875,7 @@ NMI_GET( ReligionWrapper, flags, "флаги религий (таблица .tab
     return Register((int)getTarget()->flags.getValue());
 }
 
-NMI_GET( ReligionWrapper, align, "разрешенные характеры или пустая строка (таблица .tables.align_table)" ) 
+NMI_GET( ReligionWrapper, align, "разрешенные натуры или пустая строка (таблица .tables.align_table)" ) 
 {
     return Register((int)getTarget()->align.getValue());
 }

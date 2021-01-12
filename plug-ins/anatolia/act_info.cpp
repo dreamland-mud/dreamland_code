@@ -455,7 +455,7 @@ CMDRUNP( oscore )
     buf << dlprintf( "{lRТочность{lEHitroll{lx: {C%d{x  {lRУрон{lEDamroll{lx: {C%d{x  {lRЗащита от заклинаний{lESaves vs Spell{lx: {C%d{x\n\r",
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
-    buf << dlprintf( "У тебя %s характер.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
+    buf << dlprintf( "У тебя %s натура.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
@@ -1485,11 +1485,11 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Ты %N1.", ch->getProfession()->getRusName().c_str());
         return;
     } 
-	if (arg_oneof(arg, "alignment", "характер", "натура")) {
-        ch->pecho("У тебя %s характер.", align_name_short(ch, Grammar::MultiGender::MASCULINE));
+	if (arg_oneof(arg, "alignment", "натура")) {
+        ch->pecho("У тебя %s натура.", align_name_short(ch, Grammar::MultiGender::FEMININE));
         return;
     } 
-	if (arg_oneof(arg, "ethos", "этос", "мировоззрение")) {
+	if (arg_oneof(arg, "ethos", "этос")) {
         ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1').c_str());
         return;
     } 

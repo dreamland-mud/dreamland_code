@@ -99,7 +99,7 @@ const struct olc_help_type help_table[] =
     {"clans", &clan_table, "Список всех кланов."},
     {"religion", &religion_table, "Список всех религий."},
     {"religion_flags", &religion_flags, "Флаги религий."},
-    {"align_table", &align_table, "Характер персонажа."},
+    {"align_table", &align_table, "Натура персонажа."},
     {"ethos_table", &ethos_table, "Этос персонажа."},
     {"stat_table", &stat_table, "Параметры персонажа."},
     {"sex_table", &sex_table, "Пол моба (поле sex)."},

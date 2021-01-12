@@ -95,7 +95,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         int retainChance = 50;
 
         auto allNames = random_weapon_affixes(tier, count, align, retainChance);
-        ch->printf("{W%d случайных комбинаций аффиксов для крутости %d и характера %d:\r\n", 
+        ch->printf("{W%d случайных комбинаций аффиксов для крутости %d и натуры %d:\r\n", 
                     allNames.size(), tier, align);
 
         for (auto &names: allNames) {
