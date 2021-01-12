@@ -30,14 +30,17 @@ const struct alignment_t alignment_table [] = {
 
 DLString align_name_for_range( int min, int max )
 {
-    if (min <= -500 && max >= 500)
-        return "любая";
-
-    if (min <= -500)
+    if (max <= -300)
         return "злая";
-    if (max >= 500)
-        return "добрая";
-    return "нейтральная";
+    if (min >= 300)
+        return "добрая";            
+    if (min >  -300 && max < 300)
+        return "нейтральная";
+    if (min > -300 and max >= 500)
+        return "нейтральная или добрая";
+    if (min <= -300 && max <= 300)
+        return "злая или нейтральная";
+    return "любая";
 }
 
 int align_choose_range( int min, int max, int n )
