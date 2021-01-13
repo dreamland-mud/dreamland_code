@@ -328,47 +328,60 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
 { 
     Room *target;
 
+    bool bFighting = ch->fighting != 0;
+
     if (ch->isAffected(sn)) {
         ch->println("Это заклинание использовалось совсем недавно.");
         return;
     }
     
-    if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL)) {
-        ch->println("Твоя попытка закончилась неудачей.");
-        return;
-    }
+    if(bFighting){
 
-    target = get_random_room_vanish( ch );
+        if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL)) {
+            ch->println("Твоя попытка закончилась неудачей.");
+            return;
+        }
 
-    if (target) {
+        target = get_random_room_vanish( ch );
+
+        if (target && chance(50)) {
 
   
-        transfer_char( ch, ch, target,
+            transfer_char( ch, ch, target,
                     "%1$^C1 рассеивается в клубах тумана, принимая газообразную форму.\r\n%1$^C1 исчезает!",
                     "Ты рассеиваешься в клубах тумана, принимая газообразную форму.\r\nТы исчезаешь!",
                     "Неожиданно рядом с тобой начинает клубиться туман..\r\nИз сгустков тумана постепенно вырисовывается силуэт %1$C2.",
                     "Твое тело ненадолго остается в газообразном состоянии." );
-
-        Affect af;
-        af.bitvector.setTable(&affect_flags);
-        af.type      = sn;
-        af.level     = level;
-        af.duration  = 1;
-
-        if(!IS_AFFECTED(ch, AFF_PASS_DOOR))
-        af.bitvector.setValue(AFF_PASS_DOOR);
-        affect_to_char( ch, &af );
-        
-        if(!IS_SET(ch->form, FORM_MIST)){
-        af.bitvector.setTable(&form_flags);
-        af.bitvector.setValue(FORM_MIST);
-        affect_to_char( ch, &af );
+        }
+    
+        else {
+            ch->send_to("Тебе не удалось превратиться в туман.\r\n");
+            return;
         }
 
+    }                   
 
-    } else {
-        ch->send_to("Тебе не удалось превратиться в туман.\r\n");
+    Affect af;
+    af.type      = sn;
+    af.level     = level;
+    af.duration  = 1;
+
+    if(!IS_AFFECTED(ch, AFF_PASS_DOOR)){
+    af.bitvector.setTable(&affect_flags);
+    af.bitvector.setValue(AFF_PASS_DOOR);
+    affect_to_char( ch, &af );
     }
+        
+    if(!IS_SET(ch->form, FORM_MIST)){
+    af.bitvector.setTable(&form_flags);
+    af.bitvector.setValue(FORM_MIST);
+    affect_to_char( ch, &af );
+    }
+
+    if(!bFighting){
+            act("$C1 рассеивается в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_ROOM);
+            act("Ты рассеиваешься в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_CHAR);
+    }    
 }
 
 
