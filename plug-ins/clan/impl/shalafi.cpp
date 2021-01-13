@@ -300,13 +300,12 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
         
       if(!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_SPELL))
         {
-          af.where                    = TO_AFFECTS;
           af.type               = sn;
           af.level              = level;
           af.duration           = level;
-          af.location           = APPLY_INT;
+
           af.modifier           = ch->applyCurse( -7 );
-          af.bitvector          = 0;
+          af.location = APPLY_INT;
           affect_to_char(victim,&af);
 
           af.location = APPLY_WIS;
@@ -402,25 +401,19 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
   hp_modif = ch->applyCurse( min(30000 - ch->max_hit, ( int )( ch->max_hit / 1.6 ) ) );
   ch->hit += hp_modif;
 
-  if( ch->isAffected(gsn_haste ) ) affect_strip( ch, gsn_haste );
-
-  af.where                = TO_AFFECTS;
   af.type               = sn;
   af.level              = level;
   af.duration           = 24;
-  af.location           = APPLY_HIT;
+
+  af.location = APPLY_HIT;
   af.modifier           = hp_modif;
-  af.bitvector          = 0;
   affect_to_char(ch,&af);
 
-    af.where     = TO_AFFECTS;
-    af.type      = sn;
-    af.level     = level;
-    af.duration  = 24;
-    af.location  = APPLY_DEX;
-    af.modifier  = - (4 + level / 10);
-    af.bitvector = 0;
-    affect_to_char( ch, &af );
+  af.location = APPLY_DEX;
+  af.modifier  = - (4 + level / 10);
+  af.bitvector.setTable(&affect_flags);
+  af.bitvector.setValue(AFF_SLOW);    
+  affect_to_char( ch, &af );
 
   ch->send_to("Прилив жизненной силы затмевает твой разум.\n\r");
 

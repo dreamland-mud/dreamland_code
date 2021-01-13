@@ -12,20 +12,12 @@
 #include "fread_utils.h"
 #include "mercdb.h"
 
-void RoomBehaviorManager::setAll( )
-{
-    LogStream::sendNotice( ) << "Assigning room behaviors..." << endl;
-
-    for (Room *r = room_list; r; r = r->rnext)
-        if (r->behavior)
-            r->behavior->setRoom( r );
-}
-
-void RoomBehaviorManager::parse( Room * pRoom, FILE *fp ) 
+void RoomBehaviorManager::parse( RoomIndexData * pRoom, FILE *fp ) 
 {
     char letter;
     char *word;
-    
+    istringstream istr;
+
     letter = fread_letter( fp );
     ungetc( letter, fp );
 
@@ -35,18 +27,18 @@ void RoomBehaviorManager::parse( Room * pRoom, FILE *fp )
     word = fread_string( fp );
 
     try {
-        std::basic_istringstream<char> istr( word );
-        
-        pRoom->behavior.fromStream( istr );
+        istr.str( word );
+        pRoom->behavior.construct();
+        pRoom->behavior->load(istr);
 
-    } catch (Exception e) {
+    } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
         
     free_string( word );
 }
 
-void RoomBehaviorManager::save( const Room *pRoom, FILE *fp ) 
+void RoomBehaviorManager::save( const RoomIndexData *pRoom, FILE *fp ) 
 {
     std::basic_ostringstream<char> ostr;
      
@@ -54,12 +46,31 @@ void RoomBehaviorManager::save( const Room *pRoom, FILE *fp )
         return;
 
     try {
-        pRoom->behavior.toStream( ostr );
-
+        pRoom->behavior->save( ostr );
         fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
 
-    } catch (ExceptionXMLError e) {
+    } catch (const ExceptionXMLError &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
 }
 
+void RoomBehaviorManager::assign(Room *room)
+{
+    if (!room->pIndexData->behavior)
+        return;
+    
+    try {
+        if (room->behavior) {
+            room->behavior->unsetRoom( );
+            room->behavior.clear( );
+        }
+
+        const XMLNode::Pointer &rootNode = room->pIndexData->behavior->getFirstNode();                
+        room->behavior.fromXML( rootNode );
+        room->behavior->setRoom(room);
+
+    } catch (const Exception &e) {
+        LogStream::sendError( ) << e.what( ) << endl;
+    }
+
+}

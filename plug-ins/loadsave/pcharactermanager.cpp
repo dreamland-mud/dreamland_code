@@ -18,6 +18,7 @@
 #include "dlfile.h"
 #include "dlfileop.h"
 #include "crypto.h"
+#include "math_utils.h"
 
 #include "pcharactermanager.h"
 #include "pcharactermemorylist.h"
@@ -368,11 +369,12 @@ void PCharacterManager::saveMemory( PCMemoryInterface *pci )
 bool PCharacterManager::pfDelete ( const DLString& playerName ) 
 {
     DLString name = playerName.toLower( );
+    DLString nonce = create_nonce(6); // random suffix, to avoid profiles overriding each other over time
     DLFile oldProfile( dreamland->getPlayerDir( ), name, ext );
-    DLFile newProfile( dreamland->getPlayerDeleteDir( ), name, ".delete" );
+    DLFile newProfile( dreamland->getPlayerDeleteDir( ), name, ".delete." + nonce );
 
     DLFile oldXml( DLFile( dreamland->getDbDir( ), PLAYER_TABLE ), name, ".xml" );
-    DLFile newXml( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" );
+    DLFile newXml( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml." + nonce );
 
     if (!oldProfile.rename( newProfile )) {
         LogStream::sendSystem( ) << "pfDelete failed for " << playerName << endl;
@@ -449,7 +451,12 @@ bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &
 
     if (arg=="delete") {
         oldProfile = DLFile( dreamland->getPlayerDeleteDir( ), name, ".delete" );
-             oldXml = DLFile( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" );
+        oldXml = DLFile( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" );
+
+        if (!oldProfile.exist() || !oldXml.exist()) {
+            LogStream::sendError() << "pfRecover:  " << oldXml.getPath() << " or " << oldProfile.getPath() << " not found" << endl;
+            return false;
+        }
     }
     else if (arg=="remort") {
         if (n<0)

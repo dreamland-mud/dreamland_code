@@ -107,6 +107,7 @@ void ClassSkillHelp::setProfession( DefaultProfession::Pointer prof )
     addAutoKeyword("умения " + prof->getMltName().ruscase('2'));
     addAutoKeyword("навыки " + prof->getRusName().ruscase('2'));
     addAutoKeyword("навыки " + prof->getMltName().ruscase('2'));    
+    labels.addTransient(prof->getName() + "-skills");
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -175,7 +176,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
         
     in << *this << endl;
 
-    in << "{cХарактер{x  : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
+    in << "{cНатура{x    : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
 
     if (prof->getEthos( ).equalsToBitNumber( ETHOS_LAWFUL ))
         in << "{cЭтос{x      : " << "законопослушный" << endl;
@@ -384,7 +385,7 @@ bool DefaultProfession::isPlayed( ) const
     return true;
 }
 
-GlobalBitvector DefaultProfession::toVector( Character * ) const
+GlobalBitvector DefaultProfession::toVector( CharacterMemoryInterface * ) const
 {
     GlobalBitvector bv( professionManager );
 
@@ -394,7 +395,7 @@ GlobalBitvector DefaultProfession::toVector( Character * ) const
 
 DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
-    if (ch && ch->getConfig( )->rucommands)
+    if (ch && ch->getConfig( ).rucommands)
         return getRusName( ).ruscase( c );
     else
         return getName( );
@@ -402,7 +403,7 @@ DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) 
 
 DLString DefaultProfession::getWhoNameFor( Character *ch ) const
 {
-    if (ch && ch->getConfig( )->rucommands)
+    if (ch && ch->getConfig( ).rucommands)
         return whoNameRus;
     else
         return whoName;

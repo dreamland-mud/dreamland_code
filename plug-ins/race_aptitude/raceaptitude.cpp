@@ -24,11 +24,11 @@ RaceAptitude::RaceAptitude( )
 {
 }
 
-bool RaceAptitude::visible( Character * ch ) const
+bool RaceAptitude::visible( CharacterMemoryInterface * ch ) const
 {
     const SkillRaceInfo *ri;
 
-    if (ch->is_npc( ) && mob.visible( ch->getNPC( ), this ) == MPROF_ANY)
+    if (ch->getMobile( ) && mob.visible( ch->getMobile( ), this ) == MPROF_ANY)
         return true;
     
     ri = getRaceInfo( ch );
@@ -88,17 +88,14 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
-void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) 
+void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
 {
-    Races::iterator i;
+    buf << print_what(this) << " "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl;
 
-    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
-        << " '{c" << getName( ) << "{x' или" 
-        << " '{c" << getRussianName( ) << "{x'"
-        << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'."
-        << endl << endl;
-
-
+    Races::const_iterator i;
     StringList rnames;
     for (i = races.begin( ); i != races.end( ); i++) {
         Race *race = raceManager->findExisting(i->first);
@@ -106,7 +103,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
             rnames.push_back(race->getNameFor(ch, ch));
     }
 
-    buf << "Особенность ";
+    buf << SKILL_INFO_PAD << "Особенность ";
     switch (rnames.size( )) {
     case 0:  buf << "неизвестной расы"; break;
     case 1:  buf << "расы "; break;
@@ -114,14 +111,12 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     }
     buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
 
-    print_wait_and_mana(this, ch, buf);    
+    buf << print_wait_and_mana(this, ch);
     
-    if (!visible( ch )) {
-        print_see_also(this, ch, buf);
+    if (!visible( ch ))
         return;
-    }
         
-    buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
+    buf << SKILL_INFO_PAD << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
 
     if (available( ch )) {
         int learned = ch->getSkillData(getIndex()).learned;
@@ -130,11 +125,10 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     }
 
     buf << "." << endl;
-    print_see_also(this, ch, buf);
 }
 
 const SkillRaceInfo *
-RaceAptitude::getRaceInfo( Character *ch ) const
+RaceAptitude::getRaceInfo( CharacterMemoryInterface *ch ) const
 {
     Races::const_iterator i = races.find( ch->getRace( )->getName( ) );
     

@@ -10,9 +10,7 @@
 # $FreeBSD: src/sys/conf/newvers.sh,v 1.44.2.23 2002/05/15 16:03:58 murray Exp $
 
 TYPE="DreamLand"
-REVISION="3.0"
-BRANCH="STABLE"
-RELEASE="${REVISION}-${BRANCH}"
+RELEASE="4.0"
 VERSION="${TYPE} ${RELEASE}"
 
 year=`date '+%Y'`

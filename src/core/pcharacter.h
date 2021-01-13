@@ -122,7 +122,6 @@ public:
  
     // set-get methods inherited from PCMemoryInterface
     virtual bool isOnline( ) const;
-    virtual PCharacter * getPlayer( );
 
     virtual const DLString& getName( ) const ;
 
@@ -202,8 +201,10 @@ public:
     // pc skills
     virtual int applyCurse( int );
     PCSkillData & getSkillData( int );
-    inline PCSkills & getSkills( );
-    inline PCBonuses & getBonuses();
+    virtual PCSkills & getSkills();
+    virtual void setSkills(const PCSkills &);
+    virtual PCBonuses & getBonuses();
+    virtual void setBonuses(const PCBonuses &);
     void updateSkills( );
 
     // experience 
@@ -233,7 +234,7 @@ public:
     virtual short getModifyLevel( ) const;
 
     // configuration
-    virtual PlayerConfig::Pointer getConfig( ) const;
+    virtual PlayerConfig getConfig( ) const;
 
 private:
     XML_VARIABLE XMLString password; 
@@ -303,8 +304,10 @@ public:
     GlobalArray            mod_level_skills;
     /** Bonus to spell/skill level for particular skill group. */
     GlobalArray            mod_level_groups;
-    /** General spell/skil level bonus. */
+    /** General spell/skill level bonus. */
     int                    mod_level_all;
+    /** Spell level bonus. */
+    int mod_level_spell;
 
     /** Amount of silver in the bank. */
     XML_VARIABLE XMLIntegerNoEmpty        bank_s;
@@ -332,16 +335,6 @@ public:
 inline const char * PCharacter::getNameP( ) const 
 { 
     return Character::getNameP( ); 
-}
-
-inline PCSkills & PCharacter::getSkills( )
-{
-    return skills;
-}
-
-inline PCBonuses & PCharacter::getBonuses()
-{
-    return bonuses;
 }
 
 

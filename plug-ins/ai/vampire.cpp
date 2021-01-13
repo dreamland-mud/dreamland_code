@@ -47,7 +47,7 @@ struct BasicMobileBehavior::VampVictims : public vector<Character *> {
             return false;
 
         // Don't get distracted on a hunt.
-        if (ch->zone && ch->in_room->area != ch->zone && vamp->hasLastFought())
+        if (ch->zone && ch->in_room->areaIndex() != ch->zone && vamp->hasLastFought())
             return false;
 
         return true;
@@ -77,12 +77,8 @@ struct BasicMobileBehavior::VampVictims : public vector<Character *> {
     }
     inline bool mustSuck( Character *wch )
     {
-        Affect *paf;
+        Affect *paf = wch->affected.find(gsn_vampiric_touch);
 
-        for (paf = wch->affected; paf; paf = paf->next)
-            if (paf->type == gsn_vampiric_touch)
-                break;
-        
         if (!paf && number_percent( ) < 30)
             return true;
         if (paf && paf->duration == 0)
@@ -240,14 +236,12 @@ struct BasicMobileBehavior::KillVictims : public BasicMobileBehavior::VampVictim
         int hisHit = HEALTH(wch);
         int sn = -1, snAttack = -1, snMalad = -1;
         
-        if (gsn_chain_lightning->usable( ch ) && myHit > 50)
+        if (gsn_chain_lightning->usable( ch ) && myHit > 50 && chance(75))
             snAttack = gsn_chain_lightning;
         else if (gsn_vampiric_blast->usable( ch ))
             snAttack = gsn_vampiric_blast;
         else if (gsn_dispel_good->usable( ch ) && IS_GOOD(wch))
             snAttack = gsn_dispel_good;
-        else if (gsn_colour_spray->usable( ch ))
-            snAttack = gsn_colour_spray;
         else if (gsn_burning_hands->usable( ch ))
             snAttack = gsn_burning_hands;
 
@@ -298,7 +292,7 @@ bool BasicMobileBehavior::canAggressVampire( Character *wch )
         return false;
     if (wch->is_npc( ) && IS_SET(wch->act, ACT_UNDEAD|ACT_VAMPIRE))
         return false;
-    if (wch->is_immortal( ))
+    if (wch->is_immortal() && !wch->getPC()->getAttributes().isAvailable("ai_aggress"))
         return false;
     if (wch->getModifyLevel( ) > ch->getModifyLevel( ) + 8)
         return false;
@@ -353,7 +347,7 @@ bool BasicMobileBehavior::aggressVampire( )
     if (!vtouch.attack( )) 
         if (number_bits( 1 ) || !vdispel.attack( ))
             if (number_bits( 1 ) || !vblind.attack( ))
-                if (number_percent( ) < 30 || !vsuck.attack( ))
+                if (number_percent( ) < 50 || !vsuck.attack( ))
                     if (number_percent( ) < 30 || !vbite.attack( ))
                         if (!vkill.attack( ))
                             return false;

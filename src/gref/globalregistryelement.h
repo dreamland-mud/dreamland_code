@@ -21,6 +21,7 @@ public:
     
     virtual bool matchesStrict( const DLString &str ) const;
     virtual bool matchesUnstrict( const DLString &str ) const;
+    virtual bool matchesSubstring( const DLString &str ) const;
 
     inline int getIndex( ) const
     {

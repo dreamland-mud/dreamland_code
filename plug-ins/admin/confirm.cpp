@@ -21,11 +21,23 @@
 #include "arg_utils.h"
 #include "act.h"
 #include "merc.h"
+#include "messengers.h"
+#include "replay.h"
 #include "websocketrpc.h"
 #include "descriptor.h"
 #include "def.h"
     
 CLAN(none);
+
+static XMLAttributeConfirm::Pointer get_confirm_attr(PCMemoryInterface *pcm)
+{
+    return pcm->getAttributes( ).getAttr<XMLAttributeConfirm>( "confirm" );
+}
+
+static XMLAttributeConfirm::Pointer find_confirm_attr(PCMemoryInterface *pcm)
+{
+    return pcm->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
+}
 
 /*----------------------------------------------------------------------------- 
  * 'confirm' command
@@ -69,7 +81,7 @@ COMMAND(Confirm, "confirm")
     }
     else if (arg_is_list( cmd ) && ch->is_immortal( )) 
     {
-        doList( ch, arguments );
+        doList( ch, arg_oneof(arguments, "new") );
     }
     else if (arg_is_show( cmd ) && ch->is_immortal( ))
     {
@@ -104,12 +116,13 @@ void Confirm::doRequest( Character *ch )
         return;
     }
 
-    attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeConfirm>( "confirm" );
+    attr = get_confirm_attr(ch->getPC());
     
     ch->println( "Твое описание отправлено Бессмертным на рассмотрение." );
     wiznet( WIZ_CONFIRM, 0, 0,
-            "%^C1 просит подтверждения своему персонажу ({y{hcconfirm list new{x).", ch );
-    
+            "%^C1 просит подтверждения своему персонажу ({y{hcconfirm list new{x).", ch );    
+    send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
+
     attr->update( ch ); 
     PCharacterManager::saveMemory( ch->getPC( ) );
 }
@@ -140,7 +153,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
         return;
     }
             
-    attr = pci->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
+    attr = find_confirm_attr(pci);
 
     if (!attr) { 
         if (!victim) {
@@ -153,7 +166,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
             return;
         }
 
-        attr = pci->getAttributes( ).getAttr<XMLAttributeConfirm>( "confirm" );
+        attr = get_confirm_attr(pci);
         attr->update( victim );        
     } 
 
@@ -196,15 +209,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
         return;
     }
 
-    try {
-        attr = pci->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
-
-    } catch (Exception e) {
-        LogStream::sendError( ) << e.what( ) << endl;
-        ch->send_to( "Невозможно по техническим причинам.\r\n" );
-        return;
-    }
-
+    attr = find_confirm_attr(pci);
     victim = pci->getPlayer( );
     
     if (!attr) { 
@@ -212,7 +217,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
             ch->send_to( "Может, хотя бы взглянешь на него?\r\n" );
             return;
         } else { 
-            attr = pci->getAttributes( ).getAttr<XMLAttributeConfirm>( "confirm" );
+            attr = get_confirm_attr(pci);
             attr->update( victim );        
         }
     }
@@ -250,7 +255,7 @@ void Confirm::doDelete( Character *ch, DLString& arguments )
         return;
     }
 
-    attr = pci->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
+    attr = find_confirm_attr(pci);
     
     if (!attr) {
         ch->send_to( "Этот игрок не посылал заявки на подтверждение.\r\n" );
@@ -263,21 +268,35 @@ void Confirm::doDelete( Character *ch, DLString& arguments )
     ch->send_to( "Ok.\r\n" );
 }
 
-void Confirm::doList( Character *ch, DLString &args ) 
+void Confirm::doUnread( Character *ch )
+{
+    const PCharacterMemoryList &players = PCharacterManager::getPCM( );    
+    int newRequests = 0;
+
+    for (auto &p: players) {
+        XMLAttributeConfirm::Pointer attr = find_confirm_attr(p.second);
+        
+        if (attr && attr->responsible.empty())
+            newRequests++;
+    }
+
+    if (newRequests > 0)
+        ch->pecho("Тебя ожида%1$Iет|ют|ют %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок на подтверждение персонажа ({y{hcconfirm list new{x).",
+                  newRequests);
+}
+
+void Confirm::doList( Character *ch, bool newOnly ) 
 {
     PCharacterMemoryList::const_iterator i;
     XMLAttributeConfirm::Pointer attr;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
     ostringstream buf;
-    bool fNew = (args == "new");
     int totalRequests = 0, newRequests = 0;
-
-    
     
     const DLString lineFormat = web_cmd(ch, "confirm show $1", "%-15s") + " %-13s  %-9s %s\r\n";
      
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-        attr = i->second->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
+        attr = find_confirm_attr(i->second);
         
         if (!attr)
             continue;
@@ -288,7 +307,7 @@ void Confirm::doList( Character *ch, DLString &args )
         if (rp.empty())
             newRequests++;
 
-        if (fNew && !rp.empty())
+        if (newOnly && !rp.empty())
             continue;
 
         buf << dlprintf(lineFormat.c_str(), 
@@ -303,13 +322,14 @@ void Confirm::doList( Character *ch, DLString &args )
         ch->send_to(buf);
     }
 
-    if (totalRequests == 0)
+    if (totalRequests == 0) {
         ch->println("Нет ни одной заявки на подтверждение персонажа.");
-    else if (newRequests != 0)
-        ch->pecho("Тебя ожида%1$Iет|ют|ют %1$d заяв%1$Iка|ки|ок на подтверждение персонажа. Всего заявок: %2$d.",
+    } else if (newRequests != 0) {
+        ch->pecho("Найден%1$Iа|о|о %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок, всего заявок: %2$d.",
                   newRequests, totalRequests);
-    else 
+    } else {
         ch->pecho("Нерассмотренных заявок на подтверждение нет. Всего заявок: %1$d.", totalRequests);
+    }
 }
 
 void Confirm::doShow( Character *ch, DLString& argument ) 
@@ -326,7 +346,7 @@ void Confirm::doShow( Character *ch, DLString& argument )
         return;
     }
 
-    attr = pci->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
+    attr = find_confirm_attr(pci);
     
     if (!attr) {
         ch->send_to( "Этот игрок не посылал заявки на подтверждение.\r\n" );
@@ -409,8 +429,10 @@ void XMLAttributeConfirm::run( Character *ch )
     }
     
     if (!reason.getValue( ).empty( )) 
-        buf << reason.getValue( ) << endl;
-    
+        buf << reason.getValue( );
+
+    remember_history_private(ch->getPC(), buf.str());
+    buf << endl;
     ch->send_to( buf );
 
     ch->getPC( )->getAttributes( ).eraseAttribute( "confirm" );
@@ -442,13 +464,10 @@ void XMLAttributeConfirmListenerPlugin::run( int oldState, int newState, Descrip
         return;
 
     if (ch->is_immortal( ))
-        interpret_raw( ch, "confirm", "list new" );
+        Confirm::doUnread(ch);
 
-    attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
-    
-    if (!attr)
-        return;
-    
-    attr->run( ch );
+    attr = find_confirm_attr(ch->getPC());
+    if (attr)
+        attr->run( ch );
 
 }

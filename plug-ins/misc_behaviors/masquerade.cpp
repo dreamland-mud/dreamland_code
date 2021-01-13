@@ -84,7 +84,7 @@ RoamingPortal::RoamingPortal( )
 
 bool RoamingPortal::area( ) 
 {
-    AREA_DATA *pArea, *area;
+    AreaIndexData *pArea, *area;
     Room *room;
     int vnum, count;
     
@@ -97,8 +97,9 @@ bool RoamingPortal::area( )
     vnum = obj->pIndexData->vnum;
     area = NULL;
     room = NULL;
+    count = 0;
     
-    for (count = 0, pArea = area_first; pArea; pArea = pArea->next) {
+    for(auto &pArea: areaIndexes) {
         if (IS_SET(pArea->area_flag, AREA_NOQUEST))
             continue;
 
@@ -120,7 +121,7 @@ bool RoamingPortal::area( )
 
     count = 0;
 
-    for (map<int, Room *>::iterator i = area->rooms.begin( ); i != area->rooms.end( ); i++) {
+    for (map<int, Room *>::iterator i = area->area->rooms.begin( ); i != area->area->rooms.end( ); i++) {
         if (number_range( 0, count++ ) == 0) 
             room = i->second;
     }
@@ -148,7 +149,7 @@ void CatsEye::get( Character *victim ) {
 bool CatsEye::drop( Character *victim ) { 
     Room *room;
 
-    room = get_room_index( recall.getValue( ) );
+    room = get_room_instance( recall.getValue( ) );
     if (!room) {
         log("wrong recall for cat's eye: " << recall.getValue( ));
         return false;

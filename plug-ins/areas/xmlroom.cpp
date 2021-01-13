@@ -30,6 +30,14 @@ XMLResetList::nodeFromXML(const XMLNode::Pointer &child)
     r.arg3 = 0;
     r.arg4 = 0;
 
+    r.flags.setBits(child->getAttribute("flags"));
+
+    if (child->hasAttribute("rand"))
+        r.rand.setValue(rand_table.value(child->getAttribute("rand")));
+
+    if (child->hasAttribute("bestTier"))
+        r.bestTier = child->getAttribute("bestTier").toInt();
+
     if(child->getType( ) != XMLNode::XML_LEAF) {
         return false;
     } else if(t == "mob") {
@@ -42,10 +50,12 @@ XMLResetList::nodeFromXML(const XMLNode::Pointer &child)
         r.arg1 = child->getAttribute("vnum").toInt( );
     } else if(t == "put") {
         r.command = 'P';
-        r.arg1 = child->getAttribute("vnum").toInt( );    
-        r.arg2 = child->getAttribute("limit").toInt( );    
+        NumberSet vnums(child->getAttribute("vnum"));
+        r.arg1 = (*vnums.begin());
+        r.arg2 = child->getAttribute("limit").toInt( );    // should be called 'max count'
         r.arg3 = child->getAttribute("in").toInt( );    
-        r.arg4 = child->getAttribute("maxHere").toInt( );    
+        r.arg4 = child->getAttribute("maxHere").toInt( ); // should be called 'min count'        
+        r.vnums.insert(r.vnums.end(), vnums.begin(), vnums.end());
     } else if(t == "give") {
         r.command = 'G';
         r.arg1 = child->getAttribute("vnum").toInt( );
@@ -72,6 +82,13 @@ XMLResetList::toXML(XMLNode::Pointer &parent) const
     for (const_iterator r = begin( ); r != end( ); r++) {
         XMLNode::Pointer child(NEW);
         child->setType(XMLNode::XML_LEAF);
+
+        if (r->flags.getValue() > 0)
+            child->insertAttribute("flags", r->flags.names());
+        if (r->rand.getValue() > 0)
+            child->insertAttribute("rand", r->rand.name());
+        if (r->bestTier > 0)
+            child->insertAttribute("bestTier", r->bestTier);
 
         switch(r->command) {
         case 'M':
@@ -130,7 +147,7 @@ XMLRoom::XMLRoom() :
 }
 
 void 
-XMLRoom::init(Room *room)
+XMLRoom::init(RoomIndexData *room)
 {
     name.setValue(room->name);
     description.setValue(room->description);
@@ -150,8 +167,7 @@ XMLRoom::init(Room *room)
             exits[dirs[pExit->orig_door].name].init(pExit);
     }
 
-    EXTRA_EXIT_DATA *peexit;
-    for(peexit = room->extra_exit; peexit; peexit = peexit->next)
+    for(auto &peexit: room->extra_exits)
         extraExits[peexit->keyword].init(peexit);
 
     EXTRA_DESCR_DATA *pEd;
@@ -161,40 +177,36 @@ XMLRoom::init(Room *room)
         extraDescr.back( ).setValue(pEd->description);
     }
 
-    manaRate.setValue(room->mana_rate_default);
-    healRate.setValue(room->heal_rate_default);
+    manaRate.setValue(room->mana_rate);
+    healRate.setValue(room->heal_rate);
 
     if (room->liquid != liq_none && room->liquid != liq_water) 
         liquid.setValue(room->liquid->getName( ));
 
-    RESET_DATA *pReset;
-    for (pReset = room->reset_first; pReset; pReset = pReset->next)
+    for (auto &pReset: room->resets)
         resets.push_back(*pReset);
-    
-    if(!room->behavior.isEmpty( )) {
-        XMLNode::Pointer node(NEW);
-        room->behavior.toXML(node);
-        node->setName("behavior");
-        behavior.setNode(node);
-    }
+
+    if(!room->behavior.isEmpty( ))
+        behavior.setNode(room->behavior->getFirstNode( ));
 
     for (Properties::const_iterator p = room->properties.begin( ); p != room->properties.end( ); p++)
         properties.insert( *p );
 }
 
-Room *
+RoomIndexData *
 XMLRoom::compat(int vnum)
 {
-    Room *room;
+    RoomIndexData *room;
     
-    room = new Room( );
-    room->wrapper = 0;
+    room = new RoomIndexData;
 
     room->vnum = vnum;
     room->name = str_dup(name.getValue( ).c_str( ));
     room->description = str_dup(description.getValue( ).c_str( ));
-    room->room_flags_default = room->room_flags = flags.getValue( );
+    room->room_flags = flags.getValue( );
     room->sector_type = sector.getValue( );
+    room->mana_rate = manaRate.getValue( );
+    room->heal_rate = healRate.getValue( );
 
     if(!clan.getValue( ).empty( ))
         room->clan.setName(clan.getValue( ));
@@ -213,16 +225,13 @@ XMLRoom::compat(int vnum)
             pExit->orig_door = door;
         } else
             pExit = NULL;
-
-        room->old_exit[door] = pExit;
     }
 
     XMLMapBase<XMLExtraExit>::reverse_iterator eeit;
     for(eeit = extraExits.rbegin( ); eeit != extraExits.rend( ); eeit++) {
         EXTRA_EXIT_DATA *peexit = eeit->second.compat( );
         peexit->keyword = str_dup(eeit->first.c_str( ));
-        peexit->next = room->extra_exit;
-        room->extra_exit = peexit;
+        room->extra_exits.push_front(peexit);
     }
 
     XMLListBase<XMLExtraDescr>::reverse_iterator edit;
@@ -234,20 +243,17 @@ XMLRoom::compat(int vnum)
         room->extra_descr = pEd;
     }
 
-    room->mana_rate_default = room->mana_rate = manaRate.getValue( );
-    room->heal_rate_default = room->heal_rate = healRate.getValue( );
-
     if(!liquid.getValue( ).empty( ))
         room->liquid.setName(liquid.getValue( ));
     else
         room->liquid = liq_none;
 
-    if (IS_WATER(room) && room->liquid == liq_none)
+    if ((room->sector_type == SECT_WATER_NOSWIM || room->sector_type == SECT_WATER_SWIM) && room->liquid == liq_none)
         room->liquid = liq_water;
 
     XMLResetList::iterator rit;
     for(rit = resets.begin( ); rit != resets.end( ); rit++) {
-        RESET_DATA *pReset = (RESET_DATA*)alloc_mem(sizeof(RESET_DATA));
+        RESET_DATA *pReset = new reset_data();
 
         *pReset = *rit;
 
@@ -260,23 +266,17 @@ XMLRoom::compat(int vnum)
             pReset->arg3 = vnum;
         }
 
-        pReset->next = NULL;
-
-        if(!room->reset_first) {
-            room->reset_first = pReset;
-            room->reset_last = pReset;
-        } else {
-            room->reset_last->next = pReset;
-            room->reset_last = pReset;            
-        }
-    
+        room->resets.push_back(pReset);
     }
 
-    if(behavior.getNode( ))
-        room->behavior.fromXML(behavior.getNode( ));
+    if(behavior.getNode( )) {
+        room->behavior.construct( );
+        XMLNode::Pointer p = behavior.getNode( );
+        room->behavior->appendChild(p);
+    }
 
     for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
         room->properties.insert( *p );
-
+    
     return room;
 }

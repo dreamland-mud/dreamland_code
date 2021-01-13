@@ -127,7 +127,7 @@ void SmithService::printLine( Character *client,
 
 void SmithService::toStream( Character *client, ostringstream &buf ) const
 {
-    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
+    DLString myname = client->getConfig().rucommands && !rname.empty() ? rname : name;
     printLine( client, price, myname, descr, buf );
 }
 
@@ -192,8 +192,6 @@ bool HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     else if (level < 90)        { hr = 6; dr = 6; }
     else                        { hr = 10; dr = 10; }
     
-    af.where = TO_OBJECT;
-    af.bitvector = 0;
     af.duration = -1;
     af.type = 0;
     af.level = level;
@@ -361,7 +359,7 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
  *------------------------------------------------------------------------*/
 void SharpSmithService::toStream( Character *client, ostringstream &buf ) const
 {
-    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
+    DLString myname = client->getConfig().rucommands && !rname.empty() ? rname : name;
     printLine( client, price, myname, descr, buf );
     printLine( client, extraPrice, myname, extraDescr, buf );
 }

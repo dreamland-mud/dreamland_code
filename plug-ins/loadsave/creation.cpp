@@ -13,7 +13,6 @@
 #include "skillreference.h"
 #include "mobilebehaviormanager.h"
 #include "objectbehaviormanager.h"
-
 #include "objectmanager.h"
 #include "affect.h"
 #include "pcharacter.h"
@@ -22,6 +21,8 @@
 #include "object.h"
 #include "race.h"
 
+#include "itemevents.h"
+#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "vnum.h"
@@ -38,19 +39,32 @@ RELIG(chronos);
 PROF(mobile);
 
 
+typedef void(NPCharacter::*SetterMethod)(const DLString &);
+/** Override proto descriptions if there's some formatting present. */
+static void override_description(NPCharacter *mob, const char *cProtoField, SetterMethod method)
+{
+    DLString protoField(cProtoField);
+
+    if (protoField.find("%1") == DLString::npos)
+        return;
+
+    DLString result = fmt(0, cProtoField, mob);
+    if (result != protoField)
+        (mob->*method)(result);
+}
+
 /*
  * Create an instance of a mobile.
  */
-NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count );
 NPCharacter *create_mobile( MOB_INDEX_DATA *pMobIndex )
 {
-    return create_mobile_org( pMobIndex, true );
+    return create_mobile_org( pMobIndex, 0 );
 }
 NPCharacter *create_mobile_nocount( MOB_INDEX_DATA *pMobIndex )
 {
-    return create_mobile_org( pMobIndex, false );
+    return create_mobile_org( pMobIndex, FCREATE_NOCOUNT );
 }
-NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
+NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
 {
         NPCharacter *mob;
         int i;
@@ -134,6 +148,11 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
                 mob->material                = str_dup(pMobIndex->material);
                 mob->extracted                = false;
 
+                override_description(mob, pMobIndex->player_name, &NPCharacter::setName);
+                override_description(mob, pMobIndex->short_descr, &NPCharacter::setShortDescr);
+                override_description(mob, pMobIndex->long_descr, &NPCharacter::setLongDescr);
+                override_description(mob, pMobIndex->description, &NPCharacter::setDescription);
+
                 /* computed on the spot */
 
                 for (i = 0; i < stat_table.size; i ++)
@@ -146,52 +165,8 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
                 mob->perm_stat[STAT_CON] += (mob->size - SIZE_MEDIUM) / 2;
 
                 /* let's get some spell action */
-                if (IS_AFFECTED(mob,AFF_SANCTUARY))
-                {
-                    af.type      = gsn_sanctuary; 
-                    af.bitvector = AFF_SANCTUARY;
-                    af.where     = TO_AFFECTS;
-                    af.level     = mob->getRealLevel( );
-                    af.duration  = -1;
-                    affect_to_char( mob, &af );
-                }
-
-                if (IS_AFFECTED(mob,AFF_HASTE))
-                {
-                        af.where         = TO_AFFECTS;
-                        af.type      = gsn_haste; 
-                        af.level     = mob->getRealLevel( );
-                        af.duration  = -1;
-                        af.location  = APPLY_DEX;
-                        af.modifier  = 1 + (mob->getRealLevel( ) >= 18) + (mob->getRealLevel( ) >= 25) +
-                                (mob->getRealLevel( ) >= 32);
-                        af.bitvector = AFF_HASTE;
-                        affect_to_char( mob, &af );
-                }
-
-                if (IS_AFFECTED(mob,AFF_PROTECT_EVIL))
-                {
-                        af.where         = TO_AFFECTS;
-                        af.type         = gsn_protection_evil;
-                        af.level         = mob->getRealLevel( );
-                        af.duration         = -1;
-                        af.location         = APPLY_SAVES;
-                        af.modifier         = -1;
-                        af.bitvector = AFF_PROTECT_EVIL;
-                        affect_to_char(mob,&af);
-                }
-
-                if (IS_AFFECTED(mob,AFF_PROTECT_GOOD))
-                {
-                        af.where         = TO_AFFECTS;
-                        af.type      = gsn_protection_good; 
-                        af.level     = mob->getRealLevel( );
-                        af.duration  = -1;
-                        af.location  = APPLY_SAVES;
-                        af.modifier  = -1;
-                        af.bitvector = AFF_PROTECT_GOOD;
-                        affect_to_char(mob,&af);
-                }
+                if (!IS_SET(flags, FCREATE_NOAFFECTS))
+                    create_mob_affects(mob);
         }
         else /* read in old format and convert */
         {
@@ -254,7 +229,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
         /* link the mob to the world list */
         char_to_list( mob, &char_list );
 
-        if (count)
+        if (!IS_SET(flags, FCREATE_NOCOUNT))
             pMobIndex->count++;
         
         /* assign behavior */        
@@ -264,13 +239,13 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
             MobileBehaviorManager::assignBasic( mob );
         
         /* fenia mobprog initialization */
-        if (count) {
+        if (!IS_SET(flags, FCREATE_NOCOUNT)) {
             WrapperBase *w = get_wrapper(pMobIndex->wrapper);
             if (w) {
                 static Scripting::IdRef initId( "init" );
                 try {
                     w->call(initId, "C", mob);
-                } catch (Exception e) {
+                } catch (const Exception &e) {
                     LogStream::sendError( ) 
                             << "create_mobile #" << pMobIndex->vnum 
                             << ": " <<  e.what( ) << endl;
@@ -281,11 +256,69 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, bool count )
         return mob;
 }
 
+/** Transform affect bits from the prototype into real affects. Not called for mobs read from disk. */
+void create_mob_affects(NPCharacter *mob)
+{
+    if (IS_AFFECTED(mob,AFF_SANCTUARY))
+    {
+        Affect af;
+
+        af.type      = gsn_sanctuary; 
+        af.bitvector.setValue(AFF_SANCTUARY);
+        af.bitvector.setTable(&affect_flags);
+        af.level     = mob->getRealLevel( );
+        af.duration  = -1;
+        affect_to_char( mob, &af );
+    }
+
+    if (IS_AFFECTED(mob,AFF_HASTE))
+    {
+        Affect af;
+
+        af.bitvector.setTable(&affect_flags);
+        af.type      = gsn_haste; 
+        af.level     = mob->getRealLevel( );
+        af.duration  = -1;
+        af.location = APPLY_DEX;
+        af.modifier = 1 + (mob->getRealLevel( ) >= 18) + (mob->getRealLevel( ) >= 25) +
+                (mob->getRealLevel( ) >= 32);
+        af.bitvector.setValue(AFF_HASTE);
+        affect_to_char( mob, &af );
+    }
+
+    if (IS_AFFECTED(mob,AFF_PROTECT_EVIL))
+    {
+        Affect af;
+
+        af.bitvector.setTable(&affect_flags);
+        af.type         = gsn_protection_evil;
+        af.level         = mob->getRealLevel( );
+        af.duration         = -1;
+        af.location = APPLY_SAVES; 
+        af.modifier = -1;
+        af.bitvector.setValue(AFF_PROTECT_EVIL);
+        affect_to_char(mob,&af);
+    }
+
+    if (IS_AFFECTED(mob,AFF_PROTECT_GOOD))
+    {
+        Affect af;
+
+        af.bitvector.setTable(&affect_flags);
+        af.type      = gsn_protection_good; 
+        af.level     = mob->getRealLevel( );
+        af.duration  = -1;
+        af.location = APPLY_SAVES; 
+        af.modifier = -1;
+        af.bitvector.setValue(AFF_PROTECT_GOOD);
+        affect_to_char(mob,&af);
+    }
+}
+
 /* duplicate a mobile exactly -- except inventory */
 void clone_mobile(NPCharacter *parent, NPCharacter *clone)
 {
     int i;
-    Affect *paf;
 
     if (parent == 0 || clone == 0)
         return;
@@ -354,7 +387,7 @@ void clone_mobile(NPCharacter *parent, NPCharacter *clone)
         clone->damage[i]        = parent->damage[i];
 
     /* now add the affects */
-    for (paf = parent->affected; paf != 0; paf = paf->next)
+    for (auto &paf: parent->affected)
         affect_to_char(clone,paf);
 
 }
@@ -461,7 +494,7 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
                 static Scripting::IdRef initId( "init" );
                 try {
                     w->call(initId, "O", obj);
-                } catch (Exception e) {
+                } catch (const Exception &e) {
                     LogStream::sendError( ) 
                             << "create_object #" << pObjIndex->vnum 
                             << ": " <<  e.what( ) << endl;
@@ -469,6 +502,8 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
             }
         }
 
+        // Notify item creation listeners.
+        eventBus->publish(ItemCreatedEvent(obj, Count));
         return obj;
 }
 
@@ -476,7 +511,6 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
 void clone_object(Object *parent, Object *clone)
 {
     int i;
-    Affect *paf;
     EXTRA_DESCR_DATA *ed,*ed_new;
 
     if (parent == 0 || clone == 0)
@@ -513,7 +547,7 @@ void clone_object(Object *parent, Object *clone)
     /* affects */
     clone->enchanted        = parent->enchanted;
 
-    for (paf = parent->affected; paf != 0; paf = paf->next)
+    for (auto &paf: parent->affected)
         affect_to_obj( clone, paf);
 
     /* extended desc */
@@ -526,6 +560,8 @@ void clone_object(Object *parent, Object *clone)
         clone->extra_descr          = ed_new;
     }
 
+    for (auto &p: parent->properties)
+        clone->properties[p.first] = p.second;
 }
 
 

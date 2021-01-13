@@ -20,7 +20,7 @@
 #endif
 
 #include "json/json.h"
-
+#include "math_utils.h"
 #include "rpccommandmanager.h"
 #include "iconvmap.h"
 #include "logstream.h"
@@ -57,7 +57,7 @@
 
 using namespace Scripting;
 
-template class EventHandler<WebEditorSaveArguments>;
+template class AttributeEventHandler<WebEditorSaveArguments>;
 
 static IconvMap utf2koi("utf-8", "koi8-r//IGNORE");
 
@@ -75,6 +75,7 @@ enum {
 const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet" };
 int ttype_lookup( const char *received )
 {
+    notice("telnet: checking %s as terminal type candidate", received);	
     for (int i = 0; i < TTYPE_MAX; i++) {
         const char *ttype = TTYPE_NAMES[i]; 
         if (strncmp(received, ttype, strlen(ttype)) == 0) {
@@ -286,7 +287,7 @@ int Descriptor::inputTelnet( unsigned char i )
             break;
 
         default:
-            LogStream::sendError() << "telnet: unknown state " << i << endl;
+            LogStream::sendError() << "telnet: unknown state " << telnet.state << ":" << i << endl;
             telnet.state = TNS_NORMAL;
     }
 
@@ -492,7 +493,7 @@ sendVersion(Descriptor *d)
 {
     Json::Value val;
     val["command"] = "version";
-    val["args"][0] = "DreamLand Web Client/1.10";
+    val["args"][0] = "DreamLand Web Client/2.1";
     val["args"][1] = d->websock.nonce;
     LogStream::sendError( ) << "WebSock: sending server version" << endl;
     d->writeWSCommand(val);

@@ -6,6 +6,7 @@
 #include "logstream.h"
 #include "dlfileop.h"
 #include "xmlarea.h"
+#include "areahelp.h"
 #include "feniamanager.h"
 #include "fileformatexception.h"
 #include "room.h"
@@ -43,7 +44,7 @@ XMLAreaHeader::fromXML(const XMLNode::Pointer &parent)
 }
 
 void
-XMLAreaHeader::init(area_data *a)
+XMLAreaHeader::init(AreaIndexData *a)
 {
     if(a->name) name.setValue(a->name);
     if(a->credits) credits.setValue(a->credits);
@@ -78,21 +79,15 @@ XMLAreaHeader::init(area_data *a)
     loaded = true;
 }
 
-area_data *
+AreaIndexData *
 XMLAreaHeader::compat( )
 {
     if(!loaded)
         return 0;
 
-    AREA_DATA *a = new AREA_DATA;
+    AreaIndexData *a = new AreaIndexData;
     
-    a->age                = 15;
-    a->nplayer        = 0;
-    a->empty        = false;
-    a->count        = 0;
-    a->next        = 0;
     a->vnum                = top_area++;
-
 
     a->name = str_dup(name.getValue( ).c_str( ));
     a->credits = str_dup(credits.getValue( ).c_str( ));
@@ -115,14 +110,16 @@ XMLAreaHeader::compat( )
         a->resetmsg = str_dup(resetMessage.getValue( ).c_str( ));
     else
         a->resetmsg = 0;
-    
-    
+        
     if(behavior.getNode( )) {
         a->behavior.fromXML(behavior.getNode( ));
         if(a->behavior)
             a->behavior->setArea(a);
     } else
         a->behavior.clear( );
+
+    if (FeniaManager::wrapperManager)
+        FeniaManager::wrapperManager->linkWrapper(a);
 
     return a;
 }
@@ -134,7 +131,7 @@ XMLArea::XMLArea( ) : mobiles(false), objects(false), rooms(false)
 void
 XMLArea::init(area_file *af)
 {
-    AREA_DATA *area = af->area;
+    AreaIndexData *area = af->area;
 
     if(!area)
         return;
@@ -170,7 +167,7 @@ XMLArea::init(area_file *af)
             objects[pObjIndex->vnum].init(pObjIndex);
     }
     
-    Room *pRoom;
+    RoomIndexData *pRoom;
     for (int v = area->min_vnum; v <= area->max_vnum; v++) {
         pRoom = get_room_index(v);
         if(pRoom)
@@ -179,7 +176,7 @@ XMLArea::init(area_file *af)
 }
 
 void
-XMLArea::load_helps(AREA_DATA *a)
+XMLArea::load_helps(AreaIndexData *a)
 {
     XMLListBase<XMLAreaHelp>::const_iterator h;
     bool selfHelpExists = false;
@@ -224,39 +221,33 @@ XMLArea::load_helps(AREA_DATA *a)
 }
 
 void
-XMLArea::load_rooms(AREA_DATA *a)
+XMLArea::load_rooms(AreaIndexData *a)
 {
     XMLMapBase<XMLRoom>::iterator rit;
     for(rit = rooms.begin( ); rit != rooms.end( ); rit++) {
-        int iHash, vnum = rit->first.toInt( );
+        int vnum = rit->first.toInt( );
         
         if (dup_room_vnum( vnum ))
             throw FileFormatException("Load_rooms: vnum %d duplicated", vnum);
 
-        Room *room = rit->second.compat(vnum);
-        room->area = a;
-
+        RoomIndexData *room = rit->second.compat(vnum);
+        room->areaIndex = a;
+        
         if(3000 <= vnum && vnum < 3400)
             SET_BIT(room->room_flags, ROOM_LAW);
 
-        iHash = vnum % MAX_KEY_HASH;
-        room->next = room_index_hash[iHash];
-        room_index_hash[iHash] = room;
-        top_room++;
         top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
-        room->rnext = room_list;
-        room_list = room;
+        roomIndexMap[vnum] = room;
+        room->areaIndex->roomIndexes[vnum] = room;
 
-        room->area->rooms[vnum] = room;
-
-        if (FeniaManager::wrapperManager)
-            FeniaManager::wrapperManager->linkWrapper(room);
+        // Create new single room instance for this index (FIXME)
+        room->create();        
     }
 }
 
 void
-XMLArea::load_mobiles(AREA_DATA *a)
+XMLArea::load_mobiles(AreaIndexData *a)
 {
     XMLMapBase<XMLMobileFactory>::iterator mit;
     int i = 0;
@@ -268,7 +259,7 @@ XMLArea::load_mobiles(AREA_DATA *a)
         
         MOB_INDEX_DATA *pMobIndex = mit->second.compat( );
         pMobIndex->vnum = vnum;
-        pMobIndex->area        = a;
+        pMobIndex->area = a;
 
         iHash = vnum % MAX_KEY_HASH;
         pMobIndex->next = mob_index_hash[iHash];
@@ -285,7 +276,7 @@ XMLArea::load_mobiles(AREA_DATA *a)
 }
 
 void
-XMLArea::load_objects(AREA_DATA *a)
+XMLArea::load_objects(AreaIndexData *a)
 {
     XMLMapBase<XMLObjectFactory>::iterator oit;
     for(oit = objects.begin( ); oit != objects.end( ); oit++) {
@@ -328,25 +319,25 @@ XMLArea::load(const DLString &fname)
     fromXML(doc->getFirstNode( ));
     
     area_file *af = new_area_file(fname.c_str( ));
-    AREA_DATA *a = areadata.compat( );
+    AreaIndexData *a = areadata.compat( );
+    areaIndexes.push_back(a);
 
-    if(a) {
-        af->area = a;
-        a->area_file = af;
+    try {
+        if (a) {
+            // Create new single area instance for this index (FIXME)
+            a->create();
 
-        load_rooms(a);
-        load_mobiles(a);
-        load_objects(a);
-        load_helps(a);
-        
-        if ( area_first == 0 )
-            area_first = a;
-        
-        if ( area_last  != 0 )
-            area_last->next = a;
-        
-        area_last = a;
-        a->next = 0;
+            af->area = a;
+            a->area_file = af;
+
+            load_rooms(a);
+            load_mobiles(a);
+            load_objects(a);
+            load_helps(a);
+        }
+    } catch (const Exception &ex) {
+        LogStream::sendFatal() << ex.what() << endl;
+        throw ex;
     }
 }
 
@@ -368,4 +359,10 @@ XMLArea::save(area_file *af)
     DLFileRead areaFile( dreamland->getAreaDir( ), af->file_name, ".xml" );
     ofstream os( areaFile.getPath( ).c_str( ) );
     doc->save(os);
+
+    if (!os) {
+        DLString msg = "Error saving area " + areaFile.getPath();
+        LogStream::sendSystem() << msg << endl;
+        throw ExceptionDBIO(msg);
+    }
 }

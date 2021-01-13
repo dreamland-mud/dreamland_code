@@ -63,7 +63,7 @@ int SkillGroup::getPracticer( ) const
 
 const DLString& SkillGroup::getNameFor( Character *ch ) const
 {
-    if (ch->getConfig( )->ruskills)
+    if (ch->getConfig( ).ruskills)
         return getRussianName( );
     else
         return getName( );

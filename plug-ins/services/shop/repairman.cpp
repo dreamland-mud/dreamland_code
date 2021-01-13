@@ -14,15 +14,22 @@
 
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
+
+#include "skillreference.h"
 
 #include "act.h"
 #include "interp.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+
+GSN(haggle);
+RELIG(fili);
+bool can_afford(Character *ch, int gold, int silver, int number);
+void deduct_cost(Character *ch, int cost);
 
 static void mprog_repair( Character *mob, Character *client, Object *obj, int cost )
 {
@@ -70,7 +77,7 @@ bool Repairman::specIdle( )
 void Repairman::doRepair( Character *client, const DLString &cArgs )
 {
     Object *obj;
-    int cost;
+    int cost, roll;
     DLString args = cArgs, arg;
     
     arg = args.getOneArgument( );
@@ -92,14 +99,26 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     
     cost = getRepairCost( obj );
 
-    if (cost > client->gold) {
+    if (!can_afford(client, cost, 0, 1)) {
         say_act( client, ch, "У тебя не хватит денег, чтоб оплатить ремонт этой вещи.");
         return;
     }
 
+    /* haggle */
+    if(cost > 1){
+        bool bonus = client->getReligion() == god_fili && get_eq_char(client, wear_tattoo) != 0;
+        roll = bonus ? 100 : number_percent( );
+        if ( bonus || (roll < gsn_haggle->getEffective(client)) )
+        {
+            cost -= cost / 2 * roll / 100;
+            act_p( "Ты торгуешься с $C5.", client, 0, this->getChar(), TO_CHAR, POS_RESTING );
+            gsn_haggle->improve( client, true );
+        }
+    }
+
     client->setWaitViolence( 1 );
 
-    client->gold -= cost;
+    deduct_cost(client, cost * 100);
     ch->gold += cost;
 
     act("$C1 берет $o4 y $c2, восстанавливает и возвращает $c3.",client,obj,ch,TO_ROOM);
@@ -127,24 +146,30 @@ void Repairman::doEstimate( Character *client, const DLString &cArgs )
     }
 
     if ((obj = get_obj_carry(client, arg.c_str( ))) == 0) {
-        say_act( client, ch, "У тебя нет этого");
+        say_act( client, ch, "У тебя нет этого.");
         return;
     }
     
     if (!canRepair( obj, client ))
         return;
     
-    tell_fmt( "Восстановление этой вещи будет стоить %3$d.", 
-               client, ch, getRepairCost( obj ) );
+    int cost = getRepairCost(obj);
+
+    if (cost > 0)
+        tell_fmt( "Ремонт этой вещи будет стоить %3$d золот%3$Iую|ые|ых монет%3$Iу|ы|.", 
+                client, ch, cost);
+    else
+        tell_fmt("Я, так и быть, отремонтирую тебе эту вещь бесплатно.", client, ch);
 }
 
+/** Return cost of repair in gold. */
 int Repairman::getRepairCost( Object *obj )
 {
     int cost;
     
     cost = obj->level * 10 + (obj->cost * (100 - obj->condition)) / 100;
     cost /= 100;
-    return cost;
+    return max(0, cost);
 }
 
 bool Repairman::canRepair( Object *obj, Character *client )
@@ -162,14 +187,20 @@ bool Repairman::canRepair( Object *obj, Character *client )
     }
 
     if (obj->condition >= 100) {
-        say_fmt( "%2$^O1 не нужда%2$nется|ются в ремонте.", ch, obj );
+        say_fmt( "{1%2$^O1{2 не нужда%2$nется|ются в ремонте.", ch, obj );
         return false;
     }
 
     if (obj->cost == 0) {
-        say_fmt( "%2$^O1 ничего не стоит, а значит я не смогу оценить починку.", ch, obj );
-        say_act( client, ch, "Ты случайно не из ямы для пожертвований ее вытащил{Sfа{Sx?");        
-           return false;
+        say_fmt( "{1%2$^O1{2 ничего не стоит, а значит я не смогу оценить починку.", ch, obj );
+        say_fmt( "Ты, случайно, не из ямы для пожертвований %2$P2 вытащил%3$Gо||а?", ch, obj, client);
+        return false;
+    }
+
+    if (IS_OBJ_STAT(obj, ITEM_NODROP)) {
+        say_fmt("Ты не сможешь передать мне {1%2$O4{2 для починки.", ch, obj);
+        say_fmt("Попробуй сперва избавить эту вещь от проклятия.", ch);
+        return false;
     }
 
     return true;

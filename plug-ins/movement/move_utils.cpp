@@ -17,7 +17,7 @@
 #include "affect.h"
 #include "skill.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "clanreference.h"
 
 #include "act.h"
@@ -70,10 +70,7 @@ void strip_camouflage( Character *ch )
 void check_camouflage( Character *ch, Room *to_room )
 {
     if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE)
-            && to_room->sector_type != SECT_FIELD
-            && to_room->sector_type != SECT_FOREST
-            && to_room->sector_type != SECT_MOUNTAIN
-            && to_room->sector_type != SECT_HILLS )
+            && !IS_NATURE(to_room))
     {
             strip_camouflage( ch );
     }        
@@ -87,7 +84,7 @@ Room * get_random_room( Character *ch )
 
     for ( ; ; )
     {
-        room = get_room_index( number_range( 200, 39999 ) ); /* old stuff, but appears all new interesting areas lie beyond this limit */
+        room = get_room_instance( number_range( 200, 39999 ) ); /* old stuff, but appears all new interesting areas lie beyond this limit */
         if ( room != 0 )
         if ( ch->can_see(room)
         &&   !room->isPrivate()
@@ -107,17 +104,17 @@ Room * get_random_room( Character *ch )
 
 Room * get_random_room_vanish( Character *ch )
 {
-    Room *room, *target = NULL;
+    Room *target = NULL;
     int count = 0;
 
-    for (room = room_list; room; room = room->rnext) {
+    for (auto &room: roomInstances) {
         if (room->area != ch->in_room->area || room == ch->in_room)
             continue;
         
         if (IS_SET(room->room_flags, ROOM_NO_VANISH|ROOM_SAFE)) 
             continue;
         
-        if (room->clan != clan_none && room->clan != ch->getClan( )) 
+        if (room->pIndexData->clan != clan_none && room->pIndexData->clan != ch->getClan( )) 
             continue;
         
         if (room->isPrivate( )) 
@@ -153,15 +150,11 @@ bool can_fly( Character *ch )
         if (obj->wear_loc == wear_none || obj->wear_loc == wear_stuck_in)
             continue;
         
-        if (affect_bit_check( obj->affected,
-                              TO_AFFECTS,
-                              AFF_FLYING ))
+        if (!obj->affected.findAllWithBits(TO_AFFECTS, AFF_FLYING ).empty())
             return true;
         
         if (!obj->enchanted)
-            if (affect_bit_check( obj->pIndexData->affected,
-                                  TO_AFFECTS,
-                                  AFF_FLYING ))
+            if (!obj->pIndexData->affected.findAllWithBits(TO_AFFECTS, AFF_FLYING ).empty())
                 return true;
     }
     

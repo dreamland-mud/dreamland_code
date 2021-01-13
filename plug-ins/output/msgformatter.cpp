@@ -8,6 +8,7 @@
 #include "noun.h"
 #include "grammar_entities_impl.h"
 #include "character.h"
+#include "skill.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -255,6 +256,10 @@ again:
                 s += DLString(argStr()).getOneArgument();
                 state = 0;
                 break;
+            case 'K':
+                s += argSkill()->getNameFor(to);
+                state = 0;
+                break;
             case 'c': 
                 s += argChar();
                 state = 0;
@@ -346,7 +351,7 @@ again:
                 switch (cvt) {
                     int nounFlags;
                 case 'G':
-                    nounFlags = (alternative ? 0 : FMT_INVIS);
+                    nounFlags = (alternative ? 0 : FMT_INVIS|FMT_DOPPEL);
                     if (argNoun(nounFlags)->getMultiGender() == (state - 8))
                         s += *f;
                     break;

@@ -39,8 +39,8 @@ public:
 };
 
 class XMLAttributeCraft: public XMLVariableContainer, 
-                         public virtual EventHandler<ScoreArguments>,
-                         public virtual EventHandler<WhoisArguments>
+                         public virtual AttributeEventHandler<ScoreArguments>,
+                         public virtual AttributeEventHandler<WhoisArguments>
 {
 XML_OBJECT
 public:

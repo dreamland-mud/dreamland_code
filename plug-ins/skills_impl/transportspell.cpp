@@ -115,7 +115,7 @@ bool GateMovement::checkCasterRoom( )
     if (IS_SET(from_room->room_flags, ROOM_SAFE|ROOM_NO_RECALL|ROOM_NOSUMMON))
         return false;
 
-    if (IS_RAFFECTED(from_room, AFF_ROOM_CURSE))
+    if (IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE))
         return false;
 
     return true;

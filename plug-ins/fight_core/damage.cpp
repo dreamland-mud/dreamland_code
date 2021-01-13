@@ -27,7 +27,6 @@
 #include "mercdb.h"
 #include "merc.h"
 #include "vnum.h"
-#include "deathmanager.h"
 #include "fight_safe.h"
 #include "fight_position.h"
 #include "fight_exception.h"
@@ -46,6 +45,12 @@ PROF(samurai);
 PROF(warrior);
 
 void do_visible( Character * );
+
+CharDeathEvent::CharDeathEvent(Character *victim, Character *killer) 
+{
+    this->victim = victim;
+    this->killer = killer;    
+}
 
 /*-----------------------------------------------------------------------------
  * Damage 
@@ -396,7 +401,7 @@ void Damage::inflictDamage( )
     // log damages
     if (!ch->is_immortal( ) && !ch->is_npc( ) && dam > 2000) 
         wiznet( WIZ_DAMAGES, 0, 0, "%^C1 : повреждения более 2000 : %d", ch, dam );
-    
+
     victim->hit -= dam;
     
     if (victim->is_immortal( ))
@@ -450,8 +455,12 @@ void Damage::handlePosition( )
      * Sleep spells and extremely wounded folks.
      * Don't call stop_fighting and wake up from selfdamage when you are not able to wake up
      */
-    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)) 
+    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)){ 
+        if(victim->position == POS_SLEEPING){
+            victim->println("Ты просыпаешься от внезапной боли.");
+        }
         stop_fighting( victim, false );
+    }
 }
 
 /*-----------------------------------------------------------------------------
@@ -492,7 +501,7 @@ void Damage::handleDeath( )
     act_p( "$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM,POS_RESTING);
     victim->send_to("Тебя {RУБИЛИ{x!!\n\r\n\r");
     
-    DeathManager::getThis( )->handleDeath( killer, victim );
+    eventBus->publish(CharDeathEvent(victim, killer));
 }
 
 

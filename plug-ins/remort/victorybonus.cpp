@@ -6,6 +6,7 @@
 #include "xmlattributestatistic.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "arg_utils.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
@@ -25,17 +26,17 @@ bool Koschey::command( Character *victim, const DLString &cmdName, const DLStrin
     if (victim->is_npc( ))
         return false;
 
-    if (cmdName == "buy") {
+    if (arg_oneof(cmdName, "buy", "купить")) {
         doBuy( victim, cmdArgs.quote( ) );
         return true;
     }
 
-    if (cmdName == "list") {
+    if (arg_is_list(cmdName)) {
         doList( victim );
         return true;
     }
 
-    if (cmdName == "sell" || cmdName == "value") {
+    if (arg_oneof(cmdName, "sell", "продать") || arg_oneof("value", "цена")) {
         tell_dim( victim, ch, "Мне твое жалкое добро ни к чему." );
         return true;
     }

@@ -4,6 +4,7 @@
  */
 #include "flags.h"
 #include "wearlocation.h"
+#include "core/object.h"
 
 /*-------------------------------------------------------------------
  * Wearlocation
@@ -26,6 +27,11 @@ const DLString &Wearlocation::getName( ) const
 }
 
 bool Wearlocation::isValid( ) const
+{
+    return false;
+}
+
+bool Wearlocation::givesAffects() const
 {
     return false;
 }
@@ -89,6 +95,17 @@ int Wearlocation::wear( Object *obj, int flags )
 void Wearlocation::display( Character *, Wearlocation::DisplayList & )
 {
 }
+
+DLString Wearlocation::displayName(Character *ch, Object *obj)
+{
+    return obj->getShortDescr('1');
+}
+
+DLString Wearlocation::displayLocation(Character *ch, Object *obj)
+{
+    return DLString::emptyString;    
+}
+
 bool Wearlocation::wearAtomic( Character *ch, Object *obj, int flags )
 {
     return false;

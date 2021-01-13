@@ -32,17 +32,17 @@ bool InvasionScenario::canStart( )
 
 bool InvasionScenario::checkRoom( Room *room )
 {
-    if (room->clan != clan_none)
+    if (room->pIndexData->clan != clan_none)
         return false;
 
-    if (!room->guilds.empty( ))
+    if (!room->pIndexData->guilds.empty( ))
         return false;
 
     return !IS_SET(room->room_flags, ROOM_NO_QUEST|ROOM_MANSION|ROOM_NO_MOB|ROOM_NO_DAMAGE|ROOM_SAFE|ROOM_SOLITARY)
         && !IS_SET(room->room_flags, ROOM_NEWBIES_ONLY|ROOM_GODS_ONLY|ROOM_NOWHERE);
 }
 
-bool InvasionScenario::checkArea( AREA_DATA *area )
+bool InvasionScenario::checkArea( AreaIndexData *area )
 {
     if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_NOQUEST|AREA_HIDDEN))
         return false;
@@ -59,10 +59,10 @@ bool InvasionScenario::checkArea( AREA_DATA *area )
  *-------------------------------------------------------------------------*/
 void InvasionSparseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 {
-    Room *room;
+    // FIXME: scenarios should only check default area instances.
     
-    for (room = room_list; room; room = room->rnext) {
-        if (!checkArea( room->area ))
+    for (auto &room: roomInstances) {
+        if (!checkArea( room->areaIndex() ))
             continue;
         
         if (!checkRoom( room ))
@@ -77,19 +77,18 @@ void InvasionSparseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
  *-------------------------------------------------------------------------*/
 void InvasionDenseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 {
-    Room *room;
-    typedef map<AREA_DATA *, vector<Room *> > RoomsByArea;
+    typedef map<AreaIndexData *, vector<Room *> > RoomsByArea;
     RoomsByArea goodRooms;
     int areaCnt;
     
-    for (room = room_list; room; room = room->rnext) {
-        if (!checkArea( room->area )) 
+    for (auto &room: roomInstances) {
+        if (!checkArea( room->areaIndex() )) 
             continue;
             
         if (!checkRoom( room ))
             continue;
         
-        goodRooms[room->area].push_back( room );
+        goodRooms[room->areaIndex()].push_back( room );
     }
 
     areaCnt = std::max( 3, number_range( mobCnt / 20, mobCnt / 7 ) );
@@ -121,7 +120,7 @@ bool InvasionLocustScenario::checkRoom( Room *room )
     if (IS_SET(room->room_flags, ROOM_INDOORS))
         return false;
         
-    switch (room->sector_type) {
+    switch (room->getSectorType()) {
     case SECT_FIELD: case SECT_FOREST: case SECT_HILLS: case SECT_MOUNTAIN:
         return InvasionScenario::checkRoom( room );
     default:
@@ -160,7 +159,7 @@ bool InvasionFootballScenario::checkRoom( Room *room )
     if (IS_SET(room->room_flags, ROOM_INDOORS))
         return false;
         
-    switch (room->sector_type) {
+    switch (room->getSectorType()) {
     case SECT_FIELD: case SECT_HILLS: case SECT_MOUNTAIN: 
         return InvasionScenario::checkRoom( room );
     default:

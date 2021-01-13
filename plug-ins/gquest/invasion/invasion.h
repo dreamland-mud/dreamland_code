@@ -17,7 +17,7 @@ class PCharacter;
 class NPCharacter;
 class Object;
 class InvasionScenario;
-struct area_data;
+struct AreaIndexData;
 
 class InvasionGQuest : public GlobalQuest {
 XML_OBJECT    

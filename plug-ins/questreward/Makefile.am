@@ -8,6 +8,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/system \
+-I$(top_srcdir)/plug-ins/fight_core \
 $(INCLUDES_SRC)
 
 libquestreward_la_LIBADD = \
@@ -15,6 +16,7 @@ libquestreward_la_LIBADD = \
 ../output/liboutput.la \
 ../loadsave/libloadsave.la \
 ../profession/libprofession.la \
+../fight_core/libfight_core.la \
 ../system/libsystem.la
 
 libquestreward_la_SOURCES = \

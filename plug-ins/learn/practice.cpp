@@ -50,6 +50,7 @@ struct PracInfo {
     int percent;
     int adept;
     int maximum;
+    int help_id;
     DLString name;
 
     inline const char * getNameColor( ) const
@@ -80,7 +81,7 @@ void CPractice::pracShow( PCharacter *ch )
     PracCategoryMap::iterator cm_iter;
     PracInfo info;
     DLString category;
-    bool fRussian = ch->getConfig( )->ruskills;
+    bool fRussian = ch->getConfig( ).ruskills;
     
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );
@@ -101,6 +102,11 @@ void CPractice::pracShow( PCharacter *ch )
         info.adept = skill->getAdept( ch );
         info.maximum = skill->getMaximum( ch );
 
+        if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+            info.help_id = skill->getSkillHelp()->getID();
+        else
+            info.help_id = 0;
+
         cm_iter = cmap.find( category );
 
         if (cm_iter == cmap.end( )) {
@@ -113,7 +119,8 @@ void CPractice::pracShow( PCharacter *ch )
             cm_iter->second.push_back( info );
     }
 
-    const char *pattern = (fRussian ? "%s%-27s %s%3d%%{x" : "%s%-16s%s%3d%%{x");
+    const char *patternNoHelp = (fRussian ? "%s%-27s %s%3d%%{x" : "%s%-16s%s%3d%%{x");
+    const char *patternHelp = (fRussian ? "%s{hh%d%-27s{hx %s%3d%%{x" : "%s{hh%d%-16s{hx%s%3d%%{x");
     const int columns = (fRussian ? 2 : 3);
 
     for (cm_iter = cmap.begin( ); cm_iter != cmap.end( ); cm_iter++) {
@@ -121,17 +128,26 @@ void CPractice::pracShow( PCharacter *ch )
         
         category = cm_iter->first;
         category.upperFirstCharacter( );
-        buf << category << ":" << endl;
+        buf << "{W" << category << ":{x" << endl;
         
         for (i = 0; i < cm_iter->second.size( ); i++) {
             info = cm_iter->second[i];
-             
-            buf << dlprintf( pattern,
-                              info.getNameColor( ), 
-                              info.name.c_str( ),
-                              info.getPercentColor( ),
-                              info.percent );                                
-                buf << "     ";
+            
+            if (info.help_id > 0)
+                buf << dlprintf( patternHelp,
+                                info.getNameColor( ), 
+                                info.help_id,
+                                info.name.c_str( ),
+                                info.getPercentColor( ),
+                                info.percent );
+            else
+                buf << dlprintf( patternNoHelp,
+                                info.getNameColor( ), 
+                                info.name.c_str( ),
+                                info.getPercentColor( ),
+                                info.percent );
+
+            buf << "     ";
             
             if ((i + 1) % columns == 0)
                 buf << endl;
@@ -201,7 +217,6 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     int sn, adept;
     Skill *skill;
     Character *teacher;
-    const char * sname;
     ostringstream buf;
 
     if (!IS_AWAKE( ch )) {
@@ -222,11 +237,9 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
     }
 
-    sname = skill->getNameFor(ch).c_str();
-
     if (!skill->canPractice( ch, buf )) {
         if (buf.str().empty())
-            ch->pecho("Ты не можешь выучить умение {W%s{x.", sname);
+            ch->pecho("Ты не можешь выучить умение {W%K{x.", skill);
         else
             ch->send_to(buf);
         return;
@@ -249,8 +262,8 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     adept = skill->getAdept( ch );
 
     if (learned >= adept) {
-        ch->printf( "Ты уже слишком хорошо владеешь умением {W%s{x, практиковаться бессмысленно.", sname );
-        ch->printf( "Чтобы овладеть умением еще лучше, просто применяй его почаще.\r\n", sname );        
+        ch->pecho("Ты уже слишком хорошо владеешь умением {W%K{x, практиковаться бессмысленно.", skill);
+        ch->println("Чтобы овладеть умением еще лучше, просто применяй его почаще.");  
         return;
     }
 
@@ -258,16 +271,16 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     
     skill->practice( ch );
 
-    act("$c1 обучает тебя умению {W$t{x.", teacher, sname, ch, TO_VICT);
-    act("Ты обучаешь $C4 умению {W$t{x.", teacher, sname, ch, TO_CHAR);
-    act("$c1 обучает $C4 умению {W$t{x.", teacher, sname, ch, TO_NOTVICT);
+    ch->pecho("%^C1 обучает тебя умению {W%K{x.", teacher, skill);
+    teacher->pecho("Ты обучаешь %C4 умению {W%K{x.", ch, skill);
+    ch->recho(teacher, "%^C1 обучает %C4 умению {W%K{x.", teacher, ch, skill);
     
     if (learned < adept)
-        ch->printf( "Ты теперь знаешь умение {W%s{x на %d процентов.\n\r", sname, learned );
+        ch->pecho( "Ты теперь знаешь умение {W%K{x на %d процентов.", skill, learned );
     else {
-        act_p("Теперь ты хорошо владеешь умением {W$t{x.",ch, sname, 0, TO_CHAR, POS_RESTING);
-        act_p("$c1 теперь хорошо владеет умением {W$t{x.",ch, sname, 0, TO_ROOM, POS_RESTING);
-        ch->printf( "Дальше практиковать не получится, просто начни применять его почаще.\r\n", sname );        
+        ch->pecho("Теперь ты хорошо владеешь умением {W%K{x.", skill);
+        ch->println( "Дальше практиковать не получится, просто начни применять его почаще." );        
+        ch->recho("%^C1 теперь хорошо владеет умением {W%K{x.", ch, skill);
     }
 }
 

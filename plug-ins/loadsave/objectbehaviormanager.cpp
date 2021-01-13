@@ -18,16 +18,36 @@ void ObjectBehaviorManager::assign( Object *obj ) {
         return;
     
     try {
-        if (obj->behavior) {
-            obj->behavior->unsetObj( );
-            obj->behavior.clear( );
-        }
-        
+        clear(obj);
         obj->behavior.fromXML( obj->pIndexData->behavior->getFirstNode( ) );
         obj->behavior->setObj( obj );
 
-    } catch (Exception e) {
+    } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
+    }
+}
+
+void ObjectBehaviorManager::assign( Object *obj, const DLString &behaviorClassName ) 
+{
+    try {
+        AllocateClass::Pointer p = Class::allocateClass(behaviorClassName);
+
+        if (p) {
+            clear(obj);
+            obj->behavior.setPointer( p.getDynamicPointer<ObjectBehavior>( ) );
+            obj->behavior->setObj( obj );
+        }
+    } catch (const ExceptionClassNotFound &e) {
+        LogStream::sendError( ) << "Error allocating obj behavior " << behaviorClassName << ":" << e.what( ) << endl;
+        return;
+    }
+}
+
+void ObjectBehaviorManager::clear( Object *obj ) 
+{
+    if (obj->behavior) {
+        obj->behavior->unsetObj( );
+        obj->behavior.clear( );
     }
 }
 
@@ -51,7 +71,7 @@ void ObjectBehaviorManager::parse( OBJ_INDEX_DATA * pObjIndex, FILE *fp ) {
         doc->load( istr );
         pObjIndex->behavior = new XMLDocument( **doc );
 
-    } catch (Exception e) {
+    } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
         
@@ -76,15 +96,11 @@ void ObjectBehaviorManager::parse( Object * obj, FILE *fp ) {
     try {
         std::basic_istringstream<char> istr( word );
 
-        if (obj->behavior) {
-            obj->behavior->unsetObj( );
-            obj->behavior.clear( );
-        }
-
+        clear(obj);
         obj->behavior.fromStream( istr );
         obj->behavior->setObj( obj );
 
-    } catch (Exception e) {
+    } catch (const Exception &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
         
@@ -101,7 +117,7 @@ void ObjectBehaviorManager::save( const OBJ_INDEX_DATA *pObjIndex, FILE *fp ) {
         pObjIndex->behavior->save( ostr );
         fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
 
-    } catch (ExceptionXMLError e) {
+    } catch (const ExceptionXMLError &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
 }
@@ -116,7 +132,7 @@ void ObjectBehaviorManager::save( const Object *obj, FILE *fp ) {
         obj->behavior.toStream( ostr );
         fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
 
-    } catch (ExceptionXMLError e) {
+    } catch (const ExceptionXMLError &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
 }

@@ -17,7 +17,7 @@ void LocateItem::getByHero( PCharacter *ch )
 
 void LocateItem::getByOther( Character *ch ) 
 {
-    ch->pecho( "%1$O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
-    ch->recho( "%2$C1 бросает %1$O4.", obj, ch );
+    ch->pecho( "%1$^O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
+    ch->recho( "%2$^C1 бросает %1$O4.", obj, ch );
 }
 

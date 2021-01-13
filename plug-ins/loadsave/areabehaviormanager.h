@@ -7,15 +7,12 @@
 
 #include <stdio.h>
 
-struct area_data;
+struct AreaIndexData;
 
 class AreaBehaviorManager {
 public:        
-        static void parse( area_data *, FILE * );
-        static void save( const area_data *, FILE * );
+        static void parse( AreaIndexData *, FILE * );
+        static void save( const AreaIndexData *, FILE * );
 };
 
-bool area_is_mansion(area_data *);
-bool area_is_clan(area_data *);
-bool area_is_hometown(area_data *);
 #endif

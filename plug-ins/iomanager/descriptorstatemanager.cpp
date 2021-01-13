@@ -5,6 +5,8 @@
 #include "descriptorstatemanager.h"
 #include "descriptorstatelistener.h"
 #include "descriptor.h"
+#include "fenia_utils.h"
+#include "pcharacter.h"
 #include "def.h"
 
 DescriptorStateManager * DescriptorStateManager::thisClass = 0;
@@ -46,5 +48,8 @@ void DescriptorStateManager::handle( int oldState, int newState, Descriptor *d )
 {
     for (Listeners::iterator i = listeners.begin( ); i != listeners.end( ); i++)
         (*i)->run( oldState, newState, d );
+
+    if (newState == CON_PLAYING && d->character && d->character->getPC())
+        gprog("onConnect", "C", d->character->getPC());
 }
 

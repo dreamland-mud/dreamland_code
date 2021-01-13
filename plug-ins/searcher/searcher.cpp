@@ -3,13 +3,13 @@
  * ruffina, 2019
  */
 #include "dlfilestream.h"
-#include "json/json.h"
+#include <jsoncpp/json/json.h>
 #include "iconvmap.h"
 
 #include "dlscheduler.h"
 #include "schedulertaskroundplugin.h"
 #include "plugininitializer.h"
-#include "areabehaviormanager.h"
+#include "areabehaviorplugin.h"
 #include "commandtemplate.h"
 #include "affect.h"
 #include "core/object.h"
@@ -25,7 +25,9 @@
 #include "merc.h"
 #include "act.h"
 #include "comm.h"
-#include "handler.h"
+#include "weapontier.h"
+#include "weapons.h"
+#include "../anatolia/handler.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -41,10 +43,10 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
-static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLString &where )
+static bool get_obj_resets_in_room(RoomIndexData *pRoom, int vnum, AreaIndexData *&pArea, DLString &where)
 {
     int mobVnum = -1;
-    for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next) {
+    for(auto &pReset: pRoom->resets) {
         switch(pReset->command) {
             case 'M':
                 // Remember potential carrier in the room.
@@ -55,19 +57,19 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLSt
                 // Found who carries the object.
                 if (pReset->arg1 == vnum && mobVnum > 0) {
                     MOB_INDEX_DATA *pMob = get_mob_index( mobVnum );
-                    if (pMob) {
+                    if (pMob && pReset->rand == RAND_NONE) {
                         // Return success
-                        pArea = room->area;
+                        pArea = pRoom->areaIndex;
                         where = russian_case(pMob->short_descr, '1');
                         return true;
                     }
                 }
                 break;
             case 'O':
-                if (pReset->arg1 == vnum) { 
+                if (pReset->arg1 == vnum && pReset->rand == RAND_NONE) { 
                     // Object is on the floor, return success.
-                    pArea = room->area;
-                    where = room->name;
+                    pArea = pRoom->areaIndex;
+                    where = pRoom->name;
                     return true;
                 }
                 break; 
@@ -75,10 +77,10 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLSt
                 // Found where the object is placed.
                 if (pReset->arg1 == vnum) {
                     OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
-                    if (in) {
+                    if (in && pReset->rand == RAND_NONE) {
                         // Return success.
-                        pArea = room->area;
-                        where = room->name;
+                        pArea = pRoom->areaIndex;
+                        where = pRoom->name;
                         return true;
                     }
                 }
@@ -90,18 +92,40 @@ static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLSt
     return false;
 }            
 
-static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AREA_DATA *&pArea, DLString &where )
+static bool get_mob_resets( MOB_INDEX_DATA *pMob, AreaIndexData *&pArea, DLString &where )
+{
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *pRoom = r.second;
+        for(auto &pReset: pRoom->resets) {
+            switch(pReset->command) {
+            case 'M':
+                if (pReset->arg1 == pMob->vnum) {
+                    pArea = pRoom->areaIndex;
+                    where = pRoom->name;
+                    return true;
+                }
+            }
+        }                
+    }
+
+    return false;
+}
+
+static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AreaIndexData *&pArea, DLString &where )
 {
     // First look for obj resets in the same area it's from.
-    for (auto &pair: pObj->area->rooms) {
-        Room *room = pair.second;
-        if (get_obj_resets_in_room(room, pObj->vnum, pArea, where))
+    for (auto &pair: pObj->area->roomIndexes) {
+        RoomIndexData *pRoom = pair.second;
+
+        if (get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where))
             return true;
     }
 
     // Scan resets for each room.
-    for (Room *room = room_list; room; room = room->rnext) {
-        if (room->area != pObj->area && get_obj_resets_in_room(room, pObj->vnum, pArea, where))
+    for (auto &r: roomIndexMap) {
+        RoomIndexData *pRoom = r.second;
+        if (pRoom->areaIndex != pObj->area 
+                && get_obj_resets_in_room(pRoom, pObj->vnum, pArea, where))
             return true;
     }
 
@@ -173,6 +197,8 @@ public:
                 continue;
             if (area_is_clan(pMob->area))
                 continue;
+            if (IS_SET(pMob->area->area_flag, AREA_SYSTEM))
+                continue;
 
             DLString type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
             if (type.find("Pet") == DLString::npos && type != "Rat")
@@ -228,6 +254,8 @@ public:
             // Ignore weapons, they're shown in another table.
             if (pObj->item_type == ITEM_WEAPON) 
                 continue;
+            if (item_is_random(pObj))
+                continue;
 
             // Quirk with light wearlocation.
             if (wear == 0) 
@@ -248,7 +276,7 @@ public:
             DLString aff,det,imm,res,vuln;
             DLString align;
 
-            for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+            for (auto &paf: pObj->affected) {
                 int m = paf->modifier;
 
                 switch (paf->location) {
@@ -270,16 +298,23 @@ public:
                 case APPLY_SAVING_SPELL:  svs+=m; break;
                 }
                 
-                if (paf->bitvector) {
-                    bitstring_t b = paf->bitvector;
+                const FlagTable *table = paf->bitvector.getTable();
+                if (table) {    
+                    DLString *pStr = 0;
 
-                    switch(paf->where) {
-                    case TO_DETECTS: det << detect_flags.names(b) << " "; break;
-                    case TO_AFFECTS: aff << affect_flags.names(b) << " "; break;
-                    case TO_IMMUNE:  imm << imm_flags.names(b) << " "; break;
-                    case TO_RESIST:  res << res_flags.names(b) << " "; break;
-                    case TO_VULN:    vuln << vuln_flags.names(b) << " "; break;
-                    }
+                    if (table == &detect_flags)
+                        pStr = &det;
+                    else if (table == &affect_flags)
+                        pStr = &aff;
+                    else if (table == &imm_flags)
+                        pStr = &imm;
+                    else if (table == &res_flags)
+                        pStr = &res;
+                    else if (table == &vuln_flags)
+                        pStr = &vuln;
+
+                    if (pStr)
+                        (*pStr) << table->names(paf->bitvector) << " ";
                 }
             }
 
@@ -304,7 +339,7 @@ public:
 
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
-            AREA_DATA *pArea;
+            AreaIndexData *pArea;
             useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
@@ -322,19 +357,31 @@ public:
             a["level"] = pObj->level;
             a["wearloc"] = wearloc;
             a["itemtype"] = itemtype;
-            a["hr"] = hr;
-            a["dr"] = dr;
-            a["hp"] = hp;
-            a["mana"] = mana;
-            a["move"] = move;
-            a["saves"] = svs;
-            a["stat_str"] = str;
-            a["stat_int"] = inta;
-            a["stat_wis"] = wis;
-            a["stat_dex"] = dex;
-            a["stat_con"] = con;
-            a["stat_cha"] = cha;
-            a["align"] = align;
+
+            // For 'noident' items only return a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
+                a["hr"] = hr;
+                a["dr"] = dr;
+                a["hp"] = hp;
+                a["mana"] = mana;
+                a["move"] = move;
+                a["saves"] = svs;
+                a["stat_str"] = str;
+                a["stat_int"] = inta;
+                a["stat_wis"] = wis;
+                a["stat_dex"] = dex;
+                a["stat_con"] = con;
+                a["stat_cha"] = cha;
+                a["align"] = align;
+            } else {
+                a["hr"] = a["dr"] = a["hp"] = 
+                a["mana"] = a["move"] = a["saves"] = 
+                a["stat_str"] = a["stat_int"] = 
+                a["stat_wis"] = a["stat_dex"] = 
+                a["stat_con"] = a["stat_cha"] = 
+                a["align"] = "-";
+            }
+
             a["area"] = area;
             a["where"] = where;
             a["limit"] = pObj->limit;
@@ -374,13 +421,15 @@ public:
             // Only dump weapons. An arrow can be 'held' so can't ignore non-wieldable ones.
             if (wear == 0 || pObj->item_type != ITEM_WEAPON)
                 continue;
+            if (item_is_random(pObj))
+                continue;
 
             // Format weapon class, special flags and damage.
             DLString weaponClass = weapon_class.name( pObj->value[0] );
             DLString special = weapon_type2.messages( pObj->value[4] );
             int d1 = pObj->value[1];
             int d2 = pObj->value[2];
-            int ave = (1 + pObj->value[2]) * pObj->value[1] / 2; 
+            int ave = weapon_ave(pObj);
             
             // Format object name.
             DLString name = russian_case(pObj->short_descr, '1').toLower( );
@@ -391,7 +440,7 @@ public:
             int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
             DLString align;
 
-            for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+            for (auto &paf: pObj->affected) {
                 int m = paf->modifier;
 
                 switch (paf->location) {
@@ -423,7 +472,7 @@ public:
 
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
-            AREA_DATA *pArea;
+            AreaIndexData *pArea;
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
@@ -440,21 +489,34 @@ public:
             w["name"] = name;
             w["level"] = pObj->level;
             w["wclass"] = weaponClass;
-            w["special"] = special;
-            w["d1"] = d1;
-            w["d2"] = d2;
-            w["ave"] = ave;
-            w["hr"] = hr;
-            w["dr"] = dr;
-            w["hp"] = hp;
-            w["mana"] = mana;
-            w["saves"] = svs;
-            w["stat_str"] = str;
-            w["stat_int"] = inta;
-            w["stat_wis"] = wis;
-            w["stat_dex"] = dex;
-            w["stat_con"] = con;
-            w["align"] = align;
+
+            // For 'noident' items only show a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
+                w["special"] = special;
+                w["d1"] = d1;
+                w["d2"] = d2;
+                w["ave"] = ave;
+                w["hr"] = hr;
+                w["dr"] = dr;
+                w["hp"] = hp;
+                w["mana"] = mana;
+                w["saves"] = svs;
+                w["stat_str"] = str;
+                w["stat_int"] = inta;
+                w["stat_wis"] = wis;
+                w["stat_dex"] = dex;
+                w["stat_con"] = con;
+                w["align"] = align;
+            } else {
+                w["special"] = 
+                w["d1"] = w["d2"] = w["ave"] = 
+                w["hr"] = w["dr"] = w["hp"] = 
+                w["mana"] = w["saves"] = 
+                w["stat_str"] = w["stat_int"] = 
+                w["stat_wis"] = w["stat_dex"] = 
+                w["stat_con"] = w["align"] = "-";
+            }
+
             w["area"] = area;
             w["where"] = where;
             w["limit"] = pObj->limit;
@@ -552,7 +614,7 @@ public:
 
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
-            AREA_DATA *pArea;
+            AreaIndexData *pArea;
             bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
@@ -569,9 +631,16 @@ public:
             wand["name"] = name;
             wand["level"] = pObj->level;
             wand["itemtype"] = itemtype;
-            wand["spellLevel"] = spellLevel;
-            wand["charges"] = charges;
-            wand["spells"] = spells;
+
+            // For 'noident' items only show a subset of fields.
+            if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
+                wand["spellLevel"] = spellLevel;
+                wand["charges"] = charges;
+                wand["spells"] = spells;
+            } else {
+                wand["spellLevel"] = wand["charges"] = wand["spells"] = "-";
+            }
+
             wand["area"] = area;
             wand["where"] = where;
             wand["limit"] = pObj->limit;
@@ -596,23 +665,7 @@ public:
 PluginInitializer<SearcherDumpTask> initSearcherDumpTask;
 
 /* Example syntax:
- * searcher armor level > 50 and level < 60 and wearloc='neck' and vuln != ''
- * searcher armor level > 50 and level < 60 and extra='nodrop'
- *
- * Fields:
- *  level, lvl
- *  wearloc
- *  type
- *  str,int,wis,dex,con,cha
- *  hr,dr,hp,mana,svs,mov,heal_gain,mana_gain,size,age
- *  vuln,res,imm,det,aff
- *  material
- *  extra
- *  where : area,room
- * 
- *  Operands:
- *      and or () >= <= == !=
- *      in like contains
+ * searcher q type='armor' ad level > 50 and level < 60 and wearloc='neck' and vuln != ''
  */
 CMDRUNP(searcher)
 {
@@ -706,7 +759,7 @@ CMDRUNP(searcher)
                                     pObj->area->name);
 
                     DLString where;
-                    AREA_DATA *pArea;
+                    AreaIndexData *pArea;
                     if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
@@ -751,7 +804,7 @@ CMDRUNP(searcher)
             int cnt = 0;
             vector<list<DLString> > output(MAX_LEVEL+1);
             DLString lineFormat = 
-                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%2d %2d %3d{x %-10s {%s%3d {%s%3d {%s%3d{x %-3s %1s {D%2d{w/{D%-2d{w %s{x\r\n";
+                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%2d %2d %3d{x %-10s {%s%3d {%s%3d {%s%3d{x %-3s %1s {D%2d{w/{D%-2d{w {c%3d{x %s{x\r\n";
 
             prof.start();
 
@@ -784,10 +837,11 @@ CMDRUNP(searcher)
                                     anti.join("").c_str(),
                                     aff.c_str(),
                                     countInGame, countProfiles,
+                                    pObj->weight, 
                                     p.wflags.c_str());
 
                     DLString where;
-                    AREA_DATA *pArea;
+                    AreaIndexData *pArea;
                     if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
@@ -799,8 +853,8 @@ CMDRUNP(searcher)
             } 
     
             ostringstream buf;
-            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %-2s %-2s %3s %-10s %3s %3s %3s %-3s %1s %-5s %s{x\r\n",
-                            "VNUM", "LVL", "WCLASS", "NAME", "D1", "D2", "AVE", "DAMAGE", "HR", "DR", "HP", "ALG", "A", "CNT", "WFLAGS");
+            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %-2s %-2s %3s %-10s %3s %3s %3s %-3s %1s %-5s %3s %s{x\r\n",
+                            "VNUM", "LVL", "WCLASS", "NAME", "D1", "D2", "AVE", "DAMAGE", "HR", "DR", "HP", "ALG", "A", "CNT", "WGT", "WFLAGS");
             for (size_t lvl = 0; lvl < output.size(); lvl++) {
                 const list<DLString> &lines = output[lvl];
                 for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
@@ -821,5 +875,71 @@ CMDRUNP(searcher)
         return;
     }
 
-    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\nsearcher q <item query>\nsearcher wq <weapon query>\n");
+
+    if (arg_oneof(arg, "mquery")) {
+
+        if (args.empty()) {
+            ch->println("Usage: searcher mq <query string>\nSee 'help searcher' for details.");
+            return;
+        }
+    
+        try {
+            Profiler prof;
+            int cnt = 0;
+            int maxLevel = LEVEL_MORTAL * 2;
+            vector<list<DLString> > output(maxLevel+1);
+            DLString lineFormat = 
+                web_cmd(ch, "medit $1", "%5d") + " {C%3d{x %-20.20s {D%s{x\n";
+
+            prof.start();
+
+            for (int i = 0; i < MAX_KEY_HASH; i++)
+            for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+                if (pMob->level > maxLevel)
+                    continue;
+
+                if (searcher_parse(pMob, args.c_str())) {
+                    DLString line = 
+                        fmt(NULL, lineFormat.c_str(), 
+                                    pMob->vnum,
+                                    pMob->level, 
+                                    russian_case(pMob->short_descr, '1').c_str(),
+                                    pMob->area->name);
+
+                    DLString where;
+                    AreaIndexData *pArea;
+                    if (IS_SET(pMob->area->area_flag, AREA_HIDDEN) || !get_mob_resets(pMob, pArea, where)) {
+                        line.colourstrip();
+                        line = "{D" + line + "{x";
+                    }
+
+                    output[pMob->level].push_back(line);
+                    cnt++;
+                }
+            } 
+    
+            ostringstream buf;
+            buf << fmt(0, "{W%5s %3s %-20.20s %s{x\n", 
+                            "VNUM", "LVL", "NAME", "AREA");
+            for (size_t lvl = 0; lvl < output.size(); lvl++) {
+                const list<DLString> &lines = output[lvl];
+                for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
+                    buf << *l;
+            }
+
+            prof.stop();
+            buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+     
+            page_to_char(buf.str().c_str(), ch);
+        } catch (const Exception &ex) {
+            ch->println(ex.what());
+        }
+
+        return;
+    }
+
+    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\n"
+               "searcher q <item query>\n"
+               "searcher wq <weapon query>\n"
+               "searcher mq <mob query>\n");
 }

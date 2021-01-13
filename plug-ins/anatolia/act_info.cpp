@@ -63,9 +63,9 @@
 
 #include "skill.h"
 #include "skillmanager.h"
+#include "skillgroup.h"
 #include "spell.h"
 #include "affecthandler.h"
-#include "areabehaviormanager.h"
 #include "mobilebehavior.h"
 #include "xmlattributeticker.h"
 #include "commonattributes.h"
@@ -81,11 +81,13 @@
 #include "desire.h"
 #include "helpmanager.h"
 #include "attacks.h"
+#include "areahelp.h"
 
 #include "dreamland.h"
 #include "merc.h"
 #include "descriptor.h"
 #include "comm.h"
+#include "weapons.h"
 #include "colour.h"
 #include "mudtags.h"
 #include "websocketrpc.h"
@@ -93,6 +95,7 @@
 #include "act.h"
 #include "alignment.h"
 #include "interp.h"
+#include "levenshtein.h"
 
 #include "occupations.h"
 #include "raceflags.h"
@@ -124,14 +127,6 @@ void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 DLString quality_percent( int ); /* XXX */
 DLString help_article_disambig(const HelpArticle *help);
-
-NPCharacter * find_mob_with_act( Room *room, bitstring_t act )
-{    
-    for (Character* rch = room->people; rch != 0; rch = rch->next_in_room )
-       if (rch->is_npc() && IS_SET(rch->act, act))
-          return rch->getNPC( );
-    return NULL;
-}
 
 CMDRUNP( rules )
 {
@@ -227,9 +222,9 @@ static DLString show_money( int g, int s )
     ostringstream buf;
 
     if (g > 0 || s > 0)
-        buf << (g > 0 ? "%1$d золот%1$Iая|ые|ых" : "")
+        buf << (g > 0 ? "{Y%1$d{x золот%1$Iая|ые|ых" : "")
             << (g * s == 0 ? "" : " и ")
-            << (s > 0 ? "%2$d серебрян%2$Iая|ые|ых" : "")
+            << (s > 0 ? "{W%2$d{x серебрян%2$Iая|ые|ых" : "")
             << " моне%" << (s == 0 ? "1" : "2") << "$Iта|ты|т.";
     else
         buf << "нет денег.";
@@ -288,7 +283,7 @@ const char * msgtable_lookup( const msgtable_t &table, int value )
 
 msgtable_t msg_positions = {
     { POS_DEAD,     "Ты ТРУП!!!"                  },
-    { POS_MORTAL,   "Ты присмерти."               },
+    { POS_MORTAL,   "Ты при смерти."               },
     { POS_INCAP,    "Ты в беспомощном состоянии." },
     { POS_STUNNED,  "Тебя оглушили."              },
     { POS_SLEEPING, "Ты спишь."                   },
@@ -306,7 +301,7 @@ CMDRUNP( oscore )
     Room *room = 0;
     PCharacter *pch = ch->getPC( );
 
-    buf << fmt( 0, "Ты %1$s%2$s{x, уровень %3$d",
+    buf << fmt( 0, "Ты {W%1$s%2$s{x, уровень {C%3$d{w",
                    ch->seeName( ch, '1' ).c_str( ),
                    ch->is_npc( ) ? "" : ch->getPC( )->getParsedTitle( ).c_str( ),
                    ch->getRealLevel( ));
@@ -320,17 +315,17 @@ CMDRUNP( oscore )
     if (ch->getRealLevel( ) != ch->get_trust( ))
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
-    buf << "{WРаса:{x " << ch->getRace( )->getNameFor( ch, ch )
-	<< " {WРазмер:{x " << size_table.message( ch->size )    
-        << "  {WПол:{x " << sex_table.message( ch->getSex( ) )
-        << "  {WКласс:{x " << ch->getProfession( )->getNameFor( ch );
+    buf << "{wРаса:{W " << ch->getRace( )->getNameFor( ch, ch )
+	<< "  {wРазмер:{W " << size_table.message( ch->size )    
+        << "  {wПол:{W " << sex_table.message( ch->getSex( ) )
+        << "  {wКласс:{W " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
-        room = get_room_index( ch->getPC()->getHometown( )->getAltar() );
+        room = get_room_instance( ch->getPC()->getHometown( )->getAltar() );
     else
-        room = get_room_index( ROOM_VNUM_TEMPLE );
+        room = get_room_instance( ROOM_VNUM_TEMPLE );
     
-    buf << "  {WДом:{x " << (room ? room->area->name : "Потерян" ) << endl
+    buf << "  {wДом:{W " << (room ? room->areaName() : "Потерян" ) << "{x" << endl
         << dlprintf( "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
@@ -341,7 +336,7 @@ CMDRUNP( oscore )
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-    buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
+    buf << dlprintf( "Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r",
                 ch->carry_number, ch->canCarryNumber( ),
                 ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
@@ -373,7 +368,7 @@ CMDRUNP( oscore )
 
     }
 
-    buf << dlprintf( "У тебя %d очков опыта, и %s\n\r",
+    buf << dlprintf( "У тебя {W%d{x очков опыта, и %s\n\r",
                   ch->exp.getValue( ),
                   show_money( ch->gold, ch->silver ).c_str( ) );
 
@@ -387,7 +382,7 @@ CMDRUNP( oscore )
         int qtime = qd ? qd->getTime( ) : 0;
         bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
         
-        buf << fmt( 0, "У тебя {W%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
+        buf << fmt( 0, "У тебя {Y%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
                        pch->getQuestPoints() );
         if (qtime == 0)
             buf << "У тебя сейчас нет задания.";
@@ -398,20 +393,36 @@ CMDRUNP( oscore )
 
         buf << endl;
 
-        if (ch->getProfession( ) != prof_samurai)
-            buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
-        else 
-            buf << fmt(0, "Тебя убили уже %1$d ра%1$Iз|за|з.", ch->getPC()->death.getValue());
-	    
-        if (ch->getPC()->guarding != 0)
-            buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+        bool newline = false;
 
-        if (ch->getPC()->guarded_by != 0)
+        if (ch->getProfession( ) != prof_samurai) {
+            if (ch->wimpy > 0) {
+                buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
+                newline = true;
+            }
+        } else {
+            if (ch->getPC()->death > 0)
+                buf << fmt(0, "Тебя убили уже {r%1$d{x ра%1$Iз|за|з.", ch->getPC()->death.getValue());
+            else
+                buf << "Тебя еще ни разу не убивали.";
+            newline = true;
+        }
+	    
+        if (ch->getPC()->guarding != 0) {
+            buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+            newline = true;
+        }
+
+        if (ch->getPC()->guarded_by != 0) {
             buf << dlprintf( "Ты охраняешься: %s.", ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
+            newline = true;
+        }
         
-        buf << endl;
+        if (newline)
+            buf << endl;
     }
 
+    // Report current desire status, as progress bar or percents.
     if (!ch->is_npc( )) {
         ostringstream dbuf;
 
@@ -425,7 +436,7 @@ CMDRUNP( oscore )
         }
 
         if (!dbuf.str( ).empty( ))
-            buf << dbuf.str( ); 
+            buf << dbuf.str( ) << endl;
     }
     
     buf << msgtable_lookup( msg_positions, ch->position );
@@ -436,15 +447,15 @@ CMDRUNP( oscore )
     buf << endl;
 
     /* print AC values */
-    buf << dlprintf( "Защита от укола %d, от удара %d, от разрезания %d, от экзотики %d.\n\r",
+    buf << dlprintf( "Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r",
             GET_AC(ch,AC_PIERCE),
             GET_AC(ch,AC_BASH),
             GET_AC(ch,AC_SLASH),
             GET_AC(ch,AC_EXOTIC));
-    buf << dlprintf( "{lRТочность{lEHitroll{lx: %d  {lRУрон{lEDamroll{lx: %d  {lRЗащита от заклинаний{lESaves vs Spell{lx: %d\n\r",
+    buf << dlprintf( "{lRТочность{lEHitroll{lx: {C%d{x  {lRУрон{lEDamroll{lx: {C%d{x  {lRЗащита от заклинаний{lESaves vs Spell{lx: {C%d{x\n\r",
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
-    buf << dlprintf( "У тебя %s характер.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
+    buf << dlprintf( "У тебя %s натура.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
@@ -468,8 +479,7 @@ CMDRUNP( oscore )
         if (ch->getReligion( ) == god_none)
             buf << "Ты не веришь в бога.  ";
         else
-            buf << dlprintf( "Твоя религия: {C%s{x.  ",
-                        ch->getReligion( )->getShortDescr( ).c_str( ) );
+            buf << dlprintf( "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
         buf << dlprintf("Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
 
@@ -497,6 +507,12 @@ CMDRUNP( oscore )
                 for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
                                 buf << *l << endl;
                         }
+    }
+
+    if (IS_GHOST(ch)) {
+        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$3d {xсекунд%1$-1Iу|ы|.",
+                 pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()))
+        << endl;
     }
 
     ch->send_to( buf );
@@ -579,15 +595,8 @@ CMDRUNP( compare )
             break;
 
         case  ITEM_WEAPON:
-            if (obj1->pIndexData->new_format)
-                value1 = (1 + obj1->value2()) * obj1->value1();
-            else
-                    value1 = obj1->value1() + obj1->value2();
-
-            if (obj2->pIndexData->new_format)
-                value2 = (1 + obj2->value2()) * obj2->value1();
-            else
-                    value2 = obj2->value1() + obj2->value2();
+            value1 = weapon_ave(obj1);
+            value2 = weapon_ave(obj2);
             break;
         }
     }
@@ -623,7 +632,7 @@ static void format_where( Character *ch, Character *victim )
                 victim,
                 fPK  ? "({rPK{x)"  : "    ",
                 fAfk ? "[{CAFK{x]" : "     ",
-                victim->in_room->name );
+                victim->in_room->getName() );
 }
 
 static bool rprog_where( Character *ch, const char *arg )
@@ -664,7 +673,7 @@ CMDRUNP( where )
     if (arg.empty( ) || fPKonly)
     {
         ch->printf( "Ты находишься в местности {W{hh%s{x. Недалеко от тебя:\r\n",
-                     ch->in_room->area->name );
+                     ch->in_room->areaName() );
         found = false;
 
         for ( d = descriptor_list; d; d = d->next )
@@ -1097,7 +1106,6 @@ CMDRUNP( request )
         char arg2 [MAX_INPUT_LENGTH];
         Character *victim;
         Object  *obj;
-        Affect af;
 
         if ( ch->isAffected(gsn_gratitude))
         {
@@ -1265,70 +1273,7 @@ CMDRUNP( request )
         ch->hit = max( (int)ch->hit, 0 );
 
         act_p("Ты чувствуешь благодарность за доверие $C2.", ch, 0, victim,TO_CHAR,POS_RESTING);
-
-        af.type = gsn_gratitude;
-        af.where = TO_AFFECTS;
-        af.level = ch->getModifyLevel();
-        af.duration = ch->getModifyLevel() / 10;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = 0;
-        affect_to_char ( ch,&af );
-
-        return;
-}
-
-
-
-CMDRUNP( identify )
-{
-    Object *obj;
-    Character *rch;
-    int cost = 20;
-
-    if ( ch->is_npc( ) ) {
-        ch->send_to( "У тебя же лапки!!!\n\r");
-        return;
-    }
-    
-    if ( ( obj = get_obj_carry( ch, argument ) ) == 0 )
-    {
-       ch->send_to( "У тебя нет этого.\n\r");
-       return;
-    }
-
-    rch = find_mob_with_act( ch->in_room, ACT_SAGE );
-
-    if (!rch)
-    {
-       ch->send_to("Тут никто ничего толкового не скажет об этой вещи.\n\r");
-       return;
-    }
-   
-    int remorts = ch->getPC()->getRemorts( ).size( );
-    //add guru checks?
-    if ( remorts == 0) {
-        cost = round ((ch->getRealLevel( ) - cost) * 0.66);
-        cost = URANGE (0, cost, 20);
-    }
-
-
-    if (ch->is_immortal( )) {
-        act_p( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
-    }
-    else if (ch->gold < cost) {
-        tell_fmt("У тебя даже %3$d золот%3$Iого|ых|ых нету, чтобы мне заплатить!", ch, rch, cost );
-        return;
-    }
-    else {
-       ch->gold -= cost;
-       if ( cost > 0 ) ch->send_to("Твой кошелек становится значительно легче.\n\r");
-    }
-
-    act_p( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM,POS_RESTING );
-    
-    if (gsn_identify->getSpell( ))
-        gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );
+        postaffect_to_char(ch, gsn_gratitude, ch->getModifyLevel() / 10);
 }
 
 
@@ -1540,17 +1485,17 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Ты %N1.", ch->getProfession()->getRusName().c_str());
         return;
     } 
-	if (arg_oneof(arg, "alignment", "характер", "натура")) {
-        ch->pecho("У тебя %s характер.", align_name_short(ch, Grammar::MultiGender::MASCULINE));
+	if (arg_oneof(arg, "alignment", "натура")) {
+        ch->pecho("У тебя %s натура.", align_name_short(ch, Grammar::MultiGender::FEMININE));
         return;
     } 
-	if (arg_oneof(arg, "ethos", "этос", "мировоззрение")) {
+	if (arg_oneof(arg, "ethos", "этос")) {
         ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1').c_str());
         return;
     } 
 	if (arg_oneof(arg, "hometown", "дом")) {
-        Room *room = get_room_index(pch->getHometown()->getAltar());
-        ch->pecho("Твой дом - %s.", room ? room->area->name : "потерян");
+        Room *room = get_room_instance(pch->getHometown()->getAltar());
+        ch->pecho("Твой дом - %s.", room ? room->areaName() : "потерян");
         return;
     } 
 	if (arg_oneof(arg, "religion", "религия")) {
@@ -1650,7 +1595,7 @@ CMDRUNP( score )
     
     XMLAttributeTimer::Pointer qd = pch->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );
     int age = pch->age.getYears( );
-    Room *room = get_room_index( pch->getHometown( )->getAltar( ) );
+    Room *room = get_room_instance( pch->getHometown( )->getAltar( ) );
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
     ostringstream name;
@@ -1756,7 +1701,7 @@ CMDRUNP( score )
             CLR_FRAME,
 
             CLR_CAPT,
-            room ? room->area->name : "Потерян",
+            room ? room->areaName() : "Потерян",
             CLR_BAR,
             msgtable_lookup( msg_positions, ch->position ),
             CLR_FRAME,
@@ -1781,17 +1726,21 @@ CMDRUNP( score )
         CLR_FRAME);
     }
 
+    // Report only active desires in 'score'.
     for (int i = 0; i < desireManager->size( ); i++) {
-        ostringstream buf;
+        Desire *desire = desireManager->find(i);
+        if (desire->isActive(ch->getPC())) {
+            ostringstream buf;
         
-        desireManager->find( i )->report( ch->getPC( ), buf );
+            desire->report(ch->getPC(), buf);
 
-        if (!buf.str( ).empty( )) {
-            ekle = 1;
-            ch->printf( "     %s| {w%-64s%s|\r\n", 
-                        CLR_FRAME,
-                        buf.str( ).c_str( ),
-                        CLR_FRAME );
+            if (!buf.str( ).empty( )) {
+                ekle = 1;
+                ch->printf( "     %s| {w%-64s%s|\r\n", 
+                            CLR_FRAME,
+                            buf.str( ).c_str( ),
+                            CLR_FRAME );
+            }
         }
     }
 
@@ -1800,6 +1749,15 @@ CMDRUNP( score )
         ch->printf( 
 "     %s| {yАдреналин кипит в твоих венах!                                  %s|\n\r",
                  CLR_FRAME,
+                 CLR_FRAME );
+    }
+
+    if (IS_GHOST(ch)) {
+        ekle = 1;
+        ch->pecho( 
+"     %1$s| {xТы призрак и обретёшь плоть через {Y%2$3d {xсекунд%2$-1Iу|ы|.                  %1$s|",
+                 CLR_FRAME,
+                 pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),
                  CLR_FRAME );
     }
 
@@ -1909,488 +1867,6 @@ CMDRUNP( score )
         interpret_raw( ch, "affects", "noempty");
 }
 
-CMDRUNP( areas )
-{
-    ostringstream buf, areaBuf, clanBuf, mansionBuf;
-    int acnt = 0, ccnt = 0, mcnt = 0;
-    AREA_DATA *pArea;
-    int minLevel, maxLevel, level;
-    DLString arguments( argument ), args, arg1, arg2;
-    
-    arguments.stripWhiteSpace( );
-    level = minLevel = maxLevel = -1;
-    args = arguments;
-    arg1 = arguments.getOneArgument( );
-    arg2 = arguments.getOneArgument( );
-    
-    if (!arg1.empty( ) && !arg2.empty( ) && arg1.isNumber( ) != arg2.isNumber( )) {
-        ch->println( "Использование: \r\n"
-                     "{lEareas [<level> | <min level> <max level> | <string>]"
-                     "{lRзоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]{lx" );
-        return;
-    }
-    
-    try {
-        if (arg1.isNumber( )) {
-            level = minLevel = arg1.toInt( );
-            args.clear( );
-        }
-
-        if (arg2.isNumber( )) {
-            level = -1;
-            maxLevel = arg2.toInt( );
-            args.clear( );
-        }
-    } catch (const ExceptionBadType & ) {
-        ch->send_to( "Уровень зоны указан неверно.\r\n" );
-        return;
-    }
-    
-    if (level != -1) 
-        buf << "{YАрии мира Dream Land для уровня " << level << ":{x" << endl;
-    else if (!args.empty( ))
-        buf << "{YНайдены арии: {x" << endl;
-    else if (minLevel != -1 && maxLevel != -1)
-        buf << "{YАрии мира Dream Land, для уровней " 
-            << minLevel << " - " << maxLevel << ":{x" << endl;
-    else
-        buf << "{YВсе арии мира Dream Land: {x" << endl;
-    
-    buf << "{wУровни    Название                       Уровни    Название{x" << endl
-        << "------------------------------------------------------------------------" << endl;
-
-    for (pArea = area_first; pArea; pArea = pArea->next) {
-        if (IS_SET(pArea->area_flag, AREA_HIDDEN)) 
-            continue;
-        
-        if (level != -1) {
-            if (pArea->low_range > level || pArea->high_range < level)
-                continue;
-        }
-        else if (minLevel != -1 && maxLevel != -1) {
-            if (pArea->low_range < minLevel || pArea->high_range > maxLevel)
-                continue;
-        }
-
-        if (!args.empty( )) {
-            DLString aname = DLString( pArea->name ).colourStrip( );
-            DLString altname = DLString( pArea->altname ).colourStrip( );
-            DLString acredits = DLString( pArea->credits ).colourStrip( );
-            if (!is_name( args.c_str( ), aname.c_str( ) ) 
-                    && !is_name( args.c_str( ), acredits.c_str( ) )
-                    && !is_name( args.c_str( ), altname.c_str( ) ))
-                continue;
-        }
-        
-        bool isMansion = area_is_mansion(pArea);
-        bool isClan = area_is_clan(pArea);    
-        ostringstream &str =  isMansion ? mansionBuf : isClan ? clanBuf : areaBuf;
-        int &cnt = isMansion ? mcnt : isClan ? ccnt : acnt;
-
-        str << fmt( ch, "[{w%3d{x {w%3d{x] %-30.30s ",
-                        pArea->low_range, pArea->high_range, 
-                        pArea->name);
-
-        if (++cnt % 2 == 0)
-            str << endl;
-    }
-  
-    if (!areaBuf.str().empty()) { 
-        buf << areaBuf.str();
-        if (acnt % 2)
-            buf << endl;
-    }
-
-    if (!clanBuf.str().empty()) {
-        buf << "{yКлановые территории:{x" << endl << clanBuf.str();
-        if (ccnt % 2)
-            buf << endl;
-    }
-
-    if (!mansionBuf.str().empty()) {
-        buf << "{yПригороды под застройку:{x" << endl << mansionBuf.str();
-        if (mcnt % 2)
-            buf << endl;
-    }
-    buf << endl << "Подробнее о каждой зоне смотри в {Wсправка название_зоны{x." << endl;
-    page_to_char( buf.str( ).c_str( ), ch );        
-}
-
-/*-----------------------------------------------------------------
- * 'affect' command
- *----------------------------------------------------------------*/
-enum {
-    FSHOW_LINES = (A),
-    FSHOW_TIME = (B),
-    FSHOW_COLOR = (C),
-    FSHOW_EMPTY = (D),
-    FSHOW_RUSSIAN = (E),
-};
-
-struct AffectOutput {
-    AffectOutput( ) { }
-    AffectOutput( Affect *, int flags );
-    
-    void format_affect( Affect * );
-    DLString format_affect_location( Affect * );
-    DLString format_affect_bitvector( Affect * );
-    DLString format_affect_global( Affect * );
-    void show_affect( ostringstream &, int );
-
-    int type;
-    int duration;
-    DLString name;
-    list<DLString> lines;
-    bool unitMinutes;
-    bool russian;
-};
-
-struct ShadowAffectOutput : public AffectOutput {
-    ShadowAffectOutput( int, int flags );
-};
-
-ShadowAffectOutput::ShadowAffectOutput( int shadow, int flags )
-{
-    duration = shadow * 4; 
-    name = "вторая тень";
-    type = -1;
-    unitMinutes = false;
-}
-
-AffectOutput::AffectOutput( Affect *paf, int flags )
-{
-    type = paf->type;
-    russian = IS_SET(flags, FSHOW_RUSSIAN);
-    name = russian ? paf->type->getRussianName( ) : paf->type->getName( );
-    duration = paf->duration;
-    unitMinutes = true;
-}
-
-void AffectOutput::show_affect( ostringstream &buf, int flags )
-{
-    ostringstream f;
-    DLString fmtResult;
-    
-    if (IS_SET(flags, FSHOW_RUSSIAN))
-        f << "{Y%1$-23s{x";
-    else
-        f << "{rАффект{y: {Y%1$-15s{x";
-    
-    if (IS_SET(flags, FSHOW_LINES|FSHOW_TIME)) 
-        f << "{y:";
-    
-    if (IS_SET(flags, FSHOW_LINES))
-        for (list<DLString>::iterator l = lines.begin( ); l != lines.end( ); l++) {
-            if (l != lines.begin( ))
-                f << "," << endl << "                        ";
-
-            f << "{y " << *l;
-        }
-    
-    if (IS_SET(flags, FSHOW_TIME)) {
-        if (duration < 0)
-            f << " {cпостоянно";
-        else
-            f << " {yв течение {m%2$d{y "
-              << (unitMinutes ? "час%2$Iа|ов|ов" : "секун%2$Iды|д|д");
-    }
-    
-    fmtResult = fmt( 0, f.str( ).c_str( ), name.c_str( ), duration );
-
-    buf << fmtResult << "{x" << endl;
-}
-
-void AffectOutput::format_affect( Affect *paf )
-{
-    DLString l;
-
-    if (!( l = format_affect_location( paf ) ).empty( ))
-        lines.push_back( l );
-
-    if (!( l = format_affect_bitvector( paf ) ).empty( ))
-        lines.push_back( l );
-
-    if (!( l = format_affect_global( paf ) ).empty( ))
-        lines.push_back( l );
-}
-
-DLString AffectOutput::format_affect_location( Affect *paf )
-{
-    DLString buf;
-    
-    if (paf->location != APPLY_NONE) 
-        switch (paf->location) {
-        case APPLY_HEAL_GAIN:
-        case APPLY_MANA_GAIN:
-            if (paf->modifier > 100)
-                buf << fmt( 0, "улучшает {m%1$s{y на {m%2$d%%{y",
-                               apply_flags.message( paf->location ).c_str( ),
-                               paf->modifier - 100 );
-            else if (paf->modifier < 100 && paf->modifier > 0)
-                buf << fmt( 0, "ухудшает {m%1$s{y на {m%2$d%%{y",
-                               apply_flags.message( paf->location ).c_str( ),
-                               100 - paf->modifier );
-            break;
-            
-        default:
-            if (paf->global.empty()) {
-                buf << "изменяет {m" << apply_flags.message( paf->location ) << "{y "
-                    << "на {m" << paf->modifier << "{y";
-            }
-            break;
-        }
-
-    return buf;
-}
-
-DLString AffectOutput::format_affect_bitvector( Affect *paf )
-{
-    DLString buf;
-
-    if (paf->bitvector != 0) {
-        bitstring_t b = paf->bitvector;
-        const char *word = 0;
-        char gcase = '1';
-        const FlagTable *table = 0;
-
-        switch(paf->where) {
-        case TO_AFFECTS: 
-            table = &affect_flags;
-            word = "добавляет";
-            gcase = '4';
-            break;
-        case TO_IMMUNE:        
-            table = &imm_flags;
-            word = "иммунитет к";
-            break;
-        case TO_RESIST:        
-            table = &imm_flags;
-            word = "сопротивляемость к";
-            break;
-        case TO_VULN:        
-            table = &imm_flags;
-            word = "уязвимость к";
-            break;
-        case TO_DETECTS: 
-            table = &detect_flags;
-            word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  "добавляет" : "обнаружение");
-            gcase = (IS_SET(b, ADET_WEB|ADET_FEAR) ? '4': '2');
-            break;
-        }
-
-        if (word && table)
-            buf << word << " {m" << table->messages( b, true, gcase ) << "{y";
-    }
-
-    return buf;
-}
-
-DLString AffectOutput::format_affect_global( Affect *paf )
-{
-    DLString buf;
-
-    if (!paf->global.empty( )) {
-        ostringstream s;
-        vector<int> bits = paf->global.toArray( );
-        
-        switch (paf->where) {
-        case TO_LIQUIDS:
-            for (unsigned int i = 0; i < bits.size( ); i++) {
-                Liquid *liq = liquidManager->find( bits[i] );
-
-                if (!s.str( ).empty( ))
-                    s << ", ";
-
-                s << "{m" <<  liq->getShortDescr( ).ruscase( '2' ).colourStrip( ) << "{x";
-            }
-
-            buf << "запах " << s.str( );
-            break;
-
-        case TO_LOCATIONS:
-            if (paf->global.isSet( wear_wrist_r ))
-                buf << "отрезанная правая рука";
-            else if (paf->global.isSet( wear_wrist_l ))
-                buf << "отрезанная левая рука";
-            else
-                buf << "отрезанная конечность";
-            break;
-
-        case TO_SKILLS:
-        case TO_SKILL_GROUPS:
-            if (paf->location == APPLY_LEVEL) {
-                buf << (paf->modifier >= 0 ? "повышает" : "понижает")
-                    << " уровень умений "
-                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "") << " {m" 
-                    << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
-                    << "{y на {m" << (int)abs(paf->modifier) << "{y";
-            } else if (paf->location == APPLY_NONE || paf->location == APPLY_LEARNED) {
-                buf << (paf->modifier >= 0 ? "повышает" : "понижает")
-                    << " знание "
-                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка") << " {m" 
-                    << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
-                    << "{y на {m" << (int)abs(paf->modifier) << "{y";
-            }
-            break;
-        }
-    }
-
-    return buf;
-}
-
-static bool __aff_sort_time__( const AffectOutput &a, const AffectOutput &b )
-{
-    if (a.unitMinutes == b.unitMinutes)
-        return a.duration < b.duration;
-    else
-        return a.unitMinutes ? b.duration : a.duration;
-}
-
-static bool __aff_sort_name__( const AffectOutput &a, const AffectOutput &b )
-{
-    return a.name < b.name;
-}
-
-struct PermanentAffects {
-    PermanentAffects(Character *ch) {
-        this->ch = ch;
-        my_res = ch->res_flags;
-        my_vuln = ch->vuln_flags;
-        my_imm = ch->imm_flags;
-        my_aff = ch->affected_by;
-        my_det = ch->detection;
-    }
-
-    void stripBitsFromAffects(Affect *paf) {
-        switch(paf->where) {
-        case TO_AFFECTS: 
-            REMOVE_BIT(my_aff, paf->bitvector);
-            break;
-        case TO_IMMUNE:        
-            REMOVE_BIT(my_imm, paf->bitvector);
-            break;
-        case TO_RESIST:        
-            REMOVE_BIT(my_res, paf->bitvector);
-            break;
-        case TO_VULN:        
-            REMOVE_BIT(my_vuln, paf->bitvector);
-            break;
-        case TO_DETECTS: 
-            REMOVE_BIT(my_det, paf->bitvector);
-            break;
-        }
-    }
-    
-    void printAll() const {
-        print("У тебя иммунитет к", my_imm, imm_flags, '2');
-        print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
-        print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
-        print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
-        print("Ты под воздействием", my_aff, affect_flags, '2');
-    }
-
-    bool isSet() const {
-        return my_res || my_vuln || my_imm || my_aff || my_det;
-    }
-
-private:
-    void print(const char *messagePrefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
-        if (my_flags != 0) {
-            DLString message = DLString(messagePrefix) + " " + my_table.messages(my_flags, true, gcase) + ".";
-            ch->pecho(message.c_str(), ch);
-        }
-    }
-
-    Character *ch;
-    int my_res;
-    int my_vuln;
-    int my_imm;
-    int my_aff;
-    int my_det;
-};
-
-CMDRUNP( affects )
-{
-    ostringstream buf;
-    list<AffectOutput> output;
-    list<AffectOutput>::iterator o;
-    int flags = FSHOW_LINES|FSHOW_TIME|FSHOW_COLOR|FSHOW_EMPTY;
-
-    if (ch->getConfig( )->ruskills)
-        SET_BIT(flags, FSHOW_RUSSIAN);
-   
-    // Keep track of res/vuln that are permanent (either from race affects or from items). 
-    PermanentAffects permAff(ch);
- 
-    for (Affect* paf = ch->affected; paf != 0; paf = paf->next ) {
-        if (output.empty( ) || output.back( ).type != paf->type) 
-            output.push_back( AffectOutput( paf, flags ) );
-        
-        output.back( ).format_affect( paf );
-
-        // Remove bits that are added via an affect, so that in the end
-        // only permanent bits remain.
-        permAff.stripBitsFromAffects(paf);
-    }
-    
-    if (HAS_SHADOW(ch))
-        output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, flags ) );
-
-    if (arg_has_oneof( argument, "time", "время" ))
-        output.sort( __aff_sort_time__ );
-    
-    if (arg_has_oneof( argument, "name", "имя" ))
-        output.sort( __aff_sort_name__ );
-
-    if (arg_has_oneof( argument, "desc", "убыв" ))
-        output.reverse( );
-
-    if (arg_has_oneof( argument, "short", "brief", "кратко" ))
-        REMOVE_BIT(flags, FSHOW_LINES);
-
-    if (arg_has_oneof( argument, "nocolor", "безцвета" ))
-        REMOVE_BIT(flags, FSHOW_COLOR);
-
-    if (arg_has_oneof( argument, "noempty" ))
-        REMOVE_BIT(flags, FSHOW_EMPTY);
-
-    for (o = output.begin( ); o != output.end( ); o++) 
-        o->show_affect( buf, flags );
-
-
-    if (IS_CHARMED(ch)) {
-        if (buf.str( ).empty( )) 
-            act_p( "$C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR,POS_RESTING );
-        else 
-            act_p( "$C1 находится под действием следующих аффектов:", ch->master, 0, ch, TO_CHAR,POS_RESTING );
-        buf << "{x";
-        ch->master->send_to( buf );
-        return;
-    }
-
-    // Output permanent bits on top.
-    permAff.printAll();
-
-
-    if (buf.str( ).empty( )) {
-        if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
-            ch->println( "Ты не находишься под действием каких-либо аффектов." );
-    } 
-    else {
-        if (permAff.isSet())
-            ch->send_to("\r\n");
-        ch->println( "Ты находишься под действием следующих аффектов:" );
-        buf << "{x";
-
-        if (!IS_SET(flags, FSHOW_COLOR)) {
-            ostringstream showbuf;
-            mudtags_convert( buf.str( ).c_str( ), showbuf, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, ch );        
-            ch->send_to( showbuf );
-        }
-        else
-            ch->send_to( buf );
-    }
-}
 
 CMDRUNP( nohelp )
 {
@@ -2447,6 +1923,125 @@ CMDRUNP( iidea )
 /*---------------------------------------------------------------------------*
  * Help
  *---------------------------------------------------------------------------*/
+
+/**
+ * An attempt to implement fuzzy search, matching input against keywords using
+ * Levenshtein algorithm.
+ */
+struct FuzzySearch {
+    FuzzySearch(Character *ch, const char *argument) 
+    {
+        arg = argument;
+        arg.toLower();
+
+        // For short user input, only look for very exact matches (distance 1).
+        min_distance = arg.length() > 5 ? 3 : arg.length() > 2 ? 2 : 1;
+
+        candidates.resize(min_distance + 1);
+
+        empty = true;
+
+        // Collect all matching articles.
+        for (auto &a : helpManager->getArticles()) {
+            if ((*a)->visible(ch))
+                searchArticle(a);
+        }
+    }
+
+    bool hasResults() 
+    {
+        return !empty;
+    }
+
+    void printResults(Character *ch) 
+    {
+        ostringstream buf;
+        int max_output = 5;    
+
+        buf << "Справка не найдена. Возможно, имелось в виду:" << endl;
+
+        // Output matches starting with best distance ones, but no more than max_output.
+        for (int i = 1; i <= min_distance && max_output > 0; i++) {
+            auto & matches = candidates[i];
+
+            for (auto &pair: matches) {
+                buf << "    ";
+                if (pair.second->getID() > 0)
+                    buf << "{hh" << pair.second->getID();
+
+                buf << pair.first << "{x "
+                    << "(" << pair.second->getTitle(DLString::emptyString).colourStrip() << ")" 
+                    << endl;
+
+                if ((--max_output) <= 0)
+                    break;
+            }
+        }
+
+        ch->send_to(buf);
+    }
+
+private:
+
+    void searchArticle(const HelpArticle::Pointer &a) 
+    {
+        int d;
+        StringSet keywords; // contains main keywords and additional ones.
+        keywords.insert(a->getAllKeywords().begin(), a->getAllKeywords().end());
+        keywords.insert(a->aka.begin(), a->aka.end());
+
+        // See if any of the article's keywords matches the input.
+        for (auto &keyword: keywords) {
+            DLString kw = keyword;
+            kw.replaces("'", "");
+            kw.toLower(); 
+       
+            // First try to match full keyword (with spaces but without quotes). 
+            if ((d = getDistance(kw)) <= min_distance) { 
+                candidates[d].push_back(make_pair(kw, a));
+                empty = false;
+                return;
+            }
+
+            // If keyword contains spaces, split it into words and try again.
+            if (kw != keyword) {
+                DLString word;
+                while (!(word = kw.getOneArgument()).empty()) {
+                    if ((d = getDistance(word)) <= min_distance) { 
+                        candidates[d].push_back(make_pair(word, a));
+                        empty = false;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    int getDistance(const DLString &keyword)
+    {
+        // Return Levenshtein distance between user input and the keyword. 
+        // The keyword is cut to match the input size (unless input is too short already),
+        // this allows for prefix matches.
+        DLString kw = keyword;
+
+        if (arg.length() > 3 && arg.length() < kw.length())
+            kw.cutSize(arg.length());
+
+        return levenshtein(arg.c_str(), kw.c_str(), 1, 1, 1, 1);
+    }
+
+    DLString arg;
+
+    // Keep a list of matches for each distance. A match (pair) contains the exact keyword and the article.
+    vector<
+        list<pair<DLString, HelpArticle::Pointer> > > candidates;
+
+    // Cut-off distance.
+    int min_distance;
+
+    bool empty;
+};
+
 struct HelpFinder {
     typedef vector<HelpArticle::Pointer> ArticleArray;
 
@@ -2508,7 +2103,8 @@ private:
         if (!preferredLabels.empty() && !a->labels.all.containsAny(preferredLabels))
             return false;
 
-        const DLString &fullKw = a->getAllKeywordsString();
+        DLString fullKw = a->getAllKeywordsString() + " " + a->aka.toString();
+        fullKw = fullKw.substitute('\'', "");
         const char *lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
 
         if (is_name(lookup, fullKw.c_str()))
@@ -2518,6 +2114,10 @@ private:
             if (is_name(lookup, (*k).c_str()))
                 return true; 
 
+        for (auto &aka: (*a)->aka) {
+            if (is_name(lookup, aka.c_str()))
+                return true;
+        }
         return false;
     }
 
@@ -2528,23 +2128,23 @@ private:
 
         // Reduce "help skill bash" to just "help bash".
         if (!argRest.empty()) {
-            if (arg_oneof_strict(arg1, "умение", "навык", "skill")) {
+            if (arg_oneof(arg1, "умение", "навык", "skill")) {
                 preferredLabels.insert("skill");
                 preferredLabels.insert("spell");
             }
-            else if (arg_oneof_strict(arg1, "заклинание", "spell"))
+            else if (arg_oneof(arg1, "заклинание", "spell"))
                 preferredLabels.insert("spell");
-            else if (arg_oneof_strict(arg1, "класс", "class"))
+            else if (arg_oneof(arg1, "класс", "class"))
                 preferredLabels.insert("class");
-            else if (arg_oneof_strict(arg1, "раса", "race"))
+            else if (arg_oneof(arg1, "раса", "race"))
                 preferredLabels.insert("race");
-            else if (arg_oneof_strict(arg1, "команда", "command"))
+            else if (arg_oneof(arg1, "команда", "command"))
                 preferredLabels.insert("cmd");
-            else if (arg_oneof_strict(arg1, "зона", "area", "zone"))
+            else if (arg_oneof(arg1, "зона", "area", "zone"))
                 preferredLabels.insert("area");
-            else if (arg_oneof_strict(arg1, "религия", "religion"))
+            else if (arg_oneof(arg1, "религия", "religion"))
                 preferredLabels.insert("religion");
-            else if (arg_oneof_strict(arg1, "клан", "clan"))
+            else if (arg_oneof(arg1, "клан", "clan"))
                 preferredLabels.insert("clan");
         }
     }
@@ -2557,20 +2157,17 @@ private:
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
-    DLString origArgument( argument );
+    DLString origArgument = DLString(argument).stripWhiteSpace().substitute('\'', "");
 
     if (!ch->getPC())
         return;
 
-    if (argument[0] == '\0') {
-        if (ch->getConfig( )->rucommands)
-            strcpy(argument, "summary_ru");
-        else
-            strcpy(argument, "summary_en");
+    if (origArgument.empty()) {
+        strcpy(argument, "summary");
     }
 
     // Вариант 2.create? - needs exact match.
-    if (strchr( argument , '.')){
+    if (origArgument.size() > 1 && strchr( argument , '.')) {
         char argall[MAX_INPUT_LENGTH];
         int number = number_argument(argument, argall);
 
@@ -2580,17 +2177,27 @@ CMDRUNP( help )
                 page_to_char( help->getText( ch ).c_str( ), ch );
                 return;
             }
+            ch->send_to( "Нет подсказки по данному слову.\n\r");
+            bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+            return;
         }
 
-        ch->send_to( "Нет подсказки по данному слову.\n\r");
-        bugTracker->reportNohelp( ch, origArgument.c_str( ) );
-        return;
+        // Restore original argument without the dot, assume it was a typo.
+        strcpy(argument, origArgument.substitute('.', ' ').c_str());
     }
     
     // Поиск по строке без чисел.
     HelpFinder::ArticleArray articles = HelpFinder(ch, argument).getArticles();
-    // No match.
+    // No match, try fuzzy matching.
     if (articles.empty()) {
+        if (origArgument.size() > 1) {
+            FuzzySearch fs(ch, argument);
+            if (fs.hasResults()) {
+                fs.printResults(ch);
+                return;
+            }
+        }
+        
         ch->send_to( "Нет подсказки по данному слову.\n\r");
         bugTracker->reportNohelp( ch, origArgument.c_str( ) );
         return;
@@ -2604,7 +2211,8 @@ CMDRUNP( help )
 
     // Several matches, display them all with numbers.
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
-    DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
+    DLString lineFormat = "[{C{hh%5d{x] %s\r\n";
+    int firstId = -1;
     for (unsigned int a = 0; a < articles.size(); a++) {
 	    auto help = articles[a];
         DLString title = help->getTitle(DLString::emptyString);
@@ -2620,12 +2228,15 @@ CMDRUNP( help )
             }
         }
 
+        if (firstId == -1)
+            firstId = help->getID();
+
         buf << fmt(0, lineFormat.c_str(), help->getID(), line.c_str());
     }
 
     buf << endl
-        << "Для уточнения поиска введи {yсправка {Wномер{x{Iw или нажми на ссылку{x." << endl;
-    
+        << "Для уточнения поиска смотри справку по нужному номеру, например, "
+        << "{y{hcсправка " << firstId << "{x." << endl;        
 
     ch->send_to(buf.str().c_str());
 }                  
@@ -2635,78 +2246,73 @@ CMDRUNP( help )
  * cast 'identify', shop item properties
  *----------------------------------------------------------------*/
 
-void lore_fmt_affect( Affect *paf, ostringstream &buf )
+void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
 {
     int b = paf->bitvector,
         d = paf->duration;
+    const FlagTable *table = paf->bitvector.getTable();
+    bool adaptive;
 
     if (paf->modifier != 0) {
         switch (paf->location) {
             case APPLY_NONE:
             case APPLY_LEARNED:
-                if (!paf->global.empty()) {
-                    switch(paf->where) {
-                        case TO_SKILLS:
-                        case TO_SKILL_GROUPS:
-                            buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                                << " знание "
-                                << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка")
-                                << " " << paf->global.toRussianString().quote() 
-                                << " на " << (int)abs(paf->modifier) << endl;
-                            break;
-                    }
+                if (paf->global.getRegistry() == skillManager 
+                    || paf->global.getRegistry() == skillGroupManager) 
+                {
+                    buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                        << " знание "
+                        << (paf->global.getRegistry() == skillGroupManager ? "группы" : "навыка")
+                        << " " << paf->global.toRussianString().quote() 
+                        << " на " << (int)abs(paf->modifier) << endl;
                 }
                 break;
 
             case APPLY_LEVEL:
-                if (!paf->global.empty()) {
-                    switch(paf->where) {
-                        case TO_SKILLS:
-                        case TO_SKILL_GROUPS:
-                            buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                                << " уровень умения "
-                                << (paf->where == TO_SKILL_GROUPS ? "группы" : "")
-                                << " " << paf->global.toRussianString().quote() 
-                                << " на " << (int)abs(paf->modifier) << endl;
-                            break;
-                    }
+                if (paf->global.getRegistry() == skillManager 
+                    || paf->global.getRegistry() == skillGroupManager) 
+                {
+                    buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                        << " уровень умения "
+                        << (paf->global.getRegistry() == skillGroupManager ? "группы" : "")
+                        << " " << paf->global.toRussianString().quote() 
+                        << " на " << (int)abs(paf->modifier) << endl;
                     return;
                 }
 
                 /* FALL THROUGH */
 
             default:
-                buf << "Изменяет " << apply_flags.message(paf->location ) 
-                    << " на " << paf->modifier;
+                adaptive = obj->item_type == ITEM_RECIPE && obj->getProperty("levelAdaptive") == "true";
+
+                // Don't display exact modifier for level-adaptive affects, as it changes with level.
+                buf << "Изменяет " << apply_flags.message(paf->location );
+                if (!adaptive)
+                    buf << " на " << paf->modifier;
 
                 if (d > -1)
                     buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
             
-                buf << endl;                
+                buf << "." << endl;
+
+                if (adaptive)
+                    buf << "Точные свойства этого рецепта зависят от уровня того, кто его использует." << endl;
                 break;
         }
     }
 
     if (b) {
-        switch(paf->where) {
-            case TO_AFFECTS:
-                buf << "Добавляет аффект " << affect_flags.messages(b ) << endl;
-                break;
-            case TO_IMMUNE:
-                buf << "Добавляет иммунитет к " << imm_flags.messages(b ) << endl;
-                break;
-            case TO_RESIST:
-                buf << "Добавляет сопротивляемость к " << imm_flags.messages(b ) << endl;
-                break;
-            case TO_VULN:
-                buf << "Добавляет уязвимость к " << imm_flags.messages(b ) << endl;
-                break;
-            case TO_DETECTS:
-                buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
-                break;
-        }
+        if (table == &affect_flags)
+            buf << "Добавляет аффект " << affect_flags.messages(b ) << endl;
+        else if (table == &imm_flags)
+            buf << "Добавляет иммунитет к " << imm_flags.messages(b ) << endl;
+        else if (table == &res_flags)
+            buf << "Добавляет сопротивляемость к " << imm_flags.messages(b ) << endl;
+        else if (table == &vuln_flags)
+            buf << "Добавляет уязвимость к " << imm_flags.messages(b ) << endl;
+        else if (table == &detect_flags)
+            buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
     }
-
 }
 
 void lore_fmt_wear( int type, int wear, ostringstream &buf )
@@ -2759,7 +2365,6 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     Skill *skill;
     Liquid *liquid;
     const char *mat;
-    Affect *paf;
     Keyhole::Pointer keyhole;
 
     buf << "{W" << obj->getShortDescr( '1' ) << "{x";
@@ -2770,6 +2375,10 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     buf << endl
         << "{W" << item_table.message(obj->item_type ) << "{x, "
         << "уровня {W" << obj->level << "{x" << endl;
+
+    lim = obj->pIndexData->limit;
+    if (lim != -1 && lim < 100)
+        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
 
     if (obj_is_special(obj))
         buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
@@ -2806,17 +2415,13 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     if (extra)
         buf << "Особые свойства: " << extra_flags.messages(extra, true ) << endl;
 
-    lim = obj->pIndexData->limit;
-    if (lim != -1 && lim < 100)
-        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
-
     switch (obj->item_type) {
     case ITEM_KEY:
         if (( keyhole = Keyhole::locate( ch, obj ) ))
             keyhole->doLore( buf );
         break;
     case ITEM_KEYRING:
-        buf << "Нанизано " << obj->value1() << " ключей из возможных " << obj->value0() << "." << endl;
+        buf << fmt(0, "Нанизан%1$I|ы|о %1$d ключ%1$I|а|ей из возможных %2$d.", count_obj_in_obj(obj), obj->value0()) << endl;
         break;
     case ITEM_LOCKPICK:
         if (obj->value0() == Keyhole::LOCK_VALUE_BLANK) {
@@ -2917,7 +2522,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
             << "(" << weapon_class.name( obj->value0() ) << "), ";
         
         buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
-            << "(среднее " << (1 + obj->value2()) * obj->value1() / 2 << ")" << endl;
+            << "(среднее " << weapon_ave(obj) << ")" << endl;
 		    
         if (obj->value3())  /* weapon damtype */
             buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;		    
@@ -2941,9 +2546,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     lore_fmt_wear( obj->item_type, obj->wear_flags, buf );
 
     if (!obj->enchanted)
-        for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
-            lore_fmt_affect( paf, buf );
+        for (auto &paf: obj->pIndexData->affected)
+            lore_fmt_affect( obj, paf, buf );
 
-    for (paf = obj->affected; paf != 0; paf = paf->next)
-        lore_fmt_affect( paf, buf );
+    for (auto &paf: obj->affected)
+        lore_fmt_affect( obj, paf, buf );
 }

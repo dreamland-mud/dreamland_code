@@ -4,7 +4,6 @@
  */
 #include "affectwrapper.h"
 
-#include "affect.h"
 #include "skill.h"
 #include "skillgroup.h"
 #include "skillmanager.h"
@@ -21,6 +20,8 @@
 #include "schedulerwrapper.h"
 #include "def.h"
 
+const FlagTable * affect_where_to_table(int where);
+
 using namespace std;
 NMI_INIT(AffectWrapper, "аффект");
 
@@ -34,73 +35,37 @@ AffectWrapper::AffectWrapper( const RegisterList &args )
         Skill *skill = skillManager->findExisting(i->toString());
         if (!skill)
             throw Scripting::Exception("Affect type not found.");
-        type.assign(*skill);
+        target.type.assign(*skill);
     } else
         return;
+
     if (++i != args.end( ))
-        level = i->toNumber( );
+        target.level = i->toNumber( );
     else
         return;
+
     if (++i != args.end( ))
-        duration = i->toNumber( );
+        target.duration = i->toNumber( );
     else
         return;
-    if (++i != args.end( ))
-        location = i->toNumber( );
-    else
-        return;
-    if (++i != args.end( ))
-        modifier = i->toNumber( );
-    else
-        return;
-    if (++i != args.end( ))
-        where = i->toNumber( );
-    else 
-        return;
-    if (++i != args.end( ))
-        bitvector = i->toNumber( );
+
+    if (++i != args.end())
+        throw Scripting::TooManyArgumentsException();
 }
 
-void AffectWrapper::toAffect( Affect & af ) 
+AffectWrapper::AffectWrapper(Affect &af)
 {
-    af.type = type;
-    af.where = where;
-    af.location = location;
-    af.duration = duration;
-    af.modifier = modifier;
-    af.bitvector = bitvector;
-    af.level = level;
-    
-    if (!global.empty( )) {
-        af.global.setRegistry( global.getRegistry( ) );
-        af.global.set( global );
-    }
-}
-
-void AffectWrapper::fromAffect( const Affect & af ) 
-{
-    type = af.type;
-    where = af.where;
-    location = af.location;
-    duration = af.duration;
-    modifier = af.modifier;
-    bitvector = af.bitvector;
-    level = af.level;
-
-    if (!af.global.empty( )) {
-        global.setRegistry( af.global.getRegistry( ) );
-        global.set( af.global );
-    }
+    af.copyTo(target);
 }
 
 NMI_GET( AffectWrapper, type, "название умения, которым этот аффект вешается, или none" ) 
 { 
-    int sn = type;
+    int sn = target.type;
 
     if (sn < 0)
         return Register( "none" );
     else
-        return Register( type->getName( ) ); 
+        return Register( target.type->getName( ) ); 
 } 
 
 NMI_SET( AffectWrapper, type, "название умения, которым этот аффект вешается, или none" ) 
@@ -108,14 +73,14 @@ NMI_SET( AffectWrapper, type, "название умения, которым э�
     const DLString & name = arg.toString( );
 
     if (name == "none") 
-        type.setName( name.c_str( ) );
+        target.type.setName( name.c_str( ) );
     else {
         Skill * skill = skillManager->findExisting( name );
 
         if (!skill)
             throw Scripting::IllegalArgumentException( );
         
-        type.assign( *skill );
+        target.type.assign( *skill );
     }
 }
 
@@ -123,57 +88,69 @@ NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аф
 {
     Character *ch = args2character(args);
 
-    Affect af;
-    toAffect(af);
-    affect_modify(ch, &af, true);
+    affect_modify(ch, &target, true);
     return Register();	
 }
 
 #define GS(x, api) \
 NMI_GET( AffectWrapper, x, api ) \
 { \
-    return Register( x.getValue( ) ); \
+    return Register( (int)target.x.getValue( ) ); \
 } \
 NMI_SET( AffectWrapper, x, api ) \
 { \
-    x.setValue( arg.toNumber( ) ); \
+    target.x.setValue( arg.toNumber( ) ); \
 }
 
-GS(where, "поле, у которого аффект изменяет биты (таблица .tables.affwhere_flags)")
 GS(bitvector, "какие биты добавятся полю, указанному в where")
 GS(location, "поле, на которое аффект воздействует численно (таблица .tables.apply_flags)")
 GS(modifier, "на сколько изменится поле, указанное в location")
 GS(duration, "длительность, -1 для вечных аффектов")
 GS(level, "уровень аффекта")
 
+NMI_SET(AffectWrapper, where, "на какую таблицу применен bitvector или на что воздействует global (.tables.affwhere_flags)")
+{
+    int where = arg.toNumber();
+
+    switch (where) {
+        case TO_LOCATIONS:
+            target.global.setRegistry( wearlocationManager );
+            break;
+        case TO_LIQUIDS:
+            target.global.setRegistry( liquidManager );
+            break;
+        case TO_SKILL_GROUPS:
+            target.global.setRegistry( skillGroupManager );
+            break;
+        case TO_SKILLS:
+            target.global.setRegistry( skillManager );
+            break;
+        default:
+            target.bitvector.setTable(affect_where_to_table(where));
+            if (!target.bitvector.getTable())
+                throw Scripting::IllegalArgumentException();
+            break;
+    }
+}
+
 NMI_SET( AffectWrapper, global, "список значений для where=locations (слоты экипировки), liquids (жидкости), skills, skill groups" ) 
 {
-    if (where == TO_LOCATIONS) {
-        global.setRegistry( wearlocationManager );
-        global.fromString( arg.toString( ) );
-    } else if (where == TO_LIQUIDS) {
-        global.setRegistry( liquidManager );
-        global.fromString( arg.toString( ) );
-    } else if (where == TO_SKILLS) {
-        global.setRegistry( skillManager );
-        global.fromString( arg.toString( ) );
-    } else if (where == TO_SKILL_GROUPS) {
-        global.setRegistry( skillGroupManager );
-        global.fromString( arg.toString( ) );
-    }
+    const GlobalRegistryBase *registry = target.global.getRegistry();
+    if (!registry)
+        throw Scripting::Exception("Affect 'global' is assigned before 'where' is set.");
+
+    target.global.fromString(arg.toString());
 }
 
 NMI_GET( AffectWrapper, global, "список значений для where=locations (слоты экипировки), liquids (жидкости), skills, skill groups" ) 
 {
-    return global.toString( );
+    return target.global.toString( );
 }
 
 Scripting::Register AffectWrapper::wrap( const Affect &af )
 {
-    AffectWrapper::Pointer aw( NEW );
+    AffectWrapper::Pointer aw( NEW, af );
 
-    aw->fromAffect( af );
-    
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();
     sobj->setHandler( aw );
 

@@ -15,6 +15,7 @@ const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
 const DLString HelpArticle::ATTRIBUTE_ID = "id";
 const DLString HelpArticle::ATTRIBUTE_TITLE = "title";
+const DLString HelpArticle::ATTRIBUTE_AKA = "aka";
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
@@ -139,6 +140,9 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     if (!refby.empty( ))
         parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
 
+    if (!aka.empty())
+        parent->insertAttribute(ATTRIBUTE_AKA, aka.toString());
+
     if (!labels.persistent.empty())
         parent->insertAttribute(ATTRIBUTE_LABELS, labels.persistent.toString());
 
@@ -165,6 +169,7 @@ void HelpArticle::fromXML( const XMLNode::Pointer &parent )
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
     labels.persistent.clear();
     labels.addPersistent(parent->getAttribute(ATTRIBUTE_LABELS));
+    aka.fromString(parent->getAttribute(ATTRIBUTE_AKA));
 }
 
 /*-----------------------------------------------------------------------

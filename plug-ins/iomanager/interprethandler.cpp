@@ -25,6 +25,7 @@
 #include "behavior_utils.h"
 #include "room.h"
 #include "skillreference.h"
+#include "door_utils.h"
 
 #include "wiznet.h"
 #include "act.h"
@@ -33,10 +34,6 @@
 
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
-const char *dir_name[] = {"N","E","S","W","U","D"};
-const char *dir_name_small[] = {"n","e","s","w","u","d"};
-const char *ru_dir_name[] = {"С","В","Ю","З","П","О"};
-const char *ru_dir_name_small[] = {"с","в","ю","з","п","о"};
 const char * sunlight_ru [4] = { "темно", "светает", "светло", "сумерки" };    
 
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
@@ -89,7 +86,7 @@ static bool omprog_command( Character *actor, const DLString &cmdName, const DLS
 
 static bool can_see_room_details(Character *ch)
 {
-    if (ch->getConfig( )->holy
+    if (ch->getConfig( ).holy
         || ch->is_vampire( )
         || IS_GHOST(ch) || IS_DEATH_TIME(ch)
         || (ch->in_room->isDark( ) && IS_AFFECTED(ch, AFF_INFRARED))
@@ -248,7 +245,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'd':
         case 'e':
-            ruexits = ch->getPC( ) && ch->getPC( )->getConfig( )->ruexits;
+            ruexits = ch->getPC( ) && ch->getPC( )->getConfig( ).ruexits;
 
             for (int door = 0; door < DIR_SOMEWHERE; door++) {
                 EXIT_DATA *pexit = ch->in_room->exit[door];
@@ -259,7 +256,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) {
                     doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
                 } else {
-                    doors << (ruexits ? ru_dir_name[door] : dir_name[door]);
+                    doors << (ruexits ? ru_dir_name_big[door] : dir_name_big[door]);
                 }
             }
             if (doors.str( ).empty( ))
@@ -352,7 +349,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'S':
             if (ch->in_room && can_see_room_details(ch)) {
-                int sector = ch->in_room->sector_type;
+                int sector = ch->in_room->getSectorType();
                 bool indoors = IS_SET(ch->in_room->room_flags, ROOM_INDOORS);
                 out << (indoors ? "(" : "")
                     << "{" << sector_type_color(sector) <<  sector_table.message(sector) << "{w"
@@ -365,7 +362,7 @@ void InterpretHandler::normalPrompt( Character *ch )
         case 'r' :
             if (ch->in_room != 0) {
                 if (can_see_room_details(ch)) {
-                    out << ch->in_room->name;
+                    out << ch->in_room->getName();
                 } else {
                     out << "темнота";
                 }
@@ -387,7 +384,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'z' :
             if ( ch->is_immortal() && ch->in_room != 0 )
-                out << ch->in_room->area->name;
+                out << ch->in_room->areaName();
             else
                 out << " ";
             break;
@@ -420,8 +417,7 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
     prompt["args"][0]["max_move"] = ch->max_move.getValue();
     prompt["args"][0]["vnum"] = ch->in_room ? ch->in_room->vnum : 0;
     prompt["args"][0]["area"] = DLString(
-            ch->in_room && ch->in_room->area && ch->in_room->area->area_file && ch->in_room->area->area_file->file_name ?
-                    ch->in_room->area->area_file->file_name : "");
+            ch->in_room ? ch->in_room->areaIndex()->area_file->file_name : "");
 
     // Call various web prompt handlers to write out complex stuff defined in other plugins,
     // such as group information, weather, time etc.

@@ -111,7 +111,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     if (!r || !r->isValid())
         return;
         
-    in << "{cХарактер{x    : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
+    in << "{cНатура{x      : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
     if (!r->getStats( ).empty( )) {
         bool found = false;
 
@@ -216,7 +216,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         in << "{WУникальные cпособности{x: " << raceApt << endl;
     }
     if (!prof100.empty( )) {
-        in << "{WБонусы на профессиональные умения{x: " << prof100 << endl;
+        in << "{WБонусы на классовые умения{x: " << prof100 << endl;
     }
     if (!noprof100.empty( )) {
         in << "{WБонусные умения{x: " << noprof100 << endl;
@@ -354,7 +354,7 @@ const DLString & DefaultRace::getMltName( ) const
 }
 DLString DefaultRace::getNameFor( Character *looker, Character *me, const Grammar::Case &c ) const
 {
-    if (looker && me && looker->getConfig( )->rucommands) {
+    if (looker && me && looker->getConfig( ).rucommands) {
         if (me->getSex( ) == SEX_MALE)
             return getMaleName( ).ruscase( c );
         if (me->getSex( ) == SEX_FEMALE)

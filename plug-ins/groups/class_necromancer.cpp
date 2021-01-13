@@ -104,13 +104,11 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
             return;
         }
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level     = level;
         af.duration  = level / 10;
-        af.location  = 0;
-        af.modifier  = 0;
-        af.bitvector = AFF_BLOODTHIRST;
+        af.bitvector.setValue(AFF_BLOODTHIRST);
         affect_to_char( victim, &af );
         victim->send_to("Безумие охватывает тебя!\n\r");
         act_p("Глаза $c2 наливаются кровью.",victim,0,0,TO_ROOM,POS_RESTING);

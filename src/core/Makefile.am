@@ -12,6 +12,8 @@ AM_CPPFLAGS = -Wall
 
 libcore_la_SOURCES = \
 affect.cpp \
+affectlist.cpp \
+affectmanager.cpp \
 character.cpp \
 npcharacter.cpp \
 npcharactermanager.cpp \
@@ -40,7 +42,8 @@ helpmanager.cpp \
 mobilespecial.cpp \
 dlfileloader.cpp \
 dlpluginmanager.cpp \
-bonus.cpp
+bonus.cpp \
+eventbus.cpp
 
 libcore_la_MOC = \
 affect.h \

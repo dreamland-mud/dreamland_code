@@ -82,11 +82,7 @@ int DrunkDesire::getUpdateAmount( PCharacter *ch )
 
 bool DrunkDesire::applicable( PCharacter *ch )
 {
-#ifdef DRUNK_SUPPORT    
-    return !isVampire( ch );
-#else
-    return false;
-#endif
+    return !isVampire(ch);
 }
 
 bool DrunkDesire::isActive( PCharacter *ch )
@@ -147,7 +143,7 @@ bool FullDesire::isOverflow( PCharacter *ch )
  */
 int ThirstDesire::getUpdateAmount( PCharacter *ch )
 {
-    if (ch->in_room->sector_type == SECT_DESERT)
+    if (ch->in_room->getSectorType() == SECT_DESERT)
         return -3;
     else
         return -1;

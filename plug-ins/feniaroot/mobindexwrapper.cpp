@@ -157,16 +157,14 @@ NMI_GET( MobIndexWrapper, area, "зона, в которой прописан м
 
 NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 
 {
-    Room *room;
-    RESET_DATA *pReset;
     RegList::Pointer rc(NEW);
     
     checkTarget( );
     
-    for (room = room_list; room; room = room->rnext)
-        for (pReset = room->reset_first; pReset; pReset = pReset->next)
+    for (auto &r: roomIndexMap)
+        for (auto &pReset: r.second->resets)
             if (pReset->command == 'M' && pReset->arg1 == target->vnum)
-                rc->push_back( Register( room->vnum ) );
+                rc->push_back( Register( r.first ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate( );
     obj->setHandler( rc );
@@ -196,7 +194,7 @@ NMI_INVOKE(MobIndexWrapper, create, "(): создать экземпляр мо�
 
     checkTarget( );
     mob = create_mobile( target );
-    char_to_room( mob, get_room_index( ROOM_VNUM_FENIA_STORAGE ) );
+    char_to_room( mob, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );
     return WrapperManager::getThis( )->getWrapper( mob ); 
 }
 
@@ -210,7 +208,7 @@ NMI_INVOKE(MobIndexWrapper, createFor, "(ch): создать экземпляр 
 
     PCharacter *client = args2player(args);
     mob = create_mobile( target );            
-    char_to_room( mob, get_room_index( ROOM_VNUM_FENIA_STORAGE ) );        
+    char_to_room( mob, get_room_instance( ROOM_VNUM_FENIA_STORAGE ) );        
 
     LevelAdaptivePet::Pointer pet = mob->behavior.getDynamicPointer<LevelAdaptivePet>();
     if (pet)

@@ -187,6 +187,8 @@ VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level
         dam /= 2;
 
     damage_nocatch( ch, victim, dam, sn, DAM_COLD,true, DAMF_SPELL );
+    // TODO review level. In this new implementation it became easier
+    // to avoid -STR affect.
     cold_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);    
 }
 
@@ -550,13 +552,13 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
     }
     else {
         if ( (number_percent() < chance) && (!victim->isAffected(gsn_weaken)) ) {
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_weaken;
             af.level     = level;
             af.duration  = (4 + level / 12);
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1 * (2 + level / 12);
-            af.bitvector = AFF_WEAKEN;
+            af.bitvector.setValue(AFF_WEAKEN);
             affect_to_char( victim, &af );
             victim->send_to("Ты чувствуешь, как {Dтемная магия{x отнимает у тебя последние силы!\n\r");
             act_p("$c1 слабеет на глазах.",victim,0,0,TO_ROOM,POS_RESTING);            

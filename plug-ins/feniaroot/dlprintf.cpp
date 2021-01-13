@@ -15,6 +15,7 @@
 
 #include "characterwrapper.h"
 #include "objectwrapper.h"
+#include "structwrappers.h"
 
 #include "msgformatter.h"
 #include "mercdb.h"
@@ -74,6 +75,13 @@ protected:
     }
     virtual DLString argStr() {
         return d.toString();
+    }
+    virtual const Skill * argSkill() {
+        SkillWrapper *skWrap = d.toHandler().getDynamicPointer<SkillWrapper>();
+        if (!skWrap)
+            throw Scripting::IllegalArgumentException();
+        
+        return skWrap->getTarget();
     }
     virtual Grammar::Noun::Pointer argNoun(int nounFlags) {
         CharacterWrapper *chWrap = d.toHandler().getDynamicPointer<CharacterWrapper>();

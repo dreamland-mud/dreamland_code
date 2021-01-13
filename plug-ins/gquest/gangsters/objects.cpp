@@ -70,7 +70,7 @@ bool GangPortal::canDrop( Room *pRoomIndex )
         return false;
             
     if (IS_SET(pRoomIndex->room_flags, ROOM_INDOORS)
-        || pRoomIndex->sector_type == SECT_INSIDE)
+        || pRoomIndex->getSectorType() == SECT_INSIDE)
         return false;
 
     if (!Gangsters::recursiveWalk( pRoomIndex, 0, 4 )) 

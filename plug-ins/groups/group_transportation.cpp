@@ -63,7 +63,6 @@ VOID_SPELL(MentalBlock)::run( Character *ch, Character *victim, int sn, int leve
     }
     
     af.type  = sn;
-    af.where = TO_AFFECTS;
     af.level = level;
     af.duration = level / 2;
     affect_to_char( victim, &af ); 
@@ -100,13 +99,11 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
                 return;
         }
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level         = level;
         af.duration  = level + 3;
-        af.location  = 0;
-        af.modifier  = 0;
-        af.bitvector = AFF_FLYING;
+        af.bitvector.setValue(AFF_FLYING);
         affect_to_char( victim, &af );
 
         victim->send_to("Твои ноги отрываются от земли.\n\r");
@@ -153,13 +150,11 @@ VOID_SPELL(PassDoor)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = number_fuzzy( level / 4 );
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = AFF_PASS_DOOR;
+    af.bitvector.setValue(AFF_PASS_DOOR);
     affect_to_char( victim, &af );
 
     act("$c1 становится полупрозрачн$gым|ым|ой.", victim, 0, 0, TO_ROOM);
@@ -421,7 +416,7 @@ protected:
         if (( point = ch->getClan( )->getRecallVnum( ) ) <= 0)
             point = ch->getPC( )->getHometown( )->getRecall( );
 
-        if (point <= 0 || !( to_room = get_room_index( point ) )) {
+        if (point <= 0 || !( to_room = get_room_instance( point ) )) {
             msgSelf( ch, "You are completely lost." );
             return false;
         }

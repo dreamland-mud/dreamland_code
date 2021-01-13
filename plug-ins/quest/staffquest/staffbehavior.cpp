@@ -26,7 +26,7 @@ void StaffBehavior::getByOther( Character *ch )
 {
     short level = max( 1, ch->getModifyLevel( ) - 9 );
 
-    ch->pecho( "%1$O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
+    ch->pecho( "%1$^O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
 
     switch (dice( 1, 10 ))  {
     case 1:

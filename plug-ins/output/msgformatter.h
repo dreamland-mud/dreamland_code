@@ -9,6 +9,7 @@
 #include "dlstring.h"
 
 class Character;
+class Skill;
 namespace Grammar {
 class Noun;
 }
@@ -31,6 +32,7 @@ protected:
     virtual float argFloat() = 0;
     virtual unsigned int argUInt() = 0;
     virtual DLString argStr() = 0;
+    virtual const Skill * argSkill() = 0;
     virtual Pointer<Grammar::Noun> argNoun(int nounFlags = 0) = 0;
 };
 

@@ -64,7 +64,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 
 #include "dreamland.h"
@@ -125,7 +125,7 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
     }
     
     if (ch)
-        for (Affect *paf = ch->affected; paf; paf = paf->next)
+        for (auto &paf: ch->affected)
             if (paf->type->getAffect( ))
                 paf->type->getAffect( )->saves( ch, victim, save, dam_type, paf );
 
@@ -196,15 +196,22 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
     Spell::Pointer spell; 
     Skill *skill;
 
-    if (!target)
-        return false;
-    
     if (!( skill = SkillManager::getThis( )->find( sn ) ))
         return false;
 
     if (!( spell = skill->getSpell( ) ))
         return false;
-    
+
+    return spell_nocatch(spell, level, ch, target, flags);
+}
+
+bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget::Pointer target, int flags )
+{
+    if (!target || !spell)
+        return false;
+
+    Skill::Pointer skill = spell->getSkill();
+
     if (IS_SET(flags, FSPELL_OBSTACLES)) {
         if ((ch->isAffected( gsn_garble ) || ch->isAffected( gsn_deafen )) && chance( 50 ))
             return false;
@@ -215,6 +222,9 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
         if (target->type == SpellTarget::CHAR
              && target->victim->in_room != ch->in_room
              && !ch->can_see( target->victim ))
+            return false;
+
+        if (spell->getPosition() > ch->position)
             return false;
     }
     
@@ -227,17 +237,29 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
             ch->mana -= mana;
     }
 
+    bool fForbidCasting = false;
+    bool fForbidReaction = false;
+    bool offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
+
     if (IS_SET(flags, FSPELL_VERBOSE))
         spell->utter( ch );
 
     if (IS_SET(flags, FSPELL_WAIT)) 
         ch->setWait( spell->getBeats( ) );
 
+    if (IS_SET(flags, FSPELL_CHECK_SAFE) && offensive && target->victim) {
+        if (is_safe(ch, target->victim))
+            return false;
+    }
+
+    if (IS_SET(flags, FSPELL_CHECK_GROUP) && offensive && target->victim) {
+        if (is_same_group(ch, target->victim))
+            return false;
+    }
+
     if (IS_SET(flags, FSPELL_BANE) && spell->spellbane( ch, target->victim ))
         return false;
    
-    bool fForbidCasting = false;
-
     if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
         if (target->type == SpellTarget::CHAR && target->victim)
             fForbidCasting = mprog_spell( target->victim, ch, skill, true );
@@ -250,9 +272,16 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
 
     if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
         if (target->type == SpellTarget::CHAR && target->victim)
-            mprog_spell( target->victim, ch, skill, false );
+            fForbidReaction = mprog_spell( target->victim, ch, skill, false );
 
         mprog_cast( ch, target, skill, false );
+    }
+
+    if (fForbidReaction)
+        return true;
+
+    if (IS_SET(flags, FSPELL_ATTACK_CASTER) && offensive && target->victim) {
+        attack_caster(ch, target->victim);
     }
 
     return true;
@@ -377,9 +406,7 @@ bool savesDispel( int dis_level, int spell_level, int duration)
 
 bool checkDispel( int dis_level, Character *victim, int sn)
 {
-    Affect *af;
-
-    for (af = victim->affected; af != 0; af = af->next) {
+    for (auto af: victim->affected.clone()) {
         if (af->type != sn) 
             continue;
 
@@ -412,7 +439,7 @@ bool is_safe_spell(Character *ch, Character *victim, bool area )
     if (is_same_group(ch,victim) && area)
         return true;
 
-    if (ch == victim && area && ch->in_room->sector_type == SECT_INSIDE)
+    if (ch == victim && area && ch->in_room->getSectorType() == SECT_INSIDE)
         return true;
 
     if ((RIDDEN(ch) == victim || MOUNTED(ch) == victim) && area)
@@ -430,7 +457,7 @@ bool overcharmed( Character *ch )
     max_charm -= 28 - min( 28, ch->getCurrStat( STAT_CHA ) );
 
     if (max_charm <= 0) {
-        ch->println("Ты не в состоянии контролировать никого, кроме себя!");
+        ch->println("Твоего обаяния, интеллекта и опыта недостаточно, чтобы контролировать кого-либо.");
         return true;
     }
 

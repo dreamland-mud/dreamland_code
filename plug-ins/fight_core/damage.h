@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include "bitstring.h"
 #include "fight_exception.h"
+#include "eventbus.h"
 
 class Character;
 class Object;
@@ -77,6 +78,11 @@ protected:
     bitstring_t dam_flag;
 };
 
+struct CharDeathEvent : public Event {
+    CharDeathEvent(Character *victim, Character *killer);
+    Character *victim;
+    Character *killer;
+};
 
 #endif
 

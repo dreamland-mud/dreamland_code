@@ -2,14 +2,15 @@
  *
  * ruffina, 2004
  */
+
 #include "skill.h"
 #include "skillreference.h"
-
-#include "object.h"
+#include "core/object.h"
 #include "character.h"
 
+#include "weapons.h"
+#include "math_utils.h"
 #include "itemflags.h"
-#include "merc.h"
 #include "def.h"
 
 WEARLOC(wield);
@@ -87,6 +88,22 @@ int get_weapon_sn( Object *wield )
 int get_weapon_sn( Character *ch, bool secondary )
 {
     return get_weapon_sn( get_wield( ch, secondary ) );
+}
+
+int weapon_ave(Object *wield)
+{
+    if (wield->item_type == ITEM_WEAPON)
+        return dice_ave(wield->value1(), wield->value2());
+    else
+        return 0;
+}
+
+int weapon_ave(struct obj_index_data *pWield)
+{
+    if (pWield->item_type == ITEM_WEAPON)
+        return dice_ave(pWield->value[1], pWield->value[2]);
+    else
+        return 0;
 }
 
 

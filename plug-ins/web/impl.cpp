@@ -218,7 +218,7 @@ Json::Value LocationWebPromptListener::jsonRoom( Descriptor *d, Character *ch )
     if (!canSeeLocation( ch ))
         return Json::Value( );
 
-    return Json::Value( DLString( ch->in_room->name ).colourStrip( ) );
+    return Json::Value( DLString( ch->in_room->getName() ).colourStrip( ) );
 }
 
 Json::Value LocationWebPromptListener::jsonZone( Descriptor *d, Character *ch )
@@ -226,7 +226,7 @@ Json::Value LocationWebPromptListener::jsonZone( Descriptor *d, Character *ch )
     if (!canSeeLocation( ch ))
         return Json::Value( );
 
-    return Json::Value( DLString( ch->in_room->area->name ).colourStrip( ) );
+    return Json::Value( DLString( ch->in_room->areaName() ).colourStrip( ) );
 }
 
 Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
@@ -258,7 +258,7 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
     Json::Value exits;
     exits["h"] = hidden.str( );
     exits["e"] = visible.str( );
-    exits["l"] = ch->getConfig( )->ruexits ? "r" : "e";
+    exits["l"] = ch->getConfig( ).ruexits ? "r" : "e";
     return exits;
 }    
 
@@ -387,14 +387,14 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
 /*-------------------------------------------------------------------------
  * AffectsWebPromptListener
  *------------------------------------------------------------------------*/
-static Bitstring zero_affect_bitstring( int where, Affect *list, const Bitstring &bits )
+static Bitstring zero_affect_bitstring( const FlagTable *table, AffectList &list, const Bitstring &bits )
 {
     Bitstring zero;
 
-    for (Affect *paf = list; paf; paf = paf->next) {
+    for (auto &paf: list) {
         if (paf->duration != 0)
             continue;
-        if (paf->where != where)
+        if (paf->bitvector.getTable() != table)
             continue;
 
         if (bits.isSet( paf->bitvector ))
@@ -481,7 +481,7 @@ Json::Value AffectsWebPromptListener::jsonMalad( Descriptor *d, Character *ch )
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
         
         if (paf->type == gsn_blindness) 
@@ -553,7 +553,7 @@ Json::Value AffectsWebPromptListener::jsonClan( Descriptor *d, Character *ch )
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
         
         if (paf->type == gsn_resistance) 
@@ -629,7 +629,7 @@ Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
         
         if (paf->type == gsn_invisibility) 
@@ -665,6 +665,7 @@ Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
     mark_affect( ch, active, AFF_FLYING, 'f' );
     mark_affect( ch, active, AFF_PASS_DOOR, 'p' );
     mark_affect( ch, active, AFF_FADE, 'F' );
+    mark_affect( ch, active, AFF_CAMOUFLAGE, 'c' );
 
     if (active.empty( ))
         return Json::Value( );
@@ -679,7 +680,7 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
 
         if (paf->type == gsn_stardust) 
@@ -756,7 +757,7 @@ Json::Value AffectsWebPromptListener::jsonEnhance( Descriptor *d, Character *ch 
 {
     DLString active, zero;
     
-    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+    for (auto &paf: ch->affected) {
         char m;
 
         if (paf->type == gsn_haste) 
@@ -823,7 +824,7 @@ Json::Value AffectsWebPromptListener::jsonDetect( Descriptor *d, Character *ch )
 
     Json::Value det;
     det["a"] = active;
-    Bitstring zeroDetects = zero_affect_bitstring( TO_DETECTS, ch->affected, reported_det );
+    Bitstring zeroDetects = zero_affect_bitstring( &detect_flags, ch->affected, reported_det );
     det["z"] = det_to_string( zeroDetects );
     return det;
 }
@@ -964,15 +965,19 @@ public:
 
     virtual void run()
     {
+        if (dreamland->hasOption(DL_BUILDPLOT))
+            return;
+
         dumpSkills();
         dumpCommands();
     }
 
     void dumpSkills() 
     {
-        ostringstream buf;
+        ostringstream buf, cmdbuf;
 
         buf << "name,rname,group,what,cmd,rcmd,position,target" << endl;
+        cmdbuf << "skill,name,rname,position,order,extra,hint" << endl;
 
         for (int sn = 0; sn < skillManager->size(); sn++) {
             Skill *s = skillManager->find(sn);
@@ -1015,11 +1020,26 @@ public:
             buf << cmd << "," << rcmd << "," 
                 << position_table.name(position) << ","
                 << target_table.names(target) << endl;                       
+
+            if (command) {
+                cmdbuf 
+                    << s->getName() << ","
+                    << command->getName() << ","
+                    << command->getRussianName() << ","
+                    << command->getPosition().name() << ","
+                    << command->getOrder().names() << ","
+                    << command->getExtra().names() << ","
+                    << command->getHint() 
+                    << endl;
+            }
         }
 
         try {
             DLFileStream( "/tmp/skills.csv" ).fromString( 
                 koi2utf(buf.str())
+            );
+            DLFileStream( "/tmp/skill-commands.csv" ).fromString( 
+                koi2utf(cmdbuf.str())
             );
         } catch (const ExceptionDBIO &ex) {
             LogStream::sendError() << ex.what() << endl;
@@ -1028,39 +1048,35 @@ public:
 
     void dumpCommands()
     {
-        Json::Value json;
-        list<Command::Pointer>::const_iterator c;
+        ostringstream buf;
+
+        buf << "name,rname,position,order,extra,hint" << endl;
 
         // Use this guy to choose only commands visible to mortals.
         PCharacter dummy;
         dummy.setLevel(1);
 
-        // Output English commands sorted according to their priorities.
-        // TODO: aliases
-        list<Command::Pointer> commands = commandManager->getCommands().getCommands();
-        for (c = commands.begin(); c != commands.end(); c++) {
-            if ((*c)->visible(&dummy)) {
-                Json::Value cmd;
-                cmd["name"] = (*c)->getName();
-                cmd["lvl"] = (*c)->getLevel();
-                json.append(cmd);
+        // Output commands sorted according to their priorities in English.
+        auto &commands = commandManager->getCommands().getCommands();
+        for (auto &cmd: commands) {
+            if (cmd->available(&dummy)) {
+                buf << cmd->getName() << ","
+                    << cmd->getRussianName() << ","
+                    << cmd->getPosition().name() << ","
+                    << cmd->getOrder().names() << ","
+                    << cmd->getExtra().names() << ","
+                    << cmd->getHint() 
+                    << endl;
             }
         }
 
-        // Append Russian commands sorted according to their priorities.
-        commands = commandManager->getCommands().getCommandsRU();
-        for (c = commands.begin(); c != commands.end(); c++) {
-            if ((*c)->visible(&dummy)) {
-                Json::Value cmd;
-                cmd["name"] = (*c)->getRussianName();
-                cmd["lvl"] = (*c)->getLevel();
-                json.append(cmd);
-            }
+        try {
+            DLFileStream( "/tmp/commands.csv" ).fromString( 
+                koi2utf(buf.str())
+            );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
         }
-
-        DLFileStream(dreamland->getMiscDir(), "commands", ".json").fromString(
-            koi2utf(json_to_string(json))
-        );
     }
 };    
 
@@ -1111,15 +1127,21 @@ public:
                 Json::Value h;
 
                 h["id"] = (*a)->getID();
+	    	    
+                if (!(*a)->aka.empty())
+                    h["kw"] = (*a)->getAllKeywordsString() + " " + (*a)->aka.toString();
+                else
+                    h["kw"] = (*a)->getAllKeywordsString();
 
-	    	    h["kw"] = (*a)->getAllKeywordsString();
+                for (auto &k: (*a)->getAllKeywords())
+                    h["kwList"].append(k);
+                
+                for (auto &k: (*a)->aka)
+                    h["kwList"].append(k);
 
-                for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
-                    h["kwList"].append(*k);
-
-                for (StringSet::const_iterator l = (*a)->labels.all.begin(); l != (*a)->labels.all.end(); l++) {
-                    h["labels"].append(*l);
-                    h["titles"][*l] = (*a)->getTitle(*l).colourStrip();
+                for (auto &l: (*a)->labels.all) {
+                    h["labels"].append(l);
+                    h["titles"][l] = (*a)->getTitle(l).colourStrip();
                 }
 
                 ostringstream textStream;

@@ -32,6 +32,7 @@ public:
     virtual const DLString &getLongName( ) const;
     virtual const DLString &getColor( ) const;
     virtual const DLString &getPaddedName( ) const;
+    virtual const DLString &getChannelPattern( ) const;
     
     virtual const DLString & getTitle( PCMemoryInterface * ) const;
     virtual bool isLeader( PCMemoryInterface * ) const;

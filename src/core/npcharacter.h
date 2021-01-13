@@ -77,11 +77,11 @@ public:
     virtual bool is_mirror( ) const;
 
     // configuration
-    virtual PlayerConfig::Pointer getConfig( ) const;
+    virtual PlayerConfig getConfig( ) const;
 
 public:
     MOB_INDEX_DATA *        pIndexData;
-    AREA_DATA *                zone;
+    AreaIndexData *                zone;
     /** Room VNUM where this mob was reset. */
     int reset_room;
     

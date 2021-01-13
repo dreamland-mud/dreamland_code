@@ -143,6 +143,9 @@ bool PCharacter::load( )
     for (int iNest = 0; iNest < MAX_NEST; iNest++ )
         rgObjNest[iNest] = 0;
 
+    // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
+    char_to_room(this, get_room_instance(ROOM_VNUM_LIMBO));
+   
     for ( ; ; ) {
         char letter;
         char *word;
@@ -177,7 +180,7 @@ bool PCharacter::load( )
         }
     }
     
-    if (!get_room_index( start_room )) {
+    if (!get_room_instance( start_room )) {
         if (is_immortal( ))
             start_room = ROOM_VNUM_CHAT;
         else
@@ -189,6 +192,7 @@ bool PCharacter::load( )
     mod_skills.clear();
     mod_skill_groups.clear();
     mod_level_all = 0;
+    mod_level_spell = 0;
     mod_level_skills.clear();
     mod_level_groups.clear();
     max_hit         = perm_hit;
@@ -214,11 +218,8 @@ bool PCharacter::load( )
 
     clear_fenia_skills( this );
     
-    // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
-    char_to_room(this, get_room_index(ROOM_VNUM_LIMBO));
-   
     /* Now add back spell effects. */
-    for (Affect *af = affected; af != 0; af = af->next)
+    for (auto &af: affected)
         affect_modify( this, af, true );
     
     /* Now start adding back the effects from items. Some of the items may add their own affects via onEquip progs,

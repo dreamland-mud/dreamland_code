@@ -6,8 +6,11 @@
 #include "save.h"
 
 #include "skillreference.h"
-
+#include "skillgroup.h"
+#include "liquid.h"
+#include "wearlocation.h"
 #include "affect.h"
+#include "affectmanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -20,13 +23,45 @@
 WEARLOC(none);
 WEARLOC(stuck_in);
 
+Affect * Affect::clone() const
+{
+    Affect *paf;
+
+    paf = AffectManager::getThis()->getAffect();
+    copyTo(*paf);
+
+    return paf;
+}
+
+void Affect::copyTo(Affect &target) const
+{
+    target.type     = type; 
+    target.level    = level;
+    target.duration = duration;
+    target.modifier = modifier;
+    
+    if (location.getTable() == 0)
+        target.location.setTable(&apply_flags);
+    else
+        target.location.setTable(location.getTable());
+
+    target.location.setValue(location.getValue());
+    target.bitvector.setBit(bitvector.getValue());
+    target.bitvector.setTable(bitvector.getTable());
+    target.global.setRegistry(global.getRegistry());
+    target.global.set(global);
+    target.ownerName = ownerName;
+}
+
 /*
  * Apply or remove an affect to an object.
  */
 void affect_remove_obj( Object *obj, Affect *paf )
 {
-    int where, vector;
-    if ( obj->affected == NULL )
+    if (paf->isExtracted())
+        return;
+
+    if ( obj->affected.empty())
     {
         bug( "Affect_remove_object: no affect.", 0 );
         return;
@@ -35,78 +70,39 @@ void affect_remove_obj( Object *obj, Affect *paf )
     if (obj->carried_by != NULL && obj->wear_loc != wear_none)
         affect_modify( obj->carried_by, paf, false );
 
-    where = paf->where;
-    vector = paf->bitvector;
+    const FlagTable *table = paf->bitvector.getTable();
+    int bits = paf->bitvector.getValue();
 
-    if (paf->bitvector)
-        switch( paf->where)
-        {
-        case TO_OBJECT:
-            REMOVE_BIT(obj->extra_flags,paf->bitvector);
-            break;
-        case TO_WEAPON:
-            if (obj->item_type == ITEM_WEAPON)
-                obj->value4(obj->value4() & ~paf->bitvector);
-            break;
-        }
-
-    if ( paf == obj->affected )
-    {
-        obj->affected    = paf->next;
-    }
-    else
-    {
-        Affect *prev;
-
-        for ( prev = obj->affected; prev != NULL; prev = prev->next )
-        {
-            if ( prev->next == paf )
-            {
-                prev->next = paf->next;
-                break;
-            }
-        }
-        if ( prev == NULL )
-        {
-            bug( "Affect_remove_object: cannot find paf.", 0 );
-            return;
-        }
+    if (table == &extra_flags) {
+        REMOVE_BIT(obj->extra_flags, bits);
+    } else if (table == &weapon_type2) {
+        if (obj->item_type == ITEM_WEAPON)
+            obj->value4(obj->value4() & ~bits);
     }
 
-    ddeallocate( paf );
+    obj->affected.remove(paf);
 
     if (obj->carried_by != NULL && obj->wear_loc != wear_none)
-        affect_check(obj->carried_by,where,vector);
+        affect_check(obj->carried_by, paf);
+
+    AffectManager::getThis()->extract(paf);
 }
 
-void affect_to_obj( Object *obj, Affect *paf )
+void affect_to_obj( Object *obj, const Affect *paf )
 {
-    Affect *paf_new;
+    obj->affected.push_front(paf->clone());
 
-    paf_new = dallocate( Affect );
-
-    *paf_new            = *paf;
-    paf_new->next       = obj->affected;
-    obj->affected                = paf_new;
-
-    if (paf->bitvector)
-        switch (paf->where)
-        {
-        case TO_OBJECT:
-            SET_BIT(obj->extra_flags,paf->bitvector);
-            break;
-        case TO_WEAPON:
-            if (obj->item_type == ITEM_WEAPON)
-                obj->value4(obj->value4() | paf->bitvector);
-            break;
-        }
+    if (paf->bitvector.getTable() == &extra_flags) {
+        SET_BIT(obj->extra_flags,paf->bitvector);
+    } else if (paf->bitvector.getTable() == &weapon_type2) {
+        if (obj->item_type == ITEM_WEAPON)
+            obj->value4(obj->value4() | paf->bitvector);
+    }
 }
 
-void affect_enhance( Object *obj, Affect *newAff )
+void affect_enhance( Object *obj, const Affect *newAff )
 {
-    Affect *paf;
-    
-    for (paf = obj->affected; paf != 0; paf = paf->next) {
+    for (auto &paf: obj->affected) {
         if (paf->location != newAff->location)
             continue;
         
@@ -127,11 +123,11 @@ void affect_enhance( Object *obj, Affect *newAff )
 void affect_enchant( Object *obj )
 {
     if (!obj->enchanted) {
-        Affect af, *paf;
+        Affect af;
 
         obj->enchanted = true;
 
-        for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next) {
+        for (auto &paf: obj->pIndexData->affected) {
             af = *paf;
             
             af.type = paf->type;
@@ -140,81 +136,66 @@ void affect_enchant( Object *obj )
     }
 }
 
+static Flags zeroFlags;
+
+static Flags & char_flag_by_table(Character *ch, const FlagTable *table)
+{
+    if (table == &affect_flags)
+        return ch->affected_by;
+    else if (table == &imm_flags)
+        return ch->imm_flags;
+    else if (table == &res_flags)
+        return ch->res_flags;
+    else if (table == &plr_flags || table == &act_flags)
+        return ch->act;
+    else if (table == &vuln_flags)
+        return ch->vuln_flags;
+    else if (table == &detect_flags)
+        return ch->detection;
+
+    return zeroFlags;
+}
+
+static const Flags & race_flag_by_table(const Race *race, const FlagTable *table)
+{
+    if (table == &affect_flags)
+        return race->getAff();
+    else if (table == &imm_flags)
+        return race->getImm();
+    else if (table == &res_flags)
+        return race->getRes();
+    else if (table == &plr_flags || table == &act_flags)
+        return race->getAct();
+    else if (table == &vuln_flags)
+        return race->getVuln();
+    else if (table == &detect_flags)
+        return race->getDet();
+
+    return Flags::emptyFlags;
+}
+
 /*
  * Apply or remove an affect to a character.
  */
 void affect_modify( Character *ch, Affect *paf, bool fAdd )
 {
-    int mod,i;
+    int mod, i;
+    const FlagTable *table = paf->bitvector.getTable();
 
-    mod = paf->modifier;
-
-    if ( fAdd )
-    {
-        switch (paf->where)
-        {
-        case TO_AFFECTS:
-             ch->affected_by.setBit(paf->bitvector);
-            break;
-        case TO_IMMUNE:
-            ch->imm_flags.setBit(paf->bitvector);
-            break;
-        case TO_RESIST:
-            ch->res_flags.setBit(paf->bitvector);
-            break;
-        case TO_ACT_FLAG:
-            ch->act.setBit(paf->bitvector);
-            break;
-        case TO_VULN:
-            ch->vuln_flags.setBit(paf->bitvector);
-            break;
-        case TO_DETECTS:
-            ch->detection.setBit(paf->bitvector);
-            break;
-        case TO_LOCATIONS:
-            if (!ch->is_npc( ))
-                ch->getPC( )->wearloc.remove( paf->global );
-            break;
-        case TO_RACE:
-            break;
-        }
-    }
-    else
-    {
-        switch (paf->where)
-        {
-        case TO_AFFECTS:
-            ch->affected_by.removeBit(paf->bitvector);
-            break;
-        case TO_IMMUNE:
-            ch->imm_flags.removeBit(paf->bitvector);
-            break;
-        case TO_RESIST:
-            ch->res_flags.removeBit(paf->bitvector);
-            break;
-        case TO_ACT_FLAG:
-            ch->act.removeBit(paf->bitvector);
-            break;
-        case TO_VULN:
-            ch->vuln_flags.removeBit(paf->bitvector);
-            break;
-        case TO_DETECTS:
-            ch->detection.removeBit(paf->bitvector);
-            break;
-        case TO_LOCATIONS:
-            if (!ch->is_npc( ))
-                ch->getPC( )->wearloc.set( paf->global );
-            break;
-        case TO_RACE:
-            break;
-        }
-        mod = 0 - mod;
+    if (table) {
+        char_flag_by_table(ch, table).changeBit(paf->bitvector, fAdd);
     }
 
-    switch ( paf->location )
+    if (paf->global.getRegistry() == wearlocationManager && !ch->is_npc()) {
+        ch->getPC()->wearloc.change(paf->global, !fAdd);
+    }
+
+    mod = (fAdd ? 1 : -1) * paf->modifier;
+
+    switch (paf->location)
     {
     default:
-        bug( "Affect_modify: unknown location %d.", paf->location );
+        bug( "Affect_modify: unknown location %d.", paf->location.getValue() );
         return;
 
     case APPLY_STR:           ch->mod_stat[STAT_STR]        += mod;        break;
@@ -222,7 +203,7 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     case APPLY_INT:           ch->mod_stat[STAT_INT]        += mod;        break;
     case APPLY_WIS:           ch->mod_stat[STAT_WIS]        += mod;        break;
     case APPLY_CON:           ch->mod_stat[STAT_CON]        += mod;        break;
-    case APPLY_CHA:              ch->mod_stat[STAT_CHA]        += mod; break;
+    case APPLY_CHA:           ch->mod_stat[STAT_CHA]        += mod; break;
     case APPLY_CLASS:                                                break;
     case APPLY_AGE:
         if (!ch->is_npc( ))
@@ -253,179 +234,79 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     case APPLY_NONE:
     case APPLY_LEARNED: 
         if (!ch->is_npc()) {
-            switch (paf->where) {
-                case TO_SKILLS:
-                    ch->getPC()->mod_skills.applyBitvector(paf->global, mod);
-                    break;
-                case TO_SKILL_GROUPS:
-                    ch->getPC()->mod_skill_groups.applyBitvector(paf->global, mod);
-                    break;
-            }
+            if (paf->global.getRegistry() == skillManager)
+                ch->getPC()->mod_skills.applyBitvector(paf->global, mod);
+            else if (paf->global.getRegistry() == skillGroupManager)
+                ch->getPC()->mod_skill_groups.applyBitvector(paf->global, mod);
         }
         break;
 
     case APPLY_LEVEL:
         if (!ch->is_npc()) {
-            switch (paf->where) {
-                case TO_SKILLS:
-                    ch->getPC()->mod_level_groups.applyBitvector(paf->global, mod);
-                    break;
-                case TO_SKILL_GROUPS:
-                    ch->getPC()->mod_level_groups.applyBitvector(paf->global, mod);
-                    break;
-                default:
-                    ch->getPC()->mod_level_all += mod;
-                    break;
-            }
+            if (paf->global.getRegistry() == skillManager)
+                ch->getPC()->mod_level_skills.applyBitvector(paf->global, mod);
+            else if (paf->global.getRegistry() == skillGroupManager)
+                ch->getPC()->mod_level_groups.applyBitvector(paf->global, mod);
+            else
+                ch->getPC()->mod_level_all += mod;
+        }
+        break;
+
+    case APPLY_SPELL_LEVEL:
+        if (!ch->is_npc()) {
+            ch->getPC()->mod_level_spell += mod;
         }
         break;
     }
 }
 
 
-/* fix object affects when removing one */
-void affect_check(Character *ch,int where,int vector)
+static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affect)
 {
-        Affect *paf;
-        Object *obj;
+    const FlagTable *table = affect->bitvector.getTable();
+    const GlobalRegistryBase *registry = affect->global.getRegistry();
+    Flags &charFlag = char_flag_by_table(ch, table);
+    int bits = affect->bitvector.getValue();
 
-        if (where == TO_OBJECT || where == TO_WEAPON || vector == 0)
-                return;
+    for (auto &paf : afflist)
+        if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
+            charFlag.setBit(paf->bitvector);
+        else if (paf->global.getRegistry() == registry && !ch->is_npc())
+            ch->getPC()->wearloc.remove(paf->global);
+}
 
-        for (paf = ch->affected; paf != 0; paf = paf->next)
-                if (paf->where == where && ( ( paf->bitvector & vector ) > 0 ) )
-                {
-                        switch (where)
-                        {
-                                case TO_AFFECTS:
-                                        ch->affected_by.setBit(paf->bitvector);
-                                        break;
-                                case TO_IMMUNE:
-                                        ch->imm_flags.setBit(paf->bitvector);
-                                        break;
-                                case TO_RESIST:
-                                        ch->res_flags.setBit(paf->bitvector);
-                                        break;
-                                case TO_ACT_FLAG:
-                                        ch->act.setBit(paf->bitvector);
-                                        break;
-                                case TO_VULN:
-                                        ch->vuln_flags.setBit(paf->bitvector);
-                                        break;
-                                case TO_DETECTS:
-                                        ch->detection.setBit(paf->bitvector);
-                                        break;
-                                case TO_LOCATIONS:
-                                        if (!ch->is_npc( ))
-                                            ch->getPC( )->wearloc.remove( paf->global );
-                                        break;
-                                case TO_RACE:
-                                        break;
-                        }
-                }
+/* fix object affects when removing one */
+void affect_check(Character *ch, Affect *affect)
+{
+    const FlagTable *table = affect->bitvector.getTable();
+    const GlobalRegistryBase *registry = affect->global.getRegistry();
 
-        for (obj = ch->carrying; obj != 0; obj = obj->next_content)
-        {
-                if (obj->wear_loc == wear_none || obj->wear_loc == wear_stuck_in)
-                        continue;
+    if (!table && registry != wearlocationManager)
+        return;
 
-                for ( paf = obj->affected; paf != 0; paf = paf->next )
-                        if ( paf->where == where && ( ( paf->bitvector & vector ) > 0 ) )
-                        {
-                                switch (where)
-                                {
-                                        case TO_AFFECTS:
-                                                ch->affected_by.setBit(paf->bitvector);
-                                                break;
-                                        case TO_IMMUNE:
-                                                ch->imm_flags.setBit(paf->bitvector);
-                                                break;
-                                        case TO_ACT_FLAG:
-                                                ch->act.setBit(paf->bitvector);
-                                                break;
-                                        case TO_RESIST:
-                                                ch->res_flags.setBit(paf->bitvector);
-                                                break;
-                                        case TO_VULN:
-                                                ch->vuln_flags.setBit(paf->bitvector);
-                                                break;
-                                        case TO_DETECTS:
-                                                ch->detection.setBit(paf->bitvector);
-                                                break;
-                                        case TO_LOCATIONS:
-                                            if (!ch->is_npc( ))
-                                                ch->getPC( )->wearloc.remove( paf->global );
-                                            break;
-                                        case TO_RACE:
-                                                break;
-                                }
-                        }
+    affectlist_reapply(ch->affected, ch, affect);
 
-                if (obj->enchanted)
-                        continue;
+    for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
+        if (!obj->wear_loc->givesAffects())
+            continue;
 
-                for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
-                        if (paf->where == where && ( ( paf->bitvector & vector ) > 0 ))
-                        {
-                                switch (where)
-                                {
-                                        case TO_AFFECTS:
-                                                ch->affected_by.setBit(paf->bitvector);
-                                                break;
-                                        case TO_IMMUNE:
-                                                ch->imm_flags.setBit(paf->bitvector);
-                                                break;
-                                        case TO_ACT_FLAG:
-                                                ch->act.setBit(paf->bitvector);
-                                                break;
-                                        case TO_RESIST:
-                                                ch->res_flags.setBit(paf->bitvector);
-                                                break;
-                                        case TO_VULN:
-                                                ch->vuln_flags.setBit(paf->bitvector);
-                                                break;
-                                        case TO_DETECTS:
-                                                ch->detection.setBit(paf->bitvector);
-                                                break;
-                                        case TO_LOCATIONS:
-                                            if (!ch->is_npc( ))
-                                                ch->getPC( )->wearloc.remove( paf->global );
-                                            break;
-                                        case TO_RACE:
-                                                break;
+        affectlist_reapply(obj->affected, ch, affect);
 
-                                }
-                        }
-        }
-    
-    RaceReference &race = ch->getRace( );
-    
-    switch (where) {
-    case TO_AFFECTS:
-            if (race->getAff( ).isSet( vector ))
-                ch->affected_by.setBit(race->getAff( ));
-            break;
-    case TO_IMMUNE:
-            if (race->getImm( ).isSet( vector ))
-                ch->imm_flags.setBit(race->getImm( ));
-            break;
-    case TO_RESIST:
-            if (race->getRes( ).isSet( vector ))
-                ch->res_flags.setBit(race->getRes( ));
-            break;
-    case TO_VULN:
-            if (race->getVuln( ).isSet( vector ))
-                ch->vuln_flags.setBit(race->getVuln( ));
-            break;
-    case TO_DETECTS:
-            if (race->getDet( ).isSet( vector ))
-                ch->detection.setBit(race->getDet( ));
-            break;
+        if (obj->enchanted)
+            continue;
+
+        affectlist_reapply(obj->pIndexData->affected, ch, affect);
     }
 
-    if (where == TO_AFFECTS && IS_SET(vector, AFF_FLYING))
-        if (!ch->affected_by.isSet( AFF_FLYING ))
-            ch->posFlags.removeBit( POS_FLY_DOWN );
+    if (table) {    
+        const Flags &raceFlag = race_flag_by_table(ch->getRace().getElement(), table);
+        Flags &charFlag = char_flag_by_table(ch, table);
+        charFlag.setBit(raceFlag.getValue());
+
+        if (table == &affect_flags && affect->bitvector.isSet(AFF_FLYING))
+            if (!ch->affected_by.isSet(AFF_FLYING))
+                ch->posFlags.removeBit(POS_FLY_DOWN);
+    }
 }
 
 /*
@@ -433,21 +314,16 @@ void affect_check(Character *ch,int where,int vector)
  */
 void affect_to_char( Character *ch, Affect *paf )
 {
-        Affect *paf_new;
         bool need_saving = false;
 
-        paf_new = dallocate( Affect );
-
-        *paf_new                = *paf;
-        paf_new->next        = ch->affected;
-        ch->affected        = paf_new;
+        ch->affected.push_front(paf->clone());
 
         need_saving = ch->is_npc( )
-                && paf_new->where == TO_AFFECTS
-                && IS_SET( paf_new->bitvector, AFF_CHARM )
+                && paf->bitvector.getTable() == &affect_flags
+                && paf->bitvector.isSet(AFF_CHARM)
                 && ch->in_room;
 
-        affect_modify( ch, paf_new, true );
+        affect_modify( ch, paf, true );
 
         if ( need_saving )
                 save_mobs( ch->in_room );
@@ -460,11 +336,12 @@ void affect_to_char( Character *ch, Affect *paf )
  */
 void affect_remove( Character *ch, Affect *paf )
 {
-        int where;
-        int vector;
+        if (paf->isExtracted())
+            return;
+            
         bool need_saving = false;
 
-        if ( ch->affected == 0 )
+        if ( ch->affected.empty())
         {
                 bug( "Affect_remove: no affect.", 0 );
                 return;
@@ -472,48 +349,19 @@ void affect_remove( Character *ch, Affect *paf )
 
         affect_modify( ch, paf, false );
 
-        where = paf->where;
-        vector = paf->bitvector;
-
         need_saving = ch->is_npc( )
-                && where == TO_AFFECTS
-                && IS_SET( vector, AFF_CHARM )
+                && paf->bitvector.getTable() == &affect_flags
+                && paf->bitvector.isSet(AFF_CHARM)
                 && ch->in_room;
 
-        if ( paf == ch->affected )
-        {
-                ch->affected        = paf->next;
-        }
-        else
-        {
-                Affect *prev;
+        ch->affected.remove(paf);
 
-                for ( prev = ch->affected; prev != 0; prev = prev->next )
-                {
-                        if ( prev->next == paf )
-                        {
-                                prev->next = paf->next;
-                                break;
-                        }
-                }
-
-                if ( prev == 0 )
-                {
-                        char bugbuf[MAX_STRING_LENGTH];
-                        sprintf( bugbuf, "%s: Affect_remove: cannot find paf.", ch->getNameP() );
-                        bug( bugbuf, 0 );
-                        return;
-                }
-        }
-
-        ddeallocate( paf );
-
-        affect_check(ch,where,vector);
+        affect_check(ch, paf);
 
         if ( need_saving )
                 save_mobs( ch->in_room );
 
-        return;
+        AffectManager::getThis()->extract(paf);
 }
 
 /*
@@ -521,52 +369,31 @@ void affect_remove( Character *ch, Affect *paf )
  */
 void affect_strip( Character *ch, int sn )
 {
-        Affect *paf;
-        Affect *paf_next;
+    for (auto &paf: ch->affected.findAll(sn))
+        affect_remove( ch, paf );
+}
 
-        for ( paf = ch->affected; paf != 0; paf = paf_next )
-        {
-                paf_next = paf->next;
-                if ( paf->type == sn )
-                        affect_remove( ch, paf );
-        }
-
-        return;
+void affect_strip( Object *obj, int sn )
+{
+    for (auto &paf: obj->affected.findAll(sn))
+        affect_remove_obj( obj, paf );
 }
 
 /*
  * Strip all affects which affect given bitvector
  */
-void affect_bit_strip(Character *ch, int where, int bits)
+void affect_bit_strip(Character *ch, const FlagTable *table, int bits)
 {
-    Affect *paf, *paf_next;
-
-    for (paf = ch->affected; paf; paf = paf_next) {
-        paf_next = paf->next;
-
-        if (paf->where == where && (paf->bitvector & bits))
-            affect_remove(ch, paf);
-    }
+    for (auto &paf: ch->affected.findAllWithBits(table, bits))
+        affect_remove(ch, paf);
 }
-
-bool affect_bit_check( Affect *paf_list, short where, int bits )
-{
-    for (Affect *paf = paf_list; paf; paf = paf->next)
-        if (paf->where == where && (paf->bitvector & bits))
-            return true;
-
-    return false;
-}
-
 
 /*
  * Add or enhance an affect.
  */
 void affect_join( Character *ch, Affect *paf )
 {
-    Affect *paf_old;
-
-    for ( paf_old = ch->affected; paf_old != 0; paf_old = paf_old->next )
+    for (auto &paf_old: ch->affected)
     {
         if ( paf_old->type == paf->type )
         {
@@ -593,14 +420,45 @@ void postaffect_to_char( Character *ch, int sn, int duration )
 {
     Affect af;
 
-    af.where                = TO_AFFECTS;
     af.type             = sn;
     af.level            = ch->getModifyLevel( );
     af.duration         = duration;
-    af.bitvector        = 0;
-    af.modifier         = 0;
-    af.location         = APPLY_NONE;
-
+    
     affect_to_char(ch, &af);
 }  
 
+/** Compat method for reading affects from old .player profiles. */
+const FlagTable * affect_where_to_table(int where)
+{
+    switch (where) {
+    case TO_OBJECT: return &extra_flags;
+    case TO_WEAPON: return &weapon_type2;
+    case TO_AFFECTS: return &affect_flags;       
+    case TO_IMMUNE: return &imm_flags;
+    case TO_RESIST: return &res_flags;
+    case TO_VULN: return &vuln_flags;
+    case TO_ACT_FLAG: return &plr_flags;
+    case TO_DETECTS: return &detect_flags;
+    default: return 0;
+    }
+}
+
+/** Compat method for writing affects to the old .player profiles. */
+int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry)
+{
+    if (table == &extra_flags) return TO_OBJECT;
+    if (table == &weapon_type2) return TO_WEAPON;
+    if (table == &affect_flags) return TO_AFFECTS;       
+    if (table == &imm_flags) return TO_IMMUNE;
+    if (table == &res_flags) return TO_RESIST;
+    if (table == &vuln_flags) return TO_VULN;
+    if (table == &plr_flags) return TO_ACT_FLAG;
+    if (table == &detect_flags) return TO_DETECTS;
+
+    if (registry == wearlocationManager) return TO_LOCATIONS;
+    if (registry == liquidManager) return TO_LIQUIDS;
+    if (registry == skillManager) return TO_SKILLS;
+    if (registry == skillGroupManager) return TO_SKILL_GROUPS;
+
+    return 0;
+}

@@ -13,7 +13,7 @@
 #include "bonus.h"
 
 class XMLAttributeReligion: public XMLVariableContainer, 
-                            public virtual EventHandler<ScoreArguments>
+                            public virtual AttributeEventHandler<ScoreArguments>
 {
 XML_OBJECT
 public:

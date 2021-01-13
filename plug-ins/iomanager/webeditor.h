@@ -24,6 +24,6 @@ public:
     DLString text;
 };
 
-extern template class EventHandler<WebEditorSaveArguments>;
+extern template class AttributeEventHandler<WebEditorSaveArguments>;
 
 #endif

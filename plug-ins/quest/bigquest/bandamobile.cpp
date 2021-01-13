@@ -131,7 +131,7 @@ BandaItem::~BandaItem()
 
 void BandaItem::getByOther( Character *ch ) 
 {
-    ch->pecho( "%1$O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
+    ch->pecho( "%1$^O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
 }
 
 void BandaItem::getByHero( PCharacter *ch ) 

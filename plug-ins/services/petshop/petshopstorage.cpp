@@ -109,7 +109,7 @@ void PetShopStorage::msgArticleTooFew( Character *client, Article::Pointer )
 
 Article::Pointer PetShopStorage::findArticle( Character *client, DLString &arguments )
 {
-    return getPetBehavior( get_char_room( client, room, arguments ) );
+    return getPetBehavior( get_char_room( client, room, arguments, false ) );
 }
 
 Pet::Pointer PetShopStorage::getPetBehavior( Character *pet ) const

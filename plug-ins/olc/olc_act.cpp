@@ -36,10 +36,10 @@
 
 #include "olc.h"
 #include "loadsave.h"
+#include "material-table.h"
 #include "damageflags.h"
 #include "recipeflags.h"
 #include "religionflags.h"
-#include "material.h"
 #include "def.h"
 
 GROUP(defensive);
@@ -57,12 +57,12 @@ struct olc_help_type {
 int skill_table;
 int wearloc_table;
 int liq_table;
-int mat_table;
 int group_table;
 int race_table;
 int class_table;
 int clan_table;
 int religion_table;
+int mat_table;
 
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
@@ -74,6 +74,8 @@ const struct olc_help_type help_table[] =
     {"room_flags", &room_flags, "Флаги комнат (поле room_flags)."},
     {"sector_table", &sector_table, "Тип местности в комнате (поле sector_type)."},
     {"exit_flags", &exit_flags, "Флаги выходов и экстравыходов (поле exit_info)."},
+    {"reset_flags", &reset_flags, "Флаги ресетов."},
+    {"rand_table", &rand_table, "Рандомные предметы (поле rand у ресетов)."},
 
     {"{YПредметы{x", NULL, NULL},
     {"item_table", &item_table, "Типы предметов (поле item_type)."},
@@ -88,7 +90,8 @@ const struct olc_help_type help_table[] =
     {"drink_flags", &drink_flags, "Флаги емкости для жидкостей (поле value3)."},
     {"recipe_flags", &recipe_flags, "Флаги рецептов (поле value0 у рецепта)"},
     {"liquid", &liq_table, "Жидкости (поле value2 у емкостей и фонтанов)."},
-    {"material", &mat_table, "Материалы предметов и мобов (поле material)." },
+    {"material", &mat_table, "Материалы предметов и мобов."},
+
 
     {"{YМобы и персонажи{x", NULL, NULL},
     {"races", &race_table, "Список всех рас мобов."},
@@ -96,7 +99,7 @@ const struct olc_help_type help_table[] =
     {"clans", &clan_table, "Список всех кланов."},
     {"religion", &religion_table, "Список всех религий."},
     {"religion_flags", &religion_flags, "Флаги религий."},
-    {"align_table", &align_table, "Характер персонажа."},
+    {"align_table", &align_table, "Натура персонажа."},
     {"ethos_table", &ethos_table, "Этос персонажа."},
     {"stat_table", &stat_table, "Параметры персонажа."},
     {"sex_table", &sex_table, "Пол моба (поле sex)."},
@@ -198,21 +201,6 @@ void show_spec_cmds(Character * ch)
     stc(buf1, ch);
 }
 
-void show_mat_cmds( Character *ch )
-{
-    ostringstream buf;
-    const material_t *mat;
-    
-    buf << "{gНазвание        Описание               Горючесть{x" << endl;
-    for (mat = &material_table[0]; mat->name; mat++)
-        buf << fmt( 0, "%-15s %-22N1 %-3d\n\r", 
-                       mat->name, 
-                       mat->rname ? mat->rname : "",
-                       mat->burns );
-
-    page_to_char( buf.str( ).c_str( ), ch );
-}
-
 void show_liq_cmds(Character * ch)
 {
     std::basic_ostringstream<char> buf;
@@ -274,10 +262,6 @@ bool show_help(Character * ch, const char *cargument)
             }
             else if (help_table[cnt].structure == &liq_table) {
                 show_liq_cmds(ch);
-                return false;
-            }
-            else if (help_table[cnt].structure == &mat_table) {
-                show_mat_cmds(ch);
                 return false;
             }
             else if (help_table[cnt].structure == &wearloc_table) {
@@ -356,6 +340,22 @@ bool show_help(Character * ch, const char *cargument)
                 }
                 buf << endl;
                 ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &mat_table) {
+                ostringstream buf;
+                buf << fmt(0, "{G%-14s {W%15s %10s {m%13s {G%s\r\n",
+                             "NAME", "TYPES", "FLAGS", "VULN", "RUSSIAN");
+
+                for (auto &m: material_table)
+                    buf << fmt(0, "{g%-14s{x %15s %10s {m%13s {g%s{x\r\n",
+                                m.name.c_str(),
+                                m.type.names().c_str(),
+                                m.flags.names().c_str(),
+                                m.vuln.names().c_str(),
+                                m.rname.c_str());
+                buf << "See {y{hcfedit material{x for more details." << endl;
+                page_to_char(buf.str( ).c_str( ), ch);
                 return false;
             }
             else if (help_table[cnt].structure == &skill_table) {

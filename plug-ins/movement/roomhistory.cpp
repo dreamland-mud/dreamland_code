@@ -5,7 +5,7 @@
 #include "directions.h"
 
 #include "room.h"
-#include "character.h"
+#include "pcharacter.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -22,7 +22,8 @@ void RoomHistory::record( Character *ch, int door )
         return;
 
     erase( );
-    push_front( RoomHistoryEntry( ch->getName( ), door ) );
+    push_front( RoomHistoryEntry( 
+        ch->getName( ), ch->getPC()->getRussianName().getFullForm(), door ) );
 }
 
 void RoomHistory::erase( )
@@ -44,13 +45,18 @@ int RoomHistory::went( Character *ch ) const
 
 int RoomHistory::went( DLString &arg, bool fStrict ) const
 {
-    for (const_iterator h = begin( ); h != end( ); h++)
-        if ((fStrict && h->name == arg)
-            || is_name( arg.c_str( ), h->name.c_str( ) ))
+    bool rus = arg.isRussian();
+
+    for (const_iterator h = begin( ); h != end( ); h++) {
+        DLString name = rus ? h->rname.ruscase('1') : h->name;
+
+        if ((fStrict && name == arg)
+            || is_name( arg.c_str( ), name.c_str( ) ))
         {
-            arg = h->name;
+            arg = rus ? h->rname : h->name;
             return h->went;
         }
+    }
 
     return -1;
 }

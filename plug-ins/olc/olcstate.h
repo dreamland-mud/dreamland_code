@@ -22,7 +22,7 @@ using namespace std;
 #include "arg_utils.h"
 
 class Descriptor;
-struct area_data;
+struct AreaIndexData;
 class GlobalBitvector;
 
 typedef enum {
@@ -30,7 +30,10 @@ typedef enum {
     ED_UPPER_FIRST_CHAR=1,
     ED_NO_NEWLINE=2,
     ED_ADD_NEWLINE=4,
-    ED_HELP_HINTS=8
+    ED_HELP_HINTS=8,
+    ED_UPPERCASE=16,
+    ED_JSON=32,
+    ED_CALL_DONE=64
 } editor_flags;
 
 class OLCCommand : public CommandBase {
@@ -74,13 +77,13 @@ public:
     void detach( PCharacter * );
     
     static bool can_edit( Character *, int );
-    static bool can_edit( Character *, area_data * );
+    static bool can_edit( Character *, AreaIndexData * );
     
     /** Find OLC input handler for descriptor. */
     static OLCState::Pointer getOLCState(Descriptor *d);
 
     /** returns corresponding area pointer for mob/room/obj vnum */
-    static area_data *get_vnum_area( int );
+    static AreaIndexData *get_vnum_area( int );
 
 protected:
     virtual void statePrompt( Descriptor *d ) = 0;

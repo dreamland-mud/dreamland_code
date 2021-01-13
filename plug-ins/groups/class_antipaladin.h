@@ -25,8 +25,6 @@ public:
         
         ShadowBlade( );
         
-        void adjustLevel( int level );
-
         virtual bool area( );
         virtual bool quit( Character *ch, bool count );
         virtual void fight( Character *victim );

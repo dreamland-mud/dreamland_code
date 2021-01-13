@@ -78,10 +78,11 @@
 #include "object.h"
 
 #include "wiznet.h"
-#include "def.h"
 #include "handler.h"
+#include "weapons.h"
 #include "act_move.h"
 #include "vnum.h"
+#include "def.h"
 
 /***************************************************************************
  ************************      auction.c      ******************************
@@ -89,6 +90,15 @@
 
 #define PULSE_AUCTION             (45 * dreamland->getPulsePerSecond( )) /* 60 seconds */
 #define AUC_TIMER_CUTOFF          24
+
+static bool buyer_can_trade()
+{
+    if (auction->buyer->in_room
+        && IS_SET(auction->buyer->in_room->areaIndex()->area_flag, AREA_DUNGEON))
+        return false;
+
+    return true;
+}
 
 void talk_auction(const char *argument)
 {
@@ -108,7 +118,7 @@ void talk_auction(const char *argument)
         if (IS_SET(ch->getPC( )->comm, COMM_NOAUCTION))
             continue;
     
-        bool fRussian = ch->getConfig()->rucommands;
+        bool fRussian = ch->getConfig().rucommands;
         ch->pecho(POS_SLEEPING, fRussian ? msg_ru.c_str() : msg_en.c_str());
     }
 }
@@ -208,7 +218,7 @@ void auction_update (void)
             }
             case 3 : /* SOLD! */
 
-            if (auction->bet > 0)
+            if (auction->bet > 0 && buyer_can_trade())
             {
                 sprintf (buf, "%s получает %s{Y за %d золот%s{x.",
                     auction->buyer->getNameP( '1' ).c_str( ),
@@ -329,7 +339,7 @@ CMDRUNP( auction )
 
                             for (int i = 0; i < wearlocationManager->size( ); i++) {
                                 Wearlocation *loc = wearlocationManager->find( i );
-                                if (loc->matches( obj ))
+                                if (loc->matches( obj ) && !loc->getPurpose().empty())
                                     purposes[loc->getPurpose( )] = true;
                             }
                             for (p = purposes.begin( ); p != purposes.end( ); p++)
@@ -340,7 +350,7 @@ CMDRUNP( auction )
                                 ch->printf("Тип оружия: %s (%s), среднее повреждение %d.\r\n",
                                            weapon_class.message(obj->value0() ).c_str( ),
                                            weapon_class.name( obj->value0() ).c_str( ),
-                                          (1 + obj->value2()) * obj->value1() / 2);
+                                           weapon_ave(obj));
                         }
 
                         if (obj->timer != 0) {
@@ -416,7 +426,7 @@ CMDRUNP( auction )
                         }
 
                         if (auction->item->pIndexData->limit != -1 && auction->item->isAntiAligned(ch)) {
-                            ch->pecho("Твой характер не позволит тебе владеть этим предметом.");
+                            ch->pecho("Твоя натура не позволит тебе владеть этим предметом.");
                             return;
                         }
 

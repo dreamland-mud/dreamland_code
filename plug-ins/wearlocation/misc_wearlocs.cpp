@@ -137,6 +137,110 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
     return RC_WEAR_OK;
 }
 
+/*
+ * sheath (random weapons wearloc)
+ */
+
+bool SheathWearloc::matches( Character *ch )
+{
+    return true;
+}
+
+bool SheathWearloc::displayFlags(Character *ch, Object *obj)
+{
+    return false;
+}
+
+/** 
+ * Sheath wearloc shows shortened item name for auto-generated weapons, stored during
+ * generation as eqName property. Prefixes and suffixes are hidden.
+ */
+DLString SheathWearloc::displayName(Character *ch, Object *obj)
+{
+    DLString eqName = obj->getProperty("eqName");
+
+    if (!eqName.empty())
+        return eqName.ruscase('1');
+
+    return DefaultWearlocation::displayName(ch, obj);
+}
+
+/**
+ * Sheath wearloc looks different depending on item type or item proto properties.
+ */
+DLString SheathWearloc::displayLocation(Character *ch, Object *obj)
+{
+    return getConfig(obj).msgDisplay;
+}
+
+void SheathWearloc::onFight(Character *ch, Object *obj)
+{
+    // Unequip odd weapons first.
+    Object *wield = wear_wield->find(ch);
+    if (wield && wield->reset_mob != ch->getID()) 
+        wear_wield->unequip(wield);
+
+    if (wear_wield->find(ch))
+        return;
+        
+    // Change location from sheath to wield; no need to remove and reapply the affects.
+    ch->pecho(getMsgSelfRemove(obj).c_str(), ch, obj);
+    ch->recho(getMsgRoomRemove(obj).c_str(), ch, obj);
+
+    obj->wear_loc = wear_wield;
+}
+
+const DLString &SheathWearloc::getMsgSelfRemove(Object *obj) const
+{
+    return getConfig(obj).msgSelfRemove;
+}
+
+const DLString &SheathWearloc::getMsgRoomRemove(Object *obj) const
+{
+    return getConfig(obj).msgRoomRemove;
+}
+
+const DLString &SheathWearloc::getMsgSelfWear(Object *obj) const
+{
+    return getConfig(obj).msgSelfWear;
+}
+
+const DLString &SheathWearloc::getMsgRoomWear(Object *obj) const
+{
+    return getConfig(obj).msgRoomWear;
+}
+
+/** Decide which group of messages to show for the item. */
+const SheathConfig & SheathWearloc::getConfig(Object *obj) const
+{
+    DLString key;
+
+    if (!obj)
+        key = "back";
+    else if (!obj->getProperty("eqKey").empty())
+        key = obj->getProperty("eqKey");
+    else if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS))
+        key = "back";
+    else {
+        switch (obj->value0()) {
+            case WEAPON_SWORD:
+            case WEAPON_DAGGER:
+                key = "scabbard";
+                break;
+            case WEAPON_SPEAR:
+            case WEAPON_POLEARM:
+            case WEAPON_LANCE:
+            case WEAPON_BOW:
+                key = "back";
+                break;
+            default:
+                key = "belt";
+                break;
+        }
+    }
+
+    return config.find(key)->second;
+}
 
 /*
  * wield 
@@ -226,7 +330,7 @@ void WieldWearloc::reportWeaponSkill( Character *ch, Object *obj )
             msg = "Ты все еще не готов{Sfа{Sx как следует владеть $o5.{/Владение экзотическим оружием зависит от твоего опыта и интеллекта.";    
     } else {
         if (sn != gsn_exotic)
-            msg = "Ты понятия не имеешь, как орудовать $o5.{/Возможно, стоит попрактироваться в умении владеть этим типом оружия.";
+            msg = "Ты понятия не имеешь, как орудовать $o5.{/Возможно, стоит попрактиковаться в умении владеть этим типом оружия.";
         else
             msg = "Ты пока не готов{Sfа{Sx как следует владеть $o5.{/Владение экзотическим оружием зависит от твоего опыта и интеллекта.";
     }
@@ -351,7 +455,5 @@ int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
 
 bool obj_is_worn(Object *obj)
 {
-    return obj->wear_loc != wear_none 
-            && obj->wear_loc != wear_tail
-            && obj->wear_loc != wear_hair;
+    return obj->wear_loc->givesAffects();
 }

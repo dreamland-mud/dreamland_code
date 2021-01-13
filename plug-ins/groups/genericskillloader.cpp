@@ -17,32 +17,7 @@ const DLString GenericSkillLoader::NODE_NAME = "skill";
 void GenericSkillLoader::initialization( )
 {
     XMLTableLoaderPlugin::initialization( );
-    resolveAll( );
     dumpCSV();
-}
-
-void GenericSkillLoader::destruction( )
-{
-    unresolveAll( );
-    XMLTableLoaderPlugin::destruction( );
-}
-
-void GenericSkillLoader::resolveAll( )
-{
-    for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) {
-        GenericSkill *skill = e->getStaticPointer<GenericSkill>( );
-
-        skill->resolve( );
-    }
-}
-
-void GenericSkillLoader::unresolveAll( )
-{
-    for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) {
-        GenericSkill *skill = e->getStaticPointer<GenericSkill>( );
-
-        skill->unresolve( );
-    }
 }
 
 /** Create a CSV file with all professional skills and their levels. */

@@ -19,11 +19,11 @@ public:
     virtual int  getThac32( Character * = NULL ) const;
     virtual int getStat( bitnumber_t, Character * = NULL ) const;
     virtual bool isPlayed( ) const;
-    virtual GlobalBitvector toVector( Character * = NULL ) const;
+    virtual GlobalBitvector toVector( CharacterMemoryInterface * = NULL ) const;
     virtual Flags getFlags( Character * = NULL ) const;
 
 private:
-    void checkTarget( Character * ) const ;
+    void checkTarget( CharacterMemoryInterface * ) const ;
 };
 
 #endif

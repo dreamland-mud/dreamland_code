@@ -27,7 +27,7 @@ OLCStateArea::OLCStateArea() : vnum( -1 ), area_flag(0, &area_flags)
     /*fromXML will!*/
 }
 
-OLCStateArea::OLCStateArea(AREA_DATA *original) : area_flag(0, &area_flags)
+OLCStateArea::OLCStateArea(AreaIndexData *original) : area_flag(0, &area_flags)
 {
     if (original) {
         if(original->area_file->file_name)
@@ -36,8 +36,6 @@ OLCStateArea::OLCStateArea(AREA_DATA *original) : area_flag(0, &area_flags)
             name      = original->name;
         if(original->name)
             credits   = original->credits;
-        age       = original->age;
-        nplayer   = original->nplayer;
         low_range = original->low_range;
         high_range= original->high_range;
         min_vnum  = original->min_vnum;
@@ -70,7 +68,6 @@ OLCStateArea::OLCStateArea(AREA_DATA *original) : area_flag(0, &area_flags)
         vnum = top_area - 1;
 
         name = "New area";
-        area_flag.setBit( AREA_ADDED );
         security = 9;
         authors = "None";
         translator = "None";
@@ -80,8 +77,6 @@ OLCStateArea::OLCStateArea(AREA_DATA *original) : area_flag(0, &area_flags)
         max_vnum = 0;
         low_range = 0;
         high_range = 0;
-        age = 0;
-        nplayer = 0;
         credits = "None";
         resetmsg = "";
         file_name.setValue( DLString( "area" ) + DLString( vnum ) + ".are" );
@@ -94,18 +89,16 @@ OLCStateArea::~OLCStateArea()
 
 void OLCStateArea::commit() 
 {
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
     
     if(!original) {
-        original = new AREA_DATA;
-        original->next = NULL;
+        original = new AreaIndexData;
         original->area_file = new_area_file( file_name.getValue( ).c_str( ) );
         original->area_file->area = original;
-        original->empty = true;
-        original->count = 0;
 
-        area_last->next = original;
-        area_last = original;
+        areaIndexes.push_back(original);
+
+        original->create();
     }
     else {
         free_string(original->area_file->file_name);
@@ -121,8 +114,6 @@ void OLCStateArea::commit()
 
     original->name      = str_dup( name.getValue( ).c_str( ) );
     original->credits   = str_dup( credits.getValue( ).c_str( ) );
-    original->age       = age;
-    original->nplayer   = nplayer;
     original->low_range = low_range;
     original->high_range= high_range;
     original->min_vnum  = min_vnum;
@@ -135,6 +126,7 @@ void OLCStateArea::commit()
     original->translator = str_dup( translator.getValue( ).c_str( ) );
     original->speedwalk = str_dup( speedwalk.getValue( ).c_str( ) );
     original->vnum = vnum;
+    original->changed = true;
 
     if (!behavior.empty( )) 
         try {
@@ -144,6 +136,9 @@ void OLCStateArea::commit()
         } catch (const Exception &e) {
             LogStream::sendError( ) << e.what( ) << endl;
         }
+
+    // FIXME update all instances
+    original->area->area_flag = area_flag;
 }
 
 void OLCStateArea::statePrompt(Descriptor *d) 
@@ -153,9 +148,7 @@ void OLCStateArea::statePrompt(Descriptor *d)
 
 bool OLCStateArea::checkOverlap(int lower, int upper)
 {
-    AREA_DATA *pArea;
-
-    for (pArea = area_first; pArea; pArea = pArea->next) {
+    for(auto &pArea: areaIndexes) {
         if(pArea->vnum == vnum)
             continue;
             
@@ -170,7 +163,9 @@ bool OLCStateArea::checkOverlap(int lower, int upper)
 
 void OLCStateArea::changed( PCharacter *ch )
 {
-    area_flag.setValue( area_flag.getValue( ) | AREA_CHANGED);
+    AreaIndexData *original = get_area_data(vnum);    
+    if (original)
+        original->changed = true;
 }
 
 // Area Editor Functions.
@@ -180,8 +175,6 @@ AEDIT(show, "показать", "показать все поля")
     ptc(ch, "File:       [%s]\n\r", file_name.getValue( ).c_str( ));
     ptc(ch, "Vnums:      [%u-%u]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
     ptc(ch, "Levels:     [%u-%u]\n\r", low_range.getValue( ), high_range.getValue( ));
-    ptc(ch, "Age:        [%d]\n\r", age.getValue( ));
-    ptc(ch, "Players:    [%d]\n\r", nplayer.getValue( ));
     ptc(ch, "Security:   [%d]\n\r", security.getValue( ));
     ptc(ch, "Authors:    [%s]\n\r", authors.getValue( ).c_str( ));
     ptc(ch, "Credits:    [%s]\n\r", credits.getValue( ).c_str( ));
@@ -193,7 +186,7 @@ AEDIT(show, "показать", "показать все поля")
     if (!behavior.empty( ))
         ptc(ch, "Behavior:\r\n%s", behavior.c_str( ));
 
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
     if (original) {
         DLString buf;
 
@@ -217,7 +210,7 @@ AEDIT(show, "показать", "показать все поля")
 AEDIT(helps, "справка", "создать или посмотреть справку по зоне")
 {
     DLString arg = argument;
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
 
     if (!original) {
         stc("Сперва сохрани новую арию.", ch);
@@ -242,7 +235,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
         if (!hasHelp)
             ch->println("    (нет)");
 
-        AreaHelp *ahelp = get_area_help(original);
+        AreaHelp *ahelp = area_selfhelp(original);
         if (!ahelp || !ahelp->persistent)
             ch->println("Используй {y{hchelp create{x для создания справки по зоне.");
 
@@ -250,7 +243,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
     }
 
     if (arg_oneof(arg, "create", "создать")) {
-        AreaHelp *ahelp = get_area_help(original);
+        AreaHelp *ahelp = area_selfhelp(original);
         if (!ahelp) {
             ch->println("Не найдена автоматическая справка по этой зоне, что-то поломалось.");
             return false;
@@ -269,7 +262,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
             ahelp->setKeywordAttribute(kwd.toString());
 
             ahelp->setID(
-                helpManager->getLastID() + 1
+                help_next_free_id()
             );
             helpManager->unregistrate(AreaHelp::Pointer(ahelp));
             helpManager->registrate(AreaHelp::Pointer(ahelp));
@@ -288,10 +281,11 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
 
 AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
 {
-    AREA_DATA *original = get_area_data(vnum);
+    AreaIndexData *original = get_area_data(vnum);
 
     if (original) {
-        reset_area(original);
+        // FIXME reset either all instances or the current one.
+        reset_area(original->area, FRESET_ALWAYS);
         stc("Ария сброшена.\n\r", ch);
         return false;
     }
@@ -302,8 +296,9 @@ AEDIT(reset, "сбросить", "сбросить арию, обновив вс
 
 AEDIT(create, "создать", "создать новую арию")
 {
-    OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
+    OLCStateArea::Pointer ae(NEW, (AreaIndexData *)NULL);
     ae->attach(ch);
+    ae->findCommand(ch, "show")->run(ch, "");
 
     stc("Aрия создана.\n\r", ch);
     return false;
@@ -366,7 +361,6 @@ AEDIT(flags, "флаги", "установить или сбросить фла�
     }
     
     area_flag.toggleBit( value );
-    area_flag.setBit( AREA_CHANGED );
     stc("Flag toggled.\n\r", ch);
     return true;
 }
@@ -413,24 +407,6 @@ AEDIT(file, "файл", "установить имя файла, в которы
     stc("Filename set.\n\r", ch);
     return true;
 }
-
-AEDIT(age, "возраст", "установить текущий возраст арии (как скоро наступит автосброс)")
-{
-    char age[MAX_STRING_LENGTH];
-
-    one_argument(argument, age);
-
-    if (!is_number(age) || !*age) {
-        stc("Syntax:  age [#xage]\n\r", ch);
-        return false;
-    }
-
-    this->age = atoi(age);
-
-    stc("Age set.\n\r", ch);
-    return true;
-}
-
 
 AEDIT(security, "права", "установить уровень доступа к арии, 0..9")
 {
@@ -706,11 +682,11 @@ AEDIT(dump, "вывод", "(отладка) вывести внутреннее 
 CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
         "Online area editor.")
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
     char arg[MAX_STRING_LENGTH];
 
-    pArea = ch->in_room->area;
+    pArea = ch->in_room->areaIndex();
 
     argument = one_argument(argument, arg);
     if (is_number(arg)) {
@@ -727,8 +703,9 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 stc("Insuficiente seguridad para crear areas.\n\r", ch);
                 return;
             }
-            OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
+            OLCStateArea::Pointer ae(NEW, (AreaIndexData *)NULL);
             ae->attach(ch);
+            ae->findCommand(ch, "show")->run(ch, "");
             stc("Ария создана.\r\n", ch);
             return;
         }
@@ -741,5 +718,6 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     OLCStateArea::Pointer ae(NEW, pArea);
     ae->attach(ch);
+    ae->findCommand(ch, "show")->run(ch, "");
 }
 

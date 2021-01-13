@@ -50,7 +50,6 @@ public:
 
     virtual int getManaCost( Character * );
     virtual int getMaxRange( Character * ) const;                
-    virtual Character * getCharSpell( Character *, const DLString &, int *, int * );
     virtual bool spellbane( Character *, Character * ) const; 
     virtual void utter( Character * );
     virtual int getSpellLevel( Character *, int );
@@ -68,6 +67,8 @@ public:
     virtual bool checkPosition( Character * ) const;
 
 protected:
+    Character * getCharSpell( Character *, const DLString &, int *, int *, ostringstream &errbuf );
+    
     void baneMessage( Character *ch, Character *vch ) const;
     void baneDamage( Character *ch, Character *vch, int dam ) const;
     void baneAround( Character *ch, int failChance, int dam ) const;

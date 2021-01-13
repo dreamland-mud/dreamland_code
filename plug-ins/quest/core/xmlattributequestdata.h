@@ -22,8 +22,8 @@ class XMLAttributeQuestData :
     public XMLAttributeTimer, 
     public ScheduledXMLAttribute, 
     public ScheduledPCMemoryXMLAttribute,
-    public EventHandler<DeathArguments>,
-    public EventHandler<PromptArguments>,
+    public AttributeEventHandler<DeathArguments>,
+    public AttributeEventHandler<PromptArguments>,
     public XMLAttributeStatistic
 {
 XML_OBJECT

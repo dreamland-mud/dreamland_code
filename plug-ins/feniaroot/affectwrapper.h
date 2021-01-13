@@ -9,7 +9,7 @@
 #include "xmlinteger.h"
 #include "xmlshort.h"
 #include "xmlglobalbitvector.h"
-#include "skillreference.h"
+#include "affect.h"
 
 #include "lex.h"
 #include "scope.h"
@@ -18,8 +18,6 @@
 #include "pluginwrapperimpl.h"
 
 using Scripting::NativeHandler;
-
-class Affect;
 
 class AffectWrapper : public PluginNativeImpl<AffectWrapper>, 
                       public NativeHandler,
@@ -32,17 +30,15 @@ public:
 
     AffectWrapper() { }
     AffectWrapper(const RegisterList &);
+    AffectWrapper(Affect &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
-    void fromAffect( const Affect & );
-    void toAffect( Affect & );
+    inline Affect& getTarget() { return target; }
+
     static Scripting::Register wrap( const Affect & );
 
-    XML_VARIABLE XMLInteger bitvector;
-    XML_VARIABLE XMLShort where, level, duration, modifier, location;
-    XML_VARIABLE XMLSkillReference type;
-    XML_VARIABLE XMLGlobalBitvector global;
+protected:
+    XML_VARIABLE Affect target;
 };
 
 #endif

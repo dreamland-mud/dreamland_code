@@ -47,7 +47,7 @@ struct RemortArguments {
     XMLAttributes *newAttributes;
 };
 
-class RemortAttribute : public EventHandler<RemortArguments> {
+class RemortAttribute : public AttributeEventHandler<RemortArguments> {
 public:
     virtual bool handle( const RemortArguments & );
 };
@@ -93,12 +93,12 @@ struct AfkArguments {
 };
 
 
-extern template class EventHandler<ScoreArguments>;
-extern template class EventHandler<RemortArguments>;
-extern template class EventHandler<DeathArguments>;
-extern template class EventHandler<PromptArguments>;
-extern template class EventHandler<WhoisArguments>;
-extern template class EventHandler<StopFightArguments>;
-extern template class EventHandler<AfkArguments>;
+extern template class AttributeEventHandler<ScoreArguments>;
+extern template class AttributeEventHandler<RemortArguments>;
+extern template class AttributeEventHandler<DeathArguments>;
+extern template class AttributeEventHandler<PromptArguments>;
+extern template class AttributeEventHandler<WhoisArguments>;
+extern template class AttributeEventHandler<StopFightArguments>;
+extern template class AttributeEventHandler<AfkArguments>;
 
 #endif

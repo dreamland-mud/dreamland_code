@@ -9,6 +9,7 @@
 #include "xmlstring.h"
 #include "xmlmap.h"
 #include "xmlattribute.h"
+#include "playerattributes.h"
 
 class Character;
 class PCharacter;
@@ -27,7 +28,7 @@ public:
     XML_VARIABLE XMLStringNoEmpty description;
 };
 
-class XMLAttributeRestring : public XMLAttribute, public XMLMapBase<XMLItemRestring> {
+class XMLAttributeRestring : public RemortAttribute, public XMLMapBase<XMLItemRestring> {
 public:
     typedef ::Pointer<XMLAttributeRestring> Pointer;
 

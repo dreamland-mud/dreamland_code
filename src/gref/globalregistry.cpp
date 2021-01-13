@@ -4,6 +4,7 @@
  */
 #include <stdio.h>
 #include "globalregistry.h"
+#include "stringlist.h"
 
 RegistryMap registryMap;
 
@@ -116,3 +117,16 @@ void GlobalRegistryBase::outputAll( ostringstream &out, int width, int columns )
         out << endl;
 }
 
+list<GlobalRegistryElement *> GlobalRegistryBase::findAll(const DLString &arguments)
+{
+    list<GlobalRegistryElement *> result;
+    StringList args(arguments);
+
+    for (unsigned int i = 0; i < table.size( ); i++) {
+        for (auto &s: args)
+            if (table[i]->matchesUnstrict(s))
+                result.push_back(table[i].getPointer());
+    }
+
+    return result;
+}

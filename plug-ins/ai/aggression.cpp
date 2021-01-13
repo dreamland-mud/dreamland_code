@@ -78,9 +78,9 @@ bool BasicMobileBehavior::canAggress( Character *victim )
     if (dreamland->hasOption( DL_BUILDPLOT ))
         return false;
 
-    if (victim->is_immortal( ))
+    if (victim->is_immortal() && !victim->getPC()->getAttributes().isAvailable("ai_aggress"))
         return false;
-        
+
     if (is_safe_nomessage( ch, victim ))
         return false;
         
@@ -99,7 +99,7 @@ bool BasicMobileBehavior::canAggress( Character *victim )
 bool BasicMobileBehavior::canAggressNormal( Character *victim )
 {
     int recall;
-    AREA_DATA *area;
+    AreaIndexData *area;
     
     if (!canAggress( victim ))
         return false;

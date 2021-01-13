@@ -9,6 +9,8 @@
 #include "plugin.h"
 #include "class.h"
 
+struct AreaIndexData;
+
 class AreaBehaviorPlugin : public Plugin {
 public:
     typedef ::Pointer<AreaBehaviorPlugin> Pointer;
@@ -38,5 +40,23 @@ public:
         return C::MOC_TYPE;
     }
 };
+
+/** Returns true if area is a suburb for private mansions. */
+bool area_is_mansion(AreaIndexData *);
+
+/** Returns true if area belongs to a clan. */
+bool area_is_clan(AreaIndexData *);
+
+/** Returns true if areas is a hometown. */
+bool area_is_hometown(AreaIndexData *);
+
+/** Returns true if area has a meaningful level range. */
+bool area_has_levels(AreaIndexData *area);
+
+/** Describe area danger level, with colors. */
+DLString area_danger_long(AreaIndexData *area);
+
+/** Describe area danger level as a single word, with colors. */
+DLString area_danger_short(AreaIndexData *area);
 
 #endif

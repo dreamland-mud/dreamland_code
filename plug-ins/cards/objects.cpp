@@ -458,7 +458,7 @@ bool CardBehavior::examine( Character *looker )
     else
         room = victim->in_room;
 
-    pch->printf("По деталям заднего плана ты начинаешь узнавать место. Кажется, это '%s'.\r\n", room->name );
+    pch->printf("По деталям заднего плана ты начинаешь узнавать место. Кажется, это '%s'.\r\n", room->getName() );
     gsn_peek_card->improve( pch, true );
     pch->mana -= mana;
 
@@ -468,7 +468,7 @@ bool CardBehavior::examine( Character *looker )
         buf << "Тебе удается разглядеть некоторые фрагменты пейзажа более подробно:" 
             << endl
             << spoilDescription( pch, 
-                                 room->description,
+                                 room->getDescription(),
                                  3 * gsn_card_vision->getEffective( pch ) / 4 );
         pch->send_to( buf );
 
@@ -590,7 +590,7 @@ Room * CardBehavior::findHorribleRoom( PCharacter *pch )
     static const int size = sizeof(badRooms) / sizeof(*badRooms);
     Room *room;
     
-    room = get_room_index( badRooms[number_range( 0, size - 1 )] );
+    room = get_room_instance( badRooms[number_range( 0, size - 1 )] );
     
     return (room ? room : get_random_room( pch ));
 }

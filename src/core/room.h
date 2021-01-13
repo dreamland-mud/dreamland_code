@@ -20,21 +20,23 @@
 #include "clanreference.h"
 #include "liquid.h"
 #include "roombehavior.h"
+#include "affectlist.h"
 
-struct area_data;
+struct AreaIndexData;
+struct Area;
 struct extra_descr_data;
 struct exit_data;
 struct extra_exit_data;
 struct reset_data;
-class Affect;
 typedef map<DLString, DLString> Properties;
 
 struct RoomHistoryEntry {
-    RoomHistoryEntry( DLString n, int w )
-            : name( n ), went( w )
+    RoomHistoryEntry( DLString n, DLString rn, int w )
+            : name( n ), rname(rn), went( w )
     {
     }
     DLString name;
+    DLString rname;
     int went;
 };
 
@@ -48,6 +50,50 @@ struct RoomHistory : public list<RoomHistoryEntry> {
     static const unsigned int MAX_SIZE;
 };
 
+struct ExtraExitList: public list<extra_exit_data *> {
+    /** Return an exit that matches the given keyword. */
+    extra_exit_data *find(const DLString &keyword) const;
+
+    /** 
+     * Remove matching exit from list and free its memory. 
+     * Returns true if found.
+     */
+    bool findAndDestroy(const DLString &keyword);
+};
+
+typedef vector<reset_data *> ResetList;
+
+struct RoomIndexData : public virtual DLObject, public WrapperTarget {
+    RoomIndexData();
+
+    Room * create(); // Implemented in loadsave plugin.
+
+    extra_descr_data *        extra_descr;
+    exit_data *        exit        [6];
+    ExtraExitList extra_exits;
+
+    char *        name;
+    char *        description;
+    int         vnum;
+    int         room_flags;
+    int         sector_type;
+    int         heal_rate;
+    int         mana_rate;
+    ClanReference clan;
+    GlobalBitvector guilds;
+    LiquidReference liquid;
+    Properties properties;
+    ::Pointer<XMLDocument> behavior;
+
+    Scripting::Register init;
+
+    AreaIndexData *areaIndex;
+
+    Room *room; // FIXME wil be replaces with a list of instances
+
+    ResetList resets;
+};
+
 class Room : public virtual DLObject, public WrapperTarget {
 public:
     Room( );
@@ -56,12 +102,14 @@ public:
     bool isPrivate( ) const;
     int  getCapacity( ) const;
     bool isCommon( );
+    inline long long getID( ) const;
+    inline void setID( long long );
 
     // room affects
     void affectModify( Affect *paf, bool fAdd );
     void affectTo( Affect *paf );
     void affectJoin( Affect *paf );
-    void affectCheck( int where, int vector );
+    void affectCheck( const FlagTable *table, int vector );
     void affectRemove( Affect *paf );
     void affectStrip( int sn );
     bool isAffected( int sn ) const;
@@ -74,56 +122,107 @@ public:
     void echo( int, const char *, ... ) const;
     void echoAround( int, const char *, ... ) const;
     list<Character*> getPeople( );
+    
+    bool hasExits() const;
+    
+    /** Shorthand to return prototype's extra descriptions. */
+    inline extra_descr_data *getExtraDescr();
 
-public:
-    Room *        next;
-    Room *        rnext;
-    Room *        aff_next;
-    reset_data *reset_first;
-    reset_data *reset_last;
-    Character *        people;
-    Object *        contents;
-    extra_descr_data *        extra_descr;
-    area_data *        area;
-    exit_data *        exit        [6];
-    exit_data *        old_exit[6];
-    extra_exit_data * extra_exit;
-    char *        name;
-    char *        description;
-    char *        owner;
-    int                vnum;
+    /** Shorthand to return prototype's room name. */
+    inline const char *getName() const;
+
+    /** Shorthand to return prototype's room description. */
+    inline const char *getDescription() const;
+
+    /** Calculate current heal rate (100% is the default). */
+    int getHealRate() const;
+
+    /** Calculate current mana rate (100% is the default). */
+    int getManaRate() const;
+
+    /** Shorthand to return prototype's sector type. */
+    inline int getSectorType() const;
+
+    inline AreaIndexData *areaIndex() const;
+    const char * areaName() const;
+
+    /** This room's position in the global roomInstances vector. Needed for backward compat. */
+    int position;
+
+    Character *   people;
+    Object *      contents;
+    Area *area;
+    exit_data *   exit[6];
+    ExtraExitList extra_exits;
+    char *     owner;
+    int        vnum;
     int        room_flags;
-    int        room_flags_default;
-    int                light;
-    int                sector_type;
-    int                heal_rate;
-    int                heal_rate_default;
-    int         mana_rate;
-    int         mana_rate_default;
-    ClanReference clan;
-    GlobalBitvector guilds;
+    int        light;
+
     RoomHistory history;
-    Affect        *affected;
+    AffectList affected;
     int        affected_by;
-    LiquidReference liquid;
-    Properties properties;
 
     XMLPersistentStreamable<RoomBehavior> behavior;
     Scripting::Register init;
+
+    RoomIndexData *pIndexData;
+
+protected:
+    /** How much default heal rate is changed by affects. */
+    int mod_heal_rate;
+
+    /** How much default heal rate is changed by affects. */
+    int mod_mana_rate;
+
+    long long ID;
 };
 
+inline long long Room::getID( ) const
+{
+    return ID;
+}
+
+inline void Room::setID( long long id )
+{
+    ID = id;
+}
+
+inline extra_descr_data * Room::getExtraDescr()
+{
+    return pIndexData->extra_descr;
+}
+
+inline const char * Room::getName() const
+{
+    return pIndexData->name;
+}
+
+inline const char * Room::getDescription() const
+{
+    return pIndexData->description;
+}
+
+inline int Room::getSectorType() const
+{
+    return pIndexData->sector_type;
+}
+
+inline AreaIndexData *Room::areaIndex() const
+{
+    return pIndexData->areaIndex;
+}
 
 /*
  * room macros
  */
 
 #define IS_ROOM_AFFECTED(room, sn)         (IS_SET((room)->affected_by, (sn)))
-#define IS_RAFFECTED(room, sn)         (IS_SET((room)->affected_by, (sn)))
-#define IS_WATER( var )                (((var)->sector_type == SECT_WATER_SWIM) || \
-                                 ((var)->sector_type == SECT_WATER_NOSWIM) )
-#define IS_NATURE(var)          ((var)->sector_type == SECT_FIELD || \
-                                  (var)->sector_type == SECT_FOREST || \
-                                  (var)->sector_type == SECT_HILLS || \
-                                  (var)->sector_type == SECT_MOUNTAIN)
+#define IS_WATER( var )                (((var)->getSectorType() == SECT_WATER_SWIM) || \
+                                 ((var)->getSectorType() == SECT_WATER_NOSWIM) )
+#define IS_NATURE(var)          ((var)->getSectorType() == SECT_FIELD || \
+                                  (var)->getSectorType() == SECT_FOREST || \
+                                  (var)->getSectorType() == SECT_HILLS || \
+                                  (var)->getSectorType() == SECT_MOUNTAIN)
 
 #endif

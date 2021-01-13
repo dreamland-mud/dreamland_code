@@ -5,6 +5,17 @@
 #include "stringset.h"
 #include "logstream.h"
 #include "integer.h"
+#include "dl_math.h"
+
+StringSet::StringSet()
+{
+
+}
+
+StringSet::StringSet(const DLString &constStr)
+{
+    fromString(constStr);
+}
 
 DLString StringSet::toString( ) const
 {
@@ -48,6 +59,16 @@ void NumberSet::fromStringSet( const StringSet &str )
         }
 }
 
+NumberSet::NumberSet()
+{
+}
+
+NumberSet::NumberSet(const DLString &str)
+{
+    StringSet sset(str);
+    fromStringSet(sset);
+}
+
 StringSet NumberSet::toStringSet( ) const
 {
     StringSet str;
@@ -56,6 +77,18 @@ StringSet NumberSet::toStringSet( ) const
         str.insert( DLString( *n ) );
 
     return str;
+}
+
+int NumberSet::randomNumber() const
+{
+    unsigned int random_index = number_range(0, size() - 1);
+    unsigned int count = 0;
+    
+    for (auto &n: *this)
+        if (count++ == random_index)
+            return n;
+
+    return -1;
 }
 
 void StringStorage::addTransient(const DLString &entry)

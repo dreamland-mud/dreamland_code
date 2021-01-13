@@ -63,7 +63,7 @@ protected:
     bool createSecondHint( );
     void createThirdHint( );
 
-    void populateArea( area_data *, RoomList& , int );
+    void populateArea( AreaIndexData *, RoomList& , int );
     void populateLair( );
 
     DLString lairHint( );

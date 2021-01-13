@@ -132,12 +132,10 @@ SKILL_RUNP( sconce )
         gsn_sconce->improve( ch, true, victim );
 
         af.type = gsn_sconce;
-        af.where = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.level = ch->getModifyLevel();
         af.duration = 0;
-        af.location = APPLY_NONE;
-        af.modifier = 0;
-        af.bitvector = AFF_SLEEP;
+        af.bitvector.setValue(AFF_SLEEP);
         affect_join ( victim,&af );
         
         set_violent( ch, victim, true );

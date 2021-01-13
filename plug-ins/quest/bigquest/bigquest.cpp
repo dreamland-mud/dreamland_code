@@ -33,7 +33,7 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     if (areas.empty())
         throw QuestCannotStartException();
 
-    struct area_data *targetArea = areas[number_range(0, areas.size() - 1)];
+    struct AreaIndexData *targetArea = areas[number_range(0, areas.size() - 1)];
 
     RoomList rooms = findVictimRooms(pch, targetArea);
     if (rooms.size() < 5)
@@ -95,7 +95,7 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
     Reward::Pointer r( NEW );
     
     if (mobsKilled != mobsTotal) {
-        if (hint > 0)
+        if (hint > 0 && !IS_TOTAL_NEWBIE(ch))
             tell_fmt("К тому же, ты уничтожил%1$Gо||а только %3$d преступник%3$Iа|ов|ов из %4$d.", 
                      ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
         else     
@@ -103,7 +103,7 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
                      ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
     }
 
-    if (hint > 0) {
+    if (hint > 0 && !IS_TOTAL_NEWBIE(ch)) {
         r->gold = number_range(1, 3);
         r->points = mobsKilled; 
     }
@@ -197,7 +197,7 @@ bool BigQuest::hasPartialRewards() const
 
 bool BigQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
-    if (IS_WATER(room) || room->sector_type == SECT_AIR)
+    if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
         return false;
 
     if (!VictimQuestModel::checkRoomClient( pch, room ))
@@ -223,7 +223,7 @@ const QuestMobileAppearence & BigQuestScenario::getRandomMobile() const
     return mobiles[number_range(0, mobiles.size() - 1)];    
 }
 
-void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct area_data *targetArea, int mobsTotal) const
+void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct AreaIndexData *targetArea, int mobsTotal) const
 {
     XMLStringVector::const_iterator s;
 

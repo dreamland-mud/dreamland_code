@@ -49,7 +49,7 @@ bool PortalMovement::findTargetRoom( )
     int targetVnum = (rc.empty( ) || !rc.isNumber( ) ? 0 : rc.toInt( ));
 
     if (targetVnum != 0) {
-        to_room = get_room_index( targetVnum );
+        to_room = get_room_instance( targetVnum );
     }
     else if (IS_SET(portal->value2(),GATE_RANDOM) || portal->value3() == -1) {
         to_room = get_random_room( ch );
@@ -59,7 +59,7 @@ bool PortalMovement::findTargetRoom( )
         to_room = get_random_room( ch );
     }
     else {
-        to_room = get_room_index( portal->value3() );
+        to_room = get_room_instance( portal->value3() );
     }
 
     if (to_room == 0) {
@@ -162,8 +162,8 @@ bool PortalMovement::checkClosedDoor( Character *wch )
         return true;
 
     msgSelfParty( wch, 
-                  "%4$^O1: тут закрыто.",
-                  "%4$^O1: тут закрыто." );
+                  "Тут закрыто, попробуй {y{hcоткрыть %4$O4{x.",
+                  "Тут закрыто, попробуй {y{hcоткрыть %4$O4{x." );
     return false;
 }
 
@@ -198,7 +198,7 @@ bool PortalMovement::checkCurse( Character *wch )
     }
     
     if (IS_SET(from_room->room_flags, ROOM_NO_RECALL)
-         || IS_RAFFECTED(from_room, AFF_ROOM_CURSE))
+         || IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE))
     {
         msgSelfParty( wch,
                       "Проклятье этого места мешает тебе его покинуть.",

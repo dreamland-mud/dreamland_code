@@ -159,7 +159,7 @@ public:
     virtual int getStat( bitnumber_t, Character * = NULL ) const;
     virtual int  getWearModifier( int ) const;
     virtual const DLString & getTitle( const PCMemoryInterface * ) const;
-    virtual GlobalBitvector toVector( Character * = NULL ) const;
+    virtual GlobalBitvector toVector( CharacterMemoryInterface * = NULL ) const;
     virtual Flags getFlags( Character * = NULL ) const;
     
     virtual bool isPlayed( ) const;

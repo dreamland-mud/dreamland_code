@@ -40,6 +40,7 @@
 #include "act.h"
 #include "../anatolia/handler.h"
 #include "merc.h"
+#include "damage.h"
 #include "fight.h"
 #include "vnum.h"
 #include "def.h"
@@ -84,15 +85,15 @@ static void loot_transform( Object *obj, Character *ch )
         break;
     case ITEM_WEAPON:
         if (ch->is_npc( ))
-            obj->condition = number_range( 30, 80 );
+            obj->condition = min(obj->condition, number_range( 30, 80 ));
         break;
     case ITEM_ARMOR:
         if (ch->is_npc( ))
-            obj->condition = number_range( 10, 70 );
+            obj->condition = min(obj->condition, number_range( 10, 70 ));
         break;
     case ITEM_FOOD:
         if (ch->is_npc( ))
-            obj->condition = number_range( 10, 50 );
+            obj->condition = min(obj->condition, number_range( 10, 50 ));
         break;
     }
 }
@@ -212,7 +213,7 @@ static void corpse_place( Object *corpse, Character *ch )
         return;
 
     if (!ch->is_npc( ) && ch->getModifyLevel( ) < GHOST_MIN_LEVEL) 
-        corpse_room = get_room_index( ch->getPC()->getHometown( )->getAltar( ) );
+        corpse_room = get_room_instance( ch->getPC()->getHometown( )->getAltar( ) );
     
     if (!corpse_room)
         corpse_room = ch->in_room;
@@ -350,7 +351,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
         body_vnum = corpse->value3();
     }
     else {
-        body_room = get_room_index( ROOM_VNUM_LIMBO );
+        body_room = get_room_instance( ROOM_VNUM_LIMBO );
     }
 
     obj        = create_object( get_obj_index( vnum ), 0 );
@@ -463,8 +464,8 @@ void death_cry( Character *ch, int part )
 
 void reset_dead_player( PCharacter *victim )
 {
-    while (victim->affected)
-        affect_remove( victim, victim->affected );
+    for (auto &paf: victim->affected.clone())
+        affect_remove( victim, paf );
 
     victim->affected_by    = 0;
     victim->add_affected_by = 0;
@@ -627,30 +628,6 @@ void pk_gain( Character *killer, Character *victim )
     }
 }
 
-/*-----------------------------------------------------------------------------------------*
- * default death handler 
- *-----------------------------------------------------------------------------------------*/
-class DefaultDeathHandler : public DeathHandler {
-public:
-    typedef ::Pointer<DefaultDeathHandler> Pointer;
-
-    virtual bool handleDeath( Character *killer, Character *victim ) const
-    {
-        //transfer the killer flag to master if killer is a charmed npc and victim is a player
-        if(killer->is_npc() && !victim->is_npc() && killer->master && !killer->master->is_npc())
-        killer = killer->master;
-
-        group_gain( killer, victim );
-        raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-        pk_gain( killer, victim );
-        return false;
-    }
-    
-    virtual int getPriority( ) const
-    {
-        return 50;
-    }
-};
 
 /*-----------------------------------------------------------------------------------------*
  * death autocommands 
@@ -737,7 +714,9 @@ protected:
 
     void autoBlood( )
     {
-        if (desire_bloodlust->applicable( killer->getPC( ) )) {
+        if (desire_bloodlust->applicable( killer->getPC( ) )
+        && !(IS_BLOODLESS(ch)))    
+        {
             act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
             act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
             desire_bloodlust->gain( killer->getPC( ), 3 );
@@ -764,20 +743,6 @@ protected:
     Object *corpse;
 };
 
-class DeathAutoCommandsHandler : public DeathHandler {
-public:
-    typedef ::Pointer<DeathAutoCommandsHandler> Pointer;
-
-    bool handleDeath( Character *killer, Character *victim ) const 
-    {
-        DeathAutoCommands( killer, victim ).run( );
-        return false;
-    }
-    int getPriority( ) const
-    {
-        return 60;
-    }
-};
 
 /*-----------------------------------------------------------------------------------------*
  * death penalties
@@ -906,17 +871,37 @@ protected:
     PCharacter *pch;
 };
 
-class DeathPenaltiesHandler : public DeathHandler {
+class DeathEventHandler : public Plugin, public EventHandler {
 public:
-    typedef ::Pointer<DeathPenaltiesHandler> Pointer;
+    typedef ::Pointer<DeathEventHandler> Pointer;
 
-    bool handleDeath( Character *killer, Character *victim ) const 
+    virtual void initialization()
     {
-        return DeathPenalties( killer, victim ).run( );
+        eventBus->subscribe(typeid(CharDeathEvent), Pointer(this));
     }
-    int getPriority( ) const
+
+    virtual void destruction()
     {
-        return 10;
+        eventBus->unsubscribe(typeid(CharDeathEvent), Pointer(this));
+    }
+
+    virtual void handleEvent(const type_index &eventType, const Event &event) const
+    {
+        const CharDeathEvent &evt = static_cast<const CharDeathEvent &>(event);
+        Character *victim = evt.victim;
+        Character *killer = evt.killer;
+
+        //transfer the killer flag to master if killer is a charmed npc and victim is a player
+        if (killer->is_npc() && !victim->is_npc() && killer->master && !killer->master->is_npc())
+            killer = killer->master;
+
+        DeathPenalties( killer, victim ).run( );
+
+        group_gain( killer, victim );
+        raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+        pk_gain( killer, victim );
+
+        DeathAutoCommands( killer, victim ).run( );
     }
 };
 
@@ -926,9 +911,7 @@ extern "C"
     {
         SO::PluginList ppl;
 
-        Plugin::registerPlugin<DefaultDeathHandler>( ppl );
-        Plugin::registerPlugin<DeathAutoCommandsHandler>( ppl );
-        Plugin::registerPlugin<DeathPenaltiesHandler>( ppl );
+        Plugin::registerPlugin<DeathEventHandler>( ppl );
         return ppl;
     }
 }

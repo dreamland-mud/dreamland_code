@@ -1,16 +1,11 @@
 #include "craft_utils.h"
 #include "craftattribute.h"
-#include "pcharacter.h"
+#include "pcmemoryinterface.h"
 
-::Pointer<XMLAttributeCraft> craft_attr(PCharacter *ch)
+::Pointer<XMLAttributeCraft> craft_attr(CharacterMemoryInterface *ch)
 {
-    return ch->getAttributes( ).getAttr<XMLAttributeCraft>("craft");
-}
-
-::Pointer<XMLAttributeCraft> craft_attr(Character *ch)
-{
-    if (ch->getPC())
-        return craft_attr(ch->getPC());
+    if (ch->getPCM())
+        return ch->getPCM()->getAttributes( ).getAttr<XMLAttributeCraft>("craft");
     else
         return XMLAttributeCraft::Pointer();
 }

@@ -13,12 +13,12 @@
 #include "race.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "clanreference.h"
 
 #include "fight.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "gsn_plugin.h"
 #include "effects.h"
 #include "stats_apply.h"
@@ -297,10 +297,9 @@ void MissileOneHit::damApplyDamroll( )
 
 void MissileOneHit::damApplyMissile( )
 {
-    Affect *paf;
     int bonus = 0;
 
-    for (paf = missile->affected; paf != 0; paf = paf->next)
+    for (auto &paf: missile->affected)
         if (paf->location == APPLY_DAMROLL)
             bonus += paf->modifier;
 
@@ -319,10 +318,9 @@ void MissileOneHit::calcTHAC0( )
 
 void MissileOneHit::thacApplyMissile( )
 {
-    Affect *paf;
     int bonus = 0;
 
-    for (paf = missile->affected; paf != 0; paf = paf->next)
+    for (auto &paf: missile->affected)
         if (paf->location == APPLY_HITROLL)
             bonus += paf->modifier;
 
@@ -346,17 +344,13 @@ void MissileOneHit::damEffectStucking( )
     {
         Affect af;
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = missile_sn;
         af.level     = ch->getModifyLevel( );
         af.duration  = -1;
-        af.location  = APPLY_HITROLL;
+        af.location = APPLY_HITROLL;
         af.modifier  = - (dam / 20);
-
-        if (victim->is_npc( ))
-            af.bitvector = 0;
-        else
-            af.bitvector = AFF_CORRUPTION;
+        af.bitvector.setValue(AFF_CORRUPTION);
 
         affect_join( victim, &af );
 
@@ -372,7 +366,8 @@ void MissileOneHit::damEffectFunkyWeapon( )
         short level;
         Affect *poison, af;
 
-        if (!missile->affected || (poison = missile->affected->affect_find(gsn_poison)) == 0)
+        poison = missile->affected.find(gsn_poison);
+        if (!poison)
             level = missile->level;
         else
             level = poison->level;
@@ -382,13 +377,13 @@ void MissileOneHit::damEffectFunkyWeapon( )
             msgWeaponVict("Ты чувствуешь, как яд растекается по твоим венам.");
             msgWeaponRoom("%2$^C1 отравле%2$Gно|н|на ядом от %3$O2.");
 
-            af.where     = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level     = level * 3/4;
             af.duration  = level / 2;
-            af.location  = APPLY_STR;
+            af.location = APPLY_STR;
             af.modifier  = -1;
-            af.bitvector = AFF_POISON;
+            af.bitvector.setValue(AFF_POISON);
             affect_join( victim, &af );
         }
     }

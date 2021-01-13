@@ -28,7 +28,7 @@ CMDADM( undelete )
         }
 
     if(!PCharacterManager::pfRecover(buf, "delete", 0)) {
-        ch->send_to("Oops. Failed to recover profile. Misspelled name?\n\r");
+        ch->println("Не могу восстановить профайл. Возможно, забыли убрать случайное расширение в конце имени файла.");
         return;
     }
 

@@ -122,14 +122,18 @@ void QuestMobileAppearence::dress( NPCharacter *mob ) const
     mob->setDescription( desc + "\r\n" );
     mob->setSex( sex.getValue( ) ); 
 
-    if (race.getName() != "none")
+    if (race.getName() != "none") {
         mob->setRace( race.getName( ) );
+        SET_BIT(mob->form, mob->getRace()->getForm());
+        SET_BIT(mob->parts, mob->getRace()->getParts());
+    }
     
     switch (align.getValue( )) {
     case N_ALIGN_GOOD: mob->alignment = 1000; break;
     case N_ALIGN_EVIL: mob->alignment = -1000; break;
     case N_ALIGN_NEUTRAL: mob->alignment = 0; break;
     }
+
 }
 
 

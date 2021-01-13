@@ -311,6 +311,7 @@ void PCharacter::init( )
     mod_skills.clear();
     mod_skill_groups.clear();
     mod_level_all = 0;
+    mod_level_spell = 0;
     mod_level_skills.clear();
     mod_level_groups.clear();
 
@@ -387,6 +388,8 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setRussianName( getRussianName( ).getFullForm( ) );
         mem->setReligion( getReligion( ) );
         mem->setDescription(getDescription());
+        mem->setSkills(getSkills());
+        mem->setBonuses(getBonuses());
 
         return mem;
 }
@@ -413,6 +416,8 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setRussianName( pcm->getRussianName( ).getFullForm( ) );
         setReligion( pcm->getReligion( ) );
         setDescription(pcm->getDescription());
+        setSkills(pcm->getSkills());
+        setBonuses(pcm->getBonuses());
 }
 
 /**************************************************************************
@@ -433,11 +438,6 @@ bool PCharacter::nodeFromXML( const XMLNode::Pointer& child )
 bool PCharacter::isOnline( ) const
 {
     return true;
-}
-
-PCharacter * PCharacter::getPlayer( ) 
-{
-    return this;
 }
 
 const DLString& PCharacter::getName( ) const 
@@ -679,7 +679,7 @@ using namespace Grammar;
 Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
 {
     const Character *wch = dynamic_cast<const Character *>(forWhom);
-    PlayerConfig::Pointer cfg = wch ? wch->getConfig( ) : PlayerConfig::Pointer( );
+    PlayerConfig cfg = wch ? wch->getConfig( ) : PlayerConfig();
     
     if (IS_SET(flags, FMT_DOPPEL))
         return getDoppel( wch )->toNoun( wch, REMOVE_BIT(flags, FMT_DOPPEL) );
@@ -693,7 +693,7 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
         }
                 
         if (is_vampire( ) && !wch->is_vampire( )) {
-            if (cfg->holy) 
+            if (cfg.holy) 
                 return cachedNoun.vampire2;
             else
                 return cachedNoun.vampire;
@@ -701,13 +701,13 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
     }
     
     if (IS_SET(flags, FMT_PRETITLE)) {
-        if (wch && !cfg->runames)
+        if (wch && !cfg.runames)
             return cachedNoun.pretitle;
         else
             return cachedNoun.pretitleRussian;
     }
     
-    if (wch && !cfg->runames)
+    if (wch && !cfg.runames)
         return cachedNoun.name;
     else
         return cachedNoun.russian;
@@ -742,6 +742,27 @@ int PCharacter::applyCurse( int def )
 {
     return (def * curse) / 100;
 }
+
+PCSkills & PCharacter::getSkills( )
+{
+    return skills;
+}
+
+void PCharacter::setSkills(const PCSkills &skills)
+{
+    this->skills = skills;        
+}
+
+PCBonuses & PCharacter::getBonuses()
+{
+    return bonuses;
+}
+
+void PCharacter::setBonuses(const PCBonuses &bonuses)
+{
+    this->bonuses = bonuses;        
+}
+
 
 /**************************************************************************
  *  visibility of things 
@@ -881,7 +902,7 @@ short PCharacter::getModifyLevel( ) const
 /**************************************************************************
  * configuration 
  **************************************************************************/
-PlayerConfig::Pointer PCharacter::getConfig( ) const
+PlayerConfig PCharacter::getConfig( ) const
 {
-    return PlayerConfig::Pointer( NEW, this );
+    return PlayerConfig( this );
 }

@@ -19,7 +19,7 @@ public:
     typedef ::Pointer<OLCStateArea> Pointer;
 
     OLCStateArea();
-    OLCStateArea(AREA_DATA *o);
+    OLCStateArea(AreaIndexData *o);
     virtual ~OLCStateArea();
     
     virtual void commit();
@@ -27,7 +27,7 @@ public:
 
     bool checkOverlap(int lower, int upper);
 
-    XML_VARIABLE XMLInteger vnum, security, age, nplayer;
+    XML_VARIABLE XMLInteger vnum, security;
     XML_VARIABLE XMLInteger low_range, high_range, min_vnum, max_vnum;
     XML_VARIABLE XMLFlags area_flag;
     XML_VARIABLE XMLString file_name, name, credits, resetmsg, authors, altname, translator, speedwalk;

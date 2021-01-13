@@ -6,11 +6,13 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system \
+-I$(top_srcdir)/plug-ins/alignment \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/occupations \
 -I$(top_srcdir)/plug-ins/follow/core \
--I$(top_srcdir)/plug-ins/interpret
+-I$(top_srcdir)/plug-ins/interpret \
+-I/usr/include/jsoncpp
 
 libfight_core_la_SOURCES = \
 damageflags.cpp \
@@ -23,10 +25,15 @@ damage_impl.cpp \
 character.cpp \
 stats_apply.cpp \
 weapons.cpp \
+weapontier.cpp \
+weaponaffixes.cpp \
+weaponcalculator.cpp \
+weapongenerator.cpp \
+weaponrandomizer.cpp \
 material.cpp \
 fight_safe.cpp \
 immunity.cpp \
-deathmanager.cpp
+morphology.cpp
 
 libfight_core_la_LIBADD = \
 ../output/liboutput.la \
@@ -35,9 +42,11 @@ libfight_core_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../follow/core/libfollow_core.la \
 ../system/libsystem.la \
+../alignment/libalignment.la \
 ../occupations/liboccupations.la \
 ../system/libscheduler_task_round.la \
-../interpret/libinterpret.la
+../interpret/libinterpret.la \
+-ljsoncpp
 
 damageflags.cpp: damageflags.conf damageflags.h
 damageflags.h: damageflags.conf

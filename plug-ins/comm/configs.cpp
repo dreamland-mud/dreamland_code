@@ -20,6 +20,7 @@
 #include "comm.h"
 #include "descriptor.h"
 #include "servlet_utils.h"
+#include "math_utils.h"
 #include "act.h"
 #include "arg_utils.h"
 #include "def.h"
@@ -114,7 +115,7 @@ bool ConfigElement::printText( PCharacter *ch ) const
 void ConfigElement::printRow( PCharacter *ch ) const
 {
     bool yes = isSetBit( ch );
-    bool rus = ch->getConfig( )->rucommands;
+    bool rus = ch->getConfig( ).rucommands;
 
     ch->printf( "| {%s%-14s {x|  {%s%-7s {x|\r\n", 
                       CLR_NAME(ch), 
@@ -125,7 +126,7 @@ void ConfigElement::printRow( PCharacter *ch ) const
 
 static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, bool yes, const DLString &msgYes, const DLString &msgNo)
 {
-    if (ch->getConfig( )->rucommands)
+    if (ch->getConfig( ).rucommands)
         ch->printf( "  {%s%-14s {%s%5s {x%s\r\n",
                         CLR_NAME(ch),
                         rname.c_str(),

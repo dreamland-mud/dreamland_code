@@ -120,24 +120,64 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
 
     if (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO) {
         /* visible only to each other, like vampires >8) */
-        buf << "{C    CODER    {x";
+        buf << GET_SEX( vict, "{le{C    CODER    {lr{C    КОДЕР    {x",
+                              "{le{C    CODER    {lr{C    КОДЕР    {x",
+                              "{le{C    CODER    {lr{C   КОДЕРША   {x" );         
         return buf.str( );
     }
     
     switch (vict->getLevel( )) {
-    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{W IMPLEMENTOR {x",
-                                                "{W IMPLEMENTOR {x",
-                                                "{WIMPLEMENTRESS{x" );
+
+    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{le{W IMPLEMENTOR {lr{W   ДЕМИУРГ   {x",
+                                              "{le{W IMPLEMENTOR {lr{W   ДЕМИУРГ   {x",
+                                              "{le{WIMPLEMENTRESS{lr{W  ДЕМИУРГИНЯ {x" );            
                         break;
-    case MAX_LEVEL - 1: buf << "{C   CREATOR   {x"; break;
-    case MAX_LEVEL - 2: buf << "{C  SUPREMACY  {x"; break;
-    case MAX_LEVEL - 3: buf << "{C    DEITY    {x"; break;
-    case MAX_LEVEL - 4: buf << "{C     GOD     {x"; break;
-    case MAX_LEVEL - 5: buf << "{G   IMMORTAL  {x"; break;
-    case MAX_LEVEL - 6: buf << "{G   DEMIGOD   {x"; break;
-    case MAX_LEVEL - 7: buf << "{G    ANGEL    {x"; break;
-    case MAX_LEVEL - 8: buf << "{G   AVATAR    {x"; break;
-    case MAX_LEVEL - 9: buf << "{w  LEGENDARY  {x"; break;
+
+    case MAX_LEVEL - 1: buf << GET_SEX( vict, "{le{С   СREATOR   {lr{С  ТВОРЯЩИЙ   {x",
+                                              "{le{С   СREATOR   {lr{С  ТВОРЯЩИЙ   {x",
+                                              "{le{С   СREATOR   {lr{С  ТВОРЯЩАЯ   {x" );            
+                        break;            
+
+    case MAX_LEVEL - 2: buf << GET_SEX( vict, "{le{C  SUPREMACY  {lr{С  ТВОРЯЩИЙ   {x",
+                                              "{le{C  SUPREMACY  {lr{С  ТВОРЯЩИЙ   {x",
+                                              "{le{C  SUPREMACY  {lr{С  ТВОРЯЩАЯ   {x" );            
+                        break;
+                                       
+    case MAX_LEVEL - 3: buf << GET_SEX( vict, "{le{C    DEITY    {lr{С  ТВОРЯЩИЙ   {x",
+                                              "{le{C    DEITY    {lr{С  ТВОРЯЩИЙ   {x",
+                                              "{le{C    DEITY    {lr{С  ТВОРЯЩАЯ   {x" );            
+                        break;
+            
+    case MAX_LEVEL - 4: buf << GET_SEX( vict, "{le{C     GOD     {lr{С     БОГ     {x",
+                                              "{le{C     GOD     {lr{С     БОГ     {x",
+                                              "{le{C   GODDESS   {lr{С   БОГИНЯ    {x" );            
+                        break;
+            
+    case MAX_LEVEL - 5: buf << GET_SEX( vict, "{le{G   IMMORTAL  {lr{G БЕССМЕРТНЫЙ {x",
+                                              "{le{G   IMMORTAL  {lr{G БЕССМЕРТНЫЙ {x",
+                                              "{le{G   IMMORTAL  {lr{G БЕССМЕРТНАЯ {x" );            
+                        break;
+            
+    case MAX_LEVEL - 6: buf << GET_SEX( vict, "{le{G   DEMIGOD   {lr{G   ПОЛУБОГ   {x",
+                                              "{le{G   DEMIGOD   {lr{G   ПОЛУБОГ   {x",
+                                              "{le{G DEMIGODDESS {lr{G ПОЛУБОГИНЯ  {x" );            
+                        break;
+
+    case MAX_LEVEL - 7: buf << GET_SEX( vict, "{le{G    ANGEL    {lr{G    АНГЕЛ    {x",
+                                              "{le{G    ANGEL    {lr{G    АНГЕЛ    {x",
+                                              "{le{G    ANGEL    {lr{G    АНГЕЛ    {x" );            
+                        break;
+
+    case MAX_LEVEL - 8: buf << GET_SEX( vict, "{le{G   AVATAR    {lr{G   АВАТАР    {x",
+                                              "{le{G   AVATAR    {lr{G   АВАТАР    {x",
+                                              "{le{G   AVATAR    {lr{G   АВАТАР    {x" );            
+                        break;
+                        
+    case MAX_LEVEL - 9: buf << GET_SEX( vict, "{le{y  LEGENDARY  {lr{G ЛЕГЕНДАРНЫЙ {x",
+                                              "{le{y  LEGENDARY  {lr{G ЛЕГЕНДАРНЫЙ {x",
+                                              "{le{y  LEGENDARY  {lr{y ЛЕГЕНДАРНАЯ {x" );            
+                        break;
+            
     }
 
     if (!buf.str( ).empty( ))
@@ -217,7 +257,7 @@ static DLString who_cmd_format_offline( PCharacter *ch, PCMemoryInterface *victi
     DLString color = status == "online" ? "G" : (status == "idle" ? "Y" : "R");
     buf << " {" << color << "*{x ";
 
-    DLString name = ch->getConfig()->runames && !victim->getRussianName().getFullForm().empty() 
+    DLString name = ch->getConfig().runames && !victim->getRussianName().getFullForm().empty() 
         ? victim->getRussianName().decline('1') : victim->getName();
     buf << "{W" << name << "  {D(Discord){x" << endl;        
     
@@ -326,7 +366,7 @@ CMDRUN(who)
 
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && pch->getRemorts( ).size( ) == 0) 
         buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl
-            << "Подробнее читай {Wсправка подтверждение{x." << endl;
+            << "Подробнее читай {y{hcсправка подтверждение{x." << endl;
     ch->send_to( buf );
 }
 

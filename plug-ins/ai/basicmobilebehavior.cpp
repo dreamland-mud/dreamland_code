@@ -17,7 +17,8 @@
 
 #include "dreamland.h"
 #include "interp.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
+#include "directions.h"
 #include "merc.h"
 #include "act.h"
 #include "mercdb.h"
@@ -159,6 +160,11 @@ bool BasicMobileBehavior::isLastFought( Character *wch )
     return !wch->is_npc( ) && wch->getName( ) == lastFought.getValue( );
 }
 
+void BasicMobileBehavior::rememberFought(Character *victim)
+{
+    memoryFought.remember(victim);
+}
+
 void BasicMobileBehavior::setLastFought( Character *wch )
 {
     if (!wch->is_npc( )) {
@@ -190,8 +196,13 @@ bool BasicMobileBehavior::isAfterCharm( ) const
     if (RIDDEN( ch ))
         return true;
         
-    return lastCharmTime.getValue( ) + AI_CHARM_RECOVER_TIME 
+    return getLastCharmTime() + AI_CHARM_RECOVER_TIME 
                     >= dreamland->getCurrentTime( );
+}
+
+long long BasicMobileBehavior::getLastCharmTime() const
+{
+    return lastCharmTime.getValue();
 }
 
 /*
@@ -206,8 +217,9 @@ void BasicMobileBehavior::remember( Room *room )
 bool BasicMobileBehavior::backHome( bool fAlways )
 {
     Room *home;
+    int myHomeVnum = homeVnum != 0 ? homeVnum.getValue() : ch->reset_room;
 
-    if (homeVnum == 0) {
+    if (myHomeVnum == 0) {
         if (fAlways) {
             act( "$c1 ищет свой дом.", ch, 0, 0, TO_ROOM );
             extract_char( ch );
@@ -217,16 +229,38 @@ bool BasicMobileBehavior::backHome( bool fAlways )
             return false;
     }
     
-    home = get_room_index( homeVnum );
+    home = get_room_instance( myHomeVnum );
 
     if (!home) {
-        LogStream::sendError( ) << "Mob " << ch->pIndexData->vnum << " from " << ch->in_room->vnum << ": wrong home " << homeVnum << endl;
+        LogStream::sendError( ) << "Mob " << ch->pIndexData->vnum << " from " << ch->in_room->vnum << ": wrong home " << myHomeVnum << endl;
         return false;
     }
     
     if (home == ch->in_room)
         return false;
-    
+
+    // Wimpy mobs are not in a hurry to get back.
+    if (IS_SET(ch->act, ACT_WIMPY) && ch->getLastFightDelay() <= Date::SECOND_IN_HOUR)
+        return false;
+
+    // Check if standing in the adjancent room and can just walk back there.
+    int door = door_between_rooms(ch->in_room, home);
+    if (door >= 0) {
+        // See if it's safe to go back for a wimpy mob.
+        if (IS_SET(ch->act, ACT_WIMPY)) {
+            interpret_cmd(ch, "scan", "");
+            if (findMemoryFoughtRoom(home)) 
+                return false;
+        }
+
+        interpret_cmd(ch, dirs[door].name, "");
+        if (ch->in_room == home) {
+            ch->position = ch->default_pos;
+            homeVnum = 0;
+            return false;
+        }
+    }
+
     transfer_char( ch, 0, home,
                    "%1$^C1 молит Богов о возвращении.", 
                    NULL,
@@ -237,27 +271,49 @@ bool BasicMobileBehavior::backHome( bool fAlways )
     return false;
 }
 
+/** Find everyone we fought with recently in a given room. */
+bool BasicMobileBehavior::findMemoryFoughtRoom(Room *room)
+{
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (memoryFought.memorized(rch))
+            return true;
+    return false;
+}
 
 bool BasicMobileBehavior::isHomesick( ) 
 {
     if (ch->position <= POS_SLEEPING)
         return false;
         
-    if (ch->zone == 0 || ch->in_room->area == ch->zone)
+    if (ch->zone == 0)
         return false;
+
+    if (ch->in_room->areaIndex() == ch->zone) {
+        // Mob in home zone and allowed to wander around.
+        if (!IS_SET(ch->act, ACT_SENTINEL))
+            return false;
+
+        // Sentinel mob in home zone, still in its native room.
+        if (ch->reset_room == ch->in_room->vnum)
+            return false;
+    }
 
     if (ch->switchedFrom)
         return false;
-
+    
     if (ch->fighting || hasLastFought( ))
         return false;
-    
-    if (IS_CHARMED(ch) || RIDDEN(ch))
+
+    if (IS_CHARMED(ch) || RIDDEN(ch))        
         return false;
 
-    if (ch->getWrapper( ))
+    if (IS_ROOM_AFFECTED(ch->in_room, AFF_ROOM_CURSE))
         return false;
     
+    // Prevent cursed mobs from recalling, but ignore 'native' curse set in mob index data.
+    if (ch->affected.findAllWithBits(&affect_flags, AFF_CURSE).size() > 0)
+        return false;
+
     return true;
 }
 
@@ -345,7 +401,7 @@ bool BasicMobileBehavior::spell( Character *caster, int sn, bool before )
         }
         
         if (beforeSpell != ch->in_room->vnum) 
-            remember( get_room_index( beforeSpell ) );
+            remember( get_room_instance( beforeSpell ) );
 
         return false;
     }

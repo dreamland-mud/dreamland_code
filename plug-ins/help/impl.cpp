@@ -8,6 +8,7 @@
 #include "xmlvariableregistrator.h"
 #include "bugtracker.h"
 #include "helpcontainer.h"
+#include "areahelp.h"
 #include "markuphelparticle.h"
 #include "xmltableloaderplugin.h"
 #include "json/json.h"
@@ -38,8 +39,13 @@ void help_save_ids()
             continue;
             
         Json::Value b;
-        b["kw"] = koi2utf((*a)->getAllKeywordsString());
-        b["id"] = DLString((*a)->getID());
+
+        DLString kw = a->getAllKeywordsString();
+        if (!a->aka.empty())
+            kw += " " + a->aka.toString();
+
+        b["kw"] = koi2utf(kw);
+        b["id"] = DLString(a->getID());
         typeahead.append(b);
     }
 
@@ -58,6 +64,7 @@ extern "C" {
         Plugin::registerPlugin<BugTracker>( ppl );
         Plugin::registerPlugin<XMLVariableRegistrator<GenericHelp> >( ppl );
         Plugin::registerPlugin<MocRegistrator<HelpContainer> >( ppl );                
+        Plugin::registerPlugin<MocRegistrator<AreaHelp> >( ppl );
         Plugin::registerPlugin<HelpLoader>( ppl );
 
         return ppl;

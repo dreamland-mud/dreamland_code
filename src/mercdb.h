@@ -63,10 +63,11 @@ class Object;
 class NPCharacter;
 class Character;
 class Room;
+class RoomIndexData;
 struct mob_index_data;
 struct obj_index_data;
 struct extra_descr_data;
-struct area_data;
+struct AreaIndexData;
 
 #define        MAX_KEY_HASH                 1024
 
@@ -79,8 +80,6 @@ extern int                newmobs;
 extern int                newobjs;
 extern mob_index_data         * mob_index_hash          [MAX_KEY_HASH];
 extern obj_index_data         * obj_index_hash          [MAX_KEY_HASH];
-extern area_data         * area_first;
-extern Room * room_list;
 
 extern int        top_affect;
 extern int        top_area;
@@ -88,13 +87,11 @@ extern int        top_ed;
 extern int        top_exit;
 extern int        top_mob_index;
 extern int        top_obj_index;
-extern int        top_reset;
-extern int        top_room;
 
 // MOC_SKIP_BEGIN
 struct area_file {
     struct area_file *next;
-    struct area_data *area;
+    struct AreaIndexData *area;
     char *file_name;
 };
 
@@ -127,7 +124,9 @@ void free_mem(void *, int);
 
 mob_index_data *        get_mob_index        ( int vnum );
 obj_index_data *        get_obj_index        ( int vnum );
-Room *        get_room_index        ( int vnum );
+RoomIndexData *        get_room_index        ( int vnum );
+Room * get_room_instance(int vnum);
+AreaIndexData * get_area_index(const DLString &filename);
 
 char *        get_extra_descr        ( const char *name, extra_descr_data *ed );
 extra_descr_data *new_extra_descr( );

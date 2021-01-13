@@ -38,7 +38,7 @@ Object::Object( ) :
                 short_descr( 0 ), description( 0 ), material( 0 ), 
                 next( 0 ), prev( 0 ),
                 next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
-                carried_by( 0 ), extra_descr( 0 ), affected( 0 ), pIndexData( 0 ),
+                carried_by( 0 ), extra_descr( 0 ), pIndexData( 0 ),
                 in_room( 0 ), enchanted( 0 ),
                 item_type( 0 ),
                 extra_flags( 0 ), wear_flags( 0 ), 
@@ -57,14 +57,9 @@ Object::Object( ) :
 
 void Object::extract( )
 {
-        Affect* paf_next;
         EXTRA_DESCR_DATA* ed_next;
         
-        for( Affect* paf = affected; paf != 0; paf = paf_next )
-        {
-                paf_next = paf->next;
-                ddeallocate( paf );
-        }
+        affected.deallocate();
 
         for( EXTRA_DESCR_DATA* ed = extra_descr; ed != 0; ed = ed_next )
         {
@@ -88,7 +83,6 @@ void Object::extract( )
         on = 0;
         carried_by = 0;
         extra_descr = 0;
-        affected = 0;
         pIndexData = 0;
         in_room = 0;
         enchanted = 0;
@@ -129,14 +123,9 @@ void Object::extract( )
 
 Object::~Object( )
 {
-    Affect *paf, *paf_next;
     EXTRA_DESCR_DATA *ed, *ed_next;
 
-        for (paf = affected; paf != 0; paf = paf_next)
-        {
-                paf_next = paf->next;
-                ddeallocate( paf );
-        }
+    affected.deallocate();
 
         for (ed = extra_descr; ed != 0; ed = ed_next )
         {
@@ -423,13 +412,7 @@ int Object::getTrueWeight( ) const
 
 bool Object::isAffected( int sn ) const
 {
-    Affect *paf;
-
-    for (paf = affected; paf != 0; paf = paf->next) 
-        if (paf->type == sn)
-            return true;
-
-    return false;
+    return affected.find(sn) != 0;
 }
 
 bool Object::hasOwner( const Character *ch ) const
@@ -478,12 +461,25 @@ int Object::getWeightMultiplier( ) const
     return item_type == ITEM_CONTAINER ? value4() : 100;
 }
 
+DLString Object::getProperty(const DLString &key) const
+{
+    Properties::const_iterator p = properties.find(key);
+    if (p != properties.end())
+        return p->second;
+    
+    p = pIndexData->properties.find(key);
+    if (p != pIndexData->properties.end())
+        return p->second;
+    
+    return DLString::emptyString;
+}
+
 static bool get_value0_from_proto(const Object *obj)
 {
     switch (obj->item_type) {
         case ITEM_WEAPON: 
             // Always grab weapon's class from the proto, unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr();
+            return !obj->getRealShortDescr() && obj->getProperty("tier").empty();
         default:
             return false;
     }
@@ -495,7 +491,10 @@ static bool get_value1_from_proto(const Object *obj)
         case ITEM_WEAPON: 
             // Bypass object dices and return those from proto if the weapon is not enchanted, not
             // dynamically created (ranger staff, bow, arrow, stone) and not restringed (cleric's mace).
-            return !obj->getRealShortDescr() && !obj->enchanted && obj->level == obj->pIndexData->level;
+            return !obj->getRealShortDescr() 
+                    && !obj->enchanted 
+                    && obj->level == obj->pIndexData->level
+                    && obj->getProperty("tier").empty();
         default:
             return false;
     }
@@ -511,7 +510,7 @@ static bool get_value3_from_proto(const Object *obj)
     switch (obj->item_type) {
         case ITEM_WEAPON: 
             // Grab weapon damage type (pierce, slash) from proto unless it's a restring (e.g. cleric's mace).
-            return !obj->getRealShortDescr();
+            return !obj->getRealShortDescr() && obj->getProperty("tier").empty();
         default:
             return false;
     }

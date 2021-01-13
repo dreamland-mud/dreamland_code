@@ -36,8 +36,20 @@ Walkment::Walkment( Character *ch )
             : Movement( ch )
 {
     silence = false;
-    boat_type = boat_get_type( horse ? horse : ch );
-    boat = boat_object_find( horse ? horse : ch );
+
+    Character *whoHasBoat;
+
+    // For a rider, their horse needs to swim.
+    if (horse)
+        whoHasBoat = horse;
+    // For a pet we assume they travel together in master's boat.
+    else if (ch->master && !ch->master->is_npc() && ch->master->getPC()->pet == ch)
+        whoHasBoat = ch->master;
+    else
+        whoHasBoat = ch;
+
+    boat_types = boat_get_types(whoHasBoat);
+    boat = boat_object_find(whoHasBoat);
 }
 
 bool Walkment::moveAtomic( )
@@ -353,10 +365,10 @@ bool Walkment::checkGuild( Character *wch )
     if (wch->is_npc( ))
         return true;
     
-    if (to_room->guilds.empty( ))
+    if (to_room->pIndexData->guilds.empty( ))
         return true;
 
-    if (!to_room->guilds.isSet( wch->getProfession( ) )) {
+    if (!to_room->pIndexData->guilds.isSet( wch->getProfession( ) )) {
         msgSelfParty( wch, 
                       "Ты не можешь войти в чужую гильдию.", 
                       "%2$^C1 не может войти в чужую гильдию." );
@@ -375,13 +387,10 @@ bool Walkment::checkGuild( Character *wch )
 
 bool Walkment::checkAir( Character *wch )
 {
-    if (from_room->sector_type != SECT_AIR && to_room->sector_type != SECT_AIR)
+    if (from_room->getSectorType() != SECT_AIR && to_room->getSectorType() != SECT_AIR)
         return true;
 
     if (MOUNTED(wch))
-        return true;
-
-    if (is_flying( wch ))
         return true;
 
     if (wch->is_immortal( ) || wch->is_mirror( ))
@@ -389,31 +398,69 @@ bool Walkment::checkAir( Character *wch )
 
     if (IS_GHOST(wch))
         return true;
-    
+
+    bool would_fly = false;
+
+    if (can_fly( wch )) {
+        would_fly = true;
+
+        if (!ch->posFlags.isSet(POS_FLY_DOWN))
+            return true;
+    }
+
     rc = RC_MOVE_AIR;
-    msgSelfParty( wch, 
-                  "Ты не умеешь летать.", 
-                  "%2$^C1 не умеет летать." );
+
+    if (would_fly)
+        msgSelfParty(wch, 
+                    "Сначала тебе надо {y{hcвзлететь{x.", 
+                    "%2$^C1 долж%2$Gно|ен|на сначала взлететь.");
+    else
+        msgSelfParty( wch, 
+                    "Ты не умеешь летать.", 
+                    "%2$^C1 не умеет летать." );
     return false;
 }
 
 bool Walkment::checkWater( Character *wch )
 {
-    if (from_room->sector_type != SECT_WATER_NOSWIM
-         && to_room->sector_type != SECT_WATER_NOSWIM)
-        return true;
+    // water_swim: can be ridden through even if the horse doesn't swim, can get through on foot
+    // water_noswim: can be ridden through only if the horse swims, can get through with any boat
+    // underwater: can't get through with any boat, swimming only     
     
-    if (MOUNTED(wch))
-        return true;
+    // TODO: pets still inherit all boat_types from their master, so underwater restrictions
+    // don't really apply to them yet.
 
-    if (boat_type != BOAT_NONE) 
-        return true;
-    
-    rc = RC_MOVE_WATER;
-    msgSelfParty( wch, 
-                  "Чтоб идти дальше тебе нужна лодка.",
-                  "%2$^C1 не умеет ходить по воде." );
-    return false;
+    if (from_room->getSectorType() == SECT_UNDERWATER || 
+         to_room->getSectorType() == SECT_UNDERWATER) {
+            if (!IS_SET(boat_types, BOAT_SWIM)) {
+               msgSelfParty( wch, 
+                  "Здесь ты можешь только проплыть.",
+                  "%2$^C1 сможет здесь только проплыть." );
+                rc = RC_MOVE_WATER; // TODO: add RC_MOVE_UNDERWATER
+                return false;                     
+            }
+    }
+                
+    if ( from_room->getSectorType() == SECT_WATER_NOSWIM || 
+         to_room->getSectorType() == SECT_WATER_NOSWIM ) {
+                
+            // For a rider, we'll only check horse's ability to swim.        
+            if (MOUNTED(wch))
+               return true;
+            
+            // any boats will do
+            if (boat_types != BOAT_NONE) 
+               return true;
+            
+            rc = RC_MOVE_WATER;    
+            msgSelfParty( wch, 
+                  "Чтоб идти дальше тебе нужна лодка, способность плавать или полет.",
+                  "%2$^C1 не умеет перемещаться по воде." );
+            return false;                
+    }
+ 
+    // for water_swim horses could splash water around, fun!  
+    return true;
 }
 
 bool Walkment::checkRoomCapacity( Character *wch )
@@ -508,10 +555,7 @@ bool Walkment::checkMovepoints( Character *wch )
 bool Walkment::applyCamouflage( Character *wch )
 {
     if (IS_AFFECTED(wch, AFF_CAMOUFLAGE)
-            && to_room->sector_type != SECT_FIELD
-            && to_room->sector_type != SECT_FOREST
-            && to_room->sector_type != SECT_MOUNTAIN
-            && to_room->sector_type != SECT_HILLS)
+            && !IS_NATURE(to_room))
     {
         strip_camouflage( wch );
     }        
@@ -534,7 +578,7 @@ bool Walkment::applyWeb( Character *wch )
         chance *= 2;
 
     if (number_percent( ) < chance) {
-        affect_bit_strip(wch, TO_DETECTS, ADET_WEB);
+        affect_bit_strip(wch, &detect_flags, ADET_WEB);
         affect_strip(wch, gsn_web);
         msgSelfRoom( wch,
                      "Ты разрываешь сети, которые мешали тебе покинуть это место.",

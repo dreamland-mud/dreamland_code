@@ -759,13 +759,17 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
 {
     switch (container->item_type) {
     case ITEM_CONTAINER:
+        if (IS_SET(container->value1(), CONT_LOCKED)) {
+            ch->pecho("%1$^O1 заперт%1$Gо||а на ключ, попробуй отпереть.", container);
+            return false;
+        }
         if (IS_SET(container->value1(), CONT_CLOSED)) {
-            ch->println( "Тут закрыто." );
+            ch->pecho("%1$^O1 закрыт%1$Gо||а, попробуй открыть.", container);
             return false;
         }
 
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            ch->println( "Тебе не удалось нашарить ни одного кармана." );
+            ch->pecho( "Тебе не удалось нашарить ни одного кармана на %O6.", container );
             return false;
         }
 
@@ -775,17 +779,15 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
         return true;
 
     default:
-        ch->println("Это не контейнер.");
+        ch->pecho("%^O1 не контейнер, туда ничего нельзя положить.", container);
         return false;
     }
-
-
 }
 
 static bool can_put_money_into( Character *ch, Object *container )
 {
     if (container->item_type != ITEM_CONTAINER) {
-        ch->pecho("%^O1 не контейнер.", container);
+        ch->pecho("Ты пытаешься положить деньги в %O4, но это не контейнер.", container);
         return false;
     }
 
@@ -1174,9 +1176,9 @@ static int drop_obj( Character *ch, Object *obj )
         && material_swims( obj ) == SWIM_NEVER)
     {
         if (!IS_AFFECTED(ch, AFF_SNEAK))
-            ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->liquid->getShortDescr( ).c_str( ) );
+            ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
 
-        ch->pecho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->liquid->getShortDescr( ).c_str( ) );
+        ch->pecho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
     }
     else if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
@@ -1186,9 +1188,9 @@ static int drop_obj( Character *ch, Object *obj )
         ch->pecho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
     }
     else if (!IS_WATER( ch->in_room ) 
-             && ch->in_room->sector_type != SECT_AIR
-             && ch->in_room->sector_type != SECT_FOREST
-             && ch->in_room->sector_type != SECT_DESERT
+             && ch->in_room->getSectorType() != SECT_AIR
+             && ch->in_room->getSectorType() != SECT_FOREST
+             && ch->in_room->getSectorType() != SECT_DESERT
              && obj->pIndexData->vnum == OBJ_VNUM_POTION_VIAL
 //             && material_is_flagged( obj, MAT_FRAGILE )
              && chance( 40 ))
@@ -1239,9 +1241,9 @@ CMDRUNP( drop )
         {
             extract_obj( obj );
             if ( !IS_AFFECTED(ch, AFF_SNEAK) )
-                act("Монеты падают и тонут в $n6.", ch, ch->in_room->liquid->getShortDescr( ).c_str( ), 0, TO_ROOM);
+                act("Монеты падают и тонут в $n6.", ch, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ), 0, TO_ROOM);
 
-            act("Монеты падают и тонут в $n6.", ch, ch->in_room->liquid->getShortDescr( ).c_str( ), 0, TO_CHAR);
+            act("Монеты падают и тонут в $n6.", ch, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ), 0, TO_CHAR);
         }
         else
         {

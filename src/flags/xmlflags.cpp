@@ -72,6 +72,12 @@ bool XMLFlagsWithTable::toXML( XMLNode::Pointer& parent ) const
         return false;
 }
 
+void XMLFlagsWithTable::clear()
+{
+    Bitstring::clear();
+    table = 0;
+}
+
 /*
  * XMLFlagsNoEmpty
  */

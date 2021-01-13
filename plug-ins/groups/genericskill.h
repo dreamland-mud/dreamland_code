@@ -39,12 +39,9 @@ public:
     GenericSkill( );
     virtual ~GenericSkill( );
 
-    void resolve( );
-    void unresolve( );
-
     virtual void loaded( );
     virtual SkillGroupReference & getGroup( );
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
@@ -55,7 +52,7 @@ public:
     virtual bool canPractice( PCharacter *, ostream & buf ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 
-    virtual void show( PCharacter *, ostream & buf );
+    virtual void show( PCharacter *, ostream & buf ) const;
 
     virtual const DLString & getCategory( ) const
     {
@@ -68,12 +65,9 @@ protected:
     static const DLString CATEGORY;                                             
     
     bool availableForAll( ) const;
-    int learnedAux( PCharacter *, int ) const;
-    const SkillClassInfo * getClassInfo( Character * ) const;
-    SkillClassInfo * getClassInfo( PCharacter * );
-    SkillClassInfo * getClassInfo( const DLString & );
-    const SkillRaceBonus *getRaceBonus( Character * ) const;
-    bool isRaceAffect( Character * ) const;
+    const SkillClassInfo * getClassInfo( CharacterMemoryInterface * ) const;
+    const SkillRaceBonus *getRaceBonus( CharacterMemoryInterface * ) const;
+    bool isRaceAffect( CharacterMemoryInterface * ) const;
 
     XML_VARIABLE XMLSkillGroupReference group;
     XML_VARIABLE XMLFlagsNoEmpty   raceAffect;
@@ -94,7 +88,7 @@ public:
     
     SkillClassInfo( );
 
-    const SkillClanAntiBonus *getClanAntiBonus( Character * ) const;
+    const SkillClanAntiBonus *getClanAntiBonus( CharacterMemoryInterface * ) const;
 
     inline bool isAlwaysAvailable( ) const {
         return always;

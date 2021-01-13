@@ -29,15 +29,15 @@ public:
     virtual bool toXML(XMLNode::Pointer &parent) const;
 };
 
-class Room;
+class RoomIndexData;
 
 class XMLRoom : public XMLVariableContainer {
 XML_OBJECT
 public:
     XMLRoom();
 
-    void init(Room *);
-    Room *compat(int vnum);
+    void init(RoomIndexData *);
+    RoomIndexData *compat(int vnum);
 
     XML_VARIABLE XMLStringNoEmpty name, description;
     XML_VARIABLE XMLFlagsNoEmpty flags;

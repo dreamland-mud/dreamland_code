@@ -12,6 +12,7 @@
 class Character;
 class PCharacter;
 class NPCharacter;
+class CharacterMemoryInterface;
 class Spell;
 class AffectHandler;
 class SkillGroupReference;
@@ -49,7 +50,7 @@ public:
     virtual int getMana( ) const;
     virtual const RussianString &getDammsg( ) const;
 
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool message = true ) const; 
     virtual int getLevel( Character * ) const;
@@ -63,7 +64,7 @@ public:
     virtual bool canTeach( NPCharacter *, PCharacter *, bool verbose = true );
     virtual void practice( PCharacter * ) const;
     
-    virtual void show( PCharacter *, std::ostream & );
+    virtual void show( PCharacter *, std::ostream & ) const;
 
     virtual const DLString& getCategory( ) const;
 

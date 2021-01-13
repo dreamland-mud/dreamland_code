@@ -12,6 +12,7 @@
 #define ROOM_VNUM2ID(v) (((v) << 4) | 1)
 #define OBJ_VNUM2ID(v) (((v) << 4) | 2)
 #define MOB_VNUM2ID(v) (((v) << 4) | 3)
+#define AREA_VNUM2ID(v) (((v) << 4) | 4)
 
 class WrapperManager: public WrapperManagerBase, public Plugin {
 public:
@@ -21,12 +22,14 @@ public:
     virtual Scripting::Register getWrapper( Room * );
     virtual Scripting::Register getWrapper( mob_index_data * );
     virtual Scripting::Register getWrapper( obj_index_data * );
+    virtual Scripting::Register getWrapper( AreaIndexData * );
     
     virtual void linkWrapper( Character * );
     virtual void linkWrapper( ::Object * );
     virtual void linkWrapper( Room * );
     virtual void linkWrapper( mob_index_data * );
     virtual void linkWrapper( obj_index_data * );
+    virtual void linkWrapper( AreaIndexData * );
 
     virtual void getTarget( const Scripting::Register &, Character *& );
     

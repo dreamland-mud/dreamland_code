@@ -40,6 +40,46 @@ BONUS(mana);
 bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before );
 void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before );
 
+static bool string_has_separator(const DLString &s)
+{
+    for (DLString::size_type i = 0; i < s.size(); i++)
+        if (dl_is_arg_separator(s.at(i)))
+            return true;
+
+    return false;
+}
+
+static Spell::Pointer spell_lookup(Character *ch, const DLString &fullArguments, DLString &spellName, DLString &spellArgs)
+{
+    Spell::Pointer spell;
+
+    // Player knows what they're doing, quotes added. Look up spell by the first argument.
+    if (string_has_separator(fullArguments))
+        return SpellManager::lookup(spellName, ch);
+
+    // May be forgot the quotes (e.g. [cast create spring]). 
+    // Try to match the whole argument, then cut off the last word & try again, and so on.
+    StringList args(fullArguments);
+    DLString offcuts;
+
+    while (!args.empty()) {
+        spell = SpellManager::lookup(args.toString(), ch);
+
+        if (spell) {
+            // Reset spell args to the remainder of the string.
+            spellArgs = offcuts.stripWhiteSpace();
+            return spell;
+        }
+
+        DLString lastWord = args.back();
+        offcuts = lastWord + " " + offcuts;
+        args.pop_back();
+    }
+
+    // Nothing found.
+    return spell;
+}
+
 CMDRUN( cast )
 {
     std::basic_ostringstream<char> buf;
@@ -49,7 +89,7 @@ CMDRUN( cast )
     Skill::Pointer skill;
     Spell::Pointer spell;
     SpellTarget::Pointer target;
-    DLString arguments, spellName; 
+    DLString fullArguments, spellName, spellArgs; 
 
     if (ch->is_npc( ) && !( ch->desc != 0 || ch->master != 0 ))
         return;
@@ -88,9 +128,11 @@ CMDRUN( cast )
         return;
     }
 
-    arguments = constArguments;
-    arguments.stripWhiteSpace( );
-    spellName = arguments.getOneArgument( );
+    // Split user input into spell name (potentially in quotes) and spell args (rest of the string).
+    fullArguments = constArguments;
+    fullArguments.stripWhiteSpace();
+    spellArgs = fullArguments;
+    spellName = spellArgs.getOneArgument();
     
     if (spellName.empty( )) {
         ch->send_to("Колдовать что и на кого?\n\r");
@@ -107,7 +149,8 @@ CMDRUN( cast )
         return;
     }
     
-    spell = SpellManager::lookup( spellName, ch );
+    // Find the spell and potentially adjust spell arguments.
+    spell = spell_lookup(ch, fullArguments, spellName, spellArgs);
 
     if (!spell) {
         if (ch->is_npc( ) && ch->master) 
@@ -146,7 +189,7 @@ CMDRUN( cast )
         return;
     }
 
-    target = spell->locateTargets( ch, arguments, buf );
+    target = spell->locateTargets( ch, spellArgs, buf );
     if (target->error != 0) {
         ch->send_to( buf );
         return;

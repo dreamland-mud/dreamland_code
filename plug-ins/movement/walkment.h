@@ -67,7 +67,7 @@ protected:
 
     bool silence;
     Object *boat;
-    int boat_type;
+    int boat_types;
 };
 
 

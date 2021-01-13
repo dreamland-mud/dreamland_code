@@ -19,7 +19,7 @@
 #include "comm.h"
 #include "merc.h"
 #include "interp.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "mercdb.h"
 
@@ -396,7 +396,7 @@ MEDIT(show)
             mob.behavior->save( ostr );
             ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
             
-        } catch (ExceptionXMLError e) {
+        } catch (const ExceptionXMLError &e) {
             ptc(ch, "Behavior is BUGGY.\r\n");
         }
     }
@@ -416,7 +416,7 @@ MEDIT(fenia)
 
 MEDIT(create)
 {
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
 
     value = atoi(argument);
@@ -573,8 +573,8 @@ MEDIT(where)
 
         ptc(ch, "[%5d]    %-30s (%s)\r\n", 
                 wch->in_room->vnum,
-                wch->in_room->name, 
-                wch->in_room->area->name);
+                wch->in_room->getName(), 
+                wch->in_room->areaName());
     }
 
     return true;
@@ -994,9 +994,8 @@ MEDIT(hitroll)
 
 MEDIT(list)
 {
-    int i, cnt;
-    Room *pRoom;
-    RESET_DATA *pReset;
+    int cnt;
+    RoomIndexData *pRoom;
     char buf[MAX_STRING_LENGTH];
     ostringstream buffer;
     
@@ -1006,18 +1005,19 @@ MEDIT(list)
     buffer << buf;
     
     cnt = 0;
-    for(i=0;i<MAX_KEY_HASH;i++)
-        for(pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
-            for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
-                switch(pReset->command) {
-                    case 'M':
-                        if(pReset->arg1 == mob.vnum) {
-                            snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-                                    pReset->command, pRoom->vnum, pRoom->name);
-                            buffer << buf;
-                            cnt++;
-                        }
-                }
+    for (auto &r: roomIndexMap) {
+        pRoom = r.second;
+        for(auto &pReset: pRoom->resets)
+            switch(pReset->command) {
+                case 'M':
+                    if(pReset->arg1 == mob.vnum) {
+                        snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
+                                pReset->command, pRoom->vnum, pRoom->name);
+                        buffer << buf;
+                        cnt++;
+                    }
+            }
+    }
 
     snprintf(buf, sizeof(buf), "Total {W%d{x resets found.\n\r", cnt);
     buffer << buf;
@@ -1139,7 +1139,7 @@ MEDIT(average)
 
     for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next) {
-            if (IS_SET(pMob->area->area_flag, AREA_NOQUEST|AREA_HIDDEN))
+            if (IS_SET(pMob->area->area_flag, AREA_NOQUEST|AREA_HIDDEN|AREA_SYSTEM))
                 continue;
             if (pMob->vnum == 3174) // old jew
                 continue;
@@ -1219,7 +1219,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     NPCharacter *mob;
     MOB_INDEX_DATA *pMob;
-    AREA_DATA *pArea;
+    AreaIndexData *pArea;
     int value;
     char arg1[MAX_STRING_LENGTH];
 
@@ -1249,7 +1249,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
     else if (!str_cmp(arg1, "create")) {
         if (!str_cmp(argument, "next")) {
-            value = next_mob_index(ch, ch->in_room);
+            value = next_mob_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
                 ch->println("Все внумы в этой зоне уже заняты!");
                 return;
@@ -1332,6 +1332,6 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 void OLCStateMobile::changed( PCharacter *ch )
 {
     if(mob.area)
-        SET_BIT(mob.area->area_flag, AREA_CHANGED);
+        mob.area->changed = true;
 }
 

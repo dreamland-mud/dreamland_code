@@ -42,6 +42,7 @@
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
 #include "objindexwrapper.h"
+#include "areaindexwrapper.h"
 #include "wrappermanager.h"
 #include "affectwrapper.h"
 #include "tableswrapper.h"
@@ -293,9 +294,19 @@ NMI_INVOKE( Root, get_room_index , "(vnum): возвращает комнату 
         throw Scripting::NotEnoughArgumentsException( );
         
     vnum = args.front( ).toNumber( );
-    room = ::get_room_index( vnum );
+    room = ::get_room_instance( vnum );
     
     return WrapperManager::getThis( )->getWrapper( room ); 
+}
+
+NMI_INVOKE( Root, get_area_index , "(filename): возвращает зону с этим именем файла")
+{
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+        
+    AreaIndexData *pArea = ::get_area_index(args2string(args));
+    
+    return WrapperManager::getThis( )->getWrapper( pArea ); 
 }
 
 NMI_INVOKE( Root, min, "(a, b): минимальное из двух чисел a и b") 
@@ -531,17 +542,16 @@ NMI_INVOKE( Root, makeShort , "(s1,s2,...,s6): конструирует стро
 
 NMI_INVOKE(Root, get_random_room, "(): произвольная комната из числа общедоступных" )
 {
-    std::vector<Room *> rooms;
-    Room *r;
+    RoomVector rooms;
     
-    for (r = room_list; r; r = r->rnext)
+    for (auto &r: roomInstances)
         if (r->isCommon() && !r->isPrivate())
             rooms.push_back(r);
 
     if (rooms.empty())
         return Register( );
     else {
-        r = rooms[::number_range(0, rooms.size() - 1)];
+        Room *r = rooms[::number_range(0, rooms.size() - 1)];
         return WrapperManager::getThis( )->getWrapper(r); 
     }
 }
@@ -572,26 +582,33 @@ NMI_INVOKE(Root, api, "(): печатает этот API" )
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(Root, gecho, "(msg): выдать сообщение msg всем играющим" )
+NMI_INVOKE(Root, gecho, "(fmt, args): выдать отформатированное сообщение msg всем играющим" )
 {
     Descriptor *d;
 
     if (args.empty())
         throw Scripting::NotEnoughArgumentsException( );
     
-    DLString txt = args.front().toString() + "\r\n";
-    
-    for (d = descriptor_list; d != 0; d = d->next)
-        if (d->connected == CON_PLAYING && d->character)
-            d->character->send_to( txt.c_str( ) );
+    for (d = descriptor_list; d != 0; d = d->next) {
+        Character *wch = d->character;
+        if (d->connected == CON_PLAYING && wch && wch->in_room)
+            wch->pecho(POS_RESTING, regfmt(wch, args).c_str());
+    }
     
     return Register( );
 }
 
-NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Discord от имени бота Хрустальный Шар")
+NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Discord")
 {
     DLString msg = args2string(args);
     send_discord_orb(msg);
+    return Register( );
+}
+
+NMI_INVOKE(Root, telegram, "(msg): послать сообщение в Telegram")
+{
+    DLString msg = args2string(args);
+    send_telegram(msg);
     return Register( );
 }
 
@@ -691,17 +708,19 @@ NMI_GET( Root, obj_index_list, "список (List) всех прототипо�
     for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[iHash]; pObj; pObj = pObj->next)
             list->push_back(wrap(pObj)); 
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(list);
-    return Register(listObj);
+
+    return wrap(list);
 }
 
-extern Room *room_list;
-
-NMI_GET( Root, room_list , "список всех комнат, поле комнаты rnext указывает на следующую") 
+NMI_GET( Root, rooms , "список всех комнат") 
 {
-    return WrapperManager::getThis( )->getWrapper(room_list); 
+    RegList::Pointer list(NEW);
+
+    for (auto &r: roomIndexMap) {
+        list->push_back(wrap(r.second->room));
+    }
+
+    return wrap(list);
 }
 
 NMI_GET( Root, char_list , "список всех чаров, поле чара next указывает на следующего") 
@@ -716,10 +735,8 @@ NMI_GET( Root, mob_index_list, "список (List) всех прототипо�
     for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next)
             list->push_back(wrap(pMob)); 
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(list);
-    return Register(listObj);
+
+    return wrap(list);
 }
 
 NMI_SET( Root, hour , "текущий час суток, 0..23") 
@@ -836,10 +853,8 @@ NMI_GET( Root, hometowns, "список всех хометаунов")
         if (ht->isValid( )) 
             list->push_back( HometownWrapper::wrap( ht->getName( ) ) );
     }
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+
+    return wrap(list);
 }
 
 NMI_INVOKE( Root, Hometown, "(name): конструктор для хометауна по имени" )
@@ -866,7 +881,7 @@ NMI_INVOKE( Root, Area, "(filename): конструктор для зоны по
     return AreaWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск профессии по русскому или англ названию" )
+NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск класса по русскому или англ названию" )
 {
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
@@ -879,7 +894,7 @@ NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск про
     return Register::handler<ProfessionWrapper>(prof->getName());
 }
 
-NMI_GET( Root, professions, "список всех профессий, доступных игрокам") 
+NMI_GET( Root, professions, "список всех классов, доступных игрокам") 
 {
     RegList::Pointer list(NEW);
     Profession *prof;
@@ -890,13 +905,11 @@ NMI_GET( Root, professions, "список всех профессий, дост�
         if (prof->isValid( ) && prof->isPlayed( )) 
             list->push_back( Register::handler<ProfessionWrapper>(prof->getName()) );
     }
-    
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+
+    return wrap(list);
 }
 
-NMI_INVOKE( Root, Profession, "(name): конструктор для профессии (класса) по имени" )
+NMI_INVOKE( Root, Profession, "(name): конструктор для класса по имени" )
 {
     DLString name = args2string(args);
     Profession *prof = professionManager->findExisting(name);
@@ -945,9 +958,7 @@ NMI_GET( Root, religions, "список всех религий")
                  Register::handler<ReligionWrapper>(religion->getName()));
     }
     
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 
@@ -972,9 +983,7 @@ NMI_GET( Root, races, "список всех рас")
             list->push_back( RaceWrapper::wrap( race->getName( ) ) );
     }
     
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 NMI_GET( Root, pcraces, "список рас, доступных игрокам") 
@@ -989,9 +998,7 @@ NMI_GET( Root, pcraces, "список рас, доступных игрокам"
             list->push_back( RaceWrapper::wrap( race->getName( ) ) );
     }
     
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 NMI_INVOKE( Root, Race, "(name): конструктор для расы по имени" )
@@ -1094,9 +1101,7 @@ NMI_GET( Root, players, "список (List) всех игроков")
         if (d->connected == CON_PLAYING && d->character)
             list->push_back( wrap( d->character->getPC( ) ) );
 
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
-    listObj->setHandler( list );
-    return Register( listObj );
+    return wrap(list);
 }
 
 NMI_GET( Root, feniadbStats, "статистика базы данных скриптовых объектов")
@@ -1169,9 +1174,7 @@ NMI_INVOKE(Root, spells, "(targets): вернуть названия всех з
         spells->push_back(Register(skill->getName()));
     }
 
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(spells);
-    return Register(listObj);
+    return wrap(spells);
 }
 
 NMI_INVOKE(Root, skills, "(group): вернуть названия всех умений, принадлежащих этой группе (olchelp prac)")
@@ -1188,7 +1191,6 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
             skills->push_back(Register(skill->getName()));
     }
 
-    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
-    listObj->setHandler(skills);
-    return Register(listObj);
+    return wrap(skills);    
 }
+

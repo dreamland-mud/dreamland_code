@@ -49,6 +49,20 @@ DLString LanguageHelp::getTitle(const DLString &label) const
     return buf.str();
 }
 
+void LanguageHelp::getRawText( Character *ch, ostringstream &in ) const
+{
+    const Language *lang = command ? command.getDynamicPointer<Language>() : 0;
+    if (!lang)
+        return;
+
+    in << "%PAUSE%";
+    lang->show(ch->getPC(), in);
+    in << "%RESUME%";
+
+    in << endl
+       << *this;
+}
+
 /*--------------------------------------------------------------------
  * Language
  *-------------------------------------------------------------------*/
@@ -91,7 +105,7 @@ CommandHelp::Pointer Language::getHelp( ) const
     return help;
 }
 
-const RaceLangInfo * Language::getRaceInfo( PCharacter *ch ) const
+const RaceLangInfo * Language::getRaceInfo( CharacterMemoryInterface *ch ) const
 {
     static const DLString otherName( "other" );
     Races::const_iterator i = races.find( ch->getRace( )->getName( ) );
@@ -107,7 +121,7 @@ const RaceLangInfo * Language::getRaceInfo( PCharacter *ch ) const
     return &i->second;
 }
 
-const ClassLangInfo * Language::getClassInfo( PCharacter *ch ) const
+const ClassLangInfo * Language::getClassInfo( CharacterMemoryInterface *ch ) const
 {
     static const DLString otherName( "other" );
     Classes::const_iterator i = classes.find( ch->getProfession( )->getName( ) );

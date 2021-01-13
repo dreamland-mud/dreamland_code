@@ -168,7 +168,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
     {
         if (!is_in_pk_range( ch->getModifyLevel( ),
                              victim->getModifyLevel( ),
-                             !IS_SET( victim->act, PLR_WANTED ) ))
+                             (!IS_SET( victim->act, PLR_WANTED ) && !IS_SET( victim->getPC( )->PK_flag, PK_THIEF ))))
             return true;
     }
 
@@ -201,11 +201,11 @@ bool is_safe_rspell_nom( short level, Character *victim )
     if (is_safe_rspell( victim ))
         return true;
     
-    if (!victim->is_npc() && !is_in_pk_range( level, victim->getModifyLevel( ), 1 ))
+    if (!victim->is_npc() && !is_in_pk_range( level, victim->getModifyLevel( ),  (!IS_SET( victim->act, PLR_WANTED ) && !IS_SET( victim->getPC( )->PK_flag, PK_THIEF )) ))
         return true;
 
     if (victim->is_npc() && IS_CHARMED(victim) && !victim->master->is_npc())
-        return !is_in_pk_range( level, victim->master->getModifyLevel( ), 1 );
+        return !is_in_pk_range( level, victim->master->getModifyLevel( ),  (!IS_SET( victim->master->act, PLR_WANTED ) && !IS_SET( victim->master->getPC( )->PK_flag, PK_THIEF )) );
 
     return false;
 }

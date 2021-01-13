@@ -14,6 +14,7 @@ libalias_la_LIBADD = \
 libalias_la_SOURCES = alias.cpp
 
 libcomm_la_SOURCES = \
+areas.cpp \
 banking.cpp \
 configs.cpp \
 corder.cpp \
@@ -26,7 +27,8 @@ writing.cpp \
 eating.cpp \
 communication.cpp \
 info.cpp \
-senses.cpp
+senses.cpp \
+affects.cpp
 
 libcomm_la_MOC = \
 banking.h \

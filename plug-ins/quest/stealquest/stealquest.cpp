@@ -87,14 +87,14 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     name = victim->getShortDescr( );
     name.upperFirstCharacter( );
     victimName = name;
-    victimRoom = victim->in_room->name;
-    victimArea = victim->in_room->area->name;
+    victimRoom = victim->in_room->getName();
+    victimArea = victim->in_room->areaName();
     
     name = thief->getShortDescr( );
     name.upperFirstCharacter( );
     thiefName = name;
-    thiefArea = thief->in_room->area->name;
-    thiefRoom = thief->in_room->name;
+    thiefArea = thief->in_room->areaName();
+    thiefRoom = thief->in_room->getName();
     thiefSex = thief->getSex( );
 
     itemName = item->getShortDescr( );
@@ -130,7 +130,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     }
 
     tell_raw( pch, questman, "Пострадавшего ищи в районе {W%s{G ({W{hh%s{hx{G).", 
-                  victim->in_room->name, victim->in_room->area->name );
+                  victim->in_room->getName(), victim->in_room->areaName() );
     tell_fmt("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.", 
               pch, questman, time );
     
@@ -184,8 +184,9 @@ Quest::Reward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman
         r->points += number_fuzzy( 10 );
     else    
         r->points += number_fuzzy( 3 );
-        
+    if(!IS_TOTAL_NEWBIE(ch)){
     r->points -= hint * 5;
+    }
     r->gold = number_fuzzy( r->points );
     r->wordChance = r->points;
     r->scrollChance = number_range( 5, mode * 4 );
@@ -433,18 +434,12 @@ bool StealQuest::isBonus( OBJ_INDEX_DATA *pObjIndex, PCharacter *pch )
 
 Room * StealQuest::findHideaway( PCharacter *pch, NPCharacter *thief )
 {
-    Room *room;
-    std::vector<Room *> places, places1, places2;
-    std::vector<Room *>::iterator r;
+    RoomVector places, places1, places2;
+    RoomVector::iterator r;
 
-    for (room = room_list; room; room = room->rnext) {
-        if (room->area != thief->in_room->area)
-            continue;
-        
-        if (!checkRoom( pch, room ))
-            continue;
-        
-        places.push_back( room );
+    for (auto &r: thief->in_room->area->rooms) {
+        if (checkRoom( pch, r.second ))
+            places.push_back( r.second );
     }
     
     for (r = places.begin( ); r != places.end( ); r++) {
@@ -480,7 +475,7 @@ DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
         return "";
 
     if (depth >= 2) 
-        return room->name;
+        return room->getName();
 
     for (int d = 0; d < DIR_SOMEWHERE; d++) {
         Room *r;
@@ -502,7 +497,7 @@ DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
                 return getRoomHint( r, room, depth + 1 );
     }
 
-    return room->name;
+    return room->getName();
 }
 
 /*

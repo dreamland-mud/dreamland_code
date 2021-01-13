@@ -240,7 +240,7 @@ SKILL_RUNP( settraps )
         if ( ch->is_npc()
                 || number_percent( ) <  ( gsn_settraps->getEffective( ch ) * 0.7 ) )
         {
-                Affect af,af2;
+                Affect af;
 
                 gsn_settraps->improve( ch, true );
 
@@ -256,28 +256,15 @@ SKILL_RUNP( settraps )
                         return;
                 }
 
-                af.where     = TO_ROOM_AFFECTS;
+                af.bitvector.setTable(&raffect_flags);
                 af.type      = gsn_settraps;
                 af.level     = ch->getModifyLevel();
                 af.duration  = ch->getModifyLevel() / 40;
-                af.location  = APPLY_NONE;
-                af.modifier  = 0;
-                af.bitvector = AFF_ROOM_THIEF_TRAP;
+                af.bitvector.setValue(AFF_ROOM_THIEF_TRAP);
                 ch->in_room->affectTo( &af );
 
-                af2.where     = TO_AFFECTS;
-                af2.type      = gsn_settraps;
-                af2.level            = ch->getModifyLevel();
-
-                if ( ch->is_adrenalined() )
-                        af2.duration  = 1;
-                else
-                        af2.duration = ch->getModifyLevel() / 10;
-
-                af2.modifier  = 0;
-                af2.location  = APPLY_NONE;
-                af2.bitvector = 0;
-                affect_to_char( ch, &af2 );
+                postaffect_to_char(ch, gsn_settraps, 
+                        ch->is_adrenalined() ? 1 : ch->getModifyLevel() / 10);
 
                 ch->send_to( "Ты устраиваешь ловушку в комнате.\n\r");
 
@@ -421,13 +408,13 @@ SKILL_RUNP( envenom )
         if (percent < skill)
         {
 
-            af.where     = TO_WEAPON;
+            af.bitvector.setTable(&weapon_type2);
             af.type      = gsn_poison;
             af.level     = ch->getModifyLevel() * percent / 100;
             af.duration  = ch->getModifyLevel() * percent / 100;
-            af.location  = 0;
+            
             af.modifier  = 0;
-            af.bitvector = WEAPON_POISON;
+            af.bitvector.setValue(WEAPON_POISON);
             affect_to_obj( obj, &af);
 
             if ( !IS_AFFECTED( ch, AFF_SNEAK ) )
@@ -536,7 +523,7 @@ SKILL_RUNP( steal )
             ostringstream ostr;
             bonus_thief_skills->reportAction(ch->getPC(), ostr);
             ch->send_to(ostr);
-            percent = 1;
+            percent = max(1, percent-number_range(20,25));
         }
 
         if ( is_safe( ch, victim )
@@ -995,9 +982,9 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    if ( attack_table[obj->value3()].damage != DAM_PIERCE )
+    if ( attack_table[obj->value3()].damage != DAM_PIERCE && obj->value0() != WEAPON_DAGGER )
     {
-            ch->send_to("Чтоб ударить сзади, нужно вооружится колющим оружием.\n\r");
+            ch->send_to("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием.\n\r");
             return;
     }
 
@@ -1034,31 +1021,27 @@ SKILL_RUNP( backstab )
         return;
 
     BackstabOneHit bs( ch, victim );
-    bool fBonus = false;
+    int bsBonus = 0, hasteBonus = 0;
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
         ch->send_to(ostr);
-        fBonus = true;
+        bsBonus+= number_range(20,25);
+        hasteBonus+= number_range(20,25);
     }
 
-    Chance bsChance(ch, gsn_backstab->getEffective(ch)-1, 100);
+    Chance bsChance(ch, gsn_backstab->getEffective(ch)-1+bsBonus, 100);
 
     try {
         if (!IS_AWAKE(victim)
-                || fBonus
                 || bsChance.reroll())
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
 			
             if (IS_QUICK(ch)) {
-                    int haste_chance;
-                    if (fBonus)
-                        haste_chance = 100;
-                    else
-                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
+                    int haste_chance = hasteBonus + gsn_backstab->getEffective( ch ) * 4 / 10;
 
                     if (Chance(ch, haste_chance-1, 100).reroll()) {
                         if (ch->fighting == victim)
@@ -1069,7 +1052,7 @@ SKILL_RUNP( backstab )
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
                 dual_chance = 0;
-            else if (fBonus && dual_percent > 50)
+            else if (bsBonus > 0 && dual_percent > 50)
                 dual_chance = 100;
             else
                 dual_chance =  dual_percent * 8 / 10;
@@ -1091,7 +1074,7 @@ SKILL_RUNP( backstab )
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
                 dual_chance = 0;
-            else if (fBonus && dual_percent > 50)
+            else if (bsBonus > 0 && dual_percent > 50)
                 dual_chance = 100;
             else
                 dual_chance =  dual_percent * 8 / 10;
@@ -1131,6 +1114,7 @@ SKILL_RUNP( circle )
 {
     Character *victim;
     Character *person;
+    Object *obj;
 
     if ( MOUNTED(ch) )
     {
@@ -1150,10 +1134,11 @@ SKILL_RUNP( circle )
             return;
     }
 
-    if ( get_eq_char(ch,wear_wield) == 0
-            || attack_table[get_eq_char(ch,wear_wield)->value3()].damage != DAM_PIERCE)
+    if ( (obj = get_eq_char(ch,wear_wield)) == 0
+            || (attack_table[obj->value3()].damage != DAM_PIERCE 
+            && obj->value0() != WEAPON_DAGGER))
     {
-            ch->send_to("Вооружись для этого колющим оружием.\n\r");
+            ch->send_to("Вооружись для этого кинжалом или другим колющим оружием.\n\r");
             return;
     }
 
@@ -1172,18 +1157,18 @@ SKILL_RUNP( circle )
     ch->setWait( gsn_circle->getBeats( )  );
 
     CircleOneHit circ( ch, victim );
-    bool fBonus = false;
+    int circleBonus = 0;
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
         ch->send_to(ostr);
-        fBonus = true;
+        circleBonus+= number_range(20,25);
     }
 
 
     try {
-        if (ch->is_npc() || fBonus || number_percent( ) < gsn_circle->getEffective( ch ))
+        if (ch->is_npc() || number_percent( ) < min(100,circleBonus + gsn_circle->getEffective( ch )))
         {
                 circ.hit( );
                 gsn_circle->improve( ch, true, victim );
@@ -1281,16 +1266,14 @@ SKILL_RUNP( blackjack )
         if (victim->isAffected(gsn_backguard))
             chance /= 2;
 
-        bool fBonus = false;
-
         if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
             ostringstream ostr;
             bonus_thief_skills->reportAction(ch->getPC(), ostr);
             ch->send_to(ostr);
-            fBonus = true;
+            chance += number_range(15,20);
         }
 
-        if (fBonus || Chance(ch, chance * k / 100, 100).reroll())
+        if (Chance(ch, chance * k / 100, 100).reroll())
         {
                 act_p("Ты бьешь $C4 по голове мешочком со свинцом.",
                         ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1301,12 +1284,10 @@ SKILL_RUNP( blackjack )
                 gsn_blackjack->improve( ch, true, victim );
 
                 af.type = gsn_blackjack;
-                af.where = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.level = ch->getModifyLevel();
-                af.duration = ch->getModifyLevel() / 15 + 1;
-                af.location = APPLY_NONE;
-                af.modifier = 0;
-                af.bitvector = AFF_SLEEP;
+                af.duration = ch->getModifyLevel() / 50 + 1;
+                af.bitvector.setValue(AFF_SLEEP);
                 affect_join ( victim,&af );
 
                 set_violent( ch, victim, true );

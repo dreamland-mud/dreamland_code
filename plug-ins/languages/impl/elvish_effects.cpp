@@ -36,11 +36,11 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
         return false;
     }
  
-    af.where     = TO_RESIST;
+    af.bitvector.setTable(&res_flags);
     af.type      = gsn_secret_of_sidhe;
     af.level     = ch->getModifyLevel( );
     af.duration  = af.level / 6;
-    af.bitvector = RES_IRON;
+    af.bitvector.setValue(RES_IRON);
     
     affect_join( victim, &af );
    
@@ -54,10 +54,10 @@ bool BlessEquipWE::run( PCharacter *ch, Character *victim ) const
     Object *obj;
     Affect af;
 
-    af.where     = TO_OBJECT;
+    af.bitvector.setTable(&extra_flags);
     af.type      = gsn_bless;
-    af.location         = APPLY_SAVES;
-    af.bitvector = ITEM_BLESS;
+    af.location = APPLY_SAVES;
+    af.bitvector.setValue(ITEM_BLESS);
     af.level     = ch->getModifyLevel( );
     
     for (obj = victim->carrying; obj; obj = obj->next_content) {
@@ -70,7 +70,7 @@ bool BlessEquipWE::run( PCharacter *ch, Character *victim ) const
         af.modifier = -1 * number_range( 1, 3 );
         af.duration = number_range( 6 + af.level / 2, 200 );
         affect_to_obj( obj, &af);
-        affect_modify(ch, &af, true);
+        affect_modify(victim, &af, true);
     }
 
     act( "{CОбмундирование на $c6 на мгновение загорается священным огнем.{x", victim, 0, 0, TO_ROOM );

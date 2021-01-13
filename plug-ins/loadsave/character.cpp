@@ -146,10 +146,10 @@ bool Character::canEnter( Room *room )
     if (!can_see( room ))
         return false;
         
-    if (room->clan != clan_none && room->clan != getClan( ))
+    if (room->pIndexData->clan != clan_none && room->pIndexData->clan != getClan( ))
         return false;
     
-    if (!room->guilds.empty( ) && !room->guilds.isSet( getProfession( ) ))
+    if (!room->pIndexData->guilds.empty( ) && !room->pIndexData->guilds.isSet( getProfession( ) ))
         return false;
     
     if (room->behavior && !room->behavior->canEnter( this ))
@@ -211,7 +211,7 @@ bool eyes_blinded( Character *ch )
     if (!IS_AFFECTED(ch, AFF_BLIND))
         return false;
         
-    if (ch->getConfig( )->holy)
+    if (ch->getConfig( ).holy)
         return false;
 
     return true;
@@ -222,7 +222,7 @@ bool eyes_darkened( Character *ch )
     if (!ch->in_room->isDark( ))
         return false;
 
-    if (ch->getConfig( )->holy)
+    if (ch->getConfig( ).holy)
         return false;
 
     if (ch->is_vampire() || IS_AFFECTED(ch, AFF_INFRARED))

@@ -72,7 +72,7 @@ struct PortalFunc {
 
     bool operator () ( Room *const room, Object *portal ) const
     {
-        return enabled && checkRoom( ch, get_room_index( portal->value3() ) );
+        return enabled && checkRoom( ch, get_room_instance( portal->value3() ) );
     }
     
     Character *ch;

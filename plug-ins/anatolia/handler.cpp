@@ -204,7 +204,7 @@ int count_users(Object *obj)
 }
 
 
-Character * find_char( Character *ch, const char *cArgument, int door, int *range, bool message )
+Character * find_char( Character *ch, const char *cArgument, int door, int *range, ostringstream &errbuf )
 {
     char argument[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
@@ -220,16 +220,6 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
     if ( (target = get_char_room(ch,dest_room,arg,&number)) != 0)
         return target;
 
-    if (door < 0 || door >= DIR_SOMEWHERE)
-    {
-        bug("In find_char wrong door: %d",door);
-
-        if (message)
-            ch->send_to("Ты не видишь этого здесь.\n\r");
-
-        return 0;
-    }
-    
     opdoor = dirs[door].rev;
 
     while (*range > 0)
@@ -247,9 +237,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
         if ( (bExit = dest_room->exit[opdoor]) == 0
             || bExit->u1.to_room != back_room)
         {
-            if (message)
-                ch->send_to("По выбранному направлению что-то препятствует тебе.\n\r");
-
+            errbuf << "Ты не сможешь добраться до них через односторонний проход." << endl;
             return 0;
         }
 
@@ -257,9 +245,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
             return target;
     }
     
-    if (message)
-        ch->send_to("Ты не видишь этого здесь.\n\r");
-
+    errbuf << "Ты не видишь " << dirs[door].where << " никого с таким именем." << endl;
     return 0;
 }
         
@@ -288,24 +274,21 @@ void reboot_anatolia( void )
 
 void eyes_blinded_msg( Character *ch )
 {
-    Affect *paf;
-
     if (!IS_AFFECTED(ch, AFF_BLIND))
         return;
 
-    for (paf = ch->affected; paf; paf = paf->next) 
-        if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_BLIND)) {
-            if (paf->type == gsn_fire_breath)
-                ch->println( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
-            else if (paf->type == gsn_sand_storm)
-                ch->println( "Песок в глазах мешает тебе что-либо разглядеть." );
-            else if (paf->type == gsn_dirt_kicking)
-                ch->println( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
-            else
-                continue;
+    for (auto &paf: ch->affected.findAllWithBits(&affect_flags, AFF_BLIND)) {
+        if (paf->type == gsn_fire_breath)
+            ch->println( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
+        else if (paf->type == gsn_sand_storm)
+            ch->println( "Песок в глазах мешает тебе что-либо разглядеть." );
+        else if (paf->type == gsn_dirt_kicking)
+            ch->println( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
+        else
+            continue;
 
-            return;
-        }
+        return;
+    }
 
     ch->println( "Твои глаза слепы, ты ничего не видишь!" );
 }
@@ -401,7 +384,7 @@ void extract_dead_player( PCharacter *ch, int flags )
     undig( ch );
     ch->dismount( );
     
-    if (( altar = get_room_index( ch->getHometown( )->getAltar( ) ) )) {
+    if (( altar = get_room_instance( ch->getHometown( )->getAltar( ) ) )) {
         char_from_room( ch );
         char_to_room( ch, altar );
     }

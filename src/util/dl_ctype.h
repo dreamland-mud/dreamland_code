@@ -16,6 +16,7 @@ bool dl_isupper( char );
 bool dl_islower( char );
 bool dl_isdelim( char );
 bool dl_isalnum( char c );
+bool dl_is_arg_separator(char c);
 
 inline char dl_toupper( char c )
 {
@@ -37,6 +38,12 @@ inline char dl_tolower( char c )
                     ? 'ё'
                     : c;
 }
+
+inline bool dl_is_arg_separator(char c)
+{
+    return c == '\'' || c == '"' || c == '!';
+}
+
 #ifdef __cplusplus
 }
 #endif

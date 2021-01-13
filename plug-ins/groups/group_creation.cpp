@@ -138,10 +138,7 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
         vnum = OBJ_VNUM_HOLY_SPRING;
     else if (ch->getProfession( )->getFlags( ch ).isSet(PROF_NATURE)) {
-         if (ch->in_room->sector_type != SECT_FIELD
-             && ch->in_room->sector_type != SECT_FOREST
-             && ch->in_room->sector_type != SECT_HILLS
-             && ch->in_room->sector_type != SECT_MOUNTAIN)
+         if (!IS_NATURE(ch->in_room))
         {
             ch->println("Ты не сможешь создать родник в этой местности.");
             return;

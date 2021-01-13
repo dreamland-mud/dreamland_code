@@ -12,7 +12,7 @@
 #include "merc.h"
 #include "def.h"
 
-void AreaBehaviorManager::parse( AREA_DATA * pArea, FILE *fp ) {
+void AreaBehaviorManager::parse( AreaIndexData * pArea, FILE *fp ) {
     char letter;
     char *word;
     
@@ -37,7 +37,7 @@ void AreaBehaviorManager::parse( AREA_DATA * pArea, FILE *fp ) {
     free_string( word );
 }
 
-void AreaBehaviorManager::save( const AREA_DATA *pArea, FILE *fp ) {
+void AreaBehaviorManager::save( const AreaIndexData *pArea, FILE *fp ) {
     std::basic_ostringstream<char> ostr;
      
     if (!pArea->behavior)
@@ -51,21 +51,5 @@ void AreaBehaviorManager::save( const AREA_DATA *pArea, FILE *fp ) {
     } catch (ExceptionXMLError e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
-}
-
-bool area_is_mansion(area_data *area)
-{
-    return !str_prefix("ht", area->area_file->file_name);
-}
-
-bool area_is_clan(area_data *area)
-{
-    static const DLString CLAN_AREA_TYPE = DLString("ClanArea");
-    return area->behavior && CLAN_AREA_TYPE.strPrefix(area->behavior->getType());
-}
-
-bool area_is_hometown(area_data *area)
-{
-    return IS_SET(area->area_flag, AREA_HOMETOWN);
 }
 

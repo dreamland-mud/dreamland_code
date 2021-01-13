@@ -3,13 +3,17 @@
  * ruffina, 2003
  * logic based on progs from DreamLand 2.0
  */
-
+#include "logstream.h"
 #include "personalquestreward.h"
 #include "class.h"
 #include "pcharacter.h"
-#include "object.h"
+#include "core/object.h"
+#include "room.h"
 #include "act.h"
 #include "loadsave.h"
+#include "mercdb.h"
+#include "vnum.h"
+#include "def.h"
 
 bool PersonalQuestReward::canEquip( Character *ch )
 {
@@ -46,6 +50,36 @@ bool PersonalQuestReward::save( ) {
     
     act_p("$o1 исчезает!", ch, obj, 0, TO_CHAR, POS_RESTING);
     extract_obj(obj);
+    return true;
+}
+
+bool PersonalQuestReward::hourly()
+{
+    if (!obj->in_room)
+        return false;
+
+    if (IS_SET(obj->in_room->room_flags, ROOM_MANSION|ROOM_GODS_ONLY))
+        return false;
+
+    if (obj->in_room->vnum == ROOM_VNUM_BUREAU_1 || 
+        obj->in_room->vnum == ROOM_VNUM_BUREAU_2 || 
+        obj->in_room->vnum == ROOM_VNUM_BUREAU_3)
+        return false;
+
+    if (!obj->getProperty("keepHere").empty())
+        return false;
+
+    if (!obj->getOwner())
+        return false;
+
+    if (!obj->can_wear(ITEM_TAKE))
+        return false;
+
+    notice("[cleanup] Item %d %lld of %s transferred from room [%d] [%s] to lost&found.",
+            obj->pIndexData->vnum, obj->getID(), obj->getOwner(),
+            obj->in_room->vnum, obj->in_room->getName());
+    obj_from_room(obj);
+    obj_to_room(obj, get_room_instance(ROOM_VNUM_BUREAU_2));
     return true;
 }
 

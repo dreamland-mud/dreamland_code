@@ -384,11 +384,13 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
 
     af.location  = APPLY_DEX;
     af.modifier  = -1 - level / 40;
-    af.where     = TO_DETECTS;
-    af.bitvector = ADET_WEB;
+    af.bitvector.setTable(&detect_flags);
+    af.bitvector.setValue(ADET_WEB);
     affect_to_char( victim, &af );
-    
-    act_p("Ты сковываешь движения $C4 густой сетью!", ch,0,victim,TO_CHAR,POS_RESTING);
+   
+    if (ch != victim) 
+        act_p("Ты сковываешь движения $C4 густой сетью!", ch,0,victim,TO_CHAR,POS_RESTING);
+
     act_p("$C1 сковывает движения $C4 густой сетью!", ch,0,victim,TO_NONVICT,POS_RESTING);
     victim->send_to("Густая сеть сковывает твои движения!\n\r");
 }

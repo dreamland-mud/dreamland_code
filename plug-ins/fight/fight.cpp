@@ -125,6 +125,19 @@ static bool oprog_fight( Object *obj, Character *ch )
     return false;
 }
 
+static bool oprog_fight_carry( Object *obj, Character *ch )
+{
+    FENIA_CALL( obj, "FightCarry", "C", ch );
+    FENIA_NDX_CALL( obj, "FightCarry", "OC", obj, ch );
+    return false;
+}
+
+static void wlprog_fight( Object *obj, Character *ch)
+{
+    obj->wear_loc->onFight(ch, obj);
+}
+
+
 /*
  * Control the fights going on.
  * Called periodically by update_handler.
@@ -137,8 +150,20 @@ void violence_update( )
 
     for ( ch = char_list; ch != 0; ch = ch->next )
     {
-        if ( ( victim = ch->fighting ) == 0 || ch->in_room == 0 )
+        if ( ( victim = ch->fighting ) == 0 || ch->in_room == 0 ){
+            if ( IS_AFFECTED(ch,AFF_STUN) && !ch->isAffected(gsn_power_word_stun))
+            {
+                ch->println("Оглушение постепенно проходит.");
+                REMOVE_BIT(ch->affected_by,AFF_STUN);        
+                SET_BIT(ch->affected_by,AFF_WEAK_STUN);        
+            }
+            else if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+            {
+                ch->println("Гул в твоей голове затихает.");
+                REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
+            }
             continue;
+        }
 
         if ( IS_AWAKE(ch) && ch->in_room == victim->in_room )
         {
@@ -159,18 +184,41 @@ void violence_update( )
             continue;
         }
 
-//        if ( !victim->is_npc() )
-          ch->last_fought = victim;
+        // If ch is fighting with a victim, ensure that the victim fights back.
+        if (victim->fighting == 0) {
+            set_fighting(victim, ch);
+
+            if (victim->fighting == ch) {
+                victim->pecho("Ты вступаешь в битву с %C5.", ch);
+                ch->pecho("%^C1 вступает с тобой в битву!", victim);
+                ch->recho(victim, "%^C1 вступает в битву с %C5.", victim, ch);
+            }
+        }
+
+        ch->last_fought = victim;
 
         ch->setLastFightTime( );
         UNSET_DEATH_TIME(ch);
 
-        for( obj = ch->carrying; obj; obj = obj_next )
-        {
-            obj_next = obj->next_content;
+        // Item fight progs (in behaviors) will throw exception if victim is killed.
+        try {
+            for (obj = ch->carrying; obj; obj = obj_next) {
+                obj_next = obj->next_content;
 
-            if( ch->fighting && obj_is_worn(obj))
-                oprog_fight( obj, ch );
+                // onFight is only called for items in meaningful wearlocations.
+                // Use onFightCarry to describe fighting behavior in inventory, hair, tail etc.
+                if( ch->fighting) {
+                    if (obj_is_worn(obj))
+                        oprog_fight( obj, ch );
+                    else
+                        oprog_fight_carry(obj, ch);
+
+                    if (obj_is_worn(obj)) 
+                        wlprog_fight(obj, ch);
+                }
+            }
+        } catch (const VictimDeathException &vde) {
+            continue;
         }
 
         /*

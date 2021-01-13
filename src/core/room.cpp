@@ -19,25 +19,64 @@
 
 CLAN(none);
 PROF(none);
+LIQ(none);
 
-Room::Room( ) : 
-                next( 0 ), rnext( 0 ),
-                aff_next( 0 ), reset_first( 0 ), reset_last( 0 ),
-                people( 0 ), contents( 0 ), extra_descr( 0 ),
-                area( 0 ), extra_exit( 0 ),
-                name( 0 ), description( 0 ), owner( 0 ),
-                vnum( 0 ), room_flags( 0 ), room_flags_default( 0 ),
-                light( 0 ), sector_type( 0 ),
-                heal_rate( 0 ), heal_rate_default( 0 ),
-                mana_rate( 0 ), mana_rate_default( 0 ),
-                clan( clan_none ),  
-                guilds( professionManager ),
-                affected( 0 ), affected_by( 0 ),
-                liquid( "none" ),
-                behavior( RoomBehavior::NODE_NAME )
+extra_exit_data *ExtraExitList::find(const DLString &keyword) const
+{
+    for (auto &eexit: *this)
+        if (is_name(keyword.c_str(), eexit->keyword))
+            return eexit;
+
+    return 0;
+}
+
+bool ExtraExitList::findAndDestroy(const DLString &keyword)
+{
+    extra_exit_data *eexit = find(keyword);
+    if (!eexit)
+        return false;
+
+    remove(eexit);
+    delete eexit;
+    return true;
+}
+
+RoomIndexData::RoomIndexData()
+        : extra_descr(0),
+          name(&str_empty[0]), description(&str_empty[0]), 
+          vnum(0), room_flags(0),
+          sector_type(0), heal_rate(100), mana_rate(100),
+          clan( clan_none ),  guilds( professionManager ),
+          liquid( liq_none ), areaIndex(0), room(0)
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
-        exit[i] = old_exit[i] = 0;
+        exit[i] = 0;
+}
+
+Room::Room( ) : 
+                position( -1 ),
+                people( 0 ), contents( 0 ),
+                area( 0 ),
+                owner(&str_empty[0]),
+                vnum( 0 ), room_flags( 0 ), 
+                light( 0 ),
+                affected_by( 0 ),
+                behavior( RoomBehavior::NODE_NAME ),
+                pIndexData(0),
+                mod_heal_rate( 0 ), mod_mana_rate( 0 ), ID(0)
+{
+    for (int i = 0; i < DIR_SOMEWHERE; i++) 
+        exit[i] = 0;
+}
+
+int Room::getHealRate() const
+{
+    return pIndexData->heal_rate + mod_heal_rate;
+}
+
+int Room::getManaRate() const
+{
+    return pIndexData->mana_rate + mod_mana_rate;
 }
 
 bool Room::isOwner( Character *ch ) const
@@ -47,6 +86,20 @@ bool Room::isOwner( Character *ch ) const
 
     return is_name( ch->getNameP( ), owner );
 }
+
+bool Room::hasExits() const
+{
+    for (int i = 0; i < DIR_SOMEWHERE; i++)
+        if (exit[i] != 0)
+            return true;
+    return false;
+}
+
+const char * Room::areaName() const
+{
+    return pIndexData->areaIndex->name;
+}
+
 
 bool Room::isPrivate( ) const
 {
@@ -86,10 +139,10 @@ bool Room::isCommon( )
     if (IS_SET(area->area_flag, AREA_WIZLOCK))
         return false;
 
-    if (clan != clan_none)
+    if (pIndexData->clan != clan_none)
         return false;
     
-    if (!guilds.empty( ))
+    if (!pIndexData->guilds.empty( ))
         return false;
     
     if (behavior && !behavior->isCommon( ))
@@ -111,7 +164,7 @@ bool Room::isDark( ) const
     if (IS_SET(room_flags, ROOM_DARK))
         return true;
     
-    if (sector_type == SECT_INSIDE || sector_type == SECT_CITY)
+    if (getSectorType() == SECT_INSIDE || getSectorType() == SECT_CITY)
         return false;
 
     if (weather_info.sunlight == SUN_LIGHT || weather_info.sunlight == SUN_RISE)

@@ -535,13 +535,11 @@ BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
     mod = -1 * (level/20 + skill/20 + 1);
     
     Affect af;
-    af.where    = TO_AFFECTS;
     af.type     = gsn_nerve;
     af.level    = level;
     af.duration = level / 20;
     af.location = APPLY_STR;
     af.modifier = mod;
-    af.bitvector = 0;
 
     affect_to_char(victim,&af);
     return true;
@@ -600,13 +598,11 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 {      
     Affect af;
 
-    af.where         = TO_AFFECTS;
     af.type         = gsn_endure;
     af.level         = ch->getModifyLevel();
     af.duration   = ch->getModifyLevel() / 4;
     af.location = APPLY_SAVING_SPELL;
     af.modifier = modifier;    
-    af.bitvector = 0;
 
     affect_to_char(ch,&af);
 
@@ -1050,22 +1046,18 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
         if (!victim->isAffected(gsn_caltraps)) {
             Affect tohit,todam,todex;
 
-            tohit.where     = TO_AFFECTS;
             tohit.type      = gsn_caltraps;
             tohit.level     = level;
             tohit.duration  = -1;
-            tohit.location  = APPLY_HITROLL;
+            tohit.location = APPLY_HITROLL;
             tohit.modifier  = mod;
-            tohit.bitvector = 0;
             affect_to_char( victim, &tohit );
 
-            todam.where = TO_AFFECTS;
             todam.type = gsn_caltraps;
             todam.level = level;
             todam.duration = -1;
             todam.location = APPLY_DAMROLL;
             todam.modifier = mod;
-            todam.bitvector = 0;
             affect_to_char( victim, &todam);
 
             todex.type = gsn_caltraps;
@@ -1073,7 +1065,6 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             todex.duration = -1;
             todex.location = APPLY_DEX;
             todex.modifier = mod/2;
-            todex.bitvector = 0;
             affect_to_char( victim, &todex);
 
             act_p("Острые шипы вонзаются в ступни $C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR,POS_RESTING);
@@ -1297,7 +1288,7 @@ SKILL_RUNP( throwdown )
                         ch,0,victim,TO_VICT,POS_RESTING);
                 act_p("$c1 бросает $C4 с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
-                victim->setWaitViolence( 2 + max(2, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR)) );
+                victim->setWaitViolence( 2 + URANGE (0, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR), 2) );
 
                 victim->position = POS_RESTING;
                 if (is_flying( victim )) {
@@ -1353,14 +1344,14 @@ SKILL_RUNP( strangle )
         char arg[MAX_INPUT_LENGTH];
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-        skill_mod   = 0.2;
+        skill_mod   = 0.5;
         stat_mod    = 0.04;
         level_mod   = 0.01;
         quick_mod   = 0.1;
         size_mod    = -0.03; // HARDER to affect smaller victims, easier to affect larger
         sleep_mod   = 0.1;
         vis_mod     = 0.1;
-        time_mod    = 0.05;
+        time_mod    = 0.1;
 
         //////////////// ELIGIBILITY CHECKS ////////////////
 
@@ -1497,7 +1488,7 @@ SKILL_RUNP( strangle )
             d.log(chance, "backguard");
         }
 
-        int k = ch->getLastFightDelay( );
+        int k = victim->getLastFightDelay( );
         if (k >= 0 && k < FIGHT_DELAY_TIME) {
             chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
             d.log(chance, "adrenaline");
@@ -1527,12 +1518,10 @@ SKILL_RUNP( strangle )
                 gsn_strangle->improve( ch, true, victim );
         
                 af.type = gsn_strangle;
-                af.where = TO_AFFECTS;
+                af.bitvector.setTable(&affect_flags);
                 af.level = ch->getModifyLevel();
-                af.duration = ch->getModifyLevel() / 20 + 1;
-                af.location = APPLY_NONE;
-                af.modifier = 0;
-                af.bitvector = AFF_SLEEP;
+                af.duration = ch->getModifyLevel() / 50 + 1;
+                af.bitvector.setValue(AFF_SLEEP);
                 affect_join ( victim,&af );
                 
                 set_violent( ch, victim, true );

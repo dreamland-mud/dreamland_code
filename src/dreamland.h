@@ -59,6 +59,7 @@ class SkillGroupManager;
 class BonusManager;
 class SocketManager;
 class ServletManager;
+class EventBus;
 
 extern DreamLand * dreamland;
 
@@ -118,7 +119,7 @@ public:
         
         inline void setConfigFileName( const DLString& );
         inline long long genID( );
-        inline DbEnvContext *getDbEnv( ) const;
+        inline DbEnvContext *getFeniaDbEnv( ) const;
 
         inline bool hasOption( int ) const;
         inline void setOption( int );
@@ -202,8 +203,9 @@ private:
         ::Pointer<BonusManager> bonusManager;
         ::Pointer<SocketManager> socketManager;
         ::Pointer<ServletManager> servletManager;
+        ::Pointer<EventBus> eventBus;
 
-        DbEnvContext *dbEnv;
+        DbEnvContext *feniaDbEnv;
 };
 
 #endif

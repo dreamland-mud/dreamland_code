@@ -17,17 +17,17 @@
 #include "xmlmobilefactory.h"
 #include "xmlobjectfactory.h"
 #include "xmlroom.h"
-#include "areahelp.h"
+#include "xmlareahelp.h"
 
-struct area_data;
+struct AreaIndexData;
 
 class XMLAreaHeader : public XMLVariableContainer {
 XML_OBJECT
 public:
     XMLAreaHeader( );
 
-    void init(area_data *);
-    area_data *compat( );
+    void init(AreaIndexData *);
+    AreaIndexData *compat( );
         
     virtual bool toXML( XMLNode::Pointer& ) const;
     virtual void fromXML( const XMLNode::Pointer& );
@@ -42,7 +42,7 @@ public:
     bool loaded;
 };
 
-struct area_data;
+struct AreaIndexData;
 
 typedef XMLListBase<XMLPersistent<HelpArticle> > XMLHelpArticles;
 
@@ -54,10 +54,10 @@ public:
     void init(area_file *);
     void save(area_file *af);
     void load(const DLString &fname);
-    void load_helps(area_data *);
-    void load_objects(area_data *);
-    void load_mobiles(area_data *);
-    void load_rooms(area_data *);
+    void load_helps(AreaIndexData *);
+    void load_objects(AreaIndexData *);
+    void load_mobiles(AreaIndexData *);
+    void load_rooms(AreaIndexData *);
 
     XML_VARIABLE XMLAreaHeader areadata;
     XML_VARIABLE XMLListBase<XMLAreaHelp> helps;

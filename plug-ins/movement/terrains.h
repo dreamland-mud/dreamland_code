@@ -20,14 +20,14 @@ struct terrain_t {
 extern const struct terrain_t terrains [];
 
 enum {
-    BOAT_NONE,
-    BOAT_FLY,
-    BOAT_EQ,
-    BOAT_INV,
-    BOAT_SWIM
+    BOAT_NONE = 0,
+    BOAT_FLY = 1,
+    BOAT_EQ = 2,
+    BOAT_INV = 4,
+    BOAT_SWIM = 8
 };
 
 Object * boat_object_find( Character *ch );
-int boat_get_type( Character *ch );
+int boat_get_types( Character *ch );
 
 #endif

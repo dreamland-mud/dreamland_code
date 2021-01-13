@@ -308,10 +308,6 @@ void DruidSpiritAffectHandler::stopfol( Character *ch, Affect *paf )
 {
     Character *druid, *leader;
     
-    /* only the last affect will do the job */
-    if (paf->next && paf->next->type == paf->type)
-        return;
-
     /* i was just a follower, not in some group */
     if (!(leader = ch->leader))
         return;
@@ -352,10 +348,6 @@ void DruidSpiritAffectHandler::update( Character *ch, Affect *paf )
 {
     Character *druid;
 
-    /* only the last affect will do the job */
-    if (paf->next && paf->next->type == paf->type)
-        return;
-    
     /* clean the affect if i'm no longer member of caster group */
     if (!( druid = paf->getOwner( ) )
         || !is_same_group( ch, druid ))

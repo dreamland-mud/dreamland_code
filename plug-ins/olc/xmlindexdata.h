@@ -17,20 +17,20 @@ class WrapperBase;
 class XMLIndexData {
 public:
     virtual int getVnum() const = 0;
-    virtual area_data * getArea() const = 0;
+    virtual AreaIndexData * getArea() const = 0;
     virtual const char * getIndexType() const = 0;
 };
 
 class XMLRoomIndexData : public XMLIndexData {
 public:
-    XMLRoomIndexData(Room *room);
+    XMLRoomIndexData(RoomIndexData *room);
 
     virtual int getVnum() const;
-    virtual area_data * getArea() const;
+    virtual AreaIndexData * getArea() const;
     virtual const char * getIndexType() const;
 
 protected:
-    Room *room;    
+    RoomIndexData *room;    
 };
 
 class XMLMobIndexData : public XMLVariable, public mob_index_data, public XMLIndexData {
@@ -44,7 +44,7 @@ public:
     virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
     virtual int getVnum() const;
-    virtual area_data * getArea() const;
+    virtual AreaIndexData * getArea() const;
     virtual const char * getIndexType() const;
 };
 
@@ -59,7 +59,7 @@ public:
     virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
     virtual int getVnum() const;
-    virtual area_data * getArea() const;
+    virtual AreaIndexData * getArea() const;
     virtual const char * getIndexType() const;
 };
 

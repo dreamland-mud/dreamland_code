@@ -3,6 +3,7 @@ lib_LTLIBRARIES = libolc.la
 libolc_la_SOURCES = \
 olcflags.cpp \
 olc.cpp \
+resets.cpp \
 xmlindexdata.cpp \
 redit.cpp \
 sedit.cpp \
@@ -17,14 +18,16 @@ mem.cpp \
 olc_act.cpp \
 olc_impl.cpp \
 olc_save.cpp \
-olc_savecompat.cpp \
 olc_dump.cpp \
 olcstate.cpp \
 onlinecreation.cpp \
 ovalues.cpp \
 security.cpp \
 webedit.cpp \
-feniatriggers.cpp
+orandom.cpp \
+argparser.cpp \
+feniatriggers.cpp \
+fedit.cpp
 
 libolc_la_MOC = \
 redit.h \
@@ -37,7 +40,8 @@ sedit.h \
 oedit.h \
 eeedit.h \
 security.h \
-olcstate.h 
+olcstate.h \
+fedit.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

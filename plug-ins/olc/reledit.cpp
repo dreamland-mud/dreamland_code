@@ -113,7 +113,7 @@ void OLCStateReligion::show( PCharacter *ch )
             web_edit_button(ch, "hedit", r->help->getID()).c_str(),
             r->help->getID());
 
-    ptc(ch, "Характер:          {Y%s{x {D(? align){x\r\n",
+    ptc(ch, "Натура:            {Y%s{x {D(? align){x\r\n",
         r->align.getValue() != 0 ? r->align.names().c_str() : "-");
 
     ptc(ch, "Этос:              {Y%s{x {D(? ethos){x\r\n",
@@ -213,7 +213,7 @@ RELEDIT(mark, "знак", "установить vnum знака религии")
     return true;
 }
 
-RELEDIT(align, "характер", "ограничить по характеру")
+RELEDIT(align, "натура", "ограничить по натуре")
 {
     return flagBitsEdit(align_table, getOriginal()->align);
 }
@@ -304,7 +304,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         rel->shortDescr = args.capitalize();
         rel->help.construct();
         rel->help->setID(
-            helpManager->getLastID() + 1
+            help_next_free_id()
         );
         
         ReligionLoader::getThis()->loadElement(rel);

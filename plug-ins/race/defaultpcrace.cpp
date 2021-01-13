@@ -59,7 +59,7 @@ int DefaultPCRace::getMaxAlign( ) const
 
 DLString DefaultPCRace::getWhoNameFor( Character *looker, Character *owner ) const
 {
-    if (!looker || !looker->getConfig( )->rucommands) 
+    if (!looker || !looker->getConfig( ).rucommands) 
         return nameWho;
 
     if (!owner || owner->getSex( ) == SEX_MALE)
@@ -70,7 +70,7 @@ DLString DefaultPCRace::getWhoNameFor( Character *looker, Character *owner ) con
 
 DLString DefaultPCRace::getScoreNameFor( Character *looker, Character *owner ) const
 {
-    if (!looker || !looker->getConfig( )->rucommands) 
+    if (!looker || !looker->getConfig( ).rucommands) 
         return name;
 
     if (!nameScore.empty( ))

@@ -39,7 +39,7 @@ protected:
     virtual bool checkVisibility( Character * );
     virtual bool checkClosedDoor( Character * );
     virtual int getDoorStatus(Character *);
-            bool checkExtraExit( Character * );
+            bool checkExitFlags( Character * );
 
     virtual bool tryMove( Character * );
             bool applyPassDoor( Character * );

@@ -11,6 +11,7 @@
 #include "skillmanager.h"
 
 #include "wiznet.h"
+#include "skill_utils.h"
 #include "merc.h"
 #include "handler.h"
 #include "act.h"
@@ -27,6 +28,7 @@
 #include "questregistrator.h"
 #include "questexceptions.h"
 #include "xmlattributequestdata.h"
+#include "objquestbehavior.h"
 
 #include "questor.h"
 #include "def.h"
@@ -73,7 +75,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         if (client->getAttributes( ).isAvailable( "quest" )) 
             tell_raw( client, ch, "Твое задание невозможно выполнить." );
         else
-            tell_fmt( "Тебе нужно сначала получить (request) задание, %1$C1.", client, ch );
+            tell_fmt( "Тебе нужно сначала {yпопросить{x{le (quest request){x задание, %1$C1.", client, ch );
             
         return;
     }
@@ -85,7 +87,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
 
     tell_raw( client, ch,  "Поздравляю с выполнением задания!" );
 
-    if (quest->hint.getValue( ) > 0) {
+    if (quest->hint.getValue( ) > 0 && !IS_TOTAL_NEWBIE(client)) {
         tell_raw( client, ch,  "Я припоминаю, что мне пришлось подсказать тебе путь.");
         msg << "Но за настойчивость я даю тебе";
     }
@@ -151,6 +153,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     qdata = attributes->getAttr<XMLAttributeQuestData>( "questdata" );
     qdata->setTime( time );
     qdata->rememberVictory( quest->getName( ) );
+    qdata->rememberLastQuest(quest->getName());
     
     attributes->eraseAttribute( "quest" );
     PCharacterManager::save( client );
@@ -229,7 +232,7 @@ void Questor::doFind( PCharacter *client )
         return;
     }
 
-    if (quest->hint >= 3) {
+    if (quest->hint >= 3 && !IS_TOTAL_NEWBIE(client)) {
         tell_fmt( "Извини, %1$C1, но теперь тебе придется искать путь самостоятельно.", client, ch );
         quest->wiznet( "find", "failure, too many hints" );
         return;
@@ -244,6 +247,7 @@ void Questor::doFind( PCharacter *client )
         return;
     }
 
+    if(!IS_TOTAL_NEWBIE(client))
     tell_raw( client, ch, "Я помогу тебе, но награда будет не так велика.");
     tell_raw( client, ch, buf.str( ).c_str( ) );
     tell_raw( client, ch,  "Но помни! Все дороги в этом мире изменчивы и опасны.");
@@ -301,6 +305,9 @@ void Questor::rewardScroll( PCharacter *client )
 
         if (!skill->usable( client, false ))
             continue;
+
+        if (temporary_skill_active(skill, client))
+            continue;
         
         learned = skill->getLearned( client );
         maximum = skill->getMaximum( client );
@@ -350,7 +357,7 @@ void QuestScrollBehavior::createDescription( PCharacter *ch )
     bufEmpty << "Ты держишь в руках свиток из желтого пергамента, все надписи на котором размыты так, " << endl
              << "что невозможно что-либо разобрать." << endl;
 
-    bufInfo << "Ты держишь в руках свиток из желтого пергамента, испрещенный загадочными значками." << endl
+    bufInfo << "Ты держишь в руках свиток из желтого пергамента, испещренный загадочными значками." << endl
             << "Значки выведены аккуратным почерком, и, по-видимому, для их написания использовались особые чернила." << endl
             << "Из пометок рядом со значками ты понимаешь, что они содержат ";
             
@@ -450,7 +457,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
     ch->send_to( buf );
     if(extract) {
-        act("Чернила меркнут, и $o1 рассыпается трухой..", ch, obj, 0, TO_CHAR);
+        act("Чернила меркнут, и $o1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
         extract_obj( obj );
     }
     return true;
@@ -554,9 +561,15 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     if (arg_oneof(arg, "any", "любое", "любой")) {
         try {
             QuestManager::getThis( )->generate( client, ch );
-            attr->rememberLastQuest("");
             attr->setStartTime();
             PCharacterManager::save( client );
+
+            if(!rated_as_guru(client)){
+               tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            if(IS_TOTAL_NEWBIE(client)){
+               tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка перерождение{lEhelp remort{x){G, это бесплатно!");
+            }
+            }
             
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
 
@@ -587,7 +600,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
    
     if (attr->getLastQuestCount((*q)->getName()) >= 5) {
         tell_fmt("Я уже заметил%2$Gо||а, что тебе очень нравятся такие задания, %1$C1.", client, ch);
-        tell_raw(client, ch, "Но попробуй свои силы в чем-то еще.");
+        tell_raw(client, ch, "Но попробуй добиться успеха в чем-то еще.");
         return;
     }
     
@@ -595,10 +608,18 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         try {
             client->getAttributes( ).addAttribute( 
                          (*q)->createQuest(client, ch), "quest" );
-            attr->rememberLastQuest((*q)->getName());
             attr->setStartTime();
             PCharacterManager::save( client );
+
+            if(!rated_as_guru(client)){
+               tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            if(IS_TOTAL_NEWBIE(client)){
+               tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+            }
+            }
+
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
+
             return;
         } 
         catch (const QuestCannotStartException &e) {
@@ -607,4 +628,18 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
 
     tell_fmt("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'.", client, ch, (*q)->getShortDescr().c_str());
     tell_raw(client, ch, "Приходи позже или выбери что-то другое.");
+}
+
+void Questor::give( Character *victim, Object *obj )
+{
+    obj_from_char(obj);
+    obj_to_char(obj, victim);
+
+    if (!victim->is_npc() && obj->behavior && obj->behavior.getDynamicPointer<ObjQuestBehavior>()) {
+        tell_fmt("Нет нужды передавать %3$O4 мне в руки.", victim, ch, obj);
+        tell_fmt("Если ты закончил%1$Gо||а мое задание, просто набери {y{hc{lRзадание сдать{lEquest complete{x.", victim, ch);
+    }
+
+    victim->pecho("%^C1 возвращает тебе %O4.", ch, obj);
+    victim->recho(ch, "%^C1 возвращает %O4 %C3.", ch, obj, victim);
 }

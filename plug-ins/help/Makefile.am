@@ -18,10 +18,12 @@ helpformatter.cpp \
 markuphelparticle.cpp \
 helpcontainer.cpp \
 bugtracker.cpp \
+areahelp.cpp \
 impl.cpp 
 
 libhelp_la_MOC = \
 bugtracker.h \
+areahelp.h \
 helpcontainer.h
 
 

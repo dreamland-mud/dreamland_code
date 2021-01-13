@@ -64,7 +64,7 @@ public:
                 continue;
             if (IS_SET(mob->in_room->room_flags, ROOM_SAFE|ROOM_NO_DAMAGE))
                 continue;
-            if (mob->in_room->clan != clan_none)
+            if (mob->in_room->pIndexData->clan != clan_none)
                 continue;
             if (mob->behavior && mob->behavior->hasDestiny( )) 
                 continue;
@@ -78,7 +78,7 @@ public:
             LogStream::sendNotice( ) 
                 << "CARDS autoset " << mob->getNameP( '1' ) << " [" 
                 << mob->pIndexData->vnum << "] in room " 
-                << mob->in_room->name << " [" << mob->in_room->vnum << "]" << endl;
+                << mob->in_room->getName() << " [" << mob->in_room->vnum << "]" << endl;
         }
     }
     virtual void after( )

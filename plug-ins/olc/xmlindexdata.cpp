@@ -24,10 +24,10 @@
 
 void load_mobile(FILE *, MOB_INDEX_DATA *);
 void load_object(FILE *, OBJ_INDEX_DATA *);
-void load_area_header(FILE *, AREA_DATA *);
+void load_area_header(FILE *, AreaIndexData *);
 void save_mobile(FILE *, const MOB_INDEX_DATA *);
 void save_object(FILE *, const OBJ_INDEX_DATA *);
-void save_area_header(FILE *, const AREA_DATA *);
+void save_area_header(FILE *, const AreaIndexData *);
 
 using namespace std;
 
@@ -192,7 +192,6 @@ XMLObjIndexData::XMLObjIndexData()
 
     next = NULL;
     extra_descr = NULL;
-    affected = NULL;
     area = NULL;
     name = str_dup("no name");
     short_descr = str_dup("(no short description)");
@@ -254,16 +253,12 @@ void
 XMLObjIndexData::clear()
 {
     EXTRA_DESCR_DATA *pExtra, *pExtraNext;
-    Affect *pAf, *pAfNext;
 
     free_string(name);
     free_string(short_descr);
     free_string(description);
 
-    for (pAf = affected; pAf; pAf = pAfNext) {
-        pAfNext = pAf->next;
-        ddeallocate(pAf);
-    }
+    affected.deallocate();
 
     for (pExtra = extra_descr; pExtra; pExtra = pExtraNext) {
         pExtraNext = pExtra->next;
@@ -303,7 +298,7 @@ int XMLObjIndexData::getVnum() const
     return vnum;
 }
 
-area_data * XMLObjIndexData::getArea() const
+AreaIndexData * XMLObjIndexData::getArea() const
 {
     return area;
 }
@@ -318,7 +313,7 @@ int XMLMobIndexData::getVnum() const
     return vnum;
 }
 
-area_data * XMLMobIndexData::getArea() const
+AreaIndexData * XMLMobIndexData::getArea() const
 {
     return area;
 }
@@ -328,7 +323,7 @@ const char * XMLMobIndexData::getIndexType() const
     return "mob";
 }
 
-XMLRoomIndexData::XMLRoomIndexData(Room *room)
+XMLRoomIndexData::XMLRoomIndexData(RoomIndexData *room)
 {
     this->room = room;
 }
@@ -338,9 +333,9 @@ int XMLRoomIndexData::getVnum() const
     return room->vnum;
 }
 
-area_data * XMLRoomIndexData::getArea() const
+AreaIndexData * XMLRoomIndexData::getArea() const
 {
-    return room->area;
+    return room->areaIndex;
 }
 
 const char * XMLRoomIndexData::getIndexType() const

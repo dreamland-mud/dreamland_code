@@ -32,6 +32,7 @@ public:
 
     virtual const DLString &getName( ) const;
     virtual bool isValid( ) const;
+    virtual bool givesAffects() const;
     
     virtual const DLString &getRibName( ) const;
     virtual const DLString &getPurpose( ) const;
@@ -50,11 +51,21 @@ public:
     virtual  int wear( Object *obj, int flags );
     virtual bool wearAtomic( Character *ch, Object *obj, int flags );
 
+    /** Add location_name/item_name pair to the display list. */
     virtual void display( Character *, DisplayList & );
+    /** Checks if item auras need to be shown for this location. */
+    virtual bool displayFlags(Character *ch, Object *obj) { return true; }
+    /** Formats item name to show for this location. */
+    virtual DLString displayName(Character *ch, Object *obj);
+    /** Formats location name itself depending on the item. */
+    virtual DLString displayLocation(Character *ch, Object *obj);
+
     virtual  int canWear( Character *ch, Object *obj, int flags );
     virtual bool canWear( Character *ch, int flags );
     virtual bool canRemove( Character *ch, Object *obj, int flags );
     virtual bool canRemove( Character *ch, int flags );
+
+    virtual void onFight(Character *ch, Object *obj) { };
 
 protected:
     DLString name;

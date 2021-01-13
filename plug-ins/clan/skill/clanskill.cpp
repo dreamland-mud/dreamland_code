@@ -41,11 +41,11 @@ SkillGroupReference & ClanSkill::getGroup( )
     return group_clan;
 }
 
-bool ClanSkill::visible( Character * ch ) const
+bool ClanSkill::visible( CharacterMemoryInterface * ch ) const
 {
     const SkillClanInfo *ci;
     
-    if (ch->is_npc( ) && mob.visible( ch->getNPC( ), this ) == MPROF_ANY)
+    if (ch->getMobile( ) && mob.visible( ch->getMobile( ), this ) == MPROF_ANY)
         return true;
 
     if (temporary_skill_active(this, ch))
@@ -57,10 +57,10 @@ bool ClanSkill::visible( Character * ch ) const
     if (ci->level.getValue( ) >= LEVEL_IMMORTAL)
         return false;
 
-    if (!ch->is_npc( ) && ci->clanLevel.getValue( ) > ch->getPC( )->getClanLevel( ))
+    if (ch->getPCM() && ci->clanLevel.getValue( ) > ch->getPCM()->getClanLevel( ))
         return false;
 
-    if (ci->maxLevel.getValue( ) < ch->getRealLevel( ) && ci->maxLevel.getValue( ) < LEVEL_MORTAL)
+    if (ci->maxLevel.getValue( ) < ch->getLevel() && ci->maxLevel.getValue( ) < LEVEL_MORTAL)
         return false;
 
     return true;
@@ -176,15 +176,16 @@ bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose )
     return false;
 }
 
-void ClanSkill::show( PCharacter *ch, std::ostream & buf ) 
+void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
     StringList clanNames;
-    Clans::iterator i;
-    PCSkillData &data = ch->getSkillData( getIndex( ) );
-    
-    buf << skill_what(this).ruscase('1').upperFirstCharacter() << " "
-        << "'{c" << getName( ) << "{x' или " 
-        << "'{c" << getRussianName( ) << "{x', навык ";
+    Clans::const_iterator i;
+    PCSkillData &data = ch->getSkillData( getIndex( ) );    
+    const char *pad = SKILL_INFO_PAD;
+
+    buf << print_what(this) << " "
+        << print_names_for(this, ch)
+        << ", навык ";
 
     for (i = clans.begin( ); i != clans.end( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i->first );
@@ -209,31 +210,28 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
         break;
     }
 
-    buf << "." << endl; 
+    buf << "{" << SKILL_HEADER_BG << ".{x" << endl; 
 
-    print_wait_and_mana(this, ch, buf);
+    buf << print_wait_and_mana(this, ch);
 
-    if (!visible( ch )) {
-        print_see_also(this, ch, buf);
+    if (!visible( ch ))
         return;
-    }
 
     if (temporary_skill_active(this, ch)) {        
-        buf << endl << "Досталось тебе разученное на {" 
+        buf << pad << "Досталось тебе разученное на {" 
             << skill_learned_colour(this, ch) << data.learned << "%{x";
     } else {
-        buf << endl << "Доступно тебе с уровня {C" << getLevel( ch ) << "{x";
+        buf << pad << "Доступно тебе с уровня {C" << getLevel( ch ) << "{x";
         if (available( ch ))
             buf << ", изучено на {" << skill_learned_colour(this, ch) << data.learned << "%{x";
     }
     
     buf << "." << endl
-        << "Практикуется у {gкланового охранника{x." << endl;
-    print_see_also(this, ch, buf);
+        << pad << "Практикуется у {gкланового охранника{x." << endl;
 }
 
 const SkillClanInfo * 
-ClanSkill::getClanInfo( Character *ch ) const
+ClanSkill::getClanInfo( CharacterMemoryInterface *ch ) const
 {
     Clans::const_iterator i;
     

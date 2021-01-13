@@ -42,6 +42,9 @@ public:
     virtual DLString getTitle(const DLString &label) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
+
+protected:
+    virtual void getRawText( Character *, ostringstream & ) const;
 };
 
 inline const DLString & LanguageHelp::getType( ) const
@@ -81,7 +84,7 @@ public:
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
     virtual SkillGroupReference & getGroup( );
-    virtual bool visible( Character * ) const;
+    virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
@@ -91,7 +94,7 @@ public:
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void practice( PCharacter * ) const;
-    virtual void show( PCharacter *, std::ostream & ); 
+    virtual void show( PCharacter *, std::ostream & ) const; 
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual const DLString & getCategory( ) const
     {
@@ -119,8 +122,8 @@ protected:
     Word createPersonalWord( ) const;
     DLString getRandomEffectName( bool ) const;
     virtual void dream( const Word &, PCharacter * ) const = 0;
-    const RaceLangInfo * getRaceInfo( PCharacter * ) const;
-    const ClassLangInfo * getClassInfo( PCharacter * ) const;
+    const RaceLangInfo * getRaceInfo( CharacterMemoryInterface * ) const;
+    const ClassLangInfo * getClassInfo( CharacterMemoryInterface * ) const;
     WordContainer * locateWord( Word &, PCharacter *, const DLString & ) const;
 
     static const DLString CATEGORY;

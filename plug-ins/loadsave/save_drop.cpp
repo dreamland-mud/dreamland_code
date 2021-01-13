@@ -51,7 +51,7 @@ void load_drops( )
 
                 try {
                     load_single_objects_folder( dirn, false );
-                } catch (FileFormatException e) {
+                } catch (const FileFormatException &e) {
                     LogStream::sendError( ) << e.what( ) << endl;
                 }
         }
@@ -81,7 +81,7 @@ void load_single_objects_folder( char * subdir, bool remove_after )
             if ( NAMLEN( dp ) > 0
                     && dp->d_name[0] != '.' )
             {
-                    room = get_room_index( atoi( dp->d_name ) );
+                    room = get_room_instance( atoi( dp->d_name ) );
                     
                     try {
                         load_room_objects( room, dirn, remove_after );
@@ -170,7 +170,7 @@ void        load_room_objects( Room *room, char * path, bool remove_after )
                         break;
                 }
                 
-            } catch (FileFormatException e) {
+            } catch (const FileFormatException &e) {
                 LogStream::sendError( ) << "Load_room_obj: " << e.what( ) << endl;
                 buggy = true;
                 break;
@@ -235,7 +235,7 @@ void load_single_mobiles_folder( char * subdir, bool remove_after )
                 if ( NAMLEN( dp ) > 0
                         && dp->d_name[0] != '.' )
                 {
-                        room = get_room_index( atoi( dp->d_name ) );
+                        room = get_room_instance( atoi( dp->d_name ) );
 
                         if ( !room )
                         {
@@ -319,7 +319,7 @@ void load_room_mobiles( Room *room, char *path, bool remove_after )
                     buggy = true;
                     break;
                 
-                } catch (FileFormatException e) {
+                } catch (const FileFormatException &e) {
                     LogStream::sendError( ) << "Load_room_mobiles: " << e.what( ) << endl;
                     buggy = true;
                     break;
@@ -382,7 +382,7 @@ void save_room_objects( Room *room )
         for (i = items.begin( ); i != items.end( ); i++)
             fwrite_obj_0( NULL, *i, fp, 0 );
     }
-    catch(Exception e)
+    catch(const Exception &e)
     {
             sprintf (fname,"{RSave_room: filling {Cvnum %d{R FAILED!!!!!!!!", room->vnum);
             bug(fname,0);

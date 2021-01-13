@@ -38,9 +38,6 @@
 SPELL_DECL(Awakening);
 VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    
-    Affect *paf, *paf_next;
-
     if (IS_AWAKE( victim )) {
         if (victim != ch)
             act_p("$E уже не спит.", ch, 0, victim, TO_CHAR, POS_RESTING);
@@ -50,13 +47,8 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
         return;
     }
 
-    for (paf = victim->affected; paf != NULL; paf = paf_next) {
+    for (auto &paf: victim->affected.clone()) {
         int chance;
-
-        paf_next = paf->next;
-
-        while (paf_next != NULL && paf_next->type == paf->type)
-            paf_next = paf_next->next;
 
         chance = max( 5, 50 + 5 * (level - paf->level));
 

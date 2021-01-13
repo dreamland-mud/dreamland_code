@@ -17,7 +17,7 @@
 #include "affect.h"
 
 #include "raceflags.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "magic.h"
 #include "damage_impl.h"
 #include "fight.h"
@@ -152,13 +152,11 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
             act_p( "$c1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM,POS_RESTING);
             ch->send_to("Ты хватаешься за горло и задыхаешься.\n\r");
 
-            af.where         = TO_AFFECTS;
+            af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
             af.level          = number_fuzzy( cFull / 2 );
             af.duration  = cFull;
-            af.location  = APPLY_NONE;
-            af.modifier  = 0;
-            af.bitvector = AFF_POISON;
+            af.bitvector.setValue(AFF_POISON);
             affect_join( ch, &af );
     }
 }

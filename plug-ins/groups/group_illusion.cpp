@@ -61,13 +61,13 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    af.where     = TO_DETECTS;
+    af.bitvector.setTable(&detect_flags);
     af.type      = gsn_fear;
     af.level     = level;
     af.duration  = level / 10;
-    af.location  = 0;
+    
     af.modifier  = 0;
-    af.bitvector = ADET_FEAR;
+    af.bitvector.setValue(ADET_FEAR);
     affect_to_char( victim, &af );
     act("Ты дрожишь от страха.", victim, 0, 0, TO_CHAR);
     act("$c1 дрожит от страха.", victim, 0, 0, TO_ROOM);
@@ -91,13 +91,12 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
     act_p("$c1 становится совсем невидим$gым|ым|ой.",
            ch, 0, 0, TO_ROOM,POS_RESTING);
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 10 ;
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = AFF_IMP_INVIS;
+    
+    af.bitvector.setValue(AFF_IMP_INVIS);
     affect_to_char( ch, &af );
 
     act("Ты становишься совсем невидим$gым|ым|ой.", ch, 0, 0, TO_CHAR);
@@ -117,13 +116,11 @@ VOID_SPELL(Invisibility)::run( Character *ch, Object *obj, int sn, int level )
 
     ch->in_room->echo( POS_RESTING, "%1$^O1 станов%1$nится|ятся невидим%1$Gым|ым|ой|ыми.", obj );
 
-    af.where        = TO_OBJECT;
+    af.bitvector.setTable(&extra_flags);
     af.type                = sn;
     af.level        = level;
     af.duration        = level / 4 + 12;
-    af.location        = APPLY_NONE;
-    af.modifier        = 0;
-    af.bitvector        = ITEM_INVIS;
+    af.bitvector.setValue(ITEM_INVIS);
     affect_to_obj( obj, &af);
 }
 
@@ -142,13 +139,12 @@ VOID_SPELL(Invisibility)::run( Character *ch, Character *victim, int sn, int lev
     act_p("$c1 становится невидим$gым|ым|ой.",
            victim, 0, 0, TO_ROOM,POS_RESTING);
 
-    af.where     = TO_AFFECTS;
+    af.bitvector.setTable(&affect_flags);
     af.type      = sn;
     af.level     = level;
     af.duration  = (level / 8 + 10);
-    af.location  = APPLY_NONE;
-    af.modifier  = 0;
-    af.bitvector = AFF_INVISIBLE;
+    
+    af.bitvector.setValue(AFF_INVISIBLE);
     affect_to_char( victim, &af );
 
     act("Ты становишься невидим$gым|ым|ой.", victim, 0, 0, TO_CHAR);
@@ -172,13 +168,12 @@ VOID_SPELL(MassInvis)::run( Character *ch, Room *room, int sn, int level )
         act("$c1 становится невидим$gым|ым|ой.", gch, 0, 0, TO_ROOM);
         act("Ты становишься невидим$gым|ым|ой.", gch, 0, 0, TO_CHAR);
 
-        af.where     = TO_AFFECTS;
+        af.bitvector.setTable(&affect_flags);
         af.type      = sn;
         af.level     = level/2;
         af.duration  = 24;
-        af.location  = APPLY_NONE;
-        af.modifier  = 0;
-        af.bitvector = AFF_INVISIBLE;
+        
+        af.bitvector.setValue(AFF_INVISIBLE);
         affect_to_char( gch, &af );
     }
     ch->send_to("Ok.\n\r");

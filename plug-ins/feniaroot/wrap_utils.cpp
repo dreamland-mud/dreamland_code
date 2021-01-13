@@ -48,6 +48,13 @@ Register wrap( Room * wt )
     return WrapperManager::getThis( )->getWrapper( wt ); 
 }
 
+Register wrap( RegList::Pointer &list )
+{
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(list);
+    return Register(listObj);
+}
+
 const Register & get_unique_arg( const RegisterList &args )
 {
     if (args.empty( ))
@@ -66,13 +73,11 @@ DLString args2string( const RegisterList &args )
     return get_unique_arg( args ).toString( );
 }
 
+// Return unquoted arguments, for methods that accept both [abc def] and ['abc def'].
 DLString args2word( const RegisterList &args )
 {
-    StringSet ss;
-    ss.fromString(get_unique_arg(args).toString());
-    if (ss.size() > 1 || ss.size() < 1)
-        throw Scripting::Exception("Expecting a single word or words in quotes");
-    return *(ss.begin());
+    DLString word = get_unique_arg(args).toString();
+    return word.substitute('\'', "");
 }
 
 Character * args2character( const RegisterList &args )
@@ -184,6 +189,13 @@ PCMemoryInterface * argnum2memory(const RegisterList &args, int num)
         throw Scripting::Exception("Player not found.");
     return pci;
 }
+
+::Object *argnum2item(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return arg2item(reg);
+}
+
 
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
 {
