@@ -139,7 +139,6 @@ _GSN_( forest_fighting );
 _GSN_( fourth_attack );
 _GSN_( frenzy );
 _GSN_( garble );
-_GSN_( gaseous_form );
 _GSN_( giant_strength );
 _GSN_( golden_aura );
 _GSN_( green_arrow );

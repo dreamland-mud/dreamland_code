@@ -340,7 +340,7 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
 
     target = get_random_room_vanish( ch );
 
-    if (target && number_percent() < gsn_gaseous_form->getEffective(ch)) {
+    if (target) {
 
   
         transfer_char( ch, ch, target,
