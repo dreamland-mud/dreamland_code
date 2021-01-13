@@ -365,12 +365,15 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
     af.type      = sn;
     af.level     = level;
     af.duration  = 1;
+  
 
     if(!IS_AFFECTED(ch, AFF_PASS_DOOR)){
     af.bitvector.setTable(&affect_flags);
     af.bitvector.setValue(AFF_PASS_DOOR);
-    affect_to_char( ch, &af );
     }
+    
+    affect_to_char( ch, &af );
+    
         
     if(!IS_SET(ch->form, FORM_MIST)){
     af.bitvector.setTable(&form_flags);
