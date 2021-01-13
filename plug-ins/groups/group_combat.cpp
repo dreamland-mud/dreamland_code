@@ -89,44 +89,37 @@ VOID_SPELL(ChainLightning)::run(Character *ch, Character *victim, int sn, int le
 
                 found = true;
                 last_vict = tmp_vict;
-                if (is_safe(ch, tmp_vict)) {
-                    act_p("Разряд молнии затухает, не достигнув $c2.",
-                          ch, 0, 0, TO_ROOM, POS_RESTING);
-                    act_p("Разряд молнии затухает, не достигнув тебя.",
-                          ch, 0, 0, TO_CHAR, POS_RESTING);
-                } else {
-                    act_p("Разряд молнии поражает $c4!",
-                          tmp_vict, 0, 0, TO_ROOM, POS_RESTING);
-                    act_p("Разряд молнии поражает тебя!",
-                          tmp_vict, 0, 0, TO_CHAR, POS_RESTING);
+                act_p("Разряд молнии поражает $c4!",
+                        tmp_vict, 0, 0, TO_ROOM, POS_RESTING);
+                act_p("Разряд молнии поражает тебя!",
+                        tmp_vict, 0, 0, TO_CHAR, POS_RESTING);
 
-                    // special damage table
-                    if (level <= 20)
-                        dam = dice(level, 4);
-                    else if (level <= 40)
-                        dam = dice(level, 5);
-                    else if (level <= 70)
-                        dam = dice(level, 6);
-                    else
-                        dam = dice(level, 7);
+                // special damage table
+                if (level <= 20)
+                    dam = dice(level, 4);
+                else if (level <= 40)
+                    dam = dice(level, 5);
+                else if (level <= 70)
+                    dam = dice(level, 6);
+                else
+                    dam = dice(level, 7);
 
-                    if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-                        yell_panic(ch, tmp_vict);
+                if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
+                    yell_panic(ch, tmp_vict);
 
-                    if (saves_spell(level, tmp_vict, DAM_LIGHTNING, ch, DAMF_SPELL)) {
-                        dam /= 2;
-                    }
-
-                    try {
-                        damage_nocatch(ch, tmp_vict, dam, sn, DAM_LIGHTNING, true, DAMF_SPELL);
-                        shock_effect(tmp_vict, level, dam, TARGET_CHAR, DAMF_SPELL);
-                    } catch (const VictimDeathException &) {
-                        level -= 4;
-                        people.remove(tmp_vict);
-                        break;
-                    }
-                    level -= 4; /* decrement damage */
+                if (saves_spell(level, tmp_vict, DAM_LIGHTNING, ch, DAMF_SPELL)) {
+                    dam /= 2;
                 }
+
+                try {
+                    damage_nocatch(ch, tmp_vict, dam, sn, DAM_LIGHTNING, true, DAMF_SPELL);
+                    shock_effect(tmp_vict, level, dam, TARGET_CHAR, DAMF_SPELL);
+                } catch (const VictimDeathException &) {
+                    level -= 4;
+                    people.remove(tmp_vict);
+                    break;
+                }
+                level -= 4; /* decrement damage */
             }
         } /* end target searching loop */
 
@@ -498,11 +491,12 @@ VOID_SPELL(SandStorm)::run(Character *ch, Room *room, int sn, int level)
             if (vch->is_mirror() && number_percent() < 50)
                 continue;
 
-            if (is_safe_spell(ch, vch, true) || (vch->is_npc() && ch->is_npc() && (ch->fighting != vch && vch->fighting != ch)))
-                continue;
-            if (is_safe(ch, vch))
+            if (is_safe_spell(ch, vch, true))            
                 continue;
 
+            if (vch->is_npc() && ch->is_npc() && (ch->fighting != vch && vch->fighting != ch))
+                continue;
+                
             if (ch->fighting != vch && vch->fighting != ch)
                 yell_panic(ch, vch);
 
