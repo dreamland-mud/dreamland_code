@@ -236,7 +236,7 @@ VOID_SPELL(DesertFist)::run(Character *ch, Character *victim, int sn, int level)
 
     int dam;
 
-    if ((ch->in_room->sector_type != SECT_HILLS) && (ch->in_room->sector_type != SECT_MOUNTAIN) && (ch->in_room->sector_type != SECT_DESERT)) {
+    if ((ch->in_room->getSectorType() != SECT_HILLS) && (ch->in_room->getSectorType() != SECT_MOUNTAIN) && (ch->in_room->getSectorType() != SECT_DESERT)) {
         ch->println("Здесь недостаточно песка, чтобы сформировать кулак.");
         ch->wait = 0;
         return;
@@ -290,8 +290,9 @@ VOID_SPELL(EtheralFist)::run(Character *ch, Character *victim, int sn, int level
         dam /= 2;
     else {
         if (number_percent() > 50) {
-            act_p("$C4 ошеломленно трясет головой!", 0, 0, victim, TO_CHAR, POS_RESTING);
-            act_p("$C4 ошеломленно трясет головой!", 0, 0, victim, TO_NONVICT, POS_RESTING);
+            if (ch != victim)
+                act_p("$C4 ошеломленно трясет головой!", ch, 0, victim, TO_VICT, POS_RESTING);
+            act_p("$C4 ошеломленно трясет головой!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
             victim->println("Ты ошеломленно трясешь головой и не можешь пошевелиться!");
             victim->setWaitViolence(2);
         }
@@ -343,7 +344,7 @@ VOID_SPELL(HandOfUndead)::run(Character *ch, Character *victim, int sn, int leve
     victim->move /= 2;
     ch->hit += dam / 2;
 
-    act("Призрачные когти смыкаются вокруг $C4!", 0, 0, victim, TO_NOTVICT);
+    act("Призрачные когти смыкаются вокруг $C4!", ch, 0, victim, TO_NOTVICT);
     victim->println("Ты чувствуешь, как жизнь ускользает от тебя!");
     ch->println("Ты чувствуешь прилив жизненной энергии!");
 
@@ -462,10 +463,10 @@ VOID_SPELL(SandStorm)::run(Character *ch, Room *room, int sn, int level)
 
     int dam;
 
-    if (ch->in_room->sector_type == SECT_AIR ||
-        ch->in_room->sector_type == SECT_INSIDE ||
-        ch->in_room->sector_type == SECT_WATER_SWIM ||
-        ch->in_room->sector_type == SECT_WATER_NOSWIM) {
+    if (ch->in_room->getSectorType() == SECT_AIR ||
+        ch->in_room->getSectorType() == SECT_INSIDE ||
+        ch->in_room->getSectorType() == SECT_WATER_SWIM ||
+        ch->in_room->getSectorType() == SECT_WATER_NOSWIM) {
         ch->send_to("Здесь нет ни крупицы песка!\n\r");
         ch->wait = 0;
         return;
@@ -481,7 +482,7 @@ VOID_SPELL(SandStorm)::run(Character *ch, Room *room, int sn, int level)
     else
         dam = dice(level, 20);
 
-    if (ch->in_room->sector_type == SECT_DESERT) {
+    if (ch->in_room->getSectorType() == SECT_DESERT) {
         act_p("$c1 создает мощную пустынную бурю вокруг себя!", ch, 0, 0, TO_ROOM, POS_RESTING);
         ch->send_to("Ты создаешь мощную пустынную бурю вокруг себя.\n\r");
         dam = dice(level, 24);
@@ -587,7 +588,7 @@ VOID_SPELL(Hurricane)::run(Character *ch, Room *room, int sn, int level)
     int dam;
 
     act_p("$c1 призывает повелителя ураганов на помощь.",
-          ch, 0, 0, TO_NOTVICT, POS_RESTING);
+          ch, 0, 0, TO_ROOM, POS_RESTING);
     act_p("Ты призываешь повелителя ураганов на помощь.",
           ch, 0, 0, TO_CHAR, POS_RESTING);
 

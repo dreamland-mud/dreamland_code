@@ -27,7 +27,7 @@
 #include "damage.h"
 #include "act_move.h"
 #include "gsn_plugin.h"
-
+#include "effects.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"
@@ -328,7 +328,7 @@ VOID_SPELL(Earthquake)::run(Character *ch, Room *room, int sn, int level)
             else
                 dam = dice(level, 16);
 
-            switch (room->sector_type) {
+            switch (room->getSectorType()) {
             case SECT_MOUNTAIN:
                 dam *= 4;
                 break;
@@ -376,7 +376,7 @@ VOID_SPELL(Web)::run(Character *ch, Character *victim, int sn, int level)
 
     if (saves_spell(level, victim, DAM_ENERGY, ch, DAMF_SPELL)) {
         act_p("$C1 с легкостью уворачивается от сетей.", ch, 0, victim, TO_CHAR, POS_RESTING);
-        act_p("$C1 с легкостью уворачивается от сетей.", ch, 0, victim, TO_NONVICT, POS_RESTING);
+        act_p("$C1 с легкостью уворачивается от сетей.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
         victim->send_to("Ты с легкостью уворачиваешься от сетей.\n\r");
         return;
     }
@@ -401,7 +401,7 @@ VOID_SPELL(Web)::run(Character *ch, Character *victim, int sn, int level)
     if (ch != victim)
         act_p("Ты сковываешь движения $C4 густой сетью!", ch, 0, victim, TO_CHAR, POS_RESTING);
 
-    act_p("$C1 сковывает движения $C4 густой сетью!", ch, 0, victim, TO_NONVICT, POS_RESTING);
+    act_p("$C1 сковывает движения $C4 густой сетью!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
     victim->send_to("Густая сеть сковывает твои движения!\n\r");
 }
 
