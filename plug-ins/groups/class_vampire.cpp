@@ -1258,11 +1258,6 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
 { 
     Affect af;
 
-    if (!ch->fighting) {
-        ch->send_to("Сейчас ты не сражаешься!\r\n");
-        return;
-    }
-
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
 	ch->pecho( "Для этого тебе необходимо превратиться в вампир%Gа|а|шу!", ch );    
         return;

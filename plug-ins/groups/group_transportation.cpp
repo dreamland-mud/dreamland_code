@@ -317,11 +317,6 @@ TYPE_SPELL(bool, GaseousForm)::checkPosition( Character *ch ) const
     if (!DefaultSpell::checkPosition( ch ))
         return false;
 
-    if (!ch->fighting) {
-        ch->println( "Ты можешь превратиться в туман только в бою!" );
-        return false;
-    }
-
     if (ch->mount) {
         ch->pecho( "Ты не можешь превратиться в туман, пока ты верхом или оседла%Gно|н|на!", ch );
         return false;
@@ -345,14 +340,32 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
 
     target = get_random_room_vanish( ch );
 
-    if (target && number_bits(1) == 1) {
-        postaffect_to_char( ch, sn, 1 );
-        
+    if (target && number_percent() < gsn_gaseous_form->getEffective(ch)) {
+
+  
         transfer_char( ch, ch, target,
                     "%1$^C1 рассеивается в клубах тумана, принимая газообразную форму.\r\n%1$^C1 исчезает!",
                     "Ты рассеиваешься в клубах тумана, принимая газообразную форму.\r\nТы исчезаешь!",
                     "Неожиданно рядом с тобой начинает клубиться туман..\r\nИз сгустков тумана постепенно вырисовывается силуэт %1$C2.",
-                    "Твое тело уплотняется, возвращаясь в обычное состояние." );
+                    "Твое тело ненадолго остается в газообразном состоянии." );
+
+        Affect af;
+        af.bitvector.setTable(&affect_flags);
+        af.type      = sn;
+        af.level     = level;
+        af.duration  = 1;
+
+        if(!IS_AFFECTED(ch, AFF_PASS_DOOR))
+        af.bitvector.setValue(AFF_PASS_DOOR);
+
+        affect_to_char( ch, &af );
+
+        af.bitvector.setTable(&form_flags);
+        if(!IS_SET(ch->form, FORM_MIST))
+        af.bitvector.setValue(FORM_MIST);
+        affect_to_char( ch, &af );
+
+
     } else {
         ch->send_to("Тебе не удалось превратиться в туман.\r\n");
     }
