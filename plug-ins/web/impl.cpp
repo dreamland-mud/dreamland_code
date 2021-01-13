@@ -965,15 +965,19 @@ public:
 
     virtual void run()
     {
+        if (dreamland->hasOption(DL_BUILDPLOT))
+            return;
+
         dumpSkills();
         dumpCommands();
     }
 
     void dumpSkills() 
     {
-        ostringstream buf;
+        ostringstream buf, cmdbuf;
 
         buf << "name,rname,group,what,cmd,rcmd,position,target" << endl;
+        cmdbuf << "skill,name,rname,position,order,extra,hint" << endl;
 
         for (int sn = 0; sn < skillManager->size(); sn++) {
             Skill *s = skillManager->find(sn);
@@ -1016,11 +1020,26 @@ public:
             buf << cmd << "," << rcmd << "," 
                 << position_table.name(position) << ","
                 << target_table.names(target) << endl;                       
+
+            if (command) {
+                cmdbuf 
+                    << s->getName() << ","
+                    << command->getName() << ","
+                    << command->getRussianName() << ","
+                    << command->getPosition().name() << ","
+                    << command->getOrder().names() << ","
+                    << command->getExtra().names() << ","
+                    << command->getHint() 
+                    << endl;
+            }
         }
 
         try {
             DLFileStream( "/tmp/skills.csv" ).fromString( 
                 koi2utf(buf.str())
+            );
+            DLFileStream( "/tmp/skill-commands.csv" ).fromString( 
+                koi2utf(cmdbuf.str())
             );
         } catch (const ExceptionDBIO &ex) {
             LogStream::sendError() << ex.what() << endl;
@@ -1029,39 +1048,35 @@ public:
 
     void dumpCommands()
     {
-        Json::Value json;
-        list<Command::Pointer>::const_iterator c;
+        ostringstream buf;
+
+        buf << "name,rname,position,order,extra,hint" << endl;
 
         // Use this guy to choose only commands visible to mortals.
         PCharacter dummy;
         dummy.setLevel(1);
 
-        // Output English commands sorted according to their priorities.
-        // TODO: aliases
-        list<Command::Pointer> commands = commandManager->getCommands().getCommands();
-        for (c = commands.begin(); c != commands.end(); c++) {
-            if ((*c)->visible(&dummy)) {
-                Json::Value cmd;
-                cmd["name"] = (*c)->getName();
-                cmd["lvl"] = (*c)->getLevel();
-                json.append(cmd);
+        // Output commands sorted according to their priorities in English.
+        auto &commands = commandManager->getCommands().getCommands();
+        for (auto &cmd: commands) {
+            if (cmd->available(&dummy)) {
+                buf << cmd->getName() << ","
+                    << cmd->getRussianName() << ","
+                    << cmd->getPosition().name() << ","
+                    << cmd->getOrder().names() << ","
+                    << cmd->getExtra().names() << ","
+                    << cmd->getHint() 
+                    << endl;
             }
         }
 
-        // Append Russian commands sorted according to their priorities.
-        commands = commandManager->getCommands().getCommandsRU();
-        for (c = commands.begin(); c != commands.end(); c++) {
-            if ((*c)->visible(&dummy)) {
-                Json::Value cmd;
-                cmd["name"] = (*c)->getRussianName();
-                cmd["lvl"] = (*c)->getLevel();
-                json.append(cmd);
-            }
+        try {
+            DLFileStream( "/tmp/commands.csv" ).fromString( 
+                koi2utf(buf.str())
+            );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
         }
-
-        DLFileStream(dreamland->getMiscDir(), "commands", ".json").fromString(
-            koi2utf(json_to_string(json))
-        );
     }
 };    
 
