@@ -98,7 +98,7 @@ protected:
         }
 
         if (ch->getPC( )->getHometown( ) == home_frigate) {
-            msgSelf( ch, "Сначала спустись с фрегата." );
+            msgSelf( ch, "Близость Хаоса возмущает эфир! Похоже, Галеон сейчас твой единственный вид транспорта." );
             return false;
         }
 
