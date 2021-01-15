@@ -108,7 +108,8 @@ WeaponGenerator & WeaponGenerator::randomWeaponClass()
     wclass = allClasses[random_index];
     wclassConfig = weapon_classes[wclass];
     obj->value0(weapon_class.value(wclass));
-    obj->extra_flags = 0;
+    // Keep some extra flags (e.g. for shops) but clean everything else.
+    obj->extra_flags &= ITEM_INVENTORY;
 
     return *this;
 }
@@ -282,7 +283,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
     // Generate all combinations of affixes.
     gen.run();
-    LogStream::sendNotice() << gen.dump();
+    //LogStream::sendNotice() << gen.dump();
 
     if (gen.getResultSize() == 0) {
         warn("Weapon generator: no affixes found for tier %d.", valTier);
@@ -471,8 +472,8 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
 const WeaponGenerator & WeaponGenerator::assignColours() const
 {
     DLString colour = weapon_tier_table[valTier-1].colour;
-    if (colour.empty())
-        return *this;
+    if (colour.empty()) 
+        colour = 'w';
 
     DLString myshort = obj->getShortDescr();
     if (obj->getProperty("eqName").empty())

@@ -132,8 +132,8 @@ void affix_generator::run()
 
     generateBuckets(0, 0, 0L);
 
-    notice("Weapon generator: found %d result buckets for tier %d and %d affixes", 
-            buckets.size(), tier.num, affixes.size());
+    //notice("Weapon generator: found %d result buckets for tier %d and %d affixes", 
+    //        buckets.size(), tier.num, affixes.size());
 }
 
 /** Produces a single random affix combination out of all generated ones. */

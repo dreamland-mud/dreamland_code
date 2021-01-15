@@ -2,6 +2,7 @@
 #include "logstream.h"
 #include "npcharacter.h"
 #include "core/object.h"
+#include "room.h"
 #include "loadsave.h"
 #include "itemevents.h"
 #include "occupations.h"
@@ -46,6 +47,9 @@ void WeaponRandomizer::eventItemEdited(const ItemEditedEvent &event) const
     if (obj->item_type != ITEM_WEAPON)
         return;
 
+    if (IS_SET(obj->pIndexData->area->area_flag, AREA_SYSTEM))
+        return;
+
     if (obj->getProperty("random").empty() && !obj->getProperty("tier").empty()) {
         clearWeapon(obj);
         return;
@@ -86,6 +90,7 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
             return;
 
         obj->getCarrier()->recho("%^C1 проводит инвентаризацию.", obj->getCarrier());
+        clearWeapon(obj);
     }
 
     if (pReset->rand == RAND_ALL) {
@@ -126,7 +131,6 @@ void WeaponRandomizer::clearWeapon(Object *obj) const
     obj->enchanted = false;
     obj->affected.deallocate();
     obj->timer = 0;
-    obj->setShortDescr(&str_empty[0]);
 }
 
 void WeaponRandomizer::adjustTimer(Object *obj) const
@@ -196,9 +200,11 @@ void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) c
         .assignTimers()
         .assignColours();
 
-    notice("rand_stat: created item [%d] [%lld] tier %s",
+    notice("rand_stat: created item %s [%d] [%lld] tier %s affixes [%s]",
+            obj->getShortDescr('1').c_str(),
             obj->pIndexData->vnum, obj->getID(), 
-            obj->getProperty("tier").c_str());
+            obj->getProperty("tier").c_str(),
+            obj->getProperty("affixes").c_str());
 
     Character *carrier = obj->getCarrier();
     if (carrier && !carrier->is_npc())
@@ -226,9 +232,12 @@ void WeaponRandomizer::randomizeWeapon(Object *obj, int level, int bestTier) con
         .assignDamageType()
         .assignColours();
 
-    notice("rand_all: created item [%d] [%lld] tier %s level %d",
+    notice("rand_all: created item %s [%d] [%lld] tier %s affixes [%s] level %d",
+            obj->getShortDescr('1').c_str(),
             obj->pIndexData->vnum, obj->getID(), 
-            obj->getProperty("tier").c_str(), obj->level);
+            obj->getProperty("tier").c_str(), 
+            obj->getProperty("affixes").c_str(),
+            obj->level);
 }
 
 // NPC carrying this item can influence align restrictions, unless it's just a shop.

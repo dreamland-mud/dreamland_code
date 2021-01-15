@@ -255,6 +255,7 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
             mob->recho("Милость богов снисходит на %C2, принося с собой %O4.", mob, obj);
 
     reset_obj_location(pReset, obj, mob, verbose);
+    eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
 
     return obj;
 }
@@ -344,13 +345,13 @@ static bool reset_one_mob(NPCharacter *mob)
 
         if (self) {
             reset_obj_location(myReset, self, mob, true);
+            eventBus->publish(ItemResetEvent(self, self->level, myReset));        
         } else {
             OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
             self = create_item_for_mob(myReset, pObjIndex, mob, true);
         }
 
         if (self) {
-            eventBus->publish(ItemResetEvent(self, self->level, myReset));        
             changed = true;
         }
     }
@@ -375,13 +376,13 @@ static bool reset_one_mob(NPCharacter *mob)
         self = get_obj_list_vnum(mob->carrying, myReset->arg1);
         if (self) {
             self->wear_loc->unequip(self);
+            eventBus->publish(ItemResetEvent(self, self->level, myReset));
         } else {
             OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
             self = create_item_for_mob(myReset, pObjIndex, mob, true);
         }
 
         if (self) {
-            eventBus->publish(ItemResetEvent(self, self->level, myReset));
             changed = true;
         }
     }
