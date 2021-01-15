@@ -33,6 +33,7 @@
 #include "security.h"
 #include "areahelp.h"
 
+#include "occupations.h"
 #include "websocketrpc.h"
 #include "interp.h"
 #include "merc.h"
@@ -54,6 +55,7 @@ GSN(enchant_armor);
 GSN(none);
 CLAN(none);
 PROF(necromancer);
+WEARLOC(sheath);
 
 using namespace std;
 
@@ -314,6 +316,15 @@ static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
     return line;
 }
 
+static RoomIndexData * find_mob_reset_room(NPCharacter *mob)
+{
+    for (auto &r: roomIndexMap)
+        for (auto &pReset: r.second->resets)
+            if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum) 
+                return r.second;
+    return 0;
+}
+
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;
@@ -519,6 +530,65 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         }
 
         ch->printf("Transferred %d rand_stat resets to item prototypes.\r\n", cnt);
+        ch->send_to(buf);
+        return;
+    }
+
+    if (arg == "rand_all") {
+        ostringstream buf;
+
+        // Change shop rand_all to stub vnum, limit best tier by 4.
+        for (Character *wch = char_list; wch; wch = wch->next) {
+            if (!wch->is_npc())
+                continue;
+            if (!mob_has_occupation(wch->getNPC(), OCC_SHOPPER))
+                continue;
+
+            RoomIndexData *home = find_mob_reset_room(wch->getNPC());
+            if (!home) {                
+                ch->printf("ERROR: mob %d %s without reset room\r\n", wch->getNPC()->pIndexData->vnum, wch->getNameP('1').c_str());
+                continue;
+            }
+
+            for (auto &pReset: home->resets) {
+                if (pReset->command == 'G' && pReset->rand == RAND_ALL && pReset->bestTier < 4) {
+                    ch->printf("Item %d in shop [%d] %s changed from tier %d to 4.\r\n", 
+                                pReset->arg1, home->vnum, home->name, pReset->bestTier);
+                    
+                    pReset->arg1 = OBJ_VNUM_WEAPON_STUB;
+                    pReset->bestTier = 4;
+                    home->areaIndex->changed = true;
+                }
+            }
+        }
+
+        // Clean up all other rand_all resets, printing them out first.
+        for (auto &r: roomIndexMap) {
+            for (auto &pReset: r.second->resets) {
+                if (pReset->rand != RAND_ALL) 
+                    continue;
+                if (pReset->command == 'G' && pReset->arg1 == OBJ_VNUM_WEAPON_STUB)
+                    continue;
+
+                OBJ_INDEX_DATA *pObj = get_obj_index(pReset->arg1);
+                buf << pObj->vnum << "#" 
+                    << russian_case(pObj->short_descr, '1') << "#"
+                    << pReset->bestTier << "#"
+                    << r.first << "#"
+                    << r.second->name << "#"
+                    << r.second->areaIndex->name 
+                    << endl;
+
+                pReset->rand.setValue(RAND_NONE);
+                pReset->bestTier = 0;
+                if (pReset->command == 'E' && pReset->arg3 == wear_sheath) {
+                    pReset->arg3 = wear_wield;
+                }
+
+                r.second->areaIndex->changed = true;
+            }
+        }
+        
         ch->send_to(buf);
         return;
     }

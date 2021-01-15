@@ -41,6 +41,7 @@
 
 #define OBJ_VNUM_POOL 75 
 
+#define OBJ_VNUM_WEAPON_STUB 104 // random weapon prototype for rand_all
 
 /*
  * Well known room virtual numbers.

@@ -20,6 +20,7 @@
 #include "loadsave.h"
 #include "mercdb.h"
 #include "act.h"
+#include "vnum.h"
 #include "def.h"
 
 GSN(none);
@@ -121,7 +122,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     ch->printf("{WСоздаю оружие типа '%s' уровня %d и крутости %d.{x\r\n", 
         weapon_class.message(wclass).c_str(), level, tier);
 
-    Object *obj = create_object(get_obj_index(104), 0);
+    Object *obj = create_object(get_obj_index(OBJ_VNUM_WEAPON_STUB), 0);
     obj->value0(wclass);
     obj->level = level;
     obj->setShortDescr(str_empty); // pretend it's a restring, to allow value0-4 overrides.
