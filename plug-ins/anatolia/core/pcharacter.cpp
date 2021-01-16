@@ -9,7 +9,7 @@
 #include "pcrace.h"
 #include "room.h"
 #include "commonattributes.h"
-
+#include "hometown.h"
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
@@ -21,6 +21,7 @@
 
 CLAN(none);
 PROF(samurai);
+HOMETOWN(frigate);
 
 /*
  *  Experience
@@ -33,6 +34,12 @@ void PCharacter::gainExp( int gain )
     if (level > 19  && !IS_SET( act, PLR_CONFIRMED )) {
         send_to("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
                 "Прочитай '{lRсправка подтверждение{lEhelp confirm{lx'.\n\r");
+        return;
+    }
+
+    if (level > 19  && this->getPC( )->getHometown( ) == home_frigate ) {
+        send_to("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
+                "Прочитай '{lRсправка родной город{lEhelp hometown{lx'.\n\r");
         return;
     }
 

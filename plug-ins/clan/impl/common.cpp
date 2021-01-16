@@ -11,6 +11,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "affect.h"
+#include "hometown.h"
 
 #include "act.h"
 #include "handler.h"
@@ -20,6 +21,7 @@
 
 GSN(clanrecall);
 CLAN(none);
+HOMETOWN(frigate);
 
 /*-----------------------------------------------------------------------
  * ClanRecallMovement
@@ -49,6 +51,11 @@ protected:
             return false;
         }
         
+        if (ch->getPC( )->getHometown( ) == home_frigate) {
+            msgSelf( ch, "Близость Хаоса возмущает эфир! Похоже, Галеон сейчас твой единственный вид транспорта." );
+            return false;
+        }
+
         if (!gsn_clanrecall->available( ch )) {
             msgSelf( ch, "Богам нет дела до твоих просьб." );
             return false;
