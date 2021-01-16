@@ -23,6 +23,8 @@
 #include "dreamland.h"
 #include "weather.h"
 #include "move_utils.h"
+#include "weapongenerator.h"
+#include "weapontier.h"
 #include "act.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -35,7 +37,6 @@
 #include "idcontainer.h"
 #include "regcontainer.h"
 #include "reglist.h"
-#include "object.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -1194,3 +1195,23 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
     return wrap(skills);    
 }
 
+NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier): применить rand_all к этому оружию для данного персонажа и tier")
+{
+    ::Object *obj = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    int bestTier = argnum2number(args, 3);
+
+    if (obj->item_type != ITEM_WEAPON)
+        throw Scripting::Exception("Item is not a weapon for randomize.");
+    if (bestTier < BEST_TIER || bestTier > WORST_TIER)
+        throw Scripting::Exception("Invalid weapon tier.");
+
+    WeaponGenerator()
+        .item(obj)
+        .alignment(ch->alignment)
+        .player(ch->getPC())
+        .randomTier(bestTier)
+        .randomizeAll();
+        
+    return Register();
+}

@@ -298,6 +298,15 @@ NMI_GET( ProfessionWrapper, alignName, "русское имя подходяще
     return "любая";
 }
 
+NMI_INVOKE(ProfessionWrapper, wearModifier, "(type): бонус на уровень владения этим типом предмета (.tables.item_table)")
+{
+    int itype = argnum2flag(args, 1, item_table);
+    if (itype == NO_FLAG)
+        throw Scripting::Exception("Item type not found");
+
+    return professionManager->find(name)->getWearModifier(itype);
+}
+
 NMI_GET( ProfessionWrapper, statPlus, "какие параметры увеличиваются у представителей этого класса" ) 
 {
     Profession *prof = professionManager->find( name );
