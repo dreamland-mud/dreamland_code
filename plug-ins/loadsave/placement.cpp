@@ -34,7 +34,7 @@ void char_from_room( Character *ch )
                 return;
         }
 
-        if ( !ch->is_npc() )
+        if (!ch->is_npc() && !ch->is_immortal())
         {
                 --ch->in_room->area->nplayer;
         }
@@ -128,7 +128,7 @@ void char_to_room( Character *ch, Room *pRoomIndex )
                 pRoomIndex->people        = ch;
         }
 
-        if ( !ch->is_npc() )
+        if (!ch->is_npc() && !ch->is_immortal())
         {
                 if (ch->in_room->area->empty)
                 {
