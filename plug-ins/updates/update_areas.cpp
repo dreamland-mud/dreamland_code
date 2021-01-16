@@ -21,6 +21,7 @@
 #include "dreamland.h"
 #include "loadsave.h"
 #include "wiznet.h"
+#include "weapontier.h"
 #include "gsn_plugin.h"
 #include "descriptor.h"
 #include "occupations.h"
@@ -229,6 +230,22 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to, bool i
     return true;
 }
 
+// Calculate reset probability for a carried item. Shop items and non-random stuff is reset immediately,
+// random weapons never appear in populated areas and are otherwise delayed.
+static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob)
+{
+    if (pReset->rand == RAND_NONE && !item_is_random(pObjIndex))
+        return 100;
+
+    if (mob_has_occupation(mob, OCC_SHOPPER))
+        return 100;
+
+    if (mob->in_room->area->nplayer > 0)
+        return 0;
+
+    return 10;
+}
+
 /** Create an item for inventory or equipment for a given mob, based on reset data. */
 static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob, bool verbose)
 {
@@ -236,6 +253,10 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 
     // Obj limit reached, do nothing.
     if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit) 
+        return obj;
+
+    // Not all items are reset immediately.
+    if (!chance(item_reset_chance(pReset, pObjIndex, mob)))
         return obj;
     
     obj = create_object(pObjIndex, 0);
