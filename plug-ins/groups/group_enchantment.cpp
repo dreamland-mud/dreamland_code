@@ -51,24 +51,24 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
 
     if ( IS_WEAPON_STAT(obj,WEAPON_VAMPIRIC) )
     {
-        ch->pecho("Вампиризм %1$O2 препятствует твоему благословению.", obj);
+        ch->pecho("Вампиризм %1$O2 препятствует твоему освящению.", obj);
         return;
     }
     
     if ( IS_OBJ_STAT(obj,ITEM_DARK) )
     {
-        ch->pecho("Темная сущность %1$O2 отвергает твое благословение.", obj);
+        ch->pecho("Темная сущность %1$O2 отвергает твое освящение.", obj);
         return;
     }
     
     if ( IS_OBJ_STAT(obj,ITEM_EVIL) )
     {
-        ch->pecho("Дьявольская сущность %1$O2 отвергает твое благословение.", obj);
+        ch->pecho("Дьявольская сущность %1$O2 отвергает твое освящение.", obj);
         return;
     }
     
     if (IS_WEAPON_STAT(obj,WEAPON_HOLY)) {
-        ch->pecho("%1$^O1 уже благословле%1$Gно|н|на для священной битвы.", obj);
+        ch->pecho("%1$^O1 уже освяще%1$Gно|н|на для священной битвы.", obj);
         return;
     }
         
@@ -84,7 +84,7 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL);
     affect_to_obj( obj, &af );
 
-    ch->pecho("Ты благословляешь %1$O4 для священной битвы.", obj);
+    ch->pecho("Ты освящаешь %1$O4 на битву со Злом!", obj);
 
 }
 
@@ -685,14 +685,18 @@ VOID_SPELL(WeaponMorph)::run( Character *ch, char *target_name, int sn, int leve
         return;
     }
 
-    if (obj->value0() == WEAPON_MACE
-            || obj->value0() == WEAPON_ARROW
-            || IS_WEAPON_STAT(obj,WEAPON_TWO_HANDS))
+    if (obj->value0() == WEAPON_MACE)
+    {
+        ch->println("Это и так уже булава.");
+        return;
+    }
+
+    if (obj->value0() == WEAPON_ARROW || IS_WEAPON_STAT(obj,WEAPON_TWO_HANDS))
     {
         ch->println("Из стрел или двуручного оружия создать булаву не удастся.");
         return;
     }
-
+    
     if (obj->pIndexData->limit != -1) {
         ch->println("Уникальные артефакты нельзя трансформировать.");
         return;
@@ -713,7 +717,7 @@ VOID_SPELL(WeaponMorph)::run( Character *ch, char *target_name, int sn, int leve
     if (result < (fail / 3))  /* item destroyed */
     {
         obj->getRoom( )->echo( POS_RESTING, 
-            "{W%1$^O1 ярко вспыхива%1$nет|ют... и испаря%1$nется|ются!{x", obj );
+            "{W%1$^O1 ярко вспыхива%1$nет|ют... и затухает.{x", obj );
         return;
     }
 
@@ -735,7 +739,7 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
     Affect af;
 
     if (obj->item_type != ITEM_WEAPON) {
-        act_p("$o1 - не оружие.", ch, obj, 0, TO_CHAR, POS_RESTING);
+        act_p("$o1 -- не оружие.", ch, obj, 0, TO_CHAR, POS_RESTING);
         return;
     }
 
