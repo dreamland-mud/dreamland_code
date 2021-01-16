@@ -216,7 +216,7 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to, bool i
         Object *obj = create_object(pObjIndex, 0);
         obj->reset_obj = obj_to->getID();
         obj_to_obj( obj, obj_to );
-        eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
+        eventBus->publish(ItemResetEvent(obj, pReset));
 
         count++;
 
@@ -255,7 +255,7 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
             mob->recho("Милость богов снисходит на %C2, принося с собой %O4.", mob, obj);
 
     reset_obj_location(pReset, obj, mob, verbose);
-    eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
+    eventBus->publish(ItemResetEvent(obj, pReset));
 
     return obj;
 }
@@ -329,7 +329,7 @@ static bool reset_one_mob(NPCharacter *mob)
         Wearlocation *wloc = wearlocationManager->find(myReset->arg3);
         Object *worn = wloc->find(mob);
         if (worn && worn->pIndexData->vnum == myReset->arg1) {
-            eventBus->publish(ItemResetEvent(worn, worn->level, myReset));
+            eventBus->publish(ItemResetEvent(worn, myReset));
             continue;
         }        
         
@@ -345,7 +345,7 @@ static bool reset_one_mob(NPCharacter *mob)
 
         if (self) {
             reset_obj_location(myReset, self, mob, true);
-            eventBus->publish(ItemResetEvent(self, self->level, myReset));        
+            eventBus->publish(ItemResetEvent(self, myReset));        
         } else {
             OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
             self = create_item_for_mob(myReset, pObjIndex, mob, true);
@@ -368,7 +368,7 @@ static bool reset_one_mob(NPCharacter *mob)
             }
 
         if (self) {
-            eventBus->publish(ItemResetEvent(self, self->level, myReset));
+            eventBus->publish(ItemResetEvent(self, myReset));
             continue;
         }
 
@@ -376,7 +376,7 @@ static bool reset_one_mob(NPCharacter *mob)
         self = get_obj_list_vnum(mob->carrying, myReset->arg1);
         if (self) {
             self->wear_loc->unequip(self);
-            eventBus->publish(ItemResetEvent(self, self->level, myReset));
+            eventBus->publish(ItemResetEvent(self, myReset));
         } else {
             OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
             self = create_item_for_mob(myReset, pObjIndex, mob, true);
@@ -566,7 +566,7 @@ void reset_room(Room *pRoom, int flags)
             obj->cost = 0;
             obj->reset_room = pRoom->vnum;
             obj_to_room( obj, pRoom );
-            eventBus->publish(ItemResetEvent(obj, obj->level, pReset));
+            eventBus->publish(ItemResetEvent(obj, pReset));
             changedObj = true;
             last = true;
             break;

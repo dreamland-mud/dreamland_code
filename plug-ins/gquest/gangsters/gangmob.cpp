@@ -13,12 +13,14 @@
 #include "gqchannel.h"
 #include "gangmob.h"
 
+#include "weapongenerator.h"
 #include "exitsmovement.h"
 #include "movetypes.h"
 #include "handler.h"
 #include "interp.h"
 #include "fight.h"
 #include "act.h"
+#include "vnum.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
@@ -55,6 +57,21 @@ void GangMob::config( int level )
     ch->armor[2] = -number_fuzzy(level) * 6; 
     ch->armor[3] = -number_fuzzy(level) * 6; 
     ch->saving_throw = -level / 2;
+
+    if (chance(20)) {
+        Object *weapon = create_object(get_obj_index(OBJ_VNUM_WEAPON_STUB), 0);
+        weapon->level = min(level, LEVEL_MORTAL);
+        obj_to_char(weapon, ch);
+
+        if (chance(50))
+            equip_char(ch, weapon, wear_wield);
+
+        WeaponGenerator()
+            .item(weapon)
+//            .alignment(ch->alignment)
+            .randomTier(3)
+            .randomizeAll();
+    }
 } 
 
 void GangMob::entry( ) 

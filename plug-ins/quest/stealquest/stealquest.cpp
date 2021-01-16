@@ -10,7 +10,7 @@
 #include "questexceptions.h"
 
 #include "selfrate.h"
-
+#include "weapongenerator.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
@@ -20,6 +20,7 @@
 #include "save.h"
 #include "act.h"
 #include "handler.h"
+#include "vnum.h"
 #include "def.h"
 
 StealQuest::StealQuest( )
@@ -416,6 +417,17 @@ void StealQuest::fillChest( PCharacter *pch, Object *chest )
     obj_to_obj( create_money( 
                     number_range( 0, pch->getModifyLevel( ) ), 
                     number_range( 0, 1000 ) ), chest );
+
+    // Create tier 4-5 random weapon for this player.
+    Object *weapon = create_object(get_obj_index(OBJ_VNUM_WEAPON_STUB), 0);
+    obj_to_obj(weapon, chest);
+    weapon->level = pch->getModifyLevel();
+    WeaponGenerator()
+        .item(weapon)
+        .alignment(pch->alignment)
+        .player(pch)
+        .randomTier(4)
+        .randomizeAll();
 }
 
 bool StealQuest::isBonus( OBJ_INDEX_DATA *pObjIndex, PCharacter *pch )

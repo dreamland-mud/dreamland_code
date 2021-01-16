@@ -37,15 +37,20 @@ struct WeaponGenerator {
     WeaponGenerator & randomTier(int bestTier);
     WeaponGenerator & addRequirement(const DLString &req) { this->required.insert(req); return *this; }
     WeaponGenerator & addForbidden(const DLString &fbd) { this->forbidden.insert(fbd); return *this; }
+
+    // Main method to handle rand_stat logic, after all parameters have been set up by the calls above.
+    WeaponGenerator& randomizeStats();
+
+    // Main method to handle rand_all logic, after all parameters have been set up by the calls above.
+    WeaponGenerator& randomizeAll();
+
     WeaponGenerator & randomWeaponClass();
     WeaponGenerator & randomNames();
     WeaponGenerator & randomAffixes();
 
-    const WeaponGenerator & assignValues() const;
-    
+    const WeaponGenerator & assignValues() const;    
     const WeaponGenerator & assignHitroll() const;
-    const WeaponGenerator & assignDamroll() const;
-    
+    const WeaponGenerator & assignDamroll() const;    
     const WeaponGenerator & assignStartingHitroll() const;
     const WeaponGenerator & assignStartingDamroll() const;
     

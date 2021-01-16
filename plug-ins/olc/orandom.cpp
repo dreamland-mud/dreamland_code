@@ -133,16 +133,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
         .player(ch)
         .tier(tier)
         .alignment(align)
-        .randomNames()
-        .randomAffixes()
-        .assignHitroll()
-        .assignDamroll()
-        .assignValues()
-        .assignNames()
-        .assignColours()
-        .assignFlags()
-        .assignAffects()
-        .assignDamageType();
+        .randomizeAll();
 
     interpret_fmt(ch, "stat obj %lld", obj->getID());
 }

@@ -10,7 +10,10 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "weapongenerator.h"
 #include "fight.h"
+#include "loadsave.h"
+#include "vnum.h"
 #include "act.h"
 #include "def.h"
 
@@ -34,12 +37,27 @@ bool GangChef::death( Character *killer )
     } else {
         gquest->state = Gangsters::ST_CHEF_KILLED;                
         gquest->chefKiller = killer->getName( );
+        createBounty(killer);
     }
     
     gquest->scheduleDestroy( );
     return false;
 }
    
+void GangChef::createBounty(Character *killer) 
+{
+    Object *weapon = create_object(get_obj_index(OBJ_VNUM_WEAPON_STUB), 0);
+    obj_to_char(weapon, ch);
+
+    weapon->level = killer->getModifyLevel();
+    WeaponGenerator()
+        .item(weapon)
+        .alignment(killer->alignment)
+        .player(killer->getPC())
+        .randomTier(2)
+        .randomizeAll();
+}
+
 void GangChef::greet( Character *mob ) 
 {
     Gangsters *gquest = Gangsters::getThis( );

@@ -20,11 +20,10 @@ struct ItemReadEvent : public Event {
 };
 
 struct ItemResetEvent : public Event {
-    ItemResetEvent(Object *obj, int level, struct reset_data *pReset);
+    ItemResetEvent(Object *obj, struct reset_data *pReset);
     virtual ~ItemResetEvent();
     Object *obj;    
     reset_data *pReset;
-    int level;
 };
 
 struct ItemEditedEvent : public Event {

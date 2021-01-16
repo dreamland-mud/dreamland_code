@@ -17,6 +17,9 @@ public:
     virtual void fight( Character * );
     virtual bool death( Character * );
     virtual void greet( Character * );
+
+protected:
+    void createBounty(Character *killer);
 };
 
 #endif

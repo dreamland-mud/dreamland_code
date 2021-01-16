@@ -10,10 +10,9 @@ ItemReadEvent::~ItemReadEvent()
     
 }
 
-ItemResetEvent::ItemResetEvent(Object *obj, int level, struct reset_data *pReset) 
+ItemResetEvent::ItemResetEvent(Object *obj, struct reset_data *pReset) 
 {
     this->obj = obj;
-    this->level = level;
     this->pReset = pReset;
 }
 

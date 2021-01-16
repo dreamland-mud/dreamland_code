@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "weapongenerator.h"
 #include "weaponcalculator.h"
 #include "weapontier.h"
@@ -98,9 +100,20 @@ WeaponGenerator & WeaponGenerator::randomTier(int bestTier)
     return *this;
 }
 
+// Assign random weapon class available to a player, or any class configured.
 WeaponGenerator & WeaponGenerator::randomWeaponClass()
 {
     Json::Value::Members allClasses =  weapon_classes.getMemberNames();
+
+    if (pch)
+        allClasses.erase( // Remove all weapon classes n/a to the player.
+            remove_if(
+                allClasses.begin(), allClasses.end(), [this](const string &c) {
+                    Skill *skill = skillManager->find(c);
+                    return !skill || !skill->available(pch);
+                }), 
+            allClasses.end());
+
     if (allClasses.empty())
         return *this;
 
@@ -108,6 +121,7 @@ WeaponGenerator & WeaponGenerator::randomWeaponClass()
     wclass = allClasses[random_index];
     wclassConfig = weapon_classes[wclass];
     obj->value0(weapon_class.value(wclass));
+
     // Keep some extra flags (e.g. for shops) but clean everything else.
     obj->extra_flags &= ITEM_INVENTORY;
 
@@ -395,6 +409,51 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     return *this;
 }
 
+WeaponGenerator& WeaponGenerator::randomizeStats()
+{    
+    randomAffixes()
+    .assignHitroll()
+    .assignDamroll()
+    .assignFlags()
+    .assignValues()
+    .assignAffects()
+    .assignTimers()
+    .assignColours();
+
+    notice("rand_stat: created item %s [%d] [%lld] tier %s affixes [%s]",
+            obj->getShortDescr('1').c_str(),
+            obj->pIndexData->vnum, obj->getID(), 
+            obj->getProperty("tier").c_str(),
+            obj->getProperty("affixes").c_str());
+
+    return *this;
+}
+
+WeaponGenerator& WeaponGenerator::randomizeAll()
+{
+    randomWeaponClass()
+        .randomNames()
+        .randomAffixes()
+        .assignHitroll()
+        .assignDamroll()
+        .assignFlags()
+        .assignValues()
+        .assignAffects()
+        .assignTimers()
+        .assignNames()
+        .assignDamageType()
+        .assignColours();
+
+    notice("rand_all: created item %s [%d] [%lld] tier %s affixes [%s] level %d",
+            obj->getShortDescr('1').c_str(),
+            obj->pIndexData->vnum, obj->getID(), 
+            obj->getProperty("tier").c_str(), 
+            obj->getProperty("affixes").c_str(),
+            obj->level);
+
+    return *this;        
+}
+
 /** Add obj affect to the storage to be applied later. */
 void WeaponGenerator::rememberAffect(Affect &af)
 {
@@ -472,15 +531,16 @@ const WeaponGenerator & WeaponGenerator::assignNames() const
 const WeaponGenerator & WeaponGenerator::assignColours() const
 {
     DLString colour = weapon_tier_table[valTier-1].colour;
-    if (colour.empty()) 
-        colour = 'w';
 
     DLString myshort = obj->getShortDescr();
     if (obj->getProperty("eqName").empty())
         obj->properties["eqName"] = myshort;
 
-    myshort = "{" + colour + myshort.colourStrip() + "{x";
-    obj->setShortDescr(myshort.c_str());
+    if (!colour.empty()) {
+        myshort = "{" + colour + myshort.colourStrip() + "{x";
+        obj->setShortDescr(myshort.c_str());
+    }
+
     return *this;
 }
 

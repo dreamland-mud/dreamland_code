@@ -12,7 +12,21 @@
 #include "weapontier.h"
 #include "merc.h"
 #include "mercdb.h"
+#include "vnum.h"
 #include "def.h"
+
+WeaponRandomizer * WeaponRandomizer::thisClass = 0;
+
+WeaponRandomizer::WeaponRandomizer() 
+{
+    checkDuplicate(thisClass);
+    thisClass = this;
+}
+
+WeaponRandomizer::~WeaponRandomizer() 
+{
+    thisClass = 0;
+}
 
 void WeaponRandomizer::initialization() 
 {
@@ -75,7 +89,6 @@ static bool item_is_sold(Object *obj)
 void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
 {
     Object *obj = event.obj;
-    int level = event.level;
     RESET_DATA *pReset = event.pReset;
 
     if (obj->item_type != ITEM_WEAPON)
@@ -94,7 +107,7 @@ void WeaponRandomizer::eventItemReset(const ItemResetEvent &event) const
     }
 
     if (pReset->rand == RAND_ALL) {
-        randomizeWeapon(obj, level, pReset->bestTier);
+        randomizeWeapon(obj, pReset->bestTier);
         return;
     }
 
@@ -131,6 +144,7 @@ void WeaponRandomizer::clearWeapon(Object *obj) const
     obj->enchanted = false;
     obj->affected.deallocate();
     obj->timer = 0;
+    obj->level = obj->pIndexData->level;
 }
 
 void WeaponRandomizer::adjustTimer(Object *obj) const
@@ -191,20 +205,7 @@ void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) c
     if (IS_SET(obj->extra_flags, ITEM_NOREMOVE))
         gen.addRequirement("noremove");
 
-    gen.randomAffixes()
-        .assignHitroll()
-        .assignDamroll()
-        .assignValues()
-        .assignFlags()
-        .assignAffects()
-        .assignTimers()
-        .assignColours();
-
-    notice("rand_stat: created item %s [%d] [%lld] tier %s affixes [%s]",
-            obj->getShortDescr('1').c_str(),
-            obj->pIndexData->vnum, obj->getID(), 
-            obj->getProperty("tier").c_str(),
-            obj->getProperty("affixes").c_str());
+    gen.randomizeStats();
 
     Character *carrier = obj->getCarrier();
     if (carrier && !carrier->is_npc())
@@ -212,32 +213,15 @@ void WeaponRandomizer::randomizeWeaponStats(Object *obj, int bestTierOverride) c
 }
 
 // Full randomize of a weapon. Most often the weapon will be a fixed "stub" item w/o any properties.
-// TODO: not sure yet who makes decision about the item level.
-void WeaponRandomizer::randomizeWeapon(Object *obj, int level, int bestTier) const
+void WeaponRandomizer::randomizeWeapon(Object *obj, int bestTier) const
 {
-    WeaponGenerator gen;
-    gen.item(obj)
+    obj->level = getLevel(obj);
+
+    WeaponGenerator()
+        .item(obj)
         .randomTier(getTier(obj, bestTier))
         .alignment(getAlign(obj))
-        .randomWeaponClass()
-        .randomNames()
-        .randomAffixes()
-        .assignHitroll()
-        .assignDamroll()
-        .assignValues()
-        .assignFlags()
-        .assignAffects()
-        .assignTimers()
-        .assignNames()
-        .assignDamageType()
-        .assignColours();
-
-    notice("rand_all: created item %s [%d] [%lld] tier %s affixes [%s] level %d",
-            obj->getShortDescr('1').c_str(),
-            obj->pIndexData->vnum, obj->getID(), 
-            obj->getProperty("tier").c_str(), 
-            obj->getProperty("affixes").c_str(),
-            obj->level);
+        .randomizeAll();
 }
 
 // NPC carrying this item can influence align restrictions, unless it's just a shop.
@@ -248,6 +232,23 @@ int WeaponRandomizer::getAlign(Object *obj) const
         return carrier->alignment;
 
     return ALIGN_NONE;
+}
+
+// Ensure rand_all weapons always have a level assigned: random one for shops or chests,
+// mob's level for equip/inv resets.
+int WeaponRandomizer::getLevel(Object *obj) const
+{
+    if (obj->level > 0)
+        return obj->level;
+
+    if (item_is_sold(obj))
+        return number_range(1, LEVEL_MORTAL);
+    
+    Character *carrier = obj->getCarrier();
+    if (carrier)
+        return carrier->getRealLevel();
+
+    return number_range(1, LEVEL_MORTAL);    
 }
 
 // Calculate best random tier: 3 by default, can be overridden explicitly e.g. from

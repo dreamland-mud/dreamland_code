@@ -1,10 +1,12 @@
 #include "bandamobile.h"
 #include "bigquest.h"
 #include "selfrate.h"
+#include "weapongenerator.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "act.h"
 #include "merc.h"
+#include "vnum.h"
 #include "def.h"
 
 BandaMobile::BandaMobile()
@@ -113,6 +115,18 @@ void BandaMobile::config(PCharacter *hero)
             SET_BIT(ch->off_flags, OFF_FAST|OFF_KICK|OFF_TRIP);
             break;
         }
+    }
+
+    if (chance(1)) {
+        Object *weapon = create_object(get_obj_index(OBJ_VNUM_WEAPON_STUB), 0);
+        obj_to_char(weapon, ch);
+        weapon->level = hero->getModifyLevel();
+        WeaponGenerator()
+            .item(weapon)
+            .alignment(hero->alignment)
+            .player(hero->getPC())
+            .randomTier(3)
+            .randomizeAll();
     }
 
     configured = true;
