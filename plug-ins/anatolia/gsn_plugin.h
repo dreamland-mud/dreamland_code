@@ -284,7 +284,6 @@ _GSN_( tail );
 _GSN_( tame );
 _GSN_( target );
 _GSN_( teleport );
-_GSN_( terangreal );
 _GSN_( third_attack );
 _GSN_( throw );
 _GSN_( tiger_power );

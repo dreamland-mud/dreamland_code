@@ -452,32 +452,3 @@ VOID_AFFECT(Sleep)::remove( Character *victim )
         victim->position = victim->getNPC()->default_pos;
 }
 
-
-SPELL_DECL(Terangreal);
-VOID_SPELL(Terangreal)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    Affect af;
-
-    if (victim->is_npc())
-        return;
-
-    af.bitvector.setTable(&affect_flags);
-    af.type      = sn;
-    af.level     = level;
-    af.duration  = 10;
-    af.bitvector.setValue(AFF_SLEEP);
-    affect_join( victim, &af );
-
-    if ( IS_AWAKE(victim) )
-    {
-        victim->send_to("Внезапная волна сонливости накатывает на тебя.\n\r");
-        act_p( "$c1 забывается глубоким сном.",
-                victim, 0, 0, TO_ROOM,POS_RESTING);
-        victim->position = POS_SLEEPING;
-    }
-
-    return;
-
-}
-

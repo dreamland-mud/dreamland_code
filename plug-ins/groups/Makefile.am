@@ -60,7 +60,6 @@ group_protective.cpp \
 group_transportation.cpp \
 group_weaponsmaster.cpp \
 group_weather.cpp \
-group_immortal.cpp \
 group_other.cpp \
 group_movement.cpp \
 group_nature.cpp
