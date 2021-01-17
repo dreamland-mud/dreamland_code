@@ -871,12 +871,12 @@ static void format_affect(Affect *paf, ostringstream &buf)
     if (registry) {
         if (registry == skillManager) {
             buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "знание навыка" : "уровень умения")
+                << (paf->location == APPLY_LEARNED ? "владение умением" : "уровень умения")
                 << " " << paf->global.toRussianString().quote() 
                 << " на " << (int)abs(mod);
         } else if (registry == skillGroupManager) {
             buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "знание группы" : "уровень умения группы")
+                << (paf->location == APPLY_LEARNED ? "владение группой умений" : "уровень всех умений группы")
                 << " " << paf->global.toRussianString().quote() 
                 << " на " << (int)abs(mod);
         } else if (registry == liquidManager) {
