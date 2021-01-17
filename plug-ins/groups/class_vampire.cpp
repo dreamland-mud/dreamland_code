@@ -603,7 +603,7 @@ void sucking( Character *ch, Character *victim )
  * 'suck' command
  */
 
-SKILL_RUNP( suck )
+CMDRUNP( suck )
 {
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
@@ -965,7 +965,7 @@ SKILL_RUNP( touch )
 /*
  * 'unmorph' command
  */
-SKILL_RUNP( unmorph )
+CMDRUNP( unmorph )
 {
     if (ch->getProfession( ) != prof_vampire)
     {
