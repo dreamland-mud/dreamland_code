@@ -200,6 +200,7 @@ plug-ins/misc_behaviors/Makefile \
 plug-ins/magic/Makefile \
 plug-ins/race/Makefile \
 plug-ins/race_aptitude/Makefile \
+plug-ins/other_skills/Makefile \
 plug-ins/groups/Makefile \
 plug-ins/learn/Makefile \
 plug-ins/clan/Makefile \

@@ -146,37 +146,6 @@ VOID_SPELL(DetectGood)::run( Character *ch, Character *victim, int sn, int level
 }
 
 
-SPELL_DECL(DetectHidden);
-VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    Affect af;
-
-    if ( CAN_DETECT(victim, DETECT_HIDDEN) )
-    {
-        if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие скрытых сил. \n\r");
-        else
-          act_p("$C1 уже чувствует присутствие скрытых сил.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
-        return;
-    }
-    af.bitvector.setTable(&detect_flags);
-    af.type      = sn;
-    af.level     = level;
-    af.duration  = (5 + level / 3);
-    
-    af.modifier  = 0;
-    af.bitvector.setValue(DETECT_HIDDEN);
-    affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь присутствие скрытых сил.\n\r");
-    if ( ch != victim )
-        ch->send_to("Ok.\n\r");
-    return;
-
-}
-
-
 SPELL_DECL(DetectInvis);
 VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int level ) 
 { 

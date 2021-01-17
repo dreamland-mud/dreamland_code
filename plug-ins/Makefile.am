@@ -51,6 +51,7 @@ religion \
 quest \
 misc_behaviors \
 race_aptitude \
+other_skills \
 cards \
 riding \
 web \

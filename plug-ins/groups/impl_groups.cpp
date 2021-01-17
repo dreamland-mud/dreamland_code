@@ -13,7 +13,7 @@
 #include "group_beguiling.h"
 #include "group_necromancy.h"
 #include "group_vampiric.h"
-#include "group_other.h"
+#include "exoticskill.h"
 #include "so.h"
 
 class GroupSkillsRegistrator : public Plugin {

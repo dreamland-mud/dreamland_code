@@ -14,6 +14,7 @@
 #include "defaultskillgroup.h"
 #include "spellmanager.h"
 
+#include "basicskill.h"
 #include "summoncreaturespell.h"
 #include "transportspell.h"
 #include "sleepaffecthandler.h"
@@ -30,6 +31,7 @@ extern "C"
         {
                 SO::PluginList ppl;
                 
+                Plugin::registerPlugin<MocRegistrator<BasicSkill> >( ppl );
                 Plugin::registerPlugin<SpellManager>( ppl );
                 Plugin::registerPlugin<MocRegistrator<DefaultAffectHandler> >( ppl );                
                 Plugin::registerPlugin<MocRegistrator<DefaultSkillGroup> >( ppl );                

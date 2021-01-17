@@ -57,4 +57,5 @@
 	<node>gmcp</node>
 	<node>bonus</node>
 	<node>searcher</node>
+	<node>other_skills</node>
 </PluginManager>

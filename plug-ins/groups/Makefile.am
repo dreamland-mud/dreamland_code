@@ -38,6 +38,7 @@ libgenericskill_la_LIBADD = \
 
 libgroup_skills_la_SOURCES = \
 impl_groups.cpp \
+exoticskill.cpp \
 group_attack.cpp \
 group_beguiling.cpp \
 group_benedictions.cpp \
@@ -60,7 +61,6 @@ group_protective.cpp \
 group_transportation.cpp \
 group_weaponsmaster.cpp \
 group_weather.cpp \
-group_other.cpp \
 group_movement.cpp \
 group_nature.cpp
 
@@ -68,7 +68,7 @@ libgroup_skills_la_MOC = \
 group_vampiric.h \
 group_beguiling.h \
 group_necromancy.h \
-group_other.h
+exoticskill.h
 
 libgroup_skills_la_LIBADD = \
 $(LIBADD_AI) \
