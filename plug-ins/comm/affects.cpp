@@ -187,12 +187,12 @@ DLString AffectOutput::format_affect_global( Affect *paf )
     if (registry) {
         if (registry == skillManager) {
             buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "знание умения" : "уровень умения")
+                << (paf->location == APPLY_LEARNED ? "владение умением" : "уровень умения")
                 << " {m" << paf->global.toRussianString().quote() 
                 << "{y на {m" << (int)abs(mod) << "{y";
         } else if (registry == skillGroupManager) {
             buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "знание группы" : "уровень умения группы")
+                << (paf->location == APPLY_LEARNED ? "владение группой умений" : "уровень умений группы")
                 << " {m" << paf->global.toRussianString().quote() 
                 << "{y на {m" << (int)abs(mod) << "{y";
         } else if (registry == liquidManager) {
@@ -336,15 +336,15 @@ CMDRUNP( affects )
         StringList levelGroups = pch->mod_level_groups.toStringList(rus, joiner);
 
         if (!learnedSkills.empty())
-            buf << "{yИзменено знание навыков: " << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
+            buf << "{yИзменено владение умениями: " << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!learnedGroups.empty())
-            buf << "{yИзменено знание групп навыков: " << learnedGroups.wrap("{m", "%{y").join(", ") << "." << endl;
+            buf << "{yИзменено владение группами умений: " << learnedGroups.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!levelSkills.empty())
-            buf << "{yИзменен уровень навыков: " << levelSkills.wrap("{m", "{y").join(", ") << "." << endl;
+            buf << "{yИзменен уровень умений: " << levelSkills.wrap("{m", "{y").join(", ") << "." << endl;
         if (!levelGroups.empty())
-            buf << "{yИзменен уровень групп навыков: " << levelGroups.wrap("{m", "{y").join(", ") << "." << endl;
+            buf << "{yИзменен уровень группы умений: " << levelGroups.wrap("{m", "{y").join(", ") << "." << endl;
         if (pch->mod_level_all != 0)
-            buf << "{yУровень всех навыков изменен на {m" << pch->mod_level_all << "{y.{x" << endl;
+            buf << "{yУровень всех умений изменен на {m" << pch->mod_level_all << "{y.{x" << endl;
         if (pch->mod_level_spell != 0)
             buf << "{yУровень всех заклинаний изменен на {m" << pch->mod_level_spell << "{y.{x" << endl;
     }
