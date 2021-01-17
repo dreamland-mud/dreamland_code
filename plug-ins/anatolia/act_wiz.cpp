@@ -913,6 +913,8 @@ static void format_affect(Affect *paf, ostringstream &buf)
             buf << "флаги предмета ";
         else if (table == &plr_flags)
             buf << "флаги персонажа ";
+        else if (table == &form_flags)
+            buf << "форму тела ";
         else
             buf << "не пойми что";
 

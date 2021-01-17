@@ -300,7 +300,7 @@ public:
     XML_VARIABLE XMLEnumerationArray mod_stat;
 
     // parts stuff 
-    int        form;
+    XMLFlags   form;
     int        parts;
     int        size;
     char*        material;

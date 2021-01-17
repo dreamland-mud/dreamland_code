@@ -152,6 +152,8 @@ static Flags & char_flag_by_table(Character *ch, const FlagTable *table)
         return ch->vuln_flags;
     else if (table == &detect_flags)
         return ch->detection;
+    else if (table == &form_flags)
+        return ch->form;
 
     return zeroFlags;
 }
@@ -170,6 +172,8 @@ static const Flags & race_flag_by_table(const Race *race, const FlagTable *table
         return race->getVuln();
     else if (table == &detect_flags)
         return race->getDet();
+    else if (table == &form_flags)
+        return race->getForm();
 
     return Flags::emptyFlags;
 }
@@ -439,6 +443,7 @@ const FlagTable * affect_where_to_table(int where)
     case TO_VULN: return &vuln_flags;
     case TO_ACT_FLAG: return &plr_flags;
     case TO_DETECTS: return &detect_flags;
+    case TO_FORM: return &form_flags;
     default: return 0;
     }
 }
@@ -454,6 +459,7 @@ int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *regi
     if (table == &vuln_flags) return TO_VULN;
     if (table == &plr_flags) return TO_ACT_FLAG;
     if (table == &detect_flags) return TO_DETECTS;
+    if (table == &form_flags) return TO_FORM;
 
     if (registry == wearlocationManager) return TO_LOCATIONS;
     if (registry == liquidManager) return TO_LIQUIDS;

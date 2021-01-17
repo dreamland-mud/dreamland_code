@@ -2312,6 +2312,8 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
             buf << "Добавляет уязвимость к " << imm_flags.messages(b ) << endl;
         else if (table == &detect_flags)
             buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
+        else if (table == &form_flags)
+            buf << "Добавляет " << form_flags.messages(b) << " форму тела" << endl;
     }
 }
 

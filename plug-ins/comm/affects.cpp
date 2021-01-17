@@ -152,6 +152,7 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
     if (table && b) {
         const char *word = 0;
         char gcase = '1';
+        DLString ending;
 
         if (table == &affect_flags) {
             word = "добавляет";
@@ -165,10 +166,13 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
         } else if (table == &detect_flags) {
             word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  "добавляет" : "обнаружение");
             gcase = (IS_SET(b, ADET_WEB|ADET_FEAR) ? '4': '2');
+        } else if (table == &form_flags) {
+            word = "добавляет";
+            ending = " форму тела";
         }
         
         if (word)
-            buf << word << " {m" << table->messages( b, true, gcase ) << "{y";
+            buf << word << " {m" << table->messages( b, true, gcase ) << "{y" << ending;
     }
 
     return buf.str();
