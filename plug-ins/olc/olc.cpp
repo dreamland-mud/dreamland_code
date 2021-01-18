@@ -13,6 +13,7 @@
 #include <skill.h>
 #include <spell.h>
 #include <skillmanager.h>
+#include "skillcommand.h"
 #include "feniamanager.h"
 #include "areabehaviormanager.h"
 #include <affect.h>
@@ -25,7 +26,6 @@
 #include "race.h"
 #include "clanreference.h"
 #include "room.h"
-#include "summoncreaturespell.h"
 
 #include "olc.h"
 #include "olcflags.h"
@@ -33,7 +33,10 @@
 #include "security.h"
 #include "areahelp.h"
 
+#include "damageflags.h"
+#include "commandflags.h"
 #include "occupations.h"
+#include "update_areas.h"
 #include "websocketrpc.h"
 #include "interp.h"
 #include "merc.h"
@@ -316,15 +319,6 @@ static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
     return line;
 }
 
-static RoomIndexData * find_mob_reset_room(NPCharacter *mob)
-{
-    for (auto &r: roomIndexMap)
-        for (auto &pReset: r.second->resets)
-            if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum) 
-                return r.second;
-    return 0;
-}
-
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;
@@ -492,104 +486,47 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "rand_stat") {
+    if (arg == "skills") {
         ostringstream buf;
-        int cnt = 0;
+        Character *vch = get_char_room(ch, args);
 
-        for (auto &r: roomIndexMap) {
-            MOB_INDEX_DATA *pMob = 0;
-
-            for (auto &pReset: r.second->resets) {
-                if (pReset->command == 'M')
-                    pMob = get_mob_index(pReset->arg1);
-                else if (pReset->command == 'O')
-                    pMob = 0;
-
-                if (pReset->rand == RAND_STAT) {
-                    OBJ_INDEX_DATA *pObj = get_obj_index(pReset->arg1);
-
-                    if (pReset->bestTier == 2) {
-                        buf << pObj->vnum << "#" 
-                            << russian_case(pObj->short_descr, '1') << "#"
-                            << (pMob ? pMob->vnum : 0) << "#"
-                            << (pMob ? russian_case(pMob->short_descr, '1') : "") << "#"
-                            << r.first << "#"
-                            << r.second->name << "#"
-                            << r.second->areaIndex->name 
-                            << endl;
-                    }
-
-                    pObj->properties["random"] = "true";
-                    pObj->properties["bestTier"] = max(pReset->bestTier, DEFAULT_TIER);
-                    pReset->rand.setValue(RAND_NONE);
-                    pReset->bestTier = 0;                    
-                    r.second->areaIndex->changed = true;
-                    cnt++;
-                }
-            }
+        if (!vch || !vch->is_npc()) {
+            ch->println("Usage: abc skills <mob>");
+            return;
         }
 
-        ch->printf("Transferred %d rand_stat resets to item prototypes.\r\n", cnt);
-        ch->send_to(buf);
-        return;
-    }
+        NPCharacter *pet = vch->getNPC();
 
-    if (arg == "rand_all") {
-        ostringstream buf;
+        for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
+            Skill::Pointer skill = SkillManager::getThis( )->find( sn );
+            Spell::Pointer spell = skill->getSpell( );
+            Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
 
-        // Change shop rand_all to stub vnum, limit best tier by 4.
-        for (Character *wch = char_list; wch; wch = wch->next) {
-            if (!wch->is_npc())
-                continue;
-            if (!mob_has_occupation(wch->getNPC(), OCC_SHOPPER))
+            if (!skill->usable(pet, false))
                 continue;
 
-            RoomIndexData *home = find_mob_reset_room(wch->getNPC());
-            if (!home) {                
-                ch->printf("ERROR: mob %d %s without reset room\r\n", wch->getNPC()->pIndexData->vnum, wch->getNameP('1').c_str());
+            if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
+                bool canOrder = cmd->properOrder(pet);
+                pet->fighting = ch;
+                bool canOrderFight = cmd->properOrder(pet);
+                pet->fighting = 0;
+
+                buf << "Команда {g" << cmd->getName() << "{x: "
+                    << (canOrder ? "{GДА{x" : canOrderFight ? "{YВ БОЮ{x" : "{RНЕТ{x") << endl;
                 continue;
             }
 
-            for (auto &pReset: home->resets) {
-                if (pReset->command == 'G' && pReset->rand == RAND_ALL && pReset->bestTier < 4) {
-                    ch->printf("Item %d in shop [%d] %s changed from tier %d to 4.\r\n", 
-                                pReset->arg1, home->vnum, home->name, pReset->bestTier);
-                    
-                    pReset->arg1 = OBJ_VNUM_WEAPON_STUB;
-                    pReset->bestTier = 4;
-                    home->areaIndex->changed = true;
-                }
+            if (spell && spell->isCasted()) {
+                bool canOrder = spell->properOrder(pet) && (spell->getSpellType() != SPELL_OFFENSIVE);
+                buf << "Заклинание {g" << skill->getName() << "{x: "
+                    << (canOrder ? "{GДА{x" : "{RНЕТ{x") << endl;
+                continue;
             }
+
+            buf << "Пассивное {g" << skill->getName() << "{x " << endl;
         }
 
-        // Clean up all other rand_all resets, printing them out first.
-        for (auto &r: roomIndexMap) {
-            for (auto &pReset: r.second->resets) {
-                if (pReset->rand != RAND_ALL) 
-                    continue;
-                if (pReset->command == 'G' && pReset->arg1 == OBJ_VNUM_WEAPON_STUB)
-                    continue;
-
-                OBJ_INDEX_DATA *pObj = get_obj_index(pReset->arg1);
-                buf << pObj->vnum << "#" 
-                    << russian_case(pObj->short_descr, '1') << "#"
-                    << pReset->bestTier << "#"
-                    << r.first << "#"
-                    << r.second->name << "#"
-                    << r.second->areaIndex->name 
-                    << endl;
-
-                pReset->rand.setValue(RAND_NONE);
-                pReset->bestTier = 0;
-                if (pReset->command == 'E' && pReset->arg3 == wear_sheath) {
-                    pReset->arg3 = wear_wield;
-                }
-
-                r.second->areaIndex->changed = true;
-            }
-        }
-        
-        ch->send_to(buf);
+        page_to_char(buf.str().c_str(), ch);
         return;
     }
 }
