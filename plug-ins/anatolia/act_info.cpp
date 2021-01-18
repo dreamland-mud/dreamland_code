@@ -1006,16 +1006,24 @@ CMDRUNP( report )
             continue;
               
         }
+
+        buf << fmt(0,"У %1$C2 %d/%d жизни (hp) %d/%d энергии (mana) %d/%d движения (mv).",
+        pet,
+        pet->hit.getValue( ),  pet->max_hit.getValue( ),
+        pet->mana.getValue( ), pet->max_mana.getValue( ),
+        pet->move.getValue( ), pet->max_move.getValue( )) << "\r\n" << "\r\n";
+        page_to_char( buf.str().c_str(), pet->master ) ;
         
         if(!skills.empty()){
+            buf.str(std::string());
             for(vector<DLString>::iterator it = skills.begin(); it != skills.end(); ){
-                buf << "{G" << *it << "{x";
+                buf << "{G{hh" << *it << "{x";
                 if (++it != skills.end( ))
                 buf << ", ";
                 else buf << "{x" << endl << "\r\n";                
         }
 
-        page_to_char("Доступные команды: \n\r",pet->master);
+        page_to_char("Доступные умения: \n\r",pet->master);
         page_to_char(buf.str().c_str(), pet->master);
         shown = true;
         }
@@ -1023,13 +1031,13 @@ CMDRUNP( report )
         if(!skillsFight.empty()){
             buf.str(std::string());
             for(vector<DLString>::iterator it = skillsFight.begin(); it != skillsFight.end(); ){
-                buf << "{Y" << *it << "{x";
+                buf << "{Y{hh" << *it << "{x";
                 if (++it != skillsFight.end( ))
                 buf << ", ";
                 else buf << "{x" << endl << "\r\n";
         }
          
-        page_to_char("Боевые команды: \n\r",pet->master);
+        page_to_char("Боевые умения: \n\r",pet->master);
         page_to_char(buf.str().c_str(), pet->master);
         shown = true;
         }
@@ -1037,7 +1045,7 @@ CMDRUNP( report )
         if(!spells.empty()){
             buf.str(std::string());
             for(vector<DLString>::iterator it = spells.begin(); it != spells.end(); ){
-                buf << "{g" << *it << "{x";
+                buf << "{g{hh" << *it << "{x";
                 if (++it != spells.end( ))
                 buf << ", ";
                 else buf << "{x" << endl << "\r\n";
@@ -1051,7 +1059,7 @@ CMDRUNP( report )
         if(showPassives && !passives.empty()){
             buf.str(std::string());
             for(vector<DLString>::iterator it = passives.begin(); it != passives.end(); ){
-                buf << "{W" << *it << "{x";
+                buf << "{W{hh" << *it << "{x";
                 if (++it != passives.end( ))
                 buf << ", ";
                 else buf << "{x" << endl << "\r\n";
