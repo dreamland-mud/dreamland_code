@@ -35,13 +35,13 @@ protected:
     XML_VARIABLE XMLInteger postaffectDuration;
     XML_VARIABLE XMLInteger mobVnum;
     XML_VARIABLE XMLNumberSet storageVnums;
-    XML_VARIABLE XMLString msgStillAffected;
-    XML_VARIABLE XMLString msgTooManyMobiles;
-    XML_VARIABLE XMLString msgCreateAttemptSelf, msgCreateAttemptRoom, msgCreateAttemptArea;
-    XML_VARIABLE XMLString msgCreateSelf, msgCreateRoom, msgCreateSelfOne, msgCreateRoomOne;
-    XML_VARIABLE XMLString msgNotRecognizeRoom, msgNotRecognizeSelf;
-    XML_VARIABLE XMLString msgReattachAttemptRoom, msgReattachAttemptSelf;
-    XML_VARIABLE XMLString msgReattachRoom, msgReattachSelf;
+    XML_VARIABLE XMLStringNoEmpty msgStillAffected;
+    XML_VARIABLE XMLStringNoEmpty msgTooManyMobiles;
+    XML_VARIABLE XMLStringNoEmpty msgCreateAttemptSelf, msgCreateAttemptRoom, msgCreateAttemptArea;
+    XML_VARIABLE XMLStringNoEmpty msgCreateSelf, msgCreateRoom, msgCreateSelfOne, msgCreateRoomOne;
+    XML_VARIABLE XMLStringNoEmpty msgNotRecognizeRoom, msgNotRecognizeSelf;
+    XML_VARIABLE XMLStringNoEmpty msgReattachAttemptRoom, msgReattachAttemptSelf;
+    XML_VARIABLE XMLStringNoEmpty msgReattachRoom, msgReattachSelf;
 };
 
 // MOC_SKIP_BEGIN

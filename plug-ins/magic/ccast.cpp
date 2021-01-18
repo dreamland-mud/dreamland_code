@@ -207,6 +207,11 @@ CMDRUN( cast )
         return;
     }
 
+    if (IS_CHARMED(ch) && !spell->properOrder(ch)) {
+        do_say(ch, "Я не буду делать этого.");
+        return;
+    }
+
     spell->utter( ch );
     ch->setWait(spell->getBeats( ) );
     

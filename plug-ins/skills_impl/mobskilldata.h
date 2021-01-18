@@ -22,14 +22,18 @@ public:
     MobSkillData( );
     virtual ~MobSkillData( );
     
+    virtual bool toXML( XMLNode::Pointer& ) const;
+    virtual void fromXML( const XMLNode::Pointer& );
+
     int visible( NPCharacter *, const Skill * ) const;
     int getLearned( NPCharacter *, const Skill * ) const;
 
-    XML_VARIABLE XMLBoolean ordered;
-    XML_VARIABLE XMLBoolean forbidden;
     XML_VARIABLE XMLFlagsNoEmpty offense;
     XML_VARIABLE XMLIntegerNoEmpty dice;
     XML_VARIABLE XMLIntegerNoEmpty bonus;
+
+protected:
+    bool available;    
 };
 
 class MobProfSkillData : public MobSkillData {

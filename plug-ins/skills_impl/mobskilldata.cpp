@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "mobskilldata.h"
 
 #include "npcharacter.h"
@@ -15,9 +16,8 @@
  * MobSkillData
  *-----------------------------------------------------------------------*/
 MobSkillData::MobSkillData( ) 
-                : ordered( true ), 
-                  forbidden( false ),
-                  offense( 0, &off_flags )
+                : offense( 0, &off_flags ),
+                  available( false )
 {
 }
 
@@ -25,17 +25,28 @@ MobSkillData::~MobSkillData( )
 {
 }
 
+bool MobSkillData::toXML(XMLNode::Pointer &parent) const
+{
+    if (!available)
+        return false;
+
+    return XMLVariableContainer::toXML(parent);
+}
+
+void MobSkillData::fromXML(const XMLNode::Pointer &parent) 
+{
+    XMLVariableContainer::fromXML(parent);
+    available = true;
+}
+
 int MobSkillData::visible( NPCharacter *mob, const Skill * ) const
 {
-    if (IS_CHARMED(mob) && !ordered.getValue( )) 
+    if (!available)
         return MPROF_NONE;
-    
+
     if (offense.isSet( mob->off_flags ))
         return MPROF_ANY;
     
-    if (forbidden.getValue( ))
-        return MPROF_NONE;
-
     return MPROF_REQUIRED;
 }
 
@@ -60,15 +71,12 @@ MobProfSkillData::MobProfSkillData( )
 
 int MobProfSkillData::visible( NPCharacter *mob, const Skill *skill ) const
 {
-    if (IS_CHARMED(mob) && !ordered.getValue( )) 
+    if (!available)
         return MPROF_NONE;
-    
+
     if (offense.isSet( mob->off_flags ))
         return MPROF_ANY;
     
-    if (forbidden.getValue( ))
-        return MPROF_NONE;
-
     if (professional.getValue( ))
         return MPROF_REQUIRED;
 

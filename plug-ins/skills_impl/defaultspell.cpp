@@ -21,6 +21,7 @@
 #include "stats_apply.h"
 #include "act_move.h"
 #include "profflags.h"
+#include "commandflags.h"
 #include "merc.h"
 #include "handler.h"
 #include "act.h"
@@ -51,7 +52,8 @@ DefaultSpell::DefaultSpell( )
           position( POS_STANDING, &position_table ), 
           type( SPELL_NONE, &spell_types ),
           casted( true ),
-          ranged(true)
+          ranged(true),
+          order(0, &order_flags)
           
 {
 }
@@ -533,6 +535,14 @@ bool DefaultSpell::checkPosition( Character *ch ) const
         return false;
     }
     
+    return true;
+}
+
+bool DefaultSpell::properOrder(Character *ch) const
+{
+    if (ch->is_npc() && order.isSet(ORDER_PLAYER_ONLY))
+        return false;
+        
     return true;
 }
 

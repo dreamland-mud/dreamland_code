@@ -65,6 +65,7 @@ public:
     virtual bool isCasted( ) const;
     virtual bool isPrayer( Character * ) const;
     virtual bool checkPosition( Character * ) const;
+    virtual bool properOrder( Character * ) const;
 
 protected:
     Character * getCharSpell( Character *, const DLString &, int *, int *, ostringstream &errbuf );
@@ -80,6 +81,7 @@ protected:
     XML_VARIABLE XMLEnumeration   type;
     XML_VARIABLE XMLBooleanNoTrue casted;
     XML_VARIABLE XMLBooleanNoTrue ranged;
+    XML_VARIABLE XMLFlagsNoEmpty order;
 
     SkillPointer skill;
 };
@@ -98,8 +100,9 @@ public:
     virtual void run( Character *, Character *, int, int );
 
     XML_VARIABLE XMLEnumeration damtype; // damage type from damage_table
-    XML_VARIABLE XMLFlags damflags; // additional flags other than DAMF_SPELL
-    XML_VARIABLE XMLInteger dice, diceBonus; // damage calculation: <level> d <dice> + <diceBonus>
+    XML_VARIABLE XMLFlagsNoEmpty damflags; // additional flags other than DAMF_SPELL
+    XML_VARIABLE XMLInteger dice;
+    XML_VARIABLE XMLIntegerNoEmpty diceBonus; // damage calculation: <level> d <dice> + <diceBonus>
     XML_VARIABLE XMLStringNoEmpty msgNotVict, msgVict, msgChar; // optional messages 
     XML_VARIABLE XMLIntegerNoEmpty waitMin, waitMax; // optional range of waitstate on victim
     XML_VARIABLE XMLBooleanNoTrue savesCheck; // whether to check for saves and reduce damage, true by default

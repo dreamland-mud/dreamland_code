@@ -43,6 +43,7 @@ public:
     virtual bool isCasted( ) const = 0;
     virtual bool isPrayer( Character * ) const = 0;
     virtual bool checkPosition( Character * ) const = 0;
+    virtual bool properOrder( Character * ) const = 0;
 
     virtual SpellTargetPointer locateTargets( Character *, const DLString &, std::ostringstream & ) = 0;
     virtual SpellTargetPointer locateTargetObject( Character *, const DLString &, std::ostringstream & ) = 0;
