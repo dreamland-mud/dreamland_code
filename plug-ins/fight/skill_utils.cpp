@@ -238,7 +238,7 @@ int skill_learned_from_affects(const Skill *skill, PCharacter *ch)
     int sn = skill->getIndex();
     int gsn = const_cast<Skill *>(skill)->getGroup()->getIndex();
 
-    return ch->mod_skills[sn] + ch->mod_skill_groups[gsn];
+    return ch->mod_skills[sn] + ch->mod_skill_groups[gsn] + ch->mod_skill_all;
 }
 
 DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)

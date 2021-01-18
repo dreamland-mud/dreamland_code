@@ -2253,10 +2253,14 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
                     || paf->global.getRegistry() == skillGroupManager) 
                 {
                     buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                        << " знание "
-                        << (paf->global.getRegistry() == skillGroupManager ? "группы" : "навыка")
+                        << " владение "
+                        << (paf->global.getRegistry() == skillGroupManager ? "группой" : "умением")
                         << " " << paf->global.toRussianString().quote() 
                         << " на " << (int)abs(paf->modifier) << endl;
+                } else if (paf->location == APPLY_LEARNED) {
+                    buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                        << " владение всеми умениями на " 
+                        << (int)abs(paf->modifier) << endl;                    
                 }
                 break;
 

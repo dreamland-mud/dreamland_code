@@ -242,6 +242,8 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
                 ch->getPC()->mod_skills.applyBitvector(paf->global, mod);
             else if (paf->global.getRegistry() == skillGroupManager)
                 ch->getPC()->mod_skill_groups.applyBitvector(paf->global, mod);
+            else if (paf->location == APPLY_LEARNED)
+                ch->getPC()->mod_skill_all += mod;
         }
         break;
 
