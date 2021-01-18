@@ -265,7 +265,7 @@ void QueniaLanguage::correct( DLString &d ) const
 
 void QueniaLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "Сквозь зыбкую пелену сна тебе является слово {c%s.{x\r\n",
+    ch->printf( "Сквозь зыбкую пелену сна тебе является слово {c%s{x.\r\n",
                 word.toStr( ) ); 
 }
 

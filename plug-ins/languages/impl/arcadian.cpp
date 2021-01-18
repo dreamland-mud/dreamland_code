@@ -78,7 +78,7 @@ DLString ArcadianLanguage::createDictum( ) const
 
 void ArcadianLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "В веселом гаме и цокоте копыт ты различаешь слово {c%s.{x\r\n",
+    ch->printf( "В веселом гаме и цокоте копыт ты различаешь слово {c%s{x.\r\n",
                 word.toStr( ) ); 
 }
 
