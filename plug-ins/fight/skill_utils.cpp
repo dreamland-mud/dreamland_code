@@ -267,6 +267,9 @@ int skill_level_bonus(Skill &skill, Character *ch)
         slevel += ch->getPC()->mod_level_groups[skill.getGroup()];
         slevel += ch->getPC()->mod_level_skills[skill.getIndex()];
         slevel += ch->getPC()->mod_level_all;
+
+        if (skill.getSpell() && skill.getSpell()->isCasted())
+            slevel += ch->getPC()->mod_level_spell;
     }
 
     if (skill.getGroup() == group_fightmaster && ch->isAffected(gsn_turlok_fury) && chance(50)) {
