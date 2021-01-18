@@ -139,7 +139,7 @@ void SkillDamage::protectResistance( )
         return;
 
     if (sn == gsn_mental_knife) {
-        dam -= victim->applyCurse( dam * 2 / 5 );
+        dam -= ( dam * 2 / 5 );
         return;
     }
 
@@ -155,7 +155,7 @@ void SkillDamage::protectResistance( )
             || spell->isPrayer( ch )
             || skill->getGroup( ) == group_draconian)
     {
-        dam -= victim->applyCurse( dam / 2 );
+        dam -= ( dam / 2 );
         return;
     }
 }

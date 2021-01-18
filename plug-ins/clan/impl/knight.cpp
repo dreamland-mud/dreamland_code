@@ -307,7 +307,7 @@ VOID_SPELL(Dragonplate)::run(Character *ch, char *target_name, int sn, int level
     af.type = sn;
     af.level = level;
     af.duration = -1;
-    af.modifier = ch->applyCurse(level / 8);
+    af.modifier = (level / 8);
 
     af.location = APPLY_HITROLL;
     affect_to_obj(plate, &af);
@@ -444,13 +444,13 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
 
         af.bitvector.setTable(&affect_flags);
         af.bitvector.setValue(AFF_PROTECT_EVIL);        
-        af.modifier = ch->applyCurse(level / 8);
+        af.modifier = (level / 8);
         af.location = APPLY_HITROLL;
         affect_to_char(vch, &af);
 
         af.bitvector.setTable(&detect_flags);
         af.bitvector.setValue(DETECT_FADE|DETECT_EVIL);
-        af.modifier = ch->applyCurse(0 - level / 8);
+        af.modifier = (0 - level / 8);
         af.location = APPLY_SAVING_SPELL;
         affect_to_char(vch, &af);
 
@@ -475,7 +475,7 @@ VOID_SPELL(HolyArmor)::run(Character *ch, Character *, int sn, int level)
     af.level = level;
     af.duration = level;
     af.location = APPLY_AC;
-    af.modifier = ch->applyCurse(-max(10, 10 * (level / 5)));
+    af.modifier = (-max(10, 10 * (level / 5)));
     affect_to_char(ch, &af);
     act_p("Священные силы защищают $c4 от повреждений.",
           ch, 0, 0, TO_ROOM, POS_RESTING);

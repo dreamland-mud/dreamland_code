@@ -60,8 +60,7 @@ CMDRUN( remort )
      */
     if (IS_SET(pch->comm, COMM_NOTELL|COMM_NOEMOTE) 
         || pch->in_room->vnum == ROOM_VNUM_JAIL 
-        || pch->in_room->vnum == 10 
-        || pch->curse < 100)
+        || pch->in_room->vnum == 10)
     {
         pch->pecho("Ты еще не искупи%1$Gло|л|ла провинности ЭТОЙ жизни.", pch);
         return;

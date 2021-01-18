@@ -482,14 +482,6 @@ CMDRUNP( oscore )
             buf << dlprintf( "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
         buf << dlprintf("Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
-
-        if (ch->getPC( )->curse != 100)
-            buf << dlprintf( "Проклятье, наложенное на тебя, ухудшает все твои умения на %d%%.\n\r",
-                        100 - ch->getPC( )->curse.getValue( ));
-
-        if (ch->getPC( )->bless)
-            buf << dlprintf( "Благословение богов улучшает все твои умения на %d%%.\n\r",
-                        ch->getPC( )->bless.getValue( ));
     }
     
     /* RT wizinvis and holy light */

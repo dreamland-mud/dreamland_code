@@ -286,11 +286,11 @@ SKILL_RUNP( trophy )
             af.level        = level;
             af.duration        = -1;
             af.location = APPLY_DAMROLL;
-            af.modifier   = ch->applyCurse( ch->getModifyLevel( ) / 5 );
+            af.modifier   = ( ch->getModifyLevel( ) / 5 );
             affect_to_obj( trophy, &af );
 
             af.location = APPLY_HITROLL;
-            af.modifier   = ch->applyCurse( ch->getModifyLevel( ) / 5 );
+            af.modifier   = ( ch->getModifyLevel( ) / 5 );
             affect_to_obj( trophy, &af );
 
             af.location = APPLY_INT;
@@ -371,7 +371,6 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     act_p("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT,POS_RESTING);
     act_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
-    dam *= ch->getPC( )->curse / 100;
     damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
     gsn_mortal_strike->improve( ch, true, victim );
     return true;
@@ -416,8 +415,8 @@ SKILL_RUNP( bloodthirst )
 
     /* modifiers */
 
-    hp_percent = ch->applyCurse( HEALTH(ch) );
-    chance += ch->applyCurse( 25 - hp_percent / 2 );
+    hp_percent = ( HEALTH(ch) );
+    chance += ( 25 - hp_percent / 2 );
 
     if (number_percent() < chance)
     {
@@ -435,7 +434,7 @@ SKILL_RUNP( bloodthirst )
         af.type                = gsn_bloodthirst;
         af.level        = ch->getModifyLevel();
         af.duration        = 2 + ch->getModifyLevel() / 18;
-        af.modifier        = ch->applyCurse( 5 + ch->getModifyLevel( ) / 4 );
+        af.modifier        = ( 5 + ch->getModifyLevel( ) / 4 );
         af.bitvector.setValue(AFF_BLOODTHIRST);
 
         af.location = APPLY_HITROLL;
@@ -444,7 +443,7 @@ SKILL_RUNP( bloodthirst )
         af.location = APPLY_DAMROLL;
         affect_to_char(ch,&af);
 
-        af.modifier        = ch->applyCurse( -min( ch->getModifyLevel( ) - 5, 35 ) );
+        af.modifier        = ( -min( ch->getModifyLevel( ) - 5, 35 ) );
         af.location = APPLY_AC;
         affect_to_char(ch,&af);
     }
@@ -482,7 +481,7 @@ SKILL_RUNP( spellbane )
         af.level        = ch->getModifyLevel();
         af.duration        = ch->getModifyLevel() / 3;
         af.location = APPLY_SAVING_SPELL;
-        af.modifier        = ch->applyCurse( -ch->getModifyLevel( ) / 4 );
+        af.modifier        = ( -ch->getModifyLevel( ) / 4 );
 
         affect_to_char(ch,&af);
 
@@ -659,7 +658,7 @@ SKILL_RUNP( bandage )
                 act_p("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM,POS_RESTING);
                 gsn_bandage->improve( ch, true );
 
-                heal = ch->applyCurse( dice(4, 8 ) + ch->getModifyLevel() / 2 );
+                heal = ( dice(4, 8 ) + ch->getModifyLevel() / 2 );
                 ch->hit = min( ch->hit + heal, (int)ch->max_hit );
                 update_pos( ch );
                 ch->println( "Тебе становится лучше!" );
@@ -668,7 +667,7 @@ SKILL_RUNP( bandage )
                 af.type                = gsn_bandage;
                 af.level        = ch->getModifyLevel();
                 af.duration        = ch->getModifyLevel() / 10;
-                af.modifier        = ch->applyCurse( min( 15, ch->getModifyLevel( ) / 2 ) );
+                af.modifier        = ( min( 15, ch->getModifyLevel( ) / 2 ) );
                 af.bitvector.setValue(AFF_REGENERATION);
                 
                 affect_to_char(ch,&af);

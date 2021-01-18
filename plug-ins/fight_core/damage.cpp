@@ -296,7 +296,7 @@ void Damage::protectSanctuary( )
 void Damage::protectResistance( )
 {
     if (victim->isAffected(gsn_resistance)) {
-        dam -= victim->applyCurse( dam * 2 / 5 );
+        dam -= ( dam * 2 / 5 );
     }
 }
 

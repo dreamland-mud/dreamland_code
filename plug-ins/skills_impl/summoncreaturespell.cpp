@@ -42,16 +42,17 @@ NPCharacter * SummonCreatureSpell::createMobileAux(
     int i;
     NPCharacter *mob = create_mobile( get_mob_index( mobVnum.getValue( ) ) );
 
-    mob->setLevel( max( 1, ch->applyCurse( level ) ) );
+    mob->setLevel( max( 1, ( level ) ) );
 
     for (i = 0; i < stat_table.size; i++)
-        mob->perm_stat[i] = ch->applyCurse( ch->getCurrStat( i ) ); 
+        mob->perm_stat[i] = ( ch->getCurrStat( i ) ); 
 
+    int min_hit = ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit;
     mob->hit = mob->max_hit = URANGE( 
-                                   ch->applyCurse( ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit ), 
-                                   ch->applyCurse( hit ), 
+                                   min_hit, 
+                                   hit, 
                                    30000 );
-    mob->mana = mob->max_mana = ch->applyCurse( mana );
+    mob->mana = mob->max_mana = ( mana );
     
     mob->armor[3] = interpolate( level, 100, 0 );
     for (i = 0; i < 3; i++)

@@ -230,7 +230,7 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
       af.level              = level;
       af.duration           = level;
       af.location = APPLY_CHA;
-      af.modifier           = ch->applyCurse( - ( 5 + level / 10 ) );
+      af.modifier           = ( - ( 5 + level / 10 ) );
       affect_to_char(victim,&af);
       
       act("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!", victim, 0, 0, TO_ROOM);

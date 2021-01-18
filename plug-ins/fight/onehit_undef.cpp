@@ -1153,7 +1153,6 @@ void UndefinedOneHit::damApplyDeathblow( )
         int max_dam = dam + dam * 4 * clevel * mlevel / (600);
 
         dam = number_range( min_dam, max_dam );
-        dam = ch->applyCurse( dam );
 
         act("Твои руки наполняются смертоносной силой!",ch,0,0,TO_CHAR);
         act("Руки $c2 наполняются смертоносной силой!",ch,0,0,TO_ROOM);

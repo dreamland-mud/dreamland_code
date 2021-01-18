@@ -1507,7 +1507,7 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
     if (saves_spell( level, target, DAM_LIGHT, ch, DAMF_SPELL ))
         dam /= 2;
 
-    damage( ch, target, ch->applyCurse( dam ), sn, DAM_LIGHT, true, DAMF_SPELL );
+    damage( ch, target, ( dam ), sn, DAM_LIGHT, true, DAMF_SPELL );
     
     if (target->is_npc( ))
         return;
@@ -1527,7 +1527,7 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
                 dam /= 2;
             
             try {
-                damage_nocatch( ch, target, ch->applyCurse( dam ), sn, DAM_LIGHT, true, DAMF_SPELL );
+                damage_nocatch( ch, target, ( dam ), sn, DAM_LIGHT, true, DAMF_SPELL );
             } catch (const VictimDeathException &) {
                 return;
             }
@@ -1740,14 +1740,14 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
   af.level        = level;
   af.duration     = -1;
 
-  af.modifier     = ch->applyCurse( level );
+  af.modifier     = ( level );
   af.location = APPLY_HIT;
   affect_to_obj( badge, &af);
 
   af.location = APPLY_MANA;
   affect_to_obj( badge, &af);
 
-  af.modifier     = ch->applyCurse( level / 8 );
+  af.modifier     = ( level / 8 );
   af.location = APPLY_HITROLL;
   affect_to_obj( badge, &af);
 
@@ -1790,18 +1790,18 @@ VOID_SPELL(ShieldOfRuler)::run( Character *ch, char *target_name, int sn, int le
   af.level        = level;
   af.duration     = -1;
 
-  af.modifier     = ch->applyCurse( level / 8 );
+  af.modifier     = ( level / 8 );
   af.location = APPLY_HITROLL;
   affect_to_obj( shield, &af);
 
   af.location = APPLY_DAMROLL;
   affect_to_obj( shield, &af);
 
-  af.modifier     = ch->applyCurse( -level * 2 );
+  af.modifier     = ( -level * 2 );
   af.location = APPLY_AC;
   affect_to_obj( shield, &af);
 
-  af.modifier     = ch->applyCurse( max( 1, level /  30 ) );
+  af.modifier     = ( max( 1, level /  30 ) );
   af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
@@ -1865,22 +1865,22 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
       stalker->perm_stat[i] = victim->perm_stat[i] * max( 2, ( level / 20 ) );
     }
 
-  stalker->max_hit = ch->applyCurse( min( 30000, 5 * victim->max_hit ) );
+  stalker->max_hit = ( min( 30000, 5 * victim->max_hit ) );
   stalker->hit = stalker->max_hit;
-  stalker->max_mana = ch->applyCurse( victim->max_mana );
+  stalker->max_mana = ( victim->max_mana );
   stalker->mana = stalker->max_mana;
   stalker->setLevel( victim->getModifyLevel() );
 
   stalker->damage[DICE_NUMBER] =
-                ch->applyCurse( number_range( victim->getModifyLevel(), victim->getModifyLevel() / 8 ) );
+                ( number_range( victim->getModifyLevel(), victim->getModifyLevel() / 8 ) );
   stalker->damage[DICE_TYPE] =
-                ch->applyCurse( number_range( victim->getModifyLevel(), victim->getModifyLevel() / 2 ) );
+                ( number_range( victim->getModifyLevel(), victim->getModifyLevel() / 2 ) );
   stalker->damage[DICE_BONUS] =
-                ch->applyCurse( number_range( victim->getModifyLevel(), victim->getModifyLevel() / 6 ) );
+                ( number_range( victim->getModifyLevel(), victim->getModifyLevel() / 6 ) );
 
   for (i=0; i < 3; i++)
-    stalker->armor[i] = ch->applyCurse( interpolate( stalker->getRealLevel( ), 100, -400 ) );
-  stalker->armor[3] = ch->applyCurse( interpolate( stalker->getRealLevel( ), 100, -200 ) );
+    stalker->armor[i] = ( interpolate( stalker->getRealLevel( ), 100, -400 ) );
+  stalker->armor[3] = ( interpolate( stalker->getRealLevel( ), 100, -200 ) );
   stalker->gold = 0;
   stalker->invis_level = LEVEL_HERO;
   stalker->detection = (A|B|C|D|E|F|G|H|ee);

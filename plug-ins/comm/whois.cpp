@@ -140,8 +140,6 @@ COMMAND(Whois, "whois")
     if (IS_GHOST( pch ))                flags.push_back( " {DG{w(призрак)" );
     if (IS_DEATH_TIME( pch ))           flags.push_back( " {DP{w(защита богов)" );
     if (IS_VIOLENT( pch ))              flags.push_back( " {BV{w(адреналин в крови)" );
-    if (pch->curse != 100)              flags.push_back( " {DC{w(проклят богами)" );
-    if (pch->bless)                     flags.push_back( " {CB{w(благословлен богами)" );
     if (IS_SET( pch->act, PLR_WANTED))  flags.push_back( " {RW{w(в розыске)" );
     if (pch->isAffected(gsn_manacles)) flags.push_back( " {mM{w(в кандалах)" );
     if (pch->isAffected(gsn_jail ))   flags.push_back( " {mJ{w(в тюрьме)" );

@@ -258,15 +258,8 @@ int BasicSkill::getEffective( Character *ch ) const
         if (desire_drunk->isActive( ch->getPC( ) ))
             result = 9 * result / 10;
 
-    // Immortal curse.
-    result = ch->applyCurse( result );
     result = URANGE(0, result, 100);
     
-    // Immortal bless: can go above 100%.
-    if (!ch->is_npc( )) 
-        if (result > 1)
-            result += ch->getPC( )->bless;
-
     return result;
 }
 

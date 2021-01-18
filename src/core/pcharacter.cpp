@@ -306,8 +306,6 @@ void PCharacter::init( )
     practice = 0;
     train = 0;
     loyalty = 0;
-    curse = 100;
-    bless = 0;
     mod_skills.clear();
     mod_skill_groups.clear();
     mod_level_all = 0;
@@ -736,11 +734,6 @@ DLString PCharacter::getNameP( char gram_case ) const
 PCSkillData & PCharacter::getSkillData( int sn )
 {
     return skills.get( sn );
-}
-
-int PCharacter::applyCurse( int def )
-{
-    return (def * curse) / 100;
 }
 
 PCSkills & PCharacter::getSkills( )

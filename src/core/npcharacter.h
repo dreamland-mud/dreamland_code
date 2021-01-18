@@ -61,9 +61,6 @@ public:
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
     virtual void updateCachedNoun( );
     
-    // npc skills
-    virtual int applyCurse( int );
-
     // stats
     virtual int getCurrStat( int );
 

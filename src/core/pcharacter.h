@@ -199,7 +199,6 @@ public:
     bool canSeeProfession( PCharacter * );
     
     // pc skills
-    virtual int applyCurse( int );
     PCSkillData & getSkillData( int );
     virtual PCSkills & getSkills();
     virtual void setSkills(const PCSkills &);
@@ -293,8 +292,6 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty        practice;
     XML_VARIABLE XMLIntegerNoEmpty        train;
     XML_VARIABLE XMLIntegerNoEmpty        loyalty;          // real ethos - dynamic
-    XML_VARIABLE XMLInteger                curse;
-    XML_VARIABLE XMLInteger                bless;
 
     /** Bonus to skill knowledge through affects. */
     GlobalArray            mod_skills;

@@ -256,7 +256,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
 
     if (gsn_mastering_spell->usable( ch, false )) {
         if (number_percent() < gsn_mastering_spell->getEffective( ch )) {
-            slevel += ch->applyCurse( number_range( 1, 4 ) );
+            slevel += ( number_range( 1, 4 ) );
             gsn_mastering_spell->improve( ch, true );
         }
         else
@@ -619,7 +619,7 @@ void DefaultSpell::baneDamage( Character *ch, Character *vch, int dam ) const
         return;
     
     gsn_spellbane->improve( vch, true, ch );
-    damage_nocatch( vch, ch, vch->applyCurse( dam ), gsn_spellbane, DAM_NEGATIVE, true, DAMF_SPELL );
+    damage_nocatch( vch, ch, ( dam ), gsn_spellbane, DAM_NEGATIVE, true, DAMF_SPELL );
 }
 
 void DefaultSpell::baneAround( Character *ch, int failChance, int dam ) const

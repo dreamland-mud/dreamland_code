@@ -183,7 +183,6 @@ public:
     
     // skills
     int getSkill( int );
-    virtual int applyCurse( int ) = 0;
 
     // stats
     virtual int getCurrStat( int ) = 0;

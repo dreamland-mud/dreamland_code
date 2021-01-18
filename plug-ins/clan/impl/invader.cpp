@@ -343,12 +343,12 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
     af.bitvector.setTable(&detect_flags);
     af.bitvector.setValue(DETECT_GOOD | DETECT_FADE);
     af.location = APPLY_SAVING_SPELL;
-    af.modifier = ch->applyCurse(0 - level / 9);
+    af.modifier = (0 - level / 9);
     affect_to_char(victim, &af);
 
     af.bitvector.setTable(&affect_flags);
     af.bitvector.setValue(IS_AFFECTED(victim, AFF_PROTECT_GOOD) ? 0 : AFF_PROTECT_GOOD);
-    af.modifier = ch->applyCurse(-level * 5 / 2);
+    af.modifier = (-level * 5 / 2);
     af.location = APPLY_AC;
     affect_to_char(victim, &af);
 

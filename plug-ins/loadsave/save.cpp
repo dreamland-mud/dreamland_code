@@ -767,6 +767,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
 {
     const char *word="End";
     bool fMatch = true;
+    int dummy;
 
     LogStream::sendNotice( ) << "Loading " << ch->getName( ) << '.' << endl;
 
@@ -836,7 +837,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             KEY( "Bamfout",        ch->bamfout,        fread_string( fp ) );
             KEY( "Bin",                ch->bamfin,        fread_string( fp ) );
             KEY( "Bout",        ch->bamfout,        fread_string( fp ) );
-            KEY( "Bless",        ch->bless,        fread_number( fp ) );
+            KEY( "Bless",        dummy,        fread_number( fp ) );
 
             if(!str_cmp(word, "BatlePrompt") || !str_cmp(word, "BatleProm")) {
                 ch->batle_prompt = fread_string(fp);
@@ -861,7 +862,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             }
             KEY( "Comm",        ch->comm,                fread_flag( fp ) );
             KEY( "Comm_Add",        ch->add_comm,           fread_flag( fp ) );
-            KEY( "Curse",        ch->curse,        fread_number( fp ) );
+            KEY( "Curse",        dummy,        fread_number( fp ) );
 
             break;
 

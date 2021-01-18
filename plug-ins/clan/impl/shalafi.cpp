@@ -296,7 +296,7 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
   ch->setWait(gsn_mental_attack->getBeats( ) );
 
   try {
-      damage_nocatch( ch, victim, ch->applyCurse( dam ), sn, DAM_MENTAL, true, DAMF_SPELL );
+      damage_nocatch( ch, victim, ( dam ), sn, DAM_MENTAL, true, DAMF_SPELL );
         
       if(!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_SPELL))
         {
@@ -304,7 +304,7 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
           af.level              = level;
           af.duration           = level;
 
-          af.modifier           = ch->applyCurse( -7 );
+          af.modifier           = ( -7 );
           af.location = APPLY_INT;
           affect_to_char(victim,&af);
 
@@ -373,7 +373,7 @@ VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level )
 
             if (saves_spell(level,tmp_vict, DAM_FIRE, ch, DAMF_SPELL))
               dam /= 2;
-            damage_nocatch( ch, tmp_vict, ch->applyCurse( dam ), sn, DAM_FIRE, true, DAMF_SPELL );
+            damage_nocatch( ch, tmp_vict, ( dam ), sn, DAM_FIRE, true, DAMF_SPELL );
           }
             catch (const VictimDeathException &) {
                    continue;
@@ -398,7 +398,7 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
       return;
     }
 
-  hp_modif = ch->applyCurse( min(30000 - ch->max_hit, ( int )( ch->max_hit / 1.6 ) ) );
+  hp_modif = ( min(30000 - ch->max_hit, ( int )( ch->max_hit / 1.6 ) ) );
   ch->hit += hp_modif;
 
   af.type               = sn;
