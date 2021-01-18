@@ -198,17 +198,12 @@ CMDRUN( cast )
     victim = target->victim;
     offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
 
-    if (offensive && ch->is_npc( ) && ch->master && ch->master != victim) {
-        if (victim && !victim->is_npc( ))
+    if (!spell->properOrder(ch)) {
+        if (offensive && victim && !victim->is_npc( ))
             say_fmt("Хозя%2$Gин|ин|йка, я %3$Gего|его|её боюсь!", ch, ch->master, victim);
         else
             do_say(ch, "Я не буду делать этого.");
 
-        return;
-    }
-
-    if (IS_CHARMED(ch) && !spell->properOrder(ch)) {
-        do_say(ch, "Я не буду делать этого.");
         return;
     }
 

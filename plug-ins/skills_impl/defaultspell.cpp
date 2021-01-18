@@ -538,11 +538,25 @@ bool DefaultSpell::checkPosition( Character *ch ) const
     return true;
 }
 
+/**
+ * See if this spell can be casted when ordered:
+ * - charmed mobs cannot cast offensive stuff or spells marked with 'player_only'
+ * - charmed players can cast everything
+ */
 bool DefaultSpell::properOrder(Character *ch) const
 {
-    if (ch->is_npc() && order.isSet(ORDER_PLAYER_ONLY))
+    if (!IS_CHARMED(ch))
+        return true;
+
+    if (!ch->is_npc())
+        return true;
+
+    if (order.isSet(ORDER_PLAYER_ONLY))
+        return false;    
+
+    if (getSpellType() == SPELL_OFFENSIVE)
         return false;
-        
+
     return true;
 }
 

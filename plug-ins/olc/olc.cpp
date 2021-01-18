@@ -517,7 +517,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             }
 
             if (spell && spell->isCasted()) {
-                bool canOrder = spell->properOrder(pet) && (spell->getSpellType() != SPELL_OFFENSIVE);
+                bool canOrder = spell->properOrder(pet);
                 buf << "Заклинание {g" << skill->getName() << "{x: "
                     << (canOrder ? "{GДА{x" : "{RНЕТ{x") << endl;
                 continue;
