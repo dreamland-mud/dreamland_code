@@ -91,21 +91,6 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
 }
 
 
-SPELL_DECL(DragonBreath);
-VOID_SPELL(DragonBreath)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-  
-  int dam;
-
-  dam = dice(level , 6);
-  if (!is_safe_spell(ch, victim, true))
-    {
-      if (saves_spell(level, victim, DAM_FIRE, ch, DAMF_SPELL))
-        dam /= 2;
-      damage_nocatch(ch, victim, dam, sn, DAM_FIRE, true, DAMF_SPELL);
-    }
-
-}
 
 SPELL_DECL(FireBreath);
 VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level ) 

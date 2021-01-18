@@ -179,30 +179,3 @@ VOID_SPELL(MassInvis)::run( Character *ch, Room *room, int sn, int level )
     ch->send_to("Ok.\n\r");
 }
 
-
-SPELL_DECL(Ventriloquate);
-VOID_SPELL(Ventriloquate)::run( Character *ch, char *target_name, int sn, int level ) 
-{ 
-    char buf1[MAX_STRING_LENGTH];
-    char buf2[MAX_STRING_LENGTH];
-    char speaker[MAX_INPUT_LENGTH];
-    Character *vch;
-
-    target_name = one_argument( target_name, speaker );
-
-    sprintf( buf1, "%s произносит '{g%s{x'.\n\r", speaker, target_name );
-    sprintf( buf2, "Кто-то заставляет %s произнести '{g%s{x'.\n\r", speaker, target_name );
-    buf1[0] = Char::upper(buf1[0]);
-
-    for ( vch = ch->in_room->people; vch != 0; vch = vch->next_in_room )
-    {
-        if ( !is_name( speaker, vch->getNameP( ) ) )
-            vch->send_to(saves_spell(level,vch,DAM_OTHER, ch, DAMF_SPELL) ? buf2 : buf1);
-    }
-
-}
-
-VOID_SPELL(Ventriloquate)::utter( Character * ) 
-{
-}
-
