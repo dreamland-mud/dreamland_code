@@ -39,7 +39,7 @@ short NoteThread::getLevel( ) const
     return min( readLevel.getValue( ), writeLevel.getValue( ) );
 }
 
-bool NoteThread::properOrder( Character *ch )
+bool NoteThread::properOrder( Character *ch ) const
 {
     return false;
 }    

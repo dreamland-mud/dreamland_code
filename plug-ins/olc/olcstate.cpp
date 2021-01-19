@@ -37,7 +37,7 @@ bool OLCCommand::matches( const DLString &argument ) const
     return !argument.empty( ) && argument.strPrefix( name );
 }
 
-bool OLCCommand::properOrder( Character * )
+bool OLCCommand::properOrder( Character * ) const
 {
     return false;
 }

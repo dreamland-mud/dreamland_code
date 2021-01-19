@@ -529,6 +529,41 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         page_to_char(buf.str().c_str(), ch);
         return;
     }
+
+    if (arg == "commands") {
+        ostringstream buf;
+        Character *vch = get_char_room(ch, args);
+
+        if (!vch || !vch->is_npc()) {
+            ch->println("Usage: abc commands <mob>");
+            return;
+        }
+
+        NPCharacter *pet = vch->getNPC();
+
+        for (auto &cmd: commandManager->getCommands().getCommands()) {
+            if (!cmd->visible(pet))
+                continue;
+
+            bool canOrder = cmd->properOrder(pet);
+            pet->fighting = ch;
+            bool canOrderFight = cmd->properOrder(pet);
+            pet->fighting = 0;
+
+            if (!canOrder && !canOrderFight)
+                continue;
+
+            buf << "Команда {g" << cmd->getName() << "{x: " 
+                << (canOrder ? "{GДА{x" : canOrderFight ? "{YВ БОЮ{x" : "{RНЕТ{x")
+                << "   [" << cmd->getOrder().names() << "]" 
+                << "   [" << cmd->getExtra().names() << "]" 
+                << endl;
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
 }
 
 

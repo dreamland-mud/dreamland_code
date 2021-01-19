@@ -48,7 +48,7 @@ bool SocialBase::matches( const DLString& argument ) const
     return false;
 }
 
-bool SocialBase::properOrder( Character * )
+bool SocialBase::properOrder( Character * ) const
 {
     return true;
 }

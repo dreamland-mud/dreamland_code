@@ -37,7 +37,7 @@ public:
         virtual bool matches( const DLString & ) const;
         virtual bool matchesAlias( const DLString & ) const;
         virtual bool matchesExactly( const DLString & ) const;
-        virtual bool properOrder( Character * );
+        virtual bool properOrder( Character * ) const;
         virtual bool dispatchOrder( const InterpretArguments & );
         virtual bool dispatch( const InterpretArguments & );
 

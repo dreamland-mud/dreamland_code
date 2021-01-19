@@ -23,7 +23,7 @@ public:
         virtual short getLog( ) const = 0;
 
         virtual bool matches( const DLString & ) const = 0;
-        virtual bool properOrder( Character * ) = 0;
+        virtual bool properOrder( Character * ) const = 0;
         virtual bool dispatch( const InterpretArguments & ) = 0;
         virtual bool dispatchOrder( const InterpretArguments & ) = 0;
         virtual void run( Character *, const DLString & ) = 0;
