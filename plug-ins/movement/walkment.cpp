@@ -30,6 +30,7 @@
 GSN(mount_drive);
 GSN(riding);
 GSN(web);
+GSN(entangle);
 GSN(camouflage_move);
 
 Walkment::Walkment( Character *ch )
@@ -568,7 +569,7 @@ bool Walkment::applyWeb( Character *wch )
     if (MOUNTED(wch))
         return true;
 
-    if (!CAN_DETECT(wch, ADET_WEB))
+    if ( !CAN_DETECT(wch, ADET_WEB) || !wch->isAffected(gsn_entangle) )
         return true;
 
     wch->setWaitViolence( 1 );
@@ -578,18 +579,27 @@ bool Walkment::applyWeb( Character *wch )
         chance *= 2;
 
     if (number_percent( ) < chance) {
-        affect_bit_strip(wch, &detect_flags, ADET_WEB);
-        affect_strip(wch, gsn_web);
-        msgSelfRoom( wch,
-                     "Ты разрываешь сети, которые мешали тебе покинуть это место.",
-                     "%2$^C1 разрывает сети, которые мешали %2$P3 покинуть это место." );
-        return true;
+        if ( CAN_DETECT(wch, ADET_WEB) ) {      
+            affect_bit_strip(wch, &detect_flags, ADET_WEB);
+            affect_strip(wch, gsn_web);
+            msgSelfRoom( wch,
+                     "Ты разрываешь сети, которые мешали тебе покинуть это место!",
+                     "%2$^C1 разрывает сети, которые мешали %2$P3 покинуть это место!" );
+            return true;
+        }
+        if ( wch->isAffected(gsn_entangle) ) {      
+            affect_strip(wch, gsn_entangle);
+            msgSelfRoom( wch,
+                     "Ты разрываешь побеги терновника, которые мешали тебе покинуть это место!",
+                     "%2$^C1 разрывает побеги терновника, которые мешали %2$P3 покинуть это место!" );
+            return true;
+        }        
     }
     else {
         rc = RC_MOVE_WEB;
         msgSelfRoom( wch,
-                     "Ты пытаешься разорвать сети, которые мешают пройти, но терпишь неудачу.",
-                     "%2$^C1 пытается разорвать сети, преграждающие %2$P3 дорогу, но терпит неудачу." );
+                     "Ты пытаешься разорвать путы, мешающие тебе пройти, но терпишь неудачу!",
+                     "%2$^C1 пытается разорвать путы, преграждающие %2$P3 дорогу, но терпит неудачу!" );
         return false;
     }
 }
