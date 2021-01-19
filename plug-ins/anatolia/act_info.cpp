@@ -113,6 +113,7 @@
 #include "commandflags.h"
 #include "damageflags.h"
 #include "autoflags.h"
+#include <commandmanager.h>
 
 using std::endl;
 using std::min;
@@ -1003,7 +1004,7 @@ CMDRUNP( report )
         
         }
         
-        buf << fmt(0,"%1$^C1 говорит тебе: \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
+        buf << fmt(0,"%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
         pet,
         GET_SEX( pet->master, "Хозяин", "Хозяин", "Хозяйка"),
         pet->getModifyLevel(),
@@ -1085,20 +1086,16 @@ CMDRUNP( report )
         
         if(shown){
      
-            if(showAll) {
-                pet->master->println("См. также {x{y{hc{lR? приказать{lE? order{x и {x{y{hc{lR? рапорт{lE? report{x");
+            if(!showAll) {
+               act("Напиши {x{y{hc{lRприказать \'$n1\' рапорт все{lEorder \'$n1\' report all{x, и я расскажу, что ещё я умею делать. \n\r", pet->master, pet->getNameP(1).colourStrip().c_str(), 0, TO_CHAR);
             }
-       
-            else {
-             act("Напиши {x{y{hc{lRприказать \'$n1\' рапорт все{lEorder \'$n1\' report all{x, и я расскажу, что ещё я умею делать. См. также {x{y{hc{lR? приказать{lE? order{x и {x{y{hc{lR? рапорт{lE? report{x", pet->master, pet->getNameP(1).colourStrip().c_str(), 0, TO_CHAR);
-            }
+            pet->master->println("См. также {x{y{hh1091{lR? приказать{lE? order{x и {x{y{hh1005{lR? рапорт{lE? report{x");
         }
         
         else {
             tell_raw(pet->master, pet, "%s, я ничегошеньки не умею!", GET_SEX( pet->master, "Хозяин", "Хозяин", "Хозяйка"));
             interpret_raw( pet, "abat", ""); 
         }
-    
     }
     }
     return;
