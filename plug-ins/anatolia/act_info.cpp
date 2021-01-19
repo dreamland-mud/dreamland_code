@@ -1015,7 +1015,7 @@ CMDRUNP( report )
 
         if(IS_SET(pet->act, ACT_RIDEABLE)){
             pet->master->println("На мне можно {y{hh1376ездить верхом{x!");
-        }
+        }       
         
         if(!skills.empty()){
             buf.str(std::string());
@@ -1077,27 +1077,36 @@ CMDRUNP( report )
                 << "{x";
                 if (++it != passives.end( ))
                 buf << ", ";
-                else buf << "{x" << endl << "\r\n";
+                else buf << "{x" << endl;
             }
             page_to_char("Мои пассивные умения: ",pet->master);
             page_to_char(buf.str().c_str(), pet->master);
             shown = true;
-        }    
+        }
+
+        
+        buf.str(std::string());
+        if(can_fly(pet)) buf << "Я умею {hh1018летать{x. ";
+        buf << (pet->master->getPC() && pet->master->getPC()->pet && pet->master->getPC()->pet == pet ? "" : "Мне можно {hh1024дать{x вещи и приказать из {hh990надеть{x. ");
+        buf << "Мне можно приказать {hh1020поспать{x и другие стандартные команды." << endl;
+            
+        page_to_char(buf.str().c_str(), pet->master);     
         
         if(shown){
      
             if(!showAll) {
-               act("Напиши {x{y{hc{lRприказать \'$n1\' рапорт все{lEorder \'$n1\' report all{x, и я расскажу, что ещё я умею делать. \n\r", pet->master, pet->getNameP(1).colourStrip().c_str(), 0, TO_CHAR);
+               act("Напиши {x{y{hc{lRприказать \'$n1\' рапорт все{lEorder \'$n1\' report all{x, и я расскажу, что ещё я умею делать.", pet->master, pet->getNameP(1).colourStrip().c_str(), 0, TO_CHAR);
             }
-            pet->master->println("См. также {x{y{hh1091{lR? приказать{lE? order{x и {x{y{hh1005{lR? рапорт{lE? report{x");
+            pet->master->println("\n\rСм. также {x{y{hh1091{lR? приказать{lE? order{x и {x{y{hh1005{lR? рапорт{lE? report{x");
         }
         
         else {
-            tell_raw(pet->master, pet, "%s, я ничегошеньки не умею!", GET_SEX( pet->master, "Хозяин", "Хозяин", "Хозяйка"));
+            tell_raw(pet->master, pet, "%s, у меня нет никаких полезных умений!", GET_SEX( pet->master, "Хозяин", "Хозяин", "Хозяйка"));
             interpret_raw( pet, "abat", ""); 
         }
+        }    
     }
-    }
+    
     return;
 }
 
