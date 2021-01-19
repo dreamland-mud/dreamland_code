@@ -132,7 +132,7 @@ SKILL_RUNP( tame )
     if (ch->getProfession( ) == prof_ranger) {
         if (!IS_SET(victim->act,ACT_AGGRESSIVE))
         {
-            ch->pecho("%1$^C1 обычно не аггресив%1$Gно|ен|на|ны.", victim);
+            ch->pecho("%1$^C1 обычно не агрессив%1$Gно|ен|на|ны.", victim);
             return;
         }
 
@@ -209,30 +209,32 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     int dam;
     PCharacter *victim;
 
-    if (ch->in_room->getSectorType() == SECT_INSIDE ||
-        ch->in_room->getSectorType() == SECT_CITY ||
-        ch->in_room->getSectorType() == SECT_DESERT ||
-        ch->in_room->getSectorType() == SECT_WATER_NOSWIM ||
-        ch->in_room->getSectorType() == SECT_AIR)
+    if (ch->in_room->getSectorType() != SECT_FOREST ||
+        ch->in_room->getSectorType() != SECT_FIELD ||
+        ch->in_room->getSectorType() != SECT_HILLS ||
+        ch->in_room->getSectorType() != SECT_MOUNTAIN )
     {
-        ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
+        ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
         return;
     }
 
     if (grave->pIndexData->vnum != OBJ_VNUM_GRAVE) {
-        ch->send_to("Нет никакого смысла опутывать это терновником.\r\n");
+        ch->send_to("Это не вампирская могила.\r\n");
         return;
     }
 
     victim = PCharacterManager::findPlayer( grave->getOwner( ) );
 
     if (!victim || !DIGGED(victim)) {
-        ch->send_to("Опс.. а могила-то ничейная..\r\n");
+        ch->send_to("Колючий терновник опутывает могилу... но в ней никого не оказывается!\r\n");
         LogStream::sendError( ) << "Unexistent grave owner: " << grave->getOwner( ) << endl;
         return;
     }
 
-    if (number_percent( ) > ch->getSkill( sn ) || is_safe_nomessage( ch, victim)) {
+    if (is_safe(ch, victim)) 
+        return;
+    
+    if (number_percent( ) > ch->getSkill( sn ) ) {
         act_p("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0, TO_ALL, POS_RESTING);
         return;
     }
@@ -252,38 +254,73 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
 
 VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    int dam;
+    int dam, chance;
     Affect todex;
 
-    if (ch->in_room->getSectorType() == SECT_INSIDE ||
-        ch->in_room->getSectorType() == SECT_CITY ||
-        ch->in_room->getSectorType() == SECT_DESERT ||
-        ch->in_room->getSectorType() == SECT_WATER_NOSWIM ||
-        ch->in_room->getSectorType() == SECT_AIR)
-    {
-        ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
+   if (victim == ch)
+   {
+        ch->send_to("Ты задумчиво колешь себя шипом терновника в пятку. Ай!\n\r");
         return;
-    }
-
-    act("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
-        victim, 0, 0, TO_ROOM);
-    act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
-        victim, 0, 0, TO_CHAR);
-        
-    dam = number_range(level, 4 * level);
-    if (saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL ))
-        dam /= 2;
-
-    victim->move -= victim->max_move / 3;
-    victim->move = max( 0, (int)victim->move );
+   }
     
-    todex.type = sn;
-    todex.level = level;
-    todex.duration = level / 10;
-    todex.location = APPLY_DEX;
-    todex.modifier = -1;
-    affect_join( victim, &todex);
+   if (ch->in_room->getSectorType() != SECT_FOREST ||
+        ch->in_room->getSectorType() != SECT_FIELD ||
+        ch->in_room->getSectorType() != SECT_HILLS ||
+        ch->in_room->getSectorType() != SECT_MOUNTAIN )
+   {
+        ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
+        return;
+   }
+    
+   if ( victim->isAffected(gsn_entangle) )
+   {
+        ch->send_to("Противник уже опутан терновником!\n\r");
+        return;
+   }
+
+   if (IS_SET(victim->imm_flags, IMM_PIERCE))
+   {
+        act_p("$C1 обладает иммунитетом к шипам терновника.", ch, 0,
+                victim, TO_CHAR,POS_RESTING);
+        return;
+   }
+    
+   if (is_flying( victim ))
+   {
+        ch->send_to("Побеги терновника не смогут навредить летучему противнику.\n\r");
+        return;
+   }
+
+    dam = number_range(level, 4 * level);
+    chance = 100;
+        
+    if (victim->size > 2)
+        chance -= victim->size * 15;
+    
+    if ( (!saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL )) && (number_percent() <= chance) ){
+        act("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
+            victim, 0, 0, TO_ROOM);
+        act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
+            victim, 0, 0, TO_CHAR);
+            
+       victim->move -= victim->max_move / 3;
+       victim->move = max( 0, (int)victim->move );
+    
+       todex.type = sn;
+       todex.level = level;
+       todex.duration = level / 10;
+       todex.location = APPLY_DEX;
+       todex.modifier = -1 * (level / 20 + 1);
+       affect_join( victim, &todex); 
+            
+       dam = dam * 2;   
+    }
+    else {
+        act("Колючий терновник прорастает сквозь землю, но $c1 с трудом разрывает его путы!",
+            victim, 0, 0, TO_ROOM);
+        act("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
+            victim, 0, 0, TO_CHAR);
+    }
 
     damage_nocatch(ch, victim, ch->getModifyLevel(), gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);
 }
-
