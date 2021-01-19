@@ -128,16 +128,6 @@ bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 DLString quality_percent( int ); /* XXX */
 DLString help_article_disambig(const HelpArticle *help);
 
-CMDRUNP( rules )
-{
-    do_help(ch,"worldrules");
-}
-
-CMDRUNP( wizlist )
-{
-    ch->println("Эта команда устарела, просто набери {y{hcсправка боги{x.");
-}
-
 #define MAX_PROMPT_SIZE 75
 
 CMDRUNP( prompt )
@@ -604,12 +594,6 @@ CMDRUNP( compare )
 }
 
 
-
-CMDRUNP( credits )
-{
-    ch->println("Эта команда устарела, просто набери {y{hcсправка создатели{x.");
-    return;
-}
 
 static void format_where( Character *ch, Character *victim )
 {

@@ -48,24 +48,8 @@ const DLString & ConfigElement::getRussianName( ) const
     return rname;
 }
 
-void ConfigElement::init( )
-{
-    if (autocmd) {
-        commandManager->registrate( Pointer( this ) );
-    }
-}
-
-void ConfigElement::destroy( )
-{
-    if (autocmd) {
-        commandManager->unregistrate( Pointer( this ) );
-    }
-}
-
 void ConfigElement::run( Character *ch, const DLString & )
 {
-    ch->printf("Эта команда устарела, используй {hc{y{lRрежим %s{lEconfig %s{x.\r\n", 
-               rname.c_str(), name.c_str());
 }
 
 bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
@@ -185,62 +169,20 @@ ConfigCommand * ConfigCommand::thisClass = NULL;
 
 void ConfigCommand::initialization( )
 {
-    Groups::iterator g;
-    
     thisClass = this;
     Class::regMoc<ConfigElement>( );
     Class::regMoc<ConfigGroup>( );
     Class::regMoc<ConfigCommand>( );
     CommandPlugin::initialization( );
-
-    for (g = groups.begin( ); g != groups.end( ); g++) {
-        ConfigGroup::iterator c;
-
-        for (c = g->begin( ); c != g->end( ); c++) 
-            (*c)->init( );
-    }
 }
 
 void ConfigCommand::destruction( )
 {
-    Groups::iterator g;
-    
-    for (g = groups.begin( ); g != groups.end( ); g++) {
-        ConfigGroup::iterator c;
-
-        for (c = g->begin( ); c != g->end( ); c++) 
-            (*c)->destroy( );
-    }
-
     CommandPlugin::destruction( );
     Class::unregMoc<ConfigCommand>( );
     Class::unregMoc<ConfigGroup>( );
     Class::unregMoc<ConfigElement>( );
     thisClass = NULL;
-}
-
-void ConfigCommand::printAllRows( PCharacter *pch ) const
-{
-    Groups::const_iterator g;
-    ConfigGroup::const_iterator c;
-
-    for (g = groups.begin( ); g != groups.end( ); g++) 
-        for (c = g->begin( ); c != g->end( ); c++) 
-            if ((*c)->available( pch ))
-                if ((*c)->autolist.getValue( ) && !(*c)->autotext.getValue( )) 
-                    (*c)->printRow( pch );
-}
-
-void ConfigCommand::printAllTexts( PCharacter *pch ) const
-{
-    Groups::const_iterator g;
-    ConfigGroup::const_iterator c;
-
-    for (g = groups.begin( ); g != groups.end( ); g++) 
-        for (c = g->begin( ); c != g->end( ); c++) 
-            if ((*c)->available( pch ))
-                if ((*c)->autolist.getValue( ) && (*c)->autotext.getValue( )) 
-                    (*c)->printText( pch );
 }
 
 COMMAND(ConfigCommand, "config")
@@ -305,23 +247,10 @@ COMMAND(ConfigCommand, "config")
     pch->println("Опция не найдена. Используй {hc{y{lRрежим{lEconfig{x для списка.");
 }
 
-/*-------------------------------------------------------------------------
- * 'autolist' command 
- *------------------------------------------------------------------------*/
-CMDRUN( autolist )
-{
-    ch->println("Эта команда устарела, используй {hc{y{lRрежим{lEconfig{x для списка настроек.");
-}
-
 
 /*-------------------------------------------------------------------------
  * 'scroll' command 
  *------------------------------------------------------------------------*/
-CMDRUN( scroll )
-{
-    ch->println("Эта команда устарела, используй {hc{y{lRрежим буфер{lEconfig scroll{x.");
-}
-
 static void config_scroll_print(PCharacter *ch)
 {
     DLString lines(ch->lines);
@@ -484,7 +413,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
     if (discord["id"].asString().empty()) {
         buf << "Для связи этого персонажа с пользователем Discord: " << endl
             << "  {W*{x зайди на сервер {hlhttps://discord.gg/RPaz6ut{x" << endl
-            << "  {W*{x зайди на канал {W#dreamland{x или открой приват с ботом {WВалькирия{x" << endl
+            << "  {W*{x зайди на канал {W#дрим-чат{x или открой приват с ботом {WВалькирия{x" << endl
             << "  {W*{x набери {W/link " << discord["token"].asString() << "{x" << endl
             << "Для смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x." << endl;
     } else {

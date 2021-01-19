@@ -24,16 +24,12 @@ public:
     virtual void run( Character *, const DLString & );
 
 protected:    
-    void init( );
-    void destroy( );
-
     bool handleArgument( PCharacter *, const DLString & ) const;
 
     bool printText( PCharacter * ) const;
     void printRow( PCharacter * ) const;
     void printLine( PCharacter * ) const;
 
-    XML_VARIABLE XMLBoolean autocmd, autolist, autotext;
     XML_VARIABLE XMLFlagsWithTable   bit;
     XML_VARIABLE XMLString  rname;
     XML_VARIABLE XMLString  msgOn, msgOff;
@@ -64,9 +60,6 @@ public:
     ConfigCommand( );
 
     virtual void run( Character *, const DLString & );
-
-    void printAllRows( PCharacter * ) const;
-    void printAllTexts( PCharacter * ) const;
 
     inline static ConfigCommand * getThis( )
     {
