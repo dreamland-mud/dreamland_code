@@ -62,7 +62,8 @@ group_transportation.cpp \
 group_weaponsmaster.cpp \
 group_weather.cpp \
 group_movement.cpp \
-group_nature.cpp
+group_nature.cpp \
+group_arcane.cpp
 
 libgroup_skills_la_MOC = \
 group_vampiric.h \

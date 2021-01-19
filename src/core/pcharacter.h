@@ -297,6 +297,8 @@ public:
     GlobalArray            mod_skills;
     /** Bonus to skill group knowledge through affects. */
     GlobalArray            mod_skill_groups;
+    /** Bonus to knowledge of all skills. */
+    int                    mod_skill_all;
     /** Bonus to spell/skill level for particular skill. */
     GlobalArray            mod_level_skills;
     /** Bonus to spell/skill level for particular skill group. */

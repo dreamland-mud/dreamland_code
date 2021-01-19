@@ -43,7 +43,7 @@ public:
     virtual const DLString& getName( ) const;
     virtual short getLog( ) const;
     virtual bool matches( const DLString & ) const;
-    virtual bool properOrder( Character * );
+    virtual bool properOrder( Character * ) const;
     virtual bool dispatch( const InterpretArguments & );
     virtual bool dispatchOrder( const InterpretArguments & );
     virtual void run( Character *, const DLString & );

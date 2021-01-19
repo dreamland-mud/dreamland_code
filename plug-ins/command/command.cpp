@@ -127,8 +127,14 @@ bool Command::matchesAlias( const DLString& command ) const
     return false;
 }
 
-bool Command::properOrder( Character *ch )
+bool Command::properOrder( Character *ch ) const
 {
+    if (ch->is_immortal())
+        return false;
+
+    if (getLevel() > LEVEL_MORTAL)
+        return false;
+
     if (!ch->is_npc( )) 
         return (getOrder( ).isSet( ORDER_ALLOW_RULER ) || !ch->isAffected(gsn_manacles ));
     

@@ -25,8 +25,7 @@ enum {
     FCMD_ALIASES = (B),
     FCMD_HINTS = (C),
     FCMD_WIZARD = (D),
-    FCMD_SHOW_FIRST_RUS = (E),
-    FCMD_IMPORTANT = (F)
+    FCMD_SHOW_FIRST_RUS = (E)
 };
 
 static void show_aliases( Command::Pointer cmd, ostringstream &buf, int flags = 0 )
@@ -87,7 +86,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         buf << "Категория {W" << cat << "{x";
 
         bitstring_t extra = cmd->getExtra();
-        REMOVE_BIT(extra, CMD_HIDDEN|CMD_IMPORTANT|CMD_NO_INTERPRET);
+        REMOVE_BIT(extra, CMD_HIDDEN|CMD_NO_INTERPRET);
         buf << ", можно выполнить {W";
         switch (cmd->getPosition().getValue()) {
             default: buf << "всегда"; break;
@@ -133,9 +132,6 @@ static Categories group_by_categories(Character *ch, int flags)
         if (cmd->getLevel( ) >= LEVEL_HERO)
             continue;
 
-        if (IS_SET(flags, FCMD_IMPORTANT) && !cmd->getExtra( ).isSet( CMD_IMPORTANT ))
-            continue;
-        
         DLString name = (fRus && !cmd->getRussianName().empty()) ? cmd->getRussianName() : cmd->getName();
  
         if (cmd->getCommandCategory().getValue() == 0) {

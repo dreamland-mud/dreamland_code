@@ -308,6 +308,7 @@ void PCharacter::init( )
     loyalty = 0;
     mod_skills.clear();
     mod_skill_groups.clear();
+    mod_skill_all = 0;
     mod_level_all = 0;
     mod_level_spell = 0;
     mod_level_skills.clear();
@@ -647,14 +648,14 @@ DLString PCharacter::getParsedTitle( )
                 break;
             
             case 'c':
-                out << clan->getTitle( this );
+                out << "{C[" << "{" << clan->getColor( ) << clan->getTitle( this ) << "{C]{x";
                 break;
                 
             case 'C':
                 cl = clan->getTitle( this );
                 if (!cl.empty( ))
                     cl.upperFirstCharacter( );
-                out << cl;
+                out << "{C[" << "{" << clan->getColor( ) << cl << "{C]{x";
                 break;
                 
             case 'a':

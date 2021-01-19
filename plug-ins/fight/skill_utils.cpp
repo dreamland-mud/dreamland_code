@@ -238,7 +238,7 @@ int skill_learned_from_affects(const Skill *skill, PCharacter *ch)
     int sn = skill->getIndex();
     int gsn = const_cast<Skill *>(skill)->getGroup()->getIndex();
 
-    return ch->mod_skills[sn] + ch->mod_skill_groups[gsn];
+    return ch->mod_skills[sn] + ch->mod_skill_groups[gsn] + ch->mod_skill_all;
 }
 
 DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
@@ -267,6 +267,9 @@ int skill_level_bonus(Skill &skill, Character *ch)
         slevel += ch->getPC()->mod_level_groups[skill.getGroup()];
         slevel += ch->getPC()->mod_level_skills[skill.getIndex()];
         slevel += ch->getPC()->mod_level_all;
+
+        if (skill.getSpell() && skill.getSpell()->isCasted())
+            slevel += ch->getPC()->mod_level_spell;
     }
 
     if (skill.getGroup() == group_fightmaster && ch->isAffected(gsn_turlok_fury) && chance(50)) {

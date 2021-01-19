@@ -59,6 +59,9 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
     else
         strength = (IS_GOOD(ch) || IS_EVIL(ch)) ? 1:0;
 
+    if (ch->isCoder())
+        strength = 2;
+        
     if (!strength) {
         act_p("О, нет.. Кажется, $C1 нравится твоим Богам..", ch, NULL, victim, TO_CHAR, POS_RESTING);
         return;
@@ -85,6 +88,10 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
 
     af.location = APPLY_SAVING_SPELL;
     af.modifier     = (level / 5) * strength;
+    affect_to_char(victim, &af);
+
+    af.location = APPLY_LEARNED;
+    af.modifier     = -strength * 15;
     affect_to_char(victim, &af);
 
     af.location = APPLY_LEVEL;

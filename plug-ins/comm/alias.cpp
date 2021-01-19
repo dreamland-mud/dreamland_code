@@ -92,7 +92,7 @@ public:
         this->name = COMMAND_NAME;
     }
 
-    virtual bool properOrder( Character *ch )
+    virtual bool properOrder( Character *ch ) const
     {
         if (IS_CHARMED(ch))
             return false;

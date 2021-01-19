@@ -251,6 +251,11 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 {
     Object *obj = NULL;
 
+    if (!pObjIndex) {
+        bug("Reset_area: bad vnum %d for mob %d.", pReset->arg1, mob->pIndexData->vnum);
+        return obj;
+    }
+
     // Obj limit reached, do nothing.
     if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit) 
         return obj;

@@ -132,16 +132,6 @@ bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 DLString quality_percent( int ); /* XXX */
 DLString help_article_disambig(const HelpArticle *help);
 
-CMDRUNP( rules )
-{
-    do_help(ch,"worldrules");
-}
-
-CMDRUNP( wizlist )
-{
-    ch->println("Эта команда устарела, просто набери {y{hcсправка боги{x.");
-}
-
 #define MAX_PROMPT_SIZE 75
 
 CMDRUNP( prompt )
@@ -608,12 +598,6 @@ CMDRUNP( compare )
 }
 
 
-
-CMDRUNP( credits )
-{
-    ch->println("Эта команда устарела, просто набери {y{hcсправка создатели{x.");
-    return;
-}
 
 static void format_where( Character *ch, Character *victim )
 {
@@ -2420,10 +2404,14 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
                     || paf->global.getRegistry() == skillGroupManager) 
                 {
                     buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                        << " знание "
-                        << (paf->global.getRegistry() == skillGroupManager ? "группы" : "навыка")
+                        << " владение "
+                        << (paf->global.getRegistry() == skillGroupManager ? "группой" : "умением")
                         << " " << paf->global.toRussianString().quote() 
                         << " на " << (int)abs(paf->modifier) << endl;
+                } else if (paf->location == APPLY_LEARNED) {
+                    buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                        << " владение всеми умениями на " 
+                        << (int)abs(paf->modifier) << endl;                    
                 }
                 break;
 

@@ -235,12 +235,6 @@ int BasicSkill::getEffective( Character *ch ) const
     if (result < 1)
         return result;
 
-    // Historical anti-bonus from anathema spell.
-    if (IS_AFFECTED(ch, AFF_CURSE)) 
-        for (auto &paf: ch->affected) 
-            if (paf->type == gsn_anathema && paf->location == APPLY_LEVEL) 
-                result = result * 4 / (4 - paf->modifier/3);
-
     // Influence by worn items and affects.
     if (!ch->is_npc())
         result += skill_learned_from_affects(this, ch->getPC());
@@ -253,7 +247,7 @@ int BasicSkill::getEffective( Character *ch ) const
             result = 2 * result / 3;
     }
     
-    // Being drunk would make everything worse if only we had real alcohol.
+    // Being drunk would makes everything worse.
     if (!ch->is_npc( )) 
         if (desire_drunk->isActive( ch->getPC( ) ))
             result = 9 * result / 10;

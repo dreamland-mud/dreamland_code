@@ -339,6 +339,8 @@ CMDRUNP( affects )
             buf << "{yИзменено владение умениями: " << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!learnedGroups.empty())
             buf << "{yИзменено владение группами умений: " << learnedGroups.wrap("{m", "%{y").join(", ") << "." << endl;
+        if (pch->mod_skill_all != 0)
+            buf << "{yВладение всеми умениями изменено на {m" << pch->mod_skill_all << "%{y.{x" << endl;
         if (!levelSkills.empty())
             buf << "{yИзменен уровень умений: " << levelSkills.wrap("{m", "{y").join(", ") << "." << endl;
         if (!levelGroups.empty())

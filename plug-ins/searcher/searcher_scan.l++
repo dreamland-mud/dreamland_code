@@ -242,6 +242,8 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         case APPLY_NONE:
             if (!paf->global.empty() ){
                 p.learned << paf->global.toString() << " ";
+            } else if (paf->location == APPLY_LEARNED) {
+                p.learned << "all" << " ";
             }
             break;
         }
