@@ -1111,10 +1111,10 @@ NMI_INVOKE( CharacterWrapper, get_char_room, "(name): поиск по имени
     return wrap( ::get_char_room( target, room, name ) );
 }
 
-NMI_INVOKE( CharacterWrapper, get_obj_carry, "(name): поиск по имени видимого объекта в экипировке или инвентаре" )
+NMI_INVOKE( CharacterWrapper, get_obj_carry, "(name): поиск объекта в экипировке или видимого объекта в инвентаре, по имени или ID" )
 {
     checkTarget( );
-    return wrap( ::get_obj_carry( target, args2string( args ) ) );
+    return wrap( ::get_obj_wear_carry( target, args2string( args ) ) );
 }
 
 
