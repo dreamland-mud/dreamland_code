@@ -32,6 +32,7 @@
 #include "vnum.h"
 #include "interp.h"
 #include "def.h"
+#include "move_utils.h"
 
 PROF(ranger);
 PROF(druid);
