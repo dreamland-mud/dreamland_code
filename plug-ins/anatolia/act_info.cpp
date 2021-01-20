@@ -113,7 +113,6 @@
 #include "commandflags.h"
 #include "damageflags.h"
 #include "autoflags.h"
-#include <commandmanager.h>
 
 using std::endl;
 using std::min;
