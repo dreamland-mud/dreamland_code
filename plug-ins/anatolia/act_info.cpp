@@ -1012,10 +1012,6 @@ CMDRUNP( report )
         pet->mana.getValue( ), pet->max_mana.getValue( )
         ) << "\r\n";
         page_to_char( buf.str().c_str(), pet->master ) ;
-
-        if(IS_SET(pet->act, ACT_RIDEABLE)){
-            pet->master->println("На мне можно {y{hh1376ездить верхом{x!");
-        }       
         
         if(!skills.empty()){
             buf.str(std::string());
@@ -1086,8 +1082,9 @@ CMDRUNP( report )
 
         
         buf.str(std::string());
+        if(IS_SET(pet->act, ACT_RIDEABLE)) buf << "На мне можно {y{hh1376ездить верхом{x! ";
         if(can_fly(pet)) buf << "Я умею {hh1018летать{x. ";
-        buf << (pet->master->getPC() && pet->master->getPC()->pet && pet->master->getPC()->pet == pet ? "" : "Мне можно {hh1024дать{x вещи и приказать из {hh990надеть{x. ");
+        buf << (pet->master->getPC() && pet->master->getPC()->pet && pet->master->getPC()->pet == pet ? "" : "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ");
         buf << "Мне можно приказать {hh1020поспать{x и другие стандартные команды." << endl;
             
         page_to_char(buf.str().c_str(), pet->master);     
@@ -1101,7 +1098,7 @@ CMDRUNP( report )
         }
         
         else {
-            tell_raw(pet->master, pet, "%s, у меня нет никаких полезных умений!", GET_SEX( pet->master, "Хозяин", "Хозяин", "Хозяйка"));
+            tell_raw(pet->master, pet, "%s, больше я ничегошеньки не умею!", GET_SEX( pet->master, "Хозяин", "Хозяин", "Хозяйка"));
             interpret_raw( pet, "abat", ""); 
         }
         }    
