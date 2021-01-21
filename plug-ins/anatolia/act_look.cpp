@@ -894,8 +894,6 @@ void show_char_wounds( Character *ch, Character *victim, ostringstream &buf )
 
 static void show_char_description( Character *ch, Character *vict )
 {
-    const char *dsc;
-
     if(IS_VAMPIRE(vict)){
         ostringstream buf;
         buf << "Монстр в своем ужасающем обличии. Нечисть и порождение тьмы." << endl
@@ -904,7 +902,8 @@ static void show_char_description( Character *ch, Character *vict )
         page_to_char(buf.str().c_str(), ch);
         return;  
     }
-    else dsc = vict->getDescription( );
+
+    const char *dsc = vict->getDescription( );
 
     if ((vict->is_npc( ) && dsc) || (!vict->is_npc( ) && dsc[0])) {
         ch->send_to( dsc );
