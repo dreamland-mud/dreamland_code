@@ -887,14 +887,22 @@ void show_char_wounds( Character *ch, Character *victim, ostringstream &buf )
 
     buf << ".{x" << endl;
 
-    /* vampire ... */
-    if (percent < 90 && !ch->is_npc( ))
-        desire_bloodlust->gain( ch->getPC( ), -1 );
+    /* vampire ...  comment for history of abuses ;)
+      if (percent < 90 && !ch->is_npc( ))
+        desire_bloodlust->gain( ch->getPC( ), -1 );*/
 }
 
 static void show_char_description( Character *ch, Character *vict )
 {
-    const char *dsc = vict->getDescription( );
+    const char *dsc;
+
+    if(IS_VAMPIRE(vict)){
+        dsc = 
+        "Монстр в своем ужасающем обличии. Нечисть и порождение тьмы.\n\r"
+        "Пара ярко-красных глаз и ослепительно острых клыков сверкают на фоне обсидиановой, почти черной, как ночь, кожи.\n\r"
+        "Огромное и мускулистое тело ночно{Smго{Sfй{Sx хищни{Smка{Sfцы{Sx, обрамленное крыльями, какие есть у летучих мышей, замерло в ожидании.\n\r";
+    }
+    else dsc = vict->getDescription( );
 
     if ((vict->is_npc( ) && dsc) || (!vict->is_npc( ) && dsc[0])) {
         ch->send_to( dsc );
@@ -923,11 +931,11 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
     buf << "(";
 
     if (ch->getConfig( ).rucommands)
-        buf << vict->getRace( )->getNameFor( ch, vict );
+        IS_VAMPIRE(vict) ? buf << GET_SEX(vict, "вампир", "вампир", "вампирша") : buf << vict->getRace( )->getNameFor( ch, vict );
     else
         buf << GET_SEX(vict, "male", "sexless", "female")
             << " "
-            << vict->getRace( )->getName( );
+            << (IS_VAMPIRE(vict) ? "vampire" : vict->getRace( )->getName( ));
 
     buf << ") ";
 }
