@@ -569,7 +569,7 @@ bool Walkment::applyWeb( Character *wch )
     if (MOUNTED(wch))
         return true;
 
-    if ( !CAN_DETECT(wch, ADET_WEB) || !wch->isAffected(gsn_entangle) )
+    if ( !CAN_DETECT(wch, ADET_WEB) && !wch->isAffected(gsn_entangle) )
         return true;
 
     wch->setWaitViolence( 1 );
