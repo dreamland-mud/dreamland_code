@@ -88,7 +88,10 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
     try {
         bitstring_t recite_flags = FSPELL_BANE|FSPELL_CHECK_SAFE|FSPELL_ATTACK_CASTER;
 
-        if (::spell_nocatch(spell, scroll->value0(), ch, t, recite_flags)) {
+        int slevel;
+        slevel = scroll->value0() + skill_level_bonus(*gsn_scrolls, ch);
+      
+        if (::spell_nocatch(spell, slevel, ch, t, recite_flags)) {
             successfulSpells++;
         }
 
@@ -106,7 +109,7 @@ SKILL_RUNP( recite )
     DLString args = argument, arg1;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Какие еще свитки-шмитки?! Ты же воин клана Ярости, а не презренный МАГ!\n\r");
+        ch->send_to("Какие еще свитки-шмитки?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
@@ -118,11 +121,11 @@ SKILL_RUNP( recite )
     }
 
     if (scroll->item_type != ITEM_SCROLL) {
-        ch->send_to("Ты можешь зачитать только свиток.\n\r");
+        ch->send_to("С помощью этой команды можно зачитывать только свитки.\n\r");
         return;
     }
 
-    if (get_wear_level( ch, scroll ) > ch->getModifyLevel( )) {
+    if (get_wear_level( ch, scroll ) > skill_level(*gsn_scrolls, ch)) {
         ch->send_to("Этот свиток чересчур сложен для твоего понимания.\n\r");
         return;
     }
@@ -168,7 +171,7 @@ SKILL_RUNP( brandish )
     Spell::Pointer spell;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Ты же воин клана Ярости, а не презренный МАГ!\n\r");
+        ch->send_to("Палками махать?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
@@ -209,7 +212,7 @@ SKILL_RUNP( brandish )
             bool offensive;
             int level, t;
             
-            level = staff->value0();
+            level = staff->value0() + skill_level_bonus(*gsn_staves, ch);
             offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
             t = spell->getTarget( );            
 
@@ -279,7 +282,7 @@ SKILL_RUNP( zap )
     }
 
     if (( wand = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->send_to("Но ведь в твоих руках ничего нет!\n\r");
+        ch->send_to("Жезл нужно сначала взять в руку.\n\r");
         return;
     }
 
@@ -354,7 +357,10 @@ SKILL_RUNP( zap )
         else {
             try {
                 bitstring_t zap_flags = FSPELL_CHECK_SAFE|FSPELL_BANE|FSPELL_ATTACK_CASTER;
-
+                
+                int slevel;
+                slevel = wand->value0() + skill_level_bonus(*gsn_wands, ch);
+              
                 if (::spell_nocatch(spell, wand->value0(), ch, target, zap_flags))
                     if (spell->getSpellType( ) == SPELL_OFFENSIVE)
                         yell_panic( ch, victim,
