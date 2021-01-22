@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "xmlpolymorphvariable.h"
+#include "wrappertarget.h"
 #include "dlstring.h"
 #include "skillaction.h"
 
@@ -16,16 +17,18 @@ class Object;
 class Room;
 class SpellTarget;
 typedef ::Pointer<SpellTarget> SpellTargetPointer;
-
-class Spell: public virtual SkillAction, public virtual XMLPolymorphVariable {
+class Spell: public virtual SkillAction, public WrapperTarget, public virtual XMLPolymorphVariable {
 public:
     typedef ::Pointer<Spell> Pointer;
     
+    Spell();
     virtual ~Spell( );
 
+    virtual long long getID() const = 0;
+    
     virtual void run( Character *, SpellTargetPointer, int ) = 0;
     virtual void run( Character *, Character *, int, int ) = 0;
-    virtual void run( Character *, Object *, int, int ) = 0;
+    virtual void run( Character *, ::Object *, int, int ) = 0;
     virtual void run( Character *, char *, int, int ) = 0;
     virtual void run( Character *, Room *, int, int ) = 0;
 

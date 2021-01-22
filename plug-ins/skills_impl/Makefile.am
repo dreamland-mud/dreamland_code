@@ -16,7 +16,8 @@ transportspell.cpp \
 sleepaffecthandler.cpp \
 skillhelp.cpp \
 skillgrouphelp.cpp \
-xmlattributerestring.cpp 
+xmlattributerestring.cpp \
+feniaspellhelper.cpp
 
 libskills_impl_la_MOC = \
 basicskill.h \

@@ -8,7 +8,9 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "feniamanager.h"
 
+#include "dlscheduler.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
@@ -16,6 +18,7 @@
 #include "skillreference.h"
 #include "skill_utils.h"
 #include "desire.h"
+#include "feniaspellhelper.h"
 
 #include "fight.h"
 #include "affectflags.h"
@@ -50,11 +53,17 @@ void BasicSkill::loaded( )
 
     if (eventHandler)
         eventHandler->setSkill( Pointer( this ) );
+
+    if (spell)
+        FeniaSpellHelper::linkWrapper(*spell);
 }
 
 void BasicSkill::unloaded( )
 {
-    if (spell) 
+    if (spell)
+        FeniaSpellHelper::extractWrapper(*spell);
+
+    if (spell)
         spell->unsetSkill( );
 
     if (affect) 

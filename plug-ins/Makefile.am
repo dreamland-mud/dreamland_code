@@ -41,6 +41,7 @@ selfrate \
 gquest \
 languages \
 druids \
+feniaroot \
 groups \
 learn \
 magic \
@@ -57,7 +58,6 @@ riding \
 web \
 gmcp \
 craft \
-feniaroot \
 olc \
 searcher
 

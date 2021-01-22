@@ -11,6 +11,7 @@
 #include "skillgroup.h"
 #include "skill_utils.h"
 
+#include "fenia/exceptions.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "object.h"
@@ -48,14 +49,28 @@ GROUP(clan);
 GROUP(combat);
 
 DefaultSpell::DefaultSpell( ) 
-        : target( TAR_IGNORE, &target_table ), 
+        : Spell(),
+          target( TAR_IGNORE, &target_table ), 
           position( POS_STANDING, &position_table ), 
           type( SPELL_NONE, &spell_types ),
           casted( true ),
           ranged(true),
           order(0, &order_flags)
-          
 {
+}
+
+long long DefaultSpell::getID() const
+{
+    int myId = 0;
+
+    if (getSkill()->getSkillHelp())
+        myId = getSkill()->getSkillHelp()->getID();
+
+    if (myId <= 0)
+        throw Scripting::Exception(getSkill()->getName() + ": spell ID not found or zero");
+
+    return (myId << 4) | 5;
+
 }
 
 void DefaultSpell::setSkill( SkillPointer skill )

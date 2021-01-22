@@ -14,6 +14,7 @@
 #include "mobindexwrapper.h"
 #include "objindexwrapper.h"
 #include "areaindexwrapper.h"
+#include "spellwrapper.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -25,6 +26,7 @@
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"
+#include "skillmanager.h"
 #include "dlscheduler.h"
 #include "character.h"
 #include "room.h"
@@ -71,6 +73,16 @@ WrappersPlugin::linkTargets()
     for (auto &pArea: areaIndexes)
         if (pArea->wrapper)
             wrapper_cast<AreaIndexWrapper>(pArea->wrapper)->setTarget( pArea );
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        Spell::Pointer spell = skill->getSpell();
+
+        if (spell && spell->wrapper) {
+            LogStream::sendNotice() << "Fenia spell: setting target for " << skill->getName() << endl;
+            wrapper_cast<SpellWrapper>(spell->wrapper)->setTarget(*spell);
+        }
+    }
 }
 
 void
@@ -83,6 +95,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<MobIndexWrapper>( );
     Class::regMoc<ObjIndexWrapper>( );
     Class::regMoc<AreaIndexWrapper>( );
+    Class::regMoc<SpellWrapper>( );
     Class::regMoc<AffectWrapper>( );
     Class::regMoc<CommandWrapper>( );
     Class::regMoc<TablesWrapper>( );
@@ -117,7 +130,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<RoomWrapper>("room", apiDump, true);     
     traitsAPIJson<MobIndexWrapper>("mob_index", apiDump, false);     
     traitsAPIJson<ObjIndexWrapper>("obj_index", apiDump, false);     
-    traitsAPIJson<AreaIndexWrapper>("area_index", apiDump, false);     
+    traitsAPIJson<AreaIndexWrapper>("area_index", apiDump, false);    
     traitsAPIJson<Root>("root", apiDump, true);     
     traitsAPIJson<AffectWrapper>("affect", apiDump, false);     
     traitsAPIJson<CommandWrapper>("command", apiDump, false);     
@@ -131,7 +144,8 @@ WrappersPlugin::initialization( )
     traitsAPIJson<ReligionWrapper>("religion", apiDump, false);     
     traitsAPIJson<LiquidWrapper>("liquid", apiDump, false);     
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
-    traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);     
+    traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);
+    traitsAPIJson<SpellWrapper>("spell", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
 
     Json::FastWriter writer;
@@ -164,6 +178,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<CommandWrapper>( );
     Class::unregMoc<AffectWrapper>( );
     Class::unregMoc<AreaIndexWrapper>( );
+    Class::unregMoc<SpellWrapper>( );
     Class::unregMoc<ObjIndexWrapper>( );
     Class::unregMoc<MobIndexWrapper>( );
     Class::unregMoc<CharacterWrapper>( );
