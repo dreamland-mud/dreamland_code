@@ -102,11 +102,11 @@ void BackstabOneHit::calcDamage( )
     damApplyEnhancedDamage( );
     damApplyPosition( );
 
-    if (wield != 0)
-        dam = ( ch->getModifyLevel( ) < 50)
-            ? ( ch->getModifyLevel( ) / 10 + 1) * dam + ch->getModifyLevel( )
-            : ( ch->getModifyLevel( ) / 10 ) * dam + ch->getModifyLevel( );
-
+    if (wield != 0) {
+	int slevel = skill_level(*gsn_backstab, ch);    
+        dam = ( slevel / 10 ) * dam + slevel;
+    }
+	
     damApplyDamroll( );
 
     WeaponOneHit::calcDamage( );
@@ -141,11 +141,11 @@ void DualBackstabOneHit::calcDamage( )
     damBase( );
     damApplyEnhancedDamage( );
     damApplyPosition( );
-
-    if (wield != 0)
-        dam = ( ch->getModifyLevel( ) < 56)
-            ? ( ch->getModifyLevel( ) / 14 + 1) * dam + ch->getModifyLevel( )
-            : ( ch->getModifyLevel( ) / 14 ) * dam + ch->getModifyLevel( );
+	
+    if (wield != 0) {
+	int slevel = skill_level(*gsn_dual_backstab, ch);    
+        dam = ( slevel / 10 ) * dam + slevel;
+    }
 
     damApplyDamroll( );
 
@@ -179,7 +179,10 @@ void CircleOneHit::calcDamage( )
     damBase( );
     damApplyEnhancedDamage( );
     damApplyPosition( );
-    dam = ( ch->getModifyLevel( ) / 40 + 1) * dam + ch->getModifyLevel( );
+	
+    int slevel = skill_level(*gsn_circle, ch);    
+    dam = ( slevel / 40 ) * dam + slevel;
+	
     damApplyDamroll( );
     damApplyCounter( );
 
@@ -207,7 +210,10 @@ void KnifeOneHit::calcDamage( )
     damBase( );
     damApplyEnhancedDamage( );
     damApplyPosition( );
-    dam = (ch->getModifyLevel( ) / 30 + 1) * dam + ch->getModifyLevel( );
+	
+    int slevel = skill_level(*gsn_knife, ch);    
+    dam = ( slevel / 30 ) * dam + slevel;
+	
     damApplyDamroll( );
     damApplyCounter( );
 
@@ -252,14 +258,16 @@ SKILL_RUNP( settraps )
 
                 if ( ch->isAffected(gsn_settraps))
                 {
-                        ch->send_to("Ты слишком сильно заботишься еще о старой ловушке.\n\r");
+                        ch->send_to("Ты не можешь уследить больше, чем за одной ловушкой.\n\r");
                         return;
                 }
 
+		int slevel = skill_level(*gsn_settraps, ch);
+		
                 af.bitvector.setTable(&raffect_flags);
                 af.type      = gsn_settraps;
-                af.level     = ch->getModifyLevel();
-                af.duration  = ch->getModifyLevel() / 40;
+                af.level     = slevel;
+                af.duration  = slevel / 40;
                 af.bitvector.setValue(AFF_ROOM_THIEF_TRAP);
                 ch->in_room->affectTo( &af );
 
@@ -340,7 +348,7 @@ SKILL_RUNP( envenom )
 
     if ((skill = gsn_envenom->getEffective( ch )) < 1)
     {
-        ch->send_to("О чем ты думаешь? Отравить себя!..\n\r");
+        ch->send_to("Ты не владеешь этим умением.\n\r");
         return;
     }
 
@@ -381,13 +389,13 @@ SKILL_RUNP( envenom )
         if (IS_WEAPON_STAT(obj,WEAPON_FLAMING)
         ||  IS_WEAPON_STAT(obj,WEAPON_FROST)
         ||  IS_WEAPON_STAT(obj,WEAPON_VAMPIRIC)
-        ||  IS_WEAPON_STAT(obj,WEAPON_SHARP)
         ||  IS_WEAPON_STAT(obj,WEAPON_VORPAL)
         ||  IS_WEAPON_STAT(obj,WEAPON_SHOCKING)
         ||  IS_WEAPON_STAT(obj,WEAPON_HOLY)
+        ||  IS_WEAPON_STAT(obj,WEAPON_FADING)	    
         ||  IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
         {
-            act_p("Ты не можешь отравить ядом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+            act_p("Мощные свойства $o2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR,POS_RESTING);
             return;
         }
 
@@ -408,10 +416,12 @@ SKILL_RUNP( envenom )
         if (percent < skill)
         {
 
+	    int slevel = skill_level(*gsn_envenom, ch);
+		
             af.bitvector.setTable(&weapon_type2);
             af.type      = gsn_poison;
-            af.level     = ch->getModifyLevel() * percent / 100;
-            af.duration  = ch->getModifyLevel() * percent / 100;
+            af.level     = slevel * percent / 100;
+            af.duration  = slevel * percent / 100;
             
             af.modifier  = 0;
             af.bitvector.setValue(WEAPON_POISON);
@@ -458,7 +468,7 @@ SKILL_RUNP( steal )
 
         if ( ch->is_npc() || skill <= 1)
         {
-                ch->send_to("Кажется, ты не умеешь красть?\n\r");
+                ch->send_to("Ты не умеешь воровать.\n\r");
                 return;
         }
 
@@ -516,6 +526,7 @@ SKILL_RUNP( steal )
 
         percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -30 );
         percent += victim->can_see( ch ) ? 20 : 0;
+	percent += skill_level_bonus(*gsn_steal, ch);
 
         if (ch->isCoder())
             percent = 1;
@@ -534,7 +545,7 @@ SKILL_RUNP( steal )
          * Failure.
          */
 
-                ch->send_to("Упс..\n\r");
+                ch->send_to("Тебя застукали за попыткой воровства!\n\r");
                 if ( !IS_AFFECTED( victim, AFF_SLEEP ) )
                 {
                         victim->position= victim->position==POS_SLEEPING? POS_STANDING:
@@ -791,10 +802,11 @@ protected:
 
         percent  = number_percent( ) + (IS_AWAKE(ch) ? 30 : -30);
         percent += ch->can_see( actor ) ? 20 : 0;
+	percent += skill_level_bonus(*gsn_push, ch);    
 
         if (percent > gsn_push->getEffective( actor )) {
             fSuccess = false;
-            actor->pecho( "Упс.." );
+            actor->pecho( "Тебя застукали за попыткой вытолкать жертву!" );
 
             if (!IS_AFFECTED( ch, AFF_SLEEP )) {
                 ch->position = ch->position == POS_SLEEPING ? POS_STANDING: ch->position;
@@ -959,7 +971,7 @@ SKILL_RUNP( backstab )
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-            ch->send_to("Этого нет здесь.\n\r");
+            ch->send_to("Таких здесь нет.\n\r");
             return;
     }
 
@@ -984,7 +996,7 @@ SKILL_RUNP( backstab )
 
     if ( attack_table[obj->value3()].damage != DAM_PIERCE && obj->value0() != WEAPON_DAGGER )
     {
-            ch->send_to("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием.\n\r");
+            ch->send_to("Чтобы ударить сзади, нужно вооружиться кинжалом с колющим острием.\n\r");
             return;
     }
 
@@ -996,7 +1008,7 @@ SKILL_RUNP( backstab )
 
     if ( ch->fighting != 0 )
     {
-            ch->send_to("Тебе некогда подкрадываться к противнику - ты сражаешься!\n\r");
+            ch->send_to("Тебе некогда подкрадываться к противнику -- ты сражаешься!\n\r");
             return;
     }
 
@@ -1005,7 +1017,7 @@ SKILL_RUNP( backstab )
     if ( victim->hit < (0.7 * victim->max_hit)
             && (IS_AWAKE(victim) ) )
     {
-            act_p( "$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна ... ты не можешь незаметно подкрасться к не$Gму|му|й.",
+            act_p( "$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна... ты не можешь незаметно подкрасться к не$Gму|му|й.",
                     ch, 0, victim, TO_CHAR,POS_RESTING);
             return;
     }
@@ -1021,7 +1033,8 @@ SKILL_RUNP( backstab )
         return;
 
     BackstabOneHit bs( ch, victim );
-    int bsBonus = 0, hasteBonus = 0;
+    int bsBonus = 0, hasteBonus = 0, sBonus = 0;
+    sBonus += skill_level_bonus(*gsn_backstab, ch);	
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
@@ -1031,7 +1044,7 @@ SKILL_RUNP( backstab )
         hasteBonus+= number_range(20,25);
     }
 
-    Chance bsChance(ch, gsn_backstab->getEffective(ch)-1+bsBonus, 100);
+    Chance bsChance(ch, gsn_backstab->getEffective(ch)-1+bsBonus+sBonus, 100);
 
     try {
         if (!IS_AWAKE(victim)
@@ -1055,7 +1068,7 @@ SKILL_RUNP( backstab )
             else if (bsBonus > 0 && dual_percent > 50)
                 dual_chance = 100;
             else
-                dual_chance =  dual_percent * 8 / 10;
+                dual_chance = skill_level_bonus(*gsn_dual_backstab, ch) + dual_percent * 8 / 10;
 
             if (Chance(ch, dual_chance-1, 100).reroll()) {
                 gsn_dual_backstab->improve( ch, true, victim );
@@ -1077,7 +1090,7 @@ SKILL_RUNP( backstab )
             else if (bsBonus > 0 && dual_percent > 50)
                 dual_chance = 100;
             else
-                dual_chance =  dual_percent * 8 / 10;
+                dual_chance = skill_level_bonus(*gsn_dual_backstab, ch) + dual_percent * 8 / 10;
 
             if (Chance(ch, dual_chance-1, 100).reroll()) {
                 gsn_dual_backstab->improve( ch, true, victim );
@@ -1158,6 +1171,7 @@ SKILL_RUNP( circle )
 
     CircleOneHit circ( ch, victim );
     int circleBonus = 0;
+    circleBonus += skill_level_bonus(*gsn_circle, ch);
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
@@ -1213,7 +1227,7 @@ SKILL_RUNP( blackjack )
 
         if ( ch == victim )
         {
-                ch->send_to("Не надо.. можешь потерять сознание.\n\r");
+                ch->send_to("Не надо... можешь потерять сознание.\n\r");
                 return;
         }
 
@@ -1258,6 +1272,8 @@ SKILL_RUNP( blackjack )
         chance = ( int ) ( 0.5 * gsn_blackjack->getEffective( ch ) );
         chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
         chance += victim->can_see(ch) ? 0 : 5;
+	chance += skill_level_bonus(*gsn_blackjack, ch);
+	
         if (victim->is_npc( )
             && victim->getNPC( )->behavior
             && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
@@ -1356,7 +1372,8 @@ SKILL_RUNP( knife )
     if (is_safe(ch, victim))
         return;
 
-    chance = gsn_knife->getEffective( ch );
+    chance = min(100, gsn_knife->getEffective( ch ) + skill_level_bonus(*gsn_knife, ch));
+	
     ch->setWait( gsn_knife->getBeats( ) );
 
     try {
@@ -1441,7 +1458,10 @@ SKILL_RUNP( forge )
         ch->setWait( gsn_key_forgery->getBeats( ) );
         ch->mana -= gsn_key_forgery->getMana( );
 
-        if (number_percent( ) >= gsn_key_forgery->getEffective( ch )) {
+	int chance;
+	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
+	    
+        if (number_percent( ) >= chance) {
             act( "Тебе не удалось точно передать рисунок бороздок $o2.", ch, key, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );
             return;
@@ -1491,7 +1511,10 @@ SKILL_RUNP( forge )
         ch->setWait( gsn_key_forgery->getBeats( ) );
         ch->mana -= gsn_key_forgery->getMana( );
 
-        if (number_percent( ) >= gsn_key_forgery->getEffective( ch )) {
+	int chance;
+	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 
+	    
+        if (number_percent( ) >= chance) {
             act( "Твои попытки превратить $o4 в отмычку к этому замку ни к чему не привели.", ch, blank, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );
             return;
