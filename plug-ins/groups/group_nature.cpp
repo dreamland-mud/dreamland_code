@@ -210,9 +210,9 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     int dam;
     PCharacter *victim;
 
-    if (ch->in_room->getSectorType() != SECT_FOREST ||
-        ch->in_room->getSectorType() != SECT_FIELD ||
-        ch->in_room->getSectorType() != SECT_HILLS ||
+    if (ch->in_room->getSectorType() != SECT_FOREST &&
+        ch->in_room->getSectorType() != SECT_FIELD &&
+        ch->in_room->getSectorType() != SECT_HILLS &&
         ch->in_room->getSectorType() != SECT_MOUNTAIN )
     {
         ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
