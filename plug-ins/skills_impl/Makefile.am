@@ -30,7 +30,8 @@ spellmanager.h \
 summoncreaturespell.h \
 transportspell.h \
 sleepaffecthandler.h \
-xmlattributerestring.h
+xmlattributerestring.h \
+feniaspellhelper.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

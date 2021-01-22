@@ -82,7 +82,7 @@ DLString args2word( const RegisterList &args )
 
 Character * args2character( const RegisterList &args )
 {
-    return wrapper_cast<CharacterWrapper>( get_unique_arg(args) )->getTarget( );
+    return arg2character(get_unique_arg(args));
 }
 
 PCharacter * args2player( const RegisterList &args )
@@ -170,7 +170,7 @@ RegisterList argnum2list(const RegisterList &args, int num)
 Character *argnum2character(const RegisterList &args, int num)
 {
     const Register &reg = argnum(args, num);
-    return wrapper_cast<CharacterWrapper>(reg)->getTarget();
+    return arg2character(reg);
 }
 
 PCharacter *argnum2player(const RegisterList &args, int num)

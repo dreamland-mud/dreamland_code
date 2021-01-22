@@ -23,6 +23,7 @@
 #include "tableswrapper.h"
 #include "validatetask.h"
 #include "structwrappers.h"
+#include "feniaspellhelper.h"
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"
@@ -146,6 +147,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
     traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);
     traitsAPIJson<SpellWrapper>("spell", apiDump, false);
+    traitsAPIJson<FeniaSpellContext>("spellcontext", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
 
     Json::FastWriter writer;
