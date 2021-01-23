@@ -43,6 +43,7 @@
 #include "../../anatolia/handler.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
     
 GSN(haggle);
 BONUS(black_friday);
