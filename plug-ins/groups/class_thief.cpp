@@ -55,6 +55,7 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
 
 GSN(key_forgery);
 BONUS(thief_skills);
