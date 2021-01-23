@@ -56,6 +56,7 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
 
 PROF(ranger);
 
@@ -84,7 +85,7 @@ SKILL_RUNP( track )
     int d;
 
     if (gsn_track->getEffective( ch ) < 2) {
-        ch->send_to("Здесь нет следов.\r\n");
+        ch->send_to("Ты не умеешь читать следы на земле.\r\n");
         return;
     }
 
@@ -96,7 +97,10 @@ SKILL_RUNP( track )
     ch->setWait( gsn_track->getBeats( ) );
     act_p("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM,POS_RESTING);
 
-    if (number_percent() < gsn_track->getEffective( ch ))
+    int slevel;
+    slevel = gsn_track->getEffective( ch ) + skill_level_bonus(*gsn_track, ch);  
+    
+    if (number_percent() < slevel)
         if (( d = ch->in_room->history.went( arg, false ) ) != -1) {
             if (( pexit = ch->in_room->exit[d] )) {
 
@@ -138,7 +142,7 @@ static Object * find_arrow( Character *ch, Object *quiver )
         return NULL;
     }
 
-    if (ch->getRealLevel( ) + 10 < arrow->level) {
+    if (ch->getModifyLevel( ) + 10 < arrow->level) {
         ch->println("Тебе не хватает опыта воспользоватся этой стрелой.");
         return NULL;
     }
@@ -257,7 +261,7 @@ SKILL_RUNP( shoot )
 
     ch->setWait( gsn_bow->getBeats( )  );
 
-    chance = (gsn_bow->getEffective( ch ) - 50) * 2;
+    chance = skill_level_bonus(*gsn_bow, ch) + (gsn_bow->getEffective( ch ) - 50) * 2;
     if ( victim->position == POS_SLEEPING )
             chance += 40;
     if ( victim->position == POS_RESTING )
@@ -330,7 +334,7 @@ SKILL_RUNP( herbs )
 
   if (ch->isAffected(gsn_herbs))
     {
-      ch->send_to("Ты пока не можешь искать травы.\n\r");
+      ch->send_to("Ты пока не можешь применять целебные травы, подожди немного.\n\r");
       return;
     }
 
@@ -347,31 +351,32 @@ SKILL_RUNP( herbs )
     {
       postaffect_to_char(ch, gsn_herbs, 5);
 
-      ch->send_to("Ты собираешь целебные травы.\n\r");
-      act_p("$c1 собирает какие-то травы.",ch,0,0,TO_ROOM,POS_RESTING);
+      ch->send_to("Ты собираешь целебные травы по окрестностям.\n\r");
+      act_p("$c1 собирает какие-то травы по окрестностям.",ch,0,0,TO_ROOM,POS_RESTING);
 
       if (ch != victim)
         {
-          act_p("$c1 дает тебе покушать травы.",ch,0,victim,TO_VICT,POS_RESTING);
-          act_p("Ты даешь травы $C3.",ch,0,victim,TO_CHAR,POS_RESTING);
-          act_p("$c1 дает травы $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+          act_p("$c1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT,POS_RESTING);
+          act_p("Ты накладываешь целебные травы на раны $C2.",ch,0,victim,TO_CHAR,POS_RESTING);
+          act_p("$c1 накладывает целебные травы на раны $C2.",ch,0,victim,TO_NOTVICT,POS_RESTING);
         }
         
       if (victim->hit < victim->max_hit)
         {
-          victim->send_to("Ты чувствуешь себя лучше.\n\r");
-          act_p("$c1 выглядит лучше.",victim,0,0,TO_ROOM,POS_RESTING);
+          victim->send_to("Ты чувствуешь себя здоровее.\n\r");
+          act_p("$c1 выглядит здоровее.",victim,0,0,TO_ROOM,POS_RESTING);
         }
-      victim->hit = min((int)victim->max_hit,victim->hit + 5 * ch->getModifyLevel() );
+      int slevel = skill_level(*gsn_herbs, ch);
+      victim->hit = min((int)victim->max_hit,victim->hit + 5 * slevel );
       gsn_herbs->improve( ch, true, victim );
       
-      checkDispel( ch->getModifyLevel( ), victim, gsn_plague );
-      checkDispel( ch->getModifyLevel( ), victim, gsn_poison );
+      checkDispel( slevel, victim, gsn_plague );
+      checkDispel( slevel, victim, gsn_poison );
     }
   else
     {
-      ch->send_to("Ты ищешь травы, но ничего не находишь.\n\r");
-      act_p("$c1 озирается в поисках травы.",ch,0,0,TO_ROOM,POS_RESTING);
+      ch->send_to("Ты ищешь целебные травы, но ничего не находишь.\n\r");
+      act_p("$c1 рыщет в поисках целебных трав, но ничего не находит.",ch,0,0,TO_ROOM,POS_RESTING);
       gsn_herbs->improve( ch, false, victim );
     }
 }
@@ -392,7 +397,7 @@ SKILL_RUNP( camp )
 
   if (ch->isAffected(gsn_camp))
     {
-      ch->println("У тебя нет сил разбить новый лагерь.");
+      ch->println("Ты пока не можешь разбить лагерь, подожди немного.");
       return;
     }
 
@@ -406,7 +411,7 @@ SKILL_RUNP( camp )
 
   if (!IS_NATURE(ch->in_room))
   {
-    ch->println("Здесь недостаточно растительности для разбивки лагеря.");
+    ch->println("Разбить полевой лагерь можно только на лоне природы.");
     return;
   }
 
@@ -420,22 +425,23 @@ SKILL_RUNP( camp )
   ch->mana -= gsn_camp->getMana( );
   ch->setWait( gsn_camp->getBeats( ) );
 
-  act("Ты разбиваешь лагерь.", ch, 0, 0, TO_CHAR);
-  act("$c1 разбивает лагерь.", ch, 0, 0, TO_ROOM);
+  act("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
+  act("$c1 разбивает полевой лагерь.", ch, 0, 0, TO_ROOM);
 
-  
+  int slevel = skill_level(*gsn_camp, ch);
+    
   postaffect_to_char(ch, gsn_camp, 12);
 
 
   af2.type              = gsn_camp;
-  af2.level              = ch->getModifyLevel();
-  af2.duration           = ch->getModifyLevel() / 20;
-  af2.modifier           = 2 * ch->getModifyLevel();
+  af2.level              = slevel;
+  af2.duration           = slevel / 20;
+  af2.modifier           = 4 * slevel;
   af2.location.setTable(&apply_room_table);
   af2.location = APPLY_ROOM_HEAL;
   ch->in_room->affectTo( &af2);
 
-  af2.modifier           = ch->getModifyLevel();
+  af2.modifier           = 2 * slevel;
   af2.location = APPLY_ROOM_MANA;
   ch->in_room->affectTo( &af2);
 }
@@ -469,7 +475,7 @@ SKILL_RUNP( bearcall )
 
   if ( ch->mana < gsn_bear_call->getMana( ))
   {
-     ch->send_to( "У тебя не хватает сил, чтобы крикнуть медведям.\n\r");
+     ch->send_to( "У тебя не хватает сил, чтобы призвать на помощь медведей.\n\r");
      return;
   }
 
@@ -481,7 +487,7 @@ SKILL_RUNP( bearcall )
 
   if ( number_percent( ) > gsn_bear_call->getEffective( ch ) )
   {
-        ch->send_to( "Медведи не слушают тебя.\n\r");
+        ch->send_to( "Медведи не слышат твой зов, стоит еще попрактиковаться.\n\r");
         gsn_bear_call->improve( ch, false );
         return;
   }
@@ -496,28 +502,37 @@ SKILL_RUNP( bearcall )
 SPELL_DECL_T(BearCall, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, BearCall)::createMobile( Character *ch, int level ) const 
 {
+    int slevel;
+    slevel = skill_level(*gsn_bear_call, ch);
+    
     return createMobileAux( ch, level, 
                          (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit), 
                          (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
-                         number_range(level/15, level/10),
-                         number_range(level/3, level/2),
-                         number_range(level/8, level/6) );
+                         number_range(slevel/15, slevel/10),
+                         number_range(slevel/3, slevel/2),
+                         number_range(slevel/8, slevel/6) );
 }
 
 TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const 
 {
   if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
-     ch->send_to( "Здесь медведи не услышат тебя.\n\r");
+     ch->send_to( "В эту местность медведям путь заказан.\n\r");
      return false;
   }
 
-  if (!ch->in_room->hasExits() || !IS_NATURE(ch->in_room))
+  if (!ch->in_room->hasExits())
   {
-    ch->send_to( "Медведи не пришли к тебе на помощь.\n\r");
+    ch->send_to( "Медведи не смогут пройти к тебе.\n\r");
     return false;
   }
-
+    
+  if (!IS_NATURE(ch->in_room))
+  {
+    ch->send_to( "Медведи придут на помощь только на лоне природы.\n\r");
+    return false;
+  }
+    
   return true;
 }    
 
@@ -538,7 +553,7 @@ SKILL_RUNP( lioncall )
 
   if ( ch->mana < gsn_lion_call->getMana( ))
   {
-       ch->send_to( "У тебя не хватает сил, чтобы позвать львов.\n\r");
+       ch->send_to( "У тебя не хватает энергии, чтобы позвать львов.\n\r");
        return;
     }
 
@@ -550,7 +565,7 @@ SKILL_RUNP( lioncall )
 
   if ( number_percent( ) > gsn_lion_call->getEffective( ch ) )
   {
-    ch->send_to( "Львы не слушают тебя.\n\r");
+    ch->send_to( "Львы не слышат твой зов, стоит еще попрактиковаться.\n\r");
     gsn_lion_call->improve( ch, false );
     return;
     }
@@ -565,25 +580,34 @@ SKILL_RUNP( lioncall )
 SPELL_DECL_T(LionCall, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, LionCall)::createMobile( Character *ch, int level ) const 
 {
+    int slevel;
+    slevel = skill_level(*gsn_lion_call, ch);
+    
     return createMobileAux( ch, level, 
                          (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit), 
                          (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
-                         number_range(level/15, level/10),
-                         number_range(level/3, level/2),
-                         number_range(level/8, level/6) );
+                         number_range(slevel/15, slevel/10),
+                         number_range(slevel/3, slevel/2),
+                         number_range(slevel/8, slevel/6) );
 }
 
 TYPE_SPELL(bool, LionCall)::canSummonHere( Character *ch ) const 
 {
   if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
-     ch->send_to( "Здесь львы не услышат тебя.\n\r");
+     ch->send_to( "В эту местность львам путь заказан.\n\r");
      return false;
   }
 
-  if (!ch->in_room->hasExits() || !IS_NATURE(ch->in_room))
+  if (!ch->in_room->hasExits())
   {
-    ch->send_to( "Львы не пришли к тебе на помощь.\n\r");
+    ch->send_to( "Львы не смогут пройти к тебе.\n\r");
+    return false;
+  }
+    
+  if (!IS_NATURE(ch->in_room))
+  {
+    ch->send_to( "Львы придут на помощь только на лоне природы.\n\r");
     return false;
   }
 
@@ -606,14 +630,14 @@ static Object * create_arrow( int color, int level )
     tohit.level              = level;
     tohit.duration           = -1;
     tohit.location = APPLY_HITROLL;
-    tohit.modifier           = level / 10;
+    tohit.modifier           = level / 10 + 1;
     affect_to_obj( arrow, &tohit);
 
     todam.type               = gsn_make_arrow;
     todam.level              = level;
     todam.duration           = -1;
     todam.location = APPLY_DAMROLL;
-    todam.modifier           = level / 10;
+    todam.modifier           = level / 10 + 1;
     affect_to_obj( arrow, &todam);
 
     if (color != 0 && color != gsn_make_arrow)
@@ -700,11 +724,9 @@ SKILL_RUNP( makearrow )
         return;
     }
 
-    if ( ch->in_room->getSectorType() != SECT_FIELD
-            && ch->in_room->getSectorType() != SECT_FOREST
-            && ch->in_room->getSectorType() != SECT_HILLS )
+    if (!IS_NATURE(ch->in_room))
     {
-        ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
+        ch->send_to( "В этой местности тебе не удается найти древесины для изготовления стрел.\n\r");
         return;
     }
 
@@ -751,12 +773,13 @@ SKILL_RUNP( makearrow )
     act_p("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM,POS_RESTING);
 
     if (number_percent() > arrowSkill->getEffective( ch )) {
-        ch->send_to("..но у тебя ничего не выходит.\n\r");
+        ch->send_to("Неудача. Придется еще попрактиковаться...\n\r");
         arrowSkill->improve( ch, false );
         return;
     }
     
-    count = ch->getModifyLevel( ) / 5;
+    int slevel = skill_level(*gsn_make_arrow, ch);
+    count = slevel / 5;
 
     for (int i = 0; i < count; i++) {
         if (number_percent( ) > gsn_make_arrow->getEffective( ch )) {
@@ -766,7 +789,7 @@ SKILL_RUNP( makearrow )
         }
 
         ch->send_to( "Ты изготавливаешь стрелу.\n\r");
-        obj_to_char( create_arrow( arrowSkill->getIndex( ), ch->getModifyLevel( ) ), ch );
+        obj_to_char( create_arrow( arrowSkill->getIndex( ), slevel ), ch );
     }
 
     arrowSkill->improve( ch, true );
@@ -791,10 +814,9 @@ SKILL_RUNP(makebow)
         return;
     }
 
-    if (ch->in_room->getSectorType() != SECT_FIELD &&
-        ch->in_room->getSectorType() != SECT_FOREST &&
-        ch->in_room->getSectorType() != SECT_HILLS) {
-        ch->send_to("Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
+    if (!IS_NATURE(ch->in_room))
+    {
+        ch->send_to( "В этой местности тебе не удается найти древесины для изготовления лука.\n\r");
         return;
     }
 
@@ -847,7 +869,7 @@ SKILL_RUNP( forest )
     int mana;
 
     if (ch->is_npc() || !gsn_forest_fighting->getEffective( ch )) {
-        ch->send_to("Какой такой лес?\n");
+        ch->send_to("Ты не владеешь этим умением.\n");
         return;
     }
     
@@ -893,9 +915,11 @@ SKILL_RUNP( forest )
     if (ch->isAffected(gsn_forest_fighting))
         affect_strip(ch, gsn_forest_fighting);
     
+    int slevel = skill_level(*gsn_forest_fighting, ch);
+    
     af.type           = gsn_forest_fighting;
-    af.level          = ch->getModifyLevel();
-    af.duration         = (6 + ch->getModifyLevel() / 2);
+    af.level          = slevel;
+    af.duration         = (6 + slevel / 2);
 
     if (attack) {
         af.modifier  = FOREST_ATTACK; 
@@ -913,9 +937,7 @@ SKILL_RUNP( forest )
 
 BOOL_SKILL( forest )::run( Character *ch, int type ) 
 {
-    if (ch->in_room->getSectorType() != SECT_FOREST
-        && ch->in_room->getSectorType() != SECT_HILLS
-        && ch->in_room->getSectorType() != SECT_MOUNTAIN) 
+    if (!IS_NATURE(ch->in_room))
         return false;
     
     if (ch->is_npc( ))
@@ -994,7 +1016,7 @@ SKILL_RUNP( butcher )
 
         obj->value0(obj->value0() - numsteaks);
 
-        if ( number_percent() < gsn_butcher->getEffective( ch ) )
+        if ( number_percent() < gsn_butcher->getEffective( ch ) + skill_level_bonus(*gsn_butcher, ch) )
         {
                 int i;
                 Object *steak;
@@ -1043,23 +1065,23 @@ SKILL_RUNP( tiger )
         ch->send_to("Что?\n\r");
         return;
     }
-    act_p("$c1 призывает силу 10 тигров!.",ch,0,0,TO_ROOM,POS_RESTING);
+    act_p("$c1 призывает силу десяти тигров!",ch,0,0,TO_ROOM,POS_RESTING);
 
     if (IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk) ||
     ch->isAffected(gsn_tiger_power) || ch->isAffected(gsn_frenzy))
     {
-        ch->send_to("Ты немного злишься.\n\r");
+        ch->send_to("Ты уже в состоянии боевой ярости!\n\r");
         return;
     }
 
     if (IS_AFFECTED(ch,AFF_CALM))
     {
-        ch->send_to("Ты слишком миролюбив для этого.\n\r");
+        ch->send_to("Ты слишком миролюбив{Sfа{Sx для этого.\n\r");
         return;
     }
     if (!IS_NATURE(ch->in_room))
   {
-    ch->send_to("Нет никого, кто услышал бы твой призыв.\n\r");
+    ch->send_to("Это умение сработает только на лоне природы.\n\r");
     return;
   }
 
@@ -1079,6 +1101,7 @@ SKILL_RUNP( tiger )
 
     hp_percent = HEALTH(ch);
     chance += 25 - hp_percent/2;
+    chance += skill_level_bonus(*gsn_tiger_power, ch);
 
     if (number_percent() < chance)
     {
@@ -1087,8 +1110,10 @@ SKILL_RUNP( tiger )
         ch->setWaitViolence( 1 );
         ch->mana -= mana;
 
+        int slevel = skill_level(*gsn_tiger_power, ch);
+            
         /* heal a little damage */
-        ch->hit += ch->getModifyLevel() * 2;
+        ch->hit += slevel * 2;
         ch->hit = min(ch->hit,ch->max_hit);
 
         ch->send_to("10 тигров приходят на твой призыв, когда ты зовешь их!\n\r");
@@ -1097,10 +1122,10 @@ SKILL_RUNP( tiger )
         gsn_tiger_power->improve( ch, true );
 
         af.type                = gsn_tiger_power;
-        af.level        = ch->getModifyLevel();
-        af.duration        = number_fuzzy( ch->getModifyLevel() / 8);
+        af.level        = slevel;
+        af.duration        = number_fuzzy( slevel / 8);
 
-        af.modifier        = max( 1, ch->getModifyLevel() / 5 );
+        af.modifier        = max( 1, slevel / 5 );
         af.location = APPLY_HITROLL;
         affect_to_char(ch,&af);
 
@@ -1109,7 +1134,7 @@ SKILL_RUNP( tiger )
         af.bitvector.setValue(AFF_BERSERK);
         affect_to_char(ch,&af);
 
-        af.modifier        = max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
+        af.modifier        = max( 10, 10 * ( slevel / 5 ) );
         af.location = APPLY_AC;
         af.bitvector.clear();
         affect_to_char(ch,&af);
@@ -1120,7 +1145,7 @@ SKILL_RUNP( tiger )
         ch->setWaitViolence( 2 );
         ch->mana -= mana / 2;
 
-        ch->send_to("Твоя сила повышается, но ничего не выходит.\n\r");
+        ch->send_to("Тебе не удается войти в боевую ярость.\n\r");
         gsn_tiger_power->improve( ch, false );
     }
 }
@@ -1237,7 +1262,7 @@ SKILL_RUNP( ambush )
     try {
         if ( !IS_AWAKE(victim)
                 || ch->is_npc()
-                || number_percent( ) < gsn_ambush->getEffective( ch ) )
+                || number_percent( ) < gsn_ambush->getEffective( ch ) + skill_level_bonus(*gsn_ambush, ch) )
         {
                 gsn_ambush->improve( ch, true, victim );
                 amb.hit( );
@@ -1343,7 +1368,7 @@ SKILL_RUNP( camouflage )
         }
 
         if ( ch->is_npc()
-                || number_percent( ) < gsn_camouflage->getEffective( ch ) * k / 100 )
+                || number_percent( ) < ( gsn_camouflage->getEffective( ch ) + skill_level_bonus(*gsn_camouflage, ch) ) * k / 100 )
         {
                 ch->println("Ты маскируешься на местности.");
                 SET_BIT(ch->affected_by, AFF_CAMOUFLAGE);
