@@ -28,6 +28,7 @@
 #include "fight.h"
 #include "act.h"
 #include "def.h"
+#include "skill_utils.h"
 
 PROF(samurai);
 BONUS(experience);
