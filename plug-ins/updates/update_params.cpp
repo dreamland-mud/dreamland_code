@@ -32,6 +32,7 @@
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
+#include "skill_utils.h"
 
 GSN(bandage);
 GSN(magic_concentrate);
@@ -116,7 +117,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     case POS_SLEEPING:
         if (gsn_curl->usable( ch )) {
             if (number_percent( ) < gsn_curl->getEffective( ch )) {
-                gain += gain / 20;
+                gain += (gain * skill_level_bonus(*gsn_curl, ch) )/ 20 ;
                 gsn_curl->improve( ch, true );
             }
         }
