@@ -81,13 +81,13 @@ SKILL_RUNP( smithing )
 
     if (( hammer = get_eq_char(ch, wear_hold)) == 0)
     {
-        ch->send_to("Но у тебя нет боевого молота.\n\r");
+        ch->send_to("Сначала возьми в руки кузнечный молот.\n\r");
         return;
     }
 
     if ( hammer->pIndexData->vnum != OBJ_VNUM_HAMMER )
     {
-        ch->send_to("Но это не молот.\n\r");
+        ch->send_to("Тебе понадобится специальный молот -- ищи его в Королевстве Дварфов.\n\r");
         return;
     }
 
@@ -98,9 +98,9 @@ SKILL_RUNP( smithing )
         ch->recho( "%1$^O1 по%1$nет|ют под руками %2$C2, обретая первозданный вид.", obj, ch );
         obj->condition = 100;
     }
-    else if ( number_percent() > gsn_smithing->getEffective( ch ) ) {
+    else if ( number_percent() > gsn_smithing->getEffective( ch ) + skill_level_bonus(*gsn_smithing, ch) ) {
         gsn_smithing->improve( ch, false );
-        act_p("$c1 пробует восстановить $o4, но у него не получается.",ch,obj,0,TO_ROOM,POS_RESTING);
+        act_p("$c1 пробует восстановить $o4, но безуспешно.",ch,obj,0,TO_ROOM,POS_RESTING);
         act_p("У тебя не получилось восстановить $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
         hammer->condition -= 25;
     }
@@ -109,7 +109,7 @@ SKILL_RUNP( smithing )
         act_p("$c1 восстанавливает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
         act_p("Ты восстанавливаешь $o4.\n\r",ch,obj,0,TO_CHAR,POS_RESTING);
 
-        obj->condition += gsn_smithing->getEffective( ch ) / 2;
+        obj->condition += ( gsn_smithing->getEffective( ch ) + skill_level_bonus(*gsn_smithing, ch) ) / 2;
         obj->condition = max( 100, obj->condition );
         hammer->condition -= 25;
     }
