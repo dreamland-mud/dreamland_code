@@ -433,8 +433,9 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
     {
         int skill = gsn_leadership->getEffective( leader );
         
-         if (number_percent( ) < skill / 2) {
+         if (number_percent( ) < skill / 2 + skill_level_bonus(*gsn_leadership, ch) {
             xp += (xp * skill / 2) / 100;
+            xp += skill_level_bonus(*gsn_leadership, ch) * 10; 
             act_p( "{cБлагодаря умелому руководству $C2 ты получаешь больше опыта.{x",
                         gch, 0, leader, TO_CHAR, POS_RESTING );
             gsn_leadership->improve( leader, true );        
@@ -510,7 +511,7 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
       if (gch->perm_stat[STAT_CHA] < gch->getPC( )->getMaxTrain( STAT_CHA )
         && IS_GOOD(gch) )
       {
-       gch->send_to("Твое обаяние (charisma) повысилось на единицу.\n\r");
+       gch->send_to("Твое обаяние{le (charisma){x повысилось на единицу.\n\r");
        gch->perm_stat[STAT_CHA] += 1;
       }
      }
@@ -521,7 +522,7 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
         && victim->getModifyLevel( ) - gch->getModifyLevel( ) >= 20 
         && chance( 10 ))
     {
-        act("Ты уби$gло|л|ла достойного противника, и твое обаяние (charisma) повысилось на единицу.", gch, 0, 0, TO_CHAR);
+        act("Ты уби$gло|л|ла достойного противника, и твое обаяние{le (charisma){x повысилось на единицу.", gch, 0, 0, TO_CHAR);
         gch->perm_stat[STAT_CHA] += 1;
     }
     
