@@ -48,6 +48,7 @@
 #include "act.h"
 #include "vnum.h"
 #include "def.h"
+#include "skill_utils.h"
 
 CLAN(battlerager);
 
