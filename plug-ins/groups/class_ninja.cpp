@@ -201,6 +201,7 @@ SKILL_RUNP( vanish )
 
     chance = 0;
     chance += gsn_vanish->getEffective( ch );
+    chance += skill_level_bonus(*gsn_vanish, ch);
     d.log(chance, "skill");
 
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
@@ -236,7 +237,7 @@ SKILL_RUNP( vanish )
         d.log(kidnap_chance, "kidnap skill");
         kidnap_chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_STR) ) * stat_mod * 100;
         d.log(kidnap_chance, "stats");
-        kidnap_chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        kidnap_chance += ( skill_level(*gsn_vanish, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(kidnap_chance, "lvl");
         kidnap_chance += (ch->size - victim->size) * size_mod * 100;
         d.log(kidnap_chance, "size");
@@ -462,7 +463,7 @@ SKILL_RUNP( nerve )
         d.log(chance, "skill"); 
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
         d.log(chance, "stats");
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += ( skill_level(*gsn_nerve, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
         chance += (ch->size - victim->size) * size_mod * 100;
         d.log(chance, "size");
@@ -525,7 +526,7 @@ SKILL_RUNP( nerve )
 BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
 {
     int level, skill, mod;
-    level = ch->getModifyLevel();
+    level = skill_level(*gsn_nerve, ch);
     
     if (gsn_nerve->usable( ch ) )
         skill = gsn_nerve->getEffective( ch );
@@ -579,7 +580,7 @@ SKILL_RUNP( endure )
       return;
     }
     
-    level = ch->getModifyLevel();
+    level = skill_level(*gsn_endure, ch);
     
     if (gsn_endure->usable( ch ) )
         skill = gsn_endure->getEffective( ch );
@@ -598,9 +599,9 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 {      
     Affect af;
 
-    af.type         = gsn_endure;
-    af.level         = ch->getModifyLevel();
-    af.duration   = ch->getModifyLevel() / 4;
+    af.type     = gsn_endure;
+    af.level    = skill_level(*gsn_endure, ch);
+    af.duration = skill_level(*gsn_endure, ch) / 4;
     af.location = APPLY_SAVING_SPELL;
     af.modifier = modifier;    
 
@@ -651,7 +652,7 @@ void AssassinateOneHit::calcDamage( )
     d.log(chance, "skill");
     chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
     d.log(chance, "stats");
-    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+    chance += ( skill_level(*gsn_assassinate, ch) - victim->getModifyLevel() ) * level_mod * 100;
     d.log(chance, "lvl");
     chance += (ch->size - victim->size) * size_mod * 100;
     d.log(chance, "size");
@@ -717,11 +718,11 @@ void AssassinateOneHit::calcDamage( )
     {
         gsn_assassinate->improve( ch, false, victim );
 
-        dam = ch->getModifyLevel() + ch->damroll;
+        dam = skill_level(*gsn_assassinate, ch) + ch->damroll;
         dam += dam * get_str_app(ch).damage / 100;
         damApplyEnhancedDamage( );
         if ( !IS_AWAKE(victim) )
-        dam *= 2;
+            dam *= 2;
 
         Damage::calcDamage( );
 
@@ -977,7 +978,7 @@ SKILL_RUNP( caltraps )
    d.log(chance, "skill");
    chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
    d.log(chance, "stats");
-   // chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100; // no level check for caltraps
+   chance += skill_level_bonus(*gsn_caltraps, ch); // no level diff check for caltraps
    chance += (ch->size - victim->size) * size_mod * 100;
    d.log(chance, "size");
    chance += victim->can_see(ch) ? 0 : (vis_mod * 100);   
@@ -1031,7 +1032,7 @@ SKILL_RUNP( caltraps )
 BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 {
     int level, skill, mod;
-    level = ch->getModifyLevel();
+    level = skill_level(*gsn_caltraps, ch);
     
     if (gsn_caltraps->usable( ch ) )
         skill = gsn_caltraps->getEffective( ch );
@@ -1041,7 +1042,7 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
     mod = -1 * (level/10 + skill/10 + 1);
     
     try {
-        damage_nocatch(ch,victim, ch->getModifyLevel(),gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
+        damage_nocatch(ch,victim, level,gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
 
         if (!victim->isAffected(gsn_caltraps)) {
             Affect tohit,todam,todex;
@@ -1061,7 +1062,7 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             affect_to_char( victim, &todam);
 
             todex.type = gsn_caltraps;
-            todex.level = ch->getModifyLevel();
+            todex.level = level;
             todex.duration = -1;
             todex.location = APPLY_DEX;
             todex.modifier = mod/2;
@@ -1095,7 +1096,7 @@ ThrowDownOneHit::ThrowDownOneHit( Character *ch, Character *victim )
 
 void ThrowDownOneHit::calcDamage( )
 {
-        dam = ch->getModifyLevel() + ch->damroll / 2;
+        dam = skill_level(*gsn_throw, ch) + ch->damroll / 2;
         dam += dam * get_str_app(ch).damage / 100;
         damApplyEnhancedDamage( );
 
@@ -1227,7 +1228,7 @@ SKILL_RUNP( throwdown )
         d.log(chance, "skill");
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
         d.log(chance, "stats");
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += ( skill_level(*gsn_throw, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
         chance += (ch->size - victim->size) * size_mod * 100;
         d.log(chance, "size");
@@ -1454,7 +1455,7 @@ SKILL_RUNP( strangle )
         d.log(chance, "skill");
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
         d.log(chance, "stats");
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += ( skill_level(*gsn_strangle, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
         chance += (ch->size - victim->size) * size_mod * 100;
         d.log(chance, "size");
@@ -1519,8 +1520,8 @@ SKILL_RUNP( strangle )
         
                 af.type = gsn_strangle;
                 af.bitvector.setTable(&affect_flags);
-                af.level = ch->getModifyLevel();
-                af.duration = ch->getModifyLevel() / 50 + 1;
+                af.level = skill_level(*gsn_strangle, ch);
+                af.duration = skill_level(*gsn_strangle, ch) / 50 + 1;
                 af.bitvector.setValue(AFF_SLEEP);
                 affect_join ( victim,&af );
                 
@@ -1589,7 +1590,7 @@ SKILL_RUNP( poison )
                                         "Помогите! %1$^C1 травит меня дымом!",
                                         FYP_SLEEP );
 
-                        spell( gsn_poison, ch->getModifyLevel( ), ch, tmp_vict );
+                        spell( gsn_poison, skill_level(*gsn_poison_smoke, ch), ch, tmp_vict );
 
                         if (tmp_vict != ch)
                                 multi_hit(tmp_vict,ch);
@@ -1652,7 +1653,7 @@ BOOL_SKILL( blindness )::run( Character *ch )
                             "Помогите! %1$^C1 слепит меня пылью!",
                             FYP_SLEEP );
             
-            spell( gsn_blindness, ch->getModifyLevel( ), ch, tmp_vict );
+            spell( gsn_blindness, skill_level(*gsn_blindness_dust, ch), ch, tmp_vict );
 
             if (tmp_vict != ch)
                     multi_hit(tmp_vict,ch);
