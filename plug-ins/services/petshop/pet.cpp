@@ -20,6 +20,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+#include "skill_utils.h"
 
 GSN(haggle);
 RELIG(fili);
@@ -41,7 +42,7 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     NPCharacter *pet;
     
     if (client->is_npc( ) || client->getPC( )->pet) {
-        client->println( "У тебя уже есть одно домашнее животное." );
+        client->println( "У тебя уже есть один питомец." );
         return false;
     }
 
@@ -51,7 +52,7 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     }
 
     if (getLevel( client ) > client->getModifyLevel( )) {
-        client->println( "У тебя недостаточно опыта, чтобы справиться с этим животным." );
+        client->println( "У тебя недостаточно опыта, чтобы справиться с этим питомцем." );
         return false;
     }
 
@@ -92,7 +93,7 @@ int Pet::haggle( Character *client ) const
     bool bonus = client->getReligion() == god_fili && get_eq_char(client, wear_tattoo) != 0;
     int roll = bonus ? 100 : number_percent( );
 
-    if (bonus || (roll < gsn_haggle->getEffective( client ))) {
+    if (bonus || (roll < gsn_haggle->getEffective( client ) + skill_level_bonus(*gsn_haggle, ch))) {
         cost -= cost / 2 * roll / 100;
         client->printf( "Ты торгуешься и цена снижается до %d монет.\r\n", cost );
         gsn_haggle->improve( client, true );
@@ -116,9 +117,9 @@ void Pet::config( PCharacter *client, NPCharacter *pet ) const
         pet->alignment = client->alignment;
     
     pet->setDescription( dlprintf( 
-             "%s\r\nТабличка на ошейнике %s гласит {C'Я принадлежу %s'{x.\n\r", 
+             "%s\r\nТы понимаешь, что %s будет до смерти защищать и следовать за {C%s{x.\n\r", 
              pet->getDescription( ), 
-             pet->getNameP( '2' ).c_str( ), client->getNameP( '3' ).c_str( ) ) );
+             pet->getNameP( '1' ).c_str( ), client->getNameP( '5' ).c_str( ) ) );
 }
 
 NPCharacter * Pet::create( PCharacter *client ) const
@@ -253,7 +254,7 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     
     interpret_fmt( client, "mount %s", horse->getNameP( ) );
 
-    client->println("Наслаждайся своей лошадью.");
+    client->println("Наслаждайся своим скакуном.");
     act( "$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
     return true;
 }
