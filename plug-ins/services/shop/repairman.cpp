@@ -25,6 +25,7 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+#include "skill_utils.h"
 
 GSN(haggle);
 RELIG(fili);
