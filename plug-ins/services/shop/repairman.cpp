@@ -108,7 +108,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     if(cost > 1){
         bool bonus = client->getReligion() == god_fili && get_eq_char(client, wear_tattoo) != 0;
         roll = bonus ? 100 : number_percent( );
-        if ( bonus || (roll < gsn_haggle->getEffective(client)) )
+        if ( bonus || (roll < gsn_haggle->getEffective(client) + skill_level_bonus(*gsn_haggle, ch)) )
         {
             cost -= cost / 2 * roll / 100;
             act_p( "Ты торгуешься с $C5.", client, 0, this->getChar(), TO_CHAR, POS_RESTING );
