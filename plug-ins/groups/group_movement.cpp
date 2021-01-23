@@ -110,7 +110,7 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                         ch->send_to("Таинственная сила блокирует проход.\n\r");
                         return;
                 }
-                chance = ch->getModifyLevel() / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
+                chance = level / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
 
                 const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
                 act("Ударом Магической Силы ты пытаешься открыть $N4!", ch, 0, doorname, TO_CHAR);
@@ -168,7 +168,6 @@ SKILL_RUNP( sneak )
         return;
     }
 
-//    ch->send_to("Ты пытаешься двигаться более бесшумно.\n\r");
     affect_strip( ch, gsn_sneak );
 
     if( IS_AFFECTED(ch,AFF_SNEAK)) {
@@ -176,13 +175,15 @@ SKILL_RUNP( sneak )
       return;
     }
 
-    if ( number_percent( ) < gsn_sneak->getEffective( ch ))
+    if ( number_percent( ) < gsn_sneak->getEffective( ch ) + skill_level_bonus(*gsn_sneak, ch))
     {
+        int slevel = skill_level(*gsn_sneak, ch);
+            
         gsn_sneak->improve( ch, true );
         af.bitvector.setTable(&affect_flags);
         af.type      = gsn_sneak;
-        af.level     = ch->getModifyLevel();
-        af.duration  = ch->getModifyLevel();
+        af.level     = slevel;
+        af.duration  = slevel;
         
         af.bitvector.setValue(AFF_SNEAK);
         affect_to_char( ch, &af );
@@ -219,8 +220,21 @@ SKILL_RUNP( hide )
                 return;
         }
 
-        int forest = ch->in_room->getSectorType() == SECT_FOREST ? 60 : 0;
-        forest += ch->in_room->getSectorType() == SECT_FIELD ? 60 : 0;
+        int chance = gsn_hide->getEffective( ch );
+        if ( ch->in_room->getSectorType() == SECT_FOREST ||
+             ch->in_room->getSectorType() == SECT_CITY ||
+             ch->in_room->getSectorType() == SECT_INSIDE )
+                chance += 50;
+        
+        if ( ch->in_room->getSectorType() == SECT_FIELD ||
+             ch->in_room->getSectorType() == SECT_DESERT )
+                chance -= 50;
+
+        if ( ch->in_room->getSectorType() == SECT_AIR ||
+             ch->in_room->getSectorType() == SECT_WATER_NOSWIM ||
+             ch->in_room->getSectorType() == SECT_WATER_SWIM )
+                chance = 0;
+        
 
         int k = ch->getLastFightDelay( );
 
@@ -228,8 +242,10 @@ SKILL_RUNP( hide )
                 k = k * 100 /        FIGHT_DELAY_TIME;
         else
                 k = 100;
-                
-        if ( number_percent( ) < (gsn_hide->getEffective( ch ) - forest) * k / 100 )
+        
+        chance = URANGE(1, chance * k / 100, 100); // there's always a chance
+        
+        if ( number_percent( ) <= chance )
         {
                 // TODO: add sector-specific messaging
                 ch->send_to("Ты скрываешь свое присутствие, используя особенности местности.\n\r");                
