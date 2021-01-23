@@ -105,7 +105,7 @@ void BackstabOneHit::calcDamage( )
 
     if (wield != 0) {
 	int slevel = skill_level(*gsn_backstab, ch);    
-        dam = ( slevel / 10 ) * dam + slevel;
+        dam = ( slevel / 10 + 1 ) * dam + slevel;
     }
 	
     damApplyDamroll( );
@@ -145,7 +145,7 @@ void DualBackstabOneHit::calcDamage( )
 	
     if (wield != 0) {
 	int slevel = skill_level(*gsn_dual_backstab, ch);    
-        dam = ( slevel / 10 ) * dam + slevel;
+        dam = ( slevel / 10 + 1 ) * dam + slevel;
     }
 
     damApplyDamroll( );
@@ -182,7 +182,7 @@ void CircleOneHit::calcDamage( )
     damApplyPosition( );
 	
     int slevel = skill_level(*gsn_circle, ch);    
-    dam = ( slevel / 40 ) * dam + slevel;
+    dam = ( slevel / 40 + 1 ) * dam + slevel;
 	
     damApplyDamroll( );
     damApplyCounter( );
@@ -213,7 +213,7 @@ void KnifeOneHit::calcDamage( )
     damApplyPosition( );
 	
     int slevel = skill_level(*gsn_knife, ch);    
-    dam = ( slevel / 30 ) * dam + slevel;
+    dam = ( slevel / 30 + 1 ) * dam + slevel;
 	
     damApplyDamroll( );
     damApplyCounter( );
@@ -389,12 +389,10 @@ SKILL_RUNP( envenom )
     {
         if (IS_WEAPON_STAT(obj,WEAPON_FLAMING)
         ||  IS_WEAPON_STAT(obj,WEAPON_FROST)
-        ||  IS_WEAPON_STAT(obj,WEAPON_VAMPIRIC)
-        ||  IS_WEAPON_STAT(obj,WEAPON_VORPAL)
         ||  IS_WEAPON_STAT(obj,WEAPON_SHOCKING)
         ||  IS_WEAPON_STAT(obj,WEAPON_HOLY)
         ||  IS_WEAPON_STAT(obj,WEAPON_FADING)	    
-        ||  IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
+        ||  IS_OBJ_STAT(obj,ITEM_BLESS) )
         {
             act_p("Мощные свойства $o2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR,POS_RESTING);
             return;
@@ -527,7 +525,7 @@ SKILL_RUNP( steal )
 
         percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -30 );
         percent += victim->can_see( ch ) ? 20 : 0;
-	percent += skill_level_bonus(*gsn_steal, ch);
+	percent -= skill_level_bonus(*gsn_steal, ch);
 
         if (ch->isCoder())
             percent = 1;
@@ -803,7 +801,7 @@ protected:
 
         percent  = number_percent( ) + (IS_AWAKE(ch) ? 30 : -30);
         percent += ch->can_see( actor ) ? 20 : 0;
-	percent += skill_level_bonus(*gsn_push, ch);    
+	percent -= skill_level_bonus(*gsn_push, ch);    
 
         if (percent > gsn_push->getEffective( actor )) {
             fSuccess = false;
@@ -997,7 +995,7 @@ SKILL_RUNP( backstab )
 
     if ( attack_table[obj->value3()].damage != DAM_PIERCE && obj->value0() != WEAPON_DAGGER )
     {
-            ch->send_to("Чтобы ударить сзади, нужно вооружиться кинжалом с колющим острием.\n\r");
+            ch->send_to("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием.\n\r");
             return;
     }
 
