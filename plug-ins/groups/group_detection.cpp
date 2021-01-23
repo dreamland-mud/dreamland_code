@@ -44,6 +44,7 @@
 #include "mercdb.h"
 #include "act.h"
 #include "def.h"
+#include "skill_utils.h"
 
 GSN(none);
 DLString quality_percent( int ); /* XXX */
