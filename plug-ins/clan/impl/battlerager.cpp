@@ -39,6 +39,7 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
 
 using std::max;
 using std::min;
@@ -55,7 +56,7 @@ CLAN(battlerager);
 void BattleragerPoncho::wear( Character *ch ) 
 {
     Affect af;
-    short level = ch->getModifyLevel( );
+    short level = skill_level(*gsn_trophy, ch);
 
     if (ch->isAffected(gsn_haste )) 
         return;
@@ -66,7 +67,7 @@ void BattleragerPoncho::wear( Character *ch )
     af.level = level;
     af.bitvector.setValue(AFF_HASTE);
     af.location = APPLY_DEX;
-    af.modifier = 1 + ( level >= 18 ) + ( level >= 30 ) + ( level >= 45 );
+    af.modifier = 1 + ( level >= 18 ) + ( level >= 30 ) + ( level >= 45 ) + skill_level_bonus(*gsn_trophy, ch);
     affect_to_char(ch, &af);
 }
 
@@ -104,7 +105,7 @@ COMMAND(CChop, "chop")
     argBody = args.getOneArgument( );
 
     if (argPart.empty( )) {
-        ch->println( "Какую часть тела ты хочешь отрубить - ногу, голову или руку?" );
+        ch->println( "Какую часть тела ты хочешь отрубить -- ногу, голову или руку?" );
         return;
     }
 
@@ -211,7 +212,7 @@ SKILL_RUNP( trophy )
 
     if (ch->mana < mana)
     {
-        ch->println( "Ты слишком слаб, чтоб сконцентрироваться." );
+        ch->println( "Ты слишком слаб{Sfа{Sx, чтоб сконцентрироваться." );
         return;
     }
 
@@ -271,7 +272,8 @@ SKILL_RUNP( trophy )
         if ( trophy_vnum != 0 )
         {
             level = min(part->level + 5, MAX_LEVEL);
-
+            int slevel = skill_level(*gsn_trophy, ch);
+            
             trophy = create_object( get_obj_index( trophy_vnum ), level );
             trophy->timer = ch->getModifyLevel() * 2;
             trophy->fmtShortDescr( trophy->getShortDescr( ), part->from );
@@ -286,11 +288,11 @@ SKILL_RUNP( trophy )
             af.level        = level;
             af.duration        = -1;
             af.location = APPLY_DAMROLL;
-            af.modifier   = ( ch->getModifyLevel( ) / 5 );
+            af.modifier   = ( slevel / 5 );
             affect_to_obj( trophy, &af );
 
             af.location = APPLY_HITROLL;
-            af.modifier   = ( ch->getModifyLevel( ) / 5 );
+            af.modifier   = ( slevel/ 5 );
             affect_to_obj( trophy, &af );
 
             af.location = APPLY_INT;
@@ -301,10 +303,10 @@ SKILL_RUNP( trophy )
             af.modifier        = level > 20 ? 2 : 1;
             affect_to_obj( trophy, &af );
 
-            trophy->value0(ch->getModifyLevel());
-            trophy->value1(ch->getModifyLevel());
-            trophy->value2(ch->getModifyLevel());
-            trophy->value3(ch->getModifyLevel());
+            trophy->value0(slevel / 2);
+            trophy->value1(slevel / 2);
+            trophy->value2(slevel / 2);
+            trophy->value3(slevel / 4 );
 
 
             obj_to_char(trophy, ch);
@@ -346,16 +348,17 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     if ((wield = get_eq_char(ch, wear_wield)) == 0)
         return false;
 
+    int slevel = skill_level(*gsn_bash, ch);
     // Low-level weapon cannot strike a powerful victim.
     // However, allow weapon level as low as 80+ for heroes.
-    weaponLevelDiff = max(1, ch->getModifyLevel() / 5); 
+    weaponLevelDiff = max(1, slevel / 5); 
     if (victim->getModifyLevel() - wield->level > weaponLevelDiff) {
         return false;
     }
 
     // Calculate real chance to strike (original Anatolia code).
     chance = 1 + learned / 30; 
-    chance += (ch->getModifyLevel() - victim->getModifyLevel()) / 2;
+    chance += (slevel - victim->getModifyLevel()) / 2;
     chance = max(1, chance);
 
     // Dice roll failed, learn from mistakes.
@@ -386,7 +389,7 @@ SKILL_RUNP( bloodthirst )
 
     if (!gsn_bloodthirst->available( ch ))
     {
-        ch->println( "Ты не знаешь что такое жажда." );
+        ch->println( "Ты не знаешь что такое кровожадность." );
         return;
     }
 
@@ -403,13 +406,13 @@ SKILL_RUNP( bloodthirst )
 
     if (IS_AFFECTED(ch,AFF_CALM))
     {
-        ch->println( "Ты слишком миролюбив, чтоб жаждать крови." );
+        ch->println( "Ты слишком миролюбив{Sfа{Sx, чтоб жаждать крови." );
         return;
     }
 
     if (ch->fighting == 0)
       {
-        ch->println( "Для этого ты должен сражаться." );
+        ch->println( "Это умение сработает только в бою." );
         return;
       }
 
