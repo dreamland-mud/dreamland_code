@@ -62,14 +62,14 @@ struct clan_diplomacy_names {
 
 struct clan_diplomacy_names clan_diplomacy_names_table[] =
 {
-  {"aliance",            "аль.", "{W",    "альянс"            },
+  {"alliance",            "аль.", "{W",    "альянс"            },
   {"peace",            "мир ", "{G",    "мир"            },
   {"truce",            "пер.", "{Y",    "перемирие"    },
   {"distrust",            "нед.", "{B",    "недоверие"    },
-  {"aggresive",            "агр.", "{r",    "агрессия"            },
+  {"aggression",            "агр.", "{r",    "агрессия"            },
   {"war",            "вой.", "{R",    "война"            },
   {"subordination", "под.", "{Y",    "подчинение"   },
-  {"oppress",            "угн.", "{Y",    "угнетение"    },
+  {"oppression",            "угн.", "{Y",    "угнетение"    },
 };
 
 const int clan_diplomacy_max = 5;
@@ -354,7 +354,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( ) || !argumentOne.isNumber( )) {
-        pc->send_to( "Укажите сумму перевода.\r\n" );
+        pc->send_to( "Укажи сумму перевода.\r\n" );
         return;
     }
     
@@ -373,7 +373,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( )) {
-        pc->send_to( "Укажите валютную единицу ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).\r\n" );
+        pc->send_to( "Укажи валютную единицу ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).\r\n" );
         return;
     }
     
@@ -405,7 +405,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
 
     if (!pc->is_immortal() && !clan->isRecruiter( pc ))
     {
-        pc->send_to( "Ты не можешь сделать этого - дорасти сначала до Рекруитера.\n\r" );
+        pc->send_to( "Это могут сделать только руководители кланов.\n\r" );
         return;
     }
 
@@ -450,18 +450,18 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         victim = pc;
 
     if (currency != CB_CURR_QP && (clan != acc_clan || pc != victim )) {
-        pc->send_to( "Взаиморасчеты между кланами (или игроками) осуществляются в QP\n\r" );
+        pc->send_to( "Взаиморасчеты между кланами (или игроками) осуществляются в квестовых очках.\n\r" );
         return;
     }
                 
     if (currency == CB_CURR_QP && victim && pc->getClan() != victim->getClan())
     {
-        pc->send_to ("Ты можешь отдать QP или какому-либо клану, или своему соклановику.\n\r");
+        pc->send_to ("Ты можешь отдать квестовые очки или какому-либо клану, или своему соклановику.\n\r");
         return;
     }
     
     if (!clanBankWithdraw( pc, victim, clan, acc_clan, currency, amount, buf )) {
-        pc->send_to( "В банке твоего клана столько не будет..\n\r" );
+        pc->send_to( "В банке твоего клана столько нету.\n\r" );
         return;
     }
 
@@ -505,8 +505,8 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
             pc->addQuestPoints(-amount);
         }
 
-        buf << "На банковский счет клана {" 
-            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+        buf << "На банковский счет {" 
+            << acc_clan->getColor( ) << acc_clan->getRussianName( ).ruscase('2') 
             << "{x переведено: " << amount << " квестов"
             << GET_COUNT(amount,"ая единица","ые единицы","ых единиц")
             << "." << endl;
@@ -522,8 +522,8 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
             pc->gold -= amount;
         }
         
-        buf << "На банковский счет клана {" 
-            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+        buf << "На банковский счет {" 
+            << acc_clan->getColor( ) << acc_clan->getRussianName( ).ruscase('2') 
             << "{x переведено: " << amount << " золот"
             << GET_COUNT(amount,"ая монета","ые монеты","ых монеты")
             << "." << endl;
@@ -539,8 +539,8 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
             pc->silver -= amount;
         }
 
-        buf << "На банковский счет клана {" 
-            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+        buf << "На банковский счет {" 
+            << acc_clan->getColor( ) << acc_clan->getRussianName( ).ruscase('2') 
             << "{x переведено: " << amount << " серебрян"
             << GET_COUNT(amount,"ая монета","ые монеты","ых монеты")
             << "." << endl;
@@ -571,8 +571,8 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
 
         }
 
-        buf << "На банковский счет клана {" 
-            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+        buf << "На банковский счет {" 
+            << acc_clan->getColor( ) << acc_clan->getRussianName( ).ruscase('2')
             << "{x переведено: " << amount << " бриллиант"
             << GET_COUNT(amount,"","а","ов")
             << "." << endl;
@@ -603,8 +603,8 @@ bool CClan::clanBankWithdraw( PCharacter *pc, PCharacter *victim,
         bank->questpoints -= amount;
 
         if (acc_clan && acc_clan != clan) {
-            buf << "На банковский счет клана {"
-                << acc_clan->getColor( ) << acc_clan->getShortName( ) <<"{x "
+            buf << "На банковский счет {"
+                << acc_clan->getColor( ) << acc_clan->getRussianName( ).ruscase('2') <<"{x "
                 << "переведено: " << amount << " квестов"
                 << GET_COUNT(amount,"ая единица","ые единицы","ых единиц")
                 << " со счета твоего клана." << endl;
@@ -750,14 +750,14 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
                 return;
             }
 
-        buf << "Ты уходишь из клана [{" 
-            << clan.getColor( ) << clan.getShortName( ) << "{x].";
+        buf << "Ты решаешь покинуть [{" 
+            << clan.getColor( ) << clan.getRussianName( ).ruscase('4') << "{x].";
                 
         pc->setClan( member->removeSelf );
 
     } else {
         if (!pc->is_immortal() && !clan.isRecruiter( pc )) {
-            pc->send_to( "Ты не лидер.\n\r" );
+            pc->send_to( "Это могут сделать только руководители кланов.\n\r" );
             return;
         }
 
@@ -775,11 +775,11 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
             && clan.isRecruiter( victim ) 
             && !dynamic_cast<PCharacter *>( victim )) 
         {
-            pc->send_to( "Ты не можешь выгнать из клана рекрутера(лидера), когда его нет в мире.\r\n" );
+            pc->send_to( "Выгонять руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.\r\n" );
             return;
         }
 
-        buf << "Тебя выгнали из клана [{" << clan.getColor( ) << clan.getShortName( ) << "{x].";
+        buf << "Тебя заставили покинуть [{" << clan.getColor( ) << clan.getRussianName( ).ruscase('4') << "{x].";
         victim->setClan( member->removeBy );
     }        
 
@@ -914,7 +914,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     
     if (pc->get_trust( ) < CREATOR) {
         if (!pc->getClan( )->isRecruiter( pc )) {
-            pc->send_to( "Ты не являешься лидером клана.\n\r" );
+            pc->send_to( "Это могут сделать только руководители кланов.\n\r" );
             return;
         }
         
@@ -947,7 +947,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
 
         if (victim->getClanLevel( ) > i) {
             if (clan.isRecruiter( victim ) && !dynamic_cast<PCharacter *>( victim )) {
-                pc->send_to( "Ты не можешь сместить с поста лидера или рекрутера, когда их нет в мире.\r\n" );
+                pc->send_to( "Смещать руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.\r\n" );
                 return;
             }
         }
@@ -979,7 +979,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
         DLString what = fmt(0, "{W%s становится %s клана %s.{x", 
             victim->getName().c_str(), 
             (clan.isLeader(victim) ? "лидером" : "рекрутером"),
-            clan.getShortName().c_str());
+            clan.getRussianName().ruscase('4').c_str());
 
         infonet(pcVictim, 0, "{CТихий голос из $o2: ", what.c_str());
         send_discord_clan(what);
@@ -1033,6 +1033,12 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
         return;
     }
 
+    if ( (!pc->getClan( )->getData( ) ) 
+    {
+        pc->send_to ("Сначала присоединись к одному из кланов.\n\r");
+        return;
+    }
+    
     const PCharacterMemoryList& list = PCharacterManager::getPCM( );
 
     for (pos = list.begin( ); pos != list.end( ); pos++) {
@@ -1109,9 +1115,9 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
             return;
         }
         
-        buf << "Ты желаешь вступить в клан [{"
+        buf << "Ты желаешь вступить в [{"
             << pc->getPetition( )->getColor( )
-            << pc->getPetition( )->getShortName( )
+            << pc->getPetition( )->getRussianName( ).ruscase('4')
             << "{x]" << endl;
                 
         pc->send_to( buf );
@@ -1220,7 +1226,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         if (!found)
             pc->send_to("(сейчас в мире нет ни одного рекрутера этого клана)\n\r");
 
-        DLString what = fmt(0, "{W%1$^C1 подал%1$Gо||а петицию в клан %s.{x", pc, clan->getShortName().c_str());
+        DLString what = fmt(0, "{W%1$^C1 подал%1$Gо||а петицию в %s.{x", pc, clan.getRussianName( ).ruscase('4').c_str());
         infonet(pc, 0, "{CТихий голос из $o2: ", what.c_str());
         send_discord_clan(what);
         send_telegram(what);
@@ -1288,9 +1294,9 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
     victim->setPetition( clan_none );
     victim->setClanLevel( 0 );
 
-    buf << "Ты приня$gто|т|та в клан [{" 
+    buf << "Ты приня$gто|т|та в [{" 
         << clan.getColor( ) 
-        << clan.getShortName( ) 
+        << clan.getRussianName( ).ruscase('4') 
         << "{x].";
     
     XMLAttributeInduct::Pointer attr = victim->getAttributes( ).getAttr<XMLAttributeInduct>( "induct" );
@@ -1302,7 +1308,7 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
         PCharacterManager::saveMemory( victim );
     
     if (victim->getLevel() <= LEVEL_MORTAL) {
-        DLString what = fmt(0, "{W%s вступает в клан %s.{x", victim->getName().c_str(), clan.getShortName().c_str());
+        DLString what = fmt(0, "{W%s вступает в %s.{x", victim->getName().c_str(), clan.getRussianName( ).ruscase('4').c_str());
         infonet(victim->getPlayer(), 0, "{CТихий голос из $o2: ", what.c_str());
         send_discord_clan(what);
         send_telegram(what);
@@ -1336,9 +1342,9 @@ void CClan::clanPetitionReject( PCharacter *pc, DLString& argument )
 
     victim->setPetition( clan_none );
 
-    buf << "Твоя заявка на вступление в клан [{"
+    buf << "Твоя заявка на вступление в [{"
         << pc->getClan( )->getColor( ) 
-        << pc->getClan( )->getShortName( ) 
+        << pc->getClan( )->getRussianName( ).ruscase('4')
         << "{x] отклонена." << endl;
 
     XMLAttributeInduct::Pointer attr = victim->getAttributes( ).getAttr<XMLAttributeInduct>( "induct" );
@@ -1464,7 +1470,7 @@ void CClan::clanDiplomacyProp( PCharacter *pc )
         return;
     }
 
-    buf << "Просмотр пропозиций для " << myclan->getShortName( ) << ":" << endl;
+    buf << "Просмотр пропозиций для " << myclan->getRussianName( ).ruscase('4') << ":" << endl;
     
     for (int i = 0; i < ClanManager::getThis( )->size( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i );
@@ -1580,7 +1586,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
             data->save( );
 
             buf << "Установка политики для "
-                << clan->getShortName( ) << " : "
+                << clan->getRussianName( ).ruscase('2') << " : "
                 << clan_diplomacy_names_table[dip].long_name
                 << endl;
             pc->send_to( buf );
@@ -1588,7 +1594,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
         else
         {
             buf << "Ты предлагаешь "
-                << clan->getShortName( ) 
+                << clan->getRussianName( ).ruscase('3')
                 << " отношение типа "
                 << clan_diplomacy_names_table[dip].long_name
                 << endl;
@@ -1610,7 +1616,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
         data->save( );
 
         buf << "Установка политики для "
-            << clan->getShortName( ) 
+            << clan->getRussianName( ).ruscase('2')
             << " : " << clan_diplomacy_names_table[dip].long_name
             << endl;
         pc->send_to( buf );
