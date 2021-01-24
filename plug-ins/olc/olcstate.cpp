@@ -548,6 +548,26 @@ bool OLCState::rangeEdit(int minValue, int maxValue, int &field1, int &field2)
     return true;
 }
 
+bool OLCState::boolEdit(bool &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+    DLString arg = args.getOneArgument();
+
+    if (arg_is_yes(arg))
+        field = true;
+    else if (arg_is_no(arg))
+        field = false;
+    else {
+        ptc(ch, "Использование:\r\n{W%s{x y|n - установить значение переключателя\r\n", cmd);
+        return false;
+    }
+
+    ptc(ch, "Новое значение поля {g%s{x: %s\r\n", cmd, field ? "yes" : "no");
+    return true;
+}
+
 bool OLCState::diceEdit(int *field)
 {
     static char syntax[] = "Использование:\r\n{W%s{w число_бросков {Wd{w число_граней {W+{w бонус\r\n";

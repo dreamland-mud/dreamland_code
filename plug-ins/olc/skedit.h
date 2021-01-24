@@ -7,7 +7,9 @@
 #include "xmlflags.h"
 #include "xmlstringlist.h"
 #include "skillreference.h"
-#include "basicskill.h"
+
+class BasicSkill;
+class DefaultSpell;
 
 class OLCStateSkill : public OLCStateTemplate<OLCStateSkill>,
                          public virtual OLCState
@@ -32,6 +34,8 @@ public:
 private:
     virtual void statePrompt( Descriptor * );
     BasicSkill *getOriginal();
+    DefaultSpell *getSpell(BasicSkill *skill = 0);
+    bool checkSpell(DefaultSpell *spell);
 
     XML_VARIABLE XMLBoolean isChanged;
 };

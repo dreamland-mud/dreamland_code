@@ -110,6 +110,7 @@ protected:
     bool numberEdit(int minValue, int maxValue, int &field);
     bool numberEdit(long minValue, long maxValue, long &field);
     bool rangeEdit(int minValue, int maxValue, int &field1, int &field2);
+    bool boolEdit(bool &field);
     bool diceEdit(int *field);
     bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
     bool editorCopy(const DLString &original);
