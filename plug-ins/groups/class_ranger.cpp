@@ -1343,11 +1343,9 @@ SKILL_RUNP( camouflage )
                 return;
         }
 
-        if ( ch->in_room->getSectorType() != SECT_FOREST
-                && ch->in_room->getSectorType() != SECT_HILLS
-                && ch->in_room->getSectorType() != SECT_MOUNTAIN )
+        if (!IS_NATURE(ch->in_room))
         {
-                ch->send_to("Здесь негде укрыться.\n\r");
+                ch->send_to("Ты можешь замаскироваться только в дикой местности.\n\r");
                 act_p("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM,POS_RESTING);
                 return;
         }
