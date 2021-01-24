@@ -55,8 +55,8 @@ SKILL_RUNP( tame )
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Ты не поддаешься дрессировке.\n\r");
-        act_p("$c1 пытается приручить са$gмо|м|ма себя, но эта попытка с треском проваливается.",
+        ch->send_to("Ты не поддаешься укрощению.\n\r");
+        act_p("$c1 пытается укротить са$gмо|м|ма себя, но эта попытка с треском проваливается.",
                 ch,0,0,TO_ROOM,POS_RESTING);
         return;
     }
@@ -69,7 +69,7 @@ SKILL_RUNP( tame )
 
     if (!victim->is_npc())
     {
-        ch->pecho("%1$^C1 не подда%1$nется|ются дрессировке.", victim);
+        ch->pecho("%1$^C1 не подда%1$nется|ются укрощению.", victim);
         return;
     }
     
@@ -85,7 +85,7 @@ SKILL_RUNP( tame )
             || !(animal = ch->getNPC( )->behavior.getDynamicPointer<DruidSummonedAnimal>( ))
             || !animal->myHero( ch ))
         {
-            ch->println("Это существо не поддастся твоему контролю.");
+            ch->println("Это существо не поддастся твоему укрощению.");
             return;
         }
 
@@ -145,17 +145,17 @@ SKILL_RUNP( tame )
             REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
             SET_BIT(victim->affected_by,AFF_CALM);
             victim->println("Ты успокаиваешься.");
-            act("Ты успокаиваешь $C4.",ch,0,victim,TO_CHAR);
-            act("$c1 успокаивает $C4.",ch,0,victim,TO_NOTVICT);
+            act("Ты укрощаешь $C4.",ch,0,victim,TO_CHAR);
+            act("$c1 укрощает $C4.",ch,0,victim,TO_NOTVICT);
             stop_fighting(victim,true);
             gsn_tame->improve( ch, true, victim );
         }
         else
         {
-            ch->println("Попытка не удалась.");
-            act("$c1 пытается успокоить $C4, но попытка безуспешна.",
+            ch->println("Попытка укрощения не удалась.");
+            act("$c1 пытается укротить $C4, но безуспешно.",
                     ch,0,victim,TO_NOTVICT);
-            act("$c1 пытается успокоить тебя, но попытка безуспешна.",
+            act("$c1 пытается укротить тебя, но безуспешно.",
                     ch,0,victim,TO_VICT);
             gsn_tame->improve( ch, false, victim );
         }
@@ -210,10 +210,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     int dam;
     PCharacter *victim;
 
-    if (ch->in_room->getSectorType() != SECT_FOREST &&
-        ch->in_room->getSectorType() != SECT_FIELD &&
-        ch->in_room->getSectorType() != SECT_HILLS &&
-        ch->in_room->getSectorType() != SECT_MOUNTAIN )
+    if (!IS_NATURE(ch->in_room))
     {
         ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
         return;
@@ -250,7 +247,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     if ( saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL ) )
         dam /= 2;
 
-    damage_nocatch(ch,victim, ch->getModifyLevel(),gsn_entangle,DAM_PIERCE, true, DAMF_SPELL);
+    damage_nocatch(ch,victim, level,gsn_entangle,DAM_PIERCE, true, DAMF_SPELL);
 }
 
 VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -264,18 +261,9 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
         return;
    }
     
-   if (ch->in_room->getSectorType() != SECT_FOREST &&
-        ch->in_room->getSectorType() != SECT_FIELD &&
-        ch->in_room->getSectorType() != SECT_HILLS &&
-        ch->in_room->getSectorType() != SECT_MOUNTAIN )
+   if (!IS_NATURE(ch->in_room))
    {
         ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
-        return;
-   }
-    
-   if ( victim->isAffected(gsn_entangle) )
-   {
-        ch->send_to("Противник уже опутан терновником!\n\r");
         return;
    }
 
@@ -293,35 +281,39 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
    }
 
     dam = number_range(level, 4 * level);
-    chance = 100;
-        
-    if (victim->size > 2)
-        chance -= victim->size * 15;
+    victim->move -= victim->max_move / 3;
+    victim->move = max( 0, (int)victim->move );
     
-    if ( (!saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL )) && (number_percent() <= chance) ){
-        act("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
-            victim, 0, 0, TO_ROOM);
-        act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
-            victim, 0, 0, TO_CHAR);
+    if ( !victim->isAffected(gsn_entangle) )
+    {
+        if ( !saves_spell(level, victim, DAM_PIERCE, ch, DAMF_SPELL) ){
+            act("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
+                victim, 0, 0, TO_ROOM);
+            act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
+                victim, 0, 0, TO_CHAR);
+
+            todex.type = sn;
+            todex.level = level;
+            todex.duration = level / (5 * victim->size) + 1;
+            todex.location = APPLY_DEX;
+            todex.modifier = -1 * (level / 20 + 1);
+            affect_join( victim, &todex); 
             
-       victim->move -= victim->max_move / 3;
-       victim->move = max( 0, (int)victim->move );
-    
-       todex.type = sn;
-       todex.level = level;
-       todex.duration = level / 10;
-       todex.location = APPLY_DEX;
-       todex.modifier = -1 * (level / 20 + 1);
-       affect_join( victim, &todex); 
-            
-       dam = dam * 2;   
+            dam = dam * 2;   
+        }
+        else {
+            act("Колючий терновник прорастает сквозь землю, но $c1 с трудом разрывает его путы!",
+                victim, 0, 0, TO_ROOM);
+            act("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
+                victim, 0, 0, TO_CHAR);
+        }
     }
     else {
-        act("Колючий терновник прорастает сквозь землю, но $c1 с трудом разрывает его путы!",
-            victim, 0, 0, TO_ROOM);
-        act("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
-            victim, 0, 0, TO_CHAR);
+            act("Колючий терновник прорастает сквозь землю, больно раня ноги $c2!",
+                victim, 0, 0, TO_ROOM);
+            act("Колючий терновник прорастает сквозь землю, больно раня твои ноги!",
+                victim, 0, 0, TO_CHAR);        
     }
-
-    damage_nocatch(ch, victim, ch->getModifyLevel(), gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);
+   
+    damage_nocatch(ch, victim, level, gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);
 }
