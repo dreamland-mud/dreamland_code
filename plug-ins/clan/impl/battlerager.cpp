@@ -348,7 +348,7 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     if ((wield = get_eq_char(ch, wear_wield)) == 0)
         return false;
 
-    int slevel = skill_level(*gsn_bash, ch);
+    int slevel = skill_level(*gsn_mortal_strike, ch);
     // Low-level weapon cannot strike a powerful victim.
     // However, allow weapon level as low as 80+ for heroes.
     weaponLevelDiff = max(1, slevel / 5); 
@@ -400,7 +400,7 @@ SKILL_RUNP( bloodthirst )
 
     if (IS_AFFECTED(ch,AFF_BLOODTHIRST) || ch->isAffected(gsn_bloodthirst) )
     {
-        ch->println( "Ты уже давно жаждешь крови." );
+        ch->println( "Ты уже жаждешь крови." );
         return;
     }
 
@@ -427,7 +427,8 @@ SKILL_RUNP( bloodthirst )
 
         ch->setWaitViolence( 1 );
 
-
+        int slevel = skill_level(*gsn_bloodthirst, ch);
+        
         ch->println( "Ты жаждешь {rкрови!{x" );
         act_p("Глаза $c2 загораются кровожадным огнем.",
                ch,0,0,TO_ROOM,POS_RESTING);
@@ -436,8 +437,8 @@ SKILL_RUNP( bloodthirst )
         af.bitvector.setTable(&affect_flags);
         af.type                = gsn_bloodthirst;
         af.level        = ch->getModifyLevel();
-        af.duration        = 2 + ch->getModifyLevel() / 18;
-        af.modifier        = ( 5 + ch->getModifyLevel( ) / 4 );
+        af.duration        = 2 + slevel / 18;
+        af.modifier        = slevel / 7 + 1;
         af.bitvector.setValue(AFF_BLOODTHIRST);
 
         af.location = APPLY_HITROLL;
@@ -446,7 +447,7 @@ SKILL_RUNP( bloodthirst )
         af.location = APPLY_DAMROLL;
         affect_to_char(ch,&af);
 
-        af.modifier        = ( -min( ch->getModifyLevel( ) - 5, 35 ) );
+        af.modifier        = slevel;
         af.location = APPLY_AC;
         affect_to_char(ch,&af);
     }
@@ -479,12 +480,13 @@ SKILL_RUNP( spellbane )
         }
 
         ch->setWait( gsn_spellbane->getBeats( )  );
+        int slevel = skill_level(*gsn_spellbane, ch);    
 
         af.type                = gsn_spellbane;
-        af.level        = ch->getModifyLevel();
-        af.duration        = ch->getModifyLevel() / 3;
+        af.level        = slevel;
+        af.duration        = slevel / 3;
         af.location = APPLY_SAVING_SPELL;
-        af.modifier        = ( -ch->getModifyLevel( ) / 4 );
+        af.modifier        = ( -slevel / 12 + 1 );
 
         affect_to_char(ch,&af);
 
@@ -500,15 +502,12 @@ SKILL_RUNP( resistance )
 {
         int mana = gsn_resistance->getMana( );
 
-        //if (!gsn_resistance->available( ch ))
-        //        return;
-
         if (!gsn_resistance->usable( ch ))
                 return;
 
         if (ch->isAffected(gsn_resistance))
         {
-                ch->println( "Ты уже защищен. Больше уже некуда." );
+                ch->println( "Ты уже сопротивляешься физическим атакам." );
                 return;
         }
 
@@ -523,7 +522,7 @@ SKILL_RUNP( resistance )
         if ((!ch->is_npc() && number_percent() < gsn_resistance->getEffective( ch ))
           || ch->is_npc() )
     {
-        postaffect_to_char(ch, gsn_resistance, ch->getModifyLevel() / 6);
+        postaffect_to_char(ch, gsn_resistance, skill_level(*gsn_resistance, ch) / 6);
       ch->mana -= mana;
 
       act_p("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR,POS_RESTING);
@@ -577,11 +576,12 @@ SKILL_RUNP( truesight )
   if (!ch->is_npc() && number_percent() < gsn_truesight->getEffective( ch ))
     {
       Affect af;
-
+      int slevel = skill_level(*gsn_truesight, ch);
+      
       af.bitvector.setTable(&detect_flags);
       af.type         = gsn_truesight;
-      af.level         = ch->getModifyLevel();
-      af.duration = ch->getModifyLevel() / 2 + 5;
+      af.level         = slevel;
+      af.duration = slevel / 2 + 5;
       
       af.modifier = 0;
       af.bitvector.setValue(DETECT_HIDDEN);
@@ -644,7 +644,7 @@ SKILL_RUNP( bandage )
 
         if (SHADOW(ch))
         {
-                ch->println( "Как это наверное интересно смотрится со стороны - бинтовать собственную тень." );
+                ch->println( "Как это наверное интересно смотрится со стороны -- бинтовать собственную тень." );
                 act_p("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -656,21 +656,22 @@ SKILL_RUNP( bandage )
                 Affect af;
 
                 ch->setWaitViolence( 1 );
+                int slevel = skill_level(*gsn_bandage, ch);
 
                 ch->println( "Ты накладываешь повязку на свою рану!" );
                 act_p("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM,POS_RESTING);
                 gsn_bandage->improve( ch, true );
 
-                heal = ( dice(4, 8 ) + ch->getModifyLevel() / 2 );
+                heal = ( dice(4, 8 ) + slevel / 2 );
                 ch->hit = min( ch->hit + heal, (int)ch->max_hit );
                 update_pos( ch );
                 ch->println( "Тебе становится лучше!" );
 
                 af.bitvector.setTable(&affect_flags);
                 af.type                = gsn_bandage;
-                af.level        = ch->getModifyLevel();
-                af.duration        = ch->getModifyLevel() / 10;
-                af.modifier        = ( min( 15, ch->getModifyLevel( ) / 2 ) );
+                af.level        = slevel;
+                af.duration        = slevel / 10;
+                af.modifier        = ( min( 15, slevel / 2 ) );
                 af.bitvector.setValue(AFF_REGENERATION);
                 
                 affect_to_char(ch,&af);
@@ -707,8 +708,10 @@ static bool has_curse(Character *wch)
 
 void ClanHealerBattlerager::speech( Character *wch, const char *speech )
 {
-    if (!speech[0] || str_cmp( speech, "aid me wiseman" ))
+    if (!speech[0] || str_cmp( speech, "aid me wiseman" ) || str_cmp( speech, "помоги мне" )) {
+        do_say(ch, "Скажи {y{leaid me wiseman{lrпомоги мне{x, если тебе нужна помощь.");
         return;
+    }
     
     if ((wch->is_npc( ) && (!wch->master 
                             || wch->master->getClan( ) != clan
@@ -730,13 +733,13 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
         return;
     }
 
-    act_p("$c1 дает тебе лечебное зелье, предлагая сьесть его.",
+    act_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
            ch,0,wch,TO_VICT,POS_RESTING);
-    act_p("Ты съедаешь лечебное зелье.",ch,0,wch,TO_VICT,POS_RESTING);
+    act_p("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT,POS_RESTING);
     act_p("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR,POS_RESTING);
-    act_p("$C1 съедает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR,POS_RESTING);
+    act_p("$C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR,POS_RESTING);
     act_p("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT,POS_RESTING);
-    act_p("$C1 съедает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT,POS_RESTING);
+    act_p("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT,POS_RESTING);
 
     wch->is_npc( ) ? wch->master->setWaitViolence( 1 ) : wch->setWaitViolence( 1 );
 
@@ -786,13 +789,13 @@ bool ClanGuardBattlerager::specFight( )
 
 void ClanGuardBattlerager::actGreet( PCharacter *wch )
 {
-    do_say(ch, "Добро пожаловать, великий Воин.");
+    do_say(ch, "Добро пожаловать. Да прибудет с тобой {1{RЯрость!{2");
 }
 
 void ClanGuardBattlerager::actPush( PCharacter *wch )
 {
     act( "$C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
-    act( "$C1 отвешивает $c3 подзатыльник...\n\r$c1 - как ветром сдуло.", wch, 0, ch, TO_ROOM );
+    act( "$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло.", wch, 0, ch, TO_ROOM );
 }
 
 
