@@ -463,7 +463,7 @@ SKILL_RUNP( vampire )
         af.bitvector.setTable(&affect_flags);
         af.location = APPLY_DEX;
         af.modifier  = 1 + (level /20);
-        af.bitvector.setValue(AFF_HASTE | AFF_INFRARED|AFF_BERSERK|AFF_SNEAK);
+        af.bitvector.setValue(AFF_HASTE | AFF_INFRARED|AFF_BERSERK|AFF_SNEAK|AFF_FLYING);
         affect_to_char( ch, &af );
 
         /* size + vuln light, holy */
