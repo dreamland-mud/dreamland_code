@@ -23,7 +23,7 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
-#include "skill_utils.h"
+#include "../fight/skill_utils.h"
 
 #define OBJ_VNUM_CORK 19 
 
