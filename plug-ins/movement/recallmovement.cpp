@@ -13,7 +13,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
-#include "skill_utils.h"
+#include "../fight/skill_utils.h"
 
 RecallMovement::RecallMovement( Character *ch )
                  : JumpMovement( ch )
