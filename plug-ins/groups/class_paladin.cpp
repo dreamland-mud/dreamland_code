@@ -39,10 +39,12 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
 
 RACE(golem);
 RACE(demon);
 
+GSN(holy_remedy);
 /*
  * 'layhands' skill command
  */
@@ -68,22 +70,43 @@ SKILL_RUNP( layhands )
     }
 
     ch->setWait( gsn_lay_hands->getBeats( ) );
+    if ( number_percent() < gsn_lay_hands->getEffective( ch ) + skill_level_bonus(*gsn_lay_hands, ch) ) {
+        postaffect_to_char(ch, gsn_lay_hands, 2);
 
-    postaffect_to_char(ch, gsn_lay_hands, 2);
+        int slevel, chance;
+        slevel = skill_level(*gsn_lay_hands, ch);
+        chance = gsn_holy_remedy->getEffective( ch );
 
-    victim->hit = min( victim->hit + ch->getModifyLevel() * 5, (int)victim->max_hit );
-    update_pos( victim );
+        if (number_percent( ) < chance) {
+            slevel += chance / 20;
+            act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
+            act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
+            gsn_holy_remedy->improve( ch, true );
+        }
+        
+        victim->hit = min( (victim->hit + slevel) * 5, (int)victim->max_hit );
+        update_pos( victim );
     
-    if (ch != victim) {
-        act( "Ты возлагаешь руки на $C4, и $M становится гораздо лучше.", ch, 0, victim, TO_CHAR);
-        act( "$c1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
-        act( "$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
-    } else {
-        act( "Ты возлагаешь на себя руки: тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
-        act( "$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
+        if (ch != victim) {
+            act( "Ты возлагаешь руки на $C4, и $M становится гораздо лучше.", ch, 0, victim, TO_CHAR);
+            act( "$c1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
+            act( "$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
+        } else {
+            act( "Ты возлагаешь на себя руки: тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
+            act( "$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
+        }
+    
+        gsn_lay_hands->improve( ch, true, victim );        
+    }
+    else {
+      act( "Ты возлагаешь руки на $C4, но ничего не происходит.", ch, 0, victim, TO_CHAR);
+      act( "$c1 картинным жестом возлагает на тебя руки... но ничего не происходит.", ch, 0, victim, TO_VICT);
+      act( "$c1 картинным жестом возлагает руки на $C4... но ничего не происходит.", ch, 0, victim, TO_NOTVICT);
+      gsn_lay_hands->improve( ch, false, victim );        
     }
     
-    gsn_lay_hands->improve( ch, true, victim );
+
+
 }
 
 SPELL_DECL(Banishment);
@@ -96,10 +119,13 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
            && victim->getRace( ) != race_demon
            && victim->getRace( ) != race_golem))
     {
-        act_p("$C1 - вовсе не нечисть и не демон.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        act_p("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR, POS_RESTING);
         return;
     }
 
+    if ( is_safe( ch, victim ) )
+            return;
+    
     if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_SPELL)) {
         act_p("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR, POS_RESTING);
         return;
@@ -116,33 +142,36 @@ SPELL_DECL(Prayer);
 VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level ) 
 { 
     Affect af;
-    int lvl = max(ch->getRealLevel( ) + 10, 110);
+    int punish_lvl, sk, roll;
+    punish_lvl = number_range(102, 110);    // negative effect level -- punished by gods
+    level = number_range(level, 110);  // positive effect level
+    roll = number_percent();
+    sk = gsn_prayer->getEffective( ch );
 
-    level = number_range(102, 110);
-
-    if (ch->hit < ch->getRealLevel( ) || ch->mana < ch->getRealLevel( ) || ch->move < ch->getRealLevel( )) {
+    if (ch->hit  < ch->max_hit  / 10 ||
+        ch->mana < ch->max_mana / 10 ||
+        ch->move < ch->max_move / 10) {
         act_p("Ты слишком истоще$gно|н|на для молитвы.", ch, 0, 0, TO_CHAR, POS_RESTING);
         return;
     }
 
-    ch->mana -= ch->getModifyLevel( );
-    ch->move -= ch->getModifyLevel( );
-    ch->hit -= ch->getModifyLevel( );
+    ch->mana -= ch->max_hit  / 10;
+    ch->move -= ch->max_move / 10;
+    ch->hit  -= ch->max_move / 10;
     update_pos(ch);
-    ch->setWaitViolence( 1 );
+    ch->setWait( skill->getBeats( ) );
 
-    if (ch->isAffected(sn) 
-        || (number_percent() < number_fuzzy(1) + 50 - ch->getSkill( sn ) / 2))
-    {
-        // bad 
+    // 50% chance to fail
+    if (ch->isAffected(sn) || roll > sk / 2)
+    { 
         act_p("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR, POS_RESTING);
 
         if (!ch->isAffected(gsn_weaken)) {
             af.type = gsn_weaken;
-            af.level = lvl;
-            af.duration = lvl / 15;
+            af.level = punish_lvl;
+            af.duration = punish_lvl / 15;
             af.location = APPLY_STR;
-            af.modifier = -1 * (lvl / 4);
+            af.modifier = -1 * (punish_lvl / 4);
             affect_to_char(ch, &af);
             ch->send_to("Ты чувствуешь, как сила уходит из тебя.\n\r");
             act_p("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
@@ -150,14 +179,14 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
             af.bitvector.setTable(&affect_flags);
             af.type = gsn_curse;
-            af.level = lvl;
-            af.duration = lvl / 10;
+            af.level = punish_lvl;
+            af.duration = punish_lvl / 10;
             af.location = APPLY_HITROLL;
-            af.modifier = -1 * (lvl / 7);
+            af.modifier = -1 * (punish_lvl / 7);
             af.bitvector.setValue(AFF_CURSE);
             affect_to_char(ch, &af);
             af.location = APPLY_SAVING_SPELL;
-            af.modifier = lvl / 7;
+            af.modifier = punish_lvl / 7;
             affect_to_char(ch, &af);
             act_p("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_RESTING);
         }
@@ -170,7 +199,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             else {
                 af.bitvector.setTable(&affect_flags);
                 af.type = gsn_sleep;
-                af.level = lvl;
+                af.level = punish_lvl;
                 af.duration = 3;
                 af.bitvector.setValue(AFF_SLEEP);
                 affect_join(ch, &af);
@@ -185,23 +214,20 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
 
-    if (number_percent() > ch->getSkill( sn ) - 5 ) {
-        // nothing 
+    // 5% chance to fizzle
+    if (roll < 5 ) {
         ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
         return;
     }
 
-    // you did it! 
+    // 45% chance to succeed
 
-    ch->send_to("Благословение Богов снизошло на тебя!\n\r");
-
-    postaffect_to_char(ch, sn, number_fuzzy(1 + ch->getRealLevel( ) / 8));
-
-    // random effects 
-    sn = -1;
+    ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
 
     if (ch->position == POS_FIGHTING && ch->fighting != NULL) {
-        switch (number_range(0, 7)) {
+        postaffect_to_char(ch, sn, level/10 + 1);
+        
+        switch (number_range(0, 3)) {
         case 0:
             if (IS_GOOD(ch) && IS_EVIL(ch->fighting))
                 sn = gsn_ray_of_truth;
@@ -210,59 +236,37 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             else
                 sn = gsn_flamestrike;
             break;
-        case 2:
+        case 1:
             sn = gsn_curse;
             break;
-        case 5:
+        case 2:
             sn = gsn_blindness;
             break;
-        case 7:
-            sn = gsn_cause_critical;
+        case 3:
+            sn = gsn_severity_force;
             break;
         default:
             break;
         }
-
-        if (sn != -1)
-            spell( sn, level, ch, ch->fighting );
-
-        ch->setWaitViolence( 1 );
+ 
+        spell( sn, level, ch, ch->fighting );
+        return;
     }
     else {
-        switch (number_range(0, 31)) {
-        case 0:            sn = gsn_sanctuary;                    break;
-        case 1:            sn = gsn_bless;                    break;
-        case 2:
-        case 3:            sn = gsn_heal;                    break;
-        case 4:            sn = gsn_haste;                    break;
-        case 5:
-        case 6:            sn = gsn_refresh;               break;
-        case 7:            sn = gsn_benediction;            break;
-        case 8:            sn = gsn_shield;                    break;
-        case 9:                
-        case 10:    sn = gsn_stone_skin;            break;
-        case 11:
-        case 12:    sn = gsn_armor;                    break;
-        case 13:        
-            if (IS_EVIL( ch ))
-                sn = gsn_protection_good;
-            break;
-        case 14:
-            if (IS_GOOD( ch ))
-                sn = gsn_protection_evil;
-            break;
-        case 15:
-        case 16:    sn = gsn_giant_strength;            break;
-        case 17:    sn = gsn_protective_shield;            break;
-        case 18:    sn = gsn_frenzy;                break;
-        case 19:    sn = gsn_enhanced_armor;            break;
-        default:
-            break;
-        }
-        if (sn != -1)
-            spell( sn, level, ch, ch );
+        af.bitvector.setTable(&affect_flags);
+        af.type         = sn;
+        af.level        = level;
+        af.duration     = level / 10 + 1;
+
+        af.location = APPLY_LEARNED;
+        af.modifier     = level / 10 + 1;
+        affect_to_char(ch, &af);
+
+        af.location = APPLY_LEVEL;
+        af.modifier     = level / 40 + 1;
+        affect_to_char(ch, &af);
+        return;
     }
-    
 
 }
 
