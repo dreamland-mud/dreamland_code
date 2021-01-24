@@ -14,6 +14,7 @@
 #include "room.h"
 #include "skill.h" 
 #include "skillmanager.h" 
+#include "defaultspell.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -22,6 +23,7 @@
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
 #include "affectwrapper.h"
+#include "spellwrapper.h"
 #include "xmleditorinputhandler.h"
 
 #include "subr.h"
@@ -125,6 +127,12 @@ PCharacter * arg2player( const Register &reg )
     if (ch->is_npc())
         throw Scripting::CustomException("Mobile found when PC expected.");
     return ch->getPC();
+}
+
+DefaultSpell * arg2spell( const Register &reg )
+{
+    return dynamic_cast<DefaultSpell *>(
+                wrapper_cast<SpellWrapper>(reg)->getTarget());;
 }
 
 void args2buf(const RegisterList &args, char *buf, size_t bufsize)

@@ -28,6 +28,7 @@ public:
     Scripting::Object *self;
     
     XML_VARIABLE XMLRegister thiz;
+    XML_VARIABLE XMLString name;
     XML_VARIABLE XMLRegister spell;
     XML_VARIABLE XMLRegister ch;
     XML_VARIABLE XMLRegister obj;
@@ -44,6 +45,7 @@ public:
     static void extractWrapper(Spell *);
 
     static bool executeSpell(Spell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
+    static bool spellHasTrigger(Spell *spell, const DLString &trigName);
 
 private:
     static FeniaSpellContext::Pointer createContext(Spell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);

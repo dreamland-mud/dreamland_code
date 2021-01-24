@@ -60,7 +60,6 @@ bool FeniaSpellHelper::executeSpell(Spell *spell, Character *ch, SpellTarget::Po
     return false;
 }
 
-
 FeniaSpellContext::Pointer FeniaSpellHelper::createContext(Spell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
 {
     FeniaSpellContext::Pointer ctx(NEW);
@@ -68,6 +67,7 @@ FeniaSpellContext::Pointer FeniaSpellHelper::createContext(Spell *spell, Charact
     obj->setHandler(ctx);
 
     ctx->thiz = Register(ctx->self);
+    ctx->name = spell->getSkill()->getName();
     ctx->spell = Register(spell->wrapper);
     ctx->ch = FeniaManager::wrapperManager->getWrapper(ch);
     ctx->level = level;
@@ -110,11 +110,25 @@ Scripting::Register FeniaSpellHelper::findMethod(Spell *spell, SpellTarget::Poin
     return method;
 }
 
+bool FeniaSpellHelper::spellHasTrigger(Spell *spell, const DLString &trigName) 
+{
+    WrapperBase *wrapper = spell->getWrapper();
+    if (wrapper) {
+        IdRef methodId(trigName);
+        Register method;
+        return wrapper->triggerFunction(methodId, method);
+    }
+
+    return false;
+}
+
+
+
 DLString FeniaSpellHelper::getMethodName(SpellTarget::Pointer &spellTarget) 
 {
     switch (spellTarget->type) {
     case SpellTarget::NONE:   return "runArg";
-    case SpellTarget::CHAR:   return "runChar";
+    case SpellTarget::CHAR:   return "runVict";
     case SpellTarget::OBJECT: return "runObj";
     case SpellTarget::ROOM:   return "runRoom";
     default:                  return DLString::emptyString;
@@ -155,7 +169,6 @@ NMI_GET(FeniaSpellContext, arg, "строка, цель заклинания д�
     return Register(level);
 }
 
-
 NMI_GET(FeniaSpellContext, obj, "предмет, цель заклинания для runObj")
 {
     return obj;
@@ -175,5 +188,19 @@ NMI_GET(FeniaSpellContext, level, "уровень заклинания")
 {
     return Register(level);
 }
+
+NMI_GET(FeniaSpellContext, dam, "расчетные повреждения")
+{
+    return Register(dam);
+}
+
+NMI_SET(FeniaSpellContext, dam, "расчетные повреждения")
+{
+    dam = arg.toNumber();
+}
+
+
+
+
 
 

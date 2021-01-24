@@ -81,6 +81,12 @@ NMI_GET( SpellWrapper, rname, "русское название заклинан�
     return Register( target->getSkill()->getRussianName() );
 }
 
+NMI_GET( SpellWrapper, skill, "навык, внутри которого объявлено заклинание (.Skill)") 
+{ 
+    checkTarget( ); 
+    return Register::handler<SkillWrapper>(target->getSkill()->getName());
+}
+
 
 NMI_INVOKE( SpellWrapper, api, "(): печатает этот API" )
 {

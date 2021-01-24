@@ -56,7 +56,9 @@ DefaultSpell::DefaultSpell( )
           type( SPELL_NONE, &spell_types ),
           casted( true ),
           ranged(true),
-          order(0, &order_flags)
+          order(0, &order_flags),
+          damtype(0, &damage_table),
+          damflags(0, &damage_flags)
 {
 }
 
@@ -774,8 +776,7 @@ bool DefaultSpell::isCasted( ) const
 }
 
 AnatoliaCombatSpell::AnatoliaCombatSpell()
-                : damtype(0, &damage_table),
-                  damflags(0, &damage_flags),
+                : 
                   savesCheck(true)
 {
 

@@ -22,6 +22,7 @@ class Skill;
 struct obj_index_data;
 struct mob_index_data;
 class FlagTable;
+class DefaultSpell;
 
 Register wrap( ::Object * );
 Register wrap( struct obj_index_data * );
@@ -45,6 +46,7 @@ PCharacter * arg2player( const Register & );
 Character * args2character( const RegisterList & );
 PCharacter * args2player( const RegisterList & );
 Skill * args2skill( const RegisterList & );
+DefaultSpell * arg2spell( const Register &reg );
 
 const Register & argnum(const RegisterList &args, int num);
 const Register & argnum2function(const RegisterList &args, int num);
