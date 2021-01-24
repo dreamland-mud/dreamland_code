@@ -15,9 +15,12 @@
  *-------------------------------------------------------------------------*/
 void ClanGuardFlowers::actGreet( PCharacter *wch )
 {
+    do_say(ch, "Мир, дружба, жвачка!");    
 }
 void ClanGuardFlowers::actPush( PCharacter *wch )
 {
+    act( "$C1 вежливо выпроваживает тебя восвояси.", wch, 0, ch, TO_CHAR );
+    act( "$C1 вежливо выпроваживает $c2 восвояси.", wch, 0, ch, TO_ROOM );    
 }
 
 bool ClanGuardFlowers::checkPush( PCharacter *wch ) 
@@ -27,4 +30,3 @@ bool ClanGuardFlowers::checkPush( PCharacter *wch )
                    NULL, NULL, "%1$^C1 внезапно появляется." );
     return true;
 }
-
