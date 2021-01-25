@@ -38,6 +38,7 @@
 #include "magic.h"
 #include "fight.h"
 #include "fight_exception.h"
+#include "skill_utils.h"
 #include "clanreference.h"
 #include "vnum.h"
 #include "merc.h"
@@ -48,7 +49,6 @@
 
 CLAN(battlerager);
 GSN(none);
-short get_wear_level( Character *ch, Object *obj );
 
 static bool oprog_quaff( Object *obj, Character *ch )
 {
@@ -87,7 +87,7 @@ CMDRUNP( quaff )
         return;
     }
 
-      if (get_wear_level( ch, obj ) > ch->getModifyLevel( )) {
+    if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
         ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
         return;
     }

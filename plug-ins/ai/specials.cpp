@@ -14,6 +14,7 @@
 #include "dreamland.h"
 #include "act_move.h"
 #include "fight.h"
+#include "skill_utils.h"
 #include "gsn_plugin.h"
 #include "stats_apply.h"
 #include "handler.h"
@@ -24,8 +25,6 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
-
-short get_wear_level( Character *ch, Object *obj );
 
 /*
  * Specials. Called from mobile_update every 4 seconds.
@@ -294,7 +293,7 @@ static bool can_wield_obj( Character *ch, Object *obj )
         return false;
     if (!get_weapon_skill( obj )->usable( ch ))
         return false;
-    if (get_wear_level( ch, obj ) > ch->getModifyLevel( ))
+    if (get_wear_level( ch, obj ) > ch->getRealLevel( ))
         return false;
     return true;
 }

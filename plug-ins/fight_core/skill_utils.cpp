@@ -4,6 +4,7 @@
 #include "spell.h"
 #include "affect.h"
 #include "pcharacter.h"
+#include "core/object.h"
 #include "calendar_utils.h"
 #include "skill.h"
 #include "affectflags.h"
@@ -20,8 +21,12 @@ const char *SKILL_INFO_PAD = "  {W*{x ";
 GROUP(none);
 GROUP(fightmaster);
 GROUP(defensive);
+GSN(none);
 GSN(turlok_fury);
 GSN(athena_wisdom);
+GSN(scrolls);
+GSN(staves);
+GSN(wands);
 
 bool temporary_skill_active( const Skill *skill, CharacterMemoryInterface *mem )
 {
@@ -263,6 +268,9 @@ int skill_level_bonus(Skill &skill, Character *ch)
 {
     int slevel = 0;
 
+    if (skill.getIndex() == gsn_none)
+        return slevel;
+
     if (!ch->is_npc()) {
         slevel += ch->getPC()->mod_level_groups[skill.getGroup()];
         slevel += ch->getPC()->mod_level_skills[skill.getIndex()];
@@ -281,4 +289,28 @@ int skill_level_bonus(Skill &skill, Character *ch)
     }
     
     return slevel;
+}
+
+// Returns which skill governs the usage of a given item, e.g. 'scrolls' for ITEM_SCROLL.
+static Skill & skill_for_item_type(Object *obj)
+{
+    switch (obj->item_type) {
+        case ITEM_SCROLL: return *gsn_scrolls;
+        case ITEM_WAND:   return *gsn_wands;
+        case ITEM_STAFF:  return *gsn_staves;
+        default:          return *gsn_none;
+    }
+}
+
+short get_wear_level( Character *ch, Object *obj ) 
+{
+    int wear_mod, level_diff, itemtype_bonus;
+    
+    wear_mod = ch->getProfession( )->getWearModifier( obj->item_type );
+    level_diff = ch->getModifyLevel( ) - ch->getRealLevel( );
+    itemtype_bonus = skill_level_bonus(
+        skill_for_item_type(obj), ch
+    );
+            
+    return max( 1, obj->level - wear_mod - level_diff - itemtype_bonus );
 }

@@ -42,7 +42,6 @@ GSN(scrolls);
 GSN(staves);
 GSN(wands);
 GSN(none);
-short get_wear_level( Character *ch, Object *obj );
 
 /*
  * 'recite' skill command
@@ -126,7 +125,7 @@ SKILL_RUNP( recite )
         return;
     }
 
-    if (get_wear_level( ch, scroll ) > skill_level(*gsn_scrolls, ch)) {
+    if (get_wear_level( ch, scroll ) > ch->getRealLevel()) {
         ch->send_to("Этот свиток чересчур сложен для твоего понимания.\n\r");
         return;
     }

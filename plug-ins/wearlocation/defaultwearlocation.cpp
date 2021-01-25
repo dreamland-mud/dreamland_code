@@ -19,6 +19,7 @@
 
 #include "damage_impl.h"
 #include "damageflags.h"
+#include "skill_utils.h"
 #include "interp.h"
 #include "save.h"
 #include "loadsave.h"
@@ -28,7 +29,6 @@
 
 WEARLOC(none);
 GSN(spellbane);
-short get_wear_level( Character *ch, Object *obj );
 
 /*-------------------------------------------------------------------
  * DefaultWearlocation

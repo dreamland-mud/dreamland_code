@@ -37,6 +37,7 @@
 
 #include "dreamland.h"
 #include "arg_utils.h"
+#include "skill_utils.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
@@ -51,7 +52,6 @@ RELIG(fili);
 using std::min;
 using std::max;
 
-short get_wear_level( Character *ch, Object *obj );
 void get_obj_name_hint( Object *obj, std::ostringstream &buf );
 
 /*

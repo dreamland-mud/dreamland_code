@@ -196,16 +196,6 @@ bool Object::mustDisappear( Character *ch )
 }
 
 
-short get_wear_level( Character *ch, Object *obj ) 
-{
-    int wear_mod, level_diff;
-    
-    wear_mod = ch->getProfession( )->getWearModifier( obj->item_type );
-    level_diff = ch->getModifyLevel( ) - ch->getRealLevel( );
-            
-    return std::max( 1, obj->level - wear_mod - level_diff );
-}
-
 bool eyes_blinded( Character *ch )
 {
     if (!IS_AFFECTED(ch, AFF_BLIND))
