@@ -41,6 +41,9 @@ selfrate \
 gquest \
 languages \
 druids \
+religion \
+quest \
+craft \
 feniaroot \
 groups \
 learn \
@@ -48,8 +51,6 @@ magic \
 mansion \
 mlove \
 note \
-religion \
-quest \
 misc_behaviors \
 race_aptitude \
 other_skills \
@@ -57,7 +58,6 @@ cards \
 riding \
 web \
 gmcp \
-craft \
 olc \
 searcher
 
