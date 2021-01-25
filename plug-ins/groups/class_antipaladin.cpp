@@ -43,6 +43,7 @@
 #include "interp.h"
 #include "handler.h"
 #include "def.h"
+#include "skill_utils.h"
 
 PROF(anti_paladin);
 GSN(shadowblade);
@@ -76,7 +77,7 @@ void CleaveOneHit::calcDamage( )
     else if (wield == 0)
         chance = 0;
     else {
-        chance = 5 + (ch->getModifyLevel( ) - victim->getModifyLevel( ));
+        chance = 5 + (skill_level(*gsn_cleave, ch) - victim->getModifyLevel( ));
         chance = URANGE( 4, chance, 20 );
     }
 
@@ -91,7 +92,7 @@ void CleaveOneHit::calcDamage( )
         throw VictimDeathException( );
     }
     else {
-        dam = ( dam * 2 + ch->getModifyLevel() );
+        dam = ( dam * 2 + skill_level(*gsn_cleave, ch) );
     }
 
     damApplyDamroll( );
@@ -289,7 +290,7 @@ void ShadowBlade::fight( Character *ch )
         }
     }
     
-    if (number_percent( ) > castChance)
+    if (number_percent( ) > castChance + skill_level_bonus(*gsn_shadowblade, ch))
         return;
 
     if (int chance = gsn_improved_maladiction->getEffective( ch ))
