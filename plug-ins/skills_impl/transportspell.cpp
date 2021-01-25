@@ -95,14 +95,20 @@ bool GateMovement::checkLevel( )
 
 bool GateMovement::checkCaster( Character *wch )
 {
-    if (wch->fighting)
+    if (wch->fighting) {
+        wch->pecho( "Адреналин в крови мешает тебе сконцентрироваться." );
         return false;
+    }
         
-    if (IS_AFFECTED(wch, AFF_CURSE))
+    if (IS_AFFECTED(wch, AFF_CURSE)) {
+        wch->pecho( "Проклятие на тебе блокирует транспортные заклинания." );
         return false;
+    }
     
-    if (spell && !spell->gateShadow && HAS_SHADOW( wch ))
+    if (spell && !spell->gateShadow && HAS_SHADOW( wch )) {
+        wch->pecho( "Вторая тень блокирует транспортные заклинания." );
         return false;
+    }
 
     if (wch->is_npc( ) && wch == actor && wch->mount)
         return false;
@@ -112,35 +118,52 @@ bool GateMovement::checkCaster( Character *wch )
 
 bool GateMovement::checkCasterRoom( )
 {
-    if (IS_SET(from_room->room_flags, ROOM_SAFE|ROOM_NO_RECALL|ROOM_NOSUMMON))
+    if (IS_SET(from_room->room_flags, ROOM_SAFE|ROOM_NO_RECALL|ROOM_NOSUMMON))) {
+        ch->pecho( "Транспортные заклинания в этой местности запрещены Богами." );
         return false;
+    }
 
-    if (IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE))
+    if (IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE)) {
+        ch->pecho( "На этой местности висит временное проклятие." );
         return false;
-
+    }
+  
     return true;
 }
 
 bool GateMovement::checkVictim( )
 {
-    if (victim == ch || victim == ch->mount)
+    if (victim == ch || victim == ch->mount) }
+        ch->pecho( "Перейти на сам{Smого{Sfу{Sx себя? Но как узнать, где настоящ{Smий{Sfая{Sx ты -- здесь или там?" );
+        ch->pecho( "А вдруг тебя вообще не существует?! Вопросы, вопросы..." );      
         return false;
+    }
 
-    if (victim->is_immortal( ) && !ch->is_immortal( )) 
+    if (victim->is_immortal( ) && !ch->is_immortal( )) {
+        ch->pecho( "Таким способом Бессмертных лучше не беспокоить." );      
         return false;
+    }
 
-    if (DIGGED(victim))
+    if (DIGGED(victim)) {
+        ch->pecho( "Непроницаемый экран защищает твою цель, тебе не удается установить ментальную связь." );      
         return false;
+    }
 
     if (victim->is_npc( )) {
-        if (IS_SET(victim->getNPC( )->pIndexData->area->area_flag, AREA_NOGATE))
+        if (IS_SET(victim->getNPC( )->pIndexData->area->area_flag, AREA_NOGATE)) {
+            ch->pecho( "Местность, в которой находится твоя цель, защищена Богами." );
             return false;
-
-        if (IS_SET(victim->imm_flags, IMM_SUMMON))
+        }
+      
+        if (IS_SET(victim->imm_flags, IMM_SUMMON)) {
+            ch->pecho( "Непроницаемый экран защищает твою цель, тебе не удается установить ментальную связь." );      
             return false;
+        }
             
-        if (IS_CHARMED(victim))
+        if (IS_CHARMED(victim)) {
+            ch->pecho( "Разум твоей жертвы во власти кого-то другого, тебе не удается установить ментальную связь." );
             return false;
+        }
     } 
     else {
         if (!ch->is_npc( ) 
@@ -148,13 +171,15 @@ bool GateMovement::checkVictim( )
             && ch->getClan( ) == victim->getClan( ))
             return true; 
         
-        if (!is_safe_nomessage(ch, victim) 
+        if (!is_safe(ch, victim) 
             && IS_SET(victim->act, PLR_NOSUMMON) 
             && spell 
-            && from_room->area != to_room->area)
+            && from_room->area != to_room->area) {
+            ch->pecho( "Открыть портал на твою цель удастся только в пределах одной зоны." );
             return false;
+        }  
         
-        if (is_safe_nomessage(ch, victim) && IS_SET(victim->act, PLR_NOSUMMON))
+        if (is_safe(ch, victim) && IS_SET(victim->act, PLR_NOSUMMON))
             return false;
     }
     
@@ -319,65 +344,88 @@ bool SummonMovement::checkCaster( )
     if (caster->is_npc( ) && IS_CHARMED(caster))
         return false;
 
-    if (IS_VIOLENT( caster ))
+    if (IS_VIOLENT( caster )) {
+        caster->pecho( "Адреналин в крови мешает тебе сконцентрироваться." );
         return false;
-
-    if (IS_SET(caster->in_room->room_flags, ROOM_SAFE|ROOM_NOSUMMON))
+    }
+      
+    if (IS_SET(caster->in_room->room_flags, ROOM_SAFE|ROOM_NOSUMMON)) {
+        caster->pecho( "Призыв в эту местность запрещен Богами." );
         return false;
+    }
     
-    if (caster->in_room->getCapacity( ) == 0)
+    if (caster->in_room->getCapacity( ) == 0) {
+        caster->pecho( "Рядом с тобой в этой комнате уже никто не уместится." );
         return false;
+    }
 
     return true;
 }    
 
 bool SummonMovement::checkVictim( )
 {
-    if (ch == caster)
+    if (ch == caster) {
+        caster->pecho( "Ты с глубоким удовлетворением призываешь сам{Smого{Sfу{Sx себя." );
+        caster->pecho( "К немедленному ответу за бесцельно прожитые годы." );      
         return false;
-    
-    if (ch->is_immortal( ) && !caster->is_immortal( ))
-        return false;
-
-    if (IS_SET(ch->in_room->room_flags, ROOM_SAFE|ROOM_NOSUMMON))
-        return false;
-
-    if (ch->fighting != 0)
-        return false;
-
-    if (ch->isAffected( gsn_mental_block ))
-        return false;
-
-    if (ch->isAffected( gsn_spellbane ))
-        return false;
-
-    if (IS_SET(ch->imm_flags, IMM_SUMMON))
-        return false;
-        
-    if (ch->is_npc( )) {
-        if (IS_SET(ch->act,ACT_AGGRESSIVE))
-            return false;
-            
-        if (ch->getNPC( )->behavior
-            && IS_SET(ch->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
-            return false;
-
-        if (is_safe_nomessage( caster, ch ))
-            return false;
     }
-    else {
-        if (!IS_SET(ch->act,PLR_NOSUMMON))
-            return true;
-        
-        if (!is_safe_nomessage( caster, ch ))
-            return true;
-        
-        if (!caster->is_npc( )) {
-            if (ch->getClan( )->isDispersed( ))
-                return false;
+    
+    if (ch->is_immortal( ) && !caster->is_immortal( )) {
+        caster->pecho( "Призывать Бессмертных лучше другими способами." );
+        return false;
+    }
 
-            if (caster->getClan( ) != ch->getClan( ))
+    if (IS_SET(ch->in_room->room_flags, ROOM_SAFE|ROOM_NOSUMMON)) {
+        caster->pecho( "Местность, в которой находится твоя жертва, защищена Богами." );
+        return false;
+    }
+
+    if (ch->fighting != 0) {
+        caster->pecho( "Разум твоей жертвы в смятении, тебе не удается установить ментальную связь." );
+        return false;
+    }
+
+    if (ch->isAffected( gsn_mental_block )) {
+        caster->pecho( "Непроницаемый экран защищает твою жертву, тебе не удается установить ментальную связь." );
+        return false;
+    }
+
+    if (ch->isAffected( gsn_spellbane )) {
+        caster->pecho( "Ненависть к магии защищает твою жертву, тебе не удается установить ментальную связь." );
+        return false;
+    }
+
+    if (IS_SET(ch->imm_flags, IMM_SUMMON)) {
+        caster->pecho( "Непроницаемый экран защищает твою жертву, тебе не удается установить ментальную связь." );
+        return false;
+    }
+  
+    if (ch->is_npc( )) {
+        if (IS_SET(ch->act,ACT_AGGRESSIVE) || (IS_AFFECTED(ch,AFF_BLOODTHIRST)) {
+            caster->pecho( "Призывать агрессивных существ запрещено Богами." );
+            return false;
+        }
+            
+        if (ch->getNPC( )->behavior && IS_SET(ch->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))) {
+            caster->pecho( "Призывать продавцов запрещено Богами." );
+            return false;
+        }
+            
+        if (is_safe( caster, ch ))
+            return false;            
+    }
+    else {      
+        if (!caster->is_npc( )) {      
+            if (is_safe( caster, ch ))
                 return false;
+          
+            if ( (ch->getClan( )->isDispersed( )) && (caster->getClan( ) != ch->getClan( )) ) {
+                caster->pecho( "Хочешь напасть на клановика? Сделай это лицом к лицу." );
+                return false;              
+            }
+          
+            if ( (!IS_SET(ch->act,PLR_NOSUMMON)) || (caster->getClan( ) == ch->getClan( )) )
+                return true;    
         }
     }
 
