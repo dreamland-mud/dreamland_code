@@ -10,10 +10,10 @@
 #include "room.h"
 
 #include "affectflags.h"
+#include "skill_utils.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
-#include "../fight/skill_utils.h"
 
 RecallMovement::RecallMovement( Character *ch )
                  : JumpMovement( ch )
@@ -53,7 +53,7 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
 
     wch->pecho( "Ты долж%1$Gно|ен|на сражаться!", wch );
     chance = skill->getEffective( wch );
-    chance = 80 * chance / 100 + skill_level(wch, ch);
+    chance = 80 * chance / 100 + skill_level(*skill, ch);
     
     if (number_percent( ) > chance) {
         skill->improve( wch, false );
@@ -121,16 +121,15 @@ bool RecallMovement::checkForsaken( Character *wch )
 
 bool RecallMovement::checkNorecall( Character *wch )
 {
-    if (IS_SET(from_room->room_flags, ROOM_NO_RECALL))
-    }  
-        ch->pecho("Эта местность проклята, здесь боги не услышат твою молитву о возвращении.");
+    if (IS_SET(from_room->room_flags, ROOM_NO_RECALL)) {
+        wch->pecho("Эта местность проклята, здесь боги не услышат твою молитву о возвращении.");
         return false;
     }
 
     if (wch->death_ground_delay > 0
-        && wch->trap.isSet( TF_NO_RECALL ))
-    }  
-        ch->pecho("Ты в ловушке! Отсюда не удастся спастись молитвой о возвращении.");
+        && wch->trap.isSet( TF_NO_RECALL )) 
+    {
+        wch->pecho("Ты в ловушке! Отсюда не удастся спастись молитвой о возвращении.");
         return false;
     }
 
@@ -140,14 +139,14 @@ bool RecallMovement::checkNorecall( Character *wch )
 bool RecallMovement::checkCurse( Character *wch )
 {
     if (IS_AFFECTED(wch, AFF_CURSE))
-    }  
-        ch->pecho("На тебе висит проклятие, препятствующее молитве о возвращении.");
+    { 
+        wch->pecho("На тебе висит проклятие, препятствующее молитве о возвращении.");
         return false;
     }
 
     if (IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE))
-    }  
-        ch->pecho("На этой местности висит временное проклятие, препятствующее молитве о возвращении.");
+    {  
+        wch->pecho("На этой местности висит временное проклятие, препятствующее молитве о возвращении.");
         return false;
     }
 
