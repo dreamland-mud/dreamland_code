@@ -259,7 +259,7 @@ void ShadowBlade::fight( Character *ch )
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield) 
         return;
     
-    level = skill_level(*gsn_shadowblade, ch);
+    level = ch->getModifyLevel( );
 
     if (victim->getModifyLevel( ) > level - 10 && IS_GOOD( victim )) {
         int coef = 100 - bonus;
