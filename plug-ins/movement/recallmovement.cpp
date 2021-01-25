@@ -53,7 +53,7 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
 
     wch->pecho( "Ты долж%1$Gно|ен|на сражаться!", wch );
     chance = skill->getEffective( wch );
-    chance = 80 * chance / 100 + skill_level(*skill, ch);
+    chance = 80 * chance / 100 + skill_level_bonus(*skill, ch);
     
     if (number_percent( ) > chance) {
         skill->improve( wch, false );
