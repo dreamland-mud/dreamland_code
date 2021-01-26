@@ -38,6 +38,8 @@ public:
     
     DefaultSpell( );
 
+    virtual long long getID() const;
+    
     virtual void setSkill( SkillPointer );
     virtual void unsetSkill( );
     virtual SkillPointer getSkill( ) const;
@@ -67,6 +69,16 @@ public:
     virtual bool checkPosition( Character * ) const;
     virtual bool properOrder( Character * ) const;
 
+    XML_VARIABLE XMLFlags   target; // possible spell targets, table target_table
+    XML_VARIABLE XMLEnumeration   position; // required position to cast, table postion_table
+    XML_VARIABLE XMLEnumeration   type; // offensive/defensive or neither, table spell_types
+    XML_VARIABLE XMLBooleanNoTrue casted; // false if not a real spell
+    XML_VARIABLE XMLBooleanNoTrue ranged; // false if can only be cast in the same room
+    XML_VARIABLE XMLFlagsNoEmpty order; // who can order, table order_flags
+    XML_VARIABLE XMLIntegerNoEmpty tier; // damage tier, from 1 (best) to 5
+    XML_VARIABLE XMLEnumerationNoEmpty damtype; // damage type from damage_table
+    XML_VARIABLE XMLFlagsNoEmpty damflags; // additional flags other than DAMF_SPELL
+
 protected:
     Character * getCharSpell( Character *, const DLString &, int *, int *, ostringstream &errbuf );
     
@@ -75,13 +87,6 @@ protected:
     void baneAround( Character *ch, int failChance, int dam ) const;
     void baneForAssist( Character *ch, Character *vch ) const;
     bool baneAction( Character *ch, Character *bch, int failChance, int dam ) const;
-
-    XML_VARIABLE XMLFlags   target;
-    XML_VARIABLE XMLEnumeration   position;
-    XML_VARIABLE XMLEnumeration   type;
-    XML_VARIABLE XMLBooleanNoTrue casted;
-    XML_VARIABLE XMLBooleanNoTrue ranged;
-    XML_VARIABLE XMLFlagsNoEmpty order;
 
     SkillPointer skill;
 };
@@ -99,8 +104,6 @@ public:
 
     virtual void run( Character *, Character *, int, int );
 
-    XML_VARIABLE XMLEnumeration damtype; // damage type from damage_table
-    XML_VARIABLE XMLFlagsNoEmpty damflags; // additional flags other than DAMF_SPELL
     XML_VARIABLE XMLInteger dice;
     XML_VARIABLE XMLIntegerNoEmpty diceBonus; // damage calculation: <level> d <dice> + <diceBonus>
     XML_VARIABLE XMLStringNoEmpty msgNotVict, msgVict, msgChar; // optional messages 

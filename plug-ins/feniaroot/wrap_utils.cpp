@@ -14,6 +14,7 @@
 #include "room.h"
 #include "skill.h" 
 #include "skillmanager.h" 
+#include "defaultspell.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -22,6 +23,7 @@
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
 #include "affectwrapper.h"
+#include "spellwrapper.h"
 #include "xmleditorinputhandler.h"
 
 #include "subr.h"
@@ -82,7 +84,7 @@ DLString args2word( const RegisterList &args )
 
 Character * args2character( const RegisterList &args )
 {
-    return wrapper_cast<CharacterWrapper>( get_unique_arg(args) )->getTarget( );
+    return arg2character(get_unique_arg(args));
 }
 
 PCharacter * args2player( const RegisterList &args )
@@ -125,6 +127,12 @@ PCharacter * arg2player( const Register &reg )
     if (ch->is_npc())
         throw Scripting::CustomException("Mobile found when PC expected.");
     return ch->getPC();
+}
+
+DefaultSpell * arg2spell( const Register &reg )
+{
+    return dynamic_cast<DefaultSpell *>(
+                wrapper_cast<SpellWrapper>(reg)->getTarget());;
 }
 
 void args2buf(const RegisterList &args, char *buf, size_t bufsize)
@@ -170,7 +178,7 @@ RegisterList argnum2list(const RegisterList &args, int num)
 Character *argnum2character(const RegisterList &args, int num)
 {
     const Register &reg = argnum(args, num);
-    return wrapper_cast<CharacterWrapper>(reg)->getTarget();
+    return arg2character(reg);
 }
 
 PCharacter *argnum2player(const RegisterList &args, int num)

@@ -34,6 +34,7 @@ libgenericskill_la_LIBADD = \
 ../fight_core/libfight_core.la \
 ../fight/libfight.la \
 ../wearlocation/libwearlocation.la \
+../feniaroot/libfeniaroot.la \
 ../skills_impl/libskills_impl.la 
 
 libgroup_skills_la_SOURCES = \

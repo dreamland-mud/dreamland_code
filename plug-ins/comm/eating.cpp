@@ -10,7 +10,7 @@
 
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "clanreference.h"
 #include "skillreference.h"
 #include "desire.h"
@@ -20,6 +20,7 @@
 #include "../anatolia/handler.h"
 #include "magic.h"
 #include "damage_impl.h"
+#include "skill_utils.h"
 #include "fight.h"
 #include "act.h"
 #include "merc.h"
@@ -101,7 +102,7 @@ COMMAND(CEat, "eat")
                         return;
     }
 
-    if (obj->level > ch->getModifyLevel() && !ch->is_immortal() )
+    if (get_wear_level(ch, obj) > ch->getRealLevel() && !ch->is_immortal() )
     {
             ch->send_to("Тебе надо подрасти, чтобы заглотить это.\n\r");
             return;

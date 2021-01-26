@@ -44,6 +44,7 @@
 #include "structwrappers.h"
 #include "objindexwrapper.h"
 #include "areaindexwrapper.h"
+#include "spellwrapper.h"
 #include "wrappermanager.h"
 #include "affectwrapper.h"
 #include "tableswrapper.h"
@@ -1055,6 +1056,16 @@ static bool normalize_skill_name(DLString &arg)
 
     return true;
 }
+
+NMI_INVOKE( Root, Spell , "(name): находит заклинание с заданным именем")
+{
+    Skill *skill = args2skill(args);
+    if (!skill || !skill->getSpell())
+        throw Scripting::Exception("Spell not found");
+
+    return WrapperManager::getThis( )->getWrapper(skill->getSpell().getPointer());
+}
+
 
 NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
 {

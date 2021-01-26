@@ -107,8 +107,13 @@ DLString FlagTable::message( bitnumber_t value, char gcase ) const
 {
     if (value < 0 || value > max || reverse[value] == NO_FLAG)
         return DLString::emptyString;
-    else
-        return DLString( fields[reverse[value]].message ).ruscase( gcase );
+    
+    auto &field = fields[reverse[value]];
+    
+    if (field.message)
+        return DLString(field.message).ruscase(gcase);
+
+    return field.name;
 }
 
 

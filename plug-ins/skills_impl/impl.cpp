@@ -14,6 +14,7 @@
 #include "defaultskillgroup.h"
 #include "spellmanager.h"
 
+#include "feniaspellhelper.h"
 #include "basicskill.h"
 #include "summoncreaturespell.h"
 #include "transportspell.h"
@@ -45,7 +46,7 @@ extern "C"
                 Plugin::registerPlugin<MocRegistrator<SleepAffectHandler> >( ppl );                
                 Plugin::registerPlugin<XMLVariableRegistrator<SkillHelp> >( ppl );
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeRestring> >( ppl );
-                
+                Plugin::registerPlugin<MocRegistrator<FeniaSpellContext> > (ppl);
                 return ppl;
         }
         

@@ -42,20 +42,20 @@ public:
     void postpone( Register id, const char *fmt, ... );
     DLString stringCall( Register id, const char *fmt, ... );
     bool numberCall( Register id, int &result, const char *fmt, ... );
-    bool hasTrigger( const DLString &name ) const;
-    void collectTriggers(StringSet &triggers, StringSet &misc) const;
 
     inline bool isAlive() const;
     inline bool isZombie() const;
     inline void setAlive();
     inline long long getID() const;
-    
+
+    bool hasTrigger( const DLString &name ) const;
+    void collectTriggers(StringSet &triggers, StringSet &misc) const;
+    bool triggerFunction(const Register &key, Register &prog) const;
     static void triggerArgs( RegisterList &regList, const char *fmt, va_list ap );
 
 protected:
     bool vcall( Register &rc, const Register &key, const char *fmt, va_list ap);
     virtual void croak(const Register &key, const Exception &e) const;
-    bool triggerFunction(const Register &key, Register &prog) const;
 
     Scripting::Object * self;
     bool alive;

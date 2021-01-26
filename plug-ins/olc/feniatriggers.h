@@ -10,6 +10,7 @@
 using namespace std;
 
 class PCharacter;
+class DefaultSpell;
 
 bool stringIsCapitalized(const DLString &str);
 DLString triggerType(const DLString &name);
@@ -25,9 +26,13 @@ public:
     virtual void destruction();
 
     bool openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const;
     void showAvailableTriggers(PCharacter *ch, const DLString &indexType) const;
+    void showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const;
 
 protected:
+    bool editExisting(Character *ch, Scripting::Register &retval) const;
+    bool findExample(Character *ch, const DLString &methodName, const DLString &indexType, DLString &tmpl) const;
     void loadFolder(const DLString &indexType);
 
     IndexTriggers indexTriggers;

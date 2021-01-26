@@ -18,6 +18,7 @@ public:
     void fromXML( const XMLNode::Pointer& );
 
     DLString keywordAttribute;
+    DLString aka;
     int level;
     DLString labels;
     int id;

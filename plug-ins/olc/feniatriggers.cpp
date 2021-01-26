@@ -5,14 +5,18 @@
 #include "plugininitializer.h"
 #include "wrappermanager.h"
 #include "iconvmap.h"
+#include "defaultspell.h"
+#include "feniaspellhelper.h"
 #include "websocketrpc.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "descriptor.h"
+#include "damageflags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
+#include "def.h"
 
 static IconvMap utf2koi("utf-8", "koi8-r");
 
@@ -35,6 +39,7 @@ void FeniaTriggerLoader::initialization()
     loadFolder("obj");
     loadFolder("mob");
     loadFolder("room");
+    loadFolder("spell");
 }
 
 void FeniaTriggerLoader::destruction()
@@ -98,6 +103,44 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, const DLString &i
     ch->send_to(buf);
 }
 
+
+void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const
+{
+    ostringstream buf;
+
+    if (spell->target.isSet(TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD)
+        || FeniaSpellHelper::spellHasTrigger(spell, "runVict"))
+    {
+        buf << "{g" << web_cmd(ch, "fenia $1", "runVict") << "{x  ";
+    }
+
+    if (spell->target.isSet(TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD)
+        || FeniaSpellHelper::spellHasTrigger(spell, "runObj"))
+    {
+        buf << "{g" << web_cmd(ch, "fenia $1", "runObj") << "{x  ";
+    }
+
+    if (spell->target.isSet(TAR_PEOPLE|TAR_ROOM)
+        || FeniaSpellHelper::spellHasTrigger(spell, "runRoom"))
+    {
+        buf << "{g" << web_cmd(ch, "fenia $1", "runRoom") << "{x  ";
+    }
+
+    if (spell->target.isSet(TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ)
+        || FeniaSpellHelper::spellHasTrigger(spell, "runArg"))
+    {
+        buf << "{g" << web_cmd(ch, "fenia $1", "runArg") << "{x  ";
+    }
+
+    if (buf.str().empty())
+        buf << "(укажи цель заклинания)";
+    else
+        buf << "{D(fenia <trig>){x";
+        
+    buf << endl;
+    ch->send_to(buf);
+}
+
 static Register get_wrapper_for_index_data(int vnum, const DLString &type)
 {
     Register w;
@@ -146,18 +189,6 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
             return false;
         }
 
-        // Look up trigger example for given index type and method name.
-        IndexTriggers::const_iterator i = indexTriggers.find(indexData.getIndexType());
-        if (i == indexTriggers.end()) {
-            ch->println("Нет ни одного триггера, попросите богов принять меры.");
-            return false;
-        }
-        TriggerContent::const_iterator t = i->second.find(methodName);
-        if (t == i->second.end()) {
-            ch->printf("Триггер %s не найден, проверьте написание или попросите богов добавить его.\r\n", methodName.c_str());
-            return false;
-        }
-
         std::vector<DLString> parms(2);
         // Create codesource subject.
         parms[0] = dlprintf("areas/%s/%s/%d.%s", 
@@ -167,7 +198,10 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
                         methodName.c_str());   
 
         // Create codesource body with example code.
-        DLString tmpl = t->second;
+        DLString tmpl;
+        if (!findExample(ch, methodName, indexData.getIndexType(), tmpl))
+            return false;
+
         tmpl.replaces("@vnum@", indexData.getVnum());
         tmpl.replaces("@trig@", methodName);
         parms[1] = tmpl;
@@ -178,13 +212,37 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
         return true;
     }
 
+    return editExisting(ch, retval);
+}
+
+// Look up trigger example for given index type and method name.
+bool FeniaTriggerLoader::findExample(Character *ch, const DLString &methodName, const DLString &indexType, DLString &tmpl) const
+{
+    IndexTriggers::const_iterator i = indexTriggers.find(indexType);
+    if (i == indexTriggers.end()) {
+        ch->println("Нет ни одного триггера, попросите богов принять меры.");
+        return false;
+    }
+
+    TriggerContent::const_iterator t = i->second.find(methodName);
+    if (t == i->second.end()) {
+        ch->printf("Триггер %s не найден, проверьте написание или попросите богов добавить его.\r\n", methodName.c_str());
+        return false;
+    }
+
+    tmpl = t->second;
+    return true;
+}
+
+// Launch web editor with the codesource for this function.
+bool FeniaTriggerLoader::editExisting(Character *ch, Register &retval) const
+{
     // Fenia field is not a function.
     if (retval.type != Register::FUNCTION) {
         ch->println("Это поле уже задано, но это не функция. Попробуйте что-то еще.");
         return false;
     }
 
-    // Fenia function found, open the editor with the containing codesource.
     Scripting::CodeSourceRef csRef = retval.toFunction()->getFunction()->source;
 
     // Construct cs_edit arguments: subject, editor content and line number.
@@ -197,6 +255,52 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
     ch->desc->writeWSCommand("cs_edit", parms);
     ch->printf("Запускаю веб-редактор для сценария %s, строка %d.\r\n", csRef.source->name.c_str(), csRef.line);
     return true;
+}
+
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const
+{
+    if (!is_websock(ch)) {
+        ch->println("Эта крутая фишка доступна только в веб-клиенте.");
+        return false;
+    }
+
+    Register w = WrapperManager::getThis()->getWrapper(spell);
+    if (w.type == Register::NONE)
+        return false;
+        
+    WrapperBase *base = get_wrapper(w.toObject());
+    if (!base)
+        return false;
+
+    DLString args = constArguments;
+    DLString methodName = args.getOneArgument();
+    Scripting::IdRef methodId(methodName);
+    Register retval = base->getField(methodId);
+
+    // Fenia field not found, try to open the editor with trigger example.
+    if (retval.type == Register::NONE) {
+        std::vector<DLString> parms(2);
+        // Create codesource subject.
+        parms[0] = dlprintf("spell/%s/%s",
+                        spell->getSkill()->getName().c_str(),
+                        methodName.c_str());   
+
+        // Create codesource body with example code.
+        DLString tmpl;
+        if (!findExample(ch, methodName, "spell", tmpl))
+            return false;
+
+        tmpl.replaces("@name@", DLString("\"") + spell->getSkill()->getName() + "\"");
+        tmpl.replaces("@trig@", methodName);
+        parms[1] = tmpl;
+
+        // Open the editor.
+        ch->desc->writeWSCommand("cs_edit", parms);
+        ch->printf("Запускаю веб-редактор для заклинания, триггер %s.\r\n", methodName.c_str());
+        return true;
+    }
+
+    return editExisting(ch, retval);
 }
 
 

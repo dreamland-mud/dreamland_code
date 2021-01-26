@@ -575,6 +575,24 @@ NMI_GET( CharacterWrapper, flying, "true если мы GHOST, летаем ил�
     return false;
 }
 
+NMI_GET( CharacterWrapper, neutral, "true если персонаж нейтральный" )
+{
+    checkTarget( );
+    return IS_NEUTRAL(target);
+}
+
+NMI_GET( CharacterWrapper, evil, "true если персонаж злой" )
+{
+    checkTarget( );
+    return IS_EVIL(target);
+}
+
+NMI_GET( CharacterWrapper, good, "true если персонаж добрый" )
+{
+    checkTarget( );
+    return IS_GOOD(target);
+}
+
 NMI_GET( CharacterWrapper, alignMin, "название самой злой натуры для расы и класса персонажа" )
 {
     checkTarget( );
@@ -1516,6 +1534,14 @@ NMI_INVOKE( CharacterWrapper, is_safe, "(vict): защищают ли боги v
     checkTarget( );
     return ::is_safe_nomessage( target, 
                                 arg2character( get_unique_arg( args ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, is_safe_spell, "(vict): защищают ли боги vict от наших арийных заклинаний" )
+{
+    checkTarget();
+    return ::is_safe_spell(target,
+                           args2character(args),
+                           true);
 }
 
 NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vict повреждения в размере dam с типом damtype (таблица .tables.damage_table)" )

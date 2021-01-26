@@ -9,3 +9,9 @@ Spell::~Spell( )
 }
 
 
+
+Spell::Spell() 
+        : WrapperTarget()
+{
+    
+}

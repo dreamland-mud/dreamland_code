@@ -2919,13 +2919,13 @@ int decode_flags(char * arg, int * value_add, int * value_sub)
 
 
 /*
- * Thanks to Grodyn for pointing out bugs in this function.
+ * Syntax:
+ * force all|players|gods|<name> <command with args>
  */
 CMDWIZP( force )
 {
-    char buf[MAX_STRING_LENGTH];
+    const char *msg = "%s вежливо принуждает тебя выполнить команду '%s'.\r\n";
     char arg[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
 
     argument = one_argument( argument, arg );
 
@@ -2935,17 +2935,7 @@ CMDWIZP( force )
         return;
     }
 
-    one_argument(argument,arg2);
-
-    if (!str_cmp(arg2,"delete"))
-    {
-        ch->send_to("ЭТО ЗАПРЕЩЕНО.\n\r");
-        return;
-    }
-
-    sprintf( buf, "$c1 вежливо принуждает тебя выполнить команду '%s'.", argument );
-
-    if ( !str_cmp( arg, "all" ) )
+    if (arg_is_all(arg))
     {
         Character *vch;
         Character *vch_next;
@@ -2962,7 +2952,7 @@ CMDWIZP( force )
 
             if ( !vch->is_npc() && vch->get_trust() < ch->get_trust() )
             {
-                act_p( buf, ch, 0, vch, TO_VICT,POS_DEAD );
+                vch->printf(msg, vch->sees(ch, '1').c_str(), argument);
                 interpret( vch, argument );
             }
         }
@@ -2985,7 +2975,7 @@ CMDWIZP( force )
             if ( !vch->is_npc() && vch->get_trust() < ch->get_trust()
             &&         vch->getRealLevel( ) < LEVEL_HERO)
             {
-                act_p( buf, ch, 0, vch, TO_VICT,POS_DEAD );
+                vch->printf(msg, vch->sees(ch, '1').c_str(), argument);
                 interpret( vch, argument );
             }
         }
@@ -3008,7 +2998,7 @@ CMDWIZP( force )
             if ( !vch->is_npc() && vch->get_trust() < ch->get_trust()
             &&   vch->getRealLevel( ) >= LEVEL_HERO)
             {
-                act_p( buf, ch, 0, vch, TO_VICT,POS_DEAD );
+                vch->printf(msg, vch->sees(ch, '1').c_str(), argument);
                 interpret( vch, argument );
             }
         }
@@ -3049,7 +3039,7 @@ CMDWIZP( force )
             return;
         }
 
-        act_p( buf, ch, 0, victim, TO_VICT,POS_DEAD );
+        victim->printf(msg, victim->sees(ch, '1').c_str(), argument);
         interpret( victim, argument );
     }
 
@@ -3440,9 +3430,6 @@ CMDWIZP( noaffect )
 {
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
-
-    if ( !ch->is_immortal() )
-        return;
 
     argument = one_argument(argument,arg);
 

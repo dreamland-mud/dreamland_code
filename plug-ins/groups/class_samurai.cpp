@@ -32,6 +32,7 @@
 #include "act_move.h"
 #include "mercdb.h"
 #include "magic.h"
+#include "skill_utils.h"
 #include "fight.h"
 #include "weapongenerator.h"
 #include "vnum.h"
@@ -47,7 +48,6 @@ GSN(none);
 PROF(samurai);
 DESIRE(thirst);
 DESIRE(hunger);
-short get_wear_level( Character *ch, Object *obj );
 
 /*
  * 'enchant sword' skill command

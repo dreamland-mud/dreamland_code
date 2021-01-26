@@ -9,11 +9,14 @@
 #include "mobindexwrapper.h"
 #include "objindexwrapper.h"
 #include "areaindexwrapper.h"
+#include "spellwrapper.h"
 #include "subr.h"
 
 #include "fenia/register-impl.h"
 
 #include "class.h"
+#include "spell.h"
+#include "skill.h"
 #include "room.h"
 #include "character.h"
 #include "object.h"
@@ -86,6 +89,14 @@ Scripting::Register WrapperManager::getWrapper( AreaIndexData *pArea )
     return wrapperAux<AreaIndexWrapper>( AREA_VNUM2ID(pArea->min_vnum), pArea );
 }
 
+Scripting::Register WrapperManager::getWrapper(Spell *spell) 
+{
+    if (!spell)
+        return Scripting::Register();
+
+    return wrapperAux<SpellWrapper>(spell->getID(), spell);
+}
+
 template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
 {
@@ -129,6 +140,11 @@ void WrapperManager::linkWrapper( AreaIndexData *pArea )
     linkAux<AreaIndexWrapper>( AREA_VNUM2ID(pArea->min_vnum), pArea );
 }
 
+void WrapperManager::linkWrapper(Spell *spell) 
+{
+    linkAux<SpellWrapper>(spell->getID(), spell);
+}
+
 void WrapperManager::getTarget( const Scripting::Register &reg, Character *& ch )
 {
     ch = wrapper_cast<CharacterWrapper>( reg )->getTarget( );
@@ -147,3 +163,4 @@ void WrapperManager::linkAux( long long id, TargetType t )
     t->wrapper = i->second;
     wrapper_cast<WrapperType>(t->wrapper)->setTarget( t );
 }
+

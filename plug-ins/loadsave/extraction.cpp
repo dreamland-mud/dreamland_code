@@ -40,10 +40,7 @@ bool oprog_extract( Object *obj, bool count )
 {
     FENIA_CALL( obj, "Extract", "i", count )
     FENIA_NDX_CALL( obj, "Extract", "Oi", obj, count )
-
-    if (obj->wrapper)
-        obj->getWrapper( )->extract( count );
-
+    obj->extractWrapper(count);
     BEHAVIOR_CALL( obj, extract, count )
     return false;
 }
@@ -118,10 +115,7 @@ bool mprog_extract( Character *ch, bool count )
 {
     FENIA_CALL( ch, "Extract", "i", count );
     FENIA_NDX_CALL( ch->getNPC( ), "Extract", "Ci", ch, count );
-
-    if (ch->wrapper)
-        ch->getWrapper( )->extract( count );
-
+    ch->extractWrapper(count);
     BEHAVIOR_CALL( ch->getNPC( ), extract, count );
     return false;
 }

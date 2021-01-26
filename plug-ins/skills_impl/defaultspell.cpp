@@ -10,7 +10,9 @@
 #include "spellmanager.h"
 #include "skillgroup.h"
 #include "skill_utils.h"
+#include "feniaspellhelper.h"
 
+#include "fenia/exceptions.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "object.h"
@@ -48,14 +50,30 @@ GROUP(clan);
 GROUP(combat);
 
 DefaultSpell::DefaultSpell( ) 
-        : target( TAR_IGNORE, &target_table ), 
+        : Spell(),
+          target( TAR_IGNORE, &target_table ), 
           position( POS_STANDING, &position_table ), 
           type( SPELL_NONE, &spell_types ),
           casted( true ),
           ranged(true),
-          order(0, &order_flags)
-          
+          order(0, &order_flags),
+          damtype(0, &damage_table),
+          damflags(0, &damage_flags)
 {
+}
+
+long long DefaultSpell::getID() const
+{
+    int myId = 0;
+
+    if (getSkill()->getSkillHelp())
+        myId = getSkill()->getSkillHelp()->getID();
+
+    if (myId <= 0)
+        throw Scripting::Exception(getSkill()->getName() + ": spell ID not found or zero");
+
+    return (myId << 4) | 5;
+
 }
 
 void DefaultSpell::setSkill( SkillPointer skill )
@@ -78,6 +96,9 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
     if (!spt)
         return;
 
+    if (FeniaSpellHelper::executeSpell(this, ch, spt, level))
+        return;
+        
     sn = skill->getIndex( );
 
     switch (spt->type) {
@@ -755,8 +776,7 @@ bool DefaultSpell::isCasted( ) const
 }
 
 AnatoliaCombatSpell::AnatoliaCombatSpell()
-                : damtype(0, &damage_table),
-                  damflags(0, &damage_flags),
+                : 
                   savesCheck(true)
 {
 

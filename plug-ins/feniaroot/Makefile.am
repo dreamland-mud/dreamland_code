@@ -30,6 +30,8 @@ tableswrapper.cpp \
 affectwrapper.cpp \
 structwrappers.cpp \
 areaindexwrapper.cpp \
+spellwrapper.cpp \
+feniaspellext.cpp \
 wrap_utils.cpp 
 
 libfeniaroot_la_MOC = \
@@ -45,6 +47,7 @@ xmlattributecodesource.h \
 tableswrapper.h \
 mobindexwrapper.h \
 areaindexwrapper.h \
+spellwrapper.h \
 characterwrapper.h 
 
 

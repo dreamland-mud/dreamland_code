@@ -143,7 +143,8 @@ XMLArea::init(area_file *af)
             XMLAreaHelp help;
             help.setValue((DLString)(*ahelp));
             help.keywordAttribute = ahelp->getKeywordAttribute();
-	    help.titleAttribute = ahelp->getTitleAttribute();
+            help.aka = ahelp->aka.toString();
+            help.titleAttribute = ahelp->getTitleAttribute();
             help.level = ahelp->getLevel();
             help.id = ahelp->getID();
             help.labels = ahelp->labels.persistent.toString();
@@ -190,7 +191,8 @@ XMLArea::load_helps(AreaIndexData *a)
         help->selfHelp = is_name(aname.c_str(), h->keywordAttribute.c_str());
         help->persistent = true;
         help->setKeywordAttribute(h->keywordAttribute);
-	help->setTitleAttribute(h->titleAttribute);
+        help->aka.fromString(h->aka);
+        help->setTitleAttribute(h->titleAttribute);
         help->setLevel(h->level);
         help->setID(h->id);
         help->setText(h->getValue());
@@ -346,7 +348,6 @@ XMLArea::save(area_file *af)
 {
     LogStream::sendNotice( ) << "saving `" << af->file_name << "'..." << endl;
 
-    XMLArea area;
     XMLNode::Pointer node(NEW);
 
     init(af);

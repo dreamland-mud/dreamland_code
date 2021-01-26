@@ -16,7 +16,8 @@ transportspell.cpp \
 sleepaffecthandler.cpp \
 skillhelp.cpp \
 skillgrouphelp.cpp \
-xmlattributerestring.cpp 
+xmlattributerestring.cpp \
+feniaspellhelper.cpp
 
 libskills_impl_la_MOC = \
 basicskill.h \
@@ -29,7 +30,8 @@ spellmanager.h \
 summoncreaturespell.h \
 transportspell.h \
 sleepaffecthandler.h \
-xmlattributerestring.h
+xmlattributerestring.h \
+feniaspellhelper.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

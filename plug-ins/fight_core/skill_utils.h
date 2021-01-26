@@ -9,6 +9,7 @@ class Character;
 class PCharacter;
 class PCSkillData;
 class XMLSkillReference;
+class Object;
 
 /**
  * Return true if this skill is a temporary one for the character
@@ -75,5 +76,9 @@ int skill_level_bonus(Skill &skill, Character *ch);
 extern const char SKILL_HEADER_BG;
 extern const char SKILL_HEADER_FG;
 extern const char *SKILL_INFO_PAD;
+
+// Return min level the item can be worn or used, considering all bonuses.
+// TODO: find a better header.
+short get_wear_level( Character *ch, Object *obj );
 
 #endif
