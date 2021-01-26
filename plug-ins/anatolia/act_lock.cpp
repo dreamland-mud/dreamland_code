@@ -24,7 +24,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "skill.h"
-#include "../fight/skill_utils.h"
+#include "skill_utils.h"
 
 #define OBJ_VNUM_CORK 19 
 
