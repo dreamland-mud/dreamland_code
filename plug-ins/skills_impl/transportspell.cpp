@@ -401,7 +401,7 @@ bool SummonMovement::checkVictim( )
     }
   
     if (ch->is_npc( )) {
-        if (IS_SET(ch->act,ACT_AGGRESSIVE) || (IS_AFFECTED(ch,AFF_BLOODTHIRST)) {
+        if (IS_SET(ch->act,ACT_AGGRESSIVE) || IS_AFFECTED(ch,AFF_BLOODTHIRST)) {
             caster->pecho( "Призывать агрессивных существ запрещено Богами." );
             return false;
         }
