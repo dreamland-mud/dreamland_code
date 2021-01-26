@@ -78,9 +78,9 @@ SKILL_RUNP( enchant )
         return;
     }
 
-    wear_level = get_wear_level( ch, obj );
+    wear_level = get_wear_level( ch, obj ); // takes remorts into account, compare against real level only
 
-    if (wear_level > ch->getModifyLevel( ))
+    if (wear_level > ch->getRealLevel( ))
     {
         ch->pecho("Ты долж%Gно|ен|на достичь %d уровня, чтобы улучшить это.", ch, wear_level );
         act( "$c1 пытается улучшить $o1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
