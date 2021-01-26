@@ -485,6 +485,12 @@ SKILL_RUNP( spellbane )
 
         affect_to_char(ch,&af);
 
+        af.modifier = 0;
+        af.location = APPLY_NONE;
+        af.bitvector.setTable(&detect_flags);
+        af.bitvector.setValue(DETECT_MAGIC);
+        affect_to_char(ch,&af);
+
         act_p("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR,POS_RESTING);
         act_p("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM,POS_RESTING);
 }
@@ -593,9 +599,6 @@ SKILL_RUNP( truesight )
 // Нечего ! Корвин.
 //      af.bitvector.setValue(ACUTE_VISION);
 //      affect_to_char(ch,&af);
-
-      af.bitvector.setValue(DETECT_MAGIC);
-      affect_to_char(ch,&af);
 
       ch->mana -= mana; 
 
