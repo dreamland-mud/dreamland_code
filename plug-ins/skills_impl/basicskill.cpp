@@ -18,6 +18,7 @@
 #include "skillreference.h"
 #include "skill_utils.h"
 #include "desire.h"
+#include "hometown.h"
 #include "feniaspellhelper.h"
 
 #include "fight.h"
@@ -34,6 +35,7 @@ GSN(learning);
 GSN(anathema);
 DESIRE(drunk);
 BONUS(learning);
+HOMETOWN(frigate);
 
 void BasicSkill::loaded( )
 {
@@ -123,6 +125,9 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     data.timer = 0;
 
     if (pch->getRealLevel( ) > 19  && !IS_SET( pch->act, PLR_CONFIRMED ))
+        return;
+
+    if (pch->getRealLevel() > 19  && pch->getHometown() == home_frigate)
         return;
     
     /* no improve in safe rooms */
