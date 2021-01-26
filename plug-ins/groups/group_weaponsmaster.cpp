@@ -126,19 +126,19 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
                         gsn_grip->improve( victim, false, ch );
         }
 
-        act_p("Ты обезоруживаешь $C4!", ch,0, victim, TO_CHAR,POS_FIGHTING);
-        act_p( "$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT,POS_FIGHTING);
+        act_p("Ты обезоруживаешь $C4!", ch,0, victim, TO_CHAR,POS_RESTING);
+        act_p( "$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT,POS_RESTING);
 
         obj_from_char( obj );
 
         if ( IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_INVENTORY) ) 
         {
-                   act_p("$c1 {rВЫБИ$gЛО{x|Л{x|ЛА{x у тебя оружие!", ch, 0, victim, TO_VICT ,POS_FIGHTING);
+                   act_p("$c1 {rВЫБИ$gЛО{x|Л{x|ЛА{x у тебя оружие!", ch, 0, victim, TO_VICT ,POS_RESTING);
                 obj_to_char( obj, victim );
         }
         else
         {
-                   act_p("$c1 {rВЫБИ$gЛО{x|Л{x|ЛА{x у тебя оружие, и оно упало на землю!", ch, 0, victim, TO_VICT ,POS_FIGHTING);
+                   act_p("$c1 {rВЫБИ$gЛО{x|Л{x|ЛА{x у тебя оружие, и оно упало на землю!", ch, 0, victim, TO_VICT ,POS_RESTING);
                 obj_to_room( obj, victim->in_room );
                 if (victim->is_npc() && victim->wait == 0 && victim->can_see(obj))
                         do_get_raw(victim, obj);
@@ -147,11 +147,11 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
         if ( (obj2 = get_eq_char(victim, wear_second_wield)) != 0)
         {
                 act_p( "Ты вооружаешься вторичным оружием как основным!",
-                        ch, 0, victim,TO_VICT,POS_FIGHTING);
+                        ch, 0, victim,TO_VICT,POS_RESTING);
                 act_p( "$C1 вооружается вторичным оружием как основным!",
-                        ch, 0,victim,TO_CHAR ,POS_FIGHTING);
+                        ch, 0,victim,TO_CHAR ,POS_RESTING);
                 act_p( "$C1 вооружается вторичным оружием как основным!",
-                        ch, 0, victim,TO_NOTVICT ,POS_FIGHTING);
+                        ch, 0, victim,TO_NOTVICT ,POS_RESTING);
                 unequip_char( victim, obj2);
                 equip_char( victim, obj2 , wear_wield);
         }
