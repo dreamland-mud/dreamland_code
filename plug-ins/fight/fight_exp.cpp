@@ -433,10 +433,11 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
         && pccount > 1) 
     {
         int skill = gsn_leadership->getEffective( leader );
+        int bonus = skill_level_bonus(*gsn_leadership, leader);
         
-         if (number_percent( ) < skill / 2 + skill_level_bonus(*gsn_leadership, ch) {
+         if (number_percent( ) < skill / 2 + bonus) {
             xp += (xp * skill / 2) / 100;
-            xp += skill_level_bonus(*gsn_leadership, ch) * 10; 
+            xp += bonus * 10; 
             act_p( "{cБлагодаря умелому руководству $C2 ты получаешь больше опыта.{x",
                         gch, 0, leader, TO_CHAR, POS_RESTING );
             gsn_leadership->improve( leader, true );        
