@@ -166,6 +166,8 @@ bool GateMovement::checkVictim( )
         }
     } 
     else {
+      
+        // same clanned (except unclanned, Exiles and Outsiders) can gate on each other
         if (!ch->is_npc( ) 
             && !ch->getClan( )->isDispersed( ) 
             && ch->getClan( ) == victim->getClan( ))
@@ -415,16 +417,22 @@ bool SummonMovement::checkVictim( )
             return false;            
     }
     else {      
-        if (!caster->is_npc( )) {      
-            if (is_safe( caster, ch ))
+        if (!caster->is_npc( )) {    
+
+            // players from same clan (except unclanned, Exiles and Outsiders) can summon each other
+            if ( (!caster->getClan( )->isDispersed( )) && (caster->getClan( ) == ch>getClan( )) )
+                return true; 
+          
+            if ( (is_safe( caster, ch )) && (IS_SET(ch->act,PLR_NOSUMMON)) )
                 return false;
           
-            if ( (ch->getClan( )->isDispersed( )) && (caster->getClan( ) != ch->getClan( )) ) {
+            // unclanned can't summon clanned
+            if ( (caster->getClan() == clan_none) && (caster->getClan( ) != ch->getClan( )) ) {
                 caster->pecho( "Хочешь напасть на клановика? Сделай это лицом к лицу." );
                 return false;              
             }
           
-            if ( (!IS_SET(ch->act,PLR_NOSUMMON)) || (caster->getClan( ) == ch->getClan( )) )
+            if ( !IS_SET(ch->act,PLR_NOSUMMON) )
                 return true;    
         }
     }
