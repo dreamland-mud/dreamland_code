@@ -30,7 +30,10 @@ ServletManager::ServletManager()
 {
     checkDuplicate(instance);
     instance = this;
+}
 
+void ServletManager::open()
+{
     (new HttpServerSocket(1235))->put();
 }
 
