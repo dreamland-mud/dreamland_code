@@ -133,7 +133,7 @@ bool GateMovement::checkCasterRoom( )
 
 bool GateMovement::checkVictim( )
 {
-    if (victim == ch || victim == ch->mount) }
+    if (victim == ch || victim == ch->mount) {
         ch->pecho( "Перейти на сам{Smого{Sfу{Sx себя? Но как узнать, где настоящ{Smий{Sfая{Sx ты -- здесь или там?" );
         ch->pecho( "А вдруг тебя вообще не существует?! Вопросы, вопросы..." );      
         return false;
