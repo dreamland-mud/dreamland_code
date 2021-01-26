@@ -3431,9 +3431,6 @@ CMDWIZP( noaffect )
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
 
-    if ( !ch->is_immortal() )
-        return;
-
     argument = one_argument(argument,arg);
 
     if ( (victim = get_char_world(ch ,arg)) == 0 )
