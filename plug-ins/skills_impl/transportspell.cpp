@@ -118,7 +118,7 @@ bool GateMovement::checkCaster( Character *wch )
 
 bool GateMovement::checkCasterRoom( )
 {
-    if (IS_SET(from_room->room_flags, ROOM_SAFE|ROOM_NO_RECALL|ROOM_NOSUMMON))) {
+    if (IS_SET(from_room->room_flags, ROOM_SAFE|ROOM_NO_RECALL|ROOM_NOSUMMON)) {
         ch->pecho( "Транспортные заклинания в этой местности запрещены Богами." );
         return false;
     }
