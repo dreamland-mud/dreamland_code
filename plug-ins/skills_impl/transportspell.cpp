@@ -173,7 +173,7 @@ bool GateMovement::checkVictim( )
             && ch->getClan( ) == victim->getClan( ))
             return true; 
         
-        if (!is_safe(ch, victim) 
+        if (!is_safe_nomessage(ch, victim) 
             && IS_SET(victim->act, PLR_NOSUMMON) 
             && spell 
             && from_room->area != to_room->area) {
@@ -181,7 +181,7 @@ bool GateMovement::checkVictim( )
             return false;
         }  
         
-        if (is_safe(ch, victim) && IS_SET(victim->act, PLR_NOSUMMON))
+        if (IS_SET(victim->act, PLR_NOSUMMON) && is_safe(ch, victim))
             return false;
     }
     
@@ -420,20 +420,18 @@ bool SummonMovement::checkVictim( )
         if (!caster->is_npc( )) {    
 
             // players from same clan (except unclanned, Exiles and Outsiders) can summon each other
-            if ( (!caster->getClan( )->isDispersed( )) && (caster->getClan( ) == ch>getClan( )) )
+            if (!caster->getClan( )->isDispersed() && caster->getClan() == ch->getClan())
                 return true; 
-          
-            if ( (is_safe( caster, ch )) && (IS_SET(ch->act,PLR_NOSUMMON)) )
+
+            // 'nosummon' config option prevents summons outside of your PK range.
+            if (IS_SET(ch->act, PLR_NOSUMMON) && is_safe(caster, ch))
                 return false;
           
             // unclanned can't summon clanned
-            if ( (caster->getClan() == clan_none) && (caster->getClan( ) != ch->getClan( )) ) {
+            if (caster->getClan() == clan_none && caster->getClan() != ch->getClan()) {
                 caster->pecho( "Хочешь напасть на клановика? Сделай это лицом к лицу." );
                 return false;              
             }
-          
-            if ( !IS_SET(ch->act,PLR_NOSUMMON) )
-                return true;    
         }
     }
 
