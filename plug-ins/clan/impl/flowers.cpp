@@ -9,6 +9,9 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "act_move.h"
+#include "handler.h"
+#include "interp.h"
+#include "act.h"
 
 /*--------------------------------------------------------------------------
  * ClanGuardFlowers 
