@@ -382,7 +382,7 @@ CMDRUN( sell )
 
         ch->pecho("%^C1 предлагает тебе %s за %O4.", keeper, format_coins(gold, silver).c_str(), obj);
 
-        roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + + skill_level_bonus(*gsn_haggle, ch);
+        roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + skill_level_bonus(*gsn_haggle, ch);
         ch->pecho("Ты торгуешься с %C5.", keeper);
         ch->recho("%^C1 торгуется с %C5.", ch, keeper);
 
