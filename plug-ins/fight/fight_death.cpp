@@ -585,8 +585,13 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
         wiznet( wizflag, 0, victim->get_trust( ),
                 "%1$C1 па%1$Gло|л|ла от неизвестной (божественной) руки.", victim );
 
-    if (!victim->is_npc())
+    if (!victim->is_npc()){
         send_discord_death(victim->getPC(), ch);
+        if(!ch->is_npc() && ch != victim){
+            DLString msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", victim, ch);
+            send_telegram(":skull_crossbones: " + msg);
+        }
+    }
 
     if (ch && mprog_kill( ch, victim ))
         ch = NULL;

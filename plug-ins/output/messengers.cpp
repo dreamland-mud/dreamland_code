@@ -192,7 +192,6 @@ void send_discord_death(PCharacter *ch, Character *killer)
         msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
 
     send_to_discord_stream(":skull_crossbones: " + msg);
-    if(killer->getPC() && ch->getPC()) send_to_telegram(":skull_crossbones: " + msg);
 }
 
 static const DLString COLOR_PINK = "14132165";
