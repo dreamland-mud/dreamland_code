@@ -587,7 +587,7 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
 
     if (!victim->is_npc()){
         send_discord_death(victim->getPC(), ch);
-        if(!ch->is_npc() && ch != victim){
+        if(ch && !ch->is_npc() && ch != victim){
             DLString msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", victim, ch);
             send_telegram(":skull_crossbones: " + msg);
         }
