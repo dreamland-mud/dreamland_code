@@ -483,12 +483,9 @@ SKILL_RUNP( spellbane )
         af.location = APPLY_SAVING_SPELL;
         af.modifier        = ( -ch->getModifyLevel( ) / 4 );
 
-        affect_to_char(ch,&af);
-
-        af.modifier = 0;
-        af.location = APPLY_NONE;
         af.bitvector.setTable(&detect_flags);
         af.bitvector.setValue(DETECT_MAGIC);
+
         affect_to_char(ch,&af);
 
         act_p("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR,POS_RESTING);
