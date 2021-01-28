@@ -42,7 +42,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
         if (victim != ch)
             act_p("$E уже не спит.", ch, 0, victim, TO_CHAR, POS_RESTING);
         else
-            ch->send_to("Что, не спится?\r\n");
+            ch->send_to("Может, лучше бахнуть кофейку?\r\n");
 
         return;
     }
@@ -81,7 +81,7 @@ VOID_SPELL(CureBlindness)::run( Character *ch, Character *victim, int sn, int le
     }
 
     if (!checkDispel(level,victim,gsn_blindness))
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->pecho("Заклинание слепоты, висящее на %C6, сопротивляется твоим молитвам.", victim);
 
 }
 
@@ -101,7 +101,7 @@ VOID_SPELL(CureDisease)::run( Character *ch, Character *victim, int sn, int leve
         }
 
         if (!checkDispel(level,victim,gsn_plague))
-            ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+            ch->pecho("Чума в теле %C2 сопротивляется твоим молитвам.", victim);
 
 }
 
@@ -119,7 +119,7 @@ VOID_SPELL(CurePoison)::run( Character *ch, Character *victim, int sn, int level
         }
 
         if (!checkDispel(level,victim,gsn_poison))
-            ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+            ch->pecho("Яд в крови %C2 сопротивляется твоим молитвам.", victim);
 
 }
 
@@ -128,20 +128,25 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Object *obj, int sn, int level )
 {
     if (IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_NOREMOVE))
     {
-        if (!IS_OBJ_STAT(obj,ITEM_NOUNCURSE)
-        &&  !savesDispel(level + 2,obj->level,0))
+        if (!IS_OBJ_STAT(obj,ITEM_NOUNCURSE))
         {
-            REMOVE_BIT(obj->extra_flags,ITEM_NODROP);
-            REMOVE_BIT(obj->extra_flags,ITEM_NOREMOVE);
-            act("$o1 загорается голубым светом.", ch,obj,0,TO_ALL);
-            return;
+            if (!savesDispel(level + 2,obj->level,0)) {
+                REMOVE_BIT(obj->extra_flags,ITEM_NODROP);
+                REMOVE_BIT(obj->extra_flags,ITEM_NOREMOVE);
+                obj->getRoom()->echo( POS_RESTING, "%1$^O1 загора%1$nется|ются {1{Cголубым{2 светом!", obj );
+                return;
+            }
+            else {
+                ch->pecho("Проклятье, висящее на %O6, сопротивляется твоим молитвам.", obj);
+                act("", ch,obj,0,TO_CHAR);
+                return;                
+            }
         }
-
-        act("Проклятие $o2 пока неподвластно твоим молитвам.", ch,obj,0,TO_CHAR);
+        ch->pecho("Проклятье, висящее на %O6, неподвластно твоим молитвам.", obj);
         return;
     }
     else  {
-      ch->send_to("Ничего не произошло...\n\r");
+      ch->send_to("Эту молитву стоит использовать только на вещи, которые нельзя снять или бросить.\n\r");
       return;
     }
 }
@@ -152,7 +157,7 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Character *victim, int sn, int leve
     bool found = false;
 
     if (!checkDispel(level,victim,gsn_curse))
-            ch->send_to("Не получилось.\n\r");
+            ch->send_to("Проклятье, висящее на тебе, сопротивляется твоим молитвам.\n\r");
 
    for (obj = victim->carrying; (obj != 0 && !found); obj = obj->next_content)
    {
@@ -163,10 +168,7 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Character *victim, int sn, int leve
             {
                 REMOVE_BIT(obj->extra_flags,ITEM_NODROP);
                 REMOVE_BIT(obj->extra_flags,ITEM_NOREMOVE);
-                act_p("$o1 вспыхивает голубым светом.",
-                       victim,obj,0,TO_CHAR,POS_RESTING);
-                act_p("$o1 $c2 вспыхивает голубым светом.",
-                       victim,obj,0,TO_ROOM,POS_RESTING);
+                obj->getRoom()->echo( POS_RESTING, "%1$^O1 загора%1$nется|ются {1{Cголубым{2 светом!", obj );
                 found = true;
             }
          }
@@ -178,6 +180,6 @@ SPELL_DECL(RemoveFear);
 VOID_SPELL(RemoveFear)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     if (!checkDispel(level,victim,gsn_fear))
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->pecho("Заклинание страха, висящее на %C6, сопротивляется твоим молитвам.", victim);
 }
 
