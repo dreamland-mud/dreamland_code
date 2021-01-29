@@ -12,7 +12,7 @@
 
 #include "act.h"
 #include "interp.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -82,6 +82,11 @@ void ShopTrader::speech( Character *victim, const char *speech )
 void ShopTrader::tell( Character *victim, const char *speech )
 {
     describeGoods( victim, speech, true );
+}
+
+void ShopTrader::show(Character *, std::basic_ostringstream<char> &buf) 
+{
+    buf << "{y({GПродавец{y){x";
 }
 
 void ShopTrader::describeGoods( Character *client, const DLString &args, bool verbose )

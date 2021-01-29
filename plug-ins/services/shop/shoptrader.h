@@ -20,6 +20,7 @@ public:
     virtual int getOccupation( );
     virtual void speech( Character *victim, const char *speech );
     virtual void tell ( Character *victim, const char *speech );
+    virtual void show( Character *, std::basic_ostringstream<char> & );
     
     XML_VARIABLE XMLInteger closeHour, openHour;
     XML_VARIABLE XMLInteger profitBuy, profitSell;

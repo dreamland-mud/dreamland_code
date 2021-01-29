@@ -634,10 +634,8 @@ void show_char_to_char_0( Character *victim, Character *ch )
         pVict = victim->getPC( );
     }
 
-    if (nVict && nVict->behavior){
-        if(IS_SET(nVict->behavior->getOccupation( ), (1 << OCC_SHOPPER))) buf << "{y({GПродавец{y){x";
+    if (nVict && nVict->behavior)
         nVict->behavior->show( ch, buf );
-    }
     
     if (pVict) {
         show_char_pk_flags( pVict, buf );
