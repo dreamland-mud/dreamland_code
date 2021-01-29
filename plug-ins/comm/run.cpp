@@ -279,7 +279,7 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
         ch->printf("Развернутый маршрут: %s\r\n", path.c_str());
 
     if (!collated.empty())
-        ch->printf("Тебе оставалось бежать: {c%s{x\r\n", collated.c_str());
+        ch->printf("Тебе оставалось бежать: {hs{c%s{x\r\n", collated.c_str());
 }
 
 char XMLAttributeSpeedWalk::getFirstCommand( ) const
