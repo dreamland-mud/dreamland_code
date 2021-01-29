@@ -42,6 +42,7 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
 
 GSN(none);
 PROF(samurai);
@@ -77,7 +78,7 @@ SKILL_RUNP( enchant )
         return;
     }
 
-    wear_level = get_wear_level( ch, obj );
+    wear_level = get_wear_level( ch, obj ); // takes remorts into account, compare against real level only
 
     if (wear_level > ch->getRealLevel( ))
     {
@@ -94,10 +95,10 @@ SKILL_RUNP( enchant )
          return;
         }
 
-   if ( number_percent() > gsn_enchant_sword->getEffective( ch ) )
+   if ( number_percent() > gsn_enchant_sword->getEffective( ch ) + skill_level_bonus(*gsn_enchant_sword, ch) )
         {
          ch->send_to("Ты не можешь сконцентрироваться.\n\r");
-        act_p( "$c1 пытался улучшить $o1, но на мгновение забыл как это делается.",
+        act_p( "$c1 пытался улучшить $o1, но на мгновение забыл{Sfа{sx как это делается.",
             ch, obj, 0, TO_ROOM,POS_RESTING );
         ch->setWait( gsn_enchant_sword->getBeats( ) );
         gsn_enchant_sword->improve( ch, false );
@@ -106,7 +107,7 @@ SKILL_RUNP( enchant )
         }
     ch->mana -= mana;
 
-    gsn_enchant_weapon->getSpell( )->run(  ch,  obj, gsn_enchant_weapon,  ch->getModifyLevel() );
+    gsn_enchant_weapon->getSpell( )->run(  ch,  obj, gsn_enchant_weapon,  skill_level(*gsn_enchant_sword, ch) );
 
     gsn_enchant_sword->improve( ch, true );
     ch->setWait( gsn_enchant_sword->getBeats( ) );
@@ -133,7 +134,7 @@ SKILL_RUNP( explode )
 
     victim = ch->fighting;
     dam = 0;
-    level = ch->getModifyLevel( );
+    level = skill_level(*gsn_explode, ch);
 
     if (ch->is_npc() || !gsn_explode->usable( ch ) ) {
         ch->send_to("Огонь? Что это?\n\r");
@@ -144,12 +145,12 @@ SKILL_RUNP( explode )
         one_argument(argument, arg);
 
         if (arg[0] == 0) {
-            ch->send_to("Ты играешь со взрывчатыми веществами.\n\r");
+            ch->send_to("Подорвать кого?\n\r");
             return;
         }
 
         if ((victim = get_char_room(ch,arg)) == 0) {
-            ch->send_to("Ты не находишь, кого подорвать.\n\r");
+            ch->send_to("Здесь таких нет.\n\r");
             return;
         }
     }
@@ -169,7 +170,7 @@ SKILL_RUNP( explode )
 
     ch->setWait( gsn_explode->getBeats( ) );
 
-    if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch )) {
+    if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch ) + skill_level_bonus(*gsn_explode, ch)) {
         damage(ch,victim,0,gsn_explode,DAM_FIRE, true, DAMF_WEAPON);
         gsn_explode->improve( ch, false, victim );
         yell_explode( ch, victim );
@@ -245,7 +246,7 @@ SKILL_RUNP( target )
 
     if ( !ch->is_npc() &&   !gsn_target->usable( ch ) )
     {
-        ch->send_to("Ты не знаешь, как можно поменять цель, сражаясь в группе.\n\r");
+        ch->send_to("Ты не знаешь, как можно сфокусировать атаки на конкретного противника.\n\r");
         return;
     }
 
@@ -257,13 +258,13 @@ SKILL_RUNP( target )
 
     if (argument[0] == '\0')
     {
-        ch->send_to("Изменить цель? На что?\n\r");
+        ch->send_to("Изменить цель? На кого?\n\r");
         return;
     }
 
     if (( victim = get_char_room (ch, argument)) == 0 )
     {
-        ch->send_to("Ты не видишь этого здесь.\n\r");
+        ch->send_to("Здесь таких нет.\n\r");
         return;
     }
 
@@ -280,12 +281,14 @@ SKILL_RUNP( target )
   ch->setWait( gsn_target->getBeats( ) );
 
     if (victim == ch->fighting) {
-        act("Ты и так с $Y сражаешься.", ch, 0, victim, TO_CHAR);
+        act("Ты и так наносишь большинство своих атак $Y.", ch, 0, victim, TO_CHAR);
         return;
     }
 
-  if (!ch->is_npc() && number_percent() <
-        (gsn_target->getEffective( ch ) / 2) )
+  int chance;
+  chance = 4 * gsn_target->getEffective( ch ) / 5 + skill_level_bonus(*gsn_target, ch);
+    
+  if (!ch->is_npc() && number_percent() < chance )
     {
       gsn_target->improve( ch, false, victim );
 
@@ -326,7 +329,7 @@ SKILL_RUNP( harakiri )
 
     if (ch->isAffected(gsn_hara_kiri))
     {
-        act("Если уж реши$gло|л|ла покончить с собой - попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
+        act("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -344,7 +347,7 @@ SKILL_RUNP( harakiri )
       return;
     }
 
-    if (number_percent() < chance)
+    if (number_percent() < chance + skill_level_bonus(*gsn_hara_kiri, ch))
     {
         ch->setWaitViolence( 1 );
 
@@ -424,7 +427,7 @@ SKILL_RUNP( katana )
 
         if ( part->pIndexData->vnum != OBJ_VNUM_CHUNK_IRON )
         {
-                ch->send_to("У тебя нет нужного материала.\n\r");
+                ch->send_to("У тебя нет нужного материала -- поищи в Королевстве Дварфов\n\r");
                 return;
         }
 
@@ -438,14 +441,14 @@ SKILL_RUNP( katana )
 
         if ( number_percent( ) > ( gsn_katana->getEffective( ch ) / 3 ) * 2 )
         {
-                ch->send_to("Попытка не удалась, и ты разрушаешь это.\n\r");
+                ch->send_to("Ты понапрасну изводишь брусок хорошего железа.\n\r");
                 extract_obj(part);
                 return;
         }
 
         ch->setWait( gsn_katana->getBeats( ) );
 
-        if ( !ch->is_npc() && number_percent() < gsn_katana->getEffective( ch ) )
+        if ( !ch->is_npc() && number_percent() < gsn_katana->getEffective( ch ) + skill_level_bonus(*gsn_katana, ch) )
         {
                 postaffect_to_char(ch, gsn_katana, ch->getModifyLevel());
 
@@ -483,7 +486,7 @@ SKILL_RUNP( katana )
         }
         else
         {
-                act("Ты разрушаешь $o4.",ch,part,0,TO_CHAR);
+                act("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
                 extract_obj(part);
                 ch->mana -= mana / 2;
                 gsn_katana->improve( ch, false );
@@ -513,7 +516,7 @@ void SamuraiGuildmaster::give( Character *victim, Object *obj )
         || !obj->extra_descr->description
         || !strstr(obj->extra_descr->description, victim->getNameP( )))
     {
-        say_act( victim, ch, "Надписи на этом оружии говорят о том, что оно было изготовлено кем-то другим, а не тобой, $c1." );
+        say_act( victim, ch, "Иероглифы на этом оружии говорят о том, что оно было изготовлено кем-то другим, а не тобой, $c1." );
         giveBack( victim, obj );
         return;
     }
@@ -578,7 +581,7 @@ bool SamuraiGuildmaster::checkPrice( Character *victim, int qp )
         return false;
     
     if (victim->getPC( )->getQuestPoints() < qp) {
-        say_act( victim, ch, "У тебя еще недостаточно славы для этого." );
+        say_act( victim, ch, "У тебя недостаточно квестовых очков." );
         return false;
     }
 

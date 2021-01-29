@@ -23,6 +23,8 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+#include "skill.h"
+#include "skill_utils.h"
 
 #define OBJ_VNUM_CORK 19 
 
@@ -1081,11 +1083,11 @@ bool Keyhole::doPick( const DLString &arg )
         if (number_percent( ) >= gsn_pick_lock->getEffective( ch )
             && number_percent( ) > lockpick->value1()) 
         {
-            ch->pecho( "  ... но, слишком резко надавив, ломаешь %1$P2!", lockpick );
+            ch->pecho( "  ...но, слишком резко надавив, ломаешь %1$P2!", lockpick );
             extract_obj( lockpick );
         }
         else
-            ch->println( "  ... но твои манипуляции ни к чему не приводят." );
+            ch->println( "  ...но твои манипуляции ни к чему не приводят." );
 
         gsn_pick_lock->improve( ch, false );
         ch->setWait( gsn_pick_lock->getBeats( ) );
@@ -1178,7 +1180,7 @@ void Keyhole::record( Object *obj )
 
 bool Keyhole::doLore( ostringstream &buf )
 {
-    if (number_percent( ) >= gsn_golden_eye->getEffective( ch ))
+    if (number_percent( ) >= gsn_golden_eye->getEffective( ch ) + skill_level_bonus(*gsn_golden_eye, ch))
         return false;
 
     if (!isLockable( )) 
@@ -1205,7 +1207,7 @@ bool Keyhole::doExamine( )
     if (!isLockable( ))
         return false;
 
-    if (number_percent( ) >= gsn_golden_eye->getEffective( ch ))
+    if (number_percent( ) >= gsn_golden_eye->getEffective( ch ) + skill_level_bonus(*gsn_golden_eye, ch))
         return false;
         
     if (isPickProof( )) 

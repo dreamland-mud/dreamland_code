@@ -44,6 +44,7 @@
 #include "../../anatolia/handler.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
     
 GSN(haggle);
 BONUS(black_friday);
@@ -173,7 +174,7 @@ CMDRUN( buy )
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-        act_p( "$c1 говорит тебе '{gЯ не продаю этого - используй 'list'{x'.", keeper, 0, ch, TO_VICT, POS_RESTING );
+        act_p( "$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT, POS_RESTING );
         ch->reply = keeper;
         return;
     }
@@ -243,7 +244,7 @@ CMDRUN( buy )
     /* haggle */
     bool bonus = ch->getReligion() == god_fili && get_eq_char(ch, wear_tattoo) != 0;
     roll = bonus ? 100 : number_percent( );
-    if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch))) )
+    if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
         cost -= obj->cost / 2 * roll / 100;
         act_p( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
@@ -374,14 +375,14 @@ CMDRUN( sell )
     /* haggle */
     roll = number_percent();
 
-    if (!IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) && roll < gsn_haggle->getEffective( ch ))
+    if (!IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) && roll < gsn_haggle->getEffective( ch ) )
     {
         silver = cost - (cost/100) * 100;
         gold   = cost/100;
 
         ch->pecho("%^C1 предлагает тебе %s за %O4.", keeper, format_coins(gold, silver).c_str(), obj);
 
-        roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
+        roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + skill_level_bonus(*gsn_haggle, ch);
         ch->pecho("Ты торгуешься с %C5.", keeper);
         ch->recho("%^C1 торгуется с %C5.", ch, keeper);
 
@@ -678,7 +679,7 @@ ShopTrader::Pointer find_keeper( Character *ch )
          && !ch->is_npc() && IS_SET(ch->act,PLR_WANTED) )
     {
         do_say( keeper, "Преступникам не место здесь!" );
-        DLString msg = fmt( 0, "%1$C1 - преступни%1$Gк|к|ца|ки! Хватайте %1$P2!", ch );
+        DLString msg = fmt( 0, "%1$C1 -- преступни%1$Gк|к|ца|ки! Хватайте %1$P2!", ch );
         do_yell( keeper, msg.c_str( ) );
         return null;
     }

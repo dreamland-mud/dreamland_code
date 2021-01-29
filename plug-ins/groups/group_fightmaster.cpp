@@ -104,10 +104,12 @@ SKILL_RUNP( bashdoor )
                 return;
         }
 
+        int slevel = skill_level(*gsn_bash_door, ch);
+                
         /* look for guards */
         for ( gch = room->people; gch; gch = gch->next_in_room )
         {
-                if ( gch->is_npc() && IS_AWAKE(gch) && ch->getModifyLevel() + 5 < gch->getModifyLevel() )
+                if ( gch->is_npc() && IS_AWAKE(gch) && slevel + 5 < gch->getModifyLevel() )
                 {
                         act_p( "$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR,POS_RESTING);
                         return;
@@ -165,7 +167,7 @@ SKILL_RUNP( bashdoor )
         chance += ch->getModifyLevel() / 10;
         */
 
-        chance += ( gsn_bash_door->getEffective( ch ) - 90 );
+        chance += ( gsn_bash_door->getEffective( ch ) - 90 + skill_level_bonus(*gsn_bash_door, ch) );
         const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
         act("Ты бьешь в $N4, пытаясь выбить!", ch,0, doorname,TO_CHAR);
         act("$c1 бьет в $N4, пытаясь выбить!", ch,0, doorname,TO_ROOM);
@@ -173,8 +175,7 @@ SKILL_RUNP( bashdoor )
         if (room->isDark( ) && !IS_AFFECTED(ch, AFF_INFRARED ))
                 chance /= 2;
 
-        chance = max( 3, chance );
-        chance = min( 98, chance );
+        chance = URANGE( 3, chance, 98 );
 
         /* now the attack */
         if (number_percent() < chance )
@@ -584,7 +585,7 @@ SKILL_RUNP( trip )
 
         if ( IS_CHARMED(ch) && ch->master == victim )
         {
-                act_p("Но ведь $C1 - тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("Но ведь $C1 -- тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
         }
 
@@ -915,7 +916,7 @@ SKILL_RUNP( concentrate )
 
     if(SHADOW(ch)) {
       ch->send_to("Эта странная тень не дает тебе сконцентрироваться.\n\r");
-      act_p("$c1 пыжится, но никак не сконцентрируется.\n...гляди, а то лопнет.",
+      act_p("$c1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -1279,7 +1280,8 @@ SKILL_RUNP( dirt )
                 chance -= 25;
 
         /* level */
-        chance += (skill_level(*gsn_dirt_kicking, ch) - victim->getModifyLevel()) * 2;
+        int slevel = skill_level(*gsn_dirt_kicking, ch);
+        chance += (slevel - victim->getModifyLevel()) * 2;
 
         if (chance % 5 == 0)
                 chance += 1;
@@ -1296,13 +1298,14 @@ SKILL_RUNP( dirt )
         case(SECT_MOUNTAIN):                chance -= 10;        break;
         case(SECT_WATER_SWIM):                chance  =  0;        break;
         case(SECT_WATER_NOSWIM):        chance  =  0;        break;
+        case(SECT_UNDERWATER):        chance  =  0;        break;                        
         case(SECT_AIR):                        chance  =  0;          break;
         case(SECT_DESERT):                chance += 10;   break;
         }
 
         if (chance == 0)
         {
-                ch->send_to("Здесь нет пыли..\n\r");
+                ch->send_to("Здесь нет пыли...\n\r");
                 return;
         }
 
@@ -1318,7 +1321,7 @@ SKILL_RUNP( dirt )
                 ch->setWait( gsn_dirt_kicking->getBeats( ) );
 
                 try {
-                    damage_nocatch(ch,victim,number_range(2,5),gsn_dirt_kicking,DAM_NONE, true);
+                    damage_nocatch(ch,victim,slevel/5+1,gsn_dirt_kicking,DAM_NONE, true);
                     gsn_dirt_kicking->getCommand()->run(ch, victim);
                     gsn_dirt_kicking->improve( ch, true, victim );
                 } catch (const VictimDeathException &) {
@@ -1343,13 +1346,14 @@ BOOL_SKILL( dirt )::run( Character *ch, Character *victim )
     Affect af;
 
     victim->pecho("Ты ничего не видишь!");
-
+    int slevel = skill_level(*gsn_dirt_kicking, ch);
+        
     af.bitvector.setTable(&affect_flags);
     af.type         = gsn_dirt_kicking;
-    af.level         = ch->getModifyLevel();
+    af.level         = slevel;
     af.duration        = 0;
     af.location = APPLY_HITROLL;
-    af.modifier        = -4;
+    af.modifier        = -1 * (slevel / 20 + 1);
     af.bitvector.setValue(AFF_BLIND);
 
     affect_to_char(victim,&af);
@@ -1379,7 +1383,7 @@ SKILL_RUNP( warcry )
 
   if (ch->mana < gsn_warcry->getMana( ))
     {
-      ch->send_to("Ты не можешь сконцентрироваться.\n\r");
+      ch->send_to("У тебя не хватает энергии для боевого клича.\n\r");
       return;
     }
 

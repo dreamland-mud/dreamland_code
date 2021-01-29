@@ -44,6 +44,7 @@
 #include "mercdb.h"
 #include "act.h"
 #include "def.h"
+#include "skill_utils.h"
 
 GSN(none);
 DLString quality_percent( int ); /* XXX */
@@ -77,7 +78,7 @@ VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int leve
     affect_to_char( victim, &af );
     victim->send_to("Твое зрение обостряется.\n\r");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->send_to("Получилось.\n\r");
     return;
 }
 
@@ -155,9 +156,9 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, DETECT_INVIS) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие невидимых сил.\n\r");
+          ch->send_to("Ты уже видишь невидимое.\n\r");
         else
-          act_p("$C1 уже чувствует присутствие невидимых сил.",
+          act_p("$C1 уже видит невидимое.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -170,7 +171,7 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
     
     af.bitvector.setValue(DETECT_INVIS);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь присутствие невидимых сил.\n\r");
+    victim->send_to("Теперь ты видишь невидимое.\n\r");
     if ( ch != victim )
         ch->send_to("Ok.\n\r");
     return;
@@ -187,9 +188,9 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, DETECT_MAGIC) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие магических сил.\n\r");
+          ch->send_to("Ты уже чувствуешь магическую ауру вокруг предметов.\n\r");
         else
-          act_p("$C1 уже чувствует присутствие магических сил.",
+          act_p("$C1 уже чувствует магическую ауру вокруг предметов.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -202,9 +203,9 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
     
     af.bitvector.setValue(DETECT_MAGIC);
     affect_to_char( victim, &af );
-    victim->send_to("Твои глаза загораются.\n\r");
+    victim->send_to("Теперь ты чувствуешь магическую ауру вокруг предметов.\n\r");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->send_to("Получилось.\n\r");
     return;
 
 }
@@ -216,13 +217,13 @@ VOID_SPELL(DetectPoison)::run( Character *ch, Object *obj, int sn, int level )
     if ( obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOOD )
     {
         if (IS_SET(obj->value3(), DRINK_POISONED))
-            ch->send_to("Ты чувствуешь запах яда.\n\r");
+            ch->send_to("Ты чувствуешь запах яда!\n\r");
         else
-            ch->send_to("Это выглядит вполне нормально.\n\r");
+            ch->send_to("Уф, кажется, не отравлено.\n\r");
     }
     else
     {
-        ch->send_to("Это выглядит не отравленным.\n\r");
+        ch->send_to("Это заклинание подействует только на пищу или емкости для жидкости.\n\r");
     }
 
     return;
@@ -317,9 +318,9 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
     if ( CAN_DETECT(victim, DETECT_IMP_INVIS) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие очень невидимых сил.\n\r");
+          ch->send_to("Ты уже чувствуешь присутствие очень невидимых существ.\n\r");
         else
-          act_p("$C1 уже чувствует присутствие очень невидимых сил.",
+          act_p("$C1 уже чувствует присутствие очень невидимых существ.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -332,7 +333,7 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
     
     af.bitvector.setValue(DETECT_IMP_INVIS);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь присутствие очень невидимых сил.\n\r");
+    victim->send_to("Теперь ты чувствуешь присутствие очень невидимых существ.\n\r");
     if ( ch != victim )
         ch->send_to("Ok.\n\r");
     return;
@@ -350,7 +351,7 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
         else if ( IS_NEUTRAL(victim) )
                 msg = "$C1 имеет серую ауру.";
         else
-                msg = "$C1 - воплощение {Dзла{x!.";
+                msg = "$C1 -- воплощение {Dзла{x!.";
 
         act_p( msg, ch, 0, victim, TO_CHAR,POS_RESTING);
 
@@ -411,7 +412,7 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
 
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by))
         {
-            sprintf( buf, "Имеется у %s\n\r",
+            sprintf( buf, "Имеется у %s.\n\r",
                 ch->sees(in_obj->carried_by, '2').c_str() );
         }
         else
@@ -420,9 +421,9 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
                 sprintf( buf, "находится в %s [Комната %d]\n\r",
                     in_obj->in_room->getName(), in_obj->in_room->vnum);
             else
-                sprintf( buf, "находится в %s\n\r",
+                sprintf( buf, "находится в %s.\n\r",
                     in_obj->in_room == 0
-                        ? "somewhere" : in_obj->in_room->getName() );
+                        ? "неизвестном месте" : in_obj->in_room->getName() );
         }
 
         buf[0] = Char::upper(buf[0]);
@@ -433,7 +434,7 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
     }
 
     if ( !found )
-        ch->send_to("В Dream Land нет ничего похожего на это.\n\r");
+        ch->send_to("Ни на земле, ни в небесах не найдено, увы и ах.\n\r");
     else
         page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -445,7 +446,7 @@ VOID_SPELL(Observation)::run( Character *ch, Character *victim, int sn, int leve
   Affect        af;
 
   if( CAN_DETECT( victim, DETECT_OBSERVATION ) ) {
-    ch->send_to("Ты уже замечаешь состояние других.\n\r");
+    ch->send_to("Ты уже можешь диагностировать состояние других существ.\n\r");
     return;
   }
 
@@ -457,7 +458,7 @@ VOID_SPELL(Observation)::run( Character *ch, Character *victim, int sn, int leve
   af.modifier        = 0;
   af.bitvector.setValue(DETECT_OBSERVATION);
   affect_to_char( victim, &af );
-  ch->send_to("Теперь ты замечаешь состояние других.\n\r");
+  ch->send_to("Теперь ты можешь диагностировать состояние других существ.\n\r");
   return;
 
 }
@@ -479,28 +480,30 @@ SKILL_RUNP( detect )
 
         if ( CAN_DETECT(ch, DETECT_HIDDEN) )
         {
-                ch->send_to("Ты уже чувствуешь присутствие скрытых сил. \n\r");
+                ch->send_to("Ты уже видишь скрытое. \n\r");
                 return;
         }
 
         ch->setWait( gsn_detect_hide->getBeats( ) );
         
-        if ( number_percent( ) > gsn_detect_hide->getEffective( ch ) )
+        if ( number_percent( ) > gsn_detect_hide->getEffective( ch ) + skill_level_bonus(*gsn_detect_hide, ch) )
         {
-                ch->send_to("Ты пытаешься увидеть скрытое в тени, но у тебя ничего не выходит.\n\r");
+                ch->send_to("Ты пытаешься увидеть скрытое, но у тебя ничего не выходит.\n\r");
                 gsn_detect_hide->improve( ch, false );
                 return;
         }
 
+	int slevel = skill_level(*gsn_detect_hide, ch);
+	
         af.bitvector.setTable(&detect_flags);
         af.type      = gsn_detect_hide;
-        af.level     = ch->getModifyLevel();
-        af.duration  = ch->getModifyLevel();
+        af.level     = slevel;
+        af.duration  = slevel;
         
         af.modifier  = 0;
         af.bitvector.setValue(DETECT_HIDDEN);
         affect_to_char( ch, &af );
-        ch->send_to( "Твоя информированность повышается.\n\r");
+        ch->send_to( "Теперь ты видишь скрытое. \n\r");
         gsn_detect_hide->improve( ch, true );
         return;
 }
@@ -539,7 +542,7 @@ SKILL_RUNP( lore )
   argument = one_argument( argument, arg1 );
 
     if (arg1[0] == '\0') {
-        ch->println("Использование: {lRлегенды{lElore{x предмет.");
+        ch->println("Используй это умение на предмет: {y{lRлегенды{lElore{x {Dпредмет{x.");
         return;
     }
 
@@ -550,7 +553,7 @@ SKILL_RUNP( lore )
     }
 
     mana = gsn_lore->getMana( );
-    learned = gsn_lore->getEffective( ch );
+    learned = gsn_lore->getEffective( ch ) + skill_level_bonus(*gsn_lore, ch);
     
   if (ch->mana < mana)
     {

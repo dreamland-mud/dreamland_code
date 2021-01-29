@@ -33,6 +33,7 @@
 #include "terrains.h"
 #include "wiznet.h"
 #include "def.h"
+#include "skill_utils.h"
 
 #define OBJ_VNUM_ALTAR 88
 
@@ -407,7 +408,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
 
 
     if (attr->prevBonus == bonus->getIndex()) {
-        ch->pecho("Не стоит просить %N4 об одном и том же два раза подряд - попроси %p2 о чем-то еще.", rname, religion.getSex());
+        ch->pecho("Не стоит просить %N4 об одном и том же два раза подряд -- попроси %p2 о чем-то еще.", rname, religion.getSex());
         return;
     }
 
@@ -419,7 +420,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     if (!drelig || !drelig->flags.isSet(RELIG_CULT)) {
         ch->pecho("Похоже, %N1 совершенно равнодуш%gно|ен|на к жертвоприношениям.", 
                    rname, religion.getSex());
-        ch->recho("... но ничего не происходит.");
+        ch->recho("...но ничего не происходит.");
         return;
     }
 
@@ -431,7 +432,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
         ch->pecho("{R%^N1 гневается на тебя за попытку принести в жертву %s!{x",
                        rname, offering.getSmiteMessage().c_str());
         ch->recho("Гнев божий обрушивается на %C2!", ch);
-        rawdamage(ch, ch, DAM_HOLY, ch->hit / 4, false);
+        rawdamage(ch, ch, DAM_OTHER, ch->hit / 4, false);
         ch->pecho("Это было действительно {rБОЛЬНО{x!"); 
         altar_clear(altar);
 
@@ -444,7 +445,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     
     if (offering.getSum() <  default_threshold) {
         ch->pecho("%^N1 игнорирует твое скудное подношение.", rname);
-        ch->recho("... но ничего не происходит.");
+        ch->recho("...но ничего не происходит.");
         ch->setWaitViolence(1);
         pch->save();
         return;
@@ -580,7 +581,7 @@ CMDRUNP( sacrifice )
         }
 
         if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
-            ch->send_to("Бог не хочет принять твою жертву.\r\n");
+            ch->send_to("Божество не примет твою жертву в этой местности.\r\n");
             return;
         }
 
@@ -637,7 +638,7 @@ CMDRUNP( sacrifice )
 
                 if (obj->item_type == ITEM_CORPSE_NPC) {
                     if (number_percent() < gsn_crusify->getEffective( ch )) {
-                        mana_gain = ch->getModifyLevel();
+                        mana_gain = skill_level(*gsn_crusify, ch);
                         gsn_crusify->improve( ch, true );
                     } else {
                         gsn_crusify->improve( ch, false );
