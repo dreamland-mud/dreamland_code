@@ -931,7 +931,6 @@ CMDRUNP(report)
 {
     DLString args = argument;
     DLString arg = args.getOneArgument();
-    ostringstream result;
 
     if (!ch->is_npc() || !IS_CHARMED(ch)) {
         char buf[MAX_INPUT_LENGTH];
@@ -949,7 +948,7 @@ CMDRUNP(report)
         return;
 
     vector<Skill::Pointer> skills, skillsFight, spells, passives;
-    ostringstream buf;
+    ostringstream result;
     bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
     bool shown = false;
     bool fRussian = pet->master->getConfig().ruskills;
@@ -1005,11 +1004,12 @@ CMDRUNP(report)
             << endl;
 
     if (!skills.empty()) {
-        buf.str(std::string());
-        for (vector<Skill::Pointer>::iterator it = skills.begin(); it != skills.end();) {
+        ostringstream buf;
+
+        for (auto it = skills.begin(); it != skills.end();) {
             buf << "{G"
-                << "{hh" << ((*it)->getSkillHelp() ? (*it)->getSkillHelp()->getID() : (*it)->getNameFor(pet->master))
-                << (fRussian ? (*it)->getCommand()->getRussianName().c_str() : (*it)->getCommand()->getName().c_str())
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (*it)->getCommand()->getNameFor(pet->master)
                 << "{x";
             if (++it != skills.end())
                 buf << ", ";
@@ -1022,11 +1022,11 @@ CMDRUNP(report)
     }
 
     if (!skillsFight.empty()) {
-        buf.str(std::string());
-        for (vector<Skill::Pointer>::iterator it = skillsFight.begin(); it != skillsFight.end();) {
+        ostringstream buf;
+        for (auto it = skillsFight.begin(); it != skillsFight.end();) {
             buf << "{Y"
-                << "{hh" << ((*it)->getSkillHelp() ? (*it)->getSkillHelp()->getID() : (*it)->getNameFor(pet->master))
-                << (fRussian ? (*it)->getCommand()->getRussianName().c_str() : (*it)->getCommand()->getName().c_str())
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (*it)->getCommand()->getNameFor(pet->master)
                 << "{x";
             if (++it != skillsFight.end())
                 buf << ", ";
@@ -1039,11 +1039,11 @@ CMDRUNP(report)
     }
 
     if (!spells.empty()) {
-        buf.str(std::string());
-        for (vector<Skill::Pointer>::iterator it = spells.begin(); it != spells.end();) {
+        ostringstream buf;
+        for (auto it = spells.begin(); it != spells.end();) {
             buf << "{g"
                 << "{hh" << (*it)->getSkillHelp()->getID()
-                << (fRussian ? (*it)->getRussianName().c_str() : (*it)->getName().c_str())
+                << (*it)->getNameFor(pet->master)
                 << "{x";
             if (++it != spells.end())
                 buf << ", ";
@@ -1060,11 +1060,11 @@ CMDRUNP(report)
     }
 
     if (showAll && !passives.empty()) {
-        buf.str(std::string());
-        for (vector<Skill::Pointer>::iterator it = passives.begin(); it != passives.end();) {
+        ostringstream buf;
+        for (auto it = passives.begin(); it != passives.end();) {
             buf << "{W"
                 << "{hh" << (*it)->getSkillHelp()->getID()
-                << (fRussian ? (*it)->getRussianName().c_str() : (*it)->getName().c_str())
+                << (*it)->getNameFor(pet->master)
                 << "{x";
             if (++it != passives.end())
                 buf << ", ";
@@ -1076,15 +1076,13 @@ CMDRUNP(report)
         shown = true;
     }
 
-    buf.str(std::string());
     if (IS_SET(pet->act, ACT_RIDEABLE))
-        buf << "На мне можно {y{hh1376ездить верхом{x! ";
+        result << "На мне можно {y{hh1376ездить верхом{x! ";
     if (can_fly(pet))
-        buf << "Я умею {hh1018летать{x. ";
-    buf << (pet->master->getPC() && pet->master->getPC()->pet && pet->master->getPC()->pet == pet ? "" : "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ");
-    buf << "Мне можно приказать {hh1020поспать{x и другие стандартные команды." << endl;
-
-    result << buf.str();
+        result << "Я умею {hh1018летать{x. ";
+    if (!pet->master->getPC()->pet || pet->master->getPC()->pet != pet)
+        result << "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ";
+    result << "Мне можно приказать {hh1020спать{x и другие стандартные команды." << endl;
 
     if (shown) {
 
