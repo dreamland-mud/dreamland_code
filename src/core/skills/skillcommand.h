@@ -18,6 +18,7 @@ public:
 
     virtual const DLString & getName( ) const;
     virtual const DLString & getRussianName( ) const;
+    virtual const DLString& getNameFor( Character * ) const;
     virtual bool run( Character *, Character * ) { return false; }
     virtual bool run( Character * ) { return false; }
     virtual bool run( Character *, int ) { return false; }

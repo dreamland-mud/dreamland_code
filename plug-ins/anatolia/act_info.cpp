@@ -60,10 +60,12 @@
 #include "char.h"
 #include "logstream.h"
 #include "grammar_entities_impl.h"
+#include "morphology.h"
 
 #include "skill.h"
 #include "skillmanager.h"
 #include "skillgroup.h"
+#include "skillcommand.h"
 #include "spell.h"
 #include "affecthandler.h"
 #include "mobilebehavior.h"
@@ -109,6 +111,9 @@
 #include "arg_utils.h"
 #include "vnum.h"
 #include "mercdb.h"
+#include "commandflags.h"
+#include "damageflags.h"
+#include "autoflags.h"
 
 using std::endl;
 using std::min;
@@ -306,7 +311,7 @@ CMDRUNP( oscore )
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
     buf << "{wРаса:{W " << ch->getRace( )->getNameFor( ch, ch )
-	<< "  {wРазмер:{W " << size_table.message( ch->size )    
+    << "  {wРазмер:{W " << size_table.message( ch->size )    
         << "  {wПол:{W " << sex_table.message( ch->getSex( ) )
         << "  {wКласс:{W " << ch->getProfession( )->getNameFor( ch );
     
@@ -397,7 +402,7 @@ CMDRUNP( oscore )
                 buf << "Тебя еще ни разу не убивали.";
             newline = true;
         }
-	    
+        
         if (ch->getPC()->guarding != 0) {
             buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
             newline = true;
@@ -923,19 +928,182 @@ CMDRUNP( pretitle )
     }
 }
 
-
-CMDRUNP( report )
+CMDRUNP(report)
 {
-    char buf[MAX_INPUT_LENGTH];
+    DLString args = argument;
+    DLString arg = args.getOneArgument();
 
-    sprintf( buf,
-        "У меня %d/%d жизни (hp) %d/%d энергии (mana) %d/%d движения (mv).",
-        ch->hit.getValue( ),  ch->max_hit.getValue( ),
-        ch->mana.getValue( ), ch->max_mana.getValue( ),
-        ch->move.getValue( ), ch->max_move.getValue( ) );
-    do_say( ch, buf );
+    if (!ch->is_npc() || !IS_CHARMED(ch)) {
+        char buf[MAX_INPUT_LENGTH];
+        sprintf(buf,
+                "У меня %d/%d жизни (hp) %d/%d энергии (mana) %d/%d движения (mv).",
+                ch->hit.getValue(), ch->max_hit.getValue(),
+                ch->mana.getValue(), ch->max_mana.getValue(),
+                ch->move.getValue(), ch->max_move.getValue());
+        do_say(ch, buf);
+        return;
+    }
 
-    return;
+    NPCharacter *pet = ch->getNPC();
+    if (!pet->master || pet->master->is_npc())
+        return;
+
+    vector<Skill::Pointer> skills, skillsFight, spells, passives;
+    ostringstream result;
+    bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
+    bool shown = false;
+
+    for (int sn = 0; sn < SkillManager::getThis()->size(); sn++) {
+        Skill::Pointer skill = SkillManager::getThis()->find(sn);
+        Spell::Pointer spell = skill->getSpell();
+        Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
+
+        if (!skill->usable(pet, false))
+            continue;
+
+        if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
+            bool canOrder = cmd->properOrder(pet);
+            pet->fighting = ch;
+            bool canOrderFight = cmd->properOrder(pet);
+            pet->fighting = 0;
+
+            if (canOrder && showAll) {
+                skills.push_back(skill);
+            }
+
+            else if (canOrderFight && sn != gsn_recall) {
+                skillsFight.push_back(skill);
+            }
+
+            continue;
+        }
+
+        if (spell && spell->isCasted()) {
+            if (spell->properOrder(pet)) {
+                if (showAll) {
+                    spells.push_back(skill);
+                    continue;
+                } else if (IS_SET(spell->getTarget(), TAR_CHAR_ROOM)) {
+                    spells.push_back(skill);
+                    continue;
+                }
+            }
+            continue;
+        }
+
+        if (showAll)
+            passives.push_back(skill);
+    }
+
+    result << fmt(0, "%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
+               pet,
+               GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"),
+               pet->getModifyLevel(),
+               pet->hit.getValue(), pet->max_hit.getValue(),
+               pet->mana.getValue(), pet->max_mana.getValue())
+            << endl;
+
+    if (!skills.empty()) {
+        ostringstream buf;
+
+        for (auto it = skills.begin(); it != skills.end();) {
+            buf << "{G"
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (*it)->getCommand()->getNameFor(pet->master)
+                << "{x";
+            if (++it != skills.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+
+        result << "Небоевые умения: " << buf.str();
+        shown = true;
+    }
+
+    if (!skillsFight.empty()) {
+        ostringstream buf;
+        for (auto it = skillsFight.begin(); it != skillsFight.end();) {
+            buf << "{Y"
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (*it)->getCommand()->getNameFor(pet->master)
+                << "{x";
+            if (++it != skillsFight.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+
+        result << "В бою мне можно приказать: " << buf.str();
+        shown = true;
+    }
+
+    if (!spells.empty()) {
+        ostringstream buf;
+        for (auto it = spells.begin(); it != spells.end();) {
+            buf << "{g"
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (*it)->getNameFor(pet->master)
+                << "{x";
+            if (++it != spells.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+
+        if (showAll)
+            result << "Я владею такими заклинаниями: " ;
+        else 
+            result << "Я могу наложить на тебя такие заклинания: ";
+        result << buf.str();
+        shown = true;
+    }
+
+    if (showAll && !passives.empty()) {
+        ostringstream buf;
+        for (auto it = passives.begin(); it != passives.end();) {
+            buf << "{W"
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (*it)->getNameFor(pet->master)
+                << "{x";
+            if (++it != passives.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+
+        result << "Мои пассивные умения: " << buf.str();
+        shown = true;
+    }
+
+    if (IS_SET(pet->act, ACT_RIDEABLE))
+        result << "На мне можно {y{hh1376ездить верхом{x! ";
+    if (can_fly(pet))
+        result << "Я умею {hh1018летать{x. ";
+    if (!pet->master->getPC()->pet || pet->master->getPC()->pet != pet)
+        result << "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ";
+    result << "Мне можно приказать {hh1020спать{x и другие стандартные команды." << endl;
+
+    if (shown) {
+
+        if (!showAll) {
+            DLString petName = Syntax::noun(pet->getNameP('1'));
+            result << fmt(0, "Напиши {y{hc{lRприказать %1$s рапорт все{lEorder %1$s report all{x, и я расскажу, что ещё я умею делать.", 
+                             petName.c_str())
+                   << endl;
+        }
+
+        result << endl << "См. также {y{hh1091{lR? приказать{lE? order{x и {y{hh1005{lR? рапорт{lE? report{x" 
+               << endl;
+
+        page_to_char(result.str().c_str(), pet->master);
+
+    }
+    else {
+        page_to_char(result.str().c_str(), pet->master);
+        tell_raw(pet->master, pet, "%s, больше я ничегошеньки не умею!", GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"));
+        interpret_raw(pet, "abat", "");
+    }
 }
 
 /*
@@ -1134,9 +1302,9 @@ CMDRUNP( request )
 
         Flags att = victim->getRace( )->getAttitude( *ch->getRace( ) );
 
-	/* Donating races (e.g. centaurs) donate regardless of alignment. 
-	 * Otherwise good mobs would donate to good players.
-	 */	 
+    /* Donating races (e.g. centaurs) donate regardless of alignment. 
+     * Otherwise good mobs would donate to good players.
+     */     
         if (!att.isSet( RACE_DONATES ))
         {
             if (!IS_GOOD(ch) || !IS_GOOD(victim))
@@ -1431,19 +1599,19 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Здоровье %d из %d.", ch->hit, ch->max_hit);
         return;
     } 
-	if (arg_oneof(arg, "mana", "мана", "энергия")) {
+    if (arg_oneof(arg, "mana", "мана", "энергия")) {
         ch->pecho("Мана %d из %d.", ch->mana, ch->max_mana);
         return;
     } 
-	if (arg_oneof(arg, "moves", "движение", "шаги")) {
+    if (arg_oneof(arg, "moves", "движение", "шаги")) {
         ch->pecho("Шагов %d из %d.", ch->move, ch->max_move);
         return;
     } 
-	if (arg_oneof(arg, "level", "уровень")) {
+    if (arg_oneof(arg, "level", "уровень")) {
         ch->pecho("Уровень %d.", ch->getRealLevel());
         return;
     } 
-	if (arg_oneof(arg, "race", "раса")) {
+    if (arg_oneof(arg, "race", "раса")) {
         if (ch->getRace()->isPC()) {
             PCRace::Pointer pcRace = ch->getRace()->getPC(); 
             ch->pecho("Ты %N1.", GET_SEX(ch,
@@ -1457,75 +1625,75 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Пол %s.", GET_SEX(ch, "потерян", "мужской", "женский"));
         return;
     }
-	if (arg_oneof(arg, "class", "класс", "profession", "профессия")) {
+    if (arg_oneof(arg, "class", "класс", "profession", "профессия")) {
         ch->pecho("Ты %N1.", ch->getProfession()->getRusName().c_str());
         return;
     } 
-	if (arg_oneof(arg, "alignment", "натура")) {
+    if (arg_oneof(arg, "alignment", "натура")) {
         ch->pecho("У тебя %s натура.", align_name_short(ch, Grammar::MultiGender::FEMININE));
         return;
     } 
-	if (arg_oneof(arg, "ethos", "этос")) {
+    if (arg_oneof(arg, "ethos", "этос")) {
         ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1').c_str());
         return;
     } 
-	if (arg_oneof(arg, "hometown", "дом")) {
+    if (arg_oneof(arg, "hometown", "дом")) {
         Room *room = get_room_instance(pch->getHometown()->getAltar());
         ch->pecho("Твой дом - %s.", room ? room->areaName() : "потерян");
         return;
     } 
-	if (arg_oneof(arg, "religion", "религия")) {
+    if (arg_oneof(arg, "religion", "религия")) {
         if (ch->getReligion() == god_none)
             ch->pecho("Ты атеист%1$G||ка.", ch);
         else
             ch->pecho("Религия %s.", ch->getReligion()->getRussianName().ruscase('1').c_str());
         return;
     } 
-	if (arg_oneof(arg, "practice", "практики")) {
+    if (arg_oneof(arg, "practice", "практики")) {
         ch->pecho("Практик %d.", pch->practice);
         return;
     } 
-	if (arg_oneof(arg, "train", "тренировки")) {
+    if (arg_oneof(arg, "train", "тренировки")) {
         ch->pecho("Тренировки %d.", pch->train);
         return;
     } 
-	if (!str_prefix("quest", arg.c_str()) || !str_prefix("квест", arg.c_str())) {
+    if (!str_prefix("quest", arg.c_str()) || !str_prefix("квест", arg.c_str())) {
         ch->pecho("Используй команды 'квест время' и 'квест очки'.");
         return;
     } 
-	if (arg_oneof(arg, "wimpy", "трусость")) {
+    if (arg_oneof(arg, "wimpy", "трусость")) {
         ch->pecho("Трусость %d.", ch->wimpy);
         return;
     } 
-	if (arg_oneof(arg, "death", "смертей", "смерть")) {
+    if (arg_oneof(arg, "death", "смертей", "смерть")) {
         ch->pecho("Смертей %d.", pch->death);
         return;
     } 
-	if (arg_oneof(arg, "position", "положение", "позиция")) {
+    if (arg_oneof(arg, "position", "положение", "позиция")) {
         ch->println(msgtable_lookup(msg_positions, ch->position));
         return;
     }
-	if (arg_oneof(arg, "gold", "золото")) {
+    if (arg_oneof(arg, "gold", "золото")) {
         ch->pecho("Золота %d.", ch->gold);
         return;
     } 
-	if (arg_oneof(arg, "silver", "серебро")) {
+    if (arg_oneof(arg, "silver", "серебро")) {
         ch->pecho("Серебра %d.", ch->silver);
         return;
     } 
-	if (arg_oneof(arg, "weight", "вес")) {
+    if (arg_oneof(arg, "weight", "вес")) {
         ch->pecho("Вес %d из %d.", ch->getCarryWeight()/10, ch->canCarryWeight()/10);
         return;
     } 
-	if (arg_oneof(arg, "items", "вещи")) {
+    if (arg_oneof(arg, "items", "вещи")) {
         ch->pecho("Вещи %d из %d.", ch->carry_number, ch->canCarryNumber());
         return;
     } 
-	if (arg_oneof(arg, "experience", "опыт")) {
+    if (arg_oneof(arg, "experience", "опыт")) {
         ch->pecho("Опыта до уровня %d.", pch->getExpToLevel());
         return;
     }
-	if (arg_oneof(arg, "age", "возраст")) {
+    if (arg_oneof(arg, "age", "возраст")) {
         ch->pecho("Возраст %d.", pch->age.getYears());
         return;
     }
@@ -2046,16 +2214,16 @@ struct HelpFinder {
     }
     
     HelpArticle::Pointer get(int number) const
-    {	
-		unsigned int n = (unsigned int)number;
+    {    
+        unsigned int n = (unsigned int)number;
         if (n > articles.size() || n < 0)
             return HelpArticle::Pointer();
         return articles.at(number-1);
     }
-	
-	const ArticleArray &getArticles() const {
-		return articles;
-	}
+    
+    const ArticleArray &getArticles() const {
+        return articles;
+    }
     
 private:
     void findMatchingArticles(Character *ch) 
@@ -2124,8 +2292,8 @@ private:
                 preferredLabels.insert("clan");
         }
     }
-	
-	ArticleArray articles;
+    
+    ArticleArray articles;
     DLString args, arg1, argRest;
     StringSet preferredLabels;
 };
@@ -2190,9 +2358,9 @@ CMDRUNP( help )
     DLString lineFormat = "[{C{hh%5d{x] %s\r\n";
     int firstId = -1;
     for (unsigned int a = 0; a < articles.size(); a++) {
-	    auto help = articles[a];
+        auto help = articles[a];
         DLString title = help->getTitle(DLString::emptyString);
-	    DLString disambig = help_article_disambig(*help);
+        DLString disambig = help_article_disambig(*help);
 
         // Create a line with help ID, title and disambiguation keywords (unless turned off).
         DLString line = title;
@@ -2505,9 +2673,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         
         buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
             << "(среднее " << weapon_ave(obj) << ")" << endl;
-		    
+            
         if (obj->value3())  /* weapon damtype */
-            buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;		    
+            buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;            
     
         if (obj->value4())  /* weapon flags */
             buf << "Особенности оружия: " << weapon_type2.messages(obj->value4(), true ) << endl;

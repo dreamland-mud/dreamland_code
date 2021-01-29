@@ -3,6 +3,8 @@
 #include "morphology.h"
 #include "grammar_entities_impl.h"
 #include "configurable.h"
+#include "stringset.h"
+#include "stringlist.h"
 
 Json::Value rules;
 CONFIGURABLE_LOADED(grammar, rules)
@@ -57,4 +59,20 @@ DLString Morphology::adjective(const DLString &form, const MultiGender &gender)
 
     DLString cases = rules[rule].asString();
     return stem + cases;
+}
+
+DLString Syntax::noun(const DLString &phrase) 
+{
+    StringList words(phrase.colourStrip().toLower());
+    if (words.empty())
+        return phrase;
+
+    // Recognize "наемник из герихельма".
+    StringSet preps("из на");
+    for (auto &w: words)
+        if (preps.count(w) > 0)
+            return words.front();
+
+    // For everything else just return the last word.
+    return words.back();
 }
