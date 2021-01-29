@@ -121,9 +121,6 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
         act_p("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR, POS_RESTING);
         return;
     }
-
-    if ( is_safe( ch, victim ) )
-            return;
     
     if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_SPELL)) {
         act_p("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR, POS_RESTING);
