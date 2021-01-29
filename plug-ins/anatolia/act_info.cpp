@@ -932,10 +932,6 @@ CMDRUNP(report)
     DLString args = argument;
     DLString arg = args.getOneArgument();
 
-    if (!ch) {
-        return;
-    }
-
     if (!ch->is_npc() || !IS_CHARMED(ch)) {
         char buf[MAX_INPUT_LENGTH];
         sprintf(buf,
@@ -947,165 +943,163 @@ CMDRUNP(report)
         return;
     }
 
-    if (NPCharacter *pet = ch->getNPC()) {
-        if (pet->master && !pet->master->is_npc()) {
-            vector<Skill::Pointer> skills, skillsFight, spells, passives;
-            ostringstream buf;
-            bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
-            bool shown = false;
-            bool fRussian = pet->master->getConfig().ruskills;
-            //bool fRuComm = pet->master->getConfig().rucommands;
+    NPCharacter *pet = ch->getNPC();
+    if (!pet->master || pet->master->is_npc())
+        return;
 
-            for (int sn = 0; sn < SkillManager::getThis()->size(); sn++) {
-                Skill::Pointer skill = SkillManager::getThis()->find(sn);
-                Spell::Pointer spell = skill->getSpell();
-                Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
+    vector<Skill::Pointer> skills, skillsFight, spells, passives;
+    ostringstream buf;
+    bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
+    bool shown = false;
+    bool fRussian = pet->master->getConfig().ruskills;
+    //bool fRuComm = pet->master->getConfig().rucommands;
 
-                if (!skill->usable(pet, false))
-                    continue;
+    for (int sn = 0; sn < SkillManager::getThis()->size(); sn++) {
+        Skill::Pointer skill = SkillManager::getThis()->find(sn);
+        Spell::Pointer spell = skill->getSpell();
+        Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
 
-                if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
-                    bool canOrder = cmd->properOrder(pet);
-                    pet->fighting = ch;
-                    bool canOrderFight = cmd->properOrder(pet);
-                    pet->fighting = 0;
+        if (!skill->usable(pet, false))
+            continue;
 
-                    if (canOrder && showAll) {
-                        skills.push_back(skill);
-                    }
+        if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
+            bool canOrder = cmd->properOrder(pet);
+            pet->fighting = ch;
+            bool canOrderFight = cmd->properOrder(pet);
+            pet->fighting = 0;
 
-                    else if (canOrderFight && sn != gsn_recall) {
-                        skillsFight.push_back(skill);
-                    }
-
-                    continue;
-                }
-
-                if (spell && spell->isCasted()) {
-                    if (spell->properOrder(pet)) {
-                        if (showAll) {
-                            spells.push_back(skill);
-                            continue;
-                        } else if (IS_SET(spell->getTarget(), TAR_CHAR_ROOM)) {
-                            spells.push_back(skill);
-                            continue;
-                        }
-                    }
-                    continue;
-                }
-
-                if (showAll)
-                    passives.push_back(skill);
-
-                continue;
+            if (canOrder && showAll) {
+                skills.push_back(skill);
             }
 
-            buf << fmt(0, "%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
-                       pet,
-                       GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"),
-                       pet->getModifyLevel(),
-                       pet->hit.getValue(), pet->max_hit.getValue(),
-                       pet->mana.getValue(), pet->max_mana.getValue())
-                << "\r\n";
-            page_to_char(buf.str().c_str(), pet->master);
-
-            if (!skills.empty()) {
-                buf.str(std::string());
-                for (vector<Skill::Pointer>::iterator it = skills.begin(); it != skills.end();) {
-                    buf << "{G"
-                        << "{hh" << ((*it)->getSkillHelp() ? (*it)->getSkillHelp()->getID() : (*it)->getNameFor(pet->master))
-                        << (fRussian ? (*it)->getCommand()->getRussianName().c_str() : (*it)->getCommand()->getName().c_str())
-                        << "{x";
-                    if (++it != skills.end())
-                        buf << ", ";
-                    else
-                        buf << "{x" << endl;
-                }
-
-                page_to_char("Небоевые умения: ", pet->master);
-                page_to_char(buf.str().c_str(), pet->master);
-                shown = true;
+            else if (canOrderFight && sn != gsn_recall) {
+                skillsFight.push_back(skill);
             }
 
-            if (!skillsFight.empty()) {
-                buf.str(std::string());
-                for (vector<Skill::Pointer>::iterator it = skillsFight.begin(); it != skillsFight.end();) {
-                    buf << "{Y"
-                        << "{hh" << ((*it)->getSkillHelp() ? (*it)->getSkillHelp()->getID() : (*it)->getNameFor(pet->master))
-                        << (fRussian ? (*it)->getCommand()->getRussianName().c_str() : (*it)->getCommand()->getName().c_str())
-                        << "{x";
-                    if (++it != skillsFight.end())
-                        buf << ", ";
-                    else
-                        buf << "{x" << endl;
-                }
-
-                page_to_char("В бою мне можно приказать: ", pet->master);
-                page_to_char(buf.str().c_str(), pet->master);
-                shown = true;
-            }
-
-            if (!spells.empty()) {
-                buf.str(std::string());
-                for (vector<Skill::Pointer>::iterator it = spells.begin(); it != spells.end();) {
-                    buf << "{g"
-                        << "{hh" << (*it)->getSkillHelp()->getID()
-                        << (fRussian ? (*it)->getRussianName().c_str() : (*it)->getName().c_str())
-                        << "{x";
-                    if (++it != spells.end())
-                        buf << ", ";
-                    else
-                        buf << "{x" << endl;
-                }
-
-                page_to_char(showAll ? "Я владею такими заклинаниями: " : "Я могу наложить на тебя такие заклинания: ", pet->master);
-                page_to_char(buf.str().c_str(), pet->master);
-                shown = true;
-            }
-
-            if (showAll && !passives.empty()) {
-                buf.str(std::string());
-                for (vector<Skill::Pointer>::iterator it = passives.begin(); it != passives.end();) {
-                    buf << "{W"
-                        << "{hh" << (*it)->getSkillHelp()->getID()
-                        << (fRussian ? (*it)->getRussianName().c_str() : (*it)->getName().c_str())
-                        << "{x";
-                    if (++it != passives.end())
-                        buf << ", ";
-                    else
-                        buf << "{x" << endl;
-                }
-                page_to_char("Мои пассивные умения: ", pet->master);
-                page_to_char(buf.str().c_str(), pet->master);
-                shown = true;
-            }
-
-            buf.str(std::string());
-            if (IS_SET(pet->act, ACT_RIDEABLE))
-                buf << "На мне можно {y{hh1376ездить верхом{x! ";
-            if (can_fly(pet))
-                buf << "Я умею {hh1018летать{x. ";
-            buf << (pet->master->getPC() && pet->master->getPC()->pet && pet->master->getPC()->pet == pet ? "" : "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ");
-            buf << "Мне можно приказать {hh1020поспать{x и другие стандартные команды." << endl;
-
-            page_to_char(buf.str().c_str(), pet->master);
-
-            if (shown) {
-
-                if (!showAll) {
-                    act("Напиши {x{y{hc{lRприказать \'$n1\' рапорт все{lEorder \'$n1\' report all{x, и я расскажу, что ещё я умею делать.", pet->master, pet->getNameP(1).colourStrip().c_str(), 0, TO_CHAR);
-                }
-                pet->master->println("\n\rСм. также {x{y{hh1091{lR? приказать{lE? order{x и {x{y{hh1005{lR? рапорт{lE? report{x");
-            }
-
-            else {
-                tell_raw(pet->master, pet, "%s, больше я ничегошеньки не умею!", GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"));
-                interpret_raw(pet, "abat", "");
-            }
+            continue;
         }
+
+        if (spell && spell->isCasted()) {
+            if (spell->properOrder(pet)) {
+                if (showAll) {
+                    spells.push_back(skill);
+                    continue;
+                } else if (IS_SET(spell->getTarget(), TAR_CHAR_ROOM)) {
+                    spells.push_back(skill);
+                    continue;
+                }
+            }
+            continue;
+        }
+
+        if (showAll)
+            passives.push_back(skill);
+
+        continue;
     }
 
-    return;
+    buf << fmt(0, "%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
+               pet,
+               GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"),
+               pet->getModifyLevel(),
+               pet->hit.getValue(), pet->max_hit.getValue(),
+               pet->mana.getValue(), pet->max_mana.getValue())
+        << "\r\n";
+    page_to_char(buf.str().c_str(), pet->master);
+
+    if (!skills.empty()) {
+        buf.str(std::string());
+        for (vector<Skill::Pointer>::iterator it = skills.begin(); it != skills.end();) {
+            buf << "{G"
+                << "{hh" << ((*it)->getSkillHelp() ? (*it)->getSkillHelp()->getID() : (*it)->getNameFor(pet->master))
+                << (fRussian ? (*it)->getCommand()->getRussianName().c_str() : (*it)->getCommand()->getName().c_str())
+                << "{x";
+            if (++it != skills.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+
+        page_to_char("Небоевые умения: ", pet->master);
+        page_to_char(buf.str().c_str(), pet->master);
+        shown = true;
+    }
+
+    if (!skillsFight.empty()) {
+        buf.str(std::string());
+        for (vector<Skill::Pointer>::iterator it = skillsFight.begin(); it != skillsFight.end();) {
+            buf << "{Y"
+                << "{hh" << ((*it)->getSkillHelp() ? (*it)->getSkillHelp()->getID() : (*it)->getNameFor(pet->master))
+                << (fRussian ? (*it)->getCommand()->getRussianName().c_str() : (*it)->getCommand()->getName().c_str())
+                << "{x";
+            if (++it != skillsFight.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+
+        page_to_char("В бою мне можно приказать: ", pet->master);
+        page_to_char(buf.str().c_str(), pet->master);
+        shown = true;
+    }
+
+    if (!spells.empty()) {
+        buf.str(std::string());
+        for (vector<Skill::Pointer>::iterator it = spells.begin(); it != spells.end();) {
+            buf << "{g"
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (fRussian ? (*it)->getRussianName().c_str() : (*it)->getName().c_str())
+                << "{x";
+            if (++it != spells.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+
+        page_to_char(showAll ? "Я владею такими заклинаниями: " : "Я могу наложить на тебя такие заклинания: ", pet->master);
+        page_to_char(buf.str().c_str(), pet->master);
+        shown = true;
+    }
+
+    if (showAll && !passives.empty()) {
+        buf.str(std::string());
+        for (vector<Skill::Pointer>::iterator it = passives.begin(); it != passives.end();) {
+            buf << "{W"
+                << "{hh" << (*it)->getSkillHelp()->getID()
+                << (fRussian ? (*it)->getRussianName().c_str() : (*it)->getName().c_str())
+                << "{x";
+            if (++it != passives.end())
+                buf << ", ";
+            else
+                buf << "{x" << endl;
+        }
+        page_to_char("Мои пассивные умения: ", pet->master);
+        page_to_char(buf.str().c_str(), pet->master);
+        shown = true;
+    }
+
+    buf.str(std::string());
+    if (IS_SET(pet->act, ACT_RIDEABLE))
+        buf << "На мне можно {y{hh1376ездить верхом{x! ";
+    if (can_fly(pet))
+        buf << "Я умею {hh1018летать{x. ";
+    buf << (pet->master->getPC() && pet->master->getPC()->pet && pet->master->getPC()->pet == pet ? "" : "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ");
+    buf << "Мне можно приказать {hh1020поспать{x и другие стандартные команды." << endl;
+
+    page_to_char(buf.str().c_str(), pet->master);
+
+    if (shown) {
+
+        if (!showAll) {
+            act("Напиши {x{y{hc{lRприказать \'$n1\' рапорт все{lEorder \'$n1\' report all{x, и я расскажу, что ещё я умею делать.", pet->master, pet->getNameP(1).colourStrip().c_str(), 0, TO_CHAR);
+        }
+        pet->master->println("\n\rСм. также {x{y{hh1091{lR? приказать{lE? order{x и {x{y{hh1005{lR? рапорт{lE? report{x");
+    }
+
+    else {
+        tell_raw(pet->master, pet, "%s, больше я ничегошеньки не умею!", GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"));
+        interpret_raw(pet, "abat", "");
+    }
 }
 
 /*
