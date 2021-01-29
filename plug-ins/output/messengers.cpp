@@ -183,14 +183,8 @@ void send_discord_bonus(const DLString &msg)
     send_to_discord_stream(":calendar_spiral: " + msg);
 }
 
-void send_discord_death(PCharacter *ch, Character *killer)
+void send_discord_death(const DLString &msg)
 {
-    DLString msg;
-    if (!killer || killer == ch)
-        msg = fmt(0, "%1$C1 погиб%1$Gло||ла своей смертью.", ch);
-    else
-        msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
-
     send_to_discord_stream(":skull_crossbones: " + msg);
 }
 

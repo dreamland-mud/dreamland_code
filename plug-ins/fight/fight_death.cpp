@@ -577,20 +577,17 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
     else if (IS_SET(flags, FKILL_PURGE))
         purge_corpse( ch, victim );
     
-    wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
-    if (ch)
-        wiznet( wizflag, 0, victim->get_trust( ),
-                "%1$C1 па%1$Gло|л|ла от руки %2$C2.", victim, ch );
-    else
-        wiznet( wizflag, 0, victim->get_trust( ),
-                "%1$C1 па%1$Gло|л|ла от неизвестной (божественной) руки.", victim );
+    static const char *msg_killed = "%1$C1 па%1$Gло|л|ла от руки %2$C2.";
+    static const char *msg_died = "%1$C1 погиб%1$Gло||ла своей смертью.";
+    const char *&msg = (ch && victim != ch) ? msg_killed : msg_died;
 
-    if (!victim->is_npc()){
-        send_discord_death(victim->getPC(), ch);
-        if(ch && !ch->is_npc() && ch != victim){
-            DLString msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", victim, ch);
-            send_telegram(":skull_crossbones: " + msg);
-        }
+    wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
+    wiznet(wizflag, 0, victim->get_trust(), msg, victim, ch);
+
+    if (!victim->is_npc()) {
+        send_discord_death(fmt(0, msg, victim, ch));
+        if (ch && !ch->is_npc() && ch != victim)
+            send_telegram(fmt(0, msg, victim, ch));
     }
 
     if (ch && mprog_kill( ch, victim ))
