@@ -60,6 +60,7 @@
 #include "char.h"
 #include "logstream.h"
 #include "grammar_entities_impl.h"
+#include "morphology.h"
 
 #include "skill.h"
 #include "skillmanager.h"
@@ -951,7 +952,6 @@ CMDRUNP(report)
     ostringstream result;
     bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
     bool shown = false;
-    bool fRussian = pet->master->getConfig().ruskills;
 
     for (int sn = 0; sn < SkillManager::getThis()->size(); sn++) {
         Skill::Pointer skill = SkillManager::getThis()->find(sn);
@@ -1087,9 +1087,9 @@ CMDRUNP(report)
     if (shown) {
 
         if (!showAll) {
-            // TODO pet name
-            result << fmt(0, "Напиши {y{hc{lRприказать \'%1$s\' рапорт все{lEorder \'%1$s\' report all{x, и я расскажу, что ещё я умею делать.", 
-                             pet->getNameP(1).colourStrip().c_str())
+            DLString petName = Syntax::noun(pet->getNameP('1'));
+            result << fmt(0, "Напиши {y{hc{lRприказать %1$s рапорт все{lEorder %1$s report all{x, и я расскажу, что ещё я умею делать.", 
+                             petName.c_str())
                    << endl;
         }
 
