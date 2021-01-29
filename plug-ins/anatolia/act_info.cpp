@@ -931,6 +931,7 @@ CMDRUNP(report)
 {
     DLString args = argument;
     DLString arg = args.getOneArgument();
+    ostringstream result;
 
     if (!ch->is_npc() || !IS_CHARMED(ch)) {
         char buf[MAX_INPUT_LENGTH];
@@ -952,7 +953,6 @@ CMDRUNP(report)
     bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
     bool shown = false;
     bool fRussian = pet->master->getConfig().ruskills;
-    //bool fRuComm = pet->master->getConfig().rucommands;
 
     for (int sn = 0; sn < SkillManager::getThis()->size(); sn++) {
         Skill::Pointer skill = SkillManager::getThis()->find(sn);
@@ -994,18 +994,15 @@ CMDRUNP(report)
 
         if (showAll)
             passives.push_back(skill);
-
-        continue;
     }
 
-    buf << fmt(0, "%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
+    result << fmt(0, "%1$^C1 говорит тебе \'{G%N2, я %d уровня, у меня %d/%d жизни и %d/%d маны.{x\'",
                pet,
                GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"),
                pet->getModifyLevel(),
                pet->hit.getValue(), pet->max_hit.getValue(),
                pet->mana.getValue(), pet->max_mana.getValue())
-        << "\r\n";
-    page_to_char(buf.str().c_str(), pet->master);
+            << endl;
 
     if (!skills.empty()) {
         buf.str(std::string());
@@ -1020,8 +1017,7 @@ CMDRUNP(report)
                 buf << "{x" << endl;
         }
 
-        page_to_char("Небоевые умения: ", pet->master);
-        page_to_char(buf.str().c_str(), pet->master);
+        result << "Небоевые умения: " << buf.str();
         shown = true;
     }
 
@@ -1038,8 +1034,7 @@ CMDRUNP(report)
                 buf << "{x" << endl;
         }
 
-        page_to_char("В бою мне можно приказать: ", pet->master);
-        page_to_char(buf.str().c_str(), pet->master);
+        result << "В бою мне можно приказать: " << buf.str();
         shown = true;
     }
 
@@ -1056,8 +1051,11 @@ CMDRUNP(report)
                 buf << "{x" << endl;
         }
 
-        page_to_char(showAll ? "Я владею такими заклинаниями: " : "Я могу наложить на тебя такие заклинания: ", pet->master);
-        page_to_char(buf.str().c_str(), pet->master);
+        if (showAll)
+            result << "Я владею такими заклинаниями: " ;
+        else 
+            result << "Я могу наложить на тебя такие заклинания: ";
+        result << buf.str();
         shown = true;
     }
 
@@ -1073,8 +1071,8 @@ CMDRUNP(report)
             else
                 buf << "{x" << endl;
         }
-        page_to_char("Мои пассивные умения: ", pet->master);
-        page_to_char(buf.str().c_str(), pet->master);
+
+        result << "Мои пассивные умения: " << buf.str();
         shown = true;
     }
 
@@ -1086,17 +1084,25 @@ CMDRUNP(report)
     buf << (pet->master->getPC() && pet->master->getPC()->pet && pet->master->getPC()->pet == pet ? "" : "Мне можно {hh1024дать{x вещи и приказать их {hh990надеть{x. ");
     buf << "Мне можно приказать {hh1020поспать{x и другие стандартные команды." << endl;
 
-    page_to_char(buf.str().c_str(), pet->master);
+    result << buf.str();
 
     if (shown) {
 
         if (!showAll) {
-            act("Напиши {x{y{hc{lRприказать \'$n1\' рапорт все{lEorder \'$n1\' report all{x, и я расскажу, что ещё я умею делать.", pet->master, pet->getNameP(1).colourStrip().c_str(), 0, TO_CHAR);
+            // TODO pet name
+            result << fmt(0, "Напиши {y{hc{lRприказать \'%1$s\' рапорт все{lEorder \'%1$s\' report all{x, и я расскажу, что ещё я умею делать.", 
+                             pet->getNameP(1).colourStrip().c_str())
+                   << endl;
         }
-        pet->master->println("\n\rСм. также {x{y{hh1091{lR? приказать{lE? order{x и {x{y{hh1005{lR? рапорт{lE? report{x");
-    }
 
+        result << endl << "См. также {y{hh1091{lR? приказать{lE? order{x и {y{hh1005{lR? рапорт{lE? report{x" 
+               << endl;
+
+        page_to_char(result.str().c_str(), pet->master);
+
+    }
     else {
+        page_to_char(result.str().c_str(), pet->master);
         tell_raw(pet->master, pet, "%s, больше я ничегошеньки не умею!", GET_SEX(pet->master, "Хозяин", "Хозяин", "Хозяйка"));
         interpret_raw(pet, "abat", "");
     }
