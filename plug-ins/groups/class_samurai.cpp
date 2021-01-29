@@ -281,7 +281,7 @@ SKILL_RUNP( target )
   ch->setWait( gsn_target->getBeats( ) );
 
     if (victim == ch->fighting) {
-        act("Ты и так наносишь большинство своих атак $Y.", ch, 0, victim, TO_CHAR);
+        act("Ты и так наносишь большинство своих атак $C3.", ch, 0, victim, TO_CHAR);
         return;
     }
 
