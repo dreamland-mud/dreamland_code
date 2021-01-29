@@ -52,7 +52,7 @@ bool BadSpellWE::run( PCharacter *ch, Character *victim ) const
 
     for (i = 0; i < spells_size; i++)
         spell( spells[i], 
-               number_range( ch->getModifyLevel( ) + 5, 120 ),
+               number_range( ch->getModifyLevel( ) + 5, ch->getModifyLevel( ) + 17 ),
                ch, victim, FSPELL_BANE );
 
     return true;
