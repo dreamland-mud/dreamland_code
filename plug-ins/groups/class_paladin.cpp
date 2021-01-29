@@ -44,7 +44,6 @@
 RACE(golem);
 RACE(demon);
 
-GSN(holy_remedy);
 /*
  * 'layhands' skill command
  */
