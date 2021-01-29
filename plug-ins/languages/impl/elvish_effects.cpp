@@ -49,9 +49,18 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     return true;
 }
 
-bool BlessEquipWE::run( PCharacter *ch, Character *victim ) const
+bool BlessEquipWE::run( PCharacter *ch, Object *obj ) const
 {
-    Object *obj;
+    if(!obj){
+        ch->println("Выбери вещь в инвентаре для её благословения.");
+        return false;
+    }
+
+    if (IS_OBJ_STAT(obj, ITEM_BLESS)){
+        ch->pecho("%1$^O1 уже благословле%1$Gно|н|на|ны.", obj);
+        return false;
+    }
+
     Affect af;
 
     af.bitvector.setTable(&extra_flags);
@@ -59,22 +68,15 @@ bool BlessEquipWE::run( PCharacter *ch, Character *victim ) const
     af.location = APPLY_SAVES;
     af.bitvector.setValue(ITEM_BLESS);
     af.level     = ch->getModifyLevel( );
+    af.duration = number_range( 100, 600 );
+    af.modifier = -1 * number_range( 1, 3 );
     
-    for (obj = victim->carrying; obj; obj = obj->next_content) {
-        if (obj->wear_loc == wear_none)
-            continue;
-        
-        if (IS_OBJ_STAT(obj, ITEM_BLESS))
-            continue;
-        
-        af.modifier = -1 * number_range( 1, 3 );
-        af.duration = number_range( 6 + af.level / 2, 200 );
-        affect_to_obj( obj, &af);
-        affect_modify(victim, &af, true);
-    }
+    affect_to_obj( obj, &af);
 
-    act( "{CОбмундирование на $c6 на мгновение загорается священным огнем.{x", victim, 0, 0, TO_ROOM );
-    act( "{CТвое обмундирование на мгновение загорается священным огнем.{x", victim, 0, 0, TO_CHAR );
+
+    act( "{C$o1 в руках $c2 на мгновение загорается священным огнем.{x", ch, obj, 0, TO_ROOM );
+    act( "{C$o1 на мгновение загорается священным огнем.{x", ch, obj, 0, TO_CHAR );
+
     return true;
 }
 
