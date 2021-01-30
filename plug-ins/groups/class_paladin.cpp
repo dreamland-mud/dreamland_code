@@ -83,7 +83,7 @@ SKILL_RUNP( layhands )
             gsn_holy_remedy->improve( ch, true );
         }
         
-        victim->hit = min( (victim->hit + slevel) * 5, (int)victim->max_hit );
+        victim->hit = min(victim->hit + slevel * 5, (int)victim->max_hit);
         update_pos( victim );
     
         if (ch != victim) {
@@ -98,9 +98,14 @@ SKILL_RUNP( layhands )
         gsn_lay_hands->improve( ch, true, victim );        
     }
     else {
-      act( "Ты возлагаешь руки на $C4, но ничего не происходит.", ch, 0, victim, TO_CHAR);
-      act( "$c1 картинным жестом возлагает на тебя руки... но ничего не происходит.", ch, 0, victim, TO_VICT);
-      act( "$c1 картинным жестом возлагает руки на $C4... но ничего не происходит.", ch, 0, victim, TO_NOTVICT);
+      if (ch != victim) {
+          act( "Ты возлагаешь руки на $C4, но ничего не происходит.", ch, 0, victim, TO_CHAR);
+          act( "$c1 картинным жестом возлагает на тебя руки... но ничего не происходит.", ch, 0, victim, TO_VICT);
+          act( "$c1 картинным жестом возлагает руки на $C4... но ничего не происходит.", ch, 0, victim, TO_NOTVICT);
+      } else {
+          act( "Ты возлагаешь на себя руки, но ничего не происходит.", ch, 0, 0, TO_CHAR);
+          act( "$c1 картинным жестом возлагает на себя руки... но ничего не происходит.", ch, 0, 0, TO_ROOM);
+      }
       gsn_lay_hands->improve( ch, false, victim );        
     }
     
