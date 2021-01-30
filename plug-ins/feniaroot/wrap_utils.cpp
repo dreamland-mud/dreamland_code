@@ -15,6 +15,7 @@
 #include "skill.h" 
 #include "skillmanager.h" 
 #include "defaultspell.h"
+#include "spelltarget.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -245,3 +246,45 @@ Skill * argnum2skill(const RegisterList &args, int num)
     return skill;
 }
 
+SpellTarget::Pointer argnum2target(const RegisterList &args, int num)
+{
+    Register a = argnum(args, num);
+    SpellTarget::Pointer target(NEW);
+
+    switch (a.type) {
+    case Register::STRING:
+    case Register::NUMBER:
+        target->type = SpellTarget::NONE;
+        target->arg = a.toString().c_str();
+        return target;
+
+    case Register::OBJECT:
+        {
+            CharacterWrapper *chWrap = a.toHandler().getDynamicPointer<CharacterWrapper>();
+            if (chWrap) {
+                target->type = SpellTarget::CHAR;
+                target->victim = chWrap->getTarget();
+                return target;
+            }
+
+            ObjectWrapper *objWrap = a.toHandler().getDynamicPointer<ObjectWrapper>(); 
+            if (objWrap) {
+                target->type = SpellTarget::OBJECT;
+                target->obj = objWrap->getTarget();
+                return target;
+            }
+
+            RoomWrapper *roomWrap = a.toHandler().getDynamicPointer<RoomWrapper>(); 
+            if (roomWrap) {
+                target->type = SpellTarget::ROOM;
+                target->room = roomWrap->getTarget();
+                return target;
+            }
+
+            /* FALLTHROUGH */
+        } 
+    
+    default:
+        return target;
+    }
+}

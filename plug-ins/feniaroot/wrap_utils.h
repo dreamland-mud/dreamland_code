@@ -23,6 +23,7 @@ struct obj_index_data;
 struct mob_index_data;
 class FlagTable;
 class DefaultSpell;
+class SpellTarget;
 
 Register wrap( ::Object * );
 Register wrap( struct obj_index_data * );
@@ -59,6 +60,7 @@ int argnum2number(const RegisterList &args, int num);
 DLString argnum2string(const RegisterList &args, int num);
 Skill * argnum2skill(const RegisterList &args, int num);
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table);
+::Pointer<SpellTarget> argnum2target(const RegisterList &args, int num);
 
 #endif
 
