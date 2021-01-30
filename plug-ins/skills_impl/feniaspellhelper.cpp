@@ -179,6 +179,11 @@ NMI_GET(FeniaSpellContext, vict, "персонаж, цель заклинани�
     return vict;
 }
 
+NMI_GET(FeniaSpellContext, victim, "персонаж, цель заклинания для runVict - как синоним vict")
+{
+    return vict;
+}
+
 NMI_GET(FeniaSpellContext, room, "комната, цель заклинания для runRoom")
 {
     return room;
