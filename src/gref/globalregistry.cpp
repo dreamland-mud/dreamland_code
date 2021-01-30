@@ -130,3 +130,12 @@ list<GlobalRegistryElement *> GlobalRegistryBase::findAll(const DLString &argume
 
     return result;
 }
+
+bool GlobalRegistryBase::hasElement(const DLString &name) const
+{
+    for (unsigned int i = 0; i < table.size( ); i++)
+        if (table[i]->matchesStrict(name))
+            return true;
+
+    return false;
+}

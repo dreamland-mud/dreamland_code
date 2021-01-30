@@ -10,6 +10,7 @@
 #include "lex.h"
 #include "feniamanager.h"
 
+#include "stringlist.h"
 #include "dlscheduler.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -328,4 +329,52 @@ int BasicSkill::getRating( PCharacter * ) const
     return 1;
 }
 
+bool BasicSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
+{
+    errBuf << "Этому умению невозможно задать классовые или другие ограничения." << endl;
+    return false;
+}
 
+DLString BasicSkill::accessToString() const
+{
+    return "n/a";
+}
+
+map<DLString, int> BasicSkill::parseAccessTokens(const DLString &newValue, const GlobalRegistryBase *registry, ostringstream &errBuf) const
+{
+    // Split string "cleric 10, warrior 33, witch 15" by comma, into a list of tokens.
+    StringList tokens;
+    tokens.split(newValue, ", ");
+    map<DLString, int> entriesWithLevels, empty;
+
+    // Empty restrictions: all entries will be flushed in the calling method.
+    if (tokens.empty())
+        return empty;
+
+    for (auto &t: tokens) {
+        // Split "cleric 10" into cleric/10 pair, validate and remember in a map.
+        DLString token(t);
+        DLString entryName  = token.getOneArgument();
+        DLString levelName = token.getOneArgument();
+
+        if (!registry->hasElement(entryName)) {
+            errBuf << "Не могу найти '" << entryName << "', проверьте написание." << endl;
+            return empty;
+        }
+
+        Integer level;
+        if (!Integer::tryParse(level, levelName)) {
+            errBuf << "Уровень для " << entryName << " должен быть числом." << endl;
+            return empty;
+        }
+
+        if (level < 1 || level > LEVEL_MORTAL) {
+            errBuf << "Уровень для " << entryName << " должен быть в пределах 1..100." << endl;
+            return empty;
+        }
+
+        entriesWithLevels[entryName] = level;
+    }
+
+    return entriesWithLevels;
+}

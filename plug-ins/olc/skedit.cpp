@@ -1,10 +1,12 @@
 
-#include <pcharacter.h>
+#include "util/regexp.h"
+#include "pcharacter.h"
 #include "skillhelp.h"
 #include "skillgroup.h"
 #include "skillmanager.h"
 #include "defaultspell.h"
 #include "basicskill.h"
+#include "xmltableloader.h"
 
 #include "skedit.h"
 #include "hedit.h"
@@ -14,6 +16,7 @@
 
 #include "merc.h"
 #include "websocketrpc.h"
+#include "gsn_plugin.h"
 #include "arg_utils.h"
 #include "weapontier.h"
 #include "damageflags.h"
@@ -23,6 +26,7 @@
 #include "def.h"
 
 OLC_STATE(OLCStateSkill);
+
 
 OLCStateSkill::OLCStateSkill() : isChanged(false)
 {
@@ -105,16 +109,15 @@ void OLCStateSkill::show( PCharacter *ch )
     BasicSkill *r = getOriginal();
     DefaultSpell *s = getSpell(r);
 
-    ptc(ch, "Умение:      {C%s{\r\n", r->getName().c_str());
+    ptc(ch, "Умение:      {C%s\r\n", r->getName().c_str());
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
             r->getRussianName().c_str(), 
             web_edit_button(ch, "russian", "web").c_str());
-    ptc(ch, "Группы:      {C%s{x {D(group){x\r\n", r->getGroups().toString().c_str());
+    ptc(ch, "Группы:      {C%s {D(group){x\r\n", r->getGroups().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
     ptc(ch, "Мана и шаги: {C%d {D(mana) {C%d {D(move){x \r\n", r->getMana(), r->move.getValue());
-    ptc(ch, "Натура:      {C%s{x {D(? align){x\r\n",
-        r->align.getValue() != 0 ? r->align.names().c_str() : "-");
-    ptc(ch, "Этос:        {C%s{x {D(? ethos){x\r\n",
+    ptc(ch, "Характер:    {C%s {D(align) {C%s {D(ethos){x\r\n",
+        r->align.getValue() != 0 ? r->align.names().c_str() : "-",
         r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
 
     if (r->help)
@@ -124,6 +127,9 @@ void OLCStateSkill::show( PCharacter *ch )
     else
         ptc(ch, "Справка:     нет {D(help create){x\r\n");
 
+    ptc(ch, "Доступно:    {c%s{x %s {D(allow help){x\r\n",
+            r->accessToString().c_str(),
+            web_edit_button(ch, "allow", "").c_str());
 
     if (s) {
         ptc(ch, "Цели:        {Y%s{w {D(target){x\r\n", s->target.names().c_str());                        
@@ -145,7 +151,31 @@ void OLCStateSkill::show( PCharacter *ch )
         feniaTriggers->showAvailableTriggers(ch, s);
     }
     
-    ptc(ch, "\r\n{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
+    ptc(ch, "\r\n{WКоманды{x: {hc{yspell{x, {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
+}
+
+SKEDIT(spell, "заклинание", "создать заклинание для этого умения")
+{
+    DLString arg = argument;
+
+    if (arg_oneof(arg, "create", "создать")) {
+        if (getSpell()) {
+            stc("Заклинание уже определено.\r\n", ch);
+            return false;
+        }
+
+        DefaultSpell::Pointer spell(NEW);
+        BasicSkill *skill = getOriginal();
+
+        skill->spell.setPointer(spell);
+        skill->spell->setSkill(BasicSkill::Pointer(skill));
+        stc("Создано новое заклинание для этого умения.\r\n", ch);
+        show(ch);
+        return true;
+    }
+
+    stc("Использование: {y{hcspell create{x - создать заклинание\r\n", ch);
+    return false;
 }
 
 SKEDIT(show, "показать", "показать все поля")
@@ -231,6 +261,44 @@ SKEDIT(russian, "русское", "русское имя умения")
     BasicSkill *r = getOriginal();
     return editor(argument, r->nameRus, ED_NO_NEWLINE);
 }
+
+SKEDIT(allow, "доступно", "ограничения по классу, клану, расе")
+{
+    BasicSkill *r = getOriginal();
+    DLString args(argument);
+    DLString arg = args.getOneArgument();
+
+    if (arg.empty()) {
+        // Launch web editor.
+        editorWeb(r->accessToString(), "allow paste");
+        return false;
+    }
+
+    if (arg_is_help(arg)) {
+        // Show usage.
+        stc("Использование:\r\n", ch);
+        stc("    allow - запустить веб-редактор ограничений\r\n", ch);
+        stc("    allow paste - установить ограничения из буфера веб-редактора\r\n", ch);
+        stc("    allow <string> - установить ограничения из строки\r\n", ch);
+        return false;
+    }
+
+    DLString newValue;
+    if (arg_is_paste(arg)) {
+        // Grab value from the editor buffer.
+        editorPaste(newValue, ED_NO_NEWLINE);
+    } else {
+        // Grab value from command argument.
+        newValue = argument;
+    }
+
+    // Try to assign restrictions to the skill and report back errors.
+    ostringstream errBuf;
+    bool rc = r->accessFromString(newValue, errBuf);
+    ch->send_to(errBuf);
+    return rc;
+}
+
 
 SKEDIT(align, "натура", "ограничить по натуре")
 {
@@ -318,6 +386,75 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
     if (cmd.empty()) {
         stc("Формат:  skedit умение\r\n", ch);
+        stc("Формат:  skedit create class|clan|race|other <название по-английски>\r\n", ch);
+        return;
+    }
+
+    // Creating new skill.
+    if (arg_oneof(cmd, "create", "создать")) {
+        DLString type = args.getOneArgument();
+        DLString className;
+        BasicSkill::Pointer newSkill;
+        XMLTableLoader *loader = 0;
+
+        // Figure out class name via 'reflection', without depending on corresponding plugin directly.
+        // Figure out who loads that type of skills, by looking at a typical example.
+        if (arg_oneof(type, "class", "класс")) {
+            className = "GenericSkill";
+            loader = dynamic_cast<BasicSkill *>(gsn_sanctuary.getElement())->getLoader();
+        } else if (arg_oneof(type, "clan", "клан")) {
+            className = "ClanSkill";
+            loader = dynamic_cast<BasicSkill *>(gsn_transform.getElement())->getLoader();
+        } else if (arg_oneof(type, "race", "раса")) {
+            className = "RaceAptitude";
+            loader = dynamic_cast<BasicSkill *>(gsn_rear_kick.getElement())->getLoader();
+        } else if (arg_oneof(type, "other", "другое", "разное")) {
+            className = "BasicSkill";
+            loader = dynamic_cast<BasicSkill *>(gsn_kassandra.getElement())->getLoader();
+        } else {
+            stc("Укажи вид нового умения: class, clan, race или other.\r\n", ch);
+            return;
+        }
+
+        static RegExp namePattern("^[a-z ]{2,}[a-z]$", true);
+        if (args.empty() || !namePattern.match(args)) {
+            stc("В названии умения могут быть только маленькие англ буквы и пробелы.\r\n", ch);
+            return;
+        }
+
+        if (skillManager->findExisting(args)) {
+            stc("Умение с таким названием уже существует.\r\n", ch);
+            return;
+        }
+
+        try {
+            AllocateClass::Pointer alloc = Class::allocateClass(className);
+            newSkill = alloc.getDynamicPointer<BasicSkill>();
+        }
+        catch (const ExceptionClassNotFound &e) {
+            LogStream::sendError() << "skedit create: " << e.what() << endl;
+        }
+
+        if (!newSkill || !loader) {
+            stc("Не могу создать новое умение, проверьте логи.\r\n", ch);
+            return;
+        }
+
+        newSkill->setName(args);
+        newSkill->help.construct();
+        newSkill->help->setID(
+            help_next_free_id()
+        );
+
+        loader->loadElement(newSkill);
+        loader->saveElement(newSkill);
+
+        ptc(ch, "Создано новое умение под именем %s.\r\n", newSkill->getName().c_str());
+
+        OLCStateSkill::Pointer skedit(NEW, *newSkill);
+        skedit->attach(ch);
+        skedit->show(ch);
+
         return;
     }
 

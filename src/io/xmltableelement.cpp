@@ -23,6 +23,11 @@ void XMLTableElement::save() const
         loader->saveElement(this);
 }
 
+XMLTableLoader * XMLTableElement::getLoader() const
+{
+    return loader;
+}
+
 void XMLTableElement::setLoader(XMLTableLoader *loader)
 {
     this->loader = loader;

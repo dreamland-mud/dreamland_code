@@ -40,6 +40,10 @@ public:
 
     virtual void show( PCharacter *, std::ostream & ) const; 
 
+    // Online editing helpers.
+    virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
+    virtual DLString accessToString() const;
+
     virtual const DLString & getCategory( ) const
     {
         return CATEGORY;

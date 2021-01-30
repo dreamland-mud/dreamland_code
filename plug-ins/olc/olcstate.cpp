@@ -416,14 +416,14 @@ bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
     DLString args = lastArgs;
 
     if (args.empty()) {
-        ptc(ch, "Использование:\r\n{W%s{x флаги - установить или снять указанные флаги\r\n{W? %s{x - показать таблицу флагов\r\n",
+        ptc(ch, "Использование:\r\n{y%s{x флаги - установить или снять указанные флаги\r\n{y{hc? %s{x - показать таблицу флагов\r\n",
             cmd, cmd);
         return false;
     }
 
     bitstring_t value = table.bitstring(args);
     if (value == NO_FLAG) {
-        ptc(ch, "Не найдено ни одного флага по строке '%s'. Используй '? %s' для таблицы всех флагов.\r\n",
+        ptc(ch, "Не найдено ни одного флага по строке '%s'. Используй {y{hc? %s{x для таблицы всех флагов.\r\n",
              args.c_str(), cmd); 
         return false;
     }
@@ -449,14 +449,14 @@ bool OLCState::flagValueEdit(const FlagTable &table, int &field)
     DLString args = lastArgs;
 
     if (args.empty()) {
-        ptc(ch, "Использование:\r\n{W%s{x значение - установить значение\r\n{W? %s{x - показать таблицу возможных значений\r\n",
+        ptc(ch, "Использование:\r\n{y%s{x значение - установить значение\r\n{y{hc? %s{x - показать таблицу возможных значений\r\n",
             cmd, cmd);
         return false;
     }
 
     int value = table.value(args);
     if (value == NO_FLAG) {
-        ptc(ch, "Значение '%s' не найдено. Используй '? %s' для таблицы возможных значений.\r\n",
+        ptc(ch, "Значение '%s' не найдено. Используй {y{hc? %s{x для таблицы возможных значений.\r\n",
            cmd, cmd);
         return false;
     }
@@ -473,7 +473,7 @@ bool OLCState::numberEdit(int minValue, int maxValue, int &field)
     DLString args = lastArgs;
 
     if (args.empty()) {
-        ptc(ch, "Использование:\r\n{W%s{x число - установить значение в диапазоне от %d до %d\r\n",
+        ptc(ch, "Использование:\r\n{y%s{x число - установить значение в диапазоне от %d до %d\r\n",
             cmd, minValue, maxValue);
         return false;
     }
@@ -496,7 +496,7 @@ bool OLCState::numberEdit(long minValue, long maxValue, long &field)
     DLString args = lastArgs;
 
     if (args.empty()) {
-        ptc(ch, "Использование:\r\n{W%s{x число - установить значение в диапазоне от %ld до %ld\r\n",
+        ptc(ch, "Использование:\r\n{y%s{x число - установить значение в диапазоне от %ld до %ld\r\n",
             cmd, minValue, maxValue);
         return false;
     }
@@ -522,7 +522,7 @@ bool OLCState::rangeEdit(int minValue, int maxValue, int &field1, int &field2)
     Integer value1, value2;
 
     if (!Integer::tryParse(value1, arg1) || !Integer::tryParse(value2, arg2)) {
-        ptc(ch, "Использование:\r\n{W%s{x число1 число2 - установить два значения. каждое в диапазоне от %d до %d\r\n",
+        ptc(ch, "Использование:\r\n{y%s{x число1 число2 - установить два значения. каждое в диапазоне от %d до %d\r\n",
              cmd, minValue, maxValue);        
         return false;
     }
@@ -560,7 +560,7 @@ bool OLCState::boolEdit(bool &field)
     else if (arg_is_no(arg))
         field = false;
     else {
-        ptc(ch, "Использование:\r\n{W%s{x y|n - установить значение переключателя\r\n", cmd);
+        ptc(ch, "Использование:\r\n{y{hc%s y{x и {y{hc%s n{x - установить значение переключателя\r\n", cmd, cmd);
         return false;
     }
 
@@ -570,7 +570,7 @@ bool OLCState::boolEdit(bool &field)
 
 bool OLCState::diceEdit(int *field)
 {
-    static char syntax[] = "Использование:\r\n{W%s{w число_бросков {Wd{w число_граней {W+{w бонус\r\n";
+    static char syntax[] = "Использование:\r\n{y%s{w число_бросков {Wd{w число_граней {W+{w бонус\r\n";
     char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
     
     PCharacter *ch = owner->character->getPC();

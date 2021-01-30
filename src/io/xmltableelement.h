@@ -17,6 +17,7 @@ public:
     virtual void loaded( );
     virtual void unloaded( );
     void save() const;
+    XMLTableLoader * getLoader() const;
     
     virtual const DLString & getName( ) const = 0;
     virtual void setName( const DLString & ) = 0;

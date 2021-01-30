@@ -5,6 +5,7 @@
 #ifndef __BASICSKILL_H__
 #define __BASICSKILL_H__
 
+#include <map>
 #include "xmlpointer.h"
 #include "xmlvariablecontainer.h"
 #include "xmlinteger.h"
@@ -50,6 +51,11 @@ public:
     virtual void practice( PCharacter * ) const;
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual int getMaximum( Character * ) const;
+
+    // Online editing helpers.
+    virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
+    virtual DLString accessToString() const;
+    map<DLString, int> parseAccessTokens(const DLString &newValue, const GlobalRegistryBase *registry, ostringstream &errBuf) const;
     
     XML_VARIABLE XMLStringNoEmpty nameRus;
     XML_VARIABLE XMLRussianString dammsg;

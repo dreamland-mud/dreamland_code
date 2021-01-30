@@ -29,12 +29,14 @@ public:
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
-    virtual int getLearned( Character * ) const;
-    
+    virtual int getLearned( Character * ) const;    
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
-
     virtual void show( PCharacter *, std::ostream & ) const; 
+
+    // Online editing helpers.
+    virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
+    virtual DLString accessToString() const;
 
     virtual const DLString & getCategory( ) const
     {
