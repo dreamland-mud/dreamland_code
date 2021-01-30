@@ -157,11 +157,11 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     update_pos(ch);
     ch->setWait( skill->getBeats( ) );
 
-    // 50% chance to fail
-    if (ch->isAffected(sn) || roll > sk / 2)
-    { 
+    // 20% chance to fail with max skill
+    if (ch->isAffected(sn) || roll > sk * 4 / 5 )
+    {         
         act_p("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR, POS_RESTING);
-
+        
         if (!ch->isAffected(gsn_weaken)) {
             af.type = gsn_weaken;
             af.level = punish_lvl;
@@ -210,19 +210,22 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
 
-    // 5% chance to fizzle
-    if (roll < 5 ) {
-        ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
-        return;
-    }
-
-    // 45% chance to succeed
-
+    // 80% chance to not fail with max skill   
     ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
-
+    
     if (ch->position == POS_FIGHTING && ch->fighting != NULL) {
+        // 10% chance to fizzle with max skill
+        if (roll < sk / 10 ) {
+            ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
+            return;
+        }
+        
         postaffect_to_char(ch, sn, level/10 + 1);
         
+        // 10% chance to just get the affect
+        if (roll < sk / 5 )
+            return;
+
         switch (number_range(0, 3)) {
         case 0:
             if (IS_GOOD(ch) && IS_EVIL(ch->fighting))
@@ -249,6 +252,12 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
     else {
+        // 25% chance to fizzle with max skill
+        if (roll < sk / 4 ) {
+            ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
+            return;
+        }
+        
         af.bitvector.setTable(&affect_flags);
         af.type         = sn;
         af.level        = level;
@@ -263,7 +272,6 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         affect_to_char(ch, &af);
         return;
     }
-
 }
 
 
