@@ -25,6 +25,7 @@ $(INCLUDES_SRC)
 
 libfight_la_LIBADD = \
 $(LIBADD_ANATOLIA) \
-../profession/libprofession.la 
+../profession/libprofession.la \
+-ljsoncpp
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

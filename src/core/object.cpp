@@ -474,6 +474,19 @@ DLString Object::getProperty(const DLString &key) const
     return DLString::emptyString;
 }
 
+void Object::removeProperty(const DLString &key)
+{
+    Properties::iterator p = properties.find(key);
+    if (p != properties.end())
+        properties.erase(p);
+}
+
+void Object::addProperty(const DLString &key, const DLString &value)
+{
+    properties[key] = value;
+}
+
+
 static bool get_value0_from_proto(const Object *obj)
 {
     switch (obj->item_type) {
@@ -572,4 +585,14 @@ void Object::valueByIndex(int index, int value)
             bug("Object::valueByIndex invalid index [%d] for [%d] and value [%d]", index, pIndexData->vnum, value);
             break;
     }
+}
+
+list<Object *> Object::getItems()
+{
+    list<Object *> items;
+
+    for (Object *obj = contains; obj; obj = obj->next_content)
+        items.push_back(obj);
+
+    return items;
 }

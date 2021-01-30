@@ -118,6 +118,7 @@ public:
     bool may_float(void);
     Character * getCarrier( );
     Room * getRoom( );
+    list<Object *> getItems();
     void addExtraDescr( const DLString &keys, const DLString &value );
     bool mustDisappear( Character * );
     bool isAntiAligned( Character * ) const;
@@ -163,6 +164,12 @@ public:
 
     /** Return value of a given property or an empty string if not found. */
     DLString getProperty(const DLString &key) const;
+
+    /** Remove property from instance. Can still have inherited property from the proto. */
+    void removeProperty(const DLString &key);
+
+    /** Add property to the instance. */
+    void addProperty(const DLString &key, const DLString &value);
 
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
 

@@ -13,6 +13,7 @@
  *    и все остальные, кто советовал и играл в этот MUD                           *
  ***************************************************************************/
 
+#include <jsoncpp/json/json.h>
 #include "so.h"
 #include "plugin.h"
 #include "wrapperbase.h"
@@ -30,6 +31,7 @@
 #include "playerattributes.h"
 #include "room.h"
 
+#include "configurable.h"
 #include "dreamland.h"
 #include "save.h"
 #include "interp.h"
@@ -44,6 +46,13 @@
 #include "fight.h"
 #include "vnum.h"
 #include "def.h"
+
+// A set of PK looting rules defined in fight/loot.json.
+Json::Value loot;
+CONFIGURABLE_LOADED(fight, loot)
+{
+    loot = value;
+}
 
 enum {
     LOOT_DESTROY,
@@ -177,13 +186,37 @@ static void corpse_looting( Object *corpse, Character *ch, Character *killer )
     if (ch->is_npc( ))
         return;
 
+    if (killer->is_npc())
+        return;
+
+    list<Object *> items = corpse->getItems();
+
     if (IS_SET(ch->act, PLR_WANTED)) {
         corpse->killer = str_dup( "!anybody!" );
-        corpse->count = ch->carry_number / 2;
+        corpse->count = items.size() * loot["wantedCountCoeff"].asFloat();
     }
     else {
         corpse->killer = str_dup( killer->getNameP( ) );
-        corpse->count = MAX_OBJ_LOOT_KILLER;
+        corpse->count = loot["maxTotalCount"].asInt();
+    }
+
+    // Mark items with a "looting" property based on the rules. 
+    // TODO: modify 'get' logic to forbid looting items with "loot"="false".
+    // TODO: modify show_list_to_char to highlight items one can loot.
+    const DLString mark("loot");
+
+    for (auto &obj: items) {
+        obj->removeProperty(mark);
+
+        if (obj->item_type == ITEM_MONEY)
+            obj->addProperty(mark, loot["money"].asString());
+        else if (obj->pIndexData->limit > 0)
+            obj->addProperty(mark, loot["limits"].asString());
+        else if (!obj->getProperty("tier").empty())
+            obj->addProperty(mark, loot["randoms"].asString());
+        // TODO: add more checks for different types of items.
+        else
+            obj->addProperty(mark, loot["other"].asString());
     }
 }
 
@@ -304,10 +337,10 @@ void make_corpse( Character *killer, Character *ch )
     dreamland->removeOption( DL_SAVE_MOBS );
 
     corpse = corpse_create( ch );
-    corpse_looting( corpse, ch, killer );
     corpse_money( corpse, ch );
     corpse_place( corpse, ch );
     corpse_fill( corpse, ch );
+    corpse_looting( corpse, ch, killer );
     ch->getClan( )->makeMonument( ch, killer );
 
     dreamland->resetOption( DL_SAVE_OBJS );
