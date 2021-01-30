@@ -169,13 +169,23 @@ DLString print_what(const Skill *skill)
 
 DLString print_group_for(const Skill *skill, Character *ch)
 {
-    ostringstream buf;
-    SkillGroupReference &group = const_cast<Skill *>(skill)->getGroup();
+    vector<int> groups = const_cast<Skill *>(skill)->getGroups().toArray();    
+    if (groups.empty())
+        return DLString::emptyString;
 
-    if (group != group_none)
-        buf << "{" << SKILL_HEADER_BG << ", входит в группу "
-            << "'{hg{" << SKILL_HEADER_FG << group->getNameFor(ch) << "{hx"
+    ostringstream buf;
+    buf << "{" << SKILL_HEADER_BG << ", входит в групп"
+        << (groups.size() == 1 ? "у" : "ы")
+        << " ";
+        
+    for (unsigned int g = 0; g < groups.size(); g++) {
+        if (g > 0)
+            buf << ", ";
+
+        buf << "'{hg{" << SKILL_HEADER_FG 
+            << skillGroupManager->find(g)->getNameFor(ch) << "{hx"
             << "{" << SKILL_HEADER_BG << "'{x";
+    }
 
     return buf.str();
 }
@@ -240,10 +250,14 @@ DLString skill_what_plural(const Skill *skill)
  
 int skill_learned_from_affects(const Skill *skill, PCharacter *ch)
 {    
-    int sn = skill->getIndex();
-    int gsn = const_cast<Skill *>(skill)->getGroup()->getIndex();
+    int learned = 0;
 
-    return ch->mod_skills[sn] + ch->mod_skill_groups[gsn] + ch->mod_skill_all;
+    for (auto group: const_cast<Skill *>(skill)->getGroups().toArray())
+        learned += ch->mod_skill_groups[group];
+
+    learned += ch->mod_skills[skill->getIndex()];
+    learned += ch->mod_skill_all;
+    return learned;
 }
 
 DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
@@ -272,7 +286,9 @@ int skill_level_bonus(Skill &skill, Character *ch)
         return slevel;
 
     if (!ch->is_npc()) {
-        slevel += ch->getPC()->mod_level_groups[skill.getGroup()];
+        for (auto group: skill.getGroups().toArray())
+            slevel += ch->getPC()->mod_level_groups[group];
+
         slevel += ch->getPC()->mod_level_skills[skill.getIndex()];
         slevel += ch->getPC()->mod_level_all;
 
@@ -280,11 +296,11 @@ int skill_level_bonus(Skill &skill, Character *ch)
             slevel += ch->getPC()->mod_level_spell;
     }
 
-    if (skill.getGroup() == group_fightmaster && ch->isAffected(gsn_turlok_fury) && chance(50)) {
+    if (skill.hasGroup(group_fightmaster) && ch->isAffected(gsn_turlok_fury) && chance(50)) {
         slevel += number_range(1, 5);
     }
 
-    if (skill.getGroup() == group_defensive && ch->isAffected(gsn_athena_wisdom) && chance(50)) {
+    if (skill.hasGroup(group_defensive) && ch->isAffected(gsn_athena_wisdom) && chance(50)) {
         slevel += number_range(1, 5);
     }
     

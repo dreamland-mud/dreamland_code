@@ -659,9 +659,13 @@ static int get_random_skillgroup(PCharacter *pch)
             continue;
 
         Skill *skill = skillManager->find(sn);
-        mygroups[skill->getGroup()]++;
+        vector<int> groups = skill->getGroups().toArray();
+        for (auto g: groups) {
+            mygroups[g]++;
+            totalGroups.insert(g);
+        }
+
         totalWeight++;
-        totalGroups.insert(skill->getGroup());
     }
 
     int currentWeight = 0;

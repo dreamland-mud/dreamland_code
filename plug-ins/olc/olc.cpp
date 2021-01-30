@@ -486,78 +486,21 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "skills") {
+    if (arg == "passive") {
         ostringstream buf;
-        Character *vch = get_char_room(ch, args);
-
-        if (!vch || !vch->is_npc()) {
-            ch->println("Usage: abc skills <mob>");
-            return;
-        }
-
-        NPCharacter *pet = vch->getNPC();
 
         for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
             Skill::Pointer skill = SkillManager::getThis( )->find( sn );
             Spell::Pointer spell = skill->getSpell( );
             Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
 
-            if (!skill->usable(pet, false))
+            if (spell && spell->isCasted())
                 continue;
 
-            if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
-                bool canOrder = cmd->properOrder(pet);
-                pet->fighting = ch;
-                bool canOrderFight = cmd->properOrder(pet);
-                pet->fighting = 0;
-
-                buf << "Команда {g" << cmd->getName() << "{x: "
-                    << (canOrder ? "{GДА{x" : canOrderFight ? "{YВ БОЮ{x" : "{RНЕТ{x") << endl;
-                continue;
-            }
-
-            if (spell && spell->isCasted()) {
-                bool canOrder = spell->properOrder(pet);
-                buf << "Заклинание {g" << skill->getName() << "{x: "
-                    << (canOrder ? "{GДА{x" : "{RНЕТ{x") << endl;
-                continue;
-            }
-
-            buf << "Пассивное {g" << skill->getName() << "{x " << endl;
-        }
-
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
-    if (arg == "commands") {
-        ostringstream buf;
-        Character *vch = get_char_room(ch, args);
-
-        if (!vch || !vch->is_npc()) {
-            ch->println("Usage: abc commands <mob>");
-            return;
-        }
-
-        NPCharacter *pet = vch->getNPC();
-
-        for (auto &cmd: commandManager->getCommands().getCommands()) {
-            if (!cmd->visible(pet))
+            if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET))
                 continue;
 
-            bool canOrder = cmd->properOrder(pet);
-            pet->fighting = ch;
-            bool canOrderFight = cmd->properOrder(pet);
-            pet->fighting = 0;
-
-            if (!canOrder && !canOrderFight)
-                continue;
-
-            buf << "Команда {g" << cmd->getName() << "{x: " 
-                << (canOrder ? "{GДА{x" : canOrderFight ? "{YВ БОЮ{x" : "{RНЕТ{x")
-                << "   [" << cmd->getOrder().names() << "]" 
-                << "   [" << cmd->getExtra().names() << "]" 
-                << endl;
+            buf << skill->getName() << endl;            
         }
 
         page_to_char(buf.str().c_str(), ch);

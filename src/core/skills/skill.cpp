@@ -12,7 +12,7 @@
 #include "character.h"
 #include "helpmanager.h"
 
-GROUP(none);
+GlobalBitvector Skill::zeroGroups;
 
 Skill::Skill( )
 {
@@ -42,10 +42,17 @@ const DLString &Skill::getRussianName( ) const
 {
     return DLString::emptyString;
 }
-SkillGroupReference & Skill::getGroup( ) 
+GlobalBitvector & Skill::getGroups()
 {
-    return group_none;
+    zeroGroups.setRegistry(skillGroupManager);
+    return zeroGroups;
 }
+
+bool Skill::hasGroup(unsigned int group)
+{
+    return getGroups().isSet(group);
+}
+
 Spell::Pointer Skill::getSpell( ) const
 {
     return Spell::Pointer( );

@@ -28,10 +28,11 @@ BONUS(learning);
 const DLString CraftSkill::CATEGORY = "Умения дополнительных профессий";
 
 CraftSkill::CraftSkill( )
+                : group(skillGroupManager)
 {
 }
 
-SkillGroupReference &CraftSkill::getGroup( )
+GlobalBitvector & CraftSkill::getGroups( ) 
 {
     return group;
 }
@@ -106,7 +107,7 @@ bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         return false;
     }
     
-    if (mob->pIndexData->practicer.isSet( (int)getGroup( ) ))
+    if (mob->pIndexData->practicer.isSetAny(getGroups()))
         return true;
 
     if (verbose)

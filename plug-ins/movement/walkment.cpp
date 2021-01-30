@@ -602,6 +602,8 @@ bool Walkment::applyWeb( Character *wch )
                      "%2$^C1 пытается разорвать путы, преграждающие %2$P3 дорогу, но терпит неудачу!" );
         return false;
     }
+
+    return true;
 }
 
 void Walkment::moveFollowers( Character *wch )

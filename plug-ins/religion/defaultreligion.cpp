@@ -249,7 +249,7 @@ bool DefaultReligion::likesSpell(Skill *skill) const
 {
     if (likes.skills.isSet(skill))
         return true;
-    if (likes.skillGroups.isSet(skill->getGroup()))
+    if (likes.skillGroups.isSetAny(skill->getGroups()))
         return true;
     return false;
 }

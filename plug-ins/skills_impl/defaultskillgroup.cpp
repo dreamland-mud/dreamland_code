@@ -137,7 +137,7 @@ void DefaultSkillGroup::listSkills( PCharacter *ch, ostringstream &buf ) const
     for (int col = 0, sn = 0; sn < skillManager->size( ); sn++) {
         Skill *skill = skillManager->find( sn );
 
-        if (skill->getGroup( ) != this)
+        if (!skill->hasGroup(getIndex()))
             continue;
 
         if (autodump) {

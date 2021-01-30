@@ -99,10 +99,13 @@ void Hierophant::tell( Character *victim, const char *speech )
         if (spell 
             && spell->isCasted( ) 
             && skill->usable( pet, false )
-            && spell->getSpellType( ) != SPELL_OFFENSIVE
-            && skill->getGroup( )->available( pet ))
+            && spell->getSpellType( ) != SPELL_OFFENSIVE)
         {
-            groups[skill->getGroup( )].push_back( skill->getNameFor( victim ) );
+            for (auto &g: skill->getGroups().toArray()) {
+                SkillGroup *group = skillGroupManager->find(g);
+                if (group->available(pet))
+                    groups[g].push_back(skill->getNameFor(victim));
+            }
         }
     }
     

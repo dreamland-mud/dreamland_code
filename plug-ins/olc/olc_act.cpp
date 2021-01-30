@@ -168,7 +168,7 @@ void show_skills(Character *ch, int target)
 
         buf << fmt( 0, "{g%-20s{x: %-20s %-10s %s\n\r",
                        skill->getName( ).c_str( ),
-                       skill->getGroup( )->getName( ).c_str( ),
+                       skill->getGroups( ).toString().c_str( ),
                        spell_types.name( spell->getSpellType( ) ).c_str( ),
                        target_table.names( spell->getTarget( ) ).c_str( ) );
     }

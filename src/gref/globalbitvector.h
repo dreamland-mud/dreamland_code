@@ -14,7 +14,9 @@ public:
     static const GlobalBitvector emptyBitvector;
     
     GlobalBitvector( );
-    GlobalBitvector( GlobalRegistryBase * );
+    GlobalBitvector( GlobalRegistryBase *registry );
+    GlobalBitvector( GlobalRegistryBase *registry, unsigned int ndx );
+
     virtual ~GlobalBitvector( );
 
     inline bool isSet( unsigned int ndx ) const
@@ -29,7 +31,7 @@ public:
     {
         return isSet( e->getIndex( ) );
     }
-    inline bool isSet( const GlobalBitvector &bv ) const
+    inline bool isSetAll( const GlobalBitvector &bv ) const
     {
         for (unsigned int b = 0; b < bv.bits.size( ); b++)
             if (bv.bits[b])
@@ -37,6 +39,15 @@ public:
                     return false;
 
         return true;
+    }
+    inline bool isSetAny( const GlobalBitvector &bv ) const
+    {
+        for (unsigned int b = 0; b < bv.bits.size( ); b++)
+            if (bv.bits[b])
+                if (isSet( b ))
+                    return true;
+
+        return false;
     }
 
     inline void set( unsigned int ndx )

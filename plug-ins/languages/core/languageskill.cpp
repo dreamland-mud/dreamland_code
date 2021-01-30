@@ -23,10 +23,11 @@ const int Language::SKILL_NATIVE = 100;
 
 GROUP(ancient_languages);
 BONUS(learning);
+static GlobalBitvector langGroups(skillGroupManager, group_ancient_languages);
 
-SkillGroupReference & Language::getGroup( ) 
+GlobalBitvector & Language::getGroups( ) 
 {
-    return group_ancient_languages;
+    return langGroups;
 }
 
 HelpArticlePointer Language::getSkillHelp( ) const

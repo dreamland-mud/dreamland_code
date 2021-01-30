@@ -80,7 +80,7 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         return false;
     }
     
-    if (mob->pIndexData->practicer.isSet(  (int)getGroup( ) ))
+    if (mob->pIndexData->practicer.isSetAny(getGroups()))
         return true;
 
     if (verbose)

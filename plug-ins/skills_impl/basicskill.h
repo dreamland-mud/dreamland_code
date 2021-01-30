@@ -11,6 +11,7 @@
 #include "xmlstring.h"
 #include "xmltableelement.h"
 #include "xmlrussianstring.h"
+#include "xmlflags.h"
 
 #include "skill.h"
 #include "affecthandler.h"
@@ -26,6 +27,8 @@ class BasicSkill : public virtual Skill,
 XML_OBJECT
 public:
     typedef ::Pointer<BasicSkill> Pointer;
+
+    BasicSkill();
 
     virtual void loaded( );
     virtual void unloaded( );
@@ -52,7 +55,9 @@ public:
     XML_VARIABLE XMLRussianString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;
     XML_VARIABLE XMLIntegerNoEmpty mana;
+    XML_VARIABLE XMLIntegerNoEmpty move;
     XML_VARIABLE XMLIntegerNoEmpty hard;
+    XML_VARIABLE XMLFlagsNoEmpty   align, ethos;
 
     XML_VARIABLE XMLPointerNoEmpty<AffectHandler> affect;
     XML_VARIABLE XMLPointerNoEmpty<Spell> spell;

@@ -1199,7 +1199,7 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
 
     for (int sn = 0; sn < skillManager->size(); sn++) {
         Skill *skill = skillManager->find(sn);
-        if (skill->getGroup() == group->getIndex())
+        if (skill->hasGroup(group->getIndex()))
             skills->push_back(Register(skill->getName()));
     }
 

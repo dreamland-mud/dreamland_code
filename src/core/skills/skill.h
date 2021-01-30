@@ -8,6 +8,7 @@
 #include <ostream>
 
 #include "globalregistryelement.h"
+#include "globalbitvector.h"
 
 class Character;
 class PCharacter;
@@ -40,7 +41,8 @@ public:
     
     const DLString& getNameFor( Character * ) const;
     virtual const DLString &getRussianName( ) const;
-    virtual SkillGroupReference & getGroup( );
+    virtual GlobalBitvector & getGroups();
+    bool hasGroup(unsigned int group);
     virtual SpellPointer getSpell( ) const;
     virtual AffectHandlerPointer getAffect( ) const;
     virtual SkillCommandPointer getCommand( ) const;
@@ -68,6 +70,7 @@ public:
 
     virtual const DLString& getCategory( ) const;
 
+    static GlobalBitvector zeroGroups;
 protected:
     DLString name;
 };

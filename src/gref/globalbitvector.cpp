@@ -19,6 +19,13 @@ GlobalBitvector::GlobalBitvector( GlobalRegistryBase *reg )
     bits.resize( reg->size( ), false );
 }
 
+GlobalBitvector::GlobalBitvector( GlobalRegistryBase *reg, unsigned int ndx )
+                         : registry( reg )
+{
+    bits.resize( reg->size( ), false );
+    set(ndx);
+}
+
 GlobalBitvector::~GlobalBitvector( )
 {
 }

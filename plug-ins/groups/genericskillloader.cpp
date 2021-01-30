@@ -59,7 +59,7 @@ void GenericSkillLoader::dumpCSV()
         }
 
         if (found)
-            buf << skill->getName() << "," << skill->getGroup()->getName() << levels.str() << endl;
+            buf << skill->getName() << "," << skill->getGroups().toString() << levels.str() << endl;
     }
 
     try {

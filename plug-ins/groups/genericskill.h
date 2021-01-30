@@ -13,6 +13,7 @@
 #include "xmlmap.h"
 #include "xmlflags.h"
 #include "xmlenumeration.h"
+#include "xmlglobalbitvector.h"
 
 #include "skillgroup.h"
 #include "pcskilldata.h"
@@ -40,7 +41,7 @@ public:
     virtual ~GenericSkill( );
 
     virtual void loaded( );
-    virtual SkillGroupReference & getGroup( );
+    virtual GlobalBitvector & getGroups();
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
@@ -69,7 +70,7 @@ protected:
     const SkillRaceBonus *getRaceBonus( CharacterMemoryInterface * ) const;
     bool isRaceAffect( CharacterMemoryInterface * ) const;
 
-    XML_VARIABLE XMLSkillGroupReference group;
+    XML_VARIABLE XMLGlobalBitvector group;
     XML_VARIABLE XMLFlagsNoEmpty   raceAffect;
     XML_VARIABLE MobProfSkillData mob;
 

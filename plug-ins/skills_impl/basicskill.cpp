@@ -37,6 +37,13 @@ DESIRE(drunk);
 BONUS(learning);
 HOMETOWN(frigate);
 
+BasicSkill::BasicSkill() 
+                : align( 0, &align_table ),
+                  ethos( 0, &ethos_table )
+{
+    
+}
+
 void BasicSkill::loaded( )
 {
     skillManager->registrate( Pointer( this ) );
@@ -320,4 +327,5 @@ int BasicSkill::getRating( PCharacter * ) const
 {
     return 1;
 }
+
 

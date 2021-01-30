@@ -21,14 +21,15 @@
 
 const DLString CardSkill::CATEGORY = "Умения Колоды";
 GROUP(card_pack);
+static GlobalBitvector cardGroups(skillGroupManager, group_card_pack);
 
 CardSkill::CardSkill( )
 {
 }
 
-SkillGroupReference & CardSkill::getGroup( ) 
+GlobalBitvector & CardSkill::getGroups( ) 
 {
-    return group_card_pack;
+    return cardGroups;
 }
 
 bool CardSkill::visible( CharacterMemoryInterface * ch ) const

@@ -61,9 +61,9 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
         if (mylevel > LEVEL_MORTAL)
             continue;
         
-        if (skill->getGroup() == group_ancient_languages 
-            || skill->getGroup() == group_card_pack
-            || skill->getGroup() == group_tattoo_master)
+        if (skill->hasGroup(group_ancient_languages)
+            || skill->hasGroup(group_card_pack)
+            || skill->hasGroup(group_tattoo_master))
             continue;
 
         DLString skillName;

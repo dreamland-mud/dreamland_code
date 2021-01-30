@@ -48,6 +48,7 @@ GROUP(curative);
 GROUP(healing);
 GROUP(clan);
 GROUP(combat);
+GROUP(none);
 
 DefaultSpell::DefaultSpell( ) 
         : Spell(),
@@ -212,7 +213,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             gsn_spell_craft->improve( ch, false );
     }
     
-    if (skill->getGroup( ) == group_maladictions
+    if (skill->hasGroup(group_maladictions)
         && (chance = gsn_improved_maladiction->getEffective( ch )))
     {
         if (number_percent( ) < chance) {
@@ -224,7 +225,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             gsn_improved_maladiction->improve( ch, false );
     }
 
-    if (skill->getGroup( ) == group_benedictions
+    if (skill->hasGroup(group_benedictions)
         &&  (chance = gsn_improved_benediction->getEffective( ch ))) 
     {
         if (number_percent() < chance) {
@@ -236,8 +237,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             gsn_improved_benediction->improve( ch, false );
     }
 
-    if (skill->getGroup( ) == group_healing 
-        || skill->getGroup( ) == group_curative)
+    if (skill->hasGroup(group_healing) 
+        || skill->hasGroup(group_curative))
     {
         chance = gsn_holy_remedy->getEffective( ch );
 
@@ -259,7 +260,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
      *      B0 - свободный параметр
      *      a  - дальность действия спелла
      */
-    if (skill->getGroup( ) == group_combat
+    if (skill->hasGroup(group_combat)
         && range >= 0
         && ch->isAffected( gsn_magic_concentrate ))
     {
@@ -584,10 +585,10 @@ bool DefaultSpell::isPrayer( Character *caster ) const
     if (!isCasted( ))
         return false;
 
-    if (getSkill( )->getGroup( ) == group_clan)
+    if (getSkill( )->hasGroup(group_clan))
         return false;
 
-    if (getSkill( )->getGroup( ) == -1)
+    if (getSkill( )->hasGroup(group_none))
         return false;
     
     return caster->getProfession( )->getFlags( caster ).isSet(PROF_DIVINE);

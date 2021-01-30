@@ -109,9 +109,13 @@ void OLCStateSkill::show( PCharacter *ch )
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
             r->getRussianName().c_str(), 
             web_edit_button(ch, "russian", "web").c_str());
-    ptc(ch, "Группа:      {C%s{x {D(group){x\r\n", r->getGroup()->getName().c_str());
+    ptc(ch, "Группы:      {C%s{x {D(group){x\r\n", r->getGroups().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
-    ptc(ch, "Мана:        {C%d{w {D(mana){x\r\n", r->getMana());
+    ptc(ch, "Мана и шаги: {C%d {D(mana) {C%d {D(move){x \r\n", r->getMana(), r->move.getValue());
+    ptc(ch, "Натура:      {C%s{x {D(? align){x\r\n",
+        r->align.getValue() != 0 ? r->align.names().c_str() : "-");
+    ptc(ch, "Этос:        {C%s{x {D(? ethos){x\r\n",
+        r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
 
     if (r->help)
         ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
@@ -210,16 +214,32 @@ SKEDIT(mana, "мана", "расход маны")
     return numberEdit(0, 500, r->mana);
 }
 
+SKEDIT(move, "шаги", "расход шагов")
+{
+    BasicSkill *r = getOriginal();
+    return numberEdit(0, 500, r->move);
+}
+
 SKEDIT(group, "группа", "группа умений (? practicer)")
 {
     BasicSkill *r = getOriginal();
-    return globalReferenceEdit<SkillGroupManager, SkillGroup>(r->getGroup());
+    return globalBitvectorEdit<SkillGroup>(r->getGroups());
 }
 
 SKEDIT(russian, "русское", "русское имя умения")
 {
     BasicSkill *r = getOriginal();
     return editor(argument, r->nameRus, ED_NO_NEWLINE);
+}
+
+SKEDIT(align, "натура", "ограничить по натуре")
+{
+    return flagBitsEdit(align_table, getOriginal()->align);
+}
+
+SKEDIT(ethos, "этос", "ограничить по этосу")
+{
+    return flagBitsEdit(ethos_table, getOriginal()->ethos);
 }
 
 SKEDIT(target, "цели", "цели заклинания (? target_table)")

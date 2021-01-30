@@ -83,7 +83,7 @@ public:
     virtual HelpArticlePointer getSkillHelp( ) const;
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
-    virtual SkillGroupReference & getGroup( );
+    virtual GlobalBitvector & getGroups();
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 

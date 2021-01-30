@@ -404,7 +404,7 @@ void affect_join( Character *ch, Affect *paf )
         if ( paf_old->type == paf->type )
         {
             if (!paf_old->global.empty( )) 
-                if (!paf->global.isSet( paf_old->global ))
+                if (!paf->global.isSetAll( paf_old->global ))
                     continue;
 
             paf->level += paf_old->level;

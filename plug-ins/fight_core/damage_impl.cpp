@@ -153,7 +153,7 @@ void SkillDamage::protectResistance( )
     if (!spell 
             || !spell->isCasted( ) 
             || spell->isPrayer( ch )
-            || skill->getGroup( ) == group_draconian)
+            || skill->hasGroup(group_draconian))
     {
         dam -= ( dam / 2 );
         return;

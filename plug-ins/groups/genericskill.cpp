@@ -31,7 +31,8 @@ GROUP(none);
 const DLString GenericSkill::CATEGORY = "Классовые умения";
 
 GenericSkill::GenericSkill( ) 
-                : raceAffect( 0, &affect_flags ),
+                : group(skillGroupManager),
+                  raceAffect( 0, &affect_flags ),
                   raceBonuses( false ),
                   classes( false ),
                   hidden( false )
@@ -54,7 +55,7 @@ void GenericSkill::loaded( )
     }
 }
 
-SkillGroupReference & GenericSkill::getGroup( )
+GlobalBitvector & GenericSkill::getGroups()
 {
     return group;
 }
@@ -81,6 +82,7 @@ bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
 {
     const SkillRaceBonus *rb; 
     const SkillClassInfo *ci;
+    Character *ch = 0;
     
     if (hidden.getValue( ))
         return false;
@@ -94,8 +96,18 @@ bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
         case MPROF_REQUIRED:
             break;
         }
-    }
-    
+
+        ch = mem->getMobile();
+    } else if (mem->getPlayer()) {
+        ch = mem->getPlayer();
+    } 
+
+    if (ch && align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
+        return false;
+
+    if (ch && ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
+        return false;
+
     rb = getRaceBonus( mem );
     if (rb && rb->visible( ))
         return true;
@@ -295,7 +307,7 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         return false;
     }
     
-    if (mob->pIndexData->practicer.isSet( (int)getGroup( ) ))
+    if (mob->pIndexData->practicer.isSetAny(getGroups()))
         return true;
 
     if (verbose)
@@ -350,18 +362,37 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
     }
 
     const DLString what = skill_what(this).ruscase('1');
-    SkillGroupReference &group = const_cast<GenericSkill *>(this)->getGroup();
+    list<MOB_INDEX_DATA *> practicers;
 
-    if (group->getPracticer() == 0) {
+    for (auto g: const_cast<GenericSkill *>(this)->getGroups().toArray()) {
+        SkillGroup *group = skillGroupManager->find(g);
+        if (group->getPracticer() <= 0)
+            continue;
+
+        MOB_INDEX_DATA *pMob = get_mob_index(group->getPracticer());
+        if (pMob)
+            practicers.push_back(pMob);
+    }
+
+    if (practicers.empty()) {
         // '...в твоей гильдии' - с гипер-ссылкой на справку.
         buf << pad << "Это " << what << " можно выучить в твоей {g{hh44гильдии{x." << endl;
     } else {
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
-        MOB_INDEX_DATA *pMob = get_mob_index(group->getPracticer());
-        if (pMob)
-            buf << pad << "Это " << what << " можно выучить у "
-                << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "
-                << "(зона {g{hh" << pMob->area->name << "{x)." << endl;
+        buf << pad << "Это " << what << " можно выучить у ";
+        
+        MOB_INDEX_DATA *pMob = practicers.front();
+        buf << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "
+                << "(зона {g{hh" << pMob->area->name << "{x)";
+
+        // For multi-groups show two teachers only.
+        if (practicers.size() > 1) {
+            pMob = practicers.back();
+            buf << " или у {g" << russian_case( pMob->short_descr, '2' ) << "{x "
+                    << "(зона {g{hh" << pMob->area->name << "{x)";
+        }
+                    
+        buf << "." << endl;
     }
     
     if (ch->getHometown() == home_frigate)

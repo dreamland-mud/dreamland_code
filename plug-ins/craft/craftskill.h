@@ -6,6 +6,7 @@
 #include "skillgroup.h"
 #include "xmlmap.h"
 #include "xmlflags.h"
+#include "xmlglobalbitvector.h"
 
 class CraftProfessionInfo;
 
@@ -18,8 +19,7 @@ public:
     
     CraftSkill( );
 
-    virtual SkillGroupReference & getGroup( );
-    
+    virtual GlobalBitvector & getGroups();
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
@@ -40,7 +40,7 @@ public:
 protected:
     static const DLString CATEGORY;
 
-    XML_VARIABLE XMLSkillGroupReference group;
+    XML_VARIABLE XMLGlobalBitvector group;
     XML_VARIABLE CraftProfessions subprofessions;
 };
 

@@ -10,6 +10,7 @@
 
 #include "xmlmap.h"
 #include "xmlenumeration.h"
+#include "xmlglobalbitvector.h"
 #include "skillgroup.h"
 
 class SkillRaceInfo;
@@ -23,8 +24,7 @@ public:
     
     RaceAptitude( );
 
-    inline virtual SkillGroupReference & getGroup( );
-
+    inline virtual GlobalBitvector & getGroups();
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
@@ -46,7 +46,7 @@ protected:
 
     const SkillRaceInfo *getRaceInfo( CharacterMemoryInterface * ) const;
     
-    XML_VARIABLE XMLSkillGroupReference group;
+    XML_VARIABLE XMLGlobalBitvector group;
     XML_VARIABLE MobSkillData mob;
 
     XML_VARIABLE Races races;
@@ -60,7 +60,7 @@ public:
     XML_VARIABLE XMLInteger level;
 };
 
-inline SkillGroupReference & RaceAptitude::getGroup( ) 
+inline GlobalBitvector & RaceAptitude::getGroups() 
 {
     return group;
 }

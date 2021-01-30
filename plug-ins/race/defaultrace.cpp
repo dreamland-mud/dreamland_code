@@ -184,7 +184,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         if (skill->visible( &dummy )) {
             if (skill->getLearned( &dummy ) >= 100)
                 noprof100.insert( sname );
-            else if (skill->getGroup( ) == group_ancient_languages) {
+            else if (skill->hasGroup(group_ancient_languages)) {
                 int max = skill->getMaximum(&dummy);
                 int adept = skill->getAdept(&dummy);
                 if (max > adept) {

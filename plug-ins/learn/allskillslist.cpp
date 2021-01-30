@@ -131,7 +131,7 @@ void AllSkillsList::make( Character *ch )
         if (fSpells != (spell && spell->isCasted( )))
             continue;
 
-        if (group && skill->getGroup( ) != group)
+        if (group && !skill->hasGroup(group->getIndex()))
             continue;
 
         info.level = skill->getLevel( ch );

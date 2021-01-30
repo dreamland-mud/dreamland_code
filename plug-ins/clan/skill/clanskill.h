@@ -27,7 +27,7 @@ public:
     ClanSkill( );
 
     virtual void loaded( );
-    virtual SkillGroupReference & getGroup( );
+    virtual GlobalBitvector & getGroups();
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 

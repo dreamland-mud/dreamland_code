@@ -994,7 +994,7 @@ public:
                 spell = s->getSpell();
 
             buf << s->getName() << "," << s->getRussianName() << ","
-                << s->getGroup().getName() << ",";
+                << s->getGroups().toString() << ",";
 
             DLString what = "none";
             if (spell)
