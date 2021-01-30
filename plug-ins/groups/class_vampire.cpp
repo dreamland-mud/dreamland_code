@@ -35,6 +35,7 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "skill_utils.h"
 
 PROF(vampire);
 DESIRE(bloodlust);
@@ -76,12 +77,12 @@ bool VampiricBiteOneHit::mprog_immune()
 void VampiricBiteOneHit::init( )
 {
     dam_type = IS_BLOODLESS( victim ) ? DAM_PIERCE : DAM_NEGATIVE;
-    skill = 20 + ch->getSkill( sn );
+    skill = 20 + gsn_vampiric_bite->getEffective( ch );
 }
 
 void VampiricBiteOneHit::damBase( )
 {
-    int ave, level = ch->getModifyLevel( );
+    int ave, level = skill_level(*gsn_vampiric_bite, ch);
     
          if (level >= 100) ave = level - 27; // as Tier 1 weapons, sigma distribution TODO: refactor
     else if (level >= 90)  ave = level - 18;	
@@ -111,7 +112,10 @@ void VampiricBiteOneHit::calcDamage( )
     damBase( ); 
     damApplyEnhancedDamage( );
     damApplyPosition( );
-    dam = ( ch->getModifyLevel( ) / 15 + 1) * dam + ch->getModifyLevel( );
+
+    int slevel = skill_level(*gsn_vampiric_bite, ch);    
+    dam = ( slevel / 15 + 1 ) * dam + slevel;
+
     damApplyDamroll( );
     
     OneHit::calcDamage( );
@@ -152,7 +156,7 @@ void VampiricBiteOneHit::postDamageEffects( )
 
     // corrupt victim	
     Affect af;
-    int level = ch->getModifyLevel();
+    int level = skill_level(*gsn_vampiric_bite, ch);
     if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
     	af.bitvector.setTable(&affect_flags);
     	af.type      = gsn_corruption;
@@ -261,7 +265,7 @@ SKILL_RUNP( dominate )
   skill_mod   = 0.5;
   stat_mod    = 0.02;
   level_mod   = 0.05;
-  clevel      = ch->getModifyLevel();
+  clevel      = skill_level(*gsn_dominate, ch);
   vlevel      = victim->getModifyLevel(); 
 
   //////////////// PROBABILITY CHECKS //////////////// 
@@ -444,7 +448,7 @@ SKILL_RUNP( vampire )
 		ch->pecho( "Помни, тебе нужно остерегаться солнечных лучей!", ch );
         }
 
-        level = ch->getModifyLevel();
+        level = skill_level(*gsn_vampire, ch);
         duration = level / 10 ;
         duration += 5;
 
@@ -544,14 +548,16 @@ void sucking( Character *ch, Character *victim )
     else 
         cond = number_range( -10, 60 );
 
+    int slevel = skill_level(*gsn_vampiric_bite, ch);
+	
     if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) {    
-	hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
-	mana_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
+	hp_gain = std::min( slevel * 5, (int)victim->max_hit );
+	mana_gain = std::min( slevel * 5, (int)victim->max_hit );
     }	    
     else {
 	act_p("Ты с отвращением глотаешь кровь $C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
-	hp_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit ); 
-	mana_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit );	    
+	hp_gain = std::min( slevel * 1, (int)victim->max_hit ); 
+	mana_gain = std::min( slevel * 1, (int)victim->max_hit );	    
     }
 	    
     ch->hit += hp_gain;
@@ -566,15 +572,15 @@ void sucking( Character *ch, Character *victim )
         RawDamage( ch, victim, DAM_OTHER, hp_gain ).hit( true );
 
     	// corrupt victim	
-   	    Affect af;
-    	int level = ch->getModifyLevel();
-    	if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
+   	Affect af;
+
+    	if ( (slevel > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
     		af.bitvector.setTable(&affect_flags);
     		af.type      = gsn_corruption;
-   		    af.level     = level;
-    		af.duration  = level / 10;
+   		    af.level     = slevel;
+    		af.duration  = slevel / 10;
     		af.location = APPLY_HITROLL;
-    		af.modifier  = - (level / 10);
+    		af.modifier  = - (slevel / 10);
     		af.bitvector.setValue(AFF_CORRUPTION);
         	affect_join( victim, &af );	
 	    	
@@ -736,11 +742,13 @@ SKILL_RUNP( bite )
         if (!IS_AWAKE(victim)
             && Chance(ch, gsn_vampiric_bite->getEffective( ch )-1, 100).reroll())
         {
+    	    int slevel = skill_level(*gsn_vampiric_bite, ch);	
+		
             af.type     = gsn_vampiric_bite;
-            af.level    = ch->getModifyLevel();
-            af.duration = ch->getModifyLevel() / 40 + 1;
+            af.level    = slevel;
+            af.duration = slevel / 40 + 1;
             af.location = APPLY_HITROLL;
-            af.modifier = - ch->getModifyLevel( ) / 2;
+            af.modifier = - slevel / 2;
             affect_join( victim, &af );
 
             gsn_vampiric_bite->improve( ch, true, victim );
@@ -781,6 +789,7 @@ SKILL_RUNP( touch )
         Affect af;    
         float chance, skill_mod, stat_mod, level_mod, quick_mod, sleep_mod, vis_mod, time_mod;
         char arg[MAX_INPUT_LENGTH];
+	int slevel = skill_level(*gsn_vampiric_touch, ch);
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
         skill_mod   = 0.5;
@@ -887,9 +896,10 @@ SKILL_RUNP( touch )
         //////////////// PROBABILITY CHECKS ////////////////
             
         chance = 0;
+	
         chance += gsn_vampiric_touch->getEffective( ch ) * skill_mod;
         chance += ( ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += ( slevel - victim->getModifyLevel() ) * level_mod * 100;
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
 
@@ -941,8 +951,8 @@ SKILL_RUNP( touch )
 
         af.type = gsn_vampiric_touch;
         af.bitvector.setTable(&affect_flags);
-        af.level = ch->getModifyLevel();
-        af.duration = ch->getModifyLevel() / 50 + 1;
+        af.level = slevel;
+        af.duration = slevel / 50 + 1;
         af.bitvector.setValue(AFF_SLEEP);
         affect_join ( victim,&af );
 

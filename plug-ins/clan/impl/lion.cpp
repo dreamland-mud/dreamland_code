@@ -41,6 +41,7 @@
 #include "fight.h"
 #include "magic.h"
 #include "def.h"
+#include "skill_utils.h"
 
 CLAN(hunter);
 GSN(dispel_affects);
@@ -177,6 +178,7 @@ SKILL_RUNP( claw )
         
 
         // level
+        chance += skill_level_bonus(*gsn_claw, ch);
         // chance += (ch->level - victim->level) * 2;
 
         if ( ch->mana < gsn_claw->getMana( ) )
@@ -194,7 +196,7 @@ SKILL_RUNP( claw )
                 ch->setWait(gsn_claw->getBeats( ));
                 victim->setWaitViolence( 2 );            
                 victim->position = POS_RESTING;
-                damage_claw = dice(ch->getModifyLevel(), 24) + ch->damroll;
+                damage_claw = dice(skill_level(*gsn_claw, ch) , 24) + ch->damroll;
                 if ( ch->hit <= ch->max_hit / 6 )
                         damage_claw += ch->damroll;
                 damage(ch,victim,damage_claw,gsn_claw, DAM_BASH, true, DAMF_WEAPON);
@@ -219,8 +221,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   if (ch->is_npc())
       return;
 
-  if ( ch->isAffected(sn )
-                || ch->hit > ch->max_hit )
+  if ( ch->isAffected(sn ) )
         {
                 ch->send_to("Ты уже трансформирова{Smлся{Sfлась{Sx во льва.\n\r");
                 return;
