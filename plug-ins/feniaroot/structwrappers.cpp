@@ -20,6 +20,7 @@
 #include "desire.h"
 #include "clan.h"
 #include "clantypes.h"
+#include "spelltarget.h"
 
 #include "nativeext.h"
 #include "regcontainer.h"
@@ -980,16 +981,26 @@ NMI_INVOKE( LanguageWrapper, word, "(): создать одноразовое с
     return getTarget()->createDictum();
 }
 
-NMI_INVOKE( LanguageWrapper, runEffect, "(effect, ch, vict): выполнить эффект с данным именем (good, bad, bless etc) от имени ch и с целью vict")
+NMI_INVOKE( LanguageWrapper, runEffect, "(effect, ch, target): выполнить эффект с данным именем (good, bad, bless etc) от имени ch и с целью на персонажа,себя или предмет")
 {
     DLString effectName = argnum2string(args, 1);
     PCharacter *ch = argnum2player(args, 2);
-    Character *vict = argnum2character(args, 3);
+    SpellTarget::Pointer effectTarget = argnum2target(args, 3);
+
     WordEffect::Pointer effect = getTarget()->findEffect(effectName);
     if (!effect)
         throw Scripting::Exception(effectName + " effect not found for language " + name);
 
-    return Register(effect->run(ch, vict));
+    switch (effectTarget->type) {
+    case SpellTarget::CHAR:
+        return Register(effect->run(ch, effectTarget->victim));
+
+    case SpellTarget::OBJECT:
+        return Register(effect->run(ch, effectTarget->obj));
+
+    default:
+        throw Scripting::Exception(effectName + " invalid target, can be character or item only");
+    }
 }
 
 NMI_INVOKE( LanguageWrapper, effective, "(ch): узнать процент раскачки языка у персонажа" )
