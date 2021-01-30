@@ -183,7 +183,7 @@ DLString print_group_for(const Skill *skill, Character *ch)
             buf << ", ";
 
         buf << "'{hg{" << SKILL_HEADER_FG 
-            << skillGroupManager->find(g)->getNameFor(ch) << "{hx"
+            << skillGroupManager->find(groups[g])->getNameFor(ch) << "{hx"
             << "{" << SKILL_HEADER_BG << "'{x";
     }
 
