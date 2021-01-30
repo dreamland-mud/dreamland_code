@@ -74,16 +74,21 @@ SKILL_RUNP( layhands )
 
         int slevel, chance;
         slevel = skill_level(*gsn_lay_hands, ch);
+        sbonus = skill_level_bonus(*gsn_lay_hands, ch);
         chance = gsn_holy_remedy->getEffective( ch );
 
         if (number_percent( ) < chance) {
-            slevel += chance / 20;
+            if (sbonus >= 0)
+                sbnonus += chance / 20;
+            else
+                sbonus = chance / 20;
+            
             act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
             act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
         }
         
-        victim->hit = min( (victim->hit + slevel) * 5, (int)victim->max_hit );
+        victim->hit = min( victim->hit + slevel * 5 + sbonus * 20, (int)victim->max_hit );
         update_pos( victim );
     
         if (ch != victim) {
@@ -91,7 +96,7 @@ SKILL_RUNP( layhands )
             act( "$c1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
             act( "$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
         } else {
-            act( "Ты возлагаешь на себя руки: тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
+            act( "Ты возлагаешь на себя руки и тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
             act( "$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
         }
     
@@ -151,9 +156,9 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
 
-    ch->mana -= ch->max_hit  / 10;
+    ch->mana -= ch->max_mana  / 10; 
     ch->move -= ch->max_move / 10;
-    ch->hit  -= ch->max_move / 10;
+    ch->hit  -= ch->max_hit / 10;
     update_pos(ch);
     ch->setWait( skill->getBeats( ) );
 
