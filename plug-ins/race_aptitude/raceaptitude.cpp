@@ -21,6 +21,7 @@
 const DLString RaceAptitude::CATEGORY = "Уникальные способности";
 
 RaceAptitude::RaceAptitude( ) 
+                : group(skillGroupManager)
 {
 }
 
