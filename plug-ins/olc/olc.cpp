@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
-#include "regexp.h"
+#include "util/regexp.h"
 #include <xmldocument.h>
 #include "stringset.h"
 #include "wrapperbase.h"
@@ -14,6 +14,7 @@
 #include <spell.h>
 #include <skillmanager.h>
 #include "skillcommand.h"
+#include "skillgroup.h"
 #include "feniamanager.h"
 #include "areabehaviormanager.h"
 #include <affect.h>
@@ -144,20 +145,6 @@ ptc(Character *ch, const char *fmt, ...)
     va_end(av);
 }
 
-void show_fenia_triggers(Character *ch, Scripting::Object *wrapper)
-{
-    WrapperBase *base = get_wrapper(wrapper);
-    if (base) {
-        StringSet triggers, misc;
-
-        base->collectTriggers(triggers, misc);
-        if (!triggers.empty()) 
-            ptc(ch, "{gFenia triggers{x:           %s\r\n", triggers.toString().c_str());
-        
-        if (!misc.empty()) 
-            ptc(ch, "{gFenia fields and methods{x: %s\r\n", misc.toString().c_str());
-    }
-}
 
 /** Find area with given vnum. */
 AreaIndexData *get_area_data(int vnum)
@@ -485,28 +472,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
     }
-
-    if (arg == "passive") {
-        ostringstream buf;
-
-        for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-            Skill::Pointer skill = SkillManager::getThis( )->find( sn );
-            Spell::Pointer spell = skill->getSpell( );
-            Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
-
-            if (spell && spell->isCasted())
-                continue;
-
-            if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET))
-                continue;
-
-            buf << skill->getName() << endl;            
-        }
-
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
 }
 
 

@@ -20,24 +20,10 @@
                 "     (Port a ROM 2.4 - Nov 2, 1996)\n\r"
 #define OLC_CREDITS "     Original by Surreality(cxw197psu.edu) and Locke(lockelm.com)"
 
-namespace Scripting {
-    class Object;
-}
-
-void string_show(Character * ch, char *strch);
-
-
-#define MAX_MOB 1                /* Default maximum number for resetting mobs */
-
 AreaIndexData *get_area_data(int vnum);
 
 bool show_help(Character * ch, const char *argument);
-void show_fenia_triggers(Character *, Scripting::Object *wrapper);
 int help_next_free_id();
-
-// Macros
-
-#define TOGGLE_BIT(var, bit)    ((var) ^= (bit))
 
 // Prototypes
 // mem.c - memory prototypes.
@@ -49,11 +35,8 @@ OBJ_INDEX_DATA *new_obj_index();
 MOB_INDEX_DATA *new_mob_index();
 
 #define stc(t, c) (c)->send_to((t))
-#define IS_NPC(c) (c)->is_npc()
-
 
 const char * get_skill_name( int sn, bool verbose = true );
-int olc_handler(Descriptor *d, char *argument);
 void ptc(Character *c, const char *fmt, ...);
 
 int next_obj_index( Character *ch, RoomIndexData *r );

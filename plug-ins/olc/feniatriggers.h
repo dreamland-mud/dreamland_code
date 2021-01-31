@@ -29,6 +29,7 @@ public:
     bool openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const;
     void showAvailableTriggers(PCharacter *ch, const DLString &indexType) const;
     void showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const;
+    void showAssignedTriggers(PCharacter *ch,  Scripting::Object *wrapper) const;
 
 protected:
     bool editExisting(Character *ch, Scripting::Register &retval) const;

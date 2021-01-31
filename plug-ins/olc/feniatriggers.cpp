@@ -96,10 +96,37 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, const DLString &i
 
     const TriggerContent &triggers = i->second;
     for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
-        buf << t->first << " ";
+        buf <<  web_cmd(ch, "fenia $1", t->first) << " ";
     }
 
     buf << endl;
+    ch->send_to(buf);
+}
+
+void FeniaTriggerLoader::showAssignedTriggers(PCharacter *ch, Scripting::Object *wrapper) const
+{
+    WrapperBase *base = get_wrapper(wrapper);
+    if (!base)
+        return;
+
+    StringSet triggers, misc;
+    ostringstream buf;
+
+    base->collectTriggers(triggers, misc);
+    if (!triggers.empty()) {
+        buf << "{gFenia triggers{x:           ";
+        for (auto &t: triggers)
+            buf << web_cmd(ch, "fenia $1", t) << " ";
+        buf << endl;    
+    }
+
+    if (!misc.empty()) {
+        buf << "{gFenia fields and methods{x: ";
+        for (auto &t: misc)
+            buf << web_cmd(ch, "fenia $1", t) << " ";
+        buf << endl;    
+    }
+
     ch->send_to(buf);
 }
 
