@@ -62,6 +62,9 @@ public:
 
     bool isProfessional() const;
 
+    virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
+    virtual DLString accessToString() const;
+
 protected:
     static const DLString CATEGORY;                                             
     
@@ -83,6 +86,7 @@ protected:
 
 class SkillClassInfo : public XMLVariableContainer {
 XML_OBJECT
+friend class GenericSkill;
 public:
     typedef ::Pointer<SkillClassInfo> Pointer;
     typedef XMLMapBase<SkillClanAntiBonus> ClanAntiBonuses;

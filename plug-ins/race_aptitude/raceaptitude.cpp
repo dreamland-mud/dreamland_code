@@ -136,3 +136,51 @@ RaceAptitude::getRaceInfo( CharacterMemoryInterface *ch ) const
     return (i == races.end( ) ? NULL : &i->second);
 }
 
+
+/*--------------------------------------------------------------------------
+ * OLC helpers
+ *--------------------------------------------------------------------------*/
+
+bool RaceAptitude::accessFromString(const DLString &newValue, ostringstream &errBuf)
+{
+    map<DLString, int> newRaces = parseAccessTokens(newValue, raceManager, errBuf);
+
+    if (newRaces.empty() && errBuf.str().empty()) {
+        // Valid empty input, flush all race info from this skill.
+        races.clear();
+        errBuf << "Все расовые ограничения очищены." << endl;
+        return true;
+    }
+
+    // Adjust existing clan levels or create new elements.
+    for (auto &newPair: newRaces) {
+        auto c = races.find(newPair.first);
+        if (c == races.end()) {
+            races[newPair.first].level = newPair.second;
+        } else {
+            c->second.level = newPair.second;
+        }
+    }
+
+    // Wipe clan info no longer present in the input.
+    for (auto c = races.begin(), last = races.end(); c != last; ) {
+        if (newRaces.count(c->first) == 0)
+            c = races.erase(c);
+        else
+            c++;
+    }
+
+    errBuf << "Новые расовые ограничения: " << accessToString() << endl;
+    return true;
+}
+
+DLString RaceAptitude::accessToString() const
+{
+    StringList result;
+
+    for (auto &r: races) {
+        result.push_back(r.first.quote() + " " + r.second.level.toString());
+    }
+
+    return result.join(", ");
+}

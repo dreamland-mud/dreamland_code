@@ -249,3 +249,51 @@ SkillClanInfo::SkillClanInfo( )
 {
 }
 
+
+/*--------------------------------------------------------------------------
+ * OLC helpers
+ *--------------------------------------------------------------------------*/
+
+bool ClanSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
+{
+    map<DLString, int> newClans = parseAccessTokens(newValue, clanManager, errBuf);
+
+    if (newClans.empty() && errBuf.str().empty()) {
+        // Valid empty input, flush all clan info from this skill.
+        clans.clear();
+        errBuf << "Все клановые ограничения очищены." << endl;
+        return true;
+    }
+
+    // Adjust existing clan levels or create new elements.
+    for (auto &newPair: newClans) {
+        auto c = clans.find(newPair.first);
+        if (c == clans.end()) {
+            clans[newPair.first].level = newPair.second;
+        } else {
+            c->second.level = newPair.second;
+        }
+    }
+
+    // Wipe clan info no longer present in the input.
+    for (auto c = clans.begin(), last = clans.end(); c != last; ) {
+        if (newClans.count(c->first) == 0)
+            c = clans.erase(c);
+        else
+            c++;
+    }
+
+    errBuf << "Новые клановые ограничения: " << accessToString() << endl;
+    return true;
+}
+
+DLString ClanSkill::accessToString() const
+{
+    StringList result;
+
+    for (auto &c: clans) {
+        result.push_back(c.first + " " + c.second.level.toString());
+    }
+
+    return result.join(", ");
+}

@@ -6,7 +6,7 @@
 #include <affect.h>
 #include "room.h"
 #include "areahelp.h"
-#include "regexp.h"
+#include "util/regexp.h"
 
 #include "reledit.h"
 #include "olc.h"

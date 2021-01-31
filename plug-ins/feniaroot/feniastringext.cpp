@@ -8,6 +8,7 @@
 #include "char.h"
 #include "dl_strings.h"
 #include "dl_ctype.h"
+#include "stringlist.h"
 #include "format.h"
 #include "regexp.h"
 #include "nativeext.h"
@@ -274,7 +275,6 @@ NMI_INVOKE(FeniaString, contains, "(words): true если эта строка с
 NMI_INVOKE(FeniaString, split, "(sep): возвращает List из подстрок, разбитых по разделителю sep")
 {
     string delim;
-    size_type pos1, pos2;
     RegList::Pointer list(NEW);
     
     if (args.empty() || args.front().toString().empty())
@@ -282,25 +282,10 @@ NMI_INVOKE(FeniaString, split, "(sep): возвращает List из подст
     else
         delim = args.front().toString();
        
-    // Keep track of beginning and end of the token. 
-    pos1 = 0;
-    pos2 = 0;    
-
-    // Parse all tokens, allowing for delimiters to repeat themselves
-    // several times, e.g. "x   y  z".
-    do {
-        // Remember where a token starts.
-        pos1 = find_first_not_of(delim, pos2);
-        if (pos1 == string::npos)
-            break;
-
-        // Remember where a token ends.
-        pos2 = find(delim, pos1);
-
-        // Cut off a substring with this token.
-        list->push_back(Register(substr(pos1, pos2 - pos1)));
-    }
-    while (pos1 < size() && pos2 < size());
+    StringList tokens;
+    tokens.split(*this, delim);
+    for (auto &token: tokens)
+        list->push_back(Register(token));
 
     Object *obj = &Object::manager->allocate();
     obj->setHandler(list);

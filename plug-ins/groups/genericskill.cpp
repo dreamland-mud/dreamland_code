@@ -460,7 +460,7 @@ bool SkillRaceBonus::visible( ) const
  * SkillClassInfo
  *--------------------------------------------------------------------------*/
 SkillClassInfo::SkillClassInfo( )
-                 : maximum( 100 ), always( false ), clanAntiBonuses( false )
+                 : rating(1), maximum( 100 ), always( false ), clanAntiBonuses( false )
 {
 }
 
@@ -484,3 +484,52 @@ bool SkillClassInfo::visible( ) const
             && getRating( ) > 0;
 }
 
+/*--------------------------------------------------------------------------
+ * OLC helpers
+ *--------------------------------------------------------------------------*/
+
+bool GenericSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
+{
+    // Assume only class restrictions are passed here for now.
+
+    map<DLString, int> newClasses = parseAccessTokens(newValue, professionManager, errBuf);
+
+    if (newClasses.empty() && errBuf.str().empty()) {
+        // Valid empty input, flush all class info from this skill.
+        classes.clear();
+        errBuf << "Все классовые ограничения очищены." << endl;
+        return true;
+    }
+
+    // Adjust existing class levels or create new elements.
+    for (auto &newPair: newClasses) {
+        auto c = classes.find(newPair.first);
+        if (c == classes.end()) {
+            classes[newPair.first].level = newPair.second;
+        } else {
+            c->second.level = newPair.second;
+        }
+    }
+
+    // Wipe class info no longer present in the input.
+    for (auto c = classes.begin(), last = classes.end(); c != last; ) {
+        if (newClasses.count(c->first) == 0)
+            c = classes.erase(c);
+        else
+            c++;
+    }
+
+    errBuf << "Новые классовые ограничения: " << accessToString() << endl;
+    return true;
+}
+
+DLString GenericSkill::accessToString() const
+{
+    StringList result;
+
+    for (auto &c: classes) {
+        result.push_back(c.first + " " + DLString(c.second.getLevel()));
+    }
+
+    return result.join(", ");
+}

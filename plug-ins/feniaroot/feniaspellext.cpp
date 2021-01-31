@@ -8,6 +8,7 @@
 #include "characterwrapper.h"
 #include "objectwrapper.h"
 #include "structwrappers.h"
+#include "feniamanager.h"
 
 #include "core/object.h"
 #include "room.h"
@@ -118,7 +119,7 @@ NMI_INVOKE(FeniaSpellContext, msgArea, "(fmt[,args]): выдать сообще�
 }
 
 
-NMI_INVOKE(FeniaSpellContext, calcDamage, "([tier]): рассчитать повреждения для tier в параметрах или из конфигурации")
+NMI_INVOKE(FeniaSpellContext, calcDamage, "([tier]): рассчитать повреждения для tier в параметрах или из профайла")
 {
     int tier = args.empty() ? arg2spell(spell)->tier.getValue() : args2number(args);
 
@@ -147,7 +148,7 @@ NMI_INVOKE(FeniaSpellContext, calcDamage, "([tier]): рассчитать пов
     return Register(dam);
 }
 
-NMI_INVOKE(FeniaSpellContext, savesSpell, "([damtype,damflags]): уменьшить повреждения вдвое, если прошел спассбросок у жертвы")
+NMI_INVOKE(FeniaSpellContext, savesSpell, "([damtype,damflags]): уменьшить повреждения вдвое, если прошел спассбросок у жертвы; по умолчанию damtype и damflags берутся из профайла")
 {
     if (vict.type == Register::NONE)
         return Register();
@@ -167,7 +168,7 @@ NMI_INVOKE(FeniaSpellContext, savesSpell, "([damtype,damflags]): уменьши�
     return Register(false);
 }
 
-NMI_INVOKE(FeniaSpellContext, damage, "([damtype,damflags]): нанести повреждения жертве")
+NMI_INVOKE(FeniaSpellContext, damage, "([damtype,damflags]): нанести повреждения жертве, по умолчанию damtype и damflags берутся из профайла")
 {
     if (vict.type == Register::NONE)
         return Register();
@@ -249,3 +250,16 @@ NMI_GET(FeniaSpellContext, skill, "прототип умеиния для это
 {
     return Register::handler<SkillWrapper>(name);    
 }
+
+NMI_SET(FeniaSpellContext, vict, "персонаж, цель заклинания для runVict")
+{
+    Character *v = arg2character(arg);
+    vict = FeniaManager::wrapperManager->getWrapper(v); // Huh?
+}
+
+NMI_SET(FeniaSpellContext, victim, "персонаж, цель заклинания для runVict - как синоним vict")
+{
+    Character *v = arg2character(arg);
+    vict = FeniaManager::wrapperManager->getWrapper(v);
+}
+
