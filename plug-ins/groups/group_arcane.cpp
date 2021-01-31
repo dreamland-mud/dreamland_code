@@ -361,7 +361,7 @@ SKILL_RUNP( zap )
                 int slevel;
                 slevel = wand->value0() + skill_level_bonus(*gsn_wands, ch);
               
-                if (::spell_nocatch(spell, wand->value0(), ch, target, zap_flags))
+                if (::spell_nocatch(spell, slevel, ch, target, zap_flags))
                     if (spell->getSpellType( ) == SPELL_OFFENSIVE)
                         yell_panic( ch, victim,
                                     "Помогите! Кто-то размахивает около меня волшебным жезлом!",

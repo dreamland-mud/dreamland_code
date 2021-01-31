@@ -72,18 +72,23 @@ SKILL_RUNP( layhands )
     if ( number_percent() < gsn_lay_hands->getEffective( ch ) + skill_level_bonus(*gsn_lay_hands, ch) ) {
         postaffect_to_char(ch, gsn_lay_hands, 2);
 
-        int slevel, chance;
+        int slevel, chance, sbonus;
         slevel = skill_level(*gsn_lay_hands, ch);
+        sbonus = skill_level_bonus(*gsn_lay_hands, ch);
         chance = gsn_holy_remedy->getEffective( ch );
 
         if (number_percent( ) < chance) {
-            slevel += chance / 20;
+            if (sbonus >= 0)
+                sbonus += chance / 20;
+            else
+                sbonus = chance / 20;
+            
             act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
             act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
         }
         
-        victim->hit = min(victim->hit + slevel * 5, (int)victim->max_hit);
+        victim->hit = min( victim->hit + slevel * 5 + sbonus * 20, (int)victim->max_hit );
         update_pos( victim );
     
         if (ch != victim) {
@@ -91,7 +96,7 @@ SKILL_RUNP( layhands )
             act( "$c1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
             act( "$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
         } else {
-            act( "Ты возлагаешь на себя руки: тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
+            act( "Ты возлагаешь на себя руки и тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
             act( "$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
         }
     
@@ -156,17 +161,16 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
 
-    ch->mana -= ch->max_hit  / 10;
+    ch->mana -= ch->max_mana  / 10; 
     ch->move -= ch->max_move / 10;
-    ch->hit  -= ch->max_move / 10;
+    ch->hit  -= ch->max_hit / 10;
     update_pos(ch);
-    ch->setWait( skill->getBeats( ) );
 
-    // 50% chance to fail
-    if (ch->isAffected(sn) || roll > sk / 2)
-    { 
+    // 20% chance to fail with max skill
+    if (ch->isAffected(sn) || roll > sk * 4 / 5 )
+    {         
         act_p("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR, POS_RESTING);
-
+        
         if (!ch->isAffected(gsn_weaken)) {
             af.type = gsn_weaken;
             af.level = punish_lvl;
@@ -192,7 +196,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             act_p("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_RESTING);
         }
         else {
-            if (ch->position == POS_FIGHTING) {
+            if (ch->fighting) {
                 ch->send_to("Твои мускулы перестают тебе повиноваться...\n\r");
                 ch->setDazeViolence( 3 );
                 ch->setWaitViolence( 1 );
@@ -215,19 +219,24 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
 
-    // 5% chance to fizzle
-    if (roll < 5 ) {
-        ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
-        return;
-    }
-
-    // 45% chance to succeed
-
-    ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
-
-    if (ch->position == POS_FIGHTING && ch->fighting != NULL) {
+    // 80% chance to not fail with max skill   
+    if (ch->fighting) {
+        // 10% chance to fizzle with max skill
+        if (roll < sk / 10 ) {
+            ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
+            return;
+        }
+        
         postaffect_to_char(ch, sn, level/10 + 1);
         
+        // 10% chance to just get the affect
+        if (roll < sk / 5 ) {
+            ch->println("Твоя молитва не увенчалась успехом.");
+            return;
+        }
+
+        ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
+
         switch (number_range(0, 3)) {
         case 0:
             if (IS_GOOD(ch) && IS_EVIL(ch->fighting))
@@ -254,6 +263,14 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
     else {
+        // 25% chance to fizzle with max skill
+        if (roll < sk / 4 ) {
+            ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
+            return;
+        }
+        
+        ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
+
         af.bitvector.setTable(&affect_flags);
         af.type         = sn;
         af.level        = level;
@@ -268,7 +285,6 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         affect_to_char(ch, &af);
         return;
     }
-
 }
 
 
