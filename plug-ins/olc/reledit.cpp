@@ -175,7 +175,7 @@ RELEDIT(desc, "описание", "установить описание бож�
     return editor(argument, getOriginal()->description, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
-RELEDIT(flags, "флаги", "выставить флаги религии")
+RELEDIT(flags, "флаги", "выставить флаги религии (? religion_flags)")
 {
     return flagBitsEdit(religion_flags, getOriginal()->flags);
 }

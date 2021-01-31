@@ -132,10 +132,11 @@ void OLCStateSkill::show( PCharacter *ch )
             web_edit_button(ch, "allow", "").c_str());
 
     if (s) {
-        ptc(ch, "Цели:        {Y%s{w {D(target){x\r\n", s->target.names().c_str());                        
-        ptc(ch, "Позиция:     {Y%s{w {D(position){x\r\n", s->position.name().c_str());
-        ptc(ch, "Тип:         {Y%s{w {D(type){x\r\n", s->type.name().c_str());
-        ptc(ch, "Приказ:      {Y%s{x {D(order){x\r\n",
+        ptc(ch, "Цели:        {Y%s {D(target){x\r\n", s->target.names().c_str());                        
+        ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", s->position.name().c_str());
+        ptc(ch, "Тип:         {Y%s {D(type){x\r\n", s->type.name().c_str());
+        ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", s->flags.names().c_str());
+        ptc(ch, "Приказ:      {Y%s {D(order){x\r\n",
                 s->order == 0 ? "-" : s->order.names().c_str());
                 
         if (s->type == SPELL_OFFENSIVE) {
@@ -315,6 +316,13 @@ SKEDIT(target, "цели", "цели заклинания (? target_table)")
     DefaultSpell *s = getSpell();
     return checkSpell(s)
             && flagBitsEdit(target_table, s->target);
+}
+
+SKEDIT(flags, "флаги", "флаги заклинания (? spell_flags)")
+{
+    DefaultSpell *s = getSpell();
+    return checkSpell(s)
+            && flagBitsEdit(spell_flags, s->flags);
 }
 
 SKEDIT(damtype, "уронтип", "вид повреждений (? damage_table)")

@@ -414,17 +414,18 @@ bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
     PCharacter *ch = owner->character->getPC();
     const char *cmd = lastCmd.c_str();
     DLString args = lastArgs;
+    DLString tabname = FlagTableRegistry::getName(&table);
 
     if (args.empty()) {
         ptc(ch, "Использование:\r\n{y%s{x флаги - установить или снять указанные флаги\r\n{y{hc? %s{x - показать таблицу флагов\r\n",
-            cmd, cmd);
+            cmd, tabname.c_str());
         return false;
     }
 
     bitstring_t value = table.bitstring(args);
     if (value == NO_FLAG) {
         ptc(ch, "Не найдено ни одного флага по строке '%s'. Используй {y{hc? %s{x для таблицы всех флагов.\r\n",
-             args.c_str(), cmd); 
+             args.c_str(), tabname.c_str()); 
         return false;
     }
 
@@ -447,17 +448,18 @@ bool OLCState::flagValueEdit(const FlagTable &table, int &field)
     PCharacter *ch = owner->character->getPC();
     const char *cmd = lastCmd.c_str();
     DLString args = lastArgs;
+    DLString tabname = FlagTableRegistry::getName(&table);
 
     if (args.empty()) {
         ptc(ch, "Использование:\r\n{y%s{x значение - установить значение\r\n{y{hc? %s{x - показать таблицу возможных значений\r\n",
-            cmd, cmd);
+            cmd, tabname.c_str());
         return false;
     }
 
     int value = table.value(args);
     if (value == NO_FLAG) {
         ptc(ch, "Значение '%s' не найдено. Используй {y{hc? %s{x для таблицы возможных значений.\r\n",
-           cmd, cmd);
+           cmd, tabname.c_str());
         return false;
     }
 

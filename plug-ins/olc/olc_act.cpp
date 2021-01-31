@@ -126,11 +126,12 @@ const struct olc_help_type help_table[] =
     {"{YУмения и заклинания{x", NULL, NULL}, 
     {"spells", &skill_table, "Имена всех заклинаний."},
     {"practicer", &group_table, "Все группы умений (для поля practicer)."},
-    {"target", &target_table, "Цели для заклинаний (поле target)."},
-    {"type", &spell_types, "Типы заклинаний (поле type)."},
-    {"order", &order_flags, "Флаги приказов (поле order)."},
-    {"damtype", &damage_table, "Виды повреждений (поле damtype)."},
-    {"damflags", &damage_flags, "Флаги урона {поле damflags)."},
+    {"target_table", &target_table, "Цели для заклинаний (поле target)."},
+    {"spell_types", &spell_types, "Типы заклинаний (поле type)."},
+    {"spell_flags", &spell_flags, "Флаги заклинаний (поле flags)."},
+    {"order_flags", &order_flags, "Флаги приказов (поле order)."},
+    {"damage_table", &damage_table, "Виды повреждений (поле damtype)."},
+    {"damage_flags", &damage_flags, "Флаги урона (поле damflags)."},
 
     {NULL, NULL, NULL}
 };
