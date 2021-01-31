@@ -445,7 +445,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
                 vch->send_to("Божественная сила повергает тебя!\n\r");
                 dam = dice(level,6);
                 try{
-                damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_PRAYER);
                 }
                 catch (const VictimDeathException &){
                     continue;
@@ -464,7 +464,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
                 vch->send_to("Божественная сила повергает тебя!\n\r");
                 dam = dice(level,4);
                 try{
-                damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_PRAYER);
                 }
                 catch (const VictimDeathException &){
                     continue;
@@ -562,7 +562,7 @@ VOID_SPELL(RayOfTruth)::run( Character *ch, Character *victim, int sn, int level
         ch->getProfession( ) == prof_anti_paladin )
                 dam = dam + dam / 2;
 
-    if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL) )
+    if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_PRAYER) )
         dam /= 2;
     
     if (victim->is_npc( ))
@@ -582,7 +582,7 @@ VOID_SPELL(RayOfTruth)::run( Character *ch, Character *victim, int sn, int level
     if (!IS_AFFECTED(victim, AFF_BLIND))
         spell(gsn_blindness, 3 * level / 4, ch, victim);
 
-    damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_PRAYER);
 }
 
 
@@ -703,10 +703,10 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
 
     dam = dice(level,14);
 
-    if ( saves_spell( level, victim, DAM_HOLY,ch, DAMF_SPELL ) )
+    if ( saves_spell( level, victim, DAM_HOLY,ch, DAMF_PRAYER ) )
         dam /= 2;
 
-    if (!IS_AFFECTED(victim, AFF_CURSE) && !saves_spell( level, victim, DAM_HOLY, ch, DAMF_SPELL ) )
+    if (!IS_AFFECTED(victim, AFF_CURSE) && !saves_spell( level, victim, DAM_HOLY, ch, DAMF_PRAYER ) )
     {
         af.type      = sn;
         af.level     = level;
@@ -727,5 +727,5 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
             act_p("$C1 выглядит отвратительно.",ch,0,victim,TO_CHAR,POS_RESTING);
     }
 
-    damage_nocatch( ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL );
+    damage_nocatch( ch, victim, dam, sn, DAM_HOLY, true, DAMF_PRAYER );
 }

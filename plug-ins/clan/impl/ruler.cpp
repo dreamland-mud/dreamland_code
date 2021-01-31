@@ -1504,10 +1504,10 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
     }
 
     dam = dice( level, 5 );
-    if (saves_spell( level, target, DAM_LIGHT, ch, DAMF_SPELL ))
+    if (saves_spell( level, target, DAM_LIGHT, ch, DAMF_MAGIC ))
         dam /= 2;
 
-    damage( ch, target, ( dam ), sn, DAM_LIGHT, true, DAMF_SPELL );
+    damage( ch, target, ( dam ), sn, DAM_LIGHT, true, DAMF_MAGIC );
     
     if (target->is_npc( ))
         return;
@@ -1523,11 +1523,11 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 
             dam = dice( level, 5 );
 
-            if (saves_spell( level, target, DAM_LIGHT, ch, DAMF_SPELL ))
+            if (saves_spell( level, target, DAM_LIGHT, ch, DAMF_MAGIC ))
                 dam /= 2;
             
             try {
-                damage_nocatch( ch, target, ( dam ), sn, DAM_LIGHT, true, DAMF_SPELL );
+                damage_nocatch( ch, target, ( dam ), sn, DAM_LIGHT, true, DAMF_MAGIC );
             } catch (const VictimDeathException &) {
                 return;
             }
@@ -1639,7 +1639,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
     if (!victim->isAffected(gsn_doppelganger)) {
         act("Ты не замечаешь во внешности $C2 ничего необычного.", ch, 0, victim, TO_CHAR);
     }
-    else if (saves_spell( level, victim, DAM_MENTAL, ch, DAMF_SPELL)) {
+    else if (saves_spell( level, victim, DAM_MENTAL, ch, DAMF_MAGIC)) {
         act("Тебе не удалось заглянуть под личину $C2.", ch, 0, victim, TO_CHAR);
     }
     else {

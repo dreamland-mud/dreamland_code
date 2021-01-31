@@ -174,15 +174,19 @@ NMI_INVOKE(FeniaSpellContext, damage, "([damtype,damflags]): нанести по
         return Register();
  
     DefaultSpell *mySpell = arg2spell(spell);
-    bitnumber_t damtype = args.empty() ? mySpell->damtype.getValue() : argnum2flag(args, 1, damage_table);
-    bitstring_t damflags = args.size() <= 1 ? mySpell->damflags : argnum2flag(args, 2, damage_flags);
-   
     Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
     int sn = mySpell->getSkill()->getIndex();
 
+    bitnumber_t damtype = args.empty() ? mySpell->damtype.getValue() : argnum2flag(args, 1, damage_table);
+    bitstring_t damflags = args.size() <= 1 ? mySpell->damflags : argnum2flag(args, 2, damage_flags);
+    if (mySpell->isPrayer(myCh))
+        damflags |= DAMF_PRAYER;
+    else
+        damflags |= DAMF_MAGIC;
+
     try {
-        damage_nocatch(myCh, myVict, dam, sn, damtype, true, damflags | DAMF_SPELL);    
+        damage_nocatch(myCh, myVict, dam, sn, damtype, true, damflags);    
 
     } catch (const VictimDeathException &e) {
         throw Scripting::CustomException("victim is dead");
@@ -231,8 +235,11 @@ NMI_INVOKE(FeniaSpellContext, effectCold, "(): применить холодны
     if (vict.type == Register::NONE)
         return Register();
 
+    Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
-    cold_effect(myVict, level, dam, TARGET_CHAR, DAMF_SPELL);
+    DefaultSpell *mySpell = arg2spell(spell);
+    bitstring_t damflags = mySpell->damflags | (mySpell->isPrayer(myCh) ? DAMF_PRAYER : DAMF_MAGIC);
+    cold_effect(myVict, level, dam, TARGET_CHAR, damflags);
     return Register();    
 }
 
@@ -241,8 +248,11 @@ NMI_INVOKE(FeniaSpellContext, effectFire, "(): применить огненны
     if (vict.type == Register::NONE)
         return Register();
 
+    Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
-    fire_effect(myVict, level, dam, TARGET_CHAR, DAMF_SPELL);
+    DefaultSpell *mySpell = arg2spell(spell);
+    bitstring_t damflags = mySpell->damflags | (mySpell->isPrayer(myCh) ? DAMF_PRAYER : DAMF_MAGIC);
+    fire_effect(myVict, level, dam, TARGET_CHAR, damflags);
     return Register();
 }
 

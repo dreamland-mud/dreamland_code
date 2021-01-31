@@ -640,7 +640,7 @@ void DefaultSpell::baneDamage( Character *ch, Character *vch, int dam ) const
         return;
     
     gsn_spellbane->improve( vch, true, ch );
-    damage_nocatch( vch, ch, ( dam ), gsn_spellbane, DAM_NEGATIVE, true, DAMF_SPELL );
+    damage_nocatch( vch, ch, ( dam ), gsn_spellbane, DAM_NEGATIVE, true, DAMF_MAGIC );
 }
 
 void DefaultSpell::baneAround( Character *ch, int failChance, int dam ) const
@@ -787,7 +787,7 @@ AnatoliaCombatSpell::AnatoliaCombatSpell()
 void AnatoliaCombatSpell::run( Character *ch, Character *victim, int sn, int level )
 {
     // Calculate spell flags.
-    bitstring_t flags = DAMF_SPELL | damflags;
+    bitstring_t flags = damflags | (isPrayer(ch) ? DAMF_PRAYER : DAMF_MAGIC);
 
     // Calculate damage.
     int dam = ::dice(level, dice) + diceBonus;

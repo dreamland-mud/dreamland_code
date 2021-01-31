@@ -69,7 +69,7 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
     
     level += (strength - 1) * 3;
 
-    if (saves_spell( level, victim , DAM_HOLY, ch, DAMF_SPELL )) {
+    if (saves_spell( level, victim , DAM_HOLY, ch, DAMF_PRAYER )) {
         ch->send_to("Твоя попытка закончилась неудачей.\n\r");
         return;
     }
@@ -162,7 +162,7 @@ VOID_AFFECT(BlackDeath)::update( Room *room, Affect *paf )
     plague.bitvector.setValue(AFF_PLAGUE);
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
-        if ( !saves_spell(plague.level, vch, DAM_DISEASE, 0, DAMF_SPELL)
+        if ( !saves_spell(plague.level, vch, DAM_DISEASE, 0, DAMF_MAGIC)
                 && !is_safe_rspell(paf->level,vch)
                 && !IS_AFFECTED(vch,AFF_PLAGUE)
                 && number_bits(3) == 0)
@@ -399,7 +399,7 @@ VOID_AFFECT(DeadlyVenom)::update( Room *room, Affect *paf )
 
     for ( vch = room->people; vch != 0; vch = vch->next_in_room )
     {
-        if ( !saves_spell(af.level ,vch,DAM_POISON, 0, DAMF_SPELL)
+        if ( !saves_spell(af.level ,vch,DAM_POISON, 0, DAMF_MAGIC)
                 && !is_safe_rspell(paf->level,vch)
                 && !IS_AFFECTED(vch,AFF_POISON) && number_bits(3) == 0)
         {
@@ -502,7 +502,7 @@ VOID_AFFECT(LethargicMist)::update( Room *room, Affect *paf )
     af.bitvector.setValue(AFF_SLOW);
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
-        if ( !saves_spell(af.level ,vch,DAM_OTHER, 0, DAMF_SPELL|DAMF_WATER)
+        if ( !saves_spell(af.level ,vch,DAM_OTHER, 0, DAMF_MAGIC|DAMF_WATER)
                 && !is_safe_rspell(paf->level,vch)
                 && !IS_AFFECTED(vch,AFF_SLOW) && number_bits(3) == 0 )
         {
@@ -520,7 +520,7 @@ VOID_SPELL(Plague)::run( Character *ch, Character *victim, int sn, int level )
     
     Affect af;
 
-    if (saves_spell(level,victim,DAM_DISEASE,ch, DAMF_SPELL) ||
+    if (saves_spell(level,victim,DAM_DISEASE,ch, DAMF_MAGIC) ||
         (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD)))
     {
         if (ch == victim)
@@ -572,7 +572,7 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     plague.bitvector.setValue(AFF_PLAGUE);
 
     for ( vch = ch->in_room->people; vch != 0; vch = vch->next_in_room) {
-        if (!saves_spell(plague.level + 2,vch,DAM_DISEASE, 0, DAMF_SPELL)
+        if (!saves_spell(plague.level + 2,vch,DAM_DISEASE, 0, DAMF_MAGIC)
                 && !is_safe_rspell( vch )
                 && !IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(2) == 0)
         {
@@ -591,12 +591,12 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     
     int plague_damage = max(3,(int) (dam * modifier));
 
-    damage_nocatch( ch, ch, plague_damage, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
+    damage_nocatch( ch, ch, plague_damage, gsn_plague,DAM_DISEASE,false, DAMF_MAGIC);
     
     int plague_hp_damage = (max(ch->max_hit/20, 50) * modifier);
 
     if (number_range(1, 100) < 70 )
-        damage_nocatch( ch, ch, plague_hp_damage, gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
+        damage_nocatch( ch, ch, plague_hp_damage, gsn_plague,DAM_DISEASE,true, DAMF_MAGIC);
 }
     
 VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf ) 
@@ -618,7 +618,7 @@ VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf )
     plague.bitvector.setValue(AFF_PLAGUE);
 
     for (vch = ch->in_room->people; vch != 0; vch = vch->next_in_room)
-        if ( !saves_spell(plague.level - 2,vch,DAM_DISEASE, 0, DAMF_SPELL)
+        if ( !saves_spell(plague.level - 2,vch,DAM_DISEASE, 0, DAMF_MAGIC)
                 && !vch->is_immortal()
                 && !IS_AFFECTED(vch,AFF_PLAGUE) 
                 && number_bits(6) == 0)
@@ -866,7 +866,7 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
         else 
             dam = dice( level, 15 );
     
-        if (saves_spell( level, it, DAM_NEGATIVE,ch, DAMF_SPELL )) {
+        if (saves_spell( level, it, DAM_NEGATIVE,ch, DAMF_MAGIC )) {
             dam /= 2;
         }
         else if (!IS_AFFECTED( it, AFF_CURSE )) {
@@ -896,7 +896,7 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
             if (ch->fighting != it && it->fighting != ch)
             yell_panic( ch, it );
 
-        damage_nocatch( ch, it, dam, sn, DAM_NEGATIVE, true, DAMF_SPELL );
+        damage_nocatch( ch, it, dam, sn, DAM_NEGATIVE, true, DAMF_MAGIC );
             }
                          catch (const VictimDeathException &) {
                              continue;
@@ -936,7 +936,7 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
          return;
         }
 
-    if (saves_spell(level, victim, DAM_NEGATIVE, ch, DAMF_SPELL) ||
+    if (saves_spell(level, victim, DAM_NEGATIVE, ch, DAMF_MAGIC) ||
         (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD)))
     {
         if (ch == victim)

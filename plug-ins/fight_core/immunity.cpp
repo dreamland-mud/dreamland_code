@@ -45,13 +45,13 @@ int immune_check(Character *ch, int dam_type, bitstring_t dam_flag)
         immune_from_flags( ch, IMM_WEAPON, res );
     
     if (IS_SET(dam_flag, DAMF_SPELL)) 
-        immune_from_flags( ch, IMM_SPELL, res );
+        immune_from_flags( ch, IMM_SPELL|IMM_PRAYER|IMM_MAGIC, res );
     
     if (IS_SET(dam_flag, DAMF_PRAYER))
-        immune_from_flags( ch, IMM_PRAYER, res );
+        immune_from_flags( ch, IMM_PRAYER|IMM_SPELL, res );
 
     if (IS_SET(dam_flag, DAMF_MAGIC))
-        immune_from_flags( ch, IMM_MAGIC, res );
+        immune_from_flags( ch, IMM_MAGIC|IMM_SPELL, res );
 
     if (IS_SET(dam_flag, DAMF_WATER))
         immune_from_flags( ch, IMM_DROWNING, res );
@@ -81,6 +81,14 @@ int immune_check(Character *ch, int dam_type, bitstring_t dam_flag)
     
     immune_from_flags( ch, bit, res );
     
-    return immune_resolve( res );
+    int result =  immune_resolve( res );
+#ifdef DEBUG    
+    if (ch->isCoder())
+        ch->printf("damage %s, flags %s, result %s\r\n",
+                damage_table.name(dam_type).c_str(),
+                damage_flags.names(dam_flag).c_str(),
+                (res == RESIST_IMMUNE ? "immune" : res == RESIST_RESISTANT ? "resist" : res == RESIST_VULNERABLE ? "vuln" : "normal"));
+#endif                
+    return result;
 }
 

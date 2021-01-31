@@ -88,7 +88,7 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
                 || ( ch->getSex( ) == SEX_MALE &&  level < victim->getModifyLevel() )
                 || ( ch->getSex( ) == SEX_FEMALE &&  level < ( victim->getModifyLevel()  ) )
                 || IS_SET(victim->imm_flags,IMM_CHARM)
-                || saves_spell( level, victim,DAM_CHARM, ch, DAMF_SPELL )
+                || saves_spell( level, victim,DAM_CHARM, ch, DAMF_MAGIC )
                 || (victim->is_npc( ) 
                      && victim->getNPC( )->behavior 
                      && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
@@ -184,7 +184,7 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
     if (is_safe(witch, ch) || overcharmed(witch))
         return;
 
-    if (saves_spell( paf->level, ch, DAM_CHARM, witch, DAMF_SPELL )) {
+    if (saves_spell( paf->level, ch, DAM_CHARM, witch, DAMF_MAGIC )) {
         act("При взгляде на $c4 твое сердце на мгновение замирает.", witch, 0, ch, TO_VICT);
         act("Во взгляде $C2 на мгновение мелькает полный восторг.", witch, 0, ch, TO_CHAR);
         return;
@@ -293,7 +293,7 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     }
 
 
-    if (saves_spell(level ,victim,DAM_MENTAL, ch, DAMF_SPELL))
+    if (saves_spell(level ,victim,DAM_MENTAL, ch, DAMF_MAGIC))
        {
         ch->send_to("Твоя попытка закончилась неудачей.\n\r");
         return;
@@ -393,7 +393,7 @@ VOID_AFFECT(MysteriousDream)::update( Room *room, Affect *paf )
     af.bitvector.setValue(AFF_SLEEP);
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
-        if ( !saves_spell(af.level - 4,vch,DAM_CHARM, 0, DAMF_SPELL)
+        if ( !saves_spell(af.level - 4,vch,DAM_CHARM, 0, DAMF_MAGIC)
                 && !is_safe_rspell(paf->level,vch)
                 && !(vch->is_npc() && IS_SET(vch->act,ACT_UNDEAD) )
                 && !IS_AFFECTED(vch,AFF_SLEEP) && number_bits(3) == 0 )
@@ -419,7 +419,7 @@ VOID_SPELL(Sleep)::run( Character *ch, Character *victim, int sn, int level )
     if ( IS_AFFECTED(victim, AFF_SLEEP)
     ||   (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD))
     ||   level < victim->getModifyLevel()
-    ||   saves_spell( level-4, victim,DAM_CHARM, ch, DAMF_SPELL ) )
+    ||   saves_spell( level-4, victim,DAM_CHARM, ch, DAMF_MAGIC ) )
     {
         ch->println("Не получилось...");
             return;

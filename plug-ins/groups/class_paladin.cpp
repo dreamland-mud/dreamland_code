@@ -132,7 +132,7 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
         return;
     }
     
-    if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_SPELL)) {
+    if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_PRAYER)) {
         act_p("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR, POS_RESTING);
         return;
     }
@@ -309,17 +309,17 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
         if (!IS_SET( vch->act, ACT_UNDEAD ))
             continue;
         
-        if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_SPELL )) {
+        if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_PRAYER )) {
             act("$C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
             act_p("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT, POS_RESTING);
-            damage_nocatch( ch, vch, 0, sn, DAM_HOLY, true, DAMF_SPELL );
+            damage_nocatch( ch, vch, 0, sn, DAM_HOLY, true, DAMF_PRAYER );
         }
         else {
             act_p( "$c5 овладевают священные силы, заставляя в ужасе обратиться в бегство.", vch, 0, ch, TO_ROOM, POS_RESTING);
             act_p( "Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT, POS_RESTING);
 
             dam = dice( level, 12 ); 
-            damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_SPELL );
+            damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_PRAYER );
             FleeMovement( vch ).move( );
         }
     }
@@ -378,7 +378,7 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
         }
                              
         dam = dice( level, 10 );
-        if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL ) )
+        if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_PRAYER ) )
             dam /= 2;
 
         align = victim->alignment;
@@ -389,7 +389,7 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 
         dam = (dam * align * align) / 1000000;
 
-        damage_nocatch( ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL);
+        damage_nocatch( ch, victim, dam, sn, DAM_HOLY, true, DAMF_PRAYER);
 
         if (victim->in_room == 0)
             continue;

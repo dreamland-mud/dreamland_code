@@ -56,7 +56,7 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    if (saves_spell( level, victim,DAM_OTHER, ch, DAMF_SPELL)) {
+    if (saves_spell( level, victim,DAM_OTHER, ch, DAMF_MAGIC)) {
         act("Тебе не удалось запугать $C4...", ch, 0, victim, TO_CHAR); 
         return;
     }

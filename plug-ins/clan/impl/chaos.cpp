@@ -174,7 +174,7 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
                 return;
         }
 
-        if ( saves_spell(level,victim, DAM_MENTAL, ch, DAMF_SPELL) )
+        if ( saves_spell(level,victim, DAM_MENTAL, ch, DAMF_MAGIC) )
         {
                 ch->send_to("Не получилось.\n\r");
                 return;
@@ -224,7 +224,7 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
 { 
   Affect af;
 
-  if (!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_SPELL))
+  if (!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_MAGIC))
     {
       af.type               = sn;
       af.level              = level;
@@ -338,7 +338,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
       return;
     }
 
-  if (saves_spell(level,victim, DAM_CHARM, ch, DAMF_SPELL))
+  if (saves_spell(level,victim, DAM_CHARM, ch, DAMF_MAGIC))
    {
     ch->send_to("Твоя попытка закончилась неудачей.\n\r");
     return;
@@ -379,7 +379,7 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
     return;
   }
 
-  if( saves_spell( level, victim, DAM_MENTAL, ch, DAMF_SPELL ) ) {
+  if( saves_spell( level, victim, DAM_MENTAL, ch, DAMF_MAGIC ) ) {
     ch->send_to("Хаос остался в тебе.\n\r");
     return;
   }

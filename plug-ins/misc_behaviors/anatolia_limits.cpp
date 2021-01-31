@@ -249,9 +249,9 @@ void Thunderbolt::fight( Character *ch )
             act("Разряд молнии конденсируется на оружии $c2, и выстреливает в сторону $C2!", ch, 0, victim, TO_NOTVICT);
 
             dam = dice(level,4) + 12;
-            if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
+            if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_PRAYER) )
                 dam /= 2;
-            damage_nocatch( ch, victim, dam, gsn_lightning_bolt, DAM_LIGHTNING , false, DAMF_SPELL);
+            damage_nocatch( ch, victim, dam, gsn_lightning_bolt, DAM_LIGHTNING , false, DAMF_PRAYER);
             break;
         }
     }

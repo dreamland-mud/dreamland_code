@@ -56,12 +56,12 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
            ch,0,victim,TO_VICT,POS_RESTING);
 
     dam = dice(level,6);
-    if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL)){
+    if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_MAGIC)){
         dam /= 3;
     }
 
         try{
-        damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+        damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_MAGIC);
         }
         catch (const VictimDeathException &){
             people.remove(victim);
@@ -102,12 +102,12 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
                 if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
                     yell_panic( ch, tmp_vict );
 
-              if (saves_spell(level,tmp_vict,DAM_LIGHTNING,ch, DAMF_SPELL)){
+              if (saves_spell(level,tmp_vict,DAM_LIGHTNING,ch, DAMF_MAGIC)){
                 dam /= 3;
               }
 
                 try{
-              damage_nocatch(ch,tmp_vict,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+              damage_nocatch(ch,tmp_vict,dam,sn,DAM_LIGHTNING,true, DAMF_MAGIC);
                 }
                 catch (const VictimDeathException &){
                     level -= 4;
@@ -136,9 +136,9 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
           act_p("Разряд молнии поражает $c4..!",ch,0,0,TO_ROOM,POS_RESTING);
           ch->send_to("Созданная тобой молния поражает тебя же!\n\r");
           dam = dice(level,6);
-          if (saves_spell(level,ch,DAM_LIGHTNING,ch, DAMF_SPELL))
+          if (saves_spell(level,ch,DAM_LIGHTNING,ch, DAMF_MAGIC))
            dam /= 3;
-          damage(ch,ch,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+          damage(ch,ch,dam,sn,DAM_LIGHTNING,true, DAMF_MAGIC);
           level -= 4;  /* decrement damage */
           if (ch == 0)
             return;
@@ -156,7 +156,7 @@ VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level
     int dam;
 
     dam = number_range(1,level);
-    if ( !saves_spell( level, victim,DAM_COLD,ch, DAMF_SPELL ) )
+    if ( !saves_spell( level, victim,DAM_COLD,ch, DAMF_MAGIC ) )
     {
         act_p("$c1 замерзает от ледяного прикосновения.",
                victim,0,0,TO_ROOM,POS_RESTING);
@@ -172,7 +172,7 @@ VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level
         dam /= 2;
     }
 
-    damage_nocatch( ch, victim, dam, sn, DAM_COLD,true, DAMF_SPELL );
+    damage_nocatch( ch, victim, dam, sn, DAM_COLD,true, DAMF_MAGIC );
 }
 
 
@@ -183,12 +183,12 @@ VOID_SPELL(ColourSpray)::run( Character *ch, Character *victim, int sn, int leve
     int dam;
 
     dam = dice(level,5) + 13;
-    if ( saves_spell( level, victim,DAM_LIGHT,ch, DAMF_SPELL) )
+    if ( saves_spell( level, victim,DAM_LIGHT,ch, DAMF_MAGIC) )
         dam /= 2;
     else
         spell(gsn_blindness, level / 3 * 2, ch,  victim );
 
-    damage_nocatch( ch, victim, dam, sn, DAM_LIGHT,true, DAMF_SPELL );
+    damage_nocatch( ch, victim, dam, sn, DAM_LIGHT,true, DAMF_MAGIC );
 }
 
 
@@ -211,8 +211,8 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
         act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет тебя.", victim, 0, 0, TO_CHAR);
         dam = dice( level , 14 );
 
-        damage_nocatch(ch,victim,dam,sn,DAM_OTHER,true, DAMF_SPELL);
-        sand_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
+        damage_nocatch(ch,victim,dam,sn,DAM_OTHER,true, DAMF_PRAYER);
+        sand_effect(victim,level,dam,TARGET_CHAR, DAMF_PRAYER);
 }
 
 SPELL_DECL(EtheralFist);
@@ -225,11 +225,11 @@ VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int leve
     else if (level <= 75)   dam = dice( level, 15 );
     else                    dam = dice( level, 18 );
         
-    if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
+    if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_MAGIC ) )
         dam /= 2;
     act("Кулак из темного эфира иных миров сокрушает $C4, повергая $S в ошеломление!",
            ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_MAGIC);
 }
 
 SPELL_DECL(HandOfUndead);
@@ -238,7 +238,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     
     int dam;
 
-    if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
+    if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_MAGIC) )
     {
         if (ch != victim)
             act("Рука умертвия пытается схватить $C4, но безуспешно.", ch, 0, victim, TO_CHAR);
@@ -266,7 +266,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     
     victim->println("Ты чувствуешь, как жизнь ускользает от тебя!");
     act("Непостижимая Рука Умертвия хватает $C4!", ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_MAGIC);
 }
 
 
@@ -295,10 +295,10 @@ VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level )
                         if (ch->fighting != it && it->fighting != ch)
                             yell_panic( ch, it );
 
-                        if (saves_spell(level,it, DAM_COLD,ch, DAMF_SPELL))
+                        if (saves_spell(level,it, DAM_COLD,ch, DAMF_MAGIC))
                                 dam /= 2;
                     try{
-                        damage_nocatch( ch, it, dam, sn, DAM_COLD, true, DAMF_SPELL );
+                        damage_nocatch( ch, it, dam, sn, DAM_COLD, true, DAMF_MAGIC );
                         it->move -= min((int)it->move,movedam);
                      }
                          catch (const VictimDeathException &) {
@@ -345,33 +345,33 @@ VOID_SPELL(MagicMissile)::run( Character *ch, Character *victim, int sn, int lev
     else
         dam = number_range( dam_each[level] / 2, dam_each[level] * 2 );
     
-    if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_SPELL) )
+    if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_MAGIC) )
         dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_MAGIC);
 
     if ( mlevel > 4 )  {
       dam = number_range( dam_each[level] / 2, dam_each[level] * 2 );
-      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_SPELL) )
+      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_MAGIC) )
           dam /= 2;
-      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_SPELL);
+      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_MAGIC);
     }
     if ( mlevel > 8 )  {
       dam = number_range( dam_each[level] / 2, dam_each[level] * 2 );
-      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_SPELL) )
+      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_MAGIC) )
           dam /= 2;
-      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_SPELL);
+      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_MAGIC);
     }
     if( mlevel > 12 )  {
       dam = number_range( dam_each[level] / 2, dam_each[level] * 2 );
-      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_SPELL) )
+      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_MAGIC) )
           dam /= 2;
-      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_SPELL);
+      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_MAGIC);
     }
     if( mlevel > 16 )  {
       dam = number_range( dam_each[level] / 2, dam_each[level] * 2 );
-      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_SPELL) )
+      if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_MAGIC) )
           dam /= 2;
-      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_SPELL);
+      damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_MAGIC);
     }
 }
 
@@ -402,7 +402,7 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
         dice_dam = dice(level,18);
 
         dam = max(hp_dam + dice_dam /10, dice_dam + hp_dam / 10);
-        sand_effect(room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
+        sand_effect(room,level,dam/2,TARGET_ROOM, DAMF_MAGIC);
 
         for ( auto &vch : room->getPeople() )
         {
@@ -423,15 +423,15 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
                 yell_panic( ch, vch );
 
             try{
-                if ( saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL) )
+                if ( saves_spell(level,vch,DAM_COLD,ch, DAMF_MAGIC) )
                 {
-                        sand_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                        sand_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_MAGIC);
                 }
                 else
                 {
-                        sand_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
+                        sand_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                        damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_MAGIC);
                 }
             }
             catch (const VictimDeathException &){
@@ -464,9 +464,9 @@ VOID_SPELL(ShockingGrasp)::run( Character *ch, Character *victim, int sn, int le
     dam         = level / 2 ;
         else
     dam                = number_range( dam_each[level] / 2, dam_each[level] * 2 );
-    if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
+    if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_MAGIC) )
         dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_LIGHTNING ,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn, DAM_LIGHTNING ,true, DAMF_MAGIC);
 }
 
 SPELL_DECL(VampiricBlast);
@@ -478,7 +478,7 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
     chance = 50 + ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT);
  
     dam = dice( level, 12);
-    if ( saves_spell( level, victim, DAM_NEGATIVE,ch, DAMF_SPELL ) ) {
+    if ( saves_spell( level, victim, DAM_NEGATIVE,ch, DAMF_MAGIC ) ) {
         dam /= 2;
     }
     else {
@@ -495,7 +495,7 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
             act_p("$c1 слабеет на глазах.",victim,0,0,TO_ROOM,POS_RESTING);            
         } 
     }    
-    damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_MAGIC);
 }
 
 SPELL_DECL(Hurricane);
@@ -545,10 +545,10 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
         else if (vch->size == SIZE_HUGE)  dam = ( int )( dam * 0.7 );
         else dam = ( int )( dam * 0.5 );
     try{
-        if (saves_spell(level,vch,DAM_OTHER, ch, DAMF_SPELL))
-            damage_nocatch(ch,vch,dam/2,sn,DAM_OTHER,true, DAMF_SPELL);
+        if (saves_spell(level,vch,DAM_OTHER, ch, DAMF_MAGIC))
+            damage_nocatch(ch,vch,dam/2,sn,DAM_OTHER,true, DAMF_MAGIC);
         else
-            damage_nocatch(ch,vch,dam,sn,DAM_OTHER,true, DAMF_SPELL);
+            damage_nocatch(ch,vch,dam,sn,DAM_OTHER,true, DAMF_MAGIC);
         }
     catch (const VictimDeathException &){
         continue;

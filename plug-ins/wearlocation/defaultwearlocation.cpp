@@ -214,7 +214,7 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
         int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
         act("Магия $o2 аннигилирует с твоим spellbane!", ch, obj, 0, TO_CHAR);
         act("Магия $o2 аннигилирует со spellbane $c2!", ch, obj, 0, TO_ROOM);
-        SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_SPELL ).hit( false );
+        SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_MAGIC ).hit( false );
         interpret_raw( ch, "cb", "Меня ударило магической вещью!" );
         return false;
     }

@@ -132,7 +132,7 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
     return;
   }
 
-  if (saves_spell(level,victim, DAM_SOUND,ch, DAMF_SPELL)) {
+  if (saves_spell(level,victim, DAM_SOUND,ch, DAMF_MAGIC)) {
         act("Тебе не удалось оглушить $C4.", ch, 0, victim, TO_CHAR);
         return;
   }
@@ -580,7 +580,7 @@ VOID_SPELL(PowerWordStun)::run( Character *ch, Character *victim, int sn, int le
         
         Affect af;
 
-        if ( saves_spell( level, victim, DAM_OTHER, ch, DAMF_SPELL) )
+        if ( saves_spell( level, victim, DAM_OTHER, ch, DAMF_MAGIC) )
         {
                 ch->send_to("Оглушить противника не удается!\n\r");
                 return;

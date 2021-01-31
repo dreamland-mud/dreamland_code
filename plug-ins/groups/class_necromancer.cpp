@@ -64,11 +64,11 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
                 victim, 0, ch, TO_CHAR, POS_RESTING);
 
         if ( victim->is_immortal()
-                || saves_spell(level,victim,DAM_MENTAL, ch, DAMF_SPELL)
+                || saves_spell(level,victim,DAM_MENTAL, ch, DAMF_MAGIC)
                 || number_percent () > 50 )
         {
                 dam = dice( level , 24 ) ;
-                damage_nocatch(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_SPELL);
+                damage_nocatch(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_MAGIC);
                 return;
         }
 
@@ -93,7 +93,7 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
                 return;
         }
 
-        if ( saves_spell( level, victim,DAM_OTHER, ch, DAMF_SPELL) )
+        if ( saves_spell( level, victim,DAM_OTHER, ch, DAMF_MAGIC) )
         {
                 ch->send_to("Не получилось...\n\r");        
                 return;

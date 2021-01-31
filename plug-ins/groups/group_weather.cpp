@@ -73,9 +73,9 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
         if (is_safe_spell(ch, vch, true))
             continue;
         
-        vdam = saves_spell( level, vch, DAM_LIGHTNING, ch, DAMF_SPELL ) ? dam / 2 : dam;
+        vdam = saves_spell( level, vch, DAM_LIGHTNING, ch, DAMF_PRAYER ) ? dam / 2 : dam;
 
-        damage( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
+        damage( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_PRAYER );
 
         }
     }

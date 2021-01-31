@@ -62,7 +62,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
         switch( dice(1,5) )
         {
         case 1:
-                fire_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
+                fire_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_MAGIC);
 
                 for ( auto &vch : victim->in_room->getPeople())
                 {
@@ -83,15 +83,15 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         if (vch == victim) /* full damage */
                         {
                                 try{
-                                if (saves_spell(level,vch,DAM_FIRE,ch, DAMF_SPELL))
+                                if (saves_spell(level,vch,DAM_FIRE,ch, DAMF_MAGIC))
                                 {
-                                        fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_MAGIC);
                                 }
                                 else
                                 {
-                                        fire_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        fire_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam,sn,DAM_FIRE,true, DAMF_MAGIC);
                                 }
                                 }
                                 catch (const VictimDeathException &){
@@ -101,15 +101,15 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         else /* partial damage */
                         {
                                 try{
-                                if (saves_spell(level - 2,vch,DAM_FIRE,ch, DAMF_SPELL))
+                                if (saves_spell(level - 2,vch,DAM_FIRE,ch, DAMF_MAGIC))
                                 {
-                                        fire_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam/4,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        fire_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam/4,sn,DAM_FIRE,true, DAMF_MAGIC);
                                 }
                                 else
                                 {
-                                        fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_MAGIC);
                                 }
                                 }
                                 catch (const VictimDeathException &){
@@ -121,20 +121,20 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
     break;
 
         case 2:
-                if (saves_spell(level,victim,DAM_ACID,ch, DAMF_SPELL))
+                if (saves_spell(level,victim,DAM_ACID,ch, DAMF_MAGIC))
                 {
-                        acid_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,victim,dam/2,sn,DAM_ACID,true, DAMF_SPELL);
+                        acid_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                        damage_nocatch(ch,victim,dam/2,sn,DAM_ACID,true, DAMF_MAGIC);
                 }
                 else
                 {
-                        acid_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,victim,dam,sn,DAM_ACID,true, DAMF_SPELL);
+                        acid_effect(victim,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                        damage_nocatch(ch,victim,dam,sn,DAM_ACID,true, DAMF_MAGIC);
                 }
                 break;
 
         case 3:
-                cold_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
+                cold_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_MAGIC);
 
                 for ( auto &vch : victim->in_room->getPeople())
                 {                        
@@ -154,15 +154,15 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         if (vch == victim) /* full damage */
                         {
                                 try{
-                                if (saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL))
+                                if (saves_spell(level,vch,DAM_COLD,ch, DAMF_MAGIC))
                                 {
-                                        cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                                        cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_MAGIC);
                                 }
                                 else
                                 {
-                                        cold_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
+                                        cold_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_MAGIC);
                                 }
                                 }
                                 catch (const VictimDeathException &){
@@ -172,15 +172,15 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         else
                         {
                                 try{
-                                if (saves_spell(level - 2,vch,DAM_COLD,ch, DAMF_SPELL))
+                                if (saves_spell(level - 2,vch,DAM_COLD,ch, DAMF_MAGIC))
                                 {
-                                        cold_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam/4,sn,DAM_COLD,true, DAMF_SPELL);
+                                        cold_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam/4,sn,DAM_COLD,true, DAMF_MAGIC);
                                 }
                                 else
                                 {
-                                        cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                                        cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_MAGIC);
                                 }
                                 }
                                 catch (const VictimDeathException &){
@@ -192,7 +192,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 break;
 
         case 4:
-                poison_effect(victim->in_room,level,dam,TARGET_ROOM, DAMF_SPELL);
+                poison_effect(victim->in_room,level,dam,TARGET_ROOM, DAMF_MAGIC);
 
                 for ( auto &vch : victim->in_room->getPeople())
                 {
@@ -215,15 +215,15 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 
                         try{
                                                     
-                        if (saves_spell(level,vch,DAM_POISON,ch, DAMF_SPELL))
+                        if (saves_spell(level,vch,DAM_POISON,ch, DAMF_MAGIC))
                         {
-                                poison_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                damage_nocatch(ch,vch,dam/2,sn,DAM_POISON,true, DAMF_SPELL);
+                                poison_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                                damage_nocatch(ch,vch,dam/2,sn,DAM_POISON,true, DAMF_MAGIC);
                         }
                         else
                         {
-                                poison_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                                damage_nocatch(ch,vch,dam,sn,DAM_POISON,true, DAMF_SPELL);
+                                poison_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                                damage_nocatch(ch,vch,dam,sn,DAM_POISON,true, DAMF_MAGIC);
                         }
                         }
                         catch (const VictimDeathException &){
@@ -234,15 +234,15 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 break;
 
         case 5:
-                if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL))
+                if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_MAGIC))
                 {
-                        shock_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,victim,dam/2,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+                        shock_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                        damage_nocatch(ch,victim,dam/2,sn,DAM_LIGHTNING,true, DAMF_MAGIC);
                 }
                 else
                 {
-                        shock_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+                        shock_effect(victim,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                        damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_MAGIC);
                 }
                 break;
         }

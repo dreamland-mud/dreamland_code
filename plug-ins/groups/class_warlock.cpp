@@ -103,7 +103,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
         if ( !victim->is_npc() )
                 chance /= 2;
 
-        if ( saves_spell(level,victim,DAM_MENTAL,ch, DAMF_SPELL) )
+        if ( saves_spell(level,victim,DAM_MENTAL,ch, DAMF_MAGIC) )
                 chance = 0;
 
         ch->setWait( skill->getBeats( ) );
@@ -113,7 +113,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
                         || number_percent() > chance ) )
         {
                 dam = dice( level , 24 ) ;
-                damage_nocatch(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_SPELL);
+                damage_nocatch(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_MAGIC);
                 return;
         }
 
@@ -165,7 +165,7 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
         dice_dam = dice(level,20);
         dam = max(hp_dam + dice_dam /10 , dice_dam + hp_dam /10);
 
-        scream_effect(room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
+        scream_effect(room,level,dam/2,TARGET_ROOM, DAMF_MAGIC);
 
         for ( auto &vch : room->getPeople())
         {
@@ -177,13 +177,13 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
                 if ( is_safe(ch, vch) )
                         continue;
 
-                if ( ch != vch && !saves_spell(level,vch,DAM_SOUND,ch, DAMF_SPELL))
+                if ( ch != vch && !saves_spell(level,vch,DAM_SOUND,ch, DAMF_MAGIC))
                         vch->setWaitViolence( 2 );
                         
-                if (saves_spell(level,vch,DAM_SOUND,ch, DAMF_SPELL))
-                        scream_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
+                if (saves_spell(level,vch,DAM_SOUND,ch, DAMF_MAGIC))
+                        scream_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
                 else
-                        scream_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
+                        scream_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
             }
        }
 
@@ -195,7 +195,7 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
 { 
     Affect af;
 
-    if (saves_spell( level, victim, DAM_OTHER,ch, DAMF_SPELL)) {
+    if (saves_spell( level, victim, DAM_OTHER,ch, DAMF_MAGIC)) {
         if (ch != victim)
             act_p("Легкая дрожь пронизывает $C4, но это быстро проходит.",
                ch, 0, victim, TO_CHAR,POS_RESTING );
@@ -406,7 +406,7 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
             room->owner = str_dup("");        
             room->affectRemove(paf);
 
-            damage_nocatch(vch, ch, dice(level, 4) + 12, sn, DAM_LIGHTNING, true, DAMF_SPELL);
+            damage_nocatch(vch, ch, dice(level, 4) + 12, sn, DAM_LIGHTNING, true, DAMF_MAGIC);
         }
     }
 }

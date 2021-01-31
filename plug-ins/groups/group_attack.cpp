@@ -50,16 +50,16 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
     act("Вокруг тебя возникает множество острых клинков, поражая $C4.", ch,0,victim,TO_CHAR);
     act("Множество острых клинков возникает вокруг $c2, поражая тебя!", ch,0,victim,TO_VICT);
     dam = dice(level,6);
-    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 2;
-    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_PRAYER);
     
     act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
     act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
     dam = dice(level,5);
-    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 2;
-    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_PRAYER);
 
     if (number_percent() <= 55)
         return;
@@ -67,9 +67,9 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
     act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
     act("Острые клинки со звоном ударяют в тебя!",victim,0,0,TO_CHAR);
     dam = dice(level,7);
-    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 2;
-    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_PRAYER);
 
     if (number_percent() <= 50)
         return;
@@ -77,9 +77,9 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
     act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
     act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
     dam = dice(level,6);
-    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 3;
-    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_PRAYER);
 
     if (victim->fighting != 0) {
         victim->setWaitViolence( number_bits(2) + 1 );
@@ -110,10 +110,10 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
 
         dam = dice( level, 14 );
 
-        if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_SPELL) )
+        if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_PRAYER) )
                 dam /= 2;
 
-        damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);
+        damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_PRAYER);
 
 }
 
@@ -141,10 +141,10 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
 
         dam = dice( level, 14 );
 
-        if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
+        if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_PRAYER) )
                 dam /= 2;
         
-        damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
+        damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_PRAYER);
     
         if (!IS_AFFECTED(victim, AFF_CURSE))
             spell(gsn_curse, 3 * level / 4, ch,  victim);
@@ -266,7 +266,7 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
         }
 
         try{
-        damage_nocatch( ch, vch, dam, sn, DAM_BASH, true, DAMF_SPELL );
+        damage_nocatch( ch, vch, dam, sn, DAM_BASH, true, DAMF_PRAYER );
         }
         catch (const VictimDeathException &){
             continue;
@@ -491,6 +491,6 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     
     undig( victim );
     dam = dice(level, 20);
-    damage_nocatch(ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL); 
+    damage_nocatch(ch, victim, dam, sn, DAM_HOLY, true, DAMF_PRAYER); 
 
 }

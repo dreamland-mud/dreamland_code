@@ -226,7 +226,7 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int le
    
     if (victim->isAffected(gsn_golden_aura))
     {
-        if (saves_spell(level, victim, DAM_OTHER, ch, DAMF_SPELL))
+        if (saves_spell(level, victim, DAM_OTHER, ch, DAMF_MAGIC))
         {
             ch->send_to("У тебя не хватает силы приказать темноте.\n\r");
             return;
@@ -374,7 +374,7 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
         return;
     }
 
-    if (victim->isAffected(gsn_golden_aura) && saves_spell(level, victim, DAM_OTHER, ch, DAMF_SPELL))
+    if (victim->isAffected(gsn_golden_aura) && saves_spell(level, victim, DAM_OTHER, ch, DAMF_MAGIC))
     {
         ch->send_to("Твое заклинание не может пробиться через защиту от заклинаний противника.\n\r");
         victim->send_to("Твоя золотая аура препятствует подлой попытке оживить твою тень!\n\r");
@@ -415,7 +415,7 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
 
     for (vch = room->people; vch; vch = vch->next_in_room)
     {
-        if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_SPELL) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
+        if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_MAGIC) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
         {
             vch->send_to("Злые духи овладевают тобой.\n\r");
             act_p("Злые духи овладевают $c1.", vch, 0, 0, TO_ROOM, POS_RESTING);

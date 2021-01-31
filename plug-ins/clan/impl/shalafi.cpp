@@ -289,16 +289,16 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
     dam = dice( level, 18 );
   else dam = dice( level, 20 );
 
-  if (saves_spell(level,victim, DAM_MENTAL, ch, DAMF_SPELL))
+  if (saves_spell(level,victim, DAM_MENTAL, ch, DAMF_MAGIC))
               dam /= 2;
   if( victim->is_npc() ) dam /= 4;
 
   ch->setWait(gsn_mental_attack->getBeats( ) );
 
   try {
-      damage_nocatch( ch, victim, ( dam ), sn, DAM_MENTAL, true, DAMF_SPELL );
+      damage_nocatch( ch, victim, ( dam ), sn, DAM_MENTAL, true, DAMF_MAGIC );
         
-      if(!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_SPELL))
+      if(!victim->isAffected(sn) && !saves_spell(level, victim, DAM_MENTAL, ch, DAMF_MAGIC))
         {
           af.type               = sn;
           af.level              = level;
@@ -371,9 +371,9 @@ VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level )
             if (number_percent() < level)
               spell(gsn_weaken, level, ch, tmp_vict);
 
-            if (saves_spell(level,tmp_vict, DAM_FIRE, ch, DAMF_SPELL))
+            if (saves_spell(level,tmp_vict, DAM_FIRE, ch, DAMF_MAGIC))
               dam /= 2;
-            damage_nocatch( ch, tmp_vict, ( dam ), sn, DAM_FIRE, true, DAMF_SPELL );
+            damage_nocatch( ch, tmp_vict, ( dam ), sn, DAM_FIRE, true, DAMF_MAGIC );
           }
             catch (const VictimDeathException &) {
                    continue;

@@ -198,7 +198,7 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
     act("Молекулы воды вокруг $c2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
     act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
     dam = dice( level , 14 );
-    damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_SPELL|DAMF_WATER);
+    damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_MAGIC|DAMF_WATER);
 }
 
 /*
@@ -244,10 +244,10 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     undig( victim );
 
     dam = number_range(level, 4 * level);
-    if ( saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL ) )
+    if ( saves_spell( level, victim, DAM_PIERCE, ch, DAMF_MAGIC ) )
         dam /= 2;
 
-    damage_nocatch(ch,victim, level,gsn_entangle,DAM_PIERCE, true, DAMF_SPELL);
+    damage_nocatch(ch,victim, level,gsn_entangle,DAM_PIERCE, true, DAMF_MAGIC);
 }
 
 VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -286,7 +286,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     
     if ( !victim->isAffected(gsn_entangle) )
     {
-        if ( !saves_spell(level, victim, DAM_PIERCE, ch, DAMF_SPELL) ){
+        if ( !saves_spell(level, victim, DAM_PIERCE, ch, DAMF_MAGIC) ){
             act("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
                 victim, 0, 0, TO_ROOM);
             act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
@@ -315,5 +315,5 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
                 victim, 0, 0, TO_CHAR);        
     }
    
-    damage_nocatch(ch, victim, level, gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);
+    damage_nocatch(ch, victim, level, gsn_entangle, DAM_PIERCE, true, DAMF_MAGIC);
 }
