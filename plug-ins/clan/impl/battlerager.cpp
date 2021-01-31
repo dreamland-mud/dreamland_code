@@ -708,8 +708,16 @@ static bool has_curse(Character *wch)
 
 void ClanHealerBattlerager::speech( Character *wch, const char *speech )
 {
-    if (!speech[0] || str_cmp( speech, "aid me wiseman" ) || str_cmp( speech, "помоги мне" )) {
-        do_say(ch, "Скажи {y{leaid me wiseman{lrпомоги мне{x, если тебе нужна помощь.");
+    if (!speech[0])
+        return;
+
+
+    if (str_cmp( speech, "aid me wiseman" ) && str_cmp( speech, "помоги мне" )) {
+        if (is_name("wiseman", speech) || is_name("aid", speech) || is_name("help", speech)
+		|| is_name("помоги", speech) || is_name("лекарь", speech))
+	{
+	    do_say(ch, "Скажи {1{y{leaid me wiseman{lrпомоги мне{2, если тебе нужна помощь.");
+	}
         return;
     }
     
