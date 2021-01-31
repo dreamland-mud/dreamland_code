@@ -190,6 +190,20 @@ DLString print_group_for(const Skill *skill, Character *ch)
     return buf.str();
 }
 
+DLString print_level_bonus(const Skill *skill, Character *ch)
+{
+    ostringstream buf;
+
+    int bonus = skill_level_bonus(const_cast<Skill &>(*skill), ch);
+
+    if (bonus > 0)
+        buf << SKILL_INFO_PAD << fmt(0, "У тебя бонус {C%1$d{x уров%1$Iень|ня|ней на это умение.", bonus) << endl;
+    else if (bonus < 0)
+        buf << SKILL_INFO_PAD << fmt(0, "У тебя штраф {r%1$d{x уров%1$Iень|ня|ней на это умение.", bonus) << endl;
+
+    return buf.str();
+}
+
 DLString print_wait_and_mana(const Skill *skill, Character *ch)
 {
     const char *pad = SKILL_INFO_PAD;

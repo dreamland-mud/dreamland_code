@@ -19,6 +19,7 @@
 #include "hometown.h"
 #include "profflags.h"
 #include "mercdb.h"
+#include "act.h"
 #include "clan.h"
 #include "merc.h"
 #include "def.h"
@@ -399,6 +400,8 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         buf << pad << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
     else if (ch->getModifyLevel() < 20)
         buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
+
+    buf << print_level_bonus(this, ch);
 }
 
 /*

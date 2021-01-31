@@ -15,6 +15,7 @@
 #include "race.h"
 #include "npcharacter.h"
 
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 
@@ -126,6 +127,8 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
     }
 
     buf << "." << endl;
+
+    buf << print_level_bonus(this, ch);
 }
 
 const SkillRaceInfo *

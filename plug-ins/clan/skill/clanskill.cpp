@@ -229,6 +229,8 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
     
     buf << "." << endl
         << pad << "Практикуется у {gкланового охранника{x." << endl;
+
+    buf << print_level_bonus(this, ch);
 }
 
 const SkillClanInfo * 
