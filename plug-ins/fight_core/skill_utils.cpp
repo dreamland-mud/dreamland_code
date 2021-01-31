@@ -238,6 +238,13 @@ DLString print_wait_and_mana(const Skill *skill, Character *ch)
         empty = false;
     }
 
+    if (skill->isPassive()) {
+        if (!empty)
+            buf << pad;
+        buf << "Это {Cпассивное умение{x, работает автоматически." << endl;
+        empty = false;
+    }
+
     // TODO: expose spell position and show it here.
     // TODO: show if it's ranged or not.
 

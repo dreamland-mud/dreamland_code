@@ -21,9 +21,11 @@
 #include "desire.h"
 #include "hometown.h"
 #include "feniaspellhelper.h"
+#include "command.h"
 
 #include "fight.h"
 #include "affectflags.h"
+#include "commandflags.h"
 #include "stats_apply.h"
 #include "act.h"
 #include "mercdb.h"
@@ -328,6 +330,19 @@ int BasicSkill::getRating( PCharacter * ) const
 {
     return 1;
 }
+
+bool BasicSkill::isPassive() const
+{
+    if (spell && spell->isCasted())
+        return false;
+
+    Command::Pointer cmd = command.getDynamicPointer<Command>();
+    if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET))
+        return false;
+
+    return true;
+}
+
 
 bool BasicSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
 {

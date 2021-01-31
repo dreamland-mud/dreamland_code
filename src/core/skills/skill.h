@@ -51,6 +51,7 @@ public:
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
     virtual const RussianString &getDammsg( ) const;
+    virtual bool isPassive() const;
 
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;

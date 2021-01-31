@@ -957,6 +957,7 @@ CMDRUNP(report)
         Skill::Pointer skill = SkillManager::getThis()->find(sn);
         Spell::Pointer spell = skill->getSpell();
         Command::Pointer cmd = skill->getCommand().getDynamicPointer<Command>();
+        bool passive = skill->isPassive();
 
         if (!skill->usable(pet, false))
             continue;
@@ -991,7 +992,7 @@ CMDRUNP(report)
             continue;
         }
 
-        if (showAll)
+        if (showAll && passive)
             passives.push_back(skill);
     }
 
