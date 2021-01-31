@@ -1,5 +1,7 @@
 
 #include "util/regexp.h"
+#include "wrapperbase.h"
+#include "stringset.h"
 #include "pcharacter.h"
 #include "skillhelp.h"
 #include "skillgroup.h"
@@ -22,6 +24,7 @@
 #include "damageflags.h"
 #include "commandflags.h"
 #include "act.h"
+#include "comm.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -395,6 +398,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
     if (cmd.empty()) {
         stc("Формат:  skedit умение\r\n", ch);
         stc("Формат:  skedit create class|clan|race|other <название по-английски>\r\n", ch);
+        stc("Формат:  skedit list [all|active|passive|magic|prayer|<group>]\r\n", ch);
         return;
     }
 
@@ -463,6 +467,88 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
         skedit->attach(ch);
         skedit->show(ch);
 
+        return;
+    }
+
+    // skedit list [all|active|passive|magic|prayer|<group>]
+    if (arg_is_list(cmd)) {
+        bool all = false, active = false, passive = false, magic = false, prayer = false;
+        SkillGroup *group = 0;
+
+        if (!args.empty()) {
+            if (arg_is_all(args))
+                all = true;
+            else if (arg_oneof(args, "active", "активные"))
+                active = true;
+            else if (arg_oneof(args, "passive", "пассивные"))
+                passive = true;
+            else if (arg_oneof(args, "magic", "магия"))
+                magic = true;
+            else if (arg_oneof(args, "prayer", "молитвы"))
+                prayer = true;
+            else {
+                group = skillGroupManager->findUnstrict(args);
+                if (!group) {
+                    stc("Неверный параметр или группа, используй {y{hcskedit list{x для справки.\r\n", ch);
+                    return;
+                }
+            }
+        } else {
+            stc("Использование: skedit list [all|active|passive|magic|prayer|<group>]\r\n", ch);
+            return;
+        }
+
+        list<BasicSkill *> skills;
+        for (int sn = 0; sn < skillManager->size(); sn++) {
+            Skill *skill = skillManager->find(sn);
+            BasicSkill *s = dynamic_cast<BasicSkill *>(skill);
+            if (!s)
+                continue;
+
+            DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
+
+            if (all
+                || (active && !s->isPassive())
+                || (passive && s->isPassive())
+                || (magic && spell && spell->flags.isSet(SPELL_MAGIC))
+                || (prayer && spell && spell->flags.isSet(SPELL_PRAYER))
+                || (group && skill->hasGroup(group->getIndex())))
+            {
+                skills.push_back(s);
+            }                
+        }
+
+        ostringstream buf;
+        buf << dlprintf("{C%-20s %-4s %4s %1s %1s{x\r\n", "Имя", "Тип", "Мана", "T", "F");
+        const DLString lineFormat = 
+            web_cmd(ch, "skedit $1", "%-20s") + " %-4s %4d %1s %1s{x\r\n";
+
+        for (auto &s: skills) {
+            DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
+            DLString type;
+            bool fenia = false;
+
+            if (spell && spell->isCasted()) {
+                type = spell->type == SPELL_OFFENSIVE ? "{ROFF{x" : spell->type == SPELL_DEFENSIVE ? "{GDEF{x" : "";
+                WrapperBase *wrapper = spell->getWrapper();
+                if (wrapper) {
+                    StringSet triggers, misc;
+                    wrapper->collectTriggers(triggers, misc);
+                    fenia = !triggers.empty() || !misc.empty();
+                }
+            }
+            
+            buf << dlprintf(
+                    lineFormat.c_str(),
+                    s->getName().c_str(),
+                    type.c_str(),
+                    s->getMana(),
+                    (spell && spell->isCasted() && spell->tier > 0 ? spell->tier.toString().c_str() :  ""),
+                    (fenia ? "{g*{x" : ""));
+        }
+
+        buf << "T - крутость (tier), F - перекрыто ли из фени." << endl;
+        page_to_char(buf.str().c_str(), ch);
         return;
     }
 
