@@ -46,9 +46,7 @@ GROUP(maladictions);
 GROUP(benedictions);
 GROUP(curative);
 GROUP(healing);
-GROUP(clan);
 GROUP(combat);
-GROUP(none);
 
 DefaultSpell::DefaultSpell( ) 
         : Spell(),
@@ -57,6 +55,7 @@ DefaultSpell::DefaultSpell( )
           type( SPELL_NONE, &spell_types ),
           casted( true ),
           ranged(true),
+          flags(0, &spell_flags),
           order(0, &order_flags),
           damtype(0, &damage_table),
           damflags(0, &damage_flags)
@@ -585,12 +584,14 @@ bool DefaultSpell::isPrayer( Character *caster ) const
     if (!isCasted( ))
         return false;
 
-    if (getSkill( )->hasGroup(group_clan))
+    // For spells that are exclusively marked as 'magic' or 'prayer', ignore caster's class flags.
+    if (flags.isSet(SPELL_MAGIC) && !flags.isSet(SPELL_PRAYER))
         return false;
 
-    if (getSkill( )->hasGroup(group_none))
-        return false;
-    
+    if (!flags.isSet(SPELL_MAGIC) && flags.isSet(SPELL_PRAYER))
+        return true;
+
+    // If marked as both or neither, let caster's class determine spell origin.
     return caster->getProfession( )->getFlags( caster ).isSet(PROF_DIVINE);
 }
 

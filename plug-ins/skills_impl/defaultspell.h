@@ -74,6 +74,7 @@ public:
     XML_VARIABLE XMLEnumeration   type; // offensive/defensive or neither, table spell_types
     XML_VARIABLE XMLBooleanNoTrue casted; // false if not a real spell
     XML_VARIABLE XMLBooleanNoTrue ranged; // false if can only be cast in the same room
+    XML_VARIABLE XMLFlagsNoEmpty flags; // additional flags (magic/prayer)
     XML_VARIABLE XMLFlagsNoEmpty order; // who can order, table order_flags
     XML_VARIABLE XMLIntegerNoEmpty tier; // damage tier, from 1 (best) to 5
     XML_VARIABLE XMLEnumerationNoEmpty damtype; // damage type from damage_table
