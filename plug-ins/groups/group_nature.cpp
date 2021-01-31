@@ -252,7 +252,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
 
 VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    int dam, chance;
+    int dam;
     Affect todex;
 
    if (victim == ch)

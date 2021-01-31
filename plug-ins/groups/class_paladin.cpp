@@ -72,14 +72,14 @@ SKILL_RUNP( layhands )
     if ( number_percent() < gsn_lay_hands->getEffective( ch ) + skill_level_bonus(*gsn_lay_hands, ch) ) {
         postaffect_to_char(ch, gsn_lay_hands, 2);
 
-        int slevel, chance;
+        int slevel, chance, sbonus;
         slevel = skill_level(*gsn_lay_hands, ch);
         sbonus = skill_level_bonus(*gsn_lay_hands, ch);
         chance = gsn_holy_remedy->getEffective( ch );
 
         if (number_percent( ) < chance) {
             if (sbonus >= 0)
-                sbnonus += chance / 20;
+                sbonus += chance / 20;
             else
                 sbonus = chance / 20;
             
@@ -165,7 +165,6 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     ch->move -= ch->max_move / 10;
     ch->hit  -= ch->max_hit / 10;
     update_pos(ch);
-    ch->setWait( skill->getBeats( ) );
 
     // 20% chance to fail with max skill
     if (ch->isAffected(sn) || roll > sk * 4 / 5 )
@@ -197,7 +196,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             act_p("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_RESTING);
         }
         else {
-            if (ch->position == POS_FIGHTING) {
+            if (ch->fighting) {
                 ch->send_to("Твои мускулы перестают тебе повиноваться...\n\r");
                 ch->setDazeViolence( 3 );
                 ch->setWaitViolence( 1 );
@@ -221,9 +220,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     }
 
     // 80% chance to not fail with max skill   
-    ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
-    
-    if (ch->position == POS_FIGHTING && ch->fighting != NULL) {
+    if (ch->fighting) {
         // 10% chance to fizzle with max skill
         if (roll < sk / 10 ) {
             ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
@@ -233,8 +230,12 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         postaffect_to_char(ch, sn, level/10 + 1);
         
         // 10% chance to just get the affect
-        if (roll < sk / 5 )
+        if (roll < sk / 5 ) {
+            ch->println("Твоя молитва не увенчалась успехом.");
             return;
+        }
+
+        ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
 
         switch (number_range(0, 3)) {
         case 0:
@@ -268,6 +269,8 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             return;
         }
         
+        ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
+
         af.bitvector.setTable(&affect_flags);
         af.type         = sn;
         af.level        = level;
