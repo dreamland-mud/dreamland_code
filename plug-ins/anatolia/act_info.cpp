@@ -53,6 +53,7 @@
 #include <map>
 #include <sstream>
 #include <cmath>
+#include <algorithm>
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -968,6 +969,11 @@ CMDRUNP(report)
             bool canOrderFight = cmd->properOrder(pet);
             pet->fighting = 0;
 
+            if(sn == gsn_second_weapon){
+                passives.push_back(skill);
+                continue;
+            }
+
             if (canOrder && showAll) {
                 skills.push_back(skill);
             }
@@ -1006,7 +1012,10 @@ CMDRUNP(report)
 
     if (!skills.empty()) {
         ostringstream buf;
-
+        sort( skills.begin( ), skills.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
+        {
+            return left->getCommand()->getNameFor(pet->master) < right->getCommand()->getNameFor(pet->master);
+        });
         for (auto it = skills.begin(); it != skills.end();) {
             buf << "{G"
                 << "{hh" << (*it)->getSkillHelp()->getID()
@@ -1024,6 +1033,10 @@ CMDRUNP(report)
 
     if (!skillsFight.empty()) {
         ostringstream buf;
+        sort( skillsFight.begin( ), skillsFight.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
+        {
+            return left->getCommand()->getNameFor(pet->master) < right->getCommand()->getNameFor(pet->master);
+        });
         for (auto it = skillsFight.begin(); it != skillsFight.end();) {
             buf << "{Y"
                 << "{hh" << (*it)->getSkillHelp()->getID()
@@ -1041,6 +1054,10 @@ CMDRUNP(report)
 
     if (!spells.empty()) {
         ostringstream buf;
+        sort( spells.begin( ), spells.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
+        {
+            return left->getNameFor(pet->master) < right->getNameFor(pet->master);
+        });
         for (auto it = spells.begin(); it != spells.end();) {
             buf << "{g"
                 << "{hh" << (*it)->getSkillHelp()->getID()
@@ -1062,6 +1079,10 @@ CMDRUNP(report)
 
     if (showAll && !passives.empty()) {
         ostringstream buf;
+        sort( passives.begin( ), passives.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
+        {
+            return left->getNameFor(pet->master) < right->getNameFor(pet->master);
+        });
         for (auto it = passives.begin(); it != passives.end();) {
             buf << "{W"
                 << "{hh" << (*it)->getSkillHelp()->getID()
