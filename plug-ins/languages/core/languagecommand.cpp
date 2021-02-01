@@ -184,7 +184,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     }
 
     if (effect->isObject( ) && !obj) {
-        ch->println("Выбери, на какую вещь в произнести слово.");
+        ch->println("Выбери, на какую вещь произнести слово.");
         fUsed = false;
     }
     else if (obj) {
