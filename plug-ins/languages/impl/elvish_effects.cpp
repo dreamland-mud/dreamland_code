@@ -51,10 +51,6 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
 
 bool BlessEquipWE::run( PCharacter *ch, Object *obj ) const
 {
-    if(!obj){
-        ch->println("Выбери вещь в инвентаре для её благословения.");
-        return false;
-    }
 
     if (IS_OBJ_STAT(obj, ITEM_BLESS)){
         ch->pecho("%1$^O1 уже благословле%1$Gно|н|на|ны.", obj);
@@ -74,8 +70,7 @@ bool BlessEquipWE::run( PCharacter *ch, Object *obj ) const
     affect_to_obj( obj, &af);
 
 
-    act( "{C$o1 в руках $c2 на мгновение загорается священным огнем.{x", ch, obj, 0, TO_ROOM );
-    act( "{C$o1 на мгновение загорается священным огнем.{x", ch, obj, 0, TO_CHAR );
+    act( "{C$o1 на мгновение загорается огнем нездешних звёзд.{x", ch, obj, 0, TO_ALL );
 
     return true;
 }
