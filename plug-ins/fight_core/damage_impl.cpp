@@ -53,12 +53,15 @@ void RawDamage::message( )
     } 
 
     if ( dam == 0 ) {
-       msgRoom( "%1$^C1\6%2$C2", ch, victim);
+       msgRoom( "%1$^C1\6%2$C2", ch, victim); 
        msgChar( "Ты\5%2$C2", ch, victim);
     }
     else {
        msgRoom( "%1$^C1\6%2$C4", ch, victim );
-       msgChar( "Ты\5%2$C4", ch, victim );
+       if (ch->isCoder( ))
+            msgChar( "Ты\5%2$C4 {D[{Y%3$d{D]{x", ch, victim, dam ); // show explicit damage numbers to coders
+       else 
+            msgChar( "Ты\5%2$C4", ch, victim );
     }
 
     msgVict( "%1$^C1\6тебя", ch );
@@ -112,7 +115,11 @@ void SkillDamage::message( )
             }
             else {
                 msgRoom( "%1$^O1 %2$C2\6%3$C4", &attack, ch, victim );
-                msgChar( "%1$^T1 %1$O1\6%2$C4", &attack, victim );
+                
+                if (ch->isCoder( ))
+                    msgChar( "%1$^T1 %1$O1\6%2$C4 {D[{Y%3$d{D]{x", &attack, victim, dam ); // show explicit damage numbers to coders
+                else 
+                    msgChar( "%1$^T1 %1$O1\6%2$C4", &attack, victim );
             }
             msgVict( "%1$^O1 %2$C2\6тебя", &attack, ch );
         }
