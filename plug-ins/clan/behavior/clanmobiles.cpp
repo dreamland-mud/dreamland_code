@@ -169,7 +169,7 @@ bool ClanGuard::death( Character *killer )
     if (!clanArea)
         return false;
 
-    DLString what = fmt(0, "{WКлан %s не смог удержать оборону.{x", clanArea->getClan()->getShortName().c_str());
+    DLString what = clanArea->getClan()->getRussianName( ).ruscase('3') + " {Wне удалось удержать оборону.{x";
     infonet(0, 0, "{CТихий голос из $o2: ", what.c_str());
     send_discord_clan(what);
     send_telegram(what);
@@ -247,7 +247,6 @@ void ClanGuard::greet( Character *wch )
     
     if (( obj = clanArea->findInvitation( pch ) )) {
         actInvited( pch, obj );
-//        extract_obj(obj);
         return;
     }
     
@@ -270,7 +269,7 @@ void ClanGuard::doNotify()
         return;
 
     ClanArea::Pointer clanArea = getClanArea();
-    DLString msg = "Клан " + clanArea->getClan()->getShortName() + " атакован!";
+    DLString msg = "Территория " + clanArea->getClan()->getRussianName( ).ruscase('2') + "{x атакована!";
     send_discord_clan(msg);
     send_telegram(msg);
     lastNotified = now;
@@ -302,9 +301,9 @@ bool ClanGuard::checkGhost( PCharacter *wch )
 {
     if (IS_SLAIN( wch ) || IS_DEATH_TIME( wch )) {
         actGhost( wch );
-        act( "You slay $C4 in cold blood!", ch, 0, wch, TO_CHAR );
-        act( "$c1 slays you in cold blood!", ch, 0, wch, TO_VICT );
-        act( "$c1 slays $C4 in cold blood!", ch, 0, wch, TO_NOTVICT );
+        act( "Ты хладнокровно убивает $C4!", ch, 0, wch, TO_CHAR );
+        act( "$c1 хладнокровно убивает тебя!", ch, 0, wch, TO_VICT );
+        act( "$c1 хладнокровно убивает $C4!", ch, 0, wch, TO_NOTVICT );
         raw_kill( wch, -1, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
         return true;
     }
@@ -319,7 +318,7 @@ void ClanGuard::actGhost( PCharacter *wch )
 
 void ClanGuard::actIntruder( PCharacter *wch )
 {
-    interpret_raw( ch, "cb", "Посторонние... Посторонним вход запрещен!" );
+    interpret_raw( ch, "cb", "Внимание, обнаружены лазутчики! Посторонним вход запрещен!" );
 }
 
 void ClanGuard::doPetitionOutsider( PCharacter *wch )
@@ -346,9 +345,7 @@ void ClanGuard::doAttack( PCharacter *wch )
 
 void ClanGuard::actInvited( PCharacter *wch, Object *obj )
 {
-    do_say( ch, "Тебя пригласили - только это оправдывает твое присутствие здесь!" );
-//    act( "$C1 забирает $o4 у $c2.", wch, obj, ch, TO_ROOM );
-//    act( "$C1 забирает у тебя $o4.", wch, obj, ch, TO_CHAR );
+    do_say( ch, "Тебя пригласили -- только это оправдывает твое присутствие здесь!" );
 }
 
 void ClanGuard::actPush( PCharacter *wch )
