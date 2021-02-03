@@ -567,7 +567,10 @@ bool DefaultSpell::properOrder(Character *ch) const
     if (!IS_CHARMED(ch))
         return true;
 
-    if (!ch->is_npc())
+    if (order.isSet(ORDER_NEVER))
+        return false;
+
+    if (!ch->is_npc() && !order.isSet(ORDER_EXCEPT_PK))
         return true;
 
     if (order.isSet(ORDER_PLAYER_ONLY))

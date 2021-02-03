@@ -83,9 +83,9 @@ COMMAND(CClan, "clan")
     
     if (IS_CHARMED(pc)) {
         if (pc->master)
-            pc->master->send_to( "Ничего не выйдет.\r\n" );
+            pc->master->send_to( "Нельзя проникнуть в тайны чужого клана с помощью колдовства.\r\n" );
 
-        pc->send_to( "..но ничего не происходит.\r\n" );
+        pc->send_to( "Тебя пытаются принудить выдать тайны своего клана, но ты не поддаешься.\r\n" );
         return;
     }
 
@@ -323,7 +323,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         clan = cm->findUnstrict( argumentOne );
         
         if (!clan) {
-            pc->send_to("Такого клана НЕ СУЩЕСТВУЕТ!\n\r");
+            pc->send_to("Такого клана пока не существует.\n\r");
             return;
         }
         
@@ -373,7 +373,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( )) {
-        pc->send_to( "Укажи валютную единицу ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).\r\n" );
+        pc->send_to( "Укажи единицу расчета ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).\r\n" );
         return;
     }
     
@@ -418,12 +418,12 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
             acc_clan = cm->findUnstrict( argumentOne );
 
             if (!acc_clan) {
-                pc->send_to("Клана-получателя НЕ СУЩЕСТВУЕТ !\n\r");
+                pc->send_to("Клан-получатель указан неверно.\n\r");
                 return;
             }
             
             if (!acc_clan->getData( ) || !acc_clan->getData( )->getBank( )) {
-                pc->send_to("У клана-получателя НЕТ БАНКА!\n\r");
+                pc->send_to("У клана-получателя нет банка!\n\r");
                 return;
             }
         }
@@ -877,17 +877,17 @@ void CClan::clanLevelShow( PCharacter *pc, PCMemoryInterface *victim )
 
     if (!clan->getTitles( )) {
         if (victim == pc)
-            pc->send_to( "Клановых званий в твоем клане не обнаружено.\r\n" );
+            pc->send_to( "Клановых рангов в твоем клане не обнаружено.\r\n" );
         else
-            pc->send_to( "В его/ее клане нет клановых званий.\r\n" );
+            pc->send_to( "В его/ее клане нет клановых рангов.\r\n" );
     }
     else {
         if (victim == pc)
-            pc->printf( "Твое звание [{%s%s{x].\r\n", 
+            pc->printf( "Твой ранг [{%s%s{x].\r\n", 
                         clan->getColor( ).c_str( ), 
                         clan->getTitle( pc ).c_str( ) );
         else
-            pc->printf( "%s имеет звание [{%s%s{x].\r\n", 
+            pc->printf( "%s имеет ранг [{%s%s{x].\r\n", 
                         victim->getName( ).c_str( ),
                         clan->getColor( ).c_str( ), 
                         clan->getTitle( victim ).c_str( ) );
@@ -908,7 +908,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     try {
         i = arg.toInt( );
     } catch (const ExceptionBadType &e) {
-        pc->send_to( "Неверный клановый уровень.\n\r" );
+        pc->send_to( "Неверный клановый ранг.\n\r" );
         return;
     }
     
@@ -930,12 +930,12 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
         size = 0;
 
     if (size == 0) {
-        pc->send_to( "В этом клане нет клановых уровней.\r\n" );
+        pc->send_to( "В этом клане нет клановых рангов.\r\n" );
         return;
     }
 
     if (i < 0 || i >= size) {
-        pc->printf( "Можно использовать только 0..%d\r\n", size - 1 );
+        pc->printf( "Можно использовать только цифры от 0 до %d\r\n", size - 1 );
         return;
     }
 
@@ -962,7 +962,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     victim->setClanLevel( i );
     pc->send_to( "Ok.\n\r" );
 
-    buf << "Ты получаешь клановый уровень, [{"
+    buf << "Ты получаешь клановый ранг [{"
         << clan.getColor( ) << clan.getTitle( victim ) << "{x].";
 
     attr = victim->getAttributes( ).getAttr<XMLAttributeInduct>( "induct" );
@@ -976,13 +976,14 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
 
     // Notify about level upgrades otherwise noticeable in 'who'.
     if (oldLevel < i && clan.isRecruiter(victim)) {
-        DLString what = fmt(0, "{W%s становится %s клана %s.{x", 
+        DLString what = fmt(0, "{W%s становится %s %s.{x", 
             victim->getName().c_str(), 
             (clan.isLeader(victim) ? "лидером" : "рекрутером"),
-            clan.getRussianName().ruscase('4').c_str());
+            clan.getRussianName().ruscase('2').c_str());
 
         infonet(pcVictim, 0, "{CТихий голос из $o2: ", what.c_str());
         send_discord_clan(what);
+        send_telegram(what);
     }
 }
 
@@ -993,12 +994,12 @@ void CClan::clanLevelHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf << "{W{lRклан уровень{lEclan level  {lx{x                  - показывает твое клановое звание" << endl
-        << "{W{lRклан уровень список{lEclan level list    {lx{x           - показывает список званий для твоего клана" << endl
-        << "{W{lRклан уровень {lEclan level{lx {x<имя|{W{lRя{lEself{lx{x>         - показывает клановое звание соклановика" << endl
+    buf << "{W{lRклан уровень{lEclan level  {lx{x                  - показывает твой клановый ранг" << endl
+        << "{W{lRклан уровень список{lEclan level list    {lx{x           - показывает список рангов для твоего клана" << endl
+        << "{W{lRклан уровень {lEclan level{lx {x<имя|{W{lRя{lEself{lx{x>         - показывает клановый ранг соклановика" << endl
         << endl
         << "Для лидеров:" << endl
-        << "{W{lRклан уровень{lEclan level{lx {x<имя|{W{lRсебе{lEself{lx{x> <число> - устанавливает новый клановый уровень" << endl;
+        << "{W{lRклан уровень{lEclan level{lx {x<имя|{W{lRсебе{lEself{lx{x> <число> - устанавливает новый клановый ранг" << endl;
 
     pc->send_to( buf );
 }
@@ -1082,8 +1083,8 @@ void CClan::clanMemberHelp( PCharacter *pc )
     
     buf   << "{W{lRклан состав{lEclan member{lx{x           - показывает список всех членов клана, в алфавитном порядке" << endl
           << "{W{lRклан состав дата{lEclan member date{lx{x      - сортирует список по дате последнего захода в мир" << endl
-          << "{W{lRклан состав уровень{lEclan member level{lx{x     - сортирует список по уровню" << endl
-          << "{W{lRклан состав клануровень{lEclan member clanlevel{lx{x - сортирует список по клановому уровню" << endl;
+          << "{W{lRклан состав уровень{lEclan member level{lx{x     - сортирует список по рангу" << endl
+          << "{W{lRклан состав клануровень{lEclan member clanlevel{lx{x - сортирует список по клановому рангу" << endl;
 
     pc->send_to( buf );
 }
@@ -1223,7 +1224,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         }
         
         if (!found)
-            pc->send_to("(сейчас в мире нет ни одного рекрутера этого клана)\n\r");
+            pc->send_to("(сейчас в мире нет никого из руководства этого клана)\n\r");
 
         DLString what = fmt(0, "{W%1$^C1 подал%1$Gо||а петицию в %s.{x", pc, clan->getRussianName( ).ruscase('4').c_str());
         infonet(pc, 0, "{CТихий голос из $o2: ", what.c_str());
@@ -1509,7 +1510,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
     }
     
     if (!myclan->isRecruiter( pc ) && !pc->is_immortal( )) {
-        pc->send_to( "Ты не можешь менять политику\n\r" );
+        pc->send_to( "Только руководство кланов может менять политику.\n\r" );
         return; 
     }        
 

@@ -191,26 +191,15 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
     for (i = clans.begin( ); i != clans.end( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i->first );
         
-        if (clan->isValid( )) {
-            ostringstream ostr;
-            
-            ostr << "{" << clan->getColor( ) << clan->getShortName( ) << "{x";
-            clanNames.push_back( ostr.str( ) );
-        }
+        if (clan->isValid())
+            clanNames.push_back(clan->getRussianName( ).ruscase('2'));
     }
 
-    switch (clanNames.size( )) {
-    case 0: 
-        buf << "неизвестного клана ";
-        break;
-    case 1:
-        buf << "клана " << clanNames.front( );
-        break;
-    default:
-        buf << "кланов " << clanNames.join(", ");
-        break;
-    }
-
+    if (clanNames.empty())
+        buf << "неизвестного клана";
+    else
+        buf << clanNames.join(", ");
+    
     buf << "{" << SKILL_HEADER_BG << ".{x" << endl; 
 
     buf << print_wait_and_mana(this, ch);
@@ -219,7 +208,7 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
         return;
 
     if (temporary_skill_active(this, ch)) {        
-        buf << pad << "Досталось тебе разученное на {" 
+        buf << pad << "Досталось тебе разученным на {" 
             << skill_learned_colour(this, ch) << data.learned << "%{x";
     } else {
         buf << pad << "Доступно тебе с уровня {C" << getLevel( ch ) << "{x";
