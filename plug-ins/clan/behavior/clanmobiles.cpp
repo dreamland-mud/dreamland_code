@@ -169,8 +169,7 @@ bool ClanGuard::death( Character *killer )
     if (!clanArea)
         return false;
 
-    DLString what = cclanArea->getClan()->getRussianName( ).ruscase('3') + " {Wне удалось удержать оборону.{x";
-//    DLString what = fmt(0, "%s%s {Wне удалось удержать оборону.{x", clanArea->getClan()->getColor( ), clanArea->getClan()->getRussianName( ).ruscase('3'));
+    DLString what = clanArea->getClan()->getRussianName( ).ruscase('3') + " {Wне удалось удержать оборону.{x";
     infonet(0, 0, "{CТихий голос из $o2: ", what.c_str());
     send_discord_clan(what);
     send_telegram(what);
@@ -248,7 +247,6 @@ void ClanGuard::greet( Character *wch )
     
     if (( obj = clanArea->findInvitation( pch ) )) {
         actInvited( pch, obj );
-//        extract_obj(obj);
         return;
     }
     
@@ -348,8 +346,6 @@ void ClanGuard::doAttack( PCharacter *wch )
 void ClanGuard::actInvited( PCharacter *wch, Object *obj )
 {
     do_say( ch, "Тебя пригласили -- только это оправдывает твое присутствие здесь!" );
-//    act( "$C1 забирает $o4 у $c2.", wch, obj, ch, TO_ROOM );
-//    act( "$C1 забирает у тебя $o4.", wch, obj, ch, TO_CHAR );
 }
 
 void ClanGuard::actPush( PCharacter *wch )
