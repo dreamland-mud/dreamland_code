@@ -929,6 +929,24 @@ CMDRUNP( pretitle )
     }
 }
 
+static void sortCommandsFor(vector<Skill::Pointer> &skills, Character *looker)
+{
+    sort(skills.begin(), skills.end(), [looker](const Skill::Pointer& left, const Skill::Pointer& right)
+        {
+            return left->getCommand()->getNameFor(looker)
+                .compareRussian(right->getCommand()->getNameFor(looker)) < 0;
+        });
+}
+
+static void sortSkillsFor(vector<Skill::Pointer> &skills, Character *looker)
+{
+    sort(skills.begin(), skills.end(), [looker](const Skill::Pointer& left, const Skill::Pointer& right)
+        {
+            return left->getNameFor(looker)
+                .compareRussian(right->getNameFor(looker)) < 0;
+        });
+}
+
 CMDRUNP(report)
 {
     DLString args = argument;
@@ -1012,10 +1030,7 @@ CMDRUNP(report)
 
     if (!skills.empty()) {
         ostringstream buf;
-        sort( skills.begin( ), skills.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
-        {
-            return left->getCommand()->getNameFor(pet->master).compareRussian(right->getCommand()->getNameFor(pet->master)) < 0;
-        });
+        sortCommandsFor(skills, pet->master);
         for (auto it = skills.begin(); it != skills.end();) {
             buf << "{G"
                 << "{hh" << (*it)->getSkillHelp()->getID()
@@ -1033,10 +1048,7 @@ CMDRUNP(report)
 
     if (!skillsFight.empty()) {
         ostringstream buf;
-        sort( skillsFight.begin( ), skillsFight.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
-        {
-            return left->getCommand()->getNameFor(pet->master).compareRussian(right->getCommand()->getNameFor(pet->master)) < 0;
-        });
+        sortCommandsFor(skillsFight, pet->master);
         for (auto it = skillsFight.begin(); it != skillsFight.end();) {
             buf << "{Y"
                 << "{hh" << (*it)->getSkillHelp()->getID()
@@ -1054,10 +1066,7 @@ CMDRUNP(report)
 
     if (!spells.empty()) {
         ostringstream buf;
-        sort( spells.begin( ), spells.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
-        {
-            return left->getNameFor(pet->master).compareRussian(right->getNameFor(pet->master)) < 0;
-        });
+        sortSkillsFor(spells, pet->master);
         for (auto it = spells.begin(); it != spells.end();) {
             buf << "{g"
                 << "{hh" << (*it)->getSkillHelp()->getID()
@@ -1079,10 +1088,7 @@ CMDRUNP(report)
 
     if (showAll && !passives.empty()) {
         ostringstream buf;
-        sort( passives.begin( ), passives.end( ), [pet]( const Skill::Pointer& left, const Skill::Pointer& right )
-        {
-            return left->getNameFor(pet->master).compareRussian(right->getNameFor(pet->master)) < 0;
-        });
+        sortSkillsFor(passives, pet->master);
         for (auto it = passives.begin(); it != passives.end();) {
             buf << "{W"
                 << "{hh" << (*it)->getSkillHelp()->getID()

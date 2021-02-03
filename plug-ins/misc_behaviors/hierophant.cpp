@@ -3,35 +3,21 @@
  * ruffina, 2004
  */
 
-#include <sstream>
-#include <map>
-#include <vector>
-
 #include "hierophant.h"
-#include "profflags.h"
 
 #include "class.h"
 #include "regexp.h"
 
-#include "skill.h"
-#include "skillmanager.h"
-#include "skillgroup.h"
-#include "spell.h"
-#include "damageflags.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
 
 #include "act.h"
-
 #include "arg_utils.h"
 #include "handler.h"
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
-
-using namespace std;
 
 Hierophant::Hierophant( ) 
 {
@@ -68,11 +54,9 @@ void Hierophant::tell( Character *victim, const char *speech )
         return;
     }
     
-    if (!fWhat)
-        return;
-
+    if (fWhat) {
         say_act( victim, ch, "Мил%1$Gое|ой|ая мо%1$Gе|й|я, я же на пенсии! Лучше почитай {y{hh1005{lR? рапорт{lE? report{x и {y{hh1091{lR? приказать{lE? order{x" );
         return;    
-  
+    }
 }
 

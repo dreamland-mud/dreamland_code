@@ -1719,7 +1719,7 @@ NMI_INVOKE( CharacterWrapper, affectJoin, "(.Affect): повесить новы�
 
 NMI_INVOKE( CharacterWrapper, affectBitStrip, "(where,bit): снять все аффекты, устанавливающие в поле where (.tables.affwhere_flags) значение bit")
 {
-    int where, bits;
+    int bits;
     
     checkTarget( );
 
@@ -1727,7 +1727,6 @@ NMI_INVOKE( CharacterWrapper, affectBitStrip, "(where,bit): снять все а
         throw Scripting::NotEnoughArgumentsException( );
     
     // FIXME: change affectBitStrip in existing codesources.
-    where = args.front( ).toNumber( );
     bits = args.back( ).toNumber( );
     affect_bit_strip( target, &affect_flags, bits );
     return Register( ); 

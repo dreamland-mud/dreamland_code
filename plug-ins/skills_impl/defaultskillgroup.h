@@ -46,7 +46,6 @@ protected:
 
     XML_VARIABLE XMLStringNoEmpty    shortDescr;
     XML_VARIABLE XMLRussianString    nameRus;
-    XML_VARIABLE XMLBoolean          nopet;
     XML_VARIABLE XMLBoolean          hidden;
     XML_VARIABLE XMLBoolean          autoHelp;
     XML_VARIABLE XMLPointer<SkillGroupHelp> help;

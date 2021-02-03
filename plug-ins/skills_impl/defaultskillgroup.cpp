@@ -66,9 +66,6 @@ bool DefaultSkillGroup::visible( Character *ch ) const
 
 bool DefaultSkillGroup::available( Character *ch ) const
 {
-    if (ch->is_npc( ) && IS_CHARMED(ch))
-        return !nopet;
-
     return true;
 }
 
