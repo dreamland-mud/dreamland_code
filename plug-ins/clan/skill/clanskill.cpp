@@ -191,26 +191,15 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
     for (i = clans.begin( ); i != clans.end( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i->first );
         
-        if (clan->isValid( )) {
-            ostringstream ostr;
-            
-            ostr << "{" << clan->getColor( ) << clan->getRussianName( ).ruscase('2').c_str() << "{x";
-//            clanNames.push_back( ostr.str( ) );
-        }
+        if (clan->isValid())
+            clanNames.push_back(clan->getRussianName( ).ruscase('2'));
     }
-/*
-    switch (clanNames.size( )) {
-    case 0: 
-        buf << "неизвестного клана ";
-        break;
-    case 1:
-        buf << "клана " << clanNames.front( );
-        break;
-    default:
-        buf << "кланов " << clanNames.join(", ");
-        break;
-    }*/
 
+    if (clanNames.empty())
+        buf << "неизвестного клана";
+    else
+        buf << clanNames.join(", ");
+    
     buf << "{" << SKILL_HEADER_BG << ".{x" << endl; 
 
     buf << print_wait_and_mana(this, ch);
