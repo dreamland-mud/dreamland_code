@@ -169,7 +169,7 @@ bool ClanGuard::death( Character *killer )
     if (!clanArea)
         return false;
 
-    DLString what = clanArea->getClan()->getColor( ) + clanArea->getClan()->getRussianName( ).ruscase('3') + " {Wне удалось удержать оборону.{x";
+    DLString what = cclanArea->getClan()->getRussianName( ).ruscase('3') + " {Wне удалось удержать оборону.{x";
 //    DLString what = fmt(0, "%s%s {Wне удалось удержать оборону.{x", clanArea->getClan()->getColor( ), clanArea->getClan()->getRussianName( ).ruscase('3'));
     infonet(0, 0, "{CТихий голос из $o2: ", what.c_str());
     send_discord_clan(what);
@@ -270,8 +270,8 @@ void ClanGuard::doNotify()
     if (lastNotified > now - Date::SECOND_IN_MINUTE)
         return;
 
-    ClanArea::Pointer clanArea = getClanArea();;
-    DLString msg = "Территория " + clanArea->getClan()->getColor( ) + clanArea->getClan()->getRussianName( ).ruscase('2') + "{x атакована!";
+    ClanArea::Pointer clanArea = getClanArea();
+    DLString msg = "Территория " + clanArea->getClan()->getRussianName( ).ruscase('2') + "{x атакована!";
     send_discord_clan(msg);
     send_telegram(msg);
     lastNotified = now;
