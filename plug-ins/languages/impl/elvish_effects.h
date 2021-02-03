@@ -29,7 +29,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<BlessEquipWE> Pointer;
     
-    virtual bool run( PCharacter *, Character * ) const;
+    virtual bool run( PCharacter *, Object * ) const;
 };
 
 class ElvishEffectsPlugin : public Plugin {

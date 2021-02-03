@@ -97,7 +97,7 @@ void Language::run( Character *ach, const DLString &constArguments )
 static void locateTargets(WordEffect::Pointer effect, PCharacter *ch, Character *&victim, Object *&obj, const DLString &arg2)
 {
     if (effect && effect->isObject()) {
-        obj = get_obj_carry(ch, arg2);
+        obj = get_obj_here(ch, arg2);
         return;
     }
 
@@ -184,7 +184,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     }
 
     if (effect->isObject( ) && !obj) {
-        ch->println("Слово не достигло цели.");
+        ch->println("Выбери, на какую вещь произнести слово.");
         fUsed = false;
     }
     else if (obj) {
