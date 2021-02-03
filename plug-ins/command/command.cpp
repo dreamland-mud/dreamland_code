@@ -135,8 +135,14 @@ bool Command::properOrder( Character *ch ) const
     if (getLevel() > LEVEL_MORTAL)
         return false;
 
-    if (!ch->is_npc( )) 
-        return (getOrder( ).isSet( ORDER_ALLOW_RULER ) || !ch->isAffected(gsn_manacles ));
+    if (!ch->is_npc( ) && getOrder( ).isSet( ORDER_ALLOW_RULER ) && ch->isAffected(gsn_manacles )) 
+        return true;
+
+    if (getOrder().isSet(ORDER_NEVER))
+        return false;
+
+    if (!ch->is_npc() && !getOrder().isSet(ORDER_EXCEPT_PK))
+        return true;    
     
     if (getOrder( ).isSet( ORDER_FIGHT_ONLY ) && ch->fighting == 0)
         return false;
