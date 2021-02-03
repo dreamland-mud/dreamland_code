@@ -14,6 +14,9 @@
 #define MOB_VNUM2ID(v) (((v) << 4) | 3)
 #define AREA_VNUM2ID(v) (((v) << 4) | 4)
 
+namespace Scripting {
+    class CodeSource;
+}
 class WrapperManager: public WrapperManagerBase, public Plugin {
 public:
     
@@ -37,6 +40,8 @@ public:
     
     virtual void initialization( );
     virtual void destruction( );
+
+    static void save(Scripting::CodeSource &cs);
 
     static WrapperManager* getThis( );
 

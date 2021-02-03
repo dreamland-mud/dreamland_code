@@ -41,7 +41,7 @@ bool has_fenia_security( PCharacter *pch )
         
         if ((*thiz[FENIA_SECURITY_ID]).toNumber() >= 110)
             return true;
-    } catch (::Exception e) {
+    } catch (const ::Exception &e) {
     }
 
     return false;
@@ -114,6 +114,8 @@ RPCRUN(cs_eval)
 
             cs.content = body;
             cs.eval(thiz);
+
+            WrapperManager::save(cs);
         
         } catch (const ::Exception &e) {
             ch->send_to( e.what( ) );
