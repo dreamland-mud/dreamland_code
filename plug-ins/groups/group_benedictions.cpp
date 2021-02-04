@@ -48,9 +48,9 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
 
     if (victim->isAffected(sn)) {
         if (victim == ch)
-            act_p("Ты уже благословле$gно|н|на.", ch,0,0,TO_CHAR,POS_RESTING);
+            act_p("Ты уже наслаждаешься благостью Богов.", ch,0,0,TO_CHAR,POS_RESTING);
         else
-            act_p("$C1 уже благословле$Gно|н|на.", ch,0,victim,TO_CHAR,POS_RESTING);
+            act_p("$C1 уже наслаждается благостью Богов.", ch,0,victim,TO_CHAR,POS_RESTING);
 
         return;
     }
@@ -79,11 +79,11 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
     affect_to_char(victim, &af);
 
     if (victim != ch) {
-        act_p("Ты даришь $C3 благословение своих Богов.", ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 дарит тебе благословение своих Богов.", ch,0,victim,TO_VICT,POS_RESTING);
+        act_p("Ты одаряешь $C3 благостью своих Богов.", ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 одаряет тебе благостью своих Богов.", ch,0,victim,TO_VICT,POS_RESTING);
     }
     else
-        victim->println("Ты чувствуешь божественное благословение.");
+        victim->println("Ты наслаждаешься божественной благостью.");
 
 }
 
@@ -94,7 +94,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->behavior && obj->behavior->isLevelAdaptive( ))
     {
-        act_p("$o1 отвергает твои попытки.",ch,obj,0,TO_CHAR,POS_RESTING);
+        act_p("$o1 отвергает твои попытки благословления.",ch,obj,0,TO_CHAR,POS_RESTING);
         return;
     }
     if (obj->is_obj_stat(ITEM_BLESS))
@@ -639,45 +639,45 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         {
          clean = false;
          room->affectStrip( gsn_cursed_lands);
-         ch->send_to("Это место очищается от проклятья.\n\r");
-         act_p("Это место очищается от проклятья.\n\r",
+         ch->send_to("Ты развеиваешь проклятие, висевшее над этой местностью.\n\r");
+         act_p("Проклятие, висевшее над этой местностью, развеивается.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_POISON))
         {
          clean = false;
          room->affectStrip( gsn_deadly_venom);
-         ch->send_to("Ядовитые пары, окружавшие это место, рассеиваются.\n\r");
-         act_p("Ядовитые пары, окружавшие это место, рассеиваются.\n\r",
+         ch->send_to("Ядовитые пары, клубившиеся в этой местности, рассеиваются.\n\r");
+         act_p("Ядовитые пары, клубившиеся в этой местности, рассеиваются.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLEEP))
         {
          clean = false;
-         ch->send_to("Это место пробуждается от таинственного сна.\n\r");
-         act_p("Это место пробуждается от таинственного сна.\n\r",
+         ch->send_to("Усыпляющие чары, висевшие над этой местностью, развеиваются.\n\r");
+         act_p("Усыпляющие чары, висевшие над этой местностью, развеиваются.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_mysterious_dream);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_PLAGUE))
         {
          clean = false;
-         ch->send_to("Это место очищается от болезней.\n\r");
-         act_p("Это место очищается от болезней.\n\r",
+         ch->send_to("Чумные миазмы, клубившиеся в этой местности, рассеиваются.\n\r");
+         act_p("Чумные миазмы, клубившиеся в этой местности, рассеиваются.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_black_death);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLOW))
         {
          clean = false;
-         ch->send_to("Летаргический туман, окружавший это место, рассеивается.\n\r");
-         act_p("Летаргический туман, окружавший это место, рассеивается.\n\r",
+         ch->send_to("Летаргический туман, клубившийся в этой местности, рассеивается.\n\r");
+         act_p("Летаргический туман, клубившийся в этой местности, рассеивается.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_lethargic_mist);
         }
 
     if (clean)
-        ch->println("Это место не нуждается в очищении.");
+        ch->println("Эта местность не нуждается в очищении.");
 }
 
 SPELL_DECL(Wrath);
@@ -691,8 +691,8 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
         victim = ch;
 
     if ( IS_GOOD(victim) ) {
-        act_p( "Божественные Силы защищают $c4.", victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Божественные Силы защищают тебя.", victim, 0, 0, TO_CHAR,POS_RESTING);
+        act_p( "Силы Света защищают $c4.", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act_p( "Силы Света защищают тебя.", victim, 0, 0, TO_CHAR,POS_RESTING);
         return;
     }
 
