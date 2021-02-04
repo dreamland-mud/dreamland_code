@@ -79,6 +79,7 @@ void wis_app_type::fromJson(const Json::Value &value)
 {
     practice = value["practice"].asInt();
     learn = value["learn"].asInt();
+    slevel = value["slevel"].asInt();
 }
 
 void dex_app_type::fromJson(const Json::Value &value)

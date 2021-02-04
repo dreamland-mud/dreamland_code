@@ -36,6 +36,7 @@ struct        wis_app_type
 {
     int        practice;
     int learn;
+    int slevel;
     void fromJson(const Json::Value &value);    
 };
 
