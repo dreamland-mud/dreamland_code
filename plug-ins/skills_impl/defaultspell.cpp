@@ -283,8 +283,11 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         else
             gsn_mastering_spell->improve( ch, false );
     }
-
-    slevel = max( 1, slevel + get_int_app(ch).slevel );
+        
+    if (isPrayer( ch ))
+        slevel = max( 1, slevel + get_wis_app(ch).slevel );
+    else
+        slevel = max( 1, slevel + get_int_app(ch).slevel );
 
     slevel += skill_level_bonus(**skill, ch);
 
