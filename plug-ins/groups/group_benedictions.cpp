@@ -94,7 +94,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->behavior && obj->behavior->isLevelAdaptive( ))
     {
-        act_p("$o1 отвергает твои попытки благословления.",ch,obj,0,TO_CHAR,POS_RESTING);
+        act_p("$o1 отвергает твои попытки благословения.",ch,obj,0,TO_CHAR,POS_RESTING);
         return;
     }
     if (obj->is_obj_stat(ITEM_BLESS))
