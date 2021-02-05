@@ -760,11 +760,11 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
     switch (container->item_type) {
     case ITEM_CONTAINER:
         if (IS_SET(container->value1(), CONT_LOCKED)) {
-            ch->pecho("%1$^O1 заперт%1$Gо||а на ключ, попробуй отпереть.", container);
+            ch->pecho("%1$^O1 заперт%1$Gо||а|ы на ключ, попробуй отпереть.", container);
             return false;
         }
         if (IS_SET(container->value1(), CONT_CLOSED)) {
-            ch->pecho("%1$^O1 закрыт%1$Gо||а, попробуй открыть.", container);
+            ch->pecho("%1$^O1 закрыт%1$Gо||а|ы, попробуй открыть.", container);
             return false;
         }
 
@@ -797,7 +797,7 @@ static bool can_put_money_into( Character *ch, Object *container )
     }
 
     if (IS_SET(container->value1(), CONT_CLOSED)) {
-        ch->pecho("%1$^O1 закрыт%1$Gо||а.", container);
+        ch->pecho("%1$^O1 закрыт%1$Gо||а|ы.", container);
         return false;
     }
 
@@ -1626,7 +1626,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
     switch(obj->item_type) {
         case ITEM_POTION:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
-                ch->pecho("%1$^O1 долж%1$Gно|ен|на находиться в твоем инвентаре.", obj);
+                ch->pecho("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре.", obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
                 interpret_cmd( ch, "quaff", idArg.c_str( ) );
@@ -1634,7 +1634,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
             return true;
         case ITEM_SCROLL:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
-                ch->pecho("%1$^O1 долж%1$Gно|ен|на находиться в твоем инвентаре.", obj);
+                ch->pecho("%1$^O1 долж%1$Gно|ен|на|ны находиться в твоем инвентаре.", obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
                 interpret_cmd( ch, "recite", idArg.c_str( ) );

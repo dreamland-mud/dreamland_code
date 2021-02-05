@@ -103,19 +103,19 @@ bool open_portal( Character *ch, Object *obj )
 bool open_drink_container( Character *ch, Object *obj )
 {
     if (!IS_SET(obj->value3(), DRINK_CLOSED)) {
-        ch->pecho( "%1$^O1 и так не запер%1$Gто|т|та.", obj );
+        ch->pecho( "%1$^O1 и так не запер%1$Gто|т|та|ты.", obj );
         return false;
     }
     
     if (IS_SET(obj->value3(), DRINK_LOCKED)) {
         if (IS_SET(obj->value3(), DRINK_CLOSE_CORK))
-            ch->pecho( "%1$^O1 плотно закупоре%1$Gно|н|на пробкой, поищи штопор.", obj );
+            ch->pecho( "%1$^O1 плотно закупоре%1$Gно|н|на|ны пробкой, поищи штопор.", obj );
         else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
-            ch->pecho( "%1$^O1 закры%1$Gто|т|та крышкой и заколоче%1$Gн|но|на.", obj );
+            ch->pecho( "%1$^O1 закры%1$Gто|т|та|ты крышкой и заколоче%1$Gн|но|на|ны.", obj );
         else if (IS_SET(obj->value3(), DRINK_CLOSE_KEY))
-            ch->pecho( "%1$^O1 крепко запер%1$Gто|т|та.", obj );
+            ch->pecho( "%1$^O1 крепко запер%1$Gто|т|та|ты.", obj );
         else
-            ch->pecho( "%1$^O1 запер%1$Gто|т|та.", obj );
+            ch->pecho( "%1$^O1 запер%1$Gто|т|та|ты.", obj );
 
         return false;
     }
@@ -578,11 +578,11 @@ CMDRUNP( lock )
 
             if (IS_SET(obj->value3(), DRINK_LOCKED)) {
                 if (IS_SET(obj->value3(), DRINK_CLOSE_CORK))
-                    ch->pecho( "%1$^O1 и так плотно закупоре%1$Gно|н|но пробкой.", obj );
+                    ch->pecho( "%1$^O1 и так плотно закупоре%1$Gно|н|но|ны пробкой.", obj );
                 else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
-                    ch->pecho( "%1$^O1 и так закры%1$Gто|т|то крышкой и заколоче%1$Gно|н|но.", obj );
+                    ch->pecho( "%1$^O1 и так закры%1$Gто|т|то|ты крышкой и заколоче%1$Gно|н|но|ны.", obj );
                 else
-                    ch->pecho( "%1$^O1 и так крепко запер%1$Gто|т|то.", obj );
+                    ch->pecho( "%1$^O1 и так крепко запер%1$Gто|т|то|ты.", obj );
             }
             else {
                 ch->pecho("%1$^O1 уже невозможно закупорить или заколотить намертво.", obj );

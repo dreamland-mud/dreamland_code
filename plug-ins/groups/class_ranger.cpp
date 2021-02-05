@@ -270,8 +270,8 @@ SKILL_RUNP( shoot )
             chance -= 40;
     chance += ch->hitroll;
     
-    ch->pecho( "%1$^O1, посланн%1$Gое|ый|ая тобой, улетела %2$s.", arrow, dirs[ direction ].leave );
-    ch->recho( "%1$^O1, посланн%1$Gое|ый|ая %3$C5, улетела %2$s.", arrow, dirs[ direction ].leave, ch );
+    ch->pecho( "%1$^O1, посланн%1$Gое|ый|ая|ые тобой, улете%1$nла|ли %2$s.", arrow, dirs[ direction ].leave );
+    ch->recho( "%1$^O1, посланн%1$Gое|ый|ая|ые %3$C5, улете%1$nла|ли %2$s.", arrow, dirs[ direction ].leave, ch );
 
     set_violent( ch, victim, false );
     
