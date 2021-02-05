@@ -20,6 +20,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "morphology.h"
 
 #include "class.h"
 
@@ -507,6 +508,24 @@ CMDRUN( list )
     if (bonus_black_friday->isActive(NULL, time_info))
         tell_dim(ch, keeper, "Сегодня в моем магазине невероятно низкие цены.");
     tell_dim( ch, keeper, "Скажи мне название товара, и я расскажу всё, что о нем знаю, за 1%% от стоимости." );
+
+    int counter = 0;
+    NPCharacter *mob = NULL;
+    NPCharacter *lastShopper = NULL;
+    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room){
+        if (( mob = rch->getNPC( ) )
+            && mob->behavior 
+            && IS_SET(mob->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
+        {
+            counter++;
+            lastShopper = mob;
+        }
+    }
+
+    if(counter>1){
+        DLString mobName = Syntax::noun(lastShopper->getNameP('1'));
+        ch->println(fmt(0,"{y[{GПодсказка{y]{x Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hc{lRпривлечь %1$s{x{y{hc{lEattract %1$s{x", mobName.c_str()));
+    }
 }
 
 /*----------------------------------------------------------------------------
