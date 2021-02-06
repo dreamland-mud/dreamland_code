@@ -19,7 +19,6 @@ void follower_stop( Character *, bool verbose = true );
 void follower_clear( Character * ch, bool verbose = true );
 
 bool is_same_group( Character *, Character * );
-Character *  follower_find( Character *, const char * );
 GroupMembers group_members_room( Character *ch, Room *room = 0 );
 GroupMembers group_members_world( Character *ch );
 GroupMembers party_members_room( Character *ch, Room *room = 0 );

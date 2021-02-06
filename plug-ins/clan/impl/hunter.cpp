@@ -574,7 +574,7 @@ SKILL_RUNP( hunt )
         }
     }
 
-    victim = get_char_area( ch, arg);
+    victim = get_char_world( ch, arg, FFIND_SAME_AREA );
 
     if (!fArea && victim == 0)
         victim = get_char_world( ch, arg);

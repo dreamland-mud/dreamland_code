@@ -14,6 +14,7 @@
 #include "interp.h"
 
 #include "follow_utils.h"
+#include "arg_utils.h"
 #include "loadsave.h"
 #include "act.h"
 #include "mercdb.h"
@@ -22,7 +23,6 @@
 
 CLAN(ruler);
 GSN(manacles);
-Character * follower_find_nosee( Character *ch, const char *cargument );
 
 COMMAND(COrder, "order")
 {
@@ -44,26 +44,25 @@ COMMAND(COrder, "order")
         return;
     }
     
-    if (argTarget == "all") {
+    if (arg_is_all(argTarget)) {
         ch->println( "Ты не можешь отдать приказ всем сразу." );
         return;
     }
     
-    victim = findVictim( ch, argTarget );
-    
+    victim = get_char_room(ch, argTarget, FFIND_FOR_ORDER);
+
     if (!victim) {
-        Character * follower = follower_find_nosee( ch, argTarget.c_str() );
-            if(follower){
-               ch->println( "Твой последователь должен быть рядом с тобой." );
-                    if(ch->getPC( )->pet && follower->getNPC() && ch->getPC( )->pet == follower->getNPC()){
-                       interpret_raw( ch, "gtell", "where are you" );
-                    }
-               }
-            else{
-                ch->println( "Среди твоих последователей такого нет." );
-                }
+        Character *follower = get_char_world(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE);
+        if (follower) {
+            ch->println("Твой последователь должен быть рядом с тобой.");
+            if (ch->getPC()->pet && follower->getNPC() && ch->getPC()->pet == follower->getNPC()) {
+                interpret_raw(ch, "gtell", "где ты?");
+            }
+        } else {
+            ch->println("Среди твоих последователей такого нет.");
+        }
         return;
-        }      
+    }
 
     interpretOrder( victim, iargs, argOrder );
     
@@ -85,61 +84,6 @@ COMMAND(COrder, "order")
     ch->println( "Ok.");
 }
 
-bool COrder::canOrder( Character *ch, Character *victim )
-{
-    if (ch == victim)
-        return false;
-
-    if (ch->getClan( ) == clan_ruler && victim->isAffected(gsn_manacles))
-        return true;
-        
-    if (!IS_CHARMED(victim))
-        return false;
-    
-    if (victim->master != ch)
-        return false;
-        
-    if (victim->is_immortal( ) 
-        && victim->get_trust( ) >= ch->getModifyLevel( ))
-        return false;
-    
-    return true;
-}
-
-Character * COrder::findVictim( Character *ch, DLString &argument )
-{
-    Character *rch;
-    int number, count;
-    
-    count  = 0;
-    number = argument.getNumberArgument( );
-    
-    for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room)
-    {
-        Character *tch;
-        
-        if (!canOrder( ch, rch ))
-            continue;
-
-        tch = rch->getDoppel( ch );
-
-        if (tch->is_npc( ))
-        {
-            if (!is_name( argument.c_str( ), tch->getNameP( ) ))
-                continue;
-        }
-        else
-        {
-            if (!is_name( argument.c_str( ), tch->getNameP( '7' ).c_str() ))
-                continue;
-        }
-
-        if (++count == number)
-            return rch;
-    }
-
-    return NULL;
-}
 
 void COrder::interpretOrder( Character *och, InterpretArguments &iargs, const DLString &args )
 {

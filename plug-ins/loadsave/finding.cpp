@@ -12,6 +12,8 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
+#include "clan.h"
+#include "skillreference.h"
 
 #include "descriptor.h"
 #include "act.h"
@@ -20,6 +22,8 @@
 #include "def.h"
 
 WEARLOC(none);
+CLAN(ruler);
+GSN(manacles);
 
 // Parse string argument as if it contains entity ID.
 long long get_arg_id( const DLString &cArgument )
@@ -42,41 +46,67 @@ long long get_arg_id( const DLString &cArgument )
     return id;
 }    
 
+/** Return true if ch can give orders to the victim. */
+static bool char_can_order( Character *ch, Character *victim )
+{
+    if (ch == victim)
+        return false;
+
+    if (ch->in_room != victim->in_room)
+        return false;
+
+    if (ch->getClan( ) == clan_ruler && victim->isAffected(gsn_manacles))
+        return true;
+        
+    if (!IS_CHARMED(victim))
+        return false;
+    
+    if (victim->master != ch)
+        return false;
+        
+    if (victim->is_immortal( ) 
+        && victim->get_trust( ) >= ch->getModifyLevel( ))
+        return false;
+    
+    return true;
+}
+
+
 
 /*
  * Find a char in the room.
  */
-Character *get_char_room( Character *ch, const DLString & constArgument, bool fSeenOnly )
+Character *get_char_room( Character *ch, const DLString & constArgument, int flags )
 {
     char argument[MAX_INPUT_LENGTH];
 
     strcpy( argument, constArgument.c_str( ) );
-    return get_char_room( ch, argument, fSeenOnly );
+    return get_char_room( ch, argument, flags );
 }
 
-Character *get_char_room( Character *ch, char *argument, bool fSeenOnly )
+Character *get_char_room( Character *ch, char *argument, int flags )
 {
     char arg[MAX_INPUT_LENGTH];
     int number;
 
     number = number_argument( argument, arg );
-    return get_char_room( ch, ch->in_room, arg, &number, fSeenOnly );
+    return get_char_room( ch, ch->in_room, arg, &number, flags );
 }
 
-Character * get_char_room( Character *ch, Room *room, const DLString &constArgument, bool fSeenOnly )
+Character * get_char_room( Character *ch, Room *room, const DLString &constArgument, int flags )
 {
     char arg[MAX_INPUT_LENGTH], argument[MAX_INPUT_LENGTH];
     int number;
 
     strcpy( argument, constArgument.c_str( ) );
     number = number_argument( argument, arg );
-    return get_char_room( ch, room, arg, &number, fSeenOnly );
+    return get_char_room( ch, room, arg, &number, flags );
 }
 
 /*
  * Find a char in the room.
  */
-Character *get_char_room( Character *ch, Room *room, const char *argument, int *number, bool fSeenOnly )
+Character *get_char_room( Character *ch, Room *room, const char *argument, int *number, int flags )
 {
     Character *rch;
     int count;
@@ -100,7 +130,13 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
         if (!ch->can_sense( rch ))
             continue;
 
-        if (!ch->can_see( rch ) && fSeenOnly)
+        if (!IS_SET(flags, FFIND_INVISIBLE) && !ch->can_see( rch ))
+            continue;
+
+        if (IS_SET(flags, FFIND_FOR_ORDER) && !char_can_order(ch, rch))
+            continue;
+
+        if (IS_SET(flags, FFIND_FOLLOWER) && rch->leader != ch)
             continue;
 
         if (ugly) {
@@ -114,22 +150,12 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
 
             Character *tch;
             
-            tch = rch->getDoppel( ch );
+            tch = rch->getDoppel( ch ); // FIXME doppel logic here is different from get_char_world
 
-            if (tch->is_npc( ))
-            {
-                if (id && tch->getID( ) == id)
-                    return rch;
-                if (id || !char_has_name(tch, argument))
-                    continue;
-            }
-            else
-            {
-                if (id && tch->getID( ) == id)
-                    return rch;
-                if (id || !char_has_name(tch, argument))
-                    continue;
-            }
+            if (id && tch->getID( ) == id)
+                return rch;
+            if (id || !char_has_name(tch, argument))
+                continue;
 
             if (++count == *number)
                 return rch;
@@ -142,51 +168,15 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
 }
 
 
-/*
- * Find a char in the area.
- */
-Character *get_char_area( Character *ch, char *argument )
-{
-        char arg[MAX_INPUT_LENGTH];
-        Character *ach;
-        int number;
-        int count;
-        long long id;
-
-        if ( ( ach = get_char_room( ch, argument ) ) != 0 )
-                return ach;
-
-        id = get_arg_id( argument );
-        number = number_argument( argument, arg ) - count_char_room ( ch, argument ) ;
-        count = 0;
-
-        for( ach = char_list; ach != 0; ach = ach->next )
-        {
-                if ( ach->in_room == 0
-                        || ach->in_room == ch->in_room
-                        || ach->in_room->area != ch->in_room->area
-                        || !ch->can_see( ach )
-                        || (id && ach->getID( ) != id)
-                        || (!id && !char_has_name(ach, arg)) )
-                {
-                        continue;
-                }
-
-                if(id || ++count == number )
-                        return ach;
-        }
-        return 0;
-}
-
 
 /*
  * Find a char in the world.
  */
-Character *get_char_world( Character *ch, const DLString &arg )
+Character *get_char_world( Character *ch, const DLString &arg, int flags )
 {
-    return get_char_world( ch, arg.c_str( ) );
+    return get_char_world( ch, arg.c_str( ), flags );
 }
-Character *get_char_world( Character *ch, const char *cArgument )
+Character *get_char_world( Character *ch, const char *cArgument, int flags )
 {
         char arg[MAX_INPUT_LENGTH];
         char arg_buf[strlen(cArgument)+1];
@@ -197,27 +187,33 @@ Character *get_char_world( Character *ch, const char *cArgument )
        
         strcpy( arg_buf, cArgument );
         long long id = get_arg_id( argument );
-        if ( ( wch = get_char_room( ch, argument ) ) != 0 )
+        number = number_argument( argument, arg );
+
+        if ( ( wch = get_char_room( ch, ch->in_room, arg, &number, flags ) ) != 0 )
                 return wch;
 
-        number = number_argument( argument, arg ) - count_char_room( ch, argument );
- 
         count  = 0;
         for ( wch = char_list; wch != 0 ; wch = wch->next )
         {
-                if (wch->in_room == 0)
+                Character *dch = IS_SET(flags, FFIND_DOPPEL) ? wch->getDoppel( ch ) : wch;
+
+                if (dch->in_room == 0)
                     continue;
-                if (wch->in_room == ch->in_room)
+                if (dch->in_room == ch->in_room)
                     continue;
-                if (!ch->can_see( wch ))
+                if (!IS_SET(flags, FFIND_INVISIBLE) && !ch->can_see( dch ))
                     continue;
-               if (id && wch->getID( ) != id)
+                if (IS_SET(flags, FFIND_FOLLOWER) && dch->leader != ch)
+                    continue;
+                if (IS_SET(flags, FFIND_SAME_AREA) && ch->in_room->area != dch->in_room->area)
+                    continue;
+                if (id && dch->getID( ) != id)
                      continue;
-                if (!id && !char_has_name(wch, arg))
+                if (!id && !char_has_name(dch, arg))
                     continue;
 
-                if ( ++count >= number )
-                        return wch;
+                if (++count >= number)
+                    return wch;
         }
 
         return 0;
@@ -496,50 +492,6 @@ Object *get_obj_world( Character *ch, char *argument )
 
 
 /*
- * Count character with specified name in the room
- */
-int count_char_room( Character *ch, char *argument )
-{
-        char arg[MAX_INPUT_LENGTH];
-        Character *rch;
-        int count;
-        int ugly;
-
-        count  = 0;
-        ugly   = 0;
-
-        if (arg_is_self( arg ))
-                return 1;
-
-        if (arg_is_ugly( arg ))
-                ugly = 1;
-
-        for ( rch = ch->in_room->people; rch != 0; rch = rch->next_in_room )
-        {
-                if ( !ch->can_see( rch ) )
-                        continue;
-
-                if ( ugly
-                        && IS_VAMPIRE(rch) )
-                {
-                        count++;
-                        continue;
-                }
-
-                Character *tch;
-                
-                tch = rch->getDoppel( ch );
-
-                if (!char_has_name(tch, argument))
-                        continue;
-
-                count++;
-        }
-
-        return count;
-}
-
-/*
  * Count occurrences of an obj in a list.
  */
 int count_obj_list( OBJ_INDEX_DATA *pObjIndex, Object *list )
@@ -711,45 +663,6 @@ Object * get_obj_carry_vnum( Character *ch, int vnum )
     return get_obj_list_vnum( ch, vnum, ch->carrying );
 }
 
-/*
- * Find a char in the world, taking doppel in consideration
- */
-Character *get_char_world_doppel( Character *ch, const char *cArgument )
-{
-    char arg[MAX_INPUT_LENGTH];
-    char arg_buf[strlen(cArgument)+1];
-    char *argument = arg_buf;
-    Character *wch;
-    int number;
-    int count;
-    
-    strcpy( arg_buf, cArgument );
-
-    if ( ( wch = get_char_room( ch, argument ) ) != 0 )
-            return wch;
-
-    number = number_argument( argument, arg ) - count_char_room ( ch, argument ) ;
-
-    count  = 0;
-    for ( wch = char_list; wch != 0 ; wch = wch->next )
-    {
-        Character *dch = wch->getDoppel( ch );
-
-        if (dch->in_room == 0)
-            continue;
-        if (dch->in_room == ch->in_room)
-            continue;
-        if (!ch->can_see( dch ))
-            continue;
-        if (!char_has_name( dch, arg ))
-            continue;
-
-        if ( ++count >= number )
-                return wch;
-    }
-
-    return 0;
-}
 
 PCharacter * get_player_world( Character *ch, const char *arg, bool fSeenOnly )
 {

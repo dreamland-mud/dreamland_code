@@ -21,8 +21,6 @@ public:
         virtual void run( Character *, const DLString & );
         
 private:
-        bool canOrder( Character *, Character * );
-        Character *findVictim( Character *, DLString & );
         void interpretOrder( Character *, InterpretArguments &, const DLString & );
 
         static const DLString COMMAND_NAME;

@@ -11,7 +11,7 @@
 #include "room.h"
 
 #include "act.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -109,7 +109,7 @@ void PetShopStorage::msgArticleTooFew( Character *client, Article::Pointer )
 
 Article::Pointer PetShopStorage::findArticle( Character *client, DLString &arguments )
 {
-    return getPetBehavior( get_char_room( client, room, arguments, false ) );
+    return getPetBehavior( get_char_room( client, room, arguments, FFIND_INVISIBLE ) );
 }
 
 Pet::Pointer PetShopStorage::getPetBehavior( Character *pet ) const

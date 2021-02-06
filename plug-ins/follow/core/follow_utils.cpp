@@ -20,6 +20,7 @@
 #include "act.h"
 #include "save.h"
 #include "loadsave.h"
+#include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -47,6 +48,14 @@ void follower_die( Character *ch )
     }
 }
 
+static void follower_report(Character *ch, Character *master)
+{
+    if (master->is_npc() || master->getPC()->pet != ch)
+        return;
+
+//    interpret_raw(ch, "report");
+}
+
 void follower_add( Character *ch, Character *mch )
 {
     if (ch->master != NULL)
@@ -59,6 +68,8 @@ void follower_add( Character *ch, Character *mch )
        act( "$c1 теперь следует за тобой.", ch, 0, mch, TO_VICT );
        
     act( "Ты теперь следуешь за $C5.",  ch, 0, mch, TO_CHAR );
+
+    follower_report(ch, mch);
 }
 
 static void afprog_stopfol( Character *ch )
@@ -164,65 +175,6 @@ bool is_same_group( Character *ach, Character *bch )
         break;
  }
  return false;
-}
-
-/*
- * finds a visible person following this character
- */
-Character * follower_find( Character *ch, const char *cargument )
-{
-    Character *wch;
-    int number, count;
-    char argument[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
-
-    strcpy( argument, cargument );
-    number = number_argument( argument, arg );
-    count  = 0;
-
-    if (!str_cmp( arg, "self" ) || !str_cmp( arg, "я" ))
-        return ch;
-    
-    for (wch = char_list; wch; wch = wch->next) {
-        if (wch->in_room == 0)
-            continue;
-        if (wch->master != ch && wch->leader != ch)
-            continue;
-        if (!ch->can_see( wch ))
-            continue;
-        if (!is_name( arg, wch->getNameP( '7' ).c_str( ) ))
-            continue;
-        if (++count >= number)
-            return wch;
-    }
-
-    return 0;
-}
-
-Character * follower_find_nosee( Character *ch, const char *cargument )
-{
-    Character *wch;
-    int number, count;
-    char argument[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
-
-    strcpy( argument, cargument );
-    number = number_argument( argument, arg );
-    count  = 0;
-
-    if (!str_cmp( arg, "self" ) || !str_cmp( arg, "я" ))
-        return ch;
-    
-    for (wch = char_list; wch; wch = wch->next) {
-        if (wch->in_room == 0)
-            continue;
-        if (wch->master != ch && wch->leader != ch)
-            continue;
-        if (!is_name( arg, wch->getNameP( '7' ).c_str( ) ))
-            continue;
-        if (++count >= number)
-            return wch;
-    }
-
-    return 0;
 }
 
 /*

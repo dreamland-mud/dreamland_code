@@ -7,6 +7,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/iomanager \
+-I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/loadsave 
 
 libfollow_core_la_SOURCES = \
@@ -18,6 +19,7 @@ libfollow_core_la_LIBADD = \
 ../../descriptor/libdescriptor.la \
 ../../iomanager/libiomanager.la \
 ../../loadsave/libloadsave.la \
+../../interpret/libinterpret.la \
 ../../system/libsystem.la \
 ../../system/libscheduler_task_round.la 
 

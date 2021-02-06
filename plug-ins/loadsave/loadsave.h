@@ -75,16 +75,19 @@ void        extract_mob_baddrop( NPCharacter * );
 void        extract_mob_dropped( NPCharacter * );
 bool        mprog_extract( Character *ch, bool count );
 
-int                count_char_room        ( Character *ch, char *argument );
+#define FFIND_INVISIBLE   (A) // include invisible characters into the search
+#define FFIND_FOR_ORDER   (B) // only find those you can give orders to
+#define FFIND_FOLLOWER    (C) // only find those who follow you
+#define FFIND_SAME_AREA   (D) // restrict world search to the same area you're in
+#define FFIND_DOPPEL      (E) // consider doppelganger when looking
+
 int                count_obj_list        ( obj_index_data *obj, Object *list );
-Character *        get_char_room        ( Character *ch, const DLString &, bool = true );
-Character *        get_char_room        ( Character *ch, char *argument, bool = true );
-Character *        get_char_room        ( Character *ch, Room *room, const DLString &, bool = true );
-Character *        get_char_room        ( Character *ch, Room *room, const char *argument, int *number, bool = true );
-Character *        get_char_world        ( Character *ch, const char *argument );
-Character *        get_char_world        ( Character *ch, const DLString & );
-Character *        get_char_area        ( Character *ch, char *argument );
-Character *        get_char_world_doppel( Character *ch, const char *cArgument );
+Character *        get_char_room        ( Character *ch, const DLString &, int flags = 0 );
+Character *        get_char_room        ( Character *ch, char *argument, int flags = 0 );
+Character *        get_char_room        ( Character *ch, Room *room, const DLString &arg, int flags = 0 );
+Character *        get_char_room        ( Character *ch, Room *room, const char *argument, int *number, int flags = 0 );
+Character *        get_char_world        ( Character *ch, const char *argument, int flags = 0 );
+Character *        get_char_world        ( Character *ch, const DLString &arg, int flags = 0 );
 PCharacter *        get_player_world( Character *ch, const char *arg, bool fSeenOnly = true );
 bool char_has_name(Character *target, const char *arg);
 Object *        get_obj_list        ( Character *ch, const DLString &cArg, Object *list, DLString pocket = "" );

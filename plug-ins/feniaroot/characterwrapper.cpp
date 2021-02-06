@@ -2070,9 +2070,9 @@ NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам 
     }
 
     SET_BIT( pet->affected_by, AFF_CHARM );
+    target->getPC( )->pet = pet->getNPC( );
     pet->add_follower( target );
     pet->leader = target;
-    target->getPC( )->pet = pet->getNPC( );
 
     return Register( );
 }

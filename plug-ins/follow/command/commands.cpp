@@ -31,7 +31,6 @@
 RELIG(fili);
 WEARLOC(tattoo);
 CLAN(battlerager);
-Character * follower_find_nosee( Character *ch, const char *cargument );
 
 static bool check_mutual_induct( Character *ch, Character *victim, ClanReference &clan )
 {
@@ -266,7 +265,8 @@ CMDRUN( nuke )
         return;
     }
     
-    if ( !( victim = follower_find_nosee( ch, arg.c_str( ) ) )) {
+    victim = get_char_world(ch, arg, FFIND_FOLLOWER | FFIND_INVISIBLE);
+    if (!victim) {
         ch->println( "Среди твоих последователей нет никого с таким именем." );
         return;
     }

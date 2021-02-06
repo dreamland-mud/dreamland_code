@@ -389,7 +389,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         }
 
-        victim = get_char_world_doppel( ch, carg );
+        victim = get_char_world( ch, carg, FFIND_DOPPEL );
 
         if (victim) {
             result->type = SpellTarget::CHAR;

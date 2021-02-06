@@ -206,7 +206,7 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int le
 {
     Character *victim;
 
-    if ((victim = get_char_world_doppel(ch, target_name)) == 0 || DIGGED(victim))
+    if ((victim = get_char_world(ch, target_name, FFIND_DOPPEL)) == 0 || DIGGED(victim))
     {
         ch->send_to("Тьма не может обнаружить это существо.\n\r");
         return;
