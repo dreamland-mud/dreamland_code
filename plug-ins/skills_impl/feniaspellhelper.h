@@ -37,6 +37,7 @@ public:
     XML_VARIABLE XMLRegister obj;
     XML_VARIABLE XMLRegister vict;
     XML_VARIABLE XMLRegister room;
+    XML_VARIABLE XMLRegister state;
     XML_VARIABLE XMLString arg;
     XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLInteger dam;

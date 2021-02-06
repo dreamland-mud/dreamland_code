@@ -5,6 +5,7 @@
 #include "feniamanager.h"
 #include "wrapperbase.h"
 #include "register-impl.h"
+#include "idcontainer.h"
 
 #include "skillmanager.h"
 #include "skill.h"
@@ -88,6 +89,7 @@ FeniaSpellContext::Pointer FeniaSpellHelper::createContext(DefaultSpell *spell, 
     ctx->ch = FeniaManager::wrapperManager->getWrapper(ch);
     ctx->level = level;
     ctx->tier = spell->tier;
+    ctx->state = Register::handler<IdContainer>();
     
     switch (spellTarget->type) {
     case SpellTarget::NONE:
@@ -209,6 +211,12 @@ NMI_SET(FeniaSpellContext, dam, "расчетные повреждения")
 {
     dam = arg.toNumber();
 }
+
+NMI_GET(FeniaSpellContext, state, "структура для хранения временных переменных")
+{
+    return state;
+}
+
 
 void FeniaSpellContext::calcDamage()
 {
