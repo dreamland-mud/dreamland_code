@@ -65,6 +65,9 @@ bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTar
             createContext(spell, ch, spellTarget, level)->thiz,
             RegisterList());
         
+    } catch (const CustomException &ce) {
+        // Do nothing on victim's death.
+
     } catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
         wrapper->croak(methodId, e);
@@ -192,6 +195,11 @@ NMI_GET(FeniaSpellContext, level, "уровень заклинания")
     return Register(level);
 }
 
+NMI_SET(FeniaSpellContext, level, "уровень заклинания")
+{
+    level = arg.toNumber();
+}
+
 NMI_GET(FeniaSpellContext, dam, "расчетные повреждения")
 {
     return Register(dam);
@@ -235,6 +243,17 @@ void FeniaSpellContext::calcDamage()
             dam = dice(level, 13);
         else
             dam = dice(level, 16);
+    } else if (tier == 4) {
+        /* !!! */
+    } else if (tier == 5) {
+        if (level <= 20)
+            dam = dice(level, 4);
+        else if (level <= 40)
+            dam = dice(level, 5);
+        else if (level <= 70)
+            dam = dice(level, 6);
+        else
+            dam = dice(level, 7);        
     }
 }
 

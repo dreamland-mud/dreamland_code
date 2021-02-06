@@ -119,41 +119,9 @@ NMI_INVOKE(FeniaSpellContext, msgArea, "(fmt[,args]): выдать сообще�
 }
 
 
-NMI_INVOKE(FeniaSpellContext, calcDamage, "([tier]): рассчитать повреждения для tier в параметрах или из профайла")
+NMI_INVOKE(FeniaSpellContext, calcDamage, "(): пересчитать повреждения согласно текущему level и tier")
 {
-    int tier = args.empty() ? arg2spell(spell)->tier.getValue() : args2number(args);
-
-    if (tier == 1) {
-        if (level <= 20)
-            dam = dice(level, 10);
-        else if (level <= 40)
-            dam = dice(level, 13);
-        else if (level <= 70)
-            dam = dice(level, 16);
-        else
-            dam = dice(level, 20);
-
-    } else if (tier == 2) {
-        if (level <= 20)
-            dam = dice(level, 8);
-        else if (level <= 40)
-            dam = dice(level, 12);
-        else if (level <= 70)
-            dam = dice(level, 15);
-        else
-            dam = dice(level, 18);
-
-    } else if (tier == 3) {
-        if (level <= 20)
-            dam = dice(level, 7);
-        else if (level <= 40)
-            dam = dice(level, 10);
-        else if (level <= 70)
-            dam = dice(level, 13);
-        else
-            dam = dice(level, 16);
-    }
-
+    this->calcDamage();
     return Register(dam);
 }
 
