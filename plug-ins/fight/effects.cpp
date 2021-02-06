@@ -247,9 +247,19 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     {
         Character *victim = (Character *) vo;
         Object *obj, *obj_next;
+     
+        // saves against level -- level/4 range
+        int dam_ratio, effect_level_mod = 1;
+        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        if (dam_ratio > 1)
+            effect_level_mod += 1;
+        if (dam_ratio > 5)
+            effect_level_mod += 1;
+        if (dam_ratio > 10)
+            effect_level_mod += 1;  
         
         /* chill touch effect */
-        if (!saves_spell(level/4 + dam / 20, victim, DAM_COLD, 0, dam_flag))
+        if (!saves_spell(level / (5 - effect_level_mod), victim, DAM_COLD, 0, dam_flag))
         {
             Affect af;
 
@@ -261,7 +271,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.level     = level;
             af.duration  = 6;
             af.location = APPLY_STR;
-            af.modifier = min(-1, -level / 12);
+            af.modifier = min(-1, -level / 15);
             affect_join( victim, &af );
         }
 
@@ -347,10 +357,19 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     {
         Character *victim = (Character *) vo;
         Object *obj, *obj_next;
+        // saves against level -- level/4 range
+        int dam_ratio, effect_level_mod = 1;
+        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        if (dam_ratio > 1)
+            effect_level_mod += 1;
+        if (dam_ratio > 5)
+            effect_level_mod += 1;
+        if (dam_ratio > 10)
+            effect_level_mod += 1;  
 
         /* chance of blindness */
         if (!IS_AFFECTED(victim,AFF_BLIND)
-        &&  !saves_spell(level / 4 + dam / 20, victim,DAM_FIRE, 0, dam_flag))
+        &&  !saves_spell(level / (5 - effect_level_mod), victim, DAM_FIRE, 0, dam_flag))
         {
             Affect af;
             act_p("$c1 ничего не видит из-за дыма, попавшего в глаза!",
@@ -363,7 +382,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.level        = level;
             af.duration     = number_range(0,level/50);
             af.location = APPLY_HITROLL;
-            af.modifier     = -4;
+            af.modifier = min(-4, -level / 15);
             af.bitvector.setValue(AFF_BLIND);
 
             affect_to_char(victim,&af);
@@ -509,9 +528,18 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
     {
         Character *victim = (Character *) vo;
         Object *obj, *obj_next;
-
+        // saves against level -- level/4 range
+        int dam_ratio, effect_level_mod = 1;
+        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        if (dam_ratio > 1)
+            effect_level_mod += 1;
+        if (dam_ratio > 5)
+            effect_level_mod += 1;
+        if (dam_ratio > 10)
+            effect_level_mod += 1;  
+        
         /* chance of poisoning */
-        if (!saves_spell(level / 4 + dam / 20,victim,DAM_POISON, 0, dam_flag))
+        if (!saves_spell(level / (5 - effect_level_mod), victim, DAM_POISON, 0, dam_flag))
         {
             Affect af;
 
@@ -598,12 +626,21 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
     {
         Character *victim = (Character *) vo;
         Object *obj, *obj_next;
-
+        // saves against level -- level/4 range
+        int dam_ratio, effect_level_mod = 1;
+        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        if (dam_ratio > 1)
+            effect_level_mod += 1;
+        if (dam_ratio > 5)
+            effect_level_mod += 1;
+        if (dam_ratio > 10)
+            effect_level_mod += 1;  
+         
         /* daze and confused? */
-        if (!saves_spell(level/4 + dam/20,victim,DAM_LIGHTNING, 0, dam_flag))
+        if (!saves_spell(level / (5 - effect_level_mod), victim, DAM_LIGHTNING, 0, dam_flag))
         {
             victim->send_to("Твое тело парализовано.\n\r");
-            victim->setDaze( max(12,level/4 + dam/20) );
+            victim->setDaze( URANGE(8, level / (5 - effect_level_mod), 20) );
         }
 
         /* toast some gear */
@@ -683,9 +720,19 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         {
                 Character *victim = (Character *) vo;
                 Object *obj, *obj_next;
-        
-                if ( !IS_AFFECTED(victim,AFF_BLIND )
-                        && !saves_spell(level / 4 + dam / 20, victim,DAM_COLD, 0, dam_flag) )
+                // saves against level -- level/4 range
+                int dam_ratio, effect_level_mod = 1;
+                dam_ratio = (100 * dam) / max(1, victim->max_hit);
+                if (dam_ratio > 1)
+                    effect_level_mod += 1;
+                if (dam_ratio > 5)
+                    effect_level_mod += 1;
+                if (dam_ratio > 10)
+                    effect_level_mod += 1;  
+
+                /* chance of blindness */
+                if (!IS_AFFECTED(victim,AFF_BLIND)
+                &&  !saves_spell(level / (5 - effect_level_mod), victim, DAM_SLASH, 0, dam_flag))
                 {
                         Affect af;
                         act_p("$c1 ничего не видит из-за песка, попавшего в глаза!",
@@ -696,9 +743,9 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         af.bitvector.setTable(&affect_flags);
                         af.type         = gsn_sand_storm;
                         af.level        = level;
-                        af.duration     = number_range(0,level/10);
+                        af.duration     = number_range(0,level/50);
                         af.location = APPLY_HITROLL;
-                        af.modifier     = -4;
+                        af.modifier = min(-4, -level / 15);
                         af.bitvector.setValue(AFF_BLIND);
 
                         affect_to_char(victim,&af);
@@ -857,8 +904,18 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 if ( !saves_spell( level, victim, DAM_SOUND, 0, dam_flag )
                         && victim->fighting )
                         stop_fighting( victim , true );
-
-                if  (!saves_spell(level / 4 + dam / 20, victim,DAM_SOUND, 0, dam_flag))
+         
+                // saves against level -- level/4 range
+                int dam_ratio, effect_level_mod = 1;
+                dam_ratio = (100 * dam) / max(1, victim->max_hit);
+                if (dam_ratio > 1)
+                    effect_level_mod += 1;
+                if (dam_ratio > 5)
+                    effect_level_mod += 1;
+                if (dam_ratio > 10)
+                    effect_level_mod += 1;  
+        
+                if (!saves_spell(level / (5 - effect_level_mod), victim, DAM_SOUND, 0, dam_flag))
                 {
                         Affect af;
                         act_p("$c1 теперь ничего не слышит!",victim,0,0,TO_ROOM,POS_RESTING);
@@ -873,13 +930,12 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                         af.bitvector.setValue(AFF_SCREAM);
 
                         affect_to_char(victim,&af);
-                }
-
-                /* daze and confused? */
-                if (!saves_spell(level/4 + dam/20,victim,DAM_SOUND, 0, dam_flag))
-                {
-                        victim->send_to("Ты ничего не слышишь!\n\r");
-                        victim->setDaze( max(12,level/4 + dam/20) );
+                        
+                        /* daze and confused? */
+                        if (number_percent() < 50) {
+                            victim->send_to("Твое тело парализовано.\n\r");
+                            victim->setDaze( URANGE(8, level / (5 - effect_level_mod), 20) );
+                        }
                 }
 
                 /* getting thirsty */
