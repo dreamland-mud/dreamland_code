@@ -42,22 +42,33 @@ void FeniaSpellHelper::extractWrapper(Spell *spell)
 
 bool FeniaSpellHelper::executeSpell(Spell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
-    Register method = findMethod(spell, spellTarget);
-    if (method.type != Register::FUNCTION)
+    // Check that a function matching this spell target (i.e. one of runVict, runArg etc)
+    // is actually defined on the spell's wrapper.
+    WrapperBase *wrapper = spell->getWrapper();
+    if (!wrapper)
         return false;
 
+    DLString methodName = getMethodName(spellTarget);
+    if (methodName.empty())
+        return false;
+
+    IdRef methodId(methodName);
+    Register method;    
+    if (!wrapper->triggerFunction(methodId, method))
+        return false;
+
+    // Create run context for this spell and launch the runXXX function.
     try {
         method.toFunction()->invoke(
             createContext(spell, ch, spellTarget, level)->thiz,
             RegisterList());
         
-        return true;
-
     } catch (const ::Exception &e) {
-        LogStream::sendError() << e.what() << endl;
+        // On error, complain to the logs and to all immortals in the game.
+        wrapper->croak(methodId, e);
     }
 
-    return false;
+    return true;
 }
 
 FeniaSpellContext::Pointer FeniaSpellHelper::createContext(Spell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
@@ -90,24 +101,6 @@ FeniaSpellContext::Pointer FeniaSpellHelper::createContext(Spell *spell, Charact
     }
 
     return ctx;    
-}
-
-Scripting::Register FeniaSpellHelper::findMethod(Spell *spell, SpellTarget::Pointer &spellTarget) 
-{
-    WrapperBase *wrapper = spell->getWrapper();
-    if (!wrapper)
-        return Register();
-
-    DLString methodName = getMethodName(spellTarget);
-    if (methodName.empty())
-        return Register();
-
-    IdRef methodId(methodName);
-    Register method;    
-    if (!wrapper->triggerFunction(methodId, method))
-        return Register();
-
-    return method;
 }
 
 bool FeniaSpellHelper::spellHasTrigger(Spell *spell, const DLString &trigName) 
@@ -174,7 +167,7 @@ NMI_GET(FeniaSpellContext, obj, "предмет, цель заклинания �
     return obj;
 }
 
-NMI_GET(FeniaSpellContext, vict, "персонаж, цель заклинания для runVict")
+NMI_GET(FeniaSpellContext, vict, "персонаж, цель заклинания для runVict - как синоним victim")
 {
     return vict;
 }

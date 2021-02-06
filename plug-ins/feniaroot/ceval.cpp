@@ -22,7 +22,7 @@
 using Scripting::CodeSource;
 
 
-bool has_fenia_security( PCharacter *pch )
+bool has_fenia_security( PCMemoryInterface *pch )
 {
     if (pch->get_trust( ) >= 110)
         return true;
@@ -35,9 +35,12 @@ bool has_fenia_security( PCharacter *pch )
             return true;
     }
 
+    if (!pch->isOnline())
+        return false;
+
     try {
         static Scripting::IdRef FENIA_SECURITY_ID("feniaSecurity");
-        Register thiz = WrapperManager::getThis( )->getWrapper( pch );
+        Register thiz = WrapperManager::getThis( )->getWrapper( pch->getPlayer() );
         
         if ((*thiz[FENIA_SECURITY_ID]).toNumber() >= 110)
             return true;

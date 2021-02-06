@@ -19,6 +19,8 @@ template <typename T>
 class PluginWrapperImpl : public PluginNativeImpl<T>, public WrapperBase { }
 #endif
 
+void fenia_wiznet(const WrapperBase *wrapper, const Register &key, const ::Exception &e);
+
 // MOC_SKIP_BEGIN
 template <typename T>
 class PluginWrapperImpl : public PluginNativeImpl<T>, 
@@ -35,21 +37,9 @@ public:
             buf << "{x" << Lex::getThis()->getName(i->first) << "{x" << endl;
     }
 
-    virtual void croak(const Register &key, const ::Exception &e) const {
-        Register prog;
-
-        if (triggerFunction(key, prog)) {
-            const DLString &author = prog.toFunction( )->getFunction()->source.source->author;
-            PCMemoryInterface *pcm = PCharacterManager::find( author );
-
-            if (pcm && pcm->isOnline( ))
-                pcm->getPlayer( )->printf(
-                        "{CТихий голос из хрустального шара фенера: {WИсключение при вызове %s:{x\n%s\n",
-                        key.toString( ).c_str( ),
-                        e.what( ) );
-                        
-        }
-
+    virtual void croak(const Register &key, const ::Exception &e) const 
+    {
+        fenia_wiznet(this, key, e);
         WrapperBase::croak(key, e);
     }
 };

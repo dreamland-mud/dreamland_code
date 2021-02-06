@@ -230,16 +230,20 @@ NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для
     return Register();
 }
 
+static bitstring_t my_damage_flags(const Register &ch, const Register &spell)
+{
+    Character *myCh = arg2character(ch);
+    DefaultSpell *mySpell = arg2spell(spell);
+    return mySpell->damflags | (mySpell->isPrayer(myCh) ? DAMF_PRAYER : DAMF_MAGIC);
+}
+
 NMI_INVOKE(FeniaSpellContext, effectCold, "(): применить холодный эффект на жертву")
 {
     if (vict.type == Register::NONE)
         return Register();
 
-    Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
-    DefaultSpell *mySpell = arg2spell(spell);
-    bitstring_t damflags = mySpell->damflags | (mySpell->isPrayer(myCh) ? DAMF_PRAYER : DAMF_MAGIC);
-    cold_effect(myVict, level, dam, TARGET_CHAR, damflags);
+    cold_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
     return Register();    
 }
 
@@ -248,20 +252,69 @@ NMI_INVOKE(FeniaSpellContext, effectFire, "(): применить огненны
     if (vict.type == Register::NONE)
         return Register();
 
-    Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
-    DefaultSpell *mySpell = arg2spell(spell);
-    bitstring_t damflags = mySpell->damflags | (mySpell->isPrayer(myCh) ? DAMF_PRAYER : DAMF_MAGIC);
-    fire_effect(myVict, level, dam, TARGET_CHAR, damflags);
+    fire_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
     return Register();
 }
+
+NMI_INVOKE(FeniaSpellContext, effectSand, "(): применить эффект песчаной бури на жертву")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myVict = arg2character(vict);
+    sand_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
+    return Register();
+}
+
+NMI_INVOKE(FeniaSpellContext, effectAcid, "(): применить кислотный эффект на жертву")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myVict = arg2character(vict);
+    acid_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
+    return Register();
+}
+
+NMI_INVOKE(FeniaSpellContext, effectPoison, "(): применить эффект яда на жертву")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myVict = arg2character(vict);
+    poison_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
+    return Register();
+}
+
+NMI_INVOKE(FeniaSpellContext, effectShock, "(): применить шоковый эффект на жертву")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myVict = arg2character(vict);
+    shock_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
+    return Register();
+}
+
+NMI_INVOKE(FeniaSpellContext, effectScream, "(): применить эффект песчаной бури на жертву")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myVict = arg2character(vict);
+    scream_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
+    return Register();
+}
+
+
 
 NMI_GET(FeniaSpellContext, skill, "прототип умеиния для этого заклинания (.Skill())")
 {
     return Register::handler<SkillWrapper>(name);    
 }
 
-NMI_SET(FeniaSpellContext, vict, "персонаж, цель заклинания для runVict")
+NMI_SET(FeniaSpellContext, vict, "персонаж, цель заклинания для runVict - как синоним victim")
 {
     Character *v = arg2character(arg);
     vict = FeniaManager::wrapperManager->getWrapper(v); // Huh?
@@ -269,7 +322,16 @@ NMI_SET(FeniaSpellContext, vict, "персонаж, цель заклинани�
 
 NMI_SET(FeniaSpellContext, victim, "персонаж, цель заклинания для runVict - как синоним vict")
 {
-    Character *v = arg2character(arg);
-    vict = FeniaManager::wrapperManager->getWrapper(v);
+    return nmiSet<nmi::vict>(arg);
 }
 
+NMI_GET(FeniaSpellContext, sect, "названия типа местности в комнате кастера - как синоним sector")
+{
+    Character *myCh = arg2character(ch);
+    return Register(sector_table.name(myCh->in_room->getSectorType()));
+}
+
+NMI_GET(FeniaSpellContext, sector, "названия типа местности в комнате кастера - как синоним sect")
+{
+    return nmiGet<nmi::sect>();
+}

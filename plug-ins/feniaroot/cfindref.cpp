@@ -22,7 +22,7 @@
 
 using Scripting::CodeSource;
 
-bool has_fenia_security( PCharacter *pch );
+bool has_fenia_security( PCMemoryInterface *pch );
 
 typedef Scripting::Object::id_t objid_t;
 typedef Scripting::Function::id_t funid_t;

@@ -34,7 +34,7 @@
 using namespace Scripting;
 using namespace std;
 
-bool has_fenia_security( PCharacter *pch );
+bool has_fenia_security( PCMemoryInterface *pch );
 bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf);
 
 static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)

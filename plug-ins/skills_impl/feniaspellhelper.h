@@ -49,7 +49,6 @@ public:
 
 private:
     static FeniaSpellContext::Pointer createContext(Spell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
-    static Scripting::Register findMethod(Spell *spell, ::Pointer<SpellTarget> &spellTarget);
     static DLString getMethodName(::Pointer<SpellTarget> &spellTarget);
 };
 
