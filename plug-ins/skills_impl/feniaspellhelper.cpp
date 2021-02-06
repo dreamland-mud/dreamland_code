@@ -1,5 +1,6 @@
 #include "logstream.h"
 #include "feniaspellhelper.h"
+#include "defaultspell.h"
 
 #include "feniamanager.h"
 #include "wrapperbase.h"
@@ -12,6 +13,7 @@
 #include "character.h"
 #include "core/object.h"
 #include "room.h"
+#include "dl_math.h"
 
 using namespace Scripting;
 
@@ -40,7 +42,7 @@ void FeniaSpellHelper::extractWrapper(Spell *spell)
     spell->extractWrapper(false);
 }
 
-bool FeniaSpellHelper::executeSpell(Spell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
+bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
     // Check that a function matching this spell target (i.e. one of runVict, runArg etc)
     // is actually defined on the spell's wrapper.
@@ -71,7 +73,7 @@ bool FeniaSpellHelper::executeSpell(Spell *spell, Character *ch, SpellTarget::Po
     return true;
 }
 
-FeniaSpellContext::Pointer FeniaSpellHelper::createContext(Spell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
+FeniaSpellContext::Pointer FeniaSpellHelper::createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
 {
     FeniaSpellContext::Pointer ctx(NEW);
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
@@ -82,6 +84,7 @@ FeniaSpellContext::Pointer FeniaSpellHelper::createContext(Spell *spell, Charact
     ctx->spell = Register(spell->wrapper);
     ctx->ch = FeniaManager::wrapperManager->getWrapper(ch);
     ctx->level = level;
+    ctx->tier = spell->tier;
     
     switch (spellTarget->type) {
     case SpellTarget::NONE:
@@ -99,6 +102,8 @@ FeniaSpellContext::Pointer FeniaSpellHelper::createContext(Spell *spell, Charact
     default:
         break;
     }
+
+    ctx->calcDamage();
 
     return ctx;    
 }
@@ -197,6 +202,41 @@ NMI_SET(FeniaSpellContext, dam, "расчетные повреждения")
     dam = arg.toNumber();
 }
 
+void FeniaSpellContext::calcDamage()
+{
+    dam = 0;
+
+    if (tier == 1) {
+        if (level <= 20)
+            dam = dice(level, 10);
+        else if (level <= 40)
+            dam = dice(level, 13);
+        else if (level <= 70)
+            dam = dice(level, 16);
+        else
+            dam = dice(level, 20);
+
+    } else if (tier == 2) {
+        if (level <= 20)
+            dam = dice(level, 8);
+        else if (level <= 40)
+            dam = dice(level, 12);
+        else if (level <= 70)
+            dam = dice(level, 15);
+        else
+            dam = dice(level, 18);
+
+    } else if (tier == 3) {
+        if (level <= 20)
+            dam = dice(level, 7);
+        else if (level <= 40)
+            dam = dice(level, 10);
+        else if (level <= 70)
+            dam = dice(level, 13);
+        else
+            dam = dice(level, 16);
+    }
+}
 
 
 

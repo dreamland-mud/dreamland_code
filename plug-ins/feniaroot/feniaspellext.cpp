@@ -123,7 +123,17 @@ NMI_INVOKE(FeniaSpellContext, calcDamage, "([tier]): рассчитать пов
 {
     int tier = args.empty() ? arg2spell(spell)->tier.getValue() : args2number(args);
 
-    if (tier == 2) {
+    if (tier == 1) {
+        if (level <= 20)
+            dam = dice(level, 10);
+        else if (level <= 40)
+            dam = dice(level, 13);
+        else if (level <= 70)
+            dam = dice(level, 16);
+        else
+            dam = dice(level, 20);
+
+    } else if (tier == 2) {
         if (level <= 20)
             dam = dice(level, 8);
         else if (level <= 40)
@@ -133,7 +143,6 @@ NMI_INVOKE(FeniaSpellContext, calcDamage, "([tier]): рассчитать пов
         else
             dam = dice(level, 18);
 
-        return Register(dam);
     } else if (tier == 3) {
         if (level <= 20)
             dam = dice(level, 7);
@@ -216,6 +225,7 @@ NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для
         if (vch->is_mirror() && number_percent() < 50)
             continue;
 
+        calcDamage();
         vict = wrap(vch);
 
         try {
