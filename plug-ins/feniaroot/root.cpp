@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-
+#include <math.h>
 #include "logstream.h"
 #include "core/object.h"
 #include "npcharacter.h"
@@ -336,6 +336,12 @@ NMI_INVOKE( Root, abs, "(n): модуль числа n")
 
     x = args.front( ).toNumber( );
     return ::abs( x );
+}
+
+NMI_INVOKE( Root, sqrt, "(n): квадратный корень положительного числа n, округленный вниз") 
+{
+    int x = max(0, args2number(args));
+    return Register((int)::sqrt(x));
 }
 
 NMI_INVOKE( Root, dice, "(x, y): x раз кинуть кубик с y гранями") 
