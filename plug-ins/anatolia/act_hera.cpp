@@ -243,7 +243,7 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                DLString msg = fmt(0, "Ставок не получено - %1$#O1{Y снят%1$Gо||а с аукциона{x.", auction->item);
+                DLString msg = fmt(0, "Ставок не получено - %1$#O1{Y снят%1$Gо||а|ы с аукциона{x.", auction->item);
                 talk_auction(msg.c_str());
 
                 act_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",

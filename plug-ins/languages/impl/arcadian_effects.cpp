@@ -39,7 +39,7 @@ LIQ(water);
 bool LiquidWEBase::checkItemType( PCharacter *ch, Object *obj ) const
 {
     if (obj->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%1$^O1 мало похож%1$Gе||а на емкость для жидкости.", obj);
+        ch->pecho("%1$^O1 мало похож%1$Gе||а|и на емкость для жидкости.", obj);
         return false;
     }
 

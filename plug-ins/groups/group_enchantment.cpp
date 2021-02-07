@@ -68,7 +68,7 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
     }
     
     if (IS_WEAPON_STAT(obj,WEAPON_HOLY)) {
-        ch->pecho("%1$^O1 уже освяще%1$Gно|н|на для священной битвы.", obj);
+        ch->pecho("%1$^O1 уже освяще%1$Gно|н|на|ны для священной битвы.", obj);
         return;
     }
         
@@ -404,7 +404,7 @@ VOID_SPELL(Fireproof)::run( Character *ch, Object *obj, int sn, int level )
     Affect af;
     if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
     {
-        ch->pecho("%1$^O1 уже защище%1$Gно|н|на от огня.", obj);
+        ch->pecho("%1$^O1 уже защище%1$Gно|н|на|ны от огня.", obj);
         return;
     }
 

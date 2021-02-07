@@ -407,7 +407,7 @@ SKILL_RUNP( envenom )
 
         if (IS_WEAPON_STAT(obj,WEAPON_POISON))
         {
-            ch->pecho( "%1$^O1 уже отравле%1$Gно|н|на ядом.", obj );
+            ch->pecho( "%1$^O1 уже отравле%1$Gно|н|на|ны ядом.", obj );
             return;
         }
 

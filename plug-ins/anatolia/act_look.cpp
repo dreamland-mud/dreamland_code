@@ -1720,12 +1720,12 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
         if (obj->behavior && !obj->behavior->canLock(ch) && obj->value2() <= 0)
             ch->pecho("%^O1 -- чья-то личная собственность, отпереть сможет только хозяин или хозяйка.", obj);
         else
-            ch->pecho("%1$^O1 заперт%1$Gо||а на ключ, сперва отопри.", obj);
+            ch->pecho("%1$^O1 заперт%1$Gо||а|ы на ключ, сперва отопри.", obj);
         return true;
     }
 
     if (IS_SET(obj->value1(), CONT_CLOSED)) {
-        ch->pecho("%1$^O1 закрыт%1$Gо||а, сперва открой.", obj);
+        ch->pecho("%1$^O1 закрыт%1$Gо||а|ы, сперва открой.", obj);
         return true;
     }
     
