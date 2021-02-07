@@ -514,8 +514,7 @@ CMDRUN( list )
     NPCharacter *lastShopper = NULL;
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room){
         if (( mob = rch->getNPC( ) )
-            && mob->behavior 
-            && IS_SET(mob->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
+            && mob_has_occupation(mob, OCC_SHOPPER))
         {
             counter++;
             lastShopper = mob;
@@ -524,7 +523,7 @@ CMDRUN( list )
 
     if(counter>1){
         DLString mobName = Syntax::noun(lastShopper->getNameP('1'));
-        ch->println(fmt(0,"{y[{GПодсказка{y]{x Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hc{lRпривлечь %1$s{x{y{hc{lEattract %1$s{x", mobName.c_str()));
+        hint_fmt(ch, "Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hc{lRпривлечь %1$s{x{y{hc{lEattract %1$s{x", mobName.c_str());
     }
 }
 
