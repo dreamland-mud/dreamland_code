@@ -62,6 +62,7 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     
     act( "В трудную минуту $E поможет тебе!", client, 0, pet, TO_CHAR );
     act( "$c1 приобретает $C4.", client, 0, pet, TO_ROOM );
+    interpret_raw(pet, "report");
     return true;
 }
 

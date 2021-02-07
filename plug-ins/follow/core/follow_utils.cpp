@@ -48,14 +48,6 @@ void follower_die( Character *ch )
     }
 }
 
-static void follower_report(Character *ch, Character *master)
-{
-    if (master->is_npc() || master->getPC()->pet != ch)
-        return;
-
-//    interpret_raw(ch, "report");
-}
-
 void follower_add( Character *ch, Character *mch )
 {
     if (ch->master != NULL)
@@ -68,8 +60,6 @@ void follower_add( Character *ch, Character *mch )
        act( "$c1 теперь следует за тобой.", ch, 0, mch, TO_VICT );
        
     act( "Ты теперь следуешь за $C5.",  ch, 0, mch, TO_CHAR );
-
-    follower_report(ch, mch);
 }
 
 static void afprog_stopfol( Character *ch )
