@@ -130,39 +130,49 @@ void FeniaTriggerLoader::showAssignedTriggers(PCharacter *ch, Scripting::Object 
     ch->send_to(buf);
 }
 
+bool FeniaTriggerLoader::clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const
+{
+    if (!wrapper)
+        return false;
+
+    WrapperBase *base = get_wrapper(wrapper);
+    if (!base)
+        return false;
+
+    Scripting::IdRef methodId(trigName);
+    if (base->getField(methodId).type == Register::NONE)
+        return false;
+
+    base->setField(methodId, Register());
+    return true;
+}
+
+static void show_one_trigger(PCharacter *ch, DefaultSpell *spell, const char *trigName, bitnumber_t target_mask, ostringstream &buf)
+{
+    bool hasTrigger = FeniaSpellHelper::spellHasTrigger(spell, trigName);
+    bool hasTarget = spell->target.isSet(target_mask);
+
+    if (hasTarget || hasTrigger)
+    {
+        buf << "{g" << web_cmd(ch, "fenia $1", trigName) 
+            << (hasTrigger ? "{g*{x" : "{x")
+            << "  ";
+    }
+}
 
 void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const
 {
     ostringstream buf;
 
-    if (spell->target.isSet(TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD)
-        || FeniaSpellHelper::spellHasTrigger(spell, "runVict"))
-    {
-        buf << "{g" << web_cmd(ch, "fenia $1", "runVict") << "{x  ";
-    }
-
-    if (spell->target.isSet(TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD)
-        || FeniaSpellHelper::spellHasTrigger(spell, "runObj"))
-    {
-        buf << "{g" << web_cmd(ch, "fenia $1", "runObj") << "{x  ";
-    }
-
-    if (spell->target.isSet(TAR_PEOPLE|TAR_ROOM)
-        || FeniaSpellHelper::spellHasTrigger(spell, "runRoom"))
-    {
-        buf << "{g" << web_cmd(ch, "fenia $1", "runRoom") << "{x  ";
-    }
-
-    if (spell->target.isSet(TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ)
-        || FeniaSpellHelper::spellHasTrigger(spell, "runArg"))
-    {
-        buf << "{g" << web_cmd(ch, "fenia $1", "runArg") << "{x  ";
-    }
+    show_one_trigger(ch, spell, "runVict", TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD, buf);
+    show_one_trigger(ch, spell, "runObj", TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD, buf);
+    show_one_trigger(ch, spell, "runRoom", TAR_PEOPLE|TAR_ROOM, buf);
+    show_one_trigger(ch, spell, "runArg", TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ, buf);
 
     if (buf.str().empty())
         buf << "(укажи цель заклинания)";
     else
-        buf << "{D(fenia <trig>){x";
+        buf << "{D(fenia <trig> [clear]){x";
         
     buf << endl;
     ch->send_to(buf);

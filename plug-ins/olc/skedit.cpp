@@ -213,9 +213,29 @@ SKEDIT(show, "показать", "показать все поля")
 
 SKEDIT(fenia, "феня", "редактировать тригера")
 {
+    DLString args = argument;
     DefaultSpell *s = getSpell();
-    if (checkSpell(s))
-        feniaTriggers->openEditor(ch, s, argument);
+    if (!checkSpell(s))
+        return false;
+
+    DLString trigName = args.getOneArgument();
+    bool clear = arg_is_clear(args);
+
+    if (trigName.empty() || (!args.empty() && !clear)) {
+        stc("Использование: fenia <триггер> - редактировать триггер.\r\n", ch);
+        stc("               fenia <триггер> clear - очистить триггер.\r\n", ch);
+        return false;
+    }
+
+    if (clear) {
+        if (feniaTriggers->clearTrigger(s->wrapper, trigName))
+            ptc(ch, "Триггер %s успешно удален.\r\n", trigName.c_str());
+        else
+            ptc(ch, "Триггер %s не найден.\r\n", trigName.c_str());        
+    } else {
+        feniaTriggers->openEditor(ch, s, trigName);
+    }
+    
     return false;
 }
 
