@@ -15,8 +15,10 @@
 #include "core/object.h"
 #include "room.h"
 #include "dl_math.h"
+#include "math_utils.h"
 
 using namespace Scripting;
+using namespace std;
 
 void FeniaSpellHelper::linkWrapper(Spell *spell) 
 {
@@ -220,49 +222,47 @@ NMI_GET(FeniaSpellContext, state, "структура для хранения в
 
 void FeniaSpellContext::calcDamage()
 {
+    int minLevel = 1, maxLevel = MAX_LEVEL;
+    int d1, d110;
+
     dam = 0;
 
-    if (tier == 1) {
-        if (level <= 20)
-            dam = dice(level, 10);
-        else if (level <= 40)
-            dam = dice(level, 13);
-        else if (level <= 70)
-            dam = dice(level, 16);
-        else
-            dam = dice(level, 20);
+    switch (tier) {
+        case 1:
+            d1 = 8; 
+            d110 = 25;
+            break;
 
-    } else if (tier == 2) {
-        if (level <= 20)
-            dam = dice(level, 8);
-        else if (level <= 40)
-            dam = dice(level, 12);
-        else if (level <= 70)
-            dam = dice(level, 15);
-        else
-            dam = dice(level, 18);
+        case 2:
+            d1 = 6;
+            d110 = 22;
+            break;
 
-    } else if (tier == 3) {
-        if (level <= 20)
-            dam = dice(level, 7);
-        else if (level <= 40)
-            dam = dice(level, 10);
-        else if (level <= 70)
-            dam = dice(level, 13);
-        else
-            dam = dice(level, 16);
-    } else if (tier == 4) {
-        /* !!! */
-    } else if (tier == 5) {
-        if (level <= 20)
-            dam = dice(level, 4);
-        else if (level <= 40)
-            dam = dice(level, 5);
-        else if (level <= 70)
-            dam = dice(level, 6);
-        else
-            dam = dice(level, 7);        
+        case 3:
+            d1 = 5;
+            d110 = 18;
+            break;
+
+        case 4:
+            d1 = 4;
+            d110 = 13;
+            break;
+
+        case 5:
+            d1 = 2;
+            d110 = 8;
+            break;
+
+        default:
+            return;
     }
+
+    int d = linear_interpolation(
+                min((int)level, maxLevel),
+                minLevel, maxLevel, 
+                d1, d110);
+
+    dam = dice(level, d);
 }
 
 

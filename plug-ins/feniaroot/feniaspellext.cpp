@@ -313,3 +313,14 @@ NMI_GET(FeniaSpellContext, sector, "названия типа местности
 {
     return nmiGet<nmi::sect>();
 }
+
+NMI_INVOKE(FeniaSpellContext, yellPanic, "(): новая жертва заклинания кричит 'помогите'")
+{
+    Character *myCh = arg2character(ch);
+    Character *myVict = arg2character(vict);
+     
+    if (myCh->fighting != myVict && myVict->fighting != myCh)
+        yell_panic(myCh, myVict);
+
+    return Register();
+}
