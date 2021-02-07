@@ -38,7 +38,7 @@ include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
 plugin_INCLUDES = $(INCLUDES_FIGHT) $(INCLUDES_SRC)
-libskills_impl_la_LIBADD = $(LIBADD_FIGHT) 
+libskills_impl_la_LIBADD = $(LIBADD_FIGHT) -ljsoncpp
 
 skillsflags.cpp: skillsflags.conf skillsflags.h
 skillsflags.h: skillsflags.conf

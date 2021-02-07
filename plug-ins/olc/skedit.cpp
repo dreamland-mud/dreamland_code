@@ -30,6 +30,7 @@
 
 OLC_STATE(OLCStateSkill);
 
+DLString print_damage_tiers(int tier, int level_step);
 
 OLCStateSkill::OLCStateSkill() : isChanged(false)
 {
@@ -178,7 +179,29 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
         return true;
     }
 
+    if (arg_oneof(arg, "tiers", "крутость")) {
+        DefaultSpell *s = getSpell();        
+        if (!checkSpell(s))
+            return false;
+
+        ostringstream buf;
+        int level_step = 10;
+
+        StringList levels;
+        for (int lev = 0; lev <= MAX_LEVEL; lev += level_step)
+            levels.push_back(fmt(0, "{C%2d{x", lev));
+        buf << "{cLevel {x: " << levels.join(", ") << endl;
+
+        for (int tier = BEST_TIER; tier <= WORST_TIER; tier++) {
+            buf << "{cTier {C" << tier << "{x: " << print_damage_tiers(tier, level_step) << endl;
+        }
+
+        ch->send_to(buf);
+        return true;
+    }
+
     stc("Использование: {y{hcspell create{x - создать заклинание\r\n", ch);
+    stc("               {y{hcspell tiers{x  - показать таблицу повреждений\r\n", ch);
     return false;
 }
 

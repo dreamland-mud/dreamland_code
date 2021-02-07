@@ -1,3 +1,5 @@
+#include <jsoncpp/json/json.h>
+
 #include "logstream.h"
 #include "feniaspellhelper.h"
 #include "defaultspell.h"
@@ -7,6 +9,8 @@
 #include "register-impl.h"
 #include "idcontainer.h"
 
+#include "stringlist.h"
+#include "configurable.h"
 #include "skillmanager.h"
 #include "skill.h"
 #include "spell.h"
@@ -14,11 +18,61 @@
 #include "character.h"
 #include "core/object.h"
 #include "room.h"
+#include "act.h"
 #include "dl_math.h"
 #include "math_utils.h"
 
 using namespace Scripting;
 using namespace std;
+
+// Level 1 and 110 dice pairs defined in spell/damage_tiers.json.
+struct spell_damage_t
+{
+    int d1;
+    int d110;
+
+    void fromJson(const Json::Value &value)
+    {
+        d1 = d110 = 0;
+        if (value.isArray() && value.size() == 2) {
+            d1 = value[0].asInt();
+            d110 = value[1].asInt();
+            return;
+        }
+    }
+
+    int valueAtLevel(int level) const
+    {
+        int minLevel = 1, maxLevel = MAX_LEVEL;
+        int point = URANGE(minLevel, level, maxLevel);
+
+        return linear_interpolation(
+                point,
+                minLevel, maxLevel, 
+                d1, d110);
+    }
+};
+
+json_vector<spell_damage_t> damage_tiers;
+CONFIGURABLE_LOADED(spell, damage_tiers)
+{
+    damage_tiers.fromJson(value);
+}
+
+// Output a comma-separated list of damage dices for the given tier.
+DLString print_damage_tiers(int tier, int level_step)
+{
+    spell_damage_t &damage = damage_tiers[tier - 1];    
+    StringList dices;
+
+    for (int lev = 0; lev <= MAX_LEVEL; lev += level_step) {
+        dices.push_back(
+            fmt(0, "%2d", damage.valueAtLevel(lev))
+        );
+    }
+
+    return dices.join(", ");
+}
 
 void FeniaSpellHelper::linkWrapper(Spell *spell) 
 {
@@ -222,46 +276,8 @@ NMI_GET(FeniaSpellContext, state, "структура для хранения в
 
 void FeniaSpellContext::calcDamage()
 {
-    int minLevel = 1, maxLevel = MAX_LEVEL;
-    int d1, d110;
-
-    dam = 0;
-
-    switch (tier) {
-        case 1:
-            d1 = 8; 
-            d110 = 25;
-            break;
-
-        case 2:
-            d1 = 6;
-            d110 = 22;
-            break;
-
-        case 3:
-            d1 = 5;
-            d110 = 18;
-            break;
-
-        case 4:
-            d1 = 4;
-            d110 = 13;
-            break;
-
-        case 5:
-            d1 = 2;
-            d110 = 8;
-            break;
-
-        default:
-            return;
-    }
-
-    int d = linear_interpolation(
-                min((int)level, maxLevel),
-                minLevel, maxLevel, 
-                d1, d110);
-
+    spell_damage_t &damage = damage_tiers[tier - 1];
+    int d = damage.valueAtLevel(level);
     dam = dice(level, d);
 }
 
