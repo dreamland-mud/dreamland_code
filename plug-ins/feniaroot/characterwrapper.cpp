@@ -1758,6 +1758,21 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аф�
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, affectReplace, "(.Affect): удалить все аффекты этого типа и повесить новый" )
+{
+    checkTarget( );
+    AffectWrapper *aw;
+
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    aw = wrapper_cast<AffectWrapper>( args.front( ) );        
+    affect_strip(target, aw->getTarget().type);
+    affect_to_char( target, &(aw->getTarget()) );
+    return Register( );
+}
+
+
 NMI_INVOKE( CharacterWrapper, affectRemoveAll, "(): снять все аффекты" )
 {
     checkTarget();

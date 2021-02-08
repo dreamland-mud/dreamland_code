@@ -407,9 +407,8 @@ void affect_join( Character *ch, Affect *paf )
                 if (!paf->global.isSetAll( paf_old->global ))
                     continue;
 
-            paf->level += paf_old->level;
-            paf->level /= 2;
-            paf->duration += paf_old->duration;
+            paf->level = max(paf_old->level, paf->level);
+            paf->duration = max(paf_old->duration, paf->duration);
             paf->modifier += paf_old->modifier;
 
             affect_remove( ch, paf_old );
