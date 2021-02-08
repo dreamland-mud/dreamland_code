@@ -49,7 +49,7 @@ COMMAND(COrder, "order")
         return;
     }
     
-    victim = get_char_room(ch, argTarget, FFIND_FOR_ORDER);
+    victim = get_char_room(ch, argTarget, FFIND_FOR_ORDER|FFIND_INVISIBLE);
 
     if (!victim) {
         Character *follower = get_char_world(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE);
