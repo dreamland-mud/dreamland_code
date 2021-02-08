@@ -237,6 +237,9 @@ static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCh
     if (pReset->rand == RAND_NONE && !item_is_random(pObjIndex))
         return 100;
 
+    if (IS_SET(mob->in_room->area->area_flag, AREA_DUNGEON))
+        return 100;
+
     if (mob_has_occupation(mob, OCC_SHOPPER))
         return 100;
 
