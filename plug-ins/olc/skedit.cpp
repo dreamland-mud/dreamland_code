@@ -91,7 +91,7 @@ bool OLCStateSkill::checkSpell(DefaultSpell *spell)
 {
     if (!spell) {
         if (owner)
-            stc("Это поле определено только для заклинаний.\r\n", owner->character);
+            stc("Это поле определено только для заклинаний, создайте заклинание командой {hc{yspell create{x.\r\n", owner->character);
         return false;
     }
 
@@ -395,7 +395,8 @@ SKEDIT(order, "приказ", "кому можно приказать колдо
 SKEDIT(tier, "крутость", "уровень повреждений от 1 до 5")
 {
     DefaultSpell *s = getSpell();
-    return numberEdit(BEST_TIER, WORST_TIER, s->tier);
+    return checkSpell(s) 
+            && numberEdit(BEST_TIER, WORST_TIER, s->tier);
 }
 
 SKEDIT(position, "позиция", "мин. положение тела для заклинания (? position_table)")
