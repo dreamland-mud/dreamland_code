@@ -1,8 +1,10 @@
 #include "logstream.h"
-#include "object.h"
+#include "core/object.h"
+#include "room.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "loadsave.h"
+#include "update_areas.h"
 
 #include "areaindexwrapper.h"
 #include "structwrappers.h"
@@ -111,6 +113,25 @@ NMI_GET( AreaIndexWrapper, max_vnum , "верхняя граница диапа�
     return target->max_vnum;
 }
 
+NMI_GET(AreaIndexWrapper, players, "список (List) всех игроков в экземпляре зоны по умолчанию")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (auto &r: target->roomIndexes)
+        for(Character *rch = r.second->room->people; rch; rch = rch->next_in_room)
+            if (!rch->is_npc())
+                rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+    
+    return wrap(rc);
+}
+
+NMI_INVOKE( AreaIndexWrapper, reset, "(): обновить экземпляр(ы) этой зоны" )
+{
+    checkTarget();
+    reset_area(target->area, FRESET_ALWAYS);
+    return Register();
+}
 
 NMI_INVOKE( AreaIndexWrapper, api, "(): печатает этот API" )
 {
