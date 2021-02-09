@@ -115,6 +115,23 @@ CMDRUNP( areas )
             str << endl;
     }
 
+    if (acnt + ccnt + mcnt == 0) {
+        ostringstream errbuf;
+
+        errbuf << "Не найдено ни одной зоны";
+        if (!args.empty())
+            errbuf << ", содержащей '" << args << "' в названии";
+        else if (level != -1)
+            errbuf << " для уровня " << level;
+        else if (maxLevel != -1 && minLevel != -1)
+            errbuf << " для диапазона уровней " << minLevel << "-" << maxLevel;
+        errbuf << "." << endl 
+               << "Используй команду {hc{y{lEareas{lRзоны{x для полного списка." << endl;
+               
+        ch->send_to(errbuf);
+        return;
+    }
+
     if (!areaBuf.str().empty()) { 
         buf << areaBuf.str();
         if (acnt % 2)
@@ -132,7 +149,7 @@ CMDRUNP( areas )
         if (mcnt % 2)
             buf << endl;
     }
-    buf << endl << "Подробнее о каждой зоне читай в {Wсправка {Dназвание зоны{x, например {y{hcсправка мидгаард{x." << endl;
+    buf << endl << "Подробнее о каждой зоне читай в {Wсправка {Dназвание зоны{x, например {y{hcсправка мидгаард{x." << endl;    
     page_to_char( buf.str( ).c_str( ), ch );        
 }
 
