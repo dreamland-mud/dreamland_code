@@ -366,11 +366,12 @@ bool Language::showRewards( PCharacter *ch ) const
     return true;
 }
 
-void Language::doIdent( PCharacter *ch, DLString &arg ) const
+void Language::doIdent( PCharacter *ch, DLString &arguments ) const
 {
     int chance;
     WordEffect::Pointer ef;
     Word word;
+    DLString arg = arguments.getOneArgument();
     
     if (arg.empty( )) {
         ch->println( "Смысл чего ты пытаешься понять?" );
