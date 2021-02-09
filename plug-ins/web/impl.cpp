@@ -81,6 +81,7 @@ GSN(shadow_shroud);
 GSN(soul_lust);
 GSN(randomizer);
 GSN(ruler_aura);
+GSN(bark_skin);
 CLAN(none);
 
 extern void help_save_ids();
@@ -514,6 +515,18 @@ Json::Value AffectsWebPromptListener::jsonMalad( Descriptor *d, Character *ch )
            m = 'j';
         else if (paf->type == gsn_anathema)
            m = 'a';
+        else if (paf->type == gsn_nerve)
+           m = 'n';
+        else if (paf->type == gsn_web)
+           m = 'e';
+        else if (paf->type == gsn_bonedagger)
+           m = 'r';
+        else if (paf->type == gsn_entangle)
+           m = 'E';
+        else if (paf->type == gsn_vampiric_bite)
+           m = 'y';
+        else if (paf->type == gsn_caltraps)
+           m = 'A';
         else
             continue;
 
@@ -536,6 +549,7 @@ Json::Value AffectsWebPromptListener::jsonMalad( Descriptor *d, Character *ch )
     mark_affect( ch, active, AFF_WEAKEN, 'w' );
     mark_affect( ch, active, AFF_SLOW, 's' );
     mark_affect( ch, active, AFF_SCREAM, 'S' );
+    mark_affect( ch, active, AFF_SLEEP, 'l' );
     if (!ch->isAffected(gsn_bloodthirst))
         mark_affect( ch, active, AFF_BLOODTHIRST, 'B' );
     mark_affect( ch, active, AFF_STUN|AFF_WEAK_STUN, 'T' );
@@ -729,6 +743,8 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
            m = 'E';
         else if (paf->type == gsn_sebat)
            m = 'Z';
+        else if (paf->type == gsn_bark_skin)
+           m = 'B';
         else
           continue;
         
@@ -786,6 +802,10 @@ Json::Value AffectsWebPromptListener::jsonEnhance( Descriptor *d, Character *ch 
            m = 'w';
         else if (paf->type == gsn_forest_fighting)
            m = 'F';
+        else if (paf->type == gsn_tiger_power)
+           m = 't';
+        else if (paf->type == gsn_vampire)
+           m = 'v';
         else
           continue;
         

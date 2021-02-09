@@ -161,8 +161,8 @@ void BasicMobileBehavior::fightDumb( Character *victim )
         break;
 
     case (2) :
-        if (gsn_disarm->usable( ch ))
-            cmd = "disarm";
+        if (gsn_disarm->usable( ch ) && !(get_eq_char( victim, wear_wield ) == 0))
+            cmd = "disarm";       
         break;
 
     case (3) :
