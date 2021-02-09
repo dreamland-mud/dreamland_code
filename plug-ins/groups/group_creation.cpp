@@ -135,6 +135,16 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     Object *spring;
     int vnum;
 
+    if (IS_WATER(ch->in_room)) {
+        ch->println("Вокруг тебя и так полно жидкости.");
+        return;
+    }
+
+    if (ch->in_room->getSectorType() == SECT_UNDERWATER) {
+        ch->println("Создать родник под водой не получится.");
+        return;
+    }
+    
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
         vnum = OBJ_VNUM_HOLY_SPRING;
     else if (ch->getProfession( )->getFlags( ch ).isSet(PROF_NATURE)) {
