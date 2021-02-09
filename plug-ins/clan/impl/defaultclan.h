@@ -75,7 +75,7 @@ protected:
 
     XML_VARIABLE XMLVectorBase<XMLString> deities;
     XML_VARIABLE XMLVectorBase<XMLClanReference> enemies;
-    XML_VARIABLE XMLString monument;
+    XML_VARIABLE XMLString monument, monumentName;
     
     XML_VARIABLE XMLInteger leader, recruiter;
     XML_VARIABLE XMLPointer<ClanMembership> membership;
