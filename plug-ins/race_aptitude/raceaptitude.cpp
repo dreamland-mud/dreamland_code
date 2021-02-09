@@ -155,7 +155,7 @@ bool RaceAptitude::accessFromString(const DLString &newValue, ostringstream &err
         return true;
     }
 
-    // Adjust existing clan levels or create new elements.
+    // Adjust existing race levels or create new elements.
     for (auto &newPair: newRaces) {
         auto c = races.find(newPair.first);
         if (c == races.end()) {
@@ -165,7 +165,7 @@ bool RaceAptitude::accessFromString(const DLString &newValue, ostringstream &err
         }
     }
 
-    // Wipe clan info no longer present in the input.
+    // Wipe race info no longer present in the input.
     for (auto c = races.begin(), last = races.end(); c != last; ) {
         if (newRaces.count(c->first) == 0)
             c = races.erase(c);

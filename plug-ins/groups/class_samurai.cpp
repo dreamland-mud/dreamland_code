@@ -98,8 +98,8 @@ SKILL_RUNP( enchant )
    if ( number_percent() > gsn_enchant_sword->getEffective( ch ) + skill_level_bonus(*gsn_enchant_sword, ch) )
         {
          ch->send_to("Ты не можешь сконцентрироваться.\n\r");
-        act_p( "$c1 пытался улучшить $o1, но на мгновение забыл{Sfа{sx как это делается.",
-            ch, obj, 0, TO_ROOM,POS_RESTING );
+         ch->recho("%1$^C1 пытал%1$Gось|ся|ась улучшить %2$O4, но на мгновение забыл%1$Gо||а как это делается.",
+                     ch, obj);
         ch->setWait( gsn_enchant_sword->getBeats( ) );
         gsn_enchant_sword->improve( ch, false );
         ch->mana -= mana / 2;

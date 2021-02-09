@@ -1358,7 +1358,7 @@ CMDRUNP( request )
 
         if (victim->getModifyLevel( ) >= ch->getModifyLevel( ) + 10 || victim->getModifyLevel( ) >= ch->getModifyLevel( ) * 2)
         {
-                do_say(victim, "Всему свое время, малыш{Sfка{Sx.");
+                say_fmt("Всему свое время, малыш%2$G||ка.", victim, ch);
                 return;
         }
 

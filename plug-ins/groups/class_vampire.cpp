@@ -1318,11 +1318,11 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
     }
     else {
     	if (!victim || victim != ch) {
-        	act( "$c1 смотрит на $C4 как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_NOTVICT );
-        	act( "$c1 смотрит на тебя как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_VICT );
+            actor->pecho("%1$^C1 смотрит на тебя как на полн%2$Gого|ого|ую идиот%2$Gа|а|ку.", ch, actor);
+            actor->recho("%1$^C1 смотрит на %2$C4 как на полн%2$Gого|ого|ую идиот%2$Gа|а|ку.", ch, actor);
         	say_act( actor, ch, "Кому ты кланяешься? Стенке?" );	    
         	return false;
-	}
+	    }
     }	
 	
     PCharacter *pActor = actor->getPC( );
