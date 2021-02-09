@@ -216,7 +216,7 @@ SKILL_RUNP( disarm )
         {
                 ch->send_to("Твой противник не вооружен.\n\r");
                 if(IS_CHARMED(ch) && ch->master->getPC())
-                ch->master->println("Но противник и так не вооружен.");
+                ch->master->println("Твой противник не вооружен.");
                 return;
         }
 
@@ -486,7 +486,7 @@ SKILL_RUNP( lash )
     if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP) 
     {
         ch->send_to( "Возьми в руки хлыст.\n\r" );
-        if(IS_CHARMED(ch) && ch->master->getPC())
+        if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
         ch->master->println("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
         return;
     }
