@@ -648,14 +648,17 @@ DLString PCharacter::getParsedTitle( )
                 break;
             
             case 'c':
-                out << "{C[" << "{" << clan->getColor( ) << clan->getTitle( this ) << "{C]{x";
+                cl = clan->getTitle(this);
+                if (!cl.empty())
+                    out << "{C[" << "{" << clan->getColor( ) << clan->getTitle( this ) << "{C]{x";
                 break;
                 
             case 'C':
                 cl = clan->getTitle( this );
-                if (!cl.empty( ))
+                if (!cl.empty( )) {
                     cl.upperFirstCharacter( );
-                out << "{C[" << "{" << clan->getColor( ) << cl << "{C]{x";
+                    out << "{C[" << "{" << clan->getColor( ) << cl << "{C]{x";
+                }
                 break;
                 
             case 'a':
