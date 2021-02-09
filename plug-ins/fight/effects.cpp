@@ -251,7 +251,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
      
         // saves against level*0.9 (worst) to level*0.25 (best)
         int dam_ratio, effect_level;
-        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100)
         
@@ -356,7 +356,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         Object *obj, *obj_next;
         // saves against level*0.9 (worst) to level*0.25 (best)
         int dam_ratio, effect_level;
-        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100)
 
@@ -527,7 +527,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         Object *obj, *obj_next;
         // saves against level*0.9 (worst) to level*0.25 (best)
         int dam_ratio, effect_level;
-        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100) 
         
@@ -621,7 +621,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         Object *obj, *obj_next;
         // saves against level*0.9 (worst) to level*0.25 (best)
         int dam_ratio, effect_level;
-        dam_ratio = (100 * dam) / max(1, victim->max_hit);
+        dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100) 
          
@@ -711,7 +711,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 Object *obj, *obj_next;
                 // saves against level*0.9 (worst) to level*0.25 (best)
                 int dam_ratio, effect_level;
-                dam_ratio = (100 * dam) / max(1, victim->max_hit);
+                dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
                 effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
                 effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100) 
 
@@ -892,7 +892,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
          
                 // saves against level*0.9 (worst) to level*0.25 (best)
                 int dam_ratio, effect_level;
-                dam_ratio = (100 * dam) / max(1, victim->max_hit);
+                dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
                 effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
                 effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100)
         
