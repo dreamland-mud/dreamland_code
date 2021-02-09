@@ -253,7 +253,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         int dam_ratio, effect_level;
         dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
-        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100)
+        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
         
         /* chill touch effect */
         if (!saves_spell(effect_level, victim, DAM_COLD, 0, dam_flag))
@@ -358,7 +358,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         int dam_ratio, effect_level;
         dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
-        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100)
+        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
 
         /* chance of blindness */
         if (!IS_AFFECTED(victim,AFF_BLIND)
@@ -529,7 +529,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         int dam_ratio, effect_level;
         dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
-        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100) 
+        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
         
         /* chance of poisoning */
         if (!saves_spell(effect_level, victim, DAM_POISON, 0, dam_flag))
@@ -623,7 +623,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         int dam_ratio, effect_level;
         dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
-        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100) 
+        effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100); 
          
         /* daze and confused? */
         if (!saves_spell(effect_level, victim, DAM_LIGHTNING, 0, dam_flag))
@@ -713,7 +713,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 int dam_ratio, effect_level;
                 dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
                 effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
-                effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100) 
+                effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100); 
 
                 /* chance of blindness */
                 if (!IS_AFFECTED(victim,AFF_BLIND)
@@ -894,7 +894,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 int dam_ratio, effect_level;
                 dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
                 effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
-                effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100)
+                effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
         
                 if (!saves_spell(effect_level, victim, DAM_SOUND, 0, dam_flag))
                 {
