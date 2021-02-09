@@ -200,14 +200,6 @@ SKILL_RUNP( disarm )
                 return;
         }
 
-        if ( get_eq_char( ch, wear_wield ) == 0
-                && ( (hth = gsn_hand_to_hand->getEffective( ch )) == 0
-                        || ( ch->is_npc() && !IS_SET(ch->getNPC()->off_flags,OFF_DISARM))))
-        {
-                ch->send_to("Для этого нужно сначала вооружиться.\n\r");
-                return;
-        }
-
         if ( ( victim = ch->fighting ) == 0 )
         {
                 ch->send_to("Сейчас ты не сражаешься.\n\r");
@@ -223,6 +215,8 @@ SKILL_RUNP( disarm )
         if ( ( obj = get_eq_char( victim, wear_wield ) ) == 0 )
         {
                 ch->send_to("Твой противник не вооружен.\n\r");
+                if(IS_CHARMED(ch) && ch->master->getPC())
+                ch->master->println("Твой противник не вооружен.");
                 return;
         }
 
@@ -492,6 +486,8 @@ SKILL_RUNP( lash )
     if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP) 
     {
         ch->send_to( "Возьми в руки хлыст.\n\r" );
+        if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
+        ch->master->println("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
         return;
     }
 

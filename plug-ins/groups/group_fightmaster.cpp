@@ -355,6 +355,8 @@ SKILL_RUNP( bash )
         if ( get_eq_char( ch, wear_shield ) == 0 )
         {
                 ch->send_to("Тебе нужен щит чтобы сделать это!\n\r");
+                if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
+                ch->master->println("Для этого умения твоему последователю потребуется надеть щит.");
                 return;
         }
         

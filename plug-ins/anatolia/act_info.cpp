@@ -971,6 +971,7 @@ CMDRUNP(report)
     ostringstream result;
     bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
     bool shown = false;
+    bool noCarry = pet->canCarryNumber( ) == 0;
 
     for (int sn = 0; sn < SkillManager::getThis()->size(); sn++) {
         Skill::Pointer skill = SkillManager::getThis()->find(sn);
@@ -991,6 +992,9 @@ CMDRUNP(report)
                 passives.push_back(skill);
                 continue;
             }
+
+            if((sn == gsn_lash || sn == gsn_bash) && noCarry)
+            continue;
 
             if (canOrder && showAll) {
                 skills.push_back(skill);
