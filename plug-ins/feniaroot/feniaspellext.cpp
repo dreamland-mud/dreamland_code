@@ -363,7 +363,7 @@ NMI_INVOKE(FeniaSpellContext, hasDust, "(): достаточно ли пыли �
 {
     Character *myCh = arg2character(ch);
     int s = myCh->in_room->getSectorType();
-    return s == SECT_HILLS || s == SECT_MOUNTAIN || s == SECT_DESERT || s == SECT_FIELD;
+    return !IS_WATER(myCh->in_room) && s != SECT_UNDERWATER && s != SECT_AIR;
 }
 
 NMI_INVOKE(FeniaSpellContext, hasParticles, "(): достаточно ли разных частиц в комнате кастера")
