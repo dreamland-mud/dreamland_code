@@ -73,6 +73,7 @@ using std::max;
 
 DESIRE(thirst);
 DESIRE(hunger);
+GSN(corrosion);
 
 /** Display decay message for items in inventory/eq or on the floor. */
 static void show_effect_message(Object *obj, const DLString &msg)
@@ -179,7 +180,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         af.level    = level;
                         af.duration = -1;
                         af.modifier = number_range(1,5);
-                        af.type     = -1;
+                        af.type     = gsn_corrosion;
 
                         affect_enchant( obj );
                         affect_enhance( obj, &af );
