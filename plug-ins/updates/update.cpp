@@ -336,6 +336,10 @@ void char_update( )
             }
         }
 
+        /* desert warmth cancels frostbite with 50% chance */
+        if (ch->isAffected(gsn_chill_touch) && ch->in_room->getSectorType() == SECT_DESERT && number_percent( ) < 50)
+            checkDispel(ch->getModifyLevel( ),ch,gsn_chill_touch);
+        
         // Remove caltraps effect after fight off
         if ( ch->isAffected(gsn_caltraps) && !ch->fighting)
         {
@@ -1361,7 +1365,7 @@ void player_update( )
             }
             else if( IS_SLAIN( ch ) )
             {
-                act_p("Все забывается... и даже записи жрецов Страны Грез превращаются в прах.",
+                act_p("Все забывается... и даже записи жрецов Мира Мечты превращаются в прах.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
                 act_p("Правда о твоем поражении забывается.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
