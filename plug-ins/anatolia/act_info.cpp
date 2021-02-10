@@ -2430,6 +2430,10 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
     bool adaptive;
 
     if (paf->modifier != 0) {
+        if (paf->type != gsn_none){ 
+            buf << paf->type->getRussianName().upperFirstCharacter().quote();
+            buf << ": ";
+        }
         switch (paf->location) {
             case APPLY_NONE:
             case APPLY_LEARNED:
@@ -2494,6 +2498,20 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
             buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
         else if (table == &form_flags)
             buf << "Добавляет " << form_flags.messages(b) << " форму тела" << endl;
+        else if (table == &weapon_type2){
+            buf << "Добавляет флаг " << weapon_type2.messages(b);
+            if (d > -1) {
+                buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+            } 
+            buf << endl;
+        }
+        else if (table == &extra_flags){
+            buf << "Добавляет флаг " << extra_flags.messages(b);
+                        if (d > -1) {
+                buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+            } 
+            buf << endl;
+        }
     }
 }
 
