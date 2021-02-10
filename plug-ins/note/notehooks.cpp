@@ -30,6 +30,9 @@ void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 
     if (!note.isNoteToAll( ))
         return;
+    
+    if (thread.getName() == "dream")
+        return;
   
     // Notify Discord and Telegram about all types of public messages.
     hookTelegram(thread, note);
