@@ -327,6 +327,22 @@ NMI_INVOKE(FeniaSpellContext, yellPanic, "(): новая жертва закли
     return Register();
 }
 
+
+NMI_INVOKE(FeniaSpellContext, isWater, "(): находится ли кастер в воде или под водой")
+{
+    Character *myCh = arg2character(ch);
+    if (IS_WATER(myCh->in_room))
+        return true;
+
+    if (myCh->in_room->getSectorType() == SECT_UNDERWATER)
+        return true;
+
+    if (IS_SET(myCh->in_room->room_flags, ROOM_NEAR_WATER))
+        return true;
+
+    return false;
+}
+
 NMI_INVOKE(FeniaSpellContext, hasWater, "(): достаточно ли водяных паров в комнате кастера")
 {
     Character *myCh = arg2character(ch);
