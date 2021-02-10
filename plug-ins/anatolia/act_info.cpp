@@ -2506,7 +2506,7 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
             buf << endl;
         }
         else if (table == &extra_flags){
-            buf << "Добавляет особенность " << extra_flags.messages(b);
+            buf << "Добавляет свойство " << extra_flags.messages(b);
             if (d > -1) {
                 buf << ", в течение " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
             } 
