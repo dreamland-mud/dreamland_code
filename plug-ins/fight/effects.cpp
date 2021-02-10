@@ -145,7 +145,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         msg = "%1$^O1 дым%1$nится|ятся и медленно растворя%1$nется|ются.";
                         break;
                 case ITEM_ARMOR:
-                        msg = "%1$^O1 {gпокрыва%1$nется|ются {yокалиной.{x";
+                        msg = "%1$^O1 {gпокрыва%1$nется|ются {yкоррозией.{x";
                         break;
                 case ITEM_CLOTHING:
                         msg = "%1$^O1 рассыпа%1$nется|ются на клочки.";
