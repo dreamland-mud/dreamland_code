@@ -2475,7 +2475,7 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
                     buf << " на " << paf->modifier;
 
                 if (d > -1)
-                    buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+                    buf << ", в течение " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
             
                 buf << "." << endl;
 
@@ -2501,14 +2501,14 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
         else if (table == &weapon_type2){
             buf << "Добавляет флаг " << weapon_type2.messages(b);
             if (d > -1) {
-                buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+                buf << ", в течение " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
             } 
             buf << endl;
         }
         else if (table == &extra_flags){
             buf << "Добавляет особенность " << extra_flags.messages(b);
             if (d > -1) {
-                buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+                buf << ", в течение " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
             } 
             buf << endl;
         }
