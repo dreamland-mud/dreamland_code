@@ -536,6 +536,7 @@ SKILL_RUNP( lore )
   char buf[MAX_STRING_LENGTH];
   int chance;
   int value0, value1, value2, value3;
+  int weightrandom;
   int mana, learned;
   Keyhole::Pointer keyhole;
 
@@ -567,13 +568,24 @@ SKILL_RUNP( lore )
       return;
     }
 
+        ostringstream wearloc;
+        for (int i = 0; i < wearlocationManager->size( ); i++) {
+        Wearlocation *loc = wearlocationManager->find( i );
+        if (loc->matches( obj ) && !loc->getPurpose().empty() && !(obj->item_type == ITEM_WEAPON && IS_SET(obj->wear_flags, ITEM_WIELD)) ) {
+            wearloc << ", " << loc->getPurpose( ).toLower( );
+            break;
+           }
+        }
+
         if ( IS_SET(obj->extra_flags, ITEM_NOIDENT) )
         {
-                sprintf( buf,"Обьект '{G%s{x', тип %s\n\r, Вес %d, уровень %d.\n\r",
-                        obj->getName( ),
+                sprintf( buf,"{G%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s.\n\r",
+                        obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
                         item_table.message(obj->item_type).c_str( ),
-                        obj->weight / 10,
-                        obj->level);
+                        obj->level,
+                        wearloc.str().empty() ? "" : wearloc.str().c_str(),
+                        obj->getName( ),
+                        obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит");
                 ch->send_to(buf);
             
                 if (obj->timer != 0){
@@ -592,13 +604,16 @@ SKILL_RUNP( lore )
 
   /* a random lore */
   chance = number_percent();
+  weightrandom = number_range(1, 2 * obj->weight) / 10;
 
     bitstring_t extra = obj->extra_flags; /* TODO different flags on diff lore levels */
     REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
 
   if (learned < 20)
     {
-      sprintf( buf, "Объект: '%s'.\n\r", obj->getName( ));
+      sprintf( buf, "{W%s{x.\n\rВзаимодействует по именам: '{W%s{x'\n\r",
+                     obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
+                     obj->getName( ));
       ch->send_to(buf);
 
       if (obj->timer != 0){
@@ -613,16 +628,17 @@ SKILL_RUNP( lore )
   else if (learned < 40)
     {
       sprintf( buf,
-          "Объект: '%s'.  Вес: %d.  Стоимость: %d.\n\r",
+          "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\r",
+              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
+              item_table.message(obj->item_type).c_str( ),
+              chance < 60 ? obj->level : number_range(1, 2 * obj->level),
+              wearloc.str().empty() ? "" : wearloc.str().c_str(),
               obj->getName( ),
-              chance < 60 ? obj->weight : number_range(1, 2 * obj->weight),
-              chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost
+              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", (chance < 60 ? obj->weight / 10 : weightrandom ), GET_COUNT((chance < 60 ? obj->weight / 10 : weightrandom), "т", "та", "тов")).c_str()) : "Ничего не весит,",
+              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",(chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost)).c_str()) : "ничего не стоит,",
+              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
-      if ( str_cmp( obj->getMaterial( ), "oldstyle" ) )  {
-        sprintf( buf, "Материал: %s.\n\r", obj->getMaterial( ));
-        ch->send_to(buf);
-      }
 
       if (obj->timer != 0){
       sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
@@ -637,12 +653,15 @@ SKILL_RUNP( lore )
   else if (learned < 60)
     {
       sprintf( buf,
-              "Объект: '%s'.  Вес: %d.\n\rСтоимость: %d.  Уровень: %d.\n\rМатериал: %s.\n\r",
-              obj->getName( ),
-              obj->weight,
-              chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost,
+              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\r",
+              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
+              item_table.message(obj->item_type).c_str( ),
               chance < 60 ? obj->level : number_range(1, 2 * obj->level),
-          str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
+              wearloc.str().empty() ? "" : wearloc.str().c_str(),
+              obj->getName( ),
+              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
+              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",(chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost)).c_str()) : "ничего не стоит,",
+              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
 
@@ -659,15 +678,18 @@ SKILL_RUNP( lore )
 
   else if (learned < 80)
     {
+      
       sprintf( buf,
-              "Объект: '%s'.  Тип: %s.\n\rОсобенности: %s.\n\rВес: %d.  Стоимость: %d.  Уровень: %d.\n\rМатериал: %s.\n\r",
-              obj->getName( ),
+              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\rОсобые свойства: %s.\n\r",
+              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
               item_table.message(obj->item_type).c_str( ),
-              extra_flags.messages( extra, true ).c_str( ),
-              obj->weight,
-              chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost,
-              chance < 60 ? obj->level : number_range(1, 2 * obj->level),
-          str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
+              obj->level,
+              wearloc.str().empty() ? "" : wearloc.str().c_str(),
+              obj->getName( ),
+              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
+              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",(chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost)).c_str()) : "ничего не стоит,",
+              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown",
+              extra_flags.messages( extra, true ).c_str( )
               );
       ch->send_to(buf);
 
@@ -686,14 +708,16 @@ SKILL_RUNP( lore )
   else if (learned < 85)
     {
       sprintf( buf,
-              "Объект: '%s'.  Тип: %s.\r\nОсобенности: %s.\n\rВес: %d.  Стоимость: %d.  Уровень: %d.\n\rМатериал: %s.\n\r",
-              obj->getName( ),
+              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\rОсобые свойства: %s.\n\r",
+              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
               item_table.message(obj->item_type).c_str( ),
-              extra_flags.messages( extra, true ).c_str( ),
-              obj->weight,
-              obj->cost,
               obj->level,
-          str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
+              wearloc.str().empty() ? "" : wearloc.str().c_str(),
+              obj->getName( ),
+              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
+              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",obj->cost).c_str()) : "ничего не стоит,",
+              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown",
+              extra_flags.messages( extra, true ).c_str( )
               );
       ch->send_to(buf);
 
@@ -706,14 +730,16 @@ SKILL_RUNP( lore )
   else
     {
       sprintf( buf,
-              "Объект: '%s'.  Тип: %s.\r\nОсобенности: %s.\n\rВес: %d.  Стоимость: %d.  Уровень: %d.\n\rМатериал: %s.\n\r",
-              obj->getName( ),
+              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\rОсобые свойства: %s.\n\r",
+              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
               item_table.message(obj->item_type).c_str( ),
-              extra_flags.messages( extra, true ).c_str( ),
-              obj->weight,
-              obj->cost,
               obj->level,
-          str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
+              wearloc.str().empty() ? "" : wearloc.str().c_str(),
+              obj->getName( ),
+              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
+              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",obj->cost).c_str()) : "ничего не стоит,",
+              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown",
+              extra_flags.messages( extra, true ).c_str( )
               );
       ch->send_to(buf);
 
@@ -743,8 +769,6 @@ SKILL_RUNP( lore )
     case ITEM_KEYRING:
         if (learned < 85) 
             value0 = number_fuzzy( obj->value0() );
-        else 
-            value0 = obj->value0();
         
         ch->pecho( "Можно нанизать %1$d клю%1$Iч|ча|чей.", value0 );
         break;
@@ -752,10 +776,6 @@ SKILL_RUNP( lore )
         if (learned < 85) {
             value0 = number_fuzzy( obj->value0() );   
             value1 = number_fuzzy( obj->value1() );
-        }
-        else {
-            value0 = obj->value0();
-            value1 = obj->value1();
         }
         
         if (value0 == Keyhole::LOCK_VALUE_BLANK) {
@@ -778,11 +798,6 @@ SKILL_RUNP( lore )
             value1 = number_fuzzy( obj->value1() );
             value2 = number_range( 1, 100 );
         }
-        else {
-            value0 = obj->value0();
-            value1 = obj->value1();
-            value2 = number_fuzzy( obj->value2() );
-        }
         
         ch->printf( "Страниц: %d из %d. Максимальное качество формул %d%%.\r\n",
                      value1, value0, value2 ); 
@@ -794,11 +809,7 @@ SKILL_RUNP( lore )
             value1 = number_fuzzy( obj->value1() );
             value2 = number_range( 1, 100 );
         }
-        else {
-            value0 = obj->value0();
-            value1 = obj->value1();
-            value2 = number_fuzzy( obj->value2() );
-        }
+
         ch->printf( "Страниц: %d из %d. Максимальное качество записей %d%%.\r\n",
                      value1, value0, value2 ); 
         break;
@@ -808,10 +819,7 @@ SKILL_RUNP( lore )
             value0 = obj->value0();
             value2 = number_fuzzy( obj->value2() );
         }
-        else {
-            value0 = obj->value0();
-            value2 = obj->value2();
-        }
+
         ch->printf( "Сложность рецепта: %d. Применяется для создания %s.\r\n",
                      value2, recipe_flags.messages(value0, true).c_str());
         break;
@@ -827,17 +835,6 @@ SKILL_RUNP( lore )
             if (chance > 60) {
               value2 = number_range(1, (SkillManager::getThis( )->size() - 1));
               if (chance > 80)
-                value3 = number_range(1, (SkillManager::getThis( )->size() - 1));
-            }
-          }
-        }
-      else
-        {
-          if (chance > 60) {
-            value1 = number_range(1, (SkillManager::getThis( )->size() - 1));
-            if (chance > 80) {
-              value2 = number_range(1, (SkillManager::getThis( )->size() - 1));
-              if (chance > 95)
                 value3 = number_range(1, (SkillManager::getThis( )->size() - 1));
             }
           }
@@ -884,17 +881,6 @@ SKILL_RUNP( lore )
             }
           }
         }
-      else
-        {
-          if (chance > 60) {
-            value3 = number_range(1, (SkillManager::getThis( )->size() - 1));
-            if (chance > 80) {
-              value2 = number_range(0, 2 * obj->value2());
-              if (chance > 95)
-                value1 = number_range(0, value2);
-            }
-          }
-        }
 
       sprintf( buf, " %d(%d) заклинаний %d-го уровня",
               value1, value2, value0 );
@@ -921,11 +907,6 @@ SKILL_RUNP( lore )
               value2 = number_range(1, 2 * obj->value2());
           }
         }
-      else
-        {
-	  value1 = obj->value1();
-	  value2 = obj->value2();
-        }
 
         ch->printf("%s (%s)\r\n",
                    weapon_class.message(value0 ).c_str( ),
@@ -935,12 +916,13 @@ SKILL_RUNP( lore )
         sprintf(buf,"Повреждения %dd%d (среднее %d).\n\r",
                 value1,value2, dice_ave(value1, value2));
       ch->send_to(buf);
+
       if (learned > 85){
-	if(obj->value3()) // damage type
-	{
-	  sprintf(buf,"Тип повреждений: %s.\n\r", attack_table[obj->value3()].noun);
+	      if(obj->value3()) // damage type
+	      {
+	        sprintf(buf,"Тип повреждений: %s.\n\r", attack_table[obj->value3()].noun);
           ch->send_to(buf);
-	}
+	      }
         if (obj->value4())  /* weapon flags */
         {
           sprintf(buf,"Флаги оружия: %s.\n\r",weapon_type2.messages(obj->value4()).c_str( ));
@@ -965,20 +947,6 @@ SKILL_RUNP( lore )
               }
           }
         }
-      else
-        {
-          if (chance > 45) {
-            value2 = number_range(0, 2 * obj->value2());
-              if (chance > 65) {
-                value0 = number_range(0, 2 * obj->value0());
-                  if (chance > 85) {
-                    value3 = number_range(0, 2 * obj->value3());
-                      if (chance > 95)
-                        value1 = number_range(0, 2 * obj->value1());
-                  }
-              }
-          }
-        }
 
       sprintf( buf,
               "Класс защиты: %d укол  %d удар  %d разрезание  %d vs. магия.\n\r",
@@ -987,12 +955,6 @@ SKILL_RUNP( lore )
       break;
     }
 
-  /* wear location */
-    ostringstream ostr;
-    lore_fmt_wear( obj->item_type, obj->wear_flags, ostr );
-    ch->send_to( ostr );
-/* */
-
   if (learned < 87)
   {
     oprog_lore(obj, ch);
@@ -1000,7 +962,7 @@ SKILL_RUNP( lore )
     return;
   }
 
-  ostr.str(std::string());
+  ostringstream ostr;
 
   if (!obj->enchanted)
       for (auto &paf: obj->pIndexData->affected)
