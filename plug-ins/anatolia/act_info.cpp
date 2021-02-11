@@ -2534,9 +2534,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
 
     if (obj->weight >= 10)
-        buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
+        buf << "Весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
     else
-        buf << "ничего не весит";
+        buf << "Ничего не весит";
 
     if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
         buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
