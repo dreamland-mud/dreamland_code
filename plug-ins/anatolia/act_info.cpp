@@ -2497,54 +2497,6 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
     }
 }
 
-void lore_fmt_wear( int type, int wear, ostringstream &buf )
-{
-    if (type == ITEM_LIGHT) {
-        buf << "Используется как освещение" << endl;
-        return;
-    }
-    
-    if (wear == -1)
-        return;
-
-    if (IS_SET( wear, ITEM_WEAR_FINGER ))
-       buf << "Надевается на палец" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_NECK ))
-       buf << "Надевается на шею" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_BODY ))
-       buf << "Надевается на тело" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_HEAD ))
-       buf << "Надевается на голову" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_EARS ))
-       buf << "Надевается в уши" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_FACE ))
-       buf << "Надевается на лицо" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_FEET ))
-       buf << "Надевается на ступни" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_LEGS ))
-       buf << "Надевается на бедра" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_HANDS ))
-       buf << "Надевается на руки" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_ARMS ))
-       buf << "Надевается на плечи" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_ABOUT ))
-       buf << "Накидывается вокруг тела" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_WAIST ))
-       buf << "Надевается на талию" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_WRIST ))
-       buf << "Надевается на запястье" << endl;
-    if (IS_SET( wear, ITEM_WEAR_SHIELD ))
-       buf << "Используется как щит" << endl;
-    if (IS_SET( wear, ITEM_WEAR_HORSE ))
-        buf << "Надевается на лошадиную часть" << endl;
-    if (IS_SET( wear, ITEM_WEAR_HOOVES ))
-        buf << "Надевается на копыта" << endl;
-    if (IS_SET( wear, ITEM_HOLD ))
-        buf << "Зажимается в руках" << endl;
-    if (IS_SET( wear, ITEM_WEAR_FLOAT ))
-        buf << "Кружится поблизости" << endl;
-}
-
 void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showName )
 {
     int lim;
