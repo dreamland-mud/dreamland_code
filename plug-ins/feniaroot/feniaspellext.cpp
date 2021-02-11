@@ -289,7 +289,7 @@ NMI_INVOKE(FeniaSpellContext, effectScream, "(): применить эффект
 
 
 
-NMI_GET(FeniaSpellContext, skill, "прототип умеиния для этого заклинания (.Skill())")
+NMI_GET(FeniaSpellContext, skill, "прототип умения для этого заклинания (.Skill())")
 {
     return Register::handler<SkillWrapper>(name);    
 }
@@ -337,13 +337,10 @@ NMI_INVOKE(FeniaSpellContext, isWater, "(): находится ли кастер
     if (myCh->in_room->getSectorType() == SECT_UNDERWATER)
         return true;
 
-    if (IS_SET(myCh->in_room->room_flags, ROOM_NEAR_WATER))
-        return true;
-
     return false;
 }
 
-NMI_INVOKE(FeniaSpellContext, hasWater, "(): достаточно ли водяных паров в комнате кастера")
+NMI_INVOKE(FeniaSpellContext, hasWaterParticles, "(): достаточно ли водяных паров в комнате кастера")
 {
     Character *myCh = arg2character(ch);
     if (IS_WATER(myCh->in_room))
