@@ -109,10 +109,7 @@ void affect_enhance( Object *obj, const Affect *newAff )
         if (paf->duration * newAff->duration <= 0)
             continue;
 
-        if (paf->type.getName() != newAff->type.getName()){
-            continue;
-        }
-
+        paf->type      = newAff->type;
         paf->modifier += newAff->modifier;
         paf->level     = max( paf->level,    newAff->level );
         paf->duration  = max( paf->duration, newAff->duration );
