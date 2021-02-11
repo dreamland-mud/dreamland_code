@@ -3,6 +3,7 @@
 #include "logstream.h"
 #include "feniaspellhelper.h"
 #include "defaultspell.h"
+#include "defaultaffecthandler.h"
 
 #include "feniamanager.h"
 #include "wrapperbase.h"
@@ -97,6 +98,31 @@ void FeniaSpellHelper::extractWrapper(Spell *spell)
     }
 
     spell->extractWrapper(false);
+}
+
+void FeniaSpellHelper::linkWrapper(AffectHandler *ah) 
+{
+    if (!FeniaManager::wrapperManager) {
+        LogStream::sendError() << "No Fenia manager when linking affect handler wrapper for " << ah->getSkill()->getName() << endl;
+        return;
+    }
+
+    FeniaManager::wrapperManager->linkWrapper(ah);
+    if (ah->wrapper)
+        LogStream::sendNotice() << "Fenia affect handler: linked wrapper for " << ah->getSkill()->getName() << endl;
+}
+
+void FeniaSpellHelper::extractWrapper(AffectHandler *ah) 
+{
+    if (!ah->wrapper)
+        return;
+        
+    if (!FeniaManager::wrapperManager) {
+        LogStream::sendError() << "No Fenia manager when extracting affect handler wrapper for " << ah->getSkill()->getName() << endl;
+        return;
+    }
+
+    ah->extractWrapper(false);
 }
 
 bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 

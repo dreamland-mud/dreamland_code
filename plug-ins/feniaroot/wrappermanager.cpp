@@ -10,11 +10,13 @@
 #include "objindexwrapper.h"
 #include "areaindexwrapper.h"
 #include "spellwrapper.h"
+#include "affecthandlerwrapper.h"
 #include "subr.h"
 #include "fenia/register-impl.h"
 
 #include "class.h"
 #include "spell.h"
+#include "affecthandler.h"
 #include "skill.h"
 #include "room.h"
 #include "character.h"
@@ -98,6 +100,14 @@ Scripting::Register WrapperManager::getWrapper(Spell *spell)
     return wrapperAux<SpellWrapper>(spell->getID(), spell);
 }
 
+Scripting::Register WrapperManager::getWrapper(AffectHandler *ah) 
+{
+    if (!ah)
+        return Scripting::Register();
+    
+    return wrapperAux<AffectHandlerWrapper>(ah->getID(), ah);
+}
+
 template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
 {
@@ -144,6 +154,11 @@ void WrapperManager::linkWrapper( AreaIndexData *pArea )
 void WrapperManager::linkWrapper(Spell *spell) 
 {
     linkAux<SpellWrapper>(spell->getID(), spell);
+}
+
+void WrapperManager::linkWrapper(AffectHandler *ah) 
+{
+    linkAux<AffectHandlerWrapper>(ah->getID(), ah);
 }
 
 void WrapperManager::getTarget( const Scripting::Register &reg, Character *& ch )

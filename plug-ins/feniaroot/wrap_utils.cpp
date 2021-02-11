@@ -15,6 +15,7 @@
 #include "skill.h" 
 #include "skillmanager.h" 
 #include "defaultspell.h"
+#include "defaultaffecthandler.h"
 #include "spelltarget.h"
 
 #include "objectwrapper.h"
@@ -25,6 +26,7 @@
 #include "structwrappers.h"
 #include "affectwrapper.h"
 #include "spellwrapper.h"
+#include "affecthandlerwrapper.h"
 #include "xmleditorinputhandler.h"
 
 #include "subr.h"
@@ -134,6 +136,12 @@ DefaultSpell * arg2spell( const Register &reg )
 {
     return dynamic_cast<DefaultSpell *>(
                 wrapper_cast<SpellWrapper>(reg)->getTarget());;
+}
+
+DefaultAffectHandler * arg2affecthandler( const Register &reg )
+{
+    return dynamic_cast<DefaultAffectHandler *>(
+                wrapper_cast<AffectHandlerWrapper>(reg)->getTarget());;
 }
 
 void args2buf(const RegisterList &args, char *buf, size_t bufsize)

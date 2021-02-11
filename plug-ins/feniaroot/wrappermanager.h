@@ -24,6 +24,7 @@ public:
     virtual Scripting::Register getWrapper( obj_index_data * );
     virtual Scripting::Register getWrapper( AreaIndexData * );
     virtual Scripting::Register getWrapper( Spell * );
+    virtual Scripting::Register getWrapper( AffectHandler * );
     
     virtual void linkWrapper( Character * );
     virtual void linkWrapper( ::Object * );
@@ -32,6 +33,7 @@ public:
     virtual void linkWrapper( obj_index_data * );
     virtual void linkWrapper( AreaIndexData * );
     virtual void linkWrapper( Spell * );
+    virtual void linkWrapper( AffectHandler * );
 
     virtual void getTarget( const Scripting::Register &, Character *& );
     

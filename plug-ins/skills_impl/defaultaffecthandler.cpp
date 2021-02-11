@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "defaultaffecthandler.h"
+#include "fenia/exceptions.h"
 #include "skill.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -14,6 +15,19 @@
 DefaultAffectHandler::DefaultAffectHandler( )
                : dispelled( false ), cancelled( false )
 {
+}
+
+long long DefaultAffectHandler::getID() const
+{
+    int myId = 0;
+
+    if (getSkill()->getSkillHelp())
+        myId = getSkill()->getSkillHelp()->getID();
+
+    if (myId <= 0)
+        throw Scripting::Exception(getSkill()->getName() + ": affect handler ID not found or zero");
+
+    return (myId << 4) | 6;
 }
 
 void DefaultAffectHandler::setSkill( SkillPointer skill )

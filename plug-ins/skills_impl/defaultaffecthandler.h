@@ -17,6 +17,8 @@ public:
     
     DefaultAffectHandler( );
 
+    virtual long long getID() const;
+
     virtual void setSkill( SkillPointer );
     virtual void unsetSkill( );
     virtual SkillPointer getSkill( ) const;

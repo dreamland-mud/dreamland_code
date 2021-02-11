@@ -68,10 +68,16 @@ void BasicSkill::loaded( )
 
     if (spell)
         FeniaSpellHelper::linkWrapper(*spell);
+
+    if (affect)
+        FeniaSpellHelper::linkWrapper(*affect);
 }
 
 void BasicSkill::unloaded( )
 {
+    if (affect)
+        FeniaSpellHelper::extractWrapper(*affect);
+
     if (spell)
         FeniaSpellHelper::extractWrapper(*spell);
 

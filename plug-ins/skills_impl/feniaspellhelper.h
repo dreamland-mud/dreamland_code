@@ -12,6 +12,8 @@ class Spell;
 class Character;
 class SpellTarget;
 class DefaultSpell;
+class AffectHandler;
+
 class FeniaSpellContext : public Scripting::NativeImpl<FeniaSpellContext>,
                           public Scripting::NativeHandler,
                           public XMLVariableContainer
@@ -48,6 +50,8 @@ class FeniaSpellHelper {
 public:
     static void linkWrapper(Spell *);
     static void extractWrapper(Spell *);
+    static void linkWrapper(AffectHandler *);
+    static void extractWrapper(AffectHandler *);
 
     static bool executeSpell(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
     static bool spellHasTrigger(Spell *spell, const DLString &trigName);

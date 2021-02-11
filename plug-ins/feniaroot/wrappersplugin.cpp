@@ -15,6 +15,7 @@
 #include "objindexwrapper.h"
 #include "areaindexwrapper.h"
 #include "spellwrapper.h"
+#include "affecthandlerwrapper.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -78,10 +79,16 @@ WrappersPlugin::linkTargets()
     for (int sn = 0; sn < skillManager->size(); sn++) {
         Skill *skill = skillManager->find(sn);
         Spell::Pointer spell = skill->getSpell();
-
+        AffectHandler::Pointer ah = skill->getAffect();
+        
         if (spell && spell->wrapper) {
             LogStream::sendNotice() << "Fenia spell: setting target for " << skill->getName() << endl;
             wrapper_cast<SpellWrapper>(spell->wrapper)->setTarget(*spell);
+        }
+
+        if (ah && ah->wrapper) {
+            LogStream::sendNotice() << "Fenia affect handler: setting target for " << skill->getName() << endl;
+            wrapper_cast<AffectHandlerWrapper>(ah->wrapper)->setTarget(*ah);
         }
     }
 }
@@ -97,6 +104,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<ObjIndexWrapper>( );
     Class::regMoc<AreaIndexWrapper>( );
     Class::regMoc<SpellWrapper>( );
+    Class::regMoc<AffectHandlerWrapper>( );
     Class::regMoc<AffectWrapper>( );
     Class::regMoc<CommandWrapper>( );
     Class::regMoc<TablesWrapper>( );
@@ -147,6 +155,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
     traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);
     traitsAPIJson<SpellWrapper>("spell", apiDump, false);
+    traitsAPIJson<AffectHandlerWrapper>("affecthandler", apiDump, false);
     traitsAPIJson<FeniaSpellContext>("spellcontext", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
 
@@ -181,6 +190,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<AffectWrapper>( );
     Class::unregMoc<AreaIndexWrapper>( );
     Class::unregMoc<SpellWrapper>( );
+    Class::unregMoc<AffectHandlerWrapper>( );
     Class::unregMoc<ObjIndexWrapper>( );
     Class::unregMoc<MobIndexWrapper>( );
     Class::unregMoc<CharacterWrapper>( );

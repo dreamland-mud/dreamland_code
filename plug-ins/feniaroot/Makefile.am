@@ -31,6 +31,7 @@ affectwrapper.cpp \
 structwrappers.cpp \
 areaindexwrapper.cpp \
 spellwrapper.cpp \
+affecthandlerwrapper.cpp \
 feniaspellext.cpp \
 wrap_utils.cpp \
 pluginwrapperimpl.cpp \
@@ -50,6 +51,7 @@ tableswrapper.h \
 mobindexwrapper.h \
 areaindexwrapper.h \
 spellwrapper.h \
+affecthandlerwrapper.h \
 characterwrapper.h 
 
 

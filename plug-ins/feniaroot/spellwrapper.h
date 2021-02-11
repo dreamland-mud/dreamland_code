@@ -2,7 +2,6 @@
 #define SPELLWRAPPER_H
 
 #include "xmlvariablecontainer.h"
-#include "xmlinteger.h"
 // MOC_SKIP_BEGIN
 #include "exceptions.h"
 // MOC_SKIP_END

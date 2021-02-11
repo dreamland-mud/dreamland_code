@@ -23,6 +23,8 @@ public:
     
     virtual ~AffectHandler( );
 
+    virtual long long getID() const = 0;
+
     virtual void remove( Character * ); 
     virtual void remove( Object * ); 
     virtual void remove( Room * ); 

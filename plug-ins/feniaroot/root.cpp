@@ -45,6 +45,7 @@
 #include "objindexwrapper.h"
 #include "areaindexwrapper.h"
 #include "spellwrapper.h"
+#include "affecthandlerwrapper.h"
 #include "wrappermanager.h"
 #include "affectwrapper.h"
 #include "tableswrapper.h"
@@ -1070,6 +1071,16 @@ NMI_INVOKE( Root, Spell , "(name): находит заклинание с зад
         throw Scripting::Exception("Spell not found");
 
     return WrapperManager::getThis( )->getWrapper(skill->getSpell().getPointer());
+}
+
+
+NMI_INVOKE( Root, AffectHandler , "(name): находит обработчик аффекта с заданным именем")
+{
+    Skill *skill = args2skill(args);
+    if (!skill || !skill->getAffect())
+        throw Scripting::Exception("AffectHandler not found");
+
+    return WrapperManager::getThis( )->getWrapper(skill->getAffect().getPointer());
 }
 
 
