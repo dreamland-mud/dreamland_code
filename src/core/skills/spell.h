@@ -21,7 +21,6 @@ class Spell: public virtual SkillAction, public WrapperTarget, public virtual XM
 public:
     typedef ::Pointer<Spell> Pointer;
     
-    Spell();
     virtual ~Spell( );
 
     virtual long long getID() const = 0;

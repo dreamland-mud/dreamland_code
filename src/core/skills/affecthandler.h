@@ -9,13 +9,14 @@
 
 #include "xmlpolymorphvariable.h"
 #include "skillaction.h"
+#include "wrappertarget.h"
 
 class Affect;
 class Character;
 class Object;
 class Room;
 
-class AffectHandler : public virtual SkillAction, public virtual XMLPolymorphVariable 
+class AffectHandler : public virtual SkillAction, public WrapperTarget, public virtual XMLPolymorphVariable 
 {
 public:
     typedef ::Pointer<AffectHandler> Pointer;
