@@ -17,6 +17,7 @@
 class RegExp : public virtual DLObject {
 public:
     typedef std::vector<DLString> MatchVector;
+    typedef ::Pointer<RegExp> Pointer;
 
     struct Exception : public ::Exception 
     { 

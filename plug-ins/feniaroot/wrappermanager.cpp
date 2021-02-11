@@ -2,8 +2,6 @@
  *
  * ruffina, 2004
  */
-#include <filesystem>
-
 #include "wrappermanager.h"
 #include "characterwrapper.h"
 #include "objectwrapper.h"
@@ -13,13 +11,8 @@
 #include "areaindexwrapper.h"
 #include "spellwrapper.h"
 #include "subr.h"
-#include "codesource.h"
-
 #include "fenia/register-impl.h"
 
-#include "iconvmap.h"
-#include "util/regexp.h"
-#include "dlfilestream.h"
 #include "class.h"
 #include "spell.h"
 #include "skill.h"
@@ -31,8 +24,6 @@
 #include "def.h"
 
 using namespace Scripting;
-namespace fs = std::filesystem;
-static IconvMap koi2utf("koi8-r", "utf-8");
 
 void WrapperManager::initialization( )
 {
@@ -42,30 +33,6 @@ void WrapperManager::initialization( )
 void WrapperManager::destruction( )
 {
     FeniaManager::wrapperManager.clear( );
-}
-
-void WrapperManager::save(CodeSource &cs) 
-{
-    static RegExp spellPattern("^(spell/[a-z ]{2,})/(run[a-zA-Z]+)$", true);
-    RegExp::MatchVector matches = spellPattern.subexpr(cs.name.c_str());
-    if (matches.empty())
-        return;
-
-    DLString folderName = matches.at(0);
-    DLString fileName = matches.at(1);
-
-    fs::path path = dreamland->getTableDir().getAbsolutePath().c_str();
-    path /= "fenia.local";
-    path /= folderName.c_str();
-    fs::create_directories(path);
-
-    path /= fileName.c_str();
-    ofstream os(path);
-    os << koi2utf(cs.content);
-
-    if (!os) {
-        LogStream::sendSystem() << "Error saving codesource " << cs.name << endl;
-    }
 }
 
 WrapperManager * WrapperManager::getThis( )

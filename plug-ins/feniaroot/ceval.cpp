@@ -14,6 +14,7 @@
 #include "comm.h"
 #include "merc.h"
 
+#include "codesourcerepo.h"
 #include "characterwrapper.h"
 #include "wrappersplugin.h"
 #include "wrappermanager.h"
@@ -118,7 +119,7 @@ RPCRUN(cs_eval)
             cs.content = body;
             cs.eval(thiz);
 
-            WrapperManager::save(cs);
+            CodeSourceRepo::getThis()->save(cs);
         
         } catch (const ::Exception &e) {
             ch->send_to( e.what( ) );

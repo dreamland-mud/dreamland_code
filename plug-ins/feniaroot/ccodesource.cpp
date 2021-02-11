@@ -15,6 +15,7 @@
 #include "dlfilestream.h"
 #include "dldirectory.h"
 
+#include "codesourcerepo.h"
 #include "fenia/register-impl.h"
 #include "fenia/codesource.h"
 #include "xmlattributecodesource.h"
@@ -26,6 +27,7 @@
 #include "act.h"
 #include "mudtags.h"
 #include "websocketrpc.h"
+#include "arg_utils.h"
 #include "dl_match.h"    
 #include "dl_ctype.h"
 #include "dl_strings.h"
@@ -223,9 +225,19 @@ CMDADM( codesource )
         return;
     }
     
-    if(cmd.strPrefix("write")) {
+    if(cmd.strPrefix("write") || cmd.strPrefix("save")) {
         if (!pch->isCoder( )) {
             ch->send_to( "Check your privilege.\r\n");
+            return;
+        }
+
+        if (args.empty()) {
+            ch->println("Please specify codesource number, subj or 'all'.");
+            return;
+        }
+        
+        if (arg_is_all(args)) {
+            CodeSourceRepo::getThis()->saveAll();
             return;
         }
 

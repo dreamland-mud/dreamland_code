@@ -33,7 +33,8 @@ areaindexwrapper.cpp \
 spellwrapper.cpp \
 feniaspellext.cpp \
 wrap_utils.cpp \
-pluginwrapperimpl.cpp
+pluginwrapperimpl.cpp \
+codesourcerepo.cpp
 
 libfeniaroot_la_MOC = \
 root.h \
