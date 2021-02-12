@@ -2523,26 +2523,11 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     if (showName)
         buf << "Взаимодействует по именам: '{W" << obj->getName( ) << "{x'" << endl;
 
-    lim = obj->pIndexData->limit;
-    if (lim != -1 && lim < 100)
-        buf << "{RТаких вещей в мире может быть не более {W" << lim << "{x!" << endl;
-
-    if (obj_is_special(obj))
-        buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
-
-    if (obj->timer != 0)
-        buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
-
     if (obj->weight >= 10)
         buf << "Весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
     else
         buf << "Ничего не весит";
 
-    if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
-        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
-        return;
-    }
-    
     buf << ", ";
     
     if (obj->cost)
@@ -2557,6 +2542,21 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     buf << endl;
 
+    lim = obj->pIndexData->limit;
+    if (lim != -1 && lim < 100)
+        buf << "{RТаких вещей в мире может быть не более {W" << lim << "{x!" << endl;
+
+    if (obj_is_special(obj))
+        buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
+
+    if (obj->timer != 0)
+        buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
+
+    if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
+        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
+        return;
+    }
+    
     bitstring_t extra = obj->extra_flags;
     REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
     if (extra)

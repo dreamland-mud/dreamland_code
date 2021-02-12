@@ -39,6 +39,7 @@
 #include "act_move.h"
 #include "act_lock.h"
 #include "attacks.h"
+#include "occupations.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -558,30 +559,19 @@ SKILL_RUNP( lore )
       return;
     }
 
-  if (!gsn_lore->usable( ch ) || learned < 10)
+  if (!gsn_lore->usable( ch ) || learned < 2)
     {
       ch->send_to("Ты недостаточно хорошо знаешь легенды.\n\r");
       return;
     }
 
 
-  if (learned >= 10)
+  if (learned >= 2)
     {
-      buf << "{W" << obj->getShortDescr( '1' ).upperFirstCharacter() << "{x";
-    }
+      buf << "{W" << obj->getShortDescr( '1' ).upperFirstCharacter() << "{x"
+          << " -- это {W" << item_table.message(obj->item_type )
+          << " " << obj->level << "{x уровня";
 
-  if (learned >= 20)
-    {
-      buf << " -- это {W" << item_table.message(obj->item_type );
-    }
-
-  if (learned >= 30)
-    {
-      buf << " " << obj->level << "{x уровня";
-    }
-
-  if (learned >= 40)
-    {
       for (int i = 0; i < wearlocationManager->size( ); i++) {
         Wearlocation *loc = wearlocationManager->find( i );
         if (loc->matches( obj ) && !loc->getPurpose().empty() && !(obj->item_type == ITEM_WEAPON && IS_SET(obj->wear_flags, ITEM_WIELD)) ) {
@@ -591,40 +581,12 @@ SKILL_RUNP( lore )
       }
       buf << "." << endl
           << "Взаимодействует по именам: '{W" << obj->getName( ) << "{x'" << endl;   
-    }
-
-  if (learned >= 50)
-    {
-      int lim = obj->pIndexData->limit;
-
-      if (lim != -1 && lim < 100)
-        buf << (learned >= 80 ? fmt(0,"{RТаких вещей в мире может быть не более {W%d{x!\r\n", lim) : "{RВещь, похоже, редкая{x.\r\n");
-   
-      if (obj->timer != 0)
-        buf << (learned >= 80 ? fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer): "{WЭтот предмет скоро исчезнет.{x\r\n");
 
       if (obj->weight >= 10)
         buf << "Весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
       else
-        buf << "Ничего не весит";     
+        buf << "Ничего не весит";
 
-      if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
-        if(learned >= 90)
-        {
-          buf << endl;
-          oprog_lore(obj, ch);
-        }
-
-        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
-        ch->mana -= mana;
-        gsn_lore->improve( ch, true );
-        ch->send_to(buf.str().c_str());
-        return;
-      }
-    }
-  
-  if (learned >= 60)
-    {
       buf << ", ";
 
       if (obj->cost)
@@ -639,17 +601,45 @@ SKILL_RUNP( lore )
 
       buf << endl;
     }
-  
-  if (learned >= 70)
+
+  if (learned >= 50)
     {
-      bitstring_t extra = obj->extra_flags; /* TODO different flags on diff lore levels */
+      int lim = obj->pIndexData->limit;
+
+      if (lim != -1 && lim < 100)
+        buf << (learned >= 80 ? fmt(0,"{RТаких вещей в мире может быть не более {W%d{x!\r\n", lim) : "{RВещь, похоже, редкая{x.\r\n");
+
+      if (learned < 90 && obj_is_special(obj))
+        buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;
+
+      if (obj->timer != 0)
+        buf << (learned >= 80 ? fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer): "{WЭтот предмет скоро исчезнет.{x\r\n");
+   
+      if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
+        if(learned >= 90)
+        {
+          buf << endl;
+          oprog_lore(obj, ch);
+        }
+
+        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
+        ch->mana -= mana;
+        gsn_lore->improve( ch, true );
+        ch->send_to(buf.str().c_str());
+        return;
+      }
+    }  
+ 
+  if (learned >= 60)
+    {
+      bitstring_t extra = obj->extra_flags;
       REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
 
       if (extra)
         buf << "Особые свойства: " << extra_flags.messages(extra, true ) << endl;
     }
 
-  if (learned >= 75)
+  if (learned >= 70)
     {  
     Liquid *liquid;
     switch (obj->item_type) {
@@ -791,9 +781,6 @@ SKILL_RUNP( lore )
           for (auto &paf: obj->affected)
             lore_fmt_affect( obj, paf, buf );
     }
-
-  //add missing endl for incomplete info
-  if (learned < 40 || (learned >=50 && learned < 60) ) buf << endl;
 
   ch->mana -= mana;
   gsn_lore->improve( ch, true );
