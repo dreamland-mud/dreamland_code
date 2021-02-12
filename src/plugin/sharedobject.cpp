@@ -208,7 +208,12 @@ void XMLSharedObject::load( )
     for (i = depends.begin( ); i != depends.end( ); i++)
         use( PluginManager::getThis( )->load( i->getValue( ) ) );
 
-    loadSO( );
+    try {
+        loadSO( );
+    } catch (const std::exception &ex) {
+        LogStream::sendFatal() << "Exception loading [" << name << "]: " << ex.what() << endl;
+        throw ex;
+    }
 }
 
 void XMLSharedObject::unload( ) 
@@ -220,7 +225,12 @@ void XMLSharedObject::unload( )
         usedBy.pop_front( );
     }
 
-    unloadSO( );
+    try {
+        unloadSO( );
+    } catch (const std::exception &ex) {
+        LogStream::sendFatal() << "Exception unloading [" << name << "]: " << ex.what() << endl;
+        throw ex;
+    }
 }
 
 void XMLSharedObject::use( XMLSharedObject &so ) 
