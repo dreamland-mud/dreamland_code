@@ -93,6 +93,8 @@ SKILL_RUNP( tail )
         act_p("{YТвой хвост не достает $C4 из-за защитного поля.{x", ch, 0, victim, TO_CHAR,POS_FIGHTING);
         act_p("{YХвост $c2 не достает тебя из-за защитного поля.{x", ch, 0, victim,TO_VICT,POS_FIGHTING);
         act_p("{YХвост $c2 не достает $C4.{x", ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+
+        ch->setWait( gsn_tail->getBeats( ) );
         return;
     }
 
