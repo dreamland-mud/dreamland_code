@@ -613,7 +613,6 @@ SKILL_RUNP( lore )
         {
           buf << endl;
           oprog_lore(obj, ch);
-          gsn_lore->improve( ch, true );
         }
 
         buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
@@ -800,11 +799,7 @@ SKILL_RUNP( lore )
   gsn_lore->improve( ch, true );
   ch->send_to(buf.str().c_str());
 
-  if (learned >= 90)
-  {
-    oprog_lore(obj, ch);
-    gsn_lore->improve( ch, true );
-  }
+  if (learned >= 90) oprog_lore(obj, ch);
 
   return;
 }
