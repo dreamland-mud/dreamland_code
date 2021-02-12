@@ -7,7 +7,6 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(srcdir)/../core \
 -I$(srcdir)/../behavior \
--I$(srcdir)/../impl \
 $(INCLUDES_FIGHT) \
 $(INCLUDES_SRC)
 
@@ -23,6 +22,6 @@ clanorgskill.h
 libclan_skill_la_LIBADD = \
 $(LIBADD_FIGHT) \
 ../../skills_impl/libskills_impl.la \
-../impl/libclan_impl.la
+../core/libclan_core.la
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

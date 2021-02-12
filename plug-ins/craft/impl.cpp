@@ -15,7 +15,6 @@
 #include "dl_math.h"
 
 TABLE_LOADER(CraftProfessionLoader, "craft-professions", "CraftProfession");
-TABLE_LOADER(CraftSkillLoader, "craft-skills", "skill");
 TABLE_LOADER(CraftWearlocLoader, "craft-wearlocs", "Wearlocation");
 
 AFFECT_DECL(RemoveTattoo);
@@ -56,7 +55,6 @@ extern "C"
         Plugin::registerPlugin<CraftProfessionRegistrator>( ppl );
         Plugin::registerPlugin<CraftProfessionLoader>( ppl );
         Plugin::registerPlugin<MocRegistrator<CraftSkill> >( ppl );
-        Plugin::registerPlugin<CraftSkillLoader>( ppl );
         Plugin::registerPlugin<MocRegistrator<CraftTattooWearloc> >( ppl );
         Plugin::registerPlugin<CraftWearlocLoader>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCraft> >( ppl );

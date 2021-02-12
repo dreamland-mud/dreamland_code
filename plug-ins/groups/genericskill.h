@@ -30,7 +30,6 @@ class XMLSkillParents;
 class GenericSkill : public BasicSkill 
 {
 XML_OBJECT
-friend class GenericSkillLoader;
 friend class XMLSkillParents;
 public:
     typedef ::Pointer<GenericSkill> Pointer;
@@ -61,6 +60,7 @@ public:
     }
 
     bool isProfessional() const;
+    inline const Classes & getClasses() const { return classes; }
 
     virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
     virtual DLString accessToString() const;

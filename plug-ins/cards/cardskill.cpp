@@ -3,7 +3,6 @@
  * ruffina, 2005
  */
 #include "cardskill.h"
-#include "cardskillloader.h"                                                    
 #include "mobiles.h"
 #include "xmlattributecards.h"
 

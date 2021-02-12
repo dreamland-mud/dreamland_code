@@ -1,8 +1,7 @@
 lib_LTLIBRARIES = \
 libgenericskill.la \
 libgroup_skills.la \
-libclass_skills.la \
-libgenericskill_loader.la 
+libclass_skills.la 
 
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
@@ -34,7 +33,6 @@ libgenericskill_la_LIBADD = \
 ../fight_core/libfight_core.la \
 ../fight/libfight.la \
 ../wearlocation/libwearlocation.la \
-../feniaroot/libfeniaroot.la \
 ../skills_impl/libskills_impl.la 
 
 libgroup_skills_la_SOURCES = \
@@ -105,14 +103,6 @@ $(libgroup_skills_la_LIBADD) \
 ../services/core/libservices_core.la \
 ../services/shop/libservices_shop.la 
 
-libgenericskill_loader_la_SOURCES = \
-genericskillloader.cpp
-
-libgenericskill_loader_la_LIBADD = \
-$(libgroup_skills_la_LIBADD) \
-libgroup_skills.la \
-libclass_skills.la \
-../druids/libdruids.la
 
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

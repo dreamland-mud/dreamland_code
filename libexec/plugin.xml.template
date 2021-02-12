@@ -21,7 +21,6 @@
 	<node>mlove</node>
 	<node>cards</node>
 	<node>learn</node>
-	<node>genericskill_loader</node>	
 	<node>race_skills</node>
 	<node>race_aptitude</node>
 	<node>magic</node>
@@ -58,4 +57,5 @@
 	<node>bonus</node>
 	<node>searcher</node>
 	<node>other_skills</node>
+	<node>skills_loader</node>
 </PluginManager>

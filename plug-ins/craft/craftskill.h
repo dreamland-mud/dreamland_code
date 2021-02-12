@@ -12,7 +12,6 @@ class CraftProfessionInfo;
 
 class CraftSkill : public BasicSkill {
 XML_OBJECT
-friend class CraftSkillLoader;
 public:
     typedef ::Pointer<CraftSkill> Pointer;
     typedef XMLMapBase<CraftProfessionInfo> CraftProfessions;

@@ -4,13 +4,10 @@
  */
 
 #include "so.h"
-#include "dlxmlloader.h"
-#include "xmltableloaderplugin.h"
 #include "mocregistrator.h"
 
 #include "raceaptitude.h"
 
-TABLE_LOADER(RaceAptitudeLoader, "race-aptitudes", "skill");
 
 extern "C"
 {
@@ -19,7 +16,6 @@ extern "C"
                 SO::PluginList ppl;
                 
                 Plugin::registerPlugin<MocRegistrator<RaceAptitude> >( ppl );
-                Plugin::registerPlugin<RaceAptitudeLoader>( ppl );
                 
                 return ppl;
         }

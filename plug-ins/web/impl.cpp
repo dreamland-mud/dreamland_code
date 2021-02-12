@@ -14,6 +14,7 @@
 #include "descriptor.h"
 #include "descriptorstatelistener.h"
 #include "quest.h"
+#include "genericskill.h"
 #include "pcharactermanager.h"
 #include "commandmanager.h"
 #include "commonattributes.h"
@@ -990,6 +991,7 @@ public:
 
         dumpSkills();
         dumpCommands();
+        dumpClassSkills();
     }
 
     void dumpSkills() 
@@ -1098,6 +1100,57 @@ public:
             LogStream::sendError() << ex.what() << endl;
         }
     }
+
+    /** Create a CSV file with all class skills and their levels. */
+    void dumpClassSkills()
+    {
+        ostringstream buf;
+        StringList profs;
+        
+        // Header: name,warrior,cleric,witch,...
+        for (int i = 0; i < professionManager->size( ); i++) {
+            Profession *prof = professionManager->find( i );
+            if (prof->isValid( ) && prof->isPlayed( ) 
+                && prof->getName() != "druid")
+            {
+                profs.push_back(prof->getName());
+            }
+        }
+        buf << "name,group," << profs.join(",") << endl;
+
+        // Body: armor,,1,1,...
+        for (int sn = 0; sn < skillManager->size(); sn++) {
+            Skill *s = skillManager->find(sn);
+            GenericSkill *skill = dynamic_cast<GenericSkill *>(s);
+
+            if (!skill || skill->getClasses().empty())
+                continue;
+
+            ostringstream levels;
+            bool found = false;
+
+            for (auto &profName : profs) {
+                Profession *prof = professionManager->find( profName );
+                const auto &c = skill->getClasses().find(prof->getName());
+                if (c != skill->getClasses().end()) {
+                    levels << "," << c->second.getLevel();
+                    found = true;
+                }
+                else
+                    levels << ",";
+            }
+
+            if (found)
+                buf << skill->getName() << "," << skill->getGroups().toString() << levels.str() << endl;
+        }
+
+        try {
+            DLFileStream( "/tmp/class_skills.csv" ).fromString( buf.str( ) );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
+        }
+    }
+
 };    
 
 /**

@@ -258,6 +258,7 @@ plug-ins/craft/Makefile \
 plug-ins/gmcp/Makefile \
 plug-ins/bonus/Makefile \
 plug-ins/searcher/Makefile \
+plug-ins/skills_loader/Makefile \
 )
 
 echo ""

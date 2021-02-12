@@ -4,14 +4,10 @@
  */
 
 #include "so.h"
-#include "dlxmlloader.h"
-#include "xmltableloaderplugin.h"
 #include "mocregistrator.h"
 
 #include "clanskill.h"
 #include "clanorgskill.h"
-
-TABLE_LOADER(ClanSkillLoader, "clan-skills", "skill");
 
 extern "C"
 {
@@ -21,7 +17,6 @@ extern "C"
         
         Plugin::registerPlugin<MocRegistrator<ClanSkill> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ClanOrgSkill> >( ppl );
-        Plugin::registerPlugin<ClanSkillLoader>( ppl );
         
         return ppl;
     }

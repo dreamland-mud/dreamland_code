@@ -3,7 +3,6 @@
  * ruffina, 2004
  */
 #include "genericskill.h"
-#include "genericskillloader.h"
 
 #include "logstream.h"
 #include "stringlist.h"

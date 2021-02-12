@@ -5,6 +5,7 @@
 #include "logstream.h"
 #include "so.h"
 #include "date.h"
+#include "mocregistrator.h"
 
 #include "skillcommandtemplate.h"
 #include "spelltemplate.h"
@@ -18,7 +19,7 @@
 #include "mobiles.h"
 #include "objects.h"
 #include "ccard.h"
-#include "cardskillloader.h"
+#include "cardskill.h"
 
 #include "save.h"
 #include "mercdb.h"
@@ -96,6 +97,7 @@ extern "C"
     SO::PluginList initialize_cards( ) {
         SO::PluginList ppl;
         
+        Plugin::registerPlugin<MocRegistrator<CardSkill> >( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCards> >( ppl );
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<CardStarterBehavior> >( ppl );
@@ -107,7 +109,6 @@ extern "C"
 
         Plugin::registerPlugin<CCard>( ppl );
 
-        Plugin::registerPlugin<CardSkillLoader>( ppl );
         Plugin::registerPlugin<CardStartersRefresh>( ppl );
         
         return ppl;

@@ -19,7 +19,6 @@ class SkillClanInfo;
 
 class ClanSkill : public BasicSkill {
 XML_OBJECT
-friend class ClanSkillLoader;
 public:
     typedef ::Pointer<ClanSkill> Pointer;
     typedef XMLMapBase<SkillClanInfo> Clans;

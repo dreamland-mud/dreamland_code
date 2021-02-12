@@ -59,5 +59,6 @@ riding \
 web \
 gmcp \
 olc \
-searcher
+searcher \
+skills_loader
 

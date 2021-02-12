@@ -16,7 +16,6 @@ $(LIBADD_AI) \
 libcards_la_SOURCES = \
 ccard.cpp \
 cardskill.cpp \
-cardskillloader.cpp \
 mobiles.cpp \
 objects.cpp \
 skills.cpp \
@@ -26,7 +25,6 @@ impl.cpp
 libcards_la_MOC = \
 ccard.h \
 cardskill.h \
-cardskillloader.h \
 mobiles.h \
 objects.h \
 xmlattributecards.h

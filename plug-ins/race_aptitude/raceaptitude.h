@@ -17,7 +17,6 @@ class SkillRaceInfo;
 
 class RaceAptitude : public BasicSkill {
 XML_OBJECT
-friend class RaceAptitudeLoader;
 public:
     typedef ::Pointer<RaceAptitude> Pointer;
     typedef XMLMapBase<SkillRaceInfo> Races;
