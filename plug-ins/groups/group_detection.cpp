@@ -532,10 +532,7 @@ SKILL_RUNP( lore )
 {
   char arg1[MAX_INPUT_LENGTH];
   Object *obj;
-  char buf[MAX_STRING_LENGTH];
-  int chance;
-  int value0, value1, value2, value3;
-  int weightrandom;
+  ostringstream buf;
   int mana, learned;
   Keyhole::Pointer keyhole;
 
@@ -567,422 +564,248 @@ SKILL_RUNP( lore )
       return;
     }
 
-        ostringstream wearloc;
-        for (int i = 0; i < wearlocationManager->size( ); i++) {
+
+  if (learned >= 10)
+    {
+      buf << "{W" << obj->getShortDescr( '1' ).upperFirstCharacter() << "{x";
+    }
+
+  if (learned >= 20)
+    {
+      buf << " -- это {W" << item_table.message(obj->item_type );
+    }
+
+  if (learned >= 30)
+    {
+      buf << " " << obj->level << "{x уровня";
+    }
+
+  if (learned >= 40)
+    {
+      for (int i = 0; i < wearlocationManager->size( ); i++) {
         Wearlocation *loc = wearlocationManager->find( i );
         if (loc->matches( obj ) && !loc->getPurpose().empty() && !(obj->item_type == ITEM_WEAPON && IS_SET(obj->wear_flags, ITEM_WIELD)) ) {
-            wearloc << ", " << loc->getPurpose( ).toLower( );
+            buf << ", " << loc->getPurpose( ).toLower( );
             break;
            }
-        }
+      }
+      buf << "." << endl
+          << "Взаимодействует по именам: '{W" << obj->getName( ) << "{x'" << endl;   
+    }
 
-        if ( IS_SET(obj->extra_flags, ITEM_NOIDENT) )
+  if (learned >= 50)
+    {
+      int lim = obj->pIndexData->limit;
+
+      if (lim != -1 && lim < 100)
+        buf << (learned >= 80 ? fmt(0,"{RТаких вещей в мире может быть не более {W%d{x!\r\n", lim) : "{RВещь, похоже, редкая{x.\r\n");
+   
+      if (obj->timer != 0)
+        buf << (learned >= 80 ? fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer): "{WЭтот предмет скоро исчезнет.{x\r\n");
+
+      if (obj->weight >= 10)
+        buf << "Весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
+      else
+        buf << "Ничего не весит";     
+
+      if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
+        if(learned >= 90)
         {
-                sprintf( buf,"{G%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s.\n\r",
-                        obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
-                        item_table.message(obj->item_type).c_str( ),
-                        obj->level,
-                        wearloc.str().empty() ? "" : wearloc.str().c_str(),
-                        obj->getName( ),
-                        obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит");
-                ch->send_to(buf);
-            
-                if (obj->timer != 0){
-                  if(learned < 85){
-                    sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
-                    ch->send_to(buf);
-                  }
-                  else{
-                    ch->send_to(fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer));
-                  }
-                }
-
-                ch->send_to("\n\rБолее про эту вещь невозможно ничего сказать.\n\r");
-                return;
+          buf << endl;
+          oprog_lore(obj, ch);
+          gsn_lore->improve( ch, true );
         }
 
-  /* a random lore */
-  chance = number_percent();
-  weightrandom = number_range(1, 2 * obj->weight) / 10;
-
-    bitstring_t extra = obj->extra_flags; /* TODO different flags on diff lore levels */
-    REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
-
-  if (learned < 20)
-    {
-      sprintf( buf, "{W%s{x.\n\rВзаимодействует по именам: '{W%s{x'\n\r",
-                     obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
-                     obj->getName( ));
-      ch->send_to(buf);
-
-      if (obj->timer != 0){
-      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
-      ch->send_to(buf);
+        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
+        ch->mana -= mana;
+        gsn_lore->improve( ch, true );
+        ch->send_to(buf.str().c_str());
+        return;
       }
-      ch->mana -= mana;
-      gsn_lore->improve( ch, true );
-      return;
+    }
+  
+  if (learned >= 60)
+    {
+      buf << ", ";
+
+      if (obj->cost)
+        buf << "стоит {W" << obj->cost << "{x серебра";
+      else
+        buf << "ничего не стоит";
+
+      // XXX 'изготовлено из' + падежи
+      const char *mat = obj->getMaterial( );
+      if (mat && strcmp( mat, "none" ) && strcmp( mat, "oldstyle" ))
+          buf << ", материал {W" << mat << "{x";
+
+      buf << endl;
+    }
+  
+  if (learned >= 70)
+    {
+      bitstring_t extra = obj->extra_flags; /* TODO different flags on diff lore levels */
+      REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
+
+      if (extra)
+        buf << "Особые свойства: " << extra_flags.messages(extra, true ) << endl;
     }
 
-  else if (learned < 40)
-    {
-      sprintf( buf,
-          "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\r",
-              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
-              item_table.message(obj->item_type).c_str( ),
-              chance < 60 ? obj->level : number_range(1, 2 * obj->level),
-              wearloc.str().empty() ? "" : wearloc.str().c_str(),
-              obj->getName( ),
-              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", (chance < 60 ? obj->weight / 10 : weightrandom ), GET_COUNT((chance < 60 ? obj->weight / 10 : weightrandom), "т", "та", "тов")).c_str()) : "Ничего не весит,",
-              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",(chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost)).c_str()) : "ничего не стоит,",
-              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
-              );
-      ch->send_to(buf);
-
-      if (obj->timer != 0){
-      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
-      ch->send_to(buf);
-      }
-
-      ch->mana -= mana;
-      gsn_lore->improve( ch, true );
-      return;
-    }
-
-  else if (learned < 60)
-    {
-      sprintf( buf,
-              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\r",
-              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
-              item_table.message(obj->item_type).c_str( ),
-              chance < 60 ? obj->level : number_range(1, 2 * obj->level),
-              wearloc.str().empty() ? "" : wearloc.str().c_str(),
-              obj->getName( ),
-              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
-              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",(chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost)).c_str()) : "ничего не стоит,",
-              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
-              );
-      ch->send_to(buf);
-
-      if (obj->timer != 0){
-      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
-      ch->send_to(buf);
-      }
-
-      oprog_lore(obj, ch);
-      ch->mana -= mana;
-      gsn_lore->improve( ch, true );
-      return;
-    }
-
-  else if (learned < 80)
-    {
-      
-      sprintf( buf,
-              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\rОсобые свойства: %s.\n\r",
-              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
-              item_table.message(obj->item_type).c_str( ),
-              obj->level,
-              wearloc.str().empty() ? "" : wearloc.str().c_str(),
-              obj->getName( ),
-              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
-              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",(chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost)).c_str()) : "ничего не стоит,",
-              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown",
-              extra_flags.messages( extra, true ).c_str( )
-              );
-      ch->send_to(buf);
-
-      if (obj->timer != 0){
-      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
-      ch->send_to(buf);
-      }
-
-      oprog_lore(obj, ch);
-      
-      ch->mana -= mana;
-      gsn_lore->improve( ch, true );
-      return;
-    }
-
-  else if (learned < 85)
-    {
-      sprintf( buf,
-              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\rОсобые свойства: %s.\n\r",
-              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
-              item_table.message(obj->item_type).c_str( ),
-              obj->level,
-              wearloc.str().empty() ? "" : wearloc.str().c_str(),
-              obj->getName( ),
-              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
-              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",obj->cost).c_str()) : "ничего не стоит,",
-              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown",
-              extra_flags.messages( extra, true ).c_str( )
-              );
-      ch->send_to(buf);
-
-      if (obj->timer != 0){
-      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
-      ch->send_to(buf);
-      }
-
-    }
-  else
-    {
-      sprintf( buf,
-              "{W%s{x - это {W%s %d{x уровня%s.\n\rВзаимодействует по именам: '{W%s{x'\n\r%s %s материал {W%s{x.\n\rОсобые свойства: %s.\n\r",
-              obj->getShortDescr( '1' ).upperFirstCharacter().c_str(),
-              item_table.message(obj->item_type).c_str( ),
-              obj->level,
-              wearloc.str().empty() ? "" : wearloc.str().c_str(),
-              obj->getName( ),
-              obj->weight >= 10 ? (fmt(0,"Весит {W%d {xфун%s,", obj->weight / 10 , GET_COUNT(obj->weight/10, "т", "та", "тов")).c_str()) : "Ничего не весит,",
-              obj->cost ? (fmt(0,"стоит {W%d {xсеребра,",obj->cost).c_str()) : "ничего не стоит,",
-              str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown",
-              extra_flags.messages( extra, true ).c_str( )
-              );
-      ch->send_to(buf);
-
-      if (obj->timer != 0){
-      ch->send_to(fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer));
-      }
-
-    }
-
-  ch->mana -= mana;
-
-  value0 = obj->value0();
-  value1 = obj->value1();
-  value2 = obj->value2();
-  value3 = obj->value3();
-
-  switch ( obj->item_type )
-    {
+  if (learned >= 75)
+    {  
+    Liquid *liquid;
+    switch (obj->item_type) {
     case ITEM_KEY:
-        if (( keyhole = Keyhole::locate( ch, obj ) )) {
-            ostringstream buf;
-            
-            if (keyhole->doLore( buf ) )
-                ch->send_to( buf );
-        }
+        if (( keyhole = Keyhole::locate( ch, obj ) ))
+            keyhole->doLore( buf );
         break;
     case ITEM_KEYRING:
-        if (learned < 85) 
-            value0 = number_fuzzy( obj->value0() );
-        
-        ch->pecho( "Можно нанизать %1$d клю%1$Iч|ча|чей.", value0 );
+        buf << fmt(0, "Нанизан%1$I|ы|о %1$d ключ%1$I|а|ей из возможных %2$d.", count_obj_in_obj(obj), obj->value0()) << endl;
         break;
     case ITEM_LOCKPICK:
-        if (learned < 85) {
-            value0 = number_fuzzy( obj->value0() );   
-            value1 = number_fuzzy( obj->value1() );
-        }
-        
-        if (value0 == Keyhole::LOCK_VALUE_BLANK) {
-            ch->println( "Это заготовка для ключа или отмычки." );
+        if (obj->value0() == Keyhole::LOCK_VALUE_BLANK) {
+            buf << "Это заготовка для ключа или отмычки." << endl;
         }
         else {
-            if (value0 == Keyhole::LOCK_VALUE_MULTI)
-                ch->send_to( "Открывает любой замок. " );
+            if (obj->value0() == Keyhole::LOCK_VALUE_MULTI)
+                buf << "Открывает любой замок. ";
             else
-                ch->send_to( "Открывает один из видов замков. " );
+                buf << "Открывает один из видов замков. ";
             
-            ch->printf( "Отмычка %s качества.\r\n", 
-                        quality_percent( value1 ).colourStrip( ).ruscase( '2' ).c_str( ) );
+            buf << "Отмычка " 
+                << quality_percent( obj->value1() ).colourStrip( ).ruscase( '2' ) 
+                << " качества." << endl;
         }
         break;
-        
     case ITEM_SPELLBOOK:
-        if (learned < 85) {
-            value0 = number_fuzzy( obj->value0() );
-            value1 = number_fuzzy( obj->value1() );
-            value2 = number_range( 1, 100 );
-        }
-        
-        ch->printf( "Страниц: %d из %d. Максимальное качество формул %d%%.\r\n",
-                     value1, value0, value2 ); 
+        buf << "Всего страниц: " << obj->value0() << ", из них использовано: " << obj->value1() << "." << endl
+            << "Максимальное качество заклинаний в книге: " << obj->value2() << "." << endl;
         break;
 
     case ITEM_TEXTBOOK:
-        if (learned < 85) {
-            value0 = number_fuzzy( obj->value0() );
-            value1 = number_fuzzy( obj->value1() );
-            value2 = number_range( 1, 100 );
-        }
-
-        ch->printf( "Страниц: %d из %d. Максимальное качество записей %d%%.\r\n",
-                     value1, value0, value2 ); 
+        buf << "Всего страниц: " << obj->value0() << ", из них использовано: " << obj->value1() << "." << endl
+            << "Максимальное качество записей в учебнике: " << obj->value2() << "." << endl;
         break;
-    
+
     case ITEM_RECIPE:
-        if (learned < 85) {
-            value0 = obj->value0();
-            value2 = number_fuzzy( obj->value2() );
-        }
-
-        ch->printf( "Сложность рецепта: %d. Применяется для создания %s.\r\n",
-                     value2, recipe_flags.messages(value0, true).c_str());
+        buf << "Сложность рецепта: " << obj->value2() << ". " 
+            << "Применяется для создания " << recipe_flags.messages(obj->value0(), true) << "." << endl;
         break;
-        
+
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-      if (learned < 85)
-        {
-          value0 = number_range(1, 60);
-          if (chance > 40) {
-            value1 = number_range(1, (SkillManager::getThis( )->size() - 1));
-            if (chance > 60) {
-              value2 = number_range(1, (SkillManager::getThis( )->size() - 1));
-              if (chance > 80)
-                value3 = number_range(1, (SkillManager::getThis( )->size() - 1));
-            }
-          }
-        }
+        buf << "Заклинания " << obj->value0() << " уровня:";
 
-      sprintf( buf, "Уровень %d заклинания:", obj->value0() );
-      ch->send_to(buf);
-
-      if (value1 >= 0 && value1 < SkillManager::getThis( )->size() && value1 != gsn_none)
-        {
-          ch->send_to(" '");
-          ch->send_to(SkillManager::getThis( )->find(value1)->getNameFor( ch ));
-          ch->send_to("'");
-        }
-
-      if (value2 >= 0 && value2 < SkillManager::getThis( )->size() && value2 != gsn_none)
-        {
-          ch->send_to(" '");
-          ch->send_to(SkillManager::getThis( )->find(value2)->getNameFor( ch ));
-          ch->send_to("'");
-        }
-
-      if (value3 >= 0 && value3 < SkillManager::getThis( )->size() && value3 != gsn_none)
-        {
-          ch->send_to(" '");
-          ch->send_to(SkillManager::getThis( )->find(value3)->getNameFor( ch ));
-          ch->send_to("'");
-        }
-
-      ch->send_to(".\n\r");
-      break;
+        for (int i = 1; i <= 4; i++) 
+            if (( skill = SkillManager::getThis( )->find( obj->valueByIndex(i) ) ))
+                if (skill->getIndex( ) != gsn_none)
+                    buf << " '" << skill->getNameFor( ch ) << "'";
+        
+        buf << endl;
+        break;
 
     case ITEM_WAND:
     case ITEM_STAFF:
-      if (learned < 85)
-        {
-          value0 = number_range(1, 60);
-          if (chance > 40) {
-            value3 = number_range(1, (SkillManager::getThis( )->size() - 1));
-            if (chance > 60) {
-              value2 = number_range(0, 2 * obj->value2());
-              if (chance > 80)
-                value1 = number_range(0, value2);
-            }
-          }
+        buf << "Имеет " << obj->value2() << " заклинани" << GET_COUNT(obj->value2(), "е", "я", "й") << " " 
+            << obj->value0() << " уровня:";
+        
+        if (( skill = SkillManager::getThis( )->find( obj->value3() ) ))
+            if (skill->getIndex( ) != gsn_none)
+                buf << " '" << skill->getNameFor( ch ) << "'";
+
+        buf << endl;
+        break;
+
+    case ITEM_DRINK_CON:
+        liquid = liquidManager->find( obj->value2() );
+        int sips, sipsf;
+        sips = max( 0, obj->value1() / liquid->getSipSize( ) );
+        sipsf = max( 0, obj->value0() / liquid->getSipSize( ) );
+
+        if (sipsf * liquid->getSipSize( ) < obj->value0()) {
+            sipsf +=1;
+            if (obj->value1() > 0) sips +=1;
         }
 
-      sprintf( buf, " %d(%d) заклинаний %d-го уровня",
-              value1, value2, value0 );
-      ch->send_to(buf);
+        if (obj->value1() > 0)
+            buf << "Содержит " 
+                << liquid->getShortDescr( ).ruscase( '4' ) << " "
+                << liquid->getColor( ).ruscase( '2' ) 
+                << " цвета. Осталось " << sips 
+                << " из "  << sipsf << " глотков." << endl;
+        else
+            buf << "Видны следы "
+                << liquid->getShortDescr( ).ruscase( '2' ) << " "
+                << liquid->getColor( ).ruscase( '2' ) << " цвета. " 
+                << fmt(0, "Объем емкости %1$d глот%1$Iок|ка|ков.", sipsf) << endl;
 
-      if (value3 >= 0 && value3 < SkillManager::getThis( )->size() && value3 != gsn_none)
-          {
-            ch->send_to(" '");
-            ch->send_to(SkillManager::getThis( )->find(value3)->getNameFor( ch ));
-            ch->send_to("'");
-          }
+        break;
 
-      ch->send_to(".\n\r");
-      break;
+    case ITEM_CONTAINER:
+        buf << "Вместительность: " << obj->value0() << "  "
+            << "Максим. вес: " << obj->value3() << " фун" << GET_COUNT(obj->value3(), "т", "та", "тов") << " ";
+        
+        if (obj->value4() != 100)
+            buf << " Коэф. снижения веса: " << obj->value4() << "%";
+            
+        if (obj->value1())
+            buf << endl << "Особенности: " << container_flags.messages(obj->value1(), true );
+        
+        buf << endl;
+        break;
 
     case ITEM_WEAPON:
-      ch->send_to("Тип оружия: ");
-      if (learned < 85)
-        {
-          value0 = number_range(0, 8);
-          if (chance > 33) {
-            value1 = number_range(1, 2 * obj->value1());
-            if (chance > 66)
-              value2 = number_range(1, 2 * obj->value2());
-          }
-        }
-
-        ch->printf("%s (%s)\r\n",
-                   weapon_class.message(value0 ).c_str( ),
-                   weapon_class.name( value0 ).c_str( )
-                  );
-
-        sprintf(buf,"Повреждения %dd%d (среднее %d).\n\r",
-                value1,value2, dice_ave(value1, value2));
-      ch->send_to(buf);
-
-      if (learned > 85){
-	      if(obj->value3()) // damage type
-	      {
-	        sprintf(buf,"Тип повреждений: %s.\n\r", attack_table[obj->value3()].noun);
-          ch->send_to(buf);
-	      }
+        buf << "Тип оружия: " 
+            << weapon_class.message(obj->value0() ) << " "
+            << "(" << weapon_class.name( obj->value0() ) << "), ";
+        
+        buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
+            << "(среднее " << weapon_ave(obj) << ")" << endl;
+            
+        if (obj->value3())  /* weapon damtype */
+            buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;            
+    
         if (obj->value4())  /* weapon flags */
-        {
-          sprintf(buf,"Флаги оружия: %s.\n\r",weapon_type2.messages(obj->value4()).c_str( ));
-          ch->send_to(buf);
-        }
-      }
+            buf << "Особенности оружия: " << weapon_type2.messages(obj->value4(), true ) << endl;
 
-      break;
+        break;
 
     case ITEM_ARMOR:
-      if (learned < 85)
-        {
-          if (chance > 25) {
-            value2 = number_range(0, 2 * obj->value2());
-              if (chance > 45) {
-                value0 = number_range(0, 2 * obj->value0());
-                  if (chance > 65) {
-                    value3 = number_range(0, 2 * obj->value3());
-                      if (chance > 85)
-                        value1 = number_range(0, 2 * obj->value1());
-                  }
-              }
-          }
-        }
+        buf << "Класс брони: ";
 
-      sprintf( buf,
-              "Класс защиты: %d укол  %d удар  %d разрезание  %d vs. магия.\n\r",
-              -value0, -value1, -value2, -value3 );
-      ch->send_to(buf);
-      break;
+        for (int i = 0; i <= 3; i++)
+            buf << -obj->valueByIndex(i) << " " << ac_type.message(i )
+                << (i == 3 ? "" : ", ");
+
+        buf << endl;
+        break;
     }
 
-  if (learned < 87)
+    }
+
+  if (learned >= 80)
+    {
+        if (!obj->enchanted)
+          for (auto &paf: obj->pIndexData->affected)
+            lore_fmt_affect( obj, paf, buf );
+
+          for (auto &paf: obj->affected)
+            lore_fmt_affect( obj, paf, buf );
+    }
+
+  //add missing endl for incomplete info
+  if (learned < 40 || (learned >=50 && learned < 60) ) buf << endl;
+
+  ch->mana -= mana;
+  gsn_lore->improve( ch, true );
+  ch->send_to(buf.str().c_str());
+
+  if (learned >= 90)
   {
     oprog_lore(obj, ch);
     gsn_lore->improve( ch, true );
-    return;
   }
 
-  ostringstream ostr;
-
-  if (!obj->enchanted)
-      for (auto &paf: obj->pIndexData->affected)
-          lore_fmt_affect( obj, paf, ostr );
-
-  for (auto &paf: obj->affected)
-          lore_fmt_affect( obj, paf, ostr );
-
-      ch->send_to(ostr);
-
-  // check for limited
-    if ( obj->pIndexData->limit != -1 )
-    {
-        sprintf(buf,
-        "{RОбьектов в мире не более: %d.\n\r{x",
-         obj->pIndexData->limit);
-         ch->send_to(buf);
-    }
-
-  oprog_lore(obj, ch);
-  gsn_lore->improve( ch, true );
   return;
 }
 

@@ -2507,7 +2507,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     
 
     buf << "{W" << obj->getShortDescr( '1' ).upperFirstCharacter() << "{x"
-        << " - это {W" << item_table.message(obj->item_type )
+        << " -- это {W" << item_table.message(obj->item_type )
         << " " << obj->level << "{x уровня";
 
     for (int i = 0; i < wearlocationManager->size( ); i++) {
@@ -2525,7 +2525,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     lim = obj->pIndexData->limit;
     if (lim != -1 && lim < 100)
-        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
+        buf << "{RТаких вещей в мире может быть не более {W" << lim << "{x!" << endl;
 
     if (obj_is_special(obj))
         buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
