@@ -617,10 +617,7 @@ SKILL_RUNP( lore )
    
       if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
         if(learned >= 90)
-        {
-          buf << endl;
           oprog_lore(obj, ch);
-        }
 
         buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
         ch->mana -= mana;
