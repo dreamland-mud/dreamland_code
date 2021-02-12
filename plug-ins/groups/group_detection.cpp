@@ -616,13 +616,14 @@ SKILL_RUNP( lore )
         buf << (learned >= 80 ? fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer): "{WЭтот предмет скоро исчезнет.{x\r\n");
    
       if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
-        if(learned >= 90)
-          oprog_lore(obj, ch);
-
-        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
         ch->mana -= mana;
         gsn_lore->improve( ch, true );
         ch->send_to(buf.str().c_str());
+
+        if(learned >= 90)
+        oprog_lore(obj, ch);
+
+        ch->send_to("\n\rБолее про эту вещь невозможно ничего сказать.\n\r");
         return;
       }
     }  
