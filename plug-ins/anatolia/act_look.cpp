@@ -30,6 +30,7 @@
 #include "behavior_utils.h"
 #include "skill.h"
 #include "affecthandler.h"
+#include "spelltarget.h"
 
 #include "affect.h"
 #include "core/object.h"
@@ -488,9 +489,8 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
 {
 	ostringstream buf;
 		
-    for (auto &paf: room->affected)
-        if (paf->type->getAffect())
-            paf->type->getAffect( )->toStream( buf, paf );
+    for (auto &paf: room->affected.findAllWithHandler())
+        paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, room), paf, buf);
 
     if (!buf.str().empty())
         mainBuf << endl << buf.str();
@@ -1359,7 +1359,7 @@ static void do_look_into( Character *ch, char *arg2 )
 static void afprog_look( Character *looker, Character *victim )
 {
     for (auto &paf: victim->affected.findAllWithHandler())
-        paf->type->getAffect( )->look( looker, victim, paf );
+        paf->type->getAffect( )->onLook(SpellTarget::Pointer(NEW, looker), paf, victim);
 }
 
 static void mprog_look(Character *looker, Character *victim)

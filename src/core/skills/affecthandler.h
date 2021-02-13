@@ -10,6 +10,7 @@
 #include "xmlpolymorphvariable.h"
 #include "skillaction.h"
 #include "wrappertarget.h"
+#include "spelltarget.h"
 
 class Affect;
 class Character;
@@ -24,6 +25,21 @@ public:
     virtual ~AffectHandler( );
 
     virtual long long getID() const = 0;
+
+    // List of triggers called from various places in the code.
+
+    bool onRemove(const SpellTarget::Pointer &target, Affect *paf);
+    bool onUpdate(const SpellTarget::Pointer &target, Affect *paf);
+    bool onEntry(const SpellTarget::Pointer &target, Affect *paf, Character *walker = 0);
+    bool onLeave(const SpellTarget::Pointer &target, Affect *paf, Character *walker);
+    bool onDispel(const SpellTarget::Pointer &target, Affect *paf);
+    bool onLook(const SpellTarget::Pointer &target, Affect *paf, Character *victim);
+    bool onSmell(const SpellTarget::Pointer &target, Affect *paf, Character *victim);
+    bool onSaves(const SpellTarget::Pointer &target, Affect *paf, Character *victim, int &saves, int dam_type);
+    bool onStopfol(const SpellTarget::Pointer &target, Affect *paf);
+    bool onDescr(const SpellTarget::Pointer &target, Affect *paf, ostringstream &buf);
+
+    // Overrides for various types of triggers. Have smaller priority than Fenia overrides.
 
     virtual void remove( Character * ); 
     virtual void remove( Object * ); 

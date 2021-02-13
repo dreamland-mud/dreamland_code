@@ -688,6 +688,16 @@ static bool oprog_area( Object *obj )
     return false;
 }
 
+static void afprog_update(Affect *paf, Object *obj)
+{
+    AffectHandler::Pointer ah = paf->type->getAffect();
+    if (!ah)
+        return;
+
+    FENIA_VOID_CALL(ah, "Update", "AO", paf, obj);
+    ah->update( obj, paf );
+}
+
 /*
  * Update all objs.
  * This function is performance sensitive.
@@ -748,7 +758,7 @@ void obj_update( void )
 
                 // Issue periodic message or action.
                 if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
-                    paf->type->getAffect( )->update( obj, paf );
+                    paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, obj), paf );
 
                 room_to_save( obj );
             }
@@ -760,7 +770,8 @@ void obj_update( void )
 
                 if (!affects.hasNext(paf_iter))
                     if (paf->type->getAffect())
-                        paf->type->getAffect()->remove( obj );
+                        paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf );
+
 
                 affect_remove_obj( obj, paf );
             }
@@ -1220,7 +1231,7 @@ void room_update( void )
             {
                 if (!affects.hasNext(paf_iter))
                     if (paf->type->getAffect( ))
-                        paf->type->getAffect( )->remove( room );
+                        paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, room), paf );
 
                 room->affectRemove( paf );
             }
@@ -1241,7 +1252,7 @@ void room_affect_update( )
                 paf->level = 2;
 
             if (!room->affected.hasNext(paf_iter) && paf->type->getAffect( )) 
-                paf->type->getAffect( )->update( room, paf );
+                paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, room), paf );
         }
     }
 }
@@ -1444,7 +1455,8 @@ void char_update_affects( Character *ch )
                     paf->level--;
                 
                 if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
-                    paf->type->getAffect( )->update( ch, paf );
+                    paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, ch), paf );
+
             }
             else if ( paf->duration < 0 )
                 ;
@@ -1454,7 +1466,7 @@ void char_update_affects( Character *ch )
 
                 if (!affects.hasNext(paf_iter))
                     if (paf->type->getAffect( )) 
-                        paf->type->getAffect( )->remove( ch );
+                        paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf );
 
                 affect_remove( ch, paf );
             }

@@ -3445,7 +3445,7 @@ CMDWIZP( noaffect )
         if ( paf->duration >= 0 )
         {
             if (!affects.hasNext(paf_iter) && paf->type->getAffect( ))
-                paf->type->getAffect( )->remove( victim );
+                paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, victim), paf);
 
             affect_remove( victim, paf );
         }

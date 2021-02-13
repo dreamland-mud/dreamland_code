@@ -104,15 +104,13 @@ static bool mprog_smell( Character *victim, Character *ch, char *argument )
     return false;
 }
 
-static bool afprog_smell( Character *victim, Character *ch, char *argument )
+static bool afprog_smell( Character *victim, Character *sniffer, char *argument )
 {
     bool rc = false;
     
-    for (auto &paf: victim->affected) 
-        if (paf->type->getAffect( ))
-            if (paf->type->getAffect( )->smell( victim, ch, paf ))
-                rc = true;
-
+    for (auto &paf: victim->affected.findAllWithHandler()) 
+        if (paf->type->getAffect( )->onSmell(SpellTarget::Pointer(NEW, victim), paf, sniffer))
+            rc = true;
     return rc;
 }
 
