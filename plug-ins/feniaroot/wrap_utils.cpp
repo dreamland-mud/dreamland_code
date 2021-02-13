@@ -138,6 +138,14 @@ DefaultSpell * arg2spell( const Register &reg )
                 wrapper_cast<SpellWrapper>(reg)->getTarget());;
 }
 
+DLString arg2string(const Register &reg) 
+{
+    if (reg.type != Register::STRING)
+        throw Scripting::InvalidCastException("string", reg.getTypeName());
+    
+    return reg.toString();
+}
+
 DefaultAffectHandler * arg2affecthandler( const Register &reg )
 {
     return dynamic_cast<DefaultAffectHandler *>(
