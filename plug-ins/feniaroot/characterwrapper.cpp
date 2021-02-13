@@ -575,6 +575,20 @@ NMI_GET( CharacterWrapper, flying, "true если мы GHOST, летаем ил�
     return false;
 }
 
+NMI_INVOKE( CharacterWrapper, flydown, "опуститься на землю без задержек, вернет true если до этого летали" )
+{
+    checkTarget();
+
+    if (is_flying(target)) {
+        target->posFlags.setBit( POS_FLY_DOWN );
+        target->println( "Ты перестаешь летать." );
+        target->recho( "%^C1 перестает летать.", target ); 
+        return Register(true);
+    }
+
+    return Register(false);
+}
+
 NMI_GET( CharacterWrapper, ambushing, "строка, на кого сидим в засаде" )
 {
     checkTarget( );
