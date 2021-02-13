@@ -164,7 +164,7 @@ void limit_ground_decay(Object *obj)
     obj->timestamp -= 60 * 60 * 24;
 
     if (obj->in_room)
-        obj->in_room->echo(POS_RESTING, "%1$^O1 неумолимо истонча%1$nется|ются.", obj);
+        obj->in_room->echo(POS_RESTING, "Лежа на земле, %1$O1 неумолимо истонча%1$nется|ются.", obj);
 
     save_items_at_holder(obj);
 }
