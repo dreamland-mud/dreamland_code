@@ -39,6 +39,14 @@ GSN(ground_strike);
 GSN(critical_strike);
 GSN(dominate);
 GSN(control_animal);
+GSN(harm);
+GSN(heal);
+GSN(cause_light);
+GSN(cause_serious);
+GSN(cause_critical);
+GSN(cure_light);
+GSN(cure_serious);
+GSN(cure_critical);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -49,6 +57,32 @@ static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReferen
         learn2 = learn1;
         learn1 = 1;
     }
+}
+
+static void skill_merge(
+    PCharacter *ch, 
+    SkillReference &target, 
+    SkillReference &sk1, SkillReference &sk2, SkillReference &sk3)
+{
+    int &l0 = ch->getSkillData(target).learned;
+    int &l1 = ch->getSkillData(sk1).learned;
+    int &l2 = ch->getSkillData(sk2).learned;
+    int &l3 = ch->getSkillData(sk3).learned;
+
+    if (target->visible(ch)) {
+        int old_value = l0;
+        l0 = max(
+                max(l0, l1),
+                max(l2, l3)
+        );
+        notice("Fixing skills for %s: skill %s set to %d (best of %d, %d, %d, %d)",
+            ch->getName().c_str(), target->getName().c_str(), l0,
+            old_value, l0, l1, l2, l3);
+    }
+
+    l1 = 1;
+    l2 = 1;
+    l3 = 1;
 }
 
 static void update_exp( PCharacter *ch ) 
@@ -242,6 +276,8 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_bat_sworm, gsn_bat_swarm );
     skill_exchange( this, gsn_ground_strike, gsn_critical_strike );
     skill_exchange( this, gsn_control_animal, gsn_dominate );
+    skill_merge(this, gsn_harm, gsn_cause_critical, gsn_cause_light, gsn_cause_critical);
+    skill_merge(this, gsn_heal, gsn_cure_critical, gsn_cure_light, gsn_cure_critical);
 
     // Move player out of the room, to be placed to the start room correctly further down the way.
     char_from_room(this);
