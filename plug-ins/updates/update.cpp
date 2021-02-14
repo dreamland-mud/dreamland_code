@@ -773,7 +773,7 @@ void obj_update( void )
                         paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf );
 
 
-                affect_remove_obj( obj, paf );
+                affect_remove_obj( obj, paf, false );
             }
         }
 

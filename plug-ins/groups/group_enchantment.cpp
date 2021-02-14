@@ -566,7 +566,7 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
         ch->pecho( "%1$^O1 по%1$nет|ют под твоими руками, обретая первозданный вид.", obj );
         ch->recho( "%1$^O1 по%1$nет|ют под руками %2$C2, обретая первозданный вид.", obj, ch );
         obj->condition = 100;
-        if(Affect *paf = obj->affected.find(gsn_corrosion)) affect_remove_obj( obj, paf);
+        affect_strip(obj, gsn_corrosion, true);
     }
     else if (result >= 50)
     {
@@ -574,7 +574,7 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
         ch->recho( "%1$^O1 загора%1$nется|ются ярким светом, обретая первозданный вид.", obj );
         obj->condition += result;
         obj->condition = min( obj->condition , 100 );
-        if(Affect *paf = obj->affected.find(gsn_corrosion)) affect_remove_obj( obj, paf);
+        affect_strip(obj, gsn_corrosion, true);
     }
     else if ( result >=10)
     {

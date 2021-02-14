@@ -111,7 +111,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
         if (!savesDispel(level,paf != 0 ? (int)paf->level : obj->level,0))
         {
             if (paf != 0)
-                affect_remove_obj( obj, paf);
+                affect_remove_obj( obj, paf, true);
             act_p("Священная аура окружает $o4.",ch,obj,0,TO_ALL,POS_RESTING);
             REMOVE_BIT(obj->extra_flags,ITEM_EVIL);
             return;

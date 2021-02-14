@@ -10,6 +10,7 @@
 #include "liquid.h"
 #include "wearlocation.h"
 #include "affect.h"
+#include "affecthandler.h"
 #include "affectmanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -56,7 +57,7 @@ void Affect::copyTo(Affect &target) const
 /*
  * Apply or remove an affect to an object.
  */
-void affect_remove_obj( Object *obj, Affect *paf )
+void affect_remove_obj( Object *obj, Affect *paf, bool verbose )
 {
     if (paf->isExtracted())
         return;
@@ -65,6 +66,11 @@ void affect_remove_obj( Object *obj, Affect *paf )
     {
         bug( "Affect_remove_object: no affect.", 0 );
         return;
+    }
+
+    if (verbose) {
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf);
     }
 
     if (obj->carried_by != NULL && obj->wear_loc != wear_none)
@@ -379,10 +385,10 @@ void affect_strip( Character *ch, int sn )
         affect_remove( ch, paf );
 }
 
-void affect_strip( Object *obj, int sn )
+void affect_strip( Object *obj, int sn, bool verbose )
 {
     for (auto &paf: obj->affected.findAll(sn))
-        affect_remove_obj( obj, paf );
+        affect_remove_obj( obj, paf, verbose );
 }
 
 /*

@@ -123,7 +123,7 @@ bool MendingWE::run( PCharacter *ch, Character *victim ) const
 
         obj->condition += number_range( 30, 50 );
         obj->condition = min( 100, obj->condition );
-        if(Affect *paf = obj->affected.find(gsn_corrosion)) affect_remove_obj( obj, paf);
+        affect_strip(obj, gsn_corrosion, true);
     }
 
     act( "{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );

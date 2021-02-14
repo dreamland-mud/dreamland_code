@@ -155,11 +155,12 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Character *victim, int sn, int leve
     Object *obj;
     bool found = false;
 
-    if (!checkDispel(level,victim,gsn_curse))
+    if (!checkDispel(level,victim,gsn_curse)) {
         if (ch == victim)
             ch->pecho("Проклятье, висящее на тебе, сопротивляется твоим молитвам.");
         else
             ch->pecho("Проклятье, висящее на %C6, сопротивляется твоим молитвам.", victim);
+    }
 
    for (obj = victim->carrying; (obj != 0 && !found); obj = obj->next_content)
    {
