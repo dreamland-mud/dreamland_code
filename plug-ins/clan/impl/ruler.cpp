@@ -1073,7 +1073,7 @@ SKILL_RUNP( suspect )
 
                 if ( paf != 0 )   
                 {
-                        sprintf (buf,"Повестка $C2 действительна в течении %d час%s."
+                        sprintf (buf,"Повестка $C2 действительна в течение %d час%s."
                                 ,paf->duration.getValue()
                                 ,GET_COUNT(paf->duration, "а","ов","ов"));
 

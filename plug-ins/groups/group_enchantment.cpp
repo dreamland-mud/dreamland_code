@@ -38,6 +38,7 @@
 #include "def.h"
 
 GSN(inspiration);
+GSN(corrosion);
 
 SPELL_DECL(BlessWeapon);
 VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level ) 
@@ -541,7 +542,7 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
 { 
     int result,skill;
 
-    if ( obj->condition > 99 )
+    if ( obj->condition > 99 && !obj->isAffected(gsn_corrosion) )
     {
     ch->send_to("Эта вещь не нуждается в ремонте.\n\r");
     return;
@@ -565,6 +566,7 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
         ch->pecho( "%1$^O1 по%1$nет|ют под твоими руками, обретая первозданный вид.", obj );
         ch->recho( "%1$^O1 по%1$nет|ют под руками %2$C2, обретая первозданный вид.", obj, ch );
         obj->condition = 100;
+        if(Affect *paf = obj->affected.find(gsn_corrosion)) affect_remove_obj( obj, paf);
     }
     else if (result >= 50)
     {
@@ -572,6 +574,7 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
         ch->recho( "%1$^O1 загора%1$nется|ются ярким светом, обретая первозданный вид.", obj );
         obj->condition += result;
         obj->condition = min( obj->condition , 100 );
+        if(Affect *paf = obj->affected.find(gsn_corrosion)) affect_remove_obj( obj, paf);
     }
     else if ( result >=10)
     {
