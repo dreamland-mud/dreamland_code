@@ -12,6 +12,7 @@ bool material_is_typed( Object *, int );
 bool material_is_flagged( Object *, int );
 int material_immune( Object *, Character * );
 int material_burns( Object * );
+DLString material_rname(Object *obj, char gcase='1');
 
 enum {
     SWIM_UNDEF = 0,

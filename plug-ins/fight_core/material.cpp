@@ -2,7 +2,8 @@
  *
  * ruffina, 2005
  */
-#include "object.h"
+#include "stringlist.h"
+#include "core/object.h"
 #include "character.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -33,29 +34,24 @@ CONFIGURABLE_LOADED(fight, material)
 
 
 static void 
-material_parse( Object *obj,  vector<material_t *> &result )
+material_parse( Object *obj,  vector<const material_t *> &result )
 {    
-    if (obj->getMaterial( )) {
-        char *token, name[MAX_STRING_LENGTH];
+    if (!obj->getMaterial())
+        return;
 
-        strcpy( name, obj->getMaterial( ) );
-        
-        token = strtok( name, ", " );
-        
-        for(token=strtok(name, ", "); token; token=strtok(NULL, ", "))
-            if (*token != '\0') {
-                for (auto &mat: material_table)
-                    if (!str_cmp( token, mat.name.c_str() )) {
-                        result.push_back(&mat);
-                        break;
-                    }                
-            }
+    StringList tokens;
+    tokens.split(obj->getMaterial(), ", ");
+
+    for (auto &token: tokens) {
+        const material_t *mat = material_by_name(token);
+        if (mat)
+            result.push_back(mat);
     }
 }
 
 bool material_is_typed( Object *obj, int type )
 {
-    vector<material_t *> result;
+    vector<const material_t *> result;
 
     material_parse( obj, result );
     
@@ -68,7 +64,7 @@ bool material_is_typed( Object *obj, int type )
 
 bool material_is_flagged( Object *obj, int flags )
 {
-    vector<material_t *> result;
+    vector<const material_t *> result;
 
     material_parse( obj, result );
     
@@ -82,7 +78,7 @@ bool material_is_flagged( Object *obj, int flags )
 int material_swims( Object *obj )
 {
     int swim = 0;
-    vector<material_t *> result;
+    vector<const material_t *> result;
 
     material_parse( obj, result );
     
@@ -100,7 +96,7 @@ int material_swims( Object *obj )
 int material_burns( Object *obj )
 {
     int max_burn = 0;
-    vector<material_t *> result;
+    vector<const material_t *> result;
 
     material_parse( obj, result );
     
@@ -113,11 +109,33 @@ int material_burns( Object *obj )
     return max_burn;
 }
 
+DLString material_rname(Object *obj, char gcase) 
+{
+    StringList names;
+    vector<const material_t *> result;
+
+    material_parse( obj, result );
+    
+    for (auto &mat: result) {
+        if (mat->type.isSet(MAT_NONE))
+            continue;
+
+        DLString rname = mat->rname;
+        if (!rname.empty())
+            names.push_back(rname.ruscase(gcase));
+        else
+            names.push_back(mat->name);
+    }
+
+
+    return names.join(", ");
+}
+
 int material_immune( Object *obj, Character *ch )
 {
     bitstring_t bits = 0;
     int res = RESIST_NORMAL;    
-    vector<material_t *> result;
+    vector<const material_t *> result;
 
     material_parse( obj, result );
     

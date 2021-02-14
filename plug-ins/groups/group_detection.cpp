@@ -30,6 +30,7 @@
 #include "liquid.h"
 #include "magic.h"
 #include "fight.h"
+#include "material.h"
 #include "interp.h"
 #include "gsn_plugin.h"
 #include "../anatolia/handler.h"
@@ -595,9 +596,9 @@ SKILL_RUNP( lore )
         buf << "ничего не стоит";
 
       // XXX 'изготовлено из' + падежи
-      const char *mat = obj->getMaterial( );
-      if (mat && strcmp( mat, "none" ) && strcmp( mat, "oldstyle" ))
-          buf << ", материал {W" << mat << "{x";
+        DLString mat = material_rname(obj, '1');
+        if (!mat.empty())
+            buf << ", материал {W" << mat << "{x";
 
       buf << endl;
     }

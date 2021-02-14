@@ -92,6 +92,7 @@
 #include "comm.h"
 #include "weapons.h"
 #include "colour.h"
+#include "material.h"
 #include "mudtags.h"
 #include "websocketrpc.h"
 #include "bugtracker.h"
@@ -2502,10 +2503,8 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     int lim;
     Skill *skill;
     Liquid *liquid;
-    const char *mat;
     Keyhole::Pointer keyhole;
     
-
     buf << "{W" << obj->getShortDescr( '1' ).upperFirstCharacter() << "{x"
         << " -- это {W" << item_table.message(obj->item_type )
         << " " << obj->level << "{x уровня";
@@ -2536,8 +2535,8 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "ничего не стоит";
 
     // XXX 'изготовлено из' + падежи
-    mat = obj->getMaterial( );
-    if (mat && strcmp( mat, "none" ) && strcmp( mat, "oldstyle" ))
+    DLString mat = material_rname(obj, '1');
+    if (!mat.empty())
         buf << ", материал {W" << mat << "{x";
 
     buf << endl;
