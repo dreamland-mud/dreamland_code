@@ -5,6 +5,7 @@
 #include "transfermovement.h"
 
 #include "character.h"
+#include "room.h"
 
 JumpMovement::JumpMovement( Character *ch )
                      : Movement( ch )
@@ -58,6 +59,13 @@ bool JumpMovement::tryMove( Character *wch )
 
 void JumpMovement::moveFollowers( Character *wch )
 {
+}
+
+void JumpMovement::msgRoomNoActor(Character *wch, const char *msg) 
+{
+    for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
+        if (rch != wch && rch != wch->mount && rch != actor)
+            msgEcho( rch, wch, msg );    
 }
 
 

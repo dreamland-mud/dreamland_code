@@ -301,13 +301,14 @@ SKILL_RUNP( vanish )
             // trying to kidnap
             act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
             act_p( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR,POS_RESTING    );
-            act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
+            act_p( "$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
 
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
                     transfer_char( ch, ch, pRoomIndex,
                         0,
-                        "Пользуясь всеобщим замешательством, ты исчезаешь!");
+                        "Пользуясь всеобщим замешательством, ты исчезаешь!",
+                        "%1$^C1 внезапно появляется!");
 
                     transfer_char( victim, ch, pRoomIndex,
                         "%1$^C1 исчезает вместе с %2^C5!",
