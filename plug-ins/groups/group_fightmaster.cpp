@@ -409,6 +409,8 @@ SKILL_RUNP( bash )
                         ch, 0,victim,TO_VICT,POS_FIGHTING);
                 act_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
                         ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+
+                ch->setWait( gsn_bash->getBeats( ) );
                 return;
         }
 
@@ -1008,6 +1010,8 @@ SKILL_RUNP( crush )
                         ch,0,victim,TO_VICT);
                 act("{YМощный удар $c2 как будто соскальзывает с $C2.{x",
                         ch,0,victim,TO_NOTVICT);
+
+                ch->setWait( gsn_crush->getBeats( ) );
                 return;
         }
 
@@ -1585,6 +1589,8 @@ SKILL_RUNP( smash )
                 ch, NULL,victim,TO_VICT,POS_FIGHTING);
         act_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
                 ch,NULL,victim,TO_NOTVICT,POS_FIGHTING);
+
+        ch->setWait( gsn_smash->getBeats( ) );
         return;
      }
    

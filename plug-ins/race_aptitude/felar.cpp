@@ -90,7 +90,6 @@ SKILL_RUNP( tail )
 
     /* modifiers */
 
-
     /* size  and weight */
     chance += min(ch->canCarryWeight( ), ch->carry_weight) / 200;
     chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 250;
