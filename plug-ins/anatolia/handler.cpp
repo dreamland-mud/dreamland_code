@@ -352,15 +352,15 @@ void notify_referers( Character *ch, int flags )
         if (wch->doppel == ch && wch->isAffected(gsn_doppelganger)) {
             wch->println("Ты принимаешь свое истинное обличье.");
             
+            // TODO rework with verbose affect strip
             if (gsn_doppelganger->getAffect( ))
-                gsn_doppelganger->getAffect( )->remove( wch );
+                gsn_doppelganger->getAffect( )->onRemove(SpellTarget::Pointer(NEW, wch), 0);
 
             affect_strip(wch,gsn_doppelganger);
         }
 
         if (wch->is_npc( ) && wch->getNPC( )->behavior) 
             wch->getNPC( )->behavior->extractNotify( ch, IS_SET(flags, FEXTRACT_TOTAL), IS_SET(flags, FEXTRACT_COUNT) );
-
         
         if (IS_SET(flags, FEXTRACT_TOTAL|FEXTRACT_LASTFOUGHT) && wch->last_fought == ch)
             wch->last_fought = 0;

@@ -130,6 +130,12 @@ void WrapperBase::triggerArgs( RegisterList &regList, const char *fmt, va_list a
                             va_arg( ap, Room * ) ) );
             break;
 
+        case 'A':
+            regList.push_back( 
+                    FeniaManager::wrapperManager->getWrapper( 
+                            va_arg( ap, Affect* ) ) );
+            break;
+
         case 's':
             regList.push_back( Register( va_arg( ap, char * ) ) );
             break;

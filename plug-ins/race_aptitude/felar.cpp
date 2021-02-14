@@ -31,7 +31,6 @@
 #include "def.h"
 
 GSN(tail);
-GSN(protective_shield);
 
 
 SKILL_RUNP( tail )
@@ -89,17 +88,7 @@ SKILL_RUNP( tail )
         return;
     }
 
-    if (victim->isAffected(gsn_protective_shield)) {
-        act_p("{YТвой хвост не достает $C4 из-за защитного поля.{x", ch, 0, victim, TO_CHAR,POS_FIGHTING);
-        act_p("{YХвост $c2 не достает тебя из-за защитного поля.{x", ch, 0, victim,TO_VICT,POS_FIGHTING);
-        act_p("{YХвост $c2 не достает $C4.{x", ch,0,victim,TO_NOTVICT,POS_FIGHTING);
-
-        ch->setWait( gsn_tail->getBeats( ) );
-        return;
-    }
-
     /* modifiers */
-
 
     /* size  and weight */
     chance += min(ch->canCarryWeight( ), ch->carry_weight) / 200;

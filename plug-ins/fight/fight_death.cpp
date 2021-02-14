@@ -138,8 +138,10 @@ static Object * corpse_create( Character *ch )
     Object *corpse;
     DLString name;
 
-    if (ch->is_npc( ) && IS_SET( ch->form, FORM_INSTANT_DECAY|FORM_INTANGIBLE ))
+    if (ch->is_npc( ) && IS_SET( ch->form, FORM_INSTANT_DECAY|FORM_INTANGIBLE )) {
+        ch->in_room->echo( POS_RESTING, "%1$^C1 превращается в прах и развеивается по ветру, не оставляя после себя трупа.", ch );
         return NULL;
+    }    
     
     name = ch->getNameP( '2' );
     corpse = create_object(
@@ -428,10 +430,10 @@ void death_cry( Character *ch, int part )
 
     switch (part)
     {
-    case  0: msg  = "$c1 падает на землю ... и {RУМИРАЕТ{x.";            
+    case  0: msg  = "$c1 падает на землю... и {RУМИРАЕТ{x.";            
              break;
     case  1:
-        if (ch->material == 0)
+        if (!IS_BLOODLESS(ch))
         {
             msg  = "Кровь $c2 покрывает твои доспехи.";        
             break;
@@ -439,7 +441,7 @@ void death_cry( Character *ch, int part )
     case  2:                             
         if (bodyparts.isSet(PART_GUTS))
         {
-            msg = "Внутренности $c2 вываливаются на пол.";
+            msg = "Внутренности $c2 вываливаются тебе под ноги.";
             vnum = OBJ_VNUM_GUTS;
             bodyparts.removeBit(PART_GUTS);
         }
@@ -447,7 +449,7 @@ void death_cry( Character *ch, int part )
     case  3:
         if (bodyparts.isSet(PART_HEAD))
         {
-            msg  = "Отрубленная голова $c2 падает на землю.";
+            msg  = "Отрубленная голова $c2 падает тебе под ноги.";
             vnum = OBJ_VNUM_SEVERED_HEAD;                
             bodyparts.removeBit(PART_HEAD);
         }
@@ -479,7 +481,7 @@ void death_cry( Character *ch, int part )
     case 7:
         if (bodyparts.isSet(PART_BRAINS))
         {
-            msg = "Голова $c2 разбивается вдребезги, забрызгивая все вокруг.";
+            msg = "Голова $c2 разлетается как спелый арбуз, забрызгивая все вокруг.";
             vnum = OBJ_VNUM_BRAINS;
             bodyparts.removeBit(PART_BRAINS);
         }
@@ -878,7 +880,7 @@ protected:
         if (pch->getProfession( ) == prof_samurai) {
             if ((pch->death % 3) == 2) {
                 pch->perm_stat[STAT_CHA]--;
-                pch->println("Ты чувствуешь, как твоя харизма уменьшилась после этой смерти.");
+                pch->println("Ты чувствуешь, как твое обаяние уменьшается после этой смерти.");
             }
         }
 

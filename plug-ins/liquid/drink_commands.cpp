@@ -714,7 +714,7 @@ CMDRUN( drink )
 /*---------------------------------------------------------------------------
  * smell affects
  *--------------------------------------------------------------------------*/
-bool oprog_smell_liquid(Liquid *liq, Character *ch)
+bool oprog_smell_liquid(Liquid *liq, Character *sniffer)
 {
         DLString msg;
 
@@ -729,19 +729,19 @@ bool oprog_smell_liquid(Liquid *liq, Character *ch)
         else
             return false;        
         
-        ch->pecho( msg.c_str( ), liq->getShortDescr( ).c_str( ) );
+        sniffer->pecho( msg.c_str( ), liq->getShortDescr( ).c_str( ) );
         return true;
 }        
 
 AFFECT_DECL(PouredLiquid);
-TYPE_AFFECT(bool, PouredLiquid)::smell( Character *ch, Character *victim, Affect *paf ) 
+TYPE_AFFECT(bool, PouredLiquid)::smell( Character *ch, Character *sniffer, Affect *paf ) 
 {
     bool rc = false;
     vector<int> bits = paf->global.toArray( );
 
     for (unsigned int i = 0; i < bits.size( ); i++) {
         Liquid *liq = liquidManager->find( bits[i] );
-        if (oprog_smell_liquid(liq, victim))
+        if (oprog_smell_liquid(liq, sniffer))
             rc = true;
     }
     

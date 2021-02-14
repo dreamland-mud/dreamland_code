@@ -43,11 +43,11 @@ void TransferMovement::msgOnMove( Character *wch, bool fLeaving )
     if (wch) {
         if (fLeaving) {
             msgSelf( wch, msgSelfLeave );
-            msgRoomNoParty( wch, msgRoomLeave );
+            msgRoomNoActor( wch, msgRoomLeave );
         }
         else {
             msgSelf( wch, msgSelfEnter );
-            msgRoomNoParty( wch, msgRoomEnter );
+            msgRoomNoActor( wch, msgRoomEnter );
         }
     }
 }

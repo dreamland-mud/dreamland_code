@@ -133,12 +133,12 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
         if ( IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_INVENTORY) ) 
         {
-                   act_p("$c1 {rВЫБИ$gЛО{x|Л{x|ЛА{x у тебя оружие!", ch, 0, victim, TO_VICT ,POS_RESTING);
+                   act_p("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
                 obj_to_char( obj, victim );
         }
         else
         {
-                   act_p("$c1 {rВЫБИ$gЛО{x|Л{x|ЛА{x у тебя оружие, и оно упало на землю!", ch, 0, victim, TO_VICT ,POS_RESTING);
+                   act_p("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
                 obj_to_room( obj, victim->in_room );
                 if (victim->is_npc() && victim->wait == 0 && victim->can_see(obj))
                         do_get_raw(victim, obj);
@@ -437,7 +437,7 @@ SKILL_RUNP( weapon )
             ch->setWait( gsn_weapon_cleave->getBeats( )  );
         act_p("Ты раскалываешь оружие $C2 надвое.",
                ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 раскалывает твое оружие надвое.",
+        act_p("{R$c1 раскалывает твое оружие надвое!{x",
                ch,0,victim,TO_VICT,POS_RESTING);
         act_p("$c1 раскалывает оружие $C2 надвое.",
                ch,0,victim,TO_NOTVICT,POS_RESTING);

@@ -531,7 +531,7 @@ CMDWIZP( transfer )
                   (ch != victim ? "%2$^C1 переносит тебя в столбе {Cбожественной энергии!{x" : NULL),
                   "%1$^C1 внезапно прибывает в столбе {Cбожественной энергии!{x" );
 
-    ch->send_to("Ok.\n\r");
+    ch->pecho("%1$^C1 прибывает в столбе {Cбожественной энергии!{x", victim);
 }
 
 
@@ -3445,7 +3445,7 @@ CMDWIZP( noaffect )
         if ( paf->duration >= 0 )
         {
             if (!affects.hasNext(paf_iter) && paf->type->getAffect( ))
-                paf->type->getAffect( )->remove( victim );
+                paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, victim), paf);
 
             affect_remove( victim, paf );
         }

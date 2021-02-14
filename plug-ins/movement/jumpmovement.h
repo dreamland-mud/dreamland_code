@@ -17,6 +17,8 @@ protected:
     virtual bool findTargetRoom( );
     virtual void moveFollowers( Character * );
 
+    void msgRoomNoActor( Character *wch, const char *msg );
+
     virtual bool canMove( Character * );
     virtual bool tryMove( Character * );
 

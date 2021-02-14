@@ -10,7 +10,7 @@
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    и все остальные, кто советовал и играл в этот MUD                    *п
  ***************************************************************************/
 #include <sstream>
 #include "skillcommandtemplate.h"
@@ -301,19 +301,19 @@ SKILL_RUNP( vanish )
             // trying to kidnap
             act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
             act_p( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR,POS_RESTING    );
-            act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
+            act_p( "$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
 
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
                     transfer_char( ch, ch, pRoomIndex,
-                        "%1$^C1 внезапно исчезает!",
+                        0,
                         "Пользуясь всеобщим замешательством, ты исчезаешь!",
-                        "%1$^C1 внезапно появляется у тебя за спиной." );
+                        "%1$^C1 внезапно появляется!");
 
                     transfer_char( victim, ch, pRoomIndex,
                         "%1$^C1 исчезает вместе с %2^C5!",
-                        "Ты хватаешь и утаскиваешь с собой %1$^C4!",
-                        "%1$^C1 внезапно появляется, похищенн%1$Gое|ый|ая %2$^C5." );
+                        "%2$^C1 хватает тебя и исчезает вместе с тобой!",
+                        "%1$^C1 внезапно появляется, похищенн%1$Gое|ый|ая %2$C5." );
                     
                     if (!FightingCheck) {
                         yell_panic( ch, victim,

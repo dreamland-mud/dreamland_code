@@ -11,6 +11,7 @@
 #include "areaindexwrapper.h"
 #include "spellwrapper.h"
 #include "affecthandlerwrapper.h"
+#include "affectwrapper.h"
 #include "subr.h"
 #include "fenia/register-impl.h"
 
@@ -21,6 +22,7 @@
 #include "room.h"
 #include "character.h"
 #include "object.h"
+#include "affect.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -108,6 +110,14 @@ Scripting::Register WrapperManager::getWrapper(AffectHandler *ah)
     return wrapperAux<AffectHandlerWrapper>(ah->getID(), ah);
 }
 
+Scripting::Register WrapperManager::getWrapper(Affect *paf) 
+{
+    if (!paf)
+        return Scripting::Register();
+   
+    return AffectWrapper::wrap(*paf); 
+}
+
 template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
 {
@@ -159,6 +169,11 @@ void WrapperManager::linkWrapper(Spell *spell)
 void WrapperManager::linkWrapper(AffectHandler *ah) 
 {
     linkAux<AffectHandlerWrapper>(ah->getID(), ah);
+}
+
+void WrapperManager::linkWrapper(Affect *paf) 
+{
+    /* DO NOTHING */
 }
 
 void WrapperManager::getTarget( const Scripting::Register &reg, Character *& ch )
