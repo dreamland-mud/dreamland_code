@@ -80,7 +80,6 @@ RELIG(godiva);
  * Extern functions needed
  */
 DLString get_pocket_argument( char *arg );
-void lore_fmt_wear( int type, int wear, ostringstream &buf );
 /*
  * Local functions.
  */

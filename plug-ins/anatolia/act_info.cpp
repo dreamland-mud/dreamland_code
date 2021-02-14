@@ -2497,50 +2497,6 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
     }
 }
 
-void lore_fmt_wear( int type, int wear, ostringstream &buf )
-{
-    if (type == ITEM_LIGHT) {
-        buf << "Используется как освещение" << endl;
-        return;
-    }
-    
-    if (wear == -1)
-        return;
-
-    if (IS_SET( wear, ITEM_WEAR_FINGER ))
-       buf << "Надевается на палец" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_NECK ))
-       buf << "Надевается на шею" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_BODY ))
-       buf << "Надевается на тело" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_HEAD ))
-       buf << "Надевается на голову" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_EARS ))
-       buf << "Надевается в уши" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_FACE ))
-       buf << "Надевается на лицо" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_FEET ))
-       buf << "Надевается на ступни" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_LEGS ))
-       buf << "Надевается на бедра" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_HANDS ))
-       buf << "Надевается на руки" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_ARMS ))
-       buf << "Надевается на плечи" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_ABOUT ))
-       buf << "Накидывается вокруг тела" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_WAIST ))
-       buf << "Надевается на талию" << endl;        
-    if (IS_SET( wear, ITEM_WEAR_WRIST ))
-       buf << "Надевается на запястье" << endl;
-    if (IS_SET( wear, ITEM_WEAR_SHIELD ))
-       buf << "Используется как щит" << endl;
-    if (IS_SET( wear, ITEM_WEAR_HORSE ))
-        buf << "Надевается на лошадиную часть" << endl;
-    if (IS_SET( wear, ITEM_WEAR_HOOVES ))
-        buf << "Надевается на копыта" << endl;
-}
-
 void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showName )
 {
     int lim;
@@ -2548,36 +2504,30 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     Liquid *liquid;
     const char *mat;
     Keyhole::Pointer keyhole;
+    
 
-    buf << "{W" << obj->getShortDescr( '1' ) << "{x";
+    buf << "{W" << obj->getShortDescr( '1' ).upperFirstCharacter() << "{x"
+        << " -- это {W" << item_table.message(obj->item_type )
+        << " " << obj->level << "{x уровня";
+
+    for (int i = 0; i < wearlocationManager->size( ); i++) {
+        Wearlocation *loc = wearlocationManager->find( i );
+        if (loc->matches( obj ) && !loc->getPurpose().empty() && !(obj->item_type == ITEM_WEAPON && IS_SET(obj->wear_flags, ITEM_WIELD)) ) {
+            buf << ", " << loc->getPurpose( ).toLower( );
+            break;
+           }
+    }       
+        
+    buf << "." << endl;
     
     if (showName)
-        buf << ", откликается на имена '{W" << obj->getName( ) << "{x'";
+        buf << "Взаимодействует по именам: '{W" << obj->getName( ) << "{x'" << endl;
 
-    buf << endl
-        << "{W" << item_table.message(obj->item_type ) << "{x, "
-        << "уровня {W" << obj->level << "{x" << endl;
-
-    lim = obj->pIndexData->limit;
-    if (lim != -1 && lim < 100)
-        buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
-
-    if (obj_is_special(obj))
-        buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
-
-    if (obj->timer != 0)
-        buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
-
-    if (obj->weight > 10)
-        buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
+    if (obj->weight >= 10)
+        buf << "Весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
     else
-        buf << "ничего не весит";
+        buf << "Ничего не весит";
 
-    if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
-        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
-        return;
-    }
-    
     buf << ", ";
     
     if (obj->cost)
@@ -2592,6 +2542,21 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     buf << endl;
 
+    lim = obj->pIndexData->limit;
+    if (lim != -1 && lim < 100)
+        buf << "{RТаких вещей в мире может быть не более {W" << lim << "{x!" << endl;
+
+    if (obj_is_special(obj))
+        buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
+
+    if (obj->timer != 0)
+        buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
+
+    if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
+        buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
+        return;
+    }
+    
     bitstring_t extra = obj->extra_flags;
     REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
     if (extra)
@@ -2724,8 +2689,6 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << endl;
         break;
     }
-    
-    lore_fmt_wear( obj->item_type, obj->wear_flags, buf );
 
     if (!obj->enchanted)
         for (auto &paf: obj->pIndexData->affected)
