@@ -184,7 +184,6 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 
                         affect_enchant( obj );
                         affect_enhance( obj, &af );
-                        obj->properties["corroded"] = "true";
 
                         if ( obj->carried_by != 0 && obj->wear_loc != wear_none )
                             for ( i = 0; i < 4; i++ )
