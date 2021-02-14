@@ -10,7 +10,7 @@
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    и все остальные, кто советовал и играл в этот MUD                    *п
  ***************************************************************************/
 #include <sstream>
 #include "skillcommandtemplate.h"
@@ -306,14 +306,13 @@ SKILL_RUNP( vanish )
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
                     transfer_char( ch, ch, pRoomIndex,
-                        "%1$^C1 внезапно исчезает!",
-                        "Пользуясь всеобщим замешательством, ты исчезаешь!",
-                        "%1$^C1 внезапно появляется у тебя за спиной." );
+                        0,
+                        "Пользуясь всеобщим замешательством, ты исчезаешь!");
 
                     transfer_char( victim, ch, pRoomIndex,
                         "%1$^C1 исчезает вместе с %2^C5!",
-                        "Ты хватаешь и утаскиваешь с собой %2$^C4!",
-                        "%2$^C1 внезапно появляется, похищенн%1$Gое|ый|ая %1$^C5." );
+                        "%2$^C1 хватает тебя и исчезает вместе с тобой!",
+                        "%1$^C1 внезапно появляется, похищенн%1$Gое|ый|ая %2$C5." );
                     
                     if (!FightingCheck) {
                         yell_panic( ch, victim,
