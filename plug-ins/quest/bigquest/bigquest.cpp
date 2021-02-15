@@ -8,7 +8,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
-
+#include "roomutils.h"
 #include "handler.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -197,7 +197,7 @@ bool BigQuest::hasPartialRewards() const
 
 bool BigQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
-    if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
+    if (RoomUtils::isWaterOrAir(room))
         return false;
 
     if (!VictimQuestModel::checkRoomClient( pch, room ))

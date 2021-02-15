@@ -12,6 +12,7 @@ namespace RoomUtils {
     bool isOutside(Room *r);
     bool isOutside(Character *ch);
     bool isWater(Room *r);
+    bool isWaterOrAir(Room *r);
 }
 
 #endif // __ROOMUTILS_H__

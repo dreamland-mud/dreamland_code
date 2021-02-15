@@ -12,6 +12,7 @@
 #include "skillmanager.h"
 #include "object.h"
 #include "room.h"
+#include "roomutils.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "affect.h"
@@ -139,7 +140,7 @@ void RainbowDefaultScenario::printWinnerMsgOther( const DLString &name, ostrings
 
 bool RainbowDefaultScenario::canHearInitMsg( PCharacter *ch ) const
 {
-    return IS_OUTSIDE(ch);
+    return RoomUtils::isOutside(ch);
 }
 
 void RainbowDefaultScenario::onQuestFinish( PCharacter *ch ) const
@@ -219,7 +220,7 @@ void RainbowSinsScenario::printWinnerMsgOther( const DLString &name, ostringstre
 
 bool RainbowSinsScenario::canHearInitMsg( PCharacter *ch ) const
 {
-    return IS_OUTSIDE(ch);
+    return RoomUtils::isOutside(ch);
 }
 
 void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const

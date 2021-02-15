@@ -19,6 +19,7 @@
 #include "pcharacter.h"
 #include "core/object.h"
 #include "room.h"
+#include "roomutils.h"
 #include "clanreference.h"
 #include "areabehaviorplugin.h"
 
@@ -949,7 +950,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     // everyone else:                           75 / 95 / 100 
     
     if ( ch->getProfession( ) == prof_ranger ) {                    
-            if (!IS_NATURE(ch->in_room))
+            if (!RoomUtils::isNature(ch->in_room))
                 return;
             msgVictBasic = "$c1 внезапно сотрясает землю мощным ударом!";
             msgCharBasic = "Ты сотрясаешь землю мощным ударом, заставая врасплох $C4!";               

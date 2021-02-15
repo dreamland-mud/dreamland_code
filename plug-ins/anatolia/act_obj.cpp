@@ -66,6 +66,7 @@
 #include "race.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "desire.h"
 
 #include "dreamland.h"
@@ -1171,7 +1172,7 @@ static int drop_obj( Character *ch, Object *obj )
     if (oprog_drop( obj, ch ))
         return DROP_OBJ_EXTRACT;
     
-    if (IS_WATER( ch->in_room ) 
+    if (RoomUtils::isWater( ch->in_room ) 
         && !obj->may_float( ) 
         && material_swims( obj ) == SWIM_NEVER)
     {
@@ -1187,7 +1188,7 @@ static int drop_obj( Character *ch, Object *obj )
 
         ch->pecho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
     }
-    else if (!IS_WATER( ch->in_room ) 
+    else if (!RoomUtils::isWater( ch->in_room ) 
              && ch->in_room->getSectorType() != SECT_AIR
              && ch->in_room->getSectorType() != SECT_FOREST
              && ch->in_room->getSectorType() != SECT_DESERT
@@ -1237,7 +1238,7 @@ CMDRUNP( drop )
         get_money_here( ch->in_room->contents, gold, silver );
         obj = create_money( gold, silver );
 
-        if ( IS_WATER( ch->in_room ) )
+        if ( RoomUtils::isWater( ch->in_room ) )
         {
             extract_obj( obj );
             if ( !IS_AFFECTED(ch, AFF_SNEAK) )

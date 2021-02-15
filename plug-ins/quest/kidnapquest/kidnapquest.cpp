@@ -12,7 +12,7 @@
 #include "questexceptions.h"
 
 #include "selfrate.h"
-
+#include "roomutils.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -309,7 +309,7 @@ bool KidnapQuest::checkRoomClient( PCharacter *pch, Room * room )
     if (!ClientQuestModel::checkRoomClient( pch, room ))
         return false;
         
-    if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
+    if (RoomUtils::isWaterOrAir(room))
         return false;
     
     if (!kingArea.empty( ) && kingArea == room->areaName())

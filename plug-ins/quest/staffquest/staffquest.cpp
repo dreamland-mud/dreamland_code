@@ -12,7 +12,7 @@
 #include "pcharacter.h"
 #include "object.h"
 #include "room.h"
-
+#include "roomutils.h"
 #include "handler.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -130,7 +130,7 @@ bool StaffQuest::checkRoomClient( PCharacter *pch, Room *room )
     if (room->areaIndex()->high_range + 20 < pch->getModifyLevel( ))
         return false;
 
-    if (IS_WATER(room) || room->getSectorType() == SECT_AIR)
+    if (RoomUtils::isWaterOrAir(room))
         return false;
 
     if (!ItemQuestModel::checkRoomClient( pch, room ))

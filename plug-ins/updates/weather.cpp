@@ -22,6 +22,7 @@
 #include "commandtemplate.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "dreamland.h"
 #include "descriptor.h"
 #include "mercdb.h"
@@ -223,7 +224,7 @@ void sunlight_update( )
                 && IS_AWAKE(ch) 
                 && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
             {
-                if (IS_OUTSIDE(ch) && !buf_str.empty())
+                if (RoomUtils::isOutside(ch) && !buf_str.empty())
                     ch->send_to(buf_str);
                 if (!tbuf_str.empty())
                     ch->send_to(tbuf_str);
@@ -327,7 +328,7 @@ void weather_update( )
             ch = d->character;
 
             if (ch
-                && IS_OUTSIDE(ch) 
+                && RoomUtils::isOutside(ch) 
                 && IS_AWAKE(ch) 
                 && !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
             {
@@ -382,7 +383,7 @@ CMDRUN( time )
 
     // Output time of day and sunlight.
     buf << "Сейчас " << hour_of_day() << " " << time_of_day();
-    if (IS_OUTSIDE(ch))
+    if (RoomUtils::isOutside(ch))
         buf << ", " << sunlight();
     buf << ". ";
 
@@ -432,7 +433,7 @@ CMDRUN( weather )
         return;
     }
     
-    if ( !IS_OUTSIDE(ch) )
+    if ( !RoomUtils::isOutside(ch) )
     {
         ch->send_to( "Ты не можешь видеть погоду в помещении.\n\r");
         return;

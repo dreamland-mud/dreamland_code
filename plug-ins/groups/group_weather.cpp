@@ -19,6 +19,7 @@
 #include "so.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "race.h"
 #include "object.h"
 #include "affect.h"
@@ -41,7 +42,7 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
 
     int dam, vdam;
 
-    if ( !IS_OUTSIDE(ch) )
+    if ( !RoomUtils::isOutside(ch) )
     {
         ch->send_to("Ты должен находиться вне помещения.\n\r");
         return;

@@ -39,6 +39,7 @@
 #include "pcrace.h"
 #include "liquid.h"
 #include "room.h"
+#include "roomutils.h"
 #include "desire.h"
 
 #include "descriptor.h"
@@ -302,7 +303,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     else
     {
         if (obj->in_room 
-                && IS_WATER( obj->in_room ) 
+                && RoomUtils::isWater(obj->in_room)
                 && !IS_SET(obj->extra_flags, ITEM_WATER_STAND)) 
         {
             DLString msg;

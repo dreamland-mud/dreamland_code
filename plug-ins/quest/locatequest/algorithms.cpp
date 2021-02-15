@@ -10,7 +10,7 @@
 #include "logstream.h"
 #include "pcharacter.h"
 #include "object.h"
-
+#include "roomutils.h"
 #include "merc.h"
 #include "roomtraverse.h"
 #include "def.h"
@@ -32,7 +32,7 @@ struct DoorFunc {
         if (IS_SET(room->room_flags, ROOM_SOLITARY|ROOM_PRIVATE ))
             return false;
 
-        if (IS_WATER(room))
+        if (RoomUtils::isWater(room))
             return false;
 
         if (IS_SET( room->area->area_flag, AREA_NOQUEST ))

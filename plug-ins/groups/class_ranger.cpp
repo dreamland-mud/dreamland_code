@@ -33,6 +33,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "npcharacter.h"
 #include "room.h"
 #include "core/object.h"
@@ -347,7 +348,7 @@ SKILL_RUNP( herbs )
     }
   ch->setWait( gsn_herbs->getBeats( )  );
 
-  if (IS_NATURE(ch->in_room) && number_percent() < gsn_herbs->getEffective( ch ))
+  if (RoomUtils::isNature(ch->in_room) && number_percent() < gsn_herbs->getEffective( ch ))
     {
       postaffect_to_char(ch, gsn_herbs, 5);
 
@@ -409,7 +410,7 @@ SKILL_RUNP( camp )
         return;
   }
 
-  if (!IS_NATURE(ch->in_room))
+  if (!RoomUtils::isNature(ch->in_room))
   {
     ch->println("Разбить полевой лагерь можно только на лоне природы.");
     return;
@@ -527,7 +528,7 @@ TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const
     return false;
   }
     
-  if (!IS_NATURE(ch->in_room))
+  if (!RoomUtils::isNature(ch->in_room))
   {
     ch->send_to( "Медведи придут на помощь только на лоне природы.\n\r");
     return false;
@@ -605,7 +606,7 @@ TYPE_SPELL(bool, LionCall)::canSummonHere( Character *ch ) const
     return false;
   }
     
-  if (!IS_NATURE(ch->in_room))
+  if (!RoomUtils::isNature(ch->in_room))
   {
     ch->send_to( "Львы придут на помощь только на лоне природы.\n\r");
     return false;
@@ -724,7 +725,7 @@ SKILL_RUNP( makearrow )
         return;
     }
 
-    if (!IS_NATURE(ch->in_room))
+    if (!RoomUtils::isNature(ch->in_room))
     {
         ch->send_to( "В этой местности тебе не удается найти древесины для изготовления стрел.\n\r");
         return;
@@ -814,7 +815,7 @@ SKILL_RUNP(makebow)
         return;
     }
 
-    if (!IS_NATURE(ch->in_room))
+    if (!RoomUtils::isNature(ch->in_room))
     {
         ch->send_to( "В этой местности тебе не удается найти древесины для изготовления лука.\n\r");
         return;
@@ -937,7 +938,7 @@ SKILL_RUNP( forest )
 
 BOOL_SKILL( forest )::run( Character *ch, int type ) 
 {
-    if (!IS_NATURE(ch->in_room))
+    if (!RoomUtils::isNature(ch->in_room))
         return false;
     
     if (ch->is_npc( ))
@@ -1079,7 +1080,7 @@ SKILL_RUNP( tiger )
         ch->send_to("Ты слишком миролюбив{Sfа{Sx для этого.\n\r");
         return;
     }
-    if (!IS_NATURE(ch->in_room))
+    if (!RoomUtils::isNature(ch->in_room))
   {
     ch->send_to("Это умение сработает только на лоне природы.\n\r");
     return;
@@ -1343,7 +1344,7 @@ SKILL_RUNP( camouflage )
                 return;
         }
 
-        if (!IS_NATURE(ch->in_room))
+        if (!RoomUtils::isNature(ch->in_room))
         {
                 ch->send_to("Ты можешь замаскироваться только в дикой местности.\n\r");
                 act_p("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM,POS_RESTING);

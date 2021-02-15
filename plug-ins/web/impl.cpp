@@ -2,13 +2,13 @@
  *
  * ruffina, 2018
  */
+#include <jsoncpp/json/json.h>
 #include "webprompt.h"
 #include "logstream.h"
 #include "schedulertaskroundplugin.h"
 #include "dlscheduler.h"
 #include "xmlattributeticker.h"
 #include "xmlattributeplugin.h"
-#include "json/json.h"
 #include "commandflags.h"
 #include "iconvmap.h"
 #include "descriptor.h"
@@ -31,6 +31,7 @@
 #include "clanreference.h"
 #include "affect.h"
 #include "room.h"
+#include "roomutils.h"
 #include "pcharacter.h"
 #include "follow_utils.h"
 #include "gsn_plugin.h"
@@ -290,13 +291,13 @@ bool CalendarWebPromptListener::canSeeTime( Character *ch )
 
 bool CalendarWebPromptListener::canSeeSunlight( Character *ch )
 {
-    return ch->in_room && IS_OUTSIDE(ch);
+    return ch->in_room && RoomUtils::isOutside(ch);
 }
 
 bool CalendarWebPromptListener::canSeeWeather( Character *ch )
 {
     return ch->in_room 
-        && IS_OUTSIDE(ch)
+        && RoomUtils::isOutside(ch)
         && !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER);
 }
 

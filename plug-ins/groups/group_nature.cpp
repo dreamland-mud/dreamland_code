@@ -14,6 +14,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "npcharacter.h"
 #include "object.h"
 
@@ -164,23 +165,6 @@ SKILL_RUNP( tame )
     }
 }
 
-static bool has_water_around( Character *ch )
-{
-    if (IS_WATER(ch->in_room))
-        return true;
-
-    if (ch->in_room->getSectorType() == SECT_UNDERWATER)
-        return true;
-
-    if (IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER))
-        return true;
-
-    if (IS_OUTSIDE(ch) && weather_info.sky >= SKY_RAINING)
-        return true;
-
-    return false;
-}
-
 /*
  * 'hydroblast' spell
  */
@@ -189,7 +173,7 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
 { 
     int dam;
 
-    if (!has_water_around( ch )) {
+    if (!RoomUtils::hasWaterParticles(ch->in_room)) {
          ch->send_to("Здесь недостаточно водных молекул.\n\r");
          ch->wait = 0;
          return;
@@ -210,7 +194,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     int dam;
     PCharacter *victim;
 
-    if (!IS_NATURE(ch->in_room))
+    if (!RoomUtils::isNature(ch->in_room))
     {
         ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
         return;
@@ -261,7 +245,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
         return;
    }
     
-   if (!IS_NATURE(ch->in_room))
+   if (!RoomUtils::isNature(ch->in_room))
    {
         ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
         return;

@@ -15,6 +15,7 @@
 #include "liquid.h"
 #include "desire.h"
 #include "room.h"
+#include "roomutils.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "core/object.h"
@@ -217,7 +218,7 @@ static void pour_out( Character *ch, Object * out )
     if (oprog_empty(out, ch, liqname, amount))
 	return;
 
-    if (IS_WATER( room )) {
+    if (RoomUtils::isWater( room )) {
         ch->pecho( "Ты переворачиваешь %O4, выливая %N4 в %N4.", out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
         ch->recho( "%^C1 переворачивает %O4, выливая %N4 в %N4.", ch, out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
     }

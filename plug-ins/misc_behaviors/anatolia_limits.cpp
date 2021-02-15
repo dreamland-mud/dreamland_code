@@ -27,6 +27,7 @@
 
 #include "affect.h"
 #include "room.h"
+#include "roomutils.h"
 #include "pcharacter.h"
 #include "character.h"
 #include "object.h"
@@ -451,7 +452,7 @@ void GiantStrengthArmor::remove( Character *ch )
  */
 void RoseShield::fight( Character *ch )
 {
-  if (!IS_NATURE(ch->in_room))
+  if (!RoomUtils::isNature(ch->in_room))
   return;
 
   if (get_eq_char(ch,wear_shield) != obj )

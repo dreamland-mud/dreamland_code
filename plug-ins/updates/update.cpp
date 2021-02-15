@@ -72,6 +72,7 @@
 #include "clanreference.h"
 #include "pcharactermanager.h"
 #include "room.h"
+#include "roomutils.h"
 #include "race.h"
 #include "affect.h"
 #include "pcharacter.h"
@@ -199,7 +200,7 @@ bool is_bright_for_vampire( Character *ch )
     if (IS_SET(ch->in_room->room_flags, ROOM_DARK))
         return false;
 
-    if (!IS_OUTSIDE(ch))
+    if (!RoomUtils::isOutside(ch))
         return false;
 
     if(ch->in_room->getSectorType() == SECT_UNDERWATER)
@@ -503,7 +504,7 @@ void water_float_update( )
         if (!obj->in_room)
             continue;
         
-        if (!IS_WATER( obj->in_room ))
+        if (!RoomUtils::isWater( obj->in_room ))
             continue;
 
         if (IS_SET( obj->extra_flags, ITEM_NOPURGE ))

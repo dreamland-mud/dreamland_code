@@ -16,6 +16,7 @@
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "object.h"
 
 #include "stats_apply.h"
@@ -556,7 +557,7 @@ bool Walkment::checkMovepoints( Character *wch )
 bool Walkment::applyCamouflage( Character *wch )
 {
     if (IS_AFFECTED(wch, AFF_CAMOUFLAGE)
-            && !IS_NATURE(to_room))
+            && !RoomUtils::isNature(to_room))
     {
         strip_camouflage( wch );
     }        

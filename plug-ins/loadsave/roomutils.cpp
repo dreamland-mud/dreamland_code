@@ -13,6 +13,11 @@ bool RoomUtils::isWater(Room *target)
         || s == SECT_UNDERWATER;
 }
 
+bool RoomUtils::isWaterOrAir(Room *target)
+{
+    return isWater(target) || target->getSectorType() == SECT_AIR;
+}
+
 bool RoomUtils::isOutside(Room *target)
 {
     return !IS_SET(target->room_flags, ROOM_INDOORS);

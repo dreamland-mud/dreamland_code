@@ -218,11 +218,4 @@ inline AreaIndexData *Room::areaIndex() const
  */
 
 #define IS_ROOM_AFFECTED(room, sn)         (IS_SET((room)->affected_by, (sn)))
-#define IS_WATER( var )                (((var)->getSectorType() == SECT_WATER_SWIM) || \
-                                 ((var)->getSectorType() == SECT_WATER_NOSWIM) )
-#define IS_NATURE(var)          ((var)->getSectorType() == SECT_FIELD || \
-                                  (var)->getSectorType() == SECT_FOREST || \
-                                  (var)->getSectorType() == SECT_HILLS || \
-                                  (var)->getSectorType() == SECT_MOUNTAIN)
-
 #endif

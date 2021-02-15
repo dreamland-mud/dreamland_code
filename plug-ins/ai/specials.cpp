@@ -9,6 +9,7 @@
 
 #include "npcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "core/object.h"
 
 #include "dreamland.h"
@@ -506,7 +507,7 @@ bool BasicMobileBehavior::doWander( )
     if (IS_SET(ch->act, ACT_INDOORS) && !IS_SET( room->room_flags,ROOM_INDOORS))
         return false;
 
-    if (IS_SET(ch->form, FORM_FISH) && !(IS_WATER( room ) || (room)->getSectorType() == SECT_UNDERWATER))
+    if (IS_SET(ch->form, FORM_FISH) && !RoomUtils::isWater(room))
         return false;
 
     return move_char( ch, door );

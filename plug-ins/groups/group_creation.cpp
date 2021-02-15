@@ -21,6 +21,7 @@
 #include "so.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "object.h"
 #include "affect.h"
 #include "magic.h"
@@ -135,16 +136,11 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     Object *spring;
     int vnum;
 
-    if (IS_WATER(ch->in_room)) {
+    if (RoomUtils::isWater(ch->in_room)) {
         ch->println("Вокруг тебя и так полно жидкости.");
         return;
     }
 
-    if (ch->in_room->getSectorType() == SECT_UNDERWATER) {
-        ch->println("Создать родник под водой не получится.");
-        return;
-    }
-    
     if (ch->in_room->getSectorType() == SECT_AIR) {
         ch->println("Создать родник в воздухе не получится.");
         return;
@@ -153,7 +149,7 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
         vnum = OBJ_VNUM_HOLY_SPRING;
     else if (ch->getProfession( )->getFlags( ch ).isSet(PROF_NATURE)) {
-         if (!IS_NATURE(ch->in_room))
+         if (!RoomUtils::isNature(ch->in_room))
         {
             ch->println("Ты не сможешь создать родник в этой местности.");
             return;

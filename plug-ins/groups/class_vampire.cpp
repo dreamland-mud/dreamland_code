@@ -14,6 +14,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "npcharacter.h"
 #include "desire.h"
 #include "object.h"
@@ -347,7 +348,7 @@ SKILL_RUNP( dig )
         return;
     }
 
-    if (IS_WATER( room )) {
+    if (RoomUtils::isWater( room )) {
         ch->send_to("Ты же не хочешь промокнуть?\r\n");
         return;
     }

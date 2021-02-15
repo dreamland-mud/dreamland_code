@@ -17,6 +17,7 @@
 #include "affect.h"
 #include "skill.h"
 #include "room.h"
+#include "roomutils.h"
 #include "core/object.h"
 #include "clanreference.h"
 
@@ -70,7 +71,7 @@ void strip_camouflage( Character *ch )
 void check_camouflage( Character *ch, Room *to_room )
 {
     if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE)
-            && !IS_NATURE(to_room))
+            && !RoomUtils::isNature(to_room))
     {
             strip_camouflage( ch );
     }        

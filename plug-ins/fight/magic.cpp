@@ -66,7 +66,7 @@
 #include "npcharacter.h"
 #include "core/object.h"
 #include "room.h"
-
+#include "roomutils.h"
 #include "dreamland.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -157,7 +157,7 @@ void area_message( Character *ch, const DLString &msg, bool everywhere )
         if (!IS_AWAKE(wch))
             continue;
             
-        if (!everywhere && !IS_OUTSIDE(wch))
+        if (!everywhere && !RoomUtils::isOutside(wch))
             continue;
         
         wch->println( msg );

@@ -19,6 +19,7 @@
 #include "so.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "object.h"
 #include "affect.h"
 #include "magic.h"
@@ -385,7 +386,7 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
 
         if ( ch->in_room->getSectorType() == SECT_AIR
                 || ch->in_room->getSectorType() == SECT_INSIDE
-                || IS_WATER(ch->in_room))
+                || RoomUtils::isWater(ch->in_room))
         {
                 ch->send_to("Здесь нет ни крупицы песка!\n\r");
                 ch->wait = 0;

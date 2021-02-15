@@ -13,6 +13,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "race.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -169,7 +170,7 @@ bool ButcherQuest::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *vi
     if (room->areaIndex()->low_range > pch->getModifyLevel( ))
         return false;
     
-    if (!IS_NATURE(room))
+    if (!RoomUtils::isNature(room))
         return false;
 
     return VictimQuestModel::checkRoomVictim( pch, room, victim );

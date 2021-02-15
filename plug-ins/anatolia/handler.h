@@ -57,10 +57,6 @@ void do_yell( Character *, const char * );
 void        extract_dead_player( PCharacter *, int flags );
 void        extract_char( Character *, bool fCount = true );
 
-#define IS_OUTSIDE(ch)                (!IS_SET(                                    \
-                                    (ch)->in_room->room_flags,                    \
-                                    ROOM_INDOORS))
-
 #define IS_TRUSTED(ch,level)        (( ch->get_trust() ) >= (level))
 
 #define        SHADOW_ACTIVE                50        

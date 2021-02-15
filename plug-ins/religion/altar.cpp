@@ -10,6 +10,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "object.h"
 #include "liquid.h"
 #include "affect.h"
@@ -76,7 +77,7 @@ CMDRUN(altar)
 
     if (!ch->in_room->isCommon() 
           || IS_SET(ch->in_room->room_flags, ROOM_LAW)
-          || IS_WATER(ch->in_room)) 
+          || RoomUtils::isWater(ch->in_room)) 
     {
         ch->println("Здесь неподходящее место для воздвигания алтарей.");
         return;

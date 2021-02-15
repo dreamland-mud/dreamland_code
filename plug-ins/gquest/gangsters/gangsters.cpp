@@ -7,6 +7,7 @@
 #include "race.h"
 #include "pcrace.h"
 #include "room.h"
+#include "roomutils.h"
 #include "object.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
@@ -824,7 +825,7 @@ bool Gangsters::isPoliceman( Character *ch )
 
 bool Gangsters::checkRoom( Room *const pRoomIndex )
 {
-    if (pRoomIndex->getSectorType() == SECT_AIR || IS_WATER(pRoomIndex))
+    if (RoomUtils::isWaterOrAir(pRoomIndex))
         return false;
     
     if (IS_SET(pRoomIndex->room_flags, ROOM_SAFE|ROOM_NO_QUEST|ROOM_NO_MOB))
