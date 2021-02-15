@@ -222,7 +222,7 @@ AreaIndexData *OLCState::get_vnum_area(int vnum)
 }
 
 static const char * SEDIT_SYNTAX = ""
-"{gВход во встроенный редактор. {y{hcq{hx{g - выход, {y{hch{hx{g - справка.\r\n";
+"{gВход во встроенный редактор. {y{hcq{hx{g - выход, {y{hch{hx{g - справка.{x\r\n";
 
 bool
 OLCState::sedit(DLString &original)

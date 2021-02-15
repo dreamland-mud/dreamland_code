@@ -71,13 +71,17 @@ static void skill_merge(
 
     if (target->visible(ch)) {
         int old_value = l0;
-        l0 = max(
+        int new_value = max(
                 max(l0, l1),
                 max(l2, l3)
         );
-        notice("Fixing skills for %s: skill %s set to %d (best of %d, %d, %d, %d)",
-            ch->getName().c_str(), target->getName().c_str(), l0,
-            old_value, l0, l1, l2, l3);
+
+        if (new_value > old_value) { 
+            l0 = new_value;
+            notice("Fixing skills for %s: skill %s set to %d (best of %d, %d, %d, %d)",
+                ch->getName().c_str(), target->getName().c_str(), l0,
+                old_value, l0, l1, l2, l3);
+        }
     }
 
     l1 = 1;

@@ -58,7 +58,7 @@ void send_telegram_note(const DLString &thread, const DLString &author, const DL
     ostringstream content;
 
     content 
-        << "*" << telegram_string(thread) << "*:" << endl
+        << "*" << telegram_string(thread).upperFirstCharacter() << "* " << endl
         << "*Автор*: " << telegram_string(author) << endl
         << "*Тема*: " << telegram_string(title) << endl
         << endl
