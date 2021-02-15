@@ -226,7 +226,17 @@ DLString print_wait_and_mana(const Skill *skill, Character *ch)
     }
 
     if (spell && spell->isCasted()) { 
-        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << "{x.";
+        char *force_type = "";
+        if (spell->flags.isSet(SPELL_PRAYER)) {
+            if (spell->flags.isSet(SPELL_MAGIC))
+                force_type = " магия или молитва";
+            else
+                force_type = " молитва";
+        }
+        else if (spell->flags.isSet(SPELL_MAGIC))
+            force_type = " магия";
+        
+        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << force_type << "{x.";
         empty = false;
     }
 
@@ -234,7 +244,10 @@ DLString print_wait_and_mana(const Skill *skill, Character *ch)
         buf << endl;
     
     if (spell && spell->isCasted() && spell->getTarget() != 0) {
-        buf << pad << "Целью служит {W" << target_table.messages(spell->getTarget(), true) << "{x. " << endl;
+        buf << pad << "Целью служит {W" << target_table.messages(spell->getTarget(), true);
+        if boolEdit(spell->ranged)
+            buf << " или по направлению (дальнобойное)";
+        buf << "{x. " << endl;
         empty = false;
     }
 
