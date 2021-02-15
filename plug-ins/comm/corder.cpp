@@ -67,7 +67,7 @@ COMMAND(COrder, "order")
 
     interpretOrder( victim, iargs, argOrder );
 
-    if(victim->is_npc() && victim->master->getPC()
+    if(victim->is_npc() && victim->master && victim->master->getPC()
     && iargs.pCommand && !iargs.pCommand->dispatchOrder( iargs )
     && victim->position < POS_FIGHTING)
     {
