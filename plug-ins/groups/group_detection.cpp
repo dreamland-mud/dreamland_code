@@ -504,6 +504,9 @@ SKILL_RUNP( detect )
         af.modifier  = 0;
         af.bitvector.setValue(DETECT_HIDDEN);
         affect_to_char( ch, &af );
+        if(IS_CHARMED(ch) && ch->master->getPC())
+        ch->master->send_to(fmt(0, "Теперь %1$C1 видит скрытое. \n\r", ch));
+        else
         ch->send_to( "Теперь ты видишь скрытое. \n\r");
         gsn_detect_hide->improve( ch, true );
         return;

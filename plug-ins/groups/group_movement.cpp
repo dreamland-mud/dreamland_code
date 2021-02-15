@@ -188,6 +188,9 @@ SKILL_RUNP( sneak )
         
         af.bitvector.setValue(AFF_SNEAK);
         affect_to_char( ch, &af );
+        if(IS_CHARMED(ch) && ch->master->getPC())
+        ch->master->send_to(fmt(0, "%^C1 начинает скрытно передвигаться.\n\r", ch));
+        else
         ch->send_to("Ты начинаешь скрытно передвигаться.\n\r");
     } else {
       gsn_sneak->improve( ch, false );
@@ -249,6 +252,9 @@ SKILL_RUNP( hide )
         if ( number_percent( ) <= chance )
         {
                 // TODO: add sector-specific messaging
+                if(IS_CHARMED(ch) && ch->master->getPC())
+                ch->master->send_to(fmt(0, "%^C1 скрывает свое присутствие, используя особенности местности.\n\r", ch));
+                else
                 ch->send_to("Ты скрываешь свое присутствие, используя особенности местности.\n\r");                
                 SET_BIT(ch->affected_by, AFF_HIDE);
                 gsn_hide->improve( ch, true );

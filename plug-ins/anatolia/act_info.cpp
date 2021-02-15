@@ -948,6 +948,32 @@ static void sortSkillsFor(vector<Skill::Pointer> &skills, Character *looker)
         });
 }
 
+/**
+ * Don't output specific skills in report function
+ */
+static bool skill_is_invalid(int sn, bool noCarry)
+{
+    if(noCarry){
+        if(sn == gsn_lash
+         || sn == gsn_bash
+         || sn == gsn_hand_to_hand
+         || sn == gsn_sword
+         || sn == gsn_polearm
+         || sn == gsn_dagger
+         || sn == gsn_whip
+         || sn == gsn_grip
+         || sn == gsn_axe
+         || sn == gsn_mace
+         || sn == gsn_shield_block
+         || sn == gsn_flail
+         || sn == gsn_slice
+         || sn == gsn_second_weapon    
+         || sn == gsn_pick_lock   
+         ) return true;
+    }
+    return false;
+}
+
 CMDRUNP(report)
 {
     DLString args = argument;
@@ -989,19 +1015,25 @@ CMDRUNP(report)
             bool canOrderFight = cmd->properOrder(pet);
             pet->fighting = 0;
 
-            if(sn == gsn_second_weapon){
+            if(sn == gsn_second_weapon && !skill_is_invalid(sn, noCarry)){
                 passives.push_back(skill);
                 continue;
             }
 
-            if((sn == gsn_lash || sn == gsn_bash) && noCarry)
-            continue;
-
+            if(skill_is_invalid(sn, noCarry))
+                continue;
+            
             if (canOrder && showAll) {
                 skills.push_back(skill);
             }
 
-            else if (canOrderFight && sn != gsn_recall) {
+            else if (canOrderFight 
+            && sn != gsn_recall 
+            && sn != gsn_concentrate
+            && sn != gsn_hide
+            && sn != gsn_sneak
+            && sn != gsn_detect_hidden
+            ) {
                 skillsFight.push_back(skill);
             }
 
@@ -1021,7 +1053,7 @@ CMDRUNP(report)
             continue;
         }
 
-        if (showAll && passive)
+        if (showAll && passive && !skill_is_invalid(sn, noCarry) )
             passives.push_back(skill);
     }
 

@@ -159,9 +159,6 @@ void WeaponOneHit::damApplyCounter( )
     if (victim->fighting)
         return;
     
-    if (IS_CHARMED(victim))
-        return;
-    
     if (victim->is_npc( ) 
         && victim->getNPC( )->behavior 
         && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
