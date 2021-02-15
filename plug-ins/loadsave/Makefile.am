@@ -35,7 +35,8 @@ objectbehaviormanager.cpp \
 areabehaviormanager.cpp \
 roombehaviormanager.cpp \
 fread_utils.cpp \
-itemevents.cpp
+itemevents.cpp \
+roomutils.cpp
 
 libloadsave_la_MOC = \
 savedcreature.h

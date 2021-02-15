@@ -12,6 +12,7 @@
 
 #include "core/object.h"
 #include "room.h"
+#include "roomutils.h"
 #include "character.h"
 #include "magic.h"
 #include "damageflags.h"
@@ -331,57 +332,35 @@ NMI_INVOKE(FeniaSpellContext, yellPanic, "(): новая жертва закли
 NMI_INVOKE(FeniaSpellContext, isWater, "(): находится ли кастер в воде или под водой")
 {
     Character *myCh = arg2character(ch);
-    if (IS_WATER(myCh->in_room))
-        return true;
-
-    if (myCh->in_room->getSectorType() == SECT_UNDERWATER)
-        return true;
-
-    return false;
+    return RoomUtils::isWater(myCh->in_room);
 }
 
 NMI_INVOKE(FeniaSpellContext, hasWaterParticles, "(): достаточно ли водяных паров в комнате кастера")
 {
     Character *myCh = arg2character(ch);
-    if (IS_WATER(myCh->in_room))
-        return true;
-
-    if (myCh->in_room->getSectorType() == SECT_UNDERWATER)
-        return true;
-
-    if (IS_SET(myCh->in_room->room_flags, ROOM_NEAR_WATER))
-        return true;
-
-    if (IS_OUTSIDE(myCh) && weather_info.sky >= SKY_RAINING)
-        return true;
-
-    return false;
+    return RoomUtils::hasWaterParticles(myCh->in_room);
 }
 
 NMI_INVOKE(FeniaSpellContext, isNature, "(): находится ли кастер в дикой местности")
 {
     Character *myCh = arg2character(ch);
-
-    return IS_NATURE(myCh->in_room);
+    return RoomUtils::isNature(myCh->in_room);
 }
 
 NMI_INVOKE(FeniaSpellContext, isOutside, "(): находится ли кастер снаружи помещения")
 {
     Character *myCh = arg2character(ch);
-
-    return IS_OUTSIDE(myCh);
+    return RoomUtils::isOutside(myCh->in_room);
 }
 
 NMI_INVOKE(FeniaSpellContext, hasDust, "(): достаточно ли пыли или песка в комнате кастера")
 {
     Character *myCh = arg2character(ch);
-    int s = myCh->in_room->getSectorType();
-    return !IS_WATER(myCh->in_room) && s != SECT_UNDERWATER && s != SECT_AIR;
+    return RoomUtils::hasDust(myCh->in_room);
 }
 
 NMI_INVOKE(FeniaSpellContext, hasParticles, "(): достаточно ли разных частиц в комнате кастера")
 {
     Character *myCh = arg2character(ch);
-    int s = myCh->in_room->getSectorType();
-    return s != SECT_UNDERWATER && s != SECT_INSIDE && IS_OUTSIDE(myCh);
+    return RoomUtils::hasParticles(myCh->in_room);
 }

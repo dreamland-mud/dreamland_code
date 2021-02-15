@@ -12,6 +12,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
+#include "roomutils.h"
 #include "save.h"
 #include "loadsave.h"                                                               
 #include "merc.h"
@@ -774,5 +775,41 @@ NMI_INVOKE( RoomWrapper, clear, "(): очистка всех runtime полей"
     guts.clear( );
     self->changed();
     return Register( );
+}
+
+NMI_INVOKE(RoomWrapper, isWater, "(): является ли эта комната водной или подводной")
+{
+    checkTarget();
+    return RoomUtils::isWater(target);
+}
+
+NMI_INVOKE(RoomWrapper, isOutside, "(): находится ли комната снаружи помещения")
+{
+    checkTarget();
+    return RoomUtils::isOutside(target);
+}
+
+NMI_INVOKE(RoomWrapper, hasWaterParticles, "(): достаточно ли водяных паров в комнате")
+{
+    checkTarget();
+    return RoomUtils::hasWaterParticles(target);
+}
+
+NMI_INVOKE(RoomWrapper, isNature, "(): является ли комната дикой местностью")
+{
+    checkTarget();
+    return RoomUtils::isNature(target);
+}
+
+NMI_INVOKE(RoomWrapper, hasDust, "(): достаточно ли пыли или песка в комнате")
+{
+    checkTarget();
+    return RoomUtils::hasDust(target);
+}
+
+NMI_INVOKE(RoomWrapper, hasParticles, "(): достаточно ли разных частиц в комнате")
+{
+    checkTarget();
+    return RoomUtils::hasParticles(target);
 }
 
