@@ -190,11 +190,12 @@ SKILL_RUNP( sneak )
         affect_to_char( ch, &af );
         if(IS_CHARMED(ch) && ch->master->getPC())
         ch->master->send_to(fmt(0, "%^C1 начинает скрытно передвигаться.\n\r", ch));
-        else
         ch->send_to("Ты начинаешь скрытно передвигаться.\n\r");
     } else {
       gsn_sneak->improve( ch, false );
-      ch->send_to("Тебе не удается скрытно передвигаться.\n\r");
+        if(IS_CHARMED(ch) && ch->master->getPC())
+        ch->master->send_to(fmt(0, "%^C4 не удается скрытно передвигаться..\n\r", ch));
+        ch->send_to("Тебе не удается скрытно передвигаться.\n\r");
     }
 
     ch->setWait( gsn_sneak->getBeats( ) );
@@ -220,6 +221,8 @@ SKILL_RUNP( hide )
 
         if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
         {
+                if(IS_CHARMED(ch) && ch->master->getPC())
+                ch->master->send_to(fmt(0, "%^C1 не может скрыться, когда светится.\n\r", ch));
                 ch->send_to("Ты не можешь скрыться, когда светишься.\n\r");
                 return;
         }
@@ -254,13 +257,14 @@ SKILL_RUNP( hide )
                 // TODO: add sector-specific messaging
                 if(IS_CHARMED(ch) && ch->master->getPC())
                 ch->master->send_to(fmt(0, "%^C1 скрывает свое присутствие, используя особенности местности.\n\r", ch));
-                else
                 ch->send_to("Ты скрываешь свое присутствие, используя особенности местности.\n\r");                
                 SET_BIT(ch->affected_by, AFF_HIDE);
                 gsn_hide->improve( ch, true );
         }
         else
         {
+                if(IS_CHARMED(ch) && ch->master->getPC())
+                ch->master->send_to(fmt(0, "%^C1 пытается скрыться, но терпит неудачу.\n\r", ch));
                 ch->send_to("Ты пытаешься скрыться, но терпишь неудачу.\n\r");                
                 if ( IS_AFFECTED(ch, AFF_HIDE) )
                         REMOVE_BIT(ch->affected_by, AFF_HIDE);

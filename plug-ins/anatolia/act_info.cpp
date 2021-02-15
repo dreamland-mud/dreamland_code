@@ -967,10 +967,27 @@ static bool skill_is_invalid(int sn, bool noCarry)
          || sn == gsn_shield_block
          || sn == gsn_flail
          || sn == gsn_slice
-         || sn == gsn_second_weapon    
-         || sn == gsn_pick_lock   
+         || sn == gsn_second_weapon
+         || sn == gsn_pick_lock    
          ) return true;
     }
+    return false;
+}
+
+/**
+ * Don't output specific skills in report function
+ */
+static bool skill_is_invalid_in_fight(int sn)
+{
+    if(sn == gsn_recall
+         || sn == gsn_concentrate
+         || sn == gsn_hide
+         || sn == gsn_sneak
+         || sn == gsn_detect_hide
+         || sn == gsn_pick_lock
+         || sn == gsn_bash_door
+         ) return true;
+    
     return false;
 }
 
@@ -1027,13 +1044,7 @@ CMDRUNP(report)
                 skills.push_back(skill);
             }
 
-            else if (canOrderFight 
-            && sn != gsn_recall 
-            && sn != gsn_concentrate
-            && sn != gsn_hide
-            && sn != gsn_sneak
-            && sn != gsn_detect_hidden
-            ) {
+            else if (canOrderFight && !skill_is_invalid_in_fight(sn)) {
                 skillsFight.push_back(skill);
             }
 
