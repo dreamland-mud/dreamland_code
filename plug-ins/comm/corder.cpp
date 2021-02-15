@@ -20,6 +20,7 @@
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
+#include "morphology.h"
 
 CLAN(ruler);
 GSN(manacles);
@@ -65,7 +66,17 @@ COMMAND(COrder, "order")
     }
 
     interpretOrder( victim, iargs, argOrder );
+
+    if(victim->is_npc() && victim->master->getPC()
+    && iargs.pCommand && !iargs.pCommand->dispatchOrder( iargs )
+    && victim->position < POS_FIGHTING)
+    {
+        DLString petName = Syntax::noun(victim->getNameP('1'));
+        victim->master->println(fmt(0,"%1$^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x.",victim, petName.c_str(), victim->position == POS_SLEEPING ? "спит и " : (victim->position == POS_RESTING || victim->position == POS_SITTING) ? "сидит и " : ""));
+        return;
+    }
     
+
     if (!iargs.pCommand || !iargs.pCommand->properOrder( victim )) {
         if (victim->isAffected( gsn_manacles ))
             act( "$C1 говорит тебе '{GЯ не буду делать это.{x'", ch, 0, victim, TO_CHAR );
@@ -78,7 +89,6 @@ COMMAND(COrder, "order")
         if (iargs.pCommand->dispatchOrder( iargs ))
             iargs.pCommand->run( victim, iargs.cmdArgs );
     }
-
 
     ch->setWaitViolence( 1 );
     ch->println( "Ok.");
