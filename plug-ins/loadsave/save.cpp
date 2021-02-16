@@ -117,7 +117,6 @@ DESIRE(thirst);
 DESIRE(bloodlust);
 WEARLOC(none);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
-bool limit_check_on_load( Object *obj );
 const FlagTable * affect_where_to_table(int where);
 int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry);
 
@@ -1854,15 +1853,6 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             if (fPersonal) 
                                 convert_personal( obj );
 
-                            if (limit_check_on_load( obj )) {
-                                // Limited item extracted: all nested items will be placed in character's inventory.
-                                if (fNest)
-                                    rgObjNest[iNest] = 0;
-                                return;
-                            }
-
-                            // Assign wearlocation only after potentially extracting a limit; 
-                            // otherwise affects that were never applied yet will be unapplied during unequip.
                             if (wear_loc != -1)
                                 obj->wear_loc.assign(wear_loc);
 

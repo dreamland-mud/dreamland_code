@@ -50,39 +50,6 @@ void limit_count_on_boot( OBJ_INDEX_DATA *pObjIndex, time_t ts, const DLString &
     return;
 }
 
-// Destroy expired limited objects once they're loaded from drops or player profile.
-bool limit_check_on_load( Object *obj )
-{
-    if (obj->pIndexData->limit < 0)
-        return false;
-
-    if (obj->timestamp <= 0) 
-        return false;
-    
-    if (obj->timestamp > dreamland->getCurrentTime( ))
-        return false;
-
-    bool fCount = true;
-
-    if (obj->getRoom( ))
-        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
-
-    if (obj->carried_by) {
-        // If this item was already expired during boot time, its count was not increased.
-        fCount = obj->timestamp > dreamland->getBootTime( );
-        LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
-            << " (" << obj->getID( ) << ") extracted for " << obj->carried_by->getName( )
-            << ", " << (fCount ? "count":"nocount") << endl;
-    } else {
-        LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
-            << " (" << obj->getID( ) << ") extracted in " << (obj->getRoom( ) ? obj->getRoom( )->vnum : -1)
-            << ", " << (fCount ? "count":"nocount") << endl;
-    }
-
-    extract_obj_1( obj, fCount );
-    return true;
-}
-
 // Return true if item is in its original reset place. Old items without reset_room etc fields
 // are going to be destroyed, but only once.
 static bool item_is_home(Object *obj)
@@ -199,8 +166,8 @@ bool limit_purge( Object *obj )
     else
         where = "none";
 
-    // Always decrease counters for periodic limits extract.
-    bool fCount = true;
+    // If this item was already expired during boot time, its count was not increased.
+    bool fCount = obj->timestamp > dreamland->getBootTime( );
     LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
         << " (" << obj->getID( ) << ") extracted for " << where 
         << ", " << (fCount ? "count":"nocount") << endl;
