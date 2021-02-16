@@ -67,12 +67,12 @@ COMMAND(COrder, "order")
 
     interpretOrder( victim, iargs, argOrder );
 
-    if(victim->is_npc() && victim->master && victim->master->getPC()
+    if(victim->is_npc() && victim->master
     && iargs.pCommand && !iargs.pCommand->dispatchOrder( iargs )
     && victim->position < POS_FIGHTING)
     {
         DLString petName = Syntax::noun(victim->getNameP('1'));
-        victim->master->println(fmt(0,"%1$^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x.",victim, petName.c_str(), victim->position == POS_SLEEPING ? "спит и " : (victim->position == POS_RESTING || victim->position == POS_SITTING) ? "сидит и " : ""));
+        victim->master->pecho("%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x.",victim, petName.c_str(), victim->position == POS_SLEEPING ? "спит и " : (victim->position == POS_RESTING || victim->position == POS_SITTING) ? "сидит и " : "");
         return;
     }
     
