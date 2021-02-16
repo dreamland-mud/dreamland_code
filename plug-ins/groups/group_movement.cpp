@@ -172,8 +172,10 @@ SKILL_RUNP( sneak )
     affect_strip( ch, gsn_sneak );
 
     if( IS_AFFECTED(ch,AFF_SNEAK)) {
-      ch->send_to("Ты и так двигаешься бесшумно.\n\r");
-      return;
+        if(IS_CHARMED(ch))
+        ch->master->pecho("%^$#C1 и так двигается бесшумно.\n\r", ch);
+        ch->send_to("Ты и так двигаешься бесшумно.\n\r");
+        return;
     }
 
     if ( number_percent( ) < gsn_sneak->getEffective( ch ) + skill_level_bonus(*gsn_sneak, ch))
@@ -188,10 +190,14 @@ SKILL_RUNP( sneak )
         
         af.bitvector.setValue(AFF_SNEAK);
         affect_to_char( ch, &af );
+        if(IS_CHARMED(ch))
+        ch->master->pecho("%1$#^C1 начинает скрытно передвигаться.\n\r", ch);
         ch->send_to("Ты начинаешь скрытно передвигаться.\n\r");
     } else {
       gsn_sneak->improve( ch, false );
-      ch->send_to("Тебе не удается скрытно передвигаться.\n\r");
+        if(IS_CHARMED(ch))
+        ch->master->pecho("%1$#^C1 не удается скрытно передвигаться.\n\r", ch);
+        ch->send_to("Тебе не удается скрытно передвигаться.\n\r");
     }
 
     ch->setWait( gsn_sneak->getBeats( ) );
@@ -217,6 +223,8 @@ SKILL_RUNP( hide )
 
         if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
         {
+                if(IS_CHARMED(ch))
+                ch->master->pecho("%1$#^C1 не может скрыться, когда светится.\n\r", ch);
                 ch->send_to("Ты не можешь скрыться, когда светишься.\n\r");
                 return;
         }
@@ -249,12 +257,16 @@ SKILL_RUNP( hide )
         if ( number_percent( ) <= chance )
         {
                 // TODO: add sector-specific messaging
+                if(IS_CHARMED(ch))
+                ch->master->pecho("%1$#^C1 скрывает свое присутствие, используя особенности местности.\n\r", ch);
                 ch->send_to("Ты скрываешь свое присутствие, используя особенности местности.\n\r");                
                 SET_BIT(ch->affected_by, AFF_HIDE);
                 gsn_hide->improve( ch, true );
         }
         else
         {
+                if(IS_CHARMED(ch))
+                ch->master->pecho("%1$#^C1 пытается скрыться, но терпит неудачу.\n\r", ch);
                 ch->send_to("Ты пытаешься скрыться, но терпишь неудачу.\n\r");                
                 if ( IS_AFFECTED(ch, AFF_HIDE) )
                         REMOVE_BIT(ch->affected_by, AFF_HIDE);

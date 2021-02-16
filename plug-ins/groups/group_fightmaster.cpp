@@ -45,6 +45,7 @@
 #include "material.h"
 #include "interp.h"
 #include "def.h"
+#include "morphology.h"
 
 GSN(riding);
 CLAN(shalafi);
@@ -217,6 +218,10 @@ SKILL_RUNP( bashdoor )
                 ch->setWait( gsn_bash_door->getBeats( ) * 3 / 2  );
                 damage_bash = ch->damroll + number_range(4,4 + 4* ch->size + chance/5);
                 damage(ch,ch,damage_bash,gsn_bash_door, DAM_BASH, true, DAMF_WEAPON);
+                if(IS_CHARMED(ch) && ch->master->getPC()){
+                DLString petName = Syntax::noun(ch->getNameP('1'));
+                ch->master->println(fmt(0,"%1$^C1 упа%1$Gло|л|ла и не может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x, если хочешь продолжить выбивать %1$Gим|им|ей двери.",ch, petName.c_str()));
+                }
         }
 
         return;
