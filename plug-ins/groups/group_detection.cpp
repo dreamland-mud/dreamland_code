@@ -481,8 +481,8 @@ SKILL_RUNP( detect )
 
         if ( CAN_DETECT(ch, DETECT_HIDDEN) )
         {
-                if(IS_CHARMED(ch) && ch->master->getPC())
-                ch->master->send_to(fmt(0, "%^C1 уже видит скрытое. \n\r", ch));
+                if(IS_CHARMED(ch))
+                ch->master->pecho("%1$#^C1 уже видит скрытое.\n\r", ch);
                 ch->send_to("Ты уже видишь скрытое. \n\r");
                 return;
         }
@@ -491,8 +491,8 @@ SKILL_RUNP( detect )
         
         if ( number_percent( ) > gsn_detect_hide->getEffective( ch ) + skill_level_bonus(*gsn_detect_hide, ch) )
         {
-                if(IS_CHARMED(ch) && ch->master->getPC())
-                ch->master->send_to(fmt(0, "%^C1 пытается увидеть скрытое, но у не%1$Gго|го|е ничего не выходит.\n\r", ch));
+                if(IS_CHARMED(ch))
+                ch->master->pecho("%1$#^C1 пытается увидеть скрытое, но у не%1$Gго|го|е ничего не выходит.\n\r", ch);
                 ch->send_to("Ты пытаешься увидеть скрытое, но у тебя ничего не выходит.\n\r");
                 gsn_detect_hide->improve( ch, false );
                 return;
@@ -508,8 +508,8 @@ SKILL_RUNP( detect )
         af.modifier  = 0;
         af.bitvector.setValue(DETECT_HIDDEN);
         affect_to_char( ch, &af );
-        if(IS_CHARMED(ch) && ch->master->getPC())
-        ch->master->send_to(fmt(0, "Теперь %1$C1 видит скрытое. \n\r", ch));
+        if(IS_CHARMED(ch))
+        ch->master->pecho("Теперь %1$#C1 видит скрытое.\n\r", ch);
         ch->send_to( "Теперь ты видишь скрытое. \n\r");
         gsn_detect_hide->improve( ch, true );
         return;
