@@ -120,7 +120,7 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
     }
 }
 
-int DefaultSpell::getManaCost( Character *ch )
+int DefaultSpell::getManaCost( Character *ch ) const
 {
     if (!skill->available( ch ))
         return 50;

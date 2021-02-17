@@ -86,7 +86,7 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
         << print_group_for(this, ch)
         << ".{x" << endl;
 
-    buf << print_wait_and_mana(this, ch);
+    buf << printWaitAndMana(ch);
     
     buf << SKILL_INFO_PAD 
         << "Появляется у карт, начиная с {C" 
