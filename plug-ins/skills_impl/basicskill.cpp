@@ -21,6 +21,7 @@
 #include "desire.h"
 #include "hometown.h"
 #include "feniaspellhelper.h"
+#include "defaultspell.h"
 #include "command.h"
 
 #include "fight.h"
@@ -28,6 +29,7 @@
 #include "commandflags.h"
 #include "stats_apply.h"
 #include "act.h"
+#include "dreamland.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "material.h"
@@ -398,4 +400,80 @@ map<DLString, int> BasicSkill::parseAccessTokens(const DLString &newValue, const
     }
 
     return entriesWithLevels;
+}
+
+DLString BasicSkill::printLevelBonus(Character *ch) const
+{
+    ostringstream buf;
+
+    int bonus = skill_level_bonus(const_cast<Skill &>(*(Skill*)this), ch);
+
+    if (bonus > 0)
+        buf << SKILL_INFO_PAD << fmt(0, "У тебя бонус {C%1$d{x уров%1$Iень|ня|ней на это умение.", bonus) << endl;
+    else if (bonus < 0)
+        buf << SKILL_INFO_PAD << fmt(0, "У тебя штраф {r%1$d{x уров%1$Iень|ня|ней на это умение.", bonus) << endl;
+
+    return buf.str();
+}
+
+DLString BasicSkill::printWaitAndMana(Character *ch) const
+{
+    const char *pad = SKILL_INFO_PAD;
+    bool empty = true; // Contains any meaningful output besides padding and new lines?
+    ostringstream buf;
+
+    buf << pad;
+
+    int beat = getBeats() / dreamland->getPulsePerSecond();
+    if (beat > 0) {
+        buf << fmt(0, "Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. ", beat);
+        empty = false;
+    }
+    
+    int mana = (ch && spell && spell->isCasted( )) ? spell->getManaCost(ch) : getMana();
+    if (mana > 0) {
+        buf << fmt(0, "Расход маны {W%d{x. ", mana);
+        empty = false;
+    }
+
+    DefaultSpell::Pointer dspell = spell.getDynamicPointer<DefaultSpell>();
+    if (dspell && spell->isCasted()) { 
+        const char *force_type = "";
+        if (dspell->flags.isSet(SPELL_PRAYER)) {
+            if (dspell->flags.isSet(SPELL_MAGIC))
+                force_type = " магия или молитва";
+            else
+                force_type = " молитва";
+        }
+        else if (dspell->flags.isSet(SPELL_MAGIC))
+            force_type = " магия";
+        
+        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << force_type << "{x.";
+        empty = false;
+    }
+
+    if (!empty)
+        buf << endl;
+    
+    if (dspell && spell->isCasted() && spell->getTarget() != 0) {
+        buf << pad << "Целью служит {W" << target_table.messages(spell->getTarget(), true);
+        if (dspell->getMaxRange(ch) > 0)
+            buf << " или по направлению (дальнобойное)";
+        buf << "{x. " << endl;
+        empty = false;
+    }
+
+    if (isPassive()) {
+        if (!empty)
+            buf << pad;
+        buf << "Это {Cпассивное умение{x, работает автоматически." << endl;
+        empty = false;
+    }
+
+    // TODO: expose spell position and show it here.
+
+    if (empty) 
+        return DLString::emptyString;
+
+    return buf.str();
 }

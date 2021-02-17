@@ -57,7 +57,15 @@ public:
     virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
     virtual DLString accessToString() const;
     map<DLString, int> parseAccessTokens(const DLString &newValue, const GlobalRegistryBase *registry, ostringstream &errBuf) const;
+
+    // Autohelp rendering.
+
+    /** Output bonus/penalty to skill level. */
+    DLString printLevelBonus(Character *ch) const;
     
+    /** Print wait state, targets and mana cost for a skill. */
+    DLString printWaitAndMana(Character *ch) const;
+
     XML_VARIABLE XMLStringNoEmpty nameRus;
     XML_VARIABLE XMLRussianString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;

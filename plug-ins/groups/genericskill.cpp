@@ -329,7 +329,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         << print_names_for(this, ch)
         << print_group_for(this, ch)
         << ".{x" << endl
-        << print_wait_and_mana(this, ch);
+        << printWaitAndMana(ch);
 
     if (!visible( ch )) {
         if (!classes.empty() && ch->getProfession() != prof_none)
@@ -400,7 +400,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
     else if (ch->getModifyLevel() < 20)
         buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
 
-    buf << print_level_bonus(this, ch);
+    buf << printLevelBonus(ch);
 }
 
 /*

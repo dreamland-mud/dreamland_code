@@ -44,12 +44,6 @@ DLString print_what(const Skill *skill);
 /** Return skill group name with a hyper-link. */
 DLString print_group_for(const Skill *skill, Character *ch);
 
-/** Print wait state, targets and mana cost for a skill. */
-DLString print_wait_and_mana(const Skill *skill, Character *ch);
-
-/** Output bonus/penalty to skill level. */
-DLString print_level_bonus(const Skill *skill, Character *ch);
-
 bool skill_is_spell(const Skill *skill);
 DLString skill_what(const Skill *skill);
 DLString skill_what_plural(const Skill *skill);

@@ -113,7 +113,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
     }
     buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
 
-    buf << print_wait_and_mana(this, ch);
+    buf << printWaitAndMana(ch);
     
     if (!visible( ch ))
         return;
@@ -128,7 +128,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
 
     buf << "." << endl;
 
-    buf << print_level_bonus(this, ch);
+    buf << printLevelBonus(ch);
 }
 
 const SkillRaceInfo *
