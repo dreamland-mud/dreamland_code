@@ -144,7 +144,10 @@ int DefaultSpell::getMaxRange( Character *ch ) const
     if (position.getValue( ) == POS_STANDING)
         return 0;
 
-    int level = skill->getLevel( ch ); 
+    if (!target.isSet(TAR_CHAR_ROOM))
+        return 0;
+
+    int level = ch ? skill->getLevel( ch ) : 1; 
         
     return max(1,level / 10);
 }

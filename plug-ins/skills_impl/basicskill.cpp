@@ -438,7 +438,7 @@ DLString BasicSkill::printWaitAndMana(Character *ch) const
 
     DefaultSpell::Pointer dspell = spell.getDynamicPointer<DefaultSpell>();
     if (dspell && spell->isCasted()) { 
-        char *force_type = "";
+        const char *force_type = "";
         if (dspell->flags.isSet(SPELL_PRAYER)) {
             if (dspell->flags.isSet(SPELL_MAGIC))
                 force_type = " магия или молитва";
@@ -457,7 +457,7 @@ DLString BasicSkill::printWaitAndMana(Character *ch) const
     
     if (dspell && spell->isCasted() && spell->getTarget() != 0) {
         buf << pad << "Целью служит {W" << target_table.messages(spell->getTarget(), true);
-        if (dspell->ranged)
+        if (dspell->getMaxRange(ch) > 0)
             buf << " или по направлению (дальнобойное)";
         buf << "{x. " << endl;
         empty = false;
