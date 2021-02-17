@@ -680,6 +680,17 @@ bool OLCState::editorPaste(char *&field, editor_flags flags)
     return true;
 }
 
+bool OLCState::editor(const char *argument, RussianString &russian, editor_flags flags)
+{
+    DLString original = russian.getFullForm();
+    
+    if (!editor(argument, original, flags))
+        return false;
+    
+    russian.setFullForm(original.c_str());
+    return true;
+}
+
 bool OLCState::editor(const char *argument, char *&field, editor_flags flags)
 {
     DLString original = field;

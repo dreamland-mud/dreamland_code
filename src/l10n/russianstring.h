@@ -26,6 +26,7 @@ public:
     
     void setFullForm(const DLString &ff);
     void setGender(const Grammar::MultiGender &mg);
+    const Grammar::MultiGender & getMultiGender() const { return mg; }
 
 protected:
     void fillCachedForms();

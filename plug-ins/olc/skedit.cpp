@@ -1,5 +1,6 @@
 
 #include "util/regexp.h"
+#include "grammar_entities_impl.h"
 #include "wrapperbase.h"
 #include "stringset.h"
 #include "pcharacter.h"
@@ -123,6 +124,10 @@ void OLCStateSkill::show( PCharacter *ch )
     ptc(ch, "Характер:    {C%s {D(align) {C%s {D(ethos){x\r\n",
         r->align.getValue() != 0 ? r->align.names().c_str() : "-",
         r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
+    ptc(ch, "Сообщение:   {C%s{x %s {D(dammsg) {C%s {D(damgender){x\r\n",
+        r->getDammsg().getFullForm().c_str(),
+        web_edit_button(ch, "dammsg", "web").c_str(),
+        r->getDammsg().getMultiGender().toString());
 
     if (r->help)
         ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
@@ -344,6 +349,26 @@ SKEDIT(allow, "доступно", "ограничения по классу, к�
     bool rc = r->accessFromString(newValue, errBuf);
     ch->send_to(errBuf);
     return rc;
+}
+
+SKEDIT(dammsg, "уронимя", "сообщение об уроне ('струя кислоты')")
+{
+    BasicSkill *r = getOriginal();
+    return editor(argument, r->dammsg, ED_NO_NEWLINE);
+}
+
+SKEDIT(damgender, "уронрод", "грамматический род сообщения об уроне (n, m, f, p)")
+{
+    BasicSkill *r = getOriginal();
+
+    if (argument[0] == '\0') {
+        stc("Формат:  damgender m|f|n|p\n\r", ch);
+        return false;
+    }
+
+    r->dammsg.setGender(Grammar::MultiGender(argument));
+    ptc(ch, "Род сообщения об уроне установлен в '{g%s{x'.\n\r", r->dammsg.getMultiGender().toString());
+    return true;
 }
 
 
