@@ -230,7 +230,15 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
         if (spell->getPosition() > ch->position)
             return false;
     }
-    
+
+    if (IS_SET(ch->in_room->room_flags, ROOM_NO_CAST)) {
+        if (RoomUtils::isOutside(ch))
+            ch->println("Местность вокруг тебя блокирует все заклинания.");
+        else
+            ch->println("Стены этой комнаты поглощают заклинание.");
+        return false;
+    }
+
     if (IS_SET(flags, FSPELL_MANA)) {
         int mana = spell->getManaCost( ch ) / 2;
 
