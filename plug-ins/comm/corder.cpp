@@ -76,8 +76,9 @@ COMMAND(COrder, "order")
         return;
     }
     
-
-    if (!iargs.pCommand || !iargs.pCommand->properOrder( victim )) {
+    if (!iargs.pCommand) ch->println("Похоже, такой команды не существует.");
+    
+    else if(!iargs.pCommand->properOrder( victim )) {
         if (victim->isAffected( gsn_manacles ))
             act( "$C1 говорит тебе '{GЯ не буду делать это.{x'", ch, 0, victim, TO_CHAR );
         else
@@ -89,6 +90,7 @@ COMMAND(COrder, "order")
         if (iargs.pCommand->dispatchOrder( iargs ))
             iargs.pCommand->run( victim, iargs.cmdArgs );
     }
+
 
     ch->setWaitViolence( 1 );
     ch->println( "Ok.");
