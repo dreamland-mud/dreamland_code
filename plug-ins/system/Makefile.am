@@ -42,6 +42,7 @@ roombehaviorplugin.cpp \
 fenia_utils.cpp \
 math_utils.cpp \
 calendar_utils.cpp \
+morphology.cpp \
 configurable.cpp
 
 libsystem_la_MOC = \
