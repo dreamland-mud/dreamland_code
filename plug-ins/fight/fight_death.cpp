@@ -69,6 +69,288 @@ enum {
 
 RELIG(shamash);
 
+/*-----------------------------------------------------------------------------------------*
+ * death autocommands 
+ *-----------------------------------------------------------------------------------------*/
+DESIRE(bloodlust);
+
+class DeathAutoCommands {
+public:
+    DeathAutoCommands( Character *killer, Character *ch )
+                 : killer( killer ), ch( ch ), corpse( 0 )
+    {
+    }
+
+    void run( )
+    {
+        if (!applicable( ))
+            return;
+        
+        findCorpse( );
+
+        autoLook( );
+        autoLoot( );
+        autoGold( );
+        autoBlood( );
+        autoSacrifice( );
+    }
+
+protected:
+    void findCorpse( )
+    {
+        for (Object *obj = killer->in_room->contents; obj; obj = obj->next_content)
+            if (obj->item_type == ITEM_CORPSE_NPC 
+                && obj->value3() == ch->getNPC( )->pIndexData->vnum) 
+            {
+                corpse = obj;
+                break;
+            }
+    }
+
+    virtual bool applicable( )
+    {
+        if (killer->is_npc( ))
+            return false;
+
+        if (!ch->is_npc( ))
+            return false;
+
+        if (killer->in_room != ch->in_room)
+            return false;
+        
+        return true;
+    }
+
+    void autoLoot( )
+    {
+        if (!corpse || !corpse->contains) 
+            return;
+        
+        if(!killer->can_see( corpse )){
+            if(IS_AFFECTED(killer, AFF_BLIND))
+            killer->println("{WТы пытаешься вслепую ограбить труп, но ничего не выходит.{x");          
+            return;
+        }
+
+        if (IS_SET(killer->act, PLR_AUTOLOOT)){
+            killer->println("{WТы автоматически берешь вещи из трупа:{x");
+            do_get_all_raw( killer, corpse );
+        }
+    }
+
+    void autoLook( )
+    {
+        if (!corpse || !corpse->contains || !killer->can_see( corpse ))
+            return;
+
+        if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) 
+            oprog_examine( corpse, killer );
+    }
+
+    void autoGold( )
+    {
+        if (!corpse || !corpse->contains)
+            return;
+
+        if (IS_SET(killer->act, PLR_AUTOGOLD)) {
+            Object *money = get_obj_list_type( killer, ITEM_MONEY, corpse->contains );
+
+            if (money)
+                do_get_raw( killer, money, corpse );
+        }
+    }
+
+    void autoBlood( )
+    {
+        if (desire_bloodlust->applicable( killer->getPC( ) )
+        && !(IS_BLOODLESS(ch)))    
+        {
+            act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
+            act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
+            desire_bloodlust->gain( killer->getPC( ), 3 );
+        }
+    }
+
+    void autoSacrifice( )
+    {
+        if (!corpse)
+            return;
+        
+        if (!IS_SET(killer->act, PLR_AUTOSAC))
+            return;
+
+        if (IS_SET(killer->act, PLR_AUTOLOOT) && corpse->contains)
+            return;
+
+        interpret_raw( killer, "sacrifice", 
+                       get_obj_name_list( corpse, corpse->in_room->contents, killer ).c_str( ) );
+    }
+
+    Character *killer;
+    Character *ch;
+    Object *corpse;
+};
+
+
+/*-----------------------------------------------------------------------------------------*
+ * death penalties
+ *-----------------------------------------------------------------------------------------*/
+PROF(samurai);
+void delete_player( PCharacter * );
+
+class PlayerDeleteTask : public SchedulerTask {
+public:
+    typedef ::Pointer<PlayerDeleteTask> Pointer;
+    
+    PlayerDeleteTask( PCharacter *p, Character *k, const DLString &m )
+                      : pvict( p ), killer( k ), msgWiznet( m )
+    {
+    }
+    virtual void run( )
+    {
+        pvict->println("Ты превращаешься в привидение и покидаешь этот мир.");
+        act( "$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
+        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
+        
+        delete_player( pvict );
+    }
+    virtual int getPriority( ) const
+    {
+        return SCDP_IOWRITE - 100;
+    }
+
+private:
+    PCharacter *pvict;
+    Character *killer;
+    DLString msgWiznet;
+};
+
+class DeathPenalties {
+public:
+    DeathPenalties( Character *killer, Character *ch )
+             : killer( killer ), ch( ch )
+    {
+        if (!ch->is_npc( ))
+            pch = ch->getPC( );
+    }
+
+    bool run( ) 
+    {
+        if (!applicable( ))
+            return false;
+
+        pch->death++;
+
+        return penaltyDelete( ) 
+               || penaltyConstitution( )
+               || penaltyCharisma( );
+    }
+
+protected:
+    virtual bool applicable( ) 
+    {
+        if (ch->is_npc( )) 
+            return false;
+        
+        if (ch != killer
+            && !(killer->is_npc( ) && !killer->master && !killer->leader)
+            && !IS_SET(ch->act, PLR_WANTED))
+            return false;
+
+        return true;
+    }
+
+    bool penaltyConstitution( )
+    {
+        if (pch->getProfession( ) == prof_samurai)
+            return false;
+
+        if (pch->getReligion() == god_shamash)
+            return false;
+
+        if (pch->death % 5)
+            return false;
+
+        pch->perm_stat[STAT_CON]--;
+
+        if (pch->perm_stat[STAT_CON] >= 3) {
+            pch->println("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
+            return false;
+        }
+        
+        pch->perm_stat[STAT_CON] = 10;
+
+        DLScheduler::getThis( )->putTaskNOW(
+            PlayerDeleteTask::Pointer( NEW, pch, killer, 
+                "%C1 : %C1 удаляется из-за слабого телосложения." ) );
+        return true;
+    }
+
+    bool penaltyCharisma( )
+    {
+        if (pch->getProfession( ) == prof_samurai) {
+            if ((pch->death % 3) == 2) {
+                pch->perm_stat[STAT_CHA]--;
+                pch->println("Ты чувствуешь, как твое обаяние уменьшается после этой смерти.");
+            }
+        }
+
+        return false;
+    }
+
+    bool penaltyDelete( )
+    {
+        if (pch->getProfession( ) != prof_samurai)
+            return false;
+            
+        if (pch->death <= 10)
+            return false;
+            
+        pch->death = 0;
+
+        DLScheduler::getThis( )->putTaskNOW(
+            PlayerDeleteTask::Pointer( NEW, pch, killer, 
+                "%C1 : %C1 удаляется, достигнув предела 10 смертей самурая." ) );
+        return true;
+    }
+
+    Character *killer;
+    Character *ch;
+    PCharacter *pch;
+};
+
+class DeathEventHandler : public Plugin, public EventHandler {
+public:
+    typedef ::Pointer<DeathEventHandler> Pointer;
+
+    virtual void initialization()
+    {
+        eventBus->subscribe(typeid(CharDeathEvent), Pointer(this));
+    }
+
+    virtual void destruction()
+    {
+        eventBus->unsubscribe(typeid(CharDeathEvent), Pointer(this));
+    }
+
+    virtual void handleEvent(const type_index &eventType, const Event &event) const
+    {
+        const CharDeathEvent &evt = static_cast<const CharDeathEvent &>(event);
+        Character *victim = evt.victim;
+        Character *killer = evt.killer;
+
+        //transfer the killer flag to master if killer is a charmed npc
+        if (killer->is_npc() && killer->master && !killer->master->is_npc())
+            killer = killer->master;
+
+        DeathPenalties( killer, victim ).run( );
+
+        group_gain( killer, victim );
+        raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+        pk_gain( killer, victim );
+    }
+};
+
 static void loot_transform( Object *obj, Character *ch )
 {
     // ROT_DEATH flag is only effective when the second owner dies (i.e. not the original mob that was reset with this item). 
@@ -634,7 +916,10 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
         if (IS_SET(flags, FKILL_MOB_EXTRACT))
             extract_char( victim );
         else
+        {
             victim->setDead( );
+            DeathAutoCommands( ch, victim ).run( );   
+        }    
 
         return;
     }
@@ -664,283 +949,6 @@ void pk_gain( Character *killer, Character *victim )
 
     }
 }
-
-
-/*-----------------------------------------------------------------------------------------*
- * death autocommands 
- *-----------------------------------------------------------------------------------------*/
-DESIRE(bloodlust);
-
-class DeathAutoCommands {
-public:
-    DeathAutoCommands( Character *killer, Character *ch )
-                 : killer( killer ), ch( ch ), corpse( 0 )
-    {
-    }
-
-    void run( )
-    {
-        if (!applicable( ))
-            return;
-        
-        findCorpse( );
-
-        autoLook( );
-        autoLoot( );
-        autoGold( );
-        autoBlood( );
-        autoSacrifice( );
-    }
-
-protected:
-    void findCorpse( )
-    {
-        for (Object *obj = killer->in_room->contents; obj; obj = obj->next_content)
-            if (obj->item_type == ITEM_CORPSE_NPC 
-                && obj->value3() == ch->getNPC( )->pIndexData->vnum) 
-            {
-                corpse = obj;
-                break;
-            }
-    }
-
-    virtual bool applicable( )
-    {
-        if (killer->is_npc( ))
-            return false;
-
-        if (!ch->is_npc( ))
-            return false;
-
-        if (killer->in_room != ch->in_room)
-            return false;
-        
-        return true;
-    }
-
-    void autoLoot( )
-    {
-        if (!corpse || !corpse->contains || !killer->can_see( corpse ))
-            return;
-
-        if (IS_SET(killer->act, PLR_AUTOLOOT))
-            do_get_all_raw( killer, corpse );
-    }
-
-    void autoLook( )
-    {
-        if (!corpse || !corpse->contains || !killer->can_see( corpse ))
-            return;
-
-        if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) 
-            oprog_examine( corpse, killer );
-    }
-
-    void autoGold( )
-    {
-        if (!corpse || !corpse->contains)
-            return;
-
-        if (IS_SET(killer->act, PLR_AUTOGOLD)) {
-            Object *money = get_obj_list_type( killer, ITEM_MONEY, corpse->contains );
-
-            if (money)
-                do_get_raw( killer, money, corpse );
-        }
-    }
-
-    void autoBlood( )
-    {
-        if (desire_bloodlust->applicable( killer->getPC( ) )
-        && !(IS_BLOODLESS(ch)))    
-        {
-            act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
-            act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
-            desire_bloodlust->gain( killer->getPC( ), 3 );
-        }
-    }
-
-    void autoSacrifice( )
-    {
-        if (!corpse)
-            return;
-        
-        if (!IS_SET(killer->act, PLR_AUTOSAC))
-            return;
-
-        if (IS_SET(killer->act, PLR_AUTOLOOT) && corpse->contains)
-            return;
-
-        interpret_raw( killer, "sacrifice", 
-                       get_obj_name_list( corpse, corpse->in_room->contents, killer ).c_str( ) );
-    }
-
-    Character *killer;
-    Character *ch;
-    Object *corpse;
-};
-
-
-/*-----------------------------------------------------------------------------------------*
- * death penalties
- *-----------------------------------------------------------------------------------------*/
-PROF(samurai);
-void delete_player( PCharacter * );
-
-class PlayerDeleteTask : public SchedulerTask {
-public:
-    typedef ::Pointer<PlayerDeleteTask> Pointer;
-    
-    PlayerDeleteTask( PCharacter *p, Character *k, const DLString &m )
-                      : pvict( p ), killer( k ), msgWiznet( m )
-    {
-    }
-    virtual void run( )
-    {
-        pvict->println("Ты превращаешься в привидение и покидаешь этот мир.");
-        act( "$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
-        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
-        
-        delete_player( pvict );
-    }
-    virtual int getPriority( ) const
-    {
-        return SCDP_IOWRITE - 100;
-    }
-
-private:
-    PCharacter *pvict;
-    Character *killer;
-    DLString msgWiznet;
-};
-
-class DeathPenalties {
-public:
-    DeathPenalties( Character *killer, Character *ch )
-             : killer( killer ), ch( ch )
-    {
-        if (!ch->is_npc( ))
-            pch = ch->getPC( );
-    }
-
-    bool run( ) 
-    {
-        if (!applicable( ))
-            return false;
-
-        pch->death++;
-
-        return penaltyDelete( ) 
-               || penaltyConstitution( )
-               || penaltyCharisma( );
-    }
-
-protected:
-    virtual bool applicable( ) 
-    {
-        if (ch->is_npc( )) 
-            return false;
-        
-        if (ch != killer
-            && !(killer->is_npc( ) && !killer->master && !killer->leader)
-            && !IS_SET(ch->act, PLR_WANTED))
-            return false;
-
-        return true;
-    }
-
-    bool penaltyConstitution( )
-    {
-        if (pch->getProfession( ) == prof_samurai)
-            return false;
-
-        if (pch->getReligion() == god_shamash)
-            return false;
-
-        if (pch->death % 5)
-            return false;
-
-        pch->perm_stat[STAT_CON]--;
-
-        if (pch->perm_stat[STAT_CON] >= 3) {
-            pch->println("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
-            return false;
-        }
-        
-        pch->perm_stat[STAT_CON] = 10;
-
-        DLScheduler::getThis( )->putTaskNOW(
-            PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 : %C1 удаляется из-за слабого телосложения." ) );
-        return true;
-    }
-
-    bool penaltyCharisma( )
-    {
-        if (pch->getProfession( ) == prof_samurai) {
-            if ((pch->death % 3) == 2) {
-                pch->perm_stat[STAT_CHA]--;
-                pch->println("Ты чувствуешь, как твое обаяние уменьшается после этой смерти.");
-            }
-        }
-
-        return false;
-    }
-
-    bool penaltyDelete( )
-    {
-        if (pch->getProfession( ) != prof_samurai)
-            return false;
-            
-        if (pch->death <= 10)
-            return false;
-            
-        pch->death = 0;
-
-        DLScheduler::getThis( )->putTaskNOW(
-            PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 : %C1 удаляется, достигнув предела 10 смертей самурая." ) );
-        return true;
-    }
-
-    Character *killer;
-    Character *ch;
-    PCharacter *pch;
-};
-
-class DeathEventHandler : public Plugin, public EventHandler {
-public:
-    typedef ::Pointer<DeathEventHandler> Pointer;
-
-    virtual void initialization()
-    {
-        eventBus->subscribe(typeid(CharDeathEvent), Pointer(this));
-    }
-
-    virtual void destruction()
-    {
-        eventBus->unsubscribe(typeid(CharDeathEvent), Pointer(this));
-    }
-
-    virtual void handleEvent(const type_index &eventType, const Event &event) const
-    {
-        const CharDeathEvent &evt = static_cast<const CharDeathEvent &>(event);
-        Character *victim = evt.victim;
-        Character *killer = evt.killer;
-
-        //transfer the killer flag to master if killer is a charmed npc and victim is a player
-        if (killer->is_npc() && !victim->is_npc() && killer->master && !killer->master->is_npc())
-            killer = killer->master;
-
-        DeathPenalties( killer, victim ).run( );
-
-        group_gain( killer, victim );
-        raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-        pk_gain( killer, victim );
-
-        DeathAutoCommands( killer, victim ).run( );
-    }
-};
 
 extern "C"
 {
