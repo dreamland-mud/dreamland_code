@@ -328,6 +328,14 @@ NMI_INVOKE( Root, max, "(a, b): максимальное из двух чисе�
     return Register( ::max(args.front( ).toNumber( ), args.back( ).toNumber( )) );
 }
 
+NMI_INVOKE( Root, urange, "(a, x, b): ограничить число х сверху и снизу") 
+{
+    int a = argnum2number(args, 1);
+    int x = argnum2number(args, 2);
+    int b = argnum2number(args, 3);
+    return URANGE(a, x, b);
+}
+
 NMI_INVOKE( Root, abs, "(n): модуль числа n") 
 {
     int x;
@@ -667,7 +675,7 @@ NMI_INVOKE(Root, sync, "(): test for objects sync (системное)")
 }
 
 
-NMI_INVOKE(Root, object, "(id): поиск феневого объекта по ID (cистемное)" )
+NMI_INVOKE(Root, object, "(id): поиск феневого объекта по феневому ID (cистемное)" )
 {
     Scripting::Object::id_t id;
 
@@ -681,6 +689,18 @@ NMI_INVOKE(Root, object, "(id): поиск феневого объекта по 
        return Register( );
 
     return Register(&*i);
+}
+
+NMI_INVOKE(Root, object2, "(id): поиск феневого объекта по СТРОКЕ с глобальным ID (cистемное)" )
+{
+    DLString idStr = args2string(args);
+    long long id = idStr.toLongLong();    
+    WrapperManagerBase::WrapperMap::const_iterator i = WrapperManagerBase::map.find(id);
+
+    if (i == WrapperManagerBase::map.end())
+        return Register( );
+
+    return i->second;
 }
 
 #if 0
