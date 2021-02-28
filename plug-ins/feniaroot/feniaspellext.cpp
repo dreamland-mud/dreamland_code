@@ -10,6 +10,7 @@
 #include "structwrappers.h"
 #include "feniamanager.h"
 
+#include "skillreference.h"
 #include "core/object.h"
 #include "room.h"
 #include "roomutils.h"
@@ -27,6 +28,9 @@
 
 using Scripting::NativeTraits;
 using namespace Scripting;
+
+GSN(blindness);
+GSN(curse);
 
 DLString regfmt(Character *to, const RegisterList &argv);
 
@@ -175,6 +179,38 @@ NMI_INVOKE(FeniaSpellContext, damage, "([damtype,damflags]): нанести по
     return Register(false);
 }
 
+NMI_INVOKE(FeniaSpellContext, groupCast, "(func): вызвать ф-ию для всех согруппников в той же комнате, у кого не сработал spellbane")
+{
+    DefaultSpell *mySpell = arg2spell(spell);    
+    Character *caster = arg2character(ch);
+    RegisterList::const_iterator ai = args.begin();
+    Register rfun = *ai++;
+    Closure *fun = rfun.toFunction( );
+    RegisterList funArgs;
+    funArgs.assign(ai, args.end( ));
+
+    for (auto &rch: caster->in_room->getPeople()) {
+        if (rch->in_room != caster->in_room)
+            continue;
+        if(!is_same_group(rch, caster))
+            continue;
+        if (mySpell->spellbane(caster, rch))
+            continue;
+
+        vict = wrap(rch);
+
+        try {
+            fun->invoke(thiz, funArgs);
+        } catch (const CustomException &ce) {
+
+        } catch (const VictimDeathException &vde) {
+            
+        }
+    }
+
+    return Register();
+}
+
 NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для всех в комнате, кто не защищен от заклинания")
 {
     Character *caster = arg2character(ch);
@@ -289,6 +325,33 @@ NMI_INVOKE(FeniaSpellContext, effectScream, "(): применить эффект
 }
 
 
+NMI_INVOKE(FeniaSpellContext, effectBlind, "(): применить на жертву заклинание слепоты")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myCh = arg2character(ch);
+    Character *myVict = arg2character(vict);
+
+    if (!IS_AFFECTED(myVict, AFF_BLIND))
+        ::spell(gsn_blindness, level, myCh,  myVict);
+
+    return Register();
+}
+
+NMI_INVOKE(FeniaSpellContext, effectCurse, "(): применить на жертву заклинание проклятия")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myCh = arg2character(ch);
+    Character *myVict = arg2character(vict);
+
+    if (!IS_AFFECTED(myVict, AFF_CURSE))
+        ::spell(gsn_curse, level, myCh,  myVict);
+
+    return Register();
+}
 
 NMI_GET(FeniaSpellContext, skill, "прототип умения для этого заклинания (.Skill())")
 {
