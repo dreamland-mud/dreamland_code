@@ -254,74 +254,71 @@ static bitstring_t my_damage_flags(const Register &ch, const Register &spell)
     return mySpell->damflags | (mySpell->isPrayer(myCh) ? DAMF_PRAYER : DAMF_MAGIC);
 }
 
-NMI_INVOKE(FeniaSpellContext, effectCold, "(): применить холодный эффект на жертву")
+static void call_effect_func(effect_fun_t &fun, FeniaSpellContext *thiz)
 {
-    if (vict.type == Register::NONE)
-        return Register();
+    bitstring_t damflags = my_damage_flags(thiz->ch, thiz->spell);
+    void *vo = 0;
+    int target;
+    int level = thiz->level;
+    int dam = thiz->dam;
 
-    Character *myVict = arg2character(vict);
-    cold_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
+    if (thiz->vict.type != Register::NONE) {        
+        vo = arg2character(thiz->vict);
+        target = TARGET_CHAR;
+        
+    } else if (thiz->room.type != Register::NONE) {
+        vo = arg2room(thiz->room);
+        target = TARGET_ROOM;
+        
+    } else if (thiz->obj.type != Register::NONE) {
+        vo = arg2item(thiz->obj);
+        target = TARGET_OBJ;
+    } else
+        return;
+
+    fun(vo, level, dam, target, damflags);
+}
+
+NMI_INVOKE(FeniaSpellContext, effectCold, "(): применить холодный эффект на жертву, предмет или комнату")
+{
+    call_effect_func(cold_effect, this);
     return Register();    
 }
 
-NMI_INVOKE(FeniaSpellContext, effectFire, "(): применить огненный эффект на жертву")
+NMI_INVOKE(FeniaSpellContext, effectFire, "(): применить огненный эффект на жертву, предмет или комнату")
 {
-    if (vict.type == Register::NONE)
-        return Register();
-
-    Character *myVict = arg2character(vict);
-    fire_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
-    return Register();
+    call_effect_func(fire_effect, this);
+    return Register();    
 }
 
-NMI_INVOKE(FeniaSpellContext, effectSand, "(): применить эффект песчаной бури на жертву")
+NMI_INVOKE(FeniaSpellContext, effectSand, "(): применить эффект песчаной бури на жертву, предмет или комнату")
 {
-    if (vict.type == Register::NONE)
-        return Register();
-
-    Character *myVict = arg2character(vict);
-    sand_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
-    return Register();
+    call_effect_func(sand_effect, this);
+    return Register();    
 }
 
-NMI_INVOKE(FeniaSpellContext, effectAcid, "(): применить кислотный эффект на жертву")
+NMI_INVOKE(FeniaSpellContext, effectAcid, "(): применить кислотный эффект на жертву, предмет или комнату")
 {
-    if (vict.type == Register::NONE)
-        return Register();
-
-    Character *myVict = arg2character(vict);
-    acid_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
-    return Register();
+    call_effect_func(acid_effect, this);
+    return Register();    
 }
 
-NMI_INVOKE(FeniaSpellContext, effectPoison, "(): применить эффект яда на жертву")
+NMI_INVOKE(FeniaSpellContext, effectPoison, "(): применить эффект яда на жертву, предмет или комнату")
 {
-    if (vict.type == Register::NONE)
-        return Register();
-
-    Character *myVict = arg2character(vict);
-    poison_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
-    return Register();
+    call_effect_func(poison_effect, this);
+    return Register();    
 }
 
-NMI_INVOKE(FeniaSpellContext, effectShock, "(): применить шоковый эффект на жертву")
+NMI_INVOKE(FeniaSpellContext, effectShock, "(): применить шоковый эффект на жертву, предмет или комнату")
 {
-    if (vict.type == Register::NONE)
-        return Register();
-
-    Character *myVict = arg2character(vict);
-    shock_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
-    return Register();
+    call_effect_func(shock_effect, this);
+    return Register();    
 }
 
-NMI_INVOKE(FeniaSpellContext, effectScream, "(): применить эффект песчаной бури на жертву")
+NMI_INVOKE(FeniaSpellContext, effectScream, "(): применить эффект песчаной бури на жертву, предмет или комнату")
 {
-    if (vict.type == Register::NONE)
-        return Register();
-
-    Character *myVict = arg2character(vict);
-    scream_effect(myVict, level, dam, TARGET_CHAR, my_damage_flags(ch, spell));
-    return Register();
+    call_effect_func(scream_effect, this);
+    return Register();    
 }
 
 
