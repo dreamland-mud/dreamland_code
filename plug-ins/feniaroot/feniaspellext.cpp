@@ -333,7 +333,7 @@ NMI_INVOKE(FeniaSpellContext, effectBlind, "(): применить на жерт
     Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
 
-    if (!IS_AFFECTED(myVict, AFF_BLIND))
+    if (myCh->in_room == myVict->in_room && !IS_AFFECTED(myVict, AFF_BLIND))
         ::spell(gsn_blindness, level, myCh,  myVict);
 
     return Register();
@@ -347,7 +347,7 @@ NMI_INVOKE(FeniaSpellContext, effectCurse, "(): применить на жерт
     Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
 
-    if (!IS_AFFECTED(myVict, AFF_CURSE))
+    if (myCh->in_room == myVict->in_room && !IS_AFFECTED(myVict, AFF_CURSE))
         ::spell(gsn_curse, level, myCh,  myVict);
 
     return Register();
