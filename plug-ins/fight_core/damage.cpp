@@ -33,6 +33,7 @@
 #include "immunity.h"
 #include "material.h"
 #include "def.h"
+#include "profflags.h"
 
 GSN(resistance);
 GSN(dark_shroud);
@@ -376,17 +377,21 @@ void Damage::calcDamage( )
 
 void Damage::damApplyEnhancedDamage( )
 {
-    if (ch->getProfession()->getHpRate() < 70 || ch->is_npc())
-        return;
+    // OLD LOGIC:
+    // melee (+1-100%), cleric (+0.5-77%), hybrid/agile (+0.8-88%), caster (0)
+    // NEW LOGIC:
+    // melee (+1-100%), agile (+0.9-90%), hybrid (+0.5-77%), caster (0)
 
     int div;        
-   
-    if (ch->getProfession( ) == prof_warrior || ch->getProfession( ) == prof_samurai)
-        div = 100;
-    else if (ch->getProfession( ) == prof_cleric)
-        div = 130;
-    else
-        div = 114;
+
+    if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
+        return;
+    else if ((ch->getProfession( )->getFlags( ).isSet(PROF_HYBRID)) || (ch->getProfession( ) == prof_cleric))
+        div = 130; // TO-DO: remove cleric bonus after making sure newbie clerics don't die as much
+    else if (ch->getProfession( )->getFlags( ).isSet(PROF_AGILE))
+        div = 110;
+    else    
+        div = 100;   
 
     dam += dam * number_percent()/div;
 }
