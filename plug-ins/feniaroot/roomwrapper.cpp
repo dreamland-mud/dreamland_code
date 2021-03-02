@@ -20,6 +20,7 @@
 
 #include "structwrappers.h"
 #include "areaindexwrapper.h"
+#include "affectwrapper.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -811,5 +812,49 @@ NMI_INVOKE(RoomWrapper, hasParticles, "(): достаточно ли разны�
 {
     checkTarget();
     return RoomUtils::hasParticles(target);
+}
+
+NMI_INVOKE( RoomWrapper, isAffected, "(skill): находится ли комната под воздействием аффекта с данным именем" )
+{
+    Skill *skill = args2skill(args);
+    
+    checkTarget( );
+
+    if (skill)
+        return target->isAffected( skill->getIndex( ) );
+    else
+        return false;
+}
+
+NMI_GET( RoomWrapper, affected, "список (List) всех аффектов на комнате (структура .Affect)" )
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (auto &paf: target->affected) 
+        rc->push_back( AffectWrapper::wrap( *paf ) );
+        
+    return wrap(rc);
+}
+
+NMI_INVOKE( RoomWrapper, affectJoin, "(aff): усилить существующий аффект или повесить новый (.Affect)" )
+{
+    checkTarget( );
+    AffectWrapper *aw;
+    
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+    
+    aw = wrapper_cast<AffectWrapper>( args.front( ) );
+    target->affectJoin(&(aw->getTarget()));
+    return Register( );
+}
+
+NMI_INVOKE( RoomWrapper, affectStrip, "(skill): снять с комнаты все аффекты от умения по имени skill" )
+{
+    checkTarget( );
+    Skill *skill = args2skill(args);
+    target->affectStrip(skill->getIndex());
+    return Register( );
 }
 
