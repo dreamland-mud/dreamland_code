@@ -31,7 +31,6 @@ public:
     virtual bool isDispelled( ) const;
     virtual bool isCancelled( ) const;
 
-protected:
     XML_VARIABLE XMLStringNoEmpty  wearoff;
     XML_VARIABLE XMLStringNoEmpty  wearoffObj;
     XML_VARIABLE XMLStringNoEmpty  wearoffRoom;

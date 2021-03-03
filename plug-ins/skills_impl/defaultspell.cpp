@@ -588,6 +588,26 @@ bool DefaultSpell::properOrder(Character *ch) const
     return true;
 }
 
+bool DefaultSpell::targetIsObj() const
+{
+    return target.isSet(TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD);
+}
+
+bool DefaultSpell::targetIsRoom() const
+{
+    return target.isSet(TAR_ROOM);
+}
+
+bool DefaultSpell::targetIsChar() const
+{
+    return target.isSet(TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD);
+}
+
+bool DefaultSpell::targetIsRanged() const
+{
+    return target.isSet(TAR_CHAR_ROOM);
+}
+
 bool DefaultSpell::isPrayer( Character *caster ) const
 {
     if (!isCasted( ))

@@ -69,6 +69,11 @@ public:
     virtual bool checkPosition( Character * ) const;
     virtual bool properOrder( Character * ) const;
 
+    bool targetIsObj() const;
+    bool targetIsRoom() const;
+    bool targetIsChar() const;
+    bool targetIsRanged() const;
+
     XML_VARIABLE XMLFlags   target; // possible spell targets, table target_table
     XML_VARIABLE XMLEnumeration   position; // required position to cast, table postion_table
     XML_VARIABLE XMLEnumeration   type; // offensive/defensive or neither, table spell_types

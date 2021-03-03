@@ -6,6 +6,7 @@
 #include "wrappermanager.h"
 #include "iconvmap.h"
 #include "defaultspell.h"
+#include "defaultaffecthandler.h"
 #include "feniaspellhelper.h"
 #include "websocketrpc.h"
 #include "dlfileloader.h"
@@ -175,6 +176,15 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultSpell *spe
         buf << "{D(fenia <trig> [clear]){x";
         
     buf << endl;
+    ch->send_to(buf);
+}
+
+void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultAffectHandler *ah) const
+{
+    ostringstream buf;
+
+    buf << "onLook";
+    buf << "{D(fenia <trig> [clear]){x" << endl;
     ch->send_to(buf);
 }
 

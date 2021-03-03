@@ -9,6 +9,7 @@
 #include "skillmanager.h"
 #include "defaultspell.h"
 #include "basicskill.h"
+#include "defaultaffecthandler.h"
 #include "xmltableloader.h"
 
 #include "skedit.h"
@@ -88,11 +89,33 @@ DefaultSpell* OLCStateSkill::getSpell(BasicSkill *skill)
     return 0;
 }
 
+DefaultAffectHandler* OLCStateSkill::getAffect(BasicSkill *skill) 
+{
+    if (!skill)
+        skill = getOriginal();
+
+    if (skill->affect)    
+        return skill->affect.getDynamicPointer<DefaultAffectHandler>();
+
+    return 0;
+}
+
 bool OLCStateSkill::checkSpell(DefaultSpell *spell) 
 {
     if (!spell) {
         if (owner)
             stc("Это поле определено только для заклинаний, создайте заклинание командой {hc{yspell create{x.\r\n", owner->character);
+        return false;
+    }
+
+    return true;
+}
+
+bool OLCStateSkill::checkAffect(DefaultAffectHandler *ah) 
+{
+    if (!ah) {
+        if (owner)
+            stc("Это поле определено только для аффектов, создайте аффект командой {hc{yaffect create{x.\r\n", owner->character);
         return false;
     }
 
@@ -113,6 +136,7 @@ void OLCStateSkill::show( PCharacter *ch )
 {
     BasicSkill *r = getOriginal();
     DefaultSpell *s = getSpell(r);
+    DefaultAffectHandler *a = getAffect(r);
 
     ptc(ch, "Умение:      {C%s\r\n", r->getName().c_str());
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
@@ -141,6 +165,7 @@ void OLCStateSkill::show( PCharacter *ch )
             web_edit_button(ch, "allow", "").c_str());
 
     if (s) {
+        ptc(ch, ".............{YЗаклинание{x.............\r\n");
         ptc(ch, "Цели:        {Y%s {D(target){x\r\n", s->target.names().c_str());                        
         ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", s->position.name().c_str());
         ptc(ch, "Тип:         {Y%s {D(type){x\r\n", s->type.name().c_str());
@@ -153,12 +178,41 @@ void OLCStateSkill::show( PCharacter *ch )
             ptc(ch, "Флаги урона: {Y%s {D(damflags){x\r\n", s->damflags.names().c_str());
             ptc(ch, "Крутость:    {Y%d {D(tier){x\r\n", s->tier.getValue());
 
-            if (s->target.isSet(TAR_CHAR_ROOM))
+            if (s->targetIsRanged())
                 ptc(ch, "Ранговое:    {Y%s {D(ranged){x\r\n", s->ranged ? "yes" : "no");
         }
 
         ptc(ch, "Триггера:    ");
         feniaTriggers->showAvailableTriggers(ch, s);
+    }
+
+    if (a) {
+        ptc(ch, ".............{GАффект{x.................\r\n");
+        ptc(ch, "Отменяется:  {G%s {D(cancelled){x\r\n", a->cancelled ? "yes" : "no");
+        ptc(ch, "Снимается:   {G%s {D(dispelled){x\r\n", a->dispelled ? "yes" : "no");
+
+        ostringstream fmt;
+        if (!s || s->targetIsChar())
+            fmt << "{G" << (a->wearoff.empty() ? "-" : a->wearoff) 
+                << " " << web_edit_button(ch, "wearoffChar", "web") << " "
+                << "{D(wearoffChar) ";
+        if (s && s->targetIsObj())
+            fmt << "{G" << (a->wearoffObj.empty() ? "-" : a->wearoffObj) 
+                << " " << web_edit_button(ch, "wearoffObj", "web") << " "
+                << "{D(wearoffObj) ";
+        if (s && s->targetIsRoom())
+            fmt << "{G" << (a->wearoffRoom.empty() ? "-" : a->wearoffRoom) 
+                << " " << web_edit_button(ch, "wearoffRoom", "web") << " "
+                << "{D(wearoffRoom) ";
+        if (!fmt.str().empty())
+            ptc(ch, "Спадание:    %s\r\n", fmt.str().c_str());
+
+        if (a->dispelled)
+            ptc(ch, "Снятие:      {G%s {D(wearoffDispel)\r\n",
+                a->wearoffDispel.empty() ? "-" : a->wearoffDispel.c_str());
+
+        ptc(ch, "Триггера:    ");
+        feniaTriggers->showAvailableTriggers(ch, a);
     }
     
     ptc(ch, "\r\n{WКоманды{x: {hc{yspell{x, {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
@@ -444,6 +498,45 @@ SKEDIT(ranged, "ранговое", "можно ли колдовать на ра
     return checkSpell(s)
             && boolEdit(s->ranged);
 }
+
+SKEDIT(cancelled, "отменяется", "можно ли сбить аффект заклинанием отмены")
+{
+    DefaultAffectHandler *a = getAffect();
+    return checkAffect(a)
+            && boolEdit(a->cancelled);
+}
+
+SKEDIT(dispelled, "снимается", "можно ли сбить аффект заклинанием снятия воздействий")
+{
+    DefaultAffectHandler *a = getAffect();
+    return checkAffect(a)
+            && boolEdit(a->dispelled);
+}
+
+SKEDIT(wearoffChar, "", "сообщение при спадании аффекта с персонажа")
+{
+    DefaultAffectHandler *a = getAffect();
+    return checkAffect(a) && editor(argument, a->wearoff, ED_NO_NEWLINE);
+}
+
+SKEDIT(wearoffObj, "", "сообщение при спадании аффекта с предмета")
+{
+    DefaultAffectHandler *a = getAffect();
+    return checkAffect(a) && editor(argument, a->wearoffObj, ED_NO_NEWLINE);
+}
+
+SKEDIT(wearoffRoom, "", "сообщение при спадании аффекта с комнаты")
+{
+    DefaultAffectHandler *a = getAffect();
+    return checkAffect(a) && editor(argument, a->wearoffObj, ED_NO_NEWLINE);
+}
+
+SKEDIT(wearoffDispel, "", "сообщение кастеру при успешном снятии воздействий")
+{
+    DefaultAffectHandler *a = getAffect();
+    return checkAffect(a) && editor(argument, a->wearoffDispel, ED_NO_NEWLINE);
+}
+
 
 SKEDIT(commands, "команды", "показать список встроенных команд")
 {

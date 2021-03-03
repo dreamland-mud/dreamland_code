@@ -11,6 +11,7 @@ using namespace std;
 
 class PCharacter;
 class DefaultSpell;
+class DefaultAffectHandler;
 
 bool stringIsCapitalized(const DLString &str);
 DLString triggerType(const DLString &name);
@@ -29,6 +30,7 @@ public:
     bool openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const;
     void showAvailableTriggers(PCharacter *ch, const DLString &indexType) const;
     void showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const;
+    void showAvailableTriggers(PCharacter *ch, DefaultAffectHandler *ah) const;
     void showAssignedTriggers(PCharacter *ch,  Scripting::Object *wrapper) const;
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
 

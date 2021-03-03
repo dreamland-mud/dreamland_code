@@ -10,6 +10,7 @@
 
 class BasicSkill;
 class DefaultSpell;
+class DefaultAffectHandler;
 
 class OLCStateSkill : public OLCStateTemplate<OLCStateSkill>,
                          public virtual OLCState
@@ -35,7 +36,9 @@ private:
     virtual void statePrompt( Descriptor * );
     BasicSkill *getOriginal();
     DefaultSpell *getSpell(BasicSkill *skill = 0);
+    DefaultAffectHandler *getAffect(BasicSkill *skill = 0);
     bool checkSpell(DefaultSpell *spell);
+    bool checkAffect(DefaultAffectHandler *ah);
 
     XML_VARIABLE XMLBoolean isChanged;
 };
