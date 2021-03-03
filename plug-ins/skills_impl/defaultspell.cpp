@@ -202,9 +202,13 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         return mlevel;
     
     if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
-        slevel = mlevel - max(0, mlevel / 20);
-    else
-        slevel = mlevel - max(5, mlevel / 10);
+        slevel = mlevel - max(0, mlevel / 20); // 0-5 levels penalty
+    else if (ch->getProfession( )->getFlags( ).isSet(PROF_HYBRID))
+        slevel = mlevel - max(2, mlevel / 16); // 2-6 levels penalty  
+    else if (ch->getProfession( )->getFlags( ).isSet(PROF_AGILE))
+        slevel = mlevel - max(3, mlevel / 13); // 3-8 levels penalty
+    else    
+        slevel = mlevel - max(5, mlevel / 10); // 5-10 levels penalty
     
     if (gsn_spell_craft->usable( ch )) {
         if (number_percent() < gsn_spell_craft->getEffective( ch )) {
@@ -221,6 +225,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent( ) < chance) {
             slevel = mlevel;
             slevel += chance / 20;
+            act( "Твои глаза на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_CHAR );
+            act( "Глаза $c2 на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_ROOM );                
             gsn_improved_maladiction->improve( ch, true );
         }
         else
@@ -233,6 +239,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent() < chance) {
             slevel = mlevel;
             slevel += chance / 20;
+            act( "Твои глаза на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_CHAR );
+            act( "Глаза $c2 на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_ROOM );                 
             gsn_improved_benediction->improve( ch, true );
         }
         else
