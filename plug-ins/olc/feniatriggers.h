@@ -28,6 +28,7 @@ public:
 
     bool openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const;
     void showAvailableTriggers(PCharacter *ch, const DLString &indexType) const;
     void showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const;
     void showAvailableTriggers(PCharacter *ch, DefaultAffectHandler *ah) const;

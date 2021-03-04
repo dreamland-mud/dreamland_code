@@ -196,11 +196,11 @@ void OLCStateSkill::show( PCharacter *ch )
             fmt << "{G" << (a->wearoff.empty() ? "-" : a->wearoff) 
                 << " " << web_edit_button(ch, "wearoffChar", "web") << " "
                 << "{D(wearoffChar) ";
-        if (s && s->targetIsObj())
+        if (!s || s->targetIsObj())
             fmt << "{G" << (a->wearoffObj.empty() ? "-" : a->wearoffObj) 
                 << " " << web_edit_button(ch, "wearoffObj", "web") << " "
                 << "{D(wearoffObj) ";
-        if (s && s->targetIsRoom())
+        if (!s || s->targetIsRoom())
             fmt << "{G" << (a->wearoffRoom.empty() ? "-" : a->wearoffRoom) 
                 << " " << web_edit_button(ch, "wearoffRoom", "web") << " "
                 << "{D(wearoffRoom) ";
@@ -270,12 +270,11 @@ SKEDIT(show, "показать", "показать все поля")
     return false;
 }
 
-SKEDIT(fenia, "феня", "редактировать тригера")
+SKEDIT(fenia, "феня", "редактировать тригера заклинаний и аффектов")
 {
     DLString args = argument;
     DefaultSpell *s = getSpell();
-    if (!checkSpell(s))
-        return false;
+    DefaultAffectHandler *a = getAffect();
 
     DLString trigName = args.getOneArgument();
     bool clear = arg_is_clear(args);
@@ -286,14 +285,35 @@ SKEDIT(fenia, "феня", "редактировать тригера")
         return false;
     }
 
-    if (clear) {
-        if (feniaTriggers->clearTrigger(s->wrapper, trigName))
-            ptc(ch, "Триггер %s успешно удален.\r\n", trigName.c_str());
-        else
-            ptc(ch, "Триггер %s не найден.\r\n", trigName.c_str());        
+    // Handle spell triggers with runXXX names.
+    if (DLString("run").strPrefix(trigName)) {
+        if (!checkSpell(s))
+            return false;
+
+        if (clear) {
+            if (feniaTriggers->clearTrigger(s->wrapper, trigName))
+                ptc(ch, "Триггер %s успешно удален.\r\n", trigName.c_str());
+            else
+                ptc(ch, "Триггер %s не найден.\r\n", trigName.c_str());        
+        } else {
+            feniaTriggers->openEditor(ch, s, trigName);
+        }
+
     } else {
-        feniaTriggers->openEditor(ch, s, trigName);
+        // Handle affect triggers.
+        if (!checkAffect(a))
+            return false;
+
+        if (clear) {
+            if (feniaTriggers->clearTrigger(a->wrapper, trigName))
+                ptc(ch, "Триггер %s успешно удален.\r\n", trigName.c_str());
+            else
+                ptc(ch, "Триггер %s не найден.\r\n", trigName.c_str());        
+        } else {
+            feniaTriggers->openEditor(ch, a, trigName);
+        }
     }
+
     
     return false;
 }

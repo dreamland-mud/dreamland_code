@@ -23,6 +23,8 @@ static IconvMap utf2koi("utf-8", "koi8-r");
 
 static const DLString EXAMPLE_FOLDER = "fenia.examples";
 
+using namespace Scripting;
+
 FeniaTriggerLoader *feniaTriggers = 0;
 
 FeniaTriggerLoader::FeniaTriggerLoader()
@@ -41,6 +43,7 @@ void FeniaTriggerLoader::initialization()
     loadFolder("mob");
     loadFolder("room");
     loadFolder("spell");
+    loadFolder("affect");
 }
 
 void FeniaTriggerLoader::destruction()
@@ -183,7 +186,22 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultAffectHand
 {
     ostringstream buf;
 
-    buf << "onLook";
+    IndexTriggers::const_iterator i = indexTriggers.find("affect");
+    if (i == indexTriggers.end())
+        return;
+
+    WrapperBase *wrapper = ah->getWrapper();    
+
+    const TriggerContent &triggers = i->second;
+    for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
+        IdRef methodId(t->first);
+        Register method;
+        bool hasTrigger = wrapper && wrapper->triggerFunction(methodId, method);
+        buf << web_cmd(ch, "fenia $1", t->first)
+            << (hasTrigger ? "{g*" : "")
+            << "{x ";
+    }
+
     buf << "{D(fenia <trig> [clear]){x" << endl;
     ch->send_to(buf);
 }
@@ -344,6 +362,52 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const D
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
         ch->printf("Запускаю веб-редактор для заклинания, триггер %s.\r\n", methodName.c_str());
+        return true;
+    }
+
+    return editExisting(ch, retval);
+}
+
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const
+{
+    if (!is_websock(ch)) {
+        ch->println("Эта крутая фишка доступна только в веб-клиенте.");
+        return false;
+    }
+
+    Register w = WrapperManager::getThis()->getWrapper(ah);
+    if (w.type == Register::NONE)
+        return false;
+        
+    WrapperBase *base = get_wrapper(w.toObject());
+    if (!base)
+        return false;
+
+    DLString args = constArguments;
+    DLString methodName = args.getOneArgument();
+    Scripting::IdRef methodId(methodName);
+    Register retval = base->getField(methodId);
+
+    // Fenia field not found, try to open the editor with trigger example.
+    if (retval.type == Register::NONE) {
+        std::vector<DLString> parms(2);
+        // Create codesource subject.
+        parms[0] = dlprintf("affect/%s/%s",
+                        ah->getSkill()->getName().c_str(),
+                        methodName.c_str());   
+
+        // Create codesource body with example code.
+        DLString tmpl;
+        if (!findExample(ch, methodName, "affect", tmpl))
+            return false;
+
+        tmpl.replaces("@name@", DLString("\"") + ah->getSkill()->getName() + "\"");
+        tmpl.replaces("@trig@", methodName);
+        parms[1] = tmpl;
+
+        // Open the editor.
+        ch->desc->writeWSCommand("cs_edit", parms);
+        ch->printf("Запускаю веб-редактор для аффекта, триггер %s.\r\n", methodName.c_str());
         return true;
     }
 
