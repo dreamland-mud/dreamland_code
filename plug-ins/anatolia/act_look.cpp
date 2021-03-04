@@ -1359,7 +1359,7 @@ static void do_look_into( Character *ch, char *arg2 )
 static void afprog_look( Character *looker, Character *victim )
 {
     for (auto &paf: victim->affected.findAllWithHandler())
-        paf->type->getAffect( )->onLook(SpellTarget::Pointer(NEW, looker), paf, victim);
+        paf->type->getAffect( )->onLook(SpellTarget::Pointer(NEW, victim), paf, looker);
 }
 
 static void mprog_look(Character *looker, Character *victim)

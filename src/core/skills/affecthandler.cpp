@@ -191,13 +191,13 @@ bool AffectHandler::onDispel(const SpellTarget::Pointer &target, Affect *paf)
     return false;
 }
 
-bool AffectHandler::onLook(const SpellTarget::Pointer &target, Affect *paf, Character *victim) 
+bool AffectHandler::onLook(const SpellTarget::Pointer &target, Affect *paf, Character *looker) 
 {
-    Character *looker = target->victim;
+    Character *ch = target->victim;
     AffectHandler *ah = this;
 
-    FENIA_CALL( ah, "Look", "CAC", looker, paf, victim );
-    look(looker, victim, paf);
+    FENIA_CALL( ah, "Look", "CAC", ch, paf, looker);
+    look(looker, ch, paf);
     return false;
 }
 
