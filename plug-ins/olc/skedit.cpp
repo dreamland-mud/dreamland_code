@@ -132,6 +132,13 @@ void OLCStateSkill::changed( PCharacter *ch )
     isChanged = true;
 }
 
+static void show_one_message(PCharacter *ch, const DLString &message, const char *cmd, ostringstream &buf)
+{
+    buf << "{G" << (message.empty() ? "-" : message)
+        << " " << web_edit_button(ch, cmd, "web") << " "
+        << "{D(" << cmd << ") ";
+}
+
 void OLCStateSkill::show( PCharacter *ch )
 {
     BasicSkill *r = getOriginal();
@@ -191,25 +198,24 @@ void OLCStateSkill::show( PCharacter *ch )
         ptc(ch, "Отменяется:  {G%s {D(cancelled){x\r\n", a->cancelled ? "yes" : "no");
         ptc(ch, "Снимается:   {G%s {D(dispelled){x\r\n", a->dispelled ? "yes" : "no");
 
-        ostringstream fmt;
-        if (!s || s->targetIsChar())
-            fmt << "{G" << (a->wearoff.empty() ? "-" : a->wearoff) 
-                << " " << web_edit_button(ch, "wearoffChar", "web") << " "
-                << "{D(wearoffChar) ";
-        if (!s || s->targetIsObj())
-            fmt << "{G" << (a->wearoffObj.empty() ? "-" : a->wearoffObj) 
-                << " " << web_edit_button(ch, "wearoffObj", "web") << " "
-                << "{D(wearoffObj) ";
-        if (!s || s->targetIsRoom())
-            fmt << "{G" << (a->wearoffRoom.empty() ? "-" : a->wearoffRoom) 
-                << " " << web_edit_button(ch, "wearoffRoom", "web") << " "
-                << "{D(wearoffRoom) ";
-        if (!fmt.str().empty())
-            ptc(ch, "Спадание:    %s\r\n", fmt.str().c_str());
+        {
+            ostringstream fmt;
+            if (!s || s->targetIsChar() || !a->wearoff.empty())
+                show_one_message(ch, a->wearoff, "wearoffChar", fmt);
+            if (!s || s->targetIsObj() || !a->wearoffRoom.empty())
+                show_one_message(ch, a->wearoffObj, "wearoffObj", fmt);
+            if (!s || s->targetIsRoom() || !a->wearoffRoom.empty())
+                show_one_message(ch, a->wearoffRoom, "wearoffRoom", fmt);
+            if (!fmt.str().empty())
+                ptc(ch, "Спадание:    %s\r\n", fmt.str().c_str());
+        }
 
-        if (a->dispelled)
-            ptc(ch, "Снятие:      {G%s {D(wearoffDispel)\r\n",
-                a->wearoffDispel.empty() ? "-" : a->wearoffDispel.c_str());
+        if (a->dispelled || !a->wearoffDispel.empty()) {
+            ostringstream fmt;
+            ptc(ch, "Снятие:      ");
+            show_one_message(ch, a->wearoffDispel, "wearoffDispel", fmt);
+            ch->println(fmt.str());
+        }
 
         ptc(ch, "Триггера:    ");
         feniaTriggers->showAvailableTriggers(ch, a);
