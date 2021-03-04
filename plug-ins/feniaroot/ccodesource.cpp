@@ -110,11 +110,7 @@ CMDADM( codesource )
             << endl
             << "Редактирование:" << endl
             << "     {Wweb{x [<номер>|<имя>] - редактировать новый или существующий сценарий в веб-редакторе" << endl
-            << "     {Wsubj{x <текст> - указать тему cs; удобно тут же указывать версию" << endl
-            << "     {Wbin{x <id>     - прочесть текст cs из https://pastebin.com/<id>" << endl
             << "     {Wpaste{x        - вставить текст cs из буфера редактора" << endl
-            << "     {W+ {x<строка>   - добавить одну строку в текст cs" << endl
-            << "     {W- {x           - удалить последнюю строку из текста cs" << endl
             << "     {Wshow{x         - показать редактируемый cs" << endl
             << "     {Wclear{x        - очистить редактируемый cs" << endl
             << endl
@@ -124,8 +120,7 @@ CMDADM( codesource )
         if (ch->isCoder( ))
             buf << endl
             << "Только для кодеров: " << endl
-            << "     {Wftp{x <имя_файла_без_расширения> - прочитать текст cs из файла на ftp. файл должен лежать в подкаталоге progs и иметь расширение .f++" << endl
-            << "     {Wfile{x <файл>  - прочитать текст cs из файла в корневом каталоге проекта" << endl;
+            << "     {Wfile{x <файл>  - прочитать текст cs из файла в каталоге share/DL/fenia" << endl;
         ch->send_to( buf );
         return;
     }
@@ -296,52 +291,9 @@ CMDADM( codesource )
             
         return;
     }
-
-    if(cmd.strPrefix("subject")) {
-        XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
-                        ).getAttr<XMLAttributeCodeSource>( "codesource" );
-        
-        csa->name = args;
-
-        ch->send_to("Ok.\r\n");
-        return;
-    }
     
     if(cmd.strPrefix("clear")) {
         pch->getAttributes( ).eraseAttribute( "codesource" );
-        ch->send_to("Ok.\r\n");
-        return;
-    }
-
-    if(cmd[0] == '-') {
-        XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
-                        ).findAttr<XMLAttributeCodeSource>( "codesource" );
-
-        if(!csa) {
-            ch->println("Ты не редактируешь сценарий.");
-            return;
-        } 
-        
-        if(csa->content.empty( )) {
-            ch->send_to( "No more lines left\r\n" );
-            return;
-        }
-
-        csa->content.pop_back( );
-        ch->send_to("Ok.\r\n");
-        return;
-    }
-    
-    if(cmd[0] == '+') {
-        XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
-                        ).findAttr<XMLAttributeCodeSource>( "codesource" );
-
-        if(!csa) {
-            ch->println("Ты не редактируешь сценарий.");
-            return;
-        } 
-        
-        csa->content.push_back( args );
         ch->send_to("Ok.\r\n");
         return;
     }
@@ -371,97 +323,14 @@ CMDADM( codesource )
             return;
         }
         
-        XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
-                        ).findAttr<XMLAttributeCodeSource>( "codesource" );
-        
-        if(!csa) {
-            ch->println("Ты не редактируешь сценарий.");
-            return;
-        } 
-                
-        ifstream ifs(args.c_str( ));
-        if(!ifs) {
-            ch->send_to("Open error.\r\n");
-            return;
-        }
-        
-        ch->send_to("Reading from file.\r\n");
-        
-        while(!ifs.eof()) {
-            char buf[MAX_STRING_LENGTH];
+        if (CodeSourceRepo::getThis()->read(args))
+            ch->printf("Codesource '%s' loaded from disk.\r\n", args.c_str());
+        else
+            ch->printf("Error loading codesource '%s', check logs for details.\r\n", args.c_str());
 
-            ifs.getline(buf, sizeof(buf));
-
-            csa->content.push_back( buf );
-        }
-        
-        ifs.close();
-        
-        ch->send_to("Ok.\r\n");
         return;
     }
 
-    if(cmd.strPrefix("bin")) {
-        DLString binName = args.getOneArgument();
-        
-        if (binName.empty( )) {
-            ch->println( "Укажи имя файла на pastebin.com." );
-            return;
-        }
-
-        for (DLString::size_type b = 0; b < binName.size( ); b++)
-            if (!dl_isalnum( binName.at( b ) )) {
-                ch->println("Имя файла должно состоять из букв и цифр.");
-                return;
-            }
-        
-        if(::system(("/home/dltest/runtime/bin/fetchbin " + binName).c_str()) != 0) {
-            ch->println("Ошибка при попытке загрузить файл с pastebin.com");
-            return;
-        }
-
-        args = "bins/" + binName;
-        cmd = "ftp";
-    }
-
-    if(cmd.strPrefix("ftp")) {
-        XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
-                        ).findAttr<XMLAttributeCodeSource>( "codesource" );
-
-        if(!csa) {
-            ch->println("Ты не редактируешь сценарий.");
-            return;
-        } 
-        
-        if (args.find('.') != DLString::npos) {
-            ch->send_to("Dots and slashes not allowed in filename.\r\n");
-            return;
-        }
-        
-        DLString name = "/home/fenia/ftp_root/" + args + ".f++";
-
-        ifstream ifs(name.c_str( ));
-        if(!ifs) {
-            ch->send_to("open error\r\n");
-            return;
-        }
-        
-        ch->send_to("Reading from file.\r\n");
-        
-        while(!ifs.eof()) {
-            char buf[MAX_STRING_LENGTH];
-
-            ifs.getline(buf, sizeof(buf));
-
-            csa->content.push_back( buf );
-        }
-        
-        ifs.close();
-        
-        ch->send_to("Ok.\r\n");
-        return;
-    }
-    
     if(cmd.strPrefix("eval") || cmd.strPrefix("post")) {
         XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );

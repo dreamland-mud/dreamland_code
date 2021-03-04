@@ -13,6 +13,7 @@
 using namespace Scripting;
 namespace fs = std::filesystem;
 static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap utf2koi("utf-8", "koi8-r");
 
 PluginInitializer<CodeSourceRepo> initCSRepo;
 
@@ -88,4 +89,42 @@ void CodeSourceRepo::saveAll()
     for(i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
         save(*i);
     }
+}
+
+bool CodeSourceRepo::read(const DLString &csName) 
+{
+    stringstream content;
+
+    try {
+        fs::path path = dreamland->getTableDir().getAbsolutePath().c_str();
+        path /= "fenia";
+        path /= csName.c_str();
+
+        ifstream ifs(path);
+        content << ifs.rdbuf();
+
+        if (!ifs) {
+            LogStream::sendSystem() << "CS repo: read failed " << csName << endl;
+            return false;
+        }
+
+    } catch (const std::exception &ex) {
+        LogStream::sendError() << "CS repo: read " << csName << ": " << ex.what() << endl;
+        return false;
+    }
+
+    try {
+        CodeSource &cs = CodeSource::manager->allocate();
+        cs.author = "Chronos";
+        cs.name = csName;
+        cs.content = utf2koi(content.str());
+
+        cs.eval();
+
+    } catch(const ::Exception& e) {
+        LogStream::sendError() << "CS repo: read " << csName << ": " << e.what() << endl;
+        return false;
+    }
+
+    return true;
 }

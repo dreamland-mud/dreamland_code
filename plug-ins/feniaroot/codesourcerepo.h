@@ -20,6 +20,8 @@ public:
 
     void save(Scripting::CodeSource &cs);
     void saveAll();
+    bool read(const DLString &csName);
+
     static CodeSourceRepo* getThis( ) { return thisClass; }
 
 private:
