@@ -143,10 +143,10 @@ bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTar
         return false;
 
     // Create run context for this spell and launch the runXXX function.
+    FeniaSpellContext::Pointer ctx;
     try {
-        method.toFunction()->invoke(
-            createContext(spell, ch, spellTarget, level)->thiz,
-            RegisterList());
+        ctx = createContext(spell, ch, spellTarget, level);
+        method.toFunction()->invoke(ctx->thiz, RegisterList());
         
     } catch (const CustomException &ce) {
         // Do nothing on victim's death.
@@ -155,6 +155,10 @@ bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTar
         // On error, complain to the logs and to all immortals in the game.
         wrapper->croak(methodId, e);
     }
+
+    // Clean any references that may prevent garbage collector from destroying this context object.
+    if (ctx)
+        ctx->cleanup();
 
     return true;
 }
@@ -237,11 +241,22 @@ void FeniaSpellContext::setSelf(Scripting::Object *s)
     self = s;
 }
 
+void FeniaSpellContext::cleanup()
+{
+    spell = Register();
+    state = Register();
+}
+
 NMI_INIT(FeniaSpellContext, "контекст для вызова заклинания")
 
 NMI_GET(FeniaSpellContext, spell, "прототип заклинания (.Spell())")
 {
     return spell;
+}
+
+NMI_SET(FeniaSpellContext, spell, "прототип заклинания (.Spell())")
+{
+    spell = arg;
 }
 
 NMI_GET(FeniaSpellContext, ch, "персонаж, произносящий заклинание")
