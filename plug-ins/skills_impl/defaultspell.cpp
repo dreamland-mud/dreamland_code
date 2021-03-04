@@ -262,7 +262,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     }
     
     /*
-     * Magic Concentrate, by Kind
+     * Magic Concentrate, by Kind, updated by Taiphoen
      *   f(x) = A0 / (1 + x / B0)
      *     A0 = a / (B0 * Ln(1 + a / B0))
      *      A0 - усиление на нулевом расстоянии - в стее
@@ -270,9 +270,12 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
      *      B0 - свободный параметр
      *      a  - дальность действия спелла
      */
-    if (skill->hasGroup(group_combat)
-        && range >= 0
-        && ch->isAffected( gsn_magic_concentrate ))
+            
+    if ( ch->isAffected(gsn_magic_concentrate) &&
+         !isPrayer(ch) &&
+         flags.isSet(SPELL_MAGIC) &&
+         getSpellType() == SPELL_OFFENSIVE &&
+         getMaxRange(ch) > 0 )
     {
         int a, x;
         double A0, B0, f;
@@ -284,6 +287,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         f  = A0 / (1 + x / B0);
 
         slevel = (int) (f * slevel);
+        act( "Яркая искра вспыхивает между твоих ладоней, фокусируя магический заряд.", ch, 0, 0, TO_CHAR );
+        act( "Яркая искра вспыхивает между ладоней $c2, фокусируя магический заряд.", ch, 0, 0, TO_ROOM );            
     }
 
     if (gsn_mastering_spell->usable( ch, false )) {
