@@ -49,6 +49,7 @@ void
 DbEnvContext::open( const DLString &path )
 {
 #ifdef HAS_BDB
+    dbEnv->set_lk_max_locks(1000000);        
     dbEnv->open(path.c_str( ), DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_MPOOL | DB_INIT_TXN | DB_CREATE | DB_RECOVER, 0640);
 #else
     dbEnv->path = path;
@@ -220,7 +221,7 @@ DbContext::load( )
         Dbc *cur = 0;
 
         db->cursor( txn, &cur, 0 );
-        
+
         while(cur->get( &key, &val, DB_NEXT ) != DB_NOTFOUND) {
             try {
                 key_t id = *(key_t *)key.get_data( );
