@@ -305,6 +305,11 @@ NMI_SET(FeniaSpellContext, dam, "расчетные повреждения")
     dam = arg.toNumber();
 }
 
+NMI_SET(FeniaSpellContext, thiz, "расчетные повреждения")
+{
+	thiz = arg;
+}
+
 NMI_GET(FeniaSpellContext, state, "структура для хранения временных переменных")
 {
     return state;
