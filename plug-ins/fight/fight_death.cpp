@@ -109,7 +109,7 @@ protected:
 
     virtual bool applicable( )
     {
-        if (killer->is_npc( ))
+        if (!killer || killer->is_npc( ))
             return false;
 
         if (!ch->is_npc( ))
