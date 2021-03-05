@@ -243,6 +243,7 @@ void FeniaSpellContext::setSelf(Scripting::Object *s)
 
 void FeniaSpellContext::cleanup()
 {
+    thiz = Register();
     spell = Register();
     state = Register();
 }
@@ -252,11 +253,6 @@ NMI_INIT(FeniaSpellContext, "контекст для вызова заклина
 NMI_GET(FeniaSpellContext, spell, "прототип заклинания (.Spell())")
 {
     return spell;
-}
-
-NMI_SET(FeniaSpellContext, spell, "прототип заклинания (.Spell())")
-{
-    spell = arg;
 }
 
 NMI_GET(FeniaSpellContext, ch, "персонаж, произносящий заклинание")
