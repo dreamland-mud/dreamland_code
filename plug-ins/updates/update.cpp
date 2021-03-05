@@ -689,16 +689,6 @@ static bool oprog_area( Object *obj )
     return false;
 }
 
-static void afprog_update(Affect *paf, Object *obj)
-{
-    AffectHandler::Pointer ah = paf->type->getAffect();
-    if (!ah)
-        return;
-
-    FENIA_VOID_CALL(ah, "Update", "AO", paf, obj);
-    ah->update( obj, paf );
-}
-
 /*
  * Update all objs.
  * This function is performance sensitive.

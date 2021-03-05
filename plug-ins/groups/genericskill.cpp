@@ -75,6 +75,17 @@ bool GenericSkill::isProfessional() const
     return false;
 }
 
+bool GenericSkill::checkAlignEthos(Character *ch) const
+{
+    if (ch && align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
+        return false;
+
+    if (ch && ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
+        return false;
+
+    return true;
+}
+
 /*
  * виден ли скилл этому чару в принципе, независимо от уровня.
  */
@@ -102,10 +113,7 @@ bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
         ch = mem->getPlayer();
     } 
 
-    if (ch && align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
-        return false;
-
-    if (ch && ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
+    if (!checkAlignEthos(ch))
         return false;
 
     rb = getRaceBonus( mem );

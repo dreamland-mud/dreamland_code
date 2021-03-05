@@ -105,6 +105,8 @@ Skill * DreamSkillManager::findRandomProfSkill(PCharacter *ch) const
             continue;
         if (!genSkill->isProfessional())
             continue;
+        if (!genSkill->checkAlignEthos(ch))
+            continue;
        
         // Return one skill from all found, with equal probability. 
         if (number_range(0, totalFound++) == 0)

@@ -60,6 +60,7 @@ public:
     }
 
     bool isProfessional() const;
+    bool checkAlignEthos(Character *) const;
     inline const Classes & getClasses() const { return classes; }
 
     virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
