@@ -253,7 +253,6 @@ plug-ins/follow/Makefile \
 plug-ins/follow/core/Makefile \
 plug-ins/follow/command/Makefile \
 plug-ins/help/Makefile \
-plug-ins/druids/Makefile \
 plug-ins/craft/Makefile \
 plug-ins/gmcp/Makefile \
 plug-ins/bonus/Makefile \

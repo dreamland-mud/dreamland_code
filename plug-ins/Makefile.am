@@ -40,7 +40,6 @@ clan \
 selfrate \
 gquest \
 languages \
-druids \
 religion \
 quest \
 craft \

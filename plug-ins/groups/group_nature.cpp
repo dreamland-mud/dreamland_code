@@ -36,7 +36,6 @@
 #include "move_utils.h"
 
 PROF(ranger);
-PROF(druid);
 
 /*
  * 'tame' skill command
@@ -71,60 +70,6 @@ SKILL_RUNP( tame )
     if (!victim->is_npc())
     {
         ch->pecho("%1$^C1 не подда%1$nется|ются укрощению.", victim);
-        return;
-    }
-    
-    /*
-     * druidic tame: control animal attracted by magic bite
-     */
-    if (ch->getProfession( ) == prof_druid) {
-#if 0        
-        DruidSummonedAnimal::Pointer animal;
-        int chance;
-
-        if (!ch->getNPC( )->behavior 
-            || !(animal = ch->getNPC( )->behavior.getDynamicPointer<DruidSummonedAnimal>( ))
-            || !animal->myHero( ch ))
-        {
-            ch->println("Это существо не поддастся твоему укрощению.");
-            return;
-        }
-
-        if (is_safe(ch, victim)) 
-            return;
-            
-        if (overcharmed( ch ))
-            return;
-
-        ch->setWait( gsn_tame->getBeats( )  );
-
-        chance = gsn_tame->getEffective( ch );
-        chance += 3 * (ch->getModifyLevel( ) - victim->getModifyLevel( ));
-        chance += (ch->getCurrStat(STAT_CHA) - 20) * 2;
-        chance = (chance * animal->biteQuality) / 100;
-        
-        if (number_percent( ) > chance) {
-            act("$c1 раздраженно рычит и атакует!", victim, 0, 0, TO_ROOM);
-            gsn_tame->improve( ch, false, victim );
-            interpret_raw(victim, "murder", ch->getNameP( ));
-            return;
-        }
-        
-        ch->add_follower( victim );
-        victim->leader = ch;
-
-        af.bitvector.setTable(&affect_flags);
-        af.type      = gsn_tame;
-        af.level     = ch->getModifyLevel( );
-        af.duration  = -1;
-        af.bitvector.setValue(AFF_CHARM);
-        affect_to_char( victim, &af );
-        
-        act("$C1 теперь полностью подчиняется твоей воле.", ch, 0, victim, TO_CHAR);
-        act("$C1 преданно смотрит в глаза $c3.", ch, 0, victim, TO_NOTVICT);
-        act("Ты преданно смотришь в глаза $c3.", ch, 0, victim, TO_VICT);
-        gsn_tame->improve( ch, true, victim );
-#endif        
         return;
     }
     

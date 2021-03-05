@@ -26,8 +26,6 @@
 
 using namespace std;
 
-PROF(druid);
-
 /*-------------------------------------------------------------------
  * RaceHelp 
  *------------------------------------------------------------------*/
@@ -138,7 +136,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
         if (prof->isValid() 
             && prof->isPlayed()
-            && prof->getIndex() != prof_druid
+            && !prof->getFlags().isSet(PROF_NEWLOCK)
             && const_cast<PCRace *>(r)->getClasses( )[prof->getIndex( )] <= 0) 
         {
             if (!found)

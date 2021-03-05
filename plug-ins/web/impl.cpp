@@ -1111,8 +1111,9 @@ public:
         // Header: name,warrior,cleric,witch,...
         for (int i = 0; i < professionManager->size( ); i++) {
             Profession *prof = professionManager->find( i );
-            if (prof->isValid( ) && prof->isPlayed( ) 
-                && prof->getName() != "druid")
+            if (prof->isValid() 
+                && prof->isPlayed() 
+                && !prof->getFlags().isSet(PROF_NEWLOCK))
             {
                 profs.push_back(prof->getName());
             }
