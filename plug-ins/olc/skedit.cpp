@@ -202,7 +202,7 @@ void OLCStateSkill::show( PCharacter *ch )
             ostringstream fmt;
             if (!s || s->targetIsChar() || !a->wearoff.empty())
                 show_one_message(ch, a->wearoff, "wearoffChar", fmt);
-            if (!s || s->targetIsObj() || !a->wearoffRoom.empty())
+            if (!s || s->targetIsObj() || !a->wearoffObj.empty())
                 show_one_message(ch, a->wearoffObj, "wearoffObj", fmt);
             if (!s || s->targetIsRoom() || !a->wearoffRoom.empty())
                 show_one_message(ch, a->wearoffRoom, "wearoffRoom", fmt);
@@ -554,7 +554,7 @@ SKEDIT(wearoffObj, "", "сообщение при спадании аффект�
 SKEDIT(wearoffRoom, "", "сообщение при спадании аффекта с комнаты")
 {
     DefaultAffectHandler *a = getAffect();
-    return checkAffect(a) && editor(argument, a->wearoffObj, ED_NO_NEWLINE);
+    return checkAffect(a) && editor(argument, a->wearoffRoom, ED_NO_NEWLINE);
 }
 
 SKEDIT(wearoffDispel, "", "сообщение кастеру при успешном снятии воздействий")
