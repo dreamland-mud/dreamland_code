@@ -707,12 +707,7 @@ void Damage::msgOldFormat( bool vs, char *buf )
  *----------------------------------------------------------------------------*/
 char Damage::msgPunct( )
 {
-    if( victim->getModifyLevel() < 20 )    
-        return (dam <= 24) ? '.' : '!';
-    else if( victim->getModifyLevel() < 50)  
-        return (dam <= 50 ) ? '.' : '!';
-    else 
-        return (dam <= 75) ? '.' : '!';
+    return (dam <= victim->getModifyLevel()*4) ? '.' : '!';
 }
 
 int Damage::msgNoSpamBit( )
