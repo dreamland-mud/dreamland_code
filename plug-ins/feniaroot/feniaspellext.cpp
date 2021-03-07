@@ -152,6 +152,16 @@ NMI_INVOKE(FeniaSpellContext, savesSpell, "([damtype,damflags]): уменьши�
     return Register(false);
 }
 
+NMI_INVOKE(FeniaSpellContext, checkDispel, "(skill): попробовать сбить с victim аффект с указанным именем")
+{
+    if (vict.type == Register::NONE)
+        return Register(false);
+
+    Character *myVict = arg2character(vict);
+    Skill *skill = argnum2skill(args, 1);
+    return Register(checkDispel(level, myVict, skill->getIndex()));
+}
+
 NMI_INVOKE(FeniaSpellContext, damage, "([damtype,damflags]): нанести повреждения жертве, по умолчанию damtype и damflags берутся из профайла")
 {
     if (vict.type == Register::NONE)
