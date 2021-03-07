@@ -199,6 +199,9 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     }
 
     if (paf->global.getRegistry() == wearlocationManager && !ch->is_npc()) {
+        notice("Wearloc: player %s changes %s wearlocs, affect %s.", 
+                ch->getName().c_str(), paf->global.toString().c_str(),
+                paf->type.getName().c_str());
         ch->getPC()->wearloc.change(paf->global, !fAdd);
     }
 
@@ -285,8 +288,13 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
     for (auto &paf : afflist)
         if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
             charFlag.setBit(paf->bitvector);
-        else if (paf->global.getRegistry() == registry && !ch->is_npc())
+        else if (paf->global.getRegistry() == registry && !ch->is_npc()) {
+            notice("Wearloc: player %s loses %s wearlocs.", 
+                   ch->getName().c_str(), 
+                   paf->global.toString().c_str(),
+                   paf->type.getName().c_str());
             ch->getPC()->wearloc.remove(paf->global);
+        }
 }
 
 /* fix object affects when removing one */
