@@ -87,7 +87,7 @@ private:
     /** Recursively produce masks were 1 marks an included affix, 0 marks an excluded affix.
      *  Each mask denotes a combination of affixes those total price matches prices for the tier. 
      */
-    void generateBuckets(int currentTotal, long unsigned int index, bucket_mask_t currentMask);
+    void generateBuckets(int currentTotal, int currentPenalty, long unsigned int index, bucket_mask_t currentMask);
 
     /** Creates a vector of all affixes that are allowed for the tier, sorted by price in ascending order. */
     void collectAffixesForTier();
@@ -128,6 +128,7 @@ private:
 
     int minPrice;
     int maxPrice;
+    int worstPenalty;
     int align;
     PCharacter *pch;
 

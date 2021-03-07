@@ -73,6 +73,7 @@ affix_generator::affix_generator(int t) : tier(weapon_tier_table[t-1])
 {
     minPrice = tier.min_points;
     maxPrice = tier.max_points;
+    worstPenalty = tier.worst_penalty;
     align = ALIGN_NONE;
     requirements = 0L;
     retainChance = 100;
@@ -82,7 +83,10 @@ affix_generator::affix_generator(int t) : tier(weapon_tier_table[t-1])
 string affix_generator::dump() const
 {
     ostringstream buf;
-    buf << dlprintf("Tier %d, align %d, requirements %s, ", tier.num, align, requirements.to_string().c_str());
+    buf << dlprintf("Tier %d, align %d, prices %d-%d (%d), requirements %s, ", 
+                tier.num, align, 
+                minPrice, maxPrice, worstPenalty,
+                requirements.to_string().c_str());
     buf << dlprintf("%d affixes, %d requires, %d forbids, %d preferences, ", 
                      affixes.size(), required.size(), forbidden.size(), preferences.size()) << endl;
     buf << "Affixes: ";
@@ -130,10 +134,10 @@ void affix_generator::run()
     if (affixes.empty())
         setup();
 
-    generateBuckets(0, 0, 0L);
+    generateBuckets(0, 0, 0, 0L);
 
-    //notice("Weapon generator: found %d result buckets for tier %d and %d affixes", 
-    //        buckets.size(), tier.num, affixes.size());
+    notice("Weapon generator: found %d result buckets for tier %d and %d affixes", 
+            buckets.size(), tier.num, affixes.size());
 }
 
 /** Produces a single random affix combination out of all generated ones. */
@@ -182,35 +186,40 @@ bucket_mask_t affix_generator::randomBucket() const
     return random_sample.front();
 }
 
-/** Recursively produce masks were 1 marks an included affix, 0 marks an excluded affix.
+/** Recursively produce masks where 1 marks included affix, 0 marks excluded affix.
  *  Each mask denotes a combination of affixes those total price matches prices for the tier. 
  */
-void affix_generator::generateBuckets(int currentTotal, long unsigned int index, bucket_mask_t currentMask) 
-{
-    // Good combo, remember it and continue.
+void affix_generator::generateBuckets(int currentTotal, int currentPenalty, long unsigned int index, bucket_mask_t currentMask) 
+{    
+    // Good combo, remember it and continue. Ignore combos that exceed penalty limits.
     if (currentTotal >= minPrice && currentTotal <= maxPrice)
-        buckets.insert(currentMask);
+        if (currentPenalty >= worstPenalty)
+            buckets.insert(currentMask);
 
     // Stop now: reached the end of affixes vector.
     if (index >= affixes.size())
         return;
 
+    int myPrice =  affixes[index].price;
+    int nextTotal = currentTotal + myPrice;
+    int nextPenalty = myPrice < 0 ? (currentPenalty + myPrice) : currentPenalty;
+
     // Stop now: adding this or any subsequent price will still exceed maxPrice.
-    if (currentTotal + affixes[index].price > maxPrice)
+    if (nextTotal > maxPrice)
         return;
 
     // First check whether current affix doesn't conflict with any affix chosen earlier.
     if ((currentMask & exclusions[index]).none()) {
         // Explore all further combinations that can happen if this affix is included.
         currentMask.set(index);
-        generateBuckets(currentTotal + affixes[index].price, index + 1, currentMask);
+        generateBuckets(nextTotal, nextPenalty, index + 1, currentMask);
     }
 
     // First check whether current affix is required and cannot be excluded.
     if (!requirements.test(index)) {
         // Explore all further combinations that can happen if this affix is excluded.
         currentMask.reset(index);
-        generateBuckets(currentTotal, index + 1, currentMask);
+        generateBuckets(currentTotal, currentPenalty, index + 1, currentMask);
     }
 }
 
@@ -270,29 +279,20 @@ void affix_generator::collectAffixesForTier()
 
     // Keep preferred affixes, all others have a chance to get evicted.
     for (auto &ai: affixes) {
-        if (required.count(ai.affixName) > 0) {
-//            warn("...%s required, staying", ai.affixName.c_str());
+        if (required.count(ai.affixName) > 0)
             continue;
-        }
 
-        if (preferences.count(ai.affixName) > 0) {
-//            warn("...%s preferred, staying", ai.affixName.c_str());
+        if (preferences.count(ai.affixName) > 0)
             continue;
-        }
             
-        if (checkAlignBonus(ai)) {
-//            warn("...%s has align bonus, staying", ai.affixName.c_str());
+        if (checkAlignBonus(ai))
             continue;
-        }
 
-        if (!chance(retainChance))
+        if (ai.price >= 0 && !chance(retainChance))
             toErase.insert(ai.affixName);        
-//        else
-//            warn("...%s got lucky, staying", ai.affixName.c_str());
     }
     
     for (auto &affixName: toErase) {
-//        warn("...erasing %s", affixName.c_str());
         int a;
         while ((a = getAffixIndex(affixName)) >= 0)
             affixes.erase(affixes.begin() + a);

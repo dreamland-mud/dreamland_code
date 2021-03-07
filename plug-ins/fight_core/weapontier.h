@@ -18,6 +18,7 @@ struct weapon_tier_t {
     json_flag<&extra_flags> extra;
     int min_points;
     int max_points;
+    int worst_penalty;
     int weeks;
     int chance;
 

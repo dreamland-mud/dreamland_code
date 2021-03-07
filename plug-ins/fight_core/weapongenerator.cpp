@@ -297,7 +297,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
 
     // Generate all combinations of affixes.
     gen.run();
-    //LogStream::sendNotice() << gen.dump();
+//    LogStream::sendNotice() << gen.dump();
 
     if (gen.getResultSize() == 0) {
         warn("Weapon generator: no affixes found for tier %d.", valTier);
