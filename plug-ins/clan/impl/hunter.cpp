@@ -955,12 +955,12 @@ struct HunterSnareDamage : public Damage {
         
     virtual void message( ) {
         if (fMovement) {
-            msgChar( "%1$^O1\6твою ногу при ходьбе", snare->getObj( ) );
-            msgRoom( "%2$^C1 морщится от боли, наступив на зажатую в %1$O4 ногу", snare->getObj( ), ch );
+            msgChar( "%2$^O1\6твою ногу при ходьбе", dam, snare->getObj( ) );
+            msgRoom( "%3$^C1 морщится от боли, наступив на зажатую в %2$O4 ногу", dam, snare->getObj( ), ch );
         }
         else {
-            msgRoom( "%1$^O1\6%2$C4", snare->getObj( ), ch );
-            msgChar( "%1$^O1\6тебя", snare->getObj( ) );
+            msgRoom( "%2$^O1\6%3$C4", dam, snare->getObj( ), ch );
+            msgChar( "%2$^O1\6тебя", dam, snare->getObj( ) );
         }
     }
 
@@ -1071,7 +1071,7 @@ void HunterSnareTrap::greet( Character *victim )
     if (!activated || !obj->in_room)
         return;
 
-    if (is_safe_rspell_nom( ownerLevel, victim ))
+    if (is_safe_rspell( ownerLevel, victim, false ))
         return;
 
     if (get_eq_char( victim, wear_hold_leg ))
@@ -1341,8 +1341,8 @@ struct HunterPitDamage : public Damage {
     }
     
     virtual void message( ) {
-        msgRoom( "%1$^O1 в %2$O6\6 %3$C4", pit->getSteaks( ), pit->getObj( ), ch );
-        msgChar( "%1$^O1 в %2$O6\6 тебя", pit->getSteaks( ), pit->getObj( ) );
+        msgRoom( "%2$^O1 в %3$O6\6 %4$C4", dam, pit->getSteaks( ), pit->getObj( ), ch );
+        msgChar( "%2$^O1 в %3$O6\6 тебя", dam, pit->getSteaks( ), pit->getObj( ) );
     }
     
     virtual void calcDamage( ) {
@@ -1398,7 +1398,7 @@ void HunterPitTrap::greet( Character *victim )
     if (!activated || !obj->in_room || !getSteaks( ))
         return;
 
-    if (is_safe_rspell_nom( ownerLevel, victim )) 
+    if (is_safe_rspell( ownerLevel, victim, false )) 
         return;
 
     if (is_flying( victim )) 

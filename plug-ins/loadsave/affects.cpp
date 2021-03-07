@@ -51,7 +51,7 @@ void Affect::copyTo(Affect &target) const
     target.bitvector.setTable(bitvector.getTable());
     target.global.setRegistry(global.getRegistry());
     target.global.set(global);
-    target.ownerName = ownerName;
+    target.sources = sources;
 }
 
 /*

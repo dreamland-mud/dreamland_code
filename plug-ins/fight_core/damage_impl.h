@@ -24,6 +24,7 @@ struct RawDamage : public Damage {
 
 struct SkillDamage : public virtual Damage {
     SkillDamage( Character *ch, Character *victim, int sn, int dam_type, int dam, bitstring_t dam_flag );
+    SkillDamage( Affect *paf, Character *victim, int sn, int dam_type, int dam, bitstring_t dam_flag );
     
     virtual void protectResistance( );
     virtual int msgNoSpamBit( );

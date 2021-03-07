@@ -129,6 +129,7 @@ VOID_SPELL(BlackDeath)::run( Character *ch, Room *room, int sn, int level )
     
     af.modifier  = 0;
     af.bitvector.setValue(AFF_ROOM_PLAGUE);
+    af.sources.add(ch);
     room->affectTo( &af );
 
     ch->send_to("Чума заражает все вокруг.\n\r");
@@ -160,10 +161,12 @@ VOID_AFFECT(BlackDeath)::update( Room *room, Affect *paf )
     
     plague.modifier                 = -5;
     plague.bitvector.setValue(AFF_PLAGUE);
+    plague.sources = paf->sources;
+    plague.sources.add(room);
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
         if ( !saves_spell(plague.level, vch, DAM_DISEASE, 0, DAMF_MAGIC)
-                && !is_safe_rspell(paf->level,vch)
+                && !is_safe_rspell(&plague, vch)
                 && !IS_AFFECTED(vch,AFF_PLAGUE)
                 && number_bits(3) == 0)
         {
@@ -363,6 +366,7 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
         
         af.modifier  = 0;
         af.bitvector.setValue(AFF_ROOM_POISON);
+        af.sources.add(ch);
         room->affectTo( &af );
 
         ch->send_to("Комната наполняется ядовитыми испарениями.\n\r");
@@ -396,11 +400,13 @@ VOID_AFFECT(DeadlyVenom)::update( Room *room, Affect *paf )
     
     af.modifier        = -5;
     af.bitvector.setValue(AFF_POISON);
+    af.sources = paf->sources;
+    af.sources.add(room);
 
     for ( vch = room->people; vch != 0; vch = vch->next_in_room )
     {
         if ( !saves_spell(af.level ,vch,DAM_POISON, 0, DAMF_MAGIC)
-                && !is_safe_rspell(paf->level,vch)
+                && !is_safe_rspell(&af, vch)
                 && !IS_AFFECTED(vch,AFF_POISON) && number_bits(3) == 0)
         {
             vch->send_to("Тебя подташнивает.\n\r");
@@ -466,6 +472,7 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
     
     af.modifier  = 0;
     af.bitvector.setValue(AFF_ROOM_SLOW);
+    af.sources.add(ch);
     room->affectTo( &af );
 
     ch->send_to("Клубящийся летаргический туман заполняет это место.\n\r");
@@ -500,10 +507,12 @@ VOID_AFFECT(LethargicMist)::update( Room *room, Affect *paf )
     
     af.modifier        = -5;
     af.bitvector.setValue(AFF_SLOW);
+    af.sources = paf->sources;
+    af.sources.add(room);
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
         if ( !saves_spell(af.level ,vch,DAM_OTHER, 0, DAMF_MAGIC|DAMF_WATER)
-                && !is_safe_rspell(paf->level,vch)
+                && !is_safe_rspell(&af, vch)
                 && !IS_AFFECTED(vch,AFF_SLOW) && number_bits(3) == 0 )
         {
             vch->send_to("Твои движения замедляются.\n\r");
@@ -538,6 +547,7 @@ VOID_SPELL(Plague)::run( Character *ch, Character *victim, int sn, int level )
     af.location = APPLY_STR;
     af.modifier  = -1 * max(1,3 + level / 15);
     af.bitvector.setValue(AFF_PLAGUE);
+    af.sources.add(ch);
     affect_join(victim,&af);
 
     victim->send_to("Ты кричишь от боли, когда кожа покрывается чумными язвами.\n\r");
@@ -570,10 +580,11 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     plague.location = APPLY_STR;
     plague.modifier         = -5;
     plague.bitvector.setValue(AFF_PLAGUE);
+    plague.sources = paf->sources;
 
     for ( vch = ch->in_room->people; vch != 0; vch = vch->next_in_room) {
         if (!saves_spell(plague.level + 2,vch,DAM_DISEASE, 0, DAMF_MAGIC)
-                && !is_safe_rspell( vch )
+                && !is_safe_rspell( &plague, vch )
                 && !IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(2) == 0)
         {
             vch->send_to("Ты чувствуешь жар и легкие судороги.\n\r");
@@ -591,12 +602,12 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     
     int plague_damage = max(3,(int) (dam * modifier));
 
-    damage_nocatch( ch, ch, plague_damage, gsn_plague,DAM_DISEASE,false, DAMF_MAGIC);
+    damage_nocatch( paf, ch, plague_damage, gsn_plague,DAM_DISEASE,false, DAMF_MAGIC);
     
     int plague_hp_damage = (max(ch->max_hit/20, 50) * modifier);
 
     if (number_range(1, 100) < 70 )
-        damage_nocatch( ch, ch, plague_hp_damage, gsn_plague,DAM_DISEASE,true, DAMF_MAGIC);
+        damage_nocatch( paf, ch, plague_hp_damage, gsn_plague,DAM_DISEASE,true, DAMF_MAGIC);
 }
     
 VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf ) 
@@ -616,10 +627,11 @@ VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf )
     plague.location = APPLY_STR;
     plague.modifier = -5;
     plague.bitvector.setValue(AFF_PLAGUE);
+    plague.sources = paf->sources;
 
     for (vch = ch->in_room->people; vch != 0; vch = vch->next_in_room)
         if ( !saves_spell(plague.level - 2,vch,DAM_DISEASE, 0, DAMF_MAGIC)
-                && !vch->is_immortal()
+                && !is_safe_rspell( &plague, vch )
                 && !IS_AFFECTED(vch,AFF_PLAGUE) 
                 && number_bits(6) == 0)
         {
@@ -692,7 +704,7 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
 VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         Affect af;
-
+        
         if ( saves_spell( level, victim,DAM_POISON,ch, DAMF_SPELL) )
         {
                 act_p("Кожа $c2 приобретает зеленоватый оттенок, но это сразу проходит.",
@@ -708,6 +720,8 @@ VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level )
         af.location = APPLY_STR;
         af.modifier  = -2;
         af.bitvector.setValue(AFF_POISON);
+        af.sources.add(ch);
+
         affect_join( victim, &af );
         victim->send_to("Ты чувствуешь себя очень болезненно.\n\r");
         act_p("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM,POS_RESTING);
@@ -738,7 +752,7 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
 
     poison_damage = max( 3, (int) (poison_damage*modifier) );
     
-    damage_nocatch(ch, ch, poison_damage, gsn_poison, DAM_POISON, true, DAMF_SPELL);
+    damage_nocatch(paf, ch, poison_damage, gsn_poison, DAM_POISON, true, DAMF_SPELL);
 }
 
 SPELL_DECL(Slow);
@@ -952,6 +966,7 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
     af.duration  = (10 + level / 5);
     
     af.bitvector.setValue(AFF_CORRUPTION);
+    af.sources.add(ch);
     affect_join(victim,&af);
     
     act("Ты вскрикиваешь в муках, начиная гнить заживо.", victim, 0, 0, TO_CHAR);

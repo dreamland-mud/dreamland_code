@@ -262,8 +262,8 @@ struct ShockingTrapDamage : public SelfDamage {
     {
     }
     virtual void message( ) {
-        msgRoom( "%1$^O1, наполняющие местность,\6%2$C4", gsn_shocking_trap->getDammsg(), ch );
-        msgChar( "%1$^O1, наполняющие местность,\6тебя", gsn_shocking_trap->getDammsg(), ch );
+        msgRoom( "%2$^O1, наполняющие местность,\6%3$C4", dam, gsn_shocking_trap->getDammsg(), ch );
+        msgChar( "%2$^O1, наполняющие местность,\6тебя", dam, gsn_shocking_trap->getDammsg(), ch );
     }
 };
         
@@ -304,6 +304,7 @@ VOID_SPELL(WitchCurse)::run( Character *ch, Character *victim, int sn, int level
     af.duration         = 24;
     af.location = APPLY_HIT;
     af.modifier         = - level;
+    af.sources.add(ch);
     affect_to_char(victim,&af);
 
     act("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_CHAR);
@@ -331,6 +332,7 @@ VOID_AFFECT(WitchCurse)::update( Character *ch, Affect *paf )
     witch.location.setTable(paf->location.getTable());
     witch.location = paf->location;
     witch.modifier = paf->modifier * 2;
+    witch.sources = paf->sources;
 
     affect_remove(ch, paf);
     affect_to_char( ch ,&witch);
@@ -338,7 +340,7 @@ VOID_AFFECT(WitchCurse)::update( Character *ch, Affect *paf )
 
     if (ch->hit < 1) {
         affect_strip(ch,gsn_witch_curse);
-        damage_nocatch(ch,ch,20,gsn_witch_curse,DAM_NONE,false);
+        damage_nocatch(&witch,ch,20,gsn_witch_curse,DAM_NONE,false);
     }
 }
 

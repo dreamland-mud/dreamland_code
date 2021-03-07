@@ -310,7 +310,7 @@ void group_gain( Character *ch, Character *victim )
         PCharacter *gch = *i;
         
         xp = xp_compute( gch, victim, mobcount, players.size( ), leader, base_exp_bonus );
-        gch->pecho( "Ты получаешь %1$d очк%1$Iо|а|ов опыта.", xp );
+        gch->pecho( "Ты получаешь %1$d очк%1$Iо|а|ов опыта за убийство %2$#C2.", xp, victim );
         gch->gainExp( xp );
         
         apply_align_changes( gch );

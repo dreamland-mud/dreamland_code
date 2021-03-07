@@ -14,7 +14,6 @@
 #include "affect.h"
 #include "pcharactermanager.h"
 #include "room.h"
-
 #include "skill.h"
 #include "pcharacter.h"
 #include "merc.h"
@@ -30,9 +29,12 @@
 #include "def.h"
 #include "vnum.h"
 
-
 CLAN(none);
 CLAN(flowers);
+
+#define IS_WANTED(victim) \
+    (IS_SET(victim->act, PLR_WANTED) || IS_SET(victim->getPC()->PK_flag, PK_THIEF))
+
 
 bool is_safe(Character *ch, Character *victim)
 {
@@ -166,16 +168,14 @@ bool is_safe_nomessage(Character *ch, Character *victim )
 
     if (!ch->is_immortal( ))
     {
-        if (!is_in_pk_range( ch->getModifyLevel( ),
-                             victim->getModifyLevel( ),
-                             (!IS_SET( victim->act, PLR_WANTED ) && !IS_SET( victim->getPC( )->PK_flag, PK_THIEF ))))
+        if (!is_in_pk_range(ch->getModifyLevel(), victim->getModifyLevel(), !IS_WANTED(victim)))
             return true;
     }
 
     return false;
 }
 
-bool is_safe_rspell( Character *victim )
+static bool is_safe_rspell( Character *victim )
 {
     if (victim->is_immortal( ))
         return true;
@@ -196,31 +196,42 @@ bool is_safe_rspell( Character *victim )
 }
 
 
-bool is_safe_rspell_nom( short level, Character *victim )
+bool is_safe_rspell( short level, Character *victim, bool verbose )
 {
+    bool rc;
+
     if (is_safe_rspell( victim ))
-        return true;
+        rc = true;
     
-    if (!victim->is_npc() && !is_in_pk_range( level, victim->getModifyLevel( ),  (!IS_SET( victim->act, PLR_WANTED ) && !IS_SET( victim->getPC( )->PK_flag, PK_THIEF )) ))
-        return true;
+    else if (!victim->is_npc() && !is_in_pk_range(level, victim->getModifyLevel(), !IS_WANTED(victim)))
+        rc = true;
 
-    if (victim->is_npc() && IS_CHARMED(victim) && !victim->master->is_npc())
-        return !is_in_pk_range( level, victim->master->getModifyLevel( ),  (!IS_SET( victim->master->act, PLR_WANTED ) && !IS_SET( victim->master->getPC( )->PK_flag, PK_THIEF )) );
+    else if (victim->is_npc() && IS_CHARMED(victim) && !victim->master->is_npc())
+        rc = !is_in_pk_range(level, victim->master->getModifyLevel(), !IS_WANTED(victim->master));
 
-    return false;
-}
+    else
+        rc = false;
 
-
-bool is_safe_rspell(short level, Character *victim)
-{
-    if (is_safe_rspell_nom(level, victim)) {
+    if (rc && verbose) {
         act("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
         act("Боги защищают $c4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
-        return true;
     }
 
-    return false;
+    return rc;
 }
 
+bool is_safe_rspell( Affect *paf, Character *victim, bool verbose )
+{
+    Character *pafOwner = paf->sources.getOwner();
+    // If we don't know the source of this affect, check safety against its level.
+    if (!pafOwner)
+        return is_safe_rspell(paf->level, victim, verbose);
 
+    bool rc = is_safe_nomessage(pafOwner, victim);
+    if (rc && verbose) {
+        act("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
+        act("Боги защищают $c4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+    }
 
+    return rc;
+}

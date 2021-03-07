@@ -293,8 +293,8 @@ struct SettrapsDamage : public SelfDamage {
     {
     }
     virtual void message( ) {
-        msgRoom( "%1$^O1\6%2$C4.", gsn_settraps->getDammsg(), ch );
-        msgChar( "%1$^O1\6тебя!", gsn_settraps->getDammsg(), ch );
+        msgRoom( "%2$^O1\6%3$C4.", dam, gsn_settraps->getDammsg(), ch );
+        msgChar( "%2$^O1\6тебя!", dam, gsn_settraps->getDammsg(), ch );
     }
 };
 

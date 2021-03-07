@@ -20,6 +20,7 @@ class PCharacter;
 class NPCharacter;
 class Object;
 class Skill;
+class Affect;
 
 /* fight.cpp */
 void        violence_update( );
@@ -30,6 +31,8 @@ void        one_hit( Character *ch, Character* victim, bool secondary = false);
 void        one_hit_nocatch( Character *ch, Character* victim, bool secondary = false);
 bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
 bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
+bool        damage( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
+bool        damage_nocatch( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
 void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show );
 void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show );
 void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);

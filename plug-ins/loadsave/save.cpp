@@ -208,13 +208,6 @@ Affect * fread_Affc( FILE *fp )
         globalString.substitute('\r', ' ').substitute('\n', ' ');
         globalString.stripWhiteSpace( );        
         
-        if (!globalString.empty( ) 
-            && isalpha(globalString.at(0))
-            && dl_isupper(globalString.at(0)))
-        {
-            paf->ownerName = globalString.getOneArgument( );
-        }
-
         if (where == TO_LOCATIONS) {
             paf->global.setRegistry( wearlocationManager );
             paf->global.fromString( globalString );
@@ -242,7 +235,7 @@ void fwrite_affect( FILE *fp, Affect *paf )
     if (paf->type == gsn_doppelganger)
         return;
 
-    fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10lld %s %s\n",
+    fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10lld %s\n",
             paf->type->getName( ).c_str( ),
             affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
             paf->level.getValue(),
@@ -250,7 +243,6 @@ void fwrite_affect( FILE *fp, Affect *paf )
             paf->modifier.getValue(),
             paf->location.getValue(),
             paf->bitvector.getValue(),
-            paf->ownerName.c_str( ),
             paf->global.toString( ).c_str( ));
 }
 

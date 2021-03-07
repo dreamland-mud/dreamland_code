@@ -244,6 +244,8 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             af.location = APPLY_STR;
             af.modifier  = -1;
             af.bitvector.setValue(AFF_POISON);
+            af.sources.add(ch);
+            af.sources.add(wield);
             affect_join( victim, &af );
         }
 

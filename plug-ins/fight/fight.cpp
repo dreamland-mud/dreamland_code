@@ -415,6 +415,25 @@ bool damage( Character *ch, Character *victim,
     return true;
 }
 
+bool 
+damage_nocatch( Affect *paf, Character *victim, 
+                int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) 
+{
+    return SkillDamage( paf, victim, sn, dam_type, dam, dam_flag ).hit( show );
+}
+
+bool damage( Affect *paf, Character *victim, 
+             int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) 
+{
+    try {
+        return damage_nocatch( paf, victim, dam, sn, dam_type, show, dam_flag );
+    }
+    catch (const VictimDeathException& e) {                                     
+    }
+
+    return true;
+}
+
 void rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show )
 {
     RawDamage( ch, victim, dam_type, dam ).hit( show );

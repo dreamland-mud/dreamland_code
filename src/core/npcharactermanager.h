@@ -40,6 +40,8 @@ public:
                 return thisClass;
         }
 
+        static NPCharacter *find(long long ID);
+
 private:
         static NPCharacterManager* thisClass;
         static ExtractList extractList;

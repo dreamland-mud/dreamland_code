@@ -44,6 +44,7 @@
 #include "mudtags.h"
 #include "merc.h"
 #include "autoflags.h"
+#include "profflags.h"
 #include "so.h"
 #include "def.h"
 

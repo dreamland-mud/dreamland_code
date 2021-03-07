@@ -47,24 +47,21 @@ RawDamage::RawDamage( Character *ch, Character *victim, int dam_type, int dam )
 void RawDamage::message( )
 {
     if( ch == victim ) {
-        msgRoom( "%1$^C1\6себя", ch );
-        msgChar( "Ты\5себя" );
+        msgRoom( "%2$^C1\6себя", dam, ch );
+        msgChar( "Ты\5себя", dam );
         return;
     } 
 
     if ( dam == 0 ) {
-       msgRoom( "%1$^C1\6%2$C2", ch, victim); 
-       msgChar( "Ты\5%2$C2", ch, victim);
+       msgRoom( "%2$^C1\6%3$C2", dam, ch, victim); 
+       msgChar( "Ты\5%3$C2", dam, ch, victim);
     }
     else {
-       msgRoom( "%1$^C1\6%2$C4", ch, victim );
-       if (ch->isCoder( ))
-            msgChar( "Ты\5%2$C4 {D[{Y%3$d{D]{x", ch, victim, dam ); // show explicit damage numbers to coders
-       else 
-            msgChar( "Ты\5%2$C4", ch, victim );
+        msgRoom( "%2$^C1\6%3$C4", dam, ch, victim );
+        msgChar( "Ты\5%3$C4", dam, ch, victim );
     }
 
-    msgVict( "%1$^C1\6тебя", ch );
+    msgVict( "%2$^C1\6тебя", dam, ch );
 }
 
 bool RawDamage::canDamage( )
@@ -82,6 +79,12 @@ SkillDamage::SkillDamage( Character *ch, Character *victim,
     this->sn = sn;
 }
 
+SkillDamage::SkillDamage( Affect *paf, Character *victim, int sn, int dam_type, int dam, bitstring_t dam_flag )
+            : Damage( paf, victim, dam_type, dam, dam_flag )
+{
+    this->sn = sn;
+}
+
 int SkillDamage::msgNoSpamBit( )
 {
     return CONFIG_SKILLSPAM;
@@ -93,35 +96,32 @@ void SkillDamage::message( )
 
     if (immune) {
         if (ch == victim) {
-            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна|ьны против %2$P4 сам%2$Gого|ого|ой|их", &attack, ch);
-            msgChar("Тебе повезло, у тебя иммунитет к этому");
+            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %3$P4 сам%3$Gого|ого|ой|их", dam, &attack, ch);
+            msgChar("Тебе повезло, у тебя иммунитет к этому", dam);
         }
         else {
-            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна|ьны против %3$C2", &attack, ch, victim);
-            msgChar("%1$^T1 %1$O1 бессил%1$Gьно|ен|ьна|ьны против %2$C2", &attack, victim);
-            msgVict("Против тебя %2$O1 %1$C2 бессил%2$Gьно|ен|ьна|ьны", ch, &attack);
+            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %4$C2", dam, &attack, ch, victim);
+            msgChar("%2$^T1 %2$O1 бессил%2$Gьно|ен|ьна|ьны против %3$C2", dam, &attack, victim);
+            msgVict("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна|ьны", dam, ch, &attack);
         }
     }
     else {
         if (ch == victim) {
-            msgRoom( "%1$^O1 %2$C2\6%2$P2", &attack, ch );
-            msgChar( "%1$^T1 %1$O1\6тебя", &attack );
+            msgRoom( "%2$^O1 %3$C2\6%3$P2", dam, &attack, ch );
+            msgChar( "%2$^T1 %2$O1\6тебя", dam, &attack );
         }
         else {
             if ( dam == 0 )
             {
-                msgRoom( "%1$^O1 %2$C2\6%3$C2", &attack, ch, victim );
-                msgChar( "%1$^T1 %1$O1\6%2$C2", &attack, victim );
+                msgRoom( "%2$^O1 %3$C2\6%4$C2", dam, &attack, ch, victim );
+                msgChar( "%2$^T1 %2$O1\6%3$C2", dam, &attack, victim );
             }
             else {
-                msgRoom( "%1$^O1 %2$C2\6%3$C4", &attack, ch, victim );
-                
-                if (ch->isCoder( ))
-                    msgChar( "%1$^T1 %1$O1\6%2$C4 {D[{Y%3$d{D]{x", &attack, victim, dam ); // show explicit damage numbers to coders
-                else 
-                    msgChar( "%1$^T1 %1$O1\6%2$C4", &attack, victim );
+                msgRoom( "%2$^O1 %3$C2\6%4$C4", dam, &attack, ch, victim );
+                msgChar( "%2$^T1 %2$O1\6%3$C4", dam, &attack, victim );
             }
-            msgVict( "%1$^O1 %2$C2\6тебя", &attack, ch );
+
+            msgVict( "%2$^O1 %3$C2\6тебя", dam, &attack, ch );
         }
     }
 }

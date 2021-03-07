@@ -384,6 +384,8 @@ void MissileOneHit::damEffectFunkyWeapon( )
             af.location = APPLY_STR;
             af.modifier  = -1;
             af.bitvector.setValue(AFF_POISON);
+            af.sources.add(ch);
+            af.sources.add(missile);
             affect_join( victim, &af );
         }
     }

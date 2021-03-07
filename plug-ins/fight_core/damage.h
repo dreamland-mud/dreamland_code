@@ -13,10 +13,12 @@
 class Character;
 class Object;
 class DLString;
+class Affect;
 
 class Damage {
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );
+    Damage( Affect *paf, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );
     
     bool hit( bool show );
     
@@ -55,22 +57,23 @@ protected:
     void msgVict( const char *fmt, ... );
     void msgRoom( const char *fmt, ... );
     void msgChar( const char *fmt, ... );
-
-    virtual bool mprog_immune();
-    virtual bool mprog_hit();
-
-private:
     virtual int msgNoSpamBit( );
-
+    bool canSeeMessage(Character *to);
     void msgEcho(Character *to, const char *f, va_list va);
     void msgOldFormat( bool vs, char *buf );
     void msgNewFormat( bool vs, char *buf );
     char msgPunct( );
 
+    virtual bool mprog_immune();
+    virtual bool mprog_hit();
+
+    void init(Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag);
+
 protected:
     Character *ch;
     Character *victim;
     Character *killer;
+    Affect *paf;
     
     int dam_type;
     int dam;

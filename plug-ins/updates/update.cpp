@@ -1182,11 +1182,11 @@ struct LightVampireDamage : public Damage {
 
         RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
-            msgRoom( "%1$^O1\6%2$C2", sunlight, ch);
+            msgRoom( "%2$^O1\6%3$C2", dam, sunlight, ch);
         else
-            msgRoom( "%1$^O1\6%2$C4", sunlight, ch);
+            msgRoom( "%2$^O1\6%3$C4", dam, sunlight, ch);
             
-        msgChar( "%1$^O1\6тебя", sunlight );
+        msgChar( "%2$^O1\6тебя", dam, sunlight );
     }
 };
 

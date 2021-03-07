@@ -19,6 +19,7 @@
 #include "alignment.h"
 #include "logstream.h"
 #include "websocketrpc.h"
+#include "profflags.h"
 
 #include "dreamland.h"
 #include "merc.h"

@@ -235,6 +235,8 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
             af.location = APPLY_STR;
             af.modifier  = -1;
             af.bitvector.setValue(AFF_POISON);
+            af.sources.add(ch);
+            af.sources.add(arrow);
             affect_join( victim, &af );
         }
 

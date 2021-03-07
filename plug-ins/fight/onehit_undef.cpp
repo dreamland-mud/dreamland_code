@@ -266,31 +266,31 @@ void UndefinedOneHit::message( )
 
     if (immune) {
         if (ch == victim) {
-            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна|ьны против %2$P4 сам%2$Gого|ого|ой|их", &noun, ch);
-            msgChar("Тебе повезло, у тебя иммунитет к этому");
+            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %3$P4 сам%3$Gого|ого|ой|их", dam, &noun, ch);
+            msgChar("Тебе повезло, у тебя иммунитет к этому", dam);
         }
         else {
-            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна|ьны против %3$C2", &noun, ch, victim);
-            msgChar("%1$^T1 %1$O1 бессил%1$Gьно|ен|ьна|ьны против %2$C2", &noun, victim);
-            msgVict("Против тебя %2$O1 %1$C2 бессил%2$Gьно|ен|ьна", ch, &noun);
+            msgRoom("%2$^O1 %3$C2 бессил%2$Gьно|ен|ьна|ьны против %4$C2", dam, &noun, ch, victim);
+            msgChar("%2$^T1 %2$O1 бессил%2$Gьно|ен|ьна|ьны против %3$C2", dam, &noun, victim);
+            msgVict("Против тебя %3$O1 %2$C2 бессил%3$Gьно|ен|ьна", dam, ch, &noun);
         }
     }
     else {
         if (ch == victim) {
-            msgRoom( "%1$^O1 %2$C2\6себя", &noun, ch );
-            msgChar( "%1$^T1 %1$O1\6тебя", &noun );
+            msgRoom( "%2$^O1 %3$C2\6себя", dam, &noun, ch );
+            msgChar( "%2$^T1 %2$O1\6тебя", dam, &noun );
         }
         else {
             if ( dam == 0 )
             {
-                msgRoom( "%1$^O1 %2$C2\6%3$C2", &noun, ch, victim );
-                msgChar( "%1$^T1 %1$O1\6%2$C2", &noun, victim );
+                msgRoom( "%2$^O1 %3$C2\6%4$C2", dam, &noun, ch, victim );
+                msgChar( "%2$^T1 %2$O1\6%3$C2", dam, &noun, victim );
             }
             else {
-                msgRoom( "%1$^O1 %2$C2\6%3$C4", &noun, ch, victim );
-                msgChar( "%1$^T1 %1$O1\6%2$C4", &noun, victim );
+                msgRoom( "%2$^O1 %3$C2\6%4$C4", dam, &noun, ch, victim );
+                msgChar( "%2$^T1 %2$O1\6%3$C4", dam, &noun, victim );
             }
-            msgVict( "%1$^O1 %2$C2\6тебя", &noun, ch );
+            msgVict( "%2$^O1 %3$C2\6тебя", dam, &noun, ch );
         }
     }
 }

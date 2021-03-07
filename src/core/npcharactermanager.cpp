@@ -15,6 +15,8 @@
 #include "npcharacter.h"
 
 #include "dreamland.h"
+#include "merc.h"
+#include "def.h"
 
 NPCharacterManager* NPCharacterManager::thisClass = 0;
 NPCharacterManager::ExtractList NPCharacterManager::extractList;
@@ -53,5 +55,14 @@ NPCharacter* NPCharacterManager::getNPCharacter( )
     
     ch->setID( dreamland->genID( ) );
     return ch;
+}
+
+NPCharacter* NPCharacterManager::find(long long ID) 
+{
+    for (Character *ch = char_list; ch; ch = ch->next)
+        if (ch->is_npc() && ch->getID() == ID)
+            return ch->getNPC();
+
+    return 0;
 }
 
