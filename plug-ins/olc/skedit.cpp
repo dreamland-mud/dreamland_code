@@ -224,6 +224,30 @@ void OLCStateSkill::show( PCharacter *ch )
     ptc(ch, "\r\n{WКоманды{x: {hc{yspell{x, {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
 }
 
+SKEDIT(affect, "аффект", "создать обработчик аффекта для этого умения")
+{
+    DLString arg = argument;
+
+    if (arg_oneof(arg, "create", "создать")) {
+        if (getAffect()) {
+            stc("Обработчик аффекта уже определен.\r\n", ch);
+            return false;
+        }
+
+        DefaultAffectHandler::Pointer ah(NEW);
+        BasicSkill *skill = getOriginal();
+
+        skill->affect.setPointer(ah);
+        skill->affect->setSkill(BasicSkill::Pointer(skill));
+        stc("Создан новый обработчик аффекта для этого умения.\r\n", ch);
+        show(ch);
+        return true;
+    }
+
+    stc("Использование: {y{hcaffect create{x - создать обработчик аффекта\r\n", ch);
+    return false;
+}
+
 SKEDIT(spell, "заклинание", "создать заклинание для этого умения")
 {
     DLString arg = argument;
