@@ -23,6 +23,7 @@
 #include "defaultspell.h"
 #include "dl_math.h"
 #include "../anatolia/handler.h"
+#include "vnum.h"
 #include "merc.h"
 #include "def.h"
 
@@ -398,6 +399,63 @@ NMI_INVOKE(FeniaSpellContext, yellPanic, "(): новая жертва закли
     return Register();
 }
 
+static PCharacter *get_grave_owner(::Object *grave)
+{
+    PCharacter *victim = PCharacterManager::findPlayer(grave->getOwner());
+    if (!victim || !DIGGED(victim)) {
+        LogStream::sendError( ) << "Nonexisting grave owner: " << grave->getOwner() << " for obj " << grave->getID() << endl;
+        return 0;
+    }
+
+    return victim;
+}
+
+static ::Object * find_grave_here(Character *ch)
+{
+    ::Object *grave = get_obj_room_vnum(ch->in_room, OBJ_VNUM_GRAVE);    
+    if (!grave)
+        return 0;
+
+    PCharacter *victim = get_grave_owner(grave);
+    if (!victim)
+        return 0;
+        
+    if (is_safe_nomessage(ch, victim)) 
+        return 0;
+
+    return grave;
+}
+
+
+NMI_INVOKE(FeniaSpellContext, graveDestroy, "(): выкопать вампира из могилы в комнате кастера")
+{
+    Character *myCh = arg2character(ch);
+    ::Object *grave = find_grave_here(myCh);
+    if (!grave)
+        return Register(false);
+
+    PCharacter *victim = get_grave_owner(grave);
+    if (!victim)
+        return Register(false);
+
+    undig(victim);
+    return Register(true);
+}
+
+NMI_INVOKE(FeniaSpellContext, graveFind, "(): найти в комнате кастера могилу вампира в ПК-диапазоне")
+{
+    Character *myCh = arg2character(ch);
+    ::Object *grave = find_grave_here(myCh);
+    return grave ? wrap(grave) : Register();
+}
+
+NMI_INVOKE(FeniaSpellContext, graveOwner, "(): вернуть владельца могилы в комнате кастера")
+{
+    Character *myCh = arg2character(ch);
+    ::Object *grave = find_grave_here(myCh);
+    PCharacter *victim = grave ? get_grave_owner(grave) : 0;
+    return victim ? wrap(victim) : Register();
+}
 
 NMI_INVOKE(FeniaSpellContext, isWater, "(): находится ли кастер в воде или под водой")
 {
