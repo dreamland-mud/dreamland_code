@@ -262,7 +262,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     }
     
     /*
-     * Magic Concentrate, by Kind, updated by Taiphoen
+     * Magic Concentrate, by Kind, updated by Taiphoen.
+     * Applicable to ranged, offensive, casted, non-prayer spells.
      *   f(x) = A0 / (1 + x / B0)
      *     A0 = a / (B0 * Ln(1 + a / B0))
      *      A0 - усиление на нулевом расстоянии - в стее
@@ -270,17 +271,16 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
      *      B0 - свободный параметр
      *      a  - дальность действия спелла
      */
-            
+    int maxRange = getMaxRange(ch);               
     if ( ch->isAffected(gsn_magic_concentrate) &&
          !isPrayer(ch) &&
          flags.isSet(SPELL_MAGIC) &&
-         getSpellType() == SPELL_OFFENSIVE &&
-         getMaxRange(ch) > 0 )
+         maxRange > 0 )
     {
         int a, x;
         double A0, B0, f;
 
-        a  = max( 1, getMaxRange( ch ) );
+        a  = max( 1, maxRange );
         x  = range;
         B0 = 12;
         A0 = a / (B0 * log( 1 + a / B0 ));
