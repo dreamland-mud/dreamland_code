@@ -322,7 +322,7 @@ SKILL_RUNP( shield )
     weapon = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
     
-    if (weapon == 0) && (dual == 0)
+    if ((weapon == 0) && (dual == 0))
     {
         ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
         return;
@@ -360,15 +360,14 @@ SKILL_RUNP( shield )
          weapon->value0() == WEAPON_POLEARM ||
          dual->value0() == WEAPON_AXE ||      
          dual->value0() == WEAPON_POLEARM )
-    {
+        
         chance = chance * 1.2; // 48-60%
-    }
-    else 
-    if ( weapon->value0() == WEAPON_SWORD ||
-         dual->value0() == WEAPON_SWORD ||      
-    {
+    
+    else if ( weapon->value0() == WEAPON_SWORD ||
+              dual->value0() == WEAPON_SWORD )     
+        
         chance = chance * 0.9;
-    }
+    
     else
     {
         ch->send_to("Для этого ты должен вооружиться топором, мечом или алебардой.\n\r");
@@ -507,15 +506,14 @@ SKILL_RUNP( weapon )
          weapon->value0() == WEAPON_POLEARM ||
          dual->value0() == WEAPON_AXE ||      
          dual->value0() == WEAPON_POLEARM )
-    {
+        
         chance = chance * 1.2; // 48-60%
-    }
-    else 
-    if ( weapon->value0() == WEAPON_SWORD ||
-         dual->value0() == WEAPON_SWORD ||      
-    {
+    
+    else if ( weapon->value0() == WEAPON_SWORD ||
+              dual->value0() == WEAPON_SWORD )     
+        
         chance = chance * 0.9;
-    }
+    
     else
     {
         ch->send_to("Для этого ты должен вооружиться топором, мечом или алебардой.\n\r");
