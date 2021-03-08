@@ -523,7 +523,7 @@ SKILL_RUNP( weapon )
     // +/-2% per each 1% skill diff    
     wskill = ch->getSkill(get_weapon_sn(ch, false));
     vict_skill = ch->getSkill(get_weapon_sn(victim, false));    
-    vict_skill = std::max(vict_skill, gsn_grip->getEffective( vict ));   
+    vict_skill = std::max(vict_skill, gsn_grip->getEffective( victim ));   
     chance += (wskill - vict_skill) * wskill_mod * 100;
 
     /* strength vs. con/dex, resist or evade */
@@ -571,7 +571,7 @@ SKILL_RUNP( weapon )
     {        
         act("Твое оружие со звоном отскакивает от оружия $C2!", ch,0,victim,TO_CHAR);
         act("Оружие $c2 со звоном отскакивает от твоего оружия!", ch,0,victim,TO_VICT);
-        act_p("Оружие $c2 со звоном отскакивает от оружия $C2.", ch,0,victim,TO_NOTVICT);
+        act("Оружие $c2 со звоном отскакивает от оружия $C2.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, false, victim );
         ch->send_to("Вибрация от столкновения на мгновение ошеломляет тебя!\n\r");
         SET_BIT(ch->affected_by,AFF_WEAK_STUN);
