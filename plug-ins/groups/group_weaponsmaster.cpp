@@ -251,6 +251,16 @@ SKILL_RUNP( disarm )
 
         /* level */
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+    
+        /* can see */
+        if (!ch->can_see( obj )) {
+            if (number_percent( ) < gsn_blind_fighting->getEffective( ch ))
+                chance = chance * 3 / 4;
+            else {
+                chance /= 3;
+                ch->send_to("Выбить оружие, которое ты не видишь, оказывается гораздо сложнее...\n\r");
+            }
+        }
 
         /* and now the attack */
         if (number_percent() < chance)
@@ -387,6 +397,16 @@ SKILL_RUNP( shield )
         chance += 10;
     
     // TO-DO: add object material and weight factors
+    
+    /* can see */
+    if (!ch->can_see( get_eq_char(victim,wear_shield) )) {
+        if (number_percent( ) < gsn_blind_fighting->getEffective( ch ))
+            chance = chance * 3 / 4;
+        else {
+            chance /= 3;
+            ch->send_to("Разрубить щит, который ты не видишь, оказывается гораздо сложнее...\n\r");
+        }
+    }
         
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
         chance = chance / 2;         
@@ -526,6 +546,16 @@ SKILL_RUNP( weapon )
         chance += 10;
     
     // TO-DO: add object material and weight factors
+
+    /* can see */
+    if (!ch->can_see( get_eq_char(victim,wear_wield) )) {
+        if (number_percent( ) < gsn_blind_fighting->getEffective( ch ))
+            chance = chance * 3 / 4;
+        else {
+            chance /= 3;
+            ch->send_to("Разрубить оружие, которое ты не видишь, оказывается гораздо сложнее...\n\r");
+        }
+    }
         
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
         chance = chance / 2;         
