@@ -413,9 +413,9 @@ SKILL_RUNP( shield )
     ch->setWait( gsn_shield_cleave->getBeats( )  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
-        act_p("Ты {1{Rраскалываешь{2 щит $C2 надвое!", ch,0,victim,TO_CHAR);
-        act_p("$c1 {1{RРАСКАЛЫВАЕТ{2 твой щит надвое!", ch,0,victim,TO_VICT);
-        act_p("$c1 раскалывает щит $C2 надвое.", ch,0,victim,TO_NOTVICT);
+        act("Ты {1{Rраскалываешь{2 щит $C2 надвое!", ch,0,victim,TO_CHAR);
+        act("$c1 {1{RРАСКАЛЫВАЕТ{2 твой щит надвое!", ch,0,victim,TO_VICT);
+        act("$c1 раскалывает щит $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_shield) );
     }
@@ -468,7 +468,7 @@ SKILL_RUNP( weapon )
     weapon = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
     
-    if (weapon == 0) && (dual == 0)
+    if ((weapon == 0) && (dual == 0))
     {
         ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
         return;
@@ -522,7 +522,7 @@ SKILL_RUNP( weapon )
 
     // +/-2% per each 1% skill diff    
     wskill = ch->getSkill(get_weapon_sn(ch, false));
-    vict_skill = ch->getSkill(get_weapon_sn(vict, false));    
+    vict_skill = ch->getSkill(get_weapon_sn(victim, false));    
     vict_skill = std::max(vict_skill, gsn_grip->getEffective( vict ));   
     chance += (wskill - vict_skill) * wskill_mod * 100;
 
@@ -561,9 +561,9 @@ SKILL_RUNP( weapon )
     ch->setWait( gsn_weapon_cleave->getBeats( )  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
-        act_p("Ты {1{Rраскалываешь{2 оружие $C2 надвое!", ch,0,victim,TO_CHAR);
-        act_p("$c1 {1{RРАСКАЛЫВАЕТ{2 твое оружие надвое!", ch,0,victim,TO_VICT);
-        act_p("$c1 раскалывает оружие $C2 надвое.", ch,0,victim,TO_NOTVICT);
+        act("Ты {1{Rраскалываешь{2 оружие $C2 надвое!", ch,0,victim,TO_CHAR);
+        act("$c1 {1{RРАСКАЛЫВАЕТ{2 твое оружие надвое!", ch,0,victim,TO_VICT);
+        act("$c1 раскалывает оружие $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_wield) );
     }
