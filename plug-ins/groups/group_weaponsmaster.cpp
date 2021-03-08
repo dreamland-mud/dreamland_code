@@ -282,24 +282,44 @@ SKILL_RUNP( disarm )
 SKILL_RUNP( shield )
 {
     Character *victim;
-    int chance,ch_weapon,vict_shield;
-    Object *shield,*axe;
+    int wskill,vict_skill;
+    float chance, skill_mod, level_mod, size_mod, stat_mod, wskill_mod;
+    Object *shield, *weapon, *dual;
+    
+    //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+    skill_mod   = 0.5;
+    wskill_mod  = 0.02;
+    stat_mod    = 0.02;
+    level_mod   = 0.02;    
+    size_mod    = 0.02;   
+    
+    //////////////// ELIGIBILITY CHECKS ////////////////
 
+    ///// Standard checks: TODO: turn this into a function
+    
     if ( ( victim = ch->fighting ) == 0 )
     {
-        ch->send_to("Сейчас ты не сражаешься.\n\r");
+        ch->send_to("Этот навык можно применять только в бою.\n\r");
         return;
-    }
-        
-    if ((axe = get_eq_char(ch,wear_wield)) == 0)
-    {
-        ch->send_to( "Сначала нужно вооружиться.\n\r");
-        return;
-    }
+    }  
 
-    if ((chance = gsn_shield_cleave->getEffective( ch )) == 0)
+    if ( !gsn_shield_cleave->usable( ch ) )
     {
         ch->send_to("Ты не знаешь как расколоть щит противника.\n\r");
+        return;
+    }
+ 
+    weapon = get_eq_char(ch,wear_wield);    
+    dual = get_eq_char(ch,wear_second_wield); 
+    
+    if (weapon == 0) && (dual == 0)
+    {
+        ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
+        return;
+    }
+    
+    if (attack_table[weapon->value3()].damage != DAM_SLASH && attack_table[dual->value3()].damage != DAM_SLASH) {
+        ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
         return;
     }
 
@@ -309,60 +329,85 @@ SKILL_RUNP( shield )
         return;
     }
 
-    if (material_is_flagged( shield, MAT_INDESTR ) || shield->pIndexData->limit != -1)
+    if (material_is_flagged( shield, MAT_INDESTR ) || shield->pIndexData->limit != -1 || IS_SET( shield->extra_flags, ITEM_NOPURGE ))
+    {
+        ch->send_to("Щит твоего противника слишком прочен, его не удастся разрубить.\n\r");
         return;
+    }
 
-    if (axe->value0() == WEAPON_AXE )
-        chance = ( int )( chance * 1.2 );
-    else if (axe->value0() != WEAPON_SWORD)
-        {
-         ch->send_to("Для этого ты должен вооружиться топором или мечом.\n\r");
-         return;
-        }
+    if (SHADOW(ch)) {
+        act("Ты размахиваешься и разрубаешь свою тень.", ch,0,victim,TO_CHAR);
+        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_VICT);
+        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_NOTVICT);        
+        return;
+    }
+    
+    //////////////// PROBABILITY CHECKS ////////////////        
+    chance = 0;
+    chance = gsn_shield_cleave->getEffective( ch ) * skill_mod; // 30-50% base
+    
+    if ( weapon->value0() == WEAPON_AXE ||
+         weapon->value0() == WEAPON_POLEARM ||
+         dual->value0() == WEAPON_AXE ||      
+         dual->value0() == WEAPON_POLEARM )
+    {
+        chance = chance * 1.2; // 48-60%
+    }
+    else 
+    if ( weapon->value0() == WEAPON_SWORD ||
+         dual->value0() == WEAPON_SWORD ||      
+    {
+        chance = chance * 0.9;
+    }
+    else
+    {
+        ch->send_to("Для этого ты должен вооружиться топором, мечом или алебардой.\n\r");
+        return;
+    }
 
-    /* find weapon skills */
-    ch_weapon = ch->getSkill(get_weapon_sn(ch, false));
-    vict_shield = std::max(1,gsn_shield_block->getEffective( ch ));
-    /* modifiers */
+    // +/-2% per each 1% skill diff    
+    wskill = ch->getSkill(get_weapon_sn(ch, false));
+    vict_skill = std::max(1,gsn_shield_block->getEffective( ch ));
+    chance += (wskill - vict_skill) * wskill_mod * 100;
 
-    /* skill */
-   chance = chance * ch_weapon / 200;
-   chance = chance * 100 / vict_shield;
-
-    /* dex vs. strength */
-    chance += ch->getCurrStat(STAT_DEX);
-    chance -= 2 * victim->getCurrStat(STAT_STR);
+    /* strength vs. con/dex, resist or evade */
+    // +/-2% per each 1% skill diff  
+    chance += ( ch->getCurrStat(STAT_STR) - std::max(victim->getCurrStat(STAT_CON), victim->getCurrStat(STAT_DEX)) ) * stat_mod * 100;    
 
     /* level */
-    chance += ( ch->getModifyLevel() - skill_level(*gsn_shield_block, victim) ) * 2;
-/*    chance += ch->getRealLevel( ) - victim->getRealLevel( );*/
-    chance += axe->level - shield->level;
+    // +/-2% per each 1% skill level     
+    chance += ( skill_level(*gsn_shield_cleave, victim) - skill_level(*gsn_shield_block, victim) ) * level_mod * 100;
+    // +/-1% per each 1% obj level diff    
+    chance += std::max(weapon->level, dual->level) - shield->level;
 
-    /* and now the attack */
-    SET_BIT(ch->affected_by,AFF_WEAK_STUN);
-
-    if (number_percent() < chance)
-    {
-            ch->setWait( gsn_shield_cleave->getBeats( )  );
-        act_p("Ты раскалываешь щит $C2 надвое.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 раскалывает твой щит надвое.",
-               ch,0,victim,TO_VICT,POS_RESTING);
-        act_p("$c1 раскалывает щит $C2 надвое.",
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
+    // +/-2% per each size diff 
+    chance += (ch->size - victim->size) * size_mod * 100; 
+    // +10% if mounted   
+    if ( MOUNTED(ch) )
+        chance += 10;
+    
+    // TO-DO: add object material and weight factors
+        
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        chance = chance / 2;         
+        
+    ch->setWait( gsn_shield_cleave->getBeats( )  );
+    if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
+    {        
+        act_p("Ты {1{Rраскалываешь{2 щит $C2 надвое!", ch,0,victim,TO_CHAR);
+        act_p("$c1 {1{RРАСКАЛЫВАЕТ{2 твой щит надвое!", ch,0,victim,TO_VICT);
+        act_p("$c1 раскалывает щит $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_shield) );
     }
     else
-    {
-        ch->setWait( gsn_shield_cleave->getBeats( ) );
-        act_p("Ты пытаешься расколоть щит $C2, но не выходит.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 пытается расколоть твой щит, но не выходит.",
-               ch,0,victim,TO_VICT,POS_RESTING);
-        act_p("$c1 пытается расколоть щит $C2, но не выходит.",
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
+    {        
+        act("Твое оружие со звоном отскакивает от щита $C2!", ch,0,victim,TO_CHAR);
+        act("Оружие $c2 со звоном отскакивает от твоего щита!", ch,0,victim,TO_VICT);
+        act("Оружие $c2 со звоном отскакивает от щита $C2.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, false, victim );
+        ch->send_to("Вибрация от столкновения на мгновение ошеломляет тебя!\n\r");
+        SET_BIT(ch->affected_by,AFF_WEAK_STUN);
     }
     return;
 }
@@ -374,86 +419,134 @@ SKILL_RUNP( shield )
 SKILL_RUNP( weapon )
 {
     Character *victim;
-    Object *wield,*axe;
-    int chance,ch_weapon,vict_weapon;
+    int wskill,vict_skill;
+    float chance, skill_mod, level_mod, size_mod, stat_mod, wskill_mod;
+    Object *vict_weapon, *weapon, *dual;
+    
+    //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+    skill_mod   = 0.5;
+    wskill_mod  = 0.02;
+    stat_mod    = 0.02;
+    level_mod   = 0.02;    
+    size_mod    = 0.02;   
+    
+    //////////////// ELIGIBILITY CHECKS ////////////////
 
+    ///// Standard checks: TODO: turn this into a function
+    
     if ( ( victim = ch->fighting ) == 0 )
     {
-        ch->send_to("Сейчас ты не сражаешься.\n\r");
+        ch->send_to("Этот навык можно применять только в бою.\n\r");
+        return;
+    }  
+
+    if ( !gsn_weapon_cleave->usable( ch ) )
+    {
+        ch->send_to("Ты не знаешь как расколоть оружие противника.\n\r");
+        return;
+    }
+ 
+    weapon = get_eq_char(ch,wear_wield);    
+    dual = get_eq_char(ch,wear_second_wield); 
+    
+    if (weapon == 0) && (dual == 0)
+    {
+        ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
+        return;
+    }
+    
+    if (attack_table[weapon->value3()].damage != DAM_SLASH && attack_table[dual->value3()].damage != DAM_SLASH) {
+        ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+        return;
+    }
+    
+    if ( ( vict_weapon = get_eq_char( victim, wear_wield )) == 0 )
+    {
+        ch->send_to("Твой противник не вооружен.\n\r");
         return;
     }
 
-    if ( (axe = get_eq_char(ch,wear_wield)) == 0)
+    if (material_is_flagged( vict_weapon, MAT_INDESTR ) || vict_weapon->pIndexData->limit != -1 || IS_SET( vict_weapon->extra_flags, ITEM_NOPURGE ))
     {
-        ch->send_to( "Сначала тебе нужно вооружитья.\n\r");
+        ch->send_to("Оружие твоего противника слишком прочно, его не удастся разрубить.\n\r");
         return;
     }
 
-    if ((chance = gsn_weapon_cleave->getEffective( ch )) == 0)
+    if (SHADOW(ch)) {
+        act("Ты размахиваешься и разрубаешь свою тень.", ch,0,victim,TO_CHAR);
+        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_VICT);
+        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_NOTVICT);        
+        return;
+    }
+    
+    //////////////// PROBABILITY CHECKS ////////////////        
+    chance = 0;
+    chance = gsn_weapon_cleave->getEffective( ch ) * skill_mod; // 30-50% base
+    
+    if ( weapon->value0() == WEAPON_AXE ||
+         weapon->value0() == WEAPON_POLEARM ||
+         dual->value0() == WEAPON_AXE ||      
+         dual->value0() == WEAPON_POLEARM )
     {
-        ch->send_to("Ты не знаешь как раскалывают оружие противника.\n\r");
+        chance = chance * 1.2; // 48-60%
+    }
+    else 
+    if ( weapon->value0() == WEAPON_SWORD ||
+         dual->value0() == WEAPON_SWORD ||      
+    {
+        chance = chance * 0.9;
+    }
+    else
+    {
+        ch->send_to("Для этого ты должен вооружиться топором, мечом или алебардой.\n\r");
         return;
     }
 
-    if ( (wield = get_eq_char( victim, wear_wield )) == 0 )
-    {
-        ch->send_to("Твой противник должен быть вооружен.\n\r");
-        return;
-    }
+    // +/-2% per each 1% skill diff    
+    wskill = ch->getSkill(get_weapon_sn(ch, false));
+    vict_skill = ch->getSkill(get_weapon_sn(vict, false));    
+    vict_skill = std::max(vict_skill, gsn_grip->getEffective( vict ));   
+    chance += (wskill - vict_skill) * wskill_mod * 100;
 
-    if (material_is_flagged( wield, MAT_INDESTR ) || wield->pIndexData->limit != -1 )
-        return;
+    /* strength vs. con/dex, resist or evade */
+    // +/-2% per each 1% skill diff  
+    chance += ( ch->getCurrStat(STAT_STR) - std::max(victim->getCurrStat(STAT_CON), victim->getCurrStat(STAT_DEX)) ) * stat_mod * 100;    
 
+    /* level */
+    // +/-2% per each 1% skill level
+    // TO-DO: add victim skill_level instead of getModifyLevel
+    chance += ( skill_level(*gsn_weapon_cleave, victim) - victim->getModifyLevel() ) * level_mod * 100;
+    // +/-1% per each 1% obj level diff    
+    chance += std::max(weapon->level, dual->level) - vict_weapon->level;
 
-    if (axe->value0() == WEAPON_AXE )
-        chance = ( int )( chance * 1.2 );
-    else if (axe->value0() != WEAPON_SWORD)
-        {
-         ch->send_to("Для этого тебе нужно вооружиться топором или мечом.\n\r");
-         return;
-        }
-
-    /* find weapon skills */
-    ch_weapon = ch->getSkill(get_weapon_sn(ch, false));
-    vict_weapon = std::max(1,victim->getSkill(get_weapon_sn(victim, false)));
-    /* modifiers */
-
-    /* skill */
-    chance = chance * ch_weapon / 200;
-    chance = chance * 100 / vict_weapon;
-
-    /* dex vs. strength */
-    chance += ch->getCurrStat(STAT_DEX) + ch->getCurrStat(STAT_STR);
-    chance -= victim->getCurrStat(STAT_STR) +
-                        2 * victim->getCurrStat(STAT_DEX);
-
-    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
-    chance += axe->level - wield->level;
-
-    /* and now the attack */
-    SET_BIT(ch->affected_by,AFF_WEAK_STUN);
-    if (number_percent() < chance)
-    {
-            ch->setWait( gsn_weapon_cleave->getBeats( )  );
-        act_p("Ты раскалываешь оружие $C2 надвое.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("{R$c1 раскалывает твое оружие надвое!{x",
-               ch,0,victim,TO_VICT,POS_RESTING);
-        act_p("$c1 раскалывает оружие $C2 надвое.",
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
+    // +/-2% per each size diff 
+    chance += (ch->size - victim->size) * size_mod * 100; 
+    // +10% if mounted   
+    if ( MOUNTED(ch) )
+        chance += 10;
+    
+    // TO-DO: add object material and weight factors
+        
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        chance = chance / 2;         
+        
+    ch->setWait( gsn_weapon_cleave->getBeats( )  );
+    if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
+    {        
+        act_p("Ты {1{Rраскалываешь{2 оружие $C2 надвое!", ch,0,victim,TO_CHAR);
+        act_p("$c1 {1{RРАСКАЛЫВАЕТ{2 твое оружие надвое!", ch,0,victim,TO_VICT);
+        act_p("$c1 раскалывает оружие $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_wield) );
     }
     else
-    {
-        ch->setWait( gsn_weapon_cleave->getBeats( ) );
-        act_p("Ты пытаешься расколоть оружие $C2, но не выходит.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 пытается расколоть твое оружие, но у н$s не выходит.",
-               ch,0,victim,TO_VICT,POS_RESTING);
-        act_p("$c1 пытается расколоть оружие $C2, но у н$s не выходит.",
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
+    {        
+        act("Твое оружие со звоном отскакивает от оружия $C2!", ch,0,victim,TO_CHAR);
+        act("Оружие $c2 со звоном отскакивает от твоего оружия!", ch,0,victim,TO_VICT);
+        act_p("Оружие $c2 со звоном отскакивает от оружия $C2.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, false, victim );
+        ch->send_to("Вибрация от столкновения на мгновение ошеломляет тебя!\n\r");
+        SET_BIT(ch->affected_by,AFF_WEAK_STUN);
     }
     return;
 }
