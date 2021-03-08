@@ -31,6 +31,7 @@
 #include "fight_safe.h"
 #include "fight_position.h"
 #include "fight_exception.h"
+#include "profflags.h"
 #include "immunity.h"
 #include "material.h"
 #include "def.h"
@@ -522,7 +523,7 @@ void Damage::handlePosition( )
  *----------------------------------------------------------------------------*/
 void Damage::handleDeath( ) 
 {
-    act_p( "$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM,POS_RESTING);
+    act( "$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
     victim->send_to("Тебя {RУБИЛИ{x!!\n\r\n\r");
     
     eventBus->publish(CharDeathEvent(victim, killer));

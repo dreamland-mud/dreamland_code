@@ -114,8 +114,8 @@ Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman
     
     r->exp = (r->points + r->clanpoints) * 10;
 
-    act_p("Ты передаешь $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR, POS_RESTING);
-    act_p("$c1 передает $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM, POS_RESTING);
+    act("Ты передаешь $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR);
+    act("$c1 передает $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM);
 
     return Reward::Pointer( r );
 }

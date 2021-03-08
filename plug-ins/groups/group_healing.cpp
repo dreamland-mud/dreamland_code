@@ -45,7 +45,7 @@ VOID_SPELL(Aid)::run( Character *ch, Character *victim, int sn, int level )
     victim->hit += level * 5; // Historically allowed to go above max_hit.
     update_pos( victim );
     victim->send_to("Волна тепла согревает твое тело.\n\r");
-    act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
+    act("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM);
     if (ch != victim) ch->send_to("Ok.\n\r");
 
     postaffect_to_char(ch, sn, level / 50);
@@ -64,7 +64,7 @@ VOID_SPELL(Assist)::run( Character *ch, Character *victim, int sn, int level )
         victim->hit += 100 + level * 5;  // Historically allowed to go above max_hit.
         update_pos( victim );
         victim->send_to("Волна тепла согревает твое тело.\n\r");
-        act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM);
         if ( ch != victim )
                 ch->send_to("Ok.\n\r");
 
@@ -258,13 +258,13 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     af.level            = level;
     
     if (!removed && victim->max_hit == victim->hit) {
-        act_p( "Кажется, $C1 абсолютно здоро$Gво|в|ва", ch, 0, victim, TO_CHAR, POS_RESTING);
+        act( "Кажется, $C1 абсолютно здоро$Gво|в|ва", ch, 0, victim, TO_CHAR);
         af.duration = 1;
     
     } else {
-        act_p( "Сосредоточившись, ты переносишь раны $C2 на собственное тело.", ch, 0, victim, TO_CHAR, POS_RESTING);
-        act_p( "Сосредоточившись, $c1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT, POS_RESTING);
-        act_p( "Сосредоточившись, $c1 переносит раны $C2 на собственное тело.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+        act( "Сосредоточившись, ты переносишь раны $C2 на собственное тело.", ch, 0, victim, TO_CHAR);
+        act( "Сосредоточившись, $c1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT);
+        act( "Сосредоточившись, $c1 переносит раны $C2 на собственное тело.", ch, 0, victim, TO_NOTVICT);
 
         hp = victim->max_hit - victim->hit;
         hp = URANGE( 0, hp, ch->hit - 1 );

@@ -59,7 +59,7 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
   af.location = APPLY_AC;
   af.modifier  = -30;
   affect_to_char( ch, &af );
-  act_p( "Таинственный щит окружает $c4.",ch, 0,0,TO_ROOM,POS_RESTING);
+  act( "Таинственный щит окружает $c4.",ch, 0,0,TO_ROOM);
   ch->send_to("Таинственный щит окружает тебя.\n\r");
   return;
 
@@ -98,7 +98,7 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
     update_pos( ch );
 
     ch->send_to("Волна тепла согревает твое тело.\n\r");
-    act_p("$c1 выглядит лучше.", ch, 0, 0, TO_ROOM,POS_RESTING);
+    act("$c1 выглядит лучше.", ch, 0, 0, TO_ROOM);
 }
 
 

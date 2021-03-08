@@ -354,7 +354,7 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
         else
                 msg = "$C1 -- воплощение {Dзла{x!.";
 
-        act_p( msg, ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( msg, ch, 0, victim, TO_CHAR);
 
         if (!victim->is_npc())
         {
@@ -372,7 +372,7 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
                         msg = "$C1 понятия не имеет, как относиться к законам.";
                         break;
                 }
-                act_p( msg, ch, 0, victim, TO_CHAR,POS_RESTING);
+                act( msg, ch, 0, victim, TO_CHAR);
         }
         return;
 

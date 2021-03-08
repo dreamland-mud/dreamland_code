@@ -193,7 +193,7 @@ SKILL_RUNP( vanish )
             return;
     }    
     
-    act_p( "$c1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM,POS_RESTING);
+    act( "$c1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM);
     ch->send_to("Ты бросаешь на землю световую гранату. {WЯркая вспышка{x на мгновение ослепляет всех вокруг!\r\n");
     gsn_vanish->improve( ch, true );
 
@@ -278,13 +278,13 @@ SKILL_RUNP( vanish )
     
     if ( number_percent() > chance ) {
             if (FightingCheck) {
-                act_p( "$c1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM,POS_RESTING);
+                act( "$c1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM);
                 ch->send_to("Ты пытаешься скрыться, но противник бдит, и бой продолжается!\r\n");
                 return;
             }
             else {
                 // weak stun is a bitch
-                act_p( "$c1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM,POS_RESTING);                
+                act( "$c1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM);                
                 ch->send_to("Ты пытаешься скрыться, но спотыкаешься и падаешь!\r\n");
                 return;                
             }    
@@ -299,9 +299,9 @@ SKILL_RUNP( vanish )
     }    
     else {   
             // trying to kidnap
-            act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
-            act_p( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR,POS_RESTING    );
-            act_p( "$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
+            act( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT);
+            act( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR);
+            act( "$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
 
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
@@ -325,9 +325,9 @@ SKILL_RUNP( vanish )
             }
             else {
                     // kidnap failed, victim escaped               
-                    act_p( "$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
-                    act_p( "$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR,POS_RESTING    );
-                    act_p( "Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT,POS_RESTING    );
+                    act( "$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT);
+                    act( "$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR);
+                    act( "Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT);
 
                     transfer_char( ch, ch, pRoomIndex,
                         "%1$^C1 внезапно исчезает!",
@@ -414,7 +414,7 @@ SKILL_RUNP( nerve )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -499,9 +499,9 @@ SKILL_RUNP( nerve )
         if ( ch->is_npc() || number_percent() < (int) chance )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
-                act_p("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                act("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
+                act("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
+                act("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT);
                 gsn_nerve->improve( ch, true, victim );
         }
         else
@@ -705,8 +705,8 @@ void AssassinateOneHit::calcDamage( )
     Chance mychance(ch, (int) chance, 100);
 
     if (mychance.reroll()) {
-        act_p("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR);
+        act("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT);
         act_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
@@ -923,7 +923,7 @@ SKILL_RUNP( caltraps )
 
    if (IS_CHARMED(ch) && ch->master == victim)
    {
-        act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
         return;
    }
 
@@ -1068,8 +1068,8 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             todex.modifier = mod/2;
             affect_to_char( victim, &todex);
 
-            act_p("Острые шипы вонзаются в ступни $C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR,POS_RESTING);
-            act_p("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT,POS_RESTING);
+            act("Острые шипы вонзаются в ступни $C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR);
+            act("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT);
         }
     } catch (const VictimDeathException &) {
     }
@@ -1179,7 +1179,7 @@ SKILL_RUNP( throwdown )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1576,7 +1576,7 @@ SKILL_RUNP( poison )
         }
 
         ch->send_to("Облако отравленного дыма наполнило комнату.\n\r");
-        act_p("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
+        act("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_poison_smoke->improve( ch, true );
 
@@ -1632,7 +1632,7 @@ SKILL_RUNP( blindness )
         }
 
         ch->send_to("Облако загадочной пыли наполнило комнату.\n\r");
-        act_p("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
+        act("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_blindness_dust->improve( ch, true );
     

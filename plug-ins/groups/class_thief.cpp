@@ -277,7 +277,7 @@ SKILL_RUNP( settraps )
 
                 ch->send_to( "Ты устраиваешь ловушку в комнате.\n\r");
 
-                act_p("$c1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM);
                 return;
         }
         else {
@@ -367,8 +367,8 @@ SKILL_RUNP( envenom )
 
         if (number_percent() < skill)  /* success! */
         {
-            act_p("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM,POS_RESTING);
-            act_p("Ты отравляешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR,POS_RESTING);
+            act("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
+            act("Ты отравляешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
             if (!IS_SET(obj->value3(), DRINK_POISONED))
             {
                 obj->value3(obj->value3() | DRINK_POISONED);
@@ -378,7 +378,7 @@ SKILL_RUNP( envenom )
             return;
         }
 
-        act_p("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR,POS_RESTING);
+        act("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
         if (!IS_SET(obj->value3(), DRINK_POISONED))
             gsn_envenom->improve( ch, false );
         ch->setWait( gsn_envenom->getBeats( ) );
@@ -394,7 +394,7 @@ SKILL_RUNP( envenom )
         ||  IS_WEAPON_STAT(obj,WEAPON_FADING)	    
         ||  IS_OBJ_STAT(obj,ITEM_BLESS) )
         {
-            act_p("Мощные свойства $o2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR,POS_RESTING);
+            act("Мощные свойства $o2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR);
             return;
         }
 
@@ -427,22 +427,22 @@ SKILL_RUNP( envenom )
             affect_to_obj( obj, &af);
 
             if ( !IS_AFFECTED( ch, AFF_SNEAK ) )
-              act_p("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM,POS_RESTING);
-            act_p("Ты покрываешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR,POS_RESTING);
+              act("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
+            act("Ты покрываешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, true );
             ch->setWait( gsn_envenom->getBeats( ) );
             return;
         }
         else
         {
-            act_p("Твоя попытка отравить ядом $o4 закончилась неудачей.",ch,obj,0,TO_CHAR,POS_RESTING);
+            act("Твоя попытка отравить ядом $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, false );
             ch->setWait( gsn_envenom->getBeats( ) );
             return;
         }
     }
 
-    act_p("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+    act("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
     return;
 }
 
@@ -551,7 +551,7 @@ SKILL_RUNP( steal )
                         victim->position;
                         act_p( "$c1 пытается обокрасть тебя.\n\r", ch, 0, victim,TO_VICT,POS_DEAD);
                 }
-                act_p( "$c1 пытается обокрасть $C4.\n\r",  ch, 0, victim,TO_NOTVICT,POS_RESTING);
+                act( "$c1 пытается обокрасть $C4.\n\r",  ch, 0, victim,TO_NOTVICT);
 
                 if( ( !victim->is_npc() ) || ( number_percent() < 25 ) )
                         set_thief( ch );
@@ -1244,7 +1244,7 @@ SKILL_RUNP( blackjack )
 
         if ( IS_AFFECTED(victim,AFF_SLEEP) )
         {
-                act_p("$E уже спит.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("$E уже спит.",ch,0,victim,TO_CHAR);
                 return;
         }
 

@@ -44,7 +44,7 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
         if (victim == ch)
           ch->send_to("Ты не можешь быть еще сильнее!\n\r");
         else
-          act_p("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR,POS_RESTING);
+          act("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -179,7 +179,7 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
             ch->send_to("Куда уж больше.\n\r");
         else
-            act_p("$C1 уже учится.\n\r", ch,0,victim,TO_CHAR,POS_RESTING);
+            act("$C1 уже учится.\n\r", ch,0,victim,TO_CHAR);
         return;
   }
 
@@ -191,6 +191,6 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
   victim->send_to("Ты концентрируешься на учебе.\n\r");
 
   if (ch != victim)
-      act_p("$C1 будет учиться лучше!\n\r", ch,0,victim,TO_CHAR,POS_RESTING);
+      act("$C1 будет учиться лучше!\n\r", ch,0,victim,TO_CHAR);
 
 }

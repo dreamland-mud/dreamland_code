@@ -702,7 +702,7 @@ CMDRUNP( where )
         }
 
         if (!found)
-            act_p( "Ты не находишь $T.", ch, 0, arg.c_str(), TO_CHAR,POS_RESTING );
+            act( "Ты не находишь $T.", ch, 0, arg.c_str(), TO_CHAR);
     }
 }
 
@@ -766,8 +766,8 @@ CMDRUNP( consider )
     else
       align = "$C1 выглядит совершенно непривлекательно.";
 
-    act_p( msg, ch, 0, victim, TO_CHAR,POS_RESTING );
-    act_p( align, ch, 0, victim, TO_CHAR,POS_RESTING);
+    act( msg, ch, 0, victim, TO_CHAR);
+    act( align, ch, 0, victim, TO_CHAR);
     return;
 }
 
@@ -1481,9 +1481,9 @@ CMDRUNP( request )
 
         obj_from_char( obj );
         obj_to_char( obj, ch );
-        act_p( "$c1 просит $o4 у $C2.", ch, obj, victim, TO_NOTVICT,POS_RESTING );
-        act_p( "Ты просишь $o4 у $C2.",   ch, obj, victim, TO_CHAR,POS_RESTING    );
-        act_p( "$c1 просит $o4 у тебя.", ch, obj, victim, TO_VICT,POS_RESTING    );
+        act( "$c1 просит $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
+        act( "Ты просишь $o4 у $C2.",   ch, obj, victim, TO_CHAR);
+        act( "$c1 просит $o4 у тебя.", ch, obj, victim, TO_VICT);
         
         omprog_give( obj, victim, ch );
 
@@ -1492,7 +1492,7 @@ CMDRUNP( request )
         ch->hit -= 3 * ( ch->getModifyLevel() / 2 );
         ch->hit = max( (int)ch->hit, 0 );
 
-        act_p("Ты чувствуешь благодарность за доверие $C2.", ch, 0, victim,TO_CHAR,POS_RESTING);
+        act("Ты чувствуешь благодарность за доверие $C2.", ch, 0, victim,TO_CHAR);
         postaffect_to_char(ch, gsn_gratitude, ch->getModifyLevel() / 10);
 }
 
@@ -1599,7 +1599,7 @@ CMDRUNP( demand )
 
   if ( !ch->can_see( obj ) )
     {
-      act_p( "Ты не видишь этого.", ch, 0, victim, TO_CHAR,POS_RESTING );
+      act( "Ты не видишь этого.", ch, 0, victim, TO_CHAR);
       return;
     }
 

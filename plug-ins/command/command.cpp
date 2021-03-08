@@ -232,15 +232,15 @@ void Command::visualize( Character *ch )
     {
         REMOVE_BIT( ch->affected_by, AFF_HIDE | AFF_FADE );
         ch->send_to( "Ты выходишь из тени.\n\r" );
-        act_p( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM, POS_RESTING );
+        act( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
     }
 
     if (IS_AFFECTED( ch, AFF_IMP_INVIS ) && getPosition( ).getValue( ) == POS_FIGHTING)
     {
         affect_strip( ch, gsn_improved_invis );
         REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-        act_p( "Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR, POS_RESTING );
-        act_p( "$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM, POS_RESTING );
+        act( "Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
+        act( "$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
     }
 
     if (DIGGED(ch) && (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG )))

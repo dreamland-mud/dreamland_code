@@ -82,9 +82,9 @@ void CleaveOneHit::calcDamage( )
     }
 
     if (number_percent( ) < chance) {
-        act_p("Ты рассекаешь $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT,POS_RESTING);
-        act_p("$c1 рассекает $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act("Ты рассекаешь $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_CHAR);
+        act("$c1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT);
+        act("$c1 рассекает $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT);
 
         ch->setWait( 2 );
 
@@ -128,7 +128,7 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   }
 
   if (victim->isAffected(sn)) {
-    act_p("$C1 уже ничего не слышит.",ch,0,victim,TO_CHAR,POS_RESTING);
+    act("$C1 уже ничего не слышит.",ch,0,victim,TO_CHAR);
     return;
   }
 
@@ -142,7 +142,7 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   af.duration  = 10;
   affect_to_char(victim,&af);
 
-  act_p("$C1 теперь ничего не слышит!",ch,0,victim,TO_CHAR,POS_RESTING);
+  act("$C1 теперь ничего не слышит!",ch,0,victim,TO_CHAR);
   victim->send_to("Пронзительный звон оглушает тебя... ты ничего не слышишь!\n\r");
 
 }

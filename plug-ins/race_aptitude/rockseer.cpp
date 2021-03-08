@@ -36,7 +36,7 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
       if (victim == ch)
                ch->send_to("Твоя кожа уже подобна камню.\n\r");
       else
-               act_p("Кожа $C2 уже подобна камню.",ch,0,victim,TO_CHAR,POS_RESTING);
+               act("Кожа $C2 уже подобна камню.",ch,0,victim,TO_CHAR);
       return;
     }
   

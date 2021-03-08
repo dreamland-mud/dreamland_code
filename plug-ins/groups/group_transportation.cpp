@@ -86,7 +86,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->send_to("Ты уже находишься в воздухе.\n\r");
                 else
-                        act_p("$C1 уже находится в воздухе.",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act("$C1 уже находится в воздухе.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -95,7 +95,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->send_to("Ты и так можешь подняться в воздух.\n\r");
                 else
-                        act_p("$C1 может подняться в воздух и без твоей помощи.",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act("$C1 может подняться в воздух и без твоей помощи.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -108,7 +108,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
 
         victim->send_to("Твои ноги отрываются от земли.\n\r");
 
-        act_p( "$c1 поднимается в воздух.", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act( "$c1 поднимается в воздух.", victim, 0, 0, TO_ROOM);
 
         return;
 
@@ -209,8 +209,8 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
 
     obj_to_room(portal,from_room);
 
-    act_p("Над землей образуется $o1.",ch,portal,0,TO_ROOM,POS_RESTING);
-    act_p("Перед тобой образуется $o1.",ch,portal,0,TO_CHAR,POS_RESTING);
+    act("Над землей образуется $o1.",ch,portal,0,TO_ROOM);
+    act("Перед тобой образуется $o1.",ch,portal,0,TO_CHAR);
 
     /* no second portal if rooms are the same */
     if (to_room == from_room)
@@ -278,8 +278,8 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
 
     obj_to_room(portal,ch->in_room);
 
-    act_p("Над землей образуется $o1.",ch,portal,0,TO_ROOM,POS_RESTING);
-    act_p("Перед тобой образуется $o1.",ch,portal,0,TO_CHAR,POS_RESTING);
+    act("Над землей образуется $o1.",ch,portal,0,TO_ROOM);
+    act("Перед тобой образуется $o1.",ch,portal,0,TO_CHAR);
 
     if (victim->in_room->people != 0)
     {

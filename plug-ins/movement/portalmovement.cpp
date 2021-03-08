@@ -229,8 +229,8 @@ bool PortalMovement::applySpellbane( Character *wch )
         return true;
     
     try {
-        act_p("Магия $o2 аннигилирует с твоим спеллбаном!", wch,portal,0,TO_CHAR,POS_RESTING);
-        act_p("Магия $o2 аннигилирует со спеллбаном $c2!", wch,portal,0,TO_ROOM,POS_RESTING);
+        act("Магия $o2 аннигилирует с твоим спеллбаном!", wch,portal,0,TO_CHAR);
+        act("Магия $o2 аннигилирует со спеллбаном $c2!", wch,portal,0,TO_ROOM);
         SkillDamage( wch, wch, gsn_spellbane, DAM_NEGATIVE, wch->max_hit / 3, DAMF_MAGIC ).hit( true );
         interpret_raw( wch, "cb", "Меня ударило магическим порталом!" );
     }

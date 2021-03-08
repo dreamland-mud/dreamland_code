@@ -318,7 +318,7 @@ void char_update( )
         bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
 
         if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
-            act_p("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM);
             extract_char( ch );
             continue;
         }
@@ -1325,8 +1325,8 @@ void player_update( )
         if ( IS_DEATH_TIME( ch ) ) {
             ch->last_death_time--;
             if (!IS_DEATH_TIME(ch)) {
-                act_p("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR, POS_RESTING);
-                act_p("$c1 полностью возвращается в мир живых.", ch, 0, 0, TO_NOTVICT, POS_RESTING);
+                act("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR);
+                act("$c1 полностью возвращается в мир живых.", ch, 0, 0, TO_NOTVICT);
                 UNSET_DEATH_TIME(ch);
             }
         }

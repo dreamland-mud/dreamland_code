@@ -108,8 +108,8 @@ COMMAND(CEat, "eat")
             return;
     }
 
-    act_p( "$c1 ест $o4.",  ch, obj, 0, TO_ROOM,POS_RESTING);
-    act_p( "Ты ешь $o4.", ch, obj, 0, TO_CHAR,POS_RESTING);
+    act( "$c1 ест $o4.",  ch, obj, 0, TO_ROOM);
+    act( "Ты ешь $o4.", ch, obj, 0, TO_CHAR);
     if ( ch->fighting != 0 )
              ch->setWaitViolence( 3 );
 
@@ -150,7 +150,7 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
             /* The food was poisoned! */
             Affect af;
 
-            act_p( "$c1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM,POS_RESTING);
+            act( "$c1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM);
             ch->send_to("Ты хватаешься за горло и задыхаешься.\n\r");
 
             af.bitvector.setTable(&affect_flags);

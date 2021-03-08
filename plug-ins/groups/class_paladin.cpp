@@ -128,12 +128,12 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
            && victim->getRace( ) != race_demon
            && victim->getRace( ) != race_golem))
     {
-        act_p("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        act("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR);
         return;
     }
     
     if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_PRAYER)) {
-        act_p("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        act("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR);
         return;
     }
     
@@ -157,7 +157,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     if (ch->hit  < ch->max_hit  / 10 ||
         ch->mana < ch->max_mana / 10 ||
         ch->move < ch->max_move / 10) {
-        act_p("Ты слишком истоще$gно|н|на для молитвы.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act("Ты слишком истоще$gно|н|на для молитвы.", ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -169,7 +169,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     // 20% chance to fail with max skill
     if (ch->isAffected(sn) || roll > sk * 4 / 5 )
     {         
-        act_p("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR);
         
         if (!ch->isAffected(gsn_weaken)) {
             af.type = gsn_weaken;
@@ -179,7 +179,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             af.modifier = -1 * (punish_lvl / 4);
             affect_to_char(ch, &af);
             ch->send_to("Ты чувствуешь, как сила уходит из тебя.\n\r");
-            act_p("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
+            act("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM);
         }
         else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
             af.bitvector.setTable(&affect_flags);
@@ -193,7 +193,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             af.location = APPLY_SAVING_SPELL;
             af.modifier = punish_lvl / 7;
             affect_to_char(ch, &af);
-            act_p("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_RESTING);
+            act("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR);
         }
         else {
             if (ch->fighting) {
@@ -211,7 +211,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 
                 if (IS_AWAKE(ch)) {
                     ch->send_to("Ты засыпаешь....\n\r");
-                    act_p("$c1 засыпает.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
+                    act("$c1 засыпает.", ch, NULL, NULL, TO_ROOM);
                     ch->position = POS_SLEEPING;
                 }
             }
@@ -294,8 +294,8 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
     Character *vch, *vch_next;
     int dam;
 
-    act_p( "$c1 чертит в воздухе священный символ.", ch, 0, 0, TO_ROOM, POS_RESTING);
-    act_p( "Ты чертишь в воздухе священный символ.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act( "$c1 чертит в воздухе священный символ.", ch, 0, 0, TO_ROOM);
+    act( "Ты чертишь в воздухе священный символ.", ch, 0, 0, TO_CHAR);
 
     for (vch = room->people; vch != NULL; vch = vch_next) {
         vch_next = vch->next_in_room;
@@ -311,12 +311,12 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
         
         if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_PRAYER )) {
             act("$C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
-            act_p("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT, POS_RESTING);
+            act("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT);
             damage_nocatch( ch, vch, 0, sn, DAM_HOLY, true, DAMF_PRAYER );
         }
         else {
-            act_p( "$c5 овладевают священные силы, заставляя в ужасе обратиться в бегство.", vch, 0, ch, TO_ROOM, POS_RESTING);
-            act_p( "Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT, POS_RESTING);
+            act( "$c5 овладевают священные силы, заставляя в ужасе обратиться в бегство.", vch, 0, ch, TO_ROOM);
+            act( "Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT);
 
             dam = dice( level, 12 ); 
             damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_PRAYER );
@@ -373,7 +373,7 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
             && victim->getNPC( )->behavior
             && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
         {
-            act_p("$c1 не может покинуть свой пост.", victim, 0, 0, TO_ROOM, POS_RESTING);
+            act("$c1 не может покинуть свой пост.", victim, 0, 0, TO_ROOM);
             continue;
         }
                              

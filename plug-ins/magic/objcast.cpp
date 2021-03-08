@@ -92,8 +92,8 @@ CMDRUNP( quaff )
         return;
     }
 
-    act_p( "$c1 осушает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
-    act_p( "Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR,POS_RESTING );
+    act( "$c1 осушает $o4.", ch, obj, 0, TO_ROOM);
+    act( "Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR);
     
     if (oprog_quaff( obj, ch ))
         return;

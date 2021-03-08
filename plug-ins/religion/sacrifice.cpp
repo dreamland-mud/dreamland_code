@@ -539,7 +539,7 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
         silver = number_range(number_fuzzy(obj->level), obj->cost / 10);
 
         if (needSpam)
-            act_p( "$c1 приносит в жертву богам $o4.", ch, obj, 0, TO_ROOM,POS_RESTING);
+            act( "$c1 приносит в жертву богам $o4.", ch, obj, 0, TO_ROOM);
 
         if (oprog_sac( obj, ch ))
                 return silver;

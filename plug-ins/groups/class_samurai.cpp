@@ -294,9 +294,9 @@ SKILL_RUNP( target )
 
     ch->fighting = victim;
 
-    act_p("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-    act_p("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-    act_p("$c1 меняет свою цель на тебя!",ch,0,victim,TO_VICT,POS_RESTING);
+    act("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
+    act("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR);
+    act("$c1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
       return;
     }
 
@@ -478,8 +478,8 @@ SKILL_RUNP( katana )
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
         
-                act_p("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR,POS_RESTING);
-                act_p("$c1 делает катану из $o2!",ch,part,0,TO_ROOM,POS_RESTING);
+                act("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR);
+                act("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
         
                 extract_obj(part);
                 return;

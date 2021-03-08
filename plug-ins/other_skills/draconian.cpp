@@ -53,7 +53,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
   affect_to_char(ch, &af);
 
   ch->send_to("Сила Дракона пронизывает тебя.\n\r");
-  act_p("$c1 становится сильнее.", ch, 0, 0, TO_ROOM,POS_RESTING);
+  act("$c1 становится сильнее.", ch, 0, 0, TO_ROOM);
 
 }
 
@@ -66,10 +66,10 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
     
     int dam,hp_dam,dice_dam,hpch;
 
-    act_p("$c1 брызгает кислотой на $C4.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act("$c1 брызгает кислотой на $C4.",ch,0,victim,TO_NOTVICT);
     act_p("$c1 брызгает струей едкой кислоты на тебя.",
            ch,0,victim,TO_VICT,POS_RESTING);
-    act_p("Ты брызгаешь кислотой на $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+    act("Ты брызгаешь кислотой на $C4.",ch,0,victim,TO_CHAR);
 
     hpch = max(12,(int)ch->hit);
     hp_dam = number_range(hpch/11 + 1, hpch/6);

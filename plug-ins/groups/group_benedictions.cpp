@@ -48,9 +48,9 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
 
     if (victim->isAffected(sn)) {
         if (victim == ch)
-            act_p("Ты уже наслаждаешься благостью Богов.", ch,0,0,TO_CHAR,POS_RESTING);
+            act("Ты уже наслаждаешься благостью Богов.", ch,0,0,TO_CHAR);
         else
-            act_p("$C1 уже наслаждается благостью Богов.", ch,0,victim,TO_CHAR,POS_RESTING);
+            act("$C1 уже наслаждается благостью Богов.", ch,0,victim,TO_CHAR);
 
         return;
     }
@@ -63,7 +63,7 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
             strength = IS_NEUTRAL(ch) ? 2 : 1;
 
     if (!strength) {
-        act_p("Похоже, твои Боги не благосклонны к $C3.", ch, NULL, victim, TO_CHAR, POS_RESTING);
+        act("Похоже, твои Боги не благосклонны к $C3.", ch, NULL, victim, TO_CHAR);
         return;
     }
 
@@ -79,8 +79,8 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
     affect_to_char(victim, &af);
 
     if (victim != ch) {
-        act_p("Ты одаряешь $C3 благостью своих Богов.", ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 одаряет тебе благостью своих Богов.", ch,0,victim,TO_VICT,POS_RESTING);
+        act("Ты одаряешь $C3 благостью своих Богов.", ch,0,victim,TO_CHAR);
+        act("$c1 одаряет тебе благостью своих Богов.", ch,0,victim,TO_VICT);
     }
     else
         victim->println("Ты наслаждаешься божественной благостью.");
@@ -94,12 +94,12 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->behavior && obj->behavior->isLevelAdaptive( ))
     {
-        act_p("$o1 отвергает твои попытки благословения.",ch,obj,0,TO_CHAR,POS_RESTING);
+        act("$o1 отвергает твои попытки благословения.",ch,obj,0,TO_CHAR);
         return;
     }
     if (obj->is_obj_stat(ITEM_BLESS))
     {
-        act_p("$o1 уже имеет священную ауру.",ch,obj,0,TO_CHAR,POS_RESTING);
+        act("$o1 уже имеет священную ауру.",ch,obj,0,TO_CHAR);
         return;
     }
     
@@ -112,7 +112,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
         {
             if (paf != 0)
                 affect_remove_obj( obj, paf, true);
-            act_p("Священная аура окружает $o4.",ch,obj,0,TO_ALL,POS_RESTING);
+            act("Священная аура окружает $o4.",ch,obj,0,TO_ALL);
             REMOVE_BIT(obj->extra_flags,ITEM_EVIL);
             return;
         }
@@ -147,7 +147,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
       af.modifier        = ch->isAffected( gsn_inspiration ) ? -3 : -1;
       af.bitvector.setValue(ITEM_BLESS);
       affect_to_obj( obj, &af);
-      act_p("Священная аура окружает $o4.",ch,obj,0,TO_ALL,POS_RESTING);
+      act("Священная аура окружает $o4.",ch,obj,0,TO_ALL);
     }
 }
 
@@ -265,7 +265,7 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->send_to("Ты уже в ярости!\n\r");
         else
-          act_p("$C1 уже в ярости!",ch,0,victim,TO_CHAR,POS_RESTING);
+          act("$C1 уже в ярости!",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -284,7 +284,7 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
         (IS_EVIL(ch) && !IS_EVIL(victim))
        )
     {
-        act_p("Твои боги не благосклонны к $C3.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act("Твои боги не благосклонны к $C3.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -524,7 +524,7 @@ VOID_SPELL(Inspire)::run( Character *ch, Room *room, int sn, int level )
 
             gch->send_to("Ты чувствуешь воодушевление!\n\r");
             if( ch != gch )
-                act_p( "Ты воодушевляешь $C4 силой Создателя!", ch, 0, gch, TO_CHAR,POS_RESTING);
+                act( "Ты воодушевляешь $C4 силой Создателя!", ch, 0, gch, TO_CHAR);
 
     }
 }
@@ -691,13 +691,13 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
         victim = ch;
 
     if ( IS_GOOD(victim) ) {
-        act_p( "Силы Света защищают $c4.", victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Силы Света защищают тебя.", victim, 0, 0, TO_CHAR,POS_RESTING);
+        act( "Силы Света защищают $c4.", victim, 0, 0, TO_ROOM);
+        act( "Силы Света защищают тебя.", victim, 0, 0, TO_CHAR);
         return;
     }
 
     if ( IS_NEUTRAL(victim) ) {
-        act_p( "Это заклинание не действует на $C4.", ch, 0, victim, TO_CHAR,POS_RESTING );
+        act( "Это заклинание не действует на $C4.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -724,7 +724,7 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
         victim->send_to("Ты чувствуешь себя отвратительно.\n\r");
 
         if ( ch != victim )
-            act_p("$C1 выглядит отвратительно.",ch,0,victim,TO_CHAR,POS_RESTING);
+            act("$C1 выглядит отвратительно.",ch,0,victim,TO_CHAR);
     }
 
     damage_nocatch( ch, victim, dam, sn, DAM_HOLY, true, DAMF_PRAYER );

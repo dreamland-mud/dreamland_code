@@ -400,7 +400,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->println("Осторожно, ты уже несешь слишком много вещей.");
         else {
-            act_p( "$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR,POS_RESTING );
+            act( "$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR);
             return false;
         }
     }
@@ -410,7 +410,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой.", ch);
         else {
-            act_p( "$d: ты не можешь поднять такую тяжесть.",ch,NULL,obj->getName( ),TO_CHAR ,POS_RESTING);
+            act( "$d: ты не можешь поднять такую тяжесть.",ch,NULL,obj->getName( ),TO_CHAR );
             return false;
         }
     }
@@ -420,10 +420,10 @@ static bool can_get_obj( Character *ch, Object *obj )
 
 static bool get_obj( Character *ch, Object *obj )
 {
-    act_p( "Ты берешь $o4.", ch, obj, 0, TO_CHAR,POS_RESTING);
+    act( "Ты берешь $o4.", ch, obj, 0, TO_CHAR);
 
     if (!IS_AFFECTED(ch,AFF_SNEAK))
-        act_p( "$c1 берет $o4.", ch, obj, 0, TO_ROOM,POS_RESTING);
+        act( "$c1 берет $o4.", ch, obj, 0, TO_ROOM);
             
     obj_from_room( obj );
     obj_to_char( obj, ch );
@@ -592,7 +592,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), ch->in_room->contents );
             
             if (!obj)
-                act_p( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
+                act( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR);
             else
                 do_get_raw( ch, obj );
         }
@@ -627,7 +627,7 @@ CMDRUNP( get )
                 else if (allDot)
                     ch->println("Ты не видишь ничего подобного здесь.");
                 else
-                    act_p( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
+                    act( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR);
             }
             else
                 save_items( ch->in_room );
@@ -665,7 +665,7 @@ CMDRUNP( get )
             if (victim)
                 get_obj_on_victim( ch, victim, argContainer.c_str( ) );
             else
-                act_p( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
+                act( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR);
             return;
         }
 
@@ -678,7 +678,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
 
             if(!obj) {
-                act_p( "Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
+                act( "Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR);
                 return;
             }
             
@@ -731,9 +731,9 @@ CMDRUNP( get )
 
             if (!found) {
                 if (!all)
-                    act_p( "Ты не видишь ничего в $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
+                    act( "Ты не видишь ничего в $o6.", ch, container, 0, TO_CHAR);
                 else
-                    act_p( "Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
+                    act( "Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR);
             }
         }
     }
@@ -841,7 +841,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     }
 
     if (pcount > container->value0()) {
-        act_p("Опасно запихивать столько вещей в $o4!", ch,container,0, TO_CHAR,POS_RESTING);
+        act("Опасно запихивать столько вещей в $o4!", ch,container,0, TO_CHAR);
         return PUT_OBJ_STOP;
     }
 
@@ -861,7 +861,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
             || obj->value0()  != WEAPON_ARROW ))
     {
         if (verbose)
-            act_p("Ты можешь положить только стрелы в $o4.",ch,container,0,TO_CHAR,POS_RESTING);
+            act("Ты можешь положить только стрелы в $o4.",ch,container,0,TO_CHAR);
         return PUT_OBJ_ERR;
     }
 
@@ -877,7 +877,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         pcount = count_obj_in_obj( container, ITEM_POTION );
                 
        if (pcount > 15) {
-            act_p("Небезопасно далее складывать снадобья в $o4.",ch,container,0, TO_CHAR,POS_RESTING);
+            act("Небезопасно далее складывать снадобья в $o4.",ch,container,0, TO_CHAR);
             return PUT_OBJ_ERR;
        }
     }
@@ -1068,7 +1068,7 @@ CMDRUNP( put )
     pocket = get_pocket_argument( arg2 );
 
     if ( ( container = get_obj_here( ch, arg2 ) ) == 0 ) {
-        act_p( "Ты не видишь здесь $T.", ch, 0, is_number(arg2) ? "этого" : arg2, TO_CHAR,POS_RESTING);
+        act( "Ты не видишь здесь $T.", ch, 0, is_number(arg2) ? "этого" : arg2, TO_CHAR);
         return;
     }
     
@@ -1253,9 +1253,9 @@ CMDRUNP( drop )
             if ( !IS_AFFECTED(ch, AFF_SNEAK) )
             {
                 if (obj->value0() == 1 || obj->value1() == 1)
-                 act_p( "$c1 бросает монетку.", ch, 0, 0, TO_ROOM,POS_RESTING);
+                 act( "$c1 бросает монетку.", ch, 0, 0, TO_ROOM);
                 else
-                 act_p( "$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM,POS_RESTING);
+                 act( "$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM);
             }
          
             if (obj->value0() == 1 || obj->value1() == 1)
@@ -1374,19 +1374,19 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
 
     if ( victim->carry_number + obj->getNumber( ) > victim->canCarryNumber( ) )
     {
-        act_p( "$C1 не может нести столько вещей.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( "$C1 не может нести столько вещей.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if (victim->getCarryWeight( ) + obj->getWeight( ) > victim->canCarryWeight( ) )
     {
-        act_p( "$C1 не может нести такую тяжесть.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( "$C1 не может нести такую тяжесть.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if ( !victim->can_see( obj ) )
     {
-        act_p( "$C1 не видит этого.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( "$C1 не видит этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -1448,7 +1448,7 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 
     if( ( victim->getCarryWeight( ) + gold + silver / 10 ) > victim->canCarryWeight( ) )
     {
-            act_p( "$c1 не может нести такой вес.", victim, 0, ch, TO_VICT,POS_RESTING);
+            act( "$c1 не может нести такой вес.", victim, 0, ch, TO_VICT);
             return;
     }
 
@@ -1608,7 +1608,7 @@ CMDRUNP( vomit )
         desire_thirst->vomit( ch->getPC( ) );
     }
 
-    act_p("$c1 засовывает два пальца в рот и начинает блевать.",ch,0,0,TO_ROOM,POS_RESTING);
+    act("$c1 засовывает два пальца в рот и начинает блевать.",ch,0,0,TO_ROOM);
     ch->send_to("Ты прочищаешь свой желудок двухпальцевым методом.\n\r");
 
     mprog_vomit( ch );
@@ -1678,7 +1678,7 @@ CMDRUNP( use )
 
     if (!obj)
     {
-        act_p( "Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR,POS_RESTING);
+        act( "Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
         return;
     }
     

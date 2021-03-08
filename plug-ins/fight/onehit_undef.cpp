@@ -77,7 +77,7 @@ bool UndefinedOneHit::canDamage( )
 
     if (ch != victim) {
         if (victim->is_mirror( )) {
-            act_p("$c1 разбивается на мелкие осколки.",victim,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 разбивается на мелкие осколки.",victim,0,0,TO_ROOM);
             extract_char(victim);
             return false;
         }
@@ -1040,18 +1040,18 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         // stun only in 15-35% chance, otherwise just damage
         if (diceroll >= 50) {
             victim->setWaitViolence( 2 );
-            act_p( msgVictStun, ch, 0, victim, TO_VICT,POS_RESTING);
-            act_p( msgCharStun, ch, 0, victim, TO_CHAR,POS_RESTING);                    
+            act( msgVictStun, ch, 0, victim, TO_VICT);
+            act( msgCharStun, ch, 0, victim, TO_CHAR);                    
         } 
         else {
-            act_p( msgVictBasic, ch, 0, victim, TO_VICT,POS_RESTING);
-            act_p( msgCharBasic, ch, 0, victim, TO_CHAR,POS_RESTING);
+            act( msgVictBasic, ch, 0, victim, TO_VICT);
+            act( msgCharBasic, ch, 0, victim, TO_CHAR);
         }
         dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage          
     }
     else if (diceroll < blind_chance) {
-        act_p( msgVictBlind, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgCharBlind, ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( msgVictBlind, ch, 0, victim, TO_VICT);
+        act( msgCharBlind, ch, 0, victim, TO_CHAR);
         if ( !IS_AFFECTED(victim,AFF_BLIND) )
         {
             baf.bitvector.setTable(&affect_flags);
@@ -1066,8 +1066,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         dam += dam * number_range( 1, 2 );  // +100-200% damage          
     }
     else {
-        act_p( msgVictHeart, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgCharHeart, ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( msgVictHeart, ch, 0, victim, TO_VICT);
+        act( msgCharHeart, ch, 0, victim, TO_CHAR);
         dam += dam * number_range( 2, 5 ); // +200-500% damage            
     }
 }
@@ -1398,9 +1398,9 @@ void UndefinedOneHit::damEffectSlice( )
         chance -= chance / 10;
     
     if (number_percent( ) > chance) {
-        act_p("Твое оружие скользит по запястью $C2.", ch, 0, victim, TO_CHAR, POS_RESTING);
-        act_p("$o1 $c2 скользит по твоему запястью.", ch, axe, victim, TO_VICT, POS_RESTING);
-        act_p("$o1 $c2 скользит по запястью $C2.", ch, axe, victim, TO_NOTVICT, POS_RESTING);
+        act("Твое оружие скользит по запястью $C2.", ch, 0, victim, TO_CHAR);
+        act("$o1 $c2 скользит по твоему запястью.", ch, axe, victim, TO_VICT);
+        act("$o1 $c2 скользит по запястью $C2.", ch, axe, victim, TO_NOTVICT);
         gsn_slice->improve( ch, false, victim );
         return;
     }
@@ -1476,7 +1476,7 @@ void UndefinedOneHit::damEffectSlice( )
             else if (!IS_SET( obj->extra_flags, ITEM_NODROP )) {
                 obj_from_char( obj );
                 obj_to_room( obj, victim->in_room );
-                act_p( "$o1 падает на землю.", victim, obj, 0, TO_ALL, POS_RESTING );
+                act( "$o1 падает на землю.", victim, obj, 0, TO_ALL);
             }
         }
         

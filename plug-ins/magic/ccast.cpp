@@ -96,7 +96,7 @@ CMDRUN( cast )
 
     if (ch->is_npc( ) && ch->master != 0) {
         if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
-            act_p( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR, POS_RESTING );
+            act( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR);
             return;
         }
     }

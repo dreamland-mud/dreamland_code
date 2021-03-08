@@ -247,20 +247,20 @@ void do_visible( Character *ch )
       {
         ch->println( "Ты выходишь из тени." );
         REMOVE_BIT(ch->affected_by, AFF_HIDE);
-        act_p("$c1 выходит из тени.", ch, 0, 0, TO_ROOM,POS_RESTING);
+        act("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_FADE))
       {
         ch->println( "Ты выходишь из тени." );
         REMOVE_BIT(ch->affected_by, AFF_FADE);
-        act_p("$c1 выходит из тени.", ch, 0, 0, TO_ROOM,POS_RESTING);
+        act("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
       }
     if ( IS_AFFECTED( ch, AFF_CAMOUFLAGE ) )
     {
             REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
             ch->ambushing = &str_empty[0];
             ch->send_to("Ты выходишь из своего укрытия.\n\r");
-            act_p("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM,POS_RESTING);
+            act("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
     }
     if (IS_SET(ch->affected_by, AFF_INVISIBLE))
       {
@@ -268,14 +268,14 @@ void do_visible( Character *ch )
         affect_strip(ch, gsn_invisibility);
         affect_strip(ch, gsn_mass_invis);
         REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
-        act_p("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM,POS_RESTING);
+        act("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
       {
         ch->println( "Ты появляешься из ниоткуда." );
         affect_strip(ch, gsn_improved_invis);
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
-        act_p("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM,POS_RESTING);
+        act("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_SNEAK)
         && !ch->is_npc() && !IS_SET(ch->getRace()->getAff(),AFF_SNEAK) )

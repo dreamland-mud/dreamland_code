@@ -2049,8 +2049,8 @@ CMDWIZP( clone )
 
                 recursive_clone(ch,obj,clone);
 
-                act_p("$c1 создает $o4.",ch,clone,0,TO_ROOM,POS_RESTING);
-                act_p("Ты создаешь дубликат $o2.",ch,clone,0,TO_CHAR,POS_RESTING);
+                act("$c1 создает $o4.",ch,clone,0,TO_ROOM);
+                act("Ты создаешь дубликат $o2.",ch,clone,0,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %O4.", ch, obj );
                 return;
@@ -2089,8 +2089,8 @@ CMDWIZP( clone )
                 }
 
                 char_to_room(clone,ch->in_room);
-                act_p("$c1 создает $C4.",ch,0,clone,TO_ROOM,POS_RESTING);
-                act_p("Ты клонируешь $C4.",ch,0,clone,TO_CHAR,POS_RESTING);
+                act("$c1 создает $C4.",ch,0,clone,TO_ROOM);
+                act("Ты клонируешь $C4.",ch,0,clone,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %C4.", ch, clone );
                 
@@ -2155,8 +2155,8 @@ CMDWIZP( load )
         if (victim->in_room == 0)
             char_to_room( victim, ch->in_room );
 
-        act_p( "$c1 создает $C4!", ch, 0, victim, TO_ROOM,POS_RESTING );
-        act_p( "Ты создаешь $C4!", ch, 0, victim, TO_CHAR,POS_RESTING );
+        act( "$c1 создает $C4!", ch, 0, victim, TO_ROOM);
+        act( "Ты создаешь $C4!", ch, 0, victim, TO_CHAR);
 
 
         wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
@@ -2212,8 +2212,8 @@ CMDWIZP( load )
     else
         obj_to_room( obj, ch->in_room );
         
-    act_p( "$c1 создает $o4!", ch, obj, 0, TO_ROOM,POS_RESTING );
-    act_p( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR,POS_RESTING );
+    act( "$c1 создает $o4!", ch, obj, 0, TO_ROOM);
+    act( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
     LogStream::sendNotice( ) 
@@ -2257,7 +2257,7 @@ CMDWIZP( purge )
               extract_obj( obj );
         }
 
-        act_p( "$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM,POS_RESTING);
+        act( "$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
         ch->send_to("Готово.\n\r");
         dreamland->resetOption( DL_SAVE_MOBS );
         dreamland->resetOption( DL_SAVE_OBJS );
@@ -3066,13 +3066,13 @@ CMDWIZP( wizinvis )
       if ( ch->invis_level)
       {
           ch->invis_level = 0;
-          act_p( "$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          act( "$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
           ch->send_to("Ты снова проявляешься в реальности.\n\r");
       }
       else
       {
           ch->invis_level = 102;
-          act_p( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          act( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
           ch->send_to("Ты растворяешься за подкладкой реальности.\n\r");
       }
     else
@@ -3088,7 +3088,7 @@ CMDWIZP( wizinvis )
       {
           ch->reply = 0;
           ch->invis_level = level;
-          act_p( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          act( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
           ch->send_to("Ты растворяешься за подкладкой реальности.\n\r");
       }
     }
@@ -3111,13 +3111,13 @@ CMDWIZP( incognito )
       if ( ch->incog_level)
       {
           ch->incog_level = 0;
-          act_p( "$c1 больше не маскируется.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          act( "$c1 больше не маскируется.", ch, 0, 0, TO_ROOM);
           ch->send_to("Ты больше не маскируешься.\n\r");
       }
       else
       {
           ch->incog_level = 102;
-          act_p( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          act( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
           ch->send_to("Ты скрываешь свое присутствие.\n\r");
       }
     else
@@ -3133,7 +3133,7 @@ CMDWIZP( incognito )
       {
           ch->reply = 0;
           ch->incog_level = level;
-          act_p( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          act( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
           ch->send_to("Ты скрываешь свое присутствие.\n\r");
       }
     }

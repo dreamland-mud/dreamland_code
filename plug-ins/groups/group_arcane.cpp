@@ -72,8 +72,8 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    act_p( "$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM,POS_RESTING );
-    act_p( "Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR,POS_RESTING );
+    act( "$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM);
+    act( "Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR);
 
     successfulTargets++;
 
@@ -203,8 +203,8 @@ SKILL_RUNP( brandish )
 
         if ( number_percent( ) >= gsn_staves->getEffective( ch ))
         {
-            act_p("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR,POS_RESTING);
-            act_p("...и ничего не происходит.",ch,0,0,TO_ROOM,POS_RESTING);
+            act("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR);
+            act("...и ничего не происходит.",ch,0,0,TO_ROOM);
             gsn_staves->improve( ch, false );
         }
         else {

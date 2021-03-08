@@ -180,9 +180,9 @@ void WeaponOneHit::damApplyCounter( )
     if (chance <= gsn_counter->getEffective( victim ))
     {
         gsn_counter->improve( victim, true, ch );
-        act_p("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT,POS_RESTING);
-        act_p("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR);
+        act("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT);
+        act("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT);
 
         // set fighting state
         if (ch->fighting == NULL)
@@ -255,7 +255,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             poison->level = max(0,poison->level - 2);
             poison->duration = max(0,poison->duration - 1);
             if ( poison->level == 0 || poison->duration == 0 )
-                act_p("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR,POS_RESTING);
+                act("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR);
         }
     }
 
@@ -306,7 +306,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         for (auto &waf: wield->affected.findAllWithBits(&weapon_type2, WEAPON_SPELL)) 
             if (number_range( 1, waf->modifier ) == 1)
             {
-                act_p("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL, POS_RESTING);
+                act("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL);
                 lvl = std::min((int)ch->getModifyLevel(), (int)waf->level);
                 spell_nocatch( waf->type, lvl, ch, victim );
             }

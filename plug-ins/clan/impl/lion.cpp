@@ -150,7 +150,7 @@ SKILL_RUNP( claw )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act_p("Но ведь $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но ведь $C1 твой друг!",ch,0,victim,TO_CHAR);
                 return;
         }
    
@@ -256,7 +256,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
 
   act_p("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.",
                 ch,0,0,TO_CHAR,POS_RESTING);
-  act_p( "Кожа $c2 становится серой!",ch,0,0,TO_ROOM,POS_RESTING);
+  act( "Кожа $c2 становится серой!",ch,0,0,TO_ROOM);
 
 }
 
@@ -265,8 +265,8 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
  */
 void LionEyedSword::wear( Character *ch )
 {
-    act_p("Глаза $o2 открываются.",ch,obj,0,TO_CHAR,POS_RESTING);
-    act_p("Глаза $o2 открываются.",ch,obj,0,TO_ROOM,POS_RESTING);
+    act("Глаза $o2 открываются.",ch,obj,0,TO_CHAR);
+    act("Глаза $o2 открываются.",ch,obj,0,TO_ROOM);
 
 }
 void LionEyedSword::equip( Character *ch )
@@ -367,8 +367,8 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
-  act_p( "Ты создаешь $o4!",ch,shield,0,TO_CHAR,POS_RESTING );
-  act_p( "$c1 создает $o4!",ch,shield,0,TO_ROOM,POS_RESTING );
+  act( "Ты создаешь $o4!",ch,shield,0,TO_CHAR);
+  act( "$c1 создает $o4!",ch,shield,0,TO_ROOM);
 
 }
 
@@ -424,7 +424,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
         room->affectTo( &af );
 
         ch->send_to( "Ты защищаешь местность от ловушек Охотников и от их мести.\n\r");
-        act_p( "$c1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM,POS_RESTING);
+        act( "$c1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(Prevent);

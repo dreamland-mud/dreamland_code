@@ -98,7 +98,7 @@ DLString act_to_fmt(const char *s)
 void act( const char *format, Character *ch, const void *arg1,
           const void *arg2, int type )
 {
-    act_p( format, ch, arg1, arg2, type, POS_RESTING );
+    act( format, ch, arg1, arg2, type);
 }
 
 void act_p( const char *format, Character *ch, const void *arg1,

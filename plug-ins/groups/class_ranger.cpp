@@ -96,7 +96,7 @@ SKILL_RUNP( track )
     }
 
     ch->setWait( gsn_track->getBeats( ) );
-    act_p("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM,POS_RESTING);
+    act("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
 
     int slevel;
     slevel = gsn_track->getEffective( ch ) + skill_level_bonus(*gsn_track, ch);  
@@ -353,19 +353,19 @@ SKILL_RUNP( herbs )
       postaffect_to_char(ch, gsn_herbs, 5);
 
       ch->send_to("Ты собираешь целебные травы по окрестностям.\n\r");
-      act_p("$c1 собирает какие-то травы по окрестностям.",ch,0,0,TO_ROOM,POS_RESTING);
+      act("$c1 собирает какие-то травы по окрестностям.",ch,0,0,TO_ROOM);
 
       if (ch != victim)
         {
-          act_p("$c1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT,POS_RESTING);
-          act_p("Ты накладываешь целебные травы на раны $C2.",ch,0,victim,TO_CHAR,POS_RESTING);
-          act_p("$c1 накладывает целебные травы на раны $C2.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+          act("$c1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT);
+          act("Ты накладываешь целебные травы на раны $C2.",ch,0,victim,TO_CHAR);
+          act("$c1 накладывает целебные травы на раны $C2.",ch,0,victim,TO_NOTVICT);
         }
         
       if (victim->hit < victim->max_hit)
         {
           victim->send_to("Ты чувствуешь себя здоровее.\n\r");
-          act_p("$c1 выглядит здоровее.",victim,0,0,TO_ROOM,POS_RESTING);
+          act("$c1 выглядит здоровее.",victim,0,0,TO_ROOM);
         }
       int slevel = skill_level(*gsn_herbs, ch);
       victim->hit = min((int)victim->max_hit,victim->hit + 5 * slevel );
@@ -377,7 +377,7 @@ SKILL_RUNP( herbs )
   else
     {
       ch->send_to("Ты ищешь целебные травы, но ничего не находишь.\n\r");
-      act_p("$c1 рыщет в поисках целебных трав, но ничего не находит.",ch,0,0,TO_ROOM,POS_RESTING);
+      act("$c1 рыщет в поисках целебных трав, но ничего не находит.",ch,0,0,TO_ROOM);
       gsn_herbs->improve( ch, false, victim );
     }
 }
@@ -771,7 +771,7 @@ SKILL_RUNP( makearrow )
     ch->setWait( wait );
 
     ch->send_to("Ты сосредотачиваешься на изготовлении стрел!\n\r");
-    act_p("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM,POS_RESTING);
+    act("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM);
 
     if (number_percent() > arrowSkill->getEffective( ch )) {
         ch->send_to("Неудача. Придется еще попрактиковаться...\n\r");
@@ -925,12 +925,12 @@ SKILL_RUNP( forest )
     if (attack) {
         af.modifier  = FOREST_ATTACK; 
         act_p("Ты чувствуешь себя дик$gим|им|ой!", ch, 0, 0, TO_CHAR, POS_DEAD);
-        act_p("$c1 выглядит дик$gим|им|ой.", ch, 0, 0, TO_ROOM, POS_RESTING);
+        act("$c1 выглядит дик$gим|им|ой.", ch, 0, 0, TO_ROOM);
     }
     else {
         af.modifier  = FOREST_DEFENCE;
         act_p("Ты чувствуешь себя защищенн$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_DEAD);
-        act_p("$c1 выглядит защищенн$gым|ым|ой.", ch, 0, 0, TO_ROOM, POS_RESTING);
+        act("$c1 выглядит защищенн$gым|ым|ой.", ch, 0, 0, TO_ROOM);
     }
 
     affect_to_char(ch, &af);
@@ -1025,7 +1025,7 @@ SKILL_RUNP( butcher )
                 sprintf(buf, "Ты срезаешь с $o2 %i кус%s мяса.",
                         numsteaks,
                         GET_COUNT(numsteaks,"ок","ка","ков"));
-                act_p(buf,ch,obj,0,TO_CHAR,POS_RESTING);
+                act(buf,ch,obj,0,TO_CHAR);
 
                 gsn_butcher->improve( ch, true );
 
@@ -1048,7 +1048,7 @@ SKILL_RUNP( butcher )
         }        
         else
         {
-                act_p("Неумеха! Ты испорти$gлo|л|лa столько мяса!",ch,0,0,TO_CHAR,POS_RESTING);
+                act("Неумеха! Ты испорти$gлo|л|лa столько мяса!",ch,0,0,TO_CHAR);
                 gsn_butcher->improve( ch, false );
         }
 }
@@ -1066,7 +1066,7 @@ SKILL_RUNP( tiger )
         ch->send_to("Что?\n\r");
         return;
     }
-    act_p("$c1 призывает силу десяти тигров!",ch,0,0,TO_ROOM,POS_RESTING);
+    act("$c1 призывает силу десяти тигров!",ch,0,0,TO_ROOM);
 
     if (IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk) ||
     ch->isAffected(gsn_tiger_power) || ch->isAffected(gsn_frenzy))
@@ -1347,7 +1347,7 @@ SKILL_RUNP( camouflage )
         if (!RoomUtils::isNature(ch->in_room))
         {
                 ch->send_to("Ты можешь замаскироваться только в дикой местности.\n\r");
-                act_p("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM);
                 return;
         }
 
@@ -1388,7 +1388,7 @@ VOID_SPELL(RangerStaff)::run(Character *ch, char *, int sn, int level)
 
     staff = create_object(get_obj_index(OBJ_VNUM_RANGER_STAFF), level);
     ch->send_to("Ты создаешь посох рейнджера!\n\r");
-    act_p("$c1 создает посох рейнджера!", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act("$c1 создает посох рейнджера!", ch, 0, 0, TO_ROOM);
 
     staff->timer = level;
     staff->level = ch->getModifyLevel();

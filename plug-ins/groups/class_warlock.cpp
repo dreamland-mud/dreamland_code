@@ -125,8 +125,8 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
                 ch, 0, victim, TO_CHAR, POS_RESTING);
         victim->send_to("Тебя {RУБИЛИ{x!\n\r");
 
-        act_p("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR,POS_RESTING);
-        act_p("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
+        act("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
 
         victim->send_to("{YБожественные Силы возвращают тебя к жизни!{x\n\r");
         
@@ -149,7 +149,7 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
         if ( ch->isAffected(sn ) )
         {
             ch->send_to("Ты пытаешься крикнуть, но только хрип вырывается из твоего горла.");
-            act_p("$c1 хрипит!",ch,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 хрипит!",ch,0,0,TO_ROOM);
             return;
         }
 
@@ -209,7 +209,7 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
         af.duration = level / 20;
         affect_to_char(victim, &af );
         if (ch != victim)
-            act_p("Ты создаешь изолирующий магию экран вокруг $C2.", ch, 0, victim, TO_CHAR,POS_RESTING);
+            act("Ты создаешь изолирующий магию экран вокруг $C2.", ch, 0, victim, TO_CHAR);
         victim->send_to("Вокруг тебя внезапно воздвигается экран, изолирующий магию!\n\r");
     }
     else {
@@ -220,7 +220,7 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
 
         victim->send_to("Изолирующий магию экран вокруг тебя усиливается!\n\r");
         if (ch != victim)
-            act_p("Изолирующий магию экран вокруг $C2 усиливается.", ch, 0, victim, TO_CHAR,POS_RESTING);
+            act("Изолирующий магию экран вокруг $C2 усиливается.", ch, 0, victim, TO_CHAR);
     }
 }
 
@@ -375,7 +375,7 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
 
     ch->in_room->owner = str_dup( ch->getNameP( ) );
     ch->send_to("Ты воздвигаешь вокруг себя щит молний.\n\r");
-    act_p("$c1 окружает себя щитом молний.",ch,0,0,TO_ROOM,POS_RESTING);
+    act("$c1 окружает себя щитом молний.",ch,0,0,TO_ROOM);
     return;
 
 }
@@ -397,7 +397,7 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
     }
     else if (!ch->is_immortal( )) {
         ch->send_to("Щит молний, оберегающий это место, блокирует тебя.\n\r");
-        act_p("$C1 приближается к тебе.",vch,0,ch,TO_CHAR,POS_RESTING);
+        act("$C1 приближается к тебе.",vch,0,ch,TO_CHAR);
         interpret_raw( vch, "wake" );
 
         if (!is_safe_rspell(paf->level,ch)) {

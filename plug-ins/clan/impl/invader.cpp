@@ -381,8 +381,8 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
         return;
     }
 
-    act_p("Ты даешь жизнь тени $C2!", ch, 0, victim, TO_CHAR, POS_RESTING);
-    act_p("$c1 дает жизнь тени $C2!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+    act("Ты даешь жизнь тени $C2!", ch, 0, victim, TO_CHAR);
+    act("$c1 дает жизнь тени $C2!", ch, 0, victim, TO_NOTVICT);
     act_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_DEAD);
 
     victim->getPC()->shadow = 4 * ch->getModifyLevel() / 10;
@@ -418,7 +418,7 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
         if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_MAGIC) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
         {
             vch->send_to("Злые духи овладевают тобой.\n\r");
-            act_p("Злые духи овладевают $c1.", vch, 0, 0, TO_ROOM, POS_RESTING);
+            act("Злые духи овладевают $c1.", vch, 0, 0, TO_ROOM);
             affect_join(vch, &af);
         }
     }

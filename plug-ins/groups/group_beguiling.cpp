@@ -113,10 +113,10 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
         af.bitvector.setValue(AFF_CHARM);
         affect_to_char( victim, &af );
 
-        act_p( "$c1 очаровывает тебя!!!", ch, 0, victim, TO_VICT,POS_RESTING);
+        act( "$c1 очаровывает тебя!!!", ch, 0, victim, TO_VICT);
 
         if ( ch != victim )
-                act_p("$C1 с обожанием смотрит на тебя.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("$C1 с обожанием смотрит на тебя.",ch,0,victim,TO_CHAR);
 
 }
 
@@ -142,7 +142,7 @@ VOID_SPELL(ControlUndead)::run( Character *ch, Character *victim, int sn, int le
 
         if  ( !victim->is_npc() || !IS_SET(victim->act,ACT_UNDEAD) )
         {
-                act_p("$C1 не похо$gже|ж|жа на живого мертвеца.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("$C1 не похо$gже|ж|жа на живого мертвеца.",ch,0,victim,TO_CHAR);
                 return;
         }
         spell(gsn_charm_person,level,ch,victim);
@@ -401,7 +401,7 @@ VOID_AFFECT(MysteriousDream)::update( Room *room, Affect *paf )
             if ( IS_AWAKE(vch) )
             {
                 vch->send_to("Ты засыпаешь...\n\r");
-                act_p("$c1 засыпает.",vch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 засыпает.",vch,0,0,TO_ROOM);
                 vch->position = POS_SLEEPING;
             }
 

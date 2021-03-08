@@ -188,7 +188,7 @@ SKILL_RUNP(guard)
 
     if (vict->is_npc())
     {
-        act_p("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR, POS_RESTING);
+        act("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR);
         return;
     }
 
@@ -217,13 +217,13 @@ SKILL_RUNP(guard)
 
     if (victim->guarded_by != 0)
     {
-        act_p("$C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR, POS_RESTING);
+        act("$C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR);
         return;
     }
 
     if (!is_same_group(victim, pch))
     {
-        act_p("Но ты не состоишь в той же группе, что и $C1.", pch, 0, victim, TO_CHAR, POS_RESTING);
+        act("Но ты не состоишь в той же группе, что и $C1.", pch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -253,9 +253,9 @@ SKILL_RUNP(guard)
             return;
         }
 
-    act_p("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR, POS_RESTING);
-    act_p("Теперь тебя охраняет $c4.", pch, 0, victim, TO_VICT, POS_RESTING);
-    act_p("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT, POS_RESTING);
+    act("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR);
+    act("Теперь тебя охраняет $c4.", pch, 0, victim, TO_VICT);
+    act("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT);
 
     pch->guarding = victim;
     victim->guarded_by = pch;
@@ -277,9 +277,9 @@ BOOL_SKILL(guard)::run(Character *wch, Character *mob)
 
     if (number_percent() < min(100, chance))
     {
-        act_p("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT, POS_RESTING);
-        act_p("$c1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT, POS_RESTING);
-        act_p("Ты прыгаешь перед $C5!", ch->guarded_by, 0, ch, TO_CHAR, POS_RESTING);
+        act("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
+        act("$c1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
+        act("Ты прыгаешь перед $C5!", ch->guarded_by, 0, ch, TO_CHAR);
         gsn_guard->improve(ch->guarded_by, true, mob);
         return true;
     }
@@ -317,8 +317,8 @@ VOID_SPELL(Dragonplate)::run(Character *ch, char *target_name, int sn, int level
 
     obj_to_char(plate, ch);
 
-    act_p("Ты взмахиваешь руками и создаешь $o4!", ch, plate, 0, TO_CHAR, POS_RESTING);
-    act_p("$c1 взмахивает руками и создает $o4!", ch, plate, 0, TO_ROOM, POS_RESTING);
+    act("Ты взмахиваешь руками и создаешь $o4!", ch, plate, 0, TO_CHAR);
+    act("$c1 взмахивает руками и создает $o4!", ch, plate, 0, TO_ROOM);
 }
 
 /*
@@ -456,7 +456,7 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
 
         vch->send_to("{YЗолотая аура{x окружает тебя.\n\r");
         if (ch != vch)
-            act_p("{YЗолотая аура{x окружает $C4.", ch, 0, vch, TO_CHAR, POS_RESTING);
+            act("{YЗолотая аура{x окружает $C4.", ch, 0, vch, TO_CHAR);
     }
 }
 

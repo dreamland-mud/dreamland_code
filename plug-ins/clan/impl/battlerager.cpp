@@ -312,8 +312,8 @@ SKILL_RUNP( trophy )
             obj_to_char(trophy, ch);
             gsn_trophy->improve( ch, true );
 
-            act_p("Ты изготавливаешь пончо из $o2!",ch,part,0,TO_CHAR,POS_RESTING);
-            act_p("$c1 изготавливает пончо из $o2!",ch,part,0,TO_ROOM,POS_RESTING);
+            act("Ты изготавливаешь пончо из $o2!",ch,part,0,TO_CHAR);
+            act("$c1 изготавливает пончо из $o2!",ch,part,0,TO_ROOM);
 
             extract_obj(part);
             return;
@@ -370,8 +370,8 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     // Success, inflict a lot of damage. Anatolia implementation had (victim->hit+1), but the 
     // resulting damage always got reduced by sanctuary and other protections.
     int dam;
-    act_p("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR,POS_RESTING);
-    act_p("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR);
+    act("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT);
     act_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
     damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
@@ -493,8 +493,8 @@ SKILL_RUNP( spellbane )
 
         affect_to_char(ch,&af);
 
-        act_p("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR,POS_RESTING);
-        act_p("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM,POS_RESTING);
+        act("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR);
+        act("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM);
 }
 
 /*
@@ -528,8 +528,8 @@ SKILL_RUNP( resistance )
         postaffect_to_char(ch, gsn_resistance, skill_level(*gsn_resistance, ch) / 6);
       ch->mana -= mana;
 
-      act_p("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR,POS_RESTING);
-      act_p("$c1 выглядит покрепче.",ch,0,0,TO_ROOM,POS_RESTING);
+      act("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
+      act("$c1 выглядит покрепче.",ch,0,0,TO_ROOM);
       gsn_resistance->improve( ch, true );
     }
   else
@@ -602,8 +602,8 @@ SKILL_RUNP( truesight )
 
       ch->mana -= mana; 
 
-      act_p("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR,POS_RESTING);
-      act_p("$c1 смотрит более зорко.",ch,0,0,TO_ROOM,POS_RESTING);
+      act("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
+      act("$c1 смотрит более зорко.",ch,0,0,TO_ROOM);
       gsn_truesight->improve( ch, true );
     }
   else
@@ -638,7 +638,7 @@ SKILL_RUNP( bandage )
 
         if (ch->isAffected(gsn_bandage))
         {
-                act_p("Ты уже перевяза$gло|л|ла свои раны!",ch,0,0,TO_CHAR,POS_RESTING);
+                act("Ты уже перевяза$gло|л|ла свои раны!",ch,0,0,TO_CHAR);
                 return;
         }
 
@@ -659,7 +659,7 @@ SKILL_RUNP( bandage )
                 int slevel = skill_level(*gsn_bandage, ch);
 
                 ch->println( "Ты накладываешь повязку на свою рану!" );
-                act_p("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM);
                 gsn_bandage->improve( ch, true );
 
                 heal = ( dice(4, 8 ) + slevel / 2 );
@@ -743,11 +743,11 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
 
     act_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
            ch,0,wch,TO_VICT,POS_RESTING);
-    act_p("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT,POS_RESTING);
-    act_p("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR,POS_RESTING);
-    act_p("$C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR,POS_RESTING);
-    act_p("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT,POS_RESTING);
-    act_p("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT,POS_RESTING);
+    act("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
+    act("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR);
+    act("$C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
+    act("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT);
+    act("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT);
 
     wch->is_npc( ) ? wch->master->setWaitViolence( 1 ) : wch->setWaitViolence( 1 );
 

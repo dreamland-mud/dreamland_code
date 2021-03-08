@@ -40,7 +40,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
 { 
     if (IS_AWAKE( victim )) {
         if (victim != ch)
-            act_p("$E уже не спит.", ch, 0, victim, TO_CHAR, POS_RESTING);
+            act("$E уже не спит.", ch, 0, victim, TO_CHAR);
         else
             ch->send_to("Может, лучше бахнуть кофейку?\r\n");
 
@@ -57,7 +57,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
     }
 
     if (IS_AFFECTED( victim, AFF_SLEEP )) {
-        act_p("Тебе не удалось разбудить $C4.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        act("Тебе не удалось разбудить $C4.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -76,7 +76,7 @@ VOID_SPELL(CureBlindness)::run( Character *ch, Character *victim, int sn, int le
         if (victim == ch)
           ch->send_to("Твое зрение в порядке.\n\r");
         else
-          act_p("Зрение $C2 в порядке.",ch,0,victim,TO_CHAR,POS_RESTING);
+          act("Зрение $C2 в порядке.",ch,0,victim,TO_CHAR);
         return;
     }
 

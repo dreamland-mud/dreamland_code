@@ -99,7 +99,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
         if ( IS_OBJ_STAT(obj,ITEM_NOREMOVE))
         {
-                act_p("$S оружие не двигается с места!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("$S оружие не двигается с места!",ch,0,victim,TO_CHAR);
                 act_p("$c1 пытается обезоружить тебя, но оружие не двигается с места!",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 act_p("$c1 пытается обезоружить $C4, но оружие не двигается с места.",
@@ -126,19 +126,19 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
                         gsn_grip->improve( victim, false, ch );
         }
 
-        act_p("Ты обезоруживаешь $C4!", ch,0, victim, TO_CHAR,POS_RESTING);
-        act_p( "$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT,POS_RESTING);
+        act("Ты обезоруживаешь $C4!", ch,0, victim, TO_CHAR);
+        act( "$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT);
 
         obj_from_char( obj );
 
         if ( IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_INVENTORY) ) 
         {
-                   act_p("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
+                   act("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие!{x", ch, 0, victim, TO_VICT );
                 obj_to_char( obj, victim );
         }
         else
         {
-                   act_p("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
+                   act("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT );
                 obj_to_room( obj, victim->in_room );
                 if (victim->is_npc() && victim->wait == 0 && victim->can_see(obj))
                         do_get_raw(victim, obj);
@@ -522,7 +522,7 @@ SKILL_RUNP( lash )
 
     if (SHADOW(ch)) {
         ch->send_to("Ты пытаешься огреть хлыстом собственную тень.\n\r");
-        act_p("$c1 бьет свою тень хлыстом.",ch,0,0,TO_ROOM,POS_RESTING);
+        act("$c1 бьет свою тень хлыстом.",ch,0,0,TO_ROOM);
         return;
     }
 

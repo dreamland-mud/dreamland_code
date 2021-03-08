@@ -1374,11 +1374,11 @@ static void do_look_character( Character *ch, Character *victim )
 {
     if (victim->can_see( ch )) {
         if (ch == victim)
-            act_p( "$c1 смотрит на себя.",ch,0,0,TO_ROOM,POS_RESTING);
+            act( "$c1 смотрит на себя.",ch,0,0,TO_ROOM);
         else
         {
-            act_p( "$c1 смотрит на тебя.", ch, 0, victim, TO_VICT,POS_RESTING);
-            act_p( "$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
+            act( "$c1 смотрит на тебя.", ch, 0, victim, TO_VICT);
+            act( "$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT);
         }
     }
 
@@ -1637,11 +1637,11 @@ CMDRUNP( examine )
         if ( victim->can_see( ch ) )
         {
             if (ch == victim)
-                act_p( "$c1 осматривает себя.",ch,0,0,TO_ROOM,POS_RESTING);
+                act( "$c1 осматривает себя.",ch,0,0,TO_ROOM);
             else
             {
-                act_p( "$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT,POS_RESTING);
-                act_p( "$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
+                act( "$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
+                act( "$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT);
             }
         }
 

@@ -77,7 +77,7 @@ CMDRUN( follow )
     }
 
     if ( IS_CHARMED(ch)) {
-        act_p( "Но тебе хочется следовать за $C5!", ch, 0, ch->master, TO_CHAR,POS_RESTING );
+        act( "Но тебе хочется следовать за $C5!", ch, 0, ch->master, TO_CHAR);
         return;
     }
 
@@ -168,7 +168,7 @@ CMDRUN( group )
     }
 
     if (victim->master != ch) {
-        act_p( "$C1 не следует за тобой.", ch, 0, victim, TO_CHAR,POS_RESTING );
+        act( "$C1 не следует за тобой.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -178,7 +178,7 @@ CMDRUN( group )
     }
 
     if (IS_CHARMED(ch)) {
-        act_p("Ты любишь своего мастера так сильно, что не можешь покинуть $s!",ch,0,victim,TO_VICT,POS_RESTING);
+        act("Ты любишь своего мастера так сильно, что не можешь покинуть $s!",ch,0,victim,TO_VICT);
         return;
     }
 
@@ -187,7 +187,7 @@ CMDRUN( group )
         guarding_nuke( ch, victim );
 
         victim->leader = 0;
-        act_p( "$c1 исключает $C4 из $s группы.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act( "$c1 исключает $C4 из $s группы.",ch,0,victim,TO_NOTVICT);
         act_p( "$c1 исключает тебя из $s группы.",ch,0,victim,TO_VICT,POS_SLEEPING);
         act_p( "Ты исключаешь $C4 из своей группы.",ch,0,victim,TO_CHAR,POS_SLEEPING);
         
@@ -248,7 +248,7 @@ CMDRUN( group )
     }
 
     victim->leader = ch;
-    act_p( "$C1 присоединил$Gось|ся|ась к группе $c2.", ch, 0, victim,TO_NOTVICT, POS_RESTING);
+    act( "$C1 присоединил$Gось|ся|ась к группе $c2.", ch, 0, victim,TO_NOTVICT);
     act_p( "Ты присоединил$Gось|ся|ась к группе $c2.", ch, 0, victim,TO_VICT, POS_SLEEPING);
     act_p( "$C1 присоединил$Gось|ся|ась к твоей группе.", ch, 0, victim, TO_CHAR, POS_SLEEPING);
 }
@@ -413,7 +413,7 @@ CMDRUN( split )
     {
         if ( gch != ch && is_same_group(gch,ch) && !IS_CHARMED(gch))
         {
-            act_p( buf, ch, 0, gch, TO_VICT,POS_RESTING );
+            act( buf, ch, 0, gch, TO_VICT);
             gch->gold += share_gold;
             gch->silver += share_silver;
         }

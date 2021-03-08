@@ -571,7 +571,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
         {
             if (!obj->hasOwner( ch ) && obj->mustDisappear( ch ))
             {
-                act_p("$o1 рассыпается трухой!",ch,obj,0,TO_CHAR,POS_RESTING);
+                act("$o1 рассыпается трухой!",ch,obj,0,TO_CHAR);
                 extract_obj( obj );
                 return;
             }

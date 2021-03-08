@@ -175,7 +175,7 @@ CMDRUN( buy )
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-        act_p( "$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT, POS_RESTING );
+        act( "$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
         ch->reply = keeper;
         return;
     }
@@ -248,25 +248,25 @@ CMDRUN( buy )
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
         cost -= obj->cost / 2 * roll / 100;
-        act_p( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
+        act( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR);
         gsn_haggle->improve( ch, true );
     }
 
     if ( number > 1 )
     {
         sprintf( buf, "$c1 покупает $o4[%d].", number );
-        act_p( buf, ch, obj, 0, TO_ROOM, POS_RESTING );
+        act( buf, ch, obj, 0, TO_ROOM);
         sprintf( buf, "Ты покупаешь $o4[%d] за %d серебрян%s.",
                         number, cost * number,
                         GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
-        act_p( buf, ch, obj, 0, TO_CHAR, POS_RESTING );
+        act( buf, ch, obj, 0, TO_CHAR);
     }
     else
     {
-        act_p( "$c1 покупает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+        act( "$c1 покупает $o4.", ch, obj, 0, TO_ROOM);
         sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
                         cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
-        act_p( buf, ch, obj, 0, TO_CHAR,POS_RESTING );
+        act( buf, ch, obj, 0, TO_CHAR);
     }
 
     deduct_cost( ch, cost * number );
@@ -356,13 +356,13 @@ CMDRUN( sell )
 
     if (!keeper->can_see(obj))
     {
-        act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
+        act("$c1 не видит этого.",keeper,0,ch,TO_VICT);
         return;
     }
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-        act_p( "$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
+        act( "$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT);
         return;
     }
 
@@ -400,7 +400,7 @@ CMDRUN( sell )
         }
     }
 
-    act_p( "$c1 продает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+    act( "$c1 продает $o4.", ch, obj, 0, TO_ROOM);
     silver = cost - (cost/100) * 100;
     gold   = cost/100;
 
@@ -433,7 +433,7 @@ CMDRUN( sell )
         ch->silver = silver_old;
         act_p( "$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
         keeper, 0, ch, TO_VICT,POS_RESTING );
-        act_p( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM,POS_RESTING );
+        act( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
         obj_to_room( create_money( gold, silver ), ch->in_room );
     }
 

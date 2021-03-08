@@ -49,8 +49,8 @@
  */
 void Excalibur::wear( Character *ch )
 {
-  act_p("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR,POS_RESTING);
-  act_p("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM,POS_RESTING);
+  act("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR);
+  act("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM);
   
 }
 
@@ -69,8 +69,8 @@ void Excalibur::equip( Character *ch )
 
 void Excalibur::remove( Character *ch )
 {
-  act_p("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_CHAR,POS_RESTING);
-  act_p("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_ROOM,POS_RESTING);
+  act("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_CHAR);
+  act("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_ROOM);
 }
 
 bool Excalibur::death( Character *ch )
@@ -79,10 +79,10 @@ bool Excalibur::death( Character *ch )
         return false;
 
     act_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_CHAR,POS_DEAD);
-    act_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM,POS_RESTING);
+    act("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
     ch->hit = ch->max_hit;
     ch->send_to("Ты чувствуешь себя намного лучше.");
-    act_p("$c1 выглядит намного лучше.",ch,0,0,TO_ROOM,POS_RESTING);
+    act("$c1 выглядит намного лучше.",ch,0,0,TO_ROOM);
     return true;
 }
 
@@ -200,7 +200,7 @@ void TwoSnakeWhip::remove( Character *ch )
 
 void TwoSnakeWhip::get( Character *ch )
 {
-  act_p("Тебе кажется, будто змеи на хлысте пошевелились.",ch,obj,0,TO_CHAR,POS_RESTING);
+  act("Тебе кажется, будто змеи на хлысте пошевелились.",ch,obj,0,TO_CHAR);
 }
 
 void TwoSnakeWhip::fight( Character *ch )
@@ -350,9 +350,9 @@ int dam;
   if ( number_percent() < 15 )  {
         dam = number_percent()/2 + 5 * ch->getModifyLevel();
 
-        act_p( "Твой щит обжигает лицо $C3!", ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-        act_p( "Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-        act_p( "Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
+        act( "Твой щит обжигает лицо $C3!", ch, 0, ch->fighting, TO_CHAR);
+        act( "Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
+        act( "Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
 
         damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level,dam, TARGET_CHAR );
@@ -462,7 +462,7 @@ void RoseShield::fight( Character *ch )
 
   ch->send_to("Листья на твоем щите внезапно распускаются.\n\r");
   ch->fighting->send_to("Листья на щите окружают тебя!\n\r");
-  act_p("Щит Розы $c2 внезапно распускается.",ch,0,0,TO_ROOM,POS_RESTING);
+  act("Щит Розы $c2 внезапно распускается.",ch,0,0,TO_ROOM);
   spell(gsn_slow, ch->getModifyLevel(),ch,ch->fighting);
   return;
 }

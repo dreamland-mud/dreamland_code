@@ -104,21 +104,21 @@ void ChaosBlade::fight( Character *ch )
 
     switch(number_bits(6)) {
     case 0:
-            act_p("{MКлинок Хаоса{x неистово вздрагивает!",ch,0,0,TO_ROOM,POS_RESTING);
+            act("{MКлинок Хаоса{x неистово вздрагивает!",ch,0,0,TO_ROOM);
             ch->send_to("Твой {MКлинок Хаоса{x неистово вздрагивает!\n\r");
             spell(gsn_mirror, ch->getModifyLevel(),ch,ch, FSPELL_BANE );
             ch->setWaitViolence( 2 );
             break;
 
     case 1:
-            act_p("{MКлинок Хаоса{x устрашающе звенит!",ch,0,0,TO_ROOM,POS_RESTING);
+            act("{MКлинок Хаоса{x устрашающе звенит!",ch,0,0,TO_ROOM);
             ch->send_to("Твой {MКлинок Хаоса{x устрашающе звенит!\n\r");
             spell(gsn_garble, ch->getModifyLevel()+5, ch, ch->fighting, FSPELL_BANE );
             ch->setWaitViolence( 2 );
             break;
 
     case 2:
-            act_p("{MКлинок Хаоса{x неудержимо дрожит!",ch,0,0,TO_ROOM,POS_RESTING);
+            act("{MКлинок Хаоса{x неудержимо дрожит!",ch,0,0,TO_ROOM);
             ch->send_to("Твой {MКлинок Хаоса{x неудержимо дрожит!\n\r");
             spell(gsn_confuse, ch->getModifyLevel()+5,ch,ch->fighting, FSPELL_BANE );
             ch->setWaitViolence( 2 );
@@ -181,7 +181,7 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
         }
 
         victim->send_to("Тебя сконфузили!\n\r");
-        act_p("$c1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM,POS_RESTING);
+        act("$c1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM);
 
         af.type      = sn;
         af.level     = level;
@@ -322,13 +322,13 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
   if (ch->is_npc() || victim->is_npc())
     {
-     act_p("Ты не можешь подражать $C3.",ch,0,victim,TO_CHAR,POS_RESTING);
+     act("Ты не можешь подражать $C3.",ch,0,victim,TO_CHAR);
      return;
    }
 
   if (ch == victim || ch->getDoppel( ) == victim)
     {
-      act_p("Ты уже выглядишь как $E.",ch,0,victim,TO_CHAR,POS_RESTING);
+      act("Ты уже выглядишь как $E.",ch,0,victim,TO_CHAR);
       return;
     }
 

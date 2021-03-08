@@ -112,7 +112,7 @@ SKILL_RUNP( bashdoor )
         {
                 if ( gch->is_npc() && IS_AWAKE(gch) && slevel + 5 < gch->getModifyLevel() )
                 {
-                        act_p( "$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR,POS_RESTING);
+                        act( "$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR);
                         return;
                 }
         }
@@ -347,7 +347,7 @@ SKILL_RUNP( bash )
 
         if ( ( victim->position < POS_FIGHTING ) && ( FightingCheck ) )
         {
-                act_p("Подожди пока $E встанет.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Подожди пока $E встанет.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -377,14 +377,14 @@ SKILL_RUNP( bash )
 
         if ( IS_CHARMED(ch) && ch->master == victim )
         {
-                act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
         if (SHADOW(ch))
         {
                 ch->send_to("Ты безуспешно пытаешься сбить с ног свою тень.\n\r");
-                act_p("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM);
                 return;
         }
 
@@ -430,7 +430,7 @@ SKILL_RUNP( bash )
                 {
                         act_p("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!",
                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        act_p("Ты сбиваешь $C4 с ног ударом щита!",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act("Ты сбиваешь $C4 с ног ударом щита!",ch,0,victim,TO_CHAR);
                         act_p("$c1 сильнейшим ударом щита сбивает $C4 с ног.",
                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
 
@@ -457,9 +457,9 @@ SKILL_RUNP( bash )
                 }
                 else
                 {
-                        act_p("$c1 наносит тебе удар щитом!",ch,0,victim,TO_VICT,POS_RESTING);
-                        act_p("Ты наносишь удар щитом $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
-                        act_p("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        act("$c1 наносит тебе удар щитом!",ch,0,victim,TO_VICT);
+                        act("Ты наносишь удар щитом $C3!",ch,0,victim,TO_CHAR);
+                        act("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT);
                 }
                       
                 gsn_bash->improve( ch, true, victim );
@@ -474,8 +474,8 @@ SKILL_RUNP( bash )
         {
                 if (number_percent() < 50)
                 {
-                        act_p("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR,POS_RESTING);
-                        act_p("$c1 промахивается и падает.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        act("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
+                        act("$c1 промахивается и падает.",ch,0,victim,TO_NOTVICT);
                         act_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
                                 ch,0,victim,TO_VICT,POS_RESTING);
                         ch->position = POS_RESTING;
@@ -554,7 +554,7 @@ SKILL_RUNP( trip )
 
         if ( is_flying( victim ) )
         {
-                act_p("Но $S ноги не на земле.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $S ноги не на земле.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -566,7 +566,7 @@ SKILL_RUNP( trip )
 
         if ( victim->position < POS_FIGHTING )
         {
-                act_p("Но $C1 уже лежит...",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $C1 уже лежит...",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -588,13 +588,13 @@ SKILL_RUNP( trip )
         {
                 ch->send_to("Ты запинаешься и падаешь!\n\r");
                 ch->setWait( 2 * gsn_trip->getBeats( ) );
-                act_p("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM);
                 return;
         }
 
         if ( IS_CHARMED(ch) && ch->master == victim )
         {
-                act_p("Но ведь $C1 -- тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но ведь $C1 -- тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -637,17 +637,17 @@ SKILL_RUNP( trip )
         {
                 if ( number_percent() < 70 )
                 {
-                        act_p("$c1 подсекает тебя и ты падаешь!",ch,0,victim,TO_VICT,POS_RESTING);
-                        act_p("Ты подсекаешь $C4 и $C1 падает!",ch,0,victim,TO_CHAR,POS_RESTING);
-                        act_p("$c1 подсекает $C4, и $C1 падает!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        act("$c1 подсекает тебя и ты падаешь!",ch,0,victim,TO_VICT);
+                        act("Ты подсекаешь $C4 и $C1 падает!",ch,0,victim,TO_CHAR);
+                        act("$c1 подсекает $C4, и $C1 падает!",ch,0,victim,TO_NOTVICT);
                         victim->setWaitViolence( 2 );
                         victim->position = POS_RESTING;
                 }
                 else
                 {
-                        act_p("$c1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT,POS_RESTING);
-                        act_p("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-                        act_p("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        act("$c1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT);
+                        act("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR);
+                        act("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT);
                 }
                 ch->setWait( gsn_trip->getBeats( ) );
                 gsn_trip->improve( ch, true, victim );
@@ -815,7 +815,7 @@ SKILL_RUNP( kick )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1052,7 +1052,7 @@ SKILL_RUNP( crush )
         {
                 act_p("$c1 сбивает тебя с ног мощнейшим ударом!",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR);
                 act_p("$c1 сбивает $C4 с ног мощнейшим ударом.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
@@ -1075,8 +1075,8 @@ SKILL_RUNP( crush )
         else
         {
                 damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
-                act_p("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("$c1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                act("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
+                act("$c1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT);
                 act_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 ch->position = POS_RESTING;
@@ -1234,7 +1234,7 @@ SKILL_RUNP( dirt )
 
         if (IS_AFFECTED(victim,AFF_BLIND))
         {
-                act_p("Но $E уже ничего не видит.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $E уже ничего не видит.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1249,7 +1249,7 @@ SKILL_RUNP( dirt )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act_p("Но $C1 твой лучший друг!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act("Но $C1 твой лучший друг!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1262,7 +1262,7 @@ SKILL_RUNP( dirt )
         if(SHADOW(ch))
         {
                 ch->send_to("Твоя бездонная тень поглощает пыль.\n\r");
-                act_p("$c1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM,POS_RESTING);
+                act("$c1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM);
                 return;
         }
 
@@ -1548,7 +1548,7 @@ SKILL_RUNP( smash )
     }
 
     if (victim->position < POS_FIGHTING) {
-        act_p("Подожди пока $E встанет.", ch,NULL,victim,TO_CHAR,POS_RESTING);
+        act("Подожди пока $E встанет.", ch,NULL,victim,TO_CHAR);
         return;
     } 
 
@@ -1561,7 +1561,7 @@ SKILL_RUNP( smash )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        act_p("Но $C1 твой друг!!!",ch,NULL,victim,TO_CHAR,POS_RESTING);
+        act("Но $C1 твой друг!!!",ch,NULL,victim,TO_CHAR);
         return;
     }
 
@@ -1572,7 +1572,7 @@ SKILL_RUNP( smash )
 
     if(SHADOW(ch)) {
       ch->send_to("Ты безуспешно пытаешься бороться со своей тенью.\n\r");
-      act_p("$c1 обнимается со своей тенью.", ch, NULL, NULL, TO_ROOM,POS_RESTING);
+      act("$c1 обнимается со своей тенью.", ch, NULL, NULL, TO_ROOM);
       return;
     }
    

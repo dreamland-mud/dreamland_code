@@ -283,7 +283,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Character *victim, int sn, int leve
         if ( victim == ch )
             ch->send_to("Жизнь прекрасна и ты не собираешься расставаться со своим телом!\n\r");
         else 
-            act_p("Жизнь прекрасна и $C1 не собирается расставаться со своим телом!",ch,0,victim,TO_CHAR,POS_RESTING);
+            act("Жизнь прекрасна и $C1 не собирается расставаться со своим телом!",ch,0,victim,TO_CHAR);
 
 }
 

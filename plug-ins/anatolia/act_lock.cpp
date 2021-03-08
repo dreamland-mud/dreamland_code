@@ -94,8 +94,8 @@ bool open_portal( Character *ch, Object *obj )
     }
 
     obj->value1(obj->value1() & ~EX_CLOSED);
-    act_p("Ты открываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-    act_p("$c1 открывает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
+    act("Ты открываешь $o4.",ch,obj,0,TO_CHAR);
+    act("$c1 открывает $o4.",ch,obj,0,TO_ROOM);
 
     return true;
 }
@@ -169,8 +169,8 @@ bool open_container( Character *ch, Object *obj )
     obj->value1(obj->value1() & ~CONT_CLOSED);
 
     if (!oprog_open_msg( obj, ch )) {
-        act_p("Ты открываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-        act_p("$c1 открывает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+        act("Ты открываешь $o4.",ch,obj,0,TO_CHAR);
+        act("$c1 открывает $o4.", ch, obj, 0, TO_ROOM);
     }
 
     oprog_open( obj, ch );
@@ -321,8 +321,8 @@ CMDRUNP( close )
             }
 
             obj->value1(obj->value1() | EX_CLOSED);
-            act_p("Ты закрываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-            act_p("$c1 закрывает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
+            act("Ты закрываешь $o4.",ch,obj,0,TO_CHAR);
+            act("$c1 закрывает $o4.",ch,obj,0,TO_ROOM);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
@@ -340,8 +340,8 @@ CMDRUNP( close )
             }
 
             obj->value1(obj->value1() | CONT_CLOSED);
-            act_p("Ты закрываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-            act_p( "$c1 закрывает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+            act("Ты закрываешь $o4.",ch,obj,0,TO_CHAR);
+            act( "$c1 закрывает $o4.", ch, obj, 0, TO_ROOM);
             oprog_close( obj, ch );
         }
         else if (obj->item_type == ITEM_DRINK_CON) {
@@ -537,8 +537,8 @@ CMDRUNP( lock )
                 }
 
                 obj->value1(obj->value1() | EX_LOCKED);
-                act_p("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR,POS_RESTING);
-                act_p("$c1 закрывает $o4 на ключ.",ch,obj,0,TO_ROOM,POS_RESTING);
+                act("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR);
+                act("$c1 закрывает $o4 на ключ.",ch,obj,0,TO_ROOM);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
@@ -642,7 +642,7 @@ CMDRUNP( lock )
 
         SET_BIT(peexit->exit_info, EX_LOCKED);
         ch->println( "*Щелк*" );
-        act_p( "$c1 запирает $N4 на ключ.", ch, 0, peexit->short_desc_from, TO_ROOM,POS_RESTING );
+        act( "$c1 запирает $N4 на ключ.", ch, 0, peexit->short_desc_from, TO_ROOM);
 
         return;
     }
@@ -759,8 +759,8 @@ CMDRUNP( unlock )
             }
 
             obj->value1(obj->value1() & ~EX_LOCKED);
-            act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-            act_p("$c1 открывает ключом $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
+            act("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR);
+            act("$c1 открывает ключом $o4.",ch,obj,0,TO_ROOM);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
@@ -789,8 +789,8 @@ CMDRUNP( unlock )
             if (canLock || get_key_carry( ch, obj->value2())) 
             {
                 obj->value1(obj->value1() & ~CONT_LOCKED);
-                act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-                act_p("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+                act("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR);
+                act("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM);
             } else if (!canLock && obj->value2() <= 0) {
                 ch->pecho("%^O1 -- чья-то личная собственность, ключ есть только у хозяина или хозяйки.", obj);
                 return;
@@ -884,7 +884,7 @@ CMDRUNP( unlock )
 
         REMOVE_BIT(peexit->exit_info, EX_LOCKED);
         ch->println( "*Щелк*" );
-        act_p( "$c1 открывает ключом $N4.", ch, 0, peexit->short_desc_from, TO_ROOM,POS_RESTING );
+        act( "$c1 открывает ключом $N4.", ch, 0, peexit->short_desc_from, TO_ROOM);
 
         return;
     }

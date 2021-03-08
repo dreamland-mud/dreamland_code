@@ -166,8 +166,8 @@ void Questor::doCancel( PCharacter *client )
     XMLAttributes *attributes;
     Quest::Pointer quest;
     
-    act_p("$c1 просит $C4 отменить $S задание.",client,0,ch,TO_ROOM,POS_RESTING);
-    act_p("Ты просишь $C4 отменить $S задание.",client,0,ch,TO_CHAR,POS_RESTING);
+    act("$c1 просит $C4 отменить $S задание.",client,0,ch,TO_ROOM);
+    act("Ты просишь $C4 отменить $S задание.",client,0,ch,TO_CHAR);
     
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
@@ -209,8 +209,8 @@ void Questor::doFind( PCharacter *client )
     ostringstream buf;
     Quest::Pointer quest;
     
-    act_p("$c1 просит помощи у $C2.",client,0,ch,TO_ROOM,POS_RESTING);
-    act_p("Ты просишь помощи у $C2.",client,0,ch,TO_CHAR,POS_RESTING);
+    act("$c1 просит помощи у $C2.",client,0,ch,TO_ROOM);
+    act("Ты просишь помощи у $C2.",client,0,ch,TO_CHAR);
 
     quest = client->getAttributes( ).findAttr<Quest>( "quest" );
 

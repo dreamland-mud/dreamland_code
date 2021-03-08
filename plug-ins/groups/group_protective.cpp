@@ -307,7 +307,7 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
         if (victim == ch)
           ch->send_to("Силовое поле уже защищает тебя.\n\r");
         else
-          act_p("Силовое поле уже окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+          act("Силовое поле уже окружает $C4.",ch,0,victim,TO_CHAR);
         return;
     }
     
@@ -320,7 +320,7 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
     affect_to_char( victim, &af );
     victim->send_to("Силовое поле окружает тебя.\n\r");
     if ( ch != victim )
-        act_p("Силовое поле окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act("Силовое поле окружает $C4.",ch,0,victim,TO_CHAR);
     return;
 
 }
@@ -331,7 +331,7 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (ch->isAffected(sn )) {
-        act_p("Ты уже гото$gво|в|ва противостоять холоду и темным чарам.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act("Ты уже гото$gво|в|ва противостоять холоду и темным чарам.", ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -344,7 +344,7 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     af.modifier = 0;
     affect_to_char(ch, &af);
     
-    act_p("Свет дарует тебе сопротивляемость к могильному холоду и темным чарам!", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act("Свет дарует тебе сопротивляемость к могильному холоду и темным чарам!", ch, 0, 0, TO_CHAR);
 
 }
 
@@ -621,7 +621,7 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
       if (victim == ch)
                ch->send_to("Охранный щит уже окружает тебя.\n\r");
       else
-               act_p("Охранный щит уже окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+               act("Охранный щит уже окружает $C4.",ch,0,victim,TO_CHAR);
       return;
   }
 
@@ -634,10 +634,10 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
   
   affect_to_char( victim, &af );
   if (chance(1)) {
-      act_p( "Предохранительный щит окружает $c4.",victim,0,0,TO_ROOM,POS_RESTING);
+      act( "Предохранительный щит окружает $c4.",victim,0,0,TO_ROOM);
       victim->send_to("Предохранительный щит окружает тебя.\n\r");
   } else {
-      act_p( "Охранный щит окружает $c4.",victim,0,0,TO_ROOM,POS_RESTING);
+      act( "Охранный щит окружает $c4.",victim,0,0,TO_ROOM);
       victim->send_to("Охранный щит окружает тебя.\n\r");
   }
 }

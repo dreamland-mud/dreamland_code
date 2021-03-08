@@ -42,8 +42,8 @@ bool is_safe(Character *ch, Character *victim)
         return false;
 
     if (ch && victim) {
-        act_p("$C1 находится под защитой богов.",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("Боги защитили $C4 от $c2.",ch,0,victim,TO_ROOM,POS_RESTING);
+        act("$C1 находится под защитой богов.",ch,0,victim,TO_CHAR);
+        act("Боги защитили $C4 от $c2.",ch,0,victim,TO_ROOM);
 
         if (victim->fighting == ch) 
             stop_fighting (victim, false);

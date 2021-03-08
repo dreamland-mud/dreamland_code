@@ -112,7 +112,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
         if ( bonus || (roll < gsn_haggle->getEffective(client) + skill_level_bonus(*gsn_haggle, ch)) )
         {
             cost -= cost / 2 * roll / 100;
-            act_p( "Ты торгуешься с $C5.", client, 0, this->getChar(), TO_CHAR, POS_RESTING );
+            act( "Ты торгуешься с $C5.", client, 0, this->getChar(), TO_CHAR);
             gsn_haggle->improve( client, true );
         }
     }

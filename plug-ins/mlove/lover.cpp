@@ -32,8 +32,8 @@ COMMAND(Lover, "lover")
     }
 
     if (IS_CHARMED(ch)) {
-        act_p("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR, POS_RESTING);  
-        act_p("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT, POS_RESTING);
+        act("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
+        act("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
         return;
     }
     

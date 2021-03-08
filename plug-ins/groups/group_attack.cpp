@@ -163,14 +163,14 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
 
     if ( IS_GOOD(victim) )
     {
-        act_p( "Боги защищают $c4.", victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Боги защищают тебя.", victim, 0, 0, TO_CHAR,POS_RESTING);
+        act( "Боги защищают $c4.", victim, 0, 0, TO_ROOM);
+        act( "Боги защищают тебя.", victim, 0, 0, TO_CHAR);
         return;
     }
 
     if ( IS_NEUTRAL(victim) )
     {
-        act_p( "$C1 не чувствует этого.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( "$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -200,14 +200,14 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
 
     if ( IS_EVIL(victim) )
     {
-        act_p( "$c4 защищают $s демоны.", victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Тебя защищают твои демоны.", victim, 0, 0, TO_CHAR,POS_RESTING);
+        act( "$c4 защищают $s демоны.", victim, 0, 0, TO_ROOM);
+        act( "Тебя защищают твои демоны.", victim, 0, 0, TO_CHAR);
         return;
     }
 
     if ( IS_NEUTRAL(victim) )
     {
-        act_p( "$C1 не чувствует этого.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        act( "$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -480,14 +480,14 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     }
 
     if (number_percent( ) > ch->getSkill( sn )) {
-        act_p("$c1 втыкает в могилу крест, но он падает на бок.", ch, 0, 0, TO_ROOM, POS_RESTING);
-        act_p("Ты втыкаешь в могилу крест, но он падает на бок.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act("$c1 втыкает в могилу крест, но он падает на бок.", ch, 0, 0, TO_ROOM);
+        act("Ты втыкаешь в могилу крест, но он падает на бок.", ch, 0, 0, TO_CHAR);
         return;
     }
     
-    act_p("$c1 втыкает в могилу священный крест!", ch, 0, 0, TO_ROOM, POS_RESTING);
-    act_p("Ты втыкаешь в могилу священный крест!", ch, 0, 0, TO_CHAR, POS_RESTING);
-    act_p("Из-под земли раздается раздирающий душу вопль!", ch, 0, 0, TO_ALL, POS_RESTING);
+    act("$c1 втыкает в могилу священный крест!", ch, 0, 0, TO_ROOM);
+    act("Ты втыкаешь в могилу священный крест!", ch, 0, 0, TO_CHAR);
+    act("Из-под земли раздается раздирающий душу вопль!", ch, 0, 0, TO_ALL);
     
     undig( victim );
     dam = dice(level, 20);

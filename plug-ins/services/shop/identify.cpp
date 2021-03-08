@@ -55,7 +55,7 @@ CMDRUN( identify )
 
 
     if (ch->is_immortal( )) {
-        act_p( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
+        act( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT);
     }
     else if (!can_afford(ch, cost, 0, 1)) {
         tell_fmt("У тебя даже %3$d золот%3$Iого|ых|ых нету, чтобы мне заплатить!", ch, rch, cost );
@@ -66,7 +66,7 @@ CMDRUN( identify )
        if ( cost > 0 ) ch->send_to("Твой кошелек становится значительно легче.\n\r");
     }
 
-    act_p( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM,POS_RESTING );
+    act( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM);
     
     if (gsn_identify->getSpell( ))
         gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );

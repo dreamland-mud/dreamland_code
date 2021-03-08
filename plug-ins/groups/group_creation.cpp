@@ -221,7 +221,7 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     floating = get_eq_char(ch,wear_float);
     if (floating != 0 && IS_OBJ_STAT(floating,ITEM_NOREMOVE))
     {
-        act_p("Ты не можешь снять $o4.",ch,floating,0,TO_CHAR,POS_RESTING);
+        act("Ты не можешь снять $o4.",ch,floating,0,TO_CHAR);
         return;
     }
 

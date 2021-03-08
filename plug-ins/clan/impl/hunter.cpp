@@ -590,7 +590,7 @@ SKILL_RUNP( hunt )
     }
 
     if( ch->in_room == victim->in_room ) {
-        act_p( "$C1 прямо здесь!", ch, 0, victim, TO_CHAR,POS_RESTING );
+        act( "$C1 прямо здесь!", ch, 0, victim, TO_CHAR);
         return;
     }
 

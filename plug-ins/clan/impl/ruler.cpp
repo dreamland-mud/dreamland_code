@@ -285,7 +285,7 @@ bool ClanGuardRulerJailer::specFight( )
             {
                     sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
                             victim->getNameP( ));
-                    act_p( buf, ch, 0, 0, TO_ROOM,POS_RESTING );
+                    act( buf, ch, 0, 0, TO_ROOM);
             }
             return true;
     }
@@ -498,7 +498,7 @@ SKILL_RUNP( manacles )
                         act_p("Руки $C4 закованы в кандалы!",
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
 
-                        act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
+                        act (buf, ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
@@ -684,12 +684,12 @@ SKILL_RUNP( wanted )
 
                         if ( IS_SET(victim->act ,PLR_WANTED) )
                         {
-                                act_p( "$C1 уже разыскивается.", ch, 0, victim, TO_CHAR,POS_RESTING);
+                                act( "$C1 уже разыскивается.", ch, 0, victim, TO_CHAR);
                         }
                         else
                         {
                                 SET_BIT(victim->act, PLR_WANTED);
-                                act_p( "$c1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT,POS_RESTING);
+                                act( "$c1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT);
                                 victim->send_to("Ты теперь в РОЗЫСКЕ!!!\n\r");
                                 if ( !victim->is_npc() )
                                         victim->getPC( )->loyalty = max ( victim->getPC( )->loyalty - 50, -1000);
@@ -701,11 +701,11 @@ SKILL_RUNP( wanted )
                 case 'Н':
                 case 'н':
                         if ( !IS_SET(victim->act,PLR_WANTED) )
-                                act_p( "$C1 не разыскивается.", ch, 0, victim, TO_CHAR,POS_RESTING);
+                                act( "$C1 не разыскивается.", ch, 0, victim, TO_CHAR);
                         else
                         {
                                 REMOVE_BIT(victim->act, PLR_WANTED);
-                                act_p( "$c1 больше не разыскивается.",victim, 0, ch, TO_NOTVICT,POS_RESTING);
+                                act( "$c1 больше не разыскивается.",victim, 0, ch, TO_NOTVICT);
                                 victim->send_to("Тебя больше не разыскивают.\n\r");
                                 ch->send_to("Ok.\n\r");
                         }
@@ -984,13 +984,13 @@ SKILL_RUNP( confiscate )
                         obj_from_char( obj );
                         obj->wear_loc = wear_none ;
 
-                        act_p( "Ты конфискуешь $o4 у $C4.", ch, obj, victim, TO_CHAR,POS_RESTING);
-                        act_p( "$c1 конфискует у тебя $o4.", ch, obj, victim, TO_VICT,POS_RESTING);
-                        act_p( "$c1 конфискует $o4 у $C4.", ch, obj, victim, TO_NOTVICT,POS_RESTING);
+                        act( "Ты конфискуешь $o4 у $C4.", ch, obj, victim, TO_CHAR);
+                        act( "$c1 конфискует у тебя $o4.", ch, obj, victim, TO_VICT);
+                        act( "$c1 конфискует $o4 у $C4.", ch, obj, victim, TO_NOTVICT);
 
                         obj_to_room( obj, ch->in_room );
-                        act_p( "Ты аккуратно кладешь $o4 на пол.", ch, obj, 0, TO_CHAR,POS_RESTING);
-                        act_p( "$c1 аккуратно кладет $o4 на пол.", ch, obj, 0, TO_ROOM,POS_RESTING);
+                        act( "Ты аккуратно кладешь $o4 на пол.", ch, obj, 0, TO_CHAR);
+                        act( "$c1 аккуратно кладет $o4 на пол.", ch, obj, 0, TO_ROOM);
 
                 }
         }  
@@ -1082,7 +1082,7 @@ SKILL_RUNP( suspect )
                 else
                         sprintf (buf,"$C1 не выдавалась повестка в Суд.");
 
-                act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
+                act (buf, ch, 0, victim, TO_CHAR);
 
                 return;
         }
@@ -1236,9 +1236,9 @@ SKILL_RUNP( jail )
                         }
 
                         if ( victim->isAffected(gsn_manacles) )
-                                act_p("Руки $C4 закованы в кандалы!",ch,0,victim,TO_CHAR,POS_RESTING);
+                                act("Руки $C4 закованы в кандалы!",ch,0,victim,TO_CHAR);
 
-                        act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
+                        act (buf, ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
@@ -1412,7 +1412,7 @@ SKILL_RUNP( dismiss )
                                 sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя НАВСЕГДА.");
                         }
 
-                        act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
+                        act (buf, ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
@@ -1573,7 +1573,7 @@ bool RulerSpecialGuard::specFight( )
     {
         sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
                  victim->getNameP( ));
-        act_p( buf, ch, 0, 0, TO_ROOM,POS_RESTING );
+        act( buf, ch, 0, 0, TO_ROOM);
     }
 
     return true;
@@ -1667,8 +1667,8 @@ VOID_SPELL(RemoveBadge)::run( Character *ch, Character *victim, int sn, int leve
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          act_p("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR,POS_RESTING);
-          act_p("У $c2 исчезает $o1.", ch, badge, 0, TO_ROOM,POS_RESTING);
+          act("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR);
+          act("У $c2 исчезает $o1.", ch, badge, 0, TO_ROOM);
         
           obj_from_char(badge);
           extract_obj(badge);
@@ -1725,7 +1725,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          act_p("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR,POS_RESTING);
+          act("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR);
           obj_from_char(badge);
           extract_obj(badge);
           continue;
@@ -1756,8 +1756,8 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
 
   badge->timer = 200;
-  act_p("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR,POS_RESTING);
-  act_p("$c1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM,POS_RESTING);
+  act("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR);
+  act("$c1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM);
 
   obj_to_char(badge,ch);
   wear_obj( ch, badge, 0 );
@@ -1854,7 +1854,7 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
         }
 
   ch->send_to("Ты пытаешься призвать себе в помощь охотника за головами.\n\r");
-  act_p("$c1 пытается призвать себе на помощь охотника за головами.",ch,0,0,TO_ROOM,POS_RESTING);
+  act("$c1 пытается призвать себе на помощь охотника за головами.",ch,0,0,TO_ROOM);
 
   stalker = create_mobile( get_mob_index(MOB_VNUM_STALKER) );
 
@@ -1917,8 +1917,8 @@ VOID_AFFECT(Jail)::remove( Character *victim )
     if (victim->isAffected(gsn_manacles ))
         affect_strip( victim, gsn_manacles );
 
-    act_p("$c1 искупи$gло|л|ла свою провинность и освобождается из-под стражи.", victim, 0, 0, TO_ROOM, POS_RESTING);
-    act_p("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR, POS_RESTING);
+    act("$c1 искупи$gло|л|ла свою провинность и освобождается из-под стражи.", victim, 0, 0, TO_ROOM);
+    act("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR);
 
     if (victim->in_room
         && victim->in_room->vnum >= 4343

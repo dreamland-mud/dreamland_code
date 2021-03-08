@@ -151,7 +151,7 @@ bool spec_troll_member( NPCharacter *ch)
     }
 
     if (message != 0)
-            act_p(message,ch,0,victim,TO_ALL,POS_RESTING);
+            act(message,ch,0,victim,TO_ALL);
     multi_hit( ch, victim );
     return true;
 }
@@ -210,7 +210,7 @@ bool spec_ogre_member( NPCharacter *ch)
     }
 
     if (message != 0)
-            act_p(message,ch,0,victim,TO_ALL,POS_RESTING);
+            act(message,ch,0,victim,TO_ALL);
     multi_hit( ch, victim );
     return true;
 }
@@ -249,7 +249,7 @@ bool spec_patrolman(NPCharacter *ch)
     ||  ((obj = get_eq_char(ch,wear_neck_2)) != 0
     &&   obj->pIndexData->vnum == OBJ_VNUM_WHISTLE))
     {
-        act_p("Ты со всей силы свистишь в $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+        act("Ты со всей силы свистишь в $o4.",ch,obj,0,TO_CHAR);
         act_p("$c1 свистит в $o1, ***WHEEEEEEEEEEEET***",
                ch,obj,0,TO_ROOM,POS_RESTING);
 
@@ -287,7 +287,7 @@ bool spec_patrolman(NPCharacter *ch)
     }
 
     if (message != 0)
-        act_p(message,ch,0,0,TO_ALL,POS_RESTING);
+        act(message,ch,0,0,TO_ALL);
 
     multi_hit(ch,victim);
 
@@ -724,9 +724,9 @@ bool spec_poison( NPCharacter *ch )
     ||   number_percent( ) > 2 * ch->getModifyLevel() )
         return false;
 
-    act_p( "Ты кусаешь $C4!",  ch, 0, victim, TO_CHAR,POS_RESTING    );
-    act_p( "$c1 кусает $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING );
-    act_p( "$c1 кусает тебя!", ch, 0, victim, TO_VICT,POS_RESTING    );
+    act( "Ты кусаешь $C4!",  ch, 0, victim, TO_CHAR);
+    act( "$c1 кусает $C4!",  ch, 0, victim, TO_NOTVICT);
+    act( "$c1 кусает тебя!", ch, 0, victim, TO_VICT);
 
     spell( gsn_poison, ch->getModifyLevel( ), ch, victim, FSPELL_NOTRIGGER ); 
     return true;
@@ -1038,7 +1038,7 @@ bool spec_captain( NPCharacter *ch )
 
     case 'S':
         ch->position = POS_SLEEPING;
-        act_p( "$c1 ложится и засыпает.", ch, 0, 0, TO_ROOM, POS_RESTING );
+        act( "$c1 ложится и засыпает.", ch, 0, 0, TO_ROOM);
         break;
 
     case 'a':

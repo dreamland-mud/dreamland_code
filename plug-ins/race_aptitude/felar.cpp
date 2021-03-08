@@ -84,7 +84,7 @@ SKILL_RUNP( tail )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        act_p("Но $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act("Но $C1 твой друг!",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -122,9 +122,9 @@ SKILL_RUNP( tail )
     /* now the attack */
     if (number_percent() < chance / 2)
     {
-        act_p("$c1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT,POS_RESTING);
-        act_p("Ты наносишь $C3 удар хвостом!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act("$c1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT);
+        act("Ты наносишь $C3 удар хвостом!",ch,0,victim,TO_CHAR);
+        act("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT);
         gsn_tail->improve( ch, true, victim );
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );
@@ -140,9 +140,9 @@ SKILL_RUNP( tail )
     {
         damage(ch,victim,0,gsn_tail,DAM_BASH, true, DAMF_WEAPON);
         
-        act_p("Ты теряешь равновесие и падаешь!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 теряет равновесие и падает!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-        act_p("Ты уклоняешься от хвоста $c2, и $e падает.",ch,0,victim,TO_VICT,POS_RESTING);
+        act("Ты теряешь равновесие и падаешь!",ch,0,victim,TO_CHAR);
+        act("$c1 теряет равновесие и падает!",ch,0,victim,TO_NOTVICT);
+        act("Ты уклоняешься от хвоста $c2, и $e падает.",ch,0,victim,TO_VICT);
         
         gsn_tail->improve( ch, false, victim );
         ch->position = POS_RESTING;

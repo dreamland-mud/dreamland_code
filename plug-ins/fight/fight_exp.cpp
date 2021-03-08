@@ -85,7 +85,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->getRealLevel();
             ch->setLevel( ch->getRealLevel() + 1 );
             ch->send_to("Ты получаешь уровень!\n\r");
-            act_p("$c1 выглядит более опытн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 выглядит более опытн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "уровень", oldParam, ch->getRealLevel(), victim->getRealLevel());
 
             // Restore act bits that are removed for low-level adaptive pets.
@@ -103,7 +103,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->hitroll;
             ch->hitroll++;
             ch->send_to("Теперь ты будешь попадать более метко!\n\r");
-            act_p("$c1 становится более метк$gим|им|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 становится более метк$gим|им|ой!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "точность", oldParam, ch->hitroll, victim->hitroll);
         }
     }
@@ -113,7 +113,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->damroll;
             ch->damroll++;
             ch->send_to("Теперь ты будешь больнее бить!\n\r");
-            act_p("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "урон", oldParam, ch->damroll, victim->damroll);
         }
     }
@@ -129,7 +129,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->max_hit;
             ch->max_hit = min(ch->max_hit + gain, max_hp);
             ch->send_to("Ты здоровеешь!\n\r");
-            act_p("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            act("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "здоровье", oldParam, ch->max_hit, victim->max_hit);
         }
     }
@@ -145,7 +145,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->max_mana;            
             ch->max_mana = min(ch->max_mana + gain, max_mana);
             ch->send_to("Ты чувствуешь прилив энергии!\n\r");
-            act_p("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "ману", oldParam, ch->max_mana, victim->max_mana);
         }
     }
@@ -160,7 +160,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
                 int oldParam = ch->damage[DICE_NUMBER];
                 ch->damage[DICE_NUMBER]++;
                 ch->send_to("Теперь ты будешь наносить больше повреждений!\n\r");
-                act_p("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
                 wiznet(ch, victim, "dice_number", oldParam, ch->damage[DICE_NUMBER], vch->damage[DICE_NUMBER]);
             }
         }
@@ -170,7 +170,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
                 int oldParam = ch->damage[DICE_TYPE];
                 ch->damage[DICE_TYPE]++;
                 ch->send_to("Теперь ты будешь наносить больше повреждений!\n\r");
-                act_p("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+                act("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
                 wiznet(ch, victim, "dice_type", oldParam, ch->damage[DICE_TYPE], vch->damage[DICE_TYPE]);
             }
         }
@@ -206,7 +206,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->armor[dam_type];
             ch->armor[dam_type] += gain;
             ch->send_to("Твоя защита улучшается!\n\r");
-            act_p("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            act("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "броню", oldParam, ch->armor[dam_type], victim->armor[dam_type]);
         }
     }
@@ -221,7 +221,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->perm_stat[i];
             ch->perm_stat[i] += 1;
             ch->send_to("Твои параметры улучшаются!\n\r");
-            act_p("$c1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, stat_table.fields[i].name, oldParam, ch->perm_stat[i], victim->perm_stat[i]);
         }
     }

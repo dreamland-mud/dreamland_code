@@ -537,7 +537,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
             Affect af;
 
             victim->send_to("Ты чувствуешь, как яд растекается по твоим венам.\n\r");
-            act_p("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM,POS_RESTING);
+            act("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM);
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -899,8 +899,8 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 if (!saves_spell(effect_level, victim, DAM_SOUND, 0, dam_flag))
                 {
                         Affect af;
-                        act_p("$c1 теперь ничего не слышит!",victim,0,0,TO_ROOM,POS_RESTING);
-                        act_p("Ты ничего не слышишь!",victim,0,0,TO_CHAR,POS_RESTING);
+                        act("$c1 теперь ничего не слышит!",victim,0,0,TO_ROOM);
+                        act("Ты ничего не слышишь!",victim,0,0,TO_CHAR);
         
                         af.bitvector.setTable(&affect_flags);
                         af.type         = gsn_scream;

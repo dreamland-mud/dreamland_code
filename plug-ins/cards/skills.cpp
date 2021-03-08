@@ -98,7 +98,7 @@ SKILL_RUNP( sconce )
     }
 
     if (IS_AFFECTED(victim,AFF_SLEEP)) {
-        act_p("$E уже спит.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act("$E уже спит.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -170,8 +170,8 @@ public:
                 || ( IS_AWAKE( victim ) && number_percent() <= 10 ) )
             && !victim->is_immortal())
         {
-            act_p("Твоя {Rшутка{x над $C5 удалась!",ch,0,victim,TO_CHAR,POS_RESTING);
-            act_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+            act("Твоя {Rшутка{x над $C5 удалась!",ch,0,victim,TO_CHAR);
+            act("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT);
             act_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
             gsn_joker->improve( ch, true, victim );
@@ -255,7 +255,7 @@ SKILL_RUNP( joker )
         }
         else
         {
-            act_p("Твоя шутка не удалась..",ch,0,victim,TO_CHAR,POS_RESTING);
+            act("Твоя шутка не удалась..",ch,0,victim,TO_CHAR);
             gsn_joker->improve( ch, false, victim );
             joke.miss( );
         }

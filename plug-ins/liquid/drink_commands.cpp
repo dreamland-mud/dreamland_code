@@ -389,7 +389,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     }
 
     if (out->value1() == 0) {
-        act_p("В $o6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR,POS_RESTING);
+        act("В $o6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR);
         return;
     }
 
