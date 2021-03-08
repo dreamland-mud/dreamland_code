@@ -108,6 +108,19 @@ NMI_GET( AreaWrapper, max_vnum, "верхняя граница диапазон�
 {
     return Scripting::Register((int)(getTarget()->max_vnum));
 }
+
+NMI_GET( AreaWrapper, players, "список игроков из default экземпляра зоны" ) 
+{
+    RegList::Pointer rc(NEW);
+
+    for(auto &r: getTarget()->area->rooms)
+        for (auto &rch: r.second->getPeople())
+            if (!rch->is_npc())
+                rc->push_back(::wrap(rch));
+    
+    return ::wrap(rc);
+}
+
 /*----------------------------------------------------------------------
  * Hometown
  *----------------------------------------------------------------------*/
