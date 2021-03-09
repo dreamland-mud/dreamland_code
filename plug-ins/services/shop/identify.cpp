@@ -66,7 +66,7 @@ CMDRUN( identify )
        if ( cost > 0 ) ch->pecho("Твой кошелек становится значительно легче.");
     }
 
-    oldact("$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM);
+    act("%1$^C1 изучающе смотрит на %3$C4.", rch, obj, 0, TO_ROOM);
     
     if (gsn_identify->getSpell( ))
         gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );

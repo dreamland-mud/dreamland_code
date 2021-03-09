@@ -60,7 +60,7 @@ void QuestMaster::speech( Character *victim, const char *msg )
 {
     if (my_message(msg)) {
         tell_hint(ch, victim);
-        oldact("$c1 что-то говорит $C3.", ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 что-то говорит %2$C3.", ch, 0, victim, TO_NOTVICT);
     }
 }
 

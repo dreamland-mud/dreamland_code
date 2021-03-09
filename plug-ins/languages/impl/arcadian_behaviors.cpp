@@ -146,7 +146,7 @@ bool BeerElementalBehavior::specFight( )
                dam / 10 + dice( level, 12 ) );
     
     act("%^C1 дышит на тебя перегаром!", ch, 0, victim, TO_VICT);
-    oldact("$c1 дышит перегаром на $C4!", ch, 0, victim, TO_NOTVICT);
+    act("%1$^C1 дышит перегаром на %2$C4!", ch, 0, victim, TO_NOTVICT);
     
     try {
         damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true);

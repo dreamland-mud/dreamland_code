@@ -246,7 +246,7 @@ bool BasicMobileBehavior::doQuaff( )
     }
 
     if (obj) {
-        oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM );
+        act("%1$^C1 осушает %3$C4.", ch, obj, 0, TO_ROOM );
         act("Ты осушаешь %3$O4.", ch, obj, 0 ,TO_CHAR );
         
         spell_by_item( ch, obj );
@@ -354,7 +354,7 @@ bool BasicMobileBehavior::doScavenge( )
     if ((can_wield_obj( ch, target ) && !get_eq_char( ch, wear_wield ))
         || (can_shield_obj( ch, target ) && !get_eq_char( ch, wear_shield )))
     {
-        oldact("$c1 оценивающе рассматривает $o4.", ch, target, 0, TO_ROOM);
+        act("%1$^C1 оценивающе рассматривает %3$C4.", ch, target, 0, TO_ROOM);
         wear_obj( ch, target, F_WEAR_VERBOSE );
     }
 

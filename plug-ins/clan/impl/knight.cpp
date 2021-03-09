@@ -115,7 +115,7 @@ void ClanGuardKnight::actGhost(PCharacter *)
 void ClanGuardKnight::actGiveInvitation(PCharacter *wch, Object *obj)
 {
     act("%^C1 внимательно сверяется со списком.", ch, 0, 0, TO_ROOM);
-    oldact("$c1 ставит Королевскую печать на $o6.", ch, obj, 0, TO_ROOM);
+    act("%1$^C1 ставит Королевскую печать на %3$C6.", ch, obj, 0, TO_ROOM);
 }
 
 int ClanGuardKnight::getCast(Character *victim)
@@ -255,7 +255,7 @@ SKILL_RUNP(guard)
 
     act("Теперь ты охраняешь %2$C4.", pch, 0, victim, TO_CHAR);
     act("Теперь тебя охраняет %C4.", pch, 0, victim, TO_VICT);
-    oldact("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT);
+    act("%1$^C1 теперь охраняет %2$C4.", pch, 0, victim, TO_NOTVICT);
 
     pch->guarding = victim;
     victim->guarded_by = pch;
@@ -277,7 +277,7 @@ BOOL_SKILL(guard)::run(Character *wch, Character *mob)
 
     if (number_percent() < min(100, chance))
     {
-        oldact("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
+        act("%1$^C1 прыгает перед %2$C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
         act("%^C1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
         act("Ты прыгаешь перед %2$C5!", ch->guarded_by, 0, ch, TO_CHAR);
         gsn_guard->improve(ch->guarded_by, true, mob);
@@ -318,7 +318,7 @@ VOID_SPELL(Dragonplate)::run(Character *ch, char *target_name, int sn, int level
     obj_to_char(plate, ch);
 
     act("Ты взмахиваешь руками и создаешь %3$O4!", ch, plate, 0, TO_CHAR);
-    oldact("$c1 взмахивает руками и создает $o4!", ch, plate, 0, TO_ROOM);
+    act("%1$^C1 взмахивает руками и создает %3$C4!", ch, plate, 0, TO_ROOM);
 }
 
 /*
@@ -412,7 +412,7 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
     obj_to_char(sword, ch);
 
     act("Ты взмахиваешь руками и создаешь %3$O4!", ch, sword, 0, TO_CHAR);
-    oldact("$c1 взмахивает руками и создает $o4!", ch, sword, 0, TO_ROOM);
+    act("%1$^C1 взмахивает руками и создает %3$C4!", ch, sword, 0, TO_ROOM);
 }
 
 SPELL_DECL(GoldenAura);

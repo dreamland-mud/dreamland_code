@@ -83,7 +83,7 @@ SKILL_RUNP( enchant )
     if (wear_level > ch->getRealLevel( ))
     {
         ch->pecho("Ты долж%Gно|ен|на достичь %d уровня, чтобы улучшить это.", ch, wear_level );
-        oldact("$c1 пытается улучшить $o1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 пытается улучшить %3$C1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
         return;
     }
     
@@ -479,7 +479,7 @@ SKILL_RUNP( katana )
                 gsn_katana->improve( ch, true );
         
                 act("Ты делаешь катану из %3$O2!",ch,part,0,TO_CHAR);
-                oldact("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
+                act("%1$^C1 делает катану из %3$C2!",ch,part,0,TO_ROOM);
         
                 extract_obj(part);
                 return;
@@ -561,7 +561,7 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
 
     victim->getPC( )->death -= 1;
 
-    oldact("$C1 забирает смерть у $c5.", victim, 0, ch, TO_ROOM );
+    act("%2$^C1 забирает смерть у %1$C5.", victim, 0, ch, TO_ROOM );
     act("%2$^C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
     oldact_p("{BМолнии сверкают на небе.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
 }
@@ -569,7 +569,7 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
 void SamuraiGuildmaster::giveBack( Character *victim, Object *obj )
 {
     oldact("$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    oldact("$c1 возвращает тебе $o4.", ch, obj, victim, TO_VICT );
+    act("%1$^C1 возвращает тебе %3$C4.", ch, obj, victim, TO_VICT );
 
     obj_from_char( obj );
     obj_to_char( obj, victim );

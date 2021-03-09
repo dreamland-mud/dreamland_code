@@ -46,7 +46,7 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
 { 
     int dam;
 
-    oldact("Множество острых клинков возникает вокруг $c2, поражая $C4.", ch,0,victim,TO_NOTVICT);
+    act("Множество острых клинков возникает вокруг %1$C2, поражая %2$C4.", ch,0,victim,TO_NOTVICT);
     act("Вокруг тебя возникает множество острых клинков, поражая %2$C4.", ch,0,victim,TO_CHAR);
     act("Множество острых клинков возникает вокруг %C2, поражая тебя!", ch,0,victim,TO_VICT);
     dam = dice(level,6);

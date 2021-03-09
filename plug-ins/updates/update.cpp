@@ -1497,7 +1497,7 @@ void wield_update( Character *ch )
             && !check_native_weapon( ch, second ))
     {
         act("Ты не в силах удержать %3$O4 в левой руке.", ch, second, 0, TO_CHAR);
-        oldact("$c1 не в силах удержать $o4.", ch, second, 0, TO_ROOM);
+        act("%1$^C1 не в силах удержать %3$C4.", ch, second, 0, TO_ROOM);
         unequip_char( ch, second );
     }
     
@@ -1509,7 +1509,7 @@ void wield_update( Character *ch )
             && !check_native_weapon( ch, wield ))
     {
         act("Ты не в силах удержать %3$O4 в правой руке.", ch, wield, 0, TO_CHAR);
-        oldact("$c1 не в силах удержать $o4.", ch, wield, 0, TO_ROOM);
+        act("%1$^C1 не в силах удержать %3$C4.", ch, wield, 0, TO_ROOM);
         unequip_char( ch, wield );
     }
     

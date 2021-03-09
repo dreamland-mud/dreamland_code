@@ -218,7 +218,7 @@ bool BasicMobileBehavior::assistGroupDistance( Character *fch, Character *victim
         return false;
 
     if (!memoryFought.memorized( victim )) {
-        oldact("$c1 пристально смотрит на $C4.", ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 пристально смотрит на %2$C4.", ch, 0, victim, TO_NOTVICT);
         act("%^C1 пристально смотрит на тебя.", ch, 0, victim, TO_VICT);
         memoryFought.remember( victim );
     }

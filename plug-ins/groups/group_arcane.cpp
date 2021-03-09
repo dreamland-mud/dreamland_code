@@ -72,7 +72,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    oldact("$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM);
+    act("%1$^C1 зачитывает заклинание с %3$C2.", ch, scroll, 0, TO_ROOM);
     act("Ты зачитываешь одно из заклинаний с %3$O2.", ch, scroll, 0, TO_CHAR);
 
     successfulTargets++;
@@ -329,12 +329,12 @@ SKILL_RUNP( zap )
 
         if (victim && victim->in_room == ch->in_room) {
             if (ch != victim) {
-                oldact("$c1 взмахивает $o5 на тебя!", ch, wand, victim, TO_VICT );
+                act("%1$^C1 взмахивает %3$C5 на тебя!", ch, wand, victim, TO_VICT );
                 oldact("$c1 взмахивает $o5 на $C4.", ch, wand, victim, TO_NOTVICT );
                 oldact("Ты взмахиваешь $o5 на $C4.", ch, wand, victim, TO_CHAR );
             }
             else {
-                oldact("$c1 взмахивает $o5 на себя.", ch, wand, 0, TO_ROOM );
+                act("%1$^C1 взмахивает %3$C5 на себя.", ch, wand, 0, TO_ROOM );
                 act("Ты взмахиваешь %3$O5 на себя.", ch, wand, 0, TO_CHAR );
             }
         }
@@ -343,7 +343,7 @@ SKILL_RUNP( zap )
             oldact("Ты взмахиваешь $o5 на $O4.", ch, wand, target->obj, TO_CHAR );
         }
         else {
-            oldact("$c1 взмахивает $o5.", ch, wand, 0, TO_ROOM );
+            act("%1$^C1 взмахивает %3$C5.", ch, wand, 0, TO_ROOM );
             act("Ты взмахиваешь %3$O5.", ch, wand, 0, TO_CHAR );
         }
 

@@ -92,14 +92,14 @@ SKILL_RUNP( tame )
             SET_BIT(victim->affected_by,AFF_CALM);
             victim->pecho("Ты успокаиваешься.");
             act("Ты укрощаешь %2$C4.",ch,0,victim,TO_CHAR);
-            oldact("$c1 укрощает $C4.",ch,0,victim,TO_NOTVICT);
+            act("%1$^C1 укрощает %2$C4.",ch,0,victim,TO_NOTVICT);
             stop_fighting(victim,true);
             gsn_tame->improve( ch, true, victim );
         }
         else
         {
             ch->pecho("Попытка укрощения не удалась.");
-            oldact("$c1 пытается укротить $C4, но безуспешно.",
+            act("%1$^C1 пытается укротить %2$C4, но безуспешно.",
                     ch,0,victim,TO_NOTVICT);
             act("%^C1 пытается укротить тебя, но безуспешно.",
                     ch,0,victim,TO_VICT);

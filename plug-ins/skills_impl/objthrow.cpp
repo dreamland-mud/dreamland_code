@@ -95,18 +95,18 @@ bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
     if (canCatchRock) {
         act("Ты ловишь руками %3$O4.",ch,obj,victim,TO_VICT);
         oldact("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR);
-        oldact("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT);
+        act("%1$^C1 ловит руками %3$C4.",victim,obj,ch,TO_NOTVICT);
         obj_to_char(obj,victim);
     }
     else if (canCatchMissile) {
         act("Ты ловишь руками %3$O4.",ch,obj,victim,TO_VICT);
         oldact("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR);
-        oldact("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT);
+        act("%1$^C1 ловит руками %3$C4.",victim,obj,ch,TO_NOTVICT);
         obj_to_char(obj,victim);
     } else {
         act("Ты уклоняешься от %3$O2.",ch,obj,victim,TO_VICT);
         oldact("$C1 уклоняется от $o2.",ch,obj,victim,TO_CHAR);
-        oldact("$c1 уклоняется от $o2.",victim,obj,ch,TO_NOTVICT);
+        act("%1$^C1 уклоняется от %3$C2.",victim,obj,ch,TO_NOTVICT);
         obj_to_room(obj,victim->in_room);
         gsn_dodge->improve( victim, true, ch );
     }

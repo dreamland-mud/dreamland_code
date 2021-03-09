@@ -182,7 +182,7 @@ void WeaponOneHit::damApplyCounter( )
         gsn_counter->improve( victim, true, ch );
         oldact("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR);
         oldact("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT);
-        oldact("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT);
+        act("%2$^C1 возвращает удар %1$C2 обратно!",ch,0,victim,TO_NOTVICT);
 
         // set fighting state
         if (ch->fighting == NULL)

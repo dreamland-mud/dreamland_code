@@ -127,7 +127,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
         }
 
         act("Ты обезоруживаешь %2$C4!", ch,0, victim, TO_CHAR);
-        oldact("$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT);
+        act("%1$^C1 обезоруживает %2$C4!",ch, 0, victim,TO_NOTVICT);
 
         obj_from_char( obj );
 
@@ -571,7 +571,7 @@ SKILL_RUNP( lash )
             {
                 act("%^C1 подсекает тебя своим хлыстом!!", ch, 0, victim, TO_VICT);
                 act("Ты подсекаешь %2$C4 своим хлыстом!", ch, 0, victim, TO_CHAR);
-                oldact("$c1 подсекает $C4 своим хлыстом.", ch, 0, victim, TO_NOTVICT);
+                act("%1$^C1 подсекает %2$C4 своим хлыстом.", ch, 0, victim, TO_NOTVICT);
                 
                 victim->setWaitViolence( number_range( 0, 2 ) );
                 victim->position = POS_RESTING;
@@ -582,7 +582,7 @@ SKILL_RUNP( lash )
     else {
         damage(ch,victim,2,gsn_lash,DAM_BASH, false, DAMF_WEAPON);
         oldact("Ты лишь оцарапа$gло|л|ла $C4.", ch, 0, victim, TO_CHAR);
-        oldact("$c1 взмахом хлыста поцарапал $C4!", ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 взмахом хлыста поцарапал %2$C4!", ch, 0, victim, TO_NOTVICT);
         act("Ты уклоняешься от хлыста %C2.", ch, 0, victim, TO_VICT);
         gsn_lash->improve( ch, false, victim );
         ch->setWaitViolence( 1 );

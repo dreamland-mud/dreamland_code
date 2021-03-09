@@ -54,7 +54,7 @@ VOID_SPELL(AceInSleeves)::run( Character *ch, char *, int sn, int level )
     obj_to_char( sleeves, ch );
 
     act("Ты создаешь %3$O4!", ch, sleeves, 0, TO_CHAR);
-    oldact("$c1 создает $o4!", ch, sleeves, 0, TO_ROOM);
+    act("%1$^C1 создает %3$C4!", ch, sleeves, 0, TO_ROOM);
 }
 
 /*
@@ -128,7 +128,7 @@ SKILL_RUNP( sconce )
     if (number_percent( ) < chance * k / 100) {
         act("Ты со всей силы бьешь %2$C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
         act("%^C1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
-        oldact("$c1 лупит $C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 лупит %2$C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
         gsn_sconce->improve( ch, true, victim );
 
         af.type = gsn_sconce;

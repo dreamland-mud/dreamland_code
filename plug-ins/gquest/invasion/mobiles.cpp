@@ -88,7 +88,7 @@ void InvasionHelper::tell( Character *victim, const char *speech )
 
     pch = victim->getPC( );
     
-    oldact("$C1 что-то говорит $c3.", ch, 0, victim, TO_NOTVICT);
+    act("%2$^C1 что-то говорит %1$C3.", ch, 0, victim, TO_NOTVICT);
 
     if (!help.match( speech )) {
         actWrongSpeech( pch );
@@ -119,7 +119,7 @@ void InvasionHelper::actTooMuch( PCharacter *pch, Object *obj )
 
 void InvasionHelper::actGiveInstrument( PCharacter *pch, Object *obj )
 {
-    oldact("$c1 вручает тебе $o4.", ch, obj, pch, TO_VICT);
+    act("%1$^C1 вручает тебе %3$C4.", ch, obj, pch, TO_VICT);
     oldact("$c1 вручает $C3 $o4.", ch, obj, pch, TO_NOTVICT);
 }
 

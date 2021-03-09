@@ -359,7 +359,7 @@ SKILL_RUNP( herbs )
         {
           act("%^C1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT);
           act("Ты накладываешь целебные травы на раны %2$C2.",ch,0,victim,TO_CHAR);
-          oldact("$c1 накладывает целебные травы на раны $C2.",ch,0,victim,TO_NOTVICT);
+          act("%1$^C1 накладывает целебные травы на раны %2$C2.",ch,0,victim,TO_NOTVICT);
         }
         
       if (victim->hit < victim->max_hit)

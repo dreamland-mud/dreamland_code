@@ -529,7 +529,7 @@ void sucking( Character *ch, Character *victim )
                      
     oldact_p("Сквозь кошмарный сон ты чувствуешь, как $c1 высасывает твою {rкровь{x.", ch, 0, victim, TO_VICT, POS_DEAD);
     act("Ты высасываешь {rкровь{x из шеи %2$C2.", ch, 0, victim, TO_CHAR);
-    oldact("$c1 высасывает {rкровь{x из шеи $C2.", ch, 0, victim, TO_NOTVICT);
+    act("%1$^C1 высасывает {rкровь{x из шеи %2$C2.", ch, 0, victim, TO_NOTVICT);
     
     if (!ch->is_npc( )) {
 	Object *tattoo = get_eq_char(ch, wear_tattoo);
@@ -1172,7 +1172,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         
         if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
             act("%^C1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT);
-            oldact("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, victim, TO_NOTVICT);
+            act("%1$^C1 костяным ножом промахивается мимо тени %2$C2!", ch, 0, victim, TO_NOTVICT);
             act("Ты костяным ножом промахиваешься мимо тени %2$C2!", ch, 0, victim, TO_CHAR);
             
             gsn_bonedagger->improve( ch, false, victim );
@@ -1183,7 +1183,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         gsn_bonedagger->improve( ch, true, victim );
         
         act("%^C1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT);
-        oldact("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 приковывает тень %2$C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT);
         act("Ты приковываешь тень %2$C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR);
 
         af.type = gsn_bonedagger;
@@ -1301,7 +1301,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
 	    return false;
 
     if ( (actor->getProfession( ) != prof_vampire) && (number_percent() < 20) ) {
-        oldact("$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
+        act("%1$^C1 одаривает %2$C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
         act("%^C1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
         return false;
     }
@@ -1311,7 +1311,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
 		return false;
 	}
 	else  {
-        	oldact("$c1 с отвращением смотрит на ужимки $C2.", ch, 0, actor, TO_NOTVICT );
+        	act("%1$^C1 с отвращением смотрит на ужимки %2$C2.", ch, 0, actor, TO_NOTVICT );
         	act("%^C1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
         	say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );	    
         	return false;		
@@ -1342,7 +1342,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
     pActor->addQuestPoints(-50);
     data.learned = 100;
 
-    oldact("$C1 делится секретом бессмертия с $c5.", actor, 0, ch, TO_ROOM );
+    act("%2$^C1 делится секретом бессмертия с %1$C5.", actor, 0, ch, TO_ROOM );
     act("%2$^C1 делится с тобой секретом бессмертия.", actor, 0, ch, TO_CHAR );
     oldact_p("{BМолнии сверкают на небе.{x", actor, 0, ch, TO_ALL, POS_SLEEPING );
     return true;

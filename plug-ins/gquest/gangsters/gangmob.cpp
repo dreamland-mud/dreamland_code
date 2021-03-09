@@ -172,7 +172,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
             interpret_raw(ch, "murder", briber->getNameP( ));
             break;
         case 2:
-            oldact("$c1 произносит '{gПлакали твои денежки, $C1!{x'", ch, 0, briber, TO_ROOM);
+            act("%1$^C1 произносит '{gПлакали твои денежки, %2$C1!{x'", ch, 0, briber, TO_ROOM);
             act("%^C1 мерзко ухмыляется.", ch, 0, 0, TO_ROOM);
             break;
         case 3:
@@ -191,7 +191,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
     else {
         act("%^C1 тяжко вздыхает.", ch, 0, 0, TO_ROOM);
         act("%^C1 произносит '{gУговорил, красноречивый.. Я открою тебе тайну!{x'", ch, 0, 0, TO_ROOM);
-        oldact("$c1 что-то говорит на ухо $C3.", ch, 0, briber, TO_NOTVICT);        
+        act("%1$^C1 что-то говорит на ухо %2$C3.", ch, 0, briber, TO_NOTVICT);        
         oldact_p("$c1 говорит тебе '{GВход в логово я видел около $t. Но больше мне ничего не известно.{x'",
                ch, gquest->lairHint( ).c_str( ), briber, TO_VICT, POS_RESTING);
         
@@ -246,7 +246,7 @@ void GangMember::greet( Character *mob )
                     act("%^C1 бормочет '{gОппа.. менты.. менты{x'", ch, 0, 0, TO_ROOM);
                     break;
                 case 2:
-                    oldact("$c1 дрожит от страха перед $C5", ch, 0, mob, TO_ROOM);
+                    act("%1$^C1 дрожит от страха перед %2$C5", ch, 0, mob, TO_ROOM);
                     break;
                 }
             }
@@ -405,8 +405,8 @@ bool GangMember::death( Character *killer )
         }                
     } else {
         switch(number_range(1, 2)) {
-        case 1: oldact("$c1 хрипит '{g$C1, тебе незнакомо понятие чести...{x'", ch, 0, killer, TO_ROOM); break;
-        case 2: oldact("$c1 хрипит '{gЯ не должен был умереть от твоей руки, $C1..{x'", ch, 0, killer, TO_ROOM); break;    
+        case 1: act("%1$^C1 хрипит '{g%2$C1, тебе незнакомо понятие чести...{x'", ch, 0, killer, TO_ROOM); break;
+        case 2: act("%1$^C1 хрипит '{gЯ не должен был умереть от твоей руки, %2$C1..{x'", ch, 0, killer, TO_ROOM); break;    
         }
     }
     

@@ -108,7 +108,7 @@ COMMAND(CEat, "eat")
             return;
     }
 
-    oldact("$c1 ест $o4.",  ch, obj, 0, TO_ROOM);
+    act("%1$^C1 ест %3$C4.",  ch, obj, 0, TO_ROOM);
     act("Ты ешь %3$O4.", ch, obj, 0, TO_CHAR);
     if ( ch->fighting != 0 )
              ch->setWaitViolence( 3 );
@@ -198,11 +198,11 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     
 
     if (mob->master) {
-        oldact("$c1 с аппетитом клацает зубами при виде $C2.", ch, 0, mob, TO_ROOM);
+        act("%1$^C1 с аппетитом клацает зубами при виде %2$C2.", ch, 0, mob, TO_ROOM);
         act("Ты с аппетитом клацаешь зубами при виде %2$C2.", ch, 0, mob, TO_CHAR);
         
         if (mob->master == ch) {
-            oldact("$C1 с ужасом смотрит на $c4.", ch, 0, mob, TO_ROOM);
+            act("%2$^C1 с ужасом смотрит на %1$C4.", ch, 0, mob, TO_ROOM);
             act("%2$^C1 с ужасом смотрит на тебя.", ch, 0, mob, TO_CHAR);
         }
         else if (mob->master->in_room == mob->in_room) {
@@ -220,7 +220,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
             if (!desireManager->find( i )->canEat( ch->getPC( ) ))
                  return;
    
-    oldact("$c1 с громким мяуканьем вцепляется зубами и когтями в $C4!", ch, 0, mob, TO_ROOM);
+    act("%1$^C1 с громким мяуканьем вцепляется зубами и когтями в %2$C4!", ch, 0, mob, TO_ROOM);
     act("Ты с громким мяуканьем вцепляешься зубами и когтями в %2$C4!", ch, 0, mob, TO_CHAR);
 
     diff = max( 1, ch->getRealLevel( ) - mob->getRealLevel( ) );
@@ -233,7 +233,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         
         death_cry( mob, 99 );
         act("Ты ешь %2$C4.", ch, 0, mob, TO_CHAR);
-        oldact("$c1 ест $C4.", ch, 0, mob, TO_ROOM);
+        act("%1$^C1 ест %2$C4.", ch, 0, mob, TO_ROOM);
 
         for (obj = mob->carrying; obj; obj = obj_next) {
             obj_next = obj->next_content;

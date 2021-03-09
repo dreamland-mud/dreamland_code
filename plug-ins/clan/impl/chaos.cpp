@@ -346,7 +346,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
   act("Ты меняешь свой облик, подражая %2$C3.", ch,0,victim,TO_CHAR);
   act("%^C1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
-  oldact("$c1 меняет свой облик, подражая $C3!", ch,0,victim,TO_NOTVICT);
+  act("%1$^C1 меняет свой облик, подражая %2$C3!", ch,0,victim,TO_NOTVICT);
 
   af.type               = sn;
   af.level              = level;

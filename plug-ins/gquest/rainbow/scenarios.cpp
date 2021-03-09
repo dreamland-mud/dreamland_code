@@ -248,7 +248,7 @@ void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const
 
 void RainbowSinsScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) const
 {
-    oldact("$c1 понимающе ухмыляется, узнав в $C6 достойного преемника.", mob, 0, hero, TO_NOTVICT);
+    act("%1$^C1 понимающе ухмыляется, узнав в %2$C6 достойного преемника.", mob, 0, hero, TO_NOTVICT);
     act("%^C1 понимающе ухмыляется, узнав в тебе достойного преемника.", mob, 0, hero, TO_VICT);
 }
 

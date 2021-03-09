@@ -43,7 +43,7 @@ void LockPick::getByHero( PCharacter *ch )
 void LockPick::getByOther( Character *ch ) 
 { 
     act("Ты роняешь %3$O4.", ch, obj, 0, TO_CHAR );
-    oldact("$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
+    act("%1$^C1 роняет %3$C4.", ch, obj, 0, TO_ROOM );
 }
 
 bool LockPick::ourMobile( NPCharacter *mob ) 
@@ -65,6 +65,6 @@ void RobbedItem::getByHero( PCharacter *ch )
 void RobbedItem::getByOther( Character *ch ) 
 {
     ch->pecho( "%1$^O1 выпада%1$nет|ют у тебя из рук.", obj );
-    oldact("$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
+    act("%1$^C1 роняет %3$C4.", ch, obj, 0, TO_ROOM );
 }
 

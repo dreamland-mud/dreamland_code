@@ -2049,7 +2049,7 @@ CMDWIZP( clone )
 
                 recursive_clone(ch,obj,clone);
 
-                oldact("$c1 создает $o4.",ch,clone,0,TO_ROOM);
+                act("%1$^C1 создает %3$C4.",ch,clone,0,TO_ROOM);
                 act("Ты создаешь дубликат %3$O2.",ch,clone,0,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %O4.", ch, obj );
@@ -2089,7 +2089,7 @@ CMDWIZP( clone )
                 }
 
                 char_to_room(clone,ch->in_room);
-                oldact("$c1 создает $C4.",ch,0,clone,TO_ROOM);
+                act("%1$^C1 создает %2$C4.",ch,0,clone,TO_ROOM);
                 act("Ты клонируешь %2$C4.",ch,0,clone,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %C4.", ch, clone );
@@ -2155,7 +2155,7 @@ CMDWIZP( load )
         if (victim->in_room == 0)
             char_to_room( victim, ch->in_room );
 
-        oldact("$c1 создает $C4!", ch, 0, victim, TO_ROOM);
+        act("%1$^C1 создает %2$C4!", ch, 0, victim, TO_ROOM);
         act("Ты создаешь %2$C4!", ch, 0, victim, TO_CHAR);
 
 
@@ -2212,7 +2212,7 @@ CMDWIZP( load )
     else
         obj_to_room( obj, ch->in_room );
         
-    oldact("$c1 создает $o4!", ch, obj, 0, TO_ROOM);
+    act("%1$^C1 создает %3$C4!", ch, obj, 0, TO_ROOM);
     act("Ты создаешь %3$O4!", ch, obj, 0, TO_CHAR);
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
@@ -2273,14 +2273,14 @@ CMDWIZP( purge )
             return;
         }
 
-        oldact("$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT );
+        act("%1$^C1 изничтожает %2$C4.", ch, 0, victim, TO_NOTVICT );
         act("Ты изничтожаешь %2$C4.", ch, 0, victim, TO_CHAR );
         extract_char( victim );
         return;
     }
 
     if ((obj = get_obj_here(ch, arg))) {
-        oldact("$c1 изничтожает $o4.", ch, obj, 0, TO_ROOM );
+        act("%1$^C1 изничтожает %3$C4.", ch, obj, 0, TO_ROOM );
         act("Ты изничтожаешь %3$O4.", ch, obj, 0, TO_CHAR );
         extract_obj(obj);
         return;

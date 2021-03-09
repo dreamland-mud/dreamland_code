@@ -247,7 +247,7 @@ void Thunderbolt::fight( Character *ch )
         case 0:
             act("Разряд молнии выстреливает из твоего оружия и поражает %2$C4!", ch, 0, victim, TO_CHAR);
             act("Разряд молнии конденсируется на оружии %C2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
-            oldact("Разряд молнии конденсируется на оружии $c2, и выстреливает в сторону $C2!", ch, 0, victim, TO_NOTVICT);
+            act("Разряд молнии конденсируется на оружии %1$C2, и выстреливает в сторону %2$C2!", ch, 0, victim, TO_NOTVICT);
 
             dam = dice(level,4) + 12;
             if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_PRAYER) )
@@ -351,7 +351,7 @@ int dam;
         dam = number_percent()/2 + 5 * ch->getModifyLevel();
 
         act("Твой щит обжигает лицо %2$C3!", ch, 0, ch->fighting, TO_CHAR);
-        oldact("Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
+        act("Щит %1$C2 обжигает лицо %2$C3!", ch, 0, ch->fighting, TO_NOTVICT);
         act("Щит %2$C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
 
         damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);

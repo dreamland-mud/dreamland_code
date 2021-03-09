@@ -368,7 +368,7 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   affect_to_obj( shield, &af);
 
   act("Ты создаешь %3$O4!",ch,shield,0,TO_CHAR);
-  oldact("$c1 создает $o4!",ch,shield,0,TO_ROOM);
+  act("%1$^C1 создает %3$C4!",ch,shield,0,TO_ROOM);
 
 }
 

@@ -39,13 +39,13 @@ int LocateScenario::getCount( PCharacter *pch ) const
 void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest, Object *obj ) const
 {
     oldact("$c1 произносит '{gСпасибо, конечно, но я не об этом проси$gло|л|ла тебя.'{x'", ch, 0, 0, TO_ROOM );
-    oldact("$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT );
+    act("%1$^C1 возвращает тебе %3$C4.", ch, obj, hero, TO_VICT );
     oldact("$c1 возвращает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 
 void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
-    oldact("$c1 произносит '{gВот спасибо, $C1. Теперь все найдено и я могу спать спокойно.{x'", 
+    act("%1$^C1 произносит '{gВот спасибо, %2$C1. Теперь все найдено и я могу спать спокойно.{x'", 
         ch, 0, hero, TO_ROOM );
     oldact("$c1 произносит '{gА вознаграждение я уже переда$gло|л|ла твоему квестору. Сходи и забери его.{x'",
         ch, 0, hero, TO_ROOM );

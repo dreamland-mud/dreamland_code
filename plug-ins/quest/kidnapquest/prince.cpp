@@ -169,7 +169,7 @@ void KidnapPrince::give( Character *victim, Object *obj )
         quest->getScenario( ).actWrongGiver( ch, victim, obj );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
-        oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
+        act("%1$^C1 бросает %3$C4.", ch, obj, 0, TO_ROOM );
         return;
     }
         

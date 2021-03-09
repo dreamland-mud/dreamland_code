@@ -98,7 +98,7 @@ void QuestTrader::msgListEmpty( Character *client )
 
 void QuestTrader::msgListRequest( Character *client ) 
 {
-    oldact("$c1 просит $C4 показать список вещей.", client, 0, getKeeper( ), TO_ROOM );
+    act("%1$^C1 просит %2$C4 показать список вещей.", client, 0, getKeeper( ), TO_ROOM );
     act("Ты просишь %2$C4 показать список вещей.", client, 0, getKeeper( ), TO_CHAR );
 }
 
@@ -124,7 +124,7 @@ void QuestTrader::msgArticleTooFew( Character *client, Article::Pointer )
 
 void QuestTrader::msgBuyRequest( Character *client )
 {
-    oldact("$c1 о чем-то просит $C4.", client, 0, getKeeper( ), TO_ROOM );
+    act("%1$^C1 о чем-то просит %2$C4.", client, 0, getKeeper( ), TO_ROOM );
 }
 
 /*----------------------------------------------------------------------------
@@ -298,7 +298,7 @@ void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 {
     client->perm_stat[STAT_CON]++;
 
-    oldact("$C1 повышает сложение $c2.", client, 0, questman, TO_ROOM );
+    act("%2$^C1 повышает сложение %1$C2.", client, 0, questman, TO_ROOM );
     act("%2$^C1 повышает твое сложение.", client, 0, questman, TO_CHAR );
 }
     
@@ -506,7 +506,7 @@ void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 {
     client->wearloc.set( wear_ears );
     
-    oldact("$C1 делает дырку в голове $c2.",client,0,tattoer,TO_ROOM);
+    act("%2$^C1 делает дырку в голове %1$C2.",client,0,tattoer,TO_ROOM);
     act("%2$^C1 делает тебе дырку в голове.",client,0,tattoer,TO_CHAR);
 }
 

@@ -151,7 +151,7 @@ bool CardPackBehavior::use( Character *user, const char *args )
         
         obj_to_char( card, pch );
         oldact("Ты перетасовываешь $o4 и сдаешь $O4.", pch, obj, card, TO_CHAR);
-        oldact("$c1 перетасовывает $o4.", pch, obj, 0, TO_ROOM);
+        act("%1$^C1 перетасовывает %3$C4.", pch, obj, 0, TO_ROOM);
         
         gsn_fetch_card->improve( pch, true );
     }
@@ -395,7 +395,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
 
             myAttr->setContactName( victim->getName( ) );
             oldact("Ты дотрагиваешься до $o2, мысленно протягивая $M руку.", pch, obj, victim, TO_CHAR);
-            oldact("$c1 дотрагивается до $o2.", pch, obj, 0, TO_ROOM);
+            act("%1$^C1 дотрагивается до %3$C2.", pch, obj, 0, TO_ROOM);
             act("{cИзображение %2$C2 на карте оживает и протягивает тебе руку.{x", victim, 0, pch, TO_CHAR);
         }
     }

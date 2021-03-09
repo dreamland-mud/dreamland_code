@@ -53,11 +53,11 @@ CMDRUNP( listen )
     {
         if (obj->carried_by == ch) {
             act("Ты подносишь к уху %3$O4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            oldact("$c1 подносит к уху $o4 и прислушивается.", ch, obj, 0, TO_ROOM);
+            act("%1$^C1 подносит к уху %3$C4 и прислушивается.", ch, obj, 0, TO_ROOM);
         }
         else {
             act("Ты прикладываешь ухо к %3$O3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            oldact("$c1 прикладывает ухо к $o3 и прислушивается.", ch, obj, 0, TO_ROOM);
+            act("%1$^C1 прикладывает ухо к %3$C3 и прислушивается.", ch, obj, 0, TO_ROOM);
         }
 
         if (oprog_listen( obj, ch, argument ))
@@ -176,7 +176,7 @@ CMDRUNP( smell )
          || ( obj = get_obj_room( ch, arg ) ))
     {
         act("Ты нюхаешь %3$O4.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 нюхает $o4.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 нюхает %3$C4.", ch, obj, 0, TO_ROOM);
 
         if (oprog_smell( obj, ch, argument ))
             return;
@@ -204,7 +204,7 @@ CMDRUNP( smell )
             act("%^C1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
         } else {
             act("Ты обнюхиваешь %2$C4.", ch, 0, victim, TO_CHAR);
-            oldact("$c1 обнюхивает $C4.", ch, 0, victim, TO_NOTVICT);
+            act("%1$^C1 обнюхивает %2$C4.", ch, 0, victim, TO_NOTVICT);
             act("%^C1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
         }
 

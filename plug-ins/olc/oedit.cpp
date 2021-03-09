@@ -1188,7 +1188,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         else
             obj_to_room( obj, ch->in_room );
 
-        oldact("$c1 создает $o4!", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 создает %3$C4!", ch, obj, 0, TO_ROOM);
         act("Ты создаешь %3$O4!", ch, obj, 0, TO_CHAR);
         return;
     }

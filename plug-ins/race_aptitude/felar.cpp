@@ -124,7 +124,7 @@ SKILL_RUNP( tail )
     {
         act("%^C1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT);
         act("Ты наносишь %2$C3 удар хвостом!",ch,0,victim,TO_CHAR);
-        oldact("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT);
+        act("%1$^C1 наносит %2$C3 удар хвостом.",ch,0,victim,TO_NOTVICT);
         gsn_tail->improve( ch, true, victim );
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );

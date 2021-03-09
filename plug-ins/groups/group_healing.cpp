@@ -264,7 +264,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     } else {
         act("Сосредоточившись, ты переносишь раны %2$C2 на собственное тело.", ch, 0, victim, TO_CHAR);
         act("Сосредоточившись, %C1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT);
-        oldact("Сосредоточившись, $c1 переносит раны $C2 на собственное тело.", ch, 0, victim, TO_NOTVICT);
+        act("Сосредоточившись, %1$C1 переносит раны %2$C2 на собственное тело.", ch, 0, victim, TO_NOTVICT);
 
         hp = victim->max_hit - victim->hit;
         hp = URANGE( 0, hp, ch->hit - 1 );

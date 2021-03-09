@@ -446,7 +446,7 @@ bool UndefinedOneHit::defenseParry( )
             act("Ты не можешь устоять на ногах!",ch,0,victim,TO_VICT);
             act("Ты падаешь вниз!",ch,0,victim,TO_VICT);
             act("%2$^C1 не может устоять на ногах и падает вниз!", ch,0,victim,TO_CHAR);
-            oldact("$C1 пытается парировать мощный удар $c1, но не может устоять на ногах.", ch,0,victim,TO_NOTVICT);
+            act("%2$^C1 пытается парировать мощный удар %1$C1, но не может устоять на ногах.", ch,0,victim,TO_NOTVICT);
 
             victim->setWait(gsn_bash->getBeats( ));
             victim->position = POS_RESTING;
@@ -796,7 +796,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         {
             act("Тебе не удается удержать равновесие!\nТы падаешь!", ch, 0, victim, TO_VICT);
             act("%2$^C1 не может сдержать твою атаку и падает!", ch, 0, victim, TO_CHAR);
-            oldact("$C1 не может сдержать ошеломляющую атаку $c2 и падает.", ch, 0, victim, TO_NOTVICT);
+            act("%2$^C1 не может сдержать ошеломляющую атаку %1$C2 и падает.", ch, 0, victim, TO_NOTVICT);
 
             victim->setWait(gsn_bash->getBeats( ));
             victim->position = POS_RESTING;
@@ -1241,7 +1241,7 @@ void UndefinedOneHit::damEffectMasterHand()
         if (ch != victim) {
             act("{rТвой удар в голову слегка оглушает %2$C4!{x", ch, 0, victim, TO_CHAR);
             act("{r%C1 слегка оглушает тебя ударом в голову!{x", ch, 0, victim, TO_VICT);
-            oldact("{r$c1 слегка оглушает $C4 ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
+            act("{r%1$C1 слегка оглушает %2$C4 ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
         } else {
             act("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x", ch, 0, victim, TO_CHAR);
             act("{r%C1 слегка оглушает СЕБЯ ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
@@ -1257,7 +1257,7 @@ void UndefinedOneHit::damEffectMasterHand()
 
             act("{rМощной серией ударов в голову ты сильно оглушаешь %2$C4!{x", ch, 0, victim, TO_CHAR);
             act("{r%C1 сильно оглушает тебя мощной серией ударов в голову!{x", ch, 0, victim, TO_VICT);
-            oldact("{r$c1 оглушает $C4 мощной серией ударов в голову!{x", ch, 0, victim, TO_NOTVICT);
+            act("{r%1$C1 оглушает %2$C4 мощной серией ударов в голову!{x", ch, 0, victim, TO_NOTVICT);
         }
     }
 

@@ -210,17 +210,17 @@ bool HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     if ((old_shoe = get_eq_char( client, wear_hooves ))) {
         unequip_char( client, old_shoe );
         act("%^C1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
-        oldact("$c1 снимает с $C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
+        act("%1$^C1 снимает с %2$C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
     }
 
     obj_to_char( shoe, client );
     equip_char( client, shoe, wear_hooves);
     act("%^C1 прилаживает новые подковы на твои копыта.", smithman, 0, client, TO_VICT );
-    oldact("$c1 прилаживает новые подковы на копыта $C2.", smithman, 0, client, TO_NOTVICT );
+    act("%1$^C1 прилаживает новые подковы на копыта %2$C2.", smithman, 0, client, TO_NOTVICT );
 
     if (client->getSex( ) == SEX_FEMALE && chance( 50 )) {
         act("%^C1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
-        oldact("$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
+        act("%1$^C1 хлопает %2$C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
     }
 
     return true;
@@ -305,7 +305,7 @@ void BurnproofSmithService::smith( Character *client, NPCharacter *smithman, Obj
 
     SET_BIT(obj->extra_flags, ITEM_BURN_PROOF);
 
-    oldact("$c1 обрабатывает чем-то $o4 и возвращает тебе.", smithman, obj, client, TO_VICT );
+    act("%1$^C1 обрабатывает чем-то %3$C4 и возвращает тебе.", smithman, obj, client, TO_VICT );
     oldact("$c1 обрабатывает чем-то $o4 и возвращает $C3.", smithman, obj, client, TO_NOTVICT ); 
 }
 

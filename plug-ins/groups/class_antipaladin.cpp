@@ -84,7 +84,7 @@ void CleaveOneHit::calcDamage( )
     if (number_percent( ) < chance) {
         act("Ты рассекаешь %2$C4 {RПОПОЛАМ{x!",ch,0,victim,TO_CHAR);
         act("%^C1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT);
-        oldact("$c1 рассекает $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT);
+        act("%1$^C1 рассекает %2$C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT);
 
         ch->setWait( 2 );
 
@@ -435,7 +435,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     affect_to_obj( blade, &af );
 
     act("Ты посвящаешь %3$O4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_CHAR );
-    oldact("$c1 посвящает $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
+    act("%1$^C1 посвящает %3$C4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
 }
 
 /*
@@ -535,7 +535,7 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     obj_to_char( blade, ch );
 
     act("Ты создаешь %3$O4!", ch, blade, 0, TO_CHAR );
-    oldact("$c1 создает $o4!", ch, blade, 0, TO_ROOM );
+    act("%1$^C1 создает %3$C4!", ch, blade, 0, TO_ROOM );
 }
 
 /*---------------------------------------------------------------------------
@@ -567,7 +567,7 @@ void AntipaladinGuildmaster::give( Character *victim, Object *obj )
     }
 
     oldact("$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    oldact("$c1 возвращает тебе $o4.", ch, obj, victim, TO_VICT );
+    act("%1$^C1 возвращает тебе %3$C4.", ch, obj, victim, TO_VICT );
 
     obj_from_char( obj );
     obj_to_char( obj, victim );

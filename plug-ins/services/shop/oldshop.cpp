@@ -263,7 +263,7 @@ CMDRUN( buy )
     }
     else
     {
-        oldact("$c1 покупает $o4.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 покупает %3$C4.", ch, obj, 0, TO_ROOM);
         sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
                         cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
         oldact( buf, ch, obj, 0, TO_CHAR);
@@ -362,7 +362,7 @@ CMDRUN( sell )
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-        oldact("$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT);
+        act("%1$^C1 не интересуется %3$C5.", keeper, obj, ch, TO_VICT);
         return;
     }
 
@@ -400,7 +400,7 @@ CMDRUN( sell )
         }
     }
 
-    oldact("$c1 продает $o4.", ch, obj, 0, TO_ROOM);
+    act("%1$^C1 продает %3$C4.", ch, obj, 0, TO_ROOM);
     silver = cost - (cost/100) * 100;
     gold   = cost/100;
 

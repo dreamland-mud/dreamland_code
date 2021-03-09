@@ -43,7 +43,7 @@ bool is_safe(Character *ch, Character *victim)
 
     if (ch && victim) {
         act("%2$^C1 находится под защитой богов.",ch,0,victim,TO_CHAR);
-        oldact("Боги защитили $C4 от $c2.",ch,0,victim,TO_ROOM);
+        act("Боги защитили %2$C4 от %1$C2.",ch,0,victim,TO_ROOM);
 
         if (victim->fighting == ch) 
             stop_fighting (victim, false);

@@ -299,7 +299,7 @@ SKILL_RUNP( vanish )
     }    
     else {   
             // trying to kidnap
-            oldact("$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT);
+            act("%1$^C1 пытается взять %2$C4 в охапку!", ch, 0, victim, TO_NOTVICT);
             act("Ты пытаешься взять %2$C4 в охапку.",   ch, 0, victim, TO_CHAR);
             act("%^C1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
 
@@ -325,7 +325,7 @@ SKILL_RUNP( vanish )
             }
             else {
                     // kidnap failed, victim escaped               
-                    oldact("$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT);
+                    act("%2$^C1 успевает вырваться из объятий %1$C2!", ch, 0, victim, TO_NOTVICT);
                     act("%2$^C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR);
                     act("Ты умудряешься вырваться из объятий %C2", ch, 0, victim, TO_VICT);
 
@@ -501,7 +501,7 @@ SKILL_RUNP( nerve )
                 gsn_nerve->getCommand()->run(ch, victim);
                 act("Ты ослабляешь %2$C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
                 act("%^C1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
-                oldact("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 ослабляет %2$C4",ch,0,victim,TO_NOTVICT);
                 gsn_nerve->improve( ch, true, victim );
         }
         else
@@ -706,7 +706,7 @@ void AssassinateOneHit::calcDamage( )
 
     if (mychance.reroll()) {
         act("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x %2$C3!",ch,0,victim,TO_CHAR);
-        oldact("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT);
+        act("%1$^C1 {R+++ ЛОМАЕТ ШЕЮ +++{x %2$C3!",ch,0,victim,TO_NOTVICT);
         oldact_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
@@ -1301,7 +1301,7 @@ SKILL_RUNP( throwdown )
             else {
                 act("Ты бросаешь %2$C4 через плечо.", ch,0,victim,TO_CHAR);
                 act("%^C1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
-                oldact("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 бросает %2$C4 через плечо.", ch,0,victim,TO_NOTVICT);
                 victim->position = POS_RESTING;
             }        
 
@@ -1319,7 +1319,7 @@ SKILL_RUNP( throwdown )
         {
             act("Твой бросок не удался.", ch, 0, 0, TO_CHAR);
             act("%2$^C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
-            oldact("$c1 пытается ухватиться за $C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
+            act("%1$^C1 пытается ухватиться за %2$C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
             gsn_throw->improve( ch, false, victim );
         }
 

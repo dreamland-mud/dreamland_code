@@ -61,7 +61,7 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     client->setWaitViolence( 1 );
     
     oldact("В трудную минуту $E поможет тебе!", client, 0, pet, TO_CHAR );
-    oldact("$c1 приобретает $C4.", client, 0, pet, TO_ROOM );
+    act("%1$^C1 приобретает %2$C4.", client, 0, pet, TO_ROOM );
     interpret_raw(pet, "report");
     return true;
 }
@@ -256,7 +256,7 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     interpret_fmt( client, "mount %s", horse->getNameP( ) );
 
     client->pecho("Наслаждайся своим скакуном.");
-    oldact("$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
+    act("%1$^C1 приобретает для верховой езды %2$C4.", client, 0, horse, TO_ROOM );
     return true;
 }
 

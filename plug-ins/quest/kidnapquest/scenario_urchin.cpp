@@ -30,7 +30,7 @@ bool KS::applicable( PCharacter *hero ) const
  */
 void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const 
 {
-    oldact("$c1 хмуро смотрит на $C4.", kid, 0, king, TO_ROOM);
+    act("%1$^C1 хмуро смотрит на %2$C4.", kid, 0, king, TO_ROOM);
     hero->printf( "%s и %s уже встретились.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
     act("Приди к %2$C3 за благодарностью!", hero, 0, king, TO_CHAR);
 }
@@ -68,7 +68,7 @@ void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid ) const
 {
     act("%^C1 смотрит на белый билет, держа его вверх ногами.", bandit, 0, kid, TO_ROOM);
     act("%^C1 произносит '{gЭту бумагу надо разъяснить{x'.", bandit, 0, kid, TO_ROOM);
-    oldact("$c1 хватает $C4 за шиворот и тащит за собой.", bandit, 0, kid, TO_ROOM);
+    act("%1$^C1 хватает %2$C4 за шиворот и тащит за собой.", bandit, 0, kid, TO_ROOM);
 }
 void KS::actHuntStep( NPCharacter *bandit ) const 
 {
@@ -102,7 +102,7 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
     
 
     act("%^C1 говорит тебе '{GЯ продала все, что у меня было, чтобы купить этот белый билет...{x'", king, 0, hero, TO_VICT);
-    oldact("$c1 вручает тебе $o4.", king, mark, hero, TO_VICT);
+    act("%1$^C1 вручает тебе %3$C4.", king, mark, hero, TO_VICT);
     oldact("$c1 вручает $C3 $o4.", king, mark, hero, TO_NOTVICT);
     act("%^C1 говорит тебе '{GПередай его ему и поскорей!{x'", king, 0, hero, TO_VICT);
     sprintf( buf, "$c1 говорит тебе '{GМатеринское сердце подсказывает мне, "
@@ -116,13 +116,13 @@ void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const
 {
     oldact("$c1 говорит тебе '{GЧто ты надела$Gло|л|ла?!{x'", king, 0, hero, TO_VICT);
     act("%^C1 говорит тебе '{GК счастью, такому олуху как ты я дала копию.{x'", king, 0, hero, TO_VICT);
-    oldact("$c1 дает тебе новый $o4.", king, mark, hero, TO_VICT);
+    act("%1$^C1 дает тебе новый %3$C4.", king, mark, hero, TO_VICT);
     oldact("$c1 дает $C3 новый $o4.", king, mark, hero, TO_NOTVICT);
 }
 void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero ) const 
 {
     act("%^C1 чмокает тебя в обе щеки.", king, 0, hero, TO_VICT);
-    oldact("$c1 чмокает $C4 в обе щеки.", king, 0, hero, TO_NOTVICT);
+    act("%1$^C1 чмокает %2$C4 в обе щеки.", king, 0, hero, TO_NOTVICT);
     act("%^C1 говорит тебе: '{GИди скорее за наградой к тому, кто дал тебе задание!{x'.", king, 0, hero, TO_VICT);
 }
 
@@ -137,7 +137,7 @@ void KS::actHeroWait( NPCharacter *kid ) const
 void KS::actNoHero( NPCharacter *kid, PCharacter *hero ) const 
 {
     if (number_percent( ) < 10 && hero && hero->in_room != kid->in_room)
-        oldact("$c1 озирается в поисках $C2.", kid, 0, hero, TO_ROOM);
+        act("%1$^C1 озирается в поисках %2$C2.", kid, 0, hero, TO_ROOM);
 }
 void KS::actHeroDetach( NPCharacter *kid, PCharacter *hero ) const 
 {
@@ -146,11 +146,11 @@ void KS::actHeroDetach( NPCharacter *kid, PCharacter *hero ) const
 }
 void KS::actWrongGiver( NPCharacter *kid, Character *victim, Object *obj ) const 
 {
-    oldact("$c1 безо всякого интереса смотрит на $o4.", kid, obj, 0, TO_ROOM);
+    act("%1$^C1 безо всякого интереса смотрит на %3$C4.", kid, obj, 0, TO_ROOM);
 }
 void KS::actWrongMark( NPCharacter *kid, Character *victim, Object *obj ) const 
 {
-    oldact("$c1 безо всякого интереса смотрит на $o4.", kid, obj, 0, TO_ROOM);
+    act("%1$^C1 безо всякого интереса смотрит на %3$C4.", kid, obj, 0, TO_ROOM);
 }
 void KS::actGoodMark( NPCharacter *kid, Character *victim, Object *obj ) const 
 {
@@ -160,7 +160,7 @@ void KS::actGoodMark( NPCharacter *kid, Character *victim, Object *obj ) const
 }
 void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const 
 {
-    oldact("$c1 хмуро смотрит на $C4.", kid, 0, king, TO_ROOM);
+    act("%1$^C1 хмуро смотрит на %2$C4.", kid, 0, king, TO_ROOM);
     actAckWaitComplete(king, hero);
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 

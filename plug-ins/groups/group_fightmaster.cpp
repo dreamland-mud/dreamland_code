@@ -459,7 +459,7 @@ SKILL_RUNP( bash )
                 {
                         act("%^C1 наносит тебе удар щитом!",ch,0,victim,TO_VICT);
                         act("Ты наносишь удар щитом %2$C3!",ch,0,victim,TO_CHAR);
-                        oldact("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT);
+                        act("%1$^C1 наносит удар щитом %2$C3.",ch,0,victim,TO_NOTVICT);
                 }
                       
                 gsn_bash->improve( ch, true, victim );
@@ -647,7 +647,7 @@ SKILL_RUNP( trip )
                 {
                         act("%^C1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT);
                         act("Ты пытаешься подсечь %2$C4!",ch,0,victim,TO_CHAR);
-                        oldact("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT);
+                        act("%1$^C1 пытается подсечь %2$C4!",ch,0,victim,TO_NOTVICT);
                 }
                 ch->setWait( gsn_trip->getBeats( ) );
                 gsn_trip->improve( ch, true, victim );
@@ -1013,7 +1013,7 @@ SKILL_RUNP( crush )
                         ch,0,victim,TO_CHAR);
                 act("{YМощный удар %C2 скользит по поверхности твоего охранного щита.{x",
                         ch,0,victim,TO_VICT);
-                oldact("{YМощный удар $c2 как будто соскальзывает с $C2.{x",
+                act("{YМощный удар %1$C2 как будто соскальзывает с %2$C2.{x",
                         ch,0,victim,TO_NOTVICT);
 
                 ch->setWait( gsn_crush->getBeats( ) );

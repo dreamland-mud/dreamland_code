@@ -92,7 +92,7 @@ CMDRUNP( quaff )
         return;
     }
 
-    oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM);
+    act("%1$^C1 осушает %3$C4.", ch, obj, 0, TO_ROOM);
     act("Ты осушаешь %3$O4.", ch, obj, 0 ,TO_CHAR);
     
     if (oprog_quaff( obj, ch ))

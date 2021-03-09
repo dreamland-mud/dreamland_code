@@ -96,7 +96,7 @@ void CardSellerBehavior::speech( Character *victim, const char *speech )
 
     victim->getPC( )->addQuestPoints(-50);
 
-    oldact("$c1 вручает тебе $o4.", ch, pack, victim, TO_VICT);
+    act("%1$^C1 вручает тебе %3$C4.", ch, pack, victim, TO_VICT);
     oldact("$c1 вручает $C3 $o4.", ch, pack, victim, TO_NOTVICT);
 }
 

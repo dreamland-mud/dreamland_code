@@ -1378,7 +1378,7 @@ static void do_look_character( Character *ch, Character *victim )
         else
         {
             act("%^C1 смотрит на тебя.", ch, 0, victim, TO_VICT);
-            oldact("$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT);
+            act("%1$^C1 смотрит на %2$C4.",  ch, 0, victim, TO_NOTVICT);
         }
     }
 
@@ -1641,7 +1641,7 @@ CMDRUNP( examine )
             else
             {
                 act("%^C1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
-                oldact("$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT);
+                act("%1$^C1 бросает взгляд на %2$C4.",  ch, 0, victim, TO_NOTVICT);
             }
         }
 

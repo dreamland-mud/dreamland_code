@@ -102,7 +102,7 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
     oldact_p("Боги $c2 проклинают тебя!\r\nТы чувствуешь себя преотвратно.", 
             ch, 0, victim, TO_VICT, POS_RESTING);
     act("Твои Боги проклинают %2$C4!", ch, 0, victim, TO_CHAR);
-    oldact("Боги $c2 проклинают $C4!", ch, 0, victim, TO_NOTVICT);
+    act("Боги %1$C2 проклинают %2$C4!", ch, 0, victim, TO_NOTVICT);
 
 }
 

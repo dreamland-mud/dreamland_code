@@ -367,7 +367,7 @@ SKILL_RUNP( envenom )
 
         if (number_percent() < skill)  /* success! */
         {
-            oldact("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
+            act("%1$^C1 отравляет %3$C4 смертельным ядом.",ch,obj,0,TO_ROOM);
             act("Ты отравляешь %3$O4 смертельным ядом.",ch,obj,0,TO_CHAR);
             if (!IS_SET(obj->value3(), DRINK_POISONED))
             {
@@ -427,7 +427,7 @@ SKILL_RUNP( envenom )
             affect_to_obj( obj, &af);
 
             if ( !IS_AFFECTED( ch, AFF_SNEAK ) )
-              oldact("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
+              act("%1$^C1 покрывает %3$C4 смертельным ядом.",ch,obj,0,TO_ROOM);
             act("Ты покрываешь %3$O4 смертельным ядом.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, true );
             ch->setWait( gsn_envenom->getBeats( ) );
@@ -551,7 +551,7 @@ SKILL_RUNP( steal )
                         victim->position;
                         oldact_p("$c1 пытается обокрасть тебя.\n\r", ch, 0, victim,TO_VICT,POS_DEAD);
                 }
-                oldact("$c1 пытается обокрасть $C4.\n\r",  ch, 0, victim,TO_NOTVICT);
+                act("%1$^C1 пытается обокрасть %2$C4.\n\r",  ch, 0, victim,TO_NOTVICT);
 
                 if( ( !victim->is_npc() ) || ( number_percent() < 25 ) )
                         set_thief( ch );
@@ -1481,7 +1481,7 @@ SKILL_RUNP( forge )
         obj_to_char( dup, ch );
 
         oldact("Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
-        oldact("$c1 изготавливает $o4.", ch, key, 0, TO_ROOM );
+        act("%1$^C1 изготавливает %3$C4.", ch, key, 0, TO_ROOM );
 
         gsn_key_forgery->improve( ch, true );
         extract_obj( blank );
@@ -1520,7 +1520,7 @@ SKILL_RUNP( forge )
         }
 
         oldact("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
-        oldact("$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
+        act("%1$^C1 проделывает манипуляции с %3$C5.", ch, blank, 0, TO_ROOM );
 
         blank->setOwner( ch->getName( ).c_str( ) );
         blank->gram_gender = Grammar::MultiGender::FEMININE;

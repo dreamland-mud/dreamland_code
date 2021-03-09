@@ -64,7 +64,7 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
 
 void SteakCustomer::givenBad( PCharacter *hero, Object *obj )
 {
-    oldact("$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT);
+    act("%1$^C1 возвращает тебе %3$C4.", ch, obj, hero, TO_VICT);
     oldact("$c1 возвращает $C5 $o4.", ch, obj, hero, TO_NOTVICT);
 }
 
@@ -79,7 +79,7 @@ void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
     else 
         tell_raw(hero, ch, "Маловато будет...");
     
-    oldact("$c1 куда-то прячет $o4.", ch, obj, 0, TO_ROOM);
+    act("%1$^C1 куда-то прячет %3$C4.", ch, obj, 0, TO_ROOM);
     extract_obj( obj );
 }
 

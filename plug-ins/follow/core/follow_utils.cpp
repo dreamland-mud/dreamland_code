@@ -171,7 +171,7 @@ void guarding_stop( PCharacter *guard, PCharacter *victim )
 {
     act("Ты прекращаешь охранять %2$C4.", guard, 0, victim, TO_CHAR);
     act("%^C1 прекращает охранять тебя.", guard, 0, victim, TO_VICT);
-    oldact("$c1 прекращает охранять $C4.", guard, 0, victim, TO_NOTVICT);
+    act("%1$^C1 прекращает охранять %2$C4.", guard, 0, victim, TO_NOTVICT);
     guard->guarding  = 0;
     victim->guarded_by = 0;
 }

@@ -1483,7 +1483,7 @@ CMDRUNP( request )
         obj_to_char( obj, ch );
         oldact("$c1 просит $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
         oldact("Ты просишь $o4 у $C2.",   ch, obj, victim, TO_CHAR);
-        oldact("$c1 просит $o4 у тебя.", ch, obj, victim, TO_VICT);
+        act("%1$^C1 просит %3$C4 у тебя.", ch, obj, victim, TO_VICT);
         
         omprog_give( obj, victim, ch );
 
@@ -1632,7 +1632,7 @@ CMDRUNP( demand )
 
     oldact("$c1 требует $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
     oldact("Ты требуешь $o4 у $C2.",   ch, obj, victim, TO_CHAR);
-    oldact("$c1 требует у тебя $o4.", ch, obj, victim, TO_VICT);
+    act("%1$^C1 требует у тебя %3$C4.", ch, obj, victim, TO_VICT);
 
     obj_from_char( obj );
     obj_to_char( obj, ch );

@@ -985,12 +985,12 @@ SKILL_RUNP( confiscate )
                         obj->wear_loc = wear_none ;
 
                         oldact("Ты конфискуешь $o4 у $C4.", ch, obj, victim, TO_CHAR);
-                        oldact("$c1 конфискует у тебя $o4.", ch, obj, victim, TO_VICT);
+                        act("%1$^C1 конфискует у тебя %3$C4.", ch, obj, victim, TO_VICT);
                         oldact("$c1 конфискует $o4 у $C4.", ch, obj, victim, TO_NOTVICT);
 
                         obj_to_room( obj, ch->in_room );
                         act("Ты аккуратно кладешь %3$O4 на пол.", ch, obj, 0, TO_CHAR);
-                        oldact("$c1 аккуратно кладет $o4 на пол.", ch, obj, 0, TO_ROOM);
+                        act("%1$^C1 аккуратно кладет %3$C4 на пол.", ch, obj, 0, TO_ROOM);
 
                 }
         }  
@@ -1516,7 +1516,7 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
         if (rch->is_mirror() && rch->doppel == target) {
             act("Луч света, посланный %C5, отражается от зеркала и поражает ТЕБЯ!",
                  ch, 0, target, TO_VICT );
-            oldact("Луч света, посланный $c5, отражается от зеркала и поражает $C4!",
+            act("Луч света, посланный %1$C5, отражается от зеркала и поражает %2$C4!",
                  ch, 0, target, TO_NOTVICT );
             act("Луч света, посланный тобой, отражается от зеркала и поражает %2$C4!",
                  ch, 0, target, TO_CHAR );
@@ -1668,7 +1668,7 @@ VOID_SPELL(RemoveBadge)::run( Character *ch, Character *victim, int sn, int leve
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
           act("Твой %3$O1 исчезает.",ch, badge, 0, TO_CHAR);
-          oldact("У $c2 исчезает $o1.", ch, badge, 0, TO_ROOM);
+          act("У %1$C2 исчезает %3$C1.", ch, badge, 0, TO_ROOM);
         
           obj_from_char(badge);
           extract_obj(badge);

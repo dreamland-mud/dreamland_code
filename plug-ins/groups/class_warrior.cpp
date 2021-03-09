@@ -101,13 +101,13 @@ SKILL_RUNP( smithing )
     }
     else if ( number_percent() > gsn_smithing->getEffective( ch ) + skill_level_bonus(*gsn_smithing, ch) ) {
         gsn_smithing->improve( ch, false );
-        oldact("$c1 пробует восстановить $o4, но безуспешно.",ch,obj,0,TO_ROOM);
+        act("%1$^C1 пробует восстановить %3$C4, но безуспешно.",ch,obj,0,TO_ROOM);
         act("У тебя не получилось восстановить %3$O4.",ch,obj,0,TO_CHAR);
         hammer->condition -= 25;
     }
     else {
         gsn_smithing->improve( ch, true );
-        oldact("$c1 восстанавливает $o4.",ch,obj,0,TO_ROOM);
+        act("%1$^C1 восстанавливает %3$C4.",ch,obj,0,TO_ROOM);
         act("Ты восстанавливаешь %3$O4.\n\r",ch,obj,0,TO_CHAR);
 
         obj->condition += ( gsn_smithing->getEffective( ch ) + skill_level_bonus(*gsn_smithing, ch) ) / 2;

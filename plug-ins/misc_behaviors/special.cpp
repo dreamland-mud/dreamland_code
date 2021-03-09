@@ -725,7 +725,7 @@ bool spec_poison( NPCharacter *ch )
         return false;
 
     act("Ты кусаешь %2$C4!",  ch, 0, victim, TO_CHAR);
-    oldact("$c1 кусает $C4!",  ch, 0, victim, TO_NOTVICT);
+    act("%1$^C1 кусает %2$C4!",  ch, 0, victim, TO_NOTVICT);
     act("%^C1 кусает тебя!", ch, 0, victim, TO_VICT);
 
     spell( gsn_poison, ch->getModifyLevel( ), ch, victim, FSPELL_NOTRIGGER ); 

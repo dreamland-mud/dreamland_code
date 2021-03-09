@@ -95,7 +95,7 @@ bool open_portal( Character *ch, Object *obj )
 
     obj->value1(obj->value1() & ~EX_CLOSED);
     act("Ты открываешь %3$O4.",ch,obj,0,TO_CHAR);
-    oldact("$c1 открывает $o4.",ch,obj,0,TO_ROOM);
+    act("%1$^C1 открывает %3$C4.",ch,obj,0,TO_ROOM);
 
     return true;
 }
@@ -129,15 +129,15 @@ bool open_drink_container( Character *ch, Object *obj )
         obj_to_char( cork, ch );
 
         act("Ты вынимаешь пробку из %2$O2.", ch, 0, obj, TO_CHAR );
-        oldact("$c1 вынимает пробку из $O2.", ch, 0, obj, TO_ROOM );
+        act("%1$^C1 вынимает пробку из %2$C2.", ch, 0, obj, TO_ROOM );
     }
     else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL)) {
         act("Ты открываешь крышку %2$O2.", ch, 0, obj, TO_CHAR );
-        oldact("$c1 открывает крышку $O2.", ch, 0, obj, TO_ROOM );
+        act("%1$^C1 открывает крышку %2$C2.", ch, 0, obj, TO_ROOM );
     }
     else {
         act("Ты открываешь %2$O4.", ch, 0, obj, TO_CHAR );
-        oldact("$c1 открывает $O4.", ch, 0, obj, TO_ROOM );
+        act("%1$^C1 открывает %2$C4.", ch, 0, obj, TO_ROOM );
     }
 
     return true;
@@ -170,7 +170,7 @@ bool open_container( Character *ch, Object *obj )
 
     if (!oprog_open_msg( obj, ch )) {
         act("Ты открываешь %3$O4.",ch,obj,0,TO_CHAR);
-        oldact("$c1 открывает $o4.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 открывает %3$C4.", ch, obj, 0, TO_ROOM);
     }
 
     oprog_open( obj, ch );
@@ -322,7 +322,7 @@ CMDRUNP( close )
 
             obj->value1(obj->value1() | EX_CLOSED);
             act("Ты закрываешь %3$O4.",ch,obj,0,TO_CHAR);
-            oldact("$c1 закрывает $o4.",ch,obj,0,TO_ROOM);
+            act("%1$^C1 закрывает %3$C4.",ch,obj,0,TO_ROOM);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
@@ -341,7 +341,7 @@ CMDRUNP( close )
 
             obj->value1(obj->value1() | CONT_CLOSED);
             act("Ты закрываешь %3$O4.",ch,obj,0,TO_CHAR);
-            oldact("$c1 закрывает $o4.", ch, obj, 0, TO_ROOM);
+            act("%1$^C1 закрывает %3$C4.", ch, obj, 0, TO_ROOM);
             oprog_close( obj, ch );
         }
         else if (obj->item_type == ITEM_DRINK_CON) {
@@ -368,15 +368,15 @@ CMDRUNP( close )
 
                 extract_obj( cork );
                 act("Ты закупориваешь %2$O4 пробкой.", ch, 0, obj, TO_CHAR );
-                oldact("$c1 закупоривает $O4 пробкой.", ch, 0, obj, TO_ROOM );
+                act("%1$^C1 закупоривает %2$C4 пробкой.", ch, 0, obj, TO_ROOM );
             }
             else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL)) {
                 act("Ты закрываешь %2$O4 крышкой.", ch, 0, obj, TO_CHAR );
-                oldact("$c1 закрывает $O4 крышкой.", ch, 0, obj, TO_ROOM );
+                act("%1$^C1 закрывает %2$C4 крышкой.", ch, 0, obj, TO_ROOM );
             }
             else {
                 act("Ты закрываешь %2$O4.", ch, 0, obj, TO_CHAR );
-                oldact("$c1 закрывает $O4.", ch, 0, obj, TO_ROOM );
+                act("%1$^C1 закрывает %2$C4.", ch, 0, obj, TO_ROOM );
             }
             
             obj->value3(obj->value3() | DRINK_CLOSED);
@@ -538,7 +538,7 @@ CMDRUNP( lock )
 
                 obj->value1(obj->value1() | EX_LOCKED);
                 act("Ты закрываешь %3$O4 на ключ.",ch,obj,0,TO_CHAR);
-                oldact("$c1 закрывает $o4 на ключ.",ch,obj,0,TO_ROOM);
+                act("%1$^C1 закрывает %3$C4 на ключ.",ch,obj,0,TO_ROOM);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
@@ -566,7 +566,7 @@ CMDRUNP( lock )
             {
                 obj->value1(obj->value1() | CONT_LOCKED);
                 act("Ты закрываешь %3$O4 на ключ.",ch,obj,0,TO_CHAR);
-                oldact("$c1 закрывает $o4 на ключ.", ch, obj, 0, TO_ROOM);
+                act("%1$^C1 закрывает %3$C4 на ключ.", ch, obj, 0, TO_ROOM);
                 
             } else {
                 ch->pecho( "У тебя нет ключа." );
@@ -760,7 +760,7 @@ CMDRUNP( unlock )
 
             obj->value1(obj->value1() & ~EX_LOCKED);
             act("Ты открываешь ключом %3$O4.",ch,obj,0,TO_CHAR);
-            oldact("$c1 открывает ключом $o4.",ch,obj,0,TO_ROOM);
+            act("%1$^C1 открывает ключом %3$C4.",ch,obj,0,TO_ROOM);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
@@ -790,7 +790,7 @@ CMDRUNP( unlock )
             {
                 obj->value1(obj->value1() & ~CONT_LOCKED);
                 act("Ты открываешь ключом %3$O4.",ch,obj,0,TO_CHAR);
-                oldact("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM);
+                act("%1$^C1 открывает ключом %3$C4.", ch, obj, 0, TO_ROOM);
             } else if (!canLock && obj->value2() <= 0) {
                 ch->pecho("%^O1 -- чья-то личная собственность, ключ есть только у хозяина или хозяйки.", obj);
                 return;
@@ -1275,7 +1275,7 @@ void ItemKeyhole::msgTryPickSelf( )
 }
 void ItemKeyhole::msgTryPickOther( )
 {
-    oldact("$c1 ковыряется в замке $O2.", ch, lockpick, obj, TO_ROOM );
+    act("%1$^C1 ковыряется в замке %2$C2.", ch, lockpick, obj, TO_ROOM );
 }
 DLString ItemKeyhole::getDescription( )
 {

@@ -145,13 +145,13 @@ CMDRUNP( wear )
             obj_to_char( obj, ch );
         }
         oldact("Ты пытаешься надеть $o4 на $C4, но безуспешно.", ch, obj, victim, TO_CHAR);
-        oldact("$c1 пытается надеть на тебя $o4, но не может.", ch, obj, victim, TO_VICT);
+        act("%1$^C1 пытается надеть на тебя %3$C4, но не может.", ch, obj, victim, TO_VICT);
         oldact("$c1 пытается надеть на $C4 $o4, но не может.", ch, obj, victim, TO_NOTVICT);
         return;
     }
     
     oldact("Ты надеваешь $o4 на $C4.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 надевает на тебя $o4.", ch, obj, victim, TO_VICT);
+    act("%1$^C1 надевает на тебя %3$C4.", ch, obj, victim, TO_VICT);
     oldact("$c1 надевает на $C4 $o4.", ch, obj, victim, TO_NOTVICT);
     oprog_dress(obj, ch, victim);	
 }
@@ -234,13 +234,13 @@ CMDRUNP( remove )
     
     if (!obj->wear_loc->remove( obj, 0 )) {
         oldact("Ты пытаешься снять $o4 с $C2, но безуспешно.", ch, obj, victim, TO_CHAR);
-        oldact("$c1 пытается снять с тебя $o4, но не может.", ch, obj, victim, TO_VICT);
+        act("%1$^C1 пытается снять с тебя %3$C4, но не может.", ch, obj, victim, TO_VICT);
         oldact("$c1 пытается снять с $C2 $o4, но не может.", ch, obj, victim, TO_NOTVICT);
         return;
     }
     
     oldact("Ты снимаешь $o4 с $C2.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 снимает с тебя $o4.", ch, obj, victim, TO_VICT);
+    act("%1$^C1 снимает с тебя %3$C4.", ch, obj, victim, TO_VICT);
     oldact("$c1 снимает с $C2 $o4.", ch, obj, victim, TO_NOTVICT);
     
     if (obj->carried_by == victim) {

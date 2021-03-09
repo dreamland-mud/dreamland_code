@@ -475,7 +475,7 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     affect_to_obj( obj, &af );
 
     act("Ты взываешь к Богам, и %3$O1 загорается священным огнем!", ch, obj, 0, TO_CHAR);
-    oldact("$c1 взывает к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_ROOM);
+    act("%1$^C1 взывает к Богам, и %3$C1 загорается священным огнем!", ch, obj, 0, TO_ROOM);
 }
 
 

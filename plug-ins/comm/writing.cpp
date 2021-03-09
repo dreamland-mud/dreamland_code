@@ -81,7 +81,7 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     else if (cmd == "-" && ch->is_immortal( )) {
         if (ed && lineDel( ed )) {
             act("Ты отшкрябываешь последнюю строчку с %3$O2.", ch, wall, 0, TO_CHAR );
-            oldact("$c1 скребет $o4.", ch, wall, 0, TO_ROOM );
+            act("%1$^C1 скребет %3$C4.", ch, wall, 0, TO_ROOM );
         }
         else
             act("%3$^O1 девственно чист(а) - удалять нечего.", ch, wall, 0, TO_CHAR );
@@ -89,7 +89,7 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     else if (cmd == "clear" && ch->is_immortal( )) {
         descFree( wall, wall->getName( ) );
         act("Ты тщательно отшкрябываешь все надписи с %3$O2.", ch, wall, 0, TO_CHAR );
-        oldact("$c1 тщательно отшкрябывает все надписи с $o2.", ch, wall, 0, TO_ROOM );
+        act("%1$^C1 тщательно отшкрябывает все надписи с %3$C2.", ch, wall, 0, TO_ROOM );
     }                
     else
         usage( ch );

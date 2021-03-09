@@ -269,7 +269,7 @@ bool MansionKeyMaker::canServeClient( Character * )
 
 void MansionKeyMaker::msgListRequest( Character *client )
 {
-    oldact("$c1 просит $C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
+    act("%1$^C1 просит %2$C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
     act("Ты просишь у %2$C4 показать список ключей.", client, 0, getKeeper( ), TO_CHAR );
 }
 

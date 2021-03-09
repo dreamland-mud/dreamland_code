@@ -186,7 +186,7 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
     }
     
     oldact("Ты берешь $C4 за $o4.", ch, obj, victim, TO_CHAR);
-    oldact("$c1 берет тебя за $o4.", ch, obj, victim, TO_VICT);
+    act("%1$^C1 берет тебя за %3$C4.", ch, obj, victim, TO_VICT);
     oldact("$c1 берет $C4 за $o4.", ch, obj, victim, TO_NOTVICT);
     
     FENIA_VOID_CALL( obj, "Seize", "CC", ch, victim );
@@ -423,7 +423,7 @@ static bool get_obj( Character *ch, Object *obj )
     act("Ты берешь %3$O4.", ch, obj, 0, TO_CHAR);
 
     if (!IS_AFFECTED(ch,AFF_SNEAK))
-        oldact("$c1 берет $o4.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 берет %3$C4.", ch, obj, 0, TO_ROOM);
             
     obj_from_room( obj );
     obj_to_char( obj, ch );
@@ -1165,7 +1165,7 @@ static int drop_obj( Character *ch, Object *obj )
     obj_to_room( obj, ch->in_room );
 
     if (!IS_AFFECTED(ch, AFF_SNEAK))
-        oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
+        act("%1$^C1 бросает %3$C4.", ch, obj, 0, TO_ROOM );
 
     act("Ты бросаешь %3$O4.", ch, obj, 0, TO_CHAR );
 
@@ -1405,13 +1405,13 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
     case GIVE_MODE_USUAL:
     default:
         oldact("$c1 дает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-        oldact("$c1 дает тебе $o4.", ch, obj, victim, TO_VICT );
+        act("%1$^C1 дает тебе %3$C4.", ch, obj, victim, TO_VICT );
         oldact("Ты даешь $o4 $C3.", ch, obj, victim, TO_CHAR );
         break;
 
     case GIVE_MODE_PRESENT:
         oldact("$c1 дарит $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-        oldact("$c1 дарит тебе $o4.", ch, obj, victim, TO_VICT );
+        act("%1$^C1 дарит тебе %3$C4.", ch, obj, victim, TO_VICT );
         oldact("Ты даришь $o4 $C3.", ch, obj, victim, TO_CHAR );
 
         if (oprog_present( obj, ch, victim ))
@@ -1480,9 +1480,9 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
     }
 
     if (mode == GIVE_MODE_PRESENT) {
-        oldact("$c1 дарит $C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 дарит %2$C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
     } else {
-        oldact("$c1 дает $C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 дает %2$C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
     }
     
     mprog_bribe( victim, ch, gold, silver );
@@ -1687,10 +1687,10 @@ CMDRUNP( use )
     
     if (obj->carried_by == ch) {
         act("Ты вертишь в руках %3$O4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 вертит в руках $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 вертит в руках %3$C4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
     } else {
         act("Ты озадаченно ощупываешь %3$O4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 озадаченно ощупывает $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 озадаченно ощупывает %3$C4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
     }
 }        
 

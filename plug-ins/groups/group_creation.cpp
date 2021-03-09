@@ -77,7 +77,7 @@ VOID_SPELL(ContinualLight)::run( Character *ch, char *target_name, int sn, int l
     dress_created_item( sn, light, ch, target_name );
     obj_to_char( light, ch );
 
-    oldact("$c1 взмахивает руками и создает $o4.",ch,light,0,TO_ROOM);
+    act("%1$^C1 взмахивает руками и создает %3$C4.",ch,light,0,TO_ROOM);
     act("Ты взмахиваешь руками и создаешь %3$O4.",ch,light,0,TO_CHAR);
 }
 
@@ -100,11 +100,11 @@ VOID_SPELL(CreateFood)::run( Character *ch, char *target_name, int sn, int level
     obj_to_char( mushroom, ch );
 
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-        oldact("$c1 взмахивает руками, и с неба падает $o1.", ch, mushroom, 0, TO_ROOM );
+        act("%1$^C1 взмахивает руками, и с неба падает %3$C1.", ch, mushroom, 0, TO_ROOM );
         act("Ты взмахиваешь руками, и с неба падает %3$O1.", ch, mushroom, 0, TO_CHAR );
     }
     else {
-        oldact("$c1 взмахивает руками и создает $o4.", ch, mushroom, 0, TO_ROOM);
+        act("%1$^C1 взмахивает руками и создает %3$C4.", ch, mushroom, 0, TO_ROOM);
         act("Ты взмахиваешь руками и создаешь %3$O4.", ch, mushroom, 0, TO_CHAR);
     }
 }
@@ -120,11 +120,11 @@ VOID_SPELL(CreateRose)::run( Character *ch, char *target_name, int sn, int level
     obj_to_char(rose, ch);
     
     if (!rose->getRealShortDescr( )) {
-        oldact("$c1 взмахивает руками и создает прекрасную $o4.", ch, rose, 0, TO_ROOM);
+        act("%1$^C1 взмахивает руками и создает прекрасную %3$C4.", ch, rose, 0, TO_ROOM);
         act("Ты взмахиваешь руками и создаешь прекрасную %3$O4.", ch, rose, 0, TO_CHAR);
     }
     else {
-        oldact("$c1 взмахивает руками и создает $o4.", ch, rose, 0, TO_ROOM);
+        act("%1$^C1 взмахивает руками и создает %3$C4.", ch, rose, 0, TO_ROOM);
         act("Ты взмахиваешь руками и создаешь %3$O4.", ch, rose, 0, TO_CHAR);
     }
 }
@@ -241,7 +241,7 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
         act("Ты взмахиваешь руками и создаешь вращающийся диск.", ch, 0, 0, TO_CHAR);
     }
     else {
-        oldact("$c1 взмахивает руками и создает $o4.", ch, disc, 0, TO_ROOM);
+        act("%1$^C1 взмахивает руками и создает %3$C4.", ch, disc, 0, TO_ROOM);
         act("Ты взмахиваешь руками и создаешь %3$O4.", ch, disc, 0, TO_CHAR);
     }
 
