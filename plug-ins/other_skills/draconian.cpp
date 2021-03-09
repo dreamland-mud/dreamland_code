@@ -53,7 +53,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
   affect_to_char(ch, &af);
 
   ch->pecho("Сила Дракона пронизывает тебя.");
-  oldact("$c1 становится сильнее.", ch, 0, 0, TO_ROOM);
+  act("%^C1 становится сильнее.", ch, 0, 0, TO_ROOM);
 
 }
 
@@ -99,8 +99,8 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
     int dam,hp_dam,dice_dam;
     int hpch;
     
-    oldact("$c1 выдыхает воронку бушующего огня.", ch,0,victim,TO_NOTVICT);
-    oldact("$c1 выдыхает на тебя воронку бушующего огня!", ch,0,victim,TO_VICT);
+    act("%^C1 выдыхает воронку бушующего огня.", ch,0,victim,TO_NOTVICT);
+    act("%^C1 выдыхает на тебя воронку бушующего огня!", ch,0,victim,TO_VICT);
     oldact("Ты выдыхаешь воронку бушующего огня.", ch,0,0,TO_CHAR);
 
     hpch = max( 10, (int)ch->hit );
@@ -172,8 +172,8 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
     
     int dam,hp_dam,dice_dam, hpch;
     
-    oldact("$c1 выдыхает леденящую воронку инея!", ch, 0, victim, TO_NOTVICT);
-    oldact("$c1 выдыхает на тебя леденящую воронку инея!", ch, 0, victim, TO_VICT);
+    act("%^C1 выдыхает леденящую воронку инея!", ch, 0, victim, TO_NOTVICT);
+    act("%^C1 выдыхает на тебя леденящую воронку инея!", ch, 0, victim, TO_VICT);
     oldact("Ты выдыхаешь воронку инея.", ch, 0, victim, TO_CHAR);
 
     hpch = max(12,(int)ch->hit);
@@ -246,7 +246,7 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
 
     int dam,hp_dam,dice_dam,hpch;
 
-    oldact("$c1 выдыхает воронку ядовитого газа!", ch, 0, 0, TO_ROOM);
+    act("%^C1 выдыхает воронку ядовитого газа!", ch, 0, 0, TO_ROOM);
     oldact("Ты выдыхаешь воронку ядовитого газа.", ch, 0, 0, TO_CHAR);
 
     hpch = max(16,(int)ch->hit);
@@ -303,7 +303,7 @@ VOID_SPELL(LightningBreath)::run( Character *ch, Character *victim, int sn, int 
     int dam,hp_dam,dice_dam,hpch;
 
     oldact("Выдох $c2 ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_NOTVICT);
-    oldact("Выдох $c2 ударяет по тебе разрядом молнии!", ch, 0, victim, TO_VICT);
+    act("Выдох %C2 ударяет по тебе разрядом молнии!", ch, 0, victim, TO_VICT);
     oldact("Твой выдох ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_CHAR);
 
     hpch = max(10,(int)ch->hit);

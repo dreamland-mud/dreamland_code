@@ -318,7 +318,7 @@ void char_update( )
         bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
 
         if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
-            oldact("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM);
+            act("%^C1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM);
             extract_char( ch );
             continue;
         }
@@ -418,7 +418,7 @@ void char_update( )
                 if (IS_SET(ch->act, ACT_UNDEAD))
                     oldact("$c1 развалил$gось|ся|ась на куски.", ch, 0, 0, TO_ROOM);
                 else
-                    oldact("$c1 исчезает.", ch, 0, 0, TO_ROOM);
+                    act("%^C1 исчезает.", ch, 0, 0, TO_ROOM);
                 extract_char( ch );
                 continue;
             }
@@ -1326,7 +1326,7 @@ void player_update( )
             ch->last_death_time--;
             if (!IS_DEATH_TIME(ch)) {
                 oldact("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR);
-                oldact("$c1 полностью возвращается в мир живых.", ch, 0, 0, TO_NOTVICT);
+                act("%^C1 полностью возвращается в мир живых.", ch, 0, 0, TO_ROOM);
                 UNSET_DEATH_TIME(ch);
             }
         }
@@ -1415,13 +1415,13 @@ void idle_update( PCharacter *ch )
 {
     if (IS_VIOLENT( ch ))
     {
-        oldact("Лихорадочный блеск в глазах $c2, пропадает.", ch, 0, 0, TO_ROOM );
+        act("Лихорадочный блеск в глазах %C2 пропадает.", ch, 0, 0, TO_ROOM );
         oldact("Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
         REMOVE_VIOLENT( ch );
         ch->PK_time_v = 0;
     }
 
-    oldact("$c1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
+    act("%^C1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
     oldact("Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
 
     if (IS_SET(ch->config, CONFIG_AUTOAFK) && !IS_SET(ch->comm, COMM_AFK))
@@ -1518,7 +1518,7 @@ void wield_update( Character *ch )
             && (!wield || wield->wear_loc == wear_none)) 
     {
         oldact("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
-        oldact("$c1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
+        act("%^C1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
         unequip_char( ch, second );
         equip_char( ch, second, wear_wield );
     }

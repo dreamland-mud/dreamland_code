@@ -54,7 +54,7 @@ void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest
 void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     if (chance(1) && quest->delivered == 1) {
-        oldact("$c1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );
+        act("%^C1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );
         interpret_raw( ch, "grin" );
         return;
     } 

@@ -125,7 +125,7 @@ CMDRUNP( smell )
 
     if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
         oldact("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
-        oldact("$c1 принюхивается.", ch, 0, 0, TO_ROOM);
+        act("%^C1 принюхивается.", ch, 0, 0, TO_ROOM);
 
         if (rprog_smell( ch->in_room, ch, argument ))
             return;
@@ -201,11 +201,11 @@ CMDRUNP( smell )
 
         if (ch == victim) {
             oldact("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
+            act("%^C1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
         } else {
             oldact("Ты обнюхиваешь $C4.", ch, 0, victim, TO_CHAR);
             oldact("$c1 обнюхивает $C4.", ch, 0, victim, TO_NOTVICT);
-            oldact("$c1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
+            act("%^C1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
         }
 
         if (!( rc = mprog_smell( victim, ch, argument ) )) {

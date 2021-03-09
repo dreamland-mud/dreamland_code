@@ -187,14 +187,14 @@ SKILL_RUNP( bashdoor )
                 {
                         REMOVE_BIT(peexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(peexit->exit_info, EX_CLOSED);
-                        oldact("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
+                        act("%^C1 выбивает дверь.", ch, 0, 0, TO_ROOM);
                         oldact("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
                 }
                 else
                 {
                         REMOVE_BIT(pexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-                        oldact("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
+                        act("%^C1 выбивает дверь.", ch, 0, 0, TO_ROOM);
                         oldact("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
 
                         /* open the other side */
@@ -384,7 +384,7 @@ SKILL_RUNP( bash )
         if (SHADOW(ch))
         {
                 ch->pecho("Ты безуспешно пытаешься сбить с ног свою тень.");
-                oldact("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM);
+                act("%^C1 бьет щитом свою тень.",ch,0,0,TO_ROOM);
                 return;
         }
 
@@ -457,7 +457,7 @@ SKILL_RUNP( bash )
                 }
                 else
                 {
-                        oldact("$c1 наносит тебе удар щитом!",ch,0,victim,TO_VICT);
+                        act("%^C1 наносит тебе удар щитом!",ch,0,victim,TO_VICT);
                         oldact("Ты наносишь удар щитом $C3!",ch,0,victim,TO_CHAR);
                         oldact("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT);
                 }
@@ -475,7 +475,7 @@ SKILL_RUNP( bash )
                 if (number_percent() < 50)
                 {
                         oldact("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
-                        oldact("$c1 промахивается и падает.",ch,0,victim,TO_NOTVICT);
+                        act("%^C1 промахивается и падает.",ch,0,victim,TO_NOTVICT);
                         oldact_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
                                 ch,0,victim,TO_VICT,POS_RESTING);
                         ch->position = POS_RESTING;
@@ -588,7 +588,7 @@ SKILL_RUNP( trip )
         {
                 ch->pecho("Ты запинаешься и падаешь!");
                 ch->setWait( 2 * gsn_trip->getBeats( ) );
-                oldact("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM);
+                act("%^C1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM);
                 return;
         }
 
@@ -637,7 +637,7 @@ SKILL_RUNP( trip )
         {
                 if ( number_percent() < 70 )
                 {
-                        oldact("$c1 подсекает тебя и ты падаешь!",ch,0,victim,TO_VICT);
+                        act("%^C1 подсекает тебя и ты падаешь!",ch,0,victim,TO_VICT);
                         oldact("Ты подсекаешь $C4 и $C1 падает!",ch,0,victim,TO_CHAR);
                         oldact("$c1 подсекает $C4, и $C1 падает!",ch,0,victim,TO_NOTVICT);
                         victim->setWaitViolence( 2 );
@@ -645,7 +645,7 @@ SKILL_RUNP( trip )
                 }
                 else
                 {
-                        oldact("$c1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT);
+                        act("%^C1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT);
                         oldact("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR);
                         oldact("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT);
                 }
@@ -1011,7 +1011,7 @@ SKILL_RUNP( crush )
         {
                 oldact("{YТвой мощный удар как будто соскальзывает c $C2, не причиняя вреда.",
                         ch,0,victim,TO_CHAR);
-                oldact("{YМощный удар $c2 скользит по поверхности твоего охранного щита.{x",
+                act("{YМощный удар %C2 скользит по поверхности твоего охранного щита.{x",
                         ch,0,victim,TO_VICT);
                 oldact("{YМощный удар $c2 как будто соскальзывает с $C2.{x",
                         ch,0,victim,TO_NOTVICT);
@@ -1076,7 +1076,7 @@ SKILL_RUNP( crush )
         {
                 damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
                 oldact("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
-                oldact("$c1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT);
+                act("%^C1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT);
                 oldact_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 ch->position = POS_RESTING;
@@ -1262,7 +1262,7 @@ SKILL_RUNP( dirt )
         if(SHADOW(ch))
         {
                 ch->pecho("Твоя бездонная тень поглощает пыль.");
-                oldact("$c1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM);
+                act("%^C1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM);
                 return;
         }
 
@@ -1404,11 +1404,11 @@ SKILL_RUNP( warcry )
         switch (number_range( 1, 2 )) {
         case 1: 
             oldact("Ты тихонько хрюкаешь.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 тихонько хрюкает.", ch, 0, 0, TO_ROOM);
+            act("%^C1 тихонько хрюкает.", ch, 0, 0, TO_ROOM);
             break;
         case 2:
             oldact("Ты сдавленно стонешь.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 издает сдавленные стоны.", ch, 0, 0, TO_ROOM);
+            act("%^C1 издает сдавленные стоны.", ch, 0, 0, TO_ROOM);
             break;
         }
         
@@ -1439,7 +1439,7 @@ SKILL_RUNP( warcry )
     }
     else {
         oldact("Ты издаешь боевой клич и чувствуешь, что теперь тебе все по плечу!", ch, 0, 0, TO_CHAR);
-        oldact("$c1 издает боевой клич!", ch, 0, 0, TO_ROOM);
+        act("%^C1 издает боевой клич!", ch, 0, 0, TO_ROOM);
     }
 
     gsn_warcry->improve( ch, true );
@@ -1548,7 +1548,7 @@ SKILL_RUNP( smash )
     }
 
     if (victim->position < POS_FIGHTING) {
-        oldact("Подожди пока $E встанет.", ch,NULL,victim,TO_CHAR);
+        oldact("Подожди пока $E встанет.", ch,0,victim,TO_CHAR);
         return;
     } 
 
@@ -1561,7 +1561,7 @@ SKILL_RUNP( smash )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        oldact("Но $C1 твой друг!!!",ch,NULL,victim,TO_CHAR);
+        oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -1572,7 +1572,7 @@ SKILL_RUNP( smash )
 
     if(SHADOW(ch)) {
       ch->pecho("Ты безуспешно пытаешься бороться со своей тенью.");
-      oldact("$c1 обнимается со своей тенью.", ch, NULL, NULL, TO_ROOM);
+      act("%^C1 обнимается со своей тенью.", ch, 0, 0, TO_ROOM);
       return;
     }
    

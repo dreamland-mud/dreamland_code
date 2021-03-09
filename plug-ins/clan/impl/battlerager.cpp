@@ -494,7 +494,7 @@ SKILL_RUNP( spellbane )
         affect_to_char(ch,&af);
 
         oldact("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR);
-        oldact("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM);
+        act("%^C1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM);
 }
 
 /*
@@ -529,7 +529,7 @@ SKILL_RUNP( resistance )
       ch->mana -= mana;
 
       oldact("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
-      oldact("$c1 выглядит покрепче.",ch,0,0,TO_ROOM);
+      act("%^C1 выглядит покрепче.",ch,0,0,TO_ROOM);
       gsn_resistance->improve( ch, true );
     }
   else
@@ -603,7 +603,7 @@ SKILL_RUNP( truesight )
       ch->mana -= mana; 
 
       oldact("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
-      oldact("$c1 смотрит более зорко.",ch,0,0,TO_ROOM);
+      act("%^C1 смотрит более зорко.",ch,0,0,TO_ROOM);
       gsn_truesight->improve( ch, true );
     }
   else
@@ -659,7 +659,7 @@ SKILL_RUNP( bandage )
                 int slevel = skill_level(*gsn_bandage, ch);
 
                 ch->pecho( "Ты накладываешь повязку на свою рану!" );
-                oldact("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM);
+                act("%^C1 перевязывает свои раны.",ch,0,0,TO_ROOM);
                 gsn_bandage->improve( ch, true );
 
                 heal = ( dice(4, 8 ) + slevel / 2 );
@@ -780,7 +780,7 @@ bool ClanGuardBattlerager::specFight( )
     if ( number_percent() < 33 )
     {
             oldact("Ты наносишь тройной удар смертоносной силы!",ch,0,0,TO_CHAR);
-            oldact("$c1 наносит тройной удар смертоносной силы!",ch,0,0,TO_ROOM);
+            act("%^C1 наносит тройной удар смертоносной силы!",ch,0,0,TO_ROOM);
             one_hit( ch, victim );
             one_hit( ch, victim );
             one_hit( ch, victim );

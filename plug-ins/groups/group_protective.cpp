@@ -231,7 +231,7 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
     af.level     = level;
     af.duration  = level / 6;
     affect_to_char( victim, &af );
-    oldact("{DТемная аура{x окружает $c4.", victim, 0, 0, TO_ROOM);
+    act("{DТемная аура{x окружает %C4.", victim, 0, 0, TO_ROOM);
     oldact("{DТемная аура{x окружает тебя.", victim, 0, 0, TO_CHAR);
 }
 
@@ -634,10 +634,10 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
   
   affect_to_char( victim, &af );
   if (chance(1)) {
-      oldact("Предохранительный щит окружает $c4.",victim,0,0,TO_ROOM);
+      act("Предохранительный щит окружает %C4.",victim,0,0,TO_ROOM);
       victim->pecho("Предохранительный щит окружает тебя.");
   } else {
-      oldact("Охранный щит окружает $c4.",victim,0,0,TO_ROOM);
+      act("Охранный щит окружает %C4.",victim,0,0,TO_ROOM);
       victim->pecho("Охранный щит окружает тебя.");
   }
 }
@@ -679,7 +679,7 @@ VOID_SPELL(Sanctuary)::run( Character *ch, Character *victim, int sn, int level 
     af.duration  = level / 6;
     af.bitvector.setValue(AFF_SANCTUARY);
     affect_to_char( victim, &af );
-    oldact("{WБелая аура{x окружает $c4.", victim, 0, 0, TO_ROOM);
+    act("{WБелая аура{x окружает %C4.", victim, 0, 0, TO_ROOM);
     oldact("{WБелая аура{x окружает тебя.", victim, 0, 0, TO_CHAR);
 }
 
@@ -695,7 +695,7 @@ VOID_SPELL(Stardust)::run( Character *ch, Character *victim, int sn, int level )
     af.level     = level;
     af.duration  = level / 6;
     affect_to_char( victim, &af );
-    oldact("Мерцающая {Wз{wве{Wзд{wная {Wп{wыль закружилась вокруг $c2.", victim, 0, 0, TO_ROOM);
+    act("Мерцающая {Wз{wве{Wзд{wная {Wп{wыль закружилась вокруг %C2.", victim, 0, 0, TO_ROOM);
     oldact("Мерцающая {Wз{wве{Wзд{wная {Wп{wыль закружилась вокруг тебя.", victim, 0, 0, TO_CHAR);
 }
 
@@ -724,10 +724,10 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
 
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
         oldact("Божественная энергия окружает тебя щитом.", victim, 0, 0, TO_CHAR);
-        oldact("Божественная энергия окружает $c4 щитом.", victim, 0, 0, TO_ROOM);
+        act("Божественная энергия окружает %C4 щитом.", victim, 0, 0, TO_ROOM);
     } else {
         oldact("Волшебный щит окружает тебя.", victim, 0, 0, TO_CHAR);
-        oldact("Волшебный щит окружает $c4.", victim, 0, 0, TO_ROOM);
+        act("Волшебный щит окружает %C4.", victim, 0, 0, TO_ROOM);
     }
 }
 

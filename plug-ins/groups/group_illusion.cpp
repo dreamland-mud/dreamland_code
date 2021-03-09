@@ -70,7 +70,7 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector.setValue(ADET_FEAR);
     affect_to_char( victim, &af );
     oldact("Ты дрожишь от страха.", victim, 0, 0, TO_CHAR);
-    oldact("$c1 дрожит от страха.", victim, 0, 0, TO_ROOM);
+    act("%^C1 дрожит от страха.", victim, 0, 0, TO_ROOM);
 }
 
 SPELL_DECL(ImprovedInvis);

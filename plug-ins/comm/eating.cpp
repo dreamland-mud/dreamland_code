@@ -150,7 +150,7 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
             /* The food was poisoned! */
             Affect af;
 
-            oldact("$c1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM);
+            act("%^C1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM);
             ch->pecho("Ты хватаешься за горло и задыхаешься.");
 
             af.bitvector.setTable(&affect_flags);

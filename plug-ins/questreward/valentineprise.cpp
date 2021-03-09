@@ -19,7 +19,7 @@ void ValentinePrise::wear( Character *ch )
         oldact(msgChar.getValue( ).c_str( ), ch, obj, 0, TO_CHAR);
 
     if (msgRoom.getValue( ).empty( ))
-        oldact("{CАура {Rлюбви{C окружает $c4.{x", ch, obj, 0, TO_ROOM);
+        act("{CАура {Rлюбви{C окружает %C4.{x", ch, obj, 0, TO_ROOM);
     else
         oldact(msgRoom.getValue( ).c_str( ), ch, obj, 0, TO_ROOM);
 

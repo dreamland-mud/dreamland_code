@@ -129,7 +129,7 @@ void ChaosBlade::fight( Character *ch )
 bool ChaosBlade::death( Character *ch )
 {
     oldact_p("Твой {MКлинок Хаоса{x исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    oldact("{MКлинок Хаоса{x $c2 исчезает.", ch, 0, 0, TO_ROOM );
+    act("{MКлинок Хаоса{x %C2 исчезает.", ch, 0, 0, TO_ROOM );
     extract_obj( obj );
     return false;
 }
@@ -181,7 +181,7 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
         }
 
         victim->pecho("Тебя сконфузили!");
-        oldact("$c1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM);
+        act("%^C1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM);
 
         af.type      = sn;
         af.level     = level;
@@ -345,7 +345,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
    }
 
   oldact("Ты меняешь свой облик, подражая $C3.", ch,0,victim,TO_CHAR);
-  oldact("$c1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
+  act("%^C1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
   oldact("$c1 меняет свой облик, подражая $C3!", ch,0,victim,TO_NOTVICT);
 
   af.type               = sn;

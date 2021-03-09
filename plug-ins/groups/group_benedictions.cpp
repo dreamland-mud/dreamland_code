@@ -63,7 +63,7 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
             strength = IS_NEUTRAL(ch) ? 2 : 1;
 
     if (!strength) {
-        oldact("Похоже, твои Боги не благосклонны к $C3.", ch, NULL, victim, TO_CHAR);
+        oldact("Похоже, твои Боги не благосклонны к $C3.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -80,7 +80,7 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
 
     if (victim != ch) {
         oldact("Ты одаряешь $C3 благостью своих Богов.", ch,0,victim,TO_CHAR);
-        oldact("$c1 одаряет тебе благостью своих Богов.", ch,0,victim,TO_VICT);
+        act("%^C1 одаряет тебе благостью своих Богов.", ch,0,victim,TO_VICT);
     }
     else
         victim->pecho("Ты наслаждаешься божественной благостью.");
@@ -225,7 +225,7 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
               continue;
 
             vch->pecho("Волна спокойствия окутывает тебя.");
-            oldact("Волна спокойствия окутывает $c4.", vch, 0, 0, TO_ROOM );
+            act("Волна спокойствия окутывает %C4.", vch, 0, 0, TO_ROOM );
 
             if (vch->fighting || vch->position == POS_FIGHTING)
               stop_fighting(vch,false);
@@ -333,7 +333,7 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
             affect_to_char( gch, &af );
 
             oldact("Священная броня окружает тебя.", gch, 0, 0, TO_CHAR);
-            oldact("Священная броня окружает $c4.", gch, 0, 0, TO_ROOM);
+            act("Священная броня окружает %C4.", gch, 0, 0, TO_ROOM);
         } else {
             if( gch == ch)
                oldact("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
@@ -358,7 +358,7 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
         affect_to_char( gch, &af );
 
         oldact("Божественная энергия окружает тебя щитом.", gch, 0, 0, TO_CHAR);
-        oldact("Божественная энергия окружает $c4 щитом.", gch, 0, 0, TO_ROOM);
+        act("Божественная энергия окружает %C4 щитом.", gch, 0, 0, TO_ROOM);
     }
 }
 
@@ -691,7 +691,7 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
         victim = ch;
 
     if ( IS_GOOD(victim) ) {
-        oldact("Силы Света защищают $c4.", victim, 0, 0, TO_ROOM);
+        act("Силы Света защищают %C4.", victim, 0, 0, TO_ROOM);
         oldact("Силы Света защищают тебя.", victim, 0, 0, TO_CHAR);
         return;
     }

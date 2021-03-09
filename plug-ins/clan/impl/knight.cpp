@@ -114,7 +114,7 @@ void ClanGuardKnight::actGhost(PCharacter *)
 
 void ClanGuardKnight::actGiveInvitation(PCharacter *wch, Object *obj)
 {
-    oldact("$c1 внимательно сверяется со списком.", ch, 0, 0, TO_ROOM);
+    act("%^C1 внимательно сверяется со списком.", ch, 0, 0, TO_ROOM);
     oldact("$c1 ставит Королевскую печать на $o6.", ch, obj, 0, TO_ROOM);
 }
 
@@ -254,7 +254,7 @@ SKILL_RUNP(guard)
         }
 
     oldact("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR);
-    oldact("Теперь тебя охраняет $c4.", pch, 0, victim, TO_VICT);
+    act("Теперь тебя охраняет %C4.", pch, 0, victim, TO_VICT);
     oldact("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT);
 
     pch->guarding = victim;
@@ -278,7 +278,7 @@ BOOL_SKILL(guard)::run(Character *wch, Character *mob)
     if (number_percent() < min(100, chance))
     {
         oldact("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
-        oldact("$c1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
+        act("%^C1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
         oldact("Ты прыгаешь перед $C5!", ch->guarded_by, 0, ch, TO_CHAR);
         gsn_guard->improve(ch->guarded_by, true, mob);
         return true;
@@ -331,7 +331,7 @@ bool KnightWeapon::death(Character *ch)
     wielded = (obj->wear_loc == wear_wield || obj->wear_loc == wear_second_wield);
 
     oldact_p("Твое золотое оружие исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD);
-    oldact("Золотое оружие $c2 исчезает.", ch, 0, 0, TO_ROOM);
+    act("Золотое оружие %C2 исчезает.", ch, 0, 0, TO_ROOM);
     extract_obj(obj);
 
     if (!wielded || ch->is_npc() || chance(80))

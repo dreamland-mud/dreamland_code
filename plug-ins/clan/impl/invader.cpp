@@ -418,7 +418,7 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
         if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_MAGIC) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
         {
             vch->pecho("Злые духи овладевают тобой.");
-            oldact("Злые духи овладевают $c1.", vch, 0, 0, TO_ROOM);
+            act("Злые духи овладевают %C1.", vch, 0, 0, TO_ROOM);
             affect_join(vch, &af);
         }
     }

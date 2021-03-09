@@ -122,7 +122,7 @@ SKILL_RUNP( tail )
     /* now the attack */
     if (number_percent() < chance / 2)
     {
-        oldact("$c1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT);
+        act("%^C1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT);
         oldact("Ты наносишь $C3 удар хвостом!",ch,0,victim,TO_CHAR);
         oldact("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT);
         gsn_tail->improve( ch, true, victim );
@@ -141,7 +141,7 @@ SKILL_RUNP( tail )
         damage(ch,victim,0,gsn_tail,DAM_BASH, true, DAMF_WEAPON);
         
         oldact("Ты теряешь равновесие и падаешь!",ch,0,victim,TO_CHAR);
-        oldact("$c1 теряет равновесие и падает!",ch,0,victim,TO_NOTVICT);
+        act("%^C1 теряет равновесие и падает!",ch,0,victim,TO_NOTVICT);
         oldact("Ты уклоняешься от хвоста $c2, и $e падает.",ch,0,victim,TO_VICT);
         
         gsn_tail->improve( ch, false, victim );

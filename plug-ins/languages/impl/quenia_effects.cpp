@@ -65,7 +65,7 @@ bool AccuracyWE::run( PCharacter *ch, Character *victim ) const
     affect_join( victim, &af );
 
     oldact("{CТеперь твой взгляд способен различить каждое перышко жаворонка в небе.{x", victim, 0, 0, TO_CHAR );
-    oldact("{CВ глазах $c2 стальным блеском вспыхивает наконечник стрелы.{x", victim, 0, 0, TO_ROOM );
+    act("{CВ глазах %C2 стальным блеском вспыхивает наконечник стрелы.{x", victim, 0, 0, TO_ROOM );
     return true;
 }
 

@@ -254,7 +254,7 @@ void WineSleepWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     set_violent( ch, victim, false );
 
     oldact("Ты чувствуешь внезапный неодолимый приступ сонливости.", victim, 0, 0, TO_CHAR );
-    oldact("$c1 зевает во всю пасть и засыпает.", victim, 0, 0, TO_ROOM );
+    act("%^C1 зевает во всю пасть и засыпает.", victim, 0, 0, TO_ROOM );
 
     af.bitvector.setTable(&affect_flags);
     af.type      = gsn_sleep;
@@ -298,7 +298,7 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
 
     if (number_percent( ) > slevel * bhv->getQuality( ) / 100) {
         oldact_p("Ты ворочаешься во сне.", victim, 0, 0, TO_CHAR, POS_SLEEPING );
-        oldact("$c1 ворочается во сне.", victim, 0, 0, TO_ROOM );
+        act("%^C1 ворочается во сне.", victim, 0, 0, TO_ROOM );
         return;
     }
 
@@ -307,7 +307,7 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     update_pos( victim );
 
     oldact("Сон как рукой сняло!", victim, 0, 0, TO_CHAR );
-    oldact("$c1 вздрагивает и просыпается.", victim, 0, 0, TO_ROOM );
+    act("%^C1 вздрагивает и просыпается.", victim, 0, 0, TO_ROOM );
 }
 
 void WineAwakeWE::onDrink( ArcadianDrinkBehavior::Pointer bhv, Character *ch, int amount ) const
@@ -388,12 +388,12 @@ void BeerArmorWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     
     if (victim->isAffected( gsn_beer_armor )) {
         oldact("Пивная пленка на твоей коже становится прочнее.", victim, 0, 0, TO_CHAR );
-        oldact("Пивная пленка на коже $c2 становится прочнее.", victim, 0, 0, TO_ROOM );
+        act("Пивная пленка на коже %C2 становится прочнее.", victim, 0, 0, TO_ROOM );
         af.modifier = 0;
     }
     else {
         oldact("Твоя кожа покрывается защитной пивной пленкой.", victim, 0, 0, TO_CHAR );
-        oldact("Кожа $c2 покрывается защитной пивной пленкой.", victim, 0, 0, TO_ROOM );
+        act("Кожа %C2 покрывается защитной пивной пленкой.", victim, 0, 0, TO_ROOM );
         af.modifier  = -(af.level * 3 / 2);
     }
 

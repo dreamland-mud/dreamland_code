@@ -41,7 +41,7 @@ CMDRUN( mlove )
 
         if (IS_CHARMED(ch)) {
             oldact("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
-            oldact("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
+            act("%^C1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
             return;
         }
 
@@ -51,7 +51,7 @@ CMDRUN( mlove )
             else 
                 oldact("Куда пойти, куда податься.. кого найти, кому отдаться?", ch, 0, 0, TO_CHAR);
 
-            oldact("$c1 гоняется с похотливым видом за всеми в комнате..берегись!", ch, 0, 0, TO_ROOM);
+            act("%^C1 гоняется с похотливым видом за всеми в комнате..берегись!", ch, 0, 0, TO_ROOM);
             return;
         }
         
@@ -78,7 +78,7 @@ CMDRUN( mlove )
             else 
                 oldact("Эй, не отвлекайся!", ch, 0, 0, TO_CHAR);
             
-            oldact("$c1 торжественно произносит: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM);
+            act("%^C1 торжественно произносит: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM);
             return;
         }
 
@@ -111,7 +111,7 @@ CMDRUN( mlove )
             victim->move -= victim->move / 4;
 
             oldact("Ты срываешь с $C2 одежду и страстно занимаешься с $Y любовью.", ch, 0, victim, TO_CHAR);
-            oldact("$c1 срывает с тебя одежду и страстно занимается с тобой любовью. Ах, да! Еще, еще!", ch, 0, victim, TO_VICT);
+            act("%^C1 срывает с тебя одежду и страстно занимается с тобой любовью. Ах, да! Еще, еще!", ch, 0, victim, TO_VICT);
             oldact("$c1 срывает с $C2 одежду и страстно занимается с $Y любовью.", ch, 0, victim, TO_NOTVICT);
             
             MLOVE_DAZE(victim);

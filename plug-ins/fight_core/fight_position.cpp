@@ -247,13 +247,13 @@ void do_visible( Character *ch )
       {
         ch->pecho( "Ты выходишь из тени." );
         REMOVE_BIT(ch->affected_by, AFF_HIDE);
-        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
+        act("%^C1 выходит из тени.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_FADE))
       {
         ch->pecho( "Ты выходишь из тени." );
         REMOVE_BIT(ch->affected_by, AFF_FADE);
-        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
+        act("%^C1 выходит из тени.", ch, 0, 0, TO_ROOM);
       }
     if ( IS_AFFECTED( ch, AFF_CAMOUFLAGE ) )
     {
@@ -268,14 +268,14 @@ void do_visible( Character *ch )
         affect_strip(ch, gsn_invisibility);
         affect_strip(ch, gsn_mass_invis);
         REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
-        oldact("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
+        act("%^C1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
       {
         ch->pecho( "Ты появляешься из ниоткуда." );
         affect_strip(ch, gsn_improved_invis);
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
-        oldact("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
+        act("%^C1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_SNEAK)
         && !ch->is_npc() && !IS_SET(ch->getRace()->getAff(),AFF_SNEAK) )

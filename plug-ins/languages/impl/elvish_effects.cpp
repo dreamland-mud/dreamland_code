@@ -44,7 +44,7 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
    
-    oldact("{CСекретное знание Сидхов теперь защищает $c4.{x", victim, 0, 0, TO_ROOM);
+    act("{CСекретное знание Сидхов теперь защищает %C4.{x", victim, 0, 0, TO_ROOM);
     oldact("{CСекретное знание Сидхов теперь защищает тебя.{x", victim, 0, 0, TO_CHAR);
     return true;
 }

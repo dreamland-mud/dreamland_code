@@ -55,7 +55,7 @@ CMDRUN( identify )
 
 
     if (ch->is_immortal( )) {
-        oldact("$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT);
+        act("%^C1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT);
     }
     else if (!can_afford(ch, cost, 0, 1)) {
         tell_fmt("У тебя даже %3$d золот%3$Iого|ых|ых нету, чтобы мне заплатить!", ch, rch, cost );

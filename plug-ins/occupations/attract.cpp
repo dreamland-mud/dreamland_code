@@ -51,7 +51,7 @@ CMDRUN( attract )
     }
 
     if (!vch->is_npc( ) || ch->is_npc( )) {
-        oldact("$c1 машет руками, пытаясь привлечь твое внимание.", ch, 0, vch, TO_VICT);
+        act("%^C1 машет руками, пытаясь привлечь твое внимание.", ch, 0, vch, TO_VICT);
         oldact("Ты машешь руками, пытаясь привлечь внимание $C2.", ch, 0, vch, TO_CHAR);
         oldact("$c1 машет руками, пытаясь привлечь внимание $C2.", ch, 0, vch, TO_NOTVICT);
         return;
@@ -71,7 +71,7 @@ CMDRUN( attract )
     
     oldact("$C1 поворачивается в твою сторону.", ch, 0, target, TO_CHAR);
     oldact("$C1 поворачивается к $c3.", ch, 0, target, TO_NOTVICT);
-    oldact("Ты поворачиваешься к $c3.", ch, 0, target, TO_VICT);
+    act("Ты поворачиваешься к %C3.", ch, 0, target, TO_VICT);
 
     attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeAttract>( "attract" );
     attr->addTarget( target, occupation );

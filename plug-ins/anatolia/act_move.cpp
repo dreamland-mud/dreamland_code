@@ -231,7 +231,7 @@ CMDRUNP( scan )
 
     if (arg1[0] == '\0')
     {
-        oldact("$c1 осматривает все вокруг.", ch, 0, 0, TO_ROOM );
+        act("%^C1 осматривает все вокруг.", ch, 0, 0, TO_ROOM );
         buf << "Осмотревшись, ты видишь:" << endl;
         scan_people( ch->in_room, ch, 0, -1, true, buf );
 
@@ -371,7 +371,7 @@ CMDRUNP( stand )
                 if (obj == 0)
                 {
                         ch->pecho( "Ты просыпаешься и встаешь." );
-                        oldact("$c1 просыпается и встает.", ch, 0, 0, TO_ROOM);
+                        act("%^C1 просыпается и встает.", ch, 0, 0, TO_ROOM);
                         ch->on = 0;
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeStandRoom", "msgWakeStandChar" )) {
@@ -411,7 +411,7 @@ CMDRUNP( stand )
                                 ch->pecho( "Ты уже стоишь." );
                         } else {
                                 ch->pecho( "Ты встаешь." );
-                                oldact("$c1 встает.", ch, 0, 0, TO_ROOM);
+                                act("%^C1 встает.", ch, 0, 0, TO_ROOM);
                         }
                         ch->on = 0;
                 }
@@ -523,7 +523,7 @@ CMDRUNP( rest )
                 else if (obj == 0)
                 {
                         ch->pecho( "Ты просыпаешься и садишься отдыхать." );
-                        oldact("$c1 просыпается и садится отдыхать.",ch,0,0,TO_ROOM);
+                        act("%^C1 просыпается и садится отдыхать.",ch,0,0,TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeRestRoom", "msgWakeRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
@@ -556,7 +556,7 @@ CMDRUNP( rest )
                 if (obj == 0)
                 {
                         ch->pecho( "Ты садишься отдыхать." );
-                        oldact("$c1 садится отдыхать.", ch, 0, 0, TO_ROOM);
+                        act("%^C1 садится отдыхать.", ch, 0, 0, TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRestRoom", "msgSitRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
@@ -582,7 +582,7 @@ CMDRUNP( rest )
                 if (obj == 0)
                 {
                         ch->pecho( "Ты отдыхаешь." );
-                        oldact("$c1 отдыхает.",ch,0,0,TO_ROOM);
+                        act("%^C1 отдыхает.",ch,0,0,TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgRestRoom", "msgRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
@@ -697,7 +697,7 @@ CMDRUNP( sit )
                 if (obj == 0)
                 {
                         ch->pecho( "Ты просыпаешься и садишься." );
-                        oldact("$c1 просыпается и садится.", ch, 0, 0, TO_ROOM);
+                        act("%^C1 просыпается и садится.", ch, 0, 0, TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeSitRoom", "msgWakeSitChar" )) {
                     if (IS_SET(obj->value2(),SIT_AT))
@@ -753,7 +753,7 @@ CMDRUNP( sit )
                 if (obj == 0)
                 {
                         ch->pecho( "Ты садишься." );
-                        oldact("$c1 садится на землю.",ch,0,0,TO_ROOM);
+                        act("%^C1 садится на землю.",ch,0,0,TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRoom", "msgSitChar" )) {
                     if (IS_SET(obj->value2(),SIT_AT))

@@ -63,7 +63,7 @@ void GangChef::greet( Character *mob )
     Gangsters *gquest = Gangsters::getThis( );
 
     if (!gquest->isLevelOK( gquest->getActor( mob ) )) {
-        oldact("$c1 вопит '{RВОН ОТСЮДА!{x'", ch, 0, mob, TO_VICT);
+        act("%^C1 вопит '{RВОН ОТСЮДА!{x'", ch, 0, mob, TO_VICT);
         gquest->exorcism( mob );
         return;
     }

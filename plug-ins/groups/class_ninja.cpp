@@ -193,7 +193,7 @@ SKILL_RUNP( vanish )
             return;
     }    
     
-    oldact("$c1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM);
+    act("%^C1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM);
     ch->pecho("Ты бросаешь на землю световую гранату. {WЯркая вспышка{x на мгновение ослепляет всех вокруг!");
     gsn_vanish->improve( ch, true );
 
@@ -278,13 +278,13 @@ SKILL_RUNP( vanish )
     
     if ( number_percent() > chance ) {
             if (FightingCheck) {
-                oldact("$c1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM);
+                act("%^C1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM);
                 ch->pecho("Ты пытаешься скрыться, но противник бдит, и бой продолжается!");
                 return;
             }
             else {
                 // weak stun is a bitch
-                oldact("$c1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM);                
+                act("%^C1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM);                
                 ch->pecho("Ты пытаешься скрыться, но спотыкаешься и падаешь!");
                 return;                
             }    
@@ -301,7 +301,7 @@ SKILL_RUNP( vanish )
             // trying to kidnap
             oldact("$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT);
             oldact("Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR);
-            oldact("$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
+            act("%^C1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
 
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
@@ -327,7 +327,7 @@ SKILL_RUNP( vanish )
                     // kidnap failed, victim escaped               
                     oldact("$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT);
                     oldact("$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR);
-                    oldact("Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT);
+                    act("Ты умудряешься вырваться из объятий %C2", ch, 0, victim, TO_VICT);
 
                     transfer_char( ch, ch, pRoomIndex,
                         "%1$^C1 внезапно исчезает!",
@@ -500,7 +500,7 @@ SKILL_RUNP( nerve )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
                 oldact("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
-                oldact("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
+                act("%^C1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
                 oldact("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT);
                 gsn_nerve->improve( ch, true, victim );
         }
@@ -608,7 +608,7 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
     affect_to_char(ch,&af);
 
     oldact("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0, TO_CHAR);
-    oldact("$c1 мгновенно концентрируется, готовясь к столкновению с магией.", ch,0,0,TO_ROOM);
+    act("%^C1 мгновенно концентрируется, готовясь к столкновению с магией.", ch,0,0,TO_ROOM);
     return true;
 }
 
@@ -1300,7 +1300,7 @@ SKILL_RUNP( throwdown )
             }
             else {
                 oldact("Ты бросаешь $C4 через плечо.", ch,0,victim,TO_CHAR);
-                oldact("$c1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
+                act("%^C1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
                 oldact("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
                 victim->position = POS_RESTING;
             }        

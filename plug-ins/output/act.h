@@ -41,6 +41,10 @@ void oldact( const char *format, Character *ch,
 void oldact_p( const char *format, Character *ch, 
             const void *arg1, const void *arg2, int type, int min_pos );
 
+void act(const char *format, Character *ch, const void *arg1, Character *vict, int type);
+void act(const char *format, Character *ch, const void *arg1, Object *obj, int type);
+void act(const char *format, Character *ch, const void *arg1, int noarg, int type);
+
 /*--------------------------------------------------------------------------
  * new fmt functions 
  *--------------------------------------------------------------------------*/

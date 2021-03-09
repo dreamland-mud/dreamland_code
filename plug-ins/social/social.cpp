@@ -293,7 +293,7 @@ bool Social::reaction( Character *ch, Character *victim, const DLString &arg )
     case 9: case 10: case 11: case 12:
         oldact("$c1 шлепает $C4.",  victim, 0, ch, TO_NOTVICT );
         oldact_p("Ты шлепаешь $C4.",  victim, 0, ch, TO_CHAR, getPosition( ) );
-        oldact("$c1 шлепает тебя.", victim, 0, ch, TO_VICT );
+        act("%^C1 шлепает тебя.", victim, 0, ch, TO_VICT );
         break;
     case 13: 
         interpret_fmt( victim, "sigh %s", ch->getNameP( ) );

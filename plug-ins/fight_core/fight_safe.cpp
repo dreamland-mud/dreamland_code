@@ -214,7 +214,7 @@ bool is_safe_rspell( short level, Character *victim, bool verbose )
 
     if (rc && verbose) {
         oldact("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
-        oldact("Боги защищают $c4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+        act("Боги защищают %C4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
     }
 
     return rc;
@@ -230,7 +230,7 @@ bool is_safe_rspell( Affect *paf, Character *victim, bool verbose )
     bool rc = is_safe_nomessage(pafOwner, victim);
     if (rc && verbose) {
         oldact("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
-        oldact("Боги защищают $c4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+        act("Боги защищают %C4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
     }
 
     return rc;

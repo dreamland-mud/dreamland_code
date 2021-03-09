@@ -63,7 +63,7 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
         strength = 2;
         
     if (!strength) {
-        oldact("О, нет.. Кажется, $C1 нравится твоим Богам..", ch, NULL, victim, TO_CHAR);
+        oldact("О, нет.. Кажется, $C1 нравится твоим Богам..", ch, 0, victim, TO_CHAR);
         return;
     }
     
@@ -187,7 +187,7 @@ VOID_SPELL(Blindness)::run( Character *ch, Character *victim, int sn, int level 
 
         if ( IS_AFFECTED(victim, AFF_BLIND) )
         {
-    oldact("$c1 и так ничего не видит.",victim,0,0,TO_ROOM);
+    act("%^C1 и так ничего не видит.",victim,0,0,TO_ROOM);
                 return;
         }
 
@@ -206,7 +206,7 @@ VOID_SPELL(Blindness)::run( Character *ch, Character *victim, int sn, int level 
         af.bitvector.setValue(AFF_BLIND);
         affect_to_char( victim, &af );
         victim->pecho("Тебя ослепили!");
-        oldact("$c1 теперь ничего не видит.",victim,0,0,TO_ROOM);
+        act("%^C1 теперь ничего не видит.",victim,0,0,TO_ROOM);
         return;
 
 }
@@ -410,7 +410,7 @@ VOID_AFFECT(DeadlyVenom)::update( Room *room, Affect *paf )
                 && !IS_AFFECTED(vch,AFF_POISON) && number_bits(3) == 0)
         {
             vch->pecho("Тебя подташнивает.");
-            oldact("$c1 {gзеленеет{x лицом.",vch,0,0,TO_ROOM);
+            act("%^C1 {gзеленеет{x лицом.",vch,0,0,TO_ROOM);
             affect_join(vch,&af);
         }
     }
@@ -516,7 +516,7 @@ VOID_AFFECT(LethargicMist)::update( Room *room, Affect *paf )
                 && !IS_AFFECTED(vch,AFF_SLOW) && number_bits(3) == 0 )
         {
             vch->pecho("Твои движения замедляются.");
-            oldact("Движения $c2 замедляются.",vch,0,0,TO_ROOM);
+            act("Движения %C2 замедляются.",vch,0,0,TO_ROOM);
             affect_join(vch,&af);
         }
     }
@@ -636,7 +636,7 @@ VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf )
                 && number_bits(6) == 0)
         {
             vch->pecho( "Ты чувствуешь жар и лихорадку." );
-            oldact("$c1 дрожит и выглядит болезненно.",vch,0,0,TO_ROOM);
+            act("%^C1 дрожит и выглядит болезненно.",vch,0,0,TO_ROOM);
             affect_join(vch,&plague);
         }
 }
@@ -724,7 +724,7 @@ VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level )
 
         affect_join( victim, &af );
         victim->pecho("Ты чувствуешь себя очень болезненно.");
-        oldact("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM);
+        act("%^C1 выглядит очень болезненно.",victim,0,0,TO_ROOM);
 
 }
 
@@ -738,7 +738,7 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
     if (!IS_AFFECTED(ch, AFF_POISON) || IS_SLOW(ch))
         return;
 
-    oldact("$c1 дрожит и испытывает боль.", ch, 0, 0, TO_ROOM);
+    act("%^C1 дрожит и испытывает боль.", ch, 0, 0, TO_ROOM);
     ch->pecho("Ты дрожишь и испытываешь боль.");
     
     poison_damage = paf->level * number_range(1,5);
@@ -802,7 +802,7 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector.setValue(AFF_SLOW);
     affect_to_char( victim, &af );
     victim->pecho("Твои движения замедляются...");
-    oldact("Движения $c2 замедляются.",victim,0,0,TO_ROOM);
+    act("Движения %C2 замедляются.",victim,0,0,TO_ROOM);
     return;
 
 }
@@ -838,7 +838,7 @@ VOID_SPELL(Weaken)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector.setValue(AFF_WEAKEN);
     affect_to_char( victim, &af );
     victim->pecho("Ты чувствуешь, как силы покидают тебя.");
-    oldact("$c1 слабеет на глазах.",victim,0,0,TO_ROOM);
+    act("%^C1 слабеет на глазах.",victim,0,0,TO_ROOM);
     return;
 
 }
@@ -854,7 +854,7 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
     
-    oldact("$c1 произносит нечистые слова!", ch,0,0,TO_ROOM);
+    act("%^C1 произносит нечистые слова!", ch,0,0,TO_ROOM);
     ch->pecho("Ты произносишь нечистые слова!");
 
         for(auto &it : ch->in_room->getPeople())
@@ -934,7 +934,7 @@ VOID_SPELL(BlackFeeble)::run( Character *ch, Character *victim, int sn, int leve
     af.duration  = number_fuzzy( level / 30 ) + 3;
     affect_to_char( ch, &af );
     
-    oldact("Леденящий душу шепот проклятий окружает $c2, образуя защитную ауру.", ch, 0, 0, TO_ROOM);
+    act("Леденящий душу шепот проклятий окружает %C2, образуя защитную ауру.", ch, 0, 0, TO_ROOM);
     ch->pecho("Шепот проклятий окружает тебя, образуя защитную ауру.");
 }
 
@@ -970,5 +970,5 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
     affect_join(victim,&af);
     
     oldact("Ты вскрикиваешь в муках, начиная гнить заживо.", victim, 0, 0, TO_CHAR);
-    oldact("$c1 вскрикивает в муках, начиная гнить заживо.", victim, 0, 0, TO_ROOM);
+    act("%^C1 вскрикивает в муках, начиная гнить заживо.", victim, 0, 0, TO_ROOM);
 }

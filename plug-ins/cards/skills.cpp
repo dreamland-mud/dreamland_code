@@ -127,7 +127,7 @@ SKILL_RUNP( sconce )
 
     if (number_percent( ) < chance * k / 100) {
         oldact("Ты со всей силы бьешь $C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
-        oldact("$c1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
+        act("%^C1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
         oldact("$c1 лупит $C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
         gsn_sconce->improve( ch, true, victim );
 

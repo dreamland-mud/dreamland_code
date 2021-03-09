@@ -145,7 +145,7 @@ bool BeerElementalBehavior::specFight( )
     dam = max( dam      + dice( level, 12 ) / 10, 
                dam / 10 + dice( level, 12 ) );
     
-    oldact("$c1 дышит на тебя перегаром!", ch, 0, victim, TO_VICT);
+    act("%^C1 дышит на тебя перегаром!", ch, 0, victim, TO_VICT);
     oldact("$c1 дышит перегаром на $C4!", ch, 0, victim, TO_NOTVICT);
     
     try {
@@ -162,7 +162,7 @@ bool BeerElementalBehavior::area( )
     ch->max_hit -= ch->max_hit / 10;
 
     if (ch->max_hit < ch->getModifyLevel( )) {
-        oldact("$c1 окончательно усыхает и исчезает.", ch, 0, 0, TO_ROOM );
+        act("%^C1 окончательно усыхает и исчезает.", ch, 0, 0, TO_ROOM );
         extract_char( ch, true );
         return true;
     }

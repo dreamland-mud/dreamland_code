@@ -19,7 +19,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
 
     if (!ch->can_see( vch )) {
         tell_dim( vch, ch, "Я не торгую с тем, кого не вижу. Забирай свои деньги." );
-        oldact("$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
+        act("%^C1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
         ch->silver         -= silver;
         ch->gold        -= gold;
         obj_to_room( create_money( gold, silver ), vch->in_room );
@@ -62,7 +62,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
         
         oldact_p("$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
                 ch, 0, vch, TO_VICT,POS_RESTING );
-        oldact("$c1 роняет на пол кучку монет.", vch,0,0,TO_ROOM);
+        act("%^C1 роняет на пол кучку монет.", vch,0,0,TO_ROOM);
         obj_to_room( create_money( a_gold, a_silver ), vch->in_room );
     }
     else if ( !ch->can_see( vch ) )
@@ -72,7 +72,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
 
         oldact_p("$c1 пытается дать тебе деньги, но промахивается и роняет их на пол.",
                 ch, 0, vch, TO_VICT,POS_RESTING );
-        oldact("$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
+        act("%^C1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
         obj_to_room( create_money( a_gold, a_silver ), vch->in_room );
     }
     else

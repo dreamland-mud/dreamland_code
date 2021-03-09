@@ -108,7 +108,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
 
         victim->pecho("Твои ноги отрываются от земли.");
 
-        oldact("$c1 поднимается в воздух.", victim, 0, 0, TO_ROOM);
+        act("%^C1 поднимается в воздух.", victim, 0, 0, TO_ROOM);
 
         return;
 
@@ -382,7 +382,7 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
     }
 
     if(!bFighting){
-            oldact("$c1 рассеивается в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_ROOM);
+            act("%^C1 рассеивается в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_ROOM);
             oldact("Ты рассеиваешься в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_CHAR);
     }    
 }

@@ -362,7 +362,7 @@ CMDRUNP( close )
 
                 if (!cork) {
                     oldact("У тебя нет пробки от $O2.", ch, 0, obj, TO_CHAR );
-                    oldact("$c1 шарит по карманам в поисках пробки.", ch, 0, obj, TO_ROOM );
+                    act("%^C1 шарит по карманам в поисках пробки.", ch, 0, obj, TO_ROOM );
                     return;
                 }
 

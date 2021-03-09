@@ -82,7 +82,7 @@ void AdamantiteGolem::fight( Character *victim )
     ch->setWait( gsn_rescue->getBeats( )  );
     
     oldact("Ты спасаешь $C4!",  ch, 0, master, TO_CHAR );
-    oldact("$c1 спасает тебя!", ch, 0, master, TO_VICT );
+    act("%^C1 спасает тебя!", ch, 0, master, TO_VICT );
     oldact("$c1 спасает $C4!",  ch, 0, master, TO_NOTVICT );
 
     stop_fighting( master->fighting, false );

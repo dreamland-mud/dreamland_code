@@ -19,7 +19,7 @@
 void SteakCustomer::greet( Character *victim ) 
 {
     if (ourHero( victim ))
-        oldact("$c1 выжидающе смотрит на тебя.", ch, 0, victim, TO_VICT );
+        act("%^C1 выжидающе смотрит на тебя.", ch, 0, victim, TO_VICT );
 }
 
 void SteakCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 

@@ -256,7 +256,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
 
   oldact_p("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.",
                 ch,0,0,TO_CHAR,POS_RESTING);
-  oldact("Кожа $c2 становится серой!",ch,0,0,TO_ROOM);
+  act("Кожа %C2 становится серой!",ch,0,0,TO_ROOM);
 
 }
 
@@ -424,7 +424,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
         room->affectTo( &af );
 
         ch->pecho("Ты защищаешь местность от ловушек Охотников и от их мести.");
-        oldact("$c1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM);
+        act("%^C1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(Prevent);

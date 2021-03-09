@@ -45,7 +45,7 @@ VOID_SPELL(Aid)::run( Character *ch, Character *victim, int sn, int level )
     victim->hit += level * 5; // Historically allowed to go above max_hit.
     update_pos( victim );
     victim->pecho("Волна тепла согревает твое тело.");
-    oldact("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM);
+    act("%^C1 выглядит лучше.", victim, 0, 0, TO_ROOM);
     if (ch != victim) ch->pecho("Ok.");
 
     postaffect_to_char(ch, sn, level / 50);
@@ -64,7 +64,7 @@ VOID_SPELL(Assist)::run( Character *ch, Character *victim, int sn, int level )
         victim->hit += 100 + level * 5;  // Historically allowed to go above max_hit.
         update_pos( victim );
         victim->pecho("Волна тепла согревает твое тело.");
-        oldact("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM);
+        act("%^C1 выглядит лучше.", victim, 0, 0, TO_ROOM);
         if ( ch != victim )
                 ch->pecho("Ok.");
 
@@ -263,7 +263,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     
     } else {
         oldact("Сосредоточившись, ты переносишь раны $C2 на собственное тело.", ch, 0, victim, TO_CHAR);
-        oldact("Сосредоточившись, $c1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT);
+        act("Сосредоточившись, %C1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT);
         oldact("Сосредоточившись, $c1 переносит раны $C2 на собственное тело.", ch, 0, victim, TO_NOTVICT);
 
         hp = victim->max_hit - victim->hit;

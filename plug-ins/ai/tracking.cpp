@@ -97,7 +97,7 @@ bool BasicMobileBehavior::trackLastFought( Character *wch )
     int d;
 
     ch->setWait( gsn_track->getBeats( ) );
-    oldact("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
+    act("%^C1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
 
     d = room->history.went( wch );
     pexit = (d == -1 ? NULL : room->exit[d]);

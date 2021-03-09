@@ -126,7 +126,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
         victim->pecho("Тебя {RУБИЛИ{x!");
 
         oldact("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
-        oldact("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
+        act("%^C2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
 
         victim->pecho("{YБожественные Силы возвращают тебя к жизни!{x");
         
@@ -149,7 +149,7 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
         if ( ch->isAffected(sn ) )
         {
             ch->pecho("Ты пытаешься крикнуть, но только хрип вырывается из твоего горла.");
-            oldact("$c1 хрипит!",ch,0,0,TO_ROOM);
+            act("%^C1 хрипит!",ch,0,0,TO_ROOM);
             return;
         }
 
@@ -375,7 +375,7 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
 
     ch->in_room->owner = str_dup( ch->getNameP( ) );
     ch->pecho("Ты воздвигаешь вокруг себя щит молний.");
-    oldact("$c1 окружает себя щитом молний.",ch,0,0,TO_ROOM);
+    act("%^C1 окружает себя щитом молний.",ch,0,0,TO_ROOM);
     return;
 
 }

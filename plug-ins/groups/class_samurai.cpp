@@ -164,8 +164,8 @@ SKILL_RUNP( explode )
 
     ch->mana -= mana;
 
-    oldact("$c1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
-    oldact("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
+    act("%^C1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
+    act("%^C1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
     oldact("Пусть все сгорит!",ch,0,0,TO_CHAR);
 
     ch->setWait( gsn_explode->getBeats( ) );
@@ -296,7 +296,7 @@ SKILL_RUNP( target )
 
     oldact("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
     oldact("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR);
-    oldact("$c1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
+    act("%^C1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
       return;
     }
 

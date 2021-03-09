@@ -90,7 +90,7 @@ bool Rat::area( )
         return false;
     }
 
-    oldact("$c1 отправляется в крысиный рай.", ch, 0, 0, TO_ROOM);
+    act("%^C1 отправляется в крысиный рай.", ch, 0, 0, TO_ROOM);
     extract_char( ch );
     return true;
 }

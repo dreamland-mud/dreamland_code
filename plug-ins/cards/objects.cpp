@@ -353,7 +353,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             if (number_range(1, 100) < 10) {
                 oldact("{cТы пытаешься затащить $C4 к себе через карту, но вместо этого тащишь кого-то другого!{x",
                     pch, 0, victim, TO_CHAR);        
-                oldact("$c1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
+                act("%^C1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
 
                 multi_hit( findHorribleVictim( pch ), pch );
             }
@@ -365,7 +365,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             fSuccess = true;
             
             oldact("Ты пожимаешь протянутую тебе руку.", pch, 0, victim, TO_CHAR);
-            oldact("$c1 пожимает чью-то руку.", pch, 0, 0, TO_ROOM);
+            act("%^C1 пожимает чью-то руку.", pch, 0, 0, TO_ROOM);
             oldact("{c$o1 оживает. $C1 пожимает твою руку.\r\n{x", victim, myCard->getObj( ), pch, TO_CHAR);
 
             transfer_char( victim, pch, pch->in_room,

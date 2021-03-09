@@ -618,7 +618,7 @@ CMDWIZP( goto )
                 if (!pch->bamfout.empty( ))
                     oldact("$t", ch, pch->bamfout.c_str( ), rch, TO_VICT );
                 else
-                    oldact("$c1 исчезает в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    act("%^C1 исчезает в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
             }
     }
     
@@ -630,7 +630,7 @@ CMDWIZP( goto )
                 if (!pch->bamfin.empty( ))
                     oldact("$t", ch, pch->bamfin.c_str( ), rch, TO_VICT );
                 else
-                    oldact("$c1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    act("%^C1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
             }
     }
 }
@@ -2257,7 +2257,7 @@ CMDWIZP( purge )
               extract_obj( obj );
         }
 
-        oldact("$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
+        act("%^C1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
         ch->pecho("Готово.");
         dreamland->resetOption( DL_SAVE_MOBS );
         dreamland->resetOption( DL_SAVE_OBJS );
@@ -3066,13 +3066,13 @@ CMDWIZP( wizinvis )
       if ( ch->invis_level)
       {
           ch->invis_level = 0;
-          oldact("$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
+          act("%^C1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты снова проявляешься в реальности.");
       }
       else
       {
           ch->invis_level = 102;
-          oldact("$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
+          act("%^C1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     else
@@ -3088,7 +3088,7 @@ CMDWIZP( wizinvis )
       {
           ch->reply = 0;
           ch->invis_level = level;
-          oldact("$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
+          act("%^C1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     }
@@ -3111,7 +3111,7 @@ CMDWIZP( incognito )
       if ( ch->incog_level)
       {
           ch->incog_level = 0;
-          oldact("$c1 больше не маскируется.", ch, 0, 0, TO_ROOM);
+          act("%^C1 больше не маскируется.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты больше не маскируешься.");
       }
       else

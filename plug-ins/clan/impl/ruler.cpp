@@ -689,7 +689,7 @@ SKILL_RUNP( wanted )
                         else
                         {
                                 SET_BIT(victim->act, PLR_WANTED);
-                                oldact("$c1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT);
+                                act("%^C1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT);
                                 victim->pecho("Ты теперь в РОЗЫСКЕ!!!");
                                 if ( !victim->is_npc() )
                                         victim->getPC( )->loyalty = max ( victim->getPC( )->loyalty - 50, -1000);
@@ -705,7 +705,7 @@ SKILL_RUNP( wanted )
                         else
                         {
                                 REMOVE_BIT(victim->act, PLR_WANTED);
-                                oldact("$c1 больше не разыскивается.",victim, 0, ch, TO_NOTVICT);
+                                act("%^C1 больше не разыскивается.",victim, 0, ch, TO_NOTVICT);
                                 victim->pecho("Тебя больше не разыскивают.");
                                 ch->pecho("Ok.");
                         }
@@ -1514,7 +1514,7 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 
     for (rch = victim->in_room->people; rch; rch = rch->next_in_room) {
         if (rch->is_mirror() && rch->doppel == target) {
-            oldact("Луч света, посланный $c5, отражается от зеркала и поражает ТЕБЯ!",
+            act("Луч света, посланный %C5, отражается от зеркала и поражает ТЕБЯ!",
                  ch, 0, target, TO_VICT );
             oldact("Луч света, посланный $c5, отражается от зеркала и поражает $C4!",
                  ch, 0, target, TO_NOTVICT );
@@ -1757,7 +1757,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
   badge->timer = 200;
   oldact("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR);
-  oldact("$c1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM);
+  act("%^C1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM);
 
   obj_to_char(badge,ch);
   wear_obj( ch, badge, 0 );
@@ -1854,7 +1854,7 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
         }
 
   ch->pecho("Ты пытаешься призвать себе в помощь охотника за головами.");
-  oldact("$c1 пытается призвать себе на помощь охотника за головами.",ch,0,0,TO_ROOM);
+  act("%^C1 пытается призвать себе на помощь охотника за головами.",ch,0,0,TO_ROOM);
 
   stalker = create_mobile( get_mob_index(MOB_VNUM_STALKER) );
 

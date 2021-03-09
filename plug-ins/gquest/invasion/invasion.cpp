@@ -158,7 +158,7 @@ void InvasionGQuest::cleanup( bool performance )
             if (mob->behavior) {
                 if (mob->behavior.getDynamicPointer<InvasionMob>( )) {
                     if (performance) 
-                        oldact("$c1 лопается.", ch, 0, 0, TO_ROOM);
+                        act("%^C1 лопается.", ch, 0, 0, TO_ROOM);
                     
                     extract_char( mob );
                 }

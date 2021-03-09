@@ -113,7 +113,7 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
         af.bitvector.setValue(AFF_CHARM);
         affect_to_char( victim, &af );
 
-        oldact("$c1 очаровывает тебя!!!", ch, 0, victim, TO_VICT);
+        act("%^C1 очаровывает тебя!!!", ch, 0, victim, TO_VICT);
 
         if ( ch != victim )
                 oldact("$C1 с обожанием смотрит на тебя.",ch,0,victim,TO_CHAR);
@@ -185,12 +185,12 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
         return;
 
     if (saves_spell( paf->level, ch, DAM_CHARM, witch, DAMF_MAGIC )) {
-        oldact("При взгляде на $c4 твое сердце на мгновение замирает.", witch, 0, ch, TO_VICT);
+        act("При взгляде на %C4 твое сердце на мгновение замирает.", witch, 0, ch, TO_VICT);
         oldact("Во взгляде $C2 на мгновение мелькает полный восторг.", witch, 0, ch, TO_CHAR);
         return;
     }
 
-    oldact("Неужели $c1 выглядит так очаровательно?", witch, 0, ch, TO_VICT);
+    act("Неужели %C1 выглядит так очаровательно?", witch, 0, ch, TO_VICT);
     oldact("$C1 смотрит на тебя с покорностью.", witch, 0, ch, TO_CHAR);
     oldact("$C1 зачарованно смотрит на $c4 и жаждет выполнить любые поручения.", witch, 0, ch, TO_NOTVICT);
 
@@ -331,7 +331,7 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
 
     SET_BIT(victim->act,PLR_NO_EXP);
     oldact("Дух $C2 теперь заточен в сосуде и находится в твоей власти.", ch, 0, victim, TO_CHAR);
-    oldact("$c1 {Rзаточил твой дух в сосуде.{x", ch, 0, victim, TO_VICT);
+    act("%^C1 {Rзаточил твой дух в сосуде.{x", ch, 0, victim, TO_VICT);
 }
 
 SPELL_DECL(MysteriousDream);
@@ -401,7 +401,7 @@ VOID_AFFECT(MysteriousDream)::update( Room *room, Affect *paf )
             if ( IS_AWAKE(vch) )
             {
                 vch->pecho("Ты засыпаешь...");
-                oldact("$c1 засыпает.",vch,0,0,TO_ROOM);
+                act("%^C1 засыпает.",vch,0,0,TO_ROOM);
                 vch->position = POS_SLEEPING;
             }
 
@@ -436,7 +436,7 @@ VOID_SPELL(Sleep)::run( Character *ch, Character *victim, int sn, int level )
     if ( IS_AWAKE(victim) )
     {
         oldact("Ты чувствуешь себя очень сонн$gым|ым|ой.... ты засыпаешь..", victim, 0, 0, TO_CHAR);
-        oldact("$c1 засыпает.", victim, 0, 0, TO_ROOM);
+        act("%^C1 засыпает.", victim, 0, 0, TO_ROOM);
         victim->position = POS_SLEEPING;
     }
     return;

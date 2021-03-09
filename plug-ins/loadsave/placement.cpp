@@ -439,7 +439,7 @@ void undig( Character *ch )
         ch->position = POS_RESTING;
         
     oldact_p("Ты выкапываешься из земли.", ch, 0, 0, TO_CHAR, POS_DEAD); 
-    oldact("Земля шевелится, и $c1 выкапывается из своей могилы.", ch, 0, 0, TO_ROOM); 
+    act("Земля шевелится, и %C1 выкапывается из своей могилы.", ch, 0, 0, TO_ROOM); 
     extract_grave( ch );
 }
 

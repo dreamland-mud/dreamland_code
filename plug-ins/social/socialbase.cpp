@@ -297,7 +297,7 @@ void SocialBase::visualize( Character *ch )
     if (IS_AFFECTED( ch, AFF_HIDE|AFF_FADE ))  {
         REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
         ch->pecho("Ты выходишь из тени.");
-        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
+        act("%^C1 выходит из тени.", ch, 0, 0, TO_ROOM);
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {

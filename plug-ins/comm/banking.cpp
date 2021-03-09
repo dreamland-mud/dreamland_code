@@ -160,7 +160,7 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
     }
 
     ch->send_to(buf);
-    oldact("$c1 производит банковские операции.",ch,0,0,TO_ROOM);
+    act("%^C1 производит банковские операции.",ch,0,0,TO_ROOM);
 }
 
 /*
@@ -268,7 +268,7 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     if (victim != ch) 
         victim->send_to( vbuf );
 
-    oldact("$c1 производит банковские операции.", ch, 0, 0, TO_ROOM );
+    act("%^C1 производит банковские операции.", ch, 0, 0, TO_ROOM );
 }
 
 /*------------------------------------------------------------------------

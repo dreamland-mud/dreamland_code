@@ -45,7 +45,7 @@ bool FireproofWE::run( PCharacter *ch, Character *victim ) const
         affect_to_obj( obj, &af);
     }
 
-    oldact("{CОбмундирование на $c6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
+    act("{CОбмундирование на %C6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
     oldact("{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
     return true;
 }
@@ -108,7 +108,7 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
         af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
     }
 
-    oldact("{CПламя древней ярости вспыхивает в $c6!{x", victim, 0, 0, TO_ROOM );
+    act("{CПламя древней ярости вспыхивает в %C6!{x", victim, 0, 0, TO_ROOM );
     affect_join( victim, &af );
     return true;
 }
@@ -127,7 +127,7 @@ bool MendingWE::run( PCharacter *ch, Character *victim ) const
     }
 
     oldact("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
-    oldact("{CСекреты древних кузнецов улучшают облик обмундирования $c2.{x", victim, 0, 0, TO_ROOM );
+    act("{CСекреты древних кузнецов улучшают облик обмундирования %C2.{x", victim, 0, 0, TO_ROOM );
     return true;
 }
 

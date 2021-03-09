@@ -82,7 +82,7 @@ bool Excalibur::death( Character *ch )
     oldact("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
     ch->hit = ch->max_hit;
     ch->pecho("Ты чувствуешь себя намного лучше.");
-    oldact("$c1 выглядит намного лучше.",ch,0,0,TO_ROOM);
+    act("%^C1 выглядит намного лучше.",ch,0,0,TO_ROOM);
     return true;
 }
 
@@ -246,7 +246,7 @@ void Thunderbolt::fight( Character *ch )
         switch(number_bits(6)) {
         case 0:
             oldact("Разряд молнии выстреливает из твоего оружия и поражает $C4!", ch, 0, victim, TO_CHAR);
-            oldact("Разряд молнии конденсируется на оружии $c2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
+            act("Разряд молнии конденсируется на оружии %C2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
             oldact("Разряд молнии конденсируется на оружии $c2, и выстреливает в сторону $C2!", ch, 0, victim, TO_NOTVICT);
 
             dam = dice(level,4) + 12;
@@ -380,7 +380,7 @@ void FlyingBoots::wear( Character *ch )
     if (!ch->isAffected(gsn_fly)) {
         oldact("Ты обуваешь $o4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
         oldact("Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
-        oldact("$c1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
+        act("%^C1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
     }
 }
 void FlyingBoots::equip( Character *ch )
@@ -407,7 +407,7 @@ void FlyingBoots::remove( Character *ch )
     
     affect_strip(ch, gsn_fly);
     oldact("Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0, TO_CHAR );
-    oldact("$c1 падает на землю.", ch, 0, 0, TO_ROOM );
+    act("%^C1 падает на землю.", ch, 0, 0, TO_ROOM );
 }
 
 
@@ -420,7 +420,7 @@ void GiantStrengthArmor::wear( Character *ch )
 {
     oldact("Ты чувствуешь, как становишься гораздо сильнее!\r\n"
          "Твои мышцы разбухают до внушительных размеров.", ch, obj, 0, TO_CHAR );
-    oldact("Мышцы $c2 дрожат от избытка силы!", ch, 0, 0, TO_ROOM );
+    act("Мышцы %C2 дрожат от избытка силы!", ch, 0, 0, TO_ROOM );
 }
 void GiantStrengthArmor::equip( Character *ch )
 {
@@ -442,7 +442,7 @@ void GiantStrengthArmor::remove( Character *ch )
     {
         affect_strip(ch, gsn_giant_strength);
         oldact("Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
-        oldact("Мышцы $c2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
+        act("Мышцы %C2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
     }
 }
 
@@ -462,7 +462,7 @@ void RoseShield::fight( Character *ch )
 
   ch->pecho("Листья на твоем щите внезапно распускаются.");
   ch->fighting->pecho("Листья на щите окружают тебя!");
-  oldact("Щит Розы $c2 внезапно распускается.",ch,0,0,TO_ROOM);
+  act("Щит Розы %C2 внезапно распускается.",ch,0,0,TO_ROOM);
   spell(gsn_slow, ch->getModifyLevel(),ch,ch->fighting);
   return;
 }

@@ -83,7 +83,7 @@ void CleaveOneHit::calcDamage( )
 
     if (number_percent( ) < chance) {
         oldact("Ты рассекаешь $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_CHAR);
-        oldact("$c1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT);
+        act("%^C1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT);
         oldact("$c1 рассекает $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT);
 
         ch->setWait( 2 );
@@ -464,12 +464,12 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
     }
 
     if (blade->carried_by) {
-        oldact("$o1 медленно исчезает.", blade->carried_by, blade, NULL, TO_ALL );
+        oldact("$o1 медленно исчезает.", blade->carried_by, blade, 0, TO_ALL );
         obj_from_char( blade );
     }
     else if (blade->in_room) {
         if (blade->in_room->people)
-            oldact("$o1 медленно исчезает.", blade->in_room->people, blade, NULL, TO_ALL );
+            oldact("$o1 медленно исчезает.", blade->in_room->people, blade, 0, TO_ALL );
 
         obj_from_room( blade );
     }
@@ -477,7 +477,7 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
         obj_from_obj( blade );
 
     obj_to_char( blade, ch );
-    oldact("$o1 появляется, мерцая.", ch, blade, NULL, TO_ALL );
+    oldact("$o1 появляется, мерцая.", ch, blade, 0, TO_ALL );
 }
 
 
@@ -534,8 +534,8 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
 
     obj_to_char( blade, ch );
 
-    oldact("Ты создаешь $o4!", ch, blade, NULL, TO_CHAR );
-    oldact("$c1 создает $o4!", ch, blade, NULL, TO_ROOM );
+    oldact("Ты создаешь $o4!", ch, blade, 0, TO_CHAR );
+    oldact("$c1 создает $o4!", ch, blade, 0, TO_ROOM );
 }
 
 /*---------------------------------------------------------------------------
@@ -563,7 +563,7 @@ void AntipaladinGuildmaster::give( Character *victim, Object *obj )
         victim->getPC( )->addQuestPoints(-price);
         SET_BIT(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE);
         SET_BIT(obj->wear_flags, ITEM_NO_SAC);
-        oldact("$c1 прикасается к лезвию клинка и произносит странное заклинание.", ch, 0, 0, TO_ROOM);
+        act("%^C1 прикасается к лезвию клинка и произносит странное заклинание.", ch, 0, 0, TO_ROOM);
     }
 
     oldact("$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );

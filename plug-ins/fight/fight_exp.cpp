@@ -113,7 +113,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->damroll;
             ch->damroll++;
             ch->pecho("Теперь ты будешь больнее бить!");
-            oldact("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM);
+            act("%^C1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "урон", oldParam, ch->damroll, victim->damroll);
         }
     }
@@ -129,7 +129,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->max_hit;
             ch->max_hit = min(ch->max_hit + gain, max_hp);
             ch->pecho("Ты здоровеешь!");
-            oldact("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM);
+            act("Здоровье %C2 растет!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "здоровье", oldParam, ch->max_hit, victim->max_hit);
         }
     }
@@ -145,7 +145,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->max_mana;            
             ch->max_mana = min(ch->max_mana + gain, max_mana);
             ch->pecho("Ты чувствуешь прилив энергии!");
-            oldact("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM);
+            act("%^C1 наполняется энергией!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "ману", oldParam, ch->max_mana, victim->max_mana);
         }
     }
@@ -206,7 +206,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->armor[dam_type];
             ch->armor[dam_type] += gain;
             ch->pecho("Твоя защита улучшается!");
-            oldact("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM);
+            act("Защита %C2 улучшается!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "броню", oldParam, ch->armor[dam_type], victim->armor[dam_type]);
         }
     }
@@ -221,7 +221,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->perm_stat[i];
             ch->perm_stat[i] += 1;
             ch->pecho("Твои параметры улучшаются!");
-            oldact("$c1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM);
+            act("%^C1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, stat_table.fields[i].name, oldParam, ch->perm_stat[i], victim->perm_stat[i]);
         }
     }

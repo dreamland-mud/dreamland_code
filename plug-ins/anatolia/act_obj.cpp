@@ -400,7 +400,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho("Осторожно, ты уже несешь слишком много вещей.");
         else {
-            oldact("$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR);
+            oldact("$d: ты не можешь нести больше вещей.",ch,0,obj->getName( ),TO_CHAR);
             return false;
         }
     }
@@ -410,7 +410,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой.", ch);
         else {
-            oldact("$d: ты не можешь поднять такую тяжесть.",ch,NULL,obj->getName( ),TO_CHAR );
+            oldact("$d: ты не можешь поднять такую тяжесть.",ch,0,obj->getName( ),TO_CHAR );
             return false;
         }
     }
@@ -1253,9 +1253,9 @@ CMDRUNP( drop )
             if ( !IS_AFFECTED(ch, AFF_SNEAK) )
             {
                 if (obj->value0() == 1 || obj->value1() == 1)
-                 oldact("$c1 бросает монетку.", ch, 0, 0, TO_ROOM);
+                 act("%^C1 бросает монетку.", ch, 0, 0, TO_ROOM);
                 else
-                 oldact("$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM);
+                 act("%^C1 бросает несколько монет.", ch, 0, 0, TO_ROOM);
             }
          
             if (obj->value0() == 1 || obj->value1() == 1)
@@ -1448,7 +1448,7 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 
     if( ( victim->getCarryWeight( ) + gold + silver / 10 ) > victim->canCarryWeight( ) )
     {
-            oldact("$c1 не может нести такой вес.", victim, 0, ch, TO_VICT);
+            act("%^C1 не может нести такой вес.", victim, 0, ch, TO_VICT);
             return;
     }
 
@@ -1608,7 +1608,7 @@ CMDRUNP( vomit )
         desire_thirst->vomit( ch->getPC( ) );
     }
 
-    oldact("$c1 засовывает два пальца в рот и начинает блевать.",ch,0,0,TO_ROOM);
+    act("%^C1 засовывает два пальца в рот и начинает блевать.",ch,0,0,TO_ROOM);
     ch->pecho("Ты прочищаешь свой желудок двухпальцевым методом.");
 
     mprog_vomit( ch );

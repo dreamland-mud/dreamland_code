@@ -226,7 +226,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             slevel = mlevel;
             slevel += chance / 20;
             oldact("Твои глаза на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_CHAR );
-            oldact("Глаза $c2 на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_ROOM );                
+            act("Глаза %C2 на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_ROOM );                
             gsn_improved_maladiction->improve( ch, true );
         }
         else
@@ -240,7 +240,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             slevel = mlevel;
             slevel += chance / 20;
             oldact("Твои глаза на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_CHAR );
-            oldact("Глаза $c2 на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_ROOM );                 
+            act("Глаза %C2 на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_ROOM );                 
             gsn_improved_benediction->improve( ch, true );
         }
         else
@@ -256,7 +256,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             slevel = mlevel;
             slevel += chance / 20;
             oldact("Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
-            oldact("Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
+            act("Свет на мгновение пронизывает ладони %C2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
         }
     }
@@ -288,7 +288,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
 
         slevel = (int) (f * slevel);
         oldact("Яркая искра вспыхивает между твоих ладоней, фокусируя магический заряд.", ch, 0, 0, TO_CHAR );
-        oldact("Яркая искра вспыхивает между ладоней $c2, фокусируя магический заряд.", ch, 0, 0, TO_ROOM );            
+        act("Яркая искра вспыхивает между ладоней %C2, фокусируя магический заряд.", ch, 0, 0, TO_ROOM );            
     }
 
     if (gsn_mastering_spell->usable( ch, false )) {
@@ -659,12 +659,12 @@ void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
         oldact("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
-        oldact("Боги $c2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
+        act("Боги %C2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
         oldact("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
         oldact("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
-        oldact("Ты отклоняешь заклинание $c2!", ch, 0, vch, TO_VICT);
+        act("Ты отклоняешь заклинание %C2!", ch, 0, vch, TO_VICT);
         oldact("$C1 отклоняет заклинание $c2!", ch, 0, vch, TO_NOTVICT);
     }
     else {

@@ -313,7 +313,7 @@ SKILL_RUNP( dominate )
 
   if ( ch != victim ) {
         oldact("$C1 смотрит на тебя с покорностью.",ch,0,victim,TO_CHAR);
-  	oldact("$c1 подчиняет тебя своей воле.", ch, 0, victim, TO_VICT);
+  	act("%^C1 подчиняет тебя своей воле.", ch, 0, victim, TO_VICT);
   }
 	
   return;
@@ -389,13 +389,13 @@ SKILL_RUNP( dig )
     ch->setWait( gsn_digging->getBeats( )  );
 
     if (number_percent( ) > chance) {
-        oldact("$c1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM);
+        act("%^C1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM);
         oldact("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR);
         gsn_digging->improve( ch, false );
         return;
     }
 
-    oldact("$c1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0, TO_ROOM);
+    act("%^C1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0, TO_ROOM);
     oldact("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами.", ch, 0, 0, TO_CHAR);
     gsn_digging->improve( ch, true );
 
@@ -493,7 +493,7 @@ SKILL_RUNP( vampire )
         affect_to_char( ch, &af );
 
 	ch->pecho( "Превращаясь в кровожадн%1$Gого|ого|ую вампир%1$Gа|а|шу, ты чувствуешь прилив силы.", ch );
-        oldact("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM);
+        act("%^C1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM);
 }
 
 void sucking( Character *ch, Character *victim ) 
@@ -1025,13 +1025,13 @@ SKILL_RUNP( bloodlet )
     
     if (number_percent( ) < chance) {
         oldact("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0, TO_CHAR);
-        oldact("$c1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0, TO_ROOM);
+        act("%^C1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0, TO_ROOM);
         ch->getPC( )->desires[desire_bloodlust] = 0;
         gsn_bloodlet->improve( ch, true );
 
     } else {
         oldact("Упс! Кажется, ты потеря$gло|л|ла СЛИШКОМ много крови!", ch, 0, 0, TO_CHAR);
-        oldact("$c1 слишком сильно ранит свою руку и не может остановить кровь.", ch, 0, 0, TO_ROOM);
+        act("%^C1 слишком сильно ранит свою руку и не может остановить кровь.", ch, 0, 0, TO_ROOM);
         ch->getPC( )->desires[desire_bloodlust] = -6;
         dam *= 2;
         gsn_bloodlet->improve( ch, false );
@@ -1162,7 +1162,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         return false;
     
     oldact("Твоя тень падает на могилу...", victim, 0, 0, TO_CHAR);
-    oldact("Тень $c2 падает на могилу...", victim, 0, 0, TO_ROOM);
+    act("Тень %C2 падает на могилу...", victim, 0, 0, TO_ROOM);
     
     undig( ch );
     ch->position = POS_STANDING;
@@ -1171,7 +1171,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         BonedaggerOneHit bd( ch, victim );
         
         if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
-            oldact("$c1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT);
+            act("%^C1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT);
             oldact("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, victim, TO_NOTVICT);
             oldact("Ты костяным ножом промахиваешься мимо тени $C2!", ch, 0, victim, TO_CHAR);
             
@@ -1182,7 +1182,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         
         gsn_bonedagger->improve( ch, true, victim );
         
-        oldact("$c1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT);
+        act("%^C1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT);
         oldact("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT);
         oldact("Ты приковываешь тень $C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR);
 
@@ -1302,7 +1302,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
 
     if ( (actor->getProfession( ) != prof_vampire) && (number_percent() < 20) ) {
         oldact("$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
-        oldact("$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
+        act("%^C1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
         return false;
     }
 	    
@@ -1312,7 +1312,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
 	}
 	else  {
         	oldact("$c1 с отвращением смотрит на ужимки $C2.", ch, 0, actor, TO_NOTVICT );
-        	oldact("$c1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
+        	act("%^C1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
         	say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );	    
         	return false;		
 	}

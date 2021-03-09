@@ -71,7 +71,7 @@ bool InvasionHelper::death( Character *killer )
     } 
 
     char_to_room( gq->createHelper( ), ch->in_room );
-    oldact("{YБожественные силы возвращают $c4 к жизни!{x", ch, 0, 0, TO_ROOM);
+    act("{YБожественные силы возвращают %C4 к жизни!{x", ch, 0, 0, TO_ROOM);
     return true;
 }
 

@@ -109,7 +109,7 @@ bool RainbowMob::death( Character *killer )
     } 
 
     gq->recreateMob( this );
-    oldact("Божественные силы возвращают $c4 к жизни!", ch, 0, 0, TO_ROOM);
+    act("Божественные силы возвращают %C4 к жизни!", ch, 0, 0, TO_ROOM);
     return false;
 }
 

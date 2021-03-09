@@ -101,7 +101,7 @@ SKILL_RUNP( tame )
             ch->pecho("Попытка укрощения не удалась.");
             oldact("$c1 пытается укротить $C4, но безуспешно.",
                     ch,0,victim,TO_NOTVICT);
-            oldact("$c1 пытается укротить тебя, но безуспешно.",
+            act("%^C1 пытается укротить тебя, но безуспешно.",
                     ch,0,victim,TO_VICT);
             gsn_tame->improve( ch, false, victim );
         }
@@ -124,7 +124,7 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
          return;
     }
     
-    oldact("Молекулы воды вокруг $c2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
+    act("Молекулы воды вокруг %C2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
     oldact("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
     dam = dice( level , 14 );
     damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_MAGIC|DAMF_WATER);
@@ -216,7 +216,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     if ( !victim->isAffected(gsn_entangle) )
     {
         if ( !saves_spell(level, victim, DAM_PIERCE, ch, DAMF_MAGIC) ){
-            oldact("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
+            act("Колючий терновник прорастает сквозь землю, обвивая ноги %C2!",
                 victim, 0, 0, TO_ROOM);
             oldact("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
                 victim, 0, 0, TO_CHAR);
@@ -231,14 +231,14 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
             dam = dam * 2;   
         }
         else {
-            oldact("Колючий терновник прорастает сквозь землю, но $c1 с трудом разрывает его путы!",
+            act("Колючий терновник прорастает сквозь землю, но %C1 с трудом разрывает его путы!",
                 victim, 0, 0, TO_ROOM);
             oldact("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
                 victim, 0, 0, TO_CHAR);
         }
     }
     else {
-            oldact("Колючий терновник прорастает сквозь землю, больно раня ноги $c2!",
+            act("Колючий терновник прорастает сквозь землю, больно раня ноги %C2!",
                 victim, 0, 0, TO_ROOM);
             oldact("Колючий терновник прорастает сквозь землю, больно раня твои ноги!",
                 victim, 0, 0, TO_CHAR);        

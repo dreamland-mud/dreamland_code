@@ -209,17 +209,17 @@ bool HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     
     if ((old_shoe = get_eq_char( client, wear_hooves ))) {
         unequip_char( client, old_shoe );
-        oldact("$c1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
+        act("%^C1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
         oldact("$c1 снимает с $C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
     }
 
     obj_to_char( shoe, client );
     equip_char( client, shoe, wear_hooves);
-    oldact("$c1 прилаживает новые подковы на твои копыта.", smithman, 0, client, TO_VICT );
+    act("%^C1 прилаживает новые подковы на твои копыта.", smithman, 0, client, TO_VICT );
     oldact("$c1 прилаживает новые подковы на копыта $C2.", smithman, 0, client, TO_NOTVICT );
 
     if (client->getSex( ) == SEX_FEMALE && chance( 50 )) {
-        oldact("$c1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
+        act("%^C1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
         oldact("$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
     }
 

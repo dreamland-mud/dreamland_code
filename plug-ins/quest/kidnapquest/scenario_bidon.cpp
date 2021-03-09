@@ -36,7 +36,7 @@ void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
         oldact("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, 0, TO_CHAR);
         hero->pecho("{YЗадание отменяется.{x");
     } else {
-        oldact("{Y$c1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
+        act("{Y%C1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
         hero->pecho("{YЗадание отменяется.{x");
     }
 }
@@ -57,7 +57,7 @@ void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) co
 void KS::actAttackHero( NPCharacter *bandit, PCharacter *hero ) const
 {
     if (!hero->fighting) {
-        oldact("$c1 сквозь зубы произносит: '{gА вас я попрошу остаться...{x'.", bandit, 0, hero, TO_ROOM);
+        act("%^C1 сквозь зубы произносит: '{gА вас я попрошу остаться...{x'.", bandit, 0, hero, TO_ROOM);
     }
 }
 void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid ) const
@@ -67,17 +67,17 @@ void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid ) const
 void KS::actHuntStep( NPCharacter *bandit ) const
 {
     if(number_percent() < 10)
-        oldact("$c1 глубоко затягивается огромной сигарой.", bandit, 0, 0, TO_ROOM);
+        act("%^C1 глубоко затягивается огромной сигарой.", bandit, 0, 0, TO_ROOM);
 }
 void KS::actKidnapStep( NPCharacter *bandit, NPCharacter *kid ) const
 {
     if(number_percent() < 10)
-        oldact("$c1 показывает девочке куклу.", bandit, 0, 0, TO_ROOM);
+        act("%^C1 показывает девочке куклу.", bandit, 0, 0, TO_ROOM);
 }
 void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) const
 {
     if(number_percent() < 10)
-        oldact("$c1 озадаченно оглядывается по сторонам.", bandit, 0, 0, TO_ROOM);
+        act("%^C1 озадаченно оглядывается по сторонам.", bandit, 0, 0, TO_ROOM);
 }
 
 /*
@@ -85,8 +85,8 @@ void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) const
  */
 void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer quest ) const
 {
-    oldact("$c1 говорит тебе '{GМоя дочурка вчера утром ушла за молоком, взяла деньги, но забыла бидончик.{x'", king, 0, hero, TO_VICT);
-    oldact("$c1 говорит тебе '{GВот уже прошли сутки, а ее все нет. Я очень волнуюсь.{x'", king, 0, hero, TO_VICT);
+    act("%^C1 говорит тебе '{GМоя дочурка вчера утром ушла за молоком, взяла деньги, но забыла бидончик.{x'", king, 0, hero, TO_VICT);
+    act("%^C1 говорит тебе '{GВот уже прошли сутки, а ее все нет. Я очень волнуюсь.{x'", king, 0, hero, TO_VICT);
     oldact("$c1 говорит тебе '{GСкорее всего, она заблудилась где-то в районе {W{hh$t{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const
@@ -96,9 +96,9 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
     oldact("$c1 вручает тебе $o4.", king, mark, hero, TO_VICT);
     oldact("$c1 вручает $C3 $o4.", king, mark, hero, TO_NOTVICT);
 
-    oldact("$c1 говорит тебе '{GВозьми этот бидончик и передай ей...{x'", king, 0, hero, TO_VICT);
+    act("%^C1 говорит тебе '{GВозьми этот бидончик и передай ей...{x'", king, 0, hero, TO_VICT);
     if(number_percent() < 10) {
-        oldact("$c1 пронзительно кричит '{YЧТОБ БЕЗ МОЛОКА НЕ ВОЗВРАЩАЛАСЬ!...{x'", king, 0, hero, TO_VICT);
+        act("%^C1 пронзительно кричит '{YЧТОБ БЕЗ МОЛОКА НЕ ВОЗВРАЩАЛАСЬ!...{x'", king, 0, hero, TO_VICT);
         sprintf( buf, "$c1 говорит тебе '{GИ учти, что через {Y%d{G минут%s мое терпение лопнет!{x'",
                  time, GET_COUNT(time, "у", "ы", "") );
     } else {
@@ -118,9 +118,9 @@ void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const
 }
 void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero ) const
 {
-    oldact("$c1 чмокает тебя в обе щеки.", king, 0, hero, TO_VICT);
+    act("%^C1 чмокает тебя в обе щеки.", king, 0, hero, TO_VICT);
     oldact("$c1 чмокает $C4 в обе щеки.", king, 0, hero, TO_NOTVICT);
-    oldact("$c1 говорит тебе '{GИди скорее за наградой к тому, кто дал тебе задание!{x'.", king, 0, hero, TO_VICT);
+    act("%^C1 говорит тебе '{GИди скорее за наградой к тому, кто дал тебе задание!{x'.", king, 0, hero, TO_VICT);
 }
 
 /*
@@ -129,7 +129,7 @@ void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero ) const
 void KS::actHeroWait( NPCharacter *kid ) const
 {
     if(number_percent( ) < 10)
-        oldact("$c1 ждет прекрасного принца.", kid, 0, 0, TO_ROOM);
+        act("%^C1 ждет прекрасного принца.", kid, 0, 0, TO_ROOM);
 }
 void KS::actNoHero( NPCharacter *kid, PCharacter *hero ) const
 {
@@ -151,8 +151,8 @@ void KS::actWrongMark( NPCharacter *kid, Character *victim, Object *obj ) const
 void KS::actGoodMark( NPCharacter *kid, Character *victim, Object *obj ) const
 {
     interpret(kid, "hop");
-    oldact("$c1 радостно кричит '{YЭто бидончик моей мамочки!{x'", kid, 0, 0, TO_ROOM);
-    oldact("$c1 радостно кричит '{YОтведите меня к ней, пожалуйста!{x'", kid, 0, 0, TO_ROOM);
+    act("%^C1 радостно кричит '{YЭто бидончик моей мамочки!{x'", kid, 0, 0, TO_ROOM);
+    act("%^C1 радостно кричит '{YОтведите меня к ней, пожалуйста!{x'", kid, 0, 0, TO_ROOM);
 }
 void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const
 {

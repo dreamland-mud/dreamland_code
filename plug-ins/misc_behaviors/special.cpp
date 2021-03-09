@@ -573,7 +573,7 @@ bool spec_janitor( NPCharacter *ch )
         if (chance( 33 ))
             continue;
         
-        oldact("$c1 поднимает с пола какой-то мусор.", ch, 0, 0, TO_ROOM);
+        act("%^C1 поднимает с пола какой-то мусор.", ch, 0, 0, TO_ROOM);
         obj_from_room( trash );
         obj_to_char( trash, ch );
         return true;
@@ -726,7 +726,7 @@ bool spec_poison( NPCharacter *ch )
 
     oldact("Ты кусаешь $C4!",  ch, 0, victim, TO_CHAR);
     oldact("$c1 кусает $C4!",  ch, 0, victim, TO_NOTVICT);
-    oldact("$c1 кусает тебя!", ch, 0, victim, TO_VICT);
+    act("%^C1 кусает тебя!", ch, 0, victim, TO_VICT);
 
     spell( gsn_poison, ch->getModifyLevel( ), ch, victim, FSPELL_NOTRIGGER ); 
     return true;
@@ -852,7 +852,7 @@ bool spec_guard( NPCharacter *ch )
 
     if ( ech != 0 && ch->can_see(ech) )
     {
-        oldact("$c1 кричит 'ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!", ch, 0, 0, TO_ROOM);
+        act("%^C1 кричит 'ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!", ch, 0, 0, TO_ROOM);
         multi_hit( ch, ech );
         return true;
     }
@@ -1038,7 +1038,7 @@ bool spec_captain( NPCharacter *ch )
 
     case 'S':
         ch->position = POS_SLEEPING;
-        oldact("$c1 ложится и засыпает.", ch, 0, 0, TO_ROOM);
+        act("%^C1 ложится и засыпает.", ch, 0, 0, TO_ROOM);
         break;
 
     case 'a':

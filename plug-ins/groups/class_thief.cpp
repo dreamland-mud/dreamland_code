@@ -277,7 +277,7 @@ SKILL_RUNP( settraps )
 
                 ch->pecho("Ты устраиваешь ловушку в комнате.");
 
-                oldact("$c1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM);
+                act("%^C1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM);
                 return;
         }
         else {

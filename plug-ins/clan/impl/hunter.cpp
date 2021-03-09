@@ -606,7 +606,7 @@ SKILL_RUNP( hunt )
         }
     }
 
-    oldact("$c1 сосредоточенно осматривает местность и следы на земле.", ch, 0, 0, TO_ROOM );
+    act("%^C1 сосредоточенно осматривает местность и следы на земле.", ch, 0, 0, TO_ROOM );
 
     ch->setWait( gsn_hunt->getBeats( )  );
     
@@ -747,7 +747,7 @@ bool HunterTrapObject::checkPrevent( Character *victim )
         return false;
 
     oldact("Сила твоего клана защищает тебя от ловушек Охотников.", victim, 0, 0, TO_CHAR);
-    oldact("Сила клана защищает $c4 от ловушек Охотников.", victim, 0, 0, TO_ROOM);
+    act("Сила клана защищает %C4 от ловушек Охотников.", victim, 0, 0, TO_ROOM);
     return true;
 }
 
@@ -1421,7 +1421,7 @@ void HunterPitTrap::greet( Character *victim )
         HunterPitDamage( victim, this ).hit( true );
 
         oldact("Ты теряешь сознание.", victim, 0, 0, TO_CHAR);
-        oldact("$c1 теряет сознание.", victim, 0, 0, TO_ROOM);
+        act("%^C1 теряет сознание.", victim, 0, 0, TO_ROOM);
         victim->position = POS_STUNNED;
         victim->setWait( gsn_hunter_pit->getBeats( ) );
     } catch (const VictimDeathException &) {
@@ -1535,6 +1535,6 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
     affect_to_char(ch,&af);
 
     oldact("Теперь ты будешь замечать чужие ловушки.", ch, 0, 0, TO_CHAR);
-    oldact("Взгляд $c2 становится более внимательным.", ch, 0, 0, TO_ROOM);
+    act("Взгляд %C2 становится более внимательным.", ch, 0, 0, TO_ROOM);
 }
 

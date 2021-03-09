@@ -237,7 +237,7 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     obj_to_char(disc,ch);
     
     if (!disc->getRealShortDescr( )) {
-        oldact("$c1 взмахивает руками и создает черный вращающийся диск.", ch,0,0,TO_ROOM);
+        act("%^C1 взмахивает руками и создает черный вращающийся диск.", ch,0,0,TO_ROOM);
         oldact("Ты взмахиваешь руками и создаешь вращающийся диск.", ch, 0, 0, TO_CHAR);
     }
     else {

@@ -76,7 +76,7 @@ CMDRUN( mount )
     if (!horse->is_npc( )) { /* pc-mounts like centaurs */
         if (!IS_SET(horse->form, FORM_CENTAUR)) {
             oldact("$c1 пытается запрыгнуть верхом на $C4.", ch, 0, horse, TO_NOTVICT);
-            oldact("$c1 пытается запрыгнуть верхом на тебя.", ch, 0, horse, TO_VICT);
+            act("%^C1 пытается запрыгнуть верхом на тебя.", ch, 0, horse, TO_VICT);
             oldact("Ты пытаешься оседлать $C4, но никак не поймешь, где же у $X стремена..", ch, 0, horse, TO_CHAR);
             return;
         }
@@ -84,7 +84,7 @@ CMDRUN( mount )
         trust = horse->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( "mount" );
         if (!trust || !trust->check( ch )) {
             oldact("$c1 пытается оседлать $C4. $C1 строго смотрит на $c4.", ch, 0, horse, TO_NOTVICT);
-            oldact("$c1 пытается оседлать тебя, но заметив твой строгий взгляд, останавливается.", ch, 0, horse, TO_VICT);
+            act("%^C1 пытается оседлать тебя, но заметив твой строгий взгляд, останавливается.", ch, 0, horse, TO_VICT);
             oldact("$C1 не желает, чтобы на $Z катались.", ch, 0, horse, TO_CHAR);
             return;
         }
@@ -128,7 +128,7 @@ CMDRUN( mount )
    
     if (needsRidingSkill && number_percent( ) > gsn_riding->getEffective( ch )) {
         oldact("Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
-        oldact("$c1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
+        act("%^C1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
         oldact("$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
         
         ch->setWait( gsn_riding->getBeats( ) );
@@ -142,7 +142,7 @@ CMDRUN( mount )
     horse->riding = false;
 
     oldact("Ты запрыгиваешь на $C4.", ch, 0, horse, TO_CHAR );
-    oldact("$c1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
+    act("%^C1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
     oldact("$c1 запрыгивает на спину $C2.", ch, 0, horse, TO_NOTVICT );
     
     gsn_riding->improve( ch, true);
@@ -163,12 +163,12 @@ CMDRUN( dismount )
     
     if (MOUNTED(ch)) {
         oldact("Ты соскакиваешь со спины $C2.", ch, 0, ch->mount, TO_CHAR );
-        oldact("$c1 соскакивает с твоей спины.", ch, 0, ch->mount, TO_VICT );
+        act("%^C1 соскакивает с твоей спины.", ch, 0, ch->mount, TO_VICT );
         oldact("$c1 спрыгивает с $C2.", ch, 0, ch->mount, TO_NOTVICT );
     }
     else {
         oldact("Ты сбрасываешь $C4 со спины.", ch, 0, ch->mount, TO_CHAR );
-        oldact("$c1 сбрасывает тебя со спины.", ch, 0, ch->mount, TO_VICT );
+        act("%^C1 сбрасывает тебя со спины.", ch, 0, ch->mount, TO_VICT );
         oldact("$c1 сбрасывает $C4 со спины.", ch, 0, ch->mount, TO_NOTVICT );
     }
     

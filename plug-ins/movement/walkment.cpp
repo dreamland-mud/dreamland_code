@@ -268,7 +268,7 @@ void Walkment::visualize( Character *wch )
     if (IS_AFFECTED( wch, AFF_HIDE|AFF_FADE ) && !IS_AFFECTED(wch, AFF_SNEAK)) {
         REMOVE_BIT(wch->affected_by, AFF_HIDE|AFF_FADE);
         wch->pecho( "Ты выходишь из тени." );
-        oldact("$c1 выходит из тени.", wch, 0, 0, TO_ROOM );
+        act("%^C1 выходит из тени.", wch, 0, 0, TO_ROOM );
     }
 
     if (IS_AFFECTED( wch, AFF_CAMOUFLAGE )) {

@@ -111,7 +111,7 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
         af.bitvector.setValue(AFF_BLOODTHIRST);
         affect_to_char( victim, &af );
         victim->pecho("Безумие охватывает тебя!");
-        oldact("Глаза $c2 наливаются кровью.",victim,0,0,TO_ROOM);
+        act("Глаза %C2 наливаются кровью.",victim,0,0,TO_ROOM);
         return;
 
 }

@@ -175,7 +175,7 @@ CMDRUN( buy )
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-        oldact("$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
+        act("%^C1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
         ch->reply = keeper;
         return;
     }
@@ -356,7 +356,7 @@ CMDRUN( sell )
 
     if (!keeper->can_see(obj))
     {
-        oldact("$c1 не видит этого.",keeper,0,ch,TO_VICT);
+        act("%^C1 не видит этого.",keeper,0,ch,TO_VICT);
         return;
     }
 
@@ -433,7 +433,7 @@ CMDRUN( sell )
         ch->silver = silver_old;
         oldact_p("$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
         keeper, 0, ch, TO_VICT,POS_RESTING );
-        oldact("$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
+        act("%^C1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
         obj_to_room( create_money( gold, silver ), ch->in_room );
     }
 
