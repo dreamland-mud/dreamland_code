@@ -118,7 +118,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
         }
         else
         {
-            oldact("Дьявольская сила $o2 более могущественна, чем твое благословение.", ch,obj,0,TO_CHAR);
+            act("Дьявольская сила %3$O2 более могущественна, чем твое благословение.",  ch, 0, obj,TO_CHAR);
             return;
         }
     }
@@ -133,7 +133,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
       af.modifier        = -1;
       af.bitvector.setValue(ITEM_BLESS);
       affect_to_obj( obj, &af);
-            oldact("$o1 начинает светиться ровным голубым светом.", ch,obj,0,TO_ALL);
+            act("%3$^O1 начинает светиться ровным голубым светом.",  ch, 0, obj,TO_ALL);
     }
     else // not a permanent effect
     {

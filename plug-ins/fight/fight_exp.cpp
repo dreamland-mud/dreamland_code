@@ -239,7 +239,7 @@ static void apply_align_changes( PCharacter *ch )
                 continue;
 
         if (obj->isAntiAligned( ch )) {
-            oldact("Ты пытаешься использовать $o4, но это не для тебя.", ch, obj, 0, TO_CHAR);
+            act("Ты пытаешься использовать %3$O4, но это не для тебя.",  ch,  0,  obj, TO_CHAR);
             oldact("$c1 пытается использовать $o4, но оно $m не подходит.", ch, obj, 0, TO_ROOM);
             obj_from_char( obj );
             obj_to_room( obj, ch->in_room );

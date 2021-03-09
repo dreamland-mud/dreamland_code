@@ -224,8 +224,8 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
 
     if (to_room->people != 0)
     {
-        oldact("Над землей образуется $o1.",               to_room->people,portal,0,TO_ROOM);
-        oldact("Над землей образуется $o1.",               to_room->people,portal,0,TO_CHAR);
+        act("Над землей образуется %3$O1.",                to_room->people, 0, portal,TO_ROOM);
+        act("Над землей образуется %3$O1.",                to_room->people, 0, portal,TO_CHAR);
     }
 
 }

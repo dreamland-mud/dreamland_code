@@ -118,7 +118,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
         }
 
         act("%2$^C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x тебя!",                 victim,  ch,  0, TO_CHAR);
-        oldact("$c1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x $C4!", ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x %2$C4!",  ch,  victim,  0 TO_NOTVICT);
         act("Разрушающим световым лучом ты {R###ПОЛНОСТЬЮ УНИЧТОЖАЕШЬ###{x %2$C4!",  ch,  victim,  0, TO_CHAR);
         victim->pecho("Тебя {RУБИЛИ{x!");
 

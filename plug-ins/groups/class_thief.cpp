@@ -360,7 +360,7 @@ SKILL_RUNP( envenom )
 
         if (IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
         {
-            oldact("Твоя попытка отравить $o4 закончилась неудачей.", ch,obj,0,TO_CHAR);
+            act("Твоя попытка отравить %3$O4 закончилась неудачей.",  ch, 0, obj,TO_CHAR);
             return;
         }
 
@@ -1288,7 +1288,7 @@ SKILL_RUNP( blackjack )
         {
                 act("Ты бьешь %2$C4 по голове мешочком со свинцом.",  ch, victim, 0,TO_CHAR);
                 act("Ты чувствуешь внезапную боль в черепе!", ch,0,victim,TO_VICT);
-                oldact("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*", ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 бьет %2$C4 сзади по голове тяжелым мешочком! *OUCH*",  ch, victim, 0TO_NOTVICT);
                 gsn_blackjack->improve( ch, true, victim );
 
                 af.type = gsn_blackjack;

@@ -57,7 +57,7 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
         ch->setWait( skill->getBeats( ) );
 
         act("Поток мрака, созданный тобой, окутывает %2$C4.",  ch,  victim,  0, TO_CHAR);
-        oldact("$c1 создает поток мрака, окутывая $C4.", ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 создает поток мрака, окутывая %2$C4.",  ch,  victim,  0 TO_NOTVICT);
         act("%2$^C1 создает поток мрака, окутывая тебя.",                 victim,  ch,  0, TO_CHAR);
 
         if ( victim->is_immortal()

@@ -544,7 +544,7 @@ CMDRUNP( auction )
         }
         else
         {
-                oldact("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!", ch,auction->item,0,TO_CHAR);
+                act("Попробуй позже! Кто-то другой уже выставил на аукцион %3$O4!",  ch, 0, auction->item,TO_CHAR);
                 return;
         }
 }

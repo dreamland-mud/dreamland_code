@@ -242,7 +242,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
         }
         else
         {
-            oldact("Священная аура $o2 слишком могущественна для тебя.", ch,obj,0,TO_CHAR);
+            act("Священная аура %3$O2 слишком могущественна для тебя.",  ch, 0, obj,TO_CHAR);
             return;
         }
     }

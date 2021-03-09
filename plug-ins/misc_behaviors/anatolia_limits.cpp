@@ -207,13 +207,13 @@ void TwoSnakeWhip::fight( Character *ch )
       case 0:
           act("Одна из змей на твоем хлысте жалит %2$C4!",  ch,                 ch->fighting,  0, TO_CHAR);
         act("Змея с хлыста %C2 внезапно жалит тебя!",  ch,                 ch->fighting,  0, TO_VICT);
-        oldact("Змея с хлыста $c2 жалит $C4!", ch, 0,                ch->fighting, TO_NOTVICT);
+        act("Змея с хлыста %1$C2 жалит %2$C4!",  ch,                 ch->fighting,  0 TO_NOTVICT);
         spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
         break;
       case 1:
           act("Одна из змей на твоем хлысте жалит %2$C4!",  ch,                 ch->fighting,  0, TO_CHAR);
         act("Змея с хлыста %C2 внезапно жалит тебя!",  ch,                 ch->fighting,  0, TO_VICT);
-        oldact("Змея с хлыста $c2 жалит $C4!", ch, 0,                ch->fighting, TO_NOTVICT);
+        act("Змея с хлыста %1$C2 жалит %2$C4!",  ch,                 ch->fighting,  0 TO_NOTVICT);
         spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
         break;
       }
@@ -267,7 +267,7 @@ int dam;
     if ( number_percent() < 50 )  {
         dam = number_percent()/2 + 30 + 2 * ch->getModifyLevel();
         act("Твои перчатки обжигают лицо %2$C3!",  ch,  ch->fighting,  0, TO_CHAR);
-        oldact("Перчатки $c2 обжигают лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
+        act("Перчатки %1$C2 обжигают лицо %2$C3!",  ch,  ch->fighting,  0 TO_NOTVICT);
         act("Перчатки %2$C2 обжигают твое лицо!",  ch->fighting,  ch,  0, TO_CHAR);
         damage_nocatch( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam/2, TARGET_CHAR );
@@ -299,7 +299,7 @@ int dam;
   if ( number_percent() < 20 )  {
         dam = number_percent()/2 + 30 + 5 * ch->getModifyLevel();
         act("Твои нарукавники обжигают %2$C4!",  ch,  ch->fighting,  0, TO_CHAR);
-        oldact("Нарукавники $c2 обжигают $C4!", ch, 0, ch->fighting, TO_NOTVICT);
+        act("Нарукавники %1$C2 обжигают %2$C4!",  ch,  ch->fighting,  0 TO_NOTVICT);
         act("Нарукавники %2$C2 обжигают тебя!",  ch->fighting,  ch,  0, TO_CHAR);
         damage_nocatch( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam, TARGET_CHAR );

@@ -219,7 +219,7 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
 
     potion->value1(spell);
     extract_obj(obj);
-    oldact("Используя магические силы, ты изготавливаешь $o4!", ch, potion, 0, TO_CHAR);
+    act("Используя магические силы, ты изготавливаешь %3$O4!",  ch,  0,  potion, TO_CHAR);
     oldact("Используя магические силы $c1 изготовляет $o4!", ch, potion, 0, TO_ROOM);
 
     obj_to_char(potion, ch);

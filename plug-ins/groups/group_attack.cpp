@@ -101,7 +101,7 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
 
         if (victim != ch)
         {
-                oldact("$c1 посылает {CГолубой огонь земли{x против $C2!", ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 посылает {CГолубой огонь земли{x против %2$C2!",  ch, victim, 0TO_NOTVICT);
                 act("%^C1 посылает {CГолубой огонь земли{x против тебя!",  ch, victim, 0,TO_VICT);
                 ch->pecho("Ты призываешь на помощь {CГолубой огонь земли{x!");
         }
@@ -130,7 +130,7 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
 
         if (victim != ch)
         {
-                oldact("$c1 посылает силы {RДемонов Ада{x против $C2!", ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 посылает силы {RДемонов Ада{x против %2$C2!",  ch, victim, 0TO_NOTVICT);
                 act("%^C1 посылает силы {RДемонов Ада{x против тебя!",  ch, victim, 0,TO_VICT);
                 ch->pecho("Ты призываешь на помощь {RДемонов Ада{x!");
         }
@@ -346,7 +346,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     && obj_lose->wear_loc->remove( obj_lose, 0 ))
                     {
                         oldact("$c1 кричит от боли и бросает $o4 на землю!",                                victim,obj_lose,0,TO_ROOM);
-                        oldact("Ты кричишь от боли и бросаешь $o4 на землю!",                               victim,obj_lose,0,TO_CHAR);
+                        act("Ты кричишь от боли и бросаешь %3$O4 на землю!",                                victim, 0, obj_lose,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose, victim->in_room);
@@ -354,7 +354,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* stuck on the body! ouch! */
                     {
-                        oldact("$o1 обжигает твою кожу!",                               victim,obj_lose,0,TO_CHAR);
+                        act("%3$^O1 обжигает твою кожу!",                                victim, 0, obj_lose,TO_CHAR);
                         dam += (number_range(1,obj_lose->level));
                         fail = false;
                     }
@@ -365,7 +365,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     if (can_drop_obj(victim,obj_lose))
                     {
                         oldact("$c1 кричит от боли и бросает $o4 на землю!",                               victim,obj_lose,0,TO_ROOM);
-                        oldact("Ты кричишь от боли и бросаешь $o4 на землю!",                               victim,obj_lose,0,TO_CHAR);
+                        act("Ты кричишь от боли и бросаешь %3$O4 на землю!",                                victim, 0, obj_lose,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose, victim->in_room);
@@ -373,7 +373,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* cannot drop */
                     {
-                        oldact("$o1 обжигает твою кожу!",                               victim,obj_lose,0,TO_CHAR);
+                        act("%3$^O1 обжигает твою кожу!",                                victim, 0, obj_lose,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         fail = false;
                     }
@@ -415,7 +415,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* cannot drop */
                     {
-                        oldact("$o1 обжигает тебя!",                               victim,obj_lose,0,TO_CHAR);
+                        act("%3$^O1 обжигает тебя!",                                victim, 0, obj_lose,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         fail = false;
                     }

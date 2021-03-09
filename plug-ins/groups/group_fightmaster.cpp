@@ -427,7 +427,7 @@ SKILL_RUNP( bash )
                 {
                         act("Сильнейшим ударом щита %C1 сбивает тебя с ног и ты падаешь!",  ch, victim, 0,TO_VICT);
                         act("Ты сбиваешь %2$C4 с ног ударом щита!",ch,victim,0,TO_CHAR);
-                        oldact("$c1 сильнейшим ударом щита сбивает $C4 с ног.", ch,0,victim,TO_NOTVICT);
+                        act("%1$^C1 сильнейшим ударом щита сбивает %2$C4 с ног.",  ch, victim, 0TO_NOTVICT);
 
                         wait = 3;
 
@@ -1037,7 +1037,7 @@ SKILL_RUNP( crush )
         {
                 act("%^C1 сбивает тебя с ног мощнейшим ударом!",  ch, victim, 0,TO_VICT);
                 oldact("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR);
-                oldact("$c1 сбивает $C4 с ног мощнейшим ударом.", ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 сбивает %2$C4 с ног мощнейшим ударом.",  ch, victim, 0TO_NOTVICT);
 
                 wait = 3;
 
@@ -1592,7 +1592,7 @@ SKILL_RUNP( smash )
     if (number_percent() < chance) {
         act("Сильнейшим ударом %C1 сбивает тебя с ног и ты падаешь на землю!",  ch, victim, 0,TO_VICT);
         oldact("Ты сбиваешь $C4 с ног, посылая $S на землю!", ch,0,victim,TO_CHAR);
-        oldact("$c1 сильнейшим ударом сбивает $C4 с ног.", ch,0,victim,TO_NOTVICT);
+        act("%1$^C1 сильнейшим ударом сбивает %2$C4 с ног.",  ch, victim, 0TO_NOTVICT);
         gsn_smash->improve( ch, true, victim );
 
         wait = 3;

@@ -49,7 +49,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 
     /* first strike */
 
-    oldact("Разряд молнии, созданный $c5, поражает $C4.", ch,0,victim,TO_NOTVICT);
+    act("Разряд молнии, созданный %1$C5, поражает %2$C4.",  ch, victim, 0TO_NOTVICT);
     act("Созданный тобой разряд молнии поражает %2$C4.",  ch, victim, 0,TO_CHAR);
     act("Разряд молнии, созданный %C5, поражает тебя!",  ch, victim, 0,TO_VICT);
 

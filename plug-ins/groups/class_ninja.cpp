@@ -505,7 +505,7 @@ SKILL_RUNP( nerve )
         {
                 ch->pecho("Ты нажимаешь не туда, куда надо.");
                 act("%^C1 нажимает пальцами на твои нервные окончания, но ничего не происходит.",  ch, victim, 0,TO_VICT);
-                oldact("$c1 нажимает пальцами на нервные окончания $C2, но ничего не происходит.", ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 нажимает пальцами на нервные окончания %2$C2, но ничего не происходит.",  ch, victim, 0TO_NOTVICT);
                 gsn_nerve->improve( ch, false, victim );
         }
 
@@ -1268,7 +1268,7 @@ SKILL_RUNP( throwdown )
             if ( number_percent() < 70 ) {
                 act("Ты бросаешь %2$C4 с {Wошеломляющей силой{x.",  ch, victim, 0,TO_CHAR);
                 act("%^C1 бросает тебя с {Wошеломляющей силой{x.",  ch, victim, 0,TO_VICT);
-                oldact("$c1 бросает $C4 с {Wошеломляющей силой{x.", ch,0,victim,TO_NOTVICT);
+                act("%1$^C1 бросает %2$C4 с {Wошеломляющей силой{x.",  ch, victim, 0TO_NOTVICT);
                 victim->setWaitViolence( 2 + URANGE (0, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR), 2) );
 
                 victim->position = POS_RESTING;

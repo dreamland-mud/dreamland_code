@@ -390,7 +390,7 @@ bool GangMember::death( Character *killer )
             
     if (killer == ch) {
         if (ch->fighting) {
-            oldact("$c1 хрипит '{gЛучше сдохнуть своей смертью, чем от руки такой собаки, как ты, $C2.{x'", ch, 0, ch->fighting, TO_ROOM);
+            act("%1$^C1 хрипит '{gЛучше сдохнуть своей смертью, чем от руки такой собаки, как ты, %2$C2.{x'",  ch,  ch->fighting,  0 TO_ROOM);
         }
         else {
             switch (number_range( 1, 3 )) {
