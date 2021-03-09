@@ -101,7 +101,7 @@ CMDRUN( follow )
         IS_SET( victim->act, PLR_NOFOLLOW ) &&
         !ch->is_immortal() ) 
     {
-        oldact("$C1 не желает ходить с кем-либо.\n\r", ch,0,victim, TO_CHAR);
+        act("%2$^C1 не желает ходить с кем-либо.\n\r",  ch, victim, 0, TO_CHAR);
         return;
     }
 

@@ -1020,7 +1020,7 @@ SKILL_RUNP( backstab )
 
     if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
     {
-            oldact("$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.", ch, 0, victim, TO_CHAR);
+            act("%2$^C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.",  ch,  victim,  0, TO_CHAR);
             return;
     }
 
@@ -1286,8 +1286,8 @@ SKILL_RUNP( blackjack )
 
         if (Chance(ch, chance * k / 100, 100).reroll())
         {
-                oldact("Ты бьешь $C4 по голове мешочком со свинцом.", ch,0,victim,TO_CHAR);
-                oldact("Ты чувствуешь внезапную боль в черепе!", ch,0,victim,TO_VICT);
+                act("Ты бьешь %2$C4 по голове мешочком со свинцом.",  ch, victim, 0,TO_CHAR);
+                act("Ты чувствуешь внезапную боль в черепе!", ch,0,victim,TO_VICT);
                 oldact("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*", ch,0,victim,TO_NOTVICT);
                 gsn_blackjack->improve( ch, true, victim );
 

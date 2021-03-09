@@ -718,14 +718,14 @@ SKILL_RUNP( bite )
 	
     if (IS_SET(victim->imm_flags, IMM_WEAPON))
     {
-            oldact("$C1 имеет слишком крепкую шею, чтобы ее можно было прокусить.", ch, 0,                    victim, TO_CHAR);
+            act("%2$^C1 имеет слишком крепкую шею, чтобы ее можно было прокусить.",  ch,                     victim,  0, TO_CHAR);
             return;
     }
 	
     if(SHADOW(ch))
     {
             ch->pecho("Твои клыки проходят сквозь тень!");
-            oldact("$c1 пытается прогрызть шею своей тени.", ch, 0, 0, TO_ROOM);
+            act("%^C1 пытается прогрызть шею своей тени.",  ch,  0,  0, TO_ROOM);
             return;
     }
     
@@ -875,7 +875,7 @@ SKILL_RUNP( touch )
 	
         if (IS_SET(victim->imm_flags, IMM_NEGATIVE))
         {
-                oldact("$C1 имеет иммунитет к темной магии.", ch, 0,                        victim, TO_CHAR);
+                act("%2$^C1 имеет иммунитет к темной магии.",  ch,                         victim,  0, TO_CHAR);
                 return;
         }
 	
@@ -886,7 +886,7 @@ SKILL_RUNP( touch )
         if(SHADOW(ch))
         {
                 ch->pecho("Твое прикосновение проходит сквозь тень!");
-                oldact("$c1 пытается усыпить собственную тень.", ch, 0, 0, TO_ROOM);
+                act("%^C1 пытается усыпить собственную тень.",  ch,  0,  0, TO_ROOM);
                 return;
         }
 	
@@ -939,7 +939,7 @@ SKILL_RUNP( touch )
     if (Chance(ch, chance, 100).reroll())
     {
         oldact("Ты прикасаешься к шее $C2 и $E забывается в ужасном кошмаре.", ch,0,victim,TO_CHAR);
-        oldact("$c1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.", ch,0,victim,TO_VICT);
+        act("%^C1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.",  ch, victim, 0,TO_VICT);
         oldact("$c1 прикасается к шее $C2 и $E забывается в ужасном кошмаре.", ch,0,victim,TO_NOTVICT);
         gsn_vampiric_touch->improve( ch, true, victim );
 
@@ -1241,8 +1241,8 @@ SKILL_RUNP( sense )
 
       ch->mana -= mana;
 
-      oldact("Ты начинаешь чувствовать присутствие живых организмов в комнате!", ch,0,0,TO_CHAR);
-      oldact("$c1 выглядит более чувствительным к присутствию живых организмов.", ch,0,0,TO_ROOM);
+      act("Ты начинаешь чувствовать присутствие живых организмов в комнате!", ch,0,0,TO_CHAR);
+      act("%^C1 выглядит более чувствительным к присутствию живых организмов.",  ch, 0, 0,TO_ROOM);
       gsn_sense_life->improve( ch, true );
     }
   else

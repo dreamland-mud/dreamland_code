@@ -141,7 +141,7 @@ VOID_SPELL(ChaosBlade)::run(Character *ch, char *, int sn, int level)
 
     blade = create_object(get_obj_index(OBJ_VNUM_CHAOS_BLADE), level);
     ch->pecho("Ты взмахиваешь руками и создаешь Клинок Хаоса!");
-    oldact("$c1 взмахивает руками и создает Клинок Хаоса!", ch, 0, 0, TO_ROOM);
+    act("%^C1 взмахивает руками и создает Клинок Хаоса!",  ch,  0,  0, TO_ROOM);
 
     blade->timer = level * 2;
     blade->level = ch->getModifyLevel();
@@ -168,7 +168,7 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( victim->isAffected(gsn_confuse) )
         {
-                oldact("Кто-то совсем недавно уже ввел в заблуждение $C4.", ch,0,victim,TO_CHAR);
+                act("Кто-то совсем недавно уже ввел в заблуждение %2$C4.",  ch, victim, 0,TO_CHAR);
                 return;
         }
 
@@ -367,7 +367,7 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
   }
 
   if( victim->isAffected(sn ) )  {
-    oldact("$C1 и так уже не может ничего внятно произнести.", ch, 0, victim, TO_CHAR);
+    act("%2$^C1 и так уже не может ничего внятно произнести.",  ch,  victim,  0, TO_CHAR);
     return;
   }
 
@@ -433,7 +433,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 if (ch==victim)
                         ch->pecho("Зеркальных отражений уже слишком много.");
                 else
-                        oldact("Зеркальных отражений $C2 уже слишком много.", ch,0,victim,TO_CHAR);
+                        act("Зеркальных отражений %2$C2 уже слишком много.",  ch, victim, 0,TO_CHAR);
                 return;
         }
 
@@ -537,7 +537,7 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
     ch->pecho("Окружающее тебя пространство теперь находится под властью Хаоса!");
     ch->pecho("Использование Магических Сил Хаоса опустошает тебя.");
     ch->hit -= min(200, ch->hit/2);
-    oldact("Магические Силы Хаоса изменяют окружающий мир.", ch,0,0,TO_ROOM);
+    act("Магические Силы Хаоса изменяют окружающий мир.", ch,0,0,TO_ROOM);
 }
 
 

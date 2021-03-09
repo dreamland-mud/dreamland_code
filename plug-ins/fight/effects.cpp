@@ -260,8 +260,8 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         {
             Affect af;
 
-            oldact("Волна холода пронизывает $c4.",                   victim,0,0,TO_ROOM);
-            oldact("Холод окутывает тебя и проникает до самых костей.",                   victim,0,0,TO_CHAR);
+            act("Волна холода пронизывает %C4.",                    victim, 0, 0,TO_ROOM);
+            act("Холод окутывает тебя и проникает до самых костей.",                   victim,0,0,TO_CHAR);
             af.type      = gsn_chill_touch;
             af.level     = level;
             af.duration  = 6;
@@ -363,8 +363,8 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         &&  !saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
         {
             Affect af;
-            oldact("$c1 ничего не видит из-за дыма, попавшего в глаза!",                   victim,0,0,TO_ROOM);
-            oldact("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!",                   victim,0,0,TO_CHAR);
+            act("%^C1 ничего не видит из-за дыма, попавшего в глаза!",                    victim, 0, 0,TO_ROOM);
+            act("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!",                   victim,0,0,TO_CHAR);
         
             af.bitvector.setTable(&affect_flags);
             af.type         = gsn_fire_breath;
@@ -716,8 +716,8 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 &&  !saves_spell(effect_level, victim, DAM_SLASH, 0, dam_flag))
                 {
                         Affect af;
-                        oldact("$c1 ничего не видит из-за песка, попавшего в глаза!",                                victim,0,0,TO_ROOM);
-                        oldact("Твои глаза слезятся от попавшего в них песка... ты ничего не видишь!",                                victim,0,0,TO_CHAR);
+                        act("%^C1 ничего не видит из-за песка, попавшего в глаза!",                                 victim, 0, 0,TO_ROOM);
+                        act("Твои глаза слезятся от попавшего в них песка... ты ничего не видишь!",                                victim,0,0,TO_CHAR);
         
                         af.bitvector.setTable(&affect_flags);
                         af.type         = gsn_sand_storm;

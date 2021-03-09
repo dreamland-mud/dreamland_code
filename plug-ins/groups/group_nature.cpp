@@ -195,7 +195,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
 
    if (IS_SET(victim->imm_flags, IMM_PIERCE))
    {
-        oldact("$C1 обладает иммунитетом к шипам терновника.", ch, 0,                victim, TO_CHAR);
+        act("%2$^C1 обладает иммунитетом к шипам терновника.",  ch,                 victim,  0, TO_CHAR);
         return;
    }
     

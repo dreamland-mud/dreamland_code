@@ -56,7 +56,7 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
   affect_to_char( ch, &af );
 
 
-  oldact("Кожа $c2 затвердевает, становясь подобной камню.",          victim,0,0,TO_ROOM);
+  act("Кожа %C2 затвердевает, становясь подобной камню.",           victim, 0, 0,TO_ROOM);
   victim->pecho("Твоя кожа затвердевает, становясь подобной камню.");
   return;
 

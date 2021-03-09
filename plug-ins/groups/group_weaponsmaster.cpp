@@ -100,7 +100,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
         if ( IS_OBJ_STAT(obj,ITEM_NOREMOVE))
         {
                 oldact("$S оружие не двигается с места!",ch,0,victim,TO_CHAR);
-                oldact("$c1 пытается обезоружить тебя, но оружие не двигается с места!", ch,0,victim,TO_VICT);
+                act("%^C1 пытается обезоружить тебя, но оружие не двигается с места!",  ch, victim, 0,TO_VICT);
                 oldact("$c1 пытается обезоружить $C4, но оружие не двигается с места.", ch,0,victim,TO_NOTVICT);
                 return;
         }
@@ -111,7 +111,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
                 if ( number_percent() < skill )
                 {
-                        oldact("$C1 хватает тебя за руку и ускользает!", ch,0,victim,TO_CHAR);
+                        act("%2$^C1 хватает тебя за руку и ускользает!",  ch, victim, 0,TO_CHAR);
                         oldact("$c1 пытается обезоружить тебя, но ты хватаешь $s за руку и ускользаешь!", ch,0,victim,TO_VICT);
                         oldact("$c1 пытается обезоружить $C4, но безуспешно.", ch,0,victim,TO_NOTVICT);
                         gsn_grip->improve( victim, true, ch );
@@ -141,9 +141,9 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
         if ( (obj2 = get_eq_char(victim, wear_second_wield)) != 0)
         {
-                oldact("Ты вооружаешься вторичным оружием как основным!", ch, 0, victim,TO_VICT);
-                oldact("$C1 вооружается вторичным оружием как основным!", ch, 0,victim,TO_CHAR );
-                oldact("$C1 вооружается вторичным оружием как основным!", ch, 0, victim,TO_NOTVICT );
+                act("Ты вооружаешься вторичным оружием как основным!", ch, 0, victim,TO_VICT);
+                act("%2$^C1 вооружается вторичным оружием как основным!",  ch, victim,  0,TO_CHAR );
+                act("%2$^C1 вооружается вторичным оружием как основным!",  ch,  victim,  0,TO_NOTVICT );
                 unequip_char( victim, obj2);
                 equip_char( victim, obj2 , wear_wield);
         }
@@ -187,7 +187,7 @@ SKILL_RUNP( disarm )
         if (SHADOW(ch))
         {
                 ch->pecho("Да... Как глупо пытаться разоружить свою тень.");
-                oldact("$c1 пытается выбить у своей тени оружие.\n...как глупо это выглядит.", ch, 0, 0, TO_ROOM);
+                act("%^C1 пытается выбить у своей тени оружие.\n...как глупо это выглядит.",  ch,  0,  0, TO_ROOM);
                 return;
         }
 
@@ -253,8 +253,8 @@ SKILL_RUNP( disarm )
         else
         {
                 ch->setWait( gsn_disarm->getBeats( ) );
-                oldact("Тебе не удалось обезоружить $C4.", ch,0,victim,TO_CHAR);
-                oldact("$c1 пытается обезоружить тебя, но не может.", ch,0,victim,TO_VICT);
+                act("Тебе не удалось обезоружить %2$C4.",  ch, victim, 0,TO_CHAR);
+                act("%^C1 пытается обезоружить тебя, но не может.",  ch, victim, 0,TO_VICT);
                 oldact("$c1 пытается обезоружить $C4, но не может.", ch,0,victim,TO_NOTVICT);
                 gsn_disarm->improve( ch, false, victim );
         }
@@ -332,8 +332,8 @@ SKILL_RUNP( shield )
     if (number_percent() < chance)
     {
             ch->setWait( gsn_shield_cleave->getBeats( )  );
-        oldact("Ты раскалываешь щит $C2 надвое.", ch,0,victim,TO_CHAR);
-        oldact("$c1 раскалывает твой щит надвое.", ch,0,victim,TO_VICT);
+        act("Ты раскалываешь щит %2$C2 надвое.",  ch, victim, 0,TO_CHAR);
+        act("%^C1 раскалывает твой щит надвое.",  ch, victim, 0,TO_VICT);
         oldact("$c1 раскалывает щит $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_shield) );
@@ -341,8 +341,8 @@ SKILL_RUNP( shield )
     else
     {
         ch->setWait( gsn_shield_cleave->getBeats( ) );
-        oldact("Ты пытаешься расколоть щит $C2, но не выходит.", ch,0,victim,TO_CHAR);
-        oldact("$c1 пытается расколоть твой щит, но не выходит.", ch,0,victim,TO_VICT);
+        act("Ты пытаешься расколоть щит %2$C2, но не выходит.",  ch, victim, 0,TO_CHAR);
+        act("%^C1 пытается расколоть твой щит, но не выходит.",  ch, victim, 0,TO_VICT);
         oldact("$c1 пытается расколоть щит $C2, но не выходит.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, false, victim );
     }
@@ -417,8 +417,8 @@ SKILL_RUNP( weapon )
     if (number_percent() < chance)
     {
             ch->setWait( gsn_weapon_cleave->getBeats( )  );
-        oldact("Ты раскалываешь оружие $C2 надвое.", ch,0,victim,TO_CHAR);
-        oldact("{R$c1 раскалывает твое оружие надвое!{x", ch,0,victim,TO_VICT);
+        act("Ты раскалываешь оружие %2$C2 надвое.",  ch, victim, 0,TO_CHAR);
+        act("{R%C1 раскалывает твое оружие надвое!{x",  ch, victim, 0,TO_VICT);
         oldact("$c1 раскалывает оружие $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_wield) );
@@ -426,7 +426,7 @@ SKILL_RUNP( weapon )
     else
     {
         ch->setWait( gsn_weapon_cleave->getBeats( ) );
-        oldact("Ты пытаешься расколоть оружие $C2, но не выходит.", ch,0,victim,TO_CHAR);
+        act("Ты пытаешься расколоть оружие %2$C2, но не выходит.",  ch, victim, 0,TO_CHAR);
         oldact("$c1 пытается расколоть твое оружие, но у н$s не выходит.", ch,0,victim,TO_VICT);
         oldact("$c1 пытается расколоть оружие $C2, но у н$s не выходит.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, false, victim );

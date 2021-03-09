@@ -455,7 +455,7 @@ void Damage::reportState( )
         oldact_p("Ты совершенно беспомощ$gно|ен|на и скоро умрешь, если тебе не помогут.",            victim, 0, 0, TO_CHAR,POS_DEAD);
         break;
     case POS_STUNNED:
-        oldact("$c1 без сознания, но возможно придет в себя.",            victim, 0, 0, TO_ROOM);
+        act("%^C1 без сознания, но возможно придет в себя.",             victim,  0,  0, TO_ROOM);
         victim->pecho("Ты без сознания, но еще можешь придти в себя.");
         break;
     default:

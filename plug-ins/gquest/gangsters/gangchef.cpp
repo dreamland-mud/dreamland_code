@@ -78,7 +78,7 @@ void GangChef::greet( Character *mob )
         return;
     
     if (!ch->fighting)
-        oldact("$c1 тушит сигару о ладонь одного из гангстеров и выхватывает кинжал.", ch, 0, mob, TO_ROOM);
+        act("%^C1 тушит сигару о ладонь одного из гангстеров и выхватывает кинжал.",  ch,  mob,  0, TO_ROOM);
 
     /* force guest to begin the fight */
     multi_hit( mob, ch );

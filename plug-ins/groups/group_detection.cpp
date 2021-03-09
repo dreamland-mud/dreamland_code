@@ -65,7 +65,7 @@ VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Твое зрение уже обострено до предела. ");
         else
-          oldact("Зрение $C2 уже обострено до предела.", ch,0,victim,TO_CHAR);
+          act("Зрение %2$C2 уже обострено до предела.",  ch, victim, 0,TO_CHAR);
         return;
     }
     af.bitvector.setTable(&detect_flags);
@@ -95,7 +95,7 @@ VOID_SPELL(DetectEvil)::run( Character *ch, Character *victim, int sn, int level
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь присутствие дьявольских сил.");
         else
-          oldact("$C1 уже чувствует присутствие дьявольских сил.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 уже чувствует присутствие дьявольских сил.",  ch, victim, 0,TO_CHAR);
         return;
     }
     af.bitvector.setTable(&detect_flags);
@@ -126,7 +126,7 @@ VOID_SPELL(DetectGood)::run( Character *ch, Character *victim, int sn, int level
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь присутствие добрых сил.");
         else
-          oldact("$C1 уже чувствует присутствие добрых сил.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 уже чувствует присутствие добрых сил.",  ch, victim, 0,TO_CHAR);
         return;
     }
     af.bitvector.setTable(&detect_flags);
@@ -156,7 +156,7 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Ты уже видишь невидимое.");
         else
-          oldact("$C1 уже видит невидимое.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 уже видит невидимое.",  ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -187,7 +187,7 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь магическую ауру вокруг предметов.");
         else
-          oldact("$C1 уже чувствует магическую ауру вокруг предметов.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 уже чувствует магическую ауру вокруг предметов.",  ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -316,7 +316,7 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь присутствие очень невидимых существ.");
         else
-          oldact("$C1 уже чувствует присутствие очень невидимых существ.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 уже чувствует присутствие очень невидимых существ.",  ch, victim, 0,TO_CHAR);
         return;
     }
 

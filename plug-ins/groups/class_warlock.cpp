@@ -117,9 +117,9 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
                 return;
         }
 
-        oldact("$C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x тебя!",                victim, 0, ch, TO_CHAR);
+        act("%2$^C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x тебя!",                 victim,  ch,  0, TO_CHAR);
         oldact("$c1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x $C4!", ch, 0, victim, TO_NOTVICT);
-        oldact("Разрушающим световым лучом ты {R###ПОЛНОСТЬЮ УНИЧТОЖАЕШЬ###{x $C4!", ch, 0, victim, TO_CHAR);
+        act("Разрушающим световым лучом ты {R###ПОЛНОСТЬЮ УНИЧТОЖАЕШЬ###{x %2$C4!",  ch,  victim,  0, TO_CHAR);
         victim->pecho("Тебя {RУБИЛИ{x!");
 
         act("Тебя больше не существует!\n\r", victim, 0, 0,TO_CHAR);
@@ -150,8 +150,8 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
             return;
         }
 
-        oldact("$c1 пронзительно кричит, сотрясая все вокруг!", ch,0,0,TO_ROOM);
-        oldact("Ты пронзительно кричишь, сотрясая все вокруг.", ch,0,0,TO_CHAR);
+        act("%^C1 пронзительно кричит, сотрясая все вокруг!",  ch, 0, 0,TO_ROOM);
+        act("Ты пронзительно кричишь, сотрясая все вокруг.", ch,0,0,TO_CHAR);
 
         hpch = max( 10, (int)ch->hit );
         if ( ch->is_npc() )
@@ -192,7 +192,7 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
 
     if (saves_spell( level, victim, DAM_OTHER,ch, DAMF_MAGIC)) {
         if (ch != victim)
-            oldact("Легкая дрожь пронизывает $C4, но это быстро проходит.", ch, 0, victim, TO_CHAR);
+            act("Легкая дрожь пронизывает %2$C4, но это быстро проходит.",  ch,  victim,  0, TO_CHAR);
         victim->pecho("Легкая дрожь пронизывает тебя, но это быстро проходит.");
         return;
     }
@@ -247,7 +247,7 @@ VOID_SPELL(ShockingTrap)::run( Character *ch, Room *room, int sn, int level )
     postaffect_to_char( ch, sn, level / 10 );
 
     ch->pecho("Комната наполняется силовыми волнами, заставляя вибрировать воздух.");
-    oldact("$c1 заставляет вибрировать воздух, наполняя комнату силовыми волнами.", ch,0,0,TO_ROOM);
+    act("%^C1 заставляет вибрировать воздух, наполняя комнату силовыми волнами.",  ch, 0, 0,TO_ROOM);
 }
 
 struct ShockingTrapDamage : public SelfDamage {
@@ -312,7 +312,7 @@ VOID_AFFECT(WitchCurse)::update( Character *ch, Affect *paf )
     
     DefaultAffectHandler::update( ch, paf );
 
-    oldact("Проклятие ведьм безжалостно отбирает жизнь у $c2.", ch,0,0,TO_ROOM);
+    act("Проклятие ведьм безжалостно отбирает жизнь у %C2.",  ch, 0, 0,TO_ROOM);
     ch->pecho("{RПроклятие ведьм безжалостно отбирает у тебя жизнь!{x");
 
     if (paf->level <= 1)

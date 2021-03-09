@@ -360,7 +360,7 @@ VOID_SPELL(MysteriousDream)::run( Character *ch, Room *room, int sn, int level )
     room->affectTo( &af );
 
     ch->pecho("Комната превращается в самое уютное место для сна.");
-    oldact("Комната превращается в самое прекрасное место для твоего отдыха.\n\r", ch,0,0,TO_ROOM);
+    act("Комната превращается в самое прекрасное место для твоего отдыха.\n\r", ch,0,0,TO_ROOM);
 
 
 }

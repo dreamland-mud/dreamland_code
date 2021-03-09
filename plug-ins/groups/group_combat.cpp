@@ -50,8 +50,8 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
     /* first strike */
 
     oldact("Разряд молнии, созданный $c5, поражает $C4.", ch,0,victim,TO_NOTVICT);
-    oldact("Созданный тобой разряд молнии поражает $C4.", ch,0,victim,TO_CHAR);
-    oldact("Разряд молнии, созданный $c5, поражает тебя!", ch,0,victim,TO_VICT);
+    act("Созданный тобой разряд молнии поражает %2$C4.",  ch, victim, 0,TO_CHAR);
+    act("Разряд молнии, созданный %C5, поражает тебя!",  ch, victim, 0,TO_VICT);
 
     dam = dice(level,6);
     if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_MAGIC)){
@@ -85,12 +85,12 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
             found = true;
             last_vict = tmp_vict;
             if (is_safe(ch, tmp_vict) )  {
-              oldact("Разряд молнии затухает, не достигнув $c2.", ch, 0, 0, TO_ROOM);
-              oldact("Разряд молнии затухает, не достигнув тебя.", ch, 0, 0, TO_CHAR);
+              act("Разряд молнии затухает, не достигнув %C2.",  ch,  0,  0, TO_ROOM);
+              act("Разряд молнии затухает, не достигнув тебя.", ch, 0, 0, TO_CHAR);
             }
             else  {
-              oldact("Разряд молнии поражает $c4!",                     tmp_vict,0,0,TO_ROOM);
-              oldact("Разряд молнии поражает тебя!",                     tmp_vict,0,0,TO_CHAR);
+              act("Разряд молнии поражает %C4!",                      tmp_vict, 0, 0,TO_ROOM);
+              act("Разряд молнии поражает тебя!",                     tmp_vict,0,0,TO_CHAR);
               dam = dice(level,6);
                 
                 if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
@@ -121,7 +121,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
           if (last_vict == ch) /* no double hits */
           {
             act("Разряд молнии исчезает.",ch,0,0,TO_ROOM);
-            oldact("Разряд молнии исчезает, не достигнув тебя.", ch,0,0,TO_CHAR);
+            act("Разряд молнии исчезает, не достигнув тебя.", ch,0,0,TO_CHAR);
             return;
           }
 
@@ -151,7 +151,7 @@ VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level
     dam = number_range(1,level);
     if ( !saves_spell( level, victim,DAM_COLD,ch, DAMF_MAGIC ) )
     {
-        oldact("$c1 замерзает от ледяного прикосновения.",               victim,0,0,TO_ROOM);
+        act("%^C1 замерзает от ледяного прикосновения.",                victim, 0, 0,TO_ROOM);
         af.type      = sn;
         af.level     = level;
         af.duration  = 6;
@@ -496,8 +496,8 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
 
     int dam,hp_dam,dice_dam,hpch;
 
-    oldact("$c1 призывает повелителя ураганов на помощь.", ch,0,0,TO_ROOM);
-    oldact("Ты призываешь повелителя ураганов на помощь.", ch,0,0,TO_CHAR);
+    act("%^C1 призывает повелителя ураганов на помощь.",  ch, 0, 0,TO_ROOM);
+    act("Ты призываешь повелителя ураганов на помощь.", ch,0,0,TO_CHAR);
 
     hpch = max(16,(int)ch->hit);
     hp_dam = number_range(hpch/15+1,8);

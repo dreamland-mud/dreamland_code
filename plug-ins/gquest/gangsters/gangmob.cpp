@@ -371,7 +371,7 @@ bool GangMember::death( Character *killer )
     
     if (gquest->isLevelOK( killer )) {
         if (killer->in_room == ch->in_room && number_percent( ) < 10) {
-            oldact("$c1 предсмертной хваткой цепляется за твою одежду.", ch, 0, killer, TO_VICT);
+            act("%^C1 предсмертной хваткой цепляется за твою одежду.",  ch,  killer,  0, TO_VICT);
 
             if (IS_GOOD( killer ))
                 act("%^C1 хрипит '{gТолько сейчас я понял, как неправильно жил.. Я раскаиваюсь и перед смертью открою тебе тайну.{x'", ch, killer, 0,TO_VICT);

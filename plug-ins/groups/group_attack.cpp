@@ -102,7 +102,7 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
         if (victim != ch)
         {
                 oldact("$c1 посылает {CГолубой огонь земли{x против $C2!", ch,0,victim,TO_NOTVICT);
-                oldact("$c1 посылает {CГолубой огонь земли{x против тебя!", ch,0,victim,TO_VICT);
+                act("%^C1 посылает {CГолубой огонь земли{x против тебя!",  ch, victim, 0,TO_VICT);
                 ch->pecho("Ты призываешь на помощь {CГолубой огонь земли{x!");
         }
 
@@ -131,7 +131,7 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
         if (victim != ch)
         {
                 oldact("$c1 посылает силы {RДемонов Ада{x против $C2!", ch,0,victim,TO_NOTVICT);
-                oldact("$c1 посылает силы {RДемонов Ада{x против тебя!", ch,0,victim,TO_VICT);
+                act("%^C1 посылает силы {RДемонов Ада{x против тебя!",  ch, victim, 0,TO_VICT);
                 ch->pecho("Ты призываешь на помощь {RДемонов Ада{x!");
         }
 
@@ -289,7 +289,7 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->pecho("Ты и так в паутине.");
                 else
-                        oldact("Густая паутина уже сковала движения $C2.", ch,0,victim,TO_CHAR);
+                        act("Густая паутина уже сковала движения %2$C2.",  ch, victim, 0,TO_CHAR);
                 return;
         }
 
@@ -312,7 +312,7 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
 
         victim->pecho("Густая паутина опутывает тебя!");
         if ( ch != victim )
-                oldact("Ты опутываешь $C4 густой паутиной!", ch,0,victim,TO_CHAR);
+                act("Ты опутываешь %2$C4 густой паутиной!",  ch, victim, 0,TO_CHAR);
 }
 
 SPELL_DECL(HeatMetal);

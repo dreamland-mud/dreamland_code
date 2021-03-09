@@ -60,7 +60,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
         vch->gold = o_gold;
         vch->silver = o_silver;
         
-        oldact("$c1 пытается дать тебе деньги, но ты не можешь их удержать.", ch, 0, vch, TO_VICT);
+        act("%^C1 пытается дать тебе деньги, но ты не можешь их удержать.",  ch,  vch,  0, TO_VICT);
         act("%^C1 роняет на пол кучку монет.", vch,0,0,TO_ROOM);
         obj_to_room( create_money( a_gold, a_silver ), vch->in_room );
     }
@@ -69,7 +69,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
         vch->gold = o_gold;
         vch->silver = o_silver;
 
-        oldact("$c1 пытается дать тебе деньги, но промахивается и роняет их на пол.", ch, 0, vch, TO_VICT);
+        act("%^C1 пытается дать тебе деньги, но промахивается и роняет их на пол.",  ch,  vch,  0, TO_VICT);
         act("%^C1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
         obj_to_room( create_money( a_gold, a_silver ), vch->in_room );
     }

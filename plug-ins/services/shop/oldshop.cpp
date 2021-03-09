@@ -194,14 +194,14 @@ CMDRUN( buy )
         }
 
         if ( count < number ) {
-            oldact("$c1 говорит тебе '{gУ меня нет столько.{x'",            keeper, 0, ch, TO_VICT);
+            act("%^C1 говорит тебе '{gУ меня нет столько.{x'",             keeper,  ch,  0, TO_VICT);
             ch->reply = keeper;
             return;
         }
     }
 
     if (obj->pIndexData->limit > 0 && obj->pIndexData->limit < obj->pIndexData->count - 1 + number) {
-        oldact("$c1 говорит тебе '{gТакого количества ништяков у меня нету.{x'",        keeper, 0, ch, TO_VICT);
+        act("%^C1 говорит тебе '{gТакого количества ништяков у меня нету.{x'",         keeper,  ch,  0, TO_VICT);
         ch->reply = keeper;
         return;
     }
@@ -209,7 +209,7 @@ CMDRUN( buy )
     if (!can_afford(ch, 0, cost, number))
     {
         if ( number > 1 )
-            oldact("$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",                    keeper, obj, ch, TO_VICT);
+            act("%^C1 говорит тебе '{gТы не можешь заплатить за столько.{x'",                     keeper,  ch,  obj, TO_VICT);
         else
             oldact("$c1 говорит тебе '{gУ тебя нет нужной суммы, чтоб купить $o4.{x'",                    keeper, obj, ch, TO_VICT);
         
@@ -337,7 +337,7 @@ CMDRUN( sell )
 
     if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
     {
-        oldact("$c1 говорит тебе '{gУ тебя нет этого.{x'",        keeper, 0, ch, TO_VICT);
+        act("%^C1 говорит тебе '{gУ тебя нет этого.{x'",         keeper,  ch,  0, TO_VICT);
         ch->reply = keeper;
         return;
     }
@@ -406,7 +406,7 @@ CMDRUN( sell )
         
         if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
         {
-            oldact("$c1 говорит тебе '{GУ меня нет денег.{x'",            keeper,0, ch,TO_VICT);
+            act("%^C1 говорит тебе '{GУ меня нет денег.{x'",             keeper,  ch, 0,TO_VICT);
             return;
         }
 
@@ -422,7 +422,7 @@ CMDRUN( sell )
     {
         ch->gold = gold_old;
         ch->silver = silver_old;
-        oldact("$c1 пытается дать тебе деньги, но ты не можешь их удержать.",        keeper, 0, ch, TO_VICT);
+        act("%^C1 пытается дать тебе деньги, но ты не можешь их удержать.",         keeper,  ch,  0, TO_VICT);
         act("%^C1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
         obj_to_room( create_money( gold, silver ), ch->in_room );
     }

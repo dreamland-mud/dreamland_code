@@ -1335,8 +1335,8 @@ void player_update( )
             ch->PK_time_v--;
         else if( !ch->PK_time_v && IS_VIOLENT( ch ) )
         {
-            oldact("Лихорадочный блеск в глазах $c2 пропадает.", ch, 0, 0, TO_ROOM);
-            oldact("Ты успокаиваешься.", ch, 0, 0, TO_CHAR);
+            act("Лихорадочный блеск в глазах %C2 пропадает.",  ch,  0,  0, TO_ROOM);
+            act("Ты успокаиваешься.", ch, 0, 0, TO_CHAR);
             REMOVE_VIOLENT( ch );
         }
 
@@ -1345,7 +1345,7 @@ void player_update( )
         else if( !ch->ghost_time && IS_GHOST( ch ) )
         {
             oldact("В комнате начинает сгущаться божественная энергия и $c1 обретает плоть.\n\rНо похоже $c1 еще в мире мертвых.", ch, 0, 0, TO_ROOM);
-            oldact("Ты слышишь далекий колокольный звон.\n\rНа тебя накатывается волна ужасной боли...\n\rТы рождаешься заново, обретая плоть.\n\rНо ты пока еще между живыми и мертвыми.", ch, 0, 0, TO_CHAR);
+            act("Ты слышишь далекий колокольный звон.\n\rНа тебя накатывается волна ужасной боли...\n\rТы рождаешься заново, обретая плоть.\n\rНо ты пока еще между живыми и мертвыми.", ch, 0, 0, TO_CHAR);
             REMOVE_GHOST( ch );
         }
 
@@ -1355,14 +1355,14 @@ void player_update( )
         {
             if( IS_KILLER( ch ) )
             {
-                oldact("Аура проклятия вокруг $c2 исчезает.", ch, 0, 0, TO_ROOM);
-                oldact("Боги забывают убийство, совершенное тобой.", ch, 0, 0, TO_CHAR);
+                act("Аура проклятия вокруг %C2 исчезает.",  ch,  0,  0, TO_ROOM);
+                act("Боги забывают убийство, совершенное тобой.", ch, 0, 0, TO_CHAR);
                 REMOVE_KILLER( ch );
             }
             else if( IS_SLAIN( ch ) )
             {
-                oldact("Все забывается... и даже записи жрецов Мира Мечты превращаются в прах.", ch, 0, 0, TO_ROOM);
-                oldact("Правда о твоем поражении забывается.", ch, 0, 0, TO_CHAR);
+                act("Все забывается... и даже записи жрецов Мира Мечты превращаются в прах.", ch, 0, 0, TO_ROOM);
+                act("Правда о твоем поражении забывается.", ch, 0, 0, TO_CHAR);
                 REMOVE_SLAIN( ch );
             }
         }
@@ -1373,7 +1373,7 @@ void player_update( )
         {
             if( IS_THIEF( ch ) )
             {
-                oldact("Ты вздыхаешь с облегчением, ведь все забывают о твоей неспособности\n\rхоть что-то украсть.", ch, 0, 0, TO_CHAR);
+                act("Ты вздыхаешь с облегчением, ведь все забывают о твоей неспособности\n\rхоть что-то украсть.", ch, 0, 0, TO_CHAR);
                 REMOVE_THIEF( ch );
             }
         }
@@ -1488,7 +1488,7 @@ void wield_update( Character *ch )
             && !check_native_weapon( ch, second ))
     {
         act("Ты не в силах удержать %3$O4 в левой руке.", ch, 0, second,TO_CHAR);
-        act("%1$^C1 не в силах удержать %3$C4.", ch, 0, second,TO_ROOM);
+        act("%1$^C1 не в силах удержать %3$O4.", ch, 0, second,TO_ROOM);
         unequip_char( ch, second );
     }
     
@@ -1500,7 +1500,7 @@ void wield_update( Character *ch )
             && !check_native_weapon( ch, wield ))
     {
         act("Ты не в силах удержать %3$O4 в правой руке.", ch, 0, wield,TO_CHAR);
-        act("%1$^C1 не в силах удержать %3$C4.", ch, 0, wield,TO_ROOM);
+        act("%1$^C1 не в силах удержать %3$O4.", ch, 0, wield,TO_ROOM);
         unequip_char( ch, wield );
     }
     

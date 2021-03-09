@@ -425,7 +425,7 @@ SKILL_RUNP( bash )
         {
                 if ( number_percent() < 50 )
                 {
-                        oldact("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!", ch,0,victim,TO_VICT);
+                        act("Сильнейшим ударом щита %C1 сбивает тебя с ног и ты падаешь!",  ch, victim, 0,TO_VICT);
                         act("Ты сбиваешь %2$C4 с ног ударом щита!",ch,victim,0,TO_CHAR);
                         oldact("$c1 сильнейшим ударом щита сбивает $C4 с ног.", ch,0,victim,TO_NOTVICT);
 
@@ -471,15 +471,15 @@ SKILL_RUNP( bash )
                 {
                         act("Ты промахиваешься и падаешь!",ch,victim,0,TO_CHAR);
                         act("%^C1 промахивается и падает.",ch,victim,0,TO_NOTVICT);
-                        oldact("$c1 пытается сбить тебя с ног, но промахивается и падает.", ch,0,victim,TO_VICT);
+                        act("%^C1 пытается сбить тебя с ног, но промахивается и падает.",  ch, victim, 0,TO_VICT);
                         ch->position = POS_RESTING;
                         ch->setWait( gsn_bash->getBeats( ) * 3/2 );
                 }
                 else
                 {
-                        oldact("Ты промахиваешься и едва не падаешь!", ch,0,victim,TO_CHAR);
-                        oldact("$c1 промахивается и едва не падает.", ch,0,victim,TO_NOTVICT);
-                        oldact("$c1 пытается сбить тебя с ног, но промахивается и едва не падает.", ch,0,victim,TO_VICT);
+                        act("Ты промахиваешься и едва не падаешь!", ch,0,victim,TO_CHAR);
+                        act("%^C1 промахивается и едва не падает.",  ch, victim, 0,TO_NOTVICT);
+                        act("%^C1 пытается сбить тебя с ног, но промахивается и едва не падает.",  ch, victim, 0,TO_VICT);
                 }        
                 damage(ch,victim,0,gsn_bash,DAM_BASH, true, DAMF_WEAPON);
                 gsn_bash->improve( ch, false, victim );
@@ -570,7 +570,7 @@ SKILL_RUNP( trip )
         if (SHADOW(ch))
         {
                 ch->pecho("Твоя нога вязнет в твоей тени...");
-                oldact("$c1 выделывает балетные па перед своей тенью.", ch, 0, 0, TO_ROOM);
+                act("%^C1 выделывает балетные па перед своей тенью.",  ch,  0,  0, TO_ROOM);
                 return;
         }
 
@@ -820,7 +820,7 @@ SKILL_RUNP( kick )
         if(SHADOW(ch))
         {
                 ch->pecho("Твоя нога вязнет в твоей тени...");
-                oldact("$c1 выделывает балетные па перед своей тенью.", ch, 0, 0, TO_ROOM);
+                act("%^C1 выделывает балетные па перед своей тенью.",  ch,  0,  0, TO_ROOM);
                 return;
         }
 
@@ -914,7 +914,7 @@ SKILL_RUNP( concentrate )
 
     if(SHADOW(ch)) {
       ch->pecho("Эта странная тень не дает тебе сконцентрироваться.");
-      oldact("$c1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.", ch, 0, 0, TO_ROOM);
+      act("%^C1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.",  ch,  0,  0, TO_ROOM);
       return;
     }
     
@@ -1035,7 +1035,7 @@ SKILL_RUNP( crush )
         /* now the attack */
         if ( number_percent() < chance )
         {
-                oldact("$c1 сбивает тебя с ног мощнейшим ударом!", ch,0,victim,TO_VICT);
+                act("%^C1 сбивает тебя с ног мощнейшим ударом!",  ch, victim, 0,TO_VICT);
                 oldact("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR);
                 oldact("$c1 сбивает $C4 с ног мощнейшим ударом.", ch,0,victim,TO_NOTVICT);
 
@@ -1590,7 +1590,7 @@ SKILL_RUNP( smash )
     /* now the attack */
 
     if (number_percent() < chance) {
-        oldact("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!", ch,0,victim,TO_VICT);
+        act("Сильнейшим ударом %C1 сбивает тебя с ног и ты падаешь на землю!",  ch, victim, 0,TO_VICT);
         oldact("Ты сбиваешь $C4 с ног, посылая $S на землю!", ch,0,victim,TO_CHAR);
         oldact("$c1 сильнейшим ударом сбивает $C4 с ног.", ch,0,victim,TO_NOTVICT);
         gsn_smash->improve( ch, true, victim );
@@ -1625,9 +1625,9 @@ SKILL_RUNP( smash )
     else
     {
         damage(ch,victim,0,gsn_smash,DAM_BASH, true, DAMF_WEAPON);
-        oldact("Ты промахиваешься и падаешь лицом на пол!", ch,0,victim,TO_CHAR);
-        oldact("$c1 промахивается и падает лицом на пол.", ch,0,victim,TO_NOTVICT);
-        oldact("$c1 пытается ударить тебя, но промахивается и падает на пол.", ch,0,victim,TO_VICT);
+        act("Ты промахиваешься и падаешь лицом на пол!", ch,0,victim,TO_CHAR);
+        act("%^C1 промахивается и падает лицом на пол.",  ch, victim, 0,TO_NOTVICT);
+        act("%^C1 пытается ударить тебя, но промахивается и падает на пол.",  ch, victim, 0,TO_VICT);
         gsn_smash->improve( ch, false, victim );
 
         if ( number_percent() > 5 )         

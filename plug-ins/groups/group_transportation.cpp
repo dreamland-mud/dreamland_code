@@ -145,7 +145,7 @@ VOID_SPELL(PassDoor)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->pecho("Ты уже можешь проходить сквозь преграды.");
         else
-          oldact("$C1 уже может проходить сквозь преграды.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 уже может проходить сквозь преграды.",  ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -280,8 +280,8 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
 
     if (victim->in_room->people != 0)
     {
-        oldact("Странные токи пронизывают воздух.",               victim->in_room->people,0,0,TO_ROOM);
-        oldact("Странные токи пронизывают воздух.",               victim->in_room->people,0,0,TO_CHAR);
+        act("Странные токи пронизывают воздух.",               victim->in_room->people,0,0,TO_ROOM);
+        act("Странные токи пронизывают воздух.",               victim->in_room->people,0,0,TO_CHAR);
     }
 
 

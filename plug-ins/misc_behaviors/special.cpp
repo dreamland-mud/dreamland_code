@@ -519,7 +519,7 @@ bool spec_fido( NPCharacter *ch )
              corpse->item_type == ITEM_CORPSE_PC )
             continue;
 
-        oldact("$c1 с жадностью раздирает труп на куски.", ch, 0, 0, TO_ROOM);
+        act("%^C1 с жадностью раздирает труп на куски.",  ch,  0,  0, TO_ROOM);
 
         dreamland->removeOption( DL_SAVE_OBJS );
         
@@ -661,12 +661,12 @@ bool spec_mayor( NPCharacter *ch )
 
     case 'W':
         ch->position = POS_STANDING;
-        oldact("$c1 просыпается и издает громкий стон.", ch, 0, 0, TO_ROOM);
+        act("%^C1 просыпается и издает громкий стон.",  ch,  0,  0, TO_ROOM);
         break;
 
     case 'S':
         ch->position = POS_SLEEPING;
-        oldact("$c1 ложится и засыпает.", ch, 0, 0, TO_ROOM);
+        act("%^C1 ложится и засыпает.",  ch,  0,  0, TO_ROOM);
         break;
 
     case 'a':
@@ -749,7 +749,7 @@ bool spec_thief( NPCharacter *ch )
 
         if ( IS_AWAKE(victim) && number_range( 0, ch->getModifyLevel() ) == 0 )
         {
-            oldact("$c1 пытается ограбить тебя!", ch, 0, victim, TO_VICT);
+            act("%^C1 пытается ограбить тебя!",  ch,  victim,  0, TO_VICT);
             oldact("$C1 пытается ограбить $c4!",                victim, 0, ch, TO_NOTVICT);
             return true;
         }
@@ -898,9 +898,9 @@ bool spec_nasty( NPCharacter *ch )
                 victim->gold -= gold;
                 ch->gold += gold;
 
-                oldact("$c1 разрезает твой кошелек и тянет оттуда золотые монетки!", ch, 0, victim, TO_VICT);
-                oldact("Ты разрезаешь кошелек $C2 и крадешь золото.", ch, 0, victim, TO_CHAR);
-                oldact("БА! Да у $C2 выпотрошили кошелек!", ch, 0, victim, TO_NOTVICT);
+                act("%^C1 разрезает твой кошелек и тянет оттуда золотые монетки!",  ch,  victim,  0, TO_VICT);
+                act("Ты разрезаешь кошелек %2$C2 и крадешь золото.",  ch,  victim,  0, TO_CHAR);
+                act("БА! Да у %2$C2 выпотрошили кошелек!",  ch,  victim,  0, TO_NOTVICT);
             }
             
             return true;
@@ -1023,7 +1023,7 @@ bool spec_captain( NPCharacter *ch )
 
     case 'W':
         ch->position = POS_STANDING;
-        oldact("$c1 резко просыпается и зевает.", ch, 0, 0, TO_ROOM);
+        act("%^C1 резко просыпается и зевает.",  ch,  0,  0, TO_ROOM);
         break;
 
     case 'S':

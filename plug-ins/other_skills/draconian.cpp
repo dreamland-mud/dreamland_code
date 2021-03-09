@@ -67,7 +67,7 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
     int dam,hp_dam,dice_dam,hpch;
 
     act("%1$^C1 брызгает кислотой на %2$C4.",ch,victim,0,TO_NOTVICT);
-    oldact("$c1 брызгает струей едкой кислоты на тебя.", ch,0,victim,TO_VICT);
+    act("%^C1 брызгает струей едкой кислоты на тебя.",  ch, victim, 0,TO_VICT);
     act("Ты брызгаешь кислотой на %2$C4.",ch,victim,0,TO_CHAR);
 
     hpch = max(12,(int)ch->hit);

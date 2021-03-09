@@ -356,12 +356,12 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
         }
 
         if (victim != ch) {
-            oldact("$c1 высоко вздымает руки, посылая ослепительный луч света!", ch,0,0,TO_ROOM);
+            act("%^C1 высоко вздымает руки, посылая ослепительный луч света!",  ch, 0, 0,TO_ROOM);
             ch->pecho("Ты высоко вздымаешь руки, посылая ослепительный луч света!");
         }
 
         if (IS_GOOD(victim) || IS_NEUTRAL(victim)) {
-            oldact("Свет не может причинить вреда $c3.",                   victim,0,victim,TO_ROOM);
+            act("Свет не может причинить вреда %C3.",                    victim, victim, 0,TO_ROOM);
             victim->pecho("Свет не может причинить тебе вреда.");
             continue;
         }

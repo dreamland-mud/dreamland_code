@@ -231,7 +231,7 @@ void auction_update (void)
 
                 auction->seller->gold += auction->bet; /* give him the money */
                 oldact_p("Из дымки появляется аукционер и передает тебе вырученные деньги.",                     auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact("$c1 получает вырученные деньги от прибывшего аукционера.",                     auction->seller,auction->item,0,TO_ROOM);
+                act("%^C1 получает вырученные деньги от прибывшего аукционера.",                      auction->seller, 0, auction->item,TO_ROOM);
 
                 auction->item = 0; /* reset item */
                 auction->seller = 0;
