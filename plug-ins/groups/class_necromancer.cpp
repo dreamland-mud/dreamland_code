@@ -50,7 +50,7 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
 
         if ( victim->fighting )
         {
-                ch->send_to("Ты не можешь сосредоточиться.. Жертва слишком быстро движется.\n\r");
+                ch->pecho("Ты не можешь сосредоточиться.. Жертва слишком быстро движется.");
                 return;
         }
 
@@ -72,7 +72,7 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
                 return;
         }
 
-        victim->send_to("Тебя {RУБИЛИ{x!\n\r");
+        victim->pecho("Тебя {RУБИЛИ{x!");
 
         group_gain( ch, victim );
         raw_kill( victim, -1, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
@@ -89,13 +89,13 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( victim->is_npc() )
         {
-                ch->send_to("Это заклинание может использоваться только против игроков.\n\r");
+                ch->pecho("Это заклинание может использоваться только против игроков.");
                 return;
         }
 
         if ( saves_spell( level, victim,DAM_OTHER, ch, DAMF_MAGIC) )
         {
-                ch->send_to("Не получилось...\n\r");        
+                ch->pecho("Не получилось...");        
                 return;
         }
 
@@ -110,7 +110,7 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
         af.duration  = level / 10;
         af.bitvector.setValue(AFF_BLOODTHIRST);
         affect_to_char( victim, &af );
-        victim->send_to("Безумие охватывает тебя!\n\r");
+        victim->pecho("Безумие охватывает тебя!");
         act("Глаза $c2 наливаются кровью.",victim,0,0,TO_ROOM);
         return;
 

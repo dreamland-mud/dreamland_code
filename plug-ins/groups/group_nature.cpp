@@ -49,13 +49,13 @@ SKILL_RUNP( tame )
 
     if ( ch->is_npc() || !gsn_tame->usable( ch ) )
     {
-        ch->send_to("Это ж надо уметь!\n\r");
+        ch->pecho("Это ж надо уметь!");
         return;
     }
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Ты не поддаешься укрощению.\n\r");
+        ch->pecho("Ты не поддаешься укрощению.");
         act_p("$c1 пытается укротить са$gмо|м|ма себя, но эта попытка с треском проваливается.",
                 ch,0,0,TO_ROOM,POS_RESTING);
         return;
@@ -63,7 +63,7 @@ SKILL_RUNP( tame )
 
     if ( (victim = get_char_room(ch,arg)) == 0)
     {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
@@ -119,7 +119,7 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
     int dam;
 
     if (!RoomUtils::hasWaterParticles(ch->in_room)) {
-         ch->send_to("Здесь недостаточно водных молекул.\n\r");
+         ch->pecho("Здесь недостаточно водных молекул.");
          ch->wait = 0;
          return;
     }
@@ -141,19 +141,19 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
 
     if (!RoomUtils::isNature(ch->in_room))
     {
-        ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
+        ch->pecho("Терновник растет только в лесу, поле, горах или на холмах.");
         return;
     }
 
     if (grave->pIndexData->vnum != OBJ_VNUM_GRAVE) {
-        ch->send_to("Это не вампирская могила.\r\n");
+        ch->pecho("Это не вампирская могила.");
         return;
     }
 
     victim = PCharacterManager::findPlayer( grave->getOwner( ) );
 
     if (!victim || !DIGGED(victim)) {
-        ch->send_to("Колючий терновник опутывает могилу... но в ней никого не оказывается!\r\n");
+        ch->pecho("Колючий терновник опутывает могилу... но в ней никого не оказывается!");
         LogStream::sendError( ) << "Unexistent grave owner: " << grave->getOwner( ) << endl;
         return;
     }
@@ -186,13 +186,13 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
 
    if (victim == ch)
    {
-        ch->send_to("Ты задумчиво колешь себя шипом терновника в пятку. Ай!\n\r");
+        ch->pecho("Ты задумчиво колешь себя шипом терновника в пятку. Ай!");
         return;
    }
     
    if (!RoomUtils::isNature(ch->in_room))
    {
-        ch->send_to("Терновник растет только в лесу, поле, горах или на холмах.\n\r");
+        ch->pecho("Терновник растет только в лесу, поле, горах или на холмах.");
         return;
    }
 
@@ -205,7 +205,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     
    if (is_flying( victim ))
    {
-        ch->send_to("Побеги терновника не смогут навредить летучему противнику.\n\r");
+        ch->pecho("Побеги терновника не смогут навредить летучему противнику.");
         return;
    }
 

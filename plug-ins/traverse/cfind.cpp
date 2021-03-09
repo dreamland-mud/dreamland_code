@@ -83,7 +83,7 @@ CMDRUN( find )
         if (target <= 0)
             return;
     } catch (const ExceptionBadType &e) {
-        ch->send_to( "Usage: find <room vnum>\r\n" );
+        ch->pecho("Usage: find <room vnum>");
         return;
     }
     

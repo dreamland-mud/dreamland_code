@@ -1207,9 +1207,9 @@ MEDIT(average)
         return true;
     }
     else {
-        ch->send_to("Syntax: \r\n"
+        ch->pecho("Syntax: \r\n"
                     "   average hp|mana|hitroll|damage|ac -- setup one param\r\n"
-                    "   average [all] -- setup all parameters\r\n");
+                    "   average [all] -- setup all parameters");
         return false;
     }
 }

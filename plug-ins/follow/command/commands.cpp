@@ -67,12 +67,12 @@ CMDRUN( follow )
     arg = arguments.getOneArgument( );
 
     if (arg.empty( )) {
-        ch->send_to( "Следовать за кем?\n\r");
+        ch->pecho("Следовать за кем?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 ) {
-        ch->send_to( "Ты не находишь этого здесь.\n\r");
+        ch->pecho("Ты не находишь этого здесь.");
         return;
     }
 
@@ -85,7 +85,7 @@ CMDRUN( follow )
     {
         if ( ch->master == 0 )
         {
-            ch->send_to( "Ты уже следуешь за собой.\n\r");
+            ch->pecho("Ты уже следуешь за собой.");
             return;
         }
         ch->stop_follower();
@@ -152,7 +152,7 @@ CMDRUN( group )
 
     if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 )
     {
-        ch->send_to( "Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
@@ -163,7 +163,7 @@ CMDRUN( group )
 
     if ( ch->master != 0 || ( ch->leader != 0 && ch->leader != ch ) )
     {
-        ch->send_to( "Но ты следуешь за кем-то еще!\n\r");
+        ch->pecho("Но ты следуешь за кем-то еще!");
         return;
     }
 
@@ -173,7 +173,7 @@ CMDRUN( group )
     }
 
     if (IS_CHARMED(victim)) {
-        ch->send_to("Ты не можешь исключить очарованных монстров из своей группы.\n\r");
+        ch->pecho("Ты не можешь исключить очарованных монстров из своей группы.");
         return;
     }
 
@@ -308,7 +308,7 @@ CMDRUN( split )
 
     if (arg1.empty( ))
     {
-        ch->send_to( "Разделить? Сколько?\n\r");
+        ch->pecho("Разделить? Сколько?");
         return;
     }
 
@@ -319,19 +319,19 @@ CMDRUN( split )
 
     if ( amount_gold < 0 || amount_silver < 0)
     {
-        ch->send_to( "Твоей группе это не понравится.\n\r");
+        ch->pecho("Твоей группе это не понравится.");
         return;
     }
 
     if ( amount_gold == 0 && amount_silver == 0 )
     {
-        ch->send_to( "Ты не взял ни одной монеты, но никому об этом не сказал.\n\r");
+        ch->pecho("Ты не взял ни одной монеты, но никому об этом не сказал.");
         return;
     }
 
     if ( ch->gold <  amount_gold || ch->silver < amount_silver)
     {
-        ch->send_to( "У тебя нет столько, чтоб поделиться.\n\r");
+        ch->pecho("У тебя нет столько, чтоб поделиться.");
         return;
     }
 
@@ -344,7 +344,7 @@ CMDRUN( split )
 
     if ( members < 2 )
     {
-        ch->send_to( "Можешь забрать себе все.\n\r");
+        ch->pecho("Можешь забрать себе все.");
         return;
     }
         
@@ -356,7 +356,7 @@ CMDRUN( split )
 
     if ( share_gold == 0 && share_silver == 0 )
     {
-         ch->send_to( "Очень мудро.\n\r");
+         ch->pecho("Очень мудро.");
         return;
     }
 
@@ -427,18 +427,18 @@ CMDRUN( nofollow )
         return;
 
     if ( IS_CHARMED(ch) )  {
-        ch->send_to( "Ты не можешь покинуть своего повелителя.\n\r");
+        ch->pecho("Ты не можешь покинуть своего повелителя.");
         return;
     }
 
     if (IS_SET(ch->act,PLR_NOFOLLOW))
     {
-      ch->send_to("Теперь ты разрешаешь следовать за собой.\n\r");
+      ch->pecho("Теперь ты разрешаешь следовать за собой.");
       REMOVE_BIT(ch->act,PLR_NOFOLLOW);
     }
     else
     {
-      ch->send_to("Теперь ты не разрешаешь следовать за собой.\n\r");
+      ch->pecho("Теперь ты не разрешаешь следовать за собой.");
       SET_BIT(ch->act,PLR_NOFOLLOW);
       ch->die_follower( );
     }

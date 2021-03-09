@@ -66,7 +66,7 @@ bool InvasionHelper::death( Character *killer )
 
             attr = wch->getPC( )->getAttributes( ).getAttr<XMLAttributeInvasion>( gq->getQuestID( ) );
             attr->punish( );
-            wch->send_to("{YВ твоих услугах более никто не нуждается.{x\r\n");
+            wch->pecho("{YВ твоих услугах более никто не нуждается.{x");
         }
     } 
 

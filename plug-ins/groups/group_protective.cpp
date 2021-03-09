@@ -110,7 +110,7 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
     if ( ch->isAffected(sn ) )
     {
         if (victim == ch)
-          ch->send_to("Твоя кожа не может стать еще прочнее.\n\r");
+          ch->pecho("Твоя кожа не может стать еще прочнее.");
         else
           act_p("Кожа $C2 не может стать еще прочнее.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -204,9 +204,9 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
     }
 
     if (found)
-        ch->send_to("Получилось!\n\r");
+        ch->pecho("Получилось!");
     else
-        ch->send_to("Твоя попытка отменить воздействия закончилась неудачей.\n\r");
+        ch->pecho("Твоя попытка отменить воздействия закончилась неудачей.");
 }
 
 
@@ -246,8 +246,8 @@ VOID_SPELL(DispelAffects)::run( Character *ch, Character *victim, int sn, int le
         return;
 
     if (saves_spell(level, victim,DAM_OTHER, ch, DAMF_SPELL)) {
-        victim->send_to("Ты чувствуешь легкий звон в ушах.\n\r");
-        ch->send_to("Твоя попытка развеять чары закончилась неудачей.\n\r");
+        victim->pecho("Ты чувствуешь легкий звон в ушах.");
+        ch->pecho("Твоя попытка развеять чары закончилась неудачей.");
         return;
     }
 
@@ -260,9 +260,9 @@ VOID_SPELL(DispelAffects)::run( Character *ch, Character *victim, int sn, int le
     }
 
     if (found)
-        ch->send_to("Получилось!\n\r");
+        ch->pecho("Получилось!");
     else
-        ch->send_to("Твоя попытка развеять чары закончилась неудачей.\n\r");
+        ch->pecho("Твоя попытка развеять чары закончилась неудачей.");
 }
 
 
@@ -275,7 +275,7 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
   if ( victim->isAffected(sn ) )
     {
       if (victim == ch)
-               ch->send_to("Твоя кожа уже тверда, как драконья.\n\r");
+               ch->pecho("Твоя кожа уже тверда, как драконья.");
       else
                act_p("Кожа $C2 уже тверда, как драконья.",
                ch,0,victim,TO_CHAR,POS_RESTING);
@@ -291,7 +291,7 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
   affect_to_char( victim, &af );
   act_p( "Кожа $c2 становится тверже драконьей.",
           victim,0,0,TO_ROOM,POS_RESTING );
-  victim->send_to("Твоя кожа становится тверже драконьей.\n\r");
+  victim->pecho("Твоя кожа становится тверже драконьей.");
   return;
 
 }
@@ -305,7 +305,7 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
     if ( victim->isAffected(sn ) )
     {
         if (victim == ch)
-          ch->send_to("Силовое поле уже защищает тебя.\n\r");
+          ch->pecho("Силовое поле уже защищает тебя.");
         else
           act("Силовое поле уже окружает $C4.",ch,0,victim,TO_CHAR);
         return;
@@ -318,7 +318,7 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
     af.location = APPLY_AC;
     
     affect_to_char( victim, &af );
-    victim->send_to("Силовое поле окружает тебя.\n\r");
+    victim->pecho("Силовое поле окружает тебя.");
     if ( ch != victim )
         act("Силовое поле окружает $C4.",ch,0,victim,TO_CHAR);
     return;
@@ -357,7 +357,7 @@ VOID_SPELL(SpellResistance)::run( Character *ch, Character *victim, int sn, int 
 
         if (!ch->isAffected(sn))
         {
-                ch->send_to("Ты обретаешь сопротивляемость к магии!\n\r");
+                ch->pecho("Ты обретаешь сопротивляемость к магии!");
 
                 af.bitvector.setTable(&res_flags);
                 af.type = sn;
@@ -369,7 +369,7 @@ VOID_SPELL(SpellResistance)::run( Character *ch, Character *victim, int sn, int 
                 affect_to_char(ch, &af);
         }
         else
-                ch->send_to("Ты уже имеешь сопротивляемость к магии.\n\r");
+                ch->pecho("Ты уже имеешь сопротивляемость к магии.");
         return;
 
 }
@@ -447,7 +447,7 @@ VOID_SPELL(ProtectionCold)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     
     affect_to_char( victim, &af );
-    victim->send_to("Твоя защищенность от воздействия низких температур повышается.\n\r");
+    victim->pecho("Твоя защищенность от воздействия низких температур повышается.");
     if ( ch != victim )
         act_p("Защищенность $C2 от воздействия низких температур повышается.",
               ch,0,victim,TO_CHAR,POS_RESTING);
@@ -488,7 +488,7 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector.setValue(AFF_PROTECT_EVIL);
     affect_to_char( victim, &af );
-    victim->send_to("Ты получаешь защиту от злых существ.\n\r");
+    victim->pecho("Ты получаешь защиту от злых существ.");
     if ( ch != victim )
         act_p("$C1 получает защиту от злых существ.",
                ch,0,victim,TO_CHAR,POS_RESTING);
@@ -529,7 +529,7 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector.setValue(AFF_PROTECT_GOOD);
     affect_to_char( victim, &af );
-    victim->send_to("Ты получаешь защиту от добрых существ.\n\r");
+    victim->pecho("Ты получаешь защиту от добрых существ.");
     if ( ch != victim )
         act_p("$C1 получает защиту от добрых существ.",
                ch,0,victim,TO_CHAR,POS_RESTING);
@@ -578,7 +578,7 @@ VOID_SPELL(ProtectionHeat)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     
     affect_to_char( victim, &af );
-    victim->send_to("Твоя защищенность от воздействия высоких температур повышается.\n\r");
+    victim->pecho("Твоя защищенность от воздействия высоких температур повышается.");
     if ( ch != victim )
         act_p("Защищенность $C2 от воздействия высоких температур повышается.",
                ch,0,victim,TO_CHAR,POS_RESTING);
@@ -593,7 +593,7 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
 
     if (!ch->isAffected(sn))
     {
-      ch->send_to("Ты приобретаешь сопротивляемость к темной магии и молитвам.\n\r");
+      ch->pecho("Ты приобретаешь сопротивляемость к темной магии и молитвам.");
 
       af.bitvector.setTable(&res_flags);
       af.type = sn;
@@ -605,7 +605,7 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
       affect_to_char(ch, &af);
     }
   else
-      ch->send_to("У тебя уже есть сопротивляемость к темной магии и молитвам.\n\r");
+      ch->pecho("У тебя уже есть сопротивляемость к темной магии и молитвам.");
  return;
 
 }
@@ -619,7 +619,7 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
 
   if (victim->isAffected(sn)) {
       if (victim == ch)
-               ch->send_to("Охранный щит уже окружает тебя.\n\r");
+               ch->pecho("Охранный щит уже окружает тебя.");
       else
                act("Охранный щит уже окружает $C4.",ch,0,victim,TO_CHAR);
       return;
@@ -635,10 +635,10 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
   affect_to_char( victim, &af );
   if (chance(1)) {
       act( "Предохранительный щит окружает $c4.",victim,0,0,TO_ROOM);
-      victim->send_to("Предохранительный щит окружает тебя.\n\r");
+      victim->pecho("Предохранительный щит окружает тебя.");
   } else {
       act( "Охранный щит окружает $c4.",victim,0,0,TO_ROOM);
-      victim->send_to("Охранный щит окружает тебя.\n\r");
+      victim->pecho("Охранный щит окружает тебя.");
   }
 }
 
@@ -741,7 +741,7 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
     if ( ch->isAffected(sn ) )
     {
         if (victim == ch)
-          ch->send_to("Твоя кожа уже тверда как камень.\n\r");
+          ch->pecho("Твоя кожа уже тверда как камень.");
         else
           act_p("Кожа $C2 уже тверда как камень.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -758,5 +758,5 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
     affect_to_char( victim, &af );
     act_p( "Кожа $c2 становится тверже камня.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-    victim->send_to("Твоя кожа становится тверже камня.\n\r");
+    victim->pecho("Твоя кожа становится тверже камня.");
 }

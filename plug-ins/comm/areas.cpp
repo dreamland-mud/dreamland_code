@@ -41,7 +41,7 @@ CMDRUNP( areas )
             args.clear( );
         }
     } catch (const ExceptionBadType & ) {
-        ch->send_to( "Уровень зоны указан неверно.\r\n" );
+        ch->pecho("Уровень зоны указан неверно.");
         return;
     }
     

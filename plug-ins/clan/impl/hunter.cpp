@@ -548,7 +548,7 @@ SKILL_RUNP( hunt )
     bool fArea;
     
     if (!gsn_hunt->available( ch )) {
-        ch->send_to("Ты не умеешь охотиться.\n\r");
+        ch->pecho("Ты не умеешь охотиться.");
         return;
     }
     if (!gsn_hunt->usable( ch ))
@@ -557,7 +557,7 @@ SKILL_RUNP( hunt )
     one_argument( argument, arg );
 
     if( arg[0] == '\0' ) {
-        ch->send_to( "Кого выслеживаем?\n\r");
+        ch->pecho("Кого выслеживаем?");
         return;
     }
 
@@ -570,7 +570,7 @@ SKILL_RUNP( hunt )
         }
         else {
             gsn_world_find->improve( ch, false );
-            ch->send_to ("Твоих знаний недостаточно, чтобы искать по всему миру!\n\r");
+            ch->pecho("Твоих знаний недостаточно, чтобы искать по всему миру!");
         }
     }
 
@@ -580,12 +580,12 @@ SKILL_RUNP( hunt )
         victim = get_char_world( ch, arg);
 
     if (victim == 0) {
-        ch->send_to("Нет никого здесь с таким именем.\n\r");
+        ch->pecho("Нет никого здесь с таким именем.");
         return;
     }
 
     if (victim->in_room == 0) {
-        ch->send_to("Ты не можешь точно определить, где находится цель.\n\r");
+        ch->pecho("Ты не можешь точно определить, где находится цель.");
         return;
     }
 
@@ -601,7 +601,7 @@ SKILL_RUNP( hunt )
         if (ch->endur > 2)
             ch->endur -= 3;
         else {
-            ch->send_to( "Твои силы истощились и ты не можешь охотиться!\n\r");
+            ch->pecho("Твои силы истощились и ты не можешь охотиться!");
             return;
         }
     }
@@ -676,7 +676,7 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
     }
 
     if ( !found )
-        ch->send_to("В Dream Land нет ничего похожего на это.\n\r");
+        ch->pecho("В Dream Land нет ничего похожего на это.");
     else
         page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -692,7 +692,7 @@ VOID_SPELL(TakeRevenge)::run( Character *ch, char *target_name, int sn, int leve
 
     if (!IS_DEATH_TIME( ch ))
     {
-        ch->send_to("Слишком поздно мстить в твоем положении.\n\r");
+        ch->pecho("Слишком поздно мстить в твоем положении.");
         return;
     }
     
@@ -700,9 +700,9 @@ VOID_SPELL(TakeRevenge)::run( Character *ch, char *target_name, int sn, int leve
     room = (obj ? obj->getRoom( ) : 0);
 
     if (room == 0)
-        ch->send_to("Увы, похоже твой труп разделали на мясо.\n\r");
+        ch->pecho("Увы, похоже твой труп разделали на мясо.");
     else if ( IS_SET(room->affected_by,AFF_ROOM_PREVENT) )
-        ch->send_to ("Извини, но тебе не удается добраться туда.\n\r");
+        ch->pecho("Извини, но тебе не удается добраться туда.");
     else
         transfer_char( ch, ch, room );
 }

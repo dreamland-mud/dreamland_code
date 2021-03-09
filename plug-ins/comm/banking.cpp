@@ -49,7 +49,7 @@ void BankAction::doBalance( PCharacter *ch )
     long bank_g, bank_s;
 
     if ( ch->bank_s + ch->bank_g == 0 )  {
-        ch->send_to("У тебя нет никаких денег в банке.\n\r");
+        ch->pecho("У тебя нет никаких денег в банке.");
         return;
     }
 
@@ -110,7 +110,7 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
         amount_g = amount;
     
     if (amount_g > ch->bank_g || amount_s > ch->bank_s) {
-        ch->send_to("Извини, мы не даем взаймы.\n\r");
+        ch->pecho("Извини, мы не даем взаймы.");
         return;
     }
 
@@ -174,7 +174,7 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     DLString arg;
 
     if (arguments.empty( )) {
-        ch->send_to("Положить на счет сколько?\n\r");
+        ch->pecho("Положить на счет сколько?");
         return;
     }
     
@@ -188,12 +188,12 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
                     throw Exception( );
             }
             catch (const Exception &) {
-                ch->send_to( "Сумма указана неверно.\r\n" );
+                ch->pecho("Сумма указана неверно.");
                 return;
             }
 
             if (( arg = arguments.getOneArgument( ) ).empty( )) {
-                ch->send_to( "Укажи денежную единицу: {lRзолото или серебро{lEgold или silver{lx.\r\n" );
+                ch->pecho("Укажи денежную единицу: {lRзолото или серебро{lEgold или silver{lx.");
                 return;
             }
 
@@ -202,25 +202,25 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
             else if (arg_is_gold( arg ) && amount_g == 0)
                 amount_g = amount;
             else {
-                ch->send_to("Ты можешь положить на счет только золотые или серебряные монеты.\r\n"
-                            "Пример: {lEdeposit 3 silver 18 gold{lRнасчет 3 серебра 18 золота{lx\r\n" );
+                ch->pecho("Ты можешь положить на счет только золотые или серебряные монеты.\r\n"
+                            "Пример: {lEdeposit 3 silver 18 gold{lRнасчет 3 серебра 18 золота{lx" );
                 return;
             }
         }
         else if (victim != ch) {
-            ch->send_to( "Двоим сразу давать деньги не стоит. Подерутся еще..\r\n" );
+            ch->pecho("Двоим сразу давать деньги не стоит. Подерутся еще..");
             return;
         }
         else {
             PCMemoryInterface *pci = PCharacterManager::find( arg );
 
             if (!pci) {
-                ch->send_to( "Адресат перевода не найден. Укажи имя правильно и полностью.\r\n" );
+                ch->pecho("Адресат перевода не найден. Укажи имя правильно и полностью.");
                 return;
             }
 
             if (!( victim = dynamic_cast<PCharacter *>( pci ) ) || !ch->can_see( victim )) {
-                ch->send_to( "Невидимый или отсутствующий в мире адресат не оценит твоей щедрости.\r\n" );
+                ch->pecho("Невидимый или отсутствующий в мире адресат не оценит твоей щедрости.");
                 return;
             }
         }
@@ -228,12 +228,12 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
 
 
     if (amount_g > ch->gold || amount_s > ch->silver) {
-        ch->send_to("Это больше, чем есть у тебя в кошельке.\n\r");
+        ch->pecho("Это больше, чем есть у тебя в кошельке.");
         return;
     }
 
     if ( (amount_g + victim->getPC( )->bank_g) > 100000 ) {
-        ch->send_to("Размер банковского счета не может превышать 100.000 золотых.\n\r");
+        ch->pecho("Размер банковского счета не может превышать 100.000 золотых.");
         return;
     }
 

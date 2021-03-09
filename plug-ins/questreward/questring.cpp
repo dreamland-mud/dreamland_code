@@ -17,7 +17,7 @@
 
 void QuestRing::wear( Character *ch ) 
 {
-    ch->send_to( "{CТвое кольцо ярко вспыхивает.{x\r\n" );
+    ch->pecho("{CТвое кольцо ярко вспыхивает.{x");
 }
 
 void QuestRing::equip( Character *ch ) 

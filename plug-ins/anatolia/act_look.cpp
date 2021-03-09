@@ -1405,7 +1405,7 @@ static bool do_look_direction( Character *ch, const char *arg1 )
 
     if ( pexit->description != 0 && pexit->description[0] != '\0' ) {
             ch->send_to( pexit->description);
-            ch->send_to( "\r\n" );
+            ch->pecho("");
     }
     else
             ch->pecho( "Здесь нет ничего особенного." );

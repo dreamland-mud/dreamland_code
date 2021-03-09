@@ -27,7 +27,7 @@ COMMAND(Lover, "lover")
     DLString cmd = arguments.getOneArgument( );
     
     if (ch->is_npc()) {
-        ch->send_to("Тебе нельзя.\n\r");
+        ch->pecho("Тебе нельзя.");
         return;
     }
 

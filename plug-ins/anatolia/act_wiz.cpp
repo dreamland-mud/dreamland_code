@@ -165,12 +165,12 @@ CMDWIZP( limited )
                 OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
-                        ch->send_to("Формат: limited <vnum>.\n\r");
+                        ch->pecho("Формат: limited <vnum>.");
                         return;
                 }
                 if ( obj_index->limit == -1 )
                 {
-                        ch->send_to("Это не лимит.\n\r");
+                        ch->pecho("Это не лимит.");
                         return;
                 }
                 nMatch = 0;
@@ -246,12 +246,12 @@ CMDWIZP( wiznet )
         {
                 if (IS_SET(ch->getPC( )->wiznet,WIZ_ON))
                 {
-                        ch->send_to("Визнет отключен. Уф.\n\r");
+                        ch->pecho("Визнет отключен. Уф.");
                         REMOVE_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 }
                 else
                 {
-                        ch->send_to("Визнет включен, добро пожаловать в мир спама!\n\r");
+                        ch->pecho("Визнет включен, добро пожаловать в мир спама!");
                         SET_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 }
 
@@ -260,14 +260,14 @@ CMDWIZP( wiznet )
 
         if (!str_prefix(argument,"on"))
         {
-                ch->send_to("Визнет включен, добро пожаловать в мир спама!\n\r");
+                ch->pecho("Визнет включен, добро пожаловать в мир спама!");
                 SET_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 return;
         }
 
         if (!str_prefix(argument,"off"))
         {
-                ch->send_to("Визнет отключен. Уф.\n\r");
+                ch->pecho("Визнет отключен. Уф.");
                 REMOVE_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 return;
         }
@@ -289,7 +289,7 @@ CMDWIZP( wiznet )
 
                 strcat(buf,"\n\r");
 
-                ch->send_to("Статус Визнета:\n\r");
+                ch->pecho("Статус Визнета:");
                 ch->send_to(buf);
                 return;
         }
@@ -310,7 +310,7 @@ CMDWIZP( wiznet )
 
                 strcat(buf,"\n\r");
 
-                ch->send_to("Доступные тебе опции Визнета:\n\r");
+                ch->pecho("Доступные тебе опции Визнета:");
                 ch->send_to(buf);
 
                 return;
@@ -320,7 +320,7 @@ CMDWIZP( wiznet )
 
         if ( flag == -1 || ch->get_trust() < wiznet_table[flag].level )
         {
-                ch->send_to("Такой опции Визнета нет, или тебе она пока недоступна.\n\r");
+                ch->pecho("Такой опции Визнета нет, или тебе она пока недоступна.");
                 return;
         }
 
@@ -361,7 +361,7 @@ CMDWIZP( poofin )
             && strstr(argument,ch->getNameP( '5' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '6' ).c_str()) == 0 )
     {
-            ch->send_to("Неплохо бы включить в poofin свое имя.\n\r");
+            ch->pecho("Неплохо бы включить в poofin свое имя.");
             return;
     }
 
@@ -390,7 +390,7 @@ CMDWIZP( poofout )
             && strstr(argument,ch->getNameP( '5' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '6' ).c_str()) == 0 )
     {
-            ch->send_to("Неплохо бы включить в poofout свое имя.\n\r");
+            ch->pecho("Неплохо бы включить в poofout свое имя.");
             return;
     }
 
@@ -408,7 +408,7 @@ CMDWIZP( disconnect )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Отключить кого?\n\r");
+        ch->pecho("Отключить кого?");
         return;
     }
 
@@ -422,7 +422,7 @@ CMDWIZP( disconnect )
             if ( d->descriptor == desc )
             {
                     d->close( );
-                    ch->send_to("Игрок отключен. Бай-бай!\n\r");
+                    ch->pecho("Игрок отключен. Бай-бай!");
                     return;
             }
         }
@@ -430,7 +430,7 @@ CMDWIZP( disconnect )
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("Таких сейчас в мире нет.\n\r");
+        ch->pecho("Таких сейчас в мире нет.");
         return;
     }
 
@@ -445,13 +445,13 @@ CMDWIZP( disconnect )
         if ( d == victim->desc )
         {
             d->close( );
-            ch->send_to("Готово.\n\r");
+            ch->pecho("Готово.");
             return;
         }
     }
 
     bug( "Do_disconnect: desc not found.", 0 );
-    ch->send_to("Дескриптор не найден!\n\r");
+    ch->pecho("Дескриптор не найден!");
     return;
 }
 
@@ -469,7 +469,7 @@ CMDWIZP( transfer )
 
     if ( arg1[0] == '\0' )
     {
-        ch->send_to("Перенести кого и куда?\n\r");
+        ch->pecho("Перенести кого и куда?");
         return;
     }
 
@@ -493,7 +493,7 @@ CMDWIZP( transfer )
 
     if ( ( victim = get_char_world( ch, arg1 ) ) == 0 )
     {
-        ch->send_to("Таких сейчас в мире нет.\n\r");
+        ch->pecho("Таких сейчас в мире нет.");
         return;
     }
     /*
@@ -507,7 +507,7 @@ CMDWIZP( transfer )
     {
         if ( ( location = find_location( ch, arg2 ) ) == 0 )
         {
-            ch->send_to("Цель не найдена.\n\r");
+            ch->pecho("Цель не найдена.");
             return;
         }
         
@@ -516,7 +516,7 @@ CMDWIZP( transfer )
         if ( location ->isPrivate( )
         &&  ch->get_trust() < MAX_LEVEL)
         {
-            ch->send_to("Комната приватная и сейчас занята.\n\r");
+            ch->pecho("Комната приватная и сейчас занята.");
             return;
         }
     }
@@ -548,19 +548,19 @@ CMDWIZP( at )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-        ch->send_to("Рядом с кем? Сделать что?\n\r");
+        ch->pecho("Рядом с кем? Сделать что?");
         return;
     }
 
     if ( ( location = find_location( ch, arg ) ) == 0 )
     {
-        ch->send_to("Цель не найдена.\n\r");
+        ch->pecho("Цель не найдена.");
         return;
     }
 
     if ( location ->isPrivate( ) &&  ch->get_trust() < MAX_LEVEL)
     {
-        ch->send_to("Комната приватная и сейчас занята.\n\r");
+        ch->pecho("Комната приватная и сейчас занята.");
         return;
     }
 
@@ -600,7 +600,7 @@ CMDWIZP( goto )
 
     if ( argument[0] == '\0' )
     {
-        ch->send_to("Переместиться куда?\n\r");
+        ch->pecho("Переместиться куда?");
         return;
     }
 
@@ -649,11 +649,11 @@ CMDWIZP( stat )
    string = one_argument(argument, arg);
    if ( arg[0] == '\0')
    {
-        ch->send_to("Формат:\n\r");
-        ch->send_to("  stat <name>\n\r");
-        ch->send_to("  stat obj <name>\n\r");
-        ch->send_to("  stat mob <name>\n\r");
-        ch->send_to("  stat room <number>\n\r");
+        ch->pecho("Формат:");
+        ch->pecho("  stat <name>");
+        ch->pecho("  stat obj <name>");
+        ch->pecho("  stat mob <name>");
+        ch->pecho("  stat room <number>");
         return;
    }
 
@@ -711,7 +711,7 @@ CMDWIZP( stat )
     return;
   }
 
-  ch->send_to("С таким именем ничего не найдено.\n\r");
+  ch->pecho("С таким именем ничего не найдено.");
 }
 
 
@@ -728,7 +728,7 @@ CMDWIZP( stat )
     location = ( arg[0] == '\0' ) ? ch->in_room : find_location( ch, arg );
     if ( location == 0 )
     {
-        ch->send_to("Цель не найдена.\n\r");
+        ch->pecho("Цель не найдена.");
         return;
     }
 
@@ -736,7 +736,7 @@ CMDWIZP( stat )
     if ( ch->in_room != location
     &&  location ->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->send_to("Комната приватная и сейчас занята.\n\r");
+        ch->pecho("Комната приватная и сейчас занята.");
         return;
     }
 
@@ -780,7 +780,7 @@ CMDWIZP( stat )
             if ( ed->next != 0 )
                 ch->send_to(" ");
         }
-        ch->send_to("'.\n\r");
+        ch->pecho("'.");
     }
 
     ch->send_to("Персонажи:");
@@ -797,7 +797,7 @@ CMDWIZP( stat )
     {
         ch->printf( " %s", obj->getFirstName( ).c_str( ) );
     }
-    ch->send_to(".\n\r");
+    ch->pecho(".");
 
     for ( door = 0; door <= 5; door++ )
     {
@@ -820,7 +820,7 @@ CMDWIZP( stat )
             ch->send_to(buf);
         }
     }
-    ch->send_to("Следы:\n\r");
+    ch->pecho("Следы:");
 
     for (RoomHistory::iterator h = location->history.begin( );
          h != location->history.end( );
@@ -953,13 +953,13 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         if ( arg[0] == '\0' )
         {
-                ch->send_to("Stat чему?\n\r");
+                ch->pecho("Stat чему?");
                 return;
         }
 
         if ( ( obj = get_obj_world( ch, argument ) ) == 0 )
         {
-                ch->send_to("Ни на земле, ни в небесах не найдено. Увы и ах.\n\r");
+                ch->pecho("Ни на земле, ни в небесах не найдено. Увы и ах.");
                 return;
         }
 
@@ -1050,7 +1050,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                         ch->send_to("'");
                 }
 
-                ch->send_to(".\n\r");
+                ch->pecho(".");
                 break;
 
         case ITEM_WAND:
@@ -1066,7 +1066,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                         ch->send_to("'");
                 }
 
-                ch->send_to(".\n\r");
+                ch->pecho(".");
                 break;
 
         case ITEM_DRINK_CON:
@@ -1134,7 +1134,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                                 ch->send_to(" ");
                 }
 
-                ch->send_to ("'\n\r");
+                ch->pecho("'");
         }
 
         if ( obj->pIndexData->extra_descr != 0 )
@@ -1150,7 +1150,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                                 ch->send_to(" ");
                 }
 
-                ch->send_to("'\n\r");
+                ch->pecho("'");
         }
 
     ostringstream ostr;
@@ -1175,7 +1175,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         obj->behavior.toStream( ostr );
         ch->send_to( ostr );
     } else {
-        ch->send_to("\n\r");
+        ch->pecho("");
     }
 
     if (!obj->properties.empty()) {
@@ -1416,10 +1416,10 @@ CMDWIZP( vnum )
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Формат:\n\r");
-        ch->send_to("  vnum obj <name>\n\r");
-        ch->send_to("  vnum mob <name>\n\r");
-        ch->send_to("  vnum type <item_type>\n\r");
+        ch->pecho("Формат:");
+        ch->pecho("  vnum obj <name>");
+        ch->pecho("  vnum mob <name>");
+        ch->pecho("  vnum type <item_type>");
         return;
     }
     
@@ -1460,7 +1460,7 @@ CMDWIZP( vnum )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Найти кого?\n\r");
+        ch->pecho("Найти кого?");
         return;
     }
 
@@ -1491,7 +1491,7 @@ CMDWIZP( vnum )
     }
 
     if ( !found )
-        ch->send_to("Мобы с таким именем не найдены.\n\r");
+        ch->pecho("Мобы с таким именем не найдены.");
 
     return;
 }
@@ -1512,7 +1512,7 @@ CMDWIZP( vnum )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Найти что?\n\r");
+        ch->pecho("Найти что?");
         return;
     }
 
@@ -1543,7 +1543,7 @@ CMDWIZP( vnum )
     }
 
     if ( !found )
-        ch->send_to("Объекты с таким именем не найдены.\n\r");
+        ch->pecho("Объекты с таким именем не найдены.");
 
     return;
 }
@@ -1578,7 +1578,7 @@ CMDWIZP( rwhere )
     bool found = false;
 
     if (argument[0] == '\0') {
-        ch->send_to("Найти какую комнату?\n\r");
+        ch->pecho("Найти какую комнату?");
         return;
     }
 
@@ -1606,7 +1606,7 @@ CMDWIZP( owhere )
 
     if ( argument[0] == '\0' )
     {
-            ch->send_to("Найти что?\n\r");
+            ch->pecho("Найти что?");
             return;
     }
 
@@ -1662,7 +1662,7 @@ CMDWIZP( owhere )
     }
 
     if (!found)
-        ch->send_to("Ни на земле, ни в небесах не найдено. Увы и ах.\n\r");
+        ch->pecho("Ни на земле, ни в небесах не найдено. Увы и ах.");
     else
         page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -1793,25 +1793,25 @@ CMDWIZP( snoop )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Следить за кем?\n\r");
+        ch->pecho("Следить за кем?");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("Таких сейчас в мире нет\n\r");
+        ch->pecho("Таких сейчас в мире нет");
         return;
     }
 
     if ( victim->desc == 0 )
     {
-        ch->send_to("Дескриптор не найден!\n\r");
+        ch->pecho("Дескриптор не найден!");
         return;
     }
 
     if ( victim == ch )
     {
-        ch->send_to("Отменяем всю слежку.\n\r");
+        ch->pecho("Отменяем всю слежку.");
         wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 прекращает отслеживание.", ch );
         for ( d = descriptor_list; d != 0; d = d->next )
         {
@@ -1823,28 +1823,28 @@ CMDWIZP( snoop )
 
     if ( victim->desc->snoop_by != 0 )
     {
-        ch->send_to("Кто-то уже следит за этим игроком.\n\r");
+        ch->pecho("Кто-то уже следит за этим игроком.");
         return;
     }
 
     if (!victim->in_room->isOwner(ch) && ch->in_room != victim->in_room
     &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->send_to("Этот игрок сейчас в приватной комнате.\n\r");
+        ch->pecho("Этот игрок сейчас в приватной комнате.");
         return;
     }
 
     if ( victim->get_trust() >= ch->get_trust()
     ||   IS_SET(victim->comm,COMM_SNOOP_PROOF))
     {
-        ch->send_to("У тебя пока не хватает прав на слежку за игроками.\n\r");
+        ch->pecho("У тебя пока не хватает прав на слежку за игроками.");
         return;
     }
 
     if ( ch->desc != 0 ) {
         for ( d = ch->desc->snoop_by; d != 0; d = d->snoop_by ) {
             if ( d->character == victim || d->character->getPC( ) == victim ) {
-                ch->send_to("Упс, круговая слежка!\n\r");
+                ch->pecho("Упс, круговая слежка!");
                 return;
             }
         }
@@ -1852,7 +1852,7 @@ CMDWIZP( snoop )
 
     victim->desc->snoop_by = ch->desc;
     wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 начинает следить за %C1.", ch, victim );
-    ch->send_to("Начинаем слежку.\n\r");
+    ch->pecho("Начинаем слежку.");
 }
 
 
@@ -1863,7 +1863,7 @@ CMDWIZP( switch )
     Character *victim;
 
     if(ch->is_npc( )) {
-        ch->send_to("Мобы этого не умеют.\n\r");
+        ch->pecho("Мобы этого не умеют.");
         return;
     }
     
@@ -1873,7 +1873,7 @@ CMDWIZP( switch )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Вселиться в чье тело?\n\r");
+        ch->pecho("Вселиться в чье тело?");
         return;
     }
 
@@ -1882,24 +1882,24 @@ CMDWIZP( switch )
 
     if ( pch->switchedTo )
     {
-        ch->send_to("Ты уже в чужом теле.\n\r");
+        ch->pecho("Ты уже в чужом теле.");
         return;
     }
     
     victim = get_char_world( ch, arg );
     if ( !victim )
     {
-        ch->send_to("Таких сейчас в мире нет.\n\r");
+        ch->pecho("Таких сейчас в мире нет.");
         return;
     }
 
     if ( victim == ch ) {
-        ch->send_to("Ты в своем теле.\n\r");
+        ch->pecho("Ты в своем теле.");
         return;
     }
 
     if (!victim->is_npc()) {
-        ch->send_to("Вселиться можно только в тело мобов.\n\r");
+        ch->pecho("Вселиться можно только в тело мобов.");
         return;
     }
 
@@ -1908,12 +1908,12 @@ CMDWIZP( switch )
     if (ch->in_room != victim->in_room &&  victim->in_room->isPrivate( ) &&
             !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->send_to("Этот персонаж сейчас в приватной комнате.\n\r");
+        ch->pecho("Этот персонаж сейчас в приватной комнате.");
         return;
     }
 
     if ( victim->desc != 0 ) {
-        ch->send_to("В это тело уже кто-то вселился!\n\r");
+        ch->pecho("В это тело уже кто-то вселился!");
         return;
     }
 
@@ -1929,7 +1929,7 @@ CMDWIZP( switch )
     victim->prompt = ch->prompt;
     victim->comm = ch->comm;
     victim->lines = ch->lines;
-    victim->send_to("Ты вселяешься в чужое тело.\n\r");
+    victim->pecho("Ты вселяешься в чужое тело.");
     return;
 }
 
@@ -1954,14 +1954,14 @@ CMDWIZP( return )
         return;
     
     if ( !mob->switchedFrom ) {
-        ch->send_to("Ты и так в своем теле.\n\r");
+        ch->pecho("Ты и так в своем теле.");
         return;
     }
 
     if (mprog_return( mob ))
         return;
 
-    mob->send_to("Ты возвращаешься в своё привычное тело. Используй команду {y{hc{lRпрослушать{lEreplay{x для просмотра пропущенных сообщений.\n\r");
+    mob->pecho("Ты возвращаешься в своё привычное тело. Используй команду {y{hc{lRпрослушать{lEreplay{x для просмотра пропущенных сообщений.");
     ch->prompt.clear( );
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, ch->get_trust( ), 
@@ -1999,7 +1999,7 @@ CMDWIZP( clone )
 
         if (arg[0] == '\0')
         {
-                ch->send_to("Клонировать кого или что?\n\r");
+                ch->pecho("Клонировать кого или что?");
                 return;
         }
 
@@ -2009,7 +2009,7 @@ CMDWIZP( clone )
                 obj = get_obj_here(ch,rest);
                 if (obj == 0)
                 {
-                        ch->send_to("Этого здесь нет.\n\r");
+                        ch->pecho("Этого здесь нет.");
                         return;
                 }
         }
@@ -2019,7 +2019,7 @@ CMDWIZP( clone )
                 mob = get_char_room(ch,rest);
                 if (mob == 0)
                 {
-                        ch->send_to("Таких здесь нет.\n\r");
+                        ch->pecho("Таких здесь нет.");
                         return;
                 }
         }
@@ -2029,7 +2029,7 @@ CMDWIZP( clone )
                 obj = get_obj_here(ch,argument);
                 if (mob == 0 && obj == 0)
                 {
-                        ch->send_to("Этого здесь нет.\n\r");
+                        ch->pecho("Этого здесь нет.");
                         return;
                 }
         }
@@ -2062,7 +2062,7 @@ CMDWIZP( clone )
 
                 if (!mob->is_npc())
                 {
-                        ch->send_to("Клонировать игроков запрещено Женевской конвенцией.\n\r");
+                        ch->pecho("Клонировать игроков запрещено Женевской конвенцией.");
                         return;
                 }
 
@@ -2072,7 +2072,7 @@ CMDWIZP( clone )
                         || (mob->getRealLevel( ) >  0 && !IS_TRUSTED(ch,ANGEL))
                         || !IS_TRUSTED(ch,AVATAR) )
                 {
-                        ch->send_to("У тебя пока не хватает прав для клонирования.\n\r");
+                        ch->pecho("У тебя пока не хватает прав для клонирования.");
                         return;
                 }
 
@@ -2108,9 +2108,9 @@ CMDWIZP( load )
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Формат:\n\r");
-        ch->send_to("  load mob <vnum>\n\r");
-        ch->send_to("  load obj <vnum> <level>\n\r");
+        ch->pecho("Формат:");
+        ch->pecho("  load mob <vnum>");
+        ch->pecho("  load obj <vnum> <level>");
         return;
     }
 
@@ -2140,13 +2140,13 @@ CMDWIZP( load )
 
         if ( arg[0] == '\0' || !is_number(arg) )
         {
-                ch->send_to("Формат: load mob <vnum>.\n\r");
+                ch->pecho("Формат: load mob <vnum>.");
                 return;
         }
 
         if ( ( pMobIndex = get_mob_index( atoi( arg ) ) ) == 0 )
         {
-                ch->send_to("Моба с таким внумом не найдено.\n\r");
+                ch->pecho("Моба с таким внумом не найдено.");
                 return;
         }
 
@@ -2161,7 +2161,7 @@ CMDWIZP( load )
 
         wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
                 "%C1 создает %C4.", ch, victim );
-        ch->send_to("Готово.\n\r");
+        ch->pecho("Готово.");
         return;
 }
 
@@ -2179,7 +2179,7 @@ CMDWIZP( load )
 
     if ( arg1[0] == '\0' || !is_number(arg1))
     {
-        ch->send_to("Формат: load obj <vnum> <level>.\n\r");
+        ch->pecho("Формат: load obj <vnum> <level>.");
         return;
     }
 
@@ -2189,20 +2189,20 @@ CMDWIZP( load )
     {
         if (!is_number(arg2))
         {
-          ch->send_to("Формат: oload <vnum> <level>.\n\r");
+          ch->pecho("Формат: oload <vnum> <level>.");
           return;
         }
         level = atoi(arg2);
         if (level < 0 || level > ch->get_trust())
         {
-          ch->send_to("Уровень не может быть ниже нуля или выше твоего.\n\r");
+          ch->pecho("Уровень не может быть ниже нуля или выше твоего.");
             return;
         }
     }
 
     if ( ( pObjIndex = get_obj_index( atoi( arg1 ) ) ) == 0 )
     {
-        ch->send_to("Объект с таким внумом не найден.\n\r");
+        ch->pecho("Объект с таким внумом не найден.");
         return;
     }
 
@@ -2258,7 +2258,7 @@ CMDWIZP( purge )
         }
 
         act( "$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
-        ch->send_to("Готово.\n\r");
+        ch->pecho("Готово.");
         dreamland->resetOption( DL_SAVE_MOBS );
         dreamland->resetOption( DL_SAVE_OBJS );
         save_items( ch->in_room );
@@ -2269,7 +2269,7 @@ CMDWIZP( purge )
     // Try to purge a mob in the room or an item in the room/inventory/equip.
     if ((victim = get_char_room(ch, arg))) {
         if (!victim->is_npc()) {
-            ch->send_to("Сначала научись рисовать и отрасти усики.\n\r");
+            ch->pecho("Сначала научись рисовать и отрасти усики.");
             return;
         }
 
@@ -2323,7 +2323,7 @@ CMDWIZP( restore )
         wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust(), 
                 "%C1 restored room %d.", ch, ch->in_room->vnum );
 
-        ch->send_to("Комната восстановлена.\n\r");
+        ch->pecho("Комната восстановлена.");
         return;
 
     }
@@ -2355,13 +2355,13 @@ CMDWIZP( restore )
             if (victim->in_room != 0)
                 act_p("$c1 {Gвосстановил$gо||а {xтвои силы!",ch,0,victim,TO_VICT,POS_DEAD);
         }
-        ch->send_to("Все активные игроки восстановлены!\n\r");
+        ch->pecho("Все активные игроки восстановлены!");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("Таких здесь нет.\n\r");
+        ch->pecho("Таких здесь нет.");
         return;
     }
 
@@ -2377,7 +2377,7 @@ CMDWIZP( restore )
 
     act_p( "$c1 {Gвосстановил$gо||а {xтвои силы!", ch, 0, victim, TO_VICT,POS_DEAD );
     wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust( ), "%C1 restored %C4.", ch, victim );
-    ch->send_to("Готово.\n\r");
+    ch->pecho("Готово.");
 }
 
          
@@ -2390,40 +2390,40 @@ CMDWIZP( freeze )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Заморозить кого?\n\r");
+        ch->pecho("Заморозить кого?");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("Тут таких нет.\n\r");
+        ch->pecho("Тут таких нет.");
         return;
     }
 
     if ( victim->is_npc() )
     {
-        ch->send_to("Мобов замораживать бесполезно.\n\r");
+        ch->pecho("Мобов замораживать бесполезно.");
         return;
     }
 
     if ( victim->get_trust() >= ch->get_trust() )
     {
-        ch->send_to("У тебя пока не хватает прав для этого.\n\r");
+        ch->pecho("У тебя пока не хватает прав для этого.");
         return;
     }
 
     if ( IS_SET(victim->act, PLR_FREEZE) )
     {
         victim->act.removeBit( PLR_FREEZE);
-        victim->send_to("{CТебя разморозили!{x Ты чувствуешь как способность двигаться возвращается.\n\r");
-        ch->send_to("Цель разморожена.\n\r");
+        victim->pecho("{CТебя разморозили!{x Ты чувствуешь как способность двигаться возвращается.");
+        ch->pecho("Цель разморожена.");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 thaws %C4.", ch, victim );
     }
     else
     {
         victim->act.setBit( PLR_FREEZE);
-        victim->send_to("{CТЕБЯ ЗАМОРОЗИЛИ!{x Ты теряешь способность двигаться и говорить.\n\r");
-        ch->send_to("Цель заморожена.\n\r");
+        victim->pecho("{CТЕБЯ ЗАМОРОЗИЛИ!{x Ты теряешь способность двигаться и говорить.");
+        ch->pecho("Цель заморожена.");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
                 "%C1 puts %C4 in the deep freeze.", ch, victim );
     }
@@ -2443,7 +2443,7 @@ CMDWIZP( log )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Log whom?\n\r");
+        ch->pecho("Log whom?");
         return;
     }
 
@@ -2451,11 +2451,11 @@ CMDWIZP( log )
     {
         if (!dreamland->hasOption( DL_LOG_ALL )) {
             dreamland->setOption( DL_LOG_ALL );
-            ch->send_to("Log ALL on.\n\r");
+            ch->pecho("Log ALL on.");
         }
         else {
             dreamland->removeOption( DL_LOG_ALL );
-            ch->send_to("Log ALL off.\n\r");
+            ch->pecho("Log ALL off.");
         }
 
         return;
@@ -2464,11 +2464,11 @@ CMDWIZP( log )
     if (!str_cmp( arg, "imm" )) {
         if (!dreamland->hasOption( DL_LOG_IMM )) {
             dreamland->setOption( DL_LOG_IMM );
-            ch->send_to( "Immortal logging is now ON.\r\n" );
+            ch->pecho("Immortal logging is now ON.");
         }
         else {
             dreamland->removeOption( DL_LOG_IMM );
-            ch->send_to( "Immortal logging is now OFF.\r\n" );
+            ch->pecho("Immortal logging is now OFF.");
         }
 
         return;
@@ -2476,13 +2476,13 @@ CMDWIZP( log )
     
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->pecho("They aren't here.");
         return;
     }
 
     if ( victim->is_npc() )
     {
-        ch->send_to("Not on NPC's.\n\r");
+        ch->pecho("Not on NPC's.");
         return;
     }
 
@@ -2492,12 +2492,12 @@ CMDWIZP( log )
     if ( IS_SET(victim->act, PLR_LOG) )
     {
         victim->act.removeBit( PLR_LOG);
-        ch->send_to("LOG removed.\n\r");
+        ch->pecho("LOG removed.");
     }
     else
     {
         victim->act.setBit( PLR_LOG);
-        ch->send_to("LOG set.\n\r");
+        ch->pecho("LOG set.");
     }
 
     return;
@@ -2514,35 +2514,35 @@ CMDWIZP( noemote )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Noemote whom?\n\r");
+        ch->pecho("Noemote whom?");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->pecho("They aren't here.");
         return;
     }
 
 
     if ( victim->get_trust() >= ch->get_trust() )
     {
-        ch->send_to("You failed.\n\r");
+        ch->pecho("You failed.");
         return;
     }
 
     if ( IS_SET(victim->comm, COMM_NOEMOTE) )
     {
         victim->comm.removeBit( COMM_NOEMOTE);
-        victim->send_to("{MЧувства возвращаются к тебе!{x Ты снова можешь использовать эмоции.\n\r");
-        ch->send_to("NOEMOTE removed.\n\r");
+        victim->pecho("{MЧувства возвращаются к тебе!{x Ты снова можешь использовать эмоции.");
+        ch->pecho("NOEMOTE removed.");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 restores emotes to %C1.", ch, victim );
     }
     else
     {
         victim->comm.setBit( COMM_NOEMOTE);
-        victim->send_to("{MТЫ ТЕРЯЕШЬ ЧУВСТВА!{x Ты больше не можешь использовать эмоции.\n\r");
-        ch->send_to("NOEMOTE set.\n\r");
+        victim->pecho("{MТЫ ТЕРЯЕШЬ ЧУВСТВА!{x Ты больше не можешь использовать эмоции.");
+        ch->pecho("NOEMOTE set.");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 revokes %C2 emotes.", ch, victim );
     }
 }
@@ -2563,28 +2563,28 @@ CMDWIZP( notell )
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->pecho("They aren't here.");
         return;
     }
 
     if ( victim->get_trust() >= ch->get_trust() )
     {
-        ch->send_to("You failed.\n\r");
+        ch->pecho("You failed.");
         return;
     }
 
     if ( IS_SET(victim->comm, COMM_NOTELL) )
     {
         victim->comm.removeBit( COMM_NOTELL);
-        victim->send_to("{GПечать на твоих устах пропадает.{x Ты снова можешь говорить.\n\r");
-        ch->send_to("NOTELL removed.\n\r");
+        victim->pecho("{GПечать на твоих устах пропадает.{x Ты снова можешь говорить.");
+        ch->pecho("NOTELL removed.");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 restores tells to %C2.", ch, victim );
     }
     else
     {
         victim->comm.setBit( COMM_NOTELL);
-        victim->send_to("{GБессмертный запечатывает твои уста!{x Ты не можешь говорить!\n\r");
-        ch->send_to("NOTELL set.\n\r");
+        victim->pecho("{GБессмертный запечатывает твои уста!{x Ты не можешь говорить!");
+        ch->pecho("NOTELL set.");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 revokes %C1 tells.", ch, victim );
     }
 }
@@ -2616,13 +2616,13 @@ CMDWIZP( wizlock )
     {
         dreamland->removeOption( opt );
         wiznet( 0, 0, 0, "%C1 removes wizlock.", ch );
-        ch->send_to("Game un-wizlocked.\n\r");
+        ch->pecho("Game un-wizlocked.");
     }
     else
     {
         dreamland->setOption( opt );
         wiznet( 0, 0, 0, "%C1 has wizlocked the game.", ch );
-        ch->send_to("Game wizlocked.\n\r");
+        ch->pecho("Game wizlocked.");
     }
 }
 
@@ -2636,13 +2636,13 @@ CMDWIZP( newlock )
     {
         dreamland->removeOption( opt );
         wiznet( 0, 0, 0, "%C1 allows new characters back in.", ch );
-        ch->send_to("Newlock removed.\n\r");
+        ch->pecho("Newlock removed.");
     }
     else
     {
         dreamland->setOption( opt );
         wiznet( 0, 0, 0, "%C1 locks out new characters.", ch );
-        ch->send_to("New characters have been locked out.\n\r");
+        ch->pecho("New characters have been locked out.");
     }
 }
 
@@ -2669,12 +2669,12 @@ CMDWIZP( string )
                 || arg2[0] == '\0'
                 || arg3[0] == '\0' )
         {
-                ch->send_to("Формат:\n\r");
-                ch->send_to("  string mob <name> <field> <string>\n\r");
-                ch->send_to("    поля: name short long desc title spec\n\r");
-                ch->send_to("  string obj  <name> <field> <string>\n\r");
-                ch->send_to("    поля: name short long\n\r");
-                ch->send_to("  string obj  <name> ed <add|remove|clear> <keyword> <string>\n\r");
+                ch->pecho("Формат:");
+                ch->pecho("  string mob <name> <field> <string>");
+                ch->pecho("    поля: name short long desc title spec");
+                ch->pecho("  string obj  <name> <field> <string>");
+                ch->pecho("    поля: name short long");
+                ch->pecho("  string obj  <name> ed <add|remove|clear> <keyword> <string>");
                 return;
         }
 
@@ -2683,7 +2683,7 @@ CMDWIZP( string )
         {
                 if ( ( victim = get_char_world( ch, arg1 ) ) == 0 )
                 {
-                        ch->send_to("They aren't here.\n\r");
+                        ch->pecho("They aren't here.");
                         return;
                 }
 
@@ -2697,7 +2697,7 @@ CMDWIZP( string )
                 {
                         if ( !victim->is_npc() )
                         {
-                                ch->send_to("Not on PC's.\n\r");
+                                ch->pecho("Not on PC's.");
                                 return;
                         }
 
@@ -2716,7 +2716,7 @@ CMDWIZP( string )
                 {
                         if ( !victim->is_npc() )
                         {
-                                ch->send_to("Not on PC's.\n\r");
+                                ch->pecho("Not on PC's.");
                                 return;
                         }
                         victim->getNPC()->setShortDescr( arg3 );
@@ -2727,7 +2727,7 @@ CMDWIZP( string )
                 {
                         if ( !victim->is_npc() )
                         {
-                                ch->send_to("Not on PC's.\n\r");
+                                ch->pecho("Not on PC's.");
                                 return;
                         }
                         strcat(arg3,"\n\r");
@@ -2739,7 +2739,7 @@ CMDWIZP( string )
                 {
                         if ( victim->is_npc() )
                         {
-                                ch->send_to("Not on NPC's.\n\r");
+                                ch->pecho("Not on NPC's.");
                                 return;
                         }
                         
@@ -2751,13 +2751,13 @@ CMDWIZP( string )
                 {
                         if ( !victim->is_npc() )
                         {
-                                ch->send_to("Not on PC's.\n\r");
+                                ch->pecho("Not on PC's.");
                                 return;
                         }
 
                         if ( ( victim->getNPC()->spec_fun = spec_lookup( arg3 ) ) == 0 )
                         {
-                                ch->send_to("No such spec fun.\n\r");
+                                ch->pecho("No such spec fun.");
                                 return;
                         }
 
@@ -2771,13 +2771,13 @@ CMDWIZP( string )
             
                 if ( ( obj = get_obj_world( ch, arg1 ) ) == 0 )
                 {
-                        ch->send_to("Nothing like that in heaven or earth.\n\r");
+                        ch->pecho("Nothing like that in heaven or earth.");
                         return;
                 }
 
                 if ( obj->pIndexData->limit != -1 )
                 {
-                        ch->send_to("Хмм... Тайфоэн будет возмущена, не надо.\n\r");
+                        ch->pecho("Хмм... Тайфоэн будет возмущена, не надо.");
                         return;
                 }
             
@@ -2803,7 +2803,7 @@ CMDWIZP( string )
                         argument = one_argument( argument, arg3 );
                         if ( argument == 0 )
                         {
-                                ch->send_to("Syntax: oset <object> ed <add|remove|clear> <keyword> <string>\n\r");
+                                ch->pecho("Syntax: oset <object> ed <add|remove|clear> <keyword> <string>");
                                 return;
                         }
 
@@ -2856,7 +2856,7 @@ CMDWIZP( string )
                         }
                         else
                         {
-                                ch->send_to ("А может все таки синтакс проверим, а?\n\r");
+                                ch->pecho("А может все таки синтакс проверим, а?");
                                 return;
                         }
                 }
@@ -2931,7 +2931,7 @@ CMDWIZP( force )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-        ch->send_to("Принудить кого к чему?\n\r");
+        ch->pecho("Принудить кого к чему?");
         return;
     }
 
@@ -2942,7 +2942,7 @@ CMDWIZP( force )
 
         if (ch->get_trust() < MAX_LEVEL - 5)
         {
-            ch->send_to("У тебя пока не хватает прав на принуждение.\n\r");
+            ch->pecho("У тебя пока не хватает прав на принуждение.");
             return;
         }
 
@@ -2964,7 +2964,7 @@ CMDWIZP( force )
 
         if (ch->get_trust() < MAX_LEVEL - 2)
         {
-            ch->send_to("У тебя пока не хватает прав на такое принуждение.\n\r");
+            ch->pecho("У тебя пока не хватает прав на такое принуждение.");
             return;
         }
 
@@ -2987,7 +2987,7 @@ CMDWIZP( force )
 
         if (ch->get_trust() < MAX_LEVEL - 2)
         {
-            ch->send_to("У тебя пока не хватает прав на такое принуждение.\n\r");
+            ch->pecho("У тебя пока не хватает прав на такое принуждение.");
             return;
         }
 
@@ -3009,13 +3009,13 @@ CMDWIZP( force )
 
         if ( ( victim = get_char_world( ch, arg ) ) == 0 )
         {
-            ch->send_to("Тут таких нет.\n\r");
+            ch->pecho("Тут таких нет.");
             return;
         }
 
         if ( victim == ch )
         {
-            ch->send_to("Сила воли, бессердечная ты сука.\n\r");
+            ch->pecho("Сила воли, бессердечная ты сука.");
             return;
         }
 
@@ -3023,19 +3023,19 @@ CMDWIZP( force )
         &&  ch->in_room != victim->in_room
         &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
             {
-            ch->send_to("Этот персонаж сейчас в приватной комнате.\n\r");
+            ch->pecho("Этот персонаж сейчас в приватной комнате.");
             return;
         }
 
         if ( victim->get_trust() >= ch->get_trust() )
         {
-            ch->send_to("Эту цель ты пока не можешь принудить!\n\r");
+            ch->pecho("Эту цель ты пока не можешь принудить!");
             return;
         }
 
         if ( !victim->is_npc() && ch->get_trust() < MAX_LEVEL - 4)
         {
-            ch->send_to("У тебя пока не хватает прав на такое принуждение.\n\r");
+            ch->pecho("У тебя пока не хватает прав на такое принуждение.");
             return;
         }
 
@@ -3043,7 +3043,7 @@ CMDWIZP( force )
         interpret( victim, argument );
     }
 
-    ch->send_to("Готово.\n\r");
+    ch->pecho("Готово.");
     return;
 }
 
@@ -3067,13 +3067,13 @@ CMDWIZP( wizinvis )
       {
           ch->invis_level = 0;
           act( "$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
-          ch->send_to("Ты снова проявляешься в реальности.\n\r");
+          ch->pecho("Ты снова проявляешься в реальности.");
       }
       else
       {
           ch->invis_level = 102;
           act( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
-          ch->send_to("Ты растворяешься за подкладкой реальности.\n\r");
+          ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     else
     /* do the level thing */
@@ -3081,7 +3081,7 @@ CMDWIZP( wizinvis )
       level = atoi(arg);
       if (level < 2 || level > ch->get_trust())
       {
-        ch->send_to("Invis level must be between 2 and your level.\n\r");
+        ch->pecho("Invis level must be between 2 and your level.");
         return;
       }
       else
@@ -3089,7 +3089,7 @@ CMDWIZP( wizinvis )
           ch->reply = 0;
           ch->invis_level = level;
           act( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
-          ch->send_to("Ты растворяешься за подкладкой реальности.\n\r");
+          ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     }
 
@@ -3112,13 +3112,13 @@ CMDWIZP( incognito )
       {
           ch->incog_level = 0;
           act( "$c1 больше не маскируется.", ch, 0, 0, TO_ROOM);
-          ch->send_to("Ты больше не маскируешься.\n\r");
+          ch->pecho("Ты больше не маскируешься.");
       }
       else
       {
           ch->incog_level = 102;
           act( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
-          ch->send_to("Ты скрываешь свое присутствие.\n\r");
+          ch->pecho("Ты скрываешь свое присутствие.");
       }
     else
     /* do the level thing */
@@ -3126,7 +3126,7 @@ CMDWIZP( incognito )
       level = atoi(arg);
       if (level < 2 || level > ch->get_trust())
       {
-        ch->send_to("Incog level must be between 2 and your level.\n\r");
+        ch->pecho("Incog level must be between 2 and your level.");
         return;
       }
       else
@@ -3134,7 +3134,7 @@ CMDWIZP( incognito )
           ch->reply = 0;
           ch->incog_level = level;
           act( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
-          ch->send_to("Ты скрываешь свое присутствие.\n\r");
+          ch->pecho("Ты скрываешь свое присутствие.");
       }
     }
 
@@ -3158,19 +3158,19 @@ CMDWIZP( advance )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' || !is_number( arg2 ) )
     {
-        ch->send_to("Формат: advance <char> <level>.\n\r");
+        ch->pecho("Формат: advance <char> <level>.");
         return;
     }
 
     if ( ( vict = get_char_room( ch, arg1 ) ) == 0 )
     {
-        ch->send_to("Этого игрока тут нет.\n\r");
+        ch->pecho("Этого игрока тут нет.");
         return;
     }
 
     if ( vict->is_npc() )
     {
-        ch->send_to("Not on NPC's.\n\r");
+        ch->pecho("Not on NPC's.");
         return;
     }
 
@@ -3178,13 +3178,13 @@ CMDWIZP( advance )
     
     if ( ( level = atoi( arg2 ) ) < 1 || level > 110 )
     {
-        ch->send_to("Level must be 1 to 110.\n\r");
+        ch->pecho("Level must be 1 to 110.");
         return;
     }
 
     if ( level > ch->get_trust() )
     {
-        ch->send_to("Limited to your trust level.\n\r");
+        ch->pecho("Limited to your trust level.");
         return;
     }
 
@@ -3199,8 +3199,8 @@ CMDWIZP( advance )
     {
         int temp_prac, temp_train;
 
-        ch->send_to("Lowering a player's level!\n\r");
-        victim->send_to("**** ОООООО НЕЕЕЕЕЕЕЕЕТ!!! ****\n\r");
+        ch->pecho("Lowering a player's level!");
+        victim->pecho("**** ОООООО НЕЕЕЕЕЕЕЕЕТ!!! ****");
         temp_prac = victim->practice;
         temp_train = victim->train;
         victim->setLevel( 1 );
@@ -3219,8 +3219,8 @@ CMDWIZP( advance )
     }
     else
     {
-        ch->send_to("Raising a player's level!\n\r");
-        victim->send_to("**** ООООО ДАААААААААА ****\n\r");
+        ch->pecho("Raising a player's level!");
+        victim->pecho("**** ООООО ДАААААААААА ****");
     }
 
     for ( iLevel = victim->getRealLevel( ) ; iLevel < level; iLevel++ )
@@ -3244,31 +3244,31 @@ CMDWIZP( smite )
 
   if (argument[0] == '\0')
     {
-      ch->send_to("От расстройства ты бьешь молнией себя!  Oххх!\n\r");
+      ch->pecho("От расстройства ты бьешь молнией себя!  Oххх!");
       return;
     }
 
   if ((victim = get_char_world(ch, argument)) == 0)
     {
-      ch->send_to("Придеться подождать немного и послать на них молнию в другой раз.\n\r");
+      ch->pecho("Придеться подождать немного и послать на них молнию в другой раз.");
       return;
     }
 
   if (victim->is_npc())
     {
-      ch->send_to("Этот бедный моб не сделал тебе ничего плохого.\n\r");
+      ch->pecho("Этот бедный моб не сделал тебе ничего плохого.");
       return;
     }
 
   if (victim->getRealLevel() > ch->getRealLevel())
     {
-      ch->send_to("Как ты смеешь!\n\r");
+      ch->pecho("Как ты смеешь!");
       return;
     }
 
   if (victim->position < POS_SLEEPING)
     {
-      ch->send_to("Грешно издеваться над больными людьми.\n\r");
+      ch->pecho("Грешно издеваться над больными людьми.");
       return;
     }
 
@@ -3290,13 +3290,13 @@ CMDWIZP( ititle )
     argument = one_argument( argument, arg );
 
     if ( arg[0] == '\0' )  {
-        ch->send_to("Change whose title to what?\n\r");
+        ch->pecho("Change whose title to what?");
         return;
     }
 
     victim = get_char_world( ch, arg );
     if (victim == 0)  {
-        ch->send_to("Nobody is playing with that name.\n\r");
+        ch->pecho("Nobody is playing with that name.");
         return;
     }
 
@@ -3305,11 +3305,11 @@ CMDWIZP( ititle )
 
     if ( argument[0] == '\0' )
     {
-        ch->send_to("Change the title to what?\n\r");
+        ch->pecho("Change the title to what?");
         return;
     }
     victim->getPC( )->setTitle( argument );
-    ch->send_to("Ok.\n\r");
+    ch->pecho("Ok.");
 }
 
 CMDWIZP( rename )
@@ -3323,24 +3323,24 @@ CMDWIZP( rename )
     russianName.capitalize( );
     
     if (oldName.empty( )) {
-        ch->send_to( "Rename who?\n\r" );
+        ch->pecho("Rename who?");
         return;
     }
     
     PCharacter* victim = get_player_world( ch, oldName.c_str( ) );
     
     if (!victim) {
-        ch->send_to("There is no such a person online.\n\r");
+        ch->pecho("There is no such a person online.");
         return;
     }
     
     if( (victim != ch ) && ( victim->get_trust( ) >= ch->get_trust( ) ) ) {
-        ch->send_to( "You failed.\n\r" );
+        ch->pecho("You failed.");
         return;
     }
     
     if( newName.empty( ) ) {
-        ch->send_to( "Rename to what new name?\n\r" );
+        ch->pecho("Rename to what new name?");
         return;
     }
 
@@ -3363,7 +3363,7 @@ CMDWIZP( rename )
     }
     
     if (PCharacterManager::find( newName )) {
-        ch->send_to( "A player with that name already exists!\n\r" );
+        ch->pecho("A player with that name already exists!");
         return;                
     }
 
@@ -3391,7 +3391,7 @@ CMDWIZP( rename )
             oldName.toLower( ), 
             PCharacterManager::ext ).remove( );
 
-    ch->send_to("Character renamed.\n\r");
+    ch->pecho("Character renamed.");
     act_p("$c1 переименова$gло|л|ла тебя в $C4!",ch,0,victim,TO_VICT,POS_DEAD);
 }
 
@@ -3406,21 +3406,21 @@ CMDWIZP( notitle )
 
     if ( (victim = get_char_world(ch ,arg)) == 0 )
     {
-        ch->send_to("He is not currently playing.\n\r");
+        ch->pecho("He is not currently playing.");
         return;
     }
 
    if (IS_SET(victim->act, PLR_NO_TITLE) )
         {
    victim->act.removeBit(PLR_NO_TITLE);
-   victim->send_to("Теперь ты снова можешь поменять титул.\n\r");
-   ch->send_to("Ok.\n\r");
+   victim->pecho("Теперь ты снова можешь поменять титул.");
+   ch->pecho("Ok.");
         }
    else
         {                
    victim->act.setBit(PLR_NO_TITLE);
-   victim->send_to("Бессмертный запрещает тебе менять титулы!\n\r");
-   ch->send_to("Ok.\n\r");
+   victim->pecho("Бессмертный запрещает тебе менять титулы!");
+   ch->pecho("Ok.");
         }
    return;
 }
@@ -3435,7 +3435,7 @@ CMDWIZP( noaffect )
 
     if ( (victim = get_char_world(ch ,arg)) == 0 )
     {
-        ch->send_to("He is not currently playing.\n\r");
+        ch->pecho("He is not currently playing.");
         return;
     }
 
@@ -3461,17 +3461,17 @@ CMDWIZP( reboot )
 
  if (arg[0] == '\0')
     {
-      ch->send_to("Usage: reboot now\n\r");
-      ch->send_to("Usage: reboot <ticks to reboot>\n\r");
-      ch->send_to("Usage: reboot cancel\n\r");
-      ch->send_to("Usage: reboot status\n\r");
+      ch->pecho("Usage: reboot now");
+      ch->pecho("Usage: reboot <ticks to reboot>");
+      ch->pecho("Usage: reboot cancel");
+      ch->pecho("Usage: reboot status");
       return;
     }
 
     if (is_name(arg,"cancel"))
      {
       dreamland->setRebootCounter( -1 );
-      ch->send_to("Reboot canceled.\n\r");
+      ch->pecho("Reboot canceled.");
       return;
     }
 
@@ -3521,8 +3521,8 @@ CMDWIZP( olevel )
     argument = one_argument(argument, level);
     if (level[0] == '\0')
     {
-        ch->send_to("Syntax: olevel <level>\n\r");
-        ch->send_to("        olevel <level> <name>\n\r");
+        ch->pecho("Syntax: olevel <level>");
+        ch->pecho("        olevel <level> <name>");
         return;
     }
 
@@ -3560,7 +3560,7 @@ CMDWIZP( olevel )
     }
 
     if ( !found )
-        ch->send_to("Nothing like that in heaven or earth.\n\r");
+        ch->pecho("Nothing like that in heaven or earth.");
     else
         page_to_char(buffer.str( ).c_str( ), ch);
 }
@@ -3575,7 +3575,7 @@ CMDWIZP( mlevel )
 
     if ( argument[0] == '\0' )
     {
-        ch->send_to("Syntax: mlevel <level>\n\r");
+        ch->pecho("Syntax: mlevel <level>");
         return;
     }
 
@@ -3607,18 +3607,18 @@ CMDWIZP( nopk )
 {
   if( !*argument ) {
     if( dreamland->hasOption( DL_PK ) ) {
-      ch->send_to("{RPK{x разрешен.\n\r");
+      ch->pecho("{RPK{x разрешен.");
     } else {
-      ch->send_to("{RPK{x запрещен.\n\r");
+      ch->pecho("{RPK{x запрещен.");
     }
   } else {
     if( !str_cmp( argument, "off" ) ) {
       dreamland->setOption( DL_PK );
-      ch->send_to("{RPK{x разрешен.\n\r");
+      ch->pecho("{RPK{x разрешен.");
     } else {
       if( !str_cmp( argument, "on" ) ) {
         dreamland->removeOption( DL_PK );
-        ch->send_to("{RPK{x запрещен.\n\r");
+        ch->pecho("{RPK{x запрещен.");
       } else {
         ch->send_to("Синтаксис: nopk [on/off]");
         return;

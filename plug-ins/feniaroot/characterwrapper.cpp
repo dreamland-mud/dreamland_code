@@ -1292,7 +1292,7 @@ NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отф�
 {
     checkTarget();
     
-    target->send_to( regfmt(target, args) + "\r\n");
+    target->pecho( regfmt(target, args) );
     
     return Register( );
 }

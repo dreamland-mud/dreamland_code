@@ -34,20 +34,20 @@ void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
 {
     if(hero == killer) {
         act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, 0, TO_CHAR);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     } else {
         act("{Y$c1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     }
 }
 void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) const
 {
     if(hero == killer) {
         act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кого долж$gно|ен|на бы$gло|л|ла спасти.{x", killer, 0, 0, TO_CHAR);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     } else {
         act("{Y$c1 подло уби$gло|л|ла того, кого тебе было поручено спасти.{x", killer, 0, hero, TO_VICT);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     }
 }
 

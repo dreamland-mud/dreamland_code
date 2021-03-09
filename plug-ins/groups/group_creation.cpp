@@ -161,7 +161,7 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
         vnum = OBJ_VNUM_SPRING;
 
     if (get_obj_room_vnum( ch->in_room, vnum )) {
-        ch->send_to("Ты хочешь сделать тут озеро?\r\n");
+        ch->pecho("Ты хочешь сделать тут озеро?");
         return;
     }
 
@@ -179,7 +179,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 
     if ( obj->item_type != ITEM_DRINK_CON )
     {
-        ch->send_to("Здесь не может содержаться вода.\n\r");
+        ch->pecho("Здесь не может содержаться вода.");
         return;
     }
 
@@ -188,7 +188,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->value2() != liq_water && obj->value1() != 0 )
     {
-        ch->send_to("Контейнер содержит другую жидкость.\n\r");
+        ch->pecho("Контейнер содержит другую жидкость.");
         return;
     }
 

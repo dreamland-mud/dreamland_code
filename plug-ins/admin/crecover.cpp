@@ -15,8 +15,8 @@ CMDADM( recover )
     DLString buf = arguments.getOneArgument( );
     
     if(buf.empty( )) {
-        ch->send_to("Usage: recover <player_name>\n\r"
-                    "       - restore from backup.\n\r");
+        ch->pecho("Usage: recover <player_name>\n\r"
+                    "       - restore from backup.");
         return;
     }
     
@@ -24,16 +24,16 @@ CMDADM( recover )
 
     for(c = char_list; c; c = c->next)
         if(!c->is_npc() && buf == c->getName( )) {
-            ch->send_to("Character is already in game.\n\r");
+            ch->pecho("Character is already in game.");
             return;
         }
 
     if(!PCharacterManager::pfRecover(buf, "", 0)) {
-        ch->send_to("Oops. Failed to recover profile. Misspelled name?\n\r");
+        ch->pecho("Oops. Failed to recover profile. Misspelled name?");
         return;
     }
 
-    ch->send_to("Recovered.\n\r");
+    ch->pecho("Recovered.");
 }
 
 

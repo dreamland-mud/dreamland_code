@@ -49,10 +49,10 @@ void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
 {
     if(hero == killer) {
         act("{YТы уби$gло|л|ла того, кто просил тебя о помощи. Привет тебе от преступного мира...{x", killer, 0, 0, TO_CHAR);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     } else {
         act("{Y$c1 подло убил того, кто нуждался в твоей помощи. Мафия не забудет $s.{x", killer, 0, hero, TO_VICT);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     }
 }
 void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) const 
@@ -60,11 +60,11 @@ void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) co
     if(hero == killer) {
         act("{YТы оказа$gло|л|ла неоценимую услугу всему миру, убив его!!!{x", killer, 0, 0, TO_CHAR);
         act("{YТем не менее, от тебя ожидали не этого...{x", killer, 0, 0, TO_CHAR);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     } else {
         act("{Y$c1 подло уби$gло|л|ла того, кого тебе было поручено спасти.{x", killer, 0, hero, TO_VICT);
         act("{YБольшое спасибо $m за это, однако...{x", killer, 0, hero, TO_VICT);
-        hero->send_to("{YЗадание отменяется.{x\r\n");
+        hero->pecho("{YЗадание отменяется.{x");
     }
 }
 

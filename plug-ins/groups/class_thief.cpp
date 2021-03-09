@@ -229,7 +229,7 @@ SKILL_RUNP( settraps )
 {
         if (!gsn_settraps->usable(ch))
         {
-                ch->send_to("Ты абсолютно не в курсе, как это делается.\n\r");
+                ch->pecho("Ты абсолютно не в курсе, как это делается.");
                 return;
         }
 
@@ -238,7 +238,7 @@ SKILL_RUNP( settraps )
 
         if ( IS_SET(ch->in_room->room_flags, ROOM_LAW) )
         {
-                ch->send_to("Мистическая сила защищает комнату.\n\r");
+                ch->pecho("Мистическая сила защищает комнату.");
                 return;
         }
 
@@ -253,13 +253,13 @@ SKILL_RUNP( settraps )
 
                 if (  ch->in_room->isAffected(gsn_settraps ))
                 {
-                        ch->send_to("В этой комнате уже есть ловушка.\n\r");
+                        ch->pecho("В этой комнате уже есть ловушка.");
                         return;
                 }
 
                 if ( ch->isAffected(gsn_settraps))
                 {
-                        ch->send_to("Ты не можешь уследить больше, чем за одной ловушкой.\n\r");
+                        ch->pecho("Ты не можешь уследить больше, чем за одной ловушкой.");
                         return;
                 }
 
@@ -275,7 +275,7 @@ SKILL_RUNP( settraps )
                 postaffect_to_char(ch, gsn_settraps, 
                         ch->is_adrenalined() ? 1 : ch->getModifyLevel() / 10);
 
-                ch->send_to( "Ты устраиваешь ловушку в комнате.\n\r");
+                ch->pecho("Ты устраиваешь ловушку в комнате.");
 
                 act("$c1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM);
                 return;
@@ -302,7 +302,7 @@ AFFECT_DECL(Settraps);
 VOID_AFFECT(Settraps)::entry( Room *room, Character *ch, Affect *paf )
 {
     if (!is_safe_rspell(paf->level,ch)) {
-        ch->send_to("Установленная кем-то ловушка препятствует тебе.\n\r");
+        ch->pecho("Установленная кем-то ловушка препятствует тебе.");
 
         try {
             SettrapsDamage( ch, dice(paf->level,5)+12 ).hit( true );
@@ -335,7 +335,7 @@ SKILL_RUNP( envenom )
     /* find out what */
     if (argument[0] == '\0')
     {
-        ch->send_to("Отравить ядом что?\n\r");
+        ch->pecho("Отравить ядом что?");
         return;
     }
 
@@ -343,13 +343,13 @@ SKILL_RUNP( envenom )
 
     if (obj== 0)
     {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
     if ((skill = gsn_envenom->getEffective( ch )) < 1)
     {
-        ch->send_to("Ты не владеешь этим умением.\n\r");
+        ch->pecho("Ты не владеешь этим умением.");
         return;
     }
 
@@ -401,7 +401,7 @@ SKILL_RUNP( envenom )
         if (obj->value3() < 0
         ||  attack_table[obj->value3()].damage == DAM_BASH)
         {
-            ch->send_to("Ты можешь отравить только оружие, имеющее острое лезвие.\n\r");
+            ch->pecho("Ты можешь отравить только оружие, имеющее острое лезвие.");
             return;
         }
 
@@ -467,43 +467,43 @@ SKILL_RUNP( steal )
 
         if ( ch->is_npc() || skill <= 1)
         {
-                ch->send_to("Ты не умеешь воровать.\n\r");
+                ch->pecho("Ты не умеешь воровать.");
                 return;
         }
 
         if ( arg1[0] == '\0' || arg2[0] == '\0' )
         {
-                ch->send_to("Украсть что и у кого?\n\r");
+                ch->pecho("Украсть что и у кого?");
                 return;
         }
 
         if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
         {
-                ch->send_to("Нет этого тут.\n\r");
+                ch->pecho("Нет этого тут.");
                 return;
         }
 
         if( !victim->is_npc() && IS_GHOST( victim ) )
         {
-                ch->send_to("Твои руки проходят насквозь через карманы призрака.");
+                ch->pecho("Твои руки проходят насквозь через карманы призрака.");
                 return;
         }
 
         if( !ch->is_npc() && IS_DEATH_TIME( ch ) )
         {
-                ch->send_to("Боги снимают с тебя свою защиту.\n\r");
+                ch->pecho("Боги снимают с тебя свою защиту.");
                 UNSET_DEATH_TIME(ch);
         }
 
         if (!victim->is_npc() && victim->desc == 0)
         {
-                ch->send_to("Ты не можешь сделать этого.\n\r");
+                ch->pecho("Ты не можешь сделать этого.");
                 return;
         }
 
         if ( victim == ch || victim->is_immortal() )
         {
-                ch->send_to("Это неразумно.\n\r");
+                ch->pecho("Это неразумно.");
                 return;
         }
 
@@ -513,7 +513,7 @@ SKILL_RUNP( steal )
 
         if ( victim->position == POS_FIGHTING )
         {
-                ch->send_to("Не стоит -- еще ударят больно в пылу битвы.\n\r");
+                ch->pecho("Не стоит -- еще ударят больно в пылу битвы.");
                 return;
         }
 
@@ -544,7 +544,7 @@ SKILL_RUNP( steal )
          * Failure.
          */
 
-                ch->send_to("Тебя застукали за попыткой воровства!\n\r");
+                ch->pecho("Тебя застукали за попыткой воровства!");
                 if ( !IS_AFFECTED( victim, AFF_SLEEP ) )
                 {
                         victim->position= victim->position==POS_SLEEPING? POS_STANDING:
@@ -600,7 +600,7 @@ SKILL_RUNP( steal )
 
                 if ( amount_s <= 0 && amount_g <= 0 )
                 {
-                        ch->send_to("Тебе не удалось нащупать ни одной монетки.\n\r");
+                        ch->pecho("Тебе не удалось нащупать ни одной монетки.");
                         return;
                 }
 
@@ -620,7 +620,7 @@ SKILL_RUNP( steal )
 
         if ( ( obj = see_obj_carry( ch, victim, arg1 ) ) == 0 )
         {
-                ch->send_to("Ты не находишь этого.\n\r");
+                ch->pecho("Ты не находишь этого.");
                 return;
         }
 
@@ -628,25 +628,25 @@ SKILL_RUNP( steal )
    /* ||   IS_SET(obj->extra_flags, ITEM_INVENTORY)*/
    /* ||  obj->level > ch->getModifyLevel() */ )
         {
-                ch->send_to("Это тебе не удастся стянуть.\n\r");
+                ch->pecho("Это тебе не удастся стянуть.");
                 return;
         }
 
         if (obj->behavior && !obj->behavior->canSteal( ch ))
         {
-                ch->send_to("Это бесполезно для тебя.\n\r");
+                ch->pecho("Это бесполезно для тебя.");
                 return;
         }
 
         if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
         {
-                ch->send_to("Твои руки полны.\n\r");
+                ch->pecho("Твои руки полны.");
                 return;
         }
 
         if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
         {
-                ch->send_to("Ты не можешь нести такую тяжесть.\n\r");
+                ch->pecho("Ты не можешь нести такую тяжесть.");
                 return;
         }
 
@@ -656,7 +656,7 @@ SKILL_RUNP( steal )
         if ( !IS_SET( obj->extra_flags, ITEM_INVENTORY ) )
         {
                 obj_from_char( obj );
-                ch->send_to("Есть!\n\r");
+                ch->pecho("Есть!");
 
                 target = obj;
         }
@@ -919,17 +919,17 @@ SKILL_RUNP( push )
     argument = one_argument( argument, arg2 );
 
     if (ch->is_npc() || !gsn_push->usable( ch )) {
-        ch->send_to("Кажется, ты не умеешь толкать?\n\r");
+        ch->pecho("Кажется, ты не умеешь толкать?");
         return;
     }
 
     if (arg1[0] == '\0' || arg2[0] == '\0') {
-        ch->send_to("Вытолкнуть кого и куда?\n\r");
+        ch->pecho("Вытолкнуть кого и куда?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg1 ) ) == 0 ) {
-        ch->send_to("Здесь таких нет.\n\r");
+        ch->pecho("Здесь таких нет.");
         return;
     }
 
@@ -952,32 +952,32 @@ SKILL_RUNP( backstab )
 
     if ( MOUNTED(ch) )
     {
-            ch->send_to("Ты не можешь ударить сзади, если ты верхом!\n\r");
+            ch->pecho("Ты не можешь ударить сзади, если ты верхом!");
             return;
     }
 
     if (gsn_backstab->getEffective( ch ) <= 1)
     {
-            ch->send_to("Ты не знаешь, КАК ударить сзади.\n\r");
+            ch->pecho("Ты не знаешь, КАК ударить сзади.");
             return;
     }
 
     if ( arg[0] == '\0' )
     {
-            ch->send_to("Ударить сзади? Кого?\n\r");
+            ch->pecho("Ударить сзади? Кого?");
             return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-            ch->send_to("Таких здесь нет.\n\r");
+            ch->pecho("Таких здесь нет.");
             return;
     }
 
 
     if ( victim == ch )
     {
-            ch->send_to("Как ты можешь ударить сзади себя?\n\r");
+            ch->pecho("Как ты можешь ударить сзади себя?");
             return;
     }
 
@@ -995,19 +995,19 @@ SKILL_RUNP( backstab )
 
     if ( attack_table[obj->value3()].damage != DAM_PIERCE && obj->value0() != WEAPON_DAGGER )
     {
-            ch->send_to("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием.\n\r");
+            ch->pecho("Чтобы ударить сзади, нужно вооружиться кинжалом или другим колющим оружием.");
             return;
     }
 
     if ( victim->fighting != 0 )
     {
-            ch->send_to("Ты не можешь ударить сзади того, кто уже сражается.\n\r");
+            ch->pecho("Ты не можешь ударить сзади того, кто уже сражается.");
             return;
     }
 
     if ( ch->fighting != 0 )
     {
-            ch->send_to("Тебе некогда подкрадываться к противнику -- ты сражаешься!\n\r");
+            ch->pecho("Тебе некогда подкрадываться к противнику -- ты сражаешься!");
             return;
     }
 
@@ -1130,19 +1130,19 @@ SKILL_RUNP( circle )
 
     if ( MOUNTED(ch) )
     {
-            ch->send_to("Только не верхом!\n\r");
+            ch->pecho("Только не верхом!");
             return;
     }
 
     if ( ch->is_npc() || !gsn_circle->usable( ch ) )
     {
-            ch->send_to("Ты не владеешь круговым ударом.\n\r");
+            ch->pecho("Ты не владеешь круговым ударом.");
             return;
     }
 
     if ( ( victim = ch->fighting ) == 0 )
     {
-            ch->send_to("Сейчас ты не сражаешься.\n\r");
+            ch->pecho("Сейчас ты не сражаешься.");
             return;
     }
 
@@ -1150,7 +1150,7 @@ SKILL_RUNP( circle )
             || (attack_table[obj->value3()].damage != DAM_PIERCE 
             && obj->value0() != WEAPON_DAGGER))
     {
-            ch->send_to("Вооружись для этого кинжалом или другим колющим оружием.\n\r");
+            ch->pecho("Вооружись для этого кинжалом или другим колющим оружием.");
             return;
     }
 
@@ -1161,7 +1161,7 @@ SKILL_RUNP( circle )
     {
             if (person->fighting == ch)
             {
-                    ch->send_to("Ты не можешь сделать это, защищаясь от ударов.\n\r");
+                    ch->pecho("Ты не можешь сделать это, защищаясь от ударов.");
                     return;
             }
     }
@@ -1208,31 +1208,31 @@ SKILL_RUNP( blackjack )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Только не верхом!\n\r");
+                ch->pecho("Только не верхом!");
                 return;
         }
 
         if (!gsn_blackjack->usable( ch ) )
         {
-                ch->send_to("У тебя нет мешочка.\n\r");
+                ch->pecho("У тебя нет мешочка.");
                 return;
         }
 
         if ( (victim = get_char_room(ch,argument)) == 0 )
         {
-                ch->send_to("Здесь таких нет.\n\r");
+                ch->pecho("Здесь таких нет.");
                 return;
         }
 
         if ( ch == victim )
         {
-                ch->send_to("Не надо... можешь потерять сознание.\n\r");
+                ch->pecho("Не надо... можешь потерять сознание.");
                 return;
         }
 
         if ( victim->fighting )
         {
-                ch->send_to("Подожди пока закончится сражение.\n\r");
+                ch->pecho("Подожди пока закончится сражение.");
                 return;
         }
 
@@ -1332,39 +1332,39 @@ SKILL_RUNP( knife )
     int chance;
 
     if (!gsn_knife->usable( ch )) {
-        ch->send_to("Аккуратней, смотри не порежься.\r\n");
+        ch->pecho("Аккуратней, смотри не порежься.");
         return;
     }
 
     one_argument(argument, arg);
 
     if (arg[0] == '\0') {
-        ch->send_to("Пырнуть ножом кого?\r\n");
+        ch->pecho("Пырнуть ножом кого?");
         return;
     }
 
     if ((knife = get_eq_char(ch, wear_wield)) == NULL) {
-        ch->send_to("Вооружись для начала.\r\n");
+        ch->pecho("Вооружись для начала.");
         return;
     }
 
     if (knife->value0() != WEAPON_DAGGER) {
-        ch->send_to("Для этого тебе нужен кинжал.\r\n");
+        ch->pecho("Для этого тебе нужен кинжал.");
         return;
     }
 
     if ((victim = get_char_room(ch, arg)) == NULL) {
-        ch->send_to("Нет таких здесь.\r\n");
+        ch->pecho("Нет таких здесь.");
         return;
     }
 
     if (ch == victim) {
-        ch->send_to("У тебя боязнь себя?\n\r");
+        ch->pecho("У тебя боязнь себя?");
         return;
     }
 
     if (victim->fighting != NULL) {
-        ch->send_to("Подожди, пока закончится сражение.\r\n");
+        ch->pecho("Подожди, пока закончится сражение.");
         return;
     }
 

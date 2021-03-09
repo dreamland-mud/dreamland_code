@@ -220,7 +220,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     ostringstream buf;
 
     if (!IS_AWAKE( ch )) {
-        ch->send_to( "Во сне или как?\n\r");
+        ch->pecho("Во сне или как?");
         return;
     }
 
@@ -253,7 +253,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
 
     if (ch->practice <= 0) {
-        ch->send_to( "У тебя сейчас нет сессий практики (practice).\n\r");
+        ch->pecho("У тебя сейчас нет сессий практики (practice).");
         return;
     }
 

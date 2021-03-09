@@ -1234,7 +1234,7 @@ void UndefinedOneHit::damEffectMasterHand()
         return;
 
     if ( (victim->isAffected(gsn_nerve)) && (number_percent() < 20) )
-        ch->send_to("С ослабленными нервными окончаниями оглушить противника становится легче.\n\r");        
+        ch->pecho("С ослабленными нервными окончаниями оглушить противника становится легче.");        
                 
     if (!IS_AFFECTED(victim, AFF_WEAK_STUN)) {
         SET_BIT(victim->affected_by, AFF_WEAK_STUN);

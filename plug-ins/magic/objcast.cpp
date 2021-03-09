@@ -68,22 +68,22 @@ CMDRUNP( quaff )
     one_argument( argument, arg );
 
     if(!ch->is_npc( ) && ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-        ch->send_to("Ты же воин клана Ярости, а не презренный МАГ!\n\r");
+        ch->pecho("Ты же воин клана Ярости, а не презренный МАГ!");
         return;
     }
 
     if (arg[0] == '\0') {
-        ch->send_to("Осушить что?\n\r");
+        ch->pecho("Осушить что?");
         return;
     }
 
     if (( obj = get_obj_carry( ch, arg ) ) == 0) {
-        ch->send_to("У тебя нет такого снадобья.\n\r");
+        ch->pecho("У тебя нет такого снадобья.");
         return;
     }
 
     if (obj->item_type != ITEM_POTION) {
-        ch->send_to("Осушать можно только снадобья.\n\r");
+        ch->pecho("Осушать можно только снадобья.");
         return;
     }
 

@@ -68,13 +68,13 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
 
         if (arg[0] == '\0')
         {
-                ch->send_to("Постучать в какую дверь или в каком направлении.\n\r");
+                ch->pecho("Постучать в какую дверь или в каком направлении.");
                 return;
         }
 
         if (ch->fighting)
         {        
-                ch->send_to("Подожди пока закончится сражение.\n\r");
+                ch->pecho("Подожди пока закончится сражение.");
                 return;
         }
         
@@ -98,17 +98,17 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
 
                 if ( !IS_SET(exit_info, EX_CLOSED) )
                 {
-                        ch->send_to("Здесь уже открыто.\n\r");
+                        ch->pecho("Здесь уже открыто.");
                         return;
                 }
                 if ( !IS_SET(exit_info, EX_LOCKED) )
                 {
-                        ch->send_to("Попробуй просто открыть...\n\r");
+                        ch->pecho("Попробуй просто открыть...");
                         return;
                 }
                 if ( IS_SET(exit_info, EX_NOPASS) )
                 {
-                        ch->send_to("Таинственная сила блокирует проход.\n\r");
+                        ch->pecho("Таинственная сила блокирует проход.");
                         return;
                 }
                 chance = level / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
@@ -151,7 +151,7 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                 return;
         }
 
-        ch->send_to("Тут нет такой двери.\n\r");
+        ch->pecho("Тут нет такой двери.");
 }
 
 
@@ -165,7 +165,7 @@ SKILL_RUNP( sneak )
 
     if (MOUNTED(ch))
     {
-        ch->send_to("Ты не можешь двигаться бесшумно, когда ты в седле.\n\r");
+        ch->pecho("Ты не можешь двигаться бесшумно, когда ты в седле.");
         return;
     }
 
@@ -174,7 +174,7 @@ SKILL_RUNP( sneak )
     if( IS_AFFECTED(ch,AFF_SNEAK)) {
         if(IS_CHARMED(ch))
         ch->master->pecho("%^$#C1 и так двигается бесшумно.\n\r", ch);
-        ch->send_to("Ты и так двигаешься бесшумно.\n\r");
+        ch->pecho("Ты и так двигаешься бесшумно.");
         return;
     }
 
@@ -192,12 +192,12 @@ SKILL_RUNP( sneak )
         affect_to_char( ch, &af );
         if(IS_CHARMED(ch))
         ch->master->pecho("%1$#^C1 начинает скрытно передвигаться.\n\r", ch);
-        ch->send_to("Ты начинаешь скрытно передвигаться.\n\r");
+        ch->pecho("Ты начинаешь скрытно передвигаться.");
     } else {
       gsn_sneak->improve( ch, false );
         if(IS_CHARMED(ch))
         ch->master->pecho("%1$#^C1 не удается скрытно передвигаться.\n\r", ch);
-        ch->send_to("Тебе не удается скрытно передвигаться.\n\r");
+        ch->pecho("Тебе не удается скрытно передвигаться.");
     }
 
     ch->setWait( gsn_sneak->getBeats( ) );
@@ -211,7 +211,7 @@ SKILL_RUNP( hide )
 {
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь скрыться, когда ты в седле.\n\r");
+                ch->pecho("Ты не можешь скрыться, когда ты в седле.");
                 return;
         }
 
@@ -225,7 +225,7 @@ SKILL_RUNP( hide )
         {
                 if(IS_CHARMED(ch))
                 ch->master->pecho("%1$#^C1 не может скрыться, когда светится.\n\r", ch);
-                ch->send_to("Ты не можешь скрыться, когда светишься.\n\r");
+                ch->pecho("Ты не можешь скрыться, когда светишься.");
                 return;
         }
 
@@ -259,7 +259,7 @@ SKILL_RUNP( hide )
                 // TODO: add sector-specific messaging
                 if(IS_CHARMED(ch))
                 ch->master->pecho("%1$#^C1 скрывает свое присутствие, используя особенности местности.\n\r", ch);
-                ch->send_to("Ты скрываешь свое присутствие, используя особенности местности.\n\r");                
+                ch->pecho("Ты скрываешь свое присутствие, используя особенности местности.");                
                 SET_BIT(ch->affected_by, AFF_HIDE);
                 gsn_hide->improve( ch, true );
         }
@@ -267,7 +267,7 @@ SKILL_RUNP( hide )
         {
                 if(IS_CHARMED(ch))
                 ch->master->pecho("%1$#^C1 пытается скрыться, но терпит неудачу.\n\r", ch);
-                ch->send_to("Ты пытаешься скрыться, но терпишь неудачу.\n\r");                
+                ch->pecho("Ты пытаешься скрыться, но терпишь неудачу.");                
                 if ( IS_AFFECTED(ch, AFF_HIDE) )
                         REMOVE_BIT(ch->affected_by, AFF_HIDE);
                 gsn_hide->improve( ch, false );

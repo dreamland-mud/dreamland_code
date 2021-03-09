@@ -278,7 +278,7 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
     }
 
     if (!arg.isNumber( )) {
-        ch->send_to("Ты должен ввести количество линий.\n\r");
+        ch->pecho("Ты должен ввести количество линий.");
         return;
     }
 
@@ -286,20 +286,20 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
         lines = arg.toInt( );
     }
     catch (const ExceptionBadType& ) {
-        ch->send_to("Неправильное число.\r\n");
+        ch->pecho("Неправильное число.");
         return;
     }
 
     if (lines == 0)
     {
-        ch->send_to("Буферизация вывода отключена.\n\r");
+        ch->pecho("Буферизация вывода отключена.");
         ch->lines = 0;
         return;
     }
 
     if (lines < 10 || lines > 200)
     {
-        ch->send_to("Введи значение между 10 и 200.\n\r");
+        ch->pecho("Введи значение между 10 и 200.");
         return;
     }
 
@@ -396,7 +396,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
         PCharacterManager::save(ch);
 
         if (linked)
-            ch->send_to("Связь с пользователем Discord очищена. ");
+            ch->pecho("Связь с пользователем Discord очищена. ");
 
         ch->printf("Новое секретное слово: {W%s{x.\r\n",
                    discord["token"].asString().c_str());

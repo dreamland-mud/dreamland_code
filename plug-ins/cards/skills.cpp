@@ -68,27 +68,27 @@ SKILL_RUNP( sconce )
     int chance;
 
     if (!gsn_sconce->usable( ch )) {
-        ch->send_to("Тебе незнаком карточный стиль ведения боя.\n\r");
+        ch->pecho("Тебе незнаком карточный стиль ведения боя.");
         return;
     }
 
     if (MOUNTED(ch)) {
-        ch->send_to("Только не верхом!\n\r");
+        ch->pecho("Только не верхом!");
         return;
     }
 
     if ((victim = get_char_room(ch,argument)) == 0) {
-        ch->send_to("Здесь таких нет.\n\r");
+        ch->pecho("Здесь таких нет.");
         return;
     }
 
     if (ch == victim) {
-        ch->send_to("Не надо.. можешь потерять сознание.\n\r");
+        ch->pecho("Не надо.. можешь потерять сознание.");
         return;
     }
 
     if (victim->fighting) {
-        ch->send_to("Подожди пока закончится сражение.\n\r");
+        ch->pecho("Подожди пока закончится сражение.");
         return;
     }
 
@@ -199,7 +199,7 @@ SKILL_RUNP( joker )
     one_argument( argument, arg );
 
     if (!gsn_joker->usable( ch )) {
-        ch->send_to("У тебя плохое чувство юмора.\n\r");
+        ch->pecho("У тебя плохое чувство юмора.");
         return;
     }
 
@@ -209,17 +209,17 @@ SKILL_RUNP( joker )
     }
 
     if ( arg[0] == '\0' ) {
-        ch->send_to("Пошутить над кем?\n\r");
+        ch->pecho("Пошутить над кем?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 ) {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
     if (victim == ch) {
-        ch->send_to("Сам пошутил - сам посмеялся.\n\r");
+        ch->pecho("Сам пошутил - сам посмеялся.");
         return;
     }
 
@@ -227,12 +227,12 @@ SKILL_RUNP( joker )
         return;
 
     if (victim->is_immortal( )) {
-        ch->send_to("А вот эта шутка окончится для тебя плачевно.\n\r");
+        ch->pecho("А вот эта шутка окончится для тебя плачевно.");
         return;
     }
 
     if (victim->fighting != 0) {
-        ch->send_to("Подожди, пока закончится сражение.\n\r");
+        ch->pecho("Подожди, пока закончится сражение.");
         return;
     }
     

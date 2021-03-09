@@ -88,7 +88,7 @@ bool CardPackBehavior::examine( Character *looker )
     }
     
     if (fEmpty) 
-        looker->send_to( "Похоже, сейчас твоя колода пуста.\r\n" );
+        looker->pecho("Похоже, сейчас твоя колода пуста.");
 
     return true;
 }
@@ -113,14 +113,14 @@ bool CardPackBehavior::use( Character *user, const char *args )
         return false;
     
     if (args[0] == '\0') {
-        pch->send_to( "Какую именно карту ты хочешь вытащить из колоды?\r\n" );
+        pch->pecho("Какую именно карту ты хочешь вытащить из колоды?");
         return true;
     }
     
     victim = get_player_world( pch, args );
     
     if (!victim || !victim->getAttributes( ).isAvailable( "cards" )) {
-        pch->send_to( "Ты сейчас не видишь в колоде такой карты.\r\n" );
+        pch->pecho("Ты сейчас не видишь в колоде такой карты.");
         return true;
     }
     
@@ -202,12 +202,12 @@ bool CardBehavior::use( Character *user, const char *cArgs )
     pch = user->getPC( );
     
     if (getPlayerName( ).empty( )) {
-        pch->send_to( "Эта карта пуста.\r\n" );
+        pch->pecho("Эта карта пуста.");
         return true;
     }
    
     if (pch->fighting) {
-        pch->send_to( "Ты не можешь полностью сосредоточиться на карте.\r\n" );
+        pch->pecho("Ты не можешь полностью сосредоточиться на карте.");
         return true;
     }
     
@@ -290,7 +290,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     victim = get_player_world( pch, getPlayerName( ).c_str( ) );
 
     if (pch->fighting) {
-        pch->send_to( "Ты не можешь полностью сосредоточиться на карте.\r\n" );
+        pch->pecho("Ты не можешь полностью сосредоточиться на карте.");
         return true;
     }
 
@@ -331,7 +331,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
 
     
         if (pch->mana < mana) {
-            pch->send_to("У тебя недостаточно энергии для этого.\n\r");
+            pch->pecho("У тебя недостаточно энергии для этого.");
             return true;
         }
         else
@@ -387,7 +387,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             act("$C1 не сможет затащить тебя к себе через карту.", pch, 0, victim, TO_CHAR);
         else {
             if (pch->mana < mana) {
-                pch->send_to("У тебя недостаточно энергии для этого.\n\r");
+                pch->pecho("У тебя недостаточно энергии для этого.");
                 return true;
             }
             else
@@ -419,14 +419,14 @@ bool CardBehavior::examine( Character *looker )
     pch = looker->getPC( );
     
     if (getPlayerName( ).empty( )) {
-        pch->send_to( "Эта карта пуста.\r\n" );
+        pch->pecho("Эта карта пуста.");
         return true;
     }
     
     mana = gsn_peek_card->getMana( );
     
     if (pch->mana < mana) {
-        pch->send_to("У тебя недостаточно энергии для этого.\n\r");
+        pch->pecho("У тебя недостаточно энергии для этого.");
         return true;
     }
     

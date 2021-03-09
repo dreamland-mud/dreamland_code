@@ -59,12 +59,12 @@ SKILL_RUNP( layhands )
     }
 
     if ( (victim = get_char_room(ch,argument)) == 0) {
-        ch->send_to("Ты не видишь здесь такого персонажа.\n\r");
+        ch->pecho("Ты не видишь здесь такого персонажа.");
         return;
     }
 
     if ( ch->isAffected(gsn_lay_hands)) {
-        ch->send_to("Ты пока не можешь сосредоточиться.\n\r");
+        ch->pecho("Ты пока не можешь сосредоточиться.");
         return;
     }
 
@@ -178,7 +178,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             af.location = APPLY_STR;
             af.modifier = -1 * (punish_lvl / 4);
             affect_to_char(ch, &af);
-            ch->send_to("Ты чувствуешь, как сила уходит из тебя.\n\r");
+            ch->pecho("Ты чувствуешь, как сила уходит из тебя.");
             act("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM);
         }
         else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
@@ -197,7 +197,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         }
         else {
             if (ch->fighting) {
-                ch->send_to("Твои мускулы перестают тебе повиноваться...\n\r");
+                ch->pecho("Твои мускулы перестают тебе повиноваться...");
                 ch->setDazeViolence( 3 );
                 ch->setWaitViolence( 1 );
             }
@@ -210,7 +210,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
                 affect_join(ch, &af);
 
                 if (IS_AWAKE(ch)) {
-                    ch->send_to("Ты засыпаешь....\n\r");
+                    ch->pecho("Ты засыпаешь....");
                     act("$c1 засыпает.", ch, NULL, NULL, TO_ROOM);
                     ch->position = POS_SLEEPING;
                 }
@@ -223,7 +223,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     if (ch->fighting) {
         // 10% chance to fizzle with max skill
         if (roll < sk / 10 ) {
-            ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
+            ch->pecho("Боги слишком заняты, чтобы снизойти до твоих молитв...");
             return;
         }
         
@@ -235,7 +235,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             return;
         }
 
-        ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
+        ch->pecho("{WБлагословение Богов снизошло на тебя!{x");
 
         switch (number_range(0, 3)) {
         case 0:
@@ -265,11 +265,11 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     else {
         // 25% chance to fizzle with max skill
         if (roll < sk / 4 ) {
-            ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
+            ch->pecho("Боги слишком заняты, чтобы снизойти до твоих молитв...");
             return;
         }
         
-        ch->send_to("{WБлагословение Богов снизошло на тебя!{x\n\r");
+        ch->pecho("{WБлагословение Богов снизошло на тебя!{x");
 
         af.bitvector.setTable(&affect_flags);
         af.type         = sn;
@@ -333,7 +333,7 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-        ch->send_to("Это заклинание использовалось совсем недавно.");
+        ch->pecho("Это заклинание использовалось совсем недавно.");
         return;
     }
 
@@ -353,19 +353,19 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 
         if (IS_EVIL(ch) ) {
             victim = ch;
-            ch->send_to("Энергия взрывается внутри тебя!\n\r");
+            ch->pecho("Энергия взрывается внутри тебя!");
         }
 
         if (victim != ch) {
             act_p("$c1 высоко вздымает руки, посылая ослепительный луч света!",
                    ch,0,0,TO_ROOM,POS_RESTING);
-            ch->send_to("Ты высоко вздымаешь руки, посылая ослепительный луч света!\n\r");
+            ch->pecho("Ты высоко вздымаешь руки, посылая ослепительный луч света!");
         }
 
         if (IS_GOOD(victim) || IS_NEUTRAL(victim)) {
             act_p("Свет не может причинить вреда $c3.",
                    victim,0,victim,TO_ROOM,POS_RESTING);
-            victim->send_to("Свет не может причинить тебе вреда.\n\r");
+            victim->pecho("Свет не может причинить тебе вреда.");
             continue;
         }
         

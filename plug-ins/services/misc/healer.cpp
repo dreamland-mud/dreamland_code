@@ -64,7 +64,7 @@ bool Healer::canServeClient( Character *client )
         || (client->is_npc( ) && client->master && client->master->getClan( ) == clan_battlerager)) 
     {
         act( "$C1 выразительно крутит пальцем у виска, глядя на $c4.", client, 0, getKeeper( ), TO_NOTVICT );
-        client->send_to("Напоминаем: ты BattleRager, а не презренный МАГ!\n\r");
+        client->pecho("Напоминаем: ты BattleRager, а не презренный МАГ!");
         return false;
     }
 
@@ -226,7 +226,7 @@ void ManaHealService::heal( Character *client, NPCharacter *healer )
 
     client->mana += healer->getModifyLevel() * 5 + number_range(50, 100);
     client->mana = std::min( client->mana, client->max_mana );
-    client->send_to( "Приятное тепло наполняет твое тело.\n\r" );
+    client->pecho("Приятное тепло наполняет твое тело.");
 }
 
 bool ManaHealService::available( Character *client, NPCharacter *healer ) const
@@ -255,7 +255,7 @@ CMDRUN( heal )
     healer = find_attracted_mob_behavior<Healer>( ch, OCC_HEALER );
 
     if (!healer) {
-        ch->send_to( "Здесь некому тебя вылечить за деньги.\r\n" );
+        ch->pecho("Здесь некому тебя вылечить за деньги.");
         if (ch->getModifyLevel() < 20) {
             if (!ch->is_npc( ) && ch->getPC( )->getHometown( ) == home_frigate)
                 ch->pecho("Доктор в лазарете вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
@@ -266,7 +266,7 @@ CMDRUN( heal )
     }
 
     if (ch->is_npc( ) && !ch->master) {
-        ch->send_to( "Извини, тебя никто обслуживать не будет.\r\n" );
+        ch->pecho("Извини, тебя никто обслуживать не будет.");
         return;
     }
 

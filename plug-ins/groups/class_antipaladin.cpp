@@ -123,7 +123,7 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   Affect af;
 
   if (ch == victim) {
-    ch->send_to("Оглушить кого?\n\r");
+    ch->pecho("Оглушить кого?");
     return;
   }
 
@@ -143,7 +143,7 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   affect_to_char(victim,&af);
 
   act("$C1 теперь ничего не слышит!",ch,0,victim,TO_CHAR);
-  victim->send_to("Пронзительный звон оглушает тебя... ты ничего не слышишь!\n\r");
+  victim->pecho("Пронзительный звон оглушает тебя... ты ничего не слышишь!");
 
 }
 
@@ -158,7 +158,7 @@ SKILL_RUNP( cleave )
     Object *obj;
 
     if ( MOUNTED(ch) ) {
-        ch->send_to("Находясь в седле, трудно это сделать!\n\r");
+        ch->pecho("Находясь в седле, трудно это сделать!");
         return;
     }
 
@@ -168,22 +168,22 @@ SKILL_RUNP( cleave )
         return;
 
     if (!ch->is_npc() && !gsn_cleave->usable( ch )) {
-        ch->send_to("Ты не умеешь рассекать пополам.\n\r");
+        ch->pecho("Ты не умеешь рассекать пополам.");
         return;
     }
 
     if (arg[0] == '\0') {
-        ch->send_to("Рассечь кого?\n\r");
+        ch->pecho("Рассечь кого?");
         return;
     }
 
     if (( victim = get_char_room( ch, arg ) ) == 0) {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
     if (victim == ch) {
-        ch->send_to("Себя???\n\r");
+        ch->pecho("Себя???");
         return;
     }
 
@@ -191,17 +191,17 @@ SKILL_RUNP( cleave )
         return;
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0) {
-        ch->send_to("Вооружись для начала режущим или рубящим оружием.\n\r");
+        ch->pecho("Вооружись для начала режущим или рубящим оружием.");
         return;
     }
 
     if (attack_table[obj->value3()].damage != DAM_SLASH) {
-        ch->send_to("Чтобы рассечь кого-то, нужно вооружится режущим или рубящим оружием.\n\r");
+        ch->pecho("Чтобы рассечь кого-то, нужно вооружится режущим или рубящим оружием.");
         return;
     }
 
     if (victim->fighting != 0) {
-        ch->send_to("Дождись окончания боя.\n\r");
+        ch->pecho("Дождись окончания боя.");
         return;
     }
 
@@ -401,12 +401,12 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     if (!blade->behavior 
         || !(behavior = blade->behavior.getDynamicPointer<ShadowBlade>( ))) 
     {
-        ch->send_to( "Но это не призрачный клинок!\n\r" );
+        ch->pecho("Но это не призрачный клинок!");
         return;
     }
     
     if (ch->getName( ) != behavior->owner.getValue( )) {
-        ch->send_to( "Ты можешь направить это заклинание только на свой собственный клинок.\n\r" );
+        ch->pecho("Ты можешь направить это заклинание только на свой собственный клинок.");
         return;
     }
     
@@ -416,7 +416,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     ||   IS_WEAPON_STAT(blade, WEAPON_POISON)
     ||   IS_WEAPON_STAT(blade, WEAPON_SHOCKING) )
     {
-        ch->send_to( "Твое оружие и так обладает мощными свойствами!\r\n" );
+        ch->pecho("Твое оружие и так обладает мощными свойствами!");
         return;
     }
 
@@ -459,7 +459,7 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
         }
         
     if (!blade) {
-        ch->send_to( "Ты не можешь найти свой клинок.\n\r" );
+        ch->pecho("Ты не можешь найти свой клинок.");
         return;
     }
 
@@ -500,7 +500,7 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
                 cnt++;
 
                 if (cnt >= 2) {
-                    ch->send_to( "Но у тебя уже есть призрачный клинок.\r\n" );
+                    ch->pecho("Но у тебя уже есть призрачный клинок.");
                     return;
                 }
             }
@@ -508,7 +508,7 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     
     pObjIndex = find_obj_unique_index<ShadowBlade>( );
     if (!pObjIndex) {
-        ch->send_to( "В Мире что-то нарушилось... Ты не можешь сейчас создать свой клинок.\r\n" );
+        ch->pecho("В Мире что-то нарушилось... Ты не можешь сейчас создать свой клинок.");
         LogStream::sendError( ) << "ShadowBlade: NULL obj index" << endl;
         return;
     }
@@ -582,7 +582,7 @@ VOID_SPELL(PowerWordStun)::run( Character *ch, Character *victim, int sn, int le
 
         if ( saves_spell( level, victim, DAM_OTHER, ch, DAMF_MAGIC) )
         {
-                ch->send_to("Оглушить противника не удается!\n\r");
+                ch->pecho("Оглушить противника не удается!");
                 return;
         }
 

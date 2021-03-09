@@ -44,7 +44,7 @@ CMDRUNP( listen )
     argument = one_argument( argument, arg );
 
     if (!arg[0]) {
-        ch->send_to("Послушать что?\n\r");
+        ch->pecho("Послушать что?");
         return;
     }
 

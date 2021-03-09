@@ -44,7 +44,7 @@ SKILL_RUNP( tail )
     one_argument( argument, arg );
     
     if (MOUNTED( ch )) {
-        ch->send_to("Только не верхом!\n\r");
+        ch->pecho("Только не верхом!");
         return;
     }
 
@@ -53,19 +53,19 @@ SKILL_RUNP( tail )
     chance = gsn_tail->getEffective( ch );
     
     if (chance <= 1) {        
-        ch->send_to("Крылья, ноги.. Главное - хвост!\n\r");
+        ch->pecho("Крылья, ноги.. Главное - хвост!");
         return;
     }
 
     if (arg[0] == '\0') {
         victim = ch->fighting;
         if (victim == 0) {
-            ch->send_to("Сейчас ты не сражаешься!\n\r");
+            ch->pecho("Сейчас ты не сражаешься!");
             return;
         }
     }
     else if ((victim = get_char_room(ch, arg)) == 0) {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
@@ -76,7 +76,7 @@ SKILL_RUNP( tail )
     }
 
     if (victim == ch) {
-        ch->send_to("Ты пытаешься огреть себя хвостом, но ничего не выходит.\n\r");
+        ch->pecho("Ты пытаешься огреть себя хвостом, но ничего не выходит.");
         return;
     }
 

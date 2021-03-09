@@ -23,12 +23,12 @@ CMDRUNP( deaf )
 {
         if (IS_SET(ch->comm,COMM_DEAF))
         {
-                ch->send_to("Ты опять можешь говорить с кем-либо.\n\r");
+                ch->pecho("Ты опять можешь говорить с кем-либо.");
                 REMOVE_BIT(ch->comm,COMM_DEAF);
         }
         else
         {
-                ch->send_to("С этого момента ты не хочешь ни с кем говорить.\n\r");
+                ch->pecho("С этого момента ты не хочешь ни с кем говорить.");
                 SET_BIT(ch->comm,COMM_DEAF);
         }
 }
@@ -37,12 +37,12 @@ CMDRUNP( quiet )
 {
         if (IS_SET(ch->comm,COMM_QUIET))
         {
-                ch->send_to("Режим полного молчания выключен.\n\r");
+                ch->pecho("Режим полного молчания выключен.");
                 REMOVE_BIT(ch->comm,COMM_QUIET);
         }
         else
         {
-                ch->send_to("С этого момента ты будешь слышать только то, что произносят в комнате.\n\r");
+                ch->pecho("С этого момента ты будешь слышать только то, что произносят в комнате.");
                 SET_BIT(ch->comm,COMM_QUIET);
         }
 }
@@ -250,7 +250,7 @@ CMDRUNP( afk )
     PCharacter *pch = ch->getPC( );
     
     if (ch->is_npc( )) {
-        ch->send_to( "Вдали от чего?!\r\n" );
+        ch->pecho("Вдали от чего?!");
         return;
     }
     
@@ -270,7 +270,7 @@ CMDRUNP( afk )
             pch->printf("Ты в режиме AFK: {c%s.{x\r\n", argument);
         }
         else
-            pch->send_to("Режим AFK включен.\n\r");
+            pch->pecho("Режим AFK включен.");
 
         pch->getAttributes().handleEvent(AfkArguments(pch, true));
     }

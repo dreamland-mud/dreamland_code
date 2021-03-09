@@ -222,7 +222,7 @@ CMDADM( codesource )
     
     if(cmd.strPrefix("write") || cmd.strPrefix("save")) {
         if (!pch->isCoder( )) {
-            ch->send_to( "Check your privilege.\r\n");
+            ch->pecho("Check your privilege.");
             return;
         }
 
@@ -294,7 +294,7 @@ CMDADM( codesource )
     
     if(cmd.strPrefix("clear")) {
         pch->getAttributes( ).eraseAttribute( "codesource" );
-        ch->send_to("Ok.\r\n");
+        ch->pecho("Ok.");
         return;
     }
     
@@ -313,13 +313,13 @@ CMDADM( codesource )
         for(Editor::reg_t::const_iterator i = reg.begin(); i != reg.end(); i++)
             csa->content.push_back( DLString( *i ) );
 
-        ch->send_to("Pasted from editor buffer.\r\n");
+        ch->pecho("Pasted from editor buffer.");
         return;
     }
 
     if(cmd.strPrefix("file")) {
         if (!pch->isCoder( )) {
-            ch->send_to( "This is not for you.\r\n");
+            ch->pecho("This is not for you.");
             return;
         }
         
@@ -361,7 +361,7 @@ CMDADM( codesource )
         
         try {
             cs.eval( thiz );
-            ch->send_to("Ok.\r\n");
+            ch->pecho("Ok.");
         } catch(const ::Exception& e ) {
             ostringstream ostr;
             ostr << "Evaluation exception: " << e.what() << endl;

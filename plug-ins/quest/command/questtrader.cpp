@@ -104,7 +104,7 @@ void QuestTrader::msgListRequest( Character *client )
 
 void QuestTrader::msgListBefore( Character *client ) 
 {
-    client->send_to( "Перечень квестовых вещей для покупки:\n\r" );
+    client->pecho("Перечень квестовых вещей для покупки:");
 }
 
 void QuestTrader::msgListAfter( Character *client )

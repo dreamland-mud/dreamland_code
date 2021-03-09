@@ -63,7 +63,7 @@ VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, ACUTE_VISION) )
     {
         if (victim == ch)
-          ch->send_to("Твое зрение уже обострено до предела. \n\r");
+          ch->pecho("Твое зрение уже обострено до предела. ");
         else
           act_p("Зрение $C2 уже обострено до предела.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -77,9 +77,9 @@ VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int leve
     af.modifier  = 0;
     af.bitvector.setValue(ACUTE_VISION);
     affect_to_char( victim, &af );
-    victim->send_to("Твое зрение обостряется.\n\r");
+    victim->pecho("Твое зрение обостряется.");
     if ( ch != victim )
-        ch->send_to("Получилось.\n\r");
+        ch->pecho("Получилось.");
     return;
 }
 
@@ -94,7 +94,7 @@ VOID_SPELL(DetectEvil)::run( Character *ch, Character *victim, int sn, int level
     if ( CAN_DETECT(victim, DETECT_EVIL) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие дьявольских сил.\n\r");
+          ch->pecho("Ты уже чувствуешь присутствие дьявольских сил.");
         else
           act_p("$C1 уже чувствует присутствие дьявольских сил.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -108,9 +108,9 @@ VOID_SPELL(DetectEvil)::run( Character *ch, Character *victim, int sn, int level
     
     af.bitvector.setValue(DETECT_EVIL);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь {Dзло{x.\n\r");
+    victim->pecho("Теперь ты чувствуешь {Dзло{x.");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->pecho("Ok.");
     return;
 
 }
@@ -126,7 +126,7 @@ VOID_SPELL(DetectGood)::run( Character *ch, Character *victim, int sn, int level
     if ( CAN_DETECT(victim, DETECT_GOOD) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие добрых сил.\n\r");
+          ch->pecho("Ты уже чувствуешь присутствие добрых сил.");
         else
           act_p("$C1 уже чувствует присутствие добрых сил.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -140,9 +140,9 @@ VOID_SPELL(DetectGood)::run( Character *ch, Character *victim, int sn, int level
     
     af.bitvector.setValue(DETECT_GOOD);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь присутствие {Wдобра{x.\n\r");
+    victim->pecho("Теперь ты чувствуешь присутствие {Wдобра{x.");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->pecho("Ok.");
     return;
 
 }
@@ -157,7 +157,7 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, DETECT_INVIS) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже видишь невидимое.\n\r");
+          ch->pecho("Ты уже видишь невидимое.");
         else
           act_p("$C1 уже видит невидимое.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -172,9 +172,9 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
     
     af.bitvector.setValue(DETECT_INVIS);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты видишь невидимое.\n\r");
+    victim->pecho("Теперь ты видишь невидимое.");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->pecho("Ok.");
     return;
 
 }
@@ -189,7 +189,7 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, DETECT_MAGIC) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь магическую ауру вокруг предметов.\n\r");
+          ch->pecho("Ты уже чувствуешь магическую ауру вокруг предметов.");
         else
           act_p("$C1 уже чувствует магическую ауру вокруг предметов.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -204,9 +204,9 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
     
     af.bitvector.setValue(DETECT_MAGIC);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь магическую ауру вокруг предметов.\n\r");
+    victim->pecho("Теперь ты чувствуешь магическую ауру вокруг предметов.");
     if ( ch != victim )
-        ch->send_to("Получилось.\n\r");
+        ch->pecho("Получилось.");
     return;
 
 }
@@ -218,13 +218,13 @@ VOID_SPELL(DetectPoison)::run( Character *ch, Object *obj, int sn, int level )
     if ( obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOOD )
     {
         if (IS_SET(obj->value3(), DRINK_POISONED))
-            ch->send_to("Ты чувствуешь запах яда!\n\r");
+            ch->pecho("Ты чувствуешь запах яда!");
         else
-            ch->send_to("Уф, кажется, не отравлено.\n\r");
+            ch->pecho("Уф, кажется, не отравлено.");
     }
     else
     {
-        ch->send_to("Это заклинание подействует только на пищу или емкости для жидкости.\n\r");
+        ch->pecho("Это заклинание подействует только на пищу или емкости для жидкости.");
     }
 
     return;
@@ -240,7 +240,7 @@ VOID_SPELL(DetectUndead)::run( Character *ch, Character *victim, int sn, int lev
 
     if ( CAN_DETECT(ch, DETECT_UNDEAD) )
     {
-                ch->send_to("Ты уже чувствуешь нежить.\n\r");
+                ch->pecho("Ты уже чувствуешь нежить.");
 
                 return;
     }
@@ -253,7 +253,7 @@ VOID_SPELL(DetectUndead)::run( Character *ch, Character *victim, int sn, int lev
     
     af.bitvector.setValue(DETECT_UNDEAD);
     affect_to_char( victim, &af );
-    ch->send_to("Теперь ты чувствуешь нежить.\n\r");
+    ch->pecho("Теперь ты чувствуешь нежить.");
 
     return;
 
@@ -302,7 +302,7 @@ VOID_SPELL(Farsight)::run( Character *ch, char *target_name, int sn, int level )
 
     if ( (room = check_place(ch,target_name)) == 0)
       {
-        ch->send_to("Так далеко тебе не видно.\n\r");
+        ch->pecho("Так далеко тебе не видно.");
         return;
       }
     
@@ -319,7 +319,7 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
     if ( CAN_DETECT(victim, DETECT_IMP_INVIS) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие очень невидимых существ.\n\r");
+          ch->pecho("Ты уже чувствуешь присутствие очень невидимых существ.");
         else
           act_p("$C1 уже чувствует присутствие очень невидимых существ.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -334,9 +334,9 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
     
     af.bitvector.setValue(DETECT_IMP_INVIS);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь присутствие очень невидимых существ.\n\r");
+    victim->pecho("Теперь ты чувствуешь присутствие очень невидимых существ.");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->pecho("Ok.");
     return;
 
 }
@@ -435,7 +435,7 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
     }
 
     if ( !found )
-        ch->send_to("Ни на земле, ни в небесах не найдено, увы и ах.\n\r");
+        ch->pecho("Ни на земле, ни в небесах не найдено, увы и ах.");
     else
         page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -447,7 +447,7 @@ VOID_SPELL(Observation)::run( Character *ch, Character *victim, int sn, int leve
   Affect        af;
 
   if( CAN_DETECT( victim, DETECT_OBSERVATION ) ) {
-    ch->send_to("Ты уже можешь диагностировать состояние других существ.\n\r");
+    ch->pecho("Ты уже можешь диагностировать состояние других существ.");
     return;
   }
 
@@ -459,7 +459,7 @@ VOID_SPELL(Observation)::run( Character *ch, Character *victim, int sn, int leve
   af.modifier        = 0;
   af.bitvector.setValue(DETECT_OBSERVATION);
   affect_to_char( victim, &af );
-  ch->send_to("Теперь ты можешь диагностировать состояние других существ.\n\r");
+  ch->pecho("Теперь ты можешь диагностировать состояние других существ.");
   return;
 
 }
@@ -475,7 +475,7 @@ SKILL_RUNP( detect )
 
         if (!gsn_detect_hide->usable( ch ))
         {
-                ch->send_to( "Чего?\n\r");
+                ch->pecho("Чего?");
                 return;
         }
 
@@ -483,7 +483,7 @@ SKILL_RUNP( detect )
         {
                 if(IS_CHARMED(ch))
                 ch->master->pecho("%1$#^C1 уже видит скрытое.\n\r", ch);
-                ch->send_to("Ты уже видишь скрытое. \n\r");
+                ch->pecho("Ты уже видишь скрытое. ");
                 return;
         }
 
@@ -493,7 +493,7 @@ SKILL_RUNP( detect )
         {
                 if(IS_CHARMED(ch))
                 ch->master->pecho("%1$#^C1 пытается увидеть скрытое, но у не%1$Gго|го|е ничего не выходит.\n\r", ch);
-                ch->send_to("Ты пытаешься увидеть скрытое, но у тебя ничего не выходит.\n\r");
+                ch->pecho("Ты пытаешься увидеть скрытое, но у тебя ничего не выходит.");
                 gsn_detect_hide->improve( ch, false );
                 return;
         }
@@ -510,7 +510,7 @@ SKILL_RUNP( detect )
         affect_to_char( ch, &af );
         if(IS_CHARMED(ch))
         ch->master->pecho("Теперь %1$#C1 видит скрытое.\n\r", ch);
-        ch->send_to( "Теперь ты видишь скрытое. \n\r");
+        ch->pecho("Теперь ты видишь скрытое. ");
         gsn_detect_hide->improve( ch, true );
         return;
 }
@@ -553,7 +553,7 @@ SKILL_RUNP( lore )
 
   if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-      ch->send_to("У тебя нет этого.\n\r");
+      ch->pecho("У тебя нет этого.");
       return;
     }
 
@@ -562,13 +562,13 @@ SKILL_RUNP( lore )
     
   if (ch->mana < mana)
     {
-      ch->send_to("У тебя недостаточно энергии для этого.\n\r");
+      ch->pecho("У тебя недостаточно энергии для этого.");
       return;
     }
 
   if (!gsn_lore->usable( ch ) || learned < 2)
     {
-      ch->send_to("Ты недостаточно хорошо знаешь легенды.\n\r");
+      ch->pecho("Ты недостаточно хорошо знаешь легенды.");
       return;
     }
 
@@ -630,7 +630,7 @@ SKILL_RUNP( lore )
         if(learned >= 90)
         oprog_lore(obj, ch);
 
-        ch->send_to("\n\rБолее про эту вещь невозможно ничего сказать.\n\r");
+        ch->pecho("\n\rБолее про эту вещь невозможно ничего сказать.");
         return;
       }
     }  

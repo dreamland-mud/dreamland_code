@@ -52,7 +52,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
     ostringstream errBuf;
     SpellTarget::Pointer t = spell->locateTargets( ch, args, errBuf );
     if (t->castFar && t->door != -1) {
-        ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
+        ch->pecho("На таком расстоянии жертва ничего не почувствует.");
         return;
     }
 
@@ -109,24 +109,24 @@ SKILL_RUNP( recite )
     DLString args = argument, arg1;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Какие еще свитки-шмитки?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!\n\r");
+        ch->pecho("Какие еще свитки-шмитки?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!");
         return;
     }
 
     arg1 = args.getOneArgument( );
 
     if (( scroll = get_obj_carry( ch, arg1.c_str( ) ) ) == 0) {
-        ch->send_to("У тебя нет такого свитка.\n\r");
+        ch->pecho("У тебя нет такого свитка.");
         return;
     }
 
     if (scroll->item_type != ITEM_SCROLL) {
-        ch->send_to("С помощью этой команды можно зачитывать только свитки.\n\r");
+        ch->pecho("С помощью этой команды можно зачитывать только свитки.");
         return;
     }
 
     if (get_wear_level( ch, scroll ) > ch->getRealLevel()) {
-        ch->send_to("Этот свиток чересчур сложен для твоего понимания.\n\r");
+        ch->pecho("Этот свиток чересчур сложен для твоего понимания.");
         return;
     }
     
@@ -171,17 +171,17 @@ SKILL_RUNP( brandish )
     Spell::Pointer spell;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Палками махать?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!\n\r");
+        ch->pecho("Палками махать?! Ты же вои{Smн{Sfтельница{Sx клана Ярости, а не презренный МАГ!");
         return;
     }
 
     if (( staff = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->send_to("Чтобы пользоваться посохами, их надо взять в руки.\n\r");
+        ch->pecho("Чтобы пользоваться посохами, их надо взять в руки.");
         return;
     }
 
     if (staff->item_type != ITEM_STAFF) {
-        ch->send_to("Ты можешь взмахнуть только посохом.\n\r");
+        ch->pecho("Ты можешь взмахнуть только посохом.");
         return;
     }
     
@@ -282,12 +282,12 @@ SKILL_RUNP( zap )
     }
 
     if (( wand = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->send_to("Жезл нужно сначала взять в руку.\n\r");
+        ch->pecho("Жезл нужно сначала взять в руку.");
         return;
     }
 
     if (wand->item_type != ITEM_WAND) {
-        ch->send_to("Ты можешь взмахнуть только волшебным жезлом!\n\r");
+        ch->pecho("Ты можешь взмахнуть только волшебным жезлом!");
         return;
     }
     
@@ -320,7 +320,7 @@ SKILL_RUNP( zap )
      ch->setWaitViolence( 2 );
     
     if (target->castFar && target->door != -1) {
-        ch->send_to( "Твой жезл не дотягивается до соседней комнаты.\r\n" );
+        ch->pecho("Твой жезл не дотягивается до соседней комнаты.");
         return;
     }
     

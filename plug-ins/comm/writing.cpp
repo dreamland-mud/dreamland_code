@@ -36,7 +36,7 @@ COMMAND(CWrite, "write")
     else if (( target = get_obj_room( ch, targetName.c_str( ) ) ))
         writeOnWall( ch, target, arguments );
     else
-        ch->send_to( "У тебя нет этого.\r\n" );
+        ch->pecho("У тебя нет этого.");
 }
 
 void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
@@ -56,7 +56,7 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     }
     
     if (!( nail = findNail( ch ) )) {
-        ch->send_to( "Ты не держишь в руках ничего колющего или царапающего.\r\n" );
+        ch->pecho("Ты не держишь в руках ничего колющего или царапающего.");
         return;
     }
 
@@ -101,7 +101,7 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
     DLString cmd, keyword;
 
     if (paper->item_type != ITEM_PARCHMENT) {
-        ch->send_to( "Это не пергамент.\r\n" );
+        ch->pecho("Это не пергамент.");
         return;
     }
 
@@ -282,7 +282,7 @@ Object * CWrite::findNail( Character *ch )
 
 void CWrite::usage( Character *ch )
 {
-    ch->send_to( "Подробнее см. 'help write'.\r\n" );
+    ch->pecho("Подробнее см. 'help write'.");
 }
 
 

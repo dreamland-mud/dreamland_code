@@ -225,7 +225,7 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
 
         if (!saves_spell(level,victim,DAM_POISON))
         {
-            victim->send_to("Ты чувствуешь как яд растекается по твоим венам.");
+            victim->pecho("Ты чувствуешь как яд растекается по твоим венам.");
             act("$c1 отравле$gно|н|на ядом от $o2.", victim,arrow,0,TO_ROOM);
 
             af.bitvector.setTable(&affect_flags);

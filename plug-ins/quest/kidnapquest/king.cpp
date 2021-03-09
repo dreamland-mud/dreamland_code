@@ -79,7 +79,7 @@ Object * KidnapKing::giveMarkHero( PCharacter *hero )
         
     } catch (const QuestCannotStartException &e) {
         act( "Глюк! $C4 нечего тебе дать.", hero, 0, ch, TO_CHAR );
-        hero->send_to( "Задание отменено. Через минуту сможешь получить новое.\r\n" );
+        hero->pecho("Задание отменено. Через минуту сможешь получить новое.");
         LogStream::sendError( ) << e.what( ) << endl;
         
         quest->setTime( hero, 1 );

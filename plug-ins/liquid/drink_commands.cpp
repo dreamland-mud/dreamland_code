@@ -64,12 +64,12 @@ CMDRUN( fill )
     arg1 = arguments.getOneArgument( );
 
     if (arg.empty( )) {
-        ch->send_to("Наполнить что?\n\r");
+        ch->pecho("Наполнить что?");
         return;
     }
 
     if (( obj = get_obj_wear_carry( ch, arg.c_str( ) ) ) == 0) {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -82,7 +82,7 @@ CMDRUN( fill )
         fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
         if (!fountain && pRoom->liquid == liq_none)
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
-                ch->send_to("Здесь нет источника!\n\r");
+                ch->pecho("Здесь нет источника!");
                 return;
             }
     }
@@ -449,7 +449,7 @@ CMDRUN( pourout )
     arg2 = arguments.getOneArgument( ); // victim or empty
 
     if (arg1.empty( )) {
-        ch->send_to("Вылить что и куда?\n\r");
+        ch->pecho("Вылить что и куда?");
         return;
     }
 
@@ -498,7 +498,7 @@ CMDRUN( pour )
     arg3 = arguments.getOneArgument( ); // victim or empty
 
     if (arg1.empty( )) {
-        ch->send_to("Вылить что и куда?\n\r");
+        ch->pecho("Вылить что и куда?");
         return;
     }
 
@@ -534,7 +534,7 @@ CMDRUN( pour )
         vch = get_char_room(ch,arg2.c_str( ));
 
         if (vch == 0) {
-            ch->send_to("Вылить во что?\n\r");
+            ch->pecho("Вылить во что?");
             return;
         }
 
@@ -604,13 +604,13 @@ CMDRUN( drink )
         obj = get_obj_room_type( ch, ITEM_FOUNTAIN );
         if (!obj && pRoom->liquid == liq_none) 
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
-                ch->send_to("Выпить что?\n\r");
+                ch->pecho("Выпить что?");
                 return;
             }
     }
     else {
         if (( obj = get_obj_here( ch, arg ) ) == 0) {
-            ch->send_to("Ты не находишь это.\n\r");
+            ch->pecho("Ты не находишь это.");
             return;
         }
     }
@@ -631,7 +631,7 @@ CMDRUN( drink )
                 return;
 
             if (obj->value1() <= 0) {
-                ch->send_to("Здесь пусто.\n\r");
+                ch->pecho("Здесь пусто.");
                 return;
             }
 
@@ -676,7 +676,7 @@ CMDRUN( drink )
         Affect af;
 
         act( "$c1 хватается за горло и задыхается.",ch,0,0,TO_ROOM );
-        ch->send_to("Ты хватаешься за горло и задыхаешься.\n\r");
+        ch->pecho("Ты хватаешься за горло и задыхаешься.");
         af.bitvector.setTable(&affect_flags);
         af.type      = gsn_poison;
         af.level     = number_fuzzy(amount);

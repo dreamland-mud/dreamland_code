@@ -58,7 +58,7 @@ CMDRUN( mlove )
         arg = arguments.getOneArgument( );
 
         if ( (victim = get_char_room(ch, arg.c_str())) == 0 ) {
-            ch->send_to("Объект твоей страсти куда-то подевался.\n\r");
+            ch->pecho("Объект твоей страсти куда-то подевался.");
             return;
         }
 
@@ -66,7 +66,7 @@ CMDRUN( mlove )
             ch->move -= ch->move / 4;
             ch->mana -= ch->mana / 4;
 
-            ch->send_to("Да! Ты любишь себя! Еще, еще..!\n\r");
+            ch->pecho("Да! Ты любишь себя! Еще, еще..!");
             act("Страсть $c1 к само$gму|му|й себе пользуется полной взаимностью.", ch, 0, 0, TO_ROOM);
             MLOVE_DAZE(ch);
             return;
@@ -100,7 +100,7 @@ CMDRUN( mlove )
             return;
 
         if (ch->is_npc()) {
-            ch->send_to("Тебе нельзя.\n\r");
+            ch->pecho("Тебе нельзя.");
             return;
         }
 

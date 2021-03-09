@@ -79,7 +79,7 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
     Affect af;
 
     if ( IS_AFFECTED(ch, AFF_IMP_INVIS) ) {
-        ch->send_to("Тебя уже и так совсем не видно.\r\n");
+        ch->pecho("Тебя уже и так совсем не видно.");
         return;
     }
 
@@ -130,7 +130,7 @@ VOID_SPELL(Invisibility)::run( Character *ch, Character *victim, int sn, int lev
 
     if ( IS_AFFECTED(victim, AFF_INVISIBLE) ) {
         if (victim == ch)
-            ch->send_to("Тебя уже и так не видно.\r\n");
+            ch->pecho("Тебя уже и так не видно.");
         else
             act("$C1 уже и так невиди$Gмо|м|ма.", ch, 0, victim, TO_CHAR);
         return;
@@ -176,6 +176,6 @@ VOID_SPELL(MassInvis)::run( Character *ch, Room *room, int sn, int level )
         af.bitvector.setValue(AFF_INVISIBLE);
         affect_to_char( gch, &af );
     }
-    ch->send_to("Ok.\n\r");
+    ch->pecho("Ok.");
 }
 

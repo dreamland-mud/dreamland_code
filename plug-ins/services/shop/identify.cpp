@@ -23,7 +23,7 @@ CMDRUN( identify )
     DLString arg = constArguments;
 
     if ( ch->is_npc( ) ) {
-        ch->send_to( "У тебя же лапки!!!\n\r");
+        ch->pecho("У тебя же лапки!!!");
         return;
     }
     
@@ -34,7 +34,7 @@ CMDRUN( identify )
 
     if ( ( obj = get_obj_carry( ch, arg.c_str() ) ) == 0 )
     {
-       ch->send_to( "У тебя нет этого.\n\r");
+       ch->pecho("У тебя нет этого.");
        return;
     }
 
@@ -42,7 +42,7 @@ CMDRUN( identify )
 
     if (!rch)
     {
-       ch->send_to("Тут никто ничего толкового не скажет об этой вещи.\n\r");
+       ch->pecho("Тут никто ничего толкового не скажет об этой вещи.");
        return;
     }
    
@@ -63,7 +63,7 @@ CMDRUN( identify )
     }
     else {
        deduct_cost(ch, cost * 100);
-       if ( cost > 0 ) ch->send_to("Твой кошелек становится значительно легче.\n\r");
+       if ( cost > 0 ) ch->pecho("Твой кошелек становится значительно легче.");
     }
 
     act( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM);

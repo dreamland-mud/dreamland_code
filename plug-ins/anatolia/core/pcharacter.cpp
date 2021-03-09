@@ -32,14 +32,14 @@ void PCharacter::gainExp( int gain )
         return;
 
     if (level > 19  && !IS_SET( act, PLR_CONFIRMED )) {
-        send_to("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
-                "Прочитай '{lRсправка подтверждение{lEhelp confirm{lx'.\n\r");
+        pecho("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
+                "Прочитай '{lRсправка подтверждение{lEhelp confirm{lx'.");
         return;
     }
 
     if (level > 19  && this->getPC( )->getHometown( ) == home_frigate ) {
-        send_to("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
-                "Прочитай '{lRсправка родной город{lEhelp hometown{lx'.\n\r");
+        pecho("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
+                "Прочитай '{lRсправка родной город{lEhelp hometown{lx'.");
         return;
     }
 
@@ -49,7 +49,7 @@ void PCharacter::gainExp( int gain )
     }
 
     if (IS_SET(act,PLR_NO_EXP)) {
-        send_to("Ты не можешь получать опыт, пока твой дух во власти противника.\n\r");
+        pecho("Ты не можешь получать опыт, пока твой дух во власти противника.");
         return;
     }
     

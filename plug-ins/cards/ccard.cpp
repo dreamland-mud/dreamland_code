@@ -30,7 +30,7 @@ COMMAND(CCard, "card")
         return;
     
     if (!pch->is_immortal( )) {
-        pch->send_to( "Это не для тебя.\r\n" );
+        pch->pecho("Это не для тебя.");
         return;
     }
     
@@ -52,14 +52,14 @@ void CCard::doMob( PCharacter *ch, DLString& arguments )
     DLString mobName = arguments.getOneArgument( );
     
     if (mobName.empty( )) {
-        ch->send_to( "Кого ты хочешь сделать шестеркой?\r\n" );
+        ch->pecho("Кого ты хочешь сделать шестеркой?");
         return;
     }
     
     mob = get_char_world( ch, mobName.c_str( ) );
 
     if (!mob) {
-        ch->send_to( "Mobile not found.\r\n" );
+        ch->pecho("Mobile not found.");
         return;
     }
     
@@ -84,7 +84,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-        ch->send_to( "Жертва не найдена.\r\n" );
+        ch->pecho("Жертва не найдена.");
         return;
     }
 
@@ -115,7 +115,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
         if (level < 0 || level > 8)
             throw Exception( );
     } catch (const Exception& ) {
-        ch->send_to( "<card level> должен быть числом от 0 до 8.\r\n" );
+        ch->pecho("<card level> должен быть числом от 0 до 8.");
         return;
     }
     
@@ -140,7 +140,7 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
    
-    ch->send_to( "Список всех карт из Колоды: \r\nИгроки: \r\n");
+    ch->pecho("Список всех карт из Колоды: \r\nИгроки: ");
     cnt = 0;
      
     for (i = pcm.begin( ); i != pcm.end( ); i++) {

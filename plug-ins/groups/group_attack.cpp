@@ -96,7 +96,7 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
         if ( !ch->is_npc() && !IS_NEUTRAL(ch) )
         {
                 victim = ch;
-                ch->send_to("Твой {CГолубой огонь{x оборачивается против тебя!\n\r");
+                ch->pecho("Твой {CГолубой огонь{x оборачивается против тебя!");
         }
 
         if (victim != ch)
@@ -105,7 +105,7 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
                 act_p("$c1 посылает {CГолубой огонь земли{x против тебя!",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                ch->send_to("Ты призываешь на помощь {CГолубой огонь земли{x!\n\r");
+                ch->pecho("Ты призываешь на помощь {CГолубой огонь земли{x!");
         }
 
         dam = dice( level, 14 );
@@ -127,7 +127,7 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
         if ( !ch->is_npc() && !IS_EVIL(ch) )
         {
                 victim = ch;
-                ch->send_to("Силы {RДемонов Ада{x оборачиваются против тебя!\n\r");
+                ch->pecho("Силы {RДемонов Ада{x оборачиваются против тебя!");
         }
 
         if (victim != ch)
@@ -136,7 +136,7 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
                 act_p("$c1 посылает силы {RДемонов Ада{x против тебя!",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                ch->send_to("Ты призываешь на помощь {RДемонов Ада{x!\n\r");
+                ch->pecho("Ты призываешь на помощь {RДемонов Ада{x!");
         }
 
         dam = dice( level, 14 );
@@ -231,7 +231,7 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
 
     int dam;
 
-    ch->send_to("Земля дрожит под твоими ногами!\n\r");
+    ch->pecho("Земля дрожит под твоими ногами!");
     act( "$c1 вызывает ураган и землетрясение.", ch, 0, 0, TO_ROOM);
 
     area_message( ch, "Земля слегка дрожит под твоими ногами.", true );
@@ -284,14 +284,14 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
 
         if (saves_spell (level, victim,DAM_OTHER, ch, DAMF_SPELL) )
         {
-                ch->send_to("Не получилось..\n\r");
+                ch->pecho("Не получилось..");
                 return;
         }
 
         if ( victim->isAffected(sn ) )
         {
                 if (victim == ch)
-                        ch->send_to("Ты и так в паутине.\n\r");
+                        ch->pecho("Ты и так в паутине.");
                 else
                         act_p("Густая паутина уже сковала движения $C2.",
                                 ch,0,victim,TO_CHAR,POS_RESTING);
@@ -315,7 +315,7 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
         af.bitvector.setValue(ADET_WEB);
         affect_to_char( victim, &af );
 
-        victim->send_to("Густая паутина опутывает тебя!\n\r");
+        victim->pecho("Густая паутина опутывает тебя!");
         if ( ch != victim )
                 act_p("Ты опутываешь $C4 густой паутиной!",
                         ch,0,victim,TO_CHAR,POS_RESTING);
@@ -402,7 +402,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     {
                         act_p("$o1 выпадает из обожженных рук $c2.",
                                victim,obj_lose,0,TO_ROOM,POS_RESTING);
-                        victim->send_to("Оружие выпадает из твоих обожженных рук!\n\r");
+                        victim->pecho("Оружие выпадает из твоих обожженных рук!");
                         dam += 1;
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose,victim->in_room);
@@ -410,7 +410,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* YOWCH! */
                     {
-                        victim->send_to("Раскаленное оружие обжигает твои руки!\n\r");
+                        victim->pecho("Раскаленное оружие обжигает твои руки!");
                         dam += number_range(1,obj_lose->level);
                         fail = false;
                     }
@@ -441,8 +441,8 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
     }
     if (fail)
     {
-        ch->send_to("Твоя попытка нагревания закончилась неудачей.\n\r");
-        victim->send_to("Ты чувствуешь легкое прикосновение тепла.\n\r");
+        ch->pecho("Твоя попытка нагревания закончилась неудачей.");
+        victim->pecho("Ты чувствуешь легкое прикосновение тепла.");
     }
     else /* damage! */
     {
@@ -462,19 +462,19 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     if ((ch->getProfession( ) != prof_cleric && ch->getProfession( ) != prof_paladin)
         || IS_EVIL(ch)) 
     {
-        ch->send_to("Ты не владеешь этой силой.\r\n");
+        ch->pecho("Ты не владеешь этой силой.");
         return;
     }
     
     if (grave->pIndexData->vnum != OBJ_VNUM_GRAVE) {
-        ch->send_to("Сюда не воткнется, это не могила.\r\n");
+        ch->pecho("Сюда не воткнется, это не могила.");
         return;
     }
 
     pcm = PCharacterManager::find( DLString( grave->getOwner( )));
 
     if (!pcm || (victim = dynamic_cast<PCharacter *>( pcm )) == 0 || !DIGGED(victim)) {
-        ch->send_to("Опс.. а могила-то ничейная..\r\n");
+        ch->pecho("Опс.. а могила-то ничейная..");
         LogStream::sendError( ) << "Unexistent grave owner: " << grave->getOwner( )<< endl;
         return;
     }

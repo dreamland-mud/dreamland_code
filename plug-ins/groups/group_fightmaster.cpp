@@ -69,31 +69,31 @@ SKILL_RUNP( bashdoor )
 
         if (!gsn_bash_door->getEffective( ch ))
         {
-                ch->send_to("Выбить дверь? Как это?\n\r");
+                ch->pecho("Выбить дверь? Как это?");
                 return;
         }
 
         if (MOUNTED(ch))
         {
-                ch->send_to("Только не верхом!\n\r");
+                ch->pecho("Только не верхом!");
                 return;
         }
 
         if (RIDDEN(ch))
         {
-                ch->send_to("Ты не можешь выбить дверь, когда оседлан{Sfа{Sx.\n\r");
+                ch->pecho("Ты не можешь выбить дверь, когда оседлан{Sfа{Sx.");
                 return;
         }
 
         if (arg[0] == '\0')
         {
-                ch->send_to("Выбить дверь в каком направлении?\n\r");
+                ch->pecho("Выбить дверь в каком направлении?");
                 return;
         }
 
         if (ch->fighting)
         {        
-                ch->send_to("Сначала закончи сражение.\n\r");
+                ch->pecho("Сначала закончи сражение.");
                 return;
         }
 
@@ -101,7 +101,7 @@ SKILL_RUNP( bashdoor )
         if ((!peexit || !ch->can_see( peexit ))
              && ( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) < 0)
         {
-                ch->send_to("Но тут нечего выбивать!\n\r");
+                ch->pecho("Но тут нечего выбивать!");
                 return;
         }
 
@@ -135,13 +135,13 @@ SKILL_RUNP( bashdoor )
 
         if ( !IS_SET(exit_info, EX_CLOSED) )
         {
-                ch->send_to("Здесь уже открыто.\n\r");
+                ch->pecho("Здесь уже открыто.");
                 return;
         }
 
         if ( !IS_SET(exit_info, EX_LOCKED) )
         {
-                ch->send_to("Просто попробуй открыть.\n\r");
+                ch->pecho("Просто попробуй открыть.");
                 return;
         }
 
@@ -307,7 +307,7 @@ SKILL_RUNP( bash )
 
         if ( (MOUNTED(ch)) && (!gsn_riding->available(ch)) )
         {
-                ch->send_to("Ты не знаешь, как применять такие навыки верхом.\n\r");
+                ch->pecho("Ты не знаешь, как применять такие навыки верхом.");
                 return;
         }
 
@@ -326,7 +326,7 @@ SKILL_RUNP( bash )
 
         if ( gsn_bash->getEffective( ch ) <= 1)
         {        
-                ch->send_to("Ударить щитом? Но как это сделать?\n\r");
+                ch->pecho("Ударить щитом? Но как это сделать?");
                 return;
         }
 
@@ -335,13 +335,13 @@ SKILL_RUNP( bash )
                 victim = ch->fighting;
                 if ( victim == 0 )
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ( (victim = get_char_room(ch,arg)) == 0 )
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
@@ -353,13 +353,13 @@ SKILL_RUNP( bash )
 
         if ( victim == ch )
         {
-                ch->send_to("Ударить щитом себя?\n\r");
+                ch->pecho("Ударить щитом себя?");
                 return;
         }
 
         if ( get_eq_char( ch, wear_shield ) == 0 )
         {
-                ch->send_to("Тебе нужен щит чтобы сделать это!\n\r");
+                ch->pecho("Тебе нужен щит чтобы сделать это!");
                 if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
                 ch->master->pecho("Для этого умения твоему последователю потребуется надеть щит.");
                 return;
@@ -368,7 +368,7 @@ SKILL_RUNP( bash )
         /*
         if ( is_flying( ch ) )
         {
-                ch->send_to("В полете? И как ты себе это представляешь?\n\r");
+                ch->pecho("В полете? И как ты себе это представляешь?");
                 return;
         }*/
 
@@ -383,7 +383,7 @@ SKILL_RUNP( bash )
 
         if (SHADOW(ch))
         {
-                ch->send_to("Ты безуспешно пытаешься сбить с ног свою тень.\n\r");
+                ch->pecho("Ты безуспешно пытаешься сбить с ног свою тень.");
                 act("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM);
                 return;
         }
@@ -397,7 +397,7 @@ SKILL_RUNP( bash )
         if ( MOUNTED(victim) )
         {
             if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-                ch->send_to("Ты не можешь сбить с ног того, кто верхом!\n\r");
+                ch->pecho("Ты не можешь сбить с ног того, кто верхом!");
                 return;
             }
             
@@ -515,7 +515,7 @@ SKILL_RUNP( trip )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь подсечь противника, находясь в седле!\n\r");
+                ch->pecho("Ты не можешь подсечь противника, находясь в седле!");
                 return;
         }
 
@@ -528,7 +528,7 @@ SKILL_RUNP( trip )
 
         if ( (chance = gsn_trip->getEffective( ch )) <= 1)
         {
-                ch->send_to("Подсечь? Как это?\n\r");
+                ch->pecho("Подсечь? Как это?");
                 return;
         }
 
@@ -539,13 +539,13 @@ SKILL_RUNP( trip )
                 victim = ch->fighting;
                 if ( victim == 0 )
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ( (victim = get_char_room(ch,arg)) == 0 )
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
@@ -560,7 +560,7 @@ SKILL_RUNP( trip )
 
         if ( is_flying( ch ) )
         {
-                ch->send_to("В полете? И как ты себе это представляешь?\n\r");
+                ch->pecho("В полете? И как ты себе это представляешь?");
                 return;
         }
 
@@ -578,7 +578,7 @@ SKILL_RUNP( trip )
 
         if (SHADOW(ch))
         {
-                ch->send_to("Твоя нога вязнет в твоей тени...\n\r");
+                ch->pecho("Твоя нога вязнет в твоей тени...");
                 act_p("$c1 выделывает балетные па перед своей тенью.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -586,7 +586,7 @@ SKILL_RUNP( trip )
 
         if ( victim == ch )
         {
-                ch->send_to("Ты запинаешься и падаешь!\n\r");
+                ch->pecho("Ты запинаешься и падаешь!");
                 ch->setWait( 2 * gsn_trip->getBeats( ) );
                 act("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM);
                 return;
@@ -601,7 +601,7 @@ SKILL_RUNP( trip )
         if ( MOUNTED(victim) )
         {
             if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-                ch->send_to("Ты не можешь подсечь того, кто верхом!\n\r");
+                ch->pecho("Ты не можешь подсечь того, кто верхом!");
                 return;
             }
 
@@ -770,13 +770,13 @@ SKILL_RUNP( kick )
 
         if (gsn_kick->getEffective( ch ) <= 1)
         {
-                ch->send_to("У тебя плохая растяжка.\n\r");
+                ch->pecho("У тебя плохая растяжка.");
                 return;
         }
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь ударить ногой, если ты верхом!\n\r");
+                ch->pecho("Ты не можешь ударить ногой, если ты верхом!");
                 return;
         }
 
@@ -792,19 +792,19 @@ SKILL_RUNP( kick )
                 victim = ch->fighting;
                 if (victim == 0)
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ((victim = get_char_room(ch,arg)) == 0)
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
         if (victim == ch)
         {
-                ch->send_to("Ударить себя ногой? Довольно тяжело...\n\r");
+                ch->pecho("Ударить себя ногой? Довольно тяжело...");
                 return;
         }
 
@@ -829,7 +829,7 @@ SKILL_RUNP( kick )
 
         if(SHADOW(ch))
         {
-                ch->send_to("Твоя нога вязнет в твоей тени...\n\r");
+                ch->pecho("Твоя нога вязнет в твоей тени...");
                 act_p("$c1 выделывает балетные па перед своей тенью.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -893,13 +893,13 @@ SKILL_RUNP( concentrate )
 
     if ( MOUNTED(ch) )
     {
-        ch->send_to("Ты не можешь сконцентрироваться, если ты верхом!\n\r");
+        ch->pecho("Ты не можешь сконцентрироваться, если ты верхом!");
         return;
     }
 
     if ((chance = gsn_concentrate->getEffective( ch )) == 0)
     {
-        ch->send_to("Ты пытаешься сконцентрироваться, но не выходит.\n\r");
+        ch->pecho("Ты пытаешься сконцентрироваться, но не выходит.");
         return;
     }
 
@@ -911,20 +911,20 @@ SKILL_RUNP( concentrate )
         
     if (ch->mana < gsn_concentrate->getMana( ))
     {
-        ch->send_to("У тебя не хватает энергии для этого.\n\r");
+        ch->pecho("У тебя не хватает энергии для этого.");
         return;
     }
 
     /* fighting */
     if (ch->fighting)
     {
-        ch->send_to("Поздно концентрироваться, бой уже в самом разгаре!\n\r");
+        ch->pecho("Поздно концентрироваться, бой уже в самом разгаре!");
         return;
     }
 
 
     if(SHADOW(ch)) {
-      ch->send_to("Эта странная тень не дает тебе сконцентрироваться.\n\r");
+      ch->pecho("Эта странная тень не дает тебе сконцентрироваться.");
       act_p("$c1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
@@ -940,7 +940,7 @@ SKILL_RUNP( concentrate )
     }
     else
     {
-        ch->send_to("Ты пытаешься сконцентрироваться для следующего сражения, но не выходит.\n\r");
+        ch->pecho("Ты пытаешься сконцентрироваться для следующего сражения, но не выходит.");
         gsn_concentrate->improve( ch, false );
     }
 }
@@ -1095,7 +1095,7 @@ SKILL_RUNP( berserk )
 
         if ( (chance = gsn_berserk->getEffective( ch )) <= 1)
         {
-                ch->send_to("Ты краснеешь от напряжения, но ничего не получается.\n\r");
+                ch->pecho("Ты краснеешь от напряжения, но ничего не получается.");
                 return;
         }
 
@@ -1116,7 +1116,7 @@ SKILL_RUNP( berserk )
         
         if ( ch->mana < mana )
         {
-                ch->send_to("У тебя недостаточно энергии для этого.\n\r");
+                ch->pecho("У тебя недостаточно энергии для этого.");
                 return;
         }
 
@@ -1136,7 +1136,7 @@ SKILL_RUNP( berserk )
                 ch->setWaitViolence( 1 );
                 ch->mana -= mana;
 
-                ch->send_to("Твой пульс учащается, когда ты входишь в ярость!\n\r");
+                ch->pecho("Твой пульс учащается, когда ты входишь в ярость!");
                 act_p("Глаза $c2 загораются {rдиким огнем{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
                 gsn_berserk->improve( ch, true );
                 gsn_berserk->getCommand()->run(ch);
@@ -1146,7 +1146,7 @@ SKILL_RUNP( berserk )
                 ch->setWaitViolence( 2 );
                 ch->mana -= mana / 2;
 
-                ch->send_to("Твой пульс ускоряется, но ничего не происходит.\n\r");
+                ch->pecho("Твой пульс ускоряется, но ничего не происходит.");
                 gsn_berserk->improve( ch, false );
         }
 
@@ -1194,7 +1194,7 @@ SKILL_RUNP( dirt )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь ослепить пылью, если ты верхом!\n\r");
+                ch->pecho("Ты не можешь ослепить пылью, если ты верхом!");
                 return;
         }
 
@@ -1207,7 +1207,7 @@ SKILL_RUNP( dirt )
 
         if ( ( chance = gsn_dirt_kicking->getEffective( ch )) <= 1)
         {
-                ch->send_to("Ты лишь пачкаешь свои ноги в пыли.\n\r");
+                ch->pecho("Ты лишь пачкаешь свои ноги в пыли.");
                 return;
         }
 
@@ -1216,19 +1216,19 @@ SKILL_RUNP( dirt )
                 victim = ch->fighting;
                 if (victim == 0)
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ((victim = get_char_room(ch,arg)) == 0)
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
         if (is_flying( ch ) )
         {
-                ch->send_to("Когда летаешь?\n\r");
+                ch->pecho("Когда летаешь?");
                 return;
         }
 
@@ -1240,7 +1240,7 @@ SKILL_RUNP( dirt )
 
         if (victim == ch)
         {
-                ch->send_to("Довольно глупая мысль.\n\r");
+                ch->pecho("Довольно глупая мысль.");
                 return;
         }
 
@@ -1261,7 +1261,7 @@ SKILL_RUNP( dirt )
 
         if(SHADOW(ch))
         {
-                ch->send_to("Твоя бездонная тень поглощает пыль.\n\r");
+                ch->pecho("Твоя бездонная тень поглощает пыль.");
                 act("$c1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM);
                 return;
         }
@@ -1269,7 +1269,7 @@ SKILL_RUNP( dirt )
         if ( MOUNTED(victim) )
         {
             if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-                ch->send_to("Ты не можешь ослепить пылью того, кто верхом!\n\r");
+                ch->pecho("Ты не можешь ослепить пылью того, кто верхом!");
                 return;
             }
 
@@ -1316,7 +1316,7 @@ SKILL_RUNP( dirt )
 
         if (chance == 0)
         {
-                ch->send_to("Здесь нет пыли...\n\r");
+                ch->pecho("Здесь нет пыли...");
                 return;
         }
 
@@ -1382,19 +1382,19 @@ SKILL_RUNP( warcry )
 
   if (!gsn_warcry->usable( ch ) )
     {
-      ch->send_to("Что?\n\r");
+      ch->pecho("Что?");
       return;
     }
 
   if (ch->isAffected(gsn_bless) || ch->isAffected(gsn_warcry))
     {
-      ch->send_to("Боевой клич не может помочь тебе еще больше.\n\r");
+      ch->pecho("Боевой клич не может помочь тебе еще больше.");
       return;
     }
 
   if (ch->mana < gsn_warcry->getMana( ))
     {
-      ch->send_to("У тебя не хватает энергии для боевого клича.\n\r");
+      ch->pecho("У тебя не хватает энергии для боевого клича.");
       return;
     }
 
@@ -1519,7 +1519,7 @@ SKILL_RUNP( smash )
 
     if ( MOUNTED(ch) ) 
     {
-        ch->send_to("Ты не можешь сбить с ног, если ты верхом!\n\r");
+        ch->pecho("Ты не можешь сбить с ног, если ты верхом!");
         return;
     }
 
@@ -1531,19 +1531,19 @@ SKILL_RUNP( smash )
     argument = one_argument(argument,arg);
 
     if (gsn_smash->getEffective( ch ) <= 1) {        
-        ch->send_to("Сбить с ног? Но как это сделать?\n\r");
+        ch->pecho("Сбить с ног? Но как это сделать?");
         return;
     }
 
     if (arg[0] == '\0') {
         victim = ch->fighting;
         if (victim == NULL) {
-            ch->send_to("Сейчас ты не сражаешься!\n\r");
+            ch->pecho("Сейчас ты не сражаешься!");
             return;
         }
     }
     else if ((victim = get_char_room(ch,arg)) == NULL) {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
@@ -1553,7 +1553,7 @@ SKILL_RUNP( smash )
     } 
 
     if (victim == ch) {
-        ch->send_to("Сбить с ног себя??? Не получится...\n\r");
+        ch->pecho("Сбить с ног себя??? Не получится...");
         return;
     }
 
@@ -1571,14 +1571,14 @@ SKILL_RUNP( smash )
     } 
 
     if(SHADOW(ch)) {
-      ch->send_to("Ты безуспешно пытаешься бороться со своей тенью.\n\r");
+      ch->pecho("Ты безуспешно пытаешься бороться со своей тенью.");
       act("$c1 обнимается со своей тенью.", ch, NULL, NULL, TO_ROOM);
       return;
     }
    
     if ( MOUNTED(victim) ) {
         if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-            ch->send_to("Ты не можешь сбить с ног того, кто верхом!\n\r");
+            ch->pecho("Ты не можешь сбить с ног того, кто верхом!");
             return;
         }
 

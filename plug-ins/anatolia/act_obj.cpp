@@ -151,7 +151,7 @@ bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gol
     if (arg_is_silver( arg )) {
             if (ch->silver < amount)
             {
-                    ch->send_to("У тебя нет столько серебра.\n\r");
+                    ch->pecho("У тебя нет столько серебра.");
                     return false;
             }
 
@@ -161,7 +161,7 @@ bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gol
     {
             if (ch->gold < amount)
             {
-                    ch->send_to("У тебя нет столько золота.\n\r");
+                    ch->pecho("У тебя нет столько золота.");
                     return false;
             }
 
@@ -301,7 +301,7 @@ static bool oprog_can_get( Character *ch, Object *obj )
 static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
 {
     if (ch->is_npc( )) {
-        ch->send_to( "Ты не умеешь обшаривать чужие трупы.\r\n" );
+        ch->pecho("Ты не умеешь обшаривать чужие трупы.");
         return false;
     }
     
@@ -317,12 +317,12 @@ static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
     if (str_cmp( ch->getNameP( ), container->killer ) 
         && str_cmp( "!anybody!", container->killer )) 
     {
-        ch->send_to( "Это не твоя добыча.\r\n" );
+        ch->pecho("Это не твоя добыча.");
         return false;
     }
     
     if (container->count == 0) {
-        ch->send_to("Больше взять ничего не получится.\n\r");
+        ch->pecho("Больше взять ничего не получится.");
         return false;
     }
 
@@ -578,7 +578,7 @@ CMDRUNP( get )
 
     if (argAllObj.empty( ))
     {
-        ch->send_to("Взять что?\n\r");
+        ch->pecho("Взять что?");
         return;
     }
 
@@ -650,7 +650,7 @@ CMDRUNP( get )
         // Disallow 'get <name> all.<container>' syntax.
         if (arg_is_alldot( argContainer ))
         {
-            ch->send_to("Ты не можешь сделать этого.\n\r");
+            ch->pecho("Ты не можешь сделать этого.");
             return;
         }
 
@@ -697,8 +697,8 @@ CMDRUNP( get )
 
             if (IS_PIT(container) && !ch->is_immortal() )
             {
-                ch->send_to("Не жадничай, пожертвования могут понадобиться кому-то еще.\n\r");
-                ch->send_to("И, кстати, не забудь, что продать вещи из ямы для пожертвований все равно не получится.\n\r");             
+                ch->pecho("Не жадничай, пожертвования могут понадобиться кому-то еще.");
+                ch->pecho("И, кстати, не забудь, что продать вещи из ямы для пожертвований все равно не получится.");             
                 return;
             }
                 
@@ -811,7 +811,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
     if (obj == container) {
         if (verbose)
-            ch->send_to("Ты не можешь положить что-то в себя же.\n\r");
+            ch->pecho("Ты не можешь положить что-то в себя же.");
         return PUT_OBJ_ERR;
     }
     
@@ -847,7 +847,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
     if (obj->getWeightMultiplier() != 100 && !IS_SET(container->value1(), CONT_NESTED)) {
         if (verbose)
-            ch->send_to("Наверное это была плохая идея.\n\r");
+            ch->pecho("Наверное это была плохая идея.");
         return PUT_OBJ_ERR;
     }
 
@@ -1054,14 +1054,14 @@ CMDRUNP( put )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-        ch->send_to("Положить что и куда?\n\r");
+        ch->pecho("Положить что и куда?");
         return;
     }
 
     /* no 'put obj all.container' syntax allowed */
     if (arg_is_alldot( arg2 ))
     {
-        ch->send_to("Ты не можешь сделать этого.\n\r");
+        ch->pecho("Ты не можешь сделать этого.");
         return;
     }
     
@@ -1080,7 +1080,7 @@ CMDRUNP( put )
         /* 'put obj container' */
         if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
         {
-            ch->send_to("У тебя нет этого.\n\r");
+            ch->pecho("У тебя нет этого.");
             return;
         }
         
@@ -1218,7 +1218,7 @@ CMDRUNP( drop )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Бросить что?\n\r");
+        ch->pecho("Бросить что?");
         return;
     }
 
@@ -1272,7 +1272,7 @@ CMDRUNP( drop )
         /* 'drop obj' */
         if ( ( obj = get_obj_carry( ch, arg ) ) == 0 )
         {
-            ch->send_to("У тебя нет этого.\n\r");
+            ch->pecho("У тебя нет этого.");
             return;
         }
 
@@ -1368,7 +1368,7 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
 
     if ( !can_drop_obj( ch, obj ) )
     {
-        ch->send_to("Ты не можешь избавиться от этого.\n\r");
+        ch->pecho("Ты не можешь избавиться от этого.");
         return;
     }
 
@@ -1436,13 +1436,13 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 {
     if (ch == victim)
     {
-            ch->send_to("Дать себе?\n\r");
+            ch->pecho("Дать себе?");
             return;
     }
 
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
-            ch->send_to("Разве можно что-то дать призраку?\n\r");
+            ch->pecho("Разве можно что-то дать призраку?");
             return;
     }
 
@@ -1501,13 +1501,13 @@ static void give_money( Character *ch, char *arg1, char *arg2, char *argument, i
     argument = one_argument( argument, arg2 );
     if ( arg2[0] == '\0' )
     {
-            ch->send_to("Дать что и кому?\n\r");
+            ch->pecho("Дать что и кому?");
             return;
     }
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-            ch->send_to("Нет этого тут.\n\r");
+            ch->pecho("Нет этого тут.");
             return;
     }
 
@@ -1526,7 +1526,7 @@ CMDRUNP( give )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-            ch->send_to("Дать что и кому?\n\r");
+            ch->pecho("Дать что и кому?");
             return;
     }
 
@@ -1537,13 +1537,13 @@ CMDRUNP( give )
 
     if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-        ch->send_to("Тому, кого нет здесь?.\n\r");
+        ch->pecho("Тому, кого нет здесь?.");
         return;
     }
     
@@ -1599,7 +1599,7 @@ CMDRUNP( vomit )
 {
     if (!ch->is_npc( )) {
         if (desire_bloodlust->applicable( ch->getPC( ) )) {
-            ch->send_to("Ты ведь вампир, не так ли?\n\r");
+            ch->pecho("Ты ведь вампир, не так ли?");
             return;
         }
         
@@ -1609,7 +1609,7 @@ CMDRUNP( vomit )
     }
 
     act("$c1 засовывает два пальца в рот и начинает блевать.",ch,0,0,TO_ROOM);
-    ch->send_to("Ты прочищаешь свой желудок двухпальцевым методом.\n\r");
+    ch->pecho("Ты прочищаешь свой желудок двухпальцевым методом.");
 
     mprog_vomit( ch );
 }
@@ -1666,7 +1666,7 @@ CMDRUNP( use )
     argument = one_argument( argument, arg );
 
     if (!arg[0]) {
-        ch->send_to("Воспользоваться чем?\n\r");
+        ch->pecho("Воспользоваться чем?");
         return;
     }
 

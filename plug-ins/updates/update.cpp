@@ -359,7 +359,7 @@ void char_update( )
         if (!(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && IS_VAMPIRE(ch) && !MOUNTED(ch))
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
+            ch->pecho("Ты пытаешься двигаться незаметно.");
             SET_BIT(ch->affected_by ,AFF_SNEAK);
             room_to_save( ch );
         }
@@ -367,14 +367,14 @@ void char_update( )
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
+            ch->pecho("Ты пытаешься двигаться незаметно.");
             room_to_save( ch );
         }
 
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты прячешься обратно в тень.\n\r");
+            ch->pecho("Ты прячешься обратно в тень.");
             room_to_save( ch );
         }
 
@@ -1320,7 +1320,7 @@ void player_update( )
                 act("Твоя вторая тень исчезает.",ch,0,0,TO_CHAR);
         
         if (ch->move <= 0 && ch->position != POS_SLEEPING)
-            ch->send_to("Тебе нужно отдохнуть!\n\r") ;
+            ch->pecho("Тебе нужно отдохнуть!");
 
         if ( IS_DEATH_TIME( ch ) ) {
             ch->last_death_time--;

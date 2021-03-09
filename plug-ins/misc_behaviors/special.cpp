@@ -260,7 +260,7 @@ bool spec_patrolman(NPCharacter *ch)
 
             if (vch->in_room != ch->in_room
             &&  vch->in_room->area == ch->in_room->area)
-                    vch->send_to("До тебя доносится пронзительный свист.\n\r");
+                    vch->pecho("До тебя доносится пронзительный свист.");
             }
     }
 

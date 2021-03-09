@@ -18,7 +18,7 @@ CMDRUN( teach )
     XMLAttributes * attributes;
     
     if (ch->is_npc( ) || ch->getRealLevel( ) < LEVEL_HERO - 1) {
-        ch->send_to("Тебе необходимо достичь уровня Героя.\n\r");       
+        ch->pecho("Тебе необходимо достичь уровня Героя.");       
         return;
     }
     
@@ -30,7 +30,7 @@ CMDRUN( teach )
     }
     else {
         attributes->getAttr<XMLAttributeTeacher>( "teacher" );
-        ch->send_to("Теперь ты можешь обучать других тому, что ты знаешь в совершенстве.\r\n" );
+        ch->pecho("Теперь ты можешь обучать других тому, что ты знаешь в совершенстве.");
     }
 }
 

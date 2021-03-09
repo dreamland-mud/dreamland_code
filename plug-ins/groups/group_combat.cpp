@@ -135,7 +135,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 
           last_vict = ch;
           act("Разряд молнии поражает $c4..!",ch,0,0,TO_ROOM);
-          ch->send_to("Созданная тобой молния поражает тебя же!\n\r");
+          ch->pecho("Созданная тобой молния поражает тебя же!");
           dam = dice(level,6);
           if (saves_spell(level,ch,DAM_LIGHTNING,ch, DAMF_MAGIC))
            dam /= 3;
@@ -388,13 +388,13 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
                 || ch->in_room->getSectorType() == SECT_INSIDE
                 || RoomUtils::isWater(ch->in_room))
         {
-                ch->send_to("Здесь нет ни крупицы песка!\n\r");
+                ch->pecho("Здесь нет ни крупицы песка!");
                 ch->wait = 0;
                 return;
         }
 
         act("$c1 создает песчаную бурю вокруг себя.",ch,0,0,TO_ROOM);
-        ch->send_to("Ты создаешь песчаную бурю вокруг себя.\n\r");
+        ch->pecho("Ты создаешь песчаную бурю вокруг себя.");
 
         hpch = max( 10, (int)ch->hit );
         hp_dam = number_range( hpch / 9 + 1, hpch / 5 );
@@ -492,7 +492,7 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
             af.modifier  = -1 * (2 + level / 12);
             af.bitvector.setValue(AFF_WEAKEN);
             affect_to_char( victim, &af );
-            victim->send_to("Ты чувствуешь, как {Dтемная магия{x отнимает у тебя последние силы!\n\r");
+            victim->pecho("Ты чувствуешь, как {Dтемная магия{x отнимает у тебя последние силы!");
             act("$c1 слабеет на глазах.",victim,0,0,TO_ROOM);            
         } 
     }    

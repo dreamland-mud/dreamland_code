@@ -415,12 +415,12 @@ CMDRUN( smith )
     smithman = find_attracted_mob_behavior<Smithman>( ch, OCC_SMITHMAN );
 
     if (!smithman) {
-        ch->send_to( "Здесь нет кузнеца.\r\n" );
+        ch->pecho("Здесь нет кузнеца.");
         return;
     }
 
     if (ch->is_npc( )) {
-        ch->send_to( "Тебя обслуживать не будут, извини.\r\n" );
+        ch->pecho("Тебя обслуживать не будут, извини.");
         return;
     }
     

@@ -84,7 +84,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
         if (is_flying( victim ))
         {
                 if (victim == ch)
-                        ch->send_to("Ты уже находишься в воздухе.\n\r");
+                        ch->pecho("Ты уже находишься в воздухе.");
                 else
                         act("$C1 уже находится в воздухе.",ch,0,victim,TO_CHAR);
                 return;
@@ -93,7 +93,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
         if (can_fly( victim ))
         {
                 if (victim == ch)
-                        ch->send_to("Ты и так можешь подняться в воздух.\n\r");
+                        ch->pecho("Ты и так можешь подняться в воздух.");
                 else
                         act("$C1 может подняться в воздух и без твоей помощи.",ch,0,victim,TO_CHAR);
                 return;
@@ -106,7 +106,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
         af.bitvector.setValue(AFF_FLYING);
         affect_to_char( victim, &af );
 
-        victim->send_to("Твои ноги отрываются от земли.\n\r");
+        victim->pecho("Твои ноги отрываются от земли.");
 
         act( "$c1 поднимается в воздух.", victim, 0, 0, TO_ROOM);
 
@@ -143,7 +143,7 @@ VOID_SPELL(PassDoor)::run( Character *ch, Character *victim, int sn, int level )
     if ( IS_AFFECTED(victim, AFF_PASS_DOOR) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже можешь проходить сквозь преграды.\n\r");
+          ch->pecho("Ты уже можешь проходить сквозь преграды.");
         else
           act_p("$C1 уже может проходить сквозь преграды.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -183,7 +183,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
       || saves_spell(ch->getModifyLevel(), victim, DAM_OTHER, ch, DAMF_SPELL)
       || IS_BLOODY( ch ))
     {
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->pecho("Твоя попытка закончилась неудачей.");
         return;
     }
 
@@ -191,7 +191,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
     stone = get_eq_char(ch,wear_hold);
     if (!ch->is_immortal() &&  (stone == 0 || stone->item_type != ITEM_WARP_STONE))
     {
-        ch->send_to("Для этого заклинания требуется камень, искажающий пространство.\n\r");
+        ch->pecho("Для этого заклинания требуется камень, искажающий пространство.");
         return;
     }
 
@@ -252,7 +252,7 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
       || saves_spell(ch->getModifyLevel(), victim, DAM_OTHER, ch, DAMF_SPELL)
       || IS_BLOODY( ch ))
     {
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->pecho("Твоя попытка закончилась неудачей.");
         return;
     }
 
@@ -261,7 +261,7 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
     if (!ch->is_immortal()
     &&  (stone == 0 || stone->item_type != ITEM_WARP_STONE))
     {
-        ch->send_to("Для этого заклинания требуется камень, искажающий пространство.\n\r");
+        ch->pecho("Для этого заклинания требуется камень, искажающий пространство.");
         return;
     }
 
@@ -355,7 +355,7 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
         }
     
         else {
-            ch->send_to("Тебе не удалось превратиться в туман.\r\n");
+            ch->pecho("Тебе не удалось превратиться в туман.");
             return;
         }
 
@@ -404,7 +404,7 @@ VOID_SPELL(Teleport)::run( Character *ch, Character *victim, int sn, int level )
         || (victim != ch && saves_spell( level - 5, victim, DAM_OTHER, ch, DAMF_SPELL)) 
         || IS_BLOODY(victim))
     {
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->pecho("Твоя попытка закончилась неудачей.");
         return;
     }
     
@@ -504,7 +504,7 @@ SPELL_DECL(WordOfRecall);
 VOID_SPELL(WordOfRecall)::run( Character *ch, Character *, int sn, int level ) 
 { 
     if (ch->getProfession( ) == prof_samurai && ch->fighting) {
-        ch->send_to("Твоя честь не позволяет тебе воспользоваться словом возврата!\n\r");
+        ch->pecho("Твоя честь не позволяет тебе воспользоваться словом возврата!");
         return;
     }
 

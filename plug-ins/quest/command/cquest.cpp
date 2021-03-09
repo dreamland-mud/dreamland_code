@@ -100,7 +100,7 @@ COMMAND(CQuest, "quest")
         return;
 
     if (IS_GHOST( pch )) {
-        pch->send_to("Наслаждение жизнью недоступно призракам.\r\n");
+        pch->pecho("Наслаждение жизнью недоступно призракам.");
         return;
     }
 
@@ -153,7 +153,7 @@ COMMAND(CQuest, "quest")
         trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
 
         if (!trader) {
-            pch->send_to( "Здесь нет торговца квестовыми наградами.\r\n" );
+            pch->pecho("Здесь нет торговца квестовыми наградами.");
             see_also( pch );
             return;
         }
@@ -304,7 +304,7 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
 
     // Some space between fenia quest list and its footer:
     if (feniaquest && !autoquest)
-        ch->send_to("\r\n");
+        ch->pecho("");
 
     // Fenia quest list footer:
     if (feniaquest)
@@ -312,7 +312,7 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
 
     // Space between fenia quests and questor's quest:
     if (feniaquest && autoquest)
-        ch->send_to("\r\n");
+        ch->pecho("");
 
     // Questor's quest and footer:
     if (autoquest) {
@@ -404,7 +404,7 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
     }
     
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
-        ch->send_to("Использование: quest set <player> <quest id> [+]<num. of victories>\r\n");
+        ch->pecho("Использование: quest set <player> <quest id> [+]<num. of victories>");
         return;
     }
 
@@ -418,7 +418,7 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
     qbase = QuestManager::getThis( )->findQuestRegistrator( questID );
 
     if (!qbase) {
-        ch->send_to("Неправильный ID.\r\n");
+        ch->pecho("Неправильный ID.");
         return;
     }
     
@@ -430,7 +430,7 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
         
         count = number.toInt( );
     } catch (const ExceptionBadType&) {
-        ch->send_to("Неверное количество побед.\r\n");
+        ch->pecho("Неверное количество побед.");
         return;
     }
    
@@ -441,7 +441,7 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
 
     attr->setVictories( qbase->getName( ), count );
     PCharacterManager::saveMemory( pci );
-    ch->send_to("Done.\r\n");
+    ch->pecho("Done.");
 }
 
 void CQuest::doStat( PCharacter *ch )

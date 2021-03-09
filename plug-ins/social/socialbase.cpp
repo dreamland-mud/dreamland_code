@@ -74,7 +74,7 @@ bool SocialBase::dispatch( const InterpretArguments &iargs )
         }
 
         if (IS_SET( ch->comm, COMM_AFK )) {
-            ch->send_to( "Выйди сначала из {WAFK{x\n\r" );
+            ch->pecho("Выйди сначала из {WAFK{x");
             return false;
         }
     }
@@ -260,28 +260,28 @@ bool SocialBase::checkPosition( Character *ch )
 
     switch (ch->position.getValue( )) {
     case POS_DEAD:
-        ch->send_to("Лежи смирно! Ты {RТРУП{x.\n\r");
+        ch->pecho("Лежи смирно! Ты {RТРУП{x.");
         break;
 
     case POS_INCAP:
     case POS_MORTAL:
-        ch->send_to("Даже не думай об этом! Ты в ужасном состоянии.\n\r");
+        ch->pecho("Даже не думай об этом! Ты в ужасном состоянии.");
         break;
 
     case POS_STUNNED:
-        ch->send_to("Ты не в состоянии сделать это.\n\r");
+        ch->pecho("Ты не в состоянии сделать это.");
         break;
 
     case POS_SLEEPING:
-        ch->send_to("Во сне? Или может сначала проснешься...\n\r");
+        ch->pecho("Во сне? Или может сначала проснешься...");
         break;
 
     case POS_RESTING:
-        ch->send_to( "Уфф... Но ведь ты отдыхаешь...\n\r" );
+        ch->pecho("Уфф... Но ведь ты отдыхаешь...");
         break;
 
     case POS_SITTING:
-        ch->send_to( "Сидя? Или может сначала встанешь...\n\r" );
+        ch->pecho("Сидя? Или может сначала встанешь...");
         break;
 
     case POS_FIGHTING:
@@ -296,7 +296,7 @@ void SocialBase::visualize( Character *ch )
 {
     if (IS_AFFECTED( ch, AFF_HIDE|AFF_FADE ))  {
         REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
-        ch->send_to("Ты выходишь из тени.\n\r");
+        ch->pecho("Ты выходишь из тени.");
         act( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
     }
 

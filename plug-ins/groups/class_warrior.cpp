@@ -49,14 +49,14 @@ SKILL_RUNP( smithing )
 
     if ( ch->is_npc() || !gsn_smithing->usable( ch ))
     {
-        ch->send_to("Чего?\n\r");
+        ch->pecho("Чего?");
         return;
     }
 
 
     if ( ch->fighting )
     {
-        ch->send_to( "Подожди пока сражение закончится.\n\r");
+        ch->pecho("Подожди пока сражение закончится.");
         return;
     }
 
@@ -64,31 +64,31 @@ SKILL_RUNP( smithing )
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Какую вещь ты хочешь восстановить?\n\r");
+        ch->pecho("Какую вещь ты хочешь восстановить?");
         return;
     }
 
     if (( obj = get_obj_carry(ch, arg)) == 0)
     {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
    if (obj->condition >= 100)
     {
-        ch->send_to("Но это не повреждено.\n\r");
+        ch->pecho("Но это не повреждено.");
         return;
     }
 
     if (( hammer = get_eq_char(ch, wear_hold)) == 0)
     {
-        ch->send_to("Сначала возьми в руки кузнечный молот.\n\r");
+        ch->pecho("Сначала возьми в руки кузнечный молот.");
         return;
     }
 
     if ( hammer->pIndexData->vnum != OBJ_VNUM_HAMMER )
     {
-        ch->send_to("Тебе понадобится специальный молот -- ищи его в Королевстве Дварфов.\n\r");
+        ch->pecho("Тебе понадобится специальный молот -- ищи его в Королевстве Дварфов.");
         return;
     }
 

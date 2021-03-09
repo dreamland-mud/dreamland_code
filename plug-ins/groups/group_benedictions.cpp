@@ -175,7 +175,7 @@ VOID_SPELL(Bless)::run( Character *ch, Character *victim, int sn, int level )
     af.location = APPLY_SAVING_SPELL;
     af.modifier  = 0 - level / 8;
     affect_to_char( victim, &af );
-    victim->send_to("Ты чувствуешь божественное благословение.\n\r");
+    victim->pecho("Ты чувствуешь божественное благословение.");
     if ( ch != victim )
         act("Ты даришь $C3 благословение своих богов.", ch,0,victim,TO_CHAR);
 
@@ -224,7 +224,7 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
             ||  vch->isAffected(gsn_frenzy))
               continue;
 
-            vch->send_to("Волна спокойствия окутывает тебя.\n\r");
+            vch->pecho("Волна спокойствия окутывает тебя.");
             act( "Волна спокойствия окутывает $c4.", vch, 0, 0, TO_ROOM );
 
             if (vch->fighting || vch->position == POS_FIGHTING)
@@ -263,7 +263,7 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
     if (victim->isAffected(sn) || IS_AFFECTED(victim,AFF_BERSERK))
     {
         if (victim == ch)
-          ch->send_to("Ты уже в ярости!\n\r");
+          ch->pecho("Ты уже в ярости!");
         else
           act("$C1 уже в ярости!",ch,0,victim,TO_CHAR);
         return;
@@ -272,7 +272,7 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
     if (victim->isAffected(gsn_calm))
     {
         if (victim == ch)
-          ch->send_to("Сейчас тебя ничто не может разозлить.\n\r");
+          ch->pecho("Сейчас тебя ничто не может разозлить.");
         else
           act_p("Сейчас ничто не может разозлить $C4.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
@@ -303,7 +303,7 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
     af.location = APPLY_AC;
     affect_to_char(victim,&af);
 
-    victim->send_to("Дикая ярость наполняет тебя!\n\r");
+    victim->pecho("Дикая ярость наполняет тебя!");
     act_p("В глазах $c2 вспыхивает дикая ярость!",
            victim,0,0,TO_ROOM,POS_RESTING);
 
@@ -370,7 +370,7 @@ VOID_SPELL(HealingLight)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-        ch->send_to("Эта комната уже освещена излечивающим светом.\n\r");
+        ch->pecho("Эта комната уже освещена излечивающим светом.");
         return;
     }
 
@@ -383,7 +383,7 @@ VOID_SPELL(HealingLight)::run( Character *ch, Room *room, int sn, int level )
     room->affectTo( &af );
 
     postaffect_to_char(ch, sn, level / 10);
-    ch->send_to("Комната освещается излечивающим светом.\n\r");
+    ch->pecho("Комната освещается излечивающим светом.");
     act_p("$c1 освещает комнату излечивающим светом.",
            ch,0,0,TO_ROOM,POS_RESTING);
 }
@@ -410,7 +410,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
 
     act_p("$c1 произносит заклинание {WБожественной Силы{x!",
            ch,0,0,TO_ROOM,POS_RESTING);
-    ch->send_to("Ты произносишь заклинание {WБожественной Силы{x!\n\r");
+    ch->pecho("Ты произносишь заклинание {WБожественной Силы{x!");
 
     for ( auto &vch : room->getPeople() )
     {
@@ -428,7 +428,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
                 if (spellbane( ch, vch ))
                     continue;
 
-              vch->send_to("Ты чувствуешь себя более могущественно.\n\r");
+              vch->pecho("Ты чувствуешь себя более могущественно.");
               spell(frenzy_num,level,ch, vch);
               spell(bless_num,level,ch, vch);
             }
@@ -442,7 +442,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
                     yell_panic( ch, vch );
 
                 spell(curse_num,level,ch, vch);
-                vch->send_to("Божественная сила повергает тебя!\n\r");
+                vch->pecho("Божественная сила повергает тебя!");
                 dam = dice(level,6);
                 try{
                 damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_PRAYER);
@@ -461,7 +461,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
                     yell_panic( ch, vch );
 
                 spell(curse_num,level/2,ch, vch);
-                vch->send_to("Божественная сила повергает тебя!\n\r");
+                vch->pecho("Божественная сила повергает тебя!");
                 dam = dice(level,4);
                 try{
                 damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_PRAYER);
@@ -472,7 +472,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
               }
             }
         } catch (const VictimDeathException &ex) {
-            ch->send_to("Ты чувствуешь себя опустошенно.\n\r");
+            ch->pecho("Ты чувствуешь себя опустошенно.");
             ch->move /= (4/3);
             ch->hit /= (4/3);
             throw ex;
@@ -480,7 +480,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
     }
     }
 
-    ch->send_to("Ты чувствуешь себя опустошенно.\n\r");
+    ch->pecho("Ты чувствуешь себя опустошенно.");
 /*    gain_exp( ch, -1 * number_range(1,10) * 5);           */
     ch->move /= (4/3);
     ch->hit /= (4/3);
@@ -522,7 +522,7 @@ VOID_SPELL(Inspire)::run( Character *ch, Room *room, int sn, int level )
             af.modifier  = 0 - level/12;
             affect_to_char( gch, &af );
 
-            gch->send_to("Ты чувствуешь воодушевление!\n\r");
+            gch->pecho("Ты чувствуешь воодушевление!");
             if( ch != gch )
                 act( "Ты воодушевляешь $C4 силой Создателя!", ch, 0, gch, TO_CHAR);
 
@@ -538,21 +538,21 @@ VOID_SPELL(RayOfTruth)::run( Character *ch, Character *victim, int sn, int level
     if (IS_EVIL(ch) )
     {
         victim = ch;
-        ch->send_to("Энергия взрывается внутри тебя!\n\r");
+        ch->pecho("Энергия взрывается внутри тебя!");
     }
 
     if (victim != ch)
     {
         act_p("$c1 взмахивает руками, посылая ослепительный луч света!",
                ch,0,0,TO_ROOM,POS_RESTING);
-        ch->send_to("Ты взмахиваешь руками, посылая ослепительный луч света!\n\r");
+        ch->pecho("Ты взмахиваешь руками, посылая ослепительный луч света!");
     }
 
     if (IS_GOOD(victim))
     {
         act_p("Ослепительный луч света не может повредить $c3.",
                victim,0,victim,TO_ROOM,POS_RESTING);
-        victim->send_to("Ослепительный луч света не может повредить тебе.\n\r");
+        victim->pecho("Ослепительный луч света не может повредить тебе.");
         return;
     }
 
@@ -616,9 +616,9 @@ VOID_SPELL(RestoringLight)::run( Character *ch, Character *victim, int sn, int l
              ch->mana -= mana_add;
         }
     update_pos( victim );
-    victim->send_to("Волна тепла согревает твое тело.\n\r");
+    victim->pecho("Волна тепла согревает твое тело.");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->pecho("Ok.");
     return;
 
 }
@@ -629,7 +629,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
 { 
   if (number_bits(1) == 0)
     {
-      ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+      ch->pecho("Твоя попытка закончилась неудачей.");
       return;
     }
 
@@ -639,7 +639,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         {
          clean = false;
          room->affectStrip( gsn_cursed_lands);
-         ch->send_to("Ты развеиваешь проклятие, висевшее над этой местностью.\n\r");
+         ch->pecho("Ты развеиваешь проклятие, висевшее над этой местностью.");
          act_p("Проклятие, висевшее над этой местностью, развеивается.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
         }
@@ -647,14 +647,14 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         {
          clean = false;
          room->affectStrip( gsn_deadly_venom);
-         ch->send_to("Ядовитые пары, клубившиеся в этой местности, рассеиваются.\n\r");
+         ch->pecho("Ядовитые пары, клубившиеся в этой местности, рассеиваются.");
          act_p("Ядовитые пары, клубившиеся в этой местности, рассеиваются.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLEEP))
         {
          clean = false;
-         ch->send_to("Усыпляющие чары, висевшие над этой местностью, развеиваются.\n\r");
+         ch->pecho("Усыпляющие чары, висевшие над этой местностью, развеиваются.");
          act_p("Усыпляющие чары, висевшие над этой местностью, развеиваются.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_mysterious_dream);
@@ -662,7 +662,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_PLAGUE))
         {
          clean = false;
-         ch->send_to("Чумные миазмы, клубившиеся в этой местности, рассеиваются.\n\r");
+         ch->pecho("Чумные миазмы, клубившиеся в этой местности, рассеиваются.");
          act_p("Чумные миазмы, клубившиеся в этой местности, рассеиваются.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_black_death);
@@ -670,7 +670,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLOW))
         {
          clean = false;
-         ch->send_to("Летаргический туман, клубившийся в этой местности, рассеивается.\n\r");
+         ch->pecho("Летаргический туман, клубившийся в этой местности, рассеивается.");
          act_p("Летаргический туман, клубившийся в этой местности, рассеивается.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_lethargic_mist);
@@ -721,7 +721,7 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
         af.modifier  = level / 8;
         affect_to_char( victim, &af );
 
-        victim->send_to("Ты чувствуешь себя отвратительно.\n\r");
+        victim->pecho("Ты чувствуешь себя отвратительно.");
 
         if ( ch != victim )
             act("$C1 выглядит отвратительно.",ch,0,victim,TO_CHAR);

@@ -461,13 +461,13 @@ void Damage::reportState( )
     case POS_STUNNED:
         act_p( "$c1 без сознания, но возможно придет в себя.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-        victim->send_to("Ты без сознания, но еще можешь придти в себя.\n\r");
+        victim->pecho("Ты без сознания, но еще можешь придти в себя.");
         break;
     default:
         if ( dam > victim->max_hit / 4 )
-            victim->send_to("Это действительно было БОЛЬНО!\n\r");
+            victim->pecho("Это действительно было БОЛЬНО!");
         if ( victim->hit < victim->max_hit / 4 )
-            victim->send_to("Ты истекаешь {RКРОВЬЮ{x!\n\r");
+            victim->pecho("Ты истекаешь {RКРОВЬЮ{x!");
         break;
     }
 }
@@ -531,7 +531,7 @@ void Damage::handlePosition( )
 void Damage::handleDeath( ) 
 {
     act( "$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
-    victim->send_to("Тебя {RУБИЛИ{x!!\n\r\n\r");
+    victim->pecho("Тебя {RУБИЛИ{x!!\n\r");
     
     eventBus->publish(CharDeathEvent(victim, killer));
 }

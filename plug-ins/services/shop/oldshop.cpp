@@ -152,7 +152,7 @@ CMDRUN( buy )
 {
     if (constArguments.empty( ))
     {
-        ch->send_to("Купить что?\n\r");
+        ch->pecho("Купить что?");
         return;
     }
 
@@ -232,13 +232,13 @@ CMDRUN( buy )
 
     if ( ch->carry_number + number * obj->getNumber( ) > ch->canCarryNumber( ) )
     {
-        ch->send_to("Ты не можешь нести так много вещей.\n\r");
+        ch->pecho("Ты не можешь нести так много вещей.");
         return;
     }
 
     if ( ch->carry_weight + number * obj->getWeight( ) > ch->canCarryWeight( ) )
     {
-        ch->send_to("Ты не можешь нести такую тяжесть.\n\r");
+        ch->pecho("Ты не можешь нести такую тяжесть.");
         return;
     }
 
@@ -325,7 +325,7 @@ CMDRUN( sell )
 
     if (arg.empty( ))
     {
-        ch->send_to("Продать что?\n\r");
+        ch->pecho("Продать что?");
         return;
     }
 
@@ -350,7 +350,7 @@ CMDRUN( sell )
 
     if ( !can_drop_obj( ch, obj ) )
     {
-        ch->send_to("Ты не можешь избавиться от этого.\n\r");
+        ch->pecho("Ты не можешь избавиться от этого.");
         return;
     }
 
@@ -573,7 +573,7 @@ CMDRUN( value )
 
     if (arg.empty( ))
     {
-        ch->send_to("Узнать цену чего?\n\r");
+        ch->pecho("Узнать цену чего?");
         return;
     }
 
@@ -619,7 +619,7 @@ CMDRUN( properties )
 
     if (arg.empty( ))
     {
-        ch->send_to("Узнать характеристики чего?\n\r");
+        ch->pecho("Узнать характеристики чего?");
         return;
     }
 
@@ -682,7 +682,7 @@ ShopTrader::Pointer find_keeper( Character *ch )
     
     trader = find_attracted_mob_behavior<ShopTrader>( ch, OCC_SHOPPER );
     if (!trader) {
-        ch->send_to("Здесь нет продавцов.\n\r");
+        ch->pecho("Здесь нет продавцов.");
         return null;
     }
 

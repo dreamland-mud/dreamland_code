@@ -16,19 +16,19 @@ CMDRUN( mtalk )
     PCharacter *victim;
     
     if (ch->is_npc( )) {
-        ch->send_to( "Тебе нельзя.\r\n" );
+        ch->pecho("Тебе нельзя.");
         return;
     }
 
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeMarriage>( "marriage" );
     
     if (!attr || attr->spouse.getValue( ).empty( )) {
-        ch->send_to( "Сначала женись, потом поговорим.\r\n" );
+        ch->pecho("Сначала женись, потом поговорим.");
         return;
     }
 
     if (constArguments.empty( )) {
-        ch->send_to( "Сказать что?" );
+        ch->pecho( "Сказать что?" );
         return;
     }
     
@@ -36,9 +36,9 @@ CMDRUN( mtalk )
 
     if (!victim) {
         if (attr->wife.getValue( ))
-            ch->send_to( "Твой муж отсутствует в мире.\r\n" );
+            ch->pecho("Твой муж отсутствует в мире.");
         else
-            ch->send_to( "Твоя жена отсутствует в мире.\r\n" );
+            ch->pecho("Твоя жена отсутствует в мире.");
         
         return;
     }

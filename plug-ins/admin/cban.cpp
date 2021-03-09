@@ -57,7 +57,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
         unsigned int n = patt.toInt();
 
         if(n >= bm->size()) {
-            ch->send_to("ban index out of range\r\n");
+            ch->pecho("ban index out of range");
             return;
         }
         
@@ -82,10 +82,10 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
 
         if(arg.strPrefix("none") || arg.strPrefix("off")) {
             if(it == bm->end())
-                ch->send_to("not baned\r\n");
+                ch->pecho("not baned");
             else {
                 bm->erase(it);
-                ch->send_to("ban deleted\r\n");
+                ch->pecho("ban deleted");
                 bm->save();
             }
             return;
@@ -115,7 +115,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
                 }
 
                 if(exp == 0) {
-                    ch->send_to("oops... error parsing time\r\n");
+                    ch->pecho("oops... error parsing time");
                     return;
                 }
             }
@@ -132,7 +132,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
     }
 
     if(!changed && it == bm->end()) {
-        ch->send_to("not baned\r\n");
+        ch->pecho("not baned");
         return;
     }
 
@@ -140,7 +140,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
     
     if(changed) {
         if(it == bm->end()) {
-            ch->send_to("new ban\r\n");
+            ch->pecho("new ban");
             bm->push_back(rec);
         } else {
             *it = rec;
@@ -155,7 +155,7 @@ COMMAND(CBan, "ban")
     DLString arguments = constArguments, patt;
     
     if (arguments.empty( )) {
-        ch->send_to("Pattern missing\r\n");
+        ch->pecho("Pattern missing");
         doUsage( ch );
         return;
     }
@@ -174,11 +174,11 @@ COMMAND(CBan, "ban")
 
 void CBan::doUsage( Character *ch )
 {
-    ch->send_to( 
+    ch->pecho( 
         "Использование: \r\n"
         "ban list                      - список банов\r\n"       
         "ban {<pattern>|<index>}       - подробности про бан\r\n"
-        "ban {<pattern>|<index>} [off|none|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - добавить/изменить/удалить бан\r\n ");
+        "ban {<pattern>|<index>} [off|none|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - добавить/изменить/удалить бан");
 }
 
 void CBan::doKick( Character *ch )
@@ -206,11 +206,11 @@ void CBan::doList( Character *ch )
     int i;
     
     if(bm->empty()) {
-        ch->send_to("Nothing is banned. Strange...\n");
+        ch->pecho("Nothing is banned. Strange...");
         return;
     }
 
-    ch->send_to(" # | pattern                        | flags    | until          | comment\r\n");
+    ch->pecho(" # | pattern                        | flags    | until          | comment");
 
     for(i=0, it = bm->begin(); it != bm->end(); it++, i++) {
         const Date &until = it->expire;

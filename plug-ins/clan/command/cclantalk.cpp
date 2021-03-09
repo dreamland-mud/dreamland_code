@@ -85,12 +85,12 @@ COMMAND(CClanTalk, "cb")
     DLString act_str;
 
     if (ch->getClan( ) == clan_none) {
-        ch->send_to("Ты не принадлежишь ни к одному Клану.\n\r");
+        ch->pecho("Ты не принадлежишь ни к одному Клану.");
         return;
     }
 
     if (!ch->getClan( )->hasChannel( )) {
-        ch->send_to("До тебя никому нет дела.\n\r");
+        ch->pecho("До тебя никому нет дела.");
         return;
     }
     

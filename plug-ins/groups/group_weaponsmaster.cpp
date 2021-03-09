@@ -172,7 +172,7 @@ SKILL_RUNP( disarm )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не сможешь обезоружить, если ты верхом!\n\r");
+                ch->pecho("Ты не сможешь обезоружить, если ты верхом!");
                 return;
         }
 
@@ -180,7 +180,7 @@ SKILL_RUNP( disarm )
 
         if ( (chance = gsn_disarm->getEffective( ch )) <= 1)
         {
-                ch->send_to("Ты не знаешь как обезоружить противника.\n\r");
+                ch->pecho("Ты не знаешь как обезоружить противника.");
                 return;
         }
 
@@ -194,7 +194,7 @@ SKILL_RUNP( disarm )
 
         if (SHADOW(ch))
         {
-                ch->send_to("Да... Как глупо пытаться разоружить свою тень.\n\r");
+                ch->pecho("Да... Как глупо пытаться разоружить свою тень.");
                 act_p("$c1 пытается выбить у своей тени оружие.\n...как глупо это выглядит.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -202,7 +202,7 @@ SKILL_RUNP( disarm )
 
         if ( ( victim = ch->fighting ) == 0 )
         {
-                ch->send_to("Сейчас ты не сражаешься.\n\r");
+                ch->pecho("Сейчас ты не сражаешься.");
                 return;
         }
 
@@ -214,7 +214,7 @@ SKILL_RUNP( disarm )
 
         if ( ( obj = get_eq_char( victim, wear_wield ) ) == 0 )
         {
-                ch->send_to("Твой противник не вооружен.\n\r");
+                ch->pecho("Твой противник не вооружен.");
                 if(IS_CHARMED(ch) && ch->master->getPC())
                 ch->master->pecho("Твой противник не вооружен.");
                 return;
@@ -287,25 +287,25 @@ SKILL_RUNP( shield )
 
     if ( ( victim = ch->fighting ) == 0 )
     {
-        ch->send_to("Сейчас ты не сражаешься.\n\r");
+        ch->pecho("Сейчас ты не сражаешься.");
         return;
     }
         
     if ((axe = get_eq_char(ch,wear_wield)) == 0)
     {
-        ch->send_to( "Сначала нужно вооружиться.\n\r");
+        ch->pecho("Сначала нужно вооружиться.");
         return;
     }
 
     if ((chance = gsn_shield_cleave->getEffective( ch )) == 0)
     {
-        ch->send_to("Ты не знаешь как расколоть щит противника.\n\r");
+        ch->pecho("Ты не знаешь как расколоть щит противника.");
         return;
     }
 
     if ( ( shield = get_eq_char( victim, wear_shield )) == 0 )
     {
-        ch->send_to("Твой противник не использует щит.\n\r");
+        ch->pecho("Твой противник не использует щит.");
         return;
     }
 
@@ -316,7 +316,7 @@ SKILL_RUNP( shield )
         chance = ( int )( chance * 1.2 );
     else if (axe->value0() != WEAPON_SWORD)
         {
-         ch->send_to("Для этого ты должен вооружиться топором или мечом.\n\r");
+         ch->pecho("Для этого ты должен вооружиться топором или мечом.");
          return;
         }
 
@@ -379,25 +379,25 @@ SKILL_RUNP( weapon )
 
     if ( ( victim = ch->fighting ) == 0 )
     {
-        ch->send_to("Сейчас ты не сражаешься.\n\r");
+        ch->pecho("Сейчас ты не сражаешься.");
         return;
     }
 
     if ( (axe = get_eq_char(ch,wear_wield)) == 0)
     {
-        ch->send_to( "Сначала тебе нужно вооружитья.\n\r");
+        ch->pecho("Сначала тебе нужно вооружитья.");
         return;
     }
 
     if ((chance = gsn_weapon_cleave->getEffective( ch )) == 0)
     {
-        ch->send_to("Ты не знаешь как раскалывают оружие противника.\n\r");
+        ch->pecho("Ты не знаешь как раскалывают оружие противника.");
         return;
     }
 
     if ( (wield = get_eq_char( victim, wear_wield )) == 0 )
     {
-        ch->send_to("Твой противник должен быть вооружен.\n\r");
+        ch->pecho("Твой противник должен быть вооружен.");
         return;
     }
 
@@ -409,7 +409,7 @@ SKILL_RUNP( weapon )
         chance = ( int )( chance * 1.2 );
     else if (axe->value0() != WEAPON_SWORD)
         {
-         ch->send_to("Для этого тебе нужно вооружиться топором или мечом.\n\r");
+         ch->pecho("Для этого тебе нужно вооружиться топором или мечом.");
          return;
         }
 
@@ -474,7 +474,7 @@ SKILL_RUNP( lash )
     
     if (!gsn_lash->usable( ch )) {
         act("$c1 угрощающе щелкает хлыстом.", ch, 0, 0, TO_ROOM);
-        ch->send_to( "Что?\r\n" );
+        ch->pecho("Что?");
         return;
     }
     
@@ -485,7 +485,7 @@ SKILL_RUNP( lash )
         whip = get_eq_char(ch, wear_second_wield);
     if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP) 
     {
-        ch->send_to( "Возьми в руки хлыст.\n\r" );
+        ch->pecho("Возьми в руки хлыст.");
         if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
         ch->master->pecho("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
         return;
@@ -494,19 +494,19 @@ SKILL_RUNP( lash )
     if (arg[0] == '\0') {
         victim = ch->fighting;
         if (victim == NULL) {
-            ch->send_to( "Но ты ни с кем не сражаешься!\n\r" );
+            ch->pecho("Но ты ни с кем не сражаешься!");
             return;
         }
     }
     else if ((victim = get_char_room(ch, arg)) == NULL) {
-        ch->send_to("Tут таких нет.\n\r");
+        ch->pecho("Tут таких нет.");
         return;
     }
     
     chance = gsn_lash->getEffective( ch );
 
     if (victim == ch || chance < 50) {
-        ch->send_to("Ты запутываешься в хлысте и падаешь!\n\r");
+        ch->pecho("Ты запутываешься в хлысте и падаешь!");
         ch->setWaitViolence( 5 );
         act("$c1 старательно опутывает свои ноги хлыстом и падает на землю.", ch, 0, 0, TO_ROOM);
         return;
@@ -521,7 +521,7 @@ SKILL_RUNP( lash )
     }
 
     if (SHADOW(ch)) {
-        ch->send_to("Ты пытаешься огреть хлыстом собственную тень.\n\r");
+        ch->pecho("Ты пытаешься огреть хлыстом собственную тень.");
         act("$c1 бьет свою тень хлыстом.",ch,0,0,TO_ROOM);
         return;
     }
@@ -613,18 +613,18 @@ SKILL_RUNP( throwspear )
 
         if ( !gsn_spear->usable( ch ) )
         {
-                ch->send_to("Ты не знаешь как метать копье.\n\r");
+                ch->pecho("Ты не знаешь как метать копье.");
                 return;
         }
 
         if ( ch->fighting )
         {
-                ch->send_to("Ты не можешь сконцентрироваться для метания копья.\n\r");
+                ch->pecho("Ты не можешь сконцентрироваться для метания копья.");
                 return;
         }
 
         if (!direction_range_argument(argument, argDoor, argVict, direction)) {
-                ch->send_to("Метнуть копье куда и в кого?\n\r");
+                ch->pecho("Метнуть копье куда и в кого?");
                 return;
         }
 
@@ -635,13 +635,13 @@ SKILL_RUNP( throwspear )
 
         if ( !victim->is_npc() && victim->desc == 0 )
         {
-                ch->send_to("Ты не можешь сделать этого.\n\r");
+                ch->pecho("Ты не можешь сделать этого.");
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->send_to("Это бессмысленно.\n\r");
+                ch->pecho("Это бессмысленно.");
                 return;
         }
 
@@ -653,7 +653,7 @@ SKILL_RUNP( throwspear )
 
         if ( ch->in_room == victim->in_room )
         {
-                ch->send_to("Ты не можешь метнуть копье в упор.\n\r");
+                ch->pecho("Ты не можешь метнуть копье в упор.");
                 return;
         }
 
@@ -663,7 +663,7 @@ SKILL_RUNP( throwspear )
                 || spear->item_type != ITEM_WEAPON
                 || spear->value0() != WEAPON_SPEAR )
         {
-                ch->send_to("Для метания тебе необходимо копье!\n\r");
+                ch->pecho("Для метания тебе необходимо копье!");
                 return;            
         }
 
@@ -671,7 +671,7 @@ SKILL_RUNP( throwspear )
     /*
         if ( get_eq_char(ch,wear_second_wield) || get_eq_char(ch,wear_shield) )
         {
-                ch->send_to("Твоя вторая рука дожна быть свободна!\n\r");
+                ch->pecho("Твоя вторая рука дожна быть свободна!");
                 return;            
         } */
 

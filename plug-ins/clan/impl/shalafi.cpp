@@ -125,13 +125,13 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
         && obj->item_type != ITEM_LOCKPICK
         && obj->item_type != ITEM_KEY)
       {
-        ch->send_to("Эта вещь не может быть превращена в зелье.\n\r");
+        ch->pecho("Эта вещь не может быть превращена в зелье.");
         return;
       }
 
     if (obj->wear_loc != wear_none)
       {
-        ch->send_to("Вещь должна находиться в списке инвентаря.\n\r");
+        ch->pecho("Вещь должна находиться в списке инвентаря.");
         return;
       }
 
@@ -139,14 +139,14 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
       if ( vial->pIndexData->vnum == OBJ_VNUM_POTION_VIAL )
         break;
     if (  vial == 0 )  {
-        ch->send_to("У тебя нет сосуда, необходимого для изготовления зелья.\n\r");
+        ch->pecho("У тебя нет сосуда, необходимого для изготовления зелья.");
         return;
     }
 
 
     if (number_percent() < 50)
       {
-        ch->send_to("Твоя попытка закончилась неудачей, уничтожив ингредиент.\n\r");
+        ch->pecho("Твоя попытка закончилась неудачей, уничтожив ингредиент.");
         extract_obj(obj);
         return;
       }
@@ -415,7 +415,7 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
   af.bitvector.setValue(AFF_SLOW);    
   affect_to_char( ch, &af );
 
-  ch->send_to("Прилив жизненной силы затмевает твой разум.\n\r");
+  ch->pecho("Прилив жизненной силы затмевает твой разум.");
 
 }
 

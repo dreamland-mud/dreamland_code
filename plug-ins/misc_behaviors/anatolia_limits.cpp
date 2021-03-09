@@ -81,7 +81,7 @@ bool Excalibur::death( Character *ch )
     act_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_CHAR,POS_DEAD);
     act("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
     ch->hit = ch->max_hit;
-    ch->send_to("Ты чувствуешь себя намного лучше.");
+    ch->pecho("Ты чувствуешь себя намного лучше.");
     act("$c1 выглядит намного лучше.",ch,0,0,TO_ROOM);
     return true;
 }
@@ -95,7 +95,7 @@ void Excalibur::speech( Character *ch, const char *speech )
       && (ch->fighting) && ((get_eq_char(ch,wear_wield) == obj) ||
                         (get_eq_char(ch,wear_second_wield) == obj)  ) )
     {
-      ch->send_to("Лезвие Экскалибра брызжет кислотой.\n\r");
+      ch->pecho("Лезвие Экскалибра брызжет кислотой.");
       act_p("Кислота брызжет с лезвия Экскалибра.",
              ch,0,0,TO_ROOM,POS_RESTING);
       spell(gsn_acid_blast, ch->getModifyLevel(),ch,ch->fighting, FSPELL_BANE );
@@ -117,8 +117,8 @@ bool Excalibur::sac( Character *ch )
 void HasteBracers::wear( Character *ch ) 
 {
   if( !( ch->isAffected(gsn_haste ) ) ) {
-//      ch->send_to("Предмет принимает форму твоих рук, плотно прилегая к коже.\n\r");
-      ch->send_to("Твое тело наполняется удивительной легкостью.\n\r");
+//      ch->pecho("Предмет принимает форму твоих рук, плотно прилегая к коже.");
+      ch->pecho("Твое тело наполняется удивительной легкостью.");
     }
 }
 void HasteBracers::equip( Character *ch ) 
@@ -143,7 +143,7 @@ void HasteBracers::remove( Character *ch )
   if (ch->isAffected(gsn_haste))
     {
       affect_strip(ch, gsn_haste);
-      ch->send_to("Твое тело теряет легкость, и твои движения замедляются.\n\r");
+      ch->pecho("Твое тело теряет легкость, и твои движения замедляются.");
     }
 }
 
@@ -290,12 +290,12 @@ int dam;
 
 void FireGauntlets::wear( Character *ch )
 {
-    ch->send_to("Твои руки нагреваются от перчаток.\n\r");
+    ch->pecho("Твои руки нагреваются от перчаток.");
 }
 
 void FireGauntlets::remove( Character *ch )
 {
-    ch->send_to("Твои руки почувствовали прохладу.\n\r");
+    ch->pecho("Твои руки почувствовали прохладу.");
 }
 
 /*
@@ -326,12 +326,12 @@ int dam;
 
 void VolcanoeArmbands::wear( Character *ch )
 {
-    ch->send_to("Твои руки чувствуют тепло.\n\r");
+    ch->pecho("Твои руки чувствуют тепло.");
 }
 
 void VolcanoeArmbands::remove( Character *ch )
 {
-    ch->send_to("Твои руки вновь почувствовали прохладу.\n\r");
+    ch->pecho("Твои руки вновь почувствовали прохладу.");
 }
 
 
@@ -362,12 +362,12 @@ int dam;
 
 void DemonfireShield::wear( Character *ch )
 {
-    ch->send_to("Твои руки чувствуют жар {RОгня Демонов{x.\n\r");
+    ch->pecho("Твои руки чувствуют жар {RОгня Демонов{x.");
 }
 
 void DemonfireShield::remove( Character *ch )
 {
-    ch->send_to("Твои руки вновь почувствовали прохладу.\n\r");
+    ch->pecho("Твои руки вновь почувствовали прохладу.");
 }
 
 
@@ -460,8 +460,8 @@ void RoseShield::fight( Character *ch )
 
   if ( number_percent() < 90 )  return;
 
-  ch->send_to("Листья на твоем щите внезапно распускаются.\n\r");
-  ch->fighting->send_to("Листья на щите окружают тебя!\n\r");
+  ch->pecho("Листья на твоем щите внезапно распускаются.");
+  ch->fighting->pecho("Листья на щите окружают тебя!");
   act("Щит Розы $c2 внезапно распускается.",ch,0,0,TO_ROOM);
   spell(gsn_slow, ch->getModifyLevel(),ch,ch->fighting);
   return;
@@ -479,7 +479,7 @@ void LionClaw::fight( Character *ch )
   if ( ( obj == get_eq_char(ch,wear_wield)) ||
         (secondary = (obj == get_eq_char(ch,wear_second_wield))) )
    {
-     ch->send_to("{WКогти на мгновение показались из Львиной Лапы.{x\n\r");
+     ch->pecho("{WКогти на мгновение показались из Львиной Лапы.{x");
      act_p("{WКогти на мгновение показались из Львиной Лапы $c2.{x",
                 ch,0,0,TO_ROOM,POS_DEAD);
      
@@ -505,7 +505,7 @@ void RingOfRa::speech( Character *ch, const char *speech )
       && (ch->fighting) &&
 ((get_eq_char(ch,wear_finger_l) == obj) || (get_eq_char(ch,wear_finger_r))) )
     {
-      ch->send_to("Электрический разряд выстреливает из кольца.\n\r");
+      ch->pecho("Электрический разряд выстреливает из кольца.");
       act_p("Электрический разряд выстреливает из кольца.",
              ch,0,0,TO_ROOM,POS_RESTING);
       spell(gsn_lightning_breath, ch->getModifyLevel(),ch,ch->fighting, FSPELL_BANE );

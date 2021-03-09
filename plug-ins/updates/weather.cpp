@@ -435,7 +435,7 @@ CMDRUN( weather )
     
     if ( !RoomUtils::isOutside(ch) )
     {
-        ch->send_to( "Ты не можешь видеть погоду в помещении.\n\r");
+        ch->pecho("Ты не можешь видеть погоду в помещении.");
         return;
     }
     

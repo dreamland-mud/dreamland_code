@@ -117,13 +117,13 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
     tell_dim( client, ch, "Нигде больше не найдешь такого замечательного товара:" );
 
     lore_fmt_item( client, obj, buf, false );
-    client->send_to( " {Y+------------------------------------------------------------------------------------+{x\r\n" );
+    client->pecho(" {Y+------------------------------------------------------------------------------------+{x");
     stringstream ss( buf.str( ) );
     DLString line;
     while (std::getline( ss, line, '\n' )) {
-        client->send_to( dlprintf( " {Y|{x %-75s {Y|{x\r\n", line.c_str( ) ) );
+        client->pecho( dlprintf( " {Y|{x %-75s {Y|{x", line.c_str( ) ) );
     }
-    client->send_to( " {Y+------------------------------------------------------------------------------------+{x\r\n" );
+    client->pecho(" {Y+------------------------------------------------------------------------------------+{x");
 
     if (serviceCost < 1) {
         tell_dim( client, ch, "Я сообщаю тебе это совершенно бесплатно." );

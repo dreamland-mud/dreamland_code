@@ -370,7 +370,7 @@ CMDRUNP( affects )
     } 
     else {
         if (permAff.isSet())
-            ch->send_to("\r\n");
+            ch->pecho("");
         ch->pecho( "Ты находишься под действием следующих аффектов:" );
         buf << "{x";
 

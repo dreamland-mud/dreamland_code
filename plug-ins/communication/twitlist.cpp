@@ -21,7 +21,7 @@ COMMAND(CTwit, "twit")
     cmd = arguments.getOneArgument( );
     
     if (ch->is_npc( )) {
-        ch->send_to( "Тебе нельзя.\n\r" );
+        ch->pecho("Тебе нельзя.");
         return;
     }
     
@@ -46,7 +46,7 @@ void CTwit::doAdd( PCharacter *ch, DLString &arg )
     PCMemoryInterface *pci;
 
     if (arg.empty( )) {
-        ch->send_to( "Использование: {lRжаба добавить{lEtwit add{lx <имя>\r\n" );
+        ch->pecho("Использование: {lRжаба добавить{lEtwit add{lx <имя>");
         return;
     }
 
@@ -74,14 +74,14 @@ void CTwit::doRemove( PCharacter *ch, DLString &arg )
     XMLAttributeTwitList::iterator iter;
 
     if (arg.empty( )) {
-        ch->send_to( "Использование: {lRжаба удалить{lEtwit rem{lx <имя> \r\n" );
+        ch->pecho("Использование: {lRжаба удалить{lEtwit rem{lx <имя> ");
         return;
     }
     
     attr = ch->getAttributes( ).findAttr<XMLAttributeTwitList>( "twit" );
 
     if (!attr || attr->size( ) == 0) {
-        ch->send_to( "Список жаб и так пуст.\r\n" );
+        ch->pecho("Список жаб и так пуст.");
         return;
     }
     
@@ -117,9 +117,9 @@ void CTwit::doList( PCharacter *ch )
 
 void CTwit::doUsage( PCharacter *ch )
 {
-    ch->send_to( "twit add <имя> \r\n"
+    ch->pecho( "twit add <имя> \r\n"
                  "twit rem <имя> \r\n"
-                 "twit list \r\n" );
+                 "twit list" );
 }
 
 const DLString XMLAttributeTwitList::TYPE= "XMLAttributeTwitList";

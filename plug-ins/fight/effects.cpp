@@ -536,7 +536,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         {
             Affect af;
 
-            victim->send_to("Ты чувствуешь, как яд растекается по твоим венам.\n\r");
+            victim->pecho("Ты чувствуешь, как яд растекается по твоим венам.");
             act("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM);
 
             af.bitvector.setTable(&affect_flags);
@@ -628,7 +628,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         /* daze and confused? */
         if (!saves_spell(effect_level, victim, DAM_LIGHTNING, 0, dam_flag))
         {
-            victim->send_to("Твое тело парализовано.\n\r");
+            victim->pecho("Твое тело парализовано.");
             victim->setDaze( URANGE(8, dam_ratio, 20) );
         }
 
@@ -914,7 +914,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                         
                         /* daze and confused? */
                         if (number_percent() < 50) {
-                            victim->send_to("Твое тело парализовано.\n\r");
+                            victim->pecho("Твое тело парализовано.");
                             victim->setDaze( URANGE(8, dam_ratio, 20) );
                         }
                 }

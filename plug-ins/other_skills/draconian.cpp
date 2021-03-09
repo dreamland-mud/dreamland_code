@@ -24,7 +24,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
 
   if (ch->isAffected(sn))
     {
-      ch->send_to("Сила Дракона уже переполняет тебя.\n\r");
+      ch->pecho("Сила Дракона уже переполняет тебя.");
       return;
     }
 
@@ -52,7 +52,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
   af.location = APPLY_DEX;
   affect_to_char(ch, &af);
 
-  ch->send_to("Сила Дракона пронизывает тебя.\n\r");
+  ch->pecho("Сила Дракона пронизывает тебя.");
   act("$c1 становится сильнее.", ch, 0, 0, TO_ROOM);
 
 }

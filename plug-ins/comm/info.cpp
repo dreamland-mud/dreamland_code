@@ -20,7 +20,7 @@
 static void desc_show( Character *ch )
 {
         if (ch->desc) {
-            ch->send_to( "Твое описание:\n\r");
+            ch->pecho("Твое описание:");
             ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
         }
 }
@@ -106,7 +106,7 @@ CMDRUNP( description )
             
             if (!ch->getDescription( ) || !ch->getDescription( )[0])
             {
-                ch->send_to("Нет ничего для удаления.\n\r");
+                ch->pecho("Нет ничего для удаления.");
                 return;
             }
         
@@ -128,7 +128,7 @@ CMDRUNP( description )
                         ch->setDescription( buf );
 
                         if (ch->desc) {
-                            ch->send_to( "Твое описание:\n\r");
+                            ch->pecho("Твое описание:");
                             ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
                         }
                         return;
@@ -137,7 +137,7 @@ CMDRUNP( description )
             }
             buf[0] = '\0';
             ch->setDescription( buf );
-            ch->send_to("Описание удалено.\n\r");
+            ch->pecho("Описание удалено.");
             return;
         }
         else if ( argument[0] == '+' )
@@ -154,7 +154,7 @@ CMDRUNP( description )
 
         if ( strlen(buf) + strlen(argument) >= MAX_STRING_LENGTH - 2 )
         {
-            ch->send_to( "Слишком длинное описание.\n\r");
+            ch->pecho("Слишком длинное описание.");
             return;
         }
 

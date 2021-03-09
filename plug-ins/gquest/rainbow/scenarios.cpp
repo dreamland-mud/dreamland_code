@@ -92,7 +92,7 @@ void RainbowScenario::onQuestInit( ) const
         if (!canHearInitMsg( ch->getPC( ) ))
             continue;
 
-        ch->send_to( getInitMsg( ) + "\r\n" );
+        ch->pecho( getInitMsg( )  );
     }
 }
 

@@ -67,7 +67,7 @@ SKILL_RUNP( vanish )
     if ( ch->death_ground_delay > 0
             && ch->trap.isSet( TF_NO_MOVE ) )
     {
-            ch->send_to("Ты не можешь покинуть это место без посторонней помощи!\n\r");
+            ch->pecho("Ты не можешь покинуть это место без посторонней помощи!");
             return;
     }
 
@@ -78,14 +78,14 @@ SKILL_RUNP( vanish )
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))
     {
-        ch->send_to("Из этого места нельзя исчезать.\n\r");
+        ch->pecho("Из этого места нельзя исчезать.");
         return;
     }
 
     pRoomIndex = get_random_room_vanish( ch );
 
     if (!pRoomIndex) {
-        ch->send_to("В этой зоне тебе некуда исчезать.\n\r");
+        ch->pecho("В этой зоне тебе некуда исчезать.");
         return;
     }
     
@@ -93,19 +93,19 @@ SKILL_RUNP( vanish )
     
     if ( !ch->is_npc() && !gsn_vanish->usable( ch ) )
     {
-            ch->send_to("Ты не владеешь этим навыком.\n\r");
+            ch->pecho("Ты не владеешь этим навыком.");
             return;
     }
     
     if (ch->mana < gsn_vanish->getMana( ))
     {
-            ch->send_to("У тебя недостаточно энергии для этого.\n\r" );
+            ch->pecho("У тебя недостаточно энергии для этого.");
             return;
     }
     
     /* TODO: Not sure if it needs the effect: wait_state is enough
     if (ch->isAffected(gsn_vanish)) {
-        ch->send_to("Тебе пока нечего бросить.\r\n");
+        ch->pecho("Тебе пока нечего бросить.");
         return;
     } */
 
@@ -114,7 +114,7 @@ SKILL_RUNP( vanish )
     if (!loc.isSet( wear_hands )
     || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
     {
-            ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
+            ch->pecho("Тебе нужна хотя бы одна рука для этой техники.");
             return;
     }
     
@@ -133,18 +133,18 @@ SKILL_RUNP( vanish )
     else {
         if ((victim = get_char_room(ch,arg)) == 0)
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
         if ( ( victim->fighting != 0 ) && ( victim != ch ) )
         {
-            ch->send_to("Подожди, пока закончится сражение.\n\r");
+            ch->pecho("Подожди, пока закончится сражение.");
             return;
         }
 
         if ( IS_SET(victim->imm_flags,IMM_SUMMON) ) {
-            ch->send_to(fmt(ch, "%^C4 нельзя переместить.\n\r", victim));
+            ch->pecho("%^C4 нельзя переместить.", victim);
             return;
         }
 
@@ -159,7 +159,7 @@ SKILL_RUNP( vanish )
         
         if(SHADOW(ch))
         {
-                ch->send_to("Ты пытаешься схватить в охапку свою тень!\n\r");
+                ch->pecho("Ты пытаешься схватить в охапку свою тень!");
                 act_p("$c1 пытается схватить в охапку свою тень.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -188,13 +188,13 @@ SKILL_RUNP( vanish )
         
     if (number_percent() > gsn_vanish->getEffective( ch ) )
     {
-            ch->send_to("Тебе не удается активировать световую гранату.\n\r");
+            ch->pecho("Тебе не удается активировать световую гранату.");
             gsn_vanish->improve( ch, false );
             return;
     }    
     
     act( "$c1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM);
-    ch->send_to("Ты бросаешь на землю световую гранату. {WЯркая вспышка{x на мгновение ослепляет всех вокруг!\r\n");
+    ch->pecho("Ты бросаешь на землю световую гранату. {WЯркая вспышка{x на мгновение ослепляет всех вокруг!");
     gsn_vanish->improve( ch, true );
 
     //////////////// PROBABILITY CHECKS: SELF ////////////////
@@ -217,12 +217,12 @@ SKILL_RUNP( vanish )
         d.log(chance, "vis");
 
         if ( IS_SET(ch->fighting->imm_flags,IMM_LIGHT) ) {
-            ch->send_to(fmt(ch, "{W%^C1 не поддается воздействию вспышки!{x\n\r", ch->fighting));
+            ch->pecho("{W%^C1 не поддается воздействию вспышки!{x", ch->fighting);
             chance = 0;
             d.log(chance, "imm");
         }
         if ( IS_SET(ch->fighting->res_flags,RES_LIGHT) ) {
-            ch->send_to(fmt(ch, "{W%^C1 сопротивляется воздействию вспышки!{x\n\r", ch->fighting));
+            ch->pecho("{W%^C1 сопротивляется воздействию вспышки!{x", ch->fighting);
             chance = chance / 2; 
             d.log(chance, "res");
         }         
@@ -279,13 +279,13 @@ SKILL_RUNP( vanish )
     if ( number_percent() > chance ) {
             if (FightingCheck) {
                 act( "$c1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM);
-                ch->send_to("Ты пытаешься скрыться, но противник бдит, и бой продолжается!\r\n");
+                ch->pecho("Ты пытаешься скрыться, но противник бдит, и бой продолжается!");
                 return;
             }
             else {
                 // weak stun is a bitch
                 act( "$c1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM);                
-                ch->send_to("Ты пытаешься скрыться, но спотыкаешься и падаешь!\r\n");
+                ch->pecho("Ты пытаешься скрыться, но спотыкаешься и падаешь!");
                 return;                
             }    
     }
@@ -365,13 +365,13 @@ SKILL_RUNP( nerve )
     
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Только не верхом!\n\r");
+                ch->pecho("Только не верхом!");
                 return;
         }
 
         if (!gsn_nerve->usable( ch ) )
         {
-                ch->send_to("Ты не владеешь этим навыком.\n\r");
+                ch->pecho("Ты не владеешь этим навыком.");
                 return;
         }
 
@@ -380,7 +380,7 @@ SKILL_RUNP( nerve )
         if (!loc.isSet( wear_hands )
         || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
         {
-                ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
+                ch->pecho("Тебе нужна хотя бы одна рука для этой техники.");
                 return;
         }
     
@@ -397,13 +397,13 @@ SKILL_RUNP( nerve )
         {               
                 if (!FightingCheck)
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ((victim = get_char_room(ch,arg)) == 0)
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
@@ -430,13 +430,13 @@ SKILL_RUNP( nerve )
             
         if (victim == ch)
         {
-                ch->send_to("Ты трогаешь себя в нескольких неожиданных местах и довольно улыбаешься.\n\r");
+                ch->pecho("Ты трогаешь себя в нескольких неожиданных местах и довольно улыбаешься.");
                 return;
         }
             
         if(SHADOW(ch))
         {
-                ch->send_to("Твои пальцы проходят сквозь тень!\n\r");
+                ch->pecho("Твои пальцы проходят сквозь тень!");
                 act_p("$c1 пытается потрогать свою тень.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -444,7 +444,7 @@ SKILL_RUNP( nerve )
 
         if ( victim->isAffected(gsn_nerve) )
         {
-                ch->send_to("Ты не можешь сделать противника еще слабее.\n\r");
+                ch->pecho("Ты не можешь сделать противника еще слабее.");
                 return;
         }
 
@@ -506,7 +506,7 @@ SKILL_RUNP( nerve )
         }
         else
         {
-                ch->send_to("Ты нажимаешь не туда, куда надо.\n\r");
+                ch->pecho("Ты нажимаешь не туда, куда надо.");
                 act_p("$c1 нажимает пальцами на твои нервные окончания, но ничего не происходит.",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 act_p("$c1 нажимает пальцами на нервные окончания $C2, но ничего не происходит.",
@@ -558,25 +558,25 @@ SKILL_RUNP( endure )
     
   if ( MOUNTED(ch) )
   {
-        ch->send_to("Только не верхом!\n\r");
+        ch->pecho("Только не верхом!");
         return;
   }
     
   if (ch->is_npc())
   {
-        ch->send_to("Выносливость -- не твой удел.\n\r");
+        ch->pecho("Выносливость -- не твой удел.");
         return;
   }
 
   if ( gsn_endure->getEffective( ch ) <= 1 )
   {
-        ch->send_to("Тебе недоступна техника выносливости.\n\r");
+        ch->pecho("Тебе недоступна техника выносливости.");
         return;
   }
 
   if (ch->isAffected(gsn_endure))
     {
-      ch->send_to("Ты не можешь стать еще выносливее.\n\r");
+      ch->pecho("Ты не можешь стать еще выносливее.");
       return;
     }
     
@@ -743,7 +743,7 @@ SKILL_RUNP( assassinate )
     
     if ( MOUNTED(ch) )
     {
-            ch->send_to("Только не верхом!\n\r");
+            ch->pecho("Только не верхом!");
             return;
     }
     one_argument( argument, arg );
@@ -753,7 +753,7 @@ SKILL_RUNP( assassinate )
 
     if ( !ch->is_npc() && !gsn_assassinate->usable( ch ) )
     {
-            ch->send_to("Ты не имеешь понятия, как ломать шеи.\n\r");
+            ch->pecho("Ты не имеешь понятия, как ломать шеи.");
             return;
     }
 
@@ -765,19 +765,19 @@ SKILL_RUNP( assassinate )
 
     if ( arg[0] == '\0' )
     {
-            ch->send_to("Кого убиваем СЕГОДНЯ?\n\r");
+            ch->pecho("Кого убиваем СЕГОДНЯ?");
             return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-            ch->send_to("Этого нет здесь.\n\r");
+            ch->pecho("Этого нет здесь.");
             return;
     }
 
     if ( victim == ch )
     {
-            ch->send_to("Твой путь не включает в себя суицид.\n\r");
+            ch->pecho("Твой путь не включает в себя суицид.");
             return;
     }
 
@@ -786,13 +786,13 @@ SKILL_RUNP( assassinate )
 
     if ( victim->is_immortal() && !victim->is_npc() )
     {
-            ch->send_to("На Бессмертных это не подействует.\n\r");
+            ch->pecho("На Бессмертных это не подействует.");
             return;
     }
 
     if ( victim->fighting != 0 )
     {
-            ch->send_to("Подожди, пока закончится сражение.\n\r");
+            ch->pecho("Подожди, пока закончится сражение.");
             return;
     }
     
@@ -802,13 +802,13 @@ SKILL_RUNP( assassinate )
         || !loc.isSet( wear_wrist_l )
         || !loc.isSet( wear_wrist_r ))
     {
-        ch->send_to("У тебя нет рук.\r\n");
+        ch->pecho("У тебя нет рук.");
         return;
     }
 
     if (!check_bare_hands(ch))        
     {
-            ch->send_to("Освободи обе руки для этого.\n\r");
+            ch->pecho("Освободи обе руки для этого.");
             return;
     }
 
@@ -834,7 +834,7 @@ SKILL_RUNP( assassinate )
 
     if(SHADOW(ch))
     {
-            ch->send_to("Твои пальцы проходят сквозь тень!\n\r");
+            ch->pecho("Твои пальцы проходят сквозь тень!");
             act_p("$c1 пытается сломать шею своей тени.",
                     ch, 0, 0, TO_ROOM,POS_RESTING);
             return;
@@ -880,7 +880,7 @@ SKILL_RUNP( caltraps )
     
   if (ch->is_npc() || !gsn_caltraps->usable( ch ))
   {
-        ch->send_to("Ты не владеешь этим навыком.\n\r");
+        ch->pecho("Ты не владеешь этим навыком.");
         return;
   }
 
@@ -889,7 +889,7 @@ SKILL_RUNP( caltraps )
   if (!loc.isSet( wear_hands )
   || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
   {
-        ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
+        ch->pecho("Тебе нужна хотя бы одна рука для этой техники.");
         return;
   }
     
@@ -906,13 +906,13 @@ SKILL_RUNP( caltraps )
    {               
         if (!FightingCheck)
         {
-                ch->send_to("Сейчас ты не сражаешься!\n\r");
+                ch->pecho("Сейчас ты не сражаешься!");
                 return;
         }
    }
    else if ((victim = get_char_room(ch,arg)) == 0)
    {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
    }
 
@@ -939,19 +939,19 @@ SKILL_RUNP( caltraps )
       
    if (is_flying( victim ))
    {
-        ch->send_to("Твои шипы не смогут навредить летучему противнику.\n\r");
+        ch->pecho("Твои шипы не смогут навредить летучему противнику.");
         return;
    }      
 
    if (victim == ch)
    {
-        ch->send_to("Ты задумчиво колешь себя острым шипом в пятку. Ай!\n\r");
+        ch->pecho("Ты задумчиво колешь себя острым шипом в пятку. Ай!");
         return;
    }
             
    if(SHADOW(ch))
    {
-        ch->send_to("Твои шипы проходят сквозь тень!\n\r");
+        ch->pecho("Твои шипы проходят сквозь тень!");
         act_p("$c1 бросает шипы под ноги собственной тени.",
                 ch, 0, 0, TO_ROOM,POS_RESTING);
         return;
@@ -959,7 +959,7 @@ SKILL_RUNP( caltraps )
 
    if ( victim->isAffected(gsn_caltraps) )
    {
-        ch->send_to("Противник уже хромает.\n\r");
+        ch->pecho("Противник уже хромает.");
         return;
    }
 
@@ -1130,13 +1130,13 @@ SKILL_RUNP( throwdown )
     
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Только не верхом!\n\r");
+                ch->pecho("Только не верхом!");
                 return;
         }
 
         if ( ch->is_npc() || !gsn_throw->usable( ch ) )
         {
-                ch->send_to("Ты не владеешь этим навыком.\n\r");
+                ch->pecho("Ты не владеешь этим навыком.");
                 return;
         }
 
@@ -1145,7 +1145,7 @@ SKILL_RUNP( throwdown )
         if (!loc.isSet( wear_hands )
         || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
         {
-                ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
+                ch->pecho("Тебе нужна хотя бы одна рука для этой техники.");
                 return;
         }
     
@@ -1162,13 +1162,13 @@ SKILL_RUNP( throwdown )
         {               
                 if (!FightingCheck)
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ((victim = get_char_room(ch,arg)) == 0)
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
@@ -1195,19 +1195,19 @@ SKILL_RUNP( throwdown )
 
         if (is_flying( ch ))
         {
-                ch->send_to("Твои ноги должны стоять на земле для упора.\n\r");
+                ch->pecho("Твои ноги должны стоять на земле для упора.");
                 return;
         }
 
         if (victim == ch)
         {
-                ch->send_to("Ты крепко обнимаешь себя и в экстазе падаешь на землю!\n\r");
+                ch->pecho("Ты крепко обнимаешь себя и в экстазе падаешь на землю!");
                 return;
         }
             
         if(SHADOW(ch))
         {
-                ch->send_to("Твой захват проходит сквозь тень!\n\r");
+                ch->pecho("Твой захват проходит сквозь тень!");
                 act_p("$c1 пытается бросить через плечо свою тень.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -1360,13 +1360,13 @@ SKILL_RUNP( strangle )
     
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Только не верхом!\n\r");
+                ch->pecho("Только не верхом!");
                 return;
         }
 
         if ( ch->is_npc() || !gsn_strangle->usable( ch ) )
         {
-                ch->send_to("Ты не умеешь душить.\n\r");
+                ch->pecho("Ты не умеешь душить.");
                 return;
         }
 
@@ -1376,13 +1376,13 @@ SKILL_RUNP( strangle )
             || !loc.isSet( wear_wrist_l )
             || !loc.isSet( wear_wrist_r ))
         {
-            ch->send_to("У тебя нет рук.\r\n");
+            ch->pecho("У тебя нет рук.");
             return;
         }
 
         if (!check_bare_hands(ch))        
         {
-                ch->send_to("Освободи обе руки для этого.\n\r");
+                ch->pecho("Освободи обе руки для этого.");
                 return;
         }
 
@@ -1396,31 +1396,31 @@ SKILL_RUNP( strangle )
 
         if ( arg[0] == '\0' )
         {
-            ch->send_to("И кого ты хочешь придушить?\n\r");
+            ch->pecho("И кого ты хочешь придушить?");
             return;
         }
         
         if ( (victim = get_char_room(ch,arg)) == 0 )
         {
-                ch->send_to("Здесь таких нет.\n\r");
+                ch->pecho("Здесь таких нет.");
                 return;
         }
 
         if ( ch == victim )
         {
-                ch->send_to("Ты смыкаешь руки на собственной шее и удовлетворенно хрипишь.\n\r");
+                ch->pecho("Ты смыкаешь руки на собственной шее и удовлетворенно хрипишь.");
                 return;
         }
 
         if ( victim->isAffected(gsn_strangle) )
         {
-                ch->send_to("Твоя жертва уже в отключке.\n\r");                
+                ch->pecho("Твоя жертва уже в отключке.");                
                 return;
         }
 
         if ( victim->fighting != 0 )
         {
-                ch->send_to("Подожди, пока закончится сражение.\n\r");
+                ch->pecho("Подожди, пока закончится сражение.");
                 return;
         }
     
@@ -1442,7 +1442,7 @@ SKILL_RUNP( strangle )
 
         if(SHADOW(ch))
         {
-                ch->send_to("Твои пальцы проходят сквозь тень!\n\r");
+                ch->pecho("Твои пальцы проходят сквозь тень!");
                 act_p("$c1 пытается придушить собственную тень.",
                     ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
@@ -1554,13 +1554,13 @@ SKILL_RUNP( poison )
 
         if (!gsn_poison_smoke->usable( ch ))
         {
-                ch->send_to("Ты не владеешь этим навыком.\n\r");
+                ch->pecho("Ты не владеешь этим навыком.");
                 return;
         }
 
         if ( ch->mana < gsn_poison_smoke->getMana( ) )
         {
-                ch->send_to("У тебя не хватает энергии для этого.\n\r");
+                ch->pecho("У тебя не хватает энергии для этого.");
                 return;
         }
 
@@ -1570,12 +1570,12 @@ SKILL_RUNP( poison )
 
         if ( number_percent() > gsn_poison_smoke->getEffective( ch ) )
         {
-                ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+                ch->pecho("Твоя попытка закончилась неудачей.");
                 gsn_poison_smoke->improve( ch, false );
                 return;
         }
 
-        ch->send_to("Облако отравленного дыма наполнило комнату.\n\r");
+        ch->pecho("Облако отравленного дыма наполнило комнату.");
         act("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_poison_smoke->improve( ch, true );
@@ -1610,13 +1610,13 @@ SKILL_RUNP( blindness )
         
         if (!gsn_blindness_dust->usable(ch))
         {
-                ch->send_to("Ты не владеешь этим навыком.\n\r");
+                ch->pecho("Ты не владеешь этим навыком.");
                 return;
         }
 
         if (ch->mana < gsn_blindness_dust->getMana( ))
         {
-                ch->send_to("У тебя не хватает энергии для этого.\n\r");
+                ch->pecho("У тебя не хватает энергии для этого.");
                 return;
         }
 
@@ -1626,12 +1626,12 @@ SKILL_RUNP( blindness )
 
         if (number_percent() > gsn_blindness_dust->getEffective( ch ) )
         {
-                ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+                ch->pecho("Твоя попытка закончилась неудачей.");
                 gsn_blindness_dust->improve( ch, false );
                 return;
         }
 
-        ch->send_to("Облако загадочной пыли наполнило комнату.\n\r");
+        ch->pecho("Облако загадочной пыли наполнило комнату.");
         act("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_blindness_dust->improve( ch, true );

@@ -42,7 +42,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
         if (victim != ch)
             act("$E уже не спит.", ch, 0, victim, TO_CHAR);
         else
-            ch->send_to("Может, лучше бахнуть кофейку?\r\n");
+            ch->pecho("Может, лучше бахнуть кофейку?");
 
         return;
     }
@@ -74,7 +74,7 @@ VOID_SPELL(CureBlindness)::run( Character *ch, Character *victim, int sn, int le
     if ( !victim->isAffected(gsn_blindness ) )
     {
         if (victim == ch)
-          ch->send_to("Твое зрение в порядке.\n\r");
+          ch->pecho("Твое зрение в порядке.");
         else
           act("Зрение $C2 в порядке.",ch,0,victim,TO_CHAR);
         return;
@@ -145,7 +145,7 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
     else  {
-      ch->send_to("Эту молитву стоит использовать только на вещи, которые нельзя снять или бросить.\n\r");
+      ch->pecho("Эту молитву стоит использовать только на вещи, которые нельзя снять или бросить.");
       return;
     }
 }

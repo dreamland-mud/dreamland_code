@@ -145,12 +145,12 @@ CMDRUNP( prompt )
     {
         if (IS_SET(ch->comm,COMM_PROMPT))
         {
-            ch->send_to("Вывод строки состояния (prompt) выключен.\n\r");
+            ch->pecho("Вывод строки состояния (prompt) выключен.");
             REMOVE_BIT(ch->comm,COMM_PROMPT);
         }
         else
         {
-            ch->send_to("Вывод строки состояния (prompt) включен.\n\r");
+            ch->pecho("Вывод строки состояния (prompt) включен.");
             SET_BIT(ch->comm,COMM_PROMPT);
         }
         return;
@@ -163,7 +163,7 @@ CMDRUNP( prompt )
     else if (arg_is_show( argument )) {
         ch->pecho( "Текущая строка состояния:" );
         ch->desc->send( ch->prompt.c_str( ) );
-        ch->send_to( "\n\r" );
+        ch->pecho("");
         return;
     }    
     else {
@@ -175,7 +175,7 @@ CMDRUNP( prompt )
     if (!old.empty( )) {
             ch->send_to( "Предыдущая строка состояния: " );
             ch->desc->send(  old.c_str( ) );   
-               ch->send_to( "\n\r" );
+               ch->pecho("");
     }
     ch->printf("Новая строка состояния: %s\n\r",ch->prompt.c_str( ) );
 }
@@ -186,7 +186,7 @@ CMDRUNP( battleprompt )
 
    if ( argument[0] == '\0' )
    {
-      ch->send_to("Необходимо указать вид строки состояния.\nДля получения более подробной информации используй 'help prompt'\n\r");
+      ch->pecho("Необходимо указать вид строки состояния.\nДля получения более подробной информации используй 'help prompt'");
       return;
    }
 
@@ -197,7 +197,7 @@ CMDRUNP( battleprompt )
     else if (arg_is_show( argument )) {
         ch->pecho( "Текущая строка состояния в бою:" );
         ch->desc->send( ch->batle_prompt.c_str( ) );
-        ch->send_to( "\n\r" );
+        ch->pecho("");
         return;
     }    
     else {
@@ -209,7 +209,7 @@ CMDRUNP( battleprompt )
     if (!old.empty( )) {
             ch->send_to( "Предыдущая строка состояния в бою: " );
             ch->desc->send(  old.c_str( ) );   
-               ch->send_to( "\n\r" );
+               ch->pecho("");
     }
     ch->printf("Новая строка состояния в бою: %s\n\r",ch->batle_prompt.c_str( ) );
 }
@@ -524,13 +524,13 @@ CMDRUNP( compare )
     argument = one_argument( argument, arg2 );
     if ( arg1[0] == '\0' )
     {
-        ch->send_to( "Сравнить что и с чем.?\n\r");
+        ch->pecho("Сравнить что и с чем.?");
         return;
     }
 
     if ( ( obj1 = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-        ch->send_to( "У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -547,14 +547,14 @@ CMDRUNP( compare )
 
         if (obj2 == 0)
         {
-            ch->send_to("На тебе нет ничего, с чем можно было бы сравнить.\n\r");
+            ch->pecho("На тебе нет ничего, с чем можно было бы сравнить.");
             return;
         }
     }
 
     else if ( (obj2 = get_obj_carry(ch,arg2) ) == 0 )
     {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -681,7 +681,7 @@ CMDRUNP( where )
         }
 
         if (!found)
-            ch->send_to( "Никого.\n\r");
+            ch->pecho("Никого.");
     }
     else
     {
@@ -721,19 +721,19 @@ CMDRUNP( consider )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to( "Сравнить свои силы с кем?\n\r");
+        ch->pecho("Сравнить свои силы с кем?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->send_to( "Его нет здесь.\n\r");
+        ch->pecho("Его нет здесь.");
         return;
     }
 
     if (is_safe(ch,victim))
     {
-        ch->send_to("Даже не думай об этом.\n\r");
+        ch->pecho("Даже не думай об этом.");
         return;
     }
 
@@ -1207,13 +1207,13 @@ CMDRUNP( wimpy )
 
     if ( wimpy < 0 )
     {
-        ch->send_to( "Твоя отвага превосходит твою мудрость.\n\r");
+        ch->pecho("Твоя отвага превосходит твою мудрость.");
         return;
     }
 
     if ( wimpy > ch->max_hit/2 )
     {
-        ch->send_to( "Это будет слишком большим позором для тебя.\n\r");
+        ch->pecho("Это будет слишком большим позором для тебя.");
         return;
     }
 
@@ -1283,20 +1283,20 @@ CMDRUNP( password )
     
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-        ch->send_to( "Синтаксис: {lRпароль{lEpassword{lx <старый> <новый>.\n\r");
+        ch->pecho("Синтаксис: {lRпароль{lEpassword{lx <старый> <новый>.");
         return;
     }
     
     if (!password_check( ch->getPC( ), arg1 ))
     {
         ch->setWait(40 );
-        ch->send_to( "Неверный пароль. Подождите 10 секунд.\n\r");
+        ch->pecho("Неверный пароль. Подождите 10 секунд.");
         return;
     }
 
     if ( strlen(arg2) < 5 )
     {
-        ch->send_to("Новый пароль должен содержать более пяти символов.\n\r");
+        ch->pecho("Новый пароль должен содержать более пяти символов.");
         return;
     }
 
@@ -1309,14 +1309,14 @@ CMDRUNP( password )
     {
         if ( *p == '~' )
         {
-            ch->send_to("Новый пароль неприемлем, попробуй еще раз.\n\r");
+            ch->pecho("Новый пароль неприемлем, попробуй еще раз.");
             return;
         }
     }
    
     password_set( ch->getPC( ), pwdnew );
     ch->getPC( )->save( );
-    ch->send_to( "Ok.\n\r");
+    ch->pecho("Ok.");
     return;
 }
 
@@ -1329,7 +1329,7 @@ CMDRUNP( request )
 
         if ( ch->isAffected(gsn_gratitude))
         {
-                ch->send_to("Подожди немного.\n\r");
+                ch->pecho("Подожди немного.");
                 return;
         }
 
@@ -1341,19 +1341,19 @@ CMDRUNP( request )
 
         if ( arg1[0] == '\0' || arg2[0] == '\0' )
         {
-                ch->send_to( "Что и у кого ты хочешь попросить?\n\r");
+                ch->pecho("Что и у кого ты хочешь попросить?");
                 return;
         }
 
         if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
         {
-                ch->send_to( "Здесь таких нет.\n\r");
+                ch->pecho("Здесь таких нет.");
                 return;
         }
 
         if (!victim->is_npc())
         {
-                ch->send_to("На игроков такие штучки не пройдут. Просто поговори с ними!\n\r");
+                ch->pecho("На игроков такие штучки не пройдут. Просто поговори с ними!");
                 return;
         }
 
@@ -1366,7 +1366,7 @@ CMDRUNP( request )
         if (victim->getNPC()->behavior 
             && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
         {
-                ch->send_to("Хочешь -- купи!\n\r");
+                ch->pecho("Хочешь -- купи!");
                 return;
         }
 
@@ -1428,19 +1428,19 @@ CMDRUNP( request )
 
         if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
         {
-                ch->send_to( "Твои руки полны.\n\r");
+                ch->pecho("Твои руки полны.");
                 return;
         }
 
         if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
         {
-                ch->send_to( "Ты не можешь нести такой вес.\n\r");
+                ch->pecho("Ты не можешь нести такой вес.");
                 return;
         }
 
         if ( !ch->can_see( obj ) )
         {
-                ch->send_to( "Ты не видишь этого.\n\r");
+                ch->pecho("Ты не видишь этого.");
                 return;
         }
           if ( !victim->can_see( ch ) )
@@ -1461,7 +1461,7 @@ CMDRUNP( request )
 
         if ( obj->pIndexData->vnum == 520 ) // Knight's key
         {
-                ch->send_to("Извини, он не отдаст тебе это.\n\r");
+                ch->pecho("Извини, он не отдаст тебе это.");
                 return;
         }
 
@@ -1549,7 +1549,7 @@ CMDRUNP( demand )
     if (victim->getNPC()->behavior 
         && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER))) 
     {
-        ch->send_to("Хочешь -- купи!\n\r");
+        ch->pecho("Хочешь -- купи!");
         return;
     }
   
@@ -1587,13 +1587,13 @@ CMDRUNP( demand )
 
   if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
     {
-      ch->send_to( "Твои руки полны.\n\r");
+      ch->pecho("Твои руки полны.");
       return;
     }
 
   if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
     {
-      ch->send_to( "Ты не сможешь нести такую тяжесть.\n\r");
+      ch->pecho("Ты не сможешь нести такую тяжесть.");
       return;
     }
 
@@ -2397,7 +2397,7 @@ CMDRUNP( help )
                 page_to_char( help->getText( ch ).c_str( ), ch );
                 return;
             }
-            ch->send_to( "Нет подсказки по данному слову.\n\r");
+            ch->pecho("Нет подсказки по данному слову.");
             bugTracker->reportNohelp( ch, origArgument.c_str( ) );
             return;
         }
@@ -2418,7 +2418,7 @@ CMDRUNP( help )
             }
         }
         
-        ch->send_to( "Нет подсказки по данному слову.\n\r");
+        ch->pecho("Нет подсказки по данному слову.");
         bugTracker->reportNohelp( ch, origArgument.c_str( ) );
         return;
     }

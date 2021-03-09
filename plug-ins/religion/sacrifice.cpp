@@ -474,7 +474,7 @@ static bool can_sacrifice( Character *ch, Object *obj, bool needSpam )
         if (obj->item_type == ITEM_CORPSE_PC)
         {
                 if (needSpam)
-                        ch->send_to("Богам это не понравится.\n\r");
+                        ch->pecho("Богам это не понравится.");
                 return false;
         }
 
@@ -576,12 +576,12 @@ CMDRUNP( sacrifice )
         {
                 act_p( "$c1 предлагает себя в жертву богам, но они вежливо отказываются.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
-                ch->send_to("Боги оценили твою жертву и возможно примут ее позже.\n\r");
+                ch->pecho("Боги оценили твою жертву и возможно примут ее позже.");
                 return;
         }
 
         if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
-            ch->send_to("Божество не примет твою жертву в этой местности.\r\n");
+            ch->pecho("Божество не примет твою жертву в этой местности.");
             return;
         }
 
@@ -627,7 +627,7 @@ CMDRUNP( sacrifice )
                 obj = get_obj_list( ch, arg, ch->in_room->contents );
                 if ( obj == 0 )
                 {
-                        ch->send_to("Ты не находишь это.\n\r");
+                        ch->pecho("Ты не находишь это.");
                         return;
                 }
 

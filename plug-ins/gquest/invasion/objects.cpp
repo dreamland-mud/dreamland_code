@@ -56,13 +56,13 @@ bool InvasionInstrument::use( Character *ch, const char *args )
     }
     
     if (!( trgt = get_obj_room( ch, args ) )) {
-        ch->send_to("Цель не найдена.\r\n");
+        ch->pecho("Цель не найдена.");
         act("$c1 угрожающе размахивает $o5 - берегись!", ch, obj, 0, TO_ROOM);
         return true;
     }
     
     if (!trgt->behavior || !trgt->behavior.getDynamicPointer<InvasionObj>( )) {
-        ch->send_to("То, на что ты замахиваешься, не сделало тебе ничего плохого.\r\n");
+        ch->pecho("То, на что ты замахиваешься, не сделало тебе ничего плохого.");
         return true;
     }
 

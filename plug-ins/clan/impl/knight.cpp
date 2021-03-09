@@ -165,7 +165,7 @@ SKILL_RUNP(guard)
 
     if (!gsn_guard->available(ch))
     {
-        ch->send_to("Ась?\n\r");
+        ch->pecho("Ась?");
         return;
     }
 
@@ -176,13 +176,13 @@ SKILL_RUNP(guard)
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Охранять кого?\n\r");
+        ch->pecho("Охранять кого?");
         return;
     }
 
     if ((vict = get_char_room(ch, arg)) == 0)
     {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
@@ -199,7 +199,7 @@ SKILL_RUNP(guard)
     {
         if (pch->guarding == 0)
         {
-            pch->send_to("Ты не можешь охранять себя же!\n\r");
+            pch->pecho("Ты не можешь охранять себя же!");
             return;
         }
         else
@@ -211,7 +211,7 @@ SKILL_RUNP(guard)
 
     if (pch->guarding != 0)
     {
-        pch->send_to("Но ты охраняешь кого-то другого!\n\r");
+        pch->pecho("Но ты охраняешь кого-то другого!");
         return;
     }
 
@@ -235,13 +235,13 @@ SKILL_RUNP(guard)
 
     if (victim->fighting != 0)
     {
-        pch->send_to("Почему бы тебе не позволить им сперва закончить сражение?\n\r");
+        pch->pecho("Почему бы тебе не позволить им сперва закончить сражение?");
         return;
     }
 
     if (pch->fighting != 0)
     {
-        pch->send_to("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще.\n\r");
+        pch->pecho("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще.");
         return;
     }
 
@@ -390,7 +390,7 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
         sword_vnum = OBJ_VNUM_DRAGONLANCE;
     else
     {
-        ch->send_to("Какое именно {YОружие Золотого Дракона{x ты хочешь создать: меч, булаву, кинжал или пику?\r\n");
+        ch->pecho("Какое именно {YОружие Золотого Дракона{x ты хочешь создать: меч, булаву, кинжал или пику?");
         return;
     }
 
@@ -454,7 +454,7 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
         af.location = APPLY_SAVING_SPELL;
         affect_to_char(vch, &af);
 
-        vch->send_to("{YЗолотая аура{x окружает тебя.\n\r");
+        vch->pecho("{YЗолотая аура{x окружает тебя.");
         if (ch != vch)
             act("{YЗолотая аура{x окружает $C4.", ch, 0, vch, TO_CHAR);
     }
@@ -479,7 +479,7 @@ VOID_SPELL(HolyArmor)::run(Character *ch, Character *, int sn, int level)
     affect_to_char(ch, &af);
     act_p("Священные силы защищают $c4 от повреждений.",
           ch, 0, 0, TO_ROOM, POS_RESTING);
-    ch->send_to("Священные силы защищают тебя от повреждений.\n\r");
+    ch->pecho("Священные силы защищают тебя от повреждений.");
 }
 
 SPELL_DECL_T(Squire, SummonCreatureSpell);

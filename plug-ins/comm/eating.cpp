@@ -54,7 +54,7 @@ COMMAND(CEat, "eat")
 
     if (arg.empty( ))
     {
-            ch->send_to("Съесть что?\n\r");
+            ch->pecho("Съесть что?");
             return;
     }
     
@@ -67,7 +67,7 @@ COMMAND(CEat, "eat")
             return;
         }
         
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -75,14 +75,14 @@ COMMAND(CEat, "eat")
     {
             if ( obj->item_type != ITEM_FOOD && obj->item_type != ITEM_PILL )
             {
-                    ch->send_to("Это несъедобно.\n\r");
+                    ch->pecho("Это несъедобно.");
                     return;
             }
 
             if ( ch->isAffected(gsn_manacles)
                     && obj->item_type == ITEM_PILL )
             {
-                    ch->send_to("Ты не можешь принимать снадобья в кандалах.\n\r");
+                    ch->pecho("Ты не можешь принимать снадобья в кандалах.");
                     return;
             }
 
@@ -91,7 +91,7 @@ COMMAND(CEat, "eat")
                 && !ch->is_immortal( )
                 && obj->item_type == ITEM_PILL)
             {
-                ch->send_to("Ты же BattleRager, а не презренный МАГ!\n\r");
+                ch->pecho("Ты же BattleRager, а не презренный МАГ!");
                 return;
             }
 
@@ -104,7 +104,7 @@ COMMAND(CEat, "eat")
 
     if (get_wear_level(ch, obj) > ch->getRealLevel() && !ch->is_immortal() )
     {
-            ch->send_to("Тебе надо подрасти, чтобы заглотить это.\n\r");
+            ch->pecho("Тебе надо подрасти, чтобы заглотить это.");
             return;
     }
 
@@ -151,7 +151,7 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
             Affect af;
 
             act( "$c1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM);
-            ch->send_to("Ты хватаешься за горло и задыхаешься.\n\r");
+            ch->pecho("Ты хватаешься за горло и задыхаешься.");
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -169,7 +169,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     int diff, dam, gain;
     
     if (ch->fighting) {
-        ch->send_to( "Сейчас ты сражаешься - тебе не до охоты!\r\n" );
+        ch->pecho("Сейчас ты сражаешься - тебе не до охоты!");
         return;
     }
     

@@ -39,14 +39,14 @@ CMDADM( nochannel )
         DLString name = arguments.getOneArgument( );
 
         if( name.empty( ) ) {
-            ch->send_to( "Nochannel кому?\n\r" );
+            ch->pecho("Nochannel кому?");
             return;
         }
 
         pci = PCharacterManager::find( name );
         
         if (!pci) {
-            ch->send_to( "Жертва не найдена. Укажите имя правильно и полностью.\n\r" );
+            ch->pecho("Жертва не найдена. Укажите имя правильно и полностью.");
             return;
         }
 
@@ -64,13 +64,13 @@ CMDADM( nochannel )
                 attributes->eraseAttribute( "nochannel" );
                 PCharacterManager::saveMemory( pci );
 
-                ch->send_to( "NOCHANNEL снят.\n\r" );
+                ch->pecho("NOCHANNEL снят.");
                 wiznet( WIZ_PENALTIES, WIZ_SECURE, 0 , 
                         "%^C1 восстанавливает возможность общаться для %s.",
                         ch, pci->getName( ).c_str( ) );
             }
             else {
-                ch->send_to( "Не получилось.\n\r" );
+                ch->pecho("Не получилось.");
             }
         }
         else if( arguments.empty( ) )
@@ -80,7 +80,7 @@ CMDADM( nochannel )
             if (attr) 
                 ch->printf( "%s\r\n", attr->getUntilString( false ).c_str( ) );
             else
-                ch->send_to( "none\n\r" );
+                ch->pecho("none");
         }
         else
         {
@@ -93,7 +93,7 @@ CMDADM( nochannel )
             attr->start( pci );
             PCharacterManager::saveMemory(pci);
 
-            ch->send_to( "NOCHANNEL установлен.\n\r" );
+            ch->pecho("NOCHANNEL установлен.");
             
             wiznet( WIZ_PENALTIES, WIZ_SECURE, 0 , 
                     "%^C1 отбирает у %s возможность общаться.",
@@ -133,6 +133,6 @@ void XMLAttributeNoChannel::end( PCMemoryInterface *pcm ) const
     PCharacter *pch;
 
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) 
-        pch->send_to( "Боги вернули тебе возможность общаться.\n\r" );
+        pch->pecho("Боги вернули тебе возможность общаться.");
 }
 

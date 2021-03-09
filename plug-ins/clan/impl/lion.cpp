@@ -126,7 +126,7 @@ SKILL_RUNP( claw )
 
         if (!gsn_claw->available( ch ) )
         {
-            ch->send_to("Это умение тебе недоступно.\n\r");
+            ch->pecho("Это умение тебе недоступно.");
             return;
         }
 
@@ -135,13 +135,13 @@ SKILL_RUNP( claw )
 
         if ( ( victim = ch->fighting ) == 0 )
         {
-                ch->send_to("Сейчас ты не сражаешься.\n\r");
+                ch->pecho("Сейчас ты не сражаешься.");
                 return;
         }
          
         if ( victim == ch )
         {
-                ch->send_to("Ты же не хочешь и в самом деле отхватить себе голову?\n\r");
+                ch->pecho("Ты же не хочешь и в самом деле отхватить себе голову?");
                 return;
         }
 
@@ -183,7 +183,7 @@ SKILL_RUNP( claw )
 
         if ( ch->mana < gsn_claw->getMana( ) )
         {
-                ch->send_to("У тебя не хватает энергии.\n\r");
+                ch->pecho("У тебя не хватает энергии.");
                 return;
         }
     
@@ -223,7 +223,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
 
   if ( ch->isAffected(sn ) )
         {
-                ch->send_to("Ты уже трансформирова{Smлся{Sfлась{Sx во льва.\n\r");
+                ch->pecho("Ты уже трансформирова{Smлся{Sfлась{Sx во льва.");
                 return;
         }
 
@@ -308,8 +308,8 @@ VOID_SPELL(EyedSword)::run( Character *ch, char *target_name, int sn, int level 
     eyed->level = ch->getRealLevel( );
     eyed->cost = 0;
     obj_to_char( eyed, ch);
-    ch->send_to("Ты создаешь меч с ТВОИМ именем.\n\r");
-    ch->send_to("Не забудь, что ты больше не сможешь создать это оружие.\n\r");
+    ch->pecho("Ты создаешь меч с ТВОИМ именем.");
+    ch->pecho("Не забудь, что ты больше не сможешь создать это оружие.");
 }
 
 SPELL_DECL(EyesOfTiger);
@@ -317,19 +317,19 @@ VOID_SPELL(EyesOfTiger)::run( Character *ch, Character *victim, int sn, int leve
 { 
         if (DIGGED(victim))
         {
-                ch->send_to("Твой львиный глаз не может найти такого.\n\r");
+                ch->pecho("Твой львиный глаз не может найти такого.");
                 return;
         }
 
         if (victim->is_npc() || victim->getPC()->getClan() != clan_hunter)
         {
-                ch->send_to("Ты можешь следить только за Охотниками!\n\r");
+                ch->pecho("Ты можешь следить только за Охотниками!");
                 return;
         }
         
         if (is_safe_nomessage(ch,victim)) 
         {
-                ch->send_to("Твой львиный глаз не смог найти такого.\n\r");
+                ch->pecho("Твой львиный глаз не смог найти такого.");
                 return;
         }
         
@@ -410,7 +410,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
 
         if ( room->isAffected( sn ))
         {
-                ch->send_to("Это место уже защищено от мести и ловушек Охотников.\n\r");
+                ch->pecho("Это место уже защищено от мести и ловушек Охотников.");
                 return;
         }
 
@@ -423,7 +423,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
         af.bitvector.setValue(AFF_ROOM_PREVENT);
         room->affectTo( &af );
 
-        ch->send_to( "Ты защищаешь местность от ловушек Охотников и от их мести.\n\r");
+        ch->pecho("Ты защищаешь местность от ловушек Охотников и от их мести.");
         act( "$c1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM);
 }
 
