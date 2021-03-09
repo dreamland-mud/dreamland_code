@@ -367,8 +367,8 @@ SKILL_RUNP( envenom )
 
         if (number_percent() < skill)  /* success! */
         {
-            act("%1$^C1 отравляет %3$C4 смертельным ядом.",ch,obj,0,TO_ROOM);
-            act("Ты отравляешь %3$O4 смертельным ядом.",ch,obj,0,TO_CHAR);
+            act("%1$^C1 отравляет %3$C4 смертельным ядом.",ch,0,obj,TO_ROOM);
+            act("Ты отравляешь %3$O4 смертельным ядом.",ch,0,obj,TO_CHAR);
             if (!IS_SET(obj->value3(), DRINK_POISONED))
             {
                 obj->value3(obj->value3() | DRINK_POISONED);
@@ -378,7 +378,7 @@ SKILL_RUNP( envenom )
             return;
         }
 
-        act("Твоя попытка отравить %3$O4 закончилась неудачей.",ch,obj,0,TO_CHAR);
+        act("Твоя попытка отравить %3$O4 закончилась неудачей.",ch,0,obj,TO_CHAR);
         if (!IS_SET(obj->value3(), DRINK_POISONED))
             gsn_envenom->improve( ch, false );
         ch->setWait( gsn_envenom->getBeats( ) );
@@ -394,7 +394,7 @@ SKILL_RUNP( envenom )
         ||  IS_WEAPON_STAT(obj,WEAPON_FADING)	    
         ||  IS_OBJ_STAT(obj,ITEM_BLESS) )
         {
-            act("Мощные свойства %3$O2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR);
+            act("Мощные свойства %3$O2 не позволяют тебе нанести яд.",ch,0,obj,TO_CHAR);
             return;
         }
 
@@ -427,22 +427,22 @@ SKILL_RUNP( envenom )
             affect_to_obj( obj, &af);
 
             if ( !IS_AFFECTED( ch, AFF_SNEAK ) )
-              act("%1$^C1 покрывает %3$C4 смертельным ядом.",ch,obj,0,TO_ROOM);
-            act("Ты покрываешь %3$O4 смертельным ядом.",ch,obj,0,TO_CHAR);
+              act("%1$^C1 покрывает %3$C4 смертельным ядом.",ch,0,obj,TO_ROOM);
+            act("Ты покрываешь %3$O4 смертельным ядом.",ch,0,obj,TO_CHAR);
             gsn_envenom->improve( ch, true );
             ch->setWait( gsn_envenom->getBeats( ) );
             return;
         }
         else
         {
-            act("Твоя попытка отравить ядом %3$O4 закончилась неудачей.",ch,obj,0,TO_CHAR);
+            act("Твоя попытка отравить ядом %3$O4 закончилась неудачей.",ch,0,obj,TO_CHAR);
             gsn_envenom->improve( ch, false );
             ch->setWait( gsn_envenom->getBeats( ) );
             return;
         }
     }
 
-    act("Ты не можешь отравить %3$O4.",ch,obj,0,TO_CHAR);
+    act("Ты не можешь отравить %3$O4.",ch,0,obj,TO_CHAR);
     return;
 }
 
@@ -551,7 +551,7 @@ SKILL_RUNP( steal )
                         victim->position;
                         oldact_p("$c1 пытается обокрасть тебя.\n\r", ch, 0, victim,TO_VICT,POS_DEAD);
                 }
-                act("%1$^C1 пытается обокрасть %2$C4.\n\r",  ch, 0, victim,TO_NOTVICT);
+                act("%1$^C1 пытается обокрасть %2$C4.\n\r",  ch, victim, 0,TO_NOTVICT);
 
                 if( ( !victim->is_npc() ) || ( number_percent() < 25 ) )
                         set_thief( ch );
@@ -1461,7 +1461,7 @@ SKILL_RUNP( forge )
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
 	    
         if (number_percent( ) >= chance) {
-            act("Тебе не удалось точно передать рисунок бороздок %3$O2.", ch, key, 0, TO_CHAR );
+            act("Тебе не удалось точно передать рисунок бороздок %3$O2.", ch, 0, key,TO_CHAR);
             gsn_key_forgery->improve( ch, false );
             return;
         }
@@ -1481,7 +1481,7 @@ SKILL_RUNP( forge )
         obj_to_char( dup, ch );
 
         oldact("Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
-        act("%1$^C1 изготавливает %3$C4.", ch, key, 0, TO_ROOM );
+        act("%1$^C1 изготавливает %3$C4.", ch, 0, key,TO_ROOM);
 
         gsn_key_forgery->improve( ch, true );
         extract_obj( blank );
@@ -1514,13 +1514,13 @@ SKILL_RUNP( forge )
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 
 	    
         if (number_percent( ) >= chance) {
-            act("Твои попытки превратить %3$O4 в отмычку к этому замку ни к чему не привели.", ch, blank, 0, TO_CHAR );
+            act("Твои попытки превратить %3$O4 в отмычку к этому замку ни к чему не привели.", ch, 0, blank,TO_CHAR);
             gsn_key_forgery->improve( ch, false );
             return;
         }
 
         oldact("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
-        act("%1$^C1 проделывает манипуляции с %3$C5.", ch, blank, 0, TO_ROOM );
+        act("%1$^C1 проделывает манипуляции с %3$C5.", ch, 0, blank,TO_ROOM);
 
         blank->setOwner( ch->getName( ).c_str( ) );
         blank->gram_gender = Grammar::MultiGender::FEMININE;

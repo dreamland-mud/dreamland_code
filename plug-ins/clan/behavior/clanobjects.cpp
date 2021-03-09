@@ -93,7 +93,7 @@ bool ClanItem::area( )
 
 void ClanItem::actDisappear( )
 {
-    act("%3$^O1 загадочным образом исчезает.",  obj->getRoom( )->people, obj, 0, TO_ALL );
+    act("%3$^O1 загадочным образом исчезает.",  obj->getRoom( )->people, 0, obj,TO_ALL);
 }
 
 void ClanItem::get( Character *ch ) 
@@ -172,12 +172,12 @@ bool ClanAltar::fetch( Character *ch, Object *item )
 
 void ClanAltar::actAppear( )
 {
-    act("Ты видишь, как медленно появляется %3$O1.", obj->in_room->people, obj, 0, TO_ALL );
+    act("Ты видишь, как медленно появляется %3$O1.", obj->in_room->people, 0, obj,TO_ALL);
 }
 
 void ClanAltar::actDisappear( )
 {
-    act("%3$^O1 растворяется и исчезает!", obj->getRoom( )->people, obj, 0, TO_ALL );
+    act("%3$^O1 растворяется и исчезает!", obj->getRoom( )->people, 0, obj,TO_ALL);
 }
 
 void ClanAltar::actNotify( Character *ch )

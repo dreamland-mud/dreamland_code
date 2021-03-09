@@ -98,8 +98,8 @@ void QuestTrader::msgListEmpty( Character *client )
 
 void QuestTrader::msgListRequest( Character *client ) 
 {
-    act("%1$^C1 просит %2$C4 показать список вещей.", client, 0, getKeeper( ), TO_ROOM );
-    act("Ты просишь %2$C4 показать список вещей.", client, 0, getKeeper( ), TO_CHAR );
+    act("%1$^C1 просит %2$C4 показать список вещей.", client, getKeeper( ), 0,TO_ROOM);
+    act("Ты просишь %2$C4 показать список вещей.", client, getKeeper( ), 0,TO_CHAR);
 }
 
 void QuestTrader::msgListBefore( Character *client ) 
@@ -124,7 +124,7 @@ void QuestTrader::msgArticleTooFew( Character *client, Article::Pointer )
 
 void QuestTrader::msgBuyRequest( Character *client )
 {
-    act("%1$^C1 о чем-то просит %2$C4.", client, 0, getKeeper( ), TO_ROOM );
+    act("%1$^C1 о чем-то просит %2$C4.", client, getKeeper( ), 0,TO_ROOM);
 }
 
 /*----------------------------------------------------------------------------
@@ -298,8 +298,8 @@ void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 {
     client->perm_stat[STAT_CON]++;
 
-    act("%2$^C1 повышает сложение %1$C2.", client, 0, questman, TO_ROOM );
-    act("%2$^C1 повышает твое сложение.", client, 0, questman, TO_CHAR );
+    act("%2$^C1 повышает сложение %1$C2.", client, questman, 0,TO_ROOM);
+    act("%2$^C1 повышает твое сложение.", client, questman, 0,TO_CHAR);
 }
     
 bool ConQuestArticle::available( Character *client, NPCharacter *questman ) const 
@@ -506,8 +506,8 @@ void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 {
     client->wearloc.set( wear_ears );
     
-    act("%2$^C1 делает дырку в голове %1$C2.",client,0,tattoer,TO_ROOM);
-    act("%2$^C1 делает тебе дырку в голове.",client,0,tattoer,TO_CHAR);
+    act("%2$^C1 делает дырку в голове %1$C2.",client,tattoer,0,TO_ROOM);
+    act("%2$^C1 делает тебе дырку в голове.",client,tattoer,0,TO_CHAR);
 }
 
 bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) const 

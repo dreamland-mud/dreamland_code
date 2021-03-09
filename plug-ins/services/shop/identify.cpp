@@ -55,7 +55,7 @@ CMDRUN( identify )
 
 
     if (ch->is_immortal( )) {
-        act("%^C1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT);
+        act("%^C1 смотрит на тебя!\n\r", rch, ch, obj,TO_VICT);
     }
     else if (!can_afford(ch, cost, 0, 1)) {
         tell_fmt("У тебя даже %3$d золот%3$Iого|ых|ых нету, чтобы мне заплатить!", ch, rch, cost );
@@ -66,7 +66,7 @@ CMDRUN( identify )
        if ( cost > 0 ) ch->pecho("Твой кошелек становится значительно легче.");
     }
 
-    act("%1$^C1 изучающе смотрит на %3$C4.", rch, obj, 0, TO_ROOM);
+    act("%1$^C1 изучающе смотрит на %3$C4.", rch, 0, obj,TO_ROOM);
     
     if (gsn_identify->getSpell( ))
         gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );

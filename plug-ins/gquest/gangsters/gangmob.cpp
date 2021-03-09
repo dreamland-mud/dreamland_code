@@ -168,19 +168,19 @@ void GangMember::bribe( Character *briber, int gold, int silver )
     if (confessed || amount / 100 < number_range( b, b + 50 ) || number_percent( ) < 50) {
         switch (number_range( 1, 3 )) {
         case 1: 
-            act("%^C1 громко вопит '{gПытаешься подкупить меня, щенок?!{x'", ch, 0, briber, TO_ROOM);
+            act("%^C1 громко вопит '{gПытаешься подкупить меня, щенок?!{x'", ch, briber, 0,TO_ROOM);
             interpret_raw(ch, "murder", briber->getNameP( ));
             break;
         case 2:
-            act("%1$^C1 произносит '{gПлакали твои денежки, %2$C1!{x'", ch, 0, briber, TO_ROOM);
-            act("%^C1 мерзко ухмыляется.", ch, 0, 0, TO_ROOM);
+            act("%1$^C1 произносит '{gПлакали твои денежки, %2$C1!{x'", ch, briber, 0,TO_ROOM);
+            act("%^C1 мерзко ухмыляется.", ch, 0, 0,TO_ROOM);
             break;
         case 3:
             for (int j = 0; j < 2; j++)
                 for (int i = 0; i < DIR_SOMEWHERE; i++)
                     if (ch->in_room->exit[i]) {
                         if (!j)
-                            act("%^C1 потирает руки и удаляется в сторону ближайшей таверны.", ch, 0, 0, TO_ROOM);
+                            act("%^C1 потирает руки и удаляется в сторону ближайшей таверны.", ch, 0, 0,TO_ROOM);
                         move_char(ch, i, "slink");
                         break;
                     }
@@ -189,9 +189,9 @@ void GangMember::bribe( Character *briber, int gold, int silver )
         }
     }
     else {
-        act("%^C1 тяжко вздыхает.", ch, 0, 0, TO_ROOM);
-        act("%^C1 произносит '{gУговорил, красноречивый.. Я открою тебе тайну!{x'", ch, 0, 0, TO_ROOM);
-        act("%1$^C1 что-то говорит на ухо %2$C3.", ch, 0, briber, TO_NOTVICT);        
+        act("%^C1 тяжко вздыхает.", ch, 0, 0,TO_ROOM);
+        act("%^C1 произносит '{gУговорил, красноречивый.. Я открою тебе тайну!{x'", ch, 0, 0,TO_ROOM);
+        act("%1$^C1 что-то говорит на ухо %2$C3.", ch, briber, 0,TO_NOTVICT);        
         oldact_p("$c1 говорит тебе '{GВход в логово я видел около $t. Но больше мне ничего не известно.{x'",
                ch, gquest->lairHint( ).c_str( ), briber, TO_VICT, POS_RESTING);
         
@@ -215,7 +215,7 @@ void GangMember::greet( Character *mob )
             oldact("$c1 произносит '{g$C1, ну че ты за мной ходишь, влюбил$Gось|ся|ась?{x'", ch, 0, mob, TO_ROOM);
             break;
         case 2:
-            act("%^C1 произносит '{gО господи, это опять ты?{x'", ch, 0, 0, TO_ROOM);
+            act("%^C1 произносит '{gО господи, это опять ты?{x'", ch, 0, 0,TO_ROOM);
             break;
         case 3:
             oldact("$c1 рычит '{g$C1, как же ты меня доста$Gло|л|ла!{x'", ch, 0, mob, TO_ROOM);
@@ -232,10 +232,10 @@ void GangMember::greet( Character *mob )
         if (ch->getRealLevel( ) > mob->getRealLevel( ) && ch->can_see( mob )) {
             switch (number_range(1, 2)) {
             case 1:
-                act("%^C1 произносит '{gЧертов фараон! Сейчас я тебе покажу!{x'", ch, 0, 0, TO_ROOM);
+                act("%^C1 произносит '{gЧертов фараон! Сейчас я тебе покажу!{x'", ch, 0, 0,TO_ROOM);
                 break;
             case 2:
-                act("%^C1 произносит '{gМент поганый! Получай!{x'", ch, 0, 0, TO_ROOM);
+                act("%^C1 произносит '{gМент поганый! Получай!{x'", ch, 0, 0,TO_ROOM);
                 break;
             }
             multi_hit( ch, mob );
@@ -243,10 +243,10 @@ void GangMember::greet( Character *mob )
             if (ch->can_see( mob )) {
                 switch (number_range(1, 2)) {
                 case 1:
-                    act("%^C1 бормочет '{gОппа.. менты.. менты{x'", ch, 0, 0, TO_ROOM);
+                    act("%^C1 бормочет '{gОппа.. менты.. менты{x'", ch, 0, 0,TO_ROOM);
                     break;
                 case 2:
-                    act("%1$^C1 дрожит от страха перед %2$C5", ch, 0, mob, TO_ROOM);
+                    act("%1$^C1 дрожит от страха перед %2$C5", ch, mob, 0,TO_ROOM);
                     break;
                 }
             }
@@ -333,7 +333,7 @@ void GangMember::fight( Character *victim )
     if (ch->hit < ch->max_hit / 4) {
         switch (number_range(1, 7)) {
         case 1: 
-            act("%^C1 вопит '{gMamma mia!{x'", ch, 0, 0, TO_ROOM); 
+            act("%^C1 вопит '{gMamma mia!{x'", ch, 0, 0,TO_ROOM); 
             break;
         case 2:
             interpret(ch, "curse"); 
@@ -345,7 +345,7 @@ void GangMember::fight( Character *victim )
             interpret_fmt(ch, "cramp %s", victim->getNameP( ));
             break;
         case 5:
-            act("%^C1 вопит '{gПомогите! Хулиганы зрения лишают!{x'", ch, 0, 0, TO_ROOM); 
+            act("%^C1 вопит '{gПомогите! Хулиганы зрения лишают!{x'", ch, 0, 0,TO_ROOM); 
             break;
         }
 
@@ -376,11 +376,11 @@ bool GangMember::death( Character *killer )
                     ch, 0, killer, TO_VICT, POS_RESTING );
 
             if (IS_GOOD( killer ))
-                act("%^C1 хрипит '{gТолько сейчас я понял, как неправильно жил.. Я раскаиваюсь и перед смертью открою тебе тайну.{x'", ch, 0, killer, TO_VICT);
+                act("%^C1 хрипит '{gТолько сейчас я понял, как неправильно жил.. Я раскаиваюсь и перед смертью открою тебе тайну.{x'", ch, killer, 0,TO_VICT);
             else if (IS_EVIL( killer ))
-                act("%^C1 хрипит '{gБратан, передай от меня привет шефу!{x'", ch, 0, killer, TO_VICT);
+                act("%^C1 хрипит '{gБратан, передай от меня привет шефу!{x'", ch, killer, 0,TO_VICT);
             else 
-                act("%^C1 хрипит '{gЭх, все равно помирать.. Так слушай же..{x'", ch, 0, killer, TO_VICT);
+                act("%^C1 хрипит '{gЭх, все равно помирать.. Так слушай же..{x'", ch, killer, 0,TO_VICT);
 
             oldact_p("$c1 хрипит '{gВход в логово найдешь неподалеку от $t..{x'",
                    ch, gquest->lairHint( ).c_str( ), killer, TO_VICT, POS_RESTING );
@@ -398,15 +398,15 @@ bool GangMember::death( Character *killer )
         }
         else {
             switch (number_range( 1, 3 )) {
-            case 1: act("%^C1 хрипит '{gМне крышка...{x'", ch, 0, 0, TO_ROOM); break;
-            case 2: act("%^C1 хрипит '{gКонец моим мучениям...{x'", ch, 0, 0, TO_ROOM); break;
-            case 3: act("%^C1 хрипит '{gЭта напасть доконала меня..{x'", ch, 0, 0, TO_ROOM); break;
+            case 1: act("%^C1 хрипит '{gМне крышка...{x'", ch, 0, 0,TO_ROOM); break;
+            case 2: act("%^C1 хрипит '{gКонец моим мучениям...{x'", ch, 0, 0,TO_ROOM); break;
+            case 3: act("%^C1 хрипит '{gЭта напасть доконала меня..{x'", ch, 0, 0,TO_ROOM); break;
             }
         }                
     } else {
         switch(number_range(1, 2)) {
-        case 1: act("%1$^C1 хрипит '{g%2$C1, тебе незнакомо понятие чести...{x'", ch, 0, killer, TO_ROOM); break;
-        case 2: act("%1$^C1 хрипит '{gЯ не должен был умереть от твоей руки, %2$C1..{x'", ch, 0, killer, TO_ROOM); break;    
+        case 1: act("%1$^C1 хрипит '{g%2$C1, тебе незнакомо понятие чести...{x'", ch, killer, 0,TO_ROOM); break;
+        case 2: act("%1$^C1 хрипит '{gЯ не должен был умереть от твоей руки, %2$C1..{x'", ch, killer, 0,TO_ROOM); break;    
         }
     }
     
@@ -436,7 +436,7 @@ bool GangMember::eatKey( )
     for (obj = ch->carrying; obj; obj = obj->next_content)
         if (obj->pIndexData->vnum == GangstersInfo::getThis( )->vnumKey) {
             extract_obj( obj );
-            act("%^C1 выхватывает из кармана ключ и съедает его!", ch, 0, 0, TO_ROOM);
+            act("%^C1 выхватывает из кармана ключ и съедает его!", ch, 0, 0,TO_ROOM);
             return true;
         }
     

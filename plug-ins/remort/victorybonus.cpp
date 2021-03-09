@@ -62,19 +62,19 @@ void Koschey::msgListEmpty( Character *client )
 void Koschey::msgListAfter( Character *client )
 {
     tell_dim( client, ch, "Это все. Бери то, за чем приш$gло|ел|ла, и чтоб духу твоего здесь не было!" );
-    act("%2$^C1 что-то монотонно цедит сквозь зубы, обращаясь к %1$C4.", client, 0, ch, TO_NOTVICT );
+    act("%2$^C1 что-то монотонно цедит сквозь зубы, обращаясь к %1$C4.", client, ch, 0,TO_NOTVICT);
 }
 
 void Koschey::msgListBefore( Character *client )
 {
-    act("%2$^C1 поднимает на тебя раздраженный взгляд.", client, 0, ch, TO_CHAR );
-    act("%2$^C1 поднимает на %1$C4 раздраженный взгляд.", client, 0, ch, TO_ROOM );
-    act("%2$^C1 скрипучим голосом произносит '{gВот какое счастье тебе привалило:{x'", client, 0, ch, TO_CHAR );
+    act("%2$^C1 поднимает на тебя раздраженный взгляд.", client, ch, 0,TO_CHAR);
+    act("%2$^C1 поднимает на %1$C4 раздраженный взгляд.", client, ch, 0,TO_ROOM);
+    act("%2$^C1 скрипучим голосом произносит '{gВот какое счастье тебе привалило:{x'", client, ch, 0,TO_CHAR);
 }
 
 void Koschey::msgBuyRequest( Character *client )
 {
-    act("%1$^C1 торгуется с %2$C5.", client, 0, ch, TO_NOTVICT );
+    act("%1$^C1 торгуется с %2$C5.", client, ch, 0,TO_NOTVICT);
 }
 
 void Koschey::msgArticleNotFound( Character *client )

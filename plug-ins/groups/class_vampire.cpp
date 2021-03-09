@@ -169,7 +169,7 @@ void VampiricBiteOneHit::postDamageEffects( )
         affect_join( victim, &af );	
 	    
     	oldact_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
-    	act("Рана от твоих клыков на шее %2$C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
+    	act("Рана от твоих клыков на шее %2$C2 начинает гноиться.", ch, victim, 0,TO_CHAR);	    
     }
     }
 
@@ -312,8 +312,8 @@ SKILL_RUNP( dominate )
   victim->master = victim->leader = ch;
 
   if ( ch != victim ) {
-        act("%2$^C1 смотрит на тебя с покорностью.",ch,0,victim,TO_CHAR);
-  	act("%^C1 подчиняет тебя своей воле.", ch, 0, victim, TO_VICT);
+        act("%2$^C1 смотрит на тебя с покорностью.",ch,victim,0,TO_CHAR);
+  	act("%^C1 подчиняет тебя своей воле.", ch, victim, 0,TO_VICT);
   }
 	
   return;
@@ -389,18 +389,18 @@ SKILL_RUNP( dig )
     ch->setWait( gsn_digging->getBeats( )  );
 
     if (number_percent( ) > chance) {
-        act("%^C1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM);
-        act("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR);
+        act("%^C1 предпринимает попытку закопать себя.", ch, 0, 0,TO_ROOM);
+        act("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0,TO_CHAR);
         gsn_digging->improve( ch, false );
         return;
     }
 
-    act("%^C1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0, TO_ROOM);
-    act("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами.", ch, 0, 0, TO_CHAR);
+    act("%^C1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0,TO_ROOM);
+    act("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами.", ch, 0, 0,TO_CHAR);
     gsn_digging->improve( ch, true );
 
     if (number_percent( ) < 2) 
-        act("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0, TO_ALL);
+        act("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0,TO_ALL);
     
     ch->dismount( );
     char_from_room( ch );
@@ -528,8 +528,8 @@ void sucking( Character *ch, Character *victim )
     ch->setWait( gsn_vampiric_bite->getBeats( )  );
                      
     oldact_p("Сквозь кошмарный сон ты чувствуешь, как $c1 высасывает твою {rкровь{x.", ch, 0, victim, TO_VICT, POS_DEAD);
-    act("Ты высасываешь {rкровь{x из шеи %2$C2.", ch, 0, victim, TO_CHAR);
-    act("%1$^C1 высасывает {rкровь{x из шеи %2$C2.", ch, 0, victim, TO_NOTVICT);
+    act("Ты высасываешь {rкровь{x из шеи %2$C2.", ch, victim, 0,TO_CHAR);
+    act("%1$^C1 высасывает {rкровь{x из шеи %2$C2.", ch, victim, 0,TO_NOTVICT);
     
     if (!ch->is_npc( )) {
 	Object *tattoo = get_eq_char(ch, wear_tattoo);
@@ -556,7 +556,7 @@ void sucking( Character *ch, Character *victim )
 	mana_gain = std::min( slevel * 5, (int)victim->max_hit );
     }	    
     else {
-	act("Ты с отвращением глотаешь кровь %2$C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR);	    
+	act("Ты с отвращением глотаешь кровь %2$C2, {cхолодную{x как сердца разработчиков.", ch, victim, 0,TO_CHAR);	    
 	hp_gain = std::min( slevel * 1, (int)victim->max_hit ); 
 	mana_gain = std::min( slevel * 1, (int)victim->max_hit );	    
     }
@@ -591,7 +591,7 @@ void sucking( Character *ch, Character *victim )
 		else {
     			oldact_p("Ты стонешь во сне, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);			
 		}
-		act("Рана от твоих клыков на шее %2$C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
+		act("Рана от твоих клыков на шее %2$C2 начинает гноиться.", ch, victim, 0,TO_CHAR);	    
     	}	    
         victim->position = POS_SLEEPING;
                                
@@ -1024,14 +1024,14 @@ SKILL_RUNP( bloodlet )
     dam = ch->getModifyLevel( );
     
     if (number_percent( ) < chance) {
-        act("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0, TO_CHAR);
-        act("%^C1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0, TO_ROOM);
+        act("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0,TO_CHAR);
+        act("%^C1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0,TO_ROOM);
         ch->getPC( )->desires[desire_bloodlust] = 0;
         gsn_bloodlet->improve( ch, true );
 
     } else {
         oldact("Упс! Кажется, ты потеря$gло|л|ла СЛИШКОМ много крови!", ch, 0, 0, TO_CHAR);
-        act("%^C1 слишком сильно ранит свою руку и не может остановить кровь.", ch, 0, 0, TO_ROOM);
+        act("%^C1 слишком сильно ранит свою руку и не может остановить кровь.", ch, 0, 0,TO_ROOM);
         ch->getPC( )->desires[desire_bloodlust] = -6;
         dam *= 2;
         gsn_bloodlet->improve( ch, false );
@@ -1161,8 +1161,8 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
     if (!victim)
         return false;
     
-    act("Твоя тень падает на могилу...", victim, 0, 0, TO_CHAR);
-    act("Тень %C2 падает на могилу...", victim, 0, 0, TO_ROOM);
+    act("Твоя тень падает на могилу...", victim, 0, 0,TO_CHAR);
+    act("Тень %C2 падает на могилу...", victim, 0, 0,TO_ROOM);
     
     undig( ch );
     ch->position = POS_STANDING;
@@ -1171,9 +1171,9 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         BonedaggerOneHit bd( ch, victim );
         
         if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
-            act("%^C1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT);
-            act("%1$^C1 костяным ножом промахивается мимо тени %2$C2!", ch, 0, victim, TO_NOTVICT);
-            act("Ты костяным ножом промахиваешься мимо тени %2$C2!", ch, 0, victim, TO_CHAR);
+            act("%^C1 костяным ножом промахивается мимо твоей тени!", ch, victim, 0,TO_VICT);
+            act("%1$^C1 костяным ножом промахивается мимо тени %2$C2!", ch, victim, 0,TO_NOTVICT);
+            act("Ты костяным ножом промахиваешься мимо тени %2$C2!", ch, victim, 0,TO_CHAR);
             
             gsn_bonedagger->improve( ch, false, victim );
             bd.miss( );
@@ -1182,9 +1182,9 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         
         gsn_bonedagger->improve( ch, true, victim );
         
-        act("%^C1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT);
-        act("%1$^C1 приковывает тень %2$C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT);
-        act("Ты приковываешь тень %2$C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR);
+        act("%^C1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, victim, 0,TO_VICT);
+        act("%1$^C1 приковывает тень %2$C2 костяным ножом к земле!", ch, victim, 0,TO_NOTVICT);
+        act("Ты приковываешь тень %2$C2 костяным ножом к земле!", ch, victim, 0,TO_CHAR);
 
         af.type = gsn_bonedagger;
         af.level = ch->getModifyLevel( );
@@ -1279,9 +1279,9 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
         return;
     }
 	
-    act("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0, TO_ALL);
+    act("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0,TO_ALL);
     oldact("На зов $c2 слетается стая летучих мышей и окружает $s живым облаком.", ch, 0, 0, TO_ROOM);
-    act("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR);
+    act("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0,TO_CHAR);
 
     af.type            = sn;
     af.level            = level;
@@ -1301,8 +1301,8 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
 	    return false;
 
     if ( (actor->getProfession( ) != prof_vampire) && (number_percent() < 20) ) {
-        act("%1$^C1 одаривает %2$C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
-        act("%^C1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
+        act("%1$^C1 одаривает %2$C4 равнодушным холодным взглядом.", ch, actor, 0,TO_NOTVICT);
+        act("%^C1 одаривает тебя равнодушным холодным взглядом.", ch, actor, 0,TO_VICT);
         return false;
     }
 	    
@@ -1311,8 +1311,8 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
 		return false;
 	}
 	else  {
-        	act("%1$^C1 с отвращением смотрит на ужимки %2$C2.", ch, 0, actor, TO_NOTVICT );
-        	act("%^C1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
+        	act("%1$^C1 с отвращением смотрит на ужимки %2$C2.", ch, actor, 0,TO_NOTVICT);
+        	act("%^C1 с отвращением смотрит на твои ужимки.", ch, actor, 0,TO_VICT);
         	say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );	    
         	return false;		
 	}
@@ -1342,8 +1342,8 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
     pActor->addQuestPoints(-50);
     data.learned = 100;
 
-    act("%2$^C1 делится секретом бессмертия с %1$C5.", actor, 0, ch, TO_ROOM );
-    act("%2$^C1 делится с тобой секретом бессмертия.", actor, 0, ch, TO_CHAR );
+    act("%2$^C1 делится секретом бессмертия с %1$C5.", actor, ch, 0,TO_ROOM);
+    act("%2$^C1 делится с тобой секретом бессмертия.", actor, ch, 0,TO_CHAR);
     oldact_p("{BМолнии сверкают на небе.{x", actor, 0, ch, TO_ALL, POS_SLEEPING );
     return true;
 }

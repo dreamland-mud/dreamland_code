@@ -51,16 +51,16 @@ CMDRUN( attract )
     }
 
     if (!vch->is_npc( ) || ch->is_npc( )) {
-        act("%^C1 машет руками, пытаясь привлечь твое внимание.", ch, 0, vch, TO_VICT);
-        act("Ты машешь руками, пытаясь привлечь внимание %2$C2.", ch, 0, vch, TO_CHAR);
-        act("%1$^C1 машет руками, пытаясь привлечь внимание %2$C2.", ch, 0, vch, TO_NOTVICT);
+        act("%^C1 машет руками, пытаясь привлечь твое внимание.", ch, vch, 0,TO_VICT);
+        act("Ты машешь руками, пытаясь привлечь внимание %2$C2.", ch, vch, 0,TO_CHAR);
+        act("%1$^C1 машет руками, пытаясь привлечь внимание %2$C2.", ch, vch, 0,TO_NOTVICT);
         return;
     }
     
     target = vch->getNPC( );
     occupation = (target->behavior ? target->behavior->getOccupation( ) : OCC_NONE);
 
-    act("Ты просишь %2$C4 обратить на тебя внимание.", ch, 0, target, TO_CHAR);
+    act("Ты просишь %2$C4 обратить на тебя внимание.", ch, target, 0,TO_CHAR);
     oldact("$c1 просит $C4 обратить на $x внимание.", ch, 0, target, TO_NOTVICT);
     oldact("$c1 просит тебя обратить на $x внимание.", ch, 0, target, TO_VICT);
 
@@ -69,9 +69,9 @@ CMDRUN( attract )
         return;
     }
     
-    act("%2$^C1 поворачивается в твою сторону.", ch, 0, target, TO_CHAR);
-    act("%2$^C1 поворачивается к %1$C3.", ch, 0, target, TO_NOTVICT);
-    act("Ты поворачиваешься к %C3.", ch, 0, target, TO_VICT);
+    act("%2$^C1 поворачивается в твою сторону.", ch, target, 0,TO_CHAR);
+    act("%2$^C1 поворачивается к %1$C3.", ch, target, 0,TO_NOTVICT);
+    act("Ты поворачиваешься к %C3.", ch, target, 0,TO_VICT);
 
     attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeAttract>( "attract" );
     attr->addTarget( target, occupation );

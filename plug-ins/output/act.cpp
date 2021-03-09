@@ -116,7 +116,7 @@ void oldact_p( const char *format, Character *ch, const void *arg1,
     ch->echo( min_pos, type, vch, fmt.c_str(), ch, arg1, arg2 );    
 }
 
-void act(const char *format, Character *ch, const void *arg1, Character *vict, int type)
+void act(const char *format, Character *ch, Character *vict, const void *arg1, int type)
 {
     if (!ch || format == 0 || !format[0]) 
         return;
@@ -124,7 +124,7 @@ void act(const char *format, Character *ch, const void *arg1, Character *vict, i
     ch->echo(POS_RESTING, type, vict, format, ch, vict, arg1);
 }
 
-void act(const char *format, Character *ch, const void *arg1, Object *obj, int type)
+void act(const char *format, Character *ch, Object *obj, const void *arg1, int type)
 {
     if (!ch || format == 0 || !format[0]) 
         return;
@@ -132,7 +132,7 @@ void act(const char *format, Character *ch, const void *arg1, Object *obj, int t
     ch->echo(POS_RESTING, type, 0, format, ch, obj, arg1);
 }
 
-void act(const char *format, Character *ch, const void *arg1, int noop, int type)
+void act(const char *format, Character *ch, int noop, const void *arg1, int type)
 {
     if (!ch || format == 0 || !format[0]) 
         return;

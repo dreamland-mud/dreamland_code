@@ -42,8 +42,8 @@ bool is_safe(Character *ch, Character *victim)
         return false;
 
     if (ch && victim) {
-        act("%2$^C1 находится под защитой богов.",ch,0,victim,TO_CHAR);
-        act("Боги защитили %2$C4 от %1$C2.",ch,0,victim,TO_ROOM);
+        act("%2$^C1 находится под защитой богов.",ch,victim,0,TO_CHAR);
+        act("Боги защитили %2$C4 от %1$C2.",ch,victim,0,TO_ROOM);
 
         if (victim->fighting == ch) 
             stop_fighting (victim, false);
@@ -213,8 +213,8 @@ bool is_safe_rspell( short level, Character *victim, bool verbose )
         rc = false;
 
     if (rc && verbose) {
-        act("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
-        act("Боги защищают %C4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+        act("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0,TO_CHAR);
+        act("Боги защищают %C4 от заклинаний в этой местности.", victim, 0, 0,TO_ROOM);
     }
 
     return rc;
@@ -229,8 +229,8 @@ bool is_safe_rspell( Affect *paf, Character *victim, bool verbose )
 
     bool rc = is_safe_nomessage(pafOwner, victim);
     if (rc && verbose) {
-        act("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
-        act("Боги защищают %C4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+        act("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0,TO_CHAR);
+        act("Боги защищают %C4 от заклинаний в этой местности.", victim, 0, 0,TO_ROOM);
     }
 
     return rc;

@@ -46,7 +46,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
         int hpch;
 
         act("Ты призываешь на помощь могущественную силу дракона.", ch,0,0,TO_CHAR);
-        act("Дыхание %C2 приобретает силу дракона.", ch,0,victim,TO_ROOM);
+        act("Дыхание %C2 приобретает силу дракона.", ch,victim,0,TO_ROOM);
         act("Ты дышишь дыханием Повелителя Драконов.", ch,0,0,TO_CHAR);
 
         hpch = max( 10, (int)ch->hit );

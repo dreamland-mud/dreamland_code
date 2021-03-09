@@ -49,8 +49,8 @@
  */
 void Excalibur::wear( Character *ch )
 {
-  act("%3$^O1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR);
-  act("%3$^O1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM);
+  act("%3$^O1 загорается ослепительно-белым светом.", ch,0,obj,TO_CHAR);
+  act("%3$^O1 загорается ослепительно-белым светом.", ch,0,obj,TO_ROOM);
   
 }
 
@@ -69,8 +69,8 @@ void Excalibur::equip( Character *ch )
 
 void Excalibur::remove( Character *ch )
 {
-  act("Пылающая аура вокруг %3$O2 исчезает.",ch,obj,0,TO_CHAR);
-  act("Пылающая аура вокруг %3$O2 исчезает.",ch,obj,0,TO_ROOM);
+  act("Пылающая аура вокруг %3$O2 исчезает.",ch,0,obj,TO_CHAR);
+  act("Пылающая аура вокруг %3$O2 исчезает.",ch,0,obj,TO_ROOM);
 }
 
 bool Excalibur::death( Character *ch )
@@ -79,7 +79,7 @@ bool Excalibur::death( Character *ch )
         return false;
 
     oldact_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_CHAR,POS_DEAD);
-    act("%3$^O1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
+    act("%3$^O1 начинает светиться голубым пламенем.", ch,0,obj,TO_ROOM);
     ch->hit = ch->max_hit;
     ch->pecho("Ты чувствуешь себя намного лучше.");
     act("%^C1 выглядит намного лучше.",ch,0,0,TO_ROOM);
@@ -200,7 +200,7 @@ void TwoSnakeWhip::remove( Character *ch )
 
 void TwoSnakeWhip::get( Character *ch )
 {
-  act("Тебе кажется, будто змеи на хлысте пошевелились.",ch,obj,0,TO_CHAR);
+  act("Тебе кажется, будто змеи на хлысте пошевелились.",ch,0,obj,TO_CHAR);
 }
 
 void TwoSnakeWhip::fight( Character *ch )
@@ -245,9 +245,9 @@ void Thunderbolt::fight( Character *ch )
 
         switch(number_bits(6)) {
         case 0:
-            act("Разряд молнии выстреливает из твоего оружия и поражает %2$C4!", ch, 0, victim, TO_CHAR);
-            act("Разряд молнии конденсируется на оружии %C2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
-            act("Разряд молнии конденсируется на оружии %1$C2, и выстреливает в сторону %2$C2!", ch, 0, victim, TO_NOTVICT);
+            act("Разряд молнии выстреливает из твоего оружия и поражает %2$C4!", ch, victim, 0,TO_CHAR);
+            act("Разряд молнии конденсируется на оружии %C2 и выстреливает в твою сторону!", ch, victim, 0,TO_VICT);
+            act("Разряд молнии конденсируется на оружии %1$C2, и выстреливает в сторону %2$C2!", ch, victim, 0,TO_NOTVICT);
 
             dam = dice(level,4) + 12;
             if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_PRAYER) )
@@ -350,9 +350,9 @@ int dam;
   if ( number_percent() < 15 )  {
         dam = number_percent()/2 + 5 * ch->getModifyLevel();
 
-        act("Твой щит обжигает лицо %2$C3!", ch, 0, ch->fighting, TO_CHAR);
-        act("Щит %1$C2 обжигает лицо %2$C3!", ch, 0, ch->fighting, TO_NOTVICT);
-        act("Щит %2$C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
+        act("Твой щит обжигает лицо %2$C3!", ch, ch->fighting, 0,TO_CHAR);
+        act("Щит %1$C2 обжигает лицо %2$C3!", ch, ch->fighting, 0,TO_NOTVICT);
+        act("Щит %2$C2 обжигает твое лицо!", ch->fighting, ch, 0,TO_CHAR);
 
         damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level,dam, TARGET_CHAR );
@@ -378,9 +378,9 @@ void DemonfireShield::remove( Character *ch )
 void FlyingBoots::wear( Character *ch )
 {
     if (!ch->isAffected(gsn_fly)) {
-        act("Ты обуваешь %3$O4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
-        act("Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
-        act("%^C1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
+        act("Ты обуваешь %3$O4, и твои ноги медленно отрываются от земли.", ch, 0, obj,TO_CHAR);
+        act("Ты поднимаешься в воздух.", ch, 0, 0,TO_CHAR);
+        act("%^C1 поднимается в воздух.", ch, 0, 0,TO_ROOM);
     }
 }
 void FlyingBoots::equip( Character *ch )
@@ -406,8 +406,8 @@ void FlyingBoots::remove( Character *ch )
         return;
     
     affect_strip(ch, gsn_fly);
-    act("Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0, TO_CHAR );
-    act("%^C1 падает на землю.", ch, 0, 0, TO_ROOM );
+    act("Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0,TO_CHAR);
+    act("%^C1 падает на землю.", ch, 0, 0,TO_ROOM);
 }
 
 
@@ -420,7 +420,7 @@ void GiantStrengthArmor::wear( Character *ch )
 {
     oldact("Ты чувствуешь, как становишься гораздо сильнее!\r\n"
          "Твои мышцы разбухают до внушительных размеров.", ch, obj, 0, TO_CHAR );
-    act("Мышцы %C2 дрожат от избытка силы!", ch, 0, 0, TO_ROOM );
+    act("Мышцы %C2 дрожат от избытка силы!", ch, 0, 0,TO_ROOM);
 }
 void GiantStrengthArmor::equip( Character *ch )
 {
@@ -441,8 +441,8 @@ void GiantStrengthArmor::remove( Character *ch )
     if (ch->isAffected(gsn_giant_strength))
     {
         affect_strip(ch, gsn_giant_strength);
-        act("Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
-        act("Мышцы %C2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
+        act("Твои мышцы съеживаются до обычного состояния.", ch, 0, 0,TO_CHAR);
+        act("Мышцы %C2 съеживаются до обычного состояния.", ch, 0, 0,TO_ROOM);
     }
 }
 

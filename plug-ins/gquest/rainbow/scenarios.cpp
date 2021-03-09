@@ -159,16 +159,16 @@ void RainbowDefaultScenario::onQuestFinish( PCharacter *ch ) const
     af.modifier = 0;
     affect_join(ch, &af);
     
-    act("Ты поднимаешь к небу ладони, полные разноцветных осколков.", ch, 0, 0, TO_CHAR);
-    act("%^C1 поднимает ладони к небу.", ch, 0, 0, TO_ROOM);
-    act("\r\n{YР{Rа{Mд{Gу{Bж{Cн{Rы{Mй{W столп света ударяет в {Cнебо!{x", ch, 0, 0, TO_ALL);
-    act("\r\nТебя окружают {Yр{Rа{Mз{Gн{Bо{Cц{Rв{Mе{Gт{Cн{Yы{Rе{x вихри!", ch, 0, 0, TO_CHAR);
-    act("\r\n{YР{Rа{Mз{Gн{Bо{Cц{Rв{Mе{Gт{Cн{Yы{Rе{x вихри окружают %C4!", ch, 0, 0, TO_ROOM);
+    act("Ты поднимаешь к небу ладони, полные разноцветных осколков.", ch, 0, 0,TO_CHAR);
+    act("%^C1 поднимает ладони к небу.", ch, 0, 0,TO_ROOM);
+    act("\r\n{YР{Rа{Mд{Gу{Bж{Cн{Rы{Mй{W столп света ударяет в {Cнебо!{x", ch, 0, 0,TO_ALL);
+    act("\r\nТебя окружают {Yр{Rа{Mз{Gн{Bо{Cц{Rв{Mе{Gт{Cн{Yы{Rе{x вихри!", ch, 0, 0,TO_CHAR);
+    act("\r\n{YР{Rа{Mз{Gн{Bо{Cц{Rв{Mе{Gт{Cн{Yы{Rе{x вихри окружают %C4!", ch, 0, 0,TO_ROOM);
 }  
 
 void RainbowDefaultScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) const
 {
-    act("%^C1 достает откуда-то цветной булыжник и отламывает от него кусочек.", mob, 0, hero, TO_ROOM);
+    act("%^C1 достает откуда-то цветной булыжник и отламывает от него кусочек.", mob, hero, 0,TO_ROOM);
 }
 
 void RainbowDefaultScenario::dressItem( Object *obj, int number ) const
@@ -240,16 +240,16 @@ void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const
     affect_join(ch, &af);
    
     ch->pecho("\r\nИз дымки появляется cекретарша Ада и произносит '{rТы приня%Gто|т|та!{x'.", ch);
-    act("\r\nИз дымки появляется секретарша Ада и что-то говорит %C3.", ch, 0, 0, TO_ROOM );
+    act("\r\nИз дымки появляется секретарша Ада и что-то говорит %C3.", ch, 0, 0,TO_ROOM);
 
-    act("\r\nТебя окутывает демоническая мантия!", ch, 0, 0, TO_CHAR);
-    act("\r\nДемоническая мантия окутывает %C4!", ch, 0, 0, TO_ROOM);
+    act("\r\nТебя окутывает демоническая мантия!", ch, 0, 0,TO_CHAR);
+    act("\r\nДемоническая мантия окутывает %C4!", ch, 0, 0,TO_ROOM);
 }  
 
 void RainbowSinsScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) const
 {
-    act("%1$^C1 понимающе ухмыляется, узнав в %2$C6 достойного преемника.", mob, 0, hero, TO_NOTVICT);
-    act("%^C1 понимающе ухмыляется, узнав в тебе достойного преемника.", mob, 0, hero, TO_VICT);
+    act("%1$^C1 понимающе ухмыляется, узнав в %2$C6 достойного преемника.", mob, hero, 0,TO_NOTVICT);
+    act("%^C1 понимающе ухмыляется, узнав в тебе достойного преемника.", mob, hero, 0,TO_VICT);
 }
 
 bool RainbowSinsScenario::checkMobile( NPCharacter *ch ) const

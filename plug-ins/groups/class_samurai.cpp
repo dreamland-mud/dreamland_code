@@ -83,7 +83,7 @@ SKILL_RUNP( enchant )
     if (wear_level > ch->getRealLevel( ))
     {
         ch->pecho("Ты долж%Gно|ен|на достичь %d уровня, чтобы улучшить это.", ch, wear_level );
-        act("%1$^C1 пытается улучшить %3$C1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 пытается улучшить %3$C1, но это слишком сложно.", ch, 0, obj,TO_ROOM);
         return;
     }
     
@@ -164,8 +164,8 @@ SKILL_RUNP( explode )
 
     ch->mana -= mana;
 
-    act("%^C1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
-    act("%^C1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
+    act("%^C1 поджигает что-то.",ch,victim,0,TO_NOTVICT);
+    act("%^C1 поджигает что-то взрывчатое под тобой!", ch,victim,0,TO_VICT);
     act("Пусть все сгорит!",ch,0,0,TO_CHAR);
 
     ch->setWait( gsn_explode->getBeats( ) );
@@ -281,7 +281,7 @@ SKILL_RUNP( target )
   ch->setWait( gsn_target->getBeats( ) );
 
     if (victim == ch->fighting) {
-        act("Ты и так наносишь большинство своих атак %2$C3.", ch, 0, victim, TO_CHAR);
+        act("Ты и так наносишь большинство своих атак %2$C3.", ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -295,8 +295,8 @@ SKILL_RUNP( target )
     ch->fighting = victim;
 
     oldact("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
-    act("Ты меняешь свою цель на %2$C4!",ch,0,victim,TO_CHAR);
-    act("%^C1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
+    act("Ты меняешь свою цель на %2$C4!",ch,victim,0,TO_CHAR);
+    act("%^C1 меняет свою цель на тебя!",ch,victim,0,TO_VICT);
       return;
     }
 
@@ -478,15 +478,15 @@ SKILL_RUNP( katana )
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
         
-                act("Ты делаешь катану из %3$O2!",ch,part,0,TO_CHAR);
-                act("%1$^C1 делает катану из %3$C2!",ch,part,0,TO_ROOM);
+                act("Ты делаешь катану из %3$O2!",ch,0,part,TO_CHAR);
+                act("%1$^C1 делает катану из %3$C2!",ch,0,part,TO_ROOM);
         
                 extract_obj(part);
                 return;
         }
         else
         {
-                act("Ты понапрасну изводишь %3$O4.",ch,part,0,TO_CHAR);
+                act("Ты понапрасну изводишь %3$O4.",ch,0,part,TO_CHAR);
                 extract_obj(part);
                 ch->mana -= mana / 2;
                 gsn_katana->improve( ch, false );
@@ -561,15 +561,15 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
 
     victim->getPC( )->death -= 1;
 
-    act("%2$^C1 забирает смерть у %1$C5.", victim, 0, ch, TO_ROOM );
-    act("%2$^C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
+    act("%2$^C1 забирает смерть у %1$C5.", victim, ch, 0,TO_ROOM);
+    act("%2$^C1 забирает у тебя смерть.", victim, ch, 0,TO_CHAR);
     oldact_p("{BМолнии сверкают на небе.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
 }
 
 void SamuraiGuildmaster::giveBack( Character *victim, Object *obj )
 {
     oldact("$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    act("%1$^C1 возвращает тебе %3$C4.", ch, obj, victim, TO_VICT );
+    act("%1$^C1 возвращает тебе %3$C4.", ch, victim, obj,TO_VICT);
 
     obj_from_char( obj );
     obj_to_char( obj, victim );
@@ -656,7 +656,7 @@ void OwnedKatana::get( Character *ch )
     return;
   }
 
-  act("%3$^O1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
+  act("%3$^O1 выпадает из твоих рук.", ch, 0, obj,TO_CHAR);
   oldact("$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
 
   obj_from_char( obj );

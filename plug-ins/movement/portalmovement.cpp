@@ -122,7 +122,7 @@ int PortalMovement::move( )
 
 void PortalMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    act("Ты следуешь за %2$C5.", fch, 0, wch, TO_CHAR );
+    act("Ты следуешь за %2$C5.", fch, wch, 0,TO_CHAR);
     PortalMovement( fch, portal ).moveRecursive( );
 }
 
@@ -229,7 +229,7 @@ bool PortalMovement::applySpellbane( Character *wch )
         return true;
     
     try {
-        act("Магия %3$O2 аннигилирует с твоим спеллбаном!", wch,portal,0,TO_CHAR);
+        act("Магия %3$O2 аннигилирует с твоим спеллбаном!", wch,0,portal,TO_CHAR);
         oldact("Магия $o2 аннигилирует со спеллбаном $c2!", wch,portal,0,TO_ROOM);
         SkillDamage( wch, wch, gsn_spellbane, DAM_NEGATIVE, wch->max_hit / 3, DAMF_MAGIC ).hit( true );
         interpret_raw( wch, "cb", "Меня ударило магическим порталом!" );

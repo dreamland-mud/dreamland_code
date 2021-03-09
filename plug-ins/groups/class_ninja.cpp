@@ -193,7 +193,7 @@ SKILL_RUNP( vanish )
             return;
     }    
     
-    act("%^C1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM);
+    act("%^C1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0,TO_ROOM);
     ch->pecho("Ты бросаешь на землю световую гранату. {WЯркая вспышка{x на мгновение ослепляет всех вокруг!");
     gsn_vanish->improve( ch, true );
 
@@ -278,13 +278,13 @@ SKILL_RUNP( vanish )
     
     if ( number_percent() > chance ) {
             if (FightingCheck) {
-                act("%^C1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM);
+                act("%^C1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0,TO_ROOM);
                 ch->pecho("Ты пытаешься скрыться, но противник бдит, и бой продолжается!");
                 return;
             }
             else {
                 // weak stun is a bitch
-                act("%^C1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM);                
+                act("%^C1 пытается скрыться, но спотыкается и падает!", ch, 0, 0,TO_ROOM);                
                 ch->pecho("Ты пытаешься скрыться, но спотыкаешься и падаешь!");
                 return;                
             }    
@@ -299,9 +299,9 @@ SKILL_RUNP( vanish )
     }    
     else {   
             // trying to kidnap
-            act("%1$^C1 пытается взять %2$C4 в охапку!", ch, 0, victim, TO_NOTVICT);
-            act("Ты пытаешься взять %2$C4 в охапку.",   ch, 0, victim, TO_CHAR);
-            act("%^C1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
+            act("%1$^C1 пытается взять %2$C4 в охапку!", ch, victim, 0,TO_NOTVICT);
+            act("Ты пытаешься взять %2$C4 в охапку.",   ch, victim, 0,TO_CHAR);
+            act("%^C1 пытается взять тебя в охапку!", ch, victim, 0,TO_VICT);
 
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
@@ -325,9 +325,9 @@ SKILL_RUNP( vanish )
             }
             else {
                     // kidnap failed, victim escaped               
-                    act("%2$^C1 успевает вырваться из объятий %1$C2!", ch, 0, victim, TO_NOTVICT);
-                    act("%2$^C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR);
-                    act("Ты умудряешься вырваться из объятий %C2", ch, 0, victim, TO_VICT);
+                    act("%2$^C1 успевает вырваться из объятий %1$C2!", ch, victim, 0,TO_NOTVICT);
+                    act("%2$^C1 успевает вырваться из твоих объятий!",   ch, victim, 0,TO_CHAR);
+                    act("Ты умудряешься вырваться из объятий %C2", ch, victim, 0,TO_VICT);
 
                     transfer_char( ch, ch, pRoomIndex,
                         "%1$^C1 внезапно исчезает!",
@@ -414,7 +414,7 @@ SKILL_RUNP( nerve )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но %2$C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                act("Но %2$C1 твой друг!!!",ch,victim,0,TO_CHAR);
                 return;
         }
 
@@ -499,9 +499,9 @@ SKILL_RUNP( nerve )
         if ( ch->is_npc() || number_percent() < (int) chance )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
-                act("Ты ослабляешь %2$C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
-                act("%^C1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
-                act("%1$^C1 ослабляет %2$C4",ch,0,victim,TO_NOTVICT);
+                act("Ты ослабляешь %2$C4, пережимая нервные окончания.",ch,victim,0,TO_CHAR);
+                act("%^C1 ослабляет тебя, пережимая твои нервные окончания.",ch,victim,0,TO_VICT);
+                act("%1$^C1 ослабляет %2$C4",ch,victim,0,TO_NOTVICT);
                 gsn_nerve->improve( ch, true, victim );
         }
         else
@@ -607,7 +607,7 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 
     affect_to_char(ch,&af);
 
-    act("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0, TO_CHAR);
+    act("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0,TO_CHAR);
     act("%^C1 мгновенно концентрируется, готовясь к столкновению с магией.", ch,0,0,TO_ROOM);
     return true;
 }
@@ -705,8 +705,8 @@ void AssassinateOneHit::calcDamage( )
     Chance mychance(ch, (int) chance, 100);
 
     if (mychance.reroll()) {
-        act("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x %2$C3!",ch,0,victim,TO_CHAR);
-        act("%1$^C1 {R+++ ЛОМАЕТ ШЕЮ +++{x %2$C3!",ch,0,victim,TO_NOTVICT);
+        act("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x %2$C3!",ch,victim,0,TO_CHAR);
+        act("%1$^C1 {R+++ ЛОМАЕТ ШЕЮ +++{x %2$C3!",ch,victim,0,TO_NOTVICT);
         oldact_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
@@ -923,7 +923,7 @@ SKILL_RUNP( caltraps )
 
    if (IS_CHARMED(ch) && ch->master == victim)
    {
-        act("Но %2$C1 твой друг!!!",ch,0,victim,TO_CHAR);
+        act("Но %2$C1 твой друг!!!",ch,victim,0,TO_CHAR);
         return;
    }
 
@@ -1068,8 +1068,8 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             todex.modifier = mod/2;
             affect_to_char( victim, &todex);
 
-            act("Острые шипы вонзаются в ступни %2$C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR);
-            act("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT);
+            act("Острые шипы вонзаются в ступни %2$C2, стесняя движения и вызывая хромоту.",ch,victim,0,TO_CHAR);
+            act("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,victim,0,TO_VICT);
         }
     } catch (const VictimDeathException &) {
     }
@@ -1179,7 +1179,7 @@ SKILL_RUNP( throwdown )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но %2$C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                act("Но %2$C1 твой друг!!!",ch,victim,0,TO_CHAR);
                 return;
         }
 
@@ -1299,9 +1299,9 @@ SKILL_RUNP( throwdown )
                 }    
             }
             else {
-                act("Ты бросаешь %2$C4 через плечо.", ch,0,victim,TO_CHAR);
-                act("%^C1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
-                act("%1$^C1 бросает %2$C4 через плечо.", ch,0,victim,TO_NOTVICT);
+                act("Ты бросаешь %2$C4 через плечо.", ch,victim,0,TO_CHAR);
+                act("%^C1 бросает тебя через плечо.", ch,victim,0,TO_VICT);
+                act("%1$^C1 бросает %2$C4 через плечо.", ch,victim,0,TO_NOTVICT);
                 victim->position = POS_RESTING;
             }        
 
@@ -1317,9 +1317,9 @@ SKILL_RUNP( throwdown )
         }
         else
         {
-            act("Твой бросок не удался.", ch, 0, 0, TO_CHAR);
-            act("%2$^C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
-            act("%1$^C1 пытается ухватиться за %2$C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
+            act("Твой бросок не удался.", ch, 0, 0,TO_CHAR);
+            act("%2$^C1 пытается бросить тебя, но терпит неудачу.", victim, ch, 0,TO_CHAR);
+            act("%1$^C1 пытается ухватиться за %2$C4 поудобнее, но терпит неудачу.", ch, victim, 0,TO_NOTVICT);
             gsn_throw->improve( ch, false, victim );
         }
 

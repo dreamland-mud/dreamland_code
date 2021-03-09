@@ -65,8 +65,8 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     bool fExpReward, fScrollGiven;
     DLString arg = args.getOneArgument( );
 
-    act("%1$^C1 информирует %2$C4 о выполнении задания.",client,0,ch,TO_ROOM);
-    act("Ты информируешь %2$C4 о выполнении задания.",client,0,ch,TO_CHAR);
+    act("%1$^C1 информирует %2$C4 о выполнении задания.",client,ch,0,TO_ROOM);
+    act("Ты информируешь %2$C4 о выполнении задания.",client,ch,0,TO_CHAR);
 
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
@@ -209,8 +209,8 @@ void Questor::doFind( PCharacter *client )
     ostringstream buf;
     Quest::Pointer quest;
     
-    act("%1$^C1 просит помощи у %2$C2.",client,0,ch,TO_ROOM);
-    act("Ты просишь помощи у %2$C2.",client,0,ch,TO_CHAR);
+    act("%1$^C1 просит помощи у %2$C2.",client,ch,0,TO_ROOM);
+    act("Ты просишь помощи у %2$C2.",client,ch,0,TO_CHAR);
 
     quest = client->getAttributes( ).findAttr<Quest>( "quest" );
 
@@ -416,11 +416,11 @@ bool QuestScrollBehavior::examine( Character *ch )
     bool extract = true;
     
     if (!isOwner( ch )) {
-        act("Знания, заключенные в %3$O6, недоступны тебе.", ch, obj, 0, TO_CHAR);
+        act("Знания, заключенные в %3$O6, недоступны тебе.", ch, 0, obj,TO_CHAR);
         return true;
     }
     
-    act("Ты внимательно изучаешь знаки на %3$O6.", ch, obj, 0, TO_CHAR);
+    act("Ты внимательно изучаешь знаки на %3$O6.", ch, 0, obj,TO_CHAR);
     
     for (s = skills.begin( ); s != skills.end( ); s++) {
         if (s->second <= 0)
@@ -457,7 +457,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
     ch->send_to( buf );
     if(extract) {
-        act("Чернила меркнут, и %3$O1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
+        act("Чернила меркнут, и %3$O1 рассыпается трухой.", ch, 0, obj,TO_CHAR);
         extract_obj( obj );
     }
     return true;
@@ -478,11 +478,11 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     DLString descr;
     
     if (arg.empty() || arg_is_list(arg)) {
-        act("%1$^C1 просит %2$C4 показать список заданий.",client, 0, ch, TO_ROOM);
-        act("Ты просишь %2$C4 показать список заданий.",client, 0, ch, TO_CHAR);
+        act("%1$^C1 просит %2$C4 показать список заданий.",client, ch, 0,TO_ROOM);
+        act("Ты просишь %2$C4 показать список заданий.",client, ch, 0,TO_CHAR);
     } else {
         oldact("$c1 просит $C4 дать $m задание.", client, 0, ch, TO_ROOM);
-        act("Ты просишь %2$C4 дать тебе задание.", client, 0, ch, TO_CHAR);
+        act("Ты просишь %2$C4 дать тебе задание.", client, ch, 0,TO_CHAR);
     }
 
     if (client->getAttributes( ).isAvailable( "quest" )) {

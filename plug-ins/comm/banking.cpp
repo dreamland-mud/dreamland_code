@@ -268,7 +268,7 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     if (victim != ch) 
         victim->send_to( vbuf );
 
-    act("%^C1 производит банковские операции.", ch, 0, 0, TO_ROOM );
+    act("%^C1 производит банковские операции.", ch, 0, 0,TO_ROOM);
 }
 
 /*------------------------------------------------------------------------

@@ -109,7 +109,7 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE)) {
         if (victim == ch)
-            act("{MРозовая аура{x уже окружает тебя.", ch, 0, 0, TO_CHAR);
+            act("{MРозовая аура{x уже окружает тебя.", ch, 0, 0,TO_CHAR);
         else
             oldact("$C1 уже окруже$Gно|н|на {Mрозовой аурой{x.", ch, 0, victim, TO_CHAR);
         return;
@@ -163,7 +163,7 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
           }
 
         oldact("$c1 обнаруже$gно|н|на!", ich, 0, 0, TO_ROOM);
-        act("Тебя обнаружили!", ich, 0, 0, TO_CHAR);
+        act("Тебя обнаружили!", ich, 0, 0,TO_CHAR);
     }
 }
 

@@ -485,7 +485,7 @@ int ExitsMovement::adjustMovetype( Character *wch )
 
 void ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    act("Ты следуешь за %2$C5.", fch, 0, wch, TO_CHAR );
+    act("Ты следуешь за %2$C5.", fch, wch, 0,TO_CHAR);
 
     if (peexit)
         ExitsMovement( fch, peexit, movetype ).moveRecursive( ); 

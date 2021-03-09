@@ -40,18 +40,18 @@ CMDRUN( mlove )
         Character *victim;
 
         if (IS_CHARMED(ch)) {
-            act("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
-            act("%^C1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
+            act("... но сердцу не прикажешь.", ch, 0, 0,TO_CHAR);  
+            act("%^C1 ухмыляется - сердцу не прикажешь.", ch, ch->master, 0,TO_VICT);
             return;
         }
 
         if (arguments.empty( )) {
             if (ch->getSex( ) == SEX_MALE)
-                act("Ты никак не можешь определиться: куда совать жетон?", ch, 0, 0, TO_CHAR);
+                act("Ты никак не можешь определиться: куда совать жетон?", ch, 0, 0,TO_CHAR);
             else 
-                act("Куда пойти, куда податься.. кого найти, кому отдаться?", ch, 0, 0, TO_CHAR);
+                act("Куда пойти, куда податься.. кого найти, кому отдаться?", ch, 0, 0,TO_CHAR);
 
-            act("%^C1 гоняется с похотливым видом за всеми в комнате..берегись!", ch, 0, 0, TO_ROOM);
+            act("%^C1 гоняется с похотливым видом за всеми в комнате..берегись!", ch, 0, 0,TO_ROOM);
             return;
         }
         
@@ -74,11 +74,11 @@ CMDRUN( mlove )
 
         if (ch->position == POS_FIGHTING) {
             if (ch->getSex( ) == SEX_MALE)
-                act("Быстро спрячь, пока не отрезали!", ch, 0, 0, TO_CHAR);
+                act("Быстро спрячь, пока не отрезали!", ch, 0, 0,TO_CHAR);
             else 
-                act("Эй, не отвлекайся!", ch, 0, 0, TO_CHAR);
+                act("Эй, не отвлекайся!", ch, 0, 0,TO_CHAR);
             
-            act("%^C1 торжественно произносит: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM);
+            act("%^C1 торжественно произносит: '{gMake love, not war!{x'", ch, 0, 0,TO_ROOM);
             return;
         }
 
@@ -111,7 +111,7 @@ CMDRUN( mlove )
             victim->move -= victim->move / 4;
 
             oldact("Ты срываешь с $C2 одежду и страстно занимаешься с $Y любовью.", ch, 0, victim, TO_CHAR);
-            act("%^C1 срывает с тебя одежду и страстно занимается с тобой любовью. Ах, да! Еще, еще!", ch, 0, victim, TO_VICT);
+            act("%^C1 срывает с тебя одежду и страстно занимается с тобой любовью. Ах, да! Еще, еще!", ch, victim, 0,TO_VICT);
             oldact("$c1 срывает с $C2 одежду и страстно занимается с $Y любовью.", ch, 0, victim, TO_NOTVICT);
             
             MLOVE_DAZE(victim);

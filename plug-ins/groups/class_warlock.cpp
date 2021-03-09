@@ -125,8 +125,8 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
                 ch, 0, victim, TO_CHAR, POS_RESTING);
         victim->pecho("Тебя {RУБИЛИ{x!");
 
-        act("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
-        act("%^C2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
+        act("Тебя больше не существует!\n\r", victim, 0, 0,TO_CHAR);
+        act("%^C2 больше не существует!\n\r", victim, 0, 0,TO_ROOM);
 
         victim->pecho("{YБожественные Силы возвращают тебя к жизни!{x");
         
@@ -209,7 +209,7 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
         af.duration = level / 20;
         affect_to_char(victim, &af );
         if (ch != victim)
-            act("Ты создаешь изолирующий магию экран вокруг %2$C2.", ch, 0, victim, TO_CHAR);
+            act("Ты создаешь изолирующий магию экран вокруг %2$C2.", ch, victim, 0,TO_CHAR);
         victim->pecho("Вокруг тебя внезапно воздвигается экран, изолирующий магию!");
     }
     else {
@@ -220,7 +220,7 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
 
         victim->pecho("Изолирующий магию экран вокруг тебя усиливается!");
         if (ch != victim)
-            act("Изолирующий магию экран вокруг %2$C2 усиливается.", ch, 0, victim, TO_CHAR);
+            act("Изолирующий магию экран вокруг %2$C2 усиливается.", ch, victim, 0,TO_CHAR);
     }
 }
 
@@ -397,7 +397,7 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
     }
     else if (!ch->is_immortal( )) {
         ch->pecho("Щит молний, оберегающий это место, блокирует тебя.");
-        act("%2$^C1 приближается к тебе.",vch,0,ch,TO_CHAR);
+        act("%2$^C1 приближается к тебе.",vch,ch,0,TO_CHAR);
         interpret_raw( vch, "wake" );
 
         if (!is_safe_rspell(paf->level,ch)) {

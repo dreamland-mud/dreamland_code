@@ -14,12 +14,12 @@
 void ValentinePrise::wear( Character *ch ) 
 {
     if (msgChar.getValue( ).empty( ))
-        act("{CАура {Rлюбви{C окружает тебя.{x", ch, obj, 0, TO_CHAR);
+        act("{CАура {Rлюбви{C окружает тебя.{x", ch, 0, obj,TO_CHAR);
     else
         oldact(msgChar.getValue( ).c_str( ), ch, obj, 0, TO_CHAR);
 
     if (msgRoom.getValue( ).empty( ))
-        act("{CАура {Rлюбви{C окружает %C4.{x", ch, obj, 0, TO_ROOM);
+        act("{CАура {Rлюбви{C окружает %C4.{x", ch, 0, obj,TO_ROOM);
     else
         oldact(msgRoom.getValue( ).c_str( ), ch, obj, 0, TO_ROOM);
 

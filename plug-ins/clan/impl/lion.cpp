@@ -58,7 +58,7 @@ void ClanGuardLion::actGreet( PCharacter *wch )
 }
 void ClanGuardLion::actPush( PCharacter *wch )
 {
-    act("%2$^C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности.", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности.", wch, ch, 0,TO_CHAR);
     oldact("$C1, глядя на $c4, выпускает когти, и $c1 сматывает удочки.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardLion::getCast( Character *victim )
@@ -150,7 +150,7 @@ SKILL_RUNP( claw )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но ведь %2$C1 твой друг!",ch,0,victim,TO_CHAR);
+                act("Но ведь %2$C1 твой друг!",ch,victim,0,TO_CHAR);
                 return;
         }
    
@@ -265,8 +265,8 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
  */
 void LionEyedSword::wear( Character *ch )
 {
-    act("Глаза %3$O2 открываются.",ch,obj,0,TO_CHAR);
-    act("Глаза %3$O2 открываются.",ch,obj,0,TO_ROOM);
+    act("Глаза %3$O2 открываются.",ch,0,obj,TO_CHAR);
+    act("Глаза %3$O2 открываются.",ch,0,obj,TO_ROOM);
 
 }
 void LionEyedSword::equip( Character *ch )
@@ -367,8 +367,8 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
-  act("Ты создаешь %3$O4!",ch,shield,0,TO_CHAR);
-  act("%1$^C1 создает %3$C4!",ch,shield,0,TO_ROOM);
+  act("Ты создаешь %3$O4!",ch,0,shield,TO_CHAR);
+  act("%1$^C1 создает %3$C4!",ch,0,shield,TO_ROOM);
 
 }
 

@@ -208,8 +208,8 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
                 return;
         }
         
-        act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет %C4.", victim, 0, 0, TO_ROOM);
-        act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет тебя.", victim, 0, 0, TO_CHAR);
+        act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет %C4.", victim, 0, 0,TO_ROOM);
+        act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет тебя.", victim, 0, 0,TO_CHAR);
         dam = dice( level , 14 );
 
         damage_nocatch(ch,victim,dam,sn,DAM_OTHER,true, DAMF_PRAYER);
@@ -242,7 +242,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_MAGIC) )
     {
         if (ch != victim)
-            act("Рука умертвия пытается схватить %2$C4, но безуспешно.", ch, 0, victim, TO_CHAR);
+            act("Рука умертвия пытается схватить %2$C4, но безуспешно.", ch, victim, 0,TO_CHAR);
         oldact("Ты на мгновение почувствова$gло|л|ла озноб.", victim, 0, 0, TO_CHAR);
         return;
     }
@@ -266,7 +266,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     }
     
     victim->pecho("Ты чувствуешь, как жизнь ускользает от тебя!");
-    act("Непостижимая Рука Умертвия хватает %2$C4!", ch,0,victim,TO_NOTVICT);
+    act("Непостижимая Рука Умертвия хватает %2$C4!", ch,victim,0,TO_NOTVICT);
     damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_MAGIC);
 }
 
@@ -329,10 +329,10 @@ VOID_SPELL(MagicMissile)::run( Character *ch, Character *victim, int sn, int lev
     int dam;
 
     if (victim->isAffected(gsn_shield ))  {
-        act("Твоя волшебная стрела исчезает, не достигнув цели.", ch, 0, victim, TO_CHAR);
+        act("Твоя волшебная стрела исчезает, не достигнув цели.", ch, victim, 0,TO_CHAR);
 
         if (victim != ch)
-            act("Твой щит блокирует волшебную стрелу %C2.", ch, 0, victim, TO_VICT);
+            act("Твой щит блокирует волшебную стрелу %C2.", ch, victim, 0,TO_VICT);
 
         return;
     }

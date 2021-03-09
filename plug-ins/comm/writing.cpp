@@ -46,12 +46,12 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     Object *nail;
 
     if (wall->item_type != ITEM_PARCHMENT) {
-        act("Тебе не удастся ничего нацарапать на %3$O6.", ch, wall, 0, TO_CHAR);
+        act("Тебе не удастся ничего нацарапать на %3$O6.", ch, 0, wall,TO_CHAR);
         return;
     }
 
     if (wall->can_wear(ITEM_TAKE)) {
-        act("Подними %3$O4 с земли, а потом пиши.", ch, wall, 0, TO_CHAR);
+        act("Подними %3$O4 с земли, а потом пиши.", ch, 0, wall,TO_CHAR);
         return;
     }
     
@@ -61,7 +61,7 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     }
 
     if (arguments.empty( )) {
-        act("Что именно ты хочешь выцарапать на %3$O6?", ch, wall, 0, TO_CHAR);
+        act("Что именно ты хочешь выцарапать на %3$O6?", ch, 0, wall,TO_CHAR);
         return;
     }
 
@@ -80,16 +80,16 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     }
     else if (cmd == "-" && ch->is_immortal( )) {
         if (ed && lineDel( ed )) {
-            act("Ты отшкрябываешь последнюю строчку с %3$O2.", ch, wall, 0, TO_CHAR );
-            act("%1$^C1 скребет %3$C4.", ch, wall, 0, TO_ROOM );
+            act("Ты отшкрябываешь последнюю строчку с %3$O2.", ch, 0, wall,TO_CHAR);
+            act("%1$^C1 скребет %3$C4.", ch, 0, wall,TO_ROOM);
         }
         else
-            act("%3$^O1 девственно чист(а) - удалять нечего.", ch, wall, 0, TO_CHAR );
+            act("%3$^O1 девственно чист(а) - удалять нечего.", ch, 0, wall,TO_CHAR);
     }
     else if (cmd == "clear" && ch->is_immortal( )) {
         descFree( wall, wall->getName( ) );
-        act("Ты тщательно отшкрябываешь все надписи с %3$O2.", ch, wall, 0, TO_CHAR );
-        act("%1$^C1 тщательно отшкрябывает все надписи с %3$C2.", ch, wall, 0, TO_ROOM );
+        act("Ты тщательно отшкрябываешь все надписи с %3$O2.", ch, 0, wall,TO_CHAR);
+        act("%1$^C1 тщательно отшкрябывает все надписи с %3$C2.", ch, 0, wall,TO_ROOM);
     }                
     else
         usage( ch );
@@ -106,7 +106,7 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
     }
 
     if (arguments.empty( )) {
-        act("Что именно ты хочешь записать на %3$O4?", ch, paper, 0, TO_CHAR);
+        act("Что именно ты хочешь записать на %3$O4?", ch, 0, paper,TO_CHAR);
         return;
     }
     
@@ -128,7 +128,7 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
         descFree( paper, keyword );
         
         if (keyword == paper->getName( ))
-            act("Ты стираешь все надписи с лицевой стороны %3$O2.", ch, paper, 0, TO_CHAR );
+            act("Ты стираешь все надписи с лицевой стороны %3$O2.", ch, 0, paper,TO_CHAR);
         else
             oldact("Ты стираешь с $o2 все, что касается '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
 
@@ -144,18 +144,18 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
         lineAdd( ed, arguments );
         
         if (keyword == paper->getName( ))
-            act("Ты делаешь запись на %3$O6.", ch, paper, 0, TO_CHAR );
+            act("Ты делаешь запись на %3$O6.", ch, 0, paper,TO_CHAR);
         else
             oldact("Ты делаешь запись на $o6 в раздел '$T'", ch, paper, keyword.c_str( ), TO_CHAR );
     }
     else if (cmd == "-") {
         if (ed && lineDel( ed ))
             if (keyword == paper->getName( ))
-                act("Ты удаляешь последнюю строку с %3$O2.", ch, paper, 0, TO_CHAR );
+                act("Ты удаляешь последнюю строку с %3$O2.", ch, 0, paper,TO_CHAR);
             else
                 oldact("Ты удаляешь последнюю строку с $o2 в разделе '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
         else
-            act("Удалять с %3$O2 больше нечего.", ch, paper, 0, TO_CHAR );
+            act("Удалять с %3$O2 больше нечего.", ch, 0, paper,TO_CHAR);
     }
 }
 

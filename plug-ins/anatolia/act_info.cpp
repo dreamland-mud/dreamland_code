@@ -1359,7 +1359,7 @@ CMDRUNP( request )
 
           if ( victim->position <= POS_SLEEPING )
         {
-                act("%2$^C1 не в состоянии выполнить твою просьбу.", ch, 0, victim, TO_CHAR);
+                act("%2$^C1 не в состоянии выполнить твою просьбу.", ch, victim, 0,TO_CHAR);
                 return;
         }
 
@@ -1483,7 +1483,7 @@ CMDRUNP( request )
         obj_to_char( obj, ch );
         oldact("$c1 просит $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
         oldact("Ты просишь $o4 у $C2.",   ch, obj, victim, TO_CHAR);
-        act("%1$^C1 просит %3$C4 у тебя.", ch, obj, victim, TO_VICT);
+        act("%1$^C1 просит %3$C4 у тебя.", ch, victim, obj,TO_VICT);
         
         omprog_give( obj, victim, ch );
 
@@ -1492,7 +1492,7 @@ CMDRUNP( request )
         ch->hit -= 3 * ( ch->getModifyLevel() / 2 );
         ch->hit = max( (int)ch->hit, 0 );
 
-        act("Ты чувствуешь благодарность за доверие %2$C2.", ch, 0, victim,TO_CHAR);
+        act("Ты чувствуешь благодарность за доверие %2$C2.", ch, victim, 0,TO_CHAR);
         postaffect_to_char(ch, gsn_gratitude, ch->getModifyLevel() / 10);
 }
 
@@ -1536,13 +1536,13 @@ CMDRUNP( demand )
     }
 
     if (IS_SET(victim->act, ACT_NODEMAND)) {
-        act("%2$^C1 не подчинится твоему требованию.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не подчинится твоему требованию.", ch, victim, 0,TO_CHAR);
         return;
     }
 
   if ( victim->position <= POS_SLEEPING )
     {
-       act("%2$^C1 не в состоянии исполнить твой приказ.", ch, 0, victim, TO_CHAR);
+       act("%2$^C1 не в состоянии исполнить твой приказ.", ch, victim, 0,TO_CHAR);
       return;
     }
   
@@ -1599,7 +1599,7 @@ CMDRUNP( demand )
 
   if ( !ch->can_see( obj ) )
     {
-      act("Ты не видишь этого.", ch, 0, victim, TO_CHAR);
+      act("Ты не видишь этого.", ch, victim, 0,TO_CHAR);
       return;
     }
 
@@ -1632,7 +1632,7 @@ CMDRUNP( demand )
 
     oldact("$c1 требует $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
     oldact("Ты требуешь $o4 у $C2.",   ch, obj, victim, TO_CHAR);
-    act("%1$^C1 требует у тебя %3$C4.", ch, obj, victim, TO_VICT);
+    act("%1$^C1 требует у тебя %3$C4.", ch, victim, obj,TO_VICT);
 
     obj_from_char( obj );
     obj_to_char( obj, ch );

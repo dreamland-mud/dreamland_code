@@ -113,10 +113,10 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
         af.bitvector.setValue(AFF_CHARM);
         affect_to_char( victim, &af );
 
-        act("%^C1 очаровывает тебя!!!", ch, 0, victim, TO_VICT);
+        act("%^C1 очаровывает тебя!!!", ch, victim, 0,TO_VICT);
 
         if ( ch != victim )
-                act("%2$^C1 с обожанием смотрит на тебя.",ch,0,victim,TO_CHAR);
+                act("%2$^C1 с обожанием смотрит на тебя.",ch,victim,0,TO_CHAR);
 
 }
 
@@ -185,14 +185,14 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
         return;
 
     if (saves_spell( paf->level, ch, DAM_CHARM, witch, DAMF_MAGIC )) {
-        act("При взгляде на %C4 твое сердце на мгновение замирает.", witch, 0, ch, TO_VICT);
-        act("Во взгляде %2$C2 на мгновение мелькает полный восторг.", witch, 0, ch, TO_CHAR);
+        act("При взгляде на %C4 твое сердце на мгновение замирает.", witch, ch, 0,TO_VICT);
+        act("Во взгляде %2$C2 на мгновение мелькает полный восторг.", witch, ch, 0,TO_CHAR);
         return;
     }
 
-    act("Неужели %C1 выглядит так очаровательно?", witch, 0, ch, TO_VICT);
-    act("%2$^C1 смотрит на тебя с покорностью.", witch, 0, ch, TO_CHAR);
-    act("%2$^C1 зачарованно смотрит на %1$C4 и жаждет выполнить любые поручения.", witch, 0, ch, TO_NOTVICT);
+    act("Неужели %C1 выглядит так очаровательно?", witch, ch, 0,TO_VICT);
+    act("%2$^C1 смотрит на тебя с покорностью.", witch, ch, 0,TO_CHAR);
+    act("%2$^C1 зачарованно смотрит на %1$C4 и жаждет выполнить любые поручения.", witch, ch, 0,TO_NOTVICT);
 
     if (ch->master)
         ch->stop_follower( );
@@ -214,11 +214,11 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
 void MagicJar::get( Character *ch )
 {
     if (!ch->is_npc( ) && strstr(obj->getName( ), ch->getNameP( )) != 0) {
-        act("Вот это удача!",ch,obj,0,TO_CHAR);
+        act("Вот это удача!",ch,0,obj,TO_CHAR);
         extract_obj(obj);
     }
     else
-        act("Ты заполучи%gло|л|ла блудную душу.",ch,obj,0,TO_CHAR);
+        act("Ты заполучи%gло|л|ла блудную душу.",ch,0,obj,TO_CHAR);
 } 
 
 bool MagicJar::extract( bool fCount )
@@ -330,8 +330,8 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     obj_to_char( jar , ch );
 
     SET_BIT(victim->act,PLR_NO_EXP);
-    act("Дух %2$C2 теперь заточен в сосуде и находится в твоей власти.", ch, 0, victim, TO_CHAR);
-    act("%^C1 {Rзаточил твой дух в сосуде.{x", ch, 0, victim, TO_VICT);
+    act("Дух %2$C2 теперь заточен в сосуде и находится в твоей власти.", ch, victim, 0,TO_CHAR);
+    act("%^C1 {Rзаточил твой дух в сосуде.{x", ch, victim, 0,TO_VICT);
 }
 
 SPELL_DECL(MysteriousDream);
@@ -369,7 +369,7 @@ VOID_SPELL(MysteriousDream)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(MysteriousDream);
 VOID_AFFECT(MysteriousDream)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act("{yВ воздухе клубится сонный туман.{x",ch, 0, 0, TO_CHAR);
+     act("{yВ воздухе клубится сонный туман.{x",ch, 0, 0,TO_CHAR);
 }
 
 VOID_AFFECT(MysteriousDream)::toStream( ostringstream &buf, Affect *paf ) 
@@ -436,7 +436,7 @@ VOID_SPELL(Sleep)::run( Character *ch, Character *victim, int sn, int level )
     if ( IS_AWAKE(victim) )
     {
         oldact("Ты чувствуешь себя очень сонн$gым|ым|ой.... ты засыпаешь..", victim, 0, 0, TO_CHAR);
-        act("%^C1 засыпает.", victim, 0, 0, TO_ROOM);
+        act("%^C1 засыпает.", victim, 0, 0,TO_ROOM);
         victim->position = POS_SLEEPING;
     }
     return;

@@ -126,8 +126,8 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
                         gsn_grip->improve( victim, false, ch );
         }
 
-        act("Ты обезоруживаешь %2$C4!", ch,0, victim, TO_CHAR);
-        act("%1$^C1 обезоруживает %2$C4!",ch, 0, victim,TO_NOTVICT);
+        act("Ты обезоруживаешь %2$C4!", ch, victim,0,TO_CHAR);
+        act("%1$^C1 обезоруживает %2$C4!",ch, victim, 0,TO_NOTVICT);
 
         obj_from_char( obj );
 
@@ -473,7 +473,7 @@ SKILL_RUNP( lash )
     int chance;
     
     if (!gsn_lash->usable( ch )) {
-        act("%^C1 угрощающе щелкает хлыстом.", ch, 0, 0, TO_ROOM);
+        act("%^C1 угрощающе щелкает хлыстом.", ch, 0, 0,TO_ROOM);
         ch->pecho("Что?");
         return;
     }
@@ -508,7 +508,7 @@ SKILL_RUNP( lash )
     if (victim == ch || chance < 50) {
         ch->pecho("Ты запутываешься в хлысте и падаешь!");
         ch->setWaitViolence( 5 );
-        act("%^C1 старательно опутывает свои ноги хлыстом и падает на землю.", ch, 0, 0, TO_ROOM);
+        act("%^C1 старательно опутывает свои ноги хлыстом и падает на землю.", ch, 0, 0,TO_ROOM);
         return;
     }
 
@@ -516,7 +516,7 @@ SKILL_RUNP( lash )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        act("Но %2$C1 твой друг!", ch, 0, victim, TO_CHAR);
+        act("Но %2$C1 твой друг!", ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -569,9 +569,9 @@ SKILL_RUNP( lash )
             if (damage_nocatch(ch,victim,dam,gsn_lash, DAM_BASH, true, DAMF_WEAPON)
                 && number_percent( ) < chance) 
             {
-                act("%^C1 подсекает тебя своим хлыстом!!", ch, 0, victim, TO_VICT);
-                act("Ты подсекаешь %2$C4 своим хлыстом!", ch, 0, victim, TO_CHAR);
-                act("%1$^C1 подсекает %2$C4 своим хлыстом.", ch, 0, victim, TO_NOTVICT);
+                act("%^C1 подсекает тебя своим хлыстом!!", ch, victim, 0,TO_VICT);
+                act("Ты подсекаешь %2$C4 своим хлыстом!", ch, victim, 0,TO_CHAR);
+                act("%1$^C1 подсекает %2$C4 своим хлыстом.", ch, victim, 0,TO_NOTVICT);
                 
                 victim->setWaitViolence( number_range( 0, 2 ) );
                 victim->position = POS_RESTING;
@@ -582,8 +582,8 @@ SKILL_RUNP( lash )
     else {
         damage(ch,victim,2,gsn_lash,DAM_BASH, false, DAMF_WEAPON);
         oldact("Ты лишь оцарапа$gло|л|ла $C4.", ch, 0, victim, TO_CHAR);
-        act("%1$^C1 взмахом хлыста поцарапал %2$C4!", ch, 0, victim, TO_NOTVICT);
-        act("Ты уклоняешься от хлыста %C2.", ch, 0, victim, TO_VICT);
+        act("%1$^C1 взмахом хлыста поцарапал %2$C4!", ch, victim, 0,TO_NOTVICT);
+        act("Ты уклоняешься от хлыста %C2.", ch, victim, 0,TO_VICT);
         gsn_lash->improve( ch, false, victim );
         ch->setWaitViolence( 1 );
     }

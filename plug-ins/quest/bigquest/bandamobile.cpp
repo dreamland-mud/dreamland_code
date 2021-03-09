@@ -166,6 +166,6 @@ void BandaItem::getByHero( PCharacter *ch )
         return;
     }
 
-    act("Мерцающая аура окружает %3$O4.", ch, obj, 0, TO_CHAR );
+    act("Мерцающая аура окружает %3$O4.", ch, 0, obj,TO_CHAR);
 }
 

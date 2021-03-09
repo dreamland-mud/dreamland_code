@@ -91,16 +91,16 @@ SKILL_RUNP( tame )
             REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
             SET_BIT(victim->affected_by,AFF_CALM);
             victim->pecho("Ты успокаиваешься.");
-            act("Ты укрощаешь %2$C4.",ch,0,victim,TO_CHAR);
-            act("%1$^C1 укрощает %2$C4.",ch,0,victim,TO_NOTVICT);
+            act("Ты укрощаешь %2$C4.",ch,victim,0,TO_CHAR);
+            act("%1$^C1 укрощает %2$C4.",ch,victim,0,TO_NOTVICT);
             stop_fighting(victim,true);
             gsn_tame->improve( ch, true, victim );
         }
         else
         {
             ch->pecho("Попытка укрощения не удалась.");
-            act("%1$^C1 пытается укротить %2$C4, но безуспешно.", ch,0,victim,TO_NOTVICT);
-            act("%^C1 пытается укротить тебя, но безуспешно.", ch,0,victim,TO_VICT);
+            act("%1$^C1 пытается укротить %2$C4, но безуспешно.", ch,victim,0,TO_NOTVICT);
+            act("%^C1 пытается укротить тебя, но безуспешно.", ch,victim,0,TO_VICT);
             gsn_tame->improve( ch, false, victim );
         }
 
@@ -122,8 +122,8 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
          return;
     }
     
-    act("Молекулы воды вокруг %C2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
-    act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
+    act("Молекулы воды вокруг %C2 собираются вместе, образуя кулак.", ch, 0, 0,TO_ROOM);
+    act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0,TO_CHAR);
     dam = dice( level , 14 );
     damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_MAGIC|DAMF_WATER);
 }
@@ -160,13 +160,13 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
         return;
     
     if (number_percent( ) > ch->getSkill( sn ) ) {
-        act("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0, TO_ALL);
+        act("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0,TO_ALL);
         return;
     }
 
-    act("Корни терновника проникают в могилу, тревожа твой покой.", victim, 0, 0, TO_CHAR);
-    act("Колючий терновник опутывает могилу, проникая корнями глубоко под землю!", ch, 0, 0, TO_ALL);
-    act("Из-под земли раздается недовольное ворчание.", ch, 0, 0, TO_ALL);
+    act("Корни терновника проникают в могилу, тревожа твой покой.", victim, 0, 0,TO_CHAR);
+    act("Колючий терновник опутывает могилу, проникая корнями глубоко под землю!", ch, 0, 0,TO_ALL);
+    act("Из-под земли раздается недовольное ворчание.", ch, 0, 0,TO_ALL);
 
     undig( victim );
 
@@ -214,8 +214,8 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     if ( !victim->isAffected(gsn_entangle) )
     {
         if ( !saves_spell(level, victim, DAM_PIERCE, ch, DAMF_MAGIC) ){
-            act("Колючий терновник прорастает сквозь землю, обвивая ноги %C2!", victim, 0, 0, TO_ROOM);
-            act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!", victim, 0, 0, TO_CHAR);
+            act("Колючий терновник прорастает сквозь землю, обвивая ноги %C2!", victim, 0, 0,TO_ROOM);
+            act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!", victim, 0, 0,TO_CHAR);
 
             todex.type = sn;
             todex.level = level;
@@ -227,13 +227,13 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
             dam = dam * 2;   
         }
         else {
-            act("Колючий терновник прорастает сквозь землю, но %C1 с трудом разрывает его путы!", victim, 0, 0, TO_ROOM);
-            act("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!", victim, 0, 0, TO_CHAR);
+            act("Колючий терновник прорастает сквозь землю, но %C1 с трудом разрывает его путы!", victim, 0, 0,TO_ROOM);
+            act("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!", victim, 0, 0,TO_CHAR);
         }
     }
     else {
-            act("Колючий терновник прорастает сквозь землю, больно раня ноги %C2!", victim, 0, 0, TO_ROOM);
-            act("Колючий терновник прорастает сквозь землю, больно раня твои ноги!", victim, 0, 0, TO_CHAR);        
+            act("Колючий терновник прорастает сквозь землю, больно раня ноги %C2!", victim, 0, 0,TO_ROOM);
+            act("Колючий терновник прорастает сквозь землю, больно раня твои ноги!", victim, 0, 0,TO_CHAR);        
     }
    
     damage_nocatch(ch, victim, level, gsn_entangle, DAM_PIERCE, true, DAMF_MAGIC);

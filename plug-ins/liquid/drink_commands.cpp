@@ -202,8 +202,8 @@ static void pour_out( Character *ch, Object * out )
     Room *room = ch->in_room;
 
     if (out->value1() == 0) {
-        act("Ты переворачиваешь %3$O4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
-        act("Приговаривая 'ну котеночек, ну еще капельку', %1$C1 переворачивает и трясет %3$C5.", ch, out, 0, TO_ROOM );
+        act("Ты переворачиваешь %3$O4, однако оттуда не выливается ни капли.", ch, 0, out,TO_CHAR);
+        act("Приговаривая 'ну котеночек, ну еще капельку', %1$C1 переворачивает и трясет %3$C5.", ch, 0, out,TO_ROOM);
         return;
     }
     
@@ -389,7 +389,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     }
 
     if (out->value1() == 0) {
-        act("В %3$O6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR);
+        act("В %3$O6 нет ничего, что можно вылить.",ch,0,out,TO_CHAR);
         return;
     }
 
@@ -675,7 +675,7 @@ CMDRUN( drink )
         /* The drink was poisoned ! */
         Affect af;
 
-        act("%^C1 хватается за горло и задыхается.",ch,0,0,TO_ROOM );
+        act("%^C1 хватается за горло и задыхается.",ch,0,0,TO_ROOM);
         ch->pecho("Ты хватаешься за горло и задыхаешься.");
         af.bitvector.setTable(&affect_flags);
         af.type      = gsn_poison;

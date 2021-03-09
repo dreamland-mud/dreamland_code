@@ -29,7 +29,7 @@ void RobbedVictim::givenGood( PCharacter *hero, Object *obj )
 {
     quest->state = QSTAT_FINISHED;
 
-    act("%1$^C1 восклицает '{gСпасибо тебе, %2$C1!{x'", ch, 0, hero, TO_ROOM );
+    act("%1$^C1 восклицает '{gСпасибо тебе, %2$C1!{x'", ch, hero, 0,TO_ROOM);
     say_act( hero, ch, "Вернись за вознаграждением к тому, кто рассказал тебе о моем несчастье." );
     
     if (quest->itemWear != wear_none) {
@@ -44,7 +44,7 @@ void RobbedVictim::givenGood( PCharacter *hero, Object *obj )
 void RobbedVictim::givenBad( PCharacter *hero, Object *obj )
 {
     say_act( hero, ch, "Ну и зачем мне это?" );
-    act("%1$^C1 с равнодушным видом протягивает тебе %3$C4.", ch, obj, hero, TO_VICT );
+    act("%1$^C1 с равнодушным видом протягивает тебе %3$C4.", ch, hero, obj,TO_VICT);
     oldact("$c1 с равнодушным видом протягивает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 

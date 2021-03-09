@@ -75,8 +75,8 @@ CMDRUN( mount )
     
     if (!horse->is_npc( )) { /* pc-mounts like centaurs */
         if (!IS_SET(horse->form, FORM_CENTAUR)) {
-            act("%1$^C1 пытается запрыгнуть верхом на %2$C4.", ch, 0, horse, TO_NOTVICT);
-            act("%^C1 пытается запрыгнуть верхом на тебя.", ch, 0, horse, TO_VICT);
+            act("%1$^C1 пытается запрыгнуть верхом на %2$C4.", ch, horse, 0,TO_NOTVICT);
+            act("%^C1 пытается запрыгнуть верхом на тебя.", ch, horse, 0,TO_VICT);
             oldact("Ты пытаешься оседлать $C4, но никак не поймешь, где же у $X стремена..", ch, 0, horse, TO_CHAR);
             return;
         }
@@ -84,20 +84,20 @@ CMDRUN( mount )
         trust = horse->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( "mount" );
         if (!trust || !trust->check( ch )) {
             oldact("$c1 пытается оседлать $C4. $C1 строго смотрит на $c4.", ch, 0, horse, TO_NOTVICT);
-            act("%^C1 пытается оседлать тебя, но заметив твой строгий взгляд, останавливается.", ch, 0, horse, TO_VICT);
+            act("%^C1 пытается оседлать тебя, но заметив твой строгий взгляд, останавливается.", ch, horse, 0,TO_VICT);
             oldact("$C1 не желает, чтобы на $Z катались.", ch, 0, horse, TO_CHAR);
             return;
         }
     }
     else { /* other rideable beasts */
         if (!IS_SET(horse->act, ACT_RIDEABLE)) {
-            act("%1$^C1 пытается запрыгнуть верхом на %2$C4, но соскальзывает.", ch, 0, horse, TO_NOTVICT);
+            act("%1$^C1 пытается запрыгнуть верхом на %2$C4, но соскальзывает.", ch, horse, 0,TO_NOTVICT);
             ch->pecho("Этот вид живых существ не предназначен для верховой езды.");
             return;
         }
         
         if (horse->getModifyLevel( ) - ch->getModifyLevel( ) > 5) {
-            act("%1$^C1 пытается оседлать %2$C4, но опыта явно не хватает.", ch, 0, horse, TO_NOTVICT);
+            act("%1$^C1 пытается оседлать %2$C4, но опыта явно не хватает.", ch, horse, 0,TO_NOTVICT);
             ch->pecho("Тебе не хватит опыта справиться с этим скакуном.");
             return;
         }
@@ -127,9 +127,9 @@ CMDRUN( mount )
             && IS_SET(horse->getNPC()->behavior->getOccupation(), (1<<OCC_BATTLEHORSE));
    
     if (needsRidingSkill && number_percent( ) > gsn_riding->getEffective( ch )) {
-        act("Тебе не хватило мастерства оседлать %2$C4.", ch, 0, horse, TO_CHAR );
-        act("%^C1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
-        act("%1$^C1 пытается оседлать %2$C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
+        act("Тебе не хватило мастерства оседлать %2$C4.", ch, horse, 0,TO_CHAR);
+        act("%^C1 пытается оседлать тебя, но мастерства явно не хватает.", ch, horse, 0,TO_VICT);
+        act("%1$^C1 пытается оседлать %2$C4, но мастерства явно не хватает.", ch, horse, 0,TO_NOTVICT);
         
         ch->setWait( gsn_riding->getBeats( ) );
         gsn_riding->improve( ch, false );
@@ -141,9 +141,9 @@ CMDRUN( mount )
     horse->mount = ch;
     horse->riding = false;
 
-    act("Ты запрыгиваешь на %2$C4.", ch, 0, horse, TO_CHAR );
-    act("%^C1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
-    act("%1$^C1 запрыгивает на спину %2$C2.", ch, 0, horse, TO_NOTVICT );
+    act("Ты запрыгиваешь на %2$C4.", ch, horse, 0,TO_CHAR);
+    act("%^C1 запрыгивает тебе на спину.", ch, horse, 0,TO_VICT);
+    act("%1$^C1 запрыгивает на спину %2$C2.", ch, horse, 0,TO_NOTVICT);
     
     gsn_riding->improve( ch, true);
 }
@@ -162,14 +162,14 @@ CMDRUN( dismount )
     }
     
     if (MOUNTED(ch)) {
-        act("Ты соскакиваешь со спины %2$C2.", ch, 0, ch->mount, TO_CHAR );
-        act("%^C1 соскакивает с твоей спины.", ch, 0, ch->mount, TO_VICT );
-        act("%1$^C1 спрыгивает с %2$C2.", ch, 0, ch->mount, TO_NOTVICT );
+        act("Ты соскакиваешь со спины %2$C2.", ch, ch->mount, 0,TO_CHAR);
+        act("%^C1 соскакивает с твоей спины.", ch, ch->mount, 0,TO_VICT);
+        act("%1$^C1 спрыгивает с %2$C2.", ch, ch->mount, 0,TO_NOTVICT);
     }
     else {
-        act("Ты сбрасываешь %2$C4 со спины.", ch, 0, ch->mount, TO_CHAR );
-        act("%^C1 сбрасывает тебя со спины.", ch, 0, ch->mount, TO_VICT );
-        act("%1$^C1 сбрасывает %2$C4 со спины.", ch, 0, ch->mount, TO_NOTVICT );
+        act("Ты сбрасываешь %2$C4 со спины.", ch, ch->mount, 0,TO_CHAR);
+        act("%^C1 сбрасывает тебя со спины.", ch, ch->mount, 0,TO_VICT);
+        act("%1$^C1 сбрасывает %2$C4 со спины.", ch, ch->mount, 0,TO_NOTVICT);
     }
     
     ch->dismount( );

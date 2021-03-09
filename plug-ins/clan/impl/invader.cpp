@@ -54,7 +54,7 @@ void ClanGuardInvader::actGreet(PCharacter *wch)
 }
 void ClanGuardInvader::actPush(PCharacter *wch)
 {
-    act("%2$^C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR);
+    act("%2$^C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, ch, 0,TO_CHAR);
     oldact("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM);
 }
 int ClanGuardInvader::getCast(Character *victim)
@@ -197,7 +197,7 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
     {
         Room *room = r.second;
         room->affectTo(&af);
-        act("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
+        act("Частица первородного зла проникает в этот мир.", room->people, 0, 0,TO_ALL);
     }
 }
 
@@ -381,8 +381,8 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
         return;
     }
 
-    act("Ты даешь жизнь тени %2$C2!", ch, 0, victim, TO_CHAR);
-    act("%1$^C1 дает жизнь тени %2$C2!", ch, 0, victim, TO_NOTVICT);
+    act("Ты даешь жизнь тени %2$C2!", ch, victim, 0,TO_CHAR);
+    act("%1$^C1 дает жизнь тени %2$C2!", ch, victim, 0,TO_NOTVICT);
     oldact_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_DEAD);
 
     victim->getPC()->shadow = 4 * ch->getModifyLevel() / 10;
@@ -418,7 +418,7 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
         if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_MAGIC) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
         {
             vch->pecho("Злые духи овладевают тобой.");
-            act("Злые духи овладевают %C1.", vch, 0, 0, TO_ROOM);
+            act("Злые духи овладевают %C1.", vch, 0, 0,TO_ROOM);
             affect_join(vch, &af);
         }
     }

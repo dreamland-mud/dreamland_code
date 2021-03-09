@@ -54,7 +54,7 @@ void ClanGuardChaos::actGreet( PCharacter *wch )
 }
 void ClanGuardChaos::actPush( PCharacter *wch )
 {
-    act("На мгновенье ты теряешь представление о реальности...", wch, 0, ch, TO_CHAR );
+    act("На мгновенье ты теряешь представление о реальности...", wch, ch, 0,TO_CHAR);
     oldact("$C1 выпускает частицу ХАОСА в $c2\n\r...и $c1 растворяется в нем...", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardChaos::getCast( Character *victim )
@@ -129,7 +129,7 @@ void ChaosBlade::fight( Character *ch )
 bool ChaosBlade::death( Character *ch )
 {
     oldact_p("Твой {MКлинок Хаоса{x исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act("{MКлинок Хаоса{x %C2 исчезает.", ch, 0, 0, TO_ROOM );
+    act("{MКлинок Хаоса{x %C2 исчезает.", ch, 0, 0,TO_ROOM);
     extract_obj( obj );
     return false;
 }
@@ -234,7 +234,7 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
       affect_to_char(victim,&af);
       
       oldact("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!", victim, 0, 0, TO_ROOM);
-      act("Ты чувствуешь себя гораздо менее уверенно!", victim, 0, 0, TO_CHAR);
+      act("Ты чувствуешь себя гораздо менее уверенно!", victim, 0, 0,TO_CHAR);
     }
       else
       ch->pecho("Твоя попытка закончилась неудачей.");
@@ -322,7 +322,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
   if (ch->is_npc() || victim->is_npc())
     {
-     act("Ты не можешь подражать %2$C3.",ch,0,victim,TO_CHAR);
+     act("Ты не можешь подражать %2$C3.",ch,victim,0,TO_CHAR);
      return;
    }
 
@@ -344,9 +344,9 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
     return;
    }
 
-  act("Ты меняешь свой облик, подражая %2$C3.", ch,0,victim,TO_CHAR);
-  act("%^C1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
-  act("%1$^C1 меняет свой облик, подражая %2$C3!", ch,0,victim,TO_NOTVICT);
+  act("Ты меняешь свой облик, подражая %2$C3.", ch,victim,0,TO_CHAR);
+  act("%^C1 меняет свой облик, подражая ТЕБЕ!", ch,victim,0,TO_VICT);
+  act("%1$^C1 меняет свой облик, подражая %2$C3!", ch,victim,0,TO_NOTVICT);
 
   af.type               = sn;
   af.level              = level;

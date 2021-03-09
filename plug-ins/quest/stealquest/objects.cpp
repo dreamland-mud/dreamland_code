@@ -37,13 +37,13 @@ bool HiddenChest::canLock( Character *ch )
 void LockPick::getByHero( PCharacter *ch ) 
 {
     getQuest( ch )->wiznet( "", "%s gets key", ch->getNameP( '1' ).c_str( ) );
-    act("%3$^O1 тускло поблескивает.", ch, obj, 0, TO_CHAR );
+    act("%3$^O1 тускло поблескивает.", ch, 0, obj,TO_CHAR);
 }
 
 void LockPick::getByOther( Character *ch ) 
 { 
-    act("Ты роняешь %3$O4.", ch, obj, 0, TO_CHAR );
-    act("%1$^C1 роняет %3$C4.", ch, obj, 0, TO_ROOM );
+    act("Ты роняешь %3$O4.", ch, 0, obj,TO_CHAR);
+    act("%1$^C1 роняет %3$C4.", ch, 0, obj,TO_ROOM);
 }
 
 bool LockPick::ourMobile( NPCharacter *mob ) 
@@ -65,6 +65,6 @@ void RobbedItem::getByHero( PCharacter *ch )
 void RobbedItem::getByOther( Character *ch ) 
 {
     ch->pecho( "%1$^O1 выпада%1$nет|ют у тебя из рук.", obj );
-    act("%1$^C1 роняет %3$C4.", ch, obj, 0, TO_ROOM );
+    act("%1$^C1 роняет %3$C4.", ch, 0, obj,TO_ROOM);
 }
 

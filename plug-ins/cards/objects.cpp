@@ -127,7 +127,7 @@ bool CardPackBehavior::use( Character *user, const char *args )
     chance = gsn_fetch_card->getEffective( pch );
 
     if (number_percent( ) >= chance) {
-        act("Ты пытаешься вытащить из колоды карту, но она выпадает у тебя из рук.", pch, 0, 0, TO_CHAR);
+        act("Ты пытаешься вытащить из колоды карту, но она выпадает у тебя из рук.", pch, 0, 0,TO_CHAR);
         oldact("$c1 пытается вытащить из колоды карту, но она выпадает у $x из рук.", pch, 0, 0, TO_ROOM);
         gsn_fetch_card->improve( pch, false );
     }
@@ -151,7 +151,7 @@ bool CardPackBehavior::use( Character *user, const char *args )
         
         obj_to_char( card, pch );
         oldact("Ты перетасовываешь $o4 и сдаешь $O4.", pch, obj, card, TO_CHAR);
-        act("%1$^C1 перетасовывает %3$C4.", pch, obj, 0, TO_ROOM);
+        act("%1$^C1 перетасовывает %3$C4.", pch, 0, obj,TO_ROOM);
         
         gsn_fetch_card->improve( pch, true );
     }
@@ -159,7 +159,7 @@ bool CardPackBehavior::use( Character *user, const char *args )
     throws--;
 
     if (throws <= 0) {
-        act("Это была последняя карта в %3$O6.", pch, obj, 0, TO_CHAR);
+        act("Это была последняя карта в %3$O6.", pch, 0, obj,TO_CHAR);
         extract_obj( obj );
     }
     
@@ -218,7 +218,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
             || !pch->can_see( victim ) 
             || !victim->getAttributes( ).isAvailable( "cards" )) 
     {
-        act("%3$^O1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит мертвой.", pch, 0, obj,TO_CHAR);
         return true;
     }
 
@@ -231,7 +231,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
             || !victim->in_room->isCommon()
             || !pch->can_see( victim->in_room )) 
     {
-        act("%3$^O1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, 0, obj,TO_CHAR);
         return true;
     }
     
@@ -295,7 +295,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     }
 
     if (!victim || !pch->can_see( victim )) {
-        act("%3$^O1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит мертвой.", pch, 0, obj,TO_CHAR);
         return true;
     }
 
@@ -345,25 +345,25 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             fSuccess = false;
 
             if (!IS_AFFECTED(victim, AFF_BLIND))
-                act("Тебе показалось, что картинка на %3$O6 пошевелилась.", victim, myCard->getObj( ), 0, TO_CHAR);
+                act("Тебе показалось, что картинка на %3$O6 пошевелилась.", victim, 0, myCard->getObj( ),TO_CHAR);
 
             oldact("$c1 не смо$gгло|г|гла пожать твою руку.", pch, 0, victim, TO_VICT);
             
             if (number_range(1, 100) < 10) {
-                act("{cТы пытаешься затащить %2$C4 к себе через карту, но вместо этого тащишь кого-то другого!{x", pch, 0, victim, TO_CHAR);        
-                act("%^C1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
+                act("{cТы пытаешься затащить %2$C4 к себе через карту, но вместо этого тащишь кого-то другого!{x", pch, victim, 0,TO_CHAR);        
+                act("%^C1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0,TO_ROOM);
 
                 multi_hit( findHorribleVictim( pch ), pch );
             }
             else {
-                act("Твоя попытка затащить %2$C4 к себе провалилась.", pch, 0, victim, TO_CHAR);
+                act("Твоя попытка затащить %2$C4 к себе провалилась.", pch, victim, 0,TO_CHAR);
             }
         }
         else {
             fSuccess = true;
             
-            act("Ты пожимаешь протянутую тебе руку.", pch, 0, victim, TO_CHAR);
-            act("%^C1 пожимает чью-то руку.", pch, 0, 0, TO_ROOM);
+            act("Ты пожимаешь протянутую тебе руку.", pch, victim, 0,TO_CHAR);
+            act("%^C1 пожимает чью-то руку.", pch, 0, 0,TO_ROOM);
             oldact("{c$o1 оживает. $C1 пожимает твою руку.\r\n{x", victim, myCard->getObj( ), pch, TO_CHAR);
 
             transfer_char( victim, pch, pch->in_room,
@@ -382,7 +382,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     }
     else {
         if (!hisAttr || !myCard || !gsn_pull_card->usable( victim )) 
-            act("%2$^C1 не сможет затащить тебя к себе через карту.", pch, 0, victim, TO_CHAR);
+            act("%2$^C1 не сможет затащить тебя к себе через карту.", pch, victim, 0,TO_CHAR);
         else {
             if (pch->mana < mana) {
                 pch->pecho("У тебя недостаточно энергии для этого.");
@@ -393,8 +393,8 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
 
             myAttr->setContactName( victim->getName( ) );
             oldact("Ты дотрагиваешься до $o2, мысленно протягивая $M руку.", pch, obj, victim, TO_CHAR);
-            act("%1$^C1 дотрагивается до %3$C2.", pch, obj, 0, TO_ROOM);
-            act("{cИзображение %2$C2 на карте оживает и протягивает тебе руку.{x", victim, 0, pch, TO_CHAR);
+            act("%1$^C1 дотрагивается до %3$C2.", pch, 0, obj,TO_ROOM);
+            act("{cИзображение %2$C2 на карте оживает и протягивает тебе руку.{x", victim, pch, 0,TO_CHAR);
         }
     }
     
@@ -436,7 +436,7 @@ bool CardBehavior::examine( Character *looker )
             || !pch->can_see( victim ) 
             || !victim->getAttributes( ).isAvailable( "cards" )) 
     {
-        act("%3$^O1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит мертвой.", pch, 0, obj,TO_CHAR);
         return true;
     }
 
@@ -444,7 +444,7 @@ bool CardBehavior::examine( Character *looker )
             || !victim->in_room
             || !pch->can_see( victim->in_room )) 
     {
-        act("%3$^O1 выглядит живой, но ты не можешь сосредоточиться на мелких деталях.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит живой, но ты не можешь сосредоточиться на мелких деталях.", pch, 0, obj,TO_CHAR);
         return true;
     }
 
@@ -606,9 +606,9 @@ CardSleevesBehavior::CardSleevesBehavior( )
 bool CardSleevesBehavior::canEquip( Character *ch ) 
 {
     if (!gsn_ace_in_sleeves->usable( ch )) {
-        act("Ты пытаешься напялить %3$O4, но шулер из тебя никакущий..", ch, obj, 0, TO_CHAR);
+        act("Ты пытаешься напялить %3$O4, но шулер из тебя никакущий..", ch, 0, obj,TO_CHAR);
         oldact("$c1 пытается напялить $o4, но шулер из $x никакущий..", ch, obj, 0, TO_ROOM);
-        act("%3$^O1 падают на землю.", ch, obj, 0, TO_ALL);
+        act("%3$^O1 падают на землю.", ch, 0, obj,TO_ALL);
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         return false;
@@ -636,13 +636,13 @@ void CardSleevesBehavior::fight( Character *ch )
         return;
 
     if (number_percent( ) >= gsn_ace_in_sleeves->getEffective( ch )) {
-        act("{cТы пытаешься вынуть туза из %3$O2, но роняешь его! Упс..{x", ch, obj, 0, TO_CHAR);
+        act("{cТы пытаешься вынуть туза из %3$O2, но роняешь его! Упс..{x", ch, 0, obj,TO_CHAR);
         oldact("{cИз $o2 $c2 выпадает туз! Шулер!{x", ch, obj, 0, TO_ROOM);
         gsn_ace_in_sleeves->improve( ch, false );
         ch->setWait(gsn_ace_in_sleeves->getBeats( ));
     }
     else {
-        act("{cТы достаешь из %3$O2 припрятанного туза.{x", ch, obj, 0, TO_CHAR);
+        act("{cТы достаешь из %3$O2 припрятанного туза.{x", ch, 0, obj,TO_CHAR);
         gsn_ace_in_sleeves->improve( ch, true );
         
         spell( plushki[number_range( 0, size - 1 )], 

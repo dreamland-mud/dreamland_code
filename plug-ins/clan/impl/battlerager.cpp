@@ -312,8 +312,8 @@ SKILL_RUNP( trophy )
             obj_to_char(trophy, ch);
             gsn_trophy->improve( ch, true );
 
-            act("Ты изготавливаешь пончо из %3$O2!",ch,part,0,TO_CHAR);
-            act("%1$^C1 изготавливает пончо из %3$C2!",ch,part,0,TO_ROOM);
+            act("Ты изготавливаешь пончо из %3$O2!",ch,0,part,TO_CHAR);
+            act("%1$^C1 изготавливает пончо из %3$C2!",ch,0,part,TO_ROOM);
 
             extract_obj(part);
             return;
@@ -370,8 +370,8 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     // Success, inflict a lot of damage. Anatolia implementation had (victim->hit+1), but the 
     // resulting damage always got reduced by sanctuary and other protections.
     int dam;
-    act("{RТвой молниеносный удар в одно мгновение лишает %2$C4 жизни!{x", ch,0,victim,TO_CHAR);
-    act("{RМолниеносный удар %1$C2 в одно мгновение лишает %2$C4 жизни!{x", ch,0,victim,TO_NOTVICT);
+    act("{RТвой молниеносный удар в одно мгновение лишает %2$C4 жизни!{x", ch,victim,0,TO_CHAR);
+    act("{RМолниеносный удар %1$C2 в одно мгновение лишает %2$C4 жизни!{x", ch,victim,0,TO_NOTVICT);
     oldact_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
     damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
@@ -743,10 +743,10 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
 
     oldact_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
            ch,0,wch,TO_VICT,POS_RESTING);
-    act("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
-    act("Ты передаешь лечебное зелье %2$C3.",ch,0,wch,TO_CHAR);
-    act("%2$^C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
-    act("%1$^C1 дает лечебное зелье %2$C3.",ch,0,wch,TO_NOTVICT);
+    act("Ты выпиваешь лечебное зелье.",ch,wch,0,TO_VICT);
+    act("Ты передаешь лечебное зелье %2$C3.",ch,wch,0,TO_CHAR);
+    act("%2$^C1 выпивает лечебное зелье, данное тобой.",ch,wch,0,TO_CHAR);
+    act("%1$^C1 дает лечебное зелье %2$C3.",ch,wch,0,TO_NOTVICT);
     oldact("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT);
 
     wch->is_npc( ) ? wch->master->setWaitViolence( 1 ) : wch->setWaitViolence( 1 );
@@ -802,7 +802,7 @@ void ClanGuardBattlerager::actGreet( PCharacter *wch )
 
 void ClanGuardBattlerager::actPush( PCharacter *wch )
 {
-    act("%2$^C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 отвешивает тебе нехилый подзатыльник...", wch, ch, 0,TO_CHAR);
     oldact("$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло.", wch, 0, ch, TO_ROOM );
 }
 

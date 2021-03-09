@@ -186,7 +186,7 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
     }
     
     oldact("Ты берешь $C4 за $o4.", ch, obj, victim, TO_CHAR);
-    act("%1$^C1 берет тебя за %3$C4.", ch, obj, victim, TO_VICT);
+    act("%1$^C1 берет тебя за %3$C4.", ch, victim, obj,TO_VICT);
     oldact("$c1 берет $C4 за $o4.", ch, obj, victim, TO_NOTVICT);
     
     FENIA_VOID_CALL( obj, "Seize", "CC", ch, victim );
@@ -259,7 +259,7 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 {
     if (!ch->is_immortal( ) && !obj->hasOwner( ch ))
     {
-        act("Похоже, %3$O4 от земли не оторвать.",ch,obj,0,TO_CHAR);
+        act("Похоже, %3$O4 от земли не оторвать.",ch,0,obj,TO_CHAR);
         return false;
     }
     
@@ -269,7 +269,7 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 static bool oprog_can_get_furniture( Character *ch, Object *obj )
 {
     if (count_users( obj ) > 0) {
-        act("Кто-то использует %3$O4.",ch,obj,0,TO_CHAR);
+        act("Кто-то использует %3$O4.",ch,0,obj,TO_CHAR);
         return false;
     }
 
@@ -347,7 +347,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         
     case ITEM_CONTAINER:
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            act("Тебе не удалось нашарить ни одного кармана у %3$O2.",ch,container,0,TO_CHAR);
+            act("Тебе не удалось нашарить ни одного кармана у %3$O2.",ch,0,container,TO_CHAR);
             return false;
         }
         
@@ -420,10 +420,10 @@ static bool can_get_obj( Character *ch, Object *obj )
 
 static bool get_obj( Character *ch, Object *obj )
 {
-    act("Ты берешь %3$O4.", ch, obj, 0, TO_CHAR);
+    act("Ты берешь %3$O4.", ch, 0, obj,TO_CHAR);
 
     if (!IS_AFFECTED(ch,AFF_SNEAK))
-        act("%1$^C1 берет %3$C4.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 берет %3$C4.", ch, 0, obj,TO_ROOM);
             
     obj_from_room( obj );
     obj_to_char( obj, ch );
@@ -678,7 +678,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
 
             if(!obj) {
-                act("Ты не видишь ничего подобного в %3$O6.", ch, container, 0, TO_CHAR);
+                act("Ты не видишь ничего подобного в %3$O6.", ch, 0, container,TO_CHAR);
                 return;
             }
             
@@ -731,9 +731,9 @@ CMDRUNP( get )
 
             if (!found) {
                 if (!all)
-                    act("Ты не видишь ничего в %3$O6.", ch, container, 0, TO_CHAR);
+                    act("Ты не видишь ничего в %3$O6.", ch, 0, container,TO_CHAR);
                 else
-                    act("Ты не видишь ничего подобного в %3$O6.", ch, container, 0, TO_CHAR);
+                    act("Ты не видишь ничего подобного в %3$O6.", ch, 0, container,TO_CHAR);
             }
         }
     }
@@ -819,7 +819,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         return PUT_OBJ_ERR;
 
     if (!can_drop_obj( ch, obj )) {
-        act("Ты не можешь избавиться от %3$O2.", ch, obj, 0, TO_CHAR );
+        act("Ты не можешь избавиться от %3$O2.", ch, 0, obj,TO_CHAR);
         return PUT_OBJ_ERR;
     }
     
@@ -827,13 +827,13 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
     if (container->item_type == ITEM_KEYRING) {
         if (pcount >= container->value0()) {
-            act("На %3$O6 не осталось свободного места.", ch, container, 0, TO_CHAR );
+            act("На %3$O6 не осталось свободного места.", ch, 0, container,TO_CHAR);
             return PUT_OBJ_STOP;
         }
 
         if (obj->item_type != ITEM_KEY && obj->item_type != ITEM_LOCKPICK) {
             if (verbose)
-                act("На %3$O4 ты можешь нанизать только ключи или отмычки.", ch, container, 0, TO_CHAR );
+                act("На %3$O4 ты можешь нанизать только ключи или отмычки.", ch, 0, container,TO_CHAR);
             return PUT_OBJ_ERR;
         }
 
@@ -841,7 +841,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     }
 
     if (pcount > container->value0()) {
-        act("Опасно запихивать столько вещей в %3$O4!", ch,container,0, TO_CHAR);
+        act("Опасно запихивать столько вещей в %3$O4!", ch,0,container,TO_CHAR);
         return PUT_OBJ_STOP;
     }
 
@@ -852,7 +852,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     }
 
     if (obj->pIndexData->limit != -1) {
-        act("%3$^O4 нельзя хранить в такой дребедени.", ch,obj,0,TO_CHAR );
+        act("%3$^O4 нельзя хранить в такой дребедени.", ch,0,obj,TO_CHAR);
         return PUT_OBJ_ERR;
     }
 
@@ -861,7 +861,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
             || obj->value0()  != WEAPON_ARROW ))
     {
         if (verbose)
-            act("Ты можешь положить только стрелы в %3$O4.",ch,container,0,TO_CHAR);
+            act("Ты можешь положить только стрелы в %3$O4.",ch,0,container,TO_CHAR);
         return PUT_OBJ_ERR;
     }
 
@@ -877,7 +877,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         pcount = count_obj_in_obj( container, ITEM_POTION );
                 
        if (pcount > 15) {
-            act("Небезопасно далее складывать снадобья в %3$O4.",ch,container,0, TO_CHAR);
+            act("Небезопасно далее складывать снадобья в %3$O4.",ch,0,container,TO_CHAR);
             return PUT_OBJ_ERR;
        }
     }
@@ -1165,9 +1165,9 @@ static int drop_obj( Character *ch, Object *obj )
     obj_to_room( obj, ch->in_room );
 
     if (!IS_AFFECTED(ch, AFF_SNEAK))
-        act("%1$^C1 бросает %3$C4.", ch, obj, 0, TO_ROOM );
+        act("%1$^C1 бросает %3$C4.", ch, 0, obj,TO_ROOM);
 
-    act("Ты бросаешь %3$O4.", ch, obj, 0, TO_CHAR );
+    act("Ты бросаешь %3$O4.", ch, 0, obj,TO_CHAR);
 
     if (oprog_drop( obj, ch ))
         return DROP_OBJ_EXTRACT;
@@ -1253,9 +1253,9 @@ CMDRUNP( drop )
             if ( !IS_AFFECTED(ch, AFF_SNEAK) )
             {
                 if (obj->value0() == 1 || obj->value1() == 1)
-                 act("%^C1 бросает монетку.", ch, 0, 0, TO_ROOM);
+                 act("%^C1 бросает монетку.", ch, 0, 0,TO_ROOM);
                 else
-                 act("%^C1 бросает несколько монет.", ch, 0, 0, TO_ROOM);
+                 act("%^C1 бросает несколько монет.", ch, 0, 0,TO_ROOM);
             }
          
             if (obj->value0() == 1 || obj->value1() == 1)
@@ -1310,7 +1310,7 @@ CMDRUNP( drop )
 
         if (!found) {
             if (arg[3] == '\0')
-                act("У тебя ничего нет.", ch, 0, 0, TO_CHAR );
+                act("У тебя ничего нет.", ch, 0, 0,TO_CHAR);
             else
                 oldact("У тебя нет $T.", ch, 0, is_number(&arg[4]) ? "этого":&arg[4], TO_CHAR );
         }
@@ -1374,19 +1374,19 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
 
     if ( victim->carry_number + obj->getNumber( ) > victim->canCarryNumber( ) )
     {
-        act("%2$^C1 не может нести столько вещей.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не может нести столько вещей.", ch, victim, 0,TO_CHAR);
         return;
     }
 
     if (victim->getCarryWeight( ) + obj->getWeight( ) > victim->canCarryWeight( ) )
     {
-        act("%2$^C1 не может нести такую тяжесть.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не может нести такую тяжесть.", ch, victim, 0,TO_CHAR);
         return;
     }
 
     if ( !victim->can_see( obj ) )
     {
-        act("%2$^C1 не видит этого.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не видит этого.", ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -1405,13 +1405,13 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
     case GIVE_MODE_USUAL:
     default:
         oldact("$c1 дает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-        act("%1$^C1 дает тебе %3$C4.", ch, obj, victim, TO_VICT );
+        act("%1$^C1 дает тебе %3$C4.", ch, victim, obj,TO_VICT);
         oldact("Ты даешь $o4 $C3.", ch, obj, victim, TO_CHAR );
         break;
 
     case GIVE_MODE_PRESENT:
         oldact("$c1 дарит $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-        act("%1$^C1 дарит тебе %3$C4.", ch, obj, victim, TO_VICT );
+        act("%1$^C1 дарит тебе %3$C4.", ch, victim, obj,TO_VICT);
         oldact("Ты даришь $o4 $C3.", ch, obj, victim, TO_CHAR );
 
         if (oprog_present( obj, ch, victim ))
@@ -1448,7 +1448,7 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 
     if( ( victim->getCarryWeight( ) + gold + silver / 10 ) > victim->canCarryWeight( ) )
     {
-            act("%^C1 не может нести такой вес.", victim, 0, ch, TO_VICT);
+            act("%^C1 не может нести такой вес.", victim, ch, 0,TO_VICT);
             return;
     }
 
@@ -1480,9 +1480,9 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
     }
 
     if (mode == GIVE_MODE_PRESENT) {
-        act("%1$^C1 дарит %2$C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 дарит %2$C3 несколько монет.",  ch, victim, 0,TO_NOTVICT);
     } else {
-        act("%1$^C1 дает %2$C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        act("%1$^C1 дает %2$C3 несколько монет.",  ch, victim, 0,TO_NOTVICT);
     }
     
     mprog_bribe( victim, ch, gold, silver );
@@ -1678,7 +1678,7 @@ CMDRUNP( use )
 
     if (!obj)
     {
-        act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+        act("Ты не видишь здесь этого.", ch, 0, 0,TO_CHAR);
         return;
     }
     
@@ -1686,11 +1686,11 @@ CMDRUNP( use )
         return;
     
     if (obj->carried_by == ch) {
-        act("Ты вертишь в руках %3$O4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-        act("%1$^C1 вертит в руках %3$C4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+        act("Ты вертишь в руках %3$O4, не зная, что с этим делать.", ch, 0, obj,TO_CHAR);
+        act("%1$^C1 вертит в руках %3$C4, явно не зная, что с этим делать.", ch, 0, obj,TO_ROOM);
     } else {
-        act("Ты озадаченно ощупываешь %3$O4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-        act("%1$^C1 озадаченно ощупывает %3$C4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+        act("Ты озадаченно ощупываешь %3$O4, не зная, что с этим делать.", ch, 0, obj,TO_CHAR);
+        act("%1$^C1 озадаченно ощупывает %3$C4, явно не зная, что с этим делать.", ch, 0, obj,TO_ROOM);
     }
 }        
 

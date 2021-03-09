@@ -57,7 +57,7 @@ VOID_SPELL(MentalBlock)::run( Character *ch, Character *victim, int sn, int leve
         victim->pecho( "Ты и так блокируешь все попытки ментального контакта." );
         
         if (ch != victim)
-            act("%2$^C1 и так блокирует все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
+            act("%2$^C1 и так блокирует все попытки ментального контакта.", ch, victim, 0,TO_CHAR);
 
         return;
     }
@@ -70,7 +70,7 @@ VOID_SPELL(MentalBlock)::run( Character *ch, Character *victim, int sn, int leve
     victim->pecho( "Теперь ты будешь блокировать все попытки ментального контакта с тобой." );
 
     if (ch != victim)
-        act("%2$^C1 будет блокировать все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
+        act("%2$^C1 будет блокировать все попытки ментального контакта.", ch, victim, 0,TO_CHAR);
 }
 
 /*
@@ -86,7 +86,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->pecho("Ты уже находишься в воздухе.");
                 else
-                        act("%2$^C1 уже находится в воздухе.",ch,0,victim,TO_CHAR);
+                        act("%2$^C1 уже находится в воздухе.",ch,victim,0,TO_CHAR);
                 return;
         }
 
@@ -95,7 +95,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->pecho("Ты и так можешь подняться в воздух.");
                 else
-                        act("%2$^C1 может подняться в воздух и без твоей помощи.",ch,0,victim,TO_CHAR);
+                        act("%2$^C1 может подняться в воздух и без твоей помощи.",ch,victim,0,TO_CHAR);
                 return;
         }
 
@@ -108,7 +108,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
 
         victim->pecho("Твои ноги отрываются от земли.");
 
-        act("%^C1 поднимается в воздух.", victim, 0, 0, TO_ROOM);
+        act("%^C1 поднимается в воздух.", victim, 0, 0,TO_ROOM);
 
         return;
 
@@ -209,8 +209,8 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
 
     obj_to_room(portal,from_room);
 
-    act("Над землей образуется %3$O1.",ch,portal,0,TO_ROOM);
-    act("Перед тобой образуется %3$O1.",ch,portal,0,TO_CHAR);
+    act("Над землей образуется %3$O1.",ch,0,portal,TO_ROOM);
+    act("Перед тобой образуется %3$O1.",ch,0,portal,TO_CHAR);
 
     /* no second portal if rooms are the same */
     if (to_room == from_room)
@@ -278,8 +278,8 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
 
     obj_to_room(portal,ch->in_room);
 
-    act("Над землей образуется %3$O1.",ch,portal,0,TO_ROOM);
-    act("Перед тобой образуется %3$O1.",ch,portal,0,TO_CHAR);
+    act("Над землей образуется %3$O1.",ch,0,portal,TO_ROOM);
+    act("Перед тобой образуется %3$O1.",ch,0,portal,TO_CHAR);
 
     if (victim->in_room->people != 0)
     {
@@ -382,8 +382,8 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
     }
 
     if(!bFighting){
-            act("%^C1 рассеивается в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_ROOM);
-            act("Ты рассеиваешься в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_CHAR);
+            act("%^C1 рассеивается в клубах тумана, принимая газообразную форму.", ch, 0, 0,TO_ROOM);
+            act("Ты рассеиваешься в клубах тумана, принимая газообразную форму.", ch, 0, 0,TO_CHAR);
     }    
 }
 

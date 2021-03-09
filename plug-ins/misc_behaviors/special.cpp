@@ -249,7 +249,7 @@ bool spec_patrolman(NPCharacter *ch)
     ||  ((obj = get_eq_char(ch,wear_neck_2)) != 0
     &&   obj->pIndexData->vnum == OBJ_VNUM_WHISTLE))
     {
-        act("Ты со всей силы свистишь в %3$O4.",ch,obj,0,TO_CHAR);
+        act("Ты со всей силы свистишь в %3$O4.",ch,0,obj,TO_CHAR);
         oldact_p("$c1 свистит в $o1, ***WHEEEEEEEEEEEET***",
                ch,obj,0,TO_ROOM,POS_RESTING);
 
@@ -573,7 +573,7 @@ bool spec_janitor( NPCharacter *ch )
         if (chance( 33 ))
             continue;
         
-        act("%^C1 поднимает с пола какой-то мусор.", ch, 0, 0, TO_ROOM);
+        act("%^C1 поднимает с пола какой-то мусор.", ch, 0, 0,TO_ROOM);
         obj_from_room( trash );
         obj_to_char( trash, ch );
         return true;
@@ -724,9 +724,9 @@ bool spec_poison( NPCharacter *ch )
     ||   number_percent( ) > 2 * ch->getModifyLevel() )
         return false;
 
-    act("Ты кусаешь %2$C4!",  ch, 0, victim, TO_CHAR);
-    act("%1$^C1 кусает %2$C4!",  ch, 0, victim, TO_NOTVICT);
-    act("%^C1 кусает тебя!", ch, 0, victim, TO_VICT);
+    act("Ты кусаешь %2$C4!",  ch, victim, 0,TO_CHAR);
+    act("%1$^C1 кусает %2$C4!",  ch, victim, 0,TO_NOTVICT);
+    act("%^C1 кусает тебя!", ch, victim, 0,TO_VICT);
 
     spell( gsn_poison, ch->getModifyLevel( ), ch, victim, FSPELL_NOTRIGGER ); 
     return true;
@@ -852,7 +852,7 @@ bool spec_guard( NPCharacter *ch )
 
     if ( ech != 0 && ch->can_see(ech) )
     {
-        act("%^C1 кричит 'ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!", ch, 0, 0, TO_ROOM);
+        act("%^C1 кричит 'ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!", ch, 0, 0,TO_ROOM);
         multi_hit( ch, ech );
         return true;
     }
@@ -1038,7 +1038,7 @@ bool spec_captain( NPCharacter *ch )
 
     case 'S':
         ch->position = POS_SLEEPING;
-        act("%^C1 ложится и засыпает.", ch, 0, 0, TO_ROOM);
+        act("%^C1 ложится и засыпает.", ch, 0, 0,TO_ROOM);
         break;
 
     case 'a':

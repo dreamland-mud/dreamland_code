@@ -190,8 +190,8 @@ void GlobalQuest::exorcism( Character *ch ) const
     Room *recall;
     Character *actor = getActor( ch );
     
-    act("%^C1 улетучивается.", ch, 0, 0, TO_ROOM);
-    act("Ты исчезаешь отсюда.", ch, 0, 0, TO_CHAR);
+    act("%^C1 улетучивается.", ch, 0, 0,TO_ROOM);
+    act("Ты исчезаешь отсюда.", ch, 0, 0,TO_CHAR);
     
     //lonely npc with no current master
     if (ch->is_npc( ) && (ch == actor || actor->is_npc())){

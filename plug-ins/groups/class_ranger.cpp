@@ -139,7 +139,7 @@ static Object * find_arrow( Character *ch, Object *quiver )
         }
 
     if (!arrow) {
-        act("В %3$O6 закончились стрелы.", ch, quiver, 0, TO_CHAR);
+        act("В %3$O6 закончились стрелы.", ch, 0, quiver,TO_CHAR);
         return NULL;
     }
 
@@ -357,9 +357,9 @@ SKILL_RUNP( herbs )
 
       if (ch != victim)
         {
-          act("%^C1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT);
-          act("Ты накладываешь целебные травы на раны %2$C2.",ch,0,victim,TO_CHAR);
-          act("%1$^C1 накладывает целебные травы на раны %2$C2.",ch,0,victim,TO_NOTVICT);
+          act("%^C1 накладывает целебные травы на твои раны.",ch,victim,0,TO_VICT);
+          act("Ты накладываешь целебные травы на раны %2$C2.",ch,victim,0,TO_CHAR);
+          act("%1$^C1 накладывает целебные травы на раны %2$C2.",ch,victim,0,TO_NOTVICT);
         }
         
       if (victim->hit < victim->max_hit)
@@ -426,8 +426,8 @@ SKILL_RUNP( camp )
   ch->mana -= gsn_camp->getMana( );
   ch->setWait( gsn_camp->getBeats( ) );
 
-  act("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
-  act("%^C1 разбивает полевой лагерь.", ch, 0, 0, TO_ROOM);
+  act("Ты разбиваешь полевой лагерь.", ch, 0, 0,TO_CHAR);
+  act("%^C1 разбивает полевой лагерь.", ch, 0, 0,TO_ROOM);
 
   int slevel = skill_level(*gsn_camp, ch);
     
@@ -1388,7 +1388,7 @@ VOID_SPELL(RangerStaff)::run(Character *ch, char *, int sn, int level)
 
     staff = create_object(get_obj_index(OBJ_VNUM_RANGER_STAFF), level);
     ch->pecho("Ты создаешь посох рейнджера!");
-    act("%^C1 создает посох рейнджера!", ch, 0, 0, TO_ROOM);
+    act("%^C1 создает посох рейнджера!", ch, 0, 0,TO_ROOM);
 
     staff->timer = level;
     staff->level = ch->getModifyLevel();
@@ -1418,7 +1418,7 @@ void RangerStaff::fight( Character *ch )
         return;
 
     oldact_p("{BТвой посох рейнджера вспыхивает голубым светом!{x", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act("{BПосох рейнджера %C2 вспыхивает голубым светом!{x", ch, 0, 0, TO_ROOM );
+    act("{BПосох рейнджера %C2 вспыхивает голубым светом!{x", ch, 0, 0,TO_ROOM);
 
     spell( gsn_cure_critical, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
 }
@@ -1426,7 +1426,7 @@ void RangerStaff::fight( Character *ch )
 bool RangerStaff::death( Character *ch )
 {
     oldact_p("Твой посох рейнджера исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act("Посох рейнджера %C2 исчезает.", ch, 0, 0, TO_ROOM );
+    act("Посох рейнджера %C2 исчезает.", ch, 0, 0,TO_ROOM);
     extract_obj( obj );
     return false;
 }
@@ -1435,8 +1435,8 @@ bool RangerStaff::canEquip( Character *ch )
 {
   if (ch->getProfession( ) != prof_ranger) {
         ch->pecho("Ты не знаешь как использовать эту вещь.");
-        act("Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
-        act("Посох рейнджера выскальзывает из рук %C2.", ch, 0, 0, TO_ROOM );
+        act("Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0,TO_CHAR);
+        act("Посох рейнджера выскальзывает из рук %C2.", ch, 0, 0,TO_ROOM);
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         return false;

@@ -171,8 +171,8 @@ void Damage::adjustPosition( )
 
     if (ch->wait < 1 && ch->position > POS_STUNNED) {
         if (ch->position == POS_SITTING || ch->position == POS_RESTING) {
-             act("%^C1 встает на ноги под шквалом ударов.", ch, 0, 0, TO_ROOM ); 
-             act("Ты встаешь на ноги под шквалом ударов.", ch, 0, 0, TO_CHAR );
+             act("%^C1 встает на ноги под шквалом ударов.", ch, 0, 0,TO_ROOM); 
+             act("Ты встаешь на ноги под шквалом ударов.", ch, 0, 0,TO_CHAR);
         }
         ch->position = POS_FIGHTING;
     }
@@ -530,7 +530,7 @@ void Damage::handlePosition( )
  *----------------------------------------------------------------------------*/
 void Damage::handleDeath( ) 
 {
-    act("%^C1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
+    act("%^C1 уже {RТРУП{x!!", victim, 0, 0,TO_ROOM);
     victim->pecho("Тебя {RУБИЛИ{x!!\n\r");
     
     eventBus->publish(CharDeathEvent(victim, killer));

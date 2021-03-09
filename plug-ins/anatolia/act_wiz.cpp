@@ -618,7 +618,7 @@ CMDWIZP( goto )
                 if (!pch->bamfout.empty( ))
                     oldact("$t", ch, pch->bamfout.c_str( ), rch, TO_VICT );
                 else
-                    act("%^C1 исчезает в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    act("%^C1 исчезает в столбе {Cбожественной энергии.{x", ch, rch, 0,TO_VICT);
             }
     }
     
@@ -630,7 +630,7 @@ CMDWIZP( goto )
                 if (!pch->bamfin.empty( ))
                     oldact("$t", ch, pch->bamfin.c_str( ), rch, TO_VICT );
                 else
-                    act("%^C1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    act("%^C1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, rch, 0,TO_VICT);
             }
     }
 }
@@ -2049,8 +2049,8 @@ CMDWIZP( clone )
 
                 recursive_clone(ch,obj,clone);
 
-                act("%1$^C1 создает %3$C4.",ch,clone,0,TO_ROOM);
-                act("Ты создаешь дубликат %3$O2.",ch,clone,0,TO_CHAR);
+                act("%1$^C1 создает %3$C4.",ch,0,clone,TO_ROOM);
+                act("Ты создаешь дубликат %3$O2.",ch,0,clone,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %O4.", ch, obj );
                 return;
@@ -2089,8 +2089,8 @@ CMDWIZP( clone )
                 }
 
                 char_to_room(clone,ch->in_room);
-                act("%1$^C1 создает %2$C4.",ch,0,clone,TO_ROOM);
-                act("Ты клонируешь %2$C4.",ch,0,clone,TO_CHAR);
+                act("%1$^C1 создает %2$C4.",ch,clone,0,TO_ROOM);
+                act("Ты клонируешь %2$C4.",ch,clone,0,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %C4.", ch, clone );
                 
@@ -2155,8 +2155,8 @@ CMDWIZP( load )
         if (victim->in_room == 0)
             char_to_room( victim, ch->in_room );
 
-        act("%1$^C1 создает %2$C4!", ch, 0, victim, TO_ROOM);
-        act("Ты создаешь %2$C4!", ch, 0, victim, TO_CHAR);
+        act("%1$^C1 создает %2$C4!", ch, victim, 0,TO_ROOM);
+        act("Ты создаешь %2$C4!", ch, victim, 0,TO_CHAR);
 
 
         wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
@@ -2212,8 +2212,8 @@ CMDWIZP( load )
     else
         obj_to_room( obj, ch->in_room );
         
-    act("%1$^C1 создает %3$C4!", ch, obj, 0, TO_ROOM);
-    act("Ты создаешь %3$O4!", ch, obj, 0, TO_CHAR);
+    act("%1$^C1 создает %3$C4!", ch, 0, obj,TO_ROOM);
+    act("Ты создаешь %3$O4!", ch, 0, obj,TO_CHAR);
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
     LogStream::sendNotice( ) 
@@ -2257,7 +2257,7 @@ CMDWIZP( purge )
               extract_obj( obj );
         }
 
-        act("%^C1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
+        act("%^C1 изничтожает все в комнате!", ch, 0, 0,TO_ROOM);
         ch->pecho("Готово.");
         dreamland->resetOption( DL_SAVE_MOBS );
         dreamland->resetOption( DL_SAVE_OBJS );
@@ -2273,15 +2273,15 @@ CMDWIZP( purge )
             return;
         }
 
-        act("%1$^C1 изничтожает %2$C4.", ch, 0, victim, TO_NOTVICT );
-        act("Ты изничтожаешь %2$C4.", ch, 0, victim, TO_CHAR );
+        act("%1$^C1 изничтожает %2$C4.", ch, victim, 0,TO_NOTVICT);
+        act("Ты изничтожаешь %2$C4.", ch, victim, 0,TO_CHAR);
         extract_char( victim );
         return;
     }
 
     if ((obj = get_obj_here(ch, arg))) {
-        act("%1$^C1 изничтожает %3$C4.", ch, obj, 0, TO_ROOM );
-        act("Ты изничтожаешь %3$O4.", ch, obj, 0, TO_CHAR );
+        act("%1$^C1 изничтожает %3$C4.", ch, 0, obj,TO_ROOM);
+        act("Ты изничтожаешь %3$O4.", ch, 0, obj,TO_CHAR);
         extract_obj(obj);
         return;
     }
@@ -3066,13 +3066,13 @@ CMDWIZP( wizinvis )
       if ( ch->invis_level)
       {
           ch->invis_level = 0;
-          act("%^C1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
+          act("%^C1 внезапно проявляется в реальности.", ch, 0, 0,TO_ROOM);
           ch->pecho("Ты снова проявляешься в реальности.");
       }
       else
       {
           ch->invis_level = 102;
-          act("%^C1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
+          act("%^C1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0,TO_ROOM);
           ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     else
@@ -3088,7 +3088,7 @@ CMDWIZP( wizinvis )
       {
           ch->reply = 0;
           ch->invis_level = level;
-          act("%^C1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
+          act("%^C1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0,TO_ROOM);
           ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     }
@@ -3111,7 +3111,7 @@ CMDWIZP( incognito )
       if ( ch->incog_level)
       {
           ch->incog_level = 0;
-          act("%^C1 больше не маскируется.", ch, 0, 0, TO_ROOM);
+          act("%^C1 больше не маскируется.", ch, 0, 0,TO_ROOM);
           ch->pecho("Ты больше не маскируешься.");
       }
       else

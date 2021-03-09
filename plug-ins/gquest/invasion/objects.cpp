@@ -38,8 +38,8 @@ InvasionInstrument::InvasionInstrument( ) : charges( 5 )
 
 void InvasionInstrument::wear( Character *ch ) 
 { 
-    act("Ты покрепче сжимаешь %3$O4, готовясь к грядущим подвигам.", ch, obj, 0, TO_CHAR);
-    act("%1$^C1 с серьезным видом сжимает %3$C4.", ch, obj, 0, TO_ROOM);
+    act("Ты покрепче сжимаешь %3$O4, готовясь к грядущим подвигам.", ch, 0, obj,TO_CHAR);
+    act("%1$^C1 с серьезным видом сжимает %3$C4.", ch, 0, obj,TO_ROOM);
 }
 
 bool InvasionInstrument::use( Character *ch, const char *args ) 
@@ -51,13 +51,13 @@ bool InvasionInstrument::use( Character *ch, const char *args )
         return false;
     
     if (obj->wear_loc != wear_hold) {
-        act("Покрепче зажми %3$O4 в руках - глядишь, поможет..", ch, obj, 0, TO_CHAR);
+        act("Покрепче зажми %3$O4 в руках - глядишь, поможет..", ch, 0, obj,TO_CHAR);
         return true;
     }
     
     if (!( trgt = get_obj_room( ch, args ) )) {
         ch->pecho("Цель не найдена.");
-        act("%1$^C1 угрожающе размахивает %3$C5 - берегись!", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 угрожающе размахивает %3$C5 - берегись!", ch, 0, obj,TO_ROOM);
         return true;
     }
     

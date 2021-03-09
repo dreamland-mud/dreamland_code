@@ -52,12 +52,12 @@ CMDRUNP( listen )
          || ( obj = get_obj_room( ch, arg ) ))
     {
         if (obj->carried_by == ch) {
-            act("Ты подносишь к уху %3$O4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            act("%1$^C1 подносит к уху %3$C4 и прислушивается.", ch, obj, 0, TO_ROOM);
+            act("Ты подносишь к уху %3$O4 и прислушиваешься.", ch, 0, obj,TO_CHAR);
+            act("%1$^C1 подносит к уху %3$C4 и прислушивается.", ch, 0, obj,TO_ROOM);
         }
         else {
-            act("Ты прикладываешь ухо к %3$O3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            act("%1$^C1 прикладывает ухо к %3$C3 и прислушивается.", ch, obj, 0, TO_ROOM);
+            act("Ты прикладываешь ухо к %3$O3 и прислушиваешься.", ch, 0, obj,TO_CHAR);
+            act("%1$^C1 прикладывает ухо к %3$C3 и прислушивается.", ch, 0, obj,TO_ROOM);
         }
 
         if (oprog_listen( obj, ch, argument ))
@@ -78,7 +78,7 @@ CMDRUNP( listen )
     
     /* TODO: listen to a mob */
 
-    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    act("Ты не видишь здесь этого.", ch, 0, 0,TO_CHAR);
 }        
 
 /*---------------------------------------------------------------------------
@@ -124,8 +124,8 @@ CMDRUNP( smell )
     argument = one_argument( argument, arg );
 
     if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
-        act("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
-        act("%^C1 принюхивается.", ch, 0, 0, TO_ROOM);
+        act("Ты нюхаешь воздух.", ch, 0, 0,TO_CHAR);
+        act("%^C1 принюхивается.", ch, 0, 0,TO_ROOM);
 
         if (rprog_smell( ch->in_room, ch, argument ))
             return;
@@ -175,8 +175,8 @@ CMDRUNP( smell )
     if ( ( obj = get_obj_wear_carry( ch, arg ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
     {
-        act("Ты нюхаешь %3$O4.", ch, obj, 0, TO_CHAR);
-        act("%1$^C1 нюхает %3$C4.", ch, obj, 0, TO_ROOM);
+        act("Ты нюхаешь %3$O4.", ch, 0, obj,TO_CHAR);
+        act("%1$^C1 нюхает %3$C4.", ch, 0, obj,TO_ROOM);
 
         if (oprog_smell( obj, ch, argument ))
             return;
@@ -200,12 +200,12 @@ CMDRUNP( smell )
         bool rc = false;
 
         if (ch == victim) {
-            act("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
-            act("%^C1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
+            act("Ты обнюхиваешь себя.", ch, 0, 0,TO_CHAR);
+            act("%^C1 обнюхивает себя.", ch, 0, 0,TO_ROOM);
         } else {
-            act("Ты обнюхиваешь %2$C4.", ch, 0, victim, TO_CHAR);
-            act("%1$^C1 обнюхивает %2$C4.", ch, 0, victim, TO_NOTVICT);
-            act("%^C1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
+            act("Ты обнюхиваешь %2$C4.", ch, victim, 0,TO_CHAR);
+            act("%1$^C1 обнюхивает %2$C4.", ch, victim, 0,TO_NOTVICT);
+            act("%^C1 обнюхивает тебя.", ch, victim, 0,TO_VICT);
         }
 
         if (!( rc = mprog_smell( victim, ch, argument ) )) {
@@ -233,7 +233,7 @@ CMDRUNP( smell )
         return;
     }
 
-    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    act("Ты не видишь здесь этого.", ch, 0, 0,TO_CHAR);
 }        
 
 

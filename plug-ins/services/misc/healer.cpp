@@ -63,7 +63,7 @@ bool Healer::canServeClient( Character *client )
     if ((!client->is_npc( ) && client->getClan( ) == clan_battlerager)
         || (client->is_npc( ) && client->master && client->master->getClan( ) == clan_battlerager)) 
     {
-        act("%2$^C1 выразительно крутит пальцем у виска, глядя на %1$C4.", client, 0, getKeeper( ), TO_NOTVICT );
+        act("%2$^C1 выразительно крутит пальцем у виска, глядя на %1$C4.", client, getKeeper( ), 0,TO_NOTVICT);
         client->pecho("Напоминаем: ты BattleRager, а не презренный МАГ!");
         return false;
     }
@@ -107,8 +107,8 @@ void Healer::msgArticleTooFew( Character *client, Article::Pointer )
 
 void Healer::msgBuyRequest( Character *client )
 {
-    act("Ты просишь %2$C4 о помощи.", client, 0, getKeeper( ), TO_CHAR );
-    act("%1$^C1 просит %2$C4 о помощи.", client, 0, getKeeper( ), TO_NOTVICT );
+    act("Ты просишь %2$C4 о помощи.", client, getKeeper( ), 0,TO_CHAR);
+    act("%1$^C1 просит %2$C4 о помощи.", client, getKeeper( ), 0,TO_NOTVICT);
 }
 
 /*------------------------------------------------------------------------

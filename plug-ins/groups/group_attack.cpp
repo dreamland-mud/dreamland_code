@@ -46,9 +46,9 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
 { 
     int dam;
 
-    act("Множество острых клинков возникает вокруг %1$C2, поражая %2$C4.", ch,0,victim,TO_NOTVICT);
-    act("Вокруг тебя возникает множество острых клинков, поражая %2$C4.", ch,0,victim,TO_CHAR);
-    act("Множество острых клинков возникает вокруг %C2, поражая тебя!", ch,0,victim,TO_VICT);
+    act("Множество острых клинков возникает вокруг %1$C2, поражая %2$C4.", ch,victim,0,TO_NOTVICT);
+    act("Вокруг тебя возникает множество острых клинков, поражая %2$C4.", ch,victim,0,TO_CHAR);
+    act("Множество острых клинков возникает вокруг %C2, поражая тебя!", ch,victim,0,TO_VICT);
     dam = dice(level,6);
     if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 2;
@@ -163,14 +163,14 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
 
     if ( IS_GOOD(victim) )
     {
-        act("Боги защищают %C4.", victim, 0, 0, TO_ROOM);
-        act("Боги защищают тебя.", victim, 0, 0, TO_CHAR);
+        act("Боги защищают %C4.", victim, 0, 0,TO_ROOM);
+        act("Боги защищают тебя.", victim, 0, 0,TO_CHAR);
         return;
     }
 
     if ( IS_NEUTRAL(victim) )
     {
-        act("%2$^C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не чувствует этого.", ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -201,13 +201,13 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
     if ( IS_EVIL(victim) )
     {
         oldact("$c4 защищают $s демоны.", victim, 0, 0, TO_ROOM);
-        act("Тебя защищают твои демоны.", victim, 0, 0, TO_CHAR);
+        act("Тебя защищают твои демоны.", victim, 0, 0,TO_CHAR);
         return;
     }
 
     if ( IS_NEUTRAL(victim) )
     {
-        act("%2$^C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не чувствует этого.", ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -232,7 +232,7 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
     int dam;
 
     ch->pecho("Земля дрожит под твоими ногами!");
-    act("%^C1 вызывает ураган и землетрясение.", ch, 0, 0, TO_ROOM);
+    act("%^C1 вызывает ураган и землетрясение.", ch, 0, 0,TO_ROOM);
 
     area_message( ch, "Земля слегка дрожит под твоими ногами.", true );
 
@@ -480,14 +480,14 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     }
 
     if (number_percent( ) > ch->getSkill( sn )) {
-        act("%^C1 втыкает в могилу крест, но он падает на бок.", ch, 0, 0, TO_ROOM);
-        act("Ты втыкаешь в могилу крест, но он падает на бок.", ch, 0, 0, TO_CHAR);
+        act("%^C1 втыкает в могилу крест, но он падает на бок.", ch, 0, 0,TO_ROOM);
+        act("Ты втыкаешь в могилу крест, но он падает на бок.", ch, 0, 0,TO_CHAR);
         return;
     }
     
-    act("%^C1 втыкает в могилу священный крест!", ch, 0, 0, TO_ROOM);
-    act("Ты втыкаешь в могилу священный крест!", ch, 0, 0, TO_CHAR);
-    act("Из-под земли раздается раздирающий душу вопль!", ch, 0, 0, TO_ALL);
+    act("%^C1 втыкает в могилу священный крест!", ch, 0, 0,TO_ROOM);
+    act("Ты втыкаешь в могилу священный крест!", ch, 0, 0,TO_CHAR);
+    act("Из-под земли раздается раздирающий душу вопль!", ch, 0, 0,TO_ALL);
     
     undig( victim );
     dam = dice(level, 20);

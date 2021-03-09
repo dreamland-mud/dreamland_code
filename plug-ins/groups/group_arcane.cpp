@@ -72,8 +72,8 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    act("%1$^C1 зачитывает заклинание с %3$C2.", ch, scroll, 0, TO_ROOM);
-    act("Ты зачитываешь одно из заклинаний с %3$O2.", ch, scroll, 0, TO_CHAR);
+    act("%1$^C1 зачитывает заклинание с %3$C2.", ch, 0, scroll,TO_ROOM);
+    act("Ты зачитываешь одно из заклинаний с %3$O2.", ch, 0, scroll,TO_CHAR);
 
     successfulTargets++;
 
@@ -329,13 +329,13 @@ SKILL_RUNP( zap )
 
         if (victim && victim->in_room == ch->in_room) {
             if (ch != victim) {
-                act("%1$^C1 взмахивает %3$C5 на тебя!", ch, wand, victim, TO_VICT );
+                act("%1$^C1 взмахивает %3$C5 на тебя!", ch, victim, wand,TO_VICT);
                 oldact("$c1 взмахивает $o5 на $C4.", ch, wand, victim, TO_NOTVICT );
                 oldact("Ты взмахиваешь $o5 на $C4.", ch, wand, victim, TO_CHAR );
             }
             else {
-                act("%1$^C1 взмахивает %3$C5 на себя.", ch, wand, 0, TO_ROOM );
-                act("Ты взмахиваешь %3$O5 на себя.", ch, wand, 0, TO_CHAR );
+                act("%1$^C1 взмахивает %3$C5 на себя.", ch, 0, wand,TO_ROOM);
+                act("Ты взмахиваешь %3$O5 на себя.", ch, 0, wand,TO_CHAR);
             }
         }
         else if (target->obj && target->obj->getRoom( ) == ch->in_room) {
@@ -343,8 +343,8 @@ SKILL_RUNP( zap )
             oldact("Ты взмахиваешь $o5 на $O4.", ch, wand, target->obj, TO_CHAR );
         }
         else {
-            act("%1$^C1 взмахивает %3$C5.", ch, wand, 0, TO_ROOM );
-            act("Ты взмахиваешь %3$O5.", ch, wand, 0, TO_CHAR );
+            act("%1$^C1 взмахивает %3$C5.", ch, 0, wand,TO_ROOM);
+            act("Ты взмахиваешь %3$O5.", ch, 0, wand,TO_CHAR);
         }
 
         if (number_percent() >= gsn_wands->getEffective( ch )) {

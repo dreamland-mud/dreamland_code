@@ -45,8 +45,8 @@ bool FireproofWE::run( PCharacter *ch, Character *victim ) const
         affect_to_obj( obj, &af);
     }
 
-    act("{CОбмундирование на %C6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
-    act("{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
+    act("{CОбмундирование на %C6 вспыхивает ослепительным блеском.{x", victim, 0, 0,TO_ROOM);
+    act("{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0,TO_CHAR);
     return true;
 }
 
@@ -86,7 +86,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
     victim->hitroll += af.modifier;
     victim->damroll += af.modifier;
 
-    act("{CСекреты кузнецов древности преображают %3$O4!{x", ch, obj, 0, TO_ALL );
+    act("{CСекреты кузнецов древности преображают %3$O4!{x", ch, 0, obj,TO_ALL);
     return true;
 }
 
@@ -100,15 +100,15 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
     af.location         = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
 
     if (victim->isAffected( gsn_ancient_rage )) {
-        act("{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0, TO_CHAR );
+        act("{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0,TO_CHAR);
         af.modifier = 0;
     }
     else {
-        act("{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0, TO_CHAR );
+        act("{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0,TO_CHAR);
         af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
     }
 
-    act("{CПламя древней ярости вспыхивает в %C6!{x", victim, 0, 0, TO_ROOM );
+    act("{CПламя древней ярости вспыхивает в %C6!{x", victim, 0, 0,TO_ROOM);
     affect_join( victim, &af );
     return true;
 }
@@ -126,8 +126,8 @@ bool MendingWE::run( PCharacter *ch, Character *victim ) const
         affect_strip(obj, gsn_corrosion, true);
     }
 
-    act("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
-    act("{CСекреты древних кузнецов улучшают облик обмундирования %C2.{x", victim, 0, 0, TO_ROOM );
+    act("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0,TO_CHAR);
+    act("{CСекреты древних кузнецов улучшают облик обмундирования %C2.{x", victim, 0, 0,TO_ROOM);
     return true;
 }
 

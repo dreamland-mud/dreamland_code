@@ -182,7 +182,7 @@ void WeaponOneHit::damApplyCounter( )
         gsn_counter->improve( victim, true, ch );
         oldact("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR);
         oldact("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT);
-        act("%2$^C1 возвращает удар %1$C2 обратно!",ch,0,victim,TO_NOTVICT);
+        act("%2$^C1 возвращает удар %1$C2 обратно!",ch,victim,0,TO_NOTVICT);
 
         // set fighting state
         if (ch->fighting == NULL)
@@ -255,7 +255,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             poison->level = max(0,poison->level - 2);
             poison->duration = max(0,poison->duration - 1);
             if ( poison->level == 0 || poison->duration == 0 )
-                act("Яд с %3$O2 скоро исчезнет.",ch,wield,0,TO_CHAR);
+                act("Яд с %3$O2 скоро исчезнет.",ch,0,wield,TO_CHAR);
         }
     }
 
@@ -306,7 +306,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         for (auto &waf: wield->affected.findAllWithBits(&weapon_type2, WEAPON_SPELL)) 
             if (number_range( 1, waf->modifier ) == 1)
             {
-                act("%3$^O1 ярко вспыхивает!", ch, wield, 0, TO_ALL);
+                act("%3$^O1 ярко вспыхивает!", ch, 0, wield,TO_ALL);
                 lvl = std::min((int)ch->getModifyLevel(), (int)waf->level);
                 spell_nocatch( waf->type, lvl, ch, victim );
             }
@@ -325,8 +325,8 @@ void WeaponOneHit::damEffectFeeble( )
         return;
    
     SET_BIT( ch->affected_by, AFF_WEAK_STUN );
-    act("{DЧерная немощь{x поражает твою руку!", ch, 0, 0, TO_CHAR);
-    act("{DЧерная немощь{x поражает руку %C2!", ch, 0, 0, TO_ROOM);
+    act("{DЧерная немощь{x поражает твою руку!", ch, 0, 0,TO_CHAR);
+    act("{DЧерная немощь{x поражает руку %C2!", ch, 0, 0,TO_ROOM);
 
     if (wield && !IS_OBJ_STAT(wield, ITEM_NOREMOVE)) {
         oldact("Ты парализова$gно|н|на и роняешь оружие!", ch, 0, 0, TO_CHAR);

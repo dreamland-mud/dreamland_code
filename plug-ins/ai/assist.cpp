@@ -66,7 +66,7 @@ bool BasicMobileBehavior::assistOffense( Character *fch, Character *victim )
     if (!( target = findAssistVictim( victim ) ))
         return false;
 
-    act("%^C1 вскрикивает и атакует!", ch, 0, 0, TO_ROOM);
+    act("%^C1 вскрикивает и атакует!", ch, 0, 0,TO_ROOM);
     memoryAttacked.remember( target );
     attack( target );
     return true;
@@ -218,8 +218,8 @@ bool BasicMobileBehavior::assistGroupDistance( Character *fch, Character *victim
         return false;
 
     if (!memoryFought.memorized( victim )) {
-        act("%1$^C1 пристально смотрит на %2$C4.", ch, 0, victim, TO_NOTVICT);
-        act("%^C1 пристально смотрит на тебя.", ch, 0, victim, TO_VICT);
+        act("%1$^C1 пристально смотрит на %2$C4.", ch, victim, 0,TO_NOTVICT);
+        act("%^C1 пристально смотрит на тебя.", ch, victim, 0,TO_VICT);
         memoryFought.remember( victim );
     }
     

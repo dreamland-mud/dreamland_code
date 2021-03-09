@@ -29,7 +29,7 @@ bool GangChef::death( Character *killer )
     log("GangChef: killed by " << killer->getNameP( ));
 
     if (!gquest->isLevelOK( killer )) {
-        act("Ну даешь! Как ты сюда вообще попал?", killer, 0, 0, TO_CHAR);
+        act("Ну даешь! Как ты сюда вообще попал?", killer, 0, 0,TO_CHAR);
         LogStream::sendNotice( ) << "BAD guy in the Lair: " << killer->getNameP( ) 
                                  << " lvl " << killer->getModifyLevel( ) << endl;
 
@@ -63,7 +63,7 @@ void GangChef::greet( Character *mob )
     Gangsters *gquest = Gangsters::getThis( );
 
     if (!gquest->isLevelOK( gquest->getActor( mob ) )) {
-        act("%^C1 вопит '{RВОН ОТСЮДА!{x'", ch, 0, mob, TO_VICT);
+        act("%^C1 вопит '{RВОН ОТСЮДА!{x'", ch, mob, 0,TO_VICT);
         gquest->exorcism( mob );
         return;
     }

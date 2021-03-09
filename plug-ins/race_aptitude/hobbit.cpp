@@ -174,7 +174,7 @@ SKILL_RUNP( throwstone )
     }
 
     if (is_safe_nomessage( ch, victim )) {
-        act("Боги покровительствуют %2$C3.", ch, 0, victim, TO_CHAR);
+        act("Боги покровительствуют %2$C3.", ch, victim, 0,TO_CHAR);
         return;
     }
 

@@ -82,9 +82,9 @@ void CleaveOneHit::calcDamage( )
     }
 
     if (number_percent( ) < chance) {
-        act("Ты рассекаешь %2$C4 {RПОПОЛАМ{x!",ch,0,victim,TO_CHAR);
-        act("%^C1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT);
-        act("%1$^C1 рассекает %2$C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT);
+        act("Ты рассекаешь %2$C4 {RПОПОЛАМ{x!",ch,victim,0,TO_CHAR);
+        act("%^C1 рассекает тебя {RПОПОЛАМ{x!",ch,victim,0,TO_VICT);
+        act("%1$^C1 рассекает %2$C4 {RПОПОЛАМ{x!",ch,victim,0,TO_NOTVICT);
 
         ch->setWait( 2 );
 
@@ -128,12 +128,12 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   }
 
   if (victim->isAffected(sn)) {
-    act("%2$^C1 уже ничего не слышит.",ch,0,victim,TO_CHAR);
+    act("%2$^C1 уже ничего не слышит.",ch,victim,0,TO_CHAR);
     return;
   }
 
   if (saves_spell(level,victim, DAM_SOUND,ch, DAMF_MAGIC)) {
-        act("Тебе не удалось оглушить %2$C4.", ch, 0, victim, TO_CHAR);
+        act("Тебе не удалось оглушить %2$C4.", ch, victim, 0,TO_CHAR);
         return;
   }
 
@@ -142,7 +142,7 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   af.duration  = 10;
   affect_to_char(victim,&af);
 
-  act("%2$^C1 теперь ничего не слышит!",ch,0,victim,TO_CHAR);
+  act("%2$^C1 теперь ничего не слышит!",ch,victim,0,TO_CHAR);
   victim->pecho("Пронзительный звон оглушает тебя... ты ничего не слышишь!");
 
 }
@@ -286,7 +286,7 @@ void ShadowBlade::fight( Character *ch )
                 .incrementHitroll()
                 .incrementDamroll();
 
-            act("{cСлабое {Cсияние{c окутывает %3$O4.{x", ch, obj, 0, TO_CHAR);
+            act("{cСлабое {Cсияние{c окутывает %3$O4.{x", ch, 0, obj,TO_CHAR);
         }
     }
     
@@ -306,7 +306,7 @@ void ShadowBlade::fight( Character *ch )
     switch (number_range( 1, 4 )) {
     case 1:
         if (!IS_SET(victim->imm_flags, IMM_POISON)) {
-            act("Капли {Gяда{x стекают по лезвию %3$O2.", ch, obj, 0, TO_CHAR);
+            act("Капли {Gяда{x стекают по лезвию %3$O2.", ch, 0, obj,TO_CHAR);
             oldact("Капли {Gяда{x стекают по лезвию $o2 в руках $c2.", ch, obj, 0, TO_ROOM);
             spell( gsn_poison, level + 1, ch, victim, FSPELL_BANE );
         }
@@ -349,7 +349,7 @@ bool ShadowBlade::area( )
     if (ch->fighting == 0)
         return false;
 
-    act("%3$^O1 внезапно вонзается тебе в сердце!", ch, obj, 0, TO_CHAR );
+    act("%3$^O1 внезапно вонзается тебе в сердце!", ch, 0, obj,TO_CHAR);
     oldact("$o1 внезапно вонзается $c4 в сердце!", ch, obj, 0, TO_ROOM );
     unequip_char( ch, obj );
     obj_from_char( obj );
@@ -361,7 +361,7 @@ bool ShadowBlade::area( )
 bool ShadowBlade::canEquip( Character *ch )
 {
     if (ch->getProfession( ) != prof_anti_paladin) {
-        act("%3$^O1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 выскальзывает из твоих рук.", ch, 0, obj,TO_CHAR);
         unequip_char( ch, obj );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
@@ -374,7 +374,7 @@ bool ShadowBlade::canEquip( Character *ch )
 bool ShadowBlade::quit( Character *ch, bool count )
 {
     if (ch->getName( ) != owner.getValue( )) {
-        act("%3$^O1 не принадлежит тебе и не хочет покидать мир вместе с тобой.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 не принадлежит тебе и не хочет покидать мир вместе с тобой.", ch, 0, obj,TO_CHAR);
 
         if (obj->carried_by)
             obj_from_char( obj );
@@ -421,7 +421,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     }
 
     if (IS_WEAPON_STAT(blade, WEAPON_FADING)) {
-        act("Тьма уже окутывает %3$O4.", ch, blade, 0, TO_CHAR );
+        act("Тьма уже окутывает %3$O4.", ch, 0, blade,TO_CHAR);
         return;
     }
 
@@ -434,8 +434,8 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     af.bitvector.setValue(WEAPON_FADING);
     affect_to_obj( blade, &af );
 
-    act("Ты посвящаешь %3$O4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_CHAR );
-    act("%1$^C1 посвящает %3$C4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
+    act("Ты посвящаешь %3$O4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, 0, blade,TO_CHAR);
+    act("%1$^C1 посвящает %3$C4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, 0, blade,TO_ROOM);
 }
 
 /*
@@ -464,12 +464,12 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
     }
 
     if (blade->carried_by) {
-        act("%3$^O1 медленно исчезает.", blade->carried_by, blade, 0, TO_ALL );
+        act("%3$^O1 медленно исчезает.", blade->carried_by, 0, blade,TO_ALL);
         obj_from_char( blade );
     }
     else if (blade->in_room) {
         if (blade->in_room->people)
-            act("%3$^O1 медленно исчезает.", blade->in_room->people, blade, 0, TO_ALL );
+            act("%3$^O1 медленно исчезает.", blade->in_room->people, 0, blade,TO_ALL);
 
         obj_from_room( blade );
     }
@@ -477,7 +477,7 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
         obj_from_obj( blade );
 
     obj_to_char( blade, ch );
-    act("%3$^O1 появляется, мерцая.", ch, blade, 0, TO_ALL );
+    act("%3$^O1 появляется, мерцая.", ch, 0, blade,TO_ALL);
 }
 
 
@@ -534,8 +534,8 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
 
     obj_to_char( blade, ch );
 
-    act("Ты создаешь %3$O4!", ch, blade, 0, TO_CHAR );
-    act("%1$^C1 создает %3$C4!", ch, blade, 0, TO_ROOM );
+    act("Ты создаешь %3$O4!", ch, 0, blade,TO_CHAR);
+    act("%1$^C1 создает %3$C4!", ch, 0, blade,TO_ROOM);
 }
 
 /*---------------------------------------------------------------------------
@@ -563,11 +563,11 @@ void AntipaladinGuildmaster::give( Character *victim, Object *obj )
         victim->getPC( )->addQuestPoints(-price);
         SET_BIT(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE);
         SET_BIT(obj->wear_flags, ITEM_NO_SAC);
-        act("%^C1 прикасается к лезвию клинка и произносит странное заклинание.", ch, 0, 0, TO_ROOM);
+        act("%^C1 прикасается к лезвию клинка и произносит странное заклинание.", ch, 0, 0,TO_ROOM);
     }
 
     oldact("$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    act("%1$^C1 возвращает тебе %3$C4.", ch, obj, victim, TO_VICT );
+    act("%1$^C1 возвращает тебе %3$C4.", ch, victim, obj,TO_VICT);
 
     obj_from_char( obj );
     obj_to_char( obj, victim );

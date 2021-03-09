@@ -418,7 +418,7 @@ void char_update( )
                 if (IS_SET(ch->act, ACT_UNDEAD))
                     oldact("$c1 развалил$gось|ся|ась на куски.", ch, 0, 0, TO_ROOM);
                 else
-                    act("%^C1 исчезает.", ch, 0, 0, TO_ROOM);
+                    act("%^C1 исчезает.", ch, 0, 0,TO_ROOM);
                 extract_char( ch );
                 continue;
             }
@@ -1325,8 +1325,8 @@ void player_update( )
         if ( IS_DEATH_TIME( ch ) ) {
             ch->last_death_time--;
             if (!IS_DEATH_TIME(ch)) {
-                act("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR);
-                act("%^C1 полностью возвращается в мир живых.", ch, 0, 0, TO_ROOM);
+                act("Ты полностью возвращаешься в мир живых.", ch, 0, 0,TO_CHAR);
+                act("%^C1 полностью возвращается в мир живых.", ch, 0, 0,TO_ROOM);
                 UNSET_DEATH_TIME(ch);
             }
         }
@@ -1415,14 +1415,14 @@ void idle_update( PCharacter *ch )
 {
     if (IS_VIOLENT( ch ))
     {
-        act("Лихорадочный блеск в глазах %C2 пропадает.", ch, 0, 0, TO_ROOM );
-        act("Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
+        act("Лихорадочный блеск в глазах %C2 пропадает.", ch, 0, 0,TO_ROOM);
+        act("Ты успокаиваешься.", ch, 0, 0,TO_CHAR);
         REMOVE_VIOLENT( ch );
         ch->PK_time_v = 0;
     }
 
-    act("%^C1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
-    act("Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
+    act("%^C1 растворяется в воздухе.",ch, 0, 0,TO_ROOM);
+    act("Ты растворяешься в воздухе.", ch, 0, 0,TO_CHAR);
 
     if (IS_SET(ch->config, CONFIG_AUTOAFK) && !IS_SET(ch->comm, COMM_AFK))
         interpret_raw( ch, "afk" );
@@ -1496,8 +1496,8 @@ void wield_update( Character *ch )
             && second->getWeight( ) > (get_str_app(ch).wield * 5)
             && !check_native_weapon( ch, second ))
     {
-        act("Ты не в силах удержать %3$O4 в левой руке.", ch, second, 0, TO_CHAR);
-        act("%1$^C1 не в силах удержать %3$C4.", ch, second, 0, TO_ROOM);
+        act("Ты не в силах удержать %3$O4 в левой руке.", ch, 0, second,TO_CHAR);
+        act("%1$^C1 не в силах удержать %3$C4.", ch, 0, second,TO_ROOM);
         unequip_char( ch, second );
     }
     
@@ -1508,8 +1508,8 @@ void wield_update( Character *ch )
             && wield->getWeight( ) > (get_str_app(ch).wield * 10)
             && !check_native_weapon( ch, wield ))
     {
-        act("Ты не в силах удержать %3$O4 в правой руке.", ch, wield, 0, TO_CHAR);
-        act("%1$^C1 не в силах удержать %3$C4.", ch, wield, 0, TO_ROOM);
+        act("Ты не в силах удержать %3$O4 в правой руке.", ch, 0, wield,TO_CHAR);
+        act("%1$^C1 не в силах удержать %3$C4.", ch, 0, wield,TO_ROOM);
         unequip_char( ch, wield );
     }
     
@@ -1517,8 +1517,8 @@ void wield_update( Character *ch )
             && (second && second->wear_loc == wear_second_wield) 
             && (!wield || wield->wear_loc == wear_none)) 
     {
-        act("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
-        act("%^C1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
+        act("Ты вооружаешься вторичным оружием, как основным!", ch,0, 0,TO_CHAR);
+        act("%^C1 вооружается вторичным оружием, как основным!", ch,0, 0,TO_ROOM);
         unequip_char( ch, second );
         equip_char( ch, second, wear_wield );
     }

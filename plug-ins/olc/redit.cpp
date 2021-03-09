@@ -1055,8 +1055,8 @@ static bool redit_purge_obj(PCharacter *ch, Object *obj)
         return false;
     }
     
-    act("Ты уничтожаешь %3$O4.", ch, obj, 0, TO_CHAR);
-    act("%1$^C1 уничтожает %3$C4.", ch, obj, 0, TO_ROOM);
+    act("Ты уничтожаешь %3$O4.", ch, 0, obj,TO_CHAR);
+    act("%1$^C1 уничтожает %3$C4.", ch, 0, obj,TO_ROOM);
     extract_obj(obj);
     return true;
 }
@@ -1074,8 +1074,8 @@ static bool redit_purge_mob(PCharacter *ch, Character *vch)
         return false;
     }
 
-    act("Ты уничтожаешь %2$C4.", ch, 0, mob, TO_CHAR);
-    act("%1$^C1 уничтожает %2$C4.", ch, 0, mob, TO_ROOM);
+    act("Ты уничтожаешь %2$C4.", ch, mob, 0,TO_CHAR);
+    act("%1$^C1 уничтожает %2$C4.", ch, mob, 0,TO_ROOM);
     extract_char(mob);
     return true;
 }

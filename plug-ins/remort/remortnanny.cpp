@@ -109,8 +109,8 @@ void RemortWitch::greet( Character *victim )
     if (pch->getRemorts( ).points == 0)
         return;
     
-    act("%^C1, кряхтя, поворачивается к тебе.", ch, 0, pch, TO_VICT );
-    act("%1$^C1, кряхтя, поворачивается к %2$C3.", ch, 0, pch, TO_NOTVICT );
+    act("%^C1, кряхтя, поворачивается к тебе.", ch, pch, 0,TO_VICT);
+    act("%1$^C1, кряхтя, поворачивается к %2$C3.", ch, pch, 0,TO_NOTVICT);
     oldact("$c1 говорит тебе '{G$C1, здравствуй, родненьк$Gое|ий|ая..{x'", ch, 0, pch, TO_VICT );
 }
 

@@ -49,12 +49,12 @@ bool LiquidWEBase::checkItemType( PCharacter *ch, Object *obj ) const
 bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 {
     if (obj->value1() == 0) {
-        act("Слово эхом отозвалось в пустоте %3$O2.", ch, obj, 0, TO_CHAR);
+        act("Слово эхом отозвалось в пустоте %3$O2.", ch, 0, obj,TO_CHAR);
         return false;
     }
     
     if (obj->value1() > gsn_arcadian->getEffective( ch ) * 10) {
-        act("В %3$O6 налито слишком много жидкости.", ch, obj, 0, TO_CHAR);
+        act("В %3$O6 налито слишком много жидкости.", ch, 0, obj,TO_CHAR);
         return false;
     }
     
@@ -64,7 +64,7 @@ bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 bool LiquidWEBase::checkWater( PCharacter *ch, Object *obj ) const
 {
     if (obj->value2() != liq_water) {
-        act("Это слово действует только на воду.", ch, 0, 0, TO_CHAR);
+        act("Это слово действует только на воду.", ch, 0, 0,TO_CHAR);
         return false;
     }
     
@@ -137,12 +137,12 @@ bool DrinkContainerWEBase::checkContainer( PCharacter *ch, Object *obj ) const
         return true;
 
     if (!( bhv = obj->behavior.getDynamicPointer<ArcadianDrinkBehavior>( ) )) {
-        act("Повлиять на эту емкость у тебя не получится.", ch, obj, 0, TO_CHAR);
+        act("Повлиять на эту емкость у тебя не получится.", ch, 0, obj,TO_CHAR);
         return false;
     }
 
     if (bhv->isActive( )) {
-        act("Жидкость в %3$O6 уже обладает необычными свойствами.", ch, obj, 0, TO_CHAR);
+        act("Жидкость в %3$O6 уже обладает необычными свойствами.", ch, 0, obj,TO_CHAR);
         return false;
     }
 
@@ -173,7 +173,7 @@ bool WineContainerWEBase::run( PCharacter *ch, Object *obj ) const
     
     liq = liquidManager->find( obj->value2() );
     if (!liq->getFlags( ).isSet( LIQF_WINE )) {
-        act("То, что налито в %3$O4, мало похоже на вино.", ch, obj, 0, TO_CHAR);
+        act("То, что налито в %3$O4, мало похоже на вино.", ch, 0, obj,TO_CHAR);
         return false;
     }
 
@@ -197,7 +197,7 @@ bool BeerContainerWEBase::run( PCharacter *ch, Object *obj ) const
     
     liq = liquidManager->find( obj->value2() );
     if (!liq->getFlags( ).isSet( LIQF_BEER )) {
-        act("То, что налито в %3$O4, мало похоже на пиво.", ch, obj, 0, TO_CHAR);
+        act("То, что налито в %3$O4, мало похоже на пиво.", ch, 0, obj,TO_CHAR);
         return false;
     }
 
@@ -228,7 +228,7 @@ void WineRefreshWE::onDrink( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     update_pos( ch );
 
     oldact("$c1 выглядит посвежевш$gим|им|ей.", ch, 0, 0, TO_ROOM );
-    act("Напиток освежает тебя.", ch, 0, 0, TO_CHAR );
+    act("Напиток освежает тебя.", ch, 0, 0,TO_CHAR);
 }
 
 /*
@@ -253,8 +253,8 @@ void WineSleepWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
 
     set_violent( ch, victim, false );
 
-    act("Ты чувствуешь внезапный неодолимый приступ сонливости.", victim, 0, 0, TO_CHAR );
-    act("%^C1 зевает во всю пасть и засыпает.", victim, 0, 0, TO_ROOM );
+    act("Ты чувствуешь внезапный неодолимый приступ сонливости.", victim, 0, 0,TO_CHAR);
+    act("%^C1 зевает во всю пасть и засыпает.", victim, 0, 0,TO_ROOM);
 
     af.bitvector.setTable(&affect_flags);
     af.type      = gsn_sleep;
@@ -298,7 +298,7 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
 
     if (number_percent( ) > slevel * bhv->getQuality( ) / 100) {
         oldact_p("Ты ворочаешься во сне.", victim, 0, 0, TO_CHAR, POS_SLEEPING );
-        act("%^C1 ворочается во сне.", victim, 0, 0, TO_ROOM );
+        act("%^C1 ворочается во сне.", victim, 0, 0,TO_ROOM);
         return;
     }
 
@@ -306,8 +306,8 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     victim->position = POS_RESTING;
     update_pos( victim );
 
-    act("Сон как рукой сняло!", victim, 0, 0, TO_CHAR );
-    act("%^C1 вздрагивает и просыпается.", victim, 0, 0, TO_ROOM );
+    act("Сон как рукой сняло!", victim, 0, 0,TO_CHAR);
+    act("%^C1 вздрагивает и просыпается.", victim, 0, 0,TO_ROOM);
 }
 
 void WineAwakeWE::onDrink( ArcadianDrinkBehavior::Pointer bhv, Character *ch, int amount ) const
@@ -326,12 +326,12 @@ void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, i
 void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, Character *victim, int amount ) const
 {
     if (!goodQuality( bhv ) || !goodVolume( amount )) {
-        act("Ты чувствуешь мимолетное умиротворение.", victim, 0, 0, TO_CHAR );
+        act("Ты чувствуешь мимолетное умиротворение.", victim, 0, 0,TO_CHAR);
         oldact("$c1 на мгновение кажется более умиротворенн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
         return;
     }
     
-    act("Ты чувствуешь удивительное спокойствие.", victim, 0, 0, TO_CHAR );
+    act("Ты чувствуешь удивительное спокойствие.", victim, 0, 0,TO_CHAR);
     oldact("$c1 выглядит невероятно умиротворенн$gым|ым|ой и спокойн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
     
     if (IS_AFFECTED( victim, AFF_BERSERK ))
@@ -387,13 +387,13 @@ void BeerArmorWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     af.location = APPLY_AC;
     
     if (victim->isAffected( gsn_beer_armor )) {
-        act("Пивная пленка на твоей коже становится прочнее.", victim, 0, 0, TO_CHAR );
-        act("Пивная пленка на коже %C2 становится прочнее.", victim, 0, 0, TO_ROOM );
+        act("Пивная пленка на твоей коже становится прочнее.", victim, 0, 0,TO_CHAR);
+        act("Пивная пленка на коже %C2 становится прочнее.", victim, 0, 0,TO_ROOM);
         af.modifier = 0;
     }
     else {
-        act("Твоя кожа покрывается защитной пивной пленкой.", victim, 0, 0, TO_CHAR );
-        act("Кожа %C2 покрывается защитной пивной пленкой.", victim, 0, 0, TO_ROOM );
+        act("Твоя кожа покрывается защитной пивной пленкой.", victim, 0, 0,TO_CHAR);
+        act("Кожа %C2 покрывается защитной пивной пленкой.", victim, 0, 0,TO_ROOM);
         af.modifier  = -(af.level * 3 / 2);
     }
 
@@ -423,14 +423,14 @@ void BeerElementalWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *
             extract_obj( pool );
         }
         else
-            act("Из пенных брызг рождается %2$C1!", ch, 0, mob, TO_ALL );
+            act("Из пенных брызг рождается %2$C1!", ch, mob, 0,TO_ALL);
 
         if (ch->fighting) 
             multi_hit( mob, ch->fighting );
     }
     else {
         if (pool)
-            act("%3$^O1 яростно булькает, но ничего не происходит.", ch, pool, 0, TO_ALL );
+            act("%3$^O1 яростно булькает, но ничего не происходит.", ch, 0, pool,TO_ALL);
     }
 }
 

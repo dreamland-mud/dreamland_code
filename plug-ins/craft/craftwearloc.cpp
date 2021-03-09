@@ -19,7 +19,7 @@ int CraftTattooWearloc::canWear( Character *ch, Object *obj, int flags )
 bool CraftTattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(flags, F_WEAR_VERBOSE))
-        act("Только специальные средства могут избавить тебя от %3$O2.", ch, obj, 0, TO_CHAR);
+        act("Только специальные средства могут избавить тебя от %3$O2.", ch, 0, obj,TO_CHAR);
 
     return false;
 }

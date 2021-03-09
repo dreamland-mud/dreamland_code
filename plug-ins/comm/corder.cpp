@@ -80,7 +80,7 @@ COMMAND(COrder, "order")
     
     else if(!iargs.pCommand->properOrder( victim )) {
         if (victim->isAffected( gsn_manacles ))
-            act("%2$^C1 говорит тебе '{GЯ не буду делать это.{x'", ch, 0, victim, TO_CHAR );
+            act("%2$^C1 говорит тебе '{GЯ не буду делать это.{x'", ch, victim, 0,TO_CHAR);
         else
             oldact("$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch, 0, victim, TO_CHAR );
     }

@@ -411,7 +411,7 @@ int TattooWearloc::canWear( Character *ch, Object *obj, int flags )
 bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(flags, F_WEAR_VERBOSE))
-        act("Лишь Божественные Силы могут избавить тебя от %3$O2.", ch, obj, 0, TO_CHAR);
+        act("Лишь Божественные Силы могут избавить тебя от %3$O2.", ch, 0, obj,TO_CHAR);
 
     return false;
 }

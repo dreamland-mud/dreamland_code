@@ -59,7 +59,7 @@ CLAN(knight);
  *-------------------------------------------------------------------------*/
 void ClanItemKnight::actDisappear()
 {
-    act("%3$^O1 исчезает в серой дымке.", obj->getRoom()->people, obj, 0, TO_ALL);
+    act("%3$^O1 исчезает в серой дымке.", obj->getRoom()->people, 0, obj,TO_ALL);
 }
 
 /*--------------------------------------------------------------------------
@@ -67,12 +67,12 @@ void ClanItemKnight::actDisappear()
  *-------------------------------------------------------------------------*/
 void ClanAltarKnight::actAppear()
 {
-    act("{WЛучи света пронизывают комнату и в центре материализуется %3$O1.{x", obj->in_room->people, obj, 0, TO_ALL);
+    act("{WЛучи света пронизывают комнату и в центре материализуется %3$O1.{x", obj->in_room->people, 0, obj,TO_ALL);
 }
 
 void ClanAltarKnight::actDisappear()
 {
-    act("{WСвет %3$O2 исчезает и он растворяется в воздухе!{x", obj->getRoom()->people, obj, 0, TO_ALL);
+    act("{WСвет %3$O2 исчезает и он растворяется в воздухе!{x", obj->getRoom()->people, 0, obj,TO_ALL);
 }
 
 void ClanAltarKnight::actNotify(Character *ch)
@@ -89,7 +89,7 @@ void ClanGuardKnight::actGreet(PCharacter *wch)
 }
 void ClanGuardKnight::actPush(PCharacter *wch)
 {
-    act("%2$^C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе.", wch, 0, ch, TO_CHAR);
+    act("%2$^C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе.", wch, ch, 0,TO_CHAR);
     oldact("$C1 кивает $c3, слегка нахмурившись, взмахивает рукой.\n\r... и $c1 с диким восторгом в глазах улетает.", wch, 0, ch, TO_ROOM);
 }
 
@@ -110,8 +110,8 @@ void ClanGuardKnight::actGhost(PCharacter *)
 
 void ClanGuardKnight::actGiveInvitation(PCharacter *wch, Object *obj)
 {
-    act("%^C1 внимательно сверяется со списком.", ch, 0, 0, TO_ROOM);
-    act("%1$^C1 ставит Королевскую печать на %3$C6.", ch, obj, 0, TO_ROOM);
+    act("%^C1 внимательно сверяется со списком.", ch, 0, 0,TO_ROOM);
+    act("%1$^C1 ставит Королевскую печать на %3$C6.", ch, 0, obj,TO_ROOM);
 }
 
 int ClanGuardKnight::getCast(Character *victim)
@@ -184,7 +184,7 @@ SKILL_RUNP(guard)
 
     if (vict->is_npc())
     {
-        act("%2$^C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR);
+        act("%2$^C1 не нуждается в твоей помощи!", ch, vict, 0,TO_CHAR);
         return;
     }
 
@@ -213,13 +213,13 @@ SKILL_RUNP(guard)
 
     if (victim->guarded_by != 0)
     {
-        act("%2$^C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR);
+        act("%2$^C4 уже кто-то охраняет.", pch, victim, 0,TO_CHAR);
         return;
     }
 
     if (!is_same_group(victim, pch))
     {
-        act("Но ты не состоишь в той же группе, что и %2$C1.", pch, 0, victim, TO_CHAR);
+        act("Но ты не состоишь в той же группе, что и %2$C1.", pch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -249,9 +249,9 @@ SKILL_RUNP(guard)
             return;
         }
 
-    act("Теперь ты охраняешь %2$C4.", pch, 0, victim, TO_CHAR);
-    act("Теперь тебя охраняет %C4.", pch, 0, victim, TO_VICT);
-    act("%1$^C1 теперь охраняет %2$C4.", pch, 0, victim, TO_NOTVICT);
+    act("Теперь ты охраняешь %2$C4.", pch, victim, 0,TO_CHAR);
+    act("Теперь тебя охраняет %C4.", pch, victim, 0,TO_VICT);
+    act("%1$^C1 теперь охраняет %2$C4.", pch, victim, 0,TO_NOTVICT);
 
     pch->guarding = victim;
     victim->guarded_by = pch;
@@ -273,9 +273,9 @@ BOOL_SKILL(guard)::run(Character *wch, Character *mob)
 
     if (number_percent() < min(100, chance))
     {
-        act("%1$^C1 прыгает перед %2$C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
-        act("%^C1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
-        act("Ты прыгаешь перед %2$C5!", ch->guarded_by, 0, ch, TO_CHAR);
+        act("%1$^C1 прыгает перед %2$C5!", ch->guarded_by, ch, 0,TO_NOTVICT);
+        act("%^C1 прыгает перед тобой!", ch->guarded_by, ch, 0,TO_VICT);
+        act("Ты прыгаешь перед %2$C5!", ch->guarded_by, ch, 0,TO_CHAR);
         gsn_guard->improve(ch->guarded_by, true, mob);
         return true;
     }
@@ -313,8 +313,8 @@ VOID_SPELL(Dragonplate)::run(Character *ch, char *target_name, int sn, int level
 
     obj_to_char(plate, ch);
 
-    act("Ты взмахиваешь руками и создаешь %3$O4!", ch, plate, 0, TO_CHAR);
-    act("%1$^C1 взмахивает руками и создает %3$C4!", ch, plate, 0, TO_ROOM);
+    act("Ты взмахиваешь руками и создаешь %3$O4!", ch, 0, plate,TO_CHAR);
+    act("%1$^C1 взмахивает руками и создает %3$C4!", ch, 0, plate,TO_ROOM);
 }
 
 /*
@@ -327,7 +327,7 @@ bool KnightWeapon::death(Character *ch)
     wielded = (obj->wear_loc == wear_wield || obj->wear_loc == wear_second_wield);
 
     oldact_p("Твое золотое оружие исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD);
-    act("Золотое оружие %C2 исчезает.", ch, 0, 0, TO_ROOM);
+    act("Золотое оружие %C2 исчезает.", ch, 0, 0,TO_ROOM);
     extract_obj(obj);
 
     if (!wielded || ch->is_npc() || chance(80))
@@ -357,7 +357,7 @@ void KnightWeapon::fight(Character *ch)
 
     if (sn > 0)
     {
-        act("%3$^O1 загорается ярким голубым светом!", ch, obj, 0, TO_CHAR);
+        act("%3$^O1 загорается ярким голубым светом!", ch, 0, obj,TO_CHAR);
         oldact("$o1 $c2 загорается ярким голубым светом!", ch, obj, 0, TO_ROOM);
 
         spell(sn, ch->getModifyLevel(), ch, ch, FSPELL_BANE);
@@ -407,8 +407,8 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
     SET_BIT(sword->extra_flags, (ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
     obj_to_char(sword, ch);
 
-    act("Ты взмахиваешь руками и создаешь %3$O4!", ch, sword, 0, TO_CHAR);
-    act("%1$^C1 взмахивает руками и создает %3$C4!", ch, sword, 0, TO_ROOM);
+    act("Ты взмахиваешь руками и создаешь %3$O4!", ch, 0, sword,TO_CHAR);
+    act("%1$^C1 взмахивает руками и создает %3$C4!", ch, 0, sword,TO_ROOM);
 }
 
 SPELL_DECL(GoldenAura);
@@ -452,7 +452,7 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
 
         vch->pecho("{YЗолотая аура{x окружает тебя.");
         if (ch != vch)
-            act("{YЗолотая аура{x окружает %2$C4.", ch, 0, vch, TO_CHAR);
+            act("{YЗолотая аура{x окружает %2$C4.", ch, vch, 0,TO_CHAR);
     }
 }
 

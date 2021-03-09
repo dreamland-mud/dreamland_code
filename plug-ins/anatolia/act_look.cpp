@@ -987,7 +987,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     }
 
     if (!naked) {
-        act("\r\n%2$C1 использует: ", ch, 0, victim, TO_CHAR );
+        act("\r\n%2$C1 использует: ", ch, victim, 0,TO_CHAR);
         ch->send_to( buf );
     }
             
@@ -1377,8 +1377,8 @@ static void do_look_character( Character *ch, Character *victim )
             act("%^C1 смотрит на себя.",ch,0,0,TO_ROOM);
         else
         {
-            act("%^C1 смотрит на тебя.", ch, 0, victim, TO_VICT);
-            act("%1$^C1 смотрит на %2$C4.",  ch, 0, victim, TO_NOTVICT);
+            act("%^C1 смотрит на тебя.", ch, victim, 0,TO_VICT);
+            act("%1$^C1 смотрит на %2$C4.",  ch, victim, 0,TO_NOTVICT);
         }
     }
 
@@ -1640,8 +1640,8 @@ CMDRUNP( examine )
                 act("%^C1 осматривает себя.",ch,0,0,TO_ROOM);
             else
             {
-                act("%^C1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
-                act("%1$^C1 бросает взгляд на %2$C4.",  ch, 0, victim, TO_NOTVICT);
+                act("%^C1 бросает взгляд на тебя.", ch, victim, 0,TO_VICT);
+                act("%1$^C1 бросает взгляд на %2$C4.",  ch, victim, 0,TO_NOTVICT);
             }
         }
 
@@ -1769,14 +1769,14 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
 static bool oprog_examine_corpse( Object *obj, Character *ch, const DLString & )
 {
-    act("На %3$O6 ты видишь:", ch, obj, 0, TO_CHAR );
+    act("На %3$O6 ты видишь:", ch, 0, obj,TO_CHAR);
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
 
 static bool oprog_examine_keyring( Object *obj, Character *ch, const DLString & )
 {
-    act("На %3$O4 нанизано:", ch, obj, 0, TO_CHAR );
+    act("На %3$O4 нанизано:", ch, 0, obj,TO_CHAR);
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        

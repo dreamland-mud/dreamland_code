@@ -81,9 +81,9 @@ void AdamantiteGolem::fight( Character *victim )
 
     ch->setWait( gsn_rescue->getBeats( )  );
     
-    act("Ты спасаешь %2$C4!",  ch, 0, master, TO_CHAR );
-    act("%^C1 спасает тебя!", ch, 0, master, TO_VICT );
-    act("%1$^C1 спасает %2$C4!",  ch, 0, master, TO_NOTVICT );
+    act("Ты спасаешь %2$C4!",  ch, master, 0,TO_CHAR);
+    act("%^C1 спасает тебя!", ch, master, 0,TO_VICT);
+    act("%1$^C1 спасает %2$C4!",  ch, master, 0,TO_NOTVICT);
 
     stop_fighting( master->fighting, false );
     set_fighting( ch, master->fighting);
@@ -273,7 +273,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 
         ch->pecho("С помощью сил Тьмы и Хаоса ты оживляешь труп!");
         ch->recho("С помощью сил Тьмы и Хаоса %C1 оживляет %O4!", ch, obj);
-        act("%2$^C1 смотрит на тебя бессмысленным взглядом, повинуясь твоим приказам!",ch,0,undead,TO_CHAR);
+        act("%2$^C1 смотрит на тебя бессмысленным взглядом, повинуясь твоим приказам!",ch,undead,0,TO_CHAR);
 
         extract_obj (obj);
 }
@@ -283,7 +283,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Character *victim, int sn, int leve
         if ( victim == ch )
             ch->pecho("Жизнь прекрасна и ты не собираешься расставаться со своим телом!");
         else 
-            act("Жизнь прекрасна и %2$C1 не собирается расставаться со своим телом!",ch,0,victim,TO_CHAR);
+            act("Жизнь прекрасна и %2$C1 не собирается расставаться со своим телом!",ch,victim,0,TO_CHAR);
 
 }
 

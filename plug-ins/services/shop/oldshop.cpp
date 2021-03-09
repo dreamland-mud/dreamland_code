@@ -175,7 +175,7 @@ CMDRUN( buy )
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-        act("%^C1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
+        act("%^C1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, ch, 0,TO_VICT);
         ch->reply = keeper;
         return;
     }
@@ -248,7 +248,7 @@ CMDRUN( buy )
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
         cost -= obj->cost / 2 * roll / 100;
-        act("Ты торгуешься с %2$C5.", ch, 0, keeper, TO_CHAR);
+        act("Ты торгуешься с %2$C5.", ch, keeper, 0,TO_CHAR);
         gsn_haggle->improve( ch, true );
     }
 
@@ -263,7 +263,7 @@ CMDRUN( buy )
     }
     else
     {
-        act("%1$^C1 покупает %3$C4.", ch, obj, 0, TO_ROOM);
+        act("%1$^C1 покупает %3$C4.", ch, 0, obj,TO_ROOM);
         sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
                         cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
         oldact( buf, ch, obj, 0, TO_CHAR);
@@ -356,13 +356,13 @@ CMDRUN( sell )
 
     if (!keeper->can_see(obj))
     {
-        act("%^C1 не видит этого.",keeper,0,ch,TO_VICT);
+        act("%^C1 не видит этого.",keeper,ch,0,TO_VICT);
         return;
     }
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-        act("%1$^C1 не интересуется %3$C5.", keeper, obj, ch, TO_VICT);
+        act("%1$^C1 не интересуется %3$C5.", keeper, ch, obj,TO_VICT);
         return;
     }
 
@@ -400,7 +400,7 @@ CMDRUN( sell )
         }
     }
 
-    act("%1$^C1 продает %3$C4.", ch, obj, 0, TO_ROOM);
+    act("%1$^C1 продает %3$C4.", ch, 0, obj,TO_ROOM);
     silver = cost - (cost/100) * 100;
     gold   = cost/100;
 

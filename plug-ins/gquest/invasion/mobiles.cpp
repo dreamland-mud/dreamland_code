@@ -71,7 +71,7 @@ bool InvasionHelper::death( Character *killer )
     } 
 
     char_to_room( gq->createHelper( ), ch->in_room );
-    act("{YБожественные силы возвращают %C4 к жизни!{x", ch, 0, 0, TO_ROOM);
+    act("{YБожественные силы возвращают %C4 к жизни!{x", ch, 0, 0,TO_ROOM);
     return true;
 }
 
@@ -88,7 +88,7 @@ void InvasionHelper::tell( Character *victim, const char *speech )
 
     pch = victim->getPC( );
     
-    act("%2$^C1 что-то говорит %1$C3.", ch, 0, victim, TO_NOTVICT);
+    act("%2$^C1 что-то говорит %1$C3.", ch, victim, 0,TO_NOTVICT);
 
     if (!help.match( speech )) {
         actWrongSpeech( pch );
@@ -119,7 +119,7 @@ void InvasionHelper::actTooMuch( PCharacter *pch, Object *obj )
 
 void InvasionHelper::actGiveInstrument( PCharacter *pch, Object *obj )
 {
-    act("%1$^C1 вручает тебе %3$C4.", ch, obj, pch, TO_VICT);
+    act("%1$^C1 вручает тебе %3$C4.", ch, pch, obj,TO_VICT);
     oldact("$c1 вручает $C3 $o4.", ch, obj, pch, TO_NOTVICT);
 }
 

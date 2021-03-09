@@ -76,7 +76,7 @@ void ClanGuardRulerPre::actInvited( PCharacter *wch, Object *obj )
 
 void ClanGuardRulerPre::actPush( PCharacter *wch )
 {
-    act("%2$^C1 взмахивает перед тобой кандалами... слегка задевает...\n\r... и ты летишь...", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 взмахивает перед тобой кандалами... слегка задевает...\n\r... и ты летишь...", wch, ch, 0,TO_CHAR);
     oldact("$C1 задевает кандалами $c4 и $c1 с воплем улетает...", wch, 0, ch, TO_ROOM );
 }
 
@@ -195,7 +195,7 @@ int ClanGuardRuler::getCast( Character *victim )
  *------------------------------------------------------------------------*/
 void ClanGuardRulerJailer::actPush( PCharacter *wch )
 {
-    act("%2$^C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, ch, 0,TO_CHAR);
     oldact("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
 }
 
@@ -684,12 +684,12 @@ SKILL_RUNP( wanted )
 
                         if ( IS_SET(victim->act ,PLR_WANTED) )
                         {
-                                act("%2$^C1 уже разыскивается.", ch, 0, victim, TO_CHAR);
+                                act("%2$^C1 уже разыскивается.", ch, victim, 0,TO_CHAR);
                         }
                         else
                         {
                                 SET_BIT(victim->act, PLR_WANTED);
-                                act("%^C1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT);
+                                act("%^C1 теперь в РОЗЫСКЕ!!!",victim, ch, 0,TO_NOTVICT);
                                 victim->pecho("Ты теперь в РОЗЫСКЕ!!!");
                                 if ( !victim->is_npc() )
                                         victim->getPC( )->loyalty = max ( victim->getPC( )->loyalty - 50, -1000);
@@ -701,11 +701,11 @@ SKILL_RUNP( wanted )
                 case 'Н':
                 case 'н':
                         if ( !IS_SET(victim->act,PLR_WANTED) )
-                                act("%2$^C1 не разыскивается.", ch, 0, victim, TO_CHAR);
+                                act("%2$^C1 не разыскивается.", ch, victim, 0,TO_CHAR);
                         else
                         {
                                 REMOVE_BIT(victim->act, PLR_WANTED);
-                                act("%^C1 больше не разыскивается.",victim, 0, ch, TO_NOTVICT);
+                                act("%^C1 больше не разыскивается.",victim, ch, 0,TO_NOTVICT);
                                 victim->pecho("Тебя больше не разыскивают.");
                                 ch->pecho("Ok.");
                         }
@@ -985,12 +985,12 @@ SKILL_RUNP( confiscate )
                         obj->wear_loc = wear_none ;
 
                         oldact("Ты конфискуешь $o4 у $C4.", ch, obj, victim, TO_CHAR);
-                        act("%1$^C1 конфискует у тебя %3$C4.", ch, obj, victim, TO_VICT);
+                        act("%1$^C1 конфискует у тебя %3$C4.", ch, victim, obj,TO_VICT);
                         oldact("$c1 конфискует $o4 у $C4.", ch, obj, victim, TO_NOTVICT);
 
                         obj_to_room( obj, ch->in_room );
-                        act("Ты аккуратно кладешь %3$O4 на пол.", ch, obj, 0, TO_CHAR);
-                        act("%1$^C1 аккуратно кладет %3$C4 на пол.", ch, obj, 0, TO_ROOM);
+                        act("Ты аккуратно кладешь %3$O4 на пол.", ch, 0, obj,TO_CHAR);
+                        act("%1$^C1 аккуратно кладет %3$C4 на пол.", ch, 0, obj,TO_ROOM);
 
                 }
         }  
@@ -1236,7 +1236,7 @@ SKILL_RUNP( jail )
                         }
 
                         if ( victim->isAffected(gsn_manacles) )
-                                act("Руки %2$C4 закованы в кандалы!",ch,0,victim,TO_CHAR);
+                                act("Руки %2$C4 закованы в кандалы!",ch,victim,0,TO_CHAR);
 
                         oldact(buf, ch, 0, victim, TO_CHAR);
                 }
@@ -1514,9 +1514,9 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 
     for (rch = victim->in_room->people; rch; rch = rch->next_in_room) {
         if (rch->is_mirror() && rch->doppel == target) {
-            act("Луч света, посланный %C5, отражается от зеркала и поражает ТЕБЯ!", ch, 0, target, TO_VICT );
-            act("Луч света, посланный %1$C5, отражается от зеркала и поражает %2$C4!", ch, 0, target, TO_NOTVICT );
-            act("Луч света, посланный тобой, отражается от зеркала и поражает %2$C4!", ch, 0, target, TO_CHAR );
+            act("Луч света, посланный %C5, отражается от зеркала и поражает ТЕБЯ!", ch, target, 0,TO_VICT);
+            act("Луч света, посланный %1$C5, отражается от зеркала и поражает %2$C4!", ch, target, 0,TO_NOTVICT);
+            act("Луч света, посланный тобой, отражается от зеркала и поражает %2$C4!", ch, target, 0,TO_CHAR);
 
             dam = dice( level, 5 );
 
@@ -1625,7 +1625,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
                             repops.front( )->name, repops.front( )->areaIndex->name );
             }
             else if (repops.size( ) > 0) {
-                act("%2$^C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
+                act("%2$^C1 может обитать в одном из следующих мест:", ch, mob, 0,TO_CHAR);
 
                 for (auto &r: repops)
                     ch->printf( "    %s  (%s)\r\n", r->name, r->areaIndex->name);
@@ -1634,10 +1634,10 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
     }
 
     if (!victim->isAffected(gsn_doppelganger)) {
-        act("Ты не замечаешь во внешности %2$C2 ничего необычного.", ch, 0, victim, TO_CHAR);
+        act("Ты не замечаешь во внешности %2$C2 ничего необычного.", ch, victim, 0,TO_CHAR);
     }
     else if (saves_spell( level, victim, DAM_MENTAL, ch, DAMF_MAGIC)) {
-        act("Тебе не удалось заглянуть под личину %2$C2.", ch, 0, victim, TO_CHAR);
+        act("Тебе не удалось заглянуть под личину %2$C2.", ch, victim, 0,TO_CHAR);
     }
     else {
         if (victim->is_mirror( )) 
@@ -1664,8 +1664,8 @@ VOID_SPELL(RemoveBadge)::run( Character *ch, Character *victim, int sn, int leve
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          act("Твой %3$O1 исчезает.",ch, badge, 0, TO_CHAR);
-          act("У %1$C2 исчезает %3$C1.", ch, badge, 0, TO_ROOM);
+          act("Твой %3$O1 исчезает.",ch, 0, badge,TO_CHAR);
+          act("У %1$C2 исчезает %3$C1.", ch, 0, badge,TO_ROOM);
         
           obj_from_char(badge);
           extract_obj(badge);
@@ -1722,7 +1722,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          act("Твой %3$O1 исчезает.",ch, badge, 0, TO_CHAR);
+          act("Твой %3$O1 исчезает.",ch, 0, badge,TO_CHAR);
           obj_from_char(badge);
           extract_obj(badge);
           continue;
@@ -1753,8 +1753,8 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
 
   badge->timer = 200;
-  act("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR);
-  act("%^C1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM);
+  act("Ты надеваешь символ Хранителя Закона!",ch, 0, 0,TO_CHAR);
+  act("%^C1 надевает символ Хранителя Закона!", ch, 0, 0,TO_ROOM);
 
   obj_to_char(badge,ch);
   wear_obj( ch, badge, 0 );
@@ -1915,7 +1915,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
         affect_strip( victim, gsn_manacles );
 
     oldact("$c1 искупи$gло|л|ла свою провинность и освобождается из-под стражи.", victim, 0, 0, TO_ROOM);
-    act("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR);
+    act("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0,TO_CHAR);
 
     if (victim->in_room
         && victim->in_room->vnum >= 4343

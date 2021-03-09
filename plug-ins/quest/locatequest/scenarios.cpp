@@ -39,20 +39,20 @@ int LocateScenario::getCount( PCharacter *pch ) const
 void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest, Object *obj ) const
 {
     oldact("$c1 произносит '{gСпасибо, конечно, но я не об этом проси$gло|л|ла тебя.'{x'", ch, 0, 0, TO_ROOM );
-    act("%1$^C1 возвращает тебе %3$C4.", ch, obj, hero, TO_VICT );
+    act("%1$^C1 возвращает тебе %3$C4.", ch, hero, obj,TO_VICT);
     oldact("$c1 возвращает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 
 void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
-    act("%1$^C1 произносит '{gВот спасибо, %2$C1. Теперь все найдено и я могу спать спокойно.{x'",  ch, 0, hero, TO_ROOM );
+    act("%1$^C1 произносит '{gВот спасибо, %2$C1. Теперь все найдено и я могу спать спокойно.{x'",  ch, hero, 0,TO_ROOM);
     oldact("$c1 произносит '{gА вознаграждение я уже переда$gло|л|ла твоему квестору. Сходи и забери его.{x'", ch, 0, hero, TO_ROOM );
 }
 
 void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     if (chance(1) && quest->delivered == 1) {
-        act("%^C1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );
+        act("%^C1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, hero, 0,TO_ROOM);
         interpret_raw( ch, "grin" );
         return;
     } 

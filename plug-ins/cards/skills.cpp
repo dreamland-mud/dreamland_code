@@ -53,8 +53,8 @@ VOID_SPELL(AceInSleeves)::run( Character *ch, char *, int sn, int level )
     
     obj_to_char( sleeves, ch );
 
-    act("Ты создаешь %3$O4!", ch, sleeves, 0, TO_CHAR);
-    act("%1$^C1 создает %3$C4!", ch, sleeves, 0, TO_ROOM);
+    act("Ты создаешь %3$O4!", ch, 0, sleeves,TO_CHAR);
+    act("%1$^C1 создает %3$C4!", ch, 0, sleeves,TO_ROOM);
 }
 
 /*
@@ -126,9 +126,9 @@ SKILL_RUNP( sconce )
         chance -= 40;
 
     if (number_percent( ) < chance * k / 100) {
-        act("Ты со всей силы бьешь %2$C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
-        act("%^C1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
-        act("%1$^C1 лупит %2$C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
+        act("Ты со всей силы бьешь %2$C4 канделябром по голове!", ch, victim, 0,TO_CHAR);
+        act("%^C1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, victim, 0,TO_VICT);
+        act("%1$^C1 лупит %2$C4 по голове канделябром.", ch, victim, 0,TO_NOTVICT);
         gsn_sconce->improve( ch, true, victim );
 
         af.type = gsn_sconce;
@@ -170,7 +170,7 @@ public:
                 || ( IS_AWAKE( victim ) && number_percent() <= 10 ) )
             && !victim->is_immortal())
         {
-            act("Твоя {Rшутка{x над %2$C5 удалась!",ch,0,victim,TO_CHAR);
+            act("Твоя {Rшутка{x над %2$C5 удалась!",ch,victim,0,TO_CHAR);
             oldact("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT);
             oldact_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
@@ -240,7 +240,7 @@ SKILL_RUNP( joker )
             && victim->can_see(ch)
             && IS_AWAKE(victim) )
     {
-        act("Нехорошо шутить над больными!", ch, 0, victim, TO_CHAR );
+        act("Нехорошо шутить над больными!", ch, victim, 0,TO_CHAR);
         return;
     }
 
@@ -255,7 +255,7 @@ SKILL_RUNP( joker )
         }
         else
         {
-            act("Твоя шутка не удалась..",ch,0,victim,TO_CHAR);
+            act("Твоя шутка не удалась..",ch,victim,0,TO_CHAR);
             gsn_joker->improve( ch, false, victim );
             joke.miss( );
         }
