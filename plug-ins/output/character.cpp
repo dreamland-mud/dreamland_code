@@ -66,6 +66,15 @@ void Character::vpecho( const char *f, va_list av)
     send_to( r );
 }
 
+void Character::pecho( const DLString &line )
+{
+    if (!line.empty()) {
+        ostringstream buf;
+        buf << line << endl;
+        send_to(buf);
+    }
+}
+
 void Character::pecho( const char *f, ... )
 {
     va_list av;
