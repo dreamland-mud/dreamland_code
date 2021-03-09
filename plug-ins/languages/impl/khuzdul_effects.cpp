@@ -46,7 +46,7 @@ bool FireproofWE::run( PCharacter *ch, Character *victim ) const
     }
 
     act("{CОбмундирование на %C6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
-    oldact("{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
+    act("{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
     return true;
 }
 
@@ -100,11 +100,11 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
     af.location         = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
 
     if (victim->isAffected( gsn_ancient_rage )) {
-        oldact("{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0, TO_CHAR );
+        act("{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0, TO_CHAR );
         af.modifier = 0;
     }
     else {
-        oldact("{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0, TO_CHAR );
+        act("{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0, TO_CHAR );
         af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
     }
 
@@ -126,7 +126,7 @@ bool MendingWE::run( PCharacter *ch, Character *victim ) const
         affect_strip(obj, gsn_corrosion, true);
     }
 
-    oldact("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
+    act("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
     act("{CСекреты древних кузнецов улучшают облик обмундирования %C2.{x", victim, 0, 0, TO_ROOM );
     return true;
 }

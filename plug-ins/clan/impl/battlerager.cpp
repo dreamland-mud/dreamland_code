@@ -493,7 +493,7 @@ SKILL_RUNP( spellbane )
 
         affect_to_char(ch,&af);
 
-        oldact("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR);
+        act("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR);
         act("%^C1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM);
 }
 
@@ -528,7 +528,7 @@ SKILL_RUNP( resistance )
         postaffect_to_char(ch, gsn_resistance, skill_level(*gsn_resistance, ch) / 6);
       ch->mana -= mana;
 
-      oldact("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
+      act("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
       act("%^C1 выглядит покрепче.",ch,0,0,TO_ROOM);
       gsn_resistance->improve( ch, true );
     }
@@ -602,7 +602,7 @@ SKILL_RUNP( truesight )
 
       ch->mana -= mana; 
 
-      oldact("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
+      act("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
       act("%^C1 смотрит более зорко.",ch,0,0,TO_ROOM);
       gsn_truesight->improve( ch, true );
     }
@@ -743,7 +743,7 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
 
     oldact_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
            ch,0,wch,TO_VICT,POS_RESTING);
-    oldact("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
+    act("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
     act("Ты передаешь лечебное зелье %2$C3.",ch,0,wch,TO_CHAR);
     act("%2$^C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
     oldact("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT);
@@ -779,7 +779,7 @@ bool ClanGuardBattlerager::specFight( )
 
     if ( number_percent() < 33 )
     {
-            oldact("Ты наносишь тройной удар смертоносной силы!",ch,0,0,TO_CHAR);
+            act("Ты наносишь тройной удар смертоносной силы!",ch,0,0,TO_CHAR);
             act("%^C1 наносит тройной удар смертоносной силы!",ch,0,0,TO_ROOM);
             one_hit( ch, victim );
             one_hit( ch, victim );

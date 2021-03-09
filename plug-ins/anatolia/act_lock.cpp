@@ -1211,9 +1211,9 @@ bool Keyhole::doExamine( )
         return false;
         
     if (isPickProof( )) 
-        oldact("Замок защищен от взлома.", ch, 0, 0, TO_CHAR );
+        act("Замок защищен от взлома.", ch, 0, 0, TO_CHAR );
     else {
-        oldact("Замок не устоит перед хорошим взломщиком.", ch, 0, 0, TO_CHAR );
+        act("Замок не устоит перед хорошим взломщиком.", ch, 0, 0, TO_CHAR );
 
         for (Object *o = ch->carrying; o; o = o->next_content) {
             if (checkLockPick( o )) {

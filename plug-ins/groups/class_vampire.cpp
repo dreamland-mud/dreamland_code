@@ -390,17 +390,17 @@ SKILL_RUNP( dig )
 
     if (number_percent( ) > chance) {
         act("%^C1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM);
-        oldact("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR);
+        act("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR);
         gsn_digging->improve( ch, false );
         return;
     }
 
     act("%^C1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0, TO_ROOM);
-    oldact("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами.", ch, 0, 0, TO_CHAR);
+    act("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами.", ch, 0, 0, TO_CHAR);
     gsn_digging->improve( ch, true );
 
     if (number_percent( ) < 2) 
-        oldact("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0, TO_ALL);
+        act("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0, TO_ALL);
     
     ch->dismount( );
     char_from_room( ch );
@@ -1024,7 +1024,7 @@ SKILL_RUNP( bloodlet )
     dam = ch->getModifyLevel( );
     
     if (number_percent( ) < chance) {
-        oldact("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0, TO_CHAR);
+        act("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0, TO_CHAR);
         act("%^C1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0, TO_ROOM);
         ch->getPC( )->desires[desire_bloodlust] = 0;
         gsn_bloodlet->improve( ch, true );
@@ -1161,7 +1161,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
     if (!victim)
         return false;
     
-    oldact("Твоя тень падает на могилу...", victim, 0, 0, TO_CHAR);
+    act("Твоя тень падает на могилу...", victim, 0, 0, TO_CHAR);
     act("Тень %C2 падает на могилу...", victim, 0, 0, TO_ROOM);
     
     undig( ch );
@@ -1279,9 +1279,9 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
         return;
     }
 	
-    oldact("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0, TO_ALL);
+    act("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0, TO_ALL);
     oldact("На зов $c2 слетается стая летучих мышей и окружает $s живым облаком.", ch, 0, 0, TO_ROOM);
-    oldact("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR);
+    act("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR);
 
     af.type            = sn;
     af.level            = level;

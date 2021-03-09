@@ -746,7 +746,7 @@ bool HunterTrapObject::checkPrevent( Character *victim )
     if (!saves_spell( ownerLevel, victim, DAM_NONE ))
         return false;
 
-    oldact("Сила твоего клана защищает тебя от ловушек Охотников.", victim, 0, 0, TO_CHAR);
+    act("Сила твоего клана защищает тебя от ловушек Охотников.", victim, 0, 0, TO_CHAR);
     act("Сила клана защищает %C4 от ловушек Охотников.", victim, 0, 0, TO_ROOM);
     return true;
 }
@@ -926,7 +926,7 @@ void HunterBeaconTrap::greet( Character *victim )
     if (!chance( quality + 10 ))
         return;
 
-//    oldact("Рядом с тобой раздается щелчок.", victim, 0, 0, TO_ALL );
+//    act("Рядом с тобой раздается щелчок.", victim, 0, 0, TO_ALL );
 
     clantalk( *clan_hunter, 
               "Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s.",
@@ -1370,7 +1370,7 @@ struct HunterPitDamage : public Damage {
             if (!saves_spell( obj->level, ch, DAM_POISON )) {   
                 Affect af;
 
-                oldact("Ты чувствуешь, как яд распространяется по твоим венам.", ch, 0, 0, TO_CHAR);
+                act("Ты чувствуешь, как яд распространяется по твоим венам.", ch, 0, 0, TO_CHAR);
                 oldact("$c1 отравле$gно|н|на ядом от $o2.", ch, obj, 0, TO_ROOM);
 
                 af.bitvector.setTable(&affect_flags);
@@ -1420,7 +1420,7 @@ void HunterPitTrap::greet( Character *victim )
     try { 
         HunterPitDamage( victim, this ).hit( true );
 
-        oldact("Ты теряешь сознание.", victim, 0, 0, TO_CHAR);
+        act("Ты теряешь сознание.", victim, 0, 0, TO_CHAR);
         act("%^C1 теряет сознание.", victim, 0, 0, TO_ROOM);
         victim->position = POS_STUNNED;
         victim->setWait( gsn_hunter_pit->getBeats( ) );
@@ -1534,7 +1534,7 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
     af.duration         = max( 6, ch->getPC( )->getClanLevel( ) * 2 );
     affect_to_char(ch,&af);
 
-    oldact("Теперь ты будешь замечать чужие ловушки.", ch, 0, 0, TO_CHAR);
+    act("Теперь ты будешь замечать чужие ловушки.", ch, 0, 0, TO_CHAR);
     act("Взгляд %C2 становится более внимательным.", ch, 0, 0, TO_ROOM);
 }
 

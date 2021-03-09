@@ -1756,7 +1756,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
 
   badge->timer = 200;
-  oldact("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR);
+  act("Ты надеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR);
   act("%^C1 надевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM);
 
   obj_to_char(badge,ch);
@@ -1918,7 +1918,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
         affect_strip( victim, gsn_manacles );
 
     oldact("$c1 искупи$gло|л|ла свою провинность и освобождается из-под стражи.", victim, 0, 0, TO_ROOM);
-    oldact("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR);
+    act("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR);
 
     if (victim->in_room
         && victim->in_room->vnum >= 4343

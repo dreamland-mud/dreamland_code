@@ -1317,7 +1317,7 @@ void player_update( )
 
         if (HAS_SHADOW(ch)) 
             if (--ch->shadow < 0)
-                oldact("Твоя вторая тень исчезает.",ch,0,0,TO_CHAR);
+                act("Твоя вторая тень исчезает.",ch,0,0,TO_CHAR);
         
         if (ch->move <= 0 && ch->position != POS_SLEEPING)
             ch->pecho("Тебе нужно отдохнуть!");
@@ -1325,7 +1325,7 @@ void player_update( )
         if ( IS_DEATH_TIME( ch ) ) {
             ch->last_death_time--;
             if (!IS_DEATH_TIME(ch)) {
-                oldact("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR);
+                act("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR);
                 act("%^C1 полностью возвращается в мир живых.", ch, 0, 0, TO_ROOM);
                 UNSET_DEATH_TIME(ch);
             }
@@ -1416,13 +1416,13 @@ void idle_update( PCharacter *ch )
     if (IS_VIOLENT( ch ))
     {
         act("Лихорадочный блеск в глазах %C2 пропадает.", ch, 0, 0, TO_ROOM );
-        oldact("Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
+        act("Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
         REMOVE_VIOLENT( ch );
         ch->PK_time_v = 0;
     }
 
     act("%^C1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
-    oldact("Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
+    act("Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
 
     if (IS_SET(ch->config, CONFIG_AUTOAFK) && !IS_SET(ch->comm, COMM_AFK))
         interpret_raw( ch, "afk" );
@@ -1517,7 +1517,7 @@ void wield_update( Character *ch )
             && (second && second->wear_loc == wear_second_wield) 
             && (!wield || wield->wear_loc == wear_none)) 
     {
-        oldact("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
+        act("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
         act("%^C1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
         unequip_char( ch, second );
         equip_char( ch, second, wear_wield );

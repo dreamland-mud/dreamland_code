@@ -29,7 +29,7 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
 
     if (!victim->getRace( )->getVuln( ).isSet( VULN_IRON )) {
         if (victim == ch)
-            oldact("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
+            act("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
         else
             act("%2$^C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
         
@@ -45,7 +45,7 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     affect_join( victim, &af );
    
     act("{CСекретное знание Сидхов теперь защищает %C4.{x", victim, 0, 0, TO_ROOM);
-    oldact("{CСекретное знание Сидхов теперь защищает тебя.{x", victim, 0, 0, TO_CHAR);
+    act("{CСекретное знание Сидхов теперь защищает тебя.{x", victim, 0, 0, TO_CHAR);
     return true;
 }
 

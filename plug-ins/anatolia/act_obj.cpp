@@ -1310,7 +1310,7 @@ CMDRUNP( drop )
 
         if (!found) {
             if (arg[3] == '\0')
-                oldact("У тебя ничего нет.", ch, 0, arg, TO_CHAR );
+                act("У тебя ничего нет.", ch, 0, arg, TO_CHAR );
             else
                 oldact("У тебя нет $T.", ch, 0, is_number(&arg[4]) ? "этого":&arg[4], TO_CHAR );
         }
@@ -1678,7 +1678,7 @@ CMDRUNP( use )
 
     if (!obj)
     {
-        oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+        act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
         return;
     }
     

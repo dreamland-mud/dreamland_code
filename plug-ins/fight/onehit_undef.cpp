@@ -443,8 +443,8 @@ bool UndefinedOneHit::defenseParry( )
         /* now the attack */
         if (number_percent() < ( chance / 20  ))
         {
-            oldact("Ты не можешь устоять на ногах!",ch,0,victim,TO_VICT);
-            oldact("Ты падаешь вниз!",ch,0,victim,TO_VICT);
+            act("Ты не можешь устоять на ногах!",ch,0,victim,TO_VICT);
+            act("Ты падаешь вниз!",ch,0,victim,TO_VICT);
             act("%2$^C1 не может устоять на ногах и падает вниз!", ch,0,victim,TO_CHAR);
             oldact("$C1 пытается парировать мощный удар $c1, но не может устоять на ногах.", ch,0,victim,TO_NOTVICT);
 
@@ -794,7 +794,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         /* now the attack */
         if (number_percent() < ( chance / 20  ))
         {
-            oldact("Тебе не удается удержать равновесие!\nТы падаешь!", ch, 0, victim, TO_VICT);
+            act("Тебе не удается удержать равновесие!\nТы падаешь!", ch, 0, victim, TO_VICT);
             act("%2$^C1 не может сдержать твою атаку и падает!", ch, 0, victim, TO_CHAR);
             oldact("$C1 не может сдержать ошеломляющую атаку $c2 и падает.", ch, 0, victim, TO_NOTVICT);
 
@@ -1155,7 +1155,7 @@ void UndefinedOneHit::damApplyDeathblow( )
 
         dam = number_range( min_dam, max_dam );
 
-        oldact("Твои руки наполняются смертоносной силой!",ch,0,0,TO_CHAR);
+        act("Твои руки наполняются смертоносной силой!",ch,0,0,TO_CHAR);
         act("Руки %C2 наполняются смертоносной силой!",ch,0,0,TO_ROOM);
         gsn_deathblow->improve( ch, true, victim );
     }
@@ -1243,7 +1243,7 @@ void UndefinedOneHit::damEffectMasterHand()
             act("{r%C1 слегка оглушает тебя ударом в голову!{x", ch, 0, victim, TO_VICT);
             oldact("{r$c1 слегка оглушает $C4 ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
         } else {
-            oldact("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x", ch, 0, victim, TO_CHAR);
+            act("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x", ch, 0, victim, TO_CHAR);
             act("{r%C1 слегка оглушает СЕБЯ ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
         }
     } else if (diceroll < (chance / 2) && !IS_AFFECTED(victim, AFF_STUN)) {
@@ -1435,7 +1435,7 @@ void UndefinedOneHit::damEffectSlice( )
     oldact("{RТы отрубаешь $t руку $C3!{x", ch, sideName.c_str( ), victim, TO_CHAR );
     gsn_slice->improve( ch, true, victim );
     act("Отрубленная рука %C2 падает на землю.", victim, 0, 0, TO_ROOM );
-    oldact("Твоя отрубленная рука падает на землю.", victim, 0, 0, TO_CHAR );
+    act("Твоя отрубленная рука падает на землю.", victim, 0, 0, TO_CHAR );
 
     /* affect */
     af.type  = gsn_slice;

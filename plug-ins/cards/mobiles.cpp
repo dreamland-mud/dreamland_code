@@ -49,7 +49,7 @@ bool CardStarterBehavior::death( Character *killer )
     if (card->getLevel( ) < 0) {
         card->setSuit( suit );
         card->setLevel( 0 );
-        oldact("{cТеперь ТЫ займешь её место.{x", killer, 0, 0, TO_CHAR );
+        act("{cТеперь ТЫ займешь её место.{x", killer, 0, 0, TO_CHAR );
     }
     
     return false;

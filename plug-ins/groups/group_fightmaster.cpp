@@ -188,14 +188,14 @@ SKILL_RUNP( bashdoor )
                         REMOVE_BIT(peexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(peexit->exit_info, EX_CLOSED);
                         act("%^C1 выбивает дверь.", ch, 0, 0, TO_ROOM);
-                        oldact("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
+                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
                 }
                 else
                 {
                         REMOVE_BIT(pexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(pexit->exit_info, EX_CLOSED);
                         act("%^C1 выбивает дверь.", ch, 0, 0, TO_ROOM);
-                        oldact("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
+                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
 
                         /* open the other side */
                         if ((pexit_rev = direction_reverse(room, door)))
@@ -211,7 +211,7 @@ SKILL_RUNP( bashdoor )
         }
         else
         {
-                oldact("Обессилев, ты падаешь лицом вниз!", ch,0,0,TO_CHAR);
+                act("Обессилев, ты падаешь лицом вниз!", ch,0,0,TO_CHAR);
                 oldact("Обессилев, $c1 упа$gло|л|ла лицом вниз.", ch,0,0,TO_ROOM);
                 gsn_bash_door->improve( ch, false );
                 ch->position = POS_RESTING;
@@ -474,7 +474,7 @@ SKILL_RUNP( bash )
         {
                 if (number_percent() < 50)
                 {
-                        oldact("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
+                        act("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
                         act("%^C1 промахивается и падает.",ch,0,victim,TO_NOTVICT);
                         oldact_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
                                 ch,0,victim,TO_VICT,POS_RESTING);
@@ -1075,7 +1075,7 @@ SKILL_RUNP( crush )
         else
         {
                 damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
-                oldact("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
+                act("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
                 act("%^C1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT);
                 oldact_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
                         ch,0,victim,TO_VICT,POS_RESTING);
@@ -1403,11 +1403,11 @@ SKILL_RUNP( warcry )
     if (number_percent() > gsn_warcry->getEffective( ch )) {
         switch (number_range( 1, 2 )) {
         case 1: 
-            oldact("Ты тихонько хрюкаешь.", ch, 0, 0, TO_CHAR);
+            act("Ты тихонько хрюкаешь.", ch, 0, 0, TO_CHAR);
             act("%^C1 тихонько хрюкает.", ch, 0, 0, TO_ROOM);
             break;
         case 2:
-            oldact("Ты сдавленно стонешь.", ch, 0, 0, TO_CHAR);
+            act("Ты сдавленно стонешь.", ch, 0, 0, TO_CHAR);
             act("%^C1 издает сдавленные стоны.", ch, 0, 0, TO_ROOM);
             break;
         }
@@ -1438,7 +1438,7 @@ SKILL_RUNP( warcry )
         interpret_raw( ch, "yell", attr->getValue( ).c_str( ) );
     }
     else {
-        oldact("Ты издаешь боевой клич и чувствуешь, что теперь тебе все по плечу!", ch, 0, 0, TO_CHAR);
+        act("Ты издаешь боевой клич и чувствуешь, что теперь тебе все по плечу!", ch, 0, 0, TO_CHAR);
         act("%^C1 издает боевой клич!", ch, 0, 0, TO_ROOM);
     }
 

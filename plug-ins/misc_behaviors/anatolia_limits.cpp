@@ -105,7 +105,7 @@ void Excalibur::speech( Character *ch, const char *speech )
 
 bool Excalibur::sac( Character *ch )
 {
-  oldact("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
+  act("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
   rawdamage( ch, ch, DAM_HOLY, (ch->hit - 1) > 1000 ? 1000 : (ch->hit - 1), true );
   ch->gold = 0;
   return true;
@@ -200,7 +200,7 @@ void TwoSnakeWhip::remove( Character *ch )
 
 void TwoSnakeWhip::get( Character *ch )
 {
-  oldact("Тебе кажется, будто змеи на хлысте пошевелились.",ch,obj,0,TO_CHAR);
+  act("Тебе кажется, будто змеи на хлысте пошевелились.",ch,obj,0,TO_CHAR);
 }
 
 void TwoSnakeWhip::fight( Character *ch )
@@ -379,7 +379,7 @@ void FlyingBoots::wear( Character *ch )
 {
     if (!ch->isAffected(gsn_fly)) {
         oldact("Ты обуваешь $o4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
-        oldact("Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
+        act("Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
         act("%^C1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
     }
 }
@@ -406,7 +406,7 @@ void FlyingBoots::remove( Character *ch )
         return;
     
     affect_strip(ch, gsn_fly);
-    oldact("Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0, TO_CHAR );
+    act("Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0, TO_CHAR );
     act("%^C1 падает на землю.", ch, 0, 0, TO_ROOM );
 }
 
@@ -441,7 +441,7 @@ void GiantStrengthArmor::remove( Character *ch )
     if (ch->isAffected(gsn_giant_strength))
     {
         affect_strip(ch, gsn_giant_strength);
-        oldact("Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
+        act("Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
         act("Мышцы %C2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
     }
 }

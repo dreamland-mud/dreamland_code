@@ -426,7 +426,7 @@ SKILL_RUNP( camp )
   ch->mana -= gsn_camp->getMana( );
   ch->setWait( gsn_camp->getBeats( ) );
 
-  oldact("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
+  act("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
   act("%^C1 разбивает полевой лагерь.", ch, 0, 0, TO_ROOM);
 
   int slevel = skill_level(*gsn_camp, ch);
@@ -1435,7 +1435,7 @@ bool RangerStaff::canEquip( Character *ch )
 {
   if (ch->getProfession( ) != prof_ranger) {
         ch->pecho("Ты не знаешь как использовать эту вещь.");
-        oldact("Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
+        act("Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
         act("Посох рейнджера выскальзывает из рук %C2.", ch, 0, 0, TO_ROOM );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );

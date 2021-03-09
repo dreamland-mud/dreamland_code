@@ -214,11 +214,11 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
 void MagicJar::get( Character *ch )
 {
     if (!ch->is_npc( ) && strstr(obj->getName( ), ch->getNameP( )) != 0) {
-        oldact("Вот это удача!",ch,obj,0,TO_CHAR);
+        act("Вот это удача!",ch,obj,0,TO_CHAR);
         extract_obj(obj);
     }
     else
-        oldact("Ты заполучи%gло|л|ла блудную душу.",ch,obj,0,TO_CHAR);
+        act("Ты заполучи%gло|л|ла блудную душу.",ch,obj,0,TO_CHAR);
 } 
 
 bool MagicJar::extract( bool fCount )
@@ -369,7 +369,7 @@ VOID_SPELL(MysteriousDream)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(MysteriousDream);
 VOID_AFFECT(MysteriousDream)::entry( Room *room, Character *ch, Affect *paf )
 {
-     oldact("{yВ воздухе клубится сонный туман.{x",ch, 0, 0, TO_CHAR);
+     act("{yВ воздухе клубится сонный туман.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(MysteriousDream)::toStream( ostringstream &buf, Affect *paf ) 

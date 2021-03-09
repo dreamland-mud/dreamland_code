@@ -166,7 +166,7 @@ SKILL_RUNP( explode )
 
     act("%^C1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
     act("%^C1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
-    oldact("Пусть все сгорит!",ch,0,0,TO_CHAR);
+    act("Пусть все сгорит!",ch,0,0,TO_CHAR);
 
     ch->setWait( gsn_explode->getBeats( ) );
 

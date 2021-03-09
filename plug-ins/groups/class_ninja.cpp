@@ -607,7 +607,7 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 
     affect_to_char(ch,&af);
 
-    oldact("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0, TO_CHAR);
+    act("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0, TO_CHAR);
     act("%^C1 мгновенно концентрируется, готовясь к столкновению с магией.", ch,0,0,TO_ROOM);
     return true;
 }
@@ -1069,7 +1069,7 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             affect_to_char( victim, &todex);
 
             act("Острые шипы вонзаются в ступни %2$C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR);
-            oldact("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT);
+            act("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT);
         }
     } catch (const VictimDeathException &) {
     }
@@ -1317,7 +1317,7 @@ SKILL_RUNP( throwdown )
         }
         else
         {
-            oldact("Твой бросок не удался.", ch, 0, 0, TO_CHAR);
+            act("Твой бросок не удался.", ch, 0, 0, TO_CHAR);
             act("%2$^C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
             oldact("$c1 пытается ухватиться за $C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
             gsn_throw->improve( ch, false, victim );
@@ -1576,7 +1576,7 @@ SKILL_RUNP( poison )
         }
 
         ch->pecho("Облако отравленного дыма наполнило комнату.");
-        oldact("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM);
+        act("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_poison_smoke->improve( ch, true );
 
@@ -1632,7 +1632,7 @@ SKILL_RUNP( blindness )
         }
 
         ch->pecho("Облако загадочной пыли наполнило комнату.");
-        oldact("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM);
+        act("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_blindness_dust->improve( ch, true );
     

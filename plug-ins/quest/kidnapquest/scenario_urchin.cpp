@@ -165,5 +165,5 @@ void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) con
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 
 {
-    oldact("{YГруппа людей с суровыми лицами заковаными в латы преграждает тебе путь.{x", kid, 0, 0, TO_ROOM);
+    act("{YГруппа людей с суровыми лицами заковаными в латы преграждает тебе путь.{x", kid, 0, 0, TO_ROOM);
 }

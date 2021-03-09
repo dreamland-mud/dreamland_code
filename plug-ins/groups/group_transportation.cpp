@@ -383,7 +383,7 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
 
     if(!bFighting){
             act("%^C1 рассеивается в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_ROOM);
-            oldact("Ты рассеиваешься в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_CHAR);
+            act("Ты рассеиваешься в клубах тумана, принимая газообразную форму.", ch, 0, 0, TO_CHAR);
     }    
 }
 

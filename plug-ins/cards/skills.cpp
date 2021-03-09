@@ -240,7 +240,7 @@ SKILL_RUNP( joker )
             && victim->can_see(ch)
             && IS_AWAKE(victim) )
     {
-        oldact("Нехорошо шутить над больными!", ch, 0, victim, TO_CHAR );
+        act("Нехорошо шутить над больными!", ch, 0, victim, TO_CHAR );
         return;
     }
 
@@ -255,7 +255,7 @@ SKILL_RUNP( joker )
         }
         else
         {
-            oldact("Твоя шутка не удалась..",ch,0,victim,TO_CHAR);
+            act("Твоя шутка не удалась..",ch,0,victim,TO_CHAR);
             gsn_joker->improve( ch, false, victim );
             joke.miss( );
         }

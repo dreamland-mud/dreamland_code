@@ -44,13 +44,13 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if ((victim->getProfession( ) == prof_samurai) && ( victim->getModifyLevel() >=10) ) {
-         oldact("Это заклинание не может причинить вреда твоему противнику.", ch, 0, 0, TO_CHAR);
+         act("Это заклинание не может причинить вреда твоему противнику.", ch, 0, 0, TO_CHAR);
          return;
     }
 
     if (victim->isAffected(gsn_fear)) {
         if (ch == victim)
-            oldact("Ты и так дрожишь от страха.", ch, 0, 0, TO_CHAR);
+            act("Ты и так дрожишь от страха.", ch, 0, 0, TO_CHAR);
         else
             act("%2$^C1 уже дрожит от страха.", ch, 0, victim, TO_CHAR);
         return;
@@ -69,7 +69,7 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = 0;
     af.bitvector.setValue(ADET_FEAR);
     affect_to_char( victim, &af );
-    oldact("Ты дрожишь от страха.", victim, 0, 0, TO_CHAR);
+    act("Ты дрожишь от страха.", victim, 0, 0, TO_CHAR);
     act("%^C1 дрожит от страха.", victim, 0, 0, TO_ROOM);
 }
 

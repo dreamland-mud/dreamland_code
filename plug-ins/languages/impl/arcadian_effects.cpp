@@ -64,7 +64,7 @@ bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 bool LiquidWEBase::checkWater( PCharacter *ch, Object *obj ) const
 {
     if (obj->value2() != liq_water) {
-        oldact("Это слово действует только на воду.", ch, 0, 0, TO_CHAR);
+        act("Это слово действует только на воду.", ch, 0, 0, TO_CHAR);
         return false;
     }
     
@@ -137,7 +137,7 @@ bool DrinkContainerWEBase::checkContainer( PCharacter *ch, Object *obj ) const
         return true;
 
     if (!( bhv = obj->behavior.getDynamicPointer<ArcadianDrinkBehavior>( ) )) {
-        oldact("Повлиять на эту емкость у тебя не получится.", ch, obj, 0, TO_CHAR);
+        act("Повлиять на эту емкость у тебя не получится.", ch, obj, 0, TO_CHAR);
         return false;
     }
 
@@ -228,7 +228,7 @@ void WineRefreshWE::onDrink( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     update_pos( ch );
 
     oldact("$c1 выглядит посвежевш$gим|им|ей.", ch, 0, 0, TO_ROOM );
-    oldact("Напиток освежает тебя.", ch, 0, 0, TO_CHAR );
+    act("Напиток освежает тебя.", ch, 0, 0, TO_CHAR );
 }
 
 /*
@@ -253,7 +253,7 @@ void WineSleepWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
 
     set_violent( ch, victim, false );
 
-    oldact("Ты чувствуешь внезапный неодолимый приступ сонливости.", victim, 0, 0, TO_CHAR );
+    act("Ты чувствуешь внезапный неодолимый приступ сонливости.", victim, 0, 0, TO_CHAR );
     act("%^C1 зевает во всю пасть и засыпает.", victim, 0, 0, TO_ROOM );
 
     af.bitvector.setTable(&affect_flags);
@@ -306,7 +306,7 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     victim->position = POS_RESTING;
     update_pos( victim );
 
-    oldact("Сон как рукой сняло!", victim, 0, 0, TO_CHAR );
+    act("Сон как рукой сняло!", victim, 0, 0, TO_CHAR );
     act("%^C1 вздрагивает и просыпается.", victim, 0, 0, TO_ROOM );
 }
 
@@ -326,12 +326,12 @@ void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, i
 void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, Character *victim, int amount ) const
 {
     if (!goodQuality( bhv ) || !goodVolume( amount )) {
-        oldact("Ты чувствуешь мимолетное умиротворение.", victim, 0, 0, TO_CHAR );
+        act("Ты чувствуешь мимолетное умиротворение.", victim, 0, 0, TO_CHAR );
         oldact("$c1 на мгновение кажется более умиротворенн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
         return;
     }
     
-    oldact("Ты чувствуешь удивительное спокойствие.", victim, 0, 0, TO_CHAR );
+    act("Ты чувствуешь удивительное спокойствие.", victim, 0, 0, TO_CHAR );
     oldact("$c1 выглядит невероятно умиротворенн$gым|ым|ой и спокойн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
     
     if (IS_AFFECTED( victim, AFF_BERSERK ))
@@ -387,12 +387,12 @@ void BeerArmorWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     af.location = APPLY_AC;
     
     if (victim->isAffected( gsn_beer_armor )) {
-        oldact("Пивная пленка на твоей коже становится прочнее.", victim, 0, 0, TO_CHAR );
+        act("Пивная пленка на твоей коже становится прочнее.", victim, 0, 0, TO_CHAR );
         act("Пивная пленка на коже %C2 становится прочнее.", victim, 0, 0, TO_ROOM );
         af.modifier = 0;
     }
     else {
-        oldact("Твоя кожа покрывается защитной пивной пленкой.", victim, 0, 0, TO_CHAR );
+        act("Твоя кожа покрывается защитной пивной пленкой.", victim, 0, 0, TO_CHAR );
         act("Кожа %C2 покрывается защитной пивной пленкой.", victim, 0, 0, TO_ROOM );
         af.modifier  = -(af.level * 3 / 2);
     }

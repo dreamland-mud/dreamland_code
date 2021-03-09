@@ -133,13 +133,13 @@ VOID_SPELL(BlackDeath)::run( Character *ch, Room *room, int sn, int level )
     room->affectTo( &af );
 
     ch->pecho("Чума заражает все вокруг.");
-    oldact("Чума заражает все вокруг.\n\r",ch,0,0,TO_ROOM);
+    act("Чума заражает все вокруг.\n\r",ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(BlackDeath);
 VOID_AFFECT(BlackDeath)::entry( Room *room, Character *ch, Affect *paf )
 {
-     oldact("{yВоздух отравлен чумными миазмами.{x",ch, 0, 0, TO_CHAR);
+     act("{yВоздух отравлен чумными миазмами.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(BlackDeath)::toStream( ostringstream &buf, Affect *paf ) 
@@ -170,7 +170,7 @@ VOID_AFFECT(BlackDeath)::update( Room *room, Affect *paf )
                 && !IS_AFFECTED(vch,AFF_PLAGUE)
                 && number_bits(3) == 0)
         {
-            oldact("Ты чувствуешь жар и легкую дрожь.", vch, 0, 0, TO_CHAR);
+            act("Ты чувствуешь жар и легкую дрожь.", vch, 0, 0, TO_CHAR);
             oldact("$c1 дрожит и выглядит очень больн$gым|ым|ой.", vch, 0, 0,TO_ROOM);
             affect_join(vch,&plague);
         }
@@ -332,7 +332,7 @@ VOID_SPELL(CursedLands)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(CursedLands);
 VOID_AFFECT(CursedLands)::entry( Room *room, Character *ch, Affect *paf )
 {
-     oldact("{yАура проклятия повисла вокруг.{x",ch, 0, 0, TO_CHAR);
+     act("{yАура проклятия повисла вокруг.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(CursedLands)::toStream( ostringstream &buf, Affect *paf ) 
@@ -378,7 +378,7 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(DeadlyVenom);
 VOID_AFFECT(DeadlyVenom)::entry( Room *room, Character *ch, Affect *paf )
 {
-     oldact("{yВ воздухе ощущаются ядовитые испарения.{x",ch, 0, 0, TO_CHAR);
+     act("{yВ воздухе ощущаются ядовитые испарения.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(DeadlyVenom)::toStream( ostringstream &buf, Affect *paf ) 
@@ -485,7 +485,7 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(LethargicMist);
 VOID_AFFECT(LethargicMist)::entry( Room *room, Character *ch, Affect *paf )
 {
-     oldact("{yВ воздухе клубится летаргический туман.{x",ch, 0, 0, TO_CHAR);
+     act("{yВ воздухе клубится летаргический туман.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(LethargicMist)::toStream( ostringstream &buf, Affect *paf ) 
@@ -969,6 +969,6 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
     af.sources.add(ch);
     affect_join(victim,&af);
     
-    oldact("Ты вскрикиваешь в муках, начиная гнить заживо.", victim, 0, 0, TO_CHAR);
+    act("Ты вскрикиваешь в муках, начиная гнить заживо.", victim, 0, 0, TO_CHAR);
     act("%^C1 вскрикивает в муках, начиная гнить заживо.", victim, 0, 0, TO_ROOM);
 }

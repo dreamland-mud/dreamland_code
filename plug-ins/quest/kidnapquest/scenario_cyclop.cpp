@@ -55,16 +55,16 @@ void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
 {
     if(hero == killer) {
         oldact("{YМолодец, убив злыдня ты соверши$gло|л|ла достойный поступок, он тебе зачтется... со временем.{x", killer, 0, 0, TO_CHAR);
-        oldact("{YЗадание отменяется.{x", killer, 0, 0, TO_CHAR);
+        act("{YЗадание отменяется.{x", killer, 0, 0, TO_CHAR);
     } else {
         oldact("{Y$c1 жестоко убил страждующего злыдня, слава и почет $c3.{x", killer, 0, hero, TO_VICT);
-        oldact("{YДля тебя же это означает, что: задание отменяется.{x", killer, 0, hero, TO_VICT);
+        act("{YДля тебя же это означает, что: задание отменяется.{x", killer, 0, hero, TO_VICT);
     }
 }
 void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) const 
 {
     if(hero == killer) 
-        oldact("{YНет ребенка - нет обеда.{x\r\n{YЗадание отменяется.{x", killer, 0, 0, TO_CHAR);
+        act("{YНет ребенка - нет обеда.{x\r\n{YЗадание отменяется.{x", killer, 0, 0, TO_CHAR);
     else 
         oldact("{Y$c1 с особым цинизмом уничтожи$gло|л|ла обед для упыря.{x\r\n{YЗадание отменяется.{x", killer, 0, hero, TO_VICT);
 }
@@ -80,7 +80,7 @@ void KS::actAttackHero( NPCharacter *bandit, PCharacter *hero ) const
     if (chance( 10 )) {
         act("%^C1 достает из-за пояса огромную ребристую скалку.", bandit, 0, 0, TO_ROOM);
         act("Раскатывающее движение скалкой %C2 {R<*) (*>= ! ПРЕВРАЩАЕТ В КРОВАВОЕ МЕСИВО ! =<*) (*>{x твое лицо", bandit, 0, hero, TO_VICT);
-        oldact("Ты в {RУЖАСНОМ СОСТОЯНИИ.{x", bandit, 0, hero, TO_VICT);
+        act("Ты в {RУЖАСНОМ СОСТОЯНИИ.{x", bandit, 0, hero, TO_VICT);
         oldact("Раскатывающее движение скалкой $c2 {R<*) (*>= ! ПРЕВРАЩАЕТ В КРОВАВОЕ МЕСИВО ! =<*) (*>{x лицо $C2", bandit, 0, hero, TO_NOTVICT);
         act("%2$^C1 в {RУЖАСНОМ СОСТОЯНИИ.{x", bandit, 0, hero, TO_NOTVICT);
     }
@@ -205,5 +205,5 @@ void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) con
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 
 {
-    oldact("{YТебя останавливают несколько добродушных старушек.{x", hero, 0, 0, TO_CHAR);
+    act("{YТебя останавливают несколько добродушных старушек.{x", hero, 0, 0, TO_CHAR);
 }

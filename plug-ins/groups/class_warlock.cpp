@@ -125,7 +125,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
                 ch, 0, victim, TO_CHAR, POS_RESTING);
         victim->pecho("Тебя {RУБИЛИ{x!");
 
-        oldact("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
+        act("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
         act("%^C2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
 
         victim->pecho("{YБожественные Силы возвращают тебя к жизни!{x");

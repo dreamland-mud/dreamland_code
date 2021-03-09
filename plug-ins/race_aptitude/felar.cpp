@@ -140,7 +140,7 @@ SKILL_RUNP( tail )
     {
         damage(ch,victim,0,gsn_tail,DAM_BASH, true, DAMF_WEAPON);
         
-        oldact("Ты теряешь равновесие и падаешь!",ch,0,victim,TO_CHAR);
+        act("Ты теряешь равновесие и падаешь!",ch,0,victim,TO_CHAR);
         act("%^C1 теряет равновесие и падает!",ch,0,victim,TO_NOTVICT);
         oldact("Ты уклоняешься от хвоста $c2, и $e падает.",ch,0,victim,TO_VICT);
         

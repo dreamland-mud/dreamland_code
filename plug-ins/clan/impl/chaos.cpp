@@ -54,7 +54,7 @@ void ClanGuardChaos::actGreet( PCharacter *wch )
 }
 void ClanGuardChaos::actPush( PCharacter *wch )
 {
-    oldact("На мгновенье ты теряешь представление о реальности...", wch, 0, ch, TO_CHAR );
+    act("На мгновенье ты теряешь представление о реальности...", wch, 0, ch, TO_CHAR );
     oldact("$C1 выпускает частицу ХАОСА в $c2\n\r...и $c1 растворяется в нем...", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardChaos::getCast( Character *victim )
@@ -104,21 +104,21 @@ void ChaosBlade::fight( Character *ch )
 
     switch(number_bits(6)) {
     case 0:
-            oldact("{MКлинок Хаоса{x неистово вздрагивает!",ch,0,0,TO_ROOM);
+            act("{MКлинок Хаоса{x неистово вздрагивает!",ch,0,0,TO_ROOM);
             ch->pecho("Твой {MКлинок Хаоса{x неистово вздрагивает!");
             spell(gsn_mirror, ch->getModifyLevel(),ch,ch, FSPELL_BANE );
             ch->setWaitViolence( 2 );
             break;
 
     case 1:
-            oldact("{MКлинок Хаоса{x устрашающе звенит!",ch,0,0,TO_ROOM);
+            act("{MКлинок Хаоса{x устрашающе звенит!",ch,0,0,TO_ROOM);
             ch->pecho("Твой {MКлинок Хаоса{x устрашающе звенит!");
             spell(gsn_garble, ch->getModifyLevel()+5, ch, ch->fighting, FSPELL_BANE );
             ch->setWaitViolence( 2 );
             break;
 
     case 2:
-            oldact("{MКлинок Хаоса{x неудержимо дрожит!",ch,0,0,TO_ROOM);
+            act("{MКлинок Хаоса{x неудержимо дрожит!",ch,0,0,TO_ROOM);
             ch->pecho("Твой {MКлинок Хаоса{x неудержимо дрожит!");
             spell(gsn_confuse, ch->getModifyLevel()+5,ch,ch->fighting, FSPELL_BANE );
             ch->setWaitViolence( 2 );
@@ -234,7 +234,7 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
       affect_to_char(victim,&af);
       
       oldact("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!", victim, 0, 0, TO_ROOM);
-      oldact("Ты чувствуешь себя гораздо менее уверенно!", victim, 0, 0, TO_CHAR);
+      act("Ты чувствуешь себя гораздо менее уверенно!", victim, 0, 0, TO_CHAR);
     }
       else
       ch->pecho("Твоя попытка закончилась неудачей.");

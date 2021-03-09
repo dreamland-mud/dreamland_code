@@ -40,16 +40,16 @@ CMDRUN( mlove )
         Character *victim;
 
         if (IS_CHARMED(ch)) {
-            oldact("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
+            act("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
             act("%^C1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
             return;
         }
 
         if (arguments.empty( )) {
             if (ch->getSex( ) == SEX_MALE)
-                oldact("Ты никак не можешь определиться: куда совать жетон?", ch, 0, 0, TO_CHAR);
+                act("Ты никак не можешь определиться: куда совать жетон?", ch, 0, 0, TO_CHAR);
             else 
-                oldact("Куда пойти, куда податься.. кого найти, кому отдаться?", ch, 0, 0, TO_CHAR);
+                act("Куда пойти, куда податься.. кого найти, кому отдаться?", ch, 0, 0, TO_CHAR);
 
             act("%^C1 гоняется с похотливым видом за всеми в комнате..берегись!", ch, 0, 0, TO_ROOM);
             return;
@@ -74,9 +74,9 @@ CMDRUN( mlove )
 
         if (ch->position == POS_FIGHTING) {
             if (ch->getSex( ) == SEX_MALE)
-                oldact("Быстро спрячь, пока не отрезали!", ch, 0, 0, TO_CHAR);
+                act("Быстро спрячь, пока не отрезали!", ch, 0, 0, TO_CHAR);
             else 
-                oldact("Эй, не отвлекайся!", ch, 0, 0, TO_CHAR);
+                act("Эй, не отвлекайся!", ch, 0, 0, TO_CHAR);
             
             act("%^C1 торжественно произносит: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM);
             return;

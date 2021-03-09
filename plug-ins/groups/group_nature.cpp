@@ -125,7 +125,7 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
     }
     
     act("Молекулы воды вокруг %C2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
-    oldact("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
+    act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
     dam = dice( level , 14 );
     damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_MAGIC|DAMF_WATER);
 }
@@ -162,13 +162,13 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
         return;
     
     if (number_percent( ) > ch->getSkill( sn ) ) {
-        oldact("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0, TO_ALL);
+        act("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0, TO_ALL);
         return;
     }
 
-    oldact("Корни терновника проникают в могилу, тревожа твой покой.", victim, 0, 0, TO_CHAR);
-    oldact("Колючий терновник опутывает могилу, проникая корнями глубоко под землю!", ch, 0, 0, TO_ALL);
-    oldact("Из-под земли раздается недовольное ворчание.", ch, 0, 0, TO_ALL);
+    act("Корни терновника проникают в могилу, тревожа твой покой.", victim, 0, 0, TO_CHAR);
+    act("Колючий терновник опутывает могилу, проникая корнями глубоко под землю!", ch, 0, 0, TO_ALL);
+    act("Из-под земли раздается недовольное ворчание.", ch, 0, 0, TO_ALL);
 
     undig( victim );
 
@@ -218,7 +218,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
         if ( !saves_spell(level, victim, DAM_PIERCE, ch, DAMF_MAGIC) ){
             act("Колючий терновник прорастает сквозь землю, обвивая ноги %C2!",
                 victim, 0, 0, TO_ROOM);
-            oldact("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
+            act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
                 victim, 0, 0, TO_CHAR);
 
             todex.type = sn;
@@ -233,14 +233,14 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
         else {
             act("Колючий терновник прорастает сквозь землю, но %C1 с трудом разрывает его путы!",
                 victim, 0, 0, TO_ROOM);
-            oldact("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
+            act("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
                 victim, 0, 0, TO_CHAR);
         }
     }
     else {
             act("Колючий терновник прорастает сквозь землю, больно раня ноги %C2!",
                 victim, 0, 0, TO_ROOM);
-            oldact("Колючий терновник прорастает сквозь землю, больно раня твои ноги!",
+            act("Колючий терновник прорастает сквозь землю, больно раня твои ноги!",
                 victim, 0, 0, TO_CHAR);        
     }
    

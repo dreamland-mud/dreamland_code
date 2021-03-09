@@ -157,6 +157,6 @@ void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) con
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 
 {
-    oldact("{YВнезапно из засады выпрыгивает банда рыцарей-драконоборцев!{x", kid, 0, 0, TO_ROOM);
-    oldact("В их глазах можно прочесть смешанные чувства: жадность, праведность, коварность и ненависть.", kid, 0, 0, TO_ROOM);
+    act("{YВнезапно из засады выпрыгивает банда рыцарей-драконоборцев!{x", kid, 0, 0, TO_ROOM);
+    act("В их глазах можно прочесть смешанные чувства: жадность, праведность, коварность и ненависть.", kid, 0, 0, TO_ROOM);
 }

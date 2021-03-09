@@ -78,7 +78,7 @@ CMDRUNP( listen )
     
     /* TODO: listen to a mob */
 
-    oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
 }        
 
 /*---------------------------------------------------------------------------
@@ -124,7 +124,7 @@ CMDRUNP( smell )
     argument = one_argument( argument, arg );
 
     if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
-        oldact("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
+        act("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
         act("%^C1 принюхивается.", ch, 0, 0, TO_ROOM);
 
         if (rprog_smell( ch->in_room, ch, argument ))
@@ -200,7 +200,7 @@ CMDRUNP( smell )
         bool rc = false;
 
         if (ch == victim) {
-            oldact("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
+            act("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
             act("%^C1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
         } else {
             act("Ты обнюхиваешь %2$C4.", ch, 0, victim, TO_CHAR);
@@ -233,7 +233,7 @@ CMDRUNP( smell )
         return;
     }
 
-    oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
 }        
 
 

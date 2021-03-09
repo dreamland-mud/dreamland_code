@@ -1599,7 +1599,7 @@ CMDRUNP( demand )
 
   if ( !ch->can_see( obj ) )
     {
-      oldact("Ты не видишь этого.", ch, 0, victim, TO_CHAR);
+      act("Ты не видишь этого.", ch, 0, victim, TO_CHAR);
       return;
     }
 

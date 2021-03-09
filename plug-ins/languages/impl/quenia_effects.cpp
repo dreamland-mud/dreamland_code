@@ -43,7 +43,7 @@ bool GoodSpellWE::run( PCharacter *ch, Character *victim ) const
 
     int i;
 
-    oldact("{CСила древнего благословения проникает в мир.{x", ch, 0, 0, TO_ALL );
+    act("{CСила древнего благословения проникает в мир.{x", ch, 0, 0, TO_ALL );
 
     for (i = 0; i < spells_size; i++)
         spell( spells[i], 
@@ -64,7 +64,7 @@ bool AccuracyWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
 
-    oldact("{CТеперь твой взгляд способен различить каждое перышко жаворонка в небе.{x", victim, 0, 0, TO_CHAR );
+    act("{CТеперь твой взгляд способен различить каждое перышко жаворонка в небе.{x", victim, 0, 0, TO_CHAR );
     act("{CВ глазах %C2 стальным блеском вспыхивает наконечник стрелы.{x", victim, 0, 0, TO_ROOM );
     return true;
 }

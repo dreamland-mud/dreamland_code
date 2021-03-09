@@ -127,7 +127,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 
           if (last_vict == ch) /* no double hits */
           {
-            oldact("Разряд молнии исчезает.",ch,0,0,TO_ROOM);
+            act("Разряд молнии исчезает.",ch,0,0,TO_ROOM);
             oldact_p("Разряд молнии исчезает, не достигнув тебя.",
                    ch,0,0,TO_CHAR,POS_RESTING);
             return;
@@ -209,7 +209,7 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
         }
         
         act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет %C4.", victim, 0, 0, TO_ROOM);
-        oldact("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет тебя.", victim, 0, 0, TO_CHAR);
+        act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет тебя.", victim, 0, 0, TO_CHAR);
         dam = dice( level , 14 );
 
         damage_nocatch(ch,victim,dam,sn,DAM_OTHER,true, DAMF_PRAYER);
@@ -329,7 +329,7 @@ VOID_SPELL(MagicMissile)::run( Character *ch, Character *victim, int sn, int lev
     int dam;
 
     if (victim->isAffected(gsn_shield ))  {
-        oldact("Твоя волшебная стрела исчезает, не достигнув цели.", ch, 0, victim, TO_CHAR);
+        act("Твоя волшебная стрела исчезает, не достигнув цели.", ch, 0, victim, TO_CHAR);
 
         if (victim != ch)
             act("Твой щит блокирует волшебную стрелу %C2.", ch, 0, victim, TO_VICT);

@@ -900,7 +900,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 {
                         Affect af;
                         act("%^C1 теперь ничего не слышит!",victim,0,0,TO_ROOM);
-                        oldact("Ты ничего не слышишь!",victim,0,0,TO_CHAR);
+                        act("Ты ничего не слышишь!",victim,0,0,TO_CHAR);
         
                         af.bitvector.setTable(&affect_flags);
                         af.type         = gsn_scream;

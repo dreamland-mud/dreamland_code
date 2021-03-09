@@ -204,7 +204,7 @@ SKILL_RUNP( brandish )
         if ( number_percent( ) >= gsn_staves->getEffective( ch ))
         {
             oldact("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR);
-            oldact("...и ничего не происходит.",ch,0,0,TO_ROOM);
+            act("...и ничего не происходит.",ch,0,0,TO_ROOM);
             gsn_staves->improve( ch, false );
         }
         else {

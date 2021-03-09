@@ -83,7 +83,7 @@ SKILL_RUNP( layhands )
             else
                 sbonus = chance / 20;
             
-            oldact("Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
+            act("Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
             act("Свет на мгновение пронизывает ладони %C2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
         }
@@ -96,7 +96,7 @@ SKILL_RUNP( layhands )
             act("%^C1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
             oldact("$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
         } else {
-            oldact("Ты возлагаешь на себя руки и тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
+            act("Ты возлагаешь на себя руки и тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
             oldact("$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
         }
     
@@ -108,7 +108,7 @@ SKILL_RUNP( layhands )
           act("%^C1 картинным жестом возлагает на тебя руки... но ничего не происходит.", ch, 0, victim, TO_VICT);
           oldact("$c1 картинным жестом возлагает руки на $C4... но ничего не происходит.", ch, 0, victim, TO_NOTVICT);
       } else {
-          oldact("Ты возлагаешь на себя руки, но ничего не происходит.", ch, 0, 0, TO_CHAR);
+          act("Ты возлагаешь на себя руки, но ничего не происходит.", ch, 0, 0, TO_CHAR);
           act("%^C1 картинным жестом возлагает на себя руки... но ничего не происходит.", ch, 0, 0, TO_ROOM);
       }
       gsn_lay_hands->improve( ch, false, victim );        
@@ -295,7 +295,7 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
     int dam;
 
     act("%^C1 чертит в воздухе священный символ.", ch, 0, 0, TO_ROOM);
-    oldact("Ты чертишь в воздухе священный символ.", ch, 0, 0, TO_CHAR);
+    act("Ты чертишь в воздухе священный символ.", ch, 0, 0, TO_CHAR);
 
     for (vch = room->people; vch != NULL; vch = vch_next) {
         vch_next = vch->next_in_room;
@@ -311,12 +311,12 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
         
         if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_PRAYER )) {
             act("%2$^C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
-            oldact("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT);
+            act("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT);
             damage_nocatch( ch, vch, 0, sn, DAM_HOLY, true, DAMF_PRAYER );
         }
         else {
             act("%^C5 овладевают священные силы, заставляя в ужасе обратиться в бегство.", vch, 0, ch, TO_ROOM);
-            oldact("Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT);
+            act("Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT);
 
             dam = dice( level, 12 ); 
             damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_PRAYER );

@@ -317,7 +317,7 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
             oldact("Ментальный удар $c2 повреждает разум $C2!", ch,0,victim,TO_NOTVICT);
           }
           else {
-            oldact("Ментальный удар повреждает твой разум!", ch,0,0,TO_CHAR);
+            act("Ментальный удар повреждает твой разум!", ch,0,0,TO_CHAR);
             oldact("Ментальный удар $c2 повреждает $s разум!", ch,0,0,TO_ROOM);
           }
         }

@@ -161,6 +161,6 @@ void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) con
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const
 {
-    oldact("{YВнезапно из засады выпрыгивает банда похитителей маленьких детей!{x", kid, 0, 0, TO_ROOM);
+    act("{YВнезапно из засады выпрыгивает банда похитителей маленьких детей!{x", kid, 0, 0, TO_ROOM);
 }
 

@@ -44,7 +44,7 @@ static inline bool has_sanctuary_msg( Character *ch, Character *victim )
 {
     if (IS_AFFECTED(victim, AFF_SANCTUARY)) {
         if (victim == ch)
-            oldact("Ты уже под защитой святилища.", ch, 0, 0, TO_CHAR);
+            act("Ты уже под защитой святилища.", ch, 0, 0, TO_CHAR);
         else
             act("%2$^C1 уже под защитой святилища.", ch, 0, victim, TO_CHAR);
         return true;
@@ -52,7 +52,7 @@ static inline bool has_sanctuary_msg( Character *ch, Character *victim )
 
     if (victim->isAffected(gsn_dark_shroud)) {
         if (victim == ch)
-            oldact("Ты уже под защитой темных богов.", ch, 0, 0, TO_CHAR);
+            act("Ты уже под защитой темных богов.", ch, 0, 0, TO_CHAR);
         else
             act("%2$^C1 уже под защитой темных богов.", ch, 0, victim, TO_CHAR);
         return true;
@@ -60,7 +60,7 @@ static inline bool has_sanctuary_msg( Character *ch, Character *victim )
 
     if (victim->isAffected(gsn_stardust)) {
         if (victim == ch)
-            oldact("Звездная пыль уже кружится вокруг тебя.", ch, 0, 0, TO_CHAR);
+            act("Звездная пыль уже кружится вокруг тебя.", ch, 0, 0, TO_CHAR);
         else
             act("Звездная пыль уже кружится вокруг %2$C2.", ch, 0, victim, TO_CHAR);
         return true;
@@ -90,11 +90,11 @@ VOID_SPELL(Armor)::run( Character *ch, Character *victim, int sn, int level )
     affect_to_char( victim, &af );
     
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-        oldact("Священная броня окружает тебя.", victim, 0, 0, TO_CHAR);
+        act("Священная броня окружает тебя.", victim, 0, 0, TO_CHAR);
         if (ch != victim)
             act("Священная броня окружает %2$C4.", ch, 0, victim, TO_CHAR);
     } else {
-        oldact("Волшебная броня окружает тебя.", victim, 0, 0, TO_CHAR);
+        act("Волшебная броня окружает тебя.", victim, 0, 0, TO_CHAR);
         if (ch != victim)
             act("Волшебная броня окружает %2$C4.", ch, 0, victim, TO_CHAR);
     }
@@ -221,7 +221,7 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
     if (IS_GOOD(victim)) // Not for good !!!
     {
        if (victim == ch)
-          oldact("Темные боги не будут защищать тебя!!!", ch, 0, 0, TO_CHAR);
+          act("Темные боги не будут защищать тебя!!!", ch, 0, 0, TO_CHAR);
        else
                  act("Темные боги не будут защищать %2$C4!!!", ch, 0, victim, TO_CHAR);
         return;
@@ -232,7 +232,7 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
     af.duration  = level / 6;
     affect_to_char( victim, &af );
     act("{DТемная аура{x окружает %C4.", victim, 0, 0, TO_ROOM);
-    oldact("{DТемная аура{x окружает тебя.", victim, 0, 0, TO_CHAR);
+    act("{DТемная аура{x окружает тебя.", victim, 0, 0, TO_CHAR);
 }
 
 
@@ -344,7 +344,7 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     af.modifier = 0;
     affect_to_char(ch, &af);
     
-    oldact("Свет дарует тебе сопротивляемость к могильному холоду и темным чарам!", ch, 0, 0, TO_CHAR);
+    act("Свет дарует тебе сопротивляемость к могильному холоду и темным чарам!", ch, 0, 0, TO_CHAR);
 
 }
 
@@ -400,7 +400,7 @@ VOID_SPELL(MassSanctuary)::run( Character *ch, Room *room, int sn, int level )
         af.bitvector.setValue(AFF_SANCTUARY);
         affect_to_char( gch, &af );
 
-        oldact("{WБелая аура{x окружает тебя.", gch, 0, 0, TO_CHAR);
+        act("{WБелая аура{x окружает тебя.", gch, 0, 0, TO_CHAR);
         if (ch != gch)
             act("{WБелая аура{x окружает %2$C4.", ch, 0, gch, TO_CHAR);
     }
@@ -474,7 +474,7 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     if (IS_NEUTRAL(victim))
     {
         if (victim == ch)
-          oldact("Ты не можешь получить защиту от злых существ.", ch,0, 0,TO_CHAR);
+          act("Ты не можешь получить защиту от злых существ.", ch,0, 0,TO_CHAR);
         else
           act("%2$^C1 не может получить защиту от злых существ.", ch,0,victim,TO_CHAR);
         return;
@@ -515,7 +515,7 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     if (IS_NEUTRAL(victim))
     {
         if (victim == ch)
-          oldact("Ты не можешь получить защиту от добрых существ.", ch,0, 0,TO_CHAR);
+          act("Ты не можешь получить защиту от добрых существ.", ch,0, 0,TO_CHAR);
         else
           act("%2$^C1 не может получить защиту от добрых существ.", ch,0,victim,TO_CHAR);
         return;
@@ -680,7 +680,7 @@ VOID_SPELL(Sanctuary)::run( Character *ch, Character *victim, int sn, int level 
     af.bitvector.setValue(AFF_SANCTUARY);
     affect_to_char( victim, &af );
     act("{WБелая аура{x окружает %C4.", victim, 0, 0, TO_ROOM);
-    oldact("{WБелая аура{x окружает тебя.", victim, 0, 0, TO_CHAR);
+    act("{WБелая аура{x окружает тебя.", victim, 0, 0, TO_CHAR);
 }
 
 SPELL_DECL(Stardust);
@@ -696,7 +696,7 @@ VOID_SPELL(Stardust)::run( Character *ch, Character *victim, int sn, int level )
     af.duration  = level / 6;
     affect_to_char( victim, &af );
     act("Мерцающая {Wз{wве{Wзд{wная {Wп{wыль закружилась вокруг %C2.", victim, 0, 0, TO_ROOM);
-    oldact("Мерцающая {Wз{wве{Wзд{wная {Wп{wыль закружилась вокруг тебя.", victim, 0, 0, TO_CHAR);
+    act("Мерцающая {Wз{wве{Wзд{wная {Wп{wыль закружилась вокруг тебя.", victim, 0, 0, TO_CHAR);
 }
 
 SPELL_DECL(Shield);
@@ -707,7 +707,7 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
     if ( victim->isAffected(sn ) )
     {
         if (victim == ch)
-            oldact("Ты уже под воздействием щита.", ch, 0, 0, TO_CHAR);
+            act("Ты уже под воздействием щита.", ch, 0, 0, TO_CHAR);
         else
             act("%2$^C1 уже под воздействием щита.", ch, 0, victim, TO_CHAR);
         return;
@@ -723,10 +723,10 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
     affect_to_char( victim, &af );
 
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-        oldact("Божественная энергия окружает тебя щитом.", victim, 0, 0, TO_CHAR);
+        act("Божественная энергия окружает тебя щитом.", victim, 0, 0, TO_CHAR);
         act("Божественная энергия окружает %C4 щитом.", victim, 0, 0, TO_ROOM);
     } else {
-        oldact("Волшебный щит окружает тебя.", victim, 0, 0, TO_CHAR);
+        act("Волшебный щит окружает тебя.", victim, 0, 0, TO_CHAR);
         act("Волшебный щит окружает %C4.", victim, 0, 0, TO_ROOM);
     }
 }

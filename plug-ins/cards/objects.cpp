@@ -127,7 +127,7 @@ bool CardPackBehavior::use( Character *user, const char *args )
     chance = gsn_fetch_card->getEffective( pch );
 
     if (number_percent( ) >= chance) {
-        oldact("Ты пытаешься вытащить из колоды карту, но она выпадает у тебя из рук.", pch, 0, 0, TO_CHAR);
+        act("Ты пытаешься вытащить из колоды карту, но она выпадает у тебя из рук.", pch, 0, 0, TO_CHAR);
         oldact("$c1 пытается вытащить из колоды карту, но она выпадает у $x из рук.", pch, 0, 0, TO_ROOM);
         gsn_fetch_card->improve( pch, false );
     }
@@ -364,7 +364,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
         else {
             fSuccess = true;
             
-            oldact("Ты пожимаешь протянутую тебе руку.", pch, 0, victim, TO_CHAR);
+            act("Ты пожимаешь протянутую тебе руку.", pch, 0, victim, TO_CHAR);
             act("%^C1 пожимает чью-то руку.", pch, 0, 0, TO_ROOM);
             oldact("{c$o1 оживает. $C1 пожимает твою руку.\r\n{x", victim, myCard->getObj( ), pch, TO_CHAR);
 

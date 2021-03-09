@@ -325,7 +325,7 @@ void WeaponOneHit::damEffectFeeble( )
         return;
    
     SET_BIT( ch->affected_by, AFF_WEAK_STUN );
-    oldact("{DЧерная немощь{x поражает твою руку!", ch, 0, 0, TO_CHAR);
+    act("{DЧерная немощь{x поражает твою руку!", ch, 0, 0, TO_CHAR);
     act("{DЧерная немощь{x поражает руку %C2!", ch, 0, 0, TO_ROOM);
 
     if (wield && !IS_OBJ_STAT(wield, ITEM_NOREMOVE)) {

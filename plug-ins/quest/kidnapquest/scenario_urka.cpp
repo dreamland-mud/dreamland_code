@@ -59,7 +59,7 @@ void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) co
 {
     if(hero == killer) {
         oldact("{YТы оказа$gло|л|ла неоценимую услугу всему миру, убив его!!!{x", killer, 0, 0, TO_CHAR);
-        oldact("{YТем не менее, от тебя ожидали не этого...{x", killer, 0, 0, TO_CHAR);
+        act("{YТем не менее, от тебя ожидали не этого...{x", killer, 0, 0, TO_CHAR);
         hero->pecho("{YЗадание отменяется.{x");
     } else {
         oldact("{Y$c1 подло уби$gло|л|ла того, кого тебе было поручено спасти.{x", killer, 0, hero, TO_VICT);
@@ -143,9 +143,9 @@ void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const
 void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero ) const 
 {
     oldact("$c1 хлопает тебя по плечу так, что ты теряешь равновесие и падаешь мордой прямо $m на сапог.", king, 0, hero, TO_VICT);
-    oldact("Причем тебе кажется, что сапог движется навстречу.", king, 0, hero, TO_VICT);
+    act("Причем тебе кажется, что сапог движется навстречу.", king, 0, hero, TO_VICT);
     oldact("$c1 так хлопает $C4 по плечу, что $E теряет равновесие и падает мордой $m на сапог.", king, 0, hero, TO_NOTVICT);
-    oldact("Причем сапог явно движется навстречу.", king, 0, hero, TO_NOTVICT);
+    act("Причем сапог явно движется навстречу.", king, 0, hero, TO_NOTVICT);
     act("%^C1 говорит тебе '{GМолодец, вернись к давшему тебе задание!{x'.", king, 0, hero, TO_VICT);
 }
 
@@ -191,7 +191,7 @@ void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) con
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 
 {
-    oldact("{YВдруг откуда ни возьмись появляется отряд охотников на преступников!{x", kid, 0, 0, TO_ROOM);
+    act("{YВдруг откуда ни возьмись появляется отряд охотников на преступников!{x", kid, 0, 0, TO_ROOM);
     act("%^C1 произносит '{gСержант Петренко, трое детей, предъявите документы{x'.", bandit, 0, 0, TO_ROOM);
     act("%^C1 долго и усердно изучает паспорт.", bandit, 0, 0, TO_ROOM);
     oldact("$c1 поднимает взгляд на $C4 и произносит: '{gКак хорошо, вас-то мы и ищем...{x'", bandit, 0, kid, TO_ROOM);

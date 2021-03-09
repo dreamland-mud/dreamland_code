@@ -172,7 +172,7 @@ void Damage::adjustPosition( )
     if (ch->wait < 1 && ch->position > POS_STUNNED) {
         if (ch->position == POS_SITTING || ch->position == POS_RESTING) {
              act("%^C1 встает на ноги под шквалом ударов.", ch, 0, 0, TO_ROOM ); 
-             oldact("Ты встаешь на ноги под шквалом ударов.", ch, 0, 0, TO_CHAR );
+             act("Ты встаешь на ноги под шквалом ударов.", ch, 0, 0, TO_CHAR );
         }
         ch->position = POS_FIGHTING;
     }

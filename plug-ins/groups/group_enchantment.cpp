@@ -494,7 +494,7 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
         ||  IS_OBJ_STAT(obj, ITEM_BLESS)
         ||  IS_OBJ_STAT(obj, ITEM_ANTI_EVIL)) 
     {
-            oldact("Боги Света наказывают тебя за попытку осквернения священного оружия!", ch, 0, 0, TO_CHAR);
+            act("Боги Света наказывают тебя за попытку осквернения священного оружия!", ch, 0, 0, TO_CHAR);
             act("Боги Света наказывают %C4 за попытку осквернения священного оружия!", ch, 0, 0, TO_ROOM);
             rawdamage(ch, ch, DAM_HOLY, 
                     (ch->hit - 1) > 1000 ? 1000 : (ch->hit - 1), true );

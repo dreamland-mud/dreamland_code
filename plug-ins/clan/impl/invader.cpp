@@ -197,7 +197,7 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
     {
         Room *room = r.second;
         room->affectTo(&af);
-        oldact("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
+        act("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
     }
 }
 
