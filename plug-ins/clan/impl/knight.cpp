@@ -59,8 +59,7 @@ CLAN(knight);
  *-------------------------------------------------------------------------*/
 void ClanItemKnight::actDisappear()
 {
-    act("%3$^O1 исчезает в серой дымке.",
-        obj->getRoom()->people, obj, 0, TO_ALL);
+    act("%3$^O1 исчезает в серой дымке.", obj->getRoom()->people, obj, 0, TO_ALL);
 }
 
 /*--------------------------------------------------------------------------
@@ -68,20 +67,17 @@ void ClanItemKnight::actDisappear()
  *-------------------------------------------------------------------------*/
 void ClanAltarKnight::actAppear()
 {
-    act("{WЛучи света пронизывают комнату и в центре материализуется %3$O1.{x",
-        obj->in_room->people, obj, 0, TO_ALL);
+    act("{WЛучи света пронизывают комнату и в центре материализуется %3$O1.{x", obj->in_room->people, obj, 0, TO_ALL);
 }
 
 void ClanAltarKnight::actDisappear()
 {
-    act("{WСвет %3$O2 исчезает и он растворяется в воздухе!{x",
-        obj->getRoom()->people, obj, 0, TO_ALL);
+    act("{WСвет %3$O2 исчезает и он растворяется в воздухе!{x", obj->getRoom()->people, obj, 0, TO_ALL);
 }
 
 void ClanAltarKnight::actNotify(Character *ch)
 {
-    oldact_p("{WХрамовый алтарь вашего замка был осквернен безбожниками!{x",
-          ch, 0, 0, TO_CHAR, POS_DEAD);
+    oldact_p("{WХрамовый алтарь вашего замка был осквернен безбожниками!{x", ch, 0, 0, TO_CHAR, POS_DEAD);
 }
 
 /*--------------------------------------------------------------------------

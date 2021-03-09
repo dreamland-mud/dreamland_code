@@ -45,10 +45,8 @@ void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQues
 
 void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
-    act("%1$^C1 произносит '{gВот спасибо, %2$C1. Теперь все найдено и я могу спать спокойно.{x'", 
-        ch, 0, hero, TO_ROOM );
-    oldact("$c1 произносит '{gА вознаграждение я уже переда$gло|л|ла твоему квестору. Сходи и забери его.{x'",
-        ch, 0, hero, TO_ROOM );
+    act("%1$^C1 произносит '{gВот спасибо, %2$C1. Теперь все найдено и я могу спать спокойно.{x'",  ch, 0, hero, TO_ROOM );
+    oldact("$c1 произносит '{gА вознаграждение я уже переда$gло|л|ла твоему квестору. Сходи и забери его.{x'", ch, 0, hero, TO_ROOM );
 }
 
 void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const

@@ -1009,12 +1009,9 @@ SKILL_RUNP( crush )
 
         if ( victim->isAffected(gsn_protective_shield) )
         {
-                act("{YТвой мощный удар как будто соскальзывает c %2$C2, не причиняя вреда.",
-                        ch,0,victim,TO_CHAR);
-                act("{YМощный удар %C2 скользит по поверхности твоего охранного щита.{x",
-                        ch,0,victim,TO_VICT);
-                act("{YМощный удар %1$C2 как будто соскальзывает с %2$C2.{x",
-                        ch,0,victim,TO_NOTVICT);
+                act("{YТвой мощный удар как будто соскальзывает c %2$C2, не причиняя вреда.", ch,0,victim,TO_CHAR);
+                act("{YМощный удар %C2 скользит по поверхности твоего охранного щита.{x", ch,0,victim,TO_VICT);
+                act("{YМощный удар %1$C2 как будто соскальзывает с %2$C2.{x", ch,0,victim,TO_NOTVICT);
 
                 ch->setWait( gsn_crush->getBeats( ) );
                 return;

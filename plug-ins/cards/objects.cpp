@@ -345,14 +345,12 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             fSuccess = false;
 
             if (!IS_AFFECTED(victim, AFF_BLIND))
-                act("Тебе показалось, что картинка на %3$O6 пошевелилась.", 
-                     victim, myCard->getObj( ), 0, TO_CHAR);
+                act("Тебе показалось, что картинка на %3$O6 пошевелилась.", victim, myCard->getObj( ), 0, TO_CHAR);
 
             oldact("$c1 не смо$gгло|г|гла пожать твою руку.", pch, 0, victim, TO_VICT);
             
             if (number_range(1, 100) < 10) {
-                act("{cТы пытаешься затащить %2$C4 к себе через карту, но вместо этого тащишь кого-то другого!{x",
-                    pch, 0, victim, TO_CHAR);        
+                act("{cТы пытаешься затащить %2$C4 к себе через карту, но вместо этого тащишь кого-то другого!{x", pch, 0, victim, TO_CHAR);        
                 act("%^C1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
 
                 multi_hit( findHorribleVictim( pch ), pch );

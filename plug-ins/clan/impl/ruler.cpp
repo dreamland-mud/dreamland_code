@@ -1514,12 +1514,9 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 
     for (rch = victim->in_room->people; rch; rch = rch->next_in_room) {
         if (rch->is_mirror() && rch->doppel == target) {
-            act("Луч света, посланный %C5, отражается от зеркала и поражает ТЕБЯ!",
-                 ch, 0, target, TO_VICT );
-            act("Луч света, посланный %1$C5, отражается от зеркала и поражает %2$C4!",
-                 ch, 0, target, TO_NOTVICT );
-            act("Луч света, посланный тобой, отражается от зеркала и поражает %2$C4!",
-                 ch, 0, target, TO_CHAR );
+            act("Луч света, посланный %C5, отражается от зеркала и поражает ТЕБЯ!", ch, 0, target, TO_VICT );
+            act("Луч света, посланный %1$C5, отражается от зеркала и поражает %2$C4!", ch, 0, target, TO_NOTVICT );
+            act("Луч света, посланный тобой, отражается от зеркала и поражает %2$C4!", ch, 0, target, TO_CHAR );
 
             dam = dice( level, 5 );
 
