@@ -285,7 +285,7 @@ void Walkment::visualize( Character *wch )
 bool Walkment::canControlHorse( )
 {
     if (!canOrderHorse( )) {
-        oldact("Ты не можешь управлять $C5.", ch, 0, horse, TO_CHAR );
+        act("Ты не можешь управлять %2$C5.", ch, 0, horse, TO_CHAR );
         return false;
     }
    
@@ -298,7 +298,7 @@ bool Walkment::canControlHorse( )
         return true;
 
     if (number_percent( ) > gsn_riding->getEffective( ch )) {
-        oldact("Тебе не хватает мастерства управлять $C5.", ch, 0, horse, TO_CHAR );
+        act("Тебе не хватает мастерства управлять %2$C5.", ch, 0, horse, TO_CHAR );
         gsn_riding->improve( ch, false );
         return false; 
     }

@@ -245,7 +245,7 @@ void Thunderbolt::fight( Character *ch )
 
         switch(number_bits(6)) {
         case 0:
-            oldact("Разряд молнии выстреливает из твоего оружия и поражает $C4!", ch, 0, victim, TO_CHAR);
+            act("Разряд молнии выстреливает из твоего оружия и поражает %2$C4!", ch, 0, victim, TO_CHAR);
             act("Разряд молнии конденсируется на оружии %C2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
             oldact("Разряд молнии конденсируется на оружии $c2, и выстреливает в сторону $C2!", ch, 0, victim, TO_NOTVICT);
 
@@ -350,9 +350,9 @@ int dam;
   if ( number_percent() < 15 )  {
         dam = number_percent()/2 + 5 * ch->getModifyLevel();
 
-        oldact("Твой щит обжигает лицо $C3!", ch, 0, ch->fighting, TO_CHAR);
+        act("Твой щит обжигает лицо %2$C3!", ch, 0, ch->fighting, TO_CHAR);
         oldact("Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
-        oldact("Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
+        act("Щит %2$C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
 
         damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level,dam, TARGET_CHAR );

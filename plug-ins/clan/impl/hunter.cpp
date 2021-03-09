@@ -160,7 +160,7 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
  *-------------------------------------------------------------------------*/
 void ClanGuardHunter::actPush( PCharacter *wch )
 {
-    oldact("$C1 вытягивает такой страшненький ножичек и слегка щекочет тебя.\n\r...Ты с диким воплем подпрыгиваешь и уносишься не видя ничего перед собой.", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 вытягивает такой страшненький ножичек и слегка щекочет тебя.\n\r...Ты с диким воплем подпрыгиваешь и уносишься не видя ничего перед собой.", wch, 0, ch, TO_CHAR );
     oldact("$C1 вытягивает такой страшненький ножичек и слегка щекочет $c4\n\r... $c1 с диким воплем уносится не видя ничего перед собой.", wch, 0, ch, TO_ROOM );
 }
 
@@ -590,7 +590,7 @@ SKILL_RUNP( hunt )
     }
 
     if( ch->in_room == victim->in_room ) {
-        oldact("$C1 прямо здесь!", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 прямо здесь!", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -619,7 +619,7 @@ SKILL_RUNP( hunt )
     if (road.type == Road::DOOR)
         oldact("$C1 $t отсюда.", ch, dirs[road.value.door].leave, victim, TO_CHAR );
     else
-        oldact("Тебе не удается понять, как пройти к $C3.", ch, 0, victim, TO_CHAR );
+        act("Тебе не удается понять, как пройти к %2$C3.", ch, 0, victim, TO_CHAR );
 }
 
 SPELL_DECL(FindObject);

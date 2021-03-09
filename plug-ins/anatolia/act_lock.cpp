@@ -1129,7 +1129,7 @@ bool Keyhole::checkGuards( )
                 && IS_AWAKE(rch)
                 && ch->getModifyLevel( ) + 5 < rch->getModifyLevel( ))
         {
-            oldact("$C1 маячит перед тобой, загораживая вожделенный замок.", ch, 0, rch, TO_CHAR );
+            act("%2$^C1 маячит перед тобой, загораживая вожделенный замок.", ch, 0, rch, TO_CHAR );
             return false;
         }
 

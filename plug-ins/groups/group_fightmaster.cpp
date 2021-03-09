@@ -112,7 +112,7 @@ SKILL_RUNP( bashdoor )
         {
                 if ( gch->is_npc() && IS_AWAKE(gch) && slevel + 5 < gch->getModifyLevel() )
                 {
-                        oldact("$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR);
+                        act("%2$^C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR);
                         return;
                 }
         }
@@ -377,7 +377,7 @@ SKILL_RUNP( bash )
 
         if ( IS_CHARMED(ch) && ch->master == victim )
         {
-                oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                act("Но %2$C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -430,7 +430,7 @@ SKILL_RUNP( bash )
                 {
                         oldact_p("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!",
                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        oldact("Ты сбиваешь $C4 с ног ударом щита!",ch,0,victim,TO_CHAR);
+                        act("Ты сбиваешь %2$C4 с ног ударом щита!",ch,0,victim,TO_CHAR);
                         oldact_p("$c1 сильнейшим ударом щита сбивает $C4 с ног.",
                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
 
@@ -458,7 +458,7 @@ SKILL_RUNP( bash )
                 else
                 {
                         act("%^C1 наносит тебе удар щитом!",ch,0,victim,TO_VICT);
-                        oldact("Ты наносишь удар щитом $C3!",ch,0,victim,TO_CHAR);
+                        act("Ты наносишь удар щитом %2$C3!",ch,0,victim,TO_CHAR);
                         oldact("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT);
                 }
                       
@@ -566,7 +566,7 @@ SKILL_RUNP( trip )
 
         if ( victim->position < POS_FIGHTING )
         {
-                oldact("Но $C1 уже лежит...",ch,0,victim,TO_CHAR);
+                act("Но %2$C1 уже лежит...",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -646,7 +646,7 @@ SKILL_RUNP( trip )
                 else
                 {
                         act("%^C1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT);
-                        oldact("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR);
+                        act("Ты пытаешься подсечь %2$C4!",ch,0,victim,TO_CHAR);
                         oldact("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT);
                 }
                 ch->setWait( gsn_trip->getBeats( ) );
@@ -815,7 +815,7 @@ SKILL_RUNP( kick )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                act("Но %2$C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1009,7 +1009,7 @@ SKILL_RUNP( crush )
 
         if ( victim->isAffected(gsn_protective_shield) )
         {
-                oldact("{YТвой мощный удар как будто соскальзывает c $C2, не причиняя вреда.",
+                act("{YТвой мощный удар как будто соскальзывает c %2$C2, не причиняя вреда.",
                         ch,0,victim,TO_CHAR);
                 act("{YМощный удар %C2 скользит по поверхности твоего охранного щита.{x",
                         ch,0,victim,TO_VICT);
@@ -1249,7 +1249,7 @@ SKILL_RUNP( dirt )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                oldact("Но $C1 твой лучший друг!",ch,0,victim,TO_CHAR);
+                act("Но %2$C1 твой лучший друг!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1561,7 +1561,7 @@ SKILL_RUNP( smash )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+        act("Но %2$C1 твой друг!!!",ch,0,victim,TO_CHAR);
         return;
     }
 

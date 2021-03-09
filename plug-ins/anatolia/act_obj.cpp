@@ -1374,19 +1374,19 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
 
     if ( victim->carry_number + obj->getNumber( ) > victim->canCarryNumber( ) )
     {
-        oldact("$C1 не может нести столько вещей.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не может нести столько вещей.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if (victim->getCarryWeight( ) + obj->getWeight( ) > victim->canCarryWeight( ) )
     {
-        oldact("$C1 не может нести такую тяжесть.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не может нести такую тяжесть.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if ( !victim->can_see( obj ) )
     {
-        oldact("$C1 не видит этого.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не видит этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 

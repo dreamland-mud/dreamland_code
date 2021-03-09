@@ -126,7 +126,7 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
                         gsn_grip->improve( victim, false, ch );
         }
 
-        oldact("Ты обезоруживаешь $C4!", ch,0, victim, TO_CHAR);
+        act("Ты обезоруживаешь %2$C4!", ch,0, victim, TO_CHAR);
         oldact("$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT);
 
         obj_from_char( obj );
@@ -516,7 +516,7 @@ SKILL_RUNP( lash )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        oldact("Но $C1 твой друг!", ch, 0, victim, TO_CHAR);
+        act("Но %2$C1 твой друг!", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -570,7 +570,7 @@ SKILL_RUNP( lash )
                 && number_percent( ) < chance) 
             {
                 act("%^C1 подсекает тебя своим хлыстом!!", ch, 0, victim, TO_VICT);
-                oldact("Ты подсекаешь $C4 своим хлыстом!", ch, 0, victim, TO_CHAR);
+                act("Ты подсекаешь %2$C4 своим хлыстом!", ch, 0, victim, TO_CHAR);
                 oldact("$c1 подсекает $C4 своим хлыстом.", ch, 0, victim, TO_NOTVICT);
                 
                 victim->setWaitViolence( number_range( 0, 2 ) );

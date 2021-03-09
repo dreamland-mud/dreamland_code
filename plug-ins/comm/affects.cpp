@@ -353,9 +353,9 @@ CMDRUNP( affects )
 
     if (IS_CHARMED(ch)) {
         if (buf.str( ).empty( )) 
-            oldact("$C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR);
+            act("%2$^C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR);
         else 
-            oldact("$C1 находится под действием следующих аффектов:", ch->master, 0, ch, TO_CHAR);
+            act("%2$^C1 находится под действием следующих аффектов:", ch->master, 0, ch, TO_CHAR);
         buf << "{x";
         ch->master->send_to( buf );
         return;

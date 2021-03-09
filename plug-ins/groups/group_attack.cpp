@@ -47,7 +47,7 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
     int dam;
 
     oldact("Множество острых клинков возникает вокруг $c2, поражая $C4.", ch,0,victim,TO_NOTVICT);
-    oldact("Вокруг тебя возникает множество острых клинков, поражая $C4.", ch,0,victim,TO_CHAR);
+    act("Вокруг тебя возникает множество острых клинков, поражая %2$C4.", ch,0,victim,TO_CHAR);
     act("Множество острых клинков возникает вокруг %C2, поражая тебя!", ch,0,victim,TO_VICT);
     dam = dice(level,6);
     if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
@@ -170,7 +170,7 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
 
     if ( IS_NEUTRAL(victim) )
     {
-        oldact("$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -207,7 +207,7 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
 
     if ( IS_NEUTRAL(victim) )
     {
-        oldact("$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 

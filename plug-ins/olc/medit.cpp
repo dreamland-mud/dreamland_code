@@ -1322,7 +1322,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             char_to_room( mob, ch->in_room );
         
         oldact("$c1 создает $C4!", ch, 0, mob, TO_ROOM);
-        oldact("Ты создаешь $C4!", ch, 0, mob, TO_CHAR);
+        act("Ты создаешь %2$C4!", ch, 0, mob, TO_CHAR);
         return;
     }
     

@@ -103,7 +103,7 @@ bool BasicMobileBehavior::trackLastFought( Character *wch )
     pexit = (d == -1 ? NULL : room->exit[d]);
 
     if (!pexit) {
-        oldact("Ты не видишь здесь следов $C2.", ch, 0, wch, TO_CHAR);
+        act("Ты не видишь здесь следов %2$C2.", ch, 0, wch, TO_CHAR);
         lostTrack = true;
         return true;
     }

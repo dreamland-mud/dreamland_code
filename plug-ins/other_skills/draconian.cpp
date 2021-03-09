@@ -69,7 +69,7 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
     oldact("$c1 брызгает кислотой на $C4.",ch,0,victim,TO_NOTVICT);
     oldact_p("$c1 брызгает струей едкой кислоты на тебя.",
            ch,0,victim,TO_VICT,POS_RESTING);
-    oldact("Ты брызгаешь кислотой на $C4.",ch,0,victim,TO_CHAR);
+    act("Ты брызгаешь кислотой на %2$C4.",ch,0,victim,TO_CHAR);
 
     hpch = max(12,(int)ch->hit);
     hp_dam = number_range(hpch/11 + 1, hpch/6);
@@ -304,7 +304,7 @@ VOID_SPELL(LightningBreath)::run( Character *ch, Character *victim, int sn, int 
 
     oldact("Выдох $c2 ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_NOTVICT);
     act("Выдох %C2 ударяет по тебе разрядом молнии!", ch, 0, victim, TO_VICT);
-    oldact("Твой выдох ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_CHAR);
+    act("Твой выдох ударяет по %2$C3 разрядом молнии.", ch, 0, victim, TO_CHAR);
 
     hpch = max(10,(int)ch->hit);
     hp_dam = number_range(hpch/9+1,hpch/5);

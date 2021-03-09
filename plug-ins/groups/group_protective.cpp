@@ -46,7 +46,7 @@ static inline bool has_sanctuary_msg( Character *ch, Character *victim )
         if (victim == ch)
             oldact("Ты уже под защитой святилища.", ch, 0, 0, TO_CHAR);
         else
-            oldact("$C1 уже под защитой святилища.", ch, 0, victim, TO_CHAR);
+            act("%2$^C1 уже под защитой святилища.", ch, 0, victim, TO_CHAR);
         return true;
     }
 
@@ -54,7 +54,7 @@ static inline bool has_sanctuary_msg( Character *ch, Character *victim )
         if (victim == ch)
             oldact("Ты уже под защитой темных богов.", ch, 0, 0, TO_CHAR);
         else
-            oldact("$C1 уже под защитой темных богов.", ch, 0, victim, TO_CHAR);
+            act("%2$^C1 уже под защитой темных богов.", ch, 0, victim, TO_CHAR);
         return true;
     }
 
@@ -62,7 +62,7 @@ static inline bool has_sanctuary_msg( Character *ch, Character *victim )
         if (victim == ch)
             oldact("Звездная пыль уже кружится вокруг тебя.", ch, 0, 0, TO_CHAR);
         else
-            oldact("Звездная пыль уже кружится вокруг $C2.", ch, 0, victim, TO_CHAR);
+            act("Звездная пыль уже кружится вокруг %2$C2.", ch, 0, victim, TO_CHAR);
         return true;
     }
 
@@ -92,11 +92,11 @@ VOID_SPELL(Armor)::run( Character *ch, Character *victim, int sn, int level )
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
         oldact("Священная броня окружает тебя.", victim, 0, 0, TO_CHAR);
         if (ch != victim)
-            oldact("Священная броня окружает $C4.", ch, 0, victim, TO_CHAR);
+            act("Священная броня окружает %2$C4.", ch, 0, victim, TO_CHAR);
     } else {
         oldact("Волшебная броня окружает тебя.", victim, 0, 0, TO_CHAR);
         if (ch != victim)
-            oldact("Волшебная броня окружает $C4.", ch, 0, victim, TO_CHAR);
+            act("Волшебная броня окружает %2$C4.", ch, 0, victim, TO_CHAR);
     }
 }
 
@@ -223,7 +223,7 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
        if (victim == ch)
           oldact("Темные боги не будут защищать тебя!!!", ch, 0, 0, TO_CHAR);
        else
-                 oldact("Темные боги не будут защищать $C4!!!", ch, 0, victim, TO_CHAR);
+                 act("Темные боги не будут защищать %2$C4!!!", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -307,7 +307,7 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
         if (victim == ch)
           ch->pecho("Силовое поле уже защищает тебя.");
         else
-          oldact("Силовое поле уже окружает $C4.",ch,0,victim,TO_CHAR);
+          act("Силовое поле уже окружает %2$C4.",ch,0,victim,TO_CHAR);
         return;
     }
     
@@ -320,7 +320,7 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
     affect_to_char( victim, &af );
     victim->pecho("Силовое поле окружает тебя.");
     if ( ch != victim )
-        oldact("Силовое поле окружает $C4.",ch,0,victim,TO_CHAR);
+        act("Силовое поле окружает %2$C4.",ch,0,victim,TO_CHAR);
     return;
 
 }
@@ -402,7 +402,7 @@ VOID_SPELL(MassSanctuary)::run( Character *ch, Room *room, int sn, int level )
 
         oldact("{WБелая аура{x окружает тебя.", gch, 0, 0, TO_CHAR);
         if (ch != gch)
-            oldact("{WБелая аура{x окружает $C4.", ch, 0, gch, TO_CHAR);
+            act("{WБелая аура{x окружает %2$C4.", ch, 0, gch, TO_CHAR);
     }
 }
 
@@ -476,7 +476,7 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
         if (victim == ch)
           oldact("Ты не можешь получить защиту от злых существ.", ch,0, 0,TO_CHAR);
         else
-          oldact("$C1 не может получить защиту от злых существ.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 не может получить защиту от злых существ.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -517,7 +517,7 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
         if (victim == ch)
           oldact("Ты не можешь получить защиту от добрых существ.", ch,0, 0,TO_CHAR);
         else
-          oldact("$C1 не может получить защиту от добрых существ.", ch,0,victim,TO_CHAR);
+          act("%2$^C1 не может получить защиту от добрых существ.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -621,7 +621,7 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
       if (victim == ch)
                ch->pecho("Охранный щит уже окружает тебя.");
       else
-               oldact("Охранный щит уже окружает $C4.",ch,0,victim,TO_CHAR);
+               act("Охранный щит уже окружает %2$C4.",ch,0,victim,TO_CHAR);
       return;
   }
 
@@ -709,7 +709,7 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
             oldact("Ты уже под воздействием щита.", ch, 0, 0, TO_CHAR);
         else
-            oldact("$C1 уже под воздействием щита.", ch, 0, victim, TO_CHAR);
+            act("%2$^C1 уже под воздействием щита.", ch, 0, victim, TO_CHAR);
         return;
     }
 

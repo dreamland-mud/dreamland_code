@@ -423,7 +423,7 @@ void BeerElementalWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *
             extract_obj( pool );
         }
         else
-            oldact("Из пенных брызг рождается $C1!", ch, 0, mob, TO_ALL );
+            act("Из пенных брызг рождается %2$C1!", ch, 0, mob, TO_ALL );
 
         if (ch->fighting) 
             multi_hit( mob, ch->fighting );

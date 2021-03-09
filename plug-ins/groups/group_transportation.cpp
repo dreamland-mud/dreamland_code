@@ -57,7 +57,7 @@ VOID_SPELL(MentalBlock)::run( Character *ch, Character *victim, int sn, int leve
         victim->pecho( "Ты и так блокируешь все попытки ментального контакта." );
         
         if (ch != victim)
-            oldact("$C1 и так блокирует все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
+            act("%2$^C1 и так блокирует все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
 
         return;
     }
@@ -70,7 +70,7 @@ VOID_SPELL(MentalBlock)::run( Character *ch, Character *victim, int sn, int leve
     victim->pecho( "Теперь ты будешь блокировать все попытки ментального контакта с тобой." );
 
     if (ch != victim)
-        oldact("$C1 будет блокировать все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
+        act("%2$^C1 будет блокировать все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
 }
 
 /*
@@ -86,7 +86,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->pecho("Ты уже находишься в воздухе.");
                 else
-                        oldact("$C1 уже находится в воздухе.",ch,0,victim,TO_CHAR);
+                        act("%2$^C1 уже находится в воздухе.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -95,7 +95,7 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->pecho("Ты и так можешь подняться в воздух.");
                 else
-                        oldact("$C1 может подняться в воздух и без твоей помощи.",ch,0,victim,TO_CHAR);
+                        act("%2$^C1 может подняться в воздух и без твоей помощи.",ch,0,victim,TO_CHAR);
                 return;
         }
 

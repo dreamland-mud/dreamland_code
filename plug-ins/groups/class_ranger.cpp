@@ -358,7 +358,7 @@ SKILL_RUNP( herbs )
       if (ch != victim)
         {
           act("%^C1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT);
-          oldact("Ты накладываешь целебные травы на раны $C2.",ch,0,victim,TO_CHAR);
+          act("Ты накладываешь целебные травы на раны %2$C2.",ch,0,victim,TO_CHAR);
           oldact("$c1 накладывает целебные травы на раны $C2.",ch,0,victim,TO_NOTVICT);
         }
         

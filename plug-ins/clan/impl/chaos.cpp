@@ -322,7 +322,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
   if (ch->is_npc() || victim->is_npc())
     {
-     oldact("Ты не можешь подражать $C3.",ch,0,victim,TO_CHAR);
+     act("Ты не можешь подражать %2$C3.",ch,0,victim,TO_CHAR);
      return;
    }
 
@@ -344,7 +344,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
     return;
    }
 
-  oldact("Ты меняешь свой облик, подражая $C3.", ch,0,victim,TO_CHAR);
+  act("Ты меняешь свой облик, подражая %2$C3.", ch,0,victim,TO_CHAR);
   act("%^C1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
   oldact("$c1 меняет свой облик, подражая $C3!", ch,0,victim,TO_NOTVICT);
 

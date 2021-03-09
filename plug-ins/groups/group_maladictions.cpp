@@ -63,7 +63,7 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
         strength = 2;
         
     if (!strength) {
-        oldact("О, нет.. Кажется, $C1 нравится твоим Богам..", ch, 0, victim, TO_CHAR);
+        act("О, нет.. Кажется, %2$C1 нравится твоим Богам..", ch, 0, victim, TO_CHAR);
         return;
     }
     
@@ -101,7 +101,7 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
     
     oldact_p("Боги $c2 проклинают тебя!\r\nТы чувствуешь себя преотвратно.", 
             ch, 0, victim, TO_VICT, POS_RESTING);
-    oldact("Твои Боги проклинают $C4!", ch, 0, victim, TO_CHAR);
+    act("Твои Боги проклинают %2$C4!", ch, 0, victim, TO_CHAR);
     oldact("Боги $c2 проклинают $C4!", ch, 0, victim, TO_NOTVICT);
 
 }
@@ -768,7 +768,7 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
             return;
         
         if (victim != ch)
-            oldact("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
+            act("Движения %2$C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
 
         victim->pecho("Твои движения замедляются, но лишь на мгновение.");
         return;
@@ -788,7 +788,7 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     ||  IS_SET(victim->imm_flags,IMM_SPELL))
     {
         if (victim != ch)
-        oldact("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
+        act("Движения %2$C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
         victim->pecho("Ты чувствуешь себя немного сонно, но это сразу проходит.");
         return;
     }
@@ -817,7 +817,7 @@ VOID_SPELL(Weaken)::run( Character *ch, Character *victim, int sn, int level )
       if (ch == victim)
           ch->pecho("Не получилось...");        
       else
-          oldact("У тебя не получилось ослабить $C4.", ch, 0, victim, TO_CHAR);
+          act("У тебя не получилось ослабить %2$C4.", ch, 0, victim, TO_CHAR);
       return;
     }
 
@@ -902,7 +902,7 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
             it->pecho("Ты чувствуешь себя отвратительно.");
             
             if (ch != it)
-                oldact("$C1 выглядит отвратительно.",ch,0,it,TO_CHAR);
+                act("%2$^C1 выглядит отвратительно.",ch,0,it,TO_CHAR);
         }
 
         it->pecho("Дьявольская сила повергает тебя!");
@@ -946,7 +946,7 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
 
     if (IS_AFFECTED(victim,AFF_CORRUPTION))
         {
-         oldact("$C1 уже гниет заживо.",ch,0,victim,TO_CHAR);
+         act("%2$^C1 уже гниет заживо.",ch,0,victim,TO_CHAR);
          return;
         }
 

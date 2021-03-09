@@ -69,7 +69,7 @@ bool Smithman::canServeClient( Character *client )
 
 void Smithman::msgListRequest( Character *client ) 
 {
-    oldact("Ты просишь у $C4 список услуг.", client, 0, getKeeper( ), TO_CHAR );
+    act("Ты просишь у %2$C4 список услуг.", client, 0, getKeeper( ), TO_CHAR );
     oldact("$c1 просит $C4 рассказать, что $E умеет делать.", client, 0, getKeeper( ), TO_ROOM );
 }
 
@@ -101,7 +101,7 @@ void Smithman::msgArticleTooFew( Character *client, Article::Pointer )
 
 void Smithman::msgBuyRequest( Character *client ) 
 {
-    oldact("Ты просишь $C4 обслужить тебя.", client, 0, getKeeper( ), TO_CHAR );
+    act("Ты просишь %2$C4 обслужить тебя.", client, 0, getKeeper( ), TO_CHAR );
     oldact("$c1 просит $C4 обслужить $s.", client, 0, getKeeper( ), TO_ROOM );
 }
 

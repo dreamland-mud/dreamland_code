@@ -122,7 +122,7 @@ int PortalMovement::move( )
 
 void PortalMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    oldact("Ты следуешь за $C5.", fch, 0, wch, TO_CHAR );
+    act("Ты следуешь за %2$C5.", fch, 0, wch, TO_CHAR );
     PortalMovement( fch, portal ).moveRecursive( );
 }
 

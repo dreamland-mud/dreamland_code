@@ -76,7 +76,7 @@ void ClanGuardRulerPre::actInvited( PCharacter *wch, Object *obj )
 
 void ClanGuardRulerPre::actPush( PCharacter *wch )
 {
-    oldact("$C1 взмахивает перед тобой кандалами... слегка задевает...\n\r... и ты летишь...", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 взмахивает перед тобой кандалами... слегка задевает...\n\r... и ты летишь...", wch, 0, ch, TO_CHAR );
     oldact("$C1 задевает кандалами $c4 и $c1 с воплем улетает...", wch, 0, ch, TO_ROOM );
 }
 
@@ -195,7 +195,7 @@ int ClanGuardRuler::getCast( Character *victim )
  *------------------------------------------------------------------------*/
 void ClanGuardRulerJailer::actPush( PCharacter *wch )
 {
-    oldact("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
     oldact("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
 }
 
@@ -684,7 +684,7 @@ SKILL_RUNP( wanted )
 
                         if ( IS_SET(victim->act ,PLR_WANTED) )
                         {
-                                oldact("$C1 уже разыскивается.", ch, 0, victim, TO_CHAR);
+                                act("%2$^C1 уже разыскивается.", ch, 0, victim, TO_CHAR);
                         }
                         else
                         {
@@ -701,7 +701,7 @@ SKILL_RUNP( wanted )
                 case 'Н':
                 case 'н':
                         if ( !IS_SET(victim->act,PLR_WANTED) )
-                                oldact("$C1 не разыскивается.", ch, 0, victim, TO_CHAR);
+                                act("%2$^C1 не разыскивается.", ch, 0, victim, TO_CHAR);
                         else
                         {
                                 REMOVE_BIT(victim->act, PLR_WANTED);
@@ -1236,7 +1236,7 @@ SKILL_RUNP( jail )
                         }
 
                         if ( victim->isAffected(gsn_manacles) )
-                                oldact("Руки $C4 закованы в кандалы!",ch,0,victim,TO_CHAR);
+                                act("Руки %2$C4 закованы в кандалы!",ch,0,victim,TO_CHAR);
 
                         oldact(buf, ch, 0, victim, TO_CHAR);
                 }
@@ -1518,7 +1518,7 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
                  ch, 0, target, TO_VICT );
             oldact("Луч света, посланный $c5, отражается от зеркала и поражает $C4!",
                  ch, 0, target, TO_NOTVICT );
-            oldact("Луч света, посланный тобой, отражается от зеркала и поражает $C4!",
+            act("Луч света, посланный тобой, отражается от зеркала и поражает %2$C4!",
                  ch, 0, target, TO_CHAR );
 
             dam = dice( level, 5 );
@@ -1628,7 +1628,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
                             repops.front( )->name, repops.front( )->areaIndex->name );
             }
             else if (repops.size( ) > 0) {
-                oldact("$C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
+                act("%2$^C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
 
                 for (auto &r: repops)
                     ch->printf( "    %s  (%s)\r\n", r->name, r->areaIndex->name);
@@ -1637,10 +1637,10 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
     }
 
     if (!victim->isAffected(gsn_doppelganger)) {
-        oldact("Ты не замечаешь во внешности $C2 ничего необычного.", ch, 0, victim, TO_CHAR);
+        act("Ты не замечаешь во внешности %2$C2 ничего необычного.", ch, 0, victim, TO_CHAR);
     }
     else if (saves_spell( level, victim, DAM_MENTAL, ch, DAMF_MAGIC)) {
-        oldact("Тебе не удалось заглянуть под личину $C2.", ch, 0, victim, TO_CHAR);
+        act("Тебе не удалось заглянуть под личину %2$C2.", ch, 0, victim, TO_CHAR);
     }
     else {
         if (victim->is_mirror( )) 

@@ -658,18 +658,18 @@ bool DefaultSpell::isPrayer( Character *caster ) const
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
-        oldact("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
+        act("Твои боги не благосклонны к %2$C3.", ch, 0, vch, TO_CHAR);
         act("Боги %C2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
         oldact("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
-        oldact("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
+        act("%2$^C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
         act("Ты отклоняешь заклинание %C2!", ch, 0, vch, TO_VICT);
         oldact("$C1 отклоняет заклинание $c2!", ch, 0, vch, TO_NOTVICT);
     }
     else {
         oldact("Ты отклоняешь заклинание!", ch, 0, vch, TO_VICT);
-        oldact("$C1 отклоняет заклинание!", ch, 0, vch, TO_NOTVICT);
+        act("%2$^C1 отклоняет заклинание!", ch, 0, vch, TO_NOTVICT);
     }
 }
 

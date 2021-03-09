@@ -31,7 +31,7 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
         if (victim == ch)
             oldact("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
         else
-            oldact("$C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
+            act("%2$^C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
         
         return false;
     }
@@ -84,7 +84,7 @@ bool RestoringWE::run( PCharacter *ch, Character *victim ) const
     update_pos( victim );
 
     if (ch != victim)
-        oldact("{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
+        act("{CТаинственное мелодичное слово пронизывает %2$C4 теплом.{x", ch, 0, victim, TO_CHAR );
 
     victim->pecho( "{CТаинственное мелодичное слово пронизывает тебя теплом.{x" );
     return true;

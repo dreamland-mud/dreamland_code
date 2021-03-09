@@ -100,7 +100,7 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
         }
 
         if  (IS_AFFECTED(victim,AFF_BLOODTHIRST )) {
-            oldact("$C1 уже жаждет крови!", ch, 0, victim, TO_CHAR);
+            act("%2$^C1 уже жаждет крови!", ch, 0, victim, TO_CHAR);
             return;
         }
 

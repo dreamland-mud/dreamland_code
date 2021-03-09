@@ -32,7 +32,7 @@ void ClanGuardOutsider::actGreet( PCharacter *wch )
 }
 void ClanGuardOutsider::actPush( PCharacter *wch )
 {
-    oldact("$C1 холодным взглядом смотрит на тебя...\n\rТы пятишься, оступаешься на краю пропасти и с криком летишь вниз...", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 холодным взглядом смотрит на тебя...\n\rТы пятишься, оступаешься на краю пропасти и с криком летишь вниз...", wch, 0, ch, TO_CHAR );
     oldact("$C1 смотрит на $c4 и $c1, не выдержав этого взгляда, оступается и падает в пропасть.", wch, 0, ch, TO_ROOM );
 }
 void ClanGuardOutsider::actIntruder( PCharacter *wch )

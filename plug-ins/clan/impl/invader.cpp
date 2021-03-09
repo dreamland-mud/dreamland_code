@@ -54,7 +54,7 @@ void ClanGuardInvader::actGreet(PCharacter *wch)
 }
 void ClanGuardInvader::actPush(PCharacter *wch)
 {
-    oldact("$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR);
+    act("%2$^C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR);
     oldact("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM);
 }
 int ClanGuardInvader::getCast(Character *victim)
@@ -381,7 +381,7 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
         return;
     }
 
-    oldact("Ты даешь жизнь тени $C2!", ch, 0, victim, TO_CHAR);
+    act("Ты даешь жизнь тени %2$C2!", ch, 0, victim, TO_CHAR);
     oldact("$c1 дает жизнь тени $C2!", ch, 0, victim, TO_NOTVICT);
     oldact_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_DEAD);
 

@@ -66,7 +66,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     DLString arg = args.getOneArgument( );
 
     oldact("$c1 информирует $C4 о выполнении задания.",client,0,ch,TO_ROOM);
-    oldact("Ты информируешь $C4 о выполнении задания.",client,0,ch,TO_CHAR);
+    act("Ты информируешь %2$C4 о выполнении задания.",client,0,ch,TO_CHAR);
 
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
@@ -210,7 +210,7 @@ void Questor::doFind( PCharacter *client )
     Quest::Pointer quest;
     
     oldact("$c1 просит помощи у $C2.",client,0,ch,TO_ROOM);
-    oldact("Ты просишь помощи у $C2.",client,0,ch,TO_CHAR);
+    act("Ты просишь помощи у %2$C2.",client,0,ch,TO_CHAR);
 
     quest = client->getAttributes( ).findAttr<Quest>( "quest" );
 
@@ -479,10 +479,10 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     
     if (arg.empty() || arg_is_list(arg)) {
         oldact("$c1 просит $C4 показать список заданий.",client, 0, ch, TO_ROOM);
-        oldact("Ты просишь $C4 показать список заданий.",client, 0, ch, TO_CHAR);
+        act("Ты просишь %2$C4 показать список заданий.",client, 0, ch, TO_CHAR);
     } else {
         oldact("$c1 просит $C4 дать $m задание.", client, 0, ch, TO_ROOM);
-        oldact("Ты просишь $C4 дать тебе задание.", client, 0, ch, TO_CHAR);
+        act("Ты просишь %2$C4 дать тебе задание.", client, 0, ch, TO_CHAR);
     }
 
     if (client->getAttributes( ).isAvailable( "quest" )) {

@@ -126,7 +126,7 @@ SKILL_RUNP( sconce )
         chance -= 40;
 
     if (number_percent( ) < chance * k / 100) {
-        oldact("Ты со всей силы бьешь $C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
+        act("Ты со всей силы бьешь %2$C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
         act("%^C1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
         oldact("$c1 лупит $C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
         gsn_sconce->improve( ch, true, victim );
@@ -170,7 +170,7 @@ public:
                 || ( IS_AWAKE( victim ) && number_percent() <= 10 ) )
             && !victim->is_immortal())
         {
-            oldact("Твоя {Rшутка{x над $C5 удалась!",ch,0,victim,TO_CHAR);
+            act("Твоя {Rшутка{x над %2$C5 удалась!",ch,0,victim,TO_CHAR);
             oldact("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT);
             oldact_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 

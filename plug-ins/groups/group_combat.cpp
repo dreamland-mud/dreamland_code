@@ -242,7 +242,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_MAGIC) )
     {
         if (ch != victim)
-            oldact("Рука умертвия пытается схватить $C4, но безуспешно.", ch, 0, victim, TO_CHAR);
+            act("Рука умертвия пытается схватить %2$C4, но безуспешно.", ch, 0, victim, TO_CHAR);
         oldact("Ты на мгновение почувствова$gло|л|ла озноб.", victim, 0, 0, TO_CHAR);
         return;
     }
@@ -266,7 +266,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     }
     
     victim->pecho("Ты чувствуешь, как жизнь ускользает от тебя!");
-    oldact("Непостижимая Рука Умертвия хватает $C4!", ch,0,victim,TO_NOTVICT);
+    act("Непостижимая Рука Умертвия хватает %2$C4!", ch,0,victim,TO_NOTVICT);
     damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_MAGIC);
 }
 

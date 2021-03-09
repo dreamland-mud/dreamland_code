@@ -58,7 +58,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
             return;
         }
 
-        oldact("$C1 дает тебе {Y10{x практик в обмен на {Y1{x тренировочную сессию.", client, 0, ch, TO_CHAR);
+        act("%2$^C1 дает тебе {Y10{x практик в обмен на {Y1{x тренировочную сессию.", client, 0, ch, TO_CHAR);
         oldact("$C1 обменивает для $c2 тренировочные сессии на сессии практики.", client, 0, ch, TO_NOTVICT );
 
         client->practice += 10;
@@ -72,7 +72,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
             return;
         }
 
-        oldact("$C1 дает тебе {Y1{x тренировочную сессию в обмен на {Y10{x практик.", client, 0, ch, TO_CHAR );
+        act("%2$^C1 дает тебе {Y1{x тренировочную сессию в обмен на {Y10{x практик.", client, 0, ch, TO_CHAR );
         oldact("$C1 обменивает для $c2 сессии практики на тренировочные сессии.", client, 0, ch, TO_NOTVICT );
 
         client->practice -= 10;

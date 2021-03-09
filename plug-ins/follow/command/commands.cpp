@@ -77,7 +77,7 @@ CMDRUN( follow )
     }
 
     if ( IS_CHARMED(ch)) {
-        oldact("Но тебе хочется следовать за $C5!", ch, 0, ch->master, TO_CHAR);
+        act("Но тебе хочется следовать за %2$C5!", ch, 0, ch->master, TO_CHAR);
         return;
     }
 
@@ -93,7 +93,7 @@ CMDRUN( follow )
     }
     
     if (!check_mutual_induct( ch, victim, clan_battlerager )) {
-        oldact("Ты не сможешь следовать за $C5.", ch, 0, victim, TO_CHAR);
+        act("Ты не сможешь следовать за %2$C5.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -168,7 +168,7 @@ CMDRUN( group )
     }
 
     if (victim->master != ch) {
-        oldact("$C1 не следует за тобой.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не следует за тобой.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -243,7 +243,7 @@ CMDRUN( group )
 
     if (!check_mutual_induct( ch, victim, clan_battlerager )) {
         oldact_p("Ты не сможешь вступить в группу $C2.", ch, 0, victim, TO_VICT, POS_SLEEPING);
-        oldact("$C1 не сможет вступить в твою группу.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не сможет вступить в твою группу.", ch, 0, victim, TO_CHAR);
         return;
     }
 

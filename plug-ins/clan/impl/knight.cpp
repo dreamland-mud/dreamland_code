@@ -93,7 +93,7 @@ void ClanGuardKnight::actGreet(PCharacter *wch)
 }
 void ClanGuardKnight::actPush(PCharacter *wch)
 {
-    oldact("$C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе.", wch, 0, ch, TO_CHAR);
+    act("%2$^C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе.", wch, 0, ch, TO_CHAR);
     oldact("$C1 кивает $c3, слегка нахмурившись, взмахивает рукой.\n\r... и $c1 с диким восторгом в глазах улетает.", wch, 0, ch, TO_ROOM);
 }
 
@@ -188,7 +188,7 @@ SKILL_RUNP(guard)
 
     if (vict->is_npc())
     {
-        oldact("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR);
+        act("%2$^C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR);
         return;
     }
 
@@ -217,13 +217,13 @@ SKILL_RUNP(guard)
 
     if (victim->guarded_by != 0)
     {
-        oldact("$C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR);
+        act("%2$^C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR);
         return;
     }
 
     if (!is_same_group(victim, pch))
     {
-        oldact("Но ты не состоишь в той же группе, что и $C1.", pch, 0, victim, TO_CHAR);
+        act("Но ты не состоишь в той же группе, что и %2$C1.", pch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -253,7 +253,7 @@ SKILL_RUNP(guard)
             return;
         }
 
-    oldact("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR);
+    act("Теперь ты охраняешь %2$C4.", pch, 0, victim, TO_CHAR);
     act("Теперь тебя охраняет %C4.", pch, 0, victim, TO_VICT);
     oldact("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT);
 
@@ -279,7 +279,7 @@ BOOL_SKILL(guard)::run(Character *wch, Character *mob)
     {
         oldact("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
         act("%^C1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
-        oldact("Ты прыгаешь перед $C5!", ch->guarded_by, 0, ch, TO_CHAR);
+        act("Ты прыгаешь перед %2$C5!", ch->guarded_by, 0, ch, TO_CHAR);
         gsn_guard->improve(ch->guarded_by, true, mob);
         return true;
     }
@@ -456,7 +456,7 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
 
         vch->pecho("{YЗолотая аура{x окружает тебя.");
         if (ch != vch)
-            oldact("{YЗолотая аура{x окружает $C4.", ch, 0, vch, TO_CHAR);
+            act("{YЗолотая аура{x окружает %2$C4.", ch, 0, vch, TO_CHAR);
     }
 }
 

@@ -116,7 +116,7 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
         act("%^C1 очаровывает тебя!!!", ch, 0, victim, TO_VICT);
 
         if ( ch != victim )
-                oldact("$C1 с обожанием смотрит на тебя.",ch,0,victim,TO_CHAR);
+                act("%2$^C1 с обожанием смотрит на тебя.",ch,0,victim,TO_CHAR);
 
 }
 
@@ -186,12 +186,12 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
 
     if (saves_spell( paf->level, ch, DAM_CHARM, witch, DAMF_MAGIC )) {
         act("При взгляде на %C4 твое сердце на мгновение замирает.", witch, 0, ch, TO_VICT);
-        oldact("Во взгляде $C2 на мгновение мелькает полный восторг.", witch, 0, ch, TO_CHAR);
+        act("Во взгляде %2$C2 на мгновение мелькает полный восторг.", witch, 0, ch, TO_CHAR);
         return;
     }
 
     act("Неужели %C1 выглядит так очаровательно?", witch, 0, ch, TO_VICT);
-    oldact("$C1 смотрит на тебя с покорностью.", witch, 0, ch, TO_CHAR);
+    act("%2$^C1 смотрит на тебя с покорностью.", witch, 0, ch, TO_CHAR);
     oldact("$C1 зачарованно смотрит на $c4 и жаждет выполнить любые поручения.", witch, 0, ch, TO_NOTVICT);
 
     if (ch->master)
@@ -330,7 +330,7 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     obj_to_char( jar , ch );
 
     SET_BIT(victim->act,PLR_NO_EXP);
-    oldact("Дух $C2 теперь заточен в сосуде и находится в твоей власти.", ch, 0, victim, TO_CHAR);
+    act("Дух %2$C2 теперь заточен в сосуде и находится в твоей власти.", ch, 0, victim, TO_CHAR);
     act("%^C1 {Rзаточил твой дух в сосуде.{x", ch, 0, victim, TO_VICT);
 }
 

@@ -49,7 +49,7 @@ void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero
     oldact("$c1 глядя на $C4 произносит: '{gО, вот и обед подоспел{x'.", king, 0, kid, TO_ROOM);
     act("%^C1 хватает дите за руку.", king, 0, 0, TO_ROOM);
     hero->printf( "%s и %s уже встретились.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
-    oldact("Сходи, проведай $C4.", hero, 0, king, TO_CHAR);
+    act("Сходи, проведай %2$C4.", hero, 0, king, TO_CHAR);
 }
 void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) const
 {
@@ -82,7 +82,7 @@ void KS::actAttackHero( NPCharacter *bandit, PCharacter *hero ) const
         act("Раскатывающее движение скалкой %C2 {R<*) (*>= ! ПРЕВРАЩАЕТ В КРОВАВОЕ МЕСИВО ! =<*) (*>{x твое лицо", bandit, 0, hero, TO_VICT);
         oldact("Ты в {RУЖАСНОМ СОСТОЯНИИ.{x", bandit, 0, hero, TO_VICT);
         oldact("Раскатывающее движение скалкой $c2 {R<*) (*>= ! ПРЕВРАЩАЕТ В КРОВАВОЕ МЕСИВО ! =<*) (*>{x лицо $C2", bandit, 0, hero, TO_NOTVICT);
-        oldact("$C1 в {RУЖАСНОМ СОСТОЯНИИ.{x", bandit, 0, hero, TO_NOTVICT);
+        act("%2$^C1 в {RУЖАСНОМ СОСТОЯНИИ.{x", bandit, 0, hero, TO_NOTVICT);
     }
     else {
         oldact("$c1 произносит '{gЗдравствуй мил$Gое|ок|ая, куда же это ты направил$Gось|ся|ась с чужим дитенком?{x'.", bandit, 0, hero, TO_ROOM);
@@ -113,7 +113,7 @@ void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) const
         act("%^C1 произносит: '{gВот и все, пришли,... не туда{x'", bandit, 0, 0, TO_ROOM);
         
         if (kid->in_room == bandit->in_room)
-            oldact("$C1 готов расплакаться.", bandit, 0, kid, TO_ROOM);
+            act("%2$^C1 готов расплакаться.", bandit, 0, kid, TO_ROOM);
     }
 }
 

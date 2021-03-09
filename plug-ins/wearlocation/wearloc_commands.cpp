@@ -223,7 +223,7 @@ CMDRUNP( remove )
     }
     
     if (( obj = get_obj_wear_victim( victim, argObj, ch ) ) == 0) {
-        oldact("У $C2 нет этого.", ch, 0, victim, TO_CHAR);
+        act("У %2$C2 нет этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 

@@ -199,18 +199,18 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
 
     if (mob->master) {
         oldact("$c1 с аппетитом клацает зубами при виде $C2.", ch, 0, mob, TO_ROOM);
-        oldact("Ты с аппетитом клацаешь зубами при виде $C2.", ch, 0, mob, TO_CHAR);
+        act("Ты с аппетитом клацаешь зубами при виде %2$C2.", ch, 0, mob, TO_CHAR);
         
         if (mob->master == ch) {
             oldact("$C1 с ужасом смотрит на $c4.", ch, 0, mob, TO_ROOM);
-            oldact("$C1 с ужасом смотрит на тебя.", ch, 0, mob, TO_CHAR);
+            act("%2$^C1 с ужасом смотрит на тебя.", ch, 0, mob, TO_CHAR);
         }
         else if (mob->master->in_room == mob->in_room) {
             oldact("$C1 шустро прячется за спину хозя$gина|ина|йки!", mob->master, 0, mob, TO_ROOM);
-            oldact("$C1 шустро прячется за твою спину!", mob->master, 0, mob, TO_CHAR);  
+            act("%2$^C1 шустро прячется за твою спину!", mob->master, 0, mob, TO_CHAR);  
         }
         else
-            oldact("$C1 вжимается в пол, закрыв глаза лапами.", ch, 0, mob, TO_ALL);
+            act("%2$^C1 вжимается в пол, закрыв глаза лапами.", ch, 0, mob, TO_ALL);
         
         return;
     }
@@ -221,7 +221,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
                  return;
    
     oldact("$c1 с громким мяуканьем вцепляется зубами и когтями в $C4!", ch, 0, mob, TO_ROOM);
-    oldact("Ты с громким мяуканьем вцепляешься зубами и когтями в $C4!", ch, 0, mob, TO_CHAR);
+    act("Ты с громким мяуканьем вцепляешься зубами и когтями в %2$C4!", ch, 0, mob, TO_CHAR);
 
     diff = max( 1, ch->getRealLevel( ) - mob->getRealLevel( ) );
     dam = diff * 10;
@@ -232,7 +232,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         Object *obj, *obj_next;
         
         death_cry( mob, 99 );
-        oldact("Ты ешь $C4.", ch, 0, mob, TO_CHAR);
+        act("Ты ешь %2$C4.", ch, 0, mob, TO_CHAR);
         oldact("$c1 ест $C4.", ch, 0, mob, TO_ROOM);
 
         for (obj = mob->carrying; obj; obj = obj_next) {

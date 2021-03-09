@@ -203,7 +203,7 @@ CMDRUNP( smell )
             oldact("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
             act("%^C1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
         } else {
-            oldact("Ты обнюхиваешь $C4.", ch, 0, victim, TO_CHAR);
+            act("Ты обнюхиваешь %2$C4.", ch, 0, victim, TO_CHAR);
             oldact("$c1 обнюхивает $C4.", ch, 0, victim, TO_NOTVICT);
             act("%^C1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
         }

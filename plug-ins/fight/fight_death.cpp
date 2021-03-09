@@ -166,7 +166,7 @@ protected:
         && !(IS_BLOODLESS(ch)))    
         {
             oldact("{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
-            oldact("{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
+            act("{RТы выпиваешь последние капли жизни из %2$C2!{x", killer, 0,ch,TO_CHAR);
             desire_bloodlust->gain( killer->getPC( ), 3 );
         }
     }

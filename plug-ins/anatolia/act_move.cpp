@@ -944,7 +944,7 @@ CMDRUNP( wake )
     }
 
     if (IS_AWAKE(victim)) { 
-        oldact("$C1 уже не спит.", ch, 0, victim, TO_CHAR); 
+        act("%2$^C1 уже не спит.", ch, 0, victim, TO_CHAR); 
         return; 
     }
 
@@ -953,7 +953,7 @@ CMDRUNP( wake )
         return; 
     }
 
-    oldact("Ты будишь $C4.", ch, 0, victim, TO_CHAR);
+    act("Ты будишь %2$C4.", ch, 0, victim, TO_CHAR);
     oldact("$c1 будит $C4.", ch, 0, victim, TO_NOTVICT);
     oldact_p("$c1 будит тебя.", ch, 0, victim, TO_VICT,POS_SLEEPING );
     do_stand(victim,"");

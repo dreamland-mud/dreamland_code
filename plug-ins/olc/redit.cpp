@@ -1074,7 +1074,7 @@ static bool redit_purge_mob(PCharacter *ch, Character *vch)
         return false;
     }
 
-    oldact("Ты уничтожаешь $C4.", ch, 0, mob, TO_CHAR);
+    act("Ты уничтожаешь %2$C4.", ch, 0, mob, TO_CHAR);
     oldact("$c1 уничтожает $C4.", ch, 0, mob, TO_ROOM);
     extract_char(mob);
     return true;

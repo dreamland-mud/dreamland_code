@@ -1359,7 +1359,7 @@ CMDRUNP( request )
 
           if ( victim->position <= POS_SLEEPING )
         {
-                oldact("$C1 не в состоянии выполнить твою просьбу.", ch, 0, victim, TO_CHAR);
+                act("%2$^C1 не в состоянии выполнить твою просьбу.", ch, 0, victim, TO_CHAR);
                 return;
         }
 
@@ -1492,7 +1492,7 @@ CMDRUNP( request )
         ch->hit -= 3 * ( ch->getModifyLevel() / 2 );
         ch->hit = max( (int)ch->hit, 0 );
 
-        oldact("Ты чувствуешь благодарность за доверие $C2.", ch, 0, victim,TO_CHAR);
+        act("Ты чувствуешь благодарность за доверие %2$C2.", ch, 0, victim,TO_CHAR);
         postaffect_to_char(ch, gsn_gratitude, ch->getModifyLevel() / 10);
 }
 
@@ -1536,13 +1536,13 @@ CMDRUNP( demand )
     }
 
     if (IS_SET(victim->act, ACT_NODEMAND)) {
-        oldact("$C1 не подчинится твоему требованию.", ch, 0, victim, TO_CHAR);
+        act("%2$^C1 не подчинится твоему требованию.", ch, 0, victim, TO_CHAR);
         return;
     }
 
   if ( victim->position <= POS_SLEEPING )
     {
-       oldact("$C1 не в состоянии исполнить твой приказ.", ch, 0, victim, TO_CHAR);
+       act("%2$^C1 не в состоянии исполнить твой приказ.", ch, 0, victim, TO_CHAR);
       return;
     }
   

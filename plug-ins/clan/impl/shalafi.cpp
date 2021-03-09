@@ -55,7 +55,7 @@ void ClanGuardShalafi::actGreet( PCharacter *wch )
 }
 void ClanGuardShalafi::actPush( PCharacter *wch )
 {
-    oldact("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
     oldact("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardShalafi::getCast( Character *victim )
@@ -312,7 +312,7 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
           affect_to_char(victim,&af);
 
           if (ch != victim) {
-            oldact("Твой ментальный удар повреждает разум $C2!", ch,0,victim,TO_CHAR);
+            act("Твой ментальный удар повреждает разум %2$C2!", ch,0,victim,TO_CHAR);
             act("Ментальный удар %C2 повреждает твой разум!", ch,0,victim,TO_VICT);
             oldact("Ментальный удар $c2 повреждает разум $C2!", ch,0,victim,TO_NOTVICT);
           }

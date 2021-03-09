@@ -91,7 +91,7 @@ SKILL_RUNP( tame )
             REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
             SET_BIT(victim->affected_by,AFF_CALM);
             victim->pecho("Ты успокаиваешься.");
-            oldact("Ты укрощаешь $C4.",ch,0,victim,TO_CHAR);
+            act("Ты укрощаешь %2$C4.",ch,0,victim,TO_CHAR);
             oldact("$c1 укрощает $C4.",ch,0,victim,TO_NOTVICT);
             stop_fighting(victim,true);
             gsn_tame->improve( ch, true, victim );

@@ -169,7 +169,7 @@ void VampiricBiteOneHit::postDamageEffects( )
         affect_join( victim, &af );	
 	    
     	oldact_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
-    	oldact("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
+    	act("Рана от твоих клыков на шее %2$C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
     }
     }
 
@@ -312,7 +312,7 @@ SKILL_RUNP( dominate )
   victim->master = victim->leader = ch;
 
   if ( ch != victim ) {
-        oldact("$C1 смотрит на тебя с покорностью.",ch,0,victim,TO_CHAR);
+        act("%2$^C1 смотрит на тебя с покорностью.",ch,0,victim,TO_CHAR);
   	act("%^C1 подчиняет тебя своей воле.", ch, 0, victim, TO_VICT);
   }
 	
@@ -528,7 +528,7 @@ void sucking( Character *ch, Character *victim )
     ch->setWait( gsn_vampiric_bite->getBeats( )  );
                      
     oldact_p("Сквозь кошмарный сон ты чувствуешь, как $c1 высасывает твою {rкровь{x.", ch, 0, victim, TO_VICT, POS_DEAD);
-    oldact("Ты высасываешь {rкровь{x из шеи $C2.", ch, 0, victim, TO_CHAR);
+    act("Ты высасываешь {rкровь{x из шеи %2$C2.", ch, 0, victim, TO_CHAR);
     oldact("$c1 высасывает {rкровь{x из шеи $C2.", ch, 0, victim, TO_NOTVICT);
     
     if (!ch->is_npc( )) {
@@ -556,7 +556,7 @@ void sucking( Character *ch, Character *victim )
 	mana_gain = std::min( slevel * 5, (int)victim->max_hit );
     }	    
     else {
-	oldact("Ты с отвращением глотаешь кровь $C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR);	    
+	act("Ты с отвращением глотаешь кровь %2$C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR);	    
 	hp_gain = std::min( slevel * 1, (int)victim->max_hit ); 
 	mana_gain = std::min( slevel * 1, (int)victim->max_hit );	    
     }
@@ -591,7 +591,7 @@ void sucking( Character *ch, Character *victim )
 		else {
     			oldact_p("Ты стонешь во сне, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);			
 		}
-		oldact("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
+		act("Рана от твоих клыков на шее %2$C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
     	}	    
         victim->position = POS_SLEEPING;
                                
@@ -1173,7 +1173,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
             act("%^C1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT);
             oldact("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, victim, TO_NOTVICT);
-            oldact("Ты костяным ножом промахиваешься мимо тени $C2!", ch, 0, victim, TO_CHAR);
+            act("Ты костяным ножом промахиваешься мимо тени %2$C2!", ch, 0, victim, TO_CHAR);
             
             gsn_bonedagger->improve( ch, false, victim );
             bd.miss( );
@@ -1184,7 +1184,7 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
         
         act("%^C1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT);
         oldact("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT);
-        oldact("Ты приковываешь тень $C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR);
+        act("Ты приковываешь тень %2$C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR);
 
         af.type = gsn_bonedagger;
         af.level = ch->getModifyLevel( );
@@ -1343,7 +1343,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
     data.learned = 100;
 
     oldact("$C1 делится секретом бессмертия с $c5.", actor, 0, ch, TO_ROOM );
-    oldact("$C1 делится с тобой секретом бессмертия.", actor, 0, ch, TO_CHAR );
+    act("%2$^C1 делится с тобой секретом бессмертия.", actor, 0, ch, TO_CHAR );
     oldact_p("{BМолнии сверкают на небе.{x", actor, 0, ch, TO_ALL, POS_SLEEPING );
     return true;
 }

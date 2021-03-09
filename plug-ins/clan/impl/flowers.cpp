@@ -22,7 +22,7 @@ void ClanGuardFlowers::actGreet( PCharacter *wch )
 }
 void ClanGuardFlowers::actPush( PCharacter *wch )
 {
-    oldact("$C1 вежливо выпроваживает тебя восвояси.", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 вежливо выпроваживает тебя восвояси.", wch, 0, ch, TO_CHAR );
     oldact("$C1 вежливо выпроваживает $c2 восвояси.", wch, 0, ch, TO_ROOM );    
 }
 

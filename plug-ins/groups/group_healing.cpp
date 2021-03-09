@@ -262,7 +262,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
         af.duration = 1;
     
     } else {
-        oldact("Сосредоточившись, ты переносишь раны $C2 на собственное тело.", ch, 0, victim, TO_CHAR);
+        act("Сосредоточившись, ты переносишь раны %2$C2 на собственное тело.", ch, 0, victim, TO_CHAR);
         act("Сосредоточившись, %C1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT);
         oldact("Сосредоточившись, $c1 переносит раны $C2 на собственное тело.", ch, 0, victim, TO_NOTVICT);
 

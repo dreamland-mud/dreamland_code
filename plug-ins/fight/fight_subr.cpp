@@ -102,7 +102,7 @@ void check_assist(Character *ch, Character *victim)
         if (IS_SET(rch->act, PLR_AUTOASSIST)
             && is_same_group( ch, rch ))
         {
-            oldact("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);
+            act("Ты вступаешь в битву на стороне %2$C2.", rch, 0, ch, TO_CHAR);
             one_hit( rch, victim );
             continue;
         }

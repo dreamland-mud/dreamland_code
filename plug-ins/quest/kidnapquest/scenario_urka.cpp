@@ -43,7 +43,7 @@ void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero
     oldact("$C1 внимательно смотрит на $c4.", kid, 0, king, TO_ROOM);
     oldact("$C1 произносит '{gНу, здравствуй, хорошо отдохну$gло|л|ла? Пора и за работу приниматься...{x'", kid, 0, king, TO_ROOM);
     hero->printf( "%s и %s уже встретились.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
-    oldact("Приди к $C3 за благодарностью!", hero, 0, king, TO_CHAR);
+    act("Приди к %2$C3 за благодарностью!", hero, 0, king, TO_CHAR);
 }
 void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) const 
 {
@@ -101,7 +101,7 @@ void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) const
         act("%^C1 бормочет: '{gЗамуровали изверги...{x'", bandit, 0, 0, TO_ROOM);
 
         if (kid->in_room == bandit->in_room)
-            oldact("$C1 злобно ухмыляется.", bandit, 0, kid, TO_ROOM);
+            act("%2$^C1 злобно ухмыляется.", bandit, 0, kid, TO_ROOM);
     }
 }
 
@@ -195,7 +195,7 @@ void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *ban
     act("%^C1 произносит '{gСержант Петренко, трое детей, предъявите документы{x'.", bandit, 0, 0, TO_ROOM);
     act("%^C1 долго и усердно изучает паспорт.", bandit, 0, 0, TO_ROOM);
     oldact("$c1 поднимает взгляд на $C4 и произносит: '{gКак хорошо, вас-то мы и ищем...{x'", bandit, 0, kid, TO_ROOM);
-    oldact("$C1 озабоченно бормочет: '{gЧей же паспорт этот идиот мне принес?{x'", bandit, 0, kid, TO_ROOM);
+    act("%2$^C1 озабоченно бормочет: '{gЧей же паспорт этот идиот мне принес?{x'", bandit, 0, kid, TO_ROOM);
 }
 
 #undef KS

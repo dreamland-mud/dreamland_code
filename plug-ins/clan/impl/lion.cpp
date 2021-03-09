@@ -58,7 +58,7 @@ void ClanGuardLion::actGreet( PCharacter *wch )
 }
 void ClanGuardLion::actPush( PCharacter *wch )
 {
-    oldact("$C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности.", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности.", wch, 0, ch, TO_CHAR );
     oldact("$C1, глядя на $c4, выпускает когти, и $c1 сматывает удочки.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardLion::getCast( Character *victim )
@@ -150,7 +150,7 @@ SKILL_RUNP( claw )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                oldact("Но ведь $C1 твой друг!",ch,0,victim,TO_CHAR);
+                act("Но ведь %2$C1 твой друг!",ch,0,victim,TO_CHAR);
                 return;
         }
    

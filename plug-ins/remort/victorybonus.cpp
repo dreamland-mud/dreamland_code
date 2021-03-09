@@ -67,9 +67,9 @@ void Koschey::msgListAfter( Character *client )
 
 void Koschey::msgListBefore( Character *client )
 {
-    oldact("$C1 поднимает на тебя раздраженный взгляд.", client, 0, ch, TO_CHAR );
+    act("%2$^C1 поднимает на тебя раздраженный взгляд.", client, 0, ch, TO_CHAR );
     oldact("$C1 поднимает на $c4 раздраженный взгляд.", client, 0, ch, TO_ROOM );
-    oldact("$C1 скрипучим голосом произносит '{gВот какое счастье тебе привалило:{x'", client, 0, ch, TO_CHAR );
+    act("%2$^C1 скрипучим голосом произносит '{gВот какое счастье тебе привалило:{x'", client, 0, ch, TO_CHAR );
 }
 
 void Koschey::msgBuyRequest( Character *client )

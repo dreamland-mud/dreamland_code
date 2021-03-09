@@ -2090,7 +2090,7 @@ CMDWIZP( clone )
 
                 char_to_room(clone,ch->in_room);
                 oldact("$c1 создает $C4.",ch,0,clone,TO_ROOM);
-                oldact("Ты клонируешь $C4.",ch,0,clone,TO_CHAR);
+                act("Ты клонируешь %2$C4.",ch,0,clone,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %C4.", ch, clone );
                 
@@ -2156,7 +2156,7 @@ CMDWIZP( load )
             char_to_room( victim, ch->in_room );
 
         oldact("$c1 создает $C4!", ch, 0, victim, TO_ROOM);
-        oldact("Ты создаешь $C4!", ch, 0, victim, TO_CHAR);
+        act("Ты создаешь %2$C4!", ch, 0, victim, TO_CHAR);
 
 
         wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
@@ -2274,7 +2274,7 @@ CMDWIZP( purge )
         }
 
         oldact("$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT );
-        oldact("Ты изничтожаешь $C4.", ch, 0, victim, TO_CHAR );
+        act("Ты изничтожаешь %2$C4.", ch, 0, victim, TO_CHAR );
         extract_char( victim );
         return;
     }

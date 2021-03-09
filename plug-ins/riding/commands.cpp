@@ -127,7 +127,7 @@ CMDRUN( mount )
             && IS_SET(horse->getNPC()->behavior->getOccupation(), (1<<OCC_BATTLEHORSE));
    
     if (needsRidingSkill && number_percent( ) > gsn_riding->getEffective( ch )) {
-        oldact("Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
+        act("Тебе не хватило мастерства оседлать %2$C4.", ch, 0, horse, TO_CHAR );
         act("%^C1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
         oldact("$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
         
@@ -141,7 +141,7 @@ CMDRUN( mount )
     horse->mount = ch;
     horse->riding = false;
 
-    oldact("Ты запрыгиваешь на $C4.", ch, 0, horse, TO_CHAR );
+    act("Ты запрыгиваешь на %2$C4.", ch, 0, horse, TO_CHAR );
     act("%^C1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
     oldact("$c1 запрыгивает на спину $C2.", ch, 0, horse, TO_NOTVICT );
     
@@ -162,12 +162,12 @@ CMDRUN( dismount )
     }
     
     if (MOUNTED(ch)) {
-        oldact("Ты соскакиваешь со спины $C2.", ch, 0, ch->mount, TO_CHAR );
+        act("Ты соскакиваешь со спины %2$C2.", ch, 0, ch->mount, TO_CHAR );
         act("%^C1 соскакивает с твоей спины.", ch, 0, ch->mount, TO_VICT );
         oldact("$c1 спрыгивает с $C2.", ch, 0, ch->mount, TO_NOTVICT );
     }
     else {
-        oldact("Ты сбрасываешь $C4 со спины.", ch, 0, ch->mount, TO_CHAR );
+        act("Ты сбрасываешь %2$C4 со спины.", ch, 0, ch->mount, TO_CHAR );
         act("%^C1 сбрасывает тебя со спины.", ch, 0, ch->mount, TO_VICT );
         oldact("$c1 сбрасывает $C4 со спины.", ch, 0, ch->mount, TO_NOTVICT );
     }

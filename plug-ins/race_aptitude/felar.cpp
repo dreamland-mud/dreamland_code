@@ -84,7 +84,7 @@ SKILL_RUNP( tail )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        oldact("Но $C1 твой друг!",ch,0,victim,TO_CHAR);
+        act("Но %2$C1 твой друг!",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -123,7 +123,7 @@ SKILL_RUNP( tail )
     if (number_percent() < chance / 2)
     {
         act("%^C1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT);
-        oldact("Ты наносишь $C3 удар хвостом!",ch,0,victim,TO_CHAR);
+        act("Ты наносишь %2$C3 удар хвостом!",ch,0,victim,TO_CHAR);
         oldact("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT);
         gsn_tail->improve( ch, true, victim );
     

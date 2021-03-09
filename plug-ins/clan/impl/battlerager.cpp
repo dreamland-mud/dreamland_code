@@ -370,7 +370,7 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     // Success, inflict a lot of damage. Anatolia implementation had (victim->hit+1), but the 
     // resulting damage always got reduced by sanctuary and other protections.
     int dam;
-    oldact("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR);
+    act("{RТвой молниеносный удар в одно мгновение лишает %2$C4 жизни!{x", ch,0,victim,TO_CHAR);
     oldact("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT);
     oldact_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
@@ -744,8 +744,8 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
     oldact_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
            ch,0,wch,TO_VICT,POS_RESTING);
     oldact("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
-    oldact("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR);
-    oldact("$C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
+    act("Ты передаешь лечебное зелье %2$C3.",ch,0,wch,TO_CHAR);
+    act("%2$^C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
     oldact("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT);
     oldact("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT);
 
@@ -802,7 +802,7 @@ void ClanGuardBattlerager::actGreet( PCharacter *wch )
 
 void ClanGuardBattlerager::actPush( PCharacter *wch )
 {
-    oldact("$C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
+    act("%2$^C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
     oldact("$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло.", wch, 0, ch, TO_ROOM );
 }
 

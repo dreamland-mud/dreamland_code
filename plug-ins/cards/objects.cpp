@@ -351,14 +351,14 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             oldact("$c1 не смо$gгло|г|гла пожать твою руку.", pch, 0, victim, TO_VICT);
             
             if (number_range(1, 100) < 10) {
-                oldact("{cТы пытаешься затащить $C4 к себе через карту, но вместо этого тащишь кого-то другого!{x",
+                act("{cТы пытаешься затащить %2$C4 к себе через карту, но вместо этого тащишь кого-то другого!{x",
                     pch, 0, victim, TO_CHAR);        
                 act("%^C1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
 
                 multi_hit( findHorribleVictim( pch ), pch );
             }
             else {
-                oldact("Твоя попытка затащить $C4 к себе провалилась.", pch, 0, victim, TO_CHAR);
+                act("Твоя попытка затащить %2$C4 к себе провалилась.", pch, 0, victim, TO_CHAR);
             }
         }
         else {
@@ -384,7 +384,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     }
     else {
         if (!hisAttr || !myCard || !gsn_pull_card->usable( victim )) 
-            oldact("$C1 не сможет затащить тебя к себе через карту.", pch, 0, victim, TO_CHAR);
+            act("%2$^C1 не сможет затащить тебя к себе через карту.", pch, 0, victim, TO_CHAR);
         else {
             if (pch->mana < mana) {
                 pch->pecho("У тебя недостаточно энергии для этого.");
@@ -396,7 +396,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             myAttr->setContactName( victim->getName( ) );
             oldact("Ты дотрагиваешься до $o2, мысленно протягивая $M руку.", pch, obj, victim, TO_CHAR);
             oldact("$c1 дотрагивается до $o2.", pch, obj, 0, TO_ROOM);
-            oldact("{cИзображение $C2 на карте оживает и протягивает тебе руку.{x", victim, 0, pch, TO_CHAR);
+            act("{cИзображение %2$C2 на карте оживает и протягивает тебе руку.{x", victim, 0, pch, TO_CHAR);
         }
     }
     

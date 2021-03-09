@@ -281,7 +281,7 @@ SKILL_RUNP( target )
   ch->setWait( gsn_target->getBeats( ) );
 
     if (victim == ch->fighting) {
-        oldact("Ты и так наносишь большинство своих атак $C3.", ch, 0, victim, TO_CHAR);
+        act("Ты и так наносишь большинство своих атак %2$C3.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -295,7 +295,7 @@ SKILL_RUNP( target )
     ch->fighting = victim;
 
     oldact("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
-    oldact("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR);
+    act("Ты меняешь свою цель на %2$C4!",ch,0,victim,TO_CHAR);
     act("%^C1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
       return;
     }
@@ -562,7 +562,7 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
     victim->getPC( )->death -= 1;
 
     oldact("$C1 забирает смерть у $c5.", victim, 0, ch, TO_ROOM );
-    oldact("$C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
+    act("%2$^C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
     oldact_p("{BМолнии сверкают на небе.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
 }
 

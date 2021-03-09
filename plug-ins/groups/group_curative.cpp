@@ -57,7 +57,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
     }
 
     if (IS_AFFECTED( victim, AFF_SLEEP )) {
-        oldact("Тебе не удалось разбудить $C4.", ch, 0, victim, TO_CHAR);
+        act("Тебе не удалось разбудить %2$C4.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -76,7 +76,7 @@ VOID_SPELL(CureBlindness)::run( Character *ch, Character *victim, int sn, int le
         if (victim == ch)
           ch->pecho("Твое зрение в порядке.");
         else
-          oldact("Зрение $C2 в порядке.",ch,0,victim,TO_CHAR);
+          act("Зрение %2$C2 в порядке.",ch,0,victim,TO_CHAR);
         return;
     }
 

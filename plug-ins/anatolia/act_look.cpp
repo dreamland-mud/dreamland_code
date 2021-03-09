@@ -987,7 +987,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     }
 
     if (!naked) {
-        oldact("\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
+        act("\r\n%2$C1 использует: ", ch, 0, victim, TO_CHAR );
         ch->send_to( buf );
     }
             

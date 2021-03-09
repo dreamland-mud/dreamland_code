@@ -724,7 +724,7 @@ bool spec_poison( NPCharacter *ch )
     ||   number_percent( ) > 2 * ch->getModifyLevel() )
         return false;
 
-    oldact("Ты кусаешь $C4!",  ch, 0, victim, TO_CHAR);
+    act("Ты кусаешь %2$C4!",  ch, 0, victim, TO_CHAR);
     oldact("$c1 кусает $C4!",  ch, 0, victim, TO_NOTVICT);
     act("%^C1 кусает тебя!", ch, 0, victim, TO_VICT);
 

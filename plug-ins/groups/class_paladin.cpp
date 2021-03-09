@@ -104,7 +104,7 @@ SKILL_RUNP( layhands )
     }
     else {
       if (ch != victim) {
-          oldact("Ты возлагаешь руки на $C4, но ничего не происходит.", ch, 0, victim, TO_CHAR);
+          act("Ты возлагаешь руки на %2$C4, но ничего не происходит.", ch, 0, victim, TO_CHAR);
           act("%^C1 картинным жестом возлагает на тебя руки... но ничего не происходит.", ch, 0, victim, TO_VICT);
           oldact("$c1 картинным жестом возлагает руки на $C4... но ничего не происходит.", ch, 0, victim, TO_NOTVICT);
       } else {
@@ -128,12 +128,12 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
            && victim->getRace( ) != race_demon
            && victim->getRace( ) != race_golem))
     {
-        oldact("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR);
+        act("К сожалению, %2$C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR);
         return;
     }
     
     if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_PRAYER)) {
-        oldact("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR);
+        act("С %2$C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR);
         return;
     }
     
@@ -310,7 +310,7 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
             continue;
         
         if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_PRAYER )) {
-            oldact("$C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
+            act("%2$^C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
             oldact("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT);
             damage_nocatch( ch, vch, 0, sn, DAM_HOLY, true, DAMF_PRAYER );
         }

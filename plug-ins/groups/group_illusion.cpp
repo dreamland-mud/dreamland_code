@@ -52,12 +52,12 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
         if (ch == victim)
             oldact("Ты и так дрожишь от страха.", ch, 0, 0, TO_CHAR);
         else
-            oldact("$C1 уже дрожит от страха.", ch, 0, victim, TO_CHAR);
+            act("%2$^C1 уже дрожит от страха.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if (saves_spell( level, victim,DAM_OTHER, ch, DAMF_MAGIC)) {
-        oldact("Тебе не удалось запугать $C4...", ch, 0, victim, TO_CHAR); 
+        act("Тебе не удалось запугать %2$C4...", ch, 0, victim, TO_CHAR); 
         return;
     }
 

@@ -248,7 +248,7 @@ CMDRUN( buy )
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
         cost -= obj->cost / 2 * roll / 100;
-        oldact("Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR);
+        act("Ты торгуешься с %2$C5.", ch, 0, keeper, TO_CHAR);
         gsn_haggle->improve( ch, true );
     }
 

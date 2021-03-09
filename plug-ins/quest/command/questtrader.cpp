@@ -99,7 +99,7 @@ void QuestTrader::msgListEmpty( Character *client )
 void QuestTrader::msgListRequest( Character *client ) 
 {
     oldact("$c1 просит $C4 показать список вещей.", client, 0, getKeeper( ), TO_ROOM );
-    oldact("Ты просишь $C4 показать список вещей.", client, 0, getKeeper( ), TO_CHAR );
+    act("Ты просишь %2$C4 показать список вещей.", client, 0, getKeeper( ), TO_CHAR );
 }
 
 void QuestTrader::msgListBefore( Character *client ) 
@@ -299,7 +299,7 @@ void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     client->perm_stat[STAT_CON]++;
 
     oldact("$C1 повышает сложение $c2.", client, 0, questman, TO_ROOM );
-    oldact("$C1 повышает твое сложение.", client, 0, questman, TO_CHAR );
+    act("%2$^C1 повышает твое сложение.", client, 0, questman, TO_CHAR );
 }
     
 bool ConQuestArticle::available( Character *client, NPCharacter *questman ) const 
@@ -507,7 +507,7 @@ void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
     client->wearloc.set( wear_ears );
     
     oldact("$C1 делает дырку в голове $c2.",client,0,tattoer,TO_ROOM);
-    oldact("$C1 делает тебе дырку в голове.",client,0,tattoer,TO_CHAR);
+    act("%2$^C1 делает тебе дырку в голове.",client,0,tattoer,TO_CHAR);
 }
 
 bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) const 

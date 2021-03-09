@@ -107,7 +107,7 @@ void Healer::msgArticleTooFew( Character *client, Article::Pointer )
 
 void Healer::msgBuyRequest( Character *client )
 {
-    oldact("Ты просишь $C4 о помощи.", client, 0, getKeeper( ), TO_CHAR );
+    act("Ты просишь %2$C4 о помощи.", client, 0, getKeeper( ), TO_CHAR );
     oldact("$c1 просит $C4 о помощи.", client, 0, getKeeper( ), TO_NOTVICT );
 }
 
