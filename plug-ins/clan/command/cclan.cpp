@@ -1034,9 +1034,11 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
         return;
     }
 
-    if (!pc->getClan( )->getData( )) 
-    {
-        pc->send_to ("Сначала присоединись к одному из кланов.\n\r");
+    if (pc->getClan()->isDispersed()) {
+        if (pc->getClan() == clan_none)
+            pc->pecho("Сначала присоединись к одному из кланов.");
+        else
+            pc->pecho("Ты не можешь увидеть список своих соклановиков.");
         return;
     }
     
