@@ -304,3 +304,14 @@ SpellTarget::Pointer argnum2target(const RegisterList &args, int num)
         return target;
     }
 }
+
+Affect * args2affect(const RegisterList &args)
+{
+    AffectWrapper *aw;
+
+    if (args.empty())
+        throw Scripting::NotEnoughArgumentsException();
+
+    aw = wrapper_cast<AffectWrapper>(args.front());
+    return &(aw->getTarget());
+}

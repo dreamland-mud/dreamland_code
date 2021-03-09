@@ -1072,7 +1072,7 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
     
     for (MemberList::iterator i = members.begin( ); i != members.end( ); i++) {
         PCMemoryInterface *pcm = *i;
-        buf << dlprintf("%-10s %-10s %-12s %2d %-3d %-15s %s\r\n",
+        buf << dlprintf("%-10s %-10s %-12s %2d %3d  %-15s %s\r\n",
                    pcm->getName().c_str(),
                    pcm->getRace()->getName().c_str(),
                    pcm->getProfession( )->getNameFor(pc).c_str(),
@@ -1259,7 +1259,7 @@ void CClan::clanPetitionList( PCharacter *pc )
         PCMemoryInterface *pcm = pos->second;
 
         if (pcm->getPetition( ) == pc->getClan( ))
-            buf << dlprintf("%-10s %-10s %-12s %2d %-3d\r\n",
+            buf << dlprintf("%-10s %-10s %-12s %2d %3d\r\n",
                     pcm->getName().c_str(),
                     pcm->getRace()->getName().c_str(),
                     pcm->getProfession( )->getNameFor(pc).c_str(),

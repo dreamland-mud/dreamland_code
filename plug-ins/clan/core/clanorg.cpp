@@ -111,7 +111,7 @@ void ClanOrgs::doMembers( PCharacter *pch ) const
             || getAttr( pcm ) != ord->name)
             continue;
 
-        buf << dlprintf("%-10s %-10s %-12s %2d %-3d   %-15s\r\n",
+        buf << dlprintf("%-10s %-10s %-12s %2d %3d    %-15s\r\n",
                    pcm->getName().c_str(),
                    pcm->getRace()->getName().c_str(),
                    pcm->getProfession( )->getNameFor(pch).c_str(),

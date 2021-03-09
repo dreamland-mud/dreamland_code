@@ -1577,6 +1577,13 @@ NMI_INVOKE( CharacterWrapper, is_safe_spell, "(vict): защищают ли бо
                            true);
 }
 
+NMI_INVOKE( CharacterWrapper, is_safe_rspell, "(af): защищают ли боги от действия заклинания аf на комнате" )
+{
+    checkTarget();
+    Affect *paf = args2affect(args);
+    return ::is_safe_rspell(paf, target, true);
+}
+
 NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vict повреждения в размере dam с типом damtype (таблица .tables.damage_table)" )
 {
     RegisterList::const_iterator i;

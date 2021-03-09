@@ -24,6 +24,7 @@ struct mob_index_data;
 class FlagTable;
 class DefaultSpell;
 class SpellTarget;
+class Affect;
 
 Register wrap( ::Object * );
 Register wrap( struct obj_index_data * );
@@ -47,6 +48,7 @@ PCharacter * arg2player( const Register & );
 Character * args2character( const RegisterList & );
 PCharacter * args2player( const RegisterList & );
 Skill * args2skill( const RegisterList & );
+Affect * args2affect(const RegisterList &);
 DefaultSpell * arg2spell( const Register &reg );
 DLString arg2string(const Register &reg);
 
