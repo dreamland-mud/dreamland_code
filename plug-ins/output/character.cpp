@@ -15,12 +15,6 @@
 #include "descriptor.h"
 #include "def.h"
 
-static bool mprog_act( Character *ch, const char *msg )
-{
-    FENIA_CALL( ch, "Act", "s", msg );
-    FENIA_NDX_CALL( ch->getNPC( ), "Act", "Cs", ch, msg );
-    return false;
-}
 
 /****************************************************************************
  * text output 
@@ -80,7 +74,6 @@ void Character::vpecho( const char *f, va_list av)
            
     r += "\r\n";
     send_to( r );
-    mprog_act( this, r.c_str( ) );
 }
 
 void Character::pecho( const char *f, ... )
@@ -188,9 +181,6 @@ void Character::vecho( int pos, int type, Character *vch, const char *f, va_list
         targets[to] = r;
         to->send_to( r );
     }
-        
-    for (Targets::iterator t = targets.begin( ); t != targets.end( ); t++)
-        mprog_act( t->first, t->second.c_str( ) );
 }
 
 
