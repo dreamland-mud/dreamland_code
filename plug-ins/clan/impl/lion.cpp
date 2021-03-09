@@ -254,8 +254,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   af.bitvector.setValue(AFF_BERSERK);
   affect_to_char( ch, &af );
 
-  oldact_p("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.",
-                ch,0,0,TO_CHAR,POS_RESTING);
+  oldact("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.", ch,0,0,TO_CHAR);
   act("Кожа %C2 становится серой!",ch,0,0,TO_ROOM);
 
 }

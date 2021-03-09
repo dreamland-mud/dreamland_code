@@ -360,8 +360,7 @@ SKILL_RUNP( envenom )
 
         if (IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
         {
-            oldact_p("Твоя попытка отравить $o4 закончилась неудачей.",
-            ch,obj,0,TO_CHAR,POS_RESTING);
+            oldact("Твоя попытка отравить $o4 закончилась неудачей.", ch,obj,0,TO_CHAR);
             return;
         }
 
@@ -988,8 +987,7 @@ SKILL_RUNP( backstab )
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0 )
     {
-            oldact_p("Ты долж$gно|ен|на быть вооруже$gно|н|на, чтоб ударить сзади.",
-                    ch,0,0,TO_CHAR,POS_RESTING);
+            oldact("Ты долж$gно|ен|на быть вооруже$gно|н|на, чтоб ударить сзади.", ch,0,0,TO_CHAR);
             return;
     }
 
@@ -1016,15 +1014,13 @@ SKILL_RUNP( backstab )
     if ( victim->hit < (0.7 * victim->max_hit)
             && (IS_AWAKE(victim) ) )
     {
-            oldact_p("$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна... ты не можешь незаметно подкрасться к не$Gму|му|й.",
-                    ch, 0, victim, TO_CHAR,POS_RESTING);
+            oldact("$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна... ты не можешь незаметно подкрасться к не$Gму|му|й.", ch, 0, victim, TO_CHAR);
             return;
     }
 
     if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
     {
-            oldact_p("$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.",
-                    ch, 0, victim, TO_CHAR,POS_RESTING);
+            oldact("$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.", ch, 0, victim, TO_CHAR);
             return;
     }
 
@@ -1290,12 +1286,9 @@ SKILL_RUNP( blackjack )
 
         if (Chance(ch, chance * k / 100, 100).reroll())
         {
-                oldact_p("Ты бьешь $C4 по голове мешочком со свинцом.",
-                        ch,0,victim,TO_CHAR,POS_RESTING);
-                oldact_p("Ты чувствуешь внезапную боль в черепе!",
-               ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*",
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
+                oldact("Ты бьешь $C4 по голове мешочком со свинцом.", ch,0,victim,TO_CHAR);
+                oldact("Ты чувствуешь внезапную боль в черепе!", ch,0,victim,TO_VICT);
+                oldact("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*", ch,0,victim,TO_NOTVICT);
                 gsn_blackjack->improve( ch, true, victim );
 
                 af.type = gsn_blackjack;

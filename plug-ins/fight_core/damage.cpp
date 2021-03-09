@@ -447,20 +447,15 @@ void Damage::reportState( )
 {
     switch( victim->position.getValue( ) ) {
     case POS_MORTAL:
-        oldact_p("$c1 смертельно ране$gно|н|на и скоро умрет, если $m не помогут.",
-            victim, 0, 0, TO_ROOM,POS_RESTING);
-        oldact_p("Ты смертельно ране$gно|н|на и скоро умрешь, если тебе не помогут.",
-            victim, 0, 0, TO_CHAR,POS_DEAD);
+        oldact("$c1 смертельно ране$gно|н|на и скоро умрет, если $m не помогут.",            victim, 0, 0, TO_ROOM);
+        oldact_p("Ты смертельно ране$gно|н|на и скоро умрешь, если тебе не помогут.",            victim, 0, 0, TO_CHAR,POS_DEAD);
         break;
     case POS_INCAP:
-        oldact_p("$c1 совершенно беспомощ$gно|ен|на и скоро умрет, если $m не помогут.",
-            victim, 0, 0, TO_ROOM,POS_RESTING);
-        oldact_p("Ты совершенно беспомощ$gно|ен|на и скоро умрешь, если тебе не помогут.",
-            victim, 0, 0, TO_CHAR,POS_DEAD);
+        oldact("$c1 совершенно беспомощ$gно|ен|на и скоро умрет, если $m не помогут.",            victim, 0, 0, TO_ROOM);
+        oldact_p("Ты совершенно беспомощ$gно|ен|на и скоро умрешь, если тебе не помогут.",            victim, 0, 0, TO_CHAR,POS_DEAD);
         break;
     case POS_STUNNED:
-        oldact_p("$c1 без сознания, но возможно придет в себя.",
-            victim, 0, 0, TO_ROOM,POS_RESTING);
+        oldact("$c1 без сознания, но возможно придет в себя.",            victim, 0, 0, TO_ROOM);
         victim->pecho("Ты без сознания, но еще можешь придти в себя.");
         break;
     default:

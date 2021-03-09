@@ -44,8 +44,7 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
 
     postaffect_to_char(ch, sn, level/10);
     ch->pecho("Ты наполняешь воздух энергетической силой, заставляя его мерцать.");
-    oldact_p("$c1 наполняет воздух энергетической силой, заставляя его мерцать.",
-           ch,0,0,TO_ROOM,POS_RESTING);
+    oldact("$c1 наполняет воздух энергетической силой, заставляя его мерцать.", ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(MindLight);

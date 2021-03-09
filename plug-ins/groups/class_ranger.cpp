@@ -1005,8 +1005,7 @@ SKILL_RUNP( butcher )
                 return;
         }
 
-        oldact_p("$c1 ковыряет кинжалом $o4, надеясь срезать немного мяса.",
-                ch,obj,0,TO_ROOM,POS_RESTING);
+        oldact("$c1 ковыряет кинжалом $o4, надеясь срезать немного мяса.", ch,obj,0,TO_ROOM);
 
         int numsteaks;
 
@@ -1118,8 +1117,7 @@ SKILL_RUNP( tiger )
         ch->hit = min(ch->hit,ch->max_hit);
 
         ch->pecho("10 тигров приходят на твой призыв, когда ты зовешь их!");
-        oldact_p("10 тигров приходят на призыв $c2, и присоединяются к не$gму|му|й.",
-               ch,0,0,TO_ROOM,POS_RESTING);
+        oldact("10 тигров приходят на призыв $c2, и присоединяются к не$gму|му|й.", ch,0,0,TO_ROOM);
         gsn_tiger_power->improve( ch, true );
 
         af.type                = gsn_tiger_power;

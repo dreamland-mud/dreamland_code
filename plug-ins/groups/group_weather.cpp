@@ -124,8 +124,7 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
     af.bitvector.setValue(AFF_FAERIE_FIRE);
     affect_to_char( victim, &af );
     victim->pecho("Тебя окружает {MРозовая аура{x.");
-    oldact_p("$c4 окружает {MРозовая аура{x.",
-            victim, 0, 0, TO_ROOM,POS_RESTING);
+    oldact("$c4 окружает {MРозовая аура{x.",            victim, 0, 0, TO_ROOM);
 }
 
 
@@ -134,8 +133,7 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
 { 
     Character *ich;
 
-    oldact_p("$c1 создает облако розового дыма.",
-           ch, 0, 0, TO_ROOM,POS_RESTING);
+    oldact("$c1 создает облако розового дыма.", ch, 0, 0, TO_ROOM);
     ch->pecho("Ты создаешь облако розового дыма.");
 
     for ( ich = room->people; ich != 0; ich = ich->next_in_room )

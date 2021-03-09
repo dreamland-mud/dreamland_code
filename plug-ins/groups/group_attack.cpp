@@ -101,10 +101,8 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
 
         if (victim != ch)
         {
-                oldact_p("$c1 посылает {CГолубой огонь земли{x против $C2!",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
-                oldact_p("$c1 посылает {CГолубой огонь земли{x против тебя!",
-                        ch,0,victim,TO_VICT,POS_RESTING);
+                oldact("$c1 посылает {CГолубой огонь земли{x против $C2!", ch,0,victim,TO_NOTVICT);
+                oldact("$c1 посылает {CГолубой огонь земли{x против тебя!", ch,0,victim,TO_VICT);
                 ch->pecho("Ты призываешь на помощь {CГолубой огонь земли{x!");
         }
 
@@ -132,10 +130,8 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
 
         if (victim != ch)
         {
-                oldact_p("$c1 посылает силы {RДемонов Ада{x против $C2!",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
-                oldact_p("$c1 посылает силы {RДемонов Ада{x против тебя!",
-                        ch,0,victim,TO_VICT,POS_RESTING);
+                oldact("$c1 посылает силы {RДемонов Ада{x против $C2!", ch,0,victim,TO_NOTVICT);
+                oldact("$c1 посылает силы {RДемонов Ада{x против тебя!", ch,0,victim,TO_VICT);
                 ch->pecho("Ты призываешь на помощь {RДемонов Ада{x!");
         }
 
@@ -293,8 +289,7 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->pecho("Ты и так в паутине.");
                 else
-                        oldact_p("Густая паутина уже сковала движения $C2.",
-                                ch,0,victim,TO_CHAR,POS_RESTING);
+                        oldact("Густая паутина уже сковала движения $C2.", ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -317,8 +312,7 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
 
         victim->pecho("Густая паутина опутывает тебя!");
         if ( ch != victim )
-                oldact_p("Ты опутываешь $C4 густой паутиной!",
-                        ch,0,victim,TO_CHAR,POS_RESTING);
+                oldact("Ты опутываешь $C4 густой паутиной!", ch,0,victim,TO_CHAR);
 }
 
 SPELL_DECL(HeatMetal);
@@ -351,10 +345,8 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                         number_range(1,2 * victim->getCurrStat(STAT_DEX))
                     && obj_lose->wear_loc->remove( obj_lose, 0 ))
                     {
-                        oldact_p("$c1 кричит от боли и бросает $o4 на землю!",
-                                victim,obj_lose,0,TO_ROOM,POS_RESTING);
-                        oldact_p("Ты кричишь от боли и бросаешь $o4 на землю!",
-                               victim,obj_lose,0,TO_CHAR,POS_RESTING);
+                        oldact("$c1 кричит от боли и бросает $o4 на землю!",                                victim,obj_lose,0,TO_ROOM);
+                        oldact("Ты кричишь от боли и бросаешь $o4 на землю!",                               victim,obj_lose,0,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose, victim->in_room);
@@ -362,8 +354,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* stuck on the body! ouch! */
                     {
-                        oldact_p("$o1 обжигает твою кожу!",
-                               victim,obj_lose,0,TO_CHAR,POS_RESTING);
+                        oldact("$o1 обжигает твою кожу!",                               victim,obj_lose,0,TO_CHAR);
                         dam += (number_range(1,obj_lose->level));
                         fail = false;
                     }
@@ -373,10 +364,8 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                 {
                     if (can_drop_obj(victim,obj_lose))
                     {
-                        oldact_p("$c1 кричит от боли и бросает $o4 на землю!",
-                               victim,obj_lose,0,TO_ROOM,POS_RESTING);
-                        oldact_p("Ты кричишь от боли и бросаешь $o4 на землю!",
-                               victim,obj_lose,0,TO_CHAR,POS_RESTING);
+                        oldact("$c1 кричит от боли и бросает $o4 на землю!",                               victim,obj_lose,0,TO_ROOM);
+                        oldact("Ты кричишь от боли и бросаешь $o4 на землю!",                               victim,obj_lose,0,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose, victim->in_room);
@@ -384,8 +373,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* cannot drop */
                     {
-                        oldact_p("$o1 обжигает твою кожу!",
-                               victim,obj_lose,0,TO_CHAR,POS_RESTING);
+                        oldact("$o1 обжигает твою кожу!",                               victim,obj_lose,0,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         fail = false;
                     }
@@ -400,8 +388,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     if (can_drop_obj(victim,obj_lose)
                         && obj_lose->wear_loc->remove( obj_lose, 0 ))
                     {
-                        oldact_p("$o1 выпадает из обожженных рук $c2.",
-                               victim,obj_lose,0,TO_ROOM,POS_RESTING);
+                        oldact("$o1 выпадает из обожженных рук $c2.",                               victim,obj_lose,0,TO_ROOM);
                         victim->pecho("Оружие выпадает из твоих обожженных рук!");
                         dam += 1;
                         obj_from_char(obj_lose);
@@ -428,8 +415,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* cannot drop */
                     {
-                        oldact_p("$o1 обжигает тебя!",
-                               victim,obj_lose,0,TO_CHAR,POS_RESTING);
+                        oldact("$o1 обжигает тебя!",                               victim,obj_lose,0,TO_CHAR);
                         dam += (number_range(1,obj_lose->level) / 2);
                         fail = false;
                     }

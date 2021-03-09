@@ -430,8 +430,7 @@ SKILL_RUNP( bloodthirst )
         int slevel = skill_level(*gsn_bloodthirst, ch);
         
         ch->pecho( "Ты жаждешь {rкрови!{x" );
-        oldact_p("Глаза $c2 загораются кровожадным огнем.",
-               ch,0,0,TO_ROOM,POS_RESTING);
+        oldact("Глаза $c2 загораются кровожадным огнем.", ch,0,0,TO_ROOM);
         gsn_bloodthirst->improve( ch, true );
 
         af.bitvector.setTable(&affect_flags);
@@ -537,8 +536,7 @@ SKILL_RUNP( resistance )
       ch->mana -= mana / 2;
 
      ch->pecho( "Ты напрягаешь свои мускулы, но это все впустую." );
-      oldact_p("$c1 играет мускулами, пытаясь выглядеть крепче.",
-             ch,0,0,TO_ROOM,POS_RESTING);
+      oldact("$c1 играет мускулами, пытаясь выглядеть крепче.", ch,0,0,TO_ROOM);
       gsn_resistance->improve( ch, false );
     }
 
@@ -611,8 +609,7 @@ SKILL_RUNP( truesight )
       ch->mana -= mana / 2;
 
      ch->pecho( "Ты зорко смотришь вокруг, но не видишь ничего нового." );
-      oldact_p("$c1 зорко смотрит вокруг, но ничего нового не замечает.",
-             ch,0,0,TO_ROOM,POS_RESTING);
+      oldact("$c1 зорко смотрит вокруг, но ничего нового не замечает.", ch,0,0,TO_ROOM);
       gsn_truesight->improve( ch, false );
     }
 
@@ -645,8 +642,7 @@ SKILL_RUNP( bandage )
         if (SHADOW(ch))
         {
                 ch->pecho( "Как это наверное интересно смотрится со стороны -- бинтовать собственную тень." );
-                oldact_p("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор.",
-                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                oldact("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор.", ch, 0, 0, TO_ROOM);
                 return;
         }
 
@@ -741,8 +737,7 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
         return;
     }
 
-    oldact_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
-           ch,0,wch,TO_VICT,POS_RESTING);
+    oldact("$c1 дает тебе лечебное зелье, предлагая выпить его.", ch,0,wch,TO_VICT);
     act("Ты выпиваешь лечебное зелье.",ch,wch,0,TO_VICT);
     act("Ты передаешь лечебное зелье %2$C3.",ch,wch,0,TO_CHAR);
     act("%2$^C1 выпивает лечебное зелье, данное тобой.",ch,wch,0,TO_CHAR);

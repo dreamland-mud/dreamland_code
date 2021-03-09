@@ -56,8 +56,7 @@ SKILL_RUNP( tame )
     if (arg[0] == '\0')
     {
         ch->pecho("Ты не поддаешься укрощению.");
-        oldact_p("$c1 пытается укротить са$gмо|м|ма себя, но эта попытка с треском проваливается.",
-                ch,0,0,TO_ROOM,POS_RESTING);
+        oldact("$c1 пытается укротить са$gмо|м|ма себя, но эта попытка с треском проваливается.", ch,0,0,TO_ROOM);
         return;
     }
 
@@ -196,8 +195,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
 
    if (IS_SET(victim->imm_flags, IMM_PIERCE))
    {
-        oldact_p("$C1 обладает иммунитетом к шипам терновника.", ch, 0,
-                victim, TO_CHAR,POS_RESTING);
+        oldact("$C1 обладает иммунитетом к шипам терновника.", ch, 0,                victim, TO_CHAR);
         return;
    }
     

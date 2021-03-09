@@ -113,8 +113,7 @@ VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int lev
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь присутствие скрытых сил. ");
         else
-          oldact_p("$C1 уже чувствует присутствие скрытых сил.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("$C1 уже чувствует присутствие скрытых сил.", ch,0,victim,TO_CHAR);
         return;
     }
     af.bitvector.setTable(&detect_flags);

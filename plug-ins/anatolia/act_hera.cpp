@@ -226,16 +226,12 @@ void auction_update (void)
                     GET_COUNT(auction->bet,"ую монету","ые монеты","ых монет"));
                 talk_auction(buf);
                 obj_to_char (auction->item,auction->buyer);
-                oldact_p("Из дымки появляется аукционер и передает тебе $o4.",
-                     auction->buyer,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p("$c1 получает от прибывшего аукционера $o4.",
-                     auction->buyer,auction->item,0,TO_ROOM,POS_RESTING);
+                oldact_p("Из дымки появляется аукционер и передает тебе $o4.",                     auction->buyer,auction->item,0,TO_CHAR,POS_DEAD);
+                oldact("$c1 получает от прибывшего аукционера $o4.",                     auction->buyer,auction->item,0,TO_ROOM);
 
                 auction->seller->gold += auction->bet; /* give him the money */
-                oldact_p("Из дымки появляется аукционер и передает тебе вырученные деньги.",
-                     auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p("$c1 получает вырученные деньги от прибывшего аукционера.",
-                     auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
+                oldact_p("Из дымки появляется аукционер и передает тебе вырученные деньги.",                     auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
+                oldact("$c1 получает вырученные деньги от прибывшего аукционера.",                     auction->seller,auction->item,0,TO_ROOM);
 
                 auction->item = 0; /* reset item */
                 auction->seller = 0;
@@ -246,10 +242,8 @@ void auction_update (void)
                 DLString msg = fmt(0, "Ставок не получено - %1$#O1{Y снят%1$Gо||а|ы с аукциона{x.", auction->item);
                 talk_auction(msg.c_str());
 
-                oldact_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
-                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p("Аукционер появляется перед $c5 и возвращает $m {W$o4{w.",
-                      auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
+                oldact_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
+                oldact("Аукционер появляется перед $c5 и возвращает $m {W$o4{w.",                      auction->seller,auction->item,0,TO_ROOM);
                 obj_to_char (auction->item,auction->seller);
                 auction->item = 0; /* clear auction */
                 auction->seller = 0;
@@ -517,8 +511,7 @@ CMDRUNP( auction )
                 case ITEM_CORPSE_PC:
                 case ITEM_CORPSE_NPC:
                 case ITEM_TATTOO:
-                        oldact_p("Ты не можешь выставить на аукцион $T.",
-                                ch, 0, item_table.message(obj->item_type).c_str( ),TO_CHAR,POS_SLEEPING);
+                        oldact_p("Ты не можешь выставить на аукцион $T.", ch, 0, item_table.message(obj->item_type).c_str( ),TO_CHAR,POS_SLEEPING);
                         return;
                 default:
                         obj_from_char (obj);
@@ -551,8 +544,7 @@ CMDRUNP( auction )
         }
         else
         {
-                oldact_p("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!",
-                        ch,auction->item,0,TO_CHAR,POS_RESTING);
+                oldact("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!", ch,auction->item,0,TO_CHAR);
                 return;
         }
 }

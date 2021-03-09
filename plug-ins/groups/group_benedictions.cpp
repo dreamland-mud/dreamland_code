@@ -118,8 +118,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
         }
         else
         {
-            oldact_p("Дьявольская сила $o2 более могущественна, чем твое благословение.",
-                   ch,obj,0,TO_CHAR,POS_RESTING);
+            oldact("Дьявольская сила $o2 более могущественна, чем твое благословение.", ch,obj,0,TO_CHAR);
             return;
         }
     }
@@ -134,8 +133,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
       af.modifier        = -1;
       af.bitvector.setValue(ITEM_BLESS);
       affect_to_obj( obj, &af);
-            oldact_p("$o1 начинает светиться ровным голубым светом.",
-            ch,obj,0,TO_ALL,POS_RESTING);
+            oldact("$o1 начинает светиться ровным голубым светом.", ch,obj,0,TO_ALL);
     }
     else // not a permanent effect
     {
@@ -274,8 +272,7 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->pecho("Сейчас тебя ничто не может разозлить.");
         else
-          oldact_p("Сейчас ничто не может разозлить $C4.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("Сейчас ничто не может разозлить $C4.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -304,8 +301,7 @@ VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level )
     affect_to_char(victim,&af);
 
     victim->pecho("Дикая ярость наполняет тебя!");
-    oldact_p("В глазах $c2 вспыхивает дикая ярость!",
-           victim,0,0,TO_ROOM,POS_RESTING);
+    oldact("В глазах $c2 вспыхивает дикая ярость!",           victim,0,0,TO_ROOM);
 
 }
 
@@ -384,8 +380,7 @@ VOID_SPELL(HealingLight)::run( Character *ch, Room *room, int sn, int level )
 
     postaffect_to_char(ch, sn, level / 10);
     ch->pecho("Комната освещается излечивающим светом.");
-    oldact_p("$c1 освещает комнату излечивающим светом.",
-           ch,0,0,TO_ROOM,POS_RESTING);
+    oldact("$c1 освещает комнату излечивающим светом.", ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(HealingLight);
@@ -408,8 +403,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
     curse_num = gsn_curse;
     frenzy_num = gsn_frenzy;
 
-    oldact_p("$c1 произносит заклинание {WБожественной Силы{x!",
-           ch,0,0,TO_ROOM,POS_RESTING);
+    oldact("$c1 произносит заклинание {WБожественной Силы{x!", ch,0,0,TO_ROOM);
     ch->pecho("Ты произносишь заклинание {WБожественной Силы{x!");
 
     for ( auto &vch : room->getPeople() )
@@ -543,15 +537,13 @@ VOID_SPELL(RayOfTruth)::run( Character *ch, Character *victim, int sn, int level
 
     if (victim != ch)
     {
-        oldact_p("$c1 взмахивает руками, посылая ослепительный луч света!",
-               ch,0,0,TO_ROOM,POS_RESTING);
+        oldact("$c1 взмахивает руками, посылая ослепительный луч света!", ch,0,0,TO_ROOM);
         ch->pecho("Ты взмахиваешь руками, посылая ослепительный луч света!");
     }
 
     if (IS_GOOD(victim))
     {
-        oldact_p("Ослепительный луч света не может повредить $c3.",
-               victim,0,victim,TO_ROOM,POS_RESTING);
+        oldact("Ослепительный луч света не может повредить $c3.",               victim,0,victim,TO_ROOM);
         victim->pecho("Ослепительный луч света не может повредить тебе.");
         return;
     }
@@ -640,39 +632,34 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
          clean = false;
          room->affectStrip( gsn_cursed_lands);
          ch->pecho("Ты развеиваешь проклятие, висевшее над этой местностью.");
-         oldact_p("Проклятие, висевшее над этой местностью, развеивается.\n\r",
-                ch,0,0,TO_ROOM,POS_RESTING);
+         oldact("Проклятие, висевшее над этой местностью, развеивается.\n\r", ch,0,0,TO_ROOM);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_POISON))
         {
          clean = false;
          room->affectStrip( gsn_deadly_venom);
          ch->pecho("Ядовитые пары, клубившиеся в этой местности, рассеиваются.");
-         oldact_p("Ядовитые пары, клубившиеся в этой местности, рассеиваются.\n\r",
-                ch,0,0,TO_ROOM,POS_RESTING);
+         oldact("Ядовитые пары, клубившиеся в этой местности, рассеиваются.\n\r", ch,0,0,TO_ROOM);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLEEP))
         {
          clean = false;
          ch->pecho("Усыпляющие чары, висевшие над этой местностью, развеиваются.");
-         oldact_p("Усыпляющие чары, висевшие над этой местностью, развеиваются.\n\r",
-                ch,0,0,TO_ROOM,POS_RESTING);
+         oldact("Усыпляющие чары, висевшие над этой местностью, развеиваются.\n\r", ch,0,0,TO_ROOM);
          room->affectStrip( gsn_mysterious_dream);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_PLAGUE))
         {
          clean = false;
          ch->pecho("Чумные миазмы, клубившиеся в этой местности, рассеиваются.");
-         oldact_p("Чумные миазмы, клубившиеся в этой местности, рассеиваются.\n\r",
-                ch,0,0,TO_ROOM,POS_RESTING);
+         oldact("Чумные миазмы, клубившиеся в этой местности, рассеиваются.\n\r", ch,0,0,TO_ROOM);
          room->affectStrip( gsn_black_death);
         }
   if (IS_ROOM_AFFECTED(room,AFF_ROOM_SLOW))
         {
          clean = false;
          ch->pecho("Летаргический туман, клубившийся в этой местности, рассеивается.");
-         oldact_p("Летаргический туман, клубившийся в этой местности, рассеивается.\n\r",
-                ch,0,0,TO_ROOM,POS_RESTING);
+         oldact("Летаргический туман, клубившийся в этой местности, рассеивается.\n\r", ch,0,0,TO_ROOM);
          room->affectStrip( gsn_lethargic_mist);
         }
 

@@ -104,8 +104,7 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->pecho("Ты не можешь двигаться быстрее, чем сейчас!");
         else
-          oldact_p("$C1 не может двигаться еще быстрее.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("$C1 не может двигаться еще быстрее.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -121,8 +120,7 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector.setValue(AFF_HASTE);
     affect_to_char( victim, &af );
     victim->pecho("Твои движения становятся намного быстрее.");
-    oldact_p("Движения $c2 становятся намного быстрее.",
-           victim,0,0,TO_ROOM,POS_RESTING);
+    oldact("Движения $c2 становятся намного быстрее.",           victim,0,0,TO_ROOM);
     if ( ch != victim )
         ch->pecho("Ok.");
     return;
@@ -143,12 +141,10 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Ты уже видишь в темноте.");
         else
-          oldact_p("$C1 уже видит в темноте.\n\r",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("$C1 уже видит в темноте.\n\r", ch,0,victim,TO_CHAR);
         return;
     }
-    oldact_p("Глаза $c2 загораются красным светом.\n\r",
-            victim, 0, 0, TO_ROOM,POS_RESTING);
+    oldact("Глаза $c2 загораются красным светом.\n\r",            victim, 0, 0, TO_ROOM);
 
     af.bitvector.setTable(&affect_flags);
     af.type      = sn;

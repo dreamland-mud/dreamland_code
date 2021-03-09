@@ -351,8 +351,7 @@ CMDRUNP( stand )
 
                 if (ch->on != obj && count_users(obj) >= obj->value0())
                 {
-                        oldact_p("На $o6 нет свободного места.",
-                                ch,obj,0,TO_ROOM,POS_DEAD);
+                        oldact_p("На $o6 нет свободного места.", ch,obj,0,TO_ROOM,POS_DEAD);
                         return;
                 }
 
@@ -528,20 +527,17 @@ CMDRUNP( rest )
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeRestRoom", "msgWakeRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
                     {
-                            oldact_p("Ты просыпаешься и садишься отдыхать возле $o2.",
-                                    ch,obj,0,TO_CHAR,POS_SLEEPING);
+                            oldact_p("Ты просыпаешься и садишься отдыхать возле $o2.", ch,obj,0,TO_CHAR,POS_SLEEPING);
                             act("%1$^C1 просыпается и садится отдыхать возле %3$C2.",ch,0,obj,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),REST_ON))
                     {
-                            oldact_p("Ты просыпаешься и садишься отдыхать на $o4.",
-                                    ch,obj,0,TO_CHAR,POS_SLEEPING);
+                            oldact_p("Ты просыпаешься и садишься отдыхать на $o4.", ch,obj,0,TO_CHAR,POS_SLEEPING);
                             act("%1$^C1 просыпается и садится отдыхать на %3$C4.",ch,0,obj,TO_ROOM);
                     }
                     else
                     {
-                            oldact_p("Ты просыпаешься и садишься отдыхать в $o4.",
-                                    ch,obj,0,TO_CHAR,POS_SLEEPING);
+                            oldact_p("Ты просыпаешься и садишься отдыхать в $o4.", ch,obj,0,TO_CHAR,POS_SLEEPING);
                             act("%1$^C1 просыпается и садится отдыхать в %3$C4.",ch,0,obj,TO_ROOM);
                     }
                 }
@@ -858,8 +854,7 @@ CMDRUNP( sleep )
 
             if (ch->on != obj && count_users(obj) >= obj->value0())
             {
-                    oldact_p("На $o6 не осталось свободного места для тебя.",
-                            ch,obj,0,TO_CHAR,POS_DEAD);
+                    oldact_p("На $o6 не осталось свободного места для тебя.", ch,obj,0,TO_CHAR,POS_DEAD);
                     return;
             }
 

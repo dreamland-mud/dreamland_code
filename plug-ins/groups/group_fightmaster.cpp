@@ -408,12 +408,9 @@ SKILL_RUNP( bash )
 
         if ( victim->isAffected(gsn_protective_shield) )
         {
-                oldact_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
-                        ch, 0, victim,TO_CHAR,POS_FIGHTING);
-                oldact_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
-                        ch, 0,victim,TO_VICT,POS_FIGHTING);
-                oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
-                        ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+                oldact_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x", ch, 0, victim,TO_CHAR,POS_FIGHTING);
+                oldact_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x", ch, 0,victim,TO_VICT,POS_FIGHTING);
+                oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x", ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
                 ch->setWait( gsn_bash->getBeats( ) );
                 return;
@@ -428,11 +425,9 @@ SKILL_RUNP( bash )
         {
                 if ( number_percent() < 50 )
                 {
-                        oldact_p("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!",
-                                ch,0,victim,TO_VICT,POS_RESTING);
+                        oldact("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!", ch,0,victim,TO_VICT);
                         act("Ты сбиваешь %2$C4 с ног ударом щита!",ch,victim,0,TO_CHAR);
-                        oldact_p("$c1 сильнейшим ударом щита сбивает $C4 с ног.",
-                                ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        oldact("$c1 сильнейшим ударом щита сбивает $C4 с ног.", ch,0,victim,TO_NOTVICT);
 
                         wait = 3;
 
@@ -476,19 +471,15 @@ SKILL_RUNP( bash )
                 {
                         act("Ты промахиваешься и падаешь!",ch,victim,0,TO_CHAR);
                         act("%^C1 промахивается и падает.",ch,victim,0,TO_NOTVICT);
-                        oldact_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
-                                ch,0,victim,TO_VICT,POS_RESTING);
+                        oldact("$c1 пытается сбить тебя с ног, но промахивается и падает.", ch,0,victim,TO_VICT);
                         ch->position = POS_RESTING;
                         ch->setWait( gsn_bash->getBeats( ) * 3/2 );
                 }
                 else
                 {
-                        oldact_p("Ты промахиваешься и едва не падаешь!",
-                                ch,0,victim,TO_CHAR,POS_RESTING);
-                        oldact_p("$c1 промахивается и едва не падает.",
-                                ch,0,victim,TO_NOTVICT,POS_RESTING);
-                        oldact_p("$c1 пытается сбить тебя с ног, но промахивается и едва не падает.",
-                                ch,0,victim,TO_VICT,POS_RESTING);
+                        oldact("Ты промахиваешься и едва не падаешь!", ch,0,victim,TO_CHAR);
+                        oldact("$c1 промахивается и едва не падает.", ch,0,victim,TO_NOTVICT);
+                        oldact("$c1 пытается сбить тебя с ног, но промахивается и едва не падает.", ch,0,victim,TO_VICT);
                 }        
                 damage(ch,victim,0,gsn_bash,DAM_BASH, true, DAMF_WEAPON);
                 gsn_bash->improve( ch, false, victim );
@@ -579,8 +570,7 @@ SKILL_RUNP( trip )
         if (SHADOW(ch))
         {
                 ch->pecho("Твоя нога вязнет в твоей тени...");
-                oldact_p("$c1 выделывает балетные па перед своей тенью.",
-                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                oldact("$c1 выделывает балетные па перед своей тенью.", ch, 0, 0, TO_ROOM);
                 return;
         }
 
@@ -830,8 +820,7 @@ SKILL_RUNP( kick )
         if(SHADOW(ch))
         {
                 ch->pecho("Твоя нога вязнет в твоей тени...");
-                oldact_p("$c1 выделывает балетные па перед своей тенью.",
-                                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                oldact("$c1 выделывает балетные па перед своей тенью.", ch, 0, 0, TO_ROOM);
                 return;
         }
 
@@ -925,8 +914,7 @@ SKILL_RUNP( concentrate )
 
     if(SHADOW(ch)) {
       ch->pecho("Эта странная тень не дает тебе сконцентрироваться.");
-      oldact_p("$c1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.",
-             ch, 0, 0, TO_ROOM,POS_RESTING);
+      oldact("$c1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.", ch, 0, 0, TO_ROOM);
       return;
     }
     
@@ -1047,11 +1035,9 @@ SKILL_RUNP( crush )
         /* now the attack */
         if ( number_percent() < chance )
         {
-                oldact_p("$c1 сбивает тебя с ног мощнейшим ударом!",
-                        ch,0,victim,TO_VICT,POS_RESTING);
+                oldact("$c1 сбивает тебя с ног мощнейшим ударом!", ch,0,victim,TO_VICT);
                 oldact("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR);
-                oldact_p("$c1 сбивает $C4 с ног мощнейшим ударом.",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                oldact("$c1 сбивает $C4 с ног мощнейшим ударом.", ch,0,victim,TO_NOTVICT);
 
                 wait = 3;
 
@@ -1074,8 +1060,7 @@ SKILL_RUNP( crush )
                 damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
                 act("Ты промахиваешься и падаешь!",ch,victim,0,TO_CHAR);
                 act("%^C1 делает резкое движение и падает.",ch,victim,0,TO_NOTVICT);
-                oldact_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
-                        ch,0,victim,TO_VICT,POS_RESTING);
+                oldact("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!", ch,0,victim,TO_VICT);
                 ch->position = POS_RESTING;
                 ch->setWait( gsn_crush->getBeats( ) * 3/2 );
         }
@@ -1323,8 +1308,7 @@ SKILL_RUNP( dirt )
         /* now the attack */
         if (number_percent() < chance)
         {
-                oldact_p("$c1 ослепле$gно|н|на пылью, попавшей $m в глаза!",
-                        victim,0,0,TO_ROOM,POS_RESTING);
+                oldact("$c1 ослепле$gно|н|на пылью, попавшей $m в глаза!",                        victim,0,0,TO_ROOM);
 
                 ch->setWait( gsn_dirt_kicking->getBeats( ) );
 
@@ -1585,12 +1569,9 @@ SKILL_RUNP( smash )
     ch->move -= move_dec( ch );
 
     if (victim->isAffected(gsn_protective_shield)) {
-        oldact_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
-                ch, 0, victim,TO_CHAR,POS_FIGHTING);
-        oldact_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
-                ch, 0,victim,TO_VICT,POS_FIGHTING);
-        oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
-                ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+        oldact_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x", ch, 0, victim,TO_CHAR,POS_FIGHTING);
+        oldact_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x", ch, 0,victim,TO_VICT,POS_FIGHTING);
+        oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x", ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
         ch->setWait( gsn_smash->getBeats( ) );
         return;
@@ -1609,12 +1590,9 @@ SKILL_RUNP( smash )
     /* now the attack */
 
     if (number_percent() < chance) {
-        oldact_p("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!",
-               ch,0,victim,TO_VICT,POS_RESTING);
-        oldact_p("Ты сбиваешь $C4 с ног, посылая $S на землю!",
-               ch,0,victim,TO_CHAR,POS_RESTING);
-        oldact_p("$c1 сильнейшим ударом сбивает $C4 с ног.",
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
+        oldact("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!", ch,0,victim,TO_VICT);
+        oldact("Ты сбиваешь $C4 с ног, посылая $S на землю!", ch,0,victim,TO_CHAR);
+        oldact("$c1 сильнейшим ударом сбивает $C4 с ног.", ch,0,victim,TO_NOTVICT);
         gsn_smash->improve( ch, true, victim );
 
         wait = 3;
@@ -1647,12 +1625,9 @@ SKILL_RUNP( smash )
     else
     {
         damage(ch,victim,0,gsn_smash,DAM_BASH, true, DAMF_WEAPON);
-        oldact_p("Ты промахиваешься и падаешь лицом на пол!",
-               ch,0,victim,TO_CHAR,POS_RESTING);
-        oldact_p("$c1 промахивается и падает лицом на пол.", 
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
-        oldact_p("$c1 пытается ударить тебя, но промахивается и падает на пол.",
-               ch,0,victim,TO_VICT,POS_RESTING);
+        oldact("Ты промахиваешься и падаешь лицом на пол!", ch,0,victim,TO_CHAR);
+        oldact("$c1 промахивается и падает лицом на пол.", ch,0,victim,TO_NOTVICT);
+        oldact("$c1 пытается ударить тебя, но промахивается и падает на пол.", ch,0,victim,TO_VICT);
         gsn_smash->improve( ch, false, victim );
 
         if ( number_percent() > 5 )         

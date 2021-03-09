@@ -99,8 +99,7 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector.setValue(AFF_CURSE);
     affect_to_char(victim, &af);
     
-    oldact_p("Боги $c2 проклинают тебя!\r\nТы чувствуешь себя преотвратно.", 
-            ch, 0, victim, TO_VICT, POS_RESTING);
+    oldact("Боги $c2 проклинают тебя!\r\nТы чувствуешь себя преотвратно.", ch, 0, victim, TO_VICT);
     act("Твои Боги проклинают %2$C4!", ch, victim, 0,TO_CHAR);
     act("Боги %1$C2 проклинают %2$C4!", ch, victim, 0,TO_NOTVICT);
 
@@ -243,8 +242,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
         }
         else
         {
-            oldact_p("Священная аура $o2 слишком могущественна для тебя.",
-                   ch,obj,0,TO_CHAR,POS_RESTING);
+            oldact("Священная аура $o2 слишком могущественна для тебя.", ch,obj,0,TO_CHAR);
             return;
         }
     }
@@ -323,8 +321,7 @@ VOID_SPELL(CursedLands)::run( Character *ch, Room *room, int sn, int level )
     room->affectTo( &af );
 
     ch->pecho("Божественное благословение покинуло это место.");
-    oldact_p("Божественное благословение покинуло это место.\n\r",
-           ch,0,0,TO_ROOM,POS_RESTING);
+    oldact("Божественное благословение покинуло это место.\n\r", ch,0,0,TO_ROOM);
 
 
 }
@@ -370,8 +367,7 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
         room->affectTo( &af );
 
         ch->pecho("Комната наполняется ядовитыми испарениями.");
-        oldact_p("Комната наполняется ядовитыми испарениями.\n\r",
-        ch,0,0,TO_ROOM,POS_RESTING);
+        oldact("Комната наполняется ядовитыми испарениями.\n\r", ch,0,0,TO_ROOM);
 
 }
 
@@ -476,8 +472,7 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
     room->affectTo( &af );
 
     ch->pecho("Клубящийся летаргический туман заполняет это место.");
-    oldact_p("Клубящийся летаргический туман заполняет это место.",
-           ch,0,0,TO_ROOM,POS_RESTING);
+    oldact("Клубящийся летаргический туман заполняет это место.", ch,0,0,TO_ROOM);
 
 
 }
@@ -535,8 +530,7 @@ VOID_SPELL(Plague)::run( Character *ch, Character *victim, int sn, int level )
         if (ch == victim)
           ch->pecho("Ты чувствуешь легкую слабость, но это проходит.");
         else
-          oldact_p("$C1 не восприимчи$Gво|в|ва к болезни.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("$C1 не восприимчи$Gво|в|ва к болезни.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -551,8 +545,7 @@ VOID_SPELL(Plague)::run( Character *ch, Character *victim, int sn, int level )
     affect_join(victim,&af);
 
     victim->pecho("Ты кричишь от боли, когда кожа покрывается чумными язвами.");
-    oldact_p("$c1 кричит от боли, когда кожа покрывается чумными язвами.",
-           victim,0,0,TO_ROOM,POS_RESTING);
+    oldact("$c1 кричит от боли, когда кожа покрывается чумными язвами.",           victim,0,0,TO_ROOM);
 
 }
 
@@ -565,8 +558,7 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
         
     DefaultAffectHandler::update( ch, paf );
 
-    oldact_p("$c1 бьется в агонии, когда чума охватывает всю $s кожу.",
-          ch,0,0,TO_ROOM,POS_RESTING);
+    oldact("$c1 бьется в агонии, когда чума охватывает всю $s кожу.", ch,0,0,TO_ROOM);
 
     ch->pecho("Ты бьешься в агонии от чумы.");
     
@@ -588,8 +580,7 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
                 && !IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(2) == 0)
         {
             vch->pecho("Ты чувствуешь жар и легкие судороги.");
-            oldact_p("$c1 дрожит и выглядит очень больн$gым|ым|ой.",
-                  vch,0,0,TO_ROOM,POS_RESTING);
+            oldact("$c1 дрожит и выглядит очень больн$gым|ым|ой.",                  vch,0,0,TO_ROOM);
             affect_join(vch,&plague);
         }
     }
@@ -707,8 +698,7 @@ VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level )
         
         if ( saves_spell( level, victim,DAM_POISON,ch, DAMF_SPELL) )
         {
-                oldact_p("Кожа $c2 приобретает зеленоватый оттенок, но это сразу проходит.",
-                        victim,0,0,TO_ROOM,POS_RESTING);
+                oldact("Кожа $c2 приобретает зеленоватый оттенок, но это сразу проходит.",                        victim,0,0,TO_ROOM);
                 victim->pecho("Ты чувствуешь легкое отравление, но это сразу проходит.");
                 return;
         }
@@ -779,8 +769,7 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->pecho("Ты не можешь двигаться медленнее, чем сейчас!");
         else
-          oldact_p("$C1 не может двигаться медленнее, чем сейчас.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("$C1 не может двигаться медленнее, чем сейчас.", ch,0,victim,TO_CHAR);
         return;
     }
 

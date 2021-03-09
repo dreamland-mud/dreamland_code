@@ -141,8 +141,7 @@ VOID_SPELL(ChaosBlade)::run(Character *ch, char *, int sn, int level)
 
     blade = create_object(get_obj_index(OBJ_VNUM_CHAOS_BLADE), level);
     ch->pecho("Ты взмахиваешь руками и создаешь Клинок Хаоса!");
-    oldact_p("$c1 взмахивает руками и создает Клинок Хаоса!",
-          ch, 0, 0, TO_ROOM, POS_RESTING);
+    oldact("$c1 взмахивает руками и создает Клинок Хаоса!", ch, 0, 0, TO_ROOM);
 
     blade->timer = level * 2;
     blade->level = ch->getModifyLevel();
@@ -169,8 +168,7 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( victim->isAffected(gsn_confuse) )
         {
-                oldact_p("Кто-то совсем недавно уже ввел в заблуждение $C4.",
-                        ch,0,victim,TO_CHAR,POS_RESTING);
+                oldact("Кто-то совсем недавно уже ввел в заблуждение $C4.", ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -369,8 +367,7 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
   }
 
   if( victim->isAffected(sn ) )  {
-    oldact_p("$C1 и так уже не может ничего внятно произнести.",
-            ch, 0, victim, TO_CHAR,POS_RESTING);
+    oldact("$C1 и так уже не может ничего внятно произнести.", ch, 0, victim, TO_CHAR);
     return;
   }
 
@@ -386,8 +383,7 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
 
     gsn_garble->getCommand()->run(victim, level);
 
-  oldact_p("Ты поделил$gось|ся|ась частицей хаоса с языком $C2.",
-          ch, 0, victim, TO_CHAR,POS_RESTING);
+  oldact("Ты поделил$gось|ся|ась частицей хаоса с языком $C2.", ch, 0, victim, TO_CHAR);
   victim->pecho("Такое впечатление, что твой язык завязали узлом.");
 
 }
@@ -437,8 +433,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 if (ch==victim)
                         ch->pecho("Зеркальных отражений уже слишком много.");
                 else
-                        oldact_p("Зеркальных отражений $C2 уже слишком много.",
-                                ch,0,victim,TO_CHAR,POS_RESTING);
+                        oldact("Зеркальных отражений $C2 уже слишком много.", ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -455,15 +450,12 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         if ( ch == victim )
         {
                 ch->pecho("Около тебя появляется твое зеркальное отражение!");
-                oldact_p("Зеркальное отражение $c2 появляется рядом с $y!",
-                        ch,0,victim,TO_ROOM,POS_RESTING);
+                oldact("Зеркальное отражение $c2 появляется рядом с $y!", ch,0,victim,TO_ROOM);
         }
         else
         {
-                oldact_p("Зеркальное отражение $C2 появляется рядом с $Y!",
-                        ch,0,victim,TO_CHAR,POS_RESTING);
-                oldact_p("Зеркальное отражение $C2 появляется рядом с $Y!",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                oldact("Зеркальное отражение $C2 появляется рядом с $Y!", ch,0,victim,TO_CHAR);
+                oldact("Зеркальное отражение $C2 появляется рядом с $Y!", ch,0,victim,TO_NOTVICT);
                 victim->pecho("Рядом с тобой появляется твое зеркальное отражение!");
         }
 
@@ -545,8 +537,7 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
     ch->pecho("Окружающее тебя пространство теперь находится под властью Хаоса!");
     ch->pecho("Использование Магических Сил Хаоса опустошает тебя.");
     ch->hit -= min(200, ch->hit/2);
-    oldact_p("Магические Силы Хаоса изменяют окружающий мир.",
-           ch,0,0,TO_ROOM,POS_RESTING);
+    oldact("Магические Силы Хаоса изменяют окружающий мир.", ch,0,0,TO_ROOM);
 }
 
 

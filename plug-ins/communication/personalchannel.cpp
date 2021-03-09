@@ -64,11 +64,9 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
         return false;
    
     if (victim->is_npc( ) || !victim->getPC( )->getAttributes( ).isAvailable( "afk" ))
-        oldact_p("$C1 отсутствует и не может сейчас получить твое сообщение.", 
-                ch, 0, victim, TO_CHAR, position );
+        oldact_p("$C1 отсутствует и не может сейчас получить твое сообщение.", ch, 0, victim, TO_CHAR, position );
     else
-        oldact_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", 
-                ch, 
+        oldact_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", ch, 
                 victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
                                     "afk" )->getValue( ).c_str( ), 
                 victim, TO_CHAR, position );
@@ -90,8 +88,7 @@ bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DL
         return true;
     }
     
-    oldact_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
-            ch,0,victim,TO_CHAR,position);
+    oldact_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.", ch,0,victim,TO_CHAR,position);
     return true;
 }
 
@@ -103,8 +100,7 @@ bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const D
     if (victim->desc)
         return false;
 
-    oldact_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.",
-            ch,0,victim,TO_CHAR,position);
+    oldact_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.", ch,0,victim,TO_CHAR,position);
     return true;
 }
 

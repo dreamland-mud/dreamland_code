@@ -96,8 +96,7 @@ void Excalibur::speech( Character *ch, const char *speech )
                         (get_eq_char(ch,wear_second_wield) == obj)  ) )
     {
       ch->pecho("Лезвие Экскалибра брызжет кислотой.");
-      oldact_p("Кислота брызжет с лезвия Экскалибра.",
-             ch,0,0,TO_ROOM,POS_RESTING);
+      oldact("Кислота брызжет с лезвия Экскалибра.", ch,0,0,TO_ROOM);
       spell(gsn_acid_blast, ch->getModifyLevel(),ch,ch->fighting, FSPELL_BANE );
       ch->setWaitViolence( 2 );
     }
@@ -168,10 +167,8 @@ void SubissueWeapon::fight( Character *ch )
  */
 void TwoSnakeWhip::wear( Character *ch )
 {
-  oldact_p("{GЗмеи на хлысте выдыхают пары яда.{x",
-                ch,obj,0,TO_CHAR,POS_DEAD);
-  oldact_p("{GЗмеи на хлысте выдыхают пары яда.{x",
-                ch,obj,0,TO_ROOM,POS_DEAD);
+  oldact_p("{GЗмеи на хлысте выдыхают пары яда.{x", ch,obj,0,TO_CHAR,POS_DEAD);
+  oldact_p("{GЗмеи на хлысте выдыхают пары яда.{x", ch,obj,0,TO_ROOM,POS_DEAD);
 }
 
 void TwoSnakeWhip::equip( Character *ch )
@@ -192,10 +189,8 @@ void TwoSnakeWhip::equip( Character *ch )
 
 void TwoSnakeWhip::remove( Character *ch )
 {
-  oldact_p("{rЗмеи на хлысте безжизненно обвисают.{x",
-                ch,obj,0,TO_CHAR,POS_DEAD);
-  oldact_p("{rЗмеи на хлысте безжизненно обвисают.{x",
-                ch,obj,0,TO_ROOM,POS_DEAD);
+  oldact_p("{rЗмеи на хлысте безжизненно обвисают.{x", ch,obj,0,TO_CHAR,POS_DEAD);
+  oldact_p("{rЗмеи на хлысте безжизненно обвисают.{x", ch,obj,0,TO_ROOM,POS_DEAD);
 }
 
 void TwoSnakeWhip::get( Character *ch )
@@ -210,21 +205,15 @@ void TwoSnakeWhip::fight( Character *ch )
     {
       switch(number_bits(7)) {
       case 0:
-          oldact_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
-                ch->fighting, TO_CHAR,POS_RESTING);
-        oldact_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
-                ch->fighting, TO_VICT,POS_RESTING);
-        oldact_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
-                ch->fighting, TO_NOTVICT,POS_RESTING);
+          oldact("Одна из змей на твоем хлысте жалит $C4!", ch, 0,                ch->fighting, TO_CHAR);
+        oldact("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,                ch->fighting, TO_VICT);
+        oldact("Змея с хлыста $c2 жалит $C4!", ch, 0,                ch->fighting, TO_NOTVICT);
         spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
         break;
       case 1:
-          oldact_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
-                ch->fighting, TO_CHAR,POS_RESTING);
-        oldact_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
-                ch->fighting, TO_VICT,POS_RESTING);
-        oldact_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
-                ch->fighting, TO_NOTVICT,POS_RESTING);
+          oldact("Одна из змей на твоем хлысте жалит $C4!", ch, 0,                ch->fighting, TO_CHAR);
+        oldact("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,                ch->fighting, TO_VICT);
+        oldact("Змея с хлыста $c2 жалит $C4!", ch, 0,                ch->fighting, TO_NOTVICT);
         spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
         break;
       }
@@ -277,12 +266,9 @@ int dam;
 
     if ( number_percent() < 50 )  {
         dam = number_percent()/2 + 30 + 2 * ch->getModifyLevel();
-        oldact_p("Твои перчатки обжигают лицо $C3!",
-                ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-        oldact_p("Перчатки $c2 обжигают лицо $C3!",
-                ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-        oldact_p("Перчатки $C2 обжигают твое лицо!",
-                ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
+        oldact("Твои перчатки обжигают лицо $C3!", ch, 0, ch->fighting, TO_CHAR);
+        oldact("Перчатки $c2 обжигают лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
+        oldact("Перчатки $C2 обжигают твое лицо!", ch->fighting, 0, ch, TO_CHAR);
         damage_nocatch( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam/2, TARGET_CHAR );
     }
@@ -312,12 +298,9 @@ int dam;
 
   if ( number_percent() < 20 )  {
         dam = number_percent()/2 + 30 + 5 * ch->getModifyLevel();
-        oldact_p("Твои нарукавники обжигают $C4!",
-                ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-        oldact_p("Нарукавники $c2 обжигают $C4!",
-                ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-        oldact_p("Нарукавники $C2 обжигают тебя!",
-                ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
+        oldact("Твои нарукавники обжигают $C4!", ch, 0, ch->fighting, TO_CHAR);
+        oldact("Нарукавники $c2 обжигают $C4!", ch, 0, ch->fighting, TO_NOTVICT);
+        oldact("Нарукавники $C2 обжигают тебя!", ch->fighting, 0, ch, TO_CHAR);
         damage_nocatch( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam, TARGET_CHAR );
   }
@@ -480,8 +463,7 @@ void LionClaw::fight( Character *ch )
         (secondary = (obj == get_eq_char(ch,wear_second_wield))) )
    {
      ch->pecho("{WКогти на мгновение показались из Львиной Лапы.{x");
-     oldact_p("{WКогти на мгновение показались из Львиной Лапы $c2.{x",
-                ch,0,0,TO_ROOM,POS_DEAD);
+     oldact_p("{WКогти на мгновение показались из Львиной Лапы $c2.{x", ch,0,0,TO_ROOM,POS_DEAD);
      
      one_hit_nocatch(ch, ch->fighting, secondary);
      one_hit_nocatch(ch, ch->fighting, secondary);
@@ -506,8 +488,7 @@ void RingOfRa::speech( Character *ch, const char *speech )
 ((get_eq_char(ch,wear_finger_l) == obj) || (get_eq_char(ch,wear_finger_r))) )
     {
       ch->pecho("Электрический разряд выстреливает из кольца.");
-      oldact_p("Электрический разряд выстреливает из кольца.",
-             ch,0,0,TO_ROOM,POS_RESTING);
+      oldact("Электрический разряд выстреливает из кольца.", ch,0,0,TO_ROOM);
       spell(gsn_lightning_breath, ch->getModifyLevel(),ch,ch->fighting, FSPELL_BANE );
       ch->setWaitViolence( 2 );
     }

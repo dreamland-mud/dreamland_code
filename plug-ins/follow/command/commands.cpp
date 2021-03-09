@@ -101,8 +101,7 @@ CMDRUN( follow )
         IS_SET( victim->act, PLR_NOFOLLOW ) &&
         !ch->is_immortal() ) 
     {
-        oldact_p("$C1 не желает ходить с кем-либо.\n\r",
-             ch,0,victim, TO_CHAR,POS_RESTING);
+        oldact("$C1 не желает ходить с кем-либо.\n\r", ch,0,victim, TO_CHAR);
         return;
     }
 
@@ -197,12 +196,9 @@ CMDRUN( group )
 
     if ( abs(ch->getModifyLevel() - victim->getModifyLevel()) > GROUP_RANGE)
     {
-        oldact_p("$C1 не может присоединиться к группе $c2.",
-                ch,0,victim,TO_NOTVICT,POS_RESTING );
-        oldact_p("Ты не можешь присоединиться к группе $c2.",
-                ch,0,victim,TO_VICT,POS_SLEEPING );
-        oldact_p("$C1 не может присоединиться к твоей группе.",
-                ch,0,victim,TO_CHAR,POS_SLEEPING );
+        oldact("$C1 не может присоединиться к группе $c2.", ch,0,victim,TO_NOTVICT);
+        oldact_p("Ты не можешь присоединиться к группе $c2.", ch,0,victim,TO_VICT,POS_SLEEPING );
+        oldact_p("$C1 не может присоединиться к твоей группе.", ch,0,victim,TO_CHAR,POS_SLEEPING );
         return;
     }
 
@@ -211,10 +207,8 @@ CMDRUN( group )
         && ( ch->getClan() != victim->getClan()
              || ch->getClan( )->isDispersed( ) ))
     {
-        oldact_p("Ты слишком пло$Gхое|хой|хая для группы $c2.", ch, 0, victim,
-                TO_VICT,POS_SLEEPING);
-        oldact_p("$C1 слишком пло$Gхое|хой|хая для твоей группы!", ch, 0, victim,
-                TO_CHAR,POS_SLEEPING);
+        oldact_p("Ты слишком пло$Gхое|хой|хая для группы $c2.", ch, 0, victim,                TO_VICT,POS_SLEEPING);
+        oldact_p("$C1 слишком пло$Gхое|хой|хая для твоей группы!", ch, 0, victim,                TO_CHAR,POS_SLEEPING);
         return;
     }
 
@@ -223,10 +217,8 @@ CMDRUN( group )
             && ( ch->getClan() != victim->getClan()
                     || ch->getClan()->isDispersed( ) ) )
     {
-        oldact_p("Ты слишком хоро$Gшее|ший|шая для группы $c2!", ch, 0, victim,
-                TO_VICT,POS_SLEEPING);
-        oldact_p("$C1 слишком хоро$Gшее|ший|шая для твоей группы!", ch, 0, victim,
-                TO_CHAR,POS_SLEEPING);
+        oldact_p("Ты слишком хоро$Gшее|ший|шая для группы $c2!", ch, 0, victim,                TO_VICT,POS_SLEEPING);
+        oldact_p("$C1 слишком хоро$Gшее|ший|шая для твоей группы!", ch, 0, victim,                TO_CHAR,POS_SLEEPING);
         return;
     }
 
@@ -234,10 +226,8 @@ CMDRUN( group )
         && (ch->getClan( )->isEnemy( *victim->getClan( ) )
             || victim->getClan( )->isEnemy( *ch->getClan( ) )))
     {
-        oldact_p("Ты же ненавидишь клан $c2, как ты можешь присоединиться к $s группе?!", ch,
-                0, victim,TO_VICT,POS_SLEEPING);
-        oldact_p("Ты же ненавидишь клан $C2, как ты можешь предлагать $M присоединиться к твоей группе?!",
-                ch, 0, victim, TO_CHAR,POS_SLEEPING);
+        oldact_p("Ты же ненавидишь клан $c2, как ты можешь присоединиться к $s группе?!", ch,                0, victim,TO_VICT,POS_SLEEPING);
+        oldact_p("Ты же ненавидишь клан $C2, как ты можешь предлагать $M присоединиться к твоей группе?!", ch, 0, victim, TO_CHAR,POS_SLEEPING);
         return;
     }
 

@@ -137,8 +137,7 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
         return;
     }
     
-    oldact_p("Возникает ослепительная вспышка, она поглощает $c4 и $e исчезает.",
-            victim, 0, 0, TO_ROOM, POS_RESTING);
+    oldact("Возникает ослепительная вспышка, она поглощает $c4 и $e исчезает.",            victim, 0, 0, TO_ROOM);
         
     raw_kill( victim, -1, ch, FKILL_MOB_EXTRACT );
 }
@@ -357,14 +356,12 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
         }
 
         if (victim != ch) {
-            oldact_p("$c1 высоко вздымает руки, посылая ослепительный луч света!",
-                   ch,0,0,TO_ROOM,POS_RESTING);
+            oldact("$c1 высоко вздымает руки, посылая ослепительный луч света!", ch,0,0,TO_ROOM);
             ch->pecho("Ты высоко вздымаешь руки, посылая ослепительный луч света!");
         }
 
         if (IS_GOOD(victim) || IS_NEUTRAL(victim)) {
-            oldact_p("Свет не может причинить вреда $c3.",
-                   victim,0,victim,TO_ROOM,POS_RESTING);
+            oldact("Свет не может причинить вреда $c3.",                   victim,0,victim,TO_ROOM);
             victim->pecho("Свет не может причинить тебе вреда.");
             continue;
         }

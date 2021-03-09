@@ -250,8 +250,7 @@ bool spec_patrolman(NPCharacter *ch)
     &&   obj->pIndexData->vnum == OBJ_VNUM_WHISTLE))
     {
         act("Ты со всей силы свистишь в %3$O4.",ch,0,obj,TO_CHAR);
-        oldact_p("$c1 свистит в $o1, ***WHEEEEEEEEEEEET***",
-               ch,obj,0,TO_ROOM,POS_RESTING);
+        oldact("$c1 свистит в $o1, ***WHEEEEEEEEEEEET***", ch,obj,0,TO_ROOM);
 
             for ( vch = char_list; vch != 0; vch = vch->next )
             {
@@ -520,8 +519,7 @@ bool spec_fido( NPCharacter *ch )
              corpse->item_type == ITEM_CORPSE_PC )
             continue;
 
-        oldact_p("$c1 с жадностью раздирает труп на куски.",
-                ch, 0, 0, TO_ROOM,POS_RESTING);
+        oldact("$c1 с жадностью раздирает труп на куски.", ch, 0, 0, TO_ROOM);
 
         dreamland->removeOption( DL_SAVE_OBJS );
         
@@ -663,14 +661,12 @@ bool spec_mayor( NPCharacter *ch )
 
     case 'W':
         ch->position = POS_STANDING;
-        oldact_p("$c1 просыпается и издает громкий стон.",
-                ch, 0, 0, TO_ROOM,POS_RESTING );
+        oldact("$c1 просыпается и издает громкий стон.", ch, 0, 0, TO_ROOM);
         break;
 
     case 'S':
         ch->position = POS_SLEEPING;
-        oldact_p("$c1 ложится и засыпает.",
-                ch, 0, 0, TO_ROOM,POS_RESTING );
+        oldact("$c1 ложится и засыпает.", ch, 0, 0, TO_ROOM);
         break;
 
     case 'a':
@@ -753,10 +749,8 @@ bool spec_thief( NPCharacter *ch )
 
         if ( IS_AWAKE(victim) && number_range( 0, ch->getModifyLevel() ) == 0 )
         {
-            oldact_p("$c1 пытается ограбить тебя!",
-                ch, 0, victim, TO_VICT,POS_RESTING );
-            oldact_p("$C1 пытается ограбить $c4!",
-                victim, 0, ch, TO_NOTVICT,POS_RESTING );
+            oldact("$c1 пытается ограбить тебя!", ch, 0, victim, TO_VICT);
+            oldact("$C1 пытается ограбить $c4!",                victim, 0, ch, TO_NOTVICT);
             return true;
         }
         else
@@ -904,12 +898,9 @@ bool spec_nasty( NPCharacter *ch )
                 victim->gold -= gold;
                 ch->gold += gold;
 
-                oldact_p("$c1 разрезает твой кошелек и тянет оттуда золотые монетки!",
-                    ch, 0, victim, TO_VICT, POS_RESTING);
-                oldact_p("Ты разрезаешь кошелек $C2 и крадешь золото.",
-                    ch, 0, victim, TO_CHAR, POS_RESTING);
-                oldact_p("БА! Да у $C2 выпотрошили кошелек!",
-                    ch, 0, victim, TO_NOTVICT, POS_RESTING);
+                oldact("$c1 разрезает твой кошелек и тянет оттуда золотые монетки!", ch, 0, victim, TO_VICT);
+                oldact("Ты разрезаешь кошелек $C2 и крадешь золото.", ch, 0, victim, TO_CHAR);
+                oldact("БА! Да у $C2 выпотрошили кошелек!", ch, 0, victim, TO_NOTVICT);
             }
             
             return true;
@@ -1032,8 +1023,7 @@ bool spec_captain( NPCharacter *ch )
 
     case 'W':
         ch->position = POS_STANDING;
-        oldact_p("$c1 резко просыпается и зевает.",
-                ch, 0, 0, TO_ROOM,POS_RESTING );
+        oldact("$c1 резко просыпается и зевает.", ch, 0, 0, TO_ROOM);
         break;
 
     case 'S':

@@ -473,8 +473,7 @@ VOID_SPELL(HolyArmor)::run(Character *ch, Character *, int sn, int level)
     af.location = APPLY_AC;
     af.modifier = (-max(10, 10 * (level / 5)));
     affect_to_char(ch, &af);
-    oldact_p("Священные силы защищают $c4 от повреждений.",
-          ch, 0, 0, TO_ROOM, POS_RESTING);
+    oldact("Священные силы защищают $c4 от повреждений.", ch, 0, 0, TO_ROOM);
     ch->pecho("Священные силы защищают тебя от повреждений.");
 }
 

@@ -101,8 +101,7 @@ void oldact( const char *format, Character *ch, const void *arg1,
     oldact_p( format, ch, arg1, arg2, type, POS_RESTING );
 }
 
-void oldact_p( const char *format, Character *ch, const void *arg1,
-            const void *arg2, int type, int min_pos )
+void oldact_p( const char *format, Character *ch, const void *arg1,            const void *arg2, int type, int min_pos )
 {
     if (!ch)
         return;

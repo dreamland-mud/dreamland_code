@@ -207,8 +207,7 @@ SKILL_RUNP( cleave )
 
     if (victim->hit < 0.9 * victim->max_hit && IS_AWAKE(victim) )
     {
-        oldact_p("$C1 ране$Gно|н|на и настороженно оглядывается... ты не сможешь подкрасться незаметно.",
-                ch, 0, victim, TO_CHAR,POS_RESTING);
+        oldact("$C1 ране$Gно|н|на и настороженно оглядывается... ты не сможешь подкрасться незаметно.", ch, 0, victim, TO_CHAR);
         return;
     }
 

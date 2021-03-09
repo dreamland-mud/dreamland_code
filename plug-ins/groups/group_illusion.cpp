@@ -88,8 +88,7 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
         return;
     }
 
-    oldact_p("$c1 становится совсем невидим$gым|ым|ой.",
-           ch, 0, 0, TO_ROOM,POS_RESTING);
+    oldact("$c1 становится совсем невидим$gым|ым|ой.", ch, 0, 0, TO_ROOM);
 
     af.bitvector.setTable(&affect_flags);
     af.type      = sn;
@@ -136,8 +135,7 @@ VOID_SPELL(Invisibility)::run( Character *ch, Character *victim, int sn, int lev
         return;
     }
 
-    oldact_p("$c1 становится невидим$gым|ым|ой.",
-           victim, 0, 0, TO_ROOM,POS_RESTING);
+    oldact("$c1 становится невидим$gым|ым|ой.",           victim, 0, 0, TO_ROOM);
 
     af.bitvector.setTable(&affect_flags);
     af.type      = sn;

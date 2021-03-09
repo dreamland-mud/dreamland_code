@@ -70,8 +70,7 @@ SKILL_RUNP( tail )
     }
 
     if (victim->position < POS_FIGHTING) {
-        oldact_p("Тебе нужно подождать, пока $E повернется к тебе.",
-                ch,0,victim,TO_CHAR,POS_RESTING);
+        oldact("Тебе нужно подождать, пока $E повернется к тебе.", ch,0,victim,TO_CHAR);
         return;
     }
 

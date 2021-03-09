@@ -182,7 +182,6 @@ void ClanAltar::actDisappear( )
 
 void ClanAltar::actNotify( Character *ch )
 {
-    oldact_p("{gТы вздрагиваешь от осознания Силы своего Клана!{x", 
-            ch, 0, 0, TO_CHAR, POS_DEAD );
+    oldact_p("{gТы вздрагиваешь от осознания Силы своего Клана!{x", ch, 0, 0, TO_CHAR, POS_DEAD );
 }
 

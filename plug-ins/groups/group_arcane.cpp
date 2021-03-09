@@ -348,10 +348,8 @@ SKILL_RUNP( zap )
         }
 
         if (number_percent() >= gsn_wands->getEffective( ch )) {
-            oldact_p("Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам.",
-                    ch,wand,0,TO_CHAR,POS_RESTING);
-            oldact_p("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам.",
-                    ch,wand,0,TO_ROOM,POS_RESTING);
+            oldact("Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам.", ch,wand,0,TO_CHAR);
+            oldact("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам.", ch,wand,0,TO_ROOM);
             gsn_wands->improve( ch, false, victim );
         }
         else {

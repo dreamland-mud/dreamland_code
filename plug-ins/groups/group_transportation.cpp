@@ -145,8 +145,7 @@ VOID_SPELL(PassDoor)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->pecho("Ты уже можешь проходить сквозь преграды.");
         else
-          oldact_p("$C1 уже может проходить сквозь преграды.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("$C1 уже может проходить сквозь преграды.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -225,10 +224,8 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
 
     if (to_room->people != 0)
     {
-        oldact_p("Над землей образуется $o1.",
-               to_room->people,portal,0,TO_ROOM,POS_RESTING);
-        oldact_p("Над землей образуется $o1.",
-               to_room->people,portal,0,TO_CHAR,POS_RESTING);
+        oldact("Над землей образуется $o1.",               to_room->people,portal,0,TO_ROOM);
+        oldact("Над землей образуется $o1.",               to_room->people,portal,0,TO_CHAR);
     }
 
 }
@@ -283,10 +280,8 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
 
     if (victim->in_room->people != 0)
     {
-        oldact_p("Странные токи пронизывают воздух.",
-               victim->in_room->people,0,0,TO_ROOM,POS_RESTING);
-        oldact_p("Странные токи пронизывают воздух.",
-               victim->in_room->people,0,0,TO_CHAR,POS_RESTING);
+        oldact("Странные токи пронизывают воздух.",               victim->in_room->people,0,0,TO_ROOM);
+        oldact("Странные токи пронизывают воздух.",               victim->in_room->people,0,0,TO_CHAR);
     }
 
 

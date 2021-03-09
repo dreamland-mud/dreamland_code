@@ -112,8 +112,7 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->pecho("Твоя кожа не может стать еще прочнее.");
         else
-          oldact_p("Кожа $C2 не может стать еще прочнее.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("Кожа $C2 не может стать еще прочнее.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -123,8 +122,7 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
     af.location = APPLY_AC;
     af.modifier  = -( int )(level * 1.5);
     affect_to_char( victim, &af );
-    oldact_p("Кожа $c2 покрывается корой.",
-            victim, 0, 0, TO_ROOM,POS_RESTING);
+    oldact("Кожа $c2 покрывается корой.",            victim, 0, 0, TO_ROOM);
     victim->pecho("Прочная защитная кора покрывает твою кожу.");
 }
 
@@ -277,8 +275,7 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
       if (victim == ch)
                ch->pecho("Твоя кожа уже тверда, как драконья.");
       else
-               oldact_p("Кожа $C2 уже тверда, как драконья.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
+               oldact("Кожа $C2 уже тверда, как драконья.", ch,0,victim,TO_CHAR);
       return;
     }
   
@@ -289,8 +286,7 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
   af.modifier  = - (2 * level);
   
   affect_to_char( victim, &af );
-  oldact_p("Кожа $c2 становится тверже драконьей.",
-          victim,0,0,TO_ROOM,POS_RESTING );
+  oldact("Кожа $c2 становится тверже драконьей.",          victim,0,0,TO_ROOM);
   victim->pecho("Твоя кожа становится тверже драконьей.");
   return;
 
@@ -449,8 +445,7 @@ VOID_SPELL(ProtectionCold)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->pecho("Твоя защищенность от воздействия низких температур повышается.");
     if ( ch != victim )
-        oldact_p("Защищенность $C2 от воздействия низких температур повышается.",
-              ch,0,victim,TO_CHAR,POS_RESTING);
+        oldact("Защищенность $C2 от воздействия низких температур повышается.", ch,0,victim,TO_CHAR);
     return;
 
 }
@@ -490,8 +485,7 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->pecho("Ты получаешь защиту от злых существ.");
     if ( ch != victim )
-        oldact_p("$C1 получает защиту от злых существ.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
+        oldact("$C1 получает защиту от злых существ.", ch,0,victim,TO_CHAR);
     return;
 
 }
@@ -531,8 +525,7 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->pecho("Ты получаешь защиту от добрых существ.");
     if ( ch != victim )
-        oldact_p("$C1 получает защиту от добрых существ.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
+        oldact("$C1 получает защиту от добрых существ.", ch,0,victim,TO_CHAR);
     return;
 
 }
@@ -580,8 +573,7 @@ VOID_SPELL(ProtectionHeat)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->pecho("Твоя защищенность от воздействия высоких температур повышается.");
     if ( ch != victim )
-        oldact_p("Защищенность $C2 от воздействия высоких температур повышается.",
-               ch,0,victim,TO_CHAR,POS_RESTING);
+        oldact("Защищенность $C2 от воздействия высоких температур повышается.", ch,0,victim,TO_CHAR);
     return;
 
 }
@@ -743,8 +735,7 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
         if (victim == ch)
           ch->pecho("Твоя кожа уже тверда как камень.");
         else
-          oldact_p("Кожа $C2 уже тверда как камень.",
-                 ch,0,victim,TO_CHAR,POS_RESTING);
+          oldact("Кожа $C2 уже тверда как камень.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -756,7 +747,6 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
     af.modifier  = -1 * max(40,20 + level / 2);  /*af.modifier=-40;*/
     
     affect_to_char( victim, &af );
-    oldact_p("Кожа $c2 становится тверже камня.",
-            victim, 0, 0, TO_ROOM,POS_RESTING);
+    oldact("Кожа $c2 становится тверже камня.",            victim, 0, 0, TO_ROOM);
     victim->pecho("Твоя кожа становится тверже камня.");
 }

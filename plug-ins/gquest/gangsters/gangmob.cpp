@@ -192,8 +192,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
         act("%^C1 тяжко вздыхает.", ch, 0, 0,TO_ROOM);
         act("%^C1 произносит '{gУговорил, красноречивый.. Я открою тебе тайну!{x'", ch, 0, 0,TO_ROOM);
         act("%1$^C1 что-то говорит на ухо %2$C3.", ch, briber, 0,TO_NOTVICT);        
-        oldact_p("$c1 говорит тебе '{GВход в логово я видел около $t. Но больше мне ничего не известно.{x'",
-               ch, gquest->lairHint( ).c_str( ), briber, TO_VICT, POS_RESTING);
+        oldact("$c1 говорит тебе '{GВход в логово я видел около $t. Но больше мне ничего не известно.{x'", ch, gquest->lairHint( ).c_str( ), briber, TO_VICT);
         
         confessed = true;
     }
@@ -372,8 +371,7 @@ bool GangMember::death( Character *killer )
     
     if (gquest->isLevelOK( killer )) {
         if (killer->in_room == ch->in_room && number_percent( ) < 10) {
-            oldact_p("$c1 предсмертной хваткой цепляется за твою одежду.", 
-                    ch, 0, killer, TO_VICT, POS_RESTING );
+            oldact("$c1 предсмертной хваткой цепляется за твою одежду.", ch, 0, killer, TO_VICT);
 
             if (IS_GOOD( killer ))
                 act("%^C1 хрипит '{gТолько сейчас я понял, как неправильно жил.. Я раскаиваюсь и перед смертью открою тебе тайну.{x'", ch, killer, 0,TO_VICT);
@@ -382,8 +380,7 @@ bool GangMember::death( Character *killer )
             else 
                 act("%^C1 хрипит '{gЭх, все равно помирать.. Так слушай же..{x'", ch, killer, 0,TO_VICT);
 
-            oldact_p("$c1 хрипит '{gВход в логово найдешь неподалеку от $t..{x'",
-                   ch, gquest->lairHint( ).c_str( ), killer, TO_VICT, POS_RESTING );
+            oldact("$c1 хрипит '{gВход в логово найдешь неподалеку от $t..{x'", ch, gquest->lairHint( ).c_str( ), killer, TO_VICT);
         }
         
         gquest->rewardMobKiller( killer->getPC( ), ch );
@@ -393,8 +390,7 @@ bool GangMember::death( Character *killer )
             
     if (killer == ch) {
         if (ch->fighting) {
-            oldact_p("$c1 хрипит '{gЛучше сдохнуть своей смертью, чем от руки такой собаки, как ты, $C2.{x'",
-                  ch, 0, ch->fighting, TO_ROOM, POS_RESTING );
+            oldact("$c1 хрипит '{gЛучше сдохнуть своей смертью, чем от руки такой собаки, как ты, $C2.{x'", ch, 0, ch->fighting, TO_ROOM);
         }
         else {
             switch (number_range( 1, 3 )) {
