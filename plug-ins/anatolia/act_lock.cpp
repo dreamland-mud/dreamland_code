@@ -77,19 +77,19 @@ bool open_portal( Character *ch, Object *obj )
 {
     if ( !IS_SET(obj->value1(), EX_ISDOOR) )
     {
-            ch->println( "Ты не можешь сделать этого." );
+            ch->pecho( "Ты не можешь сделать этого." );
             return false;
     }
 
     if ( !IS_SET(obj->value1(), EX_CLOSED) )
     {
-            ch->println( "Это уже открыто." );
+            ch->pecho( "Это уже открыто." );
             return false;
     }
 
     if ( IS_SET(obj->value1(), EX_LOCKED) )
     {
-            ch->println( "Здесь заперто." );
+            ch->pecho( "Здесь заперто." );
             return false;
     }
 
@@ -147,19 +147,19 @@ bool open_container( Character *ch, Object *obj )
 {
     if ( !IS_SET(obj->value1(), CONT_CLOSED) )
     {
-            ch->println( "Это уже открыто." );
+            ch->pecho( "Это уже открыто." );
             return false;
     }
 
     if ( !IS_SET(obj->value1(), CONT_CLOSEABLE) )
     {
-            ch->println( "Ты не можешь сделать этого." );
+            ch->pecho( "Ты не можешь сделать этого." );
             return false;
     }
 
     if ( IS_SET(obj->value1(), CONT_LOCKED) )
     {
-            ch->println( "Здесь заперто." );
+            ch->pecho( "Здесь заперто." );
             return false;
     }
     
@@ -190,7 +190,7 @@ CMDRUNP( open )
 
     if ( arg[0] == '\0' )
     {
-        ch->println( "Открыть что?" );
+        ch->pecho( "Открыть что?" );
         return;
     }
 
@@ -261,7 +261,7 @@ static void close_door( Character *ch, int door )
     pexit        = ch->in_room->exit[door];
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
     {
-            ch->println( "Здесь уже закрыто." );
+            ch->pecho( "Здесь уже закрыто." );
             return;
     }
 
@@ -290,7 +290,7 @@ CMDRUNP( close )
 
     if ( arg[0] == '\0' )
     {
-        ch->println( "Закрыть что?" );
+        ch->pecho( "Закрыть что?" );
         return;
     }
 
@@ -310,13 +310,13 @@ CMDRUNP( close )
             if ( !IS_SET(obj->value1(),EX_ISDOOR)
                     || IS_SET(obj->value1(),EX_NOCLOSE) )
             {
-                ch->println( "Ты не можешь сделать этого." );
+                ch->pecho( "Ты не можешь сделать этого." );
                 return;
             }
 
             if ( IS_SET(obj->value1(),EX_CLOSED) )
             {
-                ch->println( "Здесь уже закрыто." );
+                ch->pecho( "Здесь уже закрыто." );
                 return;
             }
 
@@ -329,13 +329,13 @@ CMDRUNP( close )
             // 'close object'
             if ( IS_SET(obj->value1(), CONT_CLOSED) )
             {
-                ch->println( "Здесь уже закрыто." );
+                ch->pecho( "Здесь уже закрыто." );
                 return;
             }
 
             if ( !IS_SET(obj->value1(), CONT_CLOSEABLE) )
             {
-                ch->println( "Ты не можешь сделать этого." );
+                ch->pecho( "Ты не можешь сделать этого." );
                 return;
             }
 
@@ -382,7 +382,7 @@ CMDRUNP( close )
             obj->value3(obj->value3() | DRINK_CLOSED);
         }
         else {
-            ch->println( "Это не контейнер." );
+            ch->pecho( "Это не контейнер." );
             return;
         }
 
@@ -397,13 +397,13 @@ CMDRUNP( close )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
         {
-                ch->println( "Это не дверь!" );
+                ch->pecho( "Это не дверь!" );
                 return;
         }
 
         if ( IS_SET(peexit->exit_info, EX_CLOSED) )
         {
-                ch->println( "Здесь уже закрыто." );
+                ch->pecho( "Здесь уже закрыто." );
                 return;
         }
 
@@ -431,36 +431,36 @@ static void lock_door( Character *ch, int door )
     pexit        = ch->in_room->exit[door];
     if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
     {
-            ch->println( "Здесь не закрыто." );
+            ch->pecho( "Здесь не закрыто." );
             return;
     }
 
     if ( IS_SET(pexit->exit_info, EX_NOLOCK) ) 
     {
-        ch->println( "Это невозможно запереть." );
+        ch->pecho( "Это невозможно запереть." );
         return;
     }
 
     if ( pexit->key <= 0 )
     {
-            ch->println( "Здесь нет замочной скважины -- просто закрой дверь." );
+            ch->pecho( "Здесь нет замочной скважины -- просто закрой дверь." );
             return;
     }
 
     if (!get_key_carry( ch, pexit->key))
     {
-            ch->println( "У тебя нет ключа." );
+            ch->pecho( "У тебя нет ключа." );
             return;
     }
 
     if ( IS_SET(pexit->exit_info, EX_LOCKED) )
     {
-            ch->println( "Здесь уже заперто." );
+            ch->pecho( "Здесь уже заперто." );
             return;
     }
 
     SET_BIT(pexit->exit_info, EX_LOCKED);
-    ch->println( "*Щелк*" );
+    ch->pecho( "*Щелк*" );
     act( "$c1 запирает $N4 на ключ.", ch, 0, direction_doorname(pexit), TO_ROOM);
 
     /* lock the other side */
@@ -482,7 +482,7 @@ CMDRUNP( lock )
 
     if ( arg[0] == '\0' )
     {
-            ch->println( "Запереть что?" );
+            ch->pecho( "Запереть что?" );
             return;
     }
 
@@ -502,37 +502,37 @@ CMDRUNP( lock )
                 if ( !IS_SET(obj->value1(),EX_ISDOOR)
                         || IS_SET(obj->value1(),EX_NOCLOSE) )
                 {
-                        ch->println( "Ты не можешь сделать этого." );
+                        ch->pecho( "Ты не можешь сделать этого." );
                         return;
                 }
 
                 if (!IS_SET(obj->value1(),EX_CLOSED))
                 {
-                        ch->println( "Здесь не закрыто." );
+                        ch->pecho( "Здесь не закрыто." );
                         return;
                 }
 
                     if (IS_SET(obj->value1(),EX_NOLOCK))
                 {
-                        ch->println( "Это невозможно запереть." );
+                        ch->pecho( "Это невозможно запереть." );
                         return;
                 }
 
                 if (obj->value4() <= 0) 
                 {
-                    ch->println( "Здесь нет замочной скважины -- просто закрой." );
+                    ch->pecho( "Здесь нет замочной скважины -- просто закрой." );
                     return;
                 }
 
                 if (!get_key_carry(ch,obj->value4()))
                 {
-                        ch->println( "У тебя нет ключа." );
+                        ch->pecho( "У тебя нет ключа." );
                         return;
                 }
 
                 if (IS_SET(obj->value1(),EX_LOCKED))
                 {
-                        ch->println( "Здесь уже заперто." );
+                        ch->pecho( "Здесь уже заперто." );
                         return;
                 }
 
@@ -545,19 +545,19 @@ CMDRUNP( lock )
             // 'lock object'
             if ( !IS_SET(obj->value1(), CONT_CLOSED) )
             {
-                    ch->println( "Это не закрыто." );
+                    ch->pecho( "Это не закрыто." );
                     return;
             }
 
             if ( obj->value2() < 0 )
             {
-                    ch->println( "Здесь нет замочной скважины -- просто закрой." );
+                    ch->pecho( "Здесь нет замочной скважины -- просто закрой." );
                     return;
             }
             
             if ( IS_SET(obj->value1(), CONT_LOCKED) )
             {
-                    ch->println( "Это уже заперто." );
+                    ch->pecho( "Это уже заперто." );
                     return;
             }
 
@@ -569,7 +569,7 @@ CMDRUNP( lock )
                 act("$c1 закрывает $o4 на ключ.", ch, obj, 0, TO_ROOM);
                 
             } else {
-                ch->println( "У тебя нет ключа." );
+                ch->pecho( "У тебя нет ключа." );
                 return;
             }
         }
@@ -591,7 +591,7 @@ CMDRUNP( lock )
             return;
         }
         else {
-            ch->println( "Это не контейнер." );
+            ch->pecho( "Это не контейнер." );
             return;
         }
 
@@ -606,42 +606,42 @@ CMDRUNP( lock )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
         {
-                ch->println( "Это не дверь!" );
+                ch->pecho( "Это не дверь!" );
                 return;
         }
 
         if ( !IS_SET(peexit->exit_info, EX_CLOSED) )
         {
-                ch->println( "Здесь не закрыто." );
+                ch->pecho( "Здесь не закрыто." );
                 return;
         }
 
         if ( IS_SET(peexit->exit_info, EX_NOLOCK) ) 
         {
-            ch->println( "Это невозможно запереть." );
+            ch->pecho( "Это невозможно запереть." );
             return;
         }
 
         if ( peexit->key <= 0 )
         {
-                ch->println( "Здесь нет замочной скважины -- просто закрой." );
+                ch->pecho( "Здесь нет замочной скважины -- просто закрой." );
                 return;
         }
 
         if (!get_key_carry( ch, peexit->key))
         {
-                ch->println( "У тебя нет ключа." );
+                ch->pecho( "У тебя нет ключа." );
                 return;
         }
 
         if ( IS_SET(peexit->exit_info, EX_LOCKED) )
         {
-                ch->println( "Здесь уже заперто." );
+                ch->pecho( "Здесь уже заперто." );
                 return;
         }
 
         SET_BIT(peexit->exit_info, EX_LOCKED);
-        ch->println( "*Щелк*" );
+        ch->pecho( "*Щелк*" );
         act( "$c1 запирает $N4 на ключ.", ch, 0, peexit->short_desc_from, TO_ROOM);
 
         return;
@@ -666,30 +666,30 @@ static void unlock_door( Character *ch, int door )
     pexit = ch->in_room->exit[door];
     if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
     {
-            ch->println( "Здесь не закрыто." );
+            ch->pecho( "Здесь не закрыто." );
             return;
     }
 
     if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
     {
-            ch->println( "Здесь уже не заперто." );
+            ch->pecho( "Здесь уже не заперто." );
             return;
     }
 
     if ( pexit->key <= 0 )
     {
-            ch->println( "К этой двери не существует ключа." );
+            ch->pecho( "К этой двери не существует ключа." );
             return;
     }
 
     if (!get_key_carry( ch, pexit->key))
     {
-            ch->println( "У тебя нет ключа." );
+            ch->pecho( "У тебя нет ключа." );
             return;
     }
 
     REMOVE_BIT(pexit->exit_info, EX_LOCKED);
-    ch->println( "*Щелк*" );
+    ch->pecho( "*Щелк*" );
     act( "$c1 открывает ключом $N4.", ch, 0, direction_doorname(pexit), TO_ROOM);
 
     // unlock the other side
@@ -711,7 +711,7 @@ CMDRUNP( unlock )
 
     if ( arg[0] == '\0' )
     {
-            ch->println( "Отпереть что?" );
+            ch->pecho( "Отпереть что?" );
             return;
     }
 
@@ -730,19 +730,19 @@ CMDRUNP( unlock )
         {
             if (!IS_SET(obj->value1(),EX_ISDOOR))
             {
-                    ch->println( "Ты не можешь этого сделать." );
+                    ch->pecho( "Ты не можешь этого сделать." );
                     return;
             }
 
             if (!IS_SET(obj->value1(),EX_CLOSED))
             {
-                    ch->println( "Здесь не закрыто." );
+                    ch->pecho( "Здесь не закрыто." );
                     return;
             }
 
             if (!IS_SET(obj->value1(),EX_LOCKED))
             {
-                    ch->println( "Здесь уже не заперто." );
+                    ch->pecho( "Здесь уже не заперто." );
                     return;
             }
 
@@ -754,7 +754,7 @@ CMDRUNP( unlock )
 
             if (!get_key_carry(ch,obj->value4()))
             {
-                    ch->println( "У тебя нет ключа." );
+                    ch->pecho( "У тебя нет ключа." );
                     return;
             }
 
@@ -768,13 +768,13 @@ CMDRUNP( unlock )
 
             if ( !IS_SET(obj->value1(), CONT_CLOSED) )
             {
-                    ch->println( "Здесь не закрыто." );
+                    ch->pecho( "Здесь не закрыто." );
                     return;
             }
 
             if ( !IS_SET(obj->value1(), CONT_LOCKED) )
             {
-                    ch->println( "Здесь уже не заперто." );
+                    ch->pecho( "Здесь уже не заперто." );
                     return;
             }
 
@@ -795,7 +795,7 @@ CMDRUNP( unlock )
                 ch->pecho("%^O1 -- чья-то личная собственность, ключ есть только у хозяина или хозяйки.", obj);
                 return;
             } else {
-                ch->println( "У тебя нет ключа." );
+                ch->pecho( "У тебя нет ключа." );
                 return;
             }
         }
@@ -804,7 +804,7 @@ CMDRUNP( unlock )
             
             // uncork a bottle
             if (!IS_SET(obj->value3(), DRINK_LOCKED)) {
-                ch->println( "Тут не заперто и не закупорено." );
+                ch->pecho( "Тут не заперто и не закупорено." );
                 return;
             }
 
@@ -812,11 +812,11 @@ CMDRUNP( unlock )
 
             if (!key) {
                 if (IS_SET(obj->value3(), DRINK_CLOSE_CORK)) 
-                    ch->println( "У тебя нечем вытащить пробку." );
+                    ch->pecho( "У тебя нечем вытащить пробку." );
                 else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
-                    ch->println( "У тебя нечем оторвать крышку." );
+                    ch->pecho( "У тебя нечем оторвать крышку." );
                 else
-                    ch->println( "У тебя нечем открыть эту емкость." );
+                    ch->pecho( "У тебя нечем открыть эту емкость." );
                 
                 return;
             }
@@ -839,7 +839,7 @@ CMDRUNP( unlock )
         }
         else
         {
-            ch->println( "Это не контейнер." );
+            ch->pecho( "Это не контейнер." );
             return;
         }
 
@@ -854,36 +854,36 @@ CMDRUNP( unlock )
     {
         if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
         {
-                ch->println( "Это не дверь!" );
+                ch->pecho( "Это не дверь!" );
                 return;
         }
 
         if ( !IS_SET(peexit->exit_info, EX_CLOSED) )
         {
-                ch->println( "Здесь не закрыто." );
+                ch->pecho( "Здесь не закрыто." );
                 return;
         }
 
         if ( !IS_SET(peexit->exit_info, EX_LOCKED) )
         {
-                ch->println( "Здесь уже не заперто." );
+                ch->pecho( "Здесь уже не заперто." );
                 return;
         }
 
         if ( peexit->key <= 0 )
         {
-                ch->println( "К этой двери не существует ключа." );
+                ch->pecho( "К этой двери не существует ключа." );
                 return;
         }
 
         if (!get_key_carry( ch, peexit->key))
         {
-                ch->println( "У тебя нет ключа." );
+                ch->pecho( "У тебя нет ключа." );
                 return;
         }
 
         REMOVE_BIT(peexit->exit_info, EX_LOCKED);
-        ch->println( "*Щелк*" );
+        ch->pecho( "*Щелк*" );
         act( "$c1 открывает ключом $N4.", ch, 0, peexit->short_desc_from, TO_ROOM);
 
         return;
@@ -1047,12 +1047,12 @@ bool Keyhole::doPick( const DLString &arg )
     bitstring_t flags = getLockFlags( );
 
     if (!isLockable( )) {
-        ch->println( "Здесь нет замочной скважины." );
+        ch->pecho( "Здесь нет замочной скважины." );
         return false;
     }
 
     if (!IS_SET(flags, bitLocked( ))) {
-        ch->println( "Здесь уже не заперто." );
+        ch->pecho( "Здесь уже не заперто." );
         return false;
     }
     
@@ -1060,7 +1060,7 @@ bool Keyhole::doPick( const DLString &arg )
         return false;
     
     if (isPickProof( )) {
-        ch->println( "Этот замок защищен от взлома." );
+        ch->pecho( "Этот замок защищен от взлома." );
         return false;
     }
     
@@ -1087,7 +1087,7 @@ bool Keyhole::doPick( const DLString &arg )
             extract_obj( lockpick );
         }
         else
-            ch->println( "  ...но твои манипуляции ни к чему не приводят." );
+            ch->pecho( "  ...но твои манипуляции ни к чему не приводят." );
 
         gsn_pick_lock->improve( ch, false );
         ch->setWait( gsn_pick_lock->getBeats( ) );
@@ -1140,7 +1140,7 @@ bool Keyhole::findLockpick( )
 {
     if (!argKeyring.empty( )) {
         if (!( keyring = get_obj_list_type( ch, argKeyring, ITEM_KEYRING, ch->carrying ) )) {
-            ch->println( "У тебя нет такого кольца для ключей." );
+            ch->pecho( "У тебя нет такого кольца для ключей." );
             return false;
         }
 
@@ -1150,7 +1150,7 @@ bool Keyhole::findLockpick( )
         }
     }
     else if (!( lockpick = get_obj_list_type( ch, argLockpick, ITEM_LOCKPICK, ch->carrying )) ) {
-        ch->println( "У тебя нет такой отмычки." );
+        ch->pecho( "У тебя нет такой отмычки." );
         return false;
     }
 

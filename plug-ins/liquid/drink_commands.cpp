@@ -89,7 +89,7 @@ CMDRUN( fill )
     else {
         fountain = get_obj_here( ch, arg1.c_str( ) );
         if (!fountain) {
-            ch->println("Здесь нет такого источника.");
+            ch->pecho("Здесь нет такого источника.");
             return;
         }
 
@@ -309,7 +309,7 @@ static void pour_out( Character *ch, Object * out, Character *victim )
             victim->pecho( msgVict.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
         }
         else if (sips >= 5) {
-            victim->println( "Ты чувствуешь влагу на теле." );
+            victim->pecho( "Ты чувствуешь влагу на теле." );
 
             if (!IS_AFFECTED(victim, AFF_SLEEP))
                 interpret_raw( ch, "wake", 
@@ -454,7 +454,7 @@ CMDRUN( pourout )
     }
 
     if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
-        ch->println("У тебя в инвентаре нет такой емкости для жидкости.");
+        ch->pecho("У тебя в инвентаре нет такой емкости для жидкости.");
         return;
     }
 
@@ -472,7 +472,7 @@ CMDRUN( pourout )
     }
 
     if (( vch = get_char_room(ch, arg2.c_str( ) ) ) == 0) {
-        ch->println( "Вылить на кого?" );
+        ch->pecho( "Вылить на кого?" );
         return;
     }
 
@@ -503,7 +503,7 @@ CMDRUN( pour )
     }
 
     if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
-        ch->println("У тебя в инвентаре нет такой емкости для жидкости.");
+        ch->pecho("У тебя в инвентаре нет такой емкости для жидкости.");
         return;
     }
 
@@ -518,7 +518,7 @@ CMDRUN( pour )
     if (arg2 == "out" || arg2.empty( )) {
         if (!arg3.empty( )) {
             if (( vch = get_char_room(ch, arg3.c_str( ) ) ) == 0) {
-                ch->println( "Вылить на кого?" );
+                ch->pecho( "Вылить на кого?" );
                 return;
             }
 

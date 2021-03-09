@@ -344,7 +344,7 @@ SKILL_RUNP( dig )
     chance = gsn_digging->getEffective( ch );
 
     if (chance < 2) {
-	ch->println("Для того, чтобы копать, найди и используй лопату.");
+	ch->pecho("Для того, чтобы копать, найди и используй лопату.");
         return;
     }
 

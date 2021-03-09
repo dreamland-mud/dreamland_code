@@ -88,19 +88,19 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
         || !argOne.isNumber( ) 
         || (!arg_is_gold( argTwo) && !arg_is_silver( argTwo )))
     {
-        ch->println( "Укажи сумму и денежную единицу. Например: '{lRсосчета 77 золота{lEwithdraw 77 gold{x' или '{lRсосчета 9000 серебра{lEwithdraw 9000 silver{lx'.");
+        ch->pecho( "Укажи сумму и денежную единицу. Например: '{lRсосчета 77 золота{lEwithdraw 77 gold{x' или '{lRсосчета 9000 серебра{lEwithdraw 9000 silver{lx'.");
         return;
     }
     
     try {
         amount = argOne.toInt( );
     } catch (const ExceptionBadType &) {
-        ch->println( "Сумма указана неверно." );
+        ch->pecho( "Сумма указана неверно." );
         return;
     }
 
     if (amount <= 0) {
-        ch->println( "Очень щедро." );
+        ch->pecho( "Очень щедро." );
         return;
     }
 

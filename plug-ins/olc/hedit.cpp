@@ -281,7 +281,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             }
 
             for (auto &kv: activeLabelCount) {
-                ch->println(fmt(0, lineFormat.c_str(), kv.first.c_str(), kv.second));
+                ch->pecho(fmt(0, lineFormat.c_str(), kv.first.c_str(), kv.second));
             }
             return;
         }
@@ -296,7 +296,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
                 labeledIds.push_back(a->getID());
 
         if (labeledIds.empty()) {
-            ch->println("Не найдено ни одной статьи с этой меткой, укажите название полностью.");
+            ch->pecho("Не найдено ни одной статьи с этой меткой, укажите название полностью.");
             return;
         }
 
@@ -326,7 +326,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             }
         }
 
-        ch->println("Не могу найти файл для сохранения справки.");
+        ch->pecho("Не могу найти файл для сохранения справки.");
         return;
 
     } else {

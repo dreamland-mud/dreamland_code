@@ -557,5 +557,5 @@ void hint_fmt(Character *ch, const char *format, ...)
     DLString output = vfmt(ch, format, av);
     va_end(av);
 
-    ch->println("{y[{GПодсказка{y]{x " + output);
+    ch->pecho("{y[{GПодсказка{y]{x " + output);
 }

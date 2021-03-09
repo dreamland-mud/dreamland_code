@@ -179,7 +179,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     
     if (!isFelar) {
         if (!isMouse && !isFish) {
-            ch->println("Это животное не сделало тебе ничего плохого!");
+            ch->pecho("Это животное не сделало тебе ничего плохого!");
         }
         else {
             act("Вообразив себя ко$gтом|том|шкой, $c1 пытается изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_ROOM);

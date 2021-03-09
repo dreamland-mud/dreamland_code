@@ -421,7 +421,7 @@ VOID_SPELL(Sleep)::run( Character *ch, Character *victim, int sn, int level )
     ||   level < victim->getModifyLevel()
     ||   saves_spell( level-4, victim,DAM_CHARM, ch, DAMF_MAGIC ) )
     {
-        ch->println("Не получилось...");
+        ch->pecho("Не получилось...");
             return;
     }
 

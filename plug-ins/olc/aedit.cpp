@@ -197,9 +197,9 @@ AEDIT(show, "показать", "показать все поля")
                     + " {D(hedit " + DLString(article->getID()) + "){x\r\n";
 
         if (!buf.empty())
-            ch->println("Helps:\r\n" + buf);
+            ch->pecho("Helps:\r\n" + buf);
         else
-            ch->println("Helps:      (none) ({y{hchelp create{hx {Dto add area help{w)");
+            ch->pecho("Helps:      (none) ({y{hchelp create{hx {Dto add area help{w)");
     } else {
         ptc(ch, "Helps:      {Dno helps for the new area, save and use {yhelp create{x\r\n");
     }
@@ -223,7 +223,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
 
         for (auto &article: original->helps) {
             if (article->getID() > 0) {
-                ch->println(
+                ch->pecho(
                     "    [{C" + article->getAllKeywordsString() + "{x] "
                     +  web_edit_button(ch, "hedit", DLString(article->getID()))
                     + " {D(hedit " + DLString(article->getID()) + "){x");
@@ -233,11 +233,11 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
         }
 
         if (!hasHelp)
-            ch->println("    (нет)");
+            ch->pecho("    (нет)");
 
         AreaHelp *ahelp = area_selfhelp(original);
         if (!ahelp || !ahelp->persistent)
-            ch->println("Используй {y{hchelp create{x для создания справки по зоне.");
+            ch->pecho("Используй {y{hchelp create{x для создания справки по зоне.");
 
         return false;
     }
@@ -245,15 +245,15 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
     if (arg_oneof(arg, "create", "создать")) {
         AreaHelp *ahelp = area_selfhelp(original);
         if (!ahelp) {
-            ch->println("Не найдена автоматическая справка по этой зоне, что-то поломалось.");
+            ch->pecho("Не найдена автоматическая справка по этой зоне, что-то поломалось.");
             return false;
         }
 
         if (ahelp->persistent) {
-            ch->println("Справка по этой зоне уже существет, запускаю редактор.");
+            ch->pecho("Справка по этой зоне уже существет, запускаю редактор.");
         } else {
 
-            ch->println("Превращаю автоматическую справку по зоне в постоянную.");
+            ch->pecho("Превращаю автоматическую справку по зоне в постоянную.");
             ahelp->persistent = true;
 
             StringSet kwd;

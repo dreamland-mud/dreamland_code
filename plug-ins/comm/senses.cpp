@@ -64,7 +64,7 @@ CMDRUNP( listen )
             return;
         
         if (!obj->pIndexData->sound.empty( )) {
-            ch->println( obj->pIndexData->sound );
+            ch->pecho( obj->pIndexData->sound );
             return;
         }
 
@@ -132,11 +132,11 @@ CMDRUNP( smell )
 
         Properties::const_iterator p = ch->in_room->pIndexData->properties.find( "smell" );
         if (p != ch->in_room->pIndexData->properties.end( )) {
-            ch->println(p->second);
+            ch->pecho(p->second);
             return;
         }
 
-        ch->println("Вокруг пахнет вполне обычно.");
+        ch->pecho("Вокруг пахнет вполне обычно.");
         return;
     }
 
@@ -150,18 +150,18 @@ CMDRUNP( smell )
             if (attr && !attr->getValue( ).empty( ))
                 ch->printf("Ты пахнешь:\n\r%s\n\r", attr->getValue( ).c_str( ) ); 
             else
-                ch->println("Ты ничем особенным не пахнешь.");
+                ch->pecho("Ты ничем особенным не пахнешь.");
             return;
         }
 
         if (arg_oneof_strict( argument, "clear", "очистить" )) {
             attr->setValue( "" );
-            ch->println( "Теперь ты никак не пахнешь." );
+            ch->pecho( "Теперь ты никак не пахнешь." );
             return;
         }
 
         if (arg_is_help( argument )) {
-            ch->println( "Используй 'smell description <строка>' для установки запаха\n\r"
+            ch->pecho( "Используй 'smell description <строка>' для установки запаха\n\r"
                          "или 'smell description clear' для его очистки." );
             return;
         }
@@ -182,7 +182,7 @@ CMDRUNP( smell )
             return;
         
         if (!obj->pIndexData->smell.empty( )) {
-            ch->println( obj->pIndexData->smell );
+            ch->pecho( obj->pIndexData->smell );
             return;
         }
 
@@ -192,7 +192,7 @@ CMDRUNP( smell )
                 return;
         }
 
-        ch->println("Пахнет вполне обычно.");
+        ch->pecho("Пахнет вполне обычно.");
         return;
     }
 
@@ -211,14 +211,14 @@ CMDRUNP( smell )
         if (!( rc = mprog_smell( victim, ch, argument ) )) {
             if (victim->is_npc( )) {
                 if (!victim->getNPC( )->pIndexData->smell.empty( )) {
-                    ch->println( victim->getNPC( )->pIndexData->smell );
+                    ch->pecho( victim->getNPC( )->pIndexData->smell );
                     rc = true;
                 }
             } 
             else {
                 attr = victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( "smell" );
                 if (attr && !attr->getValue( ).empty( )) {
-                    ch->println( attr->getValue( ) );
+                    ch->pecho( attr->getValue( ) );
                     rc = true;
                 }
             }
@@ -228,7 +228,7 @@ CMDRUNP( smell )
         rc = afprog_smell( victim, ch, argument ) || rc;
         
         if (!rc)
-            ch->println("Пахнет вполне обычно.");
+            ch->pecho("Пахнет вполне обычно.");
 
         return;
     }

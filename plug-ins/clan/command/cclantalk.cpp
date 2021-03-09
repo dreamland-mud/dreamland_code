@@ -98,9 +98,9 @@ COMMAND(CClanTalk, "cb")
         TOGGLE_BIT(ch->comm, COMM_NOCB);
 
         if (IS_SET(ch->comm, COMM_NOCB))
-            ch->println("С этого момента ты не слышишь клановые разговоры.");
+            ch->pecho("С этого момента ты не слышишь клановые разговоры.");
         else
-            ch->println("Ты снова слышишь клановые разговоры.");
+            ch->pecho("Ты снова слышишь клановые разговоры.");
         return;
     }
     
@@ -118,7 +118,7 @@ COMMAND(CClanTalk, "cb")
 
     if (!ch->isAffected(gsn_deafen)) {
         DLString message = fmt( ch, act_str.c_str( ), ch, argument.c_str( ) );
-        ch->println( message );
+        ch->pecho( message );
         if (ch->getPC( )) {
             remember_history_public( ch->getPC( ), message );
         }

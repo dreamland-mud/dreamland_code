@@ -41,13 +41,13 @@ COMMAND(MySocial, "mysocial")
     else if (arg_is_help( cmd ))
         usage( ch );
     else if (name.empty( )) 
-        ch->println( "Укажи имя социала." );
+        ch->pecho( "Укажи имя социала." );
     else if (arg_oneof( cmd, "del", "удалить" ))
         doDelete( ch, attr, name );
     else if (arg_is_show( cmd ))
         doShow( ch, attr, name );
     else if (arg.empty( )) 
-        ch->println( "Укажи, какой вид сообщения изменить и как. Смотри '{lRмойсоц ?{lEmysoc help{lx'." );
+        ch->pecho( "Укажи, какой вид сообщения изменить и как. Смотри '{lRмойсоц ?{lEmysoc help{lx'." );
     else {
         CustomSocial::Pointer social;
         XMLAttributeCustomSocials::iterator i = attr->find( name );
@@ -115,7 +115,7 @@ COMMAND(MySocial, "mysocial")
                 return;
         }
         else {
-            ch->println("Нет такого вида сообщений. Смотри '{lRмойсоц ?{lEmysoc help{lx'.");
+            ch->pecho("Нет такого вида сообщений. Смотри '{lRмойсоц ?{lEmysoc help{lx'.");
             return;
         }
 
@@ -167,7 +167,7 @@ bool MySocial::hasBoth( Character *ch, const DLString &arg )
                        "^\\$c1[1-6] .*\\$C[1-6][^\\$]*$", true );
     
     if (!pat.match( arg )) {
-        ch->println( "Сообщение должно начинаться с твоего имени в нужном падеже ($c1, .. $c6) \r\n"
+        ch->pecho( "Сообщение должно начинаться с твоего имени в нужном падеже ($c1, .. $c6) \r\n"
                      "и кроме него может содержать еще только имя жертвы ($C1, ... $C6)." ); 
         return false;
     }

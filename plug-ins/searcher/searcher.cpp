@@ -675,42 +675,42 @@ CMDRUNP(searcher)
 
     if (arg_is_all(arg)) {
         task.run();
-        ch->println("Created 4 JSON files in /tmp, check logs for any errors.");
+        ch->pecho("Created 4 JSON files in /tmp, check logs for any errors.");
         return;
     }
 
     if (arg_oneof(arg, "pets")) {
         if (task.dumpPets())
-            ch->println("Created /tmp/db_pets.json file.");
+            ch->pecho("Created /tmp/db_pets.json file.");
         else
-            ch->println("Error occurred, please check the logs.");
+            ch->pecho("Error occurred, please check the logs.");
         
         return;
     }
 
     if (arg_oneof(arg, "armor")) {
         if (task.dumpArmor()) 
-            ch->println("Created /tmp/db_armor.json file.");
+            ch->pecho("Created /tmp/db_armor.json file.");
         else
-            ch->println("Error occurred, please check the logs.");
+            ch->pecho("Error occurred, please check the logs.");
 
         return;
     }
 
     if (arg_oneof(arg, "magic")) {
         if (task.dumpMagic()) 
-            ch->println("Created /tmp/db_magic.json file.");
+            ch->pecho("Created /tmp/db_magic.json file.");
         else
-            ch->println("Error occurred, please check the logs.");
+            ch->pecho("Error occurred, please check the logs.");
 
         return;
     }
     
     if (arg_oneof(arg, "weapon")) {
         if (task.dumpWeapon()) 
-            ch->println("Created /tmp/db_weapon.json file.");
+            ch->pecho("Created /tmp/db_weapon.json file.");
         else
-            ch->println("Error occurred, please check the logs.");
+            ch->pecho("Error occurred, please check the logs.");
 
         return;
     }
@@ -718,7 +718,7 @@ CMDRUNP(searcher)
     if (arg_oneof(arg, "query")) {
 
         if (args.empty()) {
-            ch->println("Usage: searcher q <query string>\nSee 'help searcher' for details.");
+            ch->pecho("Usage: searcher q <query string>\nSee 'help searcher' for details.");
             return;
         }
     
@@ -786,7 +786,7 @@ CMDRUNP(searcher)
      
             page_to_char(buf.str().c_str(), ch);
         } catch (const Exception &ex) {
-            ch->println(ex.what());
+            ch->pecho(ex.what());
         }
 
         return;
@@ -795,7 +795,7 @@ CMDRUNP(searcher)
     if (arg_oneof(arg, "wquery")) {
 
         if (args.empty()) {
-            ch->println("Usage: searcher wq <query string>\nSee 'help searcher' for details.");
+            ch->pecho("Usage: searcher wq <query string>\nSee 'help searcher' for details.");
             return;
         }
     
@@ -869,7 +869,7 @@ CMDRUNP(searcher)
      
             page_to_char(buf.str().c_str(), ch);
         } catch (const Exception &ex) {
-            ch->println(ex.what());
+            ch->pecho(ex.what());
         }
 
         return;
@@ -879,7 +879,7 @@ CMDRUNP(searcher)
     if (arg_oneof(arg, "mquery")) {
 
         if (args.empty()) {
-            ch->println("Usage: searcher mq <query string>\nSee 'help searcher' for details.");
+            ch->pecho("Usage: searcher mq <query string>\nSee 'help searcher' for details.");
             return;
         }
     
@@ -932,13 +932,13 @@ CMDRUNP(searcher)
      
             page_to_char(buf.str().c_str(), ch);
         } catch (const Exception &ex) {
-            ch->println(ex.what());
+            ch->pecho(ex.what());
         }
 
         return;
     }
 
-    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\n"
+    ch->pecho("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\n"
                "searcher q <item query>\n"
                "searcher wq <weapon query>\n"
                "searcher mq <mob query>\n");

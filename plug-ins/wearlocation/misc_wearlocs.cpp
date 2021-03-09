@@ -105,7 +105,7 @@ void HairWearloc::affectsOnUnequip( Character *ch, Object *obj ) { }
 int HairWearloc::canWear( Character *ch, Object *obj, int flags ) {
     if (find( ch ) != NULL) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println("В твоих волосах уже запуталось что-то другое.");
+            ch->pecho("В твоих волосах уже запуталось что-то другое.");
         return RC_WEAR_CONFLICT;
     }
     return DefaultWearlocation::canWear( ch, obj, flags );
@@ -130,7 +130,7 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
         && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println("Твои руки заняты оружием!");
+            ch->pecho("Твои руки заняты оружием!");
         return RC_WEAR_CONFLICT;
     }
 
@@ -270,7 +270,7 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
         
     if (!ch->is_npc( ) && obj->getWeight( ) > (get_str_app(ch).wield * 10)) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println("Ты не можешь этим вооружиться. Оно слишком тяжело для тебя.");
+            ch->pecho("Ты не можешь этим вооружиться. Оно слишком тяжело для тебя.");
         return RC_WEAR_HEAVY;
     }
 
@@ -280,7 +280,7 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
             || (ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println("Чтобы вооружиться этим, у тебя должны быть свободны обе руки.");
+            ch->pecho("Чтобы вооружиться этим, у тебя должны быть свободны обе руки.");
         return RC_WEAR_LARGE;
     }
 
@@ -366,31 +366,31 @@ int SecondWieldWearloc::canWear( Character *ch, Object *obj, int flags )
     
     if (wear_shield->find( ch ) || wear_hold->find( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println( "Твои руки уже заняты щитом или чем-либо другим." );
+            ch->pecho( "Твои руки уже заняты щитом или чем-либо другим." );
         return RC_WEAR_CONFLICT;
     }
 
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS) && ch->getRace( )->getSize( ) < SIZE_HUGE) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println( "Только не двуручным оружием!" );
+            ch->pecho( "Только не двуручным оружием!" );
         return RC_WEAR_LARGE;
     }
 
     if (!( wield = wear_wield->find( ch ) )) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println( "У тебя нет даже первичного оружия!" );
+            ch->pecho( "У тебя нет даже первичного оружия!" );
         return RC_WEAR_CONFLICT;
     }
 
     if (IS_WEAPON_STAT(wield, WEAPON_TWO_HANDS) && ch->getRace( )->getSize( ) < SIZE_HUGE) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println( "Обе руки заняты двуручным оружием!" );
+            ch->pecho( "Обе руки заняты двуручным оружием!" );
         return RC_WEAR_LARGE;
     }
 
     if (obj->getWeight( ) > (get_str_app(ch).wield * 5)) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println( "Это оружие слишком тяжело для тебя, чтоб использовать его как вторичное." );
+            ch->pecho( "Это оружие слишком тяжело для тебя, чтоб использовать его как вторичное." );
         return RC_WEAR_HEAVY;
     }
 
@@ -443,7 +443,7 @@ void TailWearloc::affectsOnUnequip( Character *ch, Object *obj )
 int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
     if (find( ch ) != NULL) {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println("На твой хвост уже что-то надето.");
+            ch->pecho("На твой хвост уже что-то надето.");
         return RC_WEAR_CONFLICT;
     }
     return DefaultWearlocation::canWear( ch, obj, flags );

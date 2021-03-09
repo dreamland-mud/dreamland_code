@@ -140,7 +140,7 @@ void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
     PCMemoryInterface *victim;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-        pch->println( "Твоих полномочий недостаточно." );
+        pch->pecho( "Твоих полномочий недостаточно." );
         return;
     }
 
@@ -150,7 +150,7 @@ void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
     }
     
     if (!( victim = PCharacterManager::find( arg ) )) {
-        pch->println( "Никого нет с таким именем. Укажи имя полностью." );
+        pch->pecho( "Никого нет с таким именем. Укажи имя полностью." );
         return;
     }
 
@@ -198,7 +198,7 @@ void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
 void ClanOrgs::doSelfRemove( PCharacter *pch ) const
 {
     if (!hasAttr( pch ))
-        pch->println( "Ты и так нигде не состоишь." );
+        pch->pecho( "Ты и так нигде не состоишь." );
     else {
         delAttr( pch );
         pch->pecho( "Ты покидаешь сво%1$Gй|й|ю %1$^O4.", &name );
@@ -210,7 +210,7 @@ void ClanOrgs::doRemove( PCharacter *pch, DLString &arg ) const
     PCMemoryInterface *victim;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-        pch->println( "Твоих полномочий недостаточно." );
+        pch->pecho( "Твоих полномочий недостаточно." );
         return;
     }
     
@@ -220,7 +220,7 @@ void ClanOrgs::doRemove( PCharacter *pch, DLString &arg ) const
     }
     
     if (!( victim = PCharacterManager::find( arg ) )) {
-        pch->println( "Никого нет с таким именем. Укажи имя полностью." );
+        pch->pecho( "Никого нет с таким именем. Укажи имя полностью." );
         return;
     }
 

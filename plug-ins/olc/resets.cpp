@@ -651,13 +651,13 @@ CMD(randomize, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     DLString arg3 = args.getOneArgument();
 
     if (arg1.empty() || arg2.empty()) {
-        ch->println("Usage: randomize <vnum> <rand_flag> [best_tier]");    
+        ch->pecho("Usage: randomize <vnum> <rand_flag> [best_tier]");    
         return;
     }
 
     Integer vnum;
     if (!Integer::tryParse(vnum, arg1)) {
-        ch->println("Vnum is not a number.");
+        ch->pecho("Vnum is not a number.");
         return;
     }
 
@@ -709,7 +709,7 @@ CMD(randomize, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         Object *obj, *obj_next;
         ostringstream buf;
 
-        ch->println("{CReviewing all item locations:{x");
+        ch->pecho("{CReviewing all item locations:{x");
         
         for (obj = object_list; obj; obj = obj_next) {
             obj_next = obj->next;

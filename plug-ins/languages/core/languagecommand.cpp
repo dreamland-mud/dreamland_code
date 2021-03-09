@@ -47,7 +47,7 @@ void Language::run( Character *ach, const DLString &constArguments )
     ch = ach->getPC( );
 
     if (!ch) {
-        ch->println( "Муу-у-у." );
+        ch->pecho( "Муу-у-у." );
         return;
     }
 
@@ -126,7 +126,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     chance = getEffective( ch );
     
     if (number_percent( ) > chance || ch->isAffected( gsn_garble )) {
-        ch->println( "Тебя подвело произношение." );
+        ch->pecho( "Тебя подвело произношение." );
         ch->recho( POS_RESTING, "%^C1 бормочет что-то неразборчивое.", ch );
         ch->setWait( getBeats( ) / 2 );
         return;
@@ -184,7 +184,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     }
 
     if (effect->isObject( ) && !obj) {
-        ch->println("Выбери, на какую вещь произнести слово.");
+        ch->pecho("Выбери, на какую вещь произнести слово.");
         fUsed = false;
     }
     else if (obj) {
@@ -240,7 +240,7 @@ void Language::doKnown( PCharacter *ch ) const
     bool hasDreams = showDreams( ch );
     bool hasRewards = showRewards( ch );
     if (!hasDreams && !hasRewards)
-        ch->println( "Ты не можешь вспомнить ни одного слова." );
+        ch->pecho( "Ты не можешь вспомнить ни одного слова." );
 }
 
 /*
@@ -257,14 +257,14 @@ bool Language::showDreams( PCharacter *ch ) const
     attrHints = ch->getAttributes( ).findAttr<XMLAttributeLanguageHints>( "languageHints" );
     
     if (!attr) {
-//        ch->println( "Тебе ни разу ничего не снилось." );
+//        ch->pecho( "Тебе ни разу ничего не снилось." );
         return false;
     }
         
     XMLAttributeLanguage::Words &words = attr->getWords( );
 
     if (words.empty( )) {
-//        ch->println( "Все сны давно забылись." );
+//        ch->pecho( "Все сны давно забылись." );
         return false;
     }
     
@@ -361,7 +361,7 @@ bool Language::showRewards( PCharacter *ch ) const
         return false;
     }
 
-    ch->println( "Тебе сообщили такие слова на разных языках: " );
+    ch->pecho( "Тебе сообщили такие слова на разных языках: " );
     ch->send_to( buf );
     return true;
 }
@@ -374,7 +374,7 @@ void Language::doIdent( PCharacter *ch, DLString &arguments ) const
     DLString arg = arguments.getOneArgument();
     
     if (arg.empty( )) {
-        ch->println( "Смысл чего ты пытаешься понять?" );
+        ch->pecho( "Смысл чего ты пытаешься понять?" );
         return;
     }
     
@@ -408,12 +408,12 @@ void Language::doForget( PCharacter *ch, const DLString &arg ) const
     XMLAttributeLanguage::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeLanguage>( "language" );
 
     if (!attr || attr->getWords( ).empty( )) {
-        ch->println( "Тебе нечего забывать." );
+        ch->pecho( "Тебе нечего забывать." );
         return;
     }
     
     if (arg.empty()) {
-        ch->println("Что именно ты хочешь забыть?");
+        ch->pecho("Что именно ты хочешь забыть?");
         return;
     }
 
@@ -425,7 +425,7 @@ void Language::doForget( PCharacter *ch, const DLString &arg ) const
         }
 
         attr->getWords( ).clear( );
-        ch->println( "Все приснившиеся тебе слова ускользают из твоей памяти." );
+        ch->pecho( "Все приснившиеся тебе слова ускользают из твоей памяти." );
         return;
     }
 
@@ -451,18 +451,18 @@ void Language::doRemember( PCharacter *ch, const DLString &arg ) const
     XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).getAttr<XMLAttributeLanguageHints>( "languageHints" );
 
     if (arg.empty()) {
-        ch->println("Что именно ты хочешь запомнить?");
+        ch->pecho("Что именно ты хочешь запомнить?");
         return;
     }
     
     if (attrHints->hasWord(arg)) {
-        ch->println("Ты и так помнишь это слово.");
+        ch->pecho("Ты и так помнишь это слово.");
         return;
     }
     
     Word word;
     if (!locateWord( word, ch, arg )) {
-        ch->println("Это слово не существует.");
+        ch->pecho("Это слово не существует.");
         return;
     }
 

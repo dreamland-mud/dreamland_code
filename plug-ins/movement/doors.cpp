@@ -22,13 +22,13 @@ void open_door_extra ( Character *ch, int door, void *pexit )
 
     if ( !IS_SET(exit_info, EX_CLOSED) )
     {
-            ch->println( "Здесь уже открыто." );
+            ch->pecho( "Здесь уже открыто." );
             return;
     }
 
     if ( IS_SET(exit_info, EX_LOCKED) )
     {
-            ch->println( "Здесь заперто." );
+            ch->pecho( "Здесь заперто." );
             return;
     }
 

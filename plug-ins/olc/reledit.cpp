@@ -55,7 +55,7 @@ void OLCStateReligion::commit()
     
     original->save();
     if (owner)
-        owner->character->println("Изменения сохранены на диск.");
+        owner->character->pecho("Изменения сохранены на диск.");
 }
 
 DefaultReligion * OLCStateReligion::getOriginal()
@@ -380,7 +380,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
                     (!rel->classes.empty() || !rel->races.empty()) ? "{Y*{x" : "",
                     !rel->clans.empty() ? "{Y*{x" : ""));
         }
-        ch->println("R - ограничено по классу и/или расе; C - ограничено по клану.");
+        ch->pecho("R - ограничено по классу и/или расе; C - ограничено по клану.");
         return;
     }
 

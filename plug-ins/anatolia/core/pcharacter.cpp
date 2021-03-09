@@ -44,7 +44,7 @@ void PCharacter::gainExp( int gain )
     }
 
     if (level >= PK_MIN_LEVEL && IS_SET(in_room->room_flags, ROOM_NEWBIES_ONLY)) {
-        println("Ты не можешь больше получать опыт в этой арии.");
+        pecho("Ты не можешь больше получать опыт в этой арии.");
         return;
     }
 
@@ -133,7 +133,7 @@ void PCharacter::advanceLevel( )
         buf << ", {Y" << add_train << "{C/" << train << " {lRтренировку{lEtrain{lx";
     
     buf << ".{x";
-    println( buf.str( ).c_str( ) );
+    pecho( buf.str( ).c_str( ) );
 
     // Display how many new skills became available after level up.
     XMLIntegerAttribute::Pointer skillCount 

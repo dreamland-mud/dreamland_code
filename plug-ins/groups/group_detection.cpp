@@ -547,7 +547,7 @@ SKILL_RUNP( lore )
   argument = one_argument( argument, arg1 );
 
     if (arg1[0] == '\0') {
-        ch->println("Используй это умение на предмет: {y{lRлегенды{lElore{x {Dпредмет{x.");
+        ch->pecho("Используй это умение на предмет: {y{lRлегенды{lElore{x {Dпредмет{x.");
         return;
     }
 

@@ -204,7 +204,7 @@ CMDWIZP( set )
   int i = 0;
     
   if (ch->getPC( ) && ch->getPC( )->getAttributes( ).isAvailable( "noset" )) {
-      ch->println( "It's not a good idea." );
+      ch->pecho( "It's not a good idea." );
       return;
   }
 
@@ -642,7 +642,7 @@ void chg_mob_relig( Character* ch, char* argument ) {
       }
 
       if (!( god = religionManager->findUnstrict( argument ) )) {
-          ch->println("Религия не найдена.");
+          ch->pecho("Религия не найдена.");
           return;
       }
 
@@ -982,7 +982,7 @@ void chg_mob_qp( Character* ch, char* argument )
     DLString qpArg = arguments.getOneArgument();
 
     if (playerName.empty() || qpArg.empty()) {
-        ch->println("Укажите имя персонажа и кол-во qp.");
+        ch->pecho("Укажите имя персонажа и кол-во qp.");
         return;
     }
 
@@ -1014,7 +1014,7 @@ void chg_mob_qp( Character* ch, char* argument )
       }
     }
 
-    ch->println("Использование: set char questp имя_персонажа [+|-]число");
+    ch->pecho("Использование: set char questp имя_персонажа [+|-]число");
 }
 
 void chg_mob_attr( Character* ch, char* argument ) 
@@ -1035,7 +1035,7 @@ void chg_mob_attr( Character* ch, char* argument )
     }
 
     if (attrName.empty( )) {
-        ch->println( "Укажите  название аттрибута." );
+        ch->pecho( "Укажите  название аттрибута." );
         return;
     }
     
@@ -1111,7 +1111,7 @@ void oset( Character* ch, char* argument )
             DLString key = value.getOneArgument();
 
             if (value.empty()) {
-                ch->println("Syntax: set obj <object> property <key> <value>");
+                ch->pecho("Syntax: set obj <object> property <key> <value>");
                 return;
             }
 
@@ -1126,7 +1126,7 @@ void oset( Character* ch, char* argument )
             MultiGender mg(MultiGender::UNDEF);
             mg.fromString(arg3);
             if (mg == MultiGender::UNDEF) {
-              ch->println("Неправильное значение грам. рода, используй: neutral, female, male, plural или первые буквы n f m p.");
+              ch->pecho("Неправильное значение грам. рода, используй: neutral, female, male, plural или первые буквы n f m p.");
               return;
             }
             
@@ -1147,7 +1147,7 @@ void oset( Character* ch, char* argument )
                 // Allocate and assign new behavior and all related flags.
                 PCMemoryInterface *owner = PCharacterManager::find(arg3);
                 if (!owner) {
-                    ch->println("Персонаж не найден, укажи имя полностью.");
+                    ch->pecho("Персонаж не найден, укажи имя полностью.");
                     return;
                 }
 
@@ -1156,7 +1156,7 @@ void oset( Character* ch, char* argument )
 
                 ObjectBehaviorManager::assign(obj, behaviorName);
                 if (!obj->behavior) {
-                    ch->println("Произошла ошибка, проверь логи.");
+                    ch->pecho("Произошла ошибка, проверь логи.");
                     return;
                 }
 
@@ -1360,11 +1360,11 @@ void sset( Character *ch, char *argument )
     if (arg_is_switch_off(arg3)) {
         PCSkillData &data = victim->getPC( )->getSkillData( sn );
         if (!data.isTemporary())
-            ch->println("Это умение не является временным для персонажа.");
+            ch->pecho("Это умение не является временным для персонажа.");
         else {
             data.clear();
             victim->getPC()->save();
-            ch->println("Временное умение удалено.");
+            ch->pecho("Временное умение удалено.");
         }
         return;
     }

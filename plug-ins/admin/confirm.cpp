@@ -118,7 +118,7 @@ void Confirm::doRequest( Character *ch )
 
     attr = get_confirm_attr(ch->getPC());
     
-    ch->println( "Твое описание отправлено Бессмертным на рассмотрение." );
+    ch->pecho( "Твое описание отправлено Бессмертным на рассмотрение." );
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 просит подтверждения своему персонажу ({y{hcconfirm list new{x).", ch );    
     send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
@@ -323,7 +323,7 @@ void Confirm::doList( Character *ch, bool newOnly )
     }
 
     if (totalRequests == 0) {
-        ch->println("Нет ни одной заявки на подтверждение персонажа.");
+        ch->pecho("Нет ни одной заявки на подтверждение персонажа.");
     } else if (newRequests != 0) {
         ch->pecho("Найден%1$Iа|о|о %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок, всего заявок: %2$d.",
                   newRequests, totalRequests);

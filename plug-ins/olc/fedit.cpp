@@ -41,7 +41,7 @@ void OLCStateFile::commit()
     original->refresh(text);
 
     if (owner)
-        owner->character->println("Изменения сохранены на диск.");
+        owner->character->pecho("Изменения сохранены на диск.");
 }
 
 void OLCStateFile::statePrompt(Descriptor *d) 
@@ -68,13 +68,13 @@ bool OLCStateFile::validate(PCharacter *ch) const
     ostringstream errbuf;
 
     if (!json_validate_text(text, errbuf)) {
-        ch->println("Ошибка парсинга JSON:");
-        ch->println(errbuf.str());
-        ch->println("Отредактируйте текст еще раз ({y{hctext web{x) или отмените изменения ({y{hccancel{x).");
+        ch->pecho("Ошибка парсинга JSON:");
+        ch->pecho(errbuf.str());
+        ch->pecho("Отредактируйте текст еще раз ({y{hctext web{x) или отмените изменения ({y{hccancel{x).");
         return false;
     }
 
-    ch->println("JSON выглядит хорошо.");
+    ch->pecho("JSON выглядит хорошо.");
     return true;
 }
 

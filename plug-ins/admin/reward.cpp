@@ -93,24 +93,24 @@ CMDADM( ireward )
     DLString reason = arguments;
 
     if (name.empty( )) {
-        ch->println( "Вознаградить кого?" );
+        ch->pecho( "Вознаградить кого?" );
         return;
     }
 
     if (qpStr.empty( )) {
-        ch->println("Использование: \r\n    ireward персонаж кп причина\r\n    ireward персонаж show\r\n    ireward персонаж delete");
+        ch->pecho("Использование: \r\n    ireward персонаж кп причина\r\n    ireward персонаж show\r\n    ireward персонаж delete");
         return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-        ch->println( "Персонаж с таким именем не найден." );
+        ch->pecho( "Персонаж с таким именем не найден." );
         return;
     }
 
     if (arg_oneof(qpStr, "удалить", "delete")) {
         pci->getAttributes().eraseAttribute(ATTRNAME);
         PCharacterManager::saveMemory(pci);
-        ch->println("Удалены все награды.");
+        ch->pecho("Удалены все награды.");
         return;
     } 
 
@@ -118,7 +118,7 @@ CMDADM( ireward )
 
     if (arg_is_show(qpStr)) {
         if (attr->isEmpty()) {
-            ch->println("Наград не найдено.");
+            ch->pecho("Наград не найдено.");
             return;
         }
 
@@ -134,7 +134,7 @@ CMDADM( ireward )
     try {
         qp = qpStr.toInt( );
     } catch (const ExceptionBadType& e) {
-        ch->println("Укажите кол-во квестовых единиц.\r\n");
+        ch->pecho("Укажите кол-во квестовых единиц.\r\n");
         return;
     }
 

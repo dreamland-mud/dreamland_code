@@ -1294,7 +1294,7 @@ SKILL_RUNP( throwdown )
                 victim->position = POS_RESTING;
                 if (is_flying( victim )) {
                     victim->posFlags.setBit( POS_FLY_DOWN );
-                    victim->println( "Ты перестаешь летать." );
+                    victim->pecho( "Ты перестаешь летать." );
                     victim->recho( "%^C1 перестает летать.", victim ); 
                 }    
             }

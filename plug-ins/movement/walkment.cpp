@@ -267,7 +267,7 @@ void Walkment::visualize( Character *wch )
 {
     if (IS_AFFECTED( wch, AFF_HIDE|AFF_FADE ) && !IS_AFFECTED(wch, AFF_SNEAK)) {
         REMOVE_BIT(wch->affected_by, AFF_HIDE|AFF_FADE);
-        wch->println( "Ты выходишь из тени." );
+        wch->pecho( "Ты выходишь из тени." );
         act( "$c1 выходит из тени.", wch, 0, 0, TO_ROOM );
     }
 

@@ -36,17 +36,17 @@ COMMAND(COrder, "order")
     argOrder = argument;
     
     if (argTarget.empty( ) || argOrder.empty( )) {
-        ch->println( "Приказать кому и что?" );
+        ch->pecho( "Приказать кому и что?" );
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        ch->println( "Ты можешь только принимать приказы, а не отдавать их." );
+        ch->pecho( "Ты можешь только принимать приказы, а не отдавать их." );
         return;
     }
     
     if (arg_is_all(argTarget)) {
-        ch->println( "Ты не можешь отдать приказ всем сразу." );
+        ch->pecho( "Ты не можешь отдать приказ всем сразу." );
         return;
     }
     
@@ -55,12 +55,12 @@ COMMAND(COrder, "order")
     if (!victim) {
         Character *follower = get_char_world(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE);
         if (follower) {
-            ch->println("Твой последователь должен быть рядом с тобой.");
+            ch->pecho("Твой последователь должен быть рядом с тобой.");
             if (ch->getPC()->pet && follower->getNPC() && ch->getPC()->pet == follower->getNPC()) {
                 interpret_raw(ch, "gtell", "где ты?");
             }
         } else {
-            ch->println("Среди твоих последователей такого нет.");
+            ch->pecho("Среди твоих последователей такого нет.");
         }
         return;
     }
@@ -76,7 +76,7 @@ COMMAND(COrder, "order")
         return;
     }
     
-    if (!iargs.pCommand) ch->println("Похоже, такой команды не существует.");
+    if (!iargs.pCommand) ch->pecho("Похоже, такой команды не существует.");
     
     else if(!iargs.pCommand->properOrder( victim )) {
         if (victim->isAffected( gsn_manacles ))
@@ -93,7 +93,7 @@ COMMAND(COrder, "order")
 
 
     ch->setWaitViolence( 1 );
-    ch->println( "Ok.");
+    ch->pecho( "Ok.");
 }
 
 

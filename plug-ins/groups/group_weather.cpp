@@ -88,11 +88,11 @@ VOID_SPELL(ControlWeather)::run( Character *ch, char *target_name, int sn, int l
         
     if (arg_oneof( target_name, "better", "лучше", "к лучшему" )) {
         weather_info.change += dice( level / 3, 4 );
-        ch->println( "Прогноз погоды улучшается." );
+        ch->pecho( "Прогноз погоды улучшается." );
     }
     else if (arg_oneof( target_name, "worse", "хуже", "к худшему" )) {
         weather_info.change -= dice( level / 3, 4 );
-        ch->println( "Прогноз погоды ухудшается." );
+        ch->pecho( "Прогноз погоды ухудшается." );
     }
     else  {
         ch->send_to("Ты хочешь сделать погоду хуже или лучше?\n\r");

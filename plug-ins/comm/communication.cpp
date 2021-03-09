@@ -113,7 +113,7 @@ static void replay_summary( PCharacter *ch )
 
 static void replay_hint( PCharacter *ch )
 {
-    ch->println( "Также смотри {hc{y{lRпрослушать ?{lEreplay help{lx{x." );
+    ch->pecho( "Также смотри {hc{y{lRпрослушать ?{lEreplay help{lx{x." );
 }
 
 static void replay_help( PCharacter *ch )
@@ -141,7 +141,7 @@ CMDRUNP( replay )
     int limit = DEFAULT_REPLAY_SIZE;
 
     if (ch->is_npc( )) {
-        ch->println("Ты не можешь использовать команду replay.");
+        ch->pecho("Ты не можешь использовать команду replay.");
         return;
     }
 
@@ -152,10 +152,10 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (ReplayAttribute::playAndErase( buf, pch )) {
-            pch->println( "Сообщения, полученные за время твоего отсутствия или боя:" );
+            pch->pecho( "Сообщения, полученные за время твоего отсутствия или боя:" );
             pch->send_to( buf );
         } else {
-            pch->println( "Все сообщения, полученные за время отсутствия, уже прочитаны." );
+            pch->pecho( "Все сообщения, полученные за время отсутствия, уже прочитаны." );
         }
 
         replay_hint( pch );
@@ -183,9 +183,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_all( buf, pch, limit )) {
-            pch->println( "За последнее время никто ничего не говорил." );
+            pch->pecho( "За последнее время никто ничего не говорил." );
         } else {
-            pch->println( "Все запомненные сообщения в хронологическом порядке:" );
+            pch->pecho( "Все запомненные сообщения в хронологическом порядке:" );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -198,9 +198,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_private( buf, pch, limit )) {
-            pch->println( "За последнее время тебе никто ничего не говорил." );
+            pch->pecho( "За последнее время тебе никто ничего не говорил." );
         } else {
-            pch->println( "Запомненные личные сообщения:" );
+            pch->pecho( "Запомненные личные сообщения:" );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -213,9 +213,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_public( buf, pch, limit )) {
-            pch->println( "За последнее время никто ничего не говорил в общих каналах." );
+            pch->pecho( "За последнее время никто ничего не говорил в общих каналах." );
         } else {
-            pch->println( "Запомненные сообщения в общих каналах:" );
+            pch->pecho( "Запомненные сообщения в общих каналах:" );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -228,9 +228,9 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (!replay_history_near( buf, pch, limit )) {
-            pch->println( "Рядом с тобой ничего не происходило." );
+            pch->pecho( "Рядом с тобой ничего не происходило." );
         } else {
-            pch->println( "Запомненные сообщения рядом с тобой:" );
+            pch->pecho( "Запомненные сообщения рядом с тобой:" );
             page_to_char( buf.str( ).c_str( ), pch );
         }
 
@@ -240,7 +240,7 @@ CMDRUNP( replay )
 
 
     // Argument not recognized.
-    pch->println( "Неправильный параметр." );
+    pch->pecho( "Неправильный параметр." );
     replay_summary( pch ); 
 }
 

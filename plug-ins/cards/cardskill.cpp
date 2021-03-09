@@ -73,7 +73,7 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         if (mob)
             ch->pecho( "%^C1 не разбирается в картах.", mob );
         else
-            ch->println( "Поищи кого-то, кто разбирается в картах." );
+            ch->pecho( "Поищи кого-то, кто разбирается в картах." );
     }
 
     return false;

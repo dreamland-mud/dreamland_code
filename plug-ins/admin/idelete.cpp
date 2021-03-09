@@ -18,7 +18,7 @@ CMDADM( idelete )
     DLString name = constArguments;
 
     if (name.empty( )) {
-        ch->println( "Удалить чей профайл?" );
+        ch->pecho( "Удалить чей профайл?" );
         return;
     }
 
@@ -64,19 +64,19 @@ CMDADM( idelete )
 
 
     if (!( pci = PCharacterManager::find( name ) )) {
-        ch->println( "Персонаж с таким именем не найден." );
+        ch->pecho( "Персонаж с таким именем не найден." );
         return;
     }
 
     if (pci->isOnline( )) {
-        ch->println( "Персонаж присутствует в мире, удаление невозможно." );
+        ch->pecho( "Персонаж присутствует в мире, удаление невозможно." );
         return;
     }
     
     if (!PCharacterManager::pfDelete( constArguments ))
-        ch->println( "Ошибка при удалении профайла!" );
+        ch->pecho( "Ошибка при удалении профайла!" );
     else
-        ch->println( "Ok." );
+        ch->pecho( "Ok." );
 }
 
 
@@ -88,7 +88,7 @@ CMDADM( ipassword )
     DLString passwd = arguments.getOneArgument( );
 
     if (name.empty( )) {
-        ch->println( "Установить пароль кому?" );
+        ch->pecho( "Установить пароль кому?" );
         return;
     }
 
@@ -113,17 +113,17 @@ CMDADM( ipassword )
     }
 
     if (passwd.empty( )) {
-        ch->println("Использование: ipassword <player name> <new password>.");
+        ch->pecho("Использование: ipassword <player name> <new password>.");
         return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-        ch->println( "Персонаж с таким именем не найден." );
+        ch->pecho( "Персонаж с таким именем не найден." );
         return;
     }
     
     password_set( pci, passwd );
-    ch->println( "Новый пароль установлен и сохранен." );
+    ch->pecho( "Новый пароль установлен и сохранен." );
 }
 
 

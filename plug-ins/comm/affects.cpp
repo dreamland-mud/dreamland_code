@@ -366,12 +366,12 @@ CMDRUNP( affects )
 
     if (buf.str( ).empty( )) {
         if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
-            ch->println( "Ты не находишься под действием каких-либо аффектов." );
+            ch->pecho( "Ты не находишься под действием каких-либо аффектов." );
     } 
     else {
         if (permAff.isSet())
             ch->send_to("\r\n");
-        ch->println( "Ты находишься под действием следующих аффектов:" );
+        ch->pecho( "Ты находишься под действием следующих аффектов:" );
         buf << "{x";
 
         if (!IS_SET(flags, FSHOW_COLOR)) {

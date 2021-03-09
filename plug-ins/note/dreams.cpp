@@ -137,7 +137,7 @@ void XMLAttributeDream::run( PCharacter *ch )
     /*
      * show next dream line
      */
-    ch->println( lines.front( ) );
+    ch->pecho( lines.front( ) );
     lines.pop_front( );
 
     if (lines.empty( ))

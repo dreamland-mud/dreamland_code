@@ -42,7 +42,7 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
         victim = get_player_world(ch, name.c_str(), false);
 
     if (!victim || (victim->is_npc() && victim->in_room != ch->in_room)) {
-        ch->println( "Ты не находишь этого персонажа.");
+        ch->pecho( "Ты не находишь этого персонажа.");
         return NULL;
     }
 
@@ -76,7 +76,7 @@ Character * ReplyChannel::findListener( Character *ch, const DLString &name ) co
     Character *victim = ch->reply;
    
     if (!victim)
-        ch->println( "Ты не находишь этого персонажа." );
+        ch->pecho( "Ты не находишь этого персонажа." );
 
     return victim;
 }
@@ -87,7 +87,7 @@ bool ReplyChannel::parseArguments( Character *ch, const DLString &constArguments
     msg = constArguments;
 
     if (msg.empty( )) {
-        ch->println( msgNoArg );
+        ch->pecho( msgNoArg );
         return false;
     }
 
@@ -109,7 +109,7 @@ Character * PageChannel::findListener( Character *ch, const DLString &name ) con
     victim = get_player_world( ch, name.c_str( ), false );
 
     if (!victim || (victim->is_immortal( ) && !ch->is_immortal( ))) {
-        ch->println( "Информационное агенство не может найти данного абонента." );
+        ch->pecho( "Информационное агенство не может найти данного абонента." );
         return NULL;
     }
 
@@ -123,7 +123,7 @@ void PageChannel::run( Character *ch, const DLString &constArguments )
     arguments = constArguments;
 
     if (!get_pager( ch )) {
-        ch->println( "Тебе определенно нужен хрустальный шар и то, что внутри него." );
+        ch->pecho( "Тебе определенно нужен хрустальный шар и то, что внутри него." );
         return;
     }
 
@@ -250,7 +250,7 @@ bool EmoteChannel::canTalkGlobally( Character *ch ) const
         return false;
 
     if (IS_SET(ch->comm, COMM_NOEMOTE)) {
-        ch->println( "Боги запретили тебе волноваться." );
+        ch->pecho( "Боги запретили тебе волноваться." );
         return false;
     }
 

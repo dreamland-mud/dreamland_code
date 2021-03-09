@@ -26,7 +26,7 @@ bool drink_is_closed( Object *obj, Character *ch )
     else if (IS_SET(obj->value3(), DRINK_CLOSE_KEY))
         ch->pecho( "%1$^O1 запер%1$Gто|т|та|ты.", obj );
     else
-        ch->println( "Тут закрыто." );
+        ch->pecho( "Тут закрыто." );
     
     return true;
 }

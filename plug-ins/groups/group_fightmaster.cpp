@@ -147,7 +147,7 @@ SKILL_RUNP( bashdoor )
 
         if ( IS_SET(exit_info, EX_NOPASS) && !IS_SET(exit_info, EX_BASH_ONLY))
         {
-                ch->println("Эту дверь невозможно вышибить.");
+                ch->pecho("Эту дверь невозможно вышибить.");
                 return;
         }
 
@@ -220,7 +220,7 @@ SKILL_RUNP( bashdoor )
                 damage(ch,ch,damage_bash,gsn_bash_door, DAM_BASH, true, DAMF_WEAPON);
                 if(IS_CHARMED(ch) && ch->master->getPC()){
                 DLString petName = Syntax::noun(ch->getNameP('1'));
-                ch->master->println(fmt(0,"%1$^C1 упа%1$Gло|л|ла и не может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x, если хочешь продолжить выбивать %1$Gим|им|ей двери.",ch, petName.c_str()));
+                ch->master->pecho(fmt(0,"%1$^C1 упа%1$Gло|л|ла и не может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x, если хочешь продолжить выбивать %1$Gим|им|ей двери.",ch, petName.c_str()));
                 }
         }
 
@@ -361,7 +361,7 @@ SKILL_RUNP( bash )
         {
                 ch->send_to("Тебе нужен щит чтобы сделать это!\n\r");
                 if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
-                ch->master->println("Для этого умения твоему последователю потребуется надеть щит.");
+                ch->master->pecho("Для этого умения твоему последователю потребуется надеть щит.");
                 return;
         }
         

@@ -60,7 +60,7 @@ CMDRUNP( wear )
     argument = one_argument( argument, argVict );
 
     if (!argObj[0]) {
-        ch->println("Надеть, вооружиться или взять это в руки?");
+        ch->pecho("Надеть, вооружиться или взять это в руки?");
         return;
     }
     
@@ -72,7 +72,7 @@ CMDRUNP( wear )
             fTail = true;
         }
         else if (( victim = get_char_room( ch, argVict  ) ) == 0) {
-            ch->println("На кого ты хочешь это надеть?");
+            ch->pecho("На кого ты хочешь это надеть?");
             return;
         } else if (victim != ch && !victim->is_npc( )) {
             act("$C1 в состоянии одеться са$Gмо|м|ма!", ch, 0, victim, TO_CHAR);
@@ -86,7 +86,7 @@ CMDRUNP( wear )
         Object *obj_next;
         
         if (victim != ch) {
-            ch->println("Ты не можешь сделать этого.");
+            ch->pecho("Ты не можешь сделать этого.");
             return;
         }
         
@@ -101,7 +101,7 @@ CMDRUNP( wear )
     }
     
     if (( obj = get_obj_carry( ch, argObj ) ) == 0) {
-        ch->println("У тебя нет этого.");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -127,7 +127,7 @@ CMDRUNP( wear )
 
     if (ch == victim) {
         if (wear_obj( ch, obj, F_WEAR_VERBOSE | F_WEAR_REPLACE) == RC_WEAR_NOMATCH)
-            ch->println("Ты не можешь надеть, вооружиться или держать это в руках.");
+            ch->pecho("Ты не можешь надеть, вооружиться или держать это в руках.");
         return;
     }
     
@@ -176,13 +176,13 @@ CMDRUNP( remove )
     argument = one_argument( argument, argVict );
 
     if (!argObj[0]) {
-        ch->println("Снять что?");
+        ch->pecho("Снять что?");
         return;
     }
 
     if (arg_is_from( argFrom )) {
         if (( victim = get_char_room( ch, argVict ) ) == 0) {
-            ch->println("С кого ты хочешь это снять?");
+            ch->pecho("С кого ты хочешь это снять?");
             return;
         }
         
@@ -198,7 +198,7 @@ CMDRUNP( remove )
         Object *obj_next;
 
         if (victim != ch) {
-            ch->println("Ты не можешь сделать этого.");
+            ch->pecho("Ты не можешь сделать этого.");
             return;
         }
 
@@ -214,7 +214,7 @@ CMDRUNP( remove )
     
     if (ch == victim) {
         if (( obj = get_obj_wear( ch, argObj ) ) == 0) {
-            ch->println("У тебя нет этого.");
+            ch->pecho("У тебя нет этого.");
             return;
         }
 

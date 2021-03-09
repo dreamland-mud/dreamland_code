@@ -56,7 +56,7 @@ bool ClanPetShopStorage::canServeClient( Character *client )
     if (clanArea->findInvitation( client->getPC( ) )) 
         return true;        
     
-    client->println( "Тебя здесь обслуживать не будут." );
+    client->pecho( "Тебя здесь обслуживать не будут." );
     return false;
 }
 

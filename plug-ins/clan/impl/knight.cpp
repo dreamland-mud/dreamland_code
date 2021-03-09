@@ -467,7 +467,7 @@ VOID_SPELL(HolyArmor)::run(Character *ch, Character *, int sn, int level)
 
     if (ch->isAffected(sn))
     {
-        ch->println("Священные силы уже защищают тебя от повреждений.");
+        ch->pecho("Священные силы уже защищают тебя от повреждений.");
         return;
     }
 
@@ -512,13 +512,13 @@ COMMAND(COrden, "orden")
 
     if (pch->getClan() != clan_knight)
     {
-        pch->println("Ты не принадлежишь к клану Рыцарей.");
+        pch->pecho("Ты не принадлежишь к клану Рыцарей.");
         return;
     }
 
     if (!(orgs = clan_knight->getOrgs()))
     {
-        pch->println("Ордена сейчас недоступны.");
+        pch->pecho("Ордена сейчас недоступны.");
         return;
     }
 

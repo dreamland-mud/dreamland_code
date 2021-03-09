@@ -150,7 +150,6 @@ public:
     void send_to( const DLString& );
     void send_to( ostringstream& );
     void printf( const char *format, ... );
-    void println( const DLString & );
     void vpecho( const char *, va_list );
     void pecho( const char *, ... );
     void pecho( int pos, const char *, ... );

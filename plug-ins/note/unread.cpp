@@ -55,7 +55,7 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
         ch->send_to( buf );
     }
     else if (fVerbose)
-        ch->println("У тебя нет непрочитанных сообщений.");
+        ch->pecho("У тебя нет непрочитанных сообщений.");
 }
 
 
@@ -100,7 +100,7 @@ void Unread::doNext( PCharacter *ch )
     }
 
     if (!oldest) 
-        ch->println("У тебя нет непрочитанных сообщений.");
+        ch->pecho("У тебя нет непрочитанных сообщений.");
     else {
         ch->printf( "{W%s{x:\r\n", oldest->getName( ).c_str( ) );
         oldest->showNoteToChar( ch, onote );

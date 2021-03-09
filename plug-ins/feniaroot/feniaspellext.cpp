@@ -58,7 +58,7 @@ static RegisterList message_args(FeniaSpellContext *thiz, const RegisterList &ar
 NMI_INVOKE(FeniaSpellContext, msgChar, "(fmt[,args]): выдать сообщение кастеру; кастер 1й аргумент, цель 2й аргумент")
 {
     Character *caster = arg2character(ch);
-    caster->println(regfmt(caster, message_args(this, args)));
+    caster->pecho(regfmt(caster, message_args(this, args)));
     return Register();
 }
 
@@ -68,7 +68,7 @@ NMI_INVOKE(FeniaSpellContext, msgVict, "(fmt[,args]): выдать сообще�
         return Register();
 
     Character *victim = arg2character(vict);
-    victim->println(regfmt(victim, message_args(this, args)));
+    victim->pecho(regfmt(victim, message_args(this, args)));
     return Register();
 }
 

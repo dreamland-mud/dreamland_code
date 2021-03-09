@@ -45,12 +45,12 @@ bool BandaMobile::death(Character *killer)
 
     if (ourHeroGroup(killer)) {
         killer->pecho("{YТы помог%1$Gло||ла согрупнику уничтожить очередную жертву, браво.{x", killer);
-        pcm->getPlayer()->println("{YТвой согрупник помог тебе уничтожить очередную жертву.{x");
+        pcm->getPlayer()->pecho("{YТвой согрупник помог тебе уничтожить очередную жертву.{x");
         quest->mobKilled(pcm, killer);
         return false;
     }
 
-    pcm->getPlayer()->println("{YС кем-то из них что-то случилось без твоего участия.{x");
+    pcm->getPlayer()->pecho("{YС кем-то из них что-то случилось без твоего участия.{x");
     quest->mobDestroyed(pcm);
     return false;
 }

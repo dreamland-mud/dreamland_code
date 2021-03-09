@@ -54,7 +54,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     pegtl::mud::MyArgs myargs = { -1, -1, -1, -1, "" };
 
     if (!parse_input<pegtl::mud::grammar, pegtl::mud::MyArgs>(ch, argument, myargs)) {
-        ch->println("Формат: {Worandom{x <weapon class> {Wl{x<level> {Wt{x<tier> {Wa{x<align> [{W-{xtable|{W-{xaffix]");
+        ch->pecho("Формат: {Worandom{x <weapon class> {Wl{x<level> {Wt{x<tier> {Wa{x<align> [{W-{xtable|{W-{xaffix]");
         return;
     }
 
@@ -223,7 +223,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
         "Tests for the random weapon generator.")
 {
     
-    ch->println("Running a set of weapon generator tests:");
+    ch->pecho("Running a set of weapon generator tests:");
 
     {
         show_title(ch, "Players get skill group bonus from learned skills");
@@ -362,7 +362,7 @@ CMD(trandom, 50, "трандом", POS_DEAD, 103, LOG_ALWAYS,
         extract_obj(obj);
     }
 
-    ch->println("\r\nRunning a set of affix generator tests:");
+    ch->pecho("\r\nRunning a set of affix generator tests:");
 
     {
         show_title(ch, "Holy affix not selected for align < 350");

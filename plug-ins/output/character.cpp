@@ -19,16 +19,6 @@
 /****************************************************************************
  * text output 
  ****************************************************************************/
-void Character::println( const DLString &txt )
-{
-    if (!txt.empty( )) {
-        ostringstream buf;
-        
-        buf << txt << endl;
-        send_to( buf );
-    }
-}
-
 void Character::send_to( const DLString& txt )
 {
     send_to( txt.c_str( ) );

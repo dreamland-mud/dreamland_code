@@ -68,7 +68,7 @@ SKILL_RUNP( searchstones )
     int chance, count, mlevel;
     
     if (!gsn_search_stones->usable( ch )) {
-        ch->println("Ты не умеешь это делать.");
+        ch->pecho("Ты не умеешь это делать.");
         return;
     }
     
@@ -83,12 +83,12 @@ SKILL_RUNP( searchstones )
     }
 
     if (chance == 0) {
-        ch->println("В этой местности бесполезно искать камни.");
+        ch->pecho("В этой местности бесполезно искать камни.");
         return;
     }
     
     if (number_percent( ) > gsn_search_stones->getEffective( ch ) * chance / 100) {
-        ch->println("Тебе не удалось отыскать ни одного камня.");
+        ch->pecho("Тебе не удалось отыскать ни одного камня.");
 
         if (number_percent( ) < chance)
             gsn_search_stones->improve( ch, false );
@@ -97,7 +97,7 @@ SKILL_RUNP( searchstones )
     }
 
     if (ch->mana < gsn_search_stones->getMana( )) {
-        ch->println( "У тебя не хватает энергии для поиска." );
+        ch->pecho( "У тебя не хватает энергии для поиска." );
         return;
     }
 
@@ -154,12 +154,12 @@ SKILL_RUNP( throwstone )
     ostringstream errbuf;
 
     if (chance <= 1) {
-        ch->println("Ты не умеешь швыряться камнями.");
+        ch->pecho("Ты не умеешь швыряться камнями.");
         return;
     }
     
     if (!direction_range_argument(argument, argDoor, argVict, direction)) {
-        ch->println("Швырнуть камень куда и в кого?");
+        ch->pecho("Швырнуть камень куда и в кого?");
         return;
     }
 
@@ -169,7 +169,7 @@ SKILL_RUNP( throwstone )
     }
 
     if (victim == ch) {
-        ch->println("Просто ударь себя этим камнем по лбу.");
+        ch->pecho("Просто ударь себя этим камнем по лбу.");
         return;
     }
 
@@ -179,13 +179,13 @@ SKILL_RUNP( throwstone )
     }
 
     if (ch->in_room == victim->in_room) {
-        ch->println("Ты не можешь швыряться камнями в упор.");
+        ch->pecho("Ты не можешь швыряться камнями в упор.");
         return;
     }
 
     stone = find_stone(ch);
     if (!stone) {
-        ch->println("У тебя в инвентаре нет ни одного камня.");
+        ch->pecho("У тебя в инвентаре нет ни одного камня.");
         return;
     }
 

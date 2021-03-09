@@ -85,8 +85,8 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     
     if (arg.empty( )) {
         say_act( client, ch, "Я отремонтирую тебе что-нибудь за деньги.");
-        client->println("Напиши {y{lrчинить{lerepair{x <название предмета>, чтоб восстановить его.");
-        client->println("Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
+        client->pecho("Напиши {y{lrчинить{lerepair{x <название предмета>, чтоб восстановить его.");
+        client->pecho("Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
         return;
     }
 
@@ -128,7 +128,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     if (cost) 
         client->pecho( "Твой кошелек стал легче на %1$d золот%1$Iую|ые|ых моне%1$Iту|ты|т.", cost );
     else
-        client->println( "В честь Дня Защиты Животных починка обошлась тебе бесплатно." );
+        client->pecho( "В честь Дня Защиты Животных починка обошлась тебе бесплатно." );
 
     obj->condition = 100;
     mprog_repair(ch, client, obj, cost);
@@ -216,7 +216,7 @@ CMDRUN( repair )
     Repairman::Pointer man;
     
     if (!( man = find_attracted_mob_behavior<Repairman>( ch, OCC_REPAIRMAN ) )) {
-        ch->println( "Здесь нет ремонтника.");
+        ch->pecho( "Здесь нет ремонтника.");
         return;
     }
 
@@ -232,7 +232,7 @@ CMDRUN( estimate )
     Repairman::Pointer man;
     
     if (!( man = find_attracted_mob_behavior<Repairman>( ch, OCC_REPAIRMAN ) )) {
-        ch->println( "Здесь нет ремонтника.");
+        ch->pecho( "Здесь нет ремонтника.");
         return;
     }
 

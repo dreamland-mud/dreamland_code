@@ -114,7 +114,7 @@ bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         if (mob)
             ch->pecho( "%^C1 отнюдь не полиглот.", mob );
         else
-            ch->println( "Поищи бродячего монаха." );
+            ch->pecho( "Поищи бродячего монаха." );
     }
 
     return false;

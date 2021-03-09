@@ -137,12 +137,12 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     int vnum;
 
     if (RoomUtils::isWater(ch->in_room)) {
-        ch->println("Вокруг тебя и так полно жидкости.");
+        ch->pecho("Вокруг тебя и так полно жидкости.");
         return;
     }
 
     if (ch->in_room->getSectorType() == SECT_AIR) {
-        ch->println("Создать родник в воздухе не получится.");
+        ch->pecho("Создать родник в воздухе не получится.");
         return;
     }
 
@@ -151,7 +151,7 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     else if (ch->getProfession( )->getFlags( ch ).isSet(PROF_NATURE)) {
          if (!RoomUtils::isNature(ch->in_room))
         {
-            ch->println("Ты не сможешь создать родник в этой местности.");
+            ch->pecho("Ты не сможешь создать родник в этой местности.");
             return;
         }
         

@@ -281,7 +281,7 @@ SKILL_RUNP( settraps )
                 return;
         }
         else {
-                ch->println( "Твоя попытка устроить ловушку провалилась." );
+                ch->pecho( "Твоя попытка устроить ловушку провалилась." );
                 gsn_settraps->improve( ch, false );
         }
 
@@ -689,12 +689,12 @@ SKILL_RUNP( pick )
     Keyhole::Pointer keyhole;
 
     if (!gsn_pick_lock->usable( ch )) {
-        ch->println( "Ты пытаешься засунуть отмычку в скважину, но промахиваешься!" );
+        ch->pecho( "Ты пытаешься засунуть отмычку в скважину, но промахиваешься!" );
         return;
     }
 
     if (MOUNTED(ch)) {
-        ch->println( "Ты не можешь взломать что-либо, пока ты в седле." );
+        ch->pecho( "Ты не можешь взломать что-либо, пока ты в седле." );
         return;
     }
 
@@ -702,17 +702,17 @@ SKILL_RUNP( pick )
     arg2 = args.getOneArgument( );
 
     if (arg1.empty( )) {
-        ch->println( "Взломать что?" );
+        ch->pecho( "Взломать что?" );
         return;
     }
 
     if (arg2.empty( )) {
-        ch->println( "Взломать чем?" );
+        ch->pecho( "Взломать чем?" );
         return;
     }
 
     if (!( keyhole = Keyhole::create( ch, arg1 ) )) {
-        ch->println( "Ты не видишь здесь такого замка." );
+        ch->pecho( "Ты не видишь здесь такого замка." );
         return;
     }
 
@@ -1406,12 +1406,12 @@ SKILL_RUNP( forge )
     Object *key, *blank;
 
     if (!gsn_key_forgery->usable( ch )) {
-        ch->println( "Эти трюки не для тебя." );
+        ch->pecho( "Эти трюки не для тебя." );
         return;
     }
 
     if (( arg = args.getOneArgument( ) ).empty( )) {
-        ch->println( "Подделать что?" );
+        ch->pecho( "Подделать что?" );
         return;
     }
 
@@ -1421,12 +1421,12 @@ SKILL_RUNP( forge )
         ;
 
     if (!blank) {
-        ch->println( "Тебе понадобится заготовка, чтобы создать дубликат или отмычку." );
+        ch->pecho( "Тебе понадобится заготовка, чтобы создать дубликат или отмычку." );
         return;
     }
 
     if (ch->mana < gsn_key_forgery->getMana( )) {
-        ch->println( "У тебя не хватает сил для такой тонкой работы." );
+        ch->pecho( "У тебя не хватает сил для такой тонкой работы." );
         return;
     }
 
@@ -1440,17 +1440,17 @@ SKILL_RUNP( forge )
         static const char * DUP_LONG  = "Дубликат %s лежит тут.";
 
         if (!( keyhole = Keyhole::locate( ch, key ) )) {
-            ch->println( "Непонятно, что же открывает этот ключ." );
+            ch->pecho( "Непонятно, что же открывает этот ключ." );
             return;
         }
 
         if (!keyhole->isLockable( )) {
-            ch->println( "Это ключ от сломанного замка." );
+            ch->pecho( "Это ключ от сломанного замка." );
             return;
         }
 
         if (keyhole->isPickProof( )) {
-            ch->println( "Это ключ от замка, который невозможно взломать. Увы.." );
+            ch->pecho( "Это ключ от замка, который невозможно взломать. Увы.." );
             return;
         }
 
@@ -1498,12 +1498,12 @@ SKILL_RUNP( forge )
         static const char * LOCK_EXTRA = "Эта отмычка из 'Фирменного набора %1$#^C2' подходит для замка\n";
 
         if (!keyhole->isLockable( )) {
-            ch->println( "Здесь нет замочной скважины." );
+            ch->pecho( "Здесь нет замочной скважины." );
             return;
         }
 
         if (keyhole->isPickProof( )) {
-            ch->println( "Этот замок защищен от взлома." );
+            ch->pecho( "Этот замок защищен от взлома." );
             return;
         }
 
@@ -1537,6 +1537,6 @@ SKILL_RUNP( forge )
         return;
     }
 
-    ch->println( "У тебя нет такого ключа, и здесь нет такой замочной скважины." );
+    ch->pecho( "У тебя нет такого ключа, и здесь нет такой замочной скважины." );
 }
 

@@ -54,7 +54,7 @@ VOID_SPELL(MentalBlock)::run( Character *ch, Character *victim, int sn, int leve
     Affect af;
 
     if (victim->isAffected( sn )) {
-        victim->println( "Ты и так блокируешь все попытки ментального контакта." );
+        victim->pecho( "Ты и так блокируешь все попытки ментального контакта." );
         
         if (ch != victim)
             act( "$C1 и так блокирует все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
@@ -67,7 +67,7 @@ VOID_SPELL(MentalBlock)::run( Character *ch, Character *victim, int sn, int leve
     af.duration = level / 2;
     affect_to_char( victim, &af ); 
     
-    victim->println( "Теперь ты будешь блокировать все попытки ментального контакта с тобой." );
+    victim->pecho( "Теперь ты будешь блокировать все попытки ментального контакта с тобой." );
 
     if (ch != victim)
         act( "$C1 будет блокировать все попытки ментального контакта.", ch, 0, victim, TO_CHAR );
@@ -118,7 +118,7 @@ AFFECT_DECL(Fly);
 VOID_AFFECT(Fly)::remove( Character *victim ) 
 {
     if (victim->posFlags.isSet( POS_FLY_DOWN )) 
-        victim->println("Ты теряешь способность к полетам.");
+        victim->pecho("Ты теряешь способность к полетам.");
     else
         DefaultAffectHandler::remove( victim );                                     
 
@@ -299,7 +299,7 @@ SPELL_DECL_T(SolarFlight, GateSpell);
 VOID_SPELL(SolarFlight)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     if (weather_info.sunlight != SUN_LIGHT) {
-        ch->println( "Для этого тебе нужен солнечный свет." );
+        ch->pecho( "Для этого тебе нужен солнечный свет." );
         return;
     }
                 
@@ -331,14 +331,14 @@ VOID_SPELL(GaseousForm)::run( Character *ch, Character *, int sn, int level )
     bool bFighting = ch->fighting != 0;
 
     if (ch->isAffected(sn)) {
-        ch->println("Это заклинание использовалось совсем недавно.");
+        ch->pecho("Это заклинание использовалось совсем недавно.");
         return;
     }
     
     if(bFighting){
 
         if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL)) {
-            ch->println("Твоя попытка закончилась неудачей.");
+            ch->pecho("Твоя попытка закончилась неудачей.");
             return;
         }
 

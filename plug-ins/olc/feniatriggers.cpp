@@ -222,7 +222,7 @@ static Register get_wrapper_for_index_data(int vnum, const DLString &type)
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const
 {
     if (!is_websock(ch)) {
-        ch->println("Эта крутая фишка доступна только в веб-клиенте.");
+        ch->pecho("Эта крутая фишка доступна только в веб-клиенте.");
         return false;
     }
 
@@ -232,7 +232,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
         
     WrapperBase *base = get_wrapper(w.toObject());
     if (!base) {
-        ch->println("Не могу найти wrapper base, всё плохо.");
+        ch->pecho("Не могу найти wrapper base, всё плохо.");
         return false;
     }
 
@@ -245,12 +245,12 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
     if (retval.type == Register::NONE) {
         DLString trigType = triggerType(methodName);
         if (trigType == methodName) {
-            ch->println("Название триггера должно начинаться с 'on' или 'post'.");
+            ch->pecho("Название триггера должно начинаться с 'on' или 'post'.");
             return false;
         }
 
         if (!stringIsCapitalized(trigType)) {
-            ch->println("Название триггера должно выглядеть так: onFight, postSpeech, onWear и т.п.");
+            ch->pecho("Название триггера должно выглядеть так: onFight, postSpeech, onWear и т.п.");
             return false;
         }
 
@@ -285,7 +285,7 @@ bool FeniaTriggerLoader::findExample(Character *ch, const DLString &methodName, 
 {
     IndexTriggers::const_iterator i = indexTriggers.find(indexType);
     if (i == indexTriggers.end()) {
-        ch->println("Нет ни одного триггера, попросите богов принять меры.");
+        ch->pecho("Нет ни одного триггера, попросите богов принять меры.");
         return false;
     }
 
@@ -304,7 +304,7 @@ bool FeniaTriggerLoader::editExisting(Character *ch, Register &retval) const
 {
     // Fenia field is not a function.
     if (retval.type != Register::FUNCTION) {
-        ch->println("Это поле уже задано, но это не функция. Попробуйте что-то еще.");
+        ch->pecho("Это поле уже задано, но это не функция. Попробуйте что-то еще.");
         return false;
     }
 
@@ -325,7 +325,7 @@ bool FeniaTriggerLoader::editExisting(Character *ch, Register &retval) const
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const
 {
     if (!is_websock(ch)) {
-        ch->println("Эта крутая фишка доступна только в веб-клиенте.");
+        ch->pecho("Эта крутая фишка доступна только в веб-клиенте.");
         return false;
     }
 
@@ -371,7 +371,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const D
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const
 {
     if (!is_websock(ch)) {
-        ch->println("Эта крутая фишка доступна только в веб-клиенте.");
+        ch->pecho("Эта крутая фишка доступна только в веб-клиенте.");
         return false;
     }
 

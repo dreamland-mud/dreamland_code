@@ -85,7 +85,7 @@ bool ExitsMovement::findTargetRoom( )
         return false;
 
     if (!pexit && !peexit) {
-        ch->println( "Извини, но ты не можешь туда идти." );
+        ch->pecho( "Извини, но ты не можешь туда идти." );
         return false;
     }
     
@@ -106,7 +106,7 @@ bool ExitsMovement::findTargetRoom( )
     }
 
     if (!to_room) { /* sanity check, will be re-checked in checkVisibility */
-        ch->println( "Жаль, но ты не можешь туда идти." );
+        ch->pecho( "Жаль, но ты не можешь туда идти." );
         return false;
     }
 

@@ -150,7 +150,7 @@ void CGQuest::doInfo( PCharacter *ch )
         found = true;
     
     if (!found)
-        ch->println("Сейчас нет ни одного глобального задания.");
+        ch->pecho("Сейчас нет ни одного глобального задания.");
 }
 
 void CGQuest::doProgress( PCharacter *ch ) 
@@ -205,7 +205,7 @@ void CGQuest::doNoExp( PCharacter *ch, DLString& arguments )
         } else if (arg_is_no( arguments )) {
             attribute->setNoExp( false );
         } else {
-            ch->println("Используй '{lEgquest noexp yes{lRгквест безопыта да{lx' или '{lEgquest noexp no{lRгквест безопыта нет{lx'.");
+            ch->pecho("Используй '{lEgquest noexp yes{lRгквест безопыта да{lx' или '{lEgquest noexp no{lRгквест безопыта нет{lx'.");
             return;
         }
 
@@ -394,7 +394,7 @@ void CGQuest::doStop( PCharacter *ch, DLString& arguments )
         ch->send_to( e.what( ) );
         return;
     }
-    ch->println( "Глобальный квест остановлен." );
+    ch->pecho( "Глобальный квест остановлен." );
 }
 
 void CGQuest::doTime( PCharacter *ch, DLString& arguments ) 
@@ -487,7 +487,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
         else if (arg_is_no( on ) || arg_is_switch_off( on ))
             autostart = false;
         else {
-            ch->println( "Неправильный параметр: пишите {lRвкл{lEon{lx или {lRвыкл{lEoff{lx, {lRда{lEyes{lx или {lRнет{lEno{lx." );
+            ch->pecho( "Неправильный параметр: пишите {lRвкл{lEon{lx или {lRвыкл{lEoff{lx, {lRда{lEyes{lx или {lRнет{lEno{lx." );
             return;
         }
 

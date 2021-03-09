@@ -125,7 +125,7 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
     affect_to_char( victim, &af );
     act_p( "Кожа $c2 покрывается корой.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-    victim->println("Прочная защитная кора покрывает твою кожу.");
+    victim->pecho("Прочная защитная кора покрывает твою кожу.");
 }
 
 enum {
@@ -183,7 +183,7 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
     case CANCEL_ALWAYS:
             break;
     case CANCEL_NEVER:
-            ch->println("Отмена здесь бессильна, используй вместо этого снятие чар.");
+            ch->pecho("Отмена здесь бессильна, используй вместо этого снятие чар.");
             return;
     case CANCEL_DISPEL:
             if (!is_safe_spell( ch, victim, false ))        
@@ -649,7 +649,7 @@ VOID_SPELL(Resilience)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
 
     if (!ch->isAffected(sn)) {
-      ch->println("Ты приобретаешь устойчивость к энергетическим атакам.");
+      ch->pecho("Ты приобретаешь устойчивость к энергетическим атакам.");
 
       af.bitvector.setTable(&res_flags);
       af.type = sn;
@@ -661,7 +661,7 @@ VOID_SPELL(Resilience)::run( Character *ch, Character *victim, int sn, int level
       affect_to_char(ch, &af);
     }
   else
-      ch->println("У тебя уже есть устойчивость к энергетическим атакам.");
+      ch->pecho("У тебя уже есть устойчивость к энергетическим атакам.");
 
 }
 

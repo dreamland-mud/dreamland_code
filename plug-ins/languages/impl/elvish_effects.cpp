@@ -86,7 +86,7 @@ bool RestoringWE::run( PCharacter *ch, Character *victim ) const
     if (ch != victim)
         act( "{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
 
-    victim->println( "{CТаинственное мелодичное слово пронизывает тебя теплом.{x" );
+    victim->pecho( "{CТаинственное мелодичное слово пронизывает тебя теплом.{x" );
     return true;
 }
 

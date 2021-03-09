@@ -157,7 +157,7 @@ CMDRUN( group )
     }
 
     if (victim == ch) {
-        ch->println( "А смысл?" );
+        ch->pecho( "А смысл?" );
         return;
     }
 
@@ -261,18 +261,18 @@ CMDRUN( nuke )
     DLString arg = argument.getOneArgument( );
 
     if (arg.empty( )) {
-        ch->println( "Чье следование за тобой ты хочешь прекратить?" );
+        ch->pecho( "Чье следование за тобой ты хочешь прекратить?" );
         return;
     }
     
     victim = get_char_world(ch, arg, FFIND_FOLLOWER | FFIND_INVISIBLE);
     if (!victim) {
-        ch->println( "Среди твоих последователей нет никого с таким именем." );
+        ch->pecho( "Среди твоих последователей нет никого с таким именем." );
         return;
     }
 
     if (ch == victim) {
-        ch->println( "От себя не убежишь." );
+        ch->pecho( "От себя не убежишь." );
         return;
     }
     

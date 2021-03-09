@@ -86,7 +86,7 @@ void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
 void SteakCustomer::deadAction( Quest::Pointer quest, PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-        pcm->getPlayer( )->println( "{YЗаказ отменен в связи с кончиной заказчика.{x" );
+        pcm->getPlayer( )->pecho( "{YЗаказ отменен в связи с кончиной заказчика.{x" );
 
     ProtectedClient::deadAction( quest, pcm, killer );
 }

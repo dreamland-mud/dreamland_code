@@ -223,7 +223,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
     }
 
     if (victim == pch) {
-        pch->println("Так сильно по себе скучаешь?");
+        pch->pecho("Так сильно по себе скучаешь?");
         return true;
     }
 
@@ -300,7 +300,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     }
 
     if (pch == victim) {
-        pch->println("Ты хватаешь себя за руку.");
+        pch->pecho("Ты хватаешь себя за руку.");
         return true;
     }
 

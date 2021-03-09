@@ -343,7 +343,7 @@ CMDRUNP( auction )
                                     purposes[loc->getPurpose( )] = true;
                             }
                             for (p = purposes.begin( ); p != purposes.end( ); p++)
-                                ch->println( p->first.c_str( ) );
+                                ch->pecho( p->first.c_str( ) );
                         }
 
                         if  (obj->item_type == ITEM_WEAPON) {
@@ -507,7 +507,7 @@ CMDRUNP( auction )
 
         if (auction->item == 0) {
                 if (ch->desc && banManager->check( ch->desc, BAN_COMMUNICATE )) {
-                    ch->println( "Ты не можешь ничего выставлять на аукцион." );
+                    ch->pecho( "Ты не можешь ничего выставлять на аукцион." );
                     return;
                 }
 

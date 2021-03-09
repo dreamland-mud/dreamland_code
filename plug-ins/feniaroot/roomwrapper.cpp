@@ -487,7 +487,7 @@ NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg д�
     
     for (wch = char_list; wch; wch = wch->next) 
         if (wch->in_room->area == target->area) 
-            wch->println(msg);
+            wch->pecho(msg);
 
     return Register( );
 }

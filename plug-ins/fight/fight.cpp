@@ -153,13 +153,13 @@ void violence_update( )
         if ( ( victim = ch->fighting ) == 0 || ch->in_room == 0 ){
             if ( IS_AFFECTED(ch,AFF_STUN) && !ch->isAffected(gsn_power_word_stun))
             {
-                ch->println("Оглушение постепенно проходит.");
+                ch->pecho("Оглушение постепенно проходит.");
                 REMOVE_BIT(ch->affected_by,AFF_STUN);        
                 SET_BIT(ch->affected_by,AFF_WEAK_STUN);        
             }
             else if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
             {
-                ch->println("Гул в твоей голове затихает.");
+                ch->pecho("Гул в твоей голове затихает.");
                 REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
             }
             continue;

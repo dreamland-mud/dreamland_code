@@ -425,7 +425,7 @@ public:
         // This choice is not from the latest menu.
         DLString menuAction = get_map_attribute_value(ch->getPC(), "menu", choice.toString());
         if (menuAction.empty()) {
-            ch->println("Такого выбора не было в меню.");            
+            ch->pecho("Такого выбора не было в меню.");            
             return false;
         }
 

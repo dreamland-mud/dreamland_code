@@ -54,7 +54,7 @@ SKILL_RUNP( layhands )
 
     if ( ch->is_npc() || !gsn_lay_hands->usable( ch ) )
     {
-        ch->println("Тебе недостает мастерства лечить других наложением рук.");
+        ch->pecho("Тебе недостает мастерства лечить других наложением рук.");
         return;
     }
 
@@ -231,7 +231,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         
         // 10% chance to just get the affect
         if (roll < sk / 5 ) {
-            ch->println("Твоя молитва не увенчалась успехом.");
+            ch->pecho("Твоя молитва не увенчалась успехом.");
             return;
         }
 

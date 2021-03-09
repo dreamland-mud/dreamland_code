@@ -258,7 +258,7 @@ VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level )
     }
 
     if (IS_SET(room->room_flags, ROOM_NO_RECALL)) {
-        ch->println("Отсюда ты никого не сможешь вышвырнуть.");
+        ch->pecho("Отсюда ты никого не сможешь вышвырнуть.");
         return;
     }
 
@@ -309,7 +309,7 @@ VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level )
     postaffect_to_char( ch, sn, 15 );
     
     if (cnt == 0)
-        ch->println("Подходящей жертвы не нашлось.");
+        ch->pecho("Подходящей жертвы не нашлось.");
 }
 
 

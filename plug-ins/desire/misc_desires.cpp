@@ -93,7 +93,7 @@ bool DrunkDesire::isActive( PCharacter *ch )
 bool DrunkDesire::canDrink( PCharacter *ch )
 {
     if (isActive( ch )) {
-        ch->println( "Ты проносишь мимо рта.. *ИК*" );
+        ch->pecho( "Ты проносишь мимо рта.. *ИК*" );
         return false;
     }
 
@@ -116,7 +116,7 @@ bool FullDesire::applicable( PCharacter *ch )
 bool FullDesire::canDrink( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-        ch->println( "Ты больше не можешь выпить ни капли." );
+        ch->pecho( "Ты больше не можешь выпить ни капли." );
         return false;
     }
 
@@ -126,7 +126,7 @@ bool FullDesire::canDrink( PCharacter *ch )
 bool FullDesire::canEat( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-        ch->println( "Ты больше не можешь съесть ни кусочка." );
+        ch->pecho( "Ты больше не можешь съесть ни кусочка." );
         return false;
     }
 

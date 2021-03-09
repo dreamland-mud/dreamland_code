@@ -59,7 +59,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
 
     if (!obj) {
         if (ch != victim) {
-            victim->println( "Ты чувствуешь легкое покалывание ладони." );
+            victim->pecho( "Ты чувствуешь легкое покалывание ладони." );
             act( "Слово не достигло цели - $C1 ничем не вооруж$Gено|ен|ена.", ch, 0, victim, TO_CHAR );
         }
         else {

@@ -41,12 +41,12 @@ bool PetShopStorage::canServeClient( Character *client )
 
 void PetShopStorage::msgListEmpty( Character *client )
 {
-    client->println( "Извини, все животные давно разбежались." );
+    client->pecho( "Извини, все животные давно разбежались." );
 }
 
 void PetShopStorage::msgListBefore( Character *client )
 {
-    client->println( "Существа на продажу:" );
+    client->pecho( "Существа на продажу:" );
 }
 
 void PetShopStorage::msgListAfter( Character *client )
@@ -99,12 +99,12 @@ void PetShopStorage::toStream( Character *client, ostringstream &buf )
 
 void PetShopStorage::msgArticleNotFound( Character *client )
 {
-    client->println( "Извини, ты не можешь купить этого здесь." );
+    client->pecho( "Извини, ты не можешь купить этого здесь." );
 }
 
 void PetShopStorage::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    client->println( "Ты можешь купить только одного питомца." );
+    client->pecho( "Ты можешь купить только одного питомца." );
 }
 
 Article::Pointer PetShopStorage::findArticle( Character *client, DLString &arguments )

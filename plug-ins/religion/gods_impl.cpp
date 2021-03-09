@@ -78,7 +78,7 @@ void ErevanGod::tattooFight( Object *obj, Character *ch ) const
 
     if (!IS_AFFECTED(ch, AFF_HASTE) && chance(50)) {
         spell(gsn_haste, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
-        ch->println("{WТы внезапно ощущаешь повышенную активность!{x");
+        ch->pecho("{WТы внезапно ощущаешь повышенную активность!{x");
         return;
     }
 

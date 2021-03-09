@@ -33,7 +33,7 @@ CMDRUN( mount )
         ostringstream buf;
         
         if (ch->is_npc( ) || IS_CHARMED(ch)) {
-            ch->println( "Да ты и так на коне." );
+            ch->pecho( "Да ты и так на коне." );
             return;
         }
         
@@ -42,12 +42,12 @@ CMDRUN( mount )
         if (trust->parse( constArguments, buf )) 
             ch->send_to( "Ездить на тебе верхом " );
             
-        ch->println( buf.str( ) );
+        ch->pecho( buf.str( ) );
         return;
     }
     
     if (MOUNTED(ch)) {
-        ch->println( "Ты уже верхом." );
+        ch->pecho( "Ты уже верхом." );
         return;
     }
 
@@ -59,7 +59,7 @@ CMDRUN( mount )
     arg = args.getOneArgument( );
 
     if (( horse = get_char_room( ch, arg.c_str( ) ) ) == NULL) {
-        ch->println( "Кого ты хочешь оседлать?" );
+        ch->pecho( "Кого ты хочешь оседлать?" );
         return;
     }
     
@@ -92,13 +92,13 @@ CMDRUN( mount )
     else { /* other rideable beasts */
         if (!IS_SET(horse->act, ACT_RIDEABLE)) {
             act("$c1 пытается запрыгнуть верхом на $C4, но соскальзывает.", ch, 0, horse, TO_NOTVICT);
-            ch->println("Этот вид живых существ не предназначен для верховой езды.");
+            ch->pecho("Этот вид живых существ не предназначен для верховой езды.");
             return;
         }
         
         if (horse->getModifyLevel( ) - ch->getModifyLevel( ) > 5) {
             act("$c1 пытается оседлать $C4, но опыта явно не хватает.", ch, 0, horse, TO_NOTVICT);
-            ch->println("Тебе не хватит опыта справиться с этим скакуном.");
+            ch->pecho("Тебе не хватит опыта справиться с этим скакуном.");
             return;
         }
     }
@@ -117,7 +117,7 @@ CMDRUN( mount )
     }
 
     if (ch->move < moveCost) {
-        ch->println("У тебя не хватает сил даже задрать ногу.");
+        ch->pecho("У тебя не хватает сил даже задрать ногу.");
         return;
     }
 
@@ -157,7 +157,7 @@ CMDRUN( dismount )
      * jump off the horse 
      */
     if (!ch->mount) {
-        ch->println( "Ни над тобой, ни под тобой никого нет!" );
+        ch->pecho( "Ни над тобой, ни под тобой никого нет!" );
         return;
     }
     

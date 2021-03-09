@@ -522,7 +522,7 @@ CMDWIZP( transfer )
     }
     
     if (victim->desc && victim->desc->connected != CON_PLAYING) {
-        ch->println("Плохая идея.");
+        ch->pecho("Плохая идея.");
         return;
     }
 
@@ -674,7 +674,7 @@ CMDWIZP( stat )
 
     if (fChar || fMob) {
         if (!string[0]) {
-           ch->println("Stat на кого?");
+           ch->pecho("Stat на кого?");
            return;
         }
         
@@ -1554,7 +1554,7 @@ CMDWIZP( vnum )
     ostringstream buf;
     
     if ((type = item_table.value( argument )) == NO_FLAG) {
-        ch->println( "Такого типа предмета не существует." );
+        ch->pecho( "Такого типа предмета не существует." );
         return;
     }
     
@@ -1567,7 +1567,7 @@ CMDWIZP( vnum )
             }
 
     if (buf.str( ).empty( ))
-        ch->println( "Такого типа нет ни у одного объекта." );
+        ch->pecho( "Такого типа нет ни у одного объекта." );
     else
         page_to_char( buf.str( ).c_str( ), ch ); 
 }
@@ -1589,7 +1589,7 @@ CMDWIZP( rwhere )
         }
 
     if (!found)
-        ch->println("Комната с таким именем не найдена.");
+        ch->pecho("Комната с таким именем не найдена.");
     else
         ch->send_to(buf);
 }
@@ -1946,7 +1946,7 @@ CMDWIZP( return )
     NPCharacter *mob = ch->getNPC();
 
     if(!mob) {
-        ch->println("Ты и так в своем теле.");
+        ch->pecho("Ты и так в своем теле.");
         return;
     }
     
@@ -2286,7 +2286,7 @@ CMDWIZP( purge )
         return;
     }
 
-    ch->println("Ты не видишь здесь моба или предмет с таким именем.");
+    ch->pecho("Ты не видишь здесь моба или предмет с таким именем.");
 }
 
 
@@ -3347,10 +3347,10 @@ CMDWIZP( rename )
     if (oldName ^ newName) {
         if (!russianName.empty( )) {
             victim->setRussianName( russianName );
-            ch->println( "Russian name set." );
+            ch->pecho( "Russian name set." );
         }
         else {
-            ch->println( "Both names are equal!" );
+            ch->pecho( "Both names are equal!" );
         }
 
         return;

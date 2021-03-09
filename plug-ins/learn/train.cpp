@@ -216,14 +216,14 @@ CMDRUN( train )
     DLString argument = constArguments;
 
     if (ch->is_npc( )) {
-        ch->println( "Это бесполезно для тебя." );
+        ch->pecho( "Это бесполезно для тебя." );
         return;
     }
     
     trainer = find_attracted_mob_behavior<Trainer>( ch, OCC_TRAINER );
 
     if (!trainer) {
-        ch->println( "Здесь некому тренировать тебя." );
+        ch->pecho( "Здесь некому тренировать тебя." );
         return;
     }
 

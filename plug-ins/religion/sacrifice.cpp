@@ -354,7 +354,7 @@ static void altar_clear(Object *altar)
 void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
 {
     if (ch->is_npc()) {
-        ch->println("Изыди, глупое животное.");
+        ch->pecho("Изыди, глупое животное.");
         return;
     }
     
@@ -391,8 +391,8 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
 
     Bonus *bonus = bonusManager->findUnstrict(arg);
     if (!bonus) {
-        ch->println("Ты можешь попросить богов об одной из таких вещей: {lRопыт, мана, обучаемость, воровские умения{lEexp, mana, learning, thief skills{x.");
-        ch->println("Но помни, что не все они для тебя подходят.");
+        ch->pecho("Ты можешь попросить богов об одной из таких вещей: {lRопыт, мана, обучаемость, воровские умения{lEexp, mana, learning, thief skills{x.");
+        ch->pecho("Но помни, что не все они для тебя подходят.");
         return;
     }
 

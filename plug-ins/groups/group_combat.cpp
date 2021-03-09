@@ -203,7 +203,7 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
                 && (ch->in_room->getSectorType() != SECT_MOUNTAIN)
                 && (ch->in_room->getSectorType() != SECT_DESERT) )
         {
-                ch->println("Здесь недостаточно песка, чтобы сформировать кулак.");
+                ch->pecho("Здесь недостаточно песка, чтобы сформировать кулак.");
                 ch->wait = 0;
                 return;
         }
@@ -250,7 +250,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     if ( (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD))
         || IS_VAMPIRE(victim) )
         {
-            ch->println("Рука умертвия не властна над твоей жертвой.");
+            ch->pecho("Рука умертвия не властна над твоей жертвой.");
              return;
         }
     if( victim->getModifyLevel() <= 2 )
@@ -265,7 +265,7 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
      ch->hit                += dam / 2;
     }
     
-    victim->println("Ты чувствуешь, как жизнь ускользает от тебя!");
+    victim->pecho("Ты чувствуешь, как жизнь ускользает от тебя!");
     act("Непостижимая Рука Умертвия хватает $C4!", ch,0,victim,TO_NOTVICT);
     damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_MAGIC);
 }

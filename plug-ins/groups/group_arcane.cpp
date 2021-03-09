@@ -304,10 +304,10 @@ SKILL_RUNP( zap )
     if (target->error != 0) {
         switch (target->error) {
         case TARGET_ERR_CAST_ON_WHAT:
-            ch->println("Взмахнуть жезлом на что?");
+            ch->pecho("Взмахнуть жезлом на что?");
             break;
         case TARGET_ERR_CAST_ON_WHOM:
-            ch->println("Взмахнуть жезлом на кого именно?");
+            ch->pecho("Взмахнуть жезлом на кого именно?");
             break;
         default:
             ch->send_to(buf);

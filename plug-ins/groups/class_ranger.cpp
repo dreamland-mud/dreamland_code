@@ -91,7 +91,7 @@ SKILL_RUNP( track )
     }
 
     if (arg.empty( )) {
-        ch->println( "Кого ты хочешь выследить?" );
+        ch->pecho( "Кого ты хочешь выследить?" );
         return;
     }
 
@@ -144,7 +144,7 @@ static Object * find_arrow( Character *ch, Object *quiver )
     }
 
     if (ch->getModifyLevel( ) + 10 < arrow->level) {
-        ch->println("Тебе не хватает опыта воспользоватся этой стрелой.");
+        ch->pecho("Тебе не хватает опыта воспользоватся этой стрелой.");
         return NULL;
     }
 
@@ -398,27 +398,27 @@ SKILL_RUNP( camp )
 
   if (ch->isAffected(gsn_camp))
     {
-      ch->println("Ты пока не можешь разбить лагерь, подожди немного.");
+      ch->pecho("Ты пока не можешь разбить лагерь, подожди немного.");
       return;
     }
 
 
   if ( number_percent( ) > gsn_camp->getEffective( ch ) )
   {
-        ch->println("Ты пытаешься разбить лагерь, но у тебя ничего не получается.");
+        ch->pecho("Ты пытаешься разбить лагерь, но у тебя ничего не получается.");
         gsn_camp->improve( ch, true );
         return;
   }
 
   if (!RoomUtils::isNature(ch->in_room))
   {
-    ch->println("Разбить полевой лагерь можно только на лоне природы.");
+    ch->pecho("Разбить полевой лагерь можно только на лоне природы.");
     return;
   }
 
   if ( ch->mana < gsn_camp->getMana( ))
   {
-     ch->println("У тебя не хватает энергии для разбивки лагеря.");
+     ch->pecho("У тебя не хватает энергии для разбивки лагеря.");
      return;
   }
 
@@ -721,7 +721,7 @@ SKILL_RUNP( makearrow )
         return;
 
     if (!gsn_make_arrow->usable( ch )) {
-        ch->println("Ты не умеешь изготавливать стрелы.");
+        ch->pecho("Ты не умеешь изготавливать стрелы.");
         return;
     }
 
@@ -1304,7 +1304,7 @@ BOOL_SKILL( ambush )::run( Character *ch )
                 && !is_safe_nomessage(ch,vch)
                 && is_name(ch->ambushing, vch->getNameP()))
         {
-            ch->println( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
+            ch->pecho( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
             run( ch, ch->ambushing );
             return true;
         }
@@ -1369,12 +1369,12 @@ SKILL_RUNP( camouflage )
         if ( ch->is_npc()
                 || number_percent( ) < ( gsn_camouflage->getEffective( ch ) + skill_level_bonus(*gsn_camouflage, ch) ) * k / 100 )
         {
-                ch->println("Ты маскируешься на местности.");
+                ch->pecho("Ты маскируешься на местности.");
                 SET_BIT(ch->affected_by, AFF_CAMOUFLAGE);
                 gsn_camouflage->improve( ch, true );
         }
         else {
-                ch->println("Твоя попытка замаскироваться закончилась неудачей.");
+                ch->pecho("Твоя попытка замаскироваться закончилась неудачей.");
                 gsn_camouflage->improve( ch, false );
         }
 
@@ -1434,7 +1434,7 @@ bool RangerStaff::death( Character *ch )
 bool RangerStaff::canEquip( Character *ch )
 {
   if (ch->getProfession( ) != prof_ranger) {
-        ch->println("Ты не знаешь как использовать эту вещь.");
+        ch->pecho("Ты не знаешь как использовать эту вещь.");
         act( "Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
         act( "Посох рейнджера выскальзывает из рук $c2.", ch, 0, 0, TO_ROOM );
         obj_from_char( obj );

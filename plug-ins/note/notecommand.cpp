@@ -72,7 +72,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
     
     if (cmd.strPrefix( "dump" ) && ch->isCoder( )) {
         dump( );
-        ch->println( "Ok." );
+        ch->pecho( "Ok." );
         return;
     }
 
@@ -83,7 +83,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
 
     if (arg_oneof_strict(cmd, "save", "сохранить") && ch->isCoder()) {
         saveAllBuckets();
-        ch->println("Ok.");
+        ch->pecho("Ok.");
         return;
     }
 
@@ -116,12 +116,12 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
     }
 
     if (!IS_SET(ch->act, PLR_CONFIRMED) && ch->getRemorts( ).size( ) == 0) {
-        ch->println("Ты не можешь ничего написать, пока тебя не подтвердили Боги." );
+        ch->pecho("Ты не можешь ничего написать, пока тебя не подтвердили Боги." );
         return;
     }
 
     if (ch->getRealLevel( ) < 3 && ch->getRemorts( ).size( ) == 0) {
-        ch->println("Тебе нужно достичь 3 уровня, чтобы отправлять письма.");
+        ch->pecho("Тебе нужно достичь 3 уровня, чтобы отправлять письма.");
         return;
     }
 
@@ -134,7 +134,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
 
     static const DLString nopost( "nopost" );
     if (ch->getAttributes( ).isAvailable( nopost ) || banManager->check( ch->desc, BAN_COMMUNICATE )) {
-        ch->println( "Боги лишили тебя возможности писать сообщения." );
+        ch->pecho( "Боги лишили тебя возможности писать сообщения." );
         return;
     }
 
@@ -181,7 +181,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
             return;
     }
     else {
-        ch->println("Неверная команда, смотри {W? {lRписьмо синтаксис{lEnote syntax{x.");
+        ch->pecho("Неверная команда, смотри {W? {lRписьмо синтаксис{lEnote syntax{x.");
         return;
     }
     
@@ -200,9 +200,9 @@ void NoteThread::doFlag(PCharacter *ch, DLString &arguments )
     
     if (!Integer::tryParse(noteId, arg)) {
         if (arg.empty())
-            ch->println("Укажите номер письма.");
+            ch->pecho("Укажите номер письма.");
         else
-            ch->println("Неправильный номер письма.");
+            ch->pecho("Неправильный номер письма.");
         ch->printf( "Использование: %s flag <number> <flags to set|none>\r\n", getName( ).c_str( ) );
         return;
     }
@@ -215,7 +215,7 @@ void NoteThread::doFlag(PCharacter *ch, DLString &arguments )
         
     Note *note = findNote(cnote->getID());
     if (!note) {
-        ch->println("Что-то пошло не так, письмо не найдено.");
+        ch->pecho("Что-то пошло не так, письмо не найдено.");
         return;
     }
 
@@ -251,7 +251,7 @@ bool NoteThread::doClear( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) c
 
     if (( note = attr->findNote( this ) )) {
         attr->clearNote( this );
-        ch->println( "Ok." );
+        ch->pecho( "Ok." );
         return true;
     }
 
@@ -262,7 +262,7 @@ void NoteThread::doSubject( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
 {
     XMLNoteData *note = attr->makeNote( ch, this );
     note->setSubject( arguments );
-    ch->println( "Ok." );
+    ch->pecho( "Ok." );
 }
 
 void NoteThread::doTo( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
@@ -286,7 +286,7 @@ void NoteThread::doLinePlus( PCharacter *ch, XMLAttributeNoteData::Pointer attr,
         echo( ch, msgTooLong, "Слишком длинное сообщение." );
     else {
         note->addLine( arguments );
-        ch->println( "Ok." );
+        ch->pecho( "Ok." );
     }
 }
 
@@ -295,10 +295,10 @@ void NoteThread::doLineMinus( PCharacter *ch, XMLAttributeNoteData::Pointer attr
     XMLNoteData *note = attr->makeNote( ch, this );
 
     if (note->isBodyEmpty( )) 
-        ch->println( "Больше нечего удалять." );
+        ch->pecho( "Больше нечего удалять." );
     else {
         note->delLine( );
-        ch->println( "Ok." );
+        ch->pecho( "Ok." );
     }
 }
 
@@ -314,13 +314,13 @@ void NoteThread::doPaste( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) c
     for(Editor::reg_t::const_iterator i = reg.begin(); i != reg.end(); i++)
         note->addLine( *i );
 
-    ch->println( "Ok." );
+    ch->pecho( "Ok." );
 }
 
 void NoteThread::doCatchup( PCharacter *ch ) const
 {
     ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" )->updateStamp( this );
-    ch->println( "Ok." );
+    ch->pecho( "Ok." );
 }
 
 void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
@@ -332,7 +332,7 @@ void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
         XMLAttributeNoteData::Pointer attr = ch->getAttributes( ).getAttr<XMLAttributeNoteData>( "notedata" );
         XMLNoteData *note = attr->findNote( this );
             if (!note) {
-                ch->println("Ты не редактируешь сообщение, копировать нечего.");
+                ch->pecho("Ты не редактируешь сообщение, копировать нечего.");
                 return;
         }
 
@@ -340,7 +340,7 @@ void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
         note->linesToStream( buf );
         ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
             ->regs[0].split(buf.str( ));
-        ch->println( "Текущее сообщение скопировано в буфер." );
+        ch->pecho( "Текущее сообщение скопировано в буфер." );
         return;
     }
  
@@ -353,16 +353,16 @@ void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
                 note->toStream(arg.toInt( ), ostr);
                 ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
                     ->regs[0].split(ostr.str( ));
-                ch->println( "Ok." );
+                ch->pecho( "Ok." );
             } else
                 ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
                 
         } catch (const ExceptionBadType& e) {
-            ch->println( "Неправильный номер письма." );
+            ch->pecho( "Неправильный номер письма." );
         }
     }
     else {
-        ch->println( "Скопировать какой номер?" );
+        ch->pecho( "Скопировать какой номер?" );
     }
 }
 
@@ -389,11 +389,11 @@ void NoteThread::doRead( PCharacter *ch, DLString &arguments ) const
                 ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
                 
         } catch (const ExceptionBadType& e) {
-            ch->println( "Неправильный номер письма." );
+            ch->pecho( "Неправильный номер письма." );
         }
     }
     else {
-        ch->println( "Прочесть какой номер?" );
+        ch->pecho( "Прочесть какой номер?" );
     }
 }
 
@@ -425,12 +425,12 @@ void NoteThread::doList( PCharacter *ch, DLString &argument ) const
         }
     }
     catch (const Exception &e) {
-        ch->println("Неверный формат, смотри {y{hc{lRсправка письмо список{lEhelp note list{x." );
+        ch->pecho("Неверный формат, смотри {y{hc{lRсправка письмо список{lEhelp note list{x." );
         return;
     }
     
     if (buf.str( ).empty( ))
-        ch->println( "Не найдено ни одного сообщения." );
+        ch->pecho( "Не найдено ни одного сообщения." );
     else
         page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -441,7 +441,7 @@ void NoteThread::doRemove( PCharacter *ch, DLString &arguments )
     DLString arg = arguments.getOneArgument( );
     
     if (!arg.isNumber( )) {
-        ch->println( "Удалить какой номер?" );
+        ch->pecho( "Удалить какой номер?" );
         return;
     }
 
@@ -450,20 +450,20 @@ void NoteThread::doRemove( PCharacter *ch, DLString &arguments )
 
         if (note) {
             if (ch->get_trust( ) < CREATOR && note->getAuthor( ) != ch->getName( ))
-                ch->println( "Ты не можешь удалить это сообщение, т.к. не являешься его автором." );
+                ch->pecho( "Ты не можешь удалить это сообщение, т.к. не являешься его автором." );
             else {
                 LogStream::sendNotice( ) 
                     << getName( ) << " remove: " 
                     << ch->getName( ) << ", id " << note->getID( ) << endl;
                 remove( note );
-                ch->println( "Ok." );
+                ch->pecho( "Ok." );
             }
         }
         else
             ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
     } 
     catch (const ExceptionBadType& e) {
-        ch->println( "Неправильный номер письма." );
+        ch->pecho( "Неправильный номер письма." );
     }
 }
 
@@ -493,7 +493,7 @@ void NoteThread::doUncatchup( PCharacter *ch, DLString &arguments ) const
             ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
     }
     catch (const ExceptionBadType& e) {
-        ch->println( "Неправильный номер письма." );
+        ch->pecho( "Неправильный номер письма." );
     }
 }
 
@@ -534,11 +534,11 @@ bool NoteThread::doFrom( PCharacter *ch, XMLAttributeNoteData::Pointer attr, con
         arg.colourstrip( );
 
         if (PCharacterManager::find( arg )) {
-            ch->println( "Подделка документов запрещена!" );
+            ch->pecho( "Подделка документов запрещена!" );
         }
         else {
             note->setFrom( arguments );
-            ch->println( "Ok." );
+            ch->pecho( "Ok." );
         }
 
         return true;
@@ -555,7 +555,7 @@ void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
     DLString arg = arguments.getOneArgument( );
     
     if (!arg.isNumber( )) {
-        ch->println( "Перенаправить какой номер?" );
+        ch->pecho( "Перенаправить какой номер?" );
         return;
     }
 
@@ -563,7 +563,7 @@ void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
         orig = getNoteAtPosition( ch, arg.toInt( ) );
     } 
     catch (const ExceptionBadType& e) {
-        ch->println( "Неправильный номер письма." );
+        ch->pecho( "Неправильный номер письма." );
         return;
     }
 
@@ -575,7 +575,7 @@ void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
     note = attr->makeNote( ch, this );
     orig->toForwardStream( buf );
     note->addLine( buf.str( ) );
-    ch->println( "Ok." );
+    ch->pecho( "Ok." );
 }
 
 void NoteThread::echo( PCharacter *ch, const DLString &msg, const DLString &defaultMsg, const DLString &arg ) const

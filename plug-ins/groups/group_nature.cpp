@@ -90,7 +90,7 @@ SKILL_RUNP( tame )
         {
             REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
             SET_BIT(victim->affected_by,AFF_CALM);
-            victim->println("Ты успокаиваешься.");
+            victim->pecho("Ты успокаиваешься.");
             act("Ты укрощаешь $C4.",ch,0,victim,TO_CHAR);
             act("$c1 укрощает $C4.",ch,0,victim,TO_NOTVICT);
             stop_fighting(victim,true);
@@ -98,7 +98,7 @@ SKILL_RUNP( tame )
         }
         else
         {
-            ch->println("Попытка укрощения не удалась.");
+            ch->pecho("Попытка укрощения не удалась.");
             act("$c1 пытается укротить $C4, но безуспешно.",
                     ch,0,victim,TO_NOTVICT);
             act("$c1 пытается укротить тебя, но безуспешно.",

@@ -33,7 +33,7 @@ COMMAND(HomeRecall, "homerecall")
     PCharacter *pch = ch->getPC( );
 
     if (ch->is_npc( )) {
-        ch->println( "В лес!" );
+        ch->pecho( "В лес!" );
         return;
     }
     
@@ -180,19 +180,19 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
     try {
         vnum = vnumArg.toInt( );
     } catch (const ExceptionBadType& e) {
-        ch->println( "<room vnum> должно быть числом." );
+        ch->pecho( "<room vnum> должно быть числом." );
         return;
     }
     
     pci = PCharacterManager::find( name );
     if (!pci) {
-        ch->println( "Жертва не найдена." );
+        ch->pecho( "Жертва не найдена." );
         return;
     }
    
     Room *target =  get_room_instance( vnum );
     if (!target) {
-        ch->println( "Комнаты с таким номером не существует." );
+        ch->pecho( "Комнаты с таким номером не существует." );
         return;
     }
 
@@ -226,7 +226,7 @@ void HomeRecall::doShow( PCharacter * ch, DLString &arg )
     
     pci = PCharacterManager::find( name );
     if (!pci) {
-        ch->println( "Жертва не найдена." );
+        ch->pecho( "Жертва не найдена." );
         return;
     }
     
@@ -255,7 +255,7 @@ void HomeRecall::doRemove( PCharacter * ch, DLString &arg )
     
     pci = PCharacterManager::find( name );
     if (!pci) {
-        ch->println( "Жертва не найдена." );
+        ch->pecho( "Жертва не найдена." );
         return;
     }
     
@@ -268,7 +268,7 @@ void HomeRecall::doRemove( PCharacter * ch, DLString &arg )
     pci->getAttributes( ).eraseAttribute( "homerecall" );
     PCharacterManager::saveMemory( pci );
 
-    ch->println( "Done." );
+    ch->pecho( "Done." );
 }
 
 void HomeRecall::doList( PCharacter *ch ) 
@@ -280,7 +280,7 @@ void HomeRecall::doList( PCharacter *ch )
     XMLAttributeHomeRecall::Pointer attr;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
    
-    ch->println( "Список всех персонажей, имеющих homerecalls: \r\n");
+    ch->pecho( "Список всех персонажей, имеющих homerecalls: \r\n");
      
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
         attr = i->second->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
@@ -315,7 +315,7 @@ void HomeRecall::doListMortal( PCharacter * ch )
 {
     XMLAttributeHomeRecall::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
     if (!attr) {
-        ch->println( "У тебя нет своего дома." );
+        ch->pecho( "У тебя нет своего дома." );
         return;
     }
     

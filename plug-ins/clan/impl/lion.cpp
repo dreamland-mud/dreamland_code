@@ -401,7 +401,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     
     affect_to_char(ch, &af);  
 
-    ch->println( "Ты защищаешь себя от ловушек Охотников." );
+    ch->pecho( "Ты защищаешь себя от ловушек Охотников." );
 }
 
 VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level ) 

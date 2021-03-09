@@ -293,7 +293,7 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
 
     if (ch->is_npc() || victim->is_npc() || ch->getClan() != victim->getClan())
     {
-        ch->println("Это заклинание ты можешь произнести только на члена твоего клана.");
+        ch->pecho("Это заклинание ты можешь произнести только на члена твоего клана.");
         return;
     }
 
@@ -302,7 +302,7 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
 
     if (orgCh != orgVict)
     {
-        ch->println("Это заклинание ты можешь произнести только на члена твоей организации.");
+        ch->pecho("Это заклинание ты можешь произнести только на члена твоей организации.");
         return;
     }
 
@@ -446,13 +446,13 @@ COMMAND(CDarkLeague, "darkleague")
 
     if (pch->getClan() != clan_invader)
     {
-        pch->println("Ты не принадлежишь к Кабалу Захватчиков.");
+        pch->pecho("Ты не принадлежишь к Кабалу Захватчиков.");
         return;
     }
 
     if (!(orgs = clan_invader->getOrgs()))
     {
-        pch->println("Попробуй позже.");
+        pch->pecho("Попробуй позже.");
         return;
     }
 
@@ -474,7 +474,7 @@ COMMAND(CDarkLeague, "darkleague")
 
     if (!pch->getClan()->isRecruiter(pch))
     {
-        pch->println("Твоих полномочий хватает только посмотреть список организаций.");
+        pch->pecho("Твоих полномочий хватает только посмотреть список организаций.");
         return;
     }
 

@@ -128,22 +128,22 @@ bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gol
 {
     if ((!arg_is_silver( arg ) && !arg_is_gold( arg ) )) {
         if (!str_prefix( arg, "серебр" ) || !str_prefix( arg, "silver" )) {
-            ch->println( "Укажи название монеты полностью: {lrсеребро{lesilver{x." );
+            ch->pecho( "Укажи название монеты полностью: {lrсеребро{lesilver{x." );
             return false;
         }
         if (!str_prefix( arg, "золот" ) || !str_prefix( arg, "gold" )) {
-            ch->println( "Укажи название монеты полностью: {lrзолото{legold{x." );
+            ch->pecho( "Укажи название монеты полностью: {lrзолото{legold{x." );
             return false;
         }
-        ch->println( "Ты можешь указать количество денег в серебре {le(silver) {xили золоте {le(gold){x." );
+        ch->pecho( "Ты можешь указать количество денег в серебре {le(silver) {xили золоте {le(gold){x." );
         return false;
     }
     if (amount < 0) {
-        ch->println( "Отрицательное количество денег?" );
+        ch->pecho( "Отрицательное количество денег?" );
         return false;
     }
     if (amount == 0) {
-        ch->println( "Ноль монет, это как?" );
+        ch->pecho( "Ноль монет, это как?" );
         return false;
     }
 
@@ -398,7 +398,7 @@ static bool can_get_obj( Character *ch, Object *obj )
     if (ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ))
     {
         if (ch->is_immortal())
-            ch->println("Осторожно, ты уже несешь слишком много вещей.");
+            ch->pecho("Осторожно, ты уже несешь слишком много вещей.");
         else {
             act( "$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR);
             return false;
@@ -623,9 +623,9 @@ CMDRUNP( get )
             if ( !found )
             {
                 if (all)
-                    ch->println("Ты ничего не видишь здесь.");
+                    ch->pecho("Ты ничего не видишь здесь.");
                 else if (allDot)
-                    ch->println("Ты не видишь ничего подобного здесь.");
+                    ch->pecho("Ты не видишь ничего подобного здесь.");
                 else
                     act( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR);
             }
@@ -793,7 +793,7 @@ static bool can_put_money_into( Character *ch, Object *container )
     }
 
     if (IS_SET(container->wear_flags, ITEM_TAKE) || !container->in_room) {
-        ch->println("Ты можешь положить деньги только в стационарные контейнеры: ямы для пожертвований, алтари.");
+        ch->pecho("Ты можешь положить деньги только в стационарные контейнеры: ямы для пожертвований, алтари.");
         return false;
     }
 
@@ -979,7 +979,7 @@ void put_money_container(Character *ch, int amount, const char *currencyName, co
 {
     /* 'put -N ...' and 'put 0 ...' not allowed. */
     if (amount <= 0) {
-        ch->println("Сколько-сколько монет?");
+        ch->pecho("Сколько-сколько монет?");
         return;
     }
 
@@ -1141,7 +1141,7 @@ bool can_drop_obj( Character *ch, Object *obj, bool verbose )
         return true;
 
     if (verbose)
-        ch->println("Ты не можешь избавиться от этого.");
+        ch->pecho("Ты не можешь избавиться от этого.");
 
     return false;
 }
@@ -1259,9 +1259,9 @@ CMDRUNP( drop )
             }
          
             if (obj->value0() == 1 || obj->value1() == 1)
-             ch->println( "Ты бросаешь монетку." );
+             ch->pecho( "Ты бросаешь монетку." );
             else
-             ch->println( "Ты бросаешь несколько монет." );
+             ch->pecho( "Ты бросаешь несколько монет." );
         }
 
         return;
@@ -1561,7 +1561,7 @@ CMDRUNP( present )
     argument = one_argument( argument, arg2 );
 
     if (arg1[0] == '\0' || arg2[0] == '\0') {
-        ch->println( "Что и кому ты хочешь подарить?" );
+        ch->pecho( "Что и кому ты хочешь подарить?" );
         return;
     }
 
@@ -1571,12 +1571,12 @@ CMDRUNP( present )
     }
 
     if (( obj = get_obj_carry( ch, arg1 ) ) == 0) {
-        ch->println( "У тебя нет этого." );
+        ch->pecho( "У тебя нет этого." );
         return;
     }
 
     if (( victim = get_char_room( ch, arg2 ) ) == 0) {
-        ch->println( "Они ушли, не дождавшись подарков." );
+        ch->pecho( "Они ушли, не дождавшись подарков." );
         return;
     }
     
@@ -1713,7 +1713,7 @@ CMDRUNP( make )
         }
     }
 
-    ch->println("Ты можешь изготовить только лук {le(bow) {xили стрелы{le (arrow){x.");
+    ch->pecho("Ты можешь изготовить только лук {le(bow) {xили стрелы{le (arrow){x.");
 }
 
 CMDRUNP( search )
@@ -1727,7 +1727,7 @@ CMDRUNP( search )
         }
     }
 
-    ch->println("Ты можешь искать только камни{le (stones){x.");
+    ch->pecho("Ты можешь искать только камни{le (stones){x.");
 }
 
 CMDRUNP( throw )

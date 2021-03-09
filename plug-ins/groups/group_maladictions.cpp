@@ -635,7 +635,7 @@ VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf )
                 && !IS_AFFECTED(vch,AFF_PLAGUE) 
                 && number_bits(6) == 0)
         {
-            vch->println( "Ты чувствуешь жар и лихорадку." );
+            vch->pecho( "Ты чувствуешь жар и лихорадку." );
             act("$c1 дрожит и выглядит болезненно.",vch,0,0,TO_ROOM);
             affect_join(vch,&plague);
         }

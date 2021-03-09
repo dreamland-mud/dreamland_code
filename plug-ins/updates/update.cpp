@@ -1292,7 +1292,7 @@ void check_reboot( void )
                    dreamland->getRebootCounter( ) );
         for (d = descriptor_list; d != 0; d = d->next)
             if (d->connected == CON_PLAYING && d->character)
-                d->character->println( msg );
+                d->character->pecho( msg );
     default:
         dreamland->setRebootCounter( dreamland->getRebootCounter( ) - 1 );
         break;

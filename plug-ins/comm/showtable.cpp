@@ -56,7 +56,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
     bool found = false;
 
     if (arg.empty( )) {
-        ch->println("Использование: {y{lRкоманды показ{lEcommand show{lx{D название{x.");
+        ch->pecho("Использование: {y{lRкоманды показ{lEcommand show{lx{D название{x.");
         return;
     }
 
@@ -263,7 +263,7 @@ CMDRUN( commands )
         SET_BIT(flags, FCMD_ALIASES);
     
     if (!flags) {
-        ch->println("Использование:\n"
+        ch->pecho("Использование:\n"
         "{lRкоманды{lEcommands{x - таблица всех команд\n"
         "{lRкоманды список{lEcommands list{x - список команд с краткой справкой\n"
         "{lRкоманды синонимы{lEcommands aliases{x - список команд и их синонимов\n"

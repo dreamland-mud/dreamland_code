@@ -806,7 +806,7 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
     if(!str_cmp(argument, "next")) {
         value = next_room(ch, pRoom);
         if (value < 0) {
-            ch->println("Все внумы в этой зоне уже заняты!");
+            ch->pecho("Все внумы в этой зоне уже заняты!");
             return 0;
         }
     } else

@@ -82,7 +82,7 @@ CMDADM( codesource )
         return;
 
     if (!has_fenia_security( pch )) {
-        ch->println("Ты не ботаешь по фене.");
+        ch->pecho("Ты не ботаешь по фене.");
         return;
     }
     
@@ -158,7 +158,7 @@ CMDADM( codesource )
         static DLString highlight("{R");
 
         if (args.empty()) {
-            ch->println("Синтаксис: cs search <строка>");
+            ch->pecho("Синтаксис: cs search <строка>");
             return;
         }
 
@@ -227,7 +227,7 @@ CMDADM( codesource )
         }
 
         if (args.empty()) {
-            ch->println("Please specify codesource number, subj or 'all'.");
+            ch->pecho("Please specify codesource number, subj or 'all'.");
             return;
         }
         
@@ -242,7 +242,7 @@ CMDADM( codesource )
 
         CodeSource &cs = CodeSource::manager->at(csid);               
         if (cs.name.empty()) {
-            ch->println("This codesource has no subject, cannot save.");
+            ch->pecho("This codesource has no subject, cannot save.");
             return;
         }
 
@@ -264,7 +264,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            ch->println("Ты не редактируешь сценарий.");
+            ch->pecho("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -303,7 +303,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            ch->println("Ты не редактируешь сценарий.");
+            ch->pecho("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -336,7 +336,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            ch->println("Ты не редактируешь сценарий.");
+            ch->pecho("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -389,7 +389,7 @@ CMDADM( codesource )
         return;
     }
     
-    ch->println("Неверная подкоманда, используйте {Wcodesource help{x для справки.");
+    ch->pecho("Неверная подкоманда, используйте {Wcodesource help{x для справки.");
 }
 
 

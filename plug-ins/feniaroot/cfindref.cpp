@@ -73,12 +73,12 @@ CMDADM(findrefs)
         return;
     
     if (!has_fenia_security( pch )) {
-        ch->println("Ты не ботаешь по фене.");
+        ch->pecho("Ты не ботаешь по фене.");
         return;
     }
 
     if (constArguments.empty( )) {
-        ch->println("Синтаксис: {Wfindrefs {x<cs id> - список ссылок на этот сценарий");
+        ch->pecho("Синтаксис: {Wfindrefs {x<cs id> - список ссылок на этот сценарий");
         return;
     }
 
@@ -121,12 +121,12 @@ CMDADM(findrefs)
             DLString argCodesource = args.getOneArgument();
             it = CodeSource::manager->find( argCodesource.toInt( ) );
         } catch( ... ) {
-            ch->println("Укажи номер сценария.");
+            ch->pecho("Укажи номер сценария.");
             return;
         }
 
         if(it == CodeSource::manager->end( ) ) {
-            ch->println("Сценарий с таким номером не найден.");
+            ch->pecho("Сценарий с таким номером не найден.");
             return;
         }
 

@@ -83,7 +83,7 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
         act("$c1 одаряет тебе благостью своих Богов.", ch,0,victim,TO_VICT);
     }
     else
-        victim->println("Ты наслаждаешься божественной благостью.");
+        victim->pecho("Ты наслаждаешься божественной благостью.");
 
 }
 
@@ -251,7 +251,7 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
     }
 
     if (!found)
-        ch->println("Тебе тут некого успокаивать.");
+        ch->pecho("Тебе тут некого успокаивать.");
 }
 
 SPELL_DECL(Frenzy);
@@ -677,7 +677,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
 
     if (clean)
-        ch->println("Эта местность не нуждается в очищении.");
+        ch->pecho("Эта местность не нуждается в очищении.");
 }
 
 SPELL_DECL(Wrath);

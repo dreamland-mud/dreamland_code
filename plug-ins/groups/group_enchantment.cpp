@@ -596,7 +596,7 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->item_type != ITEM_WAND && obj->item_type != ITEM_STAFF)
     {
-        ch->println("Ты можешь восстановить заряды только у волшебных палочек и посохов.");
+        ch->pecho("Ты можешь восстановить заряды только у волшебных палочек и посохов.");
         return;
     }
 
@@ -679,29 +679,29 @@ VOID_SPELL(WeaponMorph)::run( Character *ch, char *target_name, int sn, int leve
     arg2 = args.getOneArgument( );
     
     if (!( obj = get_obj_carry( ch, arg1.c_str( ) ) )) {
-        ch->println( "У тебя нет этого." );
+        ch->pecho( "У тебя нет этого." );
         return;
     }
 
     if (obj->item_type != ITEM_WEAPON) {
-        ch->println("Ты можешь создать булаву только из оружия.");
+        ch->pecho("Ты можешь создать булаву только из оружия.");
         return;
     }
 
     if (obj->value0() == WEAPON_MACE)
     {
-        ch->println("Это и так уже булава.");
+        ch->pecho("Это и так уже булава.");
         return;
     }
 
     if (obj->value0() == WEAPON_ARROW || IS_WEAPON_STAT(obj,WEAPON_TWO_HANDS))
     {
-        ch->println("Из стрел или двуручного оружия создать булаву не удастся.");
+        ch->pecho("Из стрел или двуручного оружия создать булаву не удастся.");
         return;
     }
     
     if (obj->pIndexData->limit != -1) {
-        ch->println("Уникальные артефакты нельзя трансформировать.");
+        ch->pecho("Уникальные артефакты нельзя трансформировать.");
         return;
     }
 

@@ -222,7 +222,7 @@ CMDRUNP( quit )
     
     if (pch->position == POS_FIGHTING || pch->fighting) {
         if (!fForced) {
-            pch->println( "Не сейчас! Тебе необходимо закончить сражение!");
+            pch->pecho( "Не сейчас! Тебе необходимо закончить сражение!");
             return;
         }
 
@@ -241,15 +241,15 @@ CMDRUNP( quit )
     
     if (!pch->is_immortal( ) && !fAuto && !fForced) {
         if (IS_VIOLENT(pch)) {
-            pch->println("У тебя слишком много адреналина в крови.");
+            pch->pecho("У тебя слишком много адреналина в крови.");
             return;
         }
         if (IS_SLAIN(pch)) {
-            pch->println("Правда о твоем поражении еще не забыта.");
+            pch->pecho("Правда о твоем поражении еще не забыта.");
             return;
         }
         if (IS_KILLER(pch)) {
-            pch->println("Боги еще помнят убийство, совершенное тобой.");
+            pch->pecho("Боги еще помнят убийство, совершенное тобой.");
             return;
         }
     }

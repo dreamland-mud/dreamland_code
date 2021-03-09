@@ -245,7 +245,7 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
         if (!getErrorMsg( ).empty( ))
             act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
         else
-            ch->println("Нет этого здесь.");
+            ch->pecho("Нет этого здесь.");
         return;
     }
 

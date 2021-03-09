@@ -32,7 +32,7 @@ Character * PersonalChannel::findListener( Character *ch, const DLString &arg ) 
     Character *victim = get_char_world( ch, arg.c_str( ) );
 
     if (!victim)
-        ch->println( "Ты не находишь этого персонажа." );
+        ch->pecho( "Ты не находишь этого персонажа." );
     
     return victim;
 }
@@ -180,12 +180,12 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     }
     
     if (needOutputChar( ch )) {
-        ch->println(messageChar);
+        ch->pecho(messageChar);
         postOutput(ch, messageChar);
     }
 
     if (needOutputVict( ch, victim )) {
-        victim->println(messageVict);
+        victim->pecho(messageVict);
         postOutput(victim, messageVict);
     }
 
@@ -195,17 +195,17 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
 bool PersonalChannel::canTalkPersonally( Character *ch ) const
 {
     if (IS_SET(ch->comm, COMM_NOTELL)) {
-        ch->println( "Боги лишили тебя возможности личного общения." );
+        ch->pecho( "Боги лишили тебя возможности личного общения." );
         return false;
     }
 
     if (IS_SET(ch->comm, COMM_QUIET)) {
-        ch->println( "Сперва выйди из режима тишины (quiet)." );
+        ch->pecho( "Сперва выйди из режима тишины (quiet)." );
         return false;
     }
 
     if (IS_SET(ch->comm, COMM_DEAF)) {
-        ch->println("Сперва выйди из режима глухоты (deaf).");
+        ch->pecho("Сперва выйди из режима глухоты (deaf).");
         return false;
     }
 
@@ -237,12 +237,12 @@ bool PersonalChannel::parseArguments( Character *ch, const DLString &constArgume
     name = msg.getOneArgument( );
 
     if (name.empty( )) {
-        ch->println( msgNoName );
+        ch->pecho( msgNoName );
         return false; 
     }
 
     if (msg.empty( )) {
-        ch->println( msgNoArg );
+        ch->pecho( msgNoArg );
         return false;
     }
 

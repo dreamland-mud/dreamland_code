@@ -106,7 +106,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     if (arg == "clear" || arg == "off") {
         attributes->eraseAttribute( "cards" );
         PCharacterManager::saveMemory( pci );
-        ch->println( "Он(а) выбывает из Колоды." );        
+        ch->pecho( "Он(а) выбывает из Колоды." );        
         return;
     }
 

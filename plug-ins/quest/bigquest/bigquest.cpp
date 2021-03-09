@@ -187,7 +187,7 @@ void BigQuest::mobDestroyed(PCMemoryInterface *hero)
 void BigQuest::notifyNoMore(PCMemoryInterface *hero)
 {
     if (hero->isOnline())
-        hero->getPlayer()->println("{YВсе разбежались или были уничтожены, вернись за наградой.{x");
+        hero->getPlayer()->pecho("{YВсе разбежались или были уничтожены, вернись за наградой.{x");
 }
 
 bool BigQuest::hasPartialRewards() const

@@ -28,7 +28,7 @@ CMDRUN( identify )
     }
     
     if (arg.empty()) {
-        ch->println("Что именно ты хочешь опознать?");
+        ch->pecho("Что именно ты хочешь опознать?");
         return;
     }
 

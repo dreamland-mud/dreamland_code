@@ -173,7 +173,7 @@ void CPractice::pracHere( PCharacter *ch )
 
     if (!( teacher = findTeacher( ch ) ))
         if (!( teacher = findPracticer( ch ) )) {
-            ch->println("Тебе не с кем практиковаться здесь.");
+            ch->pecho("Тебе не с кем практиковаться здесь.");
             return;
         }
 
@@ -263,7 +263,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 
     if (learned >= adept) {
         ch->pecho("Ты уже слишком хорошо владеешь умением {W%K{x, практиковаться бессмысленно.", skill);
-        ch->println("Чтобы овладеть умением еще лучше, просто применяй его почаще.");  
+        ch->pecho("Чтобы овладеть умением еще лучше, просто применяй его почаще.");  
         return;
     }
 
@@ -279,7 +279,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         ch->pecho( "Ты теперь знаешь умение {W%K{x на %d процентов.", skill, learned );
     else {
         ch->pecho("Теперь ты хорошо владеешь умением {W%K{x.", skill);
-        ch->println( "Дальше практиковать не получится, просто начни применять его почаще." );        
+        ch->pecho( "Дальше практиковать не получится, просто начни применять его почаще." );        
         ch->recho("%^C1 теперь хорошо владеет умением {W%K{x.", ch, skill);
     }
 }

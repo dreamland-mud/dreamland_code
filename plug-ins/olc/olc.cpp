@@ -254,8 +254,8 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     else if (arg_has_oneof(arg, "flag", "флаг") && !args.empty())
         flagName = args;
     else if (!arg.empty()) {
-        ch->println("Формат:\r\nalist - список всех арий\r\nalist vnum|name|file - список арий, отсортированный по критерию");
-        ch->println("alist flag <name> - список всех арий с флагом name");
+        ch->pecho("Формат:\r\nalist - список всех арий\r\nalist vnum|name|file - список арий, отсортированный по критерию");
+        ch->pecho("alist flag <name> - список всех арий с флагом name");
         return;
     }
 
@@ -457,7 +457,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         Room *room;
 
         if (args.empty() || !Integer::tryParse(vnum, args)) {
-            ch->println("abc readroom <vnum>");
+            ch->pecho("abc readroom <vnum>");
             return;
         }
 

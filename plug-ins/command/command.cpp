@@ -190,7 +190,7 @@ bool Command::dispatchOrder( const InterpretArguments &iargs )
     }
 
     if (getExtra().isSet(CMD_NO_DUNGEON) && IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON)) {
-        ch->println("Эта команда сейчас недоступна.");
+        ch->pecho("Эта команда сейчас недоступна.");
         return false;
     }
 

@@ -393,7 +393,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
 
     if (mode == CB_MODE_DEPOSIT) {
         if (!clanBankDeposit( pc, clan, currency, amount, buf )) 
-            pc->println( "Это больше, чем ты имеешь." );
+            pc->pecho( "Это больше, чем ты имеешь." );
         else {
             pc->send_to( buf );
             clan->getData( )->save( );
@@ -746,7 +746,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
         
         if (!pc->is_immortal( )) 
             if (!member->removable) {
-                pc->println( "Из твоего клана невозможно уйти по собственной воле." );
+                pc->pecho( "Из твоего клана невозможно уйти по собственной воле." );
                 return;
             }
 
@@ -767,7 +767,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
         }
 
         if (member && !member->removable) {
-            pc->println( "Из твоего клана невозможно никого выгнать." );
+            pc->pecho( "Из твоего клана невозможно никого выгнать." );
             return;
         }
         
@@ -1145,7 +1145,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
      */
     
     if (!IS_SET(pc->act, PLR_CONFIRMED)) {
-        pc->println( "Твой персонаж еще не подтвержден Богами." );
+        pc->pecho( "Твой персонаж еще не подтвержден Богами." );
         return;
     }
     
@@ -1283,7 +1283,7 @@ void CClan::clanPetitionAccept( PCharacter *pc, DLString& argument )
         return;
     }
 
-    pc->println( "Ok." );
+    pc->pecho( "Ok." );
     
     doInduct( victim, *pc->getClan( ) );
 }
@@ -1701,12 +1701,12 @@ void CClan::clanInduct( PCharacter *pc, DLString &argument )
     argumentOne = argument.getOneArgument( );
     
     if (pc->get_trust( ) < GOD) {
-        pc->println("У тебя нет таких полномочий.");
+        pc->pecho("У тебя нет таких полномочий.");
         return;
     }
 
     if (arg_is_help( argumentOne ) || argumentOne.empty( ) || argument.empty( )) {
-        pc->println( "{Wclan induct {x<player> <clan> - принять кого-либо в указанный клан" );
+        pc->pecho( "{Wclan induct {x<player> <clan> - принять кого-либо в указанный клан" );
         return;
     }
     
@@ -1715,7 +1715,7 @@ void CClan::clanInduct( PCharacter *pc, DLString &argument )
 
     victim = PCharacterManager::find( argumentOne );
     if (!victim) {
-        pc->println( "Игрок с таким именем не найден." );
+        pc->pecho( "Игрок с таким именем не найден." );
         return;
     }
 
@@ -1726,6 +1726,6 @@ void CClan::clanInduct( PCharacter *pc, DLString &argument )
         return;
     }
     
-    pc->println( "Ok." );
+    pc->pecho( "Ok." );
     doInduct( victim, *new_clan );
 }    

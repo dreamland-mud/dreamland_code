@@ -23,7 +23,7 @@ CMDRUNP( areas )
     arg2 = arguments.getOneArgument( );
     
     if (!arg1.empty( ) && !arg2.empty( ) && arg1.isNumber( ) != arg2.isNumber( )) {
-        ch->println( "Использование: \r\n"
+        ch->pecho( "Использование: \r\n"
                      "{lEareas [<level> | <min level> <max level> | <string>]"
                      "{lRзоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]{lx" );
         return;

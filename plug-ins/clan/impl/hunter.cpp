@@ -765,7 +765,7 @@ bool HunterTrapObject::checkRoom( Room *r )
 bool HunterTrapObject::checkTrapConditions( Character *ch, Skill &skill )
 {
     if (obj->carried_by != ch) {
-        ch->println( "Подними это с земли." );
+        ch->pecho( "Подними это с земли." );
         return false;
     }
     
@@ -773,22 +773,22 @@ bool HunterTrapObject::checkTrapConditions( Character *ch, Skill &skill )
         return false;
 
     if (skill.getLearned( ch ) <= 1) {
-        ch->println( "Попрактикуйся сначала." );
+        ch->pecho( "Попрактикуйся сначала." );
         return false;
     }
     
     if (ch->mana < skill.getMana( )) {
-        ch->println( "У тебя недостаточно энергии для этого." );
+        ch->pecho( "У тебя недостаточно энергии для этого." );
         return false;
     }
 
     if (ch->position != POS_STANDING) {
-        ch->println( "Это гораздо удобней делать стоя." );
+        ch->pecho( "Это гораздо удобней делать стоя." );
         return false;
     }
     
     if (IS_SET(ch->in_room->affected_by, AFF_ROOM_PREVENT)) {
-        ch->println( "Львы защитили эту местность от ловушек Охотников." );
+        ch->pecho( "Львы защитили эту местность от ловушек Охотников." );
         return false;
     }
 
@@ -842,30 +842,30 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
         return true;
     
     if (!checkRoom( ch->in_room )) {
-        ch->println( "Здесь нельзя устанавливать маяки." );        
+        ch->pecho( "Здесь нельзя устанавливать маяки." );        
         return true;
     }
     
     if (ch->isAffected( gsn_hunter_beacon )) {
-        ch->println( "С момента установки предыдущего маяка прошло слишком мало времени." );
+        ch->pecho( "С момента установки предыдущего маяка прошло слишком мало времени." );
         return true;
     }
     
     args.colourstrip( );
     args.stripWhiteSpace( );
     if (args.empty( )) {
-        ch->println( "На кого именно должен реагировать маяк?" );
+        ch->pecho( "На кого именно должен реагировать маяк?" );
         return true;
     }
 
     victim = get_player_world( ch, args.c_str( ) );
     if (victim == NULL) {
-        ch->println( "Жертва с таким именем не найдена." );
+        ch->pecho( "Жертва с таким именем не найдена." );
         return true;
     }
 
     if (is_safe_nomessage( ch, victim )) {
-        ch->println( "Жертва не находится в твоем ПК." );
+        ch->pecho( "Жертва не находится в твоем ПК." );
         return true;
     }
     
@@ -1007,22 +1007,22 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
         return true;
 
     if (!checkRoom( ch->in_room )) {
-        ch->println( "Здесь невозможно установить и замаскировать капкан." );        
+        ch->pecho( "Здесь невозможно установить и замаскировать капкан." );        
         return true;
     }
     
     if (ch->isAffected( gsn_hunter_snare )) {
-        ch->println( "Предыдущий капкан был установлен тобой совсем недавно." );
+        ch->pecho( "Предыдущий капкан был установлен тобой совсем недавно." );
         return true;
     }
 
     if (obj->level > ch->getModifyLevel( )) {
-        ch->println( "Устройство этого капкана слишком сложно для твоего понимания." );
+        ch->pecho( "Устройство этого капкана слишком сложно для твоего понимания." );
         return true;
     }
 
     if (!ownerName.getValue( ).empty( )) {
-        ch->println( "В этом капкане уже кто-то побывал." );
+        ch->pecho( "В этом капкане уже кто-то побывал." );
         return true;
     }
     
@@ -1178,7 +1178,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
         return true;
 
     if (!checkRoom( ch->in_room )) {
-        ch->println( "Здешняя почва непригодна для копания ямы." );        
+        ch->pecho( "Здешняя почва непригодна для копания ямы." );        
         return true;
     }
     
@@ -1202,17 +1202,17 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
     }
     
     if (!pit->behavior || !(bhv = pit->behavior.getDynamicPointer<HunterPitTrap>( ))) {
-        ch->println( "Что-то не так.." );
+        ch->pecho( "Что-то не так.." );
         return true;
     }
     
     if (!bhv->isFresh( ) && !bhv->isOwner( ch )) {
-        ch->println( "Другой Охотник уже начал копать здесь яму, не стоит ему мешать." );
+        ch->pecho( "Другой Охотник уже начал копать здесь яму, не стоит ему мешать." );
         return true;
     }
     
     if (bhv->getSteaks( )) {
-        ch->println( "Эта яма уже замаскирована и ждет гостей." );
+        ch->pecho( "Эта яма уже замаскирована и ждет гостей." );
         return true;
     }
 
@@ -1301,17 +1301,17 @@ bool HunterPitSteaks::use( Character *ch, const char * cArgs )
     }
 
     if (!pit->behavior || !(bhv = pit->behavior.getDynamicPointer<HunterPitTrap>( ))) {
-        ch->println( "С этой ямой что-то не так.." );
+        ch->pecho( "С этой ямой что-то не так.." );
         return true;
     }
     
     if (bhv->getSteaks( )) {
-        ch->println( "Эта яма уже замаскирована и ждет гостей." );
+        ch->pecho( "Эта яма уже замаскирована и ждет гостей." );
         return true;
     }
 
     if (!bhv->isOwner( ch )) {
-        ch->println( "Эту яму выкопал другой Охотник." );
+        ch->pecho( "Эту яму выкопал другой Охотник." );
         return true;
     }
     
@@ -1525,7 +1525,7 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
     Affect af;
 
     if (ch->isAffected(sn)) {
-        ch->println( "Ты и так в состоянии отличить бревно от капкана.");
+        ch->pecho( "Ты и так в состоянии отличить бревно от капкана.");
         return;
     }
 

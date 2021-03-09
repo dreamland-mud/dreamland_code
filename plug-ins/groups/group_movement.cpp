@@ -496,12 +496,12 @@ SKILL_RUNP( escape )
     argument = one_argument( argument, arg );
 
     if (!gsn_escape->usable( ch )) {
-        ch->println( "Этот навык тебе недоступен, просто напиши {hc{y{leflee{lrсбежать{x." );
+        ch->pecho( "Этот навык тебе недоступен, просто напиши {hc{y{leflee{lrсбежать{x." );
         return;
     }
 
     if (arg[0] == '\0') {
-        ch->println( "Укажи направление." );
+        ch->pecho( "Укажи направление." );
         return;
     }
 

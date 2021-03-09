@@ -1083,7 +1083,7 @@ MEDIT(copy)
         mode = COPY_ERROR;
             
     if (mode == COPY_ERROR || !arg2.isNumber()) {
-        ch->println("Syntax: \r\n"
+        ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy race, hit, damage and other parameters from <vnum> mob index.\r\n"
                     "  copy desc <vnum>  -- copy name, description, short and long description from <vnum> mob index.\r\n" );
         return false;
@@ -1092,7 +1092,7 @@ MEDIT(copy)
     original = get_mob_index( arg2.toInt() );
 
     if (original == NULL) {
-        ch->println("Mobile not found.\r\n");
+        ch->pecho("Mobile not found.\r\n");
         return false;
     }
     
@@ -1128,7 +1128,7 @@ MEDIT(average)
     int total;
     
     if (mob.level == 0) {
-        ch->println("Please set non-zero mob level.");
+        ch->pecho("Please set non-zero mob level.");
         return false;
     }
     
@@ -1203,7 +1203,7 @@ MEDIT(average)
     }
     
     if (fDone) {
-        ch->println("Average values assigned.\r\n");
+        ch->pecho("Average values assigned.\r\n");
         return true;
     }
     else {
@@ -1251,7 +1251,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if (!str_cmp(argument, "next")) {
             value = next_mob_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
-                ch->println("Все внумы в этой зоне уже заняты!");
+                ch->pecho("Все внумы в этой зоне уже заняты!");
                 return;
             }
         }

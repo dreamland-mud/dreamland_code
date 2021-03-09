@@ -23,17 +23,17 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
         return false;
     
     if (!arg[0]) {
-        ch->println( "Какую именно вещь ты хочешь сделать своей собственностью?" );
+        ch->pecho( "Какую именно вещь ты хочешь сделать своей собственностью?" );
         return true;
     }
 
     if (!( item = get_obj_carry( ch, arg ) )) {
-        ch->println( "У тебя нет этого." );
+        ch->pecho( "У тебя нет этого." );
         return true;
     }
 
     if (item->pIndexData->limit >= 0) {
-        ch->println( "Лимиты нельзя приватизировать!" );
+        ch->pecho( "Лимиты нельзя приватизировать!" );
         return true;
     }
 
@@ -43,7 +43,7 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
     }
 
     if (item->pIndexData == obj->pIndexData) {
-        ch->println( "Это неразумно." );
+        ch->pecho( "Это неразумно." );
         return true;
     }
 

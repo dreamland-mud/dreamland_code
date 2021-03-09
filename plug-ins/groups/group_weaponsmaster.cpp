@@ -53,17 +53,17 @@ SKILL_RUNP( second )
     Object *obj;
 
     if (argument[0] == '\0') {
-        ch->println( "Вооружиться чем?" );
+        ch->pecho( "Вооружиться чем?" );
         return;
     }
 
     if (( obj = get_obj_carry (ch, argument) ) == 0) {
-        ch->println( "У тебя нет этого." );
+        ch->pecho( "У тебя нет этого." );
         return;
     }
 
     if (!obj->can_wear( ITEM_WIELD )) {
-        ch->println( "Ты не можешь вооружиться этим как вторичным оружием." );
+        ch->pecho( "Ты не можешь вооружиться этим как вторичным оружием." );
         return;
     }
     
@@ -216,7 +216,7 @@ SKILL_RUNP( disarm )
         {
                 ch->send_to("Твой противник не вооружен.\n\r");
                 if(IS_CHARMED(ch) && ch->master->getPC())
-                ch->master->println("Твой противник не вооружен.");
+                ch->master->pecho("Твой противник не вооружен.");
                 return;
         }
 
@@ -487,7 +487,7 @@ SKILL_RUNP( lash )
     {
         ch->send_to( "Возьми в руки хлыст.\n\r" );
         if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
-        ch->master->println("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
+        ch->master->pecho("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
         return;
     }
 

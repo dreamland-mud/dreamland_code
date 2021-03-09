@@ -53,7 +53,7 @@ COMMAND(CMlt, "mlt")
     
     if (!arg.empty( )) 
         if (!( pcm = PCharacterManager::find( arg ) )) {
-            ch->println( "В DreamLand нет жителя с таким именем." );
+            ch->pecho( "В DreamLand нет жителя с таким именем." );
             return;
         }
 

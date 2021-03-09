@@ -97,7 +97,7 @@ bool parse_input(PCharacter *ch, const DLString &_input, Args &args)
     DLString input(_input);
 
     if (input.stripWhiteSpace().empty()) {
-        ch->println("Этой команде необходимы аргументы.");
+        ch->pecho("Этой команде необходимы аргументы.");
         return false;
     }
 
@@ -120,7 +120,7 @@ bool parse_input(PCharacter *ch, const DLString &_input, Args &args)
 
     } 
     catch (const pegtl::mud::ParseException &pex) {
-        ch->println(pex.what());
+        ch->pecho(pex.what());
     }
 
     return false;

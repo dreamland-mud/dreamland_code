@@ -311,7 +311,7 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
         if (verbose)
-            ch->println( "Тебе не с кем практиковаться здесь." );
+            ch->pecho( "Тебе не с кем практиковаться здесь." );
         return false;
     }
     

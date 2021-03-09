@@ -581,7 +581,7 @@ NMI_INVOKE( CharacterWrapper, flydown, "опуститься на землю б�
 
     if (is_flying(target)) {
         target->posFlags.setBit( POS_FLY_DOWN );
-        target->println( "Ты перестаешь летать." );
+        target->pecho( "Ты перестаешь летать." );
         target->recho( "%^C1 перестает летать.", target ); 
         return Register(true);
     }
@@ -1945,13 +1945,13 @@ NMI_INVOKE( CharacterWrapper, mortality, "(): включает-выключае�
     if (target->getPC( )->getAttributes( ).isAvailable( "coder" )) {
         target->getPC( )->getAttributes( ).eraseAttribute( "coder" );
         target->getPC( )->setSecurity( 0 );
-        target->println("Now you are mortal.");
+        target->pecho("Now you are mortal.");
         return 1;
     }
     else {
         target->getPC( )->getAttributes( ).getAttr<XMLAttributeCoder>( "coder" );
         target->getPC( )->setSecurity( 999 );
-        target->println("Now you are immortal.");
+        target->pecho("Now you are immortal.");
         return 0;
     }
 }

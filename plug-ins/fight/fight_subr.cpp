@@ -147,7 +147,7 @@ void check_bloodthirst( Character *ch )
 
         if (ch != vch && ch->can_see(vch) && !is_safe_nomessage(ch, vch))
         {
-            ch->println( "{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x" );
+            ch->pecho( "{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x" );
             REMOVE_BIT(ch->affected_by, AFF_CHARM);
 
             if (ch->is_npc( ) && ch->in_room) 

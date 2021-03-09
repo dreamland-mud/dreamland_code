@@ -158,7 +158,7 @@ void SubissueWeapon::fight( Character *ch )
         return;
 
     if (hp <= 40 && chance(50)) {
-        ch->println("Твое оружие свистит, {Y'Тебе лучше {y{hcубежать{hx {Yпрочь, подальше отсюда!'{x");
+        ch->pecho("Твое оружие свистит, {Y'Тебе лучше {y{hcубежать{hx {Yпрочь, подальше отсюда!'{x");
         return;
     }
 }

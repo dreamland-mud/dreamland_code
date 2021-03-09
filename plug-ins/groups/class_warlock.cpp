@@ -72,7 +72,7 @@ SKILL_RUNP( blink )
 
     if (arg_is_switch_on( arg ))
         {
-            ch->println("Ты будешь мерцать, уклоняясь от атак.");
+            ch->pecho("Ты будешь мерцать, уклоняясь от атак.");
             SET_BIT(ch->act,PLR_BLINK_ON);
              return;
         }
@@ -80,11 +80,11 @@ SKILL_RUNP( blink )
     if (arg_is_switch_off( arg ))
         {
          REMOVE_BIT(ch->act,PLR_BLINK_ON);
-         ch->println("Ты больше не будешь мерцать, уклоняясь от атак.");
+         ch->pecho("Ты больше не будешь мерцать, уклоняясь от атак.");
          return;
         }
     
-    ch->println("Укажи {lRвкл или выкл{lEon или off{lx в качестве аргумента."); 
+    ch->pecho("Укажи {lRвкл или выкл{lEon или off{lx в качестве аргумента."); 
 }
 
 SPELL_DECL(Disintegrate);
@@ -293,7 +293,7 @@ VOID_SPELL(WitchCurse)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
 
     if (victim->isAffected(gsn_witch_curse)) {
-        ch->println("На этой жертве уже лежит ведьминское проклятие.");
+        ch->pecho("На этой жертве уже лежит ведьминское проклятие.");
         return;
     }
 

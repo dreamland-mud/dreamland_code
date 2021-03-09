@@ -161,7 +161,7 @@ CMDRUNP( prompt )
         ch->prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x>%c";
     }
     else if (arg_is_show( argument )) {
-        ch->println( "Текущая строка состояния:" );
+        ch->pecho( "Текущая строка состояния:" );
         ch->desc->send( ch->prompt.c_str( ) );
         ch->send_to( "\n\r" );
         return;
@@ -195,7 +195,7 @@ CMDRUNP( battleprompt )
         ch->batle_prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг %Xоп Вых:{g%d{x> [{r%y{x:{Y%o{x]%c";
     }
     else if (arg_is_show( argument )) {
-        ch->println( "Текущая строка состояния в бою:" );
+        ch->pecho( "Текущая строка состояния в бою:" );
         ch->desc->send( ch->batle_prompt.c_str( ) );
         ch->send_to( "\n\r" );
         return;
@@ -241,12 +241,12 @@ static DLString show_experience( PCharacter *ch )
 CMDRUNP( worth )
 {
     ch->send_to( "У тебя " );
-    ch->println( show_money( ch->gold, ch->silver ) );
+    ch->pecho( show_money( ch->gold, ch->silver ) );
 
     if ( ch->is_npc() )
             return;
 
-    ch->println( show_experience( ch->getPC( ) ) );
+    ch->pecho( show_experience( ch->getPC( ) ) );
 
     ch->pecho("Ты уби%Gло|л|ла %3d %s и %3d %s персонажей.",
             ch, 
@@ -635,12 +635,12 @@ CMDRUNP( where )
     ch->setWaitViolence( 1 );
 
     if (eyes_blinded( ch )) {
-        ch->println( "Ты не можешь видеть вещи!" );
+        ch->pecho( "Ты не можешь видеть вещи!" );
         return;
     }
     
     if (eyes_darkened( ch )) {
-        ch->println( "Ты ничего не видишь! Слишком темно!" );
+        ch->pecho( "Ты ничего не видишь! Слишком темно!" );
         return;
     }
 
@@ -784,7 +784,7 @@ static bool fix_title( PCharacter *ch, DLString &title )
     title.replaces( "{+", "" );
 
     if (title.colorLength( ) > 50) {
-        ch->println( "Слишком длинный титул." );
+        ch->pecho( "Слишком длинный титул." );
         return false;
     }
     
@@ -800,7 +800,7 @@ CMDRUNP( title )
         return;
 
     if (IS_SET(ch->act, PLR_NO_TITLE)) {
-        ch->println( "Ты не можешь сменить титул." );
+        ch->pecho( "Ты не можешь сменить титул." );
         return;
     }
     
@@ -826,7 +826,7 @@ CMDRUNP( title )
 
     if (arg == "clear" || arg == "очистить") {
         pch->setTitle( DLString::emptyString );
-        pch->println( "Титул удален." );
+        pch->pecho( "Титул удален." );
         return;
     }
 
@@ -852,12 +852,12 @@ static bool fix_pretitle( PCharacter *ch, DLString &title )
     nospace.stripWhiteSpace( );
    
     if (stripped.size( ) > 25) {
-        ch->println( "Слишком длинный претитул!" );
+        ch->pecho( "Слишком длинный претитул!" );
         return false;
     }
     
     if (nospace.size( ) != stripped.size( )) {
-        ch->println( "В начале или в конце претитула не должно быть пробелов." );
+        ch->pecho( "В начале или в конце претитула не должно быть пробелов." );
         return false;
     }
     
@@ -866,7 +866,7 @@ static bool fix_pretitle( PCharacter *ch, DLString &title )
                 && stripped[i] != ' ' 
                 && stripped[i] != '\'') 
         {
-            ch->println( "В претитуле разрешено использовать только буквы, пробелы и одинарные кавычки." );
+            ch->pecho( "В претитуле разрешено использовать только буквы, пробелы и одинарные кавычки." );
             return false;
         }
 
@@ -889,7 +889,7 @@ CMDRUNP( pretitle )
         return;
 
     if (IS_SET(pch->act, PLR_NO_TITLE)) {
-         pch->println( "Ты не можешь изменить претитул.");
+         pch->pecho( "Ты не можешь изменить претитул.");
          return;
     }
     
@@ -906,7 +906,7 @@ CMDRUNP( pretitle )
     if (arg == "clear" || arg == "очистить") {
         pch->setPretitle( DLString::emptyString );
         pch->setRussianPretitle( DLString::emptyString );
-        pch->println("Русский и английский претитулы очищены.");
+        pch->pecho("Русский и английский претитулы очищены.");
         return;
     }
     
@@ -1514,24 +1514,24 @@ CMDRUNP( demand )
 
   if (ch->getProfession( ) != prof_anti_paladin)
     {
-        ch->println( "Ты никого не запугаешь своим видом." );
+        ch->pecho( "Ты никого не запугаешь своим видом." );
       return;
     }
 
   if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-        ch->println( "Потребовать что и у кого?" );
+        ch->pecho( "Потребовать что и у кого?" );
       return;
     }
 
   if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-        ch->println( "Таких тут нет." );
+        ch->pecho( "Таких тут нет." );
       return;
     }
 
     if (!victim->is_npc( )) {
-        ch->println( "Просто убей и отбери." );
+        ch->pecho( "Просто убей и отбери." );
         return;
     }
 
@@ -1639,7 +1639,7 @@ CMDRUNP( demand )
 
     omprog_give( obj, victim, ch );
 
-    ch->println("Твое могущество повергает всех в трепет.");
+    ch->pecho("Твое могущество повергает всех в трепет.");
 }
 
 /**
@@ -1746,7 +1746,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (arg_oneof(arg, "position", "положение", "позиция")) {
-        ch->println(msgtable_lookup(msg_positions, ch->position));
+        ch->pecho(msgtable_lookup(msg_positions, ch->position));
         return;
     }
     if (arg_oneof(arg, "gold", "золото")) {
@@ -1793,7 +1793,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
    
-    ch->println("Такого параметра не существует или он скрыт от тебя, попробуй что-то еще."); 
+    ch->pecho("Такого параметра не существует или он скрыт от тебя, попробуй что-то еще."); 
 }
 
 
@@ -1834,7 +1834,7 @@ CMDRUNP( score )
 "%s\n\r"
 "      /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/~~\\\n\r", 
              CLR_FRAME);
-    ch->println(
+    ch->pecho(
         fmt ( 0, "     %s|   %s%-50.50s {y%3d{x %4s   %s|____|",
                 CLR_FRAME,
                 CLR_CAPT,
@@ -2093,12 +2093,12 @@ CMDRUNP( nohelp )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("Об отсутствии какого раздела справки ты хочешь сообщить?");
+        ch->pecho("Об отсутствии какого раздела справки ты хочешь сообщить?");
         return;
     }
 
     bugTracker->reportNohelp( ch, txt );
-    ch->println("Записано.");
+    ch->pecho("Записано.");
 }
 
 CMDRUNP( bug )
@@ -2106,12 +2106,12 @@ CMDRUNP( bug )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("О какой именно ошибке ты хочешь сообщить?");
+        ch->pecho("О какой именно ошибке ты хочешь сообщить?");
         return;
     }
 
     bugTracker->reportBug( ch, txt );
-    ch->println( "Ошибка записана.");
+    ch->pecho( "Ошибка записана.");
 }
 
 CMDRUNP( typo )
@@ -2119,12 +2119,12 @@ CMDRUNP( typo )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("О какой именно опечатке ты хочешь сообщить?");
+        ch->pecho("О какой именно опечатке ты хочешь сообщить?");
         return;
     }
 
     bugTracker->reportTypo( ch, txt );
-    ch->println( "Опечатка записана.");
+    ch->pecho( "Опечатка записана.");
 }
 
 CMDRUNP( iidea )
@@ -2132,12 +2132,12 @@ CMDRUNP( iidea )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("О какой именно идее ты хочешь сообщить?");
+        ch->pecho("О какой именно идее ты хочешь сообщить?");
         return;
     }
 
     bugTracker->reportIdea( ch, txt );
-    ch->println( "Идея записана.");
+    ch->pecho( "Идея записана.");
 }
 
 /*---------------------------------------------------------------------------*

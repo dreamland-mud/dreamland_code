@@ -245,13 +245,13 @@ void do_visible( Character *ch )
 {
     if (IS_SET(ch->affected_by, AFF_HIDE))
       {
-        ch->println( "Ты выходишь из тени." );
+        ch->pecho( "Ты выходишь из тени." );
         REMOVE_BIT(ch->affected_by, AFF_HIDE);
         act("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_FADE))
       {
-        ch->println( "Ты выходишь из тени." );
+        ch->pecho( "Ты выходишь из тени." );
         REMOVE_BIT(ch->affected_by, AFF_FADE);
         act("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
       }
@@ -264,7 +264,7 @@ void do_visible( Character *ch )
     }
     if (IS_SET(ch->affected_by, AFF_INVISIBLE))
       {
-        ch->println( "Ты появляешься из ниоткуда." );
+        ch->pecho( "Ты появляешься из ниоткуда." );
         affect_strip(ch, gsn_invisibility);
         affect_strip(ch, gsn_mass_invis);
         REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
@@ -272,7 +272,7 @@ void do_visible( Character *ch )
       }
     if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
       {
-        ch->println( "Ты появляешься из ниоткуда." );
+        ch->pecho( "Ты появляешься из ниоткуда." );
         affect_strip(ch, gsn_improved_invis);
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
         act("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
@@ -280,7 +280,7 @@ void do_visible( Character *ch )
     if (IS_SET(ch->affected_by, AFF_SNEAK)
         && !ch->is_npc() && !IS_SET(ch->getRace()->getAff(),AFF_SNEAK) )
       {
-        ch->println( "Твои движения становятся заметными для окружающих." );
+        ch->pecho( "Твои движения становятся заметными для окружающих." );
         affect_strip(ch, gsn_sneak);
         REMOVE_BIT(ch->affected_by, AFF_SNEAK);
       }

@@ -34,14 +34,14 @@ CMDRUN( attract )
     int occupation;
     
     if (targetName.empty( )) {
-        ch->println( "Чье внимание ты хочешь привлечь?" );
+        ch->pecho( "Чье внимание ты хочешь привлечь?" );
         return;
     }
     
     vch = get_char_room( ch, targetName );
     
     if (vch== NULL) {
-        ch->println( "Здесь таких нет." );
+        ch->pecho( "Здесь таких нет." );
         return;
     }
 

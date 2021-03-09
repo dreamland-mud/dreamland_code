@@ -13,6 +13,6 @@ WrongCommand::WrongCommand( const DLString &name )
 
 void WrongCommand::run( Character *ch, const DLString & )
 {
-    ch->println( msgWrong.c_str( ) );
+    ch->pecho( msgWrong.c_str( ) );
 }
 

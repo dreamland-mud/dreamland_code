@@ -53,7 +53,7 @@ void CTwit::doAdd( PCharacter *ch, DLString &arg )
     if (( pci = PCharacterManager::find( arg ) ))
         name = pci->getName( );
     else {
-        ch->println( "Жертва с таким именем не обнаружена." );
+        ch->pecho( "Жертва с таким именем не обнаружена." );
         return;
     }
     
