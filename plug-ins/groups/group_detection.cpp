@@ -65,7 +65,7 @@ VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Твое зрение уже обострено до предела. ");
         else
-          act_p("Зрение $C2 уже обострено до предела.",
+          oldact_p("Зрение $C2 уже обострено до предела.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -96,7 +96,7 @@ VOID_SPELL(DetectEvil)::run( Character *ch, Character *victim, int sn, int level
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь присутствие дьявольских сил.");
         else
-          act_p("$C1 уже чувствует присутствие дьявольских сил.",
+          oldact_p("$C1 уже чувствует присутствие дьявольских сил.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -128,7 +128,7 @@ VOID_SPELL(DetectGood)::run( Character *ch, Character *victim, int sn, int level
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь присутствие добрых сил.");
         else
-          act_p("$C1 уже чувствует присутствие добрых сил.",
+          oldact_p("$C1 уже чувствует присутствие добрых сил.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -159,7 +159,7 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Ты уже видишь невидимое.");
         else
-          act_p("$C1 уже видит невидимое.",
+          oldact_p("$C1 уже видит невидимое.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -191,7 +191,7 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь магическую ауру вокруг предметов.");
         else
-          act_p("$C1 уже чувствует магическую ауру вокруг предметов.",
+          oldact_p("$C1 уже чувствует магическую ауру вокруг предметов.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -321,7 +321,7 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
         if (victim == ch)
           ch->pecho("Ты уже чувствуешь присутствие очень невидимых существ.");
         else
-          act_p("$C1 уже чувствует присутствие очень невидимых существ.",
+          oldact_p("$C1 уже чувствует присутствие очень невидимых существ.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -354,7 +354,7 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
         else
                 msg = "$C1 -- воплощение {Dзла{x!.";
 
-        act( msg, ch, 0, victim, TO_CHAR);
+        oldact( msg, ch, 0, victim, TO_CHAR);
 
         if (!victim->is_npc())
         {
@@ -372,7 +372,7 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
                         msg = "$C1 понятия не имеет, как относиться к законам.";
                         break;
                 }
-                act( msg, ch, 0, victim, TO_CHAR);
+                oldact( msg, ch, 0, victim, TO_CHAR);
         }
         return;
 

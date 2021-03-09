@@ -232,15 +232,15 @@ void Command::visualize( Character *ch )
     {
         REMOVE_BIT( ch->affected_by, AFF_HIDE | AFF_FADE );
         ch->pecho("Ты выходишь из тени.");
-        act( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
+        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
     }
 
     if (IS_AFFECTED( ch, AFF_IMP_INVIS ) && getPosition( ).getValue( ) == POS_FIGHTING)
     {
         affect_strip( ch, gsn_improved_invis );
         REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-        act( "Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-        act( "$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+        oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
+        oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
     }
 
     if (DIGGED(ch) && (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG )))
@@ -280,7 +280,7 @@ bool Command::checkPosition( Character *ch )
             break;
 
         case POS_FIGHTING:
-            act_p( "Куда! Ты долж$gно|ен|на сражаться.", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+            oldact_p("Куда! Ты долж$gно|ен|на сражаться.", ch, 0, 0, TO_CHAR, POS_FIGHTING );
             break;
     }
     

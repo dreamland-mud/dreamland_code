@@ -96,7 +96,7 @@ CMDRUN( cast )
 
     if (ch->is_npc( ) && ch->master != 0) {
         if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
-            act( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR);
+            oldact("$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR);
             return;
         }
     }
@@ -118,7 +118,7 @@ CMDRUN( cast )
 
     if (HALF_SHADOW(ch)) {
         ch->pecho("Твоя тень поглощает всякую попытку сотворить заклинание.");
-        act_p("$c1 пытается сотворить заклинание, но тень не дает $m сосредоточится.",
+        oldact_p("$c1 пытается сотворить заклинание, но тень не дает $m сосредоточится.",
                 ch, 0, 0, TO_ROOM,POS_RESTING);
         return;
     }
@@ -171,7 +171,7 @@ CMDRUN( cast )
         
     if (IS_SET(ch->in_room->room_flags,ROOM_NO_CAST)) {
         ch->pecho("Стены этой комнаты поглотили твое заклинание.");
-        act_p("$c1 произне$gсло|с|сла заклинание, но стены комнаты поглотили его.",
+        oldact_p("$c1 произне$gсло|с|сла заклинание, но стены комнаты поглотили его.",
                 ch, 0, 0, TO_ROOM,POS_RESTING);
         return;
     }

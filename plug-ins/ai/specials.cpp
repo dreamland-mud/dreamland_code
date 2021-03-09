@@ -246,8 +246,8 @@ bool BasicMobileBehavior::doQuaff( )
     }
 
     if (obj) {
-        act( "$c1 осушает $o4.", ch, obj, 0, TO_ROOM );
-        act( "Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR );
+        oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM );
+        oldact("Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR );
         
         spell_by_item( ch, obj );
         obj_to_char( create_object(get_obj_index(OBJ_VNUM_POTION_VIAL),0),ch);
@@ -354,7 +354,7 @@ bool BasicMobileBehavior::doScavenge( )
     if ((can_wield_obj( ch, target ) && !get_eq_char( ch, wear_wield ))
         || (can_shield_obj( ch, target ) && !get_eq_char( ch, wear_shield )))
     {
-        act("$c1 оценивающе рассматривает $o4.", ch, target, 0, TO_ROOM);
+        oldact("$c1 оценивающе рассматривает $o4.", ch, target, 0, TO_ROOM);
         wear_obj( ch, target, F_WEAR_VERBOSE );
     }
 

@@ -197,23 +197,23 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     if (obj->isAntiAligned( ch )) {
-        act( "Твоя натура не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
-        act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-        act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+        oldact("Твоя натура не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
+        oldact("$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
+        oldact("$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
         return false;
     }
     
     if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
-        act("Твоя натура все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
-        act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-        act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+        oldact("Твоя натура все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
+        oldact("$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
+        oldact("$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
         return false;
     }
 
     if (IS_SET( obj->extra_flags, ITEM_MAGIC ) && ch->isAffected( gsn_spellbane )) {
         int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
-        act("Магия $o2 аннигилирует с твоим спеллбаном!", ch, obj, 0, TO_CHAR);
-        act("Магия $o2 аннигилирует со спеллбаном $c2!", ch, obj, 0, TO_ROOM);
+        oldact("Магия $o2 аннигилирует с твоим спеллбаном!", ch, obj, 0, TO_CHAR);
+        oldact("Магия $o2 аннигилирует со спеллбаном $c2!", ch, obj, 0, TO_ROOM);
         SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_MAGIC ).hit( false );
         interpret_raw( ch, "cb", "Меня ударило магической вещью!" );
         return false;
@@ -356,7 +356,7 @@ bool DefaultWearlocation::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(obj->extra_flags, ITEM_NOREMOVE)) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) 
-            act( "Ты не можешь снять $o4, на этой вещи проклятие.", ch, obj, 0, TO_CHAR);
+            oldact("Ты не можешь снять $o4, на этой вещи проклятие.", ch, obj, 0, TO_CHAR);
         return false;
     }
     

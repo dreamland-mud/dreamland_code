@@ -226,15 +226,15 @@ void auction_update (void)
                     GET_COUNT(auction->bet,"ую монету","ые монеты","ых монет"));
                 talk_auction(buf);
                 obj_to_char (auction->item,auction->buyer);
-                act_p("Из дымки появляется аукционер и передает тебе $o4.",
+                oldact_p("Из дымки появляется аукционер и передает тебе $o4.",
                      auction->buyer,auction->item,0,TO_CHAR,POS_DEAD);
-                act_p("$c1 получает от прибывшего аукционера $o4.",
+                oldact_p("$c1 получает от прибывшего аукционера $o4.",
                      auction->buyer,auction->item,0,TO_ROOM,POS_RESTING);
 
                 auction->seller->gold += auction->bet; /* give him the money */
-                act_p("Из дымки появляется аукционер и передает тебе вырученные деньги.",
+                oldact_p("Из дымки появляется аукционер и передает тебе вырученные деньги.",
                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                act_p("$c1 получает вырученные деньги от прибывшего аукционера.",
+                oldact_p("$c1 получает вырученные деньги от прибывшего аукционера.",
                      auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
 
                 auction->item = 0; /* reset item */
@@ -246,9 +246,9 @@ void auction_update (void)
                 DLString msg = fmt(0, "Ставок не получено - %1$#O1{Y снят%1$Gо||а|ы с аукциона{x.", auction->item);
                 talk_auction(msg.c_str());
 
-                act_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
+                oldact_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
                       auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                act_p("Аукционер появляется перед $c5 и возвращает $m {W$o4{w.",
+                oldact_p("Аукционер появляется перед $c5 и возвращает $m {W$o4{w.",
                       auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
                 obj_to_char (auction->item,auction->seller);
                 auction->item = 0; /* clear auction */
@@ -517,7 +517,7 @@ CMDRUNP( auction )
                 case ITEM_CORPSE_PC:
                 case ITEM_CORPSE_NPC:
                 case ITEM_TATTOO:
-                        act_p("Ты не можешь выставить на аукцион $T.",
+                        oldact_p("Ты не можешь выставить на аукцион $T.",
                                 ch, 0, item_table.message(obj->item_type).c_str( ),TO_CHAR,POS_SLEEPING);
                         return;
                 default:
@@ -551,7 +551,7 @@ CMDRUNP( auction )
         }
         else
         {
-                act_p("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!",
+                oldact_p("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!",
                         ch,auction->item,0,TO_CHAR,POS_RESTING);
                 return;
         }

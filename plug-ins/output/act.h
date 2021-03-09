@@ -35,10 +35,10 @@ enum {
 /*--------------------------------------------------------------------------
  * 'act' interface functions 
  *--------------------------------------------------------------------------*/
-void act( const char *format, Character *ch, 
+void oldact( const char *format, Character *ch, 
           const void *arg1, const void *arg2, int type );
 
-void act_p( const char *format, Character *ch, 
+void oldact_p( const char *format, Character *ch, 
             const void *arg1, const void *arg2, int type, int min_pos );
 
 /*--------------------------------------------------------------------------

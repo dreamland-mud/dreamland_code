@@ -72,13 +72,13 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    act( "$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM);
-    act( "Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR);
+    oldact("$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM);
+    oldact("Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR);
 
     successfulTargets++;
 
     if (number_percent( ) >= gsn_scrolls->getEffective( ch )) {
-        act("Ты не совлада$gло|л|ла с произношением.", ch, 0, 0, TO_CHAR);
+        oldact("Ты не совлада$gло|л|ла с произношением.", ch, 0, 0, TO_CHAR);
         gsn_scrolls->improve( ch, false );
         return;
     }
@@ -198,13 +198,13 @@ SKILL_RUNP( brandish )
     if (staff->value2() > 0) {
         const char *terrain = terrains[ch->in_room->getSectorType()].hit;
         
-        act( "$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
-        act( "Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );
+        oldact("$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
+        oldact("Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );
 
         if ( number_percent( ) >= gsn_staves->getEffective( ch ))
         {
-            act("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR);
-            act("...и ничего не происходит.",ch,0,0,TO_ROOM);
+            oldact("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR);
+            oldact("...и ничего не происходит.",ch,0,0,TO_ROOM);
             gsn_staves->improve( ch, false );
         }
         else {
@@ -329,28 +329,28 @@ SKILL_RUNP( zap )
 
         if (victim && victim->in_room == ch->in_room) {
             if (ch != victim) {
-                act( "$c1 взмахивает $o5 на тебя!", ch, wand, victim, TO_VICT );
-                act( "$c1 взмахивает $o5 на $C4.", ch, wand, victim, TO_NOTVICT );
-                act( "Ты взмахиваешь $o5 на $C4.", ch, wand, victim, TO_CHAR );
+                oldact("$c1 взмахивает $o5 на тебя!", ch, wand, victim, TO_VICT );
+                oldact("$c1 взмахивает $o5 на $C4.", ch, wand, victim, TO_NOTVICT );
+                oldact("Ты взмахиваешь $o5 на $C4.", ch, wand, victim, TO_CHAR );
             }
             else {
-                act( "$c1 взмахивает $o5 на себя.", ch, wand, 0, TO_ROOM );
-                act( "Ты взмахиваешь $o5 на себя.", ch, wand, 0, TO_CHAR );
+                oldact("$c1 взмахивает $o5 на себя.", ch, wand, 0, TO_ROOM );
+                oldact("Ты взмахиваешь $o5 на себя.", ch, wand, 0, TO_CHAR );
             }
         }
         else if (target->obj && target->obj->getRoom( ) == ch->in_room) {
-            act( "$c1 взмахивает $o5 на $O4.", ch, wand, target->obj, TO_ROOM );
-            act( "Ты взмахиваешь $o5 на $O4.", ch, wand, target->obj, TO_CHAR );
+            oldact("$c1 взмахивает $o5 на $O4.", ch, wand, target->obj, TO_ROOM );
+            oldact("Ты взмахиваешь $o5 на $O4.", ch, wand, target->obj, TO_CHAR );
         }
         else {
-            act( "$c1 взмахивает $o5.", ch, wand, 0, TO_ROOM );
-            act( "Ты взмахиваешь $o5.", ch, wand, 0, TO_CHAR );
+            oldact("$c1 взмахивает $o5.", ch, wand, 0, TO_ROOM );
+            oldact("Ты взмахиваешь $o5.", ch, wand, 0, TO_CHAR );
         }
 
         if (number_percent() >= gsn_wands->getEffective( ch )) {
-            act_p( "Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам.",
+            oldact_p("Твои усиленные манипуляции с $o5 приводят лишь к дыму и искрам.",
                     ch,wand,0,TO_CHAR,POS_RESTING);
-            act_p( "Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам.",
+            oldact_p("Усиленные манипуляции $c2 с $o5 приводят лишь к дыму и искрам.",
                     ch,wand,0,TO_ROOM,POS_RESTING);
             gsn_wands->improve( ch, false, victim );
         }

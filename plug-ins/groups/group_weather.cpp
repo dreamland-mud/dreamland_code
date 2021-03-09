@@ -57,7 +57,7 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
     dam = dice(level, 9);
 
     ch->pecho("Божественная молния поражает твоих врагов!");
-    act( "$c1 посылает молнию, которая повергает $s врагов!", ch, 0, 0, TO_ROOM );
+    oldact("$c1 посылает молнию, которая повергает $s врагов!", ch, 0, 0, TO_ROOM );
     
     area_message( ch, "Молнии сверкают на небе.", false );
 
@@ -109,9 +109,9 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE)) {
         if (victim == ch)
-            act("{MРозовая аура{x уже окружает тебя.", ch, 0, 0, TO_CHAR);
+            oldact("{MРозовая аура{x уже окружает тебя.", ch, 0, 0, TO_CHAR);
         else
-            act("$C1 уже окруже$Gно|н|на {Mрозовой аурой{x.", ch, 0, victim, TO_CHAR);
+            oldact("$C1 уже окруже$Gно|н|на {Mрозовой аурой{x.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -124,7 +124,7 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
     af.bitvector.setValue(AFF_FAERIE_FIRE);
     affect_to_char( victim, &af );
     victim->pecho("Тебя окружает {MРозовая аура{x.");
-    act_p( "$c4 окружает {MРозовая аура{x.",
+    oldact_p("$c4 окружает {MРозовая аура{x.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
 }
 
@@ -134,7 +134,7 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
 { 
     Character *ich;
 
-    act_p("$c1 создает облако розового дыма.",
+    oldact_p("$c1 создает облако розового дыма.",
            ch, 0, 0, TO_ROOM,POS_RESTING);
     ch->pecho("Ты создаешь облако розового дыма.");
 
@@ -162,8 +162,8 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
             REMOVE_BIT   ( ich->affected_by, AFF_SNEAK  );
           }
 
-        act("$c1 обнаруже$gно|н|на!", ich, 0, 0, TO_ROOM);
-        act("Тебя обнаружили!", ich, 0, 0, TO_CHAR);
+        oldact("$c1 обнаруже$gно|н|на!", ich, 0, 0, TO_ROOM);
+        oldact("Тебя обнаружили!", ich, 0, 0, TO_CHAR);
     }
 }
 

@@ -179,7 +179,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     }
     
     if (word.empty( ) || !effect) {
-        act( "{CНа мгновение все вокруг стихло.{x", ch, 0, 0, TO_ALL );
+        oldact("{CНа мгновение все вокруг стихло.{x", ch, 0, 0, TO_ALL );
         return;
     }
 

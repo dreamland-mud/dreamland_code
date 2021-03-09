@@ -60,7 +60,7 @@ void PCharacter::gainExp( int gain )
 
     while (level < LEVEL_HERO - 1 && getExpToLevel( ) <= 0) {
         
-        act_p("{CТы дости$gгло|г|гла следующего уровня!!!{x", this, 0, 0, TO_CHAR, POS_DEAD);
+        oldact_p("{CТы дости$gгло|г|гла следующего уровня!!!{x", this, 0, 0, TO_CHAR, POS_DEAD);
         setLevel( level + 1 );
 
         /* added for samurais by chronos */

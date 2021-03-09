@@ -85,7 +85,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->getRealLevel();
             ch->setLevel( ch->getRealLevel() + 1 );
             ch->pecho("Ты получаешь уровень!");
-            act("$c1 выглядит более опытн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
+            oldact("$c1 выглядит более опытн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "уровень", oldParam, ch->getRealLevel(), victim->getRealLevel());
 
             // Restore act bits that are removed for low-level adaptive pets.
@@ -103,7 +103,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->hitroll;
             ch->hitroll++;
             ch->pecho("Теперь ты будешь попадать более метко!");
-            act("$c1 становится более метк$gим|им|ой!\n\r",ch,0,0,TO_ROOM);
+            oldact("$c1 становится более метк$gим|им|ой!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "точность", oldParam, ch->hitroll, victim->hitroll);
         }
     }
@@ -113,7 +113,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->damroll;
             ch->damroll++;
             ch->pecho("Теперь ты будешь больнее бить!");
-            act("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM);
+            oldact("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "урон", oldParam, ch->damroll, victim->damroll);
         }
     }
@@ -129,7 +129,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->max_hit;
             ch->max_hit = min(ch->max_hit + gain, max_hp);
             ch->pecho("Ты здоровеешь!");
-            act("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM);
+            oldact("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "здоровье", oldParam, ch->max_hit, victim->max_hit);
         }
     }
@@ -145,7 +145,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->max_mana;            
             ch->max_mana = min(ch->max_mana + gain, max_mana);
             ch->pecho("Ты чувствуешь прилив энергии!");
-            act("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM);
+            oldact("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "ману", oldParam, ch->max_mana, victim->max_mana);
         }
     }
@@ -160,7 +160,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
                 int oldParam = ch->damage[DICE_NUMBER];
                 ch->damage[DICE_NUMBER]++;
                 ch->pecho("Теперь ты будешь наносить больше повреждений!");
-                act("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
+                oldact("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
                 wiznet(ch, victim, "dice_number", oldParam, ch->damage[DICE_NUMBER], vch->damage[DICE_NUMBER]);
             }
         }
@@ -170,7 +170,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
                 int oldParam = ch->damage[DICE_TYPE];
                 ch->damage[DICE_TYPE]++;
                 ch->pecho("Теперь ты будешь наносить больше повреждений!");
-                act("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
+                oldact("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM);
                 wiznet(ch, victim, "dice_type", oldParam, ch->damage[DICE_TYPE], vch->damage[DICE_TYPE]);
             }
         }
@@ -206,7 +206,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->armor[dam_type];
             ch->armor[dam_type] += gain;
             ch->pecho("Твоя защита улучшается!");
-            act("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM);
+            oldact("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, "броню", oldParam, ch->armor[dam_type], victim->armor[dam_type]);
         }
     }
@@ -221,7 +221,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             int oldParam = ch->perm_stat[i];
             ch->perm_stat[i] += 1;
             ch->pecho("Твои параметры улучшаются!");
-            act("$c1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM);
+            oldact("$c1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM);
             wiznet(ch, victim, stat_table.fields[i].name, oldParam, ch->perm_stat[i], victim->perm_stat[i]);
         }
     }
@@ -239,9 +239,9 @@ static void apply_align_changes( PCharacter *ch )
                 continue;
 
         if (obj->isAntiAligned( ch )) {
-            act_p( "Ты пытаешься использовать $o4, но это не для тебя.",
+            oldact_p("Ты пытаешься использовать $o4, но это не для тебя.",
                 ch, obj, 0, TO_CHAR,POS_RESTING );
-            act_p( "$c1 пытается использовать $o4, но оно $m не подходит.",
+            oldact_p("$c1 пытается использовать $o4, но оно $m не подходит.",
                 ch, obj, 0, TO_ROOM,POS_RESTING );
             obj_from_char( obj );
             obj_to_room( obj, ch->in_room );
@@ -527,7 +527,7 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
         && victim->getModifyLevel( ) - gch->getModifyLevel( ) >= 20 
         && chance( 10 ))
     {
-        act("Ты уби$gло|л|ла достойного противника, и твое обаяние{le (charisma){x повысилось на единицу.", gch, 0, 0, TO_CHAR);
+        oldact("Ты уби$gло|л|ла достойного противника, и твое обаяние{le (charisma){x повысилось на единицу.", gch, 0, 0, TO_CHAR);
         gch->perm_stat[STAT_CHA] += 1;
     }
     

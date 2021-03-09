@@ -277,7 +277,7 @@ SKILL_RUNP( settraps )
 
                 ch->pecho("Ты устраиваешь ловушку в комнате.");
 
-                act("$c1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM);
+                oldact("$c1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM);
                 return;
         }
         else {
@@ -360,15 +360,15 @@ SKILL_RUNP( envenom )
 
         if (IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
         {
-            act_p("Твоя попытка отравить $o4 закончилась неудачей.",
+            oldact_p("Твоя попытка отравить $o4 закончилась неудачей.",
             ch,obj,0,TO_CHAR,POS_RESTING);
             return;
         }
 
         if (number_percent() < skill)  /* success! */
         {
-            act("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
-            act("Ты отравляешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
+            oldact("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
+            oldact("Ты отравляешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
             if (!IS_SET(obj->value3(), DRINK_POISONED))
             {
                 obj->value3(obj->value3() | DRINK_POISONED);
@@ -378,7 +378,7 @@ SKILL_RUNP( envenom )
             return;
         }
 
-        act("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
+        oldact("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
         if (!IS_SET(obj->value3(), DRINK_POISONED))
             gsn_envenom->improve( ch, false );
         ch->setWait( gsn_envenom->getBeats( ) );
@@ -394,7 +394,7 @@ SKILL_RUNP( envenom )
         ||  IS_WEAPON_STAT(obj,WEAPON_FADING)	    
         ||  IS_OBJ_STAT(obj,ITEM_BLESS) )
         {
-            act("Мощные свойства $o2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR);
+            oldact("Мощные свойства $o2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR);
             return;
         }
 
@@ -427,22 +427,22 @@ SKILL_RUNP( envenom )
             affect_to_obj( obj, &af);
 
             if ( !IS_AFFECTED( ch, AFF_SNEAK ) )
-              act("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
-            act("Ты покрываешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
+              oldact("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
+            oldact("Ты покрываешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, true );
             ch->setWait( gsn_envenom->getBeats( ) );
             return;
         }
         else
         {
-            act("Твоя попытка отравить ядом $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
+            oldact("Твоя попытка отравить ядом $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, false );
             ch->setWait( gsn_envenom->getBeats( ) );
             return;
         }
     }
 
-    act("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
+    oldact("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
     return;
 }
 
@@ -549,9 +549,9 @@ SKILL_RUNP( steal )
                 {
                         victim->position= victim->position==POS_SLEEPING? POS_STANDING:
                         victim->position;
-                        act_p( "$c1 пытается обокрасть тебя.\n\r", ch, 0, victim,TO_VICT,POS_DEAD);
+                        oldact_p("$c1 пытается обокрасть тебя.\n\r", ch, 0, victim,TO_VICT,POS_DEAD);
                 }
-                act( "$c1 пытается обокрасть $C4.\n\r",  ch, 0, victim,TO_NOTVICT);
+                oldact("$c1 пытается обокрасть $C4.\n\r",  ch, 0, victim,TO_NOTVICT);
 
                 if( ( !victim->is_npc() ) || ( number_percent() < 25 ) )
                         set_thief( ch );
@@ -988,7 +988,7 @@ SKILL_RUNP( backstab )
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0 )
     {
-            act_p("Ты долж$gно|ен|на быть вооруже$gно|н|на, чтоб ударить сзади.",
+            oldact_p("Ты долж$gно|ен|на быть вооруже$gно|н|на, чтоб ударить сзади.",
                     ch,0,0,TO_CHAR,POS_RESTING);
             return;
     }
@@ -1016,14 +1016,14 @@ SKILL_RUNP( backstab )
     if ( victim->hit < (0.7 * victim->max_hit)
             && (IS_AWAKE(victim) ) )
     {
-            act_p( "$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна... ты не можешь незаметно подкрасться к не$Gму|му|й.",
+            oldact_p("$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна... ты не можешь незаметно подкрасться к не$Gму|му|й.",
                     ch, 0, victim, TO_CHAR,POS_RESTING);
             return;
     }
 
     if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
     {
-            act_p( "$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.",
+            oldact_p("$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.",
                     ch, 0, victim, TO_CHAR,POS_RESTING);
             return;
     }
@@ -1244,7 +1244,7 @@ SKILL_RUNP( blackjack )
 
         if ( IS_AFFECTED(victim,AFF_SLEEP) )
         {
-                act("$E уже спит.",ch,0,victim,TO_CHAR);
+                oldact("$E уже спит.",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1290,11 +1290,11 @@ SKILL_RUNP( blackjack )
 
         if (Chance(ch, chance * k / 100, 100).reroll())
         {
-                act_p("Ты бьешь $C4 по голове мешочком со свинцом.",
+                oldact_p("Ты бьешь $C4 по голове мешочком со свинцом.",
                         ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("Ты чувствуешь внезапную боль в черепе!",
+                oldact_p("Ты чувствуешь внезапную боль в черепе!",
                ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*",
+                oldact_p("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*",
                ch,0,victim,TO_NOTVICT,POS_RESTING);
                 gsn_blackjack->improve( ch, true, victim );
 
@@ -1461,7 +1461,7 @@ SKILL_RUNP( forge )
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
 	    
         if (number_percent( ) >= chance) {
-            act( "Тебе не удалось точно передать рисунок бороздок $o2.", ch, key, 0, TO_CHAR );
+            oldact("Тебе не удалось точно передать рисунок бороздок $o2.", ch, key, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );
             return;
         }
@@ -1480,8 +1480,8 @@ SKILL_RUNP( forge )
         dup->value1(1);
         obj_to_char( dup, ch );
 
-        act( "Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
-        act( "$c1 изготавливает $o4.", ch, key, 0, TO_ROOM );
+        oldact("Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
+        oldact("$c1 изготавливает $o4.", ch, key, 0, TO_ROOM );
 
         gsn_key_forgery->improve( ch, true );
         extract_obj( blank );
@@ -1514,13 +1514,13 @@ SKILL_RUNP( forge )
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 
 	    
         if (number_percent( ) >= chance) {
-            act( "Твои попытки превратить $o4 в отмычку к этому замку ни к чему не привели.", ch, blank, 0, TO_CHAR );
+            oldact("Твои попытки превратить $o4 в отмычку к этому замку ни к чему не привели.", ch, blank, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );
             return;
         }
 
-        act( "$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
-        act( "$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
+        oldact("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
+        oldact("$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
 
         blank->setOwner( ch->getName( ).c_str( ) );
         blank->gram_gender = Grammar::MultiGender::FEMININE;

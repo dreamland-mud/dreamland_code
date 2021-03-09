@@ -36,7 +36,7 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
       if (victim == ch)
                ch->pecho("Твоя кожа уже подобна камню.");
       else
-               act("Кожа $C2 уже подобна камню.",ch,0,victim,TO_CHAR);
+               oldact("Кожа $C2 уже подобна камню.",ch,0,victim,TO_CHAR);
       return;
     }
   
@@ -56,7 +56,7 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
   affect_to_char( ch, &af );
 
 
-  act_p( "Кожа $c2 затвердевает, становясь подобной камню.",
+  oldact_p("Кожа $c2 затвердевает, становясь подобной камню.",
           victim,0,0,TO_ROOM,POS_RESTING);
   victim->pecho("Твоя кожа затвердевает, становясь подобной камню.");
   return;

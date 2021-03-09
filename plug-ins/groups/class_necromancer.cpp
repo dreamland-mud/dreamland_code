@@ -56,11 +56,11 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
 
         ch->setWait( skill->getBeats( ) );
 
-        act_p("Поток мрака, созданный тобой, окутывает $C4.",
+        oldact_p("Поток мрака, созданный тобой, окутывает $C4.",
                 ch, 0, victim, TO_CHAR, POS_RESTING);
-        act_p("$c1 создает поток мрака, окутывая $C4.",
+        oldact_p("$c1 создает поток мрака, окутывая $C4.",
                 ch, 0, victim, TO_NOTVICT, POS_RESTING);
-        act_p("$C1 создает поток мрака, окутывая тебя.",
+        oldact_p("$C1 создает поток мрака, окутывая тебя.",
                 victim, 0, ch, TO_CHAR, POS_RESTING);
 
         if ( victim->is_immortal()
@@ -100,7 +100,7 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
         }
 
         if  (IS_AFFECTED(victim,AFF_BLOODTHIRST )) {
-            act("$C1 уже жаждет крови!", ch, 0, victim, TO_CHAR);
+            oldact("$C1 уже жаждет крови!", ch, 0, victim, TO_CHAR);
             return;
         }
 
@@ -111,7 +111,7 @@ VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level )
         af.bitvector.setValue(AFF_BLOODTHIRST);
         affect_to_char( victim, &af );
         victim->pecho("Безумие охватывает тебя!");
-        act("Глаза $c2 наливаются кровью.",victim,0,0,TO_ROOM);
+        oldact("Глаза $c2 наливаются кровью.",victim,0,0,TO_ROOM);
         return;
 
 }

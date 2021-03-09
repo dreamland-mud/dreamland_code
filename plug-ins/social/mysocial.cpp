@@ -182,7 +182,7 @@ void MySocial::doList( Character *ch, XMLAttributeCustomSocials::Pointer attr )
     ostringstream buf;
     
     if (attr->empty( )) {
-        act_p("Ты пока не придума$gло|л|ла ни одного собственного социала.", ch, 0, 0, TO_CHAR, POS_DEAD);
+        oldact_p("Ты пока не придума$gло|л|ла ни одного собственного социала.", ch, 0, 0, TO_CHAR, POS_DEAD);
         return;
     }
     

@@ -539,7 +539,7 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
         silver = number_range(number_fuzzy(obj->level), obj->cost / 10);
 
         if (needSpam)
-            act( "$c1 приносит в жертву богам $o4.", ch, obj, 0, TO_ROOM);
+            oldact("$c1 приносит в жертву богам $o4.", ch, obj, 0, TO_ROOM);
 
         if (oprog_sac( obj, ch ))
                 return silver;
@@ -549,7 +549,7 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 
         if (rescue_nosac_items(obj, ch->in_room)) 
             if (needSpam)
-                act( "Некоторые вещи, лежащие в $o6, не могут быть принесены в жертву и падают $T.", 
+                oldact("Некоторые вещи, лежащие в $o6, не могут быть принесены в жертву и падают $T.", 
                      ch, obj, terrains[ch->in_room->getSectorType()].fall, TO_ALL );
 
         extract_obj( obj );
@@ -574,7 +574,7 @@ CMDRUNP( sacrifice )
         
         if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) )
         {
-                act_p( "$c1 предлагает себя в жертву богам, но они вежливо отказываются.",
+                oldact_p("$c1 предлагает себя в жертву богам, но они вежливо отказываются.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 ch->pecho("Боги оценили твою жертву и возможно примут ее позже.");
                 return;
@@ -611,11 +611,11 @@ CMDRUNP( sacrifice )
                 save_items( ch->in_room );
                 
                 if (count == 0) {
-                    act("Ты не наш$gло|ел|ла ничего подходящего для жертвоприношения.", ch, 0, 0, TO_CHAR);
+                    oldact("Ты не наш$gло|ел|ла ничего подходящего для жертвоприношения.", ch, 0, 0, TO_CHAR);
                     return;
                 }
                 
-                act( "$c1 приносит в жертву богам все, что находится $T.", ch, 0, terrains[ch->in_room->getSectorType()].where, TO_ROOM );
+                oldact("$c1 приносит в жертву богам все, что находится $T.", ch, 0, terrains[ch->in_room->getSectorType()].where, TO_ROOM );
                 wiznet( WIZ_SACCING, 0, 0, "%^C1 sends up all items in %s as a burnt offering.", ch, ch->in_room->getName() );
 
                 if (silver==0) {

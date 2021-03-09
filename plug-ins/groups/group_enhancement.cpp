@@ -44,7 +44,7 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
         if (victim == ch)
           ch->pecho("Ты не можешь быть еще сильнее!");
         else
-          act("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR);
+          oldact("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -104,7 +104,7 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
           ch->pecho("Ты не можешь двигаться быстрее, чем сейчас!");
         else
-          act_p("$C1 не может двигаться еще быстрее.",
+          oldact_p("$C1 не может двигаться еще быстрее.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -121,7 +121,7 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector.setValue(AFF_HASTE);
     affect_to_char( victim, &af );
     victim->pecho("Твои движения становятся намного быстрее.");
-    act_p("Движения $c2 становятся намного быстрее.",
+    oldact_p("Движения $c2 становятся намного быстрее.",
            victim,0,0,TO_ROOM,POS_RESTING);
     if ( ch != victim )
         ch->pecho("Ok.");
@@ -143,11 +143,11 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
         if (victim == ch)
           ch->pecho("Ты уже видишь в темноте.");
         else
-          act_p("$C1 уже видит в темноте.\n\r",
+          oldact_p("$C1 уже видит в темноте.\n\r",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
-    act_p( "Глаза $c2 загораются красным светом.\n\r",
+    oldact_p("Глаза $c2 загораются красным светом.\n\r",
             victim, 0, 0, TO_ROOM,POS_RESTING);
 
     af.bitvector.setTable(&affect_flags);
@@ -179,7 +179,7 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
         if (victim == ch)
             ch->pecho("Куда уж больше.");
         else
-            act("$C1 уже учится.\n\r", ch,0,victim,TO_CHAR);
+            oldact("$C1 уже учится.\n\r", ch,0,victim,TO_CHAR);
         return;
   }
 
@@ -191,6 +191,6 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
   victim->pecho("Ты концентрируешься на учебе.");
 
   if (ch != victim)
-      act("$C1 будет учиться лучше!\n\r", ch,0,victim,TO_CHAR);
+      oldact("$C1 будет учиться лучше!\n\r", ch,0,victim,TO_CHAR);
 
 }

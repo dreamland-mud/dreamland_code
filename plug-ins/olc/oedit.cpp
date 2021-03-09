@@ -1188,8 +1188,8 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         else
             obj_to_room( obj, ch->in_room );
 
-        act( "$c1 создает $o4!", ch, obj, 0, TO_ROOM);
-        act( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
+        oldact("$c1 создает $o4!", ch, obj, 0, TO_ROOM);
+        oldact("Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
         return;
     }
     stc("OEdit:  There is no default object to edit.\n\r", ch);

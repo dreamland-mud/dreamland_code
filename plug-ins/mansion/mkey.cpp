@@ -269,8 +269,8 @@ bool MansionKeyMaker::canServeClient( Character * )
 
 void MansionKeyMaker::msgListRequest( Character *client )
 {
-    act( "$c1 просит $C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
-    act( "Ты просишь у $C4 показать список ключей.", client, 0, getKeeper( ), TO_CHAR );
+    oldact("$c1 просит $C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
+    oldact("Ты просишь у $C4 показать список ключей.", client, 0, getKeeper( ), TO_CHAR );
 }
 
 void MansionKeyMaker::msgBuyRequest( Character *client )
@@ -350,8 +350,8 @@ bool MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
     key = create_object( get_obj_index( vnum ), 1 );
     obj_to_char( key, client );
 
-    act( "$C1 вручает тебе $o4.", client, key, maker, TO_CHAR );
-    act( "$C1 вручает $c3 $o4." , client, key, maker, TO_ROOM );
+    oldact("$C1 вручает тебе $o4.", client, key, maker, TO_CHAR );
+    oldact("$C1 вручает $c3 $o4." , client, key, maker, TO_ROOM );
     return true;
 }
 

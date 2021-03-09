@@ -83,8 +83,8 @@ SKILL_RUNP( layhands )
             else
                 sbonus = chance / 20;
             
-            act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
-            act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
+            oldact("Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
+            oldact("Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
         }
         
@@ -92,24 +92,24 @@ SKILL_RUNP( layhands )
         update_pos( victim );
     
         if (ch != victim) {
-            act( "Ты возлагаешь руки на $C4, и $M становится гораздо лучше.", ch, 0, victim, TO_CHAR);
-            act( "$c1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
-            act( "$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
+            oldact("Ты возлагаешь руки на $C4, и $M становится гораздо лучше.", ch, 0, victim, TO_CHAR);
+            oldact("$c1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
+            oldact("$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
         } else {
-            act( "Ты возлагаешь на себя руки и тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
-            act( "$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
+            oldact("Ты возлагаешь на себя руки и тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
         }
     
         gsn_lay_hands->improve( ch, true, victim );        
     }
     else {
       if (ch != victim) {
-          act( "Ты возлагаешь руки на $C4, но ничего не происходит.", ch, 0, victim, TO_CHAR);
-          act( "$c1 картинным жестом возлагает на тебя руки... но ничего не происходит.", ch, 0, victim, TO_VICT);
-          act( "$c1 картинным жестом возлагает руки на $C4... но ничего не происходит.", ch, 0, victim, TO_NOTVICT);
+          oldact("Ты возлагаешь руки на $C4, но ничего не происходит.", ch, 0, victim, TO_CHAR);
+          oldact("$c1 картинным жестом возлагает на тебя руки... но ничего не происходит.", ch, 0, victim, TO_VICT);
+          oldact("$c1 картинным жестом возлагает руки на $C4... но ничего не происходит.", ch, 0, victim, TO_NOTVICT);
       } else {
-          act( "Ты возлагаешь на себя руки, но ничего не происходит.", ch, 0, 0, TO_CHAR);
-          act( "$c1 картинным жестом возлагает на себя руки... но ничего не происходит.", ch, 0, 0, TO_ROOM);
+          oldact("Ты возлагаешь на себя руки, но ничего не происходит.", ch, 0, 0, TO_CHAR);
+          oldact("$c1 картинным жестом возлагает на себя руки... но ничего не происходит.", ch, 0, 0, TO_ROOM);
       }
       gsn_lay_hands->improve( ch, false, victim );        
     }
@@ -128,16 +128,16 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
            && victim->getRace( ) != race_demon
            && victim->getRace( ) != race_golem))
     {
-        act("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR);
+        oldact("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR);
         return;
     }
     
     if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_PRAYER)) {
-        act("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR);
+        oldact("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR);
         return;
     }
     
-    act_p("Возникает ослепительная вспышка, она поглощает $c4 и $e исчезает.",
+    oldact_p("Возникает ослепительная вспышка, она поглощает $c4 и $e исчезает.",
             victim, 0, 0, TO_ROOM, POS_RESTING);
         
     raw_kill( victim, -1, ch, FKILL_MOB_EXTRACT );
@@ -157,7 +157,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     if (ch->hit  < ch->max_hit  / 10 ||
         ch->mana < ch->max_mana / 10 ||
         ch->move < ch->max_move / 10) {
-        act("Ты слишком истоще$gно|н|на для молитвы.", ch, 0, 0, TO_CHAR);
+        oldact("Ты слишком истоще$gно|н|на для молитвы.", ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -169,7 +169,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     // 20% chance to fail with max skill
     if (ch->isAffected(sn) || roll > sk * 4 / 5 )
     {         
-        act("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR);
+        oldact("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR);
         
         if (!ch->isAffected(gsn_weaken)) {
             af.type = gsn_weaken;
@@ -179,7 +179,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             af.modifier = -1 * (punish_lvl / 4);
             affect_to_char(ch, &af);
             ch->pecho("Ты чувствуешь, как сила уходит из тебя.");
-            act("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM);
+            oldact("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM);
         }
         else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
             af.bitvector.setTable(&affect_flags);
@@ -193,7 +193,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             af.location = APPLY_SAVING_SPELL;
             af.modifier = punish_lvl / 7;
             affect_to_char(ch, &af);
-            act("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR);
+            oldact("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR);
         }
         else {
             if (ch->fighting) {
@@ -211,7 +211,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 
                 if (IS_AWAKE(ch)) {
                     ch->pecho("Ты засыпаешь....");
-                    act("$c1 засыпает.", ch, NULL, NULL, TO_ROOM);
+                    oldact("$c1 засыпает.", ch, NULL, NULL, TO_ROOM);
                     ch->position = POS_SLEEPING;
                 }
             }
@@ -294,8 +294,8 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
     Character *vch, *vch_next;
     int dam;
 
-    act( "$c1 чертит в воздухе священный символ.", ch, 0, 0, TO_ROOM);
-    act( "Ты чертишь в воздухе священный символ.", ch, 0, 0, TO_CHAR);
+    oldact("$c1 чертит в воздухе священный символ.", ch, 0, 0, TO_ROOM);
+    oldact("Ты чертишь в воздухе священный символ.", ch, 0, 0, TO_CHAR);
 
     for (vch = room->people; vch != NULL; vch = vch_next) {
         vch_next = vch->next_in_room;
@@ -310,13 +310,13 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
             continue;
         
         if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_PRAYER )) {
-            act("$C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
-            act("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT);
+            oldact("$C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
+            oldact("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT);
             damage_nocatch( ch, vch, 0, sn, DAM_HOLY, true, DAMF_PRAYER );
         }
         else {
-            act( "$c5 овладевают священные силы, заставляя в ужасе обратиться в бегство.", vch, 0, ch, TO_ROOM);
-            act( "Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT);
+            oldact("$c5 овладевают священные силы, заставляя в ужасе обратиться в бегство.", vch, 0, ch, TO_ROOM);
+            oldact("Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT);
 
             dam = dice( level, 12 ); 
             damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_PRAYER );
@@ -357,13 +357,13 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
         }
 
         if (victim != ch) {
-            act_p("$c1 высоко вздымает руки, посылая ослепительный луч света!",
+            oldact_p("$c1 высоко вздымает руки, посылая ослепительный луч света!",
                    ch,0,0,TO_ROOM,POS_RESTING);
             ch->pecho("Ты высоко вздымаешь руки, посылая ослепительный луч света!");
         }
 
         if (IS_GOOD(victim) || IS_NEUTRAL(victim)) {
-            act_p("Свет не может причинить вреда $c3.",
+            oldact_p("Свет не может причинить вреда $c3.",
                    victim,0,victim,TO_ROOM,POS_RESTING);
             victim->pecho("Свет не может причинить тебе вреда.");
             continue;
@@ -373,7 +373,7 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
             && victim->getNPC( )->behavior
             && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
         {
-            act("$c1 не может покинуть свой пост.", victim, 0, 0, TO_ROOM);
+            oldact("$c1 не может покинуть свой пост.", victim, 0, 0, TO_ROOM);
             continue;
         }
                              

@@ -58,8 +58,8 @@ void ClanGuardLion::actGreet( PCharacter *wch )
 }
 void ClanGuardLion::actPush( PCharacter *wch )
 {
-    act( "$C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности.", wch, 0, ch, TO_CHAR );
-    act( "$C1, глядя на $c4, выпускает когти, и $c1 сматывает удочки.", wch, 0, ch, TO_ROOM );
+    oldact("$C1 выпускает когти.\n\rИ ты быстренько убираешься из этой местности.", wch, 0, ch, TO_CHAR );
+    oldact("$C1, глядя на $c4, выпускает когти, и $c1 сматывает удочки.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardLion::getCast( Character *victim )
 {
@@ -150,7 +150,7 @@ SKILL_RUNP( claw )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но ведь $C1 твой друг!",ch,0,victim,TO_CHAR);
+                oldact("Но ведь $C1 твой друг!",ch,0,victim,TO_CHAR);
                 return;
         }
    
@@ -254,9 +254,9 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   af.bitvector.setValue(AFF_BERSERK);
   affect_to_char( ch, &af );
 
-  act_p("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.",
+  oldact_p("Ты чувствуешь себя немного неповоротлив$gым|ым|ой, но зато намного более сильн$gым|ым|ой.",
                 ch,0,0,TO_CHAR,POS_RESTING);
-  act( "Кожа $c2 становится серой!",ch,0,0,TO_ROOM);
+  oldact("Кожа $c2 становится серой!",ch,0,0,TO_ROOM);
 
 }
 
@@ -265,8 +265,8 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
  */
 void LionEyedSword::wear( Character *ch )
 {
-    act("Глаза $o2 открываются.",ch,obj,0,TO_CHAR);
-    act("Глаза $o2 открываются.",ch,obj,0,TO_ROOM);
+    oldact("Глаза $o2 открываются.",ch,obj,0,TO_CHAR);
+    oldact("Глаза $o2 открываются.",ch,obj,0,TO_ROOM);
 
 }
 void LionEyedSword::equip( Character *ch )
@@ -367,8 +367,8 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
-  act( "Ты создаешь $o4!",ch,shield,0,TO_CHAR);
-  act( "$c1 создает $o4!",ch,shield,0,TO_ROOM);
+  oldact("Ты создаешь $o4!",ch,shield,0,TO_CHAR);
+  oldact("$c1 создает $o4!",ch,shield,0,TO_ROOM);
 
 }
 
@@ -391,7 +391,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (ch->isAffected( sn )) {
-        act("Ты уже защище$gно|н|на от ловушек Охотников.", ch, 0, 0, TO_CHAR);
+        oldact("Ты уже защище$gно|н|на от ловушек Охотников.", ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -424,7 +424,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
         room->affectTo( &af );
 
         ch->pecho("Ты защищаешь местность от ловушек Охотников и от их мести.");
-        act( "$c1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM);
+        oldact("$c1 защищает местность от ловушек Охотников и от их мести.",ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(Prevent);

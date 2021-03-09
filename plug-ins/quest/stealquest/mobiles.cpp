@@ -29,7 +29,7 @@ void RobbedVictim::givenGood( PCharacter *hero, Object *obj )
 {
     quest->state = QSTAT_FINISHED;
 
-    act( "$c1 восклицает '{gСпасибо тебе, $C1!{x'", ch, 0, hero, TO_ROOM );
+    oldact("$c1 восклицает '{gСпасибо тебе, $C1!{x'", ch, 0, hero, TO_ROOM );
     say_act( hero, ch, "Вернись за вознаграждением к тому, кто рассказал тебе о моем несчастье." );
     
     if (quest->itemWear != wear_none) {
@@ -44,25 +44,25 @@ void RobbedVictim::givenGood( PCharacter *hero, Object *obj )
 void RobbedVictim::givenBad( PCharacter *hero, Object *obj )
 {
     say_act( hero, ch, "Ну и зачем мне это?" );
-    act( "$c1 с равнодушным видом протягивает тебе $o4.", ch, obj, hero, TO_VICT );
-    act( "$c1 с равнодушным видом протягивает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
+    oldact("$c1 с равнодушным видом протягивает тебе $o4.", ch, obj, hero, TO_VICT );
+    oldact("$c1 с равнодушным видом протягивает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 
 void RobbedVictim::deadFromIdiot( PCMemoryInterface *pcm )
 {
-    act("{YИдио$gт|т|тка! Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", pcm->getPlayer( ), 0, 0, TO_CHAR);
+    oldact("{YИдио$gт|т|тка! Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", pcm->getPlayer( ), 0, 0, TO_CHAR);
 }
 
 void RobbedVictim::deadFromSuicide( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) 
-        act_p("{Y$c1 внезапно скончал$gось|ся|ась. Задание отменяется.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+        oldact_p("{Y$c1 внезапно скончал$gось|ся|ась. Задание отменяется.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void RobbedVictim::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-        act_p("{Y$c1 подло уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+        oldact_p("{Y$c1 подло уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void RobbedVictim::show( Character *victim, std::basic_ostringstream<char> &buf ) 

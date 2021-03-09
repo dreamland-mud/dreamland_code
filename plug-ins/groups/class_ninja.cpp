@@ -160,7 +160,7 @@ SKILL_RUNP( vanish )
         if(SHADOW(ch))
         {
                 ch->pecho("Ты пытаешься схватить в охапку свою тень!");
-                act_p("$c1 пытается схватить в охапку свою тень.",
+                oldact_p("$c1 пытается схватить в охапку свою тень.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
@@ -193,7 +193,7 @@ SKILL_RUNP( vanish )
             return;
     }    
     
-    act( "$c1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM);
+    oldact("$c1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM);
     ch->pecho("Ты бросаешь на землю световую гранату. {WЯркая вспышка{x на мгновение ослепляет всех вокруг!");
     gsn_vanish->improve( ch, true );
 
@@ -278,13 +278,13 @@ SKILL_RUNP( vanish )
     
     if ( number_percent() > chance ) {
             if (FightingCheck) {
-                act( "$c1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM);
+                oldact("$c1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM);
                 ch->pecho("Ты пытаешься скрыться, но противник бдит, и бой продолжается!");
                 return;
             }
             else {
                 // weak stun is a bitch
-                act( "$c1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM);                
+                oldact("$c1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM);                
                 ch->pecho("Ты пытаешься скрыться, но спотыкаешься и падаешь!");
                 return;                
             }    
@@ -299,9 +299,9 @@ SKILL_RUNP( vanish )
     }    
     else {   
             // trying to kidnap
-            act( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT);
-            act( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR);
-            act( "$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
+            oldact("$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT);
+            oldact("Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR);
+            oldact("$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
 
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
@@ -325,9 +325,9 @@ SKILL_RUNP( vanish )
             }
             else {
                     // kidnap failed, victim escaped               
-                    act( "$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT);
-                    act( "$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR);
-                    act( "Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT);
+                    oldact("$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT);
+                    oldact("$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR);
+                    oldact("Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT);
 
                     transfer_char( ch, ch, pRoomIndex,
                         "%1$^C1 внезапно исчезает!",
@@ -414,7 +414,7 @@ SKILL_RUNP( nerve )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -437,7 +437,7 @@ SKILL_RUNP( nerve )
         if(SHADOW(ch))
         {
                 ch->pecho("Твои пальцы проходят сквозь тень!");
-                act_p("$c1 пытается потрогать свою тень.",
+                oldact_p("$c1 пытается потрогать свою тень.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }    
@@ -450,7 +450,7 @@ SKILL_RUNP( nerve )
 
         if (IS_SET(victim->imm_flags, IMM_DISEASE))
         {
-                act_p("$C1 обладает иммунитетом к этой технике.", ch, 0,
+                oldact_p("$C1 обладает иммунитетом к этой технике.", ch, 0,
                     victim, TO_CHAR,POS_RESTING);
                 return;
         }            
@@ -499,17 +499,17 @@ SKILL_RUNP( nerve )
         if ( ch->is_npc() || number_percent() < (int) chance )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
-                act("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
-                act("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
-                act("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT);
+                oldact("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
+                oldact("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
+                oldact("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT);
                 gsn_nerve->improve( ch, true, victim );
         }
         else
         {
                 ch->pecho("Ты нажимаешь не туда, куда надо.");
-                act_p("$c1 нажимает пальцами на твои нервные окончания, но ничего не происходит.",
+                oldact_p("$c1 нажимает пальцами на твои нервные окончания, но ничего не происходит.",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 нажимает пальцами на нервные окончания $C2, но ничего не происходит.",
+                oldact_p("$c1 нажимает пальцами на нервные окончания $C2, но ничего не происходит.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
                 gsn_nerve->improve( ch, false, victim );
         }
@@ -607,8 +607,8 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 
     affect_to_char(ch,&af);
 
-    act("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0, TO_CHAR);
-    act("$c1 мгновенно концентрируется, готовясь к столкновению с магией.", ch,0,0,TO_ROOM);
+    oldact("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0, TO_CHAR);
+    oldact("$c1 мгновенно концентрируется, готовясь к столкновению с магией.", ch,0,0,TO_ROOM);
     return true;
 }
 
@@ -705,9 +705,9 @@ void AssassinateOneHit::calcDamage( )
     Chance mychance(ch, (int) chance, 100);
 
     if (mychance.reroll()) {
-        act("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR);
-        act("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT);
-        act_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
+        oldact("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR);
+        oldact("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT);
+        oldact_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
 
@@ -816,14 +816,14 @@ SKILL_RUNP( assassinate )
             && victim->can_see(ch)
             && IS_AWAKE(victim) )
     {
-            act_p( "$C1 ран$Gено|ен|ена и настороженно оглядывается... ты не можешь подкрасться.",
+            oldact_p("$C1 ран$Gено|ен|ена и настороженно оглядывается... ты не можешь подкрасться.",
                     ch, 0, victim, TO_CHAR,POS_RESTING);
             return;
     }
 
     if (IS_SET(victim->imm_flags, IMM_WEAPON))
     {
-            act_p("$C1 имеет слишком крепкую шею, чтобы ее можно было сломать.", ch, 0,
+            oldact_p("$C1 имеет слишком крепкую шею, чтобы ее можно было сломать.", ch, 0,
                     victim, TO_CHAR,POS_RESTING);
             return;
     }
@@ -835,7 +835,7 @@ SKILL_RUNP( assassinate )
     if(SHADOW(ch))
     {
             ch->pecho("Твои пальцы проходят сквозь тень!");
-            act_p("$c1 пытается сломать шею своей тени.",
+            oldact_p("$c1 пытается сломать шею своей тени.",
                     ch, 0, 0, TO_ROOM,POS_RESTING);
             return;
     }   
@@ -923,7 +923,7 @@ SKILL_RUNP( caltraps )
 
    if (IS_CHARMED(ch) && ch->master == victim)
    {
-        act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+        oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
         return;
    }
 
@@ -952,7 +952,7 @@ SKILL_RUNP( caltraps )
    if(SHADOW(ch))
    {
         ch->pecho("Твои шипы проходят сквозь тень!");
-        act_p("$c1 бросает шипы под ноги собственной тени.",
+        oldact_p("$c1 бросает шипы под ноги собственной тени.",
                 ch, 0, 0, TO_ROOM,POS_RESTING);
         return;
    }    
@@ -965,7 +965,7 @@ SKILL_RUNP( caltraps )
 
    if (IS_SET(victim->imm_flags, IMM_PIERCE))
    {
-        act_p("$C1 обладает иммунитетом к острым шипам.", ch, 0,
+        oldact_p("$C1 обладает иммунитетом к острым шипам.", ch, 0,
                 victim, TO_CHAR,POS_RESTING);
         return;
    }       
@@ -1003,9 +1003,9 @@ SKILL_RUNP( caltraps )
 
   //////////////// THE ROLL ////////////////      
       
-  act_p("Ты кидаешь пригоршню острых шипов под ноги $C3.",
+  oldact_p("Ты кидаешь пригоршню острых шипов под ноги $C3.",
          ch,0,victim,TO_CHAR,POS_RESTING);
-  act_p("$c1 кидает пригоршню острых шипов тебе под ноги!",
+  oldact_p("$c1 кидает пригоршню острых шипов тебе под ноги!",
          ch,0,victim,TO_VICT,POS_RESTING);
 
   ch->setWait( gsn_caltraps->getBeats( ) );
@@ -1068,8 +1068,8 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             todex.modifier = mod/2;
             affect_to_char( victim, &todex);
 
-            act("Острые шипы вонзаются в ступни $C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR);
-            act("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT);
+            oldact("Острые шипы вонзаются в ступни $C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR);
+            oldact("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT);
         }
     } catch (const VictimDeathException &) {
     }
@@ -1179,7 +1179,7 @@ SKILL_RUNP( throwdown )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1208,14 +1208,14 @@ SKILL_RUNP( throwdown )
         if(SHADOW(ch))
         {
                 ch->pecho("Твой захват проходит сквозь тень!");
-                act_p("$c1 пытается бросить через плечо свою тень.",
+                oldact_p("$c1 пытается бросить через плечо свою тень.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         } 
 
         if (IS_SET(victim->imm_flags, IMM_BASH))
         {
-                act_p("$C1 обладает иммунитетом к этой технике.", ch, 0,
+                oldact_p("$C1 обладает иммунитетом к этой технике.", ch, 0,
                     victim, TO_CHAR,POS_RESTING);
                 return;
         }
@@ -1270,11 +1270,11 @@ SKILL_RUNP( throwdown )
 
         if (victim->isAffected(gsn_protective_shield))
         {
-                act_p("{YТвоя попытка броска наталкивается на защитный щит!{x",
+                oldact_p("{YТвоя попытка броска наталкивается на защитный щит!{x",
                                         ch,0,victim, TO_CHAR,POS_FIGHTING);
-                act_p("{Y$c1 не смо$gгло|г|гла бросить тебя, натолкнувшись на защитный щит.{x",
+                oldact_p("{Y$c1 не смо$gгло|г|гла бросить тебя, натолкнувшись на защитный щит.{x",
                                         ch, 0, victim, TO_VICT,POS_FIGHTING);
-                act_p("{Y$c1 распластывается по защитному щиту $C2 в попытке броска.{x",
+                oldact_p("{Y$c1 распластывается по защитному щиту $C2 в попытке броска.{x",
                                         ch,0,victim,TO_NOTVICT,POS_FIGHTING);
                 return;
         }
@@ -1283,11 +1283,11 @@ SKILL_RUNP( throwdown )
         if ( ch->is_npc() || number_percent() < chance )
         {
             if ( number_percent() < 70 ) {
-                act_p("Ты бросаешь $C4 с {Wошеломляющей силой{x.",
+                oldact_p("Ты бросаешь $C4 с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("$c1 бросает тебя с {Wошеломляющей силой{x.",
+                oldact_p("$c1 бросает тебя с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 бросает $C4 с {Wошеломляющей силой{x.",
+                oldact_p("$c1 бросает $C4 с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
                 victim->setWaitViolence( 2 + URANGE (0, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR), 2) );
 
@@ -1299,9 +1299,9 @@ SKILL_RUNP( throwdown )
                 }    
             }
             else {
-                act("Ты бросаешь $C4 через плечо.", ch,0,victim,TO_CHAR);
-                act("$c1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
-                act("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
+                oldact("Ты бросаешь $C4 через плечо.", ch,0,victim,TO_CHAR);
+                oldact("$c1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
+                oldact("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
                 victim->position = POS_RESTING;
             }        
 
@@ -1317,9 +1317,9 @@ SKILL_RUNP( throwdown )
         }
         else
         {
-            act( "Твой бросок не удался.", ch, 0, 0, TO_CHAR);
-            act( "$C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
-            act( "$c1 пытается ухватиться за $C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
+            oldact("Твой бросок не удался.", ch, 0, 0, TO_CHAR);
+            oldact("$C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
+            oldact("$c1 пытается ухватиться за $C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
             gsn_throw->improve( ch, false, victim );
         }
 
@@ -1431,7 +1431,7 @@ SKILL_RUNP( strangle )
         
         if (IS_SET(victim->imm_flags, IMM_WEAPON))
         {
-                act_p("$C1 имеет иммунитет к физическим воздействиям.", ch, 0,
+                oldact_p("$C1 имеет иммунитет к физическим воздействиям.", ch, 0,
                         victim, TO_CHAR,POS_RESTING);
                 return;
         }
@@ -1443,7 +1443,7 @@ SKILL_RUNP( strangle )
         if(SHADOW(ch))
         {
                 ch->pecho("Твои пальцы проходят сквозь тень!");
-                act_p("$c1 пытается придушить собственную тень.",
+                oldact_p("$c1 пытается придушить собственную тень.",
                     ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
@@ -1510,11 +1510,11 @@ SKILL_RUNP( strangle )
 
         if ( ch->is_npc() || mychance.reroll())
         {
-                act_p("Ты смыкаешь руки на шее $C2 и $E погружается в сон.",
+                oldact_p("Ты смыкаешь руки на шее $C2 и $E погружается в сон.",
                         ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("$c1 смыкает руки на твоей шее и ты погружаешься в сон.",
+                oldact_p("$c1 смыкает руки на твоей шее и ты погружаешься в сон.",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 смыкает руки на шее $C2 и $E погружается в сон.",
+                oldact_p("$c1 смыкает руки на шее $C2 и $E погружается в сон.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
                 gsn_strangle->improve( ch, true, victim );
         
@@ -1576,7 +1576,7 @@ SKILL_RUNP( poison )
         }
 
         ch->pecho("Облако отравленного дыма наполнило комнату.");
-        act("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM);
+        oldact("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_poison_smoke->improve( ch, true );
 
@@ -1632,7 +1632,7 @@ SKILL_RUNP( blindness )
         }
 
         ch->pecho("Облако загадочной пыли наполнило комнату.");
-        act("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM);
+        oldact("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM);
 
         gsn_blindness_dust->improve( ch, true );
     

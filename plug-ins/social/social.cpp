@@ -285,15 +285,15 @@ bool Social::reaction( Character *ch, Character *victim, const DLString &arg )
     case 0:
     case 1: case 2: case 3: case 4:
     case 5: case 6: case 7: case 8:
-        act( getArgOther( ).c_str( ), victim, 0, ch, TO_NOTVICT );
-        act_p( getArgMe( ).c_str( ), victim, 0, ch, TO_CHAR, getPosition( ) );
-        act( getArgVictim( ).c_str( ), victim, 0, ch, TO_VICT );
+        oldact( getArgOther( ).c_str( ), victim, 0, ch, TO_NOTVICT );
+        oldact_p( getArgMe( ).c_str( ), victim, 0, ch, TO_CHAR, getPosition( ) );
+        oldact( getArgVictim( ).c_str( ), victim, 0, ch, TO_VICT );
         break;
 
     case 9: case 10: case 11: case 12:
-        act( "$c1 шлепает $C4.",  victim, 0, ch, TO_NOTVICT );
-        act_p( "Ты шлепаешь $C4.",  victim, 0, ch, TO_CHAR, getPosition( ) );
-        act( "$c1 шлепает тебя.", victim, 0, ch, TO_VICT );
+        oldact("$c1 шлепает $C4.",  victim, 0, ch, TO_NOTVICT );
+        oldact_p("Ты шлепаешь $C4.",  victim, 0, ch, TO_CHAR, getPosition( ) );
+        oldact("$c1 шлепает тебя.", victim, 0, ch, TO_VICT );
         break;
     case 13: 
         interpret_fmt( victim, "sigh %s", ch->getNameP( ) );

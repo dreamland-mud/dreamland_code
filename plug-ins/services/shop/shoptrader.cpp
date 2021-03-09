@@ -69,7 +69,7 @@ void ShopTrader::load( DLString str )
 void ShopTrader::give( Character *from, Object *obj )
 {
     tell_dim( from, ch, "Извини, но я не беру взяток!" );
-    act("$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
+    oldact("$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
 }

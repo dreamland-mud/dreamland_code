@@ -74,7 +74,7 @@ bool Rat::area( )
         XMLAttributeRats::Pointer attr = master->getPC( )->getAttributes( ).findAttr<XMLAttributeRats>( "rats" );
         
         if (attr && attr->nongrata == true) {
-            act_p( "$c1 говорит тебе '{GЯ не желаю служить тебе..{x'", ch, 0, master, TO_VICT, POS_DEAD );
+            oldact_p("$c1 говорит тебе '{GЯ не желаю служить тебе..{x'", ch, 0, master, TO_VICT, POS_DEAD );
             extract_char( ch );
             return true;
         }
@@ -90,7 +90,7 @@ bool Rat::area( )
         return false;
     }
 
-    act("$c1 отправляется в крысиный рай.", ch, 0, 0, TO_ROOM);
+    oldact("$c1 отправляется в крысиный рай.", ch, 0, 0, TO_ROOM);
     extract_char( ch );
     return true;
 }

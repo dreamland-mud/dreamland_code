@@ -436,7 +436,7 @@ CMDWIZP( disconnect )
 
     if ( victim->desc == 0 )
     {
-        act_p( "У $C2 нет дескриптора.", ch, 0, victim, TO_CHAR,POS_DEAD );
+        oldact_p("У $C2 нет дескриптора.", ch, 0, victim, TO_CHAR,POS_DEAD );
         return;
     }
 
@@ -616,9 +616,9 @@ CMDWIZP( goto )
         for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room)
             if (rch->get_trust() >= ch->invis_level) {
                 if (!pch->bamfout.empty( ))
-                    act( "$t", ch, pch->bamfout.c_str( ), rch, TO_VICT );
+                    oldact("$t", ch, pch->bamfout.c_str( ), rch, TO_VICT );
                 else
-                    act( "$c1 исчезает в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    oldact("$c1 исчезает в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
             }
     }
     
@@ -628,9 +628,9 @@ CMDWIZP( goto )
         for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room)
             if (rch->get_trust() >= ch->invis_level) {
                 if (!pch->bamfin.empty( ))
-                    act( "$t", ch, pch->bamfin.c_str( ), rch, TO_VICT );
+                    oldact("$t", ch, pch->bamfin.c_str( ), rch, TO_VICT );
                 else
-                    act( "$c1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
+                    oldact("$c1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
             }
     }
 }
@@ -1751,7 +1751,7 @@ CMDWIZP( mwhere )
     }
 
     if (!found)
-        act_p( "Тебе не удалось найти $T.", ch, 0, argument, TO_CHAR,POS_DEAD );
+        oldact_p("Тебе не удалось найти $T.", ch, 0, argument, TO_CHAR,POS_DEAD );
     else
         page_to_char(buffer.str( ).c_str( ),ch);
 
@@ -2049,8 +2049,8 @@ CMDWIZP( clone )
 
                 recursive_clone(ch,obj,clone);
 
-                act("$c1 создает $o4.",ch,clone,0,TO_ROOM);
-                act("Ты создаешь дубликат $o2.",ch,clone,0,TO_CHAR);
+                oldact("$c1 создает $o4.",ch,clone,0,TO_ROOM);
+                oldact("Ты создаешь дубликат $o2.",ch,clone,0,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %O4.", ch, obj );
                 return;
@@ -2089,8 +2089,8 @@ CMDWIZP( clone )
                 }
 
                 char_to_room(clone,ch->in_room);
-                act("$c1 создает $C4.",ch,0,clone,TO_ROOM);
-                act("Ты клонируешь $C4.",ch,0,clone,TO_CHAR);
+                oldact("$c1 создает $C4.",ch,0,clone,TO_ROOM);
+                oldact("Ты клонируешь $C4.",ch,0,clone,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %C4.", ch, clone );
                 
@@ -2155,8 +2155,8 @@ CMDWIZP( load )
         if (victim->in_room == 0)
             char_to_room( victim, ch->in_room );
 
-        act( "$c1 создает $C4!", ch, 0, victim, TO_ROOM);
-        act( "Ты создаешь $C4!", ch, 0, victim, TO_CHAR);
+        oldact("$c1 создает $C4!", ch, 0, victim, TO_ROOM);
+        oldact("Ты создаешь $C4!", ch, 0, victim, TO_CHAR);
 
 
         wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
@@ -2212,8 +2212,8 @@ CMDWIZP( load )
     else
         obj_to_room( obj, ch->in_room );
         
-    act( "$c1 создает $o4!", ch, obj, 0, TO_ROOM);
-    act( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
+    oldact("$c1 создает $o4!", ch, obj, 0, TO_ROOM);
+    oldact("Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
     LogStream::sendNotice( ) 
@@ -2257,7 +2257,7 @@ CMDWIZP( purge )
               extract_obj( obj );
         }
 
-        act( "$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
+        oldact("$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM);
         ch->pecho("Готово.");
         dreamland->resetOption( DL_SAVE_MOBS );
         dreamland->resetOption( DL_SAVE_OBJS );
@@ -2273,15 +2273,15 @@ CMDWIZP( purge )
             return;
         }
 
-        act( "$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT );
-        act( "Ты изничтожаешь $C4.", ch, 0, victim, TO_CHAR );
+        oldact("$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT );
+        oldact("Ты изничтожаешь $C4.", ch, 0, victim, TO_CHAR );
         extract_char( victim );
         return;
     }
 
     if ((obj = get_obj_here(ch, arg))) {
-        act( "$c1 изничтожает $o4.", ch, obj, 0, TO_ROOM );
-        act( "Ты изничтожаешь $o4.", ch, obj, 0, TO_CHAR );
+        oldact("$c1 изничтожает $o4.", ch, obj, 0, TO_ROOM );
+        oldact("Ты изничтожаешь $o4.", ch, obj, 0, TO_CHAR );
         extract_obj(obj);
         return;
     }
@@ -2317,7 +2317,7 @@ CMDWIZP( restore )
             vch->mana        = vch->max_mana;
             vch->move        = vch->max_move;
             update_pos( vch);
-            act_p("$c1 {Gвосстановил$gо||а {xтвои силы!",ch,0,vch,TO_VICT,POS_DEAD);
+            oldact_p("$c1 {Gвосстановил$gо||а {xтвои силы!",ch,0,vch,TO_VICT,POS_DEAD);
         }
 
         wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust(), 
@@ -2353,7 +2353,7 @@ CMDWIZP( restore )
             victim->move        = victim->max_move;
             update_pos( victim);
             if (victim->in_room != 0)
-                act_p("$c1 {Gвосстановил$gо||а {xтвои силы!",ch,0,victim,TO_VICT,POS_DEAD);
+                oldact_p("$c1 {Gвосстановил$gо||а {xтвои силы!",ch,0,victim,TO_VICT,POS_DEAD);
         }
         ch->pecho("Все активные игроки восстановлены!");
         return;
@@ -2375,7 +2375,7 @@ CMDWIZP( restore )
     victim->move = victim->max_move;
     update_pos( victim );
 
-    act_p( "$c1 {Gвосстановил$gо||а {xтвои силы!", ch, 0, victim, TO_VICT,POS_DEAD );
+    oldact_p("$c1 {Gвосстановил$gо||а {xтвои силы!", ch, 0, victim, TO_VICT,POS_DEAD );
     wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust( ), "%C1 restored %C4.", ch, victim );
     ch->pecho("Готово.");
 }
@@ -3066,13 +3066,13 @@ CMDWIZP( wizinvis )
       if ( ch->invis_level)
       {
           ch->invis_level = 0;
-          act( "$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
+          oldact("$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты снова проявляешься в реальности.");
       }
       else
       {
           ch->invis_level = 102;
-          act( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
+          oldact("$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     else
@@ -3088,7 +3088,7 @@ CMDWIZP( wizinvis )
       {
           ch->reply = 0;
           ch->invis_level = level;
-          act( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
+          oldact("$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты растворяешься за подкладкой реальности.");
       }
     }
@@ -3111,13 +3111,13 @@ CMDWIZP( incognito )
       if ( ch->incog_level)
       {
           ch->incog_level = 0;
-          act( "$c1 больше не маскируется.", ch, 0, 0, TO_ROOM);
+          oldact("$c1 больше не маскируется.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты больше не маскируешься.");
       }
       else
       {
           ch->incog_level = 102;
-          act( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
+          oldact("$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты скрываешь свое присутствие.");
       }
     else
@@ -3133,7 +3133,7 @@ CMDWIZP( incognito )
       {
           ch->reply = 0;
           ch->incog_level = level;
-          act( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
+          oldact("$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM);
           ch->pecho("Ты скрываешь свое присутствие.");
       }
     }
@@ -3272,10 +3272,10 @@ CMDWIZP( smite )
       return;
     }
 
-  act_p("{CБоги {Rв гневе{C!{/{cОгромная молния, сорвавшаяся с небес, поражает тебя!{/{RЭто было БОЛЬНО! Это было МУЧИТЕЛЬНО БОЛЬНО!{x\n\r", victim, 0,
+  oldact_p("{CБоги {Rв гневе{C!{/{cОгромная молния, сорвавшаяся с небес, поражает тебя!{/{RЭто было БОЛЬНО! Это было МУЧИТЕЛЬНО БОЛЬНО!{x\n\r", victim, 0,
         ch, TO_CHAR,POS_DEAD);
-  act_p("Твоя молния поражает $c4!\n\r", victim, 0, ch, TO_VICT,POS_DEAD);
-  act_p("{cОгромная молния, сорвавшаяся с небес, поражает $c4!{x\n\r", victim, 0, ch, TO_NOTVICT,POS_DEAD);
+  oldact_p("Твоя молния поражает $c4!\n\r", victim, 0, ch, TO_VICT,POS_DEAD);
+  oldact_p("{cОгромная молния, сорвавшаяся с небес, поражает $c4!{x\n\r", victim, 0, ch, TO_NOTVICT,POS_DEAD);
   victim->hit = victim->hit / 2;
   victim->move = victim->move / 2;
   victim->mana = victim->mana / 2;
@@ -3392,7 +3392,7 @@ CMDWIZP( rename )
             PCharacterManager::ext ).remove( );
 
     ch->pecho("Character renamed.");
-    act_p("$c1 переименова$gло|л|ла тебя в $C4!",ch,0,victim,TO_VICT,POS_DEAD);
+    oldact_p("$c1 переименова$gло|л|ла тебя в $C4!",ch,0,victim,TO_VICT,POS_DEAD);
 }
 
 CMDWIZP( notitle )
@@ -3598,7 +3598,7 @@ CMDWIZP( mlevel )
     }
 
     if ( !found )
-        act_p( "You didn't find any mob of level $T.", ch, 0, argument, TO_CHAR,POS_DEAD );
+        oldact_p("You didn't find any mob of level $T.", ch, 0, argument, TO_CHAR,POS_DEAD );
     else
         page_to_char(buffer.str( ).c_str( ), ch);
 }

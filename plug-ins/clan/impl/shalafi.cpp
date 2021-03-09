@@ -55,8 +55,8 @@ void ClanGuardShalafi::actGreet( PCharacter *wch )
 }
 void ClanGuardShalafi::actPush( PCharacter *wch )
 {
-    act( "$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
-    act( "$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
+    oldact("$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
+    oldact("$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardShalafi::getCast( Character *victim )
 {
@@ -219,9 +219,9 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
 
     potion->value1(spell);
     extract_obj(obj);
-    act_p("Используя магические силы, ты изготавливаешь $o4!",
+    oldact_p("Используя магические силы, ты изготавливаешь $o4!",
            ch, potion, 0, TO_CHAR,POS_RESTING);
-    act_p("Используя магические силы $c1 изготовляет $o4!",
+    oldact_p("Используя магические силы $c1 изготовляет $o4!",
            ch, potion, 0, TO_ROOM,POS_RESTING);
 
     obj_to_char(potion, ch);
@@ -312,13 +312,13 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
           affect_to_char(victim,&af);
 
           if (ch != victim) {
-            act("Твой ментальный удар повреждает разум $C2!", ch,0,victim,TO_CHAR);
-            act("Ментальный удар $c2 повреждает твой разум!", ch,0,victim,TO_VICT);
-            act("Ментальный удар $c2 повреждает разум $C2!", ch,0,victim,TO_NOTVICT);
+            oldact("Твой ментальный удар повреждает разум $C2!", ch,0,victim,TO_CHAR);
+            oldact("Ментальный удар $c2 повреждает твой разум!", ch,0,victim,TO_VICT);
+            oldact("Ментальный удар $c2 повреждает разум $C2!", ch,0,victim,TO_NOTVICT);
           }
           else {
-            act("Ментальный удар повреждает твой разум!", ch,0,0,TO_CHAR);
-            act("Ментальный удар $c2 повреждает $s разум!", ch,0,0,TO_ROOM);
+            oldact("Ментальный удар повреждает твой разум!", ch,0,0,TO_CHAR);
+            oldact("Ментальный удар $c2 повреждает $s разум!", ch,0,0,TO_ROOM);
           }
         }
   } catch (const VictimDeathException &) {
@@ -394,7 +394,7 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
 
   if (ch->isAffected(sn) || ch->hit > ch->max_hit)
     {
-      act("Ты уже переполне$gно|н|на жизненной энергией.", ch, 0, 0, TO_CHAR);
+      oldact("Ты уже переполне$gно|н|на жизненной энергией.", ch, 0, 0, TO_CHAR);
       return;
     }
 

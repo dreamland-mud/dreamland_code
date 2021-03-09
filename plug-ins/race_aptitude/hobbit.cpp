@@ -107,8 +107,8 @@ SKILL_RUNP( searchstones )
     mlevel = ch->getModifyLevel( );
     count = number_range( 5, 5 + mlevel / 30 );
 
-    act( "Ты подбираешь с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_CHAR );
-    act( "$c1 подбирает с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_ROOM );
+    oldact("Ты подбираешь с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_CHAR );
+    oldact("$c1 подбирает с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_ROOM );
     
     for (int i = 0; i < count; i++) {
         stone = create_stone( mlevel );
@@ -174,7 +174,7 @@ SKILL_RUNP( throwstone )
     }
 
     if (is_safe_nomessage( ch, victim )) {
-        act( "Боги покровительствуют $C3.", ch, 0, victim, TO_CHAR);
+        oldact("Боги покровительствуют $C3.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -191,8 +191,8 @@ SKILL_RUNP( throwstone )
 
     ch->setWait( gsn_throw_stone->getBeats( ) );
     set_violent( ch, victim, false );
-    act( "Ты швыряешь $o4 $T.", ch, stone, dirs[ direction ].leave, TO_CHAR );
-    act( "$c1 швыряет $o4 $T.", ch, stone, dirs[ direction ].leave, TO_ROOM );
+    oldact("Ты швыряешь $o4 $T.", ch, stone, dirs[ direction ].leave, TO_CHAR );
+    oldact("$c1 швыряет $o4 $T.", ch, stone, dirs[ direction ].leave, TO_ROOM );
 
     if (victim->position == POS_SLEEPING)
         chance += 40;

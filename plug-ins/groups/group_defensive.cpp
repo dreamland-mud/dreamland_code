@@ -101,9 +101,9 @@ SKILL_RUNP( rescue )
                 return;
         }
 
-        act( "Ты спасаешь $C4!",  ch, 0, victim, TO_CHAR);
-        act( "$c1 спасает тебя!", ch, 0, victim, TO_VICT);
-        act( "$c1 спасает $C4!",  ch, 0, victim, TO_NOTVICT);
+        oldact("Ты спасаешь $C4!",  ch, 0, victim, TO_CHAR);
+        oldact("$c1 спасает тебя!", ch, 0, victim, TO_VICT);
+        oldact("$c1 спасает $C4!",  ch, 0, victim, TO_NOTVICT);
         gsn_rescue->improve( ch, true, victim );
 
         if ( fch )

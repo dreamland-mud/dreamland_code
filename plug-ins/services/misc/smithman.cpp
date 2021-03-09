@@ -69,8 +69,8 @@ bool Smithman::canServeClient( Character *client )
 
 void Smithman::msgListRequest( Character *client ) 
 {
-    act( "Ты просишь у $C4 список услуг.", client, 0, getKeeper( ), TO_CHAR );
-    act( "$c1 просит $C4 рассказать, что $E умеет делать.", client, 0, getKeeper( ), TO_ROOM );
+    oldact("Ты просишь у $C4 список услуг.", client, 0, getKeeper( ), TO_CHAR );
+    oldact("$c1 просит $C4 рассказать, что $E умеет делать.", client, 0, getKeeper( ), TO_ROOM );
 }
 
 void Smithman::msgListBefore( Character *client ) 
@@ -101,8 +101,8 @@ void Smithman::msgArticleTooFew( Character *client, Article::Pointer )
 
 void Smithman::msgBuyRequest( Character *client ) 
 {
-    act( "Ты просишь $C4 обслужить тебя.", client, 0, getKeeper( ), TO_CHAR );
-    act( "$c1 просит $C4 обслужить $s.", client, 0, getKeeper( ), TO_ROOM );
+    oldact("Ты просишь $C4 обслужить тебя.", client, 0, getKeeper( ), TO_CHAR );
+    oldact("$c1 просит $C4 обслужить $s.", client, 0, getKeeper( ), TO_ROOM );
 }
 
 
@@ -205,22 +205,22 @@ bool HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     affect_to_obj( shoe, &af );
     
     price->deduct( client );
-    act( "$C1 забирает у тебя $n4.", client, price->toString( client ).c_str( ), smithman, TO_CHAR );
+    oldact("$C1 забирает у тебя $n4.", client, price->toString( client ).c_str( ), smithman, TO_CHAR );
     
     if ((old_shoe = get_eq_char( client, wear_hooves ))) {
         unequip_char( client, old_shoe );
-        act( "$c1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
-        act( "$c1 снимает с $C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
+        oldact("$c1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
+        oldact("$c1 снимает с $C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
     }
 
     obj_to_char( shoe, client );
     equip_char( client, shoe, wear_hooves);
-    act( "$c1 прилаживает новые подковы на твои копыта.", smithman, 0, client, TO_VICT );
-    act( "$c1 прилаживает новые подковы на копыта $C2.", smithman, 0, client, TO_NOTVICT );
+    oldact("$c1 прилаживает новые подковы на твои копыта.", smithman, 0, client, TO_VICT );
+    oldact("$c1 прилаживает новые подковы на копыта $C2.", smithman, 0, client, TO_NOTVICT );
 
     if (client->getSex( ) == SEX_FEMALE && chance( 50 )) {
-        act( "$c1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
-        act( "$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
+        oldact("$c1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
+        oldact("$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
     }
 
     return true;
@@ -260,8 +260,8 @@ bool ItemSmithService::purchase( Character *client, NPCharacter *smithman, const
         return false;
     }
 
-    act( "Ты протягиваешь $C3 $o4.", client, obj, smithman, TO_CHAR );
-    act( "$c1 протягивает $C3 $o4.", client, obj, smithman, TO_NOTVICT );
+    oldact("Ты протягиваешь $C3 $o4.", client, obj, smithman, TO_CHAR );
+    oldact("$c1 протягивает $C3 $o4.", client, obj, smithman, TO_NOTVICT );
 
     if (obj->pIndexData->limit != -1) {
         say_act( client, smithman, "Эта вещь - уникальна. Я ничего не могу тут поделать." );
@@ -305,8 +305,8 @@ void BurnproofSmithService::smith( Character *client, NPCharacter *smithman, Obj
 
     SET_BIT(obj->extra_flags, ITEM_BURN_PROOF);
 
-    act( "$c1 обрабатывает чем-то $o4 и возвращает тебе.", smithman, obj, client, TO_VICT );
-    act( "$c1 обрабатывает чем-то $o4 и возвращает $C3.", smithman, obj, client, TO_NOTVICT ); 
+    oldact("$c1 обрабатывает чем-то $o4 и возвращает тебе.", smithman, obj, client, TO_VICT );
+    oldact("$c1 обрабатывает чем-то $o4 и возвращает $C3.", smithman, obj, client, TO_NOTVICT ); 
 }
 
 /*-------------------------------------------------------------------------
@@ -350,8 +350,8 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
     REMOVE_BIT( obj->extra_flags, boff );
     SET_BIT( obj->extra_flags, bon );
 
-    act( "$C1 что-то делает с $o5 и возвращает тебе.", client, obj, smithman, TO_CHAR );
-    act( "$C1 что-то делает с $o5 и возвращает $c3.", client, obj, smithman, TO_ROOM );
+    oldact("$C1 что-то делает с $o5 и возвращает тебе.", client, obj, smithman, TO_CHAR );
+    oldact("$C1 что-то делает с $o5 и возвращает $c3.", client, obj, smithman, TO_ROOM );
 }
 
 /*-------------------------------------------------------------------------
@@ -399,8 +399,8 @@ void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object 
     obj->level += 1;
     obj->value4(obj->value4() | WEAPON_SHARP);
 
-    act( "$C1 точит $o4 и возвращает тебе.", client, obj, smithman, TO_CHAR );
-    act( "$C1 точит $o4 и возвращает $c3.", client, obj, smithman, TO_ROOM );
+    oldact("$C1 точит $o4 и возвращает тебе.", client, obj, smithman, TO_CHAR );
+    oldact("$C1 точит $o4 и возвращает $c3.", client, obj, smithman, TO_ROOM );
 }
 
 

@@ -40,7 +40,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
 { 
     if (IS_AWAKE( victim )) {
         if (victim != ch)
-            act("$E уже не спит.", ch, 0, victim, TO_CHAR);
+            oldact("$E уже не спит.", ch, 0, victim, TO_CHAR);
         else
             ch->pecho("Может, лучше бахнуть кофейку?");
 
@@ -57,7 +57,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
     }
 
     if (IS_AFFECTED( victim, AFF_SLEEP )) {
-        act("Тебе не удалось разбудить $C4.", ch, 0, victim, TO_CHAR);
+        oldact("Тебе не удалось разбудить $C4.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -76,7 +76,7 @@ VOID_SPELL(CureBlindness)::run( Character *ch, Character *victim, int sn, int le
         if (victim == ch)
           ch->pecho("Твое зрение в порядке.");
         else
-          act("Зрение $C2 в порядке.",ch,0,victim,TO_CHAR);
+          oldact("Зрение $C2 в порядке.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -93,9 +93,9 @@ VOID_SPELL(CureDisease)::run( Character *ch, Character *victim, int sn, int leve
         if ( !victim->isAffected(gsn_plague ) )
         {
                 if (victim == ch)
-                        act("Ты не бол$gьно|ен|ьна.",ch, 0, 0, TO_CHAR);
+                        oldact("Ты не бол$gьно|ен|ьна.",ch, 0, 0, TO_CHAR);
                 else
-                        act( "$C1 совершенно здоро$Gво|в|ва.", ch,0,victim,TO_CHAR);
+                        oldact("$C1 совершенно здоро$Gво|в|ва.", ch,0,victim,TO_CHAR);
 
                 return;
         }
@@ -111,9 +111,9 @@ VOID_SPELL(CurePoison)::run( Character *ch, Character *victim, int sn, int level
         if ( !victim->isAffected(gsn_poison ) )
         {
                 if (victim == ch)
-                        act("Ты не отравле$gно|н|на.", ch, 0, 0, TO_CHAR);
+                        oldact("Ты не отравле$gно|н|на.", ch, 0, 0, TO_CHAR);
                 else
-                        act("$C1 не отравле$Gно|н|на.", ch,0,victim,TO_CHAR);
+                        oldact("$C1 не отравле$Gно|н|на.", ch,0,victim,TO_CHAR);
 
                 return;
         }

@@ -164,10 +164,10 @@ bool CatsEye::drop( Character *victim ) {
             || victim->isAffected(gsn_jail)
             || victim->in_room->vnum == 10)) 
     {
-        act("Кошачий глаз {Gярко вспыхивает зеленым{x и исчезает.", victim, 0, 0, TO_ALL);
-        act("{RКошачья Богиня не хочет тебя сейчас видеть.{x", victim, 0, 0, TO_CHAR);
+        oldact("Кошачий глаз {Gярко вспыхивает зеленым{x и исчезает.", victim, 0, 0, TO_ALL);
+        oldact("{RКошачья Богиня не хочет тебя сейчас видеть.{x", victim, 0, 0, TO_CHAR);
     } else {
-        act("Кошачий глаз {Gярко вспыхивает зеленым{x и исчезает.", victim, 0, 0, TO_CHAR);
+        oldact("Кошачий глаз {Gярко вспыхивает зеленым{x и исчезает.", victim, 0, 0, TO_CHAR);
 
         transfer_char( victim, victim, room,
                        "Кошачий глаз {Gярко вспыхивает{x и исчезает, увлекая %1$^C4 за собой в зеленом вихре.",

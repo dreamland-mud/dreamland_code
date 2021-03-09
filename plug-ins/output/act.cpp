@@ -95,13 +95,13 @@ DLString act_to_fmt(const char *s)
     return rc;
 }
 
-void act( const char *format, Character *ch, const void *arg1,
+void oldact( const char *format, Character *ch, const void *arg1,
           const void *arg2, int type )
 {
-    act_p( format, ch, arg1, arg2, type, POS_RESTING );
+    oldact_p( format, ch, arg1, arg2, type, POS_RESTING );
 }
 
-void act_p( const char *format, Character *ch, const void *arg1,
+void oldact_p( const char *format, Character *ch, const void *arg1,
             const void *arg2, int type, int min_pos )
 {
     if (!ch)
@@ -334,7 +334,7 @@ void say_act( Character *listener, Character *teller,
     ostringstream buf;
 
     buf << "$C1 произносит '{g" << msg << "{x'";
-    act( buf.str( ).c_str( ), listener, arg, teller, TO_ALL );
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_ALL );
 }
 
 void tell_act( Character *listener, Character *teller, 
@@ -343,7 +343,7 @@ void tell_act( Character *listener, Character *teller,
     ostringstream buf;
 
     buf << "$C1 говорит тебе '{G" << msg << "{x'";
-    act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
 void tell_dim( Character *listener, Character *teller, 
@@ -352,7 +352,7 @@ void tell_dim( Character *listener, Character *teller,
     ostringstream buf;
 
     buf << "$C1 говорит тебе '{g" << msg << "{x'";
-    act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
 void hint_fmt(Character *ch, const char *format, ...)

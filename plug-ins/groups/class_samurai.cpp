@@ -83,7 +83,7 @@ SKILL_RUNP( enchant )
     if (wear_level > ch->getRealLevel( ))
     {
         ch->pecho("Ты долж%Gно|ен|на достичь %d уровня, чтобы улучшить это.", ch, wear_level );
-        act( "$c1 пытается улучшить $o1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
+        oldact("$c1 пытается улучшить $o1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
         return;
     }
     
@@ -164,9 +164,9 @@ SKILL_RUNP( explode )
 
     ch->mana -= mana;
 
-    act("$c1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
-    act("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
-    act("Пусть все сгорит!",ch,0,0,TO_CHAR);
+    oldact("$c1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
+    oldact("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
+    oldact("Пусть все сгорит!",ch,0,0,TO_CHAR);
 
     ch->setWait( gsn_explode->getBeats( ) );
 
@@ -273,7 +273,7 @@ SKILL_RUNP( target )
 
     if ( victim->fighting != ch)
     {
-        act("Но $E не сражается с тобой.", ch, 0, victim, TO_CHAR);
+        oldact("Но $E не сражается с тобой.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -281,7 +281,7 @@ SKILL_RUNP( target )
   ch->setWait( gsn_target->getBeats( ) );
 
     if (victim == ch->fighting) {
-        act("Ты и так наносишь большинство своих атак $C3.", ch, 0, victim, TO_CHAR);
+        oldact("Ты и так наносишь большинство своих атак $C3.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -294,9 +294,9 @@ SKILL_RUNP( target )
 
     ch->fighting = victim;
 
-    act("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
-    act("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR);
-    act("$c1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
+    oldact("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
+    oldact("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR);
+    oldact("$c1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
       return;
     }
 
@@ -329,7 +329,7 @@ SKILL_RUNP( harakiri )
 
     if (ch->isAffected(gsn_hara_kiri))
     {
-        act("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
+        oldact("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
         return;
     }
 
@@ -342,7 +342,7 @@ SKILL_RUNP( harakiri )
 
     if(SHADOW(ch)) {
       ch->pecho("Ты безуспешно режешь свою тень.");
-      act_p("$c1 не может даже сделать себе харакири.\n...пора на пенсию.",
+      oldact_p("$c1 не может даже сделать себе харакири.\n...пора на пенсию.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -359,7 +359,7 @@ SKILL_RUNP( harakiri )
         desire_thirst->reset( ch->getPC( ) );
 
         ch->pecho("Ты отрезаешь себе палец и ждешь, когда вытечет вся кровь.");
-        act_p("$c1 разрезает свое тело и ждет смерти.", ch,0,0,TO_ROOM,POS_FIGHTING);
+        oldact_p("$c1 разрезает свое тело и ждет смерти.", ch,0,0,TO_ROOM,POS_FIGHTING);
         gsn_hara_kiri->improve( ch, true );
         interpret_raw( ch, "sleep" );
         SET_BIT(ch->act,PLR_HARA_KIRI);
@@ -434,7 +434,7 @@ SKILL_RUNP( katana )
         if (SHADOW(ch))
         {
                 ch->pecho("Твоя тень все время мелькает перед глазами.\n\rТяжеловато сделать катану в таких условиях.");
-                act_p("$c1 вместе со своей тенью пытаются сделать катану.\n\r...глупое занятие.",
+                oldact_p("$c1 вместе со своей тенью пытаются сделать катану.\n\r...глупое занятие.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
@@ -478,15 +478,15 @@ SKILL_RUNP( katana )
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
         
-                act("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR);
-                act("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
+                oldact("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR);
+                oldact("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
         
                 extract_obj(part);
                 return;
         }
         else
         {
-                act("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
+                oldact("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
                 extract_obj(part);
                 ch->mana -= mana / 2;
                 gsn_katana->improve( ch, false );
@@ -561,15 +561,15 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
 
     victim->getPC( )->death -= 1;
 
-    act( "$C1 забирает смерть у $c5.", victim, 0, ch, TO_ROOM );
-    act( "$C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
-    act_p( "{BМолнии сверкают на небе.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
+    oldact("$C1 забирает смерть у $c5.", victim, 0, ch, TO_ROOM );
+    oldact("$C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
+    oldact_p("{BМолнии сверкают на небе.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
 }
 
 void SamuraiGuildmaster::giveBack( Character *victim, Object *obj )
 {
-    act( "$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    act( "$c1 возвращает тебе $o4.", ch, obj, victim, TO_VICT );
+    oldact("$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
+    oldact("$c1 возвращает тебе $o4.", ch, obj, victim, TO_VICT );
 
     obj_from_char( obj );
     obj_to_char( obj, victim );
@@ -652,12 +652,12 @@ void OwnedKatana::get( Character *ch )
     
   if (obj->hasOwner( ch ))
   {
-    act_p("{BМерцающая аура окружает лезвие $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+    oldact_p("{BМерцающая аура окружает лезвие $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
     return;
   }
 
-  act( "$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
-  act( "$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
+  oldact("$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
+  oldact("$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
 
   obj_from_char( obj );
   obj_to_room( obj, ch->in_room );

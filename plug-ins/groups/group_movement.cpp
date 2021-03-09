@@ -114,8 +114,8 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                 chance = level / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
 
                 const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
-                act("Ударом Магической Силы ты пытаешься открыть $N4!", ch, 0, doorname, TO_CHAR);
-                act("Ударом Магической Силы $c1 пытается открыть $N4!", ch, 0, doorname,TO_ROOM);
+                oldact("Ударом Магической Силы ты пытаешься открыть $N4!", ch, 0, doorname, TO_CHAR);
+                oldact("Ударом Магической Силы $c1 пытается открыть $N4!", ch, 0, doorname,TO_ROOM);
 
                 if (room->isDark() && !IS_AFFECTED(ch, AFF_INFRARED ))
                         chance /= 2;
@@ -127,12 +127,12 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                     {
                         REMOVE_BIT(peexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(peexit->exit_info, EX_CLOSED);
-                        act( "$N1 с грохотом распахивается.", ch, 0, doorname, TO_ALL);
+                        oldact("$N1 с грохотом распахивается.", ch, 0, doorname, TO_ALL);
 
                     } else {
                         REMOVE_BIT(pexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-                        act( "$N1 с грохотом распахивается.", ch, 0, doorname, TO_ALL);
+                        oldact("$N1 с грохотом распахивается.", ch, 0, doorname, TO_ALL);
 
                         // open the other side
                         if ((pexit_rev = direction_reverse(room, door)))
@@ -145,8 +145,8 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                 }
                 else
                 {
-                        act("Твой удар сотрясает все вокруг, но $N1 не поддается.", ch,0, doorname,TO_CHAR);
-                        act("Удар $c2 сотрясает все вокруг, но $N1 не поддается.", ch,0, doorname,TO_ROOM);
+                        oldact("Твой удар сотрясает все вокруг, но $N1 не поддается.", ch,0, doorname,TO_CHAR);
+                        oldact("Удар $c2 сотрясает все вокруг, но $N1 не поддается.", ch,0, doorname,TO_ROOM);
                 }
                 return;
         }

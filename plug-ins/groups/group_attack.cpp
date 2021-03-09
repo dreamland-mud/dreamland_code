@@ -46,16 +46,16 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
 { 
     int dam;
 
-    act("Множество острых клинков возникает вокруг $c2, поражая $C4.", ch,0,victim,TO_NOTVICT);
-    act("Вокруг тебя возникает множество острых клинков, поражая $C4.", ch,0,victim,TO_CHAR);
-    act("Множество острых клинков возникает вокруг $c2, поражая тебя!", ch,0,victim,TO_VICT);
+    oldact("Множество острых клинков возникает вокруг $c2, поражая $C4.", ch,0,victim,TO_NOTVICT);
+    oldact("Вокруг тебя возникает множество острых клинков, поражая $C4.", ch,0,victim,TO_CHAR);
+    oldact("Множество острых клинков возникает вокруг $c2, поражая тебя!", ch,0,victim,TO_VICT);
     dam = dice(level,6);
     if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 2;
     damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_PRAYER);
     
-    act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
-    act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
+    oldact("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
+    oldact("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
     dam = dice(level,5);
     if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 2;
@@ -64,8 +64,8 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
     if (number_percent() <= 55)
         return;
     
-    act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
-    act("Острые клинки со звоном ударяют в тебя!",victim,0,0,TO_CHAR);
+    oldact("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
+    oldact("Острые клинки со звоном ударяют в тебя!",victim,0,0,TO_CHAR);
     dam = dice(level,7);
     if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 2;
@@ -74,8 +74,8 @@ VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int lev
     if (number_percent() <= 50)
         return;
             
-    act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
-    act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
+    oldact("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
+    oldact("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
     dam = dice(level,6);
     if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_PRAYER))
         dam /= 3;
@@ -101,9 +101,9 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
 
         if (victim != ch)
         {
-                act_p("$c1 посылает {CГолубой огонь земли{x против $C2!",
+                oldact_p("$c1 посылает {CГолубой огонь земли{x против $C2!",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
-                act_p("$c1 посылает {CГолубой огонь земли{x против тебя!",
+                oldact_p("$c1 посылает {CГолубой огонь земли{x против тебя!",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 ch->pecho("Ты призываешь на помощь {CГолубой огонь земли{x!");
         }
@@ -132,9 +132,9 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
 
         if (victim != ch)
         {
-                act_p("$c1 посылает силы {RДемонов Ада{x против $C2!",
+                oldact_p("$c1 посылает силы {RДемонов Ада{x против $C2!",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
-                act_p("$c1 посылает силы {RДемонов Ада{x против тебя!",
+                oldact_p("$c1 посылает силы {RДемонов Ада{x против тебя!",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 ch->pecho("Ты призываешь на помощь {RДемонов Ада{x!");
         }
@@ -163,14 +163,14 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
 
     if ( IS_GOOD(victim) )
     {
-        act( "Боги защищают $c4.", victim, 0, 0, TO_ROOM);
-        act( "Боги защищают тебя.", victim, 0, 0, TO_CHAR);
+        oldact("Боги защищают $c4.", victim, 0, 0, TO_ROOM);
+        oldact("Боги защищают тебя.", victim, 0, 0, TO_CHAR);
         return;
     }
 
     if ( IS_NEUTRAL(victim) )
     {
-        act( "$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
+        oldact("$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -200,14 +200,14 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
 
     if ( IS_EVIL(victim) )
     {
-        act( "$c4 защищают $s демоны.", victim, 0, 0, TO_ROOM);
-        act( "Тебя защищают твои демоны.", victim, 0, 0, TO_CHAR);
+        oldact("$c4 защищают $s демоны.", victim, 0, 0, TO_ROOM);
+        oldact("Тебя защищают твои демоны.", victim, 0, 0, TO_CHAR);
         return;
     }
 
     if ( IS_NEUTRAL(victim) )
     {
-        act( "$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
+        oldact("$C1 не чувствует этого.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -232,7 +232,7 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
     int dam;
 
     ch->pecho("Земля дрожит под твоими ногами!");
-    act( "$c1 вызывает ураган и землетрясение.", ch, 0, 0, TO_ROOM);
+    oldact("$c1 вызывает ураган и землетрясение.", ch, 0, 0, TO_ROOM);
 
     area_message( ch, "Земля слегка дрожит под твоими ногами.", true );
 
@@ -293,7 +293,7 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
                 if (victim == ch)
                         ch->pecho("Ты и так в паутине.");
                 else
-                        act_p("Густая паутина уже сковала движения $C2.",
+                        oldact_p("Густая паутина уже сковала движения $C2.",
                                 ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
         }
@@ -317,7 +317,7 @@ VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level )
 
         victim->pecho("Густая паутина опутывает тебя!");
         if ( ch != victim )
-                act_p("Ты опутываешь $C4 густой паутиной!",
+                oldact_p("Ты опутываешь $C4 густой паутиной!",
                         ch,0,victim,TO_CHAR,POS_RESTING);
 }
 
@@ -351,9 +351,9 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                         number_range(1,2 * victim->getCurrStat(STAT_DEX))
                     && obj_lose->wear_loc->remove( obj_lose, 0 ))
                     {
-                        act_p("$c1 кричит от боли и бросает $o4 на землю!",
+                        oldact_p("$c1 кричит от боли и бросает $o4 на землю!",
                                 victim,obj_lose,0,TO_ROOM,POS_RESTING);
-                        act_p("Ты кричишь от боли и бросаешь $o4 на землю!",
+                        oldact_p("Ты кричишь от боли и бросаешь $o4 на землю!",
                                victim,obj_lose,0,TO_CHAR,POS_RESTING);
                         dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
@@ -362,7 +362,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* stuck on the body! ouch! */
                     {
-                        act_p("$o1 обжигает твою кожу!",
+                        oldact_p("$o1 обжигает твою кожу!",
                                victim,obj_lose,0,TO_CHAR,POS_RESTING);
                         dam += (number_range(1,obj_lose->level));
                         fail = false;
@@ -373,9 +373,9 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                 {
                     if (can_drop_obj(victim,obj_lose))
                     {
-                        act_p("$c1 кричит от боли и бросает $o4 на землю!",
+                        oldact_p("$c1 кричит от боли и бросает $o4 на землю!",
                                victim,obj_lose,0,TO_ROOM,POS_RESTING);
-                        act_p("Ты кричишь от боли и бросаешь $o4 на землю!",
+                        oldact_p("Ты кричишь от боли и бросаешь $o4 на землю!",
                                victim,obj_lose,0,TO_CHAR,POS_RESTING);
                         dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
@@ -384,7 +384,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* cannot drop */
                     {
-                        act_p("$o1 обжигает твою кожу!",
+                        oldact_p("$o1 обжигает твою кожу!",
                                victim,obj_lose,0,TO_CHAR,POS_RESTING);
                         dam += (number_range(1,obj_lose->level) / 2);
                         fail = false;
@@ -400,7 +400,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     if (can_drop_obj(victim,obj_lose)
                         && obj_lose->wear_loc->remove( obj_lose, 0 ))
                     {
-                        act_p("$o1 выпадает из обожженных рук $c2.",
+                        oldact_p("$o1 выпадает из обожженных рук $c2.",
                                victim,obj_lose,0,TO_ROOM,POS_RESTING);
                         victim->pecho("Оружие выпадает из твоих обожженных рук!");
                         dam += 1;
@@ -428,7 +428,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     }
                     else /* cannot drop */
                     {
-                        act_p("$o1 обжигает тебя!",
+                        oldact_p("$o1 обжигает тебя!",
                                victim,obj_lose,0,TO_CHAR,POS_RESTING);
                         dam += (number_range(1,obj_lose->level) / 2);
                         fail = false;
@@ -480,14 +480,14 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     }
 
     if (number_percent( ) > ch->getSkill( sn )) {
-        act("$c1 втыкает в могилу крест, но он падает на бок.", ch, 0, 0, TO_ROOM);
-        act("Ты втыкаешь в могилу крест, но он падает на бок.", ch, 0, 0, TO_CHAR);
+        oldact("$c1 втыкает в могилу крест, но он падает на бок.", ch, 0, 0, TO_ROOM);
+        oldact("Ты втыкаешь в могилу крест, но он падает на бок.", ch, 0, 0, TO_CHAR);
         return;
     }
     
-    act("$c1 втыкает в могилу священный крест!", ch, 0, 0, TO_ROOM);
-    act("Ты втыкаешь в могилу священный крест!", ch, 0, 0, TO_CHAR);
-    act("Из-под земли раздается раздирающий душу вопль!", ch, 0, 0, TO_ALL);
+    oldact("$c1 втыкает в могилу священный крест!", ch, 0, 0, TO_ROOM);
+    oldact("Ты втыкаешь в могилу священный крест!", ch, 0, 0, TO_CHAR);
+    oldact("Из-под земли раздается раздирающий душу вопль!", ch, 0, 0, TO_ALL);
     
     undig( victim );
     dam = dice(level, 20);

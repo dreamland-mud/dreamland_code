@@ -181,9 +181,9 @@ void DefaultSpell::utter( Character *ch )
             int chance = (gsn_spell_craft->getEffective( rch ) * 9) / 10;
             
             if (chance < number_percent( ))
-                act( pat, ch, utterance.c_str(), rch, TO_VICT );
+                oldact( pat, ch, utterance.c_str(), rch, TO_VICT );
             else
-                act( pat, ch, skill->getNameFor( rch ).c_str( ), rch, TO_VICT );
+                oldact( pat, ch, skill->getNameFor( rch ).c_str( ), rch, TO_VICT );
         }
     }
 }
@@ -225,8 +225,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent( ) < chance) {
             slevel = mlevel;
             slevel += chance / 20;
-            act( "Твои глаза на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_CHAR );
-            act( "Глаза $c2 на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_ROOM );                
+            oldact("Твои глаза на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_CHAR );
+            oldact("Глаза $c2 на мгновение вспыхивают {1{rбагровым{2.", ch, 0, 0, TO_ROOM );                
             gsn_improved_maladiction->improve( ch, true );
         }
         else
@@ -239,8 +239,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent() < chance) {
             slevel = mlevel;
             slevel += chance / 20;
-            act( "Твои глаза на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_CHAR );
-            act( "Глаза $c2 на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_ROOM );                 
+            oldact("Твои глаза на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_CHAR );
+            oldact("Глаза $c2 на мгновение вспыхивают {1{Yзолотом{2.", ch, 0, 0, TO_ROOM );                 
             gsn_improved_benediction->improve( ch, true );
         }
         else
@@ -255,8 +255,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         if (number_percent( ) < chance) {
             slevel = mlevel;
             slevel += chance / 20;
-            act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
-            act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
+            oldact("Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
+            oldact("Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
         }
     }
@@ -287,8 +287,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         f  = A0 / (1 + x / B0);
 
         slevel = (int) (f * slevel);
-        act( "Яркая искра вспыхивает между твоих ладоней, фокусируя магический заряд.", ch, 0, 0, TO_CHAR );
-        act( "Яркая искра вспыхивает между ладоней $c2, фокусируя магический заряд.", ch, 0, 0, TO_ROOM );            
+        oldact("Яркая искра вспыхивает между твоих ладоней, фокусируя магический заряд.", ch, 0, 0, TO_CHAR );
+        oldact("Яркая искра вспыхивает между ладоней $c2, фокусируя магический заряд.", ch, 0, 0, TO_ROOM );            
     }
 
     if (gsn_mastering_spell->usable( ch, false )) {
@@ -658,18 +658,18 @@ bool DefaultSpell::isPrayer( Character *caster ) const
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
-        act("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
-        act("Боги $c2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
-        act("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
+        oldact("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
+        oldact("Боги $c2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
+        oldact("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
-        act("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
-        act("Ты отклоняешь заклинание $c2!", ch, 0, vch, TO_VICT);
-        act("$C1 отклоняет заклинание $c2!", ch, 0, vch, TO_NOTVICT);
+        oldact("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
+        oldact("Ты отклоняешь заклинание $c2!", ch, 0, vch, TO_VICT);
+        oldact("$C1 отклоняет заклинание $c2!", ch, 0, vch, TO_NOTVICT);
     }
     else {
-        act("Ты отклоняешь заклинание!", ch, 0, vch, TO_VICT);
-        act("$C1 отклоняет заклинание!", ch, 0, vch, TO_NOTVICT);
+        oldact("Ты отклоняешь заклинание!", ch, 0, vch, TO_VICT);
+        oldact("$C1 отклоняет заклинание!", ch, 0, vch, TO_NOTVICT);
     }
 }
 
@@ -840,13 +840,13 @@ void AnatoliaCombatSpell::run( Character *ch, Character *victim, int sn, int lev
 
     // Display messages.
     if (!msgNotVict.empty())
-        act(msgNotVict.c_str(), ch, 0, victim, TO_NOTVICT);
+        oldact(msgNotVict.c_str(), ch, 0, victim, TO_NOTVICT);
 
     if (!msgChar.empty())
-        act(msgChar.c_str(), ch, 0, victim, TO_CHAR);
+        oldact(msgChar.c_str(), ch, 0, victim, TO_CHAR);
 
     if (!msgVict.empty())
-        act(msgVict.c_str(), ch, 0, victim, TO_VICT);
+        oldact(msgVict.c_str(), ch, 0, victim, TO_VICT);
 
     // Apply waitstate to the victim.
     if (waitMax != 0)

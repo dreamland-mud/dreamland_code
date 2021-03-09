@@ -92,8 +92,8 @@ void ErevanGod::tattooFight( Object *obj, Character *ch ) const
     if (chance(15)) {
         try {
             TricksterGodOneHit thit(ch, victim);
-            act("{CЭреван Илесир внезапно вселяется в тебя.{x", ch, 0, 0, TO_CHAR);
-            act("{CЭреван Илесир внезапно вселяется в $c4.{x", ch, 0, 0, TO_ROOM);
+            oldact("{CЭреван Илесир внезапно вселяется в тебя.{x", ch, 0, 0, TO_CHAR);
+            oldact("{CЭреван Илесир внезапно вселяется в $c4.{x", ch, 0, 0, TO_ROOM);
             thit.hit();
             do_yell(victim, "Помогите! Эреван Илесир пыряет меня ножом!");
         }

@@ -1321,8 +1321,8 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if (mob->in_room == 0)
             char_to_room( mob, ch->in_room );
         
-        act( "$c1 создает $C4!", ch, 0, mob, TO_ROOM);
-        act( "Ты создаешь $C4!", ch, 0, mob, TO_CHAR);
+        oldact("$c1 создает $C4!", ch, 0, mob, TO_ROOM);
+        oldact("Ты создаешь $C4!", ch, 0, mob, TO_CHAR);
         return;
     }
     

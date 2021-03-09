@@ -53,8 +53,8 @@ VOID_SPELL(AceInSleeves)::run( Character *ch, char *, int sn, int level )
     
     obj_to_char( sleeves, ch );
 
-    act("Ты создаешь $o4!", ch, sleeves, 0, TO_CHAR);
-    act("$c1 создает $o4!", ch, sleeves, 0, TO_ROOM);
+    oldact("Ты создаешь $o4!", ch, sleeves, 0, TO_CHAR);
+    oldact("$c1 создает $o4!", ch, sleeves, 0, TO_ROOM);
 }
 
 /*
@@ -98,7 +98,7 @@ SKILL_RUNP( sconce )
     }
 
     if (IS_AFFECTED(victim,AFF_SLEEP)) {
-        act("$E уже спит.",ch,0,victim,TO_CHAR);
+        oldact("$E уже спит.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -126,9 +126,9 @@ SKILL_RUNP( sconce )
         chance -= 40;
 
     if (number_percent( ) < chance * k / 100) {
-        act("Ты со всей силы бьешь $C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
-        act("$c1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
-        act("$c1 лупит $C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
+        oldact("Ты со всей силы бьешь $C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
+        oldact("$c1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
+        oldact("$c1 лупит $C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
         gsn_sconce->improve( ch, true, victim );
 
         af.type = gsn_sconce;
@@ -170,9 +170,9 @@ public:
                 || ( IS_AWAKE( victim ) && number_percent() <= 10 ) )
             && !victim->is_immortal())
         {
-            act("Твоя {Rшутка{x над $C5 удалась!",ch,0,victim,TO_CHAR);
-            act("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT);
-            act_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
+            oldact("Твоя {Rшутка{x над $C5 удалась!",ch,0,victim,TO_CHAR);
+            oldact("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT);
+            oldact_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
             gsn_joker->improve( ch, true, victim );
 
@@ -240,7 +240,7 @@ SKILL_RUNP( joker )
             && victim->can_see(ch)
             && IS_AWAKE(victim) )
     {
-        act( "Нехорошо шутить над больными!", ch, 0, victim, TO_CHAR );
+        oldact("Нехорошо шутить над больными!", ch, 0, victim, TO_CHAR );
         return;
     }
 
@@ -255,7 +255,7 @@ SKILL_RUNP( joker )
         }
         else
         {
-            act("Твоя шутка не удалась..",ch,0,victim,TO_CHAR);
+            oldact("Твоя шутка не удалась..",ch,0,victim,TO_CHAR);
             gsn_joker->improve( ch, false, victim );
             joke.miss( );
         }

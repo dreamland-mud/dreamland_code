@@ -136,7 +136,7 @@ void PageChannel::run( Character *ch, const DLString &constArguments )
 bool PageChannel::isPersonalListener( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (!get_pager( victim )) {
-        act_p("У $C2 нет хрустального шара.",ch,0,victim,TO_CHAR, position);
+        oldact_p("У $C2 нет хрустального шара.",ch,0,victim,TO_CHAR, position);
         return false;
     }
 

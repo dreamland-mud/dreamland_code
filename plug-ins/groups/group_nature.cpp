@@ -56,7 +56,7 @@ SKILL_RUNP( tame )
     if (arg[0] == '\0')
     {
         ch->pecho("Ты не поддаешься укрощению.");
-        act_p("$c1 пытается укротить са$gмо|м|ма себя, но эта попытка с треском проваливается.",
+        oldact_p("$c1 пытается укротить са$gмо|м|ма себя, но эта попытка с треском проваливается.",
                 ch,0,0,TO_ROOM,POS_RESTING);
         return;
     }
@@ -91,17 +91,17 @@ SKILL_RUNP( tame )
             REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
             SET_BIT(victim->affected_by,AFF_CALM);
             victim->pecho("Ты успокаиваешься.");
-            act("Ты укрощаешь $C4.",ch,0,victim,TO_CHAR);
-            act("$c1 укрощает $C4.",ch,0,victim,TO_NOTVICT);
+            oldact("Ты укрощаешь $C4.",ch,0,victim,TO_CHAR);
+            oldact("$c1 укрощает $C4.",ch,0,victim,TO_NOTVICT);
             stop_fighting(victim,true);
             gsn_tame->improve( ch, true, victim );
         }
         else
         {
             ch->pecho("Попытка укрощения не удалась.");
-            act("$c1 пытается укротить $C4, но безуспешно.",
+            oldact("$c1 пытается укротить $C4, но безуспешно.",
                     ch,0,victim,TO_NOTVICT);
-            act("$c1 пытается укротить тебя, но безуспешно.",
+            oldact("$c1 пытается укротить тебя, но безуспешно.",
                     ch,0,victim,TO_VICT);
             gsn_tame->improve( ch, false, victim );
         }
@@ -124,8 +124,8 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
          return;
     }
     
-    act("Молекулы воды вокруг $c2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
-    act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
+    oldact("Молекулы воды вокруг $c2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
+    oldact("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
     dam = dice( level , 14 );
     damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_MAGIC|DAMF_WATER);
 }
@@ -162,13 +162,13 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
         return;
     
     if (number_percent( ) > ch->getSkill( sn ) ) {
-        act("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0, TO_ALL);
+        oldact("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0, TO_ALL);
         return;
     }
 
-    act("Корни терновника проникают в могилу, тревожа твой покой.", victim, 0, 0, TO_CHAR);
-    act("Колючий терновник опутывает могилу, проникая корнями глубоко под землю!", ch, 0, 0, TO_ALL);
-    act("Из-под земли раздается недовольное ворчание.", ch, 0, 0, TO_ALL);
+    oldact("Корни терновника проникают в могилу, тревожа твой покой.", victim, 0, 0, TO_CHAR);
+    oldact("Колючий терновник опутывает могилу, проникая корнями глубоко под землю!", ch, 0, 0, TO_ALL);
+    oldact("Из-под земли раздается недовольное ворчание.", ch, 0, 0, TO_ALL);
 
     undig( victim );
 
@@ -198,7 +198,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
 
    if (IS_SET(victim->imm_flags, IMM_PIERCE))
    {
-        act_p("$C1 обладает иммунитетом к шипам терновника.", ch, 0,
+        oldact_p("$C1 обладает иммунитетом к шипам терновника.", ch, 0,
                 victim, TO_CHAR,POS_RESTING);
         return;
    }
@@ -216,9 +216,9 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     if ( !victim->isAffected(gsn_entangle) )
     {
         if ( !saves_spell(level, victim, DAM_PIERCE, ch, DAMF_MAGIC) ){
-            act("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
+            oldact("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
                 victim, 0, 0, TO_ROOM);
-            act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
+            oldact("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
                 victim, 0, 0, TO_CHAR);
 
             todex.type = sn;
@@ -231,16 +231,16 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
             dam = dam * 2;   
         }
         else {
-            act("Колючий терновник прорастает сквозь землю, но $c1 с трудом разрывает его путы!",
+            oldact("Колючий терновник прорастает сквозь землю, но $c1 с трудом разрывает его путы!",
                 victim, 0, 0, TO_ROOM);
-            act("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
+            oldact("Колючий терновник прорастает сквозь землю, но ты с трудом разрываешь его путы!",
                 victim, 0, 0, TO_CHAR);
         }
     }
     else {
-            act("Колючий терновник прорастает сквозь землю, больно раня ноги $c2!",
+            oldact("Колючий терновник прорастает сквозь землю, больно раня ноги $c2!",
                 victim, 0, 0, TO_ROOM);
-            act("Колючий терновник прорастает сквозь землю, больно раня твои ноги!",
+            oldact("Колючий терновник прорастает сквозь землю, больно раня твои ноги!",
                 victim, 0, 0, TO_CHAR);        
     }
    

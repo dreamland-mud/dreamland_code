@@ -165,8 +165,8 @@ protected:
         if (desire_bloodlust->applicable( killer->getPC( ) )
         && !(IS_BLOODLESS(ch)))    
         {
-            act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
-            act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
+            oldact("{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
+            oldact("{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
             desire_bloodlust->gain( killer->getPC( ), 3 );
         }
     }
@@ -209,7 +209,7 @@ public:
     virtual void run( )
     {
         pvict->pecho("Ты превращаешься в привидение и покидаешь этот мир.");
-        act( "$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
+        oldact("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
         wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
         
         delete_player( pvict );
@@ -769,7 +769,7 @@ void death_cry( Character *ch, int part )
         }
     }
 
-    act( msg, ch, 0, 0, TO_ROOM );
+    oldact( msg, ch, 0, 0, TO_ROOM );
 
     if (vnum != 0)
         bodypart_create( vnum, ch, NULL ); 

@@ -63,7 +63,7 @@ bool Healer::canServeClient( Character *client )
     if ((!client->is_npc( ) && client->getClan( ) == clan_battlerager)
         || (client->is_npc( ) && client->master && client->master->getClan( ) == clan_battlerager)) 
     {
-        act( "$C1 выразительно крутит пальцем у виска, глядя на $c4.", client, 0, getKeeper( ), TO_NOTVICT );
+        oldact("$C1 выразительно крутит пальцем у виска, глядя на $c4.", client, 0, getKeeper( ), TO_NOTVICT );
         client->pecho("Напоминаем: ты BattleRager, а не презренный МАГ!");
         return false;
     }
@@ -78,8 +78,8 @@ void Healer::msgListEmpty( Character *client )
 
 void Healer::msgListRequest( Character *client ) 
 {
-    act( "$c1 просит $C4 рассказать, какие болезни $E может вылечить.", client, 0, getKeeper( ), TO_NOTVICT );
-    act( "Ты просишь $C4 рассказать, какие болезни $E может вылечить.", client, 0, getKeeper( ), TO_CHAR );
+    oldact("$c1 просит $C4 рассказать, какие болезни $E может вылечить.", client, 0, getKeeper( ), TO_NOTVICT );
+    oldact("Ты просишь $C4 рассказать, какие болезни $E может вылечить.", client, 0, getKeeper( ), TO_CHAR );
 }
 
 void Healer::msgListBefore( Character *client ) 
@@ -107,8 +107,8 @@ void Healer::msgArticleTooFew( Character *client, Article::Pointer )
 
 void Healer::msgBuyRequest( Character *client )
 {
-    act( "Ты просишь $C4 о помощи.", client, 0, getKeeper( ), TO_CHAR );
-    act( "$c1 просит $C4 о помощи.", client, 0, getKeeper( ), TO_NOTVICT );
+    oldact("Ты просишь $C4 о помощи.", client, 0, getKeeper( ), TO_CHAR );
+    oldact("$c1 просит $C4 о помощи.", client, 0, getKeeper( ), TO_NOTVICT );
 }
 
 /*------------------------------------------------------------------------
@@ -222,7 +222,7 @@ bool SpellHealService::available( Character *client, NPCharacter *healer ) const
  *-----------------------------------------------------------------------*/
 void ManaHealService::heal( Character *client, NPCharacter *healer )
 {
-    act( "$c1 бормочет '$T'.", healer, 0, words.getValue( ).c_str( ), TO_ROOM );
+    oldact("$c1 бормочет '$T'.", healer, 0, words.getValue( ).c_str( ), TO_ROOM );
 
     client->mana += healer->getModifyLevel() * 5 + number_range(50, 100);
     client->mana = std::min( client->mana, client->max_mana );

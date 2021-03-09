@@ -221,7 +221,7 @@ bool BasicMobileBehavior::backHome( bool fAlways )
 
     if (myHomeVnum == 0) {
         if (fAlways) {
-            act( "$c1 ищет свой дом.", ch, 0, 0, TO_ROOM );
+            oldact("$c1 ищет свой дом.", ch, 0, 0, TO_ROOM );
             extract_char( ch );
             return true;
         }

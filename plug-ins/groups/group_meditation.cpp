@@ -51,7 +51,7 @@ VOID_SPELL(MagicConcentrate)::run( Character *ch, Character *, int sn, int level
   Affect af;
 
   if (ch->isAffected(sn)) {
-      act("Ты уже достаточно сконцентриров$gано|ан|ана.", ch, 0, 0, TO_CHAR);
+      oldact("Ты уже достаточно сконцентриров$gано|ан|ана.", ch, 0, 0, TO_CHAR);
       return;
   }
 

@@ -35,7 +35,7 @@ void PersonalQuestReward::get( Character *ch )
     if (!canEquip( ch ))
         return;
 
-    act_p("{BМерцающая аура окружает $o4.\n\r{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+    oldact_p("{BМерцающая аура окружает $o4.\n\r{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
 }
 
 
@@ -48,7 +48,7 @@ bool PersonalQuestReward::save( ) {
     if (obj->hasOwner( ch )) 
         return false;
     
-    act("$o1 исчезает!", ch, obj, 0, TO_CHAR);
+    oldact("$o1 исчезает!", ch, obj, 0, TO_CHAR);
     extract_obj(obj);
     return true;
 }

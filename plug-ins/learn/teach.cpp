@@ -26,7 +26,7 @@ CMDRUN( teach )
     
     if (attributes->isAvailable( "teacher" )) {
         attributes->eraseAttribute( "teacher" );
-        act_p("Ты передума$gло|л|ла обучать других.", ch, 0, 0, TO_CHAR, POS_DEAD);
+        oldact_p("Ты передума$gло|л|ла обучать других.", ch, 0, 0, TO_CHAR, POS_DEAD);
     }
     else {
         attributes->getAttr<XMLAttributeTeacher>( "teacher" );

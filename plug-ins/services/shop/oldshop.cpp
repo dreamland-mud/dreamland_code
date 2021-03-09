@@ -175,7 +175,7 @@ CMDRUN( buy )
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-        act( "$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
+        oldact("$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
         ch->reply = keeper;
         return;
     }
@@ -194,7 +194,7 @@ CMDRUN( buy )
         }
 
         if ( count < number ) {
-            act_p( "$c1 говорит тебе '{gУ меня нет столько.{x'",
+            oldact_p("$c1 говорит тебе '{gУ меня нет столько.{x'",
             keeper, 0, ch, TO_VICT, POS_RESTING );
             ch->reply = keeper;
             return;
@@ -202,7 +202,7 @@ CMDRUN( buy )
     }
 
     if (obj->pIndexData->limit > 0 && obj->pIndexData->limit < obj->pIndexData->count - 1 + number) {
-        act_p("$c1 говорит тебе '{gТакого количества ништяков у меня нету.{x'",
+        oldact_p("$c1 говорит тебе '{gТакого количества ништяков у меня нету.{x'",
         keeper, 0, ch, TO_VICT, POS_RESTING );
         ch->reply = keeper;
         return;
@@ -211,10 +211,10 @@ CMDRUN( buy )
     if (!can_afford(ch, 0, cost, number))
     {
         if ( number > 1 )
-            act_p( "$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",
+            oldact_p("$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",
                     keeper, obj, ch, TO_VICT, POS_RESTING );
         else
-            act_p( "$c1 говорит тебе '{gУ тебя нет нужной суммы, чтоб купить $o4.{x'",
+            oldact_p("$c1 говорит тебе '{gУ тебя нет нужной суммы, чтоб купить $o4.{x'",
                     keeper, obj, ch, TO_VICT,POS_RESTING );
         
         ch->reply = keeper;
@@ -223,7 +223,7 @@ CMDRUN( buy )
 
     if ( ch->getRealLevel( ) < get_wear_level( ch, obj ) )
     {
-        act_p( "$c1 говорит тебе '{gТы не сможешь использовать $o4{x'.",
+        oldact_p("$c1 говорит тебе '{gТы не сможешь использовать $o4{x'.",
                 keeper, obj, ch, TO_VICT,POS_RESTING );
 
         ch->reply = keeper;
@@ -248,25 +248,25 @@ CMDRUN( buy )
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
         cost -= obj->cost / 2 * roll / 100;
-        act( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR);
+        oldact("Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR);
         gsn_haggle->improve( ch, true );
     }
 
     if ( number > 1 )
     {
         sprintf( buf, "$c1 покупает $o4[%d].", number );
-        act( buf, ch, obj, 0, TO_ROOM);
+        oldact( buf, ch, obj, 0, TO_ROOM);
         sprintf( buf, "Ты покупаешь $o4[%d] за %d серебрян%s.",
                         number, cost * number,
                         GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
-        act( buf, ch, obj, 0, TO_CHAR);
+        oldact( buf, ch, obj, 0, TO_CHAR);
     }
     else
     {
-        act( "$c1 покупает $o4.", ch, obj, 0, TO_ROOM);
+        oldact("$c1 покупает $o4.", ch, obj, 0, TO_ROOM);
         sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
                         cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
-        act( buf, ch, obj, 0, TO_CHAR);
+        oldact( buf, ch, obj, 0, TO_CHAR);
     }
 
     deduct_cost( ch, cost * number );
@@ -342,7 +342,7 @@ CMDRUN( sell )
 
     if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
     {
-        act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
+        oldact_p("$c1 говорит тебе '{gУ тебя нет этого.{x'",
         keeper, 0, ch, TO_VICT,POS_RESTING );
         ch->reply = keeper;
         return;
@@ -356,19 +356,19 @@ CMDRUN( sell )
 
     if (!keeper->can_see(obj))
     {
-        act("$c1 не видит этого.",keeper,0,ch,TO_VICT);
+        oldact("$c1 не видит этого.",keeper,0,ch,TO_VICT);
         return;
     }
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-        act( "$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT);
+        oldact("$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT);
         return;
     }
 
     if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
     {
-        act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
+        oldact_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
               keeper,obj,ch,TO_VICT,POS_RESTING);
         return;
     }
@@ -394,13 +394,13 @@ CMDRUN( sell )
         
         if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
         {
-            act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
+            oldact_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
             keeper,obj,ch,TO_VICT,POS_RESTING);
             return;
         }
     }
 
-    act( "$c1 продает $o4.", ch, obj, 0, TO_ROOM);
+    oldact("$c1 продает $o4.", ch, obj, 0, TO_ROOM);
     silver = cost - (cost/100) * 100;
     gold   = cost/100;
 
@@ -414,7 +414,7 @@ CMDRUN( sell )
         
         if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
         {
-            act_p("$c1 говорит тебе '{GУ меня нет денег.{x'",
+            oldact_p("$c1 говорит тебе '{GУ меня нет денег.{x'",
             keeper,0,ch,TO_VICT,POS_RESTING);
             return;
         }
@@ -431,9 +431,9 @@ CMDRUN( sell )
     {
         ch->gold = gold_old;
         ch->silver = silver_old;
-        act_p( "$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
+        oldact_p("$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
         keeper, 0, ch, TO_VICT,POS_RESTING );
-        act( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
+        oldact("$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
         obj_to_room( create_money( gold, silver ), ch->in_room );
     }
 

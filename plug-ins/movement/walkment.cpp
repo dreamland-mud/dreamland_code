@@ -268,7 +268,7 @@ void Walkment::visualize( Character *wch )
     if (IS_AFFECTED( wch, AFF_HIDE|AFF_FADE ) && !IS_AFFECTED(wch, AFF_SNEAK)) {
         REMOVE_BIT(wch->affected_by, AFF_HIDE|AFF_FADE);
         wch->pecho( "Ты выходишь из тени." );
-        act( "$c1 выходит из тени.", wch, 0, 0, TO_ROOM );
+        oldact("$c1 выходит из тени.", wch, 0, 0, TO_ROOM );
     }
 
     if (IS_AFFECTED( wch, AFF_CAMOUFLAGE )) {
@@ -285,7 +285,7 @@ void Walkment::visualize( Character *wch )
 bool Walkment::canControlHorse( )
 {
     if (!canOrderHorse( )) {
-        act( "Ты не можешь управлять $C5.", ch, 0, horse, TO_CHAR );
+        oldact("Ты не можешь управлять $C5.", ch, 0, horse, TO_CHAR );
         return false;
     }
    
@@ -298,7 +298,7 @@ bool Walkment::canControlHorse( )
         return true;
 
     if (number_percent( ) > gsn_riding->getEffective( ch )) {
-        act( "Тебе не хватает мастерства управлять $C5.", ch, 0, horse, TO_CHAR );
+        oldact("Тебе не хватает мастерства управлять $C5.", ch, 0, horse, TO_CHAR );
         gsn_riding->improve( ch, false );
         return false; 
     }

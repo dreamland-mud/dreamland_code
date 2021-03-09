@@ -341,7 +341,7 @@ CMDRUNP( quit )
     if (pch->desc && !fQuiet)
         DescriptorStateManager::getThis( )->handle( CON_PLAYING, CON_QUIT, pch->desc );
 
-    act_p( "$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
+    oldact_p("$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
 
     if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
         wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 покину%1$Gло|л|ла этот мир.", pch );
