@@ -159,7 +159,7 @@ bool CardPackBehavior::use( Character *user, const char *args )
     throws--;
 
     if (throws <= 0) {
-        oldact("Это была последняя карта в $o6.", pch, obj, 0, TO_CHAR);
+        act("Это была последняя карта в %3$O6.", pch, obj, 0, TO_CHAR);
         extract_obj( obj );
     }
     
@@ -218,7 +218,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
             || !pch->can_see( victim ) 
             || !victim->getAttributes( ).isAvailable( "cards" )) 
     {
-        oldact("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
         return true;
     }
 
@@ -231,7 +231,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
             || !victim->in_room->isCommon()
             || !pch->can_see( victim->in_room )) 
     {
-        oldact("$o1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, obj, 0, TO_CHAR);
         return true;
     }
     
@@ -295,7 +295,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     }
 
     if (!victim || !pch->can_see( victim )) {
-        oldact("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
         return true;
     }
 
@@ -345,7 +345,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
             fSuccess = false;
 
             if (!IS_AFFECTED(victim, AFF_BLIND))
-                oldact("Тебе показалось, что картинка на $o6 пошевелилась.", 
+                act("Тебе показалось, что картинка на %3$O6 пошевелилась.", 
                      victim, myCard->getObj( ), 0, TO_CHAR);
 
             oldact("$c1 не смо$gгло|г|гла пожать твою руку.", pch, 0, victim, TO_VICT);
@@ -438,7 +438,7 @@ bool CardBehavior::examine( Character *looker )
             || !pch->can_see( victim ) 
             || !victim->getAttributes( ).isAvailable( "cards" )) 
     {
-        oldact("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
         return true;
     }
 
@@ -446,7 +446,7 @@ bool CardBehavior::examine( Character *looker )
             || !victim->in_room
             || !pch->can_see( victim->in_room )) 
     {
-        oldact("$o1 выглядит живой, но ты не можешь сосредоточиться на мелких деталях.", pch, obj, 0, TO_CHAR);
+        act("%3$^O1 выглядит живой, но ты не можешь сосредоточиться на мелких деталях.", pch, obj, 0, TO_CHAR);
         return true;
     }
 
@@ -608,9 +608,9 @@ CardSleevesBehavior::CardSleevesBehavior( )
 bool CardSleevesBehavior::canEquip( Character *ch ) 
 {
     if (!gsn_ace_in_sleeves->usable( ch )) {
-        oldact("Ты пытаешься напялить $o4, но шулер из тебя никакущий..", ch, obj, 0, TO_CHAR);
+        act("Ты пытаешься напялить %3$O4, но шулер из тебя никакущий..", ch, obj, 0, TO_CHAR);
         oldact("$c1 пытается напялить $o4, но шулер из $x никакущий..", ch, obj, 0, TO_ROOM);
-        oldact("$o1 падают на землю.", ch, obj, 0, TO_ALL);
+        act("%3$^O1 падают на землю.", ch, obj, 0, TO_ALL);
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         return false;
@@ -638,13 +638,13 @@ void CardSleevesBehavior::fight( Character *ch )
         return;
 
     if (number_percent( ) >= gsn_ace_in_sleeves->getEffective( ch )) {
-        oldact("{cТы пытаешься вынуть туза из $o2, но роняешь его! Упс..{x", ch, obj, 0, TO_CHAR);
+        act("{cТы пытаешься вынуть туза из %3$O2, но роняешь его! Упс..{x", ch, obj, 0, TO_CHAR);
         oldact("{cИз $o2 $c2 выпадает туз! Шулер!{x", ch, obj, 0, TO_ROOM);
         gsn_ace_in_sleeves->improve( ch, false );
         ch->setWait(gsn_ace_in_sleeves->getBeats( ));
     }
     else {
-        oldact("{cТы достаешь из $o2 припрятанного туза.{x", ch, obj, 0, TO_CHAR);
+        act("{cТы достаешь из %3$O2 припрятанного туза.{x", ch, obj, 0, TO_CHAR);
         gsn_ace_in_sleeves->improve( ch, true );
         
         spell( plushki[number_range( 0, size - 1 )], 

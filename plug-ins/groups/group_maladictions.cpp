@@ -219,12 +219,12 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->behavior && obj->behavior->isLevelAdaptive( ))
     {
-        oldact("$o1 отвергает твои попытки.",ch,obj,0,TO_CHAR);
+        act("%3$^O1 отвергает твои попытки.",ch,obj,0,TO_CHAR);
         return;
     }
     if (IS_OBJ_STAT(obj,ITEM_EVIL))
     {
-        oldact("$o1 уже полон дьявольской силы.",ch,obj,0,TO_CHAR);
+        act("%3$^O1 уже полон дьявольской силы.",ch,obj,0,TO_CHAR);
         return;
     }
 
@@ -237,7 +237,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
         {
             if (paf != 0)
                 affect_remove_obj( obj, paf, true);
-            oldact("Алая аура окружает $o4.",ch,obj,0,TO_ALL);
+            act("Алая аура окружает %3$O4.",ch,obj,0,TO_ALL);
             REMOVE_BIT(obj->extra_flags,ITEM_BLESS);
             return;
         }
@@ -258,7 +258,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(ITEM_EVIL);
     affect_to_obj( obj, &af);
 
-    oldact("Зловещая аура окружает $o4.",ch,obj,0,TO_ALL);
+    act("Зловещая аура окружает %3$O4.",ch,obj,0,TO_ALL);
 }
 
 VOID_SPELL(Curse)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -653,12 +653,12 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
 
                 if (IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
                 {
-                        oldact("Ты не можешь отравить $o1.",ch,obj,0,TO_CHAR);
+                        act("Ты не можешь отравить %3$O1.",ch,obj,0,TO_CHAR);
                         return;
                 }
                 
                 obj->value3(obj->value3() | DRINK_POISONED);
-                oldact("Пары яда проникают в $o4.",ch,obj,0,TO_ALL);
+                act("Пары яда проникают в %3$O4.",ch,obj,0,TO_ALL);
                 return;
         }
 
@@ -675,13 +675,13 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
                         || IS_OBJ_STAT(obj,ITEM_BLESS)
                         || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
                 {
-                        oldact("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
+                        act("Ты не можешь отравить %3$O4.",ch,obj,0,TO_CHAR);
                         return;
                 }
 
                 if (IS_WEAPON_STAT(obj,WEAPON_POISON))
                 {
-                        oldact("Прикосновение $o2 уже ядовито.",ch,obj,0,TO_CHAR);
+                        act("Прикосновение %3$O2 уже ядовито.",ch,obj,0,TO_CHAR);
                         return;
                 }
 
@@ -694,11 +694,11 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
                 af.bitvector.setValue(WEAPON_POISON);
                 affect_to_obj( obj, &af);
 
-                oldact("Прикосновение $o2 становится ядовитым.",ch,obj,0,TO_ALL);
+                act("Прикосновение %3$O2 становится ядовитым.",ch,obj,0,TO_ALL);
                 return;
         }
 
-        oldact("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
+        act("Ты не можешь отравить %3$O4.",ch,obj,0,TO_CHAR);
 }
 
 VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level ) 

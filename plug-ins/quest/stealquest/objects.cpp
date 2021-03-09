@@ -37,12 +37,12 @@ bool HiddenChest::canLock( Character *ch )
 void LockPick::getByHero( PCharacter *ch ) 
 {
     getQuest( ch )->wiznet( "", "%s gets key", ch->getNameP( '1' ).c_str( ) );
-    oldact("$o1 тускло поблескивает.", ch, obj, 0, TO_CHAR );
+    act("%3$^O1 тускло поблескивает.", ch, obj, 0, TO_CHAR );
 }
 
 void LockPick::getByOther( Character *ch ) 
 { 
-    oldact("Ты роняешь $o4.", ch, obj, 0, TO_CHAR );
+    act("Ты роняешь %3$O4.", ch, obj, 0, TO_CHAR );
     oldact("$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
 }
 

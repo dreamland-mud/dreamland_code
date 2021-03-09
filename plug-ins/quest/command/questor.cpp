@@ -416,11 +416,11 @@ bool QuestScrollBehavior::examine( Character *ch )
     bool extract = true;
     
     if (!isOwner( ch )) {
-        oldact("Знания, заключенные в $o6, недоступны тебе.", ch, obj, 0, TO_CHAR);
+        act("Знания, заключенные в %3$O6, недоступны тебе.", ch, obj, 0, TO_CHAR);
         return true;
     }
     
-    oldact("Ты внимательно изучаешь знаки на $o6.", ch, obj, 0, TO_CHAR);
+    act("Ты внимательно изучаешь знаки на %3$O6.", ch, obj, 0, TO_CHAR);
     
     for (s = skills.begin( ); s != skills.end( ); s++) {
         if (s->second <= 0)
@@ -457,7 +457,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
     ch->send_to( buf );
     if(extract) {
-        oldact("Чернила меркнут, и $o1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
+        act("Чернила меркнут, и %3$O1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
         extract_obj( obj );
     }
     return true;

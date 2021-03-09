@@ -501,7 +501,7 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
     oldact("$o1 наносит повреждения $O3.", ch, wield, worn, TO_ROOM );
 
     if (worn->condition < 1) {
-        oldact("$O1 разлетается на мелкие части.", ch, wield, worn, TO_ROOM);
+        act("%2$^O1 разлетается на мелкие части.", ch, wield, worn, TO_ROOM);
         extract_obj( worn );
         return;
     }

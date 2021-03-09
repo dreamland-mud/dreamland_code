@@ -1470,13 +1470,13 @@ void UndefinedOneHit::damEffectSlice( )
             loc->unequip( obj );
 
             if (obj->item_type == ITEM_TATTOO) {
-                oldact("$o1 медленно исчезает.", victim, obj, 0, TO_CHAR);
+                act("%3$^O1 медленно исчезает.", victim, obj, 0, TO_CHAR);
                 extract_obj(obj);
             }
             else if (!IS_SET( obj->extra_flags, ITEM_NODROP )) {
                 obj_from_char( obj );
                 obj_to_room( obj, victim->in_room );
-                oldact("$o1 падает на землю.", victim, obj, 0, TO_ALL);
+                act("%3$^O1 падает на землю.", victim, obj, 0, TO_ALL);
             }
         }
         

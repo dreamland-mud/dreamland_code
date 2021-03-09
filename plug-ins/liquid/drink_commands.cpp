@@ -202,7 +202,7 @@ static void pour_out( Character *ch, Object * out )
     Room *room = ch->in_room;
 
     if (out->value1() == 0) {
-        oldact("Ты переворачиваешь $o4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
+        act("Ты переворачиваешь %3$O4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
         oldact("Приговаривая 'ну котеночек, ну еще капельку', $c1 переворачивает и трясет $o5.", ch, out, 0, TO_ROOM );
         return;
     }
@@ -389,7 +389,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     }
 
     if (out->value1() == 0) {
-        oldact("В $o6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR);
+        act("В %3$O6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR);
         return;
     }
 

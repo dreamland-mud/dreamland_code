@@ -48,7 +48,7 @@ bool PersonalQuestReward::save( ) {
     if (obj->hasOwner( ch )) 
         return false;
     
-    oldact("$o1 исчезает!", ch, obj, 0, TO_CHAR);
+    act("%3$^O1 исчезает!", ch, obj, 0, TO_CHAR);
     extract_obj(obj);
     return true;
 }

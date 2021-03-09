@@ -52,11 +52,11 @@ CMDRUNP( listen )
          || ( obj = get_obj_room( ch, arg ) ))
     {
         if (obj->carried_by == ch) {
-            oldact("Ты подносишь к уху $o4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
+            act("Ты подносишь к уху %3$O4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
             oldact("$c1 подносит к уху $o4 и прислушивается.", ch, obj, 0, TO_ROOM);
         }
         else {
-            oldact("Ты прикладываешь ухо к $o3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
+            act("Ты прикладываешь ухо к %3$O3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
             oldact("$c1 прикладывает ухо к $o3 и прислушивается.", ch, obj, 0, TO_ROOM);
         }
 
@@ -175,7 +175,7 @@ CMDRUNP( smell )
     if ( ( obj = get_obj_wear_carry( ch, arg ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
     {
-        oldact("Ты нюхаешь $o4.", ch, obj, 0, TO_CHAR);
+        act("Ты нюхаешь %3$O4.", ch, obj, 0, TO_CHAR);
         oldact("$c1 нюхает $o4.", ch, obj, 0, TO_ROOM);
 
         if (oprog_smell( obj, ch, argument ))

@@ -265,8 +265,8 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
  */
 void LionEyedSword::wear( Character *ch )
 {
-    oldact("Глаза $o2 открываются.",ch,obj,0,TO_CHAR);
-    oldact("Глаза $o2 открываются.",ch,obj,0,TO_ROOM);
+    act("Глаза %3$O2 открываются.",ch,obj,0,TO_CHAR);
+    act("Глаза %3$O2 открываются.",ch,obj,0,TO_ROOM);
 
 }
 void LionEyedSword::equip( Character *ch )
@@ -367,7 +367,7 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   af.location = APPLY_CHA;
   affect_to_obj( shield, &af);
 
-  oldact("Ты создаешь $o4!",ch,shield,0,TO_CHAR);
+  act("Ты создаешь %3$O4!",ch,shield,0,TO_CHAR);
   oldact("$c1 создает $o4!",ch,shield,0,TO_ROOM);
 
 }

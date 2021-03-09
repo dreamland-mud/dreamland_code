@@ -870,13 +870,13 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     }
     
     if (!chance( gsn_hunter_beacon->getEffective( ch ) )) {
-        oldact("Твоя попытка установить $o4 окончилась неудачей.", ch, obj, 0, TO_CHAR );
+        act("Твоя попытка установить %3$O4 окончилась неудачей.", ch, obj, 0, TO_CHAR );
         ch->mana -= gsn_hunter_beacon->getMana( ) / 2;
         ch->setWait( gsn_hunter_beacon->getBeats( ) / 2 );
         gsn_hunter_beacon->improve( ch, false );
 
         if (!chance( ch->getPC( )->getClanLevel( ) * 10 )) {
-            oldact("Из-за неумелого обращения ты уничтожаешь $o4.", ch, obj, 0, TO_CHAR );
+            act("Из-за неумелого обращения ты уничтожаешь %3$O4.", ch, obj, 0, TO_CHAR );
             oldact("$c1 своим неумелым обращением уничтожает $o4.", ch, obj, 0, TO_ROOM );
             extract_obj( obj );
         }
@@ -1043,7 +1043,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
         return true;
     }
     
-    oldact("Ты устанавливаешь и маскируешь $o4.", ch, obj, 0, TO_CHAR );
+    act("Ты устанавливаешь и маскируешь %3$O4.", ch, obj, 0, TO_CHAR );
     oldact("$c1 устанавливает и маскирует $o4.", ch, obj, 0, TO_ROOM );
 
     obj_from_char( obj );
@@ -1094,7 +1094,7 @@ void HunterSnareTrap::greet( Character *victim )
     obj->timer = 24;
     activated = false;
     
-    oldact("Твоя нога попала в $o4!", victim, obj, 0, TO_CHAR );
+    act("Твоя нога попала в %3$O4!", victim, obj, 0, TO_CHAR );
     oldact("$c1 угоди$gло|л|ла в $o4!", victim, obj, 0, TO_ROOM );
 
     try {
@@ -1170,7 +1170,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
         return false;
     
     if (obj->wear_loc == wear_none) {
-        oldact("Ты не держишь $o4 в руках.", ch, obj, 0, TO_CHAR );
+        act("Ты не держишь %3$O4 в руках.", ch, obj, 0, TO_CHAR );
         return true;
     }
     
@@ -1220,7 +1220,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
     chance = gsn_hunter_pit->getEffective( ch );
 
     if (bhv->getDepth( ) == 0) {
-        oldact("Ты начинаешь копать $o4.", ch, pit, 0, TO_CHAR );
+        act("Ты начинаешь копать %3$O4.", ch, pit, 0, TO_CHAR );
         oldact("$c1 начинает копать $o4.", ch, pit, 0, TO_ROOM );
         bhv->setDepth( 1 );
     }
@@ -1232,7 +1232,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
             gsn_hunter_pit->improve( ch, true );
         }
         else {
-            oldact("Ты втыкаешь $o4 в почву, но натыкаешься на камень.", ch, obj, 0, TO_CHAR );
+            act("Ты втыкаешь %3$O4 в почву, но натыкаешься на камень.", ch, obj, 0, TO_CHAR );
             oldact("$c1 втыкает $o4 в почву, но натыкается на камень.", ch, obj, 0, TO_ROOM );
             gsn_hunter_pit->improve( ch, false );
         }
@@ -1295,7 +1295,7 @@ bool HunterPitSteaks::use( Character *ch, const char * cArgs )
 
     pit = get_obj_room_vnum( ch->in_room, OBJ_VNUM_HUNTER_PIT );
     if (!pit) {
-        oldact("Здесь некуда засунуть $o4.", ch, obj, 0, TO_CHAR );
+        act("Здесь некуда засунуть %3$O4.", ch, obj, 0, TO_CHAR );
         oldact("$c1 тычет повсюду $o5, ища, куда бы это засунуть.", ch, obj, 0, TO_ROOM );
         return true;
     }

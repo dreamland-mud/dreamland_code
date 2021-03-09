@@ -478,7 +478,7 @@ SKILL_RUNP( katana )
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
         
-                oldact("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR);
+                act("Ты делаешь катану из %3$O2!",ch,part,0,TO_CHAR);
                 oldact("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
         
                 extract_obj(part);
@@ -486,7 +486,7 @@ SKILL_RUNP( katana )
         }
         else
         {
-                oldact("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
+                act("Ты понапрасну изводишь %3$O4.",ch,part,0,TO_CHAR);
                 extract_obj(part);
                 ch->mana -= mana / 2;
                 gsn_katana->improve( ch, false );
@@ -656,7 +656,7 @@ void OwnedKatana::get( Character *ch )
     return;
   }
 
-  oldact("$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
+  act("%3$^O1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
   oldact("$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
 
   obj_from_char( obj );

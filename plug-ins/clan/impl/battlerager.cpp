@@ -312,7 +312,7 @@ SKILL_RUNP( trophy )
             obj_to_char(trophy, ch);
             gsn_trophy->improve( ch, true );
 
-            oldact("Ты изготавливаешь пончо из $o2!",ch,part,0,TO_CHAR);
+            act("Ты изготавливаешь пончо из %3$O2!",ch,part,0,TO_CHAR);
             oldact("$c1 изготавливает пончо из $o2!",ch,part,0,TO_ROOM);
 
             extract_obj(part);

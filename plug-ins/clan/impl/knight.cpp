@@ -59,7 +59,7 @@ CLAN(knight);
  *-------------------------------------------------------------------------*/
 void ClanItemKnight::actDisappear()
 {
-    oldact("$o1 исчезает в серой дымке.",
+    act("%3$^O1 исчезает в серой дымке.",
         obj->getRoom()->people, obj, 0, TO_ALL);
 }
 
@@ -68,14 +68,14 @@ void ClanItemKnight::actDisappear()
  *-------------------------------------------------------------------------*/
 void ClanAltarKnight::actAppear()
 {
-    oldact("{WЛучи света пронизывают комнату и в центре материализуется $o1.{x",
+    act("{WЛучи света пронизывают комнату и в центре материализуется %3$O1.{x",
         obj->in_room->people, obj, 0, TO_ALL);
 }
 
 void ClanAltarKnight::actDisappear()
 {
-    oldact("{WСвет $o2 исчезает и он растворяется в воздухе!{x",
-        obj->getRoom()->people, obj, NULL, TO_ALL);
+    act("{WСвет %3$O2 исчезает и он растворяется в воздухе!{x",
+        obj->getRoom()->people, obj, 0, TO_ALL);
 }
 
 void ClanAltarKnight::actNotify(Character *ch)
@@ -317,7 +317,7 @@ VOID_SPELL(Dragonplate)::run(Character *ch, char *target_name, int sn, int level
 
     obj_to_char(plate, ch);
 
-    oldact("Ты взмахиваешь руками и создаешь $o4!", ch, plate, 0, TO_CHAR);
+    act("Ты взмахиваешь руками и создаешь %3$O4!", ch, plate, 0, TO_CHAR);
     oldact("$c1 взмахивает руками и создает $o4!", ch, plate, 0, TO_ROOM);
 }
 
@@ -361,7 +361,7 @@ void KnightWeapon::fight(Character *ch)
 
     if (sn > 0)
     {
-        oldact("$o1 загорается ярким голубым светом!", ch, obj, 0, TO_CHAR);
+        act("%3$^O1 загорается ярким голубым светом!", ch, obj, 0, TO_CHAR);
         oldact("$o1 $c2 загорается ярким голубым светом!", ch, obj, 0, TO_ROOM);
 
         spell(sn, ch->getModifyLevel(), ch, ch, FSPELL_BANE);
@@ -411,7 +411,7 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
     SET_BIT(sword->extra_flags, (ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
     obj_to_char(sword, ch);
 
-    oldact("Ты взмахиваешь руками и создаешь $o4!", ch, sword, 0, TO_CHAR);
+    act("Ты взмахиваешь руками и создаешь %3$O4!", ch, sword, 0, TO_CHAR);
     oldact("$c1 взмахивает руками и создает $o4!", ch, sword, 0, TO_ROOM);
 }
 

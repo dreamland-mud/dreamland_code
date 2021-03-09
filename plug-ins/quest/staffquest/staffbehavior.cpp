@@ -41,17 +41,17 @@ void StaffBehavior::getByOther( Character *ch )
 void StaffBehavior::getByHero( PCharacter *ch ) 
 {
     if (IS_AFFECTED( ch, AFF_POISON ) && (dice( 1, 5) == 1))  {
-        oldact("$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
         spell( gsn_cure_poison, 30, ch, ch );
         return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CURSE ) && (dice(1,5)==1) )  {
-        oldact("$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
         spell( gsn_remove_curse, 30, ch, ch );
         return;
     }
     
-    oldact("Мерцающая аура окружает $o4.", ch, obj, 0, TO_CHAR );
+    act("Мерцающая аура окружает %3$O4.", ch, obj, 0, TO_CHAR );
 }
 

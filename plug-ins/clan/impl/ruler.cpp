@@ -989,7 +989,7 @@ SKILL_RUNP( confiscate )
                         oldact("$c1 конфискует $o4 у $C4.", ch, obj, victim, TO_NOTVICT);
 
                         obj_to_room( obj, ch->in_room );
-                        oldact("Ты аккуратно кладешь $o4 на пол.", ch, obj, 0, TO_CHAR);
+                        act("Ты аккуратно кладешь %3$O4 на пол.", ch, obj, 0, TO_CHAR);
                         oldact("$c1 аккуратно кладет $o4 на пол.", ch, obj, 0, TO_ROOM);
 
                 }
@@ -1667,7 +1667,7 @@ VOID_SPELL(RemoveBadge)::run( Character *ch, Character *victim, int sn, int leve
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          oldact("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR);
+          act("Твой %3$O1 исчезает.",ch, badge, 0, TO_CHAR);
           oldact("У $c2 исчезает $o1.", ch, badge, 0, TO_ROOM);
         
           obj_from_char(badge);
@@ -1725,7 +1725,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
         {
-          oldact("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR);
+          act("Твой %3$O1 исчезает.",ch, badge, 0, TO_CHAR);
           obj_from_char(badge);
           extract_obj(badge);
           continue;

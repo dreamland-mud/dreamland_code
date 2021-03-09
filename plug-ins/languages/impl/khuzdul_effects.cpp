@@ -86,7 +86,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
     victim->hitroll += af.modifier;
     victim->damroll += af.modifier;
 
-    oldact("{CСекреты кузнецов древности преображают $o4!{x", ch, obj, 0, TO_ALL );
+    act("{CСекреты кузнецов древности преображают %3$O4!{x", ch, obj, 0, TO_ALL );
     return true;
 }
 

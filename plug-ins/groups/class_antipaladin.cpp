@@ -286,7 +286,7 @@ void ShadowBlade::fight( Character *ch )
                 .incrementHitroll()
                 .incrementDamroll();
 
-            oldact("{cСлабое {Cсияние{c окутывает $o4.{x", ch, obj, 0, TO_CHAR);
+            act("{cСлабое {Cсияние{c окутывает %3$O4.{x", ch, obj, 0, TO_CHAR);
         }
     }
     
@@ -306,7 +306,7 @@ void ShadowBlade::fight( Character *ch )
     switch (number_range( 1, 4 )) {
     case 1:
         if (!IS_SET(victim->imm_flags, IMM_POISON)) {
-            oldact("Капли {Gяда{x стекают по лезвию $o2.", ch, obj, 0, TO_CHAR);
+            act("Капли {Gяда{x стекают по лезвию %3$O2.", ch, obj, 0, TO_CHAR);
             oldact("Капли {Gяда{x стекают по лезвию $o2 в руках $c2.", ch, obj, 0, TO_ROOM);
             spell( gsn_poison, level + 1, ch, victim, FSPELL_BANE );
         }
@@ -349,7 +349,7 @@ bool ShadowBlade::area( )
     if (ch->fighting == 0)
         return false;
 
-    oldact("$o1 внезапно вонзается тебе в сердце!", ch, obj, 0, TO_CHAR );
+    act("%3$^O1 внезапно вонзается тебе в сердце!", ch, obj, 0, TO_CHAR );
     oldact("$o1 внезапно вонзается $c4 в сердце!", ch, obj, 0, TO_ROOM );
     unequip_char( ch, obj );
     obj_from_char( obj );
@@ -361,7 +361,7 @@ bool ShadowBlade::area( )
 bool ShadowBlade::canEquip( Character *ch )
 {
     if (ch->getProfession( ) != prof_anti_paladin) {
-        oldact("$o1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
         unequip_char( ch, obj );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
@@ -374,7 +374,7 @@ bool ShadowBlade::canEquip( Character *ch )
 bool ShadowBlade::quit( Character *ch, bool count )
 {
     if (ch->getName( ) != owner.getValue( )) {
-        oldact("$o1 не принадлежит тебе и не хочет покидать мир вместе с тобой.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 не принадлежит тебе и не хочет покидать мир вместе с тобой.", ch, obj, 0, TO_CHAR );
 
         if (obj->carried_by)
             obj_from_char( obj );
@@ -421,7 +421,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     }
 
     if (IS_WEAPON_STAT(blade, WEAPON_FADING)) {
-        oldact("Тьма уже окутывает $o4.", ch, blade, 0, TO_CHAR );
+        act("Тьма уже окутывает %3$O4.", ch, blade, 0, TO_CHAR );
         return;
     }
 
@@ -434,7 +434,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     af.bitvector.setValue(WEAPON_FADING);
     affect_to_obj( blade, &af );
 
-    oldact("Ты посвящаешь $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_CHAR );
+    act("Ты посвящаешь %3$O4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_CHAR );
     oldact("$c1 посвящает $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
 }
 
@@ -464,12 +464,12 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
     }
 
     if (blade->carried_by) {
-        oldact("$o1 медленно исчезает.", blade->carried_by, blade, 0, TO_ALL );
+        act("%3$^O1 медленно исчезает.", blade->carried_by, blade, 0, TO_ALL );
         obj_from_char( blade );
     }
     else if (blade->in_room) {
         if (blade->in_room->people)
-            oldact("$o1 медленно исчезает.", blade->in_room->people, blade, 0, TO_ALL );
+            act("%3$^O1 медленно исчезает.", blade->in_room->people, blade, 0, TO_ALL );
 
         obj_from_room( blade );
     }
@@ -477,7 +477,7 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
         obj_from_obj( blade );
 
     obj_to_char( blade, ch );
-    oldact("$o1 появляется, мерцая.", ch, blade, 0, TO_ALL );
+    act("%3$^O1 появляется, мерцая.", ch, blade, 0, TO_ALL );
 }
 
 
@@ -534,7 +534,7 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
 
     obj_to_char( blade, ch );
 
-    oldact("Ты создаешь $o4!", ch, blade, 0, TO_CHAR );
+    act("Ты создаешь %3$O4!", ch, blade, 0, TO_CHAR );
     oldact("$c1 создает $o4!", ch, blade, 0, TO_ROOM );
 }
 

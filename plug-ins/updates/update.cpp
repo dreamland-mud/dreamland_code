@@ -1496,7 +1496,7 @@ void wield_update( Character *ch )
             && second->getWeight( ) > (get_str_app(ch).wield * 5)
             && !check_native_weapon( ch, second ))
     {
-        oldact("Ты не в силах удержать $o4 в левой руке.", ch, second, 0, TO_CHAR);
+        act("Ты не в силах удержать %3$O4 в левой руке.", ch, second, 0, TO_CHAR);
         oldact("$c1 не в силах удержать $o4.", ch, second, 0, TO_ROOM);
         unequip_char( ch, second );
     }
@@ -1508,7 +1508,7 @@ void wield_update( Character *ch )
             && wield->getWeight( ) > (get_str_app(ch).wield * 10)
             && !check_native_weapon( ch, wield ))
     {
-        oldact("Ты не в силах удержать $o4 в правой руке.", ch, wield, 0, TO_CHAR);
+        act("Ты не в силах удержать %3$O4 в правой руке.", ch, wield, 0, TO_CHAR);
         oldact("$c1 не в силах удержать $o4.", ch, wield, 0, TO_ROOM);
         unequip_char( ch, wield );
     }

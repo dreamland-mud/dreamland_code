@@ -249,7 +249,7 @@ bool spec_patrolman(NPCharacter *ch)
     ||  ((obj = get_eq_char(ch,wear_neck_2)) != 0
     &&   obj->pIndexData->vnum == OBJ_VNUM_WHISTLE))
     {
-        oldact("Ты со всей силы свистишь в $o4.",ch,obj,0,TO_CHAR);
+        act("Ты со всей силы свистишь в %3$O4.",ch,obj,0,TO_CHAR);
         oldact_p("$c1 свистит в $o1, ***WHEEEEEEEEEEEET***",
                ch,obj,0,TO_ROOM,POS_RESTING);
 

@@ -2050,7 +2050,7 @@ CMDWIZP( clone )
                 recursive_clone(ch,obj,clone);
 
                 oldact("$c1 создает $o4.",ch,clone,0,TO_ROOM);
-                oldact("Ты создаешь дубликат $o2.",ch,clone,0,TO_CHAR);
+                act("Ты создаешь дубликат %3$O2.",ch,clone,0,TO_CHAR);
                 wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
                         "%C1 клонирует %O4.", ch, obj );
                 return;
@@ -2213,7 +2213,7 @@ CMDWIZP( load )
         obj_to_room( obj, ch->in_room );
         
     oldact("$c1 создает $o4!", ch, obj, 0, TO_ROOM);
-    oldact("Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
+    act("Ты создаешь %3$O4!", ch, obj, 0, TO_CHAR);
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
     LogStream::sendNotice( ) 
@@ -2281,7 +2281,7 @@ CMDWIZP( purge )
 
     if ((obj = get_obj_here(ch, arg))) {
         oldact("$c1 изничтожает $o4.", ch, obj, 0, TO_ROOM );
-        oldact("Ты изничтожаешь $o4.", ch, obj, 0, TO_CHAR );
+        act("Ты изничтожаешь %3$O4.", ch, obj, 0, TO_CHAR );
         extract_obj(obj);
         return;
     }

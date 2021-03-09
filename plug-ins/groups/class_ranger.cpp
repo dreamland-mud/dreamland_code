@@ -139,7 +139,7 @@ static Object * find_arrow( Character *ch, Object *quiver )
         }
 
     if (!arrow) {
-        oldact("В $o6 закончились стрелы.", ch, quiver, 0, TO_CHAR);
+        act("В %3$O6 закончились стрелы.", ch, quiver, 0, TO_CHAR);
         return NULL;
     }
 

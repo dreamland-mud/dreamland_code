@@ -1769,14 +1769,14 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
 static bool oprog_examine_corpse( Object *obj, Character *ch, const DLString & )
 {
-    oldact("На $o6 ты видишь:", ch, obj, 0, TO_CHAR );
+    act("На %3$O6 ты видишь:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
 
 static bool oprog_examine_keyring( Object *obj, Character *ch, const DLString & )
 {
-    oldact("На $o4 нанизано:", ch, obj, 0, TO_CHAR );
+    act("На %3$O4 нанизано:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        

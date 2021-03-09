@@ -94,12 +94,12 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->behavior && obj->behavior->isLevelAdaptive( ))
     {
-        oldact("$o1 отвергает твои попытки благословения.",ch,obj,0,TO_CHAR);
+        act("%3$^O1 отвергает твои попытки благословения.",ch,obj,0,TO_CHAR);
         return;
     }
     if (obj->is_obj_stat(ITEM_BLESS))
     {
-        oldact("$o1 уже имеет священную ауру.",ch,obj,0,TO_CHAR);
+        act("%3$^O1 уже имеет священную ауру.",ch,obj,0,TO_CHAR);
         return;
     }
     
@@ -112,7 +112,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
         {
             if (paf != 0)
                 affect_remove_obj( obj, paf, true);
-            oldact("Священная аура окружает $o4.",ch,obj,0,TO_ALL);
+            act("Священная аура окружает %3$O4.",ch,obj,0,TO_ALL);
             REMOVE_BIT(obj->extra_flags,ITEM_EVIL);
             return;
         }
@@ -147,7 +147,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
       af.modifier        = ch->isAffected( gsn_inspiration ) ? -3 : -1;
       af.bitvector.setValue(ITEM_BLESS);
       affect_to_obj( obj, &af);
-      oldact("Священная аура окружает $o4.",ch,obj,0,TO_ALL);
+      act("Священная аура окружает %3$O4.",ch,obj,0,TO_ALL);
     }
 }
 

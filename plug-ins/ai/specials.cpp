@@ -247,7 +247,7 @@ bool BasicMobileBehavior::doQuaff( )
 
     if (obj) {
         oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM );
-        oldact("Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR );
+        act("Ты осушаешь %3$O4.", ch, obj, 0 ,TO_CHAR );
         
         spell_by_item( ch, obj );
         obj_to_char( create_object(get_obj_index(OBJ_VNUM_POTION_VIAL),0),ch);

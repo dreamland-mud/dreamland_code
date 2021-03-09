@@ -109,7 +109,7 @@ COMMAND(CEat, "eat")
     }
 
     oldact("$c1 ест $o4.",  ch, obj, 0, TO_ROOM);
-    oldact("Ты ешь $o4.", ch, obj, 0, TO_CHAR);
+    act("Ты ешь %3$O4.", ch, obj, 0, TO_CHAR);
     if ( ch->fighting != 0 )
              ch->setWaitViolence( 3 );
 

@@ -38,7 +38,7 @@ InvasionInstrument::InvasionInstrument( ) : charges( 5 )
 
 void InvasionInstrument::wear( Character *ch ) 
 { 
-    oldact("Ты покрепче сжимаешь $o4, готовясь к грядущим подвигам.", ch, obj, 0, TO_CHAR);
+    act("Ты покрепче сжимаешь %3$O4, готовясь к грядущим подвигам.", ch, obj, 0, TO_CHAR);
     oldact("$c1 с серьезным видом сжимает $o4.", ch, obj, 0, TO_ROOM);
 }
 
@@ -51,7 +51,7 @@ bool InvasionInstrument::use( Character *ch, const char *args )
         return false;
     
     if (obj->wear_loc != wear_hold) {
-        oldact("Покрепче зажми $o4 в руках - глядишь, поможет..", ch, obj, 0, TO_CHAR);
+        act("Покрепче зажми %3$O4 в руках - глядишь, поможет..", ch, obj, 0, TO_CHAR);
         return true;
     }
     

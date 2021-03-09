@@ -49,8 +49,8 @@
  */
 void Excalibur::wear( Character *ch )
 {
-  oldact("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR);
-  oldact("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM);
+  act("%3$^O1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR);
+  act("%3$^O1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM);
   
 }
 
@@ -69,8 +69,8 @@ void Excalibur::equip( Character *ch )
 
 void Excalibur::remove( Character *ch )
 {
-  oldact("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_CHAR);
-  oldact("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_ROOM);
+  act("Пылающая аура вокруг %3$O2 исчезает.",ch,obj,0,TO_CHAR);
+  act("Пылающая аура вокруг %3$O2 исчезает.",ch,obj,0,TO_ROOM);
 }
 
 bool Excalibur::death( Character *ch )
@@ -79,7 +79,7 @@ bool Excalibur::death( Character *ch )
         return false;
 
     oldact_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_CHAR,POS_DEAD);
-    oldact("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
+    act("%3$^O1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
     ch->hit = ch->max_hit;
     ch->pecho("Ты чувствуешь себя намного лучше.");
     act("%^C1 выглядит намного лучше.",ch,0,0,TO_ROOM);
@@ -378,7 +378,7 @@ void DemonfireShield::remove( Character *ch )
 void FlyingBoots::wear( Character *ch )
 {
     if (!ch->isAffected(gsn_fly)) {
-        oldact("Ты обуваешь $o4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
+        act("Ты обуваешь %3$O4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
         act("Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
         act("%^C1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
     }

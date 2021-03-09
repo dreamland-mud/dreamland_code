@@ -259,7 +259,7 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 {
     if (!ch->is_immortal( ) && !obj->hasOwner( ch ))
     {
-        oldact("Похоже, $o4 от земли не оторвать.",ch,obj,0,TO_CHAR);
+        act("Похоже, %3$O4 от земли не оторвать.",ch,obj,0,TO_CHAR);
         return false;
     }
     
@@ -269,7 +269,7 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 static bool oprog_can_get_furniture( Character *ch, Object *obj )
 {
     if (count_users( obj ) > 0) {
-        oldact("Кто-то использует $o4.",ch,obj,0,TO_CHAR);
+        act("Кто-то использует %3$O4.",ch,obj,0,TO_CHAR);
         return false;
     }
 
@@ -347,7 +347,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         
     case ITEM_CONTAINER:
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
-            oldact("Тебе не удалось нашарить ни одного кармана у $o2.",ch,container,0,TO_CHAR);
+            act("Тебе не удалось нашарить ни одного кармана у %3$O2.",ch,container,0,TO_CHAR);
             return false;
         }
         
@@ -420,7 +420,7 @@ static bool can_get_obj( Character *ch, Object *obj )
 
 static bool get_obj( Character *ch, Object *obj )
 {
-    oldact("Ты берешь $o4.", ch, obj, 0, TO_CHAR);
+    act("Ты берешь %3$O4.", ch, obj, 0, TO_CHAR);
 
     if (!IS_AFFECTED(ch,AFF_SNEAK))
         oldact("$c1 берет $o4.", ch, obj, 0, TO_ROOM);
@@ -678,7 +678,7 @@ CMDRUNP( get )
             obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
 
             if(!obj) {
-                oldact("Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR);
+                act("Ты не видишь ничего подобного в %3$O6.", ch, container, 0, TO_CHAR);
                 return;
             }
             
@@ -731,9 +731,9 @@ CMDRUNP( get )
 
             if (!found) {
                 if (!all)
-                    oldact("Ты не видишь ничего в $o6.", ch, container, 0, TO_CHAR);
+                    act("Ты не видишь ничего в %3$O6.", ch, container, 0, TO_CHAR);
                 else
-                    oldact("Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR);
+                    act("Ты не видишь ничего подобного в %3$O6.", ch, container, 0, TO_CHAR);
             }
         }
     }
@@ -819,7 +819,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         return PUT_OBJ_ERR;
 
     if (!can_drop_obj( ch, obj )) {
-        oldact("Ты не можешь избавиться от $o2.", ch, obj, 0, TO_CHAR );
+        act("Ты не можешь избавиться от %3$O2.", ch, obj, 0, TO_CHAR );
         return PUT_OBJ_ERR;
     }
     
@@ -827,13 +827,13 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
     if (container->item_type == ITEM_KEYRING) {
         if (pcount >= container->value0()) {
-            oldact("На $o6 не осталось свободного места.", ch, container, 0, TO_CHAR );
+            act("На %3$O6 не осталось свободного места.", ch, container, 0, TO_CHAR );
             return PUT_OBJ_STOP;
         }
 
         if (obj->item_type != ITEM_KEY && obj->item_type != ITEM_LOCKPICK) {
             if (verbose)
-                oldact("На $o4 ты можешь нанизать только ключи или отмычки.", ch, container, 0, TO_CHAR );
+                act("На %3$O4 ты можешь нанизать только ключи или отмычки.", ch, container, 0, TO_CHAR );
             return PUT_OBJ_ERR;
         }
 
@@ -841,7 +841,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     }
 
     if (pcount > container->value0()) {
-        oldact("Опасно запихивать столько вещей в $o4!", ch,container,0, TO_CHAR);
+        act("Опасно запихивать столько вещей в %3$O4!", ch,container,0, TO_CHAR);
         return PUT_OBJ_STOP;
     }
 
@@ -852,7 +852,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     }
 
     if (obj->pIndexData->limit != -1) {
-        oldact("$o4 нельзя хранить в такой дребедени.", ch,obj,0,TO_CHAR );
+        act("%3$^O4 нельзя хранить в такой дребедени.", ch,obj,0,TO_CHAR );
         return PUT_OBJ_ERR;
     }
 
@@ -861,7 +861,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
             || obj->value0()  != WEAPON_ARROW ))
     {
         if (verbose)
-            oldact("Ты можешь положить только стрелы в $o4.",ch,container,0,TO_CHAR);
+            act("Ты можешь положить только стрелы в %3$O4.",ch,container,0,TO_CHAR);
         return PUT_OBJ_ERR;
     }
 
@@ -877,7 +877,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         pcount = count_obj_in_obj( container, ITEM_POTION );
                 
        if (pcount > 15) {
-            oldact("Небезопасно далее складывать снадобья в $o4.",ch,container,0, TO_CHAR);
+            act("Небезопасно далее складывать снадобья в %3$O4.",ch,container,0, TO_CHAR);
             return PUT_OBJ_ERR;
        }
     }
@@ -1167,7 +1167,7 @@ static int drop_obj( Character *ch, Object *obj )
     if (!IS_AFFECTED(ch, AFF_SNEAK))
         oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
 
-    oldact("Ты бросаешь $o4.", ch, obj, 0, TO_CHAR );
+    act("Ты бросаешь %3$O4.", ch, obj, 0, TO_CHAR );
 
     if (oprog_drop( obj, ch ))
         return DROP_OBJ_EXTRACT;
@@ -1310,7 +1310,7 @@ CMDRUNP( drop )
 
         if (!found) {
             if (arg[3] == '\0')
-                act("У тебя ничего нет.", ch, 0, arg, TO_CHAR );
+                act("У тебя ничего нет.", ch, 0, 0, TO_CHAR );
             else
                 oldact("У тебя нет $T.", ch, 0, is_number(&arg[4]) ? "этого":&arg[4], TO_CHAR );
         }
@@ -1686,10 +1686,10 @@ CMDRUNP( use )
         return;
     
     if (obj->carried_by == ch) {
-        oldact("Ты вертишь в руках $o4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
+        act("Ты вертишь в руках %3$O4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
         oldact("$c1 вертит в руках $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
     } else {
-        oldact("Ты озадаченно ощупываешь $o4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
+        act("Ты озадаченно ощупываешь %3$O4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
         oldact("$c1 озадаченно ощупывает $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
     }
 }        

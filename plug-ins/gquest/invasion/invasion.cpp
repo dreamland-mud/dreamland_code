@@ -174,7 +174,7 @@ void InvasionGQuest::cleanup( bool performance )
         if (obj->behavior) {
             if (obj->behavior.getDynamicPointer<InvasionObj>( )) {
                 if (performance && obj->in_room)
-                    oldact("$o1 исчезает.", obj->in_room->people, obj, 0, TO_ROOM);
+                    act("%3$^O1 исчезает.", obj->in_room->people, obj, 0, TO_ROOM);
 
                 extract_obj( obj );
             }

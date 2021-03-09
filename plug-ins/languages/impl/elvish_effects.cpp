@@ -72,7 +72,7 @@ bool BlessEquipWE::run( PCharacter *ch, Object *obj ) const
     if (obj->carried_by && obj->wear_loc->givesAffects())
         affect_modify(obj->carried_by, &af, true);
 
-    oldact("{C$o1 на мгновение загорается огнем нездешних звёзд.{x", ch, obj, 0, TO_ALL );
+    act("{C%3$O1 на мгновение загорается огнем нездешних звёзд.{x", ch, obj, 0, TO_ALL );
     return true;
 }
 

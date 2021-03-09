@@ -1589,11 +1589,11 @@ SKILL_RUNP( smash )
 
     if (victim->isAffected(gsn_protective_shield)) {
         oldact_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
-                ch, NULL, victim,TO_CHAR,POS_FIGHTING);
+                ch, 0, victim,TO_CHAR,POS_FIGHTING);
         oldact_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
-                ch, NULL,victim,TO_VICT,POS_FIGHTING);
+                ch, 0,victim,TO_VICT,POS_FIGHTING);
         oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
-                ch,NULL,victim,TO_NOTVICT,POS_FIGHTING);
+                ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
         ch->setWait( gsn_smash->getBeats( ) );
         return;
@@ -1613,11 +1613,11 @@ SKILL_RUNP( smash )
 
     if (number_percent() < chance) {
         oldact_p("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!",
-               ch,NULL,victim,TO_VICT,POS_RESTING);
+               ch,0,victim,TO_VICT,POS_RESTING);
         oldact_p("Ты сбиваешь $C4 с ног, посылая $S на землю!",
-               ch,NULL,victim,TO_CHAR,POS_RESTING);
+               ch,0,victim,TO_CHAR,POS_RESTING);
         oldact_p("$c1 сильнейшим ударом сбивает $C4 с ног.",
-               ch,NULL,victim,TO_NOTVICT,POS_RESTING);
+               ch,0,victim,TO_NOTVICT,POS_RESTING);
         gsn_smash->improve( ch, true, victim );
 
         wait = 3;
@@ -1651,11 +1651,11 @@ SKILL_RUNP( smash )
     {
         damage(ch,victim,0,gsn_smash,DAM_BASH, true, DAMF_WEAPON);
         oldact_p("Ты промахиваешься и падаешь лицом на пол!",
-               ch,NULL,victim,TO_CHAR,POS_RESTING);
+               ch,0,victim,TO_CHAR,POS_RESTING);
         oldact_p("$c1 промахивается и падает лицом на пол.", 
-               ch,NULL,victim,TO_NOTVICT,POS_RESTING);
+               ch,0,victim,TO_NOTVICT,POS_RESTING);
         oldact_p("$c1 пытается ударить тебя, но промахивается и падает на пол.",
-               ch,NULL,victim,TO_VICT,POS_RESTING);
+               ch,0,victim,TO_VICT,POS_RESTING);
         gsn_smash->improve( ch, false, victim );
 
         if ( number_percent() > 5 )         

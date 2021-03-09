@@ -209,8 +209,8 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
 
     obj_to_room(portal,from_room);
 
-    oldact("Над землей образуется $o1.",ch,portal,0,TO_ROOM);
-    oldact("Перед тобой образуется $o1.",ch,portal,0,TO_CHAR);
+    act("Над землей образуется %3$O1.",ch,portal,0,TO_ROOM);
+    act("Перед тобой образуется %3$O1.",ch,portal,0,TO_CHAR);
 
     /* no second portal if rooms are the same */
     if (to_room == from_room)
@@ -278,8 +278,8 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
 
     obj_to_room(portal,ch->in_room);
 
-    oldact("Над землей образуется $o1.",ch,portal,0,TO_ROOM);
-    oldact("Перед тобой образуется $o1.",ch,portal,0,TO_CHAR);
+    act("Над землей образуется %3$O1.",ch,portal,0,TO_ROOM);
+    act("Перед тобой образуется %3$O1.",ch,portal,0,TO_CHAR);
 
     if (victim->in_room->people != 0)
     {

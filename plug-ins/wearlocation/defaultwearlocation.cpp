@@ -197,22 +197,22 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     if (obj->isAntiAligned( ch )) {
-        oldact("Твоя натура не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
+        act("Твоя натура не позволяет тебе носить %3$O4.", ch, obj, 0, TO_CHAR);
         oldact("$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-        oldact("$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
         return false;
     }
     
     if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
-        oldact("Твоя натура все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
+        act("Твоя натура все еще не позволяет тебе носить %3$O4.", ch, obj, 0, TO_CHAR);
         oldact("$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-        oldact("$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+        act("%3$^O1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
         return false;
     }
 
     if (IS_SET( obj->extra_flags, ITEM_MAGIC ) && ch->isAffected( gsn_spellbane )) {
         int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
-        oldact("Магия $o2 аннигилирует с твоим спеллбаном!", ch, obj, 0, TO_CHAR);
+        act("Магия %3$O2 аннигилирует с твоим спеллбаном!", ch, obj, 0, TO_CHAR);
         oldact("Магия $o2 аннигилирует со спеллбаном $c2!", ch, obj, 0, TO_ROOM);
         SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_MAGIC ).hit( false );
         interpret_raw( ch, "cb", "Меня ударило магической вещью!" );
@@ -356,7 +356,7 @@ bool DefaultWearlocation::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(obj->extra_flags, ITEM_NOREMOVE)) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) 
-            oldact("Ты не можешь снять $o4, на этой вещи проклятие.", ch, obj, 0, TO_CHAR);
+            act("Ты не можешь снять %3$O4, на этой вещи проклятие.", ch, obj, 0, TO_CHAR);
         return false;
     }
     

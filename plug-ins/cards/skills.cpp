@@ -53,7 +53,7 @@ VOID_SPELL(AceInSleeves)::run( Character *ch, char *, int sn, int level )
     
     obj_to_char( sleeves, ch );
 
-    oldact("Ты создаешь $o4!", ch, sleeves, 0, TO_CHAR);
+    act("Ты создаешь %3$O4!", ch, sleeves, 0, TO_CHAR);
     oldact("$c1 создает $o4!", ch, sleeves, 0, TO_ROOM);
 }
 

@@ -93,18 +93,18 @@ bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
         return false;
 
     if (canCatchRock) {
-        oldact("Ты ловишь руками $o4.",ch,obj,victim,TO_VICT);
+        act("Ты ловишь руками %3$O4.",ch,obj,victim,TO_VICT);
         oldact("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR);
         oldact("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT);
         obj_to_char(obj,victim);
     }
     else if (canCatchMissile) {
-        oldact("Ты ловишь руками $o4.",ch,obj,victim,TO_VICT);
+        act("Ты ловишь руками %3$O4.",ch,obj,victim,TO_VICT);
         oldact("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR);
         oldact("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT);
         obj_to_char(obj,victim);
     } else {
-        oldact("Ты уклоняешься от $o2.",ch,obj,victim,TO_VICT);
+        act("Ты уклоняешься от %3$O2.",ch,obj,victim,TO_VICT);
         oldact("$C1 уклоняется от $o2.",ch,obj,victim,TO_CHAR);
         oldact("$c1 уклоняется от $o2.",victim,obj,ch,TO_NOTVICT);
         obj_to_room(obj,victim->in_room);
@@ -144,7 +144,7 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
                 if ( check_obj_dodge(ch,victim,arrow,chance))
                         return 0;
                         
-                oldact("$o1 поражает тебя!", victim, arrow, 0, TO_CHAR);
+                act("%3$^O1 поражает тебя!", victim, arrow, 0, TO_CHAR);
                 oldact("$o1 поражает $C4!", ch, arrow, victim, TO_CHAR);
 
                 if (ch->in_room == victim->in_room)
@@ -172,7 +172,7 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
             else
             {
                 obj_to_room(arrow,victim->in_room);
-                oldact("$o1 падает на землю у твоих ног!",victim,arrow,0, TO_ALL);
+                act("%3$^O1 падает на землю у твоих ног!",victim,arrow,0, TO_ALL);
                 return 0;
             }
         }
@@ -245,21 +245,21 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     if (IS_WEAPON_STAT(arrow,WEAPON_FLAMING))
     {
         oldact("$o1 обжигает $c4.",victim,arrow,0,TO_ROOM);
-        oldact("$o1 обжигает тебя.",victim,arrow,0,TO_CHAR);
+        act("%3$^O1 обжигает тебя.",victim,arrow,0,TO_CHAR);
         fire_effect( (void *) victim,arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_FROST))
     {
         oldact("$o1 обмораживает $c4.",victim,arrow,0,TO_ROOM);
-        oldact("$o1 обмораживает тебя.",victim,arrow,0,TO_CHAR);
+        act("%3$^O1 обмораживает тебя.",victim,arrow,0,TO_CHAR);
         cold_effect(victim,arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_SHOCKING))
     {
         oldact("$o1 парализует $c4 разрядом молнии.",victim,arrow,0,TO_ROOM);
-        oldact("$o1 парализует тебя разрядом молнии.",victim,arrow,0,TO_CHAR);
+        act("%3$^O1 парализует тебя разрядом молнии.",victim,arrow,0,TO_CHAR);
         shock_effect(victim,arrow->level,dam,TARGET_CHAR);
     }
 

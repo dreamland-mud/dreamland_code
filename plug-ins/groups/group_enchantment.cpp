@@ -195,7 +195,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     }
     else if (result <= (90 - level/5))  /* success! */
     {
-        oldact("Золотая аура окружает $o4.",ch,obj,0,TO_ALL);
+        act("Золотая аура окружает %3$O4.",ch,obj,0,TO_ALL);
         add_ac = -1 * (level / 5);
     }
     else  /* exceptional enchant */
@@ -367,7 +367,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     }
     else if (result <= (100 - level/5))  /* success! */
     {
-        oldact("Голубая аура окружает $o4.",ch,obj,0,TO_ALL);
+        act("Голубая аура окружает %3$O4.",ch,obj,0,TO_ALL);
         added = 1;
     }
     else  /* exceptional enchant */
@@ -416,7 +416,7 @@ VOID_SPELL(Fireproof)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(ITEM_BURN_PROOF);
     affect_to_obj( obj, &af);
 
-    oldact("Огнеупорная аура окружает $o4.",ch,obj,0,TO_ALL);
+    act("Огнеупорная аура окружает %3$O4.",ch,obj,0,TO_ALL);
 }
 
 
@@ -432,7 +432,7 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     }
     
     if (obj->isAffected(sn )) {
-        oldact("Священный огонь уже пылает в $o6.", ch, obj, 0, TO_CHAR);
+        act("Священный огонь уже пылает в %3$O6.", ch, obj, 0, TO_CHAR);
         return;
     }
     
@@ -474,7 +474,7 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL);
     affect_to_obj( obj, &af );
 
-    oldact("Ты взываешь к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_CHAR);
+    act("Ты взываешь к Богам, и %3$O1 загорается священным огнем!", ch, obj, 0, TO_CHAR);
     oldact("$c1 взывает к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_ROOM);
 }
 
@@ -502,7 +502,7 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
     } 
 
     if (IS_WEAPON_STAT(obj, WEAPON_VAMPIRIC)) {
-        oldact("$o1 уже жаждет чужой крови.", ch, obj, 0, TO_CHAR);
+        act("%3$^O1 уже жаждет чужой крови.", ch, obj, 0, TO_CHAR);
         return;
     }
 
@@ -528,7 +528,7 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
         af.bitvector.setValue(ITEM_ANTI_GOOD|ITEM_ANTI_NEUTRAL);
         affect_to_obj( obj, &af );
         
-        oldact("Ты передаешь $o3 свою жажду крови.", ch, obj, 0, TO_CHAR);
+        act("Ты передаешь %3$O3 свою жажду крови.", ch, obj, 0, TO_CHAR);
         oldact("$c1 внимательно смотрит на $o4, е$gго|го|е глаза вспыхивают {rкрасным{x", ch, obj, 0, TO_ROOM);
     } 
     else
@@ -742,17 +742,17 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
     Affect af;
 
     if (obj->item_type != ITEM_WEAPON) {
-        oldact("$o1 -- не оружие.", ch, obj, 0, TO_CHAR);
+        act("%3$^O1 -- не оружие.", ch, obj, 0, TO_CHAR);
         return;
     }
 
     if (IS_WEAPON_STAT(obj,WEAPON_FLAMING) || IS_WEAPON_STAT(obj,WEAPON_SHOCKING)) {
-        oldact("С $o5, кажется, ничего не происходит.", ch, obj, 0, TO_CHAR);
+        act("С %3$O5, кажется, ничего не происходит.", ch, obj, 0, TO_CHAR);
         return;
     }
 
     if (IS_WEAPON_STAT(obj,WEAPON_FROST)) {
-        oldact("$o1 и без того во власти холода.", ch, obj, 0, TO_CHAR);
+        act("%3$^O1 и без того во власти холода.", ch, obj, 0, TO_CHAR);
         return;
     }
 
@@ -765,6 +765,6 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(WEAPON_FROST);
     affect_to_obj( obj, &af );
     
-    oldact("Ты отдаешь $o4 во власть холода.", ch, obj, 0, TO_CHAR);
+    act("Ты отдаешь %3$O4 во власть холода.", ch, obj, 0, TO_CHAR);
 
 }

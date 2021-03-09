@@ -78,7 +78,7 @@ VOID_SPELL(ContinualLight)::run( Character *ch, char *target_name, int sn, int l
     obj_to_char( light, ch );
 
     oldact("$c1 взмахивает руками и создает $o4.",ch,light,0,TO_ROOM);
-    oldact("Ты взмахиваешь руками и создаешь $o4.",ch,light,0,TO_CHAR);
+    act("Ты взмахиваешь руками и создаешь %3$O4.",ch,light,0,TO_CHAR);
 }
 
 
@@ -101,11 +101,11 @@ VOID_SPELL(CreateFood)::run( Character *ch, char *target_name, int sn, int level
 
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
         oldact("$c1 взмахивает руками, и с неба падает $o1.", ch, mushroom, 0, TO_ROOM );
-        oldact("Ты взмахиваешь руками, и с неба падает $o1.", ch, mushroom, 0, TO_CHAR );
+        act("Ты взмахиваешь руками, и с неба падает %3$O1.", ch, mushroom, 0, TO_CHAR );
     }
     else {
         oldact("$c1 взмахивает руками и создает $o4.", ch, mushroom, 0, TO_ROOM);
-        oldact("Ты взмахиваешь руками и создаешь $o4.", ch, mushroom, 0, TO_CHAR);
+        act("Ты взмахиваешь руками и создаешь %3$O4.", ch, mushroom, 0, TO_CHAR);
     }
 }
 
@@ -121,11 +121,11 @@ VOID_SPELL(CreateRose)::run( Character *ch, char *target_name, int sn, int level
     
     if (!rose->getRealShortDescr( )) {
         oldact("$c1 взмахивает руками и создает прекрасную $o4.", ch, rose, 0, TO_ROOM);
-        oldact("Ты взмахиваешь руками и создаешь прекрасную $o4.", ch, rose, 0, TO_CHAR);
+        act("Ты взмахиваешь руками и создаешь прекрасную %3$O4.", ch, rose, 0, TO_CHAR);
     }
     else {
         oldact("$c1 взмахивает руками и создает $o4.", ch, rose, 0, TO_ROOM);
-        oldact("Ты взмахиваешь руками и создаешь $o4.", ch, rose, 0, TO_CHAR);
+        act("Ты взмахиваешь руками и создаешь %3$O4.", ch, rose, 0, TO_CHAR);
     }
 }
 
@@ -169,7 +169,7 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     spring->timer = level;
     obj_to_room( spring, ch->in_room );
     dress_created_item( sn, spring, ch, target_name );
-    oldact("$o1 пробивается сквозь землю.", ch, spring, 0, TO_ALL );
+    act("%3$^O1 пробивается сквозь землю.", ch, spring, 0, TO_ALL );
 }
 
 SPELL_DECL(CreateWater);
@@ -221,7 +221,7 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     floating = get_eq_char(ch,wear_float);
     if (floating != 0 && IS_OBJ_STAT(floating,ITEM_NOREMOVE))
     {
-        oldact("Ты не можешь снять $o4.",ch,floating,0,TO_CHAR);
+        act("Ты не можешь снять %3$O4.",ch,floating,0,TO_CHAR);
         return;
     }
 
@@ -242,7 +242,7 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     }
     else {
         oldact("$c1 взмахивает руками и создает $o4.", ch, disc, 0, TO_ROOM);
-        oldact("Ты взмахиваешь руками и создаешь $o4.", ch, disc, 0, TO_CHAR);
+        act("Ты взмахиваешь руками и создаешь %3$O4.", ch, disc, 0, TO_CHAR);
     }
 
     wear_obj(ch,disc,F_WEAR_REPLACE|F_WEAR_VERBOSE);

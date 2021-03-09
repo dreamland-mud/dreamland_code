@@ -1055,7 +1055,7 @@ static bool redit_purge_obj(PCharacter *ch, Object *obj)
         return false;
     }
     
-    oldact("Ты уничтожаешь $o4.", ch, obj, 0, TO_CHAR);
+    act("Ты уничтожаешь %3$O4.", ch, obj, 0, TO_CHAR);
     oldact("$c1 уничтожает $o4.", ch, obj, 0, TO_ROOM);
     extract_obj(obj);
     return true;

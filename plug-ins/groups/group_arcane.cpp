@@ -73,7 +73,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
     }
 
     oldact("$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM);
-    oldact("Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR);
+    act("Ты зачитываешь одно из заклинаний с %3$O2.", ch, scroll, 0, TO_CHAR);
 
     successfulTargets++;
 
@@ -335,7 +335,7 @@ SKILL_RUNP( zap )
             }
             else {
                 oldact("$c1 взмахивает $o5 на себя.", ch, wand, 0, TO_ROOM );
-                oldact("Ты взмахиваешь $o5 на себя.", ch, wand, 0, TO_CHAR );
+                act("Ты взмахиваешь %3$O5 на себя.", ch, wand, 0, TO_CHAR );
             }
         }
         else if (target->obj && target->obj->getRoom( ) == ch->in_room) {
@@ -344,7 +344,7 @@ SKILL_RUNP( zap )
         }
         else {
             oldact("$c1 взмахивает $o5.", ch, wand, 0, TO_ROOM );
-            oldact("Ты взмахиваешь $o5.", ch, wand, 0, TO_CHAR );
+            act("Ты взмахиваешь %3$O5.", ch, wand, 0, TO_CHAR );
         }
 
         if (number_percent() >= gsn_wands->getEffective( ch )) {

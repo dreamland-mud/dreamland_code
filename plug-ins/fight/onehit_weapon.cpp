@@ -255,7 +255,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             poison->level = max(0,poison->level - 2);
             poison->duration = max(0,poison->duration - 1);
             if ( poison->level == 0 || poison->duration == 0 )
-                oldact("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR);
+                act("Яд с %3$O2 скоро исчезнет.",ch,wield,0,TO_CHAR);
         }
     }
 
@@ -306,7 +306,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         for (auto &waf: wield->affected.findAllWithBits(&weapon_type2, WEAPON_SPELL)) 
             if (number_range( 1, waf->modifier ) == 1)
             {
-                oldact("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL);
+                act("%3$^O1 ярко вспыхивает!", ch, wield, 0, TO_ALL);
                 lvl = std::min((int)ch->getModifyLevel(), (int)waf->level);
                 spell_nocatch( waf->type, lvl, ch, victim );
             }

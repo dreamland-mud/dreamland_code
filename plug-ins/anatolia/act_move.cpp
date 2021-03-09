@@ -418,17 +418,17 @@ CMDRUNP( stand )
                 else if (!oprog_msg_furniture( obj, ch, "msgStandRoom", "msgStandChar" )) {
                     if (IS_SET(obj->value2(),STAND_AT))
                     {
-                            oldact("Ты становишься возле $o2.",ch,obj,0,TO_CHAR);
+                            act("Ты становишься возле %3$O2.",ch,obj,0,TO_CHAR);
                             oldact("$c1 становится возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),STAND_ON))
                     {
-                            oldact("Ты становишься на $o4.",ch,obj,0,TO_CHAR);
+                            act("Ты становишься на %3$O4.",ch,obj,0,TO_CHAR);
                             oldact("$c1 становится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            oldact("Ты становишься в $o4.",ch,obj,0,TO_CHAR);
+                            act("Ты становишься в %3$O4.",ch,obj,0,TO_CHAR);
                             oldact("$c1 становится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
@@ -561,17 +561,17 @@ CMDRUNP( rest )
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRestRoom", "msgSitRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
                     {
-                            oldact("Ты садишься возле $o2 и отдыхаешь.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься возле %3$O2 и отдыхаешь.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится возле $o2 и отдыхает.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),REST_ON))
                     {
-                            oldact("Ты садишься на $o4 и отдыхаешь..",ch,obj,0,TO_CHAR);
+                            act("Ты садишься на %3$O4 и отдыхаешь..",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится на $o4 и отдыхает.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            oldact("Ты садишься отдыхать в $o4.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься отдыхать в %3$O4.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится отдыхать в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
@@ -587,17 +587,17 @@ CMDRUNP( rest )
                 else if (!oprog_msg_furniture( obj, ch, "msgRestRoom", "msgRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
                     {
-                            oldact("Ты отдыхаешь возле $o2.",ch,obj,0,TO_CHAR);
+                            act("Ты отдыхаешь возле %3$O2.",ch,obj,0,TO_CHAR);
                             oldact("$c1 отдыхает возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),REST_ON))
                     {
-                            oldact("Ты отдыхаешь на $o6.",ch,obj,0,TO_CHAR);
+                            act("Ты отдыхаешь на %3$O6.",ch,obj,0,TO_CHAR);
                             oldact("$c1 отдыхает на $o6.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            oldact("Ты отдыхаешь в $o6.",ch,obj,0,TO_CHAR);
+                            act("Ты отдыхаешь в %3$O6.",ch,obj,0,TO_CHAR);
                             oldact("$c1 отдыхает в $o6.",ch,obj,0,TO_ROOM);
                     }
                 }
@@ -726,18 +726,18 @@ CMDRUNP( sit )
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRoom", "msgSitChar" )) {
                     if (IS_SET(obj->value2(),SIT_AT))
                     {
-                            oldact("Ты садишься возле $o2.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься возле %3$O2.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится возле $o2.",ch,obj,0,TO_ROOM);
                     }
 
                     else if (IS_SET(obj->value2(),SIT_ON))
                     {
-                            oldact("Ты садишься на $o4.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься на %3$O4.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            oldact("Ты садишься в $o4.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься в %3$O4.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
@@ -758,17 +758,17 @@ CMDRUNP( sit )
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRoom", "msgSitChar" )) {
                     if (IS_SET(obj->value2(),SIT_AT))
                     {
-                            oldact("Ты садишься возле $o2.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься возле %3$O2.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),SIT_ON))
                     {
-                            oldact("Ты садишься на $o4.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься на %3$O4.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            oldact("Ты садишься в $o4.",ch,obj,0,TO_CHAR);
+                            act("Ты садишься в %3$O4.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }

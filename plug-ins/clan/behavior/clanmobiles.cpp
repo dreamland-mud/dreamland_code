@@ -382,7 +382,7 @@ void ClanGuard::speech( Character *wch, const char *speech )
             obj = create_object(get_obj_index(clanArea->keyVnum), 0);
             obj->timer = 120;
             oldact("$c1 снимает с шеи $o4.", ch, obj, 0, TO_ROOM );
-            oldact("Ты снимаешь с шеи $o4.", ch, obj, 0, TO_CHAR );
+            act("Ты снимаешь с шеи %3$O4.", ch, obj, 0, TO_CHAR );
         }
     }
     else if (!str_cmp( speech, "I need invitation" ) || !str_cmp(speech, "Мне нужно приглашение")) {
@@ -423,7 +423,7 @@ void ClanGuard::speech( Character *wch, const char *speech )
 void ClanGuard::actGiveInvitation( PCharacter *wch, Object *obj )
 {
     oldact("$c1 пишет на $o6.", ch, obj, 0, TO_ROOM );
-    oldact("Ты пишешь на $o6.", ch, obj, 0, TO_CHAR );
+    act("Ты пишешь на %3$O6.", ch, obj, 0, TO_CHAR );
 }
 
 /*--------------------------------------------------------------------------

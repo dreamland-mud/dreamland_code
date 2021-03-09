@@ -49,12 +49,12 @@ bool LiquidWEBase::checkItemType( PCharacter *ch, Object *obj ) const
 bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 {
     if (obj->value1() == 0) {
-        oldact("Слово эхом отозвалось в пустоте $o2.", ch, obj, 0, TO_CHAR);
+        act("Слово эхом отозвалось в пустоте %3$O2.", ch, obj, 0, TO_CHAR);
         return false;
     }
     
     if (obj->value1() > gsn_arcadian->getEffective( ch ) * 10) {
-        oldact("В $o6 налито слишком много жидкости.", ch, obj, 0, TO_CHAR);
+        act("В %3$O6 налито слишком много жидкости.", ch, obj, 0, TO_CHAR);
         return false;
     }
     
@@ -142,7 +142,7 @@ bool DrinkContainerWEBase::checkContainer( PCharacter *ch, Object *obj ) const
     }
 
     if (bhv->isActive( )) {
-        oldact("Жидкость в $o6 уже обладает необычными свойствами.", ch, obj, 0, TO_CHAR);
+        act("Жидкость в %3$O6 уже обладает необычными свойствами.", ch, obj, 0, TO_CHAR);
         return false;
     }
 
@@ -173,7 +173,7 @@ bool WineContainerWEBase::run( PCharacter *ch, Object *obj ) const
     
     liq = liquidManager->find( obj->value2() );
     if (!liq->getFlags( ).isSet( LIQF_WINE )) {
-        oldact("То, что налито в $o4, мало похоже на вино.", ch, obj, 0, TO_CHAR);
+        act("То, что налито в %3$O4, мало похоже на вино.", ch, obj, 0, TO_CHAR);
         return false;
     }
 
@@ -197,7 +197,7 @@ bool BeerContainerWEBase::run( PCharacter *ch, Object *obj ) const
     
     liq = liquidManager->find( obj->value2() );
     if (!liq->getFlags( ).isSet( LIQF_BEER )) {
-        oldact("То, что налито в $o4, мало похоже на пиво.", ch, obj, 0, TO_CHAR);
+        act("То, что налито в %3$O4, мало похоже на пиво.", ch, obj, 0, TO_CHAR);
         return false;
     }
 
@@ -430,7 +430,7 @@ void BeerElementalWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *
     }
     else {
         if (pool)
-            oldact("$o1 яростно булькает, но ничего не происходит.", ch, pool, 0, TO_ALL );
+            act("%3$^O1 яростно булькает, но ничего не происходит.", ch, pool, 0, TO_ALL );
     }
 }
 
