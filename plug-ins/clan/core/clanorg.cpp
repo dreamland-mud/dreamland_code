@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "clanorg.h"
+#include "grammar_entities_impl.h"
 #include "commonattributes.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -110,7 +111,13 @@ void ClanOrgs::doMembers( PCharacter *pch ) const
             || getAttr( pcm ) != ord->name)
             continue;
 
-        player_fmt( "%-10n %-10R %-12P %b %-3l   %-15t\r\n", pcm, buf );
+        buf << dlprintf("%-10s %-10s %-12s %2d %-3d   %-15s\r\n",
+                   pcm->getName().c_str(),
+                   pcm->getRace()->getName().c_str(),
+                   pcm->getProfession( )->getNameFor(pch).c_str(),
+                   pcm->getRemorts().size(), 
+                   pcm->getLevel(),
+                   pcm->getClan()->getTitle(pcm).c_str());
     }
 
     pch->send_to( buf );

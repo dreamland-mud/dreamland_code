@@ -10,6 +10,7 @@
 
 #include "class.h"
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 #include "pcharactermemory.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -1069,8 +1070,17 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
         }            
     }   
     
-    for (MemberList::iterator i = members.begin( ); i != members.end( ); i++) 
-        player_fmt( "%-10n %-10R %-12P %b %-3l %-15t %-a\r\n", *i, buf, pc );
+    for (MemberList::iterator i = members.begin( ); i != members.end( ); i++) {
+        PCMemoryInterface *pcm = *i;
+        buf << dlprintf("%-10s %-10s %-12s %2d %-3d %-15s %s\r\n",
+                   pcm->getName().c_str(),
+                   pcm->getRace()->getName().c_str(),
+                   pcm->getProfession( )->getNameFor(pc).c_str(),
+                   pcm->getRemorts().size(), 
+                   pcm->getLevel(),
+                   pcm->getClan()->getTitle(pcm).c_str(),
+                   pcm->getLastAccessTime( ).getTimeAsString("%d/%m/%y %H:%M").c_str());
+    }
 
     pc->send_to( "\n\r{BИмя         раса        класс         уровень звание           last time{x\n\r" );
     pc->send_to( buf );
@@ -1249,7 +1259,12 @@ void CClan::clanPetitionList( PCharacter *pc )
         PCMemoryInterface *pcm = pos->second;
 
         if (pcm->getPetition( ) == pc->getClan( ))
-            player_fmt( "%-10n %-10R %-12P %b %-3l\r\n", pcm, buf, pc );
+            buf << dlprintf("%-10s %-10s %-12s %2d %-3d\r\n",
+                    pcm->getName().c_str(),
+                    pcm->getRace()->getName().c_str(),
+                    pcm->getProfession( )->getNameFor(pc).c_str(),
+                    pcm->getRemorts().size(), 
+                    pcm->getLevel());
     }
 
     if (buf.str( ).empty( ))

@@ -47,7 +47,6 @@ void act_p( const char *format, Character *ch,
 DLString fmt(Character *to, const char *fmt, ...);
 DLString vfmt(Character *to, const char *format, va_list av);
 
-void player_fmt( const DLString &, PCMemoryInterface *, ostringstream &, Character *to = NULL );
 DLString dlprintf( const char *, ... );
 
 /*--------------------------------------------------------------------------

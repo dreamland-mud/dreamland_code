@@ -15,6 +15,7 @@
 #include "commonattributes.h"
 #include "clanreference.h"
 #include "act.h"
+#include "mudtags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "descriptor.h"
@@ -60,7 +61,9 @@ COMMAND(Whois, "whois")
     }
     
     /* Pretitle Name Title */
-    player_fmt( "{W%N{w %p{w", pch, buf, ch );
+    buf << "{W" << ch->seeName(pch) << "{w ";    
+    mudtags_convert( pch->getParsedTitle().c_str(), buf, TAGS_CONVERT_VIS, ch );
+    buf << "{w";
     lines.add( buf );
 
     /* Race, Sex, Class, Level */
