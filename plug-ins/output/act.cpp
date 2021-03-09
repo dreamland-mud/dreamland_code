@@ -136,7 +136,7 @@ void act(const char *format, Character *ch, int noop, const void *arg1, int type
     if (!ch || format == 0 || !format[0]) 
         return;
 
-    ch->echo(POS_RESTING, type, 0, format, ch);
+    ch->echo(POS_RESTING, type, 0, format, ch, 0, arg1);
 }
 
 /*--------------------------------------------------------------------------
