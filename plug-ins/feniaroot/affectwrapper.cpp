@@ -7,6 +7,7 @@
 #include "skill.h"
 #include "skillgroup.h"
 #include "skillmanager.h"
+#include "spelltarget.h"
 #include "liquid.h"
 #include "wearlocation.h"
 #include "nativeext.h"
@@ -89,6 +90,22 @@ NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аф
     Character *ch = args2character(args);
 
     affect_modify(ch, &target, true);
+    return Register();	
+}
+
+NMI_INVOKE(AffectWrapper, addSource, "(ch|obj|room): запомнить ch, obj или room как источник этого аффекта")
+{
+    SpellTarget::Pointer src = argnum2target(args, 1);
+
+    if (src->type == SpellTarget::ROOM)
+        target.sources.add(src->room);
+    else if (src->type == SpellTarget::OBJECT)
+        target.sources.add(src->obj);
+    else if (src->type == SpellTarget::CHAR)
+        target.sources.add(src->victim);
+    else 
+        throw Scripting::IllegalArgumentException();
+
     return Register();	
 }
 
