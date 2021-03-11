@@ -141,7 +141,10 @@ bool Damage::canDamage( )
     
     if (is_safe( ch, victim ))
         return false;
-
+    
+    if (paf)
+        return true;
+        
     adjustPosition( );
     adjustFighting( );
     
