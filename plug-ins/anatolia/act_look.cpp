@@ -490,7 +490,7 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
 	ostringstream buf;
 		
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, room), paf, buf);
+        paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
 
     if (!buf.str().empty())
         mainBuf << endl << buf.str();
