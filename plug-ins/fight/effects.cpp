@@ -115,6 +115,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     {
         Object *obj = (Object *) vo;
         Object *t_obj,*n_obj;
+        Character *victim = obj->carried_by;
         int chance;
         const char *msg;
 
@@ -128,8 +129,8 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         if (victim)
             dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         else
-            dam_ratio = (level - obj->level) * 2;                
-        effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+            dam_ratio = max(0, (level - obj->level) * 5);                  
+        effect_level = level * (20 + dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
          
         chance = effect_level / 2;
@@ -137,8 +138,6 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             chance -= 5;
         if (material_is_flagged(obj, MAT_TOUGH))
             chance /= 2;
-        if ( ch->is_npc() && !victim->is_npc() )
-            chance = chance * 3 / 4; // less frustration
         
         if (material_is_flagged( obj, MAT_MELTING ))  {
             chance *= 2;
@@ -295,6 +294,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
    if (target == TARGET_OBJ) /* toast an object */
    {
         Object *obj = (Object *) vo;
+        Character *victim = obj->carried_by;       
         int chance;
         const char *msg;
 
@@ -307,8 +307,8 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         if (victim)
             dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         else
-            dam_ratio = (level - obj->level) * 2;                
-        effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+            dam_ratio = max(0, (level - obj->level) * 5);                  
+        effect_level = level * (20 + dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
          
         chance = effect_level / 2;
@@ -316,8 +316,6 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             chance -= 5;
         if (material_is_flagged(obj, MAT_TOUGH))
             chance /= 2;
-        if ( ch->is_npc() && !victim->is_npc() )
-            chance = chance * 3 / 4; // less frustration
 
         switch(obj->item_type)
         {
@@ -414,6 +412,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     {
         Object *obj = (Object *) vo;
         Object *t_obj,*n_obj;
+        Character *victim = obj->carried_by;        
         int chance;
         const char *msg;
 
@@ -427,8 +426,8 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         if (victim)
             dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         else
-            dam_ratio = (level - obj->level) * 2;                
-        effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+            dam_ratio = max(0, (level - obj->level) * 5);                  
+        effect_level = level * (20 + dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
          
         chance = effect_level / 2;
@@ -436,8 +435,6 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             chance -= 5;
         if (material_is_flagged(obj, MAT_TOUGH))
             chance /= 2;
-        if ( ch->is_npc() && !victim->is_npc() )
-            chance = chance * 3 / 4; // less frustration
 
         if  (material_is_flagged( obj, MAT_MELTING ))  {
           chance += 30;
@@ -577,8 +574,10 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
     if (target == TARGET_OBJ)  /* do some poisoning */
     {
         Object *obj = (Object *) vo;
-        int chance;  
-        
+        Character *victim = obj->carried_by;        
+        int chance;
+        const char *msg;
+
         if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
              IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
              material_is_flagged(obj, MAT_INDESTR) )
@@ -589,8 +588,8 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         if (victim)
             dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         else
-            dam_ratio = (level - obj->level) * 2;                
-        effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+            dam_ratio = max(0, (level - obj->level) * 5);                  
+        effect_level = level * (20 + dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
          
         chance = effect_level / 2;
@@ -598,8 +597,6 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
             chance -= 5;
         if (material_is_flagged(obj, MAT_TOUGH))
             chance /= 2;
-        if ( ch->is_npc() && !victim->is_npc() )
-            chance = chance * 3 / 4; // less frustration
 
         switch (obj->item_type)
         {
@@ -619,7 +616,8 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
             return;
 
         obj->value3(obj->value3() | DRINK_POISONED);
-        obj->in_room->echo( POS_RESTING, "Пары смертельного яда проникают в %O4. Кому-то не поздоровится...", obj );
+        msg = "Пары смертельного яда проникают в %O4. Кому-то не поздоровится...";        
+        show_effect_message(obj, msg);        
         return;
     }
 }
@@ -669,6 +667,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
     if (target == TARGET_OBJ)
     {
         Object *obj = (Object *) vo;
+        Character *victim = obj->carried_by;        
         int chance;
         const char *msg;
 
@@ -682,8 +681,8 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         if (victim)
             dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         else
-            dam_ratio = (level - obj->level) * 2;                
-        effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+            dam_ratio = max(0, (level - obj->level) * 5);                  
+        effect_level = level * (20 + dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
          
         chance = effect_level / 2;
@@ -691,8 +690,6 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
             chance -= 5;
         if (material_is_flagged(obj, MAT_TOUGH))
             chance /= 2;
-        if ( ch->is_npc() && !victim->is_npc() )
-            chance = chance * 3 / 4; // less frustration
 
         switch(obj->item_type)
         {
@@ -774,9 +771,10 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     {
         Object *obj = (Object *) vo;
         Object *t_obj,*n_obj;
+        Character *victim = obj->carried_by;        
         int chance;
         const char *msg;
-        
+
         if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
              IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
              material_is_flagged(obj, MAT_INDESTR) )
@@ -787,8 +785,8 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         if (victim)
             dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         else
-            dam_ratio = (level - obj->level) * 2;                
-        effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+            dam_ratio = max(0, (level - obj->level) * 5);                  
+        effect_level = level * (20 + dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
          
         chance = effect_level / 2;
@@ -796,8 +794,6 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             chance -= 5;
         if (material_is_flagged(obj, MAT_TOUGH))
             chance /= 2;
-        if ( ch->is_npc() && !victim->is_npc() )
-            chance = chance * 3 / 4; // less frustration
 
         switch (obj->item_type)
         {
@@ -972,6 +968,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
     {
         Object *obj = (Object *) vo;
         Object *t_obj,*n_obj;
+        Character *victim = obj->carried_by;        
         int chance;
         const char *msg;
 
@@ -985,8 +982,8 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
         if (victim)
             dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         else
-            dam_ratio = (level - obj->level) * 2;                
-        effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 1% to effective level per each 1% damage dealt
+            dam_ratio = max(0, (level - obj->level) * 5);                  
+        effect_level = level * (20 + dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
          
         chance = effect_level / 2;
@@ -994,8 +991,6 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
             chance -= 5;
         if (material_is_flagged(obj, MAT_TOUGH))
             chance /= 2;
-        if ( ch->is_npc() && !victim->is_npc() )
-            chance = chance * 3 / 4; // less frustration
 
         if (material_is_flagged( obj, MAT_MELTING )) {
             chance *= 2;
