@@ -536,8 +536,8 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         {
             Affect af;
 
-            victim->send_to("Ты чувствуешь, как яд растекается по твоим венам.\n\r");
-            act("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM);
+            victim->pecho("{1{gТебя начинает тошнить, когда яд проникает в твое тело.{2");
+            victim->recho("%1$^C2 начинает тошнить, когда яд проникает в %1$Gего|его|ее тело.", victim);
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -595,6 +595,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
             return;
 
         obj->value3(obj->value3() | DRINK_POISONED);
+        obj->in_room->echo( POS_RESTING, "Пары смертельного яда проникают в %O4. Кому-то не поздоровится...", obj );
         return;
     }
 }
