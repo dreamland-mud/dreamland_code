@@ -118,23 +118,33 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 int chance;
                 const char *msg;
 
-                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF )
-                        || IS_OBJ_STAT(obj,ITEM_NOPURGE)
-                        || number_range(0,4) == 0 )
+                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
+                     IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
+                     material_is_flagged(obj, MAT_INDESTR) )
                         return;
-
-                chance = level / 4 + dam / 10;
-
-                if ( chance > 25 )
-                        chance = (chance - 25) / 2 + 25;
-                if ( chance > 50 )
-                        chance = (chance - 50) / 2 + 50;
-
+         
+               // effect level between 0.25 and 0.9 of spell level
+               int dam_ratio, effect_level;
+               if (victim)
+                   dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
+               else
+                   dam_ratio = (level - obj->level) * 2;                
+               effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+               effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
+         
+               chance = effect_level / 2;
                 if ( IS_OBJ_STAT(obj,ITEM_BLESS) )
-                        chance -= 5;
-
-                chance -= obj->level * 2;
-
+                    chance -= 5;
+                if (material_is_flagged(obj, MAT_TOUGH))
+                    chance /= 2;
+                if ( ch->is_npc() && !victim->is_npc() )
+                    chance = chance * 3 / 4; // less frustration
+        
+                if (material_is_flagged( obj, MAT_MELTING ))  {
+                    chance += 30;
+                    msg = "%1$^O1 та%1$nет|ют и испаря%1$nется|ются!";
+                }
+                else
                 switch ( obj->item_type )
                 {
                 default:
@@ -164,7 +174,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         break;
                 }
 
-                chance = URANGE(5,chance,95);
+                chance = URANGE(1,chance,50);
 
                 if ( number_percent() > chance )
                         return;
@@ -177,7 +187,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         Affect af;
 
                         af.location = APPLY_AC;
-                        af.level    = level;
+                        af.level    = effect_level;
                         af.duration = -1;
                         af.modifier = number_range(1,5);
                         af.type     = gsn_corrosion;
@@ -291,22 +301,26 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         int chance;
         const char *msg;
 
-        if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-        ||  IS_OBJ_STAT(obj,ITEM_NOPURGE)
-        ||  number_range(0,4) == 0)
-            return;
-
-        chance = level / 4 + dam / 10;
-
-        if (chance > 25)
-            chance = (chance - 25) / 2 + 25;
-        if (chance > 50)
-            chance = (chance - 50) / 2 + 50;
-
-        if (IS_OBJ_STAT(obj,ITEM_BLESS))
-            chance -= 5;
-
-         chance -= obj->level;  /*  * 2;  */
+                if ( IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
+                     material_is_flagged(obj, MAT_INDESTR) )
+                        return;
+         
+               // effect level between 0.25 and 0.9 of spell level
+               int dam_ratio, effect_level;
+               if (victim)
+                   dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
+               else
+                   dam_ratio = (level - obj->level) * 2;                
+               effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+               effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
+         
+               chance = effect_level / 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BLESS) )
+                    chance -= 5;
+                if (material_is_flagged(obj, MAT_TOUGH))
+                    chance /= 2;
+                if ( ch->is_npc() && !victim->is_npc() )
+                    chance = chance * 3 / 4; // less frustration
 
         switch(obj->item_type)
         {
@@ -322,7 +336,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 break;
         }
 
-        chance = URANGE(5,chance,95);
+        chance = URANGE(1,chance,50);
 
         if (number_percent() > chance)
             return;
@@ -406,21 +420,27 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         int chance;
         const char *msg;
 
-            if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-        ||  IS_OBJ_STAT(obj,ITEM_NOPURGE)
-        ||  number_range(0,4) == 0)
-            return;
-
-        chance = level / 4 + dam / 10;
-
-        if (chance > 25)
-            chance = (chance - 25) / 2 + 25;
-        if (chance > 50)
-            chance = (chance - 50) / 2 + 50;
-
-        if (IS_OBJ_STAT(obj,ITEM_BLESS))
-            chance -= 5;
-        chance -= obj->level * 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
+                     IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
+                     material_is_flagged(obj, MAT_INDESTR) )
+                        return;
+         
+               // effect level between 0.25 and 0.9 of spell level
+               int dam_ratio, effect_level;
+               if (victim)
+                   dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
+               else
+                   dam_ratio = (level - obj->level) * 2;                
+               effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+               effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
+         
+               chance = effect_level / 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BLESS) )
+                    chance -= 5;
+                if (material_is_flagged(obj, MAT_TOUGH))
+                    chance /= 2;
+                if ( ch->is_npc() && !victim->is_npc() )
+                    chance = chance * 3 / 4; // less frustration
 
         if  (material_is_flagged( obj, MAT_MELTING ))  {
           chance += 30;
@@ -461,7 +481,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             break;
         }
 
-        chance = URANGE(5,chance,95);
+        chance = URANGE(1,chance,50);
 
         if (number_percent() > chance)
             return;
@@ -561,21 +581,29 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
     if (target == TARGET_OBJ)  /* do some poisoning */
     {
         Object *obj = (Object *) vo;
-        int chance;
-        
+        int chance;  
 
-        if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-          ||  IS_OBJ_STAT(obj,ITEM_BLESS)
-        ||  number_range(0,4) == 0)
-            return;
-
-        chance = level / 4 + dam / 10;
-        if (chance > 25)
-            chance = (chance - 25) / 2 + 25;
-        if (chance > 50)
-            chance = (chance - 50) / 2 + 50;
-
-        chance -= obj->level * 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
+                     IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
+                     material_is_flagged(obj, MAT_INDESTR) )
+                        return;
+         
+               // effect level between 0.25 and 0.9 of spell level
+               int dam_ratio, effect_level;
+               if (victim)
+                   dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
+               else
+                   dam_ratio = (level - obj->level) * 2;                
+               effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+               effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
+         
+               chance = effect_level / 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BLESS) )
+                    chance -= 5;
+                if (material_is_flagged(obj, MAT_TOUGH))
+                    chance /= 2;
+                if ( ch->is_npc() && !victim->is_npc() )
+                    chance = chance * 3 / 4; // less frustration
 
         switch (obj->item_type)
         {
@@ -589,7 +617,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
                 break;
         }
 
-        chance = URANGE(5,chance,95);
+        chance = URANGE(1,chance,50);
 
         if (number_percent() > chance)
             return;
@@ -648,22 +676,27 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         int chance;
         const char *msg;
 
-        if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-        ||  IS_OBJ_STAT(obj,ITEM_NOPURGE)
-        ||  number_range(0,4) == 0)
-            return;
-
-        chance = level / 4 + dam / 10;
-
-        if (chance > 25)
-            chance = (chance - 25) / 2 + 25;
-        if (chance > 50)
-            chance = (chance - 50) /2 + 50;
-
-        if (IS_OBJ_STAT(obj,ITEM_BLESS))
-            chance -= 5;
-
-         chance -= obj->level * 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
+                     IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
+                     material_is_flagged(obj, MAT_INDESTR) )
+                        return;
+         
+               // effect level between 0.25 and 0.9 of spell level
+               int dam_ratio, effect_level;
+               if (victim)
+                   dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
+               else
+                   dam_ratio = (level - obj->level) * 2;                
+               effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+               effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
+         
+               chance = effect_level / 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BLESS) )
+                    chance -= 5;
+                if (material_is_flagged(obj, MAT_TOUGH))
+                    chance /= 2;
+                if ( ch->is_npc() && !victim->is_npc() )
+                    chance = chance * 3 / 4; // less frustration
 
         switch(obj->item_type)
         {
@@ -679,7 +712,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
                 msg = "%1$^O1 плав%1$nится|ятся.";
         }
         
-        chance = URANGE(5,chance,95);
+        chance = URANGE(1,chance,50);
 
         if (number_percent() > chance)
             return;
@@ -753,22 +786,28 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 int chance;
                 const char *msg;
 
-                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF )
-                        || IS_OBJ_STAT(obj,ITEM_NOPURGE)
-                        || number_range(0,4) == 0 )
+
+                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
+                     IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
+                     material_is_flagged(obj, MAT_INDESTR) )
                         return;
-
-                chance = level / 4 + dam / 10;
-
-                if ( chance > 25 )
-                        chance = (chance - 25) / 2 + 25;
-                if ( chance > 50 )
-                        chance = (chance - 50) / 2 + 50;
-
+         
+               // effect level between 0.25 and 0.9 of spell level
+               int dam_ratio, effect_level;
+               if (victim)
+                   dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
+               else
+                   dam_ratio = (level - obj->level) * 2;                
+               effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
+               effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
+         
+               chance = effect_level / 2;
                 if ( IS_OBJ_STAT(obj,ITEM_BLESS) )
-                        chance -= 5;
-
-                chance -= obj->level * 2;
+                    chance -= 5;
+                if (material_is_flagged(obj, MAT_TOUGH))
+                    chance /= 2;
+                if ( ch->is_npc() && !victim->is_npc() )
+                    chance = chance * 3 / 4; // less frustration
 
                 switch (obj->item_type)
                 {
@@ -804,7 +843,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         break;
                 }
 
-                chance = URANGE(5,chance,95);
+                chance = URANGE(1,chance,50);
 
                 if ( number_percent() > chance )
                         return;
@@ -949,22 +988,28 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 int chance;
                 const char *msg;
 
-                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-                        || IS_OBJ_STAT(obj,ITEM_NOPURGE)
-                        || number_range(0,4) == 0)
+
+                if ( IS_OBJ_STAT(obj,ITEM_BURN_PROOF ) ||
+                     IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
+                     material_is_flagged(obj, MAT_INDESTR) )
                         return;
-
-                chance = level / 4 + dam / 10;
-
-                if (chance > 25)
-                        chance = (chance - 25) / 2 + 25;
-                if (chance > 50)
-                        chance = (chance - 50) / 2 + 50;
-
-                if (IS_OBJ_STAT(obj,ITEM_BLESS))
-                        chance -= 5;
-
-                chance -= obj->level * 2;
+         
+               // effect level between 0.25 and 0.9 of spell level
+               int dam_ratio, effect_level;
+               if (victim)
+                   dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
+               else
+                   dam_ratio = (level - obj->level) * 2;                
+               effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 1% to effective level per each 1% damage dealt
+               effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
+         
+               chance = effect_level / 2;
+                if ( IS_OBJ_STAT(obj,ITEM_BLESS) )
+                    chance -= 5;
+                if (material_is_flagged(obj, MAT_TOUGH))
+                    chance /= 2;
+                if ( ch->is_npc() && !victim->is_npc() )
+                    chance = chance * 3 / 4; // less frustration
 
                 if  (material_is_flagged( obj, MAT_MELTING ))  
                 {
@@ -1002,7 +1047,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                                 break;
                 }
 
-                chance = URANGE(5,chance,95);
+                chance = URANGE(1,chance,50);
 
                 if (number_percent() > chance)
                         return;
