@@ -94,6 +94,7 @@ void check_assist(Character *ch, Character *victim)
             && IS_CHARMED(ch)
             && ch->master == rch)
         {
+            act("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);            
             one_hit( rch, victim );
             continue;
         }
@@ -132,6 +133,8 @@ void check_bloodthirst( Character *ch )
         return;
     if (!IS_AFFECTED(ch, AFF_BLOODTHIRST))
         return;
+    if (IS_AFFECTED(ch,AFF_CALM))
+        return;        
     if (!IS_AWAKE(ch))
         return;
     if (ch->fighting)
