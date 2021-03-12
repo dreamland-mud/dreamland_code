@@ -82,25 +82,6 @@ CMDADM(findrefs)
         return;
     }
 
-    if (constArguments == "clear")
-    {
-        Scripting::Object::Manager::iterator oi;
-        int cnt = 0;
-        map<int, int> refcnt;
-        for(oi = Scripting::Object::manager->begin(); oi != Scripting::Object::manager->end(); oi++) {
-            if (oi->hasHandler() && oi->getHandler()->getType() == "FeniaSpellContext") {
-                cnt++;
-                refcnt[oi->refcnt]++;
-                oi->getHandler()->setField("thiz", Register());
-            }
-        }
-        ch->printf("Found %d context objects.\r\n", cnt);
-        for (auto &r: refcnt)
-            ch->printf("    %d refs: %d\r\n", r.first, r.second);
-        return;
-    }
-
-
     try {
         Profiler prof;
 
