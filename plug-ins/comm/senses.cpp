@@ -104,14 +104,33 @@ static bool mprog_smell( Character *victim, Character *ch, char *argument )
     return false;
 }
 
-static bool afprog_smell( Character *victim, Character *sniffer, char *argument )
+static bool afprog_smell_affected(const AffectList &affList, SpellTarget::Pointer target, Character *sniffer, char *argument)
 {
     bool rc = false;
     
-    for (auto &paf: victim->affected.findAllWithHandler()) 
-        if (paf->type->getAffect( )->onSmell(SpellTarget::Pointer(NEW, victim), paf, sniffer))
+    for (auto &paf: affList.findAllWithHandler()) 
+        if (paf->type->getAffect( )->onSmell(target, paf, sniffer))
             rc = true;
+
     return rc;
+}
+
+static bool afprog_smell( Character *victim, Character *sniffer, char *argument )
+{
+    return afprog_smell_affected(
+            victim->affected, SpellTarget::Pointer(NEW, victim), sniffer, argument);
+}
+
+static bool afprog_smell( Object *obj, Character *sniffer, char *argument )
+{
+    return afprog_smell_affected(
+            obj->affected, SpellTarget::Pointer(NEW, obj), sniffer, argument);
+}
+
+static bool afprog_smell( Room *room, Character *sniffer, char *argument )
+{
+    return afprog_smell_affected(
+            room->affected, SpellTarget::Pointer(NEW, room), sniffer, argument);
 }
 
 CMDRUNP( smell )
@@ -123,20 +142,33 @@ CMDRUNP( smell )
 
     argument = one_argument( argument, arg );
 
+    /*
+     * Smell room:
+     * - room onSmell trigger, if returns true, overrides index data property
+     * - smells from all affects are shown next (onSmellRoom)
+     */
     if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
+        bool rc = false;
+
         act("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
         act("$c1 принюхивается.", ch, 0, 0, TO_ROOM);
 
         if (rprog_smell( ch->in_room, ch, argument ))
-            return;
+            rc = true;
 
-        Properties::const_iterator p = ch->in_room->pIndexData->properties.find( "smell" );
-        if (p != ch->in_room->pIndexData->properties.end( )) {
-            ch->pecho(p->second);
-            return;
+        if (!rc) {
+            Properties::const_iterator p = ch->in_room->pIndexData->properties.find( "smell" );
+            if (p != ch->in_room->pIndexData->properties.end( )) {
+                ch->pecho(p->second);
+                rc = true;
+            }
         }
 
-        ch->pecho("Вокруг пахнет вполне обычно.");
+        rc = afprog_smell( ch->in_room, ch, argument ) || rc;
+
+        if (!rc)
+            ch->pecho("Вокруг пахнет вполне обычно.");
+
         return;
     }
 
@@ -171,31 +203,47 @@ CMDRUNP( smell )
         return;
     }
 
-
+    /*
+     * Smell item:
+     * - item onSmell trigger, if returns true, overrides index data property
+     * - liquid smell is shown next
+     * - smells from all affects are shown next (onSmellObj)
+     */
     if ( ( obj = get_obj_wear_carry( ch, arg ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
     {
+        bool rc = false;
+
         act("Ты нюхаешь $o4.", ch, obj, 0, TO_CHAR);
         act("$c1 нюхает $o4.", ch, obj, 0, TO_ROOM);
 
         if (oprog_smell( obj, ch, argument ))
-            return;
+            rc = true;
         
-        if (!obj->pIndexData->smell.empty( )) {
+        if (!rc && !obj->pIndexData->smell.empty( )) {
             ch->pecho( obj->pIndexData->smell );
-            return;
+            rc = true;
         }
 
         if (obj->item_type == ITEM_DRINK_CON && obj->value1() > 0) {
             Liquid *liq = liquidManager->find(obj->value2());
             if (oprog_smell_liquid(liq, ch))
-                return;
+                rc = true;
         }
 
-        ch->pecho("Пахнет вполне обычно.");
+        rc = afprog_smell( obj, ch, argument ) || rc;
+        
+        if (!rc)
+            ch->pecho("Пахнет вполне обычно.");
+
         return;
     }
 
+    /*
+     * Smell char:
+     * - char onSmell trigger, if returns true, overrides index data property or player's config
+     * - smells from all affects are shown next (onSmellChar)
+     */
     if (( victim = get_char_room( ch, arg ) )) {
         bool rc = false;
 

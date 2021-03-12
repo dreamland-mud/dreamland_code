@@ -202,12 +202,22 @@ bool AffectHandler::onLook(const SpellTarget::Pointer &target, Affect *paf, Char
 }
 
 bool AffectHandler::onSmell(const SpellTarget::Pointer &target, Affect *paf, Character *sniffer) 
-{
-    Character *ch = target->victim;
+{    
     AffectHandler *ah = this;
 
-    FENIA_CALL( ah, "Smell", "CAC", ch, paf, sniffer );
-    return smell(ch, sniffer, paf);
+    if (target->type == SpellTarget::CHAR) {
+        FENIA_CALL( ah, "SmellChar", "CAC", target->victim, paf, sniffer );
+        return smell(target->victim, sniffer, paf);
+
+    } else if (target->type == SpellTarget::ROOM) {
+        FENIA_CALL( ah, "SmellRoom", "RAC", target->room, paf, sniffer );
+
+    } else if (target->type == SpellTarget::OBJECT) {
+        FENIA_CALL( ah, "SmellObj", "OAC", target->obj, paf, sniffer );
+
+    }
+    
+    return false;
 }
 
 bool AffectHandler::onSaves(const SpellTarget::Pointer &target, Affect *paf, Character *victim, int &save, int dam_type) 
