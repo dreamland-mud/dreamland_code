@@ -538,7 +538,7 @@ void fix_resets()
             case 'G': case 'O':
             case 'E': case 'P':
                 if (!( get_obj_index( pReset->arg1 ) )) {
-                    bad_reset( "Load_resets: %c: bad obj: %d.", pReset->command, pReset->arg1 );
+                    bad_reset( "Load_resets: Room [%d] bad obj [%d].", pRoom->vnum, pReset->arg1 );
                     break;
                 }
                 get_obj_index( pReset->arg1 )->reset_num++;
