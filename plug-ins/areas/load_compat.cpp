@@ -383,16 +383,16 @@ void load_resets( FILE *fp ) {
 
 void bad_reset( const char *fmt, ... )
 {
-    va_list ap;
-    
+    char buf[1024];
+    va_list ap;  
     va_start( ap, fmt );
+    vsnprintf( buf, sizeof( buf ), fmt, ap );
+    va_end( ap );
 
     if (dreamland->hasOption(DL_BUILDPLOT)) 
-        logerror( fmt, ap );
+        logerror( buf );
     else
-        throw FileFormatException( fmt, ap );
-
-    va_end( ap );
+        throw FileFormatException( buf );
 }
 
 void fix_resets()
