@@ -886,9 +886,17 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 Character *victim = (Character *) vo;
                 Object *obj, *obj_next;
 
-                if ( !saves_spell( level, victim, DAM_SOUND, 0, dam_flag )
-                        && victim->fighting )
+                if (victim->fighting) { 
+                    if (!saves_spell(level, victim, DAM_SOUND, 0, dam_flag )) {
+                        victim->pecho("Дикий вопль заставляет тебя отвлечься от сражения!");
+                        victim->recho("Дикий вопль заставляет %C4 отвлечься от сражения!", victim);                     
                         stop_fighting( victim , true );
+                    }
+                    else {
+                        victim->pecho("Вопль на мгновение отвлекает тебя, но ты вновь бросаешься в битву.");
+                        victim->recho("Вопль на мгновение отвлекает %1$C4 от сражения, но %1$P1 вновь бросается в битву.", victim); 
+                    }
+                }
          
                 // saves against level*0.9 (worst) to level*0.25 (best)
                 int dam_ratio, effect_level;
@@ -899,8 +907,8 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 if (!saves_spell(effect_level, victim, DAM_SOUND, 0, dam_flag))
                 {
                         Affect af;
-                        act("$c1 теперь ничего не слышит!",victim,0,0,TO_ROOM);
-                        act("Ты ничего не слышишь!",victim,0,0,TO_CHAR);
+                        victim->pecho("{1{MТы ничего не слышишь!{2\n\r");
+                        victim->recho("%^C1 теперь ничего не слышит.", victim);  
         
                         af.bitvector.setTable(&affect_flags);
                         af.type         = gsn_scream;
@@ -914,7 +922,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                         
                         /* daze and confused? */
                         if (number_percent() < 50) {
-                            victim->send_to("Твое тело парализовано.\n\r");
+                            victim->pecho("{1{WТвое тело парализовано.{2");
                             victim->setDaze( URANGE(8, dam_ratio, 20) );
                         }
                 }
