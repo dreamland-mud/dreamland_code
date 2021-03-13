@@ -559,6 +559,18 @@ NMI_GET( CharacterWrapper, boat, "объект лодки" )
     return wrap( boat_object_find( target ) );
 }
 
+NMI_GET( CharacterWrapper, slow, "true если есть бит slow, нету хасты и (в случае мобов) бита fast")
+{
+    checkTarget();
+    return IS_SLOW(target);
+}
+
+NMI_GET( CharacterWrapper, quick, "true если есть бит haste/fast и нету slow")
+{
+    checkTarget();
+    return IS_QUICK(target);
+}
+
 NMI_GET( CharacterWrapper, flying, "true если мы GHOST, летаем или верхом на летающем скакуне" )
 {
     checkTarget( );
@@ -1612,24 +1624,16 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vic
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
+NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName[,damtype,damflags]): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
 {
     checkTarget( );
-
     Character *victim = argnum2character(args, 1);
     int dam = argnum2number(args, 2);
     Skill *skill = argnum2skill(args, 3);
-    int dam_type = DAM_NONE;
+    int dam_type = args.size() > 3 ? argnum2flag(args, 4, damage_table) : DAM_NONE;
+    bitstring_t damflags = args.size() > 4 ? argnum2flag(args, 5, damage_flags) : 0L;
 
-    if (args.size() > 3) {
-        dam_type = argnum2flag(args, 4, damage_table);
-        if (dam_type == NO_FLAG)
-            throw Scripting::CustomException("Invalid damage type");
-    }
-
-    ::damage(target, victim, dam, skill->getIndex( ), dam_type, true);
-
-    return Register( );
+    return ::damage(target, victim, dam, skill->getIndex( ), dam_type, true, damflags);
 }
 
 NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один удар оружием" )
