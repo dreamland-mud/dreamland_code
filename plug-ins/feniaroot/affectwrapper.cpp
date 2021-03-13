@@ -93,9 +93,9 @@ NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аф
     return Register();	
 }
 
-NMI_INVOKE(AffectWrapper, addSource, "(ch|obj|room): запомнить ch, obj или room как источник этого аффекта")
+NMI_SET(AffectWrapper, source, "(ch|obj|room): запомнить ch, obj или room как источник этого аффекта")
 {
-    SpellTarget::Pointer src = argnum2target(args, 1);
+    SpellTarget::Pointer src = arg2target(arg);
 
     if (src->type == SpellTarget::ROOM)
         target.sources.add(src->room);
@@ -105,8 +105,15 @@ NMI_INVOKE(AffectWrapper, addSource, "(ch|obj|room): запомнить ch, obj 
         target.sources.add(src->victim);
     else 
         throw Scripting::IllegalArgumentException();
+}
 
-    return Register();	
+NMI_GET(AffectWrapper, source, "вернуть наиболее актуальный источник этого аффекта: player или mob")
+{
+    Character *ch = target.sources.getOwner();
+    if (ch == NULL)
+        return Register();
+    else
+        return ::wrap(ch);
 }
 
 #define GS(x, api) \
