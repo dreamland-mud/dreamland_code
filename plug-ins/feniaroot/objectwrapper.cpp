@@ -600,7 +600,7 @@ NMI_INVOKE( ObjectWrapper, equip, "(wearloc): надеть в указанную
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, unequip, "(): снимает предмет и кладет в инвентарь тому, кто несет" )
+NMI_INVOKE( ObjectWrapper, unequip, "(): снимает предмет без проверок и сообщений, кладет в инвентарь тому, кто несет" )
 {
     checkTarget( );
     
@@ -610,6 +610,19 @@ NMI_INVOKE( ObjectWrapper, unequip, "(): снимает предмет и кла
     target->wear_loc->unequip( target );
     return Register( );
 }
+
+NMI_INVOKE( ObjectWrapper, remove, "([verbose]): снимает предмет, если возможно, и кладет в инвентарь тому, кто несет" )
+{
+    checkTarget( );
+    
+    if (target->wear_loc == wear_none || target->carried_by == NULL)
+        throw Scripting::Exception("object already un-equipped");
+    
+    int flags = args.size() > 0 && args2number(args) ? F_WEAR_VERBOSE : 0;
+    return target->wear_loc->remove(target, flags);
+}
+
+
 
 
 /*-----------------------------------------------------------------------*/

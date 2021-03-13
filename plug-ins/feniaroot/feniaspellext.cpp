@@ -258,6 +258,41 @@ NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для
     return Register();
 }
 
+NMI_INVOKE(FeniaSpellContext, damageItems, "(func): вызвать ф-ию для всех предметов жертвы, предмет доступен в переменной obj")
+{
+    if (vict.type == Register::NONE)
+        return Register();
+
+    Character *myVict = arg2character(vict);
+
+    RegisterList::const_iterator ai = args.begin();
+    Register rfun = *ai++;
+    Closure *fun = rfun.toFunction( );
+    RegisterList funArgs;
+    funArgs.assign(ai, args.end( ));
+
+    list<::Object *> items;
+    for (::Object *item = myVict->carrying; item != 0; item = item->next_content)  
+        items.push_back(item);
+
+    for (auto &item: items) {
+        if (item->extracted)
+            continue;
+        
+        obj = wrap(item);
+
+        try {
+            fun->invoke(thiz, funArgs);
+        } catch (const CustomException &ce) {
+
+        } catch (const VictimDeathException &vde) {
+
+        }        
+    }
+
+    return Register();
+}
+
 static bitstring_t my_damage_flags(const Register &ch, const Register &spell)
 {
     Character *myCh = arg2character(ch);
