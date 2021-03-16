@@ -301,7 +301,10 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         if ( IS_OBJ_STAT(obj,ITEM_NOPURGE) ||
              material_is_flagged(obj, MAT_INDESTR) )
              return;
-         
+    
+       if (obj->isAffected(gsn_protection_cold))
+             return;
+    
         // effect level between 0.25 and 0.9 of spell level
         int dam_ratio, effect_level;
         if (victim)
@@ -437,8 +440,12 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             chance /= 2;
 
         if  (material_is_flagged( obj, MAT_MELTING ))  {
-          chance += 30;
-          msg = "%1$^O1 та%1$nет|ют и испаря%1$nется|ются!";
+            if (obj->isAffected(gsn_protection_heat))
+                return;
+            else {
+                chance += 30;
+                msg = "%1$^O1 та%1$nет|ют и испаря%1$nется|ются!";
+            }
         }
         else
         switch ( obj->item_type )
@@ -449,7 +456,8 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             msg = "%1$^O1 вспыхива%1$nет|ют ярким пламенем и сгора%1$nет|ют!";
             break;
         case ITEM_POTION:
-            chance += 25;
+            if (!obj->isAffected(gsn_protection_heat))    
+                chance += 25;
             msg = "%1$^O1 закипа%1$nет|ют и взрыва%1$nется|ются!";
             break;
         case ITEM_SCROLL:
