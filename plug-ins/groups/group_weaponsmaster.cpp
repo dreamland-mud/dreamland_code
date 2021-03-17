@@ -322,15 +322,32 @@ SKILL_RUNP( shield )
     weapon = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
     
-    if ((weapon == 0) && (dual == 0))
+    if (dual == 0)
     {
-        ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
-        return;
-    }
-    
-    if (attack_table[weapon->value3()].damage != DAM_SLASH && attack_table[dual->value3()].damage != DAM_SLASH) {
-        ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
-        return;
+        if (weapon == 0) {
+            ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
+            return;
+        }
+        else {
+            if (attack_table[weapon->value3()].damage != DAM_SLASH) {
+                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                return;                
+            }
+        }
+    } 
+    else {
+        if (weapon != 0) {
+            if ( attack_table[weapon->value3()].damage != DAM_SLASH &&
+                 attack_table[dual->value3()].damage != DAM_SLASH ) {
+            
+                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                return;               
+            }
+        }
+        else {
+            bug("dual wielding with no primary wield");
+            return;
+        }
     }
 
     if ( ( shield = get_eq_char( victim, wear_shield )) == 0 )
@@ -468,15 +485,32 @@ SKILL_RUNP( weapon )
     weapon = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
     
-    if ((weapon == 0) && (dual == 0))
+    if (dual == 0)
     {
-        ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
-        return;
-    }
-    
-    if (attack_table[weapon->value3()].damage != DAM_SLASH && attack_table[dual->value3()].damage != DAM_SLASH) {
-        ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
-        return;
+        if (weapon == 0) {
+            ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
+            return;
+        }
+        else {
+            if (attack_table[weapon->value3()].damage != DAM_SLASH) {
+                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                return;                
+            }
+        }
+    } 
+    else {
+        if (weapon != 0) {
+            if ( attack_table[weapon->value3()].damage != DAM_SLASH &&
+                 attack_table[dual->value3()].damage != DAM_SLASH ) {
+            
+                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                return;               
+            }
+        }
+        else {
+            bug("dual wielding with no primary wield");
+            return;
+        }
     }
     
     if ( ( vict_weapon = get_eq_char( victim, wear_wield )) == 0 )
