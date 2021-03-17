@@ -87,6 +87,21 @@ bool AffectHandler::isCancelled( ) const
     return false;
 }
 
+bool AffectHandler::onFight(const SpellTarget::Pointer &target, Affect *paf, Character *victim)
+{
+    AffectHandler *ah = this;
+    switch (target->type) {
+        case SpellTarget::CHAR:
+            FENIA_CALL(ah, "FightChar", "CAC", target->victim, paf, victim);
+            break;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
 bool AffectHandler::onRemove(const SpellTarget::Pointer &target, Affect *paf) 
 {
     AffectHandler *ah = this;

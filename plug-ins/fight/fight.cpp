@@ -68,6 +68,7 @@
 #include "behavior_utils.h"
 #include "dreamland.h"
 #include "affect.h"
+#include "affecthandler.h"
 #include "pcharactermanager.h"
 #include "room.h"
 
@@ -108,6 +109,14 @@ PROF(anti_paladin);
 PROF(ninja);
 PROF(ranger);
 PROF(samurai);
+
+static void afprog_fight(Character *ch, Character *victim)
+{
+    SpellTarget::Pointer target(NEW, ch);
+
+    for (auto &paf: ch->affected.findAllWithHandler())
+        paf->type->getAffect()->onFight(target, paf, victim);
+}
 
 static bool mprog_fight( Character *ch, Character *victim )
 {
@@ -200,8 +209,10 @@ void violence_update( )
         ch->setLastFightTime( );
         UNSET_DEATH_TIME(ch);
 
-        // Item fight progs (in behaviors) will throw exception if victim is killed.
+        // Affect and item fight progs (in behaviors) will throw exception if victim is killed.
         try {
+            afprog_fight(ch, victim);
+
             for (obj = ch->carrying; obj; obj = obj_next) {
                 obj_next = obj->next_content;
 
