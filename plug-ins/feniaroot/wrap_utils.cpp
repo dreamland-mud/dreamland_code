@@ -262,9 +262,8 @@ Skill * argnum2skill(const RegisterList &args, int num)
     return skill;
 }
 
-SpellTarget::Pointer argnum2target(const RegisterList &args, int num)
+SpellTarget::Pointer arg2target(const Register &a)
 {
-    Register a = argnum(args, num);
     SpellTarget::Pointer target(NEW);
 
     switch (a.type) {
@@ -303,6 +302,11 @@ SpellTarget::Pointer argnum2target(const RegisterList &args, int num)
     default:
         return target;
     }
+}
+
+SpellTarget::Pointer argnum2target(const RegisterList &args, int num)
+{
+    return arg2target(argnum(args, num));
 }
 
 Affect * args2affect(const RegisterList &args)

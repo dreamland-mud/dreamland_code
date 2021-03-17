@@ -135,8 +135,6 @@ bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 DLString quality_percent( int ); /* XXX */
 DLString help_article_disambig(const HelpArticle *help);
 
-#define MAX_PROMPT_SIZE 75
-
 CMDRUNP( prompt )
 {
     DLString old;
@@ -169,7 +167,6 @@ CMDRUNP( prompt )
     else {
           old = ch->prompt;
         ch->prompt = argument;
-        ch->prompt.cutSize( MAX_PROMPT_SIZE );
     }
     
     if (!old.empty( )) {
@@ -203,7 +200,6 @@ CMDRUNP( battleprompt )
     else {
         old = ch->batle_prompt;
         ch->batle_prompt = argument;
-        ch->batle_prompt.cutSize( MAX_PROMPT_SIZE );
     }
 
     if (!old.empty( )) {

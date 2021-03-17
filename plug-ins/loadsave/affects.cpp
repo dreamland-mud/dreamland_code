@@ -468,6 +468,11 @@ const FlagTable * affect_where_to_table(int where)
 /** Compat method for writing affects to the old .player profiles. */
 int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry)
 {
+    if (registry == wearlocationManager) return TO_LOCATIONS;
+    if (registry == liquidManager) return TO_LIQUIDS;
+    if (registry == skillManager) return TO_SKILLS;
+    if (registry == skillGroupManager) return TO_SKILL_GROUPS;
+
     if (table == &extra_flags) return TO_OBJECT;
     if (table == &weapon_type2) return TO_WEAPON;
     if (table == &affect_flags) return TO_AFFECTS;       
@@ -477,11 +482,6 @@ int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *regi
     if (table == &plr_flags) return TO_ACT_FLAG;
     if (table == &detect_flags) return TO_DETECTS;
     if (table == &form_flags) return TO_FORM;
-
-    if (registry == wearlocationManager) return TO_LOCATIONS;
-    if (registry == liquidManager) return TO_LIQUIDS;
-    if (registry == skillManager) return TO_SKILLS;
-    if (registry == skillGroupManager) return TO_SKILL_GROUPS;
 
     return 0;
 }

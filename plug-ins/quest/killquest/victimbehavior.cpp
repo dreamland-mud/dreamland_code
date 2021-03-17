@@ -33,7 +33,7 @@ void VictimBehavior::deadFromGroupMember( PCMemoryInterface *pcm, Character *kil
     killer->pecho("{YПоздравляю! Ты выполнил%Gо||а задание своего согруппника.", killer);
 
     if (pcm->isOnline( ))
-        pcm->getPlayer( )->pecho("{Y%1$^C1 выполнил%1$Gо||а твое задание.{x", killer);
+        pcm->getPlayer( )->pecho("{Y%1$^C1 помог%1$Gло||ла тебе выполнить задание, поспеши к квестору за наградой.{x", killer);
 }
 
 void VictimBehavior::show( Character *victim, std::basic_ostringstream<char> &buf ) 

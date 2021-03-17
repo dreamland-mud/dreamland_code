@@ -179,6 +179,11 @@ public:
         if (dreamland->hasOption(DL_BUILDPLOT))
             return;
 
+        dumpAll();
+    }
+
+    void dumpAll()
+    {
         LogStream::sendNotice() << "Dumping searcher db to disk." << endl;
         dumpArmor();
         dumpWeapon();
@@ -674,7 +679,7 @@ CMDRUNP(searcher)
     SearcherDumpTask task;
 
     if (arg_is_all(arg)) {
-        task.run();
+        task.dumpAll();
         ch->pecho("Created 4 JSON files in /tmp, check logs for any errors.");
         return;
     }

@@ -141,7 +141,10 @@ bool Damage::canDamage( )
     
     if (is_safe( ch, victim ))
         return false;
-
+    
+    if (paf)
+        return true;
+        
     adjustPosition( );
     adjustFighting( );
     
@@ -482,7 +485,9 @@ void Damage::handlePosition( )
      * Sleep spells and extremely wounded folks.
      * Don't call stop_fighting and wake up from selfdamage when you are not able to wake up
      */
-    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)){ 
+    if (!IS_AWAKE(victim) 
+        && !(IS_AFFECTED(victim, AFF_SLEEP) && (ch == victim || paf)))
+    { 
         if(victim->position == POS_SLEEPING){
             victim->pecho("Ты просыпаешься от внезапной боли.");
         }
