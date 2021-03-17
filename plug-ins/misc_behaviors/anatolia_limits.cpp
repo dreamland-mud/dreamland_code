@@ -401,8 +401,7 @@ void FlyingBoots::remove( Character *ch )
  */
 void GiantStrengthArmor::wear( Character *ch )
 {
-    oldact("Ты чувствуешь, как становишься гораздо сильнее!\r\n"
-         "Твои мышцы разбухают до внушительных размеров.", ch, obj, 0, TO_CHAR );
+    oldact("Ты чувствуешь, как становишься гораздо сильнее!\r\nТвои мышцы разбухают до внушительных размеров.", ch, obj, 0, TO_CHAR );
     act("Мышцы %C2 дрожат от избытка силы!", ch, 0, 0,TO_ROOM);
 }
 void GiantStrengthArmor::equip( Character *ch )

@@ -1125,8 +1125,7 @@ void UndefinedOneHit::damEffectMasterSword( )
         .incrementDamroll();
 
     oldact("$o1 $c2 загорается {Cголубым светом{x.", ch, katana, 0, TO_ROOM);
-    oldact("$o1 в твоей $T руке загорается {Cголубым светом{x.", 
-            ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);
+    oldact("$o1 в твоей $T руке загорается {Cголубым светом{x.", ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);
 }
 
 void UndefinedOneHit::damApplyDeathblow( ) 

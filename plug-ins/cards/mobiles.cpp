@@ -43,8 +43,7 @@ bool CardStarterBehavior::death( Character *killer )
     card = killer->getPC( )->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
     suit = card->getRandomSuit( );
 
-    oldact("{cТы уби$gло|л|ла шестерку $n2 из Колоды.{x", 
-            killer, XMLAttributeCards::suitFaces[suit].mlt, 0, TO_CHAR );
+    oldact("{cТы уби$gло|л|ла шестерку $n2 из Колоды.{x", killer, XMLAttributeCards::suitFaces[suit].mlt, 0, TO_CHAR );
 
     if (card->getLevel( ) < 0) {
         card->setSuit( suit );

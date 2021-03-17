@@ -219,8 +219,7 @@ VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int leve
         
     if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_MAGIC ) )
         dam /= 2;
-    oldact("Кулак из темного эфира иных миров сокрушает $C4, повергая $S в ошеломление!",
-           ch,0,victim,TO_NOTVICT);
+    oldact("Кулак из темного эфира иных миров сокрушает $C4, повергая $S в ошеломление!", ch,0,victim,TO_NOTVICT);
     damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_MAGIC);
 }
 

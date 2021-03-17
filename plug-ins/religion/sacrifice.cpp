@@ -549,8 +549,7 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 
         if (rescue_nosac_items(obj, ch->in_room)) 
             if (needSpam)
-                oldact("Некоторые вещи, лежащие в $o6, не могут быть принесены в жертву и падают $T.", 
-                     ch, obj, terrains[ch->in_room->getSectorType()].fall, TO_ALL );
+                oldact("Некоторые вещи, лежащие в $o6, не могут быть принесены в жертву и падают $T.", ch, obj, terrains[ch->in_room->getSectorType()].fall, TO_ALL );
 
         extract_obj( obj );
         return silver;

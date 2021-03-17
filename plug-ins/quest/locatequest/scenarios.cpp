@@ -60,14 +60,12 @@ void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQu
     switch (number_range( 1, 3 )) {
     case 1:
         if (quest->delivered > 1) {
-            oldact("$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'", 
-                    ch, russian_case( quest->itemName.getValue( ), '4' ).c_str( ), hero, TO_ROOM );
+            oldact("$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'", ch, russian_case( quest->itemName.getValue( ), '4' ).c_str( ), hero, TO_ROOM );
             break;
         }
         /* FALLTHROUGH */
     case 2:
-        oldact("$c1 произносит '{gТеперь их уже $t, осталось совсем немного.{x'", 
-                ch, DLString(quest->delivered).c_str( ), 0, TO_ROOM );
+        oldact("$c1 произносит '{gТеперь их уже $t, осталось совсем немного.{x'", ch, DLString(quest->delivered).c_str( ), 0, TO_ROOM );
         break;
     case 3:
         interpret_fmt( ch, "nod %s", hero->getNameP( ) );

@@ -184,8 +184,7 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
         else
         {
             dest_room = pExit->u1.to_room;
-            oldact("$o1 прилетает $T!", dest_room->people, arrow, 
-                                     dirs[dirs[door].rev].enter, TO_ALL);
+            oldact("$o1 прилетает $T!", dest_room->people, arrow, dirs[dirs[door].rev].enter, TO_ALL);
         }
     }
 

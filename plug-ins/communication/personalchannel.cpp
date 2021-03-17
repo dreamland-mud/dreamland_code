@@ -65,11 +65,10 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
    
     if (victim->is_npc( ) || !victim->getPC( )->getAttributes( ).isAvailable( "afk" ))
         oldact_p("$C1 отсутствует и не может сейчас получить твое сообщение.", ch, 0, victim, TO_CHAR, position );
-    else
-        oldact_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", ch, 
-                victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
-                                    "afk" )->getValue( ).c_str( ), 
-                victim, TO_CHAR, position );
+    else {
+        DLString reason = victim->getPC()->getAttributes().findAttr<XMLStringAttribute>("afk")->getValue();
+        oldact_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", ch, reason.c_str(), victim, TO_CHAR, position );
+    }
 
     oldact_p("Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
     return true;
