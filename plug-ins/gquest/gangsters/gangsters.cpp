@@ -156,8 +156,11 @@ void Gangsters::cleanup( bool performance )
         }
     }
     
-    if (!mobRoomVnums.empty( ))
-        REMOVE_BIT(get_room_instance( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
+    if (!mobRoomVnums.empty( )) {
+        AreaIndexData *area;
+        area = get_room_instance( mobRoomVnums.front( ) )->areaIndex();
+        REMOVE_BIT(area->area_flag, AREA_NOGATE);
+    }
     
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
