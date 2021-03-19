@@ -755,6 +755,18 @@ NMI_INVOKE( ObjectWrapper, madeOfMetal, "(): предмет сделан из м
     return Register( material_is_typed( target, MAT_METAL ) );
 }
 
+NMI_INVOKE( ObjectWrapper, madeOfMineral, "(): предмет сделан из камня или минерала" )
+{
+    checkTarget( );
+    return Register( material_is_typed( target, MAT_MINERAL ) );
+}
+
+NMI_INVOKE( ObjectWrapper, madeOfGem, "(): предмет сделан из драгоценного камня" )
+{
+    checkTarget( );
+    return Register( material_is_typed( target, MAT_GEM ) );
+}
+
 NMI_INVOKE( ObjectWrapper, materialBurns, "(): сколько тиков горит (-1 если тушит огонь)" )
 {
     checkTarget( );
