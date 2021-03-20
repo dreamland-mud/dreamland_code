@@ -120,7 +120,9 @@ void RainbowGQuest::create( const Config& config )
             bringers.push_back( mob );
 
             roomVnums.push_back( mob->in_room->vnum );
-            SET_BIT(mob->in_room->area->area_flag, AREA_NOGATE);
+            AreaIndexData *area;
+            area = mob->in_room->areaIndex();
+            SET_BIT(area->area_flag, AREA_NOGATE);
         }
 
         if (bringers.size( ) < total) 
@@ -149,12 +151,15 @@ void RainbowGQuest::cleanup( )
     Object *obj, *obj_next;
     NPCharacter *mob;
     unsigned int i;
-    
+    AreaIndexData *area;
+
     LogStream::sendNotice( ) << "Rainbow cleanup." << endl;
 
-    for (i = 0; i < roomVnums.size( ); i++)
-        REMOVE_BIT(get_room_instance(roomVnums[i])->area->area_flag, AREA_NOGATE);
-        
+    for (i = 0; i < roomVnums.size( ); i++) {
+        area = get_room_instance(roomVnums[i])->areaIndex();
+        REMOVE_BIT( area->area_flag, AREA_NOGATE);
+    }
+    
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
         
