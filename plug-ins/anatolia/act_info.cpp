@@ -495,7 +495,7 @@ CMDRUNP( oscore )
     }
 
     if (IS_GHOST(ch)) {
-        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$3d {xсекунд%1$-1Iу|ы|.",
+        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$3d {xсекун%1$-1Iду.|ды.|д.",
                  pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()))
         << endl;
     }
