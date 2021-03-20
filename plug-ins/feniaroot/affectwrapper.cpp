@@ -16,7 +16,9 @@
 #include "wrappermanager.h"
 #include "wrap_utils.h"
 #include "subr.h"
+#include "fight.h"
 #include "handler.h"
+#include "damageflags.h"
 #include "merc.h"
 #include "schedulerwrapper.h"
 #include "def.h"
@@ -93,9 +95,9 @@ NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аф
     return Register();	
 }
 
-NMI_INVOKE(AffectWrapper, addSource, "(ch|obj|room): запомнить ch, obj или room как источник этого аффекта")
+NMI_SET(AffectWrapper, source, "(ch|obj|room): запомнить ch, obj или room как источник этого аффекта")
 {
-    SpellTarget::Pointer src = argnum2target(args, 1);
+    SpellTarget::Pointer src = arg2target(arg);
 
     if (src->type == SpellTarget::ROOM)
         target.sources.add(src->room);
@@ -105,9 +107,28 @@ NMI_INVOKE(AffectWrapper, addSource, "(ch|obj|room): запомнить ch, obj 
         target.sources.add(src->victim);
     else 
         throw Scripting::IllegalArgumentException();
-
-    return Register();	
 }
+
+NMI_GET(AffectWrapper, source, "вернуть наиболее актуальный источник этого аффекта: player или mob")
+{
+    Character *ch = target.sources.getOwner();
+    if (ch == NULL)
+        return Register();
+    else
+        return ::wrap(ch);
+}
+
+NMI_INVOKE(AffectWrapper, damage, "(vict,dam,skillName[,damtype,damflags]): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
+{
+    Character *victim = argnum2character(args, 1);
+    int dam = argnum2number(args, 2);
+    Skill *skill = argnum2skill(args, 3);
+    int dam_type = args.size() > 3 ? argnum2flag(args, 4, damage_table) : DAM_NONE;
+    bitstring_t damflags = args.size() > 4 ? argnum2flag(args, 5, damage_flags) : 0L;
+
+    return damage(&target, victim, dam, skill->getIndex( ), dam_type, true, damflags);
+}
+
 
 #define GS(x, api) \
 NMI_GET( AffectWrapper, x, api ) \

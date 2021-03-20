@@ -8,7 +8,7 @@ run_build() {
     mkdir -p objs && \
     make -f Makefile.git && \
     cd objs && \
-    ../configure --prefix=$ROOT && \
+    ../configure --prefix=$ROOT --disable-dependency-tracking && \
     cd src && \
     time (make -j 2 && make install) && \
     cd ../plug-ins && \

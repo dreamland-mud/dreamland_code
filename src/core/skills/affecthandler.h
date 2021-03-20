@@ -28,6 +28,7 @@ public:
 
     // List of triggers called from various places in the code.
 
+    bool onFight(const SpellTarget::Pointer &target, Affect *paf, Character *victim);
     bool onRemove(const SpellTarget::Pointer &target, Affect *paf);
     bool onUpdate(const SpellTarget::Pointer &target, Affect *paf);
     bool onEntry(const SpellTarget::Pointer &target, Affect *paf, Character *walker = 0);

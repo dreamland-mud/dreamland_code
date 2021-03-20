@@ -27,6 +27,8 @@ CodeSourceRepo::CodeSourceRepo()
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^(spell/[a-z ]{2,})/(run[a-zA-Z]+)$", true));
     subjPatterns.push_back(
+        RegExp::Pointer(NEW, "^(affect/[a-z ]{2,})/([a-zA-Z]+)$", true));
+    subjPatterns.push_back(
         RegExp::Pointer(NEW, "^(areas/[-a-z0-9]{2,}.are/[a-z]+)/([0-9.a-zA-Z ]+)$", true));
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^(areas/[-a-z0-9]{2,}.are)/([a-z]+)$", true));
