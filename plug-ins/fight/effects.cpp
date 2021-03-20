@@ -266,9 +266,9 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         {
             Affect af;
 
-            act_p("Волна холода пронизывает $c4.",
+            oldact_p("Волна холода пронизывает $c4.",
                    victim,0,0,TO_ROOM,POS_RESTING);
-            act_p("Холод окутывает тебя и проникает до самых костей.",
+            oldact_p("Холод окутывает тебя и проникает до самых костей.",
                    victim,0,0,TO_CHAR,POS_RESTING);
             af.type      = gsn_chill_touch;
             af.level     = level;
@@ -377,9 +377,9 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         &&  !saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
         {
             Affect af;
-            act_p("$c1 ничего не видит из-за дыма, попавшего в глаза!",
+            oldact_p("$c1 ничего не видит из-за дыма, попавшего в глаза!",
                    victim,0,0,TO_ROOM,POS_RESTING);
-            act_p("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!",
+            oldact_p("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!",
                    victim,0,0,TO_CHAR,POS_RESTING);
         
             af.bitvector.setTable(&affect_flags);
@@ -557,8 +557,8 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         {
             Affect af;
 
-            victim->pecho("{1{gТебя начинает тошнить, когда яд проникает в твое тело.{2");
-            victim->recho("%1$^C2 начинает тошнить, когда яд проникает в %1$Gего|его|ее тело.", victim);
+            victim->pecho("{gТебя начинает тошнить, когда яд проникает в твое тело.{x");
+            victim->recho("%1$^C2 начинает тошнить, когда яд проникает в %1$P2 тело.", victim);
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -659,7 +659,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         /* daze and confused? */
         if (!saves_spell(effect_level, victim, DAM_LIGHTNING, 0, dam_flag))
         {
-            victim->send_to("Твое тело парализовано.\n\r");
+            victim->pecho("Твое тело парализовано.");
             victim->setDaze( URANGE(8, dam_ratio, 20) );
         }
 
@@ -939,7 +939,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
         if (!saves_spell(effect_level, victim, DAM_SOUND, 0, dam_flag))
         {
             Affect af;
-            victim->pecho("{1{MТы ничего не слышишь!{2\n\r");
+            victim->pecho("{MТы ничего не слышишь!{x");
             victim->recho("%^C1 теперь ничего не слышит.", victim);  
         
             af.bitvector.setTable(&affect_flags);
@@ -953,8 +953,8 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                         
             /* daze and confused? */
             if (number_percent() < 50) {
-                victim->pecho("{1{WТы ошеломленно трясешь головой!{2");
-                victim->recho("%^C1 теперь ошеломленно трясет головой.", victim);                
+                victim->pecho("{WТы ошеломленно трясешь головой!{x");
+                victim->recho("%^C1 ошеломленно трясет головой.", victim);                
                 victim->setDaze( URANGE(8, dam_ratio, 20) );
             }
         }

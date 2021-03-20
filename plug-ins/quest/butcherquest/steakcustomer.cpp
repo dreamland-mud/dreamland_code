@@ -19,7 +19,7 @@
 void SteakCustomer::greet( Character *victim ) 
 {
     if (ourHero( victim ))
-        act( "$c1 выжидающе смотрит на тебя.", ch, 0, victim, TO_VICT );
+        oldact("$c1 выжидающе смотрит на тебя.", ch, 0, victim, TO_VICT );
 }
 
 void SteakCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 
@@ -64,8 +64,8 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
 
 void SteakCustomer::givenBad( PCharacter *hero, Object *obj )
 {
-    act("$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT);
-    act("$c1 возвращает $C5 $o4.", ch, obj, hero, TO_NOTVICT);
+    oldact("$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT);
+    oldact("$c1 возвращает $C5 $o4.", ch, obj, hero, TO_NOTVICT);
 }
 
 void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
@@ -79,7 +79,7 @@ void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
     else 
         tell_raw(hero, ch, "Маловато будет...");
     
-    act("$c1 куда-то прячет $o4.", ch, obj, 0, TO_ROOM);
+    oldact("$c1 куда-то прячет $o4.", ch, obj, 0, TO_ROOM);
     extract_obj( obj );
 }
 

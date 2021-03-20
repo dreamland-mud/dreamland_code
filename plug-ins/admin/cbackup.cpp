@@ -15,8 +15,8 @@ CMDADM( backup )
     DLString buf = arguments.getOneArgument( );
     
     if(buf.empty( )) {
-        ch->send_to("Usage: backup <player_name>\n\r"
-                    "       - backup player.\n\r");
+        ch->pecho("Usage: backup <player_name>\n\r"
+                    "       - backup player.");
         return;
     }
 
@@ -24,17 +24,17 @@ CMDADM( backup )
 
     for(c = char_list; c; c = c->next)
         if(!c->is_npc() && buf == c->getName( )) {
-            ch->send_to("Character in game. Force saving.\n\r");
+            ch->pecho("Character in game. Force saving.");
             c->getPC( )->save();
             break;
         }
 
     if (!PCharacterManager::pfBackup(buf)) {
-        ch->send_to("Oops. Failed to backup player profile.\n\r");
+        ch->pecho("Oops. Failed to backup player profile.");
         return;
     }
 
-    ch->send_to("Backup done.\n\r");
+    ch->pecho("Backup done.");
 }
 
 

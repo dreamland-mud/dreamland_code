@@ -318,7 +318,7 @@ void char_update( )
         bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
 
         if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
-            act("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM);
+            oldact("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM);
             extract_char( ch );
             continue;
         }
@@ -359,7 +359,7 @@ void char_update( )
         if (!(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && IS_VAMPIRE(ch) && !MOUNTED(ch))
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
+            ch->pecho("Ты пытаешься двигаться незаметно.");
             SET_BIT(ch->affected_by ,AFF_SNEAK);
             room_to_save( ch );
         }
@@ -367,14 +367,14 @@ void char_update( )
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
+            ch->pecho("Ты пытаешься двигаться незаметно.");
             room_to_save( ch );
         }
 
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты прячешься обратно в тень.\n\r");
+            ch->pecho("Ты прячешься обратно в тень.");
             room_to_save( ch );
         }
 
@@ -416,9 +416,9 @@ void char_update( )
         if (ch->is_npc( ) && ch->timer > 0) {
             if (--ch->timer == 0) {
                 if (IS_SET(ch->act, ACT_UNDEAD))
-                    act("$c1 развалил$gось|ся|ась на куски.", ch, 0, 0, TO_ROOM);
+                    oldact("$c1 развалил$gось|ся|ась на куски.", ch, 0, 0, TO_ROOM);
                 else
-                    act("$c1 исчезает.", ch, 0, 0, TO_ROOM);
+                    oldact("$c1 исчезает.", ch, 0, 0, TO_ROOM);
                 extract_char( ch );
                 continue;
             }
@@ -1170,7 +1170,7 @@ struct LightVampireDamage : public Damage {
         else if (weather_info.sunlight == SUN_SET) 
             msg = "Закатные лучи тревожат тебя." ;
   
-        act( msg.c_str( ), ch, 0, 0, TO_CHAR );
+        oldact( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
         msg.clear();
 
@@ -1178,7 +1178,7 @@ struct LightVampireDamage : public Damage {
         if(ch->in_room->getSectorType() == SECT_INSIDE) msg = "Тени в помещении помогают выдержать солнечный свет.";
         if(ch->in_room->getSectorType() == SECT_AIR) msg = "В воздухе под открытым небом лучи солнца жалят тебя особенно сильно.";
 
-        if(!msg.empty()) act( msg.c_str( ), ch, 0, 0, TO_CHAR );
+        if(!msg.empty()) oldact( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
         RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
@@ -1317,16 +1317,16 @@ void player_update( )
 
         if (HAS_SHADOW(ch)) 
             if (--ch->shadow < 0)
-                act("Твоя вторая тень исчезает.",ch,0,0,TO_CHAR);
+                oldact("Твоя вторая тень исчезает.",ch,0,0,TO_CHAR);
         
         if (ch->move <= 0 && ch->position != POS_SLEEPING)
-            ch->send_to("Тебе нужно отдохнуть!\n\r") ;
+            ch->pecho("Тебе нужно отдохнуть!");
 
         if ( IS_DEATH_TIME( ch ) ) {
             ch->last_death_time--;
             if (!IS_DEATH_TIME(ch)) {
-                act("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR);
-                act("$c1 полностью возвращается в мир живых.", ch, 0, 0, TO_NOTVICT);
+                oldact("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR);
+                oldact("$c1 полностью возвращается в мир живых.", ch, 0, 0, TO_NOTVICT);
                 UNSET_DEATH_TIME(ch);
             }
         }
@@ -1335,9 +1335,9 @@ void player_update( )
             ch->PK_time_v--;
         else if( !ch->PK_time_v && IS_VIOLENT( ch ) )
         {
-            act_p( "Лихорадочный блеск в глазах $c2 пропадает.",
+            oldact_p("Лихорадочный блеск в глазах $c2 пропадает.",
                    ch, 0, 0, TO_ROOM,POS_RESTING );
-            act_p( "Ты успокаиваешься.",
+            oldact_p("Ты успокаиваешься.",
                    ch, 0, 0, TO_CHAR,POS_RESTING );
             REMOVE_VIOLENT( ch );
         }
@@ -1346,9 +1346,9 @@ void player_update( )
             ch->ghost_time--;
         else if( !ch->ghost_time && IS_GHOST( ch ) )
         {
-            act_p( "В комнате начинает сгущаться божественная энергия и $c1 обретает плоть.\n\rНо похоже $c1 еще в мире мертвых.",
+            oldact_p("В комнате начинает сгущаться божественная энергия и $c1 обретает плоть.\n\rНо похоже $c1 еще в мире мертвых.",
                    ch, 0, 0, TO_ROOM,POS_RESTING);
-            act_p( "Ты слышишь далекий колокольный звон.\n\rНа тебя накатывается волна ужасной боли...\n\rТы рождаешься заново, обретая плоть.\n\rНо ты пока еще между живыми и мертвыми.",
+            oldact_p("Ты слышишь далекий колокольный звон.\n\rНа тебя накатывается волна ужасной боли...\n\rТы рождаешься заново, обретая плоть.\n\rНо ты пока еще между живыми и мертвыми.",
                    ch, 0, 0, TO_CHAR,POS_RESTING);
             REMOVE_GHOST( ch );
         }
@@ -1359,17 +1359,17 @@ void player_update( )
         {
             if( IS_KILLER( ch ) )
             {
-                act_p("Аура проклятия вокруг $c2 исчезает.",
+                oldact_p("Аура проклятия вокруг $c2 исчезает.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
-                act_p("Боги забывают убийство, совершенное тобой.",
+                oldact_p("Боги забывают убийство, совершенное тобой.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
                 REMOVE_KILLER( ch );
             }
             else if( IS_SLAIN( ch ) )
             {
-                act_p("Все забывается... и даже записи жрецов Мира Мечты превращаются в прах.",
+                oldact_p("Все забывается... и даже записи жрецов Мира Мечты превращаются в прах.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
-                act_p("Правда о твоем поражении забывается.",
+                oldact_p("Правда о твоем поражении забывается.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
                 REMOVE_SLAIN( ch );
             }
@@ -1381,7 +1381,7 @@ void player_update( )
         {
             if( IS_THIEF( ch ) )
             {
-                act_p("Ты вздыхаешь с облегчением, ведь все забывают о твоей неспособности\n\rхоть что-то украсть.",
+                oldact_p("Ты вздыхаешь с облегчением, ведь все забывают о твоей неспособности\n\rхоть что-то украсть.",
                       ch, 0, 0, TO_CHAR,POS_RESTING );
                 REMOVE_THIEF( ch );
             }
@@ -1415,14 +1415,14 @@ void idle_update( PCharacter *ch )
 {
     if (IS_VIOLENT( ch ))
     {
-        act( "Лихорадочный блеск в глазах $c2, пропадает.", ch, 0, 0, TO_ROOM );
-        act( "Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
+        oldact("Лихорадочный блеск в глазах $c2, пропадает.", ch, 0, 0, TO_ROOM );
+        oldact("Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
         REMOVE_VIOLENT( ch );
         ch->PK_time_v = 0;
     }
 
-    act( "$c1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
-    act( "Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
+    oldact("$c1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
+    oldact("Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
 
     if (IS_SET(ch->config, CONFIG_AUTOAFK) && !IS_SET(ch->comm, COMM_AFK))
         interpret_raw( ch, "afk" );
@@ -1496,8 +1496,8 @@ void wield_update( Character *ch )
             && second->getWeight( ) > (get_str_app(ch).wield * 5)
             && !check_native_weapon( ch, second ))
     {
-        act("Ты не в силах удержать $o4 в левой руке.", ch, second, 0, TO_CHAR);
-        act("$c1 не в силах удержать $o4.", ch, second, 0, TO_ROOM);
+        oldact("Ты не в силах удержать $o4 в левой руке.", ch, second, 0, TO_CHAR);
+        oldact("$c1 не в силах удержать $o4.", ch, second, 0, TO_ROOM);
         unequip_char( ch, second );
     }
     
@@ -1508,8 +1508,8 @@ void wield_update( Character *ch )
             && wield->getWeight( ) > (get_str_app(ch).wield * 10)
             && !check_native_weapon( ch, wield ))
     {
-        act("Ты не в силах удержать $o4 в правой руке.", ch, wield, 0, TO_CHAR);
-        act("$c1 не в силах удержать $o4.", ch, wield, 0, TO_ROOM);
+        oldact("Ты не в силах удержать $o4 в правой руке.", ch, wield, 0, TO_CHAR);
+        oldact("$c1 не в силах удержать $o4.", ch, wield, 0, TO_ROOM);
         unequip_char( ch, wield );
     }
     
@@ -1517,8 +1517,8 @@ void wield_update( Character *ch )
             && (second && second->wear_loc == wear_second_wield) 
             && (!wield || wield->wear_loc == wear_none)) 
     {
-        act("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
-        act("$c1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
+        oldact("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
+        oldact("$c1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
         unequip_char( ch, second );
         equip_char( ch, second, wear_wield );
     }

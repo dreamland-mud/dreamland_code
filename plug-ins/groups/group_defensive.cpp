@@ -51,32 +51,32 @@ SKILL_RUNP( rescue )
 
         if ( arg[0] == '\0' )
         {
-                ch->send_to("Спасти кого?\n\r");
+                ch->pecho("Спасти кого?");
                 return;
         }
 
         if ( ( victim = get_char_room( ch, arg ) ) == 0 )
         {
-                ch->send_to("Таких нет здесь.\n\r");
+                ch->pecho("Таких нет здесь.");
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->send_to("Себя?\n\r");
+                ch->pecho("Себя?");
                 return;
         }
 
         if ( ch->fighting == victim )
         {
-                ch->send_to("Слишком поздно...\n\r");
+                ch->pecho("Слишком поздно...");
                 return;
         }
 
         if ( ( ( fch = victim->fighting ) == 0 )
                 && ( victim->death_ground_delay == 0 ) )
         {
-                ch->send_to("Но никто не нуждается в помощи..\n\r");
+                ch->pecho("Но никто не нуждается в помощи..");
                 return;
         }
 
@@ -96,14 +96,14 @@ SKILL_RUNP( rescue )
                 || ( victim->getModifyLevel() > ( skill_level(*gsn_rescue, ch) + 30) )
                 || ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
         {
-                ch->send_to("Твоя попытка спасти не удалась.\n\r");
+                ch->pecho("Твоя попытка спасти не удалась.");
                 gsn_rescue->improve( ch, false, victim );
                 return;
         }
 
-        act( "Ты спасаешь $C4!",  ch, 0, victim, TO_CHAR);
-        act( "$c1 спасает тебя!", ch, 0, victim, TO_VICT);
-        act( "$c1 спасает $C4!",  ch, 0, victim, TO_NOTVICT);
+        oldact("Ты спасаешь $C4!",  ch, 0, victim, TO_CHAR);
+        oldact("$c1 спасает тебя!", ch, 0, victim, TO_VICT);
+        oldact("$c1 спасает $C4!",  ch, 0, victim, TO_NOTVICT);
         gsn_rescue->improve( ch, true, victim );
 
         if ( fch )

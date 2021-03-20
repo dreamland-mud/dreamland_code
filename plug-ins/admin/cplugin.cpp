@@ -30,7 +30,7 @@ public:
 
         for (d = descriptor_list; d; d = d->next) 
             if (d->connected == CON_PLAYING && d->character) 
-                d->character->send_to( "Мир неуловимо изменился..\r\n" );
+                d->character->pecho("Мир неуловимо изменился..");
     }
 
     virtual int getPriority( ) const
@@ -79,11 +79,11 @@ COMMAND(CPlugin, "plugin")
 
 void CPlugin::usage( Character *ch )
 {
-    ch->send_to( 
+    ch->pecho( 
         "Использование: \r\n"
         "plugin list - список всех загруженных модулей.\r\n"
         "plugin reload [all|changed|<name>] \r\n"
-        "            - перегрузка модулей (всех, измененных или по имени)\r\n" );
+        "            - перегрузка модулей (всех, измененных или по имени)" );
 }
 
 void CPlugin::doList( Character *ch )
@@ -114,18 +114,18 @@ void CPlugin::doReload( Character *ch, DLString arg )
         usage( ch );
     else if (arg == "all") {
         manager->setReloadAllRequest( );
-        ch->send_to( "Requesting plugins reload.\r\n" );
+        ch->pecho("Requesting plugins reload.");
     }
     else if (arg == "changed") {
         manager->setReloadChangedRequest( );
-        ch->send_to( "Requesting changed plugins reload.\r\n" );
+        ch->pecho("Requesting changed plugins reload.");
     }
     else if (manager->isAvailable( arg )) {
         manager->setReloadOneRequest( arg );
         ch->printf( "Requesting reload for plugin [%s].\r\n", arg.c_str( ) );
     }
     else
-        ch->send_to( "Plugin not found.\r\n" );
+        ch->pecho("Plugin not found.");
 }
 
 

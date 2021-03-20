@@ -80,12 +80,12 @@ COMMAND(COrder, "order")
     
     else if(!iargs.pCommand->properOrder( victim )) {
         if (victim->isAffected( gsn_manacles ))
-            act( "$C1 говорит тебе '{GЯ не буду делать это.{x'", ch, 0, victim, TO_CHAR );
+            oldact("$C1 говорит тебе '{GЯ не буду делать это.{x'", ch, 0, victim, TO_CHAR );
         else
-            act( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch, 0, victim, TO_CHAR );
+            oldact("$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch, 0, victim, TO_CHAR );
     }
     else {
-        act( "$c1 приказывает тебе '$t', ты покорно исполняешь приказ.", ch, iargs.pCommand->getName( ).c_str( ), victim, TO_VICT );
+        oldact("$c1 приказывает тебе '$t', ты покорно исполняешь приказ.", ch, iargs.pCommand->getName( ).c_str( ), victim, TO_VICT );
         
         if (iargs.pCommand->dispatchOrder( iargs ))
             iargs.pCommand->run( victim, iargs.cmdArgs );

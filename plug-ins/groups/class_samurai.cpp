@@ -60,13 +60,13 @@ SKILL_RUNP( enchant )
 
     if ( !ch->is_npc() &&   !gsn_enchant_sword->usable( ch ) )
     {
-        ch->send_to("Чего?\n\r");
+        ch->pecho("Чего?");
         return;
     }
 
     if (argument[0] == '\0') /* empty */
     {
-        ch->send_to("Какое оружие ты хочешь улучшить?\n\r");
+        ch->pecho("Какое оружие ты хочешь улучшить?");
         return;
     }
 
@@ -74,7 +74,7 @@ SKILL_RUNP( enchant )
 
     if (obj == 0)
     {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -83,7 +83,7 @@ SKILL_RUNP( enchant )
     if (wear_level > ch->getRealLevel( ))
     {
         ch->pecho("Ты долж%Gно|ен|на достичь %d уровня, чтобы улучшить это.", ch, wear_level );
-        act( "$c1 пытается улучшить $o1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
+        oldact("$c1 пытается улучшить $o1, но это слишком сложно.", ch, obj, 0, TO_ROOM);
         return;
     }
     
@@ -91,13 +91,13 @@ SKILL_RUNP( enchant )
     
    if (ch->mana < mana )
         {
-         ch->send_to("У тебя недостаточно энергии для этого.\n\r");
+         ch->pecho("У тебя недостаточно энергии для этого.");
          return;
         }
 
    if ( number_percent() > gsn_enchant_sword->getEffective( ch ) + skill_level_bonus(*gsn_enchant_sword, ch) )
         {
-         ch->send_to("Ты не можешь сконцентрироваться.\n\r");
+         ch->pecho("Ты не можешь сконцентрироваться.");
          ch->recho("%1$^C1 пытал%1$Gось|ся|ась улучшить %2$O4, но на мгновение забыл%1$Gо||а как это делается.",
                      ch, obj);
         ch->setWait( gsn_enchant_sword->getBeats( ) );
@@ -137,7 +137,7 @@ SKILL_RUNP( explode )
     level = skill_level(*gsn_explode, ch);
 
     if (ch->is_npc() || !gsn_explode->usable( ch ) ) {
-        ch->send_to("Огонь? Что это?\n\r");
+        ch->pecho("Огонь? Что это?");
         return;
     }
 
@@ -145,12 +145,12 @@ SKILL_RUNP( explode )
         one_argument(argument, arg);
 
         if (arg[0] == 0) {
-            ch->send_to("Подорвать кого?\n\r");
+            ch->pecho("Подорвать кого?");
             return;
         }
 
         if ((victim = get_char_room(ch,arg)) == 0) {
-            ch->send_to("Здесь таких нет.\n\r");
+            ch->pecho("Здесь таких нет.");
             return;
         }
     }
@@ -158,15 +158,15 @@ SKILL_RUNP( explode )
     mana= gsn_explode->getMana( );
 
     if (ch->mana < mana ) {
-        ch->send_to("У тебя не хватает энергии для огня.\n\r");
+        ch->pecho("У тебя не хватает энергии для огня.");
         return;
     }
 
     ch->mana -= mana;
 
-    act("$c1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
-    act("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
-    act("Пусть все сгорит!",ch,0,0,TO_CHAR);
+    oldact("$c1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
+    oldact("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
+    oldact("Пусть все сгорит!",ch,0,0,TO_CHAR);
 
     ch->setWait( gsn_explode->getBeats( ) );
 
@@ -246,25 +246,25 @@ SKILL_RUNP( target )
 
     if ( !ch->is_npc() &&   !gsn_target->usable( ch ) )
     {
-        ch->send_to("Ты не знаешь, как можно сфокусировать атаки на конкретного противника.\n\r");
+        ch->pecho("Ты не знаешь, как можно сфокусировать атаки на конкретного противника.");
         return;
     }
 
     if (ch->fighting == 0)
     {
-        ch->send_to("Сейчас ты не сражаешься.\n\r");
+        ch->pecho("Сейчас ты не сражаешься.");
         return;
     }
 
     if (argument[0] == '\0')
     {
-        ch->send_to("Изменить цель? На кого?\n\r");
+        ch->pecho("Изменить цель? На кого?");
         return;
     }
 
     if (( victim = get_char_room (ch, argument)) == 0 )
     {
-        ch->send_to("Здесь таких нет.\n\r");
+        ch->pecho("Здесь таких нет.");
         return;
     }
 
@@ -273,7 +273,7 @@ SKILL_RUNP( target )
 
     if ( victim->fighting != ch)
     {
-        act("Но $E не сражается с тобой.", ch, 0, victim, TO_CHAR);
+        oldact("Но $E не сражается с тобой.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -281,7 +281,7 @@ SKILL_RUNP( target )
   ch->setWait( gsn_target->getBeats( ) );
 
     if (victim == ch->fighting) {
-        act("Ты и так наносишь большинство своих атак $C3.", ch, 0, victim, TO_CHAR);
+        oldact("Ты и так наносишь большинство своих атак $C3.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -294,13 +294,13 @@ SKILL_RUNP( target )
 
     ch->fighting = victim;
 
-    act("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
-    act("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR);
-    act("$c1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
+    oldact("$c1 меняет $s цель на $C4!",ch,0,victim,TO_NOTVICT);
+    oldact("Ты меняешь свою цель на $C4!",ch,0,victim,TO_CHAR);
+    oldact("$c1 меняет свою цель на тебя!",ch,0,victim,TO_VICT);
       return;
     }
 
-ch->send_to("Ты пытаешься, но не можешь. Попробуй еще раз!.\n\r");
+ch->pecho("Ты пытаешься, но не можешь. Попробуй еще раз!.");
       gsn_target->improve( ch, false, victim );
 
     return;
@@ -317,32 +317,32 @@ SKILL_RUNP( harakiri )
 
     if ( MOUNTED(ch) )
     {
-        ch->send_to("Ты не можешь сделать харакири, если ты верхом!\n\r");
+        ch->pecho("Ты не можешь сделать харакири, если ты верхом!");
         return;
     }
 
     if ( (chance = gsn_hara_kiri->getEffective( ch )) == 0)
     {
-        ch->send_to("Ты пытаешься убить себя, но не можешь вынести такую боль.\n\r");
+        ch->pecho("Ты пытаешься убить себя, но не можешь вынести такую боль.");
         return;
     }
 
     if (ch->isAffected(gsn_hara_kiri))
     {
-        act("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
+        oldact("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
         return;
     }
 
     /* fighting */
     if (ch->position == POS_FIGHTING || ch->fighting)
     {
-        ch->send_to("Используй свой шанс сразиться до конца.\n\r");
+        ch->pecho("Используй свой шанс сразиться до конца.");
         return;
     }
 
     if(SHADOW(ch)) {
-      ch->send_to("Ты безуспешно режешь свою тень.\n\r");
-      act_p("$c1 не может даже сделать себе харакири.\n...пора на пенсию.",
+      ch->pecho("Ты безуспешно режешь свою тень.");
+      oldact_p("$c1 не может даже сделать себе харакири.\n...пора на пенсию.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -358,8 +358,8 @@ SKILL_RUNP( harakiri )
         desire_hunger->reset( ch->getPC( ) );
         desire_thirst->reset( ch->getPC( ) );
 
-        ch->send_to("Ты отрезаешь себе палец и ждешь, когда вытечет вся кровь.\n\r");
-        act_p("$c1 разрезает свое тело и ждет смерти.", ch,0,0,TO_ROOM,POS_FIGHTING);
+        ch->pecho("Ты отрезаешь себе палец и ждешь, когда вытечет вся кровь.");
+        oldact_p("$c1 разрезает свое тело и ждет смерти.", ch,0,0,TO_ROOM,POS_FIGHTING);
         gsn_hara_kiri->improve( ch, true );
         interpret_raw( ch, "sleep" );
         SET_BIT(ch->act,PLR_HARA_KIRI);
@@ -372,7 +372,7 @@ SKILL_RUNP( harakiri )
         ch->setWaitViolence( 2 );
         postaffect_to_char(ch, gsn_hara_kiri, 0);
 
-        ch->send_to("Ты не можешь отрезать себе палец. Ведь это не так легко!.\n\r");
+        ch->pecho("Ты не можешь отрезать себе палец. Ведь это не так легко!.");
         gsn_hara_kiri->improve( ch, false );
     }
 }
@@ -395,7 +395,7 @@ SKILL_RUNP( katana )
 
         if ( ch->is_npc() || !gsn_katana->usable( ch ) )
         {
-                ch->send_to("Что?\n\r");
+                ch->pecho("Что?");
                 return;
         }
 
@@ -409,39 +409,39 @@ SKILL_RUNP( katana )
 
         if ( ch->mana < mana )
         {
-                ch->send_to("У тебя не хватает энергии для катаны.\n\r");
+                ch->pecho("У тебя не хватает энергии для катаны.");
                 return;
         }
 
         if ( arg[0] == '\0' )
         {
-                ch->send_to("Сделать катану? Из чего?\n\r");
+                ch->pecho("Сделать катану? Из чего?");
                 return;
         }
 
         if ( ( part = get_obj_carry( ch, arg ) ) == 0 )
         {
-                ch->send_to("У тебя нету ни куска железа.\n\r");
+                ch->pecho("У тебя нету ни куска железа.");
                 return;
         }
 
         if ( part->pIndexData->vnum != OBJ_VNUM_CHUNK_IRON )
         {
-                ch->send_to("У тебя нет нужного материала -- поищи в Королевстве Дварфов\n\r");
+                ch->pecho("У тебя нет нужного материала -- поищи в Королевстве Дварфов");
                 return;
         }
 
         if (SHADOW(ch))
         {
-                ch->send_to("Твоя тень все время мелькает перед глазами.\n\rТяжеловато сделать катану в таких условиях.\n\r");
-                act_p("$c1 вместе со своей тенью пытаются сделать катану.\n\r...глупое занятие.",
+                ch->pecho("Твоя тень все время мелькает перед глазами.\n\rТяжеловато сделать катану в таких условиях.");
+                oldact_p("$c1 вместе со своей тенью пытаются сделать катану.\n\r...глупое занятие.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
 
         if ( number_percent( ) > ( gsn_katana->getEffective( ch ) / 3 ) * 2 )
         {
-                ch->send_to("Ты понапрасну изводишь брусок хорошего железа.\n\r");
+                ch->pecho("Ты понапрасну изводишь брусок хорошего железа.");
                 extract_obj(part);
                 return;
         }
@@ -478,15 +478,15 @@ SKILL_RUNP( katana )
                 obj_to_char(katana, ch);
                 gsn_katana->improve( ch, true );
         
-                act("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR);
-                act("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
+                oldact("Ты делаешь катану из $o2!",ch,part,0,TO_CHAR);
+                oldact("$c1 делает катану из $o2!",ch,part,0,TO_ROOM);
         
                 extract_obj(part);
                 return;
         }
         else
         {
-                act("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
+                oldact("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
                 extract_obj(part);
                 ch->mana -= mana / 2;
                 gsn_katana->improve( ch, false );
@@ -561,15 +561,15 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
 
     victim->getPC( )->death -= 1;
 
-    act( "$C1 забирает смерть у $c5.", victim, 0, ch, TO_ROOM );
-    act( "$C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
-    act_p( "{BМолнии сверкают на небе.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
+    oldact("$C1 забирает смерть у $c5.", victim, 0, ch, TO_ROOM );
+    oldact("$C1 забирает у тебя смерть.", victim, 0, ch, TO_CHAR );
+    oldact_p("{BМолнии сверкают на небе.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
 }
 
 void SamuraiGuildmaster::giveBack( Character *victim, Object *obj )
 {
-    act( "$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    act( "$c1 возвращает тебе $o4.", ch, obj, victim, TO_VICT );
+    oldact("$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
+    oldact("$c1 возвращает тебе $o4.", ch, obj, victim, TO_VICT );
 
     obj_from_char( obj );
     obj_to_char( obj, victim );
@@ -633,7 +633,7 @@ void Katana::wear( Character *ch )
     if (obj->getRealShortDescr())
         ch->pecho("Ты ощущаешь %O4 как часть себя!", obj);
     else
-        ch->send_to("Ты ощущаешь СВОЮ катану, как часть себя!\n\r");
+        ch->pecho("Ты ощущаешь СВОЮ катану, как часть себя!");
   }
 }
 
@@ -652,12 +652,12 @@ void OwnedKatana::get( Character *ch )
     
   if (obj->hasOwner( ch ))
   {
-    act_p("{BМерцающая аура окружает лезвие $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+    oldact_p("{BМерцающая аура окружает лезвие $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
     return;
   }
 
-  act( "$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
-  act( "$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
+  oldact("$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
+  oldact("$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
 
   obj_from_char( obj );
   obj_to_room( obj, ch->in_room );

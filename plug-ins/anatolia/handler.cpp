@@ -325,9 +325,9 @@ void nuke_pets( PCharacter *ch, int flags )
     pet->stop_follower( );
    
     if (pet->in_room == ch->in_room)
-        act( "$C1 медленно исчезает.", ch, NULL, pet, TO_NOTVICT );
+        oldact("$C1 медленно исчезает.", ch, NULL, pet, TO_NOTVICT );
     else
-        act( "$c1 медленно исчезает.", pet, NULL, NULL, TO_ROOM );
+        oldact("$c1 медленно исчезает.", pet, NULL, NULL, TO_ROOM );
         
     
     if (IS_SET(flags, FEXTRACT_TOTAL))

@@ -44,20 +44,20 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
 
     if ( !RoomUtils::isOutside(ch) )
     {
-        ch->send_to("Ты должен находиться вне помещения.\n\r");
+        ch->pecho("Ты должен находиться вне помещения.");
         return;
     }
 
     if ( weather_info.sky < SKY_RAINING )
     {
-        ch->send_to("Тебе нужна плохая погода.\n\r");
+        ch->pecho("Тебе нужна плохая погода.");
         return;
     }
 
     dam = dice(level, 9);
 
-    ch->send_to("Божественная молния поражает твоих врагов!\n\r");
-    act( "$c1 посылает молнию, которая повергает $s врагов!", ch, 0, 0, TO_ROOM );
+    ch->pecho("Божественная молния поражает твоих врагов!");
+    oldact("$c1 посылает молнию, которая повергает $s врагов!", ch, 0, 0, TO_ROOM );
     
     area_message( ch, "Молнии сверкают на небе.", false );
 
@@ -95,7 +95,7 @@ VOID_SPELL(ControlWeather)::run( Character *ch, char *target_name, int sn, int l
         ch->pecho( "Прогноз погоды ухудшается." );
     }
     else  {
-        ch->send_to("Ты хочешь сделать погоду хуже или лучше?\n\r");
+        ch->pecho("Ты хочешь сделать погоду хуже или лучше?");
         return;
     }
 }
@@ -109,9 +109,9 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE)) {
         if (victim == ch)
-            act("{MРозовая аура{x уже окружает тебя.", ch, 0, 0, TO_CHAR);
+            oldact("{MРозовая аура{x уже окружает тебя.", ch, 0, 0, TO_CHAR);
         else
-            act("$C1 уже окруже$Gно|н|на {Mрозовой аурой{x.", ch, 0, victim, TO_CHAR);
+            oldact("$C1 уже окруже$Gно|н|на {Mрозовой аурой{x.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -123,8 +123,8 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
     af.modifier  = 2 * level;
     af.bitvector.setValue(AFF_FAERIE_FIRE);
     affect_to_char( victim, &af );
-    victim->send_to("Тебя окружает {MРозовая аура{x.\n\r");
-    act_p( "$c4 окружает {MРозовая аура{x.",
+    victim->pecho("Тебя окружает {MРозовая аура{x.");
+    oldact_p("$c4 окружает {MРозовая аура{x.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
 }
 
@@ -134,9 +134,9 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
 { 
     Character *ich;
 
-    act_p("$c1 создает облако розового дыма.",
+    oldact_p("$c1 создает облако розового дыма.",
            ch, 0, 0, TO_ROOM,POS_RESTING);
-    ch->send_to("Ты создаешь облако розового дыма.\n\r");
+    ch->pecho("Ты создаешь облако розового дыма.");
 
     for ( ich = room->people; ich != 0; ich = ich->next_in_room )
     {
@@ -162,8 +162,8 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
             REMOVE_BIT   ( ich->affected_by, AFF_SNEAK  );
           }
 
-        act("$c1 обнаруже$gно|н|на!", ich, 0, 0, TO_ROOM);
-        act("Тебя обнаружили!", ich, 0, 0, TO_CHAR);
+        oldact("$c1 обнаруже$gно|н|на!", ich, 0, 0, TO_ROOM);
+        oldact("Тебя обнаружили!", ich, 0, 0, TO_CHAR);
     }
 }
 

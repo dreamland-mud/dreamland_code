@@ -30,7 +30,7 @@ CMDRUN( showskill )
         return;
     
     if (argument.empty( )) {
-        ch->send_to( "Использование: {y{lRумение{lEslook{x <умение или заклинание>\r\n" );
+        ch->pecho("Использование: {y{lRумение{lEslook{x <умение или заклинание>");
         return;
     }
 
@@ -38,7 +38,7 @@ CMDRUN( showskill )
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill) {
-        ch->send_to( "Такого умения нет.\r\n" );
+        ch->pecho("Такого умения нет.");
         return;
     }
     

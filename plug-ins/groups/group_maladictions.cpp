@@ -48,7 +48,7 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
     int strength = 0;
 
     if (victim->isAffected(sn)) {
-        act("$C1 уже прокля$Gто|т|та.", ch,0,victim,TO_CHAR);
+        oldact("$C1 уже прокля$Gто|т|та.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -63,14 +63,14 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
         strength = 2;
         
     if (!strength) {
-        act("О, нет.. Кажется, $C1 нравится твоим Богам..", ch, NULL, victim, TO_CHAR);
+        oldact("О, нет.. Кажется, $C1 нравится твоим Богам..", ch, NULL, victim, TO_CHAR);
         return;
     }
     
     level += (strength - 1) * 3;
 
     if (saves_spell( level, victim , DAM_HOLY, ch, DAMF_PRAYER )) {
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->pecho("Твоя попытка закончилась неудачей.");
         return;
     }
 
@@ -99,10 +99,10 @@ VOID_SPELL(Anathema)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector.setValue(AFF_CURSE);
     affect_to_char(victim, &af);
     
-    act_p("Боги $c2 проклинают тебя!\r\nТы чувствуешь себя преотвратно.", 
+    oldact_p("Боги $c2 проклинают тебя!\r\nТы чувствуешь себя преотвратно.", 
             ch, 0, victim, TO_VICT, POS_RESTING);
-    act("Твои Боги проклинают $C4!", ch, 0, victim, TO_CHAR);
-    act("Боги $c2 проклинают $C4!", ch, 0, victim, TO_NOTVICT);
+    oldact("Твои Боги проклинают $C4!", ch, 0, victim, TO_CHAR);
+    oldact("Боги $c2 проклинают $C4!", ch, 0, victim, TO_NOTVICT);
 
 }
 
@@ -113,12 +113,12 @@ VOID_SPELL(BlackDeath)::run( Character *ch, Room *room, int sn, int level )
 
   if (IS_SET(room->room_flags, ROOM_LAW))
     {
-      ch->send_to("Божественные Силы покровительствуют этому месту.\n\r");
+      ch->pecho("Божественные Силы покровительствуют этому месту.");
       return;
     }
     if ( room->isAffected( sn ))
     {
-     ch->send_to("Это место уже заражено чумой.\n\r");
+     ch->pecho("Это место уже заражено чумой.");
      return;
     }
 
@@ -132,14 +132,14 @@ VOID_SPELL(BlackDeath)::run( Character *ch, Room *room, int sn, int level )
     af.sources.add(ch);
     room->affectTo( &af );
 
-    ch->send_to("Чума заражает все вокруг.\n\r");
-    act("Чума заражает все вокруг.\n\r",ch,0,0,TO_ROOM);
+    ch->pecho("Чума заражает все вокруг.");
+    oldact("Чума заражает все вокруг.\n\r",ch,0,0,TO_ROOM);
 }
 
 AFFECT_DECL(BlackDeath);
 VOID_AFFECT(BlackDeath)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act("{yВоздух отравлен чумными миазмами.{x",ch, 0, 0, TO_CHAR);
+     oldact("{yВоздух отравлен чумными миазмами.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(BlackDeath)::toStream( ostringstream &buf, Affect *paf ) 
@@ -170,8 +170,8 @@ VOID_AFFECT(BlackDeath)::update( Room *room, Affect *paf )
                 && !IS_AFFECTED(vch,AFF_PLAGUE)
                 && number_bits(3) == 0)
         {
-            act("Ты чувствуешь жар и легкую дрожь.", vch, 0, 0, TO_CHAR);
-            act("$c1 дрожит и выглядит очень больн$gым|ым|ой.", vch, 0, 0,TO_ROOM);
+            oldact("Ты чувствуешь жар и легкую дрожь.", vch, 0, 0, TO_CHAR);
+            oldact("$c1 дрожит и выглядит очень больн$gым|ым|ой.", vch, 0, 0,TO_ROOM);
             affect_join(vch,&plague);
         }
     }
@@ -187,13 +187,13 @@ VOID_SPELL(Blindness)::run( Character *ch, Character *victim, int sn, int level 
 
         if ( IS_AFFECTED(victim, AFF_BLIND) )
         {
-    act("$c1 и так ничего не видит.",victim,0,0,TO_ROOM);
+    oldact("$c1 и так ничего не видит.",victim,0,0,TO_ROOM);
                 return;
         }
 
         if ( saves_spell(level,victim,DAM_OTHER,ch, DAMF_SPELL) )
         {
-                ch->send_to("Не получилось.\n\r");
+                ch->pecho("Не получилось.");
                 return;
         }
 
@@ -205,8 +205,8 @@ VOID_SPELL(Blindness)::run( Character *ch, Character *victim, int sn, int level 
         af.duration  = 3+level / 15;
         af.bitvector.setValue(AFF_BLIND);
         affect_to_char( victim, &af );
-        victim->send_to("Тебя ослепили!\n\r");
-        act("$c1 теперь ничего не видит.",victim,0,0,TO_ROOM);
+        victim->pecho("Тебя ослепили!");
+        oldact("$c1 теперь ничего не видит.",victim,0,0,TO_ROOM);
         return;
 
 }
@@ -219,12 +219,12 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->behavior && obj->behavior->isLevelAdaptive( ))
     {
-        act("$o1 отвергает твои попытки.",ch,obj,0,TO_CHAR);
+        oldact("$o1 отвергает твои попытки.",ch,obj,0,TO_CHAR);
         return;
     }
     if (IS_OBJ_STAT(obj,ITEM_EVIL))
     {
-        act("$o1 уже полон дьявольской силы.",ch,obj,0,TO_CHAR);
+        oldact("$o1 уже полон дьявольской силы.",ch,obj,0,TO_CHAR);
         return;
     }
 
@@ -237,13 +237,13 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
         {
             if (paf != 0)
                 affect_remove_obj( obj, paf, true);
-            act("Алая аура окружает $o4.",ch,obj,0,TO_ALL);
+            oldact("Алая аура окружает $o4.",ch,obj,0,TO_ALL);
             REMOVE_BIT(obj->extra_flags,ITEM_BLESS);
             return;
         }
         else
         {
-            act_p("Священная аура $o2 слишком могущественна для тебя.",
+            oldact_p("Священная аура $o2 слишком могущественна для тебя.",
                    ch,obj,0,TO_CHAR,POS_RESTING);
             return;
         }
@@ -258,7 +258,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(ITEM_EVIL);
     affect_to_obj( obj, &af);
 
-    act("Зловещая аура окружает $o4.",ch,obj,0,TO_ALL);
+    oldact("Зловещая аура окружает $o4.",ch,obj,0,TO_ALL);
 }
 
 VOID_SPELL(Curse)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -267,14 +267,14 @@ VOID_SPELL(Curse)::run( Character *ch, Character *victim, int sn, int level )
 
     if (IS_AFFECTED(victim,AFF_CURSE)) {
         if (ch == victim)
-            act("Ты уже прокля$gто|т|та.", ch, 0, 0, TO_CHAR);
+            oldact("Ты уже прокля$gто|т|та.", ch, 0, 0, TO_CHAR);
         else
-            act("$C1 уже прокля$Gто|т|та.", ch, 0, victim, TO_CHAR);
+            oldact("$C1 уже прокля$Gто|т|та.", ch, 0, victim, TO_CHAR);
         return;
     }
     
     if (saves_spell(level,victim,DAM_NEGATIVE,ch, DAMF_SPELL)) {
-      ch->send_to("Не получилось...\n\r");        
+      ch->pecho("Не получилось...");        
       return;
     }
     
@@ -292,9 +292,9 @@ VOID_SPELL(Curse)::run( Character *ch, Character *victim, int sn, int level )
     affect_to_char( victim, &af );
 
         if (victim == ch)
-          act("Ты чувствуешь себя проклят$gым|ым|ой.", victim, 0, 0, TO_CHAR);
+          oldact("Ты чувствуешь себя проклят$gым|ым|ой.", victim, 0, 0, TO_CHAR);
         else
-          act( "$C1 выглядит проклят$Gым|ым|ой.", ch,0,victim,TO_CHAR);
+          oldact("$C1 выглядит проклят$Gым|ым|ой.", ch,0,victim,TO_CHAR);
 }
 
 SPELL_DECL(CursedLands);
@@ -304,12 +304,12 @@ VOID_SPELL(CursedLands)::run( Character *ch, Room *room, int sn, int level )
 
   if (IS_SET(room->room_flags, ROOM_LAW))
     {
-      ch->send_to("Божественные Силы покровительствуют этому месту.\n\r");
+      ch->pecho("Божественные Силы покровительствуют этому месту.");
       return;
     }
     if ( room->isAffected( sn ))
     {
-     ch->send_to("Это место уже проклято!\n\r");
+     ch->pecho("Это место уже проклято!");
      return;
     }
 
@@ -322,8 +322,8 @@ VOID_SPELL(CursedLands)::run( Character *ch, Room *room, int sn, int level )
     af.bitvector.setValue(AFF_ROOM_CURSE);
     room->affectTo( &af );
 
-    ch->send_to("Божественное благословение покинуло это место.\n\r");
-    act_p("Божественное благословение покинуло это место.\n\r",
+    ch->pecho("Божественное благословение покинуло это место.");
+    oldact_p("Божественное благословение покинуло это место.\n\r",
            ch,0,0,TO_ROOM,POS_RESTING);
 
 
@@ -332,7 +332,7 @@ VOID_SPELL(CursedLands)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(CursedLands);
 VOID_AFFECT(CursedLands)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act("{yАура проклятия повисла вокруг.{x",ch, 0, 0, TO_CHAR);
+     oldact("{yАура проклятия повисла вокруг.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(CursedLands)::toStream( ostringstream &buf, Affect *paf ) 
@@ -350,12 +350,12 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
 
         if (IS_SET(room->room_flags, ROOM_LAW))
         {
-                ch->send_to("Божественные Силы покровительствуют этому месту.\n\r");
+                ch->pecho("Божественные Силы покровительствуют этому месту.");
                 return;
         }
         if ( room->isAffected( sn ))
         {
-                ch->send_to("Эта комната уже наполнена смертельным ядом.\n\r");
+                ch->pecho("Эта комната уже наполнена смертельным ядом.");
                 return;
         }
 
@@ -369,8 +369,8 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
         af.sources.add(ch);
         room->affectTo( &af );
 
-        ch->send_to("Комната наполняется ядовитыми испарениями.\n\r");
-        act_p("Комната наполняется ядовитыми испарениями.\n\r",
+        ch->pecho("Комната наполняется ядовитыми испарениями.");
+        oldact_p("Комната наполняется ядовитыми испарениями.\n\r",
         ch,0,0,TO_ROOM,POS_RESTING);
 
 }
@@ -378,7 +378,7 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(DeadlyVenom);
 VOID_AFFECT(DeadlyVenom)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act("{yВ воздухе ощущаются ядовитые испарения.{x",ch, 0, 0, TO_CHAR);
+     oldact("{yВ воздухе ощущаются ядовитые испарения.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(DeadlyVenom)::toStream( ostringstream &buf, Affect *paf ) 
@@ -409,8 +409,8 @@ VOID_AFFECT(DeadlyVenom)::update( Room *room, Affect *paf )
                 && !is_safe_rspell(&af, vch)
                 && !IS_AFFECTED(vch,AFF_POISON) && number_bits(3) == 0)
         {
-            vch->send_to("Тебя подташнивает.\n\r");
-            act("$c1 {gзеленеет{x лицом.",vch,0,0,TO_ROOM);
+            vch->pecho("Тебя подташнивает.");
+            oldact("$c1 {gзеленеет{x лицом.",vch,0,0,TO_ROOM);
             affect_join(vch,&af);
         }
     }
@@ -425,8 +425,8 @@ VOID_SPELL(EnergyDrain)::run( Character *ch, Character *victim, int sn, int leve
 
     if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
     {
-        ch->send_to("Не получилось...\n\r");
-        victim->send_to("Твоя душа холодеет.\n\r");
+        ch->pecho("Не получилось...");
+        victim->pecho("Твоя душа холодеет.");
         return;
     }
 
@@ -443,8 +443,8 @@ VOID_SPELL(EnergyDrain)::run( Character *ch, Character *victim, int sn, int leve
         ch->hit                += dam;
     }
 
-    victim->send_to("Ты чувствуешь, как твоя жизнь уходит!\n\r");
-    ch->send_to("Ты безжалостно отбираешь жизнь!\n\r");
+    victim->pecho("Ты чувствуешь, как твоя жизнь уходит!");
+    ch->pecho("Ты безжалостно отбираешь жизнь!");
     damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
 }
 
@@ -456,12 +456,12 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
 
   if (IS_SET(room->room_flags, ROOM_LAW))
     {
-      ch->send_to("Божественные Силы покровительствуют этому месту.\n\r");
+      ch->pecho("Божественные Силы покровительствуют этому месту.");
       return;
     }
     if ( room->isAffected( sn ))
     {
-     ch->send_to("Летаргический туман уже окутал это место.\n\r");
+     ch->pecho("Летаргический туман уже окутал это место.");
      return;
     }
 
@@ -475,8 +475,8 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
     af.sources.add(ch);
     room->affectTo( &af );
 
-    ch->send_to("Клубящийся летаргический туман заполняет это место.\n\r");
-    act_p("Клубящийся летаргический туман заполняет это место.",
+    ch->pecho("Клубящийся летаргический туман заполняет это место.");
+    oldact_p("Клубящийся летаргический туман заполняет это место.",
            ch,0,0,TO_ROOM,POS_RESTING);
 
 
@@ -485,7 +485,7 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(LethargicMist);
 VOID_AFFECT(LethargicMist)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act("{yВ воздухе клубится летаргический туман.{x",ch, 0, 0, TO_CHAR);
+     oldact("{yВ воздухе клубится летаргический туман.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(LethargicMist)::toStream( ostringstream &buf, Affect *paf ) 
@@ -515,8 +515,8 @@ VOID_AFFECT(LethargicMist)::update( Room *room, Affect *paf )
                 && !is_safe_rspell(&af, vch)
                 && !IS_AFFECTED(vch,AFF_SLOW) && number_bits(3) == 0 )
         {
-            vch->send_to("Твои движения замедляются.\n\r");
-            act("Движения $c2 замедляются.",vch,0,0,TO_ROOM);
+            vch->pecho("Твои движения замедляются.");
+            oldact("Движения $c2 замедляются.",vch,0,0,TO_ROOM);
             affect_join(vch,&af);
         }
     }
@@ -533,9 +533,9 @@ VOID_SPELL(Plague)::run( Character *ch, Character *victim, int sn, int level )
         (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD)))
     {
         if (ch == victim)
-          ch->send_to("Ты чувствуешь легкую слабость, но это проходит.\n\r");
+          ch->pecho("Ты чувствуешь легкую слабость, но это проходит.");
         else
-          act_p("$C1 не восприимчи$Gво|в|ва к болезни.",
+          oldact_p("$C1 не восприимчи$Gво|в|ва к болезни.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -550,8 +550,8 @@ VOID_SPELL(Plague)::run( Character *ch, Character *victim, int sn, int level )
     af.sources.add(ch);
     affect_join(victim,&af);
 
-    victim->send_to("Ты кричишь от боли, когда кожа покрывается чумными язвами.\n\r");
-    act_p("$c1 кричит от боли, когда кожа покрывается чумными язвами.",
+    victim->pecho("Ты кричишь от боли, когда кожа покрывается чумными язвами.");
+    oldact_p("$c1 кричит от боли, когда кожа покрывается чумными язвами.",
            victim,0,0,TO_ROOM,POS_RESTING);
 
 }
@@ -565,10 +565,10 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
         
     DefaultAffectHandler::update( ch, paf );
 
-    act_p("$c1 бьется в агонии, когда чума охватывает всю $s кожу.",
+    oldact_p("$c1 бьется в агонии, когда чума охватывает всю $s кожу.",
           ch,0,0,TO_ROOM,POS_RESTING);
 
-    ch->send_to("Ты бьешься в агонии от чумы.\n\r");
+    ch->pecho("Ты бьешься в агонии от чумы.");
     
     if (paf->level <= 1) 
        return; 
@@ -587,8 +587,8 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
                 && !is_safe_rspell( &plague, vch )
                 && !IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(2) == 0)
         {
-            vch->send_to("Ты чувствуешь жар и легкие судороги.\n\r");
-            act_p("$c1 дрожит и выглядит очень больн$gым|ым|ой.",
+            vch->pecho("Ты чувствуешь жар и легкие судороги.");
+            oldact_p("$c1 дрожит и выглядит очень больн$gым|ым|ой.",
                   vch,0,0,TO_ROOM,POS_RESTING);
             affect_join(vch,&plague);
         }
@@ -636,7 +636,7 @@ VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf )
                 && number_bits(6) == 0)
         {
             vch->pecho( "Ты чувствуешь жар и лихорадку." );
-            act("$c1 дрожит и выглядит болезненно.",vch,0,0,TO_ROOM);
+            oldact("$c1 дрожит и выглядит болезненно.",vch,0,0,TO_ROOM);
             affect_join(vch,&plague);
         }
 }
@@ -653,12 +653,12 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
 
                 if (IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
                 {
-                        act("Ты не можешь отравить $o1.",ch,obj,0,TO_CHAR);
+                        oldact("Ты не можешь отравить $o1.",ch,obj,0,TO_CHAR);
                         return;
                 }
                 
                 obj->value3(obj->value3() | DRINK_POISONED);
-                act("Пары яда проникают в $o4.",ch,obj,0,TO_ALL);
+                oldact("Пары яда проникают в $o4.",ch,obj,0,TO_ALL);
                 return;
         }
 
@@ -675,13 +675,13 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
                         || IS_OBJ_STAT(obj,ITEM_BLESS)
                         || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
                 {
-                        act("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
+                        oldact("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
                         return;
                 }
 
                 if (IS_WEAPON_STAT(obj,WEAPON_POISON))
                 {
-                        act("Прикосновение $o2 уже ядовито.",ch,obj,0,TO_CHAR);
+                        oldact("Прикосновение $o2 уже ядовито.",ch,obj,0,TO_CHAR);
                         return;
                 }
 
@@ -694,11 +694,11 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
                 af.bitvector.setValue(WEAPON_POISON);
                 affect_to_obj( obj, &af);
 
-                act("Прикосновение $o2 становится ядовитым.",ch,obj,0,TO_ALL);
+                oldact("Прикосновение $o2 становится ядовитым.",ch,obj,0,TO_ALL);
                 return;
         }
 
-        act("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
+        oldact("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR);
 }
 
 VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -707,9 +707,9 @@ VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level )
         
         if ( saves_spell( level, victim,DAM_POISON,ch, DAMF_SPELL) )
         {
-                act_p("Кожа $c2 приобретает зеленоватый оттенок, но это сразу проходит.",
+                oldact_p("Кожа $c2 приобретает зеленоватый оттенок, но это сразу проходит.",
                         victim,0,0,TO_ROOM,POS_RESTING);
-                victim->send_to("Ты чувствуешь легкое отравление, но это сразу проходит.\n\r");
+                victim->pecho("Ты чувствуешь легкое отравление, но это сразу проходит.");
                 return;
         }
 
@@ -723,8 +723,8 @@ VOID_SPELL(Poison)::run( Character *ch, Character *victim, int sn, int level )
         af.sources.add(ch);
 
         affect_join( victim, &af );
-        victim->send_to("Ты чувствуешь себя очень болезненно.\n\r");
-        act("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM);
+        victim->pecho("Ты чувствуешь себя очень болезненно.");
+        oldact("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM);
 
 }
 
@@ -738,8 +738,8 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
     if (!IS_AFFECTED(ch, AFF_POISON) || IS_SLOW(ch))
         return;
 
-    act("$c1 дрожит и испытывает боль.", ch, 0, 0, TO_ROOM);
-    ch->send_to("Ты дрожишь и испытываешь боль.\n\r");
+    oldact("$c1 дрожит и испытывает боль.", ch, 0, 0, TO_ROOM);
+    ch->pecho("Ты дрожишь и испытываешь боль.");
     
     poison_damage = paf->level * number_range(1,5);
     
@@ -768,18 +768,18 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
             return;
         
         if (victim != ch)
-            act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
+            oldact("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
 
-        victim->send_to("Твои движения замедляются, но лишь на мгновение.\n\r");
+        victim->pecho("Твои движения замедляются, но лишь на мгновение.");
         return;
     }
 
         if (IS_AFFECTED(victim, AFF_SLOW))
     {
         if (victim == ch)
-          ch->send_to("Ты не можешь двигаться медленнее, чем сейчас!\n\r");
+          ch->pecho("Ты не можешь двигаться медленнее, чем сейчас!");
         else
-          act_p("$C1 не может двигаться медленнее, чем сейчас.",
+          oldact_p("$C1 не может двигаться медленнее, чем сейчас.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -788,8 +788,8 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     ||  IS_SET(victim->imm_flags,IMM_SPELL))
     {
         if (victim != ch)
-        act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
-        victim->send_to("Ты чувствуешь себя немного сонно, но это сразу проходит.\n\r");
+        oldact("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
+        victim->pecho("Ты чувствуешь себя немного сонно, но это сразу проходит.");
         return;
     }
 
@@ -801,8 +801,8 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = - max(2,level / 12);
     af.bitvector.setValue(AFF_SLOW);
     affect_to_char( victim, &af );
-    victim->send_to("Твои движения замедляются...\n\r");
-    act("Движения $c2 замедляются.",victim,0,0,TO_ROOM);
+    victim->pecho("Твои движения замедляются...");
+    oldact("Движения $c2 замедляются.",victim,0,0,TO_ROOM);
     return;
 
 }
@@ -815,17 +815,17 @@ VOID_SPELL(Weaken)::run( Character *ch, Character *victim, int sn, int level )
 
     if (saves_spell( level, victim,DAM_OTHER,ch, DAMF_SPELL) ) {
       if (ch == victim)
-          ch->send_to("Не получилось...\n\r");        
+          ch->pecho("Не получилось...");        
       else
-          act("У тебя не получилось ослабить $C4.", ch, 0, victim, TO_CHAR);
+          oldact("У тебя не получилось ослабить $C4.", ch, 0, victim, TO_CHAR);
       return;
     }
 
     if (victim->isAffected(sn )) {
         if (victim == ch)
-            act("Ты уже ослабле$gно|н|на.", ch, 0, 0, TO_CHAR);
+            oldact("Ты уже ослабле$gно|н|на.", ch, 0, 0, TO_CHAR);
         else
-            act("$C1 уже ослабле$Gно|н|на.", ch, 0, victim, TO_CHAR);
+            oldact("$C1 уже ослабле$Gно|н|на.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -837,8 +837,8 @@ VOID_SPELL(Weaken)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = -1 * (2 + level / 12);
     af.bitvector.setValue(AFF_WEAKEN);
     affect_to_char( victim, &af );
-    victim->send_to("Ты чувствуешь, как силы покидают тебя.\n\r");
-    act("$c1 слабеет на глазах.",victim,0,0,TO_ROOM);
+    victim->pecho("Ты чувствуешь, как силы покидают тебя.");
+    oldact("$c1 слабеет на глазах.",victim,0,0,TO_ROOM);
     return;
 
 }
@@ -850,12 +850,12 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
     int dam;
     
     if (!IS_EVIL(ch)) {
-        ch->send_to( "Эта сила недоступна тебе.\r\n" );
+        ch->pecho("Эта сила недоступна тебе.");
         return;
     }
     
-    act("$c1 произносит нечистые слова!", ch,0,0,TO_ROOM);
-    ch->send_to("Ты произносишь нечистые слова!\n\r");
+    oldact("$c1 произносит нечистые слова!", ch,0,0,TO_ROOM);
+    ch->pecho("Ты произносишь нечистые слова!");
 
         for(auto &it : ch->in_room->getPeople())
         {
@@ -899,13 +899,13 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
             af.bitvector.setValue(AFF_CURSE);
             affect_to_char( it, &af );
 
-            it->send_to("Ты чувствуешь себя отвратительно.\n\r");
+            it->pecho("Ты чувствуешь себя отвратительно.");
             
             if (ch != it)
-                act("$C1 выглядит отвратительно.",ch,0,it,TO_CHAR);
+                oldact("$C1 выглядит отвратительно.",ch,0,it,TO_CHAR);
         }
 
-        it->send_to("Дьявольская сила повергает тебя!\n\r");
+        it->pecho("Дьявольская сила повергает тебя!");
 
             if (ch->fighting != it && it->fighting != ch)
             yell_panic( ch, it );
@@ -925,7 +925,7 @@ VOID_SPELL(BlackFeeble)::run( Character *ch, Character *victim, int sn, int leve
     Affect af;
 
     if (ch->isAffected(sn )) {
-        ch->send_to("С тебя довольно.\n\r");
+        ch->pecho("С тебя довольно.");
         return;
     }
 
@@ -934,8 +934,8 @@ VOID_SPELL(BlackFeeble)::run( Character *ch, Character *victim, int sn, int leve
     af.duration  = number_fuzzy( level / 30 ) + 3;
     affect_to_char( ch, &af );
     
-    act( "Леденящий душу шепот проклятий окружает $c2, образуя защитную ауру.", ch, 0, 0, TO_ROOM);
-    ch->send_to("Шепот проклятий окружает тебя, образуя защитную ауру.\n\r");
+    oldact("Леденящий душу шепот проклятий окружает $c2, образуя защитную ауру.", ch, 0, 0, TO_ROOM);
+    ch->pecho("Шепот проклятий окружает тебя, образуя защитную ауру.");
 }
 
 SPELL_DECL(Corruption);
@@ -946,7 +946,7 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
 
     if (IS_AFFECTED(victim,AFF_CORRUPTION))
         {
-         act("$C1 уже гниет заживо.",ch,0,victim,TO_CHAR);
+         oldact("$C1 уже гниет заживо.",ch,0,victim,TO_CHAR);
          return;
         }
 
@@ -954,9 +954,9 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
         (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD)))
     {
         if (ch == victim)
-            act("Ты на мгновение почувствова$gло|л|ла себя болезненно.", ch, 0, 0, TO_CHAR);
+            oldact("Ты на мгновение почувствова$gло|л|ла себя болезненно.", ch, 0, 0, TO_CHAR);
         else
-          act("$C1 кажется не подвластн$Gым|ым|ой разложению.",ch,0,victim,TO_CHAR);
+          oldact("$C1 кажется не подвластн$Gым|ым|ой разложению.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -969,6 +969,6 @@ VOID_SPELL(Corruption)::run( Character *ch, Character *victim, int sn, int level
     af.sources.add(ch);
     affect_join(victim,&af);
     
-    act("Ты вскрикиваешь в муках, начиная гнить заживо.", victim, 0, 0, TO_CHAR);
-    act("$c1 вскрикивает в муках, начиная гнить заживо.", victim, 0, 0, TO_ROOM);
+    oldact("Ты вскрикиваешь в муках, начиная гнить заживо.", victim, 0, 0, TO_CHAR);
+    oldact("$c1 вскрикивает в муках, начиная гнить заживо.", victim, 0, 0, TO_ROOM);
 }

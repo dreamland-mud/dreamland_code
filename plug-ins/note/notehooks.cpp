@@ -108,7 +108,7 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
             }
         }
         
-        act_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
+        oldact_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
     }
 }
 

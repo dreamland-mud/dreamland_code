@@ -27,13 +27,13 @@ COMMAND(Lover, "lover")
     DLString cmd = arguments.getOneArgument( );
     
     if (ch->is_npc()) {
-        ch->send_to("Тебе нельзя.\n\r");
+        ch->pecho("Тебе нельзя.");
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        act("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
-        act("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
+        oldact("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR);  
+        oldact("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT);
         return;
     }
     

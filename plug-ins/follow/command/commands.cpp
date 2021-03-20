@@ -67,17 +67,17 @@ CMDRUN( follow )
     arg = arguments.getOneArgument( );
 
     if (arg.empty( )) {
-        ch->send_to( "Следовать за кем?\n\r");
+        ch->pecho("Следовать за кем?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 ) {
-        ch->send_to( "Ты не находишь этого здесь.\n\r");
+        ch->pecho("Ты не находишь этого здесь.");
         return;
     }
 
     if ( IS_CHARMED(ch)) {
-        act( "Но тебе хочется следовать за $C5!", ch, 0, ch->master, TO_CHAR);
+        oldact("Но тебе хочется следовать за $C5!", ch, 0, ch->master, TO_CHAR);
         return;
     }
 
@@ -85,7 +85,7 @@ CMDRUN( follow )
     {
         if ( ch->master == 0 )
         {
-            ch->send_to( "Ты уже следуешь за собой.\n\r");
+            ch->pecho("Ты уже следуешь за собой.");
             return;
         }
         ch->stop_follower();
@@ -93,7 +93,7 @@ CMDRUN( follow )
     }
     
     if (!check_mutual_induct( ch, victim, clan_battlerager )) {
-        act("Ты не сможешь следовать за $C5.", ch, 0, victim, TO_CHAR);
+        oldact("Ты не сможешь следовать за $C5.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -101,7 +101,7 @@ CMDRUN( follow )
         IS_SET( victim->act, PLR_NOFOLLOW ) &&
         !ch->is_immortal() ) 
     {
-        act_p("$C1 не желает ходить с кем-либо.\n\r",
+        oldact_p("$C1 не желает ходить с кем-либо.\n\r",
              ch,0,victim, TO_CHAR,POS_RESTING);
         return;
     }
@@ -152,7 +152,7 @@ CMDRUN( group )
 
     if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 )
     {
-        ch->send_to( "Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
@@ -163,22 +163,22 @@ CMDRUN( group )
 
     if ( ch->master != 0 || ( ch->leader != 0 && ch->leader != ch ) )
     {
-        ch->send_to( "Но ты следуешь за кем-то еще!\n\r");
+        ch->pecho("Но ты следуешь за кем-то еще!");
         return;
     }
 
     if (victim->master != ch) {
-        act( "$C1 не следует за тобой.", ch, 0, victim, TO_CHAR);
+        oldact("$C1 не следует за тобой.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if (IS_CHARMED(victim)) {
-        ch->send_to("Ты не можешь исключить очарованных монстров из своей группы.\n\r");
+        ch->pecho("Ты не можешь исключить очарованных монстров из своей группы.");
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        act("Ты любишь своего мастера так сильно, что не можешь покинуть $s!",ch,0,victim,TO_VICT);
+        oldact("Ты любишь своего мастера так сильно, что не можешь покинуть $s!",ch,0,victim,TO_VICT);
         return;
     }
 
@@ -187,9 +187,9 @@ CMDRUN( group )
         guarding_nuke( ch, victim );
 
         victim->leader = 0;
-        act( "$c1 исключает $C4 из $s группы.",ch,0,victim,TO_NOTVICT);
-        act_p( "$c1 исключает тебя из $s группы.",ch,0,victim,TO_VICT,POS_SLEEPING);
-        act_p( "Ты исключаешь $C4 из своей группы.",ch,0,victim,TO_CHAR,POS_SLEEPING);
+        oldact("$c1 исключает $C4 из $s группы.",ch,0,victim,TO_NOTVICT);
+        oldact_p("$c1 исключает тебя из $s группы.",ch,0,victim,TO_VICT,POS_SLEEPING);
+        oldact_p("Ты исключаешь $C4 из своей группы.",ch,0,victim,TO_CHAR,POS_SLEEPING);
         
         guarding_assert( victim );
         return;
@@ -197,11 +197,11 @@ CMDRUN( group )
 
     if ( abs(ch->getModifyLevel() - victim->getModifyLevel()) > GROUP_RANGE)
     {
-        act_p( "$C1 не может присоединиться к группе $c2.",
+        oldact_p("$C1 не может присоединиться к группе $c2.",
                 ch,0,victim,TO_NOTVICT,POS_RESTING );
-        act_p( "Ты не можешь присоединиться к группе $c2.",
+        oldact_p("Ты не можешь присоединиться к группе $c2.",
                 ch,0,victim,TO_VICT,POS_SLEEPING );
-        act_p( "$C1 не может присоединиться к твоей группе.",
+        oldact_p("$C1 не может присоединиться к твоей группе.",
                 ch,0,victim,TO_CHAR,POS_SLEEPING );
         return;
     }
@@ -211,9 +211,9 @@ CMDRUN( group )
         && ( ch->getClan() != victim->getClan()
              || ch->getClan( )->isDispersed( ) ))
     {
-        act_p("Ты слишком пло$Gхое|хой|хая для группы $c2.", ch, 0, victim,
+        oldact_p("Ты слишком пло$Gхое|хой|хая для группы $c2.", ch, 0, victim,
                 TO_VICT,POS_SLEEPING);
-        act_p("$C1 слишком пло$Gхое|хой|хая для твоей группы!", ch, 0, victim,
+        oldact_p("$C1 слишком пло$Gхое|хой|хая для твоей группы!", ch, 0, victim,
                 TO_CHAR,POS_SLEEPING);
         return;
     }
@@ -223,9 +223,9 @@ CMDRUN( group )
             && ( ch->getClan() != victim->getClan()
                     || ch->getClan()->isDispersed( ) ) )
     {
-        act_p("Ты слишком хоро$Gшее|ший|шая для группы $c2!", ch, 0, victim,
+        oldact_p("Ты слишком хоро$Gшее|ший|шая для группы $c2!", ch, 0, victim,
                 TO_VICT,POS_SLEEPING);
-        act_p("$C1 слишком хоро$Gшее|ший|шая для твоей группы!", ch, 0, victim,
+        oldact_p("$C1 слишком хоро$Gшее|ший|шая для твоей группы!", ch, 0, victim,
                 TO_CHAR,POS_SLEEPING);
         return;
     }
@@ -234,23 +234,23 @@ CMDRUN( group )
         && (ch->getClan( )->isEnemy( *victim->getClan( ) )
             || victim->getClan( )->isEnemy( *ch->getClan( ) )))
     {
-        act_p("Ты же ненавидишь клан $c2, как ты можешь присоединиться к $s группе?!", ch,
+        oldact_p("Ты же ненавидишь клан $c2, как ты можешь присоединиться к $s группе?!", ch,
                 0, victim,TO_VICT,POS_SLEEPING);
-        act_p("Ты же ненавидишь клан $C2, как ты можешь предлагать $M присоединиться к твоей группе?!",
+        oldact_p("Ты же ненавидишь клан $C2, как ты можешь предлагать $M присоединиться к твоей группе?!",
                 ch, 0, victim, TO_CHAR,POS_SLEEPING);
         return;
     }
 
     if (!check_mutual_induct( ch, victim, clan_battlerager )) {
-        act_p("Ты не сможешь вступить в группу $C2.", ch, 0, victim, TO_VICT, POS_SLEEPING);
-        act("$C1 не сможет вступить в твою группу.", ch, 0, victim, TO_CHAR);
+        oldact_p("Ты не сможешь вступить в группу $C2.", ch, 0, victim, TO_VICT, POS_SLEEPING);
+        oldact("$C1 не сможет вступить в твою группу.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     victim->leader = ch;
-    act( "$C1 присоединил$Gось|ся|ась к группе $c2.", ch, 0, victim,TO_NOTVICT);
-    act_p( "Ты присоединил$Gось|ся|ась к группе $c2.", ch, 0, victim,TO_VICT, POS_SLEEPING);
-    act_p( "$C1 присоединил$Gось|ся|ась к твоей группе.", ch, 0, victim, TO_CHAR, POS_SLEEPING);
+    oldact("$C1 присоединил$Gось|ся|ась к группе $c2.", ch, 0, victim,TO_NOTVICT);
+    oldact_p("Ты присоединил$Gось|ся|ась к группе $c2.", ch, 0, victim,TO_VICT, POS_SLEEPING);
+    oldact_p("$C1 присоединил$Gось|ся|ась к твоей группе.", ch, 0, victim, TO_CHAR, POS_SLEEPING);
 }
 
 
@@ -282,9 +282,9 @@ CMDRUN( nuke )
         guarding_assert( victim );
     }
     
-    act( "$c1 исключает $C4 из числа $s последователей.",ch,0,victim,TO_NOTVICT);
-    act_p( "$c1 исключает тебя из числа $s последователей.",ch,0,victim,TO_VICT,POS_SLEEPING);
-    act_p( "Ты исключаешь $C4 из числа твоих последователей.",ch,0,victim,TO_CHAR,POS_SLEEPING);
+    oldact("$c1 исключает $C4 из числа $s последователей.",ch,0,victim,TO_NOTVICT);
+    oldact_p("$c1 исключает тебя из числа $s последователей.",ch,0,victim,TO_VICT,POS_SLEEPING);
+    oldact_p("Ты исключаешь $C4 из числа твоих последователей.",ch,0,victim,TO_CHAR,POS_SLEEPING);
     victim->stop_follower( );
 }
 
@@ -308,7 +308,7 @@ CMDRUN( split )
 
     if (arg1.empty( ))
     {
-        ch->send_to( "Разделить? Сколько?\n\r");
+        ch->pecho("Разделить? Сколько?");
         return;
     }
 
@@ -319,19 +319,19 @@ CMDRUN( split )
 
     if ( amount_gold < 0 || amount_silver < 0)
     {
-        ch->send_to( "Твоей группе это не понравится.\n\r");
+        ch->pecho("Твоей группе это не понравится.");
         return;
     }
 
     if ( amount_gold == 0 && amount_silver == 0 )
     {
-        ch->send_to( "Ты не взял ни одной монеты, но никому об этом не сказал.\n\r");
+        ch->pecho("Ты не взял ни одной монеты, но никому об этом не сказал.");
         return;
     }
 
     if ( ch->gold <  amount_gold || ch->silver < amount_silver)
     {
-        ch->send_to( "У тебя нет столько, чтоб поделиться.\n\r");
+        ch->pecho("У тебя нет столько, чтоб поделиться.");
         return;
     }
 
@@ -344,7 +344,7 @@ CMDRUN( split )
 
     if ( members < 2 )
     {
-        ch->send_to( "Можешь забрать себе все.\n\r");
+        ch->pecho("Можешь забрать себе все.");
         return;
     }
         
@@ -356,7 +356,7 @@ CMDRUN( split )
 
     if ( share_gold == 0 && share_silver == 0 )
     {
-         ch->send_to( "Очень мудро.\n\r");
+         ch->pecho("Очень мудро.");
         return;
     }
 
@@ -413,7 +413,7 @@ CMDRUN( split )
     {
         if ( gch != ch && is_same_group(gch,ch) && !IS_CHARMED(gch))
         {
-            act( buf, ch, 0, gch, TO_VICT);
+            oldact( buf, ch, 0, gch, TO_VICT);
             gch->gold += share_gold;
             gch->silver += share_silver;
         }
@@ -427,18 +427,18 @@ CMDRUN( nofollow )
         return;
 
     if ( IS_CHARMED(ch) )  {
-        ch->send_to( "Ты не можешь покинуть своего повелителя.\n\r");
+        ch->pecho("Ты не можешь покинуть своего повелителя.");
         return;
     }
 
     if (IS_SET(ch->act,PLR_NOFOLLOW))
     {
-      ch->send_to("Теперь ты разрешаешь следовать за собой.\n\r");
+      ch->pecho("Теперь ты разрешаешь следовать за собой.");
       REMOVE_BIT(ch->act,PLR_NOFOLLOW);
     }
     else
     {
-      ch->send_to("Теперь ты не разрешаешь следовать за собой.\n\r");
+      ch->pecho("Теперь ты не разрешаешь следовать за собой.");
       SET_BIT(ch->act,PLR_NOFOLLOW);
       ch->die_follower( );
     }

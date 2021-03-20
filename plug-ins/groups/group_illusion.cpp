@@ -44,20 +44,20 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if ((victim->getProfession( ) == prof_samurai) && ( victim->getModifyLevel() >=10) ) {
-         act("Это заклинание не может причинить вреда твоему противнику.", ch, 0, 0, TO_CHAR);
+         oldact("Это заклинание не может причинить вреда твоему противнику.", ch, 0, 0, TO_CHAR);
          return;
     }
 
     if (victim->isAffected(gsn_fear)) {
         if (ch == victim)
-            act("Ты и так дрожишь от страха.", ch, 0, 0, TO_CHAR);
+            oldact("Ты и так дрожишь от страха.", ch, 0, 0, TO_CHAR);
         else
-            act("$C1 уже дрожит от страха.", ch, 0, victim, TO_CHAR);
+            oldact("$C1 уже дрожит от страха.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if (saves_spell( level, victim,DAM_OTHER, ch, DAMF_MAGIC)) {
-        act("Тебе не удалось запугать $C4...", ch, 0, victim, TO_CHAR); 
+        oldact("Тебе не удалось запугать $C4...", ch, 0, victim, TO_CHAR); 
         return;
     }
 
@@ -69,8 +69,8 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = 0;
     af.bitvector.setValue(ADET_FEAR);
     affect_to_char( victim, &af );
-    act("Ты дрожишь от страха.", victim, 0, 0, TO_CHAR);
-    act("$c1 дрожит от страха.", victim, 0, 0, TO_ROOM);
+    oldact("Ты дрожишь от страха.", victim, 0, 0, TO_CHAR);
+    oldact("$c1 дрожит от страха.", victim, 0, 0, TO_ROOM);
 }
 
 SPELL_DECL(ImprovedInvis);
@@ -79,7 +79,7 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
     Affect af;
 
     if ( IS_AFFECTED(ch, AFF_IMP_INVIS) ) {
-        ch->send_to("Тебя уже и так совсем не видно.\r\n");
+        ch->pecho("Тебя уже и так совсем не видно.");
         return;
     }
 
@@ -88,7 +88,7 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
         return;
     }
 
-    act_p("$c1 становится совсем невидим$gым|ым|ой.",
+    oldact_p("$c1 становится совсем невидим$gым|ым|ой.",
            ch, 0, 0, TO_ROOM,POS_RESTING);
 
     af.bitvector.setTable(&affect_flags);
@@ -99,7 +99,7 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
     af.bitvector.setValue(AFF_IMP_INVIS);
     affect_to_char( ch, &af );
 
-    act("Ты становишься совсем невидим$gым|ым|ой.", ch, 0, 0, TO_CHAR);
+    oldact("Ты становишься совсем невидим$gым|ым|ой.", ch, 0, 0, TO_CHAR);
 }
 
 
@@ -130,13 +130,13 @@ VOID_SPELL(Invisibility)::run( Character *ch, Character *victim, int sn, int lev
 
     if ( IS_AFFECTED(victim, AFF_INVISIBLE) ) {
         if (victim == ch)
-            ch->send_to("Тебя уже и так не видно.\r\n");
+            ch->pecho("Тебя уже и так не видно.");
         else
-            act("$C1 уже и так невиди$Gмо|м|ма.", ch, 0, victim, TO_CHAR);
+            oldact("$C1 уже и так невиди$Gмо|м|ма.", ch, 0, victim, TO_CHAR);
         return;
     }
 
-    act_p("$c1 становится невидим$gым|ым|ой.",
+    oldact_p("$c1 становится невидим$gым|ым|ой.",
            victim, 0, 0, TO_ROOM,POS_RESTING);
 
     af.bitvector.setTable(&affect_flags);
@@ -147,7 +147,7 @@ VOID_SPELL(Invisibility)::run( Character *ch, Character *victim, int sn, int lev
     af.bitvector.setValue(AFF_INVISIBLE);
     affect_to_char( victim, &af );
 
-    act("Ты становишься невидим$gым|ым|ой.", victim, 0, 0, TO_CHAR);
+    oldact("Ты становишься невидим$gым|ым|ой.", victim, 0, 0, TO_CHAR);
 }
 
 
@@ -165,8 +165,8 @@ VOID_SPELL(MassInvis)::run( Character *ch, Room *room, int sn, int level )
         if (spellbane( ch, gch ))
             continue;
 
-        act("$c1 становится невидим$gым|ым|ой.", gch, 0, 0, TO_ROOM);
-        act("Ты становишься невидим$gым|ым|ой.", gch, 0, 0, TO_CHAR);
+        oldact("$c1 становится невидим$gым|ым|ой.", gch, 0, 0, TO_ROOM);
+        oldact("Ты становишься невидим$gым|ым|ой.", gch, 0, 0, TO_CHAR);
 
         af.bitvector.setTable(&affect_flags);
         af.type      = sn;
@@ -176,6 +176,6 @@ VOID_SPELL(MassInvis)::run( Character *ch, Room *room, int sn, int level )
         af.bitvector.setValue(AFF_INVISIBLE);
         affect_to_char( gch, &af );
     }
-    ch->send_to("Ok.\n\r");
+    ch->pecho("Ok.");
 }
 

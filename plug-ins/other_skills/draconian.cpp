@@ -24,7 +24,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
 
   if (ch->isAffected(sn))
     {
-      ch->send_to("Сила Дракона уже переполняет тебя.\n\r");
+      ch->pecho("Сила Дракона уже переполняет тебя.");
       return;
     }
 
@@ -52,8 +52,8 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
   af.location = APPLY_DEX;
   affect_to_char(ch, &af);
 
-  ch->send_to("Сила Дракона пронизывает тебя.\n\r");
-  act("$c1 становится сильнее.", ch, 0, 0, TO_ROOM);
+  ch->pecho("Сила Дракона пронизывает тебя.");
+  oldact("$c1 становится сильнее.", ch, 0, 0, TO_ROOM);
 
 }
 
@@ -66,10 +66,10 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
     
     int dam,hp_dam,dice_dam,hpch;
 
-    act("$c1 брызгает кислотой на $C4.",ch,0,victim,TO_NOTVICT);
-    act_p("$c1 брызгает струей едкой кислоты на тебя.",
+    oldact("$c1 брызгает кислотой на $C4.",ch,0,victim,TO_NOTVICT);
+    oldact_p("$c1 брызгает струей едкой кислоты на тебя.",
            ch,0,victim,TO_VICT,POS_RESTING);
-    act("Ты брызгаешь кислотой на $C4.",ch,0,victim,TO_CHAR);
+    oldact("Ты брызгаешь кислотой на $C4.",ch,0,victim,TO_CHAR);
 
     hpch = max(12,(int)ch->hit);
     hp_dam = number_range(hpch/11 + 1, hpch/6);
@@ -99,9 +99,9 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
     int dam,hp_dam,dice_dam;
     int hpch;
     
-    act("$c1 выдыхает воронку бушующего огня.", ch,0,victim,TO_NOTVICT);
-    act("$c1 выдыхает на тебя воронку бушующего огня!", ch,0,victim,TO_VICT);
-    act("Ты выдыхаешь воронку бушующего огня.", ch,0,0,TO_CHAR);
+    oldact("$c1 выдыхает воронку бушующего огня.", ch,0,victim,TO_NOTVICT);
+    oldact("$c1 выдыхает на тебя воронку бушующего огня!", ch,0,victim,TO_VICT);
+    oldact("Ты выдыхаешь воронку бушующего огня.", ch,0,0,TO_CHAR);
 
     hpch = max( 10, (int)ch->hit );
     hp_dam  = number_range( hpch/9+1, hpch/5 );
@@ -172,9 +172,9 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
     
     int dam,hp_dam,dice_dam, hpch;
     
-    act("$c1 выдыхает леденящую воронку инея!", ch, 0, victim, TO_NOTVICT);
-    act("$c1 выдыхает на тебя леденящую воронку инея!", ch, 0, victim, TO_VICT);
-    act("Ты выдыхаешь воронку инея.", ch, 0, victim, TO_CHAR);
+    oldact("$c1 выдыхает леденящую воронку инея!", ch, 0, victim, TO_NOTVICT);
+    oldact("$c1 выдыхает на тебя леденящую воронку инея!", ch, 0, victim, TO_VICT);
+    oldact("Ты выдыхаешь воронку инея.", ch, 0, victim, TO_CHAR);
 
     hpch = max(12,(int)ch->hit);
     hp_dam = number_range(hpch/11 + 1, hpch/6);
@@ -246,8 +246,8 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
 
     int dam,hp_dam,dice_dam,hpch;
 
-    act("$c1 выдыхает воронку ядовитого газа!", ch, 0, 0, TO_ROOM);
-    act("Ты выдыхаешь воронку ядовитого газа.", ch, 0, 0, TO_CHAR);
+    oldact("$c1 выдыхает воронку ядовитого газа!", ch, 0, 0, TO_ROOM);
+    oldact("Ты выдыхаешь воронку ядовитого газа.", ch, 0, 0, TO_CHAR);
 
     hpch = max(16,(int)ch->hit);
     hp_dam = number_range(hpch/15+1,8);
@@ -302,9 +302,9 @@ VOID_SPELL(LightningBreath)::run( Character *ch, Character *victim, int sn, int 
 { 
     int dam,hp_dam,dice_dam,hpch;
 
-    act("Выдох $c2 ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_NOTVICT);
-    act("Выдох $c2 ударяет по тебе разрядом молнии!", ch, 0, victim, TO_VICT);
-    act("Твой выдох ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_CHAR);
+    oldact("Выдох $c2 ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_NOTVICT);
+    oldact("Выдох $c2 ударяет по тебе разрядом молнии!", ch, 0, victim, TO_VICT);
+    oldact("Твой выдох ударяет по $C3 разрядом молнии.", ch, 0, victim, TO_CHAR);
 
     hpch = max(10,(int)ch->hit);
     hp_dam = number_range(hpch/9+1,hpch/5);

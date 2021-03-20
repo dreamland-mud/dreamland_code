@@ -167,10 +167,10 @@ void Gangsters::cleanup( bool performance )
             
         if (performance) {
             if (ch->position >= POS_RESTING) 
-                act("$c1 произносит '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM);
+                oldact("$c1 произносит '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM);
             
             if (ch->position >= POS_MORTAL)        
-                act("$c1 исчезает в клубе дыма.", ch, 0, 0, TO_ROOM);
+                oldact("$c1 исчезает в клубе дыма.", ch, 0, 0, TO_ROOM);
         }
         
         extract_char( ch );

@@ -913,14 +913,14 @@ static void show_char_description( Character *ch, Character *vict )
                                     pcRace->getMaleName( ).c_str( ),
                                     pcRace->getFemaleName( ).c_str( ));
         if (ch == vict)
-            act( "Ты выглядишь как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+            oldact("Ты выглядишь как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
         else
-            act( "$E выглядит как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+            oldact("$E выглядит как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
 
         return;
     }
     
-    act( "Ты не видишь ничего особенного в $Z.", ch, 0, vict, TO_CHAR );
+    oldact("Ты не видишь ничего особенного в $Z.", ch, 0, vict, TO_CHAR );
 }
 
 static void show_char_sexrace( Character *ch, Character *vict, ostringstream &buf )
@@ -987,7 +987,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     }
 
     if (!naked) {
-        act( "\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
+        oldact("\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
         ch->send_to( buf );
     }
             
@@ -1374,11 +1374,11 @@ static void do_look_character( Character *ch, Character *victim )
 {
     if (victim->can_see( ch )) {
         if (ch == victim)
-            act( "$c1 смотрит на себя.",ch,0,0,TO_ROOM);
+            oldact("$c1 смотрит на себя.",ch,0,0,TO_ROOM);
         else
         {
-            act( "$c1 смотрит на тебя.", ch, 0, victim, TO_VICT);
-            act( "$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT);
+            oldact("$c1 смотрит на тебя.", ch, 0, victim, TO_VICT);
+            oldact("$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT);
         }
     }
 
@@ -1405,15 +1405,15 @@ static bool do_look_direction( Character *ch, const char *arg1 )
 
     if ( pexit->description != 0 && pexit->description[0] != '\0' ) {
             ch->send_to( pexit->description);
-            ch->send_to( "\r\n" );
+            ch->pecho("");
     }
     else
             ch->pecho( "Здесь нет ничего особенного." );
 
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
-        act("$N1: тут закрыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+        oldact("$N1: тут закрыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
     else if ( IS_SET(pexit->exit_info, EX_ISDOOR) )
-        act("$N1: тут открыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+        oldact("$N1: тут открыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
     
     DoorKeyhole( ch, ch->in_room, door ).doExamine( );
     return true;
@@ -1637,11 +1637,11 @@ CMDRUNP( examine )
         if ( victim->can_see( ch ) )
         {
             if (ch == victim)
-                act( "$c1 осматривает себя.",ch,0,0,TO_ROOM);
+                oldact("$c1 осматривает себя.",ch,0,0,TO_ROOM);
             else
             {
-                act( "$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
-                act( "$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT);
+                oldact("$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
+                oldact("$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT);
             }
         }
 
@@ -1769,14 +1769,14 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
 static bool oprog_examine_corpse( Object *obj, Character *ch, const DLString & )
 {
-    act( "На $o6 ты видишь:", ch, obj, 0, TO_CHAR );
+    oldact("На $o6 ты видишь:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
 
 static bool oprog_examine_keyring( Object *obj, Character *ch, const DLString & )
 {
-    act( "На $o4 нанизано:", ch, obj, 0, TO_CHAR );
+    oldact("На $o4 нанизано:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
@@ -1882,7 +1882,7 @@ CMDRUNP( exits )
     int door;
 
     if (eyes_blinded( ch )) {
-        act( "Ты ослепле$gно|н|на и не видишь ничего вокруг себя!", ch, 0, 0, TO_CHAR );
+        oldact("Ты ослепле$gно|н|на и не видишь ничего вокруг себя!", ch, 0, 0, TO_CHAR );
         return;
     }
 

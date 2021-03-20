@@ -51,7 +51,7 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
 
     if (!buf.str( ).empty( )) {
         if (!fVerbose)
-            ch->send_to( "\r\n" );
+            ch->pecho("");
         ch->send_to( buf );
     }
     else if (fVerbose)

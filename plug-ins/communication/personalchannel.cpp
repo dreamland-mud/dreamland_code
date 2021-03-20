@@ -51,7 +51,7 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
 bool PersonalChannel::checkIgnore( Character *ch, Character *victim ) const
 {
     if (CommunicationChannel::checkIgnore( ch, victim )) {
-        act_p( "$E не желает тебя слышать.", ch, 0, victim, TO_CHAR, position );
+        oldact_p("$E не желает тебя слышать.", ch, 0, victim, TO_CHAR, position );
         return true;
     }
 
@@ -64,16 +64,16 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
         return false;
    
     if (victim->is_npc( ) || !victim->getPC( )->getAttributes( ).isAvailable( "afk" ))
-        act_p( "$C1 отсутствует и не может сейчас получить твое сообщение.", 
+        oldact_p("$C1 отсутствует и не может сейчас получить твое сообщение.", 
                 ch, 0, victim, TO_CHAR, position );
     else
-        act_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", 
+        oldact_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", 
                 ch, 
                 victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
                                     "afk" )->getValue( ).c_str( ), 
                 victim, TO_CHAR, position );
 
-    act_p( "Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
+    oldact_p("Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -86,11 +86,11 @@ bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DL
         return false;
 
     if (victim->is_npc( )) {
-        act_p("$E сейчас сражается и не может получить твое сообщение.",ch,0,victim,TO_CHAR,position);
+        oldact_p("$E сейчас сражается и не может получить твое сообщение.",ch,0,victim,TO_CHAR,position);
         return true;
     }
     
-    act_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
+    oldact_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
             ch,0,victim,TO_CHAR,position);
     return true;
 }
@@ -103,7 +103,7 @@ bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const D
     if (victim->desc)
         return false;
 
-    act_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.",
+    oldact_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.",
             ch,0,victim,TO_CHAR,position);
     return true;
 }
@@ -116,7 +116,7 @@ bool PersonalChannel::checkPosition( Character *ch, Character *victim ) const
     if (positionOther <= victim->position)
         return false;
     
-    act_p( "$E не слышит тебя, попробуй позже.", ch, 0, victim, TO_CHAR, position );
+    oldact_p("$E не слышит тебя, попробуй позже.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -127,7 +127,7 @@ bool PersonalChannel::checkVictimDeaf( Character *ch, Character *victim ) const
 
     if (IS_SET(victim->comm, COMM_QUIET) || IS_SET(victim->comm, COMM_DEAF))
     {
-        act_p( "Твое сообщение не дошло $M.", ch, 0, victim, TO_CHAR, position );
+        oldact_p("Твое сообщение не дошло $M.", ch, 0, victim, TO_CHAR, position );
         return true;
     }
 

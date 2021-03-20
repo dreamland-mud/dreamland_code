@@ -301,9 +301,9 @@ bool ClanGuard::checkGhost( PCharacter *wch )
 {
     if (IS_SLAIN( wch ) || IS_DEATH_TIME( wch )) {
         actGhost( wch );
-        act( "Ты хладнокровно убивает $C4!", ch, 0, wch, TO_CHAR );
-        act( "$c1 хладнокровно убивает тебя!", ch, 0, wch, TO_VICT );
-        act( "$c1 хладнокровно убивает $C4!", ch, 0, wch, TO_NOTVICT );
+        oldact("Ты хладнокровно убивает $C4!", ch, 0, wch, TO_CHAR );
+        oldact("$c1 хладнокровно убивает тебя!", ch, 0, wch, TO_VICT );
+        oldact("$c1 хладнокровно убивает $C4!", ch, 0, wch, TO_NOTVICT );
         raw_kill( wch, -1, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
         return true;
     }
@@ -381,8 +381,8 @@ void ClanGuard::speech( Character *wch, const char *speech )
 
             obj = create_object(get_obj_index(clanArea->keyVnum), 0);
             obj->timer = 120;
-            act( "$c1 снимает с шеи $o4.", ch, obj, 0, TO_ROOM );
-            act( "Ты снимаешь с шеи $o4.", ch, obj, 0, TO_CHAR );
+            oldact("$c1 снимает с шеи $o4.", ch, obj, 0, TO_ROOM );
+            oldact("Ты снимаешь с шеи $o4.", ch, obj, 0, TO_CHAR );
         }
     }
     else if (!str_cmp( speech, "I need invitation" ) || !str_cmp(speech, "Мне нужно приглашение")) {
@@ -414,16 +414,16 @@ void ClanGuard::speech( Character *wch, const char *speech )
     }
 
     if (obj) {
-        act( "$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
-        act( "$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
+        oldact("$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
+        oldact("$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
         obj_to_char(obj, wch);
     }
 }
 
 void ClanGuard::actGiveInvitation( PCharacter *wch, Object *obj )
 {
-    act( "$c1 пишет на $o6.", ch, obj, 0, TO_ROOM );
-    act( "Ты пишешь на $o6.", ch, obj, 0, TO_CHAR );
+    oldact("$c1 пишет на $o6.", ch, obj, 0, TO_ROOM );
+    oldact("Ты пишешь на $o6.", ch, obj, 0, TO_CHAR );
 }
 
 /*--------------------------------------------------------------------------

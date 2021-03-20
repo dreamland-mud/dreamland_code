@@ -74,7 +74,7 @@ bool SocialBase::dispatch( const InterpretArguments &iargs )
         }
 
         if (IS_SET( ch->comm, COMM_AFK )) {
-            ch->send_to( "Выйди сначала из {WAFK{x\n\r" );
+            ch->pecho("Выйди сначала из {WAFK{x");
             return false;
         }
     }
@@ -184,19 +184,19 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
 
     switch (rc) {
         case RC_NOARG:  // вызов без параметров
-            act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-            act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            oldact( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
+            oldact_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
             break;
     
         case RC_SELF: // применение социала на себя, в т.ч. если оба аргумента - тоже я
-            act( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-            act_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            oldact( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
+            oldact_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
             break;
 
         case RC_VICT: // применение социала на жертву, в т.ч. если оба аргумента - одна и та же жертва
-            act( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
-            act_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
-            act( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
+            oldact( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
+            oldact_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            oldact( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
             break;
 
         case RC_VICT_NOT_FOUND: // не найдет персонаж или предмет по первому аргументу
@@ -243,7 +243,7 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
     bool reacted = reaction( ch, victim, firstArgument );
     if (!reacted && rc == RC_VICT_NOT_FOUND) {
         if (!getErrorMsg( ).empty( ))
-            act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
+            oldact_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
         else
             ch->pecho("Нет этого здесь.");
         return;
@@ -260,32 +260,32 @@ bool SocialBase::checkPosition( Character *ch )
 
     switch (ch->position.getValue( )) {
     case POS_DEAD:
-        ch->send_to("Лежи смирно! Ты {RТРУП{x.\n\r");
+        ch->pecho("Лежи смирно! Ты {RТРУП{x.");
         break;
 
     case POS_INCAP:
     case POS_MORTAL:
-        ch->send_to("Даже не думай об этом! Ты в ужасном состоянии.\n\r");
+        ch->pecho("Даже не думай об этом! Ты в ужасном состоянии.");
         break;
 
     case POS_STUNNED:
-        ch->send_to("Ты не в состоянии сделать это.\n\r");
+        ch->pecho("Ты не в состоянии сделать это.");
         break;
 
     case POS_SLEEPING:
-        ch->send_to("Во сне? Или может сначала проснешься...\n\r");
+        ch->pecho("Во сне? Или может сначала проснешься...");
         break;
 
     case POS_RESTING:
-        ch->send_to( "Уфф... Но ведь ты отдыхаешь...\n\r" );
+        ch->pecho("Уфф... Но ведь ты отдыхаешь...");
         break;
 
     case POS_SITTING:
-        ch->send_to( "Сидя? Или может сначала встанешь...\n\r" );
+        ch->pecho("Сидя? Или может сначала встанешь...");
         break;
 
     case POS_FIGHTING:
-        act_p( "Тебе не до того, ты же сражаешься!", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+        oldact_p("Тебе не до того, ты же сражаешься!", ch, 0, 0, TO_CHAR, POS_FIGHTING );
         break;
     }
 
@@ -296,13 +296,13 @@ void SocialBase::visualize( Character *ch )
 {
     if (IS_AFFECTED( ch, AFF_HIDE|AFF_FADE ))  {
         REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
-        ch->send_to("Ты выходишь из тени.\n\r");
-        act( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
+        ch->pecho("Ты выходишь из тени.");
+        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
         affect_strip(ch,gsn_improved_invis);
-        act("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-        act("$c1 становится видим$gо|ым|ой для окружающих.\n\r", ch,0,0,TO_ROOM);
+        oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
+        oldact("$c1 становится видим$gо|ым|ой для окружающих.\n\r", ch,0,0,TO_ROOM);
     }
 }

@@ -62,24 +62,24 @@ void Koschey::msgListEmpty( Character *client )
 void Koschey::msgListAfter( Character *client )
 {
     tell_dim( client, ch, "Это все. Бери то, за чем приш$gло|ел|ла, и чтоб духу твоего здесь не было!" );
-    act( "$C1 что-то монотонно цедит сквозь зубы, обращаясь к $c4.", client, 0, ch, TO_NOTVICT );
+    oldact("$C1 что-то монотонно цедит сквозь зубы, обращаясь к $c4.", client, 0, ch, TO_NOTVICT );
 }
 
 void Koschey::msgListBefore( Character *client )
 {
-    act( "$C1 поднимает на тебя раздраженный взгляд.", client, 0, ch, TO_CHAR );
-    act( "$C1 поднимает на $c4 раздраженный взгляд.", client, 0, ch, TO_ROOM );
-    act( "$C1 скрипучим голосом произносит '{gВот какое счастье тебе привалило:{x'", client, 0, ch, TO_CHAR );
+    oldact("$C1 поднимает на тебя раздраженный взгляд.", client, 0, ch, TO_CHAR );
+    oldact("$C1 поднимает на $c4 раздраженный взгляд.", client, 0, ch, TO_ROOM );
+    oldact("$C1 скрипучим голосом произносит '{gВот какое счастье тебе привалило:{x'", client, 0, ch, TO_CHAR );
 }
 
 void Koschey::msgBuyRequest( Character *client )
 {
-    act( "$c1 торгуется с $C5.", client, 0, ch, TO_NOTVICT );
+    oldact("$c1 торгуется с $C5.", client, 0, ch, TO_NOTVICT );
 }
 
 void Koschey::msgArticleNotFound( Character *client )
 {
-    act( "$C1 в ярости восклицает '{g$c1, ты сюда шутки приш$gло|ел|ла шутить?!{x'", client, 0, ch, TO_ALL );
+    oldact("$C1 в ярости восклицает '{g$c1, ты сюда шутки приш$gло|ел|ла шутить?!{x'", client, 0, ch, TO_ALL );
 }
 
 /*

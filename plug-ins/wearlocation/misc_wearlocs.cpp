@@ -334,7 +334,7 @@ void WieldWearloc::reportWeaponSkill( Character *ch, Object *obj )
         else
             msg = "Ты пока не готов{Sfа{Sx как следует владеть $o5.{/Владение экзотическим оружием зависит от твоего опыта и интеллекта.";
     }
-    act( msg, ch, obj, 0, TO_CHAR );
+    oldact( msg, ch, obj, 0, TO_CHAR );
 }
 
 /*
@@ -411,7 +411,7 @@ int TattooWearloc::canWear( Character *ch, Object *obj, int flags )
 bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(flags, F_WEAR_VERBOSE))
-        act("Лишь Божественные Силы могут избавить тебя от $o2.", ch, obj, 0, TO_CHAR);
+        oldact("Лишь Божественные Силы могут избавить тебя от $o2.", ch, obj, 0, TO_CHAR);
 
     return false;
 }

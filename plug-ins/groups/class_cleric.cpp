@@ -30,7 +30,7 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-        ch->send_to("Эта комната уже полна энергетической силы.\n\r");
+        ch->pecho("Эта комната уже полна энергетической силы.");
         return;
     }
 
@@ -43,8 +43,8 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
     room->affectTo( &af );
 
     postaffect_to_char(ch, sn, level/10);
-    ch->send_to("Ты наполняешь воздух энергетической силой, заставляя его мерцать.\n\r");
-    act_p("$c1 наполняет воздух энергетической силой, заставляя его мерцать.",
+    ch->pecho("Ты наполняешь воздух энергетической силой, заставляя его мерцать.");
+    oldact_p("$c1 наполняет воздух энергетической силой, заставляя его мерцать.",
            ch,0,0,TO_ROOM,POS_RESTING);
 }
 

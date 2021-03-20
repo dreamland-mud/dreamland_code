@@ -72,8 +72,8 @@ static bool check_soap( Character *ch )
     if (!ch->getPC( )->getAttributes( ).isAvailable( soap )) 
         return false;
     
-    act("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
-    act("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
+    oldact("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
+    oldact("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -85,12 +85,12 @@ COMMAND(CClanTalk, "cb")
     DLString act_str;
 
     if (ch->getClan( ) == clan_none) {
-        ch->send_to("Ты не принадлежишь ни к одному Клану.\n\r");
+        ch->pecho("Ты не принадлежишь ни к одному Клану.");
         return;
     }
 
     if (!ch->getClan( )->hasChannel( )) {
-        ch->send_to("До тебя никому нет дела.\n\r");
+        ch->pecho("До тебя никому нет дела.");
         return;
     }
     

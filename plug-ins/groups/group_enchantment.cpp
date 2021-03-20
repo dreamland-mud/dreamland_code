@@ -46,7 +46,7 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
     Affect af;
 
     if (obj->item_type != ITEM_WEAPON) {
-        ch->send_to("Это не оружие.\n\r");
+        ch->pecho("Это не оружие.");
         return;
     }
 
@@ -99,20 +99,20 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->item_type != ITEM_ARMOR)
     {
-        ch->send_to("Это не доспехи.\n\r");
+        ch->pecho("Это не доспехи.");
         return;
     }
 
     if (obj->wear_loc != wear_none)
     {
-        ch->send_to("Вещь должна находиться в списке инвентаря.\n\r");
+        ch->pecho("Вещь должна находиться в списке инвентаря.");
         return;
     }
 
     if (IS_OBJ_STAT(obj, ITEM_NOENCHANT)
         || (obj->behavior && obj->behavior->isLevelAdaptive( )))
     {
-        ch->send_to( "Эта вещь не подлежит улучшению.\r\n" );
+        ch->pecho("Эта вещь не подлежит улучшению.");
         return;
     }
 
@@ -184,7 +184,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
 
     if ( result <= fail )  /* failed, no bad result */
     {
-        ch->send_to("Ничего не произошло.\n\r");
+        ch->pecho("Ничего не произошло.");
         return;
     }
     
@@ -195,7 +195,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     }
     else if (result <= (90 - level/5))  /* success! */
     {
-        act("Золотая аура окружает $o4.",ch,obj,0,TO_ALL);
+        oldact("Золотая аура окружает $o4.",ch,obj,0,TO_ALL);
         add_ac = -1 * (level / 5);
     }
     else  /* exceptional enchant */
@@ -257,20 +257,20 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->item_type != ITEM_WEAPON)
     {
-        ch->send_to("Это не оружие.\n\r");
+        ch->pecho("Это не оружие.");
         return;
     }
 
     if (obj->wear_loc != wear_none)
     {
-        ch->send_to("Вещь должна находиться в списке инвентаря.\n\r");
+        ch->pecho("Вещь должна находиться в списке инвентаря.");
         return;
     }
 
     if (IS_OBJ_STAT(obj, ITEM_NOENCHANT)
         || (obj->behavior && obj->behavior->isLevelAdaptive( )))
     {
-        ch->send_to( "Это оружие не подлежит улучшению.\r\n" );
+        ch->pecho("Это оружие не подлежит улучшению.");
         return;
     }
     
@@ -356,7 +356,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
 
     if ( result <= fail )  /* failed, no bad result */
     {
-        ch->send_to("Ничего не произошло.\n\r");
+        ch->pecho("Ничего не произошло.");
         return;
     }
     
@@ -367,7 +367,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     }
     else if (result <= (100 - level/5))  /* success! */
     {
-        act("Голубая аура окружает $o4.",ch,obj,0,TO_ALL);
+        oldact("Голубая аура окружает $o4.",ch,obj,0,TO_ALL);
         added = 1;
     }
     else  /* exceptional enchant */
@@ -416,7 +416,7 @@ VOID_SPELL(Fireproof)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(ITEM_BURN_PROOF);
     affect_to_obj( obj, &af);
 
-    act("Огнеупорная аура окружает $o4.",ch,obj,0,TO_ALL);
+    oldact("Огнеупорная аура окружает $o4.",ch,obj,0,TO_ALL);
 }
 
 
@@ -427,12 +427,12 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     int chance;
 
     if (obj->item_type != ITEM_WEAPON) {
-        ch->send_to( "Это не оружие.\r\n" );
+        ch->pecho("Это не оружие.");
         return;
     }
     
     if (obj->isAffected(sn )) {
-        act("Священный огонь уже пылает в $o6.", ch, obj, 0, TO_CHAR);
+        oldact("Священный огонь уже пылает в $o6.", ch, obj, 0, TO_CHAR);
         return;
     }
     
@@ -440,7 +440,7 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
         ||  IS_OBJ_STAT(obj,ITEM_DARK|ITEM_EVIL)
         ||  IS_OBJ_STAT(obj,ITEM_ANTI_GOOD) )
     {
-        ch->send_to( "Священный огонь нельзя зажечь в темном, дьявольском или вампирическом оружии.\r\n" );
+        ch->pecho("Священный огонь нельзя зажечь в темном, дьявольском или вампирическом оружии.");
         return;
     }
     
@@ -474,8 +474,8 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL);
     affect_to_obj( obj, &af );
 
-    act("Ты взываешь к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_CHAR);
-    act("$c1 взывает к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_ROOM);
+    oldact("Ты взываешь к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_CHAR);
+    oldact("$c1 взывает к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_ROOM);
 }
 
 
@@ -486,7 +486,7 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
     int chance;
 
     if (obj->pIndexData->item_type != ITEM_WEAPON) {
-        ch->send_to("Это не оружие.\r\n");
+        ch->pecho("Это не оружие.");
         return;
     } 
 
@@ -494,15 +494,15 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
         ||  IS_OBJ_STAT(obj, ITEM_BLESS)
         ||  IS_OBJ_STAT(obj, ITEM_ANTI_EVIL)) 
     {
-            act("Боги Света наказывают тебя за попытку осквернения священного оружия!", ch, 0, 0, TO_CHAR);
-            act("Боги Света наказывают $c4 за попытку осквернения священного оружия!", ch, 0, 0, TO_ROOM);
+            oldact("Боги Света наказывают тебя за попытку осквернения священного оружия!", ch, 0, 0, TO_CHAR);
+            oldact("Боги Света наказывают $c4 за попытку осквернения священного оружия!", ch, 0, 0, TO_ROOM);
             rawdamage(ch, ch, DAM_HOLY, 
                     (ch->hit - 1) > 1000 ? 1000 : (ch->hit - 1), true );
             return;
     } 
 
     if (IS_WEAPON_STAT(obj, WEAPON_VAMPIRIC)) {
-        act("$o1 уже жаждет чужой крови.", ch, obj, 0, TO_CHAR);
+        oldact("$o1 уже жаждет чужой крови.", ch, obj, 0, TO_CHAR);
         return;
     }
 
@@ -528,8 +528,8 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
         af.bitvector.setValue(ITEM_ANTI_GOOD|ITEM_ANTI_NEUTRAL);
         affect_to_obj( obj, &af );
         
-        act("Ты передаешь $o3 свою жажду крови.", ch, obj, 0, TO_CHAR);
-        act("$c1 внимательно смотрит на $o4, е$gго|го|е глаза вспыхивают {rкрасным{x", ch, obj, 0, TO_ROOM);
+        oldact("Ты передаешь $o3 свою жажду крови.", ch, obj, 0, TO_CHAR);
+        oldact("$c1 внимательно смотрит на $o4, е$gго|го|е глаза вспыхивают {rкрасным{x", ch, obj, 0, TO_ROOM);
     } 
     else
         obj->getRoom()->echo( POS_RESTING, "%1$^O1 на миг ярко вспыхива%1$nет|ют багровым... но затем угаса%1$nет|ют.", obj );
@@ -544,13 +544,13 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
 
     if ( obj->condition > 99 && !obj->isAffected(gsn_corrosion) )
     {
-    ch->send_to("Эта вещь не нуждается в ремонте.\n\r");
+    ch->pecho("Эта вещь не нуждается в ремонте.");
     return;
     }
 
     if (obj->wear_loc != wear_none)
     {
-        ch->send_to("Для ремонта вещь должна находиться в списке инвентаря.\n\r");
+        ch->pecho("Для ремонта вещь должна находиться в списке инвентаря.");
         return;
     }
 
@@ -578,7 +578,7 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
     }
     else if ( result >=10)
     {
-        ch->send_to("Ничего не произошло.\n\r");
+        ch->pecho("Ничего не произошло.");
     }
     else
     {
@@ -602,13 +602,13 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->value0() >= 3 * level / 2)
     {
-        ch->send_to("Тебе не хватает могущества для восстановления зарядов этой вещи.\n\r");
+        ch->pecho("Тебе не хватает могущества для восстановления зарядов этой вещи.");
         return;
     }
 
     if (obj->value1() == 0)
     {
-        ch->send_to("Эту вещь больше не удастся зарядить.\n\r");
+        ch->pecho("Эту вещь больше не удастся зарядить.");
         return;
     }
 
@@ -652,7 +652,7 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     else if (percent <= min(95, 3 * chance / 2))
     {
-        ch->send_to("Ничего не произошло.\n\r");
+        ch->pecho("Ничего не произошло.");
         if (obj->value1() > 1)
             obj->value1(obj->value1() - 1);
         return;
@@ -742,17 +742,17 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
     Affect af;
 
     if (obj->item_type != ITEM_WEAPON) {
-        act("$o1 -- не оружие.", ch, obj, 0, TO_CHAR);
+        oldact("$o1 -- не оружие.", ch, obj, 0, TO_CHAR);
         return;
     }
 
     if (IS_WEAPON_STAT(obj,WEAPON_FLAMING) || IS_WEAPON_STAT(obj,WEAPON_SHOCKING)) {
-        act("С $o5, кажется, ничего не происходит.", ch, obj, 0, TO_CHAR);
+        oldact("С $o5, кажется, ничего не происходит.", ch, obj, 0, TO_CHAR);
         return;
     }
 
     if (IS_WEAPON_STAT(obj,WEAPON_FROST)) {
-        act("$o1 и без того во власти холода.", ch, obj, 0, TO_CHAR);
+        oldact("$o1 и без того во власти холода.", ch, obj, 0, TO_CHAR);
         return;
     }
 
@@ -765,6 +765,6 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector.setValue(WEAPON_FROST);
     affect_to_obj( obj, &af );
     
-    act("Ты отдаешь $o4 во власть холода.", ch, obj, 0, TO_CHAR);
+    oldact("Ты отдаешь $o4 во власть холода.", ch, obj, 0, TO_CHAR);
 
 }

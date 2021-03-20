@@ -20,12 +20,12 @@ COMMAND(Divorce, "divorce")
     DLString brideName1, brideName2;
     
     if (!ch->is_immortal( )) {
-        ch->send_to( "Это не для тебя.\r\n" );
+        ch->pecho("Это не для тебя.");
         return;
     }
 
     if (arguments.empty( )) {
-        ch->send_to( "И кого разводить будем?\r\n" );
+        ch->pecho("И кого разводить будем?");
         return;
     }
     
@@ -50,12 +50,12 @@ COMMAND(Divorce, "divorce")
     brideName2.upperFirstCharacter( );
 
     if (brideName2 == brideName1) {
-        ch->send_to( "Это еще как?\r\n" );
+        ch->pecho("Это еще как?");
         return;
     }
 
     if (ch->getName( ) == brideName1 || ch->getName( ) == brideName2) {
-        ch->send_to( "Попроси кого-то помочь тебе.\r\n" );
+        ch->pecho("Попроси кого-то помочь тебе.");
         return;
     }
 

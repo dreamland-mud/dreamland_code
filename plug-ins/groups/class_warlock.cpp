@@ -59,7 +59,7 @@ SKILL_RUNP( blink )
 
     if (!ch->is_npc() && !gsn_blink->usable( ch ))
     {
-        ch->send_to("Это умение тебе недоступно.\n\r");
+        ch->pecho("Это умение тебе недоступно.");
         return;
     }
 
@@ -94,7 +94,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
 
         if ( victim->fighting )
         {
-                ch->send_to("Ты не можешь прицелиться, жертва слишком быстро движется.\n\r");
+                ch->pecho("Ты не можешь прицелиться, жертва слишком быстро движется.");
                 return;
         }
 
@@ -117,18 +117,18 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
                 return;
         }
 
-        act_p("$C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x тебя!",
+        oldact_p("$C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x тебя!",
                 victim, 0, ch, TO_CHAR, POS_RESTING);
-        act_p("$c1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x $C4!",
+        oldact_p("$c1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x $C4!",
                 ch, 0, victim, TO_NOTVICT, POS_RESTING);
-        act_p("Разрушающим световым лучом ты {R###ПОЛНОСТЬЮ УНИЧТОЖАЕШЬ###{x $C4!",
+        oldact_p("Разрушающим световым лучом ты {R###ПОЛНОСТЬЮ УНИЧТОЖАЕШЬ###{x $C4!",
                 ch, 0, victim, TO_CHAR, POS_RESTING);
-        victim->send_to("Тебя {RУБИЛИ{x!\n\r");
+        victim->pecho("Тебя {RУБИЛИ{x!");
 
-        act("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
-        act("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
+        oldact("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
+        oldact("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
 
-        victim->send_to("{YБожественные Силы возвращают тебя к жизни!{x\n\r");
+        victim->pecho("{YБожественные Силы возвращают тебя к жизни!{x");
         
         group_gain( ch, victim );
         raw_kill( victim, -1, ch, FKILL_REABILITATE | FKILL_PURGE | FKILL_MOB_EXTRACT );
@@ -148,14 +148,14 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
 
         if ( ch->isAffected(sn ) )
         {
-            ch->send_to("Ты пытаешься крикнуть, но только хрип вырывается из твоего горла.");
-            act("$c1 хрипит!",ch,0,0,TO_ROOM);
+            ch->pecho("Ты пытаешься крикнуть, но только хрип вырывается из твоего горла.");
+            oldact("$c1 хрипит!",ch,0,0,TO_ROOM);
             return;
         }
 
-        act_p("$c1 пронзительно кричит, сотрясая все вокруг!",
+        oldact_p("$c1 пронзительно кричит, сотрясая все вокруг!",
                 ch,0,0,TO_ROOM,POS_RESTING);
-        act_p("Ты пронзительно кричишь, сотрясая все вокруг.",
+        oldact_p("Ты пронзительно кричишь, сотрясая все вокруг.",
                 ch,0,0,TO_CHAR,POS_RESTING);
 
         hpch = max( 10, (int)ch->hit );
@@ -197,9 +197,9 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
 
     if (saves_spell( level, victim, DAM_OTHER,ch, DAMF_MAGIC)) {
         if (ch != victim)
-            act_p("Легкая дрожь пронизывает $C4, но это быстро проходит.",
+            oldact_p("Легкая дрожь пронизывает $C4, но это быстро проходит.",
                ch, 0, victim, TO_CHAR,POS_RESTING );
-        victim->send_to("Легкая дрожь пронизывает тебя, но это быстро проходит.\n\r");
+        victim->pecho("Легкая дрожь пронизывает тебя, но это быстро проходит.");
         return;
     }
 
@@ -209,8 +209,8 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
         af.duration = level / 20;
         affect_to_char(victim, &af );
         if (ch != victim)
-            act("Ты создаешь изолирующий магию экран вокруг $C2.", ch, 0, victim, TO_CHAR);
-        victim->send_to("Вокруг тебя внезапно воздвигается экран, изолирующий магию!\n\r");
+            oldact("Ты создаешь изолирующий магию экран вокруг $C2.", ch, 0, victim, TO_CHAR);
+        victim->pecho("Вокруг тебя внезапно воздвигается экран, изолирующий магию!");
     }
     else {
         af.type        = sn;
@@ -218,9 +218,9 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
         af.duration = level / 15;
         affect_join( victim, &af );
 
-        victim->send_to("Изолирующий магию экран вокруг тебя усиливается!\n\r");
+        victim->pecho("Изолирующий магию экран вокруг тебя усиливается!");
         if (ch != victim)
-            act("Изолирующий магию экран вокруг $C2 усиливается.", ch, 0, victim, TO_CHAR);
+            oldact("Изолирующий магию экран вокруг $C2 усиливается.", ch, 0, victim, TO_CHAR);
     }
 }
 
@@ -231,13 +231,13 @@ VOID_SPELL(ShockingTrap)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-        ch->send_to("Комната уже наполнена силовыми волнами.\n\r");
+        ch->pecho("Комната уже наполнена силовыми волнами.");
         return;
     }
 
     if ( ch->isAffected(sn))
     {
-        ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+        ch->pecho("Это заклинание использовалось совсем недавно.");
         return;
     }
 
@@ -252,8 +252,8 @@ VOID_SPELL(ShockingTrap)::run( Character *ch, Room *room, int sn, int level )
 
     postaffect_to_char( ch, sn, level / 10 );
 
-    ch->send_to("Комната наполняется силовыми волнами, заставляя вибрировать воздух.\n\r");
-    act_p("$c1 заставляет вибрировать воздух, наполняя комнату силовыми волнами.",
+    ch->pecho("Комната наполняется силовыми волнами, заставляя вибрировать воздух.");
+    oldact_p("$c1 заставляет вибрировать воздух, наполняя комнату силовыми волнами.",
            ch,0,0,TO_ROOM,POS_RESTING);
 }
 
@@ -307,9 +307,9 @@ VOID_SPELL(WitchCurse)::run( Character *ch, Character *victim, int sn, int level
     af.sources.add(ch);
     affect_to_char(victim,&af);
 
-    act("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_CHAR);
-    act("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_NOTVICT);
-    act("Ты вступи$Gло|л|ла на путь смерти.",  ch, 0, victim, TO_VICT);
+    oldact("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_CHAR);
+    oldact("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_NOTVICT);
+    oldact("Ты вступи$Gло|л|ла на путь смерти.",  ch, 0, victim, TO_VICT);
 }
 
 AFFECT_DECL(WitchCurse);
@@ -319,9 +319,9 @@ VOID_AFFECT(WitchCurse)::update( Character *ch, Affect *paf )
     
     DefaultAffectHandler::update( ch, paf );
 
-    act_p("Проклятие ведьм безжалостно отбирает жизнь у $c2.",
+    oldact_p("Проклятие ведьм безжалостно отбирает жизнь у $c2.",
           ch,0,0,TO_ROOM,POS_RESTING);
-    ch->send_to("{RПроклятие ведьм безжалостно отбирает у тебя жизнь!{x\n\r");
+    ch->pecho("{RПроклятие ведьм безжалостно отбирает у тебя жизнь!{x");
 
     if (paf->level <= 1)
         return;
@@ -352,13 +352,13 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-        ch->send_to("Эта комната уже защищена щитом молний.\n\r");
+        ch->pecho("Эта комната уже защищена щитом молний.");
         return;
     }
 
     if ( ch->isAffected(sn))
     {
-        ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+        ch->pecho("Это заклинание использовалось совсем недавно.");
         return;
     }
 
@@ -374,8 +374,8 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
     postaffect_to_char( ch, sn, level / 10 );
 
     ch->in_room->owner = str_dup( ch->getNameP( ) );
-    ch->send_to("Ты воздвигаешь вокруг себя щит молний.\n\r");
-    act("$c1 окружает себя щитом молний.",ch,0,0,TO_ROOM);
+    ch->pecho("Ты воздвигаешь вокруг себя щит молний.");
+    oldact("$c1 окружает себя щитом молний.",ch,0,0,TO_ROOM);
     return;
 
 }
@@ -396,8 +396,8 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
         room->affectStrip(paf->type);
     }
     else if (!ch->is_immortal( )) {
-        ch->send_to("Щит молний, оберегающий это место, блокирует тебя.\n\r");
-        act("$C1 приближается к тебе.",vch,0,ch,TO_CHAR);
+        ch->pecho("Щит молний, оберегающий это место, блокирует тебя.");
+        oldact("$C1 приближается к тебе.",vch,0,ch,TO_CHAR);
         interpret_raw( vch, "wake" );
 
         if (!is_safe_rspell(paf->level,ch)) {
@@ -448,9 +448,9 @@ void EnergyShield::wear( Character *ch )
 {
     if (!ch->isAffected(gsn_make_shield)) {
         if (isColdShield( ))
-            ch->send_to("Твоя сопротивляемость холоду повышается.\n\r");
+            ch->pecho("Твоя сопротивляемость холоду повышается.");
         else if (isFireShield( )) 
-            ch->send_to("Твоя сопротивляемость огню повышается.\n\r");
+            ch->pecho("Твоя сопротивляемость огню повышается.");
     }
 }
 
@@ -484,9 +484,9 @@ void EnergyShield::remove( Character *ch )
     affect_strip(ch, gsn_make_shield);
 
     if (isColdShield( ))
-        ch->send_to("Твоя сопротивляемость холоду становится хуже.\n\r");
+        ch->pecho("Твоя сопротивляемость холоду становится хуже.");
     else  if (isFireShield( ))
-        ch->send_to("Твоя сопротивляемость огню становится хуже.\n\r");
+        ch->pecho("Твоя сопротивляемость огню становится хуже.");
 }
 
 /*
@@ -507,7 +507,7 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     else if (arg_oneof(arg, "fire", "огонь", "огня"))
         from = "огня";
     else {
-        ch->send_to("От чего ты хочешь защититься? Укажи {lrогонь или холод{lefire или cold{x в качестве параметра.\n\r");
+        ch->pecho("От чего ты хочешь защититься? Укажи {lrогонь или холод{lefire или cold{x в качестве параметра.");
         return;
     }
         

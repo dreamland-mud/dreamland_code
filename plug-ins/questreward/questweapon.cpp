@@ -18,7 +18,7 @@
 
 void QuestWeapon::wear(Character *ch)
 {
-    ch->send_to("{CТвое оружие ярко вспыхивает.{x\r\n");
+    ch->pecho("{CТвое оружие ярко вспыхивает.{x");
 }
 
 void QuestWeapon::equip(Character *ch)

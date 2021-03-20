@@ -118,7 +118,7 @@ CMDRUNP( delete )
     {
         if (!password_check( pch, argument ))
         {
-            pch->send_to("Состояние самоуничтожения отменено (неверный пароль).\n\r");
+            pch->pecho("Состояние самоуничтожения отменено (неверный пароль).");
             pch->confirm_delete = false;
             return;
         }
@@ -131,9 +131,9 @@ CMDRUNP( delete )
         }
     }
 
-    pch->send_to("Введи {Wdelete <твой пароль>{x для подтверждения команды.\n\r");
-    pch->send_to("{RВНИМАНИЕ{x: это необратимая команда.\n\r");
-    pch->send_to("Введение команды {Wdelete{x без пароля отменяет попытку самоликвидации.\n\r");
+    pch->pecho("Введи {Wdelete <твой пароль>{x для подтверждения команды.");
+    pch->pecho("{RВНИМАНИЕ{x: это необратимая команда.");
+    pch->pecho("Введение команды {Wdelete{x без пароля отменяет попытку самоликвидации.");
     pch->getPC( )->confirm_delete = true;
     wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
             "%^C1 собирается удалить свой персонаж.", pch );
@@ -158,7 +158,7 @@ CMDRUNP( delete )
 
 CMDRUNP( rent )
 {
-    ch->send_to( "Здесь нет ренты. Просто покинь мир.\n\r");
+    ch->pecho("Здесь нет ренты. Просто покинь мир.");
     return;
 }
 
@@ -267,13 +267,13 @@ CMDRUNP( quit )
         && !pch->is_immortal( )
         && IS_SET( pch->act, PLR_NO_EXP ))
     {
-        pch->send_to( "Ты не можешь покинуть этот мир! Твой дух во власти противника.\n\r");
+        pch->pecho("Ты не можешь покинуть этот мир! Твой дух во власти противника.");
         return;
     }
 
     if (auction->item != 0 && ((pch == auction->buyer) || (pch == auction->seller))) {
         if (!fForced) {
-            pch->send_to("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.\n\r");
+            pch->pecho("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.");
             return;
         }
         
@@ -285,7 +285,7 @@ CMDRUNP( quit )
         && !pch->is_immortal()
         && IS_ROOM_AFFECTED( pch->in_room, AFF_ROOM_ESPIRIT ))
     {
-        pch->send_to( "Злые духи в этой зоне не отпускают тебя.\n\r");
+        pch->pecho("Злые духи в этой зоне не отпускают тебя.");
         return;
     }
 
@@ -294,7 +294,7 @@ CMDRUNP( quit )
             && pch->getClan( ) != clan_invader 
             && pch->isAffected( gsn_evil_spirit ))
     {
-        pch->send_to( "Злые духи, овладевшие тобой, не позволяют тебе покинуть этот мир.\n\r");
+        pch->pecho("Злые духи, овладевшие тобой, не позволяют тебе покинуть этот мир.");
         return;
     }
 
@@ -302,7 +302,7 @@ CMDRUNP( quit )
         && !pch->is_immortal()  
         && pch->isAffected(gsn_suspect))
     {
-        pch->send_to ("Ты не можешь этого сделать - тебя ждет Суд!\n\r");
+        pch->pecho("Ты не можешь этого сделать - тебя ждет Суд!");
         return;
     }
 
@@ -311,7 +311,7 @@ CMDRUNP( quit )
             && pch->death_ground_delay > 0
             && pch->trap.isSet( TF_NO_MOVE ))
     {
-        pch->send_to( "Сначала выберись отсюда, а потом можно и покинуть этот Мир.\n\r" );
+        pch->pecho("Сначала выберись отсюда, а потом можно и покинуть этот Мир.");
         return;
     }
 
@@ -320,7 +320,7 @@ CMDRUNP( quit )
             && pch->getClan() != pch->in_room->pIndexData->clan)
     {
         if (!fAuto && !fForced) {
-            pch->send_to("Ты не можешь этого сделать - здесь не твоя территория!\n\r");
+            pch->pecho("Ты не можешь этого сделать - здесь не твоя территория!");
             return;
         }
         
@@ -336,12 +336,12 @@ CMDRUNP( quit )
     
     PCharacterManager::quit( pch );
 
-    pch->send_to("Жаль, но все хорошее когда-нибудь заканчивается.\n\r");
+    pch->pecho("Жаль, но все хорошее когда-нибудь заканчивается.");
     
     if (pch->desc && !fQuiet)
         DescriptorStateManager::getThis( )->handle( CON_PLAYING, CON_QUIT, pch->desc );
 
-    act_p( "$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
+    oldact_p("$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
 
     if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
         wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 покину%1$Gло|л|ла этот мир.", pch );
@@ -383,7 +383,7 @@ CMDRUNP( save )
         return;
 
     ch->getPC( )->save();
-    ch->send_to( "Жрецы {CDream Land{x заносят сведения о тебе в свои манускрипты.\n\r");
+    ch->pecho("Жрецы {CDream Land{x заносят сведения о тебе в свои манускрипты.");
     ch->setWaitViolence( 1 );
 }
 

@@ -65,8 +65,8 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     bool fExpReward, fScrollGiven;
     DLString arg = args.getOneArgument( );
 
-    act("$c1 информирует $C4 о выполнении задания.",client,0,ch,TO_ROOM);
-    act("Ты информируешь $C4 о выполнении задания.",client,0,ch,TO_CHAR);
+    oldact("$c1 информирует $C4 о выполнении задания.",client,0,ch,TO_ROOM);
+    oldact("Ты информируешь $C4 о выполнении задания.",client,0,ch,TO_CHAR);
 
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
@@ -166,8 +166,8 @@ void Questor::doCancel( PCharacter *client )
     XMLAttributes *attributes;
     Quest::Pointer quest;
     
-    act("$c1 просит $C4 отменить $S задание.",client,0,ch,TO_ROOM);
-    act("Ты просишь $C4 отменить $S задание.",client,0,ch,TO_CHAR);
+    oldact("$c1 просит $C4 отменить $S задание.",client,0,ch,TO_ROOM);
+    oldact("Ты просишь $C4 отменить $S задание.",client,0,ch,TO_CHAR);
     
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
@@ -209,8 +209,8 @@ void Questor::doFind( PCharacter *client )
     ostringstream buf;
     Quest::Pointer quest;
     
-    act("$c1 просит помощи у $C2.",client,0,ch,TO_ROOM);
-    act("Ты просишь помощи у $C2.",client,0,ch,TO_CHAR);
+    oldact("$c1 просит помощи у $C2.",client,0,ch,TO_ROOM);
+    oldact("Ты просишь помощи у $C2.",client,0,ch,TO_CHAR);
 
     quest = client->getAttributes( ).findAttr<Quest>( "quest" );
 
@@ -342,8 +342,8 @@ void Questor::rewardScroll( PCharacter *client )
     obj_to_char( scroll, client );
     tell_raw( client, ch, "Кроме того, я вручаю тебе свиток, внимательно изучив который, "
                           "ты сможешь усовершенствовать свои умения." );
-    act( "$C1 дает тебе $o4.", client, scroll, ch, TO_CHAR );
-    act( "$C1 дает $c3 $o4.", client, scroll, ch, TO_ROOM );
+    oldact("$C1 дает тебе $o4.", client, scroll, ch, TO_CHAR );
+    oldact("$C1 дает $c3 $o4.", client, scroll, ch, TO_ROOM );
 }
 
 /*--------------------------------------------------------------------------
@@ -416,11 +416,11 @@ bool QuestScrollBehavior::examine( Character *ch )
     bool extract = true;
     
     if (!isOwner( ch )) {
-        act("Знания, заключенные в $o6, недоступны тебе.", ch, obj, 0, TO_CHAR);
+        oldact("Знания, заключенные в $o6, недоступны тебе.", ch, obj, 0, TO_CHAR);
         return true;
     }
     
-    act("Ты внимательно изучаешь знаки на $o6.", ch, obj, 0, TO_CHAR);
+    oldact("Ты внимательно изучаешь знаки на $o6.", ch, obj, 0, TO_CHAR);
     
     for (s = skills.begin( ); s != skills.end( ); s++) {
         if (s->second <= 0)
@@ -457,7 +457,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
     ch->send_to( buf );
     if(extract) {
-        act("Чернила меркнут, и $o1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
+        oldact("Чернила меркнут, и $o1 рассыпается трухой.", ch, obj, 0, TO_CHAR);
         extract_obj( obj );
     }
     return true;
@@ -478,11 +478,11 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     DLString descr;
     
     if (arg.empty() || arg_is_list(arg)) {
-        act("$c1 просит $C4 показать список заданий.",client, 0, ch, TO_ROOM);
-        act("Ты просишь $C4 показать список заданий.",client, 0, ch, TO_CHAR);
+        oldact("$c1 просит $C4 показать список заданий.",client, 0, ch, TO_ROOM);
+        oldact("Ты просишь $C4 показать список заданий.",client, 0, ch, TO_CHAR);
     } else {
-        act("$c1 просит $C4 дать $m задание.", client, 0, ch, TO_ROOM);
-        act("Ты просишь $C4 дать тебе задание.", client, 0, ch, TO_CHAR);
+        oldact("$c1 просит $C4 дать $m задание.", client, 0, ch, TO_ROOM);
+        oldact("Ты просишь $C4 дать тебе задание.", client, 0, ch, TO_CHAR);
     }
 
     if (client->getAttributes( ).isAvailable( "quest" )) {

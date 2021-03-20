@@ -15,7 +15,7 @@ CMDADM( undelete )
     DLString buf = arguments.getOneArgument( );
     
     if(buf.empty( )) {
-        ch->send_to("Usage: undelete <player_name>\n\r");
+        ch->pecho("Usage: undelete <player_name>");
         return;
     }
 
@@ -23,7 +23,7 @@ CMDADM( undelete )
 
     for(c = char_list; c; c = c->next)
         if(!c->is_npc() && buf == c->getName( )) {
-            ch->send_to("Character is already in game.\n\r");
+            ch->pecho("Character is already in game.");
             return;
         }
 
@@ -32,7 +32,7 @@ CMDADM( undelete )
         return;
     }
 
-    ch->send_to("Recovered.\n\r");
+    ch->pecho("Recovered.");
 }
 
 

@@ -93,8 +93,8 @@ bool XMLAttributeCards::handle( const DeathArguments &args )
             if (card->suit < 0)
                 card->suit = getRandomSuit( );
 
-            act( "{cТы уби$gло|л|ла $t из Колоды.{x", pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
-            act( "{cТеперь ты $t!{x", pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
+            oldact("{cТы уби$gло|л|ла $t из Колоды.{x", pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
+            oldact("{cТеперь ты $t!{x", pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
         }
     
         level--;
@@ -102,7 +102,7 @@ bool XMLAttributeCards::handle( const DeathArguments &args )
         if (level >= 0)
             args.pch->printf( "{cТы становишься %s.{x\r\n", getFace( '5' ).c_str( ) );
         else {
-            args.pch->send_to( "{cТы выбываешь из колоды!{x\r\n" );
+            args.pch->pecho("{cТы выбываешь из колоды!{x");
             args.pch->getAttributes( ).eraseAttribute( "cards" );
             return false;
         }

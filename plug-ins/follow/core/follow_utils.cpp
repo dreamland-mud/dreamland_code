@@ -57,9 +57,9 @@ void follower_add( Character *ch, Character *mch )
     ch->leader        = NULL;
 
     if (ch->master->can_see( ch ) || (ch->master->getPC() && ch->master->getPC()->pet && ch->master->getPC()->pet == ch))
-       act( "$c1 теперь следует за тобой.", ch, 0, mch, TO_VICT );
+       oldact("$c1 теперь следует за тобой.", ch, 0, mch, TO_VICT );
        
-    act( "Ты теперь следуешь за $C5.",  ch, 0, mch, TO_CHAR );
+    oldact("Ты теперь следуешь за $C5.",  ch, 0, mch, TO_CHAR );
 }
 
 static void afprog_stopfol( Character *ch )
@@ -104,10 +104,10 @@ void follower_clear( Character * ch, bool verbose )
         return;
 
     if (verbose && master->can_see( ch ))
-       act( "$c1 теперь не следует за тобой.", ch, 0, master, TO_VICT );
+       oldact("$c1 теперь не следует за тобой.", ch, 0, master, TO_VICT );
 
     if (verbose)
-        act( "Ты теперь не следуешь за $C5.", ch, 0, master, TO_CHAR );
+        oldact("Ты теперь не следуешь за $C5.", ch, 0, master, TO_CHAR );
 
     afprog_stopfol( ch );
 
@@ -169,9 +169,9 @@ bool is_same_group( Character *ach, Character *bch )
  */
 void guarding_stop( PCharacter *guard, PCharacter *victim )
 {
-    act("Ты прекращаешь охранять $C4.", guard, 0, victim, TO_CHAR);
-    act("$c1 прекращает охранять тебя.", guard, 0, victim, TO_VICT);
-    act("$c1 прекращает охранять $C4.", guard, 0, victim, TO_NOTVICT);
+    oldact("Ты прекращаешь охранять $C4.", guard, 0, victim, TO_CHAR);
+    oldact("$c1 прекращает охранять тебя.", guard, 0, victim, TO_VICT);
+    oldact("$c1 прекращает охранять $C4.", guard, 0, victim, TO_NOTVICT);
     guard->guarding  = 0;
     victim->guarded_by = 0;
 }

@@ -29,9 +29,9 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
 
     if (!victim->getRace( )->getVuln( ).isSet( VULN_IRON )) {
         if (victim == ch)
-            act("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
+            oldact("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
         else
-            act("$C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
+            oldact("$C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
         
         return false;
     }
@@ -44,8 +44,8 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
    
-    act("{CСекретное знание Сидхов теперь защищает $c4.{x", victim, 0, 0, TO_ROOM);
-    act("{CСекретное знание Сидхов теперь защищает тебя.{x", victim, 0, 0, TO_CHAR);
+    oldact("{CСекретное знание Сидхов теперь защищает $c4.{x", victim, 0, 0, TO_ROOM);
+    oldact("{CСекретное знание Сидхов теперь защищает тебя.{x", victim, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -72,7 +72,7 @@ bool BlessEquipWE::run( PCharacter *ch, Object *obj ) const
     if (obj->carried_by && obj->wear_loc->givesAffects())
         affect_modify(obj->carried_by, &af, true);
 
-    act( "{C$o1 на мгновение загорается огнем нездешних звёзд.{x", ch, obj, 0, TO_ALL );
+    oldact("{C$o1 на мгновение загорается огнем нездешних звёзд.{x", ch, obj, 0, TO_ALL );
     return true;
 }
 
@@ -84,7 +84,7 @@ bool RestoringWE::run( PCharacter *ch, Character *victim ) const
     update_pos( victim );
 
     if (ch != victim)
-        act( "{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
+        oldact("{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
 
     victim->pecho( "{CТаинственное мелодичное слово пронизывает тебя теплом.{x" );
     return true;

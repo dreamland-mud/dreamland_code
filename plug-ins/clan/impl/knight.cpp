@@ -59,7 +59,7 @@ CLAN(knight);
  *-------------------------------------------------------------------------*/
 void ClanItemKnight::actDisappear()
 {
-    act("$o1 исчезает в серой дымке.",
+    oldact("$o1 исчезает в серой дымке.",
         obj->getRoom()->people, obj, 0, TO_ALL);
 }
 
@@ -68,19 +68,19 @@ void ClanItemKnight::actDisappear()
  *-------------------------------------------------------------------------*/
 void ClanAltarKnight::actAppear()
 {
-    act("{WЛучи света пронизывают комнату и в центре материализуется $o1.{x",
+    oldact("{WЛучи света пронизывают комнату и в центре материализуется $o1.{x",
         obj->in_room->people, obj, 0, TO_ALL);
 }
 
 void ClanAltarKnight::actDisappear()
 {
-    act("{WСвет $o2 исчезает и он растворяется в воздухе!{x",
+    oldact("{WСвет $o2 исчезает и он растворяется в воздухе!{x",
         obj->getRoom()->people, obj, NULL, TO_ALL);
 }
 
 void ClanAltarKnight::actNotify(Character *ch)
 {
-    act_p("{WХрамовый алтарь вашего замка был осквернен безбожниками!{x",
+    oldact_p("{WХрамовый алтарь вашего замка был осквернен безбожниками!{x",
           ch, 0, 0, TO_CHAR, POS_DEAD);
 }
 
@@ -93,8 +93,8 @@ void ClanGuardKnight::actGreet(PCharacter *wch)
 }
 void ClanGuardKnight::actPush(PCharacter *wch)
 {
-    act("$C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе.", wch, 0, ch, TO_CHAR);
-    act("$C1 кивает $c3, слегка нахмурившись, взмахивает рукой.\n\r... и $c1 с диким восторгом в глазах улетает.", wch, 0, ch, TO_ROOM);
+    oldact("$C1 кивает тебе, слегка хмурясь, взмахивает рукой.\n\r...и вот уже ты неторопливо несешься в воздухе.", wch, 0, ch, TO_CHAR);
+    oldact("$C1 кивает $c3, слегка нахмурившись, взмахивает рукой.\n\r... и $c1 с диким восторгом в глазах улетает.", wch, 0, ch, TO_ROOM);
 }
 
 void ClanGuardKnight::actInvited(PCharacter *wch, Object *obj)
@@ -114,8 +114,8 @@ void ClanGuardKnight::actGhost(PCharacter *)
 
 void ClanGuardKnight::actGiveInvitation(PCharacter *wch, Object *obj)
 {
-    act("$c1 внимательно сверяется со списком.", ch, 0, 0, TO_ROOM);
-    act("$c1 ставит Королевскую печать на $o6.", ch, obj, 0, TO_ROOM);
+    oldact("$c1 внимательно сверяется со списком.", ch, 0, 0, TO_ROOM);
+    oldact("$c1 ставит Королевскую печать на $o6.", ch, obj, 0, TO_ROOM);
 }
 
 int ClanGuardKnight::getCast(Character *victim)
@@ -165,7 +165,7 @@ SKILL_RUNP(guard)
 
     if (!gsn_guard->available(ch))
     {
-        ch->send_to("Ась?\n\r");
+        ch->pecho("Ась?");
         return;
     }
 
@@ -176,19 +176,19 @@ SKILL_RUNP(guard)
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Охранять кого?\n\r");
+        ch->pecho("Охранять кого?");
         return;
     }
 
     if ((vict = get_char_room(ch, arg)) == 0)
     {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
     if (vict->is_npc())
     {
-        act("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR);
+        oldact("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR);
         return;
     }
 
@@ -199,7 +199,7 @@ SKILL_RUNP(guard)
     {
         if (pch->guarding == 0)
         {
-            pch->send_to("Ты не можешь охранять себя же!\n\r");
+            pch->pecho("Ты не можешь охранять себя же!");
             return;
         }
         else
@@ -211,19 +211,19 @@ SKILL_RUNP(guard)
 
     if (pch->guarding != 0)
     {
-        pch->send_to("Но ты охраняешь кого-то другого!\n\r");
+        pch->pecho("Но ты охраняешь кого-то другого!");
         return;
     }
 
     if (victim->guarded_by != 0)
     {
-        act("$C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR);
+        oldact("$C4 уже кто-то охраняет.", pch, 0, victim, TO_CHAR);
         return;
     }
 
     if (!is_same_group(victim, pch))
     {
-        act("Но ты не состоишь в той же группе, что и $C1.", pch, 0, victim, TO_CHAR);
+        oldact("Но ты не состоишь в той же группе, что и $C1.", pch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -235,13 +235,13 @@ SKILL_RUNP(guard)
 
     if (victim->fighting != 0)
     {
-        pch->send_to("Почему бы тебе не позволить им сперва закончить сражение?\n\r");
+        pch->pecho("Почему бы тебе не позволить им сперва закончить сражение?");
         return;
     }
 
     if (pch->fighting != 0)
     {
-        pch->send_to("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще.\n\r");
+        pch->pecho("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще.");
         return;
     }
 
@@ -253,9 +253,9 @@ SKILL_RUNP(guard)
             return;
         }
 
-    act("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR);
-    act("Теперь тебя охраняет $c4.", pch, 0, victim, TO_VICT);
-    act("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT);
+    oldact("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR);
+    oldact("Теперь тебя охраняет $c4.", pch, 0, victim, TO_VICT);
+    oldact("$c1 теперь охраняет $C4.", pch, 0, victim, TO_NOTVICT);
 
     pch->guarding = victim;
     victim->guarded_by = pch;
@@ -277,9 +277,9 @@ BOOL_SKILL(guard)::run(Character *wch, Character *mob)
 
     if (number_percent() < min(100, chance))
     {
-        act("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
-        act("$c1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
-        act("Ты прыгаешь перед $C5!", ch->guarded_by, 0, ch, TO_CHAR);
+        oldact("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
+        oldact("$c1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
+        oldact("Ты прыгаешь перед $C5!", ch->guarded_by, 0, ch, TO_CHAR);
         gsn_guard->improve(ch->guarded_by, true, mob);
         return true;
     }
@@ -317,8 +317,8 @@ VOID_SPELL(Dragonplate)::run(Character *ch, char *target_name, int sn, int level
 
     obj_to_char(plate, ch);
 
-    act("Ты взмахиваешь руками и создаешь $o4!", ch, plate, 0, TO_CHAR);
-    act("$c1 взмахивает руками и создает $o4!", ch, plate, 0, TO_ROOM);
+    oldact("Ты взмахиваешь руками и создаешь $o4!", ch, plate, 0, TO_CHAR);
+    oldact("$c1 взмахивает руками и создает $o4!", ch, plate, 0, TO_ROOM);
 }
 
 /*
@@ -330,8 +330,8 @@ bool KnightWeapon::death(Character *ch)
 
     wielded = (obj->wear_loc == wear_wield || obj->wear_loc == wear_second_wield);
 
-    act_p("Твое золотое оружие исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD);
-    act("Золотое оружие $c2 исчезает.", ch, 0, 0, TO_ROOM);
+    oldact_p("Твое золотое оружие исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD);
+    oldact("Золотое оружие $c2 исчезает.", ch, 0, 0, TO_ROOM);
     extract_obj(obj);
 
     if (!wielded || ch->is_npc() || chance(80))
@@ -361,8 +361,8 @@ void KnightWeapon::fight(Character *ch)
 
     if (sn > 0)
     {
-        act("$o1 загорается ярким голубым светом!", ch, obj, 0, TO_CHAR);
-        act("$o1 $c2 загорается ярким голубым светом!", ch, obj, 0, TO_ROOM);
+        oldact("$o1 загорается ярким голубым светом!", ch, obj, 0, TO_CHAR);
+        oldact("$o1 $c2 загорается ярким голубым светом!", ch, obj, 0, TO_ROOM);
 
         spell(sn, ch->getModifyLevel(), ch, ch, FSPELL_BANE);
     }
@@ -390,7 +390,7 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
         sword_vnum = OBJ_VNUM_DRAGONLANCE;
     else
     {
-        ch->send_to("Какое именно {YОружие Золотого Дракона{x ты хочешь создать: меч, булаву, кинжал или пику?\r\n");
+        ch->pecho("Какое именно {YОружие Золотого Дракона{x ты хочешь создать: меч, булаву, кинжал или пику?");
         return;
     }
 
@@ -411,8 +411,8 @@ VOID_SPELL(Dragonsword)::run(Character *ch, char *target_name, int sn, int level
     SET_BIT(sword->extra_flags, (ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
     obj_to_char(sword, ch);
 
-    act("Ты взмахиваешь руками и создаешь $o4!", ch, sword, 0, TO_CHAR);
-    act("$c1 взмахивает руками и создает $o4!", ch, sword, 0, TO_ROOM);
+    oldact("Ты взмахиваешь руками и создаешь $o4!", ch, sword, 0, TO_CHAR);
+    oldact("$c1 взмахивает руками и создает $o4!", ch, sword, 0, TO_ROOM);
 }
 
 SPELL_DECL(GoldenAura);
@@ -432,9 +432,9 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
         if (vch->isAffected(sn))
         {
             if (vch == ch)
-                act("Ты уже окруже$gно|н|на {YЗолотой аурой{x.", ch, 0, 0, TO_CHAR);
+                oldact("Ты уже окруже$gно|н|на {YЗолотой аурой{x.", ch, 0, 0, TO_CHAR);
             else
-                act("$C1 уже окруже$Gно|н|на {YЗолотой аурой{x.", ch, 0, vch, TO_CHAR);
+                oldact("$C1 уже окруже$Gно|н|на {YЗолотой аурой{x.", ch, 0, vch, TO_CHAR);
             continue;
         }
 
@@ -454,9 +454,9 @@ VOID_SPELL(GoldenAura)::run(Character *ch, Room *room, int sn, int level)
         af.location = APPLY_SAVING_SPELL;
         affect_to_char(vch, &af);
 
-        vch->send_to("{YЗолотая аура{x окружает тебя.\n\r");
+        vch->pecho("{YЗолотая аура{x окружает тебя.");
         if (ch != vch)
-            act("{YЗолотая аура{x окружает $C4.", ch, 0, vch, TO_CHAR);
+            oldact("{YЗолотая аура{x окружает $C4.", ch, 0, vch, TO_CHAR);
     }
 }
 
@@ -477,9 +477,9 @@ VOID_SPELL(HolyArmor)::run(Character *ch, Character *, int sn, int level)
     af.location = APPLY_AC;
     af.modifier = (-max(10, 10 * (level / 5)));
     affect_to_char(ch, &af);
-    act_p("Священные силы защищают $c4 от повреждений.",
+    oldact_p("Священные силы защищают $c4 от повреждений.",
           ch, 0, 0, TO_ROOM, POS_RESTING);
-    ch->send_to("Священные силы защищают тебя от повреждений.\n\r");
+    ch->pecho("Священные силы защищают тебя от повреждений.");
 }
 
 SPELL_DECL_T(Squire, SummonCreatureSpell);
