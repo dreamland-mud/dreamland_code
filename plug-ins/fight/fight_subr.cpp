@@ -94,7 +94,7 @@ void check_assist(Character *ch, Character *victim)
             && IS_CHARMED(ch)
             && ch->master == rch)
         {
-            act("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);            
+            oldact("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);            
             one_hit( rch, victim );
             continue;
         }
