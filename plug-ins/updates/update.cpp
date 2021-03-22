@@ -775,6 +775,9 @@ void obj_update( void )
             && room->getSectorType() == SECT_DESERT
             && material_is_flagged( obj, MAT_MELTING ))
         {
+            if (obj->isAffected(gsn_protection_heat))
+                continue;
+            
             if (carrier) {
                 if (chance( 40 )) {
                     carrier->pecho( "%1$^O1 та%1$nет|ют от жара.", obj );
@@ -796,6 +799,9 @@ void obj_update( void )
             && room->getSectorType() == SECT_DESERT
             && material_is_flagged( obj, MAT_FRAGILE ))
         {
+            if (obj->isAffected(gsn_protection_heat))
+                continue;
+            
             if (carrier) {
                 if (!carrier->is_npc( ) && chance( 20 )) {
                     carrier->pecho( "%1$^O1 лопа%1$nется|ются от жары.", obj );
