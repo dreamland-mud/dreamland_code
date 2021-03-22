@@ -345,7 +345,7 @@ public:
 
         DeathPenalties( killer, victim ).run( );
 
-        group_gain( killer, victim );
+        group_gain( killer, victim, evt.killer );
         raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
         pk_gain( killer, victim );
     }

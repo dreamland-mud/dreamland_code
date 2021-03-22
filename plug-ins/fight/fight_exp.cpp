@@ -267,20 +267,21 @@ static bool can_influence_exp( PCharacter *gch, Character *leader )
     return true;
 }
 
-void group_gain( Character *ch, Character *victim )
+void group_gain( Character *ch, Character *victim, Character *realKiller )
 {
     Character *gch;
     Character *leader;
     int xp, mobcount, base_exp_bonus;
     std::list<PCharacter *> players;
     std::list<PCharacter *>::iterator i;
+    Character *killer = realKiller ? realKiller : ch;
 
     if ( victim == ch
         || ( victim->is_npc() && victim->getNPC()->pIndexData->vnum < 100 ) )
         return;
 
-    if (ch->is_npc( )) 
-        gain_exp_mob( ch->getNPC( ), victim );
+    if (killer->is_npc( )) 
+        gain_exp_mob( killer->getNPC( ), victim );
 
     if (!victim->is_npc( ))
         return;
