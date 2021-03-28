@@ -17,7 +17,7 @@
 
 void QuestGirth::wear( Character *ch ) 
 {
-    ch->send_to( "{CТвой пояс ярко вспыхивает.{x\r\n" );
+    ch->pecho("{CТвой пояс ярко вспыхивает.{x");
 }
 
 

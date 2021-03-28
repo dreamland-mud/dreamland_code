@@ -53,12 +53,12 @@ COMMAND(MKey, "mkey")
         maker = find_people_behavior<MansionKeyMaker>( ch->in_room );
 
         if (!maker) {
-            ch->send_to( "Здесь нет ключника.\r\n" );
+            ch->pecho("Здесь нет ключника.");
             return;
         }
 
         if (ch->is_npc( )) {
-            ch->send_to( "Ты бездомное.\r\n" );
+            ch->pecho("Ты бездомное.");
             return;
         }
         
@@ -87,12 +87,12 @@ void MKey::doRemove( Character *ch, DLString &arguments )
     try {
         vnum = arguments.getOneArgument( ).toInt( );
     } catch (const ExceptionBadType& e) {
-        ch->send_to( "Неправильный vnum ключа.\r\n" );
+        ch->pecho("Неправильный vnum ключа.");
         return;
     }
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-        ch->send_to( "Неправильное имя.\r\n" );
+        ch->pecho("Неправильное имя.");
         return;
     }
     
@@ -104,11 +104,11 @@ void MKey::doRemove( Character *ch, DLString &arguments )
         if (i->getValue( ) == vnum) {
             attr->keys.erase( i );
             PCharacterManager::saveMemory( pci );
-            ch->send_to( "Ok.\r\n" );
+            ch->pecho("Ok.");
             return;
         }
     
-    ch->send_to( "Такой ключ не найден.\r\n" );
+    ch->pecho("Такой ключ не найден.");
 }
 
 void MKey::doGrant( Character *ch, DLString &arguments ) 
@@ -130,12 +130,12 @@ void MKey::doGrant( Character *ch, DLString &arguments )
     }
 
     if (get_obj_index( vnum ) == 0) {
-        ch->send_to( "Такого ключа не существует.\r\n" );
+        ch->pecho("Такого ключа не существует.");
         return;
     }
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-        ch->send_to( "Неправильное имя.\r\n" );
+        ch->pecho("Неправильное имя.");
         return;
     }
     
@@ -145,13 +145,13 @@ void MKey::doGrant( Character *ch, DLString &arguments )
 
     for (i = attr->keys.begin( ); i != attr->keys.end( ); i++)
         if (i->getValue( ) == vnum) {
-            ch->send_to( "Такой ключ у него уже есть.\r\n" );
+            ch->pecho("Такой ключ у него уже есть.");
             return;
         }
     
     attr->keys.push_back( vnum );
     PCharacterManager::saveMemory( pci );
-    ch->send_to( "Ok.\r\n" );
+    ch->pecho("Ok.");
 }
 
 void MKey::doShow( Character *ch, DLString &arguments ) 
@@ -163,7 +163,7 @@ void MKey::doShow( Character *ch, DLString &arguments )
     DLString name = arguments.getOneArgument( );
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-        ch->send_to( "Неправильное имя.\r\n" );
+        ch->pecho("Неправильное имя.");
         return;
     }
     
@@ -171,7 +171,7 @@ void MKey::doShow( Character *ch, DLString &arguments )
     attr = attributes->findAttr<XMLAttributeMansionKey>( "mkey" );
 
     if (!attr) {
-        ch->send_to( "Ключей не найдено.\r\n" );
+        ch->pecho("Ключей не найдено.");
         return;
     }
 
@@ -254,7 +254,7 @@ void MansionKeyMaker::msgListBefore( Character *client )
 
 void MansionKeyMaker::msgListAfter( Character *client ) 
 {
-    client->send_to( "\r\n" );
+    client->pecho("");
     tell_dim( client, getKeeper( ), "За свою работу я потребую $n4.", price->toString( client ).c_str( ) );
 }
 
@@ -269,8 +269,8 @@ bool MansionKeyMaker::canServeClient( Character * )
 
 void MansionKeyMaker::msgListRequest( Character *client )
 {
-    act( "$c1 просит $C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
-    act( "Ты просишь у $C4 показать список ключей.", client, 0, getKeeper( ), TO_CHAR );
+    oldact("$c1 просит $C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
+    oldact("Ты просишь у $C4 показать список ключей.", client, 0, getKeeper( ), TO_CHAR );
 }
 
 void MansionKeyMaker::msgBuyRequest( Character *client )
@@ -350,8 +350,8 @@ bool MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
     key = create_object( get_obj_index( vnum ), 1 );
     obj_to_char( key, client );
 
-    act( "$C1 вручает тебе $o4.", client, key, maker, TO_CHAR );
-    act( "$C1 вручает $c3 $o4." , client, key, maker, TO_ROOM );
+    oldact("$C1 вручает тебе $o4.", client, key, maker, TO_CHAR );
+    oldact("$C1 вручает $c3 $o4." , client, key, maker, TO_ROOM );
     return true;
 }
 

@@ -490,7 +490,7 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
 	ostringstream buf;
 		
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, room), paf, buf);
+        paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
 
     if (!buf.str().empty())
         mainBuf << endl << buf.str();
@@ -913,14 +913,14 @@ static void show_char_description( Character *ch, Character *vict )
                                     pcRace->getMaleName( ).c_str( ),
                                     pcRace->getFemaleName( ).c_str( ));
         if (ch == vict)
-            act( "Ты выглядишь как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+            oldact("Ты выглядишь как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
         else
-            act( "$E выглядит как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+            oldact("$E выглядит как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
 
         return;
     }
     
-    act( "Ты не видишь ничего особенного в $Z.", ch, 0, vict, TO_CHAR );
+    oldact("Ты не видишь ничего особенного в $Z.", ch, 0, vict, TO_CHAR );
 }
 
 static void show_char_sexrace( Character *ch, Character *vict, ostringstream &buf )
@@ -987,7 +987,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     }
 
     if (!naked) {
-        act( "\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
+        oldact("\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
         ch->send_to( buf );
     }
             
@@ -1001,7 +1001,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
                 || ch->is_immortal()))
 
     {
-        ch->println( "\n\rТы заглядываешь в инвентарь: " );
+        ch->pecho( "\n\rТы заглядываешь в инвентарь: " );
         gsn_peek->improve( ch, true );
         show_list_to_char( victim->is_mirror() ?
                 vict->carrying : victim->carrying, ch, true, true );
@@ -1079,7 +1079,7 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount )
 // TODO invis & hide checks
         else if (!rch->is_immortal( )) {
             if (rch->in_room->isDark( ) && IS_AFFECTED(rch, AFF_INFRARED ))
-                ch->println( "{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x" );
+                ch->pecho( "{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x" );
                 
             life_count++;
         }
@@ -1097,7 +1097,7 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount )
  *--------------------------------------------------------------------------*/
 CMDRUNP( inventory )
 {
-    ch->println( "Ты несешь:" );
+    ch->pecho( "Ты несешь:" );
     show_list_to_char( ch->carrying, ch, true, true );
 }
 
@@ -1111,11 +1111,11 @@ CMDRUNP( equipment )
     
     naked = show_char_equip( ch, ch, buf, true );
 
-    ch->println( "Ты используешь:" );
+    ch->pecho( "Ты используешь:" );
     ch->send_to( buf );
 
     if (naked)
-        ch->println( "Да уж... Не мешало бы одеться!" );
+        ch->pecho( "Да уж... Не мешало бы одеться!" );
 }
 
 /*---------------------------------------------------------------------------
@@ -1272,7 +1272,7 @@ rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Character *ch, const DLS
     ostringstream buf;
 
     if (eyes_darkened( ch )) {
-        ch->println( "Здесь слишком темно ... " );
+        ch->pecho( "Здесь слишком темно ... " );
         show_people_to_char( room->people, ch, fShowMount );
         return;
     }
@@ -1325,7 +1325,7 @@ static void do_look_move( Character *ch, bool fBrief )
 {
     if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" )) {
         if (eyes_darkened( ch ))
-            ch->println( "Здесь слишком темно ... " );
+            ch->pecho( "Здесь слишком темно ... " );
         else
             ch->printf( "{W%s{x\r\n", ch->in_room->getName() );
         return;
@@ -1341,7 +1341,7 @@ static void do_look_into( Character *ch, char *arg2 )
     
     if (arg2[0] == '\0')
     {
-        ch->println( "Посмотреть на что?" );
+        ch->pecho( "Посмотреть на что?" );
         return;
     }
     
@@ -1349,7 +1349,7 @@ static void do_look_into( Character *ch, char *arg2 )
     obj = get_obj_here( ch, arg2 );
 
     if (!obj) {
-        ch->println( "Ты не видишь этого тут." );
+        ch->pecho( "Ты не видишь этого тут." );
         return;
     }
     
@@ -1374,11 +1374,11 @@ static void do_look_character( Character *ch, Character *victim )
 {
     if (victim->can_see( ch )) {
         if (ch == victim)
-            act( "$c1 смотрит на себя.",ch,0,0,TO_ROOM);
+            oldact("$c1 смотрит на себя.",ch,0,0,TO_ROOM);
         else
         {
-            act( "$c1 смотрит на тебя.", ch, 0, victim, TO_VICT);
-            act( "$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT);
+            oldact("$c1 смотрит на тебя.", ch, 0, victim, TO_VICT);
+            oldact("$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT);
         }
     }
 
@@ -1399,21 +1399,21 @@ static bool do_look_direction( Character *ch, const char *arg1 )
 
     if ( ( pexit = ch->in_room->exit[door] ) == 0 )
     {
-            ch->println( "Ничего особенного тут." );
+            ch->pecho( "Ничего особенного тут." );
             return true;
     }
 
     if ( pexit->description != 0 && pexit->description[0] != '\0' ) {
             ch->send_to( pexit->description);
-            ch->send_to( "\r\n" );
+            ch->pecho("");
     }
     else
-            ch->println( "Здесь нет ничего особенного." );
+            ch->pecho( "Здесь нет ничего особенного." );
 
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
-        act("$N1: тут закрыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+        oldact("$N1: тут закрыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
     else if ( IS_SET(pexit->exit_info, EX_ISDOOR) )
-        act("$N1: тут открыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+        oldact("$N1: тут открыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
     
     DoorKeyhole( ch, ch->in_room, door ).doExamine( );
     return true;
@@ -1482,7 +1482,7 @@ static bool do_look_extraexit( Character *ch, const char *arg3 )
             && ch->can_see( peexit ) )
             ch->send_to( peexit->description);
     else
-            ch->println( "Здесь нет ничего особенного." );
+            ch->pecho( "Здесь нет ничего особенного." );
     
     if (peexit->short_desc_from != 0
         && peexit->short_desc_from[0] != '\0'
@@ -1518,12 +1518,12 @@ CMDRUNP( look )
         return;
 
     if (ch->position < POS_SLEEPING) {
-        ch->println( "Ты не видишь ничего, кроме звезд!" );
+        ch->pecho( "Ты не видишь ничего, кроме звезд!" );
         return;
     }
 
     if (ch->position == POS_SLEEPING) {
-        ch->println( "Ты ничего не видишь, ты спишь!" );
+        ch->pecho( "Ты ничего не видишь, ты спишь!" );
         return;
     }
     
@@ -1536,7 +1536,7 @@ CMDRUNP( look )
 
     if (eyes_blinded( ch )) {
         if (fAuto || fMove)
-            ch->println( "Ты не можешь видеть вещи!" );
+            ch->pecho( "Ты не можешь видеть вещи!" );
         else
             eyes_blinded_msg( ch );
 
@@ -1559,7 +1559,7 @@ CMDRUNP( look )
     }
 
     if (eyes_darkened( ch )) {
-        ch->println( "Тебе не удается ничего разглядеть в кромешной темноте." );
+        ch->pecho( "Тебе не удается ничего разглядеть в кромешной темноте." );
         return;
     }
     
@@ -1588,7 +1588,7 @@ CMDRUNP( look )
     if (do_look_direction( ch, arg1 ))
         return;
 
-    ch->println( "Ты не видишь этого тут." );
+    ch->pecho( "Ты не видишь этого тут." );
 }
 
 /*-------------------------------------------------------------------------
@@ -1609,7 +1609,7 @@ CMDRUNP( read )
     number = number_argument( arg1, arg2 );
 
     if (!do_look_extradescr( ch, arg2, number ))
-        ch->println( "Ты не видишь этого тут." );
+        ch->pecho( "Ты не видишь этого тут." );
 }
 
 /*-------------------------------------------------------------------------
@@ -1628,7 +1628,7 @@ CMDRUNP( examine )
     argument = one_argument( argument, arg );
 
     if (arg[0] == '\0') {
-        ch->println( "Изучить что?" );
+        ch->pecho( "Изучить что?" );
         return;
     }
 
@@ -1637,11 +1637,11 @@ CMDRUNP( examine )
         if ( victim->can_see( ch ) )
         {
             if (ch == victim)
-                act( "$c1 осматривает себя.",ch,0,0,TO_ROOM);
+                oldact("$c1 осматривает себя.",ch,0,0,TO_ROOM);
             else
             {
-                act( "$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
-                act( "$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT);
+                oldact("$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT);
+                oldact("$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT);
             }
         }
 
@@ -1687,12 +1687,12 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
 static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLString& )
 {
     if (IS_SET(obj->value3(), DRINK_CLOSED)) {
-        ch->println("Эта емкость закрыта.");
+        ch->pecho("Эта емкость закрыта.");
         return true;
     }
 
     if (obj->value1() <= 0) {
-        ch->println( "Тут пусто." );
+        ch->pecho( "Тут пусто." );
         return true;
     }
 
@@ -1731,7 +1731,7 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     
     if (!pocket.empty( )) {
         if (!IS_SET(obj->value1(), CONT_WITH_POCKETS)) {
-            ch->println( "Ты не видишь здесь ни одного кармана." );
+            ch->pecho( "Ты не видишь здесь ни одного кармана." );
             return true;
         }
     }
@@ -1769,14 +1769,14 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
 static bool oprog_examine_corpse( Object *obj, Character *ch, const DLString & )
 {
-    act( "На $o6 ты видишь:", ch, obj, 0, TO_CHAR );
+    oldact("На $o6 ты видишь:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
 
 static bool oprog_examine_keyring( Object *obj, Character *ch, const DLString & )
 {
-    act( "На $o4 нанизано:", ch, obj, 0, TO_CHAR );
+    oldact("На $o4 нанизано:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        
@@ -1882,7 +1882,7 @@ CMDRUNP( exits )
     int door;
 
     if (eyes_blinded( ch )) {
-        act( "Ты ослепле$gно|н|на и не видишь ничего вокруг себя!", ch, 0, 0, TO_CHAR );
+        oldact("Ты ослепле$gно|н|на и не видишь ничего вокруг себя!", ch, 0, 0, TO_CHAR );
         return;
     }
 
@@ -1956,7 +1956,7 @@ CMDRUNP( exits )
     }
 
     if (found) {
-        ch->println("\r\nДополнительные выходы:");
+        ch->pecho("\r\nДополнительные выходы:");
         ch->send_to(buf);
     }
 }

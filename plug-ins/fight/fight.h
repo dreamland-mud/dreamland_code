@@ -45,7 +45,7 @@ void yell_panic( Character *ch, Character *victim, const char *msgBlind = NULL, 
 
 
 /* gaining experience (fight_exp.cpp) */
-void        group_gain( Character *ch, Character *victim );
+void        group_gain( Character *ch, Character *victim, Character *realKiller = 0 );
 
 /* death handling routines (fight_death.cpp) */
 #define    FKILL_CRY          (A)

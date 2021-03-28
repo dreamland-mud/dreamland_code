@@ -120,7 +120,7 @@ void MixedPetShopRoom::doList( Character *client )
     createMixedList( list, client );
 
     if (list.empty( )) {
-        client->println( "Магазин не работает." );
+        client->pecho( "Магазин не работает." );
         return;
     }
 
@@ -207,6 +207,6 @@ void MixedPetShopRoom::doBuy( Character *client, const DLString &constArguments 
         }
     }
     
-    client->println( "Извини, ты не можешь купить этого здесь." );
+    client->pecho( "Извини, ты не можешь купить этого здесь." );
 }
 

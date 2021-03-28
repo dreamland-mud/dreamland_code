@@ -728,10 +728,10 @@ void reset_area( Area *pArea, int flags )
                 && !IS_SET(ch->in_room->room_flags, ROOM_INDOORS)
                 && gsn_track->getEffective( ch ) > 50)
             {
-                ch->println( "Внезапно налетевший дождь смывает все следы." );
+                ch->pecho( "Внезапно налетевший дождь смывает все следы." );
             }
 
-            ch->println( resetmsg );
+            ch->pecho( resetmsg );
         }
     }
 }

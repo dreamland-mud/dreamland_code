@@ -23,6 +23,7 @@
 #include "dreamland.h"
 #include "weather.h"
 #include "move_utils.h"
+#include "math_utils.h"
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "act.h"
@@ -1262,4 +1263,15 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier): применить rand_all 
         .randomizeAll();
         
     return Register();
+}
+
+NMI_INVOKE(Root, interpolate, "(x, x1, x2, y1, y2): линейно интерполировать значение Y в промежутке от Y1 до Y2, для данной координаты X из промежутка X1, X2")
+{
+    int  x = argnum2number(args, 1);
+    int x1 = argnum2number(args, 2);
+    int x2 = argnum2number(args, 3);
+    int y1 = argnum2number(args, 4);
+    int y2 = argnum2number(args, 5);
+
+    return Register((int)linear_interpolation(x, x1, x2, y1, y2));
 }

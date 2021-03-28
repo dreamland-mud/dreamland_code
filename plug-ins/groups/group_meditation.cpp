@@ -32,7 +32,7 @@ VOID_SPELL(Link)::run( Character *ch, Character *victim, int sn, int level )
 
     if (victim == ch)
     {
-        ch->send_to("Это заклинание имеет смысл применять только на других.\n\r");
+        ch->pecho("Это заклинание имеет смысл применять только на других.");
         return;
     }
     
@@ -51,7 +51,7 @@ VOID_SPELL(MagicConcentrate)::run( Character *ch, Character *, int sn, int level
   Affect af;
 
   if (ch->isAffected(sn)) {
-      act("Ты уже достаточно сконцентриров$gано|ан|ана.", ch, 0, 0, TO_CHAR);
+      oldact("Ты уже достаточно сконцентриров$gано|ан|ана.", ch, 0, 0, TO_CHAR);
       return;
   }
 
@@ -60,6 +60,6 @@ VOID_SPELL(MagicConcentrate)::run( Character *ch, Character *, int sn, int level
   af.duration           = 7;
   affect_to_char(ch,&af);
 
-  ch->send_to("Ты чувствуешь, как сверхмощная способность к разрушению заполняет все твое тело.\n\r");
+  ch->pecho("Ты чувствуешь, как сверхмощная способность к разрушению заполняет все твое тело.");
 }
 

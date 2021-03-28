@@ -33,7 +33,7 @@ DLString RaceChannel::outputSelf( Character *ch, const DLString &format, const D
     DLString race = ch->getRace( )->getPC( )->getMltName( );
     DLString message = fmt( ch, format.c_str( ), ch, race.c_str( ), msg.c_str( ) );
     return message;
-//    ch->println( message );
+//    ch->pecho( message );
 //    postOutput( ch, message );
 }
 
@@ -43,7 +43,7 @@ DLString RaceChannel::outputVict( Character *ch, Character *victim,
     DLString race = ch->getRace( )->getPC( )->getMltName( );
     DLString message = fmt( victim, format.c_str( ), ch, race.c_str( ), msg.c_str( ) );
     return message;
-//    victim->println( message );
+//    victim->pecho( message );
 //    postOutput( victim, message );
 }
 

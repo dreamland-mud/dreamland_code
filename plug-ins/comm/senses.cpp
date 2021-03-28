@@ -44,7 +44,7 @@ CMDRUNP( listen )
     argument = one_argument( argument, arg );
 
     if (!arg[0]) {
-        ch->send_to("Послушать что?\n\r");
+        ch->pecho("Послушать что?");
         return;
     }
 
@@ -52,19 +52,19 @@ CMDRUNP( listen )
          || ( obj = get_obj_room( ch, arg ) ))
     {
         if (obj->carried_by == ch) {
-            act("Ты подносишь к уху $o4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            act("$c1 подносит к уху $o4 и прислушивается.", ch, obj, 0, TO_ROOM);
+            oldact("Ты подносишь к уху $o4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
+            oldact("$c1 подносит к уху $o4 и прислушивается.", ch, obj, 0, TO_ROOM);
         }
         else {
-            act("Ты прикладываешь ухо к $o3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-            act("$c1 прикладывает ухо к $o3 и прислушивается.", ch, obj, 0, TO_ROOM);
+            oldact("Ты прикладываешь ухо к $o3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
+            oldact("$c1 прикладывает ухо к $o3 и прислушивается.", ch, obj, 0, TO_ROOM);
         }
 
         if (oprog_listen( obj, ch, argument ))
             return;
         
         if (!obj->pIndexData->sound.empty( )) {
-            ch->println( obj->pIndexData->sound );
+            ch->pecho( obj->pIndexData->sound );
             return;
         }
 
@@ -78,7 +78,7 @@ CMDRUNP( listen )
     
     /* TODO: listen to a mob */
 
-    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
 }        
 
 /*---------------------------------------------------------------------------
@@ -104,14 +104,33 @@ static bool mprog_smell( Character *victim, Character *ch, char *argument )
     return false;
 }
 
-static bool afprog_smell( Character *victim, Character *sniffer, char *argument )
+static bool afprog_smell_affected(const AffectList &affList, SpellTarget::Pointer target, Character *sniffer, char *argument)
 {
     bool rc = false;
     
-    for (auto &paf: victim->affected.findAllWithHandler()) 
-        if (paf->type->getAffect( )->onSmell(SpellTarget::Pointer(NEW, victim), paf, sniffer))
+    for (auto &paf: affList.findAllWithHandler()) 
+        if (paf->type->getAffect( )->onSmell(target, paf, sniffer))
             rc = true;
+
     return rc;
+}
+
+static bool afprog_smell( Character *victim, Character *sniffer, char *argument )
+{
+    return afprog_smell_affected(
+            victim->affected, SpellTarget::Pointer(NEW, victim), sniffer, argument);
+}
+
+static bool afprog_smell( Object *obj, Character *sniffer, char *argument )
+{
+    return afprog_smell_affected(
+            obj->affected, SpellTarget::Pointer(NEW, obj), sniffer, argument);
+}
+
+static bool afprog_smell( Room *room, Character *sniffer, char *argument )
+{
+    return afprog_smell_affected(
+            room->affected, SpellTarget::Pointer(NEW, room), sniffer, argument);
 }
 
 CMDRUNP( smell )
@@ -123,20 +142,33 @@ CMDRUNP( smell )
 
     argument = one_argument( argument, arg );
 
+    /*
+     * Smell room:
+     * - room onSmell trigger, if returns true, overrides index data property
+     * - smells from all affects are shown next (onSmellRoom)
+     */
     if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
-        act("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
-        act("$c1 принюхивается.", ch, 0, 0, TO_ROOM);
+        bool rc = false;
+
+        oldact("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
+        oldact("$c1 принюхивается.", ch, 0, 0, TO_ROOM);
 
         if (rprog_smell( ch->in_room, ch, argument ))
-            return;
+            rc = true;
 
-        Properties::const_iterator p = ch->in_room->pIndexData->properties.find( "smell" );
-        if (p != ch->in_room->pIndexData->properties.end( )) {
-            ch->println(p->second);
-            return;
+        if (!rc) {
+            Properties::const_iterator p = ch->in_room->pIndexData->properties.find( "smell" );
+            if (p != ch->in_room->pIndexData->properties.end( )) {
+                ch->pecho(p->second);
+                rc = true;
+            }
         }
 
-        ch->println("Вокруг пахнет вполне обычно.");
+        rc = afprog_smell( ch->in_room, ch, argument ) || rc;
+
+        if (!rc)
+            ch->pecho("Вокруг пахнет вполне обычно.");
+
         return;
     }
 
@@ -150,18 +182,18 @@ CMDRUNP( smell )
             if (attr && !attr->getValue( ).empty( ))
                 ch->printf("Ты пахнешь:\n\r%s\n\r", attr->getValue( ).c_str( ) ); 
             else
-                ch->println("Ты ничем особенным не пахнешь.");
+                ch->pecho("Ты ничем особенным не пахнешь.");
             return;
         }
 
         if (arg_oneof_strict( argument, "clear", "очистить" )) {
             attr->setValue( "" );
-            ch->println( "Теперь ты никак не пахнешь." );
+            ch->pecho( "Теперь ты никак не пахнешь." );
             return;
         }
 
         if (arg_is_help( argument )) {
-            ch->println( "Используй 'smell description <строка>' для установки запаха\n\r"
+            ch->pecho( "Используй 'smell description <строка>' для установки запаха\n\r"
                          "или 'smell description clear' для его очистки." );
             return;
         }
@@ -171,54 +203,70 @@ CMDRUNP( smell )
         return;
     }
 
-
+    /*
+     * Smell item:
+     * - item onSmell trigger, if returns true, overrides index data property
+     * - liquid smell is shown next
+     * - smells from all affects are shown next (onSmellObj)
+     */
     if ( ( obj = get_obj_wear_carry( ch, arg ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
     {
-        act("Ты нюхаешь $o4.", ch, obj, 0, TO_CHAR);
-        act("$c1 нюхает $o4.", ch, obj, 0, TO_ROOM);
+        bool rc = false;
+
+        oldact("Ты нюхаешь $o4.", ch, obj, 0, TO_CHAR);
+        oldact("$c1 нюхает $o4.", ch, obj, 0, TO_ROOM);
 
         if (oprog_smell( obj, ch, argument ))
-            return;
+            rc = true;
         
-        if (!obj->pIndexData->smell.empty( )) {
-            ch->println( obj->pIndexData->smell );
-            return;
+        if (!rc && !obj->pIndexData->smell.empty( )) {
+            ch->pecho( obj->pIndexData->smell );
+            rc = true;
         }
 
         if (obj->item_type == ITEM_DRINK_CON && obj->value1() > 0) {
             Liquid *liq = liquidManager->find(obj->value2());
             if (oprog_smell_liquid(liq, ch))
-                return;
+                rc = true;
         }
 
-        ch->println("Пахнет вполне обычно.");
+        rc = afprog_smell( obj, ch, argument ) || rc;
+        
+        if (!rc)
+            ch->pecho("Пахнет вполне обычно.");
+
         return;
     }
 
+    /*
+     * Smell char:
+     * - char onSmell trigger, if returns true, overrides index data property or player's config
+     * - smells from all affects are shown next (onSmellChar)
+     */
     if (( victim = get_char_room( ch, arg ) )) {
         bool rc = false;
 
         if (ch == victim) {
-            act("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
-            act("$c1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
+            oldact("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
         } else {
-            act("Ты обнюхиваешь $C4.", ch, 0, victim, TO_CHAR);
-            act("$c1 обнюхивает $C4.", ch, 0, victim, TO_NOTVICT);
-            act("$c1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
+            oldact("Ты обнюхиваешь $C4.", ch, 0, victim, TO_CHAR);
+            oldact("$c1 обнюхивает $C4.", ch, 0, victim, TO_NOTVICT);
+            oldact("$c1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
         }
 
         if (!( rc = mprog_smell( victim, ch, argument ) )) {
             if (victim->is_npc( )) {
                 if (!victim->getNPC( )->pIndexData->smell.empty( )) {
-                    ch->println( victim->getNPC( )->pIndexData->smell );
+                    ch->pecho( victim->getNPC( )->pIndexData->smell );
                     rc = true;
                 }
             } 
             else {
                 attr = victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( "smell" );
                 if (attr && !attr->getValue( ).empty( )) {
-                    ch->println( attr->getValue( ) );
+                    ch->pecho( attr->getValue( ) );
                     rc = true;
                 }
             }
@@ -228,12 +276,12 @@ CMDRUNP( smell )
         rc = afprog_smell( victim, ch, argument ) || rc;
         
         if (!rc)
-            ch->println("Пахнет вполне обычно.");
+            ch->pecho("Пахнет вполне обычно.");
 
         return;
     }
 
-    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    oldact("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
 }        
 
 

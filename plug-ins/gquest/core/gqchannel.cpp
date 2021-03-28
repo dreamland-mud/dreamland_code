@@ -118,7 +118,7 @@ void GQChannel::gechoRaw( const DLString& msg )
     
     for ( d = descriptor_list; d; d = d->next ) 
         if (d->connected == CON_PLAYING && d->character)
-            d->character->send_to( msg + "\r\n" );
+            d->character->pecho(msg);
 }
 
 void GQChannel::pecho( Character *ch, ostringstream& buf ) 

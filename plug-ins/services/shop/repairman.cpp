@@ -85,8 +85,8 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     
     if (arg.empty( )) {
         say_act( client, ch, "Я отремонтирую тебе что-нибудь за деньги.");
-        client->println("Напиши {y{lrчинить{lerepair{x <название предмета>, чтоб восстановить его.");
-        client->println("Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
+        client->pecho("Напиши {y{lrчинить{lerepair{x <название предмета>, чтоб восстановить его.");
+        client->pecho("Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
         return;
     }
 
@@ -112,7 +112,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
         if ( bonus || (roll < gsn_haggle->getEffective(client) + skill_level_bonus(*gsn_haggle, ch)) )
         {
             cost -= cost / 2 * roll / 100;
-            act( "Ты торгуешься с $C5.", client, 0, this->getChar(), TO_CHAR);
+            oldact("Ты торгуешься с $C5.", client, 0, this->getChar(), TO_CHAR);
             gsn_haggle->improve( client, true );
         }
     }
@@ -122,13 +122,13 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     deduct_cost(client, cost * 100);
     ch->gold += cost;
 
-    act("$C1 берет $o4 y $c2, восстанавливает и возвращает $c3.",client,obj,ch,TO_ROOM);
-    act("$C1 берет $o4, восстанавливает и возвращает тебе.",client,obj,ch,TO_CHAR);
+    oldact("$C1 берет $o4 y $c2, восстанавливает и возвращает $c3.",client,obj,ch,TO_ROOM);
+    oldact("$C1 берет $o4, восстанавливает и возвращает тебе.",client,obj,ch,TO_CHAR);
 
     if (cost) 
         client->pecho( "Твой кошелек стал легче на %1$d золот%1$Iую|ые|ых моне%1$Iту|ты|т.", cost );
     else
-        client->println( "В честь Дня Защиты Животных починка обошлась тебе бесплатно." );
+        client->pecho( "В честь Дня Защиты Животных починка обошлась тебе бесплатно." );
 
     obj->condition = 100;
     mprog_repair(ch, client, obj, cost);
@@ -216,7 +216,7 @@ CMDRUN( repair )
     Repairman::Pointer man;
     
     if (!( man = find_attracted_mob_behavior<Repairman>( ch, OCC_REPAIRMAN ) )) {
-        ch->println( "Здесь нет ремонтника.");
+        ch->pecho( "Здесь нет ремонтника.");
         return;
     }
 
@@ -232,7 +232,7 @@ CMDRUN( estimate )
     Repairman::Pointer man;
     
     if (!( man = find_attracted_mob_behavior<Repairman>( ch, OCC_REPAIRMAN ) )) {
-        ch->println( "Здесь нет ремонтника.");
+        ch->pecho( "Здесь нет ремонтника.");
         return;
     }
 

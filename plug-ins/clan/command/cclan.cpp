@@ -10,6 +10,7 @@
 
 #include "class.h"
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 #include "pcharactermemory.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -83,9 +84,9 @@ COMMAND(CClan, "clan")
     
     if (IS_CHARMED(pc)) {
         if (pc->master)
-            pc->master->send_to( "Нельзя проникнуть в тайны чужого клана с помощью колдовства.\r\n" );
+            pc->master->pecho("Нельзя проникнуть в тайны чужого клана с помощью колдовства.");
 
-        pc->send_to( "Тебя пытаются принудить выдать тайны своего клана, но ты не поддаешься.\r\n" );
+        pc->pecho("Тебя пытаются принудить выдать тайны своего клана, но ты не поддаешься.");
         return;
     }
 
@@ -157,7 +158,7 @@ void CClan::usage( PCharacter *pc )
  */
 void CClan::clanList( PCharacter* pc )
 {
-    pc->send_to( "В мире есть такие кланы:\n\r" );                              
+    pc->pecho("В мире есть такие кланы:");                              
         
     for (int i = 0; i < ClanManager::getThis( )->size( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i );
@@ -171,7 +172,7 @@ void CClan::clanList( PCharacter* pc )
         }
     }
 
-    pc->send_to( "\n\rПодробнее смотри команду {lRклан ?{lEclan ?{lx{x.\n\r" );                              
+    pc->pecho("\n\rПодробнее смотри команду {lRклан ?{lEclan ?{lx{x.");                              
 }
 
 /*
@@ -196,7 +197,7 @@ void CClan::clanCount( PCharacter* pc )
             counts[pcm->getClan( )]++;
     }
     
-    pc->send_to( "      Клан         кол.\n\r" );                               
+    pc->pecho("      Клан         кол.");                               
 
     for (int i = 0; i < cm->size( ); i++) {
         Clan *clan = cm->find( i );
@@ -218,7 +219,7 @@ void CClan::clanRating( PCharacter* pc )
 {
     ClanManager *cm = ClanManager::getThis( );
 
-    pc->send_to( "Клан      Рейтинг\n\r" );                                     
+    pc->pecho("Клан      Рейтинг");                                     
     
     for (int i = 0; i < cm->size( ); i++) {
         Clan *clan = cm->find( i );
@@ -239,7 +240,7 @@ void CClan::clanStatus( PCharacter* pc )
 {
     ClanManager *cm = ClanManager::getThis( );
 
-    pc->send_to( "      {BКлан        ...20        21-40       41-60       61-80       81...{x\r\n" );
+    pc->pecho("      {BКлан        ...20        21-40       41-60       61-80       81...{x");
 
     for (int i = 0; i < cm->size( ); i++) {
         basic_ostringstream<char> buf;                                          
@@ -285,7 +286,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     if ((!pc->getClan( )->getData( ) || !pc->getClan( )->getData( )->getBank( ))
         && !pc->is_immortal( )) 
     {
-        pc->send_to ("У тебя нет кланового банка!\n\r");
+        pc->pecho("У тебя нет кланового банка!");
         return;
     }
 
@@ -293,8 +294,8 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     {
         bool fAll = pc->is_immortal( );
 
-        pc->send_to( "{g\t\t  Состояние банка твоего клана{x.\n\r\n\r" );
-        pc->send_to( "Клан            |{BКвестовых единиц{x|{YЗолотых монет{x|{WСеребряных монет{x|{CБриллиантов{x|\n\r" );
+        pc->pecho("{g\t\t  Состояние банка твоего клана{x.\n\r");
+        pc->pecho("Клан            |{BКвестовых единиц{x|{YЗолотых монет{x|{WСеребряных монет{x|{CБриллиантов{x|");
 
         for (int i = 0; i < cm->size( ); i++) {
             clan = cm->find( i );
@@ -323,12 +324,12 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         clan = cm->findUnstrict( argumentOne );
         
         if (!clan) {
-            pc->send_to("Такого клана пока не существует.\n\r");
+            pc->pecho("Такого клана пока не существует.");
             return;
         }
         
         if (!clan->getData( ) || !clan->getData( )->getBank( )) {
-            pc->send_to( "У этого клана нет банка!\r\n" );
+            pc->pecho("У этого клана нет банка!");
             return;
         }
         
@@ -347,33 +348,33 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     else if (arg_oneof( argumentOne, "withdraw", "сосчета", "снять" )) 
         mode = CB_MODE_WITHDRAW;
     else {
-        pc->send_to( "Можно задать только режим {lR'положить'{lEdeposit{lx или {lR'снять'{lEwithdraw{lx.\n\r" );
+        pc->pecho("Можно задать только режим {lR'положить'{lEdeposit{lx или {lR'снять'{lEwithdraw{lx.");
         return;
     }
 
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( ) || !argumentOne.isNumber( )) {
-        pc->send_to( "Укажи сумму перевода.\r\n" );
+        pc->pecho("Укажи сумму перевода.");
         return;
     }
     
     try {
         amount = argumentOne.toInt( );
     } catch (const ExceptionBadType& e) {
-        pc->send_to("Сумма перевода задана неправильно!\n\r");
+        pc->pecho("Сумма перевода задана неправильно!");
         return;
     }
 
     if (amount <= 0) {
-        pc->send_to("Сумма должна быть больше нуля.\n\r");
+        pc->pecho("Сумма должна быть больше нуля.");
         return;
     }
 
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( )) {
-        pc->send_to( "Укажи единицу расчета ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).\r\n" );
+        pc->pecho("Укажи единицу расчета ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).");
         return;
     }
     
@@ -387,13 +388,13 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         currency = CB_CURR_DIAMOND;
     else
     {
-        pc->send_to( "Кланбанк оперирует только с {lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx.\n\r" );
+        pc->pecho("Кланбанк оперирует только с {lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx.");
         return;
     }
 
     if (mode == CB_MODE_DEPOSIT) {
         if (!clanBankDeposit( pc, clan, currency, amount, buf )) 
-            pc->println( "Это больше, чем ты имеешь." );
+            pc->pecho( "Это больше, чем ты имеешь." );
         else {
             pc->send_to( buf );
             clan->getData( )->save( );
@@ -405,7 +406,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
 
     if (!pc->is_immortal() && !clan->isRecruiter( pc ))
     {
-        pc->send_to( "Это могут сделать только руководители кланов.\n\r" );
+        pc->pecho("Это могут сделать только руководители кланов.");
         return;
     }
 
@@ -418,12 +419,12 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
             acc_clan = cm->findUnstrict( argumentOne );
 
             if (!acc_clan) {
-                pc->send_to("Клан-получатель указан неверно.\n\r");
+                pc->pecho("Клан-получатель указан неверно.");
                 return;
             }
             
             if (!acc_clan->getData( ) || !acc_clan->getData( )->getBank( )) {
-                pc->send_to("У клана-получателя нет банка!\n\r");
+                pc->pecho("У клана-получателя нет банка!");
                 return;
             }
         }
@@ -432,13 +433,13 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
             vch = get_char_world( pc, argumentOne.c_str( ) );
 
             if (!vch || !(victim = vch->getPC( ))) {
-                pc->send_to( "Игрока-получателя нет в мире.\n\r" );
+                pc->pecho("Игрока-получателя нет в мире.");
                 return;
             }
         }
         else
         {
-            pc->send_to( "Непонятно, чего ты хочешь?\n\r" );
+            pc->pecho("Непонятно, чего ты хочешь?");
             return;
         }
     }
@@ -450,18 +451,18 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         victim = pc;
 
     if (currency != CB_CURR_QP && (clan != acc_clan || pc != victim )) {
-        pc->send_to( "Взаиморасчеты между кланами (или игроками) осуществляются в квестовых очках.\n\r" );
+        pc->pecho("Взаиморасчеты между кланами (или игроками) осуществляются в квестовых очках.");
         return;
     }
                 
     if (currency == CB_CURR_QP && victim && pc->getClan() != victim->getClan())
     {
-        pc->send_to ("Ты можешь отдать квестовые очки или какому-либо клану, или своему соклановику.\n\r");
+        pc->pecho("Ты можешь отдать квестовые очки или какому-либо клану, или своему соклановику.");
         return;
     }
     
     if (!clanBankWithdraw( pc, victim, clan, acc_clan, currency, amount, buf )) {
-        pc->send_to( "В банке твоего клана столько нету.\n\r" );
+        pc->pecho("В банке твоего клана столько нету.");
         return;
     }
 
@@ -731,7 +732,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
 
     victim = PCharacterManager::find( argumentOne );
     if (!victim) {
-        pc->send_to( "Игрок с таким именем не найден.\r\n" );
+        pc->pecho("Игрок с таким именем не найден.");
         return;
     }
     
@@ -740,13 +741,13 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
 
     if (pc == victim) {
         if (!member) {
-            pc->send_to( "А откуда еще тебе хотелось бы уйти?\n\r" );
+            pc->pecho("А откуда еще тебе хотелось бы уйти?");
             return;
         }
         
         if (!pc->is_immortal( )) 
             if (!member->removable) {
-                pc->println( "Из твоего клана невозможно уйти по собственной воле." );
+                pc->pecho( "Из твоего клана невозможно уйти по собственной воле." );
                 return;
             }
 
@@ -757,7 +758,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
 
     } else {
         if (!pc->is_immortal() && !clan.isRecruiter( pc )) {
-            pc->send_to( "Это могут сделать только руководители кланов.\n\r" );
+            pc->pecho("Это могут сделать только руководители кланов.");
             return;
         }
 
@@ -767,7 +768,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
         }
 
         if (member && !member->removable) {
-            pc->println( "Из твоего клана невозможно никого выгнать." );
+            pc->pecho( "Из твоего клана невозможно никого выгнать." );
             return;
         }
         
@@ -775,7 +776,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
             && clan.isRecruiter( victim ) 
             && !dynamic_cast<PCharacter *>( victim )) 
         {
-            pc->send_to( "Выгонять руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.\r\n" );
+            pc->pecho("Выгонять руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.");
             return;
         }
 
@@ -783,7 +784,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
         victim->setClan( member->removeBy );
     }        
 
-    pc->send_to( "Ok.\n\r" );
+    pc->pecho("Ok.");
 
     victim->setClanLevel( 0 );
     ClanOrgs::delAttr( victim );
@@ -838,7 +839,7 @@ void CClan::clanLevel( PCharacter *pc, DLString& argument )
         victim = PCharacterManager::find( argumentOne );
 
         if (!victim) {
-            pc->send_to( "Игрок с таким именем не найден.\r\n" );
+            pc->pecho("Игрок с таким именем не найден.");
             return;
         }                
     }
@@ -860,7 +861,7 @@ void CClan::clanLevelList( PCharacter *pc )
     titles = pc->getClan( )->getTitles( );
 
     if (!titles) {
-        pc->send_to( "Клановых званий в твоем клане не обнаружено.\r\n" );
+        pc->pecho("Клановых званий в твоем клане не обнаружено.");
         return;
     }
     
@@ -877,9 +878,9 @@ void CClan::clanLevelShow( PCharacter *pc, PCMemoryInterface *victim )
 
     if (!clan->getTitles( )) {
         if (victim == pc)
-            pc->send_to( "Клановых рангов в твоем клане не обнаружено.\r\n" );
+            pc->pecho("Клановых рангов в твоем клане не обнаружено.");
         else
-            pc->send_to( "В его/ее клане нет клановых рангов.\r\n" );
+            pc->pecho("В его/ее клане нет клановых рангов.");
     }
     else {
         if (victim == pc)
@@ -908,18 +909,18 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     try {
         i = arg.toInt( );
     } catch (const ExceptionBadType &e) {
-        pc->send_to( "Неверный клановый ранг.\n\r" );
+        pc->pecho("Неверный клановый ранг.");
         return;
     }
     
     if (pc->get_trust( ) < CREATOR) {
         if (!pc->getClan( )->isRecruiter( pc )) {
-            pc->send_to( "Это могут сделать только руководители кланов.\n\r" );
+            pc->pecho("Это могут сделать только руководители кланов.");
             return;
         }
         
         if (pc->getClan( ) != clan) {
-            pc->send_to( "Не лезь в чужой клан.\n\r" );
+            pc->pecho("Не лезь в чужой клан.");
             return;
         }
     }
@@ -930,7 +931,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
         size = 0;
 
     if (size == 0) {
-        pc->send_to( "В этом клане нет клановых рангов.\r\n" );
+        pc->pecho("В этом клане нет клановых рангов.");
         return;
     }
 
@@ -941,26 +942,26 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
 
     if (pc->get_trust( ) < CREATOR) {
         if (pc == victim && pc->getClanLevel( ) < i) {
-            pc->send_to( "И кто же тебе это позволит?\n\r" );
+            pc->pecho("И кто же тебе это позволит?");
             return;
         }
 
         if (victim->getClanLevel( ) > i) {
             if (clan.isRecruiter( victim ) && !dynamic_cast<PCharacter *>( victim )) {
-                pc->send_to( "Смещать руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.\r\n" );
+                pc->pecho("Смещать руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.");
                 return;
             }
         }
     }
 
     if (victim->getClanLevel( ) == i) {
-        pc->send_to( "Тихий голосок в сознании шепчет:\n\rЕсть и более глупые, чем ты...\r\nНо много ли таких?\n\r" );
+        pc->pecho("Тихий голосок в сознании шепчет:\n\rЕсть и более глупые, чем ты...\r\nНо много ли таких?");
         return;
     }
     
     int oldLevel = victim->getClanLevel();
     victim->setClanLevel( i );
-    pc->send_to( "Ok.\n\r" );
+    pc->pecho("Ok.");
 
     buf << "Ты получаешь клановый ранг [{"
         << clan.getColor( ) << clan.getTitle( victim ) << "{x].";
@@ -1034,9 +1035,11 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
         return;
     }
 
-    if (!pc->getClan( )->getData( )) 
-    {
-        pc->send_to ("Сначала присоединись к одному из кланов.\n\r");
+    if (pc->getClan()->isDispersed()) {
+        if (pc->getClan() == clan_none)
+            pc->pecho("Сначала присоединись к одному из кланов.");
+        else
+            pc->pecho("Ты не можешь увидеть список своих соклановиков.");
         return;
     }
     
@@ -1067,10 +1070,19 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
         }            
     }   
     
-    for (MemberList::iterator i = members.begin( ); i != members.end( ); i++) 
-        player_fmt( "%-10n %-10R %-12P %b %-3l %-15t %-a\r\n", *i, buf, pc );
+    for (MemberList::iterator i = members.begin( ); i != members.end( ); i++) {
+        PCMemoryInterface *pcm = *i;
+        buf << dlprintf("%-10s %-10s %-12s %2d %3d  %-15s %s\r\n",
+                   pcm->getName().c_str(),
+                   pcm->getRace()->getName().c_str(),
+                   pcm->getProfession( )->getNameFor(pc).c_str(),
+                   pcm->getRemorts().size(), 
+                   pcm->getLevel(),
+                   pcm->getClan()->getTitle(pcm).c_str(),
+                   pcm->getLastAccessTime( ).getTimeAsString("%d/%m/%y %H:%M").c_str());
+    }
 
-    pc->send_to( "\n\r{BИмя         раса        класс         уровень звание           last time{x\n\r" );
+    pc->pecho("\n\r{BИмя         раса        класс         уровень звание           last time{x");
     pc->send_to( buf );
 }
 
@@ -1107,12 +1119,12 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
 
     if (argumentOne.empty( )) {
         if (pc->getPetition( ) == clan_none) {
-            pc->send_to( "Укажи название клана.\r\n" );
+            pc->pecho("Укажи название клана.");
             return;
         }
         
         if (!pc->getPetition( )->isValid( )) {
-            pc->send_to( "Клан, в который ты желаешь вступить, временно недоступен.\r\n" );
+            pc->pecho("Клан, в который ты желаешь вступить, временно недоступен.");
             return;
         }
         
@@ -1143,19 +1155,19 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
      */
     
     if (!IS_SET(pc->act, PLR_CONFIRMED)) {
-        pc->println( "Твой персонаж еще не подтвержден Богами." );
+        pc->pecho( "Твой персонаж еще не подтвержден Богами." );
         return;
     }
     
     clan = ClanManager::getThis( )->findUnstrict( argumentOne );
 
     if (!clan) {
-        pc->send_to( "Такого клана не существует.\r\n" );
+        pc->pecho("Такого клана не существует.");
         return;
     }
     
     if (pc->getClan( ) == clan) {
-        pc->send_to ("И не лень тебе в свой клан пытаться еще раз вступить?\n\r");
+        pc->pecho("И не лень тебе в свой клан пытаться еще раз вступить?");
         return;
     }
     
@@ -1164,23 +1176,23 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
     
     if (mymember) {
         if (!mymember->removable && mymember->mode.getValue( ) != PETITION_ALWAYS) {
-            pc->send_to("Это насовсем...\r\n");
+            pc->pecho("Это насовсем...");
             return;
         }
 
         if (mymember->removeSelf == clan) {
-            pc->send_to ("Если ты очень хочешь, то просто покинь свой клан!\n\r");
+            pc->pecho("Если ты очень хочешь, то просто покинь свой клан!");
             return;
         }
         
         if (mymember->removeBy == clan) {
-            pc->send_to ("Если ты очень хочешь, то заставь лидера выгнать тебя из клана!\n\r");
+            pc->pecho("Если ты очень хочешь, то заставь лидера выгнать тебя из клана!");
             return;
         }
     }
 
     if (!member || !clan->canInduct( pc )) {
-        pc->send_to( "Ты не можешь вступить в этот клан.\n\r" );
+        pc->pecho("Ты не можешь вступить в этот клан.");
         return;
     }
 
@@ -1191,7 +1203,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
     }
 
     if (member->mode.getValue( ) == PETITION_NEVER) {
-        pc->send_to( "В этот клан нельзя попасть, написав петицию.\r\n" );
+        pc->pecho("В этот клан нельзя попасть, написав петицию.");
         return;
     }
     
@@ -1205,7 +1217,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         int found = false;
 
         pc->setPetition( clan->getName( ) );
-        pc->send_to( "Петиция на вступление в клан подана.\r\n" );
+        pc->pecho("Петиция на вступление в клан подана.");
                 
         // Если есть лидеры, сообщить им
         for (d = descriptor_list; d; d = d->next) {
@@ -1217,14 +1229,14 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
                 && victim->getClan( ) == pc->getPetition( )
                 && victim->getClan( )->isRecruiter( victim->getPC( ) ))
             {
-                victim->send_to("Есть желающие в клан.\n\r");
+                victim->pecho("Есть желающие в клан.");
                 run( victim, "petition list" );
                 found = true;
             }
         }
         
         if (!found)
-            pc->send_to("(сейчас в мире нет никого из руководства этого клана)\n\r");
+            pc->pecho("(сейчас в мире нет никого из руководства этого клана)");
 
         DLString what = fmt(0, "{W%1$^C1 подал%1$Gо||а петицию в %s.{x", pc, clan->getRussianName( ).ruscase('4').c_str());
         infonet(pc, 0, "{CТихий голос из $o2: ", what.c_str());
@@ -1247,13 +1259,18 @@ void CClan::clanPetitionList( PCharacter *pc )
         PCMemoryInterface *pcm = pos->second;
 
         if (pcm->getPetition( ) == pc->getClan( ))
-            player_fmt( "%-10n %-10R %-12P %b %-3l\r\n", pcm, buf, pc );
+            buf << dlprintf("%-10s %-10s %-12s %2d %3d\r\n",
+                    pcm->getName().c_str(),
+                    pcm->getRace()->getName().c_str(),
+                    pcm->getProfession( )->getNameFor(pc).c_str(),
+                    pcm->getRemorts().size(), 
+                    pcm->getLevel());
     }
 
     if (buf.str( ).empty( ))
-        pc->send_to( "\n\rНет ни одной заявки.\n\r" );
+        pc->pecho("\n\rНет ни одной заявки.");
     else {
-        pc->send_to( "\n\r{BИмя         раса        класс         уровень{x\n\r" );
+        pc->pecho("\n\r{BИмя         раса        класс         уровень{x");
         pc->send_to( buf );
     }                
 }
@@ -1266,7 +1283,7 @@ void CClan::clanPetitionAccept( PCharacter *pc, DLString& argument )
     PCMemoryInterface *victim = PCharacterManager::find( argument );
 
     if (!victim) {
-        pc->send_to( "Игрок с таким именем не найден.\r\n" );
+        pc->pecho("Игрок с таким именем не найден.");
         return;
     }
     
@@ -1281,7 +1298,7 @@ void CClan::clanPetitionAccept( PCharacter *pc, DLString& argument )
         return;
     }
 
-    pc->println( "Ok." );
+    pc->pecho( "Ok." );
     
     doInduct( victim, *pc->getClan( ) );
 }
@@ -1323,7 +1340,7 @@ void CClan::clanPetitionReject( PCharacter *pc, DLString& argument )
     PCMemoryInterface *victim = PCharacterManager::find( argument );
 
     if (!victim) {
-        pc->send_to( "Игрок с таким именем не найден.\r\n" );
+        pc->pecho("Игрок с таким именем не найден.");
         return;
     }
 
@@ -1332,7 +1349,7 @@ void CClan::clanPetitionReject( PCharacter *pc, DLString& argument )
         return;
     }
 
-    pc->send_to( "Ok.\n\r" );
+    pc->pecho("Ok.");
     
     if (victim->getClan( ) == clan_none) {
         victim->setClan( clan_outsider );
@@ -1401,7 +1418,7 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
     ClanData *data;
     ClanManager *cm = ClanManager::getThis( );
 
-    pc->send_to( "Клановая дипломатия :\n\r" );
+    pc->pecho("Клановая дипломатия :");
     buf << "********** ";
     
     for (int i = 0; i < cm->size( ); i++) {
@@ -1464,7 +1481,7 @@ void CClan::clanDiplomacyProp( PCharacter *pc )
     ClanData *mydata = myclan->getData( );
 
     if (!mydata || !myclan->hasDiplomacy( )) {
-        pc->send_to( "Для твоего клана не существует понятия дипломатии.\r\n" );
+        pc->pecho("Для твоего клана не существует понятия дипломатии.");
         return;
     }
 
@@ -1505,33 +1522,33 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
     mydata = myclan->getData( );
 
     if (!mydata || !myclan->hasDiplomacy( )) {
-        pc->send_to( "Для твоего клана не существует понятия дипломатии.\r\n" );
+        pc->pecho("Для твоего клана не существует понятия дипломатии.");
         return;
     }
     
     if (!myclan->isRecruiter( pc ) && !pc->is_immortal( )) {
-        pc->send_to( "Только руководство кланов может менять политику.\n\r" );
+        pc->pecho("Только руководство кланов может менять политику.");
         return; 
     }        
 
-    pc->send_to( "Установка политики\n\r" );
+    pc->pecho("Установка политики");
 
     clan = ClanManager::getThis( )->findUnstrict( argumentOne );
 
     if (!clan) {
-        pc->send_to( "Такого клана не существует.\r\n" );
+        pc->pecho("Такого клана не существует.");
         return;
     }
     
     data = clan->getData( );
 
     if (!data || !clan->hasDiplomacy( )) {
-        pc->send_to( "Для этого клана не существует понятия дипломатии.\r\n" );
+        pc->pecho("Для этого клана не существует понятия дипломатии.");
         return;
     }
     
     if (myclan == clan) {
-        pc->send_to( "Твой клан развалится и без твоей помощи\n\r" );
+        pc->pecho("Твой клан развалится и без твоей помощи");
         mydata->setDiplomacy( myclan, 0 );
         mydata->save( );
         return;
@@ -1542,17 +1559,17 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
     try {
         dip = argument.toInt( );
     } catch (const ExceptionBadType &e) {
-        pc->send_to( "Неверная политика.\n\r" );
+        pc->pecho("Неверная политика.");
         return;
     }
     
     if (dip < 0 || dip > clan_diplomacy_max) {
-        pc->send_to( "Неверная политика (см. clan diplomacy list).\r\n" );
+        pc->pecho("Неверная политика (см. clan diplomacy list).");
         return;
     }
     
     if (mydata->getDiplomacy( clan ) == dip) {
-        pc->send_to( "Это ничего не меняет.\n\r" );
+        pc->pecho("Это ничего не меняет.");
         return;
     }
     
@@ -1571,7 +1588,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
     }
     
     if (mydata->getDiplomacy( clan ) > dip) {
-        pc->send_to( "улучшение\n\r" );
+        pc->pecho("улучшение");
         
         if (mydata->getProposition( clan) <= dip) {
             // Не лучше предложеного
@@ -1603,7 +1620,7 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
     }
     else
     {
-        pc->send_to( "УХУДШЕНИЕ\n\r" );
+        pc->pecho("УХУДШЕНИЕ");
         
         mydata->setDiplomacy( clan, dip );
         mydata->setProposition( clan, dip );
@@ -1699,12 +1716,12 @@ void CClan::clanInduct( PCharacter *pc, DLString &argument )
     argumentOne = argument.getOneArgument( );
     
     if (pc->get_trust( ) < GOD) {
-        pc->println("У тебя нет таких полномочий.");
+        pc->pecho("У тебя нет таких полномочий.");
         return;
     }
 
     if (arg_is_help( argumentOne ) || argumentOne.empty( ) || argument.empty( )) {
-        pc->println( "{Wclan induct {x<player> <clan> - принять кого-либо в указанный клан" );
+        pc->pecho( "{Wclan induct {x<player> <clan> - принять кого-либо в указанный клан" );
         return;
     }
     
@@ -1713,17 +1730,17 @@ void CClan::clanInduct( PCharacter *pc, DLString &argument )
 
     victim = PCharacterManager::find( argumentOne );
     if (!victim) {
-        pc->println( "Игрок с таким именем не найден." );
+        pc->pecho( "Игрок с таким именем не найден." );
         return;
     }
 
     new_clan = ClanManager::getThis( )->findUnstrict( argument );
 
     if (!new_clan) {
-        pc->send_to("О таком клане ничего не известно.\n\r");
+        pc->pecho("О таком клане ничего не известно.");
         return;
     }
     
-    pc->println( "Ok." );
+    pc->pecho( "Ok." );
     doInduct( victim, *new_clan );
 }    

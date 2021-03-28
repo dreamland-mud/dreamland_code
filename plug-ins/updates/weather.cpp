@@ -377,7 +377,7 @@ CMDRUN( time )
     ostringstream buf;
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
-        ch->println( "Похоже, в этом месте время остановило свой ход." );
+        ch->pecho( "Похоже, в этом месте время остановило свой ход." );
         return;
     }
 
@@ -429,13 +429,13 @@ CMDRUN( weather )
     };
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER)) {
-        ch->println( "Похоже, в этом месте погода всегда одинаковая." );
+        ch->pecho( "Похоже, в этом месте погода всегда одинаковая." );
         return;
     }
     
     if ( !RoomUtils::isOutside(ch) )
     {
-        ch->send_to( "Ты не можешь видеть погоду в помещении.\n\r");
+        ch->pecho("Ты не можешь видеть погоду в помещении.");
         return;
     }
     

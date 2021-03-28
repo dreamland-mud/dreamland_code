@@ -54,8 +54,8 @@ void ClanGuardChaos::actGreet( PCharacter *wch )
 }
 void ClanGuardChaos::actPush( PCharacter *wch )
 {
-    act( "На мгновенье ты теряешь представление о реальности...", wch, 0, ch, TO_CHAR );
-    act( "$C1 выпускает частицу ХАОСА в $c2\n\r...и $c1 растворяется в нем...", wch, 0, ch, TO_ROOM );
+    oldact("На мгновенье ты теряешь представление о реальности...", wch, 0, ch, TO_CHAR );
+    oldact("$C1 выпускает частицу ХАОСА в $c2\n\r...и $c1 растворяется в нем...", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardChaos::getCast( Character *victim )
 {
@@ -104,22 +104,22 @@ void ChaosBlade::fight( Character *ch )
 
     switch(number_bits(6)) {
     case 0:
-            act("{MКлинок Хаоса{x неистово вздрагивает!",ch,0,0,TO_ROOM);
-            ch->send_to("Твой {MКлинок Хаоса{x неистово вздрагивает!\n\r");
+            oldact("{MКлинок Хаоса{x неистово вздрагивает!",ch,0,0,TO_ROOM);
+            ch->pecho("Твой {MКлинок Хаоса{x неистово вздрагивает!");
             spell(gsn_mirror, ch->getModifyLevel(),ch,ch, FSPELL_BANE );
             ch->setWaitViolence( 2 );
             break;
 
     case 1:
-            act("{MКлинок Хаоса{x устрашающе звенит!",ch,0,0,TO_ROOM);
-            ch->send_to("Твой {MКлинок Хаоса{x устрашающе звенит!\n\r");
+            oldact("{MКлинок Хаоса{x устрашающе звенит!",ch,0,0,TO_ROOM);
+            ch->pecho("Твой {MКлинок Хаоса{x устрашающе звенит!");
             spell(gsn_garble, ch->getModifyLevel()+5, ch, ch->fighting, FSPELL_BANE );
             ch->setWaitViolence( 2 );
             break;
 
     case 2:
-            act("{MКлинок Хаоса{x неудержимо дрожит!",ch,0,0,TO_ROOM);
-            ch->send_to("Твой {MКлинок Хаоса{x неудержимо дрожит!\n\r");
+            oldact("{MКлинок Хаоса{x неудержимо дрожит!",ch,0,0,TO_ROOM);
+            ch->pecho("Твой {MКлинок Хаоса{x неудержимо дрожит!");
             spell(gsn_confuse, ch->getModifyLevel()+5,ch,ch->fighting, FSPELL_BANE );
             ch->setWaitViolence( 2 );
             break;
@@ -128,8 +128,8 @@ void ChaosBlade::fight( Character *ch )
 
 bool ChaosBlade::death( Character *ch )
 {
-    act_p( "Твой {MКлинок Хаоса{x исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "{MКлинок Хаоса{x $c2 исчезает.", ch, 0, 0, TO_ROOM );
+    oldact_p("Твой {MКлинок Хаоса{x исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
+    oldact("{MКлинок Хаоса{x $c2 исчезает.", ch, 0, 0, TO_ROOM );
     extract_obj( obj );
     return false;
 }
@@ -140,8 +140,8 @@ VOID_SPELL(ChaosBlade)::run(Character *ch, char *, int sn, int level)
     Object *blade;
 
     blade = create_object(get_obj_index(OBJ_VNUM_CHAOS_BLADE), level);
-    ch->send_to("Ты взмахиваешь руками и создаешь Клинок Хаоса!\n\r");
-    act_p("$c1 взмахивает руками и создает Клинок Хаоса!",
+    ch->pecho("Ты взмахиваешь руками и создаешь Клинок Хаоса!");
+    oldact_p("$c1 взмахивает руками и создает Клинок Хаоса!",
           ch, 0, 0, TO_ROOM, POS_RESTING);
 
     blade->timer = level * 2;
@@ -169,19 +169,19 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( victim->isAffected(gsn_confuse) )
         {
-                act_p("Кто-то совсем недавно уже ввел в заблуждение $C4.",
+                oldact_p("Кто-то совсем недавно уже ввел в заблуждение $C4.",
                         ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
         }
 
         if ( saves_spell(level,victim, DAM_MENTAL, ch, DAMF_MAGIC) )
         {
-                ch->send_to("Не получилось.\n\r");
+                ch->pecho("Не получилось.");
                 return;
         }
 
-        victim->send_to("Тебя сконфузили!\n\r");
-        act("$c1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM);
+        victim->pecho("Тебя сконфузили!");
+        oldact("$c1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM);
 
         af.type      = sn;
         af.level     = level;
@@ -233,11 +233,11 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
       af.modifier           = ( - ( 5 + level / 10 ) );
       affect_to_char(victim,&af);
       
-      act("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!", victim, 0, 0, TO_ROOM);
-      act("Ты чувствуешь себя гораздо менее уверенно!", victim, 0, 0, TO_CHAR);
+      oldact("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!", victim, 0, 0, TO_ROOM);
+      oldact("Ты чувствуешь себя гораздо менее уверенно!", victim, 0, 0, TO_CHAR);
     }
       else
-      ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+      ch->pecho("Твоя попытка закончилась неудачей.");
 
 }
 
@@ -253,12 +253,12 @@ VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-        ch->send_to("У тебя не хватает сил разогнать эту группу.\n\r");
+        ch->pecho("У тебя не хватает сил разогнать эту группу.");
         return;
     }
 
     if (IS_SET(room->room_flags, ROOM_NO_RECALL)) {
-        ch->println("Отсюда ты никого не сможешь вышвырнуть.");
+        ch->pecho("Отсюда ты никого не сможешь вышвырнуть.");
         return;
     }
 
@@ -309,7 +309,7 @@ VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level )
     postaffect_to_char( ch, sn, 15 );
     
     if (cnt == 0)
-        ch->println("Подходящей жертвы не нашлось.");
+        ch->pecho("Подходящей жертвы не нашлось.");
 }
 
 
@@ -322,31 +322,31 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
   if (ch->is_npc() || victim->is_npc())
     {
-     act("Ты не можешь подражать $C3.",ch,0,victim,TO_CHAR);
+     oldact("Ты не можешь подражать $C3.",ch,0,victim,TO_CHAR);
      return;
    }
 
   if (ch == victim || ch->getDoppel( ) == victim)
     {
-      act("Ты уже выглядишь как $E.",ch,0,victim,TO_CHAR);
+      oldact("Ты уже выглядишь как $E.",ch,0,victim,TO_CHAR);
       return;
     }
 
   if (victim->is_immortal() || victim->getDoppel( ) == ch)
     {
-      ch->send_to("Ну..Ну...\n\r");
+      ch->pecho("Ну..Ну...");
       return;
     }
 
   if (saves_spell(level,victim, DAM_CHARM, ch, DAMF_MAGIC))
    {
-    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+    ch->pecho("Твоя попытка закончилась неудачей.");
     return;
    }
 
-  act("Ты меняешь свой облик, подражая $C3.", ch,0,victim,TO_CHAR);
-  act("$c1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
-  act("$c1 меняет свой облик, подражая $C3!", ch,0,victim,TO_NOTVICT);
+  oldact("Ты меняешь свой облик, подражая $C3.", ch,0,victim,TO_CHAR);
+  oldact("$c1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
+  oldact("$c1 меняет свой облик, подражая $C3!", ch,0,victim,TO_NOTVICT);
 
   af.type               = sn;
   af.level              = level;
@@ -364,31 +364,31 @@ SPELL_DECL(Garble);
 VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
   if( ch == victim ) {
-    ch->send_to("Это просто глупо.\n\r");
+    ch->pecho("Это просто глупо.");
     return;
   }
 
   if( victim->isAffected(sn ) )  {
-    act_p( "$C1 и так уже не может ничего внятно произнести.",
+    oldact_p("$C1 и так уже не может ничего внятно произнести.",
             ch, 0, victim, TO_CHAR,POS_RESTING);
     return;
   }
 
   if( is_safe_nomessage( ch, victim ) ) {
-    ch->send_to("Тебе не дано здесь чего-нибудь добиться.\n\r");
+    ch->pecho("Тебе не дано здесь чего-нибудь добиться.");
     return;
   }
 
   if( saves_spell( level, victim, DAM_MENTAL, ch, DAMF_MAGIC ) ) {
-    ch->send_to("Хаос остался в тебе.\n\r");
+    ch->pecho("Хаос остался в тебе.");
     return;
   }
 
     gsn_garble->getCommand()->run(victim, level);
 
-  act_p( "Ты поделил$gось|ся|ась частицей хаоса с языком $C2.",
+  oldact_p("Ты поделил$gось|ся|ась частицей хаоса с языком $C2.",
           ch, 0, victim, TO_CHAR,POS_RESTING);
-  victim->send_to("Такое впечатление, что твой язык завязали узлом.\n\r");
+  victim->pecho("Такое впечатление, что твой язык завязали узлом.");
 
 }
 
@@ -418,13 +418,13 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
         if (victim->is_npc())
         {
-                ch->send_to("Зеркальные отражения могут иметь только персонажи.\n\r");
+                ch->pecho("Зеркальные отражения могут иметь только персонажи.");
                 return;
         }
 
         if ( ch->isAffected(sn ) )
         {
-            ch->send_to("Ты пытаешься сотворить зеркальные отражения, но безуспешно.\n\r");
+            ch->pecho("Ты пытаешься сотворить зеркальные отражения, но безуспешно.");
             return;
         }
 
@@ -435,9 +435,9 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         if ( ( mirrors >= level/5 ) || ( mirrors >= 10 ) )
         {
                 if (ch==victim)
-                        ch->send_to("Зеркальных отражений уже слишком много.\n\r");
+                        ch->pecho("Зеркальных отражений уже слишком много.");
                 else
-                        act_p("Зеркальных отражений $C2 уже слишком много.",
+                        oldact_p("Зеркальных отражений $C2 уже слишком много.",
                                 ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
         }
@@ -454,17 +454,17 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( ch == victim )
         {
-                ch->send_to("Около тебя появляется твое зеркальное отражение!\n\r");
-                act_p("Зеркальное отражение $c2 появляется рядом с $y!",
+                ch->pecho("Около тебя появляется твое зеркальное отражение!");
+                oldact_p("Зеркальное отражение $c2 появляется рядом с $y!",
                         ch,0,victim,TO_ROOM,POS_RESTING);
         }
         else
         {
-                act_p("Зеркальное отражение $C2 появляется рядом с $Y!",
+                oldact_p("Зеркальное отражение $C2 появляется рядом с $Y!",
                         ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("Зеркальное отражение $C2 появляется рядом с $Y!",
+                oldact_p("Зеркальное отражение $C2 появляется рядом с $Y!",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
-                victim->send_to("Рядом с тобой появляется твое зеркальное отражение!\n\r");
+                victim->pecho("Рядом с тобой появляется твое зеркальное отражение!");
         }
 
         for (new_mirrors=0;
@@ -511,24 +511,24 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-      ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+      ch->pecho("Это заклинание использовалось совсем недавно.");
       return;
     }
 
 //  if (IS_SET(room->room_flags, ROOM_LAW))
 //    {
-//      ch->send_to("Здесь тебе противостоят Силы Порядка.\n\r");
+//      ch->pecho("Здесь тебе противостоят Силы Порядка.");
 //      return;
 //    }
     if (IS_ROOM_AFFECTED(room, AFF_ROOM_RANDOMIZER))
     {
-        ch->send_to("Магические Силы Хаоса уже изменили окружающий мир.\n\r");
+        ch->pecho("Магические Силы Хаоса уже изменили окружающий мир.");
         return;
     }
 
   if (number_bits(1) == 0)
     {
-      ch->send_to("Несмотря на твои усилия, окружающий мир противостоит Хаосу.\n\r");
+      ch->pecho("Несмотря на твои усилия, окружающий мир противостоит Хаосу.");
       postaffect_to_char(ch, sn, level / 10);
       return;
     }
@@ -542,10 +542,10 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
 
     postaffect_to_char(ch, sn, level / 5);
 
-    ch->send_to("Окружающее тебя пространство теперь находится под властью Хаоса!\n\r");
-    ch->send_to("Использование Магических Сил Хаоса опустошает тебя.\n\r");
+    ch->pecho("Окружающее тебя пространство теперь находится под властью Хаоса!");
+    ch->pecho("Использование Магических Сил Хаоса опустошает тебя.");
     ch->hit -= min(200, ch->hit/2);
-    act_p("Магические Силы Хаоса изменяют окружающий мир.",
+    oldact_p("Магические Силы Хаоса изменяют окружающий мир.",
            ch,0,0,TO_ROOM,POS_RESTING);
 }
 

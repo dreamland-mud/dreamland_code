@@ -37,11 +37,11 @@ bool check_stun( Character *ch, Character *victim )
 {
     if ( IS_AFFECTED(ch,AFF_STUN) )
     {
-        act_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
+        oldact_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
             ch,0,victim,TO_CHAR,POS_FIGHTING);
-        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
+        oldact_p("{W$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
             ch,0,victim,TO_VICT,POS_FIGHTING);
-        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
+        oldact_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
             ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
         affect_strip(ch,gsn_power_word_stun);
@@ -55,11 +55,11 @@ bool check_stun( Character *ch, Character *victim )
 
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
     {
-        act_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
+        oldact_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
             ch,0,victim,TO_CHAR,POS_FIGHTING);
-        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
+        oldact_p("{W$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
             ch,0,victim,TO_VICT,POS_FIGHTING);
-        act_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
+        oldact_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
             ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
         REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
@@ -94,6 +94,7 @@ void check_assist(Character *ch, Character *victim)
             && IS_CHARMED(ch)
             && ch->master == rch)
         {
+            oldact("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);            
             one_hit( rch, victim );
             continue;
         }
@@ -102,7 +103,7 @@ void check_assist(Character *ch, Character *victim)
         if (IS_SET(rch->act, PLR_AUTOASSIST)
             && is_same_group( ch, rch ))
         {
-            act("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);
+            oldact("Ты вступаешь в битву на стороне $C2.", rch, 0, ch, TO_CHAR);
             one_hit( rch, victim );
             continue;
         }
@@ -132,6 +133,8 @@ void check_bloodthirst( Character *ch )
         return;
     if (!IS_AFFECTED(ch, AFF_BLOODTHIRST))
         return;
+    if (IS_AFFECTED(ch,AFF_CALM))
+        return;        
     if (!IS_AWAKE(ch))
         return;
     if (ch->fighting)
@@ -147,7 +150,7 @@ void check_bloodthirst( Character *ch )
 
         if (ch != vch && ch->can_see(vch) && !is_safe_nomessage(ch, vch))
         {
-            ch->println( "{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x" );
+            ch->pecho( "{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x" );
             REMOVE_BIT(ch->affected_by, AFF_CHARM);
 
             if (ch->is_npc( ) && ch->in_room) 

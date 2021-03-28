@@ -72,8 +72,8 @@ static bool check_soap( Character *ch )
     if (!ch->getPC( )->getAttributes( ).isAvailable( soap )) 
         return false;
     
-    act("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
-    act("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
+    oldact("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
+    oldact("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -85,12 +85,12 @@ COMMAND(CClanTalk, "cb")
     DLString act_str;
 
     if (ch->getClan( ) == clan_none) {
-        ch->send_to("Ты не принадлежишь ни к одному Клану.\n\r");
+        ch->pecho("Ты не принадлежишь ни к одному Клану.");
         return;
     }
 
     if (!ch->getClan( )->hasChannel( )) {
-        ch->send_to("До тебя никому нет дела.\n\r");
+        ch->pecho("До тебя никому нет дела.");
         return;
     }
     
@@ -98,9 +98,9 @@ COMMAND(CClanTalk, "cb")
         TOGGLE_BIT(ch->comm, COMM_NOCB);
 
         if (IS_SET(ch->comm, COMM_NOCB))
-            ch->println("С этого момента ты не слышишь клановые разговоры.");
+            ch->pecho("С этого момента ты не слышишь клановые разговоры.");
         else
-            ch->println("Ты снова слышишь клановые разговоры.");
+            ch->pecho("Ты снова слышишь клановые разговоры.");
         return;
     }
     
@@ -118,7 +118,7 @@ COMMAND(CClanTalk, "cb")
 
     if (!ch->isAffected(gsn_deafen)) {
         DLString message = fmt( ch, act_str.c_str( ), ch, argument.c_str( ) );
-        ch->println( message );
+        ch->pecho( message );
         if (ch->getPC( )) {
             remember_history_public( ch->getPC( ), message );
         }

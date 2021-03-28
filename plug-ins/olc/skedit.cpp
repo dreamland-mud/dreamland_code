@@ -62,7 +62,7 @@ void OLCStateSkill::commit()
     
     original->save();
     if (owner)
-        owner->character->println("Изменения сохранены на диск.");
+        owner->character->pecho("Изменения сохранены на диск.");
 }
 
 BasicSkill * OLCStateSkill::getOriginal()
@@ -214,7 +214,7 @@ void OLCStateSkill::show( PCharacter *ch )
             ostringstream fmt;
             ptc(ch, "Снятие:      ");
             show_one_message(ch, a->wearoffDispel, "wearoffDispel", fmt);
-            ch->println(fmt.str());
+            ch->pecho(fmt.str());
         }
 
         ptc(ch, "Триггера:    ");

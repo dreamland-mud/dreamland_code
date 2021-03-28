@@ -89,7 +89,7 @@ bool ConfigElement::printText( PCharacter *ch ) const
     const DLString &msg = (isSetBit( ch ) ? msgOn.getValue( ) : msgOff.getValue( ) );
 
     if (!msg.empty( )) {
-        ch->println( msg );
+        ch->pecho( msg );
         return true;
     }
 
@@ -213,7 +213,7 @@ COMMAND(ConfigCommand, "config")
         config_scroll_print(pch);
         config_telegram_print(pch);
         config_discord_print(pch);
-        ch->println("\r\nПодробнее смотри по команде {lR{yрежим {Dнастройка{w{lE{yconfig {Dнастройка{x.");
+        ch->pecho("\r\nПодробнее смотри по команде {lR{yрежим {Dнастройка{w{lE{yconfig {Dнастройка{x.");
         return;
     }
 
@@ -238,13 +238,13 @@ COMMAND(ConfigCommand, "config")
                     && ((*c)->matches( arg1 ) || (*c)->matchesAlias( arg1 ))) 
             {
                 if (!(*c)->handleArgument( pch, arg2 ))
-                    pch->println("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
+                    pch->pecho("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
 
                 return;
             }
 
     
-    pch->println("Опция не найдена. Используй {hc{y{lRрежим{lEconfig{x для списка.");
+    pch->pecho("Опция не найдена. Используй {hc{y{lRрежим{lEconfig{x для списка.");
 }
 
 
@@ -273,12 +273,12 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
     if (arg.empty( ))
     {
         config_scroll_print(ch);
-        ch->println("Для изменения используй {y{lRрежим буфер{lEconfig scroll{x число.");
+        ch->pecho("Для изменения используй {y{lRрежим буфер{lEconfig scroll{x число.");
         return;
     }
 
     if (!arg.isNumber( )) {
-        ch->send_to("Ты должен ввести количество линий.\n\r");
+        ch->pecho("Ты должен ввести количество линий.");
         return;
     }
 
@@ -286,20 +286,20 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
         lines = arg.toInt( );
     }
     catch (const ExceptionBadType& ) {
-        ch->send_to("Неправильное число.\r\n");
+        ch->pecho("Неправильное число.");
         return;
     }
 
     if (lines == 0)
     {
-        ch->send_to("Буферизация вывода отключена.\n\r");
+        ch->pecho("Буферизация вывода отключена.");
         ch->lines = 0;
         return;
     }
 
     if (lines < 10 || lines > 200)
     {
-        ch->send_to("Введи значение между 10 и 200.\n\r");
+        ch->pecho("Введи значение между 10 и 200.");
         return;
     }
 
@@ -334,14 +334,14 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
                        "Используй {hc{y{lRрежим телеграм очистить{lEconfig telegram clear{x для очистки.\r\n", 
                        user->getValue().c_str());
         else
-            ch->println("Твой персонаж не связан с пользователями Telegram.\r\n"
+            ch->pecho("Твой персонаж не связан с пользователями Telegram.\r\n"
                         "Используй {y{lRрежим телеграм @имя{lEconfig telegram @username{x для установки.");        
         return;
     }
 
     if (arg_is_clear(arg)) {
         if (user->empty()) 
-            ch->println("Нечего очищать.");
+            ch->pecho("Нечего очищать.");
         else {
             ch->printf("Связь с пользователем {C%s{x очищена.\r\n", user->getValue().c_str());
             user->clear();
@@ -351,7 +351,7 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
     }
 
     if (arg.at(0) != '@') {
-        ch->println("Задай имя пользователя начиная с @.");
+        ch->pecho("Задай имя пользователя начиная с @.");
         return;
     }
 
@@ -396,7 +396,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
         PCharacterManager::save(ch);
 
         if (linked)
-            ch->send_to("Связь с пользователем Discord очищена. ");
+            ch->pecho("Связь с пользователем Discord очищена. ");
 
         ch->printf("Новое секретное слово: {W%s{x.\r\n",
                    discord["token"].asString().c_str());

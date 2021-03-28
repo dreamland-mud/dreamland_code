@@ -93,7 +93,7 @@ bool ClanItem::area( )
 
 void ClanItem::actDisappear( )
 {
-    act( "$o1 загадочным образом исчезает.", 
+    oldact("$o1 загадочным образом исчезает.", 
          obj->getRoom( )->people, obj, 0, TO_ALL );
 }
 
@@ -115,7 +115,7 @@ void ClanItem::give( Character *from, Character *mob )
 
 bool ClanItem::sac( Character *ch ) 
 { 
-    act("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
+    oldact("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
 
     rawdamage( ch, ch, DAM_HOLY, ch->hit - 10, true );
     ch->gold = 0;
@@ -173,19 +173,19 @@ bool ClanAltar::fetch( Character *ch, Object *item )
 
 void ClanAltar::actAppear( )
 {
-    act( "Ты видишь, как медленно появляется $o1.", 
+    oldact("Ты видишь, как медленно появляется $o1.", 
          obj->in_room->people, obj, 0, TO_ALL );
 }
 
 void ClanAltar::actDisappear( )
 {
-    act( "$o1 растворяется и исчезает!", 
+    oldact("$o1 растворяется и исчезает!", 
          obj->getRoom( )->people, obj, NULL, TO_ALL );
 }
 
 void ClanAltar::actNotify( Character *ch )
 {
-    act_p( "{gТы вздрагиваешь от осознания Силы своего Клана!{x", 
+    oldact_p("{gТы вздрагиваешь от осознания Силы своего Клана!{x", 
             ch, 0, 0, TO_CHAR, POS_DEAD );
 }
 

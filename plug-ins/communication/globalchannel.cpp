@@ -54,13 +54,13 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
     Listeners listeners;
     
     if (!msgDisable.empty( )) {
-        ch->println( msgDisable );
+        ch->pecho( msgDisable );
         return;
     }
     
     if (arg.empty( ) && msgOtherNoarg.empty( )) {
         if (off == 0 && !msgSelfNoarg.empty( )) {
-            ch->println( msgSelfNoarg );
+            ch->pecho( msgSelfNoarg );
             return;
         }
         
@@ -70,13 +70,13 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             if (msgOn.empty( ))
                 ch->printf( "Канал %s теперь включен.\r\n", getName( ).c_str( ) );
             else
-                ch->println( msgOn );
+                ch->pecho( msgOn );
         }
         else {
             if (msgOff.empty( ))
                 ch->printf( "Канал %s теперь выключен.\r\n", getName( ).c_str( ) );
             else
-                ch->println( msgOff );
+                ch->pecho( msgOff );
         }
 
         return;
@@ -98,7 +98,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         applyGarble( ch, outSelf, ch );
 
         DLString message = outputSelf( ch, fmtSelf, outSelf );
-        ch->println(message);
+        ch->pecho(message);
         postOutput(ch, message);
     }
     
@@ -116,7 +116,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             applyTranslation( ch, outVict, victim );
 
             DLString message = outputVict( ch, victim, fmtVict, outVict );
-            victim->println(message);
+            victim->pecho(message);
             postOutput(victim, message);
         }
     }
@@ -127,17 +127,17 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 bool GlobalChannel::canTalkGlobally( Character *ch ) const
 {
     if (nomob && ch->is_npc( )) {
-        ch->println( "Этот канал не для тебя, прости." );
+        ch->pecho( "Этот канал не для тебя, прости." );
         return false;
     }
     
     if (ch->get_trust( ) < trustSpeak) {
-        ch->println( "В этом канале ты можешь только слушать, прости." );
+        ch->pecho( "В этом канале ты можешь только слушать, прости." );
         return false;
     }
     
     if (quiet && IS_SET(ch->comm, COMM_QUIET)) {
-        ch->println( "Сначала необходимо повынимать вату из ушей.");
+        ch->pecho( "Сначала необходимо повынимать вату из ушей.");
         return false;
     }
 
@@ -154,7 +154,7 @@ bool GlobalChannel::canTalkGlobally( Character *ch ) const
         int cost = ch->max_mana * manaPercent / 100;
 
         if (ch->mana < cost) {
-            ch->println( "У тебя недостаточно сил, чтобы орать на весь мир." );
+            ch->pecho( "У тебя недостаточно сил, чтобы орать на весь мир." );
             return false;
         }
 
@@ -206,7 +206,7 @@ bool GlobalChannel::checkConfirmed( Character *ch ) const
 
     if (!ch->is_npc( ) && !IS_SET(ch->act, PLR_CONFIRMED))
     {
-        ch->println("Только подтвержденные богами персонажи могут общаться в этом канале." );
+        ch->pecho("Только подтвержденные богами персонажи могут общаться в этом канале." );
         return true;
     }
 
@@ -220,15 +220,15 @@ bool GlobalChannel::checkNoChannel( Character *ch ) const
     
     if (has_nochannel( ch )) {
         if (!msgNochan.empty( ))
-            ch->println( msgNochan );
+            ch->pecho( msgNochan );
         else
-            ch->println( "Боги лишили тебя возможности общаться." );
+            ch->pecho( "Боги лишили тебя возможности общаться." );
         
         return true;
     }
 
     if (IS_CHARMED(ch) && has_nochannel( ch->master )) {
-        act("$c1 сдавленно хрипит, не в силах вымолвить ни слова.", ch, 0, 0, TO_ROOM);        
+        oldact("$c1 сдавленно хрипит, не в силах вымолвить ни слова.", ch, 0, 0, TO_ROOM);        
         return true;
     }
 
@@ -251,8 +251,8 @@ bool GlobalChannel::checkSoap( Character *ch ) const
     if (!ch->getPC( )->getAttributes( ).isAvailable( attrName )) 
         return false;
     
-    act("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
-    act("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
+    oldact("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
+    oldact("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -294,7 +294,7 @@ bool GlobalChannel::needOutputSelf( Character *ch ) const
 bool GlobalChannel::needOutputOther( Character *ch ) const
 {
     if (dig && DIGGED(ch)) {
-        ch->println( "Стены могилы поглощают звуки." );
+        ch->pecho( "Стены могилы поглощают звуки." );
         return false;
     }
     

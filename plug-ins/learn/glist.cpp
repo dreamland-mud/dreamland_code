@@ -44,7 +44,7 @@ CMDRUN( glist )
         group = skillGroupManager->findUnstrict( argument );
         
         if (!group) {
-            ch->println("Неправильно указана группа.");
+            ch->pecho("Неправильно указана группа.");
             return;
         }
         

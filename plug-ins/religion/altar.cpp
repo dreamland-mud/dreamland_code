@@ -40,12 +40,12 @@ GSN(altar);
 CMDRUN(altar)
 {
     if (ch->is_npc()) {
-        ch->println("Изыди, глупое животное.");
+        ch->pecho("Изыди, глупое животное.");
         return;
     }
 
     if (IS_CHARMED(ch)) {
-        ch->println("Боги вряд ли оценят такое.");
+        ch->pecho("Боги вряд ли оценят такое.");
         return;
     }
 
@@ -79,12 +79,12 @@ CMDRUN(altar)
           || IS_SET(ch->in_room->room_flags, ROOM_LAW)
           || RoomUtils::isWater(ch->in_room)) 
     {
-        ch->println("Здесь неподходящее место для воздвигания алтарей.");
+        ch->pecho("Здесь неподходящее место для воздвигания алтарей.");
         return;
     }
     
     if (get_obj_room_vnum(ch->in_room, OBJ_VNUM_ALTAR)) {
-        ch->println("Но здесь уже есть какой-то алтарь!");
+        ch->pecho("Но здесь уже есть какой-то алтарь!");
         return;
     }
 

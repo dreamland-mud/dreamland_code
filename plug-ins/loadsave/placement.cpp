@@ -438,8 +438,8 @@ void undig( Character *ch )
     if (ch->position < POS_RESTING)
         ch->position = POS_RESTING;
         
-    act_p("Ты выкапываешься из земли.", ch, 0, 0, TO_CHAR, POS_DEAD); 
-    act("Земля шевелится, и $c1 выкапывается из своей могилы.", ch, 0, 0, TO_ROOM); 
+    oldact_p("Ты выкапываешься из земли.", ch, 0, 0, TO_CHAR, POS_DEAD); 
+    oldact("Земля шевелится, и $c1 выкапывается из своей могилы.", ch, 0, 0, TO_ROOM); 
     extract_grave( ch );
 }
 
@@ -458,8 +458,8 @@ void undig_earthquake( Character *ch )
         ch->ambushing = &str_empty[0]; 
     }
 
-    act_p("Землятрясение заставляет тебя выбраться из могилы.", ch, 0, 0, TO_CHAR, POS_DEAD); 
-    act("Земля раскалывается, обнаруживая лежавш$gое|его|ую в ней $c2!", ch, 0, 0, TO_ROOM); 
+    oldact_p("Землятрясение заставляет тебя выбраться из могилы.", ch, 0, 0, TO_CHAR, POS_DEAD); 
+    oldact("Земля раскалывается, обнаруживая лежавш$gое|его|ую в ней $c2!", ch, 0, 0, TO_ROOM); 
     extract_grave( ch );
 }
 

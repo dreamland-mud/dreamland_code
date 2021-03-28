@@ -33,7 +33,7 @@ CMDRUN( mount )
         ostringstream buf;
         
         if (ch->is_npc( ) || IS_CHARMED(ch)) {
-            ch->println( "Да ты и так на коне." );
+            ch->pecho( "Да ты и так на коне." );
             return;
         }
         
@@ -42,12 +42,12 @@ CMDRUN( mount )
         if (trust->parse( constArguments, buf )) 
             ch->send_to( "Ездить на тебе верхом " );
             
-        ch->println( buf.str( ) );
+        ch->pecho( buf.str( ) );
         return;
     }
     
     if (MOUNTED(ch)) {
-        ch->println( "Ты уже верхом." );
+        ch->pecho( "Ты уже верхом." );
         return;
     }
 
@@ -59,7 +59,7 @@ CMDRUN( mount )
     arg = args.getOneArgument( );
 
     if (( horse = get_char_room( ch, arg.c_str( ) ) ) == NULL) {
-        ch->println( "Кого ты хочешь оседлать?" );
+        ch->pecho( "Кого ты хочешь оседлать?" );
         return;
     }
     
@@ -75,30 +75,30 @@ CMDRUN( mount )
     
     if (!horse->is_npc( )) { /* pc-mounts like centaurs */
         if (!IS_SET(horse->form, FORM_CENTAUR)) {
-            act("$c1 пытается запрыгнуть верхом на $C4.", ch, 0, horse, TO_NOTVICT);
-            act("$c1 пытается запрыгнуть верхом на тебя.", ch, 0, horse, TO_VICT);
-            act("Ты пытаешься оседлать $C4, но никак не поймешь, где же у $X стремена..", ch, 0, horse, TO_CHAR);
+            oldact("$c1 пытается запрыгнуть верхом на $C4.", ch, 0, horse, TO_NOTVICT);
+            oldact("$c1 пытается запрыгнуть верхом на тебя.", ch, 0, horse, TO_VICT);
+            oldact("Ты пытаешься оседлать $C4, но никак не поймешь, где же у $X стремена..", ch, 0, horse, TO_CHAR);
             return;
         }
         
         trust = horse->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( "mount" );
         if (!trust || !trust->check( ch )) {
-            act("$c1 пытается оседлать $C4. $C1 строго смотрит на $c4.", ch, 0, horse, TO_NOTVICT);
-            act("$c1 пытается оседлать тебя, но заметив твой строгий взгляд, останавливается.", ch, 0, horse, TO_VICT);
-            act("$C1 не желает, чтобы на $Z катались.", ch, 0, horse, TO_CHAR);
+            oldact("$c1 пытается оседлать $C4. $C1 строго смотрит на $c4.", ch, 0, horse, TO_NOTVICT);
+            oldact("$c1 пытается оседлать тебя, но заметив твой строгий взгляд, останавливается.", ch, 0, horse, TO_VICT);
+            oldact("$C1 не желает, чтобы на $Z катались.", ch, 0, horse, TO_CHAR);
             return;
         }
     }
     else { /* other rideable beasts */
         if (!IS_SET(horse->act, ACT_RIDEABLE)) {
-            act("$c1 пытается запрыгнуть верхом на $C4, но соскальзывает.", ch, 0, horse, TO_NOTVICT);
-            ch->println("Этот вид живых существ не предназначен для верховой езды.");
+            oldact("$c1 пытается запрыгнуть верхом на $C4, но соскальзывает.", ch, 0, horse, TO_NOTVICT);
+            ch->pecho("Этот вид живых существ не предназначен для верховой езды.");
             return;
         }
         
         if (horse->getModifyLevel( ) - ch->getModifyLevel( ) > 5) {
-            act("$c1 пытается оседлать $C4, но опыта явно не хватает.", ch, 0, horse, TO_NOTVICT);
-            ch->println("Тебе не хватит опыта справиться с этим скакуном.");
+            oldact("$c1 пытается оседлать $C4, но опыта явно не хватает.", ch, 0, horse, TO_NOTVICT);
+            ch->pecho("Тебе не хватит опыта справиться с этим скакуном.");
             return;
         }
     }
@@ -117,7 +117,7 @@ CMDRUN( mount )
     }
 
     if (ch->move < moveCost) {
-        ch->println("У тебя не хватает сил даже задрать ногу.");
+        ch->pecho("У тебя не хватает сил даже задрать ногу.");
         return;
     }
 
@@ -127,9 +127,9 @@ CMDRUN( mount )
             && IS_SET(horse->getNPC()->behavior->getOccupation(), (1<<OCC_BATTLEHORSE));
    
     if (needsRidingSkill && number_percent( ) > gsn_riding->getEffective( ch )) {
-        act( "Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
-        act( "$c1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
-        act( "$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
+        oldact("Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
+        oldact("$c1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
+        oldact("$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
         
         ch->setWait( gsn_riding->getBeats( ) );
         gsn_riding->improve( ch, false );
@@ -141,9 +141,9 @@ CMDRUN( mount )
     horse->mount = ch;
     horse->riding = false;
 
-    act( "Ты запрыгиваешь на $C4.", ch, 0, horse, TO_CHAR );
-    act( "$c1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
-    act( "$c1 запрыгивает на спину $C2.", ch, 0, horse, TO_NOTVICT );
+    oldact("Ты запрыгиваешь на $C4.", ch, 0, horse, TO_CHAR );
+    oldact("$c1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
+    oldact("$c1 запрыгивает на спину $C2.", ch, 0, horse, TO_NOTVICT );
     
     gsn_riding->improve( ch, true);
 }
@@ -157,19 +157,19 @@ CMDRUN( dismount )
      * jump off the horse 
      */
     if (!ch->mount) {
-        ch->println( "Ни над тобой, ни под тобой никого нет!" );
+        ch->pecho( "Ни над тобой, ни под тобой никого нет!" );
         return;
     }
     
     if (MOUNTED(ch)) {
-        act( "Ты соскакиваешь со спины $C2.", ch, 0, ch->mount, TO_CHAR );
-        act( "$c1 соскакивает с твоей спины.", ch, 0, ch->mount, TO_VICT );
-        act( "$c1 спрыгивает с $C2.", ch, 0, ch->mount, TO_NOTVICT );
+        oldact("Ты соскакиваешь со спины $C2.", ch, 0, ch->mount, TO_CHAR );
+        oldact("$c1 соскакивает с твоей спины.", ch, 0, ch->mount, TO_VICT );
+        oldact("$c1 спрыгивает с $C2.", ch, 0, ch->mount, TO_NOTVICT );
     }
     else {
-        act( "Ты сбрасываешь $C4 со спины.", ch, 0, ch->mount, TO_CHAR );
-        act( "$c1 сбрасывает тебя со спины.", ch, 0, ch->mount, TO_VICT );
-        act( "$c1 сбрасывает $C4 со спины.", ch, 0, ch->mount, TO_NOTVICT );
+        oldact("Ты сбрасываешь $C4 со спины.", ch, 0, ch->mount, TO_CHAR );
+        oldact("$c1 сбрасывает тебя со спины.", ch, 0, ch->mount, TO_VICT );
+        oldact("$c1 сбрасывает $C4 со спины.", ch, 0, ch->mount, TO_NOTVICT );
     }
     
     ch->dismount( );

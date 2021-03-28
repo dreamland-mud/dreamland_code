@@ -42,9 +42,9 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
     if ( victim->isAffected(sn ) )
     {
         if (victim == ch)
-          ch->send_to("Ты не можешь быть еще сильнее!\n\r");
+          ch->pecho("Ты не можешь быть еще сильнее!");
         else
-          act("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR);
+          oldact("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -54,9 +54,9 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
             return;
         
         if (victim != ch)
-            ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+            ch->pecho("Твоя попытка закончилась неудачей.");
 
-        victim->send_to("Слабость проходит... но лишь на мгновение.\n\r");
+        victim->pecho("Слабость проходит... но лишь на мгновение.");
         return;
     }
 
@@ -93,18 +93,18 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
             return;
         
         if (victim != ch)
-            ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+            ch->pecho("Твоя попытка закончилась неудачей.");
 
-        victim->send_to("Твои движения становятся быстрее... но лишь на мгновение.\n\r");
+        victim->pecho("Твои движения становятся быстрее... но лишь на мгновение.");
         return;
     }
 
     if (IS_AFFECTED(victim, AFF_HASTE))
     {
         if (victim == ch)
-          ch->send_to("Ты не можешь двигаться быстрее, чем сейчас!\n\r");
+          ch->pecho("Ты не можешь двигаться быстрее, чем сейчас!");
         else
-          act_p("$C1 не может двигаться еще быстрее.",
+          oldact_p("$C1 не может двигаться еще быстрее.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -120,11 +120,11 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = max(2,level / 12 );
     af.bitvector.setValue(AFF_HASTE);
     affect_to_char( victim, &af );
-    victim->send_to("Твои движения становятся намного быстрее.\n\r");
-    act_p("Движения $c2 становятся намного быстрее.",
+    victim->pecho("Твои движения становятся намного быстрее.");
+    oldact_p("Движения $c2 становятся намного быстрее.",
            victim,0,0,TO_ROOM,POS_RESTING);
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->pecho("Ok.");
     return;
 
 }
@@ -141,13 +141,13 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
     if ( IS_AFFECTED(victim, AFF_INFRARED) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже видишь в темноте.\n\r");
+          ch->pecho("Ты уже видишь в темноте.");
         else
-          act_p("$C1 уже видит в темноте.\n\r",
+          oldact_p("$C1 уже видит в темноте.\n\r",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
-    act_p( "Глаза $c2 загораются красным светом.\n\r",
+    oldact_p("Глаза $c2 загораются красным светом.\n\r",
             victim, 0, 0, TO_ROOM,POS_RESTING);
 
     af.bitvector.setTable(&affect_flags);
@@ -158,7 +158,7 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
     af.modifier  = 0;
     af.bitvector.setValue(AFF_INFRARED);
     affect_to_char( victim, &af );
-    victim->send_to("Твои глаза загораются красным светом.\n\r");
+    victim->pecho("Твои глаза загораются красным светом.");
     return;
 
 }
@@ -177,9 +177,9 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
     if( victim->isAffected(gsn_learning) ) 
     {
         if (victim == ch)
-            ch->send_to("Куда уж больше.\n\r");
+            ch->pecho("Куда уж больше.");
         else
-            act("$C1 уже учится.\n\r", ch,0,victim,TO_CHAR);
+            oldact("$C1 уже учится.\n\r", ch,0,victim,TO_CHAR);
         return;
   }
 
@@ -188,9 +188,9 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
   af.duration        = level / 10 + 1;
   affect_to_char( victim, &af );
     
-  victim->send_to("Ты концентрируешься на учебе.\n\r");
+  victim->pecho("Ты концентрируешься на учебе.");
 
   if (ch != victim)
-      act("$C1 будет учиться лучше!\n\r", ch,0,victim,TO_CHAR);
+      oldact("$C1 будет учиться лучше!\n\r", ch,0,victim,TO_CHAR);
 
 }

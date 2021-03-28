@@ -43,7 +43,7 @@ void OnlineCreation::run( Character* ch, const DLString& args )
         return;
 
     if(!available( ch )) {
-        ch->send_to("Это не для тебя.\n\r");
+        ch->pecho("Это не для тебя.");
         return;
     }
     

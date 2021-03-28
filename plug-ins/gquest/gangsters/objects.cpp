@@ -31,9 +31,9 @@ void GangKey::get( Character *ch )
 
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
-    act( "Почему-то тебе кажется, что Боги этого не одобрят.\r\n"
+    oldact("Почему-то тебе кажется, что Боги этого не одобрят.\r\n"
          "Пораженн$gое|ый|ая этой мыслью, ты роняешь $o4.", ch, obj, 0, TO_CHAR);
-    act( "$c1 с озадаченным видом роняет $o4.", ch, obj, 0, TO_ROOM );
+    oldact("$c1 с озадаченным видом роняет $o4.", ch, obj, 0, TO_ROOM );
 }
 
 bool GangKey::extract( bool count )

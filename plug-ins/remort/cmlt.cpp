@@ -53,12 +53,12 @@ COMMAND(CMlt, "mlt")
     
     if (!arg.empty( )) 
         if (!( pcm = PCharacterManager::find( arg ) )) {
-            ch->println( "В DreamLand нет жителя с таким именем." );
+            ch->pecho( "В DreamLand нет жителя с таким именем." );
             return;
         }
 
     if (!ch->is_immortal( ) && ch->getPC( ) != pcm ) {
-        ch->send_to("Эта информация скрыта от Вас.\n\r");
+        ch->pecho("Эта информация скрыта от Вас.");
         return;
     }
     
@@ -72,7 +72,7 @@ void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
 {
     Remorts &r = pcm->getRemorts( );
 
-    ch->send_to("{B Раса         Класс        Время игры   Бонус{x\n\r");
+    ch->pecho("{B Раса         Класс        Время игры   Бонус{x");
 
     for (unsigned int i = 0; i < r.size( ); i++) {
         LifeData &life = r[i];
@@ -204,6 +204,6 @@ void CMlt::doCount( Character* ch, int n )
         ch->send_to( buf );
     }
     else
-        ch->send_to( "Никого нет.\r\n" );
+        ch->pecho("Никого нет.");
 }
 

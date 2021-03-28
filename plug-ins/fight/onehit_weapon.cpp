@@ -180,9 +180,9 @@ void WeaponOneHit::damApplyCounter( )
     if (chance <= gsn_counter->getEffective( victim ))
     {
         gsn_counter->improve( victim, true, ch );
-        act("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR);
-        act("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT);
-        act("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT);
+        oldact("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR);
+        oldact("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT);
+        oldact("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT);
 
         // set fighting state
         if (ch->fighting == NULL)
@@ -255,7 +255,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             poison->level = max(0,poison->level - 2);
             poison->duration = max(0,poison->duration - 1);
             if ( poison->level == 0 || poison->duration == 0 )
-                act("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR);
+                oldact("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR);
         }
     }
 
@@ -306,7 +306,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         for (auto &waf: wield->affected.findAllWithBits(&weapon_type2, WEAPON_SPELL)) 
             if (number_range( 1, waf->modifier ) == 1)
             {
-                act("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL);
+                oldact("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL);
                 lvl = std::min((int)ch->getModifyLevel(), (int)waf->level);
                 spell_nocatch( waf->type, lvl, ch, victim );
             }
@@ -325,11 +325,11 @@ void WeaponOneHit::damEffectFeeble( )
         return;
    
     SET_BIT( ch->affected_by, AFF_WEAK_STUN );
-    act("{DЧерная немощь{x поражает твою руку!", ch, 0, 0, TO_CHAR);
-    act("{DЧерная немощь{x поражает руку $c2!", ch, 0, 0, TO_ROOM);
+    oldact("{DЧерная немощь{x поражает твою руку!", ch, 0, 0, TO_CHAR);
+    oldact("{DЧерная немощь{x поражает руку $c2!", ch, 0, 0, TO_ROOM);
 
     if (wield && !IS_OBJ_STAT(wield, ITEM_NOREMOVE)) {
-        act("Ты парализова$gно|н|на и роняешь оружие!", ch, 0, 0, TO_CHAR);
+        oldact("Ты парализова$gно|н|на и роняешь оружие!", ch, 0, 0, TO_CHAR);
         
         obj_from_char( wield );
 

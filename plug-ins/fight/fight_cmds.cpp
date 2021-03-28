@@ -46,13 +46,13 @@ CMDRUN( kill )
 
     if (arg.empty( ))
     {
-        ch->send_to("Убить кого?\n\r");
+        ch->pecho("Убить кого?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
@@ -61,26 +61,26 @@ CMDRUN( kill )
 
     if ( ch->position == POS_FIGHTING )
     {
-        ch->send_to("Ты делаешь лучшее из того, что можешь!\n\r");
+        ch->pecho("Ты делаешь лучшее из того, что можешь!");
         return;
     }
 
     if ( !victim->is_npc() )
     {
-        ch->send_to("Игроков убивают с помощью MURDER.\n\r");
+        ch->pecho("Игроков убивают с помощью MURDER.");
         return;
     }
 
     if ( victim == ch )
     {
-        ch->send_to("{RТЫ БЬЕШЬ СЕБЯ!{x Ого...\n\r");
+        ch->pecho("{RТЫ БЬЕШЬ СЕБЯ!{x Ого...");
         multi_hit( ch, ch );
         return;
     }
 
     if ( IS_CHARMED(ch) && ch->master == victim )
     {
-        act( "Но $C1 тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка!", ch, 0, victim, TO_CHAR);
+        oldact("Но $C1 тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка!", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -102,19 +102,19 @@ CMDRUN( murder )
 
     if (arg.empty( ))
     {
-        ch->send_to("Порешить кого?\n\r");
+        ch->pecho("Порешить кого?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
     if ( victim == ch )
     {
-        ch->send_to("Самоубийство - это смертельный грех.\n\r");
+        ch->pecho("Самоубийство - это смертельный грех.");
         return;
     }
 
@@ -123,13 +123,13 @@ CMDRUN( murder )
 
     if ( IS_CHARMED(ch) && ch->master == victim )
     {
-        act( "Но $C1 тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка.", ch, 0, victim, TO_CHAR);
+        oldact("Но $C1 тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка.", ch, 0, victim, TO_CHAR);
         return;
     }
 
     if ( ch->position == POS_FIGHTING )
     {
-        ch->send_to("Ты делаешь лучшее из того, что можешь!\n\r");
+        ch->pecho("Ты делаешь лучшее из того, что можешь!");
         return;
     }
 
@@ -156,7 +156,7 @@ CMDRUN( flee )
         if ( ch->position == POS_FIGHTING )
             ch->position = POS_STANDING;
 
-        ch->send_to("Ты ни с кем не сражаешься.\n\r");
+        ch->pecho("Ты ни с кем не сражаешься.");
         return;
     }
 
@@ -164,7 +164,7 @@ CMDRUN( flee )
         && ch->getRealLevel( ) > 10
         && number_percent( ) < min( ch->getRealLevel( ) - 10, 90 ))
     {
-        ch->send_to("Это будет слишком большим позором для тебя!\n\r");
+        ch->pecho("Это будет слишком большим позором для тебя!");
         return;
     }
 
@@ -180,19 +180,19 @@ CMDRUN( slay )
 
     if (arg.empty( ))
     {
-        ch->send_to("Умертвить кого?\n\r");
+        ch->pecho("Умертвить кого?");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
     if ( ch == victim )
     {
-        ch->send_to("Самоубийство - это смертельный грех.\n\r");
+        ch->pecho("Самоубийство - это смертельный грех.");
         return;
     }
 
@@ -204,13 +204,13 @@ CMDRUN( slay )
             && !victim->is_immortal( )
             && victim->get_trust( ) >= ch->getRealLevel( ) ) )
     {
-        ch->send_to("Твоя попытка безуспешна.\n\r");
+        ch->pecho("Твоя попытка безуспешна.");
         return;
     }
 
-    act( "Ты хладнокровно умерщвляешь $C4!", ch, 0, victim, TO_CHAR);
-    act( "$c1 хладнокровно умерщвляет тебя!", ch, 0, victim, TO_VICT);
-    act( "$c1 хладнокровно умерщвляет $C4!", ch, 0, victim, TO_NOTVICT);
+    oldact("Ты хладнокровно умерщвляешь $C4!", ch, 0, victim, TO_CHAR);
+    oldact("$c1 хладнокровно умерщвляет тебя!", ch, 0, victim, TO_VICT);
+    oldact("$c1 хладнокровно умерщвляет $C4!", ch, 0, victim, TO_NOTVICT);
     raw_kill( victim, -1, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
     if( !ch->is_npc() && !victim->is_npc() && ch != victim )
     {

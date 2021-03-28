@@ -77,7 +77,7 @@ CMD(olcdump, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
     
-    ch->println("nothng here like that");
+    ch->pecho("nothng here like that");
 }
 
 

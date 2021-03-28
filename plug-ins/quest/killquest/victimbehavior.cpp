@@ -9,7 +9,7 @@
 
 void VictimBehavior::deadFromHunter( PCMemoryInterface *pcm )
 {
-    pcm->getPlayer( )->println(
+    pcm->getPlayer( )->pecho(
         "Твое задание {YВЫПОЛНЕНО{x!\n"
         "Вернись за вознаграждением к давшему тебе задание до того, как истечет время!" );
 }
@@ -17,15 +17,15 @@ void VictimBehavior::deadFromHunter( PCMemoryInterface *pcm )
 void VictimBehavior::deadFromSuicide( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( ))
-        pcm->getPlayer( )->println( "{YЖертва умерла своей смертью.{x" );
+        pcm->getPlayer( )->pecho( "{YЖертва умерла своей смертью.{x" );
 }
 
 void VictimBehavior::deadFromOther( PCMemoryInterface *pcm, Character *killer )
 {
-    killer->println("{YПоздравляю! Но это убийство было поручено другому.{x");
+    killer->pecho("{YПоздравляю! Но это убийство было поручено другому.{x");
 
     if (pcm->isOnline( ))
-        pcm->getPlayer( )->println( "{YКто-то другой выполнил порученное тебе задание.{x" );
+        pcm->getPlayer( )->pecho( "{YКто-то другой выполнил порученное тебе задание.{x" );
 }
 
 void VictimBehavior::deadFromGroupMember( PCMemoryInterface *pcm, Character *killer )
@@ -33,7 +33,7 @@ void VictimBehavior::deadFromGroupMember( PCMemoryInterface *pcm, Character *kil
     killer->pecho("{YПоздравляю! Ты выполнил%Gо||а задание своего согруппника.", killer);
 
     if (pcm->isOnline( ))
-        pcm->getPlayer( )->pecho("{Y%1$^C1 выполнил%1$Gо||а твое задание.{x", killer);
+        pcm->getPlayer( )->pecho("{Y%1$^C1 помог%1$Gло||ла тебе выполнить задание, поспеши к квестору за наградой.{x", killer);
 }
 
 void VictimBehavior::show( Character *victim, std::basic_ostringstream<char> &buf ) 

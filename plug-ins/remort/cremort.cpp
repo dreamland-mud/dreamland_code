@@ -67,25 +67,25 @@ CMDRUN( remort )
     }
     
     if (argument.empty( )) {
-        pch->println("{RВнимание! Все вещи в твоем инвентаре и на тебе исчезнут с перерождением!{x");
-        pch->println("Вещи можно сохранить в именном сундуке или собственном доме ({y{hc{lRсправка цены{lEhelp prices{x, {y{hc{lRсправка строительство{lEhelp building{x)");
-        pch->println("Обязательно прочитай {y{hc{lRсправка перерождение{lEhelp remort{x");
-        pch->println("Если хочешь начать новую жизнь, набери {y{lRпереродиться{lEremort{x пароль.");
+        pch->pecho("{RВнимание! Все вещи в твоем инвентаре и на тебе исчезнут с перерождением!{x");
+        pch->pecho("Вещи можно сохранить в именном сундуке или собственном доме ({y{hc{lRсправка цены{lEhelp prices{x, {y{hc{lRсправка строительство{lEhelp building{x)");
+        pch->pecho("Обязательно прочитай {y{hc{lRсправка перерождение{lEhelp remort{x");
+        pch->pecho("Если хочешь начать новую жизнь, набери {y{lRпереродиться{lEremort{x пароль.");
         return;
     }
     
     if (!password_check( pch, argument )) {
-        pch->println("Неверный пароль.");
+        pch->pecho("Неверный пароль.");
         return;
     }
 
     if (auction->item && ((pch == auction->buyer) || (pch == auction->seller))) {
-        pch->println("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.");
+        pch->pecho("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.");
         return;
     }
 
     if (!PCharacterManager::pfRemort(pch)) {
-        pch->println("Не удалось сохранить твой профайл: сообщи Богам!");
+        pch->pecho("Не удалось сохранить твой профайл: сообщи Богам!");
         return;
     }
     

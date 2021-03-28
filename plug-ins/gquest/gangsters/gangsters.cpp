@@ -156,8 +156,11 @@ void Gangsters::cleanup( bool performance )
         }
     }
     
-    if (!mobRoomVnums.empty( ))
-        REMOVE_BIT(get_room_instance( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
+    if (!mobRoomVnums.empty( )) {
+        AreaIndexData *area;
+        area = get_room_instance( mobRoomVnums.front( ) )->areaIndex();
+        REMOVE_BIT(area->area_flag, AREA_NOGATE);
+    }
     
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
@@ -167,10 +170,10 @@ void Gangsters::cleanup( bool performance )
             
         if (performance) {
             if (ch->position >= POS_RESTING) 
-                act("$c1 произносит '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM);
+                oldact("$c1 произносит '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM);
             
             if (ch->position >= POS_MORTAL)        
-                act("$c1 исчезает в клубе дыма.", ch, 0, 0, TO_ROOM);
+                oldact("$c1 исчезает в клубе дыма.", ch, 0, 0, TO_ROOM);
         }
         
         extract_char( ch );

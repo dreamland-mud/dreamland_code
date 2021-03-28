@@ -41,13 +41,13 @@ COMMAND(MySocial, "mysocial")
     else if (arg_is_help( cmd ))
         usage( ch );
     else if (name.empty( )) 
-        ch->println( "Укажи имя социала." );
+        ch->pecho( "Укажи имя социала." );
     else if (arg_oneof( cmd, "del", "удалить" ))
         doDelete( ch, attr, name );
     else if (arg_is_show( cmd ))
         doShow( ch, attr, name );
     else if (arg.empty( )) 
-        ch->println( "Укажи, какой вид сообщения изменить и как. Смотри '{lRмойсоц ?{lEmysoc help{lx'." );
+        ch->pecho( "Укажи, какой вид сообщения изменить и как. Смотри '{lRмойсоц ?{lEmysoc help{lx'." );
     else {
         CustomSocial::Pointer social;
         XMLAttributeCustomSocials::iterator i = attr->find( name );
@@ -115,11 +115,11 @@ COMMAND(MySocial, "mysocial")
                 return;
         }
         else {
-            ch->println("Нет такого вида сообщений. Смотри '{lRмойсоц ?{lEmysoc help{lx'.");
+            ch->pecho("Нет такого вида сообщений. Смотри '{lRмойсоц ?{lEmysoc help{lx'.");
             return;
         }
 
-        ch->send_to("Ok.\r\n");
+        ch->pecho("Ok.");
     }
 }
 
@@ -128,7 +128,7 @@ bool MySocial::hasMeOnly( Character *ch,  const DLString &arg )
     static RegExp pat( "^\\$c[1-6] [^\\$]*$", true );
     
     if (!pat.match( arg )) {
-        ch->send_to( "Сообщение должно начинаться с твоего имени (в нужном падеже) и не содержать других переменных. Используй $c1, $c2...$c6.\r\n" );
+        ch->pecho("Сообщение должно начинаться с твоего имени (в нужном падеже) и не содержать других переменных. Используй $c1, $c2...$c6.");
         return false;
     }
     else 
@@ -140,7 +140,7 @@ bool MySocial::hasNoVariables( Character *ch, const DLString &arg )
     static RegExp pat( "^[^\\$]*$" );
 
     if (!pat.match( arg )) {
-        ch->send_to( "Слишком много долларов! В этом сообщении нельзя использовать переменные.\r\n" );
+        ch->pecho("Слишком много долларов! В этом сообщении нельзя использовать переменные.");
         return false;
     }
 
@@ -153,7 +153,7 @@ bool MySocial::hasVictOnly( Character *ch, const DLString &arg )
                        "^[^\\$]*$", true );
     
     if (!pat.match( arg )) {
-        ch->send_to( "В этом сообщении может встречаться только имя жертвы в нуждом падеже ($C1, .. $C6).\r\n" );
+        ch->pecho("В этом сообщении может встречаться только имя жертвы в нуждом падеже ($C1, .. $C6).");
         return false;
     }
 
@@ -167,7 +167,7 @@ bool MySocial::hasBoth( Character *ch, const DLString &arg )
                        "^\\$c1[1-6] .*\\$C[1-6][^\\$]*$", true );
     
     if (!pat.match( arg )) {
-        ch->println( "Сообщение должно начинаться с твоего имени в нужном падеже ($c1, .. $c6) \r\n"
+        ch->pecho( "Сообщение должно начинаться с твоего имени в нужном падеже ($c1, .. $c6) \r\n"
                      "и кроме него может содержать еще только имя жертвы ($C1, ... $C6)." ); 
         return false;
     }
@@ -182,7 +182,7 @@ void MySocial::doList( Character *ch, XMLAttributeCustomSocials::Pointer attr )
     ostringstream buf;
     
     if (attr->empty( )) {
-        act_p("Ты пока не придума$gло|л|ла ни одного собственного социала.", ch, 0, 0, TO_CHAR, POS_DEAD);
+        oldact_p("Ты пока не придума$gло|л|ла ни одного собственного социала.", ch, 0, 0, TO_CHAR, POS_DEAD);
         return;
     }
     
@@ -232,10 +232,10 @@ void MySocial::doDelete( Character *ch, XMLAttributeCustomSocials::Pointer attr,
     i = attr->find( name );
 
     if (attr->end( ) == i)
-        ch->send_to( "Социал с таким именем не найден.\r\n" );
+        ch->pecho("Социал с таким именем не найден.");
     else {
         attr->erase( i );
-        ch->send_to( "Ok.\r\n" );
+        ch->pecho("Ok.");
     }
 }
 
@@ -246,7 +246,7 @@ void MySocial::doShow( Character *ch, XMLAttributeCustomSocials::Pointer attr, c
     XMLAttributeCustomSocials::iterator i = attr->find( name );
     
     if (i == attr->end( )) {
-        ch->send_to( "Социал с таким именем не найден.\r\n" );
+        ch->pecho("Социал с таким именем не найден.");
         return;
     }
 

@@ -218,12 +218,12 @@ CMDRUNP( scan )
     int range;
 
     if (ch->position < POS_SLEEPING) {
-        ch->println( "Ты ничего не видишь, кроме звезд..." );
+        ch->pecho( "Ты ничего не видишь, кроме звезд..." );
         return;
     }
 
     if (ch->position == POS_SLEEPING) {
-        ch->println( "Ты спишь! И можешь видеть только сны!" );
+        ch->pecho( "Ты спишь! И можешь видеть только сны!" );
         return;
     }
 
@@ -231,7 +231,7 @@ CMDRUNP( scan )
 
     if (arg1[0] == '\0')
     {
-        act( "$c1 осматривает все вокруг.", ch, 0, 0, TO_ROOM );
+        oldact("$c1 осматривает все вокруг.", ch, 0, 0, TO_ROOM );
         buf << "Осмотревшись, ты видишь:" << endl;
         scan_people( ch->in_room, ch, 0, -1, true, buf );
 
@@ -245,12 +245,12 @@ CMDRUNP( scan )
     door = direction_lookup( arg1 );
 
     if (door < 0) {
-        ch->println( "В какую сторону?" );
+        ch->pecho( "В какую сторону?" );
         return;
     }
 
-    act( "Ты пристально смотришь $T.", ch, 0, dirs[door].leave, TO_CHAR );
-    act( "$c1 пристально смотрит $T.", ch, 0, dirs[door].leave, TO_ROOM );
+    oldact("Ты пристально смотришь $T.", ch, 0, dirs[door].leave, TO_CHAR );
+    oldact("$c1 пристально смотрит $T.", ch, 0, dirs[door].leave, TO_ROOM );
     
     range = max( 1, ch->getModifyLevel() / 10 );
     room = ch->in_room;
@@ -263,7 +263,7 @@ CMDRUNP( scan )
     }
     
     if (!buf.str( ).empty( )) {
-        ch->println( "Ты видишь:" );
+        ch->pecho( "Ты видишь:" );
         ch->send_to( buf );
     }
 }
@@ -328,7 +328,7 @@ CMDRUNP( stand )
         {
                 if (ch->position == POS_FIGHTING)
                 {
-                        ch->println( "Может сначала закончишь сражаться?" );
+                        ch->pecho( "Может сначала закончишь сражаться?" );
                         return;
                 }
 
@@ -336,7 +336,7 @@ CMDRUNP( stand )
 
                 if (obj == 0)
                 {
-                        ch->println( "Ты не видишь этого здесь." );
+                        ch->pecho( "Ты не видишь этого здесь." );
                         return;
                 }
 
@@ -345,13 +345,13 @@ CMDRUNP( stand )
                                 && !IS_SET(obj->value2(),STAND_ON)
                                 && !IS_SET(obj->value2(),STAND_IN) ) )
                 {
-                        ch->println( "Ты не можешь стоять на этом." );
+                        ch->pecho( "Ты не можешь стоять на этом." );
                         return;
                 }
 
                 if (ch->on != obj && count_users(obj) >= obj->value0())
                 {
-                        act_p("На $o6 нет свободного места.",
+                        oldact_p("На $o6 нет свободного места.",
                                 ch,obj,0,TO_ROOM,POS_DEAD);
                         return;
                 }
@@ -364,37 +364,37 @@ CMDRUNP( stand )
         case POS_SLEEPING:
                 if ( IS_AFFECTED(ch, AFF_SLEEP) )
                 {
-                        ch->println( "Ты не можешь проснуться!" );
+                        ch->pecho( "Ты не можешь проснуться!" );
                         return;
                 }
 
                 if (obj == 0)
                 {
-                        ch->println( "Ты просыпаешься и встаешь." );
-                        act( "$c1 просыпается и встает.", ch, 0, 0, TO_ROOM);
+                        ch->pecho( "Ты просыпаешься и встаешь." );
+                        oldact("$c1 просыпается и встает.", ch, 0, 0, TO_ROOM);
                         ch->on = 0;
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeStandRoom", "msgWakeStandChar" )) {
                     if (IS_SET(obj->value2(),STAND_AT))
                     {
-                            act_p("Ты просыпаешься и становишься возле $o2.",ch,obj,0,TO_CHAR,POS_DEAD);
-                            act("$c1 просыпается и становится возле $o2.",ch,obj,0,TO_ROOM);
+                            oldact_p("Ты просыпаешься и становишься возле $o2.",ch,obj,0,TO_CHAR,POS_DEAD);
+                            oldact("$c1 просыпается и становится возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),STAND_ON))
                     {
-                            act_p("Ты просыпаешься и становишься на $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
-                            act("$c1 просыпается и становится на $o4.",ch,obj,0,TO_ROOM);
+                            oldact_p("Ты просыпаешься и становишься на $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
+                            oldact("$c1 просыпается и становится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act_p("Ты просыпаешься и становишься в $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
-                            act("$c1 просыпается и становится в $o4.",ch,obj,0,TO_ROOM);
+                            oldact_p("Ты просыпаешься и становишься в $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
+                            oldact("$c1 просыпается и становится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
 
                 if (IS_HARA_KIRI(ch))
                 {
-                        ch->println( "Ты чувствуешь как кровь согревает твое тело." );
+                        ch->pecho( "Ты чувствуешь как кровь согревает твое тело." );
                         REMOVE_BIT(ch->act,PLR_HARA_KIRI);
                 }
 
@@ -408,28 +408,28 @@ CMDRUNP( stand )
                 if (obj == 0)
                 {
                         if (ch->position == POS_STANDING) {
-                                ch->println( "Ты уже стоишь." );
+                                ch->pecho( "Ты уже стоишь." );
                         } else {
-                                ch->println( "Ты встаешь." );
-                                act( "$c1 встает.", ch, 0, 0, TO_ROOM);
+                                ch->pecho( "Ты встаешь." );
+                                oldact("$c1 встает.", ch, 0, 0, TO_ROOM);
                         }
                         ch->on = 0;
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgStandRoom", "msgStandChar" )) {
                     if (IS_SET(obj->value2(),STAND_AT))
                     {
-                            act("Ты становишься возле $o2.",ch,obj,0,TO_CHAR);
-                            act("$c1 становится возле $o2.",ch,obj,0,TO_ROOM);
+                            oldact("Ты становишься возле $o2.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 становится возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),STAND_ON))
                     {
-                            act("Ты становишься на $o4.",ch,obj,0,TO_CHAR);
-                            act("$c1 становится на $o4.",ch,obj,0,TO_ROOM);
+                            oldact("Ты становишься на $o4.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 становится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act("Ты становишься в $o4.",ch,obj,0,TO_CHAR);
-                            act("$c1 становится в $o4.",ch,obj,0,TO_ROOM);
+                            oldact("Ты становишься в $o4.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 становится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
 
@@ -437,7 +437,7 @@ CMDRUNP( stand )
                 break;
 
         case POS_FIGHTING:
-                ch->println( "Ты уже сражаешься!" );
+                ch->pecho( "Ты уже сражаешься!" );
                 ch->on = 0;
                 break;
         }
@@ -451,13 +451,13 @@ CMDRUNP( rest )
 
         if (ch->position == POS_FIGHTING)
         {
-                ch->println( "Но ты же сражаешься!" );
+                ch->pecho( "Но ты же сражаешься!" );
                 return;
         }
 
         if (MOUNTED(ch))
         {
-                ch->println( "Ты не можешь отдыхать, когда ты в седле." );
+                ch->pecho( "Ты не можешь отдыхать, когда ты в седле." );
                 return;
         }
 
@@ -469,14 +469,14 @@ CMDRUNP( rest )
 
         if ( IS_AFFECTED(ch, AFF_SLEEP) )
         {
-                ch->println( "Ты спишь и не можешь проснуться." );
+                ch->pecho( "Ты спишь и не можешь проснуться." );
                 return;
         }
 
         if ( ch->death_ground_delay > 0
                 && ch->trap.isSet( TF_NO_MOVE ) )
         {
-                ch->println( "Тебе некогда отдыхать." );
+                ch->pecho( "Тебе некогда отдыхать." );
                 return;
         }
 
@@ -487,7 +487,7 @@ CMDRUNP( rest )
 
                 if (obj == 0)
                 {
-                        ch->println( "Ты не видишь этого здесь." );
+                        ch->pecho( "Ты не видишь этого здесь." );
                         return;
                 }
         }
@@ -501,13 +501,13 @@ CMDRUNP( rest )
                                 && !IS_SET(obj->value2(),REST_IN)
                                 && !IS_SET(obj->value2(),REST_AT) ) )
                 {
-                        ch->println( "Ты не можешь отдыхать на этом." );
+                        ch->pecho( "Ты не можешь отдыхать на этом." );
                         return;
                 }
 
                 if (obj != 0 && ch->on != obj && count_users(obj) >= obj->value0())
                 {
-                        act_p("На $o6 нет свободного места.",ch,obj,0,TO_CHAR,POS_DEAD);
+                        oldact_p("На $o6 нет свободного места.",ch,obj,0,TO_CHAR,POS_DEAD);
                         return;
                 }
 
@@ -518,61 +518,61 @@ CMDRUNP( rest )
         {
         case POS_SLEEPING:
                 if (DIGGED(ch)) {
-                    ch->println( "Ты просыпаешься." );
+                    ch->pecho( "Ты просыпаешься." );
                 } 
                 else if (obj == 0)
                 {
-                        ch->println( "Ты просыпаешься и садишься отдыхать." );
-                        act("$c1 просыпается и садится отдыхать.",ch,0,0,TO_ROOM);
+                        ch->pecho( "Ты просыпаешься и садишься отдыхать." );
+                        oldact("$c1 просыпается и садится отдыхать.",ch,0,0,TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeRestRoom", "msgWakeRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
                     {
-                            act_p("Ты просыпаешься и садишься отдыхать возле $o2.",
+                            oldact_p("Ты просыпаешься и садишься отдыхать возле $o2.",
                                     ch,obj,0,TO_CHAR,POS_SLEEPING);
-                            act("$c1 просыпается и садится отдыхать возле $o2.",ch,obj,0,TO_ROOM);
+                            oldact("$c1 просыпается и садится отдыхать возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),REST_ON))
                     {
-                            act_p("Ты просыпаешься и садишься отдыхать на $o4.",
+                            oldact_p("Ты просыпаешься и садишься отдыхать на $o4.",
                                     ch,obj,0,TO_CHAR,POS_SLEEPING);
-                            act("$c1 просыпается и садится отдыхать на $o4.",ch,obj,0,TO_ROOM);
+                            oldact("$c1 просыпается и садится отдыхать на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act_p("Ты просыпаешься и садишься отдыхать в $o4.",
+                            oldact_p("Ты просыпаешься и садишься отдыхать в $o4.",
                                     ch,obj,0,TO_CHAR,POS_SLEEPING);
-                            act("$c1 просыпается и садится отдыхать в $o4.",ch,obj,0,TO_ROOM);
+                            oldact("$c1 просыпается и садится отдыхать в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
                 ch->position = POS_RESTING;
                 break;
 
         case POS_RESTING:
-                ch->println( "Ты уже отдыхаешь." );
+                ch->pecho( "Ты уже отдыхаешь." );
                 break;
 
         case POS_STANDING:
                 if (obj == 0)
                 {
-                        ch->println( "Ты садишься отдыхать." );
-                        act( "$c1 садится отдыхать.", ch, 0, 0, TO_ROOM);
+                        ch->pecho( "Ты садишься отдыхать." );
+                        oldact("$c1 садится отдыхать.", ch, 0, 0, TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRestRoom", "msgSitRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
                     {
-                            act("Ты садишься возле $o2 и отдыхаешь.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится возле $o2 и отдыхает.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься возле $o2 и отдыхаешь.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится возле $o2 и отдыхает.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),REST_ON))
                     {
-                            act("Ты садишься на $o4 и отдыхаешь..",ch,obj,0,TO_CHAR);
-                            act("$c1 садится на $o4 и отдыхает.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься на $o4 и отдыхаешь..",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится на $o4 и отдыхает.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act("Ты садишься отдыхать в $o4.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится отдыхать в $o4.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься отдыхать в $o4.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится отдыхать в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
                 ch->position = POS_RESTING;
@@ -581,31 +581,31 @@ CMDRUNP( rest )
         case POS_SITTING:
                 if (obj == 0)
                 {
-                        ch->println( "Ты отдыхаешь." );
-                        act("$c1 отдыхает.",ch,0,0,TO_ROOM);
+                        ch->pecho( "Ты отдыхаешь." );
+                        oldact("$c1 отдыхает.",ch,0,0,TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgRestRoom", "msgRestChar" )) {
                     if (IS_SET(obj->value2(),REST_AT))
                     {
-                            act("Ты отдыхаешь возле $o2.",ch,obj,0,TO_CHAR);
-                            act("$c1 отдыхает возле $o2.",ch,obj,0,TO_ROOM);
+                            oldact("Ты отдыхаешь возле $o2.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 отдыхает возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),REST_ON))
                     {
-                            act("Ты отдыхаешь на $o6.",ch,obj,0,TO_CHAR);
-                            act("$c1 отдыхает на $o6.",ch,obj,0,TO_ROOM);
+                            oldact("Ты отдыхаешь на $o6.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 отдыхает на $o6.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act("Ты отдыхаешь в $o6.",ch,obj,0,TO_CHAR);
-                            act("$c1 отдыхает в $o6.",ch,obj,0,TO_ROOM);
+                            oldact("Ты отдыхаешь в $o6.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 отдыхает в $o6.",ch,obj,0,TO_ROOM);
                     }
                 }
                 ch->position = POS_RESTING;
 
                 if (IS_HARA_KIRI(ch))
                 {
-                        ch->println( "Ты чувствуешь, как кровь согревает твое тело." );
+                        ch->pecho( "Ты чувствуешь, как кровь согревает твое тело." );
                         REMOVE_BIT(ch->act,PLR_HARA_KIRI);
                 }
 
@@ -622,13 +622,13 @@ CMDRUNP( sit )
 
         if (ch->position == POS_FIGHTING)
         {
-                ch->println( "Может сначала закончишь сражаться?" );
+                ch->pecho( "Может сначала закончишь сражаться?" );
                 return;
         }
 
         if (MOUNTED(ch))
         {
-                ch->println( "Ты не можешь сесть, когда ты в седле." );
+                ch->pecho( "Ты не можешь сесть, когда ты в седле." );
                 return;
         }
 
@@ -640,14 +640,14 @@ CMDRUNP( sit )
 
         if ( IS_AFFECTED(ch, AFF_SLEEP) )
         {
-                ch->println( "Ты спишь и не можешь проснуться." );
+                ch->pecho( "Ты спишь и не можешь проснуться." );
                 return;
         }
 
         if ( ch->death_ground_delay > 0
                 && ch->trap.isSet( TF_NO_MOVE ) )
         {
-                ch->println( "Тебе не до отдыха!" );
+                ch->pecho( "Тебе не до отдыха!" );
                 return;
         }
 
@@ -660,11 +660,11 @@ CMDRUNP( sit )
                 {
                         if ( IS_AFFECTED(ch, AFF_SLEEP) )
                         {
-                                ch->println( "Ты спишь и не можешь проснуться." );
+                                ch->pecho( "Ты спишь и не можешь проснуться." );
                                 return;
                         }
 
-                        ch->println( "Ты не видишь этого здесь." );
+                        ch->pecho( "Ты не видишь этого здесь." );
                         return;
                 }
         }
@@ -678,13 +678,13 @@ CMDRUNP( sit )
                                 && !IS_SET(obj->value2(),SIT_IN)
                                 && !IS_SET(obj->value2(),SIT_AT) ) )
                 {
-                        ch->println( "Ты не можешь сесть на это." );
+                        ch->pecho( "Ты не можешь сесть на это." );
                         return;
                 }
 
                 if (obj != 0 && ch->on != obj && count_users(obj) >= obj->value0())
                 {
-                        act_p("На $o6 нет больше свободного места.",ch,obj,0,TO_CHAR,POS_DEAD);
+                        oldact_p("На $o6 нет больше свободного места.",ch,obj,0,TO_CHAR,POS_DEAD);
                         return;
                 }
 
@@ -696,24 +696,24 @@ CMDRUNP( sit )
         case POS_SLEEPING:
                 if (obj == 0)
                 {
-                        ch->println( "Ты просыпаешься и садишься." );
-                        act( "$c1 просыпается и садится.", ch, 0, 0, TO_ROOM);
+                        ch->pecho( "Ты просыпаешься и садишься." );
+                        oldact("$c1 просыпается и садится.", ch, 0, 0, TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeSitRoom", "msgWakeSitChar" )) {
                     if (IS_SET(obj->value2(),SIT_AT))
                     {
-                            act_p("Ты просыпаешься и садишься возле $o2.",ch,obj,0,TO_CHAR,POS_DEAD);
-                            act("$c1 просыпается и садится возле $o2.",ch,obj,0,TO_ROOM);
+                            oldact_p("Ты просыпаешься и садишься возле $o2.",ch,obj,0,TO_CHAR,POS_DEAD);
+                            oldact("$c1 просыпается и садится возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),SIT_ON))
                     {
-                            act_p("Ты просыпаешься и садишься на $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
-                            act("$c1 просыпается и садится на $o4.",ch,obj,0,TO_ROOM);
+                            oldact_p("Ты просыпаешься и садишься на $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
+                            oldact("$c1 просыпается и садится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act_p("Ты просыпаешься и садишься в $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
-                            act("$c1 просыпается и садится в $o4.",ch,obj,0,TO_ROOM);
+                            oldact_p("Ты просыпаешься и садишься в $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
+                            oldact("$c1 просыпается и садится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
 
@@ -722,23 +722,23 @@ CMDRUNP( sit )
 
         case POS_RESTING:
                 if (obj == 0)
-                        ch->println( "Ты прекращаешь отдых." );
+                        ch->pecho( "Ты прекращаешь отдых." );
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRoom", "msgSitChar" )) {
                     if (IS_SET(obj->value2(),SIT_AT))
                     {
-                            act("Ты садишься возле $o2.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится возле $o2.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься возле $o2.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится возле $o2.",ch,obj,0,TO_ROOM);
                     }
 
                     else if (IS_SET(obj->value2(),SIT_ON))
                     {
-                            act("Ты садишься на $o4.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится на $o4.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься на $o4.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act("Ты садишься в $o4.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится в $o4.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься в $o4.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
 
@@ -746,30 +746,30 @@ CMDRUNP( sit )
                 break;
 
         case POS_SITTING:
-                ch->println( "Ты уже сидишь." );
+                ch->pecho( "Ты уже сидишь." );
                 break;
 
         case POS_STANDING:
                 if (obj == 0)
                 {
-                        ch->println( "Ты садишься." );
-                        act("$c1 садится на землю.",ch,0,0,TO_ROOM);
+                        ch->pecho( "Ты садишься." );
+                        oldact("$c1 садится на землю.",ch,0,0,TO_ROOM);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRoom", "msgSitChar" )) {
                     if (IS_SET(obj->value2(),SIT_AT))
                     {
-                            act("Ты садишься возле $o2.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится возле $o2.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься возле $o2.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится возле $o2.",ch,obj,0,TO_ROOM);
                     }
                     else if (IS_SET(obj->value2(),SIT_ON))
                     {
-                            act("Ты садишься на $o4.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится на $o4.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься на $o4.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится на $o4.",ch,obj,0,TO_ROOM);
                     }
                     else
                     {
-                            act("Ты садишься в $o4.",ch,obj,0,TO_CHAR);
-                            act("$c1 садится в $o4.",ch,obj,0,TO_ROOM);
+                            oldact("Ты садишься в $o4.",ch,obj,0,TO_CHAR);
+                            oldact("$c1 садится в $o4.",ch,obj,0,TO_ROOM);
                     }
                 }
                 ch->position = POS_SITTING;
@@ -778,7 +778,7 @@ CMDRUNP( sit )
 
         if (IS_HARA_KIRI(ch))
         {
-                ch->println( "Ты чувствуешь, как кровь согревает твое тело." );
+                ch->pecho( "Ты чувствуешь, как кровь согревает твое тело." );
                 REMOVE_BIT(ch->act,PLR_HARA_KIRI);
         }
         return;
@@ -793,7 +793,7 @@ CMDRUNP( sleep )
 
     if (MOUNTED(ch))
     {
-            ch->println( "Ты не можешь спать, когда ты в седле." );
+            ch->pecho( "Ты не можешь спать, когда ты в седле." );
             return;
     }
 
@@ -806,17 +806,17 @@ CMDRUNP( sleep )
     if ( ch->death_ground_delay > 0
             && ch->trap.isSet( TF_NO_MOVE ) )
     {
-            ch->println( "Тебе не до сна!" );
+            ch->pecho( "Тебе не до сна!" );
             return;
     }
 
     switch ( ch->position.getValue( ) ) {
     case POS_SLEEPING:
-        ch->println( "Ты уже спишь." );
+        ch->pecho( "Ты уже спишь." );
         return;
 
     case POS_FIGHTING:
-        ch->println( "Но ты же сражаешься!" );
+        ch->pecho( "Но ты же сражаешься!" );
         return;
 
     case POS_RESTING:
@@ -843,7 +843,7 @@ CMDRUNP( sleep )
 
             if (obj == 0)
             {
-                    ch->println( "Ты не видишь этого здесь." );
+                    ch->pecho( "Ты не видишь этого здесь." );
                     return;
             }
 
@@ -852,13 +852,13 @@ CMDRUNP( sleep )
                             && !IS_SET(obj->value2(),SLEEP_IN)
                             && !IS_SET(obj->value2(),SLEEP_AT)))
             {
-                    ch->println( "Ты не можешь спать на этом!" );
+                    ch->pecho( "Ты не можешь спать на этом!" );
                     return;
             }
 
             if (ch->on != obj && count_users(obj) >= obj->value0())
             {
-                    act_p("На $o6 не осталось свободного места для тебя.",
+                    oldact_p("На $o6 не осталось свободного места для тебя.",
                             ch,obj,0,TO_CHAR,POS_DEAD);
                     return;
             }
@@ -934,28 +934,28 @@ CMDRUNP( wake )
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 ) { 
-        ch->println( "Этого нет здесь." ); 
+        ch->pecho( "Этого нет здесь." ); 
         return; 
     }
 
     if (ch == victim) { 
-        ch->println( "Ты не можешь разбудить сам себя!" ); 
+        ch->pecho( "Ты не можешь разбудить сам себя!" ); 
         return; 
     }
 
     if (IS_AWAKE(victim)) { 
-        act( "$C1 уже не спит.", ch, 0, victim, TO_CHAR); 
+        oldact("$C1 уже не спит.", ch, 0, victim, TO_CHAR); 
         return; 
     }
 
     if (IS_AFFECTED(victim, AFF_SLEEP)) { 
-        act( "Ты не можешь разбудить $S!", ch, 0, victim, TO_CHAR);  
+        oldact("Ты не можешь разбудить $S!", ch, 0, victim, TO_CHAR);  
         return; 
     }
 
-    act("Ты будишь $C4.", ch, 0, victim, TO_CHAR);
-    act("$c1 будит $C4.", ch, 0, victim, TO_NOTVICT);
-    act_p( "$c1 будит тебя.", ch, 0, victim, TO_VICT,POS_SLEEPING );
+    oldact("Ты будишь $C4.", ch, 0, victim, TO_CHAR);
+    oldact("$c1 будит $C4.", ch, 0, victim, TO_NOTVICT);
+    oldact_p("$c1 будит тебя.", ch, 0, victim, TO_VICT,POS_SLEEPING );
     do_stand(victim,"");
     mprog_wake( victim, ch );
 }
@@ -989,33 +989,33 @@ CMDRUNP( fly )
     if (!str_cmp(arg,"up") || !str_cmp(arg,"вверх"))
     {
         if (!can_fly( ch )) {
-            ch->println( "Для того, чтобы летать, найди крылья или зелье." );
+            ch->pecho( "Для того, чтобы летать, найди крылья или зелье." );
             return;
         }
 
         if (!ch->posFlags.isSet( POS_FLY_DOWN )) {
-            ch->println( "Ты уже летаешь." );
+            ch->pecho( "Ты уже летаешь." );
             return;
         }
 
         ch->posFlags.removeBit( POS_FLY_DOWN );
-        ch->println( "Ты начинаешь летать." );
+        ch->pecho( "Ты начинаешь летать." );
         ch->recho( "%^C1 начинает летать.", ch );
     }
     else if (!str_cmp(arg,"down") || !str_cmp(arg,"вниз"))
     {
         if (!is_flying( ch )) {
-            ch->println( "Твои ноги уже на земле." );
+            ch->pecho( "Твои ноги уже на земле." );
             return;
         }
 
         ch->posFlags.setBit( POS_FLY_DOWN );
-        ch->println( "Твои ноги медленно опускаются на землю." );
+        ch->pecho( "Твои ноги медленно опускаются на землю." );
         ch->recho( "%^C1 медленно опускается на землю.", ch );
     }
     else
     {
-        ch->println( "Используй {lEfly с 'up' или 'down'{lR'взлететь' или 'нелетать'{lx." );
+        ch->pecho( "Используй {lEfly с 'up' или 'down'{lR'взлететь' или 'нелетать'{lx." );
         return;
     }
 
@@ -1040,7 +1040,7 @@ CMDRUNP( enter )
     }
 
     if (portal == 0 && peexit == 0) {
-        ch->println( "Ты не видишь здесь такого портала или дополнительного выхода.");
+        ch->pecho( "Ты не видишь здесь такого портала или дополнительного выхода.");
         return;
     }
     

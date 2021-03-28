@@ -63,8 +63,8 @@ void strip_camouflage( Character *ch )
     {
             REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
             ch->ambushing = &str_empty[0];
-            ch->send_to("Ты выходишь из своего укрытия.\n\r");
-            act("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
+            ch->pecho("Ты выходишь из своего укрытия.");
+            oldact("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
     }
 }
 

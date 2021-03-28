@@ -81,9 +81,9 @@ void AdamantiteGolem::fight( Character *victim )
 
     ch->setWait( gsn_rescue->getBeats( )  );
     
-    act( "Ты спасаешь $C4!",  ch, 0, master, TO_CHAR );
-    act( "$c1 спасает тебя!", ch, 0, master, TO_VICT );
-    act( "$c1 спасает $C4!",  ch, 0, master, TO_NOTVICT );
+    oldact("Ты спасаешь $C4!",  ch, 0, master, TO_CHAR );
+    oldact("$c1 спасает тебя!", ch, 0, master, TO_VICT );
+    oldact("$c1 спасает $C4!",  ch, 0, master, TO_NOTVICT );
 
     stop_fighting( master->fighting, false );
     set_fighting( ch, master->fighting);
@@ -181,19 +181,19 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         if ( !(obj->item_type == ITEM_CORPSE_NPC
                         || obj->item_type == ITEM_CORPSE_PC))
         {
-                ch->send_to("Это заклинание работает только на трупы.\n\r");
+                ch->pecho("Это заклинание работает только на трупы.");
                 return;
         }
 
         if ( !ch->is_immortal() && obj->item_type == ITEM_CORPSE_PC )
         {
-                ch->send_to("Некромантия с трупами игроков запрещена Богами.\n\r");
+                ch->pecho("Некромантия с трупами игроков запрещена Богами.");
                 return;
         }
 
         if ( ch->isAffected(sn ) )
         {
-                ch->send_to("Нужно восстановить энергию после предыдущего оживления.\n\r");
+                ch->pecho("Нужно восстановить энергию после предыдущего оживления.");
                 return;
         }
 
@@ -202,7 +202,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 
         if ( ch->in_room && IS_SET( ch->in_room->room_flags, ROOM_NO_MOB ) )
         {
-                ch->send_to("В этом месте могут находиться только игроки.\n\r");
+                ch->pecho("В этом месте могут находиться только игроки.");
                 return;
         }
 
@@ -210,7 +210,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
                 || IS_SET(ch->in_room->room_flags, ROOM_PRIVATE )
                 || IS_SET(ch->in_room->room_flags, ROOM_SOLITARY ) )
         {
-                ch->send_to("Святость этого места не позволяет тебе сделать этого.\n\r");
+                ch->pecho("Святость этого места не позволяет тебе сделать этого.");
                 return;
         }
 
@@ -218,7 +218,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
             pCorpseOwner = get_mob_index( obj->value3() );
 
         if (!pCorpseOwner || DLString(pCorpseOwner->short_descr).empty()) {
-            ch->println("Этот труп не поддается восстановлению.");
+            ch->pecho("Этот труп не поддается восстановлению.");
             return;
         }
 
@@ -271,9 +271,9 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 
         postaffect_to_char( ch, sn, ch->getModifyLevel() / 10 );
 
-        ch->send_to("С помощью сил Тьмы и Хаоса ты оживляешь труп!\n\r");
+        ch->pecho("С помощью сил Тьмы и Хаоса ты оживляешь труп!");
         ch->recho("С помощью сил Тьмы и Хаоса %C1 оживляет %O4!", ch, obj);
-        act("$C1 смотрит на тебя бессмысленным взглядом, повинуясь твоим приказам!",ch,0,undead,TO_CHAR);
+        oldact("$C1 смотрит на тебя бессмысленным взглядом, повинуясь твоим приказам!",ch,0,undead,TO_CHAR);
 
         extract_obj (obj);
 }
@@ -281,9 +281,9 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 VOID_SPELL(AnimateDead)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         if ( victim == ch )
-            ch->send_to("Жизнь прекрасна и ты не собираешься расставаться со своим телом!\n\r");
+            ch->pecho("Жизнь прекрасна и ты не собираешься расставаться со своим телом!");
         else 
-            act("Жизнь прекрасна и $C1 не собирается расставаться со своим телом!",ch,0,victim,TO_CHAR);
+            oldact("Жизнь прекрасна и $C1 не собирается расставаться со своим телом!",ch,0,victim,TO_CHAR);
 
 }
 

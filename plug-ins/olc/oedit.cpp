@@ -922,7 +922,7 @@ OEDIT(copy)
         mode = COPY_ERROR;
             
     if (mode == COPY_ERROR || !arg2.isNumber()) {
-        ch->println("Syntax: \r\n"
+        ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy affects, level, flags and other parameters from <vnum> obj index.\r\n"
                     "  copy desc <vnum>  -- copy name, short, long and extra descriptions from <vnum> obj index.\r\n" );
         return false;
@@ -931,7 +931,7 @@ OEDIT(copy)
     original = get_obj_index( arg2.toInt() );
 
     if (original == NULL) {
-        ch->println("Object not found.\r\n");
+        ch->pecho("Object not found.\r\n");
         return false;
     }
     
@@ -1084,7 +1084,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if (!str_cmp(argument, "next")) {
             value = next_obj_index(ch, ch->in_room->pIndexData);
             if (value < 0) {
-                ch->println("Все внумы в этой зоне уже заняты!");
+                ch->pecho("Все внумы в этой зоне уже заняты!");
                 return;
             }
         }
@@ -1188,8 +1188,8 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         else
             obj_to_room( obj, ch->in_room );
 
-        act( "$c1 создает $o4!", ch, obj, 0, TO_ROOM);
-        act( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
+        oldact("$c1 создает $o4!", ch, obj, 0, TO_ROOM);
+        oldact("Ты создаешь $o4!", ch, obj, 0, TO_CHAR);
         return;
     }
     stc("OEdit:  There is no default object to edit.\n\r", ch);

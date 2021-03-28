@@ -49,14 +49,14 @@ SKILL_RUNP( smithing )
 
     if ( ch->is_npc() || !gsn_smithing->usable( ch ))
     {
-        ch->send_to("Чего?\n\r");
+        ch->pecho("Чего?");
         return;
     }
 
 
     if ( ch->fighting )
     {
-        ch->send_to( "Подожди пока сражение закончится.\n\r");
+        ch->pecho("Подожди пока сражение закончится.");
         return;
     }
 
@@ -64,31 +64,31 @@ SKILL_RUNP( smithing )
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Какую вещь ты хочешь восстановить?\n\r");
+        ch->pecho("Какую вещь ты хочешь восстановить?");
         return;
     }
 
     if (( obj = get_obj_carry(ch, arg)) == 0)
     {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
    if (obj->condition >= 100)
     {
-        ch->send_to("Но это не повреждено.\n\r");
+        ch->pecho("Но это не повреждено.");
         return;
     }
 
     if (( hammer = get_eq_char(ch, wear_hold)) == 0)
     {
-        ch->send_to("Сначала возьми в руки кузнечный молот.\n\r");
+        ch->pecho("Сначала возьми в руки кузнечный молот.");
         return;
     }
 
     if ( hammer->pIndexData->vnum != OBJ_VNUM_HAMMER )
     {
-        ch->send_to("Тебе понадобится специальный молот -- ищи его в Королевстве Дварфов.\n\r");
+        ch->pecho("Тебе понадобится специальный молот -- ищи его в Королевстве Дварфов.");
         return;
     }
 
@@ -101,14 +101,14 @@ SKILL_RUNP( smithing )
     }
     else if ( number_percent() > gsn_smithing->getEffective( ch ) + skill_level_bonus(*gsn_smithing, ch) ) {
         gsn_smithing->improve( ch, false );
-        act("$c1 пробует восстановить $o4, но безуспешно.",ch,obj,0,TO_ROOM);
-        act("У тебя не получилось восстановить $o4.",ch,obj,0,TO_CHAR);
+        oldact("$c1 пробует восстановить $o4, но безуспешно.",ch,obj,0,TO_ROOM);
+        oldact("У тебя не получилось восстановить $o4.",ch,obj,0,TO_CHAR);
         hammer->condition -= 25;
     }
     else {
         gsn_smithing->improve( ch, true );
-        act("$c1 восстанавливает $o4.",ch,obj,0,TO_ROOM);
-        act("Ты восстанавливаешь $o4.\n\r",ch,obj,0,TO_CHAR);
+        oldact("$c1 восстанавливает $o4.",ch,obj,0,TO_ROOM);
+        oldact("Ты восстанавливаешь $o4.\n\r",ch,obj,0,TO_CHAR);
 
         obj->condition += ( gsn_smithing->getEffective( ch ) + skill_level_bonus(*gsn_smithing, ch) ) / 2;
         obj->condition = max( 100, obj->condition );

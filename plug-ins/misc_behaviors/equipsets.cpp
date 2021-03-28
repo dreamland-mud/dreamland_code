@@ -398,7 +398,7 @@ void MorrisDancerSet::fight( Character *ch )
 
     if (!IS_AFFECTED(ch, AFF_HASTE) && chance(50)) {
         spell(gsn_haste, ch->getModifyLevel(), ch, ch );
-        ch->println("{WТы внезапно ощущаешь повышенную активность!{x");
+        ch->pecho("{WТы внезапно ощущаешь повышенную активность!{x");
         return;
     }
 

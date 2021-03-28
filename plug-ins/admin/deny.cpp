@@ -77,7 +77,7 @@ void Deny::doRemove( Character *ch, PCMemoryInterface *pcm )
         pcm->getAttributes( ).eraseAttribute( "deny" );
         PCharacterManager::saveMemory( pcm );
         
-        ch->send_to( "Ok.\r\n" );
+        ch->pecho("Ok.");
     }
     else
         ch->printf( "Access for {W%s{x is NOT denied.\r\n", pcm->getName( ).c_str( ) );
@@ -89,7 +89,7 @@ void Deny::doPlace( Character *ch, PCMemoryInterface *pcm, const DLString & argu
     int time;
     
     if (ch->get_trust( ) < pcm->get_trust( )) {
-        ch->send_to( "Фигушки.\r\n" );
+        ch->pecho("Фигушки.");
         return;
     }
     
@@ -103,16 +103,16 @@ void Deny::doPlace( Character *ch, PCMemoryInterface *pcm, const DLString & argu
     attr->setResponsible( ch->getName( ) );
     attr->start( pcm );
     
-    ch->send_to( "Ok.\r\n" );
+    ch->pecho("Ok.");
 }
 
 void Deny::doUsage( Character *ch )
 {
-    ch->send_to( 
+    ch->pecho( 
         "Использование: \r\n"
         "deny <name>         - показать, кто и на какой срок поденаил чара\r\n"
         "deny <name> off     - снять deny\r\n"
-        "deny <name> <time>  - запретить доступ на время <time>\r\n" );
+        "deny <name> <time>  - запретить доступ на время <time>" );
 }
 
 /*----------------------------------------------------------------------------

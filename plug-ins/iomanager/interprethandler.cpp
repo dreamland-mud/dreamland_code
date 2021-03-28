@@ -501,7 +501,7 @@ void InterpretHandler::close( Descriptor *d )
     if (!ch)
         return;
 
-    act( "$c1 потеря$gло|л|ла связь с этим миром.", ch, 0, 0, TO_ROOM );
+    oldact("$c1 потеря$gло|л|ла связь с этим миром.", ch, 0, 0, TO_ROOM );
     wiznet( WIZ_LINKS, 0, ch->get_trust( ), "Net death has claimed %C1.", ch );
     ch->desc = 0;
 }

@@ -68,7 +68,7 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
     if (quest) {
 
         if (time == 0) {
-            pch->send_to( "Время, отведенное на задание, вышло!\r\n" );
+            pch->pecho("Время, отведенное на задание, вышло!");
             attributes->eraseAttribute( "quest" );
             
             time = quest->getFailTime( pch );
@@ -79,11 +79,11 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
             pch->send_to( buf );
 
         } else if (time < 6) {
-            pch->send_to( "Поторопись! Время, отведенное на выполнение задания, заканчивается!\r\n" );
+            pch->pecho("Поторопись! Время, отведенное на выполнение задания, заканчивается!");
         }
         
     } else if (time == 0) {
-        pch->send_to( "Теперь ты снова можешь взять задание.\r\n" );
+        pch->pecho("Теперь ты снова можешь взять задание.");
     }
         
     PCharacterManager::save(pch);

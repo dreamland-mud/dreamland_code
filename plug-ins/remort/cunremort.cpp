@@ -17,8 +17,8 @@ CMDADM( unremort )
     DLString num = arguments.getOneArgument( );
     
     if(buf.empty( ) || num.empty( )) {
-        ch->send_to("Usage: unremort <player_name> <#remort>\n\r"
-                    "       - restore from remorts dir.\n\r");
+        ch->pecho("Usage: unremort <player_name> <#remort>\n\r"
+                    "       - restore from remorts dir.");
         return;
     }
 
@@ -26,24 +26,24 @@ CMDADM( unremort )
 
     for(c = char_list; c; c = c->next)
         if(!c->is_npc() && buf == c->getName()) {
-            ch->send_to("Character is already in game.\n\r");
+            ch->pecho("Character is already in game.");
             return;
         }
     
     try {
         remort = num.toInt( );
     } catch (const ExceptionBadType &e) {
-        ch->send_to("Number of remort must be a number.\n\r");
+        ch->pecho("Number of remort must be a number.");
         return;
     }
         
 
     if(!PCharacterManager::pfRecover(buf, "remort", remort)) {
-        ch->send_to("Oops. Failed to recover profile. Misspelled name?\n\r");
+        ch->pecho("Oops. Failed to recover profile. Misspelled name?");
         return;
     }
 
-    ch->send_to("Recovered.\n\r");
+    ch->pecho("Recovered.");
 }
 
 

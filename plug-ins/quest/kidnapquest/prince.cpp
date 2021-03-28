@@ -169,7 +169,7 @@ void KidnapPrince::give( Character *victim, Object *obj )
         quest->getScenario( ).actWrongGiver( ch, victim, obj );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
-        act( "$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
+        oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
         return;
     }
         
@@ -185,7 +185,7 @@ void KidnapPrince::give( Character *victim, Object *obj )
     }
     
     if (obj->item_type == ITEM_POTION || obj->item_type == ITEM_PILL) {
-        act( "$c1 $T $o4.", ch, obj, (obj->item_type == ITEM_PILL ? "съедает" : "осушает"), TO_ROOM );
+        oldact("$c1 $T $o4.", ch, obj, (obj->item_type == ITEM_PILL ? "съедает" : "осушает"), TO_ROOM );
         spell_by_item( ch, obj );
         extract_obj( obj );
         return;

@@ -64,12 +64,12 @@ CMDRUN( fill )
     arg1 = arguments.getOneArgument( );
 
     if (arg.empty( )) {
-        ch->send_to("Наполнить что?\n\r");
+        ch->pecho("Наполнить что?");
         return;
     }
 
     if (( obj = get_obj_wear_carry( ch, arg.c_str( ) ) ) == 0) {
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -82,14 +82,14 @@ CMDRUN( fill )
         fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
         if (!fountain && pRoom->liquid == liq_none)
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
-                ch->send_to("Здесь нет источника!\n\r");
+                ch->pecho("Здесь нет источника!");
                 return;
             }
     }
     else {
         fountain = get_obj_here( ch, arg1.c_str( ) );
         if (!fountain) {
-            ch->println("Здесь нет такого источника.");
+            ch->pecho("Здесь нет такого источника.");
             return;
         }
 
@@ -172,7 +172,7 @@ static void create_pool( Character *ch, Object *out, int amount )
         else { /* same liquid */ 
             pool->timer += time;
             pool->value0(max( 1, pool->timer / 10 ));
-            act( "Лужа $n2 растекается еще шире.", ch, liqShort.c_str( ), 0, TO_ALL );
+            oldact("Лужа $n2 растекается еще шире.", ch, liqShort.c_str( ), 0, TO_ALL );
             save_items(room);
             return;
         }
@@ -181,7 +181,7 @@ static void create_pool( Character *ch, Object *out, int amount )
         pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
     }        
     
-    act( "На земле образуется лужа $n2.", ch, liqShort.c_str( ), 0, TO_ALL );
+    oldact("На земле образуется лужа $n2.", ch, liqShort.c_str( ), 0, TO_ALL );
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
@@ -202,8 +202,8 @@ static void pour_out( Character *ch, Object * out )
     Room *room = ch->in_room;
 
     if (out->value1() == 0) {
-        act( "Ты переворачиваешь $o4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
-        act( "Приговаривая 'ну котеночек, ну еще капельку', $c1 переворачивает и трясет $o5.", ch, out, 0, TO_ROOM );
+        oldact("Ты переворачиваешь $o4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
+        oldact("Приговаривая 'ну котеночек, ну еще капельку', $c1 переворачивает и трясет $o5.", ch, out, 0, TO_ROOM );
         return;
     }
     
@@ -223,17 +223,17 @@ static void pour_out( Character *ch, Object * out )
         ch->recho( "%^C1 переворачивает %O4, выливая %N4 в %N4.", ch, out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
     }
     else if (room->getSectorType() == SECT_AIR) {
-        act( "Ты переворачиваешь $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_CHAR );
-        act( "$c1 переворачивает $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_ROOM );
+        oldact("Ты переворачиваешь $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_CHAR );
+        oldact("$c1 переворачивает $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_ROOM );
     }
     else if (room->getSectorType() == SECT_DESERT) {
-        act( "Ты переворачиваешь $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_CHAR );
-        act( "$c1 переворачивает $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_ROOM );
-        act( "Лужа $n2 с шипением испаряется.", ch, liqShort.c_str( ), 0, TO_ALL );
+        oldact("Ты переворачиваешь $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_CHAR );
+        oldact("$c1 переворачивает $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_ROOM );
+        oldact("Лужа $n2 с шипением испаряется.", ch, liqShort.c_str( ), 0, TO_ALL );
     }
     else {
-        act( "Ты переворачиваешь $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_CHAR );
-        act( "$c1 переворачивает $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_ROOM );
+        oldact("Ты переворачиваешь $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_CHAR );
+        oldact("$c1 переворачивает $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_ROOM );
         create_pool( ch, out, amount );
     }
 
@@ -309,7 +309,7 @@ static void pour_out( Character *ch, Object * out, Character *victim )
             victim->pecho( msgVict.c_str( ), ch, victim, out, liquid->getShortDescr( ).c_str( ) );
         }
         else if (sips >= 5) {
-            victim->println( "Ты чувствуешь влагу на теле." );
+            victim->pecho( "Ты чувствуешь влагу на теле." );
 
             if (!IS_AFFECTED(victim, AFF_SLEEP))
                 interpret_raw( ch, "wake", 
@@ -389,7 +389,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     }
 
     if (out->value1() == 0) {
-        act("В $o6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR);
+        oldact("В $o6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR);
         return;
     }
 
@@ -449,12 +449,12 @@ CMDRUN( pourout )
     arg2 = arguments.getOneArgument( ); // victim or empty
 
     if (arg1.empty( )) {
-        ch->send_to("Вылить что и куда?\n\r");
+        ch->pecho("Вылить что и куда?");
         return;
     }
 
     if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
-        ch->println("У тебя в инвентаре нет такой емкости для жидкости.");
+        ch->pecho("У тебя в инвентаре нет такой емкости для жидкости.");
         return;
     }
 
@@ -472,7 +472,7 @@ CMDRUN( pourout )
     }
 
     if (( vch = get_char_room(ch, arg2.c_str( ) ) ) == 0) {
-        ch->println( "Вылить на кого?" );
+        ch->pecho( "Вылить на кого?" );
         return;
     }
 
@@ -498,12 +498,12 @@ CMDRUN( pour )
     arg3 = arguments.getOneArgument( ); // victim or empty
 
     if (arg1.empty( )) {
-        ch->send_to("Вылить что и куда?\n\r");
+        ch->pecho("Вылить что и куда?");
         return;
     }
 
     if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
-        ch->println("У тебя в инвентаре нет такой емкости для жидкости.");
+        ch->pecho("У тебя в инвентаре нет такой емкости для жидкости.");
         return;
     }
 
@@ -518,7 +518,7 @@ CMDRUN( pour )
     if (arg2 == "out" || arg2.empty( )) {
         if (!arg3.empty( )) {
             if (( vch = get_char_room(ch, arg3.c_str( ) ) ) == 0) {
-                ch->println( "Вылить на кого?" );
+                ch->pecho( "Вылить на кого?" );
                 return;
             }
 
@@ -534,7 +534,7 @@ CMDRUN( pour )
         vch = get_char_room(ch,arg2.c_str( ));
 
         if (vch == 0) {
-            ch->send_to("Вылить во что?\n\r");
+            ch->pecho("Вылить во что?");
             return;
         }
 
@@ -604,13 +604,13 @@ CMDRUN( drink )
         obj = get_obj_room_type( ch, ITEM_FOUNTAIN );
         if (!obj && pRoom->liquid == liq_none) 
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
-                ch->send_to("Выпить что?\n\r");
+                ch->pecho("Выпить что?");
                 return;
             }
     }
     else {
         if (( obj = get_obj_here( ch, arg ) ) == 0) {
-            ch->send_to("Ты не находишь это.\n\r");
+            ch->pecho("Ты не находишь это.");
             return;
         }
     }
@@ -631,7 +631,7 @@ CMDRUN( drink )
                 return;
 
             if (obj->value1() <= 0) {
-                ch->send_to("Здесь пусто.\n\r");
+                ch->pecho("Здесь пусто.");
                 return;
             }
 
@@ -656,11 +656,11 @@ CMDRUN( drink )
     DLString buf = liquid->getShortDescr( ).ruscase( '4' );
 
     if (obj) {
-        act( "$c1 пьет $T из $o2.", ch,obj,buf.c_str( ),TO_ROOM );
-        act( "Ты пьешь $T из $o2.", ch,obj,buf.c_str( ),TO_CHAR );
+        oldact("$c1 пьет $T из $o2.", ch,obj,buf.c_str( ),TO_ROOM );
+        oldact("Ты пьешь $T из $o2.", ch,obj,buf.c_str( ),TO_CHAR );
     } else {
-        act( "$c1 зачерпывает и пьет $T.", ch, 0, buf.c_str( ),TO_ROOM );
-        act( "Ты зачерпываешь и пьешь $T.", ch, 0, buf.c_str( ),TO_CHAR );
+        oldact("$c1 зачерпывает и пьет $T.", ch, 0, buf.c_str( ),TO_ROOM );
+        oldact("Ты зачерпываешь и пьешь $T.", ch, 0, buf.c_str( ),TO_CHAR );
     }
 
     if (ch->fighting != 0)
@@ -675,8 +675,8 @@ CMDRUN( drink )
         /* The drink was poisoned ! */
         Affect af;
 
-        act( "$c1 хватается за горло и задыхается.",ch,0,0,TO_ROOM );
-        ch->send_to("Ты хватаешься за горло и задыхаешься.\n\r");
+        oldact("$c1 хватается за горло и задыхается.",ch,0,0,TO_ROOM );
+        ch->pecho("Ты хватаешься за горло и задыхаешься.");
         af.bitvector.setTable(&affect_flags);
         af.type      = gsn_poison;
         af.level     = number_fuzzy(amount);

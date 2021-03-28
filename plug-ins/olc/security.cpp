@@ -106,31 +106,31 @@ CMD(security, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     PCharacter *victim;
     
     if(ch->getPC()->getSecurity() < 100) {
-        ch->send_to("Это не для тебя.\n\r");
+        ch->pecho("Это не для тебя.");
         return;
     }
     argument = one_argument(argument, buf);
     
     if(!*buf) {
-        ch->send_to("Usage: security <player> <#security level>\n\r");
+        ch->pecho("Usage: security <player> <#security level>");
         return;
     }
     victim = get_player_world(ch, buf);
 
     if(!victim) {
-        ch->send_to("Char not found.\n\r");
+        ch->pecho("Char not found.");
         return;
     }
 
     argument = one_argument(argument, buf);
     if(!*buf || !is_number(buf)) {
-        ch->send_to("Security must be a number.\n\r");
+        ch->pecho("Security must be a number.");
         return;
     }
     
     victim->setSecurity(atoi(buf));
     
-    ch->send_to("Security set.\n\r");
+    ch->pecho("Security set.");
 }
 
 CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
@@ -142,7 +142,7 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     DLString arguments = argument;
     
     if(ch->getPC( )->getSecurity() < 100) {
-        ch->send_to( "Это не для тебя.\n\r" );
+        ch->pecho("Это не для тебя.");
         return;
     }
     
@@ -153,7 +153,7 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         victim = PCharacterManager::find( arg1 );
 
         if (!victim) {
-            ch->send_to( "Char not found, misspelled name?\r\n" );
+            ch->pecho("Char not found, misspelled name?");
             return;
         }
 
@@ -186,14 +186,14 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 try {
                     attr->removeInterval( arg3.toInt( ), arg4.toInt( ) );
                 } catch (const ExceptionBadType &e) {
-                    ch->send_to( "Vnum ranges must be numbers.\r\n" );
+                    ch->pecho("Vnum ranges must be numbers.");
                     return;
                 }
                 
-                ch->send_to( "Ok.\r\n" );
+                ch->pecho("Ok.");
             }
             else
-                ch->send_to( "No vnum ranges found.\r\n" );
+                ch->pecho("No vnum ranges found.");
             
             return;
         }
@@ -210,13 +210,13 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 b = arg4.toInt( );
 
                 if (attr->isOverlapping( a, b )) {
-                    ch->send_to( "Vnums overlap existing ranges. Try olcvnum <name> show.\r\n" );
+                    ch->pecho("Vnums overlap existing ranges. Try olcvnum <name> show.");
                     return;
                 }
                 
                 attr->vnums.push_back( XMLVnumRange( a, b, arg5.toInt( ) ) );
                 PCharacterManager::saveMemory( victim );
-                ch->send_to("Vnum range granted.\n\r");
+                ch->pecho("Vnum range granted.");
                 return;
                 
             } catch (const ExceptionBadType& e) {
@@ -224,8 +224,8 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         }
     } 
 
-    ch->send_to( "Usage: olcvnum <player> set <min vnum> <max vnum> <security level>\r\n" 
+    ch->pecho( "Usage: olcvnum <player> set <min vnum> <max vnum> <security level>\r\n" 
                  "       olcvnum <player> show\r\n" 
-                 "       olcvnum <player> del <min vnum> <max vnum>\r\n" );
+                 "       olcvnum <player> del <min vnum> <max vnum>" );
 
 }

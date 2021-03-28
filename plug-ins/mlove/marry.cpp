@@ -23,12 +23,12 @@ COMMAND(Marry, "marry")
     DLString brideName1, brideName2;
     
     if (!ch->is_immortal( )) {
-        ch->send_to( "Это не для тебя.\r\n" );
+        ch->pecho("Это не для тебя.");
         return;
     }
 
     if (arguments.empty( )) {
-        ch->send_to( "И кого женить будем?\r\n" );
+        ch->pecho("И кого женить будем?");
         return;
     }
     
@@ -36,7 +36,7 @@ COMMAND(Marry, "marry")
     brideName1.upperFirstCharacter( );
     
     if (arguments.empty( )) {
-        ch->send_to( "Для это церемонии не хватает одного компонента.\r\n" );
+        ch->pecho("Для это церемонии не хватает одного компонента.");
         return;
     }
 
@@ -44,12 +44,12 @@ COMMAND(Marry, "marry")
     brideName2.upperFirstCharacter( );
 
     if (brideName2 == brideName1) {
-        ch->send_to( "Это еще как?\r\n" );
+        ch->pecho("Это еще как?");
         return;
     }
 
     if (ch->getName( ) == brideName1 || ch->getName( ) == brideName2) {
-        ch->send_to( "Попроси кого-то помочь тебе.\r\n" );
+        ch->pecho("Попроси кого-то помочь тебе.");
         return;
     }
     

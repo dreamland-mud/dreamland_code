@@ -94,7 +94,7 @@ COMMAND(CChop, "chop")
     int vnum;
 
     if (!gsn_trophy->available( ch )) {
-        ch->println( "Ты не умеешь рассекать трупы." );
+        ch->pecho( "Ты не умеешь рассекать трупы." );
         return;
     }
 
@@ -105,7 +105,7 @@ COMMAND(CChop, "chop")
     argBody = args.getOneArgument( );
 
     if (argPart.empty( )) {
-        ch->println( "Какую часть тела ты хочешь отрубить -- ногу, голову или руку?" );
+        ch->pecho( "Какую часть тела ты хочешь отрубить -- ногу, голову или руку?" );
         return;
     }
 
@@ -122,22 +122,22 @@ COMMAND(CChop, "chop")
         vnum = OBJ_VNUM_SEVERED_HEAD;
     }
     else {
-        ch->println( "Ты можешь отрубить только ногу, голову или руку." );
+        ch->pecho( "Ты можешь отрубить только ногу, голову или руку." );
         return;
     }
 
     if (argBody.empty( )) {
-        ch->println( "От какого трупа ты хочешь отрубить кусок?" );
+        ch->pecho( "От какого трупа ты хочешь отрубить кусок?" );
         return;
     }
 
     if (!( corpse = get_obj_here( ch, argBody.c_str( ) ) )) {
-        ch->println( "Здесь нет такого трупа." );
+        ch->pecho( "Здесь нет такого трупа." );
         return;
     }
 
     if (corpse->item_type != ITEM_CORPSE_PC && corpse->item_type != ITEM_CORPSE_NPC) {
-        ch->println( "Это не труп." );
+        ch->pecho( "Это не труп." );
         return;
     }
 
@@ -148,12 +148,12 @@ COMMAND(CChop, "chop")
     }
     
     if (!( axe = get_wield( ch, false ) )) {
-        ch->println( "Чем рубить будешь?" );
+        ch->pecho( "Чем рубить будешь?" );
         return;
     }
 
     if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE) {
-        ch->println( "Твоим оружием неудобно это делать." );
+        ch->pecho( "Твоим оружием неудобно это делать." );
         return;
     }
 
@@ -197,7 +197,7 @@ SKILL_RUNP( trophy )
     argument = one_argument( argument, arg );
 
     if (!gsn_trophy->available( ch )) {
-        ch->println( "Ась?" );
+        ch->pecho( "Ась?" );
         return;
     }
 
@@ -206,25 +206,25 @@ SKILL_RUNP( trophy )
 
     if (ch->isAffected(gsn_trophy))
     {
-        ch->println( "Но у тебя уже есть один трофей!" );
+        ch->pecho( "Но у тебя уже есть один трофей!" );
         return;
     }
 
     if (ch->mana < mana)
     {
-        ch->println( "Ты слишком слаб{Sfа{Sx, чтоб сконцентрироваться." );
+        ch->pecho( "Ты слишком слаб{Sfа{Sx, чтоб сконцентрироваться." );
         return;
     }
 
     if (arg[0] == '\0')
     {
-        ch->println( "Что именно ты хочешь превратить в трофей?" );
+        ch->pecho( "Что именно ты хочешь превратить в трофей?" );
         return;
     }
 
     if ( ( part = get_obj_carry( ch, arg ) ) == 0 )
     {
-        ch->println( "У тебя нету такой части тела." );
+        ch->pecho( "У тебя нету такой части тела." );
         return;
     }
 
@@ -238,27 +238,27 @@ SKILL_RUNP( trophy )
         trophy_vnum = OBJ_VNUM_BATTLE_PONCHO;
     break;
     case OBJ_VNUM_BRAINS:
-        ch->println( "А почему бы тебе просто не съесть их?" );
+        ch->pecho( "А почему бы тебе просто не съесть их?" );
         return;
     default:
-        ch->println( "Ты не можешь превратить это в трофей!" );
+        ch->pecho( "Ты не можешь превратить это в трофей!" );
         return;
     }
 
     if (part->from[0] == '\0')
     {
-        ch->println( "Это какая-то неправильная часть тела." );
+        ch->pecho( "Это какая-то неправильная часть тела." );
         return;
     }
 
     if (part->level < ch->getModifyLevel( ) - 20) {
-        ch->println( "Эта часть тела слишком мала для трофея." );
+        ch->pecho( "Эта часть тела слишком мала для трофея." );
         return;
     }
 
     if (number_percent( ) > (gsn_trophy->getEffective( ch )/3)*2)
     {
-        ch->println( "Твоя попытка не удалась, и ты разрушаешь это." );
+        ch->pecho( "Твоя попытка не удалась, и ты разрушаешь это." );
         extract_obj(part);
         return;
     }
@@ -312,8 +312,8 @@ SKILL_RUNP( trophy )
             obj_to_char(trophy, ch);
             gsn_trophy->improve( ch, true );
 
-            act("Ты изготавливаешь пончо из $o2!",ch,part,0,TO_CHAR);
-            act("$c1 изготавливает пончо из $o2!",ch,part,0,TO_ROOM);
+            oldact("Ты изготавливаешь пончо из $o2!",ch,part,0,TO_CHAR);
+            oldact("$c1 изготавливает пончо из $o2!",ch,part,0,TO_ROOM);
 
             extract_obj(part);
             return;
@@ -321,7 +321,7 @@ SKILL_RUNP( trophy )
     }
     else
     {
-        ch->println( "Ты разрушаешь это." );
+        ch->pecho( "Ты разрушаешь это." );
         extract_obj(part);
         ch->mana -= mana / 2;
         gsn_trophy->improve( ch, false );
@@ -370,9 +370,9 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     // Success, inflict a lot of damage. Anatolia implementation had (victim->hit+1), but the 
     // resulting damage always got reduced by sanctuary and other protections.
     int dam;
-    act("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR);
-    act("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT);
-    act_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
+    oldact("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR);
+    oldact("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT);
+    oldact_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
     damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
     gsn_mortal_strike->improve( ch, true, victim );
@@ -389,7 +389,7 @@ SKILL_RUNP( bloodthirst )
 
     if (!gsn_bloodthirst->available( ch ))
     {
-        ch->println( "Ты не знаешь что такое кровожадность." );
+        ch->pecho( "Ты не знаешь что такое кровожадность." );
         return;
     }
 
@@ -400,19 +400,19 @@ SKILL_RUNP( bloodthirst )
 
     if (IS_AFFECTED(ch,AFF_BLOODTHIRST) || ch->isAffected(gsn_bloodthirst) )
     {
-        ch->println( "Ты уже жаждешь крови." );
+        ch->pecho( "Ты уже жаждешь крови." );
         return;
     }
 
     if (IS_AFFECTED(ch,AFF_CALM))
     {
-        ch->println( "Ты слишком миролюбив{Sfа{Sx, чтоб жаждать крови." );
+        ch->pecho( "Ты слишком миролюбив{Sfа{Sx, чтоб жаждать крови." );
         return;
     }
 
     if (ch->fighting == 0)
       {
-        ch->println( "Это умение сработает только в бою." );
+        ch->pecho( "Это умение сработает только в бою." );
         return;
       }
 
@@ -429,8 +429,8 @@ SKILL_RUNP( bloodthirst )
 
         int slevel = skill_level(*gsn_bloodthirst, ch);
         
-        ch->println( "Ты жаждешь {rкрови!{x" );
-        act_p("Глаза $c2 загораются кровожадным огнем.",
+        ch->pecho( "Ты жаждешь {rкрови!{x" );
+        oldact_p("Глаза $c2 загораются кровожадным огнем.",
                ch,0,0,TO_ROOM,POS_RESTING);
         gsn_bloodthirst->improve( ch, true );
 
@@ -456,7 +456,7 @@ SKILL_RUNP( bloodthirst )
     {
         ch->setWaitViolence( 3 );
 
-        ch->println( "На миг ты чувствуешь себя кровожадно, но это быстро проходит." );
+        ch->pecho( "На миг ты чувствуешь себя кровожадно, но это быстро проходит." );
         gsn_bloodthirst->improve( ch, false );
     }
 }
@@ -475,7 +475,7 @@ SKILL_RUNP( spellbane )
 
         if (ch->isAffected(gsn_spellbane))
         {
-                ch->println( "Ты уже отражаешь заклинания." );
+                ch->pecho( "Ты уже отражаешь заклинания." );
                 return;
         }
 
@@ -493,8 +493,8 @@ SKILL_RUNP( spellbane )
 
         affect_to_char(ch,&af);
 
-        act("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR);
-        act("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM);
+        oldact("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR);
+        oldact("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM);
 }
 
 /*
@@ -510,13 +510,13 @@ SKILL_RUNP( resistance )
 
         if (ch->isAffected(gsn_resistance))
         {
-                ch->println( "Ты уже сопротивляешься физическим атакам." );
+                ch->pecho( "Ты уже сопротивляешься физическим атакам." );
                 return;
         }
 
         if ( ch->mana < mana )
         {
-                ch->println( "У тебя недостаточно энергии для этого." );
+                ch->pecho( "У тебя недостаточно энергии для этого." );
                 return;
         }
 
@@ -528,16 +528,16 @@ SKILL_RUNP( resistance )
         postaffect_to_char(ch, gsn_resistance, skill_level(*gsn_resistance, ch) / 6);
       ch->mana -= mana;
 
-      act("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
-      act("$c1 выглядит покрепче.",ch,0,0,TO_ROOM);
+      oldact("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
+      oldact("$c1 выглядит покрепче.",ch,0,0,TO_ROOM);
       gsn_resistance->improve( ch, true );
     }
   else
     {
       ch->mana -= mana / 2;
 
-     ch->println( "Ты напрягаешь свои мускулы, но это все впустую." );
-      act_p("$c1 играет мускулами, пытаясь выглядеть крепче.",
+     ch->pecho( "Ты напрягаешь свои мускулы, но это все впустую." );
+      oldact_p("$c1 играет мускулами, пытаясь выглядеть крепче.",
              ch,0,0,TO_ROOM,POS_RESTING);
       gsn_resistance->improve( ch, false );
     }
@@ -555,7 +555,7 @@ SKILL_RUNP( truesight )
 
   if (!gsn_truesight->available( ch ))
   {
-    ch->println( "Ась?" );
+    ch->pecho( "Ась?" );
     return;
   }
 
@@ -564,13 +564,13 @@ SKILL_RUNP( truesight )
 
   if (ch->isAffected(gsn_truesight))
     {
-      ch->println( "Твои глаза настолько зорки, насколько это возможно." );
+      ch->pecho( "Твои глаза настолько зорки, насколько это возможно." );
       return;
     }
 
   if (ch->mana < mana)
     {
-      ch->println( "У тебя не хватает энергии для этого." );
+      ch->pecho( "У тебя не хватает энергии для этого." );
       return;
     }
 
@@ -602,16 +602,16 @@ SKILL_RUNP( truesight )
 
       ch->mana -= mana; 
 
-      act("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
-      act("$c1 смотрит более зорко.",ch,0,0,TO_ROOM);
+      oldact("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
+      oldact("$c1 смотрит более зорко.",ch,0,0,TO_ROOM);
       gsn_truesight->improve( ch, true );
     }
   else
     {
       ch->mana -= mana / 2;
 
-     ch->println( "Ты зорко смотришь вокруг, но не видишь ничего нового." );
-      act_p("$c1 зорко смотрит вокруг, но ничего нового не замечает.",
+     ch->pecho( "Ты зорко смотришь вокруг, но не видишь ничего нового." );
+      oldact_p("$c1 зорко смотрит вокруг, но ничего нового не замечает.",
              ch,0,0,TO_ROOM,POS_RESTING);
       gsn_truesight->improve( ch, false );
     }
@@ -632,20 +632,20 @@ SKILL_RUNP( bandage )
 
         if ( gsn_bandage->getEffective( ch ) == 0)
         {
-                ch->println( "Что?" );
+                ch->pecho( "Что?" );
                 return;
         }
 
         if (ch->isAffected(gsn_bandage))
         {
-                act("Ты уже перевяза$gло|л|ла свои раны!",ch,0,0,TO_CHAR);
+                oldact("Ты уже перевяза$gло|л|ла свои раны!",ch,0,0,TO_CHAR);
                 return;
         }
 
         if (SHADOW(ch))
         {
-                ch->println( "Как это наверное интересно смотрится со стороны -- бинтовать собственную тень." );
-                act_p("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор.",
+                ch->pecho( "Как это наверное интересно смотрится со стороны -- бинтовать собственную тень." );
+                oldact_p("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
@@ -658,14 +658,14 @@ SKILL_RUNP( bandage )
                 ch->setWaitViolence( 1 );
                 int slevel = skill_level(*gsn_bandage, ch);
 
-                ch->println( "Ты накладываешь повязку на свою рану!" );
-                act("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM);
+                ch->pecho( "Ты накладываешь повязку на свою рану!" );
+                oldact("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM);
                 gsn_bandage->improve( ch, true );
 
                 heal = ( dice(4, 8 ) + slevel / 2 );
                 ch->hit = min( ch->hit + heal, (int)ch->max_hit );
                 update_pos( ch );
-                ch->println( "Тебе становится лучше!" );
+                ch->pecho( "Тебе становится лучше!" );
 
                 af.bitvector.setTable(&affect_flags);
                 af.type                = gsn_bandage;
@@ -680,7 +680,7 @@ SKILL_RUNP( bandage )
         {
                 ch->setWaitViolence( 1 );
 
-                ch->println( "Ты пытаешься перевязать свои раны, но пальцы не слушаются тебя." );
+                ch->pecho( "Ты пытаешься перевязать свои раны, но пальцы не слушаются тебя." );
                 gsn_bandage->improve( ch, false );
         }
 }
@@ -741,13 +741,13 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
         return;
     }
 
-    act_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
+    oldact_p("$c1 дает тебе лечебное зелье, предлагая выпить его.",
            ch,0,wch,TO_VICT,POS_RESTING);
-    act("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
-    act("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR);
-    act("$C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
-    act("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT);
-    act("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT);
+    oldact("Ты выпиваешь лечебное зелье.",ch,0,wch,TO_VICT);
+    oldact("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR);
+    oldact("$C1 выпивает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR);
+    oldact("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT);
+    oldact("$C1 выпивает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT);
 
     wch->is_npc( ) ? wch->master->setWaitViolence( 1 ) : wch->setWaitViolence( 1 );
 
@@ -779,8 +779,8 @@ bool ClanGuardBattlerager::specFight( )
 
     if ( number_percent() < 33 )
     {
-            act("Ты наносишь тройной удар смертоносной силы!",ch,0,0,TO_CHAR);
-            act("$c1 наносит тройной удар смертоносной силы!",ch,0,0,TO_ROOM);
+            oldact("Ты наносишь тройной удар смертоносной силы!",ch,0,0,TO_CHAR);
+            oldact("$c1 наносит тройной удар смертоносной силы!",ch,0,0,TO_ROOM);
             one_hit( ch, victim );
             one_hit( ch, victim );
             one_hit( ch, victim );
@@ -802,8 +802,8 @@ void ClanGuardBattlerager::actGreet( PCharacter *wch )
 
 void ClanGuardBattlerager::actPush( PCharacter *wch )
 {
-    act( "$C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
-    act( "$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло.", wch, 0, ch, TO_ROOM );
+    oldact("$C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
+    oldact("$C1 отвешивает $c3 подзатыльник...\n\r$c1 -- как ветром сдуло.", wch, 0, ch, TO_ROOM );
 }
 
 

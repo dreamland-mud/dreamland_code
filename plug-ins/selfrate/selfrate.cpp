@@ -40,12 +40,12 @@ CMDRUN( selfrate )
     PCharacter *pch = ch->getPC( );
     
     if (!pch) {
-        ch->send_to( "Ты обычное животное.\r\n" );
+        ch->pecho("Ты обычное животное.");
         return;
     }
 
     if (IS_CHARMED(pch)) {
-        pch->send_to( "Ничего не произошло.\r\n" );
+        pch->pecho("Ничего не произошло.");
         return;
     }
         
@@ -71,7 +71,7 @@ CMDRUN( selfrate )
     if (rate == attr->rate) 
         pch->printf( "Но ты и так %s!\r\n", attr->getRateAlias( ).c_str( ));
     else if (rate < attr->rate) 
-        pch->send_to( "Ты не можешь понизить оценку своего уровня опытности.\r\n" );
+        pch->pecho("Ты не можешь понизить оценку своего уровня опытности.");
     else {
         attr->rate = rate;
         DLString alias = attr->getRateAlias();

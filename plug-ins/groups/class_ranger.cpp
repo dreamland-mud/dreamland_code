@@ -86,17 +86,17 @@ SKILL_RUNP( track )
     int d;
 
     if (gsn_track->getEffective( ch ) < 2) {
-        ch->send_to("Ты не умеешь читать следы на земле.\r\n");
+        ch->pecho("Ты не умеешь читать следы на земле.");
         return;
     }
 
     if (arg.empty( )) {
-        ch->println( "Кого ты хочешь выследить?" );
+        ch->pecho( "Кого ты хочешь выследить?" );
         return;
     }
 
     ch->setWait( gsn_track->getBeats( ) );
-    act("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
+    oldact("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
 
     int slevel;
     slevel = gsn_track->getEffective( ch ) + skill_level_bonus(*gsn_track, ch);  
@@ -121,7 +121,7 @@ SKILL_RUNP( track )
             }
         }
     
-    ch->send_to("Ты не видишь здесь следов.\n\r");
+    ch->pecho("Ты не видишь здесь следов.");
     gsn_track->improve( ch, false );
 }
 
@@ -139,12 +139,12 @@ static Object * find_arrow( Character *ch, Object *quiver )
         }
 
     if (!arrow) {
-        act("В $o6 закончились стрелы.", ch, quiver, 0, TO_CHAR);
+        oldact("В $o6 закончились стрелы.", ch, quiver, 0, TO_CHAR);
         return NULL;
     }
 
     if (ch->getModifyLevel( ) + 10 < arrow->level) {
-        ch->println("Тебе не хватает опыта воспользоватся этой стрелой.");
+        ch->pecho("Тебе не хватает опыта воспользоватся этой стрелой.");
         return NULL;
     }
 
@@ -171,18 +171,18 @@ SKILL_RUNP( shoot )
 
     if (!gsn_bow->usable( ch ))
     {
-          ch->send_to("Ты не умеешь стрелять из лука.\n\r");
+          ch->pecho("Ты не умеешь стрелять из лука.");
           return;
     }
 
     if ( ch->fighting )
     {
-            ch->send_to("Сражаясь, ты не можешь прицелиться.\n\r");
+            ch->pecho("Сражаясь, ты не можешь прицелиться.");
             return;
     }
 
     if (!direction_range_argument(argument, argDoor, argVict, direction)) {
-        ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
+        ch->pecho("Выстрелить в каком направлении и в кого?");
         return;
     }
 
@@ -195,13 +195,13 @@ SKILL_RUNP( shoot )
 
     if ( !victim->is_npc() && victim->desc == 0 )
     {
-            ch->send_to("Ты не можешь сделать этого.\n\r");
+            ch->pecho("Ты не можешь сделать этого.");
             return;
     }
 
     if ( victim == ch )
     {
-            ch->send_to("Это невозможно!\n\r");
+            ch->pecho("Это невозможно!");
             return;
     }
 
@@ -219,7 +219,7 @@ SKILL_RUNP( shoot )
             || wield->item_type != ITEM_WEAPON
             || wield->value0() != WEAPON_BOW )
     {
-            ch->send_to("Для того, чтобы стрелять тебе нужен лук!\n\r");
+            ch->pecho("Для того, чтобы стрелять тебе нужен лук!");
             return;            
     }
 
@@ -227,26 +227,26 @@ SKILL_RUNP( shoot )
         && (get_eq_char(ch,wear_second_wield)
             || get_eq_char(ch,wear_shield)) )
     {
-            ch->send_to("Твоя вторая рука должна быть свободна!\n\r");
+            ch->pecho("Твоя вторая рука должна быть свободна!");
             return;            
     }
 
     if (!ch->is_npc( ) && !quiver)
     {
-            ch->send_to("У тебя в руках ничего нет!\n\r");
+            ch->pecho("У тебя в руках ничего нет!");
             return;            
     }        
     
     if (!ch->is_npc( ) && 
         (quiver->item_type != ITEM_CONTAINER || !IS_SET(quiver->value1(), CONT_FOR_ARROW)))
     {
-            ch->send_to("Возьми в руки колчан.\n\r");
+            ch->pecho("Возьми в руки колчан.");
             return;
     }
 
     if ( ch->in_room == victim->in_room )
     {
-            ch->send_to("Ты не можешь стрелять из лука в упор.\n\r");
+            ch->pecho("Ты не можешь стрелять из лука в упор.");
             return;
     }
 
@@ -335,7 +335,7 @@ SKILL_RUNP( herbs )
 
   if (ch->isAffected(gsn_herbs))
     {
-      ch->send_to("Ты пока не можешь применять целебные травы, подожди немного.\n\r");
+      ch->pecho("Ты пока не можешь применять целебные травы, подожди немного.");
       return;
     }
 
@@ -343,7 +343,7 @@ SKILL_RUNP( herbs )
     victim = ch;
   else if ( (victim = get_char_room(ch,arg)) == 0)
     {
-      ch->send_to("Таких тут нет.\n\r");
+      ch->pecho("Таких тут нет.");
       return;
     }
   ch->setWait( gsn_herbs->getBeats( )  );
@@ -352,20 +352,20 @@ SKILL_RUNP( herbs )
     {
       postaffect_to_char(ch, gsn_herbs, 5);
 
-      ch->send_to("Ты собираешь целебные травы по окрестностям.\n\r");
-      act("$c1 собирает какие-то травы по окрестностям.",ch,0,0,TO_ROOM);
+      ch->pecho("Ты собираешь целебные травы по окрестностям.");
+      oldact("$c1 собирает какие-то травы по окрестностям.",ch,0,0,TO_ROOM);
 
       if (ch != victim)
         {
-          act("$c1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT);
-          act("Ты накладываешь целебные травы на раны $C2.",ch,0,victim,TO_CHAR);
-          act("$c1 накладывает целебные травы на раны $C2.",ch,0,victim,TO_NOTVICT);
+          oldact("$c1 накладывает целебные травы на твои раны.",ch,0,victim,TO_VICT);
+          oldact("Ты накладываешь целебные травы на раны $C2.",ch,0,victim,TO_CHAR);
+          oldact("$c1 накладывает целебные травы на раны $C2.",ch,0,victim,TO_NOTVICT);
         }
         
       if (victim->hit < victim->max_hit)
         {
-          victim->send_to("Ты чувствуешь себя здоровее.\n\r");
-          act("$c1 выглядит здоровее.",victim,0,0,TO_ROOM);
+          victim->pecho("Ты чувствуешь себя здоровее.");
+          oldact("$c1 выглядит здоровее.",victim,0,0,TO_ROOM);
         }
       int slevel = skill_level(*gsn_herbs, ch);
       victim->hit = min((int)victim->max_hit,victim->hit + 5 * slevel );
@@ -376,8 +376,8 @@ SKILL_RUNP( herbs )
     }
   else
     {
-      ch->send_to("Ты ищешь целебные травы, но ничего не находишь.\n\r");
-      act("$c1 рыщет в поисках целебных трав, но ничего не находит.",ch,0,0,TO_ROOM);
+      ch->pecho("Ты ищешь целебные травы, но ничего не находишь.");
+      oldact("$c1 рыщет в поисках целебных трав, но ничего не находит.",ch,0,0,TO_ROOM);
       gsn_herbs->improve( ch, false, victim );
     }
 }
@@ -392,33 +392,33 @@ SKILL_RUNP( camp )
 
   if (ch->is_npc() || !gsn_camp->usable( ch ) )
     {
-      ch->send_to( "Чего?\n\r");
+      ch->pecho("Чего?");
       return;
     }
 
   if (ch->isAffected(gsn_camp))
     {
-      ch->println("Ты пока не можешь разбить лагерь, подожди немного.");
+      ch->pecho("Ты пока не можешь разбить лагерь, подожди немного.");
       return;
     }
 
 
   if ( number_percent( ) > gsn_camp->getEffective( ch ) )
   {
-        ch->println("Ты пытаешься разбить лагерь, но у тебя ничего не получается.");
+        ch->pecho("Ты пытаешься разбить лагерь, но у тебя ничего не получается.");
         gsn_camp->improve( ch, true );
         return;
   }
 
   if (!RoomUtils::isNature(ch->in_room))
   {
-    ch->println("Разбить полевой лагерь можно только на лоне природы.");
+    ch->pecho("Разбить полевой лагерь можно только на лоне природы.");
     return;
   }
 
   if ( ch->mana < gsn_camp->getMana( ))
   {
-     ch->println("У тебя не хватает энергии для разбивки лагеря.");
+     ch->pecho("У тебя не хватает энергии для разбивки лагеря.");
      return;
   }
 
@@ -426,8 +426,8 @@ SKILL_RUNP( camp )
   ch->mana -= gsn_camp->getMana( );
   ch->setWait( gsn_camp->getBeats( ) );
 
-  act("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
-  act("$c1 разбивает полевой лагерь.", ch, 0, 0, TO_ROOM);
+  oldact("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
+  oldact("$c1 разбивает полевой лагерь.", ch, 0, 0, TO_ROOM);
 
   int slevel = skill_level(*gsn_camp, ch);
     
@@ -470,13 +470,13 @@ SKILL_RUNP( bearcall )
 
   if (!gsn_bear_call->usable( ch ) )
     {
-      ch->send_to( "Чего?\n\r");
+      ch->pecho("Чего?");
       return;
     }
 
   if ( ch->mana < gsn_bear_call->getMana( ))
   {
-     ch->send_to( "У тебя не хватает сил, чтобы призвать на помощь медведей.\n\r");
+     ch->pecho("У тебя не хватает сил, чтобы призвать на помощь медведей.");
      return;
   }
 
@@ -488,7 +488,7 @@ SKILL_RUNP( bearcall )
 
   if ( number_percent( ) > gsn_bear_call->getEffective( ch ) )
   {
-        ch->send_to( "Медведи не слышат твой зов, стоит еще попрактиковаться.\n\r");
+        ch->pecho("Медведи не слышат твой зов, стоит еще попрактиковаться.");
         gsn_bear_call->improve( ch, false );
         return;
   }
@@ -518,19 +518,19 @@ TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const
 {
   if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
-     ch->send_to( "В эту местность медведям путь заказан.\n\r");
+     ch->pecho("В эту местность медведям путь заказан.");
      return false;
   }
 
   if (!ch->in_room->hasExits())
   {
-    ch->send_to( "Медведи не смогут пройти к тебе.\n\r");
+    ch->pecho("Медведи не смогут пройти к тебе.");
     return false;
   }
     
   if (!RoomUtils::isNature(ch->in_room))
   {
-    ch->send_to( "Медведи придут на помощь только на лоне природы.\n\r");
+    ch->pecho("Медведи придут на помощь только на лоне природы.");
     return false;
   }
     
@@ -548,13 +548,13 @@ SKILL_RUNP( lioncall )
 
   if (!gsn_lion_call->usable( ch ) )
     {
-          ch->send_to( "Чего?\n\r");
+          ch->pecho("Чего?");
           return;
         }
 
   if ( ch->mana < gsn_lion_call->getMana( ))
   {
-       ch->send_to( "У тебя не хватает энергии, чтобы позвать львов.\n\r");
+       ch->pecho("У тебя не хватает энергии, чтобы позвать львов.");
        return;
     }
 
@@ -566,7 +566,7 @@ SKILL_RUNP( lioncall )
 
   if ( number_percent( ) > gsn_lion_call->getEffective( ch ) )
   {
-    ch->send_to( "Львы не слышат твой зов, стоит еще попрактиковаться.\n\r");
+    ch->pecho("Львы не слышат твой зов, стоит еще попрактиковаться.");
     gsn_lion_call->improve( ch, false );
     return;
     }
@@ -596,19 +596,19 @@ TYPE_SPELL(bool, LionCall)::canSummonHere( Character *ch ) const
 {
   if (IS_SET(ch->in_room->room_flags, ROOM_NO_MOB|ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY) )
   {
-     ch->send_to( "В эту местность львам путь заказан.\n\r");
+     ch->pecho("В эту местность львам путь заказан.");
      return false;
   }
 
   if (!ch->in_room->hasExits())
   {
-    ch->send_to( "Львы не смогут пройти к тебе.\n\r");
+    ch->pecho("Львы не смогут пройти к тебе.");
     return false;
   }
     
   if (!RoomUtils::isNature(ch->in_room))
   {
-    ch->send_to( "Львы придут на помощь только на лоне природы.\n\r");
+    ch->pecho("Львы придут на помощь только на лоне природы.");
     return false;
   }
 
@@ -721,13 +721,13 @@ SKILL_RUNP( makearrow )
         return;
 
     if (!gsn_make_arrow->usable( ch )) {
-        ch->println("Ты не умеешь изготавливать стрелы.");
+        ch->pecho("Ты не умеешь изготавливать стрелы.");
         return;
     }
 
     if (!RoomUtils::isNature(ch->in_room))
     {
-        ch->send_to( "В этой местности тебе не удается найти древесины для изготовления стрел.\n\r");
+        ch->pecho("В этой местности тебе не удается найти древесины для изготовления стрел.");
         return;
     }
 
@@ -749,12 +749,12 @@ SKILL_RUNP( makearrow )
         else if (arg_oneof(arg, "blue", "голубая", "голубые"))
             arrowSkill = &*gsn_blue_arrow;
         else {
-            ch->send_to("Можно изготовить только зеленые, красные, белые или голубые стрелы.\n\r");
+            ch->pecho("Можно изготовить только зеленые, красные, белые или голубые стрелы.");
             return;
         }
 
         if (!arrowSkill->usable( ch )) {
-            ch->send_to("Ты не умеешь изготавливать такие стрелы.\n\r");
+            ch->pecho("Ты не умеешь изготавливать такие стрелы.");
             return;
         }
 
@@ -763,18 +763,18 @@ SKILL_RUNP( makearrow )
     }
 
     if (ch->mana < mana) {
-        ch->send_to( "У тебя не хватает энергии для изготовления стрел.\n\r");
+        ch->pecho("У тебя не хватает энергии для изготовления стрел.");
         return;
     }
 
     ch->mana -= mana;
     ch->setWait( wait );
 
-    ch->send_to("Ты сосредотачиваешься на изготовлении стрел!\n\r");
-    act("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM);
+    ch->pecho("Ты сосредотачиваешься на изготовлении стрел!");
+    oldact("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM);
 
     if (number_percent() > arrowSkill->getEffective( ch )) {
-        ch->send_to("Неудача. Придется еще попрактиковаться...\n\r");
+        ch->pecho("Неудача. Придется еще попрактиковаться...");
         arrowSkill->improve( ch, false );
         return;
     }
@@ -784,12 +784,12 @@ SKILL_RUNP( makearrow )
 
     for (int i = 0; i < count; i++) {
         if (number_percent( ) > gsn_make_arrow->getEffective( ch )) {
-            ch->send_to( "Ты пытаешься изготовить стрелу... но она ломается.\n\r");
+            ch->pecho("Ты пытаешься изготовить стрелу... но она ломается.");
             gsn_make_arrow->improve( ch, false );
             continue;
         }
 
-        ch->send_to( "Ты изготавливаешь стрелу.\n\r");
+        ch->pecho("Ты изготавливаешь стрелу.");
         obj_to_char( create_arrow( arrowSkill->getIndex( ), slevel ), ch );
     }
 
@@ -811,13 +811,13 @@ SKILL_RUNP(makebow)
         return;
 
     if (!gsn_make_bow->usable(ch)) {
-        ch->send_to("Ты не знаешь как изготовить лук.\n\r");
+        ch->pecho("Ты не знаешь как изготовить лук.");
         return;
     }
 
     if (!RoomUtils::isNature(ch->in_room))
     {
-        ch->send_to( "В этой местности тебе не удается найти древесины для изготовления лука.\n\r");
+        ch->pecho("В этой местности тебе не удается найти древесины для изготовления лука.");
         return;
     }
 
@@ -825,18 +825,18 @@ SKILL_RUNP(makebow)
     wait = gsn_make_bow->getBeats();
 
     if (ch->mana < mana) {
-        ch->send_to("У тебя не хватает энергии для изготовления лука.\n\r");
+        ch->pecho("У тебя не хватает энергии для изготовления лука.");
         return;
     }
     ch->mana -= mana;
     ch->setWait(wait);
 
     if (number_percent() > gsn_make_bow->getEffective(ch)) {
-        ch->send_to("Ты пытаешься изготовить лук... но он ломается.\n\r");
+        ch->pecho("Ты пытаешься изготовить лук... но он ломается.");
         gsn_make_bow->improve(ch, false);
         return;
     }
-    ch->send_to("Ты изготавливаешь лук.\n\r");
+    ch->pecho("Ты изготавливаешь лук.");
     gsn_make_bow->improve(ch, true);
 
     bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel());
@@ -870,23 +870,23 @@ SKILL_RUNP( forest )
     int mana;
 
     if (ch->is_npc() || !gsn_forest_fighting->getEffective( ch )) {
-        ch->send_to("Ты не владеешь этим умением.\n");
+        ch->pecho("Ты не владеешь этим умением.");
         return;
     }
     
     argument = one_argument( argument, arg );
 
     if (!*arg) {
-        ch->send_to("Использование: {lRлес атака|защита|выкл{lEforest attack|defence|off{x\n\r");
+        ch->pecho("Использование: {lRлес атака|защита|выкл{lEforest attack|defence|off{x");
         return;
     }
 
     if (arg_is_switch_off(arg) || arg_oneof(arg, "normal")) {
         if (!ch->isAffected(gsn_forest_fighting)) {
-            ch->send_to("Ты не используешь в бою твои знания о лесе.\n\r");
+            ch->pecho("Ты не используешь в бою твои знания о лесе.");
         }
         else {
-            ch->send_to("Ты прекращаешь использовать в бою твои знания о лесе.\n\r");
+            ch->pecho("Ты прекращаешь использовать в бою твои знания о лесе.");
             affect_strip(ch, gsn_forest_fighting);
         }
 
@@ -905,7 +905,7 @@ SKILL_RUNP( forest )
     mana = gsn_forest_fighting->getMana( );
 
     if (ch->mana < mana) {
-        ch->send_to("У тебя недостаточно энергии (mana).\n\r");
+        ch->pecho("У тебя недостаточно энергии (mana).");
         return;
     }
     
@@ -924,13 +924,13 @@ SKILL_RUNP( forest )
 
     if (attack) {
         af.modifier  = FOREST_ATTACK; 
-        act_p("Ты чувствуешь себя дик$gим|им|ой!", ch, 0, 0, TO_CHAR, POS_DEAD);
-        act("$c1 выглядит дик$gим|им|ой.", ch, 0, 0, TO_ROOM);
+        oldact_p("Ты чувствуешь себя дик$gим|им|ой!", ch, 0, 0, TO_CHAR, POS_DEAD);
+        oldact("$c1 выглядит дик$gим|им|ой.", ch, 0, 0, TO_ROOM);
     }
     else {
         af.modifier  = FOREST_DEFENCE;
-        act_p("Ты чувствуешь себя защищенн$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_DEAD);
-        act("$c1 выглядит защищенн$gым|ым|ой.", ch, 0, 0, TO_ROOM);
+        oldact_p("Ты чувствуешь себя защищенн$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_DEAD);
+        oldact("$c1 выглядит защищенн$gым|ым|ой.", ch, 0, 0, TO_ROOM);
     }
 
     affect_to_char(ch, &af);
@@ -971,41 +971,41 @@ SKILL_RUNP( butcher )
         one_argument(argument,arg);
         if ( arg[0]=='\0' )
         {
-                ch->send_to("Разделать что?\n\r");
+                ch->pecho("Разделать что?");
                 return;
         }
 
         if ( (obj = get_obj_here(ch,arg)) == 0 )
         {
-                ch->send_to("Ты не видишь этого здесь.\n\r");
+                ch->pecho("Ты не видишь этого здесь.");
                 return;
         }
 
         if ( obj->item_type != ITEM_CORPSE_PC && obj->item_type != ITEM_CORPSE_NPC )
         {
-                ch->send_to("Ты не сможешь разделать это на мясо.\n\r");
+                ch->pecho("Ты не сможешь разделать это на мясо.");
                 return;
         }
 
         if ( obj->carried_by != 0 )
         {
-                ch->send_to("Сперва положи это на землю.\n\r");
+                ch->pecho("Сперва положи это на землю.");
                 return;
         }
 
         if ( gsn_butcher->getEffective( ch ) < 1 )
         {
-                ch->send_to("Для этого у тебя недостаточно опыта!\n\r");
+                ch->pecho("Для этого у тебя недостаточно опыта!");
                 return;
         }
 
         if ( obj->value0() <= 0 )
         {
-                ch->send_to("Ты разве видишь мясо в этом трупе?!\n\r");
+                ch->pecho("Ты разве видишь мясо в этом трупе?!");
                 return;
         }
 
-        act_p("$c1 ковыряет кинжалом $o4, надеясь срезать немного мяса.",
+        oldact_p("$c1 ковыряет кинжалом $o4, надеясь срезать немного мяса.",
                 ch,obj,0,TO_ROOM,POS_RESTING);
 
         int numsteaks;
@@ -1025,7 +1025,7 @@ SKILL_RUNP( butcher )
                 sprintf(buf, "Ты срезаешь с $o2 %i кус%s мяса.",
                         numsteaks,
                         GET_COUNT(numsteaks,"ок","ка","ков"));
-                act(buf,ch,obj,0,TO_CHAR);
+                oldact(buf,ch,obj,0,TO_CHAR);
 
                 gsn_butcher->improve( ch, true );
 
@@ -1048,7 +1048,7 @@ SKILL_RUNP( butcher )
         }        
         else
         {
-                act("Неумеха! Ты испорти$gлo|л|лa столько мяса!",ch,0,0,TO_CHAR);
+                oldact("Неумеха! Ты испорти$gлo|л|лa столько мяса!",ch,0,0,TO_CHAR);
                 gsn_butcher->improve( ch, false );
         }
 }
@@ -1063,26 +1063,26 @@ SKILL_RUNP( tiger )
 
     if ((chance = gsn_tiger_power->getEffective( ch )) == 0)
     {
-        ch->send_to("Что?\n\r");
+        ch->pecho("Что?");
         return;
     }
-    act("$c1 призывает силу десяти тигров!",ch,0,0,TO_ROOM);
+    oldact("$c1 призывает силу десяти тигров!",ch,0,0,TO_ROOM);
 
     if (IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk) ||
     ch->isAffected(gsn_tiger_power) || ch->isAffected(gsn_frenzy))
     {
-        ch->send_to("Ты уже в состоянии боевой ярости!\n\r");
+        ch->pecho("Ты уже в состоянии боевой ярости!");
         return;
     }
 
     if (IS_AFFECTED(ch,AFF_CALM))
     {
-        ch->send_to("Ты слишком миролюбив{Sfа{Sx для этого.\n\r");
+        ch->pecho("Ты слишком миролюбив{Sfа{Sx для этого.");
         return;
     }
     if (!RoomUtils::isNature(ch->in_room))
   {
-    ch->send_to("Это умение сработает только на лоне природы.\n\r");
+    ch->pecho("Это умение сработает только на лоне природы.");
     return;
   }
 
@@ -1090,7 +1090,7 @@ SKILL_RUNP( tiger )
     
     if (ch->mana < mana)
     {
-        ch->send_to("У тебя не хватает энергии для этого.\n\r");
+        ch->pecho("У тебя не хватает энергии для этого.");
         return;
     }
 
@@ -1117,8 +1117,8 @@ SKILL_RUNP( tiger )
         ch->hit += slevel * 2;
         ch->hit = min(ch->hit,ch->max_hit);
 
-        ch->send_to("10 тигров приходят на твой призыв, когда ты зовешь их!\n\r");
-        act_p("10 тигров приходят на призыв $c2, и присоединяются к не$gму|му|й.",
+        ch->pecho("10 тигров приходят на твой призыв, когда ты зовешь их!");
+        oldact_p("10 тигров приходят на призыв $c2, и присоединяются к не$gму|му|й.",
                ch,0,0,TO_ROOM,POS_RESTING);
         gsn_tiger_power->improve( ch, true );
 
@@ -1146,7 +1146,7 @@ SKILL_RUNP( tiger )
         ch->setWaitViolence( 2 );
         ch->mana -= mana / 2;
 
-        ch->send_to("Тебе не удается войти в боевую ярость.\n\r");
+        ch->pecho("Тебе не удается войти в боевую ярость.");
         gsn_tiger_power->improve( ch, false );
     }
 }
@@ -1197,7 +1197,7 @@ SKILL_RUNP( ambush )
 
     if ( MOUNTED(ch) )
     {
-            ch->send_to("Ты не можешь быть в засаде верхом!\n\r");
+            ch->pecho("Ты не можешь быть в засаде верхом!");
             return;
     }
 
@@ -1205,7 +1205,7 @@ SKILL_RUNP( ambush )
 
     if ( ch->is_npc() || !gsn_ambush->usable( ch ) )
     {
-            ch->send_to("Ты не знаешь, как устроить засаду.\n\r");
+            ch->pecho("Ты не знаешь, как устроить засаду.");
             return;
     }
 
@@ -1213,7 +1213,7 @@ SKILL_RUNP( ambush )
     {
             if ( ch->ambushing[0] == '\0' )
             {
-                    ch->send_to("Засаду кому?\n\r");
+                    ch->pecho("Засаду кому?");
                     return;
             }
             else
@@ -1228,29 +1228,29 @@ SKILL_RUNP( ambush )
     {
             if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
             {
-                    ch->send_to("Сначала тебе стоит замаскироваться.\n\r");
+                    ch->pecho("Сначала тебе стоит замаскироваться.");
                     return;
             }
-            ch->send_to("Ты готовишься к засаде.\n\r");
+            ch->pecho("Ты готовишься к засаде.");
             ch->ambushing = str_dup(arg);
             return;
     }
 
     if ( victim == ch )
     {
-            ch->send_to("Засаду себе? Это еще как?!\n\r");
+            ch->pecho("Засаду себе? Это еще как?!");
             return;
     }
 
     if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
     {
-            ch->send_to("Сначала тебе стоит замаскироваться.\n\r");
+            ch->pecho("Сначала тебе стоит замаскироваться.");
             return;
     }   
 
     if ( victim->can_see(ch) )
     {
-            ch->send_to("Твоя жертва тебя видит.\n\r");
+            ch->pecho("Твоя жертва тебя видит.");
             return;
     }
 
@@ -1304,7 +1304,7 @@ BOOL_SKILL( ambush )::run( Character *ch )
                 && !is_safe_nomessage(ch,vch)
                 && is_name(ch->ambushing, vch->getNameP()))
         {
-            ch->println( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
+            ch->pecho( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
             run( ch, ch->ambushing );
             return true;
         }
@@ -1322,13 +1322,13 @@ SKILL_RUNP( camouflage )
 {
         if ( ch->is_npc() || !gsn_camouflage->usable( ch ) )
         {
-                ch->send_to("Ты не знаешь, как замаскировать себя.\n\r");
+                ch->pecho("Ты не знаешь, как замаскировать себя.");
                 return;
         }
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь замаскироваться, когда ты в седле.\n\r");
+                ch->pecho("Ты не можешь замаскироваться, когда ты в седле.");
                 return;
         }
 
@@ -1340,14 +1340,14 @@ SKILL_RUNP( camouflage )
 
         if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
         {
-                ch->send_to("Ты не можешь замаскироваться, когда светишься.\n\r");
+                ch->pecho("Ты не можешь замаскироваться, когда светишься.");
                 return;
         }
 
         if (!RoomUtils::isNature(ch->in_room))
         {
-                ch->send_to("Ты можешь замаскироваться только в дикой местности.\n\r");
-                act("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM);
+                ch->pecho("Ты можешь замаскироваться только в дикой местности.");
+                oldact("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM);
                 return;
         }
 
@@ -1369,12 +1369,12 @@ SKILL_RUNP( camouflage )
         if ( ch->is_npc()
                 || number_percent( ) < ( gsn_camouflage->getEffective( ch ) + skill_level_bonus(*gsn_camouflage, ch) ) * k / 100 )
         {
-                ch->println("Ты маскируешься на местности.");
+                ch->pecho("Ты маскируешься на местности.");
                 SET_BIT(ch->affected_by, AFF_CAMOUFLAGE);
                 gsn_camouflage->improve( ch, true );
         }
         else {
-                ch->println("Твоя попытка замаскироваться закончилась неудачей.");
+                ch->pecho("Твоя попытка замаскироваться закончилась неудачей.");
                 gsn_camouflage->improve( ch, false );
         }
 
@@ -1387,8 +1387,8 @@ VOID_SPELL(RangerStaff)::run(Character *ch, char *, int sn, int level)
     Object *staff;
 
     staff = create_object(get_obj_index(OBJ_VNUM_RANGER_STAFF), level);
-    ch->send_to("Ты создаешь посох рейнджера!\n\r");
-    act("$c1 создает посох рейнджера!", ch, 0, 0, TO_ROOM);
+    ch->pecho("Ты создаешь посох рейнджера!");
+    oldact("$c1 создает посох рейнджера!", ch, 0, 0, TO_ROOM);
 
     staff->timer = level;
     staff->level = ch->getModifyLevel();
@@ -1417,16 +1417,16 @@ void RangerStaff::fight( Character *ch )
     if (chance( 90 ))
         return;
 
-    act_p( "{BТвой посох рейнджера вспыхивает голубым светом!{x", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "{BПосох рейнджера $c2 вспыхивает голубым светом!{x", ch, 0, 0, TO_ROOM );
+    oldact_p("{BТвой посох рейнджера вспыхивает голубым светом!{x", ch, 0, 0, TO_CHAR, POS_DEAD );
+    oldact("{BПосох рейнджера $c2 вспыхивает голубым светом!{x", ch, 0, 0, TO_ROOM );
 
     spell( gsn_cure_critical, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
 }
 
 bool RangerStaff::death( Character *ch )
 {
-    act_p( "Твой посох рейнджера исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "Посох рейнджера $c2 исчезает.", ch, 0, 0, TO_ROOM );
+    oldact_p("Твой посох рейнджера исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
+    oldact("Посох рейнджера $c2 исчезает.", ch, 0, 0, TO_ROOM );
     extract_obj( obj );
     return false;
 }
@@ -1434,9 +1434,9 @@ bool RangerStaff::death( Character *ch )
 bool RangerStaff::canEquip( Character *ch )
 {
   if (ch->getProfession( ) != prof_ranger) {
-        ch->println("Ты не знаешь как использовать эту вещь.");
-        act( "Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
-        act( "Посох рейнджера выскальзывает из рук $c2.", ch, 0, 0, TO_ROOM );
+        ch->pecho("Ты не знаешь как использовать эту вещь.");
+        oldact("Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
+        oldact("Посох рейнджера выскальзывает из рук $c2.", ch, 0, 0, TO_ROOM );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         return false;

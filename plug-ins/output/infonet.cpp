@@ -61,7 +61,7 @@ void infonet( const char *string, Character *ch, int min_level )
           continue;
         
       if (( obj = get_pager( d->character ) ))
-           act_p( string, d->character, obj, ch, TO_CHAR, POS_DEAD);
+           oldact_p( string, d->character, obj, ch, TO_CHAR, POS_DEAD);
   }
 }
 

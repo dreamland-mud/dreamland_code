@@ -54,7 +54,7 @@ COMMAND(CEat, "eat")
 
     if (arg.empty( ))
     {
-            ch->send_to("Съесть что?\n\r");
+            ch->pecho("Съесть что?");
             return;
     }
     
@@ -67,7 +67,7 @@ COMMAND(CEat, "eat")
             return;
         }
         
-        ch->send_to("У тебя нет этого.\n\r");
+        ch->pecho("У тебя нет этого.");
         return;
     }
 
@@ -75,14 +75,14 @@ COMMAND(CEat, "eat")
     {
             if ( obj->item_type != ITEM_FOOD && obj->item_type != ITEM_PILL )
             {
-                    ch->send_to("Это несъедобно.\n\r");
+                    ch->pecho("Это несъедобно.");
                     return;
             }
 
             if ( ch->isAffected(gsn_manacles)
                     && obj->item_type == ITEM_PILL )
             {
-                    ch->send_to("Ты не можешь принимать снадобья в кандалах.\n\r");
+                    ch->pecho("Ты не можешь принимать снадобья в кандалах.");
                     return;
             }
 
@@ -91,7 +91,7 @@ COMMAND(CEat, "eat")
                 && !ch->is_immortal( )
                 && obj->item_type == ITEM_PILL)
             {
-                ch->send_to("Ты же BattleRager, а не презренный МАГ!\n\r");
+                ch->pecho("Ты же BattleRager, а не презренный МАГ!");
                 return;
             }
 
@@ -104,12 +104,12 @@ COMMAND(CEat, "eat")
 
     if (get_wear_level(ch, obj) > ch->getRealLevel() && !ch->is_immortal() )
     {
-            ch->send_to("Тебе надо подрасти, чтобы заглотить это.\n\r");
+            ch->pecho("Тебе надо подрасти, чтобы заглотить это.");
             return;
     }
 
-    act( "$c1 ест $o4.",  ch, obj, 0, TO_ROOM);
-    act( "Ты ешь $o4.", ch, obj, 0, TO_CHAR);
+    oldact("$c1 ест $o4.",  ch, obj, 0, TO_ROOM);
+    oldact("Ты ешь $o4.", ch, obj, 0, TO_CHAR);
     if ( ch->fighting != 0 )
              ch->setWaitViolence( 3 );
 
@@ -150,8 +150,8 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
             /* The food was poisoned! */
             Affect af;
 
-            act( "$c1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM);
-            ch->send_to("Ты хватаешься за горло и задыхаешься.\n\r");
+            oldact("$c1 хватается за горло и задыхается.", ch, 0, 0, TO_ROOM);
+            ch->pecho("Ты хватаешься за горло и задыхаешься.");
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -169,7 +169,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     int diff, dam, gain;
     
     if (ch->fighting) {
-        ch->send_to( "Сейчас ты сражаешься - тебе не до охоты!\r\n" );
+        ch->pecho("Сейчас ты сражаешься - тебе не до охоты!");
         return;
     }
     
@@ -179,38 +179,38 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     
     if (!isFelar) {
         if (!isMouse && !isFish) {
-            ch->println("Это животное не сделало тебе ничего плохого!");
+            ch->pecho("Это животное не сделало тебе ничего плохого!");
         }
         else {
-            act("Вообразив себя ко$gтом|том|шкой, $c1 пытается изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_ROOM);
-            act("На миг вообразив себя ко$gтом|том|шкой, ты пытаешься изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_CHAR);
+            oldact("Вообразив себя ко$gтом|том|шкой, $c1 пытается изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_ROOM);
+            oldact("На миг вообразив себя ко$gтом|том|шкой, ты пытаешься изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_CHAR);
         }
 
         return;
     }
     else {
         if (!isMouse && !isFish) {
-            act("$c1, похоже, приня$gло|л|ла $C4 за маааленькую мышку.", ch, 0, mob, TO_ROOM);
-            act("Это не мышка! Даже и не думай за $Y гоняться.", ch, 0, mob, TO_CHAR);
+            oldact("$c1, похоже, приня$gло|л|ла $C4 за маааленькую мышку.", ch, 0, mob, TO_ROOM);
+            oldact("Это не мышка! Даже и не думай за $Y гоняться.", ch, 0, mob, TO_CHAR);
             return;
         }
     }
     
 
     if (mob->master) {
-        act("$c1 с аппетитом клацает зубами при виде $C2.", ch, 0, mob, TO_ROOM);
-        act("Ты с аппетитом клацаешь зубами при виде $C2.", ch, 0, mob, TO_CHAR);
+        oldact("$c1 с аппетитом клацает зубами при виде $C2.", ch, 0, mob, TO_ROOM);
+        oldact("Ты с аппетитом клацаешь зубами при виде $C2.", ch, 0, mob, TO_CHAR);
         
         if (mob->master == ch) {
-            act("$C1 с ужасом смотрит на $c4.", ch, 0, mob, TO_ROOM);
-            act("$C1 с ужасом смотрит на тебя.", ch, 0, mob, TO_CHAR);
+            oldact("$C1 с ужасом смотрит на $c4.", ch, 0, mob, TO_ROOM);
+            oldact("$C1 с ужасом смотрит на тебя.", ch, 0, mob, TO_CHAR);
         }
         else if (mob->master->in_room == mob->in_room) {
-            act("$C1 шустро прячется за спину хозя$gина|ина|йки!", mob->master, 0, mob, TO_ROOM);
-            act("$C1 шустро прячется за твою спину!", mob->master, 0, mob, TO_CHAR);  
+            oldact("$C1 шустро прячется за спину хозя$gина|ина|йки!", mob->master, 0, mob, TO_ROOM);
+            oldact("$C1 шустро прячется за твою спину!", mob->master, 0, mob, TO_CHAR);  
         }
         else
-            act("$C1 вжимается в пол, закрыв глаза лапами.", ch, 0, mob, TO_ALL);
+            oldact("$C1 вжимается в пол, закрыв глаза лапами.", ch, 0, mob, TO_ALL);
         
         return;
     }
@@ -220,8 +220,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
             if (!desireManager->find( i )->canEat( ch->getPC( ) ))
                  return;
    
-    act("$c1 с громким мяуканьем вцепляется зубами и когтями в $C4!", ch, 0, mob, TO_ROOM);
-    act("Ты с громким мяуканьем вцепляешься зубами и когтями в $C4!", ch, 0, mob, TO_CHAR);
+    oldact("$c1 с громким мяуканьем вцепляется зубами и когтями в $C4!", ch, 0, mob, TO_ROOM);
+    oldact("Ты с громким мяуканьем вцепляешься зубами и когтями в $C4!", ch, 0, mob, TO_CHAR);
 
     diff = max( 1, ch->getRealLevel( ) - mob->getRealLevel( ) );
     dam = diff * 10;
@@ -232,8 +232,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         Object *obj, *obj_next;
         
         death_cry( mob, 99 );
-        act("Ты ешь $C4.", ch, 0, mob, TO_CHAR);
-        act("$c1 ест $C4.", ch, 0, mob, TO_ROOM);
+        oldact("Ты ешь $C4.", ch, 0, mob, TO_CHAR);
+        oldact("$c1 ест $C4.", ch, 0, mob, TO_ROOM);
 
         for (obj = mob->carrying; obj; obj = obj_next) {
             obj_next = obj->next_content;

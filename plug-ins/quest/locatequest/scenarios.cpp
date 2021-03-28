@@ -38,23 +38,23 @@ int LocateScenario::getCount( PCharacter *pch ) const
 
 void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest, Object *obj ) const
 {
-    act( "$c1 произносит '{gСпасибо, конечно, но я не об этом проси$gло|л|ла тебя.'{x'", ch, 0, 0, TO_ROOM );
-    act( "$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT );
-    act( "$c1 возвращает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
+    oldact("$c1 произносит '{gСпасибо, конечно, но я не об этом проси$gло|л|ла тебя.'{x'", ch, 0, 0, TO_ROOM );
+    oldact("$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT );
+    oldact("$c1 возвращает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 
 void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
-    act( "$c1 произносит '{gВот спасибо, $C1. Теперь все найдено и я могу спать спокойно.{x'", 
+    oldact("$c1 произносит '{gВот спасибо, $C1. Теперь все найдено и я могу спать спокойно.{x'", 
         ch, 0, hero, TO_ROOM );
-    act( "$c1 произносит '{gА вознаграждение я уже переда$gло|л|ла твоему квестору. Сходи и забери его.{x'",
+    oldact("$c1 произносит '{gА вознаграждение я уже переда$gло|л|ла твоему квестору. Сходи и забери его.{x'",
         ch, 0, hero, TO_ROOM );
 }
 
 void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     if (chance(1) && quest->delivered == 1) {
-        act( "$c1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );
+        oldact("$c1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );
         interpret_raw( ch, "grin" );
         return;
     } 
@@ -62,13 +62,13 @@ void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQu
     switch (number_range( 1, 3 )) {
     case 1:
         if (quest->delivered > 1) {
-            act( "$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'", 
+            oldact("$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'", 
                     ch, russian_case( quest->itemName.getValue( ), '4' ).c_str( ), hero, TO_ROOM );
             break;
         }
         /* FALLTHROUGH */
     case 2:
-        act( "$c1 произносит '{gТеперь их уже $t, осталось совсем немного.{x'", 
+        oldact("$c1 произносит '{gТеперь их уже $t, осталось совсем немного.{x'", 
                 ch, DLString(quest->delivered).c_str( ), 0, TO_ROOM );
         break;
     case 3:

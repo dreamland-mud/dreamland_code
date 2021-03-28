@@ -54,8 +54,8 @@ void ClanGuardInvader::actGreet(PCharacter *wch)
 }
 void ClanGuardInvader::actPush(PCharacter *wch)
 {
-    act("$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR);
-    act("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM);
+    oldact("$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR);
+    oldact("$C1 сверлит глазами $c4, и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM);
 }
 int ClanGuardInvader::getCast(Character *victim)
 {
@@ -115,13 +115,13 @@ SKILL_RUNP(fade)
 {
     if (!gsn_fade->available(ch))
     {
-        ch->send_to("Ась?\n\r");
+        ch->pecho("Ась?");
         return;
     }
 
     if (MOUNTED(ch))
     {
-        ch->send_to("Ты не можешь спрятаться в тенях, когда в седле.\n\r");
+        ch->pecho("Ты не можешь спрятаться в тенях, когда в седле.");
         return;
     }
 
@@ -133,7 +133,7 @@ SKILL_RUNP(fade)
 
     if (IS_AFFECTED(ch, AFF_FAERIE_FIRE))
     {
-        ch->send_to("Ты не можешь спрятаться в тенях, когда светишься.\n\r");
+        ch->pecho("Ты не можешь спрятаться в тенях, когда светишься.");
         return;
     }
 
@@ -151,11 +151,11 @@ SKILL_RUNP(fade)
     if (number_percent() < gsn_fade->getEffective(ch) * k / 100)
     {
         SET_BIT(ch->affected_by, AFF_FADE);
-        ch->send_to("Ты прячешься в тенях.\n\r");        
+        ch->pecho("Ты прячешься в тенях.");        
         gsn_fade->improve(ch, true);
     }
     else {        
-        ch->send_to("Ты пытаешься спрятаться в тенях, но безуспешно.\n\r");        
+        ch->pecho("Ты пытаешься спрятаться в тенях, но безуспешно.");        
         gsn_fade->improve(ch, false);
     }
     return;
@@ -169,19 +169,19 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
 
     if (IS_ROOM_AFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
     {
-        ch->send_to("Эта зона полностью под контролем злых духов.\n\r");
+        ch->pecho("Эта зона полностью под контролем злых духов.");
         return;
     }
 
     if (ch->isAffected(sn))
     {
-        ch->send_to("У тебя недостаточно энергии.\n\r");
+        ch->pecho("У тебя недостаточно энергии.");
         return;
     }
 
     if (IS_SET(room->room_flags, ROOM_LAW) || IS_SET(room->area->area_flag, AREA_HOMETOWN))
     {
-        ch->send_to("Аура Закона в этой комнате не дает творить зло.\n\r");
+        ch->pecho("Аура Закона в этой комнате не дает творить зло.");
         return;
     }
 
@@ -197,7 +197,7 @@ VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
     {
         Room *room = r.second;
         room->affectTo(&af);
-        act("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
+        oldact("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
     }
 }
 
@@ -208,19 +208,19 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int le
 
     if ((victim = get_char_world(ch, target_name, FFIND_DOPPEL)) == 0 || DIGGED(victim))
     {
-        ch->send_to("Тьма не может обнаружить это существо.\n\r");
+        ch->pecho("Тьма не может обнаружить это существо.");
         return;
     }
 
     if (is_safe_nomessage(ch, victim))
     {
-        ch->send_to("Тьма не может проникнуть туда, где скрывается это существо.\n\r");
+        ch->pecho("Тьма не может проникнуть туда, где скрывается это существо.");
         return;
     }
 
     if ( (victim->is_npc()) && (IS_SET(victim->act, ACT_NOEYE)) )
     {
-        ch->send_to("Это существо защищено от твоего взора.\n\r");
+        ch->pecho("Это существо защищено от твоего взора.");
         return;
     }
    
@@ -228,7 +228,7 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int le
     {
         if (saves_spell(level, victim, DAM_OTHER, ch, DAMF_MAGIC))
         {
-            ch->send_to("У тебя не хватает силы приказать темноте.\n\r");
+            ch->pecho("У тебя не хватает силы приказать темноте.");
             return;
         }
 
@@ -248,13 +248,13 @@ VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
 
     if (ch->isAffected(sn))
     {
-        ch->send_to("У тебя недостаточно энергии для контроля над светом.\n\r");
+        ch->pecho("У тебя недостаточно энергии для контроля над светом.");
         return;
     }
 
     if (IS_SET(room->room_flags, ROOM_SAFE))
     {
-        ch->send_to("В безопасных комнатах это запрещено.\n\r");
+        ch->pecho("В безопасных комнатах это запрещено.");
         return;
     }
 
@@ -293,7 +293,7 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
 
     if (ch->is_npc() || victim->is_npc() || ch->getClan() != victim->getClan())
     {
-        ch->println("Это заклинание ты можешь произнести только на члена твоего клана.");
+        ch->pecho("Это заклинание ты можешь произнести только на члена твоего клана.");
         return;
     }
 
@@ -302,7 +302,7 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
 
     if (orgCh != orgVict)
     {
-        ch->println("Это заклинание ты можешь произнести только на члена твоей организации.");
+        ch->pecho("Это заклинание ты можешь произнести только на члена твоей организации.");
         return;
     }
 
@@ -364,26 +364,26 @@ VOID_SPELL(Shadowlife)::run(Character *ch, Character *victim, int sn, int level)
 
     if (victim->is_npc())
     {
-        ch->send_to("Бесполезная трата сил и энергии...\n\r");
+        ch->pecho("Бесполезная трата сил и энергии...");
         return;
     }
 
     if (ch->isAffected(sn))
     {
-        ch->send_to("У тебя недостаточно энергии, чтобы создать тень.\n\r");
+        ch->pecho("У тебя недостаточно энергии, чтобы создать тень.");
         return;
     }
 
     if (victim->isAffected(gsn_golden_aura) && saves_spell(level, victim, DAM_OTHER, ch, DAMF_MAGIC))
     {
-        ch->send_to("Твое заклинание не может пробиться через защиту от заклинаний противника.\n\r");
-        victim->send_to("Твоя золотая аура препятствует подлой попытке оживить твою тень!\n\r");
+        ch->pecho("Твое заклинание не может пробиться через защиту от заклинаний противника.");
+        victim->pecho("Твоя золотая аура препятствует подлой попытке оживить твою тень!");
         return;
     }
 
-    act("Ты даешь жизнь тени $C2!", ch, 0, victim, TO_CHAR);
-    act("$c1 дает жизнь тени $C2!", ch, 0, victim, TO_NOTVICT);
-    act_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_DEAD);
+    oldact("Ты даешь жизнь тени $C2!", ch, 0, victim, TO_CHAR);
+    oldact("$c1 дает жизнь тени $C2!", ch, 0, victim, TO_NOTVICT);
+    oldact_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT, POS_DEAD);
 
     victim->getPC()->shadow = 4 * ch->getModifyLevel() / 10;
 
@@ -417,8 +417,8 @@ VOID_AFFECT(EvilSpirit)::update(Room *room, Affect *paf)
     {
         if (!saves_spell(vch->getModifyLevel() + 2, vch, DAM_MENTAL, 0, DAMF_MAGIC) && !vch->is_immortal() && !is_safe_rspell(vch->getModifyLevel() + 2, vch) && !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0)
         {
-            vch->send_to("Злые духи овладевают тобой.\n\r");
-            act("Злые духи овладевают $c1.", vch, 0, 0, TO_ROOM);
+            vch->pecho("Злые духи овладевают тобой.");
+            oldact("Злые духи овладевают $c1.", vch, 0, 0, TO_ROOM);
             affect_join(vch, &af);
         }
     }
@@ -446,13 +446,13 @@ COMMAND(CDarkLeague, "darkleague")
 
     if (pch->getClan() != clan_invader)
     {
-        pch->println("Ты не принадлежишь к Кабалу Захватчиков.");
+        pch->pecho("Ты не принадлежишь к Кабалу Захватчиков.");
         return;
     }
 
     if (!(orgs = clan_invader->getOrgs()))
     {
-        pch->println("Попробуй позже.");
+        pch->pecho("Попробуй позже.");
         return;
     }
 
@@ -474,7 +474,7 @@ COMMAND(CDarkLeague, "darkleague")
 
     if (!pch->getClan()->isRecruiter(pch))
     {
-        pch->println("Твоих полномочий хватает только посмотреть список организаций.");
+        pch->pecho("Твоих полномочий хватает только посмотреть список организаций.");
         return;
     }
 

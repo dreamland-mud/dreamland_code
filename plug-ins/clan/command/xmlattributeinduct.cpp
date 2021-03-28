@@ -18,7 +18,7 @@ const DLString XMLAttributeInduct::TYPE = "XMLAttributeInduct";
 void XMLAttributeInduct::run( PCharacter *ch )
 {   
     for (iterator entry = begin( ); entry != end( ); entry++) {
-        act_p( entry->message.getValue( ).c_str( ), ch, 0, 0, TO_CHAR, POS_DEAD );
+        oldact_p( entry->message.getValue( ).c_str( ), ch, 0, 0, TO_CHAR, POS_DEAD );
     }
     
     ch->getAttributes( ).eraseAttribute( "induct" );

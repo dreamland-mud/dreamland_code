@@ -68,8 +68,8 @@ bool OfcolMarshal::specFight( )
         {
             int i;
 
-            act_p("$c1 призывает Богов на помощь.", ch,0,0,TO_ROOM,POS_SLEEPING);
-            act_p("Боги призывают $c4 на помощь Диане.", mob,0,0,TO_ROOM,POS_SLEEPING);
+            oldact_p("$c1 призывает Богов на помощь.", ch,0,0,TO_ROOM,POS_SLEEPING);
+            oldact_p("Боги призывают $c4 на помощь Диане.", mob,0,0,TO_ROOM,POS_SLEEPING);
 
             mob->max_hit = 6000;
             mob->hit = 6000;

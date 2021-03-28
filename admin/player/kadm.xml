@@ -35,11 +35,9 @@
     </node>
   </attributes>
   <batle_prompt>&lt;%n: %h/%Hhp %m/%Mm %v/%Vmv Opp:&lt;%o&gt;&gt; </batle_prompt>
-  <bless>0</bless>
   <clanLevel>0</clanLevel>
   <comm>prompt combine</comm>
   <config>fightspam skillspam runames objname_hint newdamage ruskills rucommands ruexits</config>
-  <curse>100</curse>
   <description>Темноволосый смуглый человек с немного усталым выражением лица.
 Он одет в пыльную робу, в мозолистых руках крепко зажата лопата.
 В глазах видна бесконечность.
@@ -67,7 +65,6 @@
   <max_hit>1398</max_hit>
   <max_mana>1985</max_mana>
   <max_move>736</max_move>
-  <max_skill_points>23260</max_skill_points>
   <move>736</move>
   <name>Kadm</name>
   <password>AC11D7FD549A4210979B52671ECE53FA8CBFFF319E20507431CCFD60FBF93DE5F80697FD54FCCE4D699F121C698CDCCBFBA414E7DD0719A0CB775E932362E499$EDF4D69A773205FC0D7D2285E4C854ACC2E44C13D77BA2487CE9F8AB42B235DBD50F8CDE96BF7BC7A34558C1F6383B964B5BFF7F78AC45F5016F35F0D45A3B4C</password>

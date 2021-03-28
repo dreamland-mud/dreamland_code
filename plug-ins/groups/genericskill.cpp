@@ -171,7 +171,7 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
         return true;
 
     if (message)
-        ch->send_to("Для этого необходимо превратиться в вампира!\n\r");
+        ch->pecho("Для этого необходимо превратиться в вампира!");
 
     return false;
 }
@@ -311,7 +311,7 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
         if (verbose)
-            ch->println( "Тебе не с кем практиковаться здесь." );
+            ch->pecho( "Тебе не с кем практиковаться здесь." );
         return false;
     }
     

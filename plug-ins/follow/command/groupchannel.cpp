@@ -84,7 +84,7 @@ bool GroupChannel::canTalkGlobally( Character *ch ) const
         return false;
 
     if (IS_SET( ch->comm, COMM_NOTELL )) {
-        ch->println( "Твое сообщение не получено!" );
+        ch->pecho( "Твое сообщение не получено!" );
         return false;
     }
 

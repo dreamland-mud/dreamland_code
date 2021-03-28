@@ -49,8 +49,8 @@
  */
 void Excalibur::wear( Character *ch )
 {
-  act("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR);
-  act("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM);
+  oldact("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR);
+  oldact("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM);
   
 }
 
@@ -69,8 +69,8 @@ void Excalibur::equip( Character *ch )
 
 void Excalibur::remove( Character *ch )
 {
-  act("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_CHAR);
-  act("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_ROOM);
+  oldact("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_CHAR);
+  oldact("Пылающая аура вокруг $o2 исчезает.",ch,obj,0,TO_ROOM);
 }
 
 bool Excalibur::death( Character *ch )
@@ -78,11 +78,11 @@ bool Excalibur::death( Character *ch )
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
         return false;
 
-    act_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_CHAR,POS_DEAD);
-    act("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
+    oldact_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_CHAR,POS_DEAD);
+    oldact("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM);
     ch->hit = ch->max_hit;
-    ch->send_to("Ты чувствуешь себя намного лучше.");
-    act("$c1 выглядит намного лучше.",ch,0,0,TO_ROOM);
+    ch->pecho("Ты чувствуешь себя намного лучше.");
+    oldact("$c1 выглядит намного лучше.",ch,0,0,TO_ROOM);
     return true;
 }
 
@@ -95,8 +95,8 @@ void Excalibur::speech( Character *ch, const char *speech )
       && (ch->fighting) && ((get_eq_char(ch,wear_wield) == obj) ||
                         (get_eq_char(ch,wear_second_wield) == obj)  ) )
     {
-      ch->send_to("Лезвие Экскалибра брызжет кислотой.\n\r");
-      act_p("Кислота брызжет с лезвия Экскалибра.",
+      ch->pecho("Лезвие Экскалибра брызжет кислотой.");
+      oldact_p("Кислота брызжет с лезвия Экскалибра.",
              ch,0,0,TO_ROOM,POS_RESTING);
       spell(gsn_acid_blast, ch->getModifyLevel(),ch,ch->fighting, FSPELL_BANE );
       ch->setWaitViolence( 2 );
@@ -105,7 +105,7 @@ void Excalibur::speech( Character *ch, const char *speech )
 
 bool Excalibur::sac( Character *ch )
 {
-  act("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
+  oldact("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
   rawdamage( ch, ch, DAM_HOLY, (ch->hit - 1) > 1000 ? 1000 : (ch->hit - 1), true );
   ch->gold = 0;
   return true;
@@ -117,8 +117,8 @@ bool Excalibur::sac( Character *ch )
 void HasteBracers::wear( Character *ch ) 
 {
   if( !( ch->isAffected(gsn_haste ) ) ) {
-//      ch->send_to("Предмет принимает форму твоих рук, плотно прилегая к коже.\n\r");
-      ch->send_to("Твое тело наполняется удивительной легкостью.\n\r");
+//      ch->pecho("Предмет принимает форму твоих рук, плотно прилегая к коже.");
+      ch->pecho("Твое тело наполняется удивительной легкостью.");
     }
 }
 void HasteBracers::equip( Character *ch ) 
@@ -143,7 +143,7 @@ void HasteBracers::remove( Character *ch )
   if (ch->isAffected(gsn_haste))
     {
       affect_strip(ch, gsn_haste);
-      ch->send_to("Твое тело теряет легкость, и твои движения замедляются.\n\r");
+      ch->pecho("Твое тело теряет легкость, и твои движения замедляются.");
     }
 }
 
@@ -158,7 +158,7 @@ void SubissueWeapon::fight( Character *ch )
         return;
 
     if (hp <= 40 && chance(50)) {
-        ch->println("Твое оружие свистит, {Y'Тебе лучше {y{hcубежать{hx {Yпрочь, подальше отсюда!'{x");
+        ch->pecho("Твое оружие свистит, {Y'Тебе лучше {y{hcубежать{hx {Yпрочь, подальше отсюда!'{x");
         return;
     }
 }
@@ -168,9 +168,9 @@ void SubissueWeapon::fight( Character *ch )
  */
 void TwoSnakeWhip::wear( Character *ch )
 {
-  act_p("{GЗмеи на хлысте выдыхают пары яда.{x",
+  oldact_p("{GЗмеи на хлысте выдыхают пары яда.{x",
                 ch,obj,0,TO_CHAR,POS_DEAD);
-  act_p("{GЗмеи на хлысте выдыхают пары яда.{x",
+  oldact_p("{GЗмеи на хлысте выдыхают пары яда.{x",
                 ch,obj,0,TO_ROOM,POS_DEAD);
 }
 
@@ -192,15 +192,15 @@ void TwoSnakeWhip::equip( Character *ch )
 
 void TwoSnakeWhip::remove( Character *ch )
 {
-  act_p("{rЗмеи на хлысте безжизненно обвисают.{x",
+  oldact_p("{rЗмеи на хлысте безжизненно обвисают.{x",
                 ch,obj,0,TO_CHAR,POS_DEAD);
-  act_p("{rЗмеи на хлысте безжизненно обвисают.{x",
+  oldact_p("{rЗмеи на хлысте безжизненно обвисают.{x",
                 ch,obj,0,TO_ROOM,POS_DEAD);
 }
 
 void TwoSnakeWhip::get( Character *ch )
 {
-  act("Тебе кажется, будто змеи на хлысте пошевелились.",ch,obj,0,TO_CHAR);
+  oldact("Тебе кажется, будто змеи на хлысте пошевелились.",ch,obj,0,TO_CHAR);
 }
 
 void TwoSnakeWhip::fight( Character *ch )
@@ -210,20 +210,20 @@ void TwoSnakeWhip::fight( Character *ch )
     {
       switch(number_bits(7)) {
       case 0:
-          act_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
+          oldact_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
                 ch->fighting, TO_CHAR,POS_RESTING);
-        act_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
+        oldact_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
                 ch->fighting, TO_VICT,POS_RESTING);
-        act_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
+        oldact_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
                 ch->fighting, TO_NOTVICT,POS_RESTING);
         spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
         break;
       case 1:
-          act_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
+          oldact_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
                 ch->fighting, TO_CHAR,POS_RESTING);
-        act_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
+        oldact_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
                 ch->fighting, TO_VICT,POS_RESTING);
-        act_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
+        oldact_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
                 ch->fighting, TO_NOTVICT,POS_RESTING);
         spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
         break;
@@ -245,9 +245,9 @@ void Thunderbolt::fight( Character *ch )
 
         switch(number_bits(6)) {
         case 0:
-            act("Разряд молнии выстреливает из твоего оружия и поражает $C4!", ch, 0, victim, TO_CHAR);
-            act("Разряд молнии конденсируется на оружии $c2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
-            act("Разряд молнии конденсируется на оружии $c2, и выстреливает в сторону $C2!", ch, 0, victim, TO_NOTVICT);
+            oldact("Разряд молнии выстреливает из твоего оружия и поражает $C4!", ch, 0, victim, TO_CHAR);
+            oldact("Разряд молнии конденсируется на оружии $c2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
+            oldact("Разряд молнии конденсируется на оружии $c2, и выстреливает в сторону $C2!", ch, 0, victim, TO_NOTVICT);
 
             dam = dice(level,4) + 12;
             if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_PRAYER) )
@@ -277,11 +277,11 @@ int dam;
 
     if ( number_percent() < 50 )  {
         dam = number_percent()/2 + 30 + 2 * ch->getModifyLevel();
-        act_p( "Твои перчатки обжигают лицо $C3!",
+        oldact_p("Твои перчатки обжигают лицо $C3!",
                 ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-        act_p( "Перчатки $c2 обжигают лицо $C3!",
+        oldact_p("Перчатки $c2 обжигают лицо $C3!",
                 ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-        act_p( "Перчатки $C2 обжигают твое лицо!",
+        oldact_p("Перчатки $C2 обжигают твое лицо!",
                 ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
         damage_nocatch( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam/2, TARGET_CHAR );
@@ -290,12 +290,12 @@ int dam;
 
 void FireGauntlets::wear( Character *ch )
 {
-    ch->send_to("Твои руки нагреваются от перчаток.\n\r");
+    ch->pecho("Твои руки нагреваются от перчаток.");
 }
 
 void FireGauntlets::remove( Character *ch )
 {
-    ch->send_to("Твои руки почувствовали прохладу.\n\r");
+    ch->pecho("Твои руки почувствовали прохладу.");
 }
 
 /*
@@ -312,11 +312,11 @@ int dam;
 
   if ( number_percent() < 20 )  {
         dam = number_percent()/2 + 30 + 5 * ch->getModifyLevel();
-        act_p( "Твои нарукавники обжигают $C4!",
+        oldact_p("Твои нарукавники обжигают $C4!",
                 ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-        act_p( "Нарукавники $c2 обжигают $C4!",
+        oldact_p("Нарукавники $c2 обжигают $C4!",
                 ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-        act_p( "Нарукавники $C2 обжигают тебя!",
+        oldact_p("Нарукавники $C2 обжигают тебя!",
                 ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
         damage_nocatch( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level/2, dam, TARGET_CHAR );
@@ -326,12 +326,12 @@ int dam;
 
 void VolcanoeArmbands::wear( Character *ch )
 {
-    ch->send_to("Твои руки чувствуют тепло.\n\r");
+    ch->pecho("Твои руки чувствуют тепло.");
 }
 
 void VolcanoeArmbands::remove( Character *ch )
 {
-    ch->send_to("Твои руки вновь почувствовали прохладу.\n\r");
+    ch->pecho("Твои руки вновь почувствовали прохладу.");
 }
 
 
@@ -350,9 +350,9 @@ int dam;
   if ( number_percent() < 15 )  {
         dam = number_percent()/2 + 5 * ch->getModifyLevel();
 
-        act( "Твой щит обжигает лицо $C3!", ch, 0, ch->fighting, TO_CHAR);
-        act( "Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
-        act( "Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
+        oldact("Твой щит обжигает лицо $C3!", ch, 0, ch->fighting, TO_CHAR);
+        oldact("Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
+        oldact("Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
 
         damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
         fire_effect( ch->fighting, obj->level,dam, TARGET_CHAR );
@@ -362,12 +362,12 @@ int dam;
 
 void DemonfireShield::wear( Character *ch )
 {
-    ch->send_to("Твои руки чувствуют жар {RОгня Демонов{x.\n\r");
+    ch->pecho("Твои руки чувствуют жар {RОгня Демонов{x.");
 }
 
 void DemonfireShield::remove( Character *ch )
 {
-    ch->send_to("Твои руки вновь почувствовали прохладу.\n\r");
+    ch->pecho("Твои руки вновь почувствовали прохладу.");
 }
 
 
@@ -378,9 +378,9 @@ void DemonfireShield::remove( Character *ch )
 void FlyingBoots::wear( Character *ch )
 {
     if (!ch->isAffected(gsn_fly)) {
-        act( "Ты обуваешь $o4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
-        act( "Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
-        act( "$c1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
+        oldact("Ты обуваешь $o4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
+        oldact("Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
+        oldact("$c1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
     }
 }
 void FlyingBoots::equip( Character *ch )
@@ -406,8 +406,8 @@ void FlyingBoots::remove( Character *ch )
         return;
     
     affect_strip(ch, gsn_fly);
-    act( "Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0, TO_CHAR );
-    act( "$c1 падает на землю.", ch, 0, 0, TO_ROOM );
+    oldact("Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0, TO_CHAR );
+    oldact("$c1 падает на землю.", ch, 0, 0, TO_ROOM );
 }
 
 
@@ -418,9 +418,9 @@ void FlyingBoots::remove( Character *ch )
  */
 void GiantStrengthArmor::wear( Character *ch )
 {
-    act( "Ты чувствуешь, как становишься гораздо сильнее!\r\n"
+    oldact("Ты чувствуешь, как становишься гораздо сильнее!\r\n"
          "Твои мышцы разбухают до внушительных размеров.", ch, obj, 0, TO_CHAR );
-    act( "Мышцы $c2 дрожат от избытка силы!", ch, 0, 0, TO_ROOM );
+    oldact("Мышцы $c2 дрожат от избытка силы!", ch, 0, 0, TO_ROOM );
 }
 void GiantStrengthArmor::equip( Character *ch )
 {
@@ -441,8 +441,8 @@ void GiantStrengthArmor::remove( Character *ch )
     if (ch->isAffected(gsn_giant_strength))
     {
         affect_strip(ch, gsn_giant_strength);
-        act( "Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
-        act( "Мышцы $c2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
+        oldact("Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
+        oldact("Мышцы $c2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
     }
 }
 
@@ -460,9 +460,9 @@ void RoseShield::fight( Character *ch )
 
   if ( number_percent() < 90 )  return;
 
-  ch->send_to("Листья на твоем щите внезапно распускаются.\n\r");
-  ch->fighting->send_to("Листья на щите окружают тебя!\n\r");
-  act("Щит Розы $c2 внезапно распускается.",ch,0,0,TO_ROOM);
+  ch->pecho("Листья на твоем щите внезапно распускаются.");
+  ch->fighting->pecho("Листья на щите окружают тебя!");
+  oldact("Щит Розы $c2 внезапно распускается.",ch,0,0,TO_ROOM);
   spell(gsn_slow, ch->getModifyLevel(),ch,ch->fighting);
   return;
 }
@@ -479,8 +479,8 @@ void LionClaw::fight( Character *ch )
   if ( ( obj == get_eq_char(ch,wear_wield)) ||
         (secondary = (obj == get_eq_char(ch,wear_second_wield))) )
    {
-     ch->send_to("{WКогти на мгновение показались из Львиной Лапы.{x\n\r");
-     act_p("{WКогти на мгновение показались из Львиной Лапы $c2.{x",
+     ch->pecho("{WКогти на мгновение показались из Львиной Лапы.{x");
+     oldact_p("{WКогти на мгновение показались из Львиной Лапы $c2.{x",
                 ch,0,0,TO_ROOM,POS_DEAD);
      
      one_hit_nocatch(ch, ch->fighting, secondary);
@@ -505,8 +505,8 @@ void RingOfRa::speech( Character *ch, const char *speech )
       && (ch->fighting) &&
 ((get_eq_char(ch,wear_finger_l) == obj) || (get_eq_char(ch,wear_finger_r))) )
     {
-      ch->send_to("Электрический разряд выстреливает из кольца.\n\r");
-      act_p("Электрический разряд выстреливает из кольца.",
+      ch->pecho("Электрический разряд выстреливает из кольца.");
+      oldact_p("Электрический разряд выстреливает из кольца.",
              ch,0,0,TO_ROOM,POS_RESTING);
       spell(gsn_lightning_breath, ch->getModifyLevel(),ch,ch->fighting, FSPELL_BANE );
       ch->setWaitViolence( 2 );

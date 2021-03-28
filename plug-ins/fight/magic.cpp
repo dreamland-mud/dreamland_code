@@ -163,7 +163,7 @@ void area_message( Character *ch, const DLString &msg, bool everywhere )
         if (!everywhere && !RoomUtils::isOutside(wch))
             continue;
         
-        wch->println( msg );
+        wch->pecho( msg );
     }
 }
 
@@ -233,9 +233,9 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_CAST)) {
         if (RoomUtils::isOutside(ch))
-            ch->println("Местность вокруг тебя блокирует все заклинания.");
+            ch->pecho("Местность вокруг тебя блокирует все заклинания.");
         else
-            ch->println("Стены этой комнаты поглощают заклинание.");
+            ch->pecho("Стены этой комнаты поглощают заклинание.");
         return false;
     }
 
@@ -468,7 +468,7 @@ bool overcharmed( Character *ch )
     max_charm -= 28 - min( 28, ch->getCurrStat( STAT_CHA ) );
 
     if (max_charm <= 0) {
-        ch->println("Твоего обаяния, интеллекта и опыта недостаточно, чтобы контролировать кого-либо.");
+        ch->pecho("Твоего обаяния, интеллекта и опыта недостаточно, чтобы контролировать кого-либо.");
         return true;
     }
 

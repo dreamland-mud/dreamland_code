@@ -47,17 +47,17 @@ CMDRUN( run )
     walk.stripWhiteSpace( );
 
     if (pch->fighting) {
-        pch->println("Но ты же сражаешься! Используй команду {y{lRсбежать{lEflee{x для побега из боя.");
+        pch->pecho("Но ты же сражаешься! Используй команду {y{lRсбежать{lEflee{x для побега из боя.");
         return;
     }
 
     if (!pch || walk.empty( )) {
-        ch->send_to( "По какому маршруту ты хочешь бежать?\r\n" );
+        ch->pecho("По какому маршруту ты хочешь бежать?");
         return;
     }
 
     if (pch->position < POS_STANDING) {
-        pch->send_to("Исходное положение для бега - стоя!\n\r");
+        pch->pecho("Исходное положение для бега - стоя!");
         return;
     }
     
@@ -68,14 +68,14 @@ CMDRUN( run )
             cnt = cnt * 10 + walk[i++] - '0';
 
             if (i >= walk.length( )) {
-                pch->send_to( "Маршрут не может оканчиваться на цифру.\r\n" );
+                pch->pecho("Маршрут не может оканчиваться на цифру.");
                 return;
             }
         }
         
         if (isBigLetter( walk[i] )) {
             if (cnt > 0) {
-                pch->send_to( "Нельзя побежать 'несколько раз до упора'.\r\n" );
+                pch->pecho("Нельзя побежать 'несколько раз до упора'.");
                 return;
             }
         }
@@ -91,7 +91,7 @@ CMDRUN( run )
     }
     
     if (buf.str( ).length( ) > 100) {
-        pch->send_to( "Слишком далеко бежать.\r\n" );
+        pch->pecho("Слишком далеко бежать.");
         return;
     }
     

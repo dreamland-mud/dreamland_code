@@ -155,7 +155,7 @@ void DefaultDesire::update( PCharacter *ch )
 static void ptc( PCharacter *ch, const DLString &msg )
 {
     if (!msg.empty( ))
-        ch->println( msg );
+        ch->pecho( msg );
 }
 
 void DefaultDesire::gain( PCharacter *ch, int value )

@@ -559,6 +559,18 @@ NMI_GET( CharacterWrapper, boat, "объект лодки" )
     return wrap( boat_object_find( target ) );
 }
 
+NMI_GET( CharacterWrapper, slow, "true если есть бит slow, нету хасты и (в случае мобов) бита fast")
+{
+    checkTarget();
+    return IS_SLOW(target);
+}
+
+NMI_GET( CharacterWrapper, quick, "true если есть бит haste/fast и нету slow")
+{
+    checkTarget();
+    return IS_QUICK(target);
+}
+
 NMI_GET( CharacterWrapper, flying, "true если мы GHOST, летаем или верхом на летающем скакуне" )
 {
     checkTarget( );
@@ -581,7 +593,7 @@ NMI_INVOKE( CharacterWrapper, flydown, "опуститься на землю б�
 
     if (is_flying(target)) {
         target->posFlags.setBit( POS_FLY_DOWN );
-        target->println( "Ты перестаешь летать." );
+        target->pecho( "Ты перестаешь летать." );
         target->recho( "%^C1 перестает летать.", target ); 
         return Register(true);
     }
@@ -1292,7 +1304,7 @@ NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отф�
 {
     checkTarget();
     
-    target->send_to( regfmt(target, args) + "\r\n");
+    target->pecho( regfmt(target, args) );
     
     return Register( );
 }
@@ -1577,6 +1589,13 @@ NMI_INVOKE( CharacterWrapper, is_safe_spell, "(vict): защищают ли бо
                            true);
 }
 
+NMI_INVOKE( CharacterWrapper, is_safe_rspell, "(af): защищают ли боги от действия заклинания аf на комнате" )
+{
+    checkTarget();
+    Affect *paf = args2affect(args);
+    return ::is_safe_rspell(paf, target, true);
+}
+
 NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vict повреждения в размере dam с типом damtype (таблица .tables.damage_table)" )
 {
     RegisterList::const_iterator i;
@@ -1605,24 +1624,16 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vic
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
+NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName[,damtype,damflags]): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
 {
     checkTarget( );
-
     Character *victim = argnum2character(args, 1);
     int dam = argnum2number(args, 2);
     Skill *skill = argnum2skill(args, 3);
-    int dam_type = DAM_NONE;
+    int dam_type = args.size() > 3 ? argnum2flag(args, 4, damage_table) : DAM_NONE;
+    bitstring_t damflags = args.size() > 4 ? argnum2flag(args, 5, damage_flags) : 0L;
 
-    if (args.size() > 3) {
-        dam_type = argnum2flag(args, 4, damage_table);
-        if (dam_type == NO_FLAG)
-            throw Scripting::CustomException("Invalid damage type");
-    }
-
-    ::damage(target, victim, dam, skill->getIndex( ), dam_type, true);
-
-    return Register( );
+    return ::damage(target, victim, dam, skill->getIndex( ), dam_type, true, damflags);
 }
 
 NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один удар оружием" )
@@ -1945,13 +1956,13 @@ NMI_INVOKE( CharacterWrapper, mortality, "(): включает-выключае�
     if (target->getPC( )->getAttributes( ).isAvailable( "coder" )) {
         target->getPC( )->getAttributes( ).eraseAttribute( "coder" );
         target->getPC( )->setSecurity( 0 );
-        target->println("Now you are mortal.");
+        target->pecho("Now you are mortal.");
         return 1;
     }
     else {
         target->getPC( )->getAttributes( ).getAttr<XMLAttributeCoder>( "coder" );
         target->getPC( )->setSecurity( 999 );
-        target->println("Now you are immortal.");
+        target->pecho("Now you are immortal.");
         return 0;
     }
 }

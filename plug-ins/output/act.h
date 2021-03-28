@@ -35,10 +35,10 @@ enum {
 /*--------------------------------------------------------------------------
  * 'act' interface functions 
  *--------------------------------------------------------------------------*/
-void act( const char *format, Character *ch, 
+void oldact( const char *format, Character *ch, 
           const void *arg1, const void *arg2, int type );
 
-void act_p( const char *format, Character *ch, 
+void oldact_p( const char *format, Character *ch, 
             const void *arg1, const void *arg2, int type, int min_pos );
 
 /*--------------------------------------------------------------------------
@@ -47,7 +47,6 @@ void act_p( const char *format, Character *ch,
 DLString fmt(Character *to, const char *fmt, ...);
 DLString vfmt(Character *to, const char *format, va_list av);
 
-void player_fmt( const DLString &, PCMemoryInterface *, ostringstream &, Character *to = NULL );
 DLString dlprintf( const char *, ... );
 
 /*--------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 static void desc_show( Character *ch )
 {
         if (ch->desc) {
-            ch->send_to( "Твое описание:\n\r");
+            ch->pecho("Твое описание:");
             ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
         }
 }
@@ -55,7 +55,7 @@ CMDRUNP( description )
             return;
 
         if (!ch->getDescription( ) || !ch->getDescription( )[0]) {
-                ch->println("Твое описание пусто, копировать в буфер нечего.");
+                ch->pecho("Твое описание пусто, копировать в буфер нечего.");
                 return;
         }        
 
@@ -63,9 +63,9 @@ CMDRUNP( description )
             ->regs[0].split(ch->getDescription( )); 
 
         if (!is_websock(ch)) {
-                ch->println("Описание скопировано в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента.");
+                ch->pecho("Описание скопировано в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента.");
         } else {
-                ch->println("Описание скопировано в буфер редактора, используй команду {lRвебредактор{lEwebedit{x для редактирования.");
+                ch->pecho("Описание скопировано в буфер редактора, используй команду {lRвебредактор{lEwebedit{x для редактирования.");
         }
         return;
     }
@@ -76,23 +76,23 @@ CMDRUNP( description )
 
         DLString str = ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
         if (str.empty( )) {
-            ch->println( "Буфер редактора пуст!" );
+            ch->pecho( "Буфер редактора пуст!" );
             return;
         }
         if (str.size( ) >= MAX_STRING_LENGTH) {
-            ch->println("Слишком длиное описание.");
+            ch->pecho("Слишком длиное описание.");
             return;
         }
 
         ch->setDescription( str.c_str( ));
-        ch->println( "Новое описание вставлено из буфера редактора." );
+        ch->pecho( "Новое описание вставлено из буфера редактора." );
         desc_show( ch );
         return;
     }
 
     if (argument[0] == '\0') {
         desc_show( ch );
-        ch->println("\r\nПодробности читай в {W? {lRописание{lEdescription{x.");
+        ch->pecho("\r\nПодробности читай в {W? {lRописание{lEdescription{x.");
         return;
     }
 
@@ -106,7 +106,7 @@ CMDRUNP( description )
             
             if (!ch->getDescription( ) || !ch->getDescription( )[0])
             {
-                ch->send_to("Нет ничего для удаления.\n\r");
+                ch->pecho("Нет ничего для удаления.");
                 return;
             }
         
@@ -128,7 +128,7 @@ CMDRUNP( description )
                         ch->setDescription( buf );
 
                         if (ch->desc) {
-                            ch->send_to( "Твое описание:\n\r");
+                            ch->pecho("Твое описание:");
                             ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
                         }
                         return;
@@ -137,7 +137,7 @@ CMDRUNP( description )
             }
             buf[0] = '\0';
             ch->setDescription( buf );
-            ch->send_to("Описание удалено.\n\r");
+            ch->pecho("Описание удалено.");
             return;
         }
         else if ( argument[0] == '+' )
@@ -154,7 +154,7 @@ CMDRUNP( description )
 
         if ( strlen(buf) + strlen(argument) >= MAX_STRING_LENGTH - 2 )
         {
-            ch->send_to( "Слишком длинное описание.\n\r");
+            ch->pecho("Слишком длинное описание.");
             return;
         }
 

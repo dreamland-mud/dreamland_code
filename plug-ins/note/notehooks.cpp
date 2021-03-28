@@ -108,7 +108,7 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
             }
         }
         
-        act_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
+        oldact_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
     }
 }
 
@@ -196,13 +196,13 @@ COMMAND(NoteHooks, "webdump")
     DLString args = constArguments;
 
     if (!ch->isCoder()) {
-        ch->println("Что?");
+        ch->pecho("Что?");
         return;
     }
 
     DLString name = args.getOneArgument();
     if (name.empty()) {
-        ch->println("Какой именно вид сообщений нужно сохранить на диск?");
+        ch->pecho("Какой именно вид сообщений нужно сохранить на диск?");
         return;
     }
 
@@ -221,5 +221,5 @@ COMMAND(NoteHooks, "webdump")
         return;
     }
 
-    ch->println( "Команда 'webdump' не поддерживается для этого вида сообщений." );
+    ch->pecho( "Команда 'webdump' не поддерживается для этого вида сообщений." );
 }

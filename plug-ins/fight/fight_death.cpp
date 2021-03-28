@@ -128,12 +128,12 @@ protected:
         
         if(!killer->can_see( corpse )){
             if(IS_AFFECTED(killer, AFF_BLIND))
-            killer->println("{WТы пытаешься вслепую ограбить труп, но ничего не выходит.{x");          
+            killer->pecho("{WТы пытаешься вслепую ограбить труп, но ничего не выходит.{x");          
             return;
         }
 
         if (IS_SET(killer->act, PLR_AUTOLOOT)){
-            killer->println("{WТы автоматически берешь вещи из трупа:{x");
+            killer->pecho("{WТы автоматически берешь вещи из трупа:{x");
             do_get_all_raw( killer, corpse );
         }
     }
@@ -165,8 +165,8 @@ protected:
         if (desire_bloodlust->applicable( killer->getPC( ) )
         && !(IS_BLOODLESS(ch)))    
         {
-            act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
-            act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
+            oldact("{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
+            oldact("{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
             desire_bloodlust->gain( killer->getPC( ), 3 );
         }
     }
@@ -208,8 +208,8 @@ public:
     }
     virtual void run( )
     {
-        pvict->println("Ты превращаешься в привидение и покидаешь этот мир.");
-        act( "$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
+        pvict->pecho("Ты превращаешься в привидение и покидаешь этот мир.");
+        oldact("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
         wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
         
         delete_player( pvict );
@@ -274,7 +274,7 @@ protected:
         pch->perm_stat[STAT_CON]--;
 
         if (pch->perm_stat[STAT_CON] >= 3) {
-            pch->println("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
+            pch->pecho("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
             return false;
         }
         
@@ -291,7 +291,7 @@ protected:
         if (pch->getProfession( ) == prof_samurai) {
             if ((pch->death % 3) == 2) {
                 pch->perm_stat[STAT_CHA]--;
-                pch->println("Ты чувствуешь, как твое обаяние уменьшается после этой смерти.");
+                pch->pecho("Ты чувствуешь, как твое обаяние уменьшается после этой смерти.");
             }
         }
 
@@ -345,7 +345,7 @@ public:
 
         DeathPenalties( killer, victim ).run( );
 
-        group_gain( killer, victim );
+        group_gain( killer, victim, evt.killer );
         raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
         pk_gain( killer, victim );
     }
@@ -769,7 +769,7 @@ void death_cry( Character *ch, int part )
         }
     }
 
-    act( msg, ch, 0, 0, TO_ROOM );
+    oldact( msg, ch, 0, 0, TO_ROOM );
 
     if (vnum != 0)
         bodypart_create( vnum, ch, NULL ); 
@@ -811,7 +811,7 @@ void ghost_gain( Character *victim )
         SET_DEATH_TIME(victim);
 
         if (victim->getModifyLevel( ) >= GHOST_MIN_LEVEL) {
-            victim->println("Ты лишаешься тела на несколько минут.");
+            victim->pecho("Ты лишаешься тела на несколько минут.");
             set_ghost( victim );
         }
     }

@@ -59,12 +59,12 @@ CMDADM( eval )
         return;
     
     if (!has_fenia_security( pch )) {
-        ch->println("Ты не ботаешь по фене.");
+        ch->pecho("Ты не ботаешь по фене.");
         return;
     }
 
     if (constArguments.empty( )) {
-        ch->println("Синтаксис: {Weval {x<expression>");
+        ch->pecho("Синтаксис: {Weval {x<expression>");
         return;
     }
 
@@ -104,7 +104,7 @@ RPCRUN(cs_eval)
                 << "----------------------------" << endl;
 
         if (!has_fenia_security( pch )) {
-            ch->println("Ты не ботаешь по фене.");
+            ch->pecho("Ты не ботаешь по фене.");
             return;
         }
 

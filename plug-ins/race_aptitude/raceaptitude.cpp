@@ -78,7 +78,7 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
         if (verbose)
-            ch->println( "Тебе не с кем практиковаться здесь." );
+            ch->pecho( "Тебе не с кем практиковаться здесь." );
         return false;
     }
     
@@ -86,7 +86,7 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
         return true;
 
     if (verbose)
-        ch->println( "Ты не можешь практиковать это здесь." );
+        ch->pecho( "Ты не можешь практиковать это здесь." );
     return false;
 }
 

@@ -58,7 +58,7 @@ CMDADM( socket )
                 ch->printf( "Connected from: %s(%s)\r\n", d->realip, d->host );
 
                 if(d->via.empty())
-                    ch->send_to("No via records for this descriptor.\r\n");
+                    ch->pecho("No via records for this descriptor.");
                 else {
                     ViaVector::iterator it;
 
@@ -72,8 +72,8 @@ CMDADM( socket )
             }
         }
 
-    ch->send_to("\n\r[Num Connected  Login Idl C P] Player Name  Host\n\r");
-    ch->send_to("--------------------------------------------------------------------------\n\r");
+    ch->pecho("\n\r[Num Connected  Login Idl C P] Player Name  Host");
+    ch->pecho("--------------------------------------------------------------------------");
     count = 0;
 
     for (d = descriptor_list; d; d = d->next) {

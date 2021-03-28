@@ -15,6 +15,7 @@
 #include "commonattributes.h"
 #include "clanreference.h"
 #include "act.h"
+#include "mudtags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "descriptor.h"
@@ -38,7 +39,7 @@ COMMAND(Whois, "whois")
         return;
 
     if (args.empty( )) {
-        ch->send_to( "Имя, сестра, имя!\r\n" );
+        ch->pecho("Имя, сестра, имя!");
         return;
     }
         
@@ -55,12 +56,14 @@ COMMAND(Whois, "whois")
     }
 
     if (!pch) {
-        ch->send_to( "Никого нет с таким именем.\r\n" );
+        ch->pecho("Никого нет с таким именем.");
         return;
     }
     
     /* Pretitle Name Title */
-    player_fmt( "{W%N{w %p{w", pch, buf, ch );
+    buf << "{W" << ch->seeName(pch) << "{w ";    
+    mudtags_convert( pch->getParsedTitle().c_str(), buf, TAGS_CONVERT_VIS, ch );
+    buf << "{w";
     lines.add( buf );
 
     /* Race, Sex, Class, Level */
@@ -181,12 +184,12 @@ COMMAND(Whois, "whois")
 
     /* Output */
 
-    ch->send_to( "/------------------------------------------------------------------------\\\r\n" );
+    ch->pecho("/------------------------------------------------------------------------\\");
     
     for (LinesList::iterator j = lines.begin( ); j != lines.end( ); j++)
         ch->send_to( *j );
     
-    ch->send_to( "\\________________________________________________________________________/\r\n" );
+    ch->pecho("\\________________________________________________________________________/");
 
     if (offline_pch)
         ddeallocate(offline_pch);

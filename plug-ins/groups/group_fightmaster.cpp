@@ -69,31 +69,31 @@ SKILL_RUNP( bashdoor )
 
         if (!gsn_bash_door->getEffective( ch ))
         {
-                ch->send_to("Выбить дверь? Как это?\n\r");
+                ch->pecho("Выбить дверь? Как это?");
                 return;
         }
 
         if (MOUNTED(ch))
         {
-                ch->send_to("Только не верхом!\n\r");
+                ch->pecho("Только не верхом!");
                 return;
         }
 
         if (RIDDEN(ch))
         {
-                ch->send_to("Ты не можешь выбить дверь, когда оседлан{Sfа{Sx.\n\r");
+                ch->pecho("Ты не можешь выбить дверь, когда оседлан{Sfа{Sx.");
                 return;
         }
 
         if (arg[0] == '\0')
         {
-                ch->send_to("Выбить дверь в каком направлении?\n\r");
+                ch->pecho("Выбить дверь в каком направлении?");
                 return;
         }
 
         if (ch->fighting)
         {        
-                ch->send_to("Сначала закончи сражение.\n\r");
+                ch->pecho("Сначала закончи сражение.");
                 return;
         }
 
@@ -101,7 +101,7 @@ SKILL_RUNP( bashdoor )
         if ((!peexit || !ch->can_see( peexit ))
              && ( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) < 0)
         {
-                ch->send_to("Но тут нечего выбивать!\n\r");
+                ch->pecho("Но тут нечего выбивать!");
                 return;
         }
 
@@ -112,7 +112,7 @@ SKILL_RUNP( bashdoor )
         {
                 if ( gch->is_npc() && IS_AWAKE(gch) && slevel + 5 < gch->getModifyLevel() )
                 {
-                        act( "$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR);
+                        oldact("$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR);
                         return;
                 }
         }
@@ -135,19 +135,19 @@ SKILL_RUNP( bashdoor )
 
         if ( !IS_SET(exit_info, EX_CLOSED) )
         {
-                ch->send_to("Здесь уже открыто.\n\r");
+                ch->pecho("Здесь уже открыто.");
                 return;
         }
 
         if ( !IS_SET(exit_info, EX_LOCKED) )
         {
-                ch->send_to("Просто попробуй открыть.\n\r");
+                ch->pecho("Просто попробуй открыть.");
                 return;
         }
 
         if ( IS_SET(exit_info, EX_NOPASS) && !IS_SET(exit_info, EX_BASH_ONLY))
         {
-                ch->println("Эту дверь невозможно вышибить.");
+                ch->pecho("Эту дверь невозможно вышибить.");
                 return;
         }
 
@@ -170,8 +170,8 @@ SKILL_RUNP( bashdoor )
 
         chance += ( gsn_bash_door->getEffective( ch ) - 90 + skill_level_bonus(*gsn_bash_door, ch) );
         const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
-        act("Ты бьешь в $N4, пытаясь выбить!", ch,0, doorname,TO_CHAR);
-        act("$c1 бьет в $N4, пытаясь выбить!", ch,0, doorname,TO_ROOM);
+        oldact("Ты бьешь в $N4, пытаясь выбить!", ch,0, doorname,TO_CHAR);
+        oldact("$c1 бьет в $N4, пытаясь выбить!", ch,0, doorname,TO_ROOM);
 
         if (room->isDark( ) && !IS_AFFECTED(ch, AFF_INFRARED ))
                 chance /= 2;
@@ -187,15 +187,15 @@ SKILL_RUNP( bashdoor )
                 {
                         REMOVE_BIT(peexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(peexit->exit_info, EX_CLOSED);
-                        act("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
-                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
+                        oldact("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
+                        oldact("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
                 }
                 else
                 {
                         REMOVE_BIT(pexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-                        act("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
-                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
+                        oldact("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
+                        oldact("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
 
                         /* open the other side */
                         if ((pexit_rev = direction_reverse(room, door)))
@@ -211,8 +211,8 @@ SKILL_RUNP( bashdoor )
         }
         else
         {
-                act("Обессилев, ты падаешь лицом вниз!", ch,0,0,TO_CHAR);
-                act("Обессилев, $c1 упа$gло|л|ла лицом вниз.", ch,0,0,TO_ROOM);
+                oldact("Обессилев, ты падаешь лицом вниз!", ch,0,0,TO_CHAR);
+                oldact("Обессилев, $c1 упа$gло|л|ла лицом вниз.", ch,0,0,TO_ROOM);
                 gsn_bash_door->improve( ch, false );
                 ch->position = POS_RESTING;
                 ch->setWait( gsn_bash_door->getBeats( ) * 3 / 2  );
@@ -220,7 +220,7 @@ SKILL_RUNP( bashdoor )
                 damage(ch,ch,damage_bash,gsn_bash_door, DAM_BASH, true, DAMF_WEAPON);
                 if(IS_CHARMED(ch) && ch->master->getPC()){
                 DLString petName = Syntax::noun(ch->getNameP('1'));
-                ch->master->println(fmt(0,"%1$^C1 упа%1$Gло|л|ла и не может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x, если хочешь продолжить выбивать %1$Gим|им|ей двери.",ch, petName.c_str()));
+                ch->master->pecho(fmt(0,"%1$^C1 упа%1$Gло|л|ла и не может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x, если хочешь продолжить выбивать %1$Gим|им|ей двери.",ch, petName.c_str()));
                 }
         }
 
@@ -307,7 +307,7 @@ SKILL_RUNP( bash )
 
         if ( (MOUNTED(ch)) && (!gsn_riding->available(ch)) )
         {
-                ch->send_to("Ты не знаешь, как применять такие навыки верхом.\n\r");
+                ch->pecho("Ты не знаешь, как применять такие навыки верхом.");
                 return;
         }
 
@@ -326,7 +326,7 @@ SKILL_RUNP( bash )
 
         if ( gsn_bash->getEffective( ch ) <= 1)
         {        
-                ch->send_to("Ударить щитом? Но как это сделать?\n\r");
+                ch->pecho("Ударить щитом? Но как это сделать?");
                 return;
         }
 
@@ -335,40 +335,40 @@ SKILL_RUNP( bash )
                 victim = ch->fighting;
                 if ( victim == 0 )
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ( (victim = get_char_room(ch,arg)) == 0 )
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
         if ( ( victim->position < POS_FIGHTING ) && ( FightingCheck ) )
         {
-                act("Подожди пока $E встанет.",ch,0,victim,TO_CHAR);
+                oldact("Подожди пока $E встанет.",ch,0,victim,TO_CHAR);
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->send_to("Ударить щитом себя?\n\r");
+                ch->pecho("Ударить щитом себя?");
                 return;
         }
 
         if ( get_eq_char( ch, wear_shield ) == 0 )
         {
-                ch->send_to("Тебе нужен щит чтобы сделать это!\n\r");
+                ch->pecho("Тебе нужен щит чтобы сделать это!");
                 if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
-                ch->master->println("Для этого умения твоему последователю потребуется надеть щит.");
+                ch->master->pecho("Для этого умения твоему последователю потребуется надеть щит.");
                 return;
         }
         
         /*
         if ( is_flying( ch ) )
         {
-                ch->send_to("В полете? И как ты себе это представляешь?\n\r");
+                ch->pecho("В полете? И как ты себе это представляешь?");
                 return;
         }*/
 
@@ -377,14 +377,14 @@ SKILL_RUNP( bash )
 
         if ( IS_CHARMED(ch) && ch->master == victim )
         {
-                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
         if (SHADOW(ch))
         {
-                ch->send_to("Ты безуспешно пытаешься сбить с ног свою тень.\n\r");
-                act("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM);
+                ch->pecho("Ты безуспешно пытаешься сбить с ног свою тень.");
+                oldact("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM);
                 return;
         }
 
@@ -397,7 +397,7 @@ SKILL_RUNP( bash )
         if ( MOUNTED(victim) )
         {
             if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-                ch->send_to("Ты не можешь сбить с ног того, кто верхом!\n\r");
+                ch->pecho("Ты не можешь сбить с ног того, кто верхом!");
                 return;
             }
             
@@ -408,11 +408,11 @@ SKILL_RUNP( bash )
 
         if ( victim->isAffected(gsn_protective_shield) )
         {
-                act_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
+                oldact_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
                         ch, 0, victim,TO_CHAR,POS_FIGHTING);
-                act_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
+                oldact_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
                         ch, 0,victim,TO_VICT,POS_FIGHTING);
-                act_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
+                oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
                         ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
                 ch->setWait( gsn_bash->getBeats( ) );
@@ -428,10 +428,10 @@ SKILL_RUNP( bash )
         {
                 if ( number_percent() < 50 )
                 {
-                        act_p("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!",
+                        oldact_p("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!",
                                 ch,0,victim,TO_VICT,POS_RESTING);
-                        act("Ты сбиваешь $C4 с ног ударом щита!",ch,0,victim,TO_CHAR);
-                        act_p("$c1 сильнейшим ударом щита сбивает $C4 с ног.",
+                        oldact("Ты сбиваешь $C4 с ног ударом щита!",ch,0,victim,TO_CHAR);
+                        oldact_p("$c1 сильнейшим ударом щита сбивает $C4 с ног.",
                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
 
                         wait = 3;
@@ -457,9 +457,9 @@ SKILL_RUNP( bash )
                 }
                 else
                 {
-                        act("$c1 наносит тебе удар щитом!",ch,0,victim,TO_VICT);
-                        act("Ты наносишь удар щитом $C3!",ch,0,victim,TO_CHAR);
-                        act("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT);
+                        oldact("$c1 наносит тебе удар щитом!",ch,0,victim,TO_VICT);
+                        oldact("Ты наносишь удар щитом $C3!",ch,0,victim,TO_CHAR);
+                        oldact("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT);
                 }
                       
                 gsn_bash->improve( ch, true, victim );
@@ -474,20 +474,20 @@ SKILL_RUNP( bash )
         {
                 if (number_percent() < 50)
                 {
-                        act("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
-                        act("$c1 промахивается и падает.",ch,0,victim,TO_NOTVICT);
-                        act_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
+                        oldact("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
+                        oldact("$c1 промахивается и падает.",ch,0,victim,TO_NOTVICT);
+                        oldact_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
                                 ch,0,victim,TO_VICT,POS_RESTING);
                         ch->position = POS_RESTING;
                         ch->setWait( gsn_bash->getBeats( ) * 3/2 );
                 }
                 else
                 {
-                        act_p("Ты промахиваешься и едва не падаешь!",
+                        oldact_p("Ты промахиваешься и едва не падаешь!",
                                 ch,0,victim,TO_CHAR,POS_RESTING);
-                        act_p("$c1 промахивается и едва не падает.",
+                        oldact_p("$c1 промахивается и едва не падает.",
                                 ch,0,victim,TO_NOTVICT,POS_RESTING);
-                        act_p("$c1 пытается сбить тебя с ног, но промахивается и едва не падает.",
+                        oldact_p("$c1 пытается сбить тебя с ног, но промахивается и едва не падает.",
                                 ch,0,victim,TO_VICT,POS_RESTING);
                 }        
                 damage(ch,victim,0,gsn_bash,DAM_BASH, true, DAMF_WEAPON);
@@ -515,7 +515,7 @@ SKILL_RUNP( trip )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь подсечь противника, находясь в седле!\n\r");
+                ch->pecho("Ты не можешь подсечь противника, находясь в седле!");
                 return;
         }
 
@@ -528,7 +528,7 @@ SKILL_RUNP( trip )
 
         if ( (chance = gsn_trip->getEffective( ch )) <= 1)
         {
-                ch->send_to("Подсечь? Как это?\n\r");
+                ch->pecho("Подсечь? Как это?");
                 return;
         }
 
@@ -539,13 +539,13 @@ SKILL_RUNP( trip )
                 victim = ch->fighting;
                 if ( victim == 0 )
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ( (victim = get_char_room(ch,arg)) == 0 )
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
@@ -554,19 +554,19 @@ SKILL_RUNP( trip )
 
         if ( is_flying( victim ) )
         {
-                act("Но $S ноги не на земле.",ch,0,victim,TO_CHAR);
+                oldact("Но $S ноги не на земле.",ch,0,victim,TO_CHAR);
                 return;
         }
 
         if ( is_flying( ch ) )
         {
-                ch->send_to("В полете? И как ты себе это представляешь?\n\r");
+                ch->pecho("В полете? И как ты себе это представляешь?");
                 return;
         }
 
         if ( victim->position < POS_FIGHTING )
         {
-                act("Но $C1 уже лежит...",ch,0,victim,TO_CHAR);
+                oldact("Но $C1 уже лежит...",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -578,30 +578,30 @@ SKILL_RUNP( trip )
 
         if (SHADOW(ch))
         {
-                ch->send_to("Твоя нога вязнет в твоей тени...\n\r");
-                act_p("$c1 выделывает балетные па перед своей тенью.",
+                ch->pecho("Твоя нога вязнет в твоей тени...");
+                oldact_p("$c1 выделывает балетные па перед своей тенью.",
                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->send_to("Ты запинаешься и падаешь!\n\r");
+                ch->pecho("Ты запинаешься и падаешь!");
                 ch->setWait( 2 * gsn_trip->getBeats( ) );
-                act("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM);
+                oldact("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM);
                 return;
         }
 
         if ( IS_CHARMED(ch) && ch->master == victim )
         {
-                act("Но ведь $C1 -- тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR);
+                oldact("Но ведь $C1 -- тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR);
                 return;
         }
 
         if ( MOUNTED(victim) )
         {
             if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-                ch->send_to("Ты не можешь подсечь того, кто верхом!\n\r");
+                ch->pecho("Ты не можешь подсечь того, кто верхом!");
                 return;
             }
 
@@ -637,17 +637,17 @@ SKILL_RUNP( trip )
         {
                 if ( number_percent() < 70 )
                 {
-                        act("$c1 подсекает тебя и ты падаешь!",ch,0,victim,TO_VICT);
-                        act("Ты подсекаешь $C4 и $C1 падает!",ch,0,victim,TO_CHAR);
-                        act("$c1 подсекает $C4, и $C1 падает!",ch,0,victim,TO_NOTVICT);
+                        oldact("$c1 подсекает тебя и ты падаешь!",ch,0,victim,TO_VICT);
+                        oldact("Ты подсекаешь $C4 и $C1 падает!",ch,0,victim,TO_CHAR);
+                        oldact("$c1 подсекает $C4, и $C1 падает!",ch,0,victim,TO_NOTVICT);
                         victim->setWaitViolence( 2 );
                         victim->position = POS_RESTING;
                 }
                 else
                 {
-                        act("$c1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT);
-                        act("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR);
-                        act("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT);
+                        oldact("$c1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT);
+                        oldact("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR);
+                        oldact("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT);
                 }
                 ch->setWait( gsn_trip->getBeats( ) );
                 gsn_trip->improve( ch, true, victim );
@@ -770,13 +770,13 @@ SKILL_RUNP( kick )
 
         if (gsn_kick->getEffective( ch ) <= 1)
         {
-                ch->send_to("У тебя плохая растяжка.\n\r");
+                ch->pecho("У тебя плохая растяжка.");
                 return;
         }
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь ударить ногой, если ты верхом!\n\r");
+                ch->pecho("Ты не можешь ударить ногой, если ты верхом!");
                 return;
         }
 
@@ -792,19 +792,19 @@ SKILL_RUNP( kick )
                 victim = ch->fighting;
                 if (victim == 0)
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ((victim = get_char_room(ch,arg)) == 0)
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
         if (victim == ch)
         {
-                ch->send_to("Ударить себя ногой? Довольно тяжело...\n\r");
+                ch->pecho("Ударить себя ногой? Довольно тяжело...");
                 return;
         }
 
@@ -815,7 +815,7 @@ SKILL_RUNP( kick )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
+                oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -829,8 +829,8 @@ SKILL_RUNP( kick )
 
         if(SHADOW(ch))
         {
-                ch->send_to("Твоя нога вязнет в твоей тени...\n\r");
-                act_p("$c1 выделывает балетные па перед своей тенью.",
+                ch->pecho("Твоя нога вязнет в твоей тени...");
+                oldact_p("$c1 выделывает балетные па перед своей тенью.",
                                         ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
@@ -893,39 +893,39 @@ SKILL_RUNP( concentrate )
 
     if ( MOUNTED(ch) )
     {
-        ch->send_to("Ты не можешь сконцентрироваться, если ты верхом!\n\r");
+        ch->pecho("Ты не можешь сконцентрироваться, если ты верхом!");
         return;
     }
 
     if ((chance = gsn_concentrate->getEffective( ch )) == 0)
     {
-        ch->send_to("Ты пытаешься сконцентрироваться, но не выходит.\n\r");
+        ch->pecho("Ты пытаешься сконцентрироваться, но не выходит.");
         return;
     }
 
     if (ch->isAffected(gsn_concentrate))
     {
-        act( "Ты уже сконцентрировал$gось|ся|ась для сражения.", ch, 0, 0, TO_CHAR );
+        oldact("Ты уже сконцентрировал$gось|ся|ась для сражения.", ch, 0, 0, TO_CHAR );
         return;
     }
         
     if (ch->mana < gsn_concentrate->getMana( ))
     {
-        ch->send_to("У тебя не хватает энергии для этого.\n\r");
+        ch->pecho("У тебя не хватает энергии для этого.");
         return;
     }
 
     /* fighting */
     if (ch->fighting)
     {
-        ch->send_to("Поздно концентрироваться, бой уже в самом разгаре!\n\r");
+        ch->pecho("Поздно концентрироваться, бой уже в самом разгаре!");
         return;
     }
 
 
     if(SHADOW(ch)) {
-      ch->send_to("Эта странная тень не дает тебе сконцентрироваться.\n\r");
-      act_p("$c1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.",
+      ch->pecho("Эта странная тень не дает тебе сконцентрироваться.");
+      oldact_p("$c1 пыжится, но никак не сконцентрируется -- того и гляди, лопнет.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -940,7 +940,7 @@ SKILL_RUNP( concentrate )
     }
     else
     {
-        ch->send_to("Ты пытаешься сконцентрироваться для следующего сражения, но не выходит.\n\r");
+        ch->pecho("Ты пытаешься сконцентрироваться для следующего сражения, но не выходит.");
         gsn_concentrate->improve( ch, false );
     }
 }
@@ -1009,11 +1009,11 @@ SKILL_RUNP( crush )
 
         if ( victim->isAffected(gsn_protective_shield) )
         {
-                act("{YТвой мощный удар как будто соскальзывает c $C2, не причиняя вреда.",
+                oldact("{YТвой мощный удар как будто соскальзывает c $C2, не причиняя вреда.",
                         ch,0,victim,TO_CHAR);
-                act("{YМощный удар $c2 скользит по поверхности твоего охранного щита.{x",
+                oldact("{YМощный удар $c2 скользит по поверхности твоего охранного щита.{x",
                         ch,0,victim,TO_VICT);
-                act("{YМощный удар $c2 как будто соскальзывает с $C2.{x",
+                oldact("{YМощный удар $c2 как будто соскальзывает с $C2.{x",
                         ch,0,victim,TO_NOTVICT);
 
                 ch->setWait( gsn_crush->getBeats( ) );
@@ -1050,10 +1050,10 @@ SKILL_RUNP( crush )
         /* now the attack */
         if ( number_percent() < chance )
         {
-                act_p("$c1 сбивает тебя с ног мощнейшим ударом!",
+                oldact_p("$c1 сбивает тебя с ног мощнейшим ударом!",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                act("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR);
-                act_p("$c1 сбивает $C4 с ног мощнейшим ударом.",
+                oldact("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR);
+                oldact_p("$c1 сбивает $C4 с ног мощнейшим ударом.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
 
                 wait = 3;
@@ -1075,9 +1075,9 @@ SKILL_RUNP( crush )
         else
         {
                 damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
-                act("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
-                act("$c1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT);
-                act_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
+                oldact("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR);
+                oldact("$c1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT);
+                oldact_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 ch->position = POS_RESTING;
                 ch->setWait( gsn_crush->getBeats( ) * 3/2 );
@@ -1095,20 +1095,20 @@ SKILL_RUNP( berserk )
 
         if ( (chance = gsn_berserk->getEffective( ch )) <= 1)
         {
-                ch->send_to("Ты краснеешь от напряжения, но ничего не получается.\n\r");
+                ch->pecho("Ты краснеешь от напряжения, но ничего не получается.");
                 return;
         }
 
         if ( IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk)
                 || ch->isAffected(gsn_frenzy) )
         {
-                act("Ты становишься немного дик$gим|им|ой.", ch, 0, 0, TO_CHAR);
+                oldact("Ты становишься немного дик$gим|им|ой.", ch, 0, 0, TO_CHAR);
                 return;
         }
 
         if ( IS_AFFECTED(ch,AFF_CALM) )
         {
-                act("Ты слишком миролюби$gво|в|ва для этого.", ch, 0, 0, TO_CHAR);
+                oldact("Ты слишком миролюби$gво|в|ва для этого.", ch, 0, 0, TO_CHAR);
                 return;
         }
         
@@ -1116,7 +1116,7 @@ SKILL_RUNP( berserk )
         
         if ( ch->mana < mana )
         {
-                ch->send_to("У тебя недостаточно энергии для этого.\n\r");
+                ch->pecho("У тебя недостаточно энергии для этого.");
                 return;
         }
 
@@ -1136,8 +1136,8 @@ SKILL_RUNP( berserk )
                 ch->setWaitViolence( 1 );
                 ch->mana -= mana;
 
-                ch->send_to("Твой пульс учащается, когда ты входишь в ярость!\n\r");
-                act_p("Глаза $c2 загораются {rдиким огнем{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
+                ch->pecho("Твой пульс учащается, когда ты входишь в ярость!");
+                oldact_p("Глаза $c2 загораются {rдиким огнем{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
                 gsn_berserk->improve( ch, true );
                 gsn_berserk->getCommand()->run(ch);
         }
@@ -1146,7 +1146,7 @@ SKILL_RUNP( berserk )
                 ch->setWaitViolence( 2 );
                 ch->mana -= mana / 2;
 
-                ch->send_to("Твой пульс ускоряется, но ничего не происходит.\n\r");
+                ch->pecho("Твой пульс ускоряется, но ничего не происходит.");
                 gsn_berserk->improve( ch, false );
         }
 
@@ -1194,7 +1194,7 @@ SKILL_RUNP( dirt )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не можешь ослепить пылью, если ты верхом!\n\r");
+                ch->pecho("Ты не можешь ослепить пылью, если ты верхом!");
                 return;
         }
 
@@ -1207,7 +1207,7 @@ SKILL_RUNP( dirt )
 
         if ( ( chance = gsn_dirt_kicking->getEffective( ch )) <= 1)
         {
-                ch->send_to("Ты лишь пачкаешь свои ноги в пыли.\n\r");
+                ch->pecho("Ты лишь пачкаешь свои ноги в пыли.");
                 return;
         }
 
@@ -1216,31 +1216,31 @@ SKILL_RUNP( dirt )
                 victim = ch->fighting;
                 if (victim == 0)
                 {
-                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        ch->pecho("Сейчас ты не сражаешься!");
                         return;
                 }
         }
         else if ((victim = get_char_room(ch,arg)) == 0)
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->pecho("Этого нет здесь.");
                 return;
         }
 
         if (is_flying( ch ) )
         {
-                ch->send_to("Когда летаешь?\n\r");
+                ch->pecho("Когда летаешь?");
                 return;
         }
 
         if (IS_AFFECTED(victim,AFF_BLIND))
         {
-                act("Но $E уже ничего не видит.",ch,0,victim,TO_CHAR);
+                oldact("Но $E уже ничего не видит.",ch,0,victim,TO_CHAR);
                 return;
         }
 
         if (victim == ch)
         {
-                ch->send_to("Довольно глупая мысль.\n\r");
+                ch->pecho("Довольно глупая мысль.");
                 return;
         }
 
@@ -1249,7 +1249,7 @@ SKILL_RUNP( dirt )
 
         if (IS_CHARMED(ch) && ch->master == victim)
         {
-                act("Но $C1 твой лучший друг!",ch,0,victim,TO_CHAR);
+                oldact("Но $C1 твой лучший друг!",ch,0,victim,TO_CHAR);
                 return;
         }
 
@@ -1261,15 +1261,15 @@ SKILL_RUNP( dirt )
 
         if(SHADOW(ch))
         {
-                ch->send_to("Твоя бездонная тень поглощает пыль.\n\r");
-                act("$c1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM);
+                ch->pecho("Твоя бездонная тень поглощает пыль.");
+                oldact("$c1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM);
                 return;
         }
 
         if ( MOUNTED(victim) )
         {
             if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-                ch->send_to("Ты не можешь ослепить пылью того, кто верхом!\n\r");
+                ch->pecho("Ты не можешь ослепить пылью того, кто верхом!");
                 return;
             }
 
@@ -1316,7 +1316,7 @@ SKILL_RUNP( dirt )
 
         if (chance == 0)
         {
-                ch->send_to("Здесь нет пыли...\n\r");
+                ch->pecho("Здесь нет пыли...");
                 return;
         }
 
@@ -1326,7 +1326,7 @@ SKILL_RUNP( dirt )
         /* now the attack */
         if (number_percent() < chance)
         {
-                act_p("$c1 ослепле$gно|н|на пылью, попавшей $m в глаза!",
+                oldact_p("$c1 ослепле$gно|н|на пылью, попавшей $m в глаза!",
                         victim,0,0,TO_ROOM,POS_RESTING);
 
                 ch->setWait( gsn_dirt_kicking->getBeats( ) );
@@ -1382,19 +1382,19 @@ SKILL_RUNP( warcry )
 
   if (!gsn_warcry->usable( ch ) )
     {
-      ch->send_to("Что?\n\r");
+      ch->pecho("Что?");
       return;
     }
 
   if (ch->isAffected(gsn_bless) || ch->isAffected(gsn_warcry))
     {
-      ch->send_to("Боевой клич не может помочь тебе еще больше.\n\r");
+      ch->pecho("Боевой клич не может помочь тебе еще больше.");
       return;
     }
 
   if (ch->mana < gsn_warcry->getMana( ))
     {
-      ch->send_to("У тебя не хватает энергии для боевого клича.\n\r");
+      ch->pecho("У тебя не хватает энергии для боевого клича.");
       return;
     }
 
@@ -1403,12 +1403,12 @@ SKILL_RUNP( warcry )
     if (number_percent() > gsn_warcry->getEffective( ch )) {
         switch (number_range( 1, 2 )) {
         case 1: 
-            act("Ты тихонько хрюкаешь.", ch, 0, 0, TO_CHAR);
-            act("$c1 тихонько хрюкает.", ch, 0, 0, TO_ROOM);
+            oldact("Ты тихонько хрюкаешь.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 тихонько хрюкает.", ch, 0, 0, TO_ROOM);
             break;
         case 2:
-            act("Ты сдавленно стонешь.", ch, 0, 0, TO_CHAR);
-            act("$c1 издает сдавленные стоны.", ch, 0, 0, TO_ROOM);
+            oldact("Ты сдавленно стонешь.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 издает сдавленные стоны.", ch, 0, 0, TO_ROOM);
             break;
         }
         
@@ -1438,8 +1438,8 @@ SKILL_RUNP( warcry )
         interpret_raw( ch, "yell", attr->getValue( ).c_str( ) );
     }
     else {
-        act("Ты издаешь боевой клич и чувствуешь, что теперь тебе все по плечу!", ch, 0, 0, TO_CHAR);
-        act("$c1 издает боевой клич!", ch, 0, 0, TO_ROOM);
+        oldact("Ты издаешь боевой клич и чувствуешь, что теперь тебе все по плечу!", ch, 0, 0, TO_CHAR);
+        oldact("$c1 издает боевой клич!", ch, 0, 0, TO_ROOM);
     }
 
     gsn_warcry->improve( ch, true );
@@ -1519,7 +1519,7 @@ SKILL_RUNP( smash )
 
     if ( MOUNTED(ch) ) 
     {
-        ch->send_to("Ты не можешь сбить с ног, если ты верхом!\n\r");
+        ch->pecho("Ты не можешь сбить с ног, если ты верхом!");
         return;
     }
 
@@ -1531,29 +1531,29 @@ SKILL_RUNP( smash )
     argument = one_argument(argument,arg);
 
     if (gsn_smash->getEffective( ch ) <= 1) {        
-        ch->send_to("Сбить с ног? Но как это сделать?\n\r");
+        ch->pecho("Сбить с ног? Но как это сделать?");
         return;
     }
 
     if (arg[0] == '\0') {
         victim = ch->fighting;
         if (victim == NULL) {
-            ch->send_to("Сейчас ты не сражаешься!\n\r");
+            ch->pecho("Сейчас ты не сражаешься!");
             return;
         }
     }
     else if ((victim = get_char_room(ch,arg)) == NULL) {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->pecho("Этого нет здесь.");
         return;
     }
 
     if (victim->position < POS_FIGHTING) {
-        act("Подожди пока $E встанет.", ch,NULL,victim,TO_CHAR);
+        oldact("Подожди пока $E встанет.", ch,NULL,victim,TO_CHAR);
         return;
     } 
 
     if (victim == ch) {
-        ch->send_to("Сбить с ног себя??? Не получится...\n\r");
+        ch->pecho("Сбить с ног себя??? Не получится...");
         return;
     }
 
@@ -1561,24 +1561,24 @@ SKILL_RUNP( smash )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        act("Но $C1 твой друг!!!",ch,NULL,victim,TO_CHAR);
+        oldact("Но $C1 твой друг!!!",ch,NULL,victim,TO_CHAR);
         return;
     }
 
     if( !ch->is_npc() && !ch->move ) {
-          act("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR);
+          oldact("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR);
           return;
     } 
 
     if(SHADOW(ch)) {
-      ch->send_to("Ты безуспешно пытаешься бороться со своей тенью.\n\r");
-      act("$c1 обнимается со своей тенью.", ch, NULL, NULL, TO_ROOM);
+      ch->pecho("Ты безуспешно пытаешься бороться со своей тенью.");
+      oldact("$c1 обнимается со своей тенью.", ch, NULL, NULL, TO_ROOM);
       return;
     }
    
     if ( MOUNTED(victim) ) {
         if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-            ch->send_to("Ты не можешь сбить с ног того, кто верхом!\n\r");
+            ch->pecho("Ты не можешь сбить с ног того, кто верхом!");
             return;
         }
 
@@ -1588,11 +1588,11 @@ SKILL_RUNP( smash )
     ch->move -= move_dec( ch );
 
     if (victim->isAffected(gsn_protective_shield)) {
-        act_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
+        oldact_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
                 ch, NULL, victim,TO_CHAR,POS_FIGHTING);
-        act_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
+        oldact_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
                 ch, NULL,victim,TO_VICT,POS_FIGHTING);
-        act_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
+        oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
                 ch,NULL,victim,TO_NOTVICT,POS_FIGHTING);
 
         ch->setWait( gsn_smash->getBeats( ) );
@@ -1612,11 +1612,11 @@ SKILL_RUNP( smash )
     /* now the attack */
 
     if (number_percent() < chance) {
-        act_p("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!",
+        oldact_p("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!",
                ch,NULL,victim,TO_VICT,POS_RESTING);
-        act_p("Ты сбиваешь $C4 с ног, посылая $S на землю!",
+        oldact_p("Ты сбиваешь $C4 с ног, посылая $S на землю!",
                ch,NULL,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 сильнейшим ударом сбивает $C4 с ног.",
+        oldact_p("$c1 сильнейшим ударом сбивает $C4 с ног.",
                ch,NULL,victim,TO_NOTVICT,POS_RESTING);
         gsn_smash->improve( ch, true, victim );
 
@@ -1650,11 +1650,11 @@ SKILL_RUNP( smash )
     else
     {
         damage(ch,victim,0,gsn_smash,DAM_BASH, true, DAMF_WEAPON);
-        act_p("Ты промахиваешься и падаешь лицом на пол!",
+        oldact_p("Ты промахиваешься и падаешь лицом на пол!",
                ch,NULL,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 промахивается и падает лицом на пол.", 
+        oldact_p("$c1 промахивается и падает лицом на пол.", 
                ch,NULL,victim,TO_NOTVICT,POS_RESTING);
-        act_p("$c1 пытается ударить тебя, но промахивается и падает на пол.",
+        oldact_p("$c1 пытается ударить тебя, но промахивается и падает на пол.",
                ch,NULL,victim,TO_VICT,POS_RESTING);
         gsn_smash->improve( ch, false, victim );
 

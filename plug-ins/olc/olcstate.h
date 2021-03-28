@@ -161,7 +161,7 @@ public:
                     state->changed( pch );
             } catch (const Exception &e) {
                 LogStream::sendError() << "OLC " << e.what() << endl;
-                pch->println(e.what());
+                pch->pecho(e.what());
                 state->detach(pch);
             }
         }
@@ -228,7 +228,7 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
 
     if (arg_is_clear(args)) {
         field.clear();
-        ch->println("Поле очищено.");
+        ch->pecho("Поле очищено.");
         return true;
     }
 

@@ -96,35 +96,35 @@ CMDRUN( cast )
 
     if (ch->is_npc( ) && ch->master != 0) {
         if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
-            act( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR);
+            oldact("$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR);
             return;
         }
     }
     
     if (!ch->is_npc( ) && !ch->move) {
-        ch->send_to("У тебя нет сил даже пошевелить языком.\n\r");
+        ch->pecho("У тебя нет сил даже пошевелить языком.");
         return;
     }
 
     if (ch->isAffected(gsn_shielding ) && number_percent( ) > 50) {
-        ch->send_to("Ты пытаешься сосредоточиться на заклинании, но что-то останавливает тебя.\n\r");
+        ch->pecho("Ты пытаешься сосредоточиться на заклинании, но что-то останавливает тебя.");
         return;
     }
 
     if ((ch->isAffected(gsn_garble ) || ch->isAffected(gsn_deafen )) && number_percent( ) > 50) {
-        ch->send_to("Ты не можешь настроиться на правильную интонацию.\n\r");
+        ch->pecho("Ты не можешь настроиться на правильную интонацию.");
         return;
     }
 
     if (HALF_SHADOW(ch)) {
-        ch->send_to("Твоя тень поглощает всякую попытку сотворить заклинание.\n\r");
-        act_p("$c1 пытается сотворить заклинание, но тень не дает $m сосредоточится.",
+        ch->pecho("Твоя тень поглощает всякую попытку сотворить заклинание.");
+        oldact_p("$c1 пытается сотворить заклинание, но тень не дает $m сосредоточится.",
                 ch, 0, 0, TO_ROOM,POS_RESTING);
         return;
     }
 
     if (ch->death_ground_delay > 0 && ch->trap.isSet( TF_NO_CAST )) {
-        ch->send_to("Тебя занимает более важное занятие - спасение своей жизни.\n\r");
+        ch->pecho("Тебя занимает более важное занятие - спасение своей жизни.");
         return;
     }
 
@@ -135,12 +135,12 @@ CMDRUN( cast )
     spellName = spellArgs.getOneArgument();
     
     if (spellName.empty( )) {
-        ch->send_to("Колдовать что и на кого?\n\r");
+        ch->pecho("Колдовать что и на кого?");
         return;
     }
 
     if (ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-        ch->send_to("Ты {RBattleRager{x, а не презренный маг!\n\r");
+        ch->pecho("Ты {RBattleRager{x, а не презренный маг!");
         return;
     }
 
@@ -156,7 +156,7 @@ CMDRUN( cast )
         if (ch->is_npc( ) && ch->master) 
             do_say(ch, "Да не умею я");
         else
-            ch->send_to("Ты не знаешь такого заклинания.\n\r");
+            ch->pecho("Ты не знаешь такого заклинания.");
 
         return;
     }
@@ -170,8 +170,8 @@ CMDRUN( cast )
         return;
         
     if (IS_SET(ch->in_room->room_flags,ROOM_NO_CAST)) {
-        ch->send_to("Стены этой комнаты поглотили твое заклинание.\n\r");
-        act_p("$c1 произне$gсло|с|сла заклинание, но стены комнаты поглотили его.",
+        ch->pecho("Стены этой комнаты поглотили твое заклинание.");
+        oldact_p("$c1 произне$gсло|с|сла заклинание, но стены комнаты поглотили его.",
                 ch, 0, 0, TO_ROOM,POS_RESTING);
         return;
     }
@@ -184,7 +184,7 @@ CMDRUN( cast )
         if (ch->is_npc( ) && ch->master != 0) 
             say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
-            ch->send_to("У тебя не хватает энергии (mana).\n\r");
+            ch->pecho("У тебя не хватает энергии (mana).");
 
         return;
     }
@@ -226,7 +226,7 @@ CMDRUN( cast )
         return;
         
     if (number_percent( ) > skill->getEffective( ch )) {
-        ch->send_to("Ты не можешь сконцентрироваться.\n\r");
+        ch->pecho("Ты не можешь сконцентрироваться.");
         skill->improve( ch, false, victim );
         ch->mana -= mana / 2;
         target->castFar = false;

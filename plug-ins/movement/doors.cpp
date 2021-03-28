@@ -22,13 +22,13 @@ void open_door_extra ( Character *ch, int door, void *pexit )
 
     if ( !IS_SET(exit_info, EX_CLOSED) )
     {
-            ch->println( "Здесь уже открыто." );
+            ch->pecho( "Здесь уже открыто." );
             return;
     }
 
     if ( IS_SET(exit_info, EX_LOCKED) )
     {
-            ch->println( "Здесь заперто." );
+            ch->pecho( "Здесь заперто." );
             return;
     }
 
@@ -37,13 +37,13 @@ void open_door_extra ( Character *ch, int door, void *pexit )
             : ((EXIT_DATA *) pexit)->exit_info, EX_CLOSED);
 
     if ( eexit ) {
-        act( "$c1 открывает $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_ROOM );
-        act( "Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
+        oldact("$c1 открывает $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_ROOM );
+        oldact("Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
     }
     else {
         const char *doorname = direction_doorname((EXIT_DATA *) pexit);
-        act( "$c1 открывает $N4.", ch, 0, doorname, TO_ROOM );
-        act( "Ты открываешь $N4.", ch, 0, doorname, TO_CHAR );
+        oldact("$c1 открывает $N4.", ch, 0, doorname, TO_ROOM );
+        oldact("Ты открываешь $N4.", ch, 0, doorname, TO_CHAR );
     }
 
 

@@ -32,24 +32,24 @@ void PCharacter::gainExp( int gain )
         return;
 
     if (level > 19  && !IS_SET( act, PLR_CONFIRMED )) {
-        send_to("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
-                "Прочитай '{lRсправка подтверждение{lEhelp confirm{lx'.\n\r");
+        pecho("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
+                "Прочитай '{lRсправка подтверждение{lEhelp confirm{lx'.");
         return;
     }
 
     if (level > 19  && this->getPC( )->getHometown( ) == home_frigate ) {
-        send_to("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
-                "Прочитай '{lRсправка родной город{lEhelp hometown{lx'.\n\r");
+        pecho("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
+                "Прочитай '{lRсправка родной город{lEhelp hometown{lx'.");
         return;
     }
 
     if (level >= PK_MIN_LEVEL && IS_SET(in_room->room_flags, ROOM_NEWBIES_ONLY)) {
-        println("Ты не можешь больше получать опыт в этой арии.");
+        pecho("Ты не можешь больше получать опыт в этой арии.");
         return;
     }
 
     if (IS_SET(act,PLR_NO_EXP)) {
-        send_to("Ты не можешь получать опыт, пока твой дух во власти противника.\n\r");
+        pecho("Ты не можешь получать опыт, пока твой дух во власти противника.");
         return;
     }
     
@@ -60,7 +60,7 @@ void PCharacter::gainExp( int gain )
 
     while (level < LEVEL_HERO - 1 && getExpToLevel( ) <= 0) {
         
-        act_p("{CТы дости$gгло|г|гла следующего уровня!!!{x", this, 0, 0, TO_CHAR, POS_DEAD);
+        oldact_p("{CТы дости$gгло|г|гла следующего уровня!!!{x", this, 0, 0, TO_CHAR, POS_DEAD);
         setLevel( level + 1 );
 
         /* added for samurais by chronos */
@@ -133,7 +133,7 @@ void PCharacter::advanceLevel( )
         buf << ", {Y" << add_train << "{C/" << train << " {lRтренировку{lEtrain{lx";
     
     buf << ".{x";
-    println( buf.str( ).c_str( ) );
+    pecho( buf.str( ).c_str( ) );
 
     // Display how many new skills became available after level up.
     XMLIntegerAttribute::Pointer skillCount 

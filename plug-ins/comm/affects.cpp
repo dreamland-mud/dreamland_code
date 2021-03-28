@@ -353,9 +353,9 @@ CMDRUNP( affects )
 
     if (IS_CHARMED(ch)) {
         if (buf.str( ).empty( )) 
-            act( "$C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR);
+            oldact("$C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR);
         else 
-            act( "$C1 находится под действием следующих аффектов:", ch->master, 0, ch, TO_CHAR);
+            oldact("$C1 находится под действием следующих аффектов:", ch->master, 0, ch, TO_CHAR);
         buf << "{x";
         ch->master->send_to( buf );
         return;
@@ -366,12 +366,12 @@ CMDRUNP( affects )
 
     if (buf.str( ).empty( )) {
         if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
-            ch->println( "Ты не находишься под действием каких-либо аффектов." );
+            ch->pecho( "Ты не находишься под действием каких-либо аффектов." );
     } 
     else {
         if (permAff.isSet())
-            ch->send_to("\r\n");
-        ch->println( "Ты находишься под действием следующих аффектов:" );
+            ch->pecho("");
+        ch->pecho( "Ты находишься под действием следующих аффектов:" );
         buf << "{x";
 
         if (!IS_SET(flags, FSHOW_COLOR)) {

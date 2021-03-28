@@ -157,7 +157,7 @@ Character* get_CHAR( Character* ch, char** argument ) {
   *argument = one_argument( *argument, buf );
 
   if( !buf[0] || !( victim = get_char_world( ch, buf ) ) ) {
-    ch->send_to( "Игрок(моб) с таким названием не найден.\n\r" );
+    ch->pecho("Игрок(моб) с таким названием не найден.");
     return NULL;
   }
   return victim;
@@ -193,7 +193,7 @@ void modif_STAT( Character* ch, Character* victim, char *argument, int st ) {
     ch->send_to(buf);
     return;
   } else {
-    ch->send_to("Ошибочные данные.\n\r" );
+    ch->pecho("Ошибочные данные.");
   }
 }
 
@@ -204,7 +204,7 @@ CMDWIZP( set )
   int i = 0;
     
   if (ch->getPC( ) && ch->getPC( )->getAttributes( ).isAvailable( "noset" )) {
-      ch->println( "It's not a good idea." );
+      ch->pecho( "It's not a good idea." );
       return;
   }
 
@@ -216,7 +216,7 @@ CMDWIZP( set )
           tab_set[i].func( ch, argument );
           return;
         } else {
-          ch->send_to("Извините, но данная возможность находится в стадии разработки.\n\r" );
+          ch->pecho("Извините, но данная возможность находится в стадии разработки.");
           return;
         }
       }
@@ -252,7 +252,7 @@ void mset(Character *ch, char *argument)
                     tab_set_mob[i].func(ch, argument);
                     return;
                 } else {
-                    ch->send_to("Извините, но данная возможность находится в стадии разработки.\n\r");
+                    ch->pecho("Извините, но данная возможность находится в стадии разработки.");
                     return;
                 }
             }
@@ -349,7 +349,7 @@ void chg_mob_hp( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -387,7 +387,7 @@ void chg_mob_mana( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -425,7 +425,7 @@ void chg_mob_move( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -441,7 +441,7 @@ void chg_mob_act( Character* ch, char* argument )
         {
                 if ( !victim->is_npc() )
                 {
-                        ch->send_to ("Это не для игроков!\n\r");
+                        ch->pecho("Это не для игроков!");
                         return;
                 }
 
@@ -460,7 +460,7 @@ void chg_mob_act( Character* ch, char* argument )
         }
         else
         {
-                ch->send_to("Такого NPC в Мире нет.\n\r");
+                ch->pecho("Такого NPC в Мире нет.");
         }
 }
 
@@ -475,7 +475,7 @@ void chg_mob_off( Character* ch, char* argument )
         {
                 if ( !victim->is_npc() )
                 {
-                        ch->send_to ("Это не для игроков!\n\r");
+                        ch->pecho("Это не для игроков!");
                         return;
                 }
 
@@ -494,7 +494,7 @@ void chg_mob_off( Character* ch, char* argument )
         }
         else
         {
-                ch->send_to("Такого NPC в Мире нет.\n\r");
+                ch->pecho("Такого NPC в Мире нет.");
         }
 }
 
@@ -509,7 +509,7 @@ void chg_mob_imm( Character* ch, char* argument )
         {
                 if ( !victim->is_npc() )
                 {
-                        ch->send_to ("Это не для игроков!\n\r");
+                        ch->pecho("Это не для игроков!");
                         return;
                 }
 
@@ -528,7 +528,7 @@ void chg_mob_imm( Character* ch, char* argument )
         }
         else
         {
-                ch->send_to("Такого NPC в Мире нет.\n\r");
+                ch->pecho("Такого NPC в Мире нет.");
         }
 }
 
@@ -543,7 +543,7 @@ void chg_mob_res( Character* ch, char* argument )
         {
                 if ( !victim->is_npc() )
                 {
-                        ch->send_to ("Это не для игроков!\n\r");
+                        ch->pecho("Это не для игроков!");
                         return;
                 }
 
@@ -562,7 +562,7 @@ void chg_mob_res( Character* ch, char* argument )
         }
         else
         {
-                ch->send_to("Такого NPC в Мире нет.\n\r");
+                ch->pecho("Такого NPC в Мире нет.");
         }
 }
 
@@ -577,7 +577,7 @@ void chg_mob_vuln( Character* ch, char* argument )
         {
                 if ( !victim->is_npc() )
                 {
-                        ch->send_to ("Это не для игроков!\n\r");
+                        ch->pecho("Это не для игроков!");
                         return;
                 }
 
@@ -596,7 +596,7 @@ void chg_mob_vuln( Character* ch, char* argument )
         }
         else
         {
-                ch->send_to("Такого NPC в Мире нет.\n\r");
+                ch->pecho("Такого NPC в Мире нет.");
         }
 }
 
@@ -626,7 +626,7 @@ void chg_mob_align( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -637,12 +637,12 @@ void chg_mob_relig( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
       if (victim->is_npc()) {
-          ch->send_to("Not for NPC!\r\n");
+          ch->pecho("Not for NPC!");
           return;
       }
 
       if (!( god = religionManager->findUnstrict( argument ) )) {
-          ch->println("Религия не найдена.");
+          ch->pecho("Религия не найдена.");
           return;
       }
 
@@ -679,7 +679,7 @@ void chg_mob_questp( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
     if( victim->is_npc() ) {
-      ch->send_to("Данный параметр можно изменить только игрокам.\n\r");
+      ch->pecho("Данный параметр можно изменить только игрокам.");
       return;
     }
     if( is_number( argument ) ) {
@@ -701,7 +701,7 @@ void chg_mob_questp( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -715,13 +715,13 @@ void chg_mob_questt( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
     if( victim->is_npc() ) {
-      ch->send_to("Данный параметр можно изменить только игрокам.\n\r");
+      ch->pecho("Данный параметр можно изменить только игрокам.");
       return;
     }
     
     XMLAttributeTimer::Pointer qd = victim->getPC( )->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );        
     if (!qd) {
-        ch->send_to("Это сейчас невозможно.\n\r");
+        ch->pecho("Это сейчас невозможно.");
         return;
     }
 
@@ -736,13 +736,13 @@ void chg_mob_questt( Character* ch, char* argument ) {
 
         if (victim->getPC( )->getAttributes( ).isAvailable( "quest" )) {
             if( adv_value < 2 || adv_value > 60 ) {
-                ch->send_to( "Значение должно лежать в пределах 2...60.\n\r" );
+                ch->pecho("Значение должно лежать в пределах 2...60.");
                 return;
             }
         }
         else {
             if( adv_value < 0 || adv_value > 60 ) {
-                ch->send_to( "Значение должно лежать в пределах 0...60.\n\r" );
+                ch->pecho("Значение должно лежать в пределах 0...60.");
                 return;
             }
         }
@@ -752,7 +752,7 @@ void chg_mob_questt( Character* ch, char* argument ) {
         ch->send_to(buf);
         return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -783,7 +783,7 @@ void chg_mob_gold( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -798,7 +798,7 @@ void chg_mob_level( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
     if( !victim->is_npc() ) {
-      ch->send_to("Данный параметр можно изменить только мобам.\n\rИспользуйте advance <char> level.\n\r");
+      ch->pecho("Данный параметр можно изменить только мобам.\n\rИспользуйте advance <char> level.");
       return;
     }
     if( is_number( argument ) ) {
@@ -820,7 +820,7 @@ void chg_mob_level( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -833,7 +833,7 @@ void chg_mob_train( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
       if (victim->is_npc()) {
-          ch->send_to("Not for NPC!\r\n");
+          ch->pecho("Not for NPC!");
           return;
       }
 
@@ -856,7 +856,7 @@ void chg_mob_train( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -869,7 +869,7 @@ void chg_mob_practice( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
       if (victim->is_npc()) {
-          ch->send_to("Not for NPC!\r\n");
+          ch->pecho("Not for NPC!");
           return;
       }
 
@@ -892,7 +892,7 @@ void chg_mob_practice( Character* ch, char* argument ) {
       ch->send_to(buf);
       return;
     } else {
-      ch->send_to("Ошибочные данные.\n\r");
+      ch->pecho("Ошибочные данные.");
     }
   }
 }
@@ -923,15 +923,15 @@ void chg_mob_killer( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
     if( victim->is_npc() ) {
-      ch->send_to("Это не игрок!\n\r");
+      ch->pecho("Это не игрок!");
       return;
     }
     if( IS_KILLER( victim ) || victim->is_immortal() ) {
       REMOVE_KILLER( victim );
-      ch->send_to("{RKILLER{x remove.\n\r");
+      ch->pecho("{RKILLER{x remove.");
     } else {
       set_killer( victim );
-      ch->send_to("{RKILLER{x set.\n\r");
+      ch->pecho("{RKILLER{x set.");
     }
   }
 }
@@ -941,15 +941,15 @@ void chg_mob_violent( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
     if( victim->is_npc() ) {
-      ch->send_to("Это не игрок!\n\r");
+      ch->pecho("Это не игрок!");
       return;
     }
     if( IS_VIOLENT( victim ) || victim->is_immortal() ) {
       REMOVE_VIOLENT( victim );
-      ch->send_to("{BVIOLENT{x remove.\n\r");
+      ch->pecho("{BVIOLENT{x remove.");
     } else {
       set_violent( victim );
-      ch->send_to("{BVIOLENT{x set.\n\r");
+      ch->pecho("{BVIOLENT{x set.");
     }
   }
 }
@@ -959,15 +959,15 @@ void chg_mob_slain( Character* ch, char* argument ) {
 
   if( ( victim = get_CHAR( ch, &argument ) ) ) {
     if( victim->is_npc() ) {
-      ch->send_to("Это не игрок!\n\r");
+      ch->pecho("Это не игрок!");
       return;
     }
     if( IS_SLAIN( victim ) || victim->is_immortal() ) {
       REMOVE_SLAIN( victim );
-      ch->send_to("{DSLAIN{x remove.\n\r");
+      ch->pecho("{DSLAIN{x remove.");
     } else {
       set_slain( victim );
-      ch->send_to("{DSLAIN{x set.\n\r");
+      ch->pecho("{DSLAIN{x set.");
     }
   }
 }
@@ -982,13 +982,13 @@ void chg_mob_qp( Character* ch, char* argument )
     DLString qpArg = arguments.getOneArgument();
 
     if (playerName.empty() || qpArg.empty()) {
-        ch->println("Укажите имя персонажа и кол-во qp.");
+        ch->pecho("Укажите имя персонажа и кол-во qp.");
         return;
     }
 
     pcm = PCharacterManager::find( playerName );
     if (!pcm) {
-        ch->send_to( "Персонаж не найден, укажите имя полностью.\r\n" );
+        ch->pecho("Персонаж не найден, укажите имя полностью.");
         return;
     }
 
@@ -1014,7 +1014,7 @@ void chg_mob_qp( Character* ch, char* argument )
       }
     }
 
-    ch->println("Использование: set char questp имя_персонажа [+|-]число");
+    ch->pecho("Использование: set char questp имя_персонажа [+|-]число");
 }
 
 void chg_mob_attr( Character* ch, char* argument ) 
@@ -1030,12 +1030,12 @@ void chg_mob_attr( Character* ch, char* argument )
     pcm = PCharacterManager::find( playerName );
 
     if (!pcm) {
-        ch->send_to( "Игрок не найден, укажите имя полностью.\r\n" );
+        ch->pecho("Игрок не найден, укажите имя полностью.");
         return;
     }
 
     if (attrName.empty( )) {
-        ch->println( "Укажите  название аттрибута." );
+        ch->pecho( "Укажите  название аттрибута." );
         return;
     }
     
@@ -1086,18 +1086,18 @@ void oset( Character* ch, char* argument )
 
         if ( arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0' )
         {
-                ch->send_to("Syntax:\n\r");
-                ch->send_to("  set obj <object> <field> <value> [<value>]\n\r");
-                ch->send_to("  Field being one of:\n\r");
-                ch->send_to("    value0 value1 value2 value3 value4 (v1-v4) \n\r");
-                ch->send_to("    cost extra level material owner timer wear\n\r");
-                ch->send_to("    weight gender personal property\n\r");
+                ch->pecho("Syntax:");
+                ch->pecho("  set obj <object> <field> <value> [<value>]");
+                ch->pecho("  Field being one of:");
+                ch->pecho("    value0 value1 value2 value3 value4 (v1-v4) ");
+                ch->pecho("    cost extra level material owner timer wear");
+                ch->pecho("    weight gender personal property");
                 return;
         }
 
         if ( ( obj = get_obj_world( ch, arg1 ) ) == 0 )
         {
-                ch->send_to("Nothing like that in heaven or earth.\n\r");
+                ch->pecho("Nothing like that in heaven or earth.");
                 return;
         }
 
@@ -1111,7 +1111,7 @@ void oset( Character* ch, char* argument )
             DLString key = value.getOneArgument();
 
             if (value.empty()) {
-                ch->println("Syntax: set obj <object> property <key> <value>");
+                ch->pecho("Syntax: set obj <object> property <key> <value>");
                 return;
             }
 
@@ -1126,7 +1126,7 @@ void oset( Character* ch, char* argument )
             MultiGender mg(MultiGender::UNDEF);
             mg.fromString(arg3);
             if (mg == MultiGender::UNDEF) {
-              ch->println("Неправильное значение грам. рода, используй: neutral, female, male, plural или первые буквы n f m p.");
+              ch->pecho("Неправильное значение грам. рода, используй: neutral, female, male, plural или первые буквы n f m p.");
               return;
             }
             
@@ -1147,7 +1147,7 @@ void oset( Character* ch, char* argument )
                 // Allocate and assign new behavior and all related flags.
                 PCMemoryInterface *owner = PCharacterManager::find(arg3);
                 if (!owner) {
-                    ch->println("Персонаж не найден, укажи имя полностью.");
+                    ch->pecho("Персонаж не найден, укажи имя полностью.");
                     return;
                 }
 
@@ -1156,7 +1156,7 @@ void oset( Character* ch, char* argument )
 
                 ObjectBehaviorManager::assign(obj, behaviorName);
                 if (!obj->behavior) {
-                    ch->println("Произошла ошибка, проверь логи.");
+                    ch->pecho("Произошла ошибка, проверь логи.");
                     return;
                 }
 
@@ -1314,24 +1314,24 @@ void sset( Character *ch, char *argument )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0' )
     {
-        ch->send_to("Syntax:\n\r");
-        ch->send_to("  set skill {y<имя>{x <spell или skill> <число>\n\r");
-        ch->send_to("  set skill {y<имя>{x <spell или skill> ?\n\r");
-        ch->send_to("  set skill {y<имя>{x all <число>\n\r");
-        ch->send_to("  set skill {y<имя>{x <временное умение> off\n\r");
-        ch->send_to("   (use the name of the skill, not the number)\n\r");
+        ch->pecho("Syntax:");
+        ch->pecho("  set skill {y<имя>{x <spell или skill> <число>");
+        ch->pecho("  set skill {y<имя>{x <spell или skill> ?");
+        ch->pecho("  set skill {y<имя>{x all <число>");
+        ch->pecho("  set skill {y<имя>{x <временное умение> off");
+        ch->pecho("   (use the name of the skill, not the number)");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg1 ) ) == NULL )
     {
-        ch->send_to("Нет тут такого.\n\r");
+        ch->pecho("Нет тут такого.");
         return;
     }
 
     if ( victim->is_npc() )
     {
-        ch->send_to("Not on NPC's.\n\r");
+        ch->pecho("Not on NPC's.");
         return;
     }
 
@@ -1341,7 +1341,7 @@ void sset( Character *ch, char *argument )
         sn   = SkillManager::getThis( )->unstrictLookup( arg2, victim );
     
         if (sn < 0) {
-            ch->send_to("No such skill or spell.\n\r");
+            ch->pecho("No such skill or spell.");
             return;
         }
     }
@@ -1360,18 +1360,18 @@ void sset( Character *ch, char *argument )
     if (arg_is_switch_off(arg3)) {
         PCSkillData &data = victim->getPC( )->getSkillData( sn );
         if (!data.isTemporary())
-            ch->println("Это умение не является временным для персонажа.");
+            ch->pecho("Это умение не является временным для персонажа.");
         else {
             data.clear();
             victim->getPC()->save();
-            ch->println("Временное умение удалено.");
+            ch->pecho("Временное умение удалено.");
         }
         return;
     }
 
     if ( !is_number( arg3 ) )
     {
-        ch->send_to("Value must be numeric.\n\r");
+        ch->pecho("Value must be numeric.");
         return;
     }
 

@@ -94,7 +94,7 @@ bool ClanSkill::usable( Character * ch, bool message = true ) const
         return true;
 
     if (message)
-        ch->println( "Клан не может сейчас придать тебе сил." );
+        ch->pecho( "Клан не может сейчас придать тебе сил." );
 
     return false;
 }
@@ -170,7 +170,7 @@ bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose )
         if (mob)
             ch->pecho( "%^C1 не служит твоему клану.", mob );
         else
-            ch->println( "Клановые умения практикуют у служителей клана, "
+            ch->pecho( "Клановые умения практикуют у служителей клана, "
                          "например, у лекаря или охранника." );
     }
 

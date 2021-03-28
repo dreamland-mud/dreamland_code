@@ -85,7 +85,7 @@ bool ExitsMovement::findTargetRoom( )
         return false;
 
     if (!pexit && !peexit) {
-        ch->println( "Извини, но ты не можешь туда идти." );
+        ch->pecho( "Извини, но ты не можешь туда идти." );
         return false;
     }
     
@@ -106,7 +106,7 @@ bool ExitsMovement::findTargetRoom( )
     }
 
     if (!to_room) { /* sanity check, will be re-checked in checkVisibility */
-        ch->println( "Жаль, но ты не можешь туда идти." );
+        ch->pecho( "Жаль, но ты не можешь туда идти." );
         return false;
     }
 
@@ -485,7 +485,7 @@ int ExitsMovement::adjustMovetype( Character *wch )
 
 void ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    act( "Ты следуешь за $C5.", fch, 0, wch, TO_CHAR );
+    oldact("Ты следуешь за $C5.", fch, 0, wch, TO_CHAR );
 
     if (peexit)
         ExitsMovement( fch, peexit, movetype ).moveRecursive( ); 

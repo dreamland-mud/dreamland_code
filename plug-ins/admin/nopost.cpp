@@ -44,14 +44,14 @@ CMDADM( nopost )
         DLString name = arguments.getOneArgument( );
 
         if( name.empty( ) ) {
-            ch->send_to( "Nopost whom?\n\r" );
+            ch->pecho("Nopost whom?");
             return;
         }
 
         pci = PCharacterManager::find( name );
         
         if (!pci) {
-            ch->send_to( "Жертва не найдена. Укажите имя правильно и полностью.\n\r" );
+            ch->pecho("Жертва не найдена. Укажите имя правильно и полностью.");
             return;
         }
 
@@ -70,12 +70,12 @@ CMDADM( nopost )
                 attributes->eraseAttribute( "nopost" );
                 PCharacterManager::saveMemory( pci );
 
-                ch->send_to( "NOPOST снят.\n\r" );
+                ch->pecho("NOPOST снят.");
                 wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
                         "%^C1 restores notes to %s.", ch, pci->getName( ).c_str( ) );
             }
             else {
-                ch->send_to( "Не получилось.\n\r" );
+                ch->pecho("Не получилось.");
             }
         }
         else if( arguments.empty( ) )
@@ -85,7 +85,7 @@ CMDADM( nopost )
             if (attr) 
                 ch->printf( "%s\r\n", attr->getUntilString( false ).c_str( ) );
             else
-                ch->send_to( "none\n\r" );
+                ch->pecho("none");
         }
         else
         {
@@ -98,7 +98,7 @@ CMDADM( nopost )
             attr->start( pci );
             PCharacterManager::saveMemory(pci);
 
-            ch->send_to( "NOPOST установлен.\n\r" );
+            ch->pecho("NOPOST установлен.");
             
             wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
                     "%^C1 revokes %s's notes.", ch, pci->getName( ).c_str( ) );
@@ -134,6 +134,6 @@ void XMLAttributeNoPost::end( PCMemoryInterface *pcm ) const
     PCharacter *pch;
 
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) 
-        pch->send_to( "Боги вернули тебе привилегию писать письма.\n\r" );
+        pch->pecho("Боги вернули тебе привилегию писать письма.");
 }
 

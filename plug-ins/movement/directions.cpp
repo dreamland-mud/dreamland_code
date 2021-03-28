@@ -128,7 +128,7 @@ int find_exit( Character *ch, const char *arg, int flags )
         }
 
         if (IS_SET(flags, FEX_VERBOSE))
-            act( "Ты не видишь $T здесь.", ch, 0, arg, TO_CHAR );
+            oldact("Ты не видишь $T здесь.", ch, 0, arg, TO_CHAR );
         
         return door;
     }
@@ -137,21 +137,21 @@ int find_exit( Character *ch, const char *arg, int flags )
     
     if ((!pexit || !pexit->u1.to_room) && IS_SET(flags, FEX_NO_EMPTY)) {
         if (IS_SET(flags, FEX_VERBOSE))
-            act( "Ты не видишь выхода $T отсюда.", ch, 0, dirs[door].leave, TO_CHAR);
+            oldact("Ты не видишь выхода $T отсюда.", ch, 0, dirs[door].leave, TO_CHAR);
 
         return -1;
     }
 
     if (pexit && !ch->can_see( pexit ) && IS_SET(flags, FEX_NO_INVIS)) {
         if (IS_SET(flags, FEX_VERBOSE))
-            act( "Ты не видишь выхода $T отсюда.", ch, 0, dirs[door].leave, TO_CHAR);
+            oldact("Ты не видишь выхода $T отсюда.", ch, 0, dirs[door].leave, TO_CHAR);
 
         return -1;
     }
 
     if ((!pexit || !IS_SET(pexit->exit_info, EX_ISDOOR)) && IS_SET(flags, FEX_DOOR)) {
         if (IS_SET(flags, FEX_VERBOSE))
-            act( "Ты не видишь двери $T отсюда.", ch, 0, dirs[door].leave, TO_CHAR);
+            oldact("Ты не видишь двери $T отсюда.", ch, 0, dirs[door].leave, TO_CHAR);
 
         return -1;
     }

@@ -279,18 +279,18 @@ void eyes_blinded_msg( Character *ch )
 
     for (auto &paf: ch->affected.findAllWithBits(&affect_flags, AFF_BLIND)) {
         if (paf->type == gsn_fire_breath)
-            ch->println( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
+            ch->pecho( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
         else if (paf->type == gsn_sand_storm)
-            ch->println( "Песок в глазах мешает тебе что-либо разглядеть." );
+            ch->pecho( "Песок в глазах мешает тебе что-либо разглядеть." );
         else if (paf->type == gsn_dirt_kicking)
-            ch->println( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
+            ch->pecho( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
         else
             continue;
 
         return;
     }
 
-    ch->println( "Твои глаза слепы, ты ничего не видишь!" );
+    ch->pecho( "Твои глаза слепы, ты ничего не видишь!" );
 }
 
 /*--------------------------------------------------------------
@@ -325,9 +325,9 @@ void nuke_pets( PCharacter *ch, int flags )
     pet->stop_follower( );
    
     if (pet->in_room == ch->in_room)
-        act( "$C1 медленно исчезает.", ch, NULL, pet, TO_NOTVICT );
+        oldact("$C1 медленно исчезает.", ch, NULL, pet, TO_NOTVICT );
     else
-        act( "$c1 медленно исчезает.", pet, NULL, NULL, TO_ROOM );
+        oldact("$c1 медленно исчезает.", pet, NULL, NULL, TO_ROOM );
         
     
     if (IS_SET(flags, FEXTRACT_TOTAL))
@@ -350,7 +350,7 @@ void notify_referers( Character *ch, int flags )
             wch->reply = 0;
 
         if (wch->doppel == ch && wch->isAffected(gsn_doppelganger)) {
-            wch->println("Ты принимаешь свое истинное обличье.");
+            wch->pecho("Ты принимаешь свое истинное обличье.");
             
             // TODO rework with verbose affect strip
             if (gsn_doppelganger->getAffect( ))

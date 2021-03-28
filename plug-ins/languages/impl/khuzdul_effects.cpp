@@ -45,8 +45,8 @@ bool FireproofWE::run( PCharacter *ch, Character *victim ) const
         affect_to_obj( obj, &af);
     }
 
-    act( "{CОбмундирование на $c6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
-    act( "{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
+    oldact("{CОбмундирование на $c6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
+    oldact("{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
     return true;
 }
 
@@ -59,11 +59,11 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
 
     if (!obj) {
         if (ch != victim) {
-            victim->println( "Ты чувствуешь легкое покалывание ладони." );
-            act( "Слово не достигло цели - $C1 ничем не вооруж$Gено|ен|ена.", ch, 0, victim, TO_CHAR );
+            victim->pecho( "Ты чувствуешь легкое покалывание ладони." );
+            oldact("Слово не достигло цели - $C1 ничем не вооруж$Gено|ен|ена.", ch, 0, victim, TO_CHAR );
         }
         else {
-            act( "Слово не достигло цели - ты ничем не вооруж$gено|ен|ена.", ch, 0, 0, TO_CHAR );
+            oldact("Слово не достигло цели - ты ничем не вооруж$gено|ен|ена.", ch, 0, 0, TO_CHAR );
         }
 
         return false;
@@ -86,7 +86,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
     victim->hitroll += af.modifier;
     victim->damroll += af.modifier;
 
-    act( "{CСекреты кузнецов древности преображают $o4!{x", ch, obj, 0, TO_ALL );
+    oldact("{CСекреты кузнецов древности преображают $o4!{x", ch, obj, 0, TO_ALL );
     return true;
 }
 
@@ -100,15 +100,15 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
     af.location         = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
 
     if (victim->isAffected( gsn_ancient_rage )) {
-        act( "{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0, TO_CHAR );
+        oldact("{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0, TO_CHAR );
         af.modifier = 0;
     }
     else {
-        act( "{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0, TO_CHAR );
+        oldact("{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0, TO_CHAR );
         af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
     }
 
-    act( "{CПламя древней ярости вспыхивает в $c6!{x", victim, 0, 0, TO_ROOM );
+    oldact("{CПламя древней ярости вспыхивает в $c6!{x", victim, 0, 0, TO_ROOM );
     affect_join( victim, &af );
     return true;
 }
@@ -126,8 +126,8 @@ bool MendingWE::run( PCharacter *ch, Character *victim ) const
         affect_strip(obj, gsn_corrosion, true);
     }
 
-    act( "{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
-    act( "{CСекреты древних кузнецов улучшают облик обмундирования $c2.{x", victim, 0, 0, TO_ROOM );
+    oldact("{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
+    oldact("{CСекреты древних кузнецов улучшают облик обмундирования $c2.{x", victim, 0, 0, TO_ROOM );
     return true;
 }
 

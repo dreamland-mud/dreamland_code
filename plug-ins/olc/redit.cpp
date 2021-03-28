@@ -806,7 +806,7 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
     if(!str_cmp(argument, "next")) {
         value = next_room(ch, pRoom);
         if (value < 0) {
-            ch->println("Все внумы в этой зоне уже заняты!");
+            ch->pecho("Все внумы в этой зоне уже заняты!");
             return 0;
         }
     } else
@@ -1055,8 +1055,8 @@ static bool redit_purge_obj(PCharacter *ch, Object *obj)
         return false;
     }
     
-    act("Ты уничтожаешь $o4.", ch, obj, 0, TO_CHAR);
-    act("$c1 уничтожает $o4.", ch, obj, 0, TO_ROOM);
+    oldact("Ты уничтожаешь $o4.", ch, obj, 0, TO_CHAR);
+    oldact("$c1 уничтожает $o4.", ch, obj, 0, TO_ROOM);
     extract_obj(obj);
     return true;
 }
@@ -1074,8 +1074,8 @@ static bool redit_purge_mob(PCharacter *ch, Character *vch)
         return false;
     }
 
-    act("Ты уничтожаешь $C4.", ch, 0, mob, TO_CHAR);
-    act("$c1 уничтожает $C4.", ch, 0, mob, TO_ROOM);
+    oldact("Ты уничтожаешь $C4.", ch, 0, mob, TO_CHAR);
+    oldact("$c1 уничтожает $C4.", ch, 0, mob, TO_ROOM);
     extract_char(mob);
     return true;
 }

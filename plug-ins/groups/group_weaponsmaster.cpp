@@ -53,17 +53,17 @@ SKILL_RUNP( second )
     Object *obj;
 
     if (argument[0] == '\0') {
-        ch->println( "Вооружиться чем?" );
+        ch->pecho( "Вооружиться чем?" );
         return;
     }
 
     if (( obj = get_obj_carry (ch, argument) ) == 0) {
-        ch->println( "У тебя нет этого." );
+        ch->pecho( "У тебя нет этого." );
         return;
     }
 
     if (!obj->can_wear( ITEM_WIELD )) {
-        ch->println( "Ты не можешь вооружиться этим как вторичным оружием." );
+        ch->pecho( "Ты не можешь вооружиться этим как вторичным оружием." );
         return;
     }
     
@@ -99,11 +99,9 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
         if ( IS_OBJ_STAT(obj,ITEM_NOREMOVE))
         {
-                act("$S оружие не двигается с места!",ch,0,victim,TO_CHAR);
-                act_p("$c1 пытается обезоружить тебя, но оружие не двигается с места!",
-                        ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 пытается обезоружить $C4, но оружие не двигается с места.",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                oldact("$S оружие не двигается с места!",ch,0,victim,TO_CHAR);
+                oldact("$c1 пытается обезоружить тебя, но оружие не двигается с места!", ch,0,victim,TO_VICT);
+                oldact("$c1 пытается обезоружить $C4, но оружие не двигается с места.", ch,0,victim,TO_NOTVICT);
                 return;
         }
 
@@ -113,12 +111,9 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
                 if ( number_percent() < skill )
                 {
-                        act_p("$C1 хватает тебя за руку и ускользает!",
-                                ch,0,victim,TO_CHAR,POS_RESTING);
-                        act_p("$c1 пытается обезоружить тебя, но ты хватаешь $s за руку и ускользаешь!",
-                                ch,0,victim,TO_VICT,POS_RESTING);
-                        act_p("$c1 пытается обезоружить $C4, но безуспешно.",
-                                ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        oldact("$C1 хватает тебя за руку и ускользает!", ch,0,victim,TO_CHAR);
+                        oldact("$c1 пытается обезоружить тебя, но ты хватаешь $s за руку и ускользаешь!", ch,0,victim,TO_VICT);
+                        oldact("$c1 пытается обезоружить $C4, но безуспешно.", ch,0,victim,TO_NOTVICT);
                         gsn_grip->improve( victim, true, ch );
                         return;
                 }
@@ -126,19 +121,19 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
                         gsn_grip->improve( victim, false, ch );
         }
 
-        act("Ты обезоруживаешь $C4!", ch,0, victim, TO_CHAR);
-        act( "$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT);
+        oldact("Ты обезоруживаешь $C4!", ch,0, victim, TO_CHAR);
+        oldact( "$c1 обезоруживает $C4!",ch, 0, victim,TO_NOTVICT);
 
         obj_from_char( obj );
 
         if ( IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_INVENTORY) ) 
         {
-                   act("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие!{x", ch, 0, victim, TO_VICT );
+                   oldact("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие!{x", ch, 0, victim, TO_VICT );
                 obj_to_char( obj, victim );
         }
         else
         {
-                   act("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT );
+                   oldact("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT );
                 obj_to_room( obj, victim->in_room );
                 if (victim->is_npc() && victim->wait == 0 && victim->can_see(obj))
                         do_get_raw(victim, obj);
@@ -146,12 +141,9 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
         if ( (obj2 = get_eq_char(victim, wear_second_wield)) != 0)
         {
-                act_p( "Ты вооружаешься вторичным оружием как основным!",
-                        ch, 0, victim,TO_VICT,POS_RESTING);
-                act_p( "$C1 вооружается вторичным оружием как основным!",
-                        ch, 0,victim,TO_CHAR ,POS_RESTING);
-                act_p( "$C1 вооружается вторичным оружием как основным!",
-                        ch, 0, victim,TO_NOTVICT ,POS_RESTING);
+                oldact( "Ты вооружаешься вторичным оружием как основным!", ch, 0, victim,TO_VICT);
+                oldact( "$C1 вооружается вторичным оружием как основным!", ch, 0,victim,TO_CHAR );
+                oldact( "$C1 вооружается вторичным оружием как основным!", ch, 0, victim,TO_NOTVICT );
                 unequip_char( victim, obj2);
                 equip_char( victim, obj2 , wear_wield);
         }
@@ -172,7 +164,7 @@ SKILL_RUNP( disarm )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Ты не сможешь обезоружить, если ты верхом!\n\r");
+                ch->pecho("Ты не сможешь обезоружить, если ты верхом!");
                 return;
         }
 
@@ -180,13 +172,13 @@ SKILL_RUNP( disarm )
 
         if ( (chance = gsn_disarm->getEffective( ch )) <= 1)
         {
-                ch->send_to("Ты не знаешь как обезоружить противника.\n\r");
+                ch->pecho("Ты не знаешь как обезоружить противника.");
                 return;
         }
 
         if ( !ch->is_npc() && !ch->move )
         {
-                act("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR);
+                oldact("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR);
                 return;
         }
         else
@@ -194,15 +186,14 @@ SKILL_RUNP( disarm )
 
         if (SHADOW(ch))
         {
-                ch->send_to("Да... Как глупо пытаться разоружить свою тень.\n\r");
-                act_p("$c1 пытается выбить у своей тени оружие.\n...как глупо это выглядит.",
-                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                ch->pecho("Да... Как глупо пытаться разоружить свою тень.");
+                oldact("$c1 пытается выбить у своей тени оружие.\n...как глупо это выглядит.", ch, 0, 0, TO_ROOM);
                 return;
         }
 
         if ( ( victim = ch->fighting ) == 0 )
         {
-                ch->send_to("Сейчас ты не сражаешься.\n\r");
+                ch->pecho("Сейчас ты не сражаешься.");
                 return;
         }
 
@@ -214,9 +205,9 @@ SKILL_RUNP( disarm )
 
         if ( ( obj = get_eq_char( victim, wear_wield ) ) == 0 )
         {
-                ch->send_to("Твой противник не вооружен.\n\r");
+                ch->pecho("Твой противник не вооружен.");
                 if(IS_CHARMED(ch) && ch->master->getPC())
-                ch->master->println("Твой противник не вооружен.");
+                ch->master->pecho("Твой противник не вооружен.");
                 return;
         }
 
@@ -258,7 +249,7 @@ SKILL_RUNP( disarm )
                 chance = chance * 3 / 4;
             else {
                 chance /= 3;
-                ch->send_to("Выбить оружие, которое ты не видишь, оказывается гораздо сложнее...\n\r");
+                ch->pecho("Выбить оружие, которое ты не видишь, оказывается гораздо сложнее...");
             }
         }
 
@@ -272,12 +263,9 @@ SKILL_RUNP( disarm )
         else
         {
                 ch->setWait( gsn_disarm->getBeats( ) );
-                act_p("Тебе не удалось обезоружить $C4.",
-                        ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("$c1 пытается обезоружить тебя, но не может.",
-                        ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 пытается обезоружить $C4, но не может.",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                oldact("Тебе не удалось обезоружить $C4.", ch,0,victim,TO_CHAR);
+                oldact("$c1 пытается обезоружить тебя, но не может.", ch,0,victim,TO_VICT);
+                oldact("$c1 пытается обезоружить $C4, но не может.", ch,0,victim,TO_NOTVICT);
                 gsn_disarm->improve( ch, false, victim );
         }
 
@@ -309,13 +297,13 @@ SKILL_RUNP( shield )
     
     if ( ( victim = ch->fighting ) == 0 )
     {
-        ch->send_to("Этот навык можно применять только в бою.\n\r");
+        ch->pecho("Этот навык можно применять только в бою.");
         return;
     }  
 
     if ( !gsn_shield_cleave->usable( ch ) )
     {
-        ch->send_to("Ты не знаешь как расколоть щит противника.\n\r");
+        ch->pecho("Ты не знаешь как расколоть щит противника.");
         return;
     }
  
@@ -325,12 +313,12 @@ SKILL_RUNP( shield )
     if (dual == 0)
     {
         if (weapon == 0) {
-            ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
+            ch->pecho( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.");
             return;
         }
         else {
             if (attack_table[weapon->value3()].damage != DAM_SLASH) {
-                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
                 return;                
             }
         }
@@ -340,7 +328,7 @@ SKILL_RUNP( shield )
             if ( attack_table[weapon->value3()].damage != DAM_SLASH &&
                  attack_table[dual->value3()].damage != DAM_SLASH ) {
             
-                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
                 return;               
             }
         }
@@ -352,20 +340,19 @@ SKILL_RUNP( shield )
 
     if ( ( shield = get_eq_char( victim, wear_shield )) == 0 )
     {
-        ch->send_to("Твой противник не использует щит.\n\r");
+        ch->pecho("Твой противник не использует щит.");
         return;
     }
 
     if (material_is_flagged( shield, MAT_INDESTR ) || shield->pIndexData->limit != -1 || IS_SET( shield->extra_flags, ITEM_NOPURGE ))
     {
-        ch->send_to("Щит твоего противника слишком прочен, его не удастся разрубить.\n\r");
+        ch->pecho("Щит твоего противника слишком прочен, его не удастся разрубить.");
         return;
     }
 
     if (SHADOW(ch)) {
-        act("Ты размахиваешься и разрубаешь свою тень.", ch,0,victim,TO_CHAR);
-        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_VICT);
-        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_NOTVICT);        
+        oldact("Ты размахиваешься и разрубаешь свою тень.", ch,0,victim,TO_CHAR);
+        oldact("$c1 размахивается и разрубает свою тень.", ch,0,victim,TO_ROOM);
         return;
     }
     
@@ -387,7 +374,7 @@ SKILL_RUNP( shield )
     
     else
     {
-        ch->send_to("Для этого ты должен вооружиться топором, мечом или алебардой.\n\r");
+        ch->pecho("Для этого ты должен вооружиться топором, мечом или алебардой.");
         return;
     }
 
@@ -420,7 +407,7 @@ SKILL_RUNP( shield )
             chance = chance * 3 / 4;
         else {
             chance /= 3;
-            ch->send_to("Разрубить щит, который ты не видишь, оказывается гораздо сложнее...\n\r");
+            ch->pecho("Разрубить щит, который ты не видишь, оказывается гораздо сложнее...");
         }
     }
         
@@ -430,19 +417,19 @@ SKILL_RUNP( shield )
     ch->setWait( gsn_shield_cleave->getBeats( )  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
-        act("Ты {1{Rраскалываешь{2 щит $C2 надвое!", ch,0,victim,TO_CHAR);
-        act("$c1 {1{RРАСКАЛЫВАЕТ{2 твой щит надвое!", ch,0,victim,TO_VICT);
-        act("$c1 раскалывает щит $C2 надвое.", ch,0,victim,TO_NOTVICT);
+        oldact("Ты {1{Rраскалываешь{2 щит $C2 надвое!", ch,0,victim,TO_CHAR);
+        oldact("$c1 {1{RРАСКАЛЫВАЕТ{2 твой щит надвое!", ch,0,victim,TO_VICT);
+        oldact("$c1 раскалывает щит $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_shield) );
     }
     else
     {        
-        act("Твое оружие со звоном отскакивает от щита $C2!", ch,0,victim,TO_CHAR);
-        act("Оружие $c2 со звоном отскакивает от твоего щита!", ch,0,victim,TO_VICT);
-        act("Оружие $c2 со звоном отскакивает от щита $C2.", ch,0,victim,TO_NOTVICT);
+        oldact("Твое оружие со звоном отскакивает от щита $C2!", ch,0,victim,TO_CHAR);
+        oldact("Оружие $c2 со звоном отскакивает от твоего щита!", ch,0,victim,TO_VICT);
+        oldact("Оружие $c2 со звоном отскакивает от щита $C2.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, false, victim );
-        ch->send_to("Вибрация от столкновения на мгновение ошеломляет тебя!\n\r");
+        ch->pecho("Вибрация от столкновения на мгновение ошеломляет тебя!");
         SET_BIT(ch->affected_by,AFF_WEAK_STUN);
     }
     return;
@@ -472,13 +459,13 @@ SKILL_RUNP( weapon )
     
     if ( ( victim = ch->fighting ) == 0 )
     {
-        ch->send_to("Этот навык можно применять только в бою.\n\r");
+        ch->pecho("Этот навык можно применять только в бою.");
         return;
     }  
 
     if ( !gsn_weapon_cleave->usable( ch ) )
     {
-        ch->send_to("Ты не знаешь как расколоть оружие противника.\n\r");
+        ch->pecho("Ты не знаешь как расколоть оружие противника.");
         return;
     }
  
@@ -488,12 +475,12 @@ SKILL_RUNP( weapon )
     if (dual == 0)
     {
         if (weapon == 0) {
-            ch->send_to( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.\n\r");
+            ch->pecho( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.");
             return;
         }
         else {
             if (attack_table[weapon->value3()].damage != DAM_SLASH) {
-                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
                 return;                
             }
         }
@@ -503,7 +490,7 @@ SKILL_RUNP( weapon )
             if ( attack_table[weapon->value3()].damage != DAM_SLASH &&
                  attack_table[dual->value3()].damage != DAM_SLASH ) {
             
-                ch->send_to( "Для этого навыка нужно оружие с рубящей кромкой.\n\r");
+                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
                 return;               
             }
         }
@@ -515,20 +502,20 @@ SKILL_RUNP( weapon )
     
     if ( ( vict_weapon = get_eq_char( victim, wear_wield )) == 0 )
     {
-        ch->send_to("Твой противник не вооружен.\n\r");
+        ch->pecho("Твой противник не вооружен.");
         return;
     }
 
     if (material_is_flagged( vict_weapon, MAT_INDESTR ) || vict_weapon->pIndexData->limit != -1 || IS_SET( vict_weapon->extra_flags, ITEM_NOPURGE ))
     {
-        ch->send_to("Оружие твоего противника слишком прочно, его не удастся разрубить.\n\r");
+        ch->pecho("Оружие твоего противника слишком прочно, его не удастся разрубить.");
         return;
     }
 
     if (SHADOW(ch)) {
-        act("Ты размахиваешься и разрубаешь свою тень.", ch,0,victim,TO_CHAR);
-        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_VICT);
-        act("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_NOTVICT);        
+        oldact("Ты размахиваешься и разрубаешь свою тень.", ch,0,victim,TO_CHAR);
+        oldact("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_VICT);
+        oldact("%^C1 размахивается и разрубает свою тень.", ch,0,victim,TO_NOTVICT);        
         return;
     }
     
@@ -550,7 +537,7 @@ SKILL_RUNP( weapon )
     
     else
     {
-        ch->send_to("Для этого ты должен вооружиться топором, мечом или алебардой.\n\r");
+        ch->pecho("Для этого ты должен вооружиться топором, мечом или алебардой.");
         return;
     }
 
@@ -585,7 +572,7 @@ SKILL_RUNP( weapon )
             chance = chance * 3 / 4;
         else {
             chance /= 3;
-            ch->send_to("Разрубить оружие, которое ты не видишь, оказывается гораздо сложнее...\n\r");
+            ch->pecho("Разрубить оружие, которое ты не видишь, оказывается гораздо сложнее...");
         }
     }
         
@@ -595,19 +582,19 @@ SKILL_RUNP( weapon )
     ch->setWait( gsn_weapon_cleave->getBeats( )  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
-        act("Ты {1{Rраскалываешь{2 оружие $C2 надвое!", ch,0,victim,TO_CHAR);
-        act("$c1 {1{RРАСКАЛЫВАЕТ{2 твое оружие надвое!", ch,0,victim,TO_VICT);
-        act("$c1 раскалывает оружие $C2 надвое.", ch,0,victim,TO_NOTVICT);
+        oldact("Ты {1{Rраскалываешь{2 оружие $C2 надвое!", ch,0,victim,TO_CHAR);
+        oldact("$c1 {1{RРАСКАЛЫВАЕТ{2 твое оружие надвое!", ch,0,victim,TO_VICT);
+        oldact("$c1 раскалывает оружие $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, true, victim );
         extract_obj( get_eq_char(victim,wear_wield) );
     }
     else
     {        
-        act("Твое оружие со звоном отскакивает от оружия $C2!", ch,0,victim,TO_CHAR);
-        act("Оружие $c2 со звоном отскакивает от твоего оружия!", ch,0,victim,TO_VICT);
-        act("Оружие $c2 со звоном отскакивает от оружия $C2.", ch,0,victim,TO_NOTVICT);
+        oldact("Твое оружие со звоном отскакивает от оружия $C2!", ch,0,victim,TO_CHAR);
+        oldact("Оружие $c2 со звоном отскакивает от твоего оружия!", ch,0,victim,TO_VICT);
+        oldact("Оружие $c2 со звоном отскакивает от оружия $C2.", ch,0,victim,TO_NOTVICT);
         gsn_weapon_cleave->improve( ch, false, victim );
-        ch->send_to("Вибрация от столкновения на мгновение ошеломляет тебя!\n\r");
+        ch->pecho("Вибрация от столкновения на мгновение ошеломляет тебя!");
         SET_BIT(ch->affected_by,AFF_WEAK_STUN);
     }
     return;
@@ -628,8 +615,8 @@ SKILL_RUNP( lash )
     int chance;
     
     if (!gsn_lash->usable( ch )) {
-        act("$c1 угрощающе щелкает хлыстом.", ch, 0, 0, TO_ROOM);
-        ch->send_to( "Что?\r\n" );
+        oldact("$c1 угрощающе щелкает хлыстом.", ch, 0, 0, TO_ROOM);
+        ch->pecho( "Что?" );
         return;
     }
     
@@ -640,30 +627,30 @@ SKILL_RUNP( lash )
         whip = get_eq_char(ch, wear_second_wield);
     if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP) 
     {
-        ch->send_to( "Возьми в руки хлыст.\n\r" );
+        ch->pecho( "Возьми в руки хлыст." );
         if(IS_CHARMED(ch) && ch->master->getPC() && ch->canCarryNumber( ) > 0)
-        ch->master->println("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
+        ch->master->pecho("Для этого умения твоему последователю потребуется вооружиться хлыстом.");
         return;
     }
 
     if (arg[0] == '\0') {
         victim = ch->fighting;
         if (victim == NULL) {
-            ch->send_to( "Но ты ни с кем не сражаешься!\n\r" );
+            ch->pecho( "Но ты ни с кем не сражаешься!" );
             return;
         }
     }
     else if ((victim = get_char_room(ch, arg)) == NULL) {
-        ch->send_to("Tут таких нет.\n\r");
+        ch->pecho("Tут таких нет.");
         return;
     }
     
     chance = gsn_lash->getEffective( ch );
 
     if (victim == ch || chance < 50) {
-        ch->send_to("Ты запутываешься в хлысте и падаешь!\n\r");
+        ch->pecho("Ты запутываешься в хлысте и падаешь!");
         ch->setWaitViolence( 5 );
-        act("$c1 старательно опутывает свои ноги хлыстом и падает на землю.", ch, 0, 0, TO_ROOM);
+        oldact("$c1 старательно опутывает свои ноги хлыстом и падает на землю.", ch, 0, 0, TO_ROOM);
         return;
     }
 
@@ -671,13 +658,13 @@ SKILL_RUNP( lash )
         return;
 
     if (IS_CHARMED(ch) && ch->master == victim) {
-        act("Но $C1 твой друг!", ch, NULL, victim, TO_CHAR);
+        oldact("Но $C1 твой друг!", ch, NULL, victim, TO_CHAR);
         return;
     }
 
     if (SHADOW(ch)) {
-        ch->send_to("Ты пытаешься огреть хлыстом собственную тень.\n\r");
-        act("$c1 бьет свою тень хлыстом.",ch,0,0,TO_ROOM);
+        ch->pecho("Ты пытаешься огреть хлыстом собственную тень.");
+        oldact("$c1 бьет свою тень хлыстом.",ch,0,0,TO_ROOM);
         return;
     }
 
@@ -724,9 +711,9 @@ SKILL_RUNP( lash )
             if (damage_nocatch(ch,victim,dam,gsn_lash, DAM_BASH, true, DAMF_WEAPON)
                 && number_percent( ) < chance) 
             {
-                act("$c1 подсекает тебя своим хлыстом!!", ch, NULL, victim, TO_VICT);
-                act("Ты подсекаешь $C4 своим хлыстом!", ch, NULL, victim, TO_CHAR);
-                act("$c1 подсекает $C4 своим хлыстом.", ch, NULL, victim, TO_NOTVICT);
+                oldact("$c1 подсекает тебя своим хлыстом!!", ch, NULL, victim, TO_VICT);
+                oldact("Ты подсекаешь $C4 своим хлыстом!", ch, NULL, victim, TO_CHAR);
+                oldact("$c1 подсекает $C4 своим хлыстом.", ch, NULL, victim, TO_NOTVICT);
                 
                 victim->setWaitViolence( number_range( 0, 2 ) );
                 victim->position = POS_RESTING;
@@ -736,9 +723,9 @@ SKILL_RUNP( lash )
     }
     else {
         damage(ch,victim,2,gsn_lash,DAM_BASH, false, DAMF_WEAPON);
-        act("Ты лишь оцарапа$gло|л|ла $C4.", ch, NULL, victim, TO_CHAR);
-        act("$c1 взмахом хлыста поцарапал $C4!", ch, NULL, victim, TO_NOTVICT);
-        act("Ты уклоняешься от хлыста $c2.", ch, NULL, victim, TO_VICT);
+        oldact("Ты лишь оцарапа$gло|л|ла $C4.", ch, NULL, victim, TO_CHAR);
+        oldact("$c1 взмахом хлыста поцарапал $C4!", ch, NULL, victim, TO_NOTVICT);
+        oldact("Ты уклоняешься от хлыста $c2.", ch, NULL, victim, TO_VICT);
         gsn_lash->improve( ch, false, victim );
         ch->setWaitViolence( 1 );
     }
@@ -768,35 +755,35 @@ SKILL_RUNP( throwspear )
 
         if ( !gsn_spear->usable( ch ) )
         {
-                ch->send_to("Ты не знаешь как метать копье.\n\r");
+                ch->pecho("Ты не знаешь как метать копье.");
                 return;
         }
 
         if ( ch->fighting )
         {
-                ch->send_to("Ты не можешь сконцентрироваться для метания копья.\n\r");
+                ch->pecho("Ты не можешь сконцентрироваться для метания копья.");
                 return;
         }
 
         if (!direction_range_argument(argument, argDoor, argVict, direction)) {
-                ch->send_to("Метнуть копье куда и в кого?\n\r");
+                ch->pecho("Метнуть копье куда и в кого?");
                 return;
         }
 
         if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 ) {
-            ch->send_to(errbuf);
+            ch->pecho(errbuf);
             return;
         }
 
         if ( !victim->is_npc() && victim->desc == 0 )
         {
-                ch->send_to("Ты не можешь сделать этого.\n\r");
+                ch->pecho("Ты не можешь сделать этого.");
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->send_to("Это бессмысленно.\n\r");
+                ch->pecho("Это бессмысленно.");
                 return;
         }
 
@@ -808,7 +795,7 @@ SKILL_RUNP( throwspear )
 
         if ( ch->in_room == victim->in_room )
         {
-                ch->send_to("Ты не можешь метнуть копье в упор.\n\r");
+                ch->pecho("Ты не можешь метнуть копье в упор.");
                 return;
         }
 
@@ -818,7 +805,7 @@ SKILL_RUNP( throwspear )
                 || spear->item_type != ITEM_WEAPON
                 || spear->value0() != WEAPON_SPEAR )
         {
-                ch->send_to("Для метания тебе необходимо копье!\n\r");
+                ch->pecho("Для метания тебе необходимо копье!");
                 return;            
         }
 
@@ -826,7 +813,7 @@ SKILL_RUNP( throwspear )
     /*
         if ( get_eq_char(ch,wear_second_wield) || get_eq_char(ch,wear_shield) )
         {
-                ch->send_to("Твоя вторая рука дожна быть свободна!\n\r");
+                ch->pecho("Твоя вторая рука дожна быть свободна!");
                 return;            
         } */
 
@@ -843,8 +830,8 @@ SKILL_RUNP( throwspear )
 
         chance += ch->hitroll - ch->getRealLevel();
 
-        act( "Ты метаешь $o4 $T.", ch, spear, dirs[ direction ].leave, TO_CHAR  );
-        act( "$c1 метает $o4 $T.", ch, spear, dirs[ direction ].leave, TO_ROOM );
+        oldact( "Ты метаешь $o4 $T.", ch, spear, dirs[ direction ].leave, TO_CHAR  );
+        oldact( "$c1 метает $o4 $T.", ch, spear, dirs[ direction ].leave, TO_ROOM );
 
         set_violent( ch, victim, false );
 

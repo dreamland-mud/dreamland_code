@@ -51,7 +51,7 @@ COMMAND(Confirm, "confirm")
     cmd = arguments.getOneArgument( );
     
     if (ch->is_npc( )) {
-        ch->send_to( "Тебе нельзя.\n\r" );
+        ch->pecho("Тебе нельзя.");
         return;
     }
     
@@ -99,7 +99,7 @@ void Confirm::doRequest( Character *ch )
     DLString descr;    
 
     if (IS_SET( ch->act, PLR_CONFIRMED )) {
-        ch->send_to( "Твой персонаж уже подтвержден.\n\r" );
+        ch->pecho("Твой персонаж уже подтвержден.");
         return;
     }
     
@@ -112,13 +112,13 @@ void Confirm::doRequest( Character *ch )
     }
     
     if (descr.empty( )) {
-        ch->send_to( "Прочитай внимательно '{lRсправка подтверждение{lEhelp confirm{lx' и '{lRсправка описание{lEhelp description{lx'.\r\n" );
+        ch->pecho("Прочитай внимательно '{lRсправка подтверждение{lEhelp confirm{lx' и '{lRсправка описание{lEhelp description{lx'.");
         return;
     }
 
     attr = get_confirm_attr(ch->getPC());
     
-    ch->println( "Твое описание отправлено Бессмертным на рассмотрение." );
+    ch->pecho( "Твое описание отправлено Бессмертным на рассмотрение." );
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 просит подтверждения своему персонажу ({y{hcconfirm list new{x).", ch );    
     send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
@@ -135,21 +135,21 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
     DLString name = arguments.getOneArgument( );
 
     if (name.empty( )) {
-        ch->send_to( "Подтвердить кого?\r\n" );
+        ch->pecho("Подтвердить кого?");
         return;
     }
 
     pci = PCharacterManager::find( name );
     
     if (!pci) {
-        ch->send_to( "Player not found. Misspeled name?\r\n" );
+        ch->pecho("Player not found. Misspeled name?");
         return;
     }
 
     victim = pci->getPlayer( );
 
     if (victim && IS_SET(victim->act, PLR_CONFIRMED)) {
-        ch->send_to( "Этот персонаж уже подтвержден.\r\n" );
+        ch->pecho("Этот персонаж уже подтвержден.");
         return;
     }
             
@@ -157,7 +157,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
 
     if (!attr) { 
         if (!victim) {
-            ch->send_to( "Может, хотя бы взглянешь на него?\r\n" );
+            ch->pecho("Может, хотя бы взглянешь на него?");
             return;
         } 
         
@@ -176,7 +176,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
 
     PCharacterManager::saveMemory( pci );
 
-    ch->send_to( "Ok.\r\n" );
+    ch->pecho("Ok.");
 
     wiznet( WIZ_CONFIRM, 0, 0,
             "Персонаж %^N1 подтвержден %C5.", pci->getName( ).c_str( ), ch );
@@ -193,19 +193,19 @@ void Confirm::doReject( Character *ch, DLString& arguments )
     DLString name = arguments.getOneArgument( );
 
     if (name.empty( )) {
-        ch->send_to( "Unconfirm whom?\r\n" );
+        ch->pecho("Unconfirm whom?");
         return;
     }
 
     if (arguments.empty( )) {
-        ch->send_to( "Нужно указать причину отказа.\r\n" );
+        ch->pecho("Нужно указать причину отказа.");
         return;
     }
 
     pci = PCharacterManager::find( name );
     
     if (!pci) {
-        ch->send_to( "Player not found. Misspeled name?\r\n" );
+        ch->pecho("Player not found. Misspeled name?");
         return;
     }
 
@@ -214,7 +214,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
     
     if (!attr) { 
         if (!victim) { 
-            ch->send_to( "Может, хотя бы взглянешь на него?\r\n" );
+            ch->pecho("Может, хотя бы взглянешь на него?");
             return;
         } else { 
             attr = get_confirm_attr(pci);
@@ -228,7 +228,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
 
     PCharacterManager::saveMemory( pci );
 
-    ch->send_to( "Ok.\r\n" );
+    ch->pecho("Ok.");
 
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 отказывает в подтверждении персонажу %^N1.", ch, pci->getName( ).c_str( ) );
@@ -244,28 +244,28 @@ void Confirm::doDelete( Character *ch, DLString& arguments )
     DLString name = arguments.getOneArgument( );
 
     if (name.empty( )) {
-        ch->send_to( "Чью заявку удалить?\r\n" );
+        ch->pecho("Чью заявку удалить?");
         return;
     }
 
     pci = PCharacterManager::find( name );
     
     if (!pci) {
-        ch->send_to( "Player not found. Misspeled name?\r\n" );
+        ch->pecho("Player not found. Misspeled name?");
         return;
     }
 
     attr = find_confirm_attr(pci);
     
     if (!attr) {
-        ch->send_to( "Этот игрок не посылал заявки на подтверждение.\r\n" );
+        ch->pecho("Этот игрок не посылал заявки на подтверждение.");
         return;
     }
     
     pci->getAttributes( ).eraseAttribute( "confirm" );
     PCharacterManager::saveMemory( pci );
 
-    ch->send_to( "Ok.\r\n" );
+    ch->pecho("Ok.");
 }
 
 void Confirm::doUnread( Character *ch )
@@ -323,7 +323,7 @@ void Confirm::doList( Character *ch, bool newOnly )
     }
 
     if (totalRequests == 0) {
-        ch->println("Нет ни одной заявки на подтверждение персонажа.");
+        ch->pecho("Нет ни одной заявки на подтверждение персонажа.");
     } else if (newRequests != 0) {
         ch->pecho("Найден%1$Iа|о|о %1$d нов%1$Iая|ые|ых заяв%1$Iка|ки|ок, всего заявок: %2$d.",
                   newRequests, totalRequests);
@@ -342,14 +342,14 @@ void Confirm::doShow( Character *ch, DLString& argument )
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-        ch->send_to( "Player not found. Misspeled name?\r\n" );
+        ch->pecho("Player not found. Misspeled name?");
         return;
     }
 
     attr = find_confirm_attr(pci);
     
     if (!attr) {
-        ch->send_to( "Этот игрок не посылал заявки на подтверждение.\r\n" );
+        ch->pecho("Этот игрок не посылал заявки на подтверждение.");
         return;
     }
 

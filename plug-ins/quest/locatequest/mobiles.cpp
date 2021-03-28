@@ -69,19 +69,19 @@ void LocateCustomer::givenBad( PCharacter *hero, Object *obj )
 
 void LocateCustomer::deadFromIdiot( PCMemoryInterface *pcm )
 {
-    act("{YТы прине$gсло|с|сла $C3 смерть, а тебя просили принести кое-что другое.{x", pcm->getPlayer( ), 0, ch, TO_CHAR);
+    oldact("{YТы прине$gсло|с|сла $C3 смерть, а тебя просили принести кое-что другое.{x", pcm->getPlayer( ), 0, ch, TO_CHAR);
 }
 
 void LocateCustomer::deadFromSuicide( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) 
-        act_p("{Y$c1 внезапно скончал$gось|ся|ась. Задание отменяется.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+        oldact_p("{Y$c1 внезапно скончал$gось|ся|ась. Задание отменяется.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void LocateCustomer::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-        act_p("{Y$c1 подло уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+        oldact_p("{Y$c1 подло уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void LocateCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 

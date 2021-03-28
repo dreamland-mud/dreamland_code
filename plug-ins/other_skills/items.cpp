@@ -49,7 +49,7 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
 
   if ( ch->isAffected(sn ) )
     {
-      ch->send_to("Кассандра использовалась совсем недавно.\n\r" );
+      ch->pecho("Кассандра использовалась совсем недавно.");
       return;
     }
 
@@ -59,8 +59,8 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
   af.location = APPLY_AC;
   af.modifier  = -30;
   affect_to_char( ch, &af );
-  act( "Таинственный щит окружает $c4.",ch, 0,0,TO_ROOM);
-  ch->send_to("Таинственный щит окружает тебя.\n\r");
+  oldact("Таинственный щит окружает $c4.",ch, 0,0,TO_ROOM);
+  ch->pecho("Таинственный щит окружает тебя.");
   return;
 
 }
@@ -73,7 +73,7 @@ VOID_SPELL(Matandra)::run( Character *ch, Character *victim, int sn, int level )
 
   if ( ch->isAffected(sn ) )
     {
-      ch->send_to("Кассандра использовалась для этой же цели совсем недавно.\n\r" );
+      ch->pecho("Кассандра использовалась для этой же цели совсем недавно.");
       return;
     }
 
@@ -97,8 +97,8 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
     ch->hit = min( ch->hit + 150, (int)ch->max_hit );
     update_pos( ch );
 
-    ch->send_to("Волна тепла согревает твое тело.\n\r");
-    act("$c1 выглядит лучше.", ch, 0, 0, TO_ROOM);
+    ch->pecho("Волна тепла согревает твое тело.");
+    oldact("$c1 выглядит лучше.", ch, 0, 0, TO_ROOM);
 }
 
 
@@ -111,9 +111,9 @@ VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int lev
     if ( CAN_DETECT(victim, DETECT_HIDDEN) )
     {
         if (victim == ch)
-          ch->send_to("Ты уже чувствуешь присутствие скрытых сил. \n\r");
+          ch->pecho("Ты уже чувствуешь присутствие скрытых сил. ");
         else
-          act_p("$C1 уже чувствует присутствие скрытых сил.",
+          oldact_p("$C1 уже чувствует присутствие скрытых сил.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -125,9 +125,9 @@ VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int lev
     af.modifier  = 0;
     af.bitvector.setValue(DETECT_HIDDEN);
     affect_to_char( victim, &af );
-    victim->send_to("Теперь ты чувствуешь присутствие скрытых сил.\n\r");
+    victim->pecho("Теперь ты чувствуешь присутствие скрытых сил.");
     if ( ch != victim )
-        ch->send_to("Ok.\n\r");
+        ch->pecho("Ok.");
     return;
 
 }

@@ -141,7 +141,10 @@ bool Damage::canDamage( )
     
     if (is_safe( ch, victim ))
         return false;
-
+    
+    if (paf)
+        return true;
+        
     adjustPosition( );
     adjustFighting( );
     
@@ -171,8 +174,8 @@ void Damage::adjustPosition( )
 
     if (ch->wait < 1 && ch->position > POS_STUNNED) {
         if (ch->position == POS_SITTING || ch->position == POS_RESTING) {
-             act( "$c1 встает на ноги под шквалом ударов.", ch, 0, 0, TO_ROOM ); 
-             act( "Ты встаешь на ноги под шквалом ударов.", ch, 0, 0, TO_CHAR );
+             oldact("$c1 встает на ноги под шквалом ударов.", ch, 0, 0, TO_ROOM ); 
+             oldact("Ты встаешь на ноги под шквалом ударов.", ch, 0, 0, TO_CHAR );
         }
         ch->position = POS_FIGHTING;
     }
@@ -447,27 +450,27 @@ void Damage::reportState( )
 {
     switch( victim->position.getValue( ) ) {
     case POS_MORTAL:
-        act_p( "$c1 смертельно ране$gно|н|на и скоро умрет, если $m не помогут.",
+        oldact_p("$c1 смертельно ране$gно|н|на и скоро умрет, если $m не помогут.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Ты смертельно ране$gно|н|на и скоро умрешь, если тебе не помогут.",
+        oldact_p("Ты смертельно ране$gно|н|на и скоро умрешь, если тебе не помогут.",
             victim, 0, 0, TO_CHAR,POS_DEAD);
         break;
     case POS_INCAP:
-        act_p( "$c1 совершенно беспомощ$gно|ен|на и скоро умрет, если $m не помогут.",
+        oldact_p("$c1 совершенно беспомощ$gно|ен|на и скоро умрет, если $m не помогут.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Ты совершенно беспомощ$gно|ен|на и скоро умрешь, если тебе не помогут.",
+        oldact_p("Ты совершенно беспомощ$gно|ен|на и скоро умрешь, если тебе не помогут.",
             victim, 0, 0, TO_CHAR,POS_DEAD);
         break;
     case POS_STUNNED:
-        act_p( "$c1 без сознания, но возможно придет в себя.",
+        oldact_p("$c1 без сознания, но возможно придет в себя.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-        victim->send_to("Ты без сознания, но еще можешь придти в себя.\n\r");
+        victim->pecho("Ты без сознания, но еще можешь придти в себя.");
         break;
     default:
         if ( dam > victim->max_hit / 4 )
-            victim->send_to("Это действительно было БОЛЬНО!\n\r");
+            victim->pecho("Это действительно было БОЛЬНО!");
         if ( victim->hit < victim->max_hit / 4 )
-            victim->send_to("Ты истекаешь {RКРОВЬЮ{x!\n\r");
+            victim->pecho("Ты истекаешь {RКРОВЬЮ{x!");
         break;
     }
 }
@@ -487,9 +490,11 @@ void Damage::handlePosition( )
      * Sleep spells and extremely wounded folks.
      * Don't call stop_fighting and wake up from selfdamage when you are not able to wake up
      */
-    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)){ 
+    if (!IS_AWAKE(victim) 
+        && !(IS_AFFECTED(victim, AFF_SLEEP) && (ch == victim || paf)))
+    { 
         if(victim->position == POS_SLEEPING){
-            victim->println("Ты просыпаешься от внезапной боли.");
+            victim->pecho("Ты просыпаешься от внезапной боли.");
         }
         stop_fighting( victim, false );
     }
@@ -530,8 +535,8 @@ void Damage::handlePosition( )
  *----------------------------------------------------------------------------*/
 void Damage::handleDeath( ) 
 {
-    act( "$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
-    victim->send_to("Тебя {RУБИЛИ{x!!\n\r\n\r");
+    oldact("$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
+    victim->pecho("Тебя {RУБИЛИ{x!!\n\r");
     
     eventBus->publish(CharDeathEvent(victim, killer));
 }

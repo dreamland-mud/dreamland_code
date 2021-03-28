@@ -42,7 +42,7 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     NPCharacter *pet;
     
     if (client->is_npc( ) || client->getPC( )->pet) {
-        client->println( "У тебя уже есть один питомец." );
+        client->pecho( "У тебя уже есть один питомец." );
         return false;
     }
 
@@ -52,7 +52,7 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     }
 
     if (getLevel( client ) > client->getModifyLevel( )) {
-        client->println( "У тебя недостаточно опыта, чтобы справиться с этим питомцем." );
+        client->pecho( "У тебя недостаточно опыта, чтобы справиться с этим питомцем." );
         return false;
     }
 
@@ -60,8 +60,8 @@ bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     pet = create( client->getPC( ) ); 
     client->setWaitViolence( 1 );
     
-    act( "В трудную минуту $E поможет тебе!", client, 0, pet, TO_CHAR );
-    act( "$c1 приобретает $C4.", client, 0, pet, TO_ROOM );
+    oldact("В трудную минуту $E поможет тебе!", client, 0, pet, TO_CHAR );
+    oldact("$c1 приобретает $C4.", client, 0, pet, TO_ROOM );
     interpret_raw(pet, "report");
     return true;
 }
@@ -235,7 +235,7 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
         return false;
 
     if (MOUNTED(client)) {
-        client->println( "У тебя уже есть скакун." );
+        client->pecho( "У тебя уже есть скакун." );
         return false;
     }
 
@@ -245,7 +245,7 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     }
 
     if (getLevel( client ) - 5 > client->getModifyLevel( )) {
-        ch->println("Тебе не хватит опыта справиться с этим скакуном.");
+        ch->pecho("Тебе не хватит опыта справиться с этим скакуном.");
         return false;
     }
 
@@ -255,8 +255,8 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     
     interpret_fmt( client, "mount %s", horse->getNameP( ) );
 
-    client->println("Наслаждайся своим скакуном.");
-    act( "$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
+    client->pecho("Наслаждайся своим скакуном.");
+    oldact("$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
     return true;
 }
 

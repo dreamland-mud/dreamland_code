@@ -118,7 +118,7 @@ wiznet( long flag, long flag_skip, int min_level, const char *fmt, ... )
 
         va_start(av, fmt);
         pch->vpecho(fmt, av);
-        pch->println("");
+        pch->pecho("");
         va_end(av);
     }
 }

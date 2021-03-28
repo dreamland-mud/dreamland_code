@@ -14,7 +14,7 @@ void PatientBehavior::deadFromIdiot( PCMemoryInterface *pcm )
     if (!getQuest( ) || !quest->isComplete( ))
         pcm->getPlayer( )->pecho( "{YТы вылечи%Gло|л|ла пациента сразу от всех болезней >8){x",  pcm->getPlayer( ) );
     else
-        pcm->getPlayer( )->println("{YСперва лечим, затем калечим?{x");
+        pcm->getPlayer( )->pecho("{YСперва лечим, затем калечим?{x");
 }
 
 void PatientBehavior::deadFromSuicide( PCMemoryInterface *pcm )
@@ -25,7 +25,7 @@ void PatientBehavior::deadFromSuicide( PCMemoryInterface *pcm )
 void PatientBehavior::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-        pcm->getPlayer( )->println( "{YПациент отправился на тот свет без твоей помощи.{x" );
+        pcm->getPlayer( )->pecho( "{YПациент отправился на тот свет без твоей помощи.{x" );
 }
 
 bool PatientBehavior::spell( Character *caster, int sn, bool before ) 
@@ -63,7 +63,7 @@ bool PatientBehavior::spell( Character *caster, int sn, bool before )
 
 void PatientBehavior::healInfect( PCharacter *pch )
 {
-    pch->println( "{YЧто ж ты творишь! Тебя лечить позвали.{x" );
+    pch->pecho( "{YЧто ж ты творишь! Тебя лечить позвали.{x" );
 }
 
 void PatientBehavior::healSuccess( PCharacter *pch )
@@ -73,23 +73,23 @@ void PatientBehavior::healSuccess( PCharacter *pch )
 
 void PatientBehavior::healComplete( PCharacter *pch )
 {
-    pch->println("Твое задание {YВЫПОЛНЕНО{x!");
-    pch->println("Вернись за вознаграждением к давшему тебе задание до того, как истечет время!");
+    pch->pecho("Твое задание {YВЫПОЛНЕНО{x!");
+    pch->pecho("Вернись за вознаграждением к давшему тебе задание до того, как истечет время!");
 }
 
 void PatientBehavior::healOtherSuccess( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) {
-        pcm->getPlayer( )->println( "{YКому-то удалось избавить твоего пациента от одного из недугов.{x" );
-        pcm->getPlayer( )->println( "Это отрицательно скажется на общем размере вознаграждения." );
+        pcm->getPlayer( )->pecho( "{YКому-то удалось избавить твоего пациента от одного из недугов.{x" );
+        pcm->getPlayer( )->pecho( "Это отрицательно скажется на общем размере вознаграждения." );
     }
 }
 
 void PatientBehavior::healOtherComplete( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) {
-        pcm->getPlayer( )->println( "{YКто-то другой полностью излечил твоего пациента.{x" );
-        pcm->getPlayer( )->println( "Вернись к квестору за утешительным призом." );
+        pcm->getPlayer( )->pecho( "{YКто-то другой полностью излечил твоего пациента.{x" );
+        pcm->getPlayer( )->pecho( "Вернись к квестору за утешительным призом." );
     }
 }
 

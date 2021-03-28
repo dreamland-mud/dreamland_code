@@ -32,7 +32,7 @@ Character * PersonalChannel::findListener( Character *ch, const DLString &arg ) 
     Character *victim = get_char_world( ch, arg.c_str( ) );
 
     if (!victim)
-        ch->println( "Ты не находишь этого персонажа." );
+        ch->pecho( "Ты не находишь этого персонажа." );
     
     return victim;
 }
@@ -51,7 +51,7 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
 bool PersonalChannel::checkIgnore( Character *ch, Character *victim ) const
 {
     if (CommunicationChannel::checkIgnore( ch, victim )) {
-        act_p( "$E не желает тебя слышать.", ch, 0, victim, TO_CHAR, position );
+        oldact_p("$E не желает тебя слышать.", ch, 0, victim, TO_CHAR, position );
         return true;
     }
 
@@ -64,16 +64,16 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
         return false;
    
     if (victim->is_npc( ) || !victim->getPC( )->getAttributes( ).isAvailable( "afk" ))
-        act_p( "$C1 отсутствует и не может сейчас получить твое сообщение.", 
+        oldact_p("$C1 отсутствует и не может сейчас получить твое сообщение.", 
                 ch, 0, victim, TO_CHAR, position );
     else
-        act_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", 
+        oldact_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", 
                 ch, 
                 victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
                                     "afk" )->getValue( ).c_str( ), 
                 victim, TO_CHAR, position );
 
-    act_p( "Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
+    oldact_p("Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -86,11 +86,11 @@ bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DL
         return false;
 
     if (victim->is_npc( )) {
-        act_p("$E сейчас сражается и не может получить твое сообщение.",ch,0,victim,TO_CHAR,position);
+        oldact_p("$E сейчас сражается и не может получить твое сообщение.",ch,0,victim,TO_CHAR,position);
         return true;
     }
     
-    act_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
+    oldact_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
             ch,0,victim,TO_CHAR,position);
     return true;
 }
@@ -103,7 +103,7 @@ bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const D
     if (victim->desc)
         return false;
 
-    act_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.",
+    oldact_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.",
             ch,0,victim,TO_CHAR,position);
     return true;
 }
@@ -116,7 +116,7 @@ bool PersonalChannel::checkPosition( Character *ch, Character *victim ) const
     if (positionOther <= victim->position)
         return false;
     
-    act_p( "$E не слышит тебя, попробуй позже.", ch, 0, victim, TO_CHAR, position );
+    oldact_p("$E не слышит тебя, попробуй позже.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -127,7 +127,7 @@ bool PersonalChannel::checkVictimDeaf( Character *ch, Character *victim ) const
 
     if (IS_SET(victim->comm, COMM_QUIET) || IS_SET(victim->comm, COMM_DEAF))
     {
-        act_p( "Твое сообщение не дошло $M.", ch, 0, victim, TO_CHAR, position );
+        oldact_p("Твое сообщение не дошло $M.", ch, 0, victim, TO_CHAR, position );
         return true;
     }
 
@@ -180,12 +180,12 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     }
     
     if (needOutputChar( ch )) {
-        ch->println(messageChar);
+        ch->pecho(messageChar);
         postOutput(ch, messageChar);
     }
 
     if (needOutputVict( ch, victim )) {
-        victim->println(messageVict);
+        victim->pecho(messageVict);
         postOutput(victim, messageVict);
     }
 
@@ -195,17 +195,17 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
 bool PersonalChannel::canTalkPersonally( Character *ch ) const
 {
     if (IS_SET(ch->comm, COMM_NOTELL)) {
-        ch->println( "Боги лишили тебя возможности личного общения." );
+        ch->pecho( "Боги лишили тебя возможности личного общения." );
         return false;
     }
 
     if (IS_SET(ch->comm, COMM_QUIET)) {
-        ch->println( "Сперва выйди из режима тишины (quiet)." );
+        ch->pecho( "Сперва выйди из режима тишины (quiet)." );
         return false;
     }
 
     if (IS_SET(ch->comm, COMM_DEAF)) {
-        ch->println("Сперва выйди из режима глухоты (deaf).");
+        ch->pecho("Сперва выйди из режима глухоты (deaf).");
         return false;
     }
 
@@ -237,12 +237,12 @@ bool PersonalChannel::parseArguments( Character *ch, const DLString &constArgume
     name = msg.getOneArgument( );
 
     if (name.empty( )) {
-        ch->println( msgNoName );
+        ch->pecho( msgNoName );
         return false; 
     }
 
     if (msg.empty( )) {
-        ch->println( msgNoArg );
+        ch->pecho( msgNoArg );
         return false;
     }
 

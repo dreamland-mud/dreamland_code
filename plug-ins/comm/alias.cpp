@@ -119,7 +119,7 @@ public:
             ostringstream buf;
             
             if (aliases->empty( )) {
-                pch->send_to( "Не определен ни один синоним.\n\r" );
+                pch->pecho("Не определен ни один синоним.");
                 return;
             }
 
@@ -134,7 +134,7 @@ public:
         
         if (arg == "flush" || arg == "очистить") {
             aliases->clear( );
-            pch->send_to( "Все синонимы удалены.\r\n" );
+            pch->pecho("Все синонимы удалены.");
             return;
         }
         
@@ -144,7 +144,7 @@ public:
             if (i != aliases->end( ))
                 pch->printf( "%s означает '%s{x'.\r\n", arg.c_str( ), i->second.getValue( ).c_str( ) );
             else
-                pch->send_to( "Этот синоним не задан.\n\r" );
+                pch->pecho("Этот синоним не задан.");
 
             return;
         }
@@ -153,7 +153,7 @@ public:
                 || argument == "prefix"
                 || argument == "alias")
         {
-            pch->send_to( "Этим командам нельзя присвоить синоним!\n\r" );
+            pch->pecho("Этим командам нельзя присвоить синоним!");
             return;
         }
         
@@ -221,7 +221,7 @@ public:
         aliases = pch->getAttributes( ).getAttr<XMLAttributeAliases>( "aliases" );
         
         if (arg.empty( )) {
-            pch->send_to("Какой синоним удалить?\n\r");
+            pch->pecho("Какой синоним удалить?");
             return;
         }
         
@@ -229,12 +229,12 @@ public:
         
         if (i != aliases->end( ))
         {
-            pch->send_to( "Синоним удален.\n\r" );
+            pch->pecho("Синоним удален.");
             aliases->erase( i );
         }
         else
         {
-            pch->send_to( "Синоним с таким именем не задан.\n\r" );
+            pch->pecho("Синоним с таким именем не задан.");
         }
     }
 
@@ -296,7 +296,7 @@ public:
         iargs.line = get_multi_command( d, buffer );
 
         if (iargs.line.size( ) >  MAX_INPUT_LENGTH) {
-            iargs.ch->send_to( "Подстановка синонимов слишком удлинила строку, строка будет обрезана.\r\n" );
+            iargs.ch->pecho("Подстановка синонимов слишком удлинила строку, строка будет обрезана.");
             iargs.line.erase( MAX_INPUT_LENGTH - 1, iargs.line.size( ) );
         }
 
@@ -325,11 +325,11 @@ public:
         {
             if (ch->prefix[0] == '\0')
             {
-                ch->send_to("You have no prefix to clear.\r\n");
+                ch->pecho("You have no prefix to clear.");
                 return;
             }
 
-            ch->send_to("Prefix removed.\r\n");
+            ch->pecho("Prefix removed.");
             free_string(ch->prefix);
             ch->prefix = str_dup("");
             return;
@@ -379,7 +379,7 @@ public:
         
         if (ch->prefix[0] != 0) {
             if (strlen( ch->prefix ) + iargs.line.size( ) > MAX_INPUT_LENGTH)
-                iargs.ch->send_to("Line to long, prefix not processed.\r\n");
+                iargs.ch->pecho("Line to long, prefix not processed.");
             else
                 iargs.line = DLString( ch->prefix ) + " " + iargs.line;
         }
@@ -425,7 +425,7 @@ public:
         // This choice is not from the latest menu.
         DLString menuAction = get_map_attribute_value(ch->getPC(), "menu", choice.toString());
         if (menuAction.empty()) {
-            ch->println("Такого выбора не было в меню.");            
+            ch->pecho("Такого выбора не было в меню.");            
             return false;
         }
 

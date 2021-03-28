@@ -95,13 +95,13 @@ DLString act_to_fmt(const char *s)
     return rc;
 }
 
-void act( const char *format, Character *ch, const void *arg1,
+void oldact( const char *format, Character *ch, const void *arg1,
           const void *arg2, int type )
 {
-    act_p( format, ch, arg1, arg2, type, POS_RESTING );
+    oldact_p( format, ch, arg1, arg2, type, POS_RESTING );
 }
 
-void act_p( const char *format, Character *ch, const void *arg1,
+void oldact_p( const char *format, Character *ch, const void *arg1,
             const void *arg2, int type, int min_pos )
 {
     if (!ch)
@@ -202,189 +202,6 @@ DLString vfmt(Character *to, const char *format, va_list av)
 {
     VarArgFormatter formatter(to);
     return formatter.vfmt(format, av);
-}
-
-
-
-/*---------------------------------------------------------------------------
- * format various player data 
- *--------------------------------------------------------------------------*/
-/*
- * %n              - name
- * %N              - pretitle+name
- * %c              - clan litera 
- * %C              - clan short name
- * %k              - [colored clan litera] 
- * %K              - colored clan short name
- * %l              - real level
- * %L              - clan level
- * %r              - race 3 literas 
- * %R              - race name
- * %P              - profession
- * %t              - clan title
- * %T              - [colored clan title]
- * %p              - parsed title
- * %b              - (remort count)
- * %B              - (colored remort count)
- *
- * %a              - last access time (in numbers)
- * %A              - last access time (in words)
- *
- */
-void player_fmt( const DLString &format, PCMemoryInterface *pc, ostringstream &buf, Character *to )
-{
-    const char *str;
-    PCharacter *pch = pc->getPlayer( );
-    
-    if (format.empty( ))
-        return;
-    
-    str = format.c_str( );
-
-    while (*str != '\0') {
-        DLString word;
-        bool left = false;
-        int width = 0;
-
-        if (*str != '%') {
-            buf << *str++;
-            continue;
-        }
-
-        ++str;
-
-        if (*str == '%') {
-            buf << *str++;
-            continue;
-        }
-
-        if (*str == '-') {
-            left = true;
-            ++str;
-        }         
-
-        while (isdigit( *str )) {
-            width += width * 10 + *str - '0';
-            str++;
-        }
-       
-        switch (*str) {
-        default:  
-            break;
-            
-        case 'n':
-            word = pc->getName( );
-            break;
-
-        case 'N':
-            if (pch && to)
-                word = to->seeName( pch );
-            break;
-            
-        case 'c':
-            if (!pc->getClan( )->isHidden( ))
-                word = pc->getClan( )->getShortName( ).at( 0 );
-            break;
-
-        case 'C':
-            word = pc->getClan( )->getColor( );
-            break;
-        
-        case 'k':
-            if (!pc->getClan( )->isHidden( ))
-                word += "{x[{" 
-                         + pc->getClan( )->getColor( )
-                         + pc->getClan( )->getShortName( ).at( 0 )
-                         + "{x]";
-            break;
-
-        case 'K':
-            if (!pc->getClan( )->isHidden( ))
-                word += pc->getClan( )->getColor( )
-                        + pc->getClan( )->getShortName( )
-                        + "{x";
-            break;
-            
-        case 'l':
-            word = pc->getLevel( );
-            break;
-
-        case 'L':
-            word = pc->getClanLevel( );
-            break;
-
-        case 'r':
-            word = pc->getRace( )->getPC( )->getWhoNameFor( to );
-            
-            if (word.size( ) < 4)
-                word = dlprintf( "  %-4s", word.c_str( ) );
-            else
-                word = dlprintf( " %-5s", word.c_str( ) );
-            break;
-
-        case 'R':
-            word = pc->getRace( )->getName( );
-            break;
-
-        case 'P':
-            word = pc->getProfession( )->getNameFor( to );
-            break;
-
-        case 't':
-            word = pc->getClan( )->getTitle( pc );
-            break;
-
-        case 'T':
-            if (!pc->getClan( )->isHidden( ))
-                word += "{x[{" 
-                       + pc->getClan( )->getColor( ) 
-                       + pc->getClan( )->getTitle( pc )
-                       + "{x]";
-            break;
-
-        case 'p':
-            if (pch) {
-                ostringstream titleBuf;
-                mudtags_convert( pch->getParsedTitle().c_str(), titleBuf, TAGS_CONVERT_VIS, to );             
-                word = titleBuf.str();
-            }
-            break;
-        
-        case 'b':
-            if (pc->getRemorts( ).size( ) > 0)
-                word += "(" + DLString(pc->getRemorts( ).size( )) + ")";
-            else
-                word = "   ";
-            break;
-        
-        case 'B':
-            if (pc->getRemorts( ).size( ) > 0)
-                word += "{W({M" + DLString(pc->getRemorts( ).size( )) + "{W){x";
-            else
-                word = "   ";
-            break;
-            
-        case 'a':
-            word = pc->getLastAccessTime( ).getTimeAsString( "%d/%m/%y %H:%M" );
-            break;
-
-        case 'A':
-            word = pc->getLastAccessTime( ).getTimeAsString( );
-            break;
-        }
-
-        if (left)
-            buf << word;
-    
-        for (int i = 0; i < width - (int) word.colorLength( ); i++)
-            buf << " ";
-
-        if (!left)
-            buf << word;
-        
-        if (*str)
-            ++str;
-    }
 }
 
 /*---------------------------------------------------------------------
@@ -517,7 +334,7 @@ void say_act( Character *listener, Character *teller,
     ostringstream buf;
 
     buf << "$C1 произносит '{g" << msg << "{x'";
-    act( buf.str( ).c_str( ), listener, arg, teller, TO_ALL );
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_ALL );
 }
 
 void tell_act( Character *listener, Character *teller, 
@@ -526,7 +343,7 @@ void tell_act( Character *listener, Character *teller,
     ostringstream buf;
 
     buf << "$C1 говорит тебе '{G" << msg << "{x'";
-    act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
 void tell_dim( Character *listener, Character *teller, 
@@ -535,7 +352,7 @@ void tell_dim( Character *listener, Character *teller,
     ostringstream buf;
 
     buf << "$C1 говорит тебе '{g" << msg << "{x'";
-    act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
+    oldact( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
 void hint_fmt(Character *ch, const char *format, ...)
@@ -557,5 +374,5 @@ void hint_fmt(Character *ch, const char *format, ...)
     DLString output = vfmt(ch, format, av);
     va_end(av);
 
-    ch->println("{y[{GПодсказка{y]{x " + output);
+    ch->pecho("{y[{GПодсказка{y]{x " + output);
 }

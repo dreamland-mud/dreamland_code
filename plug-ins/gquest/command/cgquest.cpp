@@ -37,7 +37,7 @@ COMMAND(CGQuest, "gquest")
     cmd = arguments.getOneArgument( );
     
     if (!pch) {
-        ch->send_to( "Тебе нельзя.\n\r" );
+        ch->pecho("Тебе нельзя.");
         return;
     }
     
@@ -150,7 +150,7 @@ void CGQuest::doInfo( PCharacter *ch )
         found = true;
     
     if (!found)
-        ch->println("Сейчас нет ни одного глобального задания.");
+        ch->pecho("Сейчас нет ни одного глобального задания.");
 }
 
 void CGQuest::doProgress( PCharacter *ch ) 
@@ -205,7 +205,7 @@ void CGQuest::doNoExp( PCharacter *ch, DLString& arguments )
         } else if (arg_is_no( arguments )) {
             attribute->setNoExp( false );
         } else {
-            ch->println("Используй '{lEgquest noexp yes{lRгквест безопыта да{lx' или '{lEgquest noexp no{lRгквест безопыта нет{lx'.");
+            ch->pecho("Используй '{lEgquest noexp yes{lRгквест безопыта да{lx' или '{lEgquest noexp no{lRгквест безопыта нет{lx'.");
             return;
         }
 
@@ -213,9 +213,9 @@ void CGQuest::doNoExp( PCharacter *ch, DLString& arguments )
     }
 
     if (attribute->getNoExp( ) == true) {
-        ch->send_to("Ты не будешь получать опыт как награду за глобальные квесты.\r\n" );
+        ch->pecho("Ты не будешь получать опыт как награду за глобальные квесты.");
     } else {
-        ch->send_to("Ты будешь получать опыт как награду за глобальные квесты.\r\n" );
+        ch->pecho("Ты будешь получать опыт как награду за глобальные квесты.");
     }
 }
 
@@ -351,14 +351,14 @@ void CGQuest::doStart( PCharacter *ch, DLString& arguments )
     GlobalQuestInfo::Config config;
     
     if (arguments.empty( )) {
-        ch->send_to( "Укажите ID глобального квеста.\r\n" );
+        ch->pecho("Укажите ID глобального квеста.");
         return;
     }
     
     gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( arguments.getOneArgument( ) );
 
     if (!gqi) {
-        ch->send_to( "Неправильный ID.\r\n" );
+        ch->pecho("Неправильный ID.");
         return;
     }
 
@@ -378,13 +378,13 @@ void CGQuest::doStop( PCharacter *ch, DLString& arguments )
     GlobalQuest::Pointer gq;
     
     if (arguments.empty( )) {
-        ch->send_to( "Укажите ID глобального квеста.\r\n" );
+        ch->pecho("Укажите ID глобального квеста.");
         return;
     }
     
     gq = GlobalQuestManager::getThis( )->findGlobalQuest( arguments.getOneArgument( ) );
     if (!gq) {
-        ch->send_to( "Неправильный ID, либо квест не запущен.\r\n" );
+        ch->pecho("Неправильный ID, либо квест не запущен.");
         return;
     }
     
@@ -394,7 +394,7 @@ void CGQuest::doStop( PCharacter *ch, DLString& arguments )
         ch->send_to( e.what( ) );
         return;
     }
-    ch->println( "Глобальный квест остановлен." );
+    ch->pecho( "Глобальный квест остановлен." );
 }
 
 void CGQuest::doTime( PCharacter *ch, DLString& arguments ) 
@@ -402,13 +402,13 @@ void CGQuest::doTime( PCharacter *ch, DLString& arguments )
     GlobalQuest::Pointer gq;
     
     if (arguments.empty( )) {
-        ch->send_to( "Укажите ID глобального квеста.\r\n" );
+        ch->pecho("Укажите ID глобального квеста.");
         return;
     }
     
     gq = GlobalQuestManager::getThis( )->findGlobalQuest( arguments.getOneArgument( ) );
     if (!gq) {
-        ch->send_to( "Неправильный ID, либо квест не запущен.\r\n" );
+        ch->pecho("Неправильный ID, либо квест не запущен.");
         return;
     }
     
@@ -437,7 +437,7 @@ void CGQuest::doTalk( PCharacter *ch, DLString& arguments )
     DLString id, arg = arguments;
     
     if (arguments.empty( )) {
-        ch->send_to( "Сказать что?\r\n" );
+        ch->pecho("Сказать что?");
         return;
     }
    
@@ -446,7 +446,7 @@ void CGQuest::doTalk( PCharacter *ch, DLString& arguments )
 
     if (gqi) {
         if (arguments.empty( ))
-            ch->send_to( "Сказать что?\r\n" );
+            ch->pecho("Сказать что?");
         else 
             GQChannel::gecho( *gqi, arguments );
     }
@@ -464,7 +464,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
     int time = 0;
 
     if (arguments.empty( )) {
-        ch->send_to( "Укажите ID глобального квеста.\r\n" );
+        ch->pecho("Укажите ID глобального квеста.");
         return;
     }
 
@@ -472,7 +472,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
     gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( id );
 
     if (!gqi) {
-        ch->send_to( "Неправильный ID.\r\n" );
+        ch->pecho("Неправильный ID.");
         return;
     }
 
@@ -487,7 +487,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
         else if (arg_is_no( on ) || arg_is_switch_off( on ))
             autostart = false;
         else {
-            ch->println( "Неправильный параметр: пишите {lRвкл{lEon{lx или {lRвыкл{lEoff{lx, {lRда{lEyes{lx или {lRнет{lEno{lx." );
+            ch->pecho( "Неправильный параметр: пишите {lRвкл{lEon{lx или {lRвыкл{lEoff{lx, {lRда{lEyes{lx или {lRнет{lEno{lx." );
             return;
         }
 
@@ -498,7 +498,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
             } 
             
             if (time <= 0) {
-                ch->send_to( "Неправильное время.\r\n" );
+                ch->pecho("Неправильное время.");
                 return;
             }
         }
@@ -522,13 +522,13 @@ void CGQuest::doRead( PCharacter *ch, DLString& arguments )
     GlobalQuestInfo::Pointer gqi;
     
     if (arguments.empty( )) {
-        ch->send_to( "Укажите ID глобального квеста.\r\n" );
+        ch->pecho("Укажите ID глобального квеста.");
         return;
     }
     
     gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( arguments.getOneArgument( ) );
     if (!gqi) {
-        ch->send_to( "Неправильный ID.\r\n" );
+        ch->pecho("Неправильный ID.");
         return;
     }
     
@@ -539,7 +539,7 @@ void CGQuest::doRead( PCharacter *ch, DLString& arguments )
         return;
     }
     
-    ch->send_to( "Конфигурация глобального квеста обновлена.\r\n" );
+    ch->pecho("Конфигурация глобального квеста обновлена.");
 }
 
 void CGQuest::doSet( PCharacter *ch, DLString &arguments )
@@ -556,19 +556,19 @@ void CGQuest::doSet( PCharacter *ch, DLString &arguments )
     plus = false;
 
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
-        ch->send_to("Использование: gquest set <player> <quest id> <num. of victories>\r\n");
+        ch->pecho("Использование: gquest set <player> <quest id> <num. of victories>");
         return;
     }
     
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-        ch->send_to("Укажите имя правильно и полностью.\r\n");
+        ch->pecho("Укажите имя правильно и полностью.");
         return;
     }
     
     if (!GlobalQuestManager::getThis( )->findGlobalQuestInfo( questID )) {
-        ch->send_to("Неправильный ID.\r\n");
+        ch->pecho("Неправильный ID.");
         return;
     }
     
@@ -580,7 +580,7 @@ void CGQuest::doSet( PCharacter *ch, DLString &arguments )
         
         count = number.toInt( );
     } catch (const ExceptionBadType&) {
-        ch->send_to("Неверное количество побед.\r\n");
+        ch->pecho("Неверное количество побед.");
         return;
     }
     
@@ -591,7 +591,7 @@ void CGQuest::doSet( PCharacter *ch, DLString &arguments )
 
     attr->setVictories( questID, count );
     PCharacterManager::saveMemory( pci );
-    ch->send_to("Done.\r\n");
+    ch->pecho("Done.");
 }
 
 void CGQuest::usage( PCharacter *ch ) 
