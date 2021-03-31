@@ -155,7 +155,8 @@ protected:
                 return;
             }
             else
-                oprog_examine( corpse, killer );      
+                oprog_examine( corpse, killer );    
+        }
     }
 
     void autoGold( )
