@@ -125,26 +125,37 @@ protected:
     {
         if (!corpse || !corpse->contains) 
             return;
-        
-        if(!killer->can_see( corpse )){
-            if(IS_AFFECTED(killer, AFF_BLIND))
-            killer->pecho("{WТы пытаешься вслепую ограбить труп, но ничего не выходит.{x");          
-            return;
-        }
 
         if (IS_SET(killer->act, PLR_AUTOLOOT)){
-            killer->pecho("{WТы автоматически берешь вещи из трупа:{x");
-            do_get_all_raw( killer, corpse );
+            if (!killer->can_see( corpse )) {
+                if (IS_AFFECTED(killer, AFF_BLIND))
+                    killer->pecho("{WТы пытаешься вслепую ограбить труп, но ничего не выходит.{x");
+                else
+                    killer->pecho("{WТы пытаешься ограбить труп, но почему-то не находишь его.{x");
+                return;
+            }
+            else {
+                killer->pecho("{WТы методично обдираешь все вещи с трупа:{x");
+                do_get_all_raw( killer, corpse );
+            }
         }
     }
 
     void autoLook( )
     {
-        if (!corpse || !corpse->contains || !killer->can_see( corpse ))
+        if (!corpse || !corpse->contains)
             return;
 
-        if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) 
-            oprog_examine( corpse, killer );
+        if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) {            
+            if (!killer->can_see( corpse )) {
+                if (IS_AFFECTED(killer, AFF_BLIND))
+                    killer->pecho("{WТебе хочется осмотреть труп, но ты ничего не видишь!{x");
+                else
+                    killer->pecho("{WТы пытаешься осмотреть труп, но почему-то не находишь его.{x");
+                return;
+            }
+            else
+                oprog_examine( corpse, killer );      
     }
 
     void autoGold( )
