@@ -30,6 +30,7 @@
 
 #include "magic.h"
 #include "skill_utils.h"
+#include "debug_utils.h"
 #include "damage.h"
 #include "material.h"
 #include "fight.h"
@@ -279,10 +280,11 @@ SKILL_RUNP( disarm )
 
 SKILL_RUNP( shield )
 {
+    Debug d(ch, "weaponsmaster", "shield");
     Character *victim;
     int wskill,vict_skill;
     float chance, skill_mod, level_mod, size_mod, stat_mod, wskill_mod;
-    Object *shield, *weapon, *dual;
+    Object *shield, *weapon, *dual, *wield;
     
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
     skill_mod   = 0.5;
@@ -307,35 +309,27 @@ SKILL_RUNP( shield )
         return;
     }
  
-    weapon = get_eq_char(ch,wear_wield);    
+    wield = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
-    
-    if (dual == 0)
-    {
-        if (weapon == 0) {
-            ch->pecho( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.");
-            return;
-        }
-        else {
-            if (attack_table[weapon->value3()].damage != DAM_SLASH) {
-                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
-                return;                
-            }
-        }
-    } 
+    weapon = 0; // Weapon that does the cleave.
+
+    if (!wield && !dual) {
+        ch->pecho( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.");
+        return;
+    }
+
+    if (!wield && dual) {
+        bug("dual wielding with no primary wield");
+        return;
+    }
+
+    if (attack_table[wield->value3()].damage == DAM_SLASH)
+        weapon = wield;
+    else if (dual && attack_table[dual->value3()].damage == DAM_SLASH)
+        weapon = dual;
     else {
-        if (weapon != 0) {
-            if ( attack_table[weapon->value3()].damage != DAM_SLASH &&
-                 attack_table[dual->value3()].damage != DAM_SLASH ) {
-            
-                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
-                return;               
-            }
-        }
-        else {
-            bug("dual wielding with no primary wield");
-            return;
-        }
+        ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
+        return;               
     }
 
     if ( ( shield = get_eq_char( victim, wear_shield )) == 0 )
@@ -360,38 +354,29 @@ SKILL_RUNP( shield )
     chance = 0;
     chance = gsn_shield_cleave->getEffective( ch ) * skill_mod; // 30-50% base
     
-    if ( weapon->value0() == WEAPON_AXE ||
-         weapon->value0() == WEAPON_POLEARM ||
-         dual->value0() == WEAPON_AXE ||      
-         dual->value0() == WEAPON_POLEARM )
-        
+    if (weapon->value0() == WEAPON_AXE || weapon->value0() == WEAPON_POLEARM) {
         chance = chance * 1.2; // 48-60%
-    
-    else if ( weapon->value0() == WEAPON_SWORD ||
-              dual->value0() == WEAPON_SWORD )     
-        
+    } else if (weapon->value0() == WEAPON_SWORD) {        
         chance = chance * 0.9;
-    
-    else
-    {
-        ch->pecho("Для этого ты должен вооружиться топором, мечом или алебардой.");
+    } else {
+        ch->pecho("Для этого ты долж%Gно|ен|на вооружиться топором, мечом или алебардой.", ch);
         return;
     }
 
     // +/-2% per each 1% skill diff    
-    wskill = ch->getSkill(get_weapon_sn(ch, false));
+    wskill = ch->getSkill(get_weapon_sn(weapon));
     vict_skill = std::max(1,gsn_shield_block->getEffective( ch ));
     chance += (wskill - vict_skill) * wskill_mod * 100;
 
     /* strength vs. con/dex, resist or evade */
     // +/-2% per each 1% skill diff  
-    chance += ( ch->getCurrStat(STAT_STR) - std::max(victim->getCurrStat(STAT_CON), victim->getCurrStat(STAT_DEX)) ) * stat_mod * 100;    
+    chance += ( ch->getCurrStat(STAT_STR) - std::max(victim->getCurrStat(STAT_CON), victim->getCurrStat(STAT_DEX)) ) * stat_mod * 100; 
 
     /* level */
     // +/-2% per each 1% skill level     
     chance += ( skill_level(*gsn_shield_cleave, victim) - skill_level(*gsn_shield_block, victim) ) * level_mod * 100;
     // +/-1% per each 1% obj level diff    
-    chance += std::max(weapon->level, dual->level) - shield->level;
+    chance += weapon->level - shield->level;
 
     // +/-2% per each size diff 
     chance += (ch->size - victim->size) * size_mod * 100; 
@@ -413,7 +398,9 @@ SKILL_RUNP( shield )
         
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
         chance = chance / 2;         
-        
+
+    d.log(chance, "chance");
+
     ch->setWait( gsn_shield_cleave->getBeats( )  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
@@ -421,7 +408,7 @@ SKILL_RUNP( shield )
         oldact("$c1 {1{RРАСКАЛЫВАЕТ{2 твой щит надвое!", ch,0,victim,TO_VICT);
         oldact("$c1 раскалывает щит $C2 надвое.", ch,0,victim,TO_NOTVICT);
         gsn_shield_cleave->improve( ch, true, victim );
-        extract_obj( get_eq_char(victim,wear_shield) );
+        extract_obj(shield);
     }
     else
     {        
@@ -441,10 +428,11 @@ SKILL_RUNP( shield )
 
 SKILL_RUNP( weapon )
 {
+    Debug d(ch, "weaponsmaster", "weapon");
     Character *victim;
     int wskill,vict_skill;
     float chance, skill_mod, level_mod, size_mod, stat_mod, wskill_mod;
-    Object *vict_weapon, *weapon, *dual;
+    Object *vict_weapon, *weapon, *dual, *wield;
     
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
     skill_mod   = 0.5;
@@ -469,37 +457,29 @@ SKILL_RUNP( weapon )
         return;
     }
  
-    weapon = get_eq_char(ch,wear_wield);    
+    wield = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
-    
-    if (dual == 0)
-    {
-        if (weapon == 0) {
-            ch->pecho( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.");
-            return;
-        }
-        else {
-            if (attack_table[weapon->value3()].damage != DAM_SLASH) {
-                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
-                return;                
-            }
-        }
-    } 
-    else {
-        if (weapon != 0) {
-            if ( attack_table[weapon->value3()].damage != DAM_SLASH &&
-                 attack_table[dual->value3()].damage != DAM_SLASH ) {
-            
-                ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
-                return;               
-            }
-        }
-        else {
-            bug("dual wielding with no primary wield");
-            return;
-        }
+    weapon = 0; // Weapon that does the cleave.
+
+    if (!wield && !dual) {
+        ch->pecho( "Этот навык можно использовать только с оружием в руках: топором, мечом или алебардой.");
+        return;
     }
-    
+
+    if (!wield && dual) {
+        bug("dual wielding with no primary wield");
+        return;
+    }
+
+    if (attack_table[wield->value3()].damage == DAM_SLASH)
+        weapon = wield;
+    else if (dual && attack_table[dual->value3()].damage == DAM_SLASH)
+        weapon = dual;
+    else {
+        ch->pecho( "Для этого навыка нужно оружие с рубящей кромкой.");
+        return;               
+    }
+
     if ( ( vict_weapon = get_eq_char( victim, wear_wield )) == 0 )
     {
         ch->pecho("Твой противник не вооружен.");
@@ -523,27 +503,18 @@ SKILL_RUNP( weapon )
     chance = 0;
     chance = gsn_weapon_cleave->getEffective( ch ) * skill_mod; // 30-50% base
     
-    if ( weapon->value0() == WEAPON_AXE ||
-         weapon->value0() == WEAPON_POLEARM ||
-         dual->value0() == WEAPON_AXE ||      
-         dual->value0() == WEAPON_POLEARM )
-        
+    if (weapon->value0() == WEAPON_AXE || weapon->value0() == WEAPON_POLEARM) {
         chance = chance * 1.2; // 48-60%
-    
-    else if ( weapon->value0() == WEAPON_SWORD ||
-              dual->value0() == WEAPON_SWORD )     
-        
+    } else if (weapon->value0() == WEAPON_SWORD) {
         chance = chance * 0.9;
-    
-    else
-    {
-        ch->pecho("Для этого ты должен вооружиться топором, мечом или алебардой.");
+    } else {
+        ch->pecho("Для этого ты долж%Gно|ен|на вооружиться топором, мечом или алебардой.", ch);
         return;
     }
 
     // +/-2% per each 1% skill diff    
-    wskill = ch->getSkill(get_weapon_sn(ch, false));
-    vict_skill = ch->getSkill(get_weapon_sn(victim, false));    
+    wskill = ch->getSkill(get_weapon_sn(weapon));
+    vict_skill = ch->getSkill(get_weapon_sn(vict_weapon));    
     vict_skill = std::max(vict_skill, gsn_grip->getEffective( victim ));   
     chance += (wskill - vict_skill) * wskill_mod * 100;
 
@@ -556,7 +527,7 @@ SKILL_RUNP( weapon )
     // TO-DO: add victim skill_level instead of getModifyLevel
     chance += ( skill_level(*gsn_weapon_cleave, victim) - victim->getModifyLevel() ) * level_mod * 100;
     // +/-1% per each 1% obj level diff    
-    chance += std::max(weapon->level, dual->level) - vict_weapon->level;
+    chance += weapon->level - vict_weapon->level;
 
     // +/-2% per each size diff 
     chance += (ch->size - victim->size) * size_mod * 100; 
@@ -578,7 +549,9 @@ SKILL_RUNP( weapon )
         
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
         chance = chance / 2;         
-        
+
+    d.log(chance, "chance");
+    
     ch->setWait( gsn_weapon_cleave->getBeats( )  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
@@ -597,7 +570,6 @@ SKILL_RUNP( weapon )
         ch->pecho("Вибрация от столкновения на мгновение ошеломляет тебя!");
         SET_BIT(ch->affected_by,AFF_WEAK_STUN);
     }
-    return;
 }
 
 
@@ -771,7 +743,7 @@ SKILL_RUNP( throwspear )
         }
 
         if ( ( victim = find_char( ch, argVict.c_str(), direction, &range, errbuf ) ) == 0 ) {
-            ch->pecho(errbuf);
+            ch->pecho(errbuf.str());
             return;
         }
 
