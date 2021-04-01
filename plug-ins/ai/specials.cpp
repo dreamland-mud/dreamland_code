@@ -265,7 +265,8 @@ static bool can_take_obj( Character *ch, Object *obj )
 {
     if (!obj->can_wear( ITEM_TAKE )) 
         return false;
-    if (obj->can_wear(ITEM_NO_SAC) || IS_SET(obj->extra_flags, ITEM_NOSAC))
+    // replacing NOSAC with NOPURGE restriction here	
+    if (IS_OBJ_STAT(obj,ITEM_NOPURGE))
 	return false;
     if (obj->getOwner( ))
         return false;
@@ -277,7 +278,8 @@ static bool can_take_obj( Character *ch, Object *obj )
         return false;
     if (obj->pIndexData->limit > 0)
         return false;
-    if (obj->item_type == ITEM_CORPSE_NPC && obj->contains)
+    // mobs shouldn't pick up ANY corpses	
+    if (obj->item_type == ITEM_CORPSE_NPC)
         return false;
     return true;
 }
@@ -334,6 +336,12 @@ bool BasicMobileBehavior::doScavenge( )
         return false;
     
     for (obj = ch->in_room->contents; obj; obj = obj->next_content) {
+	int v = obj->pIndexData->vnum;
+	// Mobs shouldn't pick up guts, useless gore    
+        if (   v == OBJ_VNUM_GUTS       || v == OBJ_VNUM_SEVERED_HEAD
+            || v == OBJ_VNUM_TORN_HEART || v == OBJ_VNUM_SLICED_ARM
+            || v == OBJ_VNUM_SLICED_LEG || v == OBJ_VNUM_BRAINS )
+            continue;	    
         if (!can_take_obj( ch, obj ))
             continue;
         if (count_obj_list( obj->pIndexData, ch->carrying ) >= 3)
