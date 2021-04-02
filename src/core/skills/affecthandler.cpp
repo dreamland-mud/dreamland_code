@@ -102,6 +102,36 @@ bool AffectHandler::onFight(const SpellTarget::Pointer &target, Affect *paf, Cha
     return false;
 }
 
+bool AffectHandler::onImmune(const SpellTarget::Pointer &target, Affect *paf, Character *attacker, int &dam, const char *damType, Object *wield, int damFlag, const char *skillName) 
+{
+    AffectHandler *ah = this;
+    switch (target->type) {
+        case SpellTarget::CHAR:
+            FENIA_NUM_CALL(ah, "Immune", dam, "CACisOis", target->victim, paf, attacker, dam, damType, wield, damFlag, skillName);
+            break;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
+bool AffectHandler::onHit(const SpellTarget::Pointer &target, Affect *paf, Character *attacker, int dam, const char *damType, Object *wield) 
+{
+    AffectHandler *ah = this;
+    switch (target->type) {
+        case SpellTarget::CHAR:
+            FENIA_CALL(ah, "Hit", "CACisO", target->victim, paf, attacker, dam, damType, wield);
+            break;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
 bool AffectHandler::onRemove(const SpellTarget::Pointer &target, Affect *paf) 
 {
     AffectHandler *ah = this;
@@ -125,6 +155,51 @@ bool AffectHandler::onRemove(const SpellTarget::Pointer &target, Affect *paf)
             return false;
     }
 
+    return false;    
+}
+
+bool AffectHandler::onGet(const SpellTarget::Pointer &target, Affect *paf, Character *actor) 
+{
+    AffectHandler *ah = this;
+
+    if (target->type != SpellTarget::OBJECT)
+        return false;
+
+    FENIA_CALL(ah, "Get", "OAC", target->obj, paf, actor);
+    return false;
+}
+
+bool AffectHandler::onSpec(const SpellTarget::Pointer &target, Affect *paf) 
+{
+    AffectHandler *ah = this;
+    switch (target->type) {
+        case SpellTarget::ROOM:
+            FENIA_CALL(ah, "SpecRoom", "RA", target->room, paf);
+            break;
+
+        case SpellTarget::CHAR:
+            FENIA_CALL(ah, "SpecChar", "CA", target->victim, paf);
+            break;
+
+        case SpellTarget::OBJECT:
+            FENIA_CALL(ah, "SpecObj", "OA", target->obj, paf);
+            break;       
+
+        default:
+            return false; 
+    }
+
+    return false;    
+}
+
+bool AffectHandler::onPourOut(const SpellTarget::Pointer &target, Affect *paf, Character *actor, Object *out, const char *liqname, int amount) 
+{
+    AffectHandler *ah = this;
+
+    if (target->type != SpellTarget::OBJECT)
+        return false;
+
+    FENIA_CALL(ah, "PourOut", "OACOsi", target->obj, paf, actor, out, liqname, amount);
     return false;    
 }
 

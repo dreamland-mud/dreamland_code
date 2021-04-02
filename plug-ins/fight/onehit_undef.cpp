@@ -13,6 +13,7 @@
 #include "skill.h"
 #include "skillcommand.h"
 #include "affect.h"
+#include "affecthandler.h"
 #include "race.h"
 #include "religion.h"
 #include "npcharacter.h"
@@ -164,6 +165,11 @@ bool UndefinedOneHit::mprog_hit()
     
     FENIA_CALL( victim, "Hit", "CisO", ch, dam, damType.c_str( ), wield );
     FENIA_NDX_CALL( victim->getNPC( ), "Hit", "CCisO", victim, ch, dam, damType.c_str( ), wield );
+
+    for (auto &paf: victim->affected.findAllWithHandler())
+        if (paf->type->getAffect()->onHit(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), wield))
+            return true;
+
     return false;
 }
 

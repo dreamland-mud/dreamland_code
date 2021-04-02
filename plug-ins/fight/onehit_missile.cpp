@@ -10,6 +10,7 @@
 
 #include "skill.h"
 #include "affect.h"
+#include "affecthandler.h"
 #include "race.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
@@ -426,6 +427,11 @@ bool MissileOneHit::mprog_immune()
     DLString sname = missileSkill->getName();
     FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), missile, dam_flag, sname.c_str());
     FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), missile, dam_flag, sname.c_str());
+
+    for (auto &paf: victim->affected.findAllWithHandler())
+        if (paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), missile, dam_flag, sname.c_str()))
+            return true;
+
     return false; 
 }
 
@@ -435,5 +441,10 @@ bool ThrowerOneHit::mprog_immune()
     DLString sname = throwerSkill->getName();
     FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), thrower, dam_flag, sname.c_str());
     FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), thrower, dam_flag, sname.c_str());
+
+    for (auto &paf: victim->affected.findAllWithHandler())
+        if (paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), thrower, dam_flag, sname.c_str()))
+            return true;
+
     return false; 
 }

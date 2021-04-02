@@ -10,6 +10,7 @@
 #include "register-impl.h"
 #include "lex.h"
 
+#include "affecthandler.h"
 #include "affecthandlertemplate.h"
 #include "commandtemplate.h"
 #include "liquid.h"
@@ -245,6 +246,9 @@ static void oprog_pour_out( Object *obj, Character *ch, Object *out, const char 
 {
     FENIA_VOID_CALL( obj, "PourOut", "COsi", ch, out, liqname, amount );
     FENIA_NDX_VOID_CALL( obj, "PourOut", "OCOsi", obj, ch, out, liqname, amount );
+
+    for (auto &paf: obj->affected.findAllWithHandler())
+        paf->type->getAffect()->onPourOut(SpellTarget::Pointer(NEW, obj), paf, ch, out, liqname, amount);
 }
 
 static void mprog_pour_out( Character *victim, Character *ch, Object *out, const char *liqname, int amount  )

@@ -11,6 +11,8 @@
 #include "register-impl.h"
 #include "lex.h"
 
+#include "affect.h"
+#include "affecthandler.h"
 #include "skillreference.h"
 #include "skill.h"
 #include "pcharacter.h"
@@ -124,6 +126,11 @@ bool Damage::mprog_hit()
     
     FENIA_CALL( victim, "Hit", "CisO", ch, dam, damType.c_str( ), NULL );
     FENIA_NDX_CALL( victim->getNPC( ), "Hit", "CCisO", victim, ch, dam, damType.c_str( ), NULL );
+
+    for (auto &paf: victim->affected.findAllWithHandler())
+        if (paf->type->getAffect()->onHit(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL))
+            return true;
+
     return false;
 }
 
@@ -353,6 +360,11 @@ bool Damage::mprog_immune()
     DLString damType = damage_table.name(dam_type);
     FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), NULL, dam_flag, "");
     FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), NULL, dam_flag, "");
+
+    for (auto &paf: victim->affected.findAllWithHandler())
+        if (paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL, dam_flag, ""))
+            return true;
+
     return false; 
 }
 

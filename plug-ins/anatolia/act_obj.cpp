@@ -63,6 +63,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "affect.h"
+#include "affecthandler.h"
 #include "race.h"
 #include "npcharacter.h"
 #include "room.h"
@@ -218,7 +219,11 @@ bool oprog_get( Object *obj, Character *ch )
     FENIA_CALL( obj, "Get", "C", ch );
     FENIA_NDX_CALL( obj, "Get", "OC", obj, ch );
     BEHAVIOR_VOID_CALL( obj, get, ch );
-    
+
+    for (auto &paf: obj->affected.findAllWithHandler())
+        if (paf->type->getAffect()->onGet(SpellTarget::Pointer(NEW, obj), paf, ch))
+            return true;
+
     if (obj->extracted)
         return true;
 

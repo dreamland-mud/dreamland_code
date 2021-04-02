@@ -12,6 +12,8 @@
 #include "register-impl.h"
 #include "lex.h"
 
+#include "affect.h"
+#include "affecthandler.h"
 #include "skillreference.h"
 #include "spell.h"
 #include "skillgroup.h"
@@ -133,6 +135,11 @@ bool SkillDamage::mprog_immune()
     DLString sname = skillManager->find(sn)->getName();
     FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str());
     FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str());
+
+    for (auto &paf: victim->affected.findAllWithHandler())
+        if (paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str()))
+            return true;
+
     return false; 
 }
 
