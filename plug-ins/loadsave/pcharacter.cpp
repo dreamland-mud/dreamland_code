@@ -47,6 +47,8 @@ GSN(cause_critical);
 GSN(cure_light);
 GSN(cure_serious);
 GSN(cure_critical);
+GSN(unholy_word);
+GSN(holy_word);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -280,6 +282,7 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_bat_sworm, gsn_bat_swarm );
     skill_exchange( this, gsn_ground_strike, gsn_critical_strike );
     skill_exchange( this, gsn_control_animal, gsn_dominate );
+    skill_exchange( this, gsn_unholy_word, gsn_holy_word );
     skill_merge(this, gsn_harm, gsn_cause_critical, gsn_cause_light, gsn_cause_critical);
     skill_merge(this, gsn_heal, gsn_cure_critical, gsn_cure_light, gsn_cure_critical);
 
