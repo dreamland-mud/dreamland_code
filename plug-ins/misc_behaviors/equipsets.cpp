@@ -222,7 +222,7 @@ void TravellersJoySet::fight( Character *ch )
 
     if (chance(4) && HEALTH(ch) < 75) {
         ch->pecho("{CКомплект одежд путешественника на мгновение вспыхивает ярким голубым светом.{x");
-        spell( gsn_cure_critical, ch->getModifyLevel(), ch, ch );
+        spell( gsn_heal, ch->getModifyLevel(), ch, ch );
     }
 }
 

@@ -35,9 +35,6 @@ GSN(ace_in_sleeves);
 GSN(card_vision);
 GSN(pull_card);
 
-GSN(cure_light);
-GSN(cure_serious);
-GSN(cure_critical);
 GSN(heal);
 GSN(superior_heal);
 GSN(master_healing);
@@ -622,9 +619,7 @@ bool CardSleevesBehavior::canEquip( Character *ch )
 void CardSleevesBehavior::fight( Character *ch ) 
 {
     static const int plushki [] = {
-        gsn_cure_light,
-        gsn_cure_serious,
-        gsn_cure_critical,
+        gsn_heal,
         gsn_heal,
         gsn_superior_heal,
         gsn_master_healing,

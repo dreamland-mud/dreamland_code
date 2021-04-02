@@ -354,10 +354,8 @@ void KnightWeapon::fight(Character *ch)
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
         return;
 
-    if (chance(3))
-        sn = gsn_cure_critical;
-    else if (chance(8))
-        sn = gsn_cure_serious;
+    if (chance(6))
+        sn = gsn_heal;
 
     if (sn > 0)
     {

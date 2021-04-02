@@ -29,10 +29,7 @@ BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnHealing [] = {
     { gsn_restoring_light,  50 },
     { gsn_master_healing,  100 },
     { gsn_superior_heal,   100 },
-    { gsn_heal,            100 },
-    { gsn_cure_critical,   100 },
-    { gsn_cure_serious,    100 },
-    { gsn_cure_light,       -1 }
+    { gsn_heal,             -1 }
 };
 
 BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnAttack [] = {
@@ -49,9 +46,7 @@ BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnAttack [] = {
     { gsn_heat_metal,      50 },
     { gsn_earthquake,      50 },
     { gsn_harm,           100 },
-    { gsn_cause_critical, 100 },
-    { gsn_cause_serious,  100 },
-    { gsn_cause_light,     -1 }
+    { gsn_harm,            -1 }
 };    
 
 BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnPanicAttack [] = {
@@ -63,9 +58,8 @@ BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnPanicAttack [] = {
     { gsn_dispel_evil,    100 },
     { gsn_dispel_good,    100 },
     { gsn_flamestrike,    100 },
-    { gsn_cause_critical, 100 },
-    { gsn_cause_serious,  100 },
-    { gsn_cause_light,     -1 }
+    { gsn_harm,           100 },
+    { gsn_harm,            -1 }
 };
         
 BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnPassiveDefence [] = {

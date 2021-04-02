@@ -121,14 +121,8 @@ static int potion_cure_level( Object *potion )
     cl = 0;
     for (i=1;i<5;i++)
     {
-        if ( gsn_cure_critical == potion->valueByIndex(i) )
-            cl += 3;
-        if ( gsn_cure_light == potion->valueByIndex(i))
-            cl += 1;
-        if ( gsn_cure_serious == potion->valueByIndex(i) )
-            cl += 2;
         if ( gsn_heal == potion->valueByIndex(i))
-            cl += 4;
+            cl += 2;
     }
     return(cl);
 }

@@ -1420,7 +1420,7 @@ void RangerStaff::fight( Character *ch )
     oldact_p("{BТвой посох рейнджера вспыхивает голубым светом!{x", ch, 0, 0, TO_CHAR, POS_DEAD );
     oldact("{BПосох рейнджера $c2 вспыхивает голубым светом!{x", ch, 0, 0, TO_ROOM );
 
-    spell( gsn_cure_critical, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
+    spell( gsn_heal, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
 }
 
 bool RangerStaff::death( Character *ch )

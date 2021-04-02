@@ -179,7 +179,7 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
       {
         switch(number_bits(3)) {
         case 0:
-          spell = gsn_cure_critical;
+          spell = gsn_heal;
           break;
         case 1:
           spell = gsn_haste;
@@ -197,10 +197,10 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
           spell = gsn_invisibility;
           break;
         case 6:
-          spell = gsn_cure_light;
+          spell = gsn_heal;
           break;
         case 7:
-          spell = gsn_cure_serious;
+          spell = gsn_heal;
           break;
         
         }

@@ -56,6 +56,14 @@
 DLString format_longdescr_to_char(const char *descr, Character *ch);
 GSN(enchant_weapon);
 GSN(enchant_armor);
+GSN(cause_light);
+GSN(cause_serious);
+GSN(cause_critical);
+GSN(cure_light);
+GSN(cure_serious);
+GSN(cure_critical);
+GSN(harm);
+GSN(heal);
 GSN(none);
 CLAN(none);
 PROF(necromancer);
@@ -471,6 +479,50 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                     room->getName(), room->vnum);
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
+    }
+
+    if (arg == "heal") {
+        ostringstream buf, hbuf, rbuf;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+            switch (pObj->item_type) {
+            case ITEM_WAND:
+            case ITEM_STAFF:
+                {
+                    int &v = pObj->value[3];
+                    if (v == gsn_cause_critical || v == gsn_cause_serious || v == gsn_cause_light)
+                        v = gsn_harm;
+                    else if (v == gsn_cure_light || v == gsn_cure_serious || v == gsn_cure_critical)
+                        v = gsn_heal;
+                    else
+                        continue;
+
+                    buf << "[" << pObj->vnum << "] replace value3 with " << skillManager->find(v)->getName() << endl;
+                    pObj->area->changed = true;
+                }
+                break;
+
+            case ITEM_SCROLL:
+            case ITEM_POTION:
+            case ITEM_PILL:
+                for (int i = 1; i <= 4; i++) {
+                    int &v = pObj->value[i];
+                    if (v == gsn_cause_critical || v == gsn_cause_serious || v == gsn_cause_light)
+                        v = gsn_harm;
+                    else if (v == gsn_cure_light || v == gsn_cure_serious || v == gsn_cure_critical)
+                        v = gsn_heal;
+                    else
+                        continue;
+
+                    buf << "[" << pObj->vnum << "] replace value" << i << " with " << skillManager->find(v)->getName() << endl;
+                    pObj->area->changed = true;
+                }
+                break;            
+            }
+        }
+
+        page_to_char( buf.str( ).c_str( ), ch );
     }
 }
 
