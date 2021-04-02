@@ -1066,27 +1066,6 @@ NMI_INVOKE( CharacterWrapper, interpret_cmd, "(cmd, args): выполняет к
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, say, "(format, args...): произносит вслух реплику, отформатированную как в методе act" )
-{
-    checkTarget( );
-        
-    DLString msg = regfmt(target, args).c_str();
-    ::interpret_cmd(target, "say", msg.c_str());
-    return Register();
-}
-
-NMI_INVOKE( CharacterWrapper, psay, "(ch, format, args...): произносит вслух реплику, отформатированную как в методе act и видимую только для ch" )
-{
-    checkTarget( );
-    RegisterList myArgs(args);
-    Character *ch= args2character(args);
-    myArgs.pop_front();
-
-    DLString msg = regfmt(ch, myArgs).c_str();
-    ch->pecho("%^C1 произносит '{g%s{x'", target, msg.c_str());
-    return Register();
-}
-
 NMI_INVOKE( CharacterWrapper, get_char_world, "(name): видимый для нас чар с именем name в мире" )
 {
     checkTarget( );
@@ -1348,6 +1327,36 @@ NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит от
 
     return Register( );
 }
+
+NMI_INVOKE( CharacterWrapper, say, "(format, args...): произносит вслух реплику, отформатированную как в методе act" )
+{
+    checkTarget( );
+
+    for (Character *to = target->in_room->people; to; to = to->next_in_room) {
+        if (to == target)
+            continue;
+        if (!to->can_sense(target))
+            continue;
+
+        DLString msg = regfmt(to, args);
+        to->pecho(POS_RESTING, "%^C1 произносит '{g%s{x'", target, msg.c_str());
+    }
+
+    return Register();
+}
+
+NMI_INVOKE( CharacterWrapper, psay, "(ch, format, args...): произносит вслух реплику, отформатированную как в методе act и видимую только для ch" )
+{
+    checkTarget( );
+    RegisterList myArgs(args);
+    Character *ch= args2character(args);
+    myArgs.pop_front();
+
+    DLString msg = regfmt(ch, myArgs);
+    ch->pecho("%^C1 произносит '{g%s{x'", target, msg.c_str());
+    return Register();
+}
+
 
 NMI_INVOKE( CharacterWrapper, getModifyLevel, "(): уровень, с учетом плюшек от ремортов" )
 {
