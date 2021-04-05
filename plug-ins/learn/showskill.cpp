@@ -43,6 +43,12 @@ CMDRUN( showskill )
     }
     
     skill->show( pch, buf );
+
+    if (buf.str().empty()) {
+        ch->pecho("Такого умения нет.");
+        return;        
+    }
+
     print_see_also(skill, pch, buf);
     ch->send_to( buf );
 }
