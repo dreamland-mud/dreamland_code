@@ -289,10 +289,11 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
         if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
             charFlag.setBit(paf->bitvector);
         else if (paf->global.getRegistry() == registry && !ch->is_npc()) {
-            notice("Wearloc: player %s loses %s wearlocs.", 
-                   ch->getName().c_str(), 
-                   paf->global.toString().c_str(),
-                   paf->type.getName().c_str());
+            if (registry == wearlocationManager)		
+		    notice("Wearloc: player %s loses %s wearlocs.", 
+			   ch->getName().c_str(), 
+			   paf->global.toString().c_str(),
+			   paf->type.getName().c_str());
             ch->getPC()->wearloc.remove(paf->global);
         }
 }

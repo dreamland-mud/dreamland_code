@@ -288,7 +288,7 @@ void affix_generator::collectAffixesForTier()
         if (checkAlignBonus(ai))
             continue;
 
-        if (ai.price >= 0 && !chance(retainChance))
+        if (ai.price >= 0 && !chance(retainChance/2))
             toErase.insert(ai.affixName);        
     }
     
