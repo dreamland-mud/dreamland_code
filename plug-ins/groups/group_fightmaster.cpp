@@ -47,7 +47,7 @@
 #include "def.h"
 #include "morphology.h"
 
-GSN(riding);
+GSN(cavalry);
 CLAN(shalafi);
 PROF(anti_paladin);
 PROF(samurai);
@@ -305,7 +305,7 @@ SKILL_RUNP( bash )
         int wait;
         bool FightingCheck;
 
-        if ( (MOUNTED(ch)) && (!gsn_riding->available(ch)) )
+        if ( (MOUNTED(ch)) && (!gsn_cavalry->available(ch)) )
         {
                 ch->pecho("Ты не знаешь, как применять такие навыки верхом.");
                 return;
@@ -396,7 +396,7 @@ SKILL_RUNP( bash )
 
         if ( MOUNTED(victim) )
         {
-            if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+            if (victim->mount->is_npc( ) && gsn_cavalry->available( victim )) {
                 ch->pecho("Ты не можешь сбить с ног того, кто верхом!");
                 return;
             }
@@ -600,7 +600,7 @@ SKILL_RUNP( trip )
 
         if ( MOUNTED(victim) )
         {
-            if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+            if (victim->mount->is_npc( ) && gsn_cavalry->available( victim )) {
                 ch->pecho("Ты не можешь подсечь того, кто верхом!");
                 return;
             }
@@ -1268,7 +1268,7 @@ SKILL_RUNP( dirt )
 
         if ( MOUNTED(victim) )
         {
-            if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+            if (victim->mount->is_npc( ) && gsn_cavalry->available( victim )) {
                 ch->pecho("Ты не можешь ослепить пылью того, кто верхом!");
                 return;
             }
@@ -1577,7 +1577,7 @@ SKILL_RUNP( smash )
     }
    
     if ( MOUNTED(victim) ) {
-        if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+        if (victim->mount->is_npc( ) && gsn_cavalry->available( victim )) {
             ch->pecho("Ты не можешь сбить с ног того, кто верхом!");
             return;
         }

@@ -42,7 +42,7 @@ GSN(resistance);
 GSN(dark_shroud);
 GSN(protection_heat);
 GSN(protection_cold);
-GSN(prayer);
+GSN(liturgy);
 GSN(stardust);
 PROF(cleric);
 PROF(samurai);
@@ -400,7 +400,7 @@ void Damage::protectRazer( )
 
 void Damage::protectPrayer( )
 {
-    if (victim->isAffected( gsn_prayer )) 
+    if (victim->isAffected( gsn_liturgy )) 
         dam -= dam * victim->getModifyLevel( ) / 1200;
 }
 

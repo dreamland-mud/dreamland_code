@@ -37,7 +37,7 @@
 #include "act.h"
 #include "def.h"
 
-GSN(inspiration);
+GSN(creativity);
 GSN(corrosion);
 
 SPELL_DECL(BlessWeapon);
@@ -116,7 +116,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
 
-    inspire = ch->isAffected( gsn_inspiration );
+    inspire = ch->isAffected( gsn_creativity );
     /* this means they have no bonus */
     ac_bonus = 0;
     fail = 25;        /* base 25% chance of failure */
@@ -329,7 +329,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
     fail = URANGE(5,fail,95);
     result = number_percent();
 
-    if (ch->isAffected( gsn_inspiration )) 
+    if (ch->isAffected( gsn_creativity )) 
         result += result / 4;
 
     /* the moment of truth */
@@ -360,7 +360,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
     
-    if (ch->isAffected( gsn_inspiration )) {
+    if (ch->isAffected( gsn_creativity )) {
         obj->getRoom()->echo( POS_RESTING, "%1$^O1 на мгновение отража%1$nет|ют свет далеких звезд.", obj );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         added = number_range( 1, 3 );
@@ -562,7 +562,7 @@ VOID_SPELL(Mend)::run( Character *ch, Object *obj, int sn, int level )
     if (IS_OBJ_STAT(obj,ITEM_MAGIC))
           result += 5;
 
-    if (ch->isAffected( gsn_inspiration )) {
+    if (ch->isAffected( gsn_creativity )) {
         ch->pecho( "%1$^O1 по%1$nет|ют под твоими руками, обретая первозданный вид.", obj );
         ch->recho( "%1$^O1 по%1$nет|ют под руками %2$C2, обретая первозданный вид.", obj, ch );
         obj->condition = 100;

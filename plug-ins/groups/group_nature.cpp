@@ -36,18 +36,19 @@
 #include "move_utils.h"
 
 PROF(ranger);
+GSN(soothe);
 
 /*
- * 'tame' skill command
+ * 'soothe' skill command
  */
-SKILL_RUNP( tame )
+SKILL_RUNP( soothe )
 {
     Character *victim;
     char arg[MAX_INPUT_LENGTH];
 
     one_argument(argument,arg);
 
-    if ( ch->is_npc() || !gsn_tame->usable( ch ) )
+    if ( ch->is_npc() || !gsn_soothe->usable( ch ) )
     {
         ch->pecho("Это ж надо уметь!");
         return;
@@ -74,7 +75,7 @@ SKILL_RUNP( tame )
     }
     
     /* 
-     * ranger tame: remove aggression
+     * ranger soothe: remove aggression
      */
     if (ch->getProfession( ) == prof_ranger) {
         if (!IS_SET(victim->act,ACT_AGGRESSIVE))
@@ -83,9 +84,9 @@ SKILL_RUNP( tame )
             return;
         }
 
-        ch->setWait( gsn_tame->getBeats( )  );
+        ch->setWait( gsn_soothe->getBeats( )  );
 
-        if (number_percent() < gsn_tame->getEffective( ch ) + 15
+        if (number_percent() < gsn_soothe->getEffective( ch ) + 15
                 + 4 * ( ch->getModifyLevel() - victim->getModifyLevel() ) )
         {
             REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
@@ -94,7 +95,7 @@ SKILL_RUNP( tame )
             oldact("Ты укрощаешь $C4.",ch,0,victim,TO_CHAR);
             oldact("$c1 укрощает $C4.",ch,0,victim,TO_NOTVICT);
             stop_fighting(victim,true);
-            gsn_tame->improve( ch, true, victim );
+            gsn_soothe->improve( ch, true, victim );
         }
         else
         {
@@ -103,7 +104,7 @@ SKILL_RUNP( tame )
                     ch,0,victim,TO_NOTVICT);
             oldact("$c1 пытается укротить тебя, но безуспешно.",
                     ch,0,victim,TO_VICT);
-            gsn_tame->improve( ch, false, victim );
+            gsn_soothe->improve( ch, false, victim );
         }
 
         return;

@@ -152,7 +152,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     punish_lvl = number_range(102, 110);    // negative effect level -- punished by gods
     level = number_range(level, 110);  // positive effect level
     roll = number_percent();
-    sk = gsn_prayer->getEffective( ch );
+    sk = gsn_liturgy->getEffective( ch );
 
     if (ch->hit  < ch->max_hit  / 10 ||
         ch->mana < ch->max_mana / 10 ||

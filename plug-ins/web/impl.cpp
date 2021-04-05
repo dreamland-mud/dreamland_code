@@ -714,7 +714,7 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
            m = 'g';
         else if (paf->type == gsn_spell_resistance)
            m = 'm';
-        else if (paf->type == gsn_prayer)
+        else if (paf->type == gsn_liturgy)
            m = 'P';
         else if (paf->type == gsn_protection_negative)
            m = 'n';

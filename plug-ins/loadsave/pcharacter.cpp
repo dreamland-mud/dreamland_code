@@ -49,6 +49,28 @@ GSN(cure_serious);
 GSN(cure_critical);
 GSN(unholy_word);
 GSN(holy_word);
+GSN(heat_metal);
+GSN(heating);
+GSN(lightning_shield);
+GSN(lightning_ward);
+GSN(prayer);
+GSN(liturgy);
+GSN(etheral_fist);
+GSN(ethereal_fist);
+GSN(magnetic_trust);
+GSN(magnetic_thrust);
+GSN(sulfurus_spray);
+GSN(sulfuric_spray);
+GSN(power_word_stun);
+GSN(paralysis);
+GSN(know_persone);
+GSN(personal_id);
+GSN(riding);
+GSN(cavalry);
+GSN(tame);
+GSN(soothe);
+GSN(digging);
+GSN(grave);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -283,6 +305,18 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_ground_strike, gsn_critical_strike );
     skill_exchange( this, gsn_control_animal, gsn_dominate );
     skill_exchange( this, gsn_unholy_word, gsn_holy_word );
+    skill_exchange( this, gsn_heat_metal, gsn_heating );
+    skill_exchange( this, gsn_lightning_shield, gsn_lightning_ward);
+    skill_exchange( this, gsn_prayer, gsn_liturgy);
+    skill_exchange( this, gsn_etheral_fist, gsn_ethereal_fist);
+    skill_exchange( this, gsn_magnetic_trust, gsn_magnetic_thrust);
+    skill_exchange( this, gsn_sulfurus_spray, gsn_sulfuric_spray);
+    skill_exchange( this, gsn_power_word_stun, gsn_paralysis);
+    skill_exchange( this, gsn_know_persone, gsn_personal_id);
+    skill_exchange( this, gsn_riding, gsn_cavalry);
+    skill_exchange( this, gsn_tame, gsn_soothe);
+    skill_exchange( this, gsn_digging, gsn_grave);
+
     skill_merge(this, gsn_harm, gsn_cause_critical, gsn_cause_light, gsn_cause_critical);
     skill_merge(this, gsn_heal, gsn_cure_critical, gsn_cure_light, gsn_cure_critical);
 

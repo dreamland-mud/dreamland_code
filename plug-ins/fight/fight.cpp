@@ -160,7 +160,7 @@ void violence_update( )
     for ( ch = char_list; ch != 0; ch = ch->next )
     {
         if ( ( victim = ch->fighting ) == 0 || ch->in_room == 0 ){
-            if ( IS_AFFECTED(ch,AFF_STUN) && !ch->isAffected(gsn_power_word_stun))
+            if ( IS_AFFECTED(ch,AFF_STUN) && !ch->isAffected(gsn_paralysis))
             {
                 ch->pecho("Оглушение постепенно проходит.");
                 REMOVE_BIT(ch->affected_by,AFF_STUN);        

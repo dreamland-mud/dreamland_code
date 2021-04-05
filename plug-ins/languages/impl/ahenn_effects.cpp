@@ -19,7 +19,7 @@
 #include "merc.h"
 #include "def.h"
 
-GSN(inspiration);
+GSN(creativity);
 GSN(curse);
 GSN(poison);
 GSN(plague);
@@ -62,7 +62,7 @@ bool InspirationWE::run( PCharacter *ch, Character *victim ) const
 {
     Affect af;
 
-    af.type     = gsn_inspiration;
+    af.type     = gsn_creativity;
     af.level    = ch->getModifyLevel( );
     af.duration = af.level / 3;
     

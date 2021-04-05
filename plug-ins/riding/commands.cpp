@@ -17,7 +17,7 @@
 #include "mercdb.h"
 #include "def.h"
 
-GSN(riding);
+GSN(cavalry);
 
 /*
  * 'mount' command
@@ -126,13 +126,13 @@ CMDRUN( mount )
             && horse->getNPC()->behavior 
             && IS_SET(horse->getNPC()->behavior->getOccupation(), (1<<OCC_BATTLEHORSE));
    
-    if (needsRidingSkill && number_percent( ) > gsn_riding->getEffective( ch )) {
+    if (needsRidingSkill && number_percent( ) > gsn_cavalry->getEffective( ch )) {
         oldact("Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
         oldact("$c1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
         oldact("$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
         
-        ch->setWait( gsn_riding->getBeats( ) );
-        gsn_riding->improve( ch, false );
+        ch->setWait( gsn_cavalry->getBeats( ) );
+        gsn_cavalry->improve( ch, false );
         return;
     }
 
@@ -145,7 +145,7 @@ CMDRUN( mount )
     oldact("$c1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
     oldact("$c1 запрыгивает на спину $C2.", ch, 0, horse, TO_NOTVICT );
     
-    gsn_riding->improve( ch, true);
+    gsn_cavalry->improve( ch, true);
 }
 
 /*

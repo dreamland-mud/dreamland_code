@@ -35,7 +35,7 @@
 #include "def.h"
 
 
-GSN(inspiration);
+GSN(creativity);
 PROF(paladin);
 PROF(anti_paladin);
 
@@ -144,7 +144,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
       af.level                = level;
       af.duration        = (6 + level / 2);
       af.location = APPLY_SAVES;
-      af.modifier        = ch->isAffected( gsn_inspiration ) ? -3 : -1;
+      af.modifier        = ch->isAffected( gsn_creativity ) ? -3 : -1;
       af.bitvector.setValue(ITEM_BLESS);
       affect_to_obj( obj, &af);
       oldact("Священная аура окружает $o4.",ch,obj,0,TO_ALL);

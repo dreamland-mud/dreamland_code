@@ -35,7 +35,7 @@
 #include "def.h"
 #include "skill_utils.h"
 
-GSN(inspiration);
+GSN(creativity);
 
 /*
  * 'smithing' skill command
@@ -94,7 +94,7 @@ SKILL_RUNP( smithing )
 
     ch->setWaitViolence( 2 );
 
-    if (ch->isAffected( gsn_inspiration )) {
+    if (ch->isAffected( gsn_creativity )) {
         ch->pecho( "%1$^O1 по%1$nет|ют под твоими руками, обретая первозданный вид.", obj );
         ch->recho( "%1$^O1 по%1$nет|ют под руками %2$C2, обретая первозданный вид.", obj, ch );
         obj->condition = 100;

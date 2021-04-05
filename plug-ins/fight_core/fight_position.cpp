@@ -22,7 +22,7 @@
 #include "merc.h"
 #include "def.h"
 
-GSN(riding);
+GSN(cavalry);
 GSN(invisibility);
 GSN(mass_invis);
 GSN(improved_invis);
@@ -63,7 +63,7 @@ static bool dismount_attacked( Character *ch )
         if (!ch->is_npc( ))
             return true;
 
-        if (!gsn_riding->available( RIDDEN(ch) )) 
+        if (!gsn_cavalry->available( RIDDEN(ch) )) 
             return true;
 
         return false;
@@ -73,7 +73,7 @@ static bool dismount_attacked( Character *ch )
         if (!ch->mount->is_npc( ))
             return true;
 
-        if (!gsn_riding->available( ch ))
+        if (!gsn_cavalry->available( ch ))
             return true;
 
         return false;

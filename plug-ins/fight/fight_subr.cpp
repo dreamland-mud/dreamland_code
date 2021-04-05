@@ -44,7 +44,7 @@ bool check_stun( Character *ch, Character *victim )
         oldact_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
             ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
-        affect_strip(ch,gsn_power_word_stun);
+        affect_strip(ch, gsn_paralysis);
         REMOVE_BIT(ch->affected_by,AFF_STUN);        
 
         SET_BIT(ch->affected_by,AFF_WEAK_STUN);

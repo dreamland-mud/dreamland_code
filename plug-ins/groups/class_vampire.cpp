@@ -41,7 +41,7 @@
 PROF(vampire);
 DESIRE(bloodlust);
 RELIG(karmina);
-
+GSN(grave);
 
 #define ROOM_VNUM_GRAVE         5
 
@@ -332,19 +332,19 @@ SKILL_RUNP( dominate )
 */
 
 /*
- * 'dig' skill command
+ * 'grave' skill command
  */
 
-SKILL_RUNP( dig )
+SKILL_RUNP( grave )
 {
     Object *grave;
     int chance;
     Room *room = ch->in_room;
 
-    chance = gsn_digging->getEffective( ch );
+    chance = gsn_grave->getEffective( ch );
 
     if (chance < 2) {
-	ch->pecho("Для того, чтобы копать, найди и используй лопату.");
+	    ch->pecho("Ты не умеешь копать могилы.");
         return;
     }
 
@@ -386,18 +386,18 @@ SKILL_RUNP( dig )
 
     ch->move -= 100;
     
-    ch->setWait( gsn_digging->getBeats( )  );
+    ch->setWait( gsn_grave->getBeats( )  );
 
     if (number_percent( ) > chance) {
         oldact("$c1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM);
         oldact("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR);
-        gsn_digging->improve( ch, false );
+        gsn_grave->improve( ch, false );
         return;
     }
 
     oldact("$c1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0, TO_ROOM);
     oldact("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами.", ch, 0, 0, TO_CHAR);
-    gsn_digging->improve( ch, true );
+    gsn_grave->improve( ch, true );
 
     if (number_percent( ) < 2) 
         oldact("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0, TO_ALL);

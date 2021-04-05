@@ -28,8 +28,7 @@
 #include "mercdb.h"
 #include "def.h"
 
-GSN(mount_drive);
-GSN(riding);
+GSN(cavalry);
 GSN(web);
 GSN(entangle);
 GSN(camouflage_move);
@@ -297,13 +296,13 @@ bool Walkment::canControlHorse( )
     if (!needsRidingSkill)
         return true;
 
-    if (number_percent( ) > gsn_riding->getEffective( ch )) {
+    if (number_percent( ) > gsn_cavalry->getEffective( ch )) {
         oldact("Тебе не хватает мастерства управлять $C5.", ch, 0, horse, TO_CHAR );
-        gsn_riding->improve( ch, false );
+        gsn_cavalry->improve( ch, false );
         return false; 
     }
 
-    gsn_riding->improve( ch, true );
+    gsn_cavalry->improve( ch, true );
     return true;
 }
 

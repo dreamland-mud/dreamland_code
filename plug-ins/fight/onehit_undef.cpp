@@ -100,7 +100,7 @@ bool UndefinedOneHit::canDamage( )
 
 void UndefinedOneHit::protectPrayer( )
 {
-    if (victim->isAffected( gsn_prayer )) 
+    if (victim->isAffected( gsn_liturgy )) 
         dam -= dam * (3 + victim->getModifyLevel( ) / 10) / 100;
 }
 
