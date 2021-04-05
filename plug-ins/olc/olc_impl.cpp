@@ -27,7 +27,7 @@
 #include "xmlattributeplugin.h"
 #include "mocregistrator.h"
 #include "stringset.h"
-
+#include "wiznet.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
@@ -50,8 +50,9 @@ public:
             }
         }
 
-        if (!savedAreas.empty())
-            notice("Autosaved %d area(s): %s", savedAreas.size(), savedAreas.toString().c_str());
+        if (!savedAreas.empty()) {
+            wiznet(WIZ_SECURE, 0, 0, "Autosaved %d area(s): %s", savedAreas.size(), savedAreas.toString().c_str());
+        }
     }
 
     virtual void after( )
