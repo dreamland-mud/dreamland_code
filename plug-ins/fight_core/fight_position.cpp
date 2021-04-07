@@ -277,8 +277,7 @@ void do_visible( Character *ch )
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
         oldact("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
       }
-    if (IS_SET(ch->affected_by, AFF_SNEAK)
-        && !ch->is_npc() && !IS_SET(ch->getRace()->getAff(),AFF_SNEAK) )
+    if (IS_SET(ch->affected_by, AFF_SNEAK))
       {
         ch->pecho( "Твои движения становятся заметными для окружающих." );
         affect_strip(ch, gsn_sneak);
