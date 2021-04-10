@@ -13,6 +13,8 @@
 #include "dlxmlloader.h"
 #include "interpretlayer.h"
 
+class Social;
+
 class SocialManager : public InterpretLayer, public DLXMLTableLoader {
 friend class Social;    
 public:
@@ -27,6 +29,10 @@ public:
         inline static SocialManager * getThis( );
 
         virtual bool process( InterpretArguments & );
+
+        Social * find(const DLString &socialName);
+        Social * findUnstrict(const DLString &socialName);
+
 protected:
         virtual void putInto( );
 

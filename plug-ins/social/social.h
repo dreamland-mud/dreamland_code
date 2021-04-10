@@ -89,6 +89,8 @@ private:
     bool mprog( Character *, Character * );
 
     DLString name;
+
+public:    
     XML_VARIABLE XMLString  rusName;
     XML_VARIABLE XMLString  shortDesc;
     XML_VARIABLE XMLString  msgCharNoArgument;

@@ -67,7 +67,6 @@ void SocialManager::putInto( )
 
 bool SocialManager::process( InterpretArguments &iargs )
 {
-    LoadedList::iterator e;
     DLString cmd = iargs.cmdName;
     
     if (iargs.d && iargs.d->connected != CON_PLAYING)
@@ -75,17 +74,35 @@ bool SocialManager::process( InterpretArguments &iargs )
 
     if (!cmd.empty( ) && cmd.at( 0 ) == '*')
         cmd.erase( 0, 1 );
-        
-    for (e = elements.begin( ); e != elements.end( ); e++) {
-        Social *social = e->getStaticPointer<Social>( );
 
-        if (social->matches( cmd )) {
-            iargs.pCommand.setPointer( social );
-            iargs.cmdName = cmd;
-            iargs.advance( );
-            break;
-        }
+    Social *social = findUnstrict(cmd);
+    if (social) {
+        iargs.pCommand.setPointer( social );
+        iargs.cmdName = cmd;
+        iargs.advance( );
     }
 
     return true;
+}
+
+Social * SocialManager::find(const DLString &socialName) 
+{
+    for (auto &e: elements) {
+        Social *social = e.getStaticPointer<Social>();
+        if (social->getName() == socialName)
+            return social;
+    }
+        
+    return 0;
+}
+
+Social * SocialManager::findUnstrict(const DLString &socialName) 
+{
+    for (auto &e: elements) {
+        Social *social = e.getStaticPointer<Social>();
+        if (social->matches(socialName))
+            return social;
+    }
+
+    return 0;
 }

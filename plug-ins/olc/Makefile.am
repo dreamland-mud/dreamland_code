@@ -23,6 +23,7 @@ olcstate.cpp \
 onlinecreation.cpp \
 ovalues.cpp \
 security.cpp \
+socedit.cpp \
 webedit.cpp \
 orandom.cpp \
 argparser.cpp \
@@ -37,6 +38,7 @@ reledit.h \
 skedit.h \
 medit.h \
 sedit.h \
+socedit.h \
 oedit.h \
 eeedit.h \
 security.h \
@@ -54,6 +56,7 @@ $(INCLUDES_FIGHT) \
 -I$(top_srcdir)/plug-ins/areas \
 -I$(top_srcdir)/plug-ins/feniaroot \
 -I$(top_srcdir)/plug-ins/religion \
+-I$(top_srcdir)/plug-ins/social \
 -I$(top_srcdir)/plug-ins/ed \
 -I$(top_srcdir)/plug-ins/ed/lib \
 $(INCLUDES_SRC) 
@@ -67,7 +70,8 @@ $(LIBADD_FIGHT) \
 ../feniaroot/libfeniaroot.la \
 ../religion/libreligion.la \
 ../skills_impl/libskills_impl.la \
-../updates/libupdates.la
+../updates/libupdates.la \
+../social/libsocial.la
 
 olcflags.cpp: olcflags.conf olcflags.h
 olcflags.h: olcflags.conf
