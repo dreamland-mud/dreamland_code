@@ -30,6 +30,8 @@
 #include "religion.h"
 #include "playerattributes.h"
 #include "room.h"
+#include "affect.h"
+#include "liquid.h"
 
 #include "configurable.h"
 #include "dreamland.h"
@@ -68,6 +70,8 @@ enum {
 #define GHOST_MIN_LEVEL (PK_MIN_LEVEL + 10)
 
 RELIG(shamash);
+GSN(poured_liquid);
+LIQ(blood);
 
 /*-----------------------------------------------------------------------------------------*
  * death autocommands 
@@ -711,6 +715,7 @@ void death_cry( Character *ch, int part )
 {
     const char *msg;
     int vnum;
+    bool bloody = false;
     Bitstring bodyparts( ch->parts );
 
     if (ch->is_mirror( ))
@@ -729,7 +734,8 @@ void death_cry( Character *ch, int part )
     case  1:
         if (!IS_BLOODLESS(ch))
         {
-            msg  = "Кровь $c2 покрывает твои доспехи.";        
+            msg  = "{rКровь{x $c2 покрывает твои доспехи.";        
+            bloody = true;
             break;
         }
     case  2:                             
@@ -785,6 +791,18 @@ void death_cry( Character *ch, int part )
 
     if (vnum != 0)
         bodypart_create( vnum, ch, NULL ); 
+
+    if (bloody) {
+        for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
+            if (rch != ch && rch->position > POS_SITTING) {
+                Affect af;
+                af.type = gsn_poured_liquid;
+                af.duration = ch->size;
+                af.global.setRegistry(liquidManager);
+                af.global.set(liq_blood);
+                affect_join(rch, &af);
+            }
+    }
 
     msg = "Ты слышишь чей-то предсмертный крик.";
     ch->in_room->echoAround( POS_RESTING, msg );
