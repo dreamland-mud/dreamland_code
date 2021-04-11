@@ -981,9 +981,6 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Area update"  << endl;
         area_update        ( );
-
-        LastLogStream::send( ) <<  "Room update"  << endl;
-        room_update        ( );
     }
 
     if ( --pulse_music          <= 0 )
@@ -1046,6 +1043,9 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Objects update"  << endl;
         obj_update        ( );
+
+        LastLogStream::send( ) <<  "Room update"  << endl;
+        room_update        ( );
 
         LastLogStream::send( ) <<  "Reboot update"  << endl;
         check_reboot        ( );
