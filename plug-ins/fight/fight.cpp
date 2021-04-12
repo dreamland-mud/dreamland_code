@@ -71,6 +71,7 @@
 #include "affecthandler.h"
 #include "pcharactermanager.h"
 #include "room.h"
+#include "roomutils.h"
 
 #include "pcharacter.h"
 #include "merc.h"
@@ -317,23 +318,27 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
 
 bool forest_attack( Character *ch, Character *victim )
 {
-    if (gsn_forest_fighting->getCommand( )->run(ch, FOREST_ATTACK)) {
-        int chance = gsn_forest_fighting->getEffective( ch );
+    if (!RoomUtils::isNature(ch->in_room))
+        return true;
+
+    if (!gsn_forest_fighting->usable(ch))
+        return true;
+
+    int chance = gsn_forest_fighting->getEffective( ch );
+    
+    while (number_percent() < chance) {
+        one_hit_nocatch( ch, victim );
+        gsn_forest_fighting->improve( ch, true, victim );
         
-        while (number_percent() < chance) {
-            one_hit_nocatch( ch, victim );
-            gsn_forest_fighting->improve( ch, true, victim );
+        if (ch->fighting != victim)
+            return false;
             
-            if (ch->fighting != victim)
-                return false;
-                
-            second_weapon_hit( ch, victim, chance );
+        second_weapon_hit( ch, victim, chance );
+        
+        if (ch->fighting != victim)
+            return false;
             
-            if (ch->fighting != victim)
-                return false;
-                
-            chance /= 3;
-        }
+        chance /= 3;
     }
 
     return true;

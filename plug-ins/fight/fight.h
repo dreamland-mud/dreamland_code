@@ -59,8 +59,6 @@ void        death_cry( Character *ch, int part = -1 );
 void        pk_gain( Character *ch, Character *victim );
 
 /* subroutines (fight_subr.cpp) */
-#define FOREST_ATTACK  1
-#define FOREST_DEFENCE 2
 void        check_assist(Character *ch,Character *victim);
 bool        check_stun( Character *ch, Character *victim ); 
 bool        check_bare_hands( Character *ch );

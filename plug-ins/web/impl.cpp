@@ -803,8 +803,6 @@ Json::Value AffectsWebPromptListener::jsonEnhance( Descriptor *d, Character *ch 
            m = 'z';
         else if (paf->type == gsn_warcry)
            m = 'w';
-        else if (paf->type == gsn_forest_fighting)
-           m = 'F';
         else if (paf->type == gsn_tiger_power)
            m = 't';
         else if (paf->type == gsn_vampire)

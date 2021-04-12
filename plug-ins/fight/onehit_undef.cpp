@@ -374,7 +374,8 @@ bool UndefinedOneHit::defenseParry( )
         chance = ( int )( chance * 0.5 );
     }
     
-    if (gsn_forest_fighting->getCommand( )->run(victim, FOREST_DEFENCE)
+    if (RoomUtils::isNature(victim->in_room) 
+        && gsn_forest_fighting->usable(victim)
         &&  (number_percent( ) < gsn_forest_fighting->getEffective( victim ))) 
     {
         chance = ( int )( chance * 1.2 );
@@ -544,7 +545,8 @@ bool UndefinedOneHit::defenseShieldBlock( )
         chance = ( int )( chance * 0.5 );
     }
     
-    if (gsn_forest_fighting->getCommand( )->run(victim, FOREST_DEFENCE)
+    if (RoomUtils::isNature(victim->in_room) 
+        && gsn_forest_fighting->usable(victim)
         && (number_percent() < gsn_forest_fighting->getEffective( victim ))) 
     {
         chance = ( int )( chance * 1.2 );
@@ -616,7 +618,8 @@ bool UndefinedOneHit::defenseDodge( )
         chance = ( int )( chance * 0.5 );
     }
 
-    if (gsn_forest_fighting->getCommand( )->run(victim, FOREST_DEFENCE)
+    if (RoomUtils::isNature(victim->in_room) 
+        && gsn_forest_fighting->usable(victim)
         && (gsn_forest_fighting->getEffective( victim ) > number_percent( ))) 
     {
         chance = ( int )( chance * 1.2 );
