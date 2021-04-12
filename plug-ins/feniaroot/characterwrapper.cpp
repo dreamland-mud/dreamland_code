@@ -1288,6 +1288,18 @@ NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отф�
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строку хозяину, если он есть" )
+{
+    checkTarget();
+
+    if (target->master) {
+        target->master->pecho( regfmt(target->master, args) );
+        return true;
+    }
+    
+    return false;
+}
+
 NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформатированную строку всем в комнате, кроме нас" )
 {
     checkTarget();
