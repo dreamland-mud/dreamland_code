@@ -107,6 +107,9 @@ CMDRUN( find )
 /*--------------------------------------------------------------------------
  * 'path' command to construct speedwalks in the same area
  *--------------------------------------------------------------------------*/
+
+// A functor to check if we can traverse further through this door. Only allow doors
+// leading to the same area and where character is allowed to enter.
 struct GoDoorSameArea
 {
     GoDoorSameArea(Character *ch) {
@@ -123,6 +126,8 @@ struct GoDoorSameArea
     Area *area;
 };
 
+// A functor to check if we can traverse further through this extra exit. Only
+// allow exits leading within same area.
 struct GoEExitSameArea
 {
     GoEExitSameArea(Character *ch) {
@@ -140,6 +145,8 @@ struct GoEExitSameArea
     Area *area;
 };
 
+// A functor to check if we can traverse further through this portal on the floor.
+// Only allow portals leading to the same area. Exclude random portals. 
 struct GoPortalSameArea
 {
     GoPortalSameArea(Character *ch) {
@@ -165,10 +172,12 @@ typedef RoomRoadsIterator<GoDoorSameArea, GoEExitSameArea, GoPortalSameArea> Sam
 CMDRUN( path )
 {
     DLString roomName = constArguments;
-    Room *target = 0;
+    list<Room *> targets;
     Area *myArea = ch->in_room->area;
+    unsigned int maxTargets = 5;
+    unsigned int matches = 0;
 
-    if (roomName.empty()) {
+    if (roomName.empty() || DLString(constArguments).getOneArgument().empty()) {
         ch->pecho("Укажи название комнаты, куда нужно проложить путь.");
         return;
     }
@@ -185,37 +194,65 @@ CMDRUN( path )
 
     for (auto &r: myArea->rooms)
         if (is_name(roomName.c_str(), r.second->getName())) {
-            target = r.second;
-            break;
+            matches++;
+            if (targets.size() < maxTargets)
+                targets.push_back(r.second);
         }
 
-    if (!target) {
+    if (targets.empty()) {
         ch->pecho("Не могу найти комнату с названием '%s' в зоне {c%s{x.", 
                   roomName.c_str(), ch->in_room->areaName());
         return;
     }
 
-    if (target == ch->in_room) {
+    if (targets.size() == 1 && targets.front() == ch->in_room) {
         ch->pecho("Но ты уже здесь!");
         return;
     }
 
-    RoomTraverseResult elements;
-    GoDoorSameArea goDoor(ch); GoEExitSameArea goEExit(ch); GoPortalSameArea goPortal(ch);
-    SameAreaHookIterator iter(goDoor, goEExit, goPortal);    
-    FindComplete complete(target, elements);
+    // Limit BFS radius to a number of steps, normally enough to traverse even a very big area.
     int radius = 10000;
 
-    room_traverse<SameAreaHookIterator>(ch->in_room, iter, complete, radius);
+    // Define iterator to navigate from room to room during the traverse.
+    GoDoorSameArea goDoor(ch); GoEExitSameArea goEExit(ch); GoPortalSameArea goPortal(ch);
+    SameAreaHookIterator iter(goDoor, goEExit, goPortal);
 
-    if (elements.empty()) {
-        ch->pecho("Не удалось проложить путь к комнате '%s'.", target->getName());
-        return;
+    // Display results for the first N matches, worn about the rest.
+    ostringstream buf;
+    bool foundPath = false;
+    for (Room *target: targets) {
+        RoomTraverseResult elements;
+        FindComplete complete(target, elements);
+        room_traverse<SameAreaHookIterator>(ch->in_room, iter, complete, radius);
+
+        buf << "    путь к '{W" << target->getName() << "{w'";
+
+        if (elements.empty()) {
+            if (ch->in_room == target)
+                buf << ": ты уже здесь!" << endl;
+            else
+                buf << " не найден" << endl;
+            continue;
+        }
+ 
+        buf << ": ";
+        make_speedwalk(elements, buf);
+        buf << endl;
+        foundPath = true;
     }
 
-    ostringstream pathBuf;
-    make_speedwalk(elements, pathBuf);
-    ch->pecho("Путь к комнате '%s': %s", target->getName(), pathBuf.str().c_str());
-    ch->pecho("Не забывай, что на пути могут встретиться запертые или потайные выходы."); 
+    if (foundPath)
+        ch->pecho("Найдены такие комнаты и пути к ним в зоне {c%s{x:", ch->in_room->areaName());
+    else
+        ch->pecho("Не удалось проложить путь ни к одной из комнат:");
+
+    ch->send_to(buf);
+
+    if (foundPath)
+        ch->pecho("Не забывай, что на пути могут встретиться запертые или потайные выходы."); 
+
+    if (matches > targets.size())
+        ch->pecho("Всего найдено {W%1$d{x подходящ%1$Iая|ие|их комна%1$Iта|ты|т, уточни название, чтобы увидеть остальные.",
+                  matches);
 }
 
