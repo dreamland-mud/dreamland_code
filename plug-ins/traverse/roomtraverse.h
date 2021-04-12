@@ -8,7 +8,7 @@
 #include "traverse.h"
 
 #include "character.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "act_move.h"
 #include "itemflags.h"
@@ -48,26 +48,6 @@ struct Road {
         }
     }
 
-    inline const DLString speedwalk( ) const
-    {
-        DLString str;
-        
-        switch (type) {
-        default:
-            return DLString( );
-        case DOOR:
-            str.assign( dirs[value.door].name[0] );
-            return str;
-        case EEXIT:
-            str = value.eexit->keyword;
-            str = str.getOneArgument( );
-            return "walk " + str;
-        case PORTAL:
-            str = value.portal->getName( );
-            str = str.getOneArgument( );
-            return "enter " + str;
-        }
-    }
 };
 
 typedef std::list<Road> RoomTraverseResult;

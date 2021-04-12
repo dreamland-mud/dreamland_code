@@ -76,3 +76,25 @@ DLString Syntax::noun(const DLString &phrase)
     // For everything else just return the last word.
     return words.back();
 }
+
+DLString Syntax::label(const DLString &names)
+{
+    StringList labels(names);
+    DLString rus, eng;
+
+    for (auto &l: labels) {
+        if (l.isRussian()) {
+            if (rus.empty()) rus = l;
+        } else {
+            if (eng.empty()) eng = l;
+        }
+    }
+
+    if (rus.empty()) rus = eng;
+    if (eng.empty()) eng = rus;
+    
+    if (eng.empty() && rus.empty()) 
+        return DLString::emptyString;
+
+    return "{lE" + eng + "{lR" + rus + "{lx";
+}

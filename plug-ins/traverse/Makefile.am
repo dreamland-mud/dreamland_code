@@ -31,7 +31,7 @@ libtraverse_la_LIBADD = \
 
 libtraverse_la_SOURCES = \
 roomtraverse.cpp \
-cfind.cpp \
+commands.cpp \
 wanderer.cpp
 
 include $(top_srcdir)/plug-ins/Makefile.inc

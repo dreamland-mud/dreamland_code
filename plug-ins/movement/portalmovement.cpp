@@ -15,7 +15,7 @@
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "fight_exception.h"
 #include "damage_impl.h"

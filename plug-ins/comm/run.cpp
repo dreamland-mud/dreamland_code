@@ -256,6 +256,7 @@ void XMLAttributeSpeedWalk::show(PCharacter *ch) const
     char last_letter = path.at(0);
     int cnt = 0;
 
+    // TODO: use collate_speedwalk() from the 'traverse' plugin.
     for (size_t i = 0; i < path.size(); i++) {
         if (path.at(i) == last_letter && isSmallLetter(last_letter)) {
             cnt++;

@@ -4,34 +4,71 @@
  */
 
 #include "roomtraverse.h"
+#include "stringlist.h"
+#include "morphology.h"
+
+/* Transform nnnuuedd speedwalk into 3n2ue2d. */
+DLString collate_speedwalk(const DLString &path)
+{
+    char last_letter = path.at(0);
+    int cnt = 0;
+    ostringstream buf;
+
+    for (size_t i = 0; i < path.size(); i++) {
+        if (path.at(i) == last_letter) {
+            cnt++;
+        } else {
+            if (cnt > 1) // Don't show '1n', just 'n'.
+                buf << cnt;
+            buf << last_letter;
+            last_letter = path.at(i);
+            cnt = 1;
+        }
+    }
+
+    if (cnt > 1)
+        buf << cnt;
+    buf << last_letter;
+    return buf.str();
+}
 
 /*
  * make_speedwalk: constructs speedwalk string based on Road's vector
  */
 void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
 {
-    RoomTraverseResult::iterator i;
-    bool colon = false;
+    DLString path;
+    StringList commands;
 
-    for (i = elements.begin( ); i != elements.end( ); i++) {
-        DLString swalk = i->speedwalk( );
-        
-        if (colon && swalk.size( ) <= 1)
-            buf << ";";
-            
-        colon = (swalk.size( ) > 1);
-        
-        if (colon)
-            buf << ";";
-        
-        buf << swalk;
+    for (auto &road: elements) {
+        if (road.type == Road::DOOR) {
+            path << dirs[road.value.door].name[0];
+            continue;
+        } 
+
+        if (!path.empty()) {
+            commands.push_back("{IW{lRбег{lErun{lx {x{hs" + collate_speedwalk(path));
+            path.clear();
+        }
+
+        DLString kw;
+        if (road.type == Road::PORTAL)
+            kw = Syntax::label(road.value.portal->getName());
+        else if (road.type == Road::EEXIT)
+            kw = Syntax::label(road.value.eexit->keyword);
+
+        commands.push_back("{hc{lRвойти{lEenter{lx " + kw);
     }
+
+    if (!path.empty())
+        commands.push_back("{IW{lRбег{lErun{lx {x{hs" + collate_speedwalk(path));
+
+    buf << commands.wrap("{y", "{x").join(" | ");
 }
 
 /*
  * room_distance: calculates minimal distance between two rooms for this player
  */
-
 bool checkRoom( Character *ch, Room * room )
 {
     if (!ch->canEnter( room ))
