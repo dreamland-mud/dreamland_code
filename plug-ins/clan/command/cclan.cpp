@@ -772,12 +772,12 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
             return;
         }
         
-            if (pc->get_trust( ) < CREATOR 
-            && clan.isRecruiter( victim ) 
-            && !dynamic_cast<PCharacter *>( victim )) 
+        if (clan.isRecruiter( victim ) && !dynamic_cast<PCharacter *>( victim )) 
         {
-            pc->pecho("Выгонять руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.");
-            return;
+            if ( !pc->isCoder() && !pc->is_immortal() ) {
+                pc->pecho("Выгонять руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.");
+                return;
+            }
         }
 
         buf << "Тебя заставили покинуть [" << clan.getRussianName( ).ruscase('4') << "].";
@@ -940,7 +940,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
         return;
     }
 
-    if (pc->get_trust( ) < CREATOR) {
+    if ( !pc->isCoder() && !pc->is_immortal() ) {
         if (pc == victim && pc->getClanLevel( ) < i) {
             pc->pecho("И кто же тебе это позволит?");
             return;
@@ -949,7 +949,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
         if (victim->getClanLevel( ) > i) {
             if (clan.isRecruiter( victim ) && !dynamic_cast<PCharacter *>( victim )) {
                 pc->pecho("Смещать руководство кланов можно только при очной ставке -- дождись, когда они зайдут в мир.");
-                return;
+                return;           
             }
         }
     }
