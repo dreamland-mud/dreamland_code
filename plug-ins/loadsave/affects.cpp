@@ -285,14 +285,9 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
     for (auto &paf : afflist)
         if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
             charFlag.setBit(paf->bitvector);
-        else if (paf->global.getRegistry() == registry && !ch->is_npc()) {
-            if (registry == wearlocationManager)		
+        else if (paf->global.getRegistry() == registry) {
+            if (registry == wearlocationManager && !ch->is_npc())		
                 ch->getPC()->wearloc.remove(paf->global);
-            else if (registry)
-                warn("affectlist_reapply: attempt to remove %s wearlocs from registry %s for %s",
-                   paf->global.toString().c_str(),
-                   paf->global.getRegistry()->getRegistryName().c_str(),
-                   ch->getName().c_str());
         }
 }
 
