@@ -157,7 +157,7 @@ InterpretHandler::handle(Descriptor *d, char *arg)
     if (!iargs.pCommand) 
         return 0;
 
-    if (!iargs.pCommand->dispatch( iargs ))
+    if (iargs.pCommand->dispatch( iargs ) != RC_DISPATCH_OK)
         return 0;
 
     iargs.cmdName = iargs.pCommand->getName( );

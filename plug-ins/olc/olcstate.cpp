@@ -37,19 +37,19 @@ bool OLCCommand::matches( const DLString &argument ) const
     return !argument.empty( ) && argument.strPrefix( name );
 }
 
-bool OLCCommand::properOrder( Character * ) const
+int OLCCommand::properOrder( Character * ) const
 {
-    return false;
+    return RC_ORDER_ERROR;
 }
 
-bool OLCCommand::dispatch( const InterpretArguments &iargs )
+int OLCCommand::dispatch( const InterpretArguments &iargs )
 {
-    return true;
+    return RC_DISPATCH_OK;
 }
 
-bool OLCCommand::dispatchOrder( const InterpretArguments &iargs )
+int OLCCommand::dispatchOrder( const InterpretArguments &iargs )
 {
-    return false;
+    return RC_DISPATCH_NOT_HERE;
 }
 
 void OLCCommand::run( Character *ch, const DLString &cArguments )

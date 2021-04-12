@@ -82,7 +82,7 @@ public:
     virtual const Flags & getExtra( ) const;
     virtual const Flags & getCommandCategory( ) const;
     virtual void run( Character *, const DLString & );
-    virtual bool properOrder( Character * ) const;
+    virtual int properOrder( Character * ) const;
 
     virtual DLString getTableName( ) const;
     virtual DLString getNodeName( ) const;

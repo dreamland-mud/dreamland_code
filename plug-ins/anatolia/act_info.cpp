@@ -1023,9 +1023,9 @@ CMDRUNP(report)
             continue;
 
         if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
-            bool canOrder = cmd->properOrder(pet);
+            bool canOrder = cmd->properOrder(pet) == RC_ORDER_OK;
             pet->fighting = ch;
-            bool canOrderFight = cmd->properOrder(pet);
+            bool canOrderFight = cmd->properOrder(pet) == RC_ORDER_OK;
             pet->fighting = 0;
 
             if(sn == gsn_second_weapon && !skill_is_invalid(sn, noCarry)){

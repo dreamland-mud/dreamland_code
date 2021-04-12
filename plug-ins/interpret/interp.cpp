@@ -35,7 +35,7 @@ bool interpret( Character *ch, const char *line )
     if (!iargs.pCommand)
         return false;
 
-    if (iargs.pCommand->dispatch( iargs ))
+    if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK)
         iargs.pCommand->run( ch, iargs.cmdArgs );
 
     return true;
@@ -76,7 +76,7 @@ bool interpret_cmd( Character *ch, const char *cmd, const char *argsFormat, ... 
     CommandInterpreter::getThis( )->run( iargs );
 
     if (iargs.pCommand)
-        if (iargs.pCommand->dispatch( iargs )) {
+        if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK) {
             iargs.pCommand->run( ch, iargs.cmdArgs );
             return true;
         }

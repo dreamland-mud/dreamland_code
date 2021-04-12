@@ -92,12 +92,12 @@ public:
         this->name = COMMAND_NAME;
     }
 
-    virtual bool properOrder( Character *ch ) const
+    virtual int properOrder( Character *ch ) const
     {
         if (IS_CHARMED(ch))
-            return false;
+            return RC_ORDER_ERROR;
         else
-            return true;
+            return RC_ORDER_OK;
     }
 
     virtual void run( Character* ch, const DLString& cArgument )

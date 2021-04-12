@@ -39,9 +39,9 @@ short NoteThread::getLevel( ) const
     return min( readLevel.getValue( ), writeLevel.getValue( ) );
 }
 
-bool NoteThread::properOrder( Character *ch ) const
+int NoteThread::properOrder( Character *ch ) const
 {
-    return false;
+    return RC_ORDER_ERROR;
 }    
 
 const DLString& NoteThread::getHint( ) const

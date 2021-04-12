@@ -127,36 +127,36 @@ bool Command::matchesAlias( const DLString& command ) const
     return false;
 }
 
-bool Command::properOrder( Character *ch ) const
+int Command::properOrder( Character *ch ) const
 {
     if (ch->is_immortal())
-        return false;
+        return RC_ORDER_ERROR;
 
     if (getLevel() > LEVEL_MORTAL)
-        return false;
+        return RC_ORDER_ERROR;
 
     if (!ch->is_npc( ) && getOrder( ).isSet( ORDER_ALLOW_RULER ) && ch->isAffected(gsn_manacles )) 
-        return true;
+        return RC_ORDER_OK;
 
     if (getOrder().isSet(ORDER_NEVER))
-        return false;
+        return RC_ORDER_ERROR;
 
     if (!ch->is_npc() && !getOrder().isSet(ORDER_EXCEPT_PK))
-        return true;    
+        return RC_ORDER_OK;
     
     if (getOrder( ).isSet( ORDER_FIGHT_ONLY ) && ch->fighting == 0)
-        return false;
+        return RC_ORDER_NOT_FIGHTING;
     
     if (getOrder( ).isSet( ORDER_PLAYER_ONLY ))
-        return false;
+        return RC_ORDER_NOT_PLAYER;
     
     if (getOrder( ).isSet( ORDER_THIEF_ONLY ) && !IS_SET(ch->act, ACT_THIEF))
-        return false;
+        return RC_ORDER_NOT_THIEF;
 
-    return true;
+    return RC_ORDER_OK;
 }    
 
-bool Command::dispatchOrder( const InterpretArguments &iargs )
+int Command::dispatchOrder( const InterpretArguments &iargs )
 {
     Character *ch = iargs.ch;
 
@@ -165,46 +165,46 @@ bool Command::dispatchOrder( const InterpretArguments &iargs )
         && !getExtra( ).isSet( CMD_FREEZE ))
     {
         ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
-        return false;
+        return RC_DISPATCH_PENALTY;
     }
 
     if (IS_SET( ch->comm, COMM_AFK ) && !getExtra( ).isSet( CMD_AFK )) {
         ch->pecho("Выйди сначала из {WAFK{x");
-        return false;
+        return RC_DISPATCH_AFK;
     }
 
     if (getExtra( ).isSet( CMD_SPELLOUT ) && !matchesExactly( iargs.cmdName.toLower( ) )) {
         ch->printf("Команду '%s' необходимо ввести полностью.\n\r", getName( ).c_str( ) );
-        return false;
+        return RC_DISPATCH_SPELLOUT;
     }
                     
     if (IS_AFFECTED( ch, AFF_STUN ) && !getExtra( ).isSet( CMD_KEEP_HIDE )) {
         ch->pecho("Ты не в состоянии сделать это.");
-        return false;
+        return RC_DISPATCH_STUN;
     }
 
     // prevent ghosts from doing a bunch of commands
     if (IS_GHOST( ch ) && !getExtra( ).isSet( CMD_GHOST )) {
         ch->pecho("У тебя нет тела... А твой немощный дух не в состоянии тебе помочь.");
-        return false;
+        return RC_DISPATCH_GHOST;
     }
 
     if (getExtra().isSet(CMD_NO_DUNGEON) && IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON)) {
         ch->pecho("Эта команда сейчас недоступна.");
-        return false;
+        return RC_DISPATCH_NOT_HERE;
     }
+
+    // Character not in position for command?
+    if (!checkPosition( ch ))
+        return RC_DISPATCH_POSITION;
 
     // Come out of hiding for most commands
     visualize( ch );
 
-    // Character not in position for command?
-    if (!checkPosition( ch ))
-        return false;
-
-    return true;
+    return RC_DISPATCH_OK;
 }
 
-bool Command::dispatch( const InterpretArguments &iargs )
+int Command::dispatch( const InterpretArguments &iargs )
 {
     Character *ch = iargs.ch;
 
@@ -212,12 +212,12 @@ bool Command::dispatch( const InterpretArguments &iargs )
         && !(ch->is_npc( ) && ch->getNPC( )->switchedFrom)) 
     {
         ch->pecho( "Сперва спроси разрешения у любим%1$Gого|ого|ой хозя%1$Gина|ина|йки!" , ch->master );
-        return false;
+        return RC_DISPATCH_CHARMED;
     }
 
     if (ch->isAffected(gsn_manacles ) && !getExtra( ).isSet( CMD_MANACLES )) {
         ch->pecho("Ты не можешь этого сделать - мешают кандалы!");
-        return false;
+        return RC_DISPATCH_CHARMED;
     }
 
     return dispatchOrder( iargs );

@@ -15,6 +15,28 @@ enum {
     LOG_NEVER
 };
 
+// Error codes for failed command dispatch attempt.
+enum {
+    RC_DISPATCH_OK = 0,
+    RC_DISPATCH_AFK,
+    RC_DISPATCH_SPELLOUT,
+    RC_DISPATCH_STUN,
+    RC_DISPATCH_GHOST,
+    RC_DISPATCH_NOT_HERE,
+    RC_DISPATCH_POSITION,
+    RC_DISPATCH_PENALTY,
+    RC_DISPATCH_CHARMED
+};
+
+// Error codes for failed order attempt.
+enum {
+    RC_ORDER_OK = 0,
+    RC_ORDER_ERROR,
+    RC_ORDER_NOT_FIGHTING,
+    RC_ORDER_NOT_PLAYER,
+    RC_ORDER_NOT_THIEF
+};
+
 class CommandBase: public virtual DLObject {
 public:
         typedef ::Pointer<CommandBase> Pointer;
@@ -23,9 +45,9 @@ public:
         virtual short getLog( ) const = 0;
 
         virtual bool matches( const DLString & ) const = 0;
-        virtual bool properOrder( Character * ) const = 0;
-        virtual bool dispatch( const InterpretArguments & ) = 0;
-        virtual bool dispatchOrder( const InterpretArguments & ) = 0;
+        virtual int properOrder( Character * ) const = 0;
+        virtual int dispatch( const InterpretArguments & ) = 0;
+        virtual int dispatchOrder( const InterpretArguments & ) = 0;
         virtual void run( Character *, const DLString & ) = 0;
 };
 

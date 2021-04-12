@@ -48,42 +48,42 @@ bool SocialBase::matches( const DLString& argument ) const
     return false;
 }
 
-bool SocialBase::properOrder( Character * ) const
+int SocialBase::properOrder( Character * ) const
 {
-    return true;
+    return RC_ORDER_OK;
 }
 
-bool SocialBase::dispatchOrder( const InterpretArguments &iargs )
+int SocialBase::dispatchOrder( const InterpretArguments &iargs )
 {
     return dispatch( iargs );
 }
 
-bool SocialBase::dispatch( const InterpretArguments &iargs )
+int SocialBase::dispatch( const InterpretArguments &iargs )
 {
     Character *ch = iargs.ch;
 
     if (!ch->is_npc( )) {
         if (IS_SET(ch->act, PLR_FREEZE)) {
             ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
-            return false;
+            return RC_DISPATCH_PENALTY;
         }
 
         if (IS_SET( ch->comm, COMM_NOEMOTE )) {
             ch->pecho("Ты анти-социал%Gьно|ен|ьна!", ch);
-            return false;
+            return RC_DISPATCH_PENALTY;
         }
 
         if (IS_SET( ch->comm, COMM_AFK )) {
             ch->pecho("Выйди сначала из {WAFK{x");
-            return false;
+            return RC_DISPATCH_AFK;
         }
     }
     
     if (!checkPosition( ch )) 
-        return false;
+        return RC_DISPATCH_POSITION;
     
     visualize( ch );
-    return true;
+    return RC_DISPATCH_OK;
 }
 
 static const void *victimOrSelf(Character *ch, Character *victim)

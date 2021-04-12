@@ -22,9 +22,9 @@ public:
     virtual short getLog( ) const;
 
     virtual bool matches( const DLString & ) const;
-    virtual bool properOrder( Character * ) const;
-    virtual bool dispatch( const InterpretArguments & );
-    virtual bool dispatchOrder( const InterpretArguments & );
+    virtual int properOrder( Character * ) const;
+    virtual int dispatch( const InterpretArguments & );
+    virtual int dispatchOrder( const InterpretArguments & );
     virtual void run( Character *, const DLString & );
     
     virtual const DLString & getNoargOther( ) const = 0;
