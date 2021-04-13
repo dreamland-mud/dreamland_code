@@ -94,9 +94,9 @@ Skill * DreamSkillManager::findRandomProfSkill(PCharacter *ch) const
         if (ch->getSkillData(skill->getIndex()).origin == SKILL_DREAM)
             continue;
         
-        // Reduce spell probability for Battleragers.
+        // Reduce spell probability for Battleragers to zero.
         if (skill->getSpell() && skill->getSpell()->isCasted())
-            if (ch->getClan() == clan_battlerager && chance(70))
+            if (ch->getClan() == clan_battlerager)
                 continue;
 
         // This is not a professional/class skill.
