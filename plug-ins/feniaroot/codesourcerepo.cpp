@@ -12,6 +12,7 @@
 
 using namespace Scripting;
 namespace fs = std::filesystem;
+
 static IconvMap koi2utf("koi8-r", "utf-8");
 static IconvMap utf2koi("utf-8", "koi8-r");
 
@@ -69,8 +70,7 @@ void CodeSourceRepo::save(Scripting::CodeSource &cs)
         return;
     }
 
-    fs::path path = dreamland->getTableDir().getAbsolutePath().c_str();
-    path /= "fenia";
+    fs::path path = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
     path /= folderName.c_str();
     fs::create_directories(path);
 
@@ -93,13 +93,46 @@ void CodeSourceRepo::saveAll()
     }
 }
 
+bool CodeSourceRepo::readAll(const DLString &folderName)
+{
+    int success = 0, errors = 0;
+
+    try {
+        fs::path base = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
+        fs::path path = base;
+        if (!folderName.empty())
+            path /= folderName.c_str();
+
+        for (const auto& dirEntry : fs::recursive_directory_iterator(path)) {
+            if (!dirEntry.is_regular_file())
+                continue;
+
+            DLString csName = fs::relative(dirEntry.path(), base).generic_string();
+            if (csName.empty() || csName.at(0) == '.')
+                continue;
+
+            if (read(csName))
+                success++;
+            else
+                errors++;
+        }
+
+        LogStream::sendNotice() << "CS repo: read " << success << " scenarios from path " << folderName << ", with " << errors << " errors." << endl;
+
+    } catch (const std::exception &ex) {
+        LogStream::sendError() << "CS repo: read all " << folderName << ": " << ex.what() << endl;
+        return false;
+    }
+
+    return errors == 0;
+}
+
 bool CodeSourceRepo::read(const DLString &csName) 
 {
     stringstream content;
 
     try {
-        fs::path path = dreamland->getTableDir().getAbsolutePath().c_str();
-        path /= "fenia";
+        fs::path path = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
         path /= csName.c_str();
 
         ifstream ifs(path);

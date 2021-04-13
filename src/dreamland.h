@@ -101,6 +101,7 @@ public:
         inline DLDirectory getPlayerDeleteDir( ) const;
         inline DLDirectory getPlayerRemortDir( ) const;
         inline DLDirectory getPlayerBackupDir( ) const;
+        inline DLDirectory getFeniaScriptDir() const;
         inline const DLString& getTempFile( ) const;
         inline const DLString& getImmLogFile( ) const;
         inline const DLString& getShutdownFile( ) const;

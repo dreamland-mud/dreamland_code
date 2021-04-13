@@ -21,6 +21,7 @@ public:
     void save(Scripting::CodeSource &cs);
     void saveAll();
     bool read(const DLString &csName);
+    bool readAll(const DLString &folderName);
 
     static CodeSourceRepo* getThis( ) { return thisClass; }
 

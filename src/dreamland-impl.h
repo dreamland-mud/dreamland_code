@@ -112,6 +112,11 @@ inline DLDirectory DreamLand::getPlayerBackupDir( ) const
     return DLDirectory( basePath, playerBackupDir );
 }
 
+inline DLDirectory DreamLand::getFeniaScriptDir( ) const
+{
+    return DLDirectory( basePath, feniaScriptDir );
+}
+
 inline const DLString & DreamLand::getTempFile( ) const
 {
     return tempFile;

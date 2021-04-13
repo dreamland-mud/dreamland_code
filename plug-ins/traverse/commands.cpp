@@ -217,7 +217,7 @@ CMDRUN( path )
     GoDoorSameArea goDoor(ch); GoEExitSameArea goEExit(ch); GoPortalSameArea goPortal(ch);
     SameAreaHookIterator iter(goDoor, goEExit, goPortal);
 
-    // Display results for the first N matches, worn about the rest.
+    // Display results for the first N matches, warn about the rest.
     ostringstream buf;
     bool foundPath = false;
     for (Room *target: targets) {
@@ -231,7 +231,7 @@ CMDRUN( path )
             if (ch->in_room == target)
                 buf << ": ты уже здесь!" << endl;
             else
-                buf << " не найден" << endl;
+                buf << ": путь не найден" << endl;
             continue;
         }
  

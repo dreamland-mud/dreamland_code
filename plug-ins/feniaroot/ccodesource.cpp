@@ -120,7 +120,8 @@ CMDADM( codesource )
         if (ch->isCoder( ))
             buf << endl
             << "Только для кодеров: " << endl
-            << "     {Wfile{x <файл>  - прочитать текст cs из файла в каталоге share/DL/fenia" << endl;
+            << "     {Wfile{x <файл>          - прочитать текст cs из файла в каталоге share/DL/fenia" << endl
+            << "     {Wfile all{x [<каталог>] - рекурсивно прочитать все сценарии из [под]каталога" << endl;
         ch->send_to( buf );
         return;
     }
@@ -322,11 +323,21 @@ CMDADM( codesource )
             ch->pecho("This is not for you.");
             return;
         }
-        
-        if (CodeSourceRepo::getThis()->read(args))
-            ch->printf("Codesource '%s' loaded from disk.\r\n", args.c_str());
+
+        DLString constArgs = args;
+        DLString argOne = args.getOneArgument();
+        if (arg_is_all(argOne)) {
+            if (CodeSourceRepo::getThis()->readAll(args))
+                ch->pecho("Recursively loaded all codesources from path %s.", args.c_str());
+            else
+                ch->pecho("Recursively loaded all codesources from path %s with some errors, check logs for details.", args.c_str());
+            return;
+        }
+
+        if (CodeSourceRepo::getThis()->read(constArgs))
+            ch->printf("Codesource '%s' loaded from disk.\r\n", constArgs.c_str());
         else
-            ch->printf("Error loading codesource '%s', check logs for details.\r\n", args.c_str());
+            ch->printf("Error loading codesource '%s', check logs for details.\r\n", constArgs.c_str());
 
         return;
     }
