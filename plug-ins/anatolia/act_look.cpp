@@ -23,6 +23,7 @@
 #include "char.h"
 #include "grammar_entities_impl.h"
 
+#include "morphology.h"
 #include "commandtemplate.h"
 #include "command.h"
 #include "commandmanager.h"
@@ -94,65 +95,14 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount = true
 bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty );
 static void show_exits_to_char( Character *ch, Room *targetRoom );
 
-/** Split string into a list of arguments. */
-static StringList name_list(const DLString &cArgs)
-{
-    DLString args(cArgs);
-    StringList result;
-
-    while (!args.empty())
-        result.push_back(args.getOneArgument());
-
-    return result;
-}
-
-/** Return true if string doesn't contain any RU characters. */
-static bool name_is_en(const DLString &name)
-{
-    for (unsigned int i = 0; i < name.size(); i++)
-        if (dl_isrusalpha(name.at(i)))
-            return false;
-    return true;
-}
-
-/** Return first entry in the list w/o RU characters. */
-static bool find_first_en_name(const StringList &list, DLString &result)
-{
-    for (const auto &name: list) {
-        if (name_is_en(name)) {
-            result = name;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/** Return first entry in the list containing only RU characters and spaces. */
-static bool find_first_ru_name(const StringList &list, DLString &result)
-{
-    for (const auto &name: list)
-        if (name.isRussian()) {
-            result = name;
-            return true;
-        }
-
-    return false;
-}
-
 /*
  * "(english name)" for CONFIG_OBJNAME_HINT 
  */
-void get_obj_name_hint( Object *obj, std::ostringstream &buf )
+DLString get_obj_name_hint(Object *obj)
 {
-    DLString name = obj->getName( );
-    name.colourstrip( );
-    
-    DLString hint;
-    if (find_first_en_name(name_list(name), hint))
-        buf << " {x(" << hint << "{x)";
-    else
-        warn( "(objhint) no hint found for [%d]", obj->pIndexData->vnum);
+    ostringstream buf;    
+    buf << " {x(" << Syntax::label_en(obj->getName()) << "{x)";
+    return buf.str();
 }
 
 static bool is_empty_descr( const char *arg )
@@ -287,6 +237,8 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     }
 #undef FMT
     
+    bool showHint = !ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT);
+
     if (fShort)
     {
         buf << "{" << CLR_OBJ(ch) << wearloc->displayName(ch, obj) << "{x";
@@ -295,10 +247,8 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             if (obj->condition <= 99 )
                 buf << " [" << obj->get_cond_alias( ) << "]";
 
-        if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
-        {
-            get_obj_name_hint( obj, buf );
-        }
+        if (showHint)
+            buf << get_obj_name_hint(obj);
     }
     else
     {
@@ -309,7 +259,12 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             DLString msg;
             DLString liq = obj->in_room->pIndexData->liquid->getShortDescr( );
 
-            msg << "%1$^O1 ";
+            msg << "%1$^O1";
+
+            if (showHint)
+                msg << get_obj_name_hint(obj);
+
+            msg << " ";
 
             switch(dice(1,3)) {
             case 1: msg << "тихо круж%1$nится|атся на %2$N6.";break;
@@ -746,6 +701,11 @@ void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     buf << " {x";
+
+    if (nVict && !ch->is_npc()) {
+        if (!ch->getConfig().rucommands || IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
+            buf << "(" << Syntax::label_en(nVict->getName()) << ") ";
+    }
 
     switch (victim->position.getValue( )) {
     case POS_DEAD:     
@@ -1942,13 +1902,13 @@ CMDRUNP( exits )
 
     for (auto &eexit: ch->in_room->extra_exits) {
         if (ch->can_see(eexit)) {
-            StringList names = name_list(eexit->keyword);
-            DLString name, nameRus;
+            DLString name = Syntax::label_en(eexit->keyword);
+            DLString nameRus = Syntax::label_ru(eexit->keyword);
 
             buf <<  "    ";
-            if (find_first_ru_name(names, nameRus))
+            if (!nameRus.empty())
                 buf << "{C" << nameRus << "{x ";
-            if (find_first_en_name(names, name))
+            if (!name.empty())
                 buf << "(" << name << ")";
             buf << endl;
             found = true;

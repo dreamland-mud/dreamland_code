@@ -5,6 +5,7 @@
 #include "configurable.h"
 #include "stringset.h"
 #include "stringlist.h"
+#include "dl_ctype.h"
 
 Json::Value rules;
 CONFIGURABLE_LOADED(grammar, rules)
@@ -79,16 +80,8 @@ DLString Syntax::noun(const DLString &phrase)
 
 DLString Syntax::label(const DLString &names)
 {
-    StringList labels(names);
-    DLString rus, eng;
-
-    for (auto &l: labels) {
-        if (l.isRussian()) {
-            if (rus.empty()) rus = l;
-        } else {
-            if (eng.empty()) eng = l;
-        }
-    }
+    DLString rus = label_ru(names);
+    DLString eng = label_en(names);
 
     if (rus.empty()) rus = eng;
     if (eng.empty()) eng = rus;
@@ -97,4 +90,35 @@ DLString Syntax::label(const DLString &names)
         return DLString::emptyString;
 
     return "{lE" + eng + "{lR" + rus + "{lx";
+}
+
+/** Return true if string doesn't contain any RU characters. */
+static bool name_is_en(const DLString &name)
+{
+    for (unsigned int i = 0; i < name.size(); i++)
+        if (dl_isrusalpha(name.at(i)))
+            return false;
+    return true;
+}
+
+DLString Syntax::label_en(const DLString &names)
+{
+    StringList labels(names.colourStrip());
+
+    for (auto &l: labels)
+        if (name_is_en(l))
+            return l;
+
+    return DLString::emptyString;
+}
+
+DLString Syntax::label_ru(const DLString &names)
+{
+    StringList labels(names.colourStrip());
+
+    for (auto &l: labels)
+        if (l.isRussian())
+            return l;
+
+    return DLString::emptyString;
 }

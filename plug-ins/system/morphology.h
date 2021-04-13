@@ -18,6 +18,12 @@ struct Syntax {
 
     // Return first EN and RU labels from a list of names, surrounded by lang tags.
     static DLString label(const DLString &names);
+
+    // Return first EN label from a list of names.
+    static DLString label_en(const DLString &names);
+
+    // Return first RU label from a list of names.
+    static DLString label_ru(const DLString &names);
 };
 
 #endif

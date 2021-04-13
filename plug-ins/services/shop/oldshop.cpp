@@ -54,7 +54,7 @@ RELIG(fili);
 using std::min;
 using std::max;
 
-void get_obj_name_hint( Object *obj, std::ostringstream &buf );
+DLString get_obj_name_hint(Object *obj);
 
 /*
  * Local functions
@@ -498,7 +498,7 @@ CMDRUN( list )
         webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1' ), si.obj, ch );
 
         if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
-            get_obj_name_hint(si.obj, buf);
+            buf << get_obj_name_hint(si.obj);
 
         buf << endl;
     }
