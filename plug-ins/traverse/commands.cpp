@@ -225,7 +225,7 @@ CMDRUN( path )
         FindComplete complete(target, elements);
         room_traverse<SameAreaHookIterator>(ch->in_room, iter, complete, radius);
 
-        buf << "    путь к '{W" << target->getName() << "{w'";
+        buf << "    '{W" << target->getName() << "{w'";
 
         if (elements.empty()) {
             if (ch->in_room == target)

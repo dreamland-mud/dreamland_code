@@ -823,6 +823,12 @@ NMI_SET( CharacterWrapper, x, help) \
 }
 INT_FIELD(off_flags, "флаги поведения моба (таблица .tables.off_flags)")
 
+NMI_GET(CharacterWrapper, last_fight_delay, "задержка после боя в секундах")
+{
+    checkTarget();
+    return (int)target->getLastFightDelay();
+}
+
 NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
