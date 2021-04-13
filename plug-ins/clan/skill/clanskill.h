@@ -11,6 +11,7 @@
 #include "xmlmap.h"
 #include "xmlflags.h"
 #include "xmlboolean.h"
+#include "xmlglobalbitvector.h"
 
 #include "clanreference.h"
 #include "skillgroup.h"
@@ -56,6 +57,7 @@ protected:
     XML_VARIABLE MobSkillData mob;
 
     XML_VARIABLE Clans clans;
+    XML_VARIABLE XMLGlobalBitvector group;
 };
 
 class SkillClanInfo : public XMLVariableContainer {

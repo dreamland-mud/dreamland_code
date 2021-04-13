@@ -19,10 +19,9 @@
 #include "def.h"
 
 const DLString ClanSkill::CATEGORY = "Клановые умения";
-GROUP(clan);
-static GlobalBitvector clanGroups(skillGroupManager, group_clan);
 
 ClanSkill::ClanSkill( )
+            : group(skillGroupManager)
 {
 }
 
@@ -39,7 +38,7 @@ void ClanSkill::loaded( )
 
 GlobalBitvector & ClanSkill::getGroups( ) 
 {
-    return clanGroups;
+    return group;
 }
 
 bool ClanSkill::visible( CharacterMemoryInterface * ch ) const

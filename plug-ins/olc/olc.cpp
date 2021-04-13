@@ -471,29 +471,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
     }
-
-    if (arg == "clanspell") {
-        int cnt = 0;
-
-        for (int sn = 0; sn < skillManager->size(); sn++) {
-            Skill *s = skillManager->find(sn);
-            if (!s->getSpell() || !s->getSpell()->isCasted())
-                continue;
-            if (!s->hasGroup(group_clan))
-                continue;
-
-            DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
-            if (spell->flags.isSet(SPELL_MAGIC|SPELL_PRAYER))
-                continue;
-
-            spell->flags.setBit(SPELL_MAGIC);
-            dynamic_cast<BasicSkill *>(s)->save();
-            cnt++;
-        }
-
-        ch->pecho("Set 'magic' flag for %d clan spells.", cnt);
-        return;
-    }
 }
 
 
