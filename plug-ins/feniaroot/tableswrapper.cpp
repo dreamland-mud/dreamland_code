@@ -97,26 +97,31 @@ TableWrapper::callMethod(const Register &key, const RegisterList &args)
         return Register( os.str() );
     }
 
-    if (( key == ID_VALUE ).toBoolean( ) )
-        return Register((int)table->value(args2string(args)));
-
-    if (( key == ID_VALUES ).toBoolean( )) 
-        return Register((int)table->bitstring(args2string(args)));
-
-    if (( key == ID_NAME ).toBoolean( ) )
-        return Register(table->name(args2number(args)));
-
-    if (( key == ID_NAMES ).toBoolean( ) )
-        return Register(table->names(args2number(args)));
-
-    if (( key == ID_MESSAGE ).toBoolean( ) ) {
-        int gcase = args.size() > 1 ? argnum2number(args, 2) : 1;
-        return Register(table->message(argnum2number(args, 1), gcase + '0'));
+    if ((key == ID_VALUE).toBoolean() || (key == ID_VALUES).toBoolean()) {
+        DLString str = args2string(args);
+        if (table->enumerated)
+            return Register((int)table->value(str));
+        else
+            return Register((int)table->bitstring(str));
     }
 
-    if (( key == ID_MESSAGES ).toBoolean( ) ) {
-        int gcase = args.size() > 1 ? argnum2number(args, 2) : 1;
-        return Register(table->messages(argnum2number(args, 1), true, gcase + '0'));
+    if ((key == ID_NAME).toBoolean() || (key == ID_NAMES).toBoolean()) {
+        int value = args2number(args);
+        if (table->enumerated)
+            return table->name(value);
+        else
+            return table->names(value);
+    }
+        
+    if ((key == ID_MESSAGE).toBoolean() || (key == ID_MESSAGES).toBoolean()) {
+        int igcase = args.size() > 1 ? argnum2number(args, 2) : 1;
+        char gcase = igcase + '0';
+        int value = argnum2number(args, 1);
+
+        if (table->enumerated)
+            return table->message(value, gcase);
+        else
+            return table->messages(value, true, gcase);
     }
 
     throw Scripting::Exception("no such method in this object");
