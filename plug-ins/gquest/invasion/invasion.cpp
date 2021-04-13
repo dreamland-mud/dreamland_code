@@ -271,7 +271,6 @@ void InvasionGQuest::rewardLeader( )
     
     if (leaders.empty( )) {
         buf << scen->getNoWinnerMsg( ) << endl;
-//        "Жители Мира проявили невероятное милосердие: ни одна букашка не пострадала."  << endl;
     }
     else { 
         XMLReward reward;
@@ -282,14 +281,20 @@ void InvasionGQuest::rewardLeader( )
         reward.practice = number_range( -6, 3 );
         reward.reason = scen->getWinnerMsg( );
         reward.id = getQuestID( );
-        
+
+        if (leaders.size() == 1) {
+            PCMemoryInterface *winner = leaders.front();
+            winner->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
+                            ->rememberVictory( getQuestID( ) );
+        }
+
         if (leaders.size( ) > 1 && !scen->getWinnerMsgOtherMlt( ).empty( ))
             buf << scen->getWinnerMsgOtherMlt( );
         else
             buf << scen->getWinnerMsgOther( );
 
         buf << GQChannel::BOLD;
-        
+
         while (!leaders.empty( )) {
             PCMemoryInterface * pci;
 
@@ -300,11 +305,10 @@ void InvasionGQuest::rewardLeader( )
             if (!leaders.empty( ))
                 buf << ",";
 
-            log("InvasionGQuest: reward leader " << pci->getName( ));
+            log("InvasionGQuest: reward winner " << pci->getName( ));
             GlobalQuestManager::getThis( )->rewardChar( pci, reward );
-            pci->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
-                            ->rememberVictory( getQuestID( ) );
         }
+
     }
 
     GQChannel::gecho( this, buf );
