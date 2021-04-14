@@ -44,7 +44,8 @@ public:
     bool onSaves(const SpellTarget::Pointer &target, Affect *paf, Character *victim, int &saves, int dam_type);
     bool onStopfol(const SpellTarget::Pointer &target, Affect *paf);
     bool onDescr(const SpellTarget::Pointer &target, Affect *paf, ostringstream &buf);
-    
+    bool onShow(const SpellTarget::Pointer &target, Affect *paf, Character *looker, ostringstream &buf);
+
     // Overrides for various types of triggers. Have smaller priority than Fenia overrides.
 
     virtual void remove( Character * ); 

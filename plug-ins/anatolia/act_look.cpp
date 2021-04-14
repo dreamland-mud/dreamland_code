@@ -180,6 +180,15 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
         buf << "(Яркое) ";
 }
 
+static void oprog_show(Object *obj, Character *ch, ostringstream &buf)
+{
+    if (obj->behavior)
+        obj->behavior->show(ch, buf);
+
+    for (auto &paf: obj->affected.findAllWithHandler())
+        paf->type->getAffect( )->onShow(SpellTarget::Pointer(NEW, obj), paf, ch, buf);    
+}
+
 /*
  * Show object on the floor or in inventory/equipment/container...
  */
@@ -205,8 +214,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     if (wearloc->displayFlags(ch, obj)) {
         format_screenreader_flags(obj, buf, ch);
 
-        if (obj->behavior)
-            obj->behavior->show(ch, buf);
+        oprog_show(obj, ch, buf);
 
         FMT( true, buf, ch, "", "{x", "[" );
         
@@ -275,7 +283,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             buf << fmt( ch, msg.c_str( ), obj, liq.c_str( ) );
         }
         else {
-            DLString longd = format_longdescr_to_char(obj->getDescription(), ch);
+            DLString longd = format_longdescr_to_char(obj->getDescription(), ch);  
             buf << "{" << CLR_OBJROOM(ch) << longd << "{x";
         }
     }

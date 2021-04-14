@@ -346,3 +346,22 @@ bool AffectHandler::onDescr(const SpellTarget::Pointer &target, Affect *paf, ost
         toStream(buf, paf);
     return false;
 }
+
+static DLString afprog_show(AffectHandler *ah, Object *obj, Character *looker, Affect *paf)
+{
+    FENIA_STR_CALL(ah, "Show", "OAC", obj, paf, looker);
+    return DLString::emptyString;
+}
+
+bool AffectHandler::onShow(const SpellTarget::Pointer &target, Affect *paf, Character *looker, ostringstream &buf) 
+{
+    AffectHandler *ah = this;
+
+    if (target->type != SpellTarget::OBJECT)
+        return false;
+
+    DLString d = afprog_show(ah, target->obj, looker, paf);
+    if (!d.empty())
+        buf << d;
+    return false;
+}
