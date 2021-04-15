@@ -244,8 +244,8 @@ void FeniaSpellContext::setSelf(Scripting::Object *s)
 void FeniaSpellContext::cleanup()
 {
     thiz = Register();
-    spell = Register();
-    state = Register();
+//    spell = Register();
+//    state = Register();
 }
 
 NMI_INIT(FeniaSpellContext, "контекст для вызова заклинания")
