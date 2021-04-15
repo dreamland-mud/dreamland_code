@@ -235,8 +235,8 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         if ( !saves_spell(level / 2,victim,DAM_POISON) )
         {
             msgWeaponVict("Ты чувствуешь, как яд распространяется по твоим венам.");
-            msgWeaponRoom("%2$^C1 отравле%2$Gно|н|на ядом от %3$O2 %1$C2.");
-            msgWeaponChar("%2$^C1 отравле%2$Gно|н|на ядом от %3$O2.");
+            msgWeaponRoom("%2$^C1 отравле%2$Gно|н|на|ны ядом от %3$O2 %1$C2.");
+            msgWeaponChar("%2$^C1 отравле%2$Gно|н|на|ны ядом от %3$O2.");
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;
@@ -293,8 +293,8 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     if (IS_WEAPON_STAT(wield,WEAPON_SHOCKING))
     {
         msgWeaponVict("Ты пораже%2$Gно|н|на разрядом %3$O2.");
-        msgWeaponRoom("%2$^C1 пораже%2$Gно|н|на разрядом %3$O2 %1$C2.");
-        msgWeaponChar("%2$^C1 пораже%2$Gно|н|на разрядом %3$O2.");
+        msgWeaponRoom("%2$^C1 пораже%2$Gно|н|на|ны разрядом %3$O2 %1$C2.");
+        msgWeaponChar("%2$^C1 пораже%2$Gно|н|на|ны разрядом %3$O2.");
 
         dam = number_range(1,wield->level/5 + 2);
         shock_effect(victim,wield->level/2,dam,TARGET_CHAR);
