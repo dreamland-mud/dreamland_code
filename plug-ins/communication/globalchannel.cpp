@@ -269,9 +269,13 @@ void GlobalChannel::applyTranslation( Character *ch, DLString &msg, Character *v
 
 void GlobalChannel::triggers( Character *ch, const DLString &msg ) const
 {
-    if (dreamland->hasOption( DL_LOG_COMM ) && getLog( ) != LOG_NEVER)
+    if (dreamland->hasOption( DL_LOG_COMM ) 
+        && getLog( ) != LOG_NEVER
+        && (!ch->desc || ch->desc->echo))
+    {
         LogStream::sendNotice( ) << "channel [" << getName( ) << "] " << ch->getName( ) << ": " << msg << endl;
-
+    }
+    
     if (!msg.empty() && hook) {
         if (ooc)
             send_discord_ooc(ch, msgOther, msg);

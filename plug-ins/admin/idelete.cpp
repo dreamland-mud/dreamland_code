@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "admincommand.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -105,6 +106,7 @@ CMDADM( ipassword )
             if (!hashPattern.match( pwd )) {
                 password_set( pci, pwd );
                 cnt++;
+                notice("[password] Hash password for player %s.", pci->getName().c_str());
             }
         }
 
