@@ -1018,7 +1018,7 @@ NMI_INVOKE( LanguageWrapper, runEffect, "(effect, ch, target): выполнит�
 
 NMI_INVOKE( LanguageWrapper, effective, "(ch): узнать процент раскачки языка у персонажа" )
 {
-    PCharacter *ch = args2player(args); 
+    Character *ch = args2character(args);
     return Register( getTarget()->getEffective(ch) );
 }
 
@@ -1114,7 +1114,7 @@ NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разуче�
 
 NMI_INVOKE( SkillWrapper, effective, "(ch): узнать процент раскачки у персонажа" )
 {
-    PCharacter *ch = args2player(args); 
+    Character *ch = args2character(args);
     return Register( getTarget()->getEffective(ch) );
 }
 
