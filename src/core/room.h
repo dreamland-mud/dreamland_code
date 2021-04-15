@@ -110,8 +110,8 @@ public:
     void affectTo( Affect *paf );
     void affectJoin( Affect *paf );
     void affectCheck( const FlagTable *table, int vector );
-    void affectRemove( Affect *paf );
-    void affectStrip( int sn );
+    void affectRemove( Affect *paf, bool verbose = false );
+    void affectStrip( int sn, bool verbose = false );
     bool isAffected( int sn ) const;
     
     bool isDark( ) const;
