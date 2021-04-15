@@ -231,25 +231,21 @@ bool AffectHandler::onUpdate(const SpellTarget::Pointer &target, Affect *paf)
 
 bool AffectHandler::onEntry(const SpellTarget::Pointer &target, Affect *paf, Character *walker) 
 {
-    Character *ch;
-    Room *room;
     AffectHandler *ah = this;
+    switch (target->type) {
+        case SpellTarget::ROOM:
+            FENIA_CALL(ah, "EntryRoom", "RAC", target->room, paf, walker);
+            entry(target->room, walker, paf);
+            break;
 
-    if (target->type == SpellTarget::CHAR)  {
-        ch = target->victim;
-        room = ch->in_room;
-    } else if (target->type == SpellTarget::ROOM) {
-        room = target->room;
-        ch = walker;
-    } else
-        return false;
+        case SpellTarget::CHAR:
+            FENIA_CALL(ah, "EntryChar", "CA", target->victim, paf);
+            entry(target->victim, paf);
+            break;
 
-    FENIA_CALL(ah, "Entry", "RCA", room, ch, paf);
-    
-    if (target->type == SpellTarget::ROOM)
-        entry(room, ch, paf);
-    else
-        entry(ch, paf);
+        default:
+            return false; 
+    }
 
     return false;
 }
