@@ -5,7 +5,7 @@
 
 #include "logstream.h"
 #include "character.h"
-#include "object.h"
+#include "core/object.h"
 #include "affect.h"
 #include "save.h"
 #include "merc.h"
@@ -685,12 +685,13 @@ NMI_INVOKE( ObjectWrapper, affectJoin, "(aff): усилить существую
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, affectStrip, "(skill): снять с предмета все аффекты от умения по имени skill" )
+NMI_INVOKE( ObjectWrapper, affectStrip, "(skill[,verbose]): снять с предмета все аффекты от умения по имени skill, показав сообщение о спадании (verbose)" )
 {
     checkTarget( );
-    Skill *skill = args2skill(args);
-    
-    affect_strip(target, skill->getIndex());
+    Skill *skill = argnum2skill(args, 1);
+    bool verbose = args.size() > 1 ? argnum2boolean(args, 2) : false;
+
+    affect_strip(target, skill->getIndex(), verbose);
     return Register( );
 }
 
@@ -703,6 +704,21 @@ NMI_INVOKE( ObjectWrapper, affectStripAll, "(): снять все аффекты
 
     return Register( );
 }
+
+NMI_INVOKE( ObjectWrapper, affectReplace, "(.Affect): удалить все аффекты этого типа и повесить новый" )
+{
+    checkTarget( );
+    AffectWrapper *aw;
+
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    aw = wrapper_cast<AffectWrapper>( args.front( ) );        
+    affect_strip(target, aw->getTarget().type);
+    affect_to_obj( target, &(aw->getTarget()) );
+    return Register( );
+}
+
 
 NMI_INVOKE( ObjectWrapper, random_obj_list, "([item_type]): случайный объект из списка, начинающегося с этого объекта. поиск ограничивается типом item_type, если задан")
 {

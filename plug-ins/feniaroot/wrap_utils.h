@@ -60,6 +60,7 @@ PCharacter *argnum2player(const RegisterList &args, int num);
 PCMemoryInterface * argnum2memory(const RegisterList &args, int num);
 ::Object *argnum2item(const RegisterList &args, int num);
 int argnum2number(const RegisterList &args, int num);
+int argnum2boolean(const RegisterList &args, int num);
 DLString argnum2string(const RegisterList &args, int num);
 Skill * argnum2skill(const RegisterList &args, int num);
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table);

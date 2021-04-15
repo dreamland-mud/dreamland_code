@@ -850,11 +850,27 @@ NMI_INVOKE( RoomWrapper, affectJoin, "(aff): усилить существующ
     return Register( );
 }
 
-NMI_INVOKE( RoomWrapper, affectStrip, "(skill): снять с комнаты все аффекты от умения по имени skill" )
+NMI_INVOKE( RoomWrapper, affectStrip, "(skill[,verbose]): снять с комнаты все аффекты от умения по имени skill, показав сообщение о спадании (verbose)" )
 {
     checkTarget( );
-    Skill *skill = args2skill(args);
-    target->affectStrip(skill->getIndex());
+    Skill *skill = argnum2skill(args, 1);
+    bool verbose = args.size() > 1 ? argnum2boolean(args, 2) : false;
+
+    target->affectStrip(skill->getIndex(), verbose);
+    return Register( );
+}
+
+NMI_INVOKE( RoomWrapper, affectReplace, "(.Affect): удалить все аффекты этого типа и повесить новый" )
+{
+    checkTarget( );
+    AffectWrapper *aw;
+
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    aw = wrapper_cast<AffectWrapper>( args.front( ) );        
+    target->affectStrip(aw->getTarget().type);
+    target->affectJoin( &(aw->getTarget()) );
     return Register( );
 }
 

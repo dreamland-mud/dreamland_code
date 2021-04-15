@@ -239,6 +239,11 @@ int argnum2number(const RegisterList &args, int num)
     return argnum(args, num).toNumber();
 }
 
+int argnum2boolean(const RegisterList &args, int num)
+{
+    return argnum(args, num).toBoolean();
+}
+
 DLString argnum2string(const RegisterList &args, int num)
 {
     return argnum(args, num).toString();

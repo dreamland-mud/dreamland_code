@@ -167,7 +167,7 @@ void Room::affectCheck( const FlagTable *table, int vector )
 /*
  * Remove an affect from a room.
  */
-void Room::affectRemove( Affect *paf )
+void Room::affectRemove( Affect *paf, bool verbose )
 {
     if (paf->isExtracted())
         return;
@@ -176,6 +176,11 @@ void Room::affectRemove( Affect *paf )
     {
         bug( "Affect_remove_room: no affect.", 0 );
         return;
+    }
+
+    if (verbose) {
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, this), paf);
     }
 
     affectModify( paf, false );
@@ -193,10 +198,10 @@ void Room::affectRemove( Affect *paf )
 /*
  * Strip all affects of a given sn.
  */
-void Room::affectStrip( int sn )
+void Room::affectStrip( int sn, bool verbose )
 {
     for (auto &paf: affected.findAll(sn))
-        affectRemove( paf );
+        affectRemove( paf, verbose );
 }
 
 

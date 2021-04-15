@@ -1820,12 +1820,13 @@ NMI_INVOKE( CharacterWrapper, isAffected, "(skillName): находится ли 
         return false;
 }
 
-NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аффекты с именем skillName" )
+NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName[,verbose]): снять все аффекты с именем skillName, показав сообщение о спадании (verbose)" )
 {
     checkTarget( );
-    Skill *skill = args2skill(args);
+    Skill *skill = argnum2skill(args, 1);
+    bool verbose = args.size() > 1 ? argnum2boolean(args, 2) : false;
         
-    affect_strip( target, skill->getIndex( ) );
+    affect_strip( target, skill->getIndex( ), verbose );
     return Register( );
 }
 

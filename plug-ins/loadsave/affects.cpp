@@ -350,7 +350,7 @@ void affect_to_char( Character *ch, Affect *paf )
 /*
  * Remove an affect from a char.
  */
-void affect_remove( Character *ch, Affect *paf )
+void affect_remove( Character *ch, Affect *paf, bool verbose )
 {
         if (paf->isExtracted())
             return;
@@ -361,6 +361,11 @@ void affect_remove( Character *ch, Affect *paf )
         {
                 bug( "Affect_remove: no affect.", 0 );
                 return;
+        }
+
+        if (verbose) {
+            if (paf->type->getAffect())
+                paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, ch), paf);
         }
 
         affect_modify( ch, paf, false );
@@ -383,10 +388,10 @@ void affect_remove( Character *ch, Affect *paf )
 /*
  * Strip all affects of a given sn.
  */
-void affect_strip( Character *ch, int sn )
+void affect_strip( Character *ch, int sn, bool verbose )
 {
     for (auto &paf: ch->affected.findAll(sn))
-        affect_remove( ch, paf );
+        affect_remove( ch, paf, verbose );
 }
 
 void affect_strip( Object *obj, int sn, bool verbose )
