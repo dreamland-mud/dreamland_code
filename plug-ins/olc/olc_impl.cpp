@@ -14,6 +14,7 @@
 #include "eeedit.h"
 #include "reledit.h"
 #include "skedit.h"
+#include "raceedit.h"
 #include "olcstate.h"
 #include "onlinecreation.h"
 #include "security.h"
@@ -75,6 +76,7 @@ extern "C"
         OnlineCreation::registerPlugin(ppl);
         Plugin::registerPlugin<OLCInterpretLayer>( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateReligion> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateRace> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateSkill> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateRoom> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateArea> >( ppl );

@@ -5,6 +5,7 @@
 #include "dlfilestream.h"
 #include <jsoncpp/json/json.h>
 #include "iconvmap.h"
+#include "grammar_entities_impl.h"
 
 #include "dlscheduler.h"
 #include "schedulertaskroundplugin.h"
@@ -32,6 +33,8 @@
 #include "def.h"
 
 static IconvMap koi2utf("koi8-r", "utf-8");
+
+bool is_empty_descr( const char *arg );
 
 GSN(none);
 
@@ -158,6 +161,27 @@ static DLString searcher_param_asterix(OBJ_INDEX_DATA *pObj)
         aff = "{C*{x";
     }
     return aff;
+}
+
+static DLString searcher_param_class(MOB_INDEX_DATA *pMob)
+{
+    StringList act;
+    if (IS_SET(pMob->act, ACT_CLERIC)) act.push_back("C");
+    if (IS_SET(pMob->act, ACT_MAGE)) act.push_back("M");
+    if (IS_SET(pMob->act, ACT_WARRIOR)) act.push_back("W");
+    if (IS_SET(pMob->act, ACT_THIEF)) act.push_back("T");
+    if (IS_SET(pMob->act, ACT_VAMPIRE)) act.push_back("V");
+    if (IS_SET(pMob->act, ACT_UNDEAD)) act.push_back("N");
+    return act.join("");
+}
+
+static DLString searcher_param_sex(MOB_INDEX_DATA *pMob)
+{
+    StringList sex;
+    sex.push_back(sex_table.name(pMob->sex).substr(0, 1));
+    if (pMob->gram_number != Grammar::Number::SINGULAR)
+        sex.push_back("P");
+    return sex.join("");
 }
 
 class SearcherDumpTask : public SchedulerTaskRoundPlugin {
@@ -894,7 +918,10 @@ CMDRUNP(searcher)
             int maxLevel = LEVEL_MORTAL * 2;
             vector<list<DLString> > output(maxLevel+1);
             DLString lineFormat = 
-                web_cmd(ch, "medit $1", "%5d") + " {C%3d{x %-20.20s {D%s{x\n";
+                web_cmd(ch, "medit $1", "%5d") 
+                    + " {C%3d{x %-20.20s " 
+                    + web_cmd(ch, "raceedit $1", "{y%-12.12s")
+                    + " {y%3.3s {M%2s {r%10.10s {D%s{x\n";
 
             prof.start();
 
@@ -904,11 +931,19 @@ CMDRUNP(searcher)
                     continue;
 
                 if (searcher_parse(pMob, args.c_str())) {
+                    DLString name = russian_case(pMob->short_descr, '1');
+                    if (is_empty_descr(pMob->description))
+                        name = "{R*{x" + name;
+
                     DLString line = 
                         fmt(NULL, lineFormat.c_str(), 
                                     pMob->vnum,
                                     pMob->level, 
-                                    russian_case(pMob->short_descr, '1').c_str(),
+                                    name.c_str(),
+                                    pMob->race,
+                                    searcher_param_class(pMob).c_str(),
+                                    searcher_param_sex(pMob).c_str(),
+                                    weapon_flags.name(pMob->dam_type).c_str(),
                                     pMob->area->name);
 
                     DLString where;
@@ -924,8 +959,8 @@ CMDRUNP(searcher)
             } 
     
             ostringstream buf;
-            buf << fmt(0, "{W%5s %3s %-20.20s %s{x\n", 
-                            "VNUM", "LVL", "NAME", "AREA");
+            buf << fmt(0, "{W%5s %3s %-20.20s %-12.12s %-3.3s %2s %10s %s{x\n", 
+                            "VNUM", "LVL", "NAME", "RACE", "CLS", "SX", "DAMTYPE", "AREA");
             for (size_t lvl = 0; lvl < output.size(); lvl++) {
                 const list<DLString> &lines = output[lvl];
                 for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
@@ -934,6 +969,7 @@ CMDRUNP(searcher)
 
             prof.stop();
             buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+            buf << "Fields: {R*{x - no description, CLS - class Mage/Thief/Cleric/Warrior/Necro/Vamp, SX - sex+number" << endl;
      
             page_to_char(buf.str().c_str(), ch);
         } catch (const Exception &ex) {

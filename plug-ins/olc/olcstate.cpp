@@ -400,6 +400,11 @@ bool OLCState::enumerationArrayEdit(const FlagTable &table, EnumerationArray &fi
     return true;
 }
 
+bool OLCState::flagBitsEdit(Flags &field)
+{
+    return flagBitsEdit(*field.getTable(), field);
+}
+
 bool OLCState::flagBitsEdit(const FlagTable &table, Flags &field)
 {
     int value = field.getValue();
@@ -432,6 +437,11 @@ bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
     field ^= value;
     ptc(ch, "Новое значение поля {g%s{x:\r\n%s\r\n", cmd, table.names(field).c_str());
     return true;
+}
+
+bool OLCState::flagValueEdit(Enumeration &field)
+{
+    return flagValueEdit(*field.getTable(), field);
 }
 
 bool OLCState::flagValueEdit(const FlagTable &table, Flags &field)

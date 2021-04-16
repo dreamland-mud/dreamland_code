@@ -28,7 +28,8 @@ webedit.cpp \
 orandom.cpp \
 argparser.cpp \
 feniatriggers.cpp \
-fedit.cpp
+fedit.cpp \
+raceedit.cpp
 
 libolc_la_MOC = \
 redit.h \
@@ -43,7 +44,8 @@ oedit.h \
 eeedit.h \
 security.h \
 olcstate.h \
-fedit.h
+fedit.h \
+raceedit.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

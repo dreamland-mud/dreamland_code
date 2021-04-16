@@ -118,7 +118,7 @@ void OLCStateHelp::show( PCharacter *ch ) const
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
         web_edit_button(ch, "text", "web").c_str(),
         text.c_str());
-    ptc(ch, "{WКоманды{x: commands, show, cancel, done\r\n");
+    ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ycancel{x, {hc{ydone{x\r\n");
 }
 
 HEDIT(show, "показать", "показать все поля")

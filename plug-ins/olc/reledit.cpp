@@ -128,25 +128,17 @@ void OLCStateReligion::show( PCharacter *ch )
     ptc(ch, "Кланы:             {Y%s{x {D(? clans){x\r\n",
         r->clans.empty() ? "-": r->clans.toString().c_str());
 
-    DLString params;
-    for (int i = 0; i < stat_table.size; i++)
-        if (r->minstat[i] > 0)
-            params << stat_table.fields[i].name << " " << r->minstat[i] << " ";
     ptc(ch, "Мин. параметры:    {Y%s{x {D(minstat help){x\r\n", 
-        params.empty() ? "-" : params.c_str());
+            show_enum_array(r->minstat).c_str());
 
-    params.clear();
-    for (int i = 0; i < stat_table.size; i++)
-        if (r->maxstat[i] > 0)
-            params << stat_table.fields[i].name << " " << r->maxstat[i] << " ";
     ptc(ch, "Макс. параметры:   {Y%s{x {D(maxstat help){x\r\n", 
-        params.empty() ? "-" : params.c_str());
+            show_enum_array(r->maxstat).c_str());
 
     ptc(ch, "Возраст:           {Y%s-%s{x {D(age help){x\r\n", 
         r->minage > 0 ? DLString(r->minage).c_str() : "0",
         r->maxage > 0 ? DLString(r->maxage).c_str() : "");
 
-    ptc(ch, "{WКоманды{x: commands, show, done, ?\r\n");        
+    ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
 }
 
 RELEDIT(show, "показать", "показать все поля")
@@ -167,7 +159,7 @@ RELEDIT(russian, "русское", "установить русское имя �
 
 RELEDIT(sex, "пол", "установить пол божества")
 {
-    return flagValueEdit(sex_table, getOriginal()->sex);
+    return flagValueEdit(getOriginal()->sex);
 }
 
 RELEDIT(desc, "описание", "установить описание божества")
@@ -177,7 +169,7 @@ RELEDIT(desc, "описание", "установить описание бож�
 
 RELEDIT(flags, "флаги", "выставить флаги религии (? religion_flags)")
 {
-    return flagBitsEdit(religion_flags, getOriginal()->flags);
+    return flagBitsEdit(getOriginal()->flags);
 }
 
 RELEDIT(mark, "знак", "установить vnum знака религии")
@@ -215,12 +207,12 @@ RELEDIT(mark, "знак", "установить vnum знака религии")
 
 RELEDIT(align, "натура", "ограничить по натуре")
 {
-    return flagBitsEdit(align_table, getOriginal()->align);
+    return flagBitsEdit(getOriginal()->align);
 }
 
 RELEDIT(ethos, "этос", "ограничить по этосу")
 {
-    return flagBitsEdit(ethos_table, getOriginal()->ethos);
+    return flagBitsEdit(getOriginal()->ethos);
 }
 
 RELEDIT(races, "расы", "ограничить по расам")

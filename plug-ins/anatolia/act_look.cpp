@@ -105,7 +105,7 @@ DLString get_obj_name_hint(Object *obj)
     return buf.str();
 }
 
-static bool is_empty_descr( const char *arg )
+bool is_empty_descr( const char *arg )
 {
     DLString descr;
 

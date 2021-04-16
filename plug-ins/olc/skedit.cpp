@@ -478,26 +478,26 @@ SKEDIT(damgender, "уронрод", "грамматический род соо�
 
 SKEDIT(align, "натура", "ограничить по натуре")
 {
-    return flagBitsEdit(align_table, getOriginal()->align);
+    return flagBitsEdit(getOriginal()->align);
 }
 
 SKEDIT(ethos, "этос", "ограничить по этосу")
 {
-    return flagBitsEdit(ethos_table, getOriginal()->ethos);
+    return flagBitsEdit(getOriginal()->ethos);
 }
 
 SKEDIT(target, "цели", "цели заклинания (? target_table)")
 {
     DefaultSpell *s = getSpell();
     return checkSpell(s)
-            && flagBitsEdit(target_table, s->target);
+            && flagBitsEdit(s->target);
 }
 
 SKEDIT(flags, "флаги", "флаги заклинания (? spell_flags)")
 {
     DefaultSpell *s = getSpell();
     return checkSpell(s)
-            && flagBitsEdit(spell_flags, s->flags);
+            && flagBitsEdit(s->flags);
 }
 
 SKEDIT(damtype, "уронтип", "вид повреждений (? damage_table)")
@@ -511,14 +511,14 @@ SKEDIT(damflags, "уронфлаги", "флаги урона, помимо DAMF
 {
     DefaultSpell *s = getSpell();
     return checkSpell(s)
-            && flagBitsEdit(damage_flags, s->damflags);
+            && flagBitsEdit(s->damflags);
 }
 
 SKEDIT(order, "приказ", "кому можно приказать колдовать (? order_flags)")
 {
     DefaultSpell *s = getSpell();
     return checkSpell(s)
-            && flagBitsEdit(order_flags, s->order);
+            && flagBitsEdit(s->order);
 }
 
 SKEDIT(tier, "крутость", "уровень повреждений от 1 до 5")
@@ -532,14 +532,14 @@ SKEDIT(position, "позиция", "мин. положение тела для �
 {
     DefaultSpell *s = getSpell();
     return checkSpell(s)
-            && flagValueEdit(position_table, s->position);
+            && flagValueEdit(s->position);
 }
 
 SKEDIT(type, "вид", "вид заклинания (? spell_types)")
 {
     DefaultSpell *s = getSpell();
     return checkSpell(s)
-            && flagValueEdit(spell_types, s->type);
+            && flagValueEdit(s->type);
 }
 
 SKEDIT(ranged, "ранговое", "можно ли колдовать на расстоянии")

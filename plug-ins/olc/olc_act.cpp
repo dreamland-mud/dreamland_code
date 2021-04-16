@@ -405,3 +405,14 @@ CMD(olchelp, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     show_help(ch, argument);
 }
 
+DLString show_enum_array(const EnumerationArray &array)
+{
+    ostringstream buf;
+
+    for (int i = 0; i < array.getTable()->size; i++)
+        if (array[i] > 0)
+            buf << array.getTable()->fields[i].name << " " << array[i] << " ";
+
+    DLString result = buf.str();
+    return result.empty() ? "-" : result;
+}
