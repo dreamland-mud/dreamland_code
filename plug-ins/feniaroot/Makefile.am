@@ -34,7 +34,7 @@ spellwrapper.cpp \
 affecthandlerwrapper.cpp \
 feniaspellext.cpp \
 wrap_utils.cpp \
-pluginwrapperimpl.cpp \
+feniacroaker.cpp \
 codesourcerepo.cpp
 
 libfeniaroot_la_MOC = \

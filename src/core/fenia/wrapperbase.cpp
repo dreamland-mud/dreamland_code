@@ -185,23 +185,10 @@ WrapperBase::vcall( Register &rc, const Register &key, const char *fmt, va_list 
         return true;
 
     } catch (const Exception &e) {
-        croak(key, e);
+        FeniaManager::getThis()->croak(this, key, e);
     }
 
     return false;
-}
-
-void WrapperBase::croak(const Register &key, const Exception &e) const
-{
-    try {
-        LogStream::sendError() 
-            << "RT exception calling fenia prog " 
-            << key.toString() << ": " << e.what();
-    } catch(const Exception &x) {
-        LogStream::sendError() 
-            << "Exception, trying to report exception " 
-            << e.what() << ": " << x.what() << endl;
-    }
 }
 
 bool WrapperBase::numberCall( Register id, int &result, const char *fmt, ... )

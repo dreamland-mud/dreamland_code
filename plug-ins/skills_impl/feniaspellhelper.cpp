@@ -153,7 +153,7 @@ bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTar
 
     } catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
-        wrapper->croak(methodId, e);
+        FeniaManager::getThis()->croak(0, methodId, e);
     }
 
     // Clean any references that may prevent garbage collector from destroying this context object.

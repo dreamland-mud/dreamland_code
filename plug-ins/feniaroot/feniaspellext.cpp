@@ -12,6 +12,8 @@
 
 #include "skillreference.h"
 #include "core/object.h"
+#include "pcharacter.h"
+#include "pcharactermanager.h"
 #include "room.h"
 #include "roomutils.h"
 #include "character.h"

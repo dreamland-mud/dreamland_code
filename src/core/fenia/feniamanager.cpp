@@ -4,6 +4,7 @@
  */
 #include <fstream>
 
+#include "logstream.h"
 #include "class.h"
 #include "dreamland.h"
 
@@ -22,6 +23,7 @@ using namespace Scripting;
  * FeniaManager
  *----------------------------------------------------------------*/
 WrapperManagerBase::Pointer FeniaManager::wrapperManager;
+FeniaCroakerBase::Pointer FeniaManager::feniaCroaker;
 FeniaManager * FeniaManager::thisClass = 0;
 
 FeniaManager::FeniaManager() 
@@ -57,6 +59,41 @@ FeniaManager::~FeniaManager()
 
     thisClass = 0;
 }
+
+void FeniaManager::croak(const WrapperBase *wrapper, const Register &key, const ::Exception &e) const
+{
+    try {
+        if (feniaCroaker)
+            feniaCroaker->croak(wrapper, key, e);
+
+        LogStream::sendError() 
+            << "Exception calling Fenia prog " << key.toString() << ": " 
+            << e.what() << endl;
+        
+    } catch(const ::Exception &x) {
+        LogStream::sendError() 
+            << "Exception trying to report exception " 
+            << e.what() << ": " << x.what() << endl;
+    }
+}
+
+void FeniaManager::croak(const FeniaProcess *process, const ::Exception &e) const
+{
+    try {
+        if (feniaCroaker)
+            feniaCroaker->croak(process, e);
+
+        LogStream::sendError() 
+            << "Exception in Fenia process " << process->name << ": "
+            << e.what() << endl;
+        
+    } catch(const ::Exception &x) {
+        LogStream::sendError() 
+            << "Exception trying to report exception " 
+            << e.what() << ": " << x.what() << endl;
+    }
+}
+
 
 DbEnvContext *
 FeniaManager::getDbEnv( ) const

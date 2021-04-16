@@ -1,6 +1,7 @@
 #include "logstream.h"
 #include "core/object.h"
 #include "room.h"
+#include "pcharacter.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "loadsave.h"

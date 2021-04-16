@@ -12,6 +12,7 @@
 #include "race.h"
 #include "object.h"
 #include "room.h"
+#include "pcharactermanager.h"
 #include "skill.h" 
 #include "skillmanager.h" 
 #include "defaultspell.h"

@@ -4,9 +4,10 @@
  */
 
 #include "logstream.h"
-#include "character.h"
+#include "pcharacter.h"
 #include "core/object.h"
 #include "affect.h"
+#include "pcharactermanager.h"
 #include "save.h"
 #include "merc.h"
 #include "loadsave.h"
