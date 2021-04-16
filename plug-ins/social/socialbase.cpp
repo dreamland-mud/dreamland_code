@@ -302,7 +302,7 @@ void SocialBase::visualize( Character *ch )
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-        if (ch->isAffected(gsn_dematerialize) {
+        if (ch->isAffected(gsn_dematerialize)) {
             affect_strip(ch, gsn_dematerialize, true);
             REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
             REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
