@@ -106,7 +106,7 @@ void limit_timestamp( Object *obj, Character *ch )
                              << "timestamped " << obj->timestamp << endl;
 }
 
-// Speed up decay unless carried by PC. Every minute spent on the ground counts as minus 1 day.
+// Speed up decay unless carried by PC in a non-safe room. Every minute spent like that counts as minus 1 day.
 void limit_ground_decay(Object *obj)
 {
     if (obj->pIndexData->limit < 0)
@@ -125,13 +125,15 @@ void limit_ground_decay(Object *obj)
         return;
     }
 
-    if (obj->carried_by && !obj->carried_by->is_npc())
+    if (obj->carried_by && !obj->carried_by->is_npc() && !IS_SET(obj->carried_by->in_room->room_flags, ROOM_SAFE))
         return;
     
     obj->timestamp -= 60 * 60 * 24;
 
     if (obj->in_room)
         obj->in_room->echo(POS_RESTING, "Лежа на земле, %1$O1 неумолимо истонча%1$nется|ются.", obj);
+    else if (obj->carried_by)
+        obj->carried_by->pecho("%^O1 в твоих руках неумолимо истонча%1$nется|ются.", obj);
 
     save_items_at_holder(obj);
 }
