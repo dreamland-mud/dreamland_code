@@ -264,26 +264,20 @@ void do_visible( Character *ch )
     }
     if (IS_SET(ch->affected_by, AFF_INVISIBLE))
       {
-        ch->pecho( "Ты появляешься из ниоткуда." );
-        affect_strip(ch, gsn_invisibility);
-        affect_strip(ch, gsn_mass_invis);
+        affect_strip(ch, gsn_invisibility, true);
+        affect_strip(ch, gsn_mass_invis, true);
         REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
-        oldact("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
       {
-        ch->pecho( "Ты появляешься из ниоткуда." );
-        affect_strip(ch, gsn_improved_invis);
+        affect_strip(ch, gsn_improved_invis, true);
+        affect_strip(ch, "dematerialize", true);
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
-        oldact("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
       }
     if (IS_SET(ch->affected_by, AFF_SNEAK))
       {
-        ch->pecho( "Твои движения становятся заметными для окружающих." );
-        affect_strip(ch, gsn_sneak);
+        affect_strip(ch, gsn_sneak, true);
         REMOVE_BIT(ch->affected_by, AFF_SNEAK);
       }
-
-    affect_strip ( ch, gsn_mass_invis);
 }
 
