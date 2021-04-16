@@ -19,7 +19,6 @@ class PCharacter;
 
 void update_handler( );
 void char_update( );
-void area_update( );
 void room_update( );
 void obj_update( );
 void mobile_update( );

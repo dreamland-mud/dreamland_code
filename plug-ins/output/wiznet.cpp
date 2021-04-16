@@ -79,7 +79,7 @@ wiznet( long flag, long flag_skip, int min_level, const char *fmt, ... )
     Descriptor *d;
     PCharacter *pch;
 
-    if (flag != WIZ_RESETS) {
+    {
         va_list args;
         va_start( args, fmt );
         DLString msg = vfmt( NULL, fmt, args ).colourStrip( );

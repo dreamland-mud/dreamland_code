@@ -59,7 +59,6 @@ char                        strArea[MAX_INPUT_LENGTH];
 list<RESET_DATA *> areaResets;
 
 bool dup_room_vnum( int vnum );
-void area_update( void );
 void        new_load_area( FILE *fp );
 void        load_helps( FILE *fp );
 void         load_mobiles( FILE *fp );

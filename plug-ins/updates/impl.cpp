@@ -6,6 +6,7 @@
 #include "commandtemplate.h"
 
 #include "update_params.h"
+#include "update_areas.h"
 #include "update.h"
 #include "weather.h"
 
@@ -43,7 +44,7 @@ public:
     {
         if(DLScheduler::getThis()->getCurrentTick( ) == 0) {
             weather_init( );
-            area_update( );
+            area_update(FRESET_ALWAYS);
         }
     }
     virtual int getPriority( ) const

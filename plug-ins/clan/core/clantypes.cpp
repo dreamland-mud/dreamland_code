@@ -3,8 +3,10 @@
  * ruffina, 2004
  */
 #include "clantypes.h"
+#include "logstream.h"
 
 #include "object.h"
+#include "objectmanager.h"
 #include "clanreference.h"
 
 /*-----------------------------------------------------------------
@@ -13,13 +15,13 @@
 const DLString ClanData::TABLE_NAME = "clan-data";
 const DLString ClanData::NODE_NAME = "ClanData";
 
-ClanData::ClanData( )  
+ClanData::ClanData( )  : itemID(0)
 {
     defeat.resize( 5 );
     victory.resize( 5 );
 }
 
-ClanData::ClanData( const DLString &n ) : name( n )
+ClanData::ClanData( const DLString &n ) : name( n ), itemID(0)
 {
     defeat.resize( 5 );
     victory.resize( 5 );
@@ -96,7 +98,6 @@ void ClanData::unsetItem( Object *obj )
         save( );
     }
 }
-
 
 
 /*-----------------------------------------------------------------

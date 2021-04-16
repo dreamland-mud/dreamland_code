@@ -56,7 +56,7 @@ ClanItem::ClanItem( )
 {
 }
 
-bool ClanItem::isHolded( ) const
+bool ClanItem::isHeld( ) const
 {
     Character *carrier = obj->carried_by;
     
@@ -80,10 +80,13 @@ bool ClanItem::isHolded( ) const
 
 bool ClanItem::area( ) 
 { 
-    if (!clan->getData( ) || clan->getData( )->hasItem( ))
+    if (!clan->getData( ))
         return false;
     
-    if (isHolded( ))
+    if (clan->getData( )->hasItem( ))
+        return false;
+
+    if (isHeld( ))
         return false;
     
     actDisappear( );

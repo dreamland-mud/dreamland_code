@@ -1175,7 +1175,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         obj->behavior.toStream( ostr );
         ch->send_to( ostr );
     } else {
-        ch->pecho("");
+        ch->send_to("\r\n");
     }
 
     if (!obj->properties.empty()) {
@@ -1188,8 +1188,6 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         ch->send_to(ostr);
     }
-
-    
 }
 
 

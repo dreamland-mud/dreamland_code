@@ -19,9 +19,7 @@ public:
         ClanObject( );
         virtual ~ClanObject( );
         
-protected:
         ClanArea::Pointer getClanArea( );
-
         XML_VARIABLE XMLClanReference clan;
 };
 
@@ -41,7 +39,7 @@ public:
         virtual void actDisappear( );
 
 private:
-        bool isHolded( ) const;
+        bool isHeld( ) const;
 };
 
 class ClanAltar : public ClanObject {

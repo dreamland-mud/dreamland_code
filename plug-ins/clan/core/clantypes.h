@@ -91,10 +91,10 @@ protected:
     
     XML_VARIABLE XMLPointer<ClanBank> bank;
     XML_VARIABLE Diplomacy diplomacy, proposition;
-    XML_VARIABLE XMLLongLong itemID;
 
 private:
     DLString name;
+    long long itemID;
 
     static const DLString TABLE_NAME;
     static const DLString NODE_NAME;
@@ -102,7 +102,7 @@ private:
 
 inline bool ClanData::hasItem( ) const
 {
-    return itemID.getValue( ) != 0;
+    return itemID != 0;
 }
 inline ClanBank::Pointer ClanData::getBank( ) const
 {

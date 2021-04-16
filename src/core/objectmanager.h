@@ -35,6 +35,7 @@ public:
         
         static void extract( Object* object );
         static Object* getObject( );
+        static Object *find(long long ID);
         
         static inline ObjectManager* getThis( )
         {

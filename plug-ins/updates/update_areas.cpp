@@ -49,25 +49,26 @@ static void aprog_update( Area *area )
 /*
  * Repopulate areas periodically.
  */
-void area_update( )
+void area_update( int flags )
 {
-//    ProfilerBlock be("area_update");
-
     for (auto &pArea: areaInstances)
     {
         aprog_update(pArea);
 
-        if ( ++pArea->age < 3 )
+        if (!IS_SET(flags, FRESET_ALWAYS) && ++pArea->age < 3)
             continue;
 
         /*
-         * Check age and reset.
-         * Note: Mud School resets every 3 minutes (not 15).
+         * If a reset is forced (e.g. after world startup): reset immediately.
+         * Popular areas (newbie ones): reset every 3 minutes.
+         * Areas with some recent activity (empty == false): reset every 15 minutes or once all players are out.
+         * All other areas: reset every 30 minutes.
          */
-        if ( (!pArea->empty && (pArea->nplayer == 0 || pArea->age >= 15))
-                || pArea->age >= 31)
+        if ((!pArea->empty && (pArea->nplayer == 0 || pArea->age >= 15))
+                || pArea->age >= 31
+                || IS_SET(flags, FRESET_ALWAYS))
         {
-            reset_area( pArea );
+            reset_area( pArea, flags );
             wiznet( WIZ_RESETS, 0, 0, "%s has just been reset.", pArea->pIndexData->name );
 
             pArea->age = number_range( 0, 3 );

@@ -171,6 +171,9 @@ void OLCStateArea::changed( PCharacter *ch )
 // Area Editor Functions.
 AEDIT(show, "показать", "показать все поля")
 {
+    AreaIndexData *original = get_area_data(vnum);
+    Area *instance = original->area;
+
     ptc(ch, "Name:       [%5d] %s\n\r", vnum.getValue( ), name.getValue( ).c_str( ));
     ptc(ch, "File:       [%s]\n\r", file_name.getValue( ).c_str( ));
     ptc(ch, "Vnums:      [%u-%u]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
@@ -182,11 +185,15 @@ AEDIT(show, "показать", "показать все поля")
     ptc(ch, "Speedwalk:  [%s]\n\r", speedwalk.getValue( ).c_str( ));
     ptc(ch, "Message:    [%s]\n\r", resetmsg.getValue( ).c_str( ));
     ptc(ch, "Flags:      [%s] {D(? area_flags{w)\n\r", area_flags.names(area_flag).c_str());
-             
+
+    if (instance)
+        ptc(ch, "{DMain instance: empty [%s], age [%d], players [%d], flags [%s], rooms count [%d]{x\n\r",
+            (instance->empty ? "yes" : "no"), instance->age, instance->nplayer, 
+            area_flags.names(instance->area_flag).c_str(), instance->rooms.size());
+                     
     if (!behavior.empty( ))
         ptc(ch, "Behavior:\r\n%s", behavior.c_str( ));
 
-    AreaIndexData *original = get_area_data(vnum);
     if (original) {
         DLString buf;
 

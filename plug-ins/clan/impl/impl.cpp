@@ -9,7 +9,9 @@
 #include "mobilebehaviorplugin.h"
 #include "roombehaviorplugin.h"
 #include "areabehaviorplugin.h"
+#include "mocregistrator.h"
 
+#include "schedulertaskroundplugin.h"
 #include "commandtemplate.h"
 #include "xmlattributeplugin.h"
 #include "dlxmlloader.h"
@@ -17,6 +19,7 @@
 #include "skillcommandtemplate.h"
 #include "spelltemplate.h"
 #include "affecthandlertemplate.h"
+#include "dlscheduler.h"
 
 #include "defaultclan.h"
 #include "battlerager.h"
@@ -33,23 +36,44 @@
 
 TABLE_LOADER(ClanLoader, "clans", "Clan");
 
-class ClanImplRegistrator : public Plugin {
+/** A task responsible for setting up itemID inside clan data. */
+class ClanItemRefreshPlugin : public SchedulerTaskRoundPlugin {
 public:
-    typedef ::Pointer<ClanImplRegistrator> Pointer;
+    typedef ::Pointer<ClanItemRefreshPlugin> Pointer;
 
-    virtual void initialization( )
+    virtual int getPriority( ) const
     {
-        Class::regMoc<KnightOrder>( );
-        Class::regMoc<DefaultClan>( );
+        return SCDP_INITIAL + 10; // Called immediately after the first area update
     }
 
-    virtual void destruction( )
+    virtual void run( )
     {
-        Class::unregMoc<DefaultClan>( );
-        Class::unregMoc<KnightOrder>( );
+        LogStream::sendNotice() << "Refreshing clan item IDs:" << endl;
+    
+        for (Object *obj = object_list; obj; obj = obj->next) {
+            if (!obj->behavior)
+                continue;
+
+            ClanItem::Pointer clanItem = obj->behavior.getDynamicPointer<ClanItem>();
+            if (!clanItem)
+                continue;
+
+            if (!clanItem->clan->getData()) {
+                warn("...clan item (%lld) w/o clan data for %s", 
+                     obj->getID(), clanItem->clan.getName().c_str());
+
+            } else if (obj->in_obj && obj->in_obj->behavior && obj->in_obj->behavior.getDynamicPointer<ClanAltar>()) {
+                clanItem->clan->getData()->setItem(obj);
+                notice("...assigned item [%d] (%lld) to clan %s", 
+                        obj->pIndexData->vnum, obj->getID(), clanItem->clan.getName().c_str());
+
+            } else {
+                notice("...clan item [%d] (%lld) for clan %s is elsewhere", 
+                        obj->pIndexData->vnum, obj->getID(), clanItem->clan.getName().c_str());
+            }
+        }
     }
 };
-
 
 extern "C"
 {
@@ -57,7 +81,8 @@ extern "C"
     {
         SO::PluginList ppl;
         
-        Plugin::registerPlugin<ClanImplRegistrator>( ppl );
+        Plugin::registerPlugin<MocRegistrator<KnightOrder> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<DefaultClan> >( ppl );
     
         /*
          * hunter
@@ -136,6 +161,7 @@ extern "C"
          * loader
          */
         Plugin::registerPlugin<ClanLoader>( ppl );
+        Plugin::registerPlugin<ClanItemRefreshPlugin>( ppl );
 
         return ppl;
     }

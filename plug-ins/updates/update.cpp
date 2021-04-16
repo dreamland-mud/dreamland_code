@@ -737,6 +737,9 @@ void obj_update( void )
             continue;
         }
 
+        if (oprog_area( obj ))
+            continue;
+        
         // No affect update or item decay in chat rooms.
         if (IS_SET(room->room_flags, ROOM_CHAT))
             continue;
@@ -773,9 +776,6 @@ void obj_update( void )
             }
         }
 
-        if (oprog_area( obj ))
-            continue;
-        
         if (!obj->in_obj 
             && room->getSectorType() == SECT_DESERT
             && material_is_flagged( obj, MAT_MELTING ))

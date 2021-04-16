@@ -55,3 +55,15 @@ Object* ObjectManager::getObject( )
     return object;
 }
 
+Object* ObjectManager::find(long long ID) 
+{
+    if (ID == 0)
+        return 0;
+        
+    for (Object *obj = object_list; obj; obj = obj->next)
+        if (obj->getID() == ID)
+            return obj;
+
+    return 0;
+}
+
