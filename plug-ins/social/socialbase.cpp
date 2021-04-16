@@ -20,6 +20,7 @@
 #include "def.h"
 
 GSN(improved_invis);
+GSN(dematerialize);
 
 SocialBase::SocialBase( ) 
 {
@@ -301,12 +302,12 @@ void SocialBase::visualize( Character *ch )
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-        if (ch->isAffected("dematerialize") {
-            affect_strip(ch, "dematerialize", true);
+        if (ch->isAffected(gsn_dematerialize) {
+            affect_strip(ch, gsn_dematerialize, true);
             REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
             REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
             REMOVE_BIT( ch->affected_by, AFF_SNEAK );
-        }        
+        }          
         affect_strip(ch,gsn_improved_invis, true);
     }
 }
