@@ -391,8 +391,8 @@ map<DLString, int> BasicSkill::parseAccessTokens(const DLString &newValue, const
             return empty;
         }
 
-        if (level < 1 || level > LEVEL_MORTAL) {
-            errBuf << "Уровень для " << entryName << " должен быть в пределах 1..100." << endl;
+        if (level < 1 || level > MAX_LEVEL) {
+            errBuf << "Уровень для " << entryName << " должен быть не меньше 0 и не больше максимального уровня." << endl;
             return empty;
         }
 
