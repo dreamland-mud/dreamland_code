@@ -301,8 +301,12 @@ void SocialBase::visualize( Character *ch )
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-        affect_strip(ch,gsn_improved_invis);
-        oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-        oldact("$c1 становится видим$gо|ым|ой для окружающих.\n\r", ch,0,0,TO_ROOM);
+        if (ch->isAffected("dematerialize") {
+            affect_strip(ch, "dematerialize", true);
+            REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
+            REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
+            REMOVE_BIT( ch->affected_by, AFF_SNEAK );
+        }        
+        affect_strip(ch,gsn_improved_invis, true);
     }
 }
