@@ -26,6 +26,7 @@ GSN(cavalry);
 GSN(invisibility);
 GSN(mass_invis);
 GSN(improved_invis);
+GSN(dematerialize);
 GSN(sneak);
 CLAN(none);
 
@@ -270,8 +271,8 @@ void do_visible( Character *ch )
       }
     if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
       {
-        if (ch->isAffected("dematerialize") {
-            affect_strip(ch, "dematerialize", true);
+        if (ch->isAffected(gsn_dematerialize) {
+            affect_strip(ch, gsn_dematerialize, true);
             REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
             REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
             REMOVE_BIT( ch->affected_by, AFF_SNEAK );
