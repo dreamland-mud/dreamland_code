@@ -270,8 +270,13 @@ void do_visible( Character *ch )
       }
     if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
       {
+        if (ch->isAffected("dematerialize") {
+            affect_strip(ch, "dematerialize", true);
+            REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
+            REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
+            REMOVE_BIT( ch->affected_by, AFF_SNEAK );
+        }        
         affect_strip(ch, gsn_improved_invis, true);
-        affect_strip(ch, "dematerialize", true);
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
       }
     if (IS_SET(ch->affected_by, AFF_SNEAK))
