@@ -6,6 +6,7 @@
 #include "commandtemplate.h"
 #include "roomtraverse.h"
 
+#include "roomutils.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
@@ -119,7 +120,10 @@ struct GoDoorSameArea
     inline bool operator () (Room *r, EXIT_DATA * exit) const
     {
         Room *to_room = exit->u1.to_room;
-        return to_room && to_room->area == area && ch->canEnter(to_room);
+        return to_room 
+                && to_room->area == area 
+                && ch->canEnter(to_room) 
+                && !RoomUtils::isRandom(r);
     }
 
     Character *ch;

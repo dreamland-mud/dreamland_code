@@ -65,3 +65,14 @@ bool RoomUtils::hasParticles(Room *target)
         && isOutside(target);
 }
 
+
+bool RoomUtils::isRandom(Room *room) 
+{
+    for(auto &pReset: room->pIndexData->resets)
+        switch (pReset->command) {
+            case 'R': 
+                return true;
+        }
+
+    return false;
+}
