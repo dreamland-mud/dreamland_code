@@ -193,7 +193,7 @@ SKILL_RUNP( claw )
                 ch->mana -= gsn_claw->getMana( );
 
                 gsn_claw->improve( ch, true, victim );
-                ch->setWait(gsn_claw->getBeats( ));
+                ch->setWait(gsn_claw->getBeats(ch));
                 victim->setWaitViolence( 2 );            
                 victim->position = POS_RESTING;
                 damage_claw = dice(skill_level(*gsn_claw, ch) , 24) + ch->damroll;
@@ -207,7 +207,7 @@ SKILL_RUNP( claw )
                 damage(ch,victim,0,gsn_claw,DAM_BASH, true, DAMF_WEAPON);
                 gsn_claw->improve( ch, false, victim );
                 ch->position = POS_RESTING;
-                ch->setWait(gsn_claw->getBeats( ));
+                ch->setWait(gsn_claw->getBeats(ch));
         }
 }
 

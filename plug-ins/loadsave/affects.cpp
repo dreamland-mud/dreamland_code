@@ -242,6 +242,7 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     case APPLY_SAVING_SPELL:  ch->saving_throw                += mod;        break;
     case APPLY_MANA_GAIN:     ch->mana_gain             += mod; break;
     case APPLY_HEAL_GAIN:     ch->heal_gain             += mod; break;
+    case APPLY_BEATS:         ch->mod_beats += mod; break;
 
     case APPLY_NONE:
     case APPLY_LEARNED: 

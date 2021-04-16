@@ -13,7 +13,7 @@
 #include "pcrace.h"
 
 #include "mercdb.h"
-
+#include "math_utils.h"
 #include "poliglot.h"
 
 const DLString Language::CATEGORY = "Древние языки";
@@ -269,10 +269,11 @@ Spell::Pointer Language::getSpell( ) const
 {
     return Spell::Pointer( );
 }
-int Language::getBeats( ) const
+int Language::getBeats(Character *ch) const
 {
-    return beats.getValue( );
+    return ch ? percentage(beats, ch->mod_beats) : beats.getValue();
 }
+
 int Language::getMana( ) const
 {
     return 0;

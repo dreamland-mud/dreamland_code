@@ -12,7 +12,7 @@
 #include "defaultpcrace.h"
 #include "defaultracelanguage.h"
 
-TABLE_LOADER(RaceLoader, "races", "Race");
+TABLE_LOADER_IMPL(RaceLoader, "races", "Race");
 TABLE_LOADER(RaceLanguageLoader, "race-languages", "RaceLanguage");
 
 extern "C"

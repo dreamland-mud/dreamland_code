@@ -68,7 +68,7 @@ SKILL_RUNP( layhands )
         return;
     }
 
-    ch->setWait( gsn_lay_hands->getBeats( ) );
+    ch->setWait( gsn_lay_hands->getBeats(ch) );
     if ( number_percent() < gsn_lay_hands->getEffective( ch ) + skill_level_bonus(*gsn_lay_hands, ch) ) {
         postaffect_to_char(ch, gsn_lay_hands, 2);
 

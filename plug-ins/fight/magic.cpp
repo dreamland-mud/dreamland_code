@@ -256,7 +256,7 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
         spell->utter( ch );
 
     if (IS_SET(flags, FSPELL_WAIT)) 
-        ch->setWait( spell->getBeats( ) );
+        ch->setWait( spell->getBeats(ch) );
 
     if (IS_SET(flags, FSPELL_CHECK_SAFE) && offensive && target->victim) {
         if (is_safe(ch, target->victim))

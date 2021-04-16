@@ -208,7 +208,7 @@ CMDRUN( cast )
     }
 
     spell->utter( ch );
-    ch->setWait(spell->getBeats( ) );
+    ch->setWait(spell->getBeats(ch) );
     
     if (offensive) {
         UNSET_DEATH_TIME(ch);

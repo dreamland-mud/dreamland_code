@@ -54,7 +54,7 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
                 return;
         }
 
-        ch->setWait( skill->getBeats( ) );
+        ch->setWait( skill->getBeats(ch) );
 
         oldact_p("Поток мрака, созданный тобой, окутывает $C4.",
                 ch, 0, victim, TO_CHAR, POS_RESTING);

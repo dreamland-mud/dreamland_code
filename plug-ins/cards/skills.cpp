@@ -115,7 +115,7 @@ SKILL_RUNP( sconce )
     victim->setLastFightTime( );
     ch->setLastFightTime( );
 
-    ch->setWait( gsn_sconce->getBeats( ) );
+    ch->setWait( gsn_sconce->getBeats(ch) );
 
     chance = ( int ) ( 0.5 * gsn_sconce->getEffective( ch ) );
     chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
@@ -244,7 +244,7 @@ SKILL_RUNP( joker )
         return;
     }
 
-    ch->setWait( gsn_joker->getBeats( )  );
+    ch->setWait( gsn_joker->getBeats(ch)  );
     JokerOneHit joke( ch, victim );
     
     try {

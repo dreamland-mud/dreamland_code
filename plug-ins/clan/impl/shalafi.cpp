@@ -293,7 +293,7 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
               dam /= 2;
   if( victim->is_npc() ) dam /= 4;
 
-  ch->setWait(gsn_mental_attack->getBeats( ) );
+  ch->setWait(gsn_mental_attack->getBeats(ch) );
 
   try {
       damage_nocatch( ch, victim, ( dam ), sn, DAM_MENTAL, true, DAMF_MAGIC );

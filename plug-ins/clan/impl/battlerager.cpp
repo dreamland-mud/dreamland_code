@@ -158,7 +158,7 @@ COMMAND(CChop, "chop")
     }
 
     corpse->value2(corpse->value2() & ~part);
-    ch->setWait( gsn_trophy->getBeats( ) / 2 );
+    ch->setWait( gsn_trophy->getBeats(ch) / 2 );
 
     DLString what = part_flags.messages( part, true, '4' );
 
@@ -263,7 +263,7 @@ SKILL_RUNP( trophy )
         return;
     }
 
-    ch->setWait( gsn_trophy->getBeats( ) );
+    ch->setWait( gsn_trophy->getBeats(ch) );
 
     if (!ch->is_npc() && number_percent() < gsn_trophy->getEffective( ch ))
     {
@@ -479,7 +479,7 @@ SKILL_RUNP( spellbane )
                 return;
         }
 
-        ch->setWait( gsn_spellbane->getBeats( )  );
+        ch->setWait( gsn_spellbane->getBeats(ch)  );
         int slevel = skill_level(*gsn_spellbane, ch);    
 
         af.type                = gsn_spellbane;
@@ -520,7 +520,7 @@ SKILL_RUNP( resistance )
                 return;
         }
 
-        ch->setWait( gsn_resistance->getBeats( )  );
+        ch->setWait( gsn_resistance->getBeats(ch)  );
 
         if ((!ch->is_npc() && number_percent() < gsn_resistance->getEffective( ch ))
           || ch->is_npc() )
@@ -574,7 +574,7 @@ SKILL_RUNP( truesight )
       return;
     }
 
-  ch->setWait( gsn_truesight->getBeats( )  );
+  ch->setWait( gsn_truesight->getBeats(ch)  );
 
   if (!ch->is_npc() && number_percent() < gsn_truesight->getEffective( ch ))
     {

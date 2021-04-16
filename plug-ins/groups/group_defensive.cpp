@@ -90,7 +90,7 @@ SKILL_RUNP( rescue )
                 return;
         }
 
-        ch->setWait( gsn_rescue->getBeats( )  );
+        ch->setWait( gsn_rescue->getBeats(ch)  );
 
         if ( ( number_percent( ) > gsn_rescue->getEffective( ch ) )
                 || ( victim->getModifyLevel() > ( skill_level(*gsn_rescue, ch) + 30) )

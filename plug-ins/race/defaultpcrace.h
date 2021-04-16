@@ -33,7 +33,6 @@ public:
     virtual DLString getWhoNameFor( Character *, Character * ) const;
     virtual DLString getScoreNameFor( Character *looker, Character *owner = NULL ) const;
 
-protected:
     XML_VARIABLE XMLGlobalArray    classes;
     XML_VARIABLE XMLEnumerationArray stats; 
     XML_VARIABLE XMLIntegerNoEmpty points;

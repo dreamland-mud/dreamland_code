@@ -405,7 +405,7 @@ void HunterWeapon::fight_axe( Character *ch )
     /* and now the attack */
 
     if (number_percent() < chance){
-            //ch->setWait( gsn_shield_cleave->getBeats( )  );
+            //ch->setWait( gsn_shield_cleave->getBeats(ch)  );
         oldact_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         oldact_p("$o1 раскалывает пополам твой щит.",ch,obj,victim,TO_VICT,POS_DEAD);
         oldact_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
@@ -414,7 +414,7 @@ void HunterWeapon::fight_axe( Character *ch )
         oldact_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         oldact_p("$o1 с грохотом отскакивает от твоего щита.",ch,obj,victim,TO_VICT,POS_DEAD);
         oldact_p("$o1 с грохотом отскакивает от щита $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
-            //ch->setWait( gsn_shield_cleave->getBeats( )  );
+            //ch->setWait( gsn_shield_cleave->getBeats(ch)  );
     }
 }
 
@@ -474,7 +474,7 @@ void HunterWeapon::fight_sword( Character *ch )
     chance += obj->level - wield->level;
 
     if (number_percent() < chance){
-            //ch->setWait( gsn_weapon_cleave->getBeats( )  );
+            //ch->setWait( gsn_weapon_cleave->getBeats(ch)  );
         oldact_p("$o1 уничтожает оружие $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         oldact_p("$o1 уничтожает твое оружие.",ch,obj,victim,TO_VICT,POS_DEAD);
         oldact_p("$o1 уничтожает  оружие $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
@@ -483,7 +483,7 @@ void HunterWeapon::fight_sword( Character *ch )
         oldact_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
         oldact_p("$o1 со звоном отскакивает от твоего оружия.",ch,obj,victim,TO_VICT,POS_DEAD);
         oldact_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
-            //ch->setWait( gsn_weapon_cleave->getBeats( )  );
+            //ch->setWait( gsn_weapon_cleave->getBeats(ch)  );
     }
 }
 
@@ -608,7 +608,7 @@ SKILL_RUNP( hunt )
 
     oldact("$c1 сосредоточенно осматривает местность и следы на земле.", ch, 0, 0, TO_ROOM );
 
-    ch->setWait( gsn_hunt->getBeats( )  );
+    ch->setWait( gsn_hunt->getBeats(ch)  );
     
     road = room_first_step( 
                     ch,
@@ -872,7 +872,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     if (!chance( gsn_hunter_beacon->getEffective( ch ) )) {
         oldact("Твоя попытка установить $o4 окончилась неудачей.", ch, obj, 0, TO_CHAR );
         ch->mana -= gsn_hunter_beacon->getMana( ) / 2;
-        ch->setWait( gsn_hunter_beacon->getBeats( ) / 2 );
+        ch->setWait( gsn_hunter_beacon->getBeats(ch) / 2 );
         gsn_hunter_beacon->improve( ch, false );
 
         if (!chance( ch->getPC( )->getClanLevel( ) * 10 )) {
@@ -901,7 +901,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     charges = number_range( 1, ch->getPC( )->getClanLevel( ) );
     
     postaffect_to_char( ch, gsn_hunter_beacon, number_range( 0, 1 ) );
-    ch->setWait( gsn_hunter_beacon->getBeats( ) );
+    ch->setWait( gsn_hunter_beacon->getBeats(ch) );
     ch->mana -= gsn_hunter_beacon->getMana( );
     gsn_hunter_beacon->improve( ch, true );
     
@@ -1037,7 +1037,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
             ch->recho( "%2$^C1 пытается установить %1$O4, но только ломает %1$P2.", obj, ch );
         }
 
-        ch->setWait( gsn_hunter_snare->getBeats( ) / 2 );
+        ch->setWait( gsn_hunter_snare->getBeats(ch) / 2 );
         gsn_hunter_snare->improve( ch, false );
         extract_obj( obj );
         return true;
@@ -1058,7 +1058,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
     quality = gsn_hunter_snare->getEffective( ch );
 
     postaffect_to_char( ch, gsn_hunter_snare, number_range( 1, 3 ) );
-    ch->setWait( gsn_hunter_snare->getBeats( ) );
+    ch->setWait( gsn_hunter_snare->getBeats(ch) );
     ch->mana -= gsn_hunter_snare->getMana( );
     gsn_hunter_snare->improve( ch, true );
 
@@ -1099,7 +1099,7 @@ void HunterSnareTrap::greet( Character *victim )
 
     try {
         HunterSnareDamage( victim, this, false ).hit( true );
-        victim->setWait( gsn_hunter_snare->getBeats( ) );
+        victim->setWait( gsn_hunter_snare->getBeats(victim) );
     } catch (const VictimDeathException &) {
     }
 
@@ -1245,7 +1245,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
         obj->condition = max( 1, obj->condition - 10 );
     }
     
-    ch->setWait( gsn_hunter_pit->getBeats( ) );
+    ch->setWait( gsn_hunter_pit->getBeats(ch) );
     ch->move -= moveCost;
     ch->mana -= gsn_hunter_pit->getMana( );
     
@@ -1320,7 +1320,7 @@ bool HunterPitSteaks::use( Character *ch, const char * cArgs )
     bhv->setReady( ch );
     obj_from_char( obj );
     obj_to_obj( obj, pit );
-    ch->setWait( gsn_hunter_pit->getBeats( ) );
+    ch->setWait( gsn_hunter_pit->getBeats(ch) );
 
     log( ch, "устанавливает" );
     return true;
@@ -1423,7 +1423,7 @@ void HunterPitTrap::greet( Character *victim )
         oldact("Ты теряешь сознание.", victim, 0, 0, TO_CHAR);
         oldact("$c1 теряет сознание.", victim, 0, 0, TO_ROOM);
         victim->position = POS_STUNNED;
-        victim->setWait( gsn_hunter_pit->getBeats( ) );
+        victim->setWait( gsn_hunter_pit->getBeats(victim) );
     } catch (const VictimDeathException &) {
     }
 

@@ -28,6 +28,7 @@
 #include "affectflags.h"
 #include "commandflags.h"
 #include "stats_apply.h"
+#include "math_utils.h"
 #include "act.h"
 #include "dreamland.h"
 #include "mercdb.h"
@@ -322,10 +323,11 @@ HelpArticlePointer BasicSkill::getSkillHelp( ) const
     return help;
 }
 
-int BasicSkill::getBeats( ) const
+int BasicSkill::getBeats(Character *ch) const
 {
-    return beats.getValue( );
+    return ch ? percentage(beats, ch->mod_beats) : beats.getValue();
 }
+
 int BasicSkill::getMana( ) const
 {
     return mana.getValue( );
@@ -424,7 +426,7 @@ DLString BasicSkill::printWaitAndMana(Character *ch) const
 
     buf << pad;
 
-    int beat = getBeats() / dreamland->getPulsePerSecond();
+    int beat = getBeats(ch) / dreamland->getPulsePerSecond();
     if (beat > 0) {
         buf << fmt(0, "Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. ", beat);
         empty = false;

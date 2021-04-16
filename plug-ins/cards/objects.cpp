@@ -208,7 +208,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
         return true;
     }
     
-    pch->setWait( gsn_enter_card->getBeats( ) );
+    pch->setWait( gsn_enter_card->getBeats(pch) );
     victim = get_player_world( pch, getPlayerName( ).c_str( ) );
     
     if (!victim 
@@ -307,7 +307,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     myAttr = pch->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
     myCard = findMyCard( pch, victim );
 
-    pch->setWait( gsn_pull_card->getBeats( ) );
+    pch->setWait( gsn_pull_card->getBeats(pch) );
 
     if (hisAttr 
         && hisAttr->getContactName( ) == pch->getName( )
@@ -427,7 +427,7 @@ bool CardBehavior::examine( Character *looker )
         return true;
     }
     
-    pch->setWait(gsn_peek_card->getBeats( ) );
+    pch->setWait(gsn_peek_card->getBeats(pch) );
         
     victim = get_player_world( pch, getPlayerName( ).c_str( ) );
    
@@ -636,7 +636,7 @@ void CardSleevesBehavior::fight( Character *ch )
         oldact("{cТы пытаешься вынуть туза из $o2, но роняешь его! Упс..{x", ch, obj, 0, TO_CHAR);
         oldact("{cИз $o2 $c2 выпадает туз! Шулер!{x", ch, obj, 0, TO_ROOM);
         gsn_ace_in_sleeves->improve( ch, false );
-        ch->setWait(gsn_ace_in_sleeves->getBeats( ));
+        ch->setWait(gsn_ace_in_sleeves->getBeats(ch));
     }
     else {
         oldact("{cТы достаешь из $o2 припрятанного туза.{x", ch, obj, 0, TO_CHAR);

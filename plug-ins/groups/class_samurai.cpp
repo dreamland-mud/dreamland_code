@@ -100,7 +100,7 @@ SKILL_RUNP( enchant )
          ch->pecho("Ты не можешь сконцентрироваться.");
          ch->recho("%1$^C1 пытал%1$Gось|ся|ась улучшить %2$O4, но на мгновение забыл%1$Gо||а как это делается.",
                      ch, obj);
-        ch->setWait( gsn_enchant_sword->getBeats( ) );
+        ch->setWait( gsn_enchant_sword->getBeats(ch) );
         gsn_enchant_sword->improve( ch, false );
         ch->mana -= mana / 2;
          return;
@@ -110,7 +110,7 @@ SKILL_RUNP( enchant )
     gsn_enchant_weapon->getSpell( )->run(  ch,  obj, gsn_enchant_weapon,  skill_level(*gsn_enchant_sword, ch) );
 
     gsn_enchant_sword->improve( ch, true );
-    ch->setWait( gsn_enchant_sword->getBeats( ) );
+    ch->setWait( gsn_enchant_sword->getBeats(ch) );
     return;
 }
 
@@ -168,7 +168,7 @@ SKILL_RUNP( explode )
     oldact("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
     oldact("Пусть все сгорит!",ch,0,0,TO_CHAR);
 
-    ch->setWait( gsn_explode->getBeats( ) );
+    ch->setWait( gsn_explode->getBeats(ch) );
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch ) + skill_level_bonus(*gsn_explode, ch)) {
         damage(ch,victim,0,gsn_explode,DAM_FIRE, true, DAMF_WEAPON);
@@ -278,7 +278,7 @@ SKILL_RUNP( target )
     }
 
 
-  ch->setWait( gsn_target->getBeats( ) );
+  ch->setWait( gsn_target->getBeats(ch) );
 
     if (victim == ch->fighting) {
         oldact("Ты и так наносишь большинство своих атак $C3.", ch, 0, victim, TO_CHAR);
@@ -446,7 +446,7 @@ SKILL_RUNP( katana )
                 return;
         }
 
-        ch->setWait( gsn_katana->getBeats( ) );
+        ch->setWait( gsn_katana->getBeats(ch) );
 
         if ( !ch->is_npc() && number_percent() < gsn_katana->getEffective( ch ) + skill_level_bonus(*gsn_katana, ch) )
         {

@@ -128,7 +128,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     if (number_percent( ) > chance || ch->isAffected( gsn_garble )) {
         ch->pecho( "Тебя подвело произношение." );
         ch->recho( POS_RESTING, "%^C1 бормочет что-то неразборчивое.", ch );
-        ch->setWait( getBeats( ) / 2 );
+        ch->setWait( getBeats(ch) / 2 );
         return;
     }
     
@@ -208,7 +208,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
                                                  victim->getNameP( '4' ).c_str( ) ));
     }
 
-    ch->setWait( getBeats( ) );
+    ch->setWait( getBeats(ch) );
 }
 
 void Language::doList( PCharacter *ch ) const

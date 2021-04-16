@@ -386,7 +386,7 @@ SKILL_RUNP( grave )
 
     ch->move -= 100;
     
-    ch->setWait( gsn_grave->getBeats( )  );
+    ch->setWait( gsn_grave->getBeats(ch)  );
 
     if (number_percent( ) > chance) {
         oldact("$c1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM);
@@ -525,7 +525,7 @@ void sucking( Character *ch, Character *victim )
     }
 	
     UNSET_DEATH_TIME(ch);
-    ch->setWait( gsn_vampiric_bite->getBeats( )  );
+    ch->setWait( gsn_vampiric_bite->getBeats(ch)  );
                      
     oldact_p("Сквозь кошмарный сон ты чувствуешь, как $c1 высасывает твою {rкровь{x.", ch, 0, victim, TO_VICT, POS_DEAD);
     oldact("Ты высасываешь {rкровь{x из шеи $C2.", ch, 0, victim, TO_CHAR);
@@ -735,7 +735,7 @@ SKILL_RUNP( bite )
     UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
     ch->setLastFightTime( );	
-    ch->setWait( gsn_vampiric_bite->getBeats( )  );
+    ch->setWait( gsn_vampiric_bite->getBeats(ch)  );
     
     VampiricBiteOneHit vb( ch, victim );
     
@@ -938,7 +938,7 @@ SKILL_RUNP( touch )
         victim->setLastFightTime( );
         ch->setLastFightTime( ); 
 
-    	ch->setWait( gsn_vampiric_touch->getBeats( ) );
+    	ch->setWait( gsn_vampiric_touch->getBeats(ch) );
 
     if (Chance(ch, chance, 100).reroll())
     {
@@ -1020,7 +1020,7 @@ SKILL_RUNP( bloodlet )
         return;
     }
 
-    ch->setWait( gsn_bloodlet->getBeats( ) );
+    ch->setWait( gsn_bloodlet->getBeats(ch) );
     dam = ch->getModifyLevel( );
     
     if (number_percent( ) < chance) {
@@ -1123,7 +1123,7 @@ SKILL_RUNP( bonedagger )
         }
     }
 
-    ch->setWait( gsn_bonedagger->getBeats( )  );
+    ch->setWait( gsn_bonedagger->getBeats(ch)  );
     ch->ambushing = str_dup( arg );
     run( ch, str_empty );
 }
@@ -1231,7 +1231,7 @@ SKILL_RUNP( sense )
       return;
     }
 
-  ch->setWait( gsn_sense_life->getBeats( )  );
+  ch->setWait( gsn_sense_life->getBeats(ch)  );
 
   if (!ch->is_npc() && number_percent() < gsn_sense_life->getEffective( ch ))
     {

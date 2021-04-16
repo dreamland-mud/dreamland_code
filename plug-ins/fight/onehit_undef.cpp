@@ -455,7 +455,7 @@ bool UndefinedOneHit::defenseParry( )
             oldact("$C1 не может устоять на ногах и падает вниз!", ch,0,victim,TO_CHAR);
             oldact("$C1 пытается парировать мощный удар $c1, но не может устоять на ногах.", ch,0,victim,TO_NOTVICT);
 
-            victim->setWait(gsn_bash->getBeats( ));
+            victim->setWait(gsn_bash->getBeats(victim));
             victim->position = POS_RESTING;
         }
     }
@@ -678,7 +678,7 @@ bool UndefinedOneHit::defenseDodge( )
             oldact("$C1 уворачивается от твоей атаки, ты теряешь равновесие, и падаешь вниз!", ch,0,victim,TO_CHAR);
             oldact("$C1 уворачивается от атаки $c2, $c1 теряет равновесие и падает вниз.", ch,0,victim,TO_NOTVICT);
 
-            ch->setWait(gsn_trip->getBeats( ));
+            ch->setWait(gsn_trip->getBeats(ch));
             ch->position = POS_RESTING;
         }
     }
@@ -807,7 +807,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
             oldact("$C1 не может сдержать твою атаку и падает!", ch, 0, victim, TO_CHAR);
             oldact("$C1 не может сдержать ошеломляющую атаку $c2 и падает.", ch, 0, victim, TO_NOTVICT);
 
-            victim->setWait(gsn_bash->getBeats( ));
+            victim->setWait(gsn_bash->getBeats(victim));
             victim->position = POS_RESTING;
         }
     }
@@ -1414,8 +1414,8 @@ void UndefinedOneHit::damEffectSlice( )
         return;
     }
     
-    ch->setWait(gsn_slice->getBeats( ) );
-    victim->setWait(2 * gsn_slice->getBeats( ) );
+    ch->setWait(gsn_slice->getBeats(ch) );
+    victim->setWait(2 * gsn_slice->getBeats(victim) );
 
     /* timer */
     timer = std::max( 2, ch->getModifyLevel( ) / 10 ); 

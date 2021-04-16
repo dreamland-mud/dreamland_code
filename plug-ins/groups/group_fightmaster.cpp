@@ -207,7 +207,7 @@ SKILL_RUNP( bashdoor )
                 }
 
 
-                ch->setWait( gsn_bash_door->getBeats( )  );
+                ch->setWait( gsn_bash_door->getBeats(ch)  );
         }
         else
         {
@@ -215,7 +215,7 @@ SKILL_RUNP( bashdoor )
                 oldact("Обессилев, $c1 упа$gло|л|ла лицом вниз.", ch,0,0,TO_ROOM);
                 gsn_bash_door->improve( ch, false );
                 ch->position = POS_RESTING;
-                ch->setWait( gsn_bash_door->getBeats( ) * 3 / 2  );
+                ch->setWait( gsn_bash_door->getBeats(ch) * 3 / 2  );
                 damage_bash = ch->damroll + number_range(4,4 + 4* ch->size + chance/5);
                 damage(ch,ch,damage_bash,gsn_bash_door, DAM_BASH, true, DAMF_WEAPON);
                 if(IS_CHARMED(ch) && ch->master->getPC()){
@@ -415,7 +415,7 @@ SKILL_RUNP( bash )
                 oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
                         ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
-                ch->setWait( gsn_bash->getBeats( ) );
+                ch->setWait( gsn_bash->getBeats(ch) );
                 return;
         }
 
@@ -463,7 +463,7 @@ SKILL_RUNP( bash )
                 }
                       
                 gsn_bash->improve( ch, true, victim );
-                ch->setWait( gsn_bash->getBeats( ) );
+                ch->setWait( gsn_bash->getBeats(ch) );
                 try{
                 bash.hit(true);
                 }
@@ -479,7 +479,7 @@ SKILL_RUNP( bash )
                         oldact_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
                                 ch,0,victim,TO_VICT,POS_RESTING);
                         ch->position = POS_RESTING;
-                        ch->setWait( gsn_bash->getBeats( ) * 3/2 );
+                        ch->setWait( gsn_bash->getBeats(ch) * 3/2 );
                 }
                 else
                 {
@@ -492,7 +492,7 @@ SKILL_RUNP( bash )
                 }        
                 damage(ch,victim,0,gsn_bash,DAM_BASH, true, DAMF_WEAPON);
                 gsn_bash->improve( ch, false, victim );
-                ch->setWait( gsn_bash->getBeats( ) * 1/2 );
+                ch->setWait( gsn_bash->getBeats(ch) * 1/2 );
         }
         
     if (!FightingCheck)
@@ -587,7 +587,7 @@ SKILL_RUNP( trip )
         if ( victim == ch )
         {
                 ch->pecho("Ты запинаешься и падаешь!");
-                ch->setWait( 2 * gsn_trip->getBeats( ) );
+                ch->setWait( 2 * gsn_trip->getBeats(ch) );
                 oldact("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM);
                 return;
         }
@@ -649,14 +649,14 @@ SKILL_RUNP( trip )
                         oldact("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR);
                         oldact("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT);
                 }
-                ch->setWait( gsn_trip->getBeats( ) );
+                ch->setWait( gsn_trip->getBeats(ch) );
                 gsn_trip->improve( ch, true, victim );
                 damage(ch,victim,number_range(2,2+2*victim->size),gsn_trip,DAM_BASH,true, DAMF_WEAPON);
         }
         else
         {
                 damage(ch,victim,0,gsn_trip,DAM_BASH,true, DAMF_WEAPON);
-                ch->setWait( gsn_trip->getBeats( )*2/3 );
+                ch->setWait( gsn_trip->getBeats(ch)*2/3 );
                 gsn_trip->improve( ch, false, victim );
         }
 
@@ -840,7 +840,7 @@ SKILL_RUNP( kick )
         if ( is_flying( ch ) )
                 chance = ( int )( chance * 1.1 );
         
-        ch->setWait( gsn_kick->getBeats( )  );
+        ch->setWait( gsn_kick->getBeats(ch)  );
         
         if (chance < gsn_kick->getEffective( ch ))
         {
@@ -1016,7 +1016,7 @@ SKILL_RUNP( crush )
                 oldact("{YМощный удар $c2 как будто соскальзывает с $C2.{x",
                         ch,0,victim,TO_NOTVICT);
 
-                ch->setWait( gsn_crush->getBeats( ) );
+                ch->setWait( gsn_crush->getBeats(ch) );
                 return;
         }
 
@@ -1067,7 +1067,7 @@ SKILL_RUNP( crush )
                 }
 
                 victim->setWaitViolence( wait );
-                ch->setWait( gsn_crush->getBeats( ) );
+                ch->setWait( gsn_crush->getBeats(ch) );
                 victim->position = POS_RESTING;
                 damage_crush = (ch->damroll / 2) + number_range(4,4 + 4* ch->size + chance/10);
                 damage(ch,victim,damage_crush,gsn_crush, DAM_BASH, true, DAMF_WEAPON);
@@ -1080,7 +1080,7 @@ SKILL_RUNP( crush )
                 oldact_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
                         ch,0,victim,TO_VICT,POS_RESTING);
                 ch->position = POS_RESTING;
-                ch->setWait( gsn_crush->getBeats( ) * 3/2 );
+                ch->setWait( gsn_crush->getBeats(ch) * 3/2 );
         }
 }
 
@@ -1329,7 +1329,7 @@ SKILL_RUNP( dirt )
                 oldact_p("$c1 ослепле$gно|н|на пылью, попавшей $m в глаза!",
                         victim,0,0,TO_ROOM,POS_RESTING);
 
-                ch->setWait( gsn_dirt_kicking->getBeats( ) );
+                ch->setWait( gsn_dirt_kicking->getBeats(ch) );
 
                 try {
                     damage_nocatch(ch,victim,slevel/5+1,gsn_dirt_kicking,DAM_NONE, true);
@@ -1343,7 +1343,7 @@ SKILL_RUNP( dirt )
         {
                 damage(ch,victim,0,gsn_dirt_kicking,DAM_NONE, true);
                 gsn_dirt_kicking->improve( ch, false, victim );
-                ch->setWait( gsn_dirt_kicking->getBeats( ) );
+                ch->setWait( gsn_dirt_kicking->getBeats(ch) );
         }
 
     if (!FightingCheck)
@@ -1398,7 +1398,7 @@ SKILL_RUNP( warcry )
       return;
     }
 
-  ch->setWait( gsn_warcry->getBeats( )  );
+  ch->setWait( gsn_warcry->getBeats(ch)  );
 
     if (number_percent() > gsn_warcry->getEffective( ch )) {
         switch (number_range( 1, 2 )) {
@@ -1595,7 +1595,7 @@ SKILL_RUNP( smash )
         oldact_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
                 ch,NULL,victim,TO_NOTVICT,POS_FIGHTING);
 
-        ch->setWait( gsn_smash->getBeats( ) );
+        ch->setWait( gsn_smash->getBeats(ch) );
         return;
      }
    
@@ -1630,7 +1630,7 @@ SKILL_RUNP( smash )
         }
         
         victim->setWaitViolence( wait );
-        ch->setWait( gsn_smash->getBeats( ) );
+        ch->setWait( gsn_smash->getBeats(ch) );
         
 
         try {
@@ -1662,7 +1662,7 @@ SKILL_RUNP( smash )
             ch->position=POS_SITTING;       
         else                                 
             ch->position=POS_RESTING;        
-        ch->setWait( gsn_smash->getBeats( ) * 3/2 ); 
+        ch->setWait( gsn_smash->getBeats(ch) * 3/2 ); 
     }
 
     if (!FightingCheck)

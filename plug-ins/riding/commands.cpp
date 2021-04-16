@@ -131,7 +131,7 @@ CMDRUN( mount )
         oldact("$c1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
         oldact("$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
         
-        ch->setWait( gsn_cavalry->getBeats( ) );
+        ch->setWait( gsn_cavalry->getBeats(ch) );
         gsn_cavalry->improve( ch, false );
         return;
     }

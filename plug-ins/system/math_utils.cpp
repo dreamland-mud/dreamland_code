@@ -40,3 +40,11 @@ int signum(float x)
         return 1;
     return 0;
 }
+
+int percentage(int original, int percent) 
+{
+    if (percent == 0)
+        return original;
+    else 
+        return original * (100 + percent) / 100;
+}

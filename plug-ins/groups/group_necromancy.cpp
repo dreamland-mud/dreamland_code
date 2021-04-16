@@ -79,7 +79,7 @@ void AdamantiteGolem::fight( Character *victim )
     if (number_percent( ) > 100 - mirrors * 5)
         return;
 
-    ch->setWait( gsn_rescue->getBeats( )  );
+    ch->setWait( gsn_rescue->getBeats(ch)  );
     
     oldact("Ты спасаешь $C4!",  ch, 0, master, TO_CHAR );
     oldact("$c1 спасает тебя!", ch, 0, master, TO_VICT );

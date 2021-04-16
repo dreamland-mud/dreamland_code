@@ -200,7 +200,7 @@ SKILL_RUNP( sneak )
         ch->pecho("Тебе не удается скрытно передвигаться.");
     }
 
-    ch->setWait( gsn_sneak->getBeats( ) );
+    ch->setWait( gsn_sneak->getBeats(ch) );
 }
 
 /*
@@ -273,7 +273,7 @@ SKILL_RUNP( hide )
                 gsn_hide->improve( ch, false );
         }
 
-        ch->setWait( gsn_hide->getBeats( ) );
+        ch->setWait( gsn_hide->getBeats(ch) );
 }
 
 

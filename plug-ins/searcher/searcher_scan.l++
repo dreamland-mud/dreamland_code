@@ -37,8 +37,10 @@ L	    ([A-Za-z_]|{RL})
 	    DLString buf;
 
 \"	    { BEGIN(QUOTE); buf.clear( ); }
+\'	    { BEGIN(QUOTE); buf.clear( ); }
 <QUOTE>{
 \"	    { BEGIN(INITIAL); value->str = buf; return T_STRING; }
+\'	    { BEGIN(INITIAL); value->str = buf; return T_STRING; }
 \\n	    { buf += '\n';      }
 \\r	    { buf += '\r';      }
 \\t	    { buf += '\t';      }
@@ -86,6 +88,7 @@ L	    ([A-Za-z_]|{RL})
 "LIMIT"     return T_LIMIT;
 "HGAIN"     return T_HGAIN;
 "HEAL_GAIN" return T_HGAIN;
+"BEATS"     return T_BEATS;
 "MGAIN"     return T_MGAIN;
 "MANA_GAIN" return T_MGAIN;
 "SLEVEL"    return T_SLEVEL;
@@ -149,7 +152,7 @@ void SearcherParam::init()
     vnum = level = 0;
     hr = dr = hp = mana = move = saves = armor = size = 0;
     str = inta = wis = dex = con = cha = 0;
-    heal_gain = mana_gain = 0;
+    heal_gain = mana_gain = beats = 0;
     det = aff = imm = res = vuln = "";
     material = "";
     fenia = "";
@@ -233,6 +236,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         case APPLY_SAVING_SPELL:  p.saves+=m; break;
         case APPLY_HEAL_GAIN: p.heal_gain+=m; break;
         case APPLY_MANA_GAIN: p.mana_gain+=m; break;
+        case APPLY_BEATS:     p.beats+=m; break;
         case APPLY_SPELL_LEVEL:
         case APPLY_LEVEL: 
             p.slevel+=m; 

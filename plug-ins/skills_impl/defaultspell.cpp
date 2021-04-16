@@ -789,9 +789,9 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
     }
 }
 
-int DefaultSpell::getBeats( ) const
+int DefaultSpell::getBeats(Character *ch) const
 {
-    return skill->getBeats( ); 
+    return skill->getBeats(ch); 
 }
 int DefaultSpell::getMana( ) const
 {

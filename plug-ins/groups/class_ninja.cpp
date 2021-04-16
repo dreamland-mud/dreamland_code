@@ -183,7 +183,7 @@ SKILL_RUNP( vanish )
             ch->move -= move_dec( ch );
    
     ch->mana -= gsn_vanish->getMana( );
-    ch->setWait( gsn_vanish->getBeats( )  );
+    ch->setWait( gsn_vanish->getBeats(ch)  );
     UNSET_DEATH_TIME(ch);
         
     if (number_percent() > gsn_vanish->getEffective( ch ) )
@@ -493,7 +493,7 @@ SKILL_RUNP( nerve )
         d.log((int)chance, "final");
         //////////////// THE ROLL ////////////////
             
-        ch->setWait( gsn_nerve->getBeats( )  );
+        ch->setWait( gsn_nerve->getBeats(ch)  );
         UNSET_DEATH_TIME(ch);
     
         if ( ch->is_npc() || number_percent() < (int) chance )
@@ -589,7 +589,7 @@ SKILL_RUNP( endure )
     
     mod = -1 * (level/20 + skill/20 + 1); 
     
-    ch->setWait( gsn_endure->getBeats( )  );
+    ch->setWait( gsn_endure->getBeats(ch)  );
     gsn_endure->getCommand()->run(ch, mod);
     gsn_endure->improve( ch, true );
 }
@@ -840,7 +840,7 @@ SKILL_RUNP( assassinate )
             return;
     }   
     
-    ch->setWait( gsn_assassinate->getBeats( )  );
+    ch->setWait( gsn_assassinate->getBeats(ch)  );
     AssassinateOneHit ass( ch, victim );    
     
     // assassination attempt can't "miss"
@@ -1008,7 +1008,7 @@ SKILL_RUNP( caltraps )
   oldact_p("$c1 кидает пригоршню острых шипов тебе под ноги!",
          ch,0,victim,TO_VICT,POS_RESTING);
 
-  ch->setWait( gsn_caltraps->getBeats( ) );
+  ch->setWait( gsn_caltraps->getBeats(ch) );
   UNSET_DEATH_TIME(ch);  
 
   if ( (!FightingCheck) && (IS_AWAKE( victim )) ) {
@@ -1265,7 +1265,7 @@ SKILL_RUNP( throwdown )
 
         //////////////// THE ROLL ////////////////
     
-        ch->setWait( gsn_throw->getBeats( )  );
+        ch->setWait( gsn_throw->getBeats(ch)  );
         UNSET_DEATH_TIME(ch);
 
         if (victim->isAffected(gsn_protective_shield))
@@ -1501,7 +1501,7 @@ SKILL_RUNP( strangle )
 
         //////////////// THE ROLL ////////////////
     
-        ch->setWait( gsn_strangle->getBeats( ) );
+        ch->setWait( gsn_strangle->getBeats(ch) );
         UNSET_DEATH_TIME(ch);
         victim->setLastFightTime( );
         ch->setLastFightTime( );  
@@ -1565,7 +1565,7 @@ SKILL_RUNP( poison )
         }
 
         ch->mana -= gsn_poison_smoke->getMana( );
-        ch->setWait( gsn_poison_smoke->getBeats( ) );
+        ch->setWait( gsn_poison_smoke->getBeats(ch) );
         UNSET_DEATH_TIME(ch);
 
         if ( number_percent() > gsn_poison_smoke->getEffective( ch ) )
@@ -1621,7 +1621,7 @@ SKILL_RUNP( blindness )
         }
 
         ch->mana -= gsn_blindness_dust->getMana( );
-        ch->setWait( gsn_blindness_dust->getBeats( ) );
+        ch->setWait( gsn_blindness_dust->getBeats(ch) );
         UNSET_DEATH_TIME(ch);
 
         if (number_percent() > gsn_blindness_dust->getEffective( ch ) )

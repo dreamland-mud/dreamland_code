@@ -84,7 +84,7 @@ SKILL_RUNP( soothe )
             return;
         }
 
-        ch->setWait( gsn_soothe->getBeats( )  );
+        ch->setWait( gsn_soothe->getBeats(ch)  );
 
         if (number_percent() < gsn_soothe->getEffective( ch ) + 15
                 + 4 * ( ch->getModifyLevel() - victim->getModifyLevel() ) )

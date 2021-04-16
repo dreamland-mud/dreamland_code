@@ -190,6 +190,7 @@ void Character::init( )
     dam_type = DAMW_PUNCH;
     heal_gain = 0;
     mana_gain = 0;
+    mod_beats = 0;
 
     perm_stat.clear( );
     perm_stat.fill( 13 );

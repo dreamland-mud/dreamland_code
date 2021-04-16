@@ -35,7 +35,7 @@ struct SearcherParam {
     int vnum, level;
     int hr, dr, hp, mana, move, saves, armor, size;
     int str, inta, wis, dex, con, cha;
-    int heal_gain, mana_gain;
+    int heal_gain, mana_gain, beats;
     DLString aff, vuln, res, imm, det;
     DLString material;
     // Names of all attached triggers.

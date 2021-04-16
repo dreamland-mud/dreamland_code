@@ -106,7 +106,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
         if ( saves_spell(level,victim,DAM_MENTAL,ch, DAMF_MAGIC) )
                 chance = 0;
 
-        ch->setWait( skill->getBeats( ) );
+        ch->setWait( skill->getBeats(ch) );
         
         if ( !ch->is_immortal()
                 && ( victim->is_immortal()

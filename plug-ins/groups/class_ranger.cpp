@@ -95,7 +95,7 @@ SKILL_RUNP( track )
         return;
     }
 
-    ch->setWait( gsn_track->getBeats( ) );
+    ch->setWait( gsn_track->getBeats(ch) );
     oldact("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
 
     int slevel;
@@ -260,7 +260,7 @@ SKILL_RUNP( shoot )
     if (!arrow)
         return;
 
-    ch->setWait( gsn_bow->getBeats( )  );
+    ch->setWait( gsn_bow->getBeats(ch)  );
 
     chance = skill_level_bonus(*gsn_bow, ch) + (gsn_bow->getEffective( ch ) - 50) * 2;
     if ( victim->position == POS_SLEEPING )
@@ -346,7 +346,7 @@ SKILL_RUNP( herbs )
       ch->pecho("Таких тут нет.");
       return;
     }
-  ch->setWait( gsn_herbs->getBeats( )  );
+  ch->setWait( gsn_herbs->getBeats(ch)  );
 
   if (RoomUtils::isNature(ch->in_room) && number_percent() < gsn_herbs->getEffective( ch ))
     {
@@ -424,7 +424,7 @@ SKILL_RUNP( camp )
 
   gsn_camp->improve( ch, true );
   ch->mana -= gsn_camp->getMana( );
-  ch->setWait( gsn_camp->getBeats( ) );
+  ch->setWait( gsn_camp->getBeats(ch) );
 
   oldact("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
   oldact("$c1 разбивает полевой лагерь.", ch, 0, 0, TO_ROOM);
@@ -496,7 +496,7 @@ SKILL_RUNP( bearcall )
   gsn_bear_call->getSpell( )->run( ch, target, min( 100, ch->getModifyLevel( ) - 2 ) );
 
   ch->mana -= gsn_bear_call->getMana( );
-  ch->setWait( gsn_bear_call->getBeats( ) );
+  ch->setWait( gsn_bear_call->getBeats(ch) );
   gsn_bear_call->improve( ch, true );
 }
 
@@ -574,7 +574,7 @@ SKILL_RUNP( lioncall )
   gsn_lion_call->getSpell( )->run( ch, target, min( 100, ch->getModifyLevel( ) - 2 ) );
 
   ch->mana -= gsn_lion_call->getMana( );
-  ch->setWait( gsn_lion_call->getBeats( ) );
+  ch->setWait( gsn_lion_call->getBeats(ch) );
   gsn_lion_call->improve( ch, true );
 }
 
@@ -732,7 +732,7 @@ SKILL_RUNP( makearrow )
     }
 
     mana = gsn_make_arrow->getMana( );
-    wait = gsn_make_arrow->getBeats( );
+    wait = gsn_make_arrow->getBeats(ch);
 
     argument = one_argument(argument, arg);
     
@@ -759,7 +759,7 @@ SKILL_RUNP( makearrow )
         }
 
         mana += arrowSkill->getMana( );
-        wait += arrowSkill->getBeats( );
+        wait += arrowSkill->getBeats(ch);
     }
 
     if (ch->mana < mana) {
@@ -822,7 +822,7 @@ SKILL_RUNP(makebow)
     }
 
     mana = gsn_make_bow->getMana();
-    wait = gsn_make_bow->getBeats();
+    wait = gsn_make_bow->getBeats(ch);
 
     if (ch->mana < mana) {
         ch->pecho("У тебя не хватает энергии для изготовления лука.");
@@ -1157,7 +1157,7 @@ SKILL_RUNP( ambush )
     if ( is_safe( ch, victim ) )
             return;
 
-    ch->setWait( gsn_ambush->getBeats( )  );
+    ch->setWait( gsn_ambush->getBeats(ch)  );
     AmbushOneHit amb( ch, victim );
     
     try {
@@ -1258,7 +1258,7 @@ SKILL_RUNP( camouflage )
         else
                 k = 100;
 
-        ch->setWait( gsn_camouflage->getBeats( )  );
+        ch->setWait( gsn_camouflage->getBeats(ch)  );
 
         if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE) )
         {

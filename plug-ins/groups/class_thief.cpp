@@ -242,7 +242,7 @@ SKILL_RUNP( settraps )
                 return;
         }
 
-        ch->setWait( gsn_settraps->getBeats( )  );
+        ch->setWait( gsn_settraps->getBeats(ch)  );
 
         if ( ch->is_npc()
                 || number_percent( ) <  ( gsn_settraps->getEffective( ch ) * 0.7 ) )
@@ -374,14 +374,14 @@ SKILL_RUNP( envenom )
                 obj->value3(obj->value3() | DRINK_POISONED);
                 gsn_envenom->improve( ch, true );
             }
-            ch->setWait( gsn_envenom->getBeats( ) );
+            ch->setWait( gsn_envenom->getBeats(ch) );
             return;
         }
 
         oldact("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
         if (!IS_SET(obj->value3(), DRINK_POISONED))
             gsn_envenom->improve( ch, false );
-        ch->setWait( gsn_envenom->getBeats( ) );
+        ch->setWait( gsn_envenom->getBeats(ch) );
         return;
      }
 
@@ -430,14 +430,14 @@ SKILL_RUNP( envenom )
               oldact("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
             oldact("Ты покрываешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, true );
-            ch->setWait( gsn_envenom->getBeats( ) );
+            ch->setWait( gsn_envenom->getBeats(ch) );
             return;
         }
         else
         {
             oldact("Твоя попытка отравить ядом $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, false );
-            ch->setWait( gsn_envenom->getBeats( ) );
+            ch->setWait( gsn_envenom->getBeats(ch) );
             return;
         }
     }
@@ -520,7 +520,7 @@ SKILL_RUNP( steal )
         tmp_ch = ch->getDoppel( );
 
         ch->getPC( )->check_hit_newbie( victim );
-        ch->setWait( gsn_steal->getBeats( )  );
+        ch->setWait( gsn_steal->getBeats(ch)  );
 
 
         percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -30 );
@@ -789,7 +789,7 @@ protected:
 
         UNSET_DEATH_TIME(actor);
 
-        actor->setWait( gsn_push->getBeats( ) );
+        actor->setWait( gsn_push->getBeats(actor) );
 
         return applySkill( );
     }
@@ -1011,7 +1011,7 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    ch->setWait( gsn_backstab->getBeats( )  );
+    ch->setWait( gsn_backstab->getBeats(ch)  );
 
     if ( victim->hit < (0.7 * victim->max_hit)
             && (IS_AWAKE(victim) ) )
@@ -1166,7 +1166,7 @@ SKILL_RUNP( circle )
             }
     }
  
-    ch->setWait( gsn_circle->getBeats( )  );
+    ch->setWait( gsn_circle->getBeats(ch)  );
 
     CircleOneHit circ( ch, victim );
     int circleBonus = 0;
@@ -1266,7 +1266,7 @@ SKILL_RUNP( blackjack )
         victim->setLastFightTime( );
         ch->setLastFightTime( );
 
-        ch->setWait( gsn_blackjack->getBeats( ) );
+        ch->setWait( gsn_blackjack->getBeats(ch) );
 
         chance = ( int ) ( 0.5 * gsn_blackjack->getEffective( ch ) );
         chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
@@ -1373,7 +1373,7 @@ SKILL_RUNP( knife )
 
     chance = min(100, gsn_knife->getEffective( ch ) + skill_level_bonus(*gsn_knife, ch));
 	
-    ch->setWait( gsn_knife->getBeats( ) );
+    ch->setWait( gsn_knife->getBeats(ch) );
 
     try {
         KnifeOneHit khit( ch, victim );
@@ -1454,7 +1454,7 @@ SKILL_RUNP( forge )
             return;
         }
 
-        ch->setWait( gsn_key_forgery->getBeats( ) );
+        ch->setWait( gsn_key_forgery->getBeats(ch) );
         ch->mana -= gsn_key_forgery->getMana( );
 
 	int chance;
@@ -1507,7 +1507,7 @@ SKILL_RUNP( forge )
             return;
         }
 
-        ch->setWait( gsn_key_forgery->getBeats( ) );
+        ch->setWait( gsn_key_forgery->getBeats(ch) );
         ch->mana -= gsn_key_forgery->getMana( );
 
 	int chance;

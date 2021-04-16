@@ -128,7 +128,7 @@ SKILL_RUNP( tail )
         gsn_tail->improve( ch, true, victim );
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );
-        ch->setWait( gsn_tail->getBeats( ) );
+        ch->setWait( gsn_tail->getBeats(ch) );
 
         victim->position = POS_RESTING;
         damage_tail = ch->damroll +
@@ -146,7 +146,7 @@ SKILL_RUNP( tail )
         
         gsn_tail->improve( ch, false, victim );
         ch->position = POS_RESTING;
-        ch->setWait( gsn_tail->getBeats( ) * 3 / 2 );
+        ch->setWait( gsn_tail->getBeats(ch) * 3 / 2 );
     }
     
     if (!fightingCheck)

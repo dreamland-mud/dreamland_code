@@ -37,7 +37,7 @@ public:
     virtual void utter( Character * ) = 0;
     virtual int getSpellLevel( Character *, int ) = 0;
 
-    virtual int getBeats( ) const = 0;
+    virtual int getBeats(Character *ch = 0) const = 0;
     virtual int getMana( ) const = 0;
     virtual int getTarget( ) const = 0;
     virtual int getSpellType( ) const = 0;

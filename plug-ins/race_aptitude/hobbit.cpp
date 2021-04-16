@@ -102,7 +102,7 @@ SKILL_RUNP( searchstones )
     }
 
     ch->mana -= gsn_search_stones->getMana( );
-    ch->setWait( gsn_search_stones->getBeats( ) );
+    ch->setWait( gsn_search_stones->getBeats(ch) );
     
     mlevel = ch->getModifyLevel( );
     count = number_range( 5, 5 + mlevel / 30 );
@@ -189,7 +189,7 @@ SKILL_RUNP( throwstone )
         return;
     }
 
-    ch->setWait( gsn_throw_stone->getBeats( ) );
+    ch->setWait( gsn_throw_stone->getBeats(ch) );
     set_violent( ch, victim, false );
     oldact("Ты швыряешь $o4 $T.", ch, stone, dirs[ direction ].leave, TO_CHAR );
     oldact("$c1 швыряет $o4 $T.", ch, stone, dirs[ direction ].leave, TO_ROOM );

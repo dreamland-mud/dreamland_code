@@ -69,7 +69,7 @@ HelpArticlePointer Skill::getSkillHelp() const
 {
     return HelpArticle::Pointer();
 }
-int Skill::getBeats( ) const
+int Skill::getBeats(Character *ch) const
 {
     return 0;
 }

@@ -81,7 +81,7 @@ public:
     virtual Spell::Pointer getSpell( ) const;
     virtual CommandHelp::Pointer getHelp( ) const;
     virtual HelpArticlePointer getSkillHelp( ) const;
-    virtual int getBeats( ) const;
+    virtual int getBeats(Character *ch = 0) const;
     virtual int getMana( ) const;
     virtual GlobalBitvector & getGroups();
     virtual bool visible( CharacterMemoryInterface * ) const;

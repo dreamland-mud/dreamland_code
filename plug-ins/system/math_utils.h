@@ -13,4 +13,7 @@ int dice_ave(int d1, int d2);
 /** Returns -1 for negative, 1 for positive and 0 for zero. */
 int signum(float x);
 
+/** Return given percentage of the original. */
+int percentage(int original, int percent);
+
 #endif

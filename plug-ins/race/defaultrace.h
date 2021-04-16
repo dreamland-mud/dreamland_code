@@ -14,12 +14,15 @@
 #include "xmlenumeration.h"
 #include "xmlflags.h"
 #include "xmlglobalbitvector.h"
+#include "xmltableloaderplugin.h"
 
 #include "helpmanager.h"
 #include "markuphelparticle.h"
 #include "race.h"
 
 class DefaultRace;
+
+TABLE_LOADER_DECL(RaceLoader);
 
 /*
  * RaceHelp
@@ -86,7 +89,6 @@ public:
     virtual const DLString & getMltName( ) const;
     virtual DLString getNameFor( Character *, Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
 
-protected:
     XML_VARIABLE XMLFlagsNoEmpty         det;
     XML_VARIABLE XMLFlagsNoEmpty         act;
     XML_VARIABLE XMLFlagsNoEmpty         aff;

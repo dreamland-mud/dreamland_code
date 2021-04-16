@@ -294,6 +294,9 @@ public:
     int heal_gain;
     int mana_gain;
 
+    // Bonus to wait state beats, in %%.
+    int mod_beats;
+
     // stats 
     XML_VARIABLE XMLEnumerationArray perm_stat;
     XML_VARIABLE XMLEnumerationArray mod_stat;

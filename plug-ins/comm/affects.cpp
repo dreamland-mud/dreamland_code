@@ -235,6 +235,7 @@ struct PermanentAffects {
         my_det = ch->detection;
         my_hgain = ch->heal_gain;
         my_mgain = ch->mana_gain;
+        my_beats = ch->mod_beats;
     }
 
     void printAll() const {
@@ -257,6 +258,11 @@ struct PermanentAffects {
             ch->pecho("Твоя мана восстанавливается на {%s%d%%{x %s.",
                        my_mgain > 0 ? "C" : "r",
                        abs(my_mgain), my_mgain > 0 ? "быстрее" : "медленнее");
+
+        if (my_beats != 0)
+            ch->pecho("Задержки от всех умений у тебя на {%s%d%%{x %s.",
+                       my_beats > 0 ? "r" : "C",
+                       abs(my_beats), my_beats > 0 ? "длиннее" : "короче");
     }
 
     bool isSet() const {
@@ -279,6 +285,7 @@ private:
     int my_det;
     int my_hgain;
     int my_mgain;   
+    int my_beats;
 };
 
 CMDRUNP( affects )

@@ -487,7 +487,7 @@ SKILL_RUNP( detect )
                 return;
         }
 
-        ch->setWait( gsn_detect_hide->getBeats( ) );
+        ch->setWait( gsn_detect_hide->getBeats(ch) );
         
         if ( number_percent( ) > gsn_detect_hide->getEffective( ch ) + skill_level_bonus(*gsn_detect_hide, ch) )
         {

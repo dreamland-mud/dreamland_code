@@ -1247,8 +1247,9 @@ static bool has_nopost(Character *ch)
         buf << "Практик: "  << pc->practice << " "
             << "Тренировок: " << pc->train << " ";
     buf << endl;
-    if (victim->heal_gain != 0 || victim->mana_gain != 0)
-        buf << "Бонус восстановления жизни: " << victim->heal_gain << "%   Маны: " << victim->mana_gain << "%" << endl;
+    if (victim->heal_gain != 0 || victim->mana_gain != 0 || victim->mod_beats != 0)
+        buf << "Бонус восстановления жизни: " << victim->heal_gain 
+            << "%   Маны: " << victim->mana_gain << "%  Задержки: "  << victim->mod_beats << "%" << endl;
     
     if (victim->getReligion( ) == god_none)
         buf << "Не верит в богов." << endl;

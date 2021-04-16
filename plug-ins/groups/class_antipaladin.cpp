@@ -212,7 +212,7 @@ SKILL_RUNP( cleave )
         return;
     }
 
-    ch->setWait( gsn_cleave->getBeats( )  );
+    ch->setWait( gsn_cleave->getBeats(ch)  );
     
     CleaveOneHit cleave_hit( ch, victim );
     

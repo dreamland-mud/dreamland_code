@@ -59,7 +59,7 @@ public:
     virtual SpellTargetPointer locateTargets( Character *, const DLString &, std::ostringstream & );
     virtual SpellTargetPointer locateTargetObject( Character *, const DLString &, std::ostringstream & );
 
-    virtual int getBeats( ) const;
+    virtual int getBeats(Character *ch = 0) const;
     virtual int getMana( ) const;
     virtual int getTarget( ) const;
     virtual int getSpellType( ) const;

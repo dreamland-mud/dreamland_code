@@ -1019,7 +1019,7 @@ CMDRUNP( fly )
         return;
     }
 
-    ch->setWait( gsn_fly->getBeats( ) );
+    ch->setWait( gsn_fly->getBeats(ch) );
 }
 
 
