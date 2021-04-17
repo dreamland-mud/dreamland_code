@@ -23,9 +23,6 @@
 #include "def.h"
 
 GSN(cavalry);
-GSN(invisibility);
-GSN(mass_invis);
-GSN(improved_invis);
 GSN(sneak);
 CLAN(none);
 
@@ -262,28 +259,17 @@ void do_visible( Character *ch )
             ch->pecho("Ты выходишь из своего укрытия.");
             oldact("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
     }
-    if (IS_SET(ch->affected_by, AFF_INVISIBLE))
-      {
-        ch->pecho( "Ты появляешься из ниоткуда." );
-        affect_strip(ch, gsn_invisibility);
-        affect_strip(ch, gsn_mass_invis);
+    if (IS_SET(ch->affected_by, AFF_INVISIBLE)) {
+        affect_bit_strip(ch, &affect_flags, AFF_INVISIBLE, true);
         REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
-        oldact("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
-      }
-    if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
-      {
-        ch->pecho( "Ты появляешься из ниоткуда." );
-        affect_strip(ch, gsn_improved_invis);
+    }
+    if (IS_SET(ch->affected_by, AFF_IMP_INVIS)) {
+        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
-        oldact("$c1 появляется из ниоткуда.", ch, 0, 0, TO_ROOM);
-      }
-    if (IS_SET(ch->affected_by, AFF_SNEAK))
-      {
-        ch->pecho( "Твои движения становятся заметными для окружающих." );
-        affect_strip(ch, gsn_sneak);
+    }
+    if (IS_SET(ch->affected_by, AFF_SNEAK)) {
+        affect_strip(ch, gsn_sneak, true);
         REMOVE_BIT(ch->affected_by, AFF_SNEAK);
-      }
-
-    affect_strip ( ch, gsn_mass_invis);
+    }
 }
 

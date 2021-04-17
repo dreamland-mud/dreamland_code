@@ -47,7 +47,7 @@ void        affect_to_char         ( Character *ch, Affect *paf );
 void        affect_remove         ( Character *ch, Affect *paf, bool verbose = false );
 void        affect_strip         ( Character *ch, int sn, bool verbose = false  );
 void        affect_strip         ( Object *obj, int sn, bool verbose = false );
-void        affect_bit_strip ( Character *ch, const FlagTable *table, int bits);
+void        affect_bit_strip ( Character *ch, const FlagTable *table, int bits, bool verbose = false );
 void        affect_join         ( Character *ch, Affect *paf );
 void        postaffect_to_char( Character *ch, int sn, int duration );
 
