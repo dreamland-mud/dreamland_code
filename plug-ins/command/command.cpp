@@ -22,8 +22,6 @@
 #include "def.h"
 
 GSN(manacles);
-GSN(improved_invis);
-GSN(dematerialize);
 
 /*--------------------------------------------------------------------------
  * Command
@@ -238,16 +236,12 @@ void Command::visualize( Character *ch )
 
     if (IS_AFFECTED( ch, AFF_IMP_INVIS ) && getPosition( ).getValue( ) == POS_FIGHTING)
     {
-        if (ch->isAffected(gsn_dematerialize)) {
-            affect_strip(ch, gsn_dematerialize, true);
+        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
+        if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
             REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-            REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
-            REMOVE_BIT( ch->affected_by, AFF_SNEAK );
-        }  
-        affect_strip( ch, gsn_improved_invis, true );    
-        REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-        oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-        oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+        }
     }
 
     if (DIGGED(ch) && (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG )))

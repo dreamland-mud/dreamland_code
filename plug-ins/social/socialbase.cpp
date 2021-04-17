@@ -10,7 +10,6 @@
 #include "socialbase.h"
 
 #include "russianstring.h"
-#include "skillreference.h"
 #include "character.h"
 #include "room.h"
 
@@ -18,9 +17,6 @@
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
-
-GSN(improved_invis);
-GSN(dematerialize);
 
 SocialBase::SocialBase( ) 
 {
@@ -302,12 +298,11 @@ void SocialBase::visualize( Character *ch )
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-        if (ch->isAffected(gsn_dematerialize)) {
-            affect_strip(ch, gsn_dematerialize, true);
+        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
+        if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
             REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-            REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
-            REMOVE_BIT( ch->affected_by, AFF_SNEAK );
-        }          
-        affect_strip(ch,gsn_improved_invis, true);
+            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+        }        
     }
 }

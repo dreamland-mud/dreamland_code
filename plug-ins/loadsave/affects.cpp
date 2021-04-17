@@ -403,10 +403,10 @@ void affect_strip( Object *obj, int sn, bool verbose )
 /*
  * Strip all affects which affect given bitvector
  */
-void affect_bit_strip(Character *ch, const FlagTable *table, int bits)
+void affect_bit_strip(Character *ch, const FlagTable *table, int bits, bool verbose)
 {
     for (auto &paf: ch->affected.findAllWithBits(table, bits))
-        affect_remove(ch, paf);
+        affect_remove(ch, paf, verbose);
 }
 
 /*

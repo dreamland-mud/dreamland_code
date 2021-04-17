@@ -23,10 +23,6 @@
 #include "def.h"
 
 GSN(cavalry);
-GSN(invisibility);
-GSN(mass_invis);
-GSN(improved_invis);
-GSN(dematerialize);
 GSN(sneak);
 CLAN(none);
 
@@ -263,27 +259,17 @@ void do_visible( Character *ch )
             ch->pecho("Ты выходишь из своего укрытия.");
             oldact("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
     }
-    if (IS_SET(ch->affected_by, AFF_INVISIBLE))
-      {
-        affect_strip(ch, gsn_invisibility, true);
-        affect_strip(ch, gsn_mass_invis, true);
+    if (IS_SET(ch->affected_by, AFF_INVISIBLE)) {
+        affect_bit_strip(ch, &affect_flags, AFF_INVISIBLE, true);
         REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
-      }
-    if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
-      {
-        if (ch->isAffected(gsn_dematerialize)) {
-            affect_strip(ch, gsn_dematerialize, true);
-            REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-            REMOVE_BIT( ch->affected_by, AFF_PASS_DOOR );
-            REMOVE_BIT( ch->affected_by, AFF_SNEAK );
-        }        
-        affect_strip(ch, gsn_improved_invis, true);
+    }
+    if (IS_SET(ch->affected_by, AFF_IMP_INVIS)) {
+        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
         REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
-      }
-    if (IS_SET(ch->affected_by, AFF_SNEAK))
-      {
+    }
+    if (IS_SET(ch->affected_by, AFF_SNEAK)) {
         affect_strip(ch, gsn_sneak, true);
         REMOVE_BIT(ch->affected_by, AFF_SNEAK);
-      }
+    }
 }
 
