@@ -926,12 +926,12 @@ void chg_mob_killer( Character* ch, char* argument ) {
       ch->pecho("Это не игрок!");
       return;
     }
-    if( IS_KILLER( victim ) || victim->is_immortal() ) {
+    if( IS_KILLER( victim )) {
       REMOVE_KILLER( victim );
-      ch->pecho("{RKILLER{x remove.");
+      ch->pecho("Флаг {RKILLER{x убран.");
     } else {
       set_killer( victim );
-      ch->pecho("{RKILLER{x set.");
+      ch->pecho("Флаг {RKILLER{x выставлен.");
     }
   }
 }
@@ -944,12 +944,12 @@ void chg_mob_violent( Character* ch, char* argument ) {
       ch->pecho("Это не игрок!");
       return;
     }
-    if( IS_VIOLENT( victim ) || victim->is_immortal() ) {
+    if( IS_VIOLENT( victim ) ) {
       REMOVE_VIOLENT( victim );
-      ch->pecho("{BVIOLENT{x remove.");
+      ch->pecho("Флаг {BVIOLENT{x убран.");
     } else {
       set_violent( victim );
-      ch->pecho("{BVIOLENT{x set.");
+      ch->pecho("Флаг {BVIOLENT{x выставлен.");
     }
   }
 }
@@ -962,12 +962,12 @@ void chg_mob_slain( Character* ch, char* argument ) {
       ch->pecho("Это не игрок!");
       return;
     }
-    if( IS_SLAIN( victim ) || victim->is_immortal() ) {
+    if( IS_SLAIN( victim )) {
       REMOVE_SLAIN( victim );
-      ch->pecho("{DSLAIN{x remove.");
+      ch->pecho("Флаг {DSLAIN{x убран.");
     } else {
       set_slain( victim );
-      ch->pecho("{DSLAIN{x set.");
+      ch->pecho("Флаг {DSLAIN{x выставлен.");
     }
   }
 }
