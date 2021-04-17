@@ -20,7 +20,7 @@
 #include "skill_utils.h"
 #include "desire.h"
 #include "hometown.h"
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 #include "defaultspell.h"
 #include "command.h"
 
@@ -70,19 +70,19 @@ void BasicSkill::loaded( )
         eventHandler->setSkill( Pointer( this ) );
 
     if (spell)
-        FeniaSpellHelper::linkWrapper(*spell);
+        FeniaSkillActionHelper::linkWrapper(*spell);
 
     if (affect)
-        FeniaSpellHelper::linkWrapper(*affect);
+        FeniaSkillActionHelper::linkWrapper(*affect);
 }
 
 void BasicSkill::unloaded( )
 {
     if (affect)
-        FeniaSpellHelper::extractWrapper(*affect);
+        FeniaSkillActionHelper::extractWrapper(*affect);
 
     if (spell)
-        FeniaSpellHelper::extractWrapper(*spell);
+        FeniaSkillActionHelper::extractWrapper(*spell);
 
     if (spell)
         spell->unsetSkill( );

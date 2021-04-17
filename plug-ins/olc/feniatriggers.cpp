@@ -7,7 +7,7 @@
 #include "iconvmap.h"
 #include "defaultspell.h"
 #include "defaultaffecthandler.h"
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 #include "websocketrpc.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
@@ -153,7 +153,7 @@ bool FeniaTriggerLoader::clearTrigger(Scripting::Object *wrapper, const DLString
 
 static void show_one_trigger(PCharacter *ch, DefaultSpell *spell, const char *trigName, bitnumber_t target_mask, ostringstream &buf)
 {
-    bool hasTrigger = FeniaSpellHelper::spellHasTrigger(spell, trigName);
+    bool hasTrigger = FeniaSkillActionHelper::spellHasTrigger(spell, trigName);
     bool hasTarget = spell->target.isSet(target_mask);
 
     if (hasTarget || hasTrigger)

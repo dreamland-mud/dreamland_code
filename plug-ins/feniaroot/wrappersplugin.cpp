@@ -24,7 +24,7 @@
 #include "tableswrapper.h"
 #include "validatetask.h"
 #include "structwrappers.h"
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"

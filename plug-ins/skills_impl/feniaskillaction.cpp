@@ -1,7 +1,7 @@
 #include <jsoncpp/json/json.h>
 
 #include "logstream.h"
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 #include "defaultspell.h"
 #include "defaultaffecthandler.h"
 
@@ -75,7 +75,7 @@ DLString print_damage_tiers(int tier, int level_step)
     return dices.join(", ");
 }
 
-void FeniaSpellHelper::linkWrapper(Spell *spell) 
+void FeniaSkillActionHelper::linkWrapper(Spell *spell) 
 {
     if (!FeniaManager::wrapperManager) {
         LogStream::sendError() << "No Fenia manager when linking spell wrapper for " << spell->getSkill()->getName() << endl;
@@ -87,7 +87,7 @@ void FeniaSpellHelper::linkWrapper(Spell *spell)
         LogStream::sendNotice() << "Fenia spell: linked wrapper for " << spell->getSkill()->getName() << endl;
 }
 
-void FeniaSpellHelper::extractWrapper(Spell *spell) 
+void FeniaSkillActionHelper::extractWrapper(Spell *spell) 
 {
     if (!spell->wrapper)
         return;
@@ -100,7 +100,7 @@ void FeniaSpellHelper::extractWrapper(Spell *spell)
     spell->extractWrapper(false);
 }
 
-void FeniaSpellHelper::linkWrapper(AffectHandler *ah) 
+void FeniaSkillActionHelper::linkWrapper(AffectHandler *ah) 
 {
     if (!FeniaManager::wrapperManager) {
         LogStream::sendError() << "No Fenia manager when linking affect handler wrapper for " << ah->getSkill()->getName() << endl;
@@ -112,7 +112,7 @@ void FeniaSpellHelper::linkWrapper(AffectHandler *ah)
         LogStream::sendNotice() << "Fenia affect handler: linked wrapper for " << ah->getSkill()->getName() << endl;
 }
 
-void FeniaSpellHelper::extractWrapper(AffectHandler *ah) 
+void FeniaSkillActionHelper::extractWrapper(AffectHandler *ah) 
 {
     if (!ah->wrapper)
         return;
@@ -125,7 +125,7 @@ void FeniaSpellHelper::extractWrapper(AffectHandler *ah)
     ah->extractWrapper(false);
 }
 
-bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
+bool FeniaSkillActionHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
     // Check that a function matching this spell target (i.e. one of runVict, runArg etc)
     // is actually defined on the spell's wrapper.
@@ -163,7 +163,7 @@ bool FeniaSpellHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTar
     return true;
 }
 
-FeniaSpellContext::Pointer FeniaSpellHelper::createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
+FeniaSpellContext::Pointer FeniaSkillActionHelper::createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
 {
     FeniaSpellContext::Pointer ctx(NEW);
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
@@ -199,7 +199,7 @@ FeniaSpellContext::Pointer FeniaSpellHelper::createContext(DefaultSpell *spell, 
     return ctx;    
 }
 
-bool FeniaSpellHelper::spellHasTrigger(Spell *spell, const DLString &trigName) 
+bool FeniaSkillActionHelper::spellHasTrigger(Spell *spell, const DLString &trigName) 
 {
     WrapperBase *wrapper = spell->getWrapper();
     if (wrapper) {
@@ -213,7 +213,7 @@ bool FeniaSpellHelper::spellHasTrigger(Spell *spell, const DLString &trigName)
 
 
 
-DLString FeniaSpellHelper::getMethodName(SpellTarget::Pointer &spellTarget) 
+DLString FeniaSkillActionHelper::getMethodName(SpellTarget::Pointer &spellTarget) 
 {
     switch (spellTarget->type) {
     case SpellTarget::NONE:   return "runArg";

@@ -12,7 +12,7 @@
 #include "comm.h"
 #include "merc.h"
 #include "arg_utils.h"
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 
 #include "characterwrapper.h"
 #include "wrappersplugin.h"

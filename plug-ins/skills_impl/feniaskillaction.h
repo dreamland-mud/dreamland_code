@@ -1,5 +1,5 @@
-#ifndef __FENIASPELLHELPER_H__
-#define __FENIASPELLHELPER_H__
+#ifndef __FENIASKILLACTIONHELPER_H__
+#define __FENIASKILLACTIONHELPER_H__
 
 #include "xmlvariablecontainer.h"
 #include "xmlregister.h"
@@ -50,7 +50,7 @@ public:
     XML_VARIABLE XMLInteger tier;
 };                       
 
-class FeniaSpellHelper {
+class FeniaSkillActionHelper {
 public:
     static void linkWrapper(Spell *);
     static void extractWrapper(Spell *);
@@ -64,6 +64,7 @@ private:
     static FeniaSpellContext::Pointer createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
     static DLString getMethodName(::Pointer<SpellTarget> &spellTarget);
 };
+
 
 
 #endif 

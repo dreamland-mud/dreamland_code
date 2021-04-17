@@ -10,7 +10,7 @@
 #include "spellmanager.h"
 #include "skillgroup.h"
 #include "skill_utils.h"
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 
 #include "fenia/exceptions.h"
 #include "affect.h"
@@ -96,7 +96,7 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
     if (!spt)
         return;
 
-    if (FeniaSpellHelper::executeSpell(this, ch, spt, level))
+    if (FeniaSkillActionHelper::executeSpell(this, ch, spt, level))
         return;
         
     sn = skill->getIndex( );

@@ -1,4 +1,4 @@
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 
 #include "register-impl.h"
 #include "nativeext.h"

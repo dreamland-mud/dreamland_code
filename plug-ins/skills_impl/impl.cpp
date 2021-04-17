@@ -14,7 +14,7 @@
 #include "defaultskillgroup.h"
 #include "spellmanager.h"
 
-#include "feniaspellhelper.h"
+#include "feniaskillaction.h"
 #include "basicskill.h"
 #include "summoncreaturespell.h"
 #include "transportspell.h"
