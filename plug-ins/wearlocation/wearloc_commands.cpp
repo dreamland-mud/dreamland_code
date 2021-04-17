@@ -15,6 +15,7 @@
 #include "npcharacter.h"
 #include "core/object.h"
 
+#include "fight_exception.h"
 #include "loadsave.h"
 #include "save.h"
 #include "act.h"
@@ -90,11 +91,14 @@ CMDRUNP( wear )
             return;
         }
         
-        for (obj = ch->carrying; obj != 0; obj = obj_next) {
-            obj_next = obj->next_content;
-            
-            if (obj->wear_loc == wear_none && ch->can_see( obj ))
-                wear_obj( ch, obj, F_WEAR_VERBOSE );
+        try {
+            for (obj = ch->carrying; obj != 0; obj = obj_next) {
+                obj_next = obj->next_content;
+                
+                if (obj->wear_loc == wear_none && ch->can_see( obj ))
+                    wear_obj( ch, obj, F_WEAR_VERBOSE );
+            }
+        } catch (const VictimDeathException &) {
         }
 
         return;
