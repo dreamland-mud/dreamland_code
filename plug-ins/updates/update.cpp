@@ -368,7 +368,17 @@ void char_update( )
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
             ch->pecho("Ты пытаешься двигаться незаметно.");
+            SET_BIT(ch->affected_by ,AFF_SNEAK);
             room_to_save( ch );
+        }
+        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK) && ch->is_npc() )
+        {
+            if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_SNEAK ) && !MOUNTED(ch) )
+            {
+            ch->pecho("Ты пытаешься двигаться незаметно.");
+            SET_BIT(ch->affected_by ,AFF_SNEAK);
+            room_to_save( ch );
+            }
         }
 
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
