@@ -1,3 +1,4 @@
+#include <algorithm>
 
 #include "raceedit.h"
 #include "olc.h"
@@ -352,7 +353,7 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
 
     if (cmd.empty()) {
         stc("Формат:  raceedit название\r\n", ch);
-        stc("         raceedit list\r\n", ch);
+        stc("         raceedit list [name|rname|mobs] \r\n", ch);
         stc("         raceedit create pc|npc <name>\r\n", ch);
         return;
     }
@@ -408,24 +409,59 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
     }
 
     if (arg_is_list(cmd)) {
-        ch->send_to(dlprintf("{C%-15s %-19s {Y%s{x\r\n", "Название", "По-русски", "Мобов"));
+        struct RaceInfo { 
+            static bool compareMobs(const RaceInfo &a, const RaceInfo &b)
+            {
+                return a.mobs < b.mobs;
+            }
+            static bool compareName(const RaceInfo &a, const RaceInfo &b)
+            {
+                return a.race->getName().compare(b.race->getName()) < 0;
+            }
+            static bool compareRusName(const RaceInfo &a, const RaceInfo &b)
+            {
+                return a.race->getMaleName().compareRussian(b.race->getMaleName()) < 0;
+            }
+
+            Race *race; 
+            int mobs; 
+        };
+
+        vector<RaceInfo> races;
 
         for (int i = 0; i < raceManager->size(); i++) {
             DefaultRace *race = dynamic_cast<DefaultRace *>(raceManager->find(i));
-            if (!race || !race->isValid())
-                continue;
+            if (race && race->isValid()) {
+                RaceInfo ri;
+                ri.race = race;
+                ri.mobs = count_mob_race(race);
+                races.push_back(ri);
+            }
+        }
 
+        if (arg_has_oneof(args, "count", "mobs", "мобы") || args.empty()) 
+            sort(races.begin(), races.end(), RaceInfo::compareMobs);
+        else if (arg_has_oneof(args, "name", "имя"))
+            sort(races.begin(), races.end(), RaceInfo::compareName);
+        else if (arg_has_oneof(args, "rname", "russina", "русское"))
+            sort(races.begin(), races.end(), RaceInfo::compareRusName);
+
+        ch->send_to(dlprintf("{C%-15s %-19s {Y%s{x\r\n", "Название", "По-русски", "Мобов"));
+
+        for (auto &ri: races) {
+            Race *race = ri.race;
             const DLString searchFormat = "searcher mq race='" + race->getName() + "'";
             const DLString lineFormat = 
                 web_cmd(ch, "raceedit $1", "{C%-15s") 
-                    + " {x%-19s " 
+                    + " {%s%-19s " 
                     + web_cmd(ch, searchFormat, "{Y%4d") 
                     + "{x\r\n";
 
             ch->send_to(dlprintf(lineFormat.c_str(),
                     race->getName().c_str(),
+                    (race->isPC() ? "g" : "w"),
                     race->getMaleName().ruscase('1').c_str(),
-                    count_mob_race(race)));
+                    ri.mobs));
         }
         return;
     }
