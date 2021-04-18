@@ -11,6 +11,7 @@
 #include "feniamanager.h"
 
 #include "skillreference.h"
+#include "skill.h"
 #include "core/object.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -528,4 +529,18 @@ NMI_INVOKE(FeniaSpellContext, hasParticles, "(): достаточно ли ра�
 {
     Character *myCh = arg2character(ch);
     return RoomUtils::hasParticles(myCh->in_room);
+}
+
+NMI_GET(FeniaCommandContext, skill, "прототип умения для этой команды (.Skill())")
+{
+    return Register::handler<SkillWrapper>(name);
+}
+
+NMI_INVOKE(FeniaCommandContext, cooldown, "(duration): наложить пост-аффект на выполняющего команду, указанной длительности")
+{
+    Character *myCh = arg2character(ch);
+    Skill *skill = arg2skill(name);
+    int duration = args2number(args);
+    postaffect_to_char(myCh, skill->getIndex(), duration);
+    return Register();
 }

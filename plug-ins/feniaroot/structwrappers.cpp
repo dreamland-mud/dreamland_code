@@ -1076,6 +1076,18 @@ NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_typ
     return spell ? spell->getSpellType() : 0;
 }
 
+NMI_INVOKE(SkillWrapper, beats, "(ch): длина задержки в пульсах для персонажа с учетом бонусов")
+{
+    Character *ch = args2character(args);
+    return getTarget()->getBeats(ch);
+}
+
+NMI_INVOKE(SkillWrapper, level, "(ch): уровень умения для персонажа с учетом бонусов")
+{
+    Character *ch = args2character(args);
+    return skill_level(*getTarget(), ch);
+}
+
 NMI_INVOKE( SkillWrapper, usable, "(ch): доступно ли умение для использования прямо сейчас персонажу ch" )
 {
     Character *ch = args2character(args);

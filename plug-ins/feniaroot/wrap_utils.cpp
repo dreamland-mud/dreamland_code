@@ -250,22 +250,27 @@ DLString argnum2string(const RegisterList &args, int num)
     return argnum(args, num).toString();
 }
 
-Skill * args2skill( const RegisterList &args )
+Skill * arg2skill( const Register &r )
 {
-    if (args.size( ) < 1)
-        throw Scripting::NotEnoughArgumentsException( );
-
-    return skillManager->findExisting( args.front( ).toString( ) );
-}
-
-Skill * argnum2skill(const RegisterList &args, int num)
-{
-    DLString name = argnum(args, num).toString();
+    DLString name = r.toString();
     Skill *skill = skillManager->findExisting(name);
     if (!skill)
         throw Scripting::CustomException(name + ": skill name not found.");
 
     return skill;
+}
+
+Skill * args2skill( const RegisterList &args )
+{
+    if (args.size( ) < 1)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    return arg2skill(args.front());
+}
+
+Skill * argnum2skill(const RegisterList &args, int num)
+{
+    return arg2skill(argnum(args, num));
 }
 
 SpellTarget::Pointer arg2target(const Register &a)

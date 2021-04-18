@@ -829,6 +829,13 @@ NMI_GET(CharacterWrapper, last_fight_delay, "задержка после боя 
     return (int)target->getLastFightDelay();
 }
 
+NMI_GET(CharacterWrapper, adrenaline, "полна ли кровь адреналина")
+{
+    checkTarget();
+    return target->is_adrenalined();
+}
+
+
 NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );

@@ -48,6 +48,7 @@ PCharacter * arg2player( const Register & );
 Character * args2character( const RegisterList & );
 PCharacter * args2player( const RegisterList & );
 Skill * args2skill( const RegisterList & );
+Skill * arg2skill( const Register & );
 Affect * args2affect(const RegisterList &);
 DefaultSpell * arg2spell( const Register &reg );
 DLString arg2string(const Register &reg);

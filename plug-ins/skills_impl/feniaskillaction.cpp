@@ -258,7 +258,7 @@ FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillC
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(ctx);
 
-    ctx->name = cmd->getName();
+    ctx->name = cmd->getSkill()->getName();
     ctx->command = Register(cmd->wrapper);
     ctx->ch = FeniaManager::wrapperManager->getWrapper(ch);
     ctx->state = Register::handler<IdContainer>();
