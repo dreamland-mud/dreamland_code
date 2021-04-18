@@ -461,6 +461,8 @@ const FlagTable * affect_where_to_table(int where)
     case TO_ACT_FLAG: return &plr_flags;
     case TO_DETECTS: return &detect_flags;
     case TO_FORM: return &form_flags;
+    case TO_ROOM_AFFECTS: return &raffect_flags;
+    case TO_ROOM_FLAGS: return &room_flags;
     default: return 0;
     }
 }
@@ -482,6 +484,8 @@ int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *regi
     if (table == &plr_flags) return TO_ACT_FLAG;
     if (table == &detect_flags) return TO_DETECTS;
     if (table == &form_flags) return TO_FORM;
+    if (table == &raffect_flags) return TO_ROOM_AFFECTS;
+    if (table == &room_flags) return TO_ROOM_FLAGS;
 
     return 0;
 }
