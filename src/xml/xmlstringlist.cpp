@@ -20,6 +20,17 @@ StringSet XMLStringList::toSet() const
     return aset;
 }
 
+StringList XMLStringList::toList() const
+{
+    StringList result;
+    
+    for (const auto &s: *this) {
+        result.push_back(s.getValue());
+    }
+
+    return result;
+}
+
 
 bool XMLStringSet::toXML( XMLNode::Pointer& node ) const
 {

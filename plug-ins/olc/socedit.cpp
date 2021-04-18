@@ -78,7 +78,7 @@ void OLCStateSocial::show( PCharacter *ch )
             s->getShortDesc().c_str(),
             web_edit_button(ch, "short", "web").c_str());
     ptc(ch, "Синонимы:    {C%s{x %s {D(alias help){x\r\n",
-            s->aliases.toSet().toString().c_str(),
+            s->aliases.toList().toString().c_str(),
             web_edit_button(ch, "aliases", "").c_str());
     ptc(ch, "Позиция:     {C%s {D(position){x\r\n", 
             s->position.name().c_str());
@@ -126,47 +126,7 @@ SOCEDIT(position, "позиция", "мин. положение тела для 
 
 SOCEDIT(aliases, "синонимы", "русские и английские синонимы через пробел")
 {
-    Social *s = getOriginal();
-    DLString args(argument);
-    DLString arg = args.getOneArgument();
-
-    if (arg.empty()) {
-        // Launch web editor.
-        editorWeb(s->aliases.toSet().toString(), "aliases paste");
-        return false;
-    }
-
-    if (arg_is_help(arg)) {
-        // Show usage.
-        stc("Использование:\r\n", ch);
-        stc("    aliases - запустить веб-редактор синонимов\r\n", ch);
-        stc("    aliases paste - установить синонимы из буфера веб-редактора\r\n", ch);
-        stc("    aliases <string> - установить синонимы из строки\r\n", ch);
-        return false;
-    }
-
-    DLString newValue;
-    if (arg_is_paste(arg)) {
-        // Grab value from the editor buffer.
-        editorPaste(newValue, ED_NO_NEWLINE);
-    } else {
-        // Grab value from command argument.
-        newValue = argument;
-    }
-
-    // Try to assign new aliases from a space-separated string.
-    StringSet newAliases(newValue);
-    if (newAliases.empty()) {
-        s->aliases.clear();
-        stc("Все синонимы очищены.\r\n", ch);
-    } else {
-        s->aliases.clear();
-        for (auto &a: newAliases)
-            s->aliases.push_back(a);
-        ptc(ch, "Установлены новые синонимы: %s\r\n", s->aliases.toSet().toString().c_str());
-    }
-
-    return true;
+    return stringListEdit(getOriginal()->aliases);
 }
 
 SOCEDIT(charNoArgument, "", "поле msgCharNoArgument")

@@ -41,10 +41,10 @@ public:
     virtual bool run( Character *, int );
     virtual bool visible( Character * ) const;
 
+    XML_VARIABLE XMLEnumeration argtype;
+
 protected:
     SkillPointer skill;
-
-    XML_VARIABLE XMLEnumeration argtype;
 
     bool parseArguments(Character *actor, const DLString &constArgs, CommandTarget &target, ostringstream &errbuf);
 };

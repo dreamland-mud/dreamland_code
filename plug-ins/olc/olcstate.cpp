@@ -633,6 +633,53 @@ bool OLCState::diceEdit(int *field)
     return true;
 }
 
+bool OLCState::stringListEdit(XMLStringList &values)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+    DLString arg = args.getOneArgument();
+
+    if (arg.empty()) {
+        // Launch web editor.
+        editorWeb(values.toList().toString(), lastCmd +" paste");
+        return false;
+    }
+
+    if (arg_is_help(arg)) {
+        // Show usage.
+        stc("Использование:\r\n", ch);
+        ptc(ch, "    %s - запустить веб-редактор синонимов\r\n", cmd);
+        ptc(ch, "    %s paste - установить синонимы из буфера веб-редактора\r\n", cmd);
+        ptc(ch, "    %s <string> - установить синонимы из строки\r\n", cmd);
+        return false;
+    }
+
+    DLString newValue;
+    if (arg_is_paste(arg)) {
+        // Grab value from the editor buffer.
+        editorPaste(newValue, ED_NO_NEWLINE);
+    } else {
+        // Grab value from command argument.
+        newValue = lastArgs;
+    }
+
+    // Try to assign new aliases from a space-separated string.
+    StringList newAliases(newValue);
+    if (newAliases.empty()) {
+        values.clear();
+        stc("Все синонимы очищены.\r\n", ch);
+    } else {
+        values.clear();
+        for (auto &a: newAliases)
+            values.push_back(a);
+        ptc(ch, "Установлены новые синонимы: %s\r\n", values.toList().toString().c_str());
+    }
+
+    return true;
+
+}
+
 bool OLCState::editorCopy(const char *field)
 {
     DLString source = field ? field : DLString::emptyString;

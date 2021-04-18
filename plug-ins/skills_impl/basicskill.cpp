@@ -74,10 +74,16 @@ void BasicSkill::loaded( )
 
     if (affect)
         FeniaSkillActionHelper::linkWrapper(*affect);
+
+    if (command)
+        FeniaSkillActionHelper::linkWrapper(*command);
 }
 
 void BasicSkill::unloaded( )
 {
+    if (command)
+        FeniaSkillActionHelper::extractWrapper(*command);
+
     if (affect)
         FeniaSkillActionHelper::extractWrapper(*affect);
 

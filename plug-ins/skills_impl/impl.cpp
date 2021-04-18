@@ -11,6 +11,7 @@
 #include "xmlattributeplugin.h"
 #include "mobilebehaviorplugin.h"
 #include "defaultaffecthandler.h"
+#include "defaultskillcommand.h"
 #include "defaultskillgroup.h"
 #include "spellmanager.h"
 
@@ -35,6 +36,7 @@ extern "C"
                 Plugin::registerPlugin<MocRegistrator<BasicSkill> >( ppl );
                 Plugin::registerPlugin<SpellManager>( ppl );
                 Plugin::registerPlugin<MocRegistrator<DefaultAffectHandler> >( ppl );                
+                Plugin::registerPlugin<MocRegistrator<DefaultSkillCommand> >( ppl );                
                 Plugin::registerPlugin<MocRegistrator<DefaultSkillGroup> >( ppl );                
                 Plugin::registerPlugin<XMLVariableRegistrator<SkillGroupHelp> >( ppl );
                 Plugin::registerPlugin<SkillGroupLoader>( ppl );

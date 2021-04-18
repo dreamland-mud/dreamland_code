@@ -10,6 +10,8 @@
 #include "defaultspell.h"
 #include "basicskill.h"
 #include "defaultaffecthandler.h"
+#include "defaultskillcommand.h"
+#include "commandmanager.h"
 #include "xmltableloader.h"
 
 #include "skedit.h"
@@ -100,6 +102,26 @@ DefaultAffectHandler* OLCStateSkill::getAffect(BasicSkill *skill)
     return 0;
 }
 
+DefaultSkillCommand * OLCStateSkill::getCommand(BasicSkill *skill)
+{
+    if (!skill)
+        skill = getOriginal();
+
+    if (skill->command)
+        return skill->command.getDynamicPointer<DefaultSkillCommand>();
+
+    return 0;
+}
+
+// Re-add command to the command manager, when a name or a flag is changing.
+bool OLCStateSkill::commandUpdate(DefaultSkillCommand *cmd)
+{
+    SkillPointer skill = cmd->getSkill();
+    cmd->unsetSkill();
+    cmd->setSkill(skill);
+    return true;
+}
+
 bool OLCStateSkill::checkSpell(DefaultSpell *spell) 
 {
     if (!spell) {
@@ -116,6 +138,17 @@ bool OLCStateSkill::checkAffect(DefaultAffectHandler *ah)
     if (!ah) {
         if (owner)
             stc("Это поле определено только для аффектов, создайте аффект командой {hc{yaffect create{x.\r\n", owner->character);
+        return false;
+    }
+
+    return true;
+}
+
+bool OLCStateSkill::checkCommand(DefaultSkillCommand *cmd) 
+{
+    if (!cmd) {
+        if (owner)
+            stc("Это поле определено только для команд, создайте новую команду с помощью {yaction create <name>{x.\r\n", owner->character);
         return false;
     }
 
@@ -144,6 +177,7 @@ void OLCStateSkill::show( PCharacter *ch )
     BasicSkill *r = getOriginal();
     DefaultSpell *s = getSpell(r);
     DefaultAffectHandler *a = getAffect(r);
+    DefaultSkillCommand *c = getCommand(r);
 
     ptc(ch, "Умение:      {C%s\r\n", r->getName().c_str());
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
@@ -193,6 +227,26 @@ void OLCStateSkill::show( PCharacter *ch )
         feniaTriggers->showAvailableTriggers(ch, s);
     }
 
+    if (c) {
+        ptc(ch, ".............{YКоманда %s{x..........\r\n", c->name.c_str());
+        ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
+                c->aliases.toList().toString().c_str(),
+                web_edit_button(ch, "aliases", "").c_str());
+        ptc(ch, "РуСинонимы:  {Y%s{x %s {D(rualiases help){x\r\n",
+                c->russian.toList().toString().c_str(),
+                web_edit_button(ch, "rualiases", "").c_str());
+        ptc(ch, "Аргумент:    {Y%s {D(argtype){x\r\n", c->argtype.name().c_str());
+        ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
+        ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
+        ptc(ch, "Приказ:      {Y%s {D(order){x\r\n", 
+                c->order == 0 ? "-" : c->order.names().c_str());
+        ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
+                c->hint.c_str(),
+                web_edit_button(ch, "hint", "web").c_str());        
+        ptc(ch, "Триггера:    ");
+        feniaTriggers->showAvailableTriggers(ch, c);
+    }
+
     if (a) {
         ptc(ch, ".............{GАффект{x.................\r\n");
         ptc(ch, "Отменяется:  {G%s {D(cancelled){x\r\n", a->cancelled ? "yes" : "no");
@@ -221,7 +275,7 @@ void OLCStateSkill::show( PCharacter *ch )
         feniaTriggers->showAvailableTriggers(ch, a);
     }
     
-    ptc(ch, "\r\n{WКоманды{x: {hc{yspell{x, {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
+    ptc(ch, "\r\n{WКоманды{x: {hc{yspell{x, {hc{yaffect{x, {hc{yaction{x, {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
 }
 
 SKEDIT(affect, "аффект", "создать обработчик аффекта для этого умения")
@@ -245,6 +299,44 @@ SKEDIT(affect, "аффект", "создать обработчик аффект
     }
 
     stc("Использование: {y{hcaffect create{x - создать обработчик аффекта\r\n", ch);
+    return false;
+}
+
+SKEDIT(action, "действие", "создать команду для этого умения")
+{
+    DLString args = argument;
+    DLString argOne = args.getOneArgument();
+
+    if (arg_oneof(argOne, "create", "создать")) {
+        if (getCommand()) {
+            stc("Команда для этого умения уже существует.\r\n", ch);
+            return false;
+        }
+
+        static RegExp namePattern("^[a-z]{2,}$", true);
+        if (args.empty() || !namePattern.match(args)) {
+            stc("Укажи английское имя для новой команды, маленькими буквами без пробелов.\r\n", ch);
+            return false;
+        }
+
+        if (commandManager->findExact(args)) {
+            stc("Команда с таким именем уже существует.\r\n", ch);
+            return false;
+        }
+        
+        DefaultSkillCommand::Pointer cmd(NEW);
+        BasicSkill *skill = getOriginal();
+
+        cmd->name = args;
+        skill->command.setPointer(cmd);
+        skill->command->setSkill(BasicSkill::Pointer(skill));
+
+        ptc(ch, "Создана новая команда '%s'.", cmd->getName().c_str());
+        show(ch);
+        return true;
+    }
+
+    stc("Использование: {yaction create <name>{x - создать новую команду\r\n", ch);
     return false;
 }
 
@@ -305,6 +397,7 @@ SKEDIT(fenia, "феня", "редактировать тригера закли�
     DLString args = argument;
     DefaultSpell *s = getSpell();
     DefaultAffectHandler *a = getAffect();
+    DefaultSkillCommand *c = getCommand();
 
     DLString trigName = args.getOneArgument();
     bool clear = arg_is_clear(args);
@@ -314,9 +407,23 @@ SKEDIT(fenia, "феня", "редактировать тригера закли�
         stc("               fenia <триггер> clear - очистить триггер.\r\n", ch);
         return false;
     }
+    
+    if (trigName == "run") {
+        // Handle 'run' skill command override.
+        if (!checkCommand(c))
+            return false;
 
-    // Handle spell triggers with runXXX names.
-    if (DLString("run").strPrefix(trigName)) {
+        if (clear) {
+            if (feniaTriggers->clearTrigger(c->wrapper, trigName))
+                ptc(ch, "Триггер %s успешно удален.\r\n", trigName.c_str());
+            else
+                ptc(ch, "Триггер %s не найден.\r\n", trigName.c_str());        
+        } else {
+            feniaTriggers->openEditor(ch, c, trigName);
+        }
+
+    } else if (DLString("run").strPrefix(trigName)) {
+        // Handle spell triggers with runXXX names.        
         if (!checkSpell(s))
             return false;
 
@@ -418,6 +525,25 @@ SKEDIT(russian, "русское", "русское имя умения")
     return editor(argument, r->nameRus, ED_NO_NEWLINE);
 }
 
+SKEDIT(hint, "подсказка", "краткое описание команды")
+{
+    DefaultSkillCommand *c = getCommand();
+    return checkCommand(c) && editor(argument, c->hint, ED_NO_NEWLINE);
+}
+
+SKEDIT(aliases, "синонимы", "список англ синонимов для команды")
+{
+    DefaultSkillCommand *c = getCommand();
+    return checkCommand(c) && stringListEdit(c->aliases);
+}
+
+// Edit Russian aliases for the command, re-register with CommandManager if Russian name (first alias) has changed.
+SKEDIT(rualiases, "русинонимы", "список русских синонимов для команды")
+{
+    DefaultSkillCommand *c = getCommand();
+    return checkCommand(c) && stringListEdit(c->russian) && commandUpdate(c);
+}
+
 SKEDIT(allow, "доступно", "ограничения по классу, клану, расе")
 {
     BasicSkill *r = getOriginal();
@@ -493,11 +619,20 @@ SKEDIT(target, "цели", "цели заклинания (? target_table)")
             && flagBitsEdit(s->target);
 }
 
-SKEDIT(flags, "флаги", "флаги заклинания (? spell_flags)")
+SKEDIT(argtype, "аргумент", "тип аргумента у команды (? argtype_table)")
 {
+    DefaultSkillCommand *c = getCommand();
+    return checkCommand(c) && flagValueEdit(c->argtype);
+}
+
+SKEDIT(flags, "флаги", "флаги заклинания или команды (? spell_flags, ? extra_flags)")
+{
+    DefaultSkillCommand *c = getCommand();
+    if (c)
+        return flagBitsEdit(c->extra) && commandUpdate(c);
+
     DefaultSpell *s = getSpell();
-    return checkSpell(s)
-            && flagBitsEdit(s->flags);
+    return checkSpell(s) && flagBitsEdit(s->flags);
 }
 
 SKEDIT(damtype, "уронтип", "вид повреждений (? damage_table)")
@@ -514,11 +649,14 @@ SKEDIT(damflags, "уронфлаги", "флаги урона, помимо DAMF
             && flagBitsEdit(s->damflags);
 }
 
-SKEDIT(order, "приказ", "кому можно приказать колдовать (? order_flags)")
+SKEDIT(order, "приказ", "кому можно приказать колдовать или выполнять команду (? order_flags)")
 {
+    DefaultSkillCommand *c = getCommand();
+    if (c)
+        return flagBitsEdit(c->order);
+
     DefaultSpell *s = getSpell();
-    return checkSpell(s)
-            && flagBitsEdit(s->order);
+    return checkSpell(s) && flagBitsEdit(s->order);
 }
 
 SKEDIT(tier, "крутость", "уровень повреждений от 1 до 5")
@@ -528,11 +666,14 @@ SKEDIT(tier, "крутость", "уровень повреждений от 1 �
             && numberEdit(BEST_TIER, WORST_TIER, s->tier);
 }
 
-SKEDIT(position, "позиция", "мин. положение тела для заклинания (? position_table)")
+SKEDIT(position, "позиция", "мин. положение тела для заклинания или команды (? position_table)")
 {
+    DefaultSkillCommand *c = getCommand();
+    if (c)
+        return flagValueEdit(c->position);
+
     DefaultSpell *s = getSpell();
-    return checkSpell(s)
-            && flagValueEdit(s->position);
+    return checkSpell(s) && flagValueEdit(s->position);
 }
 
 SKEDIT(type, "вид", "вид заклинания (? spell_types)")

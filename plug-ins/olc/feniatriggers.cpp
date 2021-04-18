@@ -7,6 +7,7 @@
 #include "iconvmap.h"
 #include "defaultspell.h"
 #include "defaultaffecthandler.h"
+#include "defaultskillcommand.h"
 #include "feniaskillaction.h"
 #include "websocketrpc.h"
 #include "dlfileloader.h"
@@ -44,6 +45,7 @@ void FeniaTriggerLoader::initialization()
     loadFolder("room");
     loadFolder("spell");
     loadFolder("affect");
+    loadFolder("skillcommand");
 }
 
 void FeniaTriggerLoader::destruction()
@@ -206,6 +208,30 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultAffectHand
     ch->send_to(buf);
 }
 
+void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultSkillCommand *cmd) const
+{
+    ostringstream buf;
+
+    IndexTriggers::const_iterator i = indexTriggers.find("skillcommand");
+    if (i == indexTriggers.end())
+        return;
+
+    WrapperBase *wrapper = cmd->getWrapper();    
+
+    const TriggerContent &triggers = i->second;
+    for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
+        IdRef methodId(t->first);
+        Register method;
+        bool hasTrigger = wrapper && wrapper->triggerFunction(methodId, method);
+        buf << web_cmd(ch, "fenia $1", t->first)
+            << (hasTrigger ? "{g*" : "")
+            << "{x ";
+    }
+
+    buf << "{D(fenia <trig> [clear]){x" << endl;
+    ch->send_to(buf);
+}
+
 static Register get_wrapper_for_index_data(int vnum, const DLString &type)
 {
     Register w;
@@ -219,12 +245,20 @@ static Register get_wrapper_for_index_data(int vnum, const DLString &type)
     return w;
 }
 
-bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const
+bool FeniaTriggerLoader::checkWebsock(Character *ch) const
 {
     if (!is_websock(ch)) {
         ch->pecho("Эта крутая фишка доступна только в веб-клиенте.");
         return false;
     }
+
+    return true;
+}
+
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const
+{
+    if (!checkWebsock(ch))
+        return false;
 
     Register w = get_wrapper_for_index_data(indexData.getVnum(), indexData.getIndexType());
     if (w.type == Register::NONE)
@@ -322,42 +356,45 @@ bool FeniaTriggerLoader::editExisting(Character *ch, Register &retval) const
     return true;
 }
 
+vector<DLString> FeniaTriggerLoader::createSkillActionParams(
+    Character *ch, const DLString &actionType, SkillAction *action, const DLString &methodName) const
+{
+    std::vector<DLString> parms;
+
+    // Create codesource body with example code.
+    DLString tmpl;
+    if (!findExample(ch, methodName, actionType, tmpl))
+        return parms;
+
+    parms.resize(2);
+    tmpl.replaces("@name@", DLString("\"") + action->getSkill()->getName() + "\"");
+    tmpl.replaces("@trig@", methodName);
+    parms[1] = tmpl;
+
+    // Create codesource subject.
+    parms[0] = dlprintf("%s/%s/%s",
+                    actionType.c_str(),
+                    action->getSkill()->getName().c_str(),
+                    methodName.c_str());   
+
+    return parms;
+}
+
+
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const
 {
-    if (!is_websock(ch)) {
-        ch->pecho("Эта крутая фишка доступна только в веб-клиенте.");
-        return false;
-    }
-
-    Register w = WrapperManager::getThis()->getWrapper(spell);
-    if (w.type == Register::NONE)
-        return false;
-        
-    WrapperBase *base = get_wrapper(w.toObject());
-    if (!base)
+    if (!checkWebsock(ch))
         return false;
 
     DLString args = constArguments;
     DLString methodName = args.getOneArgument();
-    Scripting::IdRef methodId(methodName);
-    Register retval = base->getField(methodId);
+    Register retval = getMethodForName<Spell>(spell, methodName);
 
     // Fenia field not found, try to open the editor with trigger example.
     if (retval.type == Register::NONE) {
-        std::vector<DLString> parms(2);
-        // Create codesource subject.
-        parms[0] = dlprintf("spell/%s/%s",
-                        spell->getSkill()->getName().c_str(),
-                        methodName.c_str());   
-
-        // Create codesource body with example code.
-        DLString tmpl;
-        if (!findExample(ch, methodName, "spell", tmpl))
+        vector<DLString> parms = createSkillActionParams(ch, "spell", spell, methodName);
+        if (parms.empty())
             return false;
-
-        tmpl.replaces("@name@", DLString("\"") + spell->getSkill()->getName() + "\"");
-        tmpl.replaces("@trig@", methodName);
-        parms[1] = tmpl;
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
@@ -370,40 +407,18 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const D
 
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const
 {
-    if (!is_websock(ch)) {
-        ch->pecho("Эта крутая фишка доступна только в веб-клиенте.");
-        return false;
-    }
-
-    Register w = WrapperManager::getThis()->getWrapper(ah);
-    if (w.type == Register::NONE)
-        return false;
-        
-    WrapperBase *base = get_wrapper(w.toObject());
-    if (!base)
+    if (!checkWebsock(ch))
         return false;
 
     DLString args = constArguments;
     DLString methodName = args.getOneArgument();
-    Scripting::IdRef methodId(methodName);
-    Register retval = base->getField(methodId);
+    Register retval = getMethodForName<AffectHandler>(ah, methodName);
 
     // Fenia field not found, try to open the editor with trigger example.
     if (retval.type == Register::NONE) {
-        std::vector<DLString> parms(2);
-        // Create codesource subject.
-        parms[0] = dlprintf("affect/%s/%s",
-                        ah->getSkill()->getName().c_str(),
-                        methodName.c_str());   
-
-        // Create codesource body with example code.
-        DLString tmpl;
-        if (!findExample(ch, methodName, "affect", tmpl))
+        vector<DLString> parms = createSkillActionParams(ch, "affect", ah, methodName);
+        if (parms.empty())
             return false;
-
-        tmpl.replaces("@name@", DLString("\"") + ah->getSkill()->getName() + "\"");
-        tmpl.replaces("@trig@", methodName);
-        parms[1] = tmpl;
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
@@ -414,5 +429,29 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultAffectHandler *ah, co
     return editExisting(ch, retval);
 }
 
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSkillCommand *cmd, const DLString &constArguments) const
+{
+    if (!checkWebsock(ch))
+        return false;
+
+    DLString args = constArguments;
+    DLString methodName = args.getOneArgument();
+    Register retval = getMethodForName<SkillCommand>(cmd, methodName);
+
+    // Fenia field not found, try to open the editor with trigger example.
+    if (retval.type == Register::NONE) {
+        vector<DLString> parms = createSkillActionParams(ch, "skillcommand", cmd, methodName);
+        if (parms.empty())
+            return false;
+
+        // Open the editor.
+        ch->desc->writeWSCommand("cs_edit", parms);
+        ch->printf("Запускаю веб-редактор для команды, триггер %s.\r\n", methodName.c_str());
+        return true;
+    }
+
+    return editExisting(ch, retval);
+}
+    
 
 PluginInitializer<FeniaTriggerLoader> initFeniaTriggerLoader;

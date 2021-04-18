@@ -45,7 +45,6 @@ public:
         virtual void run( Character * ch, const DLString & );
         virtual void run( Character *, char * );
 
-protected:        
         XML_VARIABLE XMLString name;
         XML_VARIABLE XMLStringList aliases, russian;
         XML_VARIABLE XMLFlagsNoEmpty extra;

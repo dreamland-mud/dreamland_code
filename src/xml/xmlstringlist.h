@@ -6,6 +6,7 @@
 #define XMLSTRINGLIST_H
 
 #include "stringset.h"
+#include "stringlist.h"
 #include "xmlstring.h"
 #include "xmllist.h"
 
@@ -14,6 +15,7 @@ public:
 
     XMLStringList();
     StringSet toSet() const;
+    StringList toList() const;
 };
 
 class XMLStringSet : public StringSet {
