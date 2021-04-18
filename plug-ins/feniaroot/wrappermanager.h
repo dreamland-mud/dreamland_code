@@ -26,6 +26,7 @@ public:
     virtual Scripting::Register getWrapper( Spell * );
     virtual Scripting::Register getWrapper( AffectHandler * );
     virtual Scripting::Register getWrapper( Affect * );
+    virtual Scripting::Register getWrapper( SkillCommand * );
     
     virtual void linkWrapper( Character * );
     virtual void linkWrapper( ::Object * );
@@ -36,6 +37,7 @@ public:
     virtual void linkWrapper( Spell * );
     virtual void linkWrapper( AffectHandler * );
     virtual void linkWrapper( Affect * );
+    virtual void linkWrapper( SkillCommand * );
 
     virtual void getTarget( const Scripting::Register &, Character *& );
     

@@ -1104,6 +1104,15 @@ NMI_INVOKE( Root, AffectHandler , "(name): находит обработчик �
     return WrapperManager::getThis( )->getWrapper(skill->getAffect().getPointer());
 }
 
+NMI_INVOKE( Root, SkillCommand , "(name): находит команду для умения с заданным именем")
+{
+    Skill *skill = args2skill(args);
+    if (!skill || !skill->getCommand())
+        throw Scripting::Exception("SkillCommand not found");
+
+    return WrapperManager::getThis( )->getWrapper(skill->getCommand().getPointer());
+}
+
 
 NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
 {

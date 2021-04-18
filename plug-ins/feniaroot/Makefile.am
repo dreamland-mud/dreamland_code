@@ -33,6 +33,7 @@ areaindexwrapper.cpp \
 spellwrapper.cpp \
 affecthandlerwrapper.cpp \
 feniaspellext.cpp \
+skillcommandwrapper.cpp \
 wrap_utils.cpp \
 feniacroaker.cpp \
 codesourcerepo.cpp
@@ -52,6 +53,7 @@ mobindexwrapper.h \
 areaindexwrapper.h \
 spellwrapper.h \
 affecthandlerwrapper.h \
+skillcommandwrapper.h \
 characterwrapper.h 
 
 

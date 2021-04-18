@@ -18,9 +18,6 @@ struct SkillCommandTemplate : public DefaultSkillCommand, public ClassSelfRegist
         name = cmdName;
     }
 
-    virtual void run( Character * ch, const DLString & constArguments ) {
-        DefaultSkillCommand::run( ch, constArguments );
-    }
     virtual void run( Character * ch, char *argument ) { 
         DefaultSkillCommand::run( ch, argument );
     }
@@ -33,12 +30,6 @@ struct SkillCommandTemplate : public DefaultSkillCommand, public ClassSelfRegist
     virtual bool run( Character * ch, int value ) { 
         return DefaultSkillCommand::run( ch, value );
     }
-    virtual void run( Character *ch, Character *victim, Character *& result ) { 
-        DefaultSkillCommand::run( ch, victim, result );
-    }
-    virtual void run( Character *ch, Character *victim, int &result ) { 
-        DefaultSkillCommand::run( ch, victim, result );
-    } 
 
     virtual bool visible(Character *ch) const {
         return DefaultSkillCommand::visible(ch);
@@ -58,12 +49,6 @@ private:
 const char *SKILL_DUMMY(x) = "SKILL(" #x ")"; \
 template<> const char *SKILL(x)::cmdName = #x; \
 PluginInitializer<SKILL(x)> dummySkill_ ##x## _init;
-
-
-#define SKILL_RUN(x) \
-SKILL_DECL(x); \
-template <> \
-void SKILL(x)::run( Character* ch, const DLString& constArguments ) 
 
 #define SKILL_RUNP(x) \
 SKILL_DECL(x); \

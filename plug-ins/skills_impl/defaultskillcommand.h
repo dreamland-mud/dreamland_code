@@ -15,6 +15,8 @@ public:
     
     DefaultSkillCommand( );
 
+    virtual long long getID() const;
+
     virtual void setSkill( SkillPointer );
     virtual void unsetSkill( );
     virtual SkillPointer getSkill( ) const;
@@ -26,12 +28,12 @@ public:
     virtual bool run( Character *, Character * );
     virtual bool run( Character * );
     virtual bool run( Character *, int );
-    virtual void run( Character *, Character *, Character *& );
-    virtual void run( Character *, Character *, int & );
     virtual bool visible( Character * ) const;
 
 protected:
     SkillPointer skill;
+
+    XML_VARIABLE XMLEnumeration argtype;
 };
 
 #endif

@@ -1,15 +1,9 @@
 #ifndef SPELLWRAPPER_H
 #define SPELLWRAPPER_H
 
-#include "xmlvariablecontainer.h"
-// MOC_SKIP_BEGIN
-#include "exceptions.h"
-// MOC_SKIP_END
-#include "fenia/handler.h"
 #include "pluginwrapperimpl.h"
 
 struct Spell;
-
 class SpellWrapper : public PluginWrapperImpl<SpellWrapper>
 {
 XML_OBJECT

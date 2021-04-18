@@ -20,6 +20,7 @@
 #include "roomwrapper.h"
 #include "characterwrapper.h"
 #include "affectwrapper.h"
+#include "skillcommandwrapper.h"
 #include "commandwrapper.h"
 #include "tableswrapper.h"
 #include "validatetask.h"
@@ -80,6 +81,7 @@ WrappersPlugin::linkTargets()
         Skill *skill = skillManager->find(sn);
         Spell::Pointer spell = skill->getSpell();
         AffectHandler::Pointer ah = skill->getAffect();
+        SkillCommand::Pointer cmd = skill->getCommand();
         
         if (spell && spell->wrapper) {
             LogStream::sendNotice() << "Fenia spell: setting target for " << skill->getName() << endl;
@@ -89,6 +91,11 @@ WrappersPlugin::linkTargets()
         if (ah && ah->wrapper) {
             LogStream::sendNotice() << "Fenia affect handler: setting target for " << skill->getName() << endl;
             wrapper_cast<AffectHandlerWrapper>(ah->wrapper)->setTarget(*ah);
+        }
+
+        if (cmd && cmd->wrapper) {
+            LogStream::sendNotice() << "Fenia skill command: setting target for " << skill->getName() << endl;
+            wrapper_cast<SkillCommandWrapper>(cmd->wrapper)->setTarget(*cmd);
         }
     }
 }
@@ -106,6 +113,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<SpellWrapper>( );
     Class::regMoc<AffectHandlerWrapper>( );
     Class::regMoc<AffectWrapper>( );
+    Class::regMoc<SkillCommandWrapper>( );
     Class::regMoc<CommandWrapper>( );
     Class::regMoc<TablesWrapper>( );
     Class::regMoc<TableWrapper>( );
@@ -156,6 +164,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);
     traitsAPIJson<SpellWrapper>("spell", apiDump, false);
     traitsAPIJson<AffectHandlerWrapper>("affecthandler", apiDump, false);
+    traitsAPIJson<SkillCommandWrapper>("skillcommand", apiDump, false);
     traitsAPIJson<FeniaSpellContext>("spellcontext", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
 
@@ -187,6 +196,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<TablesWrapper>( );
     Class::unregMoc<TableWrapper>( );
     Class::unregMoc<CommandWrapper>( );
+    Class::unregMoc<SkillCommandWrapper>( );
     Class::unregMoc<AffectWrapper>( );
     Class::unregMoc<AreaIndexWrapper>( );
     Class::unregMoc<SpellWrapper>( );

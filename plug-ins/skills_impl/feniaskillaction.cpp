@@ -16,6 +16,7 @@
 #include "skill.h"
 #include "spell.h"
 #include "spelltarget.h"
+#include "skillcommand.h"
 #include "character.h"
 #include "core/object.h"
 #include "room.h"
@@ -125,6 +126,36 @@ void FeniaSkillActionHelper::extractWrapper(AffectHandler *ah)
     ah->extractWrapper(false);
 }
 
+void FeniaSkillActionHelper::linkWrapper(SkillCommand *cmd) 
+{
+    if (!FeniaManager::wrapperManager) {
+        LogStream::sendError() << "No Fenia manager when linking skill command wrapper for " << cmd->getSkill()->getName() << endl;
+        return;
+    }
+
+    FeniaManager::wrapperManager->linkWrapper(cmd);
+    if (cmd->wrapper)
+        LogStream::sendNotice() << "Fenia skill command: linked wrapper for " << cmd->getSkill()->getName() << endl;
+}
+
+void FeniaSkillActionHelper::extractWrapper(SkillCommand *cmd) 
+{
+    if (!cmd->wrapper)
+        return;
+        
+    if (!FeniaManager::wrapperManager) {
+        LogStream::sendError() << "No Fenia manager when extracting skill command wrapper for " << cmd->getSkill()->getName() << endl;
+        return;
+    }
+
+    cmd->extractWrapper(false);
+}
+#if 0
+bool FeniaSkillActionHelper::executeCommand()
+{
+    return false;
+}
+#endif
 bool FeniaSkillActionHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
     // Check that a function matching this spell target (i.e. one of runVict, runArg etc)

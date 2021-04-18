@@ -13,6 +13,7 @@ class Character;
 class SpellTarget;
 class DefaultSpell;
 class AffectHandler;
+class SkillCommand;
 
 class FeniaSpellContext : public Scripting::NativeImpl<FeniaSpellContext>,
                           public Scripting::NativeHandler,
@@ -56,6 +57,8 @@ public:
     static void extractWrapper(Spell *);
     static void linkWrapper(AffectHandler *);
     static void extractWrapper(AffectHandler *);
+    static void linkWrapper(SkillCommand *);
+    static void extractWrapper(SkillCommand *);
 
     static bool executeSpell(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
     static bool spellHasTrigger(Spell *spell, const DLString &trigName);

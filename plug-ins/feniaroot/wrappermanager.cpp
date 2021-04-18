@@ -12,6 +12,7 @@
 #include "spellwrapper.h"
 #include "affecthandlerwrapper.h"
 #include "affectwrapper.h"
+#include "skillcommandwrapper.h"
 #include "subr.h"
 #include "fenia/register-impl.h"
 
@@ -19,6 +20,7 @@
 #include "spell.h"
 #include "affecthandler.h"
 #include "skill.h"
+#include "skillcommand.h"
 #include "room.h"
 #include "character.h"
 #include "object.h"
@@ -118,6 +120,14 @@ Scripting::Register WrapperManager::getWrapper(Affect *paf)
     return AffectWrapper::wrap(*paf); 
 }
 
+Scripting::Register WrapperManager::getWrapper(SkillCommand *cmd) 
+{
+    if (!cmd)
+        return Scripting::Register();
+    
+    return wrapperAux<SkillCommandWrapper>(cmd->getID(), cmd);
+}
+
 template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
 {
@@ -175,6 +185,12 @@ void WrapperManager::linkWrapper(Affect *paf)
 {
     /* DO NOTHING */
 }
+
+void WrapperManager::linkWrapper(SkillCommand *cmd) 
+{
+    linkAux<SkillCommandWrapper>(cmd->getID(), cmd);
+}
+
 
 void WrapperManager::getTarget( const Scripting::Register &reg, Character *& ch )
 {

@@ -145,6 +145,7 @@ class DummySkillCommand : public SkillCommand {
 public:
     typedef ::Pointer<DummySkillCommand> Pointer;
     
+    virtual long long getID() const { return 0; }
     virtual void setSkill( SkillPointer ) { }
     virtual void unsetSkill( ) { }
     virtual SkillPointer getSkill( ) const { return SkillPointer( ); }
