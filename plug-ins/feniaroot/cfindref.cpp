@@ -91,7 +91,7 @@ CMDADM(findrefs)
              if (oi->hasHandler() && oi->getHandler()->getType() == "FeniaSpellContext") {
                  cnt++;
                  refcnt[oi->refcnt]++;
-                 oi->getHandler()->setField("thiz", Register());
+//                 oi->getHandler()->setField("thiz", Register());
              }
          }
          ch->printf("Found %d context objects.\r\n", cnt);

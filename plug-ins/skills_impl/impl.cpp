@@ -47,6 +47,7 @@ extern "C"
                 Plugin::registerPlugin<XMLVariableRegistrator<SkillHelp> >( ppl );
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeRestring> >( ppl );
                 Plugin::registerPlugin<MocRegistrator<FeniaSpellContext> > (ppl);
+                Plugin::registerPlugin<MocRegistrator<FeniaCommandContext> > (ppl);
                 return ppl;
         }
         

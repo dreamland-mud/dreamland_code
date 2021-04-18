@@ -4,6 +4,7 @@
 #include "feniaskillaction.h"
 #include "defaultspell.h"
 #include "defaultaffecthandler.h"
+#include "defaultskillcommand.h"
 
 #include "feniamanager.h"
 #include "wrapperbase.h"
@@ -13,10 +14,6 @@
 #include "stringlist.h"
 #include "configurable.h"
 #include "skillmanager.h"
-#include "skill.h"
-#include "spell.h"
-#include "spelltarget.h"
-#include "skillcommand.h"
 #include "character.h"
 #include "core/object.h"
 #include "room.h"
@@ -150,12 +147,7 @@ void FeniaSkillActionHelper::extractWrapper(SkillCommand *cmd)
 
     cmd->extractWrapper(false);
 }
-#if 0
-bool FeniaSkillActionHelper::executeCommand()
-{
-    return false;
-}
-#endif
+
 bool FeniaSkillActionHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
     // Check that a function matching this spell target (i.e. one of runVict, runArg etc)
@@ -194,6 +186,36 @@ bool FeniaSkillActionHelper::executeSpell(DefaultSpell *spell, Character *ch, Sp
     return true;
 }
 
+bool FeniaSkillActionHelper::executeCommand(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target)
+{
+    // Find 'run' function defined on the command's wrapper.
+    WrapperBase *wrapper = cmd->getWrapper();
+    if (!wrapper)
+        return false;
+
+    IdRef methodId("run");
+    Register method;
+    if (!wrapper->triggerFunction(methodId, method))
+        return false;
+
+    // Create run context for the command and execute 'run' function.
+    FeniaCommandContext::Pointer ctx;
+    try {
+        ctx = createContext(cmd, ch, target);
+        method.toFunction()->invoke(Register(ctx->self), RegisterList());
+
+    } catch (const CustomException &ce) {
+        // Do nothing on victim's death.
+
+    } catch (const ::Exception &e) {
+        // On error, complain to the logs and to all immortals in the game.
+        FeniaManager::getThis()->croak(0, methodId, e);
+    }
+    
+    return true;
+}
+
+
 FeniaSpellContext::Pointer FeniaSkillActionHelper::createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
 {
     FeniaSpellContext::Pointer ctx(NEW);
@@ -228,6 +250,29 @@ FeniaSpellContext::Pointer FeniaSkillActionHelper::createContext(DefaultSpell *s
     ctx->calcDamage();
 
     return ctx;    
+}
+
+FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target) 
+{
+    FeniaCommandContext::Pointer ctx(NEW);
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(ctx);
+
+    ctx->name = cmd->getName();
+    ctx->command = Register(cmd->wrapper);
+    ctx->ch = FeniaManager::wrapperManager->getWrapper(ch);
+    ctx->state = Register::handler<IdContainer>();
+    ctx->argAll = target.argAll;
+    ctx->argOne = target.argOne;
+    ctx->argTwo = target.argTwo;
+
+    if (target.obj)
+        ctx->obj = FeniaManager::wrapperManager->getWrapper(target.obj);
+    
+    if (target.vict)
+        ctx->vict = FeniaManager::wrapperManager->getWrapper(target.vict);
+
+    return ctx;        
 }
 
 bool FeniaSkillActionHelper::spellHasTrigger(Spell *spell, const DLString &trigName) 
@@ -352,4 +397,70 @@ void FeniaSpellContext::calcDamage()
 
 
 
+
+/*--------------------------------------------------------------------
+ * FeniaCommandContext
+ *-------------------------------------------------------------------*/
+
+FeniaCommandContext::FeniaCommandContext() 
+{
+    
+}
+
+FeniaCommandContext::~FeniaCommandContext() 
+{
+    
+}
+
+void FeniaCommandContext::setSelf(Scripting::Object *s) 
+{
+    self = s;    
+}
+
+NMI_INIT(FeniaCommandContext, "контекст для вызова команды умения")
+
+NMI_GET(FeniaCommandContext, command, "прототип команды умения (.SkillCommand())")
+{
+    return command;
+}
+
+NMI_GET(FeniaCommandContext, ch, "персонаж, выполняющий команду")
+{
+    return ch;
+}
+
+NMI_GET(FeniaCommandContext, argAll, "аргумент команды целиком")
+{
+    return argAll;
+}
+
+NMI_GET(FeniaCommandContext, argOne, "первый аргумент команды")
+{
+    return argOne;
+}
+
+NMI_GET(FeniaCommandContext, argTwo, "второй аргумент команды")
+{
+    return argTwo;
+}
+
+NMI_GET(FeniaCommandContext, obj, "предмет, цель команды")
+{
+    return obj;
+}
+
+NMI_GET(FeniaCommandContext, vict, "персонаж, цель команды - как синоним victim")
+{
+    return vict;
+}
+
+NMI_GET(FeniaCommandContext, victim, "персонаж, цель команды - как синоним vict")
+{
+    return vict;
+}
+
+NMI_GET(FeniaCommandContext, state, "структура для хранения временных переменных")
+{
+    return state;
+}
 

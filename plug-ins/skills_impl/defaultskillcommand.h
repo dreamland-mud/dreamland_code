@@ -8,6 +8,17 @@
 #include "skillcommand.h"
 #include "defaultcommand.h"
 
+class Object;
+struct CommandTarget {
+    CommandTarget();
+
+    Character *vict;
+    Object *obj;
+    DLString argAll;
+    DLString argOne, argTwo;
+    // TODO exits 
+};
+
 class DefaultSkillCommand : public DefaultCommand, public SkillCommand {
 XML_OBJECT
 public:
@@ -34,6 +45,8 @@ protected:
     SkillPointer skill;
 
     XML_VARIABLE XMLEnumeration argtype;
+
+    bool parseArguments(Character *actor, const DLString &constArgs, CommandTarget &target, ostringstream &errbuf);
 };
 
 #endif

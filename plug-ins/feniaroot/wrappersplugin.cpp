@@ -166,6 +166,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<AffectHandlerWrapper>("affecthandler", apiDump, false);
     traitsAPIJson<SkillCommandWrapper>("skillcommand", apiDump, false);
     traitsAPIJson<FeniaSpellContext>("spellcontext", apiDump, false);
+    traitsAPIJson<FeniaCommandContext>("commandcontext", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
 
     Json::FastWriter writer;
