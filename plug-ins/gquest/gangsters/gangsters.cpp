@@ -457,7 +457,7 @@ void Gangsters::createFirstHint( MobileList &people )
     informerName = name;
     informerRoom = informer->in_room->getName();
 
-    buf << name        << " сообщил" << GET_SEX( informer, "", "о", "а" );
+    buf << "{1" << name << "{2 сообщил" << GET_SEX( informer, "", "о", "а" );
     
     switch (number_range(1, 4)) {
     case 1: case 2: buf << " Хассану"; break;
