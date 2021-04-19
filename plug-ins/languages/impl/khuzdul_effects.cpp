@@ -97,7 +97,7 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
     if ( IS_AFFECTED(ch,AFF_CALM) )
     {
         ch->pecho( "Ты слишком миролюбив{Sfа{Sx для древней ярости." );
-        return;
+        return false;
     } 
     
     af.type         = gsn_ancient_rage;
