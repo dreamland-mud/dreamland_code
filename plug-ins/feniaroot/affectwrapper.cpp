@@ -148,7 +148,7 @@ GS(level, "уровень аффекта")
 NMI_INVOKE(AffectWrapper, bitvector, "(table,flags): какие флаги и по какой таблице устанавливает аффект; table - таблица или название, flags - биты или строка с их названиями")
 {
     const FlagTable *table = argnum2table(args, 1);
-    int flag = argnum2flag(args, 2, *table);
+    int flag = table ? argnum2flag(args, 2, *table) : 0;
 
     target.bitvector.setTable(table);
     target.bitvector.setValue(flag);

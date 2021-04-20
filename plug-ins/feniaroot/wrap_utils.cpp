@@ -336,7 +336,10 @@ const FlagTable * arg2table(const Register &r)
 {
     const FlagTable *table = 0;
 
-    if (r.type == Register::STRING) {
+    if (r.type == Register::NONE || (r.type == Register::NUMBER && r.toNumber() == 0)) {
+        return 0;
+
+    } else if (r.type == Register::STRING) {
         table = FlagTableRegistry::getTable(r.toString());
 
     } else if (r.type == Register::OBJECT) {
