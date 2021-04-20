@@ -544,3 +544,15 @@ NMI_INVOKE(FeniaCommandContext, cooldown, "(duration): наложить пост
     postaffect_to_char(myCh, skill->getIndex(), duration);
     return Register();
 }
+
+NMI_INVOKE(FeniaCommandContext, takeMana, "(value): уменьшить ману персонажа на value; вернет false если не получилось")
+{
+    Character *myCh = arg2character(ch);
+    int mana = args2number(args);
+
+    if (myCh->mana < mana)
+        return false;
+
+    myCh->mana -= mana;
+    return true;
+}

@@ -1082,6 +1082,12 @@ NMI_INVOKE(SkillWrapper, beats, "(ch): длина задержки в пульс
     return getTarget()->getBeats(ch);
 }
 
+NMI_INVOKE(SkillWrapper, mana, "(ch): цена этого умения в мане для персонажа ch [пока что одинакова для всех]")
+{
+//    Character *ch = args2character(args);
+    return getTarget()->getMana();
+}
+
 NMI_INVOKE(SkillWrapper, level, "(ch): уровень умения для персонажа с учетом бонусов")
 {
     Character *ch = args2character(args);
