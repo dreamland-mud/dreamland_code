@@ -837,6 +837,19 @@ NMI_GET( RoomWrapper, affected, "список (List) всех аффектов �
     return wrap(rc);
 }
 
+NMI_INVOKE( RoomWrapper, affectAdd, "(aff): повесить новый аффект (.Affect)" )
+{
+    checkTarget( );
+    AffectWrapper *aw;
+    
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+    
+    aw = wrapper_cast<AffectWrapper>( args.front( ) );
+    target->affectTo(&(aw->getTarget()));
+    return Register( );
+}
+
 NMI_INVOKE( RoomWrapper, affectJoin, "(aff): усилить существующий аффект или повесить новый (.Affect)" )
 {
     checkTarget( );
