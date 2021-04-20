@@ -714,6 +714,107 @@ CMDWIZP( stat )
   ch->pecho("С таким именем ничего не найдено.");
 }
 
+static void format_affect_duration(Affect *paf, ostringstream &buf)
+{
+    if (paf->duration >= 0)
+        buf << fmt(0, " в течение %1$d час%1$Iа|ов|ов", paf->duration);
+    else
+        buf << " постоянно";    
+}
+
+static void format_affect_level(Affect *paf, ostringstream &buf)
+{
+    if (paf->level >= 0)
+        buf << ", уровень " << paf->level;
+}
+
+static void format_affect(Affect *paf, ostringstream &buf)
+{
+    int b = paf->bitvector;
+    int mod = paf->modifier;
+    const FlagTable *table = paf->bitvector.getTable();
+    const GlobalRegistryBase *registry = paf->global.getRegistry();
+    bool empty = true;
+
+    buf << "Аффект";
+    if (paf->type != gsn_none) 
+        buf << " " << paf->type->getRussianName().quote();
+    buf << ": ";
+
+    if (registry) {
+        if (registry == skillManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "владение умением" : "уровень умения")
+                << " " << paf->global.toRussianString().quote() 
+                << " на " << (int)abs(mod);
+        } else if (registry == skillGroupManager) {
+            buf << (mod >= 0 ? "повышает" : "понижает") << " "
+                << (paf->location == APPLY_LEARNED ? "владение группой умений" : "уровень всех умений группы")
+                << " " << paf->global.toRussianString().quote() 
+                << " на " << (int)abs(mod);
+        } else if (registry == liquidManager) {
+            buf << "добавляет запах " << paf->global.toRussianString('2', ',').colourStrip();
+        } else if (registry == wearlocationManager) {
+            buf << "отнимает конечность " << paf->global.toString(',');
+        } else {
+            buf << "неизвестный вектор";
+        }
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        return;
+    }
+
+    if (table && b != 0) {
+        buf << "добавляет ";
+        if (table == &affect_flags)
+            buf << "аффект ";
+        else if (table == &imm_flags)
+            buf << "иммунитет к ";
+        else if (table == &res_flags)
+            buf << "сопротивляемость к ";
+        else if (table == &vuln_flags)
+            buf << "уязвимость к ";
+        else if (table == &detect_flags)
+            buf << "обнаружение ";
+        else if (table == &raffect_flags)
+            buf << "флаги комнаты ";
+        else if (table == &weapon_type2)
+            buf << "флаги оружия ";
+        else if (table == &extra_flags)
+            buf << "флаги предмета ";
+        else if (table == &plr_flags)
+            buf << "флаги персонажа ";
+        else if (table == &form_flags)
+            buf << "форму тела ";
+        else
+            buf << "не пойми что";
+
+        buf << table->messages(b);
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        empty = false;
+    }
+
+    if (paf->modifier != 0 && paf->location != APPLY_NONE) {
+        if (!empty)
+            buf << "        ";
+        buf << "изменяет " << paf->location.message()
+            << " на " << paf->modifier;
+
+        format_affect_duration(paf, buf);
+        format_affect_level(paf, buf);
+        buf << "." << endl;
+        empty = false;
+    }
+
+    if (empty)
+        buf << " (ничего)." << endl;
+}
+
 
 /* NOTCOMMAND */ void do_rstat( Character *ch, char *argument )
 {
@@ -820,6 +921,12 @@ CMDWIZP( stat )
             ch->send_to(buf);
         }
     }
+
+    ostringstream ostr;
+    for (auto &paf: location->affected)
+        format_affect(paf, ostr);
+    ch->send_to(ostr);
+
     ch->pecho("Следы:");
 
     for (RoomHistory::iterator h = location->history.begin( );
@@ -841,106 +948,6 @@ CMDWIZP( stat )
 
 }
 
-static void format_affect_duration(Affect *paf, ostringstream &buf)
-{
-    if (paf->duration >= 0)
-        buf << fmt(0, " в течение %1$d час%1$Iа|ов|ов", paf->duration);
-    else
-        buf << " постоянно";    
-}
-
-static void format_affect_level(Affect *paf, ostringstream &buf)
-{
-    if (paf->level >= 0)
-        buf << ", уровень " << paf->level;
-}
-
-static void format_affect(Affect *paf, ostringstream &buf)
-{
-    int b = paf->bitvector;
-    int mod = paf->modifier;
-    const FlagTable *table = paf->bitvector.getTable();
-    const GlobalRegistryBase *registry = paf->global.getRegistry();
-    bool empty = true;
-
-    buf << "Аффект";
-    if (paf->type != gsn_none) 
-        buf << " " << paf->type->getRussianName().quote();
-    buf << ": ";
-
-    if (registry) {
-        if (registry == skillManager) {
-            buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "владение умением" : "уровень умения")
-                << " " << paf->global.toRussianString().quote() 
-                << " на " << (int)abs(mod);
-        } else if (registry == skillGroupManager) {
-            buf << (mod >= 0 ? "повышает" : "понижает") << " "
-                << (paf->location == APPLY_LEARNED ? "владение группой умений" : "уровень всех умений группы")
-                << " " << paf->global.toRussianString().quote() 
-                << " на " << (int)abs(mod);
-        } else if (registry == liquidManager) {
-            buf << "добавляет запах " << paf->global.toRussianString('2', ',').colourStrip();
-        } else if (registry == wearlocationManager) {
-            buf << "отнимает конечность " << paf->global.toString(',');
-        } else {
-            buf << "неизвестный вектор";
-        }
-
-        format_affect_duration(paf, buf);
-        format_affect_level(paf, buf);
-        buf << "." << endl;
-        return;
-    }
-
-    if (table && b != 0) {
-        buf << "добавляет ";
-        if (table == &affect_flags)
-            buf << "аффект ";
-        else if (table == &imm_flags)
-            buf << "иммунитет к ";
-        else if (table == &res_flags)
-            buf << "сопротивляемость к ";
-        else if (table == &vuln_flags)
-            buf << "уязвимость к ";
-        else if (table == &detect_flags)
-            buf << "обнаружение ";
-        else if (table == &raffect_flags)
-            buf << "флаги комнаты ";
-        else if (table == &weapon_type2)
-            buf << "флаги оружия ";
-        else if (table == &extra_flags)
-            buf << "флаги предмета ";
-        else if (table == &plr_flags)
-            buf << "флаги персонажа ";
-        else if (table == &form_flags)
-            buf << "форму тела ";
-        else
-            buf << "не пойми что";
-
-        buf << table->messages(b);
-
-        format_affect_duration(paf, buf);
-        format_affect_level(paf, buf);
-        buf << "." << endl;
-        empty = false;
-    }
-
-    if (paf->modifier != 0 && paf->location != APPLY_NONE) {
-        if (!empty)
-            buf << "        ";
-        buf << "изменяет " << paf->location.message()
-            << " на " << paf->modifier;
-
-        format_affect_duration(paf, buf);
-        format_affect_level(paf, buf);
-        buf << "." << endl;
-        empty = false;
-    }
-
-    if (empty)
-        buf << " (ничего)." << endl;
-}
 
 /* NOTCOMMAND */ void do_ostat( Character *ch, char *argument )
 {
