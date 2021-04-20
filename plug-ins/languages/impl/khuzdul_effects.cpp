@@ -94,17 +94,23 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
 {
     Affect af;
     
+    if ( IS_AFFECTED(ch,AFF_CALM) )
+    {
+        ch->pecho( "Ты слишком миролюбив{Sfа{Sx для древней ярости." );
+        return false;
+    } 
+    
     af.type         = gsn_ancient_rage;
     af.level         = ch->getModifyLevel( );
     af.duration         = number_fuzzy( af.level / 8 );
     af.location         = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
 
     if (victim->isAffected( gsn_ancient_rage )) {
-        oldact("{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0, TO_CHAR );
+        ch->pecho( "{CПламя древней ярости разгорается в тебе с новой силой!{x" );
         af.modifier = 0;
     }
     else {
-        oldact("{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0, TO_CHAR );
+        ch->pecho( "{CПламя древней ярости вспыхивает в тебе!{x" );
         af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
     }
 
