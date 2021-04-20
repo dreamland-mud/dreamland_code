@@ -377,8 +377,7 @@ VOID_SPELL(HealingLight)::run( Character *ch, Room *room, int sn, int level )
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 25;
-    af.location.setTable(&apply_room_table);
-    af.location = APPLY_ROOM_HEAL;
+    af.location = APPLY_HEAL_GAIN;
     af.modifier  = level;
     room->affectTo( &af );
 

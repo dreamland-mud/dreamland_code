@@ -438,24 +438,19 @@ SKILL_RUNP( camp )
   af2.level              = slevel;
   af2.duration           = slevel / 20;
   af2.modifier           = 4 * slevel;
-  af2.location.setTable(&apply_room_table);
-  af2.location = APPLY_ROOM_HEAL;
+  af2.location = APPLY_HEAL_GAIN;
   ch->in_room->affectTo( &af2);
 
   af2.modifier           = 2 * slevel;
-  af2.location = APPLY_ROOM_MANA;
+  af2.location = APPLY_MANA_GAIN;
   ch->in_room->affectTo( &af2);
 }
 
 AFFECT_DECL(Camp);
 VOID_AFFECT(Camp)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    if (paf->location == APPLY_ROOM_HEAL)
-        buf << fmt( 0, "Разбитый здесь лагерь улучшит восстановление здоровья на {W%2$d{x в течение {W%1$d{x ча%1$Iса|сов|сов.",
-                    paf->duration, paf->modifier) << endl;
-    else if (paf->location == APPLY_ROOM_MANA)
-        buf << fmt( 0, "Разбитый здесь лагерь улучшит восстановление маны на {W%2$d{x в течение {W%1$d{x ча%1$Iса|сов|сов.",
-                    paf->duration, paf->modifier) << endl;
+    buf << fmt( 0, "Разбитый здесь лагерь улучшит восстановление здоровья и маны в течение {W%1$d{x ча%1$Iса|сов|сов.",
+                    paf->duration) << endl;
 }
 
 

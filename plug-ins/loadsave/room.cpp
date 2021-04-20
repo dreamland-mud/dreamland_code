@@ -132,9 +132,8 @@ void Room::affectModify( Affect *paf, bool fAdd )
         bug( "Affect_modify_room: unknown location %d.", paf->location.getValue() );
         return;
 
-    case APPLY_ROOM_NONE:                                        break;
-    case APPLY_ROOM_HEAL:        mod_heal_rate += mod;                break;
-    case APPLY_ROOM_MANA:        mod_mana_rate += mod;                break;
+    case APPLY_HEAL_GAIN:        mod_heal_rate += mod;                break;
+    case APPLY_MANA_GAIN:        mod_mana_rate += mod;                break;
     }
 }
 

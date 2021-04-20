@@ -37,8 +37,7 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 30;
-    af.location.setTable(&apply_room_table);
-    af.location = APPLY_ROOM_MANA;
+    af.location = APPLY_MANA_GAIN;
     af.modifier  = level;
     room->affectTo( &af );
 
