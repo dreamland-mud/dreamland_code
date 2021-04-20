@@ -140,11 +140,25 @@ NMI_SET( AffectWrapper, x, api ) \
     target.x.setValue( arg.toNumber( ) ); \
 }
 
-GS(bitvector, "какие биты добавятся полю, указанному в where")
 GS(location, "поле, на которое аффект воздействует численно (таблица .tables.apply_flags)")
 GS(modifier, "на сколько изменится поле, указанное в location")
 GS(duration, "длительность, -1 для вечных аффектов")
 GS(level, "уровень аффекта")
+
+NMI_INVOKE(AffectWrapper, bitvector, "(table,flags): какие флаги и по какой таблице устанавливает аффект; table - таблица или название, flags - биты или строка с их названиями")
+{
+    const FlagTable *table = argnum2table(args, 1);
+    int flag = argnum2flag(args, 2, *table);
+
+    target.bitvector.setTable(table);
+    target.bitvector.setValue(flag);
+    return Register();
+}
+
+NMI_GET(AffectWrapper, bitvector, "численное значение флагов, которые установит аффект")
+{
+    return Register((int)target.bitvector.getValue());
+}
 
 NMI_SET(AffectWrapper, where, "на какую таблицу применен bitvector или на что воздействует global (.tables.affwhere_flags)")
 {
@@ -164,10 +178,7 @@ NMI_SET(AffectWrapper, where, "на какую таблицу применен b
             target.global.setRegistry( skillManager );
             break;
         default:
-            target.bitvector.setTable(affect_where_to_table(where));
-            if (!target.bitvector.getTable())
-                throw Scripting::IllegalArgumentException();
-            break;
+            throw Scripting::Exception("Accepted values for 'where' field are: wearlocations, liquids, skills, skill_groups");
     }
 }
 

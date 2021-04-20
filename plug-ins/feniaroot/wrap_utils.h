@@ -65,6 +65,8 @@ int argnum2boolean(const RegisterList &args, int num);
 DLString argnum2string(const RegisterList &args, int num);
 Skill * argnum2skill(const RegisterList &args, int num);
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table);
+const FlagTable * arg2table(const Register &);
+const FlagTable * argnum2table(const RegisterList &args, int num);
 ::Pointer<SpellTarget> arg2target(const Register &arg);
 ::Pointer<SpellTarget> argnum2target(const RegisterList &args, int num);
 

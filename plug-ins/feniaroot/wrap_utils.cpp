@@ -19,6 +19,7 @@
 #include "defaultaffecthandler.h"
 #include "spelltarget.h"
 
+#include "tableswrapper.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -329,4 +330,30 @@ Affect * args2affect(const RegisterList &args)
 
     aw = wrapper_cast<AffectWrapper>(args.front());
     return &(aw->getTarget());
+}
+
+const FlagTable * arg2table(const Register &r)
+{
+    const FlagTable *table = 0;
+
+    if (r.type == Register::STRING) {
+        table = FlagTableRegistry::getTable(r.toString());
+
+    } else if (r.type == Register::OBJECT) {
+        TableWrapper *twrap = r.toHandler().getDynamicPointer<TableWrapper>();
+        if (twrap)
+            table = FlagTableRegistry::getTable(twrap->tableName);
+        else
+            throw Scripting::Exception("Argument is not a table name nor a .tables.<table> object");
+    }
+
+    if (!table)
+        throw Scripting::Exception("Null or unknown flag table name.");
+
+    return table;
+}
+
+const FlagTable * argnum2table(const RegisterList &args, int num)
+{
+    return arg2table(argnum(args, num));
 }
