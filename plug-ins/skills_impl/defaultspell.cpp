@@ -48,6 +48,10 @@ GROUP(curative);
 GROUP(healing);
 GROUP(combat);
 
+CLAN(shalafi);
+
+RELIG(none);
+
 DefaultSpell::DefaultSpell( ) 
         : Spell(),
           target( TAR_IGNORE, &target_table ), 
