@@ -1751,7 +1751,7 @@ CMDRUNP( throw )
         }
     }
 
-    interpret_cmd( ch, "throwdown", argument );
+    ch->pecho("Метнуть что?");
 }
 
 

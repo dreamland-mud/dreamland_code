@@ -84,7 +84,7 @@ RoamingPortal::RoamingPortal( )
 
 bool RoamingPortal::area( ) 
 {
-    AreaIndexData *pArea, *area;
+    AreaIndexData *area;
     Room *room;
     int vnum, count;
     

@@ -779,12 +779,12 @@ SKILL_RUNP( lore )
 
   if (learned >= 80)
     {
-        if (!obj->enchanted)
-          for (auto &paf: obj->pIndexData->affected)
-            lore_fmt_affect( obj, paf, buf );
+      if (!obj->enchanted)
+        for (auto &paf: obj->pIndexData->affected)
+          lore_fmt_affect( obj, paf, buf );
 
-          for (auto &paf: obj->affected)
-            lore_fmt_affect( obj, paf, buf );
+      for (auto &paf: obj->affected)
+      lore_fmt_affect( obj, paf, buf );
     }
 
   ch->mana -= mana;
