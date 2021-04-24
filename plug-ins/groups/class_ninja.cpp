@@ -1349,7 +1349,7 @@ SKILL_RUNP( strangle )
         stat_mod    = 0.04;
         level_mod   = 0.01;
         quick_mod   = 0.1;
-        size_mod    = -0.03; // HARDER to affect victims with big difference of sizes (if diff=0 then +mod, if diff=1 then not affect, if diif>1 then -diff*mod)
+        size_mod    = -0.03; // HARDER to affect victims with difference of sizes
         sleep_mod   = 0.1;
         vis_mod     = 0.1;
         time_mod    = 0.1;
@@ -1457,7 +1457,7 @@ SKILL_RUNP( strangle )
         d.log(chance, "stats");
         chance += ( skill_level(*gsn_strangle, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
-        chance += ( abs(ch->size - victim->size) - 1 ) * size_mod * 100;
+        chance += ( abs(ch->size - victim->size) ) * size_mod * 100;
         d.log(chance, "size");
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
