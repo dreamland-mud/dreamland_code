@@ -158,7 +158,6 @@ BufferedSocketTask::handleRead()
 void
 BufferedSocketTask::handleEOF()
 {
-    LogStream::sendError() << "BufferedSocketTask: EOF" << endl;
     close();
 }
 
