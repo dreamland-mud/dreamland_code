@@ -76,6 +76,10 @@ bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
     return true;
 }
 
+/**
+ * Find player referred by the args.id payload. For Discord, analyze 'discord' json attribute
+ * looking for 'id' field; for Telegram, analyze 'telegram' string attribute containing the id directly.
+ */
 PCMemoryInterface * servlet_find_player(Json::Value &params, HttpResponse &response)
 {
     DLString myId = params["args"]["id"].asString();
@@ -88,6 +92,10 @@ PCMemoryInterface * servlet_find_player(Json::Value &params, HttpResponse &respo
 
     DLString botType = params["bottype"].asString();
     botType.toLower();
+
+    PCMemoryInterface *player = find_player_by_attribute(botType, myId);
+    if (player)
+        return player;
 
     list<PCMemoryInterface *> players = find_players_by_json_attribute(botType, "id", myId);
     if (players.empty()) {

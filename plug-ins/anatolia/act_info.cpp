@@ -2084,57 +2084,6 @@ CMDRUNP( score )
 }
 
 
-CMDRUNP( nohelp )
-{
-    DLString txt = argument;
-    txt.stripWhiteSpace( );
-    if (txt.empty( )) {
-        ch->pecho("Об отсутствии какого раздела справки ты хочешь сообщить?");
-        return;
-    }
-
-    bugTracker->reportNohelp( ch, txt );
-    ch->pecho("Записано.");
-}
-
-CMDRUNP( bug )
-{
-    DLString txt = argument;
-    txt.stripWhiteSpace( );
-    if (txt.empty( )) {
-        ch->pecho("О какой именно ошибке ты хочешь сообщить?");
-        return;
-    }
-
-    bugTracker->reportBug( ch, txt );
-    ch->pecho( "Ошибка записана.");
-}
-
-CMDRUNP( typo )
-{
-    DLString txt = argument;
-    txt.stripWhiteSpace( );
-    if (txt.empty( )) {
-        ch->pecho("О какой именно опечатке ты хочешь сообщить?");
-        return;
-    }
-
-    bugTracker->reportTypo( ch, txt );
-    ch->pecho( "Опечатка записана.");
-}
-
-CMDRUNP( iidea )
-{
-    DLString txt = argument;
-    txt.stripWhiteSpace( );
-    if (txt.empty( )) {
-        ch->pecho("О какой именно идее ты хочешь сообщить?");
-        return;
-    }
-
-    bugTracker->reportIdea( ch, txt );
-    ch->pecho( "Идея записана.");
-}
 
 /*---------------------------------------------------------------------------*
  * Help

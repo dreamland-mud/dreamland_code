@@ -28,43 +28,58 @@ BugTracker::~BugTracker( )
     bugTracker = NULL;
 }
 
-void BugTracker::reportBug( Character *ch, const DLString &txt ) const
+void BugTracker::reportMessage(const DLString &msgType, Character *ch, const DLString &message) const
 {
-    writeFile( ch, bugFile, bugDir, txt );
-}
+    reportMessage(msgType, ch->getName(), message, ch->in_room->vnum);
 
-void BugTracker::reportTypo( Character *ch, const DLString &txt ) 
-{
-    writeFile( ch, typoFile, typoDir, txt );
-}
-
-void BugTracker::reportIdea( Character *ch, const DLString &txt ) const
-{
-    writeFile( ch, ideaFile, ideaDir, txt );
 }
 
 void BugTracker::reportNohelp( Character *ch, const DLString &txt ) const
 {
-    writeFile( ch, nohelpFile, nohelpDir, txt );
+    reportMessage("nohelp", ch, txt);
 }
 
-void BugTracker::writeFile( Character *ch, const DLString &filename, const DLString &dirname, const DLString &txt ) const
+const DLString &BugTracker::getDirName(const DLString &msgType) const
 {
+    // TODO: a bit less yuck.
+    if (msgType == "idea") return ideaDir;
+    if (msgType == "typo") return typoDir;
+    if (msgType == "nohelp") return nohelpDir;
+    if (msgType == "bug") return bugDir;
+    return DLString::emptyString;
+}
+
+const DLString &BugTracker::getFileName(const DLString &msgType) const
+{
+    if (msgType == "idea") return ideaFile;
+    if (msgType == "typo") return typoFile;
+    if (msgType == "nohelp") return nohelpFile;
+    if (msgType == "bug") return bugFile;
+    return DLString::emptyString;
+}
+
+void BugTracker::reportMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location) const
+{
+    DLString filename = getFileName(msgType);
+    DLString dirname = getDirName(msgType);
+    if (filename.empty() || dirname.empty())
+        return;
+
     // Compose message for trello checklist.
-    DLString message;
-    message << "[" << ch->in_room->vnum  << "] " << ch->getNameP( ) << ": " << txt;
+    DLString mbuf;
+    if (!location.empty())
+        mbuf << "[" << location << "] ";
+    mbuf << authorName << ": " << message;
 
     // Create temporary file in a subfolder, for trello sync job to pick up.
     DLDirectory dir( dreamland->getMiscDir( ), dirname );
-    DLFileStream( dir.tempEntry( ) ).fromString( message );
+    DLFileStream( dir.tempEntry( ) ).fromString( mbuf );
     
     // Log typos normally.
     DLFileAppend( dreamland->getMiscDir( ), filename ).printf(
-        "[T][   %2s][%5d][%8s] %s: %s\n", 
-        ch->is_immortal( ) ? "  " : "qp",
-        ch->in_room->vnum, 
+        "[%s][%s] %s: %s\n", 
+        location.c_str(), 
         Date::getCurrentTimeAsString( "%d/%m/%y" ).c_str( ),
-        ch->getNameP( ), 
-        txt.c_str( ) );
+        authorName.c_str(), 
+        message.c_str());
 }
-

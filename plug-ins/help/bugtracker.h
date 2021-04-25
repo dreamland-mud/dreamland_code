@@ -21,14 +21,14 @@ public:
     BugTracker( );
     virtual ~BugTracker( );
     
-    void reportBug( Character *, const DLString & ) const;
-    void reportTypo( Character *, const DLString & );
-    void reportIdea( Character *, const DLString & ) const;
-    void reportNohelp( Character *, const DLString & ) const;
-
-    void writeFile( Character *, const DLString &, const DLString &, const DLString & ) const;
+    void reportNohelp( Character *ch, const DLString &txt ) const;
+    void reportMessage(const DLString &msgType, Character *ch, const DLString &message) const;
+    void reportMessage(const DLString &msgType, const DLString &authorName, const DLString &message, const DLString &location = DLString::emptyString) const;
 
 protected:
+    const DLString &getDirName(const DLString &msgType) const;
+    const DLString &getFileName(const DLString &msgType) const;
+
     XML_VARIABLE XMLString bugFile;
     XML_VARIABLE XMLString ideaFile;
     XML_VARIABLE XMLString typoFile;
