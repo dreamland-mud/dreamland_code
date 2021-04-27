@@ -102,9 +102,9 @@ void VampiricBiteOneHit::damBase( )
     if (number_percent( ) <= skill / 8)        // as sharpness
         dam = 2 * dam + (dam * 2 * number_percent( ) / 100); 
 
-        if(IS_BLOODLESS(victim)){
-            dam = dam/2;
-        }
+    if (IS_BLOODLESS(victim)) {
+        dam = dam/2;
+    }
 }
 
 

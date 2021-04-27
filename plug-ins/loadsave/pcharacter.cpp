@@ -71,6 +71,8 @@ GSN(tame);
 GSN(soothe);
 GSN(digging);
 GSN(grave);
+GSN(throw);
+GSN(grab);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -316,6 +318,7 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_riding, gsn_cavalry);
     skill_exchange( this, gsn_tame, gsn_soothe);
     skill_exchange( this, gsn_digging, gsn_grave);
+    skill_exchange( this, gsn_throw, gsn_grab);
 
     skill_merge(this, gsn_harm, gsn_cause_critical, gsn_cause_light, gsn_cause_critical);
     skill_merge(this, gsn_heal, gsn_cure_critical, gsn_cure_light, gsn_cure_critical);

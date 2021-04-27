@@ -596,7 +596,6 @@ bool spec_mayor( NPCharacter *ch )
     static int pos;
     static bool move;
     static Room *cabinet = 0;
-    Object *key;
     Room *room;
 
     if ( !move )

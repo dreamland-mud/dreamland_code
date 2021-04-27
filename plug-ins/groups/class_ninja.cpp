@@ -1079,24 +1079,24 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 
 
 /*----------------------------------------------------------------------------
- * throwdown 
+ * grab 
  *---------------------------------------------------------------------------*/
-class ThrowDownOneHit: public SkillDamage {
+class GrabOneHit: public SkillDamage {
 public:
-    ThrowDownOneHit( Character *ch, Character *victim );
+    GrabOneHit( Character *ch, Character *victim );
 
     virtual void calcDamage( );
 };
 
-ThrowDownOneHit::ThrowDownOneHit( Character *ch, Character *victim )
+GrabOneHit::GrabOneHit( Character *ch, Character *victim )
             : Damage( ch, victim, DAM_BASH, 0 ),
-              SkillDamage( ch, victim, gsn_throw, DAM_BASH, 0, DAMF_WEAPON )
+              SkillDamage( ch, victim, gsn_grab, DAM_BASH, 0, DAMF_WEAPON )
 {
 }
 
-void ThrowDownOneHit::calcDamage( )
+void GrabOneHit::calcDamage( )
 {
-        dam = skill_level(*gsn_throw, ch) + ch->damroll / 2;
+        dam = skill_level(*gsn_grab, ch) + ch->damroll / 2;
         dam += dam * get_str_app(ch).damage / 100;
         damApplyEnhancedDamage( );
 
@@ -1104,12 +1104,12 @@ void ThrowDownOneHit::calcDamage( )
 }
 
 /*
- * 'throw' skill command
+ * 'grab' skill command
  */
 
-SKILL_RUNP( throwdown )
+SKILL_RUNP( grab )
 {
-        Debug d(ch, "debug_ninja", "throw");
+        Debug d(ch, "debug_ninja", "grab");
         Character *victim;
         float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
         bool FightingCheck;
@@ -1120,7 +1120,7 @@ SKILL_RUNP( throwdown )
         stat_mod    = 0.03;
         level_mod   = 0.01;    
         quick_mod   = 0.1;
-        size_mod    = 0.25; // much easier to throw smaller victims, much harder on larger
+        size_mod    = 0.25; // much easier to grab smaller victims, much harder on larger
         sleep_mod   = 0.05;
         vis_mod     = 0.05; 
 
@@ -1134,7 +1134,7 @@ SKILL_RUNP( throwdown )
                 return;
         }
 
-        if ( ch->is_npc() || !gsn_throw->usable( ch ) )
+        if ( ch->is_npc() || !gsn_grab->usable( ch ) )
         {
                 ch->pecho("Ты не владеешь этим навыком.");
                 return;
@@ -1224,11 +1224,11 @@ SKILL_RUNP( throwdown )
             
         chance = 0;
   
-        chance += gsn_throw->getEffective( ch ) * skill_mod;
+        chance += gsn_grab->getEffective( ch ) * skill_mod;
         d.log(chance, "skill");
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
         d.log(chance, "stats");
-        chance += ( skill_level(*gsn_throw, ch) - victim->getModifyLevel() ) * level_mod * 100;
+        chance += ( skill_level(*gsn_grab, ch) - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
         chance += (ch->size - victim->size) * size_mod * 100;
         d.log(chance, "size");
@@ -1265,7 +1265,7 @@ SKILL_RUNP( throwdown )
 
         //////////////// THE ROLL ////////////////
     
-        ch->setWait( gsn_throw->getBeats(ch)  );
+        ch->setWait( gsn_grab->getBeats(ch)  );
         UNSET_DEATH_TIME(ch);
 
         if (victim->isAffected(gsn_protective_shield))
@@ -1305,22 +1305,22 @@ SKILL_RUNP( throwdown )
                 victim->position = POS_RESTING;
             }        
 
-            ThrowDownOneHit throwdown( ch, victim );
+            GrabOneHit grab( ch, victim );
             try
             {
-                throwdown.hit(true);
+                grab.hit(true);
             }
             catch (const VictimDeathException &e){   
             }                     
           
-            gsn_throw->improve( ch, true, victim );
+            gsn_grab->improve( ch, true, victim );
         }
         else
         {
             oldact("Твой бросок не удался.", ch, 0, 0, TO_CHAR);
             oldact("$C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
             oldact("$c1 пытается ухватиться за $C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
-            gsn_throw->improve( ch, false, victim );
+            gsn_grab->improve( ch, false, victim );
         }
 
         if (!FightingCheck) {

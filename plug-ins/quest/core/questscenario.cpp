@@ -5,11 +5,11 @@
 #include "questscenario.h"
 #include "questexceptions.h"
 
-#include "object.h"
+#include "core/object.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
@@ -126,6 +126,11 @@ void QuestMobileAppearence::dress( NPCharacter *mob ) const
         mob->setRace( race.getName( ) );
         SET_BIT(mob->form, mob->getRace()->getForm());
         SET_BIT(mob->parts, mob->getRace()->getParts());
+        SET_BIT(mob->vuln_flags, mob->getRace()->getVuln());
+        SET_BIT(mob->detection, mob->getRace()->getDet());
+        SET_BIT(mob->affected_by, mob->getRace()->getAff());
+        SET_BIT(mob->imm_flags, mob->getRace()->getImm());
+        SET_BIT(mob->res_flags, mob->getRace()->getRes());
     }
     
     switch (align.getValue( )) {
