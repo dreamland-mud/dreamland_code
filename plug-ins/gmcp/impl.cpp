@@ -54,7 +54,7 @@ void GMCPCommand::send(Descriptor *d, const string &package, const string &messa
     DLString translatedData = d->buffer_handler->convert(data.c_str());
 
     buf << C_IAC << C_SB << C_GMCP
-        << package << "." << message << " " << data
+        << package << "." << message << " " << translatedData
         << C_IAC << C_SE;
 
     string str = buf.str();
