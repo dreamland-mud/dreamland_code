@@ -323,7 +323,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
    
     DLString descr = ch->seeName( victim );
     if (arg_oneof_strict(arg1, "nopretitle", "безпретитла" ))
-        descr = descr.substr( descr.find_last_of(" ") + 1 );
+        descr = victim->toNoun( victim )->decline('1');
 
     webManipManager->decorateCharacter( buf, descr, victim, ch );
     buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
