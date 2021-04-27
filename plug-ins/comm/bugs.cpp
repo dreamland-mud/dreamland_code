@@ -6,12 +6,6 @@
 #include "pcharacter.h"
 #include "room.h"
 
-static void bugtracker_command(const DLString &msgType, Character *ch, const DLString &txt)
-{
-    bugTracker->reportMessage(msgType, ch->getName(), txt, ch->in_room->vnum);
-
-}
-
 CMDRUNP( nohelp )
 {
     DLString txt = argument;
@@ -21,7 +15,7 @@ CMDRUNP( nohelp )
         return;
     }
 
-    bugtracker_command(getName(), ch, txt);
+    bugTracker->reportMessage(getName(), ch, txt);
     ch->pecho("Записано.");
 }
 
@@ -34,7 +28,7 @@ CMDRUNP( bug )
         return;
     }
 
-    bugtracker_command(getName(), ch, txt);
+    bugTracker->reportMessage(getName(), ch, txt);
     ch->pecho( "Ошибка записана.");
 }
 
@@ -47,7 +41,7 @@ CMDRUNP( typo )
         return;
     }
 
-    bugtracker_command(getName(), ch, txt);
+    bugTracker->reportMessage(getName(), ch, txt);
     ch->pecho( "Опечатка записана.");
 }
 
@@ -60,7 +54,7 @@ CMDRUNP( iidea )
         return;
     }
 
-    bugtracker_command("idea", ch, txt);
+    bugTracker->reportMessage("idea", ch, txt);
     ch->pecho( "Идея записана.");
 }
 

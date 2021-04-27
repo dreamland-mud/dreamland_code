@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DreamLand>
+  <apiPort>1235</apiPort>
   <areaDir>share/DL/areas.local</areaDir>
   <areaListFile>area.lst</areaListFile>
   <basePath>.</basePath>

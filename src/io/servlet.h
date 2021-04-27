@@ -34,7 +34,7 @@ public:
 
     void handle(HttpRequest &req, HttpResponse &rsp);
 
-    void open();
+    void open(int port);
     void add(const DLString &prefix, Servlet::Pointer p);
     void remove(const DLString &prefix);
 

@@ -173,6 +173,7 @@ private:
         XML_VARIABLE XMLString areaDir;
         XML_VARIABLE XMLString savedDir;
         XML_VARIABLE XMLString logPattern;
+        XML_VARIABLE XMLInteger apiPort;
 
         XML_VARIABLE XMLString feniaDbDir;
         XML_VARIABLE XMLString feniaScriptDir;

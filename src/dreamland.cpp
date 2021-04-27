@@ -236,8 +236,8 @@ void DreamLand::load( bool recursive )
         feniaManager->open( );
         feniaManager->load( );
 
-        if (!hasOption(DL_BUILDPLOT))
-            servletManager->open();
+        if (apiPort != 0)
+            servletManager->open(apiPort);
         
         pluginManager->loadAll( );
     }

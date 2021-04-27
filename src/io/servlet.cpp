@@ -32,9 +32,9 @@ ServletManager::ServletManager()
     instance = this;
 }
 
-void ServletManager::open()
+void ServletManager::open(int port)
 {
-    (new HttpServerSocket(1235))->put();
+    (new HttpServerSocket(port))->put();
 }
 
 
