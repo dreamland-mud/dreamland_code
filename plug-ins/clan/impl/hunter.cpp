@@ -271,6 +271,7 @@ bool HunterEquip::canEquip( Character *ch )
     }
     else {
         ch->pecho( "Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj );
+        ch->recho("%2$^C1 не может владеть %1$O5 и бросает %1$P2.", obj, ch);
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         return false;
