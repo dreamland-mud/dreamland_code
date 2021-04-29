@@ -261,9 +261,10 @@ static DLString who_cmd_format_offline( PCharacter *ch, PCMemoryInterface *victi
 }
 
 /** Format one line of 'who' command. */
-static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim ) 
+static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLString arg)
 {
     DLString result;
+    DLString arg1 = arg.getOneArgument( );
     std::basic_ostringstream<char> buf, tmp;
 
     /* Level, Race, Class */
@@ -272,7 +273,11 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim )
     /* PK */
     if (victim->getModifyLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, victim ))
         tmp << "{x({rPK{x)";
-    
+    else if (arg_is_pk( arg1 ))
+	    return "";
+
+
+
     buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
     tmp.str( "" );
 
@@ -317,6 +322,9 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim )
         buf << "{W";
    
     DLString descr = ch->seeName( victim );
+    if (arg_oneof_strict(arg1, "nopretitle", "безпретитла" ))
+        descr = victim->toNoun( victim )->decline('1');
+
     webManipManager->decorateCharacter( buf, descr, victim, ch );
     buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
 
@@ -330,7 +338,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim )
 CMDRUN(who)
 {
     ostringstream buf;
-    DLString arg, arguments = constArguments;
+    DLString arguments = constArguments.toLower( );
     
     if (ch->getPC( ) == 0)
         return;
@@ -349,7 +357,7 @@ CMDRUN(who)
     if (online_count > 0)
         buf << fmt(0, "Сейчас в мире {W%1$d{w игрок%1$I|а|ов:", online_count) << endl;
     for (const auto &victim: online)
-        buf << who_cmd_format_char(pch, victim);
+        buf << who_cmd_format_char(pch, victim, arguments);
 
     if (offline_count > 0)
         buf << endl << fmt(0, "Еще {W%1$d{w игрок%1$I|а|ов слыш%1$Iит|ат|ат общие каналы:", offline_count) << endl;
