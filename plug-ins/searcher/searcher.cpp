@@ -904,6 +904,77 @@ CMDRUNP(searcher)
         return;
     }
 
+    if (arg_oneof(arg, "squery")) {
+
+        if (args.empty()) {
+            ch->pecho("Usage: searcher sq <query string>\nSee 'help searcher' for details.");
+            return;
+        }
+    
+        try {
+            Profiler prof;
+            int cnt = 0;
+            vector<list<DLString> > output(MAX_LEVEL+1);
+            DLString lineFormat = 
+                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%3d %2d %s{x\r\n";
+
+            prof.start();
+
+            for (int i = 0; i < MAX_KEY_HASH; i++)
+            for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+                if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
+                    continue;
+                if (pObj->level > MAX_LEVEL)
+                    continue;
+                if (pObj->item_type != ITEM_PILL && pObj->item_type != ITEM_POTION
+                    && pObj->item_type != ITEM_SCROLL
+                    && pObj->item_type != ITEM_STAFF && pObj->item_type != ITEM_WAND)
+                    continue;
+
+                if (searcher_parse(pObj, args.c_str())) {
+                    StringList anti = searcher_param_anti(pObj);
+                    DLString aff = searcher_param_asterix(pObj);
+
+                    DLString line = 
+                        fmt(NULL, lineFormat.c_str(), 
+                                    pObj->vnum,
+                                    pObj->level, 
+                                    p.itemtype.c_str(),
+                                    russian_case(pObj->short_descr, '1').c_str(),
+                                    p.power, p.charges, p.spells.c_str());
+
+                    DLString where;
+                    AreaIndexData *pArea;
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
+                        line.colourstrip();
+                        line = "{D" + line + "{x";
+                    }
+
+                    output[pObj->level].push_back(line);
+                    cnt++;
+                }
+            } 
+    
+            ostringstream buf;
+            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %3s %2s %s{x\r\n",
+                            "VNUM", "LVL", "TYPE", "NAME", "PWR", "CHG", "SPELLS");
+            for (size_t lvl = 0; lvl < output.size(); lvl++) {
+                const list<DLString> &lines = output[lvl];
+                for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
+                    buf << *l;
+            }
+
+            prof.stop();
+            buf << endl << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+            buf << "{WPWR{x: spell power level, {WCHG{x: number of charges." << endl;
+     
+            page_to_char(buf.str().c_str(), ch);
+        } catch (const Exception &ex) {
+            ch->pecho(ex.what());
+        }
+
+        return;
+    }
 
     if (arg_oneof(arg, "mquery")) {
 
@@ -982,5 +1053,6 @@ CMDRUNP(searcher)
     ch->pecho("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\n"
                "searcher q <item query>\n"
                "searcher wq <weapon query>\n"
+               "searcher sq <magic item query>\n"
                "searcher mq <mob query>\n");
 }

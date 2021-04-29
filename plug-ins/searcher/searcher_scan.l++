@@ -15,6 +15,7 @@
 #include "grammar_entities_impl.h"
 #include "searcher_val.h"    
 #include "searcher_parse.h++"
+#include "skillreference.h"
 #include "pcharacter.h"
 #include "affect.h"
 #include "object.h"
@@ -24,6 +25,8 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "def.h"
+
+GSN(none);
 
 void searcher_yyerror( const char *txt );
 %}
@@ -114,6 +117,9 @@ L	    ([A-Za-z_]|{RL})
 "NUMBER"    return T_NUMBER;
 "RANDOM"    return T_RANDOM;
 "TIER"      return T_TIER;
+"SPELLS"    return T_SPELLS;
+"CHARGES"   return T_CHARGES;
+"POWER"     return T_POWER;
 
 
 "<="	    return T_LEQ;
@@ -181,6 +187,11 @@ void SearcherParam::init()
     ave = 0; d1 = 0; d2 = 0;
     random = false;
     tier = 0;
+
+    // Magic item fields.
+    charges = 0;
+    power = 0;
+    spells = "";
 }
 
 /** Populate global searcher parameters and launch obj or weapon search for the given user query. */
@@ -285,6 +296,31 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         p.damage = weapon_flags.name(pObj->value[3]);
         p.random = pObj->properties.count("random") > 0;
         p.tier = get_item_tier(pObj);
+    }
+
+    StringSet spells;
+    Skill *skill;
+    if (pObj->item_type == ITEM_SCROLL || pObj->item_type == ITEM_POTION || pObj->item_type == ITEM_PILL) {
+        p.power = pObj->value[0];
+        p.charges = 1;
+
+        for (int i = 1; i <= 4; i++)
+            if ((skill = SkillManager::getThis()->find(pObj->value[i])))
+                if (skill->getIndex() != gsn_none) 
+                    spells.insert(skill->getName());
+
+        p.spells = spells.toString();
+    }
+
+    if (pObj->item_type == ITEM_WAND || pObj->item_type == ITEM_STAFF) {
+        p.power = pObj->value[0];
+        p.charges = pObj->value[2];
+
+        if ((skill = SkillManager::getThis()->find(pObj->value[3])))
+            if (skill->getIndex() != gsn_none)
+                spells.insert(skill->getName());
+
+        p.spells = spells.toString();
     }
 
     if (searcher_yyparse( ) != 0) {

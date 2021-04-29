@@ -83,7 +83,19 @@ struct SearcherParam {
     bool random;
     // Best tier for random weapon.
     int tier;
+
+    /*
+     * Fields specific to magic items.
+     */
+
+    // A space-separated list of spells on the item.
+    DLString spells;
+    // Number of charges for wands and staves.
+    int charges;
+    // The level of spell this item can cast.
+    int power;
 };
+
 extern SearcherParam p;
 
 int searcher_yyparse( );
