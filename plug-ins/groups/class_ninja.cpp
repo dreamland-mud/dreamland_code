@@ -153,8 +153,7 @@ SKILL_RUNP( vanish )
                 return;
         }
 
-        // strangled centaurs can't rearkick
-        if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
+        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
                 return;
         
         if(SHADOW(ch))
@@ -498,7 +497,7 @@ SKILL_RUNP( nerve )
     
         if ( ch->is_npc() || number_percent() < (int) chance )
         {
-                gsn_nerve->getCommand()->run(ch, victim);
+                gsn_nerve->getCommand()->apply(ch, victim);
                 oldact("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
                 oldact("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
                 oldact("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT);
@@ -523,7 +522,7 @@ SKILL_RUNP( nerve )
         }
 }
 
-BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
+BOOL_SKILL(nerve)::apply(Character *ch, Character *victim, int unused)
 {
     int level, skill, mod;
     level = skill_level(*gsn_nerve, ch);
@@ -590,12 +589,12 @@ SKILL_RUNP( endure )
     mod = -1 * (level/20 + skill/20 + 1); 
     
     ch->setWait( gsn_endure->getBeats(ch)  );
-    gsn_endure->getCommand()->run(ch, mod);
+    gsn_endure->getCommand()->apply(ch, ch, mod);
     gsn_endure->improve( ch, true );
 }
 
 
-BOOL_SKILL(endure)::run(Character *ch, int modifier)
+BOOL_SKILL(endure)::apply(Character *ch, Character *victim, int modifier)
 {      
     Affect af;
 
@@ -828,8 +827,7 @@ SKILL_RUNP( assassinate )
             return;
     }
 
-    // strangled centaurs can't rearkick
-    if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
+    if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
         return;
 
     if(SHADOW(ch))
@@ -1025,11 +1023,11 @@ SKILL_RUNP( caltraps )
         gsn_caltraps->improve( ch, false, victim );
         return;
   }
-  gsn_caltraps->getCommand()->run(ch, victim);    
+  gsn_caltraps->getCommand()->apply(ch, victim);    
   gsn_caltraps->improve( ch, true, victim );
 }
 
-BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
+BOOL_SKILL(caltraps)::apply(Character *ch, Character *victim, int unused)
 {
     int level, skill, mod;
     level = skill_level(*gsn_caltraps, ch);
@@ -1436,8 +1434,7 @@ SKILL_RUNP( strangle )
                 return;
         }
 
-        // sleepy centaurs can't rearkick
-        if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
+        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
             return;
 
         if(SHADOW(ch))
@@ -1636,13 +1633,11 @@ SKILL_RUNP( blindness )
 
         gsn_blindness_dust->improve( ch, true );
     
-        gsn_blindness_dust->getCommand()->run(ch);
+        gsn_blindness_dust->getCommand()->apply(ch);
 }
 
-BOOL_SKILL( blindness )::run( Character *ch ) 
+BOOL_SKILL( blindness )::apply( Character *ch, Character *, int ) 
 {
- 
-
     for ( auto &tmp_vict : ch->in_room->getPeople() )
     {
         if (!is_safe_spell(ch,tmp_vict,true))

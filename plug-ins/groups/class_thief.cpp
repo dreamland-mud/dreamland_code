@@ -1028,7 +1028,7 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    if (gsn_rear_kick->getCommand( )->run( ch, victim ))
+    if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
         return;
 
     BackstabOneHit bs( ch, victim );
@@ -1253,7 +1253,7 @@ SKILL_RUNP( blackjack )
                 return;
         }
 
-        if (gsn_rear_kick->getCommand( )->run( ch, victim ))
+        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
             return;
 
         int k = victim->getLastFightDelay( );

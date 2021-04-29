@@ -92,7 +92,7 @@ void RearKickOneHit::calcTHAC0( )
  * 'rear kick' skill command
  */
 SKILL_DECL( rearkick );
-BOOL_SKILL( rearkick )::run( Character *ch, Character *victim ) 
+BOOL_SKILL( rearkick )::apply( Character *ch, Character *victim, int unused ) 
 {
     if (!IS_AWAKE( victim ))
         return false;

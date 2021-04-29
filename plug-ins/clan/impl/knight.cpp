@@ -261,7 +261,7 @@ SKILL_RUNP(guard)
     victim->guarded_by = pch;
 }
 
-BOOL_SKILL(guard)::run(Character *wch, Character *mob)
+BOOL_SKILL(guard)::apply(Character *wch, Character *mob, int unused)
 {
     int chance;
     PCharacter *ch = wch->getPC();

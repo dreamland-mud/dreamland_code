@@ -384,7 +384,7 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
     return;
   }
 
-    gsn_garble->getCommand()->run(victim, level);
+    gsn_garble->getCommand()->apply(ch, victim, level);
 
   oldact_p("Ты поделил$gось|ся|ась частицей хаоса с языком $C2.",
           ch, 0, victim, TO_CHAR,POS_RESTING);
@@ -393,7 +393,7 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
 }
 
 SKILL_DECL(garble);
-BOOL_SKILL(garble)::run( Character *victim, int slevel ) 
+BOOL_SKILL(garble)::apply( Character *ch, Character *victim, int slevel ) 
 {
     Affect af;
 

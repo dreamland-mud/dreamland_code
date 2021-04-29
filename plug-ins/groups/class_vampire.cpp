@@ -882,8 +882,7 @@ SKILL_RUNP( touch )
                 return;
         }
 	
-        // sleepy centaurs can't rearkick
-        if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
+        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
             return;
 	
         if(SHADOW(ch))
@@ -1128,7 +1127,7 @@ SKILL_RUNP( bonedagger )
     run( ch, str_empty );
 }
 
-BOOL_SKILL( bonedagger )::run( Character *ch ) 
+BOOL_SKILL( bonedagger )::apply( Character *ch, Character *, int ) 
 {
     Affect af;
     Character *victim;

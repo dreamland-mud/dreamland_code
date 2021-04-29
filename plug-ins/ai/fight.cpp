@@ -28,7 +28,7 @@ GSN(dispel_affects);
  */
 void BasicMobileBehavior::attack( Character *victim )
 {
-    if (gsn_guard->getCommand( )->run( victim, ch ))
+    if (gsn_guard->getCommand( )->apply( victim, ch ))
         victim = victim->getPC( )->guarded_by;
     
     if (isAfterCharm( ))

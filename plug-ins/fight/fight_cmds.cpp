@@ -87,7 +87,7 @@ CMDRUN( kill )
      ch->setWaitViolence( 1 );
 
     
-    if (gsn_mortal_strike->getCommand( )->run( ch, victim ))
+    if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
     multi_hit( ch, victim );
@@ -142,7 +142,7 @@ CMDRUN( murder )
                 "Помогите! На меня напа%1$Gло|л|ла %1$C1!",
                 FYP_VICT_ANY );
     
-    if (gsn_mortal_strike->getCommand( )->run( ch, victim ))
+    if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
     multi_hit( ch, victim );

@@ -171,18 +171,8 @@ void DefaultSkillCommand::run( Character *ch, char *args )
 
 // TODO: helper run methods, will be renamed to applyChar or applyVict etc
 
-bool DefaultSkillCommand::run( Character *ch1, Character *ch2 )
+bool DefaultSkillCommand::apply( Character *ch, Character *victim, int level )
 {
-    return SkillCommand::run( ch1, ch2 );
-}
-
-bool DefaultSkillCommand::run( Character *ch1 )
-{
-    return SkillCommand::run( ch1 );
-}
-
-bool DefaultSkillCommand::run( Character *ch, int value )
-{
-    return SkillCommand::run( ch, value );
+    return SkillCommand::apply( ch, victim, level );
 }
 

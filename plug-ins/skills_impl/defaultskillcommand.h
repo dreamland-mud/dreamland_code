@@ -36,9 +36,7 @@ public:
     virtual const DLString & getRussianName( ) const;
     virtual void run( Character *, const DLString & );
     virtual void run( Character *, char * );
-    virtual bool run( Character *, Character * );
-    virtual bool run( Character * );
-    virtual bool run( Character *, int );
+    virtual bool apply( Character *ch, Character *victim = 0, int level = 0 );
     virtual bool visible( Character * ) const;
 
     XML_VARIABLE XMLEnumeration argtype;

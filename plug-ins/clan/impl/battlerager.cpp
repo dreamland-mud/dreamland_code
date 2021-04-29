@@ -332,7 +332,7 @@ SKILL_RUNP( trophy )
  * 'mortal strike' skill command
  */
 SKILL_DECL( mortalstrike );
-BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
+BOOL_SKILL( mortalstrike )::apply( Character *ch, Character *victim, int level )
 {
     Object *wield;
     int chance, learned;

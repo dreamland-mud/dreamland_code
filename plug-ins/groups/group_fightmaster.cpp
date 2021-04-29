@@ -935,7 +935,7 @@ SKILL_RUNP( concentrate )
     if (number_percent() < chance)
     {
         ch->mana -= gsn_concentrate->getMana( );
-        gsn_concentrate->getCommand()->run(ch);
+        gsn_concentrate->getCommand()->apply(ch);
         gsn_concentrate->improve( ch, true );
     }
     else
@@ -945,7 +945,7 @@ SKILL_RUNP( concentrate )
     }
 }
 
-BOOL_SKILL( concentrate )::run( Character *ch ) 
+BOOL_SKILL( concentrate )::apply( Character *ch, Character *, int ) 
 {
     Affect af;
     int level = skill_level(*gsn_concentrate, ch);
@@ -1139,7 +1139,7 @@ SKILL_RUNP( berserk )
                 ch->pecho("Твой пульс учащается, когда ты входишь в ярость!");
                 oldact_p("Глаза $c2 загораются {rдиким огнем{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
                 gsn_berserk->improve( ch, true );
-                gsn_berserk->getCommand()->run(ch);
+                gsn_berserk->getCommand()->apply(ch);
         }
         else
         {
@@ -1152,7 +1152,7 @@ SKILL_RUNP( berserk )
 
 }
 
-BOOL_SKILL( berserk )::run( Character *ch )
+BOOL_SKILL( berserk )::apply( Character *ch, Character *, int )
 {
     Affect af;
     int level = skill_level(*gsn_berserk, ch);
@@ -1333,7 +1333,7 @@ SKILL_RUNP( dirt )
 
                 try {
                     damage_nocatch(ch,victim,slevel/5+1,gsn_dirt_kicking,DAM_NONE, true);
-                    gsn_dirt_kicking->getCommand()->run(ch, victim);
+                    gsn_dirt_kicking->getCommand()->apply(ch, victim);
                     gsn_dirt_kicking->improve( ch, true, victim );
                 } catch (const VictimDeathException &) {
                     return;
@@ -1352,7 +1352,7 @@ SKILL_RUNP( dirt )
                     "Умри, %1$C1, грязное животное!" );        
 }
 
-BOOL_SKILL( dirt )::run( Character *ch, Character *victim ) 
+BOOL_SKILL( dirt )::apply( Character *ch, Character *victim, int ) 
 {
     Affect af;
 
@@ -1675,7 +1675,7 @@ SKILL_RUNP( smash )
  * 'area attack' skill command
  */
 SKILL_DECL( areaattack );
-BOOL_SKILL( areaattack )::run( Character *ch, Character *victim ) 
+BOOL_SKILL( areaattack )::apply( Character *ch, Character *victim, int ) 
 {
     int count=0, max_count;
     Character *vch, *vch_next;

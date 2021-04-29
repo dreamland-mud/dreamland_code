@@ -1177,7 +1177,7 @@ SKILL_RUNP( ambush )
     }
 }
 
-BOOL_SKILL( ambush )::run( Character *ch ) 
+BOOL_SKILL( ambush )::apply( Character *ch, Character *, int ) 
 {
     Character *vch, *vch_next;
 

@@ -1208,22 +1208,27 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить вр
     return Register(true);
 }
 
-NMI_INVOKE(SkillWrapper, run, "(ch[,victim or level]): выполнить умение без проверок и сообщений")
+NMI_INVOKE(SkillWrapper, apply, "(ch[,victim or level]): выполнить умение без проверок и сообщений")
 {
     Skill *skill = getTarget();
     Character *ch = argnum2character(args, 1);
+    Character *victim = 0;
+    int level = 0;
     
-    if (args.size() < 2)
-        return Register(skill->getCommand()->run(ch));
-
-    Register arg2 = argnum(args, 2);
-    if (arg2.type == Register::NUMBER) {
-        int slevel = arg2.toNumber();
-        return Register(skill->getCommand()->run(ch, slevel));
+    if (args.size() > 1) {
+        Register arg2 = argnum(args, 2);
+        if (arg2.type == Register::NUMBER)
+            level = arg2.toNumber();
+        else 
+            victim = arg2character(arg2);
     }
 
-    Character *victim = arg2character(arg2);
-    return Register(skill->getCommand()->run(ch, victim));
+    return Register(skill->getCommand()->apply(ch, victim, level));
+}
+
+NMI_INVOKE(SkillWrapper, run, "(ch[,victim or level]): DEPRECATED, use 'apply'")
+{
+    return nmiInvoke<nmi::apply>(args);
 }
 
 /*----------------------------------------------------------------------

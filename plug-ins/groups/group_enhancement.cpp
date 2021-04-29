@@ -60,11 +60,11 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
         return;
     }
 
-    gsn_giant_strength->getCommand()->run(victim, level);
+    gsn_giant_strength->getCommand()->apply(ch, victim, level);
 }
 
 SKILL_DECL(giantstrength);
-BOOL_SKILL(giantstrength)::run( Character *victim, int slevel ) 
+BOOL_SKILL(giantstrength)::apply( Character *ch, Character *victim, int slevel ) 
 {
     Affect af;
 

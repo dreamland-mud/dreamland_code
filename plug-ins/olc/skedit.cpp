@@ -769,7 +769,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
             loader = dynamic_cast<BasicSkill *>(gsn_sanctuary.getElement())->getLoader();
         } else if (arg_oneof(type, "clan", "клан")) {
             className = "ClanSkill";
-            loader = dynamic_cast<BasicSkill *>(gsn_transform.getElement())->getLoader();
+            loader = dynamic_cast<BasicSkill *>(gsn_garble.getElement())->getLoader();
         } else if (arg_oneof(type, "race", "раса")) {
             className = "RaceAptitude";
             loader = dynamic_cast<BasicSkill *>(gsn_rear_kick.getElement())->getLoader();
