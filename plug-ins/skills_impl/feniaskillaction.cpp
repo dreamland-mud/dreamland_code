@@ -338,7 +338,7 @@ NMI_GET(FeniaSpellContext, ch, "персонаж, произносящий за�
 
 NMI_GET(FeniaSpellContext, arg, "строка, цель заклинания для runArg")
 {
-    return Register(level);
+    return arg;
 }
 
 NMI_GET(FeniaSpellContext, obj, "предмет, цель заклинания для runObj")
