@@ -878,6 +878,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
         for (auto &s: skills) {
             DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
+            DefaultSkillCommand::Pointer cmd = s->getCommand().getDynamicPointer<DefaultSkillCommand>();
             DLString type;
             bool fenia = false;
 
@@ -889,6 +890,11 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                     wrapper->collectTriggers(triggers, misc);
                     fenia = !triggers.empty() || !misc.empty();
                 }
+            }
+
+            if (cmd) {
+                if (cmd->getWrapper())
+                    fenia = true;
             }
             
             buf << dlprintf(
