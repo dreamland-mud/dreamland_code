@@ -37,6 +37,7 @@ RACE(felar);
 RACE(fish);
 RACE(mouse);
 RACE(rat);
+RACE(rodent);
 
 static bool oprog_eat( Object *obj, Character *ch )
 {
