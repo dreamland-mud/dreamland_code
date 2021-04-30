@@ -64,9 +64,9 @@ void        obj_from_obj        ( Object *obj );
 void undig_earthquake( Character *ch );
 void undig( Character *ch );
 
-void        extract_obj        ( Object *obj );
+void        extract_obj        ( Object *obj, const char *message = 0 );
 void        extract_obj_nocount        ( Object *obj );
-void        extract_obj_1        ( Object *obj, bool count );
+void        extract_obj_1        ( Object *obj, bool count, const char *message = 0 );
 void        char_from_list( Character *ch, Character **list );
 void        char_to_list( Character *ch, Character **list );
 void        obj_to_list( Object * );

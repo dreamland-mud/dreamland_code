@@ -20,12 +20,14 @@
 #include "mercdb.h"
 #include "def.h"
 
+WEARLOC(float);
+
 /*
  * Extract an object consider limit
  */
-void extract_obj( Object *obj )
+void extract_obj( Object *obj, const char *message )
 {
-  extract_obj_1(obj,true);
+  extract_obj_1(obj,true, message);
 }
 
 /*
@@ -48,7 +50,7 @@ bool oprog_extract( Object *obj, bool count )
 /*
  * Extract an obj from the world.
  */
-void extract_obj_1( Object *obj, bool count )
+void extract_obj_1( Object *obj, bool count, const char *message )
 {
         Object *obj_content;
         Object *obj_next;
@@ -70,20 +72,34 @@ void extract_obj_1( Object *obj, bool count )
         {
             count = true;
         }
-        
-        if ( obj->in_room != 0 )
-                obj_from_room( obj );
-        else if ( obj->carried_by != 0 )
-                obj_from_char( obj );
-        else if ( obj->in_obj != 0 )
-                obj_from_obj( obj );
 
-        for ( obj_content = obj->contains; obj_content; obj_content = obj_next )
-        {
-                obj_next = obj_content->next_content;
-                extract_obj_1( obj_content, count );
+        // Remove obj from all locations, showing an optional message.
+        if (obj->in_room != 0) {
+            if (message)
+                obj->in_room->echo(POS_RESTING, message, obj);
+            obj_from_room(obj);
+
+        } else if (obj->carried_by != 0) {
+            Character *carrier = obj->carried_by;
+            bool echoAround = (obj->wear_loc == wear_float);
+            
+            obj_from_char(obj);
+
+            if (message) {
+                carrier->pecho(message, obj);
+                if (echoAround)
+                    carrier->recho(message, obj);
+            }
+
+        } else if (obj->in_obj != 0) {
+            obj_from_obj(obj);
         }
-        
+
+        for (obj_content = obj->contains; obj_content; obj_content = obj_next) {
+            obj_next = obj_content->next_content;
+            extract_obj_1(obj_content, count);
+        }
+
         obj_from_list( obj );
 
         if (count)

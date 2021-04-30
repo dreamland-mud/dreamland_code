@@ -886,17 +886,6 @@ void obj_update( void )
             break;
         }
 
-        if (obj->carried_by != 0) {
-            obj->carried_by->pecho( message, obj );
-
-            if (obj->wear_loc == wear_float)
-                obj->carried_by->recho( message, obj );
-        }
-        else if (obj->in_room != 0) {
-            if (!(obj->in_obj && IS_PIT(obj->in_obj)))
-                obj->in_room->echo( POS_RESTING, message, obj );
-        }
-
         /* Save the contents of the decaying obj. Always preserve everything inside
          * PC corpses and carried containers. In other cases, only save undestructible items.
          * TODO: this code, unlike 'sacrifice' command, is not recursive, so items 
@@ -945,7 +934,7 @@ void obj_update( void )
             }
         }
 
-        extract_obj(obj);
+        extract_obj(obj, message);
     }
 }
 
