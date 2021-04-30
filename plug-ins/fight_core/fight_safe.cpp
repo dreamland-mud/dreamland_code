@@ -227,6 +227,10 @@ bool is_safe_rspell( Affect *paf, Character *victim, bool verbose )
     if (!pafOwner)
         return is_safe_rspell(paf->level, victim, verbose);
 
+    // Ensure charmed creatures are safe from master's spells.
+    if (IS_CHARMED(victim) && victim->master == pafOwner)
+        return true;
+        
     bool rc = is_safe_nomessage(pafOwner, victim);
     if (rc && verbose) {
         oldact("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
