@@ -113,7 +113,7 @@ void RatGod::greet( Character *mob ) {
 
     race = mob->getRace( )->getName( );
     
-    if (race == "felar" || race == "lion" || race == "cat") {
+    if (race == "felar" || race == "lion" || race == "cat" || IS_SET( mob->form, FORM_FELINE )) {
         exorcism( mob, "{DС котами нельзя!{x" );
         return;
     }
