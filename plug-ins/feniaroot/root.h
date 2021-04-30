@@ -29,6 +29,7 @@ public:
     virtual void setSelf(Scripting::Object *s) {
         self = s;
     }
+    virtual Scripting::Object *getSelf() const { return self; }
    
     XML_VARIABLE XMLRegister tmp, scheduler, tables, nanny;
 private:

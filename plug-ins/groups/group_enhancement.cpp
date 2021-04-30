@@ -64,15 +64,15 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
 }
 
 SKILL_DECL(giantstrength);
-BOOL_SKILL(giantstrength)::apply( Character *ch, Character *victim, int slevel ) 
+SKILL_APPLY(giantstrength)
 {
     Affect af;
 
     af.type      = gsn_giant_strength;
-    af.level     = slevel;
-    af.duration  = (10 + slevel / 3);
+    af.level     = level;
+    af.duration  = (10 + level / 3);
     af.location = APPLY_STR;
-    af.modifier  = max(2, slevel / 10);
+    af.modifier  = max(2, level / 10);
     affect_to_char( victim, &af );
 
     victim->pecho("Ты становишься намного сильнее!");

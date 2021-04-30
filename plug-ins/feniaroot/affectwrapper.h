@@ -33,6 +33,7 @@ public:
     AffectWrapper(Affect &);
             
     virtual void setSelf(Scripting::Object *) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
     inline Affect& getTarget() { return target; }
 
     static Scripting::Register wrap( const Affect & );

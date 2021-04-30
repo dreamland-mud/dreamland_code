@@ -393,12 +393,12 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
 }
 
 SKILL_DECL(garble);
-BOOL_SKILL(garble)::apply( Character *ch, Character *victim, int slevel ) 
+SKILL_APPLY(garble)
 {
     Affect af;
 
     af.type      = gsn_garble;
-    af.level     = slevel;
+    af.level     = level;
     af.duration  = 1;
     affect_to_char( victim, &af );
     return true;

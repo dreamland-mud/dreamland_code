@@ -64,6 +64,7 @@ public:
     virtual void setSelf(Scripting::Object *s) {
         self = s;
     }
+    virtual Scripting::Object *getSelf() const { return self; }
 
     static const DLString TYPE;
 

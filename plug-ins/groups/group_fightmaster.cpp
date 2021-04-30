@@ -945,15 +945,15 @@ SKILL_RUNP( concentrate )
     }
 }
 
-BOOL_SKILL( concentrate )::apply( Character *ch, Character *, int ) 
+SKILL_APPLY( concentrate )
 {
     Affect af;
-    int level = skill_level(*gsn_concentrate, ch);
+    int slevel = skill_level(*gsn_concentrate, ch);
 
     af.type         = gsn_concentrate;
-    af.level        = level;
-    af.duration     = number_fuzzy( level / 8);
-    af.modifier     = max( 1, level / 8 );
+    af.level        = slevel;
+    af.duration     = number_fuzzy( slevel / 8);
+    af.modifier     = max( 1, slevel / 8 );
 
     af.location = APPLY_HITROLL;
     affect_to_char(ch,&af);
@@ -961,7 +961,7 @@ BOOL_SKILL( concentrate )::apply( Character *ch, Character *, int )
     af.location = APPLY_DAMROLL;
     affect_to_char(ch,&af);
 
-    af.modifier        = max( 1, level / 10 );
+    af.modifier        = max( 1, slevel / 10 );
     af.location = APPLY_AC;
     affect_to_char(ch,&af);
 
@@ -1152,20 +1152,20 @@ SKILL_RUNP( berserk )
 
 }
 
-BOOL_SKILL( berserk )::apply( Character *ch, Character *, int )
+SKILL_APPLY( berserk )
 {
     Affect af;
-    int level = skill_level(*gsn_berserk, ch);
+    int slevel = skill_level(*gsn_berserk, ch);
 
     /* heal a little damage */
-    ch->hit += level * 2;
+    ch->hit += slevel * 2;
     ch->hit = min(ch->hit, ch->max_hit);
 
     af.type         = gsn_berserk;
-    af.level        = level;
-    af.duration     = number_fuzzy( level / 8);
+    af.level        = slevel;
+    af.duration     = number_fuzzy( slevel / 8);
 
-    af.modifier        = max( 1, level / 5 );
+    af.modifier        = max( 1, slevel / 5 );
     af.location = APPLY_HITROLL;
     affect_to_char(ch,&af);
 
@@ -1174,7 +1174,7 @@ BOOL_SKILL( berserk )::apply( Character *ch, Character *, int )
     af.bitvector.setValue(AFF_BERSERK);
     affect_to_char(ch,&af);
 
-    af.modifier        = max( 10, 10 * ( level / 5 ) );
+    af.modifier        = max( 10, 10 * ( slevel / 5 ) );
     af.location = APPLY_AC;
     af.bitvector.clear();
     affect_to_char(ch,&af);
@@ -1352,7 +1352,7 @@ SKILL_RUNP( dirt )
                     "Умри, %1$C1, грязное животное!" );        
 }
 
-BOOL_SKILL( dirt )::apply( Character *ch, Character *victim, int ) 
+SKILL_APPLY( dirt )
 {
     Affect af;
 
@@ -1675,7 +1675,7 @@ SKILL_RUNP( smash )
  * 'area attack' skill command
  */
 SKILL_DECL( areaattack );
-BOOL_SKILL( areaattack )::apply( Character *ch, Character *victim, int ) 
+SKILL_APPLY( areaattack )
 {
     int count=0, max_count;
     Character *vch, *vch_next;
@@ -1685,13 +1685,13 @@ BOOL_SKILL( areaattack )::apply( Character *ch, Character *victim, int )
     
     gsn_area_attack->improve( ch, true, victim );
 
-    int level = skill_level(*gsn_area_attack, ch);
+    int slevel = skill_level(*gsn_area_attack, ch);
 
-    if (level < 70)
+    if (slevel < 70)
         max_count = 1;
-    else if (level < 80)
+    else if (slevel < 80)
         max_count = 2;
-    else if (level < 90)
+    else if (slevel < 90)
         max_count = 3;
     else
         max_count = 4;

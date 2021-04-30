@@ -68,7 +68,8 @@ public:
     virtual void getInfo(ostream &os);
 
     virtual void setSelf(Scripting::Object *s);
- 
+    virtual Scripting::Object *getSelf() const { return self; }
+
     void start();
     void yield(const DLString &msg);
     void stop(const DLString &r);
@@ -96,6 +97,7 @@ NMI_OBJECT
 public:
 
     virtual void setSelf(Scripting::Object*) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
 
 protected:    
     void yield(const DLString &msg);

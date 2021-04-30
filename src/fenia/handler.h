@@ -30,6 +30,7 @@ public:
     virtual Register callMethod(const Register &key, const RegisterList &args) = 0;
 
     virtual void setSelf(Object *) = 0;
+    virtual Object *getSelf() const = 0;
     virtual void backup(); // called when 'object -> handler' link destroyed
 };
 

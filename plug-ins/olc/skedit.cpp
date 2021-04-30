@@ -408,8 +408,8 @@ SKEDIT(fenia, "феня", "редактировать тригера закли�
         return false;
     }
     
-    if (trigName == "run") {
-        // Handle 'run' skill command override.
+    if (trigName == "run" || trigName == "apply") {
+        // Handle 'run' and 'apply' skill command overrides.
         if (!checkCommand(c))
             return false;
 

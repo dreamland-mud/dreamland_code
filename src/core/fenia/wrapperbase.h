@@ -36,6 +36,7 @@ public:
     virtual Register callMethod(const Register &key, const RegisterList &args );
 
     virtual void setSelf( Scripting::Object * );
+    virtual Scripting::Object *getSelf() const { return self; }
     virtual void extract( bool );
 
     bool call( Register id, const char *fmt, ... );

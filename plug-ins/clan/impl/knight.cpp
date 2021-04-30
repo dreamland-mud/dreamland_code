@@ -261,31 +261,31 @@ SKILL_RUNP(guard)
     victim->guarded_by = pch;
 }
 
-BOOL_SKILL(guard)::apply(Character *wch, Character *mob, int unused)
+SKILL_APPLY(guard)
 {
     int chance;
-    PCharacter *ch = wch->getPC();
+    PCharacter *pch = ch->getPC();
 
-    if (wch->is_npc())
+    if (ch->is_npc())
         return false;
 
-    if (ch->guarded_by == 0 || ch->guarded_by->in_room != ch->in_room)
+    if (pch->guarded_by == 0 || pch->guarded_by->in_room != ch->in_room)
         return false;
 
-    chance = (gsn_guard->getEffective(ch->guarded_by) -
-              (int)(1.5 * (ch->getModifyLevel() - mob->getModifyLevel())));
+    chance = (gsn_guard->getEffective(pch->guarded_by) -
+              (int)(1.5 * (ch->getModifyLevel() - victim->getModifyLevel())));
 
     if (number_percent() < min(100, chance))
     {
-        oldact("$c1 прыгает перед $C5!", ch->guarded_by, 0, ch, TO_NOTVICT);
-        oldact("$c1 прыгает перед тобой!", ch->guarded_by, 0, ch, TO_VICT);
-        oldact("Ты прыгаешь перед $C5!", ch->guarded_by, 0, ch, TO_CHAR);
-        gsn_guard->improve(ch->guarded_by, true, mob);
+        oldact("$c1 прыгает перед $C5!", pch->guarded_by, 0, ch, TO_NOTVICT);
+        oldact("$c1 прыгает перед тобой!", pch->guarded_by, 0, ch, TO_VICT);
+        oldact("Ты прыгаешь перед $C5!", pch->guarded_by, 0, ch, TO_CHAR);
+        gsn_guard->improve(pch->guarded_by, true, victim);
         return true;
     }
     else
     {
-        gsn_guard->improve(ch->guarded_by, false, mob);
+        gsn_guard->improve(pch->guarded_by, false, victim);
         return false;
     }
 }

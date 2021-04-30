@@ -1119,8 +1119,11 @@ void aggr_update( )
         }
 
         check_bloodthirst( ch );
-        gsn_ambush->getCommand( )->apply( ch );
-        gsn_bonedagger->getCommand( )->apply( ch );
+
+        if (ch->ambushing[0]) {
+            gsn_ambush->getCommand( )->apply( ch );
+            gsn_bonedagger->getCommand( )->apply( ch );
+        }
         
         if (ch->in_room->area->empty)
             continue;

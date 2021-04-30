@@ -150,59 +150,42 @@ void FeniaSkillActionHelper::extractWrapper(SkillCommand *cmd)
 
 bool FeniaSkillActionHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
-    // Check that a function matching this spell target (i.e. one of runVict, runArg etc)
-    // is actually defined on the spell's wrapper.
-    WrapperBase *wrapper = spell->getWrapper();
-    if (!wrapper)
-        return false;
-
-    DLString methodName = getMethodName(spellTarget);
-    if (methodName.empty())
-        return false;
-
-    IdRef methodId(methodName);
-    Register method;    
-    if (!wrapper->triggerFunction(methodId, method))
-        return false;
-
-    // Create run context for this spell and launch the runXXX function.
-    FeniaSpellContext::Pointer ctx;
-    try {
-        ctx = createContext(spell, ch, spellTarget, level);
-        method.toFunction()->invoke(ctx->thiz, RegisterList());
-        
-    } catch (const CustomException &ce) {
-        // Do nothing on victim's death.
-
-    } catch (const ::Exception &e) {
-        // On error, complain to the logs and to all immortals in the game.
-        FeniaManager::getThis()->croak(0, methodId, e);
-    }
+    FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
+    // Figure out applicable runXXX method and call it, if defined on the spell wrapper.
+    bool rc = executeMethod(spell, getMethodName(spellTarget), ctx);
 
     // Clean any references that may prevent garbage collector from destroying this context object.
     if (ctx)
         ctx->cleanup();
 
-    return true;
+    return rc;
 }
 
-bool FeniaSkillActionHelper::executeCommand(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target)
+bool FeniaSkillActionHelper::executeCommandRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target)
 {
-    // Find 'run' function defined on the command's wrapper.
-    WrapperBase *wrapper = cmd->getWrapper();
+    return executeMethod(cmd, "run", createContext(cmd, ch, target));
+}
+
+bool FeniaSkillActionHelper::executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level)
+{
+    return executeMethod(cmd, "apply", createContext(cmd, ch, victim, level));
+}
+
+bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx)
+{
+    // Find method defined on the wrapper.
+    WrapperBase *wrapper = wtarget->getWrapper();
     if (!wrapper)
         return false;
 
-    IdRef methodId("run");
+    IdRef methodId(methodName);
     Register method;
     if (!wrapper->triggerFunction(methodId, method))
         return false;
 
-    // Create run context for the command and execute 'run' function.
-    FeniaCommandContext::Pointer ctx;
+    // Invoke the function with the provided context.
     try {
-        ctx = createContext(cmd, ch, target);
-        method.toFunction()->invoke(Register(ctx->self), RegisterList());
+        method.toFunction()->invoke(Register(ctx->getSelf()), RegisterList());
 
     } catch (const CustomException &ce) {
         // Do nothing on victim's death.
@@ -211,10 +194,9 @@ bool FeniaSkillActionHelper::executeCommand(DefaultSkillCommand *cmd, Character 
         // On error, complain to the logs and to all immortals in the game.
         FeniaManager::getThis()->croak(0, methodId, e);
     }
-    
+
     return true;
 }
-
 
 FeniaSpellContext::Pointer FeniaSkillActionHelper::createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
 {
@@ -271,6 +253,23 @@ FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillC
     
     if (target.vict)
         ctx->vict = FeniaManager::wrapperManager->getWrapper(target.vict);
+
+    return ctx;        
+}
+
+FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level)
+{
+    FeniaCommandContext::Pointer ctx(NEW);
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(ctx);
+
+    ctx->name = cmd->getSkill()->getName();
+    ctx->command = Register(cmd->wrapper);
+    ctx->ch = FeniaManager::wrapperManager->getWrapper(ch);
+    ctx->level = level;
+
+    if (victim)
+        ctx->vict = FeniaManager::wrapperManager->getWrapper(victim);
 
     return ctx;        
 }
@@ -464,3 +463,7 @@ NMI_GET(FeniaCommandContext, state, "структура для хранения 
     return state;
 }
 
+NMI_GET(FeniaCommandContext, level, "уровень, с которым вызвали apply")
+{
+    return Register(level);
+}

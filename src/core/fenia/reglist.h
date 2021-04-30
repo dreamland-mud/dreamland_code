@@ -40,6 +40,7 @@ public:
     typedef ::Pointer<RegList> Pointer;
 
     virtual void setSelf(Scripting::Object *s);
+    virtual Scripting::Object *getSelf() const { return self; }
     virtual const DLString &getType() const;
     virtual DLObject::Pointer set(DLObject::Pointer o1, DLObject::Pointer o2);
 
@@ -62,6 +63,7 @@ public:
     virtual Register callMethod(const Register &key, const RegisterList &args);
 
     virtual void setSelf(Scripting::Object *s) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
 
 protected:
     XML_VARIABLE XMLRegister list;
@@ -82,6 +84,7 @@ public:
     void restoreIterator();
 
     virtual void setSelf(Scripting::Object *s);
+    virtual Scripting::Object *getSelf() const { return self; }
 
 protected:
     XML_VARIABLE XMLRegister list;

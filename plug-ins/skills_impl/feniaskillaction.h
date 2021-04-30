@@ -16,6 +16,7 @@ class AffectHandler;
 class SkillCommand;
 class DefaultSkillCommand;
 class CommandTarget;
+class WrapperTarget;
 
 class FeniaSpellContext : public Scripting::NativeImpl<FeniaSpellContext>,
                           public Scripting::NativeHandler,
@@ -30,6 +31,7 @@ public:
     virtual ~FeniaSpellContext();    
 
     virtual void setSelf(Scripting::Object *s);
+    virtual Scripting::Object *getSelf() const { return self; }
 
     Scripting::Object *self;
     
@@ -66,6 +68,7 @@ public:
     virtual ~FeniaCommandContext();    
 
     virtual void setSelf(Scripting::Object *s);
+    virtual Scripting::Object *getSelf() const { return self; }
 
     Scripting::Object *self;
     
@@ -75,6 +78,7 @@ public:
     XML_VARIABLE XMLRegister obj;
     XML_VARIABLE XMLRegister vict;
     XML_VARIABLE XMLRegister state;
+    XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLString argAll, argOne, argTwo;
 };                       
 
@@ -88,13 +92,16 @@ public:
     static void extractWrapper(SkillCommand *);
 
     static bool executeSpell(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
-    static bool executeCommand(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);
+    static bool executeCommandRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);
+    static bool executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
     static bool spellHasTrigger(Spell *spell, const DLString &trigName);
 
 private:
     static FeniaSpellContext::Pointer createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
     static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);    
+    static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
     static DLString getMethodName(::Pointer<SpellTarget> &spellTarget);
+    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx);
 };
 
 

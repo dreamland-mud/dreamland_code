@@ -38,7 +38,7 @@ public:
     AreaWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString filename;
@@ -65,7 +65,7 @@ public:
     HometownWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
@@ -89,7 +89,7 @@ public:
     ProfessionWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     XML_VARIABLE XMLString name;
 };
 
@@ -111,7 +111,7 @@ public:
     CraftProfessionWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     XML_VARIABLE XMLString name;
 
 protected:
@@ -136,7 +136,7 @@ public:
     BonusWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     XML_VARIABLE XMLString name;
 
 protected:
@@ -161,7 +161,7 @@ public:
     RaceWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
@@ -185,7 +185,7 @@ public:
     LiquidWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
@@ -212,7 +212,7 @@ public:
     ClanWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
@@ -236,7 +236,7 @@ public:
     ReligionWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     XML_VARIABLE XMLString name;
 
 protected:
@@ -261,7 +261,7 @@ public:
     LanguageWrapper(const DLString &);
             
     virtual void setSelf(Scripting::Object *) { }
-    
+    virtual Scripting::Object *getSelf() const { return 0; }
     XML_VARIABLE XMLString name;
 
 protected:
@@ -285,6 +285,7 @@ public:
     SkillWrapper() { }
     SkillWrapper(const DLString &);            
     virtual void setSelf(Scripting::Object *) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
     Skill * getTarget() const;
     
 protected:
@@ -304,6 +305,7 @@ public:
     FeniaSkill(const DLString &);
 
     virtual void setSelf(Scripting::Object *);
+    virtual Scripting::Object *getSelf() const { return self; }
     static Scripting::Register wrap( const DLString & );
     virtual void backup();
 private:

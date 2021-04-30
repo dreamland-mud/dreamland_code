@@ -21,8 +21,8 @@ struct SkillCommandTemplate : public DefaultSkillCommand, public ClassSelfRegist
     virtual void run( Character * ch, char *argument ) { 
         DefaultSkillCommand::run( ch, argument );
     }
-    virtual bool apply( Character * ch, Character *victim = 0, int level = 0) { 
-        return DefaultSkillCommand::apply( ch, victim, level );
+    virtual bool applyLegacy(Character * ch, Character *victim, int level) {
+        return DefaultSkillCommand::applyLegacy(ch, victim, level);
     }
     virtual bool visible(Character *ch) const {
         return DefaultSkillCommand::visible(ch);
@@ -48,8 +48,8 @@ SKILL_DECL(x); \
 template <> \
 void SKILL(x)::run( Character* ch, char *argument ) 
 
-#define TYPE_SKILL(type, x) template <> type SKILL(x)
-#define BOOL_SKILL(x) TYPE_SKILL(bool, x)
+#define SKILL_APPLY(x) \
+template <> bool SKILL(x)::applyLegacy(Character * ch, Character *victim, int level)
 
 // MOC_SKIP_END
 #endif

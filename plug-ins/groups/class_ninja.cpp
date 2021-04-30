@@ -522,22 +522,22 @@ SKILL_RUNP( nerve )
         }
 }
 
-BOOL_SKILL(nerve)::apply(Character *ch, Character *victim, int unused)
+SKILL_APPLY(nerve)
 {
-    int level, skill, mod;
-    level = skill_level(*gsn_nerve, ch);
+    int slevel, skill, mod;
+    slevel = skill_level(*gsn_nerve, ch);
     
     if (gsn_nerve->usable( ch ) )
         skill = gsn_nerve->getEffective( ch );
     else
         skill = 0;
     
-    mod = -1 * (level/20 + skill/20 + 1);
+    mod = -1 * (slevel/20 + skill/20 + 1);
     
     Affect af;
     af.type     = gsn_nerve;
-    af.level    = level;
-    af.duration = level / 20;
+    af.level    = slevel;
+    af.duration = slevel / 20;
     af.location = APPLY_STR;
     af.modifier = mod;
 
@@ -594,7 +594,7 @@ SKILL_RUNP( endure )
 }
 
 
-BOOL_SKILL(endure)::apply(Character *ch, Character *victim, int modifier)
+SKILL_APPLY(endure)
 {      
     Affect af;
 
@@ -602,7 +602,7 @@ BOOL_SKILL(endure)::apply(Character *ch, Character *victim, int modifier)
     af.level    = skill_level(*gsn_endure, ch);
     af.duration = skill_level(*gsn_endure, ch) / 4;
     af.location = APPLY_SAVING_SPELL;
-    af.modifier = modifier;    
+    af.modifier = level;    
 
     affect_to_char(ch,&af);
 
@@ -1027,40 +1027,40 @@ SKILL_RUNP( caltraps )
   gsn_caltraps->improve( ch, true, victim );
 }
 
-BOOL_SKILL(caltraps)::apply(Character *ch, Character *victim, int unused)
+SKILL_APPLY(caltraps)
 {
-    int level, skill, mod;
-    level = skill_level(*gsn_caltraps, ch);
+    int slevel, skill, mod;
+    slevel = skill_level(*gsn_caltraps, ch);
     
     if (gsn_caltraps->usable( ch ) )
         skill = gsn_caltraps->getEffective( ch );
     else
         skill = 0;
     
-    mod = -1 * (level/10 + skill/10 + 1);
+    mod = -1 * (slevel/10 + skill/10 + 1);
     
     try {
-        damage_nocatch(ch,victim, level,gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
+        damage_nocatch(ch,victim, slevel,gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
 
         if (!victim->isAffected(gsn_caltraps)) {
             Affect tohit,todam,todex;
 
             tohit.type      = gsn_caltraps;
-            tohit.level     = level;
+            tohit.level     = slevel;
             tohit.duration  = -1;
             tohit.location = APPLY_HITROLL;
             tohit.modifier  = mod;
             affect_to_char( victim, &tohit );
 
             todam.type = gsn_caltraps;
-            todam.level = level;
+            todam.level = slevel;
             todam.duration = -1;
             todam.location = APPLY_DAMROLL;
             todam.modifier = mod;
             affect_to_char( victim, &todam);
 
             todex.type = gsn_caltraps;
-            todex.level = level;
+            todex.level = slevel;
             todex.duration = -1;
             todex.location = APPLY_DEX;
             todex.modifier = mod/2;
@@ -1636,7 +1636,7 @@ SKILL_RUNP( blindness )
         gsn_blindness_dust->getCommand()->apply(ch);
 }
 
-BOOL_SKILL( blindness )::apply( Character *ch, Character *, int ) 
+SKILL_APPLY( blindness )
 {
     for ( auto &tmp_vict : ch->in_room->getPeople() )
     {

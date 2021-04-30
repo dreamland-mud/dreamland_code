@@ -35,7 +35,7 @@ public:
     typedef ::Pointer<CommandWrapper> Pointer;
 
     virtual void setSelf(Scripting::Object *);
-
+    virtual Scripting::Object *getSelf() const { return self; }
     virtual void run( Character * ch, const DLString & );
 
     virtual void backup();

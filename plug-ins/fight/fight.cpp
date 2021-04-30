@@ -380,7 +380,8 @@ void multi_hit_nocatch( Character *ch, Character *victim )
     if (ch->fighting != victim)
         return;
     
-    gsn_area_attack->getCommand( )->apply( ch, victim );
+    if (gsn_area_attack->usable(ch))
+        gsn_area_attack->getCommand( )->apply( ch, victim );
 
     if (IS_QUICK(ch))
         one_hit_nocatch( ch, victim );

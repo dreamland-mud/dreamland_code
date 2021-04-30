@@ -63,6 +63,7 @@ public:
     virtual void setSelf(Object *s) { 
         self = s;
     }
+    virtual Scripting::Object *getSelf() const { return self; }
 
     Object *self;
 

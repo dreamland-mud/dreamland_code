@@ -29,7 +29,8 @@ public:
     typedef ::Pointer<NannyHandler> Pointer;
 
     virtual void setSelf( Scripting::Object * );
-
+    virtual Scripting::Object *getSelf() const { return 0; }
+    
     virtual int handle(Descriptor *d, char *arg);
     virtual void prompt(Descriptor *d);
     virtual void close( Descriptor * );

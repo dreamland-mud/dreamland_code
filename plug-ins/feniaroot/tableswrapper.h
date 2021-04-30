@@ -27,6 +27,7 @@ public:
     virtual Register getField(const Register &key);
     virtual Register callMethod(const Register &key, const RegisterList &args);
     void setSelf(Scripting::Object *);
+    virtual Scripting::Object *getSelf() const { return 0; }
     void resolveTab();
 
     const FlagTable *table;
@@ -39,6 +40,7 @@ public:
     typedef ::Pointer<TablesWrapper> Pointer;
     
     virtual void setField(const Register &key, const Register &val);
+    virtual Scripting::Object *getSelf() const { return 0; }
     virtual Register getField(const Register &key);
     virtual Register callMethod(const Register &key, const RegisterList &args);
     void setSelf(Scripting::Object *);

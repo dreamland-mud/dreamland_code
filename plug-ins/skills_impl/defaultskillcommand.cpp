@@ -155,7 +155,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     }
 
     // See if there is 'run' method override in Fenia. 
-    if (FeniaSkillActionHelper::executeCommand(this, ch, target))
+    if (FeniaSkillActionHelper::executeCommandRun(this, ch, target))
         return;
 
     // Fall back to the old implementation.
@@ -168,11 +168,19 @@ void DefaultSkillCommand::run( Character *ch, char *args )
     DefaultCommand::run( ch, args );
 }
 
-
-// TODO: helper run methods, will be renamed to applyChar or applyVict etc
-
+// An 'apply' method is called from objprogs or various places in the code.
+// Usually just 'does the job' after all the checks were successful.
 bool DefaultSkillCommand::apply( Character *ch, Character *victim, int level )
 {
-    return SkillCommand::apply( ch, victim, level );
+    // See if there is 'apply' method override in Fenia. 
+    if (FeniaSkillActionHelper::executeCommandApply(this, ch, victim, level))
+        return true;
+
+    // Fall back to the old implementation.
+    return applyLegacy( ch, victim, level );
 }
 
+bool DefaultSkillCommand::applyLegacy(Character * ch, Character *victim, int level)
+{
+    return false;
+}

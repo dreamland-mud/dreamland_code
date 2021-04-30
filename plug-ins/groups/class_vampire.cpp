@@ -1127,10 +1127,10 @@ SKILL_RUNP( bonedagger )
     run( ch, str_empty );
 }
 
-BOOL_SKILL( bonedagger )::apply( Character *ch, Character *, int ) 
+SKILL_APPLY( bonedagger )
 {
     Affect af;
-    Character *victim;
+    Character *vch;
     Room *room = ch->was_in_room;
     
     if (!DIGGED(ch) || !ch->ambushing || ch->ambushing[0] == 0)
@@ -1144,46 +1144,46 @@ BOOL_SKILL( bonedagger )::apply( Character *ch, Character *, int )
             return false;
     }
 
-    for (victim = room->people; victim; victim = victim->next_in_room) {
-        if (!ch->can_see( victim ))
+    for (vch = room->people; vch; vch = vch->next_in_room) {
+        if (!ch->can_see( vch ))
             continue;
         
-        if (is_safe_nomessage( victim, ch ))
+        if (is_safe_nomessage( vch, ch ))
             continue;
         
-        if (!is_name( ch->ambushing, victim->getNameP( ) ))
+        if (!is_name( ch->ambushing, vch->getNameP( ) ))
             continue;
 
         break;
     }
 
-    if (!victim)
+    if (!vch)
         return false;
     
-    oldact("Твоя тень падает на могилу...", victim, 0, 0, TO_CHAR);
-    oldact("Тень $c2 падает на могилу...", victim, 0, 0, TO_ROOM);
+    oldact("Твоя тень падает на могилу...", vch, 0, 0, TO_CHAR);
+    oldact("Тень $c2 падает на могилу...", vch, 0, 0, TO_ROOM);
     
     undig( ch );
     ch->position = POS_STANDING;
     
     try {
-        BonedaggerOneHit bd( ch, victim );
+        BonedaggerOneHit bd( ch, vch );
         
         if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
-            oldact("$c1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT);
-            oldact("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, victim, TO_NOTVICT);
-            oldact("Ты костяным ножом промахиваешься мимо тени $C2!", ch, 0, victim, TO_CHAR);
+            oldact("$c1 костяным ножом промахивается мимо твоей тени!", ch, 0, vch, TO_VICT);
+            oldact("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, vch, TO_NOTVICT);
+            oldact("Ты костяным ножом промахиваешься мимо тени $C2!", ch, 0, vch, TO_CHAR);
             
-            gsn_bonedagger->improve( ch, false, victim );
+            gsn_bonedagger->improve( ch, false, vch );
             bd.miss( );
             return true;
         }
         
-        gsn_bonedagger->improve( ch, true, victim );
+        gsn_bonedagger->improve( ch, true, vch );
         
-        oldact("$c1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT);
-        oldact("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT);
-        oldact("Ты приковываешь тень $C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR);
+        oldact("$c1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, vch, TO_VICT);
+        oldact("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, vch, TO_NOTVICT);
+        oldact("Ты приковываешь тень $C2 костяным ножом к земле!", ch, 0, vch, TO_CHAR);
 
         af.type = gsn_bonedagger;
         af.level = ch->getModifyLevel( );
@@ -1192,7 +1192,7 @@ BOOL_SKILL( bonedagger )::apply( Character *ch, Character *, int )
         af.modifier = 0;
         af.bitvector.setTable(&detect_flags);
         af.bitvector.setValue(ADET_WEB);
-        affect_to_char( victim, &af );
+        affect_to_char( vch, &af );
         
         bd.hit( );
     }
