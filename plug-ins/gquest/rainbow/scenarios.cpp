@@ -43,8 +43,6 @@ bool RainbowScenario::checkMobile( NPCharacter *ch ) const
 {
     if (!IS_SET(ch->form, FORM_BIPED))
         return false;
-    if (!IS_SET(ch->form, FORM_MAMMAL))
-        return false;
     if (IS_SET(ch->imm_flags, IMM_SUMMON|IMM_CHARM))
         return false;
     if ((ch->behavior && ch->behavior->hasDestiny( )) || ch->fighting)
