@@ -95,7 +95,7 @@ CMDRUN( fill )
         }
 
         if (fountain->item_type != ITEM_FOUNTAIN) {
-            ch->pecho("%^O1 - не фонтан.", fountain);
+            ch->pecho("%^O1 -- не фонтан.", fountain);
             return;
         } 
     }
@@ -760,7 +760,7 @@ VOID_AFFECT(PouredLiquid)::saves( Character *ch, Character *victim, int &save, i
     if (dam_type != DAM_CHARM)
         return;
     
-    if (victim->getRace( ) == race_felar || victim->getRace( ) == race_cat) { 
+    if (victim->getRace( ) == race_felar || victim->getRace( ) == race_cat || IS_SET( victim->form, FORM_FELINE )) { 
         if (paf->global.isSet( liq_valerian_tincture )) 
             hasVuln = true;
     }
