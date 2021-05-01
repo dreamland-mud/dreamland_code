@@ -425,8 +425,8 @@ bool checkDispel( int dis_level, Character *victim, int sn)
             AffectHandler::Pointer handler = skillManager->find( sn )->getAffect( );
             
             if (handler) {
-                handler->remove( victim );
-                handler->dispel( victim );
+                handler->onDispel(SpellTarget::Pointer(NEW, victim), af);
+                handler->onRemove(SpellTarget::Pointer(NEW, victim), af);
             }
 
             affect_strip(victim,sn);            
