@@ -387,12 +387,23 @@ void affect_remove( Character *ch, Affect *paf, bool verbose )
 }
 
 /*
- * Strip all affects of a given sn.
+ * Strip all affects of a given sn. Ensure onRemove trigger is only called
+ * once for each affect type.
  */
 void affect_strip( Character *ch, int sn, bool verbose )
 {
-    for (auto &paf: ch->affected.findAll(sn))
-        affect_remove( ch, paf, verbose );
+    auto affectsWithType = ch->affected.findAll(sn);
+
+    if (verbose && !affectsWithType.empty()) {
+        Affect *firstAffect = affectsWithType.front();
+        AffectHandler::Pointer firstHandler = firstAffect->type->getAffect();
+
+        if (firstHandler)
+            firstHandler->onRemove(SpellTarget::Pointer(NEW, ch), firstAffect);
+    }
+
+    for (auto &paf: affectsWithType)
+        affect_remove(ch, paf);
 }
 
 void affect_strip( Object *obj, int sn, bool verbose )
