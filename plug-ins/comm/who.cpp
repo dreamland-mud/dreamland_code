@@ -265,6 +265,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
 {
     DLString result;
     DLString arg1 = arg.getOneArgument( );
+    DLString arg2 = arg.getOneArgument( );
     std::basic_ostringstream<char> buf, tmp;
 
     /* Level, Race, Class */
@@ -273,7 +274,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
     /* PK */
     if (victim->getModifyLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, victim ))
         tmp << "{x({rPK{x)";
-    else if (arg_is_pk( arg1 ))
+    else if (arg_is_pk( arg1 ) || arg_is_pk( arg2 ))
 	    return "";
 
 
@@ -322,8 +323,8 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
         buf << "{W";
    
     DLString descr = ch->seeName( victim );
-    if (arg_oneof_strict(arg1, "nopretitle", "безпретитла" ))
-        descr = victim->toNoun( victim )->decline('1');
+    if (arg_oneof_strict(arg1, "nopretitle", "безпретитла", "np", "бп" ) || arg_oneof_strict(arg2, "nopretitle", "безпретитла", "np", "бп" ))
+        descr = victim->toNoun( ch )->decline('1');
 
     webManipManager->decorateCharacter( buf, descr, victim, ch );
     buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
