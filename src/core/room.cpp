@@ -63,6 +63,7 @@ Room::Room( ) :
                 affected_by( 0 ),
                 behavior( RoomBehavior::NODE_NAME ),
                 pIndexData(0),
+                sector_type(SECT_MAX),
                 mod_heal_rate( 0 ), mod_mana_rate( 0 ), ID(0)
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
@@ -185,5 +186,10 @@ list<Character*> Room::getPeople ( )
         }
 
         return people;
+}
+
+int Room::getSectorType() const
+{
+    return sector_type == SECT_MAX ? pIndexData->sector_type : sector_type;
 }
 

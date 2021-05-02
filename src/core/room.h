@@ -140,8 +140,8 @@ public:
     /** Calculate current mana rate (100% is the default). */
     int getManaRate() const;
 
-    /** Shorthand to return prototype's sector type. */
-    inline int getSectorType() const;
+    /** Return sector type, either from prototype or as changed by the affects. */
+    int getSectorType() const;
 
     inline AreaIndexData *areaIndex() const;
     const char * areaName() const;
@@ -169,6 +169,9 @@ public:
     RoomIndexData *pIndexData;
 
 protected:
+    /** Sector type if different from the prototype. */
+    int sector_type;
+
     /** How much default heal rate is changed by affects. */
     int mod_heal_rate;
 
@@ -201,11 +204,6 @@ inline const char * Room::getName() const
 inline const char * Room::getDescription() const
 {
     return pIndexData->description;
-}
-
-inline int Room::getSectorType() const
-{
-    return pIndexData->sector_type;
 }
 
 inline AreaIndexData *Room::areaIndex() const
