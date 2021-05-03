@@ -470,7 +470,7 @@ CMDRUNP( oscore )
     
     if (!ch->is_npc( )) {
         if (ch->getReligion( ) == god_none)
-            buf << "Ты не веришь в бога.  ";
+            buf << fmt(0, "Ты не определил%Gось|ся|ась с выбором религии.  ", ch);
         else
             buf << dlprintf( "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
@@ -1716,7 +1716,7 @@ static void do_score_args(Character *ch, const DLString &arg)
     } 
     if (arg_oneof(arg, "religion", "религия")) {
         if (ch->getReligion() == god_none)
-            ch->pecho("Ты атеист%1$G||ка.", ch);
+            ch->pecho("Ты не определил%Gось|ся|ась с выбором религии.", ch);
         else
             ch->pecho("Религия %s.", ch->getReligion()->getRussianName().ruscase('1').c_str());
         return;
@@ -1860,7 +1860,7 @@ CMDRUNP( score )
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
             CLR_BAR,
             CLR_CAPT,
-            ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ),
+            (ch->getReligion() == god_none ? "не определена": ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( )),
             CLR_FRAME,
 
             CLR_CAPT,
