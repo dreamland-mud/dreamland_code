@@ -48,6 +48,10 @@ GROUP(curative);
 GROUP(healing);
 GROUP(combat);
 
+CLAN(shalafi);
+
+RELIG(none);
+
 DefaultSpell::DefaultSpell( ) 
         : Spell(),
           target( TAR_IGNORE, &target_table ), 
@@ -201,6 +205,10 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     else    
         slevel = mlevel - max(5, mlevel / 10); // 5-10 levels penalty
     
+    // shalafi get half penalty
+    if (ch->getClan( ) == clan_shalafi)
+        slevel = max(slevel, (slevel + mlevel)/2);
+        
     if (gsn_spell_craft->usable( ch )) {
         if (number_percent() < gsn_spell_craft->getEffective( ch )) {
             slevel = mlevel;
@@ -290,6 +298,10 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         else
             gsn_mastering_spell->improve( ch, false );
     }
+    
+    // shalafi atheist bonus
+    if ( ch->getReligion() == god_none && ch->getClan( ) == clan_shalafi )
+        slevel += 2;
         
     if (isPrayer( ch ))
         slevel = max( 1, slevel + get_wis_app(ch).slevel );
