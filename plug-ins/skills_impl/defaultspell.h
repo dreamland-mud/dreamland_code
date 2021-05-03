@@ -50,7 +50,6 @@ public:
     virtual void run( Character *, char *, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
 
-    virtual int getManaCost( Character * ) const;
     virtual int getMaxRange( Character * ) const;                
     virtual bool spellbane( Character *, Character * ) const; 
     virtual void utter( Character * );

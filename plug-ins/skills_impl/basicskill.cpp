@@ -2,6 +2,8 @@
  *
  * ruffina, 2005
  */
+#include <math.h>
+
 #include "basicskill.h"
 #include "logstream.h"
 
@@ -41,6 +43,7 @@ GSN(learning);
 GSN(anathema);
 DESIRE(drunk);
 BONUS(learning);
+BONUS(mana);
 HOMETOWN(frigate);
 
 BasicSkill::BasicSkill() 
@@ -334,10 +337,34 @@ int BasicSkill::getBeats(Character *ch) const
     return ch ? percentage(beats, ch->mod_beats) : beats.getValue();
 }
 
-int BasicSkill::getMana( ) const
+int BasicSkill::getMana(Character *ch) const
 {
-    return mana.getValue( );
+    if (!ch)
+        return mana;
+
+    if (!available(ch))
+        return mana;
+
+    int cost = max( mana.getValue(),
+                100 / (2 + ch->getRealLevel() - getLevel(ch)) );
+
+    if (!ch->is_npc() && bonus_mana->isActive(ch->getPC(), time_info))
+        cost /= 2;
+
+    return cost;
 }
+
+int BasicSkill::getMoves(Character *ch) const
+{
+    if (!ch)
+        return move;
+
+    if (ch->is_npc( ))
+        return 0;
+    
+    return min(max(ch->getModifyLevel() / 20, 1), (int)ch->move);
+}
+
 const RussianString &BasicSkill::getDammsg( ) const
 {
     return dammsg;
@@ -438,9 +465,15 @@ DLString BasicSkill::printWaitAndMana(Character *ch) const
         empty = false;
     }
     
-    int mana = (ch && spell && spell->isCasted( )) ? spell->getManaCost(ch) : getMana();
-    if (mana > 0) {
-        buf << fmt(0, "Расход маны {W%d{x. ", mana);
+    int mana = getMana(ch);
+    int moves = getMoves(ch);
+    if (mana > 0 || moves > 0) {
+        buf << "Расход ";
+        if (mana > 0)
+            buf << "маны {W" << mana << "{x";
+        if (moves > 0) 
+            buf << (mana > 0 ? ", " : "") << "шагов {W" << moves << "{x";
+        buf << ". ";
         empty = false;
     }
 

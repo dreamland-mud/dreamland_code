@@ -120,15 +120,6 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
     }
 }
 
-int DefaultSpell::getManaCost( Character *ch ) const
-{
-    if (!skill->available( ch ))
-        return 50;
-
-    return max( getMana( ),
-                100 / (2 + ch->getRealLevel( ) - skill->getLevel( ch )) );
-}
-
 /*
  * how far can we cast
  * returns number of rooms

@@ -240,7 +240,7 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
     }
 
     if (IS_SET(flags, FSPELL_MANA)) {
-        int mana = spell->getManaCost( ch ) / 2;
+        int mana = skill->getMana( ch ) / 2;
 
         if (ch->mana < mana)
             return false;

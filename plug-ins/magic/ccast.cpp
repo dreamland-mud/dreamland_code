@@ -34,8 +34,6 @@ CLAN(battlerager);
 GSN(shielding);
 GSN(garble);
 GSN(deafen);
-BONUS(mana);
-
 
 bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before );
 void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before );
@@ -84,7 +82,7 @@ CMDRUN( cast )
 {
     std::basic_ostringstream<char> buf;
     Character *victim;
-    int mana, slevel;
+    int slevel;
     bool offensive;
     Skill::Pointer skill;
     Spell::Pointer spell;
@@ -176,15 +174,22 @@ CMDRUN( cast )
         return;
     }
 
-    mana = spell->getManaCost( ch );
-    if (!ch->is_npc() && bonus_mana->isActive(ch->getPC(), time_info))
-        mana /= 2;
-
-    if (ch->mana < mana) {
+    int mana = skill->getMana(ch);
+    if (mana > 0 && ch->mana < mana) {
         if (ch->is_npc( ) && ch->master != 0) 
             say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
-            ch->pecho("У тебя не хватает энергии (mana).");
+            ch->pecho("У тебя не хватает энергии{lE (mana){x.");
+
+        return;
+    }
+
+    int moves = skill->getMoves(ch);
+    if (moves > 0 && ch->move < moves) {
+        if (ch->is_npc( ) && ch->master != 0)
+            say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
+        else
+            ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
 
         return;
     }
@@ -229,6 +234,8 @@ CMDRUN( cast )
         ch->pecho("Ты не можешь сконцентрироваться.");
         skill->improve( ch, false, victim );
         ch->mana -= mana / 2;
+        ch->move -= moves / 2;
+
         target->castFar = false;
     }
     else {
@@ -237,6 +244,8 @@ CMDRUN( cast )
             bool fForbidReaction = false;
 
             ch->mana -= mana;
+            ch->move -= moves;
+
             slevel = spell->getSpellLevel( ch, target->range );
             
             if (victim)

@@ -155,10 +155,7 @@ void AllSkillsList::make( Character *ch )
             info.adept = skill->getAdept( ch->getPC( ) );
         }
         
-        if (spell && spell->isCasted( ))
-            info.mana = spell->getManaCost( ch );
-        else
-            info.mana = skill->getMana( );
+        info.mana = skill->getMana( );
 
         if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
             info.help_id = skill->getSkillHelp()->getID();

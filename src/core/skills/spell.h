@@ -31,7 +31,6 @@ public:
     virtual void run( Character *, char *, int, int ) = 0;
     virtual void run( Character *, Room *, int, int ) = 0;
 
-    virtual int getManaCost( Character * ) const = 0;
     virtual int getMaxRange( Character * ) const = 0;
     virtual bool spellbane( Character *, Character * ) const = 0;
     virtual void utter( Character * ) = 0;

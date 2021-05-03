@@ -42,7 +42,8 @@ public:
     virtual SkillCommandPointer getCommand( ) const;
     virtual HelpArticlePointer getSkillHelp( ) const;
     virtual int getBeats(Character *ch = 0) const;
-    virtual int getMana( ) const;
+    virtual int getMana(Character *ch = 0) const;
+    virtual int getMoves(Character *ch = 0) const;
     virtual const RussianString &getDammsg( ) const;
     virtual int getRating( PCharacter * ) const;
     virtual bool isPassive() const;

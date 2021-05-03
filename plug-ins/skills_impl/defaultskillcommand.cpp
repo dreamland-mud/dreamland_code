@@ -12,6 +12,7 @@
 #include "feniaskillaction.h"
 #include "commandmanager.h"
 #include "loadsave.h"
+#include "act.h"
 #include "def.h"
 
 CommandTarget::CommandTarget() 
@@ -148,12 +149,39 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     CommandTarget target;
     ostringstream errbuf;
 
+    // Do skill availability check early. TODO: custom message overrides.
+    if (!skill->usable(ch)) {
+        ch->pecho("Ты не владеешь навыком '{W%s{x'.", skill->getNameFor(ch).c_str());
+        return;
+    }
+
     // If argtype was defined in skill profile, enforce argument parsing.
     if (!parseArguments(ch, args, target, errbuf)) {
         ch->pecho(errbuf.str());
         return;
     }
 
+    // Do mana and move checks early. TODO: show skill name somehow.
+    int mana = skill->getMana(ch);
+    if (mana > 0 && ch->mana < mana) {
+        if (ch->is_npc() && ch->master != 0) 
+            say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
+        else 
+            ch->pecho("У тебя не хватает энергии{lE (mana){x.");
+
+        return;
+    }
+
+    int moves = skill->getMoves(ch);
+    if (moves > 0 && ch->move < moves) {
+        if (ch->is_npc() && ch->master != 0)
+            say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
+        else
+            ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+
+        return;
+    }
+    
     // See if there is 'run' method override in Fenia. 
     if (FeniaSkillActionHelper::executeCommandRun(this, ch, target))
         return;

@@ -73,7 +73,11 @@ int Skill::getBeats(Character *ch) const
 {
     return 0;
 }
-int Skill::getMana( ) const
+int Skill::getMana(Character *ch) const
+{
+    return 0;
+}
+int Skill::getMoves(Character *ch) const
 {
     return 0;
 }
