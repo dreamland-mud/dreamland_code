@@ -11,6 +11,7 @@
 #include "skillgroup.h"
 #include "skill_utils.h"
 #include "feniaskillaction.h"
+#include "religion.h"
 
 #include "fenia/exceptions.h"
 #include "affect.h"
@@ -47,6 +48,7 @@ GROUP(benedictions);
 GROUP(curative);
 GROUP(healing);
 GROUP(combat);
+RELIG(none);
 
 DefaultSpell::DefaultSpell( ) 
         : Spell(),
@@ -163,6 +165,27 @@ DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, 
  */
 void DefaultSpell::utter( Character *ch )
 {
+    if (isPrayer(ch))
+        utterPrayer(ch);
+    else
+        utterMagicSpell(ch);
+}
+
+void DefaultSpell::utterPrayer(Character *ch)
+{
+    if (ch->is_npc()) {
+        ch->recho("%^C1 молится своим богам.", ch);
+    } else if (ch->getReligion() == god_none) {
+        ch->pecho("Ты неумело молишься, прося богов о помощи.");  
+        ch->recho("%^C1 неумело молится, прося богов о помощи.", ch); 
+    } else {
+        ch->pecho("Ты возносишь молитву %N3.", ch->getReligion()->getRussianName().c_str());
+        ch->recho("%^C1 возносит молитву %N3.", ch->getReligion()->getRussianName().c_str());
+    }
+}
+
+void DefaultSpell::utterMagicSpell(Character *ch)
+{
     Character *rch;
     DLString utterance = spell_utterance(*skill);
     const char *pat = "$c1 бормочет '$t'.";
@@ -188,10 +211,11 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     int slevel;
     int chance;
     int mlevel = ch->getModifyLevel( );
+    bool fPrayer = isPrayer(ch);
     
     if (ch->is_npc( ))
         return mlevel;
-    
+
     if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
         slevel = mlevel - max(0, mlevel / 20); // 0-5 levels penalty
     else if (ch->getProfession( )->getFlags( ).isSet(PROF_HYBRID))
@@ -209,7 +233,14 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         else
             gsn_spell_craft->improve( ch, false );
     }
-    
+
+    // Divine non-believers get a spell level penalty.
+    slevel = spell_level_penalty(*skill, ch, slevel);
+    if (slevel <= 0) {
+        ch->pecho("Никто из богов больше не откликнется на твои молитвы, пока ты не изберешь себе {hh1религию{x.");
+        return -1;
+    }
+
     if (skill->hasGroup(group_maladictions)
         && (chance = gsn_improved_maladiction->getEffective( ch )))
     {
@@ -264,7 +295,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
      */
     int maxRange = getMaxRange(ch);               
     if ( ch->isAffected(gsn_magic_concentrate) &&
-         !isPrayer(ch) &&
+         !fPrayer &&
          flags.isSet(SPELL_MAGIC) &&
          maxRange > 0 )
     {
@@ -291,7 +322,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             gsn_mastering_spell->improve( ch, false );
     }
         
-    if (isPrayer( ch ))
+    if (fPrayer)
         slevel = max( 1, slevel + get_wis_app(ch).slevel );
     else
         slevel = max( 1, slevel + get_int_app(ch).slevel );

@@ -17,7 +17,7 @@
 #include "pcharactermanager.h"
 #include "room.h"
 #include "roomutils.h"
-#include "character.h"
+#include "religion.h"
 #include "magic.h"
 #include "damageflags.h"
 #include "fight.h"
@@ -35,6 +35,7 @@ using namespace Scripting;
 
 GSN(blindness);
 GSN(curse);
+RELIG(none);
 
 DLString regfmt(Character *to, const RegisterList &argv);
 
@@ -529,6 +530,36 @@ NMI_INVOKE(FeniaSpellContext, hasParticles, "(): достаточно ли ра�
 {
     Character *myCh = arg2character(ch);
     return RoomUtils::hasParticles(myCh->in_room);
+}
+
+static Religion * get_random_god(Character *ch)
+{
+    int cnt = 0;
+    Religion *result = 0;
+
+    for (int r = 0; r < religionManager->size(); r++) {
+        Religion *rel = religionManager->find(r);
+        if (rel->available(ch) && number_range(0, cnt++) == 0)
+            result = rel;
+    }
+
+    return result;
+}
+
+NMI_GET(FeniaSpellContext, rel, "религия кастера, случайный бог для неопределившихся или строка 'бог|и|ов...' для мобов")
+{
+    static const char *gods = "бог|и|ов|ам|ов|ами|ах";
+    Character *myCh = arg2character(ch);
+
+    if (myCh->is_npc())
+        return gods;
+
+    if (myCh->getReligion() == god_none) {
+        Religion *god = get_random_god(myCh);
+        return god ? god->getRussianName() : gods;
+    }
+    
+    return myCh->getReligion()->getRussianName();
 }
 
 NMI_GET(FeniaCommandContext, skill, "прототип умения для этой команды (.Skill())")

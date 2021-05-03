@@ -93,6 +93,9 @@ protected:
     void baneForAssist( Character *ch, Character *vch ) const;
     bool baneAction( Character *ch, Character *bch, int failChance, int dam ) const;
 
+    void utterPrayer(Character *ch);
+    void utterMagicSpell(Character *ch);
+
     SkillPointer skill;
 };
 

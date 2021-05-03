@@ -2,6 +2,7 @@
 #include "skillreference.h"
 #include "skillgroup.h"
 #include "spell.h"
+#include "religion.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "core/object.h"
@@ -27,6 +28,7 @@ GSN(athena_wisdom);
 GSN(scrolls);
 GSN(staves);
 GSN(wands);
+RELIG(none);
 
 bool temporary_skill_active( const Skill *skill, CharacterMemoryInterface *mem )
 {
@@ -262,6 +264,28 @@ int skill_level_bonus(Skill &skill, Character *ch)
     }
     
     return slevel;
+}
+
+int spell_level_penalty(Skill *skill, Character *ch, int slevel) 
+{
+    if (ch->is_npc())
+        return slevel;
+
+    if (!skill->getSpell() || !skill->getSpell()->isCasted())
+        return slevel;
+
+    if (!skill->getSpell()->isPrayer(ch))
+        return slevel;
+
+    if (ch->getReligion() != god_none)
+        return slevel;
+
+    int mlevel = ch->getModifyLevel();
+    if (mlevel <= 1)
+        return slevel;
+
+    int penalty = 100 - mlevel * 2;
+    return slevel * penalty / 100;
 }
 
 // Returns which skill governs the usage of a given item, e.g. 'scrolls' for ITEM_SCROLL.

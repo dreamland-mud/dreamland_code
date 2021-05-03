@@ -68,6 +68,8 @@ int skill_level(Skill &skill, Character *ch);
  */
 int skill_level_bonus(Skill &skill, Character *ch);
 
+// Calculate how many spell levels non-believers lose when praying.
+int spell_level_penalty(Skill *skill, Character *ch, int slevel);
 
 // Skill help formatting colours.
 extern const char SKILL_HEADER_BG;

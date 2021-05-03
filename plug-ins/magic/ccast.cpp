@@ -82,7 +82,6 @@ CMDRUN( cast )
 {
     std::basic_ostringstream<char> buf;
     Character *victim;
-    int slevel;
     bool offensive;
     Skill::Pointer skill;
     Spell::Pointer spell;
@@ -239,14 +238,17 @@ CMDRUN( cast )
         target->castFar = false;
     }
     else {
+        int slevel = spell->getSpellLevel( ch, target->range );
+        // Check if spell level penalty prevents from casting.
+        if (slevel <= 0)
+            return;
+
         try {
             bool fForbidCasting = false;
             bool fForbidReaction = false;
 
             ch->mana -= mana;
-            ch->move -= moves;
-
-            slevel = spell->getSpellLevel( ch, target->range );
+            ch->move -= moves;            
             
             if (victim)
                 fForbidCasting = mprog_spell( victim, ch, skill, true );
