@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "json/json.h"
+#include "register-impl.h"
 #include "commonattributes.h"
 #include "pcmemoryinterface.h"
 #include "pcharactermemorylist.h"
@@ -44,12 +45,22 @@ XMLStringAttribute::~XMLStringAttribute( )
 {
 }
 
+Scripting::Register XMLStringAttribute::toRegister() const
+{
+    return Scripting::Register(getValue());
+}
+
 XMLIntegerAttribute::XMLIntegerAttribute( )
 {
 }
 
 XMLIntegerAttribute::~XMLIntegerAttribute( )
 {
+}
+
+Scripting::Register XMLIntegerAttribute::toRegister() const
+{
+    return Scripting::Register(getValue());
 }
 
 XMLStringListAttribute::XMLStringListAttribute( )

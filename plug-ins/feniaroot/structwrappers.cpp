@@ -33,6 +33,7 @@
 
 #include "calendar_utils.h"
 #include "skill_utils.h"
+#include "xmlattributerestring.h"
 #include "handler.h"
 #include "gsn_plugin.h"
 #include "profflags.h"
@@ -1235,6 +1236,18 @@ NMI_INVOKE(SkillWrapper, apply, "(ch[,victim or level]): выполнить ум
 NMI_INVOKE(SkillWrapper, run, "(ch[,victim or level]): DEPRECATED, use 'apply'")
 {
     return nmiInvoke<nmi::apply>(args);
+}
+
+NMI_INVOKE(SkillWrapper, dressItem, "(obj,ch[,key]): рестрингнуть предмет согласно аттрибутам персонажа")
+{
+    Object *item = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+    DLString key;
+    if (args.size() > 2)
+        key = argnum2string(args, 3);
+
+    dress_created_item(getTarget()->getIndex(), item, ch, key);
+    return Register();
 }
 
 /*----------------------------------------------------------------------

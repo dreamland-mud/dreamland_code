@@ -35,6 +35,7 @@ public:
 
     XMLStringAttribute( );
     virtual ~XMLStringAttribute( );
+    virtual Scripting::Register toRegister() const;
 
     virtual const DLString & getType( ) const
     {
@@ -50,6 +51,7 @@ public:
 
     XMLIntegerAttribute( );
     virtual ~XMLIntegerAttribute( );
+    virtual Scripting::Register toRegister() const;
 
     virtual const DLString & getType( ) const
     {

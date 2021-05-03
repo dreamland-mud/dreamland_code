@@ -9,6 +9,7 @@
 
 #include "xmlpolymorphvariable.h"
 #include "xmlpersistent.h"
+#include "register-decl.h"
 
 template <typename ArgType>
 class AttributeEventHandler;
@@ -19,6 +20,7 @@ public:
     typedef ::Pointer<XMLAttribute> Pointer;
     
     virtual const DLString &getName( ) const;
+    virtual Scripting::Register toRegister() const;
 
     template <typename ArgType>
     bool handleEvent( const ArgType &args )

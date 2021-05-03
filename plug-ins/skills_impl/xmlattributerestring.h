@@ -20,7 +20,8 @@ XML_OBJECT
 public:
     typedef ::Pointer<XMLItemRestring> Pointer;
     
-    void dress( Object *, PCharacter * ) const;
+    Scripting::Register toRegister() const;
+    void dress( ::Object *, PCharacter * ) const;
 
     XML_VARIABLE XMLStringNoEmpty name;
     XML_VARIABLE XMLStringNoEmpty shortDescr;
@@ -32,7 +33,8 @@ class XMLAttributeRestring : public RemortAttribute, public XMLMapBase<XMLItemRe
 public:
     typedef ::Pointer<XMLAttributeRestring> Pointer;
 
-    void dress( Object *, PCharacter *, const DLString & = DLString::emptyString ) const;
+    virtual Scripting::Register toRegister() const;
+    void dress( ::Object *, PCharacter *, const DLString & = DLString::emptyString ) const;
 
     virtual const DLString & getType( ) const
     {
@@ -43,6 +45,6 @@ public:
     static const DLString DEFAULT_KEYWORD;
 };
 
-void dress_created_item( int sn, Object *, Character *, const DLString & = DLString::emptyString );
+void dress_created_item( int sn, ::Object *, Character *, const DLString & = DLString::emptyString );
 
 #endif

@@ -4,8 +4,7 @@
  */
 
 #include <iostream>
-
-#include "json/json.h"
+#include <jsoncpp/json/json.h>
 
 #include "logstream.h"
 #include "mobilebehaviormanager.h"
@@ -39,7 +38,7 @@
 #include "movement.h"
 #include "act_move.h"
 #include "merc.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "alignment.h"
 #include "wiznet.h"
 #include "xmlattributecoder.h"
@@ -59,6 +58,7 @@
 #include "reglist.h"
 #include "regcontainer.h"
 #include "nativeext.h"
+#include "idcontainer.h"
 
 #include "wrap_utils.h"
 #include "subr.h"
@@ -2384,6 +2384,19 @@ NMI_INVOKE(CharacterWrapper, giveBack, "(vict,obj): вернуть персон�
     vict->recho("%^C1 возвращает %C3 %O4.", target, vict, item);
 
     return Register();
+}
+
+NMI_INVOKE(CharacterWrapper, attribute, "(name): вернуть аттрибут с данным именем, в виде строки или структуры, либо null")
+{
+    checkTarget();
+    CHK_NPC
+    DLString name = args2string(args);
+
+    if (!target->getPC()->getAttributes().isAvailable(name))
+        return Register();
+
+    XMLAttribute::Pointer attr = target->getPC()->getAttributes().find(name)->second;
+    return attr->toRegister();
 }
 
 NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long): установить аттрибут для рестринга результатов заклинаний")

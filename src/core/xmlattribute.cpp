@@ -4,12 +4,18 @@
  */
 
 #include "xmlattribute.h"
+#include "register-impl.h"
 
 template class XMLStub<XMLAttribute>;
 
 const DLString & XMLAttribute::getName( ) const
 {
     return getType( );
+}
+
+Scripting::Register XMLAttribute::toRegister() const
+{
+    return Scripting::Register();
 }
 
 void XMLAttribute::init( )
