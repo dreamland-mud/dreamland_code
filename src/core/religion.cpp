@@ -39,7 +39,7 @@ int Religion::getSex() const
     return 0;
 }
 
-bool Religion::isAllowed( Character * ) const
+bool Religion::available(Character *) const
 {
     return false;
 }

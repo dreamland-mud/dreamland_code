@@ -178,26 +178,6 @@ DLString DefaultReligion::reasonWhy(Character *ch) const
         return myRace ? OK : "race";
 }
 
-bool DefaultReligion::isAllowed( Character *ch ) const
-{
-    if (flags.isSet(RELIG_SYSTEM))
-        return false;
-
-    if (flags.isSet(RELIG_HIDDEN) && !ch->is_immortal())
-        return false;
-
-    if (!ethos.isSetBitNumber( ch->ethos ))
-        return false;
-
-    if (!align.isSetBitNumber( ALIGNMENT(ch) ))
-        return false;
-
-    bool raceOK = races.empty() || races.isSet(ch->getRace());
-    bool classOK = classes.empty() || classes.isSet(ch->getProfession());
-
-    return raceOK || classOK;
-}
-
 const DLString &DefaultReligion::getRussianName( ) const
 {
     return nameRus;

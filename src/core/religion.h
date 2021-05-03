@@ -35,10 +35,10 @@ public:
     virtual const DLString &getRussianName( ) const;
     virtual bool isValid( ) const;
     virtual int getSex() const;
+    virtual bool available(Character *) const;
 
     virtual const DLString & getShortDescr( ) const;
     virtual const DLString & getDescription( ) const;
-    virtual bool isAllowed( Character * ) const;
     virtual const DLString& getNameFor( Character * ) const;
     virtual void tattooFight( Object *, Character * ) const;
 
