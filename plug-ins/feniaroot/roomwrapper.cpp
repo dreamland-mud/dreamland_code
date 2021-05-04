@@ -360,6 +360,55 @@ NMI_INVOKE( RoomWrapper, doorName, "(номер выхода): вернет им
     return dirs[get_door_argument( args )].name;
 }
 
+Room *check_place(Character *ch, Room *start_room, const DLString &cArg)
+{
+    char arg[MAX_INPUT_LENGTH], argument[MAX_INPUT_LENGTH];
+    EXIT_DATA *pExit;
+    Room *dest_room;
+    int number, door;
+    int range = (ch->getModifyLevel() / 10) + 1;
+
+    strcpy(argument, cArg.c_str());
+    number = number_argument(argument, arg);
+    if ((door = direction_lookup(arg)) < 0)
+        return 0;
+
+    dest_room = start_room;
+
+    while (number > 0) {
+        number--;
+
+        if (--range < 1)
+            return 0;
+
+        if ((pExit = dest_room->exit[door]) == 0 
+            || !ch->can_see(pExit) 
+            || IS_SET(pExit->exit_info, EX_CLOSED)) 
+        {
+            break;
+        }
+
+        dest_room = pExit->u1.to_room;
+        if (number < 1)
+            return dest_room;
+    }
+
+    return 0;
+}
+
+NMI_INVOKE(RoomWrapper, roomAt, "(ch,arg): доступная ch комната по направлению, указанному в аргументе (2.n, 3.e и т.д.)")
+{
+    checkTarget();
+    Character *ch = argnum2character(args, 1);
+    DLString arg = argnum2string(args, 2);
+
+    Room *dest = check_place(ch, target, arg);
+    if (!dest)
+        return Register();
+
+    return wrap(dest);
+}
+
 NMI_INVOKE( RoomWrapper, dirMsgLeave, "(имя или номер выхода): сообщение при уходе через этот выход (на север, на восток)" )
 {
     checkTarget( );
