@@ -22,6 +22,7 @@
 #include "fight.h"
 #include "fight_exception.h"
 #include "stats_apply.h"
+#include "commonattributes.h"
 #include "act_move.h"
 #include "profflags.h"
 #include "commandflags.h"
@@ -202,6 +203,20 @@ void DefaultSpell::utterMagicSpell(Character *ch)
     }
 }
 
+static Religion * get_random_god(Character *ch)
+{
+    int cnt = 0;
+    Religion *result = 0;
+
+    for (int r = 0; r < religionManager->size(); r++) {
+        Religion *rel = religionManager->find(r);
+        if (rel->available(ch) && number_range(0, cnt++) == 0)
+            result = rel;
+    }
+
+    return result;
+}
+
 /*
  * apply spell level modifiers
  */
@@ -235,10 +250,23 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     }
 
     // Divine non-believers get a spell level penalty.
-    slevel = spell_level_penalty(*skill, ch, slevel);
-    if (slevel <= 0) {
+    int slevel_with_penalty = spell_level_penalty(*skill, ch, slevel);
+    if (slevel_with_penalty <= 0) {
         ch->pecho("Никто из богов больше не откликнется на твои молитвы, пока ты не изберешь себе {hh1религию{x.");
         return -1;
+    }
+
+    // Choose a random deity to fulfil the prayer and remember their name.
+    XMLStringAttribute::Pointer randomGodAttr = ch->getPC()->getAttributes().getAttr<XMLStringAttribute>("randomGod");
+    randomGodAttr->clear();
+
+    if (slevel_with_penalty < slevel) {
+        slevel = slevel_with_penalty;
+        Religion *randomGod = get_random_god(ch);
+        if (randomGod) {
+            ch->pecho("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x.", randomGod->getRussianName().c_str());
+            randomGodAttr->setValue(randomGod->getName());
+        }
     }
 
     if (skill->hasGroup(group_maladictions)
