@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <set>
 #include "genericskill.h"
 
 #include "logstream.h"
@@ -370,7 +371,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
     }
 
     const DLString what = skill_what(this).ruscase('1');
-    list<MOB_INDEX_DATA *> practicers;
+    std::set<MOB_INDEX_DATA *> practicers;
 
     for (auto g: const_cast<GenericSkill *>(this)->getGroups().toArray()) {
         SkillGroup *group = skillGroupManager->find(g);
@@ -379,7 +380,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 
         MOB_INDEX_DATA *pMob = get_mob_index(group->getPracticer());
         if (pMob)
-            practicers.push_back(pMob);
+            practicers.insert(pMob);
     }
 
     if (practicers.empty()) {
@@ -389,15 +390,15 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
         buf << pad << "Это " << what << " можно выучить у ";
         
-        MOB_INDEX_DATA *pMob = practicers.front();
-        buf << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "
-                << "(зона {g{hh" << pMob->area->name << "{x)";
+        auto p = practicers.begin();
+        buf << "{g" << russian_case((*p)->short_descr, '2') << "{x "
+                << "(зона {g{hh" << (*p)->area->name << "{x)";
 
         // For multi-groups show two teachers only.
         if (practicers.size() > 1) {
-            pMob = practicers.back();
-            buf << " или у {g" << russian_case( pMob->short_descr, '2' ) << "{x "
-                    << "(зона {g{hh" << pMob->area->name << "{x)";
+            p++;
+            buf << " или у {g" << russian_case((*p)->short_descr, '2') << "{x "
+                    << "(зона {g{hh" << (*p)->area->name << "{x)";
         }
                     
         buf << "." << endl;
