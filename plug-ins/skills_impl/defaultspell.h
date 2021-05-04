@@ -96,6 +96,8 @@ protected:
     void utterPrayer(Character *ch);
     void utterMagicSpell(Character *ch);
 
+    bool canPray(Character *ch, int &slevel);
+
     SkillPointer skill;
 };
 

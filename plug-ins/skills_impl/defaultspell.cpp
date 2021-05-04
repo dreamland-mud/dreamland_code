@@ -217,6 +217,48 @@ static Religion * get_random_god(Character *ch)
     return result;
 }
 
+/**
+ * Apply spell level penalties for prayers, return 'false' to prevent casting.
+ */
+bool DefaultSpell::canPray(Character *ch, int &slevel)
+{
+    if (ch->is_npc())
+        return true;
+
+    if (!skill->getSpell() || !skill->getSpell()->isCasted())
+        return true;
+
+    if (!skill->getSpell()->isPrayer(ch))
+        return true;
+
+    if (ch->getReligion() != god_none)
+        return true;
+
+    // Divine non-believers get a spell level penalty.
+    int mlevel = ch->getModifyLevel();
+    if (mlevel > 1) {
+        int penalty = 100 - mlevel * 2;
+        slevel = slevel * penalty / 100;
+    }
+
+    if (slevel <= 0) {
+        ch->pecho("Никто из богов больше не откликнется на твои молитвы, пока ты не изберешь себе {hh1религию{x.");
+        return false;
+    }
+
+    // Choose a random deity to fulfil the prayer and remember their name.
+    XMLStringAttribute::Pointer randomGodAttr = ch->getPC()->getAttributes().getAttr<XMLStringAttribute>("randomGod");
+    randomGodAttr->clear();
+
+    Religion *randomGod = get_random_god(ch);
+    if (randomGod) {
+        ch->pecho("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x.", randomGod->getRussianName().c_str());
+        randomGodAttr->setValue(randomGod->getName());
+    }
+
+    return true;
+}
+
 /*
  * apply spell level modifiers
  */
@@ -239,7 +281,10 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         slevel = mlevel - max(3, mlevel / 13); // 3-8 levels penalty
     else    
         slevel = mlevel - max(5, mlevel / 10); // 5-10 levels penalty
-    
+
+    if (!canPray(ch, slevel))
+        return -1;
+
     if (gsn_spell_craft->usable( ch )) {
         if (number_percent() < gsn_spell_craft->getEffective( ch )) {
             slevel = mlevel;
@@ -247,26 +292,6 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         }
         else
             gsn_spell_craft->improve( ch, false );
-    }
-
-    // Divine non-believers get a spell level penalty.
-    int slevel_with_penalty = spell_level_penalty(*skill, ch, slevel);
-    if (slevel_with_penalty <= 0) {
-        ch->pecho("Никто из богов больше не откликнется на твои молитвы, пока ты не изберешь себе {hh1религию{x.");
-        return -1;
-    }
-
-    // Choose a random deity to fulfil the prayer and remember their name.
-    XMLStringAttribute::Pointer randomGodAttr = ch->getPC()->getAttributes().getAttr<XMLStringAttribute>("randomGod");
-    randomGodAttr->clear();
-
-    if (slevel_with_penalty < slevel) {
-        slevel = slevel_with_penalty;
-        Religion *randomGod = get_random_god(ch);
-        if (randomGod) {
-            ch->pecho("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x.", randomGod->getRussianName().c_str());
-            randomGodAttr->setValue(randomGod->getName());
-        }
     }
 
     if (skill->hasGroup(group_maladictions)
