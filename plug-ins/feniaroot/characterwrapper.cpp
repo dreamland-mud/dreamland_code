@@ -33,6 +33,7 @@
 #include "save.h"
 #include "mercdb.h"
 #include "fight.h"
+#include "skill_utils.h"
 #include "immunity.h"
 #include "magic.h"
 #include "movement.h"
@@ -1978,8 +1979,10 @@ NMI_INVOKE(CharacterWrapper, list_obj_world, "(arg): поиск по миру в
     RegList::Pointer rc(NEW);
 
     for (::Object *obj = object_list; obj != 0; obj = obj->next) {
-        if (target->getModifyLevel() < obj->level
-            || !target->can_see(obj))
+        if (target->getRealLevel() < get_wear_level(target, obj))
+            continue;
+
+        if (!target->can_see(obj))
             continue;
 
         Character *carrier = obj->getCarrier();
