@@ -172,7 +172,7 @@ void OLCStateArea::changed( PCharacter *ch )
 AEDIT(show, "показать", "показать все поля")
 {
     AreaIndexData *original = get_area_data(vnum);
-    Area *instance = original->area;
+    Area *instance = original ? original->area : 0;
 
     ptc(ch, "Name:       [%5d] %s\n\r", vnum.getValue( ), name.getValue( ).c_str( ));
     ptc(ch, "File:       [%s]\n\r", file_name.getValue( ).c_str( ));
