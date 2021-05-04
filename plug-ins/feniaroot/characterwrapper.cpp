@@ -1971,6 +1971,33 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднят�
     return true;
 }
 
+NMI_INVOKE(CharacterWrapper, list_obj_world, "(arg): поиск по миру видимых персонажу предметов с уровнем не выше персонажа" )
+{
+    checkTarget();
+    DLString arg = args2string(args);
+    RegList::Pointer rc(NEW);
+
+    for (::Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (target->getModifyLevel() < obj->level
+            || !target->can_see(obj))
+            continue;
+
+        Character *carrier = obj->getCarrier();
+        if (carrier && !target->can_see(carrier))
+            continue;
+
+        Room *location = obj->getRoom();
+        if (location && !target->can_see(location))
+            continue;
+
+        if (!obj_has_name(obj, arg, target))
+            continue;
+
+        rc->push_back(WrapperManager::getThis( )->getWrapper(obj));
+    }
+    
+    return wrap(rc);
+}
 
 
 NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по внуму предмета в инвентаре или экипировке" )
