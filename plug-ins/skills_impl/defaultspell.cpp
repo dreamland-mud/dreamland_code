@@ -11,6 +11,7 @@
 #include "skillgroup.h"
 #include "skill_utils.h"
 #include "feniaskillaction.h"
+#include "religion.h"
 
 #include "fenia/exceptions.h"
 #include "affect.h"
@@ -21,6 +22,7 @@
 #include "fight.h"
 #include "fight_exception.h"
 #include "stats_apply.h"
+#include "commonattributes.h"
 #include "act_move.h"
 #include "profflags.h"
 #include "commandflags.h"
@@ -47,6 +49,7 @@ GROUP(benedictions);
 GROUP(curative);
 GROUP(healing);
 GROUP(combat);
+RELIG(none);
 
 DefaultSpell::DefaultSpell( ) 
         : Spell(),
@@ -163,6 +166,27 @@ DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, 
  */
 void DefaultSpell::utter( Character *ch )
 {
+    if (isPrayer(ch))
+        utterPrayer(ch);
+    else
+        utterMagicSpell(ch);
+}
+
+void DefaultSpell::utterPrayer(Character *ch)
+{
+    if (ch->is_npc()) {
+        ch->recho("%^C1 молится своим богам.", ch);
+    } else if (ch->getReligion() == god_none) {
+        ch->pecho("Ты неумело молишься, прося богов о помощи.");  
+        ch->recho("%^C1 неумело молится, прося богов о помощи.", ch); 
+    } else {
+        ch->pecho("Ты возносишь молитву %N3.", ch->getReligion()->getRussianName().c_str());
+        ch->recho("%^C1 возносит молитву %N3.", ch->getReligion()->getRussianName().c_str());
+    }
+}
+
+void DefaultSpell::utterMagicSpell(Character *ch)
+{
     Character *rch;
     DLString utterance = spell_utterance(*skill);
     const char *pat = "$c1 бормочет '$t'.";
@@ -179,6 +203,62 @@ void DefaultSpell::utter( Character *ch )
     }
 }
 
+static Religion * get_random_god(Character *ch)
+{
+    int cnt = 0;
+    Religion *result = 0;
+
+    for (int r = 0; r < religionManager->size(); r++) {
+        Religion *rel = religionManager->find(r);
+        if (rel->available(ch) && number_range(0, cnt++) == 0)
+            result = rel;
+    }
+
+    return result;
+}
+
+/**
+ * Apply spell level penalties for prayers, return 'false' to prevent casting.
+ */
+bool DefaultSpell::canPray(Character *ch, int &slevel)
+{
+    if (ch->is_npc())
+        return true;
+
+    if (!skill->getSpell() || !skill->getSpell()->isCasted())
+        return true;
+
+    if (!skill->getSpell()->isPrayer(ch))
+        return true;
+
+    if (ch->getReligion() != god_none)
+        return true;
+
+    // Divine non-believers get a spell level penalty.
+    int mlevel = ch->getModifyLevel();
+    if (mlevel > 1) {
+        int penalty = 100 - mlevel * 2;
+        slevel = slevel * penalty / 100;
+    }
+
+    if (slevel <= 0) {
+        ch->pecho("Никто из богов больше не откликнется на твои молитвы, пока ты не изберешь себе {hh1религию{x.");
+        return false;
+    }
+
+    // Choose a random deity to fulfil the prayer and remember their name.
+    XMLStringAttribute::Pointer randomGodAttr = ch->getPC()->getAttributes().getAttr<XMLStringAttribute>("randomGod");
+    randomGodAttr->clear();
+
+    Religion *randomGod = get_random_god(ch);
+    if (randomGod) {
+        ch->pecho("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x.", randomGod->getRussianName().c_str());
+        randomGodAttr->setValue(randomGod->getName());
+    }
+
+    return true;
+}
+
 /*
  * apply spell level modifiers
  */
@@ -188,10 +268,11 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     int slevel;
     int chance;
     int mlevel = ch->getModifyLevel( );
+    bool fPrayer = isPrayer(ch);
     
     if (ch->is_npc( ))
         return mlevel;
-    
+
     if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
         slevel = mlevel - max(0, mlevel / 20); // 0-5 levels penalty
     else if (ch->getProfession( )->getFlags( ).isSet(PROF_HYBRID))
@@ -200,7 +281,10 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         slevel = mlevel - max(3, mlevel / 13); // 3-8 levels penalty
     else    
         slevel = mlevel - max(5, mlevel / 10); // 5-10 levels penalty
-    
+
+    if (!canPray(ch, slevel))
+        return -1;
+
     if (gsn_spell_craft->usable( ch )) {
         if (number_percent() < gsn_spell_craft->getEffective( ch )) {
             slevel = mlevel;
@@ -209,7 +293,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         else
             gsn_spell_craft->improve( ch, false );
     }
-    
+
     if (skill->hasGroup(group_maladictions)
         && (chance = gsn_improved_maladiction->getEffective( ch )))
     {
@@ -264,7 +348,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
      */
     int maxRange = getMaxRange(ch);               
     if ( ch->isAffected(gsn_magic_concentrate) &&
-         !isPrayer(ch) &&
+         !fPrayer &&
          flags.isSet(SPELL_MAGIC) &&
          maxRange > 0 )
     {
@@ -291,7 +375,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             gsn_mastering_spell->improve( ch, false );
     }
         
-    if (isPrayer( ch ))
+    if (fPrayer)
         slevel = max( 1, slevel + get_wis_app(ch).slevel );
     else
         slevel = max( 1, slevel + get_int_app(ch).slevel );

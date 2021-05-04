@@ -2,6 +2,7 @@
 #include "skillreference.h"
 #include "skillgroup.h"
 #include "spell.h"
+#include "religion.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "core/object.h"
@@ -27,6 +28,7 @@ GSN(athena_wisdom);
 GSN(scrolls);
 GSN(staves);
 GSN(wands);
+RELIG(none);
 
 bool temporary_skill_active( const Skill *skill, CharacterMemoryInterface *mem )
 {

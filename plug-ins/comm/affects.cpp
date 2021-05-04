@@ -1,15 +1,19 @@
 #include "commandtemplate.h"
 #include "skillgroup.h"
 #include "liquid.h"
+#include "religion.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "affect.h"
 #include "autoflags.h"
 #include "affectflags.h"
+#include "profflags.h"
 #include "mudtags.h"
 #include "../anatolia/handler.h"
 #include "act.h"
 #include "def.h"
+
+RELIG(none);
 
 /*-----------------------------------------------------------------
  * 'affect' command
@@ -244,6 +248,9 @@ struct PermanentAffects {
         print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
         print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
         print("Ты под воздействием", my_aff, affect_flags, '2');
+
+        if (ch->getProfession()->getFlags().isSet(PROF_DIVINE) && ch->getReligion() == god_none)
+            ch->pecho("У тебя {rштраф{x на все молитвы, пока ты не выберешь себе {hh1религию{x.");
 
         if (my_hgain <= -100)
             ch->pecho("Твоё здоровье не восстанавливается!");

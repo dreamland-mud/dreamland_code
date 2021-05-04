@@ -68,7 +68,6 @@ int skill_level(Skill &skill, Character *ch);
  */
 int skill_level_bonus(Skill &skill, Character *ch);
 
-
 // Skill help formatting colours.
 extern const char SKILL_HEADER_BG;
 extern const char SKILL_HEADER_FG;

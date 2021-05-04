@@ -936,12 +936,6 @@ NMI_GET( ReligionWrapper, minstat, "по каким параметрам огр�
     return Register((int)stats); 
 }
 
-NMI_INVOKE( ReligionWrapper, isAllowed, "(ch): доступна ли религия персонажу")
-{
-    Character *ch = args2character(args);
-    return getTarget()->isAllowed(ch);
-}
-
 NMI_INVOKE( ReligionWrapper, available, "(ch): НОВАЯ ЛОГИКА - доступна ли религия персонажу")
 {
     Character *ch = args2character(args);
