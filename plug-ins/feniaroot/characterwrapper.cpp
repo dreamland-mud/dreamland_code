@@ -1565,6 +1565,18 @@ NMI_INVOKE( CharacterWrapper, is_same_group, "(gch): вернет true если 
     return Register(is_same_group(target, gch));
 }
 
+NMI_GET(CharacterWrapper, groupHere, "список (List) всех согруппников в комнате")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (Character *rch = target->in_room->people; rch; rch = rch->next_in_room)
+        if (is_same_group(target, rch))
+            rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+    
+    return wrap(rc);
+}
+
 NMI_INVOKE( CharacterWrapper, clearBehavior, "(): сбросить поведение моба до обычного" )
 {
     checkTarget( );
