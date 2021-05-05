@@ -423,31 +423,6 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
     strcpy( carg, arg.c_str( ) );
     
-    if (target.isSet( TAR_IGNORE|TAR_CREATE_OBJ )) {
-        result->type = SpellTarget::NONE;
-        result->arg = arg.c_str( );
-        return result;
-    }
-
-    if (target.isSet( TAR_CREATE_MOB )) {
-        if (!arg.empty( )) {
-            if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
-                buf << "Кого именно ты хочешь призвать?" << endl;
-                result->error = TARGET_ERR_SUMMON_WHO; 
-                return result;
-            }
-
-            result->type = SpellTarget::CHAR;
-            result->victim = victim;
-        }
-        else {
-            result->type = SpellTarget::NONE;
-            result->arg = arg.c_str( );
-        }
-
-        return result;
-    }
-    
     if (target.isSet( TAR_ROOM|TAR_PEOPLE )) {
         if (arg.empty( )) {
             result->type = SpellTarget::ROOM;
@@ -578,13 +553,43 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     }
 
     SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
-    if (objresult)
+    if (objresult && objresult->obj)
         return objresult;
+
+    if (target.isSet( TAR_IGNORE|TAR_CREATE_OBJ )) {
+        result->type = SpellTarget::NONE;
+        result->arg = arg.c_str( );
+        return result;
+    }
+
+    if (target.isSet( TAR_CREATE_MOB )) {
+        if (!arg.empty( )) {
+            if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
+                buf.str("");
+                buf << "Кого именно ты хочешь призвать?" << endl;
+                result->error = TARGET_ERR_SUMMON_WHO; 
+                return result;
+            }
+
+            result->type = SpellTarget::CHAR;
+            result->victim = victim;
+        }
+        else {
+            result->type = SpellTarget::NONE;
+            result->arg = arg.c_str( );
+        }
+
+        return result;
+    }
     
     if (buf.str( ).empty( ))
         buf << "Произнести заклинание... на кого?" << endl;
 
     result->error = TARGET_ERR_CAST_ON_WHOM;
+
+    if (objresult && objresult->error)
+        result->error = objresult->error;
+
     return result;
 }
 
