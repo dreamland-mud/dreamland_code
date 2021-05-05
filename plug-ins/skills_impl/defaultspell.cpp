@@ -181,7 +181,7 @@ void DefaultSpell::utterPrayer(Character *ch)
         ch->recho("%^C1 неумело молится, прося богов о помощи.", ch); 
     } else {
         ch->pecho("Ты возносишь молитву %N3.", ch->getReligion()->getRussianName().c_str());
-        ch->recho("%^C1 возносит молитву %N3.", ch->getReligion()->getRussianName().c_str());
+        ch->recho("%^C1 возносит молитву %N3.", ch, ch->getReligion()->getRussianName().c_str());
     }
 }
 
