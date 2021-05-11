@@ -65,7 +65,7 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
             ch->pecho("Ты зачитываешь одно из заклинаний с %O2, но оно не находит, на что подействовать.", scroll);
             break;
         default:
-            ch->send_to(errBuf);
+            ch->pecho(errBuf.str());
             break;
         }
 
@@ -310,7 +310,7 @@ SKILL_RUNP( zap )
             ch->pecho("Взмахнуть жезлом на кого именно?");
             break;
         default:
-            ch->send_to(buf);
+            ch->pecho(buf.str());
             break;
         }
 

@@ -477,7 +477,7 @@ SKILL_RUNP( bearcall )
 
   target = gsn_bear_call->getSpell( )->locateTargets( ch, argument, errbuf );
   if (target->error) {
-      ch->send_to( errbuf );
+      ch->pecho( errbuf.str() );
       return;
   }
 
@@ -555,7 +555,7 @@ SKILL_RUNP( lioncall )
 
   target = gsn_lion_call->getSpell( )->locateTargets( ch, argument, errbuf );
   if (target->error) {
-        ch->send_to( errbuf );
+        ch->pecho( errbuf.str() );
         return;
   }
 

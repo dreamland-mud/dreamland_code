@@ -195,7 +195,10 @@ CMDRUN( cast )
 
     target = spell->locateTargets( ch, spellArgs, buf );
     if (target->error != 0) {
-        ch->send_to( buf );
+        ch->pecho( buf.str() );
+        if (ch->is_npc() && ch->master && !buf.str().empty())
+            say_fmt("Хозя%2$Gин|ин|йка, у меня ничего не получится: %3$s", ch, ch->master, buf.str().c_str());
+
         return;
     }
 
@@ -231,6 +234,9 @@ CMDRUN( cast )
         
     if (number_percent( ) > skill->getEffective( ch )) {
         ch->pecho("Ты не можешь сконцентрироваться.");
+        if (ch->is_npc() && ch->master)
+            ch->master->pecho("%^C1 теряет концентрацию.", ch);
+
         skill->improve( ch, false, victim );
         ch->mana -= mana / 2;
         ch->move -= moves / 2;

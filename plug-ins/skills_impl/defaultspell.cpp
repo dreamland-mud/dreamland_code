@@ -432,7 +432,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         
         if (target.isSet( TAR_CHAR_SELF )) {
             if (!is_self_name( arg, ch )) {
-                buf << "Ты не можешь использовать это заклинание на других." << endl;
+                buf << "Ты не можешь использовать это заклинание на других.";
                 result->error = TARGET_ERR_NOT_ON_OTHERS;
                 return result;
             }
@@ -450,7 +450,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
     if (target.isSet( TAR_CHAR_WORLD )) {
         if (arg.empty( )) {
-            buf << "Колдовать на кого?" << endl;
+            buf << "Колдовать на кого?";
             result->error = TARGET_ERR_CAST_ON_WHOM;
             return result;
         }
@@ -468,7 +468,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return objresult;
         
         buf.str( "" );
-        buf << "Ты не находишь никого с таким именем." << endl;
+        buf << "Ты не находишь никого с таким именем.";
         result->error = TARGET_ERR_CHAR_NOT_FOUND;
         return result;
     }
@@ -480,7 +480,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                 return objresult;
 
             buf.str( "" );
-            buf << "Ты не можешь использовать это заклинание на других." << endl;
+            buf << "Ты не можешь использовать это заклинание на других.";
             result->error = TARGET_ERR_NOT_ON_OTHERS;
             return result;
         }
@@ -516,7 +516,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                         && victim->in_room != ch->in_room )
                     {
                         buf << "Твое заклинание не действует на "
-                            << victim->getNameP( '4' ) << " на таком расстоянии." << endl;
+                            << victim->getNameP( '4' ) << " на таком расстоянии.";
                         result->error = TARGET_ERR_TOO_FAR;
                         return result;
                     }
@@ -547,7 +547,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return objresult;
             
         buf.str( "" );
-        buf << "Произнести заклинание... на кого?" << endl;
+        buf << "На кого именно ты хочешь произнести заклинание?";
         result->error = TARGET_ERR_CAST_ON_WHOM;
         return result;
     }
@@ -566,7 +566,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         if (!arg.empty( )) {
             if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
                 buf.str("");
-                buf << "Кого именно ты хочешь призвать?" << endl;
+                buf << "Кого именно ты хочешь призвать?";
                 result->error = TARGET_ERR_SUMMON_WHO; 
                 return result;
             }
@@ -583,7 +583,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     }
     
     if (buf.str( ).empty( ))
-        buf << "Произнести заклинание... на кого?" << endl;
+        buf << "На кого именно ты хочешь произнести заклинание?";
 
     result->error = TARGET_ERR_CAST_ON_WHOM;
 
@@ -610,7 +610,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         obj = NULL;
 
         if (arg.empty( )) {
-            buf << "Произнести заклинание на что?" << endl;
+            buf << "На какой предмет ты хочешь произнести заклинание?";
             result->error = TARGET_ERR_CAST_ON_WHAT;
             return result;
         }
@@ -633,11 +633,11 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         }
 
         if (target.isSet( TAR_OBJ_INV|TAR_OBJ_EQUIP ))
-            buf << "У тебя нет этого." << endl;
+            buf << "У тебя нет этого.";
         else if (target.isSet( TAR_OBJ_ROOM ))
-            buf << "Ты не видишь здесь такого предмета." << endl;
+            buf << "Ты не видишь здесь такого предмета.";
         else if (target.isSet( TAR_OBJ_WORLD ))
-            buf << "Ты не можешь обнаружить ничего с таким именем." << endl;
+            buf << "Ты не можешь обнаружить ничего с таким именем.";
 
         result->error = TARGET_ERR_OBJ_NOT_FOUND;
         return result;
