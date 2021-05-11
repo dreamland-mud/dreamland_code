@@ -130,8 +130,8 @@ struct VarArgFormatter : public MsgFormatter {
         va_copy(this->av, av);
         argcnt = 0;
         
-        if (to && !to->getPC())
-            return DLString::emptyString;
+//        if (to && !to->getPC())
+//            return DLString::emptyString;
 
         DLString s = run();
         va_end(av);
