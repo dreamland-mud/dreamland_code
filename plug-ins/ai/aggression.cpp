@@ -205,7 +205,7 @@ bool BasicMobileBehavior::aggressMemorized( )
         if (!memoryFought.memorized( rch ))
             continue;
     
-        if (!canAggress( rch ))
+        if (!canAggressLastFought( rch ))
             continue;
 
         if (number_range( 0, count++ ) == 0) 

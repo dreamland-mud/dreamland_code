@@ -918,18 +918,6 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
         Character *victim = (Character *) vo;
         Object *obj, *obj_next;
 
-        if (victim->fighting) { 
-            if (!saves_spell(level, victim, DAM_SOUND, 0, dam_flag )) {
-                victim->pecho("Дикий вопль заставляет тебя отвлечься от сражения!");
-                victim->recho("Дикий вопль заставляет %C4 отвлечься от сражения!", victim);                     
-                stop_fighting( victim , true );
-            }
-            else {
-                victim->pecho("Вопль на мгновение отвлекает тебя, но ты вновь бросаешься в битву.");
-                victim->recho("Вопль на мгновение отвлекает %1$C4 от сражения, но %1$P1 вновь бросается в битву.", victim); 
-            }
-        }
-         
         // saves against level*0.9 (worst) to level*0.25 (best)
         int dam_ratio, effect_level;
         dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
@@ -957,6 +945,12 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 victim->recho("%^C1 ошеломленно трясет головой.", victim);                
                 victim->setDaze( URANGE(8, dam_ratio, 20) );
             }
+
+            if (victim->fighting) { 
+                victim->pecho("Дикий вопль заставляет тебя отвлечься от сражения!");
+                victim->recho("Дикий вопль заставляет %C4 отвлечься от сражения!", victim);                     
+                stop_fighting( victim , true );
+            }         
         }
 
         /* getting thirsty */
