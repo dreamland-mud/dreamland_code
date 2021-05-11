@@ -540,6 +540,7 @@ SKILL_RUNP( lore )
 {
   char arg1[MAX_INPUT_LENGTH];
   Object *obj;
+  Skill *sk;
   ostringstream buf;
   int mana, learned;
   Keyhole::Pointer keyhole;
@@ -691,9 +692,9 @@ SKILL_RUNP( lore )
         buf << "Заклинания " << obj->value0() << " уровня:";
 
         for (int i = 1; i <= 4; i++) 
-            if (( skill = SkillManager::getThis( )->find( obj->valueByIndex(i) ) ))
-                if (skill->getIndex( ) != gsn_none)
-                    buf << " '" << skill->getNameFor( ch ) << "'";
+            if (( sk = SkillManager::getThis( )->find( obj->valueByIndex(i) ) ))
+                if (sk->getIndex( ) != gsn_none)
+                    buf << " '" << sk->getNameFor( ch ) << "'";
         
         buf << endl;
         break;
@@ -703,9 +704,9 @@ SKILL_RUNP( lore )
         buf << "Имеет " << obj->value2() << " заклинани" << GET_COUNT(obj->value2(), "е", "я", "й") << " " 
             << obj->value0() << " уровня:";
         
-        if (( skill = SkillManager::getThis( )->find( obj->value3() ) ))
-            if (skill->getIndex( ) != gsn_none)
-                buf << " '" << skill->getNameFor( ch ) << "'";
+        if (( sk = SkillManager::getThis( )->find( obj->value3() ) ))
+            if (sk->getIndex( ) != gsn_none)
+                buf << " '" << sk->getNameFor( ch ) << "'";
 
         buf << endl;
         break;
