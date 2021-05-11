@@ -47,6 +47,7 @@ using namespace std;
 DESIRE(thirst);
 DESIRE(hunger);
 DESIRE(full);
+CLAN(battlerager);
 
 /*----------------------------------------------------------------------
  * Area
@@ -1177,6 +1178,10 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
     if (skill->available(ch))
         return Register(false);
     
+    // Do nothing for spells and battlerager clan.
+    if (skill->getSpell() && skill->getSpell()->isCasted() && ch->getClan() == clan_battlerager)
+        return Register(false);
+
     // Create and save temporary skill data.
     PCSkillData &data = ch->getSkillData(skill->getIndex());
     data.origin = origin;
