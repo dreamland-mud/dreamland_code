@@ -2443,34 +2443,30 @@ NMI_INVOKE(CharacterWrapper, attribute, "(name): вернуть аттрибут
     return attr->toRegister();
 }
 
-NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long): установить аттрибут для рестринга результатов заклинаний")
+NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long,extra): установить аттрибут для рестринга результатов заклинаний")
 {
     checkTarget( );
     CHK_NPC
-    if (args.size( ) != 5)
-        throw Scripting::NotEnoughArgumentsException( );
 
-    RegisterList::const_iterator i = args.begin( );
-    DLString skillName = (i++)->toString();
-    DLString key = (i++)->toString();
-    DLString objName = (i++)->toString();
-    DLString objShort = (i++)->toString();
-    DLString objLong = (i)->toString();
+    Skill *skill = argnum2skill(args, 1);
+    DLString key = argnum2string(args, 2);
+    DLString objName = argnum2string(args, 3);
+    DLString objShort = argnum2string(args, 4);
+    DLString objLong = argnum2string(args, 5);
+    DLString objExtra = argnum2string(args, 6);
 
-    Skill *skill = skillManager->findExisting( skillName );
-    if (!skill)
-        throw Scripting::Exception( "Skill name not found" );
-
-    XMLAttributeRestring::Pointer attr = target->getPC( )->getAttributes( ).getAttr<XMLAttributeRestring>( skillName );
+    XMLAttributeRestring::Pointer attr = target->getPC( )->getAttributes( ).getAttr<XMLAttributeRestring>(skill->getName());
     XMLAttributeRestring::iterator r = attr->find( key );
     if (r != attr->end( )) {
         r->second.name = objName;
         r->second.shortDescr = objShort;
         r->second.longDescr = objLong;
+        r->second.description = objExtra;
     } else {
         (**attr)[key].name = objName;
         (**attr)[key].shortDescr = objShort;
         (**attr)[key].longDescr = objLong;
+        (**attr)[key].description = objExtra;
     }
 
     target->getPC( )->save( );
