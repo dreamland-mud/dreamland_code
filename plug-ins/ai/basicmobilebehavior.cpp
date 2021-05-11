@@ -219,7 +219,7 @@ bool BasicMobileBehavior::backHome( bool fAlways )
     Room *home;
     int myHomeVnum = homeVnum != 0 ? homeVnum.getValue() : ch->reset_room;
 
-    if (myHomeVnum == 0) {
+    if (myHomeVnum == 0 || IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL)) {
         if (fAlways) {
             oldact("$c1 ищет свой дом.", ch, 0, 0, TO_ROOM );
             extract_char( ch );
@@ -309,7 +309,7 @@ bool BasicMobileBehavior::isHomesick( )
 
     if (IS_ROOM_AFFECTED(ch->in_room, AFF_ROOM_CURSE))
         return false;
-    
+
     // Prevent cursed mobs from recalling, but ignore 'native' curse set in mob index data.
     if (ch->affected.findAllWithBits(&affect_flags, AFF_CURSE).size() > 0)
         return false;
