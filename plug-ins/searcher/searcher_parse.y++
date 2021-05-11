@@ -95,7 +95,6 @@ num_expr:
     |	T_AVE               { $$ = p.ave;   }
     |   T_D1                { $$ = p.d1; }
     |   T_D2                { $$ = p.d2; }
-    |   T_SLEVEL            { $$ = p.slevel; }
     |   T_ALIGN             { $$ = p.alignment; }
     |   T_GROUP             { $$ = p.group; }
     |   T_TIER              { $$ = p.tier; }
@@ -120,6 +119,7 @@ str_expr:
     |	T_WFLAGS            { $$ = p.wflags;}
     |	T_DAMAGE            { $$ = p.damage;}
     |   T_FENIA             { $$ = p.fenia;}
+    |   T_SLEVEL            { $$ = p.slevel; }
     |   T_LEARNED           { $$ = p.learned; }
     |   T_MATERIAL          { $$ = p.material; }
     |   T_FORM              { $$ = p.form; }

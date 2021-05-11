@@ -178,7 +178,7 @@ void SearcherParam::init()
     limit = -1;
     extra = wear = itemtype = "";
     age = 0;
-    slevel = 0;
+    slevel = "";
     learned = "";
     ed = false;
 
@@ -250,7 +250,10 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         case APPLY_BEATS:     p.beats+=m; break;
         case APPLY_SPELL_LEVEL:
         case APPLY_LEVEL: 
-            p.slevel+=m; 
+            if (!paf->global.empty())
+                p.slevel << paf->global.toString() << " ";
+            else
+                p.slevel << "all" << " ";
             break;
 
         case APPLY_LEARNED:

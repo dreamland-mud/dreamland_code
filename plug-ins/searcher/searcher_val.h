@@ -65,7 +65,8 @@ struct SearcherParam {
     DLString wear;
     DLString itemtype;
     int age;
-    int slevel;
+    // Which skills and groups it affects the level of.
+    DLString slevel;
     // Which skills and groups it improves the knowledge of.
     DLString learned;
     // Whether an item has extra descriptions.
