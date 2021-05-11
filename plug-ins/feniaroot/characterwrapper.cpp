@@ -47,6 +47,7 @@
 #include "commonattributes.h"
 #include "pet.h"
 #include "recipeflags.h"
+#include "act.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -1307,7 +1308,8 @@ NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строк�
     checkTarget();
 
     if (target->master) {
-        target->master->pecho( regfmt(target->master, args) );
+        DLString msg = fmt(0, "{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x\r\n  {W*{x ", target);
+        target->master->pecho( msg + regfmt(target->master, args) );
         return true;
     }
     
