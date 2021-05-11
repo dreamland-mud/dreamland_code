@@ -96,12 +96,12 @@ SKILL_RUNP( searchstones )
         return;
     }
 
-    if (ch->mana < gsn_search_stones->getMana( )) {
+    if (ch->mana < gsn_search_stones->getMana(ch)) {
         ch->pecho( "У тебя не хватает энергии для поиска." );
         return;
     }
 
-    ch->mana -= gsn_search_stones->getMana( );
+    ch->mana -= gsn_search_stones->getMana(ch);
     ch->setWait( gsn_search_stones->getBeats(ch) );
     
     mlevel = ch->getModifyLevel( );

@@ -181,7 +181,7 @@ SKILL_RUNP( claw )
         chance += skill_level_bonus(*gsn_claw, ch);
         // chance += (ch->level - victim->level) * 2;
 
-        if ( ch->mana < gsn_claw->getMana( ) )
+        if ( ch->mana < gsn_claw->getMana(ch) )
         {
                 ch->pecho("У тебя не хватает энергии.");
                 return;
@@ -190,7 +190,7 @@ SKILL_RUNP( claw )
         // now the attack
         if ( number_percent() < chance )
         {
-                ch->mana -= gsn_claw->getMana( );
+                ch->mana -= gsn_claw->getMana(ch);
 
                 gsn_claw->improve( ch, true, victim );
                 ch->setWait(gsn_claw->getBeats(ch));

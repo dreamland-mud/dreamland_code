@@ -778,7 +778,7 @@ bool HunterTrapObject::checkTrapConditions( Character *ch, Skill &skill )
         return false;
     }
     
-    if (ch->mana < skill.getMana( )) {
+    if (ch->mana < skill.getMana(ch)) {
         ch->pecho( "У тебя недостаточно энергии для этого." );
         return false;
     }
@@ -872,7 +872,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     
     if (!chance( gsn_hunter_beacon->getEffective( ch ) )) {
         oldact("Твоя попытка установить $o4 окончилась неудачей.", ch, obj, 0, TO_CHAR );
-        ch->mana -= gsn_hunter_beacon->getMana( ) / 2;
+        ch->mana -= gsn_hunter_beacon->getMana(ch) / 2;
         ch->setWait( gsn_hunter_beacon->getBeats(ch) / 2 );
         gsn_hunter_beacon->improve( ch, false );
 
@@ -903,7 +903,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     
     postaffect_to_char( ch, gsn_hunter_beacon, number_range( 0, 1 ) );
     ch->setWait( gsn_hunter_beacon->getBeats(ch) );
-    ch->mana -= gsn_hunter_beacon->getMana( );
+    ch->mana -= gsn_hunter_beacon->getMana(ch);
     gsn_hunter_beacon->improve( ch, true );
     
     log( ch, "устанавливает" );
@@ -1060,7 +1060,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
 
     postaffect_to_char( ch, gsn_hunter_snare, number_range( 1, 3 ) );
     ch->setWait( gsn_hunter_snare->getBeats(ch) );
-    ch->mana -= gsn_hunter_snare->getMana( );
+    ch->mana -= gsn_hunter_snare->getMana(ch);
     gsn_hunter_snare->improve( ch, true );
 
     log( ch, "маскирует" );
@@ -1248,7 +1248,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
     
     ch->setWait( gsn_hunter_pit->getBeats(ch) );
     ch->move -= moveCost;
-    ch->mana -= gsn_hunter_pit->getMana( );
+    ch->mana -= gsn_hunter_pit->getMana(ch);
     
     save_items( ch->in_room );
     return true;

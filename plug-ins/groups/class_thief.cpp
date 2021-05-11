@@ -1425,7 +1425,7 @@ SKILL_RUNP( forge )
         return;
     }
 
-    if (ch->mana < gsn_key_forgery->getMana( )) {
+    if (ch->mana < gsn_key_forgery->getMana(ch)) {
         ch->pecho( "У тебя не хватает сил для такой тонкой работы." );
         return;
     }
@@ -1455,7 +1455,7 @@ SKILL_RUNP( forge )
         }
 
         ch->setWait( gsn_key_forgery->getBeats(ch) );
-        ch->mana -= gsn_key_forgery->getMana( );
+        ch->mana -= gsn_key_forgery->getMana(ch);
 
 	int chance;
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
@@ -1508,7 +1508,7 @@ SKILL_RUNP( forge )
         }
 
         ch->setWait( gsn_key_forgery->getBeats(ch) );
-        ch->mana -= gsn_key_forgery->getMana( );
+        ch->mana -= gsn_key_forgery->getMana(ch);
 
 	int chance;
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 

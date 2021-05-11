@@ -192,7 +192,7 @@ SKILL_RUNP( trophy )
     Object *part;
     char arg[MAX_INPUT_LENGTH];
     short level;
-    int mana = gsn_trophy->getMana( );
+    int mana = gsn_trophy->getMana(ch);
 
     argument = one_argument( argument, arg );
 
@@ -503,7 +503,7 @@ SKILL_RUNP( spellbane )
 
 SKILL_RUNP( resistance )
 {
-        int mana = gsn_resistance->getMana( );
+        int mana = gsn_resistance->getMana(ch);
 
         if (!gsn_resistance->usable( ch ))
                 return;
@@ -551,7 +551,7 @@ SKILL_RUNP( resistance )
 
 SKILL_RUNP( truesight )
 {
-    int mana = gsn_truesight->getMana( );
+    int mana = gsn_truesight->getMana(ch);
 
   if (!gsn_truesight->available( ch ))
   {

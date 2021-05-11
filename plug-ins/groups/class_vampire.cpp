@@ -1222,7 +1222,7 @@ SKILL_RUNP( sense )
       return;
     }
 
-    mana = gsn_sense_life->getMana( );
+    mana = gsn_sense_life->getMana(ch);
     
   if (ch->mana < mana)
     {

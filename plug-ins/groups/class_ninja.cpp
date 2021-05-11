@@ -97,7 +97,7 @@ SKILL_RUNP( vanish )
             return;
     }
     
-    if (ch->mana < gsn_vanish->getMana( ))
+    if (ch->mana < gsn_vanish->getMana(ch))
     {
             ch->pecho("У тебя недостаточно энергии для этого.");
             return;
@@ -181,7 +181,7 @@ SKILL_RUNP( vanish )
     else
             ch->move -= move_dec( ch );
    
-    ch->mana -= gsn_vanish->getMana( );
+    ch->mana -= gsn_vanish->getMana(ch);
     ch->setWait( gsn_vanish->getBeats(ch)  );
     UNSET_DEATH_TIME(ch);
         
@@ -1555,13 +1555,13 @@ SKILL_RUNP( poison )
                 return;
         }
 
-        if ( ch->mana < gsn_poison_smoke->getMana( ) )
+        if ( ch->mana < gsn_poison_smoke->getMana(ch) )
         {
                 ch->pecho("У тебя не хватает энергии для этого.");
                 return;
         }
 
-        ch->mana -= gsn_poison_smoke->getMana( );
+        ch->mana -= gsn_poison_smoke->getMana(ch);
         ch->setWait( gsn_poison_smoke->getBeats(ch) );
         UNSET_DEATH_TIME(ch);
 
@@ -1611,13 +1611,13 @@ SKILL_RUNP( blindness )
                 return;
         }
 
-        if (ch->mana < gsn_blindness_dust->getMana( ))
+        if (ch->mana < gsn_blindness_dust->getMana(ch))
         {
                 ch->pecho("У тебя не хватает энергии для этого.");
                 return;
         }
 
-        ch->mana -= gsn_blindness_dust->getMana( );
+        ch->mana -= gsn_blindness_dust->getMana(ch);
         ch->setWait( gsn_blindness_dust->getBeats(ch) );
         UNSET_DEATH_TIME(ch);
 

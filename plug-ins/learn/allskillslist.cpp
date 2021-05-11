@@ -155,7 +155,7 @@ void AllSkillsList::make( Character *ch )
             info.adept = skill->getAdept( ch->getPC( ) );
         }
         
-        info.mana = skill->getMana( );
+        info.mana = skill->getMana(ch);
 
         if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
             info.help_id = skill->getSkillHelp()->getID();

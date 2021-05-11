@@ -301,7 +301,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
         return true;
     }
 
-    mana = gsn_pull_card->getMana( );
+    mana = gsn_pull_card->getMana(pch);
 
     hisAttr = victim->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
     myAttr = pch->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
@@ -420,7 +420,7 @@ bool CardBehavior::examine( Character *looker )
         return true;
     }
     
-    mana = gsn_peek_card->getMana( );
+    mana = gsn_peek_card->getMana(pch);
     
     if (pch->mana < mana) {
         pch->pecho("У тебя недостаточно энергии для этого.");

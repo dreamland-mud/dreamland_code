@@ -416,14 +416,14 @@ SKILL_RUNP( camp )
     return;
   }
 
-  if ( ch->mana < gsn_camp->getMana( ))
+  if ( ch->mana < gsn_camp->getMana(ch))
   {
      ch->pecho("У тебя не хватает энергии для разбивки лагеря.");
      return;
   }
 
   gsn_camp->improve( ch, true );
-  ch->mana -= gsn_camp->getMana( );
+  ch->mana -= gsn_camp->getMana(ch);
   ch->setWait( gsn_camp->getBeats(ch) );
 
   oldact("Ты разбиваешь полевой лагерь.", ch, 0, 0, TO_CHAR);
@@ -469,7 +469,7 @@ SKILL_RUNP( bearcall )
       return;
     }
 
-  if ( ch->mana < gsn_bear_call->getMana( ))
+  if ( ch->mana < gsn_bear_call->getMana(ch))
   {
      ch->pecho("У тебя не хватает сил, чтобы призвать на помощь медведей.");
      return;
@@ -490,7 +490,7 @@ SKILL_RUNP( bearcall )
     
   gsn_bear_call->getSpell( )->run( ch, target, min( 100, ch->getModifyLevel( ) - 2 ) );
 
-  ch->mana -= gsn_bear_call->getMana( );
+  ch->mana -= gsn_bear_call->getMana(ch);
   ch->setWait( gsn_bear_call->getBeats(ch) );
   gsn_bear_call->improve( ch, true );
 }
@@ -547,7 +547,7 @@ SKILL_RUNP( lioncall )
           return;
         }
 
-  if ( ch->mana < gsn_lion_call->getMana( ))
+  if ( ch->mana < gsn_lion_call->getMana(ch))
   {
        ch->pecho("У тебя не хватает энергии, чтобы позвать львов.");
        return;
@@ -568,7 +568,7 @@ SKILL_RUNP( lioncall )
     
   gsn_lion_call->getSpell( )->run( ch, target, min( 100, ch->getModifyLevel( ) - 2 ) );
 
-  ch->mana -= gsn_lion_call->getMana( );
+  ch->mana -= gsn_lion_call->getMana(ch);
   ch->setWait( gsn_lion_call->getBeats(ch) );
   gsn_lion_call->improve( ch, true );
 }
@@ -726,7 +726,7 @@ SKILL_RUNP( makearrow )
         return;
     }
 
-    mana = gsn_make_arrow->getMana( );
+    mana = gsn_make_arrow->getMana(ch);
     wait = gsn_make_arrow->getBeats(ch);
 
     argument = one_argument(argument, arg);
@@ -753,7 +753,7 @@ SKILL_RUNP( makearrow )
             return;
         }
 
-        mana += arrowSkill->getMana( );
+        mana += arrowSkill->getMana(ch);
         wait += arrowSkill->getBeats(ch);
     }
 
@@ -816,7 +816,7 @@ SKILL_RUNP(makebow)
         return;
     }
 
-    mana = gsn_make_bow->getMana();
+    mana = gsn_make_bow->getMana(ch);
     wait = gsn_make_bow->getBeats(ch);
 
     if (ch->mana < mana) {
@@ -981,7 +981,7 @@ SKILL_RUNP( tiger )
     return;
   }
 
-    mana = gsn_tiger_power->getMana( );
+    mana = gsn_tiger_power->getMana(ch);
     
     if (ch->mana < mana)
     {

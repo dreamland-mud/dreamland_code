@@ -87,7 +87,7 @@ SKILL_RUNP( enchant )
         return;
     }
     
-    mana = gsn_enchant_sword->getMana( );
+    mana = gsn_enchant_sword->getMana(ch);
     
    if (ch->mana < mana )
         {
@@ -155,7 +155,7 @@ SKILL_RUNP( explode )
         }
     }
 
-    mana= gsn_explode->getMana( );
+    mana= gsn_explode->getMana(ch);
 
     if (ch->mana < mana ) {
         ch->pecho("У тебя не хватает энергии для огня.");
@@ -405,7 +405,7 @@ SKILL_RUNP( katana )
                 return;
         }
         
-        mana = gsn_katana->getMana( );
+        mana = gsn_katana->getMana(ch);
 
         if ( ch->mana < mana )
         {

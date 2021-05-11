@@ -558,7 +558,7 @@ SKILL_RUNP( lore )
       return;
     }
 
-    mana = gsn_lore->getMana( );
+    mana = gsn_lore->getMana(ch);
     learned = gsn_lore->getEffective( ch ) + skill_level_bonus(*gsn_lore, ch);
     
   if (ch->mana < mana)

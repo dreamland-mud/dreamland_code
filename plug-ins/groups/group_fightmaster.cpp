@@ -909,7 +909,7 @@ SKILL_RUNP( concentrate )
         return;
     }
         
-    if (ch->mana < gsn_concentrate->getMana( ))
+    if (ch->mana < gsn_concentrate->getMana(ch))
     {
         ch->pecho("У тебя не хватает энергии для этого.");
         return;
@@ -934,7 +934,7 @@ SKILL_RUNP( concentrate )
 
     if (number_percent() < chance)
     {
-        ch->mana -= gsn_concentrate->getMana( );
+        ch->mana -= gsn_concentrate->getMana(ch);
         gsn_concentrate->getCommand()->apply(ch);
         gsn_concentrate->improve( ch, true );
     }
@@ -1112,7 +1112,7 @@ SKILL_RUNP( berserk )
                 return;
         }
         
-        mana = gsn_berserk->getMana( );
+        mana = gsn_berserk->getMana(ch);
         
         if ( ch->mana < mana )
         {
@@ -1392,7 +1392,7 @@ SKILL_RUNP( warcry )
       return;
     }
 
-  if (ch->mana < gsn_warcry->getMana( ))
+  if (ch->mana < gsn_warcry->getMana(ch))
     {
       ch->pecho("У тебя не хватает энергии для боевого клича.");
       return;
@@ -1416,7 +1416,7 @@ SKILL_RUNP( warcry )
         return;
     }
 
-    ch->mana -= gsn_warcry->getMana( );
+    ch->mana -= gsn_warcry->getMana(ch);
     
     int level = skill_level(*gsn_warcry, ch);
 
