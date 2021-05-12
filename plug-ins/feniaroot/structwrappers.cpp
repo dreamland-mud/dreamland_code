@@ -1218,13 +1218,17 @@ NMI_INVOKE(SkillWrapper, apply, "(ch,vict|obj|room|arg,level): выполнит�
 {
     Skill *skill = getTarget();
     Character *ch = argnum2character(args, 1);
-    SpellTarget::Pointer target = argnum2target(args, 2);
-    int level = argnum2number(args, 3);
 
-    if (skill->getSpell())
+    if (skill->getSpell()) {
+        SpellTarget::Pointer target = argnum2target(args, 2);
+        int level = argnum2number(args, 3);
         skill->getSpell()->apply(ch, target, level);
-    else
-        skill->getCommand()->apply(ch, target->victim, level);
+    }
+    else {
+        Character *victim = args.size() > 1 ? argnum2character(args, 2) : 0;
+        int level = args.size() > 2 ? argnum2number(args, 3) : 0;
+        skill->getCommand()->apply(ch, victim, level);
+    }
 
     return Register();
 }
