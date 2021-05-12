@@ -99,7 +99,7 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
     if (!spt)
         return;
 
-    if (FeniaSkillActionHelper::executeSpell(this, ch, spt, level))
+    if (FeniaSkillActionHelper::executeSpellRun(this, ch, spt, level))
         return;
         
     sn = skill->getIndex( );
@@ -117,6 +117,35 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
         break;
     case SpellTarget::ROOM:
         run( ch, spt->room, sn, level );
+        break;
+    default:
+        break;
+    }
+}
+
+void DefaultSpell::apply( Character *ch, SpellTargetPointer spt, int level )
+{
+    char arg[MAX_STRING_LENGTH];                                            
+    
+    if (!spt)
+        return;
+
+    if (FeniaSkillActionHelper::executeSpellApply(this, ch, spt, level))
+        return;
+        
+    switch (spt->type) {
+    case SpellTarget::NONE:
+        strcpy( arg, spt->arg );
+        apply( ch, arg, level );
+        break;
+    case SpellTarget::CHAR:
+        apply( ch, spt->victim, level );
+        break;
+    case SpellTarget::OBJECT:
+        apply( ch, spt->obj, level );
+        break;
+    case SpellTarget::ROOM:
+        apply( ch, spt->room, level );
         break;
     default:
         break;

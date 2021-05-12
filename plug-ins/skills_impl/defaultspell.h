@@ -46,9 +46,15 @@ public:
 
     virtual void run( Character *, SpellTargetPointer, int );             
     virtual void run( Character *, Character *, int, int ) { }
-    virtual void run( Character *, Object *, int, int ) { }
+    virtual void run( Character *, ::Object *, int, int ) { }
     virtual void run( Character *, char *, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
+
+    virtual void apply( Character *ch, SpellTargetPointer target, int level );
+    virtual void apply( Character *ch, Character *victim, int level) { }
+    virtual void apply( Character *ch, ::Object *obj, int level) { }
+    virtual void apply( Character *ch, char *arg, int level) { }
+    virtual void apply( Character *ch, Room *room, int level) { }
 
     virtual int getMaxRange( Character * ) const;                
     virtual bool spellbane( Character *, Character * ) const; 

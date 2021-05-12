@@ -361,6 +361,16 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
 
 SPELL_DECL(Garble);
+VOID_SPELL(Garble)::apply( Character *ch, Character *victim, int level ) 
+{
+    Affect af;
+
+    af.type      = gsn_garble;
+    af.level     = level;
+    af.duration  = 1;
+    affect_to_char( victim, &af );
+}
+
 VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
   if( ch == victim ) {
@@ -384,7 +394,7 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
     return;
   }
 
-    gsn_garble->getCommand()->apply(ch, victim, level);
+    apply(ch, victim, level);
 
   oldact_p("Ты поделил$gось|ся|ась частицей хаоса с языком $C2.",
           ch, 0, victim, TO_CHAR,POS_RESTING);
@@ -392,17 +402,6 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
 
 }
 
-SKILL_DECL(garble);
-SKILL_APPLY(garble)
-{
-    Affect af;
-
-    af.type      = gsn_garble;
-    af.level     = level;
-    af.duration  = 1;
-    affect_to_char( victim, &af );
-    return true;
-}
 
 
 

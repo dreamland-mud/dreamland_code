@@ -148,13 +148,25 @@ void FeniaSkillActionHelper::extractWrapper(SkillCommand *cmd)
     cmd->extractWrapper(false);
 }
 
-bool FeniaSkillActionHelper::executeSpell(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
+bool FeniaSkillActionHelper::executeSpellRun(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
     FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
     // Figure out applicable runXXX method and call it, if defined on the spell wrapper.
-    bool rc = executeMethod(spell, getMethodName(spellTarget), ctx);
+    bool rc = executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx);
 
     // Clean any references that may prevent garbage collector from destroying this context object.
+    if (ctx)
+        ctx->cleanup();
+
+    return rc;
+}
+
+bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level)
+{
+    FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
+    // Figure out applicable applyXXX method and call it, if defined on the spell wrapper.
+    bool rc = executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx);
+
     if (ctx)
         ctx->cleanup();
 
@@ -288,13 +300,13 @@ bool FeniaSkillActionHelper::spellHasTrigger(Spell *spell, const DLString &trigN
 
 
 
-DLString FeniaSkillActionHelper::getMethodName(SpellTarget::Pointer &spellTarget) 
+DLString FeniaSkillActionHelper::getMethodSuffix(SpellTarget::Pointer &spellTarget) 
 {
     switch (spellTarget->type) {
-    case SpellTarget::NONE:   return "runArg";
-    case SpellTarget::CHAR:   return "runVict";
-    case SpellTarget::OBJECT: return "runObj";
-    case SpellTarget::ROOM:   return "runRoom";
+    case SpellTarget::NONE:   return "Arg";
+    case SpellTarget::CHAR:   return "Vict";
+    case SpellTarget::OBJECT: return "Obj";
+    case SpellTarget::ROOM:   return "Room";
     default:                  return DLString::emptyString;
     }    
 }

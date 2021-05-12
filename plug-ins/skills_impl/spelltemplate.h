@@ -22,7 +22,8 @@ struct SpellTemplate<tn, DefaultSpell> : public DefaultSpell, public ClassSelfRe
     virtual void run( Character *, Object *, int, int ) { }
     virtual void run( Character *, char *, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
-    
+    virtual void apply( Character *ch, Character *victim, int level ) { }    
+
     virtual bool spellbane( Character *ch, Character *victim ) const { 
         return DefaultSpell::spellbane( ch, victim );
     }

@@ -37,6 +37,22 @@
 
 
 SPELL_DECL(GiantStrength);
+VOID_SPELL(GiantStrength)::apply( Character *ch, Character *victim, int level ) 
+{
+    Affect af;
+
+    af.type      = gsn_giant_strength;
+    af.level     = level;
+    af.duration  = (10 + level / 3);
+    af.location = APPLY_STR;
+    af.modifier  = max(2, level / 10);
+    affect_to_char( victim, &af );
+
+    victim->pecho("Ты становишься намного сильнее!");
+    victim->recho("%^C1 становится намного сильнее.", victim);
+}
+
+
 VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     if ( victim->isAffected(sn ) )
@@ -60,24 +76,7 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
         return;
     }
 
-    gsn_giant_strength->getCommand()->apply(ch, victim, level);
-}
-
-SKILL_DECL(giantstrength);
-SKILL_APPLY(giantstrength)
-{
-    Affect af;
-
-    af.type      = gsn_giant_strength;
-    af.level     = level;
-    af.duration  = (10 + level / 3);
-    af.location = APPLY_STR;
-    af.modifier  = max(2, level / 10);
-    affect_to_char( victim, &af );
-
-    victim->pecho("Ты становишься намного сильнее!");
-    victim->recho("%^C1 становится намного сильнее.", victim);
-    return true;
+    apply(ch, victim, level);
 }
 
 SPELL_DECL(Haste);
