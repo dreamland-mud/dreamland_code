@@ -144,12 +144,16 @@ NMI_INVOKE(FeniaSpellContext, savesSpell, "([damtype,damflags]): уменьши�
         return Register();
 
     DefaultSpell *mySpell = arg2spell(spell);
-    bitnumber_t damtype = args.empty() ? mySpell->damtype.getValue() : argnum2flag(args, 1, damage_table);
-    bitstring_t damflags = args.size() <= 1 ? mySpell->damflags : argnum2flag(args, 2, damage_flags);
-    
     Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
 
+    bitnumber_t damtype = args.empty() ? mySpell->damtype.getValue() : argnum2flag(args, 1, damage_table);
+    bitstring_t damflags = args.size() <= 1 ? mySpell->damflags : argnum2flag(args, 2, damage_flags);
+    if (mySpell->isPrayer(myCh))
+        damflags |= DAMF_PRAYER;
+    else
+        damflags |= DAMF_MAGIC;
+    
     if (saves_spell(level, myVict, damtype, myCh, damflags)) {
         dam /= 2;
         return Register(true);
