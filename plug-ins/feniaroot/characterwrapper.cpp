@@ -1110,8 +1110,9 @@ NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(liqname): вернет емк�
 
     list< ::Object *> drinks = ::get_objs_list_type(target, ITEM_DRINK_CON, target->carrying);
     for (list< ::Object *>::iterator o = drinks.begin(); o != drinks.end(); o++)
-        if (liquidManager->find((*o)->value2()) == liquid)
-            return wrap(*o);
+        if ((*o)->wear_loc == wear_none)
+            if (liquidManager->find((*o)->value2()) == liquid)
+                return wrap(*o);
 
     return Register();
 }
@@ -1123,8 +1124,9 @@ NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(flag): вернет рецеп
     bitstring_t flag = args2number(args);
     list< ::Object *> recipes = ::get_objs_list_type(target, ITEM_RECIPE, target->carrying);
     for (list< ::Object *>::iterator o = recipes.begin(); o != recipes.end(); o++)
-        if (IS_SET((*o)->value0(), flag))
-            return wrap(*o);
+        if ((*o)->wear_loc == wear_none)
+            if (IS_SET((*o)->value0(), flag))
+                return wrap(*o);
 
     return Register();
 }
