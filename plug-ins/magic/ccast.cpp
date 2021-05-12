@@ -47,6 +47,18 @@ static bool string_has_separator(const DLString &s)
     return false;
 }
 
+// Replace a string like ', "" (with nothing but spaces and separators in it) with an empty string.
+static DLString normalize_string(const DLString &s)
+{
+    for (DLString::size_type i = 0; i < s.size(); i++) {
+        char c = s.at(i);
+        if (!dl_is_arg_separator(c) && !dl_isspace(c))
+            return s;
+    }
+
+    return DLString::emptyString;
+}
+
 static Spell::Pointer spell_lookup(Character *ch, const DLString &fullArguments, DLString &spellName, DLString &spellArgs)
 {
     Spell::Pointer spell;
@@ -148,7 +160,8 @@ CMDRUN( cast )
     
     // Find the spell and potentially adjust spell arguments.
     spell = spell_lookup(ch, fullArguments, spellName, spellArgs);
-
+    spellArgs = normalize_string(spellArgs);
+    
     if (!spell) {
         if (ch->is_npc( ) && ch->master) 
             do_say(ch, "Да не умею я");
