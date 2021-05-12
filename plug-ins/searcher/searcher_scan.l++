@@ -104,6 +104,8 @@ L	    ([A-Za-z_]|{RL})
 "FENIA"     return T_FENIA;
 "LEARNED"   return T_LEARNED;
 "MATERIAL"  return T_MATERIAL;
+"DEFAULT_POS" return T_DEFAULT_POS;
+"START_POS" return T_START_POS;
 "FORM"      return T_FORM;
 "PARTS"     return T_PARTS;
 "ACT"       return T_ACT;
@@ -172,6 +174,7 @@ void SearcherParam::init()
     spec = "";
     alignment = 0;
     race = sex = number = "";
+    default_pos = start_pos = "";
 
     // Item fields.
     pObj = 0;
@@ -366,6 +369,8 @@ bool searcher_parse(struct mob_index_data *pMob, const char *args)
     p.material = pMob->material;
     p.fenia = fenia_triggers(pMob->wrapper);
     p.damage = weapon_flags.name(pMob->dam_type);
+    p.default_pos = position_table.name(pMob->default_pos);
+    p.start_pos = position_table.name(pMob->start_pos);
 
     p.pMob = pMob;
     p.form = form_flags.names(pMob->form);

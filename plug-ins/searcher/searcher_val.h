@@ -54,6 +54,8 @@ struct SearcherParam {
     DLString spec;
     int alignment;
     DLString race, sex, number;
+    // Default and starting position names.
+    DLString default_pos, start_pos;
     
     /*
      * Fields specific to items.    

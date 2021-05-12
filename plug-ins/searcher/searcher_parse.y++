@@ -35,7 +35,7 @@ bool match( const DLString &str, const DLString &pattern )
 %token T_LEQ T_GEQ T_NEQ 
 %token T_HR T_DR T_HP T_MANA T_MOVE T_SAVES T_ARMOR T_STR T_INT T_WIS T_DEX T_CON T_CHA T_SIZE T_AGE
 %token T_AFF T_RES T_IMM T_VULN T_DET T_LIMIT T_HGAIN T_MGAIN T_SLEVEL T_BEATS
-%token T_WCLASS T_WFLAGS T_D1 T_D2 T_AVE T_DAMAGE T_FENIA T_LEARNED T_MATERIAL
+%token T_WCLASS T_WFLAGS T_D1 T_D2 T_AVE T_DAMAGE T_FENIA T_LEARNED T_MATERIAL T_DEFAULT_POS T_START_POS
 %token T_FORM T_PARTS T_ACT T_OFF T_GROUP T_SPEC T_ALIGN T_RACE T_SEX T_NUMBER
 %token T_RANDOM T_TIER T_SPELLS T_CHARGES T_POWER
 
@@ -122,6 +122,8 @@ str_expr:
     |   T_SLEVEL            { $$ = p.slevel; }
     |   T_LEARNED           { $$ = p.learned; }
     |   T_MATERIAL          { $$ = p.material; }
+    |   T_DEFAULT_POS       { $$ = p.default_pos; }
+    |   T_START_POS         { $$ = p.start_pos; }
     |   T_FORM              { $$ = p.form; }
     |   T_PARTS             { $$ = p.parts; }
     |   T_ACT               { $$ = p.act; }
