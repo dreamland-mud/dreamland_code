@@ -20,6 +20,7 @@ aclocal.m4
 /lib
 /share
 /var
+/.vscode
 /core.*
 /*.f++
 /db_*.csv

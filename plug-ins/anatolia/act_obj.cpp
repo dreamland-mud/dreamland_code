@@ -426,9 +426,7 @@ static bool can_get_obj( Character *ch, Object *obj )
 static bool get_obj( Character *ch, Object *obj )
 {
     oldact("Ты берешь $o4.", ch, obj, 0, TO_CHAR);
-
-    if (!IS_AFFECTED(ch,AFF_SNEAK))
-        oldact("$c1 берет $o4.", ch, obj, 0, TO_ROOM);
+    oldact("$c1 берет $o4.", ch, obj, 0, TO_ROOM);
             
     obj_from_room( obj );
     obj_to_char( obj, ch );
@@ -480,9 +478,7 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
     }
 
     oldact( toChar.str( ).c_str( ), ch, obj, container, TO_CHAR );
-
-    if (!IS_AFFECTED(ch, AFF_SNEAK))
-        oldact( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
+    oldact( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
 
     obj_from_obj( obj );
     obj_to_char( obj, ch );
@@ -1169,10 +1165,8 @@ static int drop_obj( Character *ch, Object *obj )
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
 
-    if (!IS_AFFECTED(ch, AFF_SNEAK))
-        oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
-
-    oldact("Ты бросаешь $o4.", ch, obj, 0, TO_CHAR );
+    ch->pecho( "Ты бросаешь %1$O4.", obj );
+    oldact("$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
 
     if (oprog_drop( obj, ch ))
         return DROP_OBJ_EXTRACT;
@@ -1181,16 +1175,12 @@ static int drop_obj( Character *ch, Object *obj )
         && !obj->may_float( ) 
         && material_swims( obj ) == SWIM_NEVER)
     {
-        if (!IS_AFFECTED(ch, AFF_SNEAK))
-            ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
-
+        ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
         ch->pecho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
     }
     else if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
-        if (!IS_AFFECTED(ch, AFF_SNEAK))
-            ch->recho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
-
+        ch->recho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
         ch->pecho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
     }
     else if (!RoomUtils::isWater( ch->in_room ) 
@@ -1201,9 +1191,7 @@ static int drop_obj( Character *ch, Object *obj )
 //             && material_is_flagged( obj, MAT_FRAGILE )
              && chance( 40 ))
     {
-        if (!IS_AFFECTED(ch, AFF_SNEAK))
-            ch->recho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
-        
+        ch->recho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
         ch->pecho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
     }
     else
@@ -1246,27 +1234,24 @@ CMDRUNP( drop )
         if ( RoomUtils::isWater( ch->in_room ) )
         {
             extract_obj( obj );
-            if ( !IS_AFFECTED(ch, AFF_SNEAK) )
-                oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ), 0, TO_ROOM);
-
+            oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ), 0, TO_ROOM);
             oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ), 0, TO_CHAR);
         }
         else
         {
             obj_to_room( obj, ch->in_room );
 
-            if ( !IS_AFFECTED(ch, AFF_SNEAK) )
+            if (obj->value0() == 1 || obj->value1() == 1)
             {
-                if (obj->value0() == 1 || obj->value1() == 1)
-                 oldact("$c1 бросает монетку.", ch, 0, 0, TO_ROOM);
-                else
-                 oldact("$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM);
+                oldact("$c1 бросает монетку.", ch, 0, 0, TO_ROOM);
+                ch->pecho( "Ты бросаешь монетку." );
+            }
+            else
+            {
+                oldact("$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM);
+                ch->pecho( "Ты бросаешь несколько монет." );
             }
          
-            if (obj->value0() == 1 || obj->value1() == 1)
-             ch->pecho( "Ты бросаешь монетку." );
-            else
-             ch->pecho( "Ты бросаешь несколько монет." );
         }
 
         return;
