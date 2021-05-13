@@ -174,7 +174,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         return;
     }
     
-    isCat = (ch->getRace( ) == race_felar || ch->getRace( ) == race_cat || IS_SET( ch->form, FORM_FELINE ));
+    isCat = (IS_SET( ch->form, FORM_FELINE ));
     isRodent = (mob->getRace( ) == race_mouse || mob->getRace( ) == race_rat || mob->getRace( ) == race_rodent);
     isFish = (mob->getRace( ) == race_fish);
     
@@ -191,8 +191,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     }
     else {
         if (!isRodent && !isFish) {
-            oldact("$c1, похоже, приня$gло|л|ла $C4 за маааленькую мышку.", ch, 0, mob, TO_ROOM);
-            oldact("Это не мышка! Даже и не думай за $Y гоняться.", ch, 0, mob, TO_CHAR);
+            oldact("$c1, похоже, приня$gло|л|ла $C4 за маааленького грызунчика.", ch, 0, mob, TO_ROOM);
+            oldact("Это не грызун! Даже и не думай за $Y гоняться.", ch, 0, mob, TO_CHAR);
             return;
         }
     }
