@@ -344,11 +344,19 @@ CMDRUNP( affects )
         PCharacter *pch = ch->getPC();
         bool rus = IS_SET(flags, FSHOW_RUSSIAN);
         const DLString joiner = " {yна{m ";
-        StringList learnedSkills = pch->mod_skills.toStringList(rus, joiner);
+        StringList learnedSkills;
         StringList learnedGroups = pch->mod_skill_groups.toStringList(rus, joiner);
         StringList levelSkills = pch->mod_level_skills.toStringList(rus, joiner);
         StringList levelGroups = pch->mod_level_groups.toStringList(rus, joiner);
 
+        for ( int sn = 0; sn < skillManager->size( ); sn++) {
+            Skill *skill = skillManager->find(sn);
+            if (skill->available(pch) && pch->mod_skills[sn] != 0) {
+                DLString line = rus ? skill->getRussianName() : skill->getName();
+                line << joiner << pch->mod_skills[sn];
+                learnedSkills.push_back( line );
+            }
+        }
         if (!learnedSkills.empty())
             buf << "{yИзменено владение умениями: " << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!learnedGroups.empty())
