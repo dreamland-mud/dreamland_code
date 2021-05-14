@@ -258,7 +258,7 @@ bool ExitsMovement::checkExitFlags( Character *wch )
         
         if (total_size > peexit->max_size_pass) {
             msgSelfParty( wch, 
-                        "Чтобы это сделать, надо быть чуууточку поменьше размером.",
+                        "Чтобы это сделать, надо быть чуточку поменьше размером.",
                         "Вам с %2$C5 стоит быть чуточку поменьше размером." );
             return false;
         }
@@ -270,22 +270,22 @@ bool ExitsMovement::checkExitFlags( Character *wch )
 
     if (IS_SET(exit_info, EX_NOFLY) && flying) {
         msgSelfParty( wch, 
-                      "Ты не сможешь здесь пролететь.",
-                      "%2$^C1 не может здесь пролететь." );
+                      "Ты не сможешь туда пролететь.",
+                      "%2$^C1 не может туда пролететь." );
         return false;
     }
 
     if (IS_SET(exit_info, EX_NOWALK) && !flying) {
         msgSelfParty( wch, 
-                      "Ты не сможешь здесь пройти.",
-                      "%2$^C1 не сможет здесь пройти." );
+                      "Ты не сможешь туда пройти.",
+                      "%2$^C1 не сможет туда пройти." );
         return false;
     }
 
     if (IS_SET(exit_info, EX_SWIM_ONLY) && !IS_SET(boat_types, BOAT_SWIM)) {
         msgSelfParty( wch, 
-                      "Здесь ты можешь только проплыть.",
-                      "%2$^C1 сможет здесь только проплыть." );
+                      "Чтобы попасть {hh2128под воду{x, нужны жабры или акваланг.",
+                      "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x." );
         return false;
     }
 
@@ -328,7 +328,7 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     rc = RC_MOVE_PASS_FAILED;
     wch->setWait( 4 );
     msgSelfRoom( wch,
-                 "Твоя попытка просочиться сквозь %4$N4 закончилась неудачей.", 
+                 "Твоя попытка просочиться сквозь %4$N4 не удалась, попробуй еще раз.", 
                  "%2$^C1 стукается лбом о %4$N4." );
     return false;
 }
