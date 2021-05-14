@@ -225,7 +225,7 @@ bool Walkment::checkPositionHorse( )
 
     if (horse->position <= POS_RESTING) {
         msgSelfParty( horse,
-                      "Исходное положение для ходьбы - стоя!",
+                      "Исходное положение для передвижения -- стоя!",
                       "%2$^C1 долж%2$Gно|ен|на сначала встать." );
         return false;
     }
@@ -255,7 +255,7 @@ bool Walkment::checkPositionWalkman( )
     
     if (ch->position < POS_STANDING) {
         rc = RC_MOVE_RESTING;
-        msgSelf( ch, "Исходное положение для ходьбы - стоя!" );
+        msgSelf( ch, "Исходное положение для ходьбы -- стоя!" );
         return false;
     }
 
@@ -322,7 +322,7 @@ bool Walkment::checkTrap( Character *wch )
 {
     if (wch->death_ground_delay > 0 && wch->trap.isSet( TF_NO_MOVE )) {
         msgSelfParty( wch, 
-                     "Ты не можешь покинуть это место - без посторонней помощи!",
+                     "Ты не можешь покинуть это место без посторонней помощи!",
                      "%2$^C1 не может покинуть это место без посторонней помощи!" );
         return false;
     }
@@ -435,8 +435,8 @@ bool Walkment::checkWater( Character *wch )
          to_room->getSectorType() == SECT_UNDERWATER) {
             if (!IS_SET(boat_types, BOAT_SWIM)) {
                msgSelfParty( wch, 
-                  "Здесь ты можешь только проплыть.",
-                  "%2$^C1 сможет здесь только проплыть." );
+                      "Чтобы попасть {hh2128под воду{x, нужны жабры или акваланг.",
+                      "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x." );
                 rc = RC_MOVE_WATER; // TODO: add RC_MOVE_UNDERWATER
                 return false;                     
             }
