@@ -20,6 +20,9 @@ PROF(ranger);
 
 int  MobileProfession::getThac32( Character *ch ) const
 {
+    if (!ch)
+        return DefaultProfession::getThac32( ch );
+
     checkTarget( ch );
 
     if (IS_SET(ch->act, ACT_WARRIOR))
@@ -37,6 +40,10 @@ int  MobileProfession::getThac32( Character *ch ) const
 Flags MobileProfession::getFlags( Character *ch ) const
 {
     Flags flags( 0, &prof_flags );
+    
+    if (!ch)
+        return flags;
+
     checkTarget( ch );
     
     if (IS_SET(ch->act, ACT_CLERIC))
@@ -54,6 +61,9 @@ int MobileProfession::getStat( bitnumber_t s, Character *ch ) const
 {
     EnumerationArray bonuses( &stat_table );
     
+    if (!ch)
+        return 0;
+
     checkTarget( ch );
 
     if (IS_SET(ch->act,ACT_WARRIOR)) {
@@ -90,10 +100,13 @@ bool MobileProfession::isPlayed( ) const
 
 GlobalBitvector MobileProfession::toVector( CharacterMemoryInterface *mem ) const
 {
-    checkTarget( mem );
-    
     GlobalBitvector bv = DefaultProfession::toVector( mem );
 
+    if (!mem)
+        return bv;
+
+    checkTarget( mem );
+    
     if (mem->getMobile()) {
         NPCharacter *ch = mem->getMobile();
         
