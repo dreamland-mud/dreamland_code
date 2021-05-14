@@ -80,7 +80,7 @@ void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pc
     if (dreamland->isShutdown( ))
         return;
     
-    buf << BOLD << "[" << NORMAL << "Global Quest" << BOLD << ": " 
+    buf << BOLD << "[" << NORMAL << "{leGlobal Quest{lrГлобал{lx" << BOLD << ": " 
         << NORMAL << name << BOLD << "] "
         << NORMAL << msg << "{x" << endl;
     
@@ -100,7 +100,7 @@ void GQChannel::gecho( const DLString& msg )
     if (dreamland->isShutdown( ))
         return;
     
-    buf << BOLD << "[" << NORMAL << "Global Quest" << BOLD << "] " 
+    buf << BOLD << "[" << NORMAL << "{leGlobal Quest{lrГлобал{lx" << BOLD << "] " 
         << NORMAL << msg << "{x" << endl;
     
     for ( d = descriptor_list; d; d = d->next ) 
