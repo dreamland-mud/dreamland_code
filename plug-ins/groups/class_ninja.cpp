@@ -500,7 +500,7 @@ SKILL_RUNP( nerve )
                 gsn_nerve->getCommand()->apply(ch, victim);
                 oldact("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR);
                 oldact("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT);
-                oldact("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT);
+                oldact("$c1 ослабляет $C4.",ch,0,victim,TO_NOTVICT);
                 gsn_nerve->improve( ch, true, victim );
         }
         else
