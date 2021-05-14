@@ -377,6 +377,30 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     feniaTriggers->showAvailableTriggers(ch, "room");
 }
 
+REDIT(behavior, "поведение", "редактирование поведения (behavior)")
+{
+    RoomIndexData *pRoom;
+    EDIT_ROOM(ch, pRoom);
+
+    if (argument[0] == '\0') {
+        if(!xmledit(pRoom->behavior))
+            return false;
+
+        stc("Behavior set.\r\n", ch);
+        return true;
+    }
+
+    if (!str_cmp( argument, "clear" )) {        
+        pRoom->behavior.clear( );
+        stc("Поведение очищено.\r\n", ch);
+        return true;
+    }
+
+    stc("Syntax:  behavior       - line edit\n\r", ch);
+    stc("Syntax:  behavior clear\n\r", ch);
+    return false;
+}
+
 REDIT(show, "показать", "показать все поля")
 {
     RoomIndexData *pRoom;
