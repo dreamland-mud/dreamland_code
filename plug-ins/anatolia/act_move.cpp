@@ -159,7 +159,7 @@ static void scan_people( Room *room, Character *ch, int depth, int door,
         buf << "    {" << CLR_SCAN_MOB(ch) << ch->sees( orig, '1' ) << ".{x";
 
         if (IS_SET( orig->comm, COMM_AFK ))
-            buf << " {w[{CAFK{w]{x";
+            buf << " {w[{C{leAFK{lrАФК{x{w]{x";
 
         buf << endl; 
     }
@@ -223,7 +223,7 @@ CMDRUNP( scan )
     }
 
     if (ch->position == POS_SLEEPING) {
-        ch->pecho( "Ты спишь! И можешь видеть только сны!" );
+        ch->pecho( "Ты спишь и можешь видеть только сны." );
         return;
     }
 
@@ -328,7 +328,7 @@ CMDRUNP( stand )
         {
                 if (ch->position == POS_FIGHTING)
                 {
-                        ch->pecho( "Может сначала закончишь сражаться?" );
+                        ch->pecho( "Во время сражения есть дела поважнее." );
                         return;
                 }
 
@@ -394,7 +394,7 @@ CMDRUNP( stand )
 
                 if (IS_HARA_KIRI(ch))
                 {
-                        ch->pecho( "Ты чувствуешь как кровь согревает твое тело." );
+                        ch->pecho( "Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает. );
                         REMOVE_BIT(ch->act,PLR_HARA_KIRI);
                 }
 
@@ -451,7 +451,7 @@ CMDRUNP( rest )
 
         if (ch->position == POS_FIGHTING)
         {
-                ch->pecho( "Но ты же сражаешься!" );
+                ch->pecho( "Во время сражения есть дела поважнее." );
                 return;
         }
 
@@ -566,7 +566,7 @@ CMDRUNP( rest )
                     }
                     else if (IS_SET(obj->value2(),REST_ON))
                     {
-                            oldact("Ты садишься на $o4 и отдыхаешь..",ch,obj,0,TO_CHAR);
+                            oldact("Ты садишься на $o4 и отдыхаешь.",ch,obj,0,TO_CHAR);
                             oldact("$c1 садится на $o4 и отдыхает.",ch,obj,0,TO_ROOM);
                     }
                     else
@@ -605,7 +605,7 @@ CMDRUNP( rest )
 
                 if (IS_HARA_KIRI(ch))
                 {
-                        ch->pecho( "Ты чувствуешь, как кровь согревает твое тело." );
+                        ch->pecho( "Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает." );
                         REMOVE_BIT(ch->act,PLR_HARA_KIRI);
                 }
 
@@ -622,7 +622,7 @@ CMDRUNP( sit )
 
         if (ch->position == POS_FIGHTING)
         {
-                ch->pecho( "Может сначала закончишь сражаться?" );
+                ch->pecho( "Во время сражения есть дела поважнее." );
                 return;
         }
 
@@ -778,7 +778,7 @@ CMDRUNP( sit )
 
         if (IS_HARA_KIRI(ch))
         {
-                ch->pecho( "Ты чувствуешь, как кровь согревает твое тело." );
+                ch->pecho( "Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает." );
                 REMOVE_BIT(ch->act,PLR_HARA_KIRI);
         }
         return;
@@ -939,7 +939,7 @@ CMDRUNP( wake )
     }
 
     if (ch == victim) { 
-        ch->pecho( "Ты не можешь разбудить сам себя!" ); 
+        ch->pecho( "Ты не можешь разбудить сам{Sfа{Sx себя!" ); 
         return; 
     }
 
@@ -949,7 +949,7 @@ CMDRUNP( wake )
     }
 
     if (IS_AFFECTED(victim, AFF_SLEEP)) { 
-        oldact("Ты не можешь разбудить $S!", ch, 0, victim, TO_CHAR);  
+        oldact("Ты не можешь разбудить $S от нездорового сна!", ch, 0, victim, TO_CHAR);  
         return; 
     }
 
@@ -989,7 +989,7 @@ CMDRUNP( fly )
     if (!str_cmp(arg,"up") || !str_cmp(arg,"вверх"))
     {
         if (!can_fly( ch )) {
-            ch->pecho( "Для того, чтобы летать, найди крылья или зелье." );
+            ch->pecho( "Чтобы взлететь, найди крылья или зелье." );
             return;
         }
 
@@ -1015,7 +1015,7 @@ CMDRUNP( fly )
     }
     else
     {
-        ch->pecho( "Используй {lEfly с 'up' или 'down'{lR'взлететь' или 'нелетать'{lx." );
+        ch->pecho( "Напиши {y{hc{lefly up{lrвзлететь{x или {y{hc{lefly down{lrнелетать{x." );
         return;
     }
 
