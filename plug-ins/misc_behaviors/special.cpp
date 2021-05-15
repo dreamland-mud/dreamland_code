@@ -101,7 +101,6 @@ bool spec_troll_member( NPCharacter *ch)
 {
     Character *vch, *victim = 0;
     int count = 0;
-    const char *message;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
     ||  IS_CHARMED(ch) || ch->fighting != 0)
@@ -157,7 +156,6 @@ bool spec_ogre_member( NPCharacter *ch)
 {
     Character *vch, *victim = 0;
     int count = 0;
-    const char *message;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
     ||  IS_CHARMED(ch) || ch->fighting != 0)
@@ -213,7 +211,6 @@ bool spec_patrolman(NPCharacter *ch)
 {
     Character *vch,*victim = 0;
     Object *obj;
-    const char *message;
     int count = 0;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
@@ -355,18 +352,18 @@ bool spec_breath_lightning( NPCharacter *ch )
 bool spec_breath_any( NPCharacter *ch )
 {
     if ( ch->position != POS_FIGHTING )
+		return false;
+	
+    if ( number_percent() < 50 )
         return false;
-
+  
     switch (number_range(0,6))
     {
-    case 0: return spec_breath_fire( ch );
-    case 1: return spec_breath_frost( ch );
-    case 2: return spec_breath_lightning( ch );
-    case 3: return spec_breath_gas( ch );
-    case 4: return spec_breath_acid( ch );
-    case 5:
-    case 6:
-    
+    	case 0: return spec_breath_fire( ch );
+    	case 1: return spec_breath_frost( ch );
+    	case 2: return spec_breath_lightning( ch );
+    	case 3: return spec_breath_gas( ch );
+    	case 4: return spec_breath_acid( ch );
     }
 
     return false;
