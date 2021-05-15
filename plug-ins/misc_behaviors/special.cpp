@@ -131,7 +131,7 @@ bool spec_troll_member( NPCharacter *ch)
     /* say something, then raise hell */
     switch (number_range(0,6))
     {
-        default:  message = 0;         break;
+        default: break;
         case 0: do_yell( ch, "Я найду тебя, шпана!");
                 break;
         case 1: oldact("Яростно вскрикнув, $c1 бросается на $C4.",ch,0,victim,TO_ALL);
@@ -186,7 +186,7 @@ bool spec_ogre_member( NPCharacter *ch)
     /* say something, then raise hell */
     switch (number_range(0,6))
     {
-        default:  message = 0;         break;
+        default: break;
         case 0: do_yell( ch, "Я найду тебя, шпана!");
                 break;
         case 1: oldact("Яростно вскрикнув, $c1 бросается на $C4.",ch,0,victim,TO_ALL);
@@ -257,7 +257,7 @@ bool spec_patrolman(NPCharacter *ch)
 
     switch (number_range(0,6))
     {
-        default:  message = 0;         break;
+        default: break;
         case 0: do_yell( ch, "А ну, прекр-р-р-ратить скопление!");
                 break;
         case 1: do_say( ch, "Виновато, конечно, общество, но что уж тут поделаешь?");
