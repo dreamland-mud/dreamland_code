@@ -859,12 +859,13 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                 continue;
 
             DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
+            bool isSpell = spell && spell->isCasted();
 
             if (all
-                || (active && !s->isPassive())
+                || (active && !s->isPassive() && !isSpell)
                 || (passive && s->isPassive())
-                || (magic && spell && spell->flags.isSet(SPELL_MAGIC))
-                || (prayer && spell && spell->flags.isSet(SPELL_PRAYER))
+                || (magic && isSpell && spell->flags.isSet(SPELL_MAGIC))
+                || (prayer && isSpell && spell->flags.isSet(SPELL_PRAYER))
                 || (group && skill->hasGroup(group->getIndex())))
             {
                 skills.push_back(s);
