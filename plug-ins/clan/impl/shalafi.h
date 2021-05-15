@@ -40,6 +40,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<ShalafiClan> Pointer;
 
+    virtual bool canInduct( PCharacter * ) const;
     virtual void onInduct(PCharacter *) const;
 
     XML_VARIABLE XMLMapBase<ShalafiFaculty> faculties;

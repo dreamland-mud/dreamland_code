@@ -25,6 +25,7 @@
 #include "object.h"
 #include "room.h"
 #include "affect.h"
+#include "religion.h"
 
 #include "damage.h"
 #include "fight.h"
@@ -41,6 +42,10 @@
 #include "def.h"
 
 GSN(dispel_affects);
+RELIG(alala);
+RELIG(ares);
+RELIG(turlok);
+RELIG(goktengri);
 
 #define OBJ_VNUM_POTION_SILVER        43
 #define OBJ_VNUM_POTION_GOLDEN        44
@@ -266,6 +271,25 @@ void ShalafiDemon::conjure( )
         do_say(ch, "Кто рискнул нарушить мой покой?!!!");
 
     interpret_raw( ch, "murder", mch->getNameP( ) );
+}
+
+bool ShalafiClan::canInduct(PCharacter *ch) const
+{
+    if (!DefaultClan::canInduct(ch))
+        return false;
+
+    // TODO these checks can be changed to "ch.religion.path != 'rage'", 
+    // once a Path becomes a separate concept in the code.
+    if (ch->getReligion() == god_alala 
+        || ch->getReligion() == god_ares
+        || ch->getReligion() == god_turlok
+        || ch->getReligion() == god_goktengri)
+        return false;
+
+    if (ch->getCurrStat(STAT_INT) <= 23)
+        return false;
+        
+    return true;
 }
 
 void ShalafiClan::onInduct(PCharacter *ch) const
