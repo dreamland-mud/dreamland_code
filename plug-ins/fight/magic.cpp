@@ -465,7 +465,7 @@ bool overcharmed( Character *ch )
     int max_charm;
 
     max_charm  = ch->getCurrStat( STAT_INT ) / 4 + ch->getRealLevel( ) / 30;
-    max_charm -= 28 - min( 28, ch->getCurrStat( STAT_CHA ) );
+    max_charm -= 25 - min( 25, ch->getCurrStat( STAT_CHA ) );
 
     if (max_charm <= 0) {
         ch->pecho("Твоего обаяния, интеллекта и опыта недостаточно, чтобы контролировать кого-либо.");
