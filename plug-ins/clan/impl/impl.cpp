@@ -21,7 +21,6 @@
 #include "affecthandlertemplate.h"
 #include "dlscheduler.h"
 
-#include "defaultclan.h"
 #include "battlerager.h"
 #include "shalafi.h"
 #include "chaos.h"
@@ -141,6 +140,7 @@ extern "C"
         /*
          * shalafi
          */
+        Plugin::registerPlugin<MocRegistrator<ShalafiClan> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardShalafi> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ShalafiDemon> >( ppl );
         

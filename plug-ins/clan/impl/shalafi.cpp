@@ -268,6 +268,20 @@ void ShalafiDemon::conjure( )
     interpret_raw( ch, "murder", mch->getNameP( ) );
 }
 
+void ShalafiClan::onInduct(PCharacter *ch) const
+{
+    const DLString &prof = ch->getProfession()->getName();
+
+    for (auto &f: faculties) 
+        if (f.second.classes.toSet().count(prof) > 0) {
+            ClanOrgs::setAttr(ch, f.first);
+            ch->pecho("Ты поступаешь на {b%N4{x.", f.second.shortDescr.c_str());
+            return;
+        }
+
+    LogStream::sendWarning() << "Shalafi: no faculty found for class "  << prof << endl;
+}
+
 
 
 

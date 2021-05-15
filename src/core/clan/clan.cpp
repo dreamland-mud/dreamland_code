@@ -63,6 +63,10 @@ bool Clan::canInduct( PCharacter * ) const
     return false;
 }
 
+void Clan::onInduct(PCharacter *) const
+{
+}
+
 void Clan::makeMonument( Character *, Character * ) const
 {
 }

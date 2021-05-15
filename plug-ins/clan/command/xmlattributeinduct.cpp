@@ -21,6 +21,7 @@ void XMLAttributeInduct::run( PCharacter *ch )
         oldact_p( entry->message.getValue( ).c_str( ), ch, 0, 0, TO_CHAR, POS_DEAD );
     }
     
+    ch->getClan()->onInduct(ch);
     ch->getAttributes( ).eraseAttribute( "induct" );
     ch->updateSkills( );
     ch->save( );

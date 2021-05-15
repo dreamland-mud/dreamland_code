@@ -316,15 +316,15 @@ VOID_SPELL(ShadowCloak)::run(Character *ch, Character *victim, int sn, int level
     {
         ch->pecho(ch == victim ? "Призрачная мантия уже защищает тебя." : "Призрачная мантия уже защищает %C4.", victim);
         return;
-    }
+    }   
 
-    if (orgCh == "killers")
+    if (gsn_shadow_shroud->usable(ch))
     {
         msgVict = "Призрачная мантия окутывает тебя. Ты погружаешься во тьму.";
         msgChar = "%2$C1 окутывается тьмой.";
         sn = gsn_shadow_shroud;
     }
-    else if (orgVict == "adepts")
+    else if (gsn_soul_lust->usable(ch))
     {
         msgVict = "В тебе загорается огонь, жаждущий душ ангелов.";
         msgChar = "В %2$C6 загорается огонь, жаждущий душ ангелов.";

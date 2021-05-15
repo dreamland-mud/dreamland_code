@@ -6,7 +6,9 @@
 #ifndef SHALAFI_H 
 #define SHALAFI_H 
 
+#include "xmlmap.h"
 #include "clanmobiles.h"
+#include "defaultclan.h"
 
 class ClanGuardShalafi: public ClanGuard {
 XML_OBJECT
@@ -25,6 +27,22 @@ public:
     typedef ::Pointer<ShalafiDemon> Pointer;
 
     virtual void conjure( );
+};
+
+class ShalafiFaculty : public XMLVariableContainer {
+XML_OBJECT
+public:
+    XML_VARIABLE XMLString shortDescr;
+    XML_VARIABLE XMLStringList classes;
+};
+class ShalafiClan : public DefaultClan {
+XML_OBJECT
+public:
+    typedef ::Pointer<ShalafiClan> Pointer;
+
+    virtual void onInduct(PCharacter *) const;
+
+    XML_VARIABLE XMLMapBase<ShalafiFaculty> faculties;
 };
 
 #endif
