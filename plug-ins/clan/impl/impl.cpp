@@ -141,6 +141,7 @@ extern "C"
          * shalafi
          */
         Plugin::registerPlugin<MocRegistrator<ShalafiClan> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ShalafiFaculty> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardShalafi> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ShalafiDemon> >( ppl );
         

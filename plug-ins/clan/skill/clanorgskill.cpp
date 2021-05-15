@@ -3,6 +3,7 @@
  * ruffina, 2005
  */
 #include "clanorgskill.h"
+#include "clanorg.h"
 
 #include "commonattributes.h"
 #include "pcharacter.h"
@@ -58,3 +59,45 @@ ClanOrgSkill::getOrgInfo( PCMemoryInterface *pch ) const
     return NULL;
 }
 
+/*--------------------------------------------------------------------------
+ * OLC helpers
+ *--------------------------------------------------------------------------*/
+
+// Parse a string of clan and orden restrictions, separated by a semicolon.
+bool ClanOrgSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
+{
+    StringList values;
+    values.split(newValue, ";");
+    DLString clanValues = values.front().stripWhiteSpace();
+    DLString orgValues = values.size() > 1 ? values.back().stripWhiteSpace() : DLString::emptyString;
+
+    ClanSkill::accessFromString(clanValues, errBuf);
+    organizations.clear();
+
+    if (!orgValues.empty()) {
+        for (auto &c: clans) {
+            const ClanOrgs *orgs = clanManager->find(c.first)->getOrgs();
+            for (auto &o: *orgs) {
+                if (o.first == orgValues) {
+                    organizations[ClanOrgs::ATTR_NAME].name = o.first;
+                    break;
+                }
+            }
+        }
+    }
+
+    errBuf.str("");
+    errBuf << "Новые клановые и организационные ограничения: " << accessToString() << endl;
+    return true;
+}
+
+// Returns a string combining clan and orden information, for example: shalafi 10; occultism
+DLString ClanOrgSkill::accessToString() const
+{
+    StringList orgAccess;
+
+    for (auto &o: organizations)
+        orgAccess.push_back(o.second.name);
+
+    return ClanSkill::accessToString() +  ";" + orgAccess.join(", ");
+}

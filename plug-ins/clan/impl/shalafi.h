@@ -7,6 +7,7 @@
 #define SHALAFI_H 
 
 #include "xmlmap.h"
+#include "xmlglobalbitvector.h"
 #include "clanmobiles.h"
 #include "defaultclan.h"
 
@@ -29,11 +30,13 @@ public:
     virtual void conjure( );
 };
 
-class ShalafiFaculty : public XMLVariableContainer {
+class ShalafiFaculty : public ClanOrder {
 XML_OBJECT
 public:
-    XML_VARIABLE XMLString shortDescr;
-    XML_VARIABLE XMLStringList classes;
+    ShalafiFaculty();
+    virtual bool canInduct( PCMemoryInterface * ) const;
+
+    XML_VARIABLE XMLGlobalBitvector classes;
 };
 class ShalafiClan : public DefaultClan {
 XML_OBJECT
@@ -42,8 +45,6 @@ public:
 
     virtual bool canInduct( PCharacter * ) const;
     virtual void onInduct(PCharacter *) const;
-
-    XML_VARIABLE XMLMapBase<ShalafiFaculty> faculties;
 };
 
 #endif

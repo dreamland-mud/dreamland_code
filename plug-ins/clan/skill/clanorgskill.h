@@ -20,6 +20,10 @@ public:
     virtual bool visible( CharacterMemoryInterface * ) const;
     virtual bool available( Character * ) const;
     
+    // Online editing helpers.
+    virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
+    virtual DLString accessToString() const;
+
 protected:
     const SkillOrgInfo * getOrgInfo( PCMemoryInterface * ) const;
 

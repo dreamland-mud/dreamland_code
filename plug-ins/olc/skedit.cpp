@@ -750,7 +750,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
     if (cmd.empty()) {
         stc("Формат:  skedit умение\r\n", ch);
-        stc("Формат:  skedit create class|clan|race|other <название по-английски>\r\n", ch);
+        stc("Формат:  skedit create class|clan|orden|race|other <название по-английски>\r\n", ch);
         stc("Формат:  skedit list [all|active|passive|magic|prayer|<group>]\r\n", ch);
         return;
     }
@@ -769,6 +769,9 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
             loader = dynamic_cast<BasicSkill *>(gsn_sanctuary.getElement())->getLoader();
         } else if (arg_oneof(type, "clan", "клан")) {
             className = "ClanSkill";
+            loader = dynamic_cast<BasicSkill *>(gsn_garble.getElement())->getLoader();
+        } else if (arg_oneof(type, "orden", "орден")) {
+            className = "ClanOrgSkill";
             loader = dynamic_cast<BasicSkill *>(gsn_garble.getElement())->getLoader();
         } else if (arg_oneof(type, "race", "раса")) {
             className = "RaceAptitude";

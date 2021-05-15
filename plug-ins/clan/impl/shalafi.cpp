@@ -273,6 +273,16 @@ void ShalafiDemon::conjure( )
     interpret_raw( ch, "murder", mch->getNameP( ) );
 }
 
+ShalafiFaculty::ShalafiFaculty() 
+     : classes(professionManager)
+{    
+}
+
+bool ShalafiFaculty::canInduct(PCMemoryInterface *pci) const
+{
+    return classes.isSet(pci->getProfession());
+}
+
 bool ShalafiClan::canInduct(PCharacter *ch) const
 {
     if (!DefaultClan::canInduct(ch))
@@ -296,10 +306,10 @@ void ShalafiClan::onInduct(PCharacter *ch) const
 {
     const DLString &prof = ch->getProfession()->getName();
 
-    for (auto &f: faculties) 
-        if (f.second.classes.toSet().count(prof) > 0) {
-            ClanOrgs::setAttr(ch, f.first);
-            ch->pecho("Ты поступаешь на {b%N4{x.", f.second.shortDescr.c_str());
+    for (auto &o: *getOrgs())
+        if (o.second->canInduct(ch)) {
+            ClanOrgs::setAttr(ch, o.first);
+            ch->pecho("Ты поступаешь на {b%N4{x.", o.second->shortDescr.c_str());
             return;
         }
 
