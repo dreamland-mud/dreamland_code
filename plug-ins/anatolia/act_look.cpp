@@ -267,7 +267,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             DLString msg;
             DLString liq = obj->in_room->pIndexData->liquid->getShortDescr( );
 
-            msg << "%1$^O1";
+            msg << "{" << CLR_OBJ(ch) << "{1" << "%1$^O1" << "{2";
 
             if (showHint)
                 msg << get_obj_name_hint(obj);
@@ -427,7 +427,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
              sd++, item++, iShow++) {
             if (iShow >= 200) {
                 output << "{" << CLR_OBJ(ch)
-                        << "     ... И много чего еще ...{x" << endl;
+                        << "     ...и много чего еще.{x" << endl;
                 break;
             }
 
@@ -470,11 +470,11 @@ void show_char_pk_flags( PCharacter *ch, ostringstream &buf )
         const char *descr;
     };
     static const struct PKFlag pk_flag_table [] = {
-        { PK_VIOLENT, 'B', "VIOLENT" },
-        { PK_KILLER,  'R', "KILLER"  },
-        { PK_THIEF,   'R', "THIEF"   },
-        { PK_SLAIN,   'D', "SLAIN"   },
-        { PK_GHOST,   'D', "GHOST"   },
+        { PK_VIOLENT, 'B', "{leVIOLENT{lrАДРЕНАЛИН{lx" },
+        { PK_KILLER,  'R', "{leKILLER{lrУБИЙЦА{lx"  },
+        { PK_THIEF,   'R', "{leTHIEF{lrВОРЮГА{lx"   },
+        { PK_SLAIN,   'D', "{leSLAIN{lrЖЕРТВА{lx"   },
+        { PK_GHOST,   'D', "{leGHOST{lrПРИЗРАК{lx"   },
     };
     static const int size = sizeof(pk_flag_table) / sizeof(*pk_flag_table);
 
@@ -486,11 +486,14 @@ void show_char_pk_flags( PCharacter *ch, ostringstream &buf )
 
 void show_char_blindness( Character *ch, Character *victim, ostringstream &buf )
 {
-    if (IS_AFFECTED(victim, AFF_BLIND))
-        buf << fmt( ch, 
-                    " ... %1$P1 выглядит слеп%1$Gым|ым|ой, ощупывая все вокруг.{x",
-                    victim )
-            << endl;
+    if (IS_AFFECTED(victim, AFF_BLIND)) {
+	if (victim->position <= POS_SLEEPING)
+		buf << endl;	
+	else if (victim->fighting == ch)
+		buf << "...вслепую размахивая во все стороны.{x" << endl;
+	else	    
+        	buf << fmt( ch, "...%1$P1 выглядит слеп%1$Gым|ым|ой и дезориентированн%1$Gым|ым|ой.{x", victim ) << endl;
+    }
 }
 
 static DLString
@@ -607,7 +610,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
             buf << "[{DБез связи{x]";
 
         if (IS_SET(pVict->comm, COMM_AFK ))
-            buf << "[{CAFK{x]";
+            buf << "[{C{leAFK{lrАФК{lx{x]";
 
         if (IS_SET(pVict->act, PLR_WANTED))
             buf << "({RРАЗЫСКИВАЕТСЯ{x)";
@@ -623,33 +626,33 @@ void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     if (RIDDEN( victim ))
-        buf << "(Оседлано)";
+	buf << fmt( ch, "({1{gОседла%1$Gно{2|н{2|на{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_INVISIBLE))
-        buf << "({DНевидимо{x)";
+	buf << fmt( ch, "({1{DНевиди%1$Gмо{2|м{2|ма{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_IMP_INVIS))
-        buf << "({DОчень невидимо{x)";
+	buf << fmt( ch, "({1{bОчень невиди%1$Gмо{2|м{2|ма{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_HIDE))
-        buf << "({DУкрыто{x)";
+	buf << fmt( ch, "({1{DУкры%1$Gто{2|т{2|та{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_FADE))
-        buf << "({DСпрятано{x)";
+	buf << fmt( ch, "({1{DСпрята%1$Gно{2|н{2|на{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_CAMOUFLAGE))
-        buf << "({DЗамаскировано{x)";
+	buf << fmt( ch, "({1{GЗамаскирова%1$Gно{2|н{2|на{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_CHARM))
-        buf << "(Очаровано)";
+	buf << fmt( ch, "({1{mОчарова%1$Gно{2|н{2|на{2)", victim );
 
     if (victim->is_npc()
             && IS_SET(victim->act,ACT_UNDEAD)
             && CAN_DETECT(ch, DETECT_UNDEAD))
-        buf << "(Нежить)";
+        buf << "({1{rНежить{2)";
 
     if (IS_AFFECTED(victim, AFF_PASS_DOOR))
-        buf << "(Прозрачно)";
+        buf << "({1{wПр{Dо{wзр{Dа{wчно{2)";
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE))
         buf << "({MРозовая Аура{x)";
@@ -678,26 +681,26 @@ void show_char_to_char_0( Character *victim, Character *ch )
     if (nVict) 
         if (can_show_long_descr(nVict)) {
             DLString longd = format_longdescr_to_char(nVict->getLongDescr(), ch);
-            buf << "{" << CLR_MOB(ch);
+            buf << "{" << CLR_MOB(ch) << "{1";
             webManipManager->decorateCharacter(buf, longd, victim, ch);
-            buf << "{x";
+            buf << "{2";
             show_char_blindness( ch, victim, buf );
             ch->send_to( buf);
             return;
         }
     
     if (nVict) {
-        buf << "{" << CLR_MOB(ch);
+        buf << "{" << CLR_MOB(ch) << "{1";;
         webManipManager->decorateCharacter(buf, ch->sees( victim, '1' ), victim, ch);
     }
     else {
         if (ch->getConfig( ).holy && origVict != victim)
-            buf << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ) << "{x "
+            buf << "{1" << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ) << "{2 "
                 << "(под личиной " << ch->sees( victim, '2' ) << ") ";
         else {
-            buf << "{" << CLR_PLAYER(ch);
+            buf << "{1" << "{" << CLR_PLAYER(ch);
             webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ), victim, ch );
-            buf << "{x";
+            buf << "{2";
         }
 
         if (!IS_SET(ch->comm, COMM_BRIEF) 
@@ -708,7 +711,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         }
     }
 
-    buf << " {x";
+    buf << " {2";
 
     if (nVict && !ch->is_npc()) {
         if (!ch->getConfig().rucommands || IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
@@ -717,7 +720,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
 
     switch (victim->position.getValue( )) {
     case POS_DEAD:     
-        buf << "уже {RТРУП!!!{x" << endl;
+        buf << "уже {1{RТРУП!!!{2" << endl;
         break;
         
     case POS_MORTAL:   
@@ -754,7 +757,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         if (victim->fighting == 0)
             buf << "неизвестно с кем...";
         else if (victim->fighting == ch)
-            buf << "с {RТОБОЙ!!!{x";
+            buf << "с {1{RТОБОЙ!!!{2";
         else if (victim->in_room == victim->fighting->in_room)
             buf << "с " << ch->sees( victim->fighting, '5') << ".";
         else
@@ -797,6 +800,8 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
 
     if (IS_AFFECTED( victim, AFF_BLIND ))
         str << "Похоже, ничего не видит." << endl;
+    if (IS_AFFECTED( victim, AFF_SCREAM ))
+        str << "В ужасе зажимает уши." << endl;	
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
         str << "Покрыт%1$Gо||а чумными язвочками." << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
@@ -1083,7 +1088,7 @@ CMDRUNP( equipment )
     ch->send_to( buf );
 
     if (naked)
-        ch->pecho( "Да уж... Не мешало бы одеться!" );
+        ch->pecho( "На тебе совсем ничего нет -- не мешало бы одеться!" );
 }
 
 /*---------------------------------------------------------------------------
@@ -1240,7 +1245,7 @@ rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Character *ch, const DLS
     ostringstream buf;
 
     if (eyes_darkened( ch )) {
-        ch->pecho( "Здесь слишком темно ... " );
+        ch->pecho( "Здесь слишком темно... " );
         show_people_to_char( room->people, ch, fShowMount );
         return;
     }
@@ -1293,7 +1298,7 @@ static void do_look_move( Character *ch, bool fBrief )
 {
     if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" )) {
         if (eyes_darkened( ch ))
-            ch->pecho( "Здесь слишком темно ... " );
+            ch->pecho( "Здесь слишком темно... " );
         else
             ch->printf( "{W%s{x\r\n", ch->in_room->getName() );
         return;
@@ -1630,7 +1635,7 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
     if (obj->value0() == 0)
     {
         if (obj->value1() == 0)
-                ch->printf("Жаль... но здесь нет золота.\n\r");
+                ch->printf("Жаль, но здесь нет золота.\n\r");
         else if (obj->value1() == 1)
                 ch->printf("Ух-ты. Одна золотая монетка!\n\r");
         else
@@ -1640,7 +1645,7 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
     else if (obj->value1() == 0)
     {
         if (obj->value0() == 1)
-                ch->printf("Ух-ты. Одна серебряная монетка.\n\r");
+                ch->printf("Ух-ты! Одна серебряная монетка.\n\r");
         else
                 ch->printf("Здесь %d серебрян%s.\n\r",
                         obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
@@ -1669,7 +1674,7 @@ static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLS
                     "Меньше, чем до половины" :
                     obj->value1() < 3 * obj->value0() / 4 ? 
                         "До половины"  : 
-                        "Больше, чем до половины",
+                        "Чуть более, чем на половину",
                 liquidManager->find( obj->value2() )->getColor( ).ruscase( '2' ).c_str( )
               );
     return true;
