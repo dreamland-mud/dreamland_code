@@ -37,6 +37,7 @@ RACE(felar);
 RACE(fish);
 RACE(mouse);
 RACE(rat);
+RACE(rodent);
 
 static bool oprog_eat( Object *obj, Character *ch )
 {
@@ -91,7 +92,7 @@ COMMAND(CEat, "eat")
                 && !ch->is_immortal( )
                 && obj->item_type == ITEM_PILL)
             {
-                ch->pecho("Ты же BattleRager, а не презренный МАГ!");
+                ch->pecho("Воинам клана Ярости это ни к чему!");
                 return;
             }
 
@@ -164,21 +165,21 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
 
 void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
 {
-    bool isFelar, isMouse, isFish;
+    bool isCat, isRodent, isFish;
     bool wasPoisoned;
     int diff, dam, gain;
     
     if (ch->fighting) {
-        ch->pecho("Сейчас ты сражаешься - тебе не до охоты!");
+        ch->pecho("Сейчас ты сражаешься -- тебе не до охоты!");
         return;
     }
     
-    isFelar = (ch->getRace( ) == race_felar || ch->getRace( ) == race_cat);
-    isMouse = (mob->getRace( ) == race_mouse || mob->getRace( ) == race_rat);
+    isCat = (IS_SET( ch->form, FORM_FELINE ));
+    isRodent = (mob->getRace( ) == race_mouse || mob->getRace( ) == race_rat || mob->getRace( ) == race_rodent);
     isFish = (mob->getRace( ) == race_fish);
     
-    if (!isFelar) {
-        if (!isMouse && !isFish) {
+    if (!isCat) {
+        if (!isRodent && !isFish) {
             ch->pecho("Это животное не сделало тебе ничего плохого!");
         }
         else {
@@ -189,9 +190,9 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         return;
     }
     else {
-        if (!isMouse && !isFish) {
-            oldact("$c1, похоже, приня$gло|л|ла $C4 за маааленькую мышку.", ch, 0, mob, TO_ROOM);
-            oldact("Это не мышка! Даже и не думай за $Y гоняться.", ch, 0, mob, TO_CHAR);
+        if (!isRodent && !isFish) {
+            oldact("$c1, похоже, приня$gло|л|ла $C4 за маааленького грызунчика.", ch, 0, mob, TO_ROOM);
+            oldact("Это не грызун! Даже и не думай за $Y гоняться.", ch, 0, mob, TO_CHAR);
             return;
         }
     }
@@ -245,7 +246,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         eatFood( ch, gain, gain, wasPoisoned );
     }
     else {
-        RawDamage( ch, mob, DAM_OTHER, dam ).hit( true );
+        RawDamage( ch, mob, DAM_PIERCE, dam ).hit( true );
 
         if (mob->position >= POS_FIGHTING)
             multi_hit( mob, ch );

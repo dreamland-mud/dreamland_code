@@ -59,7 +59,7 @@ public:
                 continue;
             if (IS_GOOD(mob))
                 continue;
-            if (!IS_SET(mob->form, FORM_BIPED|FORM_MAMMAL))
+            if (!IS_SET(mob->form, FORM_BIPED))
                 continue;
             if (IS_SET(mob->in_room->area->area_flag, AREA_HIDDEN|AREA_NOQUEST|AREA_WIZLOCK))
                 continue;
