@@ -109,11 +109,8 @@ void Rat::stopfol( Character *master ) {
  *--------------------------------------------------------------------------*/
 void RatGod::greet( Character *mob ) {
     XMLAttributeRats::Pointer attr;
-    DLString race;
 
-    race = mob->getRace( )->getName( );
-    
-    if (race == "felar" || race == "lion" || race == "cat" || IS_SET( mob->form, FORM_FELINE )) {
+    if (IS_SET( mob->form, FORM_FELINE )) {
         exorcism( mob, "{DС котами нельзя!{x" );
         return;
     }

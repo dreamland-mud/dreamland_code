@@ -40,8 +40,6 @@ PROF(vampire);
 GSN(none);
 GSN(poison);
 GSN(poured_liquid);
-RACE(felar);
-RACE(cat);
 RACE(satyr);
 LIQ(none);
 LIQ(water);
@@ -760,7 +758,7 @@ VOID_AFFECT(PouredLiquid)::saves( Character *ch, Character *victim, int &save, i
     if (dam_type != DAM_CHARM)
         return;
     
-    if (victim->getRace( ) == race_felar || victim->getRace( ) == race_cat || IS_SET( victim->form, FORM_FELINE )) { 
+    if (IS_SET( victim->form, FORM_FELINE )) { 
         if (paf->global.isSet( liq_valerian_tincture )) 
             hasVuln = true;
     }

@@ -32,8 +32,6 @@ GSN(manacles);
 GSN(poison);
 DESIRE(full);
 DESIRE(hunger);
-RACE(cat);
-RACE(felar);
 RACE(fish);
 RACE(mouse);
 RACE(rat);
