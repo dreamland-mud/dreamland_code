@@ -106,6 +106,10 @@ void UndefinedOneHit::protectPrayer( )
 
 bool UndefinedOneHit::checkHands( )
 {
+	//TO-DO: provide better logic later, allow blobs, beasts etc. to hit without hands
+	if (ch->is_npc( ))
+		return true;
+		
     if (!ch->getWearloc( ).isSet( wear_hands ))
         return false;
 
