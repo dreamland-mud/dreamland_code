@@ -162,7 +162,7 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
             victim = victim->master;
             buf << ch->getNameP() << " атакует чармиса " << victim->getNameP();
         } else if (victim->in_room->pIndexData->clan != clan_none) {
-            buf << ch->getNameP() << " атакует клангварда " << victim->in_room->pIndexData->clan->getRussianName().ruscase('2') ;
+            buf << ch->getNameP() << " атакует моба на территории " << victim->in_room->pIndexData->clan->getRussianName().ruscase('2') ;
         } else return;
     } else buf << ch->getNameP() << " атакует " << victim->getNameP();
 
