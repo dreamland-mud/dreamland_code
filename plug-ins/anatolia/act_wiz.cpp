@@ -1332,6 +1332,9 @@ static bool has_nopost(Character *ch)
         show_char_pk_flags( pc, buf );
         buf << endl;
     }
+
+    if (victim->affected_by)
+        buf << "Под воздействием " << affect_flags.names(victim->affected_by) << endl;
     
     if (pc || victim->comm) {
         buf << "Связь: " 
@@ -1362,9 +1365,7 @@ static bool has_nopost(Character *ch)
     
     buf << "Форма:  " << form_flags.names(victim->form) << "  " << endl
         << "Части тела: " << part_flags.names(victim->parts) << endl;
-    
-    if (victim->affected_by)
-        buf << "Под воздействием " << affect_flags.names(victim->affected_by) << endl;
+    buf << "Слоты экипировки: " << victim->getWearloc().toString() << endl;
     
     buf << "Хозяин " <<  (victim->master ? victim->master->getNameC() : "(none)") << "  "
         << "Лидер " <<  (victim->leader ? victim->leader->getNameC() : "(none)") << "  ";
