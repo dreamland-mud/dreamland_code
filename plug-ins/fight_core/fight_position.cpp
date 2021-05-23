@@ -160,14 +160,14 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
     if (victim->is_npc() ) {
         if (IS_CHARMED(victim) && !victim->master->is_npc()) {
             victim = victim->master;
-            buf << ch->getNameP() << " атакует чармиса " << victim->getNameP();
+            buf << ch->getNameC() << " атакует чармиса " << victim->getNameC();
         } else if (victim->in_room->pIndexData->clan != clan_none) {
-            buf << ch->getNameP() << " атакует моба на территории " << victim->in_room->pIndexData->clan->getRussianName().ruscase('2') ;
+            buf << ch->getNameC() << " атакует моба на территории " << victim->in_room->pIndexData->clan->getRussianName().ruscase('2') ;
         } else return;
-    } else buf << ch->getNameP() << " атакует " << victim->getNameP();
+    } else buf << ch->getNameC() << " атакует " << victim->getNameC();
 
     if (victim->is_mirror( ) )
-        buf <<  "зеркало " << victim->getNameP() ;
+        buf <<  "зеркало " << victim->getNameC() ;
 
     buf << " в " << ch->in_room->getName() << "[" << ch->in_room->vnum << "]" << endl;
 
