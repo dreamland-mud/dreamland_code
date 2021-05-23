@@ -423,7 +423,7 @@ bool Object::hasOwner( const Character *ch ) const
     if (ch->is_npc( ))
         return false;
 
-    return !str_cmp( getOwner( ), ch->getNameP( ) );
+    return !str_cmp( getOwner( ), ch->getNameC() );
 }
 
 using namespace Grammar;

@@ -46,6 +46,8 @@ public:
     
     // CharacterMemoryInterface
     virtual const DLString& getName( ) const ;
+    virtual DLString getNameP(char gram_case) const;
+    virtual const char * getNameC( ) const;
     virtual void setName( const DLString& name ) ;
 
     virtual short getLevel( ) const ;

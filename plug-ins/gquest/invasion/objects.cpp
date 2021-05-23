@@ -70,7 +70,7 @@ bool InvasionInstrument::use( Character *ch, const char *args )
     trgt->behavior.getDynamicPointer<InvasionObj>( )->actDestroy( ch );
     extract_obj( trgt );
 
-    log("InvasionObj: destroyed by " << ch->getNameP( ));
+    log("InvasionObj: destroyed by " << ch->getNameC());
     gquest->rewardKiller( ch->getPC( ) );
     
     if (--charges <= 0) {

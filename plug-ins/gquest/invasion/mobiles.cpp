@@ -33,7 +33,7 @@ bool InvasionMob::death( Character *killer )
 
     killer = gquest->getActor( killer );
 
-    log("InvasionMob: killed by " << killer->getNameP( ));
+    log("InvasionMob: killed by " << killer->getNameC());
     
     gquest->rewardKiller( killer->getPC( ) );
     actDeath( killer );
@@ -104,7 +104,7 @@ void InvasionHelper::tell( Character *victim, const char *speech )
     }
     else {
         obj_to_char( obj, pch );
-        obj->setOwner( pch->getNameP( ) );
+        obj->setOwner( pch->getNameC() );
         actGiveInstrument( pch, obj );
     }
 }

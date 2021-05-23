@@ -66,7 +66,7 @@ CLAN(ruler);
  *------------------------------------------------------------------------*/
 void ClanGuardRulerPre::actGreet( PCharacter *wch )
 {
-    interpret_fmt( ch, "bow %s", wch->getNameP( ) );
+    interpret_fmt( ch, "bow %s", wch->getNameC() );
 }
 
 void ClanGuardRulerPre::actInvited( PCharacter *wch, Object *obj )
@@ -268,7 +268,7 @@ bool ClanGuardRulerJailer::specFight( )
     {
             ch->setClan( clan_ruler );
             interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
-                            victim->getNameP(), 
+                            victim->getNameC(), 
                             ch->in_room->getName(),
                             ch->in_room->areaName());
 
@@ -277,14 +277,14 @@ bool ClanGuardRulerJailer::specFight( )
                     && !is_safe_nomessage ( ch, victim ) )
             {
                     sprintf( buf, "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
-                            victim->getNameP( ), crime );
+                            victim->getNameC(), crime );
                     do_yell( ch, buf );
                     multi_hit( ch, victim );
             }
             else
             {
                     sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
-                            victim->getNameP( ));
+                            victim->getNameC());
                     oldact( buf, ch, 0, 0, TO_ROOM);
             }
             return true;
@@ -1557,7 +1557,7 @@ bool RulerSpecialGuard::specFight( )
 
     ch->setClan( clan_ruler );
     interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
-                    victim->getNameP(), 
+                    victim->getNameC(), 
                     ch->in_room->getName(), 
                     ch->in_room->areaName());
 
@@ -1565,14 +1565,14 @@ bool RulerSpecialGuard::specFight( )
             && !is_safe_nomessage ( ch, victim ) )
     {
         sprintf( buf, "%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
-                victim->getNameP( ) );
+                victim->getNameC() );
         do_yell( ch, buf );
         multi_hit( ch, victim );
     }
     else
     {
         sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
-                 victim->getNameP( ));
+                 victim->getNameC());
         oldact( buf, ch, 0, 0, TO_ROOM);
     }
 

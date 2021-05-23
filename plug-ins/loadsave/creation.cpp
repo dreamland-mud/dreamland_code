@@ -324,7 +324,7 @@ void clone_mobile(NPCharacter *parent, NPCharacter *clone)
         return;
 
     /* start fixing values */
-    DLString name( parent->getNameP( ) );
+    DLString name( parent->getNameC() );
     clone->setName( name );
 
     if (parent->getRealShortDescr( ))

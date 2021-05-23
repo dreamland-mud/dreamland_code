@@ -476,7 +476,7 @@ bool spec_executioner( NPCharacter *ch )
                 return false;
 
         sprintf( buf, "%s -- %s!  ЗАЩИЩАЙ НЕВИННЫХ! БОЛЬШЕ КРОВИ!!!",
-                victim->getNameP( ), crime );
+                victim->getNameC(), crime );
 
         do_yell( ch, buf );
 
@@ -815,7 +815,7 @@ bool spec_guard( NPCharacter *ch )
     {
         ch->setClan( clan_ruler );
         interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
-                        victim->getNameP(), 
+                        victim->getNameC(), 
                         ch->in_room->getName(), 
                         ch->in_room->areaName());
 
@@ -823,12 +823,12 @@ bool spec_guard( NPCharacter *ch )
                 && !is_safe_nomessage( ch, victim ))
         {
             interpret_raw( ch, "yell", "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
-                           victim->getNameP( ), crime );
+                           victim->getNameC(), crime );
             multi_hit( ch, victim );
         }
         else
         {
-            oldact("$c1 кричит '$t! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'", ch, victim->getNameP( ), 0, TO_ROOM);
+            oldact("$c1 кричит '$t! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'", ch, victim->getNameC(), 0, TO_ROOM);
         }
         return true;
     }
@@ -860,9 +860,9 @@ bool spec_nasty( NPCharacter *ch )
              && ( victim->getModifyLevel() > ch->getModifyLevel() )
              && ( victim->getModifyLevel() < ch->getModifyLevel() + 10))
           {
-             interpret_raw( ch, "backstab", victim->getNameP( ) );
+             interpret_raw( ch, "backstab", victim->getNameC() );
              if (ch->position != POS_FIGHTING)
-                 interpret_raw( ch, "murder", victim->getNameP( ) );
+                 interpret_raw( ch, "murder", victim->getNameC() );
              /* should steal some coins right away? :) */
              return true;
           }

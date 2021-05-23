@@ -451,7 +451,7 @@ static Object * corpse_create( Character *ch )
     }
     else {
         corpse->timer = number_range( 20, 25 );
-        corpse->setOwner( ch->getNameP( ) );
+        corpse->setOwner( ch->getNameC() );
     }
 
     corpse->from = str_dup( name.c_str( ) );
@@ -496,7 +496,7 @@ static void corpse_looting( Object *corpse, Character *ch, Character *killer )
         corpse->count = items.size() * loot["wantedCountCoeff"].asFloat();
     }
     else {
-        corpse->killer = str_dup( killer->getNameP( ) );
+        corpse->killer = str_dup( killer->getNameC() );
         corpse->count = loot["maxTotalCount"].asInt();
     }
 

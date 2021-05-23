@@ -373,7 +373,7 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
 
     postaffect_to_char( ch, sn, level / 10 );
 
-    ch->in_room->owner = str_dup( ch->getNameP( ) );
+    ch->in_room->owner = str_dup( ch->getNameC() );
     ch->pecho("Ты воздвигаешь вокруг себя щит молний.");
     oldact("$c1 окружает себя щитом молний.",ch,0,0,TO_ROOM);
     return;
@@ -512,8 +512,8 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     }
         
     fire        = create_object(get_obj_index(OBJ_VNUM_FIRE_SHIELD), 0);
-    fire->setOwner(ch->getNameP( ));
-    fire->from = str_dup(ch->getNameP( ));
+    fire->setOwner(ch->getNameC());
+    fire->from = str_dup(ch->getNameC());
     fire->level = ch->getRealLevel( );
 
     sprintf( buf, fire->pIndexData->extra_descr->description, from.c_str() );

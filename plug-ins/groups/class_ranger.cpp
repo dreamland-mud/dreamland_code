@@ -1197,7 +1197,7 @@ SKILL_APPLY( ambush )
                 && ch->can_see(vch)
                 && !vch->can_see(ch)
                 && !is_safe_nomessage(ch,vch)
-                && is_name(ch->ambushing, vch->getNameP()))
+                && is_name(ch->ambushing, vch->getNameC()))
         {
             ch->pecho( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
             run( ch, ch->ambushing );

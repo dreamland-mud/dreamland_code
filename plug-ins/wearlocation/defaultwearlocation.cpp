@@ -140,7 +140,7 @@ bool DefaultWearlocation::equip( Object *obj )
         return false;
     
     if (find( ch ))
-        LogStream::sendError( ) << "Equip_char: " << ch->getNameP() << " already equipped (" << getName( ) << ")." << endl;
+        LogStream::sendError( ) << "Equip_char: " << ch->getNameC() << " already equipped (" << getName( ) << ")." << endl;
     
     obj->wear_loc.assign( this );
     

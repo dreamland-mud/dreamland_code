@@ -213,7 +213,7 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
  */
 void MagicJar::get( Character *ch )
 {
-    if (!ch->is_npc( ) && strstr(obj->getName( ), ch->getNameP( )) != 0) {
+    if (!ch->is_npc( ) && strstr(obj->getName( ), ch->getNameC()) != 0) {
         oldact("Вот это удача!",ch,obj,0,TO_CHAR);
         extract_obj(obj);
     }
@@ -230,7 +230,7 @@ bool MagicJar::extract( bool fCount )
         if (wch->is_npc()) 
             continue;
 
-        if (strstr(obj->getName( ),wch->getNameP( )) != 0)
+        if (strstr(obj->getName( ),wch->getNameC()) != 0)
         {
             if (IS_SET( wch->act, PLR_NO_EXP )) {
                 REMOVE_BIT(wch->act,PLR_NO_EXP);
@@ -311,15 +311,15 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     extract_obj(vial);
 
     jar        = create_object(get_obj_index(OBJ_VNUM_MAGIC_JAR), 0);
-    jar->setOwner(ch->getNameP( ));
-    jar->from = str_dup(ch->getNameP( ));
+    jar->setOwner(ch->getNameC());
+    jar->from = str_dup(ch->getNameC());
     jar->level = ch->getRealLevel( );
 
-    jar->fmtName( jar->getName( ), victim->getNameP( ));
-    jar->fmtShortDescr( jar->getShortDescr( ), victim->getNameP( ));
-    jar->fmtDescription( jar->getDescription( ), victim->getNameP( ));
+    jar->fmtName( jar->getName( ), victim->getNameC());
+    jar->fmtShortDescr( jar->getShortDescr( ), victim->getNameC());
+    jar->fmtDescription( jar->getDescription( ), victim->getNameC());
 
-    sprintf( buf,jar->pIndexData->extra_descr->description, victim->getNameP( ) );
+    sprintf( buf,jar->pIndexData->extra_descr->description, victim->getNameC() );
     jar->extra_descr = new_extra_descr();
     jar->extra_descr->keyword = str_dup( jar->pIndexData->extra_descr->keyword );
     jar->extra_descr->description = str_dup( buf );

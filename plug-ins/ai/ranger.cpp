@@ -59,7 +59,7 @@ bool BasicMobileBehavior::aggressRanger( )
          ch, get_eq_char( ch, wear_wield ), dirs[victDoor].leave, TO_ROOM);
 
     interpret_raw( ch, "shoot", "%s %s", 
-                   dirs[victDoor].name, victim->getNameP( ) );    
+                   dirs[victDoor].name, victim->getNameC() );    
     return true;
 }
 

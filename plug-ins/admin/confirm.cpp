@@ -170,7 +170,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
         attr->update( victim );        
     } 
 
-    attr->responsible.setValue( ch->getNameP( ) );
+    attr->responsible.setValue( ch->getNameC() );
     attr->reason.setValue( arguments );
     attr->accepted.setValue( true );
 
@@ -222,7 +222,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
         }
     }
 
-    attr->responsible.setValue( ch->getNameP( ) );
+    attr->responsible.setValue( ch->getNameC() );
     attr->reason.setValue( arguments );
     attr->accepted.setValue( false );
 

@@ -410,7 +410,7 @@ SKILL_RUNP( grave )
     ch->position = POS_RESTING;
     
     grave = create_object( get_obj_index( OBJ_VNUM_GRAVE ), ch->getRealLevel( ) );
-    grave->setOwner( ch->getNameP( ) );
+    grave->setOwner( ch->getNameC() );
     obj_to_room( grave, room );
 }
 
@@ -1151,7 +1151,7 @@ SKILL_APPLY( bonedagger )
         if (is_safe_nomessage( vch, ch ))
             continue;
         
-        if (!is_name( ch->ambushing, vch->getNameP( ) ))
+        if (!is_name( ch->ambushing, vch->getNameC() ))
             continue;
 
         break;

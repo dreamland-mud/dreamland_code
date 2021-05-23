@@ -156,7 +156,7 @@ void check_bloodthirst( Character *ch )
             if (ch->is_npc( ) && ch->in_room) 
                 save_mobs( ch->in_room );
 
-            interpret_raw( ch, "murder",  vch->getDoppel( ch )->getNameP( ) );
+            interpret_raw( ch, "murder",  vch->getDoppel( ch )->getNameC() );
         }
     }
 }

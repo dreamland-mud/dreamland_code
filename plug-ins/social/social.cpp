@@ -296,13 +296,13 @@ bool Social::reaction( Character *ch, Character *victim, const DLString &arg )
         oldact("$c1 шлепает тебя.", victim, 0, ch, TO_VICT );
         break;
     case 13: 
-        interpret_fmt( victim, "sigh %s", ch->getNameP( ) );
+        interpret_fmt( victim, "sigh %s", ch->getNameC() );
         break;
     case 14:
-        interpret_fmt( victim, "shrug %s", ch->getNameP( ) );
+        interpret_fmt( victim, "shrug %s", ch->getNameC() );
         break;
     case 15: 
-        interpret_fmt( victim, "eyebrow %s", ch->getNameP( ) );
+        interpret_fmt( victim, "eyebrow %s", ch->getNameC() );
         break;
     }
 

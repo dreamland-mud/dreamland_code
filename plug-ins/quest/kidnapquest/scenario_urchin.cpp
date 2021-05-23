@@ -142,7 +142,7 @@ void KS::actNoHero( NPCharacter *kid, PCharacter *hero ) const
 void KS::actHeroDetach( NPCharacter *kid, PCharacter *hero ) const 
 {
     if (hero)
-        interpret_fmt( kid, "yell Эй, %s, ты где?!!!", hero->getNameP( ) );
+        interpret_fmt( kid, "yell Эй, %s, ты где?!!!", hero->getNameC() );
 }
 void KS::actWrongGiver( NPCharacter *kid, Character *victim, Object *obj ) const 
 {

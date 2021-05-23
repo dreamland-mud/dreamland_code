@@ -294,8 +294,8 @@ CMDRUNP( auction )
                         if ( ch->is_immortal() )
                         {
                                 sprintf(buf,"Продавец: %s Текущая ставка: %s\n\r",
-                                        auction->seller->getNameP(),
-                                        auction->buyer ? auction->buyer->getNameP() : "Нет");
+                                        auction->seller->getNameC(),
+                                        auction->buyer ? auction->buyer->getNameC() : "Нет");
                                 ch->send_to(buf);
                         }
                         /* show item data here */

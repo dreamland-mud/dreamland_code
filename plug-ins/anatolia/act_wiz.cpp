@@ -187,7 +187,7 @@ CMDWIZP( limited )
                         {
                                 if ( obj->carried_by != 0 && ch->can_see( obj->carried_by ) )
                                         sprintf(buf, "У %-30s\n\r",
-                                                obj->carried_by->getNameP( ));
+                                                obj->carried_by->getNameC());
                                 if ( obj->in_room != 0 )
                                         sprintf(buf, "В комнате %-20s [%d]\n\r",
                                                 obj->in_room->getName(), obj->in_room->vnum);
@@ -353,7 +353,7 @@ CMDWIZP( poofin )
             return;
     }
 
-    if ( strstr(argument,ch->getNameP( )) == 0 
+    if ( strstr(argument,ch->getNameC()) == 0 
             && strstr(argument,ch->getNameP( '1' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '2' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '3' ).c_str()) == 0 
@@ -382,7 +382,7 @@ CMDWIZP( poofout )
             return;
     }
 
-    if ( strstr(argument,ch->getNameP( )) == 0 
+    if ( strstr(argument,ch->getNameC()) == 0 
             && strstr(argument,ch->getNameP( '1' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '2' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '3' ).c_str()) == 0 
@@ -483,7 +483,7 @@ CMDWIZP( transfer )
             &&   ch->can_see( d->character ) )
             {
                 char buf[MAX_STRING_LENGTH];
-                sprintf( buf, "%s %s", d->character->getNameP( ), arg2 );
+                sprintf( buf, "%s %s", d->character->getNameC(), arg2 );
                 run( ch, buf );
             }
         }
@@ -1011,7 +1011,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 obj->in_room == 0 ? 0 : obj->in_room->vnum,
                 obj->in_obj  == 0 ? "(none)" : obj->in_obj->getShortDescr( '1' ).c_str( ),
                 obj->carried_by == 0 ? "(none)" :
-                        ch->can_see(obj->carried_by) ? obj->carried_by->getNameP( ) : "someone",
+                        ch->can_see(obj->carried_by) ? obj->carried_by->getNameC() : "someone",
                 obj->wear_loc->getName( ).c_str( ) );
         ch->send_to(buf);
 
@@ -1221,7 +1221,7 @@ static bool has_nopost(Character *ch)
     PCharacter *pc = victim->is_npc( ) ? 0 : victim->getPC( ); // no switched data
     NPCharacter *npc = victim->getNPC( );
     
-    buf << "Имя: [" << victim->getNameP( ) << "] ";
+    buf << "Имя: [" << victim->getNameC() << "] ";
     if (pc)
         buf << "Шорт: [" << pc->getRussianName( ).normal( ) << "] ";
     if (npc)
@@ -1303,7 +1303,7 @@ static bool has_nopost(Character *ch)
             << "Тип урона: " << weapon_flags.name(npc->dam_type)
             << endl;
     
-    buf << "Сражается с: " << (victim->fighting ? victim->fighting->getNameP( ) : "(none)") << "  ";
+    buf << "Сражается с: " << (victim->fighting ? victim->fighting->getNameC() : "(none)") << "  ";
     if (pc)
         buf << "Смертей: " << pc->death << "  ";
     buf << "Несет вещей: " << victim->carry_number << "  "
@@ -1366,10 +1366,10 @@ static bool has_nopost(Character *ch)
     if (victim->affected_by)
         buf << "Под воздействием " << affect_flags.names(victim->affected_by) << endl;
     
-    buf << "Хозяин " <<  (victim->master ? victim->master->getNameP( ) : "(none)") << "  "
-        << "Лидер " <<  (victim->leader ? victim->leader->getNameP( ) : "(none)") << "  ";
+    buf << "Хозяин " <<  (victim->master ? victim->master->getNameC() : "(none)") << "  "
+        << "Лидер " <<  (victim->leader ? victim->leader->getNameC() : "(none)") << "  ";
     if (pc)
-        buf << "Пет: " << (pc->pet ? pc->pet->getNameP( ) : "(none)");
+        buf << "Пет: " << (pc->pet ? pc->pet->getNameC() : "(none)");
     buf << endl;
     
     if (npc) {
@@ -1392,7 +1392,7 @@ static bool has_nopost(Character *ch)
             buf << "Последний хост: " << pc->getLastAccessHost( ) << endl;
     }
 
-    buf << "Прошлый бой: " << (victim->last_fought ? victim->last_fought->getNameP( ) :"none") << "  "
+    buf << "Прошлый бой: " << (victim->last_fought ? victim->last_fought->getNameC() :"none") << "  "
         << "Когда: " << Date::getTimeAsString( victim->getLastFightTime( ) ) 
         << endl;
     
@@ -1712,13 +1712,13 @@ CMDWIZP( mwhere )
                 if (victim->is_npc( ))
                     sprintf(buf,"%3d) %s (в теле %s) находится в %s [%d]\n\r",
                             count, 
-                            victim->getPC( )->getNameP( ),
+                            victim->getPC( )->getNameC(),
                             victim->getNameP('1').c_str( ),
                             victim->in_room->getName(), victim->in_room->vnum);
                 else
                     sprintf(buf,"%3d) %s находится в %s [%d]\n\r",
                             count, 
-                            victim->getNameP( ),
+                            victim->getNameC(),
                             victim->in_room->getName(), victim->in_room->vnum);
 
                 buffer << buf;
@@ -1750,7 +1750,7 @@ CMDWIZP( mwhere )
         count++;
         sprintf( buf, "%3d) [%5d] %-28s [%5d] %s\n\r", count,
                 victim->is_npc() ? victim->getNPC()->pIndexData->vnum : 0,
-                victim->is_npc() ? victim->getNameP( '1' ).c_str( ) : victim->getNameP( ),
+                victim->is_npc() ? victim->getNameP( '1' ).c_str( ) : victim->getNameC(),
                 victim->in_room->vnum,
                 victim->in_room->getName() );
         buffer << buf;
@@ -1775,7 +1775,7 @@ CMDWIZP( shutdown )
     DLFileAppend( dreamland->getBasePath( ), dreamland->getShutdownFile( ) )
          .printf( "Shutdown %s by %s\n",
                     Date::getCurrentTimeAsString( ).c_str( ),
-                    ch->getNameP( )
+                    ch->getNameC()
                 );
 
     /* TODO save all */

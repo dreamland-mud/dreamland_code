@@ -26,11 +26,11 @@ bool GangChef::death( Character *killer )
 
     killer = gquest->getActor( killer );
     
-    log("GangChef: killed by " << killer->getNameP( ));
+    log("GangChef: killed by " << killer->getNameC());
 
     if (!gquest->isLevelOK( killer )) {
         oldact("Ну даешь! Как ты сюда вообще попал?", killer, 0, 0, TO_CHAR);
-        LogStream::sendNotice( ) << "BAD guy in the Lair: " << killer->getNameP( ) 
+        LogStream::sendNotice( ) << "BAD guy in the Lair: " << killer->getNameC() 
                                  << " lvl " << killer->getModifyLevel( ) << endl;
 
         gquest->state = Gangsters::ST_BROKEN;                

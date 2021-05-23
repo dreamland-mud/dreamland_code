@@ -52,7 +52,7 @@ public:
     virtual bool process( InterpretArguments &iargs )
     {        
         LastLogStream::send( ) 
-            << iargs.ch->getNameP( ) << ": " << iargs.line << endl;
+            << iargs.ch->getNameC() << ": " << iargs.line << endl;
         return true;
     }
 };

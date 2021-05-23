@@ -170,7 +170,7 @@ void Gangsters::cleanup( bool performance )
             
         if (performance) {
             if (ch->position >= POS_RESTING)
-                do_say(ch, "Hasta la vista, детка!");
+                do_say(ch, "Hasta la vista, baby!");
             
             if (ch->position >= POS_MORTAL)        
                 oldact("$c1 исчезает в клубе дыма.", ch, 0, 0, TO_ROOM);
@@ -404,7 +404,7 @@ void Gangsters::rewardChefKiller( )
 
     GlobalQuestManager::getThis( )->rewardChar( pci, r );
 
-    buf << GQChannel::BOLD << pci->getRussianName( ).normal( ) << GQChannel::NORMAL 
+    buf << GQChannel::BOLD << pci->getNameP('1') << GQChannel::NORMAL 
         << " уничтожил" << GET_SEX(pci, "", "о", "а") <<" главаря шайки!";
 
     GQChannel::gecho( this, buf );

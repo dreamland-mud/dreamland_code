@@ -265,7 +265,7 @@ void ShalafiDemon::conjure( )
     else
         do_say(ch, "Кто рискнул нарушить мой покой?!!!");
 
-    interpret_raw( ch, "murder", mch->getNameP( ) );
+    interpret_raw( ch, "murder", mch->getNameC() );
 }
 
 

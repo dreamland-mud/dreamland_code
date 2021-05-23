@@ -182,7 +182,7 @@ void Questor::doCancel( PCharacter *client )
     }
     
     if (rated_as_guru( client )) {
-        tell_raw( client, ch, "Извини, %s, но это было бы слишком простым выходом для тебя.", client->getNameP( ) );
+        tell_raw( client, ch, "Извини, %s, но это было бы слишком простым выходом для тебя.", client->getNameC() );
         return;
     }
     

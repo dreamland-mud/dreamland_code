@@ -50,7 +50,7 @@ void Hierophant::tell( Character *victim, const char *speech )
     if (fHello) {
         say_act( victim, ch, "Здравствуй, $c1." );
         say_act( victim, ch, "Если вдруг ты при%1$Gшло|шел|шла поговорить о питомцах, то знай: отныне я на пенсии! Лучше почитай {y{hh1005{lR? рапорт{lE? report{x и {y{hh1091{lR? приказать{lE? order{x" );
-        interpret_fmt( ch, "smile %s", victim->getNameP( ) );
+        interpret_fmt( ch, "smile %s", victim->getNameC() );
         return;
     }
     

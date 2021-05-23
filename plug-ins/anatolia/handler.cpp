@@ -402,7 +402,7 @@ void extract_char( Character *ch, bool count )
     int flags;
 
     if (ch->extracted)  {
-        LogStream::sendError( ) << "Warning! Extraction of " << ch->getNameP( ) << endl;
+        LogStream::sendError( ) << "Warning! Extraction of " << ch->getNameC() << endl;
         return; 
     }
     else
@@ -450,7 +450,7 @@ void extract_char( Character *ch, bool count )
         pc->switchedTo = 0;
         LogStream::sendError() 
             << "attempt to extract original PCwhile in switch: " 
-            << pc->getNameP( ) << endl;
+            << pc->getNameC() << endl;
     }
 
     char_from_list( ch, &char_list );

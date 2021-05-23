@@ -136,8 +136,7 @@ public:
     virtual short getModifyLevel( ) const = 0;
 
     // name and sex formatting
-    virtual const char * getNameP( ) const;
-    virtual DLString getNameP( char gram_case ) const = 0;
+    virtual const char * getNameC( ) const;
     DLString sees( const Character *whomsee, char needcase = '1' ) const;
     DLString seesD( const Character *whomsee, char needcase = '1' ) const;
     DLString seeName( const Character *whomsee, char needcase = '1' ) const;

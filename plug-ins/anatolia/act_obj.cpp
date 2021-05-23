@@ -319,7 +319,7 @@ static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
     if (!container->killer)
         return true;
 
-    if (str_cmp( ch->getNameP( ), container->killer ) 
+    if (str_cmp( ch->getNameC(), container->killer ) 
         && str_cmp( "!anybody!", container->killer )) 
     {
         ch->pecho("Это не твоя добыча.");

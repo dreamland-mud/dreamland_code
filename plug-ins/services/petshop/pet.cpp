@@ -253,7 +253,7 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     horse = create( client->getPC( ) ); 
     client->setWaitViolence( 1 );
     
-    interpret_fmt( client, "mount %s", horse->getNameP( ) );
+    interpret_fmt( client, "mount %s", horse->getNameC() );
 
     client->pecho("Наслаждайся своим скакуном.");
     oldact("$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );

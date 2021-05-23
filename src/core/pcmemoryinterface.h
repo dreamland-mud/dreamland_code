@@ -35,6 +35,8 @@ class PCMemoryInterface;
 class CharacterMemoryInterface : public virtual DLObject {
 public:
     virtual const DLString& getName( ) const  = 0;
+    virtual DLString getNameP(char gram_case) const  = 0;
+    virtual const char * getNameC( ) const = 0;
     virtual void setName( const DLString& )  = 0;
 
     virtual short getLevel( ) const  = 0;

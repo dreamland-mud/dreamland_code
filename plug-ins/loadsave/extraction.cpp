@@ -144,7 +144,7 @@ void extract_mob_dropped( NPCharacter *mob )
     Object *obj, *obj_next;
     
     if (mob->extracted) {
-        LogStream::sendError( ) << "Warning! Extraction of " << mob->getNameP( ) << endl;
+        LogStream::sendError( ) << "Warning! Extraction of " << mob->getNameC() << endl;
         return;
     }
     else
