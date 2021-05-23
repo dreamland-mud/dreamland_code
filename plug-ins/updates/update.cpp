@@ -380,6 +380,20 @@ void char_update( )
             room_to_save( ch );
             }
         }
+        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_INVISIBLE) && ch->is_npc() )
+        {
+            if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_INVISIBLE ) && !IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
+            {
+            spell( gsn_invisibility, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE|FSPELL_BANE );
+            }
+        }
+        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_IMP_INVIS) && ch->is_npc() )
+        {
+            if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_IMP_INVIS ) && !IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
+            {
+            spell( gsn_improved_invis, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE|FSPELL_BANE );
+            }
+        }
 
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
