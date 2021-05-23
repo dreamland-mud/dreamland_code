@@ -189,7 +189,6 @@ public:
     DLString getParsedTitle( );
     
     // name and sex formatting
-    inline const char *getNameP( ) const;
     virtual DLString getNameP( char gram_case ) const;
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
     virtual void updateCachedNoun( );
@@ -329,12 +328,6 @@ public:
 
     XML_VARIABLE XMLInteger start_room;
 };
-
-
-inline const char * PCharacter::getNameP( ) const 
-{ 
-    return Character::getNameP( ); 
-}
 
 
 #endif

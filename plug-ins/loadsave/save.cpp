@@ -304,7 +304,7 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
 
         fprintf(fp,"Vnum %d\n",pet->pIndexData->vnum);
 
-        fprintf(fp,"Name %s~\n", pet->getNameP( ) );
+        fprintf(fp,"Name %s~\n", pet->getNameC() );
 
         if (pet->in_room && pet->master && pet->master->in_room != pet->in_room)
             fprintf(fp,"Room %d\n", pet->in_room->vnum);
@@ -409,7 +409,7 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
 
         fprintf(fp,"Vnum %d\n",mob->pIndexData->vnum);
 
-        fprintf(fp,"Name %s~\n", mob->getNameP( ) );
+        fprintf(fp,"Name %s~\n", mob->getNameC() );
 
         fprintf( fp, "Id   %s\n", id_to_string(mob->getID()).c_str() );
         

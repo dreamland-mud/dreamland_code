@@ -271,7 +271,7 @@ CMDADM( codesource )
         
         char buf[MAX_STRING_LENGTH];
         sprintf( buf, "%s: %s\r\n", 
-                        pch->getNameP( ), 
+                        pch->getNameC(), 
                         csa->name.getValue( ).c_str( ));
         page_to_char(buf, ch);
         
@@ -353,7 +353,7 @@ CMDADM( codesource )
         
         CodeSource &cs = CodeSource::manager->allocate();
         
-        cs.author = pch->getNameP( );
+        cs.author = pch->getNameC();
         cs.name = csa->name;
 
         ostringstream sbuf;

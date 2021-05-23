@@ -187,7 +187,7 @@ void ObjectQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     Object *obj;
 
     obj = create_object( get_obj_index( vnum ), client->getRealLevel( ) );
-    obj->setOwner( client->getNameP( ) );
+    obj->setOwner( client->getNameC() );
     
     buyObject( obj, client, questman );
 
@@ -520,7 +520,7 @@ bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) 
     }
 
     if (get_eq_char( client, wear_head )) {
-        interpret_raw( tattoer, "bonk", client->getNameP( ) );
+        interpret_raw( tattoer, "bonk", client->getNameC() );
         say_act( client, tattoer, "Шляпу сними!" );
         return false;
     }

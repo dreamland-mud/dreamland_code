@@ -110,7 +110,7 @@ struct BasicMobileBehavior::TouchVictims : public BasicMobileBehavior::VampVicti
     virtual bool hit( Character *wch )
     {
         interpret_raw( vamp->getChar( ), "touch", 
-                       wch->getDoppel( vamp->getChar( ) )->getNameP( ) );
+                       wch->getDoppel( vamp->getChar( ) )->getNameC() );
         return true;
     }
 };
@@ -132,7 +132,7 @@ struct BasicMobileBehavior::BiteVictims : public BasicMobileBehavior::VampVictim
     virtual bool hit( Character *wch )
     {
         interpret_raw( vamp->getChar( ), "bite", 
-                       wch->getDoppel( vamp->getChar( ) )->getNameP( ) );
+                       wch->getDoppel( vamp->getChar( ) )->getNameC() );
         return true;
     }
 };
@@ -154,7 +154,7 @@ struct BasicMobileBehavior::SuckVictims : public BasicMobileBehavior::VampVictim
     virtual bool hit( Character *wch )
     {
         interpret_raw( vamp->getChar( ), "suck", 
-                       wch->getDoppel( vamp->getChar( ) )->getNameP( ) );
+                       wch->getDoppel( vamp->getChar( ) )->getNameC() );
         return true;
     }
 };

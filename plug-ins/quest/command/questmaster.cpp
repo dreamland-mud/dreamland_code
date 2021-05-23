@@ -8,6 +8,7 @@
 #include "arg_utils.h"
 #include "act.h"
 #include "mercdb.h"
+#include "handler.h"
 
 #include "questmaster.h"
 #include "def.h"
@@ -24,7 +25,7 @@ bool QuestMaster::specIdle( )
     if (chance(99))
         return false;
 
-    interpret_raw(ch, "say", "Хочешь получить интересное задание?");
+    do_say(ch, "Хочешь получить интересное задание?");
     return true;
 }
 

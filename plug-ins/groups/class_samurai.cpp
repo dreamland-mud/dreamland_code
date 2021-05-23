@@ -469,7 +469,7 @@ SKILL_RUNP( katana )
                     .assignStartingHitroll()
                     .assignStartingDamroll();
 
-                sprintf( buf,katana->pIndexData->extra_descr->description,ch->getNameP( ) );
+                sprintf( buf,katana->pIndexData->extra_descr->description,ch->getNameC() );
                 katana->extra_descr = new_extra_descr();
                 katana->extra_descr->keyword =str_dup(katana->pIndexData->extra_descr->keyword );
                 katana->extra_descr->description = str_dup( buf );
@@ -514,7 +514,7 @@ void SamuraiGuildmaster::give( Character *victim, Object *obj )
     
     if (!obj->extra_descr 
         || !obj->extra_descr->description
-        || !strstr(obj->extra_descr->description, victim->getNameP( )))
+        || !strstr(obj->extra_descr->description, victim->getNameC()))
     {
         say_act( victim, ch, "Иероглифы на этом оружии говорят о том, что оно было изготовлено кем-то другим, а не тобой, $c1." );
         giveBack( victim, obj );
@@ -612,7 +612,7 @@ void SamuraiGuildmaster::doOwner( Character *victim, Object *katana )
         
     katana->behavior.setPointer( new OwnedKatana );
     katana->behavior->setObj( katana );
-    katana->setOwner( victim->getNameP( ) );
+    katana->setOwner( victim->getNameC() );
     SET_BIT(katana->extra_flags, ITEM_NOSAC|ITEM_NOPURGE);
     SET_BIT(katana->wear_flags, ITEM_NO_SAC);
 
@@ -628,7 +628,7 @@ void Katana::wear( Character *ch )
   if (IS_WEAPON_STAT(obj,WEAPON_KATANA)
         && obj->extra_descr
         && obj->extra_descr->description
-        && strstr( obj->extra_descr->description, ch->getNameP( ) ) != 0)
+        && strstr( obj->extra_descr->description, ch->getNameC() ) != 0)
   {
     if (obj->getRealShortDescr())
         ch->pecho("Ты ощущаешь %O4 как часть себя!", obj);

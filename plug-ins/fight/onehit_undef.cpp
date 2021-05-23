@@ -1113,7 +1113,7 @@ void UndefinedOneHit::damEffectMasterSword( )
     if (!katana->extra_descr || !katana->extra_descr->description)
         return;
     
-    if (strstr(katana->extra_descr->description, ch->getNameP( )) == 0)
+    if (strstr(katana->extra_descr->description, ch->getNameC()) == 0)
         return;
 
     if (immune_check( victim, dam_type, dam_flag ) == RESIST_IMMUNE)

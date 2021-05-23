@@ -295,13 +295,13 @@ VOID_SPELL(EyedSword)::run( Character *ch, char *target_name, int sn, int level 
     Object *eyed;
 
     eyed        = create_object(get_obj_index(OBJ_VNUM_EYED_SWORD), 0);
-    eyed->setOwner( ch->getNameP( ) );
-    eyed->from = str_dup(ch->getNameP( ));
+    eyed->setOwner( ch->getNameC() );
+    eyed->from = str_dup(ch->getNameC());
     eyed->level = ch->getRealLevel( );
-    eyed->fmtShortDescr( eyed->getShortDescr( ), ch->getNameP( ) );
-    eyed->fmtDescription( eyed->getDescription( ), ch->getNameP( ) );
+    eyed->fmtShortDescr( eyed->getShortDescr( ), ch->getNameC() );
+    eyed->fmtDescription( eyed->getDescription( ), ch->getNameC() );
 
-    sprintf( buf, eyed->pIndexData->extra_descr->description, ch->getNameP( ) );
+    sprintf( buf, eyed->pIndexData->extra_descr->description, ch->getNameC() );
     eyed->addExtraDescr( eyed->pIndexData->extra_descr->keyword, buf );
 
     eyed->value2(( ch->getModifyLevel() / 10) + 3);

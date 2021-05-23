@@ -562,17 +562,17 @@ SKILL_RUNP( steal )
                 switch(number_range(0,3))
                 {
                 case 0 :
-                        sprintf( buf, "%s -- подлая ворюга!", tmp_ch->getNameP( ) );
+                        sprintf( buf, "%s -- подлая ворюга!", tmp_ch->getNameC() );
                         break;
                 case 1 :
                         sprintf( buf, "Да %s и конфетку у ребенка украсть не сможет, неумеха!",
-                                 tmp_ch->getNameP( ));
+                                 tmp_ch->getNameC());
                         break;
                 case 2 :
-                        sprintf( buf,"%s пытается обокрасть меня!",tmp_ch->getNameP( ) );
+                        sprintf( buf,"%s пытается обокрасть меня!",tmp_ch->getNameC() );
                         break;
                 case 3 :
-                        sprintf(buf,"Держи свои руки подальше, %s!",tmp_ch->getNameP( ));
+                        sprintf(buf,"Держи свои руки подальше, %s!",tmp_ch->getNameC());
                         break;
                 }
                 if ( IS_AWAKE( victim ) )

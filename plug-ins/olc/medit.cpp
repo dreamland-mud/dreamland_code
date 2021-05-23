@@ -163,7 +163,7 @@ void OLCStateMobile::commit()
             if(victim->group == original->group)
                 victim->group = mob.group;
 
-            if(!strcmp(victim->getNameP(), original->player_name))
+            if(!strcmp(victim->getNameC(), original->player_name))
                 victim->setName(DLString(mob.player_name));
 
             if(victim->act == original->act)

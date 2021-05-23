@@ -101,7 +101,6 @@ bool spec_troll_member( NPCharacter *ch)
 {
     Character *vch, *victim = 0;
     int count = 0;
-    const char *message;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
     ||  IS_CHARMED(ch) || ch->fighting != 0)
@@ -132,26 +131,23 @@ bool spec_troll_member( NPCharacter *ch)
     /* say something, then raise hell */
     switch (number_range(0,6))
     {
-        default:  message = 0;         break;
-        case 0:        message = "$c1 пронзительно кричит 'Я найду тебя, щенок!'";
+        default: break;
+        case 0: do_yell( ch, "Я найду тебя, шпана!");
                 break;
-        case 1: message = "Яростно вскрикнув, $c1 бросается на $C4.";
+        case 1: oldact("Яростно вскрикнув, $c1 бросается на $C4.",ch,0,victim,TO_ALL);
                 break;
-        case 2: message =
-                "$c1 произносит 'Что ты тут забыло, огровское отродье?'";
+        case 2: do_say( ch, "Что ты тут забыло, огровское отродье?");
                 break;
-        case 3: message = "$c1 хрустит костяшками и произносит 'Че, почуял$Gо||а удачу?'";
+        case 3: do_say( ch, "Чувствуешь удачу, шпана?");
                 break;
-        case 4: message = "$c1 произносит 'В этот раз копы тебе не помогут!'";
+        case 4: do_say( ch, "В этот раз стражники тебе не помогут!");
                 break;        
-        case 5: message = "$c1 произносит 'Время отправиться к твоим братьям, уродина.'";
+        case 5: do_say( ch, "Время отправиться к предкам, уродина.");
                 break;
-        case 6: message = "$c1 произносит 'Ну, понеслась.'";
+        case 6: do_say( ch, "Ну, понеслась Варда по кочкам.");
                 break;
     }
 
-    if (message != 0)
-            oldact(message,ch,0,victim,TO_ALL);
     multi_hit( ch, victim );
     return true;
 }
@@ -160,7 +156,6 @@ bool spec_ogre_member( NPCharacter *ch)
 {
     Character *vch, *victim = 0;
     int count = 0;
-    const char *message;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
     ||  IS_CHARMED(ch) || ch->fighting != 0)
@@ -191,26 +186,23 @@ bool spec_ogre_member( NPCharacter *ch)
     /* say something, then raise hell */
     switch (number_range(0,6))
     {
-        default: message = 0;        break;
-        case 0: message = "$c1 пронзительно кричит 'Я за тобой охотился, шпана!'";
+        default: break;
+        case 0: do_yell( ch, "Я найду тебя, шпана!");
                 break;
-        case 1: message = "С яростным криком $c1 бросается в атаку на $C4.";
+        case 1: oldact("Яростно вскрикнув, $c1 бросается на $C4.",ch,0,victim,TO_ALL);
                 break;
-        case 2: message =
-                "$c1 произносит 'Что ты тут забыла, троллина грязная?'";
+        case 2: do_say( ch, "Что ты тут забыло, тролльское отродье?");
                 break;
-        case 3: message = "$c1 хрустит костяшками и произносит 'Че, почуя{Smл{Sfла{Sx удачу?'";
+        case 3: do_say( ch, "Чувствуешь удачу, шпана?");
                 break;
-        case 4: message = "$c1 произносит 'В этот раз копы тебе не помогут!'";
+        case 4: do_say( ch, "В этот раз стражники тебе не помогут!");
                 break;        
-        case 5: message = "$c1 произносит 'Время отправиться к твоим братьям, уродина.'";
+        case 5: do_say( ch, "Время отправиться к предкам, уродина.");
                 break;
-        case 6: message = "$c1 произносит 'Ну, понеслась.'";
+        case 6: do_say( ch, "Ну, понеслась Варда по кочкам.");
                 break;
     }
 
-    if (message != 0)
-            oldact(message,ch,0,victim,TO_ALL);
     multi_hit( ch, victim );
     return true;
 }
@@ -219,7 +211,6 @@ bool spec_patrolman(NPCharacter *ch)
 {
     Character *vch,*victim = 0;
     Object *obj;
-    const char *message;
     int count = 0;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
@@ -250,7 +241,7 @@ bool spec_patrolman(NPCharacter *ch)
     &&   obj->pIndexData->vnum == OBJ_VNUM_WHISTLE))
     {
         oldact("Ты со всей силы свистишь в $o4.",ch,obj,0,TO_CHAR);
-        oldact_p("$c1 свистит в $o1, ***WHEEEEEEEEEEEET***",
+        oldact_p("$c1 свистит в $o1, {W***ФРРРРРРРРРРРРРРРР***{x",
                ch,obj,0,TO_ROOM,POS_RESTING);
 
             for ( vch = char_list; vch != 0; vch = vch->next )
@@ -266,31 +257,24 @@ bool spec_patrolman(NPCharacter *ch)
 
     switch (number_range(0,6))
     {
-        default:        message = 0;                break;
-        case 0:        message = "$c1 пронзительно кричит 'А ну прекратить, пнятно?!'";
+        default: break;
+        case 0: do_yell( ch, "А ну, прекр-р-р-ратить скопление!");
                 break;
-        case 1: message =
-                "$c1 произносит 'Виновато, конечно, общество, но что уж тут поделаешь?'";
+        case 1: do_say( ch, "Виновато, конечно, общество, но что уж тут поделаешь?");
                 break;
-        case 2: message =
-                "$c1 бормочет 'Чертова шпана нас вcех в гроб загонит.'";
+        case 2: do_say( ch, "Чертова шпана нас вcех в гроб загонит.");
                 break;
-        case 3: message = "$c1 кричит 'Прекратите! Прекратите!' и атакует.";
+        case 3: do_yell( ch, "Сержант Петренко. Предъявите ваши документы!");
                 break;
-        case 4: message = "$c1 вытаскивает дубинку и принимается за работу.";
+        case 4: oldact("$c1 вытаскивает дубинку и принимается за работу.",ch,0,victim,TO_ALL);
+                break;        
+        case 5: oldact("$c1 обреченно вздыхает и продолжает останавливать драку.",ch,0,victim,TO_ALL);
                 break;
-        case 5: message =
-                "$c1 обреченно вздыхает и продолжает останавливать драку.";
-                break;
-        case 6: message = "$c1 произносит 'А ну угомонились, хулиганье!'";
+        case 6: do_say( ch, "А ну угомонились, хулиганье!");
                 break;
     }
 
-    if (message != 0)
-        oldact(message,ch,0,0,TO_ALL);
-
     multi_hit(ch,victim);
-
     return true;
 }
         
@@ -368,18 +352,18 @@ bool spec_breath_lightning( NPCharacter *ch )
 bool spec_breath_any( NPCharacter *ch )
 {
     if ( ch->position != POS_FIGHTING )
+		return false;
+	
+    if ( number_percent() < 50 )
         return false;
-
-    switch ( number_bits( 3 ) )
+  
+    switch (number_range(0,6))
     {
-    case 0: return spec_breath_fire                ( ch );
-    case 1:
-    case 2: return spec_breath_lightning        ( ch );
-    case 3: return spec_breath_gas                ( ch );
-    case 4: return spec_breath_acid                ( ch );
-    case 5:
-    case 6:
-    case 7: return spec_breath_frost                ( ch );
+    	case 0: return spec_breath_fire( ch );
+    	case 1: return spec_breath_frost( ch );
+    	case 2: return spec_breath_lightning( ch );
+    	case 3: return spec_breath_gas( ch );
+    	case 4: return spec_breath_acid( ch );
     }
 
     return false;
@@ -491,8 +475,8 @@ bool spec_executioner( NPCharacter *ch )
         if ( victim == 0 )
                 return false;
 
-        sprintf( buf, "%s - %s!  ЗАЩИЩАЙ НЕВИННЫХ!  БОЛЬШЕ КРОВИ!!!",
-                victim->getNameP( ), crime );
+        sprintf( buf, "%s -- %s!  ЗАЩИЩАЙ НЕВИННЫХ! БОЛЬШЕ КРОВИ!!!",
+                victim->getNameC(), crime );
 
         do_yell( ch, buf );
 
@@ -831,7 +815,7 @@ bool spec_guard( NPCharacter *ch )
     {
         ch->setClan( clan_ruler );
         interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
-                        victim->getNameP(), 
+                        victim->getNameC(), 
                         ch->in_room->getName(), 
                         ch->in_room->areaName());
 
@@ -839,12 +823,12 @@ bool spec_guard( NPCharacter *ch )
                 && !is_safe_nomessage( ch, victim ))
         {
             interpret_raw( ch, "yell", "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
-                           victim->getNameP( ), crime );
+                           victim->getNameC(), crime );
             multi_hit( ch, victim );
         }
         else
         {
-            oldact("$c1 кричит '$t! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'", ch, victim->getNameP( ), 0, TO_ROOM);
+            oldact("$c1 кричит '$t! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'", ch, victim->getNameC(), 0, TO_ROOM);
         }
         return true;
     }
@@ -876,9 +860,9 @@ bool spec_nasty( NPCharacter *ch )
              && ( victim->getModifyLevel() > ch->getModifyLevel() )
              && ( victim->getModifyLevel() < ch->getModifyLevel() + 10))
           {
-             interpret_raw( ch, "backstab", victim->getNameP( ) );
+             interpret_raw( ch, "backstab", victim->getNameC() );
              if (ch->position != POS_FIGHTING)
-                 interpret_raw( ch, "murder", victim->getNameP( ) );
+                 interpret_raw( ch, "murder", victim->getNameC() );
              /* should steal some coins right away? :) */
              return true;
           }
@@ -957,19 +941,19 @@ bool spec_assassinater( NPCharacter *ch )
         switch (rnd_say)
         {
         case  5:
-                sprintf( buf, "Смерть - вот верное завершение твоего пути...");
+                sprintf( buf, "Смерть -- вот верное завершение твоего пути...");
                 break;
         case  6:
                 sprintf( buf, "Настало время умирать....");
                 break;
         case  7:
-                sprintf( buf, "Cabrone....");
+                sprintf( buf, "Подонок...");
                 break;
         case  8:
-                sprintf( buf, "Добро пожаловать к твоей судьбе....");
+                sprintf( buf, "Настало время встретить свой рок...");
                 break;
         case  9:
-                sprintf( buf, "Жертвоприношение Богам.. ");
+                sprintf( buf, "Жертвоприношение Богам... ");
                 break;
         case 10:
                 sprintf( buf, "Случалось ли тебе танцевать с дьяволом?");

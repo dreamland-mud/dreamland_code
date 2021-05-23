@@ -56,7 +56,6 @@ public:
     inline const char * getRealDescription( ) const;
 
     // name and sex formatting
-    inline const char *getNameP( ) const;
     virtual DLString getNameP( char gram_case ) const;
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
     virtual void updateCachedNoun( );
@@ -103,10 +102,6 @@ public:
     PCharacter                *switchedFrom;
 };
 
-inline const char * NPCharacter::getNameP( ) const 
-{ 
-    return Character::getNameP( ); 
-}
 inline const char * NPCharacter::getShortDescr( ) const
 {
     return short_descr ? short_descr : pIndexData->short_descr;

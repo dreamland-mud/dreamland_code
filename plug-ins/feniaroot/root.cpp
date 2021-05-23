@@ -255,7 +255,7 @@ NMI_INVOKE( Root, get_char_world , "(name): ищет в мире чара с у�
     const char *name = args.front( ).toString( ).c_str( );
     
     for (wch = char_list; wch; wch = wch->next) 
-        if (is_name( name, wch->getNameP( ) ))
+        if (is_name( name, wch->getNameC() ))
             return WrapperManager::getThis( )->getWrapper(wch); 
 
     return Register( );

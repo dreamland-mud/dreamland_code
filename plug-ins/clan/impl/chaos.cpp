@@ -210,9 +210,9 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
         }
 
         if ( rch )
-            interpret_raw( victim, "murder", rch->getNameP( ));
+            interpret_raw( victim, "murder", rch->getNameC());
 
-        interpret_raw( victim, "murder", ch->getNameP( ));
+        interpret_raw( victim, "murder", ch->getNameC());
 
 }
 
@@ -449,7 +449,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
         sprintf(long_buf, "{W%s{x%s здесь.\n\r",
                 tmp_vict->getNameP( '1' ).c_str(), tmp_vict->getPC( )->getParsedTitle( ).c_str( ));
-        strcpy(short_buf, tmp_vict->getNameP( ) );
+        strcpy(short_buf, tmp_vict->getNameC() );
 
         if ( ch == victim )
         {
@@ -478,7 +478,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
                 mch->setLongDescr( long_buf );
                 mch->setDescription( tmp_vict->getDescription( ) );
                 
-                DLString name( tmp_vict->getNameP( ) );
+                DLString name( tmp_vict->getNameC() );
                 mch->setName( name );
                 
                 mch->setSex( tmp_vict->getSex( ) );

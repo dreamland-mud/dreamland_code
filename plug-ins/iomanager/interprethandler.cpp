@@ -196,7 +196,7 @@ void InterpretHandler::normalPrompt( Character *ch )
     }
 
     if (IS_SET(ch->comm,COMM_AFK)) {
-        ch->send_to("{C<AFK>{x ");
+        ch->send_to("{C<{leAFK{lrАФК{x>{x ");
         return;
     }
 
@@ -277,7 +277,7 @@ void InterpretHandler::normalPrompt( Character *ch )
             if (ch->hit >= 0)
                 out << HEALTH(ch) << "%";
             else
-                out << "BAD!!";
+                out << "ПРИ СМЕРТИ!";
             break;
 
         case 'o' :
@@ -286,7 +286,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                 if (victim->hit >= 0)
                     out << HEALTH(victim) << "%";
                 else
-                    out << "BAD!!";
+                    out << "ПРИ СМЕРТИ!";
             }
             else
                 out << "нет";

@@ -33,7 +33,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
         if (a_gold < 1)
         {
             tell_dim( vch, ch, "Извини, но эта сумма слишком мала для обмена." );
-            interpret_raw( ch, "give", "%d silver %s", silver, vch->getNameP( ) );
+            interpret_raw( ch, "give", "%d silver %s", silver, vch->getNameC() );
             return;
         }
 
@@ -84,12 +84,12 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
         
         if ( a_gold > 0 )
         {
-            interpret_raw( ch, "give", "%d gold %s", a_gold, vch->getNameP( ) );
+            interpret_raw( ch, "give", "%d gold %s", a_gold, vch->getNameC() );
         }
         
         if ( a_silver > 0 )
         {
-            interpret_raw( ch, "give", "%d silver %s", a_silver, vch->getNameP( ) );
+            interpret_raw( ch, "give", "%d silver %s", a_silver, vch->getNameC() );
         }
 
         tell_dim( vch, ch, "Спасибо, приходи еще!" );

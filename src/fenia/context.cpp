@@ -30,7 +30,8 @@ BackTrace::BackTrace()
 
 BackTrace::~BackTrace()
 {
-    Context::current->backTrace = parent;
+    if (Context::current)
+        Context::current->backTrace = parent;
 }
 
 void 

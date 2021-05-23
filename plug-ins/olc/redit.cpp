@@ -303,7 +303,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     stc("Characters: [{W", ch);
     fcnt = false;
     for (rch = pRoom->room->people; rch; rch = rch->next_in_room) {
-        DLString names = rch->getNameP();
+        DLString names = rch->getNameC();
         ptc(ch, "%s ", names.getOneArgument().c_str());
         fcnt = true;
     }

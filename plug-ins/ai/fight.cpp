@@ -66,7 +66,7 @@ void BasicMobileBehavior::attackSmart( Character *victim )
         cmd = "bash";
 
     if (cmd) 
-        interpret_raw( ch, cmd, victim->getNameP( ) );
+        interpret_raw( ch, cmd, victim->getNameC() );
     else 
         SpellChanceTable( spellTable, ch, victim ).castSpell( );
         

@@ -15,21 +15,9 @@
 #include "merc.h"
 #include "descriptor.h"
 
-GQChannel* GQChannel::thisClass = NULL;
-
 const char * const GQChannel::BOLD = "{Y";
 const char * const GQChannel::NORMAL = "{y";
 
-GQChannel::GQChannel( ) 
-{
-    thisClass = this;
-}
-
-GQChannel::~GQChannel( )
-{
-    thisClass = NULL;
-}
-    
 void GQChannel::zecho( GlobalQuest *gquest, Area *area, const DLString& msg ) 
 {
     Descriptor *d;
@@ -80,7 +68,7 @@ void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pc
     if (dreamland->isShutdown( ))
         return;
     
-    buf << BOLD << "[" << NORMAL << "Global Quest" << BOLD << ": " 
+    buf << BOLD << "[" << NORMAL << "{leGlobal Quest{lrГлобал{lx" << BOLD << ": " 
         << NORMAL << name << BOLD << "] "
         << NORMAL << msg << "{x" << endl;
     
@@ -100,25 +88,13 @@ void GQChannel::gecho( const DLString& msg )
     if (dreamland->isShutdown( ))
         return;
     
-    buf << BOLD << "[" << NORMAL << "Global Quest" << BOLD << "] " 
+    buf << BOLD << "[" << NORMAL << "{leGlobal Quest{lrГлобал{lx" << BOLD << "] " 
         << NORMAL << msg << "{x" << endl;
     
     for ( d = descriptor_list; d; d = d->next ) 
         if (d->connected == CON_PLAYING)
             if (d->character)
                 d->character->send_to( buf );
-}
-
-void GQChannel::gechoRaw( const DLString& msg ) 
-{
-    Descriptor *d;
-    
-    if (dreamland->isShutdown( ))
-        return;
-    
-    for ( d = descriptor_list; d; d = d->next ) 
-        if (d->connected == CON_PLAYING && d->character)
-            d->character->pecho(msg);
 }
 
 void GQChannel::pecho( Character *ch, ostringstream& buf ) 
@@ -132,10 +108,5 @@ void GQChannel::pecho( Character *ch, const DLString& msg )
         return;
 
     ch->printf( "%s%s{x\r\n", NORMAL, msg.c_str( ) );
-}
-
-GQChannel * GQChannel::getThis( ) 
-{
-    return thisClass;
 }
 

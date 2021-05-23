@@ -50,7 +50,7 @@ bool CommunicationChannel::checkIgnore( Character *ch, Character *victim ) const
     if (!twit)
         return false;
 
-    return twit->isAvailable( ch->getNameP( ) );
+    return twit->isAvailable( ch->getNameC() );
 }
 
 void CommunicationChannel::applyGarble( Character *ch, DLString &msg, Character *victim ) const

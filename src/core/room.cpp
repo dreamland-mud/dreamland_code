@@ -85,7 +85,7 @@ bool Room::isOwner( Character *ch ) const
     if (owner == 0 || owner[0] == '\0')
         return false;
 
-    return is_name( ch->getNameP( ), owner );
+    return is_name( ch->getNameC(), owner );
 }
 
 bool Room::hasExits() const

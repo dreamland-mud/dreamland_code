@@ -110,7 +110,7 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
 
     DLString nameFormat = monumentName + " " + obj->getName();
     obj->fmtName( 
-            nameFormat.c_str(), ch->getNameP( ), killer->getNameP( ) );
+            nameFormat.c_str(), ch->getNameC(), killer->getNameC() );
 
     obj->fmtShortDescr( 
             obj->getShortDescr( ), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );

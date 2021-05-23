@@ -8,7 +8,6 @@
 
 #include <sstream>
 
-#include "dlobject.h"
 #include "dlstring.h"
 
 struct Area;
@@ -17,12 +16,8 @@ class PCharacter;
 class GlobalQuest;
 class GlobalQuestInfo;
 
-class GQChannel : public virtual DLObject {
+class GQChannel {
 public:
-    typedef ::Pointer<GQChannel> Pointer;
-    
-    GQChannel( );
-    virtual ~GQChannel( );
 
     static void zecho( GlobalQuest *, struct Area*, const DLString& );
     static void gecho( GlobalQuestInfo *, const DLString& );
@@ -32,17 +27,9 @@ public:
     static void gecho( const DLString&, const DLString&, PCharacter *pch = NULL);
     static void pecho( Character *, const DLString& );
     static void pecho( Character *, ostringstream& );
-    static void gechoRaw( const DLString& );
 
     static const char * const BOLD;
     static const char * const NORMAL;
-
-    static GQChannel * getThis( );
-    
-private:
-    
-    static GQChannel *thisClass;
-
 };
 
 #endif

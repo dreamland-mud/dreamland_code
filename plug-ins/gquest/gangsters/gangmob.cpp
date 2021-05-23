@@ -169,7 +169,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
         switch (number_range( 1, 3 )) {
         case 1: 
             oldact("$c1 громко вопит '{gПытаешься подкупить меня, щенок?!{x'", ch, 0, briber, TO_ROOM);
-            interpret_raw(ch, "murder", briber->getNameP( ));
+            interpret_raw(ch, "murder", briber->getNameC());
             break;
         case 2:
             oldact("$c1 произносит '{gПлакали твои денежки, $C1!{x'", ch, 0, briber, TO_ROOM);
@@ -219,7 +219,7 @@ void GangMember::greet( Character *mob )
             break;
         case 3:
             oldact("$c1 рычит '{g$C1, как же ты меня доста$Gло|л|ла!{x'", ch, 0, mob, TO_ROOM);
-            interpret_raw(ch, "murder", mob->getNameP( ) );
+            interpret_raw(ch, "murder", mob->getNameC() );
             break;
         }
         return;
@@ -265,10 +265,10 @@ void GangMember::greet( Character *mob )
                 if (ch->can_see( mob )) 
                     switch (number_range( 1, 5 )) {
                     case 1:
-                        interpret_fmt(ch, "tip %s", mob->getNameP( ));
+                        interpret_fmt(ch, "tip %s", mob->getNameC());
                         break;
                     case 2:
-                        interpret_fmt(ch, "shake %s", mob->getNameP( ));
+                        interpret_fmt(ch, "shake %s", mob->getNameC());
                         break;
                     }
 
@@ -290,20 +290,20 @@ void GangMember::greet( Character *mob )
         if (!mob->is_npc( ) && mob->getSex( ) == SEX_FEMALE && ch->can_see( mob )) 
             switch (number_range( 1, 20 )) {
             case 1:
-                interpret_fmt(ch, "pinch %s", mob->getNameP( ));
+                interpret_fmt(ch, "pinch %s", mob->getNameC());
                 interpret( ch, "smirk" );
                 break;
             case 2:
-                interpret_fmt(ch, "spank %s", mob->getNameP( ));
+                interpret_fmt(ch, "spank %s", mob->getNameC());
                 break;
             case 3:
-                interpret_fmt(ch, "leer %s", mob->getNameP( ));
+                interpret_fmt(ch, "leer %s", mob->getNameC());
                 break;
             case 24:
-                interpret_fmt(ch, "rose %s", mob->getNameP( ));
+                interpret_fmt(ch, "rose %s", mob->getNameC());
                 break;
             case 25:
-                interpret_fmt(ch, "bkiss %s", mob->getNameP( ));
+                interpret_fmt(ch, "bkiss %s", mob->getNameC());
                 break;
             }
     }
@@ -339,10 +339,10 @@ void GangMember::fight( Character *victim )
             interpret(ch, "curse"); 
             break;
             case 3: 
-            interpret_fmt(ch, "fatality %s", victim->getNameP( ));
+            interpret_fmt(ch, "fatality %s", victim->getNameC());
             break;
         case 4: 
-            interpret_fmt(ch, "cramp %s", victim->getNameP( ));
+            interpret_fmt(ch, "cramp %s", victim->getNameC());
             break;
         case 5:
             oldact("$c1 вопит '{gПомогите! Хулиганы зрения лишают!{x'", ch, 0, 0, TO_ROOM); 
@@ -368,7 +368,7 @@ bool GangMember::death( Character *killer )
 
     killer = gquest->getActor( killer );
 
-    log("GangMember: killed by " << killer->getNameP( ));
+    log("GangMember: killed by " << killer->getNameC());
     
     if (gquest->isLevelOK( killer )) {
         if (killer->in_room == ch->in_room && number_percent( ) < 10) {

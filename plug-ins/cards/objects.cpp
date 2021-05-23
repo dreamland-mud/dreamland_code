@@ -80,7 +80,7 @@ bool CardPackBehavior::examine( Character *looker )
         
         fEmpty = false;
         looker->printf( "    %-20s %s\r\n", 
-                victim->getNameP( ),
+                victim->getNameC(),
                 attr->getFace( '1' ).c_str( ) );
     }
     

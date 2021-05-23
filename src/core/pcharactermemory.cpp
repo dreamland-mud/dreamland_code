@@ -11,7 +11,7 @@
  ***************************************************************************/
 
 #include "pcharactermemory.h"
-#include "class.h"
+#include "grammar_entities_impl.h"
 
 PCharacterMemory::PCharacterMemory( )
 {
@@ -24,6 +24,19 @@ PCharacterMemory::~PCharacterMemory( )
 const DLString& PCharacterMemory::getName( ) const 
 {
         return name.getValue( );
+}
+
+DLString PCharacterMemory::getNameP(char gram_case) const
+{
+    if (russianName.getFullForm().empty())
+        return name;
+
+    return russianName.decline(gram_case);
+}
+
+const char * PCharacterMemory::getNameC() const
+{
+    return name.c_str();
 }
 
 void PCharacterMemory::setName( const DLString& name ) 

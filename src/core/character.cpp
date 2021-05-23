@@ -310,7 +310,7 @@ NPCharacter * Character::getMobile( )
 /*****************************************************************************
  * name and sex formatting
  *****************************************************************************/
-const char* Character::getNameP( ) const
+const char* Character::getNameC( ) const
 {
     return getName( ).c_str( );
 }

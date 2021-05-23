@@ -173,7 +173,7 @@ void KidnapBandit::greet( Character *victim )
     switch (state.getValue( )) {
     case BSTAT_HUNT_PRINCE: 
         if (ourHero( victim ) && number_percent( ) < 50) /* little surprise */
-            interpret_fmt( ch, "blackjack %s", victim->getNameP( ) );
+            interpret_fmt( ch, "blackjack %s", victim->getNameC() );
         
         break;
     default:

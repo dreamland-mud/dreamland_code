@@ -72,7 +72,7 @@ void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQu
                 ch, DLString(quest->delivered).c_str( ), 0, TO_ROOM );
         break;
     case 3:
-        interpret_fmt( ch, "nod %s", hero->getNameP( ) );
+        interpret_fmt( ch, "nod %s", hero->getNameC() );
         break;
     }
 }
