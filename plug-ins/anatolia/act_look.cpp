@@ -1637,7 +1637,7 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
         if (obj->value1() == 0)
                 ch->printf("Жаль, но здесь нет золота.\n\r");
         else if (obj->value1() == 1)
-                ch->printf("Ух-ты. Одна золотая монетка!\n\r");
+                ch->printf("Ух ты! Одна золотая монетка!\n\r");
         else
                 ch->printf("Здесь %d золот%s.\n\r",
                         obj->value1(),GET_COUNT(obj->value1(), "ая монета","ые монеты","ых монет"));
@@ -1645,7 +1645,7 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
     else if (obj->value1() == 0)
     {
         if (obj->value0() == 1)
-                ch->printf("Ух-ты! Одна серебряная монетка.\n\r");
+                ch->printf("Ух ты! Одна серебряная монетка.\n\r");
         else
                 ch->printf("Здесь %d серебрян%s.\n\r",
                         obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
@@ -1674,7 +1674,7 @@ static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLS
                     "Меньше, чем до половины" :
                     obj->value1() < 3 * obj->value0() / 4 ? 
                         "До половины"  : 
-                        "Чуть более, чем на половину",
+                        "Чуть более, чем наполовину",
                 liquidManager->find( obj->value2() )->getColor( ).ruscase( '2' ).c_str( )
               );
     return true;
