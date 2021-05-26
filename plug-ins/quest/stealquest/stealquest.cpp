@@ -14,6 +14,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "roomutils.h"
 #include "object.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -450,7 +451,7 @@ Room * StealQuest::findHideaway( PCharacter *pch, NPCharacter *thief )
     RoomVector::iterator r;
 
     for (auto &r: thief->in_room->area->rooms) {
-        if (checkRoom( pch, r.second ))
+        if (checkRoom( pch, r.second ) && !RoomUtils::isWaterOrAir(r.second))
             places.push_back( r.second );
     }
     
