@@ -652,7 +652,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         buf << "({1{rНежить{2)";
 
     if (IS_AFFECTED(victim, AFF_PASS_DOOR))
-        buf << "({1{wПр{Dо{wзр{Dа{wч%1$Gно{2)|н{2)|на{2)";
+        buf << fmt(ch, "({1{wПр{Dо{wзр{Dа{wч%1$Gно{2)|н{2)|на{2)", victim);
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE))
         buf << "({MРозовая Аура{x)";
