@@ -344,6 +344,8 @@ again:
             case ',':
             case '.':
             case ':':
+            case '{':
+            case '(': case ')':
                 state = 0;
                 rc += pad(left, width, limit, upcase, s);
                 goto again;
