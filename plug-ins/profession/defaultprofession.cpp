@@ -51,6 +51,8 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
     PCharacter dummy;
     dummy.setLevel(100);
     dummy.setProfession(prof->getName());
+    dummy.alignment = ALIGN_NONE; // ensure align and ethos restrictions won't be active
+    dummy.ethos = ETHOS_NULL;
 
     // Group all skills by the level they become available to this class.
     map<int, StringList> myskills;

@@ -78,11 +78,13 @@ bool GenericSkill::isProfessional() const
 
 bool GenericSkill::checkAlignEthos(Character *ch) const
 {
-    if (ch && align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
-        return false;
+    if (ch && ch->alignment != ALIGN_NONE)
+        if (align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
+            return false;
 
-    if (ch && ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
-        return false;
+    if (ch && ch->ethos != ETHOS_NULL)
+        if (ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
+            return false;
 
     return true;
 }
