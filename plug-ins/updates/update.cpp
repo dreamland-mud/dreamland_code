@@ -1260,9 +1260,6 @@ void room_update( void )
 void room_affect_update( )
 {
     for (auto &room: roomAffected) {        
-        if (!room->people)
-            continue;
-        
         for (auto paf_iter = room->affected.cbegin(); paf_iter != room->affected.cend(); paf_iter++) {
             Affect *paf = *paf_iter;
             
