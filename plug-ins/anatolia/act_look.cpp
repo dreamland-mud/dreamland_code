@@ -626,25 +626,25 @@ void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     if (RIDDEN( victim ))
-	buf << fmt( ch, "({1{gОседла%1$Gно{2|н{2|на{2)", victim );
+	buf << fmt( ch, "({1{gОседла%1$Gно{2)|н{2)|на{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_INVISIBLE))
-	buf << fmt( ch, "({1{DНевиди%1$Gмо{2|м{2|ма{2)", victim );
+	buf << fmt( ch, "({1{DНевиди%1$Gмо{2)|м{2)|ма{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_IMP_INVIS))
-	buf << fmt( ch, "({1{bОчень невиди%1$Gмо{2|м{2|ма{2)", victim );
+	buf << fmt( ch, "({1{bОчень невиди%1$Gмо{2)|м{2)|ма{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_HIDE))
-	buf << fmt( ch, "({1{DУкры%1$Gто{2|т{2|та{2)", victim );
+	buf << fmt( ch, "({1{DУкры%1$Gто{2)|т{2)|та{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_FADE))
-	buf << fmt( ch, "({1{DСпрята%1$Gно{2|н{2|на{2)", victim );
+	buf << fmt( ch, "({1{DСпрята%1$Gно{2)|н{2)|на{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_CAMOUFLAGE))
-	buf << fmt( ch, "({1{GЗамаскирова%1$Gно{2|н{2|на{2)", victim );
+	buf << fmt( ch, "({1{GЗамаскирова%1$Gно{2)|н{2)|на{2)", victim );
 
     if (IS_AFFECTED(victim, AFF_CHARM))
-	buf << fmt( ch, "({1{mОчарова%1$Gно{2|н{2|на{2)", victim );
+	buf << fmt( ch, "({1{mОчарова%1$Gно{2)|н{2)|на{2)", victim );
 
     if (victim->is_npc()
             && IS_SET(victim->act,ACT_UNDEAD)
@@ -652,7 +652,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         buf << "({1{rНежить{2)";
 
     if (IS_AFFECTED(victim, AFF_PASS_DOOR))
-        buf << "({1{wПр{Dо{wзр{Dа{wчно{2)";
+        buf << "({1{wПр{Dо{wзр{Dа{wч%1$Gно{2)|н{2)|на{2)";
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE))
         buf << "({MРозовая Аура{x)";
