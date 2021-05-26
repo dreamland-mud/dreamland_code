@@ -149,6 +149,7 @@ bool FeniaTriggerLoader::clearTrigger(Scripting::Object *wrapper, const DLString
     if (base->getField(methodId).type == Register::NONE)
         return false;
 
+    Register self = base->getSelf();
     base->setField(methodId, Register());
     return true;
 }
