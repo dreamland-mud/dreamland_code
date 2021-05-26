@@ -345,6 +345,9 @@ int BasicSkill::getMana(Character *ch) const
     if (!available(ch))
         return mana;
 
+    if (mana <= 0)
+        return 0;
+        
     int cost = max( mana.getValue(),
                 100 / (2 + ch->getRealLevel() - getLevel(ch)) );
 
