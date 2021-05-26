@@ -1259,14 +1259,20 @@ void room_update( void )
 
 void room_affect_update( )
 {
-    for (auto &room: roomAffected) {        
-        for (auto paf_iter = room->affected.cbegin(); paf_iter != room->affected.cend(); paf_iter++) {
+    RoomSet tempAffected;
+
+    // Create temporary set to avoid removing set elements from inside the loop.
+    tempAffected.insert(roomAffected.begin(), roomAffected.end());    
+
+    for (auto &room: tempAffected) {
+        AffectList affects = room->affected.clone();
+        for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
             Affect *paf = *paf_iter;
             
             if (paf->level == 1)
                 paf->level = 2;
 
-            if (!room->affected.hasNext(paf_iter) && paf->type->getAffect( )) 
+            if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
                 paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, room), paf );
         }
     }
