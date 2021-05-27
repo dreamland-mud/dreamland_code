@@ -62,4 +62,6 @@ void say_fmt( const char *, ... );
 /** Display newbie hint message. */
 void hint_fmt(Character *ch, const char *format, ...);
 
+/** Output message to mob's master. */
+void echo_master(Character *ch, const char *format, ...);
 #endif

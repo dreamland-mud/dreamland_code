@@ -51,42 +51,42 @@ SKILL_RUNP( rescue )
 
         if ( arg[0] == '\0' )
         {
-                ch->pecho("Спасти кого?");
+                echo_master(ch, "Спасти кого?");                
                 return;
         }
 
         if ( ( victim = get_char_room( ch, arg ) ) == 0 )
         {
-                ch->pecho("Таких нет здесь.");
+                echo_master(ch, "Таких нет здесь.");
                 return;
         }
 
         if ( victim == ch )
         {
-                ch->pecho("Себя?");
+                echo_master(ch, "Себя?");
                 return;
         }
 
         if ( ch->fighting == victim )
         {
-                ch->pecho("Слишком поздно...");
+                echo_master(ch, "Слишком поздно...");
                 return;
         }
 
         if ( ( ( fch = victim->fighting ) == 0 )
                 && ( victim->death_ground_delay == 0 ) )
         {
-                ch->pecho("Но никто не нуждается в помощи..");
+                echo_master(ch, "Но никто не нуждается в помощи..");
                 return;
         }
 
         if (fch && is_safe_nomessage(ch, fch) ) {
-                ch->pecho( "Ты не можешь вступить в бой против %C2. Вы вне ПК.", fch);
+                echo_master(ch, "Ты не можешь вступить в бой против %C2. Вы вне ПК.", fch);
                 return;
         }
 
         if ((!victim->is_npc( ) || (victim->is_npc( ) && victim->master != 0 ) ) && !is_same_group(ch, victim) && fch) {
-                ch->pecho("Вы не в одной группе!");
+                echo_master(ch, "Вы не в одной группе!");
                 return;
         }
 
@@ -96,7 +96,7 @@ SKILL_RUNP( rescue )
                 || ( victim->getModifyLevel() > ( skill_level(*gsn_rescue, ch) + 30) )
                 || ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
         {
-                ch->pecho("Твоя попытка спасти не удалась.");
+                echo_master(ch, "Твоя попытка спасти не удалась.");
                 gsn_rescue->improve( ch, false, victim );
                 return;
         }

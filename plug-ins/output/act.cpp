@@ -376,3 +376,19 @@ void hint_fmt(Character *ch, const char *format, ...)
 
     ch->pecho("{y[{GПодсказка{y]{x " + output);
 }
+
+void echo_master(Character *ch, const char *format, ...)
+{
+    va_list av;
+    va_start(av, format);
+
+    if (ch->master)
+        ch->master->pecho("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch);
+
+    ch->vpecho(format, av);
+
+    if (ch->master)
+        ch->master->vpecho(format, av);
+
+    va_end(av);
+}

@@ -151,6 +151,8 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
     // Do skill availability check early. TODO: custom message overrides.
     if (!skill->usable(ch)) {
+        if (ch->master)
+            ch->master->pecho("%^C1 не владеет навыком '{W%s{x'.", ch, skill->getNameFor(ch->master).c_str());
         ch->pecho("Ты не владеешь навыком '{W%s{x'.", skill->getNameFor(ch).c_str());
         return;
     }
