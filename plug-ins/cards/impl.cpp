@@ -50,7 +50,7 @@ public:
             if (cnt > 10)
                 break;
 
-            if (!ch->is_npc( ))
+            if (!ch->is_npc( ) || ch->is_mirror())
                 continue;
             
             mob = ch->getNPC( );
