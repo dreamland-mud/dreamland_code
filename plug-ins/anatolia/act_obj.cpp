@@ -1102,7 +1102,7 @@ CMDRUNP( put )
                 &&   obj->wear_loc == wear_none)
             {
 
-                switch (can_put_obj_into( ch, obj, container, pocket, false )) {
+                switch (can_put_obj_into( ch, obj, container, pocket, true )) {
                 case PUT_OBJ_STOP:
                     return;
 
