@@ -37,6 +37,9 @@ void QuestEntity::mandatoryExtract( )
         quest->state = QSTAT_BROKEN_BY_OTHERS;
         quest->setTime( pcm, quest->getAccidentTime( pcm ) );
         quest->scheduleDestroy( );
+
+        if (pcm->isOnline())
+            pcm->getPlayer()->pecho("{YТвоё задание уже невозможно выполнить. Через пару минут сможешь попросить новое.{x");
     }
 }
 
