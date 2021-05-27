@@ -221,15 +221,6 @@ CMDRUN( buy )
         return;
     }
 
-    if ( ch->getRealLevel( ) < get_wear_level( ch, obj ) )
-    {
-        oldact_p("$c1 говорит тебе '{gТы не сможешь использовать $o4{x'.",
-                keeper, obj, ch, TO_VICT,POS_RESTING );
-
-        ch->reply = keeper;
-        return;
-    }
-
     if ( ch->carry_number + number * obj->getNumber( ) > ch->canCarryNumber( ) )
     {
         ch->pecho("Ты не можешь нести так много вещей.");
@@ -267,6 +258,11 @@ CMDRUN( buy )
         sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
                         cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
         oldact( buf, ch, obj, 0, TO_CHAR);
+    }
+
+    int wlevel = get_wear_level( ch, obj );
+    if (ch->getRealLevel() < wlevel) {
+        say_fmt("Ты сможешь использовать %3$O4 только на %4$d уровне.", keeper, ch, obj, wlevel);
     }
 
     deduct_cost( ch, cost * number );
