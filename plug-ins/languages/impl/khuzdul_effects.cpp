@@ -96,25 +96,25 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
     
     if ( IS_AFFECTED(ch,AFF_CALM) )
     {
-        ch->pecho( "Ты слишком миролюбив{Sfа{Sx для древней ярости." );
+        victim->pecho( "Ты слишком миролюбив{Sfа{Sx для древней ярости." );
+        victim->recho("%1$^C1 слишком миролюбив%1$Gо||а для древней ярости.", victim);
         return false;
     } 
-    
+
+    if (victim->isAffected( gsn_ancient_rage )) {
+        victim->pecho("Пламя древней ярости уже горит в тебе.");
+        victim->recho("Пламя древней ярости уже горит в %C6.", victim);
+        return false;
+    }
+
     af.type         = gsn_ancient_rage;
     af.level         = ch->getModifyLevel( );
     af.duration         = number_fuzzy( af.level / 8 );
     af.location         = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
+    af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
 
-    if (victim->isAffected( gsn_ancient_rage )) {
-        ch->pecho( "{CПламя древней ярости разгорается в тебе с новой силой!{x" );
-        af.modifier = 0;
-    }
-    else {
-        ch->pecho( "{CПламя древней ярости вспыхивает в тебе!{x" );
-        af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
-    }
-
-    oldact("{CПламя древней ярости вспыхивает в $c6!{x", victim, 0, 0, TO_ROOM );
+    victim->pecho( "{CПламя древней ярости вспыхивает в тебе!{x" );
+    victim->recho( "{CПламя древней ярости вспыхивает в %C6!{x", victim);
     affect_join( victim, &af );
     return true;
 }
