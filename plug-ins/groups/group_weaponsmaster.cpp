@@ -129,12 +129,12 @@ void disarm( Character *ch, Character *victim ,int disarm_second)
 
         if ( IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_INVENTORY) ) 
         {
-                   oldact("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие!{x", ch, 0, victim, TO_VICT );
+                oldact("{R$c1 ВЫБИ$gЛО|Л|ЛА {xу тебя оружие!{x", ch, 0, victim, TO_VICT );
                 obj_to_char( obj, victim );
         }
         else
         {
-                   oldact("{R$c1 ВЫБИ$gЛО{x|Л{x|ЛА у тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT );
+                oldact("{R$c1 ВЫБИ$gЛО|Л|ЛА {xу тебя оружие, и оно упало на землю!{x", ch, 0, victim, TO_VICT );
                 obj_to_room( obj, victim->in_room );
                 if (victim->is_npc() && victim->wait == 0 && victim->can_see(obj))
                         do_get_raw(victim, obj);

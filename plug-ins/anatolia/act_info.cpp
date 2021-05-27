@@ -300,7 +300,7 @@ CMDRUNP( oscore )
                    ch->getRealLevel( ));
     
     if (!ch->is_npc( ))
-        buf << fmt( 0, ", тебе %1$d %1$Iгод|года|лет (%2$d ча%2$Iс)|са)|сов).",
+        buf << fmt( 0, ", тебе %1$d %1$Iгод|года|лет (%2$d ча%2$Iс|са|сов).",
                         pch->age.getYears( ), pch->age.getHours( ) ); 
     
     buf << endl;
