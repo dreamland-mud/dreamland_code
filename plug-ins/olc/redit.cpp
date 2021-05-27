@@ -116,7 +116,9 @@ REDIT(sector, "местность", "установить тип местнос�
     EDIT_ROOM(ch, pRoom);
 
     if (flagValueEdit(sector_table, pRoom->sector_type)) {
-        if ((pRoom->sector_type == SECT_WATER_NOSWIM || pRoom->sector_type == SECT_WATER_SWIM)
+        if ((pRoom->sector_type == SECT_WATER_NOSWIM 
+            || pRoom->sector_type == SECT_WATER_SWIM
+            || pRoom->sector_type == SECT_UNDERWATER)
             && pRoom->liquid == liq_none)
             pRoom->liquid = liq_water;
         return true;

@@ -248,7 +248,10 @@ XMLRoom::compat(int vnum)
     else
         room->liquid = liq_none;
 
-    if ((room->sector_type == SECT_WATER_NOSWIM || room->sector_type == SECT_WATER_SWIM) && room->liquid == liq_none)
+    if ((room->sector_type == SECT_WATER_NOSWIM 
+        || room->sector_type == SECT_WATER_SWIM
+        || room->sector_type == SECT_UNDERWATER) 
+        && room->liquid == liq_none)
         room->liquid = liq_water;
 
     XMLResetList::iterator rit;
