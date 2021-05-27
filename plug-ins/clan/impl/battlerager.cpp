@@ -38,6 +38,7 @@
 #include "handler.h"
 #include "act.h"
 #include "interp.h"
+#include "immunity.h"
 #include "def.h"
 #include "skill_utils.h"
 
@@ -356,6 +357,11 @@ SKILL_APPLY( mortalstrike )
         return false;
     }
 
+    int dam_type = attack_table[wield->value3()].damage;
+    int dam_flag = DAMF_WEAPON;
+    if (immune_check(victim, dam_type, dam_flag) == RESIST_IMMUNE)
+        return false;
+
     // Calculate real chance to strike (original Anatolia code).
     chance = 1 + learned / 30; 
     chance += (slevel - victim->getModifyLevel()) / 2;
@@ -374,7 +380,7 @@ SKILL_APPLY( mortalstrike )
     oldact("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT);
     oldact_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
-    damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
+    damage(ch, victim, dam, gsn_mortal_strike, dam_type, dam_flag);
     gsn_mortal_strike->improve( ch, true, victim );
     return true;
 }
