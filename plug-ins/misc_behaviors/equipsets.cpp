@@ -372,7 +372,7 @@ bool MorrisDancerSet::area( )
     
     // Dance with a 'random' person in the room.
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
-        if (rch != ch && chance(50)) {
+        if (rch != ch && ch->can_see(rch) && chance(50)) {
             ch->pecho("{WЖелание непременно с кем-то потанцевать охватывает тебя!{x");
             switch(number_range(0, 1)) {
             case 0:
