@@ -191,7 +191,7 @@ private:
 
 
 const DLString CAlias::COMMAND_NAME = "alias";
-const unsigned int CAlias::MAX_ALIASES = 200;
+const unsigned int CAlias::MAX_ALIASES = 1000;
 
 /*-----------------------------------------------------------------------------
  * 'unalias' command 
