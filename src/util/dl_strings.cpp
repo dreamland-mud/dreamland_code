@@ -217,13 +217,18 @@ char *one_argument( char *argument, char *arg_first )
 /*
  * See if a string is one of the names of an object.
  */
-bool is_name( const char *arg1, const char *arg2 )
+bool is_name( const char *carg1, const char *carg2 )
 {        
         char *list;
         char *string;
         
-        if (!arg1 || !arg2)
+        if (!carg1 || !carg2)
             return false;
+
+        DLString arg1str = DLString(carg1).colourStrip();
+        DLString arg2str = DLString(carg2).colourStrip();
+        const char *arg1 = arg1str.c_str();
+        const char *arg2 = arg2str.c_str();
 
         int len1 = strlen(arg1) + 1, len2 = strlen(arg2) + 1;
         char name[len2], part[len1];

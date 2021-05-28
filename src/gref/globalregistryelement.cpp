@@ -39,12 +39,11 @@ bool GlobalRegistryElement::matchesUnstrict( const DLString &str ) const
     if (str.empty() || getName().empty())
         return false;
 
-    DLString str0 = str.colourStrip();
-    if (is_name(str0.c_str(), getName().c_str()))
+    if (is_name(str.c_str(), getName().c_str()))
         return true;
 
-    DLString rname = getRussianName().ruscase('1').colourStrip();
-    if (is_name(str0.c_str(), rname.c_str()))
+    DLString rname = getRussianName().ruscase('1');
+    if (is_name(str.c_str(), rname.c_str()))
         return true;
     
     return false;
