@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "globalregistryelement.h"
+#include "dl_strings.h"
 
 GlobalRegistryElement::GlobalRegistryElement( )
          : index( -1 )
@@ -37,11 +38,13 @@ bool GlobalRegistryElement::matchesUnstrict( const DLString &str ) const
 {
     if (str.empty() || getName().empty())
         return false;
-    
-    if (str.strPrefix(getName()))
+
+    DLString str0 = str.colourStrip();
+    if (is_name(str0.c_str(), getName().c_str()))
         return true;
 
-    if (str.strPrefix(getRussianName().ruscase('1')))
+    DLString rname = getRussianName().ruscase('1').colourStrip();
+    if (is_name(str0.c_str(), rname.c_str()))
         return true;
     
     return false;
