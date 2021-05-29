@@ -36,11 +36,7 @@ CodeSourceRepo::CodeSourceRepo()
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^(areas/[-a-z0-9]{2,}.are)/([a-z]+)$", true));
     subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(quest)/([0-9.a-zA-Z :]+)$", true));
-    subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(gquest)/([0-9.a-zA-Z :]+)$", true));
-    subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(behavior)/([0-9.a-zA-Z ]+)$", true));
+        RegExp::Pointer(NEW, "^([a-z]+)/([0-9.a-zA-Z :]+)$", true));
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^(global/on[A-Z][a-z]+)/([_a-zA-Z]+)$", true));
     subjPatterns.push_back(
