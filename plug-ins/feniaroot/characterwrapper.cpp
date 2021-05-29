@@ -80,6 +80,7 @@ const char *ttype_name( int ttype );
 DLString regfmt(Character *to, const RegisterList &argv);
 list< ::Object *> get_objs_list_type( Character *ch, int type, ::Object *list );
 void obj_from_anywhere( ::Object *obj );
+void do_visible( Character * );
 
 using namespace std;
 using namespace Scripting;
@@ -2142,6 +2143,13 @@ NMI_INVOKE( CharacterWrapper, canRecall, "(): может ли прямо сей�
         return false;
 
     return true;
+}
+
+NMI_INVOKE( CharacterWrapper, visible, "(): проявиться из невидимости" )
+{
+    checkTarget();
+    do_visible(target);
+    return Register();
 }
 
 NMI_INVOKE( CharacterWrapper, get_eq_char, "(wearloc): предмет экипировки, надетый на эту локацию" )
