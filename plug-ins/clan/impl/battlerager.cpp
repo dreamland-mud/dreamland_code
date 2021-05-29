@@ -380,7 +380,7 @@ SKILL_APPLY( mortalstrike )
     oldact("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT);
     oldact_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
     dam = victim->hit * 2; 
-    damage(ch, victim, dam, gsn_mortal_strike, dam_type, dam_flag);
+    damage(ch, victim, dam, gsn_mortal_strike, dam_type, true, dam_flag);
     gsn_mortal_strike->improve( ch, true, victim );
     return true;
 }
