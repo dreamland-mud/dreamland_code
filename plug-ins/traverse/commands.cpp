@@ -234,6 +234,8 @@ CMDRUN( path )
         if (elements.empty()) {
             if (ch->in_room == target)
                 buf << ": ты уже здесь!" << endl;
+            else if (!target->isCommon())
+                buf << ": ты не сможешь сюда войти" << endl;
             else
                 buf << ": путь не найден" << endl;
             continue;
