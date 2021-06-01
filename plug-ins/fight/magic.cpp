@@ -86,7 +86,6 @@
 #include "def.h"
 
 CLAN(none);
-GSN(spell_craft);
 
 /*
  * Compute a saving throw.
