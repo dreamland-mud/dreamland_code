@@ -18,7 +18,7 @@
 #include "skill_utils.h"
 #include "gsn_plugin.h"
 #include "stats_apply.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
 #include "magic.h"

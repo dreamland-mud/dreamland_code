@@ -25,6 +25,7 @@ GSN(pass_door);
 GSN(track);
 GSN(giant_strength);
 GSN(fly);
+GSN(gills);
 
 /*
  * Tracking. Called once per 6 seconds from track_update.
@@ -131,6 +132,7 @@ bool BasicMobileBehavior::move( int d, EXIT_DATA *pexit, Character *whosHunted )
         assistSpell( ch, gsn_giant_strength, whosHunted );
         return true;
 
+    case RC_MOVE_OUTWATER:
     case RC_MOVE_PASS_NEVER:
         return false;
 
@@ -141,6 +143,9 @@ bool BasicMobileBehavior::move( int d, EXIT_DATA *pexit, Character *whosHunted )
     case RC_MOVE_WATER:
         return assistSpell( ch, gsn_fly, whosHunted );
     
+    case RC_MOVE_UNDERWATER:
+        return assistSpell( ch, gsn_gills, whosHunted );
+
     case RC_MOVE_CLOSED:
         open_door_extra( ch, d, pexit );
         return true;
