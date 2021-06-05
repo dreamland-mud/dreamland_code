@@ -1324,7 +1324,7 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
         PCharacterManager::saveMemory( victim );
     
     if (victim->getLevel() <= LEVEL_MORTAL) {
-        if (clan != "NONE")
+        if (victim->getClan() != clan_none)
             DLString what = fmt(0, "{W%1$^C1 вступает в %s.{x", victim, clan.getRussianName( ).ruscase('4').c_str());
         else
             DLString what = fmt(0, "{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x", victim);
