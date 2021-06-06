@@ -158,9 +158,11 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     if (pch->getRealLevel() > 19  && pch->getHometown() == home_frigate)
         return;
     
-    /* no improve in safe rooms */
-    if (IS_SET(pch->in_room->room_flags, ROOM_SAFE))
+    /* no improve in safe rooms or mansions */
+    if ( IS_SET(pch->in_room->room_flags, ROOM_SAFE|ROOM_MANSION) ) {
+        pch->pecho("{WТишина и покой в этой местности расслабляют тебя, препятствуя прокачке умений.{x");
         return;
+    }
     
     /* no improve on immune mobiles */
     if (victim) {
