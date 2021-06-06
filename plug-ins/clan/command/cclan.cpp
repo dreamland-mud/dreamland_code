@@ -977,8 +977,8 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
 
     // Notify about level upgrades otherwise noticeable in 'who'.
     if (oldLevel < i && clan.isRecruiter(victim)) {
-        DLString what = fmt(0, "{W%s становится %s %s.{x", 
-            victim->getName().c_str(), 
+        DLString what = fmt(0, "{W%^C1 становится %s %s.{x", 
+            victim, 
             (clan.isLeader(victim) ? "лидером" : "рекрутером"),
             clan.getRussianName().ruscase('2').c_str());
 
@@ -1324,7 +1324,9 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
         PCharacterManager::saveMemory( victim );
     
     if (victim->getLevel() <= LEVEL_MORTAL) {
-        DLString what = fmt(0, "{W%s вступает в %s.{x", victim->getName().c_str(), clan.getRussianName( ).ruscase('4').c_str());
+        DLString what = fmt(0, "{W%^C1 вступает в %s.{x", victim, clan.getRussianName( ).ruscase('4').c_str());
+        if (victim->getClan() == clan_none)
+            what = fmt(0, "{W%1$^C1 становится внекланов%1$Gым|ым|ой.{x", victim);
         infonet(victim->getPlayer(), 0, "{CТихий голос из $o2: ", what.c_str());
         send_discord_clan(what);
         send_telegram(what);
