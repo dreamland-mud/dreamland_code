@@ -196,7 +196,7 @@ void InterpretHandler::normalPrompt( Character *ch )
     }
 
     if (IS_SET(ch->comm,COMM_AFK)) {
-        ch->send_to("{C<{leAFK{lrАФК{x>{x ");
+        ch->send_to("{C<{leAFK{lrАФК{lx>{x ");
         return;
     }
 
