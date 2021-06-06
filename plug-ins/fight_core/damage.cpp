@@ -793,7 +793,9 @@ void Damage::msgEcho(Character *to, const char *fmt, va_list va)
 
     buf << msgPunct();
 
-    if (to->isCoder()) // show explicit damage numbers to coders
+    // show explicit damage numbers for old damage config
+    // not for newbies -- not enabled by default
+    if(!to->is_npc() && !IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE))
          buf << " {D[{Y%1$d{D]{x";
 
     to->vpecho(buf.str().c_str(), va);
