@@ -431,13 +431,21 @@ bool Walkment::checkWater( Character *wch )
     // TODO: pets still inherit all boat_types from their master, so underwater restrictions
     // don't really apply to them yet.
 
+    if (RoomUtils::isWater(from_room) && !RoomUtils::isWater(to_room) && IS_SET(wch->form, FORM_FISH)) {
+            msgSelfParty( wch, 
+                      "Рыбы не амфибии, на сушу нельзя!",
+                      "%2$^C1 подплывает к краю воды, но не выходит на берег." );
+            rc = RC_MOVE_OUTWATER;
+            return false;         
+    }
+
     if (from_room->getSectorType() == SECT_UNDERWATER || 
          to_room->getSectorType() == SECT_UNDERWATER) {
             if (!IS_SET(boat_types, BOAT_SWIM)) {
                msgSelfParty( wch, 
                       "Чтобы попасть {hh2128под воду{x, нужны жабры или акваланг.",
                       "%2$^C3 нужны жабры или акваланг, чтобы попасть {hh2128под воду{x." );
-                rc = RC_MOVE_WATER; // TODO: add RC_MOVE_UNDERWATER
+                rc = RC_MOVE_UNDERWATER;
                 return false;                     
             }
     }

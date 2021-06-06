@@ -188,7 +188,7 @@ void Movement::callProgs( Character *wch )
                 oprog_greet( obj, wch );
 
         /* greet programs for people */
-        if (IS_AWAKE(fch) && movetype != MOVETYPE_RUNNING)
+        if (IS_AWAKE(fch))
             mprog_greet( fch, wch );
     }
 
