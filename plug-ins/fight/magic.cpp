@@ -96,16 +96,31 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
     int save;
     int mlevel = victim->getModifyLevel( );
 
+    // average saves on lvl 100: -70, max saves per non-limit item: -5
+    // shooting for ~70-80% chance to save with "normal" saves
+    // new equation should be:
+    // save = (mlevel - level) * 4 - victim->saving_throw / mlevel * 100
+    
     save = 40 + (mlevel - level) * 4 -
         (victim->saving_throw * 90) / max( 45, mlevel );
-
+    
     if (IS_AFFECTED(victim,AFF_BERSERK))
         save += mlevel / 5;
     
     switch(immune_check(victim, dam_type, dam_flag)) {
-    case RESIST_IMMUNE:                return true;
-    case RESIST_RESISTANT:        save += mlevel / 5; break;
-    case RESIST_VULNERABLE:        save -= mlevel / 5; break;
+        case RESIST_IMMUNE:
+            ch->pecho("%^s, похоже, никак не сможет навредить %C3.", damage_flags.messages(dam_flag).c_str(), victim); 
+            return true;
+        case RESIST_RESISTANT:
+            if (number_percent( ) < gsn_spell_craft->getEffective( ch ))
+                ch->pecho("%^s {1{Gочень слабо{2 влияет на %C4.", damage_flags.messages(dam_flag).c_str(), victim); 
+            save += mlevel / 5;
+            break;
+        case RESIST_VULNERABLE:
+            if (number_percent( ) < gsn_spell_craft->getEffective( ch ))
+                ch->pecho("%^s {1{Rособо пагубно{2 влияет на %C4.", damage_flags.messages(dam_flag).c_str(), victim);         
+            save -= mlevel / 5;
+            break;
     }
     
     if (ch && IS_GOOD(ch) && IS_EVIL(victim))
