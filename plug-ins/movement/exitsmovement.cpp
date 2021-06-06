@@ -460,11 +460,11 @@ int ExitsMovement::adjustMovetype( Character *wch )
         return MOVETYPE_FLYING;
 
     if (from_room->getSectorType() == SECT_WATER_NOSWIM || to_room->getSectorType() == SECT_WATER_NOSWIM) {
-        if (IS_SET(boat_types, BOAT_INV|BOAT_EQ))
-            return boat->value0();
-
         if (IS_SET(boat_types, BOAT_FLY))
             return MOVETYPE_FLYING;
+      
+        if (IS_SET(boat_types, BOAT_INV|BOAT_EQ))
+            return boat->value0();
     }
     
     switch (movetype) {
