@@ -352,7 +352,7 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
                     pch, 0, victim, TO_CHAR);        
                 oldact("$c1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
 
-                multi_hit( findHorribleVictim( pch ), pch );
+                multi_hit( findHorribleVictim( pch ), pch , "murder" );
             }
             else {
                 oldact("Твоя попытка затащить $C4 к себе провалилась.", pch, 0, victim, TO_CHAR);

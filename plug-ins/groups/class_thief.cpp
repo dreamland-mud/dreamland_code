@@ -582,7 +582,7 @@ SKILL_RUNP( steal )
                         if ( victim->is_npc() )
                         {
                                 gsn_steal->improve( ch, false, victim );
-                                multi_hit( victim, ch );
+                                multi_hit( victim, ch , "murder" );
                         }
                 }
 
@@ -819,7 +819,7 @@ protected:
                                fmt( ch, "Держи свои руки подальше, %^C1!", actor ).c_str( ) );
 
                 if (ch->is_npc( ))
-                    multi_hit( ch, actor );
+                    multi_hit( ch, actor , "murder" );
             }
         }
         else {

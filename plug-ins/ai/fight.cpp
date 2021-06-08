@@ -39,7 +39,7 @@ void BasicMobileBehavior::attack( Character *victim )
 
 void BasicMobileBehavior::attackDumb( Character *victim )
 {
-    multi_hit( ch, victim );
+    multi_hit( ch, victim , "murder" );
 }
 
 void BasicMobileBehavior::attackSmart( Character *victim )
@@ -71,7 +71,7 @@ void BasicMobileBehavior::attackSmart( Character *victim )
         SpellChanceTable( spellTable, ch, victim ).castSpell( );
         
     if (!ch->fighting)
-        multi_hit( ch, victim );
+        multi_hit( ch, victim , "murder" );
 }
 
 

@@ -32,12 +32,12 @@
 #include "vnum.h"
 #include "def.h"
 
-WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary )
+WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary, string command )
                 : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
                   OneHit( ch, victim )
 {
     this->secondary = secondary;
-    
+    this->command = command;
     weapon_sn = -1;
     weaponSkill = NULL;
     wield = NULL;
@@ -156,6 +156,9 @@ void WeaponOneHit::damApplyHoly( )
 void WeaponOneHit::damApplyCounter( )
 {
     int chance;
+
+    if (command != "murder")
+        return;
 
     if (victim->fighting)
         return;

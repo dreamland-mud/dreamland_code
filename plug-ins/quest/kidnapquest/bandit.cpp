@@ -290,7 +290,7 @@ bool KidnapBandit::heroAttack( PCharacter *hero )
     }
     
     debug( "Я вижу неспящего героя - ща как дам в дыню!" );
-    multi_hit( ch, hero );
+    multi_hit( ch, hero , "murder" );
     
     if (!ch->fighting) {
         debug( "Все это очень хорошо, но сражение не началось!" );

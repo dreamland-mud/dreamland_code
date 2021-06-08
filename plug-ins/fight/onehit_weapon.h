@@ -10,7 +10,7 @@
 
 class WeaponOneHit : public OneHit {
 public:
-    WeaponOneHit( Character *ch, Character *victim, bool secondary );
+    WeaponOneHit( Character *ch, Character *victim, bool secondary, string command = "" );
     
     virtual void init( );
     
@@ -32,6 +32,7 @@ protected:
 
     Object *wield;
     bool secondary;
+    string command;
     int weapon_sn;
     Skill *weaponSkill;
     int attack;

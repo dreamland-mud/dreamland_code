@@ -203,7 +203,7 @@ bool spec_ogre_member( NPCharacter *ch)
                 break;
     }
 
-    multi_hit( ch, victim );
+    multi_hit( ch, victim , "murder" );
     return true;
 }
 
@@ -267,14 +267,14 @@ bool spec_patrolman(NPCharacter *ch)
         case 3: do_yell( ch, "Сержант Петренко. Предъявите ваши документы!");
                 break;
         case 4: oldact("$c1 вытаскивает дубинку и принимается за работу.",ch,0,victim,TO_ALL);
-                break;        
+                break;
         case 5: oldact("$c1 обреченно вздыхает и продолжает останавливать драку.",ch,0,victim,TO_ALL);
                 break;
         case 6: do_say( ch, "А ну угомонились, хулиганье!");
                 break;
     }
 
-    multi_hit(ch,victim);
+    multi_hit( ch , victim , "murder" );
     return true;
 }
         
@@ -353,10 +353,10 @@ bool spec_breath_any( NPCharacter *ch )
 {
     if ( ch->position != POS_FIGHTING )
 		return false;
-	
+
     if ( number_percent() < 50 )
         return false;
-  
+
     switch (number_range(0,6))
     {
     	case 0: return spec_breath_fire( ch );
@@ -480,7 +480,7 @@ bool spec_executioner( NPCharacter *ch )
 
         do_yell( ch, buf );
 
-        multi_hit( ch, victim );
+        multi_hit( ch, victim , "murder" );
 
         return true;
 }
@@ -815,7 +815,7 @@ bool spec_guard( NPCharacter *ch )
     {
         ch->setClan( clan_ruler );
         interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
-                        victim->getNameC(), 
+                        victim->getNameC(),
                         ch->in_room->getName(), 
                         ch->in_room->areaName());
 
@@ -824,7 +824,7 @@ bool spec_guard( NPCharacter *ch )
         {
             interpret_raw( ch, "yell", "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
                            victim->getNameC(), crime );
-            multi_hit( ch, victim );
+            multi_hit( ch, victim , "murder" );
         }
         else
         {
@@ -836,7 +836,7 @@ bool spec_guard( NPCharacter *ch )
     if ( ech != 0 && ch->can_see(ech) )
     {
         oldact("$c1 кричит 'ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!", ch, 0, 0, TO_ROOM);
-        multi_hit( ch, ech );
+        multi_hit( ch, ech , "murder" );
         return true;
     }
 

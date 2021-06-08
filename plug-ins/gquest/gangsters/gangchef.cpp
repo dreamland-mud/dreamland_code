@@ -82,7 +82,7 @@ void GangChef::greet( Character *mob )
                ch, 0, mob, TO_ROOM, POS_RESTING);
 
     /* force guest to begin the fight */
-    multi_hit( mob, ch );
+    multi_hit( mob, ch , "murder" );
 }
 
 void GangChef::fight( Character *victim ) 
