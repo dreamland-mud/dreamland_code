@@ -156,6 +156,7 @@ void WeaponOneHit::damApplyHoly( )
 void WeaponOneHit::damApplyCounter( )
 {
     int chance;
+    Object *ch_wield, *victim_wield;
 
     if (command != "murder")
         return;
