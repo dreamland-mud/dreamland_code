@@ -48,13 +48,15 @@ bool oprog_extract( Object *obj, bool count )
 }
 
 /*
- * Extract an obj from the world.
+ * Extract an obj from the world. Optional echo message can be stored as 'extract' property.
+ * TODO: get rid of the third parameter.
  */
-void extract_obj_1( Object *obj, bool count, const char *message )
+void extract_obj_1( Object *obj, bool count, const char *not_used )
 {
         Object *obj_content;
         Object *obj_next;
         char buf[MAX_STRING_LENGTH];
+        DLString message = obj->getProperty("extract");
 
         if (obj->extracted)  /* if the object has already been extracted once */
         {
@@ -75,8 +77,8 @@ void extract_obj_1( Object *obj, bool count, const char *message )
 
         // Remove obj from all locations, showing an optional message.
         if (obj->in_room != 0) {
-            if (message)
-                obj->in_room->echo(POS_RESTING, message, obj);
+            if (!message.empty())
+                obj->in_room->echo(POS_RESTING, message.c_str(), obj);
             obj_from_room(obj);
 
         } else if (obj->carried_by != 0) {
@@ -85,10 +87,10 @@ void extract_obj_1( Object *obj, bool count, const char *message )
             
             obj_from_char(obj);
 
-            if (message) {
-                carrier->pecho(message, obj);
+            if (!message.empty()) {
+                carrier->pecho(message.c_str(), obj);
                 if (echoAround)
-                    carrier->recho(message, obj);
+                    carrier->recho(message.c_str(), obj);
             }
 
         } else if (obj->in_obj != 0) {

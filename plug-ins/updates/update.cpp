@@ -729,13 +729,13 @@ void obj_update( void )
     Object *obj_next;
     Room *room;
     Character *carrier;
+    list<Object *> extracted; // Keep track of all items that are about to die this round.
 
     for ( obj = object_list; obj != 0; obj = obj_next )
     {
         const char *message;
 
         if(!obj->pIndexData) {
-            // TODO: does it need additional debugging output, as it happens fairly regularly in prod.
             LogStream::sendError() << "obj_update aborted" << endl;
             return;
         }
@@ -756,8 +756,8 @@ void obj_update( void )
             && obj->pIndexData->limit != -1) 
         {
 
-            room->echo( POS_RESTING, "Внезапно появляется злобная домоуправительница и подметает %1$O4 на совок!", obj );
-            extract_obj( obj );
+            obj->addProperty("extract", "Внезапно появляется злобная домоуправительница и подметает %1$O4 на совок!");
+            extracted.push_back(obj);
             continue;
         }
 
@@ -809,15 +809,15 @@ void obj_update( void )
             
             if (carrier) {
                 if (chance( 40 )) {
-                    carrier->pecho( "%1$^O1 та%1$nет|ют от жара.", obj );
-                    extract_obj( obj );
+                    obj->addProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
+                    extracted.push_back(obj);
                     continue;
                 }
             }
             else {
                 if (chance( 50 )) {
-                    room->echo( POS_RESTING, "%1$^O1 та%1$nет|ют от жара.", obj );
-                    extract_obj( obj );
+                    obj->addProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
+                    extracted.push_back(obj);
                     continue;
                 }
             }
@@ -833,15 +833,15 @@ void obj_update( void )
             
             if (carrier) {
                 if (!carrier->is_npc( ) && chance( 20 )) {
-                    carrier->pecho( "%1$^O1 лопа%1$nется|ются от жары.", obj );
-                    extract_obj( obj );
+                    obj->addProperty("extract", "%1$^O1 лопа%1$nется|ются от жары.");
+                    extracted.push_back(obj);
                     continue;
                 }
             }
             else {
                 if (chance( 30 )) {
-                    room->echo( POS_RESTING, "%1$^O1 разбива%1$nется|ются на мелкие осколки.", obj );
-                    extract_obj( obj );
+                    obj->addProperty("extract", "%1$^O1 разбива%1$nется|ются на мелкие осколки.");
+                    extracted.push_back(obj);
                     continue;
                 }
             }
@@ -930,7 +930,7 @@ void obj_update( void )
                 } else if (obj->carried_by) { /* carried */
                     if (obj->wear_loc == wear_float) {
                         if (obj->carried_by->in_room == 0)
-                            extract_obj(t_obj);
+                            extracted.push_back(t_obj);
                         else
                             obj_to_room(t_obj, obj->carried_by->in_room);
                     } else {
@@ -938,7 +938,7 @@ void obj_update( void )
                     }
 
                 } else if (obj->in_room == 0) { /* destroy it */
-                    extract_obj(t_obj);
+                    extracted.push_back(t_obj);
                 } else { /* to the pit */
                     if (pit == 0)
                         obj_to_room(t_obj, obj->in_room);
@@ -948,7 +948,15 @@ void obj_update( void )
             }
         }
 
-        extract_obj(obj, message);
+        obj->addProperty("extract", message);
+        extracted.push_back(obj);
+    }
+
+    // Do the extract now that it's safe and we don't have to worry about obj->next->next
+    // pointer becoming invalid.
+    while (!extracted.empty()) {
+        extract_obj(extracted.front());
+        extracted.pop_front();
     }
 }
 
