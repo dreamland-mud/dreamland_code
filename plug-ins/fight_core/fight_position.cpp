@@ -18,6 +18,7 @@
 #include "interp.h"
 #include "loadsave.h"
 #include "act.h"
+#include "occupations.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
@@ -161,7 +162,10 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
         if (IS_CHARMED(victim) && !victim->master->is_npc() && ch != victim->master) {
             victim = victim->master;
             buf << ch->getNameC() << " атакует чармиса " << victim->getNameC();
-        } else if (victim->in_room->pIndexData->clan != clan_none) {
+        } else if (victim->in_room->pIndexData->clan != clan_none && ( 
+            IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)) ||
+            IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_HEALER)) || 
+            IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)) ) ) {
             buf << ch->getNameC() << " атакует моба на территории " << victim->in_room->pIndexData->clan->getRussianName().ruscase('2') ;
         } else return;
     } else buf << ch->getNameC() << " атакует " << victim->getNameC();
