@@ -93,7 +93,7 @@ void PCharacter::check_hit_newbie( Character *victim )
 
         newbie_hit_counter.setValue( newbie_hit_counter.getValue() + 1 );
         
-        if ( newbie_hit_counter.getValue() > 10 ) // на неклановых можно нападать.. но недолго
+        if ( newbie_hit_counter.getValue() > 0 )
         {
                 interpret_raw(this, "clan", "petition outsider");
                 return;
