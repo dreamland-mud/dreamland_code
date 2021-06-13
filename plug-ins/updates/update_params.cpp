@@ -161,7 +161,8 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     
     if ( IS_AFFECTED(ch, AFF_REGENERATION )) {
         gain *= 2;
-        if (ch->getRace( )->getAff( ).isSet( AFF_REGENERATION ))
+        // extra gain for "native" regen, e.g. trolls/mawgs -- but not mobs
+        if (ch->getRace( )->getAff( ).isSet( AFF_REGENERATION ) && !ch->is_npc( ))
             gain *= 2;
     }
 

@@ -157,8 +157,7 @@ bool arg_is_self( const DLString &arg )
 
 bool arg_is_ugly( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "ugly", "vampire", "вампир", "creature" )
-    ||  arg_oneof( arg, "создание ночи");
+    return arg_oneof( arg, "vampire", "вампир", "creature", "создание ночи" );
 }
 
 bool arg_is_silver( const DLString &arg )

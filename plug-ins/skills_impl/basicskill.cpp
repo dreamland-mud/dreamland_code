@@ -157,20 +157,10 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 
     if (pch->getRealLevel() > 19  && pch->getHometown() == home_frigate)
         return;
-    
-    /* no improve in safe rooms */
-    if (IS_SET(pch->in_room->room_flags, ROOM_SAFE))
-        return;
-    
-    /* no improve on immune mobiles */
-    if (victim) {
-        if (dam_type != -1 && immune_check( victim, dam_type, dam_flags ) == RESIST_IMMUNE)
-            return;
-    }
-    
+  
     if (data.learned >= getMaximum( pch ))
         return;
-
+  
     /* check to see if the character has a chance to learn */
     chance = 10 * get_int_app( pch ).learn;
     chance /= max( 1, hard.getValue( ) ) * getRating( pch ) * 4;
@@ -191,7 +181,21 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         chance *= 2;
     if (number_range(1, 1000) > chance)
         return;
-   
+
+    /* no improve in safe rooms or mansions */
+    if ( IS_SET(pch->in_room->room_flags, ROOM_SAFE|ROOM_MANSION) ) {
+        pch->pecho("{WТишина и покой в этой местности расслабляют тебя, препятствуя прокачке умений.{x");
+        return;
+    }
+    
+    /* no improve on immune mobiles */
+    if (victim) {
+        if (dam_type != -1 && immune_check( victim, dam_type, dam_flags ) == RESIST_IMMUNE) {
+            // TODO: show message to pch
+            return;
+        }
+    }
+      
     /* now that the character has a CHANCE to learn, see if they really have */        
     if (success) {
         int learned = data.learned;
