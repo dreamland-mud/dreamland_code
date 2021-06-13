@@ -464,11 +464,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if (conflict->find( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) 
-            ch->pecho( msgSelfConflict.c_str( ), ch, obj );
-            if (ch->master) {
-                ch->master->pecho( "%^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch );
-                ch->master->pecho( msgSelfConflict.c_str( ), ch, obj );
-            }
+            echo_master(ch, msgSelfConflict.c_str(), ch, obj);
         return RC_WEAR_CONFLICT;
     }
     
