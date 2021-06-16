@@ -141,8 +141,6 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 mob->setSex( pMobIndex->sex );
                 if (mob->getSex( ) == SEX_EITHER) /* random sex */
                         mob->setSex( number_range(1,2) );
-                // DLString raceName = pMobIndex->race;
-                //raceName = raceName.toLower();
                 mob->setRace( race->getName() );
                 mob->form                = pMobIndex->form;
                 mob->parts                = pMobIndex->parts;
