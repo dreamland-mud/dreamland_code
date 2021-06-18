@@ -71,6 +71,7 @@ void OLCStateHelp::commit()
     original->setTitleAttribute(title);
     original->labels.persistent.clear();
     original->labels.addPersistent(labels);
+    original->aka.clear();
     original->aka.fromString(aka);
     original->save();
 
