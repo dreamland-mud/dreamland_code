@@ -106,6 +106,8 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 /* read from prototype */
                 mob->group                = pMobIndex->group;
                 mob->act                 = pMobIndex->act | ACT_IS_NPC;
+                // FIXME: explicitly apply race affect/detect/resist bits to the mob instance, ignoring 'del' attribute values saved in area XML format.
+                // To fix it properly, all mob indexes should have a pair of overrides for every bit field, "bits to delete" and "bits to add".
                 mob->affected_by        = pMobIndex->affected_by | race->getAff() ;
                 mob->detection                = pMobIndex->detection | race->getDet();
                 mob->alignment                = pMobIndex->alignment;
