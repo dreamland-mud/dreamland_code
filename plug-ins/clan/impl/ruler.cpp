@@ -279,7 +279,7 @@ bool ClanGuardRulerJailer::specFight( )
                     sprintf( buf, "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
                             victim->getNameC(), crime );
                     do_yell( ch, buf );
-                    multi_hit( ch, victim );
+                    multi_hit( ch, victim , "murder" );
             }
             else
             {
@@ -294,7 +294,7 @@ bool ClanGuardRulerJailer::specFight( )
     {
             oldact_p("$c1 кричит ' ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
                     ch, 0, 0, TO_ROOM,POS_RESTING );
-            multi_hit( ch, ech );
+            multi_hit( ch, ech , "murder" );
             return true;
     }
 
@@ -1567,7 +1567,7 @@ bool RulerSpecialGuard::specFight( )
         sprintf( buf, "%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
                 victim->getNameC() );
         do_yell( ch, buf );
-        multi_hit( ch, victim );
+        multi_hit( ch, victim , "murder" );
     }
     else
     {
@@ -2008,7 +2008,7 @@ bool Stalker::ourVictim( Character *vch )
 void Stalker::attackVictim( Character *vch )
 {
     interpret_raw( ch, "yell", "%s, пришло твое время умереть!", victimName.getValue( ).c_str( ) );
-    multi_hit_nocatch( ch, vch );
+    multi_hit_nocatch( ch, vch , "murder" );
 }
 
 Character * Stalker::findVictimHere( )

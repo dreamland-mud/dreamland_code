@@ -82,7 +82,7 @@ bool OfcolMarshal::specFight( )
                 mob->perm_stat[i] = 23;
 
             do_say(mob, "Диана, я иду на помощь...");
-            multi_hit( mob, ch->fighting );
+            multi_hit( mob, ch->fighting , "murder" );
         }
         else {
             guard->pathToTarget( mob->in_room, ch->in_room, 2000 );
@@ -149,7 +149,7 @@ bool OfcolGuard::specFight()
         if (ch->in_room == mob->in_room) {
             interpret_raw( mob, "say", "Теперь, %s, ты поплатишься за нападение на стражника.",
                            ch->fighting->getNameP( '1' ).c_str( ) );
-            multi_hit( mob, ch->fighting );
+            multi_hit( mob, ch->fighting , "murder" );
         }
         else {
             guard->pathToTarget( mob->in_room, ch->in_room, 2000 );

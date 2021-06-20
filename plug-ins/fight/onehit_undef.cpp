@@ -62,9 +62,9 @@ RELIG(deimos);
 /*----------------------------------------------------------------------------
  * Hit by weapon or bare hands
  *---------------------------------------------------------------------------*/
-UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool secondary )
+UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command )
             : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
-              WeaponOneHit( ch, victim, secondary )
+              WeaponOneHit( ch, victim, secondary, command )
 {
 }
 

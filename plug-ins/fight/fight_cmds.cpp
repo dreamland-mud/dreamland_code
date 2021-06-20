@@ -90,7 +90,7 @@ CMDRUN( kill )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
-    multi_hit( ch, victim );
+    multi_hit( ch, victim, "murder" );
 }
 
 CMDRUN( murder )
@@ -145,7 +145,7 @@ CMDRUN( murder )
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;
 
-    multi_hit( ch, victim );
+    multi_hit( ch, victim , "murder" );
 }
 
 

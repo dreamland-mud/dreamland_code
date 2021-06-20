@@ -9,7 +9,7 @@
 
 class UndefinedOneHit: public WeaponOneHit {
 public:
-    UndefinedOneHit( Character *ch, Character *victim, bool secondary );
+    UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command = "" );
     
     virtual bool canHit( );
     bool checkHands( );

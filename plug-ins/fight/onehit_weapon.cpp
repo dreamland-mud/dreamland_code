@@ -32,12 +32,12 @@
 #include "vnum.h"
 #include "def.h"
 
-WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary )
+WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary, string command )
                 : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
                   OneHit( ch, victim )
 {
     this->secondary = secondary;
-    
+    this->command = command;
     weapon_sn = -1;
     weaponSkill = NULL;
     wield = NULL;
@@ -156,6 +156,10 @@ void WeaponOneHit::damApplyHoly( )
 void WeaponOneHit::damApplyCounter( )
 {
     int chance;
+    Object *ch_wield, *victim_wield;
+
+    if (command != "murder")
+        return;
 
     if (victim->fighting)
         return;
@@ -170,6 +174,18 @@ void WeaponOneHit::damApplyCounter( )
         
     if (victim->position != POS_SITTING && victim->position != POS_STANDING)
         return;
+
+    ch_wield = get_eq_char(ch,wear_wield);
+    victim_wield = get_eq_char(victim,wear_wield);
+
+    if (!victim_wield)
+        return;
+
+    if (ch_wield && IS_WEAPON_STAT(ch_wield, WEAPON_TWO_HANDS) != IS_WEAPON_STAT(victim_wield, WEAPON_TWO_HANDS))
+        return;
+
+    if (!ch_wield && ((ch->size - victim->size)>1 || (attack_table[ch->dam_type].damage != DAM_SLASH && attack_table[ch->dam_type].damage != DAM_BASH && attack_table[ch->dam_type].damage != DAM_PIERCE)))
+       return;
 
     chance = number_percent();
 

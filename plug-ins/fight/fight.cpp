@@ -347,16 +347,16 @@ bool forest_attack( Character *ch, Character *victim )
 /*
  * Do one group of attacks.
  */
-void multi_hit( Character *ch, Character *victim )
+void multi_hit( Character *ch, Character *victim, string command )
 {
     try {
-        multi_hit_nocatch( ch, victim );
+        multi_hit_nocatch( ch, victim, command );
     }
     catch (const VictimDeathException &) {
     }
 }
    
-void multi_hit_nocatch( Character *ch, Character *victim )
+void multi_hit_nocatch( Character *ch, Character *victim, string command )
 {
     /* no attacks for stunnies -- just a check */
     if ( ch->position < POS_RESTING )
@@ -375,7 +375,7 @@ void multi_hit_nocatch( Character *ch, Character *victim )
     if (ch->is_npc( ))
         return;
    
-    one_hit_nocatch( ch, victim );
+    one_hit_nocatch( ch, victim, false, command );
 
     if (ch->fighting != victim)
         return;
@@ -399,15 +399,15 @@ void multi_hit_nocatch( Character *ch, Character *victim )
         && forest_attack( ch, victim );
 }
 
-void one_hit_nocatch( Character *ch, Character *victim, bool secondary )
+void one_hit_nocatch( Character *ch, Character *victim, bool secondary, string command )
 {
-    UndefinedOneHit( ch, victim, secondary ).hit( );
+    UndefinedOneHit( ch, victim, secondary, command ).hit( );
 }
 
-void one_hit( Character *ch, Character *victim, bool secondary )
+void one_hit( Character *ch, Character *victim, bool secondary, string command )
 {
     try {
-        one_hit_nocatch( ch, victim, secondary );
+        one_hit_nocatch( ch, victim, secondary, command );
     }
     catch (const VictimDeathException& e) {                                     
     }

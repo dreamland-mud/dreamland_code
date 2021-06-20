@@ -293,7 +293,7 @@ SKILL_RUNP( dominate )
   {
 	gsn_dominate->improve( ch, false, victim );
 	do_say(victim,"Я не собираюсь следовать за тобой!");
-	multi_hit(victim,ch);
+	multi_hit( victim , ch , "murder" );
 	return;
   }
 
@@ -599,7 +599,7 @@ void sucking( Character *ch, Character *victim )
             set_fighting( victim, ch );
             oldact("$c1 очнул$gось|ся|ась от терзавшего $s кошмара.", victim, 0, ch, TO_ROOM);
             oldact_p("Ты просыпаешься от невыносимой боли в шее!", victim, 0, ch, TO_CHAR, POS_DEAD);
-            multi_hit( victim, ch );
+            multi_hit( victim, ch , "murder" );
         }
     } 
     catch (const VictimDeathException &) {

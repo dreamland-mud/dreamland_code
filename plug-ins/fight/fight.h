@@ -24,11 +24,11 @@ class Affect;
 
 /* fight.cpp */
 void        violence_update( );
-void        multi_hit( Character *ch, Character *victim );
-void        multi_hit_nocatch( Character *ch, Character *victim );
+void        multi_hit( Character *ch, Character *victim, string command = "" );
+void        multi_hit_nocatch( Character *ch, Character *victim, string command = "" );
 bool        next_attack( Character *ch, Character *victim, Skill &skill, int coef );
-void        one_hit( Character *ch, Character* victim, bool secondary = false);
-void        one_hit_nocatch( Character *ch, Character* victim, bool secondary = false);
+void        one_hit( Character *ch, Character* victim, bool secondary = false, string command = "" );
+void        one_hit_nocatch( Character *ch, Character* victim, bool secondary = false, string command = "" );
 bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
 bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
 bool        damage( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );

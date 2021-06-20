@@ -319,7 +319,7 @@ SKILL_RUNP( vanish )
                             "Помогите! Меня кто-то похищает!",
                             "Убери свои лапы, %1$C1!" );
         
-                        multi_hit(victim,ch);
+                        multi_hit(victim, ch);
                     }
             }
             else {
