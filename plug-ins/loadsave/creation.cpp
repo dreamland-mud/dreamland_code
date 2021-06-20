@@ -69,6 +69,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
         NPCharacter *mob;
         int i;
         Affect af;
+        Race *race;
 
         if ( pMobIndex == 0 )
         {
@@ -79,7 +80,8 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
         mob = NPCharacterManager::getNPCharacter( );
 
         mob->pIndexData        = pMobIndex;
-        
+        race = raceManager->find( pMobIndex->race );
+
         DLString name( pMobIndex->player_name );
         mob->setName( name );
 
@@ -104,8 +106,10 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 /* read from prototype */
                 mob->group                = pMobIndex->group;
                 mob->act                 = pMobIndex->act | ACT_IS_NPC;
-                mob->affected_by        = pMobIndex->affected_by;
-                mob->detection                = pMobIndex->detection;
+                // FIXME: explicitly apply race affect/detect/resist bits to the mob instance, ignoring 'del' attribute values saved in area XML format.
+                // To fix it properly, all mob indexes should have a pair of overrides for every bit field, "bits to delete" and "bits to add".
+                mob->affected_by        = pMobIndex->affected_by | race->getAff() ;
+                mob->detection                = pMobIndex->detection | race->getDet();
                 mob->alignment                = pMobIndex->alignment;
                 mob->setLevel( pMobIndex->level );
 //                mob->hitroll                = (mob->getRealLevel( ) / 2) + pMobIndex->hitroll;
@@ -131,17 +135,15 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 for (i = 0; i < 4; i++)
                         mob->armor[i]        = pMobIndex->ac[i];
                 mob->off_flags                = pMobIndex->off_flags;
-                mob->imm_flags                = pMobIndex->imm_flags;
-                mob->res_flags                = pMobIndex->res_flags;
-                mob->vuln_flags                = pMobIndex->vuln_flags;
+                mob->imm_flags                = pMobIndex->imm_flags | race->getImm( );
+                mob->res_flags                = pMobIndex->res_flags | race->getRes( );
+                mob->vuln_flags                = pMobIndex->vuln_flags | race->getVuln( );
                 mob->start_pos                = pMobIndex->start_pos;
                 mob->default_pos        = pMobIndex->default_pos;
                 mob->setSex( pMobIndex->sex );
                 if (mob->getSex( ) == SEX_EITHER) /* random sex */
                         mob->setSex( number_range(1,2) );
-                DLString raceName = pMobIndex->race;
-                raceName = raceName.toLower();
-                mob->setRace( raceName );
+                mob->setRace( race->getName() );
                 mob->form                = pMobIndex->form;
                 mob->parts                = pMobIndex->parts;
                 mob->size                = pMobIndex->size;
