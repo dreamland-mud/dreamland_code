@@ -39,7 +39,7 @@ Reference::operator () (const RegisterList &args) const
         }
         case Register::NUMBER:
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Cannot call operator () on ") + container.getTypeName());
     }
 }
 
@@ -58,7 +58,7 @@ Reference::operator = (const Register &r) const
             return r;
 
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Cannot call operator = on ") + container.getTypeName());
     }
 }
 
@@ -84,7 +84,7 @@ Reference::operator * () const
             }
             
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Cannot call operator * on ") + container.getTypeName());
     }
 }
 

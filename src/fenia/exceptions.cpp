@@ -50,6 +50,16 @@ NullPointerException::~NullPointerException( ) throw()
 {
 }
 
+NotImplementedException::NotImplementedException()  throw()
+    : Exception("Operation not implemented") 
+{ 
+}
+
+NotImplementedException::NotImplementedException(const DLString &msg)  throw()
+    : Exception(msg) 
+{ 
+}
+
 NotImplementedException::~NotImplementedException( ) throw() 
 {
 }

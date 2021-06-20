@@ -365,7 +365,7 @@ Register::operator + (const Register &r) const
         case STRING:
             return DLString(*strPtr( ) + r.toString());
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Operation + is not defined for ") + getTypeName() + " and " + r.getTypeName());
     }
 }
 
@@ -376,7 +376,7 @@ Register::operator * (const Register &r) const
     if(type == NUMBER)
         return value.number * r.toNumber();
     
-    throw NotImplementedException();
+    throw NotImplementedException(DLString("Operation * is not defined for ") + getTypeName() + " and " + r.getTypeName());
 }
 
 inline const Register 
@@ -385,7 +385,7 @@ Register::operator - (const Register &r) const
     if(type == NUMBER)
         return value.number - r.toNumber();
     
-    throw NotImplementedException();
+    throw NotImplementedException(DLString("Operation - is not defined for ") + getTypeName() + " and " + r.getTypeName());
 }
 
 inline const Register 
@@ -400,7 +400,7 @@ Register::operator / (const Register &r) const
         return value.number / d;
     }
     
-    throw NotImplementedException();
+    throw NotImplementedException(DLString("Operation / is not defined for ") + getTypeName() + " and " + r.getTypeName());
 }
 
 inline const Register 
@@ -409,7 +409,7 @@ Register::operator & (const Register &r) const
     if(type == NUMBER)
         return value.number & r.toNumber();
     
-    throw NotImplementedException();
+    throw NotImplementedException(DLString("Operation & is not defined for ") + getTypeName() + " and " + r.getTypeName());
 }
 
 inline const Register
@@ -418,7 +418,7 @@ Register::operator | (const Register &r) const
     if(type == NUMBER)
         return value.number | r.toNumber();
     
-    throw NotImplementedException();
+    throw NotImplementedException(DLString("Operation | is not defined for ") + getTypeName() + " and " + r.getTypeName());
 }
 
 inline const Register
@@ -433,7 +433,7 @@ Register::operator % (const Register &r) const
         return value.number % d;
     }
     
-    throw NotImplementedException();
+    throw NotImplementedException(DLString("Operation % is not defined for ") + getTypeName() + " and " + r.getTypeName());
 }
 
 inline const Register
@@ -442,7 +442,7 @@ Register::operator ^ (const Register &r) const
     if(type == NUMBER)
         return value.number ^ r.toNumber();
     
-    throw NotImplementedException();
+    throw NotImplementedException(DLString("Operation ^ is not defined for ") + getTypeName() + " and " + r.getTypeName());
 }
 
 /*comparition operators*/
@@ -464,7 +464,7 @@ Register::operator == (const Register &r) const
         case FUNCTION:
             return value.function == r.toFunction();
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Operation == is not defined for ") + getTypeName() + " and " + r.getTypeName());
     }
 }
 
@@ -488,7 +488,7 @@ Register::operator != (const Register &r) const
         case FUNCTION:
             return value.function != r.toFunction();
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Operation != is not defined for ") + getTypeName() + " and " + r.getTypeName());
     }
 }
 
@@ -503,7 +503,7 @@ Register::operator > (const Register &r) const
         case STRING:
             return *strPtr( ) > r.toString();
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Operation > is not defined for ") + getTypeName() + " and " + r.getTypeName());
     }
 }
 
@@ -518,7 +518,7 @@ Register::operator < (const Register &r) const
         case STRING:
             return *strPtr( ) < r.toString();
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Operation < is not defined for ") + getTypeName() + " and " + r.getTypeName());
     }
 }
 
@@ -533,7 +533,7 @@ Register::operator >= (const Register &r) const
         case STRING:
             return *strPtr( ) >= r.toString();
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Operation >= is not defined for ") + getTypeName() + " and " + r.getTypeName());
     }
 }
 
@@ -548,7 +548,7 @@ Register::operator <= (const Register &r) const
         case STRING:
             return *strPtr( ) <= r.toString();
         default:
-            throw NotImplementedException();
+            throw NotImplementedException(DLString("Operation <= is not defined for ") + getTypeName() + " and " + r.getTypeName());
     }
 }
 

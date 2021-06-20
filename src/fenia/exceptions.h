@@ -35,7 +35,8 @@ public:
 
 class NotImplementedException : public Exception {
 public:
-    NotImplementedException()  throw(): Exception("Operation not implemented") { }
+    NotImplementedException()  throw();
+    NotImplementedException(const DLString &msg)  throw();
 
     virtual ~NotImplementedException( ) throw() ;
 };
