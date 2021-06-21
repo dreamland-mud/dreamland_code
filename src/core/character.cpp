@@ -483,8 +483,10 @@ bool Character::can_see( const Object *obj ) const
  */
 bool Character::can_hear( const Object *obj ) const
 {
+    // not sure why this code is here
+    /*
     if (oprog_invisible( const_cast<Object *>( obj ), this ))
-        return false;
+        return false; */
         
     if ( !IS_SET(obj->extra_flags, ITEM_HUM)
             || isAffected(gsn_deafen) )
