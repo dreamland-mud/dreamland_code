@@ -4,7 +4,6 @@ libremort_la_SOURCES = \
 cmlt.cpp \
 impl.cpp \
 cremort.cpp \
-cunremort.cpp \
 remortnanny.cpp \
 remortbonus.cpp \
 remortbonuses_impl.cpp \

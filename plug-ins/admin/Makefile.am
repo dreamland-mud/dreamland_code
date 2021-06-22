@@ -36,9 +36,7 @@ $(WSOCK)
 
 libadmin_la_SOURCES = \
 impl.cpp \
-cbackup.cpp \
-crecover.cpp \
-cundelete.cpp \
+cprofile.cpp \
 deny.cpp \
 cban.cpp \
 finger.cpp \

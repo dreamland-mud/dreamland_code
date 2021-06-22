@@ -427,14 +427,16 @@ bool PCharacterManager::pfBackup ( const DLString &playerName )
 
     DLFile oldProfile( dreamland->getPlayerDir( ), name, ext );
     DLFile newProfile( dreamland->getPlayerBackupDir( ), name, ext );
+    DLFile tmpProfile( "/tmp", name, ext );
 
     DLFile oldXml( DLFile( dreamland->getDbDir( ), PLAYER_TABLE ), name, ".xml" );
     DLFile newXml( DLFile( dreamland->getDbDir( ), BACKUP_TABLE ), name, ".xml" );
+    DLFile tmpXml( "/tmp", name, ".xml" );
 
-    if (!oldXml.copy( newXml )) 
+    if (!oldXml.copy( newXml ) || !oldXml.copy(tmpXml)) 
         return false;
 
-    if (!oldProfile.copy( newProfile )) 
+    if (!oldProfile.copy( newProfile ) || !oldProfile.copy(tmpProfile))
         return false;
 
     return true;
@@ -468,7 +470,11 @@ bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &
         oldProfile = DLFile( dreamland->getPlayerRemortDir( ), name, remortExt );
         oldXml = DLFile( DLFile( dreamland->getDbDir( ), REMORTS_TABLE ), name, remortExt );
     }
-    else {
+    else if (arg == "tmp") {
+        oldProfile = DLFile( "/tmp", name, ext );
+        oldXml = DLFile( "/tmp", name, ".xml" );
+
+    } else {
         oldProfile = DLFile( dreamland->getPlayerBackupDir( ), name, ext );
         oldXml = DLFile( DLFile( dreamland->getDbDir( ), BACKUP_TABLE ), name, ".xml" );
     }
