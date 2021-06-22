@@ -681,9 +681,9 @@ void show_char_to_char_0( Character *victim, Character *ch )
     if (nVict) 
         if (can_show_long_descr(nVict)) {
             DLString longd = format_longdescr_to_char(nVict->getLongDescr(), ch);
-            buf << "{" << CLR_MOB(ch) << "{1";
+            buf << "{" << CLR_MOB(ch);
             webManipManager->decorateCharacter(buf, longd, victim, ch);
-            buf << "{2";
+            buf << "{x";
             show_char_blindness( ch, victim, buf );
             ch->send_to( buf);
             return;
