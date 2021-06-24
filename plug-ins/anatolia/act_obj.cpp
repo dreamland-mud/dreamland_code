@@ -1180,8 +1180,8 @@ static int drop_obj( Character *ch, Object *obj )
     }
     else if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
-        ch->recho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
-        ch->pecho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
+        ch->recho( "%1$^O1 превраща%1$nется|ются в ничто и исчеза%1$nет|ют.", obj );
+        ch->pecho( "%1$^O1 превраща%1$nется|ются в ничто и исчеза%1$nет|ют.", obj );
     }
     else if (!RoomUtils::isWater( ch->in_room ) 
              && ch->in_room->getSectorType() != SECT_AIR
