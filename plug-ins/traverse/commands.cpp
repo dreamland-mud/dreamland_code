@@ -182,7 +182,7 @@ CMDRUN( path )
     unsigned int matches = 0;
 
     if (roomName.empty() || DLString(constArguments).getOneArgument().empty()) {
-        ch->pecho("Укажи название комнаты, куда нужно проложить путь.");
+        ch->pecho("Укажи название местности, куда нужно проложить путь.");
         return;
     }
 
@@ -204,7 +204,7 @@ CMDRUN( path )
         }
 
     if (targets.empty()) {
-        ch->pecho("Не могу найти комнату с названием '%s' в зоне {c%s{x.", 
+        ch->pecho("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x.", 
                   roomName.c_str(), ch->in_room->areaName());
         return;
     }
@@ -237,7 +237,7 @@ CMDRUN( path )
             else if (!target->isCommon())
                 buf << ": ты не сможешь сюда войти" << endl;
             else
-                buf << ": путь не найден" << endl;
+                buf << ": путь искажен Хаосом" << endl;
             continue;
         }
  
@@ -248,9 +248,9 @@ CMDRUN( path )
     }
 
     if (foundPath)
-        ch->pecho("Найдены такие комнаты и пути к ним в зоне {c%s{x:", ch->in_room->areaName());
+        ch->pecho("Найдены такие местности в зоне {c%s{x:", ch->in_room->areaName());
     else
-        ch->pecho("Не удалось проложить путь ни к одной из комнат:");
+        ch->pecho("Не удалось проложить путь ни к одной из местностей:");
 
     ch->send_to(buf);
 
@@ -258,7 +258,7 @@ CMDRUN( path )
         ch->pecho("Не забывай, что на пути могут встретиться запертые или потайные выходы."); 
 
     if (matches > targets.size())
-        ch->pecho("Всего найдено {W%1$d{x подходящ%1$Iая|ие|их комна%1$Iта|ты|т, уточни название, чтобы увидеть остальные.",
+        ch->pecho("Всего нашл%1$Iась|ись|ось {Y%1$d{x подходящ%1$Iая|ие|их местност%1$Iь|и|ей. Уточни название, чтобы увидеть остальные.",
                   matches);
 }
 
