@@ -480,7 +480,7 @@ void Damage::reportState( )
         break;
     default:
         if ( dam > victim->max_hit / 4 )
-            victim->pecho("Это действительно было БОЛЬНО!");
+            victim->pecho("Это было действительно БОЛЬНО!");
         if ( victim->hit < victim->max_hit / 4 )
             victim->pecho("Ты истекаешь {RКРОВЬЮ{x!");
         break;
@@ -686,7 +686,7 @@ void Damage::msgOldFormat( bool vs, char *buf )
         const char *vs, *vp;
     } msgTable [] =
     {
-     {    0, 'w', " ",              "не наносишь урона",     "не нанос%2$nит|ят урона"      },
+     {    0, 'w', " ",              "не наносишь урона",     "безвред%2$nен|ны для"         },
      {    1, 'r', " ",              "слегка царапаешь",      "слегка царапа%2$nет|ют"       },
      {    4, 'r', " ",              "царапаешь",             "царапа%2$nет|ют"              },
      {    8, 'r', " ",              "задеваешь",             "задева%2$nет|ют"              },
