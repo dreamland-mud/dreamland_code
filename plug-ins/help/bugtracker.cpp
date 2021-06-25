@@ -12,9 +12,6 @@
 #include "room.h"
 #include "dreamland.h"
 
-/*
- * Bug status: U(ndefined) F(ixed) R(ewarded) P(ostponed) C(ancelled) D(uplicate)
- */
 BugTracker *bugTracker = NULL;
 
 BugTracker::BugTracker( )

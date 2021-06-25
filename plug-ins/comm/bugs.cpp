@@ -74,12 +74,8 @@ static void bugtracker_servlet(HttpRequest &request, HttpResponse &response)
         return;
 
     // Grab player name or just use the provided Telegram id.
-    PCMemoryInterface *player = servlet_find_player(params, response);
-    if (player)
-        authorName = player->getName();
-    else if (response.status == 404)
-        authorName = params["args"]["id"].asString();
-    else
+    authorName = servlet_find_username(params, response);
+    if (authorName.empty())
         return;
 
     // Grab the message.

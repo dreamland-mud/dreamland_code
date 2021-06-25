@@ -24,7 +24,7 @@ void JsonServletBase::handleRequest(HttpRequest &request, HttpResponse &response
         response.message = "OK";
         response.headers["content-type"] = "application/json";
     
-    } catch (const ::Exception &e) {
+    } catch (const std::exception &e) {
         response.status = 500;
         response.message = "Command failed";
         response.body = e.what();

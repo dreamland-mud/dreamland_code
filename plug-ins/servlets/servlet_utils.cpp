@@ -5,6 +5,7 @@
 #include "iconvmap.h"
 #include "dlfilestream.h"
 #include "servlet.h"
+#include "pcmemoryinterface.h"
 #include "dreamland.h"
 #include "commonattributes.h"
 
@@ -23,7 +24,7 @@ bool servlet_parse_params(HttpRequest &request, HttpResponse &response, Json::Va
 
         return true;
 
-    } catch (const Exception &e) {
+    } catch (const std::exception &e) {
         LogStream::sendError() << "Servlet " << request.uri << ":" << e.what() << endl;
         response.status = 500;
         response.message = "Command failed";
@@ -43,7 +44,7 @@ static DLString read_token()
         token = buf.str();
         token.replaces("\n", "");
         
-    } catch (const Exception &ex) {
+    } catch (const std::exception &ex) {
         LogStream::sendError() << "Reading bot token: " << ex.what() << endl;
     }
 
@@ -108,10 +109,31 @@ PCMemoryInterface * servlet_find_player(Json::Value &params, HttpResponse &respo
     return players.front();
 }   
 
-bool servlet_get_arg(Json::Value &params, HttpResponse &response, const DLString &argName, DLString &argValue)
+// Grab player name or just use the provided Telegram id.
+DLString servlet_find_username(Json::Value &params, HttpResponse &response)
 {
+    PCMemoryInterface *player = servlet_find_player(params, response);
+
+    if (player)
+        return player->getName();
+    else if (response.status == 404)
+        return params["args"]["id"].asString();
+    else
+        return DLString::emptyString;
+}
+
+bool servlet_get_arg(const Json::Value &params, const DLString &argName, DLString &argValue)
+{
+    if (!params.isMember("args") || !params["args"].isMember(argName))
+        return false;
+
     argValue = utf2koi(params["args"][argName].asString());
-    if (argValue.empty()) {
+    return !argValue.empty();
+}
+
+bool servlet_get_arg(const Json::Value &params, HttpResponse &response, const DLString &argName, DLString &argValue)
+{
+    if (!servlet_get_arg(params, argName, argValue)) {
         response.status = 400;
         response.message = "Bad request";
         response.body = "Required parameter args." + argName + " not found";
