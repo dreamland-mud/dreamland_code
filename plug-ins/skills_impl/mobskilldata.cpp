@@ -8,6 +8,7 @@
 #include "npcharacter.h"
 #include "skill.h"
 #include "spell.h"
+#include "damageflags.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
@@ -39,14 +40,17 @@ void MobSkillData::fromXML(const XMLNode::Pointer &parent)
     available = true;
 }
 
-int MobSkillData::visible( NPCharacter *mob, const Skill * ) const
+int MobSkillData::visible( NPCharacter *mob, const Skill *skill ) const
 {
     if (!available)
         return MPROF_NONE;
 
+    if (IS_CHARMED(mob) && skill->getSpell() && skill->getSpell()->getSpellType() == SPELL_OFFENSIVE)
+        return MPROF_NONE;
+
     if (offense.isSet( mob->off_flags ))
         return MPROF_ANY;
-    
+
     return MPROF_REQUIRED;
 }
 
@@ -72,6 +76,9 @@ MobProfSkillData::MobProfSkillData( )
 int MobProfSkillData::visible( NPCharacter *mob, const Skill *skill ) const
 {
     if (!available)
+        return MPROF_NONE;
+
+    if (IS_CHARMED(mob) && skill->getSpell() && skill->getSpell()->getSpellType() == SPELL_OFFENSIVE)
         return MPROF_NONE;
 
     if (offense.isSet( mob->off_flags ))
