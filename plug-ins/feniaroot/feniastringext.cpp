@@ -125,7 +125,7 @@ NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str): заменяет в д
         }
         
     } catch( const std::exception &e ) {
-        throw CustomException(e.what());
+        throw Exception(e.what());
     }
 
     return result;
@@ -150,7 +150,7 @@ NMI_INVOKE(FeniaString, matchGroups, "(pattern): возвращает списо
         }
         
     } catch( const std::exception &e ) {
-        throw CustomException(e.what());
+        throw Exception(e.what());
     }
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();
@@ -168,7 +168,7 @@ NMI_INVOKE(FeniaString, match, "(regex): true если строка соотве
 
         return re.match( c_str() );
     } catch( const std::exception &e ) {
-        throw CustomException(e.what());
+        throw Exception(e.what());
     }
 }
 

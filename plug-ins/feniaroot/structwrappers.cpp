@@ -653,7 +653,7 @@ static const int diplomacy_count = sizeof(diplomacy_names) / sizeof(char *);
 static int diplomacy_number( Clan *clan, Clan *otherClan )
 {
     if (!otherClan || !clan)
-        throw Scripting::CustomException( "No such clan" );
+        throw Scripting::Exception( "No such clan" );
     
     if (!clan->hasDiplomacy( ) || !otherClan->hasDiplomacy( ))
         return diplomacy_count - 1;
@@ -1140,7 +1140,7 @@ NMI_INVOKE( SkillWrapper, effective, "(ch): узнать процент раск
 
 NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться улучшить знание умения на успехе/неудаче (true/false), применен на жертву" )
 {
-    PCharacter *ch = argnum2player(args, 1);
+    Character *ch = argnum2character(args, 1);
     int success = argnum2number(args, 2);
     Character *victim = args.size() > 2 ? argnum2character(args, 3) : NULL;
      

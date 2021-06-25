@@ -204,7 +204,7 @@ NMI_INVOKE( Root, player_attribute, "(playerName, attrName): значение д
     DLString attrName = args.back( ).toString( );
 
     if (!pci)
-        throw Scripting::CustomException( "Player not found" );
+        throw Scripting::Exception( "Player not found" );
 
     XMLStringAttribute::Pointer sAttr = pci->getAttributes( ).findAttr<XMLStringAttribute>( attrName );
 
@@ -1126,7 +1126,7 @@ NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для новог�
     Skill *skill = skillManager->findExisting(name);
 
     if (skill && skill->isValid())
-        throw Scripting::CustomException(name + ": skill already exists.");
+        throw Scripting::Exception(name + ": skill already exists.");
 
     if (!normalize_skill_name(name))
         throw Scripting::Exception("Skill name can only consist of letters and spaces");

@@ -96,7 +96,7 @@ PCharacter * args2player( const RegisterList &args )
 {
     Character *ch = args2character(args); 
     if (ch->is_npc())
-        throw Scripting::CustomException("Mobile found when PC expected.");
+        throw Scripting::Exception("Mobile found when PC expected.");
     return ch->getPC();
 }
 
@@ -106,7 +106,7 @@ Wearlocation * arg2wearloc( const Register &reg )
     Wearlocation *loc = wearlocationManager->findExisting( locName );
 
     if (!loc)
-        throw Scripting::CustomException( DLString("Invalid wearlocation name '") + locName + "'" );
+        throw Scripting::Exception( DLString("Invalid wearlocation name '") + locName + "'" );
 
     return loc;
 }
@@ -130,7 +130,7 @@ PCharacter * arg2player( const Register &reg )
 {
     Character *ch = arg2character(reg);
     if (ch->is_npc())
-        throw Scripting::CustomException("Mobile found when PC expected.");
+        throw Scripting::Exception("Mobile found when PC expected.");
     return ch->getPC();
 }
 
@@ -204,7 +204,7 @@ PCharacter *argnum2player(const RegisterList &args, int num)
 {
     Character *ch = argnum2character(args, num);
     if (ch->is_npc())
-        throw Scripting::CustomException("Mobile found when PC expected.");
+        throw Scripting::Exception("Mobile found when PC expected.");
     return ch->getPC();
 }
 
@@ -256,7 +256,7 @@ Skill * arg2skill( const Register &r )
     DLString name = r.toString();
     Skill *skill = skillManager->findExisting(name);
     if (!skill)
-        throw Scripting::CustomException(name + ": skill name not found.");
+        throw Scripting::Exception(name + ": skill name not found.");
 
     return skill;
 }

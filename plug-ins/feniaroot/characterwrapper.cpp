@@ -1107,7 +1107,7 @@ NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(liqname): вернет емк�
     DLString liqName = args2string(args);
     Liquid *liquid = liquidManager->find(liqName);
     if (!liquid)
-        throw Scripting::CustomException( "Invalid liquid name");
+        throw Scripting::Exception( "Invalid liquid name");
 
     list< ::Object *> drinks = ::get_objs_list_type(target, ITEM_DRINK_CON, target->carrying);
     for (list< ::Object *>::iterator o = drinks.begin(); o != drinks.end(); o++)
@@ -1668,7 +1668,7 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vic
         DLString d = (++i)->toString();
         dam_type = damage_table.value( d.c_str(), true );
         if (dam_type == NO_FLAG)
-            throw Scripting::CustomException( "Invalid damage type");
+            throw Scripting::Exception( "Invalid damage type");
     }
 
     ::rawdamage(target, victim, dam_type, dam, true);
