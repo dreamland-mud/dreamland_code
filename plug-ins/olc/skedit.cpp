@@ -5,7 +5,7 @@
 #include "stringset.h"
 #include "pcharacter.h"
 #include "skillhelp.h"
-#include "skillgroup.h"
+#include "defaultskillgroup.h"
 #include "skillmanager.h"
 #include "defaultspell.h"
 #include "basicskill.h"
@@ -33,6 +33,7 @@
 #include "def.h"
 
 OLC_STATE(OLCStateSkill);
+OLC_STATE(OLCStateSkillGroup);
 
 DLString print_damage_tiers(int tier, int level_step);
 
@@ -43,9 +44,6 @@ OLCStateSkill::OLCStateSkill() : isChanged(false)
 OLCStateSkill::OLCStateSkill(Skill *skill) 
     : isChanged(false)
 {
-    if (!original)
-        return;
-
     original = skill->getIndex();
 }
 
@@ -298,7 +296,27 @@ SKEDIT(affect, "аффект", "создать обработчик аффект
         return true;
     }
 
-    stc("Использование: {y{hcaffect create{x - создать обработчик аффекта\r\n", ch);
+    if (arg_oneof(arg, "delete", "удалить")) {
+        DefaultAffectHandler *ah = getAffect();     
+        if (!ah) {
+            stc("У этого умения и так нету аффекта.\r\n", ch);
+            return false;
+        }
+
+        if (feniaTriggers->clearTriggers(ah->wrapper))
+            stc("Феневые триггера аффекта очищены.\r\n", ch);
+
+        BasicSkill *skill = getOriginal();
+        skill->affect->unsetSkill();
+        skill->affect.clear();
+
+        stc("Аффект удален.\r\n", ch);
+        return true;
+    }
+
+    stc("Использование:\r\n"
+        "{y{hcaffect create{x - создать обработчик аффекта\r\n"
+        "{y{hcaffect delete{x - удалить обработчик\r\n", ch);
     return false;
 }
 
@@ -331,12 +349,32 @@ SKEDIT(action, "действие", "создать команду для это�
         skill->command.setPointer(cmd);
         skill->command->setSkill(BasicSkill::Pointer(skill));
 
-        ptc(ch, "Создана новая команда '%s'.", cmd->getName().c_str());
+        ptc(ch, "Создана новая команда '%s'.\r\n", cmd->getName().c_str());
         show(ch);
         return true;
     }
 
-    stc("Использование: {yaction create <name>{x - создать новую команду\r\n", ch);
+    if (arg_oneof(argOne, "delete", "удалить")) {
+        DefaultSkillCommand *cmd = getCommand();
+        if (!cmd) {
+            stc("У этого умения и так нету команды.\r\n", ch);
+            return false;
+        }
+
+        if (feniaTriggers->clearTriggers(cmd->wrapper))
+            stc("Феневые триггера команды очищены.\r\n", ch);
+
+        BasicSkill *skill = getOriginal();
+        skill->command->unsetSkill();
+        skill->command.clear();
+
+        stc("Команда удалена.\r\n", ch);
+        return true;
+    }
+
+    stc("Использование:\r\n"
+        "{yaction create <name>{x - создать новую команду\r\n"
+        "{y{hcaction delete{x        - удалить команду\r\n", ch);
     return false;
 }
 
@@ -357,6 +395,24 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
         skill->spell->setSkill(BasicSkill::Pointer(skill));
         stc("Создано новое заклинание для этого умения.\r\n", ch);
         show(ch);
+        return true;
+    }
+
+    if (arg_oneof(arg, "delete", "удалить")) {
+        DefaultSpell *s = getSpell();        
+        if (!s) {
+            stc("У этого умения и так нету заклинаний.\r\n", ch);
+            return false;
+        }
+
+        if (feniaTriggers->clearTriggers(s->wrapper))
+            stc("Феневые триггера заклинания очищены.\r\n", ch);
+
+        BasicSkill *skill = getOriginal();
+        skill->spell->unsetSkill();
+        skill->spell.clear();
+
+        stc("Заклинание удалено.\r\n", ch);
         return true;
     }
 
@@ -382,6 +438,7 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
     }
 
     stc("Использование: {y{hcspell create{x - создать заклинание\r\n", ch);
+    stc("               {y{hcspell delete{x - удалить заклинание\r\n", ch);
     stc("               {y{hcspell tiers{x  - показать таблицу повреждений\r\n", ch);
     return false;
 }
@@ -933,4 +990,81 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
     ske->attach(ch);
     ske->show(ch);
 }
+
+CMD(gredit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill group editor.")
+{
+    DLString args = argument;
+    DLString cmd = args.getOneArgument();
+
+    if (cmd.empty()) {
+        stc("Формат:  gredit группа умений\r\n", ch);
+        return;
+    }
+
+    DLString arg = DLString(argument).toLower().stripWhiteSpace();    
+
+    SkillGroup *group = skillGroupManager->findUnstrict(arg);
+    if (!group) {
+        ch->printf("Группа умений '%s' не найдена.\r\n", arg.c_str());
+        return;
+    }
+
+    if (!dynamic_cast<DefaultSkillGroup *>(group)) {
+        ch->printf("Группу '%s' невозможно отредактировать.\r\n", group->getName().c_str());
+        return;
+    }
+    
+    OLCStateSkillGroup::Pointer gre(NEW, group);
+    gre->attach(ch);
+    gre->show(ch);
+}
+
+OLCStateSkillGroup::OLCStateSkillGroup() : isChanged(false)
+{
+}
+
+OLCStateSkillGroup::OLCStateSkillGroup(SkillGroup *group) 
+    : isChanged(false)
+{
+    original = group->getIndex();
+}
+
+OLCStateSkillGroup::~OLCStateSkillGroup() 
+{
+}
+
+void OLCStateSkillGroup::commit() 
+{
+    if (!isChanged)
+        return;
+
+    DefaultSkillGroup *original = getOriginal();
+    if (!original)
+        return;
+    
+    original->save();
+    if (owner)
+        owner->character->pecho("Изменения сохранены на диск.");
+}
+
+DefaultSkillGroup * OLCStateSkillGroup::getOriginal()
+{
+    return 0;    
+}
+
+
+void OLCStateSkillGroup::changed( PCharacter * )
+{
+
+}
+void OLCStateSkillGroup::show( PCharacter * )
+{
+
+}
+
+void OLCStateSkillGroup::statePrompt(Descriptor *) 
+{
+    
+}
+
 

@@ -136,6 +136,9 @@ void FeniaTriggerLoader::showAssignedTriggers(PCharacter *ch, Scripting::Object 
     ch->send_to(buf);
 }
 
+/**
+ * Clear a single runtime field (aka trigger) if exists on this wrapper.
+ */
 bool FeniaTriggerLoader::clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const
 {
     if (!wrapper)
@@ -151,6 +154,33 @@ bool FeniaTriggerLoader::clearTrigger(Scripting::Object *wrapper, const DLString
 
     Register self = base->getSelf();
     base->setField(methodId, Register());
+    return true;
+}
+
+/**
+ * Retrieve and clear all runtime fields assigned to this wrapper.
+ */
+bool FeniaTriggerLoader::clearTriggers(Scripting::Object *wrapper) const
+{
+    if (!wrapper)
+        return false;
+
+    WrapperBase *base = get_wrapper(wrapper);
+    if (!base)
+        return false;
+
+    StringSet triggers, misc;
+    base->collectTriggers(triggers, misc);
+
+    if (triggers.empty() && misc.empty())
+        return false;
+
+    for (auto &trigName: triggers)
+        clearTrigger(wrapper, trigName);
+
+    for (auto &miscName: misc)
+        clearTrigger(wrapper, miscName);
+
     return true;
 }
 

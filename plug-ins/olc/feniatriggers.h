@@ -40,6 +40,7 @@ public:
     void showAvailableTriggers(PCharacter *ch, DefaultSkillCommand *cmd) const;
     void showAssignedTriggers(PCharacter *ch,  Scripting::Object *wrapper) const;
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
+    bool clearTriggers(Scripting::Object *wrapper) const;
 
 protected:
     bool editExisting(Character *ch, Scripting::Register &retval) const;
