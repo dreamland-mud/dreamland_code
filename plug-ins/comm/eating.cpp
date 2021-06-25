@@ -171,6 +171,13 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         ch->pecho("Сейчас ты сражаешься -- тебе не до охоты!");
         return;
     }
+
+    // TODO: all messaging is currently focused on felines.
+    Flags att = ch->getRace()->getAttitude(*mob->getRace( ));
+    if (!att.isSet(RACE_HUNTS)) {
+        ch->pecho("Это животное не сделало тебе ничего плохого!");
+        return;
+    }
     
     isCat = (IS_SET( ch->form, FORM_FELINE ));
     isRodent = (mob->getRace( ) == race_mouse || mob->getRace( ) == race_rat || mob->getRace( ) == race_rodent);

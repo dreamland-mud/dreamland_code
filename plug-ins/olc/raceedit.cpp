@@ -130,7 +130,7 @@ void OLCStateRace::show( PCharacter *ch )
     ptc(ch, "Части тела:    {Y%s{x {D(parts){x\r\n", show_flag(r->parts).c_str());
     ptc(ch, "Слоты:         {Y%s{x {D(wearloc){x\r\n", r->wearloc.toString().c_str());
 
-    ptc(ch, "Политика:      ненавидит [{r%s{x] {D(hates){x любит [{g%s{x] {D(loves){x\r\n",
+    ptc(ch, "Политика:      охотится [{r%s{x] {D(hunts){x, делится [{g%s{x] {D(donates){x\r\n",
            r->hunts.toString().c_str(), r->donates.toString().c_str());
 
     if (pc) {
@@ -275,11 +275,11 @@ RACEEDIT(wearloc, "слоты", "слоты экипировки (? wearloc)")
 {
     return globalBitvectorEdit<Wearlocation>(getOriginal()->wearloc);
 }
-RACEEDIT(hates, "ненавидит", "какие расы не любит")
+RACEEDIT(hunts, "охотится", "на какие расы охотится командой 'съесть'")
 {
     return globalBitvectorEdit<Race>(getOriginal()->hunts);
 }
-RACEEDIT(loves, "любит", "какие расы любит")
+RACEEDIT(donates, "делится", "каким расам отдает вещи по команде 'попросить'")
 {
     return globalBitvectorEdit<Race>(getOriginal()->donates);
 }
