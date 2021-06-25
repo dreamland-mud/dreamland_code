@@ -19,7 +19,7 @@ CMDADM( profile )
         return;
     }
 
-    if (arg.empty()) {
+    if (arg.empty() || playerName.empty()) {
         ch->pecho(
             "Формат:\r\n"
             "profile backup <player_name>  -- сохранить профайлы игрока в каталогах var/db/backup и var/db/oldstyle/backup\r\n"
@@ -103,16 +103,23 @@ CMDADM( profile )
         }
 
         pcm = PCharacterManager::find(playerName);
+        // Allow to execute fenia scripts, grant OLC rights.
         pcm->getAttributes( ).getAttr<XMLIntegerAttribute>( "feniasecurity" )->setValue(110);
         pcm->setSecurity(99);        
         PCharacterManager::saveMemory(pcm);
         ch->pecho("Установлены права на феню и OLC.");
 
+        // Grant editing permissions for most common areas.
         if (!pcm->getAttributes().isAvailable("olc")) {
             DLString cmdArgs = playerName + " set 1 50000 9";
             interpret_raw(ch, "olcvnum", cmdArgs.c_str());
         }
 
+        // Create sandbox area for this player.
+        {
+            DLString cmdArgs = playerName + " create";
+            interpret_raw(ch, "olcvnum", cmdArgs.c_str());
+        }
         return;
     }
 

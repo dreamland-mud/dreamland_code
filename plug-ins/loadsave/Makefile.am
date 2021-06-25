@@ -36,6 +36,7 @@ areabehaviormanager.cpp \
 roombehaviormanager.cpp \
 fread_utils.cpp \
 itemevents.cpp \
+areautils.cpp \
 roomutils.cpp
 
 libloadsave_la_MOC = \

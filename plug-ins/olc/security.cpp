@@ -13,6 +13,7 @@
 #include "merc.h"
 #include "interp.h"
 
+#include "areautils.h"
 #include "security.h"
 #include "olc.h"
 #include "onlinecreation.h"
@@ -221,11 +222,33 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 
             } catch (const ExceptionBadType& e) {
             }
+            return;
+        }
+
+        // Create a <playername.are> area with 100 vnums and grant permissions to the player.
+        if (arg_oneof(arg2, "create", "создать")) {
+            DLString filename = victim->getName().toLower() + ".are";
+            AreaIndexData *area = get_area_index(filename);
+            if (area) {
+                ch->pecho("Зона '%s' (%s) для этого персонажа уже существует. Используй {y{hcaedit %d{x для редактирования.",
+                            area->name, area->area_file->file_name, area->vnum);
+                return;
+            }
+
+            area = AreaUtils::createFor(victim);
+            ch->pecho("Создана зона '%s' (%s), диапазон внумов %d-%d. Используй {y{hcaedit %d{x для редактирования.",
+                        area->name, area->area_file->file_name, area->min_vnum, area->max_vnum, area->vnum);
+
+            attr = victim->getAttributes( ).getAttr<XMLAttributeOLC>( "olc" );
+            attr->vnums.push_back(XMLVnumRange(area->min_vnum, area->max_vnum, 9));
+            PCharacterManager::saveMemory(victim);
+            return;
         }
     } 
 
     ch->pecho( "Usage: olcvnum <player> set <min vnum> <max vnum> <security level>\r\n" 
                  "       olcvnum <player> show\r\n" 
+                 "       olcvnum <player> create\r\n"
                  "       olcvnum <player> del <min vnum> <max vnum>" );
 
 }
