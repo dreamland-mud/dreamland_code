@@ -58,6 +58,14 @@ enum {
 #define TNS_SUBNEG        1
 #define TNS_SUBNEG_IAC        2
 
+// Client terminal type
+enum {
+    TTYPE_NONE = 0,
+    TTYPE_MUDLET,
+    TTYPE_LYNTIN,
+    TTYPE_MAX
+};
+
 struct telnet {
     int state;
     unsigned char subneg[2048];

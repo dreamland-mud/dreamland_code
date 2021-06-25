@@ -353,11 +353,10 @@ protected:
     enum {
         INVIS_NONE = 0,
         INVIS_IMMORTAL = (A),
-        INVIS_CODER = (B),
-        INVIS_RECRUITER = (C),
-        INVIS_LEADER = (D),
         INVIS_WEB = (E),
-        INVIS_TELNET = (F)
+        INVIS_TELNET = (F),
+        INVIS_SCREENREADER_ON = (G),
+        INVIS_SCREENREADER_OFF = (H)
     };
     void invis_tag_parse( ostringstream & );
     bool invis_tag_work( );
@@ -405,16 +404,17 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
     if (ch) {
         if (ch->is_immortal( ))
             SET_BIT(my_invis, INVIS_IMMORTAL);
-        if (ch->isCoder( ))
-            SET_BIT(my_invis, INVIS_CODER);
-        if (!ch->is_npc( ) && ch->getClan( )->isRecruiter( ch->getPC( ) ))
-            SET_BIT(my_invis, INVIS_RECRUITER);
-        if (!ch->is_npc( ) && ch->getClan( )->isLeader( ch->getPC( ) ))
-            SET_BIT(my_invis, INVIS_LEADER);
         if (my_web)
             SET_BIT(my_invis, INVIS_WEB);
         else
             SET_BIT(my_invis, INVIS_TELNET);
+        
+        if (ch->desc && ch->desc->telnet.ttype == TTYPE_LYNTIN)
+            SET_BIT(my_invis, INVIS_SCREENREADER_ON);
+        else if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_SCREENREADER))
+            SET_BIT(my_invis, INVIS_SCREENREADER_ON);
+        else
+            SET_BIT(my_invis, INVIS_SCREENREADER_OFF);
     }
    
     reset( );
@@ -858,7 +858,7 @@ void VisibilityTags::time_tag_parse( )
 
 // {I
 // end invis: x
-// invis type: i (imm-only), c (coder-only), r (clanrecruiter-only), l (clanleader-only)
+// invis type: i (imm-only), s/S (screenreader on/off), w/W (web client on/off)
 bool VisibilityTags::invis_tag_work( )
 {
     return st_invis == INVIS_NONE || IS_SET(my_invis, st_invis);
@@ -868,9 +868,8 @@ void VisibilityTags::invis_tag_parse( ostringstream &out )
 {
     switch (*++p) {
     case 'i': st_invis = INVIS_IMMORTAL; break;
-    case 'c': st_invis = INVIS_CODER; break;
-    case 'r': st_invis = INVIS_RECRUITER; break;
-    case 'l': st_invis = INVIS_LEADER; break;
+    case 's': st_invis = INVIS_SCREENREADER_ON; break;
+    case 'S': st_invis = INVIS_SCREENREADER_OFF; break;
     case 'W': st_invis = INVIS_TELNET; break;
     case 'w': 
               st_invis = INVIS_WEB; 
@@ -880,9 +879,9 @@ void VisibilityTags::invis_tag_parse( ostringstream &out )
     default:  --p; /* FALLTHROUGH */ 
     case 'x':
     case 'X': 
-              st_invis = INVIS_NONE; 
-              if (IS_SET(my_invis, INVIS_WEB)) 
+              if (st_invis == INVIS_WEB && IS_SET(my_invis, INVIS_WEB)) 
                   out << "\037";
+              st_invis = INVIS_NONE; 
               break;
     }
 }

@@ -69,10 +69,11 @@ const char *lid = "\n\r*** ХВАТЫТ!!! ***\n\r";
  */
 enum {
     TTYPE_NONE = 0,
-    TTYPE_MUDLET,
+    TTYPE_MUDLET, 
+    TTYPE_LYNTIN, // blintin sends this terminal type; 'real' lyntin uses TERM env variable by default
     TTYPE_MAX
 };
-const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet" };
+const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet", "lyntin" };
 int ttype_lookup( const char *received )
 {
     notice("telnet: checking %s as terminal type candidate", received);	
