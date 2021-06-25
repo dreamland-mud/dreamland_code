@@ -54,8 +54,7 @@
 #include "comm.h"
 #include "def.h"
 
-
-DLString format_longdescr_to_char(const char *descr, Character *ch);
+void obj_update();
 GSN(none);
 CLAN(none);
 GROUP(clan);
@@ -305,6 +304,8 @@ static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
     return line;
 }
 
+
+
 CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 {
     DLString args = argument;
@@ -469,6 +470,12 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         ch->printf("Loading room objects for '%s' [%d], check logs for details.\r\n", 
                     room->getName(), room->vnum);
         load_room_objects(room, const_cast<char *>("/tmp"), false);
+        return;
+    }
+
+    if (arg == "update") {
+        obj_update();
+        ch->pecho("Forced obj update.");
         return;
     }
 }
