@@ -93,6 +93,12 @@ static DLString show_flag(const Flags &f)
     return f.getValue() == 0 ? "-" : f.names();
 }
 
+static DLString show_enum(const Enumeration &e)
+{
+    return e.getValue() == 0 ? "-" : e.name();
+}
+
+
 void OLCStateRace::show( PCharacter *ch )
 {
     DefaultRace *r = getOriginal();
@@ -128,6 +134,7 @@ void OLCStateRace::show( PCharacter *ch )
     ptc(ch, "Уязвимость:    {Y%s{x {D(vuln){x\r\n", show_flag(r->vuln).c_str());
     ptc(ch, "Форма тела:    {Y%s{x {D(form){x\r\n", show_flag(r->form).c_str());
     ptc(ch, "Части тела:    {Y%s{x {D(parts){x\r\n", show_flag(r->parts).c_str());
+    ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n", show_enum(r->size).c_str());
     ptc(ch, "Слоты:         {Y%s{x {D(wearloc){x\r\n", r->wearloc.toString().c_str());
 
     ptc(ch, "Политика:      охотится [{r%s{x] {D(hunts){x, делится [{g%s{x] {D(donates){x\r\n",
@@ -270,6 +277,10 @@ RACEEDIT(form, "форма", "формы тела (? form_flags)")
 RACEEDIT(parts, "части", "части тела (? part_flags)")
 {
     return flagBitsEdit(getOriginal()->parts);
+}
+RACEEDIT(size, "размер", "размеры (? size_table)")
+{
+    return flagValueEdit(getOriginal()->size);
 }
 RACEEDIT(wearloc, "слоты", "слоты экипировки (? wearloc)")
 {
