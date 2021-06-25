@@ -103,7 +103,7 @@ CMDRUN( cast )
     if (ch->is_npc( ) && !( ch->desc != 0 || ch->master != 0 ))
         return;
 
-    if (ch->is_npc( ) && ch->master != 0) {
+    if (ch->is_npc( ) && IS_CHARMED(ch)) {
         if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
             oldact("$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR);
             return;
@@ -153,7 +153,7 @@ CMDRUN( cast )
         return;
     }
 
-    if (ch->is_npc( ) && ch->master && ch->master->getClan( ) == clan_battlerager) {
+    if (ch->is_npc( ) && IS_CHARMED(ch) && ch->master->getClan( ) == clan_battlerager) {
         say_fmt("Хозя%2$Gин|ин|йка, я уважаю твои убеждения.", ch, ch->master);
         return;
     }
@@ -163,7 +163,7 @@ CMDRUN( cast )
     spellArgs = normalize_string(spellArgs);
     
     if (!spell) {
-        if (ch->is_npc( ) && ch->master) 
+        if (ch->is_npc( ) && IS_CHARMED(ch)) 
             do_say(ch, "Да не умею я");
         else
             ch->pecho("Ты не знаешь такого заклинания.");
@@ -188,7 +188,7 @@ CMDRUN( cast )
 
     int mana = skill->getMana(ch);
     if (mana > 0 && ch->mana < mana) {
-        if (ch->is_npc( ) && ch->master != 0) 
+        if (ch->is_npc( ) && IS_CHARMED(ch)) 
             say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
             ch->pecho("У тебя не хватает энергии{lE (mana){x.");
@@ -198,7 +198,7 @@ CMDRUN( cast )
 
     int moves = skill->getMoves(ch);
     if (moves > 0 && ch->move < moves) {
-        if (ch->is_npc( ) && ch->master != 0)
+        if (ch->is_npc( ) && IS_CHARMED(ch))
             say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
         else
             ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
@@ -209,7 +209,7 @@ CMDRUN( cast )
     target = spell->locateTargets( ch, spellArgs, buf );
     if (target->error != 0) {
         ch->pecho( buf.str() );
-        if (ch->is_npc() && ch->master && !buf.str().empty())
+        if (ch->is_npc() && IS_CHARMED(ch) && !buf.str().empty())
             say_fmt("Хозя%2$Gин|ин|йка, у меня ничего не получится: %3$s", ch, ch->master, buf.str().c_str());
 
         return;
@@ -247,7 +247,7 @@ CMDRUN( cast )
         
     if (number_percent( ) > skill->getEffective( ch )) {
         ch->pecho("Ты не можешь сконцентрироваться.");
-        if (ch->is_npc() && ch->master)
+        if (ch->is_npc() && IS_CHARMED(ch))
             ch->master->pecho("%^C1 теряет концентрацию.", ch);
 
         skill->improve( ch, false, victim );
