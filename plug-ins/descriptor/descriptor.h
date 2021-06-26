@@ -62,7 +62,7 @@ enum {
 enum {
     TTYPE_NONE = 0,
     TTYPE_MUDLET,
-    TTYPE_LYNTIN,
+    TTYPE_LYNTIN, // blintin sends this terminal type; 'real' lyntin uses TERM env variable by default
     TTYPE_MAX
 };
 
