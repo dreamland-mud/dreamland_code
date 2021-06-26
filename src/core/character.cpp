@@ -456,7 +456,7 @@ bool Character::can_see( const Object *obj ) const
     if ( IS_SET(obj->extra_flags,ITEM_VIS_DEATH))
         return false;
 
-    if ( IS_AFFECTED( this, AFF_BLIND ) && obj->item_type != ITEM_POTION)
+    if ( IS_AFFECTED( this, AFF_BLIND ) )
         return false;
 
     if ( obj->item_type == ITEM_LIGHT && obj->value2() != 0 )
