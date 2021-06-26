@@ -124,6 +124,7 @@ protected:
     bool editor(const char *argument, DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, char *&field, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, RussianString &original, editor_flags flags = ED_NO_FLAG);
+    bool editor(const char *argument, XMLStringList &values, editor_flags flags = ED_NO_FLAG);
     
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;

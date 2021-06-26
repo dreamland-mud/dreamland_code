@@ -748,6 +748,22 @@ bool OLCState::editor(const char *argument, RussianString &russian, editor_flags
     return true;
 }
 
+bool OLCState::editor(const char *argument, XMLStringList &values, editor_flags flags)
+{
+    DLString original = values.toList().join("\n");
+
+    if (!editor(argument, original, flags))
+        return false;
+
+    StringList newLines;
+    newLines.split(original, "\n");
+    values.clear();
+    for (auto &line: newLines)
+        values.push_back(line);
+
+    return true;
+}
+
 bool OLCState::editor(const char *argument, char *&field, editor_flags flags)
 {
     DLString original = field;

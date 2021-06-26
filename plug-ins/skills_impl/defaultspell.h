@@ -14,6 +14,7 @@
 #include "xmlflags.h"
 #include "xmlenumeration.h"
 #include "xmlboolean.h"
+#include "xmlstringlist.h"
 
 enum {
     TARGET_ERR_SUMMON_WHO = 1,
@@ -89,6 +90,7 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty tier; // damage tier, from 1 (best) to 5
     XML_VARIABLE XMLEnumerationNoEmpty damtype; // damage type from damage_table
     XML_VARIABLE XMLFlagsNoEmpty damflags; // additional flags other than DAMF_SPELL
+    XML_VARIABLE XMLStringList messages; // utterances
 
 protected:
     Character * getCharSpell( Character *, const DLString &, int *, int *, ostringstream &errbuf );

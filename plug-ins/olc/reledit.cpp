@@ -183,7 +183,7 @@ RELEDIT(mark, "знак", "установить vnum знака религии")
     if (vnum == 0) {
         getOriginal()->tattooVnum = 0;
         stc("Знак очищен.\r\n", ch);
-        return false;
+        return true;
     }
  
     OBJ_INDEX_DATA *tattoo = get_obj_index(vnum);

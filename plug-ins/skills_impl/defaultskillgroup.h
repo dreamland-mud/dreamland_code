@@ -8,6 +8,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlboolean.h"
 #include "xmlstring.h"
+#include "xmlstringlist.h"
 #include "xmltableelement.h"
 #include "xmlinteger.h"
 #include "xmlrussianstring.h"
@@ -33,23 +34,22 @@ public:
     virtual void unloaded( );
     
     virtual const DLString &getRussianName( ) const;
-    virtual const DLString &getShortDescr( ) const;
     virtual bool visible( Character * ) const;
     virtual bool available( Character * ) const;
     virtual void show( PCharacter *, ostringstream & ) const;
     virtual int getPracticer( ) const;
 
-protected:
-    virtual void listSkills( PCharacter *, ostringstream & ) const;
-    virtual void listPracticers( PCharacter *, ostringstream & ) const;
-    virtual char getSkillColor( Skill *, PCharacter * ) const;
-
-    XML_VARIABLE XMLStringNoEmpty    shortDescr;
     XML_VARIABLE XMLRussianString    nameRus;
     XML_VARIABLE XMLBoolean          hidden;
     XML_VARIABLE XMLBoolean          autoHelp;
     XML_VARIABLE XMLPointer<SkillGroupHelp> help;
     XML_VARIABLE XMLIntegerNoEmpty   practicer;
+    XML_VARIABLE XMLStringList messages;
+
+protected:
+    virtual void listSkills( PCharacter *, ostringstream & ) const;
+    virtual void listPracticers( PCharacter *, ostringstream & ) const;
+    virtual char getSkillColor( Skill *, PCharacter * ) const;
 };
 
 inline const DLString & DefaultSkillGroup::getName( ) const

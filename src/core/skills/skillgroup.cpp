@@ -32,11 +32,6 @@ bool SkillGroup::isValid( ) const
     return false;
 }
 
-const DLString &SkillGroup::getShortDescr( ) const
-{
-    return DLString::emptyString;
-}
-
 const DLString &SkillGroup::getRussianName( ) const
 {
     return DLString::emptyString;

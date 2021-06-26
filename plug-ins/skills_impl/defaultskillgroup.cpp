@@ -44,11 +44,6 @@ void DefaultSkillGroup::unloaded( )
     skillGroupManager->unregistrate( Pointer( this ) );
 }
 
-const DLString & DefaultSkillGroup::getShortDescr( ) const
-{
-    return shortDescr;
-}
-
 const DLString &DefaultSkillGroup::getRussianName( ) const
 {
     return nameRus.getFullForm( );

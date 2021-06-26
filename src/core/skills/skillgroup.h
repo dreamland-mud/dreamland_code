@@ -34,7 +34,6 @@ public:
     virtual bool isValid( ) const;
     virtual const DLString &getName( ) const;
     virtual const DLString &getRussianName( ) const;
-    virtual const DLString &getShortDescr( ) const;
     virtual bool visible( Character * ) const;
     virtual bool available( Character * ) const;
     virtual void show( PCharacter *, ostringstream & ) const;

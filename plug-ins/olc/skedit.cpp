@@ -67,10 +67,7 @@ void OLCStateSkill::commit()
 
 BasicSkill * OLCStateSkill::getOriginal()
 {
-    Skill *skill = skillManager->find(original->getIndex());
-    if (!skill)
-        throw Exception("Attached skill doesn't exist");
-
+    Skill *skill = original.getElement();
     BasicSkill *basicSkill = dynamic_cast<BasicSkill *>(skill);
     if (!basicSkill)
         throw Exception("Attached skill was unloaded");
@@ -220,6 +217,9 @@ void OLCStateSkill::show( PCharacter *ch )
             if (s->targetIsRanged())
                 ptc(ch, "Ранговое:    {Y%s {D(ranged){x\r\n", s->ranged ? "yes" : "no");
         }
+
+        ptc(ch, "Сообщения:   %s  %s {D(messages){x\r\n",
+               s->messages.toList().join("\r\n").c_str(), web_edit_button(ch, "messages", "web").c_str());
 
         ptc(ch, "Триггера:    ");
         feniaTriggers->showAvailableTriggers(ch, s);
@@ -669,6 +669,13 @@ SKEDIT(ethos, "этос", "ограничить по этосу")
     return flagBitsEdit(getOriginal()->ethos);
 }
 
+SKEDIT(messages, "сообщения", "сообщения при произнесении заклинания")
+{    
+    DefaultSpell *s = getSpell();
+    return checkSpell(s)
+            && editor(argument, s->messages, ED_NO_NEWLINE);
+}
+
 SKEDIT(target, "цели", "цели заклинания (? target_table)")
 {
     DefaultSpell *s = getSpell();
@@ -1049,22 +1056,152 @@ void OLCStateSkillGroup::commit()
 
 DefaultSkillGroup * OLCStateSkillGroup::getOriginal()
 {
-    return 0;    
+    DefaultSkillGroup *group = dynamic_cast<DefaultSkillGroup *>(original.getElement());
+    if (!group)
+        throw Exception("Attached group was unloaded");
+
+    return group;
 }
 
 
 void OLCStateSkillGroup::changed( PCharacter * )
 {
-
+    isChanged = true;
 }
-void OLCStateSkillGroup::show( PCharacter * )
+
+void OLCStateSkillGroup::statePrompt(Descriptor *d) 
 {
-
+    d->send( "SkillGroup> " );    
 }
 
-void OLCStateSkillGroup::statePrompt(Descriptor *) 
+void OLCStateSkillGroup::show(PCharacter *ch)
 {
-    
+    DefaultSkillGroup *g = getOriginal();
+
+    ptc(ch, "Группа:      {C%s\r\n", g->getName().c_str());
+    ptc(ch, "Русское:     {C%s{x  %s {D(russian help){x\r\n",
+            g->getRussianName().c_str(), 
+            web_edit_button(ch, "russian", "web").c_str());
+    ptc(ch, "Скрыта:      {C%s {D(hidden){x\r\n", 
+            g->hidden ? "yes" : "no");
+
+    MOB_INDEX_DATA *pMob = get_mob_index(g->getPracticer());
+    ptc(ch, "Учитель:     {g%s{x [%d] {D(practicer){x\r\n",
+             (pMob ? russian_case(pMob->short_descr, '1').c_str() : "-"),
+             g->getPracticer());
+
+    ptc(ch, "Сообщения:    %s %s {D(messages){x\r\n",
+              g->messages.toList().join("\r\n").c_str(),
+              web_edit_button(ch, "messages", "web").c_str());
+
+    if (g->help)
+        ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
+            web_edit_button(ch, "hedit", g->help->getID()).c_str(),
+            g->help->getID());
+    else
+        ptc(ch, "Справка:     нет {D(help create){x\r\n");
+
+    ptc(ch, "\r\n{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");
 }
 
 
+GREDIT(commands, "команды", "показать список встроенных команд")
+{
+    do_commands(ch);
+    return false;
+}
+
+GREDIT(done, "готово", "выйти из редактора") 
+{
+    commit();
+    detach(ch);
+    return false;
+}
+
+GREDIT(show, "показать", "показать все поля")
+{
+    show(ch);
+    return false;
+}
+
+// TODO remove boilerplate
+GREDIT(help, "справка", "создать или посмотреть справку по группе")
+{
+    DLString arg = argument;
+    DefaultSkillGroup *g = getOriginal();
+
+    if (arg.empty()) {
+        if (!g->help || g->help->getID() < 1) {
+            ptc(ch, "Справка не задана, используй help create для создания новой.");
+            return false;
+        }
+
+        OLCStateHelp::Pointer hedit(NEW, g->help.getPointer());
+        hedit->attach(ch);
+        hedit->show(ch);
+        return true;
+    }
+
+    if (arg_oneof(arg, "create", "создать")) {
+        if (g->help && g->help->getID() > 0) {
+            ptc(ch, "Справка уже существует, используй команду help для редактирования.");
+            return false;
+        }
+
+        if (!g->help)
+            g->help.construct();
+        g->help->setID(
+            help_next_free_id()
+        );
+        g->help->setSkillGroup(DefaultSkillGroup::Pointer(g));
+
+        OLCStateHelp::Pointer hedit(NEW, g->help.getPointer());
+        hedit->attach(ch);
+        hedit->show(ch);
+        return true;
+    }   
+
+    ptc(ch, "Использование: help, help create\r\n");
+    return false;
+}
+
+GREDIT(russian, "русское", "русское название группы")
+{
+    return editor(argument, getOriginal()->nameRus, ED_NO_NEWLINE);
+}
+
+GREDIT(messages, "сообщения", "сообщения при произнесении заклинаний этой группы")
+{    
+    return editor(argument, getOriginal()->messages, ED_NO_NEWLINE);
+}
+
+GREDIT(practicer, "учитель", "задать vnum моба-учителя группы")
+{
+    DefaultSkillGroup *g = getOriginal();
+    Integer vnum;
+    if (!Integer::tryParse(vnum, argument)) {
+        stc("Укажи vnum моба-учителя или 0 для сброса.\r\n", ch);
+        return false;
+    }
+
+    if (vnum == 0) {
+        g->practicer = 0;
+        stc("Учитель очищен.\r\n", ch);
+        return true;
+    }
+
+    MOB_INDEX_DATA *pMob = get_mob_index(vnum);
+    if (!pMob) {
+        stc("Моба с таким номером не существует.\r\n", ch);
+        return false;
+    }
+
+    g->practicer.setValue(vnum);
+    ch->pecho("Учитель этой группы теперь %N1 из зоны '%s'.", pMob->short_descr, pMob->area->name);
+    return true;
+}
+
+GREDIT(hidden, "скрыта", "видима ли группа смертным")
+{
+    return boolEdit(getOriginal()->hidden);
+}
