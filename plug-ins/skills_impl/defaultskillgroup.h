@@ -44,7 +44,7 @@ public:
     XML_VARIABLE XMLBoolean          autoHelp;
     XML_VARIABLE XMLPointer<SkillGroupHelp> help;
     XML_VARIABLE XMLIntegerNoEmpty   practicer;
-    XML_VARIABLE XMLStringList messages;
+    XML_VARIABLE XMLStringList msgRoom, msgSelf, msgVict;
 
 protected:
     virtual void listSkills( PCharacter *, ostringstream & ) const;

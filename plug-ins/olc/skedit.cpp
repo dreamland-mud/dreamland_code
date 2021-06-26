@@ -219,7 +219,7 @@ void OLCStateSkill::show( PCharacter *ch )
         }
 
         ptc(ch, "Сообщения:   %s  %s {D(messages){x\r\n",
-               s->messages.toList().join("\r\n").c_str(), web_edit_button(ch, "messages", "web").c_str());
+               s->messages.toList().join(" {Y|{x ").c_str(), web_edit_button(ch, "messages", "web").c_str());
 
         ptc(ch, "Триггера:    ");
         feniaTriggers->showAvailableTriggers(ch, s);
@@ -1090,16 +1090,24 @@ void OLCStateSkillGroup::show(PCharacter *ch)
              (pMob ? russian_case(pMob->short_descr, '1').c_str() : "-"),
              g->getPracticer());
 
-    ptc(ch, "Сообщения:    %s %s {D(messages){x\r\n",
-              g->messages.toList().join("\r\n").c_str(),
-              web_edit_button(ch, "messages", "web").c_str());
-
     if (g->help)
         ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
             web_edit_button(ch, "hedit", g->help->getID()).c_str(),
             g->help->getID());
     else
         ptc(ch, "Справка:     нет {D(help create){x\r\n");
+
+    stc("{YСообщения{x:\r\n", ch);
+    ptc(ch, "Себе:        %s %s {D(self){x\r\n",
+              g->msgSelf.toList().join(" {Y|{x ").c_str(),
+              web_edit_button(ch, "self", "web").c_str());
+    ptc(ch, "Жертве:      %s %s {D(victim){x\r\n",
+              g->msgVict.toList().join(" {Y|{x ").c_str(),
+              web_edit_button(ch, "victim", "web").c_str());
+    ptc(ch, "Комнате:     %s %s {D(room){x\r\n",
+              g->msgRoom.toList().join(" {Y|{x ").c_str(),
+              web_edit_button(ch, "room", "web").c_str());
+
 
     ptc(ch, "\r\n{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");
 }
@@ -1170,9 +1178,19 @@ GREDIT(russian, "русское", "русское название группы"
     return editor(argument, getOriginal()->nameRus, ED_NO_NEWLINE);
 }
 
-GREDIT(messages, "сообщения", "сообщения при произнесении заклинаний этой группы")
+GREDIT(self, "себе", "сообщения кастеру при произнесении заклинаний этой группы")
 {    
-    return editor(argument, getOriginal()->messages, ED_NO_NEWLINE);
+    return editor(argument, getOriginal()->msgSelf, ED_NO_NEWLINE);
+}
+
+GREDIT(victim, "жертве", "сообщения жертве при произнесении заклинаний этой группы")
+{    
+    return editor(argument, getOriginal()->msgVict, ED_NO_NEWLINE);
+}
+
+GREDIT(room, "комнате", "сообщения в комнату при произнесении заклинаний этой группы")
+{    
+    return editor(argument, getOriginal()->msgRoom, ED_NO_NEWLINE);
 }
 
 GREDIT(practicer, "учитель", "задать vnum моба-учителя группы")
