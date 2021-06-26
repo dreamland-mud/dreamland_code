@@ -12,7 +12,7 @@
 #include "xmltableelement.h"
 #include "xmlinteger.h"
 #include "xmlrussianstring.h"
-
+#include "xmlglobalbitvector.h"
 #include "skillgrouphelp.h"
 #include "skillgroup.h"
 
@@ -45,6 +45,8 @@ public:
     XML_VARIABLE XMLPointer<SkillGroupHelp> help;
     XML_VARIABLE XMLIntegerNoEmpty   practicer;
     XML_VARIABLE XMLStringList msgRoom, msgSelf, msgVict;
+    XML_VARIABLE XMLStringNoEmpty path;
+    XML_VARIABLE XMLGlobalBitvector gods;
 
 protected:
     virtual void listSkills( PCharacter *, ostringstream & ) const;

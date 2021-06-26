@@ -13,6 +13,7 @@
 #include "defaultskillcommand.h"
 #include "commandmanager.h"
 #include "xmltableloader.h"
+#include "religion.h"
 
 #include "skedit.h"
 #include "hedit.h"
@@ -1089,6 +1090,11 @@ void OLCStateSkillGroup::show(PCharacter *ch)
     ptc(ch, "Учитель:     {g%s{x [%d] {D(practicer){x\r\n",
              (pMob ? russian_case(pMob->short_descr, '1').c_str() : "-"),
              g->getPracticer());
+    ptc(ch, "Боги:        {g%s {D(gods){x\r\n",
+        g->gods.empty() ? "-": g->gods.toString().c_str());
+    ptc(ch, "Путь:        {g%s{x  %s {D(path help){x\r\n",
+            g->path.c_str(), 
+            web_edit_button(ch, "path", "web").c_str());
 
     if (g->help)
         ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
@@ -1223,3 +1229,14 @@ GREDIT(hidden, "скрыта", "видима ли группа смертным"
 {
     return boolEdit(getOriginal()->hidden);
 }
+
+GREDIT(gods, "боги", "задать богов-покровителей группы")
+{
+    return globalBitvectorEdit<Religion>(getOriginal()->gods);
+}
+
+GREDIT(path, "путь", "задать Пути для группы: light, darkness, order, fury, reason, chaos, nature, society")
+{
+    return editor(argument, getOriginal()->path, ED_NO_NEWLINE);
+}
+

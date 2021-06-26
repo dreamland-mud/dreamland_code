@@ -10,6 +10,7 @@
 #include "spell.h"
 #include "skillmanager.h"
 #include "pcharacter.h"
+#include "religion.h"
 #include "websocketrpc.h"
 #include "act.h"
 #include "loadsave.h"
@@ -23,7 +24,7 @@ GROUP(clan);
  * DefaultSkillGroup
  *------------------------------------------------------------------*/
 DefaultSkillGroup::DefaultSkillGroup( )
-            : autoHelp( true )
+            : autoHelp( true ), gods(religionManager)
 {
 }
 

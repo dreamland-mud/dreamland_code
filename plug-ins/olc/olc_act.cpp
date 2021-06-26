@@ -52,6 +52,7 @@ struct olc_help_type {
     const char *command;
     const void *structure;
     const char *desc;
+    const char *alias;
 };
 
 
@@ -69,17 +70,17 @@ int mat_table;
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
 {
-    {"{YАрии{x", NULL, NULL },
+    {"{YАрии{x", NULL, NULL, NULL },
     {"area_flags", &area_flags, "Флаги арий (поле area_flag)"},
 
-    {"{YКомнаты{x", NULL, NULL},
+    {"{YКомнаты{x", NULL, NULL, NULL},
     {"room_flags", &room_flags, "Флаги комнат (поле room_flags)."},
     {"sector_table", &sector_table, "Тип местности в комнате (поле sector_type)."},
     {"exit_flags", &exit_flags, "Флаги выходов и экстравыходов (поле exit_info)."},
     {"reset_flags", &reset_flags, "Флаги ресетов."},
     {"rand_table", &rand_table, "Рандомные предметы (поле rand у ресетов)."},
 
-    {"{YПредметы{x", NULL, NULL},
+    {"{YПредметы{x", NULL, NULL, NULL},
     {"item_table", &item_table, "Типы предметов (поле item_type)."},
     {"wear_flags", &wear_flags, "Куда одевать предмет (поле wear_flags)."},
     {"extra_flags", &extra_flags, "Флаги предметов (поле extra_flags)."},
@@ -95,11 +96,11 @@ const struct olc_help_type help_table[] =
     {"material", &mat_table, "Материалы предметов и мобов."},
 
 
-    {"{YМобы и персонажи{x", NULL, NULL},
+    {"{YМобы и персонажи{x", NULL, NULL, NULL},
     {"races", &race_table, "Список всех рас мобов."},
     {"classes", &class_table, "Список всех классов персонажей."},
     {"clans", &clan_table, "Список всех кланов."},
-    {"religion", &religion_table, "Список всех религий."},
+    {"religion", &religion_table, "Список всех религий.", "gods"},
     {"religion_flags", &religion_flags, "Флаги религий."},
     {"align_table", &align_table, "Натура персонажа."},
     {"ethos_table", &ethos_table, "Этос персонажа."},
@@ -119,12 +120,12 @@ const struct olc_help_type help_table[] =
     {"part_flags", &part_flags, "Части тела мобов (поле parts)."},
     {"spec", &spec_table, "Доступные спец. программы моба."},
 
-    {"{YАффекты{x", NULL, NULL},
+    {"{YАффекты{x", NULL, NULL, NULL},
     {"apply_flags", &apply_flags, "Поле location у аффекта (на что влияет его modifier)"},
     {"affwhere_flags", &affwhere_flags, "Поле where у аффекта (на что влияет его bitvector)"},
     {"wearloc", &wearloc_table, "Куда мобы одевают предметы."},
 
-    {"{YУмения и заклинания{x", NULL, NULL}, 
+    {"{YУмения и заклинания{x", NULL, NULL, NULL}, 
     {"spells", &skill_table, "Имена всех заклинаний."},
     {"practicer", &group_table, "Все группы умений (для поля practicer)."},
     {"target_table", &target_table, "Цели для заклинаний (поле target)."},
@@ -136,8 +137,19 @@ const struct olc_help_type help_table[] =
     {"command_flags", &command_flags, "Флаги для команды."},
     {"argtype_table", &argtype_table, "Тип аргумента для команды умения (поле argtype)."},
 
-    {NULL, NULL, NULL}
+    {NULL, NULL, NULL, NULL}
 };
+
+bool help_table_matches(const olc_help_type *help_entry, const char *arg)
+{
+    if (arg[0] == help_entry->command[0] && !str_prefix(arg, help_entry->command))
+        return true;
+
+    if (help_entry->alias && !str_prefix(arg, help_entry->alias))
+        return true;
+
+    return false;
+}
 
 void show_flag_cmds(Character * ch, const FlagTable *table)
 {
@@ -264,8 +276,7 @@ bool show_help(Character * ch, const char *cargument)
 
     // Find the command, show changeable data.
     for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
-        if (arg[0] == help_table[cnt].command[0]
-            && !str_prefix(arg, help_table[cnt].command)) {
+        if (help_table_matches(&help_table[cnt], arg)) {
             if (help_table[cnt].structure == &spec_table) {
                 show_spec_cmds(ch);
                 return false;
