@@ -413,12 +413,18 @@ void affect_strip( Object *obj, int sn, bool verbose )
 }
 
 /*
- * Strip all affects which affect given bitvector
+ * Strip all affects which affect given bitvector. Some spells add 2-3 affects,
+ * only one of them giving a certain bivector (e.g. hitroll+berserk, damroll);
+ * in this case need to take care to remove all of them.
  */
 void affect_bit_strip(Character *ch, const FlagTable *table, int bits, bool verbose)
 {
+    list<int> typesToRemove;
     for (auto &paf: ch->affected.findAllWithBits(table, bits))
-        affect_remove(ch, paf, verbose);
+        typesToRemove.push_back(paf->type);
+
+    for (auto &type: typesToRemove)
+        affect_strip(ch, type, verbose);
 }
 
 /*
