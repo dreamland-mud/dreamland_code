@@ -1453,7 +1453,7 @@ void idle_update( PCharacter *ch )
 {
     if (IS_VIOLENT( ch ))
     {
-        oldact("Лихорадочный блеск в глазах $c2, пропадает.", ch, 0, 0, TO_ROOM );
+        oldact("Лихорадочный блеск в глазах $c2 пропадает.", ch, 0, 0, TO_ROOM );
         oldact("Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
         REMOVE_VIOLENT( ch );
         ch->PK_time_v = 0;

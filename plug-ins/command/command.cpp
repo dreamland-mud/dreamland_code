@@ -245,7 +245,12 @@ void Command::visualize( Character *ch )
     }
 
     if (DIGGED(ch) && (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG )))
-        undig(ch);
+        undig(ch);    
+
+    // All active commands interrupt rituals.
+    if (!ch->is_npc() && ch->act.isSet(PLR_RITUAL) && !getExtra().isSet(CMD_AFK)) {
+        affect_bit_strip(ch, &plr_flags, PLR_RITUAL, true);
+    }
 }
 
 

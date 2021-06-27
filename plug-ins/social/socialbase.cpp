@@ -74,6 +74,11 @@ int SocialBase::dispatch( const InterpretArguments &iargs )
             ch->pecho("Выйди сначала из {WAFK{x");
             return RC_DISPATCH_AFK;
         }
+
+        if (ch->act.isSet(PLR_RITUAL)) {
+            ch->pecho("Ты не можешь выражать эмоции, не прервав ритуал.");
+            return RC_DISPATCH_POSITION;
+        }
     }
     
     if (!checkPosition( ch )) 

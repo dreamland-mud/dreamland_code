@@ -612,6 +612,9 @@ void show_char_to_char_0( Character *victim, Character *ch )
         if (IS_SET(pVict->comm, COMM_AFK ))
             buf << "[{C{leAFK{lrАФК{lx{x]";
 
+        if (pVict->act.isSet(PLR_RITUAL))
+            buf << "({bРитуал{x)";
+
         if (IS_SET(pVict->act, PLR_WANTED))
             buf << "({RРАЗЫСКИВАЕТСЯ{x)";
 
