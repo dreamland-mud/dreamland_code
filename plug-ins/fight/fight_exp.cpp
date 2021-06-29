@@ -41,7 +41,7 @@ static void wiznet(NPCharacter *pet, Character *victim, const char *what, int ol
 {
     Character *master = pet->master;
 
-    if (master)
+    if (IS_CHARMED(pet))
         wiznet( WIZ_LEVELS, 0, 0, 
                   "Питомец %C2 %C1 (ур. %d) повышает %s, убив %C4 (ур. %d). Параметр убийцы %d -> %d, жертвы %d.", 
                   master, pet, pet->getLevel(), 

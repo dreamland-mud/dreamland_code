@@ -63,7 +63,7 @@ static bool check_soap( Character *ch )
 {
     static const DLString soap( "soap" );
     
-    if (IS_CHARMED(ch) && ch->master)
+    if (IS_CHARMED(ch))
         return check_soap(ch->master);
     
     if (ch->is_npc( ))
