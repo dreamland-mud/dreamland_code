@@ -140,8 +140,9 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
             continue;
 
         if (ugly) {
+            /* // Removing this so that mob vampires would be visible
             if (!IS_VAMPIRE(rch))
-                continue;
+                continue; */
 
             if (++count == *number)
                 return rch;
