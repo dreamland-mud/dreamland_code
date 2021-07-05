@@ -345,6 +345,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
     if (!visible( ch )) {
         if (!classes.empty() && ch->getProfession() != prof_none)
             buf << pad << "Недоступно для твоего класса или характера." << endl;
+            buf << pad << "Доступно классам: " << this->getSkillClassList() << endl;
         return;
     }
 
@@ -412,6 +413,8 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
 
     buf << printLevelBonus(ch);
+    buf << pad << "Доступно классам: " << this->getSkillClassList() << endl;
+
 }
 
 /*
@@ -546,3 +549,15 @@ DLString GenericSkill::accessToString() const
 
     return result.join(", ");
 }
+
+DLString GenericSkill::getSkillClassList() const
+{
+    StringList result;
+
+    for (auto &c: classes) {
+        result.push_back(professionManager->find(c.first)->getRusName().ruscase('1'));
+    }
+
+    return result.join(", ");
+}
+
