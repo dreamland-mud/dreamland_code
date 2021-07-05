@@ -65,7 +65,8 @@ public:
 
     virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
     virtual DLString accessToString() const;
-    virtual DLString getSkillClassList() const;
+    virtual DLString skillClassesList() const;
+    virtual DLString skillRacesList() const;
 
 protected:
     static const DLString CATEGORY;                                             
