@@ -564,7 +564,7 @@ DLString GenericSkill::skillClassesList() const
         result.push_back(professionManager->find(c.first)->getRusName().ruscase('1'));
     }
 
-    return result.join(" ");
+    return result.join("{x, {D");
 }
 
 DLString GenericSkill::skillRacesList() const
@@ -575,5 +575,5 @@ DLString GenericSkill::skillRacesList() const
         result.push_back(raceManager->find(r.first)->getMltName().ruscase('1'));
     }
 
-    return result.join(" ");
+    return result.join("{x, {D");
 }
