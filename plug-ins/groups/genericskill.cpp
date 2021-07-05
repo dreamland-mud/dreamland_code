@@ -336,6 +336,13 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
     const char *pad = SKILL_INFO_PAD;
 
+    auto fillRacesClassesInfo = [&]() {
+        if (!classes.empty())
+            buf << pad << "Доступно классам: {D" << this->skillClassesList() << "{x" << endl;
+        if (!raceBonuses.empty())
+            buf << pad << "Бонус для рас: {D" << this->skillRacesList() << "{x" << endl;
+    };
+
     buf << print_what(this) << " "
         << print_names_for(this, ch)
         << print_group_for(this, ch)
@@ -345,6 +352,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
     if (!visible( ch )) {
         if (!classes.empty() && ch->getProfession() != prof_none)
             buf << pad << "Недоступно для твоего класса или характера." << endl;
+        fillRacesClassesInfo();
         return;
     }
 
@@ -412,6 +420,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
 
     buf << printLevelBonus(ch);
+    fillRacesClassesInfo();
 }
 
 /*
@@ -545,4 +554,26 @@ DLString GenericSkill::accessToString() const
     }
 
     return result.join(", ");
+}
+
+DLString GenericSkill::skillClassesList() const
+{
+    StringList result;
+
+    for (auto &c: classes) {
+        result.push_back(professionManager->find(c.first)->getRusName().ruscase('1'));
+    }
+
+    return result.join("{x, {D");
+}
+
+DLString GenericSkill::skillRacesList() const
+{
+    StringList result;
+
+    for (auto &r: raceBonuses) {
+        result.push_back(raceManager->find(r.first)->getMltName().ruscase('1'));
+    }
+
+    return result.join("{x, {D");
 }
