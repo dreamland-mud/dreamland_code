@@ -407,11 +407,6 @@ void Language::doForget( PCharacter *ch, const DLString &arg ) const
     XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).findAttr<XMLAttributeLanguageHints>( "languageHints" );
     XMLAttributeLanguage::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeLanguage>( "language" );
 
-    if (!attr || attr->getWords( ).empty( )) {
-        ch->pecho( "Тебе нечего забывать." );
-        return;
-    }
-    
     if (arg.empty()) {
         ch->pecho("Что именно ты хочешь забыть?");
         return;
@@ -431,8 +426,9 @@ void Language::doForget( PCharacter *ch, const DLString &arg ) const
 
     // Find and forget a word among the dreams.    
     Word word;
-    if (attr->findWord(word, arg)) {
+    if (attr && attr->findWord(word, arg)) {
         attr->removeWord(word, ch);
+        ch->pecho("Ты забываешь слово %s.", arg.c_str());
         return;
     }
 
