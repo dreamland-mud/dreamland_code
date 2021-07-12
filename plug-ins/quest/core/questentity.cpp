@@ -39,7 +39,7 @@ void QuestEntity::mandatoryExtract( )
         quest->scheduleDestroy( );
 
         if (pcm->isOnline())
-            pcm->getPlayer()->pecho("{YТвоё задание уже невозможно выполнить. Через пару минут сможешь попросить новое.{x");
+            pcm->getPlayer()->pecho("{YТвоё задание уже невозможно выполнить. Через несколько минут сможешь попросить новое.{x");
     }
 }
 

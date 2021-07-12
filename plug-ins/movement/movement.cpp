@@ -118,9 +118,9 @@ void Movement::place( Character *wch )
     {
         int helpId = get_area_help_id(to_room->areaIndex());
         if (helpId >= 0)
-            wch->printf("Ты попадаешь в местность '{c{hh%d%s{x'.\r\n\r\n", helpId, to_room->areaName());
+            wch->printf("Ты попадаешь в зону '{c{hh%d%s{x'.\r\n\r\n", helpId, to_room->areaName());
         else
-            wch->printf("Ты попадаешь в местность '{c{hh%s{x'.\r\n\r\n", to_room->areaName());
+            wch->printf("Ты попадаешь в зону '{c{hh%s{x'.\r\n\r\n", to_room->areaName());
     }
  
     interpret_raw( wch, "look", "move" );
