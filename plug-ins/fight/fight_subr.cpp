@@ -67,17 +67,17 @@ bool check_stun( Character *ch, Character *victim )
 			// success: replace stun with weak stun
 			else if (number_percent( ) <= (int) chance) {
 				affect_strip(ch, gsn_paralysis);
-				ch->pecho("{1{YТвой паралич проходит, но ты все еще чувствуешь ошеломление!{2");
-				ch->recho("{1{YПаралич %1$C2 проходит, но %1$P1, похоже, все еще ошеломле%1$Gно|н|на|ны!{2", ch);
+				ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
+				ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
 				REMOVE_BIT(ch->affected_by,AFF_STUN);
 				SET_BIT(ch->affected_by,AFF_WEAK_STUN);
 			}
 			else {
-        		oldact_p("{WТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
+        		oldact_p("{WТы парализова$gно|н|на и не можешь реагировать на атаки $C2.{x",
             		ch,0,victim,TO_CHAR,POS_FIGHTING);
-        		oldact_p("{W$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
+        		oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на твои атаки.{x",
             		ch,0,victim,TO_VICT,POS_FIGHTING);
-        		oldact_p("{W$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
+        		oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на атаки.{x",
             		ch,0,victim,TO_NOTVICT,POS_FIGHTING);				
 			}
         	return true;
@@ -86,11 +86,11 @@ bool check_stun( Character *ch, Character *victim )
 
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
     {
-        oldact_p("{MТы ошеломле$gно|н|на и не можешь реагировать на атаки $C2.{x",
+        oldact_p("{MТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
             ch,0,victim,TO_CHAR,POS_FIGHTING);
-        oldact_p("{M$c1 ошеломле$gно|н|на и не может реагировать на твои атаки.{x",
+        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
             ch,0,victim,TO_VICT,POS_FIGHTING);
-        oldact_p("{M$c1 ошеломле$gно|н|на и не может реагировать на атаки.{x",
+        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
             ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
         REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
