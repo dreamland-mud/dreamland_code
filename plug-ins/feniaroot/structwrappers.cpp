@@ -8,6 +8,7 @@
 #include "hometown.h"
 #include "skill.h"
 #include "skillcommand.h"
+#include "skillgroup.h"
 #include "profession.h"
 #include "defaultreligion.h"
 #include "language.h"
@@ -1072,6 +1073,16 @@ NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_typ
     return spell ? spell->getSpellType() : 0;
 }
 
+NMI_GET(SkillWrapper, groups, "список названий групп умения")
+{
+    RegList::Pointer rc(NEW);
+
+    for (auto &group: getTarget()->getGroups().toArray())
+        rc->push_back(Register(skillGroupManager->find(group)->getName()));
+
+    return wrap(rc);
+}
+
 NMI_INVOKE(SkillWrapper, beats, "(ch): длина задержки в пульсах для персонажа с учетом бонусов")
 {
     Character *ch = args2character(args);
@@ -1336,3 +1347,38 @@ NMI_INVOKE(FeniaSkill, api, "(): печатает этот api")
 }
 
 
+/*----------------------------------------------------------------------
+ * SkillGroup
+ *----------------------------------------------------------------------*/
+NMI_INIT(SkillGroupWrapper, "skill group, группа умений");
+
+SkillGroupWrapper::SkillGroupWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+SkillGroup * SkillGroupWrapper::getTarget() const
+{
+    SkillGroup *group = skillGroupManager->find(name);
+    if (!group)
+        throw Scripting::Exception(name + ": skill group no longer exists");
+    return group;
+}
+
+NMI_INVOKE( SkillGroupWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<SkillGroupWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( SkillGroupWrapper, name, "английское название" ) 
+{
+    return getTarget()->getName( );
+}
+
+NMI_GET( SkillGroupWrapper, nameRus, "русское название" ) 
+{
+    return getTarget()->getRussianName( );
+}
