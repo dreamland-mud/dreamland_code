@@ -253,10 +253,21 @@ DLString argnum2string(const RegisterList &args, int num)
 
 Skill * arg2skill( const Register &r )
 {
-    DLString name = r.toString();
-    Skill *skill = skillManager->findExisting(name);
-    if (!skill)
-        throw Scripting::Exception(name + ": skill name not found.");
+    Skill *skill;
+
+    if (r.type == Register::STRING) {
+        skill = skillManager->findExisting(r.toString());
+        if (!skill)
+            throw Scripting::Exception(r.toString() + ": skill does not exist.");
+
+    } else if (r.type == Register::NUMBER) {
+        skill = skillManager->find(r.toNumber());
+        if (!skill)
+            throw Scripting::Exception(r.toString() + ": invalid skill number.");
+
+    } else {
+        throw Scripting::IllegalArgumentException();
+    }
 
     return skill;
 }

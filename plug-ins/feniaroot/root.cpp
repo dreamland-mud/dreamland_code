@@ -1114,7 +1114,7 @@ NMI_INVOKE( Root, SkillCommand , "(name): находит команду для �
 }
 
 
-NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
+NMI_INVOKE( Root, Skill, "(name|gsn): конструктор для умения по имени или числу" )
 {
     Skill *skill = argnum2skill(args, 1);
     return Register::handler<SkillWrapper>(skill->getName());    
