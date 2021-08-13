@@ -161,6 +161,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<BonusWrapper>("bonus", apiDump, false);     
     traitsAPIJson<ReligionWrapper>("religion", apiDump, false);     
     traitsAPIJson<LiquidWrapper>("liquid", apiDump, false);     
+    traitsAPIJson<MaterialWrapper>("material", apiDump, false);
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
     traitsAPIJson<SkillGroupWrapper>("skillgroup", apiDump, false);     
     traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);

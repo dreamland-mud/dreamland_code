@@ -19,6 +19,7 @@
 #include "personalquestreward.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
+#include "structwrappers.h"
 #include "characterwrapper.h"
 #include "objindexwrapper.h"
 #include "wrappermanager.h"
@@ -183,18 +184,10 @@ NMI_SET( ObjectWrapper, description , "описание, видимое на з�
     target->setDescription( d.c_str( ) );
 }
 
-NMI_GET( ObjectWrapper, material, "название материала, из которого сделан предмет")
+NMI_GET( ObjectWrapper, material, "материалы (.Material), из которых сделан предмет")
 {
     checkTarget( );
-    return Register( target->getMaterial( ) );
-}
-
-NMI_SET( ObjectWrapper, material, "название материала, из которого сделан предмет")
-{
-    DLString d = arg.toString( );
-
-    checkTarget( );
-    target->setMaterial( d.c_str( ) );
+    return MaterialWrapper::wrap(target->getMaterial());
 }
 
 NMI_GET( ObjectWrapper, name , "имена предмета, на которые он откликается")
@@ -758,36 +751,6 @@ NMI_INVOKE(ObjectWrapper, hasWeaponFlag, "(flags): выставлен ли хо�
     }
     
     return Register(IS_WEAPON_STAT(target, flags) != 0);
-}
-
-NMI_INVOKE( ObjectWrapper, madeOfWood, "(): предмет сделан из дерева" )
-{
-    checkTarget( );
-    return Register( material_is_typed( target, MAT_WOOD ) );
-}
-
-NMI_INVOKE( ObjectWrapper, madeOfMetal, "(): предмет сделан из металла" )
-{
-    checkTarget( );
-    return Register( material_is_typed( target, MAT_METAL ) );
-}
-
-NMI_INVOKE( ObjectWrapper, madeOfMineral, "(): предмет сделан из камня или минерала" )
-{
-    checkTarget( );
-    return Register( material_is_typed( target, MAT_MINERAL ) );
-}
-
-NMI_INVOKE( ObjectWrapper, madeOfGem, "(): предмет сделан из драгоценного камня" )
-{
-    checkTarget( );
-    return Register( material_is_typed( target, MAT_GEM ) );
-}
-
-NMI_INVOKE( ObjectWrapper, materialBurns, "(): сколько тиков горит (-1 если тушит огонь)" )
-{
-    checkTarget( );
-    return Register( material_burns( target ) );
 }
 
 NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "(vnum): поиск объекта внутри этого по внуму" )

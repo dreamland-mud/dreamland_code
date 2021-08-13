@@ -195,6 +195,33 @@ protected:
 };
 
 /*----------------------------------------------------------------------
+ * Material
+ *----------------------------------------------------------------------*/
+struct material_t;
+
+class MaterialWrapper : public PluginNativeImpl<MaterialWrapper>, 
+                      public NativeHandler,
+                      public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<MaterialWrapper> Pointer;
+
+    MaterialWrapper() { }
+    MaterialWrapper(const DLString &);
+            
+    virtual void setSelf(Scripting::Object *) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
+    static Scripting::Register wrap( const DLString &names );
+
+    XML_VARIABLE XMLString names;
+
+protected:
+    material_t * getTarget() const;
+};
+
+/*----------------------------------------------------------------------
  * Clan
  *----------------------------------------------------------------------*/
 class Clan;

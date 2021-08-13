@@ -32,15 +32,14 @@ CONFIGURABLE_LOADED(fight, material)
     material_table.fromJson(value);
 }
 
-
 static void 
-material_parse( Object *obj,  vector<const material_t *> &result )
+material_parse( const char *materials,  vector<const material_t *> &result )
 {    
-    if (!obj->getMaterial())
+    if (!materials)
         return;
 
     StringList tokens;
-    tokens.split(obj->getMaterial(), ", ");
+    tokens.split(materials, ", ");
 
     for (auto &token: tokens) {
         const material_t *mat = material_by_name(token);
@@ -49,11 +48,22 @@ material_parse( Object *obj,  vector<const material_t *> &result )
     }
 }
 
+static void 
+material_parse( Object *obj,  vector<const material_t *> &result )
+{
+    material_parse(obj->getMaterial(), result);
+}
+
 bool material_is_typed( Object *obj, int type )
+{
+    return material_is_typed(obj->getMaterial(), type);
+}
+
+bool material_is_typed( const char *materials, int type )
 {
     vector<const material_t *> result;
 
-    material_parse( obj, result );
+    material_parse( materials, result );
     
     for (auto &mat: result)
         if (IS_SET( mat->type, type ))
@@ -64,9 +74,14 @@ bool material_is_typed( Object *obj, int type )
 
 bool material_is_flagged( Object *obj, int flags )
 {
+    return material_is_flagged(obj->getMaterial(), flags);
+}
+
+bool material_is_flagged( const char *materials, int flags )
+{
     vector<const material_t *> result;
 
-    material_parse( obj, result );
+    material_parse( materials, result );
     
     for (auto &mat: result)
         if (IS_SET( mat->flags, flags ))
@@ -95,10 +110,15 @@ int material_swims( Object *obj )
 
 int material_burns( Object *obj )
 {
+    return material_burns(obj->getMaterial());
+}
+
+int material_burns( const char *materials )
+{
     int max_burn = 0;
     vector<const material_t *> result;
 
-    material_parse( obj, result );
+    material_parse( materials, result );
     
     for (auto &mat: result)
         if (mat->burns < 0)
@@ -109,12 +129,17 @@ int material_burns( Object *obj )
     return max_burn;
 }
 
-DLString material_rname(Object *obj, char gcase) 
+DLString material_rname(Object *obj) 
+{
+    return material_rname(obj->getMaterial());
+}
+
+DLString material_rname(const char *materials)
 {
     StringList names;
     vector<const material_t *> result;
 
-    material_parse( obj, result );
+    material_parse( materials, result );
     
     for (auto &mat: result) {
         if (mat->type.isSet(MAT_NONE))
@@ -122,7 +147,7 @@ DLString material_rname(Object *obj, char gcase)
 
         DLString rname = mat->rname;
         if (!rname.empty())
-            names.push_back(rname.ruscase(gcase));
+            names.push_back(rname);
         else
             names.push_back(mat->name);
     }

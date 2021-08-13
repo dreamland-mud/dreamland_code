@@ -1072,6 +1072,13 @@ NMI_INVOKE( Root, Liquid, "(name): конструктор для жидкост�
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
 }
 
+NMI_INVOKE( Root, Material, "(names): конструктор для материалов по имени или именам через запятую" )
+{
+    DLString names = args2string(args);
+
+    return MaterialWrapper::wrap(names);
+}
+
 static bool normalize_skill_name(DLString &arg)
 {
     arg.toLower().stripWhiteSpace();
