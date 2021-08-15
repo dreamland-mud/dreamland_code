@@ -228,7 +228,7 @@ void show_liq_cmds(Character * ch)
     std::basic_ostringstream<char> buf;
     Liquid *liq;
 
-    buf << "Name                ShowName            Color       Proof Full Thirst Food Size" << endl;
+    buf << "Name                ShowName            Color       Full/Thirst/Food/Drunk/Sips" << endl;
 
     for (int l = 0; l < liquidManager->size( ); l++) {
         liq = liquidManager->find( l );
