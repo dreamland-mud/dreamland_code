@@ -261,6 +261,13 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     int index = 0; /* hand to hand */
     Object *weapon;
 
+    // can't dual wield without either of hands/wrists/arms
+    const GlobalBitvector &loc = ch->getWearloc( );    
+    if (!loc.isSet( wear_hands )
+        || !loc.isSet( wear_wrist_l )
+        || !loc.isSet( wear_wrist_r ))        
+        return; 
+    
     weapon = get_eq_char(ch, wear_wield);
     if (weapon != 0 
         && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS)
