@@ -626,9 +626,9 @@ void SamuraiGuildmaster::doOwner( Character *victim, Object *katana )
 bool Katana::canEquip( Character *ch )
 {
     if (!ch->is_immortal() && ch->getProfession( ) != prof_samurai) {
-        act( "$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
-        act( "$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
-        ch->println("Катаны - только для самураев.");
+        oldact( "$o1 выпадает из твоих рук.", ch, obj, 0, TO_CHAR );
+        oldact( "$o1 выпадает из рук $c2.", ch, obj, 0, TO_ROOM );
+        ch->pecho("Катаны -- только для самураев.");
         unequip_char( ch, obj );
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
