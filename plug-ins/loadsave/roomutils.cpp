@@ -49,7 +49,7 @@ bool RoomUtils::isNature(Room *target)
     return s == SECT_FIELD
         || s == SECT_FOREST
         || s == SECT_MOUNTAIN
-        || s == SECT_FIELD;
+        || s == SECT_HILLS;
 }
 
 bool RoomUtils::hasDust(Room *target)
