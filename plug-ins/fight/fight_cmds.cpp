@@ -168,7 +168,7 @@ CMDRUN( flee )
         ch->pecho("Это будет слишком большим позором для тебя!");
         return;
     }
-    if (ch->affected_by.isSet(AFF_IMMOBILIZED)) {
+    if (ch->detection.isSet(ADET_IMMOBILIZED)) {
         ch->pecho("Ты обездвижен{Sfа{Sx и не можешь сбежать!");
         return; 
     }
