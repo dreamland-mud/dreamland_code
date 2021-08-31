@@ -29,7 +29,7 @@ bool FleeMovement::canFlee( Character *wch )
     if (IS_SET(exit_info, EX_NOFLEE))
         return false;
     
-    if (wch->affected_by.isSet(AFF_IMMOBILIZED)) {
+    if (wch->affected_by.isSet(AFF_IMMOBILIZED))
 	return false;
       
     if (wch->is_npc( ) 
