@@ -111,7 +111,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
             return target.vict != 0;
 
         case ARG_CHAR_FIGHT:
-            if (argOne.empty() {
+            if (argOne.empty()) {
                 if (!actor->fighting) {
                 	errbuf << "Без указания цели это умение можно применять только в бою.";
                 	return false;
