@@ -504,7 +504,11 @@ CMDRUNP( auction )
             ch->pecho("Этот предмет не подлежит продаже.");
             return;
         }
-
+        if (IS_OBJ_STAT(obj, ITEM_NODROP) || IS_OBJ_STAT(obj, ITEM_NOREMOVE)) {
+            ch->pecho("С этого предмета нужно снять проклятие перед продажей.");
+            return;
+        }
+ 
         if (auction->item == 0) {
                 if (ch->desc && banManager->check( ch->desc, BAN_COMMUNICATE )) {
                     ch->pecho( "Ты не можешь ничего выставлять на аукцион." );
