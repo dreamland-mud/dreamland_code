@@ -1,0 +1,23 @@
+---
+kind: pipeline
+type: exec
+name: default
+
+clone:
+  disable: true
+  
+steps:
+- name: full_rebuild
+  commands:
+  - eval `ssh-agent -s`
+  - ssh-add /home/dreamland/.ssh/drone    
+  - cd /home/dreamland/dreamland_code
+  - git pull
+  - cd ../objs
+  - make -j 2
+  - make install
+  
+  
+  
+  
+  
