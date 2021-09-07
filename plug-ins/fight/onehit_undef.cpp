@@ -51,6 +51,9 @@ PROF(ninja);
 PROF(ranger);
 PROF(samurai);
 PROF(thief);
+PROF(druid);
+
+GSN(shapeshift);
 
 WEARLOC(tat_wrist_l);
 WEARLOC(tat_wrist_r);
@@ -957,7 +960,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
                         break;
             }
     }            
-    // thieves have +10% to blind:              65 / 95 / 100  
+    // thieves/druids have +10% to blind:       65 / 95 / 100  
     // ninjas and rangers have +10% to stun:    85 / 95 / 100
     // samurai have +10% to strike heart:       75 / 85 / 100
     // everyone else:                           75 / 95 / 100 
@@ -972,9 +975,25 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             msgVictBlind = "{y$c1 внезапной серией ударов поднимает вихрь листьев, ослепляя тебя!{x";
             msgCharBlind = "{yТы внезапной серией ударов поднимаешь вихрь листьев, ослепляя $C4!{x";
             msgVictHeart = "{R$c1 призывает силу Природы, нанося тебе мощнейший удар прямо в сердце!{x";
-            msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";                            
+            msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";  
+	    
             stun_chance = 85;
     }       
+    if ( ch->getProfession( ) == prof_druid ) {                    
+            if (!ch->isAffected(gsn_shapeshift))
+                return;
+            msgVictBasic = "$c1 внезапно всаживает тебе когти в печень!";
+            msgCharBasic = "Ты внезапно всаживаешь $C3 когти в печень!";               
+            msgVictStun = "{W$c1 разрывает когтями сухожилия, обездвиживая тебя!{x";
+            msgCharStun = "{WТы разрываешь когтями сухожилия, обездвиживая $C4!{x";
+            msgVictBlind = "{y$c1 разрывает когтями лицо, ослепляя тебя!{x";
+            msgCharBlind = "{yТы разрываешь когтями лицо, ослепляя $C4!{x";
+            msgVictHeart = "{R$c1 вспарывает тебе когтями живот, и твои кишки вываливаются наружу!{x";
+            msgCharHeart = "{RТы вспарываешь когтями живот $C2, и кишки вываливаются наружу!{x";     
+	                            
+            stun_chance = 65;
+    }  
+	
     if ( ch->getProfession( ) == prof_thief ) {
             if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
                         return;                
