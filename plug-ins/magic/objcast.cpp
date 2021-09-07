@@ -49,6 +49,7 @@
 
 CLAN(battlerager);
 GSN(none);
+PROF(druid);
 
 static bool oprog_quaff( Object *obj, Character *ch )
 {
@@ -91,7 +92,12 @@ CMDRUNP( quaff )
         ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
         return;
     }
-
+    
+    if (ch->getProfession( ) == prof_druid) {
+        ch->pecho("Ты не хочешь осквернять свое тело синтетикой.");
+        return;        
+    }
+    
     oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM);
     oldact("Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR);
     
