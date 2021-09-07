@@ -26,9 +26,11 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+#include "material.h"
 
 WEARLOC(none);
 GSN(spellbane);
+PROF(druid);
 
 /*-------------------------------------------------------------------
  * DefaultWearlocation
@@ -219,6 +221,11 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
         return false;
     }
 
+    if (ch->getProfession( ) == prof_druid && material_is_typed( obj, MAT_METAL )) {
+        ch->pecho("Друиды не носят ничего металлического.");
+        return false;    
+    }
+  
     if (obj->behavior && !obj->behavior->canEquip( ch ))
         return false;
     
