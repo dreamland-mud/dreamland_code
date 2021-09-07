@@ -24,6 +24,7 @@
 
 GSN(haggle);
 RELIG(fili);
+PROF(druid);
 
 /*----------------------------------------------------------------------
  * Pet
@@ -40,9 +41,15 @@ void Pet::stopfol( Character *master )
 bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int )
 {
     NPCharacter *pet;
-    
+
     if (client->is_npc( ) || client->getPC( )->pet) {
         client->pecho( "У тебя уже есть один питомец." );
+        return false;
+    }
+    
+    if (client->getProfession( ) == prof_druid) {
+        client->pecho( "Тебе омерзительна сама мысль о покупке этих несчастных порабощенных созданий." );
+        client->pecho( "Ты надеешься, что если перестать покупать питомцев, то их просто выпустят на волю." );
         return false;
     }
 
@@ -234,6 +241,12 @@ bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     if (client->is_npc( ))
         return false;
 
+    if (client->getProfession( ) == prof_druid) {
+        client->pecho( "Тебе омерзительна сама мысль о покупке этих несчастных порабощенных созданий." );
+        client->pecho( "Ты надеешься, что если перестать покупать питомцев, то их просто выпустят на волю." );
+        return false;
+    }
+    
     if (MOUNTED(client)) {
         client->pecho( "У тебя уже есть скакун." );
         return false;
