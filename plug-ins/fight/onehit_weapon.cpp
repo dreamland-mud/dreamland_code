@@ -278,9 +278,9 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 
     if (IS_WEAPON_STAT(wield,WEAPON_VAMPIRIC))
     {
-        msgWeaponVict("Ты чувствуешь как %3$O1 вытягивает из тебя жизнь.");
-        msgWeaponRoom("%3$^O1 %1$C2 вытягивает жизнь из %2$C2.");
-        msgWeaponChar("%3$^O1 вытягивает жизнь из %2$C2.");
+        msgWeaponVict("Ты чувствуешь как %3$O1 вытягива%3$nет|ют из тебя жизнь.");
+        msgWeaponRoom("%3$^O1 %1$C2 вытягива%3$nет|ют жизнь из %2$C2.");
+        msgWeaponChar("%3$^O1 вытягива%3$nет|ют жизнь из %2$C2.");
 
         dam = number_range(1, wield->level / 5 + 1);
         damage_nocatch(ch,victim,dam,0,DAM_NEGATIVE,false);
@@ -288,9 +288,9 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FLAMING) )
     {
-        msgWeaponVict("%3$^O1 обжигает тебя.");
-        msgWeaponRoom("%3$^O1 %1$C2 обжигает %2$C4.");
-        msgWeaponChar("%3$^O1 обжигает %2$C4.");
+        msgWeaponVict("%3$^O1 обжига%3$nет|ют тебя.");
+        msgWeaponRoom("%3$^O1 %1$C2 обжига%3$nет|ют %2$C4.");
+        msgWeaponChar("%3$^O1 обжига%3$nет|ют %2$C4.");
 
         dam = number_range(1,wield->level / 4 + 1);
         fire_effect( (void *) victim,wield->level/2,dam,TARGET_CHAR);
@@ -299,8 +299,8 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     if (IS_WEAPON_STAT(wield,WEAPON_FROST) )
     {
         msgWeaponVict("Ледяное прикосновение %3$O2 обмораживает тебя, покрывая льдом.");
-        msgWeaponRoom("%3$^O1 %1$C2 обмораживает %2$C4.");
-        msgWeaponChar("%3$^O1 обмораживает %2$C4.");
+        msgWeaponRoom("%3$^O1 %1$C2 обморажива%3$nет|ют %2$C4.");
+        msgWeaponChar("%3$^O1 обморажива%3$nет|ют %2$C4.");
 
         dam = number_range(1,wield->level / 6 + 2);
         cold_effect(victim,wield->level/2,dam,TARGET_CHAR);
