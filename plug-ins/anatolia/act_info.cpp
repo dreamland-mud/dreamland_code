@@ -143,12 +143,12 @@ CMDRUNP( prompt )
     {
         if (IS_SET(ch->comm,COMM_PROMPT))
         {
-            ch->pecho("Вывод строки состояния (prompt) выключен.");
+            ch->pecho("Вывод строки состояния {le(prompt) {xвыключен.");
             REMOVE_BIT(ch->comm,COMM_PROMPT);
         }
         else
         {
-            ch->pecho("Вывод строки состояния (prompt) включен.");
+            ch->pecho("Вывод строки состояния {le(prompt) {xвключен.");
             SET_BIT(ch->comm,COMM_PROMPT);
         }
         return;
@@ -183,7 +183,7 @@ CMDRUNP( battleprompt )
 
    if ( argument[0] == '\0' )
    {
-      ch->pecho("Необходимо указать вид строки состояния.\nДля получения более подробной информации используй 'help prompt'");
+      ch->pecho("Необходимо указать вид строки состояния.\nДля получения более подробной информации напиши {y{hc{lehelp prompt{lrсправка строка состояния{x'");
       return;
    }
 
@@ -495,7 +495,7 @@ CMDRUNP( oscore )
     }
 
     if (IS_GHOST(ch)) {
-        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$3d {xсекун%1$-1Iду.|ды.|д.",
+        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$d {xсекун%1$Iду|ды|д.",
                  pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()))
         << endl;
     }
@@ -1191,7 +1191,7 @@ CMDRUNP( wimpy )
 
     if ((ch->getProfession( ) == prof_samurai) && (ch->getRealLevel( ) >=10))
         {
-         sprintf(buf,"Стыдись!!! Это будет слишком большим позором для Самурая.\n\r");
+         sprintf(buf,"Стыдись! Это будет слишком большим позором для самурая.\n\r");
          ch->send_to(buf);
          if (ch->wimpy != 0) ch->wimpy = 0;
          return;
@@ -1215,7 +1215,7 @@ CMDRUNP( wimpy )
 
     ch->wimpy        = wimpy;
 
-    sprintf( buf, "Ты попытаешься убежать при %d жизни (hit points).\n\r", wimpy );
+    sprintf( buf, "Ты попытаешься убежать при %d очков жизни{le (hit points){x.\n\r", wimpy );
     ch->send_to( buf);
     return;
 }
@@ -1286,7 +1286,7 @@ CMDRUNP( password )
     if (!password_check( ch->getPC( ), arg1 ))
     {
         ch->setWait(40 );
-        ch->pecho("Неверный пароль. Подождите 10 секунд.");
+        ch->pecho("Неверный пароль. Подожди 10 секунд.");
         return;
     }
 
@@ -1667,7 +1667,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
    
-    if (arg_oneof(arg, "hitpoint", "здоровье", "hp")) {
+    if (arg_oneof(arg, "hitpoints", "здоровье", "hp")) {
         ch->pecho("Здоровье %d из %d.", ch->hit, ch->max_hit);
         return;
     } 
@@ -1730,7 +1730,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
     if (!str_prefix("quest", arg.c_str()) || !str_prefix("квест", arg.c_str())) {
-        ch->pecho("Используй команды 'квест время' и 'квест очки'.");
+        ch->pecho("Используй команды {y{hcквест время{x и {y{hcквест очки{x.");
         return;
     } 
     if (arg_oneof(arg, "wimpy", "трусость")) {

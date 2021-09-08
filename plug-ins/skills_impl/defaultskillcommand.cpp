@@ -111,14 +111,15 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
             return target.vict != 0;
 
         case ARG_CHAR_FIGHT:
-            if (argOne.empty() && !actor->fighting) {
-                errbuf << "Сейчас ты не сражаешься!";
-                return false;
-            }
-
-            if (actor->fighting) {
-                target.vict = actor->fighting;
-                return true;
+            if (argOne.empty()) {
+                if (!actor->fighting) {
+                	errbuf << "Без указания цели это умение можно применять только в бою.";
+                	return false;
+                }
+                else {
+                	target.vict = actor->fighting;
+                	return true;                  
+                }
             }
 
             target.vict = get_char_room(actor, argOne.c_str());
@@ -152,8 +153,8 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     // Do skill availability check early. TODO: custom message overrides.
     if (!skill->usable(ch)) {
         if (ch->master)
-            ch->master->pecho("%^C1 не владеет навыком '{W%s{x'.", ch, skill->getNameFor(ch->master).c_str());
-        ch->pecho("Ты не владеешь навыком '{W%s{x'.", skill->getNameFor(ch).c_str());
+            ch->master->pecho("%^C1 не владеет навыком {y{hh%s{x.", ch, skill->getNameFor(ch->master).c_str());
+        ch->pecho("Ты не владеешь навыком {y{hh%s{x.", skill->getNameFor(ch).c_str());
         return;
     }
 

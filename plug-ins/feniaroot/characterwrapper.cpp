@@ -1310,7 +1310,7 @@ NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строк�
 {
     checkTarget();
 
-    if (target->master) {
+    if (target->master && target->is_npc()) {
         DLString msg = fmt(0, "{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x\r\n  {W*{x ", target);
         target->master->pecho( msg + regfmt(target->master, args) );
         return true;

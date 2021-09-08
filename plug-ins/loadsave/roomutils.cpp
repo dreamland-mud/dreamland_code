@@ -20,7 +20,7 @@ bool RoomUtils::isWaterOrAir(Room *target)
 
 bool RoomUtils::isOutside(Room *target)
 {
-    return !IS_SET(target->room_flags, ROOM_INDOORS);
+    return !IS_SET(target->room_flags, ROOM_INDOORS) && target->getSectorType() != SECT_UNDERWATER;
 }
 
 bool RoomUtils::isOutside(Character *ch)
@@ -49,7 +49,7 @@ bool RoomUtils::isNature(Room *target)
     return s == SECT_FIELD
         || s == SECT_FOREST
         || s == SECT_MOUNTAIN
-        || s == SECT_FIELD;
+        || s == SECT_HILLS;
 }
 
 bool RoomUtils::hasDust(Room *target)

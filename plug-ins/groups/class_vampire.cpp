@@ -461,28 +461,28 @@ SKILL_RUNP( vampire )
         af.bitvector.setTable(&imm_flags);
         af.location = APPLY_STR;
         af.modifier  = 1 + (level / 20);
-        af.bitvector.setValue(IMM_NEGATIVE | IMM_CHARM);
+        af.bitvector.setValue(IMM_NEGATIVE|IMM_CHARM|IMM_DISEASE);
         affect_to_char( ch, &af );
 
         /* haste + dex, infrared, berserk, sneak */
         af.bitvector.setTable(&affect_flags);
         af.location = APPLY_DEX;
         af.modifier  = 1 + (level /20);
-        af.bitvector.setValue(AFF_HASTE | AFF_INFRARED|AFF_BERSERK|AFF_SNEAK|AFF_FLYING);
+        af.bitvector.setValue(AFF_HASTE|AFF_INFRARED|AFF_BERSERK|AFF_SNEAK|AFF_FLYING|AFF_SWIM);
         affect_to_char( ch, &af );
 
         /* size + vuln light, holy */
         af.bitvector.setTable(&vuln_flags);
         af.location = APPLY_SIZE;
         af.modifier  = 1 + (level / 50 );
-        af.bitvector.setValue(VULN_LIGHT | VULN_HOLY);
+        af.bitvector.setValue(VULN_LIGHT|VULN_HOLY|VULN_SILVER|VULN_WOOD);
         affect_to_char( ch, &af );
 
         /* damroll + resist cold, lighting */
         af.bitvector.setTable(&res_flags);
         af.location = APPLY_DAMROLL;
         af.modifier  = ch->damroll * 4 / 3;
-        af.bitvector.setValue(RES_COLD | RES_LIGHTNING);
+        af.bitvector.setValue(RES_COLD|RES_POISON);
         affect_to_char( ch, &af );
 
         /* vampire flag */

@@ -16,6 +16,7 @@ public:
 
     virtual void wear( Character * );
     virtual bool mayFloat( ); 
+    virtual bool canEquip( Character * );
 };
 
 class OwnedKatana : public Katana {

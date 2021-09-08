@@ -23,6 +23,7 @@ GSN(ancient_rage);
 GSN(enchant_weapon);
 GSN(fireproof);
 GSN(corrosion);
+GSN(inaction);
 
 bool FireproofWE::run( PCharacter *ch, Character *victim ) const
 {
@@ -94,7 +95,7 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
 {
     Affect af;
     
-    if ( IS_AFFECTED(ch,AFF_CALM) )
+    if ( IS_AFFECTED(ch,AFF_CALM) || victim->isAffected( gsn_inaction ) )
     {
         victim->pecho( "Ты слишком миролюбив{Sfа{Sx для древней ярости." );
         victim->recho("%1$^C1 слишком миролюбив%1$Gо||а для древней ярости.", victim);

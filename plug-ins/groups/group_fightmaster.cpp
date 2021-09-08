@@ -1620,6 +1620,11 @@ SKILL_RUNP( smash )
                ch,NULL,victim,TO_NOTVICT,POS_RESTING);
         gsn_smash->improve( ch, true, victim );
 
+        if (!FightingCheck)
+                yell_panic( ch, victim,
+                    "Помогите! Кто-то сбил меня с ног!",
+                    "Помогите! %1$^C1 сбивает меня с ног!" );
+            
         wait = 3;
 
         switch(number_bits(2)) {
@@ -1664,11 +1669,6 @@ SKILL_RUNP( smash )
             ch->position=POS_RESTING;        
         ch->setWait( gsn_smash->getBeats(ch) * 3/2 ); 
     }
-
-    if (!FightingCheck)
-        yell_panic( ch, victim,
-                    "Помогите! Кто-то сбил меня с ног!",
-                    "Помогите! %1$^C1 сбивает меня с ног!" );
 }
 
 /*

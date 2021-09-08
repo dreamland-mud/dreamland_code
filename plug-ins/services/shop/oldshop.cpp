@@ -50,6 +50,7 @@
 GSN(haggle);
 BONUS(black_friday);
 RELIG(fili);
+PROF(druid);
 
 using std::min;
 using std::max;
@@ -172,6 +173,10 @@ CMDRUN( buy )
     number = mult_argument( argument, arg );
     obj  = get_obj_keeper( ch, trader, arg );
     cost = get_cost( keeper, obj, true, trader );
+    
+    // everyone reaps off druids
+    if (ch->getProfession( ) == prof_druid)
+        cost *= 2;
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
@@ -356,7 +361,12 @@ CMDRUN( sell )
         return;
     }
 
-    if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
+    cost = get_cost( keeper, obj, false, trader );
+    // everyone reaps off druids
+    if (ch->getProfession( ) == prof_druid)
+        cost /= 2;
+    
+    if ( cost <= 0 )
     {
         oldact("$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT);
         return;
@@ -541,6 +551,10 @@ static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Point
     }
 
     int cost = get_cost( keeper, obj, false, trader );
+    // everyone reaps off druids
+    if (ch->getProfession( ) == prof_druid)
+        cost /= 2;
+    
     if (cost <= 0) {
         if (verbose)
             ch->pecho("%^C1 не интересуется %O5.", keeper, obj);
