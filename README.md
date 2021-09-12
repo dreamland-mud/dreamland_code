@@ -9,7 +9,7 @@
 
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
-[![Build Status](https://api.travis-ci.com/dreamland-mud/dreamland_code.svg?branch=master&status=unknown)](https://travis-ci.org/dreamland-mud/dreamland_code)
+[![Build Status](https://api.travis-ci.com/dreamland-mud/dreamland_code.svg?branch=master&status=unknown)](https://app.travis-ci.com/github/dreamland-mud/dreamland_code)
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
 Как собирать и запускать:
