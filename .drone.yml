@@ -15,6 +15,7 @@ steps:
   - ssh-add /home/dreamland/.ssh/drone    
   - cd /home/dreamland/dreamland_code
   - git pull
+  - kill $SSH_AGENT_PID
   - cd ../objs
   - make -j 2
   - make install
