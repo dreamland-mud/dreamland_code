@@ -35,63 +35,61 @@
 
 bool check_stun( Character *ch, Character *victim ) 
 {
-    if ( IS_AFFECTED(ch,AFF_STUN) )
-    {
-        set_violent( ch, victim, false );
-		
+    if (IS_AFFECTED(ch, AFF_STUN)) {
+        set_violent(ch, victim, false);
+
         // paralysis lasts up to level/30 ticks
         // chance to shrug paralysis increases by 15% each tick + with higher CON
-	Affect *paf = ch->affected.find(gsn_paralysis);
+        Affect *paf = ch->affected.find(gsn_paralysis);
         if (paf) {
-    		float chance, stat_mod, level_mod;
-		//////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-		stat_mod    = 0.03;
-		level_mod   = 0.02;
-		chance 		= 0;	
-		//////////////// PROBABILITY ////////////////
-		if ( paf->duration >= 0 )
-			chance += (paf->level/30 - paf->duration) * 15; // 15% per each tick, up to ~45%
-        	chance += (ch->getCurrStat(STAT_CON) - 20) * stat_mod * 100; // 3% per each CON point, up to 24%
-		chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100; // 2% per each lvl diff, up to ~20%
-		chance = URANGE( 5, chance, 95 );
-			
-		int roll = number_percent( );
-		// critical success: shrug the stun entirely
-		if (roll <= (int) chance/2) {
-			affect_strip(ch, gsn_paralysis);
-			ch->pecho("{1{GТвой паралич проходит, и ты снова можешь двигаться!{2");
-			ch->recho("{1{GПаралич %1$C2 проходит, и %1$P1 снова начинает двигаться!{2", ch);
-			REMOVE_BIT(ch->affected_by,AFF_STUN);
-			return false; // can attack
-		}
-		// success: replace stun with weak stun
-		else if (roll <= (int) chance) {
-			affect_strip(ch, gsn_paralysis);
-			ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
-			ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
-			REMOVE_BIT(ch->affected_by,AFF_STUN);
-			SET_BIT(ch->affected_by,AFF_WEAK_STUN);
-		}
-		else {
-        		oldact_p("{WТы парализова$gно|н|на и не можешь реагировать на атаки $C2.{x",
-            		ch,0,victim,TO_CHAR,POS_FIGHTING);
-        		oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на твои атаки.{x",
-            		ch,0,victim,TO_VICT,POS_FIGHTING);
-        		oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на атаки.{x",
-            		ch,0,victim,TO_NOTVICT,POS_FIGHTING);				
-		}
-        	return true;
-	}
-	// other stuns -- not AP's paralysis    
-	else {
-		ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
-		ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
-		REMOVE_BIT(ch->affected_by,AFF_STUN);
-		SET_BIT(ch->affected_by,AFF_WEAK_STUN);	
-		return true;
-	}
-    }
+            float chance, stat_mod, level_mod;
+            //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+            stat_mod = 0.03;
+            level_mod = 0.02;
+            chance = 0;
+            //////////////// PROBABILITY ////////////////
+            if (paf->duration >= 0)
+                chance += (paf->level / 30 - paf->duration) * 15;                          // 15% per each tick, up to ~45%
+            chance += (ch->getCurrStat(STAT_CON) - 20) * stat_mod * 100;                   // 3% per each CON point, up to 24%
+            chance += (ch->getModifyLevel() - victim->getModifyLevel()) * level_mod * 100; // 2% per each lvl diff, up to ~20%
+            chance = URANGE(5, chance, 95);
 
+            int roll = number_percent( );
+            // critical success: shrug the stun entirely
+            if (roll <= (int)chance / 2) {
+                affect_strip(ch, gsn_paralysis);
+                ch->pecho("{1{GТвой паралич проходит, и ты снова можешь двигаться!{2");
+                ch->recho("{1{GПаралич %1$C2 проходит, и %1$P1 снова начинает двигаться!{2", ch);
+                REMOVE_BIT(ch->affected_by, AFF_STUN);
+                return false; // can attack
+            }
+            // success: replace stun with weak stun
+            else if (roll <= (int)chance) {
+                affect_strip(ch, gsn_paralysis);
+                ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
+                ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
+                REMOVE_BIT(ch->affected_by, AFF_STUN);
+                SET_BIT(ch->affected_by, AFF_WEAK_STUN);
+            } else {
+                oldact_p("{WТы парализова$gно|н|на и не можешь реагировать на атаки $C2.{x",
+                         ch, 0, victim, TO_CHAR, POS_FIGHTING);
+                oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на твои атаки.{x",
+                         ch, 0, victim, TO_VICT, POS_FIGHTING);
+                oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на атаки.{x",
+                         ch, 0, victim, TO_NOTVICT, POS_FIGHTING);
+            }
+            return true;
+        }
+        // other stuns -- not AP's paralysis
+        else {
+            ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
+            ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
+            REMOVE_BIT(ch->affected_by, AFF_STUN);
+            SET_BIT(ch->affected_by, AFF_WEAK_STUN);
+            return true;
+        }
+    }
+	
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
     {
         oldact_p("{MТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
