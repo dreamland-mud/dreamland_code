@@ -168,6 +168,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         case ITEM_SPELLBOOK:
         case ITEM_TEXTBOOK:
         case ITEM_RECIPE:
+        case ITEM_FURNITURE:          
             chance += 10;
             msg = "%1$^O1 обраща%1$nется|ются в пепел.";
             break;
@@ -468,6 +469,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             chance += 50;
             msg = "%1$^O1 треска%1$nется|ются и сгора%1$nет|ют!";
             break;
+        case ITEM_FURNITURE:          
         case ITEM_STAFF:
             chance += 10;
             msg = "%1$^O1 дым%1$nится|ятся и обуглива%1$nется|ются!";
@@ -819,7 +821,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             break;
         case ITEM_CLOTHING:
             msg = "%1$^O1 разрыва%1$nется|ются песком.";
-            break;
+            break;          
         case ITEM_WAND:
             chance = 50;
             msg = "%1$^O1 рассыпа%1$nется|ются в пыль.";
@@ -832,6 +834,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             msg = "%1$^O1 покрыва%1$nется|ются слоем песка.";
             break;
         case ITEM_POTION:
+        case ITEM_FURNITURE:          
             chance +=10;
             msg = "%1$^O1 разбива%1$nется|ются на кусочки под ударом песка.";
             break;
@@ -1022,6 +1025,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
             msg = "%1$^O1 разбива%1$nется|ются и содержимое выливается на землю!";
             chance += 5;
             break;
+        case ITEM_FURNITURE:          
         case ITEM_PILL:
             msg = "%1$^O1 разлета%1$nется|ются на мелкие кусочки!";
             break;
