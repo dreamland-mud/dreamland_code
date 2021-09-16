@@ -429,17 +429,17 @@ NMI_GET( RaceWrapper, name, "английское название" )
 
 NMI_GET( RaceWrapper, nameMlt, "русское название во множ.числе с падежами" ) 
 {
-    return raceManager->find( name )->getPC( )->getMltName( );
+    return raceManager->find( name )->getMltName( );
 }
 
 NMI_GET( RaceWrapper, nameMale, "русское название в мужском роде с падежами" ) 
 {
-    return raceManager->find( name )->getPC( )->getMaleName( );
+    return raceManager->find( name )->getMaleName( );
 }
 
 NMI_GET( RaceWrapper, nameFemale, "русское название в женском роде с падежами" ) 
 {
-    return raceManager->find( name )->getPC( )->getFemaleName( );
+    return raceManager->find( name )->getFemaleName( );
 }
 
 NMI_INVOKE( RaceWrapper, nameRus, "(ch): русское название в зависимости от пола персонажа ch" ) 
@@ -452,9 +452,9 @@ NMI_INVOKE( RaceWrapper, nameRus, "(ch): русское название в за
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
 
     if (ch->getTarget( )->getSex( ) == SEX_FEMALE)
-        return raceManager->find( name )->getPC( )->getFemaleName( );
+        return raceManager->find( name )->getFemaleName( );
     else
-        return raceManager->find( name )->getPC( )->getMaleName( );
+        return raceManager->find( name )->getMaleName( );
 }
 
 NMI_GET( RaceWrapper, hpBonus, "бонус на здоровья при создании персонажа этой расы" ) 

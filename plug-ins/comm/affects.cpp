@@ -171,8 +171,8 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
             word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  "добавляет" : "обнаружение");
             gcase = (IS_SET(b, ADET_WEB|ADET_FEAR) ? '4': '2');
         } else if (table == &form_flags) {
-            word = "добавляет";
-            ending = " форму тела";
+            word = "добавляет форму";
+            //ending = " форму тела";
         }
         
         if (word)

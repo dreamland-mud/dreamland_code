@@ -704,9 +704,9 @@ void AssassinateOneHit::calcDamage( )
     Chance mychance(ch, (int) chance, 100);
 
     if (mychance.reroll()) {
-        oldact("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR);
-        oldact("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT);
-        oldact_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
+        oldact("Ты {R{IS+++ {IxЛОМАЕШЬ ШЕЮ{IS +++{Ix{x $C3!",ch,0,victim,TO_CHAR);
+        oldact("$c1 {R{IS+++ {IxЛОМАЕТ ШЕЮ{IS +++{Ix{x $C3!",ch,0,victim,TO_NOTVICT);
+        oldact_p("$c1 {R{IS+++ {IxЛОМАЕТ ТЕБЕ ШЕЮ{IS +++{Ix{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
 

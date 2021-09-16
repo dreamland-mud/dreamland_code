@@ -1953,7 +1953,8 @@ CMDWIZP( return )
     NPCharacter *mob = ch->getNPC();
 
     if(!mob) {
-        ch->pecho("Ты и так в своем теле.");
+        ch->pecho("Эта команда нужна для смены тел -- а ты и так в своем теле.");
+        ch->pecho("А чтобы вернуться в Храм, напиши {y{hc{lerecall{lrвозврат{x.");
         return;
     }
     

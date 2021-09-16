@@ -2486,7 +2486,7 @@ void lore_fmt_affect( Object *obj, Affect *paf, ostringstream &buf )
         else if (table == &detect_flags)
             buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
         else if (table == &form_flags)
-            buf << "Добавляет " << form_flags.messages(b) << " форму тела" << endl;
+            buf << "Добавляет форму " << form_flags.messages(b) << endl;
         else if (table == &weapon_type2){
             buf << "Добавляет флаг " << weapon_type2.messages(b);
             if (d > -1) {
