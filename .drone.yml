@@ -5,6 +5,12 @@ name: default
 concurrency:
   limit: 1
 
+environment:
+  DISCORD_ID:
+    from_secret: discord_id
+  DISCORD_TOKEN:
+    from_secret: discord_token
+    
 clone:
   disable: true
   
@@ -19,6 +25,19 @@ steps:
   - cd ../objs
   - make -j 2
   - make install
+
+- name: discord failure
+  when:
+    status:
+      - failure
+  commands:
+      - echo "{\"embeds\":[{\"color\": 13632027,\"description\":\"Latest dreamland_code failed to build, what have you done, mate?\n\", \"title\":\"Deployment failed!\"}]}" | curl -v -X POST -H "Content-Type: application/json" --data @- --url "https://discordapp.com/api/webhooks/$DISCORD_ID/$DISCORD_TOKEN"     
   
+- name: discord success
+  when:
+    status:
+      - success
+  commands:
+      - echo "{\"embeds\":[{\"color\": 8311585,\"description\":\"Latest dreamland_code build was successful, you can reboot\n\", \"title\":\"Deployment successful\"}]}" | curl -v -X POST -H "Content-Type: application/json" --data @- --url "https://discordapp.com/api/webhooks/$DISCORD_ID/$DISCORD_TOKEN"
   
   
