@@ -27,17 +27,17 @@ steps:
   - make install
 
 - name: discord failure
+  commands:
+      - echo "{\"embeds\":[{\"color\": 13632027,\"description\":\"Latest dreamland_code failed to build, what have you done, mate?\n\", \"title\":\"Deployment failed!\"}]}" | curl -v -X POST -H "Content-Type: application/json" --data @- --url "https://discordapp.com/api/webhooks/${DISCORD_ID}/${DISCORD_TOKEN}"     
   when:
     status:
       - failure
-  commands:
-      - echo "{\"embeds\":[{\"color\": 13632027,\"description\":\"Latest dreamland_code failed to build, what have you done, mate?\n\", \"title\":\"Deployment failed!\"}]}" | curl -v -X POST -H "Content-Type: application/json" --data @- --url "https://discordapp.com/api/webhooks/$DISCORD_ID/$DISCORD_TOKEN"     
   
 - name: discord success
+  commands:
+      - echo "{\"embeds\":[{\"color\": 8311585,\"description\":\"Latest dreamland_code build was successful, you can reboot\n\", \"title\":\"Deployment successful\"}]}" | curl -v -X POST -H "Content-Type: application/json" --data @- --url "https://discordapp.com/api/webhooks/${DISCORD_ID}/${DISCORD_TOKEN}"
   when:
     status:
       - success
-  commands:
-      - echo "{\"embeds\":[{\"color\": 8311585,\"description\":\"Latest dreamland_code build was successful, you can reboot\n\", \"title\":\"Deployment successful\"}]}" | curl -v -X POST -H "Content-Type: application/json" --data @- --url "https://discordapp.com/api/webhooks/$DISCORD_ID/$DISCORD_TOKEN"
   
   
