@@ -174,10 +174,6 @@ CMDRUN( buy )
     obj  = get_obj_keeper( ch, trader, arg );
     cost = get_cost( keeper, obj, true, trader );
     
-    // everyone reaps off druids
-    if (ch->getProfession( ) == prof_druid)
-        cost *= 2;
-
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
         oldact("$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
@@ -247,6 +243,10 @@ CMDRUN( buy )
         oldact("Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR);
         gsn_haggle->improve( ch, true );
     }
+
+    // everyone reaps off druids
+    if (ch->getProfession( ) == prof_druid)
+        cost *= 2;
 
     if ( number > 1 )
     {
@@ -880,14 +880,9 @@ void deduct_cost(Character *ch, int cost)
         ch->silver -= silver;
 
         if (ch->gold < 0)
-        {
-                bug("deduct costs: gold %d < 0",ch->gold.getValue( ));
-                ch->gold = 0;
-        }
+            ch->gold = 0;
+        
         if (ch->silver < 0)
-        {
-                bug("deduct costs: silver %d < 0",ch->silver.getValue( ));
-                ch->silver = 0;
-        }
+            ch->silver = 0;
 }
 
