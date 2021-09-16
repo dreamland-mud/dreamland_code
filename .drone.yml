@@ -19,6 +19,9 @@ steps:
   - cd ../objs
   - make -j 2
   - make install
+  when:
+    branch:
+    - master
 
 - name: discord_failure
   commands:
