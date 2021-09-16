@@ -29,6 +29,7 @@
 
 GSN(haggle);
 RELIG(fili);
+PROF(druid);
 bool can_afford(Character *ch, int gold, int silver, int number);
 void deduct_cost(Character *ch, int cost);
 
@@ -99,6 +100,10 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
         return;
     
     cost = getRepairCost( obj );
+    
+    // everyone reaps off druids
+    if (client->getProfession( ) == prof_druid)
+        cost *= 2;
 
     if (!can_afford(client, cost, 0, 1)) {
         say_act( client, ch, "У тебя не хватит денег, чтоб оплатить ремонт этой вещи.");
@@ -155,6 +160,9 @@ void Repairman::doEstimate( Character *client, const DLString &cArgs )
         return;
     
     int cost = getRepairCost(obj);
+    // everyone reaps off druids
+    if (client->getProfession( ) == prof_druid)
+        cost *= 2;    
 
     if (cost > 0)
         tell_fmt( "Ремонт этой вещи будет стоить %3$d золот%3$Iую|ые|ых монет%3$Iу|ы|.", 

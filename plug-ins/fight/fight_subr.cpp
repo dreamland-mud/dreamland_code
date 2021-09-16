@@ -33,7 +33,7 @@
 #include "fight.h"
 #include "def.h"
 
-bool check_stun( Character *ch, Character *victim ) 
+bool check_stun(Character *ch, Character *victim)
 {
     if (IS_AFFECTED(ch, AFF_STUN)) {
         set_violent(ch, victim, false);
@@ -89,19 +89,18 @@ bool check_stun( Character *ch, Character *victim )
             return true;
         }
     }
-	
-    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-    {
-        oldact_p("{MТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
-            ch,0,victim,TO_CHAR,POS_FIGHTING);
-        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
-            ch,0,victim,TO_VICT,POS_FIGHTING);
-        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
-            ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
-        REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
-        
-        set_violent( ch, victim, false );
+    if (IS_AFFECTED(ch, AFF_WEAK_STUN)) {
+        oldact_p("{MТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
+                 ch, 0, victim, TO_CHAR, POS_FIGHTING);
+        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
+                 ch, 0, victim, TO_VICT, POS_FIGHTING);
+        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
+                 ch, 0, victim, TO_NOTVICT, POS_FIGHTING);
+
+        REMOVE_BIT(ch->affected_by, AFF_WEAK_STUN);
+
+        set_violent(ch, victim, false);
         return true;
     }
 

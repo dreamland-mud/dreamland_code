@@ -1,0 +1,42 @@
+---
+kind: pipeline
+type: exec
+name: default
+concurrency:
+  limit: 1
+
+clone:
+  disable: true
+
+steps:
+- name: full_rebuild
+  commands:
+  - eval `ssh-agent -s`
+  - ssh-add /home/dreamland/.ssh/drone
+  - cd /home/dreamland/dreamland_code
+  - git pull
+  - kill $SSH_AGENT_PID
+  - cd ../objs
+  - make -j 2
+  - make install
+  when:
+    branch:
+    - master
+
+- name: discord_failure
+  commands:
+  - >
+    echo "{\"embeds\":[{\"color\": 13632027,\"description\":\"Latest dreamland_code failed to build, what have you done, mate?\n\",\"title\":\"Deployment failed!\"}], \"username\":\"Drone Bot\", \"avatar_url\": \"https://docs.drone.io/logo.svg\"}" \
+    | /home/dreamland/runtime/bin/idiscord-code
+  when:
+    status:
+      - failure
+  
+- name: discord_success
+  commands:
+  - >
+    echo "{\"embeds\":[{\"color\": 8311585,\"description\":\"Latest dreamland_code build was successful, you can reboot\n\",\"title\":\"Deployment successful\"}], \"username\":\"Drone Bot\", \"avatar_url\": \"https://docs.drone.io/logo.svg\"}" \
+    | /home/dreamland/runtime/bin/idiscord-code
+  when:
+    status:
+      - success

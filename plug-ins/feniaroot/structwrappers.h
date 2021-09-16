@@ -195,6 +195,33 @@ protected:
 };
 
 /*----------------------------------------------------------------------
+ * Material
+ *----------------------------------------------------------------------*/
+struct material_t;
+
+class MaterialWrapper : public PluginNativeImpl<MaterialWrapper>, 
+                      public NativeHandler,
+                      public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<MaterialWrapper> Pointer;
+
+    MaterialWrapper() { }
+    MaterialWrapper(const DLString &);
+            
+    virtual void setSelf(Scripting::Object *) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
+    static Scripting::Register wrap( const DLString &names );
+
+    XML_VARIABLE XMLString names;
+
+protected:
+    material_t * getTarget() const;
+};
+
+/*----------------------------------------------------------------------
  * Clan
  *----------------------------------------------------------------------*/
 class Clan;
@@ -272,7 +299,7 @@ protected:
  * Skill
  *----------------------------------------------------------------------*/
 class Skill;
-
+class SkillGroup;
 class SkillWrapper : public PluginNativeImpl<SkillWrapper>, 
                       public NativeHandler,
                       public XMLVariableContainer 
@@ -287,6 +314,25 @@ public:
     virtual void setSelf(Scripting::Object *) { }
     virtual Scripting::Object *getSelf() const { return 0; }
     Skill * getTarget() const;
+    
+protected:
+    XML_VARIABLE XMLString name;
+};
+
+class SkillGroupWrapper : public PluginNativeImpl<SkillGroupWrapper>, 
+                      public NativeHandler,
+                      public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<SkillGroupWrapper> Pointer;
+
+    SkillGroupWrapper() { }
+    SkillGroupWrapper(const DLString &);            
+    virtual void setSelf(Scripting::Object *) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
+    SkillGroup * getTarget() const;
     
 protected:
     XML_VARIABLE XMLString name;

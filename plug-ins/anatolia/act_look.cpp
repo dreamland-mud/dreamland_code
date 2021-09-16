@@ -76,7 +76,9 @@ DESIRE(bloodlust);
 GSN(stardust);
 GSN(rainbow_shield);
 GSN(demonic_mantle);
+GSN(shapeshift);
 RELIG(godiva);
+PROF(druid);
 
 /*
  * Extern functions needed
@@ -701,11 +703,11 @@ void show_char_to_char_0( Character *victim, Character *ch )
     }
     else {
         if (ch->getConfig( ).holy && origVict != victim)
-            buf << "{1" << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ) << "{2 "
+            buf << "{1" << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ).capitalize() << "{2 "
                 << "(под личиной " << ch->sees( victim, '2' ) << ") ";
         else {
             buf << "{1" << "{" << CLR_PLAYER(ch);
-            webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ), victim, ch );
+            webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ).capitalize(), victim, ch );
             buf << "{2";
         }
 
@@ -964,7 +966,11 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
         ch->pecho("\r\n{DПризрачное покрывало окутывает %1$C4, скрывая %1$P2 экипировку от твоего взора.{x", victim);
         return;
     }
-
+    if (victim->getProfession( ) == prof_druid && victim->isAffected(gsn_shapeshift)) {
+        ch->pecho("\r\nБоевая трансформация скрывает экипировку от твоего взора.");
+        return;
+    }
+	
     if (!naked) {
         oldact("\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
         ch->send_to( buf );

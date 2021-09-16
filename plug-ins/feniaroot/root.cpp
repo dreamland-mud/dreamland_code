@@ -1072,6 +1072,13 @@ NMI_INVOKE( Root, Liquid, "(name): конструктор для жидкост�
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
 }
 
+NMI_INVOKE( Root, Material, "(names): конструктор для материалов по имени или именам через запятую" )
+{
+    DLString names = args2string(args);
+
+    return MaterialWrapper::wrap(names);
+}
+
 static bool normalize_skill_name(DLString &arg)
 {
     arg.toLower().stripWhiteSpace();
@@ -1114,7 +1121,7 @@ NMI_INVOKE( Root, SkillCommand , "(name): находит команду для �
 }
 
 
-NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
+NMI_INVOKE( Root, Skill, "(name|gsn): конструктор для умения по имени или числу" )
 {
     Skill *skill = argnum2skill(args, 1);
     return Register::handler<SkillWrapper>(skill->getName());    
@@ -1132,6 +1139,16 @@ NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для новог�
         throw Scripting::Exception("Skill name can only consist of letters and spaces");
 
     return FeniaSkill::wrap(name);
+}
+
+NMI_INVOKE( Root, SkillGroup, "(name): конструктор для группы умений по имени" )
+{
+    DLString name = args2string(args);
+    SkillGroup *group = skillGroupManager->findExisting(name);
+    if (!group)
+        throw Scripting::Exception(name + ": skill group not found");
+        
+    return Register::handler<SkillGroupWrapper>(group->getName());    
 }
 
 NMI_INVOKE( Root, Clan, "(name): конструктор для клана по имени" )

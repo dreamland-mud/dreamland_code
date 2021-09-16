@@ -2541,7 +2541,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "ничего не стоит";
 
     // XXX 'изготовлено из' + падежи
-    DLString mat = material_rname(obj, '1');
+    DLString mat = material_rname(obj).ruscase('1');
     if (!mat.empty())
         buf << ", материал {W" << mat << "{x";
 

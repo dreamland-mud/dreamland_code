@@ -8,6 +8,7 @@
 #include "hometown.h"
 #include "skill.h"
 #include "skillcommand.h"
+#include "skillgroup.h"
 #include "profession.h"
 #include "defaultreligion.h"
 #include "language.h"
@@ -21,6 +22,8 @@
 #include "clan.h"
 #include "clantypes.h"
 #include "spelltarget.h"
+#include "material-table.h"
+#include "material.h"
 
 #include "nativeext.h"
 #include "regcontainer.h"
@@ -38,6 +41,7 @@
 #include "gsn_plugin.h"
 #include "profflags.h"
 #include "liquidflags.h"
+#include "damageflags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -595,6 +599,76 @@ NMI_INVOKE( LiquidWrapper, isBooze, "алкоголь ли это" )
 }
 
 /*----------------------------------------------------------------------
+ * Material
+ *----------------------------------------------------------------------*/
+NMI_INIT(MaterialWrapper, "material, материал(ы)");
+
+MaterialWrapper::MaterialWrapper( const DLString &n )
+                        : names(n)
+{
+}
+
+Scripting::Register MaterialWrapper::wrap( const DLString &names )
+{
+    MaterialWrapper::Pointer mw( NEW, names );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( mw );
+
+    return Scripting::Register( sobj );
+}
+
+material_t * MaterialWrapper::getTarget() const
+{
+    // TODO
+    return 0;
+}
+
+NMI_INVOKE( MaterialWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<MaterialWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( MaterialWrapper, name, "английские названия" ) 
+{
+    return names;
+}
+
+NMI_GET( MaterialWrapper, nameRus, "русские названия с падежами" ) 
+{
+    return material_rname(names.c_str());
+}
+
+NMI_GET( MaterialWrapper, wood, "среди материалов есть дерево" )
+{
+    return Register( material_is_typed( names.c_str(), MAT_WOOD ) );
+}
+
+NMI_GET( MaterialWrapper, metal, "среди материалов есть металл" )
+{
+    return Register( material_is_typed( names.c_str(), MAT_METAL ) );
+}
+
+NMI_GET( MaterialWrapper, mineral, "среди материалов есть камень или минерал" )
+{
+    return Register( material_is_typed( names.c_str(), MAT_MINERAL ) );
+}
+
+NMI_GET( MaterialWrapper, gem, "среди материалов есть драгоценный камень" )
+{
+    return Register( material_is_typed( names.c_str(), MAT_GEM ) );
+}
+
+NMI_GET( MaterialWrapper, burns, "сколько тиков горит (-1 если тушит огонь)" )
+{
+    return Register( material_burns( names.c_str() ) );
+}
+
+
+/*----------------------------------------------------------------------
  * Clan
  *----------------------------------------------------------------------*/
 NMI_INIT(ClanWrapper, "clan, клан");
@@ -1072,6 +1146,16 @@ NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_typ
     return spell ? spell->getSpellType() : 0;
 }
 
+NMI_GET(SkillWrapper, groups, "список названий групп умения")
+{
+    RegList::Pointer rc(NEW);
+
+    for (auto &group: getTarget()->getGroups().toArray())
+        rc->push_back(Register(skillGroupManager->find(group)->getName()));
+
+    return wrap(rc);
+}
+
 NMI_INVOKE(SkillWrapper, beats, "(ch): длина задержки в пульсах для персонажа с учетом бонусов")
 {
     Character *ch = args2character(args);
@@ -1336,3 +1420,38 @@ NMI_INVOKE(FeniaSkill, api, "(): печатает этот api")
 }
 
 
+/*----------------------------------------------------------------------
+ * SkillGroup
+ *----------------------------------------------------------------------*/
+NMI_INIT(SkillGroupWrapper, "skill group, группа умений");
+
+SkillGroupWrapper::SkillGroupWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+SkillGroup * SkillGroupWrapper::getTarget() const
+{
+    SkillGroup *group = skillGroupManager->find(name);
+    if (!group)
+        throw Scripting::Exception(name + ": skill group no longer exists");
+    return group;
+}
+
+NMI_INVOKE( SkillGroupWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<SkillGroupWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( SkillGroupWrapper, name, "английское название" ) 
+{
+    return getTarget()->getName( );
+}
+
+NMI_GET( SkillGroupWrapper, nameRus, "русское название" ) 
+{
+    return getTarget()->getRussianName( );
+}

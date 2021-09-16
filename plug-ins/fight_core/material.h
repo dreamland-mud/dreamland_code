@@ -9,10 +9,14 @@ class Object;
 class Character;
 
 bool material_is_typed( Object *, int );
+bool material_is_typed( const char *, int );
 bool material_is_flagged( Object *, int );
+bool material_is_flagged( const char *, int );
 int material_immune( Object *, Character * );
 int material_burns( Object * );
-DLString material_rname(Object *obj, char gcase='1');
+int material_burns( const char * );
+DLString material_rname(Object *obj);
+DLString material_rname(const char *materials);
 
 enum {
     SWIM_UNDEF = 0,

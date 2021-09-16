@@ -128,6 +128,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<RaceWrapper>( );
     Class::regMoc<LiquidWrapper>( );
     Class::regMoc<SkillWrapper>( );
+    Class::regMoc<SkillGroupWrapper>( );
     Class::regMoc<FeniaSkill>( );
     
     FeniaManager::getThis( )->recover( );
@@ -160,7 +161,9 @@ WrappersPlugin::initialization( )
     traitsAPIJson<BonusWrapper>("bonus", apiDump, false);     
     traitsAPIJson<ReligionWrapper>("religion", apiDump, false);     
     traitsAPIJson<LiquidWrapper>("liquid", apiDump, false);     
+    traitsAPIJson<MaterialWrapper>("material", apiDump, false);
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
+    traitsAPIJson<SkillGroupWrapper>("skillgroup", apiDump, false);     
     traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);
     traitsAPIJson<SpellWrapper>("spell", apiDump, false);
     traitsAPIJson<AffectHandlerWrapper>("affecthandler", apiDump, false);
@@ -184,6 +187,7 @@ void WrappersPlugin::destruction( ) {
 
     Class::unregMoc<LiquidWrapper>( );
     Class::unregMoc<FeniaSkill>( );
+    Class::unregMoc<SkillGroupWrapper>( );
     Class::unregMoc<SkillWrapper>( );
     Class::unregMoc<HometownWrapper>( );
     Class::unregMoc<AreaWrapper>( );
