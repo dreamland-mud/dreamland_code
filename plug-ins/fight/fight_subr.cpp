@@ -54,8 +54,9 @@ bool check_stun(Character *ch, Character *victim)
             chance += (ch->getModifyLevel() - victim->getModifyLevel()) * level_mod * 100; // 2% per each lvl diff, up to ~20%
             chance = URANGE(5, chance, 95);
 
+            int roll = number_percent( );
             // critical success: shrug the stun entirely
-            if (number_percent() <= (int)chance / 2) {
+            if (roll <= (int)chance / 2) {
                 affect_strip(ch, gsn_paralysis);
                 ch->pecho("{1{GТвой паралич проходит, и ты снова можешь двигаться!{2");
                 ch->recho("{1{GПаралич %1$C2 проходит, и %1$P1 снова начинает двигаться!{2", ch);
@@ -63,7 +64,7 @@ bool check_stun(Character *ch, Character *victim)
                 return false; // can attack
             }
             // success: replace stun with weak stun
-            else if (number_percent() <= (int)chance) {
+            else if (roll <= (int)chance) {
                 affect_strip(ch, gsn_paralysis);
                 ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
                 ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
