@@ -703,11 +703,11 @@ void show_char_to_char_0( Character *victim, Character *ch )
     }
     else {
         if (ch->getConfig( ).holy && origVict != victim)
-            buf << "{1" << "{" << CLR_PLAYER(ch) << DLString(ch->sees( origVict, '1' )).capitalize().c_str() << "{2 "
+            buf << "{1" << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ).capitalize() << "{2 "
                 << "(под личиной " << ch->sees( victim, '2' ) << ") ";
         else {
             buf << "{1" << "{" << CLR_PLAYER(ch);
-            webManipManager->decorateCharacter( buf, DLString(ch->sees( victim, '1' )).capitalize().c_str(), victim, ch );
+            webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ).capitalize(), victim, ch );
             buf << "{2";
         }
 
@@ -967,7 +967,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
         return;
     }
     if (victim->getProfession( ) == prof_druid && victim->isAffected(gsn_shapeshift)) {
-        ch->pecho("\r\nБоевая трансформация скрывает экипировку от твоего взора.", victim);
+        ch->pecho("\r\nБоевая трансформация скрывает экипировку от твоего взора.");
         return;
     }
 	
