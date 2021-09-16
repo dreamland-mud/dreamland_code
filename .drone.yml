@@ -5,12 +5,6 @@ name: default
 concurrency:
   limit: 1
 
-environment:
-  DISCORD_ID:
-    from_secret: discord_id
-  DISCORD_TOKEN:
-    from_secret: discord_token
-
 clone:
   disable: true
 
@@ -31,9 +25,8 @@ steps:
   - >
     echo "{\"embeds\":[{\"color\": 13632027,\
     \"description\":\"Latest dreamland_code failed to build, what have you done, mate?\n\",\
-    \"title\":\"Deployment failed!\"}]}" \
-    | curl -v -X POST -H "Content-Type: application/json" --data @- \
-    --url "https://discordapp.com/api/webhooks/${DISCORD_ID}/${DISCORD_TOKEN}"
+    \"title\":\"Deployment failed!\"}], \"username\":\"Drone Bot\", \"avatar_url\": \"https://docs.drone.io/logo.svg\"}" \
+    | /home/dreamland/runtime/bin/idiscord-code
   when:
     status:
       - failure
@@ -43,9 +36,8 @@ steps:
   - >
     echo "{\"embeds\":[{\"color\": 8311585,\
     \"description\":\"Latest dreamland_code build was successful, you can reboot\n\",\
-    \"title\":\"Deployment successful\"}]}" \
-    | curl -v -X POST -H "Content-Type: application/json" --data @- \
-    --url "https://discordapp.com/api/webhooks/${DISCORD_ID}/${DISCORD_TOKEN}"
+    \"title\":\"Deployment successful\"}], \"username\":\"Drone Bot\", \"avatar_url\": \"https://docs.drone.io/logo.svg\"}" \
+    | /home/dreamland/runtime/bin/idiscord-code
   when:
     status:
       - success
