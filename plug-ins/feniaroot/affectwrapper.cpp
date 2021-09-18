@@ -163,6 +163,9 @@ NMI_GET(AffectWrapper, bitvector, "численное значение флаг�
 
 NMI_GET(AffectWrapper, bitvectorTable, "таблица для флагов, которые установит аффект")
 {
+    if (target.bitvector.getTable() == 0)
+        return Register();
+        
     DLString tableName = target.bitvector.getTableName();
     return TableWrapper::wrap(tableName);
 }
