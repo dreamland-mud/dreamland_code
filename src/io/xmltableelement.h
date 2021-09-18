@@ -14,6 +14,8 @@ class XMLTableElement : public virtual XMLPolymorphVariable {
 public:
     typedef ::Pointer<XMLTableElement> Pointer;
 
+    XMLTableElement();
+    
     virtual void loaded( );
     virtual void unloaded( );
     void save() const;
