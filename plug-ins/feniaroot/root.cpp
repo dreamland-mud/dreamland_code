@@ -1144,11 +1144,7 @@ NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для новог�
 NMI_INVOKE( Root, SkillGroup, "(name): конструктор для группы умений по имени" )
 {
     DLString name = args2string(args);
-    SkillGroup *group = skillGroupManager->findExisting(name);
-    if (!group)
-        throw Scripting::Exception(name + ": skill group not found");
-        
-    return Register::handler<SkillGroupWrapper>(group->getName());    
+    return SkillGroupWrapper::wrap(name);
 }
 
 NMI_INVOKE( Root, Clan, "(name): конструктор для клана по имени" )

@@ -329,11 +329,13 @@ public:
     typedef ::Pointer<SkillGroupWrapper> Pointer;
 
     SkillGroupWrapper() { }
-    SkillGroupWrapper(const DLString &);            
+    SkillGroupWrapper(const DLString &);
+
     virtual void setSelf(Scripting::Object *) { }
     virtual Scripting::Object *getSelf() const { return 0; }
     SkillGroup * getTarget() const;
-    
+    static Scripting::Register wrap(const DLString &);
+
 protected:
     XML_VARIABLE XMLString name;
 };

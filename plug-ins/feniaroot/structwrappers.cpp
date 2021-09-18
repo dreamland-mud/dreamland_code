@@ -1146,14 +1146,23 @@ NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_typ
     return spell ? spell->getSpellType() : 0;
 }
 
-NMI_GET(SkillWrapper, groups, "список названий групп умения")
+NMI_GET(SkillWrapper, groups, "список групп умения (.SkillGroup)")
 {
     RegList::Pointer rc(NEW);
 
-    for (auto &group: getTarget()->getGroups().toArray())
-        rc->push_back(Register(skillGroupManager->find(group)->getName()));
+    for (auto &group: getTarget()->getGroups().toArray()) {
+        DLString groupName = skillGroupManager->find(group)->getName();
+        rc->push_back(SkillGroupWrapper::wrap(groupName));
+    }
 
     return wrap(rc);
+}
+
+NMI_GET(SkillWrapper, group, "первая, часто и единственная, группа умения (.SkillGroup)")
+{
+    vector<int> gsns = getTarget()->getGroups().toArray();
+    DLString groupName = gsns.empty() ? "none" : skillGroupManager->find(gsns.front())->getName();
+    return SkillGroupWrapper::wrap(groupName);
 }
 
 NMI_INVOKE(SkillWrapper, beats, "(ch): длина задержки в пульсах для персонажа с учетом бонусов")
@@ -1428,6 +1437,15 @@ NMI_INIT(SkillGroupWrapper, "skill group, группа умений");
 SkillGroupWrapper::SkillGroupWrapper( const DLString &n )
                   : name( n )
 {
+}
+
+Register SkillGroupWrapper::wrap(const DLString &name)
+{
+    SkillGroup *group = skillGroupManager->findExisting(name);
+    if (!group)
+        throw Scripting::Exception(name + ": skill group not found");
+        
+    return Register::handler<SkillGroupWrapper>(group->getName());    
 }
 
 SkillGroup * SkillGroupWrapper::getTarget() const
