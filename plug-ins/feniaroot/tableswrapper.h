@@ -29,6 +29,7 @@ public:
     void setSelf(Scripting::Object *);
     virtual Scripting::Object *getSelf() const { return 0; }
     void resolveTab();
+    static Scripting::Register wrap(const DLString &);
 
     const FlagTable *table;
     XML_VARIABLE XMLString tableName;

@@ -132,6 +132,20 @@ TableWrapper::setSelf(Scripting::Object *)
 {
 }
 
+Register TableWrapper::wrap(const DLString &tableName)
+{
+    const FlagTable * table = FlagTableRegistry::getTable(tableName);
+    if(table == 0)
+        throw Scripting::Exception("no such table defined in bits.conf");
+
+    TableWrapper::Pointer twp(NEW, tableName);
+    Scripting::Object &obj = Scripting::Object::manager->allocate();
+    obj.setHandler(twp);
+
+    return &obj;    
+}
+
+
 ////////////////////////////////////////
 
 void 
@@ -143,19 +157,8 @@ TablesWrapper::setField(const Register &key, const Register &val)
 Register 
 TablesWrapper::getField(const Register &key)
 {
-    const DLString &table = Lex::getThis()->getName(key.toIdentifier());
-    
-    const FlagTable * t = FlagTableRegistry::getTable( table );
-    
-    if(t == 0)
-        throw Scripting::Exception("no such table defined in bits.conf");
-
-    TableWrapper::Pointer twp(NEW, table);
-    Scripting::Object &obj = Scripting::Object::manager->allocate();
-
-    obj.setHandler(twp);
-
-    return &obj;
+    const DLString &tableName = Lex::getThis()->getName(key.toIdentifier());
+    return TableWrapper::wrap(tableName);
 }
 
 Register 

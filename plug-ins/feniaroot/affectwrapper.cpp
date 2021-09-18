@@ -14,6 +14,7 @@
 #include "regcontainer.h"
 #include "reglist.h"
 #include "wrappermanager.h"
+#include "tableswrapper.h"
 #include "wrap_utils.h"
 #include "subr.h"
 #include "fight.h"
@@ -158,6 +159,12 @@ NMI_INVOKE(AffectWrapper, bitvector, "(table,flags): какие флаги и п
 NMI_GET(AffectWrapper, bitvector, "численное значение флагов, которые установит аффект")
 {
     return Register((int)target.bitvector.getValue());
+}
+
+NMI_GET(AffectWrapper, bitvectorTable, "таблица для флагов, которые установит аффект")
+{
+    DLString tableName = target.bitvector.getTableName();
+    return TableWrapper::wrap(tableName);
 }
 
 NMI_SET(AffectWrapper, where, "на какую таблицу применен bitvector или на что воздействует global (.tables.affwhere_flags)")
