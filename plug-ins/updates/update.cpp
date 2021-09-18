@@ -482,7 +482,7 @@ void char_update( )
      * Check that these chars still exist.
      */
 
-    if (last_save_time == -1 || dreamland->getCurrentTime( ) - last_save_time > 300)
+    if (last_save_time == -1 || dreamland->getCurrentTime( ) - last_save_time > 60)
     {
         last_save_time = dreamland->getCurrentTime( );
         for (ch = char_list; ch != 0; ch = ch_next)
