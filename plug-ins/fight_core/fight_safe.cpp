@@ -94,7 +94,10 @@ bool is_safe_nomessage(Character *ch, Character *victim )
     if (victim->isDead( ) || ch->isDead( ))
         return true;
 
-    // recurent victim pet to master
+    // Special protected mobs outside of safe rooms.
+    if (victim->is_npc() && IS_SET(victim->act, ACT_SAFE))
+        return true;
+
     if ( victim->is_npc()
         && IS_CHARMED(victim)
         && !victim->master->is_npc() )
