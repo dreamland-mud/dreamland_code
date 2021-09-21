@@ -40,7 +40,7 @@ void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
         oldact("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, 0, TO_CHAR);
         hero->pecho("{YЗадание отменяется.{x");
     } else {
-        oldact("{Y$c1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
+        oldact("{Y$c1 подло уби$gло|л|ла того, кого тебе было поручено спасти.{x", killer, 0, hero, TO_VICT);
         hero->pecho("{YЗадание отменяется.{x");
     }
 }
@@ -115,7 +115,7 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
 void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const 
 {
     oldact("$c1 говорит тебе '{GЧто ты надела$Gло|л|ла?!{x'", king, 0, hero, TO_VICT);
-    oldact("$c1 говорит тебе '{GК счастью, такому олуху как ты я дала копию.{x'", king, 0, hero, TO_VICT);
+    oldact("$c1 говорит тебе '{GК счастью, тако{Smму{Sfй{Sx {Smолуху{Sfдурынде{Sx как ты я дала копию.{x'", king, 0, hero, TO_VICT);
     oldact("$c1 дает тебе новый $o4.", king, mark, hero, TO_VICT);
     oldact("$c1 дает $C3 новый $o4.", king, mark, hero, TO_NOTVICT);
 }
@@ -165,5 +165,5 @@ void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) con
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 
 {
-    oldact("{YГруппа людей с суровыми лицами заковаными в латы преграждает тебе путь.{x", kid, 0, 0, TO_ROOM);
+    oldact("{YГруппа закованных в латы людей с суровыми лицами преграждает тебе путь.{x", kid, 0, 0, TO_ROOM);
 }
