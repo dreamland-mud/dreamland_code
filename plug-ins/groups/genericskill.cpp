@@ -365,6 +365,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
             buf << pad << "Досталось тебе";
         buf << " разученное до {C" << percent << "%{x"
             << skill_effective_bonus(this, ch) << "." << endl;
+        fillRacesClassesInfo();
         return;
     }
 
