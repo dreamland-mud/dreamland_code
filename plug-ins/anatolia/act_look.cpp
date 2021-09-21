@@ -630,30 +630,30 @@ void show_char_to_char_0( Character *victim, Character *ch )
             buf << "(Wizi)";
     }
 
-    if (RIDDEN( victim ))
-	buf << fmt( ch, "({1{gОседлан%Gо||а{2)", victim );
+    if (RIDDEN(victim))
+        buf << fmt(ch, "({1{gОседлан%Gо||а{2)", victim);
 
     if (IS_AFFECTED(victim, AFF_INVISIBLE))
-	buf << fmt( ch, "({1{DНевидим%Gо||а{2)", victim );
+        buf << fmt(ch, "({1{DНевидим%Gо||а{2)", victim);
 
     if (IS_AFFECTED(victim, AFF_IMP_INVIS))
-	buf << fmt( ch, "({1{bОчень невидим%Gо||а{2)", victim );
+        buf << fmt(ch, "({1{bОчень невидим%Gо||а{2)", victim);
 
     if (IS_AFFECTED(victim, AFF_HIDE))
-	buf << fmt( ch, "({1{DУкрыт%Gо||а{2)", victim );
+        buf << fmt(ch, "({1{DУкрыт%Gо||а{2)", victim);
 
     if (IS_AFFECTED(victim, AFF_FADE))
-	buf << fmt( ch, "({1{DСпрятан%Gо||а{2)", victim );
+        buf << fmt(ch, "({1{DСпрятан%Gо||а{2)", victim);
 
     if (IS_AFFECTED(victim, AFF_CAMOUFLAGE))
-	buf << fmt( ch, "({1{GЗамаскирован%Gо||а{2)", victim );
+        buf << fmt(ch, "({1{GЗамаскирован%Gо||а{2)", victim);
 
     if (IS_AFFECTED(victim, AFF_CHARM))
-	buf << fmt( ch, "({1{mОчарован%Gо||а{2)", victim );
+        buf << fmt(ch, "({1{mОчарован%Gо||а{2)", victim);
 
-	if (CAN_DETECT(ch, DETECT_UNDEAD)) {
+    if (CAN_DETECT(ch, DETECT_UNDEAD)) {
 		if (victim->is_npc() &&
-			(IS_SET(victim->act,ACT_UNDEAD) || IS_SET(victim->form,FORM_UNDEAD)) )
+			(IS_SET(victim->act, ACT_UNDEAD) || IS_SET(victim->form, FORM_UNDEAD)) )
 			buf << "({1{rНежить{2)";
 		else if (!victim->is_npc() && IS_VAMPIRE(ch))
 			buf << "({1{rНежить{2)";
@@ -699,7 +699,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
     
     if (nVict) {
         buf << "{" << CLR_MOB(ch) << "{1";;
-        webManipManager->decorateCharacter(buf, ch->sees( victim, '1' ), victim, ch);
+        webManipManager->decorateCharacter(buf, ch->sees( victim, '1' ).capitalize(), victim, ch);
     }
     else {
         if (ch->getConfig( ).holy && origVict != victim)
