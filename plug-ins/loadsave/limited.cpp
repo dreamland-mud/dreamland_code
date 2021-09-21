@@ -130,11 +130,11 @@ void limit_ground_decay(Object *obj)
     
     obj->timestamp -= 60 * 60 * 24;
 
-	obj->in_room->echo(POS_RESTING, "Лимитные вещи созданы для войны, и в {hh86безопасной комнате{x им находится нельзя.", obj);
-    if (obj->in_room)	
+    if (obj->in_room) {	
         obj->in_room->echo(POS_RESTING, "Лежа на земле, %1$O1 неумолимо истонча%1$nется|ются.", obj);
-    else if (obj->carried_by) {
+    } else if (obj->carried_by) {
         obj->carried_by->pecho("%^O1 в твоих руках неумолимо истонча%1$nется|ются.", obj);
+	    obj->carried_by->pecho("Лимитные вещи созданы для войны, и в {hh86безопасной комнате{x им находиться нельзя.");
 		obj->carried_by->recho("%^O1 в руках %C2 неумолимо истонча%1$nется|ются.", obj, obj->carried_by);
 	}
     save_items_at_holder(obj);
