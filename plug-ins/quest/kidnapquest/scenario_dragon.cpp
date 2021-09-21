@@ -29,7 +29,7 @@ bool KS::applicable( PCharacter *hero ) const
  */
 void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const
 {
-    oldact("$c1 бросается на шею $C3. Семейная сцена, сопли/слюни.", kid, 0, king, TO_ROOM);
+    oldact("$c1 бросается на шею $C3. Семейная сцена, сопли, слюни.", kid, 0, king, TO_ROOM);
     hero->printf( "%s и %s уже встретились.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
     oldact("Приди к $C3 за благодарностью!", hero, 0, king, TO_CHAR);
 }
@@ -39,7 +39,7 @@ void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
         oldact("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, 0, TO_CHAR);
         hero->pecho("{YЗадание отменяется.{x");
     } else {
-        oldact("{Y$c1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
+        oldact("{Y$c1 подло уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
         hero->pecho("{YЗадание отменяется.{x");
     }
 }
@@ -66,7 +66,7 @@ void KS::actAttackHero( NPCharacter *bandit, PCharacter *hero ) const
 }
 void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid ) const 
 {
-    oldact("$c1 одевает на $C2 ошейник и тащит за собой.", bandit, 0, kid, TO_ROOM);
+    oldact("$c1 надевает на $C2 ошейник и тащит за собой.", bandit, 0, kid, TO_ROOM);
 }
 void KS::actHuntStep( NPCharacter *bandit ) const 
 {
@@ -89,7 +89,7 @@ void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) const
  */
 void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer quest ) const 
 {
-    oldact("$c1 говорит тебе '{GУ меня недавно встал на крыло дракончик.. не по годам рано.{x'", king, 0, hero, TO_VICT);
+    oldact("$c1 говорит тебе '{GУ меня недавно встал на крыло дракончик, не по годам рано.{x'", king, 0, hero, TO_VICT);
     oldact("$c1 говорит тебе '{GОт радости он улетел так далеко, что, похоже, не может найти дороги обратно.{x'", king, 0, hero, TO_VICT);
     oldact("$c1 говорит тебе '{GНайди его и верни, пока до него не добрались охотники за драконами.{x'", king, 0, hero, TO_VICT);
     oldact("$c1 говорит тебе '{GСкорее всего ты встретишь его в местности {W{hh$t{hx{G.{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
@@ -110,7 +110,6 @@ void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const
 {
     oldact("$c1 дает тебе $o4.", king, mark, hero, TO_VICT);
     oldact("$c1 дает $C3 $o4.", king, mark, hero, TO_NOTVICT);
-    oldact("$c1 вздыхает в присутствии Еще Одного Идиота.", king, 0, 0, TO_ROOM);
     oldact("$c1 говорит тебе '{GВ следующий раз будь повнимательнее.{x'", king, 0, hero, TO_VICT);
 }
 void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero ) const 
@@ -152,7 +151,7 @@ void KS::actGoodMark( NPCharacter *kid, Character *victim, Object *obj ) const
 }
 void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const 
 {
-    oldact("$c1 бросается на шею $C3. Семейная сцена, сопли/слюни.", kid, 0, king, TO_ROOM);
+    oldact("$c1 бросается на шею $C3. Семейная сцена, сопли, слюни.", kid, 0, king, TO_ROOM);
     actAckWaitComplete(king, hero);
 }
 void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 
