@@ -1977,7 +1977,7 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднят�
     return true;
 }
 
-NMI_INVOKE(CharacterWrapper, totems, "(): список всех тотемов, созданных персонажем" )
+NMI_GET(CharacterWrapper, totems, "список всех тотемов, созданных персонажем" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
