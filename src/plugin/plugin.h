@@ -23,6 +23,12 @@ public:
 protected:
     virtual void initialization( ) = 0;
     virtual void destruction( ) = 0;
+
+    /** 
+      * Return 'true' for plugins that have serious side-effects when reloaded,
+      * e.g. [descriptor] plugin that disconnects all players. 
+      */
+    virtual bool isCritical() const;
 };
 
 #endif

@@ -13,6 +13,14 @@
 #include "plugin.h"
 
 /*--------------------------------------------------------------------------
+ * Plugin
+ *--------------------------------------------------------------------------*/
+bool Plugin::isCritical() const 
+{
+    return false;
+}
+
+/*--------------------------------------------------------------------------
  * PluginManager 
  *--------------------------------------------------------------------------*/
  
@@ -97,6 +105,23 @@ void PluginManager::reloadAll( )
     loadAll( );
 }
 
+void PluginManager::reloadNonCritical( ) 
+{
+    list<DLString> todo;
+    iterator i;
+
+    for (i = begin( ); i != end( ); i++)
+        if (!i->second.isCritical())
+            todo.push_back( i->first );
+
+    while (!todo.empty( )) {
+        unload( todo.front( ) );
+        todo.pop_front( );
+    }
+
+    loadAll( );
+}
+
 void PluginManager::reloadChanged( ) 
 {
     list<DLString> todo;
@@ -119,6 +144,14 @@ public:
     virtual void process( ) 
     {
         PluginManager::getThis( )->reloadAll( );
+    }
+};
+
+class PluginReloadNonCriticalRequest : public PluginReloadRequest {
+public:
+    virtual void process( ) 
+    {
+        PluginManager::getThis( )->reloadNonCritical( );
     }
 };
 
@@ -155,6 +188,10 @@ public:
 void PluginManager::setReloadAllRequest( )
 {
     request = ::Pointer<PluginReloadAllRequest>( NEW );
+}
+void PluginManager::setReloadNonCriticalRequest( )
+{
+    request = ::Pointer<PluginReloadNonCriticalRequest>( NEW );
 }
 void PluginManager::setReloadChangedRequest( )
 {

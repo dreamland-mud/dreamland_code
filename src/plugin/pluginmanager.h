@@ -31,9 +31,11 @@ public:
 
     void reload( const DLString &n );
     void reloadAll( );
+    void reloadNonCritical( );
     void reloadChanged( );
 
     void setReloadAllRequest( );
+    void setReloadNonCriticalRequest( );
     void setReloadChangedRequest( );
     void setReloadOneRequest( const DLString &, int w = 0);
     void checkReloadRequest( );

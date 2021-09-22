@@ -14,6 +14,11 @@ class DescriptorPlugin : public Plugin
 public:
     virtual void initialization();
     virtual void destruction();
+
+    /** Try to avoid reloading this plugin whenever possible, as it disconnects players. */
+    virtual bool isCritical() const { 
+        return true; 
+    }
 };
 
 void

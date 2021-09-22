@@ -30,7 +30,7 @@ public:
 
         for (d = descriptor_list; d; d = d->next) 
             if (d->connected == CON_PLAYING && d->character) 
-                d->character->pecho("Мир неуловимо изменился..");
+                d->character->pecho("Мир неуловимо изменился...");
     }
 
     virtual int getPriority( ) const
@@ -115,16 +115,20 @@ void CPlugin::doReload( Character *ch, DLString arg )
     else if (arg == "all") {
         manager->setReloadAllRequest( );
         ch->pecho("Requesting plugins reload.");
-    }
-    else if (arg == "changed") {
+
+    } else if (arg == "most") {
+        manager->setReloadNonCriticalRequest( );
+        ch->pecho("Requesting reload of all plugins except for [descriptor].");
+
+    } else if (arg == "changed") {
         manager->setReloadChangedRequest( );
         ch->pecho("Requesting changed plugins reload.");
-    }
-    else if (manager->isAvailable( arg )) {
+
+    } else if (manager->isAvailable( arg )) {
         manager->setReloadOneRequest( arg );
         ch->printf( "Requesting reload for plugin [%s].\r\n", arg.c_str( ) );
-    }
-    else
+
+    } else
         ch->pecho("Plugin not found.");
 }
 

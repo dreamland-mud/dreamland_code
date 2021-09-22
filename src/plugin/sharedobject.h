@@ -33,6 +33,7 @@ public:
     
     inline bool isLoaded( ) const;
     bool isChanged( ) const;
+    bool isCritical() const;
     inline const Date getLoadTime( ) const;
     DLString getFileName( ) const;
 

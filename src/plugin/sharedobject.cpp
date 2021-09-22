@@ -67,6 +67,16 @@ bool SharedObject::isChanged( ) const
     return loadTime < sb.st_mtime;
 }
 
+bool SharedObject::isCritical() const
+{
+    for (auto &p: plugins) {
+        if (p->isCritical())
+            return true;
+    }
+
+    return false;
+}
+
 DLString SharedObject::getFileName( ) const
 {
     return PluginManager::getThis( )->getTablePath( ) + '/' +
