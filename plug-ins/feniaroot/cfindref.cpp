@@ -84,21 +84,26 @@ CMDADM(findrefs)
 
     if (constArguments == "spell")
     {
-         Scripting::Object::Manager::iterator oi;
-         int cnt = 0;
-         map<int, int> refcnt;
-         for(oi = Scripting::Object::manager->begin(); oi != Scripting::Object::manager->end(); oi++) {
-             if (oi->hasHandler() && oi->getHandler()->getType() == "FeniaSpellContext") {
-                 cnt++;
-                 refcnt[oi->refcnt]++;
-//                 oi->getHandler()->setField("thiz", Register());
-             }
-         }
-         ch->printf("Found %d context objects.\r\n", cnt);
-         for (auto &r: refcnt)
-             ch->printf("    %d refs: %d\r\n", r.first, r.second);
-         return;
-     }
+        Scripting::Object::Manager::iterator oi;
+        int cnt = 0;
+        map<int, int> refcnt;
+        list<Scripting::Object::id_t> ids;
+        for (oi = Scripting::Object::manager->begin(); oi != Scripting::Object::manager->end(); oi++) {
+            if (oi->hasHandler() && oi->getHandler()->getType() == "FeniaSpellContext") {
+                cnt++;
+                refcnt[oi->refcnt]++;
+                //                 oi->getHandler()->setField("thiz", Register());
+                ids.push_back(oi->getId());
+            }
+        }
+        ch->printf("Found %d context objects.\r\n", cnt);
+        for (auto &r : refcnt)
+            ch->printf("    %d refs: %d\r\n", r.first, r.second);
+
+        if (cnt > 0)
+            ch->printf("Example: %lld\r\n", ids.front());
+        return;
+    }
 
     try {
         Profiler prof;

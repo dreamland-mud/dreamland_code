@@ -99,8 +99,7 @@ public:
     virtual void setSelf(Scripting::Object*) { }
     virtual Scripting::Object *getSelf() const { return 0; }
 
-protected:    
-    void yield(const DLString &msg);
+    static void yield(const DLString &msg);
 };
 
 extern template class Scripting::NativeImpl<SchedulerWrapper>;

@@ -27,6 +27,7 @@
 #include "defaultspell.h"
 #include "dl_math.h"
 #include "../anatolia/handler.h"
+#include "dreamland.h"
 #include "vnum.h"
 #include "merc.h"
 #include "def.h"
@@ -556,6 +557,32 @@ NMI_GET(FeniaSpellContext, rel, "религия кастера, случайны
     
     return caster->getReligion()->getRussianName();
 }
+
+NMI_INVOKE(FeniaSpellContext, wait, "(seconds): пауза на указанное кол-во секунд")
+{
+    int delay = args2number(args) * dreamland->getPulsePerSecond();
+
+    for (int i = 0; i < delay; i++)
+        SchedulerWrapper::yield(DLString::emptyString);
+    
+    return Register();
+}
+
+NMI_INVOKE(FeniaSpellContext, waitSameRoom, "(seconds): пауза на указанное кол-во секунд или пока кастер в той же комнате")
+{
+    int delay = args2number(args) * dreamland->getPulsePerSecond();
+    Character *caster = arg2character(ch);
+    Room *start_room = caster->in_room;
+
+    for (int i = 0; i < delay; i++) {
+        SchedulerWrapper::yield(DLString::emptyString);
+        if (caster->in_room != start_room)
+            throw Scripting::CustomException("Caster left the room");
+    }
+    
+    return Register();
+}
+
 
 
 NMI_GET(FeniaCommandContext, skill, "прототип умения для этой команды (.Skill())")

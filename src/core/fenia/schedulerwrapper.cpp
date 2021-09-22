@@ -228,7 +228,8 @@ NMI_INVOKE(SchedulerWrapper, yield, "(): уступить выполнение �
     return Register( );
 }
 
-void SchedulerWrapper::yield(const DLString &msg) {
+void SchedulerWrapper::yield(const DLString &msg) 
+{
     FeniaProcess *pw = FeniaProcess::currentProcess( );
 
     if(pw == NULL)

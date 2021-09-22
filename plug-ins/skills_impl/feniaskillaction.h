@@ -38,9 +38,6 @@ public:
     /** Tier-based damage calculation. */
     void calcDamage();
 
-    /** Break circular references once spell is cast. */
-    void cleanup();
-
     XML_VARIABLE XMLRegister thiz;
     XML_VARIABLE XMLString name;
     XML_VARIABLE XMLRegister spell;

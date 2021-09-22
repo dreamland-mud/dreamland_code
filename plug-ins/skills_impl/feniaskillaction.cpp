@@ -10,6 +10,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "idcontainer.h"
+#include "schedulerwrapper.h"
 
 #include "stringlist.h"
 #include "configurable.h"
@@ -154,10 +155,6 @@ bool FeniaSkillActionHelper::executeSpellRun(DefaultSpell *spell, Character *ch,
     // Figure out applicable runXXX method and call it, if defined on the spell wrapper.
     bool rc = executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx);
 
-    // Clean any references that may prevent garbage collector from destroying this context object.
-    if (ctx)
-        ctx->cleanup();
-
     return rc;
 }
 
@@ -166,9 +163,6 @@ bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *c
     FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
     // Figure out applicable applyXXX method and call it, if defined on the spell wrapper.
     bool rc = executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx);
-
-    if (ctx)
-        ctx->cleanup();
 
     return rc;
 }
@@ -216,7 +210,6 @@ FeniaSpellContext::Pointer FeniaSkillActionHelper::createContext(DefaultSpell *s
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(ctx);
 
-    ctx->thiz = Register(ctx->self);
     ctx->name = spell->getSkill()->getName();
     ctx->spell = Register(spell->wrapper);
     ctx->ch = FeniaManager::wrapperManager->getWrapper(ch);
@@ -328,13 +321,6 @@ void FeniaSpellContext::setSelf(Scripting::Object *s)
     self = s;
 }
 
-void FeniaSpellContext::cleanup()
-{
-    thiz = Register();
-//    spell = Register();
-//    state = Register();
-}
-
 NMI_INIT(FeniaSpellContext, "контекст для вызова заклинания")
 
 NMI_GET(FeniaSpellContext, spell, "прототип заклинания (.Spell())")
@@ -406,8 +392,34 @@ void FeniaSpellContext::calcDamage()
 }
 
 
+NMI_INVOKE(FeniaSpellContext, start, "(func[, args...]): запустить в новом потоке функцию с аргументами")
+{
+    // First argument is a function to run asyncronously, all remaining optional args are function parameters.
+    RegisterList::const_iterator ai = args.begin();
+    if (ai == args.end())
+        throw Scripting::NotEnoughArgumentsException();
 
+    Register asyncFun = (*ai++);
+    if (asyncFun.type != Register::FUNCTION)
+        throw Scripting::Exception("First argument is not a function");
+    
+    RegisterList asyncArgs;
+    asyncArgs.assign(ai, args.end( ));
 
+    // Create and kick off new process. 
+    FeniaProcess::Pointer process(NEW);
+    process->args.assign(asyncArgs.begin(), asyncArgs.end());
+    // Ensure that same context variables (ch, vict, skill) will be accessible from within the process function.
+    process->thiz = Register(self);
+    process->fun = asyncFun;
+    process->name.setValue("Thread for spell '" + name + "'");
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(process);
+    
+    process->start();
+    return Register();
+}
 
 /*--------------------------------------------------------------------
  * FeniaCommandContext
