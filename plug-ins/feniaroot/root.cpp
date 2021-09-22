@@ -31,6 +31,7 @@
 #include "merc.h"
 #include "damageflags.h"
 #include "../anatolia/handler.h"
+#include "calendar_utils.h"
 
 #include "root.h"
 #include "nannyhandler.h"
@@ -807,6 +808,11 @@ NMI_GET( Root, year, "текущий год")
 NMI_GET( Root, month, "текущий месяц, 0..16" ) 
 {
     return Register( time_info.month ); 
+}
+
+NMI_GET( Root, day_of_epoch, "сколько дней прошло со дня сотворения мира" ) 
+{
+    return Register((int)day_of_epoch(time_info));
 }
 
 NMI_GET(Root, season, "время года (winter,autumn,summer,spring), зависит от текущего месяца")
