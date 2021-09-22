@@ -7,6 +7,7 @@
 #include "pcharacter.h"
 #include "core/object.h"
 #include "affect.h"
+#include "room.h"
 #include "pcharactermanager.h"
 #include "save.h"
 #include "merc.h"
@@ -781,6 +782,20 @@ NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "(vnum): поиск списк
     sobj->setHandler( rc );
 
     return Register( sobj );
+}
+
+NMI_INVOKE( ObjectWrapper, get_owner_here, "(): вернуть персонажа-владельца в той же комнате" )
+{
+    checkTarget();
+    
+    if (!target->getOwner())
+        return Register();
+    
+    for (Character *rch = target->getRoom()->people; rch; rch = rch->next_in_room)
+        if (target->hasOwner(rch))
+            return wrap(rch);
+
+    return Register();    
 }
 
 NMI_GET( ObjectWrapper, items, "список (List) всех предметов внутри этого" )

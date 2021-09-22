@@ -1977,6 +1977,25 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднят�
     return true;
 }
 
+NMI_INVOKE(CharacterWrapper, list_totem_world, "(): поиск по миру тотемов, созданных персонажем" )
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (::Object *obj = object_list; obj != 0; obj = obj->next) {
+        if (obj->item_type != ITEM_FURNITURE)
+            continue;
+        if (!IS_SET(obj->value1(), TOTEM))
+            continue;
+        if (!obj->hasOwner(target))
+            continue;
+        
+        rc->push_back(WrapperManager::getThis( )->getWrapper(obj));
+    }
+
+    return wrap(rc);
+}
+
 NMI_INVOKE(CharacterWrapper, list_obj_world, "(arg): поиск по миру видимых персонажу предметов с уровнем не выше персонажа" )
 {
     checkTarget();

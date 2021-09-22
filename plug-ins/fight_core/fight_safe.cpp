@@ -98,6 +98,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
     if (victim->is_npc() && IS_SET(victim->act, ACT_SAFE))
         return true;
 
+    // recurrent victim pet to master
     if ( victim->is_npc()
         && IS_CHARMED(victim)
         && !victim->master->is_npc() )
@@ -105,7 +106,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
         return is_safe_nomessage(ch,victim->master);
     }
 
-    // recurent for attacker pet master
+    // recurrent for attacker pet master
     if ( ch->is_npc()
         && IS_CHARMED(ch)
         && !ch->master->is_npc() )
