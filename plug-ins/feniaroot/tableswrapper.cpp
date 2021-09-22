@@ -20,6 +20,7 @@ using namespace Scripting;
 static IdRef ID_API("api");
 static IdRef ID_VALUE("value");
 static IdRef ID_VALUES("values");
+static IdRef ID_TABNAME("tabname");
 static IdRef ID_NAME("name");
 static IdRef ID_NAMES("names");
 static IdRef ID_MESSAGE("message");
@@ -55,10 +56,13 @@ TableWrapper::resolveTab()
 Register 
 TableWrapper::getField(const Register &key)
 {
-    const DLString &flag = Lex::getThis()->getName(key.toIdentifier());
-
     resolveTab();
 
+    if ((key == ID_TABNAME).toBoolean()) {
+        return FlagTableRegistry::getName(table);
+    }
+
+    const DLString &flag = Lex::getThis()->getName(key.toIdentifier());
     int rc;
     
     if (table->enumerated)
