@@ -1977,7 +1977,7 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднят�
     return true;
 }
 
-NMI_INVOKE(CharacterWrapper, list_totem_world, "(): поиск по миру тотемов, созданных персонажем" )
+NMI_INVOKE(CharacterWrapper, totems, "(): список всех тотемов, созданных персонажем" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
@@ -1985,7 +1985,7 @@ NMI_INVOKE(CharacterWrapper, list_totem_world, "(): поиск по миру т�
     for (::Object *obj = object_list; obj != 0; obj = obj->next) {
         if (obj->item_type != ITEM_FURNITURE)
             continue;
-        if (!IS_SET(obj->value1(), TOTEM))
+        if (!IS_SET(obj->value2(), TOTEM))
             continue;
         if (!obj->hasOwner(target))
             continue;
