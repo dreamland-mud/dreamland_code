@@ -133,4 +133,7 @@ bool eyes_darkened( Character *ch );
                             && IS_SET(obj->value1(), CONT_PIT))
 
 #define IS_CHARMED(ch)  (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL)
+
+#define IS_MOB_VAMPIRE(ch) ((ch)->is_npc( ) && IS_SET((ch)->act, ACT_VAMPIRE))
+
 #endif
