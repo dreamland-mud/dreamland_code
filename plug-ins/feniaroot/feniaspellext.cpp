@@ -210,6 +210,8 @@ NMI_INVOKE(FeniaSpellContext, groupCast, "(func): вызвать ф-ию для 
     RegisterList funArgs;
     funArgs.assign(ai, args.end( ));
 
+    Register thiz = Register(self);
+
     for (auto &rch: caster->in_room->getPeople()) {
         if (rch->in_room != caster->in_room)
             continue;
