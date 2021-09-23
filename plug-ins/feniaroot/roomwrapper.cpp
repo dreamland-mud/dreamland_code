@@ -936,3 +936,17 @@ NMI_INVOKE( RoomWrapper, affectReplace, "(.Affect): удалить все афф
     return Register( );
 }
 
+NMI_INVOKE( RoomWrapper, affectFind, "(skill,ch): найти аффект с данным именем и владельцем-персонажем" )
+{
+    Skill *skill = argnum2skill(args, 1);
+    Character *owner = argnum2character(args, 2);
+    
+    checkTarget();
+
+    for (auto &paf: target->affected) 
+        if (paf->type.getElement() == skill && paf->sources.getOwner() == owner)
+            return AffectWrapper::wrap(*paf);
+
+    return Register();
+}
+
