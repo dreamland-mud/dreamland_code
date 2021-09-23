@@ -243,6 +243,8 @@ NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для
     RegisterList funArgs;
     funArgs.assign(ai, args.end( ));
 
+    Register thiz = Register(self);
+
     for (auto &vch: caster->in_room->getPeople()) {
         if (vch->isDead())
             continue;
@@ -282,6 +284,8 @@ NMI_INVOKE(FeniaSpellContext, damageItems, "(func): вызвать ф-ию дл�
     Closure *fun = rfun.toFunction( );
     RegisterList funArgs;
     funArgs.assign(ai, args.end( ));
+
+    Register thiz = Register(self);
 
     list<::Object *> items;
     for (::Object *item = myVict->carrying; item != 0; item = item->next_content)  
