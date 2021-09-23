@@ -709,6 +709,10 @@ NMI_GET( ClanWrapper, color, "буква цвета" )
 {
     return clanManager->find( name )->getColor( );
 }
+NMI_GET( ClanWrapper, dispersed, "true для разрозненных кланов (одиночки,изгои,внеклановые)" ) 
+{
+    return clanManager->find(name)->isDispersed();
+}
 
 static const char *diplomacy_names [] = {
     "alliance",
