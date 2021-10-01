@@ -13,7 +13,6 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "wearloc_utils.h"
-#include "drink_commands.h"
 #include "weapons.h"
 #include "occupations.h"
 #include "mercdb.h"
@@ -30,6 +29,8 @@
 #include "nativeext.h"
 #include "wrap_utils.h"
 #include "subr.h"
+
+#include "drinkcontainer.h"
 
 #include "material.h"
 #include "damageflags.h"
