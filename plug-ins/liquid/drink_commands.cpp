@@ -199,10 +199,11 @@ static void pour_out( Character *ch, Object * out )
 {
     int amount;
     Room *room = ch->in_room;
-
+	
+	// Tai: updating this to include the destruction of items, not just manual pour out
+	
     if (out->value1() == 0) {
-        oldact("Ты переворачиваешь $o4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
-        oldact("Приговаривая 'ну котеночек, ну еще капельку', $c1 переворачивает и трясет $o5.", ch, out, 0, TO_ROOM );
+		room->echo("Из %O4 не выливается ни капли.", out);
         return;
     }
     
@@ -217,22 +218,14 @@ static void pour_out( Character *ch, Object * out )
     if (oprog_empty(out, ch, liqname, amount))
 	return;
 
-    if (RoomUtils::isWater( room )) {
-        ch->pecho( "Ты переворачиваешь %O4, выливая %N4 в %N4.", out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
-        ch->recho( "%^C1 переворачивает %O4, выливая %N4 в %N4.", ch, out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
-    }
-    else if (room->getSectorType() == SECT_AIR) {
-        oldact("Ты переворачиваешь $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_CHAR );
-        oldact("$c1 переворачивает $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_ROOM );
-    }
-    else if (room->getSectorType() == SECT_DESERT) {
-        oldact("Ты переворачиваешь $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_CHAR );
-        oldact("$c1 переворачивает $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_ROOM );
-        oldact("Лужа $n2 с шипением испаряется.", ch, liqShort.c_str( ), 0, TO_ALL );
-    }
+    if (RoomUtils::isWater( room ))
+		room->echo("Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str( ), out, room->pIndexData->liquid->getShortDescr( ).c_str( ));
+    else if (room->getSectorType() == SECT_AIR)
+		room->echo("Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str( ), out); // TO-DO: move to non-air room downwards		
+    else if (room->getSectorType() == SECT_DESERT)
+		room->echo("Лужа %N2 из %O2 с шипением испаряется на песке.", liqShort.c_str( ), out);
     else {
-        oldact("Ты переворачиваешь $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_CHAR );
-        oldact("$c1 переворачивает $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_ROOM );
+        room->echo("Поток %N2 из %O2 проливается на землю.", liqShort.c_str( ), out);
         create_pool( ch, out, amount );
     }
 
