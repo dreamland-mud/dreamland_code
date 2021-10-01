@@ -667,6 +667,11 @@ NMI_GET( MaterialWrapper, burns, "сколько тиков горит (-1 ес�
     return Register( material_burns( names.c_str() ) );
 }
 
+NMI_GET( MaterialWrapper, indestructible, "среди материалов есть неуничтожимый (dragonskin, platinum)" )
+{
+    return Register( material_is_flagged(names.c_str(), MAT_INDESTR) );
+}
+
 
 /*----------------------------------------------------------------------
  * Clan
