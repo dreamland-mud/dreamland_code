@@ -147,17 +147,16 @@ static bool oprog_empty( Object *obj, Character *ch, const char *liqname, int am
     return false;
 }
 
+// TO-DO: remove *ch from here
 static void create_pool( Character *ch, Object *out, int amount ) 
 {
     Object *pool;
     int time;
     DLString liqShort;
-    Room *room = ch->in_room;
+    Room *room = out->getRoom();
 
-    time = amount / 15;
-    
-    if (time == 0) 
-        return;
+    time = amount / 15;    
+    if (time == 0) return;
 
     liqShort = liquidManager->find( out->value2() )->getShortDescr( );
     time = std::max( 2, time );
@@ -165,22 +164,20 @@ static void create_pool( Character *ch, Object *out, int amount )
     
     if (pool) {
         /* mix two liquids */
-        if (liqShort.ruscase( '1' ) != pool->getMaterial( )) {
+        if (liqShort.ruscase( '1' ) != pool->getMaterial( ))
             liqShort = "бурд|а|ы|е|у|ой|е";
-        } 
         else { /* same liquid */ 
             pool->timer += time;
             pool->value0(max( 1, pool->timer / 10 ));
-            oldact("Лужа $n2 растекается еще шире.", ch, liqShort.c_str( ), 0, TO_ALL );
+			room->echo("Лужа %N2 растекается еще шире.", liqShort.c_str( ));
             save_items(room);
             return;
         }
     }
-    else /* new pool */ {
-        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
-    }        
+    else /* new pool */
+        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);     
     
-    oldact("На земле образуется лужа $n2.", ch, liqShort.c_str( ), 0, TO_ALL );
+	room->echo("На земле образуется лужа %N2.", liqShort.c_str( ));
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
@@ -189,16 +186,15 @@ static void create_pool( Character *ch, Object *out, int amount )
     pool->timer += time;
     pool->value0(max( 1, pool->timer / 10 ));
 
-    if (!pool->in_room)
-        obj_to_room(pool, room);
-    else
-        save_items(room);
+    if (!pool->in_room) obj_to_room(pool, room);
+    else save_items(room);
 }
 
+// TO-DO: remove *ch from here
 static void pour_out( Character *ch, Object * out )
 {
     int amount;
-    Room *room = ch->in_room;
+    Room *room = out->getRoom();
 	
 	// Tai: updating this to include the destruction of items, not just manual pour out
 	
