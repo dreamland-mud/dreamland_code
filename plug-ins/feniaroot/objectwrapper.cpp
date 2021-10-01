@@ -619,12 +619,16 @@ NMI_INVOKE( ObjectWrapper, remove, "([verbose]): снимает предмет, 
     return target->wear_loc->remove(target, flags);
 }
 
-NMI_INVOKE( ObjectWrapper, pourOut, "(): вылить жидкость из контейнера, создав лужу" )
+NMI_INVOKE( ObjectWrapper, pour_out, "(): вылить жидкость из контейнера, создав лужу" )
 {
     checkTarget( );
+    
     if (target->item_type != ITEM_DRINK_CON)
         throw Scripting::Exception("Item is not a drink container."); 
-    //pour_out(ch, target);
+
+    Character *ch = target->carried_by;
+    
+    pour_out(ch, target);
     return Register( );
 }
 
