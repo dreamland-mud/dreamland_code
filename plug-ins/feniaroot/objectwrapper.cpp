@@ -31,6 +31,7 @@
 #include "subr.h"
 
 #include "drinkcontainer.h"
+#include "drink_utils.h"
 
 #include "material.h"
 #include "damageflags.h"
