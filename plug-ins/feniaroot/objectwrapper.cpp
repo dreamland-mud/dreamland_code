@@ -13,6 +13,7 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "wearloc_utils.h"
+#include "drink_commands.h"
 #include "weapons.h"
 #include "occupations.h"
 #include "mercdb.h"
@@ -617,7 +618,14 @@ NMI_INVOKE( ObjectWrapper, remove, "([verbose]): снимает предмет, 
     return target->wear_loc->remove(target, flags);
 }
 
-
+NMI_INVOKE( ObjectWrapper, pourOut, "(): вылить жидкость из контейнера, создав лужу" )
+{
+    checkTarget( );
+    if (target->item_type != ITEM_DRINK_CON)
+        throw Scripting::Exception("Item is not a drink container."); 
+    //pour_out(ch, target);
+    return Register( );
+}
 
 
 /*-----------------------------------------------------------------------*/
