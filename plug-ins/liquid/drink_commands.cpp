@@ -191,7 +191,7 @@ static void create_pool( Character *ch, Object *out, int amount )
 }
 
 // TO-DO: remove *ch from here
-static void pour_out( Character *ch, Object * out )
+void pour_out( Character *ch, Object * out )
 {
     int amount;
     Room *room = out->getRoom();
