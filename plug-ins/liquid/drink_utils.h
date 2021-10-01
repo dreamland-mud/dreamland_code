@@ -9,5 +9,6 @@ class Object;
 class Character;
 
 bool drink_is_closed( Object *obj, Character *ch );
+void pour_out( Character *ch, Object *obj );
 
 #endif
