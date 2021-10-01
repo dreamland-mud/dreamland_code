@@ -169,7 +169,7 @@ static void create_pool( Character *ch, Object *out, int amount )
         else { /* same liquid */ 
             pool->timer += time;
             pool->value0(max( 1, pool->timer / 10 ));
-			room->echo( POS_RESTING, fmt("Лужа %N2 растекается еще шире.", liqShort.c_str( )) );
+			room->echo( POS_RESTING, fmt(0, "Лужа %N2 растекается еще шире.", liqShort.c_str( )) );
             save_items(room);
             return;
         }
@@ -177,7 +177,7 @@ static void create_pool( Character *ch, Object *out, int amount )
     else /* new pool */
         pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);     
     
-	room->echo( POS_RESTING, fmt("На земле образуется лужа %N2.", liqShort.c_str( )) );
+	room->echo( POS_RESTING, fmt(0, "На земле образуется лужа %N2.", liqShort.c_str( )) );
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
@@ -199,7 +199,7 @@ static void pour_out( Character *ch, Object * out )
 	// Tai: updating this to include the destruction of items, not just manual pour out
 	
     if (out->value1() == 0) {
-		room->echo( POS_RESTING, fmt("Из %O4 не выливается ни капли.", out) );
+		room->echo( POS_RESTING, fmt(0, "Из %O4 не выливается ни капли.", out) );
         return;
     }
     
@@ -215,13 +215,13 @@ static void pour_out( Character *ch, Object * out )
 	return;
 
     if (RoomUtils::isWater( room ))
-		room->echo( POS_RESTING, fmt("Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str( ), out, room->pIndexData->liquid->getShortDescr( ).c_str( )) );
+		room->echo( POS_RESTING, fmt(0, "Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str( ), out, room->pIndexData->liquid->getShortDescr( ).c_str( )) );
     else if (room->getSectorType() == SECT_AIR)
-		room->echo( POS_RESTING, fmt("Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str( ), out) ); // TO-DO: move to non-air room downwards		
+		room->echo( POS_RESTING, fmt(0, "Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str( ), out) ); // TO-DO: move to non-air room downwards		
     else if (room->getSectorType() == SECT_DESERT)
-		room->echo( POS_RESTING, fmt("Лужа %N2 из %O2 с шипением испаряется на песке.", liqShort.c_str( ), out) );
+		room->echo( POS_RESTING, fmt(0, "Лужа %N2 из %O2 с шипением испаряется на песке.", liqShort.c_str( ), out) );
     else {
-        room->echo( POS_RESTING, fmt("Поток %N2 из %O2 проливается на землю.", liqShort.c_str( ), out) );
+        room->echo( POS_RESTING, fmt(0, "Поток %N2 из %O2 проливается на землю.", liqShort.c_str( ), out) );
         create_pool( ch, out, amount );
     }
 
