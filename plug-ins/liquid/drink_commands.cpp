@@ -244,7 +244,7 @@ static void mprog_pour_out( Character *victim, Character *ch, Object *out, const
     FENIA_NDX_VOID_CALL( victim->getNPC( ), "PourOut", "CCOsi", victim, ch, out, liqname, amount );
 }
 
-static void pour_out( Character *ch, Object * out, Character *victim )
+void pour_out( Character *ch, Object * out, Character *victim )
 {
     Liquid *liquid;
     int sips, amount;
