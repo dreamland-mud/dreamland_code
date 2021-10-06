@@ -625,9 +625,7 @@ NMI_INVOKE( ObjectWrapper, pour_out, "(): вылить жидкость из к�
     if (target->item_type != ITEM_DRINK_CON)
         throw Scripting::Exception("Item is not a drink container."); 
 
-    Character *ch = target->carried_by;
-    
-    pour_out(ch, target);
+    pour_out(target);
     return Register( );
 }
 

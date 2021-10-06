@@ -147,8 +147,7 @@ static bool oprog_empty( Object *obj, Character *ch, const char *liqname, int am
     return false;
 }
 
-// TO-DO: remove *ch from here
-static void create_pool( Character *ch, Object *out, int amount ) 
+static void create_pool( Object *out, int amount ) 
 {
     Object *pool;
     int time;
@@ -190,42 +189,48 @@ static void create_pool( Character *ch, Object *out, int amount )
     else save_items(room);
 }
 
-void pour_out( Object * out )
+void pour_out(Object *out)
 {
     int amount;
     Room *room = out->getRoom();
-	
-	// Tai: updating this to include the destruction of items, not just manual pour out
-	
+
+    // Tai: updating this to include the destruction of items, not just manual pour out
+
     if (out->value1() == 0) {
-		room->echo( POS_RESTING, "%1$^O1 ярко вспыхива%1$nет|ют и испаря%1$nется|ются.", out );
+        room->echo(POS_RESTING, "%1$^O1 ярко вспыхива%1$nет|ют и испаря%1$nется|ются.", out);
         return;
     }
-    
+
     amount = out->value1();
     out->value1(0);
     out->value3(0);
-   
-    Liquid *liq =  liquidManager->find( out->value2() );
-    const char *liqname = liq->getName( ).c_str( );
-    DLString liqShort = liq->getShortDescr( );
 
-    if (oprog_empty(out, ch, liqname, amount))
-	return;
+    Liquid *liq = liquidManager->find(out->value2());
+    const char *liqname = liq->getName().c_str();
+    DLString liqShort = liq->getShortDescr();
+    Character *ch = out->carried_by;
 
-    if (RoomUtils::isWater( room ))
-		room->echo( POS_RESTING, "Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str( ), out, room->pIndexData->liquid->getShortDescr( ).c_str( ) );
-    else if (room->getSectorType() == SECT_AIR)
-		room->echo( POS_RESTING, "Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str( ), out ); // TO-DO: move to non-air room downwards		
-    else if (room->getSectorType() == SECT_DESERT)
-		room->echo( POS_RESTING, "Лужа %N2 из %O2 с шипением испаряется на песке.", liqShort.c_str( ), out );
-    else {
-        room->echo( POS_RESTING, "Поток %N2 из %O2 проливается на землю.", liqShort.c_str( ), out );
-        create_pool( ch, out, amount );
+    if (ch && oprog_empty(out, ch, liqname, amount))
+        return;
+
+    if (ch) {
+        ch->pecho("Ты переворачиваешь %O4.", out);
+        ch->recho("%^C1 переворачивает %O4.", ch, out);
     }
 
-    if (out->behavior && out->behavior.getDynamicPointer<DrinkContainer>( ))
-        out->behavior.getDynamicPointer<DrinkContainer>( )->pourOut( ch, amount );
+    if (RoomUtils::isWater(room))
+        room->echo(POS_RESTING, "Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str(), out, room->pIndexData->liquid->getShortDescr().c_str());
+    else if (room->getSectorType() == SECT_AIR)
+        room->echo(POS_RESTING, "Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str(), out); // TO-DO: move to non-air room downwards
+    else if (room->getSectorType() == SECT_DESERT)
+        room->echo(POS_RESTING, "Лужа %N2 из %O2 с шипением испаряется на песке.", liqShort.c_str(), out);
+    else {
+        room->echo(POS_RESTING, "Поток %N2 из %O2 проливается на землю.", liqShort.c_str(), out);
+        create_pool(out, amount);
+    }
+
+    if (ch && out->behavior && out->behavior.getDynamicPointer<DrinkContainer>())
+        out->behavior.getDynamicPointer<DrinkContainer>()->pourOut(ch, amount);
 }
 
 static void oprog_pour_out( Object *obj, Character *ch, Object *out, const char *liqname, int amount )
@@ -457,7 +462,7 @@ CMDRUN( pourout )
         return;
     
     if (arg2.empty( )) {
-        pour_out( ch, out );
+        pour_out( out );
         return;
     }
 
@@ -515,7 +520,7 @@ CMDRUN( pour )
             pour_out( ch, out, vch );
         }
         else
-            pour_out( ch, out );
+            pour_out( out );
 
         return;
     }
