@@ -147,17 +147,15 @@ static bool oprog_empty( Object *obj, Character *ch, const char *liqname, int am
     return false;
 }
 
-static void create_pool( Character *ch, Object *out, int amount ) 
+static void create_pool( Object *out, int amount ) 
 {
     Object *pool;
     int time;
     DLString liqShort;
-    Room *room = ch->in_room;
+    Room *room = out->getRoom();
 
-    time = amount / 15;
-    
-    if (time == 0) 
-        return;
+    time = amount / 15;    
+    if (time == 0) return;
 
     liqShort = liquidManager->find( out->value2() )->getShortDescr( );
     time = std::max( 2, time );
@@ -165,22 +163,20 @@ static void create_pool( Character *ch, Object *out, int amount )
     
     if (pool) {
         /* mix two liquids */
-        if (liqShort.ruscase( '1' ) != pool->getMaterial( )) {
+        if (liqShort.ruscase( '1' ) != pool->getMaterial( ))
             liqShort = "бурд|а|ы|е|у|ой|е";
-        } 
         else { /* same liquid */ 
             pool->timer += time;
             pool->value0(max( 1, pool->timer / 10 ));
-            oldact("Лужа $n2 растекается еще шире.", ch, liqShort.c_str( ), 0, TO_ALL );
+			room->echo( POS_RESTING, "Лужа %N2 растекается еще шире.", liqShort.c_str( ) );
             save_items(room);
             return;
         }
     }
-    else /* new pool */ {
-        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
-    }        
+    else /* new pool */
+        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);     
     
-    oldact("На земле образуется лужа $n2.", ch, liqShort.c_str( ), 0, TO_ALL );
+	room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
@@ -189,55 +185,52 @@ static void create_pool( Character *ch, Object *out, int amount )
     pool->timer += time;
     pool->value0(max( 1, pool->timer / 10 ));
 
-    if (!pool->in_room)
-        obj_to_room(pool, room);
-    else
-        save_items(room);
+    if (!pool->in_room) obj_to_room(pool, room);
+    else save_items(room);
 }
 
-static void pour_out( Character *ch, Object * out )
+void pour_out(Object *out)
 {
     int amount;
-    Room *room = ch->in_room;
+    Room *room = out->getRoom();
+
+    // Tai: updating this to include the destruction of items, not just manual pour out
 
     if (out->value1() == 0) {
-        oldact("Ты переворачиваешь $o4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
-        oldact("Приговаривая 'ну котеночек, ну еще капельку', $c1 переворачивает и трясет $o5.", ch, out, 0, TO_ROOM );
+        room->echo(POS_RESTING, "%1$^O1 ярко вспыхива%1$nет|ют и испаря%1$nется|ются.", out);
         return;
     }
-    
+
     amount = out->value1();
     out->value1(0);
     out->value3(0);
-   
-    Liquid *liq =  liquidManager->find( out->value2() );
-    const char *liqname = liq->getName( ).c_str( );
-    DLString liqShort = liq->getShortDescr( );
 
-    if (oprog_empty(out, ch, liqname, amount))
-	return;
+    Liquid *liq = liquidManager->find(out->value2());
+    const char *liqname = liq->getName().c_str();
+    DLString liqShort = liq->getShortDescr();
+    Character *ch = out->carried_by;
 
-    if (RoomUtils::isWater( room )) {
-        ch->pecho( "Ты переворачиваешь %O4, выливая %N4 в %N4.", out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
-        ch->recho( "%^C1 переворачивает %O4, выливая %N4 в %N4.", ch, out, liqShort.c_str( ), room->pIndexData->liquid->getShortDescr( ).c_str( ) );
+    if (ch && oprog_empty(out, ch, liqname, amount))
+        return;
+
+    if (ch) {
+        ch->pecho("Ты переворачиваешь %O4.", out);
+        ch->recho("%^C1 переворачивает %O4.", ch, out);
     }
-    else if (room->getSectorType() == SECT_AIR) {
-        oldact("Ты переворачиваешь $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_CHAR );
-        oldact("$c1 переворачивает $o4, и струя $N2 устремляется вниз.", ch, out, liqShort.c_str( ), TO_ROOM );
-    }
-    else if (room->getSectorType() == SECT_DESERT) {
-        oldact("Ты переворачиваешь $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_CHAR );
-        oldact("$c1 переворачивает $o4, выливая $N4 на песок.", ch, out, liqShort.c_str( ), TO_ROOM );
-        oldact("Лужа $n2 с шипением испаряется.", ch, liqShort.c_str( ), 0, TO_ALL );
-    }
+
+    if (RoomUtils::isWater(room))
+        room->echo(POS_RESTING, "Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str(), out, room->pIndexData->liquid->getShortDescr().c_str());
+    else if (room->getSectorType() == SECT_AIR)
+        room->echo(POS_RESTING, "Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str(), out); // TO-DO: move to non-air room downwards
+    else if (room->getSectorType() == SECT_DESERT)
+        room->echo(POS_RESTING, "Лужа %N2 из %O2 с шипением испаряется на песке.", liqShort.c_str(), out);
     else {
-        oldact("Ты переворачиваешь $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_CHAR );
-        oldact("$c1 переворачивает $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_ROOM );
-        create_pool( ch, out, amount );
+        room->echo(POS_RESTING, "Поток %N2 из %O2 проливается на землю.", liqShort.c_str(), out);
+        create_pool(out, amount);
     }
 
-    if (out->behavior && out->behavior.getDynamicPointer<DrinkContainer>( ))
-        out->behavior.getDynamicPointer<DrinkContainer>( )->pourOut( ch, amount );
+    if (ch && out->behavior && out->behavior.getDynamicPointer<DrinkContainer>())
+        out->behavior.getDynamicPointer<DrinkContainer>()->pourOut(ch, amount);
 }
 
 static void oprog_pour_out( Object *obj, Character *ch, Object *out, const char *liqname, int amount )
@@ -255,7 +248,7 @@ static void mprog_pour_out( Character *victim, Character *ch, Object *out, const
     FENIA_NDX_VOID_CALL( victim->getNPC( ), "PourOut", "CCOsi", victim, ch, out, liqname, amount );
 }
 
-static void pour_out( Character *ch, Object * out, Character *victim )
+void pour_out( Character *ch, Object * out, Character *victim )
 {
     Liquid *liquid;
     int sips, amount;
@@ -469,7 +462,7 @@ CMDRUN( pourout )
         return;
     
     if (arg2.empty( )) {
-        pour_out( ch, out );
+        pour_out( out );
         return;
     }
 
@@ -527,7 +520,7 @@ CMDRUN( pour )
             pour_out( ch, out, vch );
         }
         else
-            pour_out( ch, out );
+            pour_out( out );
 
         return;
     }

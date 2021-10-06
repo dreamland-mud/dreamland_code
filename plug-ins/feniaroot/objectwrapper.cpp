@@ -30,6 +30,7 @@
 #include "wrap_utils.h"
 #include "subr.h"
 
+#include "drink_utils.h"
 #include "material.h"
 #include "damageflags.h"
 #include "def.h"
@@ -617,7 +618,16 @@ NMI_INVOKE( ObjectWrapper, remove, "([verbose]): снимает предмет, 
     return target->wear_loc->remove(target, flags);
 }
 
+NMI_INVOKE( ObjectWrapper, pour_out, "(): вылить жидкость из контейнера, создав лужу" )
+{
+    checkTarget( );
+    
+    if (target->item_type != ITEM_DRINK_CON)
+        throw Scripting::Exception("Item is not a drink container."); 
 
+    pour_out(target);
+    return Register( );
+}
 
 
 /*-----------------------------------------------------------------------*/
