@@ -1293,6 +1293,72 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier): применить rand_all 
     return Register();
 }
 
+NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]): выставить статы для weapon или улучшить в бою")
+{
+    ::Object *weapon = argnum2item(args, 1);
+    Character *ch = argnum2character(args, 2);
+	Skill *skill = argnum2skill(args, 3);
+    int tier = argnum2number(args, 4);
+	int hr_tier, dr_tier;
+	hr_tier = dr_tier = tier;
+	float penalty = args.size() > 4 ? argnum2number(args, 5) / 100 : 1; // must be specified in %
+	bool increment = args.size() > 5 ? argnum2boolean(args, 6) : false;
+
+    if (weapon->item_type != ITEM_WEAPON)
+        throw Scripting::Exception("Item is not a weapon for generation.");
+    if (tier < BEST_TIER || tier > WORST_TIER)
+        throw Scripting::Exception("Invalid weapon tier.");
+	
+	if (IS_GOOD(ch)) {
+		hr_tier = min(BEST_TIER, hr_tier + 1);
+		dr_tier = max(WORST_TIER, dr_tier - 1);
+	}
+	if (IS_EVIL(ch)) {
+		dr_tier = min(BEST_TIER, dr_tier + 1);
+		hr_tier = max(WORST_TIER, hr_tier - 1);
+	}
+	
+	if (!increment) {
+		if (penalty < 1) {
+    		WeaponGenerator()
+        		.item(weapon)
+        		.skill(skill->getIndex())
+        		.valueTier(tier)
+        		.hitrollTier(hr_tier)
+        		.damrollTier(dr_tier)
+        		.hitrollMinStartValue(1)
+        		.damrollMinStartValue(1)
+        		.hitrollStartPenalty(penalty)
+        		.damrollStartPenalty(penalty)
+        		.assignValues()
+        		.assignStartingHitroll()
+        		.assignStartingDamroll();	
+		}
+		else {
+    		WeaponGenerator()
+        		.item(weapon)
+        		.skill(skill->getIndex())
+        		.valueTier(tier)
+        		.hitrollTier(hr_tier)
+        		.damrollTier(dr_tier)
+        		.assignValues()
+        		.assignHitroll()
+        		.assignDamroll();			
+		}
+	}
+	else {
+    	WeaponGenerator()
+        	.item(weapon)
+        	.skill(skill->getIndex())
+        	.hitrollTier(hr_tier)
+        	.damrollTier(dr_tier)
+        	.incrementHitroll()
+        	.incrementDamroll();		
+	}
+        
+    return Register();
+}
+
 NMI_INVOKE(Root, interpolate, "(x, x1, x2, y1, y2): линейно интерполировать значение Y в промежутке от Y1 до Y2, для данной координаты X из промежутка X1, X2")
 {
     int  x = argnum2number(args, 1);
