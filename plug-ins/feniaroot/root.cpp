@@ -1304,9 +1304,9 @@ NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]
 	float penalty = args.size() > 4 ? argnum2number(args, 5) / 100 : 1; // must be specified in %
 	bool increment = args.size() > 5 ? argnum2boolean(args, 6) : false;
 
-    if (obj->item_type != ITEM_WEAPON)
+    if (weapon->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for generation.");
-    if (bestTier < BEST_TIER || bestTier > WORST_TIER)
+    if (tier < BEST_TIER || tier > WORST_TIER)
         throw Scripting::Exception("Invalid weapon tier.");
 	
 	if (IS_GOOD(ch)) {
