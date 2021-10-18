@@ -89,7 +89,11 @@ DLString FlagTable::messages( bitstring_t bits, bool comma, char gcase ) const
             if (!buf.empty( ))
                 buf << (comma ? ", " : " ");
 
-            buf << DLString( fields[reverse[i]].message ).ruscase( gcase );
+            const char *msg = fields[reverse[i]].message;
+            if (!msg)
+                msg = fields[reverse[i]].name;
+
+            buf << DLString(msg).ruscase( gcase );
         }
 
     return buf;

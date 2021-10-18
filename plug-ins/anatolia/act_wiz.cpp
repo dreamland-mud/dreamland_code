@@ -778,8 +778,10 @@ static void format_affect(Affect *paf, ostringstream &buf)
             buf << "уязвимость к ";
         else if (table == &detect_flags)
             buf << "обнаружение ";
-        else if (table == &raffect_flags)
+        else if (table == &room_flags)
             buf << "флаги комнаты ";
+        else if (table == &raffect_flags)
+            buf << "аффект комнаты ";
         else if (table == &weapon_type2)
             buf << "флаги оружия ";
         else if (table == &extra_flags)
@@ -789,7 +791,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         else if (table == &form_flags)
             buf << "форму тела ";
         else
-            buf << "не пойми что";
+            buf << "не пойми что ";
 
         buf << table->messages(b);
 
