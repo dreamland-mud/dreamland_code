@@ -40,7 +40,8 @@ struct NodeTrace {
         top = this;
     }
     ~NodeTrace() {
-        Context::current->nodeTrace = parent;
+        if (Context::current)
+            Context::current->nodeTrace = parent;
     }
     
     Node *node;
