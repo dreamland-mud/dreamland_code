@@ -126,7 +126,7 @@ void Pet::config( PCharacter *client, NPCharacter *pet ) const
     
     pet->setDescription( dlprintf( 
              "%s\r\nТы понимаешь, что %s будет защищать и следовать за {C%s{x до самой смерти.\n\r",     
-             pet->getNPC( )->pIndexData->description.c_str( ), 
+             pet->getNPC( )->pIndexData->description, 
              pet->getNameP( '1' ).c_str( ), client->getNameP( '5' ).c_str( ) ) );
 }
 
