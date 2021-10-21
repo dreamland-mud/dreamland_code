@@ -1008,16 +1008,16 @@ NMI_GET( ReligionWrapper, races, "разрешенные расы или пус�
     return Register(getTarget()->races.toString());
 }
 
-NMI_GET( ReligionWrapper, minstat, "по каким параметрам ограничено сверху" ) 
+NMI_GET( ReligionWrapper, minstat, "список параметров, по которым ограничено сверху" ) 
 {
-    Bitstring stats;
     DefaultReligion *target = getTarget();
+    RegList::Pointer list(NEW);
 
     for (int i = 0; i < stat_table.size; i++)
         if (target->minstat[i] != 0)
-            stats.setBitNumber(i);
+            list->push_back(Register(stat_table.name(i)));
 
-    return Register((int)stats); 
+    return wrap(list);
 }
 
 NMI_INVOKE( ReligionWrapper, available, "(ch): НОВАЯ ЛОГИКА - доступна ли религия персонажу")
