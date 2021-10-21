@@ -412,14 +412,21 @@ void Language::doForget( PCharacter *ch, const DLString &arg ) const
         return;
     }
 
+    if (!attr && !attrHints) {
+        ch->pecho("Ты не знаешь никаких слов.");
+        return;
+    }
+
     if (arg_is_all(arg)) {
         // Clear all hints pertaining to the dreamed words.
-        if (attrHints) {
+        if (attrHints && attr) {
             for (XMLAttributeLanguage::Words::iterator w = attr->getWords( ).begin( ); w != attr->getWords( ).end( ); w++)
                 attrHints->removeWord( w->first );
         }
 
-        attr->getWords( ).clear( );
+        if (attr)
+            attr->getWords( ).clear( );
+
         ch->pecho( "Все приснившиеся тебе слова ускользают из твоей памяти." );
         return;
     }
@@ -433,7 +440,7 @@ void Language::doForget( PCharacter *ch, const DLString &arg ) const
     }
 
     // Find and forget a word among the rewards or overheard ones.
-    if (attrHints->hasWord(arg)) {
+    if (attrHints && attrHints->hasWord(arg)) {
         attrHints->removeWord(arg);
         ch->pecho("Ты забываешь слово %s.", arg.c_str());
         return;
