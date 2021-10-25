@@ -1301,7 +1301,7 @@ NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]
     int tier = argnum2number(args, 4);
 	int hr_tier, dr_tier;
 	hr_tier = dr_tier = tier;
-	float penalty = args.size() > 4 ? argnum2number(args, 5) / 100 : 1; // must be specified in %
+	float penalty = args.size() > 4 ? argnum2number(args, 5) / 100.0 : 1; // must be specified in %
 	bool increment = args.size() > 5 ? argnum2boolean(args, 6) : false;
 
     if (weapon->item_type != ITEM_WEAPON)
