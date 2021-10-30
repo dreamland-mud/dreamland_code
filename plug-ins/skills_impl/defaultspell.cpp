@@ -461,7 +461,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         
         if (target.isSet( TAR_CHAR_SELF )) {
             if (!is_self_name( arg, ch )) {
-                buf << "Ты не можешь использовать это заклинание на других.";
+                buf << "Это заклинание нельзя использовать на других.";
                 result->error = TARGET_ERR_NOT_ON_OTHERS;
                 return result;
             }
@@ -479,7 +479,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
     if (target.isSet( TAR_CHAR_WORLD )) {
         if (arg.empty( )) {
-            buf << "Колдовать на кого?";
+            buf << "Для этого заклинания нужно указать имя персонажа в качестве цели.";
             result->error = TARGET_ERR_CAST_ON_WHOM;
             return result;
         }
@@ -497,7 +497,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return objresult;
         
         buf.str( "" );
-        buf << "Ты не находишь никого с таким именем.";
+        buf << "Увы, никого с таким именем обнаружить не удается.";
         result->error = TARGET_ERR_CHAR_NOT_FOUND;
         return result;
     }
@@ -509,7 +509,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                 return objresult;
 
             buf.str( "" );
-            buf << "Ты не можешь использовать это заклинание на других.";
+            buf << "Это заклинание нельзя использовать на других.";
             result->error = TARGET_ERR_NOT_ON_OTHERS;
             return result;
         }
@@ -544,7 +544,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                     if (victim->is_npc() && IS_SET(victim->act,ACT_NOTRACK )
                         && victim->in_room != ch->in_room )
                     {
-                        buf << "Твое заклинание не действует на "
+                        buf << "Это заклинание не подействует на "
                             << victim->getNameP( '4' ) << " на таком расстоянии.";
                         result->error = TARGET_ERR_TOO_FAR;
                         return result;
@@ -576,7 +576,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return objresult;
             
         buf.str( "" );
-        buf << "На кого именно ты хочешь произнести заклинание?";
+        buf << "Для этого заклинания нужно указать имя персонажа в качестве цели.";
         result->error = TARGET_ERR_CAST_ON_WHOM;
         return result;
     }
@@ -595,7 +595,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         if (!arg.empty( )) {
             if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
                 buf.str("");
-                buf << "Кого именно ты хочешь призвать?";
+                buf << "Увы, никого с таким именем перепризвать не удается.";
                 result->error = TARGET_ERR_SUMMON_WHO; 
                 return result;
             }
@@ -612,7 +612,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     }
     
     if (buf.str( ).empty( ))
-        buf << "На кого именно ты хочешь произнести заклинание?";
+        buf << "Для этого заклинания нужно указать цель.";
 
     result->error = TARGET_ERR_CAST_ON_WHOM;
 
@@ -639,7 +639,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         obj = NULL;
 
         if (arg.empty( )) {
-            buf << "На какой предмет ты хочешь произнести заклинание?";
+            buf << "Для этого заклинания нужно выбрать предмет в качестве цели.";
             result->error = TARGET_ERR_CAST_ON_WHAT;
             return result;
         }
@@ -662,11 +662,11 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         }
 
         if (target.isSet( TAR_OBJ_INV|TAR_OBJ_EQUIP ))
-            buf << "У тебя нет этого.";
+            buf << "Увы, в инвентаре или экипировке такого предмета найти не удается.";
         else if (target.isSet( TAR_OBJ_ROOM ))
-            buf << "Ты не видишь здесь такого предмета.";
+            buf << "Увы, в этой местности такого предмета найти не удается.";
         else if (target.isSet( TAR_OBJ_WORLD ))
-            buf << "Ты не можешь обнаружить ничего с таким именем.";
+            buf << "Увы, во всей Тэре такого предмета найти не удается.";
 
         result->error = TARGET_ERR_OBJ_NOT_FOUND;
         return result;
@@ -678,7 +678,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
-        ch->pecho("Ты не можешь использовать это заклинание, когда сражаешься.");
+        ch->pecho("Это заклинание нельзя использовать во время сражения.");
         return false;
     }
     
