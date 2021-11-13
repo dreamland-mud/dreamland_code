@@ -275,11 +275,18 @@ SKILL_RUNP( shoot )
     ch->recho( "%1$^O1, посланн%1$Gое|ый|ая|ые %3$C5, улете%1$nла|ли %2$s.", arrow, dirs[ direction ].leave, ch );
 
     set_violent( ch, victim, false );
+
+    // calculate bow bonus damage: diceroll + bow damroll
+    int bow_bonus = 0;    
+    for (auto &paf: wield->affected)
+    {
+        if ( paf->location == APPLY_DAMROLL )
+            bow_bonus += paf->modifier;
+    } 
+    bow_bonus += dice( wield->value1(), wield->value2() );
     
     try {
-        success = send_arrow( ch, victim, arrow,
-                              direction, chance,
-                              dice( wield->value1(), wield->value2() ) );
+        success = send_arrow( ch, victim, arrow, direction, chance, bow_bonus );
     } catch (const VictimDeathException &e) {
         return;
     }
@@ -310,9 +317,7 @@ SKILL_RUNP( shoot )
             return;
         
         try {
-            success = send_arrow( ch, victim, arrow,
-                                  direction, chance,
-                                  dice( wield->value1(), wield->value2() ) );
+            success = send_arrow( ch, victim, arrow, direction, chance, bow_bonus );
         } catch (const VictimDeathException &e) {
             return;
         }
