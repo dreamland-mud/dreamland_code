@@ -1288,8 +1288,8 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить 
         WeaponGenerator()
             .item(obj)
             .alignment(ch->alignment)
-            .player(ch->getPC())
-            .randomTier(bestTier)
+            .player(ch->getPC())            
+            .tier(bestTier)
             .randomizeStats();
     }
     else {
