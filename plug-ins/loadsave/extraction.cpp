@@ -56,24 +56,22 @@ void extract_obj_1( Object *obj, bool count, const char *not_used )
         Object *obj_content;
         Object *obj_next;
         char buf[MAX_STRING_LENGTH];
-        DLString message = obj->getProperty("extract");
 
-        if (obj->extracted)  /* if the object has already been extracted once */
-        {
-                sprintf(buf, "Warning! Extraction of %s, vnum %d.", obj->getName( ),
-                        obj->pIndexData->vnum);
-                bug(buf, 0);
-                return; /* if it's already been extracted, something bad is going on */
+        if (obj->extracted) {
+            // This situation can happen during obj update and is considered normal.
+            // For example, when both container and one of its items are marked for extraction
+            // separately within the same obj update loop.
+            // There's no relevant info about obj to mention in the logs, as it's been cleared by now.
+            return;
         }
-        else
-                obj->extracted = true;  /* if it hasn't been extracted yet, now
-                                                                                                                 * it's being extracted. */
-        
+          
         if (IS_SET(obj->pIndexData->area->area_flag, AREA_NOSAVEDROP)
             || IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)) 
         {
             count = true;
         }
+
+        DLString message = obj->getProperty("extract");
 
         // Remove obj from all locations, showing an optional message.
         if (obj->in_room != 0) {

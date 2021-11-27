@@ -104,7 +104,7 @@ void Object::extract( )
         timer = 0;
         timestamp = -1;
         from = &str_empty[0];
-        extracted = 0;
+        extracted = true;
         water_float = 0;
         killer = &str_empty[0];
         count = 0;
