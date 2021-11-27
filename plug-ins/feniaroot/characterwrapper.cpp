@@ -2236,6 +2236,9 @@ NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам 
             bhv->config( target->getPC( ), pet->getNPC( ) );
     }
 
+    if (pet->master)
+        pet->stop_follower();
+
     SET_BIT( pet->affected_by, AFF_CHARM );
     target->getPC( )->pet = pet->getNPC( );
     pet->add_follower( target );
