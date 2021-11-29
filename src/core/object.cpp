@@ -458,7 +458,11 @@ void Object::updateCachedNoun( )
 
 int Object::getWeightMultiplier( ) const
 {
-    return item_type == ITEM_CONTAINER ? value4() : 100;
+    if (item_type == ITEM_CONTAINER) {
+        if (value4() <= 0) return 100;
+        else return value4;
+    }
+    else return 100;
 }
 
 DLString Object::getProperty(const DLString &key) const
