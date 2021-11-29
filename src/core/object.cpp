@@ -460,7 +460,7 @@ int Object::getWeightMultiplier( ) const
 {
     if (item_type == ITEM_CONTAINER) {
         if (value4() <= 0) return 100;
-        else return value4;
+        else return value4();
     }
     else return 100;
 }
