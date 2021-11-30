@@ -112,6 +112,12 @@ Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman
             r->prac = 1;
     }
     
+
+    if (ch->getClan( )->isDispersed( )) 
+        r->points *= 2;
+    else
+        r->clanpoints = r->points;
+
     r->exp = (r->points + r->clanpoints) * 10;
 
     oldact("Ты передаешь $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR);
