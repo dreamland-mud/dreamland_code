@@ -374,6 +374,12 @@ NMI_GET( ObjectWrapper, weightTotal, "вес предмета с учетом с
     return Register( target->getWeight( ) );
 }
 
+NMI_GET( ObjectWrapper, weight, "вес предмета")
+{
+    checkTarget( );
+    return Register( target->weight );
+}
+
 NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия или 0")
 {
     checkTarget( );
