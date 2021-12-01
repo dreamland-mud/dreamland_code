@@ -192,6 +192,12 @@ NMI_GET( ObjectWrapper, material, "материалы (.Material), из кото
     return MaterialWrapper::wrap(target->getMaterial());
 }
 
+NMI_SET( ObjectWrapper, weight, "вес предмета")
+{
+    checkTarget( );
+    target->weight = arg.toNumber( );
+}
+
 NMI_GET( ObjectWrapper, name , "имена предмета, на которые он откликается")
 {
     checkTarget( );
@@ -366,12 +372,6 @@ NMI_GET( ObjectWrapper, weightTotal, "вес предмета с учетом с
 {
     checkTarget( );
     return Register( target->getWeight( ) );
-}
-
-NMI_GET( ObjectWrapper, weight, "вес предмета")
-{
-    checkTarget( );
-    return Register( target->weight );
 }
 
 NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия или 0")
