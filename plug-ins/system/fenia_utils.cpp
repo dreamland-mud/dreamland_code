@@ -52,7 +52,8 @@ bool gprog(const DLString &trigName, const char *fmt, ...)
         return true;
     }
     catch (const Scripting::Exception &e) {
-        LogStream::sendWarning( ) << "global trigger: " << e.what( ) << endl;
+        // On error, complain to the logs and to all immortals in the game.
+        FeniaManager::getThis()->croak(0, Scripting::Register(trigName), e);
         return false;
     }
 }
