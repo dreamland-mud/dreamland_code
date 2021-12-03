@@ -112,6 +112,11 @@ NMI_GET( MobIndexWrapper, vnum , "внум, уникальный номер пр
     checkTarget( ); 
     return target->vnum;
 }
+NMI_GET( MobIndexWrapper, size , "численный размер (таблица .tables.size_table)") 
+{ 
+    checkTarget( ); 
+    return target->size;
+}
 NMI_GET( MobIndexWrapper, imm_flags , "флаги иммунитета (таблица .tables.imm_flags)") 
 { 
     checkTarget( ); 
