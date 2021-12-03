@@ -48,6 +48,7 @@
 #include "pet.h"
 #include "recipeflags.h"
 #include "act.h"
+#include "selfrate.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -886,6 +887,13 @@ NMI_SET( CharacterWrapper, level, "настоящий уровень" )
 {
     checkTarget( );
     return target->setLevel( arg.toNumber( ) );
+}
+
+NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 квестов и самооценка новичок")
+{
+    checkTarget();
+    CHK_NPC	
+    return IS_TOTAL_NEWBIE(target);
 }
 
 NMI_GET( CharacterWrapper, lastAccessTime, "время последнего захода в мир" )
