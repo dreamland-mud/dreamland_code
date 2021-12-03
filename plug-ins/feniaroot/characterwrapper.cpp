@@ -48,7 +48,7 @@
 #include "pet.h"
 #include "recipeflags.h"
 #include "act.h"
-#include "selfrate.h"
+// #include "selfrate.h" -- TO-DO (RUFFINA), fix this
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -892,8 +892,12 @@ NMI_SET( CharacterWrapper, level, "настоящий уровень" )
 NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 квестов и самооценка новичок")
 {
     checkTarget();
-    CHK_NPC	
-    return IS_TOTAL_NEWBIE(target);
+    CHK_NPC	   
+    // TO-DO (RUFFINA): remove this after the include file path is fixed
+    return ( ch->getRemorts().size() == 0 && rated_as_newbie(ch) &&
+            (ch->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" ) ? 
+             ch->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" )->getAllVictoriesCount() < 51 : true) )	    
+    //return IS_TOTAL_NEWBIE(target);
 }
 
 NMI_GET( CharacterWrapper, lastAccessTime, "время последнего захода в мир" )
