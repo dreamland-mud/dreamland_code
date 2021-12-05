@@ -617,10 +617,10 @@ NMI_INVOKE(Root, gecho, "(fmt, args): выдать отформатирован�
     return Register( );
 }
 
-NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Discord")
+NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Discord (не забудь вначале добавить иконку)")
 {
     DLString msg = args2string(args);
-    send_discord_orb(msg);
+    send_to_discord_stream(msg);
     return Register( );
 }
 
