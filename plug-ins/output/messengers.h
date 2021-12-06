@@ -7,6 +7,7 @@ class PCharacter;
 class Character;
 
 void send_discord(const DLString &content);
+void send_to_discord_stream(const DLString &content);
 
 void send_discord_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description);
 void send_discord_news(const DLString &thread, const DLString &author, const DLString &title, const DLString &description);

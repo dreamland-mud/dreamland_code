@@ -115,7 +115,7 @@ static void send_to_discord_chat(Json::Value &body)
 }
 
 /** Send one message to the stream channel. */
-static void send_to_discord_stream(const DLString &content)
+void send_to_discord_stream(const DLString &content)
 {
     Json::Value body;
     body["content"] = discord_string(content);

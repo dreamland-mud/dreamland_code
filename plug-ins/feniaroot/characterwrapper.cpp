@@ -48,7 +48,7 @@
 #include "pet.h"
 #include "recipeflags.h"
 #include "act.h"
-// #include "selfrate.h" -- TO-DO (RUFFINA), fix this
+#include "selfrate.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -893,11 +893,7 @@ NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 �
 {
     checkTarget();
     CHK_NPC	   
-    // TO-DO (RUFFINA): remove this after the include file path is fixed
-    return ( ch->getRemorts().size() == 0 && rated_as_newbie(ch) &&
-            (ch->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" ) ? 
-             ch->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" )->getAllVictoriesCount() < 51 : true) )	    
-    //return IS_TOTAL_NEWBIE(target);
+    return IS_TOTAL_NEWBIE(target->getPC());
 }
 
 NMI_GET( CharacterWrapper, lastAccessTime, "время последнего захода в мир" )
