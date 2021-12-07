@@ -24,5 +24,6 @@ enum {
     SWIM_ALWAYS,
 };
 int material_swims( Object * );
+int material_swims( const char *materials );
 
 #endif

@@ -92,10 +92,15 @@ bool material_is_flagged( const char *materials, int flags )
 
 int material_swims( Object *obj )
 {
+    return material_swims(obj->getMaterial());
+}
+
+int material_swims( const char *materials )
+{
     int swim = 0;
     vector<const material_t *> result;
 
-    material_parse( obj, result );
+    material_parse( materials, result );
     
     for (auto &mat: result)
         swim += mat->floats;

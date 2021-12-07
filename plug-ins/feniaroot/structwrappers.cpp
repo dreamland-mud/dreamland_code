@@ -667,6 +667,11 @@ NMI_GET( MaterialWrapper, burns, "сколько тиков горит (-1 ес�
     return Register( material_burns( names.c_str() ) );
 }
 
+NMI_GET( MaterialWrapper, swims, "как плавает: 2=никогда не утонет; 1=тут же утонет; 0=будет зависеть от предмета" )
+{
+    return Register( material_swims( names.c_str() ) );
+}
+
 NMI_GET( MaterialWrapper, indestructible, "среди материалов есть неуничтожимый (dragonskin, platinum)" )
 {
     return Register( material_is_flagged(names.c_str(), MAT_INDESTR) );
