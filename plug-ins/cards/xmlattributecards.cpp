@@ -79,7 +79,7 @@ bool XMLAttributeCards::handle( const DeathArguments &args )
     PCharacter *pkiller;
     Pointer card;
     
-    if (!args.killer || args.killer->is_npc( ) || args.killer == args.pch)
+    if (!args.killer || args.killer->is_npc( ) || args.killer->is_immortal( ) || args.killer == args.pch)
         return false;
 
     pkiller = args.killer->getPC( );
