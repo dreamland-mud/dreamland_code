@@ -1318,7 +1318,7 @@ void check_reboot( void )
         break;
     case 0:
         msg2 = "Мир Мечты перезапускается, надо немного подождать.";
-        send_discord_stream(":red_circle: " + msg2);
+        send_to_discord_stream(":red_circle: " + msg2);
         send_telegram(msg2);
         reboot_anatolia();
         return;
@@ -1331,7 +1331,7 @@ void check_reboot( void )
     case 15:
         msg2 = fmt( NULL, "Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!'",
                    dreamland->getRebootCounter( ) );
-        send_discord_stream(":red_circle: " + msg2);
+        send_to_discord_stream(":red_circle: " + msg2);
         send_telegram(msg2);
         msg = fmt( NULL, "%1$^s громко кричит '{R%2$s{x'",
                    (chance( 50 ) ? "Хассан" : "Валькирия"), msg2 );
