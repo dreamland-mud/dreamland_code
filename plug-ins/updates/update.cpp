@@ -1331,8 +1331,10 @@ void check_reboot( void )
     case 15:
         msg2 = fmt( NULL, "Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!'",
                    dreamland->getRebootCounter( ) );
-        send_to_discord_stream(":red_circle: " + msg2);
-        send_telegram(msg2);
+        if (dreamland->getRebootCounter( ) == 5) {
+            send_to_discord_stream(":red_circle: " + msg2);
+            send_telegram(msg2);
+        }
         msg = fmt( NULL, "%1$^s громко кричит '{R%2$s{x'",
                    (chance( 50 ) ? "Хассан" : "Валькирия"), msg2 );
         for (d = descriptor_list; d != 0; d = d->next)
