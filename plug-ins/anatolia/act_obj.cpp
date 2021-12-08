@@ -1320,16 +1320,26 @@ CMDRUNP( drop )
 bool omprog_give( Object *obj, Character *ch, Character *victim )
 {
     FENIA_CALL( obj, "Give", "CC", ch, victim )
-    FENIA_NDX_CALL( obj, "Give", "OCC", obj, ch, victim )
-    BEHAVIOR_VOID_CALL( obj, give, ch, victim )
+    if (obj->carried_by != victim)
+        return true;
 
+    FENIA_NDX_CALL( obj, "Give", "OCC", obj, ch, victim )
+    if (obj->carried_by != victim)
+        return true;
+
+    BEHAVIOR_VOID_CALL( obj, give, ch, victim )
     if (obj->carried_by != victim)
         return true;
     
     FENIA_CALL( victim, "Give", "CO", ch, obj );
+    if (obj->carried_by != victim)
+        return true;
+
     FENIA_NDX_CALL( victim->getNPC( ), "Give", "CCO", victim, ch, obj );
-    BEHAVIOR_VOID_CALL( victim->getNPC( ), give, ch, obj );
-        
+    if (obj->carried_by != victim)
+        return true;
+
+    BEHAVIOR_VOID_CALL( victim->getNPC( ), give, ch, obj );        
     if (obj->carried_by != victim)
         return true;
         
