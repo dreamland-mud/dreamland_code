@@ -103,6 +103,7 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+#include "messengers.h"
 
 CLAN(battlerager);
 CLAN(hunter);
@@ -1309,13 +1310,16 @@ void track_update( )
 void check_reboot( void )
 {
     Descriptor *d;
-    DLString msg;
+    DLString msg, msg2;
 
     switch(dreamland->getRebootCounter( ))
     {
     case -1:
         break;
     case 0:
+        msg2 = "Мир Мечты перезапускается, надо немного подождать.";
+        send_to_discord_stream(":red_circle: " + msg2);
+        send_telegram(msg2);
         reboot_anatolia();
         return;
     case 1:
@@ -1325,9 +1329,14 @@ void check_reboot( void )
     case 5:
     case 10:
     case 15:
-        msg = fmt( NULL, "%1$^s громко кричит '{RВнимание! Перезагрузка через %2$d мину%2$Iту|ты|т!{x'",
-                   (chance( 50 ) ? "Хассан" : "Валькирия"), 
+        msg2 = fmt( NULL, "Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!'",
                    dreamland->getRebootCounter( ) );
+        if (dreamland->getRebootCounter( ) == 5) {
+            send_to_discord_stream(":red_circle: " + msg2);
+            send_telegram(msg2);
+        }
+        msg = fmt( NULL, "%1$^s громко кричит '{R%2$s{x'",
+                   (chance( 50 ) ? "Хассан" : "Валькирия"), msg2 );
         for (d = descriptor_list; d != 0; d = d->next)
             if (d->connected == CON_PLAYING && d->character)
                 d->character->pecho( msg );

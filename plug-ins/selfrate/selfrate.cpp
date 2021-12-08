@@ -79,7 +79,7 @@ CMDRUN( selfrate )
 
         DLString what = fmt(0, "%#^C1 теперь %s!", pch, attr->getRateAlias(pch).c_str());
         infonet(0, 0, "{CТоржественный голос из $o2: ", what.c_str());
-        send_discord_orb(what);
+        send_discord_orb(":muscle: " + what);
     }
 }
 
@@ -112,7 +112,7 @@ bool XMLAttributeSelfRate::handle( const WhoisArguments &args )
 {
     DLString l;
     
-    l << "самоуверенность уровня {W" << getRateAlias(args.looker) << "{x";
+    l << "самооценка уровня {W" << getRateAlias(args.looker) << "{x";
     args.lines.push_back( l );
     return true;
 }

@@ -236,7 +236,7 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
         wiznet(WIZ_LEVELS, 0, 0, 
                   "%1$^C1 дости%1$Gгло|г|гла %2$d уровня в профессии %3$N2!", 
                   ch, level, getRusName().c_str());
-        send_discord_orb(fmt(0, "%1$#^C1 дости%1$Gгло|г|гла нового уровня мастерства в профессии %2$N2.",
+        send_discord_orb(":tools: " + fmt(0, "%1$#^C1 дости%1$Gгло|г|гла нового уровня мастерства в профессии %2$N2.",
                             ch, getRusName().c_str()));
     }
 

@@ -83,6 +83,7 @@
 #include "act_move.h"
 #include "vnum.h"
 #include "def.h"
+#include "messengers.h"
 
 /***************************************************************************
  ************************      auction.c      ******************************
@@ -186,6 +187,8 @@ int parsebet (const int currentbet, const char *argument)
 void auction_update (void)
 {
     char buf[MAX_STRING_LENGTH];
+    DLString msg;
+    
     if (auction->item != 0)
         if (--auction->pulse <= 0) /* decrease pulse */
         {
@@ -196,12 +199,11 @@ void auction_update (void)
             case 2 : /* going twice */
             if (auction->bet > 0)
             {
-                talk_auction(fmt(0, "%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%3$s -- %4$s{x.", 
+                talk_auction(fmt(0, "%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%2$Iую|ых|ых монет%2$Iу|ы| -- %3$s{x.", 
                         auction->item,
                         auction->bet,
-                        GET_COUNT(auction->bet,"ую монету","ые монеты","ых монет"),
                         ((auction->going == 1) ? "раз" : "два")).c_str( ));
-                break;
+                break;                
             }
             else
             {
@@ -220,11 +222,11 @@ void auction_update (void)
 
             if (auction->bet > 0 && buyer_can_trade())
             {
-                sprintf (buf, "%s получает %s{Y за %d золот%s{x.",
-                    auction->buyer->getNameP( '1' ).c_str( ),
-                    auction->item->getShortDescr( '4' ).c_str( ), auction->bet,
-                    GET_COUNT(auction->bet,"ую монету","ые монеты","ых монет"));
-                talk_auction(buf);
+                msg = fmt(0, "{1{C%1$^C1 {Yполучает {2%2$O1{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2.",
+                    auction->buyer, auction->item, auction->bet);                           
+                talk_auction(msg.c_str());
+                send_to_discord_stream(":moneybag: " + msg);
+                send_telegram(msg);
                 obj_to_char (auction->item,auction->buyer);
                 oldact_p("Из дымки появляется аукционер и передает тебе $o4.",
                      auction->buyer,auction->item,0,TO_CHAR,POS_DEAD);
@@ -243,7 +245,7 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                DLString msg = fmt(0, "Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x.", auction->item);
+                msg = fmt(0, "Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x.", auction->item);
                 talk_auction(msg.c_str());
 
                 oldact_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
@@ -267,6 +269,7 @@ CMDRUNP( auction )
         char buf[MAX_STRING_LENGTH];
         char betbuf[MAX_STRING_LENGTH];
         argument = one_argument (argument, arg1);
+        DLString msg; 
 
         if (ch->is_npc())    /* NPC extracted can't auction! */
                 return;
@@ -293,7 +296,7 @@ CMDRUNP( auction )
                 {
                         if ( ch->is_immortal() )
                         {
-                                sprintf(buf,"Продавец: %s Текущая ставка: %s\n\r",
+                                sprintf(buf,"Продавец -- %s, текущая ставка -- %s\n\r",
                                         auction->seller->getNameC(),
                                         auction->buyer ? auction->buyer->getNameC() : "Нет");
                                 ch->send_to(buf);
@@ -312,7 +315,7 @@ CMDRUNP( auction )
                                 ch->send_to( buf);
                                 if (auction->startbet != 0)
                                 {
-                                        sprintf(buf, "Начальная цена: %d золот%s{x.\n\r", auction->startbet,
+                                        sprintf(buf, "Начальная цена -- %d золот%s{x.\n\r", auction->startbet,
                                                 GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет"));
                                         ch->send_to( buf);
                                 }
@@ -534,9 +537,11 @@ CMDRUNP( auction )
                         auction->pulse = PULSE_AUCTION;
                         auction->going = 0;
 
-                        sprintf(buf, "На аукцион выставлен новый лот: %s{x.",
-                                obj->getShortDescr( '1' ).c_str( ));
-                        talk_auction( buf );
+                        msg = fmt(0, "{1{YНа аукцион выставлен новый лот -- {2%O1!", auction->item);                           
+                        talk_auction(msg.c_str());
+                        send_to_discord_stream(":moneybag: " + msg);
+                        send_telegram(msg);
+
                         if (auction->startbet == 0)
                         {
                                 sprintf(buf, "Начальная цена владельцем не установлена{x.");
