@@ -105,7 +105,7 @@ CMDRUN( cast )
 
     if (ch->is_npc( ) && IS_CHARMED(ch)) {
         if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
-            oldact("$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR);
+            ch->master->pecho("%1$^C1 хотел%1$Gо||а|и бы помочь, но, к сожалению, совершенно не способ%1$Gно|ен|на|ны колдовать.", ch);
             return;
         }
     }
@@ -115,25 +115,33 @@ CMDRUN( cast )
         return;
     }
 
-    if (ch->isAffected(gsn_shielding ) && number_percent( ) > 50) {
-        ch->pecho("Ты пытаешься сосредоточиться на заклинании, но что-то останавливает тебя.");
+    if (ch->isAffected( gsn_shielding ) && number_percent( ) > 50) {
+        ch->pecho("Ты пытаешься сотворить заклинание, но изолирующий экран блокирует тебя.");
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но изолирующий экран блокирует %1$P2.", ch);
         return;
     }
 
-    if ((ch->isAffected(gsn_garble ) || ch->isAffected(gsn_deafen )) && number_percent( ) > 50) {
-        ch->pecho("Ты не можешь настроиться на правильную интонацию.");
+    if (ch->isAffected( gsn_garble ) && number_percent( ) > 50) {
+        ch->pecho("Твой язык заплетается, и ты не можешь как следует произнести заклинание.");
+        ch->recho("Язык %1$C2 заплетается, и %1$P1 не мо%1$nжет|гут как следует произнести заклинание.", ch);        
         return;
     }
+    
+    if (ch->isAffected( gsn_deafen ) && number_percent( ) > 50) {
+        ch->pecho("Глухота мешает тебе как следует произнести заклинание.");
+        ch->recho("Глухота мешает %1$C3 как следует произнести заклинание.", ch);        
+        return;
+    }    
 
     if (HALF_SHADOW(ch)) {
         ch->pecho("Твоя тень поглощает всякую попытку сотворить заклинание.");
-        oldact_p("$c1 пытается сотворить заклинание, но тень не дает $m сосредоточится.",
-                ch, 0, 0, TO_ROOM,POS_RESTING);
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но тень не дает %1$P3 сосредоточиться.", ch);
         return;
     }
 
     if (ch->death_ground_delay > 0 && ch->trap.isSet( TF_NO_CAST )) {
-        ch->pecho("Тебя занимает более важное занятие - спасение своей жизни.");
+        ch->pecho("Ловушка, в которой ты оказал%1$Gось|ся|ась, препятствует сотворению заклинаний.", ch);
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но ловушка мешает %1$P3 сосредоточиться.", ch);
         return;
     }
 
@@ -149,7 +157,7 @@ CMDRUN( cast )
     }
 
     if (ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-        ch->pecho("Ты {RBattleRager{x, а не презренный маг!");
+        ch->pecho("Ты вои{Smн{Sfтельница{Sx {RКлана Ярости{x, а не презренный маг!");
         return;
     }
 
@@ -164,7 +172,7 @@ CMDRUN( cast )
     
     if (!spell) {
         if (ch->is_npc( ) && IS_CHARMED(ch)) 
-            do_say(ch, "Да не умею я");
+            do_say(ch, "Я не знаю такого заклинания.");
         else
             ch->pecho("Ты не знаешь такого заклинания.");
 
@@ -180,9 +188,8 @@ CMDRUN( cast )
         return;
         
     if (IS_SET(ch->in_room->room_flags,ROOM_NO_CAST)) {
-        ch->pecho("Стены этой комнаты поглотили твое заклинание.");
-        oldact_p("$c1 произне$gсло|с|сла заклинание, но стены комнаты поглотили его.",
-                ch, 0, 0, TO_ROOM,POS_RESTING);
+        ch->pecho("Эта местность поглощает и блокирует твое заклинание.");
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но что-то в этой местности блокирует %1$P2.", ch);
         return;
     }
 
@@ -246,9 +253,8 @@ CMDRUN( cast )
         return;
         
     if (number_percent( ) > skill->getEffective( ch )) {
-        ch->pecho("Ты не можешь сконцентрироваться.");
-        if (ch->is_npc() && IS_CHARMED(ch))
-            ch->master->pecho("%^C1 теряет концентрацию.", ch);
+        ch->pecho("Ты пытаешься сотворить заклинание, но теряешь концентрацию и терпишь неудачу.");
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но теря%1$nет|ют концентрацию и терп%1$nит|ят неудачу.", ch);
 
         skill->improve( ch, false, victim );
         ch->mana -= mana / 2;
