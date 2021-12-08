@@ -151,9 +151,10 @@ void send_discord_note_notify(const DLString &thread, const DLString &from, cons
     send_to_discord_stream(":envelope: " + thread.upperFirstCharacter() + " от " + from + " на тему: " + subj);
 }
 
+// Removed emoji from here to make other messages stand out more amidst in/out spam
 void send_discord_orb(const DLString &msg)
 {
-    send_to_discord_stream(":arrow_right: " + msg);
+    send_to_discord_stream(msg);
 }
 
 void send_discord_clan(const DLString &msg)
