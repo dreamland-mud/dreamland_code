@@ -269,6 +269,7 @@ CMDRUNP( auction )
         char buf[MAX_STRING_LENGTH];
         char betbuf[MAX_STRING_LENGTH];
         argument = one_argument (argument, arg1);
+        DLString msg; 
 
         if (ch->is_npc())    /* NPC extracted can't auction! */
                 return;
