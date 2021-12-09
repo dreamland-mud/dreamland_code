@@ -19,6 +19,7 @@ class DLString : public std::string
 {
 public:
         static const DLString emptyString;
+        static const DLString SPACE;
         static const locale LOCALE_RU;
 
 public:

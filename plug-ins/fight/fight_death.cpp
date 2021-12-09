@@ -661,6 +661,9 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     int body_level = 0, body_vnum = 0;
     Room *body_room;
     
+    // Get body part owner name and other details. 
+    // For body parts created upon 'ch' death - take details directly from character.
+    // For parts chopped off from existing corpses - guess from the corpse short description.
     if (ch) {
         body_name = ch->getNameP( '2' );
         body_form = ch->form;
@@ -690,8 +693,18 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     obj        = create_object( get_obj_index( vnum ), 0 );
     obj->timer = number_range( 4, 7 );
     
-    obj->fmtShortDescr( obj->getShortDescr( ), body_name.c_str( ) );
-    obj->fmtDescription( obj->getDescription( ), body_name.c_str( ) );
+    // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
+    // If there're no format symbols in the body part names, just concatenate owner name to it.
+    if (str_str(obj->getShortDescr(), "%"))
+        obj->fmtShortDescr( obj->getShortDescr(), body_name.c_str());
+    else
+        obj->setShortDescr(obj->getShortDescr() + DLString::SPACE + body_name);
+
+    if (str_str(obj->getDescription(), "%"))
+        obj->fmtDescription(obj->getDescription(), body_name.c_str());
+    else
+        obj->setDescription(obj->getDescription() + DLString::SPACE + body_name);
+
     obj->from = str_dup(body_name.c_str());
     obj->level = body_level;
 

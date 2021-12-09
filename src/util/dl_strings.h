@@ -23,6 +23,6 @@ bool    is_positive_number( const char *arg );
 int        number_argument        ( char *argument, char *arg );
 int        mult_argument        ( char *argument, char *arg );
 char *        one_argument        ( char *argument, char *arg_first );
-char *  str_str(char *cs, const char *ct);
+const char *  str_str(const char *cs, const char *ct);
 
 #endif
