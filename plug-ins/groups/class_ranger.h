@@ -5,12 +5,12 @@
 #ifndef __CLASS_RANGER__
 #define __CLASS_RANGER__
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "basicmobilebehavior.h"
 #include "summoncreaturespell.h"
 #include "savedcreature.h"
 
-class RangerStaff : public ObjectBehavior {
+class RangerStaff : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<RangerStaff> Pointer;

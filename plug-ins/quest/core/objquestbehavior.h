@@ -6,10 +6,10 @@
 #ifndef OBJQUESTBEHAVIOR_H
 #define OBJQUESTBEHAVIOR_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "questentity.h"
 
-class ObjQuestBehavior : public ObjectBehavior, public virtual QuestEntity {
+class ObjQuestBehavior : public BasicObjectBehavior, public virtual QuestEntity {
 XML_OBJECT
 public:
     typedef ::Pointer<ObjQuestBehavior> Pointer;

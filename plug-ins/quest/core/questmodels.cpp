@@ -9,6 +9,7 @@
 #include "skillreference.h"
 #include "skill.h"
 #include "mobilebehaviormanager.h"
+#include "objectbehaviormanager.h"
 #include "occupations.h"
 #include "selfrate.h"
 #include "pcharacter.h"
@@ -373,8 +374,7 @@ Object * ItemQuestModel::getRandomItem( PCharacter *pch )
 void ItemQuestModel::clear( Object *obj )
 {
     if (obj) {
-        obj->behavior->unsetObj( );
-        obj->behavior.clear( );
+        ObjectBehaviorManager::assignBasic( obj );
     }
 }
 

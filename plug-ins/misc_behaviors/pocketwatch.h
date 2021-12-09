@@ -9,9 +9,9 @@
 #include "xmlboolean.h"
 #include "xmlinteger.h"
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class PocketWatch : public ObjectBehavior {
+class PocketWatch : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<PocketWatch> Pointer;

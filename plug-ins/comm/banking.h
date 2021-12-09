@@ -6,7 +6,7 @@
 #define __BANKING_H__
 
 #include "roombehavior.h"
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "descriptorstatelistener.h"
 
 class PCharacter;
@@ -29,7 +29,7 @@ public:
     virtual bool command( Character *, const DLString &, const DLString & );
 };
 
-class CreditCard : public BankAction, public virtual ObjectBehavior {
+class CreditCard : public BankAction, public virtual BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<CreditCard> Pointer;

@@ -1,9 +1,9 @@
 #ifndef EQUIPSET_H
 #define EQUIPSET_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class EquipSet : public ObjectBehavior {
+class EquipSet : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<EquipSet> Pointer;

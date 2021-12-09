@@ -62,7 +62,7 @@ protected:
         virtual int getCast( Character * );
 };
 
-class KnightWeapon : public ObjectBehavior {
+class KnightWeapon : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<KnightWeapon> Pointer;

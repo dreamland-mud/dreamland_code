@@ -20,7 +20,7 @@
 #include "arg_utils.h"
 #include "wiznet.h"
 #include "interp.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "act.h"
 #include "def.h"
 
@@ -187,7 +187,6 @@ void ObjectQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     Object *obj;
 
     obj = create_object( get_obj_index( vnum ), client->getRealLevel( ) );
-    obj->setOwner( client->getNameC() );
     
     buyObject( obj, client, questman );
 
@@ -210,6 +209,8 @@ PersonalQuestArticle::PersonalQuestArticle( )
 
 void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter *questman ) 
 {
+    obj->setOwner( client->getNameC() );
+
     switch (gender.getValue( )) {
     default:
     case SEX_NEUTRAL:
@@ -496,6 +497,7 @@ bool OwnerQuestArticle::visible( Character *client ) const
 
 void OwnerQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharacter *questman ) 
 {
+    obj->setOwner( client->getNameC() );    
     lifePrice.deduct( client );
 }
 

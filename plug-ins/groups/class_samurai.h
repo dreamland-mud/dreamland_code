@@ -7,9 +7,9 @@
 #define CLASS_SAMURAI_H 
 
 #include "basicmobilebehavior.h"
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class Katana : public ObjectBehavior {
+class Katana : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<Katana> Pointer;

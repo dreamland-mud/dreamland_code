@@ -5,9 +5,9 @@
 #ifndef __DRINKCONTAINER_H__
 #define __DRINKCONTAINER_H__
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class DrinkContainer : public ObjectBehavior {
+class DrinkContainer : public BasicObjectBehavior {
 public:
     typedef ::Pointer<DrinkContainer> Pointer;
 

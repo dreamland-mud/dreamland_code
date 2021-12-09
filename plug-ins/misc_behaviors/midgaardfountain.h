@@ -6,9 +6,9 @@
 #ifndef MIDGAARDFOUNTAIN_H
 #define MIDGAARDFOUNTAIN_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class MidgaardFountain : public ObjectBehavior {
+class MidgaardFountain : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<MidgaardFountain> Pointer;

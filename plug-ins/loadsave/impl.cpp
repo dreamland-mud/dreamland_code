@@ -8,6 +8,7 @@
 #include "objectbehaviorplugin.h"
 #include "mobilebehaviorplugin.h"
 #include "pcharactermanager.h"
+#include "objectbehaviormanager.h"
 
 #include "savedcreature.h"
 
@@ -81,7 +82,8 @@ extern "C" {
         Plugin::registerPlugin<DropsLoadTask>( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<SavedCreature> >( ppl );
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
-
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<BasicObjectBehavior> >(ppl);
+        
         return ppl;
     }
 }

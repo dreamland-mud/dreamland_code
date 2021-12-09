@@ -488,6 +488,8 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
         /* assign behavior */
         if (pObjIndex->behavior) 
             ObjectBehaviorManager::assign( obj );
+        else
+            ObjectBehaviorManager::assignBasic( obj );
         
         /* fenia objprog initialization */
         if (Count) {

@@ -1522,7 +1522,7 @@ SKILL_RUNP( forge )
         oldact("$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
         oldact("$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
 
-        blank->setOwner( ch->getName( ).c_str( ) );
+//        blank->setOwner( ch->getName( ).c_str( ) );
         blank->gram_gender = Grammar::MultiGender::FEMININE;
         blank->setName( LOCK_NAMES );
         blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ).c_str( ) );

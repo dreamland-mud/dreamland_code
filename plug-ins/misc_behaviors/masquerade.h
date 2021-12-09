@@ -11,7 +11,7 @@
 
 #include "areabehavior.h"
 #include "mobilebehavior.h"
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "objectbehaviorplugin.h"
 
 class Masquer : public MobileBehavior {
@@ -24,7 +24,7 @@ protected:
         virtual void tell( Character *victim, const char *speech );
 };
 
-class RoamingPortal : public ObjectBehavior {
+class RoamingPortal : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<RoamingPortal> Pointer;
@@ -40,7 +40,7 @@ protected:
         XML_VARIABLE XMLInteger highlevel;
 };
 
-class CatsEye : public ObjectBehavior {
+class CatsEye : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<CatsEye> Pointer;

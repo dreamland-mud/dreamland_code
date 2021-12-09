@@ -16,12 +16,8 @@ public:
         typedef ::Pointer<PersonalQuestReward> Pointer;
         
         virtual void get( Character * );
-        virtual bool save( );
         virtual bool hourly();
-        virtual void delete_( Character * ); 
         virtual bool isLevelAdaptive( ); 
-        virtual bool canSteal( Character * );
-        virtual bool canEquip( Character * );
 };
 
 #endif

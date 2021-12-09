@@ -5,9 +5,9 @@
 #ifndef __CLASS_WARLOCK_H__
 #define __CLASS_WARLOCK_H__
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class EnergyShield : public ObjectBehavior {
+class EnergyShield : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<EnergyShield> Pointer;

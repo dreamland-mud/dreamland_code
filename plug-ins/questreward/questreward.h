@@ -6,17 +6,15 @@
 #ifndef QUESTREWARD_H
 #define QUESTREWARD_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "objectbehaviorplugin.h"
 
-class QuestReward : public virtual ObjectBehavior {
+class QuestReward : public virtual BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<QuestReward> Pointer;
         
         virtual bool mayFloat( );
-        virtual bool canConfiscate( );
-                        
 };
 
 #endif
