@@ -527,5 +527,3 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     }
 }
 
-
-
