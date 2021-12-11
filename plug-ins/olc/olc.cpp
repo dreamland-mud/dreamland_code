@@ -58,6 +58,7 @@ void obj_update();
 GSN(none);
 CLAN(none);
 GROUP(clan);
+WEARLOC(sheath);
 
 using namespace std;
 
@@ -476,6 +477,52 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     if (arg == "update") {
         obj_update();
         ch->pecho("Forced obj update.");
+        return;
+    }
+
+    if (arg == "badresets") {
+        ostringstream buf;
+
+        buf << "List of all resets with invalid wearlocations: " << endl;
+        for (auto &r: roomIndexMap) {
+            MOB_INDEX_DATA *pMob = 0;
+
+            for (auto &pReset: r.second->resets) {
+                if (pReset->command == 'O' || pReset->command == 'R') {
+                    pMob = 0;
+                    continue;
+                }
+
+                if (pReset->command == 'M') {
+                    pMob = get_mob_index(pReset->arg1);
+                    continue;
+                }
+
+                if (pReset->command == 'E') {
+                    if (!pMob) {
+                        buf << "Bad mob reset " << pReset->arg1 << " in room " << r.first << endl;
+                        continue;
+                    }
+
+                    Wearlocation *wloc = wearlocationManager->find(pReset->arg3);
+                    if (!wloc) {
+                        buf << "Bad wearloc for mob " << pMob->vnum << " in room " << r.first << endl;
+                        continue;
+                    }
+
+                    if (wloc->getIndex() == wear_sheath)
+                        continue;
+
+                    Race *race = raceManager->find(pMob->race);
+                    if (!race->getWearloc().isSet(*wloc)) {
+                        buf << "[" << r.first << "] mob [" << pMob->vnum << "] race '" 
+                            << race->getName() <<"' equipped at " << wloc->getName() << endl;
+                    }
+                }
+            }
+        }
+
+        page_to_char(buf.str().c_str(), ch);
         return;
     }
 }
