@@ -525,5 +525,70 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         page_to_char(buf.str().c_str(), ch);
         return;
     }
+
+    if (arg == "part") {
+        ostringstream buf;
+        buf << "Mobs that have body parts ADDed or DELeted compared to their race:" << endl << endl;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            Race *race = raceManager->find(pMob->race);
+            if (!race || !race->isValid()) {
+                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
+                continue;
+            }
+
+            bitstring_t raceParts = race->getParts();
+            bitstring_t mobParts = pMob->parts;
+
+            if (raceParts == mobParts)
+                continue;
+
+            bitstring_t adds = mobParts & ~raceParts;
+            bitstring_t dels = ~mobParts & raceParts;
+            DLString line = "[" + web_cmd(ch, "medit $1", "%5d") + "] %-18.18s {g" 
+                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x add [{G%s{x] del [{r%s{x]\n\r";
+            buf << fmt(0, line.c_str(),
+                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
+
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    if (arg == "form") {
+        ostringstream buf;
+        buf << "Mobs that have forms ADDed or DELeted compared to their race:" << endl << endl;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            Race *race = raceManager->find(pMob->race);
+            if (!race || !race->isValid()) {
+                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
+                continue;
+            }
+
+            bitstring_t raceForm = race->getForm();
+            bitstring_t mobForm = pMob->form;
+
+            if (raceForm == mobForm)
+                continue;
+
+            bitstring_t adds = mobForm & ~raceForm;
+            bitstring_t dels = ~mobForm & raceForm;
+            DLString line = "[" + web_cmd(ch, "medit $1", "%5d") + "] %-18.18s {g" 
+                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x add [{G%s{x] del [{r%s{x]\n\r";
+            buf << fmt(0, line.c_str(),
+                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                form_flags.names(adds).c_str(), form_flags.names(dels).c_str());
+
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
 }
 
