@@ -977,8 +977,8 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
 
     // Notify about level upgrades otherwise noticeable in 'who'.
     if (oldLevel < i && clan.isRecruiter(victim)) {
-        DLString what = fmt(0, "{W%^C1 становится %s %s.{x", 
-            victim, 
+        DLString what = fmt(0, "{W%s становится %s %s.{x", 
+            victim->getNameP('1').c_str(),
             (clan.isLeader(victim) ? "лидером" : "рекрутером"),
             clan.getRussianName().ruscase('2').c_str());
 
