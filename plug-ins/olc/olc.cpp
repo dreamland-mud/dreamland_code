@@ -531,7 +531,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     if (arg == "part") {
         ostringstream buf;
         int cnt = 0;
-        buf << "Mobs that have body parts ADDed or DELeted compared to their race:" << endl << endl;
+        buf << endl;
 
         for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
@@ -560,7 +560,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 + (adds ? web_cmd(ch, "abc reset part " + vnum + " add", "reset") + "]{x" : "")
                 + (dels ? "[{r%s{x " : "%s")
                 + (dels ? web_cmd(ch, "abc reset part " + vnum + " del", "reset") + "]{x" : "")
-                + "   [" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
+                + "   [" + web_cmd(ch, "abc hide part " + vnum, "hide") + "]"
                 + "\n\r";
             buf << fmt(0, line.c_str(),
                 pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
@@ -576,8 +576,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     if (arg == "form") {
         ostringstream buf;
         int cnt = 0;
-        buf << "Mobs that have forms ADDed or DELeted compared to their race:" << endl << endl;
-
+        buf << endl;
+        
         for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
             Race *race = raceManager->find(pMob->race);
@@ -605,7 +605,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 + (adds ? web_cmd(ch, "abc reset form " + vnum + " add", "reset") + "]{x" : "")
                 + (dels ? "[{r%s{x " : "%s")
                 + (dels ? web_cmd(ch, "abc reset form " + vnum + " del", "reset") + "]{x" : "")
-                + "   [" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
+                + "   [" + web_cmd(ch, "abc hide form " + vnum, "hide") + "]"
                 + "\n\r";
             buf << fmt(0, line.c_str(),
                 pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
@@ -619,27 +619,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "hide") {
-        Integer vnum;
-        MOB_INDEX_DATA *pMob;
-
-        if (args.empty() || !Integer::tryParse(vnum, args)) {
-            ch->pecho("abc hide <vnum>");
-            return;
-        }
-
-        pMob = get_mob_index(vnum);
-        if (!pMob) {
-            ch->pecho("Mob %d doesn't exist.", vnum.getValue());
-            return;
-        }
-
-        pMob->properties["hidden"] = "true";
-        pMob->area->changed = true;
-        ch->pecho("Mob %d is now hidden from output.", vnum.getValue());
-        return;
-    }
-
     DLString arg2 = args.getOneArgument();
     DLString arg3 = args.getOneArgument();
     MOB_INDEX_DATA *pMob;
@@ -650,9 +629,18 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     pMob = get_mob_index(vnum);
     if (!pMob)
         return;
+
     Race *race = raceManager->find(pMob->race);
     if (!race || !race->isValid())
         return;
+
+    if (arg == "hide") {
+        pMob->properties["hidden"] = "true";
+        pMob->area->changed = true;
+        ch->pecho("Mob %d is now hidden from output.", vnum.getValue());
+        __do_abc(ch, const_cast<char *>(arg2.c_str()));
+        return;
+    }
 
     if (arg == "reset") {
 
@@ -668,6 +656,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             else
                 return;
 
+            ch->pecho("Mob %d has forms [%s].", vnum.getValue(), form_flags.names(pMob->form).c_str());
         }
         else if (arg2 == "part") {
             bitstring_t racePart = race->getParts();
@@ -680,13 +669,15 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 pMob->parts = racePart & mobPart;
             else
                 return;
+
+            ch->pecho("Mob %d has parts [%s].", vnum.getValue(), part_flags.names(pMob->parts).c_str());
         }
         else
             return;
 
+        __do_abc(ch, const_cast<char *>(arg2.c_str()));
         pMob->area->changed = true;
         return;
     }
-
 }
 
