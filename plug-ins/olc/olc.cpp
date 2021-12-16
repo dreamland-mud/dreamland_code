@@ -553,8 +553,11 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 "[" + web_cmd(ch, "medit $1", "%5d") + "] "
                 + "%-18.18s {g" 
                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
-                + " [{G%s{x] [{r%s{x] "
-                + "[" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
+                + (adds ? "[{G%s{x " : "%s")
+                + (adds ? web_cmd(ch, "abc reset part " + vnum + " add", "reset") + "]{x" : "")
+                + (dels ? "[{r%s{x " : "%s")
+                + (dels ? web_cmd(ch, "abc reset part " + vnum + " del", "reset") + "]{x" : "")
+                + "   [" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
                 + "\n\r";
             buf << fmt(0, line.c_str(),
                 pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
@@ -593,12 +596,16 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 "[" + web_cmd(ch, "medit $1", "%5d") + "] "
                 + "%-18.18s {g" 
                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
-                + " [{G%s{x] [{r%s{x] "
-                + "[" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
+                + (adds ? "[{G%s{x " : "%s")
+                + (adds ? web_cmd(ch, "abc reset form " + vnum + " add", "reset") + "]{x" : "")
+                + (dels ? "[{r%s{x " : "%s")
+                + (dels ? web_cmd(ch, "abc reset form " + vnum + " del", "reset") + "]{x" : "")
+                + "   [" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
                 + "\n\r";
             buf << fmt(0, line.c_str(),
                 pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
-                form_flags.names(adds).c_str(), form_flags.names(dels).c_str());
+                form_flags.names(adds).c_str(), 
+                form_flags.names(dels).c_str());
 
         }
 
@@ -627,6 +634,53 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
+    DLString arg2 = args.getOneArgument();
+    DLString arg3 = args.getOneArgument();
+    MOB_INDEX_DATA *pMob;
+    Integer vnum;
+    if (!Integer::tryParse(vnum, arg3))
+        return;
     
+    pMob = get_mob_index(vnum);
+    if (!pMob)
+        return;
+    Race *race = raceManager->find(pMob->race);
+    if (!race || !race->isValid())
+        return;
+
+    if (arg == "reset") {
+
+        if (arg2 == "form") {
+            bitstring_t raceForm = race->getForm();
+            bitstring_t mobForm = pMob->form;            
+            bitstring_t dels = ~mobForm & raceForm;
+
+            if (args == "del")
+                pMob->form = dels | pMob->form;
+            else if (args == "add")
+                pMob->form = raceForm & mobForm;
+            else
+                return;
+
+        }
+        else if (arg2 == "part") {
+            bitstring_t racePart = race->getParts();
+            bitstring_t mobPart = pMob->parts;
+            bitstring_t dels = ~mobPart & racePart;
+
+            if (args == "del")
+                pMob->parts = dels | pMob->parts;
+            else if (args == "add")
+                pMob->parts = racePart & mobPart;
+            else
+                return;
+        }
+        else
+            return;
+
+        pMob->area->changed = true;
+        return;
+    }
+
 }
 
