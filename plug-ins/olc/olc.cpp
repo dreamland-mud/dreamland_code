@@ -537,6 +537,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
+            if (pMob->properties.count("hidden") > 0)
+                continue;
 
             bitstring_t raceParts = race->getParts();
             bitstring_t mobParts = pMob->parts;
@@ -544,10 +546,16 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             if (raceParts == mobParts)
                 continue;
 
+            DLString vnum = pMob->vnum;
             bitstring_t adds = mobParts & ~raceParts;
             bitstring_t dels = ~mobParts & raceParts;
-            DLString line = "[" + web_cmd(ch, "medit $1", "%5d") + "] %-18.18s {g" 
-                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x add [{G%s{x] del [{r%s{x]\n\r";
+            DLString line = 
+                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
+                + "%-18.18s {g" 
+                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
+                + " [{G%s{x] [{r%s{x] "
+                + "[" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
+                + "\n\r";
             buf << fmt(0, line.c_str(),
                 pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
                 part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
@@ -569,6 +577,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
+            if (pMob->properties.count("hidden") > 0)
+                continue;
 
             bitstring_t raceForm = race->getForm();
             bitstring_t mobForm = pMob->form;
@@ -576,10 +586,16 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             if (raceForm == mobForm)
                 continue;
 
+            DLString vnum = pMob->vnum;
             bitstring_t adds = mobForm & ~raceForm;
             bitstring_t dels = ~mobForm & raceForm;
-            DLString line = "[" + web_cmd(ch, "medit $1", "%5d") + "] %-18.18s {g" 
-                 + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x add [{G%s{x] del [{r%s{x]\n\r";
+            DLString line = 
+                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
+                + "%-18.18s {g" 
+                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
+                + " [{G%s{x] [{r%s{x] "
+                + "[" + web_cmd(ch, "abc hide " + vnum, "hide") + "]"
+                + "\n\r";
             buf << fmt(0, line.c_str(),
                 pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
                 form_flags.names(adds).c_str(), form_flags.names(dels).c_str());
@@ -590,5 +606,27 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
+    if (arg == "hide") {
+        Integer vnum;
+        MOB_INDEX_DATA *pMob;
+
+        if (args.empty() || !Integer::tryParse(vnum, args)) {
+            ch->pecho("abc hide <vnum>");
+            return;
+        }
+
+        pMob = get_mob_index(vnum);
+        if (!pMob) {
+            ch->pecho("Mob %d doesn't exist.", vnum.getValue());
+            return;
+        }
+
+        pMob->properties["hidden"] = "true";
+        pMob->area->changed = true;
+        ch->pecho("Mob %d is now hidden from output.", vnum.getValue());
+        return;
+    }
+
+    
 }
 
