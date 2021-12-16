@@ -526,12 +526,15 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
+    const int maxlines = 40;
+
     if (arg == "part") {
         ostringstream buf;
+        int cnt = 0;
         buf << "Mobs that have body parts ADDed or DELeted compared to their race:" << endl << endl;
 
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
             Race *race = raceManager->find(pMob->race);
             if (!race || !race->isValid()) {
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
@@ -563,6 +566,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
                 part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
 
+            cnt++;
         }
 
         page_to_char(buf.str().c_str(), ch);
@@ -571,10 +575,11 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
     if (arg == "form") {
         ostringstream buf;
+        int cnt = 0;
         buf << "Mobs that have forms ADDed or DELeted compared to their race:" << endl << endl;
 
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
             Race *race = raceManager->find(pMob->race);
             if (!race || !race->isValid()) {
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
@@ -607,6 +612,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 form_flags.names(adds).c_str(), 
                 form_flags.names(dels).c_str());
 
+            cnt++;
         }
 
         page_to_char(buf.str().c_str(), ch);
