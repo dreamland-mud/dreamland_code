@@ -159,7 +159,7 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
         return;
         
     if (victim->is_npc() ) {
-        if (IS_CHARMED(victim) && !victim->master->is_npc() && ch != victim->master) {
+        if (victim->master && !victim->master->is_npc() && ch != victim->master) {
             victim = victim->master;
             buf << ch->getNameC() << " атакует чармиса " << victim->getNameC();
         } else if (victim->in_room->pIndexData->clan != clan_none && ( 
