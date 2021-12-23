@@ -1329,7 +1329,7 @@ void check_reboot( void )
     case 5:
     case 10:
     case 15:
-        msg2 = fmt( NULL, "Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!'",
+        msg2 = fmt( NULL, "Внимание! Через %1$d мину%1$Iту|ты|т будет перезагрузка Мира Мечты!",
                    dreamland->getRebootCounter( ) );
         if (dreamland->getRebootCounter( ) == 5) {
             send_to_discord_stream(":red_circle: " + msg2);
