@@ -542,7 +542,9 @@ SKILL_RUNP( steal )
         /*
          * Failure.
          */
-
+		if (victim->is_npc() && IS_SET(victim->act, ACT_NOSTEAL))
+			ch->pecho("У %C2 магическая защита от воришек.", victim);
+		
                 ch->pecho("Тебя застукали за попыткой воровства!");
                 if ( !IS_AFFECTED( victim, AFF_SLEEP ) )
                 {
@@ -633,7 +635,7 @@ SKILL_RUNP( steal )
 
         if (obj->behavior && !obj->behavior->canSteal( ch ))
         {
-                ch->pecho("У этого существа магическая защита от воровства.");
+                ch->pecho("У этого предмета магическая защита от воровства.");
                 return;
         }
 
