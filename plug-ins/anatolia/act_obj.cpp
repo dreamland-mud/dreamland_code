@@ -1685,12 +1685,13 @@ CMDRUNP( use )
     if (oprog_use( obj, ch, argument ))
         return;
     
-    if (obj->carried_by == ch) {
-        oldact("Ты вертишь в руках $o4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 вертит в руках $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+    // Can only "handle" something in the inventory -- otherwise, "touch"
+    if (obj->carried_by == ch && obj->wear_loc == wear_none) {
+        oldact("Ты вертишь в руках $o4, не находя способа это использовать.", ch, obj, 0, TO_CHAR);
+        oldact("$c1 вертит в руках $o4, не находя способа это использовать.", ch, obj, 0, TO_ROOM);
     } else {
-        oldact("Ты озадаченно ощупываешь $o4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-        oldact("$c1 озадаченно ощупывает $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+        oldact("Ты озадаченно ощупываешь $o4, не находя способа это использовать.", ch, obj, 0, TO_CHAR);
+        oldact("$c1 озадаченно ощупывает $o4, не находя способа это использовать.", ch, obj, 0, TO_ROOM);
     }
 }        
 
