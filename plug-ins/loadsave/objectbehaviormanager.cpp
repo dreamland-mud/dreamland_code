@@ -207,9 +207,9 @@ void BasicObjectBehavior::delete_(Character *ch)
 bool BasicObjectBehavior::canSteal(Character *) 
 {
     if (obj->getOwner())
-        return true;
+        return false;
     
-    return false;
+    return true;
 }
 
 /** Owned items can't be picked up from the floor or container */
