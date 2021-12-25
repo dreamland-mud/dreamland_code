@@ -101,6 +101,7 @@ class_warlock.h
 libclass_skills_la_LIBADD = \
 $(libgroup_skills_la_LIBADD) \
 ../services/core/libservices_core.la \
+../selfrate/libselfrate.la \
 ../services/shop/libservices_shop.la 
 
 

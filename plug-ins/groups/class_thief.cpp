@@ -50,12 +50,13 @@
 #include "damage_impl.h"
 #include "vnum.h"
 #include "occupations.h"
-#include "merc.h"
+#include "skill_utils.h"
+#include "selfrate.h"
 #include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
+#include "merc.h"
 #include "def.h"
-#include "skill_utils.h"
 
 GSN(key_forgery);
 BONUS(thief_skills);
@@ -102,13 +103,12 @@ void BackstabOneHit::calcDamage( )
     damBase( );
     damApplyEnhancedDamage( );
     damApplyPosition( );
-
+    damApplyDamroll( );
+	
     if (wield != 0) {
 	int slevel = skill_level(*gsn_backstab, ch);    
         dam = ( slevel / 10 + 1 ) * dam + slevel;
     }
-	
-    damApplyDamroll( );
 
     WeaponOneHit::calcDamage( );
 }
@@ -142,13 +142,12 @@ void DualBackstabOneHit::calcDamage( )
     damBase( );
     damApplyEnhancedDamage( );
     damApplyPosition( );
+    damApplyDamroll( );
 	
     if (wield != 0) {
 	int slevel = skill_level(*gsn_dual_backstab, ch);    
         dam = ( slevel / 10 + 1 ) * dam + slevel;
     }
-
-    damApplyDamroll( );
 
     WeaponOneHit::calcDamage( );
 }
@@ -180,11 +179,11 @@ void CircleOneHit::calcDamage( )
     damBase( );
     damApplyEnhancedDamage( );
     damApplyPosition( );
+    damApplyDamroll( );
 	
     int slevel = skill_level(*gsn_circle, ch);    
     dam = ( slevel / 40 + 1 ) * dam + slevel;
 	
-    damApplyDamroll( );
     damApplyCounter( );
 
     WeaponOneHit::calcDamage( );
@@ -211,11 +210,11 @@ void KnifeOneHit::calcDamage( )
     damBase( );
     damApplyEnhancedDamage( );
     damApplyPosition( );
+    damApplyDamroll( );
 	
     int slevel = skill_level(*gsn_knife, ch);    
     dam = ( slevel / 30 + 1 ) * dam + slevel;
 	
-    damApplyDamroll( );
     damApplyCounter( );
 
     WeaponOneHit::calcDamage( );
@@ -495,9 +494,9 @@ SKILL_RUNP( steal )
                 UNSET_DEATH_TIME(ch);
         }
 
-        if (!victim->is_npc() && victim->desc == 0)
+        if (!victim->is_npc() && IS_TOTAL_NEWBIE(victim->getPC()))
         {
-                ch->pecho("Ты не можешь сделать этого.");
+                ch->pecho("Не стоит воровать у новичков.");
                 return;
         }
 
@@ -543,7 +542,9 @@ SKILL_RUNP( steal )
         /*
          * Failure.
          */
-
+		if (victim->is_npc() && IS_SET(victim->act, ACT_NOSTEAL))
+			ch->pecho("У %C2 магическая защита от воришек.", victim);
+		
                 ch->pecho("Тебя застукали за попыткой воровства!");
                 if ( !IS_AFFECTED( victim, AFF_SLEEP ) )
                 {
@@ -634,7 +635,7 @@ SKILL_RUNP( steal )
 
         if (obj->behavior && !obj->behavior->canSteal( ch ))
         {
-                ch->pecho("Это бесполезно для тебя.");
+                ch->pecho("У этого предмета магическая защита от воровства.");
                 return;
         }
 
@@ -887,7 +888,7 @@ protected:
         }
 
         if (actor == ch) {
-            actor->pecho( "Это бесполезно." );
+            actor->pecho( "Ты пихаешь себя в бок и глупо улыбаешься." );
             return false;
         }
 
