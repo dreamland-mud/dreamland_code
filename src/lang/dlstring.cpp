@@ -18,6 +18,7 @@ using std::basic_ostringstream;
 using std::basic_istringstream;
 
 const DLString DLString::emptyString;
+const DLString DLString::SPACE = " ";
 
 const locale DLString::LOCALE_RU = DLString::initLocale();
 

@@ -6,10 +6,10 @@
 #ifndef INVASIONOBJECTS_H
 #define INVASIONOBJECTS_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "xmlinteger.h"
 
-class InvasionObj : public ObjectBehavior {
+class InvasionObj : public BasicObjectBehavior {
 XML_OBJECT
 friend class InvasionInstrument;
 public:
@@ -23,7 +23,7 @@ protected:
         virtual void actDestroy( Character * );
 };
 
-class InvasionInstrument : public ObjectBehavior {
+class InvasionInstrument : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<InvasionInstrument> Pointer;

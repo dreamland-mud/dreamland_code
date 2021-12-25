@@ -40,8 +40,8 @@ areautils.cpp \
 roomutils.cpp
 
 libloadsave_la_MOC = \
-savedcreature.h
-
+savedcreature.h \
+objectbehaviormanager.h
 
 libloadsave_la_LIBADD = \
 ../descriptor/libdescriptor.la \

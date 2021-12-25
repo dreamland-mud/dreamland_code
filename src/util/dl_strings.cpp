@@ -291,9 +291,9 @@ DLString russian_case_all_forms(const DLString &string)
  * Finds the first occurrence of the substring needle(ct) in the
  * string haystack(cs), case insensitive.
  */
-char *str_str(char *cs, const char *ct) 
+const char *str_str(const char *cs, const char *ct) 
 {
-    char *s;
+    const char *s;
     const char *t;
 
     if (!cs || !ct)

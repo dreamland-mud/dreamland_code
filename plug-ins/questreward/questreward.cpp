@@ -11,7 +11,3 @@ bool QuestReward::mayFloat( ) {
     return true;
 }
 
-bool QuestReward::canConfiscate( ) { 
-    return false;
-}
-

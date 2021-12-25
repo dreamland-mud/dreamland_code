@@ -576,7 +576,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return objresult;
             
         buf.str( "" );
-        buf << "Для этого заклинания нужно указать имя персонажа в качестве цели.";
+        buf << "Увы, никого с таким именем в этой местности обнаружить не удается.";
         result->error = TARGET_ERR_CAST_ON_WHOM;
         return result;
     }

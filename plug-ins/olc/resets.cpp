@@ -258,7 +258,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
             pObj = pObjIndex;
 
             if (!pMob) {
-                buf << fmt(0, "Give/Equip Object - No Previous Mobile\n\r");
+                buf << fmt(0, "Give/Equip Object %d - No Previous Mobile\n\r", pReset->arg1);
                 break;
             }
 

@@ -255,6 +255,10 @@ void Object::setName( const char *s )
 
     name = str_dup( s );
 }
+void Object::setShortDescr(const DLString &s)
+{
+    setShortDescr(s.c_str());
+}
 void Object::setShortDescr( const char *s )
 {
     if (short_descr)
@@ -262,6 +266,10 @@ void Object::setShortDescr( const char *s )
 
     short_descr = str_dup( s );
     updateCachedNoun( );
+}
+void Object::setDescription( const DLString &s )
+{
+    setDescription(s.c_str());
 }
 void Object::setDescription( const char *s )
 {

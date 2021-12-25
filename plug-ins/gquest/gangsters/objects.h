@@ -30,7 +30,7 @@ public:
  * portal
  */
 
-class GangPortal : public ObjectBehavior {
+class GangPortal : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<GangPortal> Pointer;

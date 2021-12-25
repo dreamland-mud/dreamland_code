@@ -101,7 +101,7 @@ protected:
         void addAffect( Character *, Affect * );
 };
 
-class HunterTrapObject : public ObjectBehavior {
+class HunterTrapObject : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<HunterTrapObject> Pointer;

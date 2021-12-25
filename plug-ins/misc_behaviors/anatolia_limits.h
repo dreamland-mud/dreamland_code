@@ -6,9 +6,9 @@
 #ifndef ANATOLIA_LIMITS_H 
 #define ANATOLIA_LIMITS_H 
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class DemonfireShield : public ObjectBehavior {
+class DemonfireShield : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<DemonfireShield> Pointer;
@@ -18,7 +18,7 @@ public:
         virtual void fight( Character *ch );
 };
 
-class Excalibur : public ObjectBehavior {
+class Excalibur : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<Excalibur> Pointer;
@@ -31,7 +31,7 @@ public:
         virtual void speech( Character *victim, const char *speech );
 };
 
-class FireGauntlets : public ObjectBehavior {
+class FireGauntlets : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<FireGauntlets> Pointer;
@@ -41,7 +41,7 @@ public:
         virtual void fight( Character *ch );
 };
 
-class FlyingBoots : public ObjectBehavior {
+class FlyingBoots : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<FlyingBoots> Pointer;
@@ -51,7 +51,7 @@ public:
         virtual void remove( Character *victim );
 };
 
-class GiantStrengthArmor : public ObjectBehavior {
+class GiantStrengthArmor : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<GiantStrengthArmor> Pointer;
@@ -62,7 +62,7 @@ public:
 };
 
 
-class HasteBracers : public ObjectBehavior {
+class HasteBracers : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<HasteBracers> Pointer;
@@ -72,7 +72,7 @@ public:
         virtual void remove( Character *victim );
 };
 
-class LionClaw : public ObjectBehavior {
+class LionClaw : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<LionClaw> Pointer;
@@ -80,7 +80,7 @@ public:
         virtual void fight( Character *ch );
 };
 
-class RingOfRa : public ObjectBehavior {
+class RingOfRa : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<RingOfRa> Pointer;
@@ -88,7 +88,7 @@ public:
         virtual void speech( Character *victim, const char *speech );
 };
 
-class RoseShield : public ObjectBehavior {
+class RoseShield : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<RoseShield> Pointer;
@@ -97,7 +97,7 @@ public:
 };
 
 
-class SubissueWeapon : public ObjectBehavior {
+class SubissueWeapon : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<SubissueWeapon> Pointer;
@@ -106,7 +106,7 @@ public:
 };
 
 
-class Thunderbolt : public ObjectBehavior {
+class Thunderbolt : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<Thunderbolt> Pointer;
@@ -115,7 +115,7 @@ public:
 };
 
 
-class TwoSnakeWhip : public ObjectBehavior {
+class TwoSnakeWhip : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<TwoSnakeWhip> Pointer;
@@ -127,7 +127,7 @@ public:
         virtual void fight( Character *ch );
 };
 
-class VolcanoeArmbands : public ObjectBehavior {
+class VolcanoeArmbands : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<VolcanoeArmbands> Pointer;

@@ -296,6 +296,24 @@ NMI_SET( ObjectWrapper, timer, "через сколько тиков исчез�
     target->timer = arg.toNumber( );
 }
 
+NMI_GET(ObjectWrapper, killer , "имя убийцы для трупов или строка '!anybody!'")
+{
+    checkTarget();
+    return Register(target->killer);
+}
+
+NMI_GET(ObjectWrapper, count , "счетчик лута для трупов")
+{
+    checkTarget();
+    return Register(target->count);
+}
+
+NMI_GET(ObjectWrapper, from , "куда была надета вещь из трупа; или имя владельца части тела; или имя владельца трупа")
+{
+    checkTarget();
+    return Register(target->from);
+}
+
 NMI_GET( ObjectWrapper, owner , "имя персонажа-владельца (для трупов и личных вещей)")
 {
     checkTarget( );

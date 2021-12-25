@@ -150,7 +150,9 @@ public:
     void setOwner( const char * );
     void setName( const char * );
     void setShortDescr( const char * );
+    void setShortDescr( const DLString & );
     void setDescription( const char * );
+    void setDescription( const DLString & );
     void setMaterial( const char * );
     
     void fmtName( const char *, ... );

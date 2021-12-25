@@ -5,9 +5,9 @@
 #ifndef RELIGIONTATTOO_H
 #define RELIGIONTATTOO_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class ReligionTattoo : public ObjectBehavior {
+class ReligionTattoo : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<ReligionTattoo> Pointer;

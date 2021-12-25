@@ -5,9 +5,9 @@
 #ifndef __GROUP_BEGUILING_H__
 #define __GROUP_BEGUILING_H__
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class MagicJar : public ObjectBehavior {
+class MagicJar : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<MagicJar> Pointer;

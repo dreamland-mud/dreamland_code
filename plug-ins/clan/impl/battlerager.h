@@ -7,7 +7,7 @@
 
 #include "xmlstring.h"
 #include "xmlattribute.h"
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "personalquestreward.h"
 #include "commandplugin.h"
 #include "defaultcommand.h"
@@ -15,7 +15,7 @@
 
 class Object;
 
-class BattleragerPoncho : public virtual ObjectBehavior {
+class BattleragerPoncho : public virtual BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<BattleragerPoncho> Pointer;

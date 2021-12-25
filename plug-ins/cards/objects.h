@@ -8,8 +8,8 @@
 
 #include "xmlstring.h"
 #include "xmlinteger.h"
-#include "objectbehavior.h"
 #include "objectbehaviorplugin.h"
+#include "objectbehaviormanager.h"
 
 #define OBJ_VNUM_CARD 28200
 #define OBJ_VNUM_CARDPACK 28201
@@ -19,7 +19,7 @@ class Room;
 class PCharacter;
 class NPCharacter;
 
-class CardPackBehavior : public ObjectBehavior {
+class CardPackBehavior : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<CardPackBehavior> Pointer;
@@ -34,7 +34,7 @@ private:
         XML_VARIABLE XMLInteger throws;        
 };
 
-class CardBehavior : public ObjectBehavior {
+class CardBehavior : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<CardBehavior> Pointer;
@@ -79,7 +79,7 @@ inline void CardBehavior::setQuality( int q )
     quality.setValue( q );
 }
 
-class CardSleevesBehavior : public ObjectBehavior {
+class CardSleevesBehavior : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<CardSleevesBehavior> Pointer;

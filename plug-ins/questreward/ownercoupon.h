@@ -6,9 +6,9 @@
 #ifndef OWNERCOUPON_H
 #define OWNERCOUPON_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
-class OwnerCoupon : public ObjectBehavior {
+class OwnerCoupon : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<OwnerCoupon> Pointer;

@@ -21,7 +21,7 @@ protected:
         virtual bool specFight( );
 };
 
-class LionEyedSword : public ObjectBehavior {
+class LionEyedSword : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<LionEyedSword> Pointer;

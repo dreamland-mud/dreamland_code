@@ -7,7 +7,7 @@
 #define QUESTOR_H
 
 #include "wanderer.h"
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
 class Questor : public Wanderer {
 XML_OBJECT
@@ -34,7 +34,7 @@ private:
         void rewardWord( PCharacter * );
 };
 
-class QuestScrollBehavior : public ObjectBehavior {
+class QuestScrollBehavior : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<QuestScrollBehavior> Pointer;

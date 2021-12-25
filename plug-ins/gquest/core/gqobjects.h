@@ -3,11 +3,11 @@
 
 #include "xmlinteger.h"
 #include "xmlstring.h"
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
 class GlobalQuest;
 
-class GlobalQuestObject: public ObjectBehavior {
+class GlobalQuestObject: public BasicObjectBehavior {
 XML_OBJECT    
 public:
         typedef ::Pointer<GlobalQuestObject> Pointer;

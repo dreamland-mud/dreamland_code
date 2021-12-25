@@ -6,7 +6,7 @@
 #ifndef CHAOS_H 
 #define CHAOS_H 
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "clanmobiles.h"
 
 class ClanGuardChaos: public ClanGuard {
@@ -20,7 +20,7 @@ protected:
         virtual int getCast( Character * );
 };
 
-class ChaosBlade : public ObjectBehavior {
+class ChaosBlade : public BasicObjectBehavior {
 XML_OBJECT
 public:
     typedef ::Pointer<ChaosBlade> Pointer;

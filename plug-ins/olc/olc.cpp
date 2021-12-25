@@ -58,6 +58,7 @@ void obj_update();
 GSN(none);
 CLAN(none);
 GROUP(clan);
+WEARLOC(sheath);
 
 using namespace std;
 
@@ -478,7 +479,205 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         ch->pecho("Forced obj update.");
         return;
     }
+
+    if (arg == "badresets") {
+        ostringstream buf;
+
+        buf << "List of all resets with invalid wearlocations: " << endl;
+        for (auto &r: roomIndexMap) {
+            MOB_INDEX_DATA *pMob = 0;
+
+            for (auto &pReset: r.second->resets) {
+                if (pReset->command == 'O' || pReset->command == 'R') {
+                    pMob = 0;
+                    continue;
+                }
+
+                if (pReset->command == 'M') {
+                    pMob = get_mob_index(pReset->arg1);
+                    continue;
+                }
+
+                if (pReset->command == 'E') {
+                    if (!pMob) {
+                        buf << "Bad mob reset " << pReset->arg1 << " in room " << r.first << endl;
+                        continue;
+                    }
+
+                    Wearlocation *wloc = wearlocationManager->find(pReset->arg3);
+                    if (!wloc) {
+                        buf << "Bad wearloc for mob " << pMob->vnum << " in room " << r.first << endl;
+                        continue;
+                    }
+
+                    if (wloc->getIndex() == wear_sheath)
+                        continue;
+
+                    Race *race = raceManager->find(pMob->race);
+                    if (!race->getWearloc().isSet(*wloc)) {
+                        buf << "[" << r.first << "] mob [" << pMob->vnum << "] race '" 
+                            << race->getName() <<"' equipped at " << wloc->getName() << endl;
+                    }
+                }
+            }
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    const int maxlines = 40;
+
+    if (arg == "part") {
+        ostringstream buf;
+        int cnt = 0;
+        buf << endl;
+
+        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
+            Race *race = raceManager->find(pMob->race);
+            if (!race || !race->isValid()) {
+                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
+                continue;
+            }
+            if (pMob->properties.count("hidden") > 0)
+                continue;
+
+            bitstring_t raceParts = race->getParts();
+            bitstring_t mobParts = pMob->parts;
+
+            if (raceParts == mobParts)
+                continue;
+
+            DLString vnum = pMob->vnum;
+            bitstring_t adds = mobParts & ~raceParts;
+            bitstring_t dels = ~mobParts & raceParts;
+            DLString line = 
+                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
+                + "%-18.18s {g" 
+                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
+                + (adds ? "[{G%s{x " : "%s")
+                + (adds ? web_cmd(ch, "abc reset part " + vnum + " add", "reset") + "]{x" : "")
+                + (dels ? "[{r%s{x " : "%s")
+                + (dels ? web_cmd(ch, "abc reset part " + vnum + " del", "reset") + "]{x" : "")
+                + "   [" + web_cmd(ch, "abc hide part " + vnum, "hide") + "]"
+                + "\n\r";
+            buf << fmt(0, line.c_str(),
+                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
+
+            cnt++;
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    if (arg == "form") {
+        ostringstream buf;
+        int cnt = 0;
+        buf << endl;
+        
+        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
+            Race *race = raceManager->find(pMob->race);
+            if (!race || !race->isValid()) {
+                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
+                continue;
+            }
+            if (pMob->properties.count("hidden") > 0)
+                continue;
+
+            bitstring_t raceForm = race->getForm();
+            bitstring_t mobForm = pMob->form;
+
+            if (raceForm == mobForm)
+                continue;
+
+            DLString vnum = pMob->vnum;
+            bitstring_t adds = mobForm & ~raceForm;
+            bitstring_t dels = ~mobForm & raceForm;
+            DLString line = 
+                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
+                + "%-18.18s {g" 
+                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
+                + (adds ? "[{G%s{x " : "%s")
+                + (adds ? web_cmd(ch, "abc reset form " + vnum + " add", "reset") + "]{x" : "")
+                + (dels ? "[{r%s{x " : "%s")
+                + (dels ? web_cmd(ch, "abc reset form " + vnum + " del", "reset") + "]{x" : "")
+                + "   [" + web_cmd(ch, "abc hide form " + vnum, "hide") + "]"
+                + "\n\r";
+            buf << fmt(0, line.c_str(),
+                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                form_flags.names(adds).c_str(), 
+                form_flags.names(dels).c_str());
+
+            cnt++;
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    DLString arg2 = args.getOneArgument();
+    DLString arg3 = args.getOneArgument();
+    MOB_INDEX_DATA *pMob;
+    Integer vnum;
+    if (!Integer::tryParse(vnum, arg3))
+        return;
+    
+    pMob = get_mob_index(vnum);
+    if (!pMob)
+        return;
+
+    Race *race = raceManager->find(pMob->race);
+    if (!race || !race->isValid())
+        return;
+
+    if (arg == "hide") {
+        pMob->properties["hidden"] = "true";
+        pMob->area->changed = true;
+        ch->pecho("Mob %d is now hidden from output.", vnum.getValue());
+        __do_abc(ch, const_cast<char *>(arg2.c_str()));
+        return;
+    }
+
+    if (arg == "reset") {
+
+        if (arg2 == "form") {
+            bitstring_t raceForm = race->getForm();
+            bitstring_t mobForm = pMob->form;            
+            bitstring_t dels = ~mobForm & raceForm;
+
+            if (args == "del")
+                pMob->form = dels | pMob->form;
+            else if (args == "add")
+                pMob->form = raceForm & mobForm;
+            else
+                return;
+
+            ch->pecho("Mob %d has forms [%s].", vnum.getValue(), form_flags.names(pMob->form).c_str());
+        }
+        else if (arg2 == "part") {
+            bitstring_t racePart = race->getParts();
+            bitstring_t mobPart = pMob->parts;
+            bitstring_t dels = ~mobPart & racePart;
+
+            if (args == "del")
+                pMob->parts = dels | pMob->parts;
+            else if (args == "add")
+                pMob->parts = racePart & mobPart;
+            else
+                return;
+
+            ch->pecho("Mob %d has parts [%s].", vnum.getValue(), part_flags.names(pMob->parts).c_str());
+        }
+        else
+            return;
+
+        __do_abc(ch, const_cast<char *>(arg2.c_str()));
+        pMob->area->changed = true;
+        return;
+    }
 }
-
-
 

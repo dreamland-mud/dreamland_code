@@ -6,12 +6,12 @@
 #ifndef CLANOBJECTS_H
 #define CLANOBJECTS_H
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 
 #include "clanreference.h"
 #include "clanarea.h"
 
-class ClanObject: public ObjectBehavior {
+class ClanObject: public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<ClanObject> Pointer;

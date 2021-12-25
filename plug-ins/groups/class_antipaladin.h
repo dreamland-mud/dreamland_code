@@ -5,7 +5,7 @@
 #ifndef __CLASS_ANTIPALADIN_H__
 #define __CLASS_ANTIPALADIN_H__
 
-#include "objectbehavior.h"
+#include "objectbehaviormanager.h"
 #include "objectbehaviorplugin.h"
 #include "basicmobilebehavior.h"
 
@@ -18,7 +18,7 @@ class Character;
 /*
  *  'shadow blade' behavior
  */
-class ShadowBlade : public ObjectBehavior {
+class ShadowBlade : public BasicObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<ShadowBlade> Pointer;

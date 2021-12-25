@@ -8,8 +8,11 @@
 
 #include "xmldocument.h"
 #include "logstream.h"
-#include "object.h"
+#include "core/object.h"
+#include "character.h"
+#include "loadsave.h"
 #include "fread_utils.h"
+#include "act.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -42,6 +45,30 @@ void ObjectBehaviorManager::assign( Object *obj, const DLString &behaviorClassNa
         return;
     }
 }
+
+void ObjectBehaviorManager::assignBasic( Object *obj ) 
+{
+    static const DLString basicName( "BasicObjectBehavior" );
+
+    if (obj->behavior) {
+        obj->behavior->unsetObj( );
+        obj->behavior.clear( );
+    }
+
+    try {
+        AllocateClass::Pointer pointer = Class::allocateClass( basicName );
+        ObjectBehavior::Pointer behavior = pointer.getDynamicPointer<ObjectBehavior>( );
+        
+        if (!behavior)
+            throw Exception( "BasicObjectBehavior is not derived from ObjectBehavior" );
+        
+        obj->behavior.setPointer( *behavior );
+        obj->behavior->setObj( obj );
+    }
+    catch (const ExceptionClassNotFound &e ) {
+    }
+}
+
 
 void ObjectBehaviorManager::clear( Object *obj ) 
 {
@@ -135,5 +162,79 @@ void ObjectBehaviorManager::save( const Object *obj, FILE *fp ) {
     } catch (const ExceptionXMLError &e) {
         LogStream::sendError( ) << e.what( ) << endl;
     }
+}
+
+/*-----------------------------------------------------------------
+ * BasicObjectBehavior
+ *-----------------------------------------------------------------*/
+
+/** Owned items can't be confiscated by Rulers */
+bool BasicObjectBehavior::canConfiscate() 
+{
+    if (obj->getOwner())
+        return false;
+
+    return true;
+}
+
+/** Someone else's items disappear on save. */
+bool BasicObjectBehavior::save() 
+{
+    if (!obj->getOwner())
+        return false;
+
+    Character *ch = obj->getCarrier( );
+
+    if (!ch || ch->is_immortal( ))
+        return false;
+    
+    if (obj->hasOwner( ch )) 
+        return false;
+    
+    oldact("$o1 исчезает!", ch, obj, 0, TO_CHAR);
+    extract_obj(obj);
+    return true;    
+}
+
+/** Owned items disappear when character is deleted. */
+void BasicObjectBehavior::delete_(Character *ch) 
+{
+    if (obj->hasOwner( ch )) 
+        extract_obj( obj );    
+}
+
+/** Owned items can't be stolen. */
+bool BasicObjectBehavior::canSteal(Character *) 
+{
+    if (obj->getOwner())
+        return true;
+    
+    return false;
+}
+
+/** Owned items can't be picked up from the floor or container */
+void BasicObjectBehavior::get( Character *ch ) 
+{ 
+    canEquip(ch);
+}
+
+/** Owned items can't be equipped */
+bool BasicObjectBehavior::canEquip(Character *ch) 
+{
+    if (!obj->getOwner())
+        return true;
+
+    if (ch->is_immortal())
+        return true;
+    
+    if (!obj->hasOwner( ch )) {
+        ch->pecho( "Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj );
+        ch->recho("%2$^C1 не может владеть %1$O5 и бросает %1$P2.", obj, ch);
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        return false;
+    }
+
+    return true;
 }
 
