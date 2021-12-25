@@ -131,17 +131,19 @@ void DrinkContainerWEBase::setupBehavior( PCharacter *ch, Object *obj ) const
 
 bool DrinkContainerWEBase::checkContainer( PCharacter *ch, Object *obj ) const
 {
-    ArcadianDrinkBehavior::Pointer bhv;
+    ArcadianDrinkBehavior::Pointer arcadBehavior;
 
     if (!obj->behavior)
         return true;
 
-    if (!( bhv = obj->behavior.getDynamicPointer<ArcadianDrinkBehavior>( ) )) {
+    // Can't apply arcadian words to a container with complex behavior.
+    arcadBehavior = obj->behavior.getDynamicPointer<ArcadianDrinkBehavior>();
+    if (!arcadBehavior && obj->behavior->getType() != "BasicObjectBehavior") {
         oldact("Повлиять на эту емкость у тебя не получится.", ch, obj, 0, TO_CHAR);
         return false;
     }
 
-    if (bhv->isActive( )) {
+    if (arcadBehavior && arcadBehavior->isActive( )) {
         oldact("Жидкость в $o6 уже обладает необычными свойствами.", ch, obj, 0, TO_CHAR);
         return false;
     }
