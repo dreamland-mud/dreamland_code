@@ -1336,7 +1336,7 @@ void check_reboot( void )
             send_telegram(msg2);
         }
         msg = fmt( NULL, "%1$^s громко кричит '{R%2$s{x'",
-                   (chance( 50 ) ? "Хассан" : "Валькирия"), msg2 );
+                   (chance( 50 ) ? "Хассан" : "Валькирия"), msg2.c_str() );
         for (d = descriptor_list; d != 0; d = d->next)
             if (d->connected == CON_PLAYING && d->character)
                 d->character->pecho( msg );
