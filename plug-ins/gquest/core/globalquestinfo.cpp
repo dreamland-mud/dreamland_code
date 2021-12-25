@@ -114,6 +114,9 @@ bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
     if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY|ROOM_CHAT))
         return false;
 
+    if (!IS_SET(ch->act, PLR_CONFIRMED))
+        return false;
+
     return true;
 }
 
