@@ -50,13 +50,13 @@
 #include "damage_impl.h"
 #include "vnum.h"
 #include "occupations.h"
-#include "merc.h"
+#include "skill_utils.h"
+#include "selfrate.h"
 #include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
+#include "merc.h"
 #include "def.h"
-#include "skill_utils.h"
-#include "selfrate.h"
 
 GSN(key_forgery);
 BONUS(thief_skills);
@@ -494,7 +494,7 @@ SKILL_RUNP( steal )
                 UNSET_DEATH_TIME(ch);
         }
 
-        if (!victim->is_npc() && IS_TOTAL_NEWBIE(victim))
+        if (!victim->is_npc() && IS_TOTAL_NEWBIE(victim->getPC()))
         {
                 ch->pecho("Не стоит воровать у новичков.");
                 return;
