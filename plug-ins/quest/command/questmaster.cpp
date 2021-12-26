@@ -2,6 +2,8 @@
  *
  * ruffina, 2005
  */
+#include "questmaster.h"
+
 #include "npcharacter.h"
 #include "merc.h"
 #include "interp.h"
@@ -9,9 +11,7 @@
 #include "act.h"
 #include "mercdb.h"
 #include "handler.h"
-
-#include "questmaster.h"
-#include "def.h"
+//#include "def.h"
 
 /*--------------------------------------------------------------------------
  * QuestMaster

@@ -9,7 +9,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "roomutils.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "act.h"
@@ -90,46 +90,17 @@ bool BigQuest::isComplete( )
     return (state == QSTAT_FINISHED);
 }
 
-Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
-    
-    if (mobsKilled != mobsTotal) {
-        if (hint > 0 && !IS_TOTAL_NEWBIE(ch))
-            tell_fmt("К тому же, ты уничтожил%1$Gо||а только %3$d преступник%3$Iа|ов|ов из %4$d.", 
-                     ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
-        else     
-            tell_fmt("Тебе удалось уничтожить только %3$d преступник%3$Iа|ов|ов из %4$d, но все равно это заслуживает поощрения.", 
-                     ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
-    }
-
-    if (hint > 0 && !IS_TOTAL_NEWBIE(ch)) {
-        r->gold = number_range(1, 3);
-        r->points = mobsKilled; 
-    }
-    else {
-        r->gold = number_range( 8, 12 );
-        r->points = number_range( 8, 10 ) +  mobsKilled * number_range(2, 3);
-        r->wordChance = 10;
-        r->scrollChance = 10;
-        if (chance(5))
-            r->prac = number_range(1, 2);
-    }
-
-    if (ch->getClan( )->isDispersed( )) 
-        r->points *= 2;
-    else
-        r->clanpoints = r->points;
-
-    r->exp = (r->points + r->clanpoints) * 10;
-    return Reward::Pointer( r );
+    QuestReward::Pointer r( NEW );
+    return r;
 }
 
 void BigQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
         buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+            << "Сообщи об этом квестору командой {yквест сдать{x, до того как выйдет время!" << endl;
     else {
         getScenario().onQuestInfo(ch, mobsTotal, buf);
         buf << "Последний раз их видели в местности '{hh" << areaName << "{hx'." << endl;
@@ -141,7 +112,7 @@ void BigQuest::info( std::ostream &buf, PCharacter *ch )
 void BigQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-        buf << "Вернуться к квестору за наградой.";
+        buf << "Сообщить квестору о выполнении задания.";
     else
         buf << fmt(0, "Уничтожить %1$d преступник%1$Iа|ов|ов из '%2$s' (убито %3$d).",
                     mobsTotal.getValue(), areaName.c_str(), mobsKilled.getValue());
@@ -167,7 +138,7 @@ void BigQuest::mobKilled(PCMemoryInterface *hero, Character *killer)
 
     if (hero->isOnline()) {
         if (hasPartialRewards()) 
-            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d, или же вернуться за частичным вознаграждением.{x\r\n", 
+            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d, или же сообщить квестору о частичном выполнении задания.{x\r\n", 
                                        mobsLeft, mobsTotal.getValue());
         else
             hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
@@ -187,7 +158,7 @@ void BigQuest::mobDestroyed(PCMemoryInterface *hero)
 void BigQuest::notifyNoMore(PCMemoryInterface *hero)
 {
     if (hero->isOnline())
-        hero->getPlayer()->pecho("{YВсе разбежались или были уничтожены, вернись за наградой.{x");
+        hero->getPlayer()->pecho("{YВсе разбежались или были уничтожены, сообщи квестору о выполнении задания.{x");
 }
 
 bool BigQuest::hasPartialRewards() const

@@ -100,9 +100,9 @@ bool KillQuest::isComplete( )
     return (state == QSTAT_FINISHED);
 }
 
-Quest::Reward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
+    QuestReward::Pointer r( NEW );
     
     if (hint.getValue( ) > 0 && !IS_TOTAL_NEWBIE(ch)) {
         r->gold = number_range( 1, 2 );
@@ -150,7 +150,7 @@ Quest::Reward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman 
         r->clanpoints = r->points;
 
     r->exp = (r->points + r->clanpoints) * 10;
-    return Reward::Pointer( r );
+    return r;
 }
 
 void KillQuest::info( std::ostream &buf, PCharacter *ch ) 

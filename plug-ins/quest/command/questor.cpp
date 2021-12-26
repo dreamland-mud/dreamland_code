@@ -56,13 +56,11 @@ bool Questor::canGiveQuest( Character *ach )
 
 void Questor::doComplete( PCharacter *client, DLString &args ) 
 {
-    ostringstream msg;
     int time;
-    Quest::Reward::Pointer r;
+    QuestReward::Pointer reward;
     Quest::Pointer quest;
     XMLAttributes *attributes;
     XMLAttributeQuestData::Pointer qdata;
-    bool fExpReward, fScrollGiven;
     DLString arg = args.getOneArgument( );
 
     oldact("$c1 информирует $C4 о выполнении задания.",client,0,ch,TO_ROOM);
@@ -87,6 +85,39 @@ void Questor::doComplete( PCharacter *client, DLString &args )
 
     tell_raw( client, ch,  "Поздравляю с выполнением задания!" );
 
+    reward = quest->reward( client, ch );
+
+    // Issue reward only for quests that allow players to gain quest points.
+    if (reward->points > 0) {
+        // Handle 'quest complete exp' syntax.
+        bool fExpReward = (!arg.empty( ) && (arg.strPrefix( "experience" ) || arg.strPrefix("опыт")));
+        if (fExpReward)
+            reward->points = 0;
+        else
+            reward->exp = 0;
+
+        giveReward(client, quest, reward);
+        quest->wiznet( "complete", "%s = %d Gold = %d Prac = %d WordChance = %d ScrollChance = %d",
+                    (fExpReward ? "Exp" : "Qp"), (fExpReward ? reward->exp : reward->points), 
+                    reward->gold, reward->prac, reward->wordChance, reward->scrollChance);
+    } else {
+        quest->wiznet("complete", "");
+    }
+    
+    time = quest->getNextTime( client );
+    qdata = attributes->getAttr<XMLAttributeQuestData>( "questdata" );
+    qdata->setTime( time );
+    qdata->rememberVictory( quest->getName( ) );
+    qdata->rememberLastQuest(quest->getName());
+    
+    attributes->eraseAttribute( "quest" );
+    PCharacterManager::save( client );
+}
+
+void Questor::giveReward(PCharacter *client, Quest::Pointer &quest, QuestReward::Pointer &r)
+{
+    ostringstream msg;
+
     if (quest->hint.getValue( ) > 0 && !IS_TOTAL_NEWBIE(client)) {
         tell_raw( client, ch,  "Я припоминаю, что мне пришлось подсказать тебе путь.");
         msg << "Но за настойчивость я даю тебе";
@@ -95,14 +126,12 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         msg << "В награду я даю тебе";
     }
     
-    fExpReward = (!arg.empty( ) && (arg.strPrefix( "experience" ) || arg.strPrefix("опыт")));
     msg << " {Y%3$d{G "
-        << (fExpReward ? "очк%3$Iо|а|ов опыта" : "квестов%3$Iую|ые|ых едини%3$Iцу|цы|ц")
+        << (r->exp > 0 ? "очк%3$Iо|а|ов опыта" : "квестов%3$Iую|ые|ых едини%3$Iцу|цы|ц")
         << " и {Y%4$d{G золот%4$Iую|ые|ых моне%4$Iту|ты|т.";
     
-    r = quest->reward( client, ch );
     tell_fmt( msg.str( ).c_str( ), client, ch, 
-              fExpReward ? r->exp : r->points,
+              r->exp > 0 ? r->exp : r->points,
               r->gold );
 
     if (client->getReligion() == god_fili && get_eq_char(client, wear_tattoo)) {
@@ -113,7 +142,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
 
     client->gold += r->gold;
 
-    if (fExpReward) {
+    if (r->exp > 0) {
         client->gainExp( r->exp );
     }
     else {
@@ -141,24 +170,9 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     if (chance( r->wordChance ))
         rewardWord( client );
    
-    fScrollGiven = chance( r->scrollChance );
-    if (fScrollGiven)
+    if (chance( r->scrollChance ))
         rewardScroll( client );
-
-    quest->wiznet( "complete", "%s = %d Gold = %d Prac = %d WordChance = %d ScrollChance = %d %s",
-                   (fExpReward ? "Exp" : "Qp"), (fExpReward ? r->exp : r->points), 
-                   r->gold, r->prac, r->wordChance, r->scrollChance, (fScrollGiven ? "" : "*") );
-    
-    time = quest->getNextTime( client );
-    qdata = attributes->getAttr<XMLAttributeQuestData>( "questdata" );
-    qdata->setTime( time );
-    qdata->rememberVictory( quest->getName( ) );
-    qdata->rememberLastQuest(quest->getName());
-    
-    attributes->eraseAttribute( "quest" );
-    PCharacterManager::save( client );
 }
-
 
 void Questor::doCancel( PCharacter *client )  
 {
@@ -294,6 +308,7 @@ void Questor::rewardWord( PCharacter *client )
 
 void Questor::rewardScroll( PCharacter *client )
 {
+    ostringstream report;
     int sn, i, count;
     int learned, maximum;
     vector<int> skills;
@@ -329,7 +344,9 @@ void Questor::rewardScroll( PCharacter *client )
 
     for (i = 0; i < count && !skills.empty( ); i++) {
         sn = number_range( 0, skills.size( ) - 1 );
-        bhv->addSkill( skills[sn], number_range( 2, 4 ) );
+        int gain = number_range(2, 4);
+        bhv->addSkill(skills[sn], gain);
+        report << skillManager->find(sn)->getName() << " (" << gain << "%%) ";
         skills.erase( skills.begin( ) + sn );
     }
     
@@ -344,6 +361,7 @@ void Questor::rewardScroll( PCharacter *client )
                           "ты сможешь усовершенствовать свои умения." );
     oldact("$C1 дает тебе $o4.", client, scroll, ch, TO_CHAR );
     oldact("$C1 дает $c3 $o4.", client, scroll, ch, TO_ROOM );
+    ::wiznet( WIZ_QUEST, 0, 0, "%^C1 получает свиток познания для умения %s", client, report.str().c_str());
 }
 
 /*--------------------------------------------------------------------------

@@ -9,11 +9,12 @@
 #include "wanderer.h"
 #include "objectbehaviormanager.h"
 
+class Quest;
+class QuestReward;
 class Questor : public Wanderer {
 XML_OBJECT
 public:
-        typedef ::Pointer<Questor> Pointer;
-
+        typedef ::Pointer<Questor> Pointer;        
         Questor( );
         
         virtual int getOccupation( );
@@ -30,6 +31,7 @@ public:
         virtual bool canWander( Room *const, Object * );
 
 private:
+        void giveReward(PCharacter *client, ::Pointer<Quest> &quest, ::Pointer<QuestReward> &reward);
         void rewardScroll( PCharacter * );
         void rewardWord( PCharacter * );
 };

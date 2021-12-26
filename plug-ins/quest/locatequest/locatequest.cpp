@@ -141,9 +141,9 @@ void LocateQuest::shortInfo( std::ostream &buf, PCharacter *ch )
     }
 }
 
-Quest::Reward::Pointer LocateQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer LocateQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
+    QuestReward::Pointer r( NEW );
     
     if (hint && !IS_TOTAL_NEWBIE(ch)) {
         r->points = number_range( 3, 9 );

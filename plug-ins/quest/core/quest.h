@@ -35,14 +35,32 @@ enum {
 };
 
 /*
+ * Quest reward
+ */
+struct QuestReward : public virtual DLObject {
+    typedef ::Pointer<QuestReward> Pointer;
+    
+    QuestReward( ) : points( 0 ), exp( 0 ), gold( 0 ), prac( 0 ), clanpoints( 0 ),
+                wordChance( 0 ), scrollChance( 0 )
+    {
+    }
+
+    int points;
+    int exp;
+    int gold;
+    int prac;
+    int clanpoints;
+    int wordChance;
+    int scrollChance;
+};
+
+/*
  * Quest
  */
 class Quest :        public XMLAttribute, public XMLVariableContainer 
 {
 XML_OBJECT
 public:
-    struct Reward;
-    typedef ::Pointer<Reward> RewardPointer;
     typedef ::Pointer<Quest> Pointer;
     
     Quest( );
@@ -52,7 +70,7 @@ public:
     virtual bool hasPartialRewards() const;
     virtual void info( std::ostream &, PCharacter * ) = 0;
     virtual void shortInfo( std::ostream &, PCharacter * );
-    virtual RewardPointer reward( PCharacter *, NPCharacter * ) = 0;
+    virtual QuestReward::Pointer reward( PCharacter *, NPCharacter * ) = 0;
     virtual void scheduleDestroy( );
 
     virtual bool help( PCharacter *, NPCharacter * );
@@ -80,28 +98,9 @@ protected:
     PCharacter * getHeroWorld( );
     PCMemoryInterface * getHeroMemory( );
     
-    template<typename T> inline bool check( Character * );
-    template<typename T> inline bool check( Object * );
+    template<typename QT> inline bool check( Character * );
+    template<typename QT> inline bool check( Object * );
 };
 
-/*
- * Quest::Reward
- */
-struct Quest::Reward : public virtual DLObject {
-    typedef ::Pointer<Reward> Pointer;
-    
-    Reward( ) : points( 0 ), exp( 0 ), gold( 0 ), prac( 0 ), clanpoints( 0 ),
-                wordChance( 0 ), scrollChance( 0 )
-    {
-    }
-
-    int points;
-    int exp;
-    int gold;
-    int prac;
-    int clanpoints;
-    int wordChance;
-    int scrollChance;
-};
 
 #endif

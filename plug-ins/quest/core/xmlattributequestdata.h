@@ -47,7 +47,7 @@ public:
 protected:
     XML_VARIABLE XMLInteger countdown;
     XML_VARIABLE XMLString lastQuestType;
-    XML_VARIABLE XMLInteger lastQuestCount;
+    XML_VARIABLE XMLInteger lastQuestCount;    
     XML_VARIABLE XMLLongLongNoEmpty startTime;
 };
 

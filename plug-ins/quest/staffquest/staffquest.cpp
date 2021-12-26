@@ -94,9 +94,9 @@ void StaffQuest::shortInfo( std::ostream &buf, PCharacter *ch )
             << roomName << " (" << areaName << ").";
 }
 
-Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
+    QuestReward::Pointer r( NEW );
 
     if (hint.getValue( ) && !IS_TOTAL_NEWBIE(ch)) {
         r->gold = number_range( 1, 2 );
@@ -123,7 +123,7 @@ Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman
     oldact("Ты передаешь $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR);
     oldact("$c1 передает $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM);
 
-    return Reward::Pointer( r );
+    return r;
 }
 
 void StaffQuest::destroy( ) 

@@ -88,9 +88,9 @@ void KidnapQuest::destroy( )
     destroyItems<KidnapMark>( );
 }
 
-Quest::Reward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
+    QuestReward::Pointer r( NEW );
     
     r->points = number_range( 18, 25 );
     r->points += ambushes * 25;
@@ -112,7 +112,7 @@ Quest::Reward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questma
     }
 
     r->exp = (r->points + r->clanpoints) * 10;
-    return Reward::Pointer( r );
+    return r;
 }
 
 void KidnapQuest::info( std::ostream &buf, PCharacter *ch ) 

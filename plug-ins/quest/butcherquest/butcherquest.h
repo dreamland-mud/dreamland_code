@@ -23,7 +23,7 @@ public:
     virtual bool isComplete( );
     virtual void info( std::ostream &, PCharacter * );
     virtual void shortInfo( std::ostream &, PCharacter * );
-    virtual Reward::Pointer reward( PCharacter *, NPCharacter * );
+    virtual QuestReward::Pointer reward( PCharacter *, NPCharacter * );
     virtual void destroy( );
 
     XML_VARIABLE XMLString raceName;

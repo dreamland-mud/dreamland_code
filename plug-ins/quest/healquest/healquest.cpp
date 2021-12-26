@@ -116,9 +116,9 @@ bool HealQuest::isComplete( )
     return (int)maladies.size( ) == maladies.successTotal( );
 }
 
-Quest::Reward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
+    QuestReward::Pointer r( NEW );
     
     if (hint > 0 && !IS_TOTAL_NEWBIE(ch)) {
         r->gold = number_range( 1, 2 );
@@ -166,7 +166,7 @@ Quest::Reward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman 
         r->clanpoints = r->points;
 
     r->exp = (r->points + r->clanpoints) * 10;
-    return Reward::Pointer( r );
+    return r;
 }
 
 void HealQuest::info( std::ostream &buf, PCharacter *ch ) 
