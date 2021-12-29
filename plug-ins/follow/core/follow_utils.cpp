@@ -57,9 +57,9 @@ void follower_add( Character *ch, Character *mch )
     ch->leader        = NULL;
 
     if (ch->master->can_see( ch ) || (ch->master->getPC() && ch->master->getPC()->pet && ch->master->getPC()->pet == ch))
-       oldact("$c1 теперь следует за тобой.", ch, 0, mch, TO_VICT );
-       
-    oldact("Ты теперь следуешь за $C5.",  ch, 0, mch, TO_CHAR );
+       mch->pecho("%1$^C1 теперь следу%1$nет|ют за тобой.", ch);
+    
+    ch->pecho("Ты теперь следуешь за %1$C5.", mch);
 }
 
 static void afprog_stopfol( Character *ch )
@@ -101,13 +101,13 @@ void follower_clear( Character * ch, bool verbose )
     Character *master = ch->master;
 
     if (master == NULL)
-        return;
-
+		return;
+   
     if (verbose && master->can_see( ch ))
-       oldact("$c1 теперь не следует за тобой.", ch, 0, master, TO_VICT );
+		master->pecho("%1$^C1 больше не следу%1$nет|ют за тобой.", ch);
 
     if (verbose)
-        oldact("Ты теперь не следуешь за $C5.", ch, 0, master, TO_CHAR );
+		ch->pecho("Ты больше не следуешь за %1$C5.", mch);
 
     afprog_stopfol( ch );
 
