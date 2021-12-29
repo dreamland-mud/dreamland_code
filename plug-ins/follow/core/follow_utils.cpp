@@ -107,7 +107,7 @@ void follower_clear( Character * ch, bool verbose )
 		master->pecho("%1$^C1 больше не следу%1$nет|ют за тобой.", ch);
 
     if (verbose)
-		ch->pecho("Ты больше не следуешь за %1$C5.", mch);
+		ch->pecho("Ты больше не следуешь за %1$C5.", master);
 
     afprog_stopfol( ch );
 
