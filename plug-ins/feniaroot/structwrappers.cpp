@@ -657,6 +657,11 @@ NMI_GET( MaterialWrapper, cloth, "среди материалов есть тк�
     return Register( material_is_typed( names.c_str(), MAT_CLOTH ) );
 }
 
+NMI_GET( MaterialWrapper, leather, "среди материалов есть кожа" )
+{
+    return Register( material_is_typed( names.c_str(), MAT_LEATHER ) );
+}
+
 NMI_GET( MaterialWrapper, mineral, "среди материалов есть камень или минерал" )
 {
     return Register( material_is_typed( names.c_str(), MAT_MINERAL ) );
