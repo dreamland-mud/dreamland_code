@@ -33,6 +33,7 @@ GSN(haste);
 GSN(protection_evil);
 GSN(protection_good);
 GSN(stardust);
+GSN(dark_shroud);
 WEARLOC(none);
 WEARLOC(stuck_in);
 RELIG(chronos);
@@ -264,10 +265,14 @@ void create_mob_affects(NPCharacter *mob)
     if (IS_AFFECTED(mob,AFF_SANCTUARY))
     {
         Affect af;
-
-        af.type      = gsn_sanctuary; 
-        af.bitvector.setValue(AFF_SANCTUARY);
-        af.bitvector.setTable(&affect_flags);
+        if (IS_EVIL(mob)) {
+			af.type      = gsn_dark_shroud;
+		}
+		else {
+        	af.type      = gsn_sanctuary; 
+        	af.bitvector.setValue(AFF_SANCTUARY);
+        	af.bitvector.setTable(&affect_flags);
+		}
         af.level     = mob->getRealLevel( );
         af.duration  = -1;
         affect_to_char( mob, &af );
