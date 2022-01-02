@@ -1458,8 +1458,18 @@ void UndefinedOneHit::damEffectSlice( )
     arm = create_object( get_obj_index( OBJ_VNUM_SLICED_ARM ), victim->getRealLevel( ) );
     
     name = victim->getNameP( '2' );
-    arm->fmtShortDescr( arm->getShortDescr( ), name.c_str( ) );
-    arm->fmtDescription( arm->getDescription( ), name.c_str( ) );
+    // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
+    // If there're no format symbols in the body part names, just concatenate owner name to it.
+    if (str_str(arm->getShortDescr(), "%"))
+        arm->fmtShortDescr( arm->getShortDescr(), name.c_str());
+    else
+        arm->setShortDescr(arm->getShortDescr() + DLString::SPACE + name);
+
+    if (str_str(arm->getDescription(), "%"))
+        arm->fmtDescription(arm->getDescription(), name.c_str());
+    else
+        arm->setDescription(arm->getDescription() + DLString::SPACE + name);
+
     arm->from = str_dup(name.c_str());
     arm->timer = timer;
 
