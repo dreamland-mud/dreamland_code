@@ -92,9 +92,11 @@ bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
     
     if (IS_SET(ch->off_flags, ASSIST_RACE) && ch->getRace( ) == mob->getRace( ))
         return true;
-
-    if (IS_SET(ch->off_flags, ASSIST_GUARD) && IS_SET(mob->off_flags, ASSIST_GUARD))
-        return true;
+    
+    // Guards, patrolmen and guard assistants always assist each other
+    if ( (ch->spec_fun.name == "spec_guard" || ch->spec_fun.name == "spec_patrolman" || IS_SET(ch->off_flags, ASSIST_GUARD)) && 
+         (mob->spec_fun.name == "spec_guard" || mob->spec_fun.name == "spec_patrolman" || IS_SET(mob->off_flags, ASSIST_GUARD)) )
+		return true;
 
     if (IS_SET(ch->off_flags, ASSIST_ALIGN) && ALIGNMENT(ch) == ALIGNMENT(mob))
         return true;
