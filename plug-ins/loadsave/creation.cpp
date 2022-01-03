@@ -262,10 +262,12 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
 /** Transform affect bits from the prototype into real affects. Not called for mobs read from disk. */
 void create_mob_affects(NPCharacter *mob)
 {
-    if (IS_AFFECTED(mob,AFF_SANCTUARY))
+    if (IS_AFFECTED(mob, AFF_SANCTUARY))
     {
         Affect af;
         if (IS_EVIL(mob)) {
+			affect_strip( mob, gsn_sanctuary );
+			REMOVE_BIT(mob->affected_by, AFF_SANCTUARY);
 			af.type      = gsn_dark_shroud;
 		}
 		else {
