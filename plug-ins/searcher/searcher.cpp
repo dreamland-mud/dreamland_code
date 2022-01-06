@@ -568,8 +568,6 @@ public:
     bool dumpMagic()
     {
         Json::Value dump;
-        // Collect distinct list of spells.
-        std::set<DLString> allSpells;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
@@ -584,7 +582,7 @@ public:
             DLString itemtype = item_table.name( pObj->item_type );
             int spellLevel = 0;
             int charges = 0;
-            DLString spells = "";
+            StringSet spells, ruspells;
             Skill *skill;
 
             // Only dump magic items; collect properties.
@@ -598,8 +596,8 @@ public:
                 for (int i = 1; i <= 4; i++) 
                     if ((skill = SkillManager::getThis( )->find( pObj->value[i] ) ))
                         if (skill->getIndex( ) != gsn_none) {
-                            spells += "'" + skill->getName( ) + "' ";
-                            allSpells.insert( skill->getName( ) );
+                            spells.insert(skill->getName());
+                            ruspells.insert(skill->getRussianName());
                         }
                 
                 break;
@@ -611,8 +609,8 @@ public:
                 
                 if ((skill = SkillManager::getThis( )->find( pObj->value[3] ) ))
                     if (skill->getIndex( ) != gsn_none) {
-                        spells = "'" + skill->getName( ) + "'";
-                        allSpells.insert( skill->getName( ) );
+                        spells.insert(skill->getName());
+                        ruspells.insert(skill->getRussianName());
                     }
 
                 break;
@@ -632,10 +630,6 @@ public:
             default:
                 continue;
             }
-
-            // Ignore useless stuff. Leave it commented for debugging.
-//            if (spells.empty( ) || charges == 0)
-//                continue;
 
             // Format object name.
             DLString name = russian_case(pObj->short_descr, '1').toLower( );
@@ -665,9 +659,11 @@ public:
             if (!IS_SET(pObj->extra_flags, ITEM_NOIDENT)) {
                 wand["spellLevel"] = spellLevel;
                 wand["charges"] = charges;
-                wand["spells"] = spells;
+                wand["spells"] = spells.toString();
+                wand["ruspells"] = ruspells.toString();
             } else {
-                wand["spellLevel"] = wand["charges"] = wand["spells"] = "-";
+                wand["spellLevel"] = wand["charges"] = "-";
+                wand["spells"] = wand["ruspells"] = "-";
             }
 
             wand["area"] = area;
