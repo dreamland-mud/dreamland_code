@@ -222,7 +222,7 @@ void auction_update (void)
 
             if (auction->bet > 0 && buyer_can_trade())
             {
-                msg = fmt(0, "{1{C%1$^C1 {Yполучает {2%2$O1{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2.",
+                msg = fmt(0, "{1{C%1$^C1 {Yпокупает {2%2$O4{1 за %3$d золот%3$Iую|ых|ых монет%3$Iу|ы|{2.",
                     auction->buyer, auction->item, auction->bet);                           
                 talk_auction(msg.c_str());
                 send_to_discord_stream(":moneybag: " + msg);
