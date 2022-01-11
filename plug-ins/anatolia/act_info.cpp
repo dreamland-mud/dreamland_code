@@ -2403,7 +2403,7 @@ CMDRUNP( help )
         << "Для уточнения поиска смотри справку по нужному номеру, например, "
         << "{y{hcсправка " << firstId << "{x." << endl;        
 
-    ch->send_to(buf.str().c_str());
+    page_to_char(buf.str().c_str(), ch);
 }                  
 
 
