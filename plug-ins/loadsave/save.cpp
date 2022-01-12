@@ -444,6 +444,8 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         if (mob->silver > 0)
                 fprintf(fp,"Silv %d\n",mob->silver.getValue( ));
 
+        fprintf(fp, "Wearloc %s~\n", mob->wearloc.toString().c_str());
+
         if (mob->exp > 0)
                 fprintf(fp, "Exp  %d\n", mob->exp.getValue( ));
 
@@ -1334,7 +1336,16 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 break;
             }
                 break;
-            
+
+            case 'W':
+                if (!str_cmp(word, "Wearloc")) {
+                    char *str = fread_string(fp);
+                    pet->wearloc.fromString(str);
+                    free_string(str);
+                    fMatch = true;
+                    break;
+                }
+                break;            
             }
 
             if ( !fMatch )
@@ -1610,7 +1621,17 @@ NPCharacter * fread_mob( FILE *fp )
             case 'T':
                     KEY( "Timer",        mob->timer,                fread_number( fp ) );
                     break;
-            
+
+            case 'W':
+                if (!str_cmp(word, "Wearloc")) {
+                    char *str = fread_string(fp);
+                    mob->wearloc.fromString(str);
+                    free_string(str);
+                    fMatch = true;
+                    break;
+                }
+                break;            
+
             }
             
             if ( !fMatch )

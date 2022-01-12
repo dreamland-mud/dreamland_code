@@ -86,6 +86,7 @@ Character::Character( )
                 detection( 0, &detect_flags ),
                 position( POS_STANDING, &position_table ),
                 posFlags( 0, &position_flags ),
+                wearloc( wearlocationManager ),
                 armor( &ac_type ),
                 perm_stat( &stat_table ), 
                 mod_stat( &stat_table ),
@@ -177,6 +178,7 @@ void Character::init( )
     detection = 0;
     position = POS_STANDING;
     posFlags = 0;
+    wearloc.clear( );
 
     carry_weight = 0;
     carry_number = 0;
@@ -306,6 +308,10 @@ NPCharacter * Character::getMobile( )
     return getNPC();
 }
 
+const GlobalBitvector & Character::getWearloc( )
+{
+    return wearloc;
+}
 
 /*****************************************************************************
  * name and sex formatting

@@ -17,7 +17,6 @@
 #include "xmllong.h"
 #include "xmldate.h"
 #include "xmlflags.h"
-#include "xmlglobalbitvector.h"
 #include "xmlglobalarray.h"
 #include "xmltimestamp.h"
 
@@ -179,7 +178,6 @@ public:
     virtual void setPretitle( const DLString& ) ;
 
     // set-get methods inherited from Character
-    virtual const GlobalBitvector & getWearloc( );
     virtual void setDescription( const DLString& );
     virtual const char * getDescription( ) const;
     
@@ -234,6 +232,9 @@ public:
     // configuration
     virtual PlayerConfig getConfig( ) const;
 
+    // return this player or mob they're switched to
+    Character *body();
+
 private:
     XML_VARIABLE XMLString password; 
     XML_VARIABLE XMLDate lastAccessTime;
@@ -260,7 +261,6 @@ private:
     CachedNoun cachedNoun;
 
 public:
-    XML_VARIABLE XMLGlobalBitvector wearloc;
     XML_VARIABLE XMLGlobalArray      desires;
 
     // wizard stuff
@@ -328,7 +328,6 @@ public:
 
     XML_VARIABLE XMLInteger start_room;
 };
-
 
 #endif
 

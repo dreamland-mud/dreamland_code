@@ -139,6 +139,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 mob->imm_flags                = pMobIndex->imm_flags | race->getImm( );
                 mob->res_flags                = pMobIndex->res_flags | race->getRes( );
                 mob->vuln_flags                = pMobIndex->vuln_flags | race->getVuln( );
+                mob->wearloc.set(race->getWearloc());
                 mob->start_pos                = pMobIndex->start_pos;
                 mob->default_pos        = pMobIndex->default_pos;
                 mob->setSex( pMobIndex->sex );

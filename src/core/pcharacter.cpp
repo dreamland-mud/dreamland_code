@@ -233,8 +233,7 @@ void CachedNoun::update( PCharacter *ch )
  **************************************************************************/
 
 PCharacter::PCharacter( )
-        :       wearloc( wearlocationManager ),
-                desires( desireManager ),
+        :       desires( desireManager ),
                 mod_skills(skillManager),
                 mod_skill_groups(skillGroupManager),
                 mod_level_skills(skillManager),
@@ -278,7 +277,6 @@ void PCharacter::init( )
     security = 0;
     newbie_hit_counter = 0;
 
-    wearloc.clear( );
     desires.clear( );        
     for (int i = 0; i < desireManager->size( ); i++)
         desireManager->find( i )->reset( this );
@@ -358,6 +356,15 @@ const NPCharacter *PCharacter::getNPC() const
 bool PCharacter::is_npc( ) const
 {
     return false;
+}
+
+
+Character *PCharacter::body()
+{
+    if (switchedTo)
+        return switchedTo;
+    else
+        return this;
 }
 
 
@@ -603,10 +610,6 @@ void PCharacter::setDescription( const DLString& d )
 const char * PCharacter::getDescription( ) const
 {
     return description.c_str( );
-}
-const GlobalBitvector & PCharacter::getWearloc( )
-{
-    return wearloc;
 }
 
 /**************************************************************************

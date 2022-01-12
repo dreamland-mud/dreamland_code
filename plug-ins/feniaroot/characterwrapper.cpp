@@ -843,15 +843,13 @@ NMI_GET(CharacterWrapper, adrenaline, "полна ли кровь адренал
 NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
-    CHK_NPC
-    target->getPC( )->wearloc.fromString( arg.toString( ) );
+    target->wearloc.fromString( arg.toString( ) );
 }
 
 NMI_GET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
-    CHK_NPC
-    return target->getPC( )->wearloc.toString();
+    return target->wearloc.toString();
 }
 
 NMI_GET( CharacterWrapper, expToLevel, "сколько опыта осталось набрать до след уровня")

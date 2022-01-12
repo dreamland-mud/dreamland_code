@@ -35,7 +35,6 @@ public:
     virtual bool is_npc( ) const;
     
     // additional set-get methods
-    virtual const GlobalBitvector & getWearloc( );
     virtual short getModifyLevel( ) const;
 
     // set-get methods for string fields

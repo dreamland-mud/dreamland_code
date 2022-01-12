@@ -113,10 +113,6 @@ bool NPCharacter::is_npc( ) const
 /****************************************************************************
  * additional set/get methods 
  ****************************************************************************/
-const GlobalBitvector & NPCharacter::getWearloc( ) 
-{
-    return race->getWearloc( );
-}
 
 short NPCharacter::getModifyLevel( ) const 
 {

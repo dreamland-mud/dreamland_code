@@ -131,6 +131,7 @@ void QuestMobileAppearence::dress( NPCharacter *mob ) const
         SET_BIT(mob->affected_by, mob->getRace()->getAff());
         SET_BIT(mob->imm_flags, mob->getRace()->getImm());
         SET_BIT(mob->res_flags, mob->getRace()->getRes());
+        mob->wearloc.set(mob->getRace()->getWearloc());
     }
     
     switch (align.getValue( )) {

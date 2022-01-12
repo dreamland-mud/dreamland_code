@@ -198,8 +198,8 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
         char_flag_by_table(ch, table).changeBit(paf->bitvector, fAdd);
     }
 
-    if (paf->global.getRegistry() == wearlocationManager && !ch->is_npc()) {
-        ch->getPC()->wearloc.change(paf->global, !fAdd);
+    if (paf->global.getRegistry() == wearlocationManager) {
+        ch->wearloc.change(paf->global, !fAdd);
     }
 
     mod = (fAdd ? 1 : -1) * paf->modifier;
@@ -287,8 +287,8 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
         if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
             charFlag.setBit(paf->bitvector);
         else if (paf->global.getRegistry() == registry) {
-            if (registry == wearlocationManager && !ch->is_npc())		
-                ch->getPC()->wearloc.remove(paf->global);
+            if (registry == wearlocationManager)		
+                ch->wearloc.remove(paf->global);
         }
 }
 
