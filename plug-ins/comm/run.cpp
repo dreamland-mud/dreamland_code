@@ -39,10 +39,12 @@ CMDRUN( run )
     ostringstream buf;
     unsigned int i;
 
-    pch = ch->getPC( );
-    if (!pch)
+    if (ch->is_npc()) {
+        ch->pecho("Тебе доступно только передвижение пешком, увы.");
         return;
+    }
 
+    pch = ch->getPC();
     walk = constArguments;
     walk.stripWhiteSpace( );
 
