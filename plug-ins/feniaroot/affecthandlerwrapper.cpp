@@ -81,6 +81,18 @@ NMI_GET( AffectHandlerWrapper, rname, "русское название аффе�
     return Register( target->getSkill()->getRussianName() );
 }
 
+NMI_GET( AffectHandlerWrapper, dispelled, "поддается ли заклинанию снятия воздействий") 
+{ 
+    checkTarget(); 
+    return Register(target->isDispelled());
+}
+
+NMI_GET( AffectHandlerWrapper, cancelled, "поддается ли заклинанию отмены") 
+{ 
+    checkTarget(); 
+    return Register(target->isCancelled());
+}
+
 NMI_GET( AffectHandlerWrapper, skill, "навык, внутри которого объявлен аффект (.Skill)") 
 { 
     checkTarget( ); 
