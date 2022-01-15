@@ -7,7 +7,12 @@
 #include "corder.h"
 #include "commandinterpreter.h"
 
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
+
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "room.h"
 #include "interp.h"
 #include "follow_utils.h"
@@ -18,6 +23,20 @@
 #include "merc.h"
 #include "def.h"
 #include "morphology.h"
+
+static bool mprog_cantorder(Character *victim, Character *master, const char *cmdName, const char *cmdArgs)
+{
+    FENIA_CALL(victim, "CantOrder", "Css", master, cmdName, cmdArgs);
+    FENIA_NDX_CALL(victim->getNPC(), "CantOrder", "CCss", victim, master, cmdName, cmdArgs);
+    return false;
+}
+
+static void mprog_order(Character *victim, Character *master, const char *cmdName, const char *cmdArgs)
+{
+    FENIA_VOID_CALL(victim, "Order", "Css", master, cmdName, cmdArgs);
+    FENIA_NDX_VOID_CALL(victim->getNPC(), "Order", "CCss", victim, master, cmdName, cmdArgs);
+}
+
 
 COMMAND(COrder, "order")
 {
@@ -131,12 +150,19 @@ COMMAND(COrder, "order")
     }
 
     // Display exact message as typed by the master.
-    victim->pecho("%^C1 приказывает тебе '%s', ты покорно исполняешь приказ.", ch, argOrder.c_str());
+    victim->pecho("%^C1 приказывает тебе '%s'.", ch, argOrder.c_str());
+
+    if (mprog_cantorder(victim, ch, iargs.cmdName.c_str(), iargs.cmdArgs.c_str())) {
+        // All failure messages to the master should be displayed inside the trigger.
+        return;
+    }
 
     // Run the command without further error feedback.
     iargs.pCommand->run( victim, iargs.cmdArgs );
     ch->setWaitViolence( 1 );
     ch->pecho( "Ok.");
+
+    mprog_order(victim, ch, iargs.cmdName.c_str(), iargs.cmdArgs.c_str());
 }
 
 
