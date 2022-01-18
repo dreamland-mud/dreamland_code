@@ -51,7 +51,7 @@ protected:
             return false;
         }
         
-        if (ch->getPC( )->getHometown( ) == home_frigate) {
+        if (!ch->is_npc() && ch->getPC( )->getHometown( ) == home_frigate) {
             msgSelf( ch, "Близость Хаоса возмущает эфир! Похоже, Галеон сейчас твой единственный вид транспорта." );
             return false;
         }
