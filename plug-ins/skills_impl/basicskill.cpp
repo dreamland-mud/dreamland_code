@@ -381,6 +381,11 @@ int BasicSkill::getRating( PCharacter * ) const
     return 1;
 }
 
+MobSkillData *BasicSkill::getMobSkillData()
+{
+    return 0;
+}
+
 bool BasicSkill::isPassive() const
 {
     if (spell && spell->isCasted())

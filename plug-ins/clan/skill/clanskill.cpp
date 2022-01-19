@@ -138,6 +138,11 @@ int ClanSkill::getMaximum( Character *ch ) const
     return BasicSkill::getMaximum( ch );
 }
 
+MobSkillData *ClanSkill::getMobSkillData()
+{
+    return &mob;
+}
+
 bool ClanSkill::canPractice( PCharacter * ch, std::ostream & ) const
 {
     const SkillClanInfo *ci;

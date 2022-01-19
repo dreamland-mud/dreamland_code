@@ -278,6 +278,11 @@ int GenericSkill::getMaximum( Character *ch ) const
     return BasicSkill::getMaximum( ch );
 }
 
+MobSkillData *GenericSkill::getMobSkillData()
+{
+    return &mob;
+}
+
 
 /*
  * skill rating for player's class (how hard is it to learn)

@@ -21,6 +21,8 @@
 #include "skillhelp.h"
 #include "skilleventhandler.h"
 
+class MobSkillData;
+
 class BasicSkill : public virtual Skill, 
                    public XMLTableElement,
                    public XMLVariableContainer 
@@ -53,6 +55,7 @@ public:
     virtual void practice( PCharacter * ) const;
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual int getMaximum( Character * ) const;
+    virtual MobSkillData *getMobSkillData();
 
     // Online editing helpers.
     virtual bool accessFromString(const DLString &newValue, ostringstream &errBuf);
