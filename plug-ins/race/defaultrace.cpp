@@ -240,6 +240,7 @@ DefaultRace::DefaultRace( ) :
                 vuln( 0, &vuln_flags ),
                 form( 0, &form_flags ),
                 parts( 0, &part_flags ),
+                stats( &stat_table ),
                 size( SIZE_MEDIUM, &size_table ),
                 wearloc( wearlocationManager ),
                 hunts( raceManager ),
@@ -325,6 +326,12 @@ const Flags & DefaultRace::getParts( ) const
 {
     return parts;
 }
+
+const EnumerationArray & DefaultRace::getStats( ) const 
+{
+    return stats;
+}
+
 const GlobalBitvector & DefaultRace::getWearloc( ) const
 {
     return wearloc;

@@ -263,7 +263,11 @@ int NPCharacter::getCurrStat( int stat )
 {
     int value;
 
+    // Mob's perm_stat is set only once when the mob is created, all other modifiers are applied on-the-fly.
+    // TODO: we might allow mob's stat to go above the max threshold in some cases, but existing battle formulae
+    // need to be reviewed first.
     value = perm_stat[stat];
+    value += getRace()->getStats()[stat];
     value += mod_stat[stat];
     value += getProfession( )->getStat( stat, this ); 
     return URANGE( MIN_STAT, value, MAX_STAT );

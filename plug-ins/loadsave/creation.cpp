@@ -9,6 +9,7 @@
 #include "fenia/register-impl.h"
 #include "feniamanager.h"
 #include "wrapperbase.h"
+#include "fenia_utils.h"
 
 #include "skillreference.h"
 #include "mobilebehaviormanager.h"
@@ -157,16 +158,21 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 override_description(mob, pMobIndex->long_descr, &NPCharacter::setLongDescr);
                 override_description(mob, pMobIndex->description, &NPCharacter::setDescription);
 
-                /* computed on the spot */
+                // Configure perm stats, they can be further adjusted in a global onInit.
+                // Race and class modifications are applied on-the-fly inside NPCharacter::getCurrStat
+                for (i = 0; i < stat_table.size; i++)
+                    mob->perm_stat[i] = BASE_STAT; 
 
-                for (i = 0; i < stat_table.size; i ++)
-                        mob->perm_stat[i] = min(25,11 + mob->getRealLevel( )/4);
+
+/*
+                TODO: review and either move to global onInit or discard
 
                 if (IS_SET(mob->off_flags,OFF_FAST))
                         mob->perm_stat[STAT_DEX] += 2;
 
                 mob->perm_stat[STAT_STR] += mob->size - SIZE_MEDIUM;
                 mob->perm_stat[STAT_CON] += (mob->size - SIZE_MEDIUM) / 2;
+*/
 
                 /* let's get some spell action */
                 if (!IS_SET(flags, FCREATE_NOAFFECTS))
@@ -219,10 +225,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 mob->extracted                = false;
 
                 for (i = 0; i < stat_table.size; i ++)
-                        mob->perm_stat[i] = min(25,11 + mob->getRealLevel( )/4);
-
-                if (IS_SET(mob->off_flags,OFF_FAST))
-                        mob->perm_stat[STAT_DEX] += 2;
+                        mob->perm_stat[i] = BASE_STAT;
         }
 
         mob->position = mob->start_pos;
@@ -242,8 +245,11 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
         else
             MobileBehaviorManager::assignBasic( mob );
         
-        /* fenia mobprog initialization */
+        /* Fenia initialization: call global onInit followed by specific 'init' defined for this mob index data. */
         if (!IS_SET(flags, FCREATE_NOCOUNT)) {
+            
+            gprog("onInit", "C", mob);
+
             WrapperBase *w = get_wrapper(pMobIndex->wrapper);
             if (w) {
                 static Scripting::IdRef initId( "init" );

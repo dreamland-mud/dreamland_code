@@ -13,14 +13,8 @@
  *------------------------------------------------------------------*/
 DefaultPCRace::DefaultPCRace( ) :
           classes( professionManager ),
-          stats( &stat_table ),
           align( 0, &align_table )
 {
-}
-
-const EnumerationArray & DefaultPCRace::getStats( ) const 
-{
-    return stats;
 }
 
 GlobalArray & DefaultPCRace::getClasses( ) 

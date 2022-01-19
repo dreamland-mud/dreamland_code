@@ -134,6 +134,7 @@ void OLCStateRace::show( PCharacter *ch )
     ptc(ch, "Уязвимость:    {Y%s{x {D(vuln){x\r\n", show_flag(r->vuln).c_str());
     ptc(ch, "Форма тела:    {Y%s{x {D(form){x\r\n", show_flag(r->form).c_str());
     ptc(ch, "Части тела:    {Y%s{x {D(parts){x\r\n", show_flag(r->parts).c_str());
+    ptc(ch, "Параметры:     {Y%s{x {D(stats help){x\r\n", show_enum_array(r->stats).c_str());
     ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n", show_enum(r->size).c_str());
     ptc(ch, "Слоты:         {Y%s{x {D(wearloc){x\r\n", r->wearloc.toString().c_str());
 
@@ -141,7 +142,6 @@ void OLCStateRace::show( PCharacter *ch )
            r->hunts.toString().c_str(), r->donates.toString().c_str());
 
     if (pc) {
-        ptc(ch, "Параметры:     {G%s {D(stats help){x\r\n", show_enum_array(pc->stats).c_str());
         ptc(ch, "Натура:        {G%s {D(align){x  мин {G%d{x макс {G%d{x {D(minalign, maxalign){x\r\n",
              show_flag(pc->align).c_str(), pc->minAlign.getValue(), pc->maxAlign.getValue());
         ptc(ch, "Бонусы:        здоровье {G%d {D(hp){x мана {G%d {D(mana){x практики {G%d {D(prac){x\r\n",
@@ -295,10 +295,9 @@ RACEEDIT(donates, "делится", "каким расам отдает вещи
     return globalBitvectorEdit<Race>(getOriginal()->donates);
 }
 
-RACEEDIT(stats, "парамеры", "бонусы к параметрам персонажа")
+RACEEDIT(stats, "парамеры", "бонусы к параметрам")
 {
-    DefaultPCRace *pc = getPC();
-    return checkPC(pc) && enumerationArrayEdit(stat_table, pc->stats);
+    return enumerationArrayEdit(stat_table, getOriginal()->stats);
 }
 RACEEDIT(align, "натура", "ограничить натуру по названию")
 {

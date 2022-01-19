@@ -20,6 +20,7 @@ class RaceManager;
 class Enumeration;
 class GlobalBitvector;
 class Flags;
+class EnumerationArray;
 class Character;
 
 /*
@@ -47,6 +48,7 @@ public:
     virtual const Flags & getVuln( ) const;
     virtual const Flags & getForm( ) const;
     virtual const Flags & getParts( ) const;
+    virtual const EnumerationArray & getStats( ) const;
     virtual const GlobalBitvector & getWearloc( ) const;
     virtual const Enumeration & getSize( ) const;
     virtual Flags getAttitude( const Race & ) const;

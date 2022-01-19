@@ -879,7 +879,7 @@ int PCharacter::getMaxTrain( int i )
         return MAX_STAT;
     else
         return min(MAX_STAT, BASE_STAT
-                                + getRace( )->getPC( )->getStats( )[i]
+                                + getRace( )->getStats( )[i]
                                 + getProfession( )->getStat( i ));
 }
 
