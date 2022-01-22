@@ -160,10 +160,10 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
         gain *= 3;
     
     if ( IS_AFFECTED(ch, AFF_REGENERATION )) {
-        gain *= 2;
         // extra gain for "native" regen, e.g. trolls/mawgs -- but not mobs
         if (ch->getRace( )->getAff( ).isSet( AFF_REGENERATION ) && !ch->is_npc( ))
             gain *= 2;
+        else gain = gain * 3 / 2;
     }
 
     gain += gain * ch->heal_gain / 100;
@@ -308,10 +308,6 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
 
     if ( IS_HARA_KIRI(ch) )
         gain *= 3;
-
-    if(ch->getRace()->getName() == "troll"){
-        gain *= 2;
-    }
 
     if( ch->isAffected(gsn_bandage ) )
         gain += ch->getRealLevel( ) / 20;
