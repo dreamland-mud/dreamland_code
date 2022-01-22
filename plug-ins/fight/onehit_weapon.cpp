@@ -79,24 +79,34 @@ void WeaponOneHit::calcDamage( )
  *----------------------------------------------------------------------------*/
 void WeaponOneHit::damBase( )
 {
+    // Calculate damage from a wielded weapon dices or from bare hands
+    int weaponDamage = 0, handsDamage = 0;
+
     if (weaponSkill)
         weaponSkill->improve( ch, true, victim, dam_type, dam_flag );
 
     if (wield) {
-        dam = dice(wield->value1(), wield->value2()) * skill / 100;
+        weaponDamage = dice(wield->value1(), wield->value2()) * skill / 100;
 
-        damApplyShield( );
-        damApplySharp( );
-    }
-    else if (ch->is_npc( )) {
+    } else if (ch->is_npc()) {
         NPCharacter *nch = ch->getNPC();
 
-        dam = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
-    }
-    else
-    {
-        dam = number_range( 1 + 4 * skill/100, 
+        handsDamage = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
+
+    } else {
+        handsDamage = number_range( 1 + 4 * skill/100, 
                             2 * ch->getModifyLevel( ) / 3 * skill/100 );
+    }
+
+    // For NPC choose the best value; for PC weapon dices override hand-to-hand damage.
+    if (ch->is_npc())
+        dam = max(weaponDamage, handsDamage);
+    else
+        dam = wield ? weaponDamage : handsDamage;
+
+    if (wield) {
+        damApplyShield( );
+        damApplySharp( );
     }
 
     damApplyHoly( );
