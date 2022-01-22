@@ -160,6 +160,19 @@ NMI_GET( MobIndexWrapper, area, "зона, в которой прописан м
     return AreaWrapper::wrap(target->area->area_file->file_name);
 }
 
+NMI_INVOKE( MobIndexWrapper, property, "(name, defaultValue): свойство прототипа с именем name или значение по умолчанию" )
+{
+    checkTarget();
+    DLString name = args2string(args);
+    Register defaultValue = args.size() > 1 ? args.back() : Register();
+
+    Properties::const_iterator p = target->properties.find(name);
+    if (p == target->properties.end())
+        return defaultValue;
+    else
+        return Register(p->second);
+}
+
 NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 
 {
     RegList::Pointer rc(NEW);
