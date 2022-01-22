@@ -389,7 +389,7 @@ bool OLCState::enumerationArrayEdit(const FlagTable &table, EnumerationArray &fi
     int index = table.value(valueName);
     Integer value;
 
-    if (index == NO_FLAG || !Integer::tryParse(value, args) || value < 0) {
+    if (index == NO_FLAG || !Integer::tryParse(value, args)) {
         ptc(ch, "Формат: %s <param name> <число>\r\n", cmd);
         ptc(ch, "        %s <param name> 0\r\n", cmd);
         return false;
