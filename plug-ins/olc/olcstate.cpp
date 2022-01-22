@@ -380,15 +380,17 @@ bool OLCState::mapEdit( Properties &map, DLString &args )
     return false;
 }
 
-bool OLCState::enumerationArrayEdit(const FlagTable &table, EnumerationArray &field)
+bool OLCState::enumerationArrayEdit(EnumerationArray &field)
 {
     PCharacter *ch = owner->character->getPC();
     const char *cmd = lastCmd.c_str();
     DLString args = lastArgs;
     DLString valueName = args.getOneArgument();
-    int index = table.value(valueName);
+    const FlagTable *table = field.getTable();
+    int index = table->value(valueName);
     Integer value;
 
+    
     if (index == NO_FLAG || !Integer::tryParse(value, args)) {
         ptc(ch, "Формат: %s <param name> <число>\r\n", cmd);
         ptc(ch, "        %s <param name> 0\r\n", cmd);
@@ -396,7 +398,7 @@ bool OLCState::enumerationArrayEdit(const FlagTable &table, EnumerationArray &fi
     }
 
     field[index] = value;
-    ptc(ch, "Поле %s установлено в %d.\r\n", table.fields[index].name, value);
+    ptc(ch, "Поле %s установлено в %d.\r\n", table->fields[index].name, value);
     return true;
 }
 
@@ -630,6 +632,67 @@ bool OLCState::diceEdit(int *field)
 
     ptc(ch, "Полю {g%{x установлено значение {W%dd%d+%d{x, среднее {W%d{x.\r\n", 
         cmd, field[DICE_NUMBER], field[DICE_TYPE], field[DICE_BONUS], ave);
+    return true;
+}
+
+bool OLCState::enumerationArrayWebEdit(EnumerationArray &values)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+    DLString arg = args.getOneArgument();
+    const FlagTable *table = values.getTable();
+
+    if (arg.empty()) {
+        // Launch web editor.
+        editorWeb(show_enum_array_web(values), lastCmd +" paste");
+        return false;
+    }
+
+    if (arg_is_help(arg)) {
+        // Show usage.
+        stc("Использование:\r\n", ch);
+        ptc(ch, "    %s - запустить веб-редактор массива значений\r\n", cmd);
+        ptc(ch, "    %s paste - установить значения из буфера веб-редактора\r\n", cmd);
+        ptc(ch, "    %s <string> - установить значения из строки\r\n", cmd);
+        return false;
+    }
+
+    DLString newValue;
+    if (arg_is_paste(arg)) {
+        // Grab value from the editor buffer.
+        editorPaste(newValue, ED_NO_NEWLINE);
+    } else {
+        // Grab value from command argument.
+        newValue = lastArgs;
+    }
+
+    // Split values string by comma, receiving name+value pairs
+    StringList pairs;
+    pairs.split(newValue, ",");
+    for (auto &pair: pairs) {
+        DLString name = pair.getOneArgument();
+        DLString value = pair.getOneArgument();        
+
+        // Do a strict search inside a flag table for provided flag name.
+        int index = table->index(name, true);
+        if (index == NO_FLAG) {
+            ptc(ch, "Вхождение %s не найдено в таблице %s.\r\n", 
+                name.c_str(), values.getTableName().c_str());
+            return false;
+        }
+
+        // Convert provided flag value to an integer.
+        Integer v;
+        if (!Integer::tryParse(v, value)) {
+            ptc(ch, "Неверное числовое значение %s для %s.\r\n",
+                  value.c_str(), name.c_str());
+            return false;
+        }
+
+        values[index] = v;
+    }
+
     return true;
 }
 

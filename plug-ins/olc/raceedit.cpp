@@ -134,7 +134,10 @@ void OLCStateRace::show( PCharacter *ch )
     ptc(ch, "Уязвимость:    {Y%s{x {D(vuln){x\r\n", show_flag(r->vuln).c_str());
     ptc(ch, "Форма тела:    {Y%s{x {D(form){x\r\n", show_flag(r->form).c_str());
     ptc(ch, "Части тела:    {Y%s{x {D(parts){x\r\n", show_flag(r->parts).c_str());
-    ptc(ch, "Параметры:     {Y%s{x {D(stats help){x\r\n", show_enum_array(r->stats).c_str());
+    ptc(ch, "Параметры:     {Y%s{x %s {D(stats help){x\r\n", 
+            show_enum_array_web(r->stats).c_str(),
+            web_edit_button(ch, "stats", "").c_str());
+
     ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n", show_enum(r->size).c_str());
     ptc(ch, "Слоты:         {Y%s{x {D(wearloc){x\r\n", r->wearloc.toString().c_str());
 
@@ -297,7 +300,7 @@ RACEEDIT(donates, "делится", "каким расам отдает вещи
 
 RACEEDIT(stats, "парамеры", "бонусы к параметрам")
 {
-    return enumerationArrayEdit(stat_table, getOriginal()->stats);
+    return enumerationArrayWebEdit(getOriginal()->stats);
 }
 RACEEDIT(align, "натура", "ограничить натуру по названию")
 {

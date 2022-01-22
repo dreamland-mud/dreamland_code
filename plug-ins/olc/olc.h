@@ -25,6 +25,7 @@ AreaIndexData *get_area_data(int vnum);
 bool show_help(Character * ch, const char *argument);
 int help_next_free_id();
 DLString show_enum_array(const EnumerationArray &array);
+DLString show_enum_array_web(const EnumerationArray &array);
 
 // Prototypes
 // mem.c - memory prototypes.

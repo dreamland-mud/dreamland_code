@@ -104,7 +104,8 @@ protected:
     bool flagValueEdit(Enumeration &field);
     bool flagValueEdit(const FlagTable &table, int &field);
     bool flagValueEdit(const FlagTable &table, Flags &field);
-    bool enumerationArrayEdit(const FlagTable &table, EnumerationArray &field);
+    bool enumerationArrayEdit(EnumerationArray &field);
+    bool enumerationArrayWebEdit(EnumerationArray &field);
     template<typename E> inline
     bool globalBitvectorEdit(GlobalBitvector &field);
     template<typename R, typename E> inline
