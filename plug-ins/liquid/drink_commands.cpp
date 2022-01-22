@@ -73,7 +73,7 @@ CMDRUN( fill )
     }
 
     if (obj->item_type != ITEM_DRINK_CON) {
-        ch->pecho( "Ты не можешь наполнить %O4.", obj );
+        ch->pecho( "Ты не можешь наполнить %O4 -- это не емкость для жидкости.", obj );
         return;
     }
 
@@ -93,7 +93,7 @@ CMDRUN( fill )
         }
 
         if (fountain->item_type != ITEM_FOUNTAIN) {
-            ch->pecho("%^O1 -- не фонтан.", fountain);
+            ch->pecho("%^O1 -- не источник жидкости.", fountain);
             return;
         } 
     }
@@ -117,7 +117,7 @@ CMDRUN( fill )
     }
 
     if (obj->value1() >= obj->value0()) {
-        ch->pecho("%1$^O1 уже наполн%1$Gено|ен|на|ны до краев.", obj);
+        ch->pecho("%1$^O1 уже наполнен%1$Gо||а|ы до краев.", obj);
         return;
     }    
     
@@ -454,7 +454,7 @@ CMDRUN( pourout )
     }
 
     if (out->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%^O1 - не емкость для жидкости.", out);
+        ch->pecho("%^O1 -- не емкость для жидкости.", out);
         return;
     }
 
@@ -503,7 +503,7 @@ CMDRUN( pour )
     }
 
     if (out->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%^O1 - не емкость для жидкости.", out);
+        ch->pecho("%^O1 -- не емкость для жидкости.", out);
         return;
     }
 
@@ -605,7 +605,7 @@ CMDRUN( drink )
     }
     else {
         if (( obj = get_obj_here( ch, arg ) ) == 0) {
-            ch->pecho("Ты не находишь это.");
+            ch->pecho("Ты не находишь этого.");
             return;
         }
     }
