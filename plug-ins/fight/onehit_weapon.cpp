@@ -21,6 +21,7 @@
 
 #include "fight.h"
 #include "../anatolia/handler.h"
+#include "math_utils.h"
 #include "gsn_plugin.h"
 #include "effects.h"
 #include "damageflags.h"
@@ -79,24 +80,41 @@ void WeaponOneHit::calcDamage( )
  *----------------------------------------------------------------------------*/
 void WeaponOneHit::damBase( )
 {
+    int weaponDamage = 0;
+    if (wield) {
+        weaponDamage = dice(wield->value1(), wield->value2()) * skill / 100;
+    }
+
+    if (ch->is_npc()) {
+        // Calculate and compare mob ave damage from a wielded weapon dices or from bare hands.
+        // NPCs get the best damage of the two.
+
+        NPCharacter *nch = ch->getNPC();
+        int handsAve = dice_ave(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
+        int handsDamage = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
+        int weaponAve = wield ? weapon_ave(wield) : 0;
+
+        if (handsAve > weaponAve)
+            dam = handsDamage;
+        else
+            dam = weaponDamage;
+
+    } else if (wield) {
+        // PC weapon
+        dam = weaponDamage;
+
+    } else {
+        // PC hand to hand
+        dam = number_range( 1 + 4 * skill/100, 
+                            2 * ch->getModifyLevel( ) / 3 * skill/100 );
+    }
+
     if (weaponSkill)
         weaponSkill->improve( ch, true, victim, dam_type, dam_flag );
 
     if (wield) {
-        dam = dice(wield->value1(), wield->value2()) * skill / 100;
-
         damApplyShield( );
         damApplySharp( );
-    }
-    else if (ch->is_npc( )) {
-        NPCharacter *nch = ch->getNPC();
-
-        dam = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
-    }
-    else
-    {
-        dam = number_range( 1 + 4 * skill/100, 
-                            2 * ch->getModifyLevel( ) / 3 * skill/100 );
     }
 
     damApplyHoly( );
