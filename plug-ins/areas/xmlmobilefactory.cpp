@@ -26,7 +26,7 @@ XMLMobileFactory::XMLMobileFactory( ) :
                           sex(SEX_NEUTRAL, &sex_table),
                           form(&form_flags),
                           parts(&part_flags),
-                          size(SIZE_MEDIUM, &size_table),
+                          size(NO_FLAG, &size_table),
                           detection(&detect_flags),
                           practicer(skillGroupManager),
                           religion(religionManager),

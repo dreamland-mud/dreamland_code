@@ -149,7 +149,7 @@ NPCharacter *create_mobile_org( MOB_INDEX_DATA *pMobIndex, int flags )
                 mob->setRace( race->getName() );
                 mob->form                = pMobIndex->form;
                 mob->parts                = pMobIndex->parts;
-                mob->size                = pMobIndex->size;
+                mob->size                = pMobIndex->getSize();
                 mob->material                = str_dup(pMobIndex->material);
                 mob->extracted                = false;
 

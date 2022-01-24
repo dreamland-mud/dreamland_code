@@ -68,7 +68,7 @@ using namespace std;
 
 #include "skillreference.h"
 #include "skillgroup.h"
-
+#include "race.h"
 #include "mobilebehavior.h"
 #include "areabehavior.h"
 
@@ -209,6 +209,11 @@ mob_index_data::mob_index_data( )
                        religion( religionManager ),
                        wrapper ( 0 )
 {
+}
+
+int mob_index_data::getSize() const
+{
+    return size == NO_FLAG ? raceManager->find(race)->getSize() : size;
 }
 
 auction_data::auction_data( )

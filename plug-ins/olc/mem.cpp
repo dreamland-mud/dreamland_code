@@ -135,7 +135,7 @@ MOB_INDEX_DATA *new_mob_index(void)
     pMob->vuln_flags = 0;
     pMob->material = str_dup("none");
     pMob->off_flags = 0;
-    pMob->size = SIZE_MEDIUM;
+    pMob->size = NO_FLAG;
     pMob->ac[AC_PIERCE] = 0;
     pMob->ac[AC_BASH] = 0;
     pMob->ac[AC_SLASH] = 0;

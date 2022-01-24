@@ -281,7 +281,7 @@ protected:
         // Very pleased if corpse's align is not allowed for religion.
         if (!religion->getAlign().isSetBitNumber(align)) {
             // Penalty for smaller corpses.
-            int sizePenalty = max(0, SIZE_MEDIUM - pMob->size);    
+            int sizePenalty = max(0, SIZE_MEDIUM - pMob->getSize());    
             int item_cost = 500 - sizePenalty * 50; 
             cost["goodcorpse"] = min(800, cost["goodcorpse"] + item_cost);
             quantity["goodcorpse"]++;

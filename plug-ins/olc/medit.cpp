@@ -229,8 +229,11 @@ void OLCStateMobile::commit()
             if(victim->parts == original->parts)
                 victim->parts = mob.parts;
 
-            if(victim->size == original->size)
-                victim->size             = mob.size;
+/*
+  don't touch, mob size value can be affected by worn items
+            if(victim->size == original->getSize())
+                victim->size  = mob.size == NO_FLAG ? victim->getRace()->getSize() : mob.size;
+*/                
         }
     }
 

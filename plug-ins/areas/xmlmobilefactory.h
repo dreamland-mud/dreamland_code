@@ -34,7 +34,7 @@ public:
     XML_VARIABLE XMLEnumeration start_pos, default_pos, sex;
     XML_VARIABLE XMLIntegerNoEmpty wealth;
     XML_VARIABLE XMLFlagsDiff form, parts;
-    XML_VARIABLE XMLEnumeration size;
+    XML_VARIABLE XMLEnumerationNoEmpty size;
     XML_VARIABLE XMLStringNoEmpty material;
     XML_VARIABLE XMLFlagsDiff detection;
 

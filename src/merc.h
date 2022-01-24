@@ -359,6 +359,8 @@ struct        mob_index_data
     AreaIndexData *                area;
     DLString smell;
     Properties properties;
+
+    int getSize() const;
 };
 
 
