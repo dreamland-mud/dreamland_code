@@ -696,8 +696,12 @@ MEDIT(behavior)
         static const DLString trainerType( "Trainer" );
         type = trainerType;
     }
+    else if (!str_cmp( argument, "savedcreature" )) {
+        static const DLString savedCreatureType( "SavedCreature" );
+        type = savedCreatureType;
+    }
     else { 
-        stc("Допустимые значения поведения: shopper, pet, leveladaptivepet, trainer.\r\n", ch);
+        stc("Допустимые значения поведения: savedcreature, shopper, pet, leveladaptivepet, trainer.\r\n", ch);
         return false;
     }
 
