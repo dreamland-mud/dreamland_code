@@ -1756,7 +1756,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             }
     }
 
-    if ( obj == 0 )  /* either not found or old style */
+    if ( obj == 0 )
     {
         bug( "Fread_obj: zero object", 0 );
         return;

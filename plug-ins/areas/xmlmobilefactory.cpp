@@ -123,7 +123,6 @@ XMLMobileFactory::compat(mob_index_data *mob)
 
     Race *mobrace = raceManager->find(race.getValue( ).c_str( ));
 
-    mob->new_format = true;
     mob->player_name = str_dup(player_name.getValue( ).c_str( ));
     mob->short_descr = str_dup(short_descr.getValue( ).c_str( ));
     mob->long_descr = str_dup(long_descr.getValue( ).c_str( ));

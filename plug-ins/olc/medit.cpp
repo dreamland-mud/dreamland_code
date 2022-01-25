@@ -57,7 +57,6 @@ OLCStateMobile::OLCStateMobile( MOB_INDEX_DATA *original )
         mob.behavior         = 0;
 
     mob.vnum             = original->vnum;
-    mob.new_format       = original->new_format;
     mob.area             = original->area;
 
     copyParameters( original );
@@ -253,7 +252,6 @@ void OLCStateMobile::commit()
     original->spec_fun.func    = spec_lookup( mob.spec_fun.name.c_str() );
     original->vnum             = mob.vnum;
     original->group            = mob.group;
-    original->new_format       = mob.new_format;
     original->smell            = mob.smell;
     mob.smell.clear( );
     original->act              = mob.act;

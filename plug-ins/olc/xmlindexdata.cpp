@@ -79,7 +79,6 @@ XMLMobIndexData::XMLMobIndexData()
     start_pos = POS_STANDING;
     default_pos = POS_STANDING;
     wealth = 0;
-    new_format = true;
     behavior = 0;
     practicer.setRegistry( skillGroupManager );
     religion.setRegistry(religionManager);
@@ -115,7 +114,6 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     level            = mob.level;
     long_descr       = str_dup(mob.long_descr);
     material         = str_dup(mob.material);
-    new_format       = mob.new_format;
     off_flags        = mob.off_flags;
     parts            = mob.parts;
     player_name      = str_dup(mob.player_name);
@@ -210,7 +208,6 @@ XMLObjIndexData::XMLObjIndexData()
     for (v = 0; v < 5; v++)
         value[v] = 0;
 
-    new_format = true;
     behavior = 0; 
     wrapper = 0;
     limit = -1;
@@ -219,7 +216,6 @@ XMLObjIndexData::XMLObjIndexData()
 
 XMLObjIndexData::XMLObjIndexData(const obj_index_data &original)
 {
-    new_format   = original.new_format;
     name         = str_dup(original.name);
     short_descr  = str_dup(original.short_descr);
     description  = str_dup(original.description);

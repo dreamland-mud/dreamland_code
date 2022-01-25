@@ -97,7 +97,6 @@ load_mobile(FILE *fp, MOB_INDEX_DATA *pMobIndex)
 
     pMobIndex->wrapper                = 0;
 
-    pMobIndex->new_format        = true;
     pMobIndex->player_name      = fread_string( fp );
     pMobIndex->short_descr      = fread_string( fp );
     pMobIndex->long_descr       = fread_string( fp );
@@ -316,7 +315,6 @@ load_object(FILE *fp, OBJ_INDEX_DATA *pObjIndex)
 
     pObjIndex->wrapper                = 0;
 
-    pObjIndex->new_format       = true;
     pObjIndex->reset_num        = 0;
     pObjIndex->name             = fread_string( fp );
     pObjIndex->short_descr      = fread_string( fp );
