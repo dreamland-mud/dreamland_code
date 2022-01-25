@@ -146,7 +146,7 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     mob->setSex(pMobIndex->sex);
     if (mob->getSex() == SEX_EITHER) /* random sex */
         mob->setSex(number_range(1, 2));
-        
+
     mob->setRace(race->getName());
     mob->form = pMobIndex->form;
     mob->parts = pMobIndex->parts;
@@ -203,13 +203,7 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
         WrapperBase *w = get_wrapper(pMobIndex->wrapper);
         if (w) {
             static Scripting::IdRef initId("init");
-            try {
-                w->call(initId, "C", mob);
-            } catch (const Exception &e) {
-                LogStream::sendError()
-                    << "create_mobile #" << pMobIndex->vnum
-                    << ": " << e.what() << endl;
-            }
+            w->call(initId, "C", mob);
         }
     }
 

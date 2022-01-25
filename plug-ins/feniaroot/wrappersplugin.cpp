@@ -30,6 +30,8 @@
 #include "class.h"
 #include "core/fenia/feniamanager.h"
 #include "skillmanager.h"
+#include "flagtable.h"
+#include "flagtableregistry.h"
 #include "dlscheduler.h"
 #include "character.h"
 #include "room.h"
@@ -98,6 +100,36 @@ WrappersPlugin::linkTargets()
             wrapper_cast<SkillCommandWrapper>(cmd->wrapper)->setTarget(*cmd);
         }
     }
+}
+
+static void dumpTables(Json::Value &apiDump)
+{
+    Json::Value tables;
+
+    for (auto &pair: FlagTableRegistry::getNamesMap()) {
+        const DLString &name = pair.first;
+        const FlagTable *table = pair.second;
+        const FlagTable::Field *fields = table->fields;
+
+        Json::Value tableEntries;
+
+        for(int i = 0; i < table->size; i++) {
+            Json::Value entry;
+            entry["name"] = fields[i].name;
+            entry["msg"] = fields[i].message ? fields[i].message : "";
+
+            if (table->enumerated)
+                entry["value"] = fields[i].value;
+            else
+                entry["value"] = table->bitstring(fields[i].name);
+
+            tableEntries.append(entry);
+        }
+
+        tables[name] = tableEntries;
+    }
+
+    apiDump["tables"] = tables;
 }
 
 void
@@ -171,6 +203,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaSpellContext>("spellcontext", apiDump, false);
     traitsAPIJson<FeniaCommandContext>("commandcontext", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
+    dumpTables(apiDump);
 
     Json::FastWriter writer;
     DLFileStream("/tmp", "feniaapi", ".json").fromString(
