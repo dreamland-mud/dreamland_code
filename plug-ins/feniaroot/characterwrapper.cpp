@@ -1012,6 +1012,19 @@ NMI_GET( CharacterWrapper, charmed, "true если очарован и есть 
     return IS_CHARMED(target);
 }
 
+NMI_GET(CharacterWrapper, followers, "список существ, у которых персонаж master" )
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (Character *wch = char_list; wch; wch = wch->next) {
+        if (IS_CHARMED(wch) && wch->master == target)
+            rc->push_back(wrap(wch));
+    }
+
+    return wrap(rc);
+}
+
 NMI_GET( CharacterWrapper, connected, "true если есть связь" )
 {
     Character *ch;
