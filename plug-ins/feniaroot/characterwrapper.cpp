@@ -1006,6 +1006,12 @@ NMI_SET( CharacterWrapper, race, "раса (структура .Race)" )
         target->setRace( wrapper_cast<RaceWrapper>(arg)->name );
 }
 
+NMI_GET( CharacterWrapper, charmed, "true если очарован и есть хозяин" )
+{
+    checkTarget();
+    return IS_CHARMED(target);
+}
+
 NMI_GET( CharacterWrapper, connected, "true если есть связь" )
 {
     Character *ch;
@@ -1162,7 +1168,7 @@ NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "(vnum): поиск объек�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, get_char_room, "(name): поиск по имени видимого персонажа в той же комнате" )
+NMI_INVOKE( CharacterWrapper, get_char_room, "(name[,room]): поиск по имени видимого персонажа, в той же комнате или в room" )
 {
     checkTarget( );
     
