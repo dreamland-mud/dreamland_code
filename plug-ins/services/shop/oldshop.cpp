@@ -159,7 +159,7 @@ CMDRUN( buy )
 
     char buf[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
     char argument[MAX_INPUT_LENGTH];
-    int cost, newcost, roll;
+    int cost, oldcost, roll;
     NPCharacter*  keeper;
     ShopTrader::Pointer trader;
     Object* obj,*t_obj;
@@ -239,10 +239,11 @@ CMDRUN( buy )
     roll = bonus ? 100 : number_percent( );
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
+		oldcost = cost;
         cost -= cost / 2 * roll / 100;
         // can't reduce buying price to less than 25% of the original cost
-        newcost = URANGE(obj->cost / 4, cost, obj->cost);
-        if (newcost < cost) {
+        cost = URANGE(obj->cost / 4, cost, obj->cost);
+        if (cost < oldcost) {
             ch->pecho("Ты торгуешься с %C5 и выбиваешь скидку!", keeper);
             ch->recho("%^C1 торгуется с %C5 и выбивает скидку!", ch, keeper);
             gsn_haggle->improve( ch, true );                      
@@ -252,7 +253,6 @@ CMDRUN( buy )
             ch->recho("%^C1 торгуется с %C5, но безуспешно.", ch, keeper);   
             gsn_haggle->improve( ch, false );            
         }
-		cost = newcost;
     }
 	
     // everyone reaps off druids
@@ -330,7 +330,7 @@ CMDRUN( sell )
     NPCharacter *keeper;
     ShopTrader::Pointer trader;
     Object *obj;
-    int cost, newcost;
+    int cost, oldcost;
     int roll;
     int gold, silver;
     DLString arg = constArguments;
@@ -397,7 +397,8 @@ CMDRUN( sell )
     {
         silver = cost - (cost/100) * 100;
         gold   = cost/100;
-
+		oldcost = cost;
+		
         ch->pecho("%^C1 предлагает тебе %s за %O4.", keeper, format_coins(gold, silver).c_str(), obj);
         
         // make sure this is a positive factor
@@ -405,9 +406,9 @@ CMDRUN( sell )
 
         cost += obj->cost / 2 * roll / 100;
         // can't increase selling price to more than 125% of the original cost
-        newcost = ::min(cost, obj->cost * 125 / 100);
+        cost = ::min(cost, obj->cost * 125 / 100);
         
-        if (newcost > cost) {
+        if (cost > oldcost) {
             ch->pecho("Ты торгуешься с %C5 и выбиваешь наценок!", keeper);
             ch->recho("%^C1 торгуется с %C5 и выбивает наценок!", ch, keeper);
             gsn_haggle->improve( ch, true );                      
@@ -417,7 +418,6 @@ CMDRUN( sell )
             ch->recho("%^C1 торгуется с %C5, но безуспешно.", ch, keeper);   
             gsn_haggle->improve( ch, false );            
         }
-		cost = newcost;
         
         if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
         {
