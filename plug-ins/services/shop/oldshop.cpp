@@ -401,11 +401,11 @@ CMDRUN( sell )
         ch->pecho("%^C1 предлагает тебе %s за %O4.", keeper, format_coins(gold, silver).c_str(), obj);
         
         // make sure this is a positive factor
-        roll = MAX(1, gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + skill_level_bonus(*gsn_haggle, ch));
+        roll = ::max(1, gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + skill_level_bonus(*gsn_haggle, ch));
 
         cost += obj->cost / 2 * roll / 100;
         // can't increase selling price to more than 125% of the original cost
-        newcost = MIN(cost, obj->cost * 125 / 100);
+        newcost = ::min(cost, obj->cost * 125 / 100);
         
         if (newcost > cost) {
             ch->pecho("Ты торгуешься с %C5 и выбиваешь наценок!", keeper);
