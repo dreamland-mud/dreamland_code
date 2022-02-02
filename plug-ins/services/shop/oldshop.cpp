@@ -243,7 +243,7 @@ CMDRUN( buy )
         // can't reduce buying price to less than 25% of the original cost
         newcost = URANGE(obj->cost / 4, cost, obj->cost);
         if (newcost < cost) {
-            ch->pecho("Ты торгуешься с %C5 и выбиваешь скидку!, keeper);
+            ch->pecho("Ты торгуешься с %C5 и выбиваешь скидку!", keeper);
             ch->recho("%^C1 торгуется с %C5 и выбивает скидку!", ch, keeper);
             gsn_haggle->improve( ch, true );                      
         }
@@ -408,7 +408,7 @@ CMDRUN( sell )
         newcost = MIN(cost, obj->cost * 125 / 100);
         
         if (newcost > cost) {
-            ch->pecho("Ты торгуешься с %C5 и выбиваешь наценок!, keeper);
+            ch->pecho("Ты торгуешься с %C5 и выбиваешь наценок!", keeper);
             ch->recho("%^C1 торгуется с %C5 и выбивает наценок!", ch, keeper);
             gsn_haggle->improve( ch, true );                      
         }
