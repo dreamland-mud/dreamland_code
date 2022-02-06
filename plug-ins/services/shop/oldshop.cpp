@@ -312,6 +312,9 @@ CMDRUN( buy )
             t_obj->timer = 0;
         
         REMOVE_BIT( t_obj->extra_flags, ITEM_HAD_TIMER );
+        // prevent predatory resale
+        SET_BIT(t_obj->extra_flags, ITEM_SELL_EXTRACT);
+
         obj_to_char( t_obj, ch );
 
         if ( cost < t_obj->cost )
