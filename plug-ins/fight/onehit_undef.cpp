@@ -1218,7 +1218,7 @@ void UndefinedOneHit::damEffectMasterHand()
     diceroll = number_percent();
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-    skill_mod = 0.15;
+    skill_mod = 0.1;
     stat_mod = 0.01;
     level_mod = 0.01;
     quick_mod = 0.05;
@@ -1267,14 +1267,14 @@ void UndefinedOneHit::damEffectMasterHand()
         chance -= quick_mod * 100;
         d.log(chance, "quick");
     }
-
-    chance = max(1, (int)chance); // there's always a chance;
+	// normalize chance, maxed at 15%
+	chance = (int)URANGE(1, (int)chance, 15);
     d.log(chance, "final");
 
     if (diceroll > chance)
         return;
 
-    if ( (victim->isAffected(gsn_nerve)) && (number_percent() < 20) )
+    if ( (victim->isAffected(gsn_nerve)) && (number_percent() < 15) )
         ch->pecho("С ослабленными нервными окончаниями оглушить противника становится легче.");        
                 
     if (!IS_AFFECTED(victim, AFF_WEAK_STUN)) {
@@ -1330,7 +1330,7 @@ void UndefinedOneHit::damApplyMasterHand()
 
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
 
-    dam_bonus += (ch->getCurrStat(STAT_STR) - 20) * stat_mod * 100; // TODO: this should roll vs. victim's CON instead
+    dam_bonus += (ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON)) * stat_mod * 100;
     d.log(dam_bonus, "stats");
     dam_bonus += (skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel()) * level_mod * 100;
     dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;
@@ -1399,13 +1399,13 @@ void UndefinedOneHit::damEffectSlice( )
     bool left;
     vector<int> sliced;
     
-    if (ch == victim || !axe || victim->is_npc( ))
+    if (ch == victim || !axe)
         return;
    
     if ((chance = gsn_slice->getEffective( ch )) <= 1)
         return;
     
-    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE)
+    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE && axe->value3() != DAMW_CLEAVE)
         return;
     
     if (number_bits(1)) {
@@ -1421,22 +1421,31 @@ void UndefinedOneHit::damEffectSlice( )
 
     if (!victim->getWearloc( ).isSet( sliced_loc ))
         return;
-
+	
+	// base chance: 1%
     if (number_range( 1, 100 ) > 1)
         return;
 
+	// chance depends on both slice skill and weapon skill
     chance = (chance * ch->getSkill( weapon_sn )) / 100;
-    
-    chance += ch->getCurrStat(STAT_DEX ) - victim->getCurrStat(STAT_DEX );
-    chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_STR ));
+	
+    chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_CON ));
 
     chance += (skill_level(*gsn_slice, ch) - victim->getModifyLevel()) * 2;
-
+	chance += victim->size - 2; // easier to chop larger hands
+	
     if (!IS_WEAPON_STAT( axe, WEAPON_SHARP ))
         chance -= chance / 10;
-
-    if (!IS_WEAPON_STAT( axe, WEAPON_TWO_HANDS ))
-        chance -= chance / 10;
+	
+	// samurai always get +0.1% chance, others get -0.1% if not two-handed
+	if ( ch->getProfession( ) == prof_samurai && axe->value0( ) == WEAPON_SWORD)
+		chance += chance / 10;
+    else {
+		if (axe->value0( ) == WEAPON_AXE)
+			chance += chance / 10;
+		if (!IS_WEAPON_STAT( axe, WEAPON_TWO_HANDS ))
+        	chance -= chance / 10;
+	}
     
     if (number_percent( ) > chance) {
         oldact("Твое оружие скользит по запястью $C2.", ch, 0, victim, TO_CHAR);
