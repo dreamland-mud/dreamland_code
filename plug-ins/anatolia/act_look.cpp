@@ -916,7 +916,7 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
             << " "
             << (IS_VAMPIRE(vict) ? "vampire" : vict->getRace( )->getName( ));
     }
-
+	buf << ", " << size_table.message( vict->size, '2' ) << " размера";
     buf << ") ";
 }
 
