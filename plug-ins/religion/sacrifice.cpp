@@ -555,8 +555,9 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 
         if (rescue_nosac_items(obj, ch->in_room)) {
             if (needSpam) {
-				DLString fall = DLString(terrains[ch->in_room->getSectorType()].fall);
-				ch->in_room->echo("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
+				const char *fall = terrains[ch->in_room->getSectorType()].fall;
+				ch->recho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
+				ch->pecho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
 			}
 		}
         extract_obj( obj );
@@ -624,7 +625,7 @@ CMDRUNP( sacrifice )
                     return;
                 }
                 
-				DLString where = terrains[ch->in_room->getSectorType()].where;
+				const char *where = terrains[ch->in_room->getSectorType()].where;
 				ch->recho("%^C1 приносит в жертву %N3 все, что находится %s.", ch, rname, where);
                 wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит в жертву %N3 все, что находится %s в %s.", ch, rname, where, ch->in_room->getName() );
 
