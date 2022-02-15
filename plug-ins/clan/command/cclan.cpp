@@ -136,7 +136,7 @@ void CClan::usage( PCharacter *pc )
 
     buf << "{W{lRклан список{lEclan list  {lx{x     показать список всех кланов" << endl
         << "{W{lRклан счет {lEclan count{lx{x      показать количество игроков в кланах" << endl
-        << "{W{lRклан банк{lEclan bank{lx{x       операции с клановым банком (подробее см. {W{lRклан банк помощь{lEclan bank help{lx{x)" << endl
+        << "{W{lRклан банк{lEclan bank{lx{x       операции с клановым банком (подробнее см. {W{lRклан банк помощь{lEclan bank help{lx{x)" << endl
         << "{W{lRклан выгнать{lEclan remove {lx{x    выйти (выгнать кого-либо) из клана (см. {W{lRклан выгнать помощь{lEclan remove help{lx{x)" << endl
         << "{W{lRклан уровень{lEclan level  {lx{x    посмотреть/установить клановый уровень (cм. {W{lRклан уровень помощь{lEclan level help{lx{x)" << endl
         << "{W{lRклан состав{lEclan member{lx{x     показывает лидеру список членов клана (см. {W{lRклан состав помощь{lEclan member help{lx{x)" << endl

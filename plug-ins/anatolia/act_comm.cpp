@@ -118,7 +118,7 @@ CMDRUNP( delete )
     {
         if (!password_check( pch, argument ))
         {
-            pch->pecho("Состояние самоуничтожения отменено (неверный пароль).");
+            pch->pecho("Попытка суицида отменена -- неверный пароль.");
             pch->confirm_delete = false;
             return;
         }
@@ -126,17 +126,22 @@ CMDRUNP( delete )
         {
             wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
                    "%1$^C1 превращает себя в помехи в проводах.", pch );
+			DLString msg;
+			msg = fmt(0, "{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир.", pch);
+        	infonet(pch, 0, "{CТихий голос из $o2: ", msg.c_str());
+        	send_to_discord_stream(":ghost: " + msg);
+        	send_telegram(msg);			
             delete_player( pch );
             return;
         }
     }
 
-    pch->pecho("Введи {Wdelete <твой пароль>{x для подтверждения команды.");
-    pch->pecho("{RВНИМАНИЕ{x: это необратимая команда.");
-    pch->pecho("Введение команды {Wdelete{x без пароля отменяет попытку самоликвидации.");
+    pch->pecho("{RВНИМАНИЕ: {WЭТО НЕОБРАТИМОЕ ДЕЙСТВИЕ, ТВОЙ ПЕРСОНАЖ БУДЕТ УДАЛЕН НАСОВСЕМ!{x");	
+    pch->pecho("Введи {y{ledelete{lrудалить{lx <твой пароль>{x для подтверждения команды.");
+    pch->pecho("Чтобы отменить попытку суицида, введи {y{ledelete{lrудалить{lx без пароля.");
     pch->getPC( )->confirm_delete = true;
     wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
-            "%^C1 собирается удалить свой персонаж.", pch );
+            "%^C1 собирается удалить своего персонажа.", pch );
 }
 
 /* COMPAT */void do_quit( Character *ch, const char *argument )
@@ -302,7 +307,7 @@ CMDRUNP( quit )
         && !pch->is_immortal()  
         && pch->isAffected(gsn_suspect))
     {
-        pch->pecho("Ты не можешь этого сделать - тебя ждет Суд!");
+        pch->pecho("Ты не можешь этого сделать -- тебя ждет Суд!");
         return;
     }
 
@@ -311,7 +316,7 @@ CMDRUNP( quit )
             && pch->death_ground_delay > 0
             && pch->trap.isSet( TF_NO_MOVE ))
     {
-        pch->pecho("Сначала выберись отсюда, а потом можно и покинуть этот Мир.");
+        pch->pecho("Сначала выберись из ловушки, а потом можно и покинуть этот мир.");
         return;
     }
 
@@ -320,7 +325,7 @@ CMDRUNP( quit )
             && pch->getClan() != pch->in_room->pIndexData->clan)
     {
         if (!fAuto && !fForced) {
-            pch->pecho("Ты не можешь этого сделать - здесь не твоя территория!");
+            pch->pecho("Ты не можешь этого сделать -- здесь не твоя территория!");
             return;
         }
         
@@ -383,7 +388,7 @@ CMDRUNP( save )
         return;
 
     ch->getPC( )->save();
-    ch->pecho("Жрецы {CDream Land{x заносят сведения о тебе в свои манускрипты.");
+    ch->pecho("Архивариус {CМира Мечты{x заносит сведения о тебе в свои манускрипты.");
     ch->setWaitViolence( 1 );
 }
 
