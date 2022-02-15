@@ -555,7 +555,7 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 
         if (rescue_nosac_items(obj, ch->in_room)) {
             if (needSpam) {
-				DLString fall = terrains[ch->in_room->getSectorType()].fall;
+				DLString fall = DLString(terrains[ch->in_room->getSectorType()].fall);
 				ch->in_room->echo("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
 			}
 		}
