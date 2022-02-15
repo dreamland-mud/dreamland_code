@@ -431,7 +431,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     if (offering.smites()) {
         ch->pecho("{R%^N1 гневается на тебя за попытку принести в жертву %s!{x",
                        rname, offering.getSmiteMessage().c_str());
-        ch->recho("Гнев божий обрушивается на %C2!", ch);
+        ch->recho("Гнев %^N2 обрушивается на %C4!", rname, ch);
         rawdamage(ch, ch, DAM_OTHER, ch->hit / 4, false);
         ch->pecho("Это было действительно {rБОЛЬНО{x!"); 
         altar_clear(altar);
@@ -474,7 +474,7 @@ static bool can_sacrifice( Character *ch, Object *obj, bool needSpam )
         if (obj->item_type == ITEM_CORPSE_PC)
         {
                 if (needSpam)
-                        ch->pecho("Богам это не понравится.");
+                        ch->pecho("Трупы игроков жертвовать запрещено.");
                 return false;
         }
 
@@ -490,7 +490,7 @@ static bool can_sacrifice( Character *ch, Object *obj, bool needSpam )
                 && ( count_users(obj) > 0 ) )
         {
                 if (needSpam) 
-                    ch->pecho( "%1$^O1 использу%1$nется|ются.", obj );
+                    ch->pecho( "%1$^O1 в данный момент использу%1$nется|ются.", obj );
                 return false;
         }
 
@@ -531,27 +531,35 @@ static bool oprog_sac( Object *obj, Character *ch )
 
 int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 {
+    	DLString rname;
+    	if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
+			rname = "бог|и|ов|ам|ов|ами|ах";
+		else rname = ch->getPC()->getReligion()->getRussianName();
+		
         int silver = -1;
 
         if ( !can_sacrifice(ch, obj, needSpam) )
-                return -1;
+			return -1;
 
-        silver = number_range(number_fuzzy(obj->level), obj->cost / 10);
+		// sac can't yield more $$ than obj->cost
+        silver = ::min(number_range(1, obj->level), obj->cost);
 
         if (needSpam)
-            oldact("$c1 приносит в жертву богам $o4.", ch, obj, 0, TO_ROOM);
+			ch->recho("%^C1 приносит %O4 в жертву %N3.", ch, obj, rname);
 
         if (oprog_sac( obj, ch ))
-                return silver;
+			return silver;
         
         if (needSpam)
-            wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит во всесожжение %O4.", ch, obj );
+            wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит %O4 в жертву %N3.", ch, obj, rname );
 
-        if (rescue_nosac_items(obj, ch->in_room)) 
-            if (needSpam)
-                oldact("Некоторые вещи, лежащие в $o6, не могут быть принесены в жертву и падают $T.", 
-                     ch, obj, terrains[ch->in_room->getSectorType()].fall, TO_ALL );
-
+        if (rescue_nosac_items(obj, ch->in_room)) {
+            if (needSpam) {
+				const char *fall = terrains[ch->in_room->getSectorType()].fall;
+				ch->recho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
+				ch->pecho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
+			}
+		}
         extract_obj( obj );
         return silver;
 }
@@ -564,24 +572,26 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 CMDRUNP( sacrifice )
 {
         char arg[MAX_INPUT_LENGTH];
-        char buf[MAX_STRING_LENGTH];
         Object *obj, *next_obj;
         int silver, mana_gain;
-
+    	DLString rname;
+    	if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
+			rname = "бог|и|ов|ам|ов|ами|ах";
+		else rname = ch->getPC()->getReligion()->getRussianName();
+	
         mana_gain=-1;
 
         argument = one_argument( argument, arg );
         
         if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) )
         {
-                oldact_p("$c1 предлагает себя в жертву богам, но они вежливо отказываются.",
-                        ch, 0, 0, TO_ROOM,POS_RESTING);
-                ch->pecho("Боги оценили твою жертву и возможно примут ее позже.");
+				ch->recho("%^C1 предлагает себя в жертву %N3, но слышит в ответ тактичное молчание.", ch, rname);
+                ch->pecho("Ты предлагаешь себя в жертву %N3, но слышишь в ответ лишь тактичное молчание.", rname);
                 return;
         }
 
         if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
-            ch->pecho("Божество не примет твою жертву в этой местности.");
+            ch->pecho("В этой местности %N3 не удастся принять твою жертву.", rname);
             return;
         }
 
@@ -611,12 +621,13 @@ CMDRUNP( sacrifice )
                 save_items( ch->in_room );
                 
                 if (count == 0) {
-                    oldact("Ты не наш$gло|ел|ла ничего подходящего для жертвоприношения.", ch, 0, 0, TO_CHAR);
+					ch->pecho("Ты не находишь ничего подходящего для жертвоприношения.");
                     return;
                 }
                 
-                oldact("$c1 приносит в жертву богам все, что находится $T.", ch, 0, terrains[ch->in_room->getSectorType()].where, TO_ROOM );
-                wiznet( WIZ_SACCING, 0, 0, "%^C1 sends up all items in %s as a burnt offering.", ch, ch->in_room->getName() );
+				const char *where = terrains[ch->in_room->getSectorType()].where;
+				ch->recho("%^C1 приносит в жертву %N3 все, что находится %s.", ch, rname, where);
+                wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит в жертву %N3 все, что находится %s в %s.", ch, rname, where, ch->in_room->getName() );
 
                 if (silver==0) {
                     return;
@@ -627,7 +638,7 @@ CMDRUNP( sacrifice )
                 obj = get_obj_list( ch, arg, ch->in_room->contents );
                 if ( obj == 0 )
                 {
-                        ch->pecho("Ты не находишь это.");
+                        ch->pecho("Ты не находишь этого.");
                         return;
                 }
 
@@ -652,22 +663,22 @@ CMDRUNP( sacrifice )
         if (mana_gain != -1 )
         {
                 ch->mana += mana_gain;
-                sprintf(buf,"Боги дают тебе %d энергии за сожжение.\n\r", mana_gain);
-                ch->send_to(buf);
+				ch->pecho("Ты устраиваешь торжественное сожжение во славу %1$N3, восстанавливая %2$d очк%2$Iо|а|ов энергии.", rname, mana_gain);
+				ch->recho("%^C1 устраивает торжественное сожжение во славу %N3, восстанавливая энергию.", ch, rname);
         }
+		
+		if (silver > 0) {
+			ch->pecho("Ты получаешь %1$d серебрян%1$Iую|ые|ых монет%1$Iу|ы| от %2$N2 за свое жертвоприношение.", silver, rname);
+			ch->silver += silver;
 
-        sprintf(buf,"Боги дают тебе %d серебрян%s за жертвоприношение.\n\r",
-                silver,GET_COUNT(silver,"ую монету","ые монеты","ых монет"));
-        ch->send_to(buf);
-
-        ch->silver += silver;
-
-        if (ch->getReligion() == god_fili && get_eq_char(ch, wear_tattoo)) {
-            int bonus = silver * 2;
-            ch->pecho("{YФили{x добавляет тебе еще %1$d монет%1$Iу|ы|.", bonus);
-            ch->silver += bonus;
-        }
-
+			if (ch->getReligion() == god_fili && get_eq_char(ch, wear_tattoo)) {
+            	int bonus = silver * 2;
+            	ch->pecho("{Y%1^N1{x скупо кряхтит и добавляет тебе еще %2$d монет%2$Iу|ы|.", rname, bonus);
+            	ch->silver += bonus;
+        	}
+		}
+		else ch->pecho("Твое скудное жертвоприношение остается без награды от %N2.", rname);
+	
         if (IS_SET(ch->act,PLR_AUTOSPLIT))
             if (silver > 1)
                 if (party_members_room( ch ).size( ) > 1)
