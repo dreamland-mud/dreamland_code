@@ -224,10 +224,14 @@ public:
     }
     virtual void run( )
     {
-        pvict->pecho("Ты превращаешься в привидение и покидаешь этот мир.");
+        pvict->pecho("Милостивая Варда больше не сможет тебя возродить.");
+        pvict->pecho("Ты превращаешься в призрак в последний раз и навсегда покидаешь этот мир.");
         oldact("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
-        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
         
+        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
+        infonet(pvict, 0, "{CТихий голос из $o2: ", msgWiznet.c_str());
+        send_to_discord_stream(":ghost: " + msgWiznet);
+        send_telegram(msgWiznet);
         delete_player( pvict );
     }
     virtual int getPriority( ) const
@@ -290,7 +294,7 @@ protected:
         pch->perm_stat[STAT_CON]--;
 
         if (pch->perm_stat[STAT_CON] >= 3) {
-            pch->pecho("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
+            pch->pecho("Ты чувствуешь, как твое телосложение уменьшается после этой смерти.");
             return false;
         }
         
@@ -298,7 +302,7 @@ protected:
 
         DLScheduler::getThis( )->putTaskNOW(
             PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 : %C1 удаляется из-за слабого телосложения." ) );
+                "%C1 теряет слишком много очков телосложения и навсегда покидает этот мир." ) );
         return true;
     }
 
@@ -326,7 +330,7 @@ protected:
 
         DLScheduler::getThis( )->putTaskNOW(
             PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 : %C1 удаляется, достигнув предела 10 смертей самурая." ) );
+                "%C1 десятый раз гибнет смертью самурая и навсегда покидает этот мир" ) );
         return true;
     }
 
