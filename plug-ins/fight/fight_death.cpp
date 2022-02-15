@@ -472,6 +472,31 @@ static Object * corpse_create( Character *ch )
         corpse->value3(ch->getPC( )->getHometown( )->getPit( ));
     
     corpse->value4(ch->alignment);
+    switch ( ch->size ) {
+        default:
+        case 0:
+            corpse->weight = number_range(20, 120);
+            break;
+        case 1:
+            corpse->weight = number_range(140, 800);
+            break;
+        case 2:
+            corpse->weight = number_range(800, 2200);
+            break;
+        case 3:
+            corpse->weight = number_range(3000, 6000);
+            break;
+        case 4:
+            corpse->weight = number_range(6500, 10000);
+            break;
+        case 5:
+            corpse->weight = number_range(11000, 18000);
+            break;
+        case 6:
+            corpse->weight = number_range(20000, 30000);
+            break;
+    }
+    
     return corpse;
 }
 
