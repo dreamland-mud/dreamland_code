@@ -128,7 +128,7 @@ CMDRUNP( delete )
                    "%1$^C1 превращает себя в помехи в проводах.", pch );
 			DLString msg;
 			msg = fmt(0, "{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир.", pch);
-        	infonet(pvict, 0, "{CТихий голос из $o2: ", msg.c_str());
+        	infonet(pch, 0, "{CТихий голос из $o2: ", msg.c_str());
         	send_to_discord_stream(":ghost: " + msg);
         	send_telegram(msg);			
             delete_player( pch );
