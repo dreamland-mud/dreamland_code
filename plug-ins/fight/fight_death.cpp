@@ -39,6 +39,7 @@
 #include "interp.h"
 #include "wiznet.h"
 #include "messengers.h"
+#include "infonet.h"
 #include "mercdb.h"
 #include "desire.h"
 #include "act.h"
@@ -48,6 +49,7 @@
 #include "fight.h"
 #include "vnum.h"
 #include "def.h"
+
 
 // A set of PK looting rules defined in fight/loot.json.
 Json::Value loot;
