@@ -3,7 +3,6 @@
 #include "merc.h"
 #include "def.h"
 #include "liquid.h"
-#include "liquidflags.h"
 
 LIQ(none);
 
