@@ -531,10 +531,12 @@ static bool oprog_sac( Object *obj, Character *ch )
 
 int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 {
-    	DLString rname;
+		PCharacter *pch = ch->getPC();
+		const Religion &religion = *(pch->getReligion());
+		const char *rname = religion.getRussianName().c_str();
+
     	if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
 			rname = "бог|и|ов|ам|ов|ами|ах";
-		else rname = ch->getPC()->getReligion()->getRussianName();
 		
         int silver = -1;
 
@@ -574,10 +576,12 @@ CMDRUNP( sacrifice )
         char arg[MAX_INPUT_LENGTH];
         Object *obj, *next_obj;
         int silver, mana_gain;
-    	DLString rname;
+		PCharacter *pch = ch->getPC();
+		const Religion &religion = *(pch->getReligion());
+		const char *rname = religion.getRussianName().c_str();
+
     	if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
 			rname = "бог|и|ов|ам|ов|ами|ах";
-		else rname = ch->getPC()->getReligion()->getRussianName();
 	
         mana_gain=-1;
 
