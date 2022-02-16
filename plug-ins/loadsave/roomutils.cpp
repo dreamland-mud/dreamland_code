@@ -34,14 +34,12 @@ bool RoomUtils::isOutside(Character *ch)
 
 bool RoomUtils::hasWaterParticles(Room *target)
 {
-    if (isWater(target) ||
-		IS_SET(target->room_flags, ROOM_NEAR_WATER) ||
-		(isOutside(target) && weather_info.sky >= SKY_RAINING))
+	if ( (isWater(target)) ||
+		 (IS_SET(target->room_flags, ROOM_NEAR_WATER)) ||
+		 (isOutside(target) && weather_info.sky >= SKY_RAINING) ||
+		 (get_obj_room_type(target, ITEM_FOUNTAIN) == 0) ) {
         return true;
-
-	::Object *obj = get_obj_room_type(target, ITEM_FOUNTAIN);	
-	if (obj != null)
-		return true;
+	}
 
     return false;
 }
