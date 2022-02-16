@@ -3,6 +3,7 @@
 #include "roomutils.h"
 #include "merc.h"
 #include "def.h"
+#include "loadsave.h"
 #include "liquid.h"
 
 LIQ(none);
@@ -33,7 +34,6 @@ bool RoomUtils::isOutside(Character *ch)
 
 bool RoomUtils::hasWaterParticles(Room *target)
 {
-	RoomIndexData *pRoom = ch->in_room->pIndexData;
 	Object *fountain = 0;
 	
     if (isWater(target))
@@ -44,10 +44,10 @@ bool RoomUtils::hasWaterParticles(Room *target)
 
     if (isOutside(target) && weather_info.sky >= SKY_RAINING)
         return true;
-    
-	fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
-	if (fountain || pRoom->liquid != liq_none)
-        return true;
+
+	fountain = get_obj_room_type( target, ITEM_FOUNTAIN );
+	if (fountain || target->liquid != liq_none)
+		return true;
 
     return false;
 }
