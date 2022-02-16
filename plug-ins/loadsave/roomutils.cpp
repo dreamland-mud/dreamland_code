@@ -1,5 +1,6 @@
 #include "character.h"
 #include "room.h"
+#include "roomutils.h"
 #include "merc.h"
 #include "def.h"
 #include "liquid.h"
