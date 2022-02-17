@@ -129,8 +129,7 @@ CMDRUNP( delete )
 			DLString msg;
 			msg = fmt(0, "{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир.", pch);
         	infonet(pch, 0, "{CТихий голос из $o2: ", msg.c_str());
-        	send_to_discord_stream(":ghost: " + msg);
-        	send_telegram(msg);			
+        	send_to_discord_stream(":ghost: " + msg); // discord only here, explicitly asked for by players		
             delete_player( pch );
             return;
         }
