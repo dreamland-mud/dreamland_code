@@ -1716,6 +1716,8 @@ static void convert_personal( Object *obj )
             << "ID " << obj->getID( ) << ", owner " << obj->getOwner( ) << endl;
 }
 
+#define OBJ_VNUM_STUB 127
+
 void fread_obj( Character *ch, Room *room, FILE *fp )
 {
     Object *obj;
@@ -1727,6 +1729,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
     bool first;
     bool fPersonal;
     int wear_loc = -1;
+    int vnum = 0;
 
     fVnum = false;
     obj = 0;
@@ -1737,23 +1740,23 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
     if( !str_cmp( word,"Vnum" ) )
     {
-            int vnum;
             first = false;  /* fp will be in right place */
 
             vnum = fread_number( fp );
-            if( !get_obj_index( vnum ) )
+            OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
+
+            if (!pObj)
             {
-                    bug( "Fread_obj: bad vnum %d.", vnum );
+                bug( "Fread_obj: bad vnum %d in room %d.", vnum, room ? room->vnum : -1 );
+                pObj = get_obj_index(OBJ_VNUM_STUB);
             }
-            else
-            {
-                    /*this object was already initialized once*/
-                    obj = create_object_nocount( get_obj_index( vnum ), -1);
-                    
-                    /*init pIndexData counter, in case of bootup*/
-                    if ( obj && create_obj_dropped )
-                        obj->pIndexData->count++;
-            }
+
+            /*this object was already initialized once*/
+            obj = create_object_nocount( pObj, -1);
+            
+            /*init pIndexData counter, in case of bootup*/
+            if (create_obj_dropped)
+                obj->pIndexData->count++;
     }
 
     if ( obj == 0 )
@@ -1840,6 +1843,12 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                         {
                             bug( "Fread_obj: incomplete object.", 0 );
                             ddeallocate( obj );
+                            return;
+                        }
+                        else if (obj->pIndexData->vnum == OBJ_VNUM_STUB) {
+                            bug("Fread_obj: extracting stub item %d in room %d", vnum, room ? room->vnum : -1);
+                            ObjectBehaviorManager::parse( obj, fp );                            
+                            extract_obj( obj );
                             return;
                         }
                         else
