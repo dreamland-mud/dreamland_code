@@ -28,7 +28,6 @@ character.cpp \
 pcharacter.cpp \
 pcharactermanager.cpp \
 room.cpp \
-savedcreature.cpp \
 save_charmed.cpp \
 mobilebehaviormanager.cpp \
 objectbehaviormanager.cpp \
@@ -40,7 +39,6 @@ areautils.cpp \
 roomutils.cpp
 
 libloadsave_la_MOC = \
-savedcreature.h \
 objectbehaviormanager.h
 
 libloadsave_la_LIBADD = \

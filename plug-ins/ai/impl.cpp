@@ -16,6 +16,7 @@ extern "C"
         
         Plugin::registerPlugin<MobileBehaviorRegistrator<BasicMobileBehavior> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<BasicMobileDestiny> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<SavedCreature> >( ppl );
 
         return ppl;
     }        

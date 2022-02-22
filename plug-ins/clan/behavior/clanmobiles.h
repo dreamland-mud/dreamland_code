@@ -9,7 +9,6 @@
 #include "healer.h"
 #include "clanobjects.h"
 #include "summoncreaturespell.h"
-#include "savedcreature.h"
 
 class PCharacter;
 class Object;
@@ -77,8 +76,7 @@ protected:
 };
 
 class ClanSummonedCreature : public SummonedCreature, 
-                             public SavedCreature,
-                             public BasicMobileDestiny {
+                             public SavedCreature {
 XML_OBJECT
 public:
         typedef ::Pointer<ClanSummonedCreature> Pointer;
