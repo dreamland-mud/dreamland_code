@@ -940,8 +940,10 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
 
     if (IS_SET(flags, FKILL_CORPSE))
         make_corpse( ch, victim );
-    else if (IS_SET(flags, FKILL_PURGE))
-        purge_corpse( ch, victim );
+    else {
+		if (IS_SET(flags, FKILL_PURGE))
+        	purge_corpse( ch, victim );
+	}
     
 	DLString msg = fmt(0, "%1$C1 ", victim);
 	if (!victim->is_npc()) {
@@ -974,7 +976,7 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
 	}
 
     wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
-    wiznet(wizflag, 0, victim->get_trust(), msg, victim, ch);
+    wiznet(wizflag, 0, victim->get_trust(), msg.c_str(), victim, ch);
 
     if (!victim->is_npc()) {
         send_discord_death(msg);
