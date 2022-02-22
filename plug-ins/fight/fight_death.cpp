@@ -965,20 +965,48 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
 
     if (IS_SET(flags, FKILL_CORPSE))
         make_corpse( ch, victim );
-    else if (IS_SET(flags, FKILL_PURGE))
-        purge_corpse( ch, victim );
+    else {
+		if (IS_SET(flags, FKILL_PURGE))
+        	purge_corpse( ch, victim );
+	}
     
-    static const char *msg_killed = "%1$C1 па%1$Gло|л|ла от руки %2$C2.";
-    static const char *msg_died = "%1$C1 погиб%1$Gло||ла своей смертью.";
-    const char *&msg = (ch && victim != ch) ? msg_killed : msg_died;
+	DLString msg = fmt(0, "%1$C1 ", victim);
+	if (!victim->is_npc()) {
+		if (victim == ch) 
+			msg = msg + fmt(0, "погиб%1$Gло||ла|ли своей смертью ", victim);
+		else {			
+			msg = msg + fmt(0, "па%1$Gло|л|ла|ли от ", victim);
+			if (IS_SET(ch->form, FORM_SENTIENT) && IS_SET(ch->parts, PART_HANDS))
+				msg = msg + "руки ";				
+			else if (IS_SET(ch->parts, PART_FANGS))
+				msg = msg + "клыков ";
+			else if (IS_SET(ch->parts, PART_CLAWS))
+				msg = msg + "когтей ";
+			else if (IS_SET(ch->parts, PART_TENTACLES))
+				msg = msg + "щупалец ";			
+			else if (IS_SET(ch->parts, PART_HORNS))
+				msg = msg + "рогов ";				
+			else if (IS_SET(ch->parts, PART_TUSKS))
+				msg = msg + "бивней ";
+			else if (IS_SET(ch->parts, PART_TWO_HOOVES) || IS_SET(ch->parts, PART_FOUR_HOOVES))
+				msg = msg + "копыт ";
+			else if (IS_SET(ch->parts, PART_FINS))
+				msg = msg + "плавников ";			
+			msg = msg + fmt(0, "%C2", ch);
+		}
+		if (ch)
+			msg = msg + fmt(0, " в зоне %s.", ch->in_room->areaName());
+		else
+			msg = msg + ".";
+	}
 
     wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
-    wiznet(wizflag, 0, victim->get_trust(), msg, victim, ch);
+    wiznet(wizflag, 0, victim->get_trust(), msg.c_str(), victim, ch);
 
     if (!victim->is_npc()) {
-        send_discord_death(fmt(0, msg, victim, ch));
+        send_discord_death(msg);
         if (ch && !ch->is_npc() && ch != victim)
-            send_telegram(fmt(0, msg, victim, ch));
+            send_telegram(msg);
     }
 
     if (ch && mprog_kill( ch, victim ))
