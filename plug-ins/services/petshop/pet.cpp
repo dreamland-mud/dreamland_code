@@ -38,6 +38,23 @@ void Pet::stopfol( Character *master )
     lastCharmTime = dreamland->getCurrentTime( );
 }
 
+bool Pet::area( ) 
+{
+    Character *master = ch->master;
+    
+    if (master) {
+        // nothing to do, still charmed
+        return false;
+    }
+
+    // Check if in reset position at pet store -- return false in that case
+
+    // Extract free-roaming pet with some custom message.
+    // extract_char( ch );
+    return true;
+}
+
+
 bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int )
 {
     NPCharacter *pet;
