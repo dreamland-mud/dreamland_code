@@ -47,7 +47,10 @@ bool Pet::area( )
         return false;
     }
 
-    // Check if in reset position at pet store -- return false in that case
+    if (ch->reset_room == ch->in_room->vnum) {
+        // nothing to do, still at pet storage room
+        return false;
+    }
 
     // Extract free-roaming pet with some custom message.
     // extract_char( ch );
