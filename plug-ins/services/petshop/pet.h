@@ -17,6 +17,7 @@ public:
     Pet( );
 
     virtual void stopfol( Character * );
+    virtual bool area( );
 
     virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
     virtual bool available( Character *, NPCharacter * ) const;

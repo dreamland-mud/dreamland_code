@@ -67,9 +67,6 @@ bool Rat::area( )
     int time = timer.getValue( );
     Character *master = ch->master;
     
-    if (LevelAdaptivePet::area( ))
-        return true;
-
     if (master && !master->is_npc( )) {
         XMLAttributeRats::Pointer attr = master->getPC( )->getAttributes( ).findAttr<XMLAttributeRats>( "rats" );
         
