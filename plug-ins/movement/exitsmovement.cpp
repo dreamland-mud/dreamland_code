@@ -475,7 +475,7 @@ int ExitsMovement::adjustMovetype( Character *wch )
             return MOVETYPE_FLYING;
         else if (IS_SET(wch->parts, PART_FOUR_HOOVES | PART_TWO_HOOVES))
             return MOVETYPE_RIDING;
-        else if (IS_SET(wch->form, FORM_SNAKE))
+        else if (!IS_SET(wch->parts, PART_LEGS))
             return MOVETYPE_SLINK;
         break;
     }
