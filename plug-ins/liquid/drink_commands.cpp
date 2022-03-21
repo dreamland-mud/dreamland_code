@@ -151,20 +151,22 @@ static void create_pool( Object *out, int amount )
 {
     Object *pool;
     int time;
-    DLString liqShort;
+    DLString liqShort, liqName;
     Room *room = out->getRoom();
 
     time = amount / 15;    
     if (time == 0) return;
 
     liqShort = liquidManager->find( out->value2() )->getShortDescr( );
+	liqName  = liquidManager->find( out->value2() )->getName( );
     time = std::max( 2, time );
     pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); 
     
     if (pool) {
         /* mix two liquids */
-        if (out->value2() != pool->getMaterial( ))
+        if (liqName.c_str() != pool->getMaterial( )) {
             liqShort = "бурд|а|ы|е|у|ой|е";
+		}
         else { /* same liquid */ 
             pool->timer += time;
             pool->value0(max( 1, pool->timer / 10 ));
@@ -173,14 +175,16 @@ static void create_pool( Object *out, int amount )
             return;
         }
     }
-    else /* new pool */
-        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);     
+    else { 
+		/* new pool */
+        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
+	}
     
 	room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
-    pool->setMaterial( out->value2() );        
+    pool->setMaterial( liqName );        
         
     pool->timer += time;
     pool->value0(max( 1, pool->timer / 10 ));
