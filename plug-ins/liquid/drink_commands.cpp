@@ -163,7 +163,7 @@ static void create_pool( Object *out, int amount )
     
     if (pool) {
         /* mix two liquids */
-        if (liqShort.ruscase( '1' ) != pool->getMaterial( ))
+        if (out->value2() != pool->getMaterial( ))
             liqShort = "бурд|а|ы|е|у|ой|е";
         else { /* same liquid */ 
             pool->timer += time;
@@ -180,7 +180,7 @@ static void create_pool( Object *out, int amount )
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
-    pool->setMaterial( liqShort.ruscase( '1' ).c_str( ) );        
+    pool->setMaterial( out->value2() );        
         
     pool->timer += time;
     pool->value0(max( 1, pool->timer / 10 ));
