@@ -151,14 +151,16 @@ static void create_pool( Object *out, int amount )
 {
     Object *pool;
     int time;
+	Liquid *liquid;
     DLString liqShort, liqName;
     Room *room = out->getRoom();
 
     time = amount / 15;    
     if (time == 0) return;
 
-    liqShort = liquidManager->find( out->value2() )->getShortDescr( );
-	liqName  = liquidManager->find( out->value2() )->getName( );
+	liquid = liquidManager->find( out->value2() );
+    liqShort = liquid->getShortDescr( );
+	liqName  = liquid->getName( );
     time = std::max( 2, time );
     pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); 
     
@@ -184,7 +186,7 @@ static void create_pool( Object *out, int amount )
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
-    pool->setMaterial( liqName );        
+    pool->setMaterial( liqName.c_str() );        
         
     pool->timer += time;
     pool->value0(max( 1, pool->timer / 10 ));
