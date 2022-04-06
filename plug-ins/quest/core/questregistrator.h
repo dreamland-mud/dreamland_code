@@ -38,14 +38,14 @@ protected:
     XML_VARIABLE XMLIntegerNoEmpty minAutoLevel;
 };
 
-template<typename C>
+template<typename QT>
 class QuestRegistrator : public QuestRegistratorBase {
 public:
-    typedef ::Pointer< QuestRegistrator<C> > Pointer;
+    typedef ::Pointer< QuestRegistrator<QT> > Pointer;
 
     virtual void initialization( ) 
     {
-        Class::regMoc<C>( );
+        Class::regMoc<QT>( );
         QuestManager::getThis( )->load( this );
         XMLAttributePlugin::initialization( );
     }
@@ -54,19 +54,19 @@ public:
     {
         XMLAttributePlugin::destruction( );
         QuestManager::getThis( )->unLoad( this );
-        Class::unregMoc<C>( );
+        Class::unregMoc<QT>( );
     }
 
     virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) const
     {
-        ::Pointer<C> quest( NEW );
+        ::Pointer<QT> quest( NEW );
         quest->create( pch, questor );
         return quest;
     }
 
     virtual const DLString& getName( ) const 
     {
-        return C::MOC_TYPE;
+        return QT::MOC_TYPE;
     }
 };
 

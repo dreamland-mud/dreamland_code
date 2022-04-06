@@ -108,9 +108,9 @@ void ButcherQuest::shortInfo( std::ostream &buf, PCharacter *ch )
     }        
 }
 
-Quest::Reward::Pointer ButcherQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer ButcherQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
+    QuestReward::Pointer r( NEW );
     int n;
     
     n = ordered.getValue( ) * 2;
@@ -126,7 +126,7 @@ Quest::Reward::Pointer ButcherQuest::reward( PCharacter *ch, NPCharacter *questm
         r->clanpoints = r->points;
 
     r->exp = (r->points + r->clanpoints) * 10;
-    return Reward::Pointer( r );
+    return r;
 }
 
 void ButcherQuest::destroy( ) 

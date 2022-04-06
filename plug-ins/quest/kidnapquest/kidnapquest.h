@@ -38,7 +38,7 @@ public:
     KidnapQuest( );
 
     virtual void create( PCharacter *, NPCharacter * );
-    virtual Reward::Pointer reward( PCharacter *, NPCharacter * );
+    virtual QuestReward::Pointer reward( PCharacter *, NPCharacter * );
     virtual bool isComplete( );
     virtual bool help( PCharacter *, NPCharacter * );
     virtual Room * helpLocation( );

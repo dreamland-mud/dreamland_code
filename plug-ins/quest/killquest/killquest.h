@@ -21,7 +21,7 @@ public:
 
     virtual void create( PCharacter *, NPCharacter * );
     virtual bool isComplete( );
-    virtual Reward::Pointer reward( PCharacter *, NPCharacter * );
+    virtual QuestReward::Pointer reward( PCharacter *, NPCharacter * );
     virtual Room * helpLocation( );
     virtual void info( std::ostream &, PCharacter * );
     virtual void shortInfo( std::ostream &, PCharacter * );

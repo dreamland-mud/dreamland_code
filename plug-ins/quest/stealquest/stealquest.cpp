@@ -169,9 +169,9 @@ void StealQuest::destroy( )
     destroyItem<LockPick>( );
 }
 
-Quest::Reward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman ) 
+QuestReward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman ) 
 {
-    Reward::Pointer r( NEW );
+    QuestReward::Pointer r( NEW );
 
     switch (mode.getValue( )) {
     case -1: r->points = number_range( 1, 5 ); break;
@@ -205,7 +205,7 @@ Quest::Reward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman
     r->clanpoints = std::max( 0, r->clanpoints );
     r->exp = (r->points + r->clanpoints) * 10;
 
-    return Reward::Pointer( r );
+    return r;
 }
 
 void StealQuest::info( std::ostream &buf, PCharacter *ch ) 

@@ -36,7 +36,7 @@ public:
     StealQuest( );
 
     virtual void create( PCharacter *, NPCharacter * );
-    virtual Reward::Pointer reward( PCharacter *, NPCharacter * );
+    virtual QuestReward::Pointer reward( PCharacter *, NPCharacter * );
     virtual bool isComplete( );
     virtual Room * helpLocation( );
     virtual void helpMessage( ostringstream & );
