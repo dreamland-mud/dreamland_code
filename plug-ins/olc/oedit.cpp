@@ -1140,11 +1140,12 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         if (obji) {
             pArea->changed = true;
             SET_BIT(obji->extra_flags, ITEM_DELETED);
-            ptc(ch, "[%u] (%s) marked as deleted.\n\r", obji->vnum, obji->name);
+            ptc(ch, "[%u] (%s) помечен к удалению.\n\r", obji->vnum, russian_case(obji->short_descr, '1').c_str());
         }
         else
-            stc("Item is not exist.\n\r", ch);
+            ptc(ch, "Предмет %d не найден.\n\r", value);
         return;
+
     } else if(!str_cmp(arg1, "show")) {
         if(!*argument || !is_number(argument)) {
             stc("Syntax: oedit show <vnum>\n\r", ch);
