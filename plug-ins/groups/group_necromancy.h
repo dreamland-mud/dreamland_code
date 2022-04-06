@@ -7,11 +7,9 @@
 
 #include "basicmobilebehavior.h"
 #include "summoncreaturespell.h"
-#include "savedcreature.h"
 
 class NecroCreature : public SummonedCreature, 
-                      public SavedCreature,
-                      public BasicMobileDestiny {
+                      public SavedCreature {
 XML_OBJECT
 public:
     typedef ::Pointer<NecroCreature> Pointer;

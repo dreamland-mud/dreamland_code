@@ -21,8 +21,6 @@ void XMLEnumeration::fromXML( const XMLNode::Pointer& parent )
     int value;
     XMLNode::Pointer node = parent->getFirstNode( );
 
-    Integer::setValue( 0 );
-
     if (node) 
         if (( value = table->value( node->getCData( ) ) ) != NO_FLAG)
             setValue( value );

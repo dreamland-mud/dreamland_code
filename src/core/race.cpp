@@ -81,6 +81,10 @@ const Flags & Race::getParts( ) const
 {
     return Flags::emptyFlags;
 }
+const EnumerationArray & Race::getStats( ) const
+{
+    return EnumerationArray::emptyArray;
+}
 const GlobalBitvector & Race::getWearloc( ) const
 {
     return GlobalBitvector::emptyBitvector;

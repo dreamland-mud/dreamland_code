@@ -430,3 +430,17 @@ DLString show_enum_array(const EnumerationArray &array)
     DLString result = buf.str();
     return result.empty() ? "-" : result;
 }
+
+DLString show_enum_array_web(const EnumerationArray &array)
+{
+    StringList values;
+
+    for (int i = 0; i < array.getTable()->size; i++) {
+        DLString pair = array.getTable()->fields[i].name;
+        pair += " ";
+        pair += array[i];
+        values.push_back(pair);
+    }
+
+    return values.join(",");
+}

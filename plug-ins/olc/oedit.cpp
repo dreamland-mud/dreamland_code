@@ -55,7 +55,6 @@ OLCStateObject::OLCStateObject( )
 
 OLCStateObject::OLCStateObject( OBJ_INDEX_DATA *original )
 {
-    obj.new_format   = original->new_format;
     obj.vnum         = original->vnum;
     obj.reset_num    = original->reset_num;
     obj.area         = original->area;
@@ -195,7 +194,6 @@ void OLCStateObject::commit()
                     o->valueByIndex(i, obj.value[i]);
         }
     
-    original->new_format   = obj.new_format;
     free_string(original->name);
     original->name         = obj.name;
     obj.name = 0;

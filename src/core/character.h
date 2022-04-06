@@ -29,6 +29,7 @@
 #include "xmlenumeration.h"
 #include "xmlflags.h"
 #include "xmllonglong.h"
+#include "xmlglobalbitvector.h"
 
 #include "pcmemoryinterface.h"
 #include "clanreference.h"
@@ -129,7 +130,7 @@ public:
     inline bool isDead( ) const;
     inline void setDead( );
 
-    virtual const GlobalBitvector & getWearloc( ) = 0;
+    const GlobalBitvector & getWearloc( );
     
     // level
     short getRealLevel( ) const;
@@ -280,6 +281,7 @@ public:
     XML_VARIABLE XMLFlags                detection;
     XML_VARIABLE XMLEnumeration        position;
     XML_VARIABLE XMLFlags posFlags;
+    XML_VARIABLE XMLGlobalBitvector wearloc;
 
     int                        carry_weight;
     int                        carry_number;

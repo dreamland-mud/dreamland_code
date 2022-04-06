@@ -279,6 +279,18 @@ public:
     virtual bool hasDestiny( );
 };
 
+class SavedCreature : public BasicMobileDestiny {
+XML_OBJECT
+public:
+    typedef ::Pointer<SavedCreature> Pointer;
+    
+    virtual void save( );
+    virtual bool extract( bool );
+    virtual void stopfol( Character * );
+
+protected:
+    XML_VARIABLE XMLBoolean saved;
+};
 
 
 #endif

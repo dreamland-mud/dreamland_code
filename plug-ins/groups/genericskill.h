@@ -48,6 +48,7 @@ public:
     virtual int getLearned( Character * ) const;
     virtual int getRating( PCharacter * ) const;
     virtual int getMaximum( Character * ) const;
+    virtual MobSkillData *getMobSkillData();
 
     virtual bool canPractice( PCharacter *, ostream & buf ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );

@@ -528,6 +528,84 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
     const int maxlines = 40;
 
+    // Show size info for the first 40 mobs that don't have "sizeConfirmed" attribute. 
+    // [clear] button removes mob's size override, [keep] button confirms size override.
+    // Both buttons hide mob from further output.
+    if (arg == "size") {
+        if (!args.empty()) {
+            DLString arg2 = args.getOneArgument();
+            DLString arg3 = args.getOneArgument();
+            MOB_INDEX_DATA *pMob;
+
+            Integer vnum;
+            if (!Integer::tryParse(vnum, arg3))
+                return;
+            
+            pMob = get_mob_index(vnum);
+            if (!pMob)
+                return;
+
+            DLString verb;
+
+            if (arg2 == "keep") {
+                verb = "confirmed";
+                
+
+            } else if (arg2 == "clear") {
+                verb = "cleared";
+                pMob->size = NO_FLAG;
+
+            } else {
+                return;
+            }
+
+            pMob->properties["sizeConfirmed"] = "true";
+            pMob->area->changed = true;
+            ch->pecho("Mob %d size is %s. Mob hidden from output.", vnum.getValue(), verb.c_str());
+            __do_abc(ch, const_cast<char *>(arg.c_str()));
+            return;
+        }
+
+        ostringstream buf;
+        int cnt = 0;
+
+        buf << fmt(0, "%7s %18s %10s %10s %10s", "VNUM", "NAME", "RACE", "RACE SIZE", "MOB SIZE")
+            << endl;
+
+        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
+            Race *race = raceManager->find(pMob->race);
+            if (!race || !race->isValid()) {
+                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
+                continue;
+            }
+
+            if (pMob->properties.count("sizeConfirmed") > 0)
+                continue;
+
+            bitnumber_t raceSize = race->getSize();
+            bitnumber_t mobSize = pMob->size;            
+            DLString vnum = pMob->vnum;
+            DLString line = 
+                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
+                + "%-18.18s {g" 
+                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
+                + "%10s %10s {C["
+                + web_cmd(ch, "abc size clear " + vnum, "clear") + "{C]   {G["
+                + web_cmd(ch, "abc size keep " + vnum, "keep") + "{G]{x"
+                + "\n\r";
+
+            buf << fmt(0, line.c_str(),
+                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                size_table.name(raceSize).c_str(), size_table.name(mobSize).c_str());
+
+            cnt++;
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
     if (arg == "part") {
         ostringstream buf;
         int cnt = 0;

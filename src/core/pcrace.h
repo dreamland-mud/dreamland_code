@@ -9,7 +9,6 @@
 
 class Profession;
 class GlobalArray;
-class EnumerationArray;
 
 /*
  * PCRace
@@ -25,7 +24,6 @@ public:
     virtual PCRace * getPC( );
     virtual bool  isPC( ) const;
 
-    virtual const EnumerationArray & getStats( ) const;
     virtual GlobalArray & getClasses( );
     virtual GlobalArray & getEquipment( );
     virtual const Flags & getAlign( ) const;

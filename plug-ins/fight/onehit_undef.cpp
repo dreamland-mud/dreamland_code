@@ -984,12 +984,12 @@ void UndefinedOneHit::damEffectCriticalStrike( )
                 return;
             msgVictBasic = "$c1 внезапно всаживает тебе когти в печень!";
             msgCharBasic = "Ты внезапно всаживаешь $C3 когти в печень!";               
-            msgVictStun = "{W$c1 разрывает когтями сухожилия, обездвиживая тебя!{x";
-            msgCharStun = "{WТы разрываешь когтями сухожилия, обездвиживая $C4!{x";
-            msgVictBlind = "{y$c1 разрывает когтями лицо, ослепляя тебя!{x";
-            msgCharBlind = "{yТы разрываешь когтями лицо, ослепляя $C4!{x";
-            msgVictHeart = "{R$c1 вспарывает тебе когтями живот, и твои кишки вываливаются наружу!{x";
-            msgCharHeart = "{RТы вспарываешь когтями живот $C2, и кишки вываливаются наружу!{x";     
+            msgVictStun = "{W$c1 разрывает когтями печень, обездвиживая тебя!{x";
+            msgCharStun = "{WТы разрываешь когтями печень, обездвиживая $C4!{x";
+            msgVictBlind = "{y$c1 царапает когтями глаза, ослепляя тебя!{x";
+            msgCharBlind = "{yТы царапаешь когтями глаза, ослепляя $C4!{x";
+            msgVictHeart = "{R$c1 всаживает острые когти тебе прямо в сердце!{x";
+            msgCharHeart = "{RТы всаживаешь острые когти прямо в сердце $C2!{x";     
 	                            
             stun_chance = 65;
     }  
@@ -1067,25 +1067,29 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     diceroll = number_percent( );
     d.log(diceroll, "diceroll");
 
+	// requires according body parts: guts (liver), eye, heart
     if (diceroll < stun_chance) {
-
-        // stun only in 15-35% chance, otherwise just damage
-        if (diceroll >= 50) {
-            victim->setWaitViolence( 2 );
-            oldact( msgVictStun, ch, 0, victim, TO_VICT);
-            oldact( msgCharStun, ch, 0, victim, TO_CHAR);                    
-        } 
-        else {
-            oldact( msgVictBasic, ch, 0, victim, TO_VICT);
-            oldact( msgCharBasic, ch, 0, victim, TO_CHAR);
-        }
-        dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage          
+		if (IS_SET(victim->parts, PART_GUTS)) {
+        	// stun only in 15-35% chance, otherwise just damage
+        	if (diceroll >= 50) {
+            	victim->setWaitViolence( 2 );
+            	oldact( msgVictStun, ch, 0, victim, TO_VICT);
+            	oldact( msgCharStun, ch, 0, victim, TO_CHAR);                    
+        	} 
+        	else {
+            	oldact( msgVictBasic, ch, 0, victim, TO_VICT);
+            	oldact( msgCharBasic, ch, 0, victim, TO_CHAR);
+        	}
+        	dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage   
+		}
+		else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts
     }
     else if (diceroll < blind_chance) {
-        oldact( msgVictBlind, ch, 0, victim, TO_VICT);
-        oldact( msgCharBlind, ch, 0, victim, TO_CHAR);
-        if ( !IS_AFFECTED(victim,AFF_BLIND) )
+        if (!IS_AFFECTED(victim,AFF_BLIND) && IS_SET(victim->parts, PART_EYE))
         {
+        	oldact( msgVictBlind, ch, 0, victim, TO_VICT);
+        	oldact( msgCharBlind, ch, 0, victim, TO_CHAR);	
+			
             baf.bitvector.setTable(&affect_flags);
             baf.type     = gsn_critical_strike;
             baf.level    = ch->getModifyLevel();
@@ -1094,13 +1098,18 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             baf.duration     = number_range(1,5);
             baf.bitvector.setValue(AFF_BLIND);
             affect_to_char( victim, &baf );
+			
+			dam += dam * number_range( 1, 2 );  // +100-200% damage 			
         }
-        dam += dam * number_range( 1, 2 );  // +100-200% damage          
+		else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts		
     }
     else {
-        oldact( msgVictHeart, ch, 0, victim, TO_VICT);
-        oldact( msgCharHeart, ch, 0, victim, TO_CHAR);
-        dam += dam * number_range( 2, 5 ); // +200-500% damage            
+		if (IS_SET(victim->parts, PART_HEART)) {
+        	oldact( msgVictHeart, ch, 0, victim, TO_VICT);
+        	oldact( msgCharHeart, ch, 0, victim, TO_CHAR);
+        	dam += dam * number_range( 2, 5 ); // +200-500% damage
+		}
+		else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts		
     }
 }
 
@@ -1209,7 +1218,7 @@ void UndefinedOneHit::damEffectMasterHand()
     diceroll = number_percent();
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-    skill_mod = 0.15;
+    skill_mod = 0.1;
     stat_mod = 0.01;
     level_mod = 0.01;
     quick_mod = 0.05;
@@ -1258,14 +1267,14 @@ void UndefinedOneHit::damEffectMasterHand()
         chance -= quick_mod * 100;
         d.log(chance, "quick");
     }
-
-    chance = max(1, (int)chance); // there's always a chance;
+	// normalize chance, maxed at 15%
+	chance = (int)URANGE(1, (int)chance, 15);
     d.log(chance, "final");
 
     if (diceroll > chance)
         return;
 
-    if ( (victim->isAffected(gsn_nerve)) && (number_percent() < 20) )
+    if ( (victim->isAffected(gsn_nerve)) && (number_percent() < 15) )
         ch->pecho("С ослабленными нервными окончаниями оглушить противника становится легче.");        
                 
     if (!IS_AFFECTED(victim, AFF_WEAK_STUN)) {
@@ -1321,7 +1330,7 @@ void UndefinedOneHit::damApplyMasterHand()
 
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
 
-    dam_bonus += (ch->getCurrStat(STAT_STR) - 20) * stat_mod * 100; // TODO: this should roll vs. victim's CON instead
+    dam_bonus += (ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON)) * stat_mod * 100;
     d.log(dam_bonus, "stats");
     dam_bonus += (skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel()) * level_mod * 100;
     dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;
@@ -1390,13 +1399,13 @@ void UndefinedOneHit::damEffectSlice( )
     bool left;
     vector<int> sliced;
     
-    if (ch == victim || !axe || victim->is_npc( ))
+    if (ch == victim || !axe)
         return;
    
     if ((chance = gsn_slice->getEffective( ch )) <= 1)
         return;
     
-    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE)
+    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE && axe->value3() != DAMW_CLEAVE)
         return;
     
     if (number_bits(1)) {
@@ -1412,22 +1421,31 @@ void UndefinedOneHit::damEffectSlice( )
 
     if (!victim->getWearloc( ).isSet( sliced_loc ))
         return;
-
+	
+	// base chance: 1%
     if (number_range( 1, 100 ) > 1)
         return;
 
+	// chance depends on both slice skill and weapon skill
     chance = (chance * ch->getSkill( weapon_sn )) / 100;
-    
-    chance += ch->getCurrStat(STAT_DEX ) - victim->getCurrStat(STAT_DEX );
-    chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_STR ));
+	
+    chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_CON ));
 
     chance += (skill_level(*gsn_slice, ch) - victim->getModifyLevel()) * 2;
-
+	chance += victim->size - 2; // easier to chop larger hands
+	
     if (!IS_WEAPON_STAT( axe, WEAPON_SHARP ))
         chance -= chance / 10;
-
-    if (!IS_WEAPON_STAT( axe, WEAPON_TWO_HANDS ))
-        chance -= chance / 10;
+	
+	// samurai always get +0.1% chance, others get -0.1% if not two-handed
+	if ( ch->getProfession( ) == prof_samurai && axe->value0( ) == WEAPON_SWORD)
+		chance += chance / 10;
+    else {
+		if (axe->value0( ) == WEAPON_AXE)
+			chance += chance / 10;
+		if (!IS_WEAPON_STAT( axe, WEAPON_TWO_HANDS ))
+        	chance -= chance / 10;
+	}
     
     if (number_percent( ) > chance) {
         oldact("Твое оружие скользит по запястью $C2.", ch, 0, victim, TO_CHAR);
@@ -1449,8 +1467,18 @@ void UndefinedOneHit::damEffectSlice( )
     arm = create_object( get_obj_index( OBJ_VNUM_SLICED_ARM ), victim->getRealLevel( ) );
     
     name = victim->getNameP( '2' );
-    arm->fmtShortDescr( arm->getShortDescr( ), name.c_str( ) );
-    arm->fmtDescription( arm->getDescription( ), name.c_str( ) );
+    // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
+    // If there're no format symbols in the body part names, just concatenate owner name to it.
+    if (str_str(arm->getShortDescr(), "%"))
+        arm->fmtShortDescr( arm->getShortDescr(), name.c_str());
+    else
+        arm->setShortDescr(arm->getShortDescr() + DLString::SPACE + name);
+
+    if (str_str(arm->getDescription(), "%"))
+        arm->fmtDescription(arm->getDescription(), name.c_str());
+    else
+        arm->setDescription(arm->getDescription() + DLString::SPACE + name);
+
     arm->from = str_dup(name.c_str());
     arm->timer = timer;
 

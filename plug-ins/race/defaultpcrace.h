@@ -7,7 +7,6 @@
 
 #include "xmlvector.h"
 #include "xmlmap.h"
-#include "xmlenumeration.h"
 #include "xmlglobalarray.h"
 
 #include "pcrace.h"
@@ -20,7 +19,6 @@ public:
     
     DefaultPCRace( );
 
-    virtual const EnumerationArray & getStats( ) const;
     virtual GlobalArray & getClasses( );
     virtual const Flags & getAlign( ) const;
     virtual int getMinAlign( ) const;
@@ -34,7 +32,6 @@ public:
     virtual DLString getScoreNameFor( Character *looker, Character *owner = NULL ) const;
 
     XML_VARIABLE XMLGlobalArray    classes;
-    XML_VARIABLE XMLEnumerationArray stats; 
     XML_VARIABLE XMLIntegerNoEmpty points;
     XML_VARIABLE XMLIntegerNoEmpty hpBonus; 
     XML_VARIABLE XMLIntegerNoEmpty manaBonus;

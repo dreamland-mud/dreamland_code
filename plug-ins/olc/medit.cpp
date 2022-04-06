@@ -57,7 +57,6 @@ OLCStateMobile::OLCStateMobile( MOB_INDEX_DATA *original )
         mob.behavior         = 0;
 
     mob.vnum             = original->vnum;
-    mob.new_format       = original->new_format;
     mob.area             = original->area;
 
     copyParameters( original );
@@ -229,8 +228,11 @@ void OLCStateMobile::commit()
             if(victim->parts == original->parts)
                 victim->parts = mob.parts;
 
-            if(victim->size == original->size)
-                victim->size             = mob.size;
+/*
+  don't touch, mob size value can be affected by worn items
+            if(victim->size == original->getSize())
+                victim->size  = mob.size == NO_FLAG ? victim->getRace()->getSize() : mob.size;
+*/                
         }
     }
 
@@ -250,7 +252,6 @@ void OLCStateMobile::commit()
     original->spec_fun.func    = spec_lookup( mob.spec_fun.name.c_str() );
     original->vnum             = mob.vnum;
     original->group            = mob.group;
-    original->new_format       = mob.new_format;
     original->smell            = mob.smell;
     mob.smell.clear( );
     original->act              = mob.act;
@@ -313,6 +314,7 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 MEDIT(show)
 {
     bool showWeb = !arg_oneof_strict(argument, "noweb");
+    Race *race = raceManager->findExisting(mob.race);
 
     ptc(ch, "{GName: [{x%s{G] %s\n\r", 
         mob.player_name, web_edit_button(showWeb, ch, "name", "web").c_str());
@@ -369,7 +371,9 @@ MEDIT(show)
     ptc(ch, "Res:  [{Y%s{x] {D(? res_flags){x\n\r", res_flags.names(mob.res_flags).c_str());
     ptc(ch, "Vuln: [{y%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
     ptc(ch, "Off:  [{M%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
-    ptc(ch, "Size: [{G%s{x] {D(? size_table){x\n\r", size_table.name(mob.size).c_str());
+    ptc(ch, "Size: [{G%s{x] (расовый {g%s{x) {D(? size_table){x\n\r", 
+        size_table.name(mob.size).c_str(), 
+        race ? race->getSize().name().c_str() : "-");
 
     ptc(ch, "Material: [%s] {D(? material){x\n\r", mob.material);
     ptc(ch, "Form:     [%s] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
@@ -690,8 +694,12 @@ MEDIT(behavior)
         static const DLString trainerType( "Trainer" );
         type = trainerType;
     }
+    else if (!str_cmp( argument, "savedcreature" )) {
+        static const DLString savedCreatureType( "SavedCreature" );
+        type = savedCreatureType;
+    }
     else { 
-        stc("Допустимые значения поведения: shopper, pet, leveladaptivepet, trainer.\r\n", ch);
+        stc("Допустимые значения поведения: savedcreature, shopper, pet, leveladaptivepet, trainer.\r\n", ch);
         return false;
     }
 

@@ -44,10 +44,6 @@ int PCRace::getMaxAlign( ) const
 {
     return 0;
 }
-const EnumerationArray & PCRace::getStats( ) const
-{
-    return EnumerationArray::emptyArray;
-}
 GlobalArray & PCRace::getClasses( ) 
 {
     static GlobalArray emptyArray;

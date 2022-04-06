@@ -74,6 +74,13 @@ bool RaceAptitude::canPractice( PCharacter * ch, std::ostream & ) const
     return available( ch );
 }
 
+
+MobSkillData *RaceAptitude::getMobSkillData()
+{
+    return &mob;
+}
+
+
 bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {

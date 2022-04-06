@@ -58,7 +58,8 @@ int MobSkillData::getLearned( NPCharacter *mob, const Skill *skill ) const
 {
     int level = mob->getRealLevel( );
 
-    if (skill->getSpell( ))
+    // Spells historically were 2*level+40 by default, but can be overridden
+    if (skill->getSpell( ) && dice == 0 && bonus == 0)
         return 2 * level + 40;
     else
         return dice.getValue( ) * level + bonus.getValue( );

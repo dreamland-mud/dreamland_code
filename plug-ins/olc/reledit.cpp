@@ -232,12 +232,12 @@ RELEDIT(clans, "кланы", "ограничить по клановой при�
 
 RELEDIT(minstat, "минпарам", "ограничить по параметрам снизу")
 {
-    return enumerationArrayEdit(stat_table, getOriginal()->minstat);
+    return enumerationArrayEdit(getOriginal()->minstat);
 }
 
 RELEDIT(maxstat, "макспарам", "ограничить по параметрам сверху")
 {
-    return enumerationArrayEdit(stat_table, getOriginal()->maxstat);
+    return enumerationArrayEdit(getOriginal()->maxstat);
 }
 
 RELEDIT(age, "возраст", "ограничить по возрасту")

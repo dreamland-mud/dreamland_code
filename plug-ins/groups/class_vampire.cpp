@@ -494,7 +494,7 @@ SKILL_RUNP( vampire )
         oldact("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM);
 }
 
-void sucking( Character *ch, Character *victim ) 
+void sucking(Character *ch, Character *victim)
 {
     int cond, hp_gain, mana_gain;
     bool karminaBonus = false;
@@ -504,103 +504,97 @@ void sucking( Character *ch, Character *victim )
         return;
     }
 
-    if (is_safe( ch, victim ))
+    if (is_safe(ch, victim))
         return;
 
-    if (IS_AWAKE( victim )) {
+    if (IS_AWAKE(victim)) {
         ch->pecho("Сначала жертва должна уснуть.");
         return;
     }
-    
-    if (!victim->isAffected(gsn_vampiric_bite )) {
+
+    if (!victim->isAffected(gsn_vampiric_bite)) {
         ch->pecho("В жертве нет необходимой дырочки.");
         return;
     }
 
-    if ( IS_BLOODLESS( victim ) ) {
-	ch->pecho("Ты не ощущаешь ни капли крови в этом существе. Брррр...");
-	return;        
+    if (IS_BLOODLESS(victim)) {
+        ch->pecho("Ты не ощущаешь ни капли крови в этом существе. Брррр...");
+        return;
     }
-	
+
     UNSET_DEATH_TIME(ch);
-    ch->setWait( gsn_vampiric_bite->getBeats(ch)  );
-                     
+    ch->setWait(gsn_vampiric_bite->getBeats(ch));
+
     oldact_p("Сквозь кошмарный сон ты чувствуешь, как $c1 высасывает твою {rкровь{x.", ch, 0, victim, TO_VICT, POS_DEAD);
     oldact("Ты высасываешь {rкровь{x из шеи $C2.", ch, 0, victim, TO_CHAR);
     oldact("$c1 высасывает {rкровь{x из шеи $C2.", ch, 0, victim, TO_NOTVICT);
-    
-    if (!ch->is_npc( )) {
-	Object *tattoo = get_eq_char(ch, wear_tattoo);
-	    
-        if ( (ch->getReligion() == god_karmina) &&
-	      (tattoo) && (chance(10)) ) {
-                ch->pecho("{rКармина{x позволяет тебе насладиться кровью ради чистого удовольствия!");
-                ch->recho("%^O1 на челе %C2 вспыхивает {Rярко-красным{x.", tattoo, ch);
-		desire_bloodlust->gain( ch->getPC( ), 0 );	
-        karminaBonus = true;	      
+
+    if (!ch->is_npc()) {
+        Object *tattoo = get_eq_char(ch, wear_tattoo);
+
+        if (ch->getReligion() == god_karmina && tattoo && chance(10)) {
+            ch->pecho("{rКармина{x позволяет тебе насладиться кровью ради чистого удовольствия!");
+            ch->recho("%^O1 на челе %C2 вспыхивает {Rярко-красным{x.", tattoo, ch);
+            desire_bloodlust->gain(ch->getPC(), 0);
+            karminaBonus = true;
+        } else {
+            desire_bloodlust->gain(ch->getPC(), 20);
         }
-	else {	    
-        	desire_bloodlust->gain( ch->getPC( ), 20 );
-	}	
-        cond = ch->getPC( )->desires[desire_bloodlust];
-    } 
-    else 
-        cond = number_range( -10, 60 );
+        cond = ch->getPC()->desires[desire_bloodlust];
+    } else
+        cond = number_range(-10, 60);
 
     int slevel = skill_level(*gsn_vampiric_bite, ch);
-	
-    if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) {    
-	hp_gain = std::min( slevel * 5, (int)victim->max_hit );
-	mana_gain = std::min( slevel * 5, (int)victim->max_hit );
-    }	    
-    else {
-	oldact("Ты с отвращением глотаешь кровь $C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR);	    
-	hp_gain = std::min( slevel * 1, (int)victim->max_hit ); 
-	mana_gain = std::min( slevel * 1, (int)victim->max_hit );	    
+
+    if (!IS_SET(victim->form, FORM_COLD_BLOOD)) {
+        hp_gain = std::min(slevel * 5, (int)victim->max_hit);
+        mana_gain = std::min(slevel * 5, (int)victim->max_hit);
+    } else {
+        oldact("Ты с отвращением глотаешь кровь $C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR);
+        hp_gain = std::min(slevel * 1, (int)victim->max_hit);
+        mana_gain = std::min(slevel * 1, (int)victim->max_hit);
     }
-	    
+
     ch->hit += hp_gain;
-    ch->hit = std::min( ch->hit , ch->max_hit );
+    ch->hit = std::min(ch->hit, ch->max_hit);
     ch->mana += mana_gain;
-    ch->mana = std::min( ch->mana , ch->max_mana );	    
-    update_pos( ch );
-    
+    ch->mana = std::min(ch->mana, ch->max_mana);
+    update_pos(ch);
+
     victim->position = POS_STANDING;
-    
+
     try {
-        RawDamage( ch, victim, DAM_OTHER, hp_gain ).hit( true );
+        RawDamage(ch, victim, DAM_OTHER, hp_gain).hit(true);
 
-    	// corrupt victim	
-   	Affect af;
+        // corrupt victim
+        Affect af;
 
-    	if ( (slevel > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
-    		af.bitvector.setTable(&affect_flags);
-    		af.type      = gsn_corruption;
-   		    af.level     = slevel;
-    		af.duration  = slevel / 10;
-    		af.location = APPLY_HITROLL;
-    		af.modifier  = - (slevel / 10);
-    		af.bitvector.setValue(AFF_CORRUPTION);
-        	affect_join( victim, &af );	
-	    	
-		if (!IS_AWAKE( victim )) {
-    			oldact_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
-		}
-		else {
-    			oldact_p("Ты стонешь во сне, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);			
-		}
-		oldact("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
-    	}	    
+        if ((slevel > number_percent()) && (!IS_AFFECTED(victim, AFF_CORRUPTION))) {
+            af.bitvector.setTable(&affect_flags);
+            af.type = gsn_corruption;
+            af.level = slevel;
+            af.duration = slevel / 10;
+            af.location = APPLY_HITROLL;
+            af.modifier = -(slevel / 10);
+            af.bitvector.setValue(AFF_CORRUPTION);
+            affect_join(victim, &af);
+
+            if (!IS_AWAKE(victim)) {
+                oldact_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
+            } else {
+                oldact_p("Ты стонешь во сне, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
+            }
+            oldact("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR);
+        }
         victim->position = POS_SLEEPING;
-                               
-        if (number_percent( ) < cond && !karminaBonus) {
-            set_fighting( victim, ch );
+
+        if (number_percent() < cond && !karminaBonus) {
+            set_fighting(victim, ch);
             oldact("$c1 очнул$gось|ся|ась от терзавшего $s кошмара.", victim, 0, ch, TO_ROOM);
             oldact_p("Ты просыпаешься от невыносимой боли в шее!", victim, 0, ch, TO_CHAR, POS_DEAD);
-            multi_hit( victim, ch , "murder" );
+            multi_hit(victim, ch, "murder");
         }
-    } 
-    catch (const VictimDeathException &) {
+    } catch (const VictimDeathException &) {
     }
 }
 

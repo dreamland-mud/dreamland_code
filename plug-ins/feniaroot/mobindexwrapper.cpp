@@ -112,10 +112,10 @@ NMI_GET( MobIndexWrapper, vnum , "внум, уникальный номер пр
     checkTarget( ); 
     return target->vnum;
 }
-NMI_GET( MobIndexWrapper, size , "численный размер (таблица .tables.size_table)") 
+NMI_GET( MobIndexWrapper, size , "численный размер моба или расовый (таблица .tables.size_table)") 
 { 
     checkTarget( ); 
-    return target->size;
+    return target->getSize();
 }
 NMI_GET( MobIndexWrapper, imm_flags , "флаги иммунитета (таблица .tables.imm_flags)") 
 { 
@@ -158,6 +158,19 @@ NMI_GET( MobIndexWrapper, area, "зона, в которой прописан м
 {
     checkTarget( );
     return AreaWrapper::wrap(target->area->area_file->file_name);
+}
+
+NMI_INVOKE( MobIndexWrapper, property, "(name, defaultValue): свойство прототипа с именем name или значение по умолчанию" )
+{
+    checkTarget();
+    DLString name = args2string(args);
+    Register defaultValue = args.size() > 1 ? args.back() : Register();
+
+    Properties::const_iterator p = target->properties.find(name);
+    if (p == target->properties.end())
+        return defaultValue;
+    else
+        return Register(p->second);
 }
 
 NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 

@@ -159,11 +159,11 @@ CMDRUN( buy )
 
     char buf[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
     char argument[MAX_INPUT_LENGTH];
-    int        cost, roll;
+    int cost, oldcost, roll;
     NPCharacter*  keeper;
     ShopTrader::Pointer trader;
-    Object*            obj,*t_obj;
-    int            number, count = 1;
+    Object* obj,*t_obj;
+    int number, count = 1;
 
     if ( !( trader = find_keeper( ch ) ) )
         return;
@@ -239,11 +239,22 @@ CMDRUN( buy )
     roll = bonus ? 100 : number_percent( );
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
-        cost -= obj->cost / 2 * roll / 100;
-        oldact("Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR);
-        gsn_haggle->improve( ch, true );
+		oldcost = cost;
+        cost -= cost / 2 * roll / 100;
+        // can't reduce buying price to less than 25% of the original cost
+        cost = URANGE(obj->cost / 4, cost, obj->cost);
+        if (cost < oldcost) {
+            ch->pecho("Ты торгуешься с %C5 и выбиваешь скидку!", keeper);
+            ch->recho("%^C1 торгуется с %C5 и выбивает скидку!", ch, keeper);
+            gsn_haggle->improve( ch, true );                      
+        }
+        else {
+            ch->pecho("Ты торгуешься с %C5, но безуспешно.", keeper);
+            ch->recho("%^C1 торгуется с %C5, но безуспешно.", ch, keeper);   
+            gsn_haggle->improve( ch, false );            
+        }
     }
-
+	
     // everyone reaps off druids
     if (ch->getProfession( ) == prof_druid)
         cost *= 2;
@@ -301,6 +312,9 @@ CMDRUN( buy )
             t_obj->timer = 0;
         
         REMOVE_BIT( t_obj->extra_flags, ITEM_HAD_TIMER );
+        // prevent predatory resale
+        SET_BIT(t_obj->extra_flags, ITEM_SELL_EXTRACT);
+
         obj_to_char( t_obj, ch );
 
         if ( cost < t_obj->cost )
@@ -319,7 +333,7 @@ CMDRUN( sell )
     NPCharacter *keeper;
     ShopTrader::Pointer trader;
     Object *obj;
-    int cost;
+    int cost, oldcost;
     int roll;
     int gold, silver;
     DLString arg = constArguments;
@@ -386,17 +400,27 @@ CMDRUN( sell )
     {
         silver = cost - (cost/100) * 100;
         gold   = cost/100;
-
+		oldcost = cost;
+		
         ch->pecho("%^C1 предлагает тебе %s за %O4.", keeper, format_coins(gold, silver).c_str(), obj);
-
-        roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + skill_level_bonus(*gsn_haggle, ch);
-        ch->pecho("Ты торгуешься с %C5.", keeper);
-        ch->recho("%^C1 торгуется с %C5.", ch, keeper);
+        
+        // make sure this is a positive factor
+        roll = ::max(1, gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10 + skill_level_bonus(*gsn_haggle, ch));
 
         cost += obj->cost / 2 * roll / 100;
-        cost = min(cost,95 * get_cost(keeper,obj,true, trader) / 100);
-        //cost = min(cost, static_cast<int>( keeper->silver + 100 * keeper->gold ) );
-        gsn_haggle->improve( ch, true );
+        // can't increase selling price to more than 125% of the original cost
+        cost = ::min(cost, obj->cost * 125 / 100);
+        
+        if (cost > oldcost) {
+            ch->pecho("Ты торгуешься с %C5 и выбиваешь наценок!", keeper);
+            ch->recho("%^C1 торгуется с %C5 и выбивает наценок!", ch, keeper);
+            gsn_haggle->improve( ch, true );                      
+        }
+        else {
+            ch->pecho("Ты торгуешься с %C5, но безуспешно.", keeper);
+            ch->recho("%^C1 торгуется с %C5, но безуспешно.", ch, keeper);   
+            gsn_haggle->improve( ch, false );            
+        }
         
         if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
         {
@@ -551,6 +575,7 @@ static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Point
     }
 
     int cost = get_cost( keeper, obj, false, trader );
+	
     // everyone reaps off druids
     if (ch->getProfession( ) == prof_druid)
         cost /= 2;
@@ -642,6 +667,7 @@ CMDRUN( properties )
 /*
  * Local functions
  */
+// TO-DO: (RUFFINA) Add *ch to parameters to make druid and CHA-related calculations here					  
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader ) 
 {
     int cost;
@@ -651,7 +677,7 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
 
     if( IS_OBJ_STAT( obj, ITEM_NOSELL ) ) 
         return 0;
-
+	
     if( fBuy ) {
         if (bonus_black_friday->isActive(NULL, time_info))
             cost = obj->cost / 2;

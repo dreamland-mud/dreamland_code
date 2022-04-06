@@ -73,7 +73,7 @@ CMDRUN( fill )
     }
 
     if (obj->item_type != ITEM_DRINK_CON) {
-        ch->pecho( "Ты не можешь наполнить %O4.", obj );
+        ch->pecho( "Ты не можешь наполнить %O4 -- это не емкость для жидкости.", obj );
         return;
     }
 
@@ -93,7 +93,7 @@ CMDRUN( fill )
         }
 
         if (fountain->item_type != ITEM_FOUNTAIN) {
-            ch->pecho("%^O1 -- не фонтан.", fountain);
+            ch->pecho("%^O1 -- не источник жидкости.", fountain);
             return;
         } 
     }
@@ -117,7 +117,7 @@ CMDRUN( fill )
     }
 
     if (obj->value1() >= obj->value0()) {
-        ch->pecho("%1$^O1 уже наполн%1$Gено|ен|на|ны до краев.", obj);
+        ch->pecho("%1$^O1 уже наполнен%1$Gо||а|ы до краев.", obj);
         return;
     }    
     
@@ -151,20 +151,24 @@ static void create_pool( Object *out, int amount )
 {
     Object *pool;
     int time;
-    DLString liqShort;
+	Liquid *liquid;
+    DLString liqShort, liqName;
     Room *room = out->getRoom();
 
     time = amount / 15;    
     if (time == 0) return;
 
-    liqShort = liquidManager->find( out->value2() )->getShortDescr( );
+	liquid = liquidManager->find( out->value2() );
+    liqShort = liquid->getShortDescr( );
+	liqName  = liquid->getName( );
     time = std::max( 2, time );
     pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); 
     
     if (pool) {
         /* mix two liquids */
-        if (liqShort.ruscase( '1' ) != pool->getMaterial( ))
+        if (liqName.c_str() != pool->getMaterial( )) {
             liqShort = "бурд|а|ы|е|у|ой|е";
+		}
         else { /* same liquid */ 
             pool->timer += time;
             pool->value0(max( 1, pool->timer / 10 ));
@@ -173,14 +177,16 @@ static void create_pool( Object *out, int amount )
             return;
         }
     }
-    else /* new pool */
-        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);     
+    else { 
+		/* new pool */
+        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
+	}
     
 	room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
-    pool->setMaterial( liqShort.ruscase( '1' ).c_str( ) );        
+    pool->setMaterial( liqName.c_str() );        
         
     pool->timer += time;
     pool->value0(max( 1, pool->timer / 10 ));
@@ -197,7 +203,7 @@ void pour_out(Object *out)
     // Tai: updating this to include the destruction of items, not just manual pour out
 
     if (out->value1() == 0) {
-        room->echo(POS_RESTING, "%1$^O1 ярко вспыхива%1$nет|ют и испаря%1$nется|ются.", out);
+		room->echo(POS_RESTING, "Из %O4 не выливается ни капли.", out);
         return;
     }
 
@@ -454,7 +460,7 @@ CMDRUN( pourout )
     }
 
     if (out->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%^O1 - не емкость для жидкости.", out);
+        ch->pecho("%^O1 -- не емкость для жидкости.", out);
         return;
     }
 
@@ -503,7 +509,7 @@ CMDRUN( pour )
     }
 
     if (out->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%^O1 - не емкость для жидкости.", out);
+        ch->pecho("%^O1 -- не емкость для жидкости.", out);
         return;
     }
 
@@ -605,7 +611,7 @@ CMDRUN( drink )
     }
     else {
         if (( obj = get_obj_here( ch, arg ) ) == 0) {
-            ch->pecho("Ты не находишь это.");
+            ch->pecho("Ты не находишь этого.");
             return;
         }
     }

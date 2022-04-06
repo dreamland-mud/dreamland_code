@@ -34,6 +34,7 @@ public:
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
     virtual int getMaximum( Character * ) const;
+    virtual MobSkillData *getMobSkillData();
     
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );

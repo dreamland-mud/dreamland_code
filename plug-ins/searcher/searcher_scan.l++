@@ -357,7 +357,7 @@ bool searcher_parse(struct mob_index_data *pMob, const char *args)
     p.move = 0; // TODO discuss
     p.saves = 0; // not set during creation
     p.armor = pMob->ac[0]; // show AC vs pierce
-    p.size = pMob->size;
+    p.size = pMob->getSize();
     // TODO: stats computed during creation, discuss
     // heal_gain, mana_gain not set in index data
     

@@ -843,15 +843,13 @@ NMI_GET(CharacterWrapper, adrenaline, "полна ли кровь адренал
 NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
-    CHK_NPC
-    target->getPC( )->wearloc.fromString( arg.toString( ) );
+    target->wearloc.fromString( arg.toString( ) );
 }
 
 NMI_GET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
-    CHK_NPC
-    return target->getPC( )->wearloc.toString();
+    return target->wearloc.toString();
 }
 
 NMI_GET( CharacterWrapper, expToLevel, "сколько опыта осталось набрать до след уровня")
@@ -1006,6 +1004,25 @@ NMI_SET( CharacterWrapper, race, "раса (структура .Race)" )
         target->setRace( "none" );
     else
         target->setRace( wrapper_cast<RaceWrapper>(arg)->name );
+}
+
+NMI_GET( CharacterWrapper, charmed, "true если очарован и есть хозяин" )
+{
+    checkTarget();
+    return IS_CHARMED(target);
+}
+
+NMI_GET(CharacterWrapper, followers, "список существ, у которых персонаж master" )
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (Character *wch = char_list; wch; wch = wch->next) {
+        if (IS_CHARMED(wch) && wch->master == target)
+            rc->push_back(wrap(wch));
+    }
+
+    return wrap(rc);
 }
 
 NMI_GET( CharacterWrapper, connected, "true если есть связь" )
@@ -1164,7 +1181,7 @@ NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "(vnum): поиск объек�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, get_char_room, "(name): поиск по имени видимого персонажа в той же комнате" )
+NMI_INVOKE( CharacterWrapper, get_char_room, "(name[,room]): поиск по имени видимого персонажа, в той же комнате или в room" )
 {
     checkTarget( );
     

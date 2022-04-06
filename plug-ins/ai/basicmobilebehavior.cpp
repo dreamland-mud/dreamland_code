@@ -22,6 +22,7 @@
 #include "merc.h"
 #include "act.h"
 #include "mercdb.h"
+#include "save.h"
 
 #include "roomtraverse.h"
 #include "occupations.h"
@@ -584,5 +585,34 @@ bool BasicMobileDestiny::isSaved( ) const
 bool BasicMobileDestiny::hasDestiny( )
 {
     return true;
+}
+
+/*
+ * SavedCreature
+ */
+void SavedCreature::save( )
+{
+    save_creature( ch );
+    saved = true;
+}
+
+bool SavedCreature::extract( bool fCount )
+{
+    if (saved) {
+        unsave_creature( ch );
+        saved = false;
+    }
+
+    return MobileBehavior::extract( fCount );
+}
+
+void SavedCreature::stopfol( Character *master )
+{
+    if (saved) {
+        unsave_creature( ch );
+        saved = false;
+    }
+
+    MobileBehavior::stopfol( master );
 }
 

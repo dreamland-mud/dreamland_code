@@ -39,6 +39,7 @@
 #include "interp.h"
 #include "wiznet.h"
 #include "messengers.h"
+#include "infonet.h"
 #include "mercdb.h"
 #include "desire.h"
 #include "act.h"
@@ -48,6 +49,7 @@
 #include "fight.h"
 #include "vnum.h"
 #include "def.h"
+
 
 // A set of PK looting rules defined in fight/loot.json.
 Json::Value loot;
@@ -224,10 +226,14 @@ public:
     }
     virtual void run( )
     {
-        pvict->pecho("Ты превращаешься в привидение и покидаешь этот мир.");
+        pvict->pecho("Милостивая Варда больше не сможет тебя возродить.");
+        pvict->pecho("Ты превращаешься в призрак в последний раз и навсегда покидаешь этот мир.");
         oldact("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
-        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
         
+        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
+        infonet(pvict, 0, "{CТихий голос из $o2: ", msgWiznet.c_str());
+        send_to_discord_stream(":ghost: " + msgWiznet);
+        send_telegram(msgWiznet);
         delete_player( pvict );
     }
     virtual int getPriority( ) const
@@ -290,7 +296,7 @@ protected:
         pch->perm_stat[STAT_CON]--;
 
         if (pch->perm_stat[STAT_CON] >= 3) {
-            pch->pecho("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
+            pch->pecho("Ты чувствуешь, как твое телосложение уменьшается после этой смерти.");
             return false;
         }
         
@@ -298,7 +304,7 @@ protected:
 
         DLScheduler::getThis( )->putTaskNOW(
             PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 : %C1 удаляется из-за слабого телосложения." ) );
+                "%C1 теряет слишком много очков телосложения и навсегда покидает этот мир." ) );
         return true;
     }
 
@@ -326,7 +332,7 @@ protected:
 
         DLScheduler::getThis( )->putTaskNOW(
             PlayerDeleteTask::Pointer( NEW, pch, killer, 
-                "%C1 : %C1 удаляется, достигнув предела 10 смертей самурая." ) );
+                "%C1 десятый раз гибнет смертью самурая и навсегда покидает этот мир" ) );
         return true;
     }
 
@@ -472,6 +478,31 @@ static Object * corpse_create( Character *ch )
         corpse->value3(ch->getPC( )->getHometown( )->getPit( ));
     
     corpse->value4(ch->alignment);
+    switch ( ch->size ) {
+        default:
+        case 0:
+            corpse->weight = number_range(20, 120);
+            break;
+        case 1:
+            corpse->weight = number_range(140, 800);
+            break;
+        case 2:
+            corpse->weight = number_range(800, 2200);
+            break;
+        case 3:
+            corpse->weight = number_range(3000, 6000);
+            break;
+        case 4:
+            corpse->weight = number_range(6500, 10000);
+            break;
+        case 5:
+            corpse->weight = number_range(11000, 18000);
+            break;
+        case 6:
+            corpse->weight = number_range(20000, 30000);
+            break;
+    }
+    
     return corpse;
 }
 
@@ -934,20 +965,48 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
 
     if (IS_SET(flags, FKILL_CORPSE))
         make_corpse( ch, victim );
-    else if (IS_SET(flags, FKILL_PURGE))
-        purge_corpse( ch, victim );
+    else {
+		if (IS_SET(flags, FKILL_PURGE))
+        	purge_corpse( ch, victim );
+	}
     
-    static const char *msg_killed = "%1$C1 па%1$Gло|л|ла от руки %2$C2.";
-    static const char *msg_died = "%1$C1 погиб%1$Gло||ла своей смертью.";
-    const char *&msg = (ch && victim != ch) ? msg_killed : msg_died;
+	DLString msg = fmt(0, "%1$C1 ", victim);
+	if (!victim->is_npc()) {
+		if (victim == ch) 
+			msg = msg + fmt(0, "погиб%1$Gло||ла|ли своей смертью ", victim);
+		else {			
+			msg = msg + fmt(0, "па%1$Gло|л|ла|ли от ", victim);
+			if (IS_SET(ch->form, FORM_SENTIENT) && IS_SET(ch->parts, PART_HANDS))
+				msg = msg + "руки ";				
+			else if (IS_SET(ch->parts, PART_FANGS))
+				msg = msg + "клыков ";
+			else if (IS_SET(ch->parts, PART_CLAWS))
+				msg = msg + "когтей ";
+			else if (IS_SET(ch->parts, PART_TENTACLES))
+				msg = msg + "щупалец ";			
+			else if (IS_SET(ch->parts, PART_HORNS))
+				msg = msg + "рогов ";				
+			else if (IS_SET(ch->parts, PART_TUSKS))
+				msg = msg + "бивней ";
+			else if (IS_SET(ch->parts, PART_TWO_HOOVES) || IS_SET(ch->parts, PART_FOUR_HOOVES))
+				msg = msg + "копыт ";
+			else if (IS_SET(ch->parts, PART_FINS))
+				msg = msg + "плавников ";			
+			msg = msg + fmt(0, "%C2", ch);
+		}
+		if (ch)
+			msg = msg + fmt(0, " в зоне %s.", ch->in_room->areaName());
+		else
+			msg = msg + ".";
+	}
 
     wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
-    wiznet(wizflag, 0, victim->get_trust(), msg, victim, ch);
+    wiznet(wizflag, 0, victim->get_trust(), msg.c_str(), victim, ch);
 
     if (!victim->is_npc()) {
-        send_discord_death(fmt(0, msg, victim, ch));
+        send_discord_death(msg);
         if (ch && !ch->is_npc() && ch != victim)
-            send_telegram(fmt(0, msg, victim, ch));
+            send_telegram(msg);
     }
 
     if (ch && mprog_kill( ch, victim ))

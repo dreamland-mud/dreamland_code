@@ -21,6 +21,8 @@
 #include "mercdb.h"
 #include "def.h"
 #include "skill_utils.h"
+#include "roomutils.h"
+#include "move_utils.h"
 
 GSN(haggle);
 RELIG(fili);
@@ -37,6 +39,38 @@ void Pet::stopfol( Character *master )
 {
     lastCharmTime = dreamland->getCurrentTime( );
 }
+
+bool Pet::area( ) 
+{
+    Character *master = ch->master;
+    
+	// Auto-extract abandoned pets, unless in pet storage
+    if (master) {
+        // nothing to do, still charmed
+        return false;
+    }
+
+    if (ch->reset_room == ch->in_room->vnum) {
+        // nothing to do, still at pet storage room
+        return false;
+    }
+
+	DLString msg = fmt(0, "Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и ", ch);
+	if (is_flying(ch))
+		msg = msg + fmt(0, "улета%1$nет|ют ", ch);
+	else if (RoomUtils::isWater(ch->in_room))
+		msg = msg + fmt(0, "уплыва%1$nет|ют ", ch);
+	else if (!IS_SET(ch->parts, PART_LEGS))
+		msg = msg + fmt(0, "уполза%1$nет|ют ", ch);		
+	else
+		msg = msg + fmt(0, "уход%1$nит|ят ", ch);
+	
+	msg = msg + "восвояси.";
+	ch->recho(msg.c_str());
+    extract_char( ch );
+    return true;
+}
+
 
 bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int )
 {

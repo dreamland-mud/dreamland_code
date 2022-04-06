@@ -79,6 +79,7 @@ public:
     virtual const Flags & getVuln( ) const;
     virtual const Flags & getForm( ) const;
     virtual const Flags & getParts( ) const;
+    virtual const EnumerationArray & getStats( ) const;
     virtual const GlobalBitvector & getWearloc( ) const;
     virtual const Enumeration & getSize( ) const;
     virtual Flags getAttitude( const Race & ) const;
@@ -96,6 +97,7 @@ public:
     XML_VARIABLE XMLFlagsNoEmpty         imm, res, vuln;
     XML_VARIABLE XMLFlagsNoEmpty         form;
     XML_VARIABLE XMLFlagsNoEmpty         parts;
+    XML_VARIABLE XMLEnumerationArray     stats; 
     XML_VARIABLE XMLEnumerationNoEmpty   size;
     XML_VARIABLE XMLGlobalBitvector      wearloc;
 

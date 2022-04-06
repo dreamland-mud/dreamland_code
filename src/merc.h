@@ -319,7 +319,6 @@ struct        mob_index_data
     ProgWrapper<SPEC_FUN> spec_fun;
     int                vnum;
     int                group;
-    bool                new_format;
     int                count;
     int                killed;
     char *                player_name;
@@ -359,6 +358,8 @@ struct        mob_index_data
     AreaIndexData *                area;
     DLString smell;
     Properties properties;
+
+    int getSize() const;
 };
 
 
@@ -383,7 +384,6 @@ struct        obj_index_data
     OBJ_INDEX_DATA *        next;
     EXTRA_DESCR_DATA *        extra_descr;
     AffectList        affected;
-    bool                new_format;
     char *                name;
     char *                short_descr;
     char *                description;

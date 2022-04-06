@@ -9,6 +9,7 @@
 #include "skillmanager.h"
 #include "defaultspell.h"
 #include "basicskill.h"
+#include "mobskilldata.h"
 #include "defaultaffecthandler.h"
 #include "defaultskillcommand.h"
 #include "commandmanager.h"
@@ -174,6 +175,7 @@ void OLCStateSkill::show( PCharacter *ch )
     DefaultSpell *s = getSpell(r);
     DefaultAffectHandler *a = getAffect(r);
     DefaultSkillCommand *c = getCommand(r);
+    MobSkillData *mob = r->getMobSkillData();
 
     ptc(ch, "Умение:      {C%s\r\n", r->getName().c_str());
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
@@ -200,6 +202,18 @@ void OLCStateSkill::show( PCharacter *ch )
     ptc(ch, "Доступно:    {c%s{x %s {D(allow help){x\r\n",
             r->accessToString().c_str(),
             web_edit_button(ch, "allow", "").c_str());
+
+    if (mob) {
+        ostringstream mobBuf;
+        MobProfSkillData *pmob = dynamic_cast<MobProfSkillData *>(mob);
+
+        mobBuf  << "разучено {c" << mob->dice << "{x*level+{c" << mob->bonus 
+                << "{x, атаки {c" << (mob->offense.getValue() == 0 ? "нет" : mob->offense.names()) << "{x";
+        if (pmob)
+            mobBuf << ", классовое {c" << (pmob->professional ? "да" : "нет") << "{x";
+        
+        ptc(ch, "Мобы:        %s {D({hcmob{hx){x\r\n", mobBuf.str().c_str());
+    }
 
     if (s) {
         ptc(ch, ".............{YЗаклинание{x.............\r\n");
@@ -447,6 +461,56 @@ SKEDIT(spell, "заклинание", "создать заклинание дл�
 SKEDIT(show, "показать", "показать все поля")
 {
     show(ch);
+    return false;
+}
+
+SKEDIT(mob, "моб", "доступность умения для мобов")
+{
+    DLString args = argument;
+    DLString cmd = args.getOneArgument();
+    BasicSkill *skill = getOriginal();
+    MobSkillData *mob = skill->getMobSkillData();
+
+    if (!mob) {
+        stc("У этого типа умений нету секции конфигурации для мобов.\r\n", ch);
+        return false;
+    }
+
+    if (cmd.empty() || arg_is_help(cmd)) {
+        stc("Использование: {y{hcmob off{x   - установить флаги из off_flags, делающие это умение доступным мобу\r\n", ch);
+        stc("               {y{hcmob dice{x  - установить dice для уровня раскачки (dice*level+bonus)\r\n", ch);
+        stc("               {y{hcmob bonus{x - установить bonus для уровня раскачки (dice*level+bonus)\r\n", ch);
+        stc("               {y{hcmob class{x - нужны ли act флаги классов для владения умением\r\n", ch);
+        return false;
+    }
+
+    // Override cached command and arguments so that flag&number editors work correctly with subcommand syntax.
+    lastCmd.setValue(lastCmd + " " + cmd);
+    lastArgs = args;
+
+    if (arg_oneof(cmd, "offense", "атаки")) {
+        return flagBitsEdit(mob->offense);
+    }
+
+    if (arg_oneof(cmd, "dice", "дайс")) {
+        return numberEdit(0, 100, mob->dice);
+    }
+
+    if (arg_oneof(cmd, "bonus", "бонус")) {
+        return numberEdit(0, 100, mob->bonus);
+    }
+
+    if (arg_oneof(cmd, "class", "класс")) {
+        MobProfSkillData *pmob = dynamic_cast<MobProfSkillData *>(mob);
+        if (!pmob) {
+            stc("У этой конфигурации мобов нету поля для классов.\r\n", ch);
+            return false;
+        }
+
+        return boolEdit(pmob->professional);
+    }
+
+    stc("Неверная подкоманда, смотри {y{hcmob{x для списка.\r\n", ch);
     return false;
 }
 

@@ -95,7 +95,6 @@ OBJ_INDEX_DATA *new_obj_index(void)
     pObj->condition = 100;
     for (value = 0; value < 5; value++)
         pObj->value[value] = 0;
-    pObj->new_format = true;
     pObj->behavior = 0; 
     pObj->limit = -1;
     pObj->level = 0;
@@ -135,7 +134,7 @@ MOB_INDEX_DATA *new_mob_index(void)
     pMob->vuln_flags = 0;
     pMob->material = str_dup("none");
     pMob->off_flags = 0;
-    pMob->size = SIZE_MEDIUM;
+    pMob->size = NO_FLAG;
     pMob->ac[AC_PIERCE] = 0;
     pMob->ac[AC_BASH] = 0;
     pMob->ac[AC_SLASH] = 0;
@@ -152,7 +151,6 @@ MOB_INDEX_DATA *new_mob_index(void)
     pMob->start_pos = POS_STANDING;
     pMob->default_pos = POS_STANDING;
     pMob->wealth = 0;
-    pMob->new_format = true;
     pMob->behavior = 0;
     return pMob;
 }

@@ -71,7 +71,6 @@ XMLObjectFactory::compat( )
 void
 XMLObjectFactory::compat(obj_index_data *obj)
 {
-    obj->new_format = true;
     obj->name = str_dup(name.getValue( ).c_str( ));
     obj->short_descr = str_dup(short_descr.getValue( ).c_str( ));
     obj->description = str_dup(description.getValue( ).c_str( ));

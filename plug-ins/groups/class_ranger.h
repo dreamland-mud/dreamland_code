@@ -8,7 +8,6 @@
 #include "objectbehaviormanager.h"
 #include "basicmobilebehavior.h"
 #include "summoncreaturespell.h"
-#include "savedcreature.h"
 
 class RangerStaff : public BasicObjectBehavior {
 XML_OBJECT
@@ -21,8 +20,7 @@ public:
 };
 
 class RangerCreature : public SummonedCreature, 
-                       public SavedCreature,
-                       public BasicMobileDestiny {
+                       public SavedCreature {
 XML_OBJECT
 public:
     typedef ::Pointer<RangerCreature> Pointer;
