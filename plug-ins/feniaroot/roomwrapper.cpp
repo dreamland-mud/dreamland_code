@@ -192,6 +192,12 @@ NMI_GET( RoomWrapper, light, "количество источников свет
     return (int)target->light;
 }
 
+NMI_GET( RoomWrapper, liquid, "жидкость комнаты (.Liquid)" )
+{
+    checkTarget();
+    return LiquidWrapper::wrap(target->pIndexData->liquid->getName());
+}
+
 NMI_GET( RoomWrapper, description, "описание комнаты" )
 {
     checkTarget( );
