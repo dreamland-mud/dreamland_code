@@ -106,6 +106,22 @@ public:
 
         return NULL;
     }
+
+    /** Return all valid registry elements matching a given name. */
+    list<Elem *> findAll(const DLString &name)
+    {
+        list<Elem *> result;
+
+        if (name.empty())
+            return result;
+
+        for (unsigned int i = 0; i < table.size(); i++) {
+            if (table[i]->isValid() && table[i]->matchesUnstrict(name))
+                result.push_back((Elem *)*table[i]);
+        }
+
+        return result;
+    }
 };
 
 template <typename Comparator>

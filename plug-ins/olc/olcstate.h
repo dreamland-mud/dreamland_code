@@ -269,21 +269,34 @@ bool OLCState::globalReferenceEdit(GlobalReference<R, E> &field)
     DLString args = lastArgs;
 
     if (args.empty()) {
-        ch->pecho("Использование:\r\n{W%1$s{x значение - установить новое значение\r\n", cmd);
+        ch->pecho("Использование:\r\n{W%1$s{x значение - установить новое значение", cmd);
+        ch->pecho("{y{hc%1$s none{x - очистить значение", cmd);
         return false;
     }
 
+    // Either assign an exact match or look for unique unstrict match.
     E *elem = R::getThis()->findExisting(args);
-    if (!elem)
-        elem = R::getThis()->findUnstrict(args);
 
     if (!elem) {
-        ch->printf("Значение '%s' не найдено.\r\n", args.c_str());
-        return false;
+        elem = R::getThis()->findUnstrict(args);
+
+        if (!elem) {
+            ch->pecho("Значение '%s' не найдено.", args.c_str());
+            return false;
+        }
+
+        list<E *> matches = R::getThis()->findAll(args);
+        if (matches.size() > 1) {
+            ch->pecho("Найдено несколько совпадений для '%s', уточни значение:", args.c_str());
+            for (auto &m: matches) {
+                ch->pecho("    {y{hc%s %s{x", cmd, m->getName().c_str());
+            }
+            return false;
+        }
     }
 
     field.assign(elem->getIndex());
-    ch->printf("Новое значение: {g%s{x\r\n", field.getName().c_str());
+    ch->pecho("Новое значение: {g%s{x", field.getName().c_str());
     return true;    
 }
 
