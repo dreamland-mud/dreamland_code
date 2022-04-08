@@ -1175,8 +1175,8 @@ static int drop_obj( Character *ch, Object *obj )
         && !obj->may_float( ) 
         && material_swims( obj ) == SWIM_NEVER)
     {
-        ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
-        ch->pecho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
+        ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->getLiquid()->getShortDescr( ).c_str( ) );
+        ch->pecho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->getLiquid()->getShortDescr( ).c_str( ) );
     }
     else if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
@@ -1234,8 +1234,8 @@ CMDRUNP( drop )
         if ( RoomUtils::isWater( ch->in_room ) )
         {
             extract_obj( obj );
-            oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ), 0, TO_ROOM);
-            oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->pIndexData->liquid->getShortDescr( ).c_str( ), 0, TO_CHAR);
+            oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->getLiquid()->getShortDescr( ).c_str( ), 0, TO_ROOM);
+            oldact("Монеты падают и тонут в $n6.", ch, ch->in_room->getLiquid()->getShortDescr( ).c_str( ), 0, TO_CHAR);
         }
         else
         {

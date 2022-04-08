@@ -267,7 +267,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
                 && !IS_SET(obj->extra_flags, ITEM_WATER_STAND)) 
         {
             DLString msg;
-            DLString liq = obj->in_room->pIndexData->liquid->getShortDescr( );
+            DLString liq = obj->in_room->getLiquid()->getShortDescr();
 
             msg << "{" << CLR_OBJ(ch) << "{1" << "%1$^O1" << "{2";
 

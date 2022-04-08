@@ -56,7 +56,7 @@ CMDRUN( fill )
     Object *fountain = 0;
     Liquid *liq;
     DrinkContainer::Pointer drink;
-    RoomIndexData *pRoom = ch->in_room->pIndexData;
+    Room *room = ch->in_room;
     DLString arguments = constArguments, arg, arg1;
 
     arg = arguments.getOneArgument( );
@@ -79,7 +79,7 @@ CMDRUN( fill )
 
     if (arg1.empty( )) {
         fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
-        if (!fountain && pRoom->liquid == liq_none)
+        if (!fountain && room->getLiquid() == liq_none)
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
                 ch->pecho("Здесь нет источника!");
                 return;
@@ -103,8 +103,8 @@ CMDRUN( fill )
 
     if (fountain)
         liq = liquidManager->find( fountain->value2() );
-    else if (pRoom->liquid != liq_none)
-        liq = pRoom->liquid.getElement();
+    else if (room->getLiquid() != liq_none)
+        liq = room->getLiquid().getElement();
     else
         liq = liq_water.getElement();
 
@@ -225,7 +225,7 @@ void pour_out(Object *out)
     }
 
     if (RoomUtils::isWater(room))
-        room->echo(POS_RESTING, "Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str(), out, room->pIndexData->liquid->getShortDescr().c_str());
+        room->echo(POS_RESTING, "Поток %N2 из %O2 выплескивается в %N4.", liqShort.c_str(), out, room->getLiquid()->getShortDescr().c_str());
     else if (room->getSectorType() == SECT_AIR)
         room->echo(POS_RESTING, "Поток %N2 из %O2 устремляется куда-то вниз и пропадает.", liqShort.c_str(), out); // TO-DO: move to non-air room downwards
     else if (room->getSectorType() == SECT_DESERT)

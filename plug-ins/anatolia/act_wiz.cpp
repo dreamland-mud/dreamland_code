@@ -117,6 +117,8 @@ void do_oload                ( Character *, char * );
 
 RELIG(none);
 GSN(none);
+LIQ(none);
+CLAN(none);
 
 /*
  * Local functions.
@@ -820,134 +822,137 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
 /* NOTCOMMAND */ void do_rstat( Character *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
-    Room *location;
+    ostringstream b;
+    Room *r;
     Object *obj;
     Character *rch;
     int door;
 
     one_argument( argument, arg );
-    location = ( arg[0] == '\0' ) ? ch->in_room : find_location( ch, arg );
-    if ( location == 0 )
+    r = ( arg[0] == '\0' ) ? ch->in_room : find_location( ch, arg );
+    if ( r == 0 )
     {
         ch->pecho("Цель не найдена.");
         return;
     }
 
-/*    if (!location->isOwner(ch) && ch->in_room != location  */
-    if ( ch->in_room != location
-    &&  location ->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
+    b << "Имя: [" << r->getName() << "]  Зона: [" << r->areaName() << "]" << endl;
+
     {
-        ch->pecho("Комната приватная и сейчас занята.");
-        return;
+        ostringstream tbuf;
+
+        if (r->owner && r->owner[0])
+            tbuf << "Владелец: " << r->owner << "  ";
+        if (r->pIndexData->clan != clan_none)
+            tbuf << "Клан: " << r->pIndexData->clan->getShortName() << "  ";
+        if (!r->pIndexData->guilds.empty())
+            tbuf << "Гильдии: " << r->pIndexData->guilds.toRussianString() << "  ";
+
+        if (!tbuf.str().empty())
+            b << tbuf.str() << endl;
     }
 
-    if (ch->in_room->affected_by)
-    {
-        sprintf(buf, "Под воздействием: %s\n\r",
-            raffect_flags.messages(ch->in_room->affected_by).c_str( ));
-        ch->send_to(buf);
-    }
+    b << "Vnum: " << r->vnum << "  "
+      << "Сектор: " << sector_table.message(r->getSectorType());
 
-    sprintf( buf, "Имя: '%s'\n\rЗона: '%s'\n\rВладелец: '%s' Клан: '%s'\n\r",
-        location->getName(),
-        location->areaName() ,
-        location->owner,
-        location->pIndexData->clan->getShortName( ).c_str( ) );
-    ch->send_to(buf);
+    if (r->getLiquid() != liq_none)
+        b << " (" << r->getLiquid()->getShortDescr().ruscase('1') << "{x)";
 
-    sprintf( buf,
-        "Vnum: %d  Сектор: %d  Свет: %d  Лечение: %d  Мана: %d\n\r",
-        location->vnum,
-        location->getSectorType(),
-        location->light,
-        location->getHealRate(),
-        location->getManaRate() );
-    ch->send_to(buf);
+    b << "  " << "Свет: " << r->light << "  "
+      << "Лечение: " << r->getHealRate() << "  "
+      << "Мана: " << r->getManaRate() << endl;
 
-    sprintf( buf,
-        "Флаги: %s.\n\rОписание:\n\r%s",
-        room_flags.names(location->room_flags).c_str( ),
-        location->getDescription() );
-    ch->send_to(buf);
+    if (r->affected_by)
+        b << "Под воздействием: " << raffect_flags.messages(r->affected_by, true) << endl;
 
-    if ( location->getExtraDescr() != 0 )
+    if (r->room_flags)
+        b << "Флаги: " << room_flags.names(r->room_flags) << endl;
+
+    b << "Описание:" << endl << r->getDescription();
+
+    if ( r->getExtraDescr() != 0 )
     {
         EXTRA_DESCR_DATA *ed;
 
-        ch->send_to("Ключевые слова экстра-описания: '");
-        for ( ed = location->getExtraDescr(); ed; ed = ed->next )
+        b << "Ключевые слова экстра-описания: ";
+        for ( ed = r->getExtraDescr(); ed; ed = ed->next )
         {
-            ch->send_to(ed->keyword);
-            if ( ed->next != 0 )
-                ch->send_to(" ");
+            b << "[" << ed->keyword << "] ";
         }
-        ch->pecho("'.");
+        b << endl;
     }
 
-    ch->send_to("Персонажи:");
-    for ( rch = location->people; rch; rch = rch->next_in_room )
+    b << "Персонажи: ";
+    for ( rch = r->people; rch; rch = rch->next_in_room )
     {
         if (ch->can_see(rch))
+            b << "[" << rch->getNameP('1') << "] ";
+    }
+
+    b << endl << "Объекты: ";
+    for (obj = r->contents; obj; obj = obj->next_content)
+        b << "[" << obj->getFirstName() << "] ";
+    b << endl;
+
+    b << "Выходы:" << endl;
+    for (door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit = r->exit[door];
+        if (!pexit)
+            continue;
+
+        Room *to_room = pexit->u1.to_room;
+
+        b << dlprintf("{G%-6s{x [{W%5u{x] [{W%-10s{x]",
+                      dirs[door].rname,
+                      to_room ? to_room->vnum : 0,
+                      to_room ? to_room->getName() : "");
+
+        b << endl;
+
+        if (pexit->key > 0)
+            b << dlprintf("Ключ: [{W%7u{x]  ", pexit->key) << endl;
+            
+        if (pexit->exit_info)
+            b << dlprintf("Флаги: [{W%s{x]", exit_flags.names(pexit->exit_info).c_str()) << endl;
+
         {
-            ch->printf( " %s", rch->getNameP( '1' ).c_str() );
+            ostringstream tbuf;
+
+            if (pexit->keyword && pexit->keyword[0] != '\0')
+                tbuf << dlprintf("Имена: [{W%s{x]  ", pexit->keyword);
+
+            if (pexit->short_descr && pexit->short_descr[0] != '\0')
+                tbuf << dlprintf("Краткое: [{W%s{x]  ", russian_case(pexit->short_descr, '1').c_str());
+
+            if (pexit->description && pexit->description[0] != '\0')
+                tbuf << "Описание: " << pexit->description;
+
+            if (!tbuf.str().empty())
+                b << tbuf.str() << endl;
         }
     }
 
-    ch->send_to(".\n\rОбъекты:   ");
-    for ( obj = location->contents; obj; obj = obj->next_content )
-    {
-        ch->printf( " %s", obj->getFirstName( ).c_str( ) );
-    }
-    ch->pecho(".");
+    for (auto &paf: r->affected)
+        format_affect(paf, b);
 
-    for ( door = 0; door <= 5; door++ )
-    {
-        EXIT_DATA *pexit;
+    if (!r->history.empty()) {
+        b << "Следы:" << endl;
 
-        if ( ( pexit = location->exit[door] ) != 0 )
+        for (RoomHistory::iterator h = r->history.begin( );
+            h != r->history.end( );
+            h++)
         {
-            sprintf( buf,
-                "Дверь: %d.  В: %d.  Ключ: %d. Уровень: %d.  Флаги выхода: %s.\n\rКейворд: '%s'.  Шорт: '%s'. Описание: %s",
-
-                door,
-                ( pexit->u1.to_room == 0 ? -1 : pexit->u1.to_room->vnum),
-                    pexit->key,
-                pexit->level,
-                    exit_flags.names(pexit->exit_info).c_str(),
-                    pexit->keyword,
-                direction_doorname(pexit),
-                    pexit->description[0] != '\0'
-                    ? pexit->description : "(none).\n\r" );
-            ch->send_to(buf);
+            b << dlprintf( "%s проходит через дверь %d.\r\n", h->name.c_str( ), h->went );
         }
     }
 
-    ostringstream ostr;
-    for (auto &paf: location->affected)
-        format_affect(paf, ostr);
-    ch->send_to(ostr);
-
-    ch->pecho("Следы:");
-
-    for (RoomHistory::iterator h = location->history.begin( );
-         h != location->history.end( );
-         h++)
-    {
-        ch->printf( "%s проходит через дверь %d.\r\n", h->name.c_str( ), h->went );
+    if (r->behavior) {
+        b << "Поведение: [" << r->behavior->getType() << "]" << endl;
+        r->behavior.toStream(b);
     }
 
-    if (location->behavior) {
-        ostringstream ostr;
-        
-        sprintf(buf, "Поведение: [%s]\r\n", location->behavior->getType( ).c_str( ));
-        ch->send_to(buf);
-
-        location->behavior.toStream( ostr );
-        ch->send_to( ostr );
-    }
-
+    page_to_char(b.str().c_str(), ch);
 }
 
 
