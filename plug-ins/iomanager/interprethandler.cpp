@@ -32,6 +32,8 @@
 #include "mercdb.h"
 #include "def.h"
 
+LIQ(none);
+
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
 const char * sunlight_ru [4] = { "темно", "светает", "светло", "сумерки" };    
@@ -350,10 +352,18 @@ void InterpretHandler::normalPrompt( Character *ch )
         case 'S':
             if (ch->in_room && can_see_room_details(ch)) {
                 int sector = ch->in_room->getSectorType();
+                LiquidReference &liq = ch->in_room->getLiquid();
+
                 bool indoors = IS_SET(ch->in_room->room_flags, ROOM_INDOORS);
                 out << (indoors ? "(" : "")
-                    << "{" << sector_type_color(sector) <<  sector_table.message(sector) << "{w"
+                    << "{" << sector_type_color(sector) <<  sector_table.message(sector);
+                    
+                if (liq_none != liq)
+                    out << "{D|{x" << liq->getShortDescr().ruscase('1');
+
+                out << "{w"
                     << (indoors ? ")" : "");
+
             } else {
                 out << "";
             }
