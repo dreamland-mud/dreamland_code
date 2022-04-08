@@ -81,11 +81,14 @@ static bool dismount_attacked( Character *ch )
 }
 
 /*
- * Start fights.
+ * Start fights, configuring ch to attack victim and adjusting positions.
  */
 void set_fighting( Character *ch, Character *victim )
 {
     if (ch->fighting != 0)
+        return;
+
+    if (ch->position <= POS_INCAP)
         return;
     
     if (IS_AFFECTED(ch, AFF_SLEEP)) {
