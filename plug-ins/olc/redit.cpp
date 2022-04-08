@@ -964,24 +964,8 @@ REDIT(guilds, "гильдии", "установить гильдию для кл
 REDIT(liquid, "жидкость", "установить жидкость для рек (? liquid)")
 {
     RoomIndexData *pRoom;
-    Liquid *liq;
-
     EDIT_ROOM(ch, pRoom);
-
-    if (argument[0] == '\0') {
-        stc("Syntax:  liquid [name]\n\r", ch);
-        return false;
-    }
-    
-    liq = liquidManager->findUnstrict( argument );
-    if (!liq) {
-        stc("Liquid not found\n\r", ch);
-        return false;
-    }
-
-    pRoom->liquid.assign( *liq );
-    stc("Liquid set.\n\r", ch);
-    return true;
+    return globalReferenceEdit<LiquidManager, Liquid>(pRoom->liquid);
 }
 
 REDIT(eexit, "экстравыход", "редактор экстра-выходов (eexit help)")

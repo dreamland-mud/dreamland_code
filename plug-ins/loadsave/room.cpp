@@ -18,6 +18,7 @@
 #include "def.h"
 
 WEARLOC(none);
+LIQ(none);
 
 extra_exit_data * extra_exit_data::create()
 {
@@ -124,6 +125,14 @@ void Room::affectModify( Affect *paf, bool fAdd )
         int &flag = room_flag_by_table(this, paf->bitvector.getTable());
         REMOVE_BIT(flag, paf->bitvector.getValue());
         mod = 0 - mod;
+    }
+
+    if (paf->global.getRegistry() == liquidManager) {
+        int liqNum = paf->global.empty() ? liq_none : paf->global.toArray().front();
+        if (fAdd)
+            liquid.assign(liqNum);
+        else
+            liquid.assign(liq_none);
     }
 
     switch ( paf->location )

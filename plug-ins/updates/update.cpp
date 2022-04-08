@@ -555,11 +555,11 @@ void water_float_update( )
         }
         
         if (obj->item_type == ITEM_DRINK_CON && !IS_SET(obj->value4(), DRINK_CLOSED)) {
-            obj->in_room->echo( POS_RESTING, "%1$^O1 дела%1$nет|ют пузыри на поверхности %2$N2.", obj, obj->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
+            obj->in_room->echo( POS_RESTING, "%1$^O1 дела%1$nет|ют пузыри на поверхности %2$N2.", obj, obj->in_room->getLiquid()->getShortDescr( ).c_str( ) );
 
             obj->value1(URANGE( 1, obj->value1() + 8, obj->value0() ));
             obj->water_float = obj->value0() - obj->value1();
-            obj->value2(obj->in_room->pIndexData->liquid);
+            obj->value2(obj->in_room->getLiquid());
             room_to_save( obj );
         }
 
@@ -571,10 +571,10 @@ void water_float_update( )
                     || obj->item_type == ITEM_CORPSE_PC
                     || obj->item_type == ITEM_CONTAINER)
             {
-                obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6, оставляя лишь несколько пузырьков.", obj, obj->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
+                obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6, оставляя лишь несколько пузырьков.", obj, obj->in_room->getLiquid()->getShortDescr( ).c_str( ) );
             }
             else
-                obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6.", obj, obj->in_room->pIndexData->liquid->getShortDescr( ).c_str( ) );
+                obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6.", obj, obj->in_room->getLiquid()->getShortDescr( ).c_str( ) );
 
             extract_obj( obj );
         }

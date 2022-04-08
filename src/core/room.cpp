@@ -64,6 +64,7 @@ Room::Room( ) :
                 behavior( RoomBehavior::NODE_NAME ),
                 pIndexData(0),
                 sector_type(SECT_MAX),
+                liquid(liq_none),
                 mod_heal_rate( 0 ), mod_mana_rate( 0 ), ID(0)
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
@@ -193,3 +194,10 @@ int Room::getSectorType() const
     return sector_type == SECT_MAX ? pIndexData->sector_type : sector_type;
 }
 
+LiquidReference & Room::getLiquid()
+{
+    if (liquid == liq_none)
+        return pIndexData->liquid;
+
+    return liquid;
+}

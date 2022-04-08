@@ -143,6 +143,9 @@ public:
     /** Return sector type, either from prototype or as changed by the affects. */
     int getSectorType() const;
 
+    /** Return room liquid type, either from prototype or its own override. */
+    LiquidReference &getLiquid();
+
     inline AreaIndexData *areaIndex() const;
     const char * areaName() const;
 
@@ -171,6 +174,9 @@ public:
 protected:
     /** Sector type if different from the prototype. */
     int sector_type;
+
+    /** Room liquid if different from the prototype. */
+    LiquidReference liquid;
 
     /** How much default heal rate is changed by affects. */
     int mod_heal_rate;
