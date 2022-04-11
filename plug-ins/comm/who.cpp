@@ -454,7 +454,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         wch["race"]["en"] = victim->getRace()->getName();
         wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim);
 
-        if (victim->getClan() != clan_none && victim->getClan().isValid())
+        if (victim->getClan() != clan_none && victim->getClan()->isValid())
             wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();
 
         if (!victim->getPretitle().empty())
