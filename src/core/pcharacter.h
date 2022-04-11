@@ -221,9 +221,6 @@ public:
     int getMaxStat( int );
     int getMaxTrain( int );
     
-    // player pk counter (implemented in anatolia_core)
-    void check_hit_newbie( Character *victim );
-
     // misc
     virtual bool is_vampire( ) const;
     virtual bool is_mirror( ) const;
@@ -255,7 +252,6 @@ private:
     XML_VARIABLE PCSkills skills;
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger security;
-    XML_VARIABLE XMLIntegerNoEmpty newbie_hit_counter; 
     XML_VARIABLE XMLIntegerNoEmpty     questpoints;        
 
     CachedNoun cachedNoun;

@@ -153,7 +153,6 @@ void ClanGuardRuler::greet( Character *wch )
         return;
     
     actIntruder( pch );
-    doPetitionOutsider( pch );
     doAttack( pch );
 }
 

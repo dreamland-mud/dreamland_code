@@ -275,7 +275,6 @@ void PCharacter::init( )
     skills.clear( );
     bonuses.clear();
     security = 0;
-    newbie_hit_counter = 0;
 
     desires.clear( );        
     for (int i = 0; i < desireManager->size( ); i++)

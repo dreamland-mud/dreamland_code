@@ -29,7 +29,6 @@
 #include "knight.h"
 #include "hunter.h"
 #include "lion.h"
-#include "outsider.h"
 #include "ghost.h"
 #include "flowers.h"
 
@@ -154,7 +153,6 @@ extern "C"
         /*
          * other guards
          */
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardOutsider> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardFlowers> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardGhost> >( ppl );
         

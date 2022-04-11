@@ -43,7 +43,6 @@
 #include "def.h"
 
 CLAN(none);
-CLAN(outsider);
 PROF(none);
 
 typedef void                ( *FUNC_SET )( Character*, char* );

@@ -736,9 +736,7 @@ bool HunterTrapObject::checkPrevent( Character *victim )
     if (victim->can_see( obj ))
         return true;
 
-    if (!victim->is_npc( ) 
-            && (victim->getClan( ) == clan_none 
-                || victim->getClan( ) == clan_flowers))
+    if (!victim->is_npc( ) && victim->getClan( ) == clan_flowers)
         return true;
 
     if (!victim->isAffected( gsn_prevent ))

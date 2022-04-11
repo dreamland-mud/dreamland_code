@@ -36,7 +36,6 @@
 #include "def.h"
 
 CLAN(none);
-CLAN(outsider);
 
 using namespace std;
 
@@ -1356,11 +1355,6 @@ void CClan::clanPetitionReject( PCharacter *pc, DLString& argument )
 
     pc->pecho("Ok.");
     
-    if (victim->getClan( ) == clan_none) {
-        victim->setClan( clan_outsider );
-        victim->setClanLevel( 0 );
-    }
-
     victim->setPetition( clan_none );
 
     buf << "Твоя заявка на вступление в ["

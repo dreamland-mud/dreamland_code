@@ -24,7 +24,6 @@ hunter.cpp \
 invader.cpp \
 knight.cpp \
 lion.cpp \
-outsider.cpp \
 ruler.cpp \
 shalafi.cpp \
 flowers.cpp \
@@ -40,7 +39,6 @@ hunter.h \
 invader.h \
 knight.h \
 lion.h \
-outsider.h \
 ruler.h \
 shalafi.h \
 flowers.h 

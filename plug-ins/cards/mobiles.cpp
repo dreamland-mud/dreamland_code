@@ -37,7 +37,7 @@ bool CardStarterBehavior::death( Character *killer )
     
     if (!killer || killer->is_npc( ))
         return false;
-    if (killer->getClan( ) == clan_none || killer->getClan( ) == clan_flowers)
+    if (killer->getClan( ) == clan_flowers)
         return false;
 
     card = killer->getPC( )->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
