@@ -940,9 +940,49 @@ static bool mprog_kill( Character *killer, Character *victim )
     return false;
 }
 
+// Format realistic death message for wiznet/Discord/Telegram.
+static DLString death_message(Character *victim, Character *ch)
+{
+	DLString msg = "%1$^C1 ";
+    if (victim == ch) {
+        msg += "погиб%1$Gло||ла|ли своей смертью";
+    } else if (ch == 0) {
+        msg += "па%1$Gло|л|ла|ли от неизвестной руки";
+    } else {			
+        msg += "па%1$Gло|л|ла|ли от ";
+        if (IS_SET(ch->form, FORM_SENTIENT) && IS_SET(ch->parts, PART_HANDS))
+            msg = msg + "руки ";				
+        else if (IS_SET(ch->parts, PART_FANGS))
+            msg = msg + "клыков ";
+        else if (IS_SET(ch->parts, PART_CLAWS))
+            msg = msg + "когтей ";
+        else if (IS_SET(ch->parts, PART_TENTACLES))
+            msg = msg + "щупалец ";			
+        else if (IS_SET(ch->parts, PART_HORNS))
+            msg = msg + "рогов ";				
+        else if (IS_SET(ch->parts, PART_TUSKS))
+            msg = msg + "бивней ";
+        else if (IS_SET(ch->parts, PART_TWO_HOOVES) || IS_SET(ch->parts, PART_FOUR_HOOVES))
+            msg = msg + "копыт ";
+        else if (IS_SET(ch->parts, PART_FINS))
+            msg = msg + "плавников ";	
+        else
+            msg = msg + "руки ";
+            
+        msg += "%2$C2";
+    }
+
+    if (ch) {
+        msg += " в зоне %3$s.";
+        return fmt(0, msg.c_str(), victim, ch, ch->in_room->areaName());
+    } else {
+        msg += ".";
+        return fmt(0, msg.c_str(), victim, ch);
+    }
+}
+
 void raw_kill( Character* victim, int part, Character* ch, int flags )
 {
-    int wizflag;
 
     stop_fighting( victim, true );
     
@@ -970,37 +1010,8 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
         	purge_corpse( ch, victim );
 	}
     
-	DLString msg = fmt(0, "%1$C1 ", victim);
-	if (!victim->is_npc()) {
-		if (victim == ch) 
-			msg = msg + fmt(0, "погиб%1$Gло||ла|ли своей смертью ", victim);
-		else {			
-			msg = msg + fmt(0, "па%1$Gло|л|ла|ли от ", victim);
-			if (IS_SET(ch->form, FORM_SENTIENT) && IS_SET(ch->parts, PART_HANDS))
-				msg = msg + "руки ";				
-			else if (IS_SET(ch->parts, PART_FANGS))
-				msg = msg + "клыков ";
-			else if (IS_SET(ch->parts, PART_CLAWS))
-				msg = msg + "когтей ";
-			else if (IS_SET(ch->parts, PART_TENTACLES))
-				msg = msg + "щупалец ";			
-			else if (IS_SET(ch->parts, PART_HORNS))
-				msg = msg + "рогов ";				
-			else if (IS_SET(ch->parts, PART_TUSKS))
-				msg = msg + "бивней ";
-			else if (IS_SET(ch->parts, PART_TWO_HOOVES) || IS_SET(ch->parts, PART_FOUR_HOOVES))
-				msg = msg + "копыт ";
-			else if (IS_SET(ch->parts, PART_FINS))
-				msg = msg + "плавников ";			
-			msg = msg + fmt(0, "%C2", ch);
-		}
-		if (ch)
-			msg = msg + fmt(0, " в зоне %s.", ch->in_room->areaName());
-		else
-			msg = msg + ".";
-	}
-
-    wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
+    DLString msg = death_message(victim, ch);
+    int wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
     wiznet(wizflag, 0, victim->get_trust(), msg.c_str(), victim, ch);
 
     if (!victim->is_npc()) {
