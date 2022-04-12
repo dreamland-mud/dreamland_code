@@ -65,7 +65,9 @@ void BugTracker::reportMessage(const DLString &msgType, const DLString &authorNa
     // Compose message for trello checklist.
     DLString mbuf;
     if (!location.empty())
-        mbuf << "[" << location << "] ";
+        mbuf << "[" << location << "]";
+
+    mbuf << "[" << Date::getCurrentTimeAsString("%Y/%m/%d %H:%M") << "] ";
     mbuf << authorName << ": " << message;
 
     // Create temporary file in a subfolder, for trello sync job to pick up.
