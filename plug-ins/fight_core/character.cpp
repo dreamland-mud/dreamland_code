@@ -72,32 +72,3 @@ bool Character::is_adrenalined( ) const
 }
 
 
-/*
- * player pk counter 
- */
-void PCharacter::check_hit_newbie( Character *victim )
-{
-        // памятка: "как попасть в аутсайдеры"
-
-        if ( getClan() != clan_none ) // клановые не считаются
-                return;
-
-        if ( victim->is_npc() ) // на всякий случай
-                return;
-
-        if ( victim->getClan() != clan_none ) // нападения на клановых - прямой путь в out-s :)
-        {
-                interpret_raw(this, "clan", "petition outsider");
-                return;
-        }
-
-        newbie_hit_counter.setValue( newbie_hit_counter.getValue() + 1 );
-        
-        if ( newbie_hit_counter.getValue() > 0 )
-        {
-                interpret_raw(this, "clan", "petition outsider");
-                return;
-        }
-}
-
-

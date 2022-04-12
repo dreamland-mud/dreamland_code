@@ -183,9 +183,8 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
     
     set_violent( ch );
 
-    if (fAlways || !IS_VIOLENT(victim) || victim->getClan( ) != clan_none) {
+    if (fAlways || !IS_VIOLENT(victim)) {
         set_violent( victim );
-        ch->getPC( )->check_hit_newbie( victim );
     }
 }
 
@@ -220,10 +219,7 @@ void set_slain( Character *ch )
     
     SET_BIT( ch->getPC( )->PK_flag, PK_SLAIN );
 
-    if (ch->getClan( ) == clan_none)
-        ch->getPC( )->PK_time_sk = PK_TIME_SLAIN_NOCLAN;
-    else
-        ch->getPC( )->PK_time_sk = PK_TIME_SLAIN;
+    ch->getPC( )->PK_time_sk = PK_TIME_SLAIN;
 }
 
 void set_ghost( Character *ch )

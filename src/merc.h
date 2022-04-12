@@ -169,7 +169,6 @@ typedef struct  auction_data            AUCTION_DATA;
 #define        GHOST_TIME                3  * PULSE_MOBILE
 
 #define        PK_TIME_SLAIN                7  * PULSE_MOBILE
-#define        PK_TIME_SLAIN_NOCLAN        20 * PULSE_MOBILE
 #define        PK_TIME_KILLER                10 * PULSE_MOBILE
 #define        PK_TIME_VIOLENT                5 * PULSE_MOBILE
 #define        PK_TIME_THIEF                15 * PULSE_MOBILE

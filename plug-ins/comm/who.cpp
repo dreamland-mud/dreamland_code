@@ -45,9 +45,7 @@ bool can_see_profession( PCharacter *ch, PCMemoryInterface *victim )
     if (ch == victim->getPlayer())
         return true;
     
-    if (ch->getClan( ) != clan_none 
-        && ch->getClan( ) == victim->getClan( )
-        && !ch->getClan( )->isDispersed( ))
+    if (ch->getClan( ) == victim->getClan( ) && !ch->getClan( )->isDispersed( ))
         return true;
 
     return false;
@@ -456,7 +454,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         wch["race"]["en"] = victim->getRace()->getName();
         wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim);
 
-        if (victim->getClan() != clan_none)
+        if (victim->getClan() != clan_none && victim->getClan()->isValid())
             wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();
 
         if (!victim->getPretitle().empty())

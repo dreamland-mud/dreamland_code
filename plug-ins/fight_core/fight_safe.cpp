@@ -164,9 +164,6 @@ bool is_safe_nomessage(Character *ch, Character *victim )
         return true;
     }
 
-    if (ch->getClan( ) != clan_none && victim->getClan( ) == clan_none)
-        return true;
-
     if (ch->getClan( ) == clan_flowers || victim->getClan( ) == clan_flowers)
         return true;
 

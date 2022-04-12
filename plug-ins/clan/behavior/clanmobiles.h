@@ -70,7 +70,6 @@ protected:
         Character * getVictim( );
         void doNotify();
         void doAttack( PCharacter * );
-        void doPetitionOutsider( PCharacter * );
 
         XML_VARIABLE XMLLongLongNoEmpty lastNotified;
 };

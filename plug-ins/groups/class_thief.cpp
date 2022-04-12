@@ -518,7 +518,6 @@ SKILL_RUNP( steal )
 
         tmp_ch = ch->getDoppel( );
 
-        ch->getPC( )->check_hit_newbie( victim );
         ch->setWait( gsn_steal->getBeats(ch)  );
 
 

@@ -167,7 +167,7 @@ bool GateMovement::checkVictim( )
     } 
     else {
       
-        // same clanned (except unclanned, Exiles and Outsiders) can gate on each other
+        // same clanned (except clan None) can gate on each other
         if (!ch->is_npc( ) 
             && !ch->getClan( )->isDispersed( ) 
             && ch->getClan( ) == victim->getClan( ))
@@ -419,7 +419,7 @@ bool SummonMovement::checkVictim( )
     else {      
         if (!caster->is_npc( )) {    
 
-            // players from same clan (except unclanned, Exiles and Outsiders) can summon each other
+            // players from same clan (except clan None) can summon each other
             if (!caster->getClan( )->isDispersed() && caster->getClan() == ch->getClan())
                 return true; 
 
