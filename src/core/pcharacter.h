@@ -53,7 +53,7 @@ public:
     
     static const int BASE_AGE;
     static const int HOURS_PER_YEAR;
-protected:
+
     time_t logon;
     int played;
     int true_played;

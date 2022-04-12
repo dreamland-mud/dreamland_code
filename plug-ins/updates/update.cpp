@@ -272,13 +272,6 @@ void mobile_update( )
 
         wield_update( ch );
 
-        if (!ch->is_npc( )) {
-            // workaround, waiting for current
-            if (IS_SET(ch->act, PLR_NO_EXP)) 
-                ch->getPC( )->age.setTruePlayed( 
-                    ch->getPC( )->age.getTrueTime( ) - 4 );
-        } 
-        
         mprog_special( ch );
     }
 }
@@ -291,6 +284,32 @@ static bool mprog_area( Character *ch )
     return false;
 }
 
+static Date getLogon(time_t t)
+{
+    return Date(t);
+}
+// Trying to catch "You are 100500 years old" bug 
+// by checking and reporting player ages outside of reasonable limits.
+static void debug_player_age(PCharacter *ch)
+{
+    int age = ch->age.getTrueYears();
+
+    if (age < 17) {
+        LogStream::sendWarning() << "AGE_DEBUG: Low age for " << ch->getName() << " true_years=" << age
+            << " years="  << ch->age.getYears() << " played=" << ch->age.played << " true_played=" << ch->age.true_played << " logon=" << ch->age.logon
+            << " time=" << ch->age.getTime() << " true_time=" << ch->age.getTrueTime() 
+            << " current_time=" << dreamland->getCurrentTime() << " " << Date::getCurrentTimeAsString() << endl;
+        return;
+    }
+
+    if (age > 30 && ch->get_trust() < LEVEL_IMMORTAL) {
+        LogStream::sendWarning() << "AGE_DEBUG: High age for " << ch->getName() << " true_years=" << age
+            << " years="  << ch->age.getYears() << " played=" << ch->age.played << " true_played=" << ch->age.true_played << " logon=" << ch->age.logon
+            << " time=" << ch->age.getTime() << " true_time=" << ch->age.getTrueTime() 
+            << " current_time=" << dreamland->getCurrentTime() << " " << Date::getCurrentTimeAsString() << endl;
+        return;
+    }
+}
 
 /*
  * Update all chars, including mobs.
@@ -489,8 +508,11 @@ void char_update( )
         for (ch = char_list; ch != 0; ch = ch_next)
         {
             ch_next = ch->next;
-            if (!ch->is_npc())
+            if (!ch->is_npc()) {
                 ch->getPC( )->save();
+                debug_player_age(ch->getPC());
+            }
+
             if( ( ch == ch_quit || ch->timer > 20 ) && !ch->isCoder( ) ) {
                 if (ch->getPC( ))
                     ch->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
