@@ -1211,32 +1211,31 @@ void fread_pet( PCharacter *ch, FILE *fp )
                     break;
                 }
                  break;
-            
-             case 'E':
-                 if (!str_cmp(word,"End"))
-             {
-                pet->leader = ch;
-                pet->master = ch;
-                ch->pet = pet;
-                    /* adjust hp mana move up  -- here for speed's sake */
-                    percent = ( dreamland->getCurrentTime( ) - ch->last_logoff) * 25 / ( 2 * 60 * 60);
 
-                    if (percent > 0 && !IS_AFFECTED(ch,AFF_POISON)
-                    &&  !IS_AFFECTED(ch,AFF_PLAGUE))
-                    {
-                    percent = std::min(percent,100);
-                        pet->hit        += (pet->max_hit - pet->hit) * percent / 100;
-                    pet->mana   += (pet->max_mana - pet->mana) * percent / 100;
-                    pet->move   += (pet->max_move - pet->move)* percent / 100;
-                    }
-                
-                if (FeniaManager::wrapperManager)
-                    FeniaManager::wrapperManager->linkWrapper( pet );
-                         return;
-             }
-                 KEY( "Exp",        pet->exp,                fread_number(fp));
+             case 'E':
+                 if (!str_cmp(word, "End")) {
+                     pet->leader = ch;
+                     pet->master = ch;
+                     ch->pet = pet;
+                     /* adjust hp mana move up  -- here for speed's sake */
+                     percent = (dreamland->getCurrentTime() - ch->last_logoff) * 25 / (2 * 60 * 60);
+
+                     if (percent > 0 && !IS_AFFECTED(ch, AFF_POISON) && !IS_AFFECTED(ch, AFF_PLAGUE)) {
+                         percent = std::min(percent, 100);
+                         pet->hit += (pet->max_hit - pet->hit) * percent / 100;
+                         pet->mana += (pet->max_mana - pet->mana) * percent / 100;
+                         pet->move += (pet->max_move - pet->move) * percent / 100;
+                     }
+
+                     if (FeniaManager::wrapperManager)
+                         FeniaManager::wrapperManager->linkWrapper(pet);
+
+                     LogStream::sendNotice() << "LOAD " << ch->getName() << " pet " << pet->getID() << " [" << pet->pIndexData->vnum << "]" << endl;    
+                     return;
+                 }
+                 KEY("Exp", pet->exp, fread_number(fp));
                  break;
-            
+
              case 'G':
                  KEY( "Gold",        pet->gold,                fread_number(fp));
                  break;

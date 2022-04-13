@@ -346,8 +346,10 @@ void PCharacter::save( )
 
     fwrite_obj( this, carrying, fp, 0 );
 
-    if (pet)
+    if (pet) {
+        LogStream::sendNotice() << "SAVE " << getName() << " pet " << pet->getID() << " [" << pet->pIndexData->vnum << "]" << endl;
         fwrite_pet( pet, fp );
+    }
 
     fprintf( fp, "#END\n" );
 
