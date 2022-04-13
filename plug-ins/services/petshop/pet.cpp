@@ -16,7 +16,7 @@
 #include "occupations.h"
 #include "interp.h"
 #include "act.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -67,6 +67,10 @@ bool Pet::area( )
 	
 	msg = msg + "восвояси.";
 	ch->recho(msg.c_str());
+    LogStream::sendNotice() 
+        << "PET_EXTRACT: Extracting " << ch->getID() << " [" << ch->getNPC()->pIndexData->vnum << "] "
+        << " in room " << ch->in_room->vnum << endl;
+
     extract_char( ch );
     return true;
 }

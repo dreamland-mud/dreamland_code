@@ -80,10 +80,6 @@ public:
     typedef ::Pointer<SummonedCreature> Pointer;
     
     virtual void conjure( );
-    virtual bool hourly( );
-
-    SummonCreatureSpell::Pointer getMySpell() const;
-    PCMemoryInterface * getMyCreator() const;
     
     XML_VARIABLE XMLLongLong creatorID;
     XML_VARIABLE XMLString creatorName;

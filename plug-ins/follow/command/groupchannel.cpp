@@ -46,34 +46,37 @@ void GroupChannel::findListeners( Character *ch, Listeners &listeners ) const
             listeners.push_back( gch );
 }
 
-void GroupChannel::triggers( Character *ch, const DLString &msg ) const
+void GroupChannel::triggers(Character *ch, const DLString &msg) const
 {
-    GlobalChannel::triggers( ch, msg );
+    GlobalChannel::triggers(ch, msg);
 
-    if (!ch->is_npc( ) && (!str_prefix( msg.c_str( ), "where are you?" )
-                || !str_prefix( msg.c_str( ), "где ты?" ))) {
-        NPCharacter *pet = ch->getPC( )->pet;
-    
-        if (!pet)
+    if (!ch->is_npc() && (!str_prefix(msg.c_str(), "where are you?") || !str_prefix(msg.c_str(), "где ты?"))) {
+        NPCharacter *pet = ch->getPC()->pet;
+
+        if (!pet) {
+            ch->pecho("На твой вопрос отвечать некому, у тебя нет {hh15питомца{x.");
             return;
+        }
 
-        if (IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON))
+        if (IS_SET(ch->in_room->areaIndex()->area_flag, AREA_DUNGEON)) {
+            ch->pecho("Здесь никто не откликнется на твой вопрос.");
             return;
+        }
 
-        if (pet->position > POS_SLEEPING){
-            if(IS_AFFECTED(pet, AFF_BLIND)){
-            tell_raw( ch, pet, "%s, я ничего не вижу!",
-                        GET_SEX( ch, "Хозяин", "Хозяин", "Хозяйка"));
-            }
-            else if(eyes_darkened(pet)){
-            tell_raw( ch, pet, "%s, тут слишком темно, я ничего не вижу!",
-                        GET_SEX( ch, "Хозяин", "Хозяин", "Хозяйка"));
-            }
-            else{   
-            tell_raw( ch, pet, "%s, я нахожусь в {hh%s{hx - %s",
-                        GET_SEX( ch, "Хозяин", "Хозяин", "Хозяйка"),
-                        pet->in_room->areaName(), pet->in_room->getName() );
-            }
+        if (pet->position > POS_SLEEPING) {
+            if (IS_AFFECTED(pet, AFF_BLIND)) {
+                tell_raw(ch, pet, "%s, я ничего не вижу!",
+                         GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"));
+            } else if (eyes_darkened(pet)) {
+                tell_raw(ch, pet, "%s, тут слишком темно, я ничего не вижу!",
+                         GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"));
+            } else {
+                tell_raw(ch, pet, "%s, я нахожусь в {hh%s{hx - %s",
+                         GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"),
+                         pet->in_room->areaName(), pet->in_room->getName());
+            } 
+        } else {
+            ch->pecho("Твой питомец не в состоянии ответить на твой вопрос."); // dumb wording, for debugging
         }
     }
 }
