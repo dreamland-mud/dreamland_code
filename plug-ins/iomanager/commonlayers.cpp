@@ -97,7 +97,7 @@ static bool create_log_entry(InterpretArguments &iargs)
     log["ch"]["remort"] = (int)iargs.ch->getPC()->getRemorts().size();
     log["ch"]["room"] = iargs.ch->in_room->vnum;
 
-    DLString defaultPrompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x>%c";
+    DLString defaultPrompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x %S>%c";
     if (!IS_SET(iargs.ch->comm, COMM_PROMPT))
         log["cfg"]["prompt"] = "off";
     else if (iargs.ch->prompt != defaultPrompt)
