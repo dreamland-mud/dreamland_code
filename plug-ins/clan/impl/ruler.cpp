@@ -126,36 +126,6 @@ bool ClanGuardRulerPre::specFight( )
 /*--------------------------------------------------------------------------
  * Ruler's Clan Guard 
  *------------------------------------------------------------------------*/
-void ClanGuardRuler::greet( Character *wch )
-{
-    Object *obj;
-    PCharacter *pch = wch->getPC( );
-    ClanArea::Pointer clanArea;
-
-    clanArea = getClanArea( );
-
-    if (!clanArea)
-        return;
-
-    if (wch->is_npc( ) || wch->is_immortal( ))
-        return;
-
-    if (pch->getClan( ) == clan) 
-        return;
-
-    if (( obj = clanArea->findInvitation( pch ) )) {
-        actInvited( pch, obj );
-//        extract_obj(obj);
-        return;
-    }
-
-    if (checkGhost( pch ))
-        return;
-    
-    actIntruder( pch );
-    doAttack( pch );
-}
-
 int ClanGuardRuler::getCast( Character *victim )
 {
     int sn = -1;

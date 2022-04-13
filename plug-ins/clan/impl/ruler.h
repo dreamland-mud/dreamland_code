@@ -30,8 +30,6 @@ XML_OBJECT
 public:
         typedef ::Pointer<ClanGuardRuler> Pointer;
     
-        virtual void greet( Character * );
-
 protected:        
         virtual int getCast( Character * );
 };
