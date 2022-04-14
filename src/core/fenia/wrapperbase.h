@@ -50,6 +50,7 @@ public:
     inline long long getID() const;
 
     bool hasTrigger( const DLString &name ) const;
+    bool hasField(const DLString &name) const;
     void collectTriggers(StringSet &triggers, StringSet &misc) const;
     bool triggerFunction(const Register &key, Register &prog) const;
     static void triggerArgs( RegisterList &regList, const char *fmt, va_list ap );

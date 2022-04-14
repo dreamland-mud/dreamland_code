@@ -152,6 +152,13 @@ bool WrapperBase::hasTrigger(const DLString &name ) const
     return triggerFunction(onId, prog);
 }
 
+bool WrapperBase::hasField(const DLString &name) const
+{
+    Scripting::IdRef fieldId(name);
+    Lex::id_t id = ((Register)fieldId).toIdentifier();
+    return guts.find(id) != guts.end();
+}
+
 bool WrapperBase::triggerFunction(const Register &key, Register &prog) const
 {    
     Lex::id_t id = key.toIdentifier( );

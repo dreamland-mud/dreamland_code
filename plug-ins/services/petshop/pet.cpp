@@ -11,6 +11,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "wrapperbase.h"
 
 #include "dreamland.h"
 #include "occupations.h"
@@ -54,6 +55,15 @@ bool Pet::area( )
         // nothing to do, still at pet storage room
         return false;
     }
+
+    {
+        // Druid spirits share the same behavior, but are not affected by auto-extract.
+        // Their 'master' will be null once in switched state, causing them to disappear by mistake.
+        WrapperBase *wbase = ch->getWrapper();
+        if (wbase && wbase->hasField("bound_player"))
+            return false;
+    }
+    
 
 	DLString msg = fmt(0, "Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и ", ch);
 	if (is_flying(ch))
