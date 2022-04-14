@@ -360,6 +360,7 @@ public:
         const CharDeathEvent &evt = static_cast<const CharDeathEvent &>(event);
         Character *victim = evt.victim;
         Character *killer = evt.killer;
+	int bodypart = evt.bodypart;
 
         //transfer the killer flag to master if killer is a charmed npc
         if (killer->is_npc() && killer->master && !killer->master->is_npc())
@@ -368,8 +369,7 @@ public:
         DeathPenalties( killer, victim ).run( );
 
         group_gain( killer, victim, evt.killer );
-        raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-        pk_gain( killer, victim );
+        raw_kill( victim, bodypart, killer );
     }
 };
 
@@ -635,24 +635,6 @@ static void corpse_reequip( Character *victim )
         obj->wear_loc->equip( obj );
 }
 
-/*  
- *  disintegrate the objects... 
- */
-void purge_corpse( Character *killer, Character *ch )
-{
-    dreamland->removeOption( DL_SAVE_OBJS );
-    dreamland->removeOption( DL_SAVE_MOBS );
-
-    corpse_fill( NULL, ch, FLOOT_PURGE );
-    ch->gold = 0;
-    ch->silver = 0;
-
-    dreamland->resetOption( DL_SAVE_OBJS );
-    dreamland->resetOption( DL_SAVE_MOBS );
-
-    save_items( ch->in_room );
-    save_mobs( ch->in_room );
-}
 
 /*
  * Make a corpse out of a character.
@@ -853,7 +835,7 @@ void death_cry( Character *ch, int part )
     ch->parts = bodyparts;
 }
 
-void reset_dead_player( PCharacter *victim )
+static void reset_dead_player( PCharacter *victim )
 {
     for (auto &paf: victim->affected.clone())
         affect_remove( victim, paf );
@@ -873,13 +855,13 @@ void reset_dead_player( PCharacter *victim )
         desireManager->find( i )->reset( victim );
 }
 
-void killed_npc_gain( NPCharacter *victim )
+static void killed_npc_gain( NPCharacter *victim )
 {
     victim->getNPC( )->pIndexData->killed++;
     kill_table[URANGE(0, victim->getRealLevel( ), MAX_LEVEL-1)].killed++;
 }
 
-void ghost_gain( Character *victim )
+static void ghost_gain( Character *victim )
 {
     if (!victim->is_npc( )) {
         SET_DEATH_TIME(victim);
@@ -906,7 +888,7 @@ static bool oprog_death( Character *victim, Character *killer )
     return false;
 }
 
-void loyalty_gain( Character *ch, Character *victim, int flags )
+static void loyalty_gain( Character *ch, Character *victim, int flags )
 {
     if (!ch)
         return;
@@ -920,7 +902,7 @@ void loyalty_gain( Character *ch, Character *victim, int flags )
     if (!ch->is_npc( ))
         ch->getPC( )->loyalty = min ( ch->getPC( )->loyalty+25, 1000 );
     
-    if (IS_SET(flags, FKILL_REABILITATE) || victim->getPC( )->loyalty > -900)
+    if (victim->getPC( )->loyalty > -900)
         REMOVE_BIT(victim->act, PLR_WANTED);
 }
 
@@ -1000,15 +982,9 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
         return;
     }
     
-    if (IS_SET(flags, FKILL_CRY))
-        death_cry( victim, part );
+    death_cry( victim, part );
 
-    if (IS_SET(flags, FKILL_CORPSE))
-        make_corpse( ch, victim );
-    else {
-		if (IS_SET(flags, FKILL_PURGE))
-        	purge_corpse( ch, victim );
-	}
+    make_corpse( ch, victim );
     
     DLString msg = death_message(victim, ch);
     int wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
@@ -1020,47 +996,56 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
             send_telegram(msg);
     }
 
-    if (ch && mprog_kill( ch, victim ))
-        ch = NULL;
+    if (ch)
+	mprog_kill( ch, victim );
 
     if (victim->is_npc( )) {
         killed_npc_gain( victim->getNPC( ) );
-
-        if (IS_SET(flags, FKILL_MOB_EXTRACT))
-            extract_char( victim );
-        else
-        {
-            victim->setDead( );
-            DeathAutoCommands( ch, victim ).run( );   
-        }    
-
+	victim->setDead( );
+	DeathAutoCommands( ch, victim ).run( );   
         return;
     }
 
     victim->getPC( )->getAttributes( ).handleEvent( DeathArguments( victim->getPC( ), ch ) );
     
-    extract_dead_player( victim->getPC( ), FEXTRACT_COUNT | (IS_SET(flags, FKILL_PURGE) ? FEXTRACT_LASTFOUGHT : 0));
+    extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
     reset_dead_player( victim->getPC( ) );
     loyalty_gain( ch, victim, flags );
 
-    if (IS_SET(flags, FKILL_GHOST))
-        ghost_gain( victim );
+    ghost_gain( victim );
     
     corpse_reequip( victim );
 
-    victim->getPC( )->save( );
+    if (ch && !ch->is_npc() && ch != victim ) {
+	set_killer( ch );
+	set_slain( victim );
+	ch->getClan( )->handleVictory( ch->getPC( ), victim->getPC( ) );
+	victim->getClan( )->handleDefeat( victim->getPC( ), ch->getPC( ) );
+    }
+
+    victim->getPC()->save();
+    ch->getPC()->save();
 }
 
-void pk_gain( Character *killer, Character *victim )
+/*
+ * Extract мертвого игрока
+ */
+static void extract_dead_player( PCharacter *ch, int flags )
 {
-    if ( !killer->is_npc() && !victim->is_npc() && killer != victim )
-    {
-        set_killer( killer );
-        set_slain( victim );
-        killer->getClan( )->handleVictory( killer->getPC( ), victim->getPC( ) );
-        victim->getClan( )->handleDefeat( victim->getPC( ), killer->getPC( ) );
+    Room *altar;
+    
+    nuke_pets( ch, flags );
+    ch->die_follower( );
 
+    undig( ch );
+    ch->dismount( );
+    
+    if (( altar = get_room_instance( ch->getHometown( )->getAltar( ) ) )) {
+        char_from_room( ch );
+        char_to_room( ch, altar );
     }
+
+    notify_referers( ch, flags );
 }
 
 extern "C"

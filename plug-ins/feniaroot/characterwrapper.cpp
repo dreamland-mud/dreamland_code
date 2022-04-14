@@ -1806,7 +1806,7 @@ NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer]]): убить. ча
             killer = arg2character( *i );
     }
     
-    raw_kill( target, part, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+    raw_kill( target, part, killer );
     return Register( );
 }
 

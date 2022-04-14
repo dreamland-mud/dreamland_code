@@ -54,7 +54,6 @@ void do_yell( Character *, const char * );
 #define    FEXTRACT_TOTAL  (A)
 #define    FEXTRACT_COUNT  (B)
 #define    FEXTRACT_LASTFOUGHT  (C)
-void        extract_dead_player( PCharacter *, int flags );
 void        extract_char( Character *, bool fCount = true );
 
 #define IS_TRUSTED(ch,level)        (( ch->get_trust() ) >= (level))

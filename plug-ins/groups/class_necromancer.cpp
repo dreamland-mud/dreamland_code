@@ -44,41 +44,6 @@
 
 
 SPELL_DECL(PowerWordKill);
-VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-        int dam;
-
-        if ( victim->fighting )
-        {
-                ch->pecho("Ты не можешь сосредоточиться.. Жертва слишком быстро движется.");
-                return;
-        }
-
-        ch->setWait( skill->getBeats(ch) );
-
-        oldact_p("Поток мрака, созданный тобой, окутывает $C4.",
-                ch, 0, victim, TO_CHAR, POS_RESTING);
-        oldact_p("$c1 создает поток мрака, окутывая $C4.",
-                ch, 0, victim, TO_NOTVICT, POS_RESTING);
-        oldact_p("$C1 создает поток мрака, окутывая тебя.",
-                victim, 0, ch, TO_CHAR, POS_RESTING);
-
-        if ( victim->is_immortal()
-                || saves_spell(level,victim,DAM_MENTAL, ch, DAMF_MAGIC)
-                || number_percent () > 50 )
-        {
-                dam = dice( level , 24 ) ;
-                damage_nocatch(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_MAGIC);
-                return;
-        }
-
-        victim->pecho("Тебя {RУБИЛИ{x!");
-
-        group_gain( ch, victim );
-        raw_kill( victim, -1, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-        pk_gain( ch, victim );
-}
-
 
 
 SPELL_DECL(Insanity);

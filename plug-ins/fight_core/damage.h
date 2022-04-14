@@ -82,9 +82,10 @@ protected:
 };
 
 struct CharDeathEvent : public Event {
-    CharDeathEvent(Character *victim, Character *killer);
+    CharDeathEvent(Character *victim, Character *killer, int bodypart = -1);
     Character *victim;
     Character *killer;
+    int bodypart;
 };
 
 #endif

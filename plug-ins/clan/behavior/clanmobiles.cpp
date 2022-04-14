@@ -303,7 +303,7 @@ bool ClanGuard::checkGhost( PCharacter *wch )
         oldact("Ты хладнокровно убивает $C4!", ch, 0, wch, TO_CHAR );
         oldact("$c1 хладнокровно убивает тебя!", ch, 0, wch, TO_VICT );
         oldact("$c1 хладнокровно убивает $C4!", ch, 0, wch, TO_NOTVICT );
-        raw_kill( wch, -1, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+        raw_kill( wch, -1, 0 );
         return true;
     }
 
