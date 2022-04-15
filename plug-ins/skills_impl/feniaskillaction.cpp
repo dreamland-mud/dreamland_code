@@ -18,6 +18,7 @@
 #include "character.h"
 #include "core/object.h"
 #include "room.h"
+#include "fight_exception.h"
 #include "act.h"
 #include "dl_math.h"
 #include "math_utils.h"
