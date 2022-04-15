@@ -227,7 +227,7 @@ NMI_INVOKE(FeniaSpellContext, groupCast, "(func): вызвать ф-ию для 
         } catch (const CustomException &ce) {
 
         } catch (const VictimDeathException &vde) {
-            
+            throw Scripting::CustomException("victim is dead");
         }
     }
 
@@ -265,7 +265,7 @@ NMI_INVOKE(FeniaSpellContext, damageRoom, "(func): вызвать ф-ию для
         } catch (const CustomException &ce) {
 
         } catch (const VictimDeathException &vde) {
-            
+            throw Scripting::CustomException("victim is dead");
         }
     }
 
@@ -302,7 +302,7 @@ NMI_INVOKE(FeniaSpellContext, damageItems, "(func): вызвать ф-ию дл�
         } catch (const CustomException &ce) {
 
         } catch (const VictimDeathException &vde) {
-
+            throw Scripting::CustomException("victim is dead");
         }        
     }
 
