@@ -194,7 +194,9 @@ bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLStrin
         method.toFunction()->invoke(Register(ctx->getSelf()), RegisterList());
 
     } catch (const CustomException &ce) {
-        // Do nothing on victim's death.
+        // Propagate exception further on victim's death.
+        if (ce.message == "victim is dead")
+            throw VictimDeathException();        
 
     } catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
