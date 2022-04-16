@@ -905,14 +905,12 @@ static bool oprog_death( Character *victim, Character *killer )
     return false;
 }
 
+// Killing a wanted players increases your loyalty.
 static void loyalty_gain( Character *ch, Character *victim )
 {
     if (!ch)
         return;
 
-    if (victim->is_npc( ))
-        return;
-        
     if (!IS_SET(victim->act, PLR_WANTED))
         return;
     
@@ -1011,6 +1009,7 @@ void raw_kill( Character* victim, int part, Character* ch )
 
     DeathPenalties(ch, victim).run();
 
+    // Experience gain!
     group_gain(ch, victim, realKiller);
 
     // Death special effects. TODO move to global onDeath trigger (and add 'bodypart' trigger param).
@@ -1031,7 +1030,7 @@ void raw_kill( Character* victim, int part, Character* ch )
         }
     }
 
-    // MOB killed
+    // MOB is killed.
     if (victim->is_npc( )) {
         killed_npc_gain( victim->getNPC( ) );
     	victim->setDead( );
@@ -1039,19 +1038,23 @@ void raw_kill( Character* victim, int part, Character* ch )
         return;
     }
 
-    // PLAYER killed
+    // PLAYER is killed.
 
+    // Notify various attributes about player death, e.g. quest data.
     victim->getPC( )->getAttributes( ).handleEvent( DeathArguments( victim->getPC( ), ch ) );
-    
+
+    // Reset player and move them to the altar.    
     extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
+    
     reset_dead_player( victim->getPC( ) );
+    
     loyalty_gain( ch, victim );
 
     ghost_gain( victim );
     
     corpse_reequip( victim );
 
-    // Player kills another player
+    // Player kills another player: flag and clan stats gain.
     if (ch && !ch->is_npc() && ch != victim) {
         set_killer( ch );
         set_slain( victim );
