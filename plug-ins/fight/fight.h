@@ -50,6 +50,7 @@ void        group_gain( Character *ch, Character *victim, Character *realKiller 
 /* death handling routines (fight_death.cpp) */
 void        raw_kill( Character* victim, int part, Character* ch );
 void        death_cry( Character *ch, int part = -1 );
+Object * bodypart_create( int vnum, Character *ch, Object *corpse );
 
 /* subroutines (fight_subr.cpp) */
 void        check_assist(Character *ch,Character *victim);

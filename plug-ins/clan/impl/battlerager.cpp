@@ -45,8 +45,6 @@
 using std::max;
 using std::min;
 
-Object * bodypart_create( int vnum, Character *ch, Object *corpse );
-
 #define OBJ_VNUM_BATTLE_PONCHO       26
 
 CLAN(battlerager);

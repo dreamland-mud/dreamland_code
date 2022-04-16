@@ -51,6 +51,9 @@
 #include "def.h"
 
 
+void nuke_pets( PCharacter *ch, int flags );
+void notify_referers( Character *ch, int flags );
+
 // A set of PK looting rules defined in fight/loot.json.
 Json::Value loot;
 CONFIGURABLE_LOADED(fight, loot)
@@ -360,15 +363,8 @@ public:
         const CharDeathEvent &evt = static_cast<const CharDeathEvent &>(event);
         Character *victim = evt.victim;
         Character *killer = evt.killer;
-	int bodypart = evt.bodypart;
+	    int bodypart = evt.bodypart;
 
-        //transfer the killer flag to master if killer is a charmed npc
-        if (killer->is_npc() && killer->master && !killer->master->is_npc())
-            killer = killer->master;
-
-        DeathPenalties( killer, victim ).run( );
-
-        group_gain( killer, victim, evt.killer );
         raw_kill( victim, bodypart, killer );
     }
 };
@@ -639,7 +635,7 @@ static void corpse_reequip( Character *victim )
 /*
  * Make a corpse out of a character.
  */
-void make_corpse( Character *killer, Character *ch )
+static void make_corpse( Character *killer, Character *ch )
 {
     Object *corpse;
     
@@ -855,6 +851,27 @@ static void reset_dead_player( PCharacter *victim )
         desireManager->find( i )->reset( victim );
 }
 
+/*
+ * Extract мертвого игрока
+ */
+static void extract_dead_player( PCharacter *ch, int flags )
+{
+    Room *altar;
+    
+    nuke_pets( ch, flags );
+    ch->die_follower( );
+
+    undig( ch );
+    ch->dismount( );
+    
+    if (( altar = get_room_instance( ch->getHometown( )->getAltar( ) ) )) {
+        char_from_room( ch );
+        char_to_room( ch, altar );
+    }
+
+    notify_referers( ch, flags );
+}
+
 static void killed_npc_gain( NPCharacter *victim )
 {
     victim->getNPC( )->pIndexData->killed++;
@@ -888,7 +905,7 @@ static bool oprog_death( Character *victim, Character *killer )
     return false;
 }
 
-static void loyalty_gain( Character *ch, Character *victim, int flags )
+static void loyalty_gain( Character *ch, Character *victim )
 {
     if (!ch)
         return;
@@ -963,89 +980,87 @@ static DLString death_message(Character *victim, Character *ch)
     }
 }
 
-void raw_kill( Character* victim, int part, Character* ch, int flags )
+/*
+ * Main death handler.
+ */ 
+void raw_kill( Character* victim, int part, Character* ch )
 {
+    Character *realKiller = ch;
+
+    // Transfer the killer flag to master if killer is a charmed npc.
+    if (ch && ch->is_npc() && ch->master && !ch->master->is_npc())
+        ch = ch->master;
 
     stop_fighting( victim, true );
-    
-    if (oprog_death( victim, ch )) {
-        victim->position = POS_STANDING;
-        return;
-    }
-    
     victim->unsetLastFightTime( );
+    
+    // onDeath obj trigger for carried item can interrupt normal death handling.
+    if (oprog_death( victim, ch ))
+        return;
+    
+    if (ch)
+    	mprog_kill( ch, victim );
+
+    // onDeath mob trigger can interrupt normal death handling.
+    if (mprog_death( victim, ch ))
+        return;
+
+    // From this point on the death has certainly happened.
 
     gprog("onDeath", "CC", victim, ch);
 
-    if (mprog_death( victim, ch )) {
-        victim->setDead( );
-        return;
-    }
-    
+    DeathPenalties(ch, victim).run();
+
+    group_gain(ch, victim, realKiller);
+
+    // Death special effects. TODO move to global onDeath trigger (and add 'bodypart' trigger param).
     death_cry( victim, part );
 
     make_corpse( ch, victim );
-    
-    DLString msg = death_message(victim, ch);
-    int wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
-    wiznet(wizflag, 0, victim->get_trust(), msg.c_str(), victim, ch);
 
-    if (!victim->is_npc()) {
-        send_discord_death(msg);
-        if (ch && !ch->is_npc() && ch != victim)
-            send_telegram(msg);
+    // Death notification: wiznet/discord/telegram. TODO move to global onDeath trigger.
+    {
+        DLString msg = death_message(victim, ch);
+        int wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
+        wiznet(wizflag, 0, victim->get_trust(), msg.c_str(), victim, ch);
+
+        if (!victim->is_npc()) {
+            send_discord_death(msg);
+            if (ch && !ch->is_npc() && ch != victim)
+                send_telegram(msg);
+        }
     }
 
-    if (ch)
-	mprog_kill( ch, victim );
-
+    // MOB killed
     if (victim->is_npc( )) {
         killed_npc_gain( victim->getNPC( ) );
-	victim->setDead( );
-	DeathAutoCommands( ch, victim ).run( );   
+    	victim->setDead( );
+	    DeathAutoCommands( ch, victim ).run( );   
         return;
     }
+
+    // PLAYER killed
 
     victim->getPC( )->getAttributes( ).handleEvent( DeathArguments( victim->getPC( ), ch ) );
     
     extract_dead_player( victim->getPC( ), FEXTRACT_COUNT );
     reset_dead_player( victim->getPC( ) );
-    loyalty_gain( ch, victim, flags );
+    loyalty_gain( ch, victim );
 
     ghost_gain( victim );
     
     corpse_reequip( victim );
 
-    if (ch && !ch->is_npc() && ch != victim ) {
-	set_killer( ch );
-	set_slain( victim );
-	ch->getClan( )->handleVictory( ch->getPC( ), victim->getPC( ) );
-	victim->getClan( )->handleDefeat( victim->getPC( ), ch->getPC( ) );
+    // Player kills another player
+    if (ch && !ch->is_npc() && ch != victim) {
+        set_killer( ch );
+        set_slain( victim );
+        ch->getClan( )->handleVictory( ch->getPC( ), victim->getPC( ) );
+        victim->getClan( )->handleDefeat( victim->getPC( ), ch->getPC( ) );
+        ch->getPC()->save();
     }
 
     victim->getPC()->save();
-    ch->getPC()->save();
-}
-
-/*
- * Extract мертвого игрока
- */
-static void extract_dead_player( PCharacter *ch, int flags )
-{
-    Room *altar;
-    
-    nuke_pets( ch, flags );
-    ch->die_follower( );
-
-    undig( ch );
-    ch->dismount( );
-    
-    if (( altar = get_room_instance( ch->getHometown( )->getAltar( ) ) )) {
-        char_from_room( ch );
-        char_to_room( ch, altar );
-    }
-
-    notify_referers( ch, flags );
 }
 
 extern "C"
