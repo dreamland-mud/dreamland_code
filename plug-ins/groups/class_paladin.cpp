@@ -119,29 +119,6 @@ SKILL_RUNP( layhands )
 }
 
 SPELL_DECL(Banishment);
-VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    if (!victim->is_npc( ) 
-        || (!IS_SET( victim->form, FORM_UNDEAD )
-           && !IS_SET( victim->act, ACT_UNDEAD )
-           && victim->getRace( ) != race_demon
-           && victim->getRace( ) != race_golem))
-    {
-        oldact("К сожалению, $C1 -- не нечисть, не демон и не богомерзкий голем.", ch, 0, victim, TO_CHAR);
-        return;
-    }
-    
-    if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_PRAYER)) {
-        oldact("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR);
-        return;
-    }
-    
-    oldact_p("Возникает ослепительная вспышка, она поглощает $c4 и $e исчезает.",
-            victim, 0, 0, TO_ROOM, POS_RESTING);
-        
-    raw_kill( victim, -1, ch, FKILL_MOB_EXTRACT );
-}
 
 
 SPELL_DECL(Prayer);

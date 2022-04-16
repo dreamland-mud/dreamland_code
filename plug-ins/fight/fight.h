@@ -48,15 +48,9 @@ void yell_panic( Character *ch, Character *victim, const char *msgBlind = NULL, 
 void        group_gain( Character *ch, Character *victim, Character *realKiller = 0 );
 
 /* death handling routines (fight_death.cpp) */
-#define    FKILL_CRY          (A)
-#define    FKILL_GHOST        (B)
-#define    FKILL_CORPSE       (C)
-#define    FKILL_PURGE        (D)
-#define    FKILL_MOB_EXTRACT  (E)
-#define    FKILL_REABILITATE  (F)
-void        raw_kill( Character* victim, int part, Character* ch, int flags );
+void        raw_kill( Character* victim, int part, Character* ch );
 void        death_cry( Character *ch, int part = -1 );
-void        pk_gain( Character *ch, Character *victim );
+Object * bodypart_create( int vnum, Character *ch, Object *corpse );
 
 /* subroutines (fight_subr.cpp) */
 void        check_assist(Character *ch,Character *victim);

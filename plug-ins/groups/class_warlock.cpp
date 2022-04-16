@@ -88,56 +88,6 @@ SKILL_RUNP( blink )
 }
 
 SPELL_DECL(Disintegrate);
-VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-        int dam=0;
-
-        if ( victim->fighting )
-        {
-                ch->pecho("Ты не можешь прицелиться, жертва слишком быстро движется.");
-                return;
-        }
-
-        short chance = 50;
-
-        if ( !victim->is_npc() )
-                chance /= 2;
-
-        if ( saves_spell(level,victim,DAM_MENTAL,ch, DAMF_MAGIC) )
-                chance = 0;
-
-        ch->setWait( skill->getBeats(ch) );
-        
-        if ( !ch->is_immortal()
-                && ( victim->is_immortal()
-                        || number_percent() > chance ) )
-        {
-                dam = dice( level , 24 ) ;
-                damage_nocatch(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_MAGIC);
-                return;
-        }
-
-        oldact_p("$C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x тебя!",
-                victim, 0, ch, TO_CHAR, POS_RESTING);
-        oldact_p("$c1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x $C4!",
-                ch, 0, victim, TO_NOTVICT, POS_RESTING);
-        oldact_p("Разрушающим световым лучом ты {R###ПОЛНОСТЬЮ УНИЧТОЖАЕШЬ###{x $C4!",
-                ch, 0, victim, TO_CHAR, POS_RESTING);
-        victim->pecho("Тебя {RУБИЛИ{x!");
-
-        oldact("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR);
-        oldact("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM);
-
-        victim->pecho("{YБожественные Силы возвращают тебя к жизни!{x");
-        
-        group_gain( ch, victim );
-        raw_kill( victim, -1, ch, FKILL_REABILITATE | FKILL_PURGE | FKILL_MOB_EXTRACT );
-        pk_gain( ch, victim );
-        
-        victim->hit  = 1;
-        victim->mana = 1;
-}
-
 
 SPELL_DECL(Scream);
 VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level ) 

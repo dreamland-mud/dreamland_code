@@ -50,10 +50,11 @@ PROF(warrior);
 
 void do_visible( Character * );
 
-CharDeathEvent::CharDeathEvent(Character *victim, Character *killer) 
+CharDeathEvent::CharDeathEvent(Character *victim, Character *killer, int bodypart) 
 {
     this->victim = victim;
     this->killer = killer;    
+    this->bodypart = bodypart;
 }
 
 /*-----------------------------------------------------------------------------

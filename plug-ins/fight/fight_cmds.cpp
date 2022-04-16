@@ -216,7 +216,7 @@ CMDRUN( slay )
     oldact("Ты хладнокровно умерщвляешь $C4!", ch, 0, victim, TO_CHAR);
     oldact("$c1 хладнокровно умерщвляет тебя!", ch, 0, victim, TO_VICT);
     oldact("$c1 хладнокровно умерщвляет $C4!", ch, 0, victim, TO_NOTVICT);
-    raw_kill( victim, -1, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+    raw_kill( victim, -1, 0 );
     if( !ch->is_npc() && !victim->is_npc() && ch != victim )
     {
         set_slain( victim );

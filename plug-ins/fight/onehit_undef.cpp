@@ -264,11 +264,9 @@ void UndefinedOneHit::damEffectVorpal()
     victim->pecho(msgVict, victim);
     victim->recho(msgOther, victim);
     victim->recho("%^C1 уже ТРУП!", victim);
-
-    group_gain( ch, victim );
-    raw_kill( victim, 3, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-    pk_gain( ch, victim );
     victim->pecho("Тебя УБИЛИ!");
+
+    eventBus->publish(CharDeathEvent(victim, ch, 3));
     throw VictimDeathException( );
 }
 

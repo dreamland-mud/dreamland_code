@@ -370,29 +370,6 @@ void notify_referers( Character *ch, int flags )
 }
 
 /*
- * Extract мертвого игрока
- */
-void extract_dead_player( PCharacter *ch, int flags )
-{
-    Room *altar;
-    
-    nuke_pets( ch, flags );
-    ch->die_follower( );
-
-    stop_fighting( ch, true );
-    
-    undig( ch );
-    ch->dismount( );
-    
-    if (( altar = get_room_instance( ch->getHometown( )->getAltar( ) ) )) {
-        char_from_room( ch );
-        char_to_room( ch, altar );
-    }
-
-    notify_referers( ch, flags );
-}
-
-/*
  * Extract a char from the world.
  */
 void extract_char( Character *ch, bool count )
