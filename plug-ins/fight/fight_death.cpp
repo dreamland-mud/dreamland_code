@@ -277,6 +277,9 @@ protected:
         if (ch->is_npc( )) 
             return false;
         
+        if (!killer)
+            return false;
+            
         if (ch != killer
             && !(killer->is_npc( ) && !killer->master && !killer->leader)
             && !IS_SET(ch->act, PLR_WANTED))
@@ -1010,7 +1013,8 @@ void raw_kill( Character* victim, int part, Character* ch )
     DeathPenalties(ch, victim).run();
 
     // Experience gain!
-    group_gain(ch, victim, realKiller);
+    if (ch)
+        group_gain(ch, victim, realKiller);
 
     // Death special effects. TODO move to global onDeath trigger (and add 'bodypart' trigger param).
     death_cry( victim, part );
