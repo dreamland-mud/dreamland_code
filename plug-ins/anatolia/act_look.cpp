@@ -699,15 +699,15 @@ void show_char_to_char_0( Character *victim, Character *ch )
     
     if (nVict) {
         buf << "{" << CLR_MOB(ch) << "{1";;
-        webManipManager->decorateCharacter(buf, ch->sees( victim, '1' ).capitalize(), victim, ch);
+        webManipManager->decorateCharacter(buf, ch->sees( victim, '1' ).upperFirstCharacter(), victim, ch);
     }
     else {
         if (ch->getConfig( ).holy && origVict != victim)
-            buf << "{1" << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ).capitalize() << "{2 "
+            buf << "{1" << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ).upperFirstCharacter() << "{2 "
                 << "(под личиной " << ch->sees( victim, '2' ) << ") ";
         else {
             buf << "{1" << "{" << CLR_PLAYER(ch);
-            webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ).capitalize(), victim, ch );
+            webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ).upperFirstCharacter(), victim, ch );
             buf << "{2";
         }
 
