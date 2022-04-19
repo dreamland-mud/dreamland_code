@@ -136,12 +136,9 @@ CMDRUN( murder )
 
      ch->setWaitViolence( 1 );
 
-//    if ( !victim->is_npc()
-//        || ( ch->is_npc() && victim->is_npc() ) )
     yell_panic( ch, victim,
                 "Помогите! На меня кто-то напал!",
-                "Помогите! На меня напа%1$Gло|л|ла %1$C1!",
-                FYP_VICT_ANY );
+                "Помогите! На меня напа%1$Gло|л|ла %1$C1!" );
     
     if (gsn_mortal_strike->getCommand( )->apply( ch, victim ))
         return;

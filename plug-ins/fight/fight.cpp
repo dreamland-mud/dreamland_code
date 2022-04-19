@@ -477,16 +477,16 @@ static inline bool must_not_yell( Character *ch, Character *victim, int flags )
     if (!ch || !victim || ch == victim)
         return true;
     
-    /* sleeping victims yell only with FYP_SLEEP flag */
-    if (!IS_AWAKE(victim) && !IS_SET(flags, FYP_SLEEP))
+    /* sleeping victims don't yell */
+    if (!IS_AWAKE(victim))
         return true;
     
     /* players yell always */
     if (!victim->is_npc( ))
         return false;
     
-    /* in some cases (like murder or shooting) mobs yell always too */
-    if (IS_SET(flags, FYP_VICT_ANY))
+    /* in some cases (like shooting) mobs yell always too */
+    if (ch->in_room != victim->in_room)
         return false;
     
     /* by default mobs are silent */

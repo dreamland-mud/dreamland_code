@@ -1584,8 +1584,7 @@ SKILL_RUNP( poison )
                         if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
                             yell_panic( ch, tmp_vict,
                                         "Помогите! Меня пытаются отравить!",
-                                        "Помогите! %1$^C1 травит меня дымом!",
-                                        FYP_SLEEP );
+                                        "Помогите! %1$^C1 травит меня дымом!");
 
                         spell( gsn_poison, skill_level(*gsn_poison_smoke, ch), ch, tmp_vict );
 
@@ -1645,8 +1644,7 @@ SKILL_APPLY( blindness )
             if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
                 yell_panic( ch, tmp_vict,
                             "Помогите! Кто-то слепит меня пылью!",
-                            "Помогите! %1$^C1 слепит меня пылью!",
-                            FYP_SLEEP );
+                            "Помогите! %1$^C1 слепит меня пылью!");
             
             spell( gsn_blindness, skill_level(*gsn_blindness_dust, ch), ch, tmp_vict );
 
