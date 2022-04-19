@@ -32,15 +32,15 @@ CodeSourceRepo::CodeSourceRepo()
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^(skillcommand/[a-z ]{2,})/([a-zA-Z]+)$", true));
     subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(areas/[-a-z0-9]{2,}.are/[a-z]+)/([0-9.a-zA-Z ]+)$", true));
+        RegExp::Pointer(NEW, "^(areas/[-a-z0-9]{2,}.are/[a-z]+)/([-0-9.a-zA-Z ]+)$", true));
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^(areas/[-a-z0-9]{2,}.are)/([a-z]+)$", true));
     subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^([a-z]+)/([0-9.a-zA-Z :]+)$", true));
+        RegExp::Pointer(NEW, "^([a-z]+)/([-0-9.a-zA-Z :]+)$", true));
     subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(global/on[A-Z][a-z]+)/([_a-zA-Z]+)$", true));
+        RegExp::Pointer(NEW, "^(global/on[A-Z][a-z]+)/([-_a-zA-Z]+)$", true));
     subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(global/post[A-Z][a-z]+)/([_a-zA-Z]+)$", true));
+        RegExp::Pointer(NEW, "^(global/post[A-Z][a-z]+)/([-_a-zA-Z]+)$", true));
 }
 
 CodeSourceRepo::~CodeSourceRepo() 
