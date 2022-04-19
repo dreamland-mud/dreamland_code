@@ -34,7 +34,8 @@ public:
         Context::current->scope = this;
     }
     ~CppScopeClobber() {
-        Context::current->scope = parent;
+        if (Context::current)
+            Context::current->scope = parent;
     }
 };
 
@@ -44,7 +45,8 @@ public:
         Context::current->scope = this;
     }
     ~CppScopeClobberRoot() {
-        Context::current->scope = save;
+        if (Context::current)
+            Context::current->scope = save;
     }
 
     Scope *save;
