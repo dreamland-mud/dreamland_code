@@ -150,10 +150,21 @@ NMI_GET( CharacterWrapper, online, "true, если персонаж в мире"
     return Register( target != NULL );
 }
 
-NMI_GET( CharacterWrapper, dead, "true, если персонаж полностью уничтожен (suicide/remort для pc, смерть для npc)" )
+NMI_GET( CharacterWrapper, dead, "true, если персонажа уничтожили или моб только что умер" )
 {
-    return Register( zombie.getValue() );
+    if (zombie)
+        return true;
+
+    checkTarget();
+    return target->isDead();
 }
+
+NMI_SET( CharacterWrapper, dead, "true, если персонажа уничтожили или моб только что умер" )
+{
+    checkTarget( );
+    target->setDead();
+}
+
 
 #define CHK_PC \
     if (!target->is_npc()) \
@@ -2363,7 +2374,7 @@ NMI_INVOKE( CharacterWrapper, switchFrom, "(): выселиться из моб�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, setDead, "(): пометить моба как умершего" )
+NMI_INVOKE( CharacterWrapper, setDead, "(): DEPRECATED" )
 {
     checkTarget( );
     CHK_PC
@@ -2371,7 +2382,7 @@ NMI_INVOKE( CharacterWrapper, setDead, "(): пометить моба как у�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, isDead, "(): умер ли моб" )
+NMI_INVOKE( CharacterWrapper, isDead, "(): DEPRECATED" )
 {
     checkTarget( );
     CHK_PC
