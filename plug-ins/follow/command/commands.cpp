@@ -31,6 +31,7 @@
 RELIG(fili);
 WEARLOC(tattoo);
 CLAN(battlerager);
+CLAN(ruler);
 
 static bool check_mutual_induct( Character *ch, Character *victim, ClanReference &clan )
 {
