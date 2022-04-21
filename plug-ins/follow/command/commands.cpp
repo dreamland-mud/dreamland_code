@@ -92,7 +92,7 @@ CMDRUN( follow )
         return;
     }
     
-    if (!check_mutual_induct( ch, victim, clan_battlerager )) {
+    if (!(ch->isAffected( gsn_manacles ) && victim->getClan() == clan_ruler) && !check_mutual_induct( ch, victim, clan_battlerager )) {
         oldact("Ты не сможешь следовать за $C5.", ch, 0, victim, TO_CHAR);
         return;
     }
