@@ -20,6 +20,7 @@
 #include "room.h"
 #include "clanreference.h"
 #include "wearlocation.h"
+#include "skillreference.h"
 
 #include "follow_utils.h"
 #include "loadsave.h"
@@ -32,6 +33,7 @@ RELIG(fili);
 WEARLOC(tattoo);
 CLAN(battlerager);
 CLAN(ruler);
+GSN(manacles);
 
 static bool check_mutual_induct( Character *ch, Character *victim, ClanReference &clan )
 {
