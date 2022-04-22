@@ -39,7 +39,7 @@ void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage)
 int        move_dec( Character *ch );
 
 
-void yell_panic( Character *ch, Character *victim, const char *msgBlind = NULL, const char *msg = NULL, int flags = 0 );
+void yell_panic( Character *ch, Character *victim, const char *msgBlind = NULL, const char *msg = NULL );
 
 
 /* gaining experience (fight_exp.cpp) */

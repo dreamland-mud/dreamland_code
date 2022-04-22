@@ -91,7 +91,7 @@
 #include "vnum.h"
 #include "wearloc_utils.h"
 #include "skill_utils.h"
-
+#include "fenia_utils.h"
 #include "onehit_undef.h"
 #include "damage_impl.h"
 #include "fight.h"
@@ -471,7 +471,7 @@ void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool sh
     }
 }
 
-static inline bool must_not_yell( Character *ch, Character *victim, int flags )
+static inline bool must_not_yell( Character *ch, Character *victim )
 {
     /* sanity checks */
     if (!ch || !victim || ch == victim)
@@ -493,12 +493,14 @@ static inline bool must_not_yell( Character *ch, Character *victim, int flags )
     return true;
 }
 
-void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, int flags )
+void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg )
 {
     static const char *defaultMsgBlind = "Помогите! Кто-то напал на меня!";
     static const char *defaultMsg = "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!";
 
-    if (must_not_yell( ch, victim, flags ))
+    gprog("onPanicYell", "CCss", ch, victim, msgBlind ? msgBlind : defaultMsgBlind, msg ? msg : defaultMsg);
+
+    if (must_not_yell( ch, victim ))
         return;
 
     if (!victim->can_see( ch )) 
