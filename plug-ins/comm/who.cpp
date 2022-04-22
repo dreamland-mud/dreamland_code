@@ -94,9 +94,10 @@ list<PCMemoryInterface *> who_find_offline(PCharacter *looker)
     for (const auto &kv: PCharacterManager::getPCM()) {
         PCMemoryInterface *pcm = kv.second;
         Json::Value discord;
+        PCharacter *pch = pcm->getPlayer();
         
-        // Consider link dead people as offline.
-        if (pcm->getPlayer() && pcm->getPlayer()->desc)
+        // Consider link dead, non-switched people as offline.
+        if (pch && (pch->desc || pch->switchedTo))
             continue;
 
         if (get_json_attribute(pcm, "discord", discord) && !discord["id"].asString().empty()) {
