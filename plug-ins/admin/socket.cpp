@@ -20,6 +20,7 @@
 #include "serversocketcontainer.h"
 
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "merc.h"
 #include "descriptor.h"
@@ -72,7 +73,7 @@ CMDADM( socket )
             }
         }
 
-    ch->pecho("\n\r[Num Connected  Login Idl C P] Player Name  Host");
+    ch->pecho("\n\r[Num Connected  Login Idl C P] Player Name  Host            ");
     ch->pecho("--------------------------------------------------------------------------");
     count = 0;
 
@@ -84,11 +85,14 @@ CMDADM( socket )
         char idle[10];
 
         if (d->character) {
-            name = d->character->getName( );
+            PCharacter *player;
+
+            player = d->character->getPC();
+            name = player->getName();
             pcm = PCharacterManager::find( name );
             
             if (pcm) {
-                if (!ch->can_see( d->character ))
+                if (!ch->can_see(player))
                     continue;
 
                 // hide wizard login attempt
@@ -129,7 +133,7 @@ CMDADM( socket )
             p = (ServerSocketContainer::isWrapped(d->control) ? "*" : " "); 
         }
         
-        ch->printf( "[%3d %10s %-5s %s %c %s] %-12s %s\n\r",
+        ch->printf( "[%3d %10s %-5s %s %c %s] %-12s %-15s %s\n\r",
                         d->descriptor,
                         state,
                         logon,
@@ -141,7 +145,8 @@ CMDADM( socket )
 #endif
                         p.c_str( ),
                         name.c_str( ),
-                        (ip || !*myHost) ? myIP : myHost );
+                        (ip || !*myHost) ? myIP : myHost,
+                        (d->character && d->character->is_npc() ? "switched" : "") );
     }
 
     ch->printf( "\n\r%d user%s\n\r", count, count == 1 ? "" : "s" );
