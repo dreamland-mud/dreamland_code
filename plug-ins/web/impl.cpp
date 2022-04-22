@@ -114,7 +114,7 @@ void GroupWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &jso
 {
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
-
+    
     attr->updateIfNew( GROUP, jsonGroup( ch ), prompt ); 
 }    
 
@@ -159,10 +159,10 @@ Json::Value GroupWebPromptListener::jsonGroup( Character *ch )
     leader = (ch->leader != 0) ? ch->leader : ch;
 
     for (Character *gch = char_list; gch != 0; gch = gch->next )
-        if (is_same_group( gch, ch )) {
+        if (is_same_group( gch, ch ) && gch != leader) {
                 if (gch->is_npc( ))
                     mobs.push_back( gch );
-                else if (gch != leader)
+                else
                     players.push_back( gch );
         }
 
@@ -177,7 +177,7 @@ Json::Value GroupWebPromptListener::jsonGroup( Character *ch )
     }
 
     group["leader"] = jsonGroupMember( ch, leader );
-    group["ln"] = ch->sees( leader,'2' );
+    group["ln"] = ch->sees( leader,'2' ).colourStrip();
     return group;
 }
 
