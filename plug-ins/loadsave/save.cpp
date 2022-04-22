@@ -116,6 +116,7 @@ DESIRE(hunger);
 DESIRE(thirst);
 DESIRE(bloodlust);
 WEARLOC(none);
+CLAN(none);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 const FlagTable * affect_where_to_table(int where);
 int affect_table_to_where(const FlagTable *table, const GlobalRegistryBase *registry);
@@ -434,6 +435,9 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
 
         if (mob->getRealLevel( ) != mob->pIndexData->level)
                 fprintf(fp,"Levl %d\n", mob->getRealLevel( ) );
+
+        if (mob->getClan() != clan_none)
+            fprintf(fp, "Clan %s~\n", mob->getClan().getName().c_str());
 
         fprintf(fp, "HMV  %d %d %d %d %d %d\n",
                 mob->hit.getValue( ), mob->max_hit.getValue( ), mob->mana.getValue( ), mob->max_mana.getValue( ), mob->move.getValue( ), mob->max_move.getValue( ));
@@ -1195,6 +1199,18 @@ void fread_pet( PCharacter *ch, FILE *fp )
             
              case 'C':
                  KEY( "Comm",        pet->comm,                fread_flag(fp));
+
+                if (!str_cmp(word, "Clan")) {
+                    char *word = fread_string(fp);
+                    Clan *clan = clanManager->findExisting(word);
+                    if (clan)
+                        pet->setClan(clan->getName());
+
+                    fMatch = true;
+                    free_string( word );
+                    break;
+                }
+
                  break;
             
              case 'D':
@@ -1455,6 +1471,17 @@ NPCharacter * fread_mob( FILE *fp )
                     if (!str_cmp( word, "Cab" )) {
                         fread_number( fp );
                         fMatch = true;
+                        break;
+                    }
+
+                    if (!str_cmp(word, "Clan")) {
+                        char *word = fread_string(fp);
+                        Clan *clan = clanManager->findExisting(word);
+                        if (clan)
+                            mob->setClan(clan->getName());
+
+                        fMatch = true;
+                        free_string( word );
                         break;
                     }
 
