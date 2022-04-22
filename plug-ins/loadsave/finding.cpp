@@ -679,9 +679,6 @@ PCharacter * get_player_world( Character *ch, const char *arg, bool fSeenOnly )
 
         victim = d->character->getPC( );
 
-        if(victim->switchedTo)
-            continue;
-
         if (fSeenOnly && !ch->can_see( victim ))
             continue;
 
