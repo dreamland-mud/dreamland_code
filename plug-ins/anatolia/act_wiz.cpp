@@ -88,6 +88,7 @@
 #include "clan.h"
 #include "liquid.h"
 
+#include "playerattributes.h"
 #include "gsn_plugin.h"
 #include "npcharacter.h"
 #include "core/object.h"
@@ -1976,16 +1977,18 @@ CMDWIZP( return )
     if (mprog_return( mob ))
         return;
 
-    mob->pecho("Ты возвращаешься в своё привычное тело. Используй команду {y{hc{lRпрослушать{lEreplay{x для просмотра пропущенных сообщений.");
-    ch->prompt.clear( );
+    mob->pecho("Ты возвращаешься в своё привычное тело.");    
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, ch->get_trust( ), 
             "%C1 returns from %C2.", mob->switchedFrom, mob );
     
+    PCharacter *pch = mob->switchedFrom;
     mob->desc->associate( mob->switchedFrom );
     mob->switchedFrom->switchedTo = 0;
     mob->switchedFrom = 0;
     mob->desc = 0;
+
+    pch->getAttributes().handleEvent(AfkArguments(pch, false));
 }
 
 /* for clone, to insure that cloning goes many levels deep */
