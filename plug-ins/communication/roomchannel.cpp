@@ -27,7 +27,7 @@ void RoomChannel::findListeners( Character *ch, Listeners &listeners ) const
 
 void RoomChannel::postOutput( Character *outputTo, const DLString &message ) const
 {
-    if (outputTo->getPC( ))
+    if (!outputTo->is_npc())
         remember_history_near( outputTo->getPC( ), message );
 }
 

@@ -268,7 +268,7 @@ bool PersonalChannel::needOutputVict( Character *ch, Character *victim ) const
 
 void PersonalChannel::postOutput( Character *outputTo, const DLString &message ) const
 {
-    if (outputTo->getPC( ))
+    if (!outputTo->is_npc())
         remember_history_private( outputTo->getPC( ), message );
 }
 

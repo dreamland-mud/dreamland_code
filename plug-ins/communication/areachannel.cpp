@@ -61,7 +61,7 @@ void AreaChannel::triggers( Character *ch, const DLString &msg ) const
 
 void AreaChannel::postOutput( Character *outputTo, const DLString &message ) const
 {
-    if (outputTo->getPC( ))
+    if (!outputTo->is_npc())
         remember_history_near( outputTo->getPC( ), message );
 }
 
