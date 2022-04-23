@@ -217,7 +217,8 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
     number = number_argument(argument,arg);
     dest_room = ch->in_room;
 
-    if ( (target = get_char_room(ch,dest_room,arg,&number)) != 0)
+    // Look for target in the same room only if a non-ranged lookup is requested.
+    if (door == -1 && (target = get_char_room(ch,dest_room,arg,&number)) != 0)
         return target;
 
     opdoor = dirs[door].rev;
