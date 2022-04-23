@@ -135,7 +135,6 @@ bool is_safe_nomessage(Character *ch, Character *victim )
         return true;
     }
 
-    /* link dead players whose adrenalin is not gushing are safe */
     if (( IS_SLAIN( victim ) || IS_DEATH_TIME( victim ) )
         && !IS_VIOLENT( victim )
         && !IS_SET( victim->act, PLR_WANTED ) )
@@ -143,6 +142,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
         return true;
     }
 
+    /* link dead players whose adrenalin is not gushing are safe */
     if (!victim->is_npc()
         && !victim->is_adrenalined()
         && victim->desc == 0

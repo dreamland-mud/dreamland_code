@@ -9,6 +9,7 @@
 #include "pcharacter.h"
 #include "object.h"
 #include "room.h"
+#include "clanreference.h"
 
 #include "fread_utils.h"
 #include "dreamland.h"
@@ -19,6 +20,8 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+
+CLAN(flowers);
 
 // Decide whether to update item count for this item prototype.
 void limit_count_on_boot( OBJ_INDEX_DATA *pObjIndex, time_t ts, const DLString &playerName )
@@ -106,7 +109,7 @@ void limit_timestamp( Object *obj, Character *ch )
                              << "timestamped " << obj->timestamp << endl;
 }
 
-// Speed up decay unless carried by PC in a non-safe room. Every minute spent like that counts as minus 1 day.
+// Speed up decay unless carried by PC in a non-safe room. 
 void limit_ground_decay(Object *obj)
 {
     if (obj->pIndexData->limit < 0)
@@ -125,18 +128,37 @@ void limit_ground_decay(Object *obj)
         return;
     }
 
-    if (obj->carried_by && !obj->carried_by->is_npc() && !IS_SET(obj->carried_by->in_room->room_flags, ROOM_SAFE))
-        return;
-    
-    obj->timestamp -= 60 * 60 * 24;
+    Character *ch = obj->carried_by;
 
-    if (obj->in_room) {	
+    // Speed up decay on the ground: every minute removes 1 day from timer.
+    if (obj->in_room) {
         obj->in_room->echo(POS_RESTING, "Лежа на земле, %1$O1 неумолимо истонча%1$nется|ются.", obj);
-    } else if (obj->carried_by) {
-        obj->carried_by->pecho("%^O1 в твоих руках неумолимо истонча%1$nется|ются.", obj);
-	    obj->carried_by->pecho("Лимитные вещи созданы для войны, и в {hh86безопасной комнате{x им находиться нельзя.");
-		obj->carried_by->recho("%^O1 в руках %C2 неумолимо истонча%1$nется|ются.", obj, obj->carried_by);
-	}
+        obj->timestamp -= Date::SECOND_IN_DAY;
+    }
+
+    // Should not happen
+    else if (obj->in_obj || !ch) {
+        obj->timestamp -= Date::SECOND_IN_DAY;
+    }
+
+    // Speed up decay in safe rooms or for NPCs
+    else if (ch->is_npc() || IS_SET(ch->in_room->room_flags, ROOM_SAFE)) {
+        obj->timestamp -= Date::SECOND_IN_DAY;
+        ch->pecho("%^O1 в твоих руках неумолимо истонча%1$nется|ются.", obj);
+        ch->pecho("Лимитные вещи созданы для войны, и в {hh86безопасной комнате{x им находиться нельзя.");
+        ch->recho("%^O1 в руках %C2 неумолимо истонча%1$nется|ются.", obj, ch);
+    }
+
+    // Speed up decay for flowers: they can hold limited item for several hours only.
+    else if (ch->getClan() == clan_flowers) {
+        obj->timestamp -= Date::SECOND_IN_HOUR;
+    }
+
+    // Legit user.
+    else {
+        return;
+    }
+
     save_items_at_holder(obj);
 }
 
