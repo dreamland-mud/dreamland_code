@@ -1901,6 +1901,9 @@ VOID_AFFECT(Jail)::remove( Character *victim )
         
         transfer_char( victim, 0, location,
                     NULL, NULL, "%1$^C1 появляется, вдыхая воздух свободы." );
+
+        if (!victim->is_npc() && victim->getPC()->pet)
+            transfer_char( victim->getPC()->pet, 0, victim->in_room );
     }
 }
 
