@@ -332,8 +332,6 @@ void char_update( )
         if (ch->in_room == 0)
             continue;
 
-        // No timer or affect update will happen in chat rooms.
-        bool frozen = IS_SET(ch->in_room->room_flags, ROOM_CHAT);
         // Special mobs don't get their HP or position updated automatically.
         bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
 
@@ -368,7 +366,7 @@ void char_update( )
             affect_strip(ch,gsn_caltraps);
         }
         
-        if (ch->is_vampire( ) && !frozen) {
+        if (ch->is_vampire( )) {
             if (is_bright_for_vampire( ch ))
             {
                 interpret( ch, "human" );
@@ -438,10 +436,10 @@ void char_update( )
                 affect_strip(ch, gsn_spear);
         }
 
-        if (!ch->is_npc( ) && !frozen)
+        if (!ch->is_npc( ))
             lantern_update( ch );
 
-        if (!ch->is_npc( ) && !dreamland->hasOption( DL_BUILDPLOT ) && !frozen)
+        if (!ch->is_npc( ) && !dreamland->hasOption( DL_BUILDPLOT ))
             try {
                 for (int i = 0; i < desireManager->size( ); i++)
                     desireManager->find( i )->update( ch->getPC( ) );
@@ -449,7 +447,7 @@ void char_update( )
                 continue;
             }
         
-        if (!ch->is_npc( ) && !ch->is_immortal( ) && !ch->getPC( )->switchedTo && !frozen) {
+        if (!ch->is_npc( ) && !ch->is_immortal( ) && !ch->getPC( )->switchedTo) {
             if (++ch->timer == 12)
                 idle_update( ch->getPC( ) );
             
@@ -468,7 +466,7 @@ void char_update( )
             }
         }
 
-        if (!frozen && !ch->isDead() && !noupdate)
+        if (!ch->isDead() && !noupdate)
             char_update_affects( ch );
 
         if (!ch->is_npc( )
@@ -787,10 +785,6 @@ void obj_update( void )
         if (oprog_area( obj ))
             continue;
         
-        // No affect update or item decay in chat rooms.
-        if (IS_SET(room->room_flags, ROOM_CHAT))
-            continue;
-
         /* go through affects and decrement */
         AffectList affects = obj->affected.clone();
         for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
@@ -1379,10 +1373,6 @@ void player_update( )
             continue;
 
         ch = d->character->getPC( );
-
-        // Nothing changes inside chat rooms.
-        if (IS_SET(ch->in_room->room_flags, ROOM_CHAT))
-            continue;
 
         if (HAS_SHADOW(ch)) 
             if (--ch->shadow < 0)

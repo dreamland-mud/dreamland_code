@@ -114,9 +114,6 @@ void LanguageManager::run( PCharacter *ch )
     if (IS_AFFECTED( ch, AFF_SLEEP))
         return;
 
-    if (IS_SET(ch->in_room->room_flags, ROOM_CHAT))
-        return;
-
     if (attr->sleepTime == 0) {
         attr->sleepTime = now;
         return;

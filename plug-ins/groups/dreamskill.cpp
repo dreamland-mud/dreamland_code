@@ -199,9 +199,6 @@ void DreamSkillManager::run( PCharacter *ch )
     if (ch->getRealLevel() < 20 && ch->getRemorts().size() == 0)
         return;
 
-    if (IS_SET(ch->in_room->room_flags, ROOM_CHAT))
-        return;
-    
     // Exclude those with an active dreamt skill (or a skill gained from equipment, obj prog etc).
     int dreamtSkillNumber = findActiveDreamSkill(ch);
     if (dreamtSkillNumber >= 0) 

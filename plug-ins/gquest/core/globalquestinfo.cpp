@@ -111,7 +111,7 @@ bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
             || ch->isAffected( gsn_jail ))
         return false;
 
-    if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY|ROOM_CHAT))
+    if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY))
         return false;
 
     if (!IS_SET(ch->act, PLR_CONFIRMED))

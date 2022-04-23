@@ -59,9 +59,6 @@ void CharacterParamsUpdateTask::run( Character *ch )
     if (ch->isDead( ))
         return;
 
-    if (IS_SET(ch->in_room->room_flags, ROOM_CHAT))
-        return;
-
     if (ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE))
         return;
 
