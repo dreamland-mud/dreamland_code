@@ -2,6 +2,7 @@
 
 #include "commandtemplate.h"
 #include "spell.h"
+#include "spelltarget.h"
 #include "pcharacter.h"
 #include "core/object.h"
 #include "attract.h"
@@ -67,9 +68,15 @@ CMDRUN( identify )
     }
 
     oldact("$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM);
-    
+
+    bool hadMagic = ch->detection.isSet(DETECT_MAGIC);
+    ch->detection.setBit(DETECT_MAGIC);
+
     if (gsn_identify->getSpell( ))
-        gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );
+        gsn_identify->getSpell( )->run( ch, SpellTarget::Pointer(NEW, obj), 0 );
+
+    if (!hadMagic)
+        ch->detection.removeBit(DETECT_MAGIC);
 }
 
 

@@ -5,6 +5,9 @@
 #include "shoptrader.h"
 #include "occupations.h"
 
+#include "skillreference.h"
+#include "spelltarget.h"
+#include "spell.h"
 #include "room.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
@@ -22,21 +25,11 @@
  * Git history for this plugin.
  */
 
-void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showName );
 void deduct_cost(Character *ch, int cost);
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );
 Object *get_obj_keeper( Character *ch, ShopTrader::Pointer trader, const DLString &constArguments );
 
-int count_player_room( Room *room )
-{
-    int cnt = 0;
-
-    for (Character *ch = room->people; ch; ch = ch->next_in_room)
-        if (!ch->is_npc( ))
-            cnt++;
-
-    return cnt;
-}
+GSN(identify);
 
 ShopTrader::ShopTrader( )
             : buys( 0, &item_table )
@@ -116,14 +109,16 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
 
     tell_dim( client, ch, "Нигде больше не найдешь такого замечательного товара:" );
 
-    lore_fmt_item( client, obj, buf, false );
-    client->pecho(" {Y+------------------------------------------------------------------------------------+{x");
-    stringstream ss( buf.str( ) );
-    DLString line;
-    while (std::getline( ss, line, '\n' )) {
-        client->pecho( dlprintf( " {Y|{x %-75s {Y|{x", line.c_str( ) ) );
+    {
+        bool hadMagic = client->detection.isSet(DETECT_MAGIC);
+        client->detection.setBit(DETECT_MAGIC);
+
+        if (gsn_identify->getSpell( ))
+            gsn_identify->getSpell( )->run( client, SpellTarget::Pointer(NEW, obj), 0 );
+
+        if (!hadMagic)
+            client->detection.removeBit(DETECT_MAGIC);
     }
-    client->pecho(" {Y+------------------------------------------------------------------------------------+{x");
 
     if (serviceCost < 1) {
         tell_dim( client, ch, "Я сообщаю тебе это совершенно бесплатно." );
