@@ -75,6 +75,13 @@ static int check_range(const Register &arg, int min, int max)
     return n;
 }
 
+static DLString arg2string(const RegisterList &args)
+{
+    if (args.empty())
+        return "<empty>";
+    return args.front().toString();
+}
+
 /*
  * METHODS
  */
@@ -205,7 +212,7 @@ NMI_INVOKE( Root, player_attribute, "(playerName, attrName): значение д
     DLString attrName = args.back( ).toString( );
 
     if (!pci)
-        throw Scripting::Exception( "Player not found" );
+        throw Scripting::Exception( "Player not found: " + arg2string(args) );
 
     XMLStringAttribute::Pointer sAttr = pci->getAttributes( ).findAttr<XMLStringAttribute>( attrName );
 
@@ -950,7 +957,7 @@ NMI_INVOKE( Root, Profession, "(name): конструктор для класс�
     DLString name = args2string(args);
     Profession *prof = professionManager->findExisting(name);
     if (!prof)
-        throw Scripting::Exception("Profession not found");
+        throw Scripting::Exception("Profession not found: " + arg2string(args));
     return Register::handler<ProfessionWrapper>(prof->getName());
 }
 
@@ -959,7 +966,7 @@ NMI_INVOKE( Root, CraftProfession, "(name): конструктор для доп
     DLString name = args2word(args);
     CraftProfession::Pointer prof = craftProfessionManager->get(name);
     if (!prof)
-        throw Scripting::Exception("Craft profession not found");
+        throw Scripting::Exception("Craft profession not found: " + arg2string(args));
     return Register::handler<CraftProfessionWrapper>(prof->getName());
 }
 
@@ -968,7 +975,7 @@ NMI_INVOKE( Root, Bonus, "(name): конструктор для бонусов �
     DLString name = args2word(args);
     Bonus *bonus = bonusManager->findExisting(name);
     if (!bonus)
-        throw Scripting::Exception("Bonus not found");
+        throw Scripting::Exception("Bonus not found: " + arg2string(args));
     return Register::handler<BonusWrapper>(bonus->getName());
 }
 
@@ -977,7 +984,7 @@ NMI_INVOKE( Root, Religion, "(name): конструктор для религи�
     DLString name = args2word(args);
     Religion *religion = religionManager->findExisting(name);
     if (!religion)
-        throw Scripting::Exception("Religion not found");
+        throw Scripting::Exception("Religion not found: " + arg2string(args));
     return Register::handler<ReligionWrapper>(religion->getName());
 }
 
@@ -1003,7 +1010,7 @@ NMI_INVOKE( Root, Language, "(name): конструктор для древне�
     DLString name = args2string(args);
     Language::Pointer lang = languageManager->findLanguage(name);
     if (!lang)
-        throw Scripting::Exception("Language not found");
+        throw Scripting::Exception("Language not found: " + arg2string(args));
     return Register::handler<LanguageWrapper>(lang->getName());
 }
 
@@ -1102,7 +1109,7 @@ NMI_INVOKE( Root, Spell , "(name): находит заклинание с зад
 {
     Skill *skill = args2skill(args);
     if (!skill || !skill->getSpell())
-        throw Scripting::Exception("Spell not found");
+        throw Scripting::Exception("Spell not found: " + arg2string(args));
 
     return WrapperManager::getThis( )->getWrapper(skill->getSpell().getPointer());
 }
@@ -1112,7 +1119,7 @@ NMI_INVOKE( Root, AffectHandler , "(name): находит обработчик �
 {
     Skill *skill = args2skill(args);
     if (!skill || !skill->getAffect())
-        throw Scripting::Exception("AffectHandler not found");
+        throw Scripting::Exception("AffectHandler not found: " + arg2string(args));
 
     return WrapperManager::getThis( )->getWrapper(skill->getAffect().getPointer());
 }
@@ -1121,7 +1128,7 @@ NMI_INVOKE( Root, SkillCommand , "(name): находит команду для �
 {
     Skill *skill = args2skill(args);
     if (!skill || !skill->getCommand())
-        throw Scripting::Exception("SkillCommand not found");
+        throw Scripting::Exception("SkillCommand not found: " + arg2string(args));
 
     return WrapperManager::getThis( )->getWrapper(skill->getCommand().getPointer());
 }
@@ -1259,7 +1266,7 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
 {
     SkillGroup *group = skillGroupManager->findExisting(args2string(args));
     if (!group)
-        throw Scripting::Exception("Skill group not found");
+        throw Scripting::Exception("Skill group not found: " + arg2string(args));
 
     RegList::Pointer skills(NEW);
 
