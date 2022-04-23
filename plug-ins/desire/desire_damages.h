@@ -12,6 +12,7 @@ struct HungerDamage : public SelfDamage {
     HungerDamage( Character *ch, int dam );
 
     virtual void message( );
+    virtual bool canDamage( );
     virtual void reportState( ) { }
 };
 
@@ -20,6 +21,7 @@ struct ThirstDamage : public SelfDamage {
     ThirstDamage( Character *ch, int dam );
 
     virtual void message( );
+    virtual bool canDamage( );
     virtual void reportState( ) { }
 };
 
