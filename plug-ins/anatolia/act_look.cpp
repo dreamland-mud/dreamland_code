@@ -193,6 +193,9 @@ static void format_loot_mark(Object *obj, ostringstream &buf, Character *ch)
     if (!oprog_can_fetch_corpse_pc(ch, obj->in_obj, obj, false))
         return;
 
+    if (obj->in_obj->hasOwner( ch ))
+        return;
+
     buf << "({cДобыча{x) "; 
 }
 

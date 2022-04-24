@@ -235,27 +235,12 @@ bool oprog_get( Object *obj, Character *ch )
     return false;
 }
 
-static bool oprog_fetch_corpse_pc( Character *ch, Object *obj, Object *container )
-{
-    if (!ch->is_immortal( ) && !container->hasOwner( ch ))
-    {
-        container->count--;
-    }
-
-    return false;
-}
-
 static bool oprog_fetch( Character *ch, Object *obj, Object *container )
 {
     FENIA_CALL( container, "Fetch", "CO", ch, obj );
     FENIA_NDX_CALL( container, "Fetch", "OCO", container, ch, obj );
     BEHAVIOR_CALL( container, fetch, ch, obj );
     SKILLEVENT_CALL( ch, fetchItem, ch, obj, container );
-
-    switch (container->item_type) {
-    case ITEM_CORPSE_PC:
-        return oprog_fetch_corpse_pc( ch, obj, container );
-    }
 
     return false;
 }
@@ -493,9 +478,13 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
     obj_from_obj( obj );
     obj_to_char( obj, ch );
 
+    // Decrease looting counter before any other 'get' progs have a chance to run.
+    if (container->item_type == ITEM_CORPSE_PC && !ch->is_immortal( ) && !container->hasOwner( ch ))
+        container->count--;
+
     if (oprog_get( obj, ch ))
         return true;
-    
+        
     if (oprog_fetch( ch, obj, container ))
         return true;
     
