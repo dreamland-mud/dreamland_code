@@ -136,6 +136,70 @@ static int count_mob_room(Room *room, MOB_INDEX_DATA *pMob, int limit)
     return count;
 }
 
+// Calculate reset probability for an item inside container. 
+static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, Object *container, bool isForced)
+{
+    // Limited items never reset if count is exceeded.
+    if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit)
+        return 0;
+
+    // 'redit reset' called explicitly always resets everything, for testing.
+    if (isForced)
+        return 100;
+
+    // Limited items are not reset in populated areas; have a chance to be reset in an empty area.
+    if (pObjIndex->limit != -1) {
+        if (container->getRoom()->area->nplayer > 0)
+            return 0;
+
+        return 10;
+    }
+
+    // 'maxCount' specifies maximum reset at the given location;     
+    int maxCount = pReset->arg2;
+    if (maxCount <= 0)     /* no limit */
+        maxCount = 999;
+
+    // If there are too many in the world already, decrease reset chances.
+    if (pObjIndex->count >= maxCount)
+        return 25;
+        
+    return 100;
+}
+
+// Calculate reset probability for a carried item. 
+static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob)
+{
+    // Obj limit reached, do nothing.
+    if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit) 
+        return 0;
+
+    // Limited items are not reset in populated areas; have a chance to be reset in an empty area.
+    if (pObjIndex->limit != -1) {
+        if (mob->in_room->area->nplayer > 0)
+            return 0;
+
+        return 10;
+    }
+
+    // Shop items and non-random stuff is reset immediately,
+    // random weapons never appear in populated areas and are otherwise delayed.
+    if (pReset->rand == RAND_NONE && !item_is_random(pObjIndex))
+        return 100;
+
+    if (IS_SET(mob->in_room->area->area_flag, AREA_DUNGEON))
+        return 100;
+
+    if (mob_has_occupation(mob, OCC_SHOPPER))
+        return 100;
+
+    if (mob->in_room->area->nplayer > 0)
+        return 0;
+
+    return 10;
+}
+
+
 /** Equip an item if required by reset configuration. */
 static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob, bool verbose)
 {
@@ -183,10 +247,6 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to, bool i
     if (!obj_to)
         return false;
 
-    int maxCount = pReset->arg2;
-    if (maxCount <= 0)     /* no limit */
-        maxCount = 999;
-
     vector<int> vnums;
     vnums.insert(vnums.end(), pReset->vnums.begin(), pReset->vnums.end());
     int count = count_vnums_in_list(vnums, obj_to->contains);
@@ -208,11 +268,8 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to, bool i
             bug("Reset_area: 'P' bad vnum %d.", random_vnum);
             break;
         }
-
-        if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit)
-            break;
-
-        if (pObjIndex->count >= maxCount && !isForced && number_range(0,4) != 0)
+        
+        if (!chance(item_reset_chance(pReset, pObjIndex, obj_to, isForced)))
             break;
 
         Object *obj = create_object(pObjIndex, 0);
@@ -231,25 +288,6 @@ static bool create_item_for_container(RESET_DATA *pReset, Object *obj_to, bool i
     return true;
 }
 
-// Calculate reset probability for a carried item. Shop items and non-random stuff is reset immediately,
-// random weapons never appear in populated areas and are otherwise delayed.
-static int item_reset_chance(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob)
-{
-    if (pReset->rand == RAND_NONE && !item_is_random(pObjIndex))
-        return 100;
-
-    if (IS_SET(mob->in_room->area->area_flag, AREA_DUNGEON))
-        return 100;
-
-    if (mob_has_occupation(mob, OCC_SHOPPER))
-        return 100;
-
-    if (mob->in_room->area->nplayer > 0)
-        return 0;
-
-    return 10;
-}
-
 /** Create an item for inventory or equipment for a given mob, based on reset data. */
 static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob, bool verbose)
 {
@@ -259,10 +297,6 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
         bug("Reset_area: bad vnum %d for mob %d.", pReset->arg1, mob->pIndexData->vnum);
         return obj;
     }
-
-    // Obj limit reached, do nothing.
-    if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit) 
-        return obj;
 
     // Not all items are reset immediately.
     if (!chance(item_reset_chance(pReset, pObjIndex, mob)))
