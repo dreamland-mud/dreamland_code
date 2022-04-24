@@ -531,8 +531,6 @@ static void corpse_looting( Object *corpse, Character *ch, Character *killer )
     }
 
     // Mark items with a "looting" property based on the rules. 
-    // TODO: modify 'get' logic to forbid looting items with "loot"="false".
-    // TODO: modify show_list_to_char to highlight items one can loot.
     const DLString mark("loot");
 
     for (auto &obj: items) {
@@ -544,7 +542,15 @@ static void corpse_looting( Object *corpse, Character *ch, Character *killer )
             obj->addProperty(mark, loot["limits"].asString());
         else if (!obj->getProperty("tier").empty())
             obj->addProperty(mark, loot["randoms"].asString());
-        // TODO: add more checks for different types of items.
+        else if (obj->item_type == ITEM_PILL 
+                || obj->item_type == ITEM_SCROLL
+                || obj->item_type == ITEM_POTION
+                || obj->item_type == ITEM_WAND
+                || obj->item_type == ITEM_STAFF
+                || obj->item_type == ITEM_WARP_STONE)
+            obj->addProperty(mark, loot["magic"].asString());
+        else if (obj->item_type == ITEM_RECIPE)
+            obj->addProperty(mark, loot["recipes"].asString());
         else
             obj->addProperty(mark, loot["other"].asString());
     }

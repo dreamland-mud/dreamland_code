@@ -303,10 +303,11 @@ static bool oprog_can_get( Character *ch, Object *obj )
     return true;
 }
 
-static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
+bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, bool verbose )
 {
     if (ch->is_npc( )) {
-        ch->pecho("Ты не умеешь обшаривать чужие трупы.");
+        if (verbose)
+            ch->pecho("Ты не умеешь обшаривать чужие трупы.");
         return false;
     }
     
@@ -322,12 +323,21 @@ static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
     if (str_cmp( ch->getNameC(), container->killer ) 
         && str_cmp( "!anybody!", container->killer )) 
     {
-        ch->pecho("Это не твоя добыча.");
+        if (verbose)
+            ch->pecho("Это не твоя добыча.");
         return false;
     }
     
     if (container->count == 0) {
-        ch->pecho("Больше взять ничего не получится.");
+        if (verbose)
+            ch->pecho("Больше взять ничего не получится.");
+        return false;
+    }
+
+    // The corpse is someone killed by 'ch', let's check the mark.
+    if (obj && obj->getProperty("loot") != "true") {
+        if (verbose)
+            ch->pecho("Ты не можешь снять %O4 с трупа противника, это не добыча.", obj);
         return false;
     }
 
@@ -348,7 +358,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
 
     switch (container->item_type) {
     case ITEM_CORPSE_PC:
-        return oprog_can_fetch_corpse_pc( ch, container );
+        return oprog_can_fetch_corpse_pc( ch, container, obj, true );
         
     case ITEM_CONTAINER:
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {

@@ -84,6 +84,8 @@ PROF(druid);
  * Extern functions needed
  */
 DLString get_pocket_argument( char *arg );
+bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, bool verbose );
+
 /*
  * Local functions.
  */
@@ -182,6 +184,18 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
         buf << "(Яркое) ";
 }
 
+// Display aura if the item can be looted from PC corpse
+static void format_loot_mark(Object *obj, ostringstream &buf, Character *ch)
+{
+    if (!obj->in_obj || obj->in_obj->item_type != ITEM_CORPSE_PC)
+        return;
+
+    if (!oprog_can_fetch_corpse_pc(ch, obj->in_obj, obj, false))
+        return;
+
+    buf << "({cДобыча{x) "; 
+}
+
 static void oprog_show(Object *obj, Character *ch, ostringstream &buf)
 {
     if (obj->behavior)
@@ -215,6 +229,8 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
 
     if (wearloc->displayFlags(ch, obj)) {
         format_screenreader_flags(obj, buf, ch);
+
+        format_loot_mark(obj, buf, ch);
 
         oprog_show(obj, ch, buf);
 
