@@ -223,7 +223,7 @@ void UndefinedOneHit::damEffectVorpal()
     const char *msgAll;
     
     if (wield->value0() == WEAPON_SWORD)
-        msgAll = "{mРаз-два, раз-два! Горит трава, взы-взы -- стрижает меч!";
+        msgAll = "{mРаз-два, раз-два! Горит трава, взы-взы стрижает меч!{x";
     else if (wield->value0() == WEAPON_AXE)
         msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы свирчит топор!{x";
     else if (wield->value0() == WEAPON_POLEARM)
@@ -245,8 +245,8 @@ void UndefinedOneHit::damEffectVorpal()
         msgOther = "{mУва! Ува! И %1$C2 голова барабардает с плеч!{x";
         msgVict = "{mУва! И твоя голова барабардает с плеч!{x";
     } else if (wield->value0() == WEAPON_AXE) {
-        msgOther = "{mУва! %1$^C1 без головы остал%1$Gось|ся|ась с этих пор!{x";
-        msgVict = "{mУва! И ты без головы остал%1$Gось|ся|ась с этих пор!{x";    
+        msgOther = "{mУва! %1$^C1 без головы остал%1$Gось|ся|ась|ись с этих пор!{x";
+        msgVict = "{mУва! И ты без головы остал%1$Gось|ся|ась|ись с этих пор!{x";    
     } else if (wield->value0() == WEAPON_POLEARM) {
         msgOther = "{mУва! %1$C2 котелок скосило как камыш!{x";
         msgVict = "{mУва! Ува! Твой котелок скосило как камыш!{x";
