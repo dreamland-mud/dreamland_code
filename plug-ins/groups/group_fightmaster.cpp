@@ -204,75 +204,10 @@ SKILL_RUNP(bashdoor)
     return;
 }
 
-/*----------------------------------------------------------------------------
- * bash
- *---------------------------------------------------------------------------*/
-class BashOneHit : public SkillDamage {
-public:
-    BashOneHit(Character *ch, Character *victim);
-
-    virtual void calcDamage();
-    virtual int calcChance();
-    int chance = 0;
-};
-
-BashOneHit::BashOneHit(Character *ch, Character *victim)
-    : Damage(ch, victim, DAM_BASH, 0),
-      SkillDamage(ch, victim, gsn_bash, DAM_BASH, 0, DAMF_WEAPON)
-{
-}
-
-void BashOneHit::calcDamage()
-{
-    dam = (ch->damroll / 2) + number_range(4, 4 + 4 * ch->size + chance / 10);
-    if (is_flying(victim))
-        dam += dam / 3;
-    damapply_class(ch, dam);
-    Damage::calcDamage();
-}
-
-int BashOneHit::calcChance()
-{
-
-    chance = gsn_bash->getEffective(ch);
-
-    /* modifiers */
-    chance = chance * 4 / 5;
-
-    /* size  and weight */
-    chance += min(ch->canCarryWeight(), ch->carry_weight) / 25;
-    chance -= min(victim->canCarryWeight(), victim->carry_weight) / 20;
-
-    if (ch->size < victim->size)
-        chance += (ch->size - victim->size) * 25;
-    else
-        chance += (ch->size - victim->size) * 10;
-
-    /* stats */
-    chance += ch->getCurrStat(STAT_STR);
-    chance -= victim->getCurrStat(STAT_DEX) * 4 / 3;
-
-    /* speed */
-    if (IS_QUICK(ch))
-        chance += 10;
-    if (IS_QUICK(victim))
-        chance -= 20;
-
-    /* level */
-    chance += (skill_level(*gsn_bash, ch) - victim->getModifyLevel()) * 2;
-
-    if (is_flying(victim))
-        chance -= 10;
-
-    if (ch->getProfession() == prof_anti_paladin && ch->getClan() == clan_shalafi)
-        chance /= 2;
-    return chance;
-}
 
 /*
  * 'bash' skill command
  */
-
 SKILL_RUNP(bash)
 {
     char arg[MAX_INPUT_LENGTH];
@@ -330,13 +265,6 @@ SKILL_RUNP(bash)
         return;
     }
 
-    /*
-        if ( is_flying( ch ) )
-        {
-                ch->pecho("В полете? И как ты себе это представляешь?");
-                return;
-        }*/
-
     if (is_safe(ch, victim))
         return;
 
@@ -379,11 +307,46 @@ SKILL_RUNP(bash)
         return;
     }
 
-    BashOneHit bash(ch, victim);
+    int chance;
+    // Calculate success chance.
+    {
+        chance = gsn_bash->getEffective(ch);
+
+        /* modifiers */
+        chance = chance * 4 / 5;
+
+        /* size  and weight */
+        chance += min(ch->canCarryWeight(), ch->carry_weight) / 25;
+        chance -= min(victim->canCarryWeight(), victim->carry_weight) / 20;
+
+        if (ch->size < victim->size)
+            chance += (ch->size - victim->size) * 25;
+        else
+            chance += (ch->size - victim->size) * 10;
+
+        /* stats */
+        chance += ch->getCurrStat(STAT_STR);
+        chance -= victim->getCurrStat(STAT_DEX) * 4 / 3;
+
+        /* speed */
+        if (IS_QUICK(ch))
+            chance += 10;
+        if (IS_QUICK(victim))
+            chance -= 20;
+
+        /* level */
+        chance += (skill_level(*gsn_bash, ch) - victim->getModifyLevel()) * 2;
+
+        if (is_flying(victim))
+            chance -= 10;
+
+        if (ch->getProfession() == prof_anti_paladin && ch->getClan() == clan_shalafi)
+            chance /= 2;
+    }
 
     /* now the attack */
 
-    if (number_percent() < bash.calcChance()) {
+    if (number_percent() < chance) {
         if (number_percent() < 50) {
             oldact_p("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!",
                      ch, 0, victim, TO_VICT, POS_RESTING);
@@ -418,10 +381,21 @@ SKILL_RUNP(bash)
 
         gsn_bash->improve(ch, true, victim);
         ch->setWait(gsn_bash->getBeats(ch));
+
+        // Calculate bash damage.
+        int dam = (ch->damroll / 2) + number_range(4, 4 + 4 * ch->size + chance / 10);
+
+        if (is_flying(victim))
+            dam += dam / 3;
+
+        damapply_class(ch, dam);
+
         try {
-            bash.hit(true);
+            damage_nocatch(ch, victim, dam, gsn_bash, DAM_BASH, true, DAMF_WEAPON);
         } catch (const VictimDeathException &e) {
+            return;
         }
+
     } else {
         if (number_percent() < 50) {
             oldact("Ты промахиваешься и падаешь!", ch, 0, victim, TO_CHAR);
@@ -438,6 +412,7 @@ SKILL_RUNP(bash)
             oldact_p("$c1 пытается сбить тебя с ног, но промахивается и едва не падает.",
                      ch, 0, victim, TO_VICT, POS_RESTING);
         }
+
         damage(ch, victim, 0, gsn_bash, DAM_BASH, true, DAMF_WEAPON);
         gsn_bash->improve(ch, false, victim);
         ch->setWait(gsn_bash->getBeats(ch) * 1 / 2);
@@ -593,88 +568,9 @@ SKILL_RUNP(trip)
                    "Помогите! %1$^C1 только что подсе%1$Gкло|к|кла меня!");
 }
 
-/*----------------------------------------------------------------------------
- * kick
- *---------------------------------------------------------------------------*/
-class KickOneHit : public SkillDamage {
-public:
-    KickOneHit(Character *ch, Character *victim);
-
-    virtual void calcDamage();
-};
-
-KickOneHit::KickOneHit(Character *ch, Character *victim)
-    : Damage(ch, victim, DAM_BASH, 0),
-      SkillDamage(ch, victim, gsn_kick, DAM_BASH, 0, DAMF_WEAPON)
-{
-}
-
-void KickOneHit::calcDamage()
-{
-    Object *on_feet;
-    dam = number_range(1, ch->getModifyLevel());
-
-    if ((ch->getProfession() == prof_samurai) && IS_SET(ch->parts, PART_FEET) && ((on_feet = get_eq_char(ch, wear_feet)) == 0 || (on_feet != 0 && !material_is_typed(on_feet, MAT_METAL)))) {
-        dam *= 2;
-    }
-
-    dam += ch->damroll / 2;
-    damapply_class(ch, dam);
-
-    //10% extra damage for every skill level
-    dam += dam * skill_level_bonus(*gsn_kick, ch) / 10;
-
-    if (IS_SET(ch->parts, PART_TWO_HOOVES))
-        dam = 3 * dam / 2;
-    else if (IS_SET(ch->parts, PART_FOUR_HOOVES))
-        dam *= 2;
-
-    Damage::calcDamage();
-}
-
-/*----------------------------------------------------------------------------
- * doublekick
- *---------------------------------------------------------------------------*/
-class DoubleKickOneHit : public SkillDamage {
-public:
-    DoubleKickOneHit(Character *ch, Character *victim);
-
-    virtual void calcDamage();
-};
-
-DoubleKickOneHit::DoubleKickOneHit(Character *ch, Character *victim)
-    : Damage(ch, victim, DAM_BASH, 0),
-      SkillDamage(ch, victim, gsn_double_kick, DAM_BASH, 0, DAMF_WEAPON)
-{
-}
-
-void DoubleKickOneHit::calcDamage()
-{
-    Object *on_feet;
-    dam = number_range(1, ch->getModifyLevel());
-
-    if ((ch->getProfession() == prof_samurai) && IS_SET(ch->parts, PART_FEET) && ((on_feet = get_eq_char(ch, wear_feet)) == 0 || (on_feet != 0 && !material_is_typed(on_feet, MAT_METAL)))) {
-        dam *= 2;
-    }
-
-    dam += ch->damroll / 2;
-    damapply_class(ch, dam);
-
-    //10% extra damage for every skill level
-    dam += dam * skill_level_bonus(*gsn_double_kick, ch) / 10;
-
-    if (IS_SET(ch->parts, PART_TWO_HOOVES))
-        dam = 3 * dam / 2;
-    else if (IS_SET(ch->parts, PART_FOUR_HOOVES))
-        dam *= 2;
-
-    Damage::calcDamage();
-}
-
 /*
  * 'kick' skill command
  */
-
 SKILL_RUNP(kick)
 {
     Character *victim;
@@ -746,21 +642,59 @@ SKILL_RUNP(kick)
 
     if (chance < gsn_kick->getEffective(ch)) {
         gsn_kick->improve(ch, true, victim);
-        KickOneHit kick(ch, victim);
-        try {
-            kick.hit(true);
-        } catch (const VictimDeathException &) {
+
+        Object *on_feet;
+        int dam = number_range(1, ch->getModifyLevel());
+
+        if ((ch->getProfession() == prof_samurai) && IS_SET(ch->parts, PART_FEET) && ((on_feet = get_eq_char(ch, wear_feet)) == 0 || (on_feet != 0 && !material_is_typed(on_feet, MAT_METAL)))) {
+            dam *= 2;
         }
 
-        if (victim->in_room == ch->in_room)
-            if (number_percent() < (gsn_double_kick->getEffective(ch) * 8) / 10) {
-                gsn_double_kick->improve(ch, true, victim);
-                DoubleKickOneHit doublekick(ch, victim);
-                try {
-                    doublekick.hit(true);
-                } catch (const VictimDeathException &) {
-                }
+        dam += ch->damroll / 2;
+        damapply_class(ch, dam);
+
+        //10% extra damage for every skill level
+        dam += dam * skill_level_bonus(*gsn_kick, ch) / 10;
+
+        if (IS_SET(ch->parts, PART_TWO_HOOVES))
+            dam = 3 * dam / 2;
+        else if (IS_SET(ch->parts, PART_FOUR_HOOVES))
+            dam *= 2;
+
+        try {
+            damage_nocatch(ch, victim, dam, gsn_kick, DAM_BASH, true, DAMF_WEAPON);
+        } catch (const VictimDeathException &) {
+            return;
+        }
+
+        if (number_percent() < (gsn_double_kick->getEffective(ch) * 8) / 10) {
+            gsn_double_kick->improve(ch, true, victim);
+
+            Object *on_feet;
+            int dam = number_range(1, ch->getModifyLevel());
+
+            if ((ch->getProfession() == prof_samurai) && IS_SET(ch->parts, PART_FEET) && ((on_feet = get_eq_char(ch, wear_feet)) == 0 || (on_feet != 0 && !material_is_typed(on_feet, MAT_METAL)))) {
+                dam *= 2;
             }
+
+            dam += ch->damroll / 2;
+            damapply_class(ch, dam);
+
+            //10% extra damage for every skill level
+            dam += dam * skill_level_bonus(*gsn_double_kick, ch) / 10;
+
+            if (IS_SET(ch->parts, PART_TWO_HOOVES))
+                dam = 3 * dam / 2;
+            else if (IS_SET(ch->parts, PART_FOUR_HOOVES))
+                dam *= 2;
+
+            try {
+                damage_nocatch(ch, victim, dam, gsn_double_kick, DAM_BASH, true, DAMF_WEAPON);
+            } catch (const VictimDeathException &) {
+                return;
+            }
+        }
+
     } else {
         damage(ch, victim, 0, gsn_kick, DAM_BASH, true, DAMF_WEAPON);
         gsn_kick->improve(ch, false, victim);
