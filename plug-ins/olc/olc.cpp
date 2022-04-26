@@ -55,6 +55,8 @@
 #include "def.h"
 
 void obj_update();
+void char_update();
+
 GSN(none);
 CLAN(none);
 GROUP(clan);
@@ -474,9 +476,15 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "update") {
+    if (arg == "obj_update") {
         obj_update();
         ch->pecho("Forced obj update.");
+        return;
+    }
+
+    if (arg == "char_update") {
+        char_update();
+        ch->pecho("Forced char update.");
         return;
     }
 

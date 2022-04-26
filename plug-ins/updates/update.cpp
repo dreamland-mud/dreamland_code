@@ -49,9 +49,7 @@
 *        By using this code, you have agreed to follow the terms of the           *
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
-
-#include <unistd.h>
-#include <signal.h>
+#include <jsoncpp/json/json.h>
 
 #include "lastlogstream.h"
 #include "logstream.h"
@@ -85,6 +83,7 @@
 #include "update_areas.h"
 #include "weather.h"
 
+#include "configurable.h"
 #include "dreamland.h"
 #include "interp.h"
 #include "stats_apply.h"
@@ -115,6 +114,14 @@ PROF(vampire);
 #define PULSE_RAFFECT                  ( 3 * PULSE_MOBILE)
 #define PULSE_AREA                  (110 * dreamland->getPulsePerSecond( )) /* 97 saniye */
 #define PULSE_TRACK                  ( 6 * dreamland->getPulsePerSecond( ))
+
+
+// A set of update settings defined in config/update.json.
+Json::Value config;
+CONFIGURABLE_LOADED(config, update)
+{
+    config = value;
+}
 
 /*
  * Local functions.
@@ -284,10 +291,6 @@ static bool mprog_area( Character *ch )
     return false;
 }
 
-static Date getLogon(time_t t)
-{
-    return Date(t);
-}
 // Trying to catch "You are 100500 years old" bug 
 // by checking and reporting player ages outside of reasonable limits.
 static void debug_player_age(PCharacter *ch)
@@ -319,11 +322,9 @@ void char_update( )
 //    ProfilerBlock be("char_update");
     Character *ch;
     Character *ch_next;
-    Character *ch_quit;
 
     static time_t last_save_time = -1;
-
-    ch_quit = 0;
+    int autoquit_timer = config["autoquit"].asInt();
 
     for ( ch = char_list; ch != 0; ch = ch_next )
     {
@@ -450,9 +451,6 @@ void char_update( )
         if (!ch->is_npc( ) && !ch->is_immortal( ) && !ch->getPC( )->switchedTo) {
             if (++ch->timer == 12)
                 idle_update( ch->getPC( ) );
-            
-            if (ch->timer > 20)
-                ch_quit = ch;
         }
 
         if (ch->is_npc( ) && ch->timer > 0) {
@@ -499,22 +497,25 @@ void char_update( )
      * Autosave and autoquit.
      * Check that these chars still exist.
      */
-
     if (last_save_time == -1 || dreamland->getCurrentTime( ) - last_save_time > 60)
     {
         last_save_time = dreamland->getCurrentTime( );
         for (ch = char_list; ch != 0; ch = ch_next)
         {
             ch_next = ch->next;
-            if (!ch->is_npc()) {
-                ch->getPC( )->save();
-                debug_player_age(ch->getPC());
-            }
+            if (ch->is_npc())
+                continue;
 
-            if( ( ch == ch_quit || ch->timer > 20 ) && !ch->isCoder( ) ) {
-                if (ch->getPC( ))
-                    ch->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
-                interpret_raw(ch, "quit", "");
+            PCharacter *pch = ch->getPC();
+            pch->save();
+            debug_player_age(pch);
+
+            if (pch->isCoder())
+                continue;
+
+            if (autoquit_timer > 0 && pch->timer > autoquit_timer) {
+                pch->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
+                interpret_raw(pch, "quit", "");
             }
         }
     }

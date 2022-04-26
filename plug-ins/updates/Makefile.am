@@ -12,6 +12,7 @@ include $(top_srcdir)/plug-ins/Makefile.inc
 plugin_INCLUDES = $(INCLUDES_FIGHT) $(INCLUDES_SRC) 
 
 libupdates_la_LIBADD = \
-$(LIBADD_FIGHT)
+$(LIBADD_FIGHT) \
+-ljsoncpp
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

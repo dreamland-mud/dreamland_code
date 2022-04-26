@@ -235,27 +235,12 @@ bool oprog_get( Object *obj, Character *ch )
     return false;
 }
 
-static bool oprog_fetch_corpse_pc( Character *ch, Object *obj, Object *container )
-{
-    if (!ch->is_immortal( ) && !container->hasOwner( ch ))
-    {
-        container->count--;
-    }
-
-    return false;
-}
-
 static bool oprog_fetch( Character *ch, Object *obj, Object *container )
 {
     FENIA_CALL( container, "Fetch", "CO", ch, obj );
     FENIA_NDX_CALL( container, "Fetch", "OCO", container, ch, obj );
     BEHAVIOR_CALL( container, fetch, ch, obj );
     SKILLEVENT_CALL( ch, fetchItem, ch, obj, container );
-
-    switch (container->item_type) {
-    case ITEM_CORPSE_PC:
-        return oprog_fetch_corpse_pc( ch, obj, container );
-    }
 
     return false;
 }
@@ -303,10 +288,11 @@ static bool oprog_can_get( Character *ch, Object *obj )
     return true;
 }
 
-static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
+bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, bool verbose )
 {
     if (ch->is_npc( )) {
-        ch->pecho("Ты не умеешь обшаривать чужие трупы.");
+        if (verbose)
+            ch->pecho("Ты не умеешь обшаривать чужие трупы.");
         return false;
     }
     
@@ -322,12 +308,21 @@ static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
     if (str_cmp( ch->getNameC(), container->killer ) 
         && str_cmp( "!anybody!", container->killer )) 
     {
-        ch->pecho("Это не твоя добыча.");
+        if (verbose)
+            ch->pecho("Это не твоя добыча.");
         return false;
     }
     
     if (container->count == 0) {
-        ch->pecho("Больше взять ничего не получится.");
+        if (verbose)
+            ch->pecho("Больше взять ничего не получится.");
+        return false;
+    }
+
+    // The corpse is someone killed by 'ch', let's check the mark.
+    if (obj && obj->getProperty("loot") != "true") {
+        if (verbose)
+            ch->pecho("Ты не можешь снять %O4 с трупа противника, это не добыча.", obj);
         return false;
     }
 
@@ -348,7 +343,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
 
     switch (container->item_type) {
     case ITEM_CORPSE_PC:
-        return oprog_can_fetch_corpse_pc( ch, container );
+        return oprog_can_fetch_corpse_pc( ch, container, obj, true );
         
     case ITEM_CONTAINER:
         if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
@@ -483,9 +478,13 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
     obj_from_obj( obj );
     obj_to_char( obj, ch );
 
+    // Decrease looting counter before any other 'get' progs have a chance to run.
+    if (container->item_type == ITEM_CORPSE_PC && !ch->is_immortal( ) && !container->hasOwner( ch ))
+        container->count--;
+
     if (oprog_get( obj, ch ))
         return true;
-    
+        
     if (oprog_fetch( ch, obj, container ))
         return true;
     
