@@ -252,7 +252,7 @@ void BashOneHit::calcDamage( )
 {
         dam = (ch->damroll / 2) + number_range(4,4 + 4* ch->size + chance/10);
         if ( is_flying( victim ) ) dam += dam/3;
-        damApplyEnhancedDamage();
+        damapply_class(ch, dam);
         Damage::calcDamage( );
 }
 
@@ -699,7 +699,7 @@ void KickOneHit::calcDamage( )
                 }
                 
                 dam += ch->damroll / 2;
-                damApplyEnhancedDamage( );
+                damapply_class(ch, dam);
 
                 //10% extra damage for every skill level
                 dam+= dam * skill_level_bonus(*gsn_kick, ch) / 10;
@@ -743,7 +743,7 @@ void DoubleKickOneHit::calcDamage( )
                 }
                 
                 dam += ch->damroll / 2;
-                damApplyEnhancedDamage( );
+                damapply_class(ch, dam);
 
                 //10% extra damage for every skill level
                 dam+= dam * skill_level_bonus(*gsn_double_kick, ch) / 10;
@@ -1467,7 +1467,7 @@ SmashOneHit::SmashOneHit( Character *ch, Character *victim )
 void SmashOneHit::calcDamage( )
 {
         dam = (ch->damroll / 2) + number_range(4, 4 + 5 * ch->size + chance/10);
-        damApplyEnhancedDamage();
+        damapply_class(ch, dam);
         Damage::calcDamage( );
 }
 

@@ -1069,7 +1069,7 @@ AmbushOneHit::AmbushOneHit( Character *ch, Character *victim )
 void AmbushOneHit::calcDamage( ) 
 {
     damBase( );
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
     dam *= 3;

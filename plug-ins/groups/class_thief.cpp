@@ -101,7 +101,7 @@ BackstabOneHit::BackstabOneHit( Character *ch, Character *victim )
 void BackstabOneHit::calcDamage( )
 {
     damBase( );
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
 	
@@ -140,7 +140,7 @@ DualBackstabOneHit::DualBackstabOneHit( Character *ch, Character *victim )
 void DualBackstabOneHit::calcDamage( )
 {
     damBase( );
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
 	
@@ -177,7 +177,7 @@ CircleOneHit::CircleOneHit( Character *ch, Character *victim )
 void CircleOneHit::calcDamage( )
 {
     damBase( );
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
 	
@@ -208,7 +208,7 @@ KnifeOneHit::KnifeOneHit( Character *ch, Character *victim )
 void KnifeOneHit::calcDamage( )
 {
     damBase( );
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
 	

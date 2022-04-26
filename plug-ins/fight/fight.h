@@ -37,6 +37,7 @@ void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, 
 void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show );
 void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);
 int        move_dec( Character *ch );
+void damapply_class(Character *ch, int &dam);
 
 
 void yell_panic( Character *ch, Character *victim, const char *msgBlind = NULL, const char *msg = NULL );

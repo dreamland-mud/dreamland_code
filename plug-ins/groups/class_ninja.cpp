@@ -719,7 +719,7 @@ void AssassinateOneHit::calcDamage( )
 
         dam = skill_level(*gsn_assassinate, ch) + ch->damroll;
         dam += dam * get_str_app(ch).damage / 100;
-        damApplyEnhancedDamage( );
+        damapply_class(ch, dam);
         if ( !IS_AWAKE(victim) )
             dam *= 2;
 
@@ -1096,7 +1096,7 @@ void GrabOneHit::calcDamage( )
 {
         dam = skill_level(*gsn_grab, ch) + ch->damroll / 2;
         dam += dam * get_str_app(ch).damage / 100;
-        damApplyEnhancedDamage( );
+        damapply_class(ch, dam);
 
         Damage::calcDamage( );
 }
