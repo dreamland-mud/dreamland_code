@@ -204,7 +204,6 @@ SKILL_RUNP(bashdoor)
     return;
 }
 
-
 /*
  * 'bash' skill command
  */
@@ -1254,70 +1253,10 @@ SKILL_RUNP(warcry)
     gsn_warcry->improve(ch, true);
 }
 
-/*----------------------------------------------------------------------------
- * smash
- *---------------------------------------------------------------------------*/
-class SmashOneHit : public SkillDamage {
-public:
-    SmashOneHit(Character *ch, Character *victim);
-
-    virtual void calcDamage();
-    virtual int calcChance();
-    int chance = 0;
-};
-
-SmashOneHit::SmashOneHit(Character *ch, Character *victim)
-    : Damage(ch, victim, DAM_BASH, 0),
-      SkillDamage(ch, victim, gsn_smash, DAM_BASH, 0, DAMF_WEAPON)
-{
-}
-
-void SmashOneHit::calcDamage()
-{
-    dam = (ch->damroll / 2) + number_range(4, 4 + 5 * ch->size + chance / 10);
-    damapply_class(ch, dam);
-    Damage::calcDamage();
-}
-
-int SmashOneHit::calcChance()
-{
-
-    chance = gsn_smash->getEffective(ch);
-    /* modifiers */
-    chance = chance * 4 / 5;
-
-    /* size  and weight */
-    chance += min(ch->canCarryWeight(), ch->carry_weight) / 25;
-    chance -= min(victim->canCarryWeight(), victim->carry_weight) / 20;
-
-    if (ch->size < victim->size)
-        chance += (ch->size - victim->size) * 25;
-    else
-        chance += (ch->size - victim->size) * 10;
-
-    /* stats */
-    chance += ch->getCurrStat(STAT_STR);
-    chance -= victim->getCurrStat(STAT_DEX) * 4 / 3;
-
-    if (is_flying(ch))
-        chance -= 10;
-
-    /* speed */
-    if (IS_QUICK(ch))
-        chance += 10;
-    if (IS_QUICK(victim))
-        chance -= 20;
-
-    /* level */
-    chance += skill_level(*gsn_smash, ch) - victim->getModifyLevel();
-
-    return chance;
-}
 
 /*
  * 'smash' skill command
  */
-
 SKILL_RUNP(smash)
 {
     char arg[MAX_INPUT_LENGTH];
@@ -1405,18 +1344,40 @@ SKILL_RUNP(smash)
         return;
     }
 
-    SmashOneHit smash(ch, victim);
-    int chance = smash.calcChance();
+    int chance;
+    // Calculate smash chance.
+    {
+        chance = gsn_smash->getEffective(ch);
+        /* modifiers */
+        chance = chance * 4 / 5;
 
-    if (!ch->is_npc() && !victim->is_npc())
-        LogStream::sendNotice()
-            << "smash: "
-            << ch->getName() << " " << ch->size << ":" << min(ch->canCarryWeight(), ch->carry_weight) << ":" << ch->getCurrStat(STAT_STR) << ":" << ch->getModifyLevel() << ", "
-            << victim->getName() << " " << victim->size << ":" << min(victim->canCarryWeight(), victim->carry_weight) << ":" << victim->getCurrStat(STAT_DEX) << ":" << victim->getModifyLevel() << ", "
-            << " chance " << chance << endl;
+        /* size  and weight */
+        chance += min(ch->canCarryWeight(), ch->carry_weight) / 25;
+        chance -= min(victim->canCarryWeight(), victim->carry_weight) / 20;
+
+        if (ch->size < victim->size)
+            chance += (ch->size - victim->size) * 25;
+        else
+            chance += (ch->size - victim->size) * 10;
+
+        /* stats */
+        chance += ch->getCurrStat(STAT_STR);
+        chance -= victim->getCurrStat(STAT_DEX) * 4 / 3;
+
+        if (is_flying(ch))
+            chance -= 10;
+
+        /* speed */
+        if (IS_QUICK(ch))
+            chance += 10;
+        if (IS_QUICK(victim))
+            chance -= 20;
+
+        /* level */
+        chance += skill_level(*gsn_smash, ch) - victim->getModifyLevel();
+    }
 
     /* now the attack */
-
     if (number_percent() < chance) {
         oldact_p("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!",
                  ch, NULL, victim, TO_VICT, POS_RESTING);
@@ -1451,8 +1412,13 @@ SKILL_RUNP(smash)
         victim->setWaitViolence(wait);
         ch->setWait(gsn_smash->getBeats(ch));
 
+        // Calculate smash damage.
+        int dam = (ch->damroll / 2) + number_range(4, 4 + 5 * ch->size + chance / 10);
+        damapply_class(ch, dam);
+
         try {
-            smash.hit(true);
+            
+            damage_nocatch(ch, victim, dam, gsn_smash, DAM_BASH, true, DAMF_WEAPON); 
 
             if (number_percent() < gsn_smash->getEffective(ch) - 40) {
                 if (number_percent() > 30)
@@ -1463,6 +1429,7 @@ SKILL_RUNP(smash)
         } catch (const VictimDeathException &) {
             return;
         }
+
     } else {
         damage(ch, victim, 0, gsn_smash, DAM_BASH, true, DAMF_WEAPON);
         oldact_p("Ты промахиваешься и падаешь лицом на пол!",
