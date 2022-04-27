@@ -19,6 +19,7 @@
 #include "core/object.h"
 #include "room.h"
 #include "fight_exception.h"
+#include "fight.h"
 #include "act.h"
 #include "dl_math.h"
 #include "math_utils.h"
@@ -255,6 +256,7 @@ FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillC
     ctx->argAll = target.argAll;
     ctx->argOne = target.argOne;
     ctx->argTwo = target.argTwo;
+    ctx->dam = 0;
 
     if (target.obj)
         ctx->obj = FeniaManager::wrapperManager->getWrapper(target.obj);
@@ -494,3 +496,14 @@ NMI_GET(FeniaCommandContext, level, "уровень, с которым вызв�
 {
     return Register(level);
 }
+
+NMI_GET(FeniaCommandContext, dam, "расчетные повреждения")
+{
+    return Register(dam);
+}
+
+NMI_SET(FeniaCommandContext, dam, "расчетные повреждения")
+{
+    dam = arg.toNumber();
+}
+

@@ -76,6 +76,7 @@ public:
     XML_VARIABLE XMLRegister vict;
     XML_VARIABLE XMLRegister state;
     XML_VARIABLE XMLInteger level;
+    XML_VARIABLE XMLInteger dam;    
     XML_VARIABLE XMLString argAll, argOne, argTwo;
 };                       
 
