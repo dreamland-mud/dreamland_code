@@ -444,30 +444,6 @@ void Damage::calcDamage( )
     protectRazer( ); // >8)
 }
 
-void Damage::damApplyEnhancedDamage( )
- {
-    if (ch->is_npc())
-        return;
-
-    // OLD LOGIC:
-    // melee (+1-100%), cleric (+0.5-77%), hybrid/agile (+0.8-88%), caster (0)
-    // NEW LOGIC:
-    // melee (+1-100%), agile (+0.9-90%), hybrid (+0.5-77%), caster (0)
- 
-    int div;        
-   
-    if ((ch->getProfession( )->getFlags( ).isSet(PROF_HYBRID)) || (ch->getProfession( ) == prof_cleric))
-        div = 130; // TO-DO: remove cleric bonus after making sure newbie clerics don't die as much
-    else if (ch->getProfession( )->getFlags( ).isSet(PROF_AGILE))
-        div = 110;
-    else if (!ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
-        div = 100;   
-    else 
-        return;
- 
-     dam += dam * number_percent()/div;
-}
-
 /*-----------------------------------------------------------------------------
  * Inflict actual damage
  *----------------------------------------------------------------------------*/

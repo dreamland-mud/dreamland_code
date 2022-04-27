@@ -109,7 +109,7 @@ void VampiricBiteOneHit::damBase( )
 void VampiricBiteOneHit::calcDamage( )
 {
     damBase( ); 
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyPosition( );
 
     int slevel = skill_level(*gsn_vampiric_bite, ch);    
@@ -1065,7 +1065,7 @@ void BonedaggerOneHit::damApplyReligion()
 void BonedaggerOneHit::calcDamage( ) 
 {
     damBase( );
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
     damApplyReligion();

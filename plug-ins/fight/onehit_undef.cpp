@@ -137,7 +137,7 @@ void UndefinedOneHit::calcDamage( )
 {
     damBase( );
     damApplyMasterHand( );
-    damApplyEnhancedDamage( );
+    damapply_class(ch, dam);
     damApplyMasterSword( );
     damApplyPosition( );
     damApplyDamroll( );

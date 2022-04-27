@@ -90,6 +90,7 @@
 #include "magic.h"
 #include "vnum.h"
 #include "wearloc_utils.h"
+#include "profflags.h"
 #include "skill_utils.h"
 #include "fenia_utils.h"
 #include "onehit_undef.h"
@@ -539,4 +540,25 @@ int move_dec( Character *ch )
         return 0;
 
     return min( max( ch->getModifyLevel( ) / 20, 1 ), (int)ch->move );
+}
+
+// Apply damange bonus by character class:
+// melee (+1-100%), agile (+0.9-90%), hybrid (+0.5-77%), caster (0)
+void damapply_class(Character *ch, int &dam)
+{
+    if (ch->is_npc())
+        return;
+
+    int div;        
+   
+    if (ch->getProfession( )->getFlags( ).isSet(PROF_HYBRID))
+        div = 130; 
+    else if (ch->getProfession( )->getFlags( ).isSet(PROF_AGILE))
+        div = 110;
+    else if (!ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
+        div = 100;   
+    else 
+        return;
+ 
+     dam += dam * number_percent()/div;
 }

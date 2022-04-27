@@ -630,7 +630,6 @@ AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
 
 void AssassinateOneHit::calcDamage( )
 {
-    Debug d(ch, "debug_ninja", "assa");
     float chance, skill_mod, stat_mod, level_mod, size_mod, vis_mod, sleep_mod, quick_mod, time_mod;
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
@@ -648,48 +647,37 @@ void AssassinateOneHit::calcDamage( )
     chance = 0;
         
     chance += gsn_assassinate->getEffective( ch ) * skill_mod;
-    d.log(chance, "skill");
     chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
-    d.log(chance, "stats");
     chance += ( skill_level(*gsn_assassinate, ch) - victim->getModifyLevel() ) * level_mod * 100;
-    d.log(chance, "lvl");
     chance += (ch->size - victim->size) * size_mod * 100;
-    d.log(chance, "size");
     chance += victim->can_see(ch) ? 0 : (vis_mod * 100);    
     chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
-    d.log(chance, "vis");
 
     if (IS_QUICK(ch)) {
         chance += quick_mod * 100;
-        d.log(chance, "quick");
     }        
 
     if (IS_QUICK(victim)) {
         chance -= quick_mod * 100;            
-        d.log(chance, "quick");
     }
 
     if (IS_SET(victim->res_flags, RES_WEAPON)) {
         chance = chance / 2;
-        d.log(chance, "res");
     }
             
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
         chance = chance / 2;
-        d.log(chance, "stun");
     }
     
     // neckguard can't protect if you're asleep
     if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) {
         chance = chance / 2;
-        d.log(chance, "backguard");
     }
 
     // only check for assassinate spam without strangle
     int k = ch->getLastFightDelay( );
     if (k >= 0 && k < FIGHT_DELAY_TIME && IS_AWAKE( victim )) {
         chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
-        d.log(chance, "adrenaline");
     }
         
     UNSET_DEATH_TIME(ch);
@@ -697,7 +685,6 @@ void AssassinateOneHit::calcDamage( )
     ch->setLastFightTime( );    
     
     chance = max( (float)1, chance ); // there's always a chance
-    d.log((int)chance, "final");
 
     //////////////// THE ROLL ////////////////
     
@@ -719,7 +706,7 @@ void AssassinateOneHit::calcDamage( )
 
         dam = skill_level(*gsn_assassinate, ch) + ch->damroll;
         dam += dam * get_str_app(ch).damage / 100;
-        damApplyEnhancedDamage( );
+        damapply_class(ch, dam);
         if ( !IS_AWAKE(victim) )
             dam *= 2;
 
@@ -1096,7 +1083,7 @@ void GrabOneHit::calcDamage( )
 {
         dam = skill_level(*gsn_grab, ch) + ch->damroll / 2;
         dam += dam * get_str_app(ch).damage / 100;
-        damApplyEnhancedDamage( );
+        damapply_class(ch, dam);
 
         Damage::calcDamage( );
 }

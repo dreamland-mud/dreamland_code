@@ -32,7 +32,6 @@ public:
     void adjustDeathTime( );
     
     virtual void calcDamage( );
-    void damApplyEnhancedDamage( );
     void protectMaterial( Object * );
     void protectSanctuary( );
     void protectAlign( );
