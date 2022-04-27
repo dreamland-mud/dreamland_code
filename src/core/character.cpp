@@ -400,7 +400,10 @@ bool Character::can_see( const Character *victim ) const
 
     if ( IS_AFFECTED(this, AFF_BLIND) )
         return false;
-
+	
+	if (position <= POS_SLEEPING)
+        return false;
+	
     if ( !in_room )
         return false;
 
