@@ -34,6 +34,7 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+#include "magic.h"
 
 WEARLOC(hold);
 PROF(vampire);
@@ -670,20 +671,24 @@ CMDRUN( drink )
     if (!ch->is_npc( )) 
         for (int i = 0; i < desireManager->size( ); i++)
             desireManager->find( i )->drink( ch->getPC( ), amount, liquid );
-    
+
+	/* The drink was poisoned ! */	
     if (obj && (IS_SET( obj->value3(), DRINK_POISONED ) || obj->isAffected(gsn_poison)))
     {
-        /* The drink was poisoned ! */
+        int level = number_fuzzy(amount);
         Affect af;
 
-        oldact("$c1 хватается за горло и задыхается.",ch,0,0,TO_ROOM );
-        ch->pecho("Ты хватаешься за горло и задыхаешься.");
-        af.bitvector.setTable(&affect_flags);
-        af.type      = gsn_poison;
-        af.level     = number_fuzzy(amount);
-        af.duration  = 3 * amount;
-        af.bitvector.setValue(AFF_POISON);
-        affect_join( ch, &af );
+        if ( !saves_spell(level / 2, ch, DAM_POISON) ) {
+			ch->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а.", ch);
+            ch->pecho("Тебя начинает тошнить, когда яд проникает в твое тело.");
+
+            af.bitvector.setTable(&affect_flags);
+            af.type      = gsn_poison;
+            af.level     = level;
+            af.duration  = 3 * amount;
+            af.bitvector.setValue(AFF_POISON);
+            affect_join( ch, &af );
+		}
     }
 
     if (obj && obj->value0() > 0)

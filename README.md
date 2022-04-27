@@ -231,5 +231,3 @@ make -j 4 && make install
 ```
 plug reload changed
 ```
-
-

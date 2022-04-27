@@ -38,7 +38,7 @@ Pet::Pet( )
 
 void Pet::stopfol( Character *master ) 
 {
-    lastCharmTime = dreamland->getCurrentTime( );
+    setLastCharmTime();
 }
 
 bool Pet::area( ) 
