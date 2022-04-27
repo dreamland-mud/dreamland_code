@@ -51,6 +51,7 @@ public:
     virtual bool canCancel( Character * );
     virtual bool isAfterCharm( ) const;
     virtual long long getLastCharmTime() const;
+    void setLastCharmTime();
 
     void rememberFought(Character *victim);
 

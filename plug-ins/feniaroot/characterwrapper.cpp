@@ -2252,6 +2252,13 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
     af.bitvector.setValue(AFF_CHARM);
     affect_to_char( victim, &af );
 
+    // Ensure that when charm is off, default mobile AI won't be active for a while.
+    if (victim->is_npc() && victim->getNPC()->behavior) {
+        BasicMobileBehavior::Pointer bhv = victim->getNPC()->behavior.getDynamicPointer<BasicMobileBehavior>();
+        if (bhv)
+            bhv->setLastCharmTime();
+    }
+
     return Register( );
 }
 
@@ -2282,6 +2289,13 @@ NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам 
     target->getPC( )->pet = pet->getNPC( );
     pet->add_follower( target );
     pet->leader = target;
+
+    // Ensure that when charm is off, default mobile AI won't be active for a while.
+    if (pet->getNPC()->behavior) {
+        BasicMobileBehavior::Pointer bhv = pet->getNPC()->behavior.getDynamicPointer<BasicMobileBehavior>();
+        if (bhv)
+            bhv->setLastCharmTime();
+    }
 
     return Register( );
 }

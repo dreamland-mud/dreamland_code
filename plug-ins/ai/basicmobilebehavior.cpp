@@ -206,6 +206,12 @@ long long BasicMobileBehavior::getLastCharmTime() const
     return lastCharmTime.getValue();
 }
 
+void BasicMobileBehavior::setLastCharmTime()
+{
+    lastCharmTime = dreamland->getCurrentTime( );
+}
+
+
 /*
  * BasicMobileBehavior - returning to home position 
  */
@@ -388,7 +394,7 @@ bool BasicMobileBehavior::spell( Character *caster, int sn, bool before )
                                    - caster->getModifyLevel( )) * 10)
             memoryFought.remember( caster );
         
-        lastCharmTime = dreamland->getCurrentTime( );
+        setLastCharmTime();
         remember( ch->in_room );
 
         return false;
@@ -613,6 +619,6 @@ void SavedCreature::stopfol( Character *master )
         saved = false;
     }
 
-    MobileBehavior::stopfol( master );
+    BasicMobileDestiny::stopfol( master );
 }
 
