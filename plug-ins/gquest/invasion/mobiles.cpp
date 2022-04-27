@@ -37,6 +37,7 @@ bool InvasionMob::death( Character *killer )
     
     gquest->rewardKiller( killer->getPC( ) );
     actDeath( killer );
+    ch->setDead();
     return true;
 }
 
