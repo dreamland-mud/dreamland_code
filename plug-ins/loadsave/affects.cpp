@@ -216,18 +216,14 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     case APPLY_WIS:           ch->mod_stat[STAT_WIS]        += mod;        break;
     case APPLY_CON:           ch->mod_stat[STAT_CON]        += mod;        break;
     case APPLY_CHA:           ch->mod_stat[STAT_CHA]        += mod; break;
-    case APPLY_CLASS:                                                break;
     case APPLY_AGE:
         if (!ch->is_npc( ))
             ch->getPC( )->age.modifyYears( mod );
         break;
-    case APPLY_HEIGHT:                                                break;
-    case APPLY_WEIGHT:                                                break;
     case APPLY_MANA:          ch->max_mana                += mod;        break;
     case APPLY_HIT:           ch->max_hit                += mod;        break;
     case APPLY_MOVE:          ch->max_move                += mod;        break;
     case APPLY_GOLD:                                                break;
-    case APPLY_EXP:                                                break;
     case APPLY_AC:
         for (i = 0; i < 4; i ++)
             ch->armor[i] += mod;
