@@ -71,5 +71,40 @@ protected:
     int level;
 };
 
+/*
+ * summon
+ */
+class SummonSpell : public virtual DefaultSpell {
+XML_OBJECT
+public:
+    typedef ::Pointer<SummonSpell> Pointer;
+    
+    virtual void run( Character *, Character *, int, int );
+};
+
+class SummonMovement : public JumpMovement {
+public:
+    SummonMovement( Character *ch, Character *caster, SummonSpell::Pointer, int level );
+    virtual ~SummonMovement( );
+
+protected:
+    virtual bool canMove( Character * );
+    bool checkCaster( );
+    bool checkVictim( );
+    
+    virtual bool tryMove( Character * );
+    bool applySpellbane( );
+    bool applySavesSpell( );
+    bool applyLazy( );
+
+    virtual bool moveAtomic( );
+    virtual void msgOnMove( Character *, bool );
+    virtual void msgEcho( Character *, Character *, const char * );
+
+    Character *caster;
+    SummonSpell::Pointer spell;
+    int level;
+};
+
 #endif
 

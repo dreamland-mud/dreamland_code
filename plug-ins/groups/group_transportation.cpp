@@ -16,6 +16,7 @@
 
 #include "spelltemplate.h"
 #include "affecthandlertemplate.h"
+#include "transportspell.h"
 #include "recallmovement.h"
 #include "profflags.h"
 
