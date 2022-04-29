@@ -10,7 +10,6 @@ defaultskillgroup.cpp \
 impl.cpp \
 mobskilldata.cpp \
 spellmanager.cpp \
-summoncreaturespell.cpp \
 objthrow.cpp \
 transportspell.cpp \
 sleepaffecthandler.cpp \
@@ -27,7 +26,6 @@ defaultskillcommand.h \
 defaultskillgroup.h \
 mobskilldata.h \
 spellmanager.h \
-summoncreaturespell.h \
 transportspell.h \
 sleepaffecthandler.h \
 xmlattributerestring.h \

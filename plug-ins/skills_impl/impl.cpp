@@ -17,7 +17,6 @@
 
 #include "feniaskillaction.h"
 #include "basicskill.h"
-#include "summoncreaturespell.h"
 #include "transportspell.h"
 #include "sleepaffecthandler.h"
 #include "skillhelp.h"
@@ -40,10 +39,8 @@ extern "C"
                 Plugin::registerPlugin<MocRegistrator<DefaultSkillGroup> >( ppl );                
                 Plugin::registerPlugin<XMLVariableRegistrator<SkillGroupHelp> >( ppl );
                 Plugin::registerPlugin<SkillGroupLoader>( ppl );
-                Plugin::registerPlugin<MobileBehaviorRegistrator<SummonedCreature> >( ppl );
                 Plugin::registerPlugin<MocRegistrator<DefaultSpell> >( ppl );                
                 Plugin::registerPlugin<MocRegistrator<GateSpell> >( ppl );                
-                Plugin::registerPlugin<MocRegistrator<SummonSpell> >( ppl );                
                 Plugin::registerPlugin<MocRegistrator<SleepAffectHandler> >( ppl );                
                 Plugin::registerPlugin<XMLVariableRegistrator<SkillHelp> >( ppl );
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeRestring> >( ppl );
