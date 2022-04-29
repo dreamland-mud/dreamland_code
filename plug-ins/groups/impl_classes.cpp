@@ -11,8 +11,6 @@
 #include "affecthandlertemplate.h"
 #include "commandtemplate.h"
 
-#include "class_antipaladin.h"
-#include "class_ranger.h"
 #include "class_samurai.h"
 #include "class_vampire.h"
 #include "class_warlock.h"
@@ -24,10 +22,6 @@ extern "C"
         {
             SO::PluginList ppl;
 
-            Plugin::registerPlugin<ObjectBehaviorRegistrator<ShadowBlade> >( ppl );
-            Plugin::registerPlugin<MobileBehaviorRegistrator<AntipaladinGuildmaster> >( ppl );
-            Plugin::registerPlugin<MobileBehaviorRegistrator<RangerCreature> >( ppl );
-            Plugin::registerPlugin<ObjectBehaviorRegistrator<RangerStaff> >( ppl );
             Plugin::registerPlugin<ObjectBehaviorRegistrator<EnergyShield> >( ppl );
             Plugin::registerPlugin<MobileBehaviorRegistrator<SamuraiGuildmaster> >( ppl );
             Plugin::registerPlugin<ObjectBehaviorRegistrator<Katana> >( ppl );

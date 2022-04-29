@@ -38,36 +38,17 @@ libgenericskill_la_LIBADD = \
 libgroup_skills_la_SOURCES = \
 impl_groups.cpp \
 exoticskill.cpp \
-group_attack.cpp \
 group_beguiling.cpp \
-group_benedictions.cpp \
-group_combat.cpp \
-group_creation.cpp \
-group_curative.cpp \
-group_defensive.cpp \
 group_detection.cpp \
-group_draconian.cpp \
-group_enchantment.cpp \
-group_enhancement.cpp \
 group_fightmaster.cpp \
-group_harmful.cpp \
-group_healing.cpp \
-group_illusion.cpp \
-group_maladictions.cpp \
-group_meditation.cpp \
-group_necromancy.cpp \
-group_protective.cpp \
 group_transportation.cpp \
 group_weaponsmaster.cpp \
-group_weather.cpp \
 group_movement.cpp \
-group_nature.cpp \
 group_arcane.cpp
 
 libgroup_skills_la_MOC = \
 group_vampiric.h \
 group_beguiling.h \
-group_necromancy.h \
 exoticskill.h
 
 libgroup_skills_la_LIBADD = \
@@ -81,21 +62,16 @@ libclass_skills_la_SOURCES = \
 impl_classes.cpp \
 class_antipaladin.cpp \
 class_ninja.cpp \
-class_paladin.cpp \
 class_ranger.cpp \
 class_samurai.cpp \
 class_thief.cpp \
 class_vampire.cpp \
 class_warlock.cpp \
-class_warrior.cpp \
-class_necromancer.cpp \
-class_cleric.cpp 
+class_warrior.cpp 
 
 libclass_skills_la_MOC = \
-class_antipaladin.h \
 class_samurai.h \
 class_vampire.h \
-class_ranger.h \
 class_warlock.h 
 
 libclass_skills_la_LIBADD = \

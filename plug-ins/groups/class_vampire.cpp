@@ -176,146 +176,6 @@ void VampiricBiteOneHit::postDamageEffects( )
     }
 }
 
-/*
- * 'dominate' (former 'control animal') skill command
- */
-SKILL_RUNP( dominate )
-{
-  char arg[MAX_INPUT_LENGTH];
-  Character *victim;
-  int clevel, vlevel; 
-  float chance, skill_mod, stat_mod, level_mod;
-        
-
-  //////////////// ELIGIBILITY CHECKS ////////////////
-
-  ///// Standard checks: TODO: turn this into a function 
-	
-  argument = one_argument( argument, arg );
-
-  if (ch->is_npc() || !gsn_dominate->usable( ch ) )
-  {
-  	ch->pecho("Это умение тебе недоступно.");
-	return;
-  }
-
-  if ( arg[0] == '\0' )
-  {
-	ch->pecho("Доминировать над кем?");
-	return;
-  }
-
-  if ( ( victim = get_char_room( ch, arg ) ) == 0 )
-  {
-	ch->pecho("Тут таких нет.");
-	return;
-  }
-
-  if ( victim == ch )
-  {
-	ch->pecho("Ты ДОМИНИРУЕШЬ над собой!");
-	return;
-  }
-	
-  if (!victim->is_npc( ))
-  {
-	ch->pecho("Доминировать над игроками нельзя -- используй вместо этого очарование.");
-	return;
-  }
-
-  if ( IS_BLOODLESS(victim) ) {
-	ch->pecho("Это существо не поддается доминированию.");
-	return;        
-  }	
-    
-  if (is_safe(ch,victim) || overcharmed(ch))
-	return;
-
-  if ( IS_CHARMED(victim) ) {
-	ch->pecho("Это существо уже под чьим-то контролем.");
-	return;
-  }
-  
-  if ( IS_CHARMED(ch) )
-  {
-  	ch->pecho("Спроси разрешения у сво%1$Gего|его|й хозя%1$Gина|ина|йки.", ch->master);
-        return;
-  }
-
-  if ( IS_SET(victim->imm_flags,IMM_CHARM ) )
-  {
-	ch->pecho("У этого существа иммунитет к очарованию.");
-        return;
-  }
-  
-  if ( victim->fighting != 0 )
-  {
-	ch->pecho("Подожди, пока закончится сражение.");
-	return;
-  }
-  
-  if ( !IS_AWAKE(victim) || !victim->can_see(ch) )
-  {
-	ch->pecho("Твоя жертва не видит тебя.");
-	return;                
-  }  
-
-  //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-  skill_mod   = 0.5;
-  stat_mod    = 0.02;
-  level_mod   = 0.05;
-  clevel      = skill_level(*gsn_dominate, ch);
-  vlevel      = victim->getModifyLevel(); 
-
-  //////////////// PROBABILITY CHECKS //////////////// 
-      
-  ch->setWaitViolence( 1 );
-
-  chance = gsn_dominate->getEffective( ch ) * skill_mod;
-  chance += ( ch->getCurrStat(STAT_CHA) - 20 ) * stat_mod * 100;
-  chance += ( ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT) ) * stat_mod * 100;
-  chance += ( clevel - vlevel ) * level_mod * 100;
-  chance = URANGE(1, (int)chance, 100) ;   
-  
-  // can't dominate shoppers or +5 level mobs    
-  if ( (vlevel - clevel) > 5 )
-	  chance = 0;	  
-  
-  if ( (victim->is_npc( )) && (victim->getNPC( )->behavior) &&
-       (IS_SET( victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER) )) )
-	  chance = 0;
-
-  //////////////// THE ROLL ////////////////
-	
-  if ( number_percent() > (int)chance )
-  {
-	gsn_dominate->improve( ch, false, victim );
-	do_say(victim,"Я не собираюсь следовать за тобой!");
-	multi_hit( victim , ch , "murder" );
-	return;
-  }
-
-  gsn_dominate->improve( ch, true, victim );
-
-  if ( victim->master )
-        victim->stop_follower( );
-	
-  SET_BIT(victim->affected_by,AFF_CHARM);
-
-  if ( victim->is_npc( ) && victim->in_room )
-  {
-	save_mobs( victim->in_room );
-  }
-                
-  victim->master = victim->leader = ch;
-
-  if ( ch != victim ) {
-        oldact("$C1 смотрит на тебя с покорностью.",ch,0,victim,TO_CHAR);
-  	oldact("$c1 подчиняет тебя своей воле.", ch, 0, victim, TO_VICT);
-  }
-	
-  return;
-}
 
 /*
     * 'earthquake' open graves
@@ -1194,93 +1054,6 @@ SKILL_APPLY( bonedagger )
     return true;
 }
 
-/*
- * 'sense life' skill command
- */
-
-SKILL_RUNP( sense )
-{
-    int mana;
-    
-  if (ch->is_npc() || !gsn_sense_life->usable( ch ) )
-    {
-      ch->pecho("Ты не умеешь чуять присутствие живых организмов.");
-      return;
-    }
-
-  if (ch->isAffected(gsn_sense_life))
-    {
-      ch->pecho("Ты уже можешь почуять присутствие живых организмов.");
-      return;
-    }
-
-    mana = gsn_sense_life->getMana(ch);
-    
-  if (ch->mana < mana)
-    {
-      ch->pecho("У тебя не хватает энергии для этого.");
-      return;
-    }
-
-  ch->setWait( gsn_sense_life->getBeats(ch)  );
-
-  if (!ch->is_npc() && number_percent() < gsn_sense_life->getEffective( ch ))
-    {
-      Affect af;
-
-      af.bitvector.setTable(&detect_flags);
-      af.type         = gsn_sense_life;
-      af.level         = ch->getModifyLevel();
-      af.duration = ch->getModifyLevel();
-      
-      af.modifier = 0;
-      af.bitvector.setValue(DETECT_LIFE);
-      affect_to_char(ch, &af);
-
-      ch->mana -= mana;
-
-      oldact_p("Ты начинаешь чувствовать присутствие живых организмов в комнате!",
-             ch,0,0,TO_CHAR,POS_RESTING);
-      oldact_p("$c1 выглядит более чувствительным к присутствию живых организмов.",
-             ch,0,0,TO_ROOM,POS_RESTING);
-      gsn_sense_life->improve( ch, true );
-    }
-  else
-    {
-      ch->mana -= mana / 2;
-
-     ch->pecho("Твоя попытка закончилась неудачей.");
-      gsn_sense_life->improve( ch, false );
-    }
-
-}
-
-SPELL_DECL(BatSwarm);
-VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level ) 
-{ 
-    Affect af;
-
-    if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	ch->pecho( "Для этого тебе необходимо превратиться в вампир%Gа|а|шу!", ch );    
-        return;
-    }
-
-    if (ch->isAffected(sn)) {
-        ch->pecho("Две стаи летучих мышей -- это слишком.");
-        return;
-    }
-	
-    oldact("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0, TO_ALL);
-    oldact("На зов $c2 слетается стая летучих мышей и окружает $s живым облаком.", ch, 0, 0, TO_ROOM);
-    oldact("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR);
-
-    af.type            = sn;
-    af.level            = level;
-    af.duration            = 1 + level / 10;
-    
-    affect_to_char(ch, &af);
-}
-
 
 /*---------------------------------------------------------------------------
  * VampireGuildmaster
@@ -1291,9 +1064,11 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
     if (actor->is_npc( ))
 	    return false;
 
-    if ( (actor->getProfession( ) != prof_vampire) && (number_percent() < 20) ) {
-        oldact("$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
-        oldact("$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
+    if (actor->getProfession( ) != prof_vampire) {
+        if (chance(20)) {
+            oldact("$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );    
+            oldact("$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
+        }
         return false;
     }
 	    
