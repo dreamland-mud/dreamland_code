@@ -39,7 +39,6 @@ libgroup_skills_la_SOURCES = \
 impl_groups.cpp \
 exoticskill.cpp \
 group_beguiling.cpp \
-group_detection.cpp \
 group_fightmaster.cpp \
 group_transportation.cpp \
 group_weaponsmaster.cpp \
