@@ -62,14 +62,6 @@ protected:
         virtual int getCast( Character * );
 };
 
-class KnightWeapon : public BasicObjectBehavior {
-XML_OBJECT
-public:
-    typedef ::Pointer<KnightWeapon> Pointer;
-
-    virtual bool death( Character * );
-    virtual void fight( Character * );
-};
 
 class COrden : public CommandPlugin, public DefaultCommand {
 public:

@@ -12,8 +12,6 @@
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
-#include "class_warlock.h"
-
 #include "playerattributes.h"
 
 #include "skill.h"

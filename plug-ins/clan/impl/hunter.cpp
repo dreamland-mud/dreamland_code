@@ -709,16 +709,6 @@ VOID_SPELL(TakeRevenge)::run( Character *ch, char *target_name, int sn, int leve
 }
 
 
-SPELL_DECL_T(Wolf, SummonCreatureSpell);
-TYPE_SPELL(NPCharacter *, Wolf)::createMobile( Character *ch, int level ) const 
-{
-    return createMobileAux( ch, ch->getModifyLevel( ), 
-                         ch->hit, 
-                         (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
-                         number_range(level/15, level/10),
-                         number_range(level/3, level/2),
-                         number_range(level/8, level/6) );
-}
 
 /*--------------------------------------------------------------------------
  * trap skills

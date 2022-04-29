@@ -1548,26 +1548,6 @@ bool RulerSpecialGuard::specFight( )
     return true;
 }
 
-SPELL_DECL_T(GuardCall, SummonCreatureSpell);
-TYPE_SPELL(NPCharacter *, GuardCall)::createMobile( Character *ch, int level ) const 
-{
-    return createMobileAux( ch, ch->getModifyLevel( ), 
-                                     2 * ch->max_hit, ch->max_mana,
-                                     number_range(level/18, level/14),
-                                     number_range(level/4, level/3),
-                                     number_range(level/10, level/8) );
-} 
-
-VOID_SPELL(GuardCall)::run( Character *ch, char *target_name, int sn, int level ) 
-{ 
-    if ( ch->isAffected(gsn_dismiss ) ) {
-        ch->pecho("У тебя отобрали привилегии Правителя!");
-        return;
-    }
-    
-    SummonCreatureSpell::run( ch, target_name, sn, level );
-}
-
 SPELL_DECL(KnowPersone);
 VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -1649,27 +1629,6 @@ VOID_SPELL(RemoveBadge)::run( Character *ch, Character *victim, int sn, int leve
 }
 
 
-
-
-SPELL_DECL(RulerAura);
-VOID_SPELL(RulerAura)::run( Character *ch, Character *, int sn, int level ) 
-{ 
-  Affect af;
-
-    if (!ch->isAffected(sn))
-    {
-      ch->pecho("Аура Правителя помогает тебе видеть сквозь тень и камуфляж.");
-
-      af.bitvector.setTable(&detect_flags);
-      af.type = sn;
-      af.duration = level / 4;
-      af.level = ch->getModifyLevel();
-      af.bitvector.setValue(DETECT_FADE | ACUTE_VISION | DETECT_IMP_INVIS | DETECT_INVIS | DETECT_HIDDEN);
-      affect_to_char(ch, &af);
-    }
-  else
-      ch->pecho("Ты и так уже знаешь многое в этом мире, неподвластное другим.");
-}
 
 
 

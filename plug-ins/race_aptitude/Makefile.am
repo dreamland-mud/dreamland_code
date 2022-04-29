@@ -17,7 +17,6 @@ $(LIBADD_FIGHT) \
 librace_skills_la_SOURCES = \
 hobbit.cpp \
 felar.cpp \
-rockseer.cpp \
 centaur.cpp
 
 librace_aptitude_la_LIBADD = \

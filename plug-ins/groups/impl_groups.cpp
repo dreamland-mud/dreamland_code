@@ -11,7 +11,6 @@
 #include "skillcommandtemplate.h"
 
 #include "group_beguiling.h"
-#include "group_necromancy.h"
 #include "group_vampiric.h"
 #include "exoticskill.h"
 #include "so.h"
@@ -43,8 +42,6 @@ extern "C"
             Plugin::registerPlugin<GroupSkillsRegistrator>( ppl );
 
             Plugin::registerPlugin<ObjectBehaviorRegistrator<MagicJar> >( ppl );
-            Plugin::registerPlugin<MobileBehaviorRegistrator<NecroCreature> >( ppl );
-            Plugin::registerPlugin<MobileBehaviorRegistrator<AdamantiteGolem> >( ppl );
             
             return ppl;
         }

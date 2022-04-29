@@ -21,13 +21,5 @@ protected:
         virtual bool specFight( );
 };
 
-class LionEyedSword : public BasicObjectBehavior {
-XML_OBJECT
-public:
-    typedef ::Pointer<LionEyedSword> Pointer;
-
-    virtual void wear( Character * );
-    virtual void equip( Character * );                           
-};
 
 #endif

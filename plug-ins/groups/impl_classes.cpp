@@ -13,7 +13,6 @@
 
 #include "class_samurai.h"
 #include "class_vampire.h"
-#include "class_warlock.h"
 #include "so.h"
 
 extern "C"
@@ -22,7 +21,6 @@ extern "C"
         {
             SO::PluginList ppl;
 
-            Plugin::registerPlugin<ObjectBehaviorRegistrator<EnergyShield> >( ppl );
             Plugin::registerPlugin<MobileBehaviorRegistrator<SamuraiGuildmaster> >( ppl );
             Plugin::registerPlugin<ObjectBehaviorRegistrator<Katana> >( ppl );
             Plugin::registerPlugin<ObjectBehaviorRegistrator<OwnedKatana> >( ppl );

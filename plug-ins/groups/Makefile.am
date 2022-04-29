@@ -71,8 +71,7 @@ class_warrior.cpp
 
 libclass_skills_la_MOC = \
 class_samurai.h \
-class_vampire.h \
-class_warlock.h 
+class_vampire.h 
 
 libclass_skills_la_LIBADD = \
 $(libgroup_skills_la_LIBADD) \

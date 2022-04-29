@@ -110,7 +110,6 @@ extern "C"
          * chaos
          */
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardChaos> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<ChaosBlade> >( ppl );
         
         /*
          * knight
@@ -118,14 +117,12 @@ extern "C"
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardKnight> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanItemKnight> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanAltarKnight> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<KnightWeapon> >( ppl );
         Plugin::registerPlugin<COrden>( ppl );
         
         /*
          * lion
          */
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardLion> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<LionEyedSword> >( ppl );
         
         /*
          * ruler
@@ -142,7 +139,6 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<ShalafiClan> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ShalafiFaculty> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardShalafi> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ShalafiDemon> >( ppl );
         
         /*
          * invader

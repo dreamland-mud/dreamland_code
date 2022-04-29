@@ -22,13 +22,6 @@ protected:
         virtual int getCast( Character * );
 };
 
-class ShalafiDemon : public ClanSummonedCreature {
-XML_OBJECT
-public:
-    typedef ::Pointer<ShalafiDemon> Pointer;
-
-    virtual void conjure( );
-};
 
 class ShalafiFaculty : public ClanOrder {
 XML_OBJECT
