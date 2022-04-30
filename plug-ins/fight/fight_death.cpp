@@ -1027,19 +1027,6 @@ void raw_kill( Character* victim, int part, Character* ch )
 
     make_corpse( ch, victim );
 
-    // Death notification: wiznet/discord/telegram. TODO move to global onDeath trigger.
-    {
-        DLString msg = death_message(victim, ch);
-        int wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
-        wiznet(wizflag, 0, victim->get_trust(), msg.c_str(), victim, ch);
-
-        if (!victim->is_npc()) {
-            send_discord_death(msg);
-            if (ch && !ch->is_npc() && ch != victim)
-                send_telegram(msg);
-        }
-    }
-
     // MOB is killed.
     if (victim->is_npc( )) {
         killed_npc_gain( victim->getNPC( ) );
