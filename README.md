@@ -6,7 +6,7 @@
 </p>
 
 ---
-
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Build Status](https://api.travis-ci.com/dreamland-mud/dreamland_code.svg?branch=master&status=unknown)](https://app.travis-ci.com/github/dreamland-mud/dreamland_code)
