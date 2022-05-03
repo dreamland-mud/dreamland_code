@@ -86,6 +86,7 @@
 #include "act.h"
 #include "def.h"
 #include "vnum.h"
+#include "character.h"
 
 DESIRE(full);
 DESIRE(hunger);
