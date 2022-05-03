@@ -80,6 +80,7 @@
 #include "interp.h"
 #include "gsn_plugin.h"
 #include "stats_apply.h"
+#include "damageflags.h"
 #include "material.h"
 #include "act_move.h"
 #include "handler.h"
