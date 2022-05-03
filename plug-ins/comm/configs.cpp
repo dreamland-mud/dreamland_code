@@ -412,7 +412,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
 
     if (discord["id"].asString().empty()) {
         buf << "Для связи этого персонажа с пользователем Discord: " << endl
-            << "  {W*{x зайди на сервер {hlhttps://discord.gg/RPaz6ut{x" << endl
+            << "  {W*{x зайди на сервер {hlhttps://discord.gg/fVtaeePyey{x" << endl
             << "  {W*{x зайди на канал {W#дрим-чат{x или открой приват с ботом {WВалькирия{x" << endl
             << "  {W*{x набери {W/link " << discord["token"].asString() << "{x" << endl
             << "Для смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x." << endl;
