@@ -1186,7 +1186,6 @@ static int drop_obj( Character *ch, Object *obj )
              && ch->in_room->getSectorType() != SECT_AIR
              && ch->in_room->getSectorType() != SECT_FOREST
              && ch->in_room->getSectorType() != SECT_DESERT
-             && obj->pIndexData->vnum == OBJ_VNUM_POTION_VIAL
              && material_is_flagged( obj, MAT_FRAGILE )
              && chance( 40 ))
     {
