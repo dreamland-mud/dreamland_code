@@ -286,7 +286,7 @@ bool ClanGuard::checkPush( PCharacter* wch )
         actPush( wch );
 
         if (!( location = get_room_instance( wch->getHometown( )->getRecall( ) ) )) 
-            location = get_room_instance( 1 ); // В limbo потвор
+            location = get_room_instance( 1 );
         
         transfer_char( wch, ch, location,
                        NULL, NULL, "%1$^C1 внезапно появляется." );
@@ -300,10 +300,12 @@ bool ClanGuard::checkGhost( PCharacter *wch )
 {
     if (IS_SLAIN( wch ) || IS_DEATH_TIME( wch )) {
         actGhost( wch );
-        oldact("Ты хладнокровно убивает $C4!", ch, 0, wch, TO_CHAR );
-        oldact("$c1 хладнокровно убивает тебя!", ch, 0, wch, TO_VICT );
-        oldact("$c1 хладнокровно убивает $C4!", ch, 0, wch, TO_NOTVICT );
-        raw_kill( wch, -1, 0 );
+
+        if (!( location = get_room_instance( wch->getHometown( )->getRecall( ) ) )) 
+            location = get_room_instance( 1 );
+        
+        transfer_char( wch, ch, location,
+                       NULL, NULL, "%1$^C1 внезапно появляется." );
         return true;
     }
 
