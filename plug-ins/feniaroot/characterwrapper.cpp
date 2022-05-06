@@ -315,6 +315,25 @@ NMI_GET( CharacterWrapper, terminal_type, "тип терминала у mud-кл
     return ttype_name( target->desc->telnet.ttype );
 }
 
+NMI_GET( CharacterWrapper, attack_name, "англ название типа атаки (таблица в коде attack_table)")
+{
+    checkTarget();
+    return attack_table[target->dam_type].name;
+}
+
+NMI_GET( CharacterWrapper, attack_noun, "русск название типа атаки (таблица в коде attack_table)")
+{
+    checkTarget();
+    return attack_table[target->dam_type].noun;
+}
+
+NMI_GET( CharacterWrapper, attack_damage, "название типа повреждения (таблица .damage_table)")
+{
+    checkTarget();
+    
+    return damage_table.name(attack_table[target->dam_type].damage);
+}
+
 NMI_SET( CharacterWrapper, damage_number, "повреждения моба: сколько раз кидать кубик" )
 {
     checkTarget( );

@@ -12,6 +12,7 @@
 #include "save.h"
 #include "merc.h"
 #include "loadsave.h"
+#include "attacks.h"
 #include "wearloc_utils.h"
 #include "weapons.h"
 #include "occupations.h"
@@ -402,6 +403,28 @@ NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия
 {
     checkTarget( );
     return weapon_ave(target);
+}
+
+NMI_GET( ObjectWrapper, attack_name, "англ название типа атаки оружия (таблица в коде attack_table)")
+{
+    checkTarget();
+    return target->item_type == ITEM_WEAPON ? attack_table[target->value3()].name : "";
+}
+
+NMI_GET( ObjectWrapper, attack_noun, "русск название типа атаки оружия (таблица в коде attack_table)")
+{
+    checkTarget();
+    return target->item_type == ITEM_WEAPON ? attack_table[target->value3()].noun : "";
+}
+
+NMI_GET( ObjectWrapper, attack_damage, "название типа повреждения оружия (таблица .damage_table)")
+{
+    checkTarget();
+    
+    if (target->item_type != ITEM_WEAPON)
+        return "";
+
+    return damage_table.name(attack_table[target->value3()].damage);
 }
 
 #define SETGETVALUE(x) \
