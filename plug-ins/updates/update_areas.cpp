@@ -69,7 +69,7 @@ void area_update( int flags )
                 || IS_SET(flags, FRESET_ALWAYS))
         {
             reset_area( pArea, flags );
-            wiznet( WIZ_RESETS, 0, 0, "%s has just been reset.", pArea->pIndexData->name );
+            wiznet( WIZ_RESETS, 0, 0, "%s has just been reset.", pArea->pIndexData->getName() );
 
             pArea->age = number_range( 0, 3 );
             if (IS_SET(pArea->area_flag, AREA_POPULAR))

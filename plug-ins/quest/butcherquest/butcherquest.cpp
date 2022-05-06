@@ -37,7 +37,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     pGameIndex  = getRandomMobIndex( games );
     raceName    = pGameIndex->race;
     raceRusName = pGameIndex->short_descr;
-    areaName    = pGameIndex->area->name;
+    areaName    = pGameIndex->area->getName();
     
     if (rated_as_guru( pch ))
         ordered = URANGE( 5, games[pGameIndex].size( ) * 3 / 2, 12 );

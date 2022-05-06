@@ -97,9 +97,9 @@ bool Room::hasExits() const
     return false;
 }
 
-const char * Room::areaName() const
+const char * Room::areaName(char gcase) const
 {
-    return pIndexData->areaIndex->name;
+    return pIndexData->areaIndex->getName(gcase);
 }
 
 

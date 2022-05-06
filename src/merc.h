@@ -515,6 +515,8 @@ struct AreaIndexData {
 
     Area *create();
 
+    const char * getName(char gcase = '1') const;
+
     char *name;
     char *altname;
     char *authors;

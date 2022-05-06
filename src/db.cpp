@@ -198,6 +198,11 @@ Area * AreaIndexData::create()
     return area;
 }
 
+const char * AreaIndexData::getName(char gcase) const
+{
+    return russian_case(name, gcase).c_str();
+}
+
 Area::Area()
     : empty(true), age(15), nplayer(0),
       area_flag(0), pIndexData(0)

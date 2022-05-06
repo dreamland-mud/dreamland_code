@@ -146,8 +146,11 @@ public:
     /** Return room liquid type, either from prototype or its own override. */
     LiquidReference &getLiquid();
 
+    /** Quick access to area prototype for this room instance. */
     inline AreaIndexData *areaIndex() const;
-    const char * areaName() const;
+
+    /** Quick access to room area name, in nominative case by default. */
+    const char * areaName(char gcase = '1') const;
 
     /** This room's position in the global roomInstances vector. Needed for backward compat. */
     int position;
