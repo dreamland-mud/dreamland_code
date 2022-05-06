@@ -156,7 +156,7 @@ NMI_GET( CharacterWrapper, dead, "true, если персонажа уничто
         return true;
 
     if (!target)
-        
+        return true;        
 
     checkTarget();
     return target->isDead();
