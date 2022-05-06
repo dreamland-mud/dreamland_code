@@ -946,46 +946,6 @@ static bool mprog_kill( Character *killer, Character *victim )
     return false;
 }
 
-// Format realistic death message for wiznet/Discord/Telegram.
-static DLString death_message(Character *victim, Character *ch)
-{
-	DLString msg = "%1$^C1 ";
-    if (victim == ch) {
-        msg += "погиб%1$Gло||ла|ли своей смертью";
-    } else if (ch == 0) {
-        msg += "па%1$Gло|л|ла|ли от неизвестной руки";
-    } else {			
-        msg += "па%1$Gло|л|ла|ли от ";
-        if (IS_SET(ch->form, FORM_SENTIENT) && IS_SET(ch->parts, PART_HANDS))
-            msg = msg + "руки ";				
-        else if (IS_SET(ch->parts, PART_FANGS))
-            msg = msg + "клыков ";
-        else if (IS_SET(ch->parts, PART_CLAWS))
-            msg = msg + "когтей ";
-        else if (IS_SET(ch->parts, PART_TENTACLES))
-            msg = msg + "щупалец ";			
-        else if (IS_SET(ch->parts, PART_HORNS))
-            msg = msg + "рогов ";				
-        else if (IS_SET(ch->parts, PART_TUSKS))
-            msg = msg + "бивней ";
-        else if (IS_SET(ch->parts, PART_TWO_HOOVES) || IS_SET(ch->parts, PART_FOUR_HOOVES))
-            msg = msg + "копыт ";
-        else if (IS_SET(ch->parts, PART_FINS))
-            msg = msg + "плавников ";	
-        else
-            msg = msg + "руки ";
-            
-        msg += "%2$C2";
-    }
-
-    if (ch) {
-        msg += " в зоне %3$s.";
-        return fmt(0, msg.c_str(), victim, ch, ch->in_room->areaName());
-    } else {
-        msg += ".";
-        return fmt(0, msg.c_str(), victim, ch);
-    }
-}
 
 /*
  * Main death handler.
@@ -995,7 +955,7 @@ void raw_kill( Character* victim, int part, Character* ch )
     Character *realKiller = ch;
 
     // Transfer the killer flag to master if killer is a charmed npc.
-    if (ch && ch->is_npc() && ch->master && !ch->master->is_npc())
+    if (ch && ch->is_npc() && ch->master && !ch->master->is_npc() && ch != victim)
         ch = ch->master;
 
     stop_fighting( victim, true );
