@@ -523,6 +523,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         victim = NULL;
         result->range = 0;
 
+        // Empty argument: defaults to your victim in battle for offensive spells, or to yourself for defensive spells.
         if (arg.empty( )) {
             if (getSpellType( ) == SPELL_OFFENSIVE) 
                 victim = ch->fighting;
@@ -530,7 +531,17 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                 victim = ch;
                 result->range = -1;
             }
+
+            if (!victim) {
+                // Victim still not found, e.g. offensive spell cast outside of battle.
+                buf.str( "" );
+                buf << "Нужно указать цель для заклинания.";
+                result->error = TARGET_ERR_CAST_ON_WHOM;
+                return result;
+            }
+
         }
+        // Non-empty argument: locate victim.
         else {
             int maxrange = getMaxRange( ch );
             
