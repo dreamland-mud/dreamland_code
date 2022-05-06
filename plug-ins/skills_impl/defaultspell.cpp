@@ -632,15 +632,15 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
     
     strcpy( carg, arg.c_str( ) );
     
-    if (ch->is_npc( )) {
-        buf << "Ты не можешь использовать заклинания, направленные на предметы.";
-        result->error = TARGET_ERR_CAST_ON_WHAT;
-        return result;
-    }
-    
     if (target.isSet( TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_OBJ_ROOM|TAR_OBJ_WORLD )) {
         obj = NULL;
 
+        if (ch->is_npc( )) {
+            buf << "Ты не можешь использовать заклинания, направленные на предметы.";
+            result->error = TARGET_ERR_CAST_ON_WHAT;
+            return result;
+        }
+    
         if (arg.empty( )) {
             buf << "Для этого заклинания нужно выбрать предмет в качестве цели.";
             result->error = TARGET_ERR_CAST_ON_WHAT;
