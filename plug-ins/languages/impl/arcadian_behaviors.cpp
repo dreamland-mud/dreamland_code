@@ -150,7 +150,7 @@ bool BeerElementalBehavior::specFight( )
     
     try {
         damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true);
-        poison_effect( victim, level, dam, TARGET_CHAR );
+        poison_effect( victim, ch, level, dam, TARGET_CHAR );
     } catch (const VictimDeathException &) {
     }
 

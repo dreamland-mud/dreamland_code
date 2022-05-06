@@ -121,7 +121,7 @@ SKILL_RUNP( explode )
 
     if (!(is_safe(ch,victim))) {
         dam = max(hp_dam + dice_dam /10, dice_dam + hp_dam / 10);
-        fire_effect(victim->in_room,level,dam/2,TARGET_ROOM);
+        fire_effect(victim->in_room, ch, level,dam/2,TARGET_ROOM);
     }
 
     for ( auto &vch : victim->in_room->getPeople()){
@@ -141,7 +141,7 @@ SKILL_RUNP( explode )
 
         if (vch == victim) /* full damage */ {
             try{
-            fire_effect(vch,level,dam,TARGET_CHAR);            
+            fire_effect(vch, ch, level,dam,TARGET_CHAR);            
             damage_nocatch(ch,vch,dam,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
             }
             catch (const VictimDeathException &){
@@ -150,7 +150,7 @@ SKILL_RUNP( explode )
         }
         else /* partial damage */ {
             try{
-            fire_effect(vch,level/2,dam/4,TARGET_CHAR);
+            fire_effect(vch, ch, level/2,dam/4,TARGET_CHAR);
             damage_nocatch(ch,vch,dam/2,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
             }
             catch (const VictimDeathException &){
@@ -163,7 +163,7 @@ SKILL_RUNP( explode )
     }
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch )) {        
-        fire_effect(ch,level/4,dam/10,TARGET_CHAR);
+        fire_effect(ch, ch, level/4,dam/10,TARGET_CHAR);
         damage(ch,ch,(ch->hit / 10),gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
     
     }

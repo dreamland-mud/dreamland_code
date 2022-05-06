@@ -246,21 +246,21 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     {
         oldact("$o1 обжигает $c4.",victim,arrow,0,TO_ROOM);
         oldact("$o1 обжигает тебя.",victim,arrow,0,TO_CHAR);
-        fire_effect( (void *) victim,arrow->level,dam,TARGET_CHAR);
+        fire_effect( (void *) victim, ch, arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_FROST))
     {
         oldact("$o1 обмораживает $c4.",victim,arrow,0,TO_ROOM);
         oldact("$o1 обмораживает тебя.",victim,arrow,0,TO_CHAR);
-        cold_effect(victim,arrow->level,dam,TARGET_CHAR);
+        cold_effect(victim, ch, arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_SHOCKING))
     {
         oldact("$o1 парализует $c4 разрядом молнии.",victim,arrow,0,TO_ROOM);
         oldact("$o1 парализует тебя разрядом молнии.",victim,arrow,0,TO_CHAR);
-        shock_effect(victim,arrow->level,dam,TARGET_CHAR);
+        shock_effect(victim, ch, arrow->level,dam,TARGET_CHAR);
     }
 
     if ( dam_type == DAM_PIERCE

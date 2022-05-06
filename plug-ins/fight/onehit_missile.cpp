@@ -395,21 +395,21 @@ void MissileOneHit::damEffectFunkyWeapon( )
     {
         msgWeaponVict("%3$^O1 обжигает тебя.");
         msgWeaponRoom("%3$^O1 обжигает %2$C4.");
-        fire_effect( (void *) victim,missile->level,dam,TARGET_CHAR);
+        fire_effect( (void *) victim, ch, missile->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(missile,WEAPON_FROST))
     {
         msgWeaponVict("%3$^O1 обмораживает тебя.");
         msgWeaponRoom("%3$^O1 обмораживает %2$C4.");
-        cold_effect(victim,missile->level,dam,TARGET_CHAR);
+        cold_effect(victim, ch, missile->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(missile,WEAPON_SHOCKING))
     {
         msgWeaponVict("%3$^O1 парализует тебя разрядом молнии.");
         msgWeaponRoom("%3$^O1 парализует %2$C4 разрядом молнии.");
-        shock_effect(victim,missile->level,dam,TARGET_CHAR);
+        shock_effect(victim, ch, missile->level,dam,TARGET_CHAR);
     }
 }
 

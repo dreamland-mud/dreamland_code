@@ -82,7 +82,7 @@ static void show_effect_message(Object *obj, const DLString &msg)
         obj->getRoom()->echo(POS_RESTING, msg.c_str(), obj);
 }
 
-void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_flag )
+void acid_effect(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag )
 {
     if ( target == TARGET_ROOM ) /* nail objects on the floor */
     {
@@ -92,7 +92,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         for ( obj = room->contents; obj != 0; obj = obj_next )
         {
             obj_next = obj->next_content;
-            acid_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            acid_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -106,7 +106,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         for ( obj = victim->carrying; obj != 0; obj = obj_next )
         {
             obj_next = obj->next_content;
-            acid_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            acid_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -191,6 +191,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.duration = -1;
             af.modifier = number_range(1,5);
             af.type     = gsn_corrosion;
+            af.sources.add(source);
 
             affect_enchant( obj );
             affect_enhance( obj, &af );
@@ -219,7 +220,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                     continue;
                 }
 
-                acid_effect(t_obj,level/2,dam/2,TARGET_OBJ, dam_flag);
+                acid_effect(t_obj,source, level/2,dam/2,TARGET_OBJ, dam_flag);
                 dreamland->removeOption( DL_SAVE_OBJS );
             }
 
@@ -236,7 +237,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     }
 }
 
-void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_flag )
+void cold_effect(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag )
 {
     if (target == TARGET_ROOM) /* nail objects on the floor */
     {
@@ -246,7 +247,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         for (obj = room->contents; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            cold_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            cold_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -276,6 +277,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.duration  = 6;
             af.location = APPLY_STR;
             af.modifier = min(-1, -level / 15);
+            af.sources.add(source);
             affect_join( victim, &af );
         }
 
@@ -287,7 +289,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         for (obj = victim->carrying; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            cold_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            cold_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
    }
@@ -349,7 +351,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 
 
 
-void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_flag )
+void fire_effect(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag )
 {
     if (target == TARGET_ROOM)  /* nail objects on the floor */
     {
@@ -358,7 +360,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         for (obj = room->contents; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            fire_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            fire_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -390,6 +392,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.location = APPLY_HITROLL;
             af.modifier = min(-4, -level / 15);
             af.bitvector.setValue(AFF_BLIND);
+            af.sources.add(source);
 
             affect_to_char(victim,&af);
         }
@@ -407,7 +410,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         {
             obj_next = obj->next_content;
 
-            fire_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            fire_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -512,7 +515,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                     continue;
                 }
 
-                fire_effect(t_obj,level/2,dam/2,TARGET_OBJ, dam_flag);
+                fire_effect(t_obj,source, level/2,dam/2,TARGET_OBJ, dam_flag);
                 dreamland->removeOption( DL_SAVE_OBJS );
             }
 
@@ -529,7 +532,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     }
 }
 
-void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_flag )
+void poison_effect(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag )
 {
     if (target == TARGET_ROOM)  /* nail objects on the floor */
     {
@@ -539,7 +542,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         for (obj = room->contents; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            poison_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            poison_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -569,6 +572,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
             af.location = APPLY_STR;
             af.modifier  = -1;
             af.bitvector.setValue(AFF_POISON);
+            af.sources.add(source);
             affect_join( victim, &af );
         }
 
@@ -576,7 +580,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         for (obj = victim->carrying; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            poison_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            poison_effect(obj, source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -633,7 +637,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
 }
 
 
-void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_flag )
+void shock_effect(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag )
 {
     if (target == TARGET_ROOM)
     {
@@ -643,7 +647,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         for (obj = room->contents; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            shock_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            shock_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -669,7 +673,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
         for (obj = victim->carrying; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            shock_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            shock_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -727,7 +731,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
     }
 }
 
-void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_flag )
+void sand_effect(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag )
 {
     if ( target == TARGET_ROOM ) /* nail objects on the floor */
     {
@@ -736,7 +740,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 
         for (obj = room->contents; obj != 0; obj = obj_next) {
             obj_next = obj->next_content;
-            sand_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            sand_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -765,6 +769,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.location = APPLY_HITROLL;
             af.modifier = min(-4, -level / 15);
             af.bitvector.setValue(AFF_BLIND);
+            af.sources.add(source);
             affect_to_char(victim,&af);
         }
 
@@ -772,7 +777,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         for ( obj = victim->carrying; obj; obj = obj_next )
         {
             obj_next = obj->next_content;
-            sand_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            sand_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -857,6 +862,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.duration = -1;
             af.modifier = 1;
             af.type     = -1;
+            af.sources.add(source);
 
             affect_enchant( obj );
             affect_enhance( obj, &af );
@@ -886,7 +892,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                     continue;
                 }
 
-                sand_effect(t_obj,level/2,dam/2,TARGET_OBJ, dam_flag);
+                sand_effect(t_obj,source, level/2,dam/2,TARGET_OBJ, dam_flag);
                 dreamland->removeOption( DL_SAVE_OBJS );
             }
 
@@ -903,7 +909,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
     }
 }
 
-void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_flag )
+void scream_effect(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag )
 {
     if (target == TARGET_ROOM)  /* nail objects on the floor */
     {
@@ -911,7 +917,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
         Object *obj, *obj_next;
         for (obj = room->contents; obj != 0; obj = obj_next) {
             obj_next = obj->next_content;
-            scream_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            scream_effect(obj,source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -939,6 +945,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
             af.duration     = number_range(0,1);
             af.modifier     = 0;
             af.bitvector.setValue(AFF_SCREAM);
+            af.sources.add(source);
 
             affect_to_char(victim,&af);
                         
@@ -964,7 +971,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
         for (obj = victim->carrying; obj != 0; obj = obj_next)
         {
             obj_next = obj->next_content;
-            scream_effect(obj,level,dam,TARGET_OBJ, dam_flag);
+            scream_effect(obj, source, level,dam,TARGET_OBJ, dam_flag);
         }
         return;
     }
@@ -1056,7 +1063,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                     continue;
                 }
 
-                scream_effect(t_obj,level/2,dam/2,TARGET_OBJ, dam_flag);
+                scream_effect(t_obj, source, level/2,dam/2,TARGET_OBJ, dam_flag);
                 dreamland->removeOption( DL_SAVE_OBJS );
             }
 

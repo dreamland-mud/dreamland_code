@@ -311,7 +311,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         msgWeaponChar("%3$^O1 обжига%3$nет|ют %2$C4.");
 
         dam = number_range(1,wield->level / 4 + 1);
-        fire_effect( (void *) victim,wield->level/2,dam,TARGET_CHAR);
+        fire_effect( (void *) victim, ch, wield->level/2,dam,TARGET_CHAR);
         damage_nocatch(ch,victim,dam,0,DAM_FIRE,false);
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FROST) )
@@ -321,7 +321,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         msgWeaponChar("%3$^O1 обморажива%3$nет|ют %2$C4.");
 
         dam = number_range(1,wield->level / 6 + 2);
-        cold_effect(victim,wield->level/2,dam,TARGET_CHAR);
+        cold_effect(victim, ch, wield->level/2,dam,TARGET_CHAR);
         damage_nocatch(ch,victim,dam,0,DAM_COLD,false);
     }
     if (IS_WEAPON_STAT(wield,WEAPON_SHOCKING))
@@ -331,7 +331,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         msgWeaponChar("%2$^C1 пораже%2$Gно|н|на|ны разрядом %3$O2.");
 
         dam = number_range(1,wield->level/5 + 2);
-        shock_effect(victim,wield->level/2,dam,TARGET_CHAR);
+        shock_effect(victim, ch, wield->level/2,dam,TARGET_CHAR);
         damage_nocatch(ch,victim,dam,0,DAM_LIGHTNING,false);
     }
     

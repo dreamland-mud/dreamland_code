@@ -79,12 +79,12 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
 
     if (saves_spell(level,victim,DAM_ACID, ch, DAMF_MAGIC))
     {
-        acid_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+        acid_effect(victim, ch, level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
         damage_nocatch(ch,victim,dam/2,sn,DAM_ACID,true, DAMF_MAGIC);
     }
     else
     {
-        acid_effect(victim,level,dam,TARGET_CHAR, DAMF_MAGIC);
+        acid_effect(victim, ch, level,dam,TARGET_CHAR, DAMF_MAGIC);
         damage_nocatch(ch,victim,dam,sn,DAM_ACID,true, DAMF_MAGIC);
     }
 
@@ -108,7 +108,7 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
     dice_dam = dice(level,20);
 
     dam = max(hp_dam + dice_dam /10, dice_dam + hp_dam / 10);
-    fire_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_MAGIC);
+    fire_effect(victim->in_room, ch, level,dam/2,TARGET_ROOM, DAMF_MAGIC);
 
     for ( auto &vch : victim->in_room->getPeople())
     {
@@ -130,12 +130,12 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
                 try{
             if (saves_spell(level,vch,DAM_FIRE, ch, DAMF_MAGIC))
             {
-                fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                fire_effect(vch, ch, level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_MAGIC);
             }
             else
             {
-                fire_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                fire_effect(vch, ch, level,dam,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam,sn,DAM_FIRE,true, DAMF_MAGIC);
             }
                 }
@@ -148,12 +148,12 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
                 try{
             if (saves_spell(level - 2,vch,DAM_FIRE, ch, DAMF_MAGIC))
             {
-                fire_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_MAGIC);
+                fire_effect(vch, ch, level/4,dam/8,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam/4,sn,DAM_FIRE,true, DAMF_MAGIC);
             }
             else
             {
-                fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                fire_effect(vch, ch, level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_MAGIC);
             }
                 }
@@ -181,7 +181,7 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
     dice_dam = dice(level,16);
 
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
-    cold_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_MAGIC);
+    cold_effect(victim->in_room, ch, level,dam/2,TARGET_ROOM, DAMF_MAGIC);
 
     for ( auto &vch : victim->in_room->getPeople())
     {
@@ -203,12 +203,12 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
                 try{
             if (saves_spell(level,vch,DAM_COLD, ch, DAMF_MAGIC))
             {
-                cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                cold_effect(vch, ch, level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_MAGIC);
             }
             else
             {
-                cold_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
+                cold_effect(vch, ch, level,dam,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_MAGIC);
             }
                 }
@@ -221,12 +221,12 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
                 try{
             if (saves_spell(level - 2,vch,DAM_COLD, ch, DAMF_MAGIC))
             {
-                cold_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_MAGIC);
+                cold_effect(vch, ch, level/4,dam/8,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam/4,sn,DAM_COLD,true, DAMF_MAGIC);
             }
             else
             {
-                cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+                cold_effect(vch, ch, level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
                 damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_MAGIC);
             }
                 }
@@ -254,7 +254,7 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
     dice_dam = dice(level,12);
 
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
-    poison_effect(room,level,dam,TARGET_ROOM, DAMF_MAGIC);
+    poison_effect(room, ch, level,dam,TARGET_ROOM, DAMF_MAGIC);
 
     for ( auto &vch : room->getPeople())
     {
@@ -277,12 +277,12 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
 
         if (saves_spell(level,vch,DAM_POISON, ch, DAMF_MAGIC))
         {
-            poison_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+            poison_effect(vch, ch, level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
             damage_nocatch(ch,vch,dam/2,sn,DAM_POISON,true, DAMF_MAGIC);
         }
         else
         {
-            poison_effect(vch,level,dam,TARGET_CHAR, DAMF_MAGIC);
+            poison_effect(vch, ch, level,dam,TARGET_CHAR, DAMF_MAGIC);
             damage_nocatch(ch,vch,dam,sn,DAM_POISON,true, DAMF_MAGIC);
         }
 
@@ -314,12 +314,12 @@ VOID_SPELL(LightningBreath)::run( Character *ch, Character *victim, int sn, int 
 
     if (saves_spell(level,victim,DAM_LIGHTNING, ch, DAMF_MAGIC))
     {
-        shock_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
+        shock_effect(victim, ch, level/2,dam/4,TARGET_CHAR, DAMF_MAGIC);
         damage_nocatch(ch,victim,dam/2,sn,DAM_LIGHTNING,true, DAMF_MAGIC);
     }
     else
     {
-        shock_effect(victim,level,dam,TARGET_CHAR, DAMF_MAGIC);
+        shock_effect(victim, ch, level,dam,TARGET_CHAR, DAMF_MAGIC);
         damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_MAGIC);
     }
 

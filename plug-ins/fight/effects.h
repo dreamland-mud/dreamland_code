@@ -17,14 +17,14 @@
 
 #include "bitstring.h"
 
-typedef void effect_fun_t(void *vo, short level, int dam, int target, bitstring_t dam_flag );
+typedef void effect_fun_t(void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag );
 
-void    acid_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag = 0 );
-void    cold_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag = 0 );
-void    fire_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag = 0 );
-void    poison_effect   (void *vo, short level, int dam, int target, bitstring_t dam_flag = 0 );
-void    shock_effect    (void *vo, short level, int dam, int target, bitstring_t dam_flag = 0 );
-void    sand_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag = 0 );
-void    scream_effect   (void *vo, short level, int dam, int target, bitstring_t dam_flag = 0 );
+void    acid_effect     (void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag = 0 );
+void    cold_effect     (void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag = 0 );
+void    fire_effect     (void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag = 0 );
+void    poison_effect   (void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag = 0 );
+void    shock_effect    (void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag = 0 );
+void    sand_effect     (void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag = 0 );
+void    scream_effect   (void *vo, Character *source, short level, int dam, int target, bitstring_t dam_flag = 0 );
 
 #endif

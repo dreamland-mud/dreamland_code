@@ -323,6 +323,7 @@ static void call_effect_func(effect_fun_t &fun, FeniaSpellContext *thiz)
     int target;
     int level = thiz->level;
     int dam = thiz->dam;
+    Character *caster = arg2character(thiz->ch);
 
     if (thiz->vict.type != Register::NONE) {        
         vo = arg2character(thiz->vict);
@@ -338,7 +339,7 @@ static void call_effect_func(effect_fun_t &fun, FeniaSpellContext *thiz)
     } else
         return;
 
-    fun(vo, level, dam, target, damflags);
+    fun(vo, caster, level, dam, target, damflags);
 }
 
 NMI_INVOKE(FeniaSpellContext, effectCold, "(): применить холодный эффект на жертву, предмет или комнату")
