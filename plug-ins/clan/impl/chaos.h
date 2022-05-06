@@ -20,13 +20,4 @@ protected:
         virtual int getCast( Character * );
 };
 
-class ChaosBlade : public BasicObjectBehavior {
-XML_OBJECT
-public:
-    typedef ::Pointer<ChaosBlade> Pointer;
-
-    virtual bool death( Character * );
-    virtual void fight( Character * );
-};
-
 #endif

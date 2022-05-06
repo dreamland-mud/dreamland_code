@@ -161,46 +161,6 @@ SKILL_RUNP(fade)
     return;
 }
 
-SPELL_DECL(EvilSpirit);
-VOID_SPELL(EvilSpirit)::run(Character *ch, Room *room, int sn, int level)
-{
-    Area *pArea = room->area;
-    Affect af;
-
-    if (IS_ROOM_AFFECTED(room, AFF_ROOM_ESPIRIT) || room->isAffected(sn))
-    {
-        ch->pecho("Эта зона полностью под контролем злых духов.");
-        return;
-    }
-
-    if (ch->isAffected(sn))
-    {
-        ch->pecho("У тебя недостаточно энергии.");
-        return;
-    }
-
-    if (IS_SET(room->room_flags, ROOM_LAW) || IS_SET(room->area->area_flag, AREA_HOMETOWN))
-    {
-        ch->pecho("Аура Закона в этой комнате не дает творить зло.");
-        return;
-    }
-
-    postaffect_to_char(ch, sn, level / 5);
-
-    af.bitvector.setTable(&raffect_flags);
-    af.type = sn;
-    af.level = ch->getModifyLevel();
-    af.duration = level / 25;
-    af.bitvector.setValue(AFF_ROOM_ESPIRIT);
-
-    for (auto r: pArea->rooms)
-    {
-        Room *room = r.second;
-        room->affectTo(&af);
-        oldact("Частица первородного зла проникает в этот мир.", room->people, 0, 0, TO_ALL);
-    }
-}
-
 SPELL_DECL(EyesOfIntrigue);
 VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int level)
 {
@@ -238,51 +198,6 @@ VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int le
     }
 
     do_look_auto(ch, victim->in_room);
-}
-
-SPELL_DECL(Nightfall);
-VOID_SPELL(Nightfall)::run(Character *ch, Room *room, int sn, int level)
-{
-    Character *vch;
-    Object *light;
-
-    if (ch->isAffected(sn))
-    {
-        ch->pecho("У тебя недостаточно энергии для контроля над светом.");
-        return;
-    }
-
-    if (IS_SET(room->room_flags, ROOM_SAFE))
-    {
-        ch->pecho("В безопасных комнатах это запрещено.");
-        return;
-    }
-
-    for (vch = room->people; vch != 0; vch = vch->next_in_room)
-        for (light = vch->carrying; light != 0; light = light->next_content)
-            if (light->item_type == ITEM_LIGHT && !is_same_group(ch, vch))
-            {
-                damage_to_obj(vch, light, light, light->condition / 2 + number_range(1, light->condition));
-            }
-
-    for (light = room->contents; light != 0; light = light->next_content)
-        if (light->item_type == ITEM_LIGHT)
-        {
-            damage_to_obj(vch, light, light, light->condition / 2 + number_range(1, light->condition));
-        }
-
-    postaffect_to_char(ch, sn, 2);
-}
-
-SPELL_DECL_T(Nightwalker, SummonCreatureSpell);
-TYPE_SPELL(NPCharacter *, Nightwalker)::createMobile(Character *ch, int level) const
-{
-    return createMobileAux(ch, ch->getModifyLevel(),
-                           (ch->is_npc() ? ch->max_hit : ch->getPC()->perm_hit),
-                           ch->max_mana,
-                           number_range(level / 15, level / 10),
-                           number_range(level / 3, level / 2),
-                           0);
 }
 
 SPELL_DECL(ShadowCloak);

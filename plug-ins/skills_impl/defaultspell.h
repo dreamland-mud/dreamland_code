@@ -109,24 +109,4 @@ protected:
     SkillPointer skill;
 };
 
-/**
- * Describes a typical spell from attack or combat group that checks saves roll, inflicts damage
- * and shows some messages.
- */
-class AnatoliaCombatSpell : public virtual DefaultSpell {
-XML_OBJECT
-public:
-    typedef ::Pointer<AnatoliaCombatSpell> Pointer;
-    
-    AnatoliaCombatSpell();
-
-    virtual void run( Character *, Character *, int, int );
-
-    XML_VARIABLE XMLInteger dice;
-    XML_VARIABLE XMLIntegerNoEmpty diceBonus; // damage calculation: <level> d <dice> + <diceBonus>
-    XML_VARIABLE XMLStringNoEmpty msgNotVict, msgVict, msgChar; // optional messages 
-    XML_VARIABLE XMLIntegerNoEmpty waitMin, waitMax; // optional range of waitstate on victim
-    XML_VARIABLE XMLBooleanNoTrue savesCheck; // whether to check for saves and reduce damage, true by default
-};
-
 #endif

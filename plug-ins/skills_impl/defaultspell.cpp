@@ -931,39 +931,3 @@ bool DefaultSpell::isCasted( ) const
     return casted.getValue( );
 }
 
-AnatoliaCombatSpell::AnatoliaCombatSpell()
-                : 
-                  savesCheck(true)
-{
-
-}
-
-void AnatoliaCombatSpell::run( Character *ch, Character *victim, int sn, int level )
-{
-    // Calculate spell flags.
-    bitstring_t flags = damflags | (isPrayer(ch) ? DAMF_PRAYER : DAMF_MAGIC);
-
-    // Calculate damage.
-    int dam = ::dice(level, dice) + diceBonus;
-    
-    // Do a saves check if required.
-    if (savesCheck && saves_spell(level, victim, damtype, ch, flags))
-        dam /= 2;
-
-    // Display messages.
-    if (!msgNotVict.empty())
-        oldact(msgNotVict.c_str(), ch, 0, victim, TO_NOTVICT);
-
-    if (!msgChar.empty())
-        oldact(msgChar.c_str(), ch, 0, victim, TO_CHAR);
-
-    if (!msgVict.empty())
-        oldact(msgVict.c_str(), ch, 0, victim, TO_VICT);
-
-    // Apply waitstate to the victim.
-    if (waitMax != 0)
-        victim->setWait(number_range(waitMin, waitMax));
-
-    // Inflict the damage.
-    damage_nocatch(ch, victim, dam, sn, damtype, true, flags);
-}
