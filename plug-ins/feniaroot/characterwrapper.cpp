@@ -1822,22 +1822,21 @@ NMI_INVOKE( CharacterWrapper, multi_hit, "(vict): нанести один рау
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer]]): убить. часть тела из таблицы .tables.part_flags или -1" )
+NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label]]]): убить. часть тела из таблицы .tables.part_flags или -1" )
 {
     RegisterList::const_iterator i;
     Character *killer = NULL;
     int part = -1;
+    DLString label;
 
     checkTarget();
     
-    i = args.begin( );
-
-    if (i != args.end( )) {
-        part = i->toNumber( );
-
-        if (++i != args.end( ))
-            killer = arg2character( *i );
-    }
+    if (args.size() > 0)
+        part = argnum2number(args, 1);
+    if (args.size() > 1)
+        killer = argnum2character(args, 2);
+    if (args.size() > 2)
+        label = argnum2string(args, 3);
     
     raw_kill( target, part, killer );
     return Register( );

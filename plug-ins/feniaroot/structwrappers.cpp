@@ -733,6 +733,10 @@ NMI_GET( ClanWrapper, dispersed, "true для разрозненных клан�
 {
     return clanManager->find(name)->isDispersed();
 }
+NMI_GET( ClanWrapper, recallVnum, "vnum комнаты для кланвозврата" ) 
+{
+    return clanManager->find( name )->getRecallVnum();
+}
 
 static const char *diplomacy_names [] = {
     "alliance",
