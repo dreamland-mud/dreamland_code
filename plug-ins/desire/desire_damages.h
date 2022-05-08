@@ -7,7 +7,6 @@
 
 #include "damage_impl.h"
 
-// obsolates damage( .. TYPE_HUNGER .. );
 struct HungerDamage : public SelfDamage {
     HungerDamage( Character *ch, int dam );
 
@@ -16,7 +15,6 @@ struct HungerDamage : public SelfDamage {
     virtual void reportState( ) { }
 };
 
-// obsolates damage( .. TYPE_THIRST.. );
 struct ThirstDamage : public SelfDamage {
     ThirstDamage( Character *ch, int dam );
 

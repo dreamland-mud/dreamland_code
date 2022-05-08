@@ -87,7 +87,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
             ch->hit -= ch->getRealLevel( ) / 10;
             
             if (ch->hit < 1)
-                RawDamage( ch, ch, DAM_NONE, 1 ).hit( false );
+                RawDamage( ch, ch, DAM_NONE, 1, "corruption" ).hit( false );
         }
         //trolls do not care much about corruption
         if(ch->getRace()->getName() != "troll")

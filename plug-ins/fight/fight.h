@@ -33,8 +33,8 @@ bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_t
 bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
 bool        damage( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
 bool        damage_nocatch( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
-void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show );
-void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show );
+void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason );
+void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason );
 void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);
 int        move_dec( Character *ch );
 void damapply_class(Character *ch, int &dam);
@@ -47,7 +47,7 @@ void yell_panic( Character *ch, Character *victim, const char *msgBlind = NULL, 
 void        group_gain( Character *ch, Character *victim, Character *realKiller = 0 );
 
 /* death handling routines (fight_death.cpp) */
-void        raw_kill( Character* victim, int part, Character* ch );
+void        raw_kill( Character* victim, int part, Character* ch, const DLString &label );
 void        death_cry( Character *ch, int part = -1 );
 Object * bodypart_create( int vnum, Character *ch, Object *corpse );
 

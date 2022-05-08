@@ -69,6 +69,7 @@ UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool seconda
             : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
               WeaponOneHit( ch, victim, secondary, command )
 {
+    deathReason = "melee";
 }
 
 bool UndefinedOneHit::canDamage( )
@@ -266,7 +267,7 @@ void UndefinedOneHit::damEffectVorpal()
     victim->recho("%^C1 уже ТРУП!", victim);
     victim->pecho("Тебя УБИЛИ!");
 
-    eventBus->publish(CharDeathEvent(victim, ch, 3));
+    eventBus->publish(CharDeathEvent(victim, ch, 3, "vorpal"));
     throw VictimDeathException( );
 }
 

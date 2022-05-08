@@ -298,6 +298,8 @@ bool ClanGuard::checkPush( PCharacter* wch )
 
 bool ClanGuard::checkGhost( PCharacter *wch ) 
 {
+    Room * location;
+
     if (IS_SLAIN( wch ) || IS_DEATH_TIME( wch )) {
         actGhost( wch );
 

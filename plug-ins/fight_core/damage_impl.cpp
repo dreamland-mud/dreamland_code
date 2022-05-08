@@ -41,9 +41,10 @@ void SelfDamage::calcDamage( )
 /*-----------------------------------------------------------------------------
  * Raw Damage
  *---------------------------------------------------------------------------*/
-RawDamage::RawDamage( Character *ch, Character *victim, int dam_type, int dam )
+RawDamage::RawDamage( Character *ch, Character *victim, int dam_type, int dam, const DLString &deathReason )
     : Damage( ch, victim, dam_type, dam )
 {
+    this->deathReason = deathReason;
 }
 
 void RawDamage::message( )
@@ -79,12 +80,14 @@ SkillDamage::SkillDamage( Character *ch, Character *victim,
             : Damage( ch, victim, dam_type, dam, dam_flag )
 {
     this->sn = sn;
+    this->deathReason = skillManager->find(sn)->getName();
 }
 
 SkillDamage::SkillDamage( Affect *paf, Character *victim, int sn, int dam_type, int dam, bitstring_t dam_flag )
             : Damage( paf, victim, dam_type, dam, dam_flag )
 {
     this->sn = sn;
+    this->deathReason = skillManager->find(sn)->getName();
 }
 
 int SkillDamage::msgNoSpamBit( )

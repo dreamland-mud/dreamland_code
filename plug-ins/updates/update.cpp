@@ -480,7 +480,7 @@ void char_update( )
         {
             if (!noupdate) {
                 room_to_save( ch );
-                rawdamage( ch, ch, DAM_NONE, 1, false );
+                rawdamage( ch, ch, DAM_NONE, 1, false, "wounds" );
             }
         }
 
@@ -1170,6 +1170,7 @@ void aggr_update( )
 struct LightVampireDamage : public Damage {
     LightVampireDamage( Character *ch ) : Damage( ch, ch, DAM_NONE, 0 )
     {
+        deathReason = "daylight";
     }
     
     virtual void calcDamage( ) {

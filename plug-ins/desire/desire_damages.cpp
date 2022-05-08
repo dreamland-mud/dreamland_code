@@ -12,6 +12,7 @@
 HungerDamage::HungerDamage( Character *ch, int dam )
     : SelfDamage( ch, DAM_NONE, dam )
 {
+    deathReason = "hunger";
 }
 
 void HungerDamage::message( )
@@ -29,6 +30,7 @@ bool HungerDamage::canDamage()
 ThirstDamage::ThirstDamage( Character *ch, int dam )
     : SelfDamage( ch, DAM_NONE, dam )
 {
+    deathReason = "thirst";
 }
 
 void ThirstDamage::message( )

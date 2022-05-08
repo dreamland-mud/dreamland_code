@@ -1706,30 +1706,26 @@ NMI_INVOKE( CharacterWrapper, is_safe_rspell, "(af): защищают ли бо�
     return ::is_safe_rspell(paf, target, true);
 }
 
-NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vict повреждения в размере dam с типом damtype (таблица .tables.damage_table)" )
+NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype[,label]): нанести vict повреждения в размере dam с типом damtype (таблица .tables.damage_table)" )
 {
     RegisterList::const_iterator i;
     Character *victim;
     int dam;
     int dam_type = DAM_NONE;
+    DLString label;
 
     checkTarget( );
 
     if (args.size() < 2)
         throw Scripting::NotEnoughArgumentsException( );
     
-    i = args.begin( );
-    victim = arg2character( *i );
-    dam = (++i)->toNumber( );
+    victim = argnum2character(args, 1);
+    dam = argnum2number(args, 2);
+    dam_type = argnum2flag(args, 3, damage_table);
+    if (args.size() > 3)
+        label = argnum2string(args, 4);
 
-    if (args.size() > 2) {
-        DLString d = (++i)->toString();
-        dam_type = damage_table.value( d.c_str(), true );
-        if (dam_type == NO_FLAG)
-            throw Scripting::Exception( "Invalid damage type");
-    }
-
-    ::rawdamage(target, victim, dam_type, dam, true);
+    ::rawdamage(target, victim, dam_type, dam, true, label);
 
     return Register( );
 }
@@ -1838,7 +1834,7 @@ NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label]]]): убит
     if (args.size() > 2)
         label = argnum2string(args, 3);
     
-    raw_kill( target, part, killer );
+    raw_kill( target, part, killer, label );
     return Register( );
 }
 

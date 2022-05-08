@@ -432,7 +432,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
         ch->pecho("{R%^N1 гневается на тебя за попытку принести в жертву %s!{x",
                        rname, offering.getSmiteMessage().c_str());
         ch->recho("Гнев %^N2 обрушивается на %C4!", rname, ch);
-        rawdamage(ch, ch, DAM_OTHER, ch->hit / 4, false);
+        rawdamage(ch, ch, DAM_OTHER, ch->hit / 4, false, "gods");
         ch->pecho("Это было действительно {rБОЛЬНО{x!"); 
         altar_clear(altar);
 

@@ -424,7 +424,7 @@ void sucking(Character *ch, Character *victim)
     victim->position = POS_STANDING;
 
     try {
-        RawDamage(ch, victim, DAM_OTHER, hp_gain).hit(true);
+        RawDamage(ch, victim, DAM_OTHER, hp_gain, "vampire").hit(true);
 
         // corrupt victim
         Affect af;
@@ -888,7 +888,7 @@ SKILL_RUNP( bloodlet )
         gsn_bloodlet->improve( ch, false );
     }
 
-    rawdamage(ch, ch, DAM_OTHER, dam, true);
+    rawdamage(ch, ch, DAM_OTHER, dam, true, "vampire");
     
     postaffect_to_char( ch, gsn_bloodlet, 5 );
 }

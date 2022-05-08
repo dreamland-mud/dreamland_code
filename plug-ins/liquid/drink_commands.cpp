@@ -713,7 +713,7 @@ CMDRUN( drink )
     if (obj && IS_OBJ_STAT(obj, ITEM_BLESS) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
         ch->pecho("Святость %O2 обжигает твои внутренности!", obj);
         ch->recho("Лицо %^C2 искажается гримасой боли.", ch);
-        rawdamage(ch, ch, DAM_HOLY, ch->hit / 100 + 1, true);
+        rawdamage(ch, ch, DAM_HOLY, ch->hit / 100 + 1, true, "holywater");
     }
 }
 

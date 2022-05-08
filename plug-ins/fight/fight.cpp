@@ -459,15 +459,15 @@ bool damage( Affect *paf, Character *victim,
     return true;
 }
 
-void rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show )
+void rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason )
 {
-    RawDamage( ch, victim, dam_type, dam ).hit( show );
+    RawDamage( ch, victim, dam_type, dam, deathReason ).hit( show );
 }
 
-void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show )
+void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason )
 {
     try {
-        rawdamage_nocatch( ch, victim, dam_type, dam, show );
+        RawDamage( ch, victim, dam_type, dam, deathReason ).hit( show );
     } catch (const VictimDeathException &) {
     }
 }

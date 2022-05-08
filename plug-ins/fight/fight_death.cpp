@@ -367,8 +367,9 @@ public:
         Character *victim = evt.victim;
         Character *killer = evt.killer;
 	    int bodypart = evt.bodypart;
+        DLString label = evt.label;
 
-        raw_kill( victim, bodypart, killer );
+        raw_kill( victim, bodypart, killer, label );
     }
 };
 
@@ -950,7 +951,7 @@ static bool mprog_kill( Character *killer, Character *victim )
 /*
  * Main death handler.
  */ 
-void raw_kill( Character* victim, int part, Character* ch )
+void raw_kill( Character* victim, int part, Character* ch, const DLString &label )
 {
     Character *realKiller = ch;
 
@@ -974,7 +975,7 @@ void raw_kill( Character* victim, int part, Character* ch )
 
     // From this point on the death has certainly happened.
 
-    gprog("onDeath", "CC", victim, ch);
+    gprog("onDeath", "CCis", victim, ch, part, label.c_str());
 
     DeathPenalties(ch, victim).run();
 

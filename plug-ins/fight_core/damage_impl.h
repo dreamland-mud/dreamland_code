@@ -15,7 +15,7 @@ struct SelfDamage : public Damage {
 
 // obsolates damage( .. TYPE_HIT .. );
 struct RawDamage : public Damage {
-    RawDamage( Character *ch, Character *victim, int dam_type, int dam );
+    RawDamage( Character *ch, Character *victim, int dam_type, int dam, const DLString &deathReason );
     
     virtual void message( );
     virtual bool canDamage( );

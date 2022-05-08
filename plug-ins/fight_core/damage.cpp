@@ -50,11 +50,12 @@ PROF(warrior);
 
 void do_visible( Character * );
 
-CharDeathEvent::CharDeathEvent(Character *victim, Character *killer, int bodypart) 
+CharDeathEvent::CharDeathEvent(Character *victim, Character *killer, int bodypart, const DLString &label) 
 {
     this->victim = victim;
     this->killer = killer;    
     this->bodypart = bodypart;
+    this->label = label;
 }
 
 /*-----------------------------------------------------------------------------
@@ -93,6 +94,7 @@ void Damage::init(Character *ch, Character *victim, int dam_type, int dam, bitst
     
     killer = ch;
     immune = false;
+    deathReason = "damage";
 }
 
 bool Damage::hit( bool show )
@@ -556,7 +558,7 @@ void Damage::handleDeath( )
     oldact("$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
     victim->pecho("Тебя {RУБИЛИ{x!!\n\r");
     
-    eventBus->publish(CharDeathEvent(victim, killer));
+    eventBus->publish(CharDeathEvent(victim, killer, -1, deathReason)); // TODO more granular death labels
 }
 
 

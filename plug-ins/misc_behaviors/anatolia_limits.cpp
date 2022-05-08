@@ -106,7 +106,7 @@ void Excalibur::speech( Character *ch, const char *speech )
 bool Excalibur::sac( Character *ch )
 {
   oldact("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
-  rawdamage( ch, ch, DAM_HOLY, (ch->hit - 1) > 1000 ? 1000 : (ch->hit - 1), true );
+  rawdamage( ch, ch, DAM_HOLY, (ch->hit - 1) > 1000 ? 1000 : (ch->hit - 1), true, "gods" );
   ch->gold = 0;
   return true;
 }

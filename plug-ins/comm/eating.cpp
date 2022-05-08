@@ -254,7 +254,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
         eatFood( ch, gain, gain, wasPoisoned );
     }
     else {
-        RawDamage( ch, mob, DAM_PIERCE, dam ).hit( true );
+        RawDamage( ch, mob, DAM_PIERCE, dam, "hunt" ).hit( true );
 
         if (mob->position >= POS_FIGHTING)
             multi_hit( mob, ch );

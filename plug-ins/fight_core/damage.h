@@ -6,13 +6,13 @@
 #define __DAMAGE_H__
 
 #include <stdarg.h>
+#include "dlstring.h"
 #include "bitstring.h"
 #include "fight_exception.h"
 #include "eventbus.h"
 
 class Character;
 class Object;
-class DLString;
 class Affect;
 
 class Damage {
@@ -78,13 +78,17 @@ protected:
     int dam;
     bool immune;
     bitstring_t dam_flag;
+    
+    // What to pass to the death handler as source of death.
+    DLString deathReason;
 };
 
 struct CharDeathEvent : public Event {
-    CharDeathEvent(Character *victim, Character *killer, int bodypart = -1);
+    CharDeathEvent(Character *victim, Character *killer, int bodypart, const DLString &label);
     Character *victim;
     Character *killer;
     int bodypart;
+    DLString label;
 };
 
 #endif

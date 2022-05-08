@@ -120,7 +120,7 @@ bool ClanItem::sac( Character *ch )
 { 
     oldact("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
 
-    rawdamage( ch, ch, DAM_HOLY, ch->hit - 10, true );
+    rawdamage( ch, ch, DAM_HOLY, ch->hit - 10, true, "gods" );
     ch->gold = 0;
 
     return false;
