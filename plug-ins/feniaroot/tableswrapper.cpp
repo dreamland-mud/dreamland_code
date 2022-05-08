@@ -102,15 +102,11 @@ TableWrapper::callMethod(const Register &key, const RegisterList &args)
     }
 
     if ((key == ID_VALUE).toBoolean() || (key == ID_VALUES).toBoolean()) {
-        DLString str = args2string(args);
-        if (table->enumerated)
-            return Register((int)table->value(str));
-        else
-            return Register((int)table->bitstring(str));
+        return argnum2flag(args, 1, *table);
     }
 
     if ((key == ID_NAME).toBoolean() || (key == ID_NAMES).toBoolean()) {
-        int value = args2number(args);
+        int value = argnum2flag(args, 1, *table);
         if (table->enumerated)
             return table->name(value);
         else
@@ -120,7 +116,7 @@ TableWrapper::callMethod(const Register &key, const RegisterList &args)
     if ((key == ID_MESSAGE).toBoolean() || (key == ID_MESSAGES).toBoolean()) {
         int igcase = args.size() > 1 ? argnum2number(args, 2) : 1;
         char gcase = igcase + '0';
-        int value = argnum2number(args, 1);
+        int value = argnum2flag(args, 1, *table);
 
         if (table->enumerated)
             return table->message(value, gcase);
