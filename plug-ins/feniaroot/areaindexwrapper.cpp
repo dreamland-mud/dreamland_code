@@ -72,7 +72,7 @@ AreaIndexWrapper::getTarget( ) const
     return target;
 }
 
-NMI_GET( AreaIndexWrapper, name, "название зоны") 
+NMI_GET( AreaIndexWrapper, name, "название зоны со всеми падежами") 
 { 
     checkTarget( ); 
     return Register( target->name);

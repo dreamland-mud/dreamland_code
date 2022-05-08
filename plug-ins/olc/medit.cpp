@@ -326,7 +326,7 @@ MEDIT(show)
     ptc(ch, "{CLevel {Y%3d  {CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
         mob.level, mob.vnum,
         !mob.area ? -1 : mob.area->vnum,
-        !mob.area ? "No Area" : mob.area->name);
+        !mob.area ? "No Area" : mob.area->getName().c_str());
 
     ptc(ch, "Race [{G%s{x] {D(? race){x Sex: [{G%s{x] {D(? sex_table){x Number: [{G%s{x]\n\r",
         mob.race, 
@@ -578,7 +578,7 @@ MEDIT(where)
         ptc(ch, "[%5d]    %-30s (%s)\r\n", 
                 wch->in_room->vnum,
                 wch->in_room->getName(), 
-                wch->in_room->areaName());
+                wch->in_room->areaName().c_str());
     }
 
     return true;

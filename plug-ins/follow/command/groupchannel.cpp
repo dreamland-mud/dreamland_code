@@ -73,7 +73,7 @@ void GroupChannel::triggers(Character *ch, const DLString &msg) const
             } else {
                 tell_raw(ch, pet, "%s, я нахожусь в {hh%s{hx - %s",
                          GET_SEX(ch, "Хозяин", "Хозяин", "Хозяйка"),
-                         pet->in_room->areaName(), pet->in_room->getName());
+                         pet->in_room->areaName().c_str(), pet->in_room->getName());
             } 
         } else {
             ch->pecho("Твой питомец не в состоянии ответить на твой вопрос."); // dumb wording, for debugging

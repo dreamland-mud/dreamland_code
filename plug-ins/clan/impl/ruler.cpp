@@ -239,7 +239,7 @@ bool ClanGuardRulerJailer::specFight( )
             interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
                             victim->getNameC(), 
                             ch->in_room->getName(),
-                            ch->in_room->areaName());
+                            ch->in_room->areaName().c_str());
 
 
             if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
@@ -1528,7 +1528,7 @@ bool RulerSpecialGuard::specFight( )
     interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
                     victim->getNameC(), 
                     ch->in_room->getName(), 
-                    ch->in_room->areaName());
+                    ch->in_room->areaName().c_str());
 
     if ( ( ch->getModifyLevel() + 20 > victim->getModifyLevel() )
             && !is_safe_nomessage ( ch, victim ) )
@@ -1574,13 +1574,13 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
             if (repops.size( ) == 1) {
                 ch->printf( "%s обитает в местности под названием %s (%s).\r\n",
                             mob->getNameP( '1' ).c_str( ), 
-                            repops.front( )->name, repops.front( )->areaIndex->getName() );
+                            repops.front( )->name, repops.front( )->areaIndex->getName().c_str() );
             }
             else if (repops.size( ) > 0) {
                 oldact("$C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
 
                 for (auto &r: repops)
-                    ch->printf( "    %s  (%s)\r\n", r->name, r->areaIndex->getName());
+                    ch->printf( "    %s  (%s)\r\n", r->name, r->areaIndex->getName().c_str());
             }
         }
     }

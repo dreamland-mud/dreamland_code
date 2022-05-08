@@ -220,7 +220,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         tell_raw( ch, questman, 
              "Последний раз {W%s{G видели в местности {W{hh%s{hx{G.", 
              russian_case( princeName, '4' ).c_str( ),
-             room->areaName() );
+             room->areaName().c_str() );
      
     hint++;
     wiznet( "find", "success, attempt #%d", hint.getValue( ) );

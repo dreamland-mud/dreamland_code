@@ -108,7 +108,7 @@ NMI_GET( RoomWrapper, name , "название комнаты")
     return Register( target->getName() );
 }
 
-NMI_GET( RoomWrapper, areaname , "имя арии")
+NMI_GET( RoomWrapper, areaname , "имя арии в именительном падеже")
 {
     checkTarget( );
     return Register( target->areaName() );

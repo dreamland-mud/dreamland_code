@@ -294,7 +294,7 @@ void HomeRecall::doList( PCharacter *ch )
         sprintf( buf, "%-15s [%-5d] %-25.25s (%s)\r\n", 
                  i->second->getName( ).c_str( ), point, 
                  (room ? room->getName() : "{Rnull!{x"),
-                 (room ? room->areaName() : "") );
+                 (room ? room->areaName().c_str() : "") );
 
         ch->send_to( buf );
     }

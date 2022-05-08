@@ -265,7 +265,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
 
     ptc(ch, "Name:       [{W%s{x] %s\n\rArea:       [{W%5d{x] %s\n\r",
               pRoom->name, web_edit_button(showWeb, ch, "name", "web").c_str(),
-              pRoom->areaIndex->vnum, pRoom->areaIndex->getName());
+              pRoom->areaIndex->vnum, pRoom->areaIndex->getName().c_str());
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
     ptc(ch, "Clan:       [{W%s{x] ", pRoom->clan->getName( ).c_str( ));
     ptc(ch, "Guilds: [{W%s{x]\n\r", pRoom->guilds.toString().c_str());

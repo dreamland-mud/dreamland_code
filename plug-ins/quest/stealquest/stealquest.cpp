@@ -132,7 +132,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     }
 
     tell_raw( pch, questman, "Пострадавшего ищи в районе {W%s{G ({W{hh%s{hx{G).", 
-                  victim->in_room->getName(), victim->in_room->areaName() );
+                  victim->in_room->getName(), victim->in_room->areaName().c_str() );
     tell_fmt("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.", 
               pch, questman, time );
     

@@ -43,7 +43,7 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     mobsKilled = 0;
     mobsDestroyed = 0;
     objsTotal = 10;
-    areaName = targetArea->name;
+    areaName = targetArea->getName();
     
     try {
         for (int m = 0, o = 0; m < mobsTotal; m++, o++) {
@@ -71,7 +71,7 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     wiznet( "", "%s, %d victims in area %s",
                  scenName.c_str(),
                  mobsTotal,
-                 targetArea->name);
+                 targetArea->getName().c_str());
 }
 
 const BigQuestScenario & BigQuest::getScenario( ) const

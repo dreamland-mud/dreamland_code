@@ -205,7 +205,7 @@ CMDRUN( path )
 
     if (targets.empty()) {
         ch->pecho("Не могу найти местность с названием '{W%s{x' в зоне {c%s{x.", 
-                  roomName.c_str(), ch->in_room->areaName());
+                  roomName.c_str(), ch->in_room->areaName().c_str());
         return;
     }
 
@@ -248,7 +248,7 @@ CMDRUN( path )
     }
 
     if (foundPath)
-        ch->pecho("Найдены такие местности в зоне {c%s{x:", ch->in_room->areaName());
+        ch->pecho("Найдены такие местности в зоне {c%s{x:", ch->in_room->areaName().c_str());
     else
         ch->pecho("Не удалось проложить путь ни к одной из местностей:");
 

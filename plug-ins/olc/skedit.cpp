@@ -1285,7 +1285,7 @@ GREDIT(practicer, "учитель", "задать vnum моба-учителя �
     }
 
     g->practicer.setValue(vnum);
-    ch->pecho("Учитель этой группы теперь %N1 из зоны '%s'.", pMob->short_descr, pMob->area->name);
+    ch->pecho("Учитель этой группы теперь %N1 из зоны '%s'.", pMob->short_descr, pMob->area->getName().c_str());
     return true;
 }
 

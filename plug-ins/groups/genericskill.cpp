@@ -408,13 +408,13 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
         
         auto p = practicers.begin();
         buf << "{g" << russian_case((*p)->short_descr, '2') << "{x "
-                << "(зона {g{hh" << (*p)->area->name << "{x)";
+                << "(зона {g{hh" << (*p)->area->getName() << "{x)";
 
         // For multi-groups show two teachers only.
         if (practicers.size() > 1) {
             p++;
             buf << " или у {g" << russian_case((*p)->short_descr, '2') << "{x "
-                    << "(зона {g{hh" << (*p)->area->name << "{x)";
+                    << "(зона {g{hh" << (*p)->area->getName() << "{x)";
         }
                     
         buf << "." << endl;

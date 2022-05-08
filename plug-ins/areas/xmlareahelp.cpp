@@ -67,7 +67,7 @@ public:
         for(auto &area: areaIndexes) {
             HelpArticles::iterator a;
             HelpArticles &articles = area->helps;
-            DLString aname(area->name);
+            DLString aname(area->getName());
             aname.colourstrip();
             
             for (a = articles.begin( ); a != articles.end( ); a++) {

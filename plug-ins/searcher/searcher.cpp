@@ -233,7 +233,7 @@ public:
             if (type.find("Pet") == DLString::npos && type != "Rat")
                 continue;
             
-            DLString aname = pMob->area->name;
+            DLString aname = pMob->area->getName();
             csv_escape(aname);
 
             Json::Value pet;
@@ -376,7 +376,7 @@ public:
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
-            DLString area = pArea->name;
+            DLString area = pArea->getName();
             csv_escape( area );
             csv_escape( where );
 
@@ -509,7 +509,7 @@ public:
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
-            DLString area = pArea->name;
+            DLString area = pArea->getName();
             csv_escape( area );
             csv_escape( where );
 
@@ -645,7 +645,7 @@ public:
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
-            DLString area = pArea->name;
+            DLString area = pArea->getName();
             csv_escape( area );
             csv_escape( where );
                 
@@ -781,7 +781,7 @@ CMDRUNP(searcher)
                                     (p.hp != 0 ? "C": "w"), p.hp, 
                                     (p.mana != 0 ? "C": "w"), p.mana, 
                                     (p.saves != 0 ? "C": "w"), p.saves, 
-                                    pObj->area->name);
+                                    pObj->area->getName().c_str());
 
                     DLString where;
                     AreaIndexData *pArea;
@@ -1011,7 +1011,7 @@ CMDRUNP(searcher)
                                     searcher_param_class(pMob).c_str(),
                                     searcher_param_sex(pMob).c_str(),
                                     weapon_flags.name(pMob->dam_type).c_str(),
-                                    pMob->area->name);
+                                    pMob->area->getName().c_str());
 
                     DLString where;
                     AreaIndexData *pArea;

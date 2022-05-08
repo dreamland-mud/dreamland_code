@@ -1599,7 +1599,7 @@ CMDWIZP( rwhere )
 
     for (auto &r: roomInstances)
         if (is_name(argument, r->getName())) {
-            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->areaName());
+            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->areaName().c_str());
             found = true;
         }
 

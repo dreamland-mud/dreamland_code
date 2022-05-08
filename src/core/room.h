@@ -150,7 +150,7 @@ public:
     inline AreaIndexData *areaIndex() const;
 
     /** Quick access to room area name, in nominative case by default. */
-    const char * areaName(char gcase = '1') const;
+    DLString areaName(char gcase = '1') const;
 
     /** This room's position in the global roomInstances vector. Needed for backward compat. */
     int position;

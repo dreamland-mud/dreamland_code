@@ -257,7 +257,7 @@ OEDIT(show)
               pObj->name,
               web_edit_button(showWeb, ch, "name", "web").c_str(),
               !pObj->area ? -1 : pObj->area->vnum,
-              !pObj->area ? "No Area" : pObj->area->name);
+              !pObj->area ? "No Area" : pObj->area->getName().c_str());
     stc(buf, ch);
 
 
@@ -410,18 +410,18 @@ OEDIT(where)
                     room->vnum,
                     wch->getNameP('2').c_str( ), 
                     room->getName(), 
-                    room->areaName());
+                    room->areaName().c_str());
         else if (o->in_room)
             ptc(ch, "[%5d]   на полу в %s (%s)\r\n", 
                     room->vnum,
                     room->getName(), 
-                    room->areaName());
+                    room->areaName().c_str());
         else if (o->in_obj)
             ptc(ch, "[%5d]   внутри %s в %s (%s)\r\n", 
                     room->vnum,
                     o->in_obj->getShortDescr('2').c_str( ),
                     room->getName(),
-                    room->areaName());
+                    room->areaName().c_str());
     }
 
     return true;

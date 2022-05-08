@@ -198,9 +198,9 @@ Area * AreaIndexData::create()
     return area;
 }
 
-const char * AreaIndexData::getName(char gcase) const
+DLString AreaIndexData::getName(char gcase) const
 {
-    return russian_case(name, gcase).c_str();
+    return russian_case(name, gcase);
 }
 
 Area::Area()

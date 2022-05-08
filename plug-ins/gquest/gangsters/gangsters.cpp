@@ -112,7 +112,7 @@ void Gangsters::create( const Config& )
                         number--;
 
                 if (number == 0) {
-                    log("good area: " << area->name);
+                    log("good area: " << area->getName());
                     populateArea( area, mobRooms, numPortal );
                     createFirstHint( people );
                     populateLair( );
@@ -763,7 +763,7 @@ void Gangsters::populateArea( AreaIndexData *area, RoomList &mobRooms, int numPo
 {
     int number;
     
-    areaName = area->name;
+    areaName = area->getName();
     SET_BIT( area->area_flag, AREA_NOGATE );
     
     number = number_fuzzy( mobRooms.size( ) / 5 );

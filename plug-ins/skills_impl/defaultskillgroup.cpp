@@ -110,7 +110,7 @@ void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) con
 
         buf << " - {g" 
             << russian_case( pMob->short_descr, '1' ) << "{x "
-            << "({g{hh" << pMob->area->name << "{x).";
+            << "({g{hh" << pMob->area->getName() << "{x).";
     }
 
     buf << endl;

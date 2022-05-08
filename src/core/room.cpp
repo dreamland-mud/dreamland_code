@@ -97,7 +97,7 @@ bool Room::hasExits() const
     return false;
 }
 
-const char * Room::areaName(char gcase) const
+DLString Room::areaName(char gcase) const
 {
     return pIndexData->areaIndex->getName(gcase);
 }

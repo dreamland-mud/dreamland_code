@@ -29,7 +29,7 @@ DLString AreaHelp::getTitle(const DLString &label) const
     if (!label.empty() || !titleAttribute.empty() || !selfHelp)
         return MarkupHelpArticle::getTitle(label);
 
-    buf << "Зона {c" << area->name << "{x";
+    buf << "Зона {c" << area->getName() << "{x";
 
     if (strlen(area->credits) > 0 
             && str_str(area->credits, area->name) == 0
@@ -48,7 +48,7 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
         return;
     }
 
-    in << "Зона {Y" << area->name << "{x, ";
+    in << "Зона {Y" << area->getName() << "{x, ";
 
     if (area->low_range > 0 || area->high_range > 0)
        in << "уровни {Y" << area->low_range << "-" << area->high_range << "{x, ";
