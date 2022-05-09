@@ -80,12 +80,14 @@
 #include "interp.h"
 #include "gsn_plugin.h"
 #include "stats_apply.h"
+#include "damageflags.h"
 #include "material.h"
 #include "act_move.h"
 #include "handler.h"
 #include "act.h"
 #include "def.h"
 #include "vnum.h"
+#include "character.h"
 
 DESIRE(full);
 DESIRE(hunger);
@@ -400,7 +402,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho("Осторожно, ты уже несешь слишком много вещей.");
         else {
-            oldact("$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR);
+			ch->pecho("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4.", ch->canCarryNumber( ), obj);
             return false;
         }
     }
@@ -410,7 +412,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой.", ch);
         else {
-            oldact("$d: ты не можешь поднять такую тяжесть.",ch,NULL,obj->getName( ),TO_CHAR );
+			ch->pecho("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4.", ch->canCarryWeight( ), obj);
             return false;
         }
     }
@@ -1186,8 +1188,7 @@ static int drop_obj( Character *ch, Object *obj )
              && ch->in_room->getSectorType() != SECT_AIR
              && ch->in_room->getSectorType() != SECT_FOREST
              && ch->in_room->getSectorType() != SECT_DESERT
-             && obj->pIndexData->vnum == OBJ_VNUM_POTION_VIAL
-//             && material_is_flagged( obj, MAT_FRAGILE )
+             && material_is_flagged( obj, MAT_FRAGILE )
              && chance( 40 ))
     {
         ch->recho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
