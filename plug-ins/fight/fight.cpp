@@ -472,44 +472,12 @@ void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool sh
     }
 }
 
-static inline bool must_not_yell( Character *ch, Character *victim )
-{
-    /* sanity checks */
-    if (!ch || !victim || ch == victim)
-        return true;
-    
-    /* sleeping victims don't yell */
-    if (!IS_AWAKE(victim))
-        return true;
-    
-    /* players yell always */
-    if (!victim->is_npc( ))
-        return false;
-    
-    /* in some cases (like shooting) mobs yell always too */
-    if (ch->in_room != victim->in_room)
-        return false;
-    
-    /* by default mobs are silent */
-    return true;
-}
-
 void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg )
 {
     static const char *defaultMsgBlind = "Помогите! Кто-то напал на меня!";
     static const char *defaultMsg = "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!";
 
     gprog("onPanicYell", "CCss", ch, victim, msgBlind ? msgBlind : defaultMsgBlind, msg ? msg : defaultMsg);
-
-    if (must_not_yell( ch, victim ))
-        return;
-
-    if (!victim->can_see( ch )) 
-        interpret_raw( victim, "yell", 
-                        msgBlind ? msgBlind : defaultMsgBlind );
-    else
-        interpret_raw( victim, "yell", 
-                       fmt( victim, msg ? msg : defaultMsg, ch, victim ).c_str( ) );
 }
 
 void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage ) 
