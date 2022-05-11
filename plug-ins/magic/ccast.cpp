@@ -245,8 +245,6 @@ CMDRUN( cast )
 
         if (victim)
             set_violent( ch, victim, false );
-        
-        yell_panic(ch, victim);
     }
      
     if (spell->spellbane( ch, victim ))
@@ -301,6 +299,8 @@ CMDRUN( cast )
     }
     
     if (offensive && victim) {
+        yell_panic(ch, victim);
+
         if (target->castFar && target->door != -1) {
             ch->setLastFightTime( );
             victim->setLastFightTime( );
