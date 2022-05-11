@@ -137,31 +137,34 @@ void follower_clear( Character * ch, bool verbose )
  */
 bool is_same_group( Character *ach, Character *bch )
 {
- Character *ch,*vch,*ch_next,*vch_next;
+    set<Character *> leaders_a, leaders_b;
 
- for (ch = ach; ch != 0; ch = ch_next) {
-    if (!ch->in_room)
-        return false;
-    
-    ch_next = ch->leader;
-    
-    for(vch = bch; vch != 0; vch = vch_next) {
-        if (!vch->in_room)
-            return false;
-        
-        vch_next = vch->leader;
-        
-        if (ch == vch) 
-            return true;
-        
-        if (vch == vch_next)
+    // Create a set of: 'A', 'leader of A', 'leader of leader of A' and so on.
+    for (Character *ch = ach; ch != 0; ch = ch->leader) {
+        if (leaders_a.count(ch) > 0)
             break;
+
+        leaders_a.insert(ch);
     }
-   
-    if (ch == ch_next)
-        break;
- }
- return false;
+
+    // Same for B.
+    for (Character *ch = bch; ch != 0; ch = ch->leader) {
+        if (leaders_b.count(ch) > 0)
+            break;
+
+        leaders_b.insert(ch);
+    }
+
+    // Check if anyone who leads A also leads B, and viceversa.
+    for (auto &ch: leaders_a)
+        if (leaders_b.count(ch) > 0)
+            return true;
+
+    for (auto &ch: leaders_b)
+        if (leaders_a.count(ch) > 0)
+            return true;
+
+    return false;
 }
 
 /*
