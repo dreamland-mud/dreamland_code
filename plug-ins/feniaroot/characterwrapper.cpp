@@ -327,7 +327,7 @@ NMI_GET( CharacterWrapper, attack_noun, "русск название типа а
     return attack_table[target->dam_type].noun;
 }
 
-NMI_GET( CharacterWrapper, attack_damage, "название типа повреждения (таблица .damage_table)")
+NMI_GET( CharacterWrapper, attack_damage, "название типа повреждения (таблица .tables.damage_table)")
 {
     checkTarget();
     

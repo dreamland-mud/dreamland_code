@@ -417,7 +417,7 @@ NMI_GET( ObjectWrapper, attack_noun, "русск название типа ат�
     return target->item_type == ITEM_WEAPON ? attack_table[target->value3()].noun : "";
 }
 
-NMI_GET( ObjectWrapper, attack_damage, "название типа повреждения оружия (таблица .damage_table)")
+NMI_GET( ObjectWrapper, attack_damage, "название типа повреждения оружия (таблица .tables.damage_table)")
 {
     checkTarget();
     

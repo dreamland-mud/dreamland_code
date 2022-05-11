@@ -558,7 +558,7 @@ void Damage::handleDeath( )
     oldact("$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
     victim->pecho("Тебя {RУБИЛИ{x!!\n\r");
     
-    eventBus->publish(CharDeathEvent(victim, killer, -1, deathReason)); // TODO more granular death labels
+    eventBus->publish(CharDeathEvent(victim, killer, -1, deathReason));
 }
 
 
