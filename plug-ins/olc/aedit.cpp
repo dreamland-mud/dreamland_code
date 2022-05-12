@@ -174,7 +174,9 @@ AEDIT(show, "показать", "показать все поля")
     AreaIndexData *original = get_area_data(vnum);
     Area *instance = original ? original->area : 0;
 
-    ptc(ch, "Name:       [%5d] %s\n\r", vnum.getValue( ), name.getValue( ).c_str( ));
+    ptc(ch, "Name:       [%5d] %s %s\n\r", 
+        vnum.getValue( ), name.getValue( ).c_str( ),
+        web_edit_button(ch, "name", "web").c_str());
     ptc(ch, "File:       [%s]\n\r", file_name.getValue( ).c_str( ));
     ptc(ch, "Vnums:      [%u-%u]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
     ptc(ch, "Levels:     [%u-%u]\n\r", low_range.getValue( ), high_range.getValue( ));
@@ -313,15 +315,7 @@ AEDIT(create, "создать", "создать новую арию")
 
 AEDIT(name, "имя", "установить имя (то, что видно по команде 'зоны' и 'где')")
 {
-    if (!*argument) {
-        stc("Синтаксис:   name [$имя]\n\r", ch);
-        return false;
-    }
-
-    name = argument;
-
-    stc("Имя присвоено.\n\r", ch);
-    return true;
+    return editor(argument, name, (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
 }
 
 
