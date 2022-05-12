@@ -1019,7 +1019,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
         if (!chance( ch->getPC( )->getClanLevel( ) * 10 )) {
             ch->pecho( "Ты пытаешься зарядить %1$O4, но зажимаешь в %1$P4 собственную руку. Это больно!", obj );
             ch->recho( "%2$^C1 пытается зарядить %1$O4, но зажимает в %1$P4 собственную руку.", obj, ch );
-            rawdamage( ch, ch, DAM_PIERCE, ch->hit / 10, true, "hunter" );
+            rawdamage( ch, ch, DAM_PIERCE, ch->hit / 10, true, "room" );
         }
         else {
             ch->pecho( "Ты пытаешься установить %1$O4, но только ломаешь %1$P2.", obj );
