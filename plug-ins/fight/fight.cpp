@@ -474,10 +474,7 @@ void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool sh
 
 void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg )
 {
-    static const char *defaultMsgBlind = "Помогите! Кто-то напал на меня!";
-    static const char *defaultMsg = "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!";
-
-    gprog("onPanicYell", "CCss", ch, victim, msgBlind ? msgBlind : defaultMsgBlind, msg ? msg : defaultMsg);
+    gprog("onPanicYell", "CCss", ch, victim, msgBlind, msg);
 }
 
 void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage ) 

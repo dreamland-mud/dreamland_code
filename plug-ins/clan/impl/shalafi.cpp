@@ -247,7 +247,8 @@ VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level )
       if ( !is_safe_spell(ch,tmp_vict,true))
         {
             if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-                yell_panic( ch, tmp_vict );
+                yell_panic(ch, tmp_vict, "Помогите! Кто-то напал на меня!", "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!");
+
         
           if (!tmp_vict->isAffected(sn)) {
         

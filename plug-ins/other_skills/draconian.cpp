@@ -271,7 +271,8 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
           continue;
 
         if (ch->fighting != vch && vch->fighting != ch)
-            yell_panic( ch, vch );
+            yell_panic(ch, vch, "Помогите! Кто-то напал на меня!", "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!");
+
 
         try{
 

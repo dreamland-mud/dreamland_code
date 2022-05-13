@@ -299,7 +299,7 @@ CMDRUN( cast )
     }
     
     if (offensive && victim) {
-        yell_panic(ch, victim);
+        yell_panic(ch, victim, "Помогите! Кто-то напал на меня!", "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!");
 
         if (target->castFar && target->door != -1) {
             ch->setLastFightTime( );
