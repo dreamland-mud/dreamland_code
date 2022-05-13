@@ -199,7 +199,7 @@ void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, stru
     XMLStringVector::const_iterator s;
 
     for (s = msgStart.begin(); s != msgStart.end(); s++)
-        tell_fmt(s->c_str(), pch, questman, targetArea->name, mobsTotal);            
+        tell_fmt(s->c_str(), pch, questman, targetArea->getName().c_str(), mobsTotal);            
 }
 
 void BigQuestScenario::onQuestInfo(PCharacter *pch, int mobsTotal, ostream &buf) const

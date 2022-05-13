@@ -446,7 +446,7 @@ NMI_INVOKE(FeniaSpellContext, yellPanic, "(): новая жертва закли
     Character *myVict = arg2character(vict);
      
     if (myCh->fighting != myVict && myVict->fighting != myCh)
-        yell_panic(myCh, myVict);
+        yell_panic(myCh, myVict, "Помогите! Кто-то напал на меня!", "Помогите! %1$^C1 напа%1$Gло|л|ла на меня!");
 
     return Register();
 }

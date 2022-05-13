@@ -32,8 +32,8 @@ DLString AreaHelp::getTitle(const DLString &label) const
     buf << "Зона {c" << area->getName() << "{x";
 
     if (strlen(area->credits) > 0 
-            && str_str(area->credits, area->name) == 0
-            && str_str(area->name, area->credits) == 0)
+            && str_str(area->credits, area->getName().c_str()) == 0
+            && str_str(area->getName().c_str(), area->credits) == 0)
         buf << " ({c" << area->credits << "{x)";
 
     return buf.str();
