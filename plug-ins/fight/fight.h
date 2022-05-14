@@ -40,7 +40,7 @@ int        move_dec( Character *ch );
 void damapply_class(Character *ch, int &dam);
 
 
-void yell_panic( Character *ch, Character *victim, const char *msgBlind , const char *msg );
+void yell_panic( Character *ch, Character *victim, const char *msgBlind , const char *msg, const char *label = 0 );
 
 
 /* gaining experience (fight_exp.cpp) */

@@ -20,6 +20,7 @@
 #include "../anatolia/handler.h"
 #include "directions.h"
 #include "merc.h"
+#include "fight.h"
 #include "act.h"
 #include "mercdb.h"
 #include "save.h"
@@ -367,7 +368,7 @@ bool BasicMobileBehavior::checkLastFoughtHiding()
     // Complain and go home if victim is hiding in a safe law room.
 
     DLString moan = fmt(NULL, "%1$^C1, подл%1$Gое|ый|ая трус%1$Gло||иха, я еще до тебя доберусь!", pch);
-    interpret_raw(ch, "yell", moan.c_str());
+    yell_panic(pch, ch, moan.c_str(), moan.c_str(), "lastFoughtHiding"); // always sees the victim
 
     backHome(true);
     clearLastFought();

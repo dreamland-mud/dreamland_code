@@ -461,24 +461,25 @@ SKILL_RUNP( steal )
                 if (mprog_steal_fail( victim, ch ))
                     return;
 
+                const char *msg;
                 switch(number_range(0,3))
                 {
                 case 0 :
-                        sprintf( buf, "%s -- подлая ворюга!", tmp_ch->getNameC() );
+                        msg = "%1$^C1 -- подлая ворюга!";
                         break;
                 case 1 :
-                        sprintf( buf, "Да %s и конфетку у ребенка украсть не сможет, неумеха!",
-                                 tmp_ch->getNameC());
+                        msg = "Да %1$C1 и конфетку у ребенка украсть не сможет, неумеха!";
                         break;
                 case 2 :
-                        sprintf( buf,"%s пытается обокрасть меня!",tmp_ch->getNameC() );
+                        msg = "%1$^C1 пытается обокрасть меня!";
                         break;
-                case 3 :
-                        sprintf(buf,"Держи свои руки подальше, %s!",tmp_ch->getNameC());
+                default:
+                        msg = "Держи свои руки подальше, %1$C1!";
                         break;
                 }
-                if ( IS_AWAKE( victim ) )
-                        do_yell( victim, buf );
+
+                yell_panic(ch, victim, "Кто-то пытается обокрасть меня!", msg, "steal");
+
                 if ( !ch->is_npc() )
                 {
                         if ( victim->is_npc() )
@@ -716,13 +717,10 @@ protected:
 
             actor->recho( ch, "%1$^C1 пытается вытолкнуть %2$C4.", actor, ch );
 
-            if (IS_AWAKE( ch )) {
-                interpret_raw( ch, "yell",
-                               fmt( ch, "Держи свои руки подальше, %^C1!", actor ).c_str( ) );
+            yell_panic(actor, ch, "Держите свои руки подальше!", "Держи свои руки подальше, %1$C1!");
 
-                if (ch->is_npc( ))
-                    multi_hit( ch, actor , "murder" );
-            }
+            if (ch->is_npc( ))
+                multi_hit( ch, actor , "murder" );
         }
         else {
             fSuccess = true;

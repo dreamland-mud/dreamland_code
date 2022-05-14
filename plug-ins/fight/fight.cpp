@@ -472,9 +472,9 @@ void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool sh
     }
 }
 
-void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg )
+void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, const char *label )
 {
-    gprog("onPanicYell", "CCss", ch, victim, msgBlind, msg);
+    gprog("onPanicYell", "CCsss", ch, victim, msgBlind, msg, label ? label : "attack");
 }
 
 void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage ) 

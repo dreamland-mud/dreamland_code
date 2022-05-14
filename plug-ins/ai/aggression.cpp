@@ -178,10 +178,7 @@ bool BasicMobileBehavior::aggressLastFought( )
     if (!canAggressLastFought( victim ))
         return false;
 
-    interpret_raw( ch, "yell", 
-                   fmt( ch, "%^C1! Теперь ты%s умрешь!", victim, 
-                            (chance(50) ? " может быть" : "" ) ).c_str( ) );
-    
+    yell_panic(victim, ch, "", "%1$^C1! Теперь ты умрешь!", "aggressLastFought");
     attack( victim );
     return true;
 }
@@ -213,9 +210,7 @@ bool BasicMobileBehavior::aggressMemorized( )
     }
 
     if (victim) {
-        interpret_raw( ch, "yell", "Вот мы и встретились! %s!",
-                           victim->getNameP( '1' ).c_str( ) );
-        
+        yell_panic(victim, ch, "", "Вот мы и встретились, %1$C1!", "aggressMemorized");        
         attack( victim );
         return true;
     }

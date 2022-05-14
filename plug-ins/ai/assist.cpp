@@ -410,7 +410,7 @@ bool BasicMobileBehavior::doCallHelp( )
     if (fighters < helpers) 
         return false;
    
-    interpret_raw( ch, "yell", "На помощь!" );
+    yell_panic(ch->fighting, ch, "На помощь!", "На помощь!", "callHelp");
     
     if (ch->isAffected( gsn_garble ))
         return true;
