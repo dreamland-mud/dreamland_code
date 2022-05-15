@@ -184,7 +184,7 @@ XMLArea::load_helps(AreaIndexData *a)
 
     for (h = helps.begin( ); h != helps.end( ); h++) {
         AreaHelp::Pointer help(NEW);
-        DLString aname(a->name);
+        DLString aname(a->getName());
         aname.colourstrip();
 
         help->areafile = a->area_file;
@@ -211,7 +211,7 @@ XMLArea::load_helps(AreaIndexData *a)
         help->areafile = a->area_file;
         help->selfHelp = true;
         help->persistent = false;
-        help->addAutoKeyword(DLString(a->name).colourStrip().quote());
+        help->addAutoKeyword(a->getName().colourStrip().quote());
         help->addAutoKeyword(DLString(a->credits).colourStrip().quote());
         help->setText("     ");
         help->labels.addTransient("area");

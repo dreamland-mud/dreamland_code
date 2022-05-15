@@ -38,7 +38,7 @@ AreaIndexData * AreaUtils::createFor(PCMemoryInterface *player)
 
     areaIndexes.push_back(a);
 
-    DLString areaname = "Зона " + player->getNameP('2');
+    DLString areaname = "Зон|а|ы|е|у|ой|е " + player->getNameP('2');
     a->name = str_dup(areaname.c_str());
     a->authors = str_dup(player->getNameP('1').c_str());
     a->security = 9;

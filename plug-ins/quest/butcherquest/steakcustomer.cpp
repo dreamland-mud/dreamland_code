@@ -52,7 +52,7 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
         
     } 
     
-    if (quest->areaName != orig->area->name) {
+    if (quest->areaName != orig->area->getName()) {
         tell_raw( hero, ch, 
                 "Эти звери водятся в %s, а не в %s.",
                 orig->area->getName().c_str(), quest->areaName.c_str( ) );
