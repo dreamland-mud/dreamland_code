@@ -671,10 +671,10 @@ void show_char_to_char_0( Character *victim, Character *ch )
         buf << fmt(ch, "({1{mОчарован%Gо||а{2)", victim);
 
     if (CAN_DETECT(ch, DETECT_UNDEAD)) {
-		if (victim->is_npc() &&
-			(IS_SET(victim->act, ACT_UNDEAD) || IS_SET(victim->form, FORM_UNDEAD)) )
-			buf << "({1{rНежить{2)";
-		else if (!victim->is_npc() && IS_VAMPIRE(ch))
+        bool npcUndead = victim->is_npc() && 
+            (IS_SET(victim->act, ACT_UNDEAD) || IS_SET(victim->form, FORM_UNDEAD));
+    
+		if (npcUndead || IS_VAMPIRE(victim))
 			buf << "({1{rНежить{2)";
 	}      
 
