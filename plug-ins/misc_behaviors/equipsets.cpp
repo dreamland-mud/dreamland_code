@@ -14,7 +14,7 @@
 #include "act.h"
 #include "magic.h"
 #include "interp.h"
-#include "gsn_plugin.h"
+
 #include "effects.h"
 #include "handler.h"
 #include "fight.h"
@@ -26,6 +26,8 @@ GSN(travellers_joy);
 GSN(myrvale_noriva);
 GSN(shevale_reykaris);
 GSN(morris_dancer);
+GSN(heal);
+GSN(haste);
 PROF(cleric);
 PROF(necromancer);
 

@@ -19,7 +19,7 @@
 #include "desire.h"
 #include "object.h"
 
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 #include "save.h"
@@ -41,7 +41,15 @@
 PROF(vampire);
 DESIRE(bloodlust);
 RELIG(karmina);
+GSN(backguard);
+GSN(bloodlet);
+GSN(bonedagger);
+GSN(corruption);
 GSN(grave);
+GSN(rear_kick);
+GSN(vampire);
+GSN(vampiric_bite);
+GSN(vampiric_touch);
 
 #define ROOM_VNUM_GRAVE         5
 

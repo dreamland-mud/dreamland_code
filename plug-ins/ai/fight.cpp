@@ -5,6 +5,7 @@
 #include "basicmobilebehavior.h"
 
 #include "skillcommand.h"
+#include "skillreference.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -12,7 +13,7 @@
 #include "dreamland.h"
 #include "damage.h"
 #include "fight.h"
-#include "gsn_plugin.h"
+
 #include "interp.h"
 #include "handler.h"
 #include "magic.h"
@@ -21,7 +22,20 @@
 #include "def.h"
 
 GSN(none);
+GSN(blindness);
+GSN(faerie_fire);
 GSN(dispel_affects);
+GSN(curse);
+GSN(second_attack);
+GSN(third_attack);
+GSN(fourth_attack);
+GSN(guard);
+GSN(dirt_kicking);
+GSN(smash);
+GSN(backstab);
+GSN(tiger_power);
+GSN(disarm);
+GSN(bash);
 
 /*
  * Hit victim for the first time 

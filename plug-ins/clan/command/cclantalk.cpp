@@ -21,10 +21,10 @@
 
 #include "pcharacter.h"
 #include "clanreference.h"
-
+#include "skillreference.h"
 #include "dreamland.h"
 #include "loadsave.h"
-#include "gsn_plugin.h"
+
 #include "descriptor.h"
 #include "mudtags.h"
 #include "act.h"
@@ -33,6 +33,8 @@
 #include "def.h"
 
 CLAN(none);
+GSN(deafen);
+GSN(garble);
 
 /* TODO reimplement clantalk using 'communication' interfaces */
 

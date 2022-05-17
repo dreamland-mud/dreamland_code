@@ -27,7 +27,7 @@
 #include "desire.h"
 #include "object.h"
 
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 #include "magic.h"
@@ -41,6 +41,7 @@
 #include "interp.h"
 #include "def.h"
 
+GSN(blink);
 
 /*
  * 'blink' skill command

@@ -21,7 +21,8 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "race.h"
-#include "gsn_plugin.h"
+#include "skillreference.h"
+
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
@@ -32,6 +33,8 @@
 
 #include "fight.h"
 #include "def.h"
+
+GSN(paralysis);
 
 bool check_stun(Character *ch, Character *victim)
 {

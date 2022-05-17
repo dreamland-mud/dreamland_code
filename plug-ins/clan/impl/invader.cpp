@@ -30,7 +30,7 @@
 #include "affect.h"
 
 #include "act.h"
-#include "gsn_plugin.h"
+
 #include "merc.h"
 #include "mercdb.h"
 #include "fight.h"
@@ -40,9 +40,23 @@
 #include "magic.h"
 #include "def.h"
 
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(blindness);
 GSN(dispel_affects);
-GSN(soul_lust);
+GSN(energy_drain);
+GSN(evil_spirit);
+GSN(fade);
+GSN(golden_aura);
+GSN(mental_attack);
+GSN(mental_knife);
+GSN(plague);
+GSN(shadow_cloak);
 GSN(shadow_shroud);
+GSN(soul_lust);
+GSN(spellbane);
+GSN(weaken);
+
 CLAN(invader);
 
 /*--------------------------------------------------------------------------

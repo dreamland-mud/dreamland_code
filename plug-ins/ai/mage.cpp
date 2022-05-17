@@ -11,17 +11,40 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "spell.h"
+#include "skillreference.h"
 
 #include "fight.h"
-#include "gsn_plugin.h"
 #include "magic.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
+
 GSN(none);
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(blindness);
+GSN(burning_hands);
+GSN(chill_touch);
+GSN(colour_spray);
+GSN(curse);
 GSN(dispel_affects);
 GSN(dragons_breath);
+GSN(energy_drain);
+GSN(faerie_fire);
+GSN(fireball);
+GSN(lightning_bolt);
+GSN(magic_missile);
+GSN(magnetic_thrust);
+GSN(plague);
+GSN(poison);
+GSN(scream);
+GSN(shocking_grasp);
+GSN(slow);
+GSN(sulfuric_spray);
+GSN(teleport);
+GSN(weaken);
+GSN(web);
 
 /*----------------------------------------------------------------------------
  *                         MAGE'S BRAIN

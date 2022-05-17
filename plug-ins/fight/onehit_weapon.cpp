@@ -22,7 +22,7 @@
 #include "fight.h"
 #include "../anatolia/handler.h"
 #include "math_utils.h"
-#include "gsn_plugin.h"
+
 #include "effects.h"
 #include "damageflags.h"
 #include "magic.h"
@@ -32,6 +32,11 @@
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
+
+GSN(black_feeble);
+GSN(counter);
+GSN(holy_attack);
+GSN(poison);
 
 WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary, string command )
                 : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 

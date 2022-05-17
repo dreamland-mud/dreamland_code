@@ -6,14 +6,16 @@
 #include "pcharacter.h"
 #include "liquid.h"
 #include "room.h"
+#include "skillreference.h"
 
 #include "act.h"
-#include "gsn_plugin.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
 #define HUNGER_MIN_LEVEL (PK_MIN_LEVEL + 5)
+
+GSN(vampire);
 
 /*-------------------------------------------------------------------
  * DefaultDesire

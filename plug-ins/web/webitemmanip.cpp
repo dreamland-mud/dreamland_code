@@ -18,7 +18,7 @@
 #include "commandmanager.h"
 #include "mobilebehavior.h"
 #include "behavior_utils.h"
-
+#include "skillreference.h"
 #include "object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -26,7 +26,7 @@
 
 #include "descriptor.h"
 #include "comm.h"
-#include "gsn_plugin.h"
+
 #include "attract.h"
 #include "occupations.h"
 #include "shoptrader.h"
@@ -37,6 +37,9 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+
+GSN(lore);
+GSN(steal);
 
 NPCharacter * find_mob_with_act( Room *room, bitstring_t act );
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );

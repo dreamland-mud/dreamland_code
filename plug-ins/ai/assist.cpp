@@ -18,7 +18,7 @@
 #include "dreamland.h"
 #include "damage.h"
 #include "fight.h"
-#include "gsn_plugin.h"
+
 #include "interp.h"
 #include "handler.h"
 #include "magic.h"
@@ -30,6 +30,8 @@
 #include "roomtraverse.h"
 
 #include "def.h"
+
+GSN(garble);
 
 
 /*

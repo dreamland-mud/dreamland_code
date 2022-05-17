@@ -24,7 +24,7 @@
 
 #include "merc.h"
 #include "websocketrpc.h"
-#include "gsn_plugin.h"
+
 #include "arg_utils.h"
 #include "weapontier.h"
 #include "damageflags.h"
@@ -33,6 +33,11 @@
 #include "comm.h"
 #include "mercdb.h"
 #include "def.h"
+
+GSN(garble);
+GSN(kassandra);
+GSN(rear_kick);
+GSN(sanctuary);
 
 OLC_STATE(OLCStateSkill);
 OLC_STATE(OLCStateSkillGroup);

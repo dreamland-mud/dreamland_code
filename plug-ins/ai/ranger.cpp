@@ -8,10 +8,10 @@
 #include "room.h"
 #include "affect.h"
 #include "object.h"
+#include "skillreference.h"
 
 #include "dreamland.h"
 #include "fight.h"
-#include "gsn_plugin.h"
 #include "magic.h"
 #include "interp.h"
 #include "act_move.h"
@@ -20,6 +20,11 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+
+GSN(bow);
+GSN(herbs);
+GSN(plague);
+GSN(poison);
 
 /*----------------------------------------------------------------------------
  *                         RANGER BRAIN

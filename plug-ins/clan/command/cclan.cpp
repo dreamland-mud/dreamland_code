@@ -20,7 +20,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "clanreference.h"
-#include "gsn_plugin.h"
+
 #include "handler.h"
 #include "infonet.h"
 #include "messengers.h"

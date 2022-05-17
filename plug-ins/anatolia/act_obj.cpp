@@ -78,7 +78,7 @@
 #include "mercdb.h"
 #include "act.h"
 #include "interp.h"
-#include "gsn_plugin.h"
+
 #include "stats_apply.h"
 #include "damageflags.h"
 #include "material.h"

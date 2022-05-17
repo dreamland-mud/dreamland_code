@@ -22,7 +22,7 @@
 #include "merc.h"
 #include "handler.h"
 #include "arg_utils.h"
-#include "gsn_plugin.h"
+
 #include "magic.h"
 #include "act.h"
 #include "mercdb.h"
@@ -30,6 +30,15 @@
 
 CLAN(battlerager);
 HOMETOWN(frigate);
+GSN(bless);
+GSN(blindness);
+GSN(cure_blindness);
+GSN(cure_disease);
+GSN(cure_poison);
+GSN(master_healing);
+GSN(plague);
+GSN(poison);
+GSN(refresh);
 
 /*------------------------------------------------------------------------
  * Healer 

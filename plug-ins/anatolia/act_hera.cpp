@@ -70,7 +70,7 @@
 #include "descriptor.h"
 #include "ban.h"
 #include "act.h"
-#include "gsn_plugin.h"
+
 #include "mercdb.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
@@ -84,6 +84,8 @@
 #include "vnum.h"
 #include "def.h"
 #include "messengers.h"
+
+GSN(identify);
 
 /***************************************************************************
  ************************      auction.c      ******************************

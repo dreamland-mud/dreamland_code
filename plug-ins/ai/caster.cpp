@@ -9,9 +9,10 @@
 #include "room.h"
 #include "spell.h"
 #include "spelltarget.h"
+#include "skillreference.h"
 
 #include "fight.h"
-#include "gsn_plugin.h"
+
 #include "magic.h"
 #include "act.h"
 #include "interp.h"
@@ -20,13 +21,44 @@
 #include "mercdb.h"
 #include "def.h"
 
-GSN(summon);
-GSN(none);
-GSN(stardust);
-GSN(dispel_affects);
 PROF(warlock);
 PROF(necromancer);
 PROF(cleric);
+
+GSN(benediction);
+GSN(bless);
+GSN(blindness);
+GSN(bluefire);
+GSN(corruption);
+GSN(cure_blindness);
+GSN(cure_disease);
+GSN(cure_poison);
+GSN(curse);
+GSN(dark_shroud);
+GSN(demonfire);
+GSN(dispel_affects);
+GSN(dispel_evil);
+GSN(dispel_good);
+GSN(energy_drain);
+GSN(faerie_fire);
+GSN(frenzy);
+GSN(haste);
+GSN(holy_word);
+GSN(inspire);
+GSN(none);
+GSN(plague);
+GSN(poison);
+GSN(protection_evil);
+GSN(protection_good);
+GSN(ray_of_truth);
+GSN(remove_curse);
+GSN(sanctuary);
+GSN(slow);
+GSN(spellbane);
+GSN(stardust);
+GSN(summon);
+GSN(weaken);
+GSN(web);
 
 static inline bool has_sanctuary( Character *ch )
 {

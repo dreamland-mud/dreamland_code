@@ -11,17 +11,35 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "spell.h"
+#include "skillreference.h"
 
 #include "fight.h"
-#include "gsn_plugin.h"
 #include "magic.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
-GSN(assist);
+
 GSN(none);
+GSN(acid_blast);
+GSN(assist);
+GSN(burning_hands);
+GSN(chill_touch);
+GSN(corruption);
+GSN(curse);
 GSN(dispel_affects);
+GSN(disruption);
+GSN(energy_drain);
+GSN(hand_of_undead);
+GSN(lightning_bolt);
+GSN(magic_missile);
+GSN(plague);
+GSN(poison);
+GSN(slow);
+GSN(sonic_resonance);
+GSN(spectral_furor);
+GSN(weaken);
+GSN(web);
 
 /*-----------------------------------------------------------------------------
  *                    NECROMANCER'S AND UNDEAD'S BRAIN

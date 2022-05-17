@@ -28,7 +28,7 @@
 #include "desire.h"
 #include "damage.h"
 
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 #include "magic.h"
@@ -45,6 +45,9 @@
 #include "skill_utils.h"
 
 GSN(none);
+GSN(explode);
+GSN(hara_kiri);
+GSN(katana);
 PROF(samurai);
 DESIRE(thirst);
 DESIRE(hunger);

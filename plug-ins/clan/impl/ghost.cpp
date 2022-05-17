@@ -19,14 +19,23 @@
 #include "npcharacter.h"
 
 #include "act.h"
-#include "gsn_plugin.h"
+
 #include "handler.h"
 #include "mercdb.h"
 #include "magic.h"
 #include "merc.h"
 #include "def.h"
 
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(blindness);
 GSN(dispel_affects);
+GSN(energy_drain);
+GSN(fireball);
+GSN(lightning_breath);
+GSN(plague);
+GSN(spellbane);
+GSN(weaken);
 
 /*--------------------------------------------------------------------------
  * Sharu-Gorul 

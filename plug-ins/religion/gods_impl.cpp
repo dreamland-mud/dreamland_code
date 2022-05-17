@@ -26,13 +26,17 @@
 #include "damage_impl.h"
 #include "fight.h"
 #include "magic.h"
-#include "gsn_plugin.h"
+
 #include "immunity.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
 
+GSN(colour_spray);
+GSN(haste);
+GSN(heal);
+GSN(knife);
 
 /*
  * The only religion mark behavior still implemented via behaviors. Waiting on Fenia interface

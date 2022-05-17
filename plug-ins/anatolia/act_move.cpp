@@ -67,13 +67,15 @@
 #include "npcharacter.h"
 #include "core/object.h"
 
-#include "gsn_plugin.h"
+
 #include "act.h"
 #include "../anatolia/handler.h"
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+
+GSN(fly);
 
 /* command procedures needed */
 void do_stand( Character *, const char * );

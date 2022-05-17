@@ -25,7 +25,7 @@
 
 #include "descriptor.h"
 #include "comm.h"
-#include "gsn_plugin.h"
+
 #include "attract.h"
 #include "occupations.h"
 #include "shoptrader.h"

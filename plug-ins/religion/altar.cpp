@@ -17,7 +17,7 @@
 
 #include "act.h"
 #include "terrains.h"
-#include "gsn_plugin.h"
+
 #include "dreamland.h"
 #include "loadsave.h"
 #include "handler.h"

@@ -87,7 +87,7 @@
 #include "dreamland.h"
 #include "interp.h"
 #include "stats_apply.h"
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "descriptor.h"
 #include "fight.h"
@@ -107,6 +107,19 @@
 CLAN(battlerager);
 CLAN(hunter);
 PROF(vampire);
+GSN(ambush);
+GSN(arrow);
+GSN(bonedagger);
+GSN(caltraps);
+GSN(chill_touch);
+GSN(dark_shroud);
+GSN(doppelganger);
+GSN(improved_invis);
+GSN(invisibility);
+GSN(path_find);
+GSN(protection_heat);
+GSN(spear);
+GSN(spellbane);
 
 #define PULSE_SAVING                  ( 6 * dreamland->getPulsePerSecond( ))
 #define PULSE_WATER_FLOAT          ( 4 * dreamland->getPulsePerSecond( ))

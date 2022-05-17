@@ -34,7 +34,7 @@
 #include "dreamland.h"
 #include "act.h"
 #include "interp.h"
-#include "gsn_plugin.h"
+
 #include "merc.h"
 #include "vnum.h"
 #include "mercdb.h"
@@ -45,8 +45,13 @@
 #include "magic.h"
 #include "def.h"
 
-GSN(dispel_affects);
 CLAN(knight);
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(caustic_font);
+GSN(dispel_affects);
+GSN(guard);
+GSN(spellbane);
 
 #define OBJ_VNUM_DRAGONDAGGER 80
 #define OBJ_VNUM_DRAGONMACE 81

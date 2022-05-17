@@ -31,7 +31,7 @@
 
 #include "act.h"
 #include "interp.h"
-#include "gsn_plugin.h"
+
 #include "merc.h"
 #include "move_utils.h"
 #include "vnum.h"
@@ -44,7 +44,12 @@
 #include "skill_utils.h"
 
 CLAN(hunter);
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(caustic_font);
+GSN(claw);
 GSN(dispel_affects);
+GSN(spellbane);
 
 #define OBJ_VNUM_EYED_SWORD                503        
 #define OBJ_VNUM_LION_SHIELD                33

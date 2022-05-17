@@ -48,7 +48,7 @@
 #include "websocketrpc.h"
 #include "comm.h"
 #include "weapontier.h"
-#include "gsn_plugin.h"
+
 #include "directions.h"
 #include "attract.h"
 #include "occupations.h"
@@ -77,6 +77,10 @@ GSN(stardust);
 GSN(rainbow_shield);
 GSN(demonic_mantle);
 GSN(shapeshift);
+GSN(manacles);
+GSN(jail);
+GSN(dark_shroud);
+GSN(peek);
 RELIG(godiva);
 PROF(druid);
 

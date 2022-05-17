@@ -28,7 +28,7 @@
 #include "npcharacter.h"
 #include "object.h"
 
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 #include "magic.h"
@@ -48,6 +48,18 @@ using std::min;
 #define OBJ_VNUM_BATTLE_PONCHO       26
 
 CLAN(battlerager);
+GSN(bandage);
+GSN(bloodthirst);
+GSN(cure_blindness);
+GSN(cure_disease);
+GSN(cure_poison);
+GSN(haste);
+GSN(mortal_strike);
+GSN(remove_curse);
+GSN(resistance);
+GSN(spellbane);
+GSN(trophy);
+GSN(truesight);
 
 /*
  * poncho behavior

@@ -40,7 +40,7 @@
 #include "weapongenerator.h"
 #include "damage.h"
 #include "merc.h"
-#include "gsn_plugin.h"
+
 #include "comm.h"
 #include "mercdb.h"
 #include "handler.h"
@@ -62,6 +62,16 @@ GSN(hunter_snare);
 GSN(prevent);
 GSN(detect_trap);
 GSN(dispel_affects);
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(caustic_font);
+GSN(hunt);
+GSN(poison);
+GSN(shield_block);
+GSN(shield_cleave);
+GSN(spellbane);
+GSN(weapon_cleave);
+GSN(world_find);
 
 CLAN(none);
 CLAN(hunter);

@@ -89,7 +89,7 @@
 #include "liquid.h"
 
 #include "playerattributes.h"
-#include "gsn_plugin.h"
+
 #include "npcharacter.h"
 #include "core/object.h"
 #include "../anatolia/handler.h"
@@ -118,6 +118,12 @@ void do_oload                ( Character *, char * );
 
 RELIG(none);
 GSN(none);
+GSN(plague);
+GSN(sleep);
+GSN(curse);
+GSN(blindness);
+GSN(poison);
+
 LIQ(none);
 CLAN(none);
 

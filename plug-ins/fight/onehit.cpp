@@ -18,7 +18,7 @@
 #include "fight.h"
 #include "../anatolia/handler.h"
 #include "stats_apply.h"
-#include "gsn_plugin.h"
+
 #include "act.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -29,6 +29,8 @@
 
 GSN(shadow_shroud);
 GSN(soul_lust);
+GSN(armor_use);
+GSN(blind_fighting);
 RACE(hobbit);
 
 /*-----------------------------------------------------------------------------

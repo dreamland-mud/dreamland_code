@@ -24,7 +24,7 @@
 #include "race.h"
 #include "npcharacter.h"
 #include "object.h"
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 
@@ -44,6 +44,15 @@
 #include "def.h"
 
 RELIG(godiva);
+GSN(blind_fighting);
+GSN(disarm);
+GSN(grip);
+GSN(lash);
+GSN(shield_block);
+GSN(shield_cleave);
+GSN(spear);
+GSN(weapon_cleave);
+GSN(whip);
 
 /*
  * 'second wield' skill command

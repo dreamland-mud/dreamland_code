@@ -21,7 +21,7 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "object.h"
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 #include "handler.h"
@@ -36,6 +36,7 @@
 #include "skill_utils.h"
 
 GSN(creativity);
+GSN(smithing);
 
 /*
  * 'smithing' skill command

@@ -33,7 +33,7 @@
 #include "../anatolia/handler.h"
 #include "skill_utils.h"
 #include "move_utils.h"
-#include "gsn_plugin.h"
+
 #include "profflags.h"
 #include "act.h"
 #include "mercdb.h"
@@ -53,7 +53,28 @@ PROF(samurai);
 PROF(thief);
 PROF(druid);
 
+GSN(axe);
+GSN(bash);
+GSN(bat_swarm);
+GSN(blind_fighting);
+GSN(blink);
+GSN(critical_strike);
+GSN(cross_block);
+GSN(deathblow);
+GSN(dodge);
+GSN(forest_fighting);
+GSN(hand_block);
+GSN(katana);
+GSN(liturgy);
+GSN(mastering_pound);
+GSN(mastering_sword);
+GSN(nerve);
+GSN(parry);
 GSN(shapeshift);
+GSN(shield_block);
+GSN(slice);
+GSN(sword);
+GSN(trip);
 
 WEARLOC(tat_wrist_l);
 WEARLOC(tat_wrist_r);

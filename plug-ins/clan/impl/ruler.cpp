@@ -35,7 +35,7 @@
 #include "alignment.h"
 #include "clanreference.h"
 #include "merc.h"
-#include "gsn_plugin.h"
+
 
 #include "mercdb.h"
 #include "vnum.h"
@@ -49,9 +49,23 @@
 #include "cclantalk.h"
 
 
-GSN(dispel_affects);
 CLAN(chaos);
 CLAN(ruler);
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(caustic_font);
+GSN(confiscate);
+GSN(dismiss);
+GSN(dispel_affects);
+GSN(dodge);
+GSN(doppelganger);
+GSN(fine);
+GSN(jail);
+GSN(judge);
+GSN(manacles);
+GSN(spellbane);
+GSN(suspect);
+GSN(wanted);
 
 
 #define MOB_VNUM_STALKER           15

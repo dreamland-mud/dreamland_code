@@ -21,7 +21,7 @@
 #include "magic.h"
 #include "fight.h"
 #include "damage.h"
-#include "gsn_plugin.h"
+
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"

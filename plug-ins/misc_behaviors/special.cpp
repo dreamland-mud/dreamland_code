@@ -76,7 +76,7 @@
 #include "interp.h"
 #include "magic.h"
 #include "clanreference.h"
-#include "gsn_plugin.h"
+
 #include "fight.h"
 #include "save.h"
 #include "act_move.h"
@@ -87,6 +87,20 @@ CLAN(battlerager);
 CLAN(ruler);
 PROF(thief);
 PROF(ninja);
+GSN(armor);
+GSN(bless);
+GSN(blindness);
+GSN(cure_blindness);
+GSN(cure_disease);
+GSN(cure_poison);
+GSN(curse);
+GSN(heal);
+GSN(jail);
+GSN(plague);
+GSN(poison);
+GSN(refresh);
+GSN(remove_curse);
+GSN(warcry);
 
 #define OBJ_VNUM_WHISTLE           2116
 #define MOB_VNUM_PATROLMAN           2106

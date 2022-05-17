@@ -31,7 +31,7 @@
 #include "fight.h"
 #include "magic.h"
 #include "merc.h"
-#include "gsn_plugin.h"
+
 #include "mercdb.h"
 #include "vnum.h"
 #include "handler.h"
@@ -41,11 +41,23 @@
 #include "act_move.h"
 #include "def.h"
 
-GSN(dispel_affects);
 RELIG(alala);
 RELIG(ares);
 RELIG(turlok);
 RELIG(goktengri);
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(blindness);
+GSN(caustic_font);
+GSN(dispel_affects);
+GSN(energy_drain);
+GSN(lightning_breath);
+GSN(mental_attack);
+GSN(mental_knife);
+GSN(plague);
+GSN(poison);
+GSN(spellbane);
+GSN(weaken);
 
 /*--------------------------------------------------------------------------
  * Seneschal 

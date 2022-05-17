@@ -11,7 +11,7 @@
 #include "descriptor.h"
 #include "xmlpcstringeditor.h"
 #include "websocketrpc.h"
-#include "gsn_plugin.h"
+
 #include "handler.h"
 #include "vnum.h"
 #include "mercdb.h"

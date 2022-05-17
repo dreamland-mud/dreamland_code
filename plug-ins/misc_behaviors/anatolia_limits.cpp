@@ -37,12 +37,24 @@
 #include "mercdb.h"
 #include "act.h"
 #include "magic.h"
-#include "gsn_plugin.h"
+
 #include "effects.h"
 #include "handler.h"
 #include "fight.h"
 #include "damage_impl.h"
 #include "def.h"
+
+GSN(acid_blast);
+GSN(burning_hands);
+GSN(demonfire);
+GSN(fly);
+GSN(giant_strength);
+GSN(haste);
+GSN(lightning_bolt);
+GSN(lightning_breath);
+GSN(poison);
+GSN(slow);
+GSN(weaken);
 
 /*
  * Excalibur, Dwarven Catacombs

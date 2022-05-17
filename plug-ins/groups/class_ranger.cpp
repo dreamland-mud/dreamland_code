@@ -38,7 +38,7 @@
 #include "core/object.h"
 
 #include "dreamland.h"
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 #include "magic.h"
@@ -59,6 +59,17 @@
 #include "skill_utils.h"
 
 PROF(ranger);
+GSN(ambush);
+GSN(blue_arrow);
+GSN(bow);
+GSN(camouflage);
+GSN(green_arrow);
+GSN(make_arrow);
+GSN(make_bow);
+GSN(mastering_bow);
+GSN(red_arrow);
+GSN(track);
+GSN(white_arrow);
 
 static Object * create_arrow( int color, int level );
 static Object * find_arrow( Character *ch, Object *quiver );

@@ -15,13 +15,14 @@
 #include "core/object.h"
 #include "skill.h"
 #include "skillmanager.h"
+#include "skillreference.h"
 #include "liquid.h"
 
 #include "act.h"
 #include "alignment.h"
 #include "dreamland.h"
 #include "fight.h"
-#include "gsn_plugin.h"
+
 #include "../anatolia/handler.h"
 #include "interp.h"
 #include "itemflags.h"
@@ -40,6 +41,7 @@
 RELIG(none);
 RELIG(fili);
 GSN(sacrifice);
+GSN(crusify);
 BONUS(experience);
 BONUS(learning);
 BONUS(mana);

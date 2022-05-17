@@ -21,7 +21,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "object.h"
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "mercdb.h"
 #include "skill_utils.h"
@@ -37,6 +37,20 @@
 #include "def.h"
 #include "stats_apply.h"
 #include "debug_utils.h"
+
+GSN(assassinate);
+GSN(backguard);
+GSN(blindness);
+GSN(blindness_dust);
+GSN(endure);
+GSN(grab);
+GSN(nerve);
+GSN(poison);
+GSN(poison_smoke);
+GSN(protective_shield);
+GSN(rear_kick);
+GSN(strangle);
+GSN(vanish);
 
 /*
  * 'vanish' skill command

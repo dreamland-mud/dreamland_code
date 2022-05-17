@@ -10,7 +10,7 @@
 
 #include "merc.h"
 #include "websocketrpc.h"
-#include "gsn_plugin.h"
+
 #include "commandflags.h"
 #include "act.h"
 #include "mercdb.h"

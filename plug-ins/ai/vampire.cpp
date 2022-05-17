@@ -8,19 +8,31 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "affect.h"
+#include "skillreference.h"
 
 #include "dreamland.h"
 #include "loadsave.h"
 #include "fight.h"
-#include "gsn_plugin.h"
+
 #include "magic.h"
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
-GSN(dispel_affects);
 PROF(vampire);
+GSN(bat_swarm);
+GSN(blindness);
+GSN(burning_hands);
+GSN(chain_lightning);
+GSN(curse);
+GSN(dispel_affects);
+GSN(dispel_good);
+GSN(slow);
+GSN(vampiric_bite);
+GSN(vampiric_blast);
+GSN(vampiric_touch);
+GSN(weaken);
 
 /*----------------------------------------------------------------------------
  *                         VAMPIRIC BRAIN

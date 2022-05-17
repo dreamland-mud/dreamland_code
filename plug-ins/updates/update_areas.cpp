@@ -22,7 +22,7 @@
 #include "loadsave.h"
 #include "wiznet.h"
 #include "weapontier.h"
-#include "gsn_plugin.h"
+
 #include "descriptor.h"
 #include "occupations.h"
 #include "itemevents.h"
@@ -33,6 +33,7 @@
 
 WEARLOC(none);
 WEARLOC(wield);
+GSN(track);
 
 static void rprog_reset( Room *room )
 {

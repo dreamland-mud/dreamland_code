@@ -24,7 +24,7 @@
 #include "affect.h"
 
 #include "act_move.h"
-#include "gsn_plugin.h"
+
 #include "fight.h"
 #include "damage.h"
 #include "handler.h"
@@ -39,12 +39,14 @@
 #include "def.h"
 
 CLAN(battlerager);
-GSN(accuracy);
 PROF(warrior);
 PROF(samurai);
 PROF(paladin);
 PROF(thief);
 PROF(ninja);
+GSN(accuracy);
+GSN(dodge);
+GSN(poison);
 
 static void arrow_damage( Object *arrow, Character *ch, Character *victim, int damroll, int door );
 

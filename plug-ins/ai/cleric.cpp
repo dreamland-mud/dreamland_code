@@ -11,16 +11,45 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "spell.h"
+#include "skillreference.h"
 
 #include "fight.h"
-#include "gsn_plugin.h"
 #include "magic.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
 GSN(none);
+GSN(blade_barrier);
+GSN(blindness);
+GSN(bluefire);
+GSN(cure_blindness);
+GSN(cure_disease);
+GSN(cure_poison);
+GSN(curse);
+GSN(demonfire);
 GSN(dispel_affects);
+GSN(dispel_evil);
+GSN(dispel_good);
+GSN(earthquake);
+GSN(energy_drain);
+GSN(faerie_fire);
+GSN(flamestrike);
+GSN(harm);
+GSN(heal);
+GSN(heat_metal);
+GSN(holy_word);
+GSN(master_healing);
+GSN(plague);
+GSN(poison);
+GSN(ray_of_truth);
+GSN(remove_curse);
+GSN(restoring_light);
+GSN(severity_force);
+GSN(slow);
+GSN(superior_heal);
+GSN(teleport);
+GSN(weaken);
 
 /*----------------------------------------------------------------------------
  *                         CLERICS BRAIN

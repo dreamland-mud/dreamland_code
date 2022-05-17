@@ -34,7 +34,7 @@
 #include "roomutils.h"
 #include "pcharacter.h"
 #include "follow_utils.h"
-#include "gsn_plugin.h"
+
 #include "directions.h"
 #include "handler.h"
 #include "weather.h"
@@ -67,25 +67,98 @@ static const DLString PERM_STAT = "ps";
 static const DLString CURR_STAT = "cs";
 static const DLString QUESTOR = "q";
 
-GSN(protection_negative);
-GSN(stardust);
-GSN(spell_resistance);
-GSN(meld_into_stone);
-GSN(rainbow_shield);
-GSN(demonic_mantle);
-GSN(magic_jar);
+CLAN(none);
+
 GSN(anathema);
-GSN(stuck_arrow);
+GSN(armor);
+GSN(bandage);
+GSN(bark_skin);
+GSN(bat_swarm);
+GSN(benediction);
+GSN(berserk);
+GSN(black_feeble);
+GSN(bless);
+GSN(blindness);
+GSN(bloodthirst);
+GSN(bonedagger);
+GSN(calm);
+GSN(caltraps);
+GSN(charm_person);
+GSN(concentrate);
+GSN(confuse);
+GSN(corruption);
+GSN(curse);
+GSN(dark_shroud);
+GSN(demonic_mantle);
 GSN(detect_trap);
+GSN(disgrace);
+GSN(dismiss);
+GSN(doppelganger);
+GSN(dragon_skin);
+GSN(endure);
+GSN(enhanced_armor);
+GSN(entangle);
 GSN(evolve_lion);
-GSN(prevent);
+GSN(faerie_fire);
+GSN(fly);
+GSN(frenzy);
+GSN(garble);
+GSN(giant_strength);
+GSN(golden_aura);
+GSN(haste);
+GSN(hide);
 GSN(holy_armor);
+GSN(improved_invis);
+GSN(inspire);
+GSN(invisibility);
+GSN(jail);
+GSN(learning);
+GSN(liturgy);
+GSN(magic_concentrate);
+GSN(magic_jar);
+GSN(manacles);
+GSN(meld_into_stone);
+GSN(mental_block);
+GSN(mirror);
+GSN(nerve);
+GSN(pass_door);
+GSN(plague);
+GSN(poison);
+GSN(prevent);
+GSN(protection_cold);
+GSN(protection_evil);
+GSN(protection_good);
+GSN(protection_heat);
+GSN(protection_negative);
+GSN(protective_shield);
+GSN(rainbow_shield);
+GSN(randomizer);
+GSN(resistance);
+GSN(ruler_aura);
+GSN(sanctuary);
+GSN(scream);
+GSN(sebat);
+GSN(shield);
+GSN(slice);
+GSN(slow);
+GSN(sneak);
 GSN(shadow_shroud);
 GSN(soul_lust);
-GSN(randomizer);
-GSN(ruler_aura);
-GSN(bark_skin);
-CLAN(none);
+GSN(spellbane);
+GSN(spell_resistance);
+GSN(stardust);
+GSN(stone_skin);
+GSN(stuck_arrow);
+GSN(suspect);
+GSN(tiger_power);
+GSN(transform);
+GSN(trophy);
+GSN(truesight);
+GSN(vampire);
+GSN(vampiric_bite);
+GSN(warcry);
+GSN(weaken);
+GSN(web);
 
 extern void help_save_ids();
 static IconvMap koi2utf("koi8-r", "utf-8");

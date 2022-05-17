@@ -17,7 +17,7 @@
 #include "act.h"
 #include "act_move.h"
 #include "act_lock.h"
-#include "gsn_plugin.h"
+
 #include "loadsave.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -29,6 +29,7 @@
 #define OBJ_VNUM_CORK 19 
 
 GSN(golden_eye);
+GSN(pick_lock);
 Object * get_obj_list_vnum( Character *ch, int vnum, Object *list );
 
 static Object * get_key_carry( Character *ch, int vnum )

@@ -22,7 +22,7 @@
 #include "act_move.h"
 #include "affect.h"
 #include "commonattributes.h"
-#include "gsn_plugin.h"
+
 #include "mercdb.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -47,7 +47,16 @@
 #include "skill_utils.h"
 #include "vnum.h"
 
+GSN(area_attack);
+GSN(bash);
+GSN(bash_door);
 GSN(cavalry);
+GSN(crush);
+GSN(double_kick);
+GSN(kick);
+GSN(protective_shield);
+GSN(smash);
+
 CLAN(shalafi);
 PROF(anti_paladin);
 PROF(samurai);

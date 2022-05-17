@@ -79,7 +79,7 @@
 #include "act.h"
 #include "interp.h"
 #include "clanreference.h"
-#include "gsn_plugin.h"
+
 #include "race.h"
 #include "npcharacter.h"
 #include "core/object.h"
@@ -99,10 +99,14 @@
 #include "material.h"
 #include "def.h"
 
-
-GSN(none);
-GSN(throw_stone);
-GSN(exotic);
+GSN(area_attack);
+GSN(fifth_attack);
+GSN(forest_fighting);
+GSN(fourth_attack);
+GSN(paralysis);
+GSN(second_attack);
+GSN(second_weapon);
+GSN(third_attack);
 
 PROF(none);
 PROF(warrior);

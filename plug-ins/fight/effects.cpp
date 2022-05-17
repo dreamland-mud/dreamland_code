@@ -62,7 +62,7 @@
 #include "mercdb.h"
 #include "desire.h"
 #include "act.h"
-#include "gsn_plugin.h"
+
 #include "fight.h"
 #include "handler.h"
 #include "material.h"
@@ -73,7 +73,15 @@ using std::max;
 
 DESIRE(thirst);
 DESIRE(hunger);
+GSN(chill_touch);
 GSN(corrosion);
+GSN(fire_breath);
+GSN(poison);
+GSN(protection_cold);
+GSN(protection_heat);
+GSN(sand_storm);
+GSN(scream);
+
 
 /** Display decay message for items in inventory/eq or on the floor. */
 static void show_effect_message(Object *obj, const DLString &msg)

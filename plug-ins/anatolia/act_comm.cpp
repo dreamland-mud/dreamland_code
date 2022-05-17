@@ -82,7 +82,7 @@
 #include "object.h"
 #include "character.h"
 #include "clanreference.h"
-#include "gsn_plugin.h"
+#include "skillreference.h"
 
 #include "vnum.h"
 #include "act_move.h"
@@ -91,6 +91,9 @@
 
 CLAN(invader);
 CLAN(none);
+GSN(evil_spirit);
+GSN(suspect);
+
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 
 

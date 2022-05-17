@@ -104,7 +104,7 @@
 #include "occupations.h"
 #include "raceflags.h"
 #include "recipeflags.h"
-#include "gsn_plugin.h"
+
 #include "def.h"
 #include "act_move.h"
 #include "act_lock.h"
@@ -127,6 +127,29 @@ PROF(anti_paladin);
 RELIG(none);
 GSN(none);
 GSN(gratitude);
+GSN(sneak);
+GSN(detect_hide);
+GSN(second_weapon);
+GSN(pick_lock);
+GSN(bash_door);
+GSN(hide);
+GSN(concentrate);
+GSN(recall);
+GSN(lash);
+GSN(axe);
+GSN(bash);
+GSN(hand_to_hand);
+GSN(sword);
+GSN(polearm);
+GSN(dagger);
+GSN(whip);
+GSN(grip);
+GSN(mace);
+GSN(shield_block);
+GSN(flail);
+GSN(slice);
+
+
 
 /* command procedures needed */
 bool omprog_give( Object *obj, Character *ch, Character *victim );

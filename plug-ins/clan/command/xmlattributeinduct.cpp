@@ -7,7 +7,7 @@
 #include "skill.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
-#include "gsn_plugin.h"
+
 #include "clan.h"
 #include "act.h"
 #include "descriptor.h"

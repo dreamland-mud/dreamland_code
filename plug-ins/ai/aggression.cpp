@@ -12,7 +12,7 @@
 #include "dreamland.h"
 #include "loadsave.h"
 #include "fight.h"
-#include "gsn_plugin.h"
+
 #include "interp.h"
 #include "act.h"
 #include "merc.h"

@@ -24,7 +24,7 @@
 
 #include "act_move.h"
 #include "interp.h"
-#include "gsn_plugin.h"
+
 #include "merc.h"
 #include "stats_apply.h"
 #include "mercdb.h"
@@ -35,7 +35,7 @@
 
 
 PROF(samurai);
-
+GSN(mortal_strike);
 
 CMDRUN( kill )
 {

@@ -31,7 +31,7 @@
 #include "act_move.h"
 #include "interp.h"
 #include "weapongenerator.h"
-#include "gsn_plugin.h"
+
 #include "handler.h"
 #include "merc.h"
 #include "vnum.h"
@@ -43,7 +43,16 @@
 #define MOB_VNUM_MIRROR_IMAGE       17
 #define OBJ_VNUM_CHAOS_BLADE        87
 
+GSN(acid_arrow);
+GSN(acid_blast);
+GSN(caustic_font);
+GSN(confuse);
+GSN(disgrace);
 GSN(dispel_affects);
+GSN(doppelganger);
+GSN(garble);
+GSN(mirror);
+GSN(spellbane);
 
 /*--------------------------------------------------------------------------
  * Ivan 

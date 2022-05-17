@@ -23,7 +23,7 @@
 
 #include "affecthandler.h"
 #include "skill.h"
-
+#include "skillreference.h"
 #include "dreamland.h"
 #include "affect.h"
 #include "object.h"
@@ -35,7 +35,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "interp.h"
-#include "gsn_plugin.h"
+
 #include "act.h"
 #include "act_move.h"
 #include "mercdb.h"
@@ -48,6 +48,11 @@
 #define OBJ_VNUM_GOLD_SOME              3
 #define OBJ_VNUM_SILVER_SOME              4
 #define OBJ_VNUM_COINS                      5
+
+GSN(fire_breath);
+GSN(sand_storm);
+GSN(dirt_kicking);
+GSN(doppelganger);
 
 void get_money_here( Object *list, int &gold, int &silver )
 {

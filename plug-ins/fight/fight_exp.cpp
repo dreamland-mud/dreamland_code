@@ -14,12 +14,13 @@
  ***************************************************************************/
 
 #include "skill.h"
+#include "skillreference.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
 #include "object.h"
 #include "bonus.h"
-#include "gsn_plugin.h"
+
 #include "wiznet.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -33,6 +34,7 @@
 PROF(samurai);
 BONUS(experience);
 BONUS(pet_day);
+GSN(leadership);
 
 int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
 

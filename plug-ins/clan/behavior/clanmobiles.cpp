@@ -20,7 +20,7 @@
 #include "messengers.h"
 #include "merc.h"
 #include "handler.h"
-#include "gsn_plugin.h"
+
 #include "interp.h"
 #include "act.h"
 #include "arg_utils.h"
@@ -31,6 +31,18 @@
 CLAN(battlerager);
 CLAN(none);
 CLAN(flowers);
+GSN(armor);
+GSN(bless);
+GSN(blindness);
+GSN(cure_blindness);
+GSN(cure_disease);
+GSN(cure_poison);
+GSN(heal);
+GSN(plague);
+GSN(poison);
+GSN(refresh);
+GSN(remove_curse);
+GSN(warcry);
 
 
 /*--------------------------------------------------------------------------

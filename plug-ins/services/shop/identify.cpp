@@ -1,5 +1,6 @@
 #include <cmath>
 
+#include "skillreference.h"
 #include "commandtemplate.h"
 #include "spell.h"
 #include "spelltarget.h"
@@ -7,10 +8,12 @@
 #include "core/object.h"
 #include "attract.h"
 #include "loadsave.h"
-#include "gsn_plugin.h"
+
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+
+GSN(identify);
 
 NPCharacter * find_mob_with_act( Room *room, bitstring_t act );
 bool can_afford(Character *ch, int gold, int silver, int number);

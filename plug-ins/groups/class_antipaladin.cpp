@@ -13,7 +13,7 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 #include "logstream.h"
-#include "gsn_plugin.h"
+
 #include "spelltemplate.h"
 
 #include "skill.h"
@@ -44,6 +44,7 @@
 #include "skill_utils.h"
 
 PROF(anti_paladin);
+GSN(cleave);
 
 /*----------------------------------------------------------------------------
  * Cleave 

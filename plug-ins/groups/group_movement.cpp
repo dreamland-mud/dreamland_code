@@ -38,7 +38,7 @@
 #include "act_move.h"
 #include "interp.h"
 #include "clanreference.h"
-#include "gsn_plugin.h"
+
 
 #include "stats_apply.h"
 #include "merc.h"
@@ -52,9 +52,10 @@
 
 CLAN(battlerager);
 
-
-
-
+GSN(escape);
+GSN(hide);
+GSN(recall);
+GSN(sneak);
 
 
 /*

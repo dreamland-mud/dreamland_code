@@ -74,7 +74,7 @@
 
 #include "magic.h"
 #include "clanreference.h"
-#include "gsn_plugin.h"
+
 #include "act_move.h"
 #include "../anatolia/handler.h"
 #include "interp.h"
@@ -86,6 +86,11 @@
 #include "def.h"
 
 CLAN(none);
+GSN(deafen);
+GSN(garble);
+GSN(holy_craft);
+GSN(shielding);
+GSN(spell_craft);
 
 /*
  * Compute a saving throw.

@@ -33,7 +33,7 @@
 #include "bonus.h"
 #include "dreamland.h"
 
-#include "gsn_plugin.h"
+
 #include "drink_utils.h"
 #include "act_move.h"
 #include "arg_utils.h"
@@ -58,7 +58,20 @@
 #include "merc.h"
 #include "def.h"
 
+GSN(backguard);
+GSN(backstab);
+GSN(blackjack);
+GSN(circle);
+GSN(dual_backstab);
+GSN(envenom);
 GSN(key_forgery);
+GSN(knife);
+GSN(pick_lock);
+GSN(poison);
+GSN(push);
+GSN(rear_kick);
+GSN(steal);
+
 BONUS(thief_skills);
 
 static bool mprog_steal_fail( Character *victim, Character *thief )

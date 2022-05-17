@@ -9,6 +9,7 @@
 #include "skill.h"
 #include "skillcommand.h"
 #include "skillgroup.h"
+#include "skillreference.h"
 #include "profession.h"
 #include "defaultreligion.h"
 #include "language.h"
@@ -38,7 +39,7 @@
 #include "skill_utils.h"
 #include "xmlattributerestring.h"
 #include "handler.h"
-#include "gsn_plugin.h"
+
 #include "profflags.h"
 #include "liquidflags.h"
 #include "damageflags.h"
@@ -52,6 +53,11 @@ DESIRE(thirst);
 DESIRE(hunger);
 DESIRE(full);
 CLAN(battlerager);
+GSN(axe);
+GSN(dagger);
+GSN(mace);
+GSN(spear);
+GSN(sword);
 
 /*----------------------------------------------------------------------
  * Area

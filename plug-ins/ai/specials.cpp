@@ -11,12 +11,13 @@
 #include "room.h"
 #include "roomutils.h"
 #include "core/object.h"
+#include "skillreference.h"
 
 #include "dreamland.h"
 #include "act_move.h"
 #include "fight.h"
 #include "skill_utils.h"
-#include "gsn_plugin.h"
+
 #include "stats_apply.h"
 #include "../anatolia/handler.h"
 #include "act.h"
@@ -26,6 +27,19 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+
+GSN(heal);
+GSN(armor);
+GSN(shield);
+GSN(stone_skin);
+GSN(sanctuary);
+GSN(protection_evil);
+GSN(protection_good);
+GSN(cure_blindness);
+GSN(cure_poison);
+GSN(cure_disease);
+GSN(bow);
+GSN(backstab);
 
 /*
  * Specials. Called from mobile_update every 4 seconds.

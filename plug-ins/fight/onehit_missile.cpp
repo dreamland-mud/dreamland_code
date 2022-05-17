@@ -20,7 +20,7 @@
 
 #include "fight.h"
 #include "../anatolia/handler.h"
-#include "gsn_plugin.h"
+
 #include "effects.h"
 #include "stats_apply.h"
 #include "magic.h"
@@ -30,13 +30,21 @@
 #include "vnum.h"
 #include "def.h"
 
-GSN(accuracy);
 CLAN(battlerager);
 PROF(warrior);
 PROF(samurai);
 PROF(paladin);
 PROF(thief);
 PROF(ninja);
+GSN(accuracy);
+GSN(arrow);
+GSN(blind_fighting);
+GSN(dodge);
+GSN(mastering_sword);
+GSN(parry);
+GSN(poison);
+GSN(second_weapon);
+GSN(sword);
 
 /*----------------------------------------------------------------------------
  * one hit with missile weapon (send by hand or thrower) 
