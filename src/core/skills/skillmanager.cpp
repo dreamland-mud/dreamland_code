@@ -5,9 +5,12 @@
 
 #include "skillmanager.h"
 #include "skill.h"
+#include "skillreference.h"
 #include "stringlist.h"
 
 #include "pcharacter.h"
+
+GSN(none);
 
 SkillManager* skillManager = 0;
 
@@ -17,6 +20,7 @@ SkillManager::SkillManager( )
     skillManager = this;
     setRegistryName("skill");
     saveRegistryName();
+    gsn_none->getName(); // Ensure that skill 'none' is the first to init and has 0 index.
 }
 
 SkillManager::~SkillManager( )
