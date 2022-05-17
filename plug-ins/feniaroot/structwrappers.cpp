@@ -1174,23 +1174,23 @@ NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_typ
     return spell ? spell->getSpellType() : 0;
 }
 
-NMI_GET(SkillWrapper, groups, "список групп умения (.SkillGroup)")
+NMI_GET(SkillWrapper, groups, "список названий групп умения")
 {
     RegList::Pointer rc(NEW);
 
     for (auto &group: getTarget()->getGroups().toArray()) {
         DLString groupName = skillGroupManager->find(group)->getName();
-        rc->push_back(SkillGroupWrapper::wrap(groupName));
+        rc->push_back(Register(groupName));
     }
 
     return wrap(rc);
 }
 
-NMI_GET(SkillWrapper, group, "первая, часто и единственная, группа умения (.SkillGroup)")
+NMI_GET(SkillWrapper, group, "название первой (часто и единственной) группы умения")
 {
     vector<int> gsns = getTarget()->getGroups().toArray();
     DLString groupName = gsns.empty() ? "none" : skillGroupManager->find(gsns.front())->getName();
-    return SkillGroupWrapper::wrap(groupName);
+    return Register(groupName);
 }
 
 NMI_INVOKE(SkillWrapper, beats, "(ch): длина задержки в пульсах для персонажа с учетом бонусов")
