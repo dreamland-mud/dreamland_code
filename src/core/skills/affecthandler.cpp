@@ -277,6 +277,15 @@ bool AffectHandler::onDispel(const SpellTarget::Pointer &target, Affect *paf)
     return false;
 }
 
+bool AffectHandler::onUpdateHit(const SpellTarget::Pointer &target, Affect *paf)
+{
+    Character *ch = target->victim;
+    AffectHandler *ah = this;
+
+    FENIA_CALL( ah, "UpdateHit", "CA", ch, paf );
+    return false;
+}
+
 bool AffectHandler::onLook(const SpellTarget::Pointer &target, Affect *paf, Character *looker) 
 {
     Character *ch = target->victim;

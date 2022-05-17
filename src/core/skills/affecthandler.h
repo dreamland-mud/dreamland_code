@@ -45,6 +45,7 @@ public:
     bool onStopfol(const SpellTarget::Pointer &target, Affect *paf);
     bool onDescr(const SpellTarget::Pointer &target, Affect *paf, ostringstream &buf);
     bool onShow(const SpellTarget::Pointer &target, Affect *paf, Character *looker, ostringstream &buf);
+    bool onUpdateHit(const SpellTarget::Pointer &target, Affect *paf);
 
     // Overrides for various types of triggers. Have smaller priority than Fenia overrides.
 

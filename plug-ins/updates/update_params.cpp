@@ -17,7 +17,10 @@
 
 #include "skillreference.h"
 #include "skill.h"
+#include "spelltarget.h"
+#include "affecthandler.h"
 
+#include "affect.h"
 #include "object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -37,6 +40,7 @@
 GSN(bandage);
 GSN(magic_concentrate);
 GSN(curl);
+GSN(corruption);
 
 DESIRE(thirst);
 DESIRE(hunger);
@@ -71,6 +75,18 @@ void CharacterParamsUpdateTask::run( Character *ch )
     }
 }
 
+static bool afprog_updatehit(Character *ch)
+{
+    bool rc = false;
+    SpellTarget::Pointer spellTarget(NEW, ch);
+
+    for (auto &paf: ch->affected.findAllWithHandler())
+        if (paf->type->getAffect( )->onUpdateHit(spellTarget, paf))
+            rc = true;
+
+    return rc;
+}
+
 /*------------------------------------------------------------------------
  * Hit point update
  *------------------------------------------------------------------------*/
@@ -82,6 +98,10 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     if (ch->hit > ch->max_hit) 
         ch->hit = std::max( ch->hit - (ch->hit - ch->max_hit) / 4 - 1, (int)ch->max_hit);
 
+    if (afprog_updatehit(ch))
+        return;
+
+    /* TODO cut this block out once corruption is implemented in .AffectHandler("corruption").onUpdateHit */
     if (IS_AFFECTED( ch, AFF_CORRUPTION )) {
         if (number_bits( 2 ) == 0) {
             ch->hit -= ch->getRealLevel( ) / 10;
@@ -93,7 +113,10 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
         if(ch->getRace()->getName() != "troll")
         return;
     }
+    /* TODO end block */
 
+
+    
     if (ch->hit >= ch->max_hit)
         return;
 
