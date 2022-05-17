@@ -49,11 +49,11 @@ GROUP(benedictions);
 GROUP(curative);
 GROUP(healing);
 GROUP(combat);
+
 RELIG(none);
 
 CLAN(shalafi);
 
-RELIG(none);
 
 DefaultSpell::DefaultSpell( ) 
         : Spell(),
