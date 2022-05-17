@@ -35,6 +35,7 @@ GSN(protection_evil);
 GSN(protection_good);
 GSN(stardust);
 GSN(dark_shroud);
+GSN(corruption);
 WEARLOC(none);
 WEARLOC(stuck_in);
 RELIG(chronos);
@@ -266,6 +267,17 @@ void create_mob_affects(NPCharacter *mob)
         af.location = APPLY_SAVES;
         af.modifier = -1;
         af.bitvector.setValue(AFF_PROTECT_GOOD);
+        affect_to_char(mob, &af);
+    }
+
+    if (IS_AFFECTED(mob, AFF_CORRUPTION) && !mob->isAffected(gsn_corruption)) {
+        Affect af;
+
+        af.bitvector.setTable(&affect_flags);
+        af.type = gsn_corruption;
+        af.level = mob->getRealLevel();
+        af.duration = -1;
+        af.bitvector.setValue(AFF_CORRUPTION);
         affect_to_char(mob, &af);
     }
 }
