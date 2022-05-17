@@ -1314,6 +1314,13 @@ NMI_INVOKE( CharacterWrapper, seeName, "(ch[, case]): как мы видим и�
     return Register( target->seeName(ch, '0' + cse ) );
 }
 
+NMI_INVOKE( CharacterWrapper, getParsedTitle, "(): титул персонажа как мы его видим" )
+{
+    checkTarget();
+    CHK_NPC
+    return Register( target->getPC()->getParsedTitle() );
+}
+
 NMI_INVOKE( CharacterWrapper, can_see_mob, "(ch): видим ли персонажа ch" )
 {
     checkTarget( );
