@@ -762,6 +762,10 @@ bool DefaultSpell::isPrayer( Character *caster ) const
     if (!isCasted( ))
         return false;
 
+    // Shalafi clan members always use magic.
+    if (caster->getClan() == clan_shalafi)
+        return false;
+        
     // For spells that are exclusively marked as 'magic' or 'prayer', ignore caster's class flags.
     if (flags.isSet(SPELL_MAGIC) && !flags.isSet(SPELL_PRAYER))
         return false;
