@@ -30,6 +30,8 @@
 
 GSN(heal);
 GSN(armor);
+GSN(improved_invis);
+GSN(invisibility);
 GSN(shield);
 GSN(stone_skin);
 GSN(sanctuary);
@@ -55,6 +57,8 @@ bool BasicMobileBehavior::spec( )
 
         return false;
     }
+
+    doInvis();
 
     if (isAdrenalined( ))
         return specAdrenaline( );
@@ -123,6 +127,39 @@ bool BasicMobileBehavior::specIdle( )
         return true;
 
     return false;
+}
+
+// Reset native invisibility state if not in battle.
+bool BasicMobileBehavior::doInvis()
+{
+    bool rc = false;
+
+    if (!IS_AWAKE(ch))
+        return false;
+
+    if (!IS_AFFECTED(ch, AFF_SNEAK)) {
+        if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_SNEAK) && !MOUNTED(ch)) {
+            ch->pecho("Ты пытаешься двигаться незаметно.");
+            SET_BIT(ch->affected_by, AFF_SNEAK);
+            rc = true;
+        }
+    }
+
+    if (!IS_AFFECTED(ch, AFF_INVISIBLE)) {
+        if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_FAERIE_FIRE)) {
+            ::spell(gsn_invisibility, ch->getModifyLevel(), ch, ch, FSPELL_VERBOSE | FSPELL_BANE);
+            rc = true;
+        }
+    }
+
+    if (!IS_AFFECTED(ch, AFF_IMP_INVIS)) {
+        if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_IMP_INVIS) && !IS_AFFECTED(ch, AFF_FAERIE_FIRE)) {
+            ::spell(gsn_improved_invis, ch->getModifyLevel(), ch, ch, FSPELL_VERBOSE | FSPELL_BANE);
+            rc = true;
+        }
+    }
+
+    return rc;
 }
 
 /*

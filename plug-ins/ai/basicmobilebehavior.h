@@ -110,7 +110,8 @@ protected:
     virtual bool specFight( );
     virtual bool specAdrenaline( );
     virtual bool specIdle( );
-    
+
+    bool doInvis();    
     bool doCallHelp( );
     bool doHeal( );
     bool doPickWeapon( );

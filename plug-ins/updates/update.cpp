@@ -114,8 +114,6 @@ GSN(caltraps);
 GSN(chill_touch);
 GSN(dark_shroud);
 GSN(doppelganger);
-GSN(improved_invis);
-GSN(invisibility);
 GSN(path_find);
 GSN(protection_heat);
 GSN(spear);
@@ -349,13 +347,14 @@ void char_update( )
         // Special mobs don't get their HP or position updated automatically.
         bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
 
+        // FENIA: onArea for mob vnum 17
         if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
             oldact("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM);
             extract_char( ch );
             continue;
         }
 
-        // reset hunters path find
+        // Reset hunters path find.
         if (!ch->is_npc() && ch->getClan( ) == clan_hunter)
         {
             if (number_percent() < gsn_path_find->getEffective( ch ) )
@@ -369,17 +368,18 @@ void char_update( )
             }
         }
 
-        /* desert warmth cancels frostbite with 50% chance */
+        // FENIA: onUpdateChar for 'chill touch' affect. Desert warmth cancels frostbite with 50% chance.
         if (ch->isAffected(gsn_chill_touch) && ch->in_room->getSectorType() == SECT_DESERT && number_percent( ) < 50)
             checkDispel(ch->getModifyLevel( ),ch,gsn_chill_touch);
         
-        // Remove caltraps effect after fight off
+        // FENIA: onUpdateChar for 'caltraps' affect. Remove caltraps effect after fight off
         if ( ch->isAffected(gsn_caltraps) && !ch->fighting)
         {
             room_to_save( ch );
             affect_strip(ch,gsn_caltraps);
         }
         
+        // FENIA: onUpdateChar for 'vampire' affect.
         if (ch->is_vampire( )) {
             if (is_bright_for_vampire( ch ))
             {
@@ -387,15 +387,15 @@ void char_update( )
             }
         }
         
-        // Reset sneak for vampire
-        if (!(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
-                && IS_VAMPIRE(ch) && !MOUNTED(ch))
+        // FENIA: onUpdateChar for 'vampire' affect. Reset sneak for vampire.
+        if (!(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK) && IS_VAMPIRE(ch) && !MOUNTED(ch))
         {
             ch->pecho("Ты пытаешься двигаться незаметно.");
             SET_BIT(ch->affected_by ,AFF_SNEAK);
             room_to_save( ch );
         }
 
+        // Reset native sneak outside of battle.
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
@@ -403,30 +403,8 @@ void char_update( )
             SET_BIT(ch->affected_by ,AFF_SNEAK);
             room_to_save( ch );
         }
-        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK) && ch->is_npc() )
-        {
-            if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_SNEAK ) && !MOUNTED(ch) )
-            {
-            ch->pecho("Ты пытаешься двигаться незаметно.");
-            SET_BIT(ch->affected_by ,AFF_SNEAK);
-            room_to_save( ch );
-            }
-        }
-        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_INVISIBLE) && ch->is_npc() )
-        {
-            if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_INVISIBLE ) && !IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
-            {
-            spell( gsn_invisibility, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE|FSPELL_BANE );
-            }
-        }
-        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_IMP_INVIS) && ch->is_npc() )
-        {
-            if (IS_SET(ch->getNPC()->pIndexData->affected_by, AFF_IMP_INVIS ) && !IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
-            {
-            spell( gsn_improved_invis, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE|FSPELL_BANE );
-            }
-        }
 
+        // Reset native hide outside of battle.
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
         {
@@ -434,14 +412,16 @@ void char_update( )
             room_to_save( ch );
         }
 
+        // Reset race affect bits. 
         SET_BIT(ch->affected_by, ch->getRace( )->getAff( ) );
 
+        // Recover from 'stunned' state if HP is ok.
         if (ch->position == POS_STUNNED && !noupdate) {
             update_pos( ch );
             room_to_save( ch );
         }
         
-        // remove effects from extracted arrows (workaround, waiting for current)
+        // FENIA: onUpdateChar for 'stuck item' affect (or existing spear, arrow affects). Remove effects from extracted arrows.
         if (get_eq_char(ch, wear_stuck_in) == 0) {
             room_to_save( ch );
             if (ch->isAffected(gsn_arrow))
@@ -487,6 +467,7 @@ void char_update( )
             interpret_raw( ch, "spellbane" );
         }
 
+        // Coup de grace.
         if ((ch->position == POS_INCAP && number_range(0, 1) == 0)
             || ch->position == POS_MORTAL
             || (ch->position == POS_DEAD && !ch->isDead()))
@@ -497,6 +478,7 @@ void char_update( )
             }
         }
 
+        // Wtf?
         if (ch->position <= POS_STUNNED && ch->hit > 0 && !noupdate) {
             room_to_save( ch );
             update_pos( ch );
