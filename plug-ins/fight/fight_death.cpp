@@ -368,8 +368,9 @@ public:
         Character *killer = evt.killer;
 	    int bodypart = evt.bodypart;
         DLString label = evt.label;
+        int damtype = evt.damtype;
 
-        raw_kill( victim, bodypart, killer, label );
+        raw_kill( victim, bodypart, killer, label, damtype );
     }
 };
 
@@ -743,7 +744,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
 /*
  * Improved Death_cry contributed by Diavolo.
  */
-void death_cry( Character *ch, int part )
+static void death_cry( Character *ch, int part )
 {
     const char *msg;
     int vnum;
@@ -951,7 +952,7 @@ static bool mprog_kill( Character *killer, Character *victim )
 /*
  * Main death handler.
  */ 
-void raw_kill( Character* victim, int part, Character* ch, const DLString &label )
+void raw_kill( Character* victim, int part, Character* ch, const DLString &label, int damtype )
 {
     Character *realKiller = ch;
 
@@ -975,7 +976,7 @@ void raw_kill( Character* victim, int part, Character* ch, const DLString &label
 
     // From this point on the death has certainly happened.
 
-    gprog("onDeath", "CCis", victim, ch, part, label.c_str());
+    gprog("onDeath", "CCisi", victim, ch, part, label.c_str(), damtype);
 
     DeathPenalties(ch, victim).run();
 
@@ -983,7 +984,7 @@ void raw_kill( Character* victim, int part, Character* ch, const DLString &label
     if (ch)
         group_gain(ch, victim, realKiller);
 
-    // Death special effects. TODO move to global onDeath trigger (and add 'bodypart' trigger param).
+    // Death special effects.
     death_cry( victim, part );
 
     make_corpse( ch, victim );

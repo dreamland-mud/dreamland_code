@@ -1825,12 +1825,13 @@ NMI_INVOKE( CharacterWrapper, multi_hit, "(vict): нанести один рау
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label]]]): убить. часть тела из таблицы .tables.part_flags или -1" )
+NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label[,damtype]]]]): убить. часть тела из таблицы .tables.part_flags или -1" )
 {
     RegisterList::const_iterator i;
     Character *killer = NULL;
     int part = -1;
     DLString label;
+    int damtype = -1; 
 
     checkTarget();
     
@@ -1840,8 +1841,10 @@ NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label]]]): убит
         killer = argnum2character(args, 2);
     if (args.size() > 2)
         label = argnum2string(args, 3);
+    if (args.size() > 3)
+        damtype = argnum2flag(args, 4, damage_table);
     
-    raw_kill( target, part, killer, label );
+    raw_kill( target, part, killer, label, damtype );
     return Register( );
 }
 

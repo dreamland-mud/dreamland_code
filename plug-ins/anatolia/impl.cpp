@@ -7,8 +7,6 @@
 #include "plugin.h"
 #include "so.h"
 
-#define _GSN_( name ) SkillReference gsn_##name( #name );
-
 
 extern "C"
 {

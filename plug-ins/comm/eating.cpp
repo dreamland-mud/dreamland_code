@@ -240,7 +240,6 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     if (dam >= mob->hit) {
         Object *obj, *obj_next;
         
-        death_cry( mob, 99 );
         oldact("Ты ешь $C4.", ch, 0, mob, TO_CHAR);
         oldact("$c1 ест $C4.", ch, 0, mob, TO_ROOM);
 
