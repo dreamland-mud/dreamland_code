@@ -58,8 +58,6 @@ bool BasicMobileBehavior::spec( )
         return false;
     }
 
-    doInvis();
-
     if (isAdrenalined( ))
         return specAdrenaline( );
 
@@ -111,7 +109,10 @@ bool BasicMobileBehavior::specAdrenaline( )
     
     if (doHeal( ))
         return true;
-    
+
+    if (doInvis())
+        return true;
+
     return false;
 }
 
@@ -119,6 +120,9 @@ bool BasicMobileBehavior::specIdle( )
 {
     if (!IS_AWAKE( ch ))
         return false;
+
+    if (doInvis())
+        return true;
 
     if (doWander( ))
         return true;
