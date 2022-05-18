@@ -1168,6 +1168,22 @@ NMI_GET( SkillWrapper, index, "порядковый номер (для value у 
     return getTarget()->getIndex();
 }
 
+NMI_GET( SkillWrapper, spell, "заклинание для этого умения (.Spell) или null" ) 
+{ 
+    if (getTarget()->getSpell())
+        return WrapperManager::getThis( )->getWrapper(getTarget()->getSpell().getPointer());
+    else
+        return Register();
+}
+
+NMI_GET( SkillWrapper, affectHandler, "обработчик аффекта для этого умения (.AffectHandler) или null" ) 
+{ 
+    if (getTarget()->getAffect())
+        return WrapperManager::getThis( )->getWrapper(getTarget()->getAffect().getPointer());
+    else
+        return Register();
+}
+
 NMI_GET(SkillWrapper, spellTarget, "флаги целей заклинания (.tables.target_table)")
 {
     Spell::Pointer spell = getTarget()->getSpell();
