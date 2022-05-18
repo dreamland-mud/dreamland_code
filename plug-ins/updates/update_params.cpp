@@ -100,22 +100,6 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
 
     if (afprog_updatehit(ch))
         return;
-
-    /* TODO cut this block out once corruption is implemented in .AffectHandler("corruption").onUpdateHit */
-    if (IS_AFFECTED( ch, AFF_CORRUPTION )) {
-        if (number_bits( 2 ) == 0) {
-            ch->hit -= ch->getRealLevel( ) / 10;
-            
-            if (ch->hit < 1)
-                RawDamage( ch, ch, DAM_NONE, 1, "corruption" ).hit( false );
-        }
-        //trolls do not care much about corruption
-        if(ch->getRace()->getName() != "troll")
-        return;
-    }
-    /* TODO end block */
-
-
     
     if (ch->hit >= ch->max_hit)
         return;
