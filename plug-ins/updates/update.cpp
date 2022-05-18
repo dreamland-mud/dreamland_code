@@ -336,6 +336,7 @@ void char_update( )
 
     static time_t last_save_time = -1;
     int autoquit_timer = config["autoquit"].asInt();
+    int lostlink_timer = config["lostlink"].asInt();
 
     for ( ch = char_list; ch != 0; ch = ch_next )
     {
@@ -511,6 +512,13 @@ void char_update( )
             if (autoquit_timer > 0 && pch->timer > autoquit_timer) {
                 pch->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
                 interpret_raw(pch, "quit", "");
+                continue;
+            }
+
+            if (lostlink_timer > 0 && !pch->desc && pch->timer > lostlink_timer) {
+                pch->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
+                interpret_raw(pch, "quit", "");
+                continue;
             }
         }
     }
