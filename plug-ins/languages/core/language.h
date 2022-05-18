@@ -100,6 +100,10 @@ public:
     {
         return CATEGORY;
     }
+    virtual bool isValid( ) const
+    {
+        return true;
+    }
     
     WordEffectPointer findEffect( const DLString & ) const;
     DLString getEffectName( WordEffectPointer ) const;

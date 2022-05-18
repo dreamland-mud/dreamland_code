@@ -2,6 +2,7 @@
 #include "util/regexp.h"
 #include "grammar_entities_impl.h"
 #include "wrapperbase.h"
+#include "structwrappers.h"
 #include "stringset.h"
 #include "pcharacter.h"
 #include "skillhelp.h"
@@ -962,7 +963,8 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
     // skedit list [all|active|passive|magic|prayer|<group>]
     if (arg_is_list(cmd)) {
-        bool all = false, active = false, passive = false, magic = false, prayer = false;
+        bool all = false, active = false, passive = false, magic = false, 
+             prayer = false, invalid = false, fenia = false;
         SkillGroup *group = 0;
 
         if (!args.empty()) {
@@ -976,6 +978,10 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                 magic = true;
             else if (arg_oneof(args, "prayer", "молитвы"))
                 prayer = true;
+            else if (arg_oneof(args, "fenia", "феня"))
+                fenia = true;
+            else if (arg_oneof(args, "invalid"))
+                invalid = true;
             else {
                 group = skillGroupManager->findUnstrict(args);
                 if (!group) {
@@ -984,13 +990,18 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                 }
             }
         } else {
-            stc("Использование: skedit list [all|active|passive|magic|prayer|<group>]\r\n", ch);
+            stc("Использование: skedit list [all|active|passive|magic|prayer|fenia|invalid|<group>]\r\n", ch);
             return;
         }
 
-        list<BasicSkill *> skills;
+        list<Skill *> skills;
         for (int sn = 0; sn < skillManager->size(); sn++) {
             Skill *skill = skillManager->find(sn);
+
+            if (all 
+                || (invalid && !skill->isValid()))
+                skills.push_back(skill);
+
             BasicSkill *s = dynamic_cast<BasicSkill *>(skill);
             if (!s)
                 continue;
@@ -998,9 +1009,9 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
             DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
             bool isSpell = spell && spell->isCasted();
 
-            if (all
-                || (active && !s->isPassive() && !isSpell)
+            if (   (active && !s->isPassive() && !isSpell)
                 || (passive && s->isPassive())
+                || (fenia && dynamic_cast<FeniaSkill *>(s))
                 || (magic && isSpell && spell->flags.isSet(SPELL_MAGIC))
                 || (prayer && isSpell && spell->flags.isSet(SPELL_PRAYER))
                 || (group && skill->hasGroup(group->getIndex())))

@@ -49,6 +49,10 @@ public:
     virtual const RussianString &getDammsg( ) const;
     virtual int getRating( PCharacter * ) const;
     virtual bool isPassive() const;
+    virtual bool isValid( ) const
+    {
+        return true;
+    }
     
     virtual int getEffective( Character * ) const;
     virtual int getAdept( PCharacter * ) const;
