@@ -1288,8 +1288,9 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
     else {
         end = argnum2number(args, 3);
         if (end < 0)
-            throw Scripting::Exception("end day cannot be negative");
-        end = today + end;
+            end = PCSkillData::END_NEVER;
+        else
+            end = today + end;
     }
 
     if (args.size() >= 4)
