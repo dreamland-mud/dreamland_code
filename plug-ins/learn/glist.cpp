@@ -30,10 +30,12 @@ CMDRUN( glist )
         
         for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
             group = skillGroupManager->find( gn );
-            buf << fmt( 0, "    %-17s   %-25s",
-                        group->getName( ).c_str( ),
-                        group->getRussianName( ).c_str( ) )
-                << endl;
+
+            if (group->isValid() && group->visible(ch))
+                buf << fmt( 0, "    %-17s   %-25s",
+                            group->getName( ).c_str( ),
+                            group->getRussianName( ).c_str( ) )
+                    << endl;
         }
 
         buf << endl
@@ -45,6 +47,11 @@ CMDRUN( glist )
         
         if (!group) {
             ch->pecho("Неправильно указана группа.");
+            return;
+        }
+
+        if (!group->visible(ch)) {
+            ch->pecho("Эта группа умений скрыта от тебя.");
             return;
         }
         

@@ -73,6 +73,16 @@ GSN(digging);
 GSN(grave);
 GSN(throw);
 GSN(grab);
+GSN(make_shield);
+GSN(broom_ritual);
+GSN(mysterious_dream);
+GSN(narcotic_mist);
+GSN(create_spring);
+GSN(spring);
+GSN(weapon_morph);
+GSN(compound);
+GSN(enchant_sword);
+GSN(temper);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -319,6 +329,11 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_tame, gsn_soothe);
     skill_exchange( this, gsn_digging, gsn_grave);
     skill_exchange( this, gsn_throw, gsn_grab);
+    skill_exchange( this, gsn_make_shield, gsn_broom_ritual);
+    skill_exchange( this, gsn_mysterious_dream, gsn_narcotic_mist);
+    skill_exchange( this, gsn_create_spring, gsn_spring);
+    skill_exchange( this, gsn_weapon_morph, gsn_compound);
+    skill_exchange( this, gsn_enchant_sword, gsn_temper);
 
     skill_merge(this, gsn_harm, gsn_cause_critical, gsn_cause_light, gsn_cause_critical);
     skill_merge(this, gsn_heal, gsn_cure_critical, gsn_cure_light, gsn_cure_critical);
