@@ -741,107 +741,6 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     return obj;
 }
 
-/*
- * Improved Death_cry contributed by Diavolo.
- */
-static void death_cry( Character *ch, int part )
-{
-    const char *msg;
-    int vnum;
-    bool bloody = false;
-    Bitstring bodyparts( ch->parts );
-
-    if (ch->is_mirror( ))
-        return;
-
-    vnum = 0;
-    msg = "Ты слышишь предсмертный крик $c2.";
-
-    if (part == -1)
-      part = number_bits(4);
-
-    switch (part)
-    {
-    case  0: msg  = "$c1 падает на землю... и {RУМИРАЕТ{x.";            
-             break;
-    case  1:
-        if (!IS_BLOODLESS(ch))
-        {
-            msg  = "{rКровь{x $c2 покрывает твои доспехи.";        
-            bloody = true;
-            break;
-        }
-    case  2:                             
-        if (bodyparts.isSet(PART_GUTS))
-        {
-            msg = "Внутренности $c2 вываливаются тебе под ноги.";
-            vnum = OBJ_VNUM_GUTS;
-            bodyparts.removeBit(PART_GUTS);
-        }
-        break;
-    case  3:
-        if (bodyparts.isSet(PART_HEAD))
-        {
-            msg  = "Отрубленная голова $c2 падает тебе под ноги.";
-            vnum = OBJ_VNUM_SEVERED_HEAD;                
-            bodyparts.removeBit(PART_HEAD);
-        }
-        break;
-    case  4:
-        if (bodyparts.isSet(PART_HEART))
-        {
-            msg  = "Сердце $c2 выпадает из $s разрубленной груди.";
-            vnum = OBJ_VNUM_TORN_HEART;                
-            bodyparts.removeBit(PART_HEART);
-        }
-        break;
-    case  5:
-        if (bodyparts.isSet(PART_ARMS))
-        {
-            msg  = "Рука $c2 отваливается от $s мертвого тела.";
-            vnum = OBJ_VNUM_SLICED_ARM;                
-            bodyparts.removeBit(PART_ARMS);
-        }
-        break;
-    case  6:
-        if (bodyparts.isSet(PART_LEGS))
-        {
-            msg  = "Нога $c2 отваливается от $s мертвого тела.";
-            vnum = OBJ_VNUM_SLICED_LEG;                
-            bodyparts.removeBit(PART_LEGS);
-        }
-        break;
-    case 7:
-        if (bodyparts.isSet(PART_BRAINS))
-        {
-            msg = "Голова $c2 разлетается как спелый арбуз, забрызгивая все вокруг.";
-            vnum = OBJ_VNUM_BRAINS;
-            bodyparts.removeBit(PART_BRAINS);
-        }
-    }
-
-    oldact( msg, ch, 0, 0, TO_ROOM );
-
-    if (vnum != 0)
-        bodypart_create( vnum, ch, NULL ); 
-
-    if (bloody) {
-        for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
-            if (rch != ch && rch->position > POS_SITTING) {
-                Affect af;
-                af.type = gsn_poured_liquid;
-                af.duration = ch->size;
-                af.global.setRegistry(liquidManager);
-                af.global.set(liq_blood);
-                affect_join(rch, &af);
-            }
-    }
-
-    msg = "Ты слышишь чей-то предсмертный крик.";
-    ch->in_room->echoAround( POS_RESTING, msg );
-    ch->parts = bodyparts;
-}
-
 static void reset_dead_player( PCharacter *victim )
 {
     for (auto &paf: victim->affected.clone())
@@ -984,10 +883,7 @@ void raw_kill( Character* victim, int part, Character* ch, const DLString &label
     if (ch)
         group_gain(ch, victim, realKiller);
 
-    // Death special effects.
-    death_cry( victim, part );
-
-    make_corpse( ch, victim );
+    make_corpse( ch, victim ); // TO-DO: move this to fenia too
 
     // MOB is killed.
     if (victim->is_npc( )) {
