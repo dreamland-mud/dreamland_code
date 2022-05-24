@@ -55,7 +55,7 @@ public:
             if (tattoo->getRealShortDescr() && !tattooDefaultName.strPrefix(tattoo->getRealShortDescr()))
                 qp += 200;
 
-            ch->pecho("\r\n%^O1 больше не может служить тебе и исчезает.", tattoo);
+            ch->pecho("\r\nСтарая татуировка больше не может служить тебе и исчезает.", tattoo);
             ch->pecho("На твой счет перечислено %d qp для покупки нового знака твоей религии.", qp);
             wiznet(WIZ_RELIGION, 0, 0, "%^C1 лишается %O2.", ch, tattoo);
             
