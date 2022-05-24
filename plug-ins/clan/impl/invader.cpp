@@ -387,7 +387,7 @@ COMMAND(CDarkLeague, "darkleague")
 
     arguments = constArguments;
     cmd = arguments.getOneArgument();
-    arg = arguments.getOneArgument();
+    arg = arguments;
 
     if (cmd.empty() || arg_is_help(cmd))
     {
@@ -423,7 +423,7 @@ COMMAND(CDarkLeague, "darkleague")
     }
     else if (arg_oneof(cmd, "members", "члены"))
     {
-        orgs->doMembers(pch);
+        orgs->doMembers(pch, arg);
     }
     else
     {
@@ -441,14 +441,15 @@ void CDarkLeague::doUsage(PCharacter *pch)
     ostringstream buf;
 
     buf << "Для всех: " << endl
-        << "{lEdarkleague{lRтемнаялига{x {lElist    {lRсписок{x        - посмотреть список групп" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lElist{lRсписок{x - посмотреть список групп" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEmembers{lRчлены{x - посмотреть список членов группы" << endl
         << endl
         << "Для руководства: " << endl
-        << "{lEdarkleague{lRтемнаялига{x {lEmembers{lRчлены{x         - посмотреть список членов группы" << endl
-        << "{lEdarkleague{lRтемнаялига{x {lEinduct{lRпринять{x {Dимя{x - принять кого-то в группу" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEmembers{lRчлены{x [{Dгруппа{x] - посмотреть список членов своей или указанной группы" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEinduct{lRпринять{x {Dимя{x [{Dгруппа{x]- принять кого-то в свою или указанную группу" << endl
         << "{lEdarkleague{lRтемнаялига{x {lEremove{lRвыгнать{x {Dимя{x - выгнать кого-то из группы" << endl
-        << "{lEdarkleague{lRтемнаялига{x {lEremove self{lRвыгнать я{x     - выйти из группы" << endl
-        << "{lEdarkleague{lRтемнаялига{x {lEinduct self{lRпринять я{x {Dимя группы{x - принять себя в группу" << endl;
+        << "{lEdarkleague{lRтемнаялига{x {lEremove self{lRвыгнать я{x - выйти из группы" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEinduct self{lRпринять я{x {Dгруппа{x - принять себя в группу" << endl;
 
     pch->send_to(buf);
 }

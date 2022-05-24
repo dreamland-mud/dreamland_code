@@ -397,7 +397,7 @@ COMMAND(COrden, "orden")
     }
     else if (arg_oneof(cmd, "members", "члены"))
     {
-        orgs->doMembers(pch);
+        orgs->doMembers(pch, arg);
     }
     else
     {
@@ -415,17 +415,15 @@ void COrden::doUsage(PCharacter *pch)
     ostringstream buf;
 
     buf << "Для всех: " << endl
-        << "{Worden list{x        - посмотреть список орденов" << endl
-        << "{Worden members{x     - посмотреть список членов ордена" << endl
-        << "{Worden remove self{x - выйти из ордена" << endl
+        << "{lEorden{lRорден{x {lElist{lRсписок{x - посмотреть список групп" << endl
+        << "{lEorden{lRорден{x {lEmembers{lRчлены{x - посмотреть список членов группы" << endl
         << endl
-        << "Для рекруитеров: " << endl
-        << "{Worden induct <{xname{W>{x - принять кого-либо в орден" << endl
-        << "{Worden remove <{xname{W>{x - выгнать кого-либо из ордена" << endl
-        << endl
-        << "Для лидера: " << endl
-        << "{Worden induct self <{xorden name{W>{x - войти в указанный орден" << endl;
-
+        << "Для руководства: " << endl
+        << "{lEorden{lRорден{x {lEmembers{lRчлены{x [{Dгруппа{x] - посмотреть список членов своей или указанной группы" << endl
+        << "{lEorden{lRорден{x {lEinduct{lRпринять{x {Dимя{x [{Dгруппа{x]- принять кого-то в свою или указанную группу" << endl
+        << "{lEorden{lRорден{x {lEremove{lRвыгнать{x {Dимя{x - выгнать кого-то из группы" << endl
+        << "{lEorden{lRорден{x {lEremove self{lRвыгнать я{x - выйти из группы" << endl
+        << "{lEorden{lRорден{x {lEinduct self{lRпринять я{x {Dгруппа{x - принять себя в группу" << endl;
     pch->send_to(buf);
 }
 

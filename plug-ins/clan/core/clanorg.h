@@ -33,11 +33,11 @@ public:
     ClanOrder::Pointer findOrder( const DLString & ) const;
 
     void doList( PCharacter * ) const;
-    void doMembers( PCharacter * ) const;
-    void doSelfInduct( PCharacter *, DLString & ) const;
-    void doInduct( PCharacter *, DLString & ) const;
+    void doMembers( PCharacter *, const DLString & ) const;
+    void doSelfInduct( PCharacter *, const DLString & ) const;
+    void doInduct( PCharacter *, const DLString & ) const;
     void doSelfRemove( PCharacter * ) const;
-    void doRemove( PCharacter *, DLString & ) const;
+    void doRemove( PCharacter *, const DLString & ) const;
 
     static const DLString &getAttr( PCMemoryInterface * );
     static void setAttr( PCMemoryInterface *, const DLString & );
