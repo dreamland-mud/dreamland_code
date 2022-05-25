@@ -7,6 +7,8 @@
 
 #include "commonattributes.h"
 #include "pcharacter.h"
+#include "skill_utils.h"
+
 
 ClanOrgSkill::ClanOrgSkill( )
 {
@@ -19,7 +21,10 @@ bool ClanOrgSkill::visible( CharacterMemoryInterface * ch ) const
 
     if (!ch->getPCM())
         return false;
-    
+
+    if (temporary_skill_active(this, ch))
+        return true;
+
     return (getOrgInfo( ch->getPCM( ) ) != NULL);
 }
 
@@ -29,7 +34,10 @@ bool ClanOrgSkill::available( Character * ch ) const
     
     if (!ClanSkill::available( ch ))
         return false;
-        
+
+    if (temporary_skill_active(this, ch))
+        return true;
+
     if (ch->is_npc( ))
         return false;
 
