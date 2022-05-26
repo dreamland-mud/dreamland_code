@@ -10,6 +10,7 @@
 
 #include "pcharacter.h"
 
+#include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -43,7 +44,7 @@ bool GangstersInfo::canAutoStart( const PlayerList &players, Config &config ) co
     level = players[i]->getModifyLevel( );
     
     config.minLevel = max( 1, level - lowGap.getValue( ) );
-    config.maxLevel = level + highGap.getValue( );
+    config.maxLevel = min(level + highGap.getValue(), LEVEL_MORTAL);
 
     config.time = getDefaultTime( );
     return true;

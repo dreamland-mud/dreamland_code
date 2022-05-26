@@ -139,7 +139,7 @@ void GlobalQuest::printRemainedTime( ostringstream &buf ) const
 
 bool GlobalQuest::isLevelOK( Character *ch ) const
 {
-    int level = ch->getModifyLevel( );
+    int level = ch->getRealLevel( ); // if you see your level is in the range, you're in, no matter the remort bonuses
     
     if (ch->is_npc( ))
         return false;
