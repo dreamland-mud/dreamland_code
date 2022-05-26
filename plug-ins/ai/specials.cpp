@@ -61,7 +61,10 @@ bool BasicMobileBehavior::spec( )
     if (isAdrenalined( ))
         return specAdrenaline( );
 
-    return specIdle( );
+    if (IS_AWAKE( ch ))
+        return specIdle( );
+
+    return false;
 }
 
 bool BasicMobileBehavior::specFight( )
@@ -118,9 +121,6 @@ bool BasicMobileBehavior::specAdrenaline( )
 
 bool BasicMobileBehavior::specIdle( )
 {
-    if (!IS_AWAKE( ch ))
-        return false;
-
     if (doInvis())
         return true;
 
