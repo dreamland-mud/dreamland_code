@@ -26,7 +26,7 @@
 #include "room.h"
 #include "skillreference.h"
 #include "door_utils.h"
-
+#include "websocketrpc.h"
 #include "wiznet.h"
 #include "act.h"
 #include "mercdb.h"
