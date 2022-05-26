@@ -40,15 +40,18 @@ static bool room_has_exits(Room *room)
  *--------------------------------------------------------------------*/
 bool RoomQuestModel::mobileCanAggress(PCharacter *pch, NPCharacter *mob)
 {
-    int ldiff = mob->getModifyLevel() - pch->getModifyLevel();
+    if (IS_SET(mob->act, ACT_AGGRESSIVE))
+        if (mob->getModifyLevel() >= pch->getModifyLevel() - 5)
+            return true;
 
-    if (IS_SET(mob->act, ACT_AGGRESSIVE) && !IS_SET(mob->act, ACT_WIMPY) && ldiff >= -5)
-        return true;
-
-    if (IS_SET(mob->act, ACT_VAMPIRE) && ldiff >= -8)
-        return true;
+    if (IS_SET(mob->act, ACT_VAMPIRE))
+        if (mob->getModifyLevel() >= pch->getModifyLevel() - 8)
+            return true;
 
     if (IS_AFFECTED( mob, AFF_BLOODTHIRST ))
+        return true;
+
+    if (mob->spec_fun.name == "spec_nasty")
         return true;
 
     return false;
