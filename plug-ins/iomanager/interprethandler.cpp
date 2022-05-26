@@ -451,7 +451,7 @@ InterpretHandler::prompt(Descriptor *d)
 
     battlePrompt( ch );
 
-    if (d->websock.state == WS_ESTABLISHED)
+    if (is_websock(d))
         webPrompt(d, d->character);
 
     if (!IS_SET( ch->comm, COMM_COMPACT ))

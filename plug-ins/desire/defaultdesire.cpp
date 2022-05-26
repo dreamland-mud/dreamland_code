@@ -8,6 +8,7 @@
 #include "room.h"
 #include "skillreference.h"
 
+#include "screenreader.h"
 #include "act.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -115,7 +116,7 @@ void DefaultDesire::report( PCharacter *ch, ostringstream &buf )
     // Draw player desire status as progress bar or percents.
     buf << what << " ";
 
-    if (IS_SET(ch->config, CONFIG_SCREENREADER))
+    if (uses_screenreader(ch))
         buf << showPercent(ch);
     else
         buf << "[" << showDots(ch) << "]";

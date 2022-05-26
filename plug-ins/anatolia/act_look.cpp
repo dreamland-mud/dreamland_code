@@ -42,13 +42,12 @@
 #include "room.h"
 #include "roomutils.h"
 #include "desire.h"
-
+#include "screenreader.h"
 #include "descriptor.h"
 #include "webmanip.h"
 #include "websocketrpc.h"
 #include "comm.h"
 #include "weapontier.h"
-
 #include "directions.h"
 #include "attract.h"
 #include "occupations.h"
@@ -135,10 +134,7 @@ bool is_empty_descr( const char *arg )
  */
 DLString format_longdescr_to_char(const char *descr, Character *ch)
 {
-    if (ch->is_npc())
-        return descr;
-    
-    if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER))
+    if (!uses_screenreader(ch))
         return descr;
 
     // Remove (keywords) and 1 preceding space.
@@ -174,7 +170,7 @@ static void format_screenreader_flags(Object *obj, ostringstream &buf, Character
     if (ch->is_npc())
         return;
 
-    if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER) && ch->getPC()->getConfig().color)
+    if (!uses_screenreader(ch) && ch->getPC()->getConfig().color)
         return;
 
     DLString aura = get_tier_aura(obj);

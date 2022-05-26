@@ -27,7 +27,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "mercdb.h"
-
+#include "websocketrpc.h"
 #include "nannyhandler.h"
 #include "feniamanager.h"
 #include "wrappermanagerbase.h"
@@ -100,7 +100,7 @@ void NannyHandler::doGreeting( Descriptor *d )
     time_t clock = dreamland->getCurrentTime( );
     struct tm * now = localtime( &clock );
 
-    if(d->websock.state == WS_ESTABLISHED)
+    if(is_websock(d))
         return;
 
     d->send( ANSI_CLEARSCR ANSI_HOME ANSI_COLOR_RESET "\n\r" );

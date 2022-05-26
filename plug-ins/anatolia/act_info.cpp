@@ -105,6 +105,7 @@
 #include "raceflags.h"
 #include "recipeflags.h"
 
+#include "screenreader.h"
 #include "def.h"
 #include "act_move.h"
 #include "act_lock.h"
@@ -2409,7 +2410,7 @@ CMDRUNP( help )
         // Create a line with help ID, title and disambiguation keywords (unless turned off).
         DLString line = title;
         if (!disambig.empty()) {
-            if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER) 
+            if (!uses_screenreader(ch)
                 && !ch->getPC()->getAttributes().isAvailable("newhelp"))
             {
                 line += " ({D" + disambig + "{x)"; 

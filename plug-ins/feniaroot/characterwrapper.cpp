@@ -25,6 +25,7 @@
 #include "room.h"
 
 #include "subprofession.h"
+#include "screenreader.h"
 #include "profflags.h"
 #include "occupations.h"
 #include "follow_utils.h"
@@ -2329,6 +2330,12 @@ NMI_INVOKE( CharacterWrapper, look_auto, "(room): вывести описани�
     checkTarget( );
     do_look_auto( target, arg2room( get_unique_arg( args ) ) );
     return Register( );
+}
+
+NMI_GET(CharacterWrapper, screenreader, "пользуется ли персонаж клиентом или режимом для незрячих")
+{
+    checkTarget();
+    return uses_screenreader(target);
 }
 
 NMI_GET( CharacterWrapper, affected, "список всех аффектов (List из структур Affect)" )

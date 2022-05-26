@@ -16,7 +16,7 @@
 #include "dlfileop.h"
 #include "profiler.h"
 #include "plugininitializer.h"
-
+#include "screenreader.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "dreamland.h"
@@ -106,8 +106,8 @@ static bool create_log_entry(InterpretArguments &iargs)
         log["cfg"]["prompt"] = "default";
 
     log["cfg"]["web"] = is_websock(iargs.ch);
-    log["cfg"]["blind"] = (bool)(IS_SET(iargs.ch->getPC()->config, CONFIG_SCREENREADER));
-    log["cfg"]["mudlet"] = iargs.ch->desc && iargs.ch->desc->telnet.ttype != 0;
+    log["cfg"]["blind"] = uses_screenreader(iargs.ch);
+    log["cfg"]["mudlet"] = iargs.ch->desc && iargs.ch->desc->telnet.ttype == TTYPE_MUDLET;
     log["cfg"]["nanny"] = (iargs.ch->desc && iargs.ch->desc->connected != CON_PLAYING);
     log["cfg"]["brief"] = (bool)(IS_SET(iargs.ch->comm, COMM_BRIEF));
 

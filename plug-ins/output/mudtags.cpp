@@ -10,6 +10,7 @@
 #include "logstream.h"
 #include "descriptor.h"
 #include "websocketrpc.h"
+#include "screenreader.h"
 #include "pcharacter.h"
 #include "race.h"
 #include "merc.h"
@@ -409,9 +410,7 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
         else
             SET_BIT(my_invis, INVIS_TELNET);
         
-        if (ch->desc && ch->desc->telnet.ttype == TTYPE_LYNTIN)
-            SET_BIT(my_invis, INVIS_SCREENREADER_ON);
-        else if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_SCREENREADER))
+        if (uses_screenreader(ch))
             SET_BIT(my_invis, INVIS_SCREENREADER_ON);
         else
             SET_BIT(my_invis, INVIS_SCREENREADER_OFF);
