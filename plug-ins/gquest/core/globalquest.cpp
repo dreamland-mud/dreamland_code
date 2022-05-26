@@ -166,21 +166,9 @@ bool GlobalQuest::isLevelOK( Character *ch ) const
 
 Character * GlobalQuest::getActor( Character *ch ) const
 {
-    if (!ch)
-        return ch;
+    if (ch && ch->is_npc() && ch->master && !ch->master->is_npc())
+        return ch->master;
 
-    if (ch->is_mirror( ) && ch->doppel)
-        return getActor( ch->doppel );
-    
-    if (!ch->is_npc( ) && !IS_CHARMED(ch))
-        return ch;
-    
-    if (ch->leader && ch->leader != ch)
-        return getActor( ch->leader );
-    
-    if (ch->master && ch->master != ch)
-        return getActor( ch->master );
-    
     return ch;
 }
 
