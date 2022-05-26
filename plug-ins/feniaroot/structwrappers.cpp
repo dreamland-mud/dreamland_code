@@ -678,6 +678,11 @@ NMI_GET( MaterialWrapper, gem, "среди материалов есть дра�
     return Register( material_is_typed( names.c_str(), MAT_GEM ) );
 }
 
+NMI_GET( MaterialWrapper, organic, "материал органического происхождения" )
+{
+    return Register( material_is_typed( names.c_str(), MAT_ORGANIC ) );
+}
+
 NMI_GET( MaterialWrapper, burns, "сколько тиков горит (-1 если тушит огонь)" )
 {
     return Register( material_burns( names.c_str() ) );
