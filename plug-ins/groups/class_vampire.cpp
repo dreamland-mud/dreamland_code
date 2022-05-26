@@ -634,7 +634,7 @@ SKILL_RUNP( bite )
         }
         
         yell_panic( ch, victim,
-                    "Помогите, {Dсоздание ночи{Y кусает меня!",
+                    "Свят-свят-свят, вампиры!",
                     "Помогите, {Dсоздание ночи{Y кусает меня!" );
     }
     catch (const VictimDeathException& e) {                                     
