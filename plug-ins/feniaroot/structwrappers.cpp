@@ -693,6 +693,10 @@ NMI_GET( MaterialWrapper, indestructible, "среди материалов ес�
     return Register( material_is_flagged(names.c_str(), MAT_INDESTR) );
 }
 
+NMI_GET( MaterialWrapper, tough, "среди материалов есть особо прочный (mithril etc.)" )
+{
+    return Register( material_is_flagged(names.c_str(), MAT_TOUGH) );
+}
 
 /*----------------------------------------------------------------------
  * Clan
