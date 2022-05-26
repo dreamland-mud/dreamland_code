@@ -13,7 +13,7 @@
 #include "dreamland.h"
 #include "damage.h"
 #include "fight.h"
-
+#include "fenia_utils.h"
 #include "interp.h"
 #include "handler.h"
 #include "magic.h"
@@ -57,7 +57,10 @@ void BasicMobileBehavior::attackDumb( Character *victim )
 }
 
 void BasicMobileBehavior::attackSmart( Character *victim )
-{        
+{   
+    gprog("onAttackAI", "CC", ch, victim);
+
+    /* TODO: remove the following code once global onAttackAI is implemented. */     
     const char *cmd = 0;
     static const SpellChance spellTable [] = {
         { gsn_blindness,     50 },
@@ -139,24 +142,13 @@ void BasicMobileBehavior::fight( Character *victim )
     if (ch->fighting != victim)
         return;
 
-    /* PC waits */
     if (ch->wait > 0)
         return;
 
-    /* now for the skills */
-    if (isAfterCharm( ))
-        fightDumb( victim );
-    else
-        fightSmart( victim );
-}
+    
+    /* TODO: remove the following block once implemented in global onFightAI */
+    gprog("onFightAI", "C", ch);
 
-void BasicMobileBehavior::fightSmart( Character *victim )
-{
-    fightDumb( victim );
-}
-
-void BasicMobileBehavior::fightDumb( Character *victim )
-{
     const char *cmd = 0;
 
     switch (number_range(0, 7)) {

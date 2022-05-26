@@ -158,8 +158,6 @@ protected:
 public:
     virtual void fight( Character * );
 protected:    
-    virtual void fightSmart( Character * );
-    void fightDumb( Character * );
     virtual void attack( Character * );;
     virtual void attackSmart( Character * );
     void attackDumb( Character * );
