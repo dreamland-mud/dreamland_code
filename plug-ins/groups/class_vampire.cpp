@@ -166,6 +166,7 @@ void VampiricBiteOneHit::postDamageEffects( )
     int level = skill_level(*gsn_vampiric_bite, ch);
     if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
     	af.bitvector.setTable(&affect_flags);
+        af.sources.add(ch);
     	af.type      = gsn_corruption;
    	    af.level     = level;
     	af.duration  = level / 10;
@@ -439,6 +440,7 @@ void sucking(Character *ch, Character *victim)
 
         if ((slevel > number_percent()) && (!IS_AFFECTED(victim, AFF_CORRUPTION))) {
             af.bitvector.setTable(&affect_flags);
+            af.sources.add(ch);
             af.type = gsn_corruption;
             af.level = slevel;
             af.duration = slevel / 10;
