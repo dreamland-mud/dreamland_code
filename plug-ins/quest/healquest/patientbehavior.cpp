@@ -30,22 +30,24 @@ void PatientBehavior::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 
 bool PatientBehavior::spell( Character *caster, int sn, bool before ) 
 {
+    Character *actor = caster->is_npc() && caster->master ? caster->master : caster;
+
     if (!getQuest( ) || quest->isComplete( ))
         return false;
 
     if (before) {
-        if (quest->maladies.hasKey( sn ) && ourHero( caster ))
-            healInfect( caster->getPC( ) );
+        if (quest->maladies.hasKey( sn ) && ourHero( actor ))
+            healInfect( actor->getPC( ) );
         
         quest->maladies.setAttempts( sn );
     }
     else {
-        if (ourHero( caster )) {
+        if (ourHero( actor )) {
             if (quest->maladies.checkSuccess( sn, ch )) {
                 if (quest->isComplete( )) 
-                    healComplete( caster->getPC( ) );
+                    healComplete( actor->getPC( ) );
                 else
-                    healSuccess( caster->getPC( ) );
+                    healSuccess( actor->getPC( ) );
             }
         }
         else {

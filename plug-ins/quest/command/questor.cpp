@@ -346,7 +346,7 @@ void Questor::rewardScroll( PCharacter *client )
         sn = number_range( 0, skills.size( ) - 1 );
         int gain = number_range(2, 4);
         bhv->addSkill(skills[sn], gain);
-        report << skillManager->find(sn)->getName() << " (" << gain << "%%) ";
+        report << skillManager->find(skills[sn])->getName() << " (" << gain << "%) ";
         skills.erase( skills.begin( ) + sn );
     }
     
