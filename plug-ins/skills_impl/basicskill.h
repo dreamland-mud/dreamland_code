@@ -69,10 +69,13 @@ public:
     // Autohelp rendering.
 
     /** Output bonus/penalty to skill level. */
-    DLString printLevelBonus(Character *ch) const;
+    DLString printLevelBonus(PCharacter *ch) const;
     
     /** Print wait state, targets and mana cost for a skill. */
-    DLString printWaitAndMana(Character *ch) const;
+    DLString printWaitAndMana(PCharacter *ch) const;
+
+    /** Print out info about mobs-practicers for this skill. */
+    DLString printPracticers(PCharacter *ch) const;
 
     XML_VARIABLE XMLStringNoEmpty nameRus;
     XML_VARIABLE XMLRussianString dammsg;

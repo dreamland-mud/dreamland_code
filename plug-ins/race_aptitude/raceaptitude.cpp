@@ -122,8 +122,10 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
 
     buf << printWaitAndMana(ch);
     
-    if (!visible( ch ))
+    if (!visible( ch )) {
+        buf << printPracticers(ch);
         return;
+    }
         
     buf << SKILL_INFO_PAD << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
 
@@ -135,6 +137,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
 
     buf << "." << endl;
 
+    buf << printPracticers(ch);
     buf << printLevelBonus(ch);
 }
 

@@ -20,6 +20,7 @@
 #include "affect.h"
 #include "skillreference.h"
 #include "skill_utils.h"
+#include "skillgroup.h"
 #include "desire.h"
 #include "hometown.h"
 #include "feniaskillaction.h"
@@ -449,7 +450,7 @@ map<DLString, int> BasicSkill::parseAccessTokens(const DLString &newValue, const
     return entriesWithLevels;
 }
 
-DLString BasicSkill::printLevelBonus(Character *ch) const
+DLString BasicSkill::printLevelBonus(PCharacter *ch) const
 {
     ostringstream buf;
 
@@ -463,7 +464,53 @@ DLString BasicSkill::printLevelBonus(Character *ch) const
     return buf.str();
 }
 
-DLString BasicSkill::printWaitAndMana(Character *ch) const
+DLString BasicSkill::printPracticers(PCharacter *ch) const
+{
+    const char *pad = SKILL_INFO_PAD;
+    ostringstream buf;
+    std::set<MOB_INDEX_DATA *> practicers;
+    const DLString what = skill_what(this).ruscase('1');
+
+    for (auto g: const_cast<BasicSkill *>(this)->getGroups().toArray()) {
+        SkillGroup *group = skillGroupManager->find(g);
+        if (group->getPracticer() <= 0)
+            continue;
+
+        MOB_INDEX_DATA *pMob = get_mob_index(group->getPracticer());
+        if (pMob)
+            practicers.insert(pMob);
+    }
+
+    if (practicers.empty()) {
+        // '...в твоей гильдии' - с гипер-ссылкой на справку.
+        buf << pad << "Это " << what << " можно выучить в твоей {g{hh44гильдии{x." << endl;
+    } else {
+        // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
+        buf << pad << "Это " << what << " можно выучить у ";
+        
+        auto p = practicers.begin();
+        buf << "{g" << russian_case((*p)->short_descr, '2') << "{x "
+                << "(зона {g{hh" << (*p)->area->getName() << "{x)";
+
+        // For multi-groups show two teachers only.
+        if (practicers.size() > 1) {
+            p++;
+            buf << " или у {g" << russian_case((*p)->short_descr, '2') << "{x "
+                    << "(зона {g{hh" << (*p)->area->getName() << "{x)";
+        }
+                    
+        buf << "." << endl;
+    }
+    
+    if (ch->getHometown() == home_frigate)
+        buf << pad << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
+    else if (ch->getModifyLevel() < 20)
+        buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
+
+    return buf.str();
+}
+
+DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
 {
     const char *pad = SKILL_INFO_PAD;
     bool empty = true; // Contains any meaningful output besides padding and new lines?
