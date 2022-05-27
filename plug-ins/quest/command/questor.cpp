@@ -13,7 +13,7 @@
 #include "wiznet.h"
 #include "skill_utils.h"
 #include "merc.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "act.h"
 #include "mercdb.h"
 
@@ -588,7 +588,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         return;
     }
 
-    if (arg_oneof(arg, "any", "любое", "любой")) {
+    if (arg_oneof_strict(arg, "any", "любое", "любой")) {
         try {
             QuestManager::getThis( )->generate( client, ch );
             attr->setStartTime();
@@ -611,53 +611,85 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         return;
     }
 
-    Integer choice;
-    if (!Integer::tryParse(choice, arg)) {
-        tell_fmt("Я не умею читать мысли, %1$C1. Укажи номер задания или {lRлюбое{lEany{x.", client, ch);
+    QuestRegistratorBase::Pointer q = parseQuestArgument(client, arg);
+    if (!q)
         return;
-    }
 
-    QuestList quests = QuestManager::getThis()->list(client);
-    if (choice <= 0 || choice > (int)quests.size()) {
-        tell_fmt("Я не предлагал%2$Gо||а тебе задание под таким номером, будь внимательнее!", client, ch);
-        return;
-    }
-    
-    int index;
-    QuestList::const_iterator q;
-    for (index = 1, q = quests.begin(); index != choice; index++, q++)
-        ;
-   
     if (attr->getLastQuestCount((*q)->getName()) >= 5) {
         tell_fmt("Я уже заметил%2$Gо||а, что тебе очень нравятся такие задания, %1$C1.", client, ch);
         tell_raw(client, ch, "Но попробуй добиться успеха в чем-то еще.");
         return;
     }
-    
+
     for (int i = 0; i < 3; i++) {
         try {
-            client->getAttributes( ).addAttribute( 
-                         (*q)->createQuest(client, ch), "quest" );
+            client->getAttributes().addAttribute(
+                (*q)->createQuest(client, ch), "quest");
             attr->setStartTime();
-            PCharacterManager::save( client );
+            PCharacterManager::save(client);
 
-            if(!rated_as_guru(client)){
-               tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
-            if(IS_TOTAL_NEWBIE(client)){
-               tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+            if (!rated_as_guru(client)) {
+                tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+                if (IS_TOTAL_NEWBIE(client)) {
+                    tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+                }
             }
-            }
 
-            tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
-
+            tell_raw(client, ch, "Пусть удача сопутствует тебе!");            
             return;
-        } 
-        catch (const QuestCannotStartException &e) {
-        } 
+
+        } catch (const QuestCannotStartException &e) {
+        }
     }
 
     tell_fmt("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'.", client, ch, (*q)->getShortDescr().c_str());
     tell_raw(client, ch, "Приходи позже или выбери что-то другое.");
+}
+
+/** Return a quest type that player has requested with "q request <arg>" command */
+QuestRegistratorBase::Pointer Questor::parseQuestArgument(PCharacter *client, const DLString &arg)
+{
+    QuestRegistratorBase::Pointer result, null;
+    QuestList quests = QuestManager::getThis()->list(client);
+
+    // Player chose quest type by its number.
+    Integer choice;
+    if (Integer::tryParse(choice, arg)) {
+        if (choice <= 0 || choice > (int)quests.size()) {
+            tell_fmt("Я не предлагал%2$Gо||а тебе задание под таким номером, будь внимательнее!", client, ch);
+            return null;
+        }
+
+        int index;
+        QuestList::const_iterator q;
+        for (index = 1, q = quests.begin(); index != choice; index++, q++)
+            ;
+
+        result = *q;
+        return result;
+    }
+    
+    // Player is probably calling quest type by its name.    
+    for (auto &q: quests) {
+        
+        if (is_name(arg.c_str(), q->getName().c_str()) || is_name(arg.c_str(), q->getShortDescr().c_str())) {
+            
+            // No ambiguity allowed.
+            if (result) {
+                tell_fmt("У меня есть несколько заданий с таким названием, %1$C1. Скажи конкретнее, что ты хочешь?", client, ch);
+                tell_fmt("Например, {1{y{hcзадание попросить %3$s{hx{2 или {1{y{hcзадание попросить %4$s{hx{2.",
+                        client, ch, result->getShortDescr().c_str(), q->getShortDescr().c_str());
+                return null;
+            }
+
+            result = *q;
+        }
+    }
+
+    if (!result)
+        tell_fmt("Я не умею читать мысли, %1$C1. Укажи номер задания, название или {1{Y{lRлюбое{lEany{lx{2.", client, ch);
+
+    return result;
 }
 
 void Questor::give( Character *victim, Object *obj )

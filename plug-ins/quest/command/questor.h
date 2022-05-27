@@ -10,7 +10,9 @@
 #include "objectbehaviormanager.h"
 
 class Quest;
+class QuestRegistratorBase;
 class QuestReward;
+
 class Questor : public Wanderer {
 XML_OBJECT
 public:
@@ -34,6 +36,7 @@ private:
         void giveReward(PCharacter *client, ::Pointer<Quest> &quest, ::Pointer<QuestReward> &reward);
         void rewardScroll( PCharacter * );
         void rewardWord( PCharacter * );
+        ::Pointer<QuestRegistratorBase> parseQuestArgument(PCharacter *pch, const DLString &arg);
 };
 
 class QuestScrollBehavior : public BasicObjectBehavior {
