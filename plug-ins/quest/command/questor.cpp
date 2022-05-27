@@ -9,7 +9,7 @@
 #include "room.h"
 #include "skill.h"
 #include "skillmanager.h"
-
+#include "bonus.h"
 #include "wiznet.h"
 #include "skill_utils.h"
 #include "merc.h"
@@ -36,6 +36,7 @@
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
 RELIG(fili);
+BONUS(experience);
 
 /*--------------------------------------------------------------------------
  * Questor
@@ -89,6 +90,8 @@ void Questor::doComplete( PCharacter *client, DLString &args )
 
     // Issue reward only for quests that allow players to gain quest points.
     if (reward->points > 0) {
+        ostringstream buf;
+
         // Handle 'quest complete exp' syntax.
         bool fExpReward = (!arg.empty( ) && (arg.strPrefix( "experience" ) || arg.strPrefix("опыт")));
         if (fExpReward)
@@ -96,7 +99,16 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         else
             reward->exp = 0;
 
+        // Apply altar and calendar exp bonuses.
+        if (reward->exp > 0 && bonus_experience->isActive(client, time_info)) {
+            int xp = reward->exp;
+            reward->exp = number_range(xp + xp / 2, xp * 2);
+            bonus_experience->reportAction(client, buf);
+        }
+
         giveReward(client, quest, reward);
+        client->send_to(buf);
+
         quest->wiznet( "complete", "%s = %d Gold = %d Prac = %d WordChance = %d ScrollChance = %d",
                     (fExpReward ? "Exp" : "Qp"), (fExpReward ? reward->exp : reward->points), 
                     reward->gold, reward->prac, reward->wordChance, reward->scrollChance);
