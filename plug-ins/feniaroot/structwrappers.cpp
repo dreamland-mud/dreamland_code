@@ -678,6 +678,11 @@ NMI_GET( MaterialWrapper, gem, "среди материалов есть дра�
     return Register( material_is_typed( names.c_str(), MAT_GEM ) );
 }
 
+NMI_GET( MaterialWrapper, organic, "материал органического происхождения" )
+{
+    return Register( material_is_typed( names.c_str(), MAT_ORGANIC ) );
+}
+
 NMI_GET( MaterialWrapper, burns, "сколько тиков горит (-1 если тушит огонь)" )
 {
     return Register( material_burns( names.c_str() ) );
@@ -693,6 +698,10 @@ NMI_GET( MaterialWrapper, indestructible, "среди материалов ес�
     return Register( material_is_flagged(names.c_str(), MAT_INDESTR) );
 }
 
+NMI_GET( MaterialWrapper, tough, "среди материалов есть особо прочный (mithril etc.)" )
+{
+    return Register( material_is_flagged(names.c_str(), MAT_TOUGH) );
+}
 
 /*----------------------------------------------------------------------
  * Clan
