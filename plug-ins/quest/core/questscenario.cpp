@@ -5,6 +5,7 @@
 #include "questscenario.h"
 #include "questexceptions.h"
 
+#include "grammar_entities_impl.h"
 #include "core/object.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
@@ -91,6 +92,9 @@ QuestItemAppearence::QuestItemAppearence( )
 
 void QuestItemAppearence::dress( Object *obj ) const
 {
+    if (!gender.empty())
+        obj->gram_gender.fromString(gender.c_str());
+
     if (!name.empty( ))
         obj->setName( (name + " " + obj->pIndexData->name).c_str( ) );
         
@@ -102,6 +106,9 @@ void QuestItemAppearence::dress( Object *obj ) const
 
     if (!extraDesc.empty( ))
         obj->addExtraDescr( obj->getName( ), extraDesc );
+
+    if (!material.empty())
+        obj->setMaterial(material.c_str());
 
     SET_BIT( obj->wear_flags, wear.getValue( ) );
     SET_BIT( obj->extra_flags, extra.getValue( ) );

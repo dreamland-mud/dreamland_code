@@ -89,6 +89,8 @@ public:
     XML_VARIABLE XMLStringNoEmpty extraDesc;
     XML_VARIABLE XMLFlagsNoEmpty wear;
     XML_VARIABLE XMLFlagsNoEmpty extra;
+    XML_VARIABLE XMLStringNoEmpty gender;
+    XML_VARIABLE XMLStringNoEmpty material;
 
     void dress( Object * ) const;
 };
