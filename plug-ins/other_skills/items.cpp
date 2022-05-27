@@ -26,7 +26,7 @@ VOID_SPELL(GeneralPurpose)::run( Character *ch, Character *victim, int sn, int l
     dam = number_range( 25, 100 );
     if ( saves_spell( level, victim, DAM_PIERCE) )
         dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true, DAMF_OTHER);
+    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true, DAMF_WEAPON);
 }
 
 
@@ -39,7 +39,7 @@ VOID_SPELL(HighExplosive)::run( Character *ch, Character *victim, int sn, int le
     dam = number_range( 30, 120 );
     if ( saves_spell( level, victim, DAM_PIERCE) )
         dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true, DAMF_OTHER);
+    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true, DAMF_WEAPON);
 }
 
 SPELL_DECL(Sebat);

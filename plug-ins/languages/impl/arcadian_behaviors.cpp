@@ -149,7 +149,7 @@ bool BeerElementalBehavior::specFight( )
     oldact("$c1 дышит перегаром на $C4!", ch, 0, victim, TO_NOTVICT);
     
     try {
-        damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true, DAMF_WATER);
+        damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true, DAMF_SPELL);
         poison_effect( victim, ch, level, dam, TARGET_CHAR );
     } catch (const VictimDeathException &) {
     }
