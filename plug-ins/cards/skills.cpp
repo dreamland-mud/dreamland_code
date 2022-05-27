@@ -145,7 +145,7 @@ SKILL_RUNP( sconce )
     }
     else
     {
-        damage(ch,victim, ch->getModifyLevel() / 2,gsn_sconce,DAM_NONE,true);
+        damage(ch,victim, ch->getModifyLevel() / 2,gsn_sconce,DAM_NONE,true, DAMF_WEAPON);
         gsn_sconce->improve( ch, false, victim );
         
         yell_panic( ch, victim,

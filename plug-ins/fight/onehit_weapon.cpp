@@ -306,7 +306,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
         msgWeaponChar("%3$^O1 вытягива%3$nет|ют жизнь из %2$C2.");
 
         dam = number_range(1, wield->level / 5 + 1);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_NEGATIVE,false);
+        damage_nocatch(ch,victim,dam, weapon_sn,DAM_NEGATIVE,false, DAMF_WEAPON);
         ch->hit += dam*2;
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FLAMING) )
@@ -317,7 +317,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 
         dam = number_range(1,wield->level / 4 + 1);
         fire_effect( (void *) victim, ch, wield->level/2,dam,TARGET_CHAR);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_FIRE,false);
+        damage_nocatch(ch,victim,dam, weapon_sn,DAM_FIRE,false, DAMF_WEAPON);
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FROST) )
     {
@@ -327,7 +327,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 
         dam = number_range(1,wield->level / 6 + 2);
         cold_effect(victim, ch, wield->level/2,dam,TARGET_CHAR);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_COLD,false);
+        damage_nocatch(ch,victim,dam, weapon_sn,DAM_COLD,false, DAMF_WEAPON);
     }
     if (IS_WEAPON_STAT(wield,WEAPON_SHOCKING))
     {
@@ -337,7 +337,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 
         dam = number_range(1,wield->level/5 + 2);
         shock_effect(victim, ch, wield->level/2,dam,TARGET_CHAR);
-        damage_nocatch(ch,victim,dam, weapon_sn,DAM_LIGHTNING,false);
+        damage_nocatch(ch,victim,dam, weapon_sn,DAM_LIGHTNING,false, DAMF_WEAPON);
     }
     
     if (IS_WEAPON_STAT(wield, WEAPON_SPELL)) {

@@ -29,10 +29,10 @@ void        multi_hit_nocatch( Character *ch, Character *victim, string command 
 bool        next_attack( Character *ch, Character *victim, Skill &skill, int coef );
 void        one_hit( Character *ch, Character* victim, bool secondary = false, string command = "" );
 void        one_hit_nocatch( Character *ch, Character* victim, bool secondary = false, string command = "" );
-bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
-bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
-bool        damage( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
-bool        damage_nocatch( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
+bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag);
+bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag);
+bool        damage( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag);
+bool        damage_nocatch( Affect *paf, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag);
 void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason );
 void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show, const DLString &deathReason );
 void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);

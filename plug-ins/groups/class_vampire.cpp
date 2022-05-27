@@ -825,7 +825,7 @@ SKILL_RUNP( touch )
     }
     else
     {
-        damage(ch,victim,0,gsn_vampiric_touch,DAM_NONE, true);
+        damage(ch,victim,0,gsn_vampiric_touch,DAM_NONE, true, DAMF_WEAPON);
         gsn_vampiric_touch->improve( ch, false, victim );
         if ( !victim->is_npc() )
         {

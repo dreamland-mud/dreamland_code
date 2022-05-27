@@ -119,13 +119,13 @@ NMI_GET(AffectWrapper, source, "вернуть наиболее актуальн
         return ::wrap(ch);
 }
 
-NMI_INVOKE(AffectWrapper, damage, "(vict,dam,skillName[,damtype,damflags]): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
+NMI_INVOKE(AffectWrapper, damage, "(vict,dam,skillName,damtype,damflags): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
 {
     Character *victim = argnum2character(args, 1);
     int dam = argnum2number(args, 2);
     Skill *skill = argnum2skill(args, 3);
-    int dam_type = args.size() > 3 ? argnum2flag(args, 4, damage_table) : DAM_NONE;
-    bitstring_t damflags = args.size() > 4 ? argnum2flag(args, 5, damage_flags) : 0L;
+    int dam_type =argnum2flag(args, 4, damage_table);
+    bitstring_t damflags =argnum2flag(args, 5, damage_flags);
 
     return damage(&target, victim, dam, skill->getIndex( ), dam_type, true, damflags);
 }

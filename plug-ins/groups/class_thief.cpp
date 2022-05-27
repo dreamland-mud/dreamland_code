@@ -1224,7 +1224,7 @@ SKILL_RUNP( blackjack )
         }
         else
         {
-                damage(ch,victim, ch->getModifyLevel() / 2,gsn_blackjack,DAM_NONE,true);
+                damage(ch,victim, ch->getModifyLevel() / 2,gsn_blackjack,DAM_NONE,true, DAMF_WEAPON);
                 gsn_blackjack->improve( ch, false, victim );
 
                 yell_panic( ch, victim,

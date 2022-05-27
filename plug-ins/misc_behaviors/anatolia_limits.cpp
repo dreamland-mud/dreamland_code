@@ -295,7 +295,7 @@ int dam;
                 ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
         oldact_p("Перчатки $C2 обжигают твое лицо!",
                 ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
-        damage_nocatch( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
+        damage_nocatch( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false, DAMF_PRAYER);
         fire_effect( ch->fighting, ch, obj->level/2, dam/2, TARGET_CHAR );
     }
 }
@@ -330,7 +330,7 @@ int dam;
                 ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
         oldact_p("Нарукавники $C2 обжигают тебя!",
                 ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
-        damage_nocatch( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
+        damage_nocatch( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false, DAMF_PRAYER);
         fire_effect( ch->fighting, ch, obj->level/2, dam, TARGET_CHAR );
   }
   return;
@@ -366,7 +366,7 @@ int dam;
         oldact("Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT);
         oldact("Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR);
 
-        damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
+        damage_nocatch( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false, DAMF_PRAYER);
         fire_effect( ch->fighting, ch, obj->level,dam, TARGET_CHAR );
   }
   return;

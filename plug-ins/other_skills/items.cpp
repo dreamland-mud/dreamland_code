@@ -26,7 +26,7 @@ VOID_SPELL(GeneralPurpose)::run( Character *ch, Character *victim, int sn, int l
     dam = number_range( 25, 100 );
     if ( saves_spell( level, victim, DAM_PIERCE) )
         dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true);
+    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true, DAMF_OTHER);
 }
 
 
@@ -39,7 +39,7 @@ VOID_SPELL(HighExplosive)::run( Character *ch, Character *victim, int sn, int le
     dam = number_range( 30, 120 );
     if ( saves_spell( level, victim, DAM_PIERCE) )
         dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true);
+    damage_nocatch( ch, victim, dam, sn, DAM_PIERCE ,true, DAMF_OTHER);
 }
 
 SPELL_DECL(Sebat);
@@ -80,7 +80,7 @@ VOID_SPELL(Matandra)::run( Character *ch, Character *victim, int sn, int level )
   postaffect_to_char( ch, sn, 5 );
 
   dam = dice(level, 7);
-  damage_nocatch(ch,victim,dam,sn,DAM_HOLY, true);
+  damage_nocatch(ch,victim,dam,sn,DAM_HOLY, true, DAMF_PRAYER);
 }
 
 SPELL_DECL(Kassandra);
