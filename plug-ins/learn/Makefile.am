@@ -11,7 +11,6 @@ liblearn_la_LIBADD = \
 $(LIBADD_AI)
 
 liblearn_la_SOURCES = \
-allskillslist.cpp \
 cskills.cpp \
 train.cpp \
 glist.cpp \
