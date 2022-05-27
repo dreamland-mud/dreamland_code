@@ -20,6 +20,8 @@ void material_t::fromJson(const Json::Value &value)
     name = value["name"].asString();
     burns = value["burns"].asInt();
     floats = value["floats"].asInt();
+    weight = value["weight"].asInt();
+    hardness = value["hardness"].asInt();
     type.fromJson(value["type"]);
     flags.fromJson(value["flags"]);
     vuln.fromJson(value["vuln"]);

@@ -11,6 +11,8 @@ struct material_t {
     DLString name;
     int burns;
     int floats;
+    int weight;
+    int hardness;
     json_flag<&material_types> type;
     json_flag<&material_flags> flags;
     json_flag<&imm_flags> vuln;
