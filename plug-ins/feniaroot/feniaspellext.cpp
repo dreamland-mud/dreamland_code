@@ -606,18 +606,6 @@ NMI_INVOKE(FeniaCommandContext, cooldown, "(duration): наложить пост
     return Register();
 }
 
-NMI_INVOKE(FeniaCommandContext, takeMana, "(value): уменьшить ману персонажа на value; вернет false если не получилось")
-{
-    Character *myCh = arg2character(ch);
-    int mana = args2number(args);
-
-    if (myCh->mana < mana)
-        return false;
-
-    myCh->mana -= mana;
-    return true;
-}
-
 NMI_INVOKE(FeniaCommandContext, damApplyClass, "(): наложить бонусы от класса атакующего на размер повреждений")
 {
     if (dam == 0)

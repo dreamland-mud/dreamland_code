@@ -168,7 +168,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
             i++;
             continue;
         }
-        if (arg_oneof(t, "passive", "пасссивные")) {
+        if (arg_oneof(t, "passive", "пассивные")) {
             fPassive = true;
             i++;
             continue;
@@ -186,7 +186,10 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         }
 
         // Unknown garbage.
-        buf << "Неверный параметр '" << t << "', смотри {hc" << mycmd << " ?{hx для списка." << endl;
+        buf << fmt(0, 
+            "Неверный параметр '%1$s', подходящие фильтры: "
+            "{lRзаклинания{lEspells{lx, {lRнавыки{lEskills{lx, {lRпассивные{lEpassive{lx, "
+            "{lRактивные{lEactive{lx, название группы умений, диапазон уровней.\r\n", t.c_str());
         return false;
     }
 
@@ -368,6 +371,11 @@ void AllSkillsList::display( std::ostream & buf )
 
     if (!firstColumn) 
         buf << "                    |         |" << endl;
+
+    buf << fmt(0, 
+        "Также используй фильтры "
+        "{y{hc%1$s {lRзаклинания{lEspells{x, {y{hc%1$s {lRнавыки{lEskills{x, {y{hc%1$s {lRпассивные{lEpassive{x, "
+        "{y{hc%1$s {lRактивные{lEactive{x, группа умений и диапазон уровней (например, 10 или 10 42)\r\n", mycmd.c_str());
 
     buf << endl << "См. также {y{hc" << mycmd << " ?{x." << endl;
 }
