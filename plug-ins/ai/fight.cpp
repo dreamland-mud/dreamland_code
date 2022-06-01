@@ -145,59 +145,7 @@ void BasicMobileBehavior::fight( Character *victim )
     if (ch->wait > 0)
         return;
 
-    
-    /* TODO: remove the following block once implemented in global onFightAI */
     gprog("onFightAI", "C", ch);
-
-    const char *cmd = 0;
-
-    switch (number_range(0, 7)) {
-    case (0) :
-        if (IS_SET(ch->off_flags, OFF_BASH))
-            cmd = "smash";
-        break;
-
-    case (1) :
-        if (!IS_AFFECTED(ch,AFF_BERSERK)) {
-            if (gsn_tiger_power->usable( ch ))
-                cmd = "tiger";
-            else if (IS_SET(ch->off_flags,OFF_BERSERK))
-                cmd = "berserk";
-        }
-        break;
-
-    case (2) :
-        if (gsn_disarm->usable( ch ) && !(get_eq_char( victim, wear_wield ) == 0))
-            cmd = "disarm";       
-        break;
-
-    case (3) :
-        if (IS_SET(ch->off_flags,OFF_KICK))
-            cmd = "kick";
-        break;
-
-    case (4) :
-        if (IS_SET(ch->off_flags,OFF_KICK_DIRT))
-            cmd = "dirt";
-        break;
-
-    case (5) :
-        if (IS_SET(ch->off_flags,OFF_TAIL))
-            cmd = "tail";
-        break;
-
-    case (6) :
-        if (IS_SET(ch->off_flags,OFF_TRIP))
-            cmd = "trip";
-        break;
-    case (7) :
-        if (IS_SET(ch->off_flags,OFF_CRUSH))
-            cmd = "crush";
-        break;
-    }
-
-    if (cmd)
-        interpret_raw( ch, cmd );
 }
 
 
