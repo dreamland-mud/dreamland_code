@@ -146,7 +146,7 @@ bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gol
         return false;
     }
     if (amount == 0) {
-        ch->pecho( "Ноль монет, это как?" );
+        ch->pecho( "Ноль монет -- это как?" );
         return false;
     }
 
@@ -1507,7 +1507,7 @@ static void give_money( Character *ch, char *arg1, char *arg2, char *argument, i
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-            ch->pecho("Нет этого тут.");
+            ch->pecho("Здесь таких нет.");
             return;
     }
 
@@ -1543,7 +1543,7 @@ CMDRUNP( give )
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-        ch->pecho("Тому, кого нет здесь?.");
+        ch->pecho("Здесь таких нет.");
         return;
     }
     
@@ -1666,7 +1666,7 @@ CMDRUNP( use )
     argument = one_argument( argument, arg );
 
     if (!arg[0]) {
-        ch->pecho("Воспользоваться чем?");
+        ch->pecho("Использовать что?");
         return;
     }
 
