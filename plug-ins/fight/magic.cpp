@@ -126,21 +126,21 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             if (ch && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
 				if (ch != victim)
                 	ch->pecho("%^N1 {1{Gочень слабо{2 влияет на %C4.", 
-                        	damage_table.message(dam_type).c_str(), victim);
+                    	damage_table.message(dam_type).c_str(), victim);
 				else 
                 	ch->pecho("%^N1 {1{Gочень слабо{2 влияет на тебя.", 
-                        	damage_table.message(dam_type).c_str());					
+                    	damage_table.message(dam_type).c_str());					
 			}
             break;
         case RESIST_VULNERABLE:
             save -= mlevel / 5;
             if (ch && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
 				if (ch != victim)
-                	ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на %C4., 
-                        	damage_table.message(dam_type).c_str(), victim);
+                	ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на %C4.", 
+                    	damage_table.message(dam_type).c_str(), victim);
 				else
                 	ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на тебя.", 
-                        	damage_table.message(dam_type).c_str());					
+                    	damage_table.message(dam_type).c_str());					
 			}
             break;
     }
