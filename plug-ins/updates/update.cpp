@@ -348,13 +348,6 @@ void char_update( )
         // Special mobs don't get their HP or position updated automatically.
         bool noupdate = ch->is_npc() && IS_SET(ch->getNPC()->act, ACT_NOUPDATE);
 
-        // FENIA: onArea for mob vnum 17
-        if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
-            oldact("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM);
-            extract_char( ch );
-            continue;
-        }
-
         // Reset hunters path find.
         if (!ch->is_npc() && ch->getClan( ) == clan_hunter)
         {
@@ -367,33 +360,6 @@ void char_update( )
             {
                 gsn_path_find->improve( ch, false );
             }
-        }
-
-        // FENIA: onUpdateChar for 'chill touch' affect. Desert warmth cancels frostbite with 50% chance.
-        if (ch->isAffected(gsn_chill_touch) && ch->in_room->getSectorType() == SECT_DESERT && number_percent( ) < 50)
-            checkDispel(ch->getModifyLevel( ),ch,gsn_chill_touch);
-        
-        // FENIA: onUpdateChar for 'caltraps' affect. Remove caltraps effect after fight off
-        if ( ch->isAffected(gsn_caltraps) && !ch->fighting)
-        {
-            room_to_save( ch );
-            affect_strip(ch,gsn_caltraps);
-        }
-        
-        // FENIA: onUpdateChar for 'vampire' affect.
-        if (ch->is_vampire( )) {
-            if (is_bright_for_vampire( ch ))
-            {
-                interpret( ch, "human" );
-            }
-        }
-        
-        // FENIA: onUpdateChar for 'vampire' affect. Reset sneak for vampire.
-        if (!(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK) && IS_VAMPIRE(ch) && !MOUNTED(ch))
-        {
-            ch->pecho("Ты пытаешься двигаться незаметно.");
-            SET_BIT(ch->affected_by ,AFF_SNEAK);
-            room_to_save( ch );
         }
 
         // Reset native sneak outside of battle.
@@ -423,6 +389,7 @@ void char_update( )
         }
         
         // FENIA: onUpdateChar for 'stuck item' affect (or existing spear, arrow affects). Remove effects from extracted arrows.
+		// TO-DO (RUFFINA): Needs actual stuck_item effect and some missile refactoring
         if (get_eq_char(ch, wear_stuck_in) == 0) {
             room_to_save( ch );
             if (ch->isAffected(gsn_arrow))
