@@ -55,9 +55,10 @@ CMDRUNP( iidea )
         return;
     }
 
+	txt = fmt(0, "от %1$C2]: %2$s", ch, txt.c_str());
 	// Let's experiment and see if this will be abused -- can always mute abusers
-	send_to_discord_stream(":bulb: [**Идейка**]: " + txt);
-	send_telegram("[Идейка]: " + txt);
+	send_to_discord_stream(":bulb: [**Идейка** " + txt);
+	send_telegram("[Идейка " + txt);
     
     bugTracker->reportMessage("idea", ch, txt);
     ch->pecho( "Идейка записана.");
