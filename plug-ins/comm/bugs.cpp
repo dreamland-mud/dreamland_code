@@ -5,6 +5,7 @@
 #include "bugtracker.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "messengers.h"
 
 CMDRUNP( nohelp )
 {
@@ -50,12 +51,16 @@ CMDRUNP( iidea )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->pecho("О какой именно идее ты хочешь сообщить?");
+        ch->pecho("Какой именно идейкой ты хочешь поделиться?");
         return;
     }
 
+	// Let's experiment and see if this will be abused -- can always mute abusers
+	send_to_discord_stream(":bulb: " + txt);
+	send_telegram(txt);
+    
     bugTracker->reportMessage("idea", ch, txt);
-    ch->pecho( "Идея записана.");
+    ch->pecho( "Идейка записана.");
 }
 
 /** 
