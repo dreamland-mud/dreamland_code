@@ -6,6 +6,7 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "messengers.h"
+#include "act.h"
 
 CMDRUNP( nohelp )
 {
