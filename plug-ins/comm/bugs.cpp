@@ -56,8 +56,8 @@ CMDRUNP( iidea )
     }
 
 	// Let's experiment and see if this will be abused -- can always mute abusers
-	send_to_discord_stream(":bulb: " + txt);
-	send_telegram(txt);
+	send_to_discord_stream(":bulb: [**Идейка**]: " + txt);
+	send_telegram("[Идейка]: " + txt);
     
     bugTracker->reportMessage("idea", ch, txt);
     ch->pecho( "Идейка записана.");
