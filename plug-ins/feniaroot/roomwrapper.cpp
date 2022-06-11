@@ -210,6 +210,15 @@ NMI_GET( RoomWrapper, clan, "имя клана, которому принадл�
     return Register( target->pIndexData->clan->getShortName( ) );
 }
 
+NMI_GET( RoomWrapper, guilds, "гильдии в этой комнате" )
+{
+    checkTarget();
+	if (!target->pIndexData->guilds.empty( ))
+    	return Register( target->pIndexData->guilds.toString().c_str() );
+	else 
+		return Register("");
+}
+
 static Scripting::Register get_direction( Room *r, int dir )
 {
     if (r->exit[dir])
