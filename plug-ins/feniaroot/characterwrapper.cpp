@@ -1046,6 +1046,15 @@ NMI_GET( CharacterWrapper, charmed, "true если очарован и есть 
     return IS_CHARMED(target);
 }
 
+NMI_GET( CharacterWrapper, vampire, "true если персонаж в форме вампира или моб-вампир" )
+{
+    checkTarget();
+    if (!target->is_npc())
+        return target->is_vampire();
+    else
+        return IS_MOB_VAMPIRE(target);
+}
+
 NMI_GET(CharacterWrapper, followers, "список существ, у которых персонаж master" )
 {
     checkTarget();
