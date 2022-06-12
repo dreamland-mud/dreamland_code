@@ -577,3 +577,13 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
 
     return buf.str();
 }
+
+
+void BasicSkill::show( PCharacter *ch, std::ostream & buf ) const
+{
+    buf << print_what(this) << " "
+        << print_names_for(this, ch)
+        << print_group_for(this, ch)
+        << ".{x" << endl
+        << printWaitAndMana(ch);
+}

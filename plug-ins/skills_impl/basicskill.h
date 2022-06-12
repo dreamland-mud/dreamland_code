@@ -68,6 +68,9 @@ public:
 
     // Autohelp rendering.
 
+    /** Format help article for 'other' skill. This method is overriden for most skill types. */
+    virtual void show( PCharacter *, ostream & buf ) const;
+
     /** Output bonus/penalty to skill level. */
     DLString printLevelBonus(PCharacter *ch) const;
     
