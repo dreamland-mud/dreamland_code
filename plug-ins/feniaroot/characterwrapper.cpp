@@ -1757,7 +1757,7 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype[,label]): нанес
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
+NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags[,show]): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
 {
     checkTarget( );
     Character *victim = argnum2character(args, 1);
@@ -1765,8 +1765,9 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags): н
     Skill *skill = argnum2skill(args, 3);
     int dam_type = argnum2flag(args, 4, damage_table);
     bitstring_t damflags = argnum2flag(args, 5, damage_flags);
+    bool show = args.size() > 5 ? argnum2boolean(args, 6) : true;
 
-    return ::damage(target, victim, dam, skill->getIndex( ), dam_type, true, damflags);
+    return ::damage(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
 }
 
 NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один удар оружием" )
