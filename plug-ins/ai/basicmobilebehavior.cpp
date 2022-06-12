@@ -212,6 +212,10 @@ void BasicMobileBehavior::setLastCharmTime()
     lastCharmTime = dreamland->getCurrentTime( );
 }
 
+void BasicMobileBehavior::unsetLastCharmTime()
+{
+    lastCharmTime = 0;
+}
 
 /*
  * BasicMobileBehavior - returning to home position 
@@ -265,6 +269,7 @@ bool BasicMobileBehavior::backHome( bool fAlways )
         if (ch->in_room == home) {
             ch->position = ch->default_pos;
             homeVnum = 0;
+            unsetLastCharmTime();
             return false;
         }
     }
@@ -276,6 +281,7 @@ bool BasicMobileBehavior::backHome( bool fAlways )
 
     ch->position = ch->default_pos;
     homeVnum = 0;
+    unsetLastCharmTime();
     return false;
 }
 

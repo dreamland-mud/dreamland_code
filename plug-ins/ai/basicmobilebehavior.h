@@ -52,6 +52,7 @@ public:
     virtual bool isAfterCharm( ) const;
     virtual long long getLastCharmTime() const;
     void setLastCharmTime();
+    void unsetLastCharmTime();
 
     void rememberFought(Character *victim);
 

@@ -873,6 +873,16 @@ NMI_GET(CharacterWrapper, adrenaline, "полна ли кровь адренал
     return target->is_adrenalined();
 }
 
+NMI_GET(CharacterWrapper, afterCharm, "очарован или недавно раз-очарован")
+{
+    checkTarget();
+    if (target->is_npc())
+        return target->getNPC()->behavior && target->getNPC()->behavior->isAfterCharm();
+    else
+        return IS_CHARMED(target);
+}
+
+
 
 NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
