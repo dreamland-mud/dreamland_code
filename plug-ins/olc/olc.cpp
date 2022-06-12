@@ -534,7 +534,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    const int maxlines = 40;
+    const int maxlines = 100;
 
     // Show size info for the first 40 mobs that don't have "sizeConfirmed" attribute. 
     // [clear] button removes mob's size override, [keep] button confirms size override.
@@ -619,15 +619,15 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         int cnt = 0;
         buf << endl;
 
-        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
             Race *race = raceManager->find(pMob->race);
             if (!race || !race->isValid()) {
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
-            if (pMob->properties.count("hidden") > 0)
-                continue;
+//            if (pMob->properties.count("hidden") > 0)
+//                continue;
 
             bitstring_t raceParts = race->getParts();
             bitstring_t mobParts = pMob->parts;
@@ -648,13 +648,16 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 + (dels ? web_cmd(ch, "abc reset part " + vnum + " del", "reset") + "]{x" : "")
                 + "   [" + web_cmd(ch, "abc hide part " + vnum, "hide") + "]"
                 + "\n\r";
-            buf << fmt(0, line.c_str(),
-                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
-                part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
+
+            if (cnt <= maxlines)
+                buf << fmt(0, line.c_str(),
+                    pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                    part_flags.names(adds).c_str(), part_flags.names(dels).c_str());
 
             cnt++;
         }
 
+        buf << "Found " << cnt << " mobs." << endl;
         page_to_char(buf.str().c_str(), ch);
         return;
     }
@@ -664,15 +667,15 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         int cnt = 0;
         buf << endl;
         
-        for (int i = 0; i < MAX_KEY_HASH && cnt < maxlines; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob && cnt < maxlines; pMob = pMob->next) {
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
             Race *race = raceManager->find(pMob->race);
             if (!race || !race->isValid()) {
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
-            if (pMob->properties.count("hidden") > 0)
-                continue;
+//            if (pMob->properties.count("hidden") > 0)
+ //               continue;
 
             bitstring_t raceForm = race->getForm();
             bitstring_t mobForm = pMob->form;
@@ -693,14 +696,17 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 + (dels ? web_cmd(ch, "abc reset form " + vnum + " del", "reset") + "]{x" : "")
                 + "   [" + web_cmd(ch, "abc hide form " + vnum, "hide") + "]"
                 + "\n\r";
-            buf << fmt(0, line.c_str(),
-                pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
-                form_flags.names(adds).c_str(), 
-                form_flags.names(dels).c_str());
+
+            if (cnt <= maxlines)
+                buf << fmt(0, line.c_str(),
+                    pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                    form_flags.names(adds).c_str(), 
+                    form_flags.names(dels).c_str());
 
             cnt++;
         }
 
+        buf << "Found " << cnt << " mobs." << endl;
         page_to_char(buf.str().c_str(), ch);
         return;
     }
