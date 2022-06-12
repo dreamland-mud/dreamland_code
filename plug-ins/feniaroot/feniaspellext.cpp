@@ -590,7 +590,16 @@ NMI_INVOKE(FeniaSpellContext, waitSameRoom, "(seconds): пауза на указ
     return Register();
 }
 
+NMI_SET(FeniaCommandContext, vict, "персонаж, цель команды - как синоним victim")
+{
+    Character *v = arg2character(arg);
+    vict = FeniaManager::wrapperManager->getWrapper(v); // Huh?
+}
 
+NMI_SET(FeniaCommandContext, victim, "персонаж, цель команды - как синоним vict")
+{
+    return nmiSet<nmi::vict>(arg);
+}
 
 NMI_GET(FeniaCommandContext, skill, "прототип умения для этой команды (.Skill())")
 {
