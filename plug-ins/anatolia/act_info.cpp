@@ -2145,7 +2145,8 @@ struct FuzzySearch {
     void printResults(Character *ch) 
     {
         ostringstream buf;
-        int max_output = 5;    
+        int max_output = 5; 
+        int firstId = -1;   
 
         buf << "Справка не найдена. Возможно, имелось в виду:" << endl;
 
@@ -2154,18 +2155,29 @@ struct FuzzySearch {
             auto & matches = candidates[i];
 
             for (auto &pair: matches) {
-                buf << "    ";
-                if (pair.second->getID() > 0)
-                    buf << "{hh" << pair.second->getID();
+                int id = pair.second->getID();
+                DLString hint = pair.first;
+                DLString title = pair.second->getTitle(DLString::emptyString);
+                
+                // For example:  {hh123beer{x: [{C{hh123{x] Spell 'beer armor'
+                buf << fmt(0, "  {hh%d%-20s{x: [{C{hh%5d{x] %s\r\n",
+                          id,
+                          hint.c_str(),
+                          id,
+                          title.c_str());
 
-                buf << pair.first << "{x "
-                    << "(" << pair.second->getTitle(DLString::emptyString).colourStrip() << ")" 
-                    << endl;
+                if (firstId <= 0)
+                    firstId = id;
 
                 if ((--max_output) <= 0)
                     break;
             }
         }
+
+        if (firstId > 0)
+            buf << endl
+                << "Для уточнения поиска смотри справку по нужному номеру, например, "
+                << "{y{hcсправка " << firstId << "{x." << endl;        
 
         ch->send_to(buf);
     }
