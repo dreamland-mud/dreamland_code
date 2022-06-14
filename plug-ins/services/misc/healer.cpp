@@ -256,6 +256,7 @@ static void mprog_heal( Character *mob, Character *client, const DLString &args 
     FENIA_NDX_VOID_CALL(mob->getNPC(), "Heal", "CCs", mob, client, args.c_str());
 }
 
+/*
 CMDRUN( heal )
 {
     DLString argument = constArguments;
@@ -286,6 +287,7 @@ CMDRUN( heal )
 
     mprog_heal(healer->getChar(), ch, argument);
 }
+*/
 
 /*------------------------------------------------------------------------
  * CustomHealPrice 
