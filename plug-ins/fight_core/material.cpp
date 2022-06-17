@@ -136,6 +136,28 @@ int material_burns( const char *materials )
     return max_burn;
 }
 
+int material_rho( Object *obj )
+{
+    return material_rho(obj->getMaterial());
+}
+
+int material_rho( const char *materials )
+{
+    int rho = 0;
+	int i = 0;
+    vector<const material_t *> result;
+
+    material_parse( materials, result );
+    
+    for (auto &mat: result) {
+		i++;
+		rho = rho + mat->rho;
+	}
+	if (i = 0) i++; // sanity check
+	rho = rho / i; // find everage density
+    return rho;
+}
+
 DLString material_rname(Object *obj) 
 {
     return material_rname(obj->getMaterial());
