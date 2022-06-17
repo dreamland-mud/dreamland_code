@@ -153,7 +153,7 @@ int material_rho( const char *materials )
 		i++;
 		rho = rho + mat->rho;
 	}
-	if (i = 0) i++; // sanity check
+	if (i == 0) i++; // sanity check
 	rho = rho / i; // find everage density
     return rho;
 }
