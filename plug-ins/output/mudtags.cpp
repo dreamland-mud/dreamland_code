@@ -95,10 +95,10 @@ void ColorTags::run( ostringstream &out )
         parse_color_web( out );
 }
 
-static const char valid_colors[16] = { 'x', 'b', 'c', 'g', 'm', 'r', 'w', 'y', 'B', 'C', 'G', 'M', 'R', 'W', 'Y', 'D' };
+static const char valid_colors[17] = { 'x', 'X', 'b', 'c', 'g', 'm', 'r', 'w', 'y', 'B', 'C', 'G', 'M', 'R', 'W', 'Y', 'D' };
 static bool is_valid_color( char c )
 {
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 17; i++)
         if (valid_colors[i] == c)
             return true;
     return false;
@@ -144,6 +144,7 @@ void ColorTags::parse_color_web( ostringstream &out )
             break;
 
         // total reset
+        case 'X':
         case 'x':
             reset( );
             /* FALLTHROUGH */;
@@ -229,6 +230,7 @@ void ColorTags::parse_color_ansi( ostringstream &out )
             break;
 
         // total reset
+        case 'X':
         case 'x':
             reset( );
             if (!raw)
@@ -281,6 +283,7 @@ const char * ColorTags::color_tag_ansi( )
 
     switch (t) {
     default:
+    case 'X':
     case 'x':        return CLEAR C_WHITE;
     case 'b':        return C_BLUE;             
     case 'c':        return C_CYAN;             
@@ -592,6 +595,7 @@ void VisibilityTags::run( ostringstream &out )
         // Total reset, but leave {x there for color parser to pick up.
         // Ideally each tag should reset individually, but historically many
         // texts rely on this 'total reset' sequence.
+        case 'X':
         case 'x':
             hyper_tag_end( out );
             reset( );
