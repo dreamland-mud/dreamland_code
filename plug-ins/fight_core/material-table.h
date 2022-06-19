@@ -12,7 +12,7 @@ struct material_t {
     int burns;
     int floats;
     int hardness;
-    int density;
+    int rho;
     json_flag<&material_types> type;
     json_flag<&material_flags> flags;
     json_flag<&imm_flags> vuln;
