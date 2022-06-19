@@ -397,10 +397,6 @@ bool BasicMobileBehavior::spell( Character *caster, int sn, bool before )
         if (!beforeSpell || !IS_CHARMED(ch))
             return false;
 
-        if (number_percent( ) < (4 + ch->getModifyLevel( ) 
-                                   - caster->getModifyLevel( )) * 10)
-            memoryFought.remember( caster );
-        
         setLastCharmTime();
         remember( ch->in_room );
 
