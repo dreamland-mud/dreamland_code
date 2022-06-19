@@ -59,36 +59,6 @@ void BasicMobileBehavior::attackDumb( Character *victim )
 void BasicMobileBehavior::attackSmart( Character *victim )
 {   
     gprog("onAttackAI", "CC", ch, victim);
-
-    /* TODO: remove the following code once global onAttackAI is implemented. */     
-    const char *cmd = 0;
-    static const SpellChance spellTable [] = {
-        { gsn_blindness,     50 },
-        { gsn_faerie_fire,   50 }, 
-        { gsn_dispel_affects, 100 },
-        { gsn_curse,        100 },
-        { gsn_none,          -1 }
-    };
-
-    if (gsn_backstab->usable( ch ) && get_eq_char( ch, wear_wield ) && chance( 80 ))
-        cmd = "backstab";
-    else 
-    if (gsn_smash->usable( ch ) && chance( 80 )) 
-        cmd = "smash";
-    else 
-    if (gsn_dirt_kicking->usable( ch )) 
-        cmd = "dirt";
-    else 
-    if (gsn_bash->usable( ch ) && get_eq_char( ch, wear_shield )) 
-        cmd = "bash";
-
-    if (cmd) 
-        interpret_raw( ch, cmd, victim->getNameC() );
-    else 
-        SpellChanceTable( spellTable, ch, victim ).castSpell( );
-        
-    if (!ch->fighting)
-        multi_hit( ch, victim , "murder" );
 }
 
 
