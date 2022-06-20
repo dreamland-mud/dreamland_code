@@ -30,9 +30,9 @@ DLString web_cmd(Descriptor *d, const DLString &cmd, const DLString &seeFmt)
 DLString web_cmd_placeholder(const DLString &_cmd, const DLString &_seeFmt, const DLString &placeholder)
 {
     ostringstream buf;
-    DLString cmd = cmd.colourStrip();
-    DLString seeFmt = seeFmt.colourStrip();
-
+    DLString cmd = _cmd.colourStrip();
+    DLString seeFmt = _seeFmt.colourStrip();
+    
     buf << "{Iw[cmd=" << cmd << ",see=" << seeFmt << ",nonce=" << placeholder << "]"
         << "{IW" << seeFmt << "{Ix";
 

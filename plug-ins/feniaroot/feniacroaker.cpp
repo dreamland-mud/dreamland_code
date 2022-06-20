@@ -43,11 +43,12 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
     // Try our best to guess the codesource where the buggy code is originating from.
     if (wrapper && wrapper->triggerFunction(key, prog)) {
         const CodeSource::Pointer &codeSource = prog.toFunction()->getFunction()->source.source;    
-        DLString messageFormat = 
-            "Исключение при вызове [" +  
-            web_cmd_placeholder("cs web $1", "%d", NONCE_PLACEHOLDER) + 
-            "] %s %s:{x\n%s\n";
-        message = fmt(0, messageFormat.c_str(), 
+        ostringstream messageFormat;
+        messageFormat 
+            << "Исключение при вызове ["
+            << web_cmd_placeholder("cs web $1", "%1$d", NONCE_PLACEHOLDER)
+            << "] %2$s %3$s:{x\n%4$s\n";
+        message = fmt(0, messageFormat.str().c_str(), 
                        codeSource->getId(), codeSource->name.c_str(), key.toString().c_str(), e.what());
 
     } else {
@@ -59,7 +60,8 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
 
 void FeniaCroaker::wiznet(const DLString &exceptionMessage)
 {
-    DLString crystalOrbMessage = fmt(0, "{CТихий голос из хрустального шара фенера: {W%s{x", exceptionMessage.c_str());
+    DLString crystalOrbMessage = 
+        fmt(0, "{CТихий голос из хрустального шара фенера: {W%s{x", exceptionMessage.c_str());
 
     for (Descriptor *d = descriptor_list; d; d = d->next) {
         if (d->connected == CON_PLAYING
