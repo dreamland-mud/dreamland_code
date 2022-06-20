@@ -17,8 +17,25 @@ DLString web_cmd(Descriptor *d, const DLString &cmd, const DLString &seeFmt)
     if (!is_websock(d))
         return seeFmt;
 
-
     buf << "[cmd=" << cmd.colourStrip() << ",see=" << seeFmt.colourStrip() << ",nonce=" << d->websock.nonce << "]";
+    return buf.str();
+}
+
+/** 
+ * Prepares a command tag but without a concrete nonce. The nonce will be
+ * inserted later when the target player is known. Can be used to prepare output to many
+ * users at once. Example output:
+ * {Iw[cmd=shrug,see=shrug your shoulders,nonce=NONCE]{IWshrug your shoulders{Ix
+ */
+DLString web_cmd_placeholder(const DLString &_cmd, const DLString &_seeFmt, const DLString &placeholder)
+{
+    ostringstream buf;
+    DLString cmd = cmd.colourStrip();
+    DLString seeFmt = seeFmt.colourStrip();
+
+    buf << "{Iw[cmd=" << cmd << ",see=" << seeFmt << ",nonce=" << placeholder << "]"
+        << "{IW" << seeFmt << "{Ix";
+
     return buf.str();
 }
 
