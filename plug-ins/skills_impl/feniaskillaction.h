@@ -92,7 +92,7 @@ public:
     static bool executeSpellRun(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
     static bool executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);    
     static bool executeCommandRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);
-    static bool executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
+    static bool executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level, bool &rc);
     static bool spellHasTrigger(Spell *spell, const DLString &trigName);
 
 private:
@@ -100,7 +100,7 @@ private:
     static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);    
     static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
     static DLString getMethodSuffix(::Pointer<SpellTarget> &spellTarget);
-    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx);
+    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx, bool &rc);
 };
 
 

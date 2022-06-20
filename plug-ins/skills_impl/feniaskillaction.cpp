@@ -153,33 +153,32 @@ void FeniaSkillActionHelper::extractWrapper(SkillCommand *cmd)
 
 bool FeniaSkillActionHelper::executeSpellRun(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
+    bool rcIgnored;
     FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
     // Figure out applicable runXXX method and call it, if defined on the spell wrapper.
-    bool rc = executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx);
-
-    return rc;
+    return executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx, rcIgnored);
 }
 
 bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level)
 {
+    bool rcIgnored;
     FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
     // Figure out applicable applyXXX method and call it, if defined on the spell wrapper.
-    bool rc = executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx);
-
-    return rc;
+    return executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx, rcIgnored);
 }
 
 bool FeniaSkillActionHelper::executeCommandRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target)
 {
-    return executeMethod(cmd, "run", createContext(cmd, ch, target));
+    bool rcIgnored;
+    return executeMethod(cmd, "run", createContext(cmd, ch, target), rcIgnored);
 }
 
-bool FeniaSkillActionHelper::executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level)
+bool FeniaSkillActionHelper::executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level, bool &rc)
 {
-    return executeMethod(cmd, "apply", createContext(cmd, ch, victim, level));
+    return executeMethod(cmd, "apply", createContext(cmd, ch, victim, level), rc);
 }
 
-bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx)
+bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx, bool &rc)
 {
     // Find method defined on the wrapper.
     WrapperBase *wrapper = wtarget->getWrapper();
@@ -191,9 +190,9 @@ bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLStrin
     if (!wrapper->triggerFunction(methodId, method))
         return false;
 
-    // Invoke the function with the provided context.
+    // Invoke the function with the provided context, save its return value for further use.
     try {
-        method.toFunction()->invoke(Register(ctx->getSelf()), RegisterList());
+        rc = method.toFunction()->invoke(Register(ctx->getSelf()), RegisterList()).toBoolean();
 
     } catch (const CustomException &ce) {
         // Propagate exception further on victim's death.
