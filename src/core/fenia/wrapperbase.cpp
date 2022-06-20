@@ -71,21 +71,26 @@ get_wrapper(Scripting::Object *obj)
 
 void WrapperBase::postpone( Register id, const char *fmt, ... )
 {
-    RegisterList regList;
-    Register prog;
+    RegisterList progArgs;
+    Register progFun;
     va_list ap;
 
-    if (!triggerFunction(id, prog))
+    if (!triggerFunction(id, progFun))
         return;
     
     va_start(ap, fmt);
-    triggerArgs(regList, fmt, ap);
+    triggerArgs(progArgs, fmt, ap);
     va_end(ap);
 
+    postpone(progFun, progArgs);
+}
+
+void WrapperBase::postpone(const Register &progFun, const RegisterList &progArgs)
+{
     FeniaProcess::Pointer fp(NEW);
-    fp->args.assign(regList.begin(), regList.end());
+    fp->args.assign(progArgs.begin(), progArgs.end());
     fp->thiz = Register(self);
-    fp->fun = prog;
+    fp->fun = progFun;
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(fp);

@@ -192,7 +192,9 @@ bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLStrin
 
     // Invoke the function with the provided context, save its return value for further use.
     try {
-        rc = method.toFunction()->invoke(Register(ctx->getSelf()), RegisterList()).toBoolean();
+        Register returnValue = method.toFunction()->invoke(Register(ctx->getSelf()), RegisterList());
+        if (returnValue.type != Register::NONE)
+            rc = returnValue.toBoolean();
 
     } catch (const CustomException &ce) {
         // Propagate exception further on victim's death.

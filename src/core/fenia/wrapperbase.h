@@ -20,6 +20,7 @@ namespace Scripting {
 class Object;
 };
 using Scripting::Register;
+using Scripting::RegisterList;
 
 class WrapperBase : public virtual Scripting::Handler, 
                     public virtual Scripting::Native, 
@@ -41,6 +42,7 @@ public:
 
     bool call( Register id, const char *fmt, ... );
     void postpone( Register id, const char *fmt, ... );
+    void postpone(const Register &progFun, const RegisterList &progArgs);
     DLString stringCall( Register id, const char *fmt, ... );
     bool numberCall( Register id, int &result, const char *fmt, ... );
 
