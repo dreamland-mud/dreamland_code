@@ -24,6 +24,7 @@
 #include "object.h"
 #include "room.h"
 
+#include "fight_exception.h"
 #include "subprofession.h"
 #include "screenreader.h"
 #include "profflags.h"
@@ -1866,7 +1867,7 @@ NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label[,damtype]]]])
         damtype = argnum2flag(args, 4, damage_table);
     
     raw_kill( target, part, killer, label, damtype );
-    return Register( );
+    throw VictimDeathException();
 }
 
 NMI_INVOKE( CharacterWrapper, affectAdd, "(.Affect): повесить новый аффект" )

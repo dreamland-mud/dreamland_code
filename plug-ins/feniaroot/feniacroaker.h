@@ -19,6 +19,7 @@ public:
 
 private:
     static void wiznet(const DLString &message);
+    static bool isFiltered(const ::Exception &e);
 };
 
 #endif

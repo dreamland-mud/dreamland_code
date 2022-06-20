@@ -24,6 +24,7 @@ public:
     virtual ~Exception( ) throw ();
     
     virtual const char* what( ) const throw ();
+    inline const string & getMessage() const;
     void setStr( const string& str );
     void printStackTrace( std::ostream &os = std::cerr ) const;
 
@@ -35,6 +36,10 @@ private:
 };
 
 
+inline const string & Exception::getMessage() const
+{
+    return message;
+}
 
 inline ostream& 
 operator << ( ostream& ostr, Exception ex )

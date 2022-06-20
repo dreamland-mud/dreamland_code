@@ -4,10 +4,13 @@
 #include "wrapperbase.h"
 #include "pcharacter.h"
 #include "codesource.h"
+#include "websocketrpc.h"
 #include "descriptor.h"
 #include "act.h"
 
 using namespace Scripting;
+
+DLString NONCE_PLACEHOLDER = "NONCE";
 
 bool has_fenia_security( PCMemoryInterface *pch );
 
@@ -34,10 +37,17 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
     Register prog;
     DLString message;
 
+    if (isFiltered(e))
+        return;
+
     // Try our best to guess the codesource where the buggy code is originating from.
     if (wrapper && wrapper->triggerFunction(key, prog)) {
         const CodeSource::Pointer &codeSource = prog.toFunction()->getFunction()->source.source;    
-        message = fmt(0, "Исключение при вызове [%d] %s %s:{x\n%s\n", 
+        DLString messageFormat = 
+            "Исключение при вызове [" +  
+            web_cmd_placeholder("cs web $1", "%d", NONCE_PLACEHOLDER) + 
+            "] %s %s:{x\n%s\n";
+        message = fmt(0, messageFormat.c_str(), 
                        codeSource->getId(), codeSource->name.c_str(), key.toString().c_str(), e.what());
 
     } else {
@@ -47,9 +57,9 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
     wiznet(message);
 }
 
-void FeniaCroaker::wiznet(const DLString &message)
+void FeniaCroaker::wiznet(const DLString &exceptionMessage)
 {
-    DLString msg = fmt(0, "{CТихий голос из хрустального шара фенера: {W%s{x", message.c_str());
+    DLString crystalOrbMessage = fmt(0, "{CТихий голос из хрустального шара фенера: {W%s{x", exceptionMessage.c_str());
 
     for (Descriptor *d = descriptor_list; d; d = d->next) {
         if (d->connected == CON_PLAYING
@@ -57,8 +67,18 @@ void FeniaCroaker::wiznet(const DLString &message)
             && d->character->getPC()
             && has_fenia_security(d->character->getPC()))
         {
-            d->character->send_to(msg);
+            DLString messageWithNonce = crystalOrbMessage;
+            messageWithNonce.replaces(NONCE_PLACEHOLDER, d->websock.nonce);
+            d->character->send_to(messageWithNonce);
         }
     }
 }
 
+// Don't spam about certain exceptions.
+bool FeniaCroaker::isFiltered(const ::Exception &e)
+{
+    if (e.getMessage() == "victim is dead")
+        return true;
+
+    return false;
+}

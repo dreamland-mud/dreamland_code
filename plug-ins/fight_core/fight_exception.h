@@ -8,6 +8,7 @@
 #include "exception.h"
 
 struct VictimDeathException : public Exception {
+    VictimDeathException();
     virtual ~VictimDeathException( ) ;
 };
 
