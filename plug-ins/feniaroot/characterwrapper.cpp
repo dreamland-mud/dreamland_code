@@ -1758,6 +1758,15 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype[,label]): нанес
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, setViolent, "(vict): установить VIOLENT за нападение на vict" )
+{
+    checkTarget();
+    CHK_NPC
+	Character *victim = args2character(args);
+    ::set_violent( target, victim, true );
+    return Register();
+}
+
 NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags[,show]): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
 {
     checkTarget( );
