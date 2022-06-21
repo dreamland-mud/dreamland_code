@@ -104,7 +104,7 @@ QuestReward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint.getValue( ) > 0 && !IS_TOTAL_NEWBIE(ch)) {
+    if (hint.getValue( ) > 0 && !is_total_newbie(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
         r->prac = 0;

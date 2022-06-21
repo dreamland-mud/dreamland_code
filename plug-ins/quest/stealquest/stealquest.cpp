@@ -186,7 +186,7 @@ QuestReward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman )
         r->points += number_fuzzy( 10 );
     else    
         r->points += number_fuzzy( 3 );
-    if(!IS_TOTAL_NEWBIE(ch)){
+    if(!is_total_newbie(ch)){
     r->points -= hint * 5;
     }
     r->gold = number_fuzzy( r->points );

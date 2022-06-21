@@ -409,7 +409,7 @@ SKILL_RUNP( steal )
                 UNSET_DEATH_TIME(ch);
         }
 
-        if (!victim->is_npc() && IS_TOTAL_NEWBIE(victim->getPC()))
+        if (!victim->is_npc() && is_total_newbie(victim->getPC()))
         {
                 ch->pecho("Не стоит воровать у новичков.");
                 return;

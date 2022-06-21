@@ -13,11 +13,10 @@
 #include "xmlvariablecontainer.h"
 #include "xmlattributestatistic.h"
 
-#define IS_TOTAL_NEWBIE(ch)     (ch->getRemorts().size()==0 && rated_as_newbie(ch) && (ch->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" ) ? ch->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" )->getAllVictoriesCount() < 51 : true))
-
 class PCMemoryInterface;
 class PCharacter;
 
+bool is_total_newbie(Character *ch);
 bool rated_as_newbie( PCMemoryInterface* );
 bool rated_as_expert( PCMemoryInterface* );
 bool rated_as_guru( PCMemoryInterface* );

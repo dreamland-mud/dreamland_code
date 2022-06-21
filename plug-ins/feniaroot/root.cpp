@@ -137,12 +137,12 @@ NMI_INVOKE( Root, getCurrentTime , "(): текущее время в секун�
     return Register((int)dreamland->getCurrentTime( ));
 }
 
-NMI_GET( Root, world_time, "внутримировое время в секундах") 
+NMI_GET( Root, world_time, "внутримировое время в минутах (игровых часах)") 
 {
     return Register((int)dreamland->getWorldTime( ));
 }
 
-NMI_SET( Root, world_time, "внутримировое время в секундах") 
+NMI_SET( Root, world_time, "внутримировое время в минутах (игровых часах)") 
 {
     dreamland->setWorldTime(arg.toNumber());
 }
