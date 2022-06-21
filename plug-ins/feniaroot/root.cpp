@@ -32,6 +32,7 @@
 #include "damageflags.h"
 #include "../anatolia/handler.h"
 #include "calendar_utils.h"
+#include "material-table.h"
 
 #include "root.h"
 #include "nannyhandler.h"
@@ -1083,6 +1084,17 @@ NMI_INVOKE( Root, Liquid, "(name): конструктор для жидкост�
     }
     
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
+}
+
+NMI_GET( Root, materials, "список всех материалов") 
+{
+    RegList::Pointer list(NEW);
+    
+    for (auto &m: material_table) {
+        list->push_back(MaterialWrapper::wrap(m.name));
+    }
+
+    return wrap(list);
 }
 
 NMI_INVOKE( Root, Material, "(names): конструктор для материалов по имени или именам через запятую" )
