@@ -304,7 +304,7 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
 
 SPELL_DECL(Garble);
-VOID_SPELL(Garble)::apply( Character *ch, Character *victim, int level ) 
+BOOL_SPELL(Garble)::apply( Character *ch, Character *victim, int level ) 
 {
     Affect af;
 
@@ -312,6 +312,7 @@ VOID_SPELL(Garble)::apply( Character *ch, Character *victim, int level )
     af.level     = level;
     af.duration  = 1;
     affect_to_char( victim, &af );
+    return true;
 }
 
 VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level ) 

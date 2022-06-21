@@ -159,12 +159,11 @@ bool FeniaSkillActionHelper::executeSpellRun(DefaultSpell *spell, Character *ch,
     return executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx, rcIgnored);
 }
 
-bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level)
+bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level, bool &rc)
 {
-    bool rcIgnored;
     FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
     // Figure out applicable applyXXX method and call it, if defined on the spell wrapper.
-    return executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx, rcIgnored);
+    return executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx, rc);
 }
 
 bool FeniaSkillActionHelper::executeCommandRun(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target)

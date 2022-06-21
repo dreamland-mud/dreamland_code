@@ -31,11 +31,11 @@ public:
     virtual void run( Character *, char *, int, int ) = 0;
     virtual void run( Character *, Room *, int, int ) = 0;
 
-    virtual void apply( Character *, SpellTargetPointer, int ) = 0;
-    virtual void apply( Character *ch, Character *victim, int level) = 0;
-    virtual void apply( Character *ch, ::Object *obj, int level) = 0;
-    virtual void apply( Character *ch, char *arg, int level) = 0;
-    virtual void apply( Character *ch, Room *room, int level) = 0;
+    virtual bool apply( Character *, SpellTargetPointer, int ) = 0;
+    virtual bool apply( Character *ch, Character *victim, int level) = 0;
+    virtual bool apply( Character *ch, ::Object *obj, int level) = 0;
+    virtual bool apply( Character *ch, char *arg, int level) = 0;
+    virtual bool apply( Character *ch, Room *room, int level) = 0;
 
     virtual int getMaxRange( Character * ) const = 0;
     virtual bool spellbane( Character *, Character * ) const = 0;

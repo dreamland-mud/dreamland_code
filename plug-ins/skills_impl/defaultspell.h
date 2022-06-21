@@ -51,11 +51,11 @@ public:
     virtual void run( Character *, char *, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
 
-    virtual void apply( Character *ch, SpellTargetPointer target, int level );
-    virtual void apply( Character *ch, Character *victim, int level) { }
-    virtual void apply( Character *ch, ::Object *obj, int level) { }
-    virtual void apply( Character *ch, char *arg, int level) { }
-    virtual void apply( Character *ch, Room *room, int level) { }
+    virtual bool apply( Character *ch, SpellTargetPointer target, int level );
+    virtual bool apply( Character *ch, Character *victim, int level) { return false; }
+    virtual bool apply( Character *ch, ::Object *obj, int level) { return false; }
+    virtual bool apply( Character *ch, char *arg, int level) { return false; }
+    virtual bool apply( Character *ch, Room *room, int level) { return false; }
 
     virtual int getMaxRange( Character * ) const;                
     virtual bool spellbane( Character *, Character * ) const; 

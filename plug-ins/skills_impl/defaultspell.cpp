@@ -127,33 +127,37 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
     }
 }
 
-void DefaultSpell::apply( Character *ch, SpellTargetPointer spt, int level )
+bool DefaultSpell::apply( Character *ch, SpellTargetPointer spt, int level )
 {
-    char arg[MAX_STRING_LENGTH];                                            
+    char arg[MAX_STRING_LENGTH];      
+    bool rc;                                      
     
     if (!spt)
-        return;
+        return false;
 
-    if (FeniaSkillActionHelper::executeSpellApply(this, ch, spt, level))
-        return;
+    if (FeniaSkillActionHelper::executeSpellApply(this, ch, spt, level, rc))
+        return rc;
         
     switch (spt->type) {
     case SpellTarget::NONE:
         strcpy( arg, spt->arg );
-        apply( ch, arg, level );
+        rc = apply( ch, arg, level );
         break;
     case SpellTarget::CHAR:
-        apply( ch, spt->victim, level );
+        rc = apply( ch, spt->victim, level );
         break;
     case SpellTarget::OBJECT:
-        apply( ch, spt->obj, level );
+        rc = apply( ch, spt->obj, level );
         break;
     case SpellTarget::ROOM:
-        apply( ch, spt->room, level );
+        rc = apply( ch, spt->room, level );
         break;
     default:
+        rc = false;
         break;
     }
+
+    return rc;
 }
 
 /*
