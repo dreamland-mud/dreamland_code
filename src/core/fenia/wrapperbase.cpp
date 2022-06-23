@@ -196,7 +196,7 @@ WrapperBase::vcall( Register &rc, const Register &key, const char *fmt, va_list 
         rc = prog.toFunction( )->invoke( Register( self ), regList );
         return true;
 
-    } catch (const Exception &e) {
+    } catch (const Scripting::Exception &e) {
         FeniaManager::getThis()->croak(this, key, e);
     }
 
