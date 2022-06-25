@@ -16,9 +16,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/command
 
-libriding_la_SOURCES = \
-commands.cpp 
-
 libriding_la_LIBADD = \
 ../output/liboutput.la \
 ../descriptor/libdescriptor.la \
