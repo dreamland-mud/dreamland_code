@@ -252,6 +252,16 @@ GETWRAP( in_room, "комната, в которой сейчас находим
 GETWRAP( was_in_room, "комната, в которой находились перед закапыванием в могилу")
 GETWRAP( mount, "на ком мы верхом или кто верхом на нас" )
     
+NMI_SET( CharacterWrapper, mount, "лидер группы или тот, кто очаровал" )
+{
+    checkTarget( );
+
+    if (arg.type == Register::NONE)
+        target->mount = NULL;
+    else
+        target->mount = arg2character( arg );
+}
+
 NMI_SET( CharacterWrapper, leader, "лидер группы или тот, кто очаровал" )
 {
     checkTarget( );
