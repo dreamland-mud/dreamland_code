@@ -236,7 +236,6 @@ plug-ins/languages/impl/Makefile \
 plug-ins/movement/Makefile \
 plug-ins/fight_core/Makefile \
 plug-ins/profession/Makefile \
-plug-ins/riding/Makefile \
 plug-ins/hometown/Makefile \
 plug-ins/wearlocation/Makefile \
 plug-ins/selfrate/Makefile \
