@@ -4,7 +4,7 @@
  */
 #include "fenia/exceptions.h"
 #include "skill.h"
-#include "character.h"
+#include "pcharacter.h"
 #include "core/object.h"
 #include "defaultskillcommand.h"
 #include "commandflags.h"
@@ -195,7 +195,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     ch->setWait(skill->getBeats(ch));
 
     // See if there is 'run' method override in Fenia. 
-    bool feniaOverride = FeniaSkillActionHelper::executeCommandRun(this, ch, target));
+    bool feniaOverride = FeniaSkillActionHelper::executeCommandRun(this, ch, target);
 
     // Fall back to the old implementation.
     if (!feniaOverride)
