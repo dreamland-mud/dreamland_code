@@ -261,12 +261,6 @@ SKILL_RUNP( envenom )
         return;
     }
 
-    if ((skill = gsn_envenom->getEffective( ch )) < 1)
-    {
-        ch->pecho("Ты не владеешь этим умением.");
-        return;
-    }
-
     if (obj->item_type == ITEM_FOOD || obj->item_type == ITEM_DRINK_CON)
     {
         if (drink_is_closed( obj, ch ))
@@ -288,14 +282,14 @@ SKILL_RUNP( envenom )
                 obj->value3(obj->value3() | DRINK_POISONED);
                 gsn_envenom->improve( ch, true );
             }
-            ch->setWait( gsn_envenom->getBeats(ch) );
+            
             return;
         }
 
         oldact("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
         if (!IS_SET(obj->value3(), DRINK_POISONED))
             gsn_envenom->improve( ch, false );
-        ch->setWait( gsn_envenom->getBeats(ch) );
+        
         return;
      }
 
@@ -344,14 +338,14 @@ SKILL_RUNP( envenom )
               oldact("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM);
             oldact("Ты покрываешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, true );
-            ch->setWait( gsn_envenom->getBeats(ch) );
+            
             return;
         }
         else
         {
             oldact("Твоя попытка отравить ядом $o4 закончилась неудачей.",ch,obj,0,TO_CHAR);
             gsn_envenom->improve( ch, false );
-            ch->setWait( gsn_envenom->getBeats(ch) );
+            
             return;
         }
     }
@@ -379,11 +373,6 @@ SKILL_RUNP( steal )
         argument = one_argument( argument, arg2 );
         skill = gsn_steal->getEffective( ch );
 
-        if ( ch->is_npc() || skill <= 1)
-        {
-                ch->pecho("Ты не умеешь воровать.");
-                return;
-        }
 
         if ( arg1[0] == '\0' || arg2[0] == '\0' )
         {
@@ -403,11 +392,6 @@ SKILL_RUNP( steal )
                 return;
         }
 
-        if( !ch->is_npc() && IS_DEATH_TIME( ch ) )
-        {
-                ch->pecho("Боги снимают с тебя свою защиту.");
-                UNSET_DEATH_TIME(ch);
-        }
 
         if (!victim->is_npc() && is_total_newbie(victim->getPC()))
         {
@@ -604,10 +588,6 @@ SKILL_RUNP( pick )
     DLString args = argument, arg1, arg2;
     Keyhole::Pointer keyhole;
 
-    if (!gsn_pick_lock->usable( ch )) {
-        ch->pecho( "Ты пытаешься засунуть отмычку в скважину, но промахиваешься!" );
-        return;
-    }
 
     if (MOUNTED(ch)) {
         ch->pecho( "Ты не можешь взломать что-либо, пока ты в седле." );
@@ -635,220 +615,6 @@ SKILL_RUNP( pick )
     keyhole->doPick( arg2 );
 }
 
-/*
- * PushMovement
- */
-class PushMovement : public ExitsMovement {
-public:
-    PushMovement( Character *ch, Character *actor, const char *arg )
-               : ExitsMovement( ch, MOVETYPE_SLINK ), actor( actor ), arg( arg )
-    {
-    }
-
-protected:
-    virtual bool checkPosition( Character *wch )
-    {
-        return true;
-    }
-
-    virtual bool findTargetRoom( )
-    {
-        door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
-
-        if (door < 0) {
-            actor->pecho( "Ты не видишь выхода в этом направлении." );
-            return false;
-        }
-
-        pexit = from_room->exit[door];
-        exit_info = pexit->exit_info;
-        to_room = pexit->u1.to_room;
-        peexit = NULL;
-
-        if (IS_SET(pexit->exit_info, EX_ISDOOR)) {
-            if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-                actor->pecho( "Там закрыто." );
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    virtual bool canMove( Character *wch )
-    {
-        if (wch == ch->mount)
-            return true;
-
-        if (!(checkActor( )
-               && checkVictim( )
-               && checkWeb( )))
-            return false;
-
-        if (!ExitsMovement::canMove( wch )) {
-            actor->pecho( "Ты не сможешь протолкнуть %1$C4 в этом направлении.", ch );
-            return false;
-        }
-
-        return true;
-    }
-
-    virtual bool tryMove( Character *wch )
-    {
-        if (wch != ch)
-            return true;
-
-        if (!ExitsMovement::tryMove( wch )) {
-            actor->pecho( "Ты не сможешь протолкнуть %1$C4 в этом направлении.", ch );
-            return false;
-        }
-
-        UNSET_DEATH_TIME(actor);
-
-        actor->setWait( gsn_push->getBeats(actor) );
-
-        return applySkill( );
-    }
-
-    bool applySkill( )
-    {
-        bool fSuccess;
-        int percent;
-
-        percent  = number_percent( ) + (IS_AWAKE(ch) ? 30 : -30);
-        percent += ch->can_see( actor ) ? 20 : 0;
-	percent -= skill_level_bonus(*gsn_push, ch);    
-
-        if (percent > gsn_push->getEffective( actor )) {
-            fSuccess = false;
-            actor->pecho( "Тебя застукали за попыткой вытолкать жертву!" );
-
-            if (!IS_AFFECTED( ch, AFF_SLEEP )) {
-                ch->position = ch->position == POS_SLEEPING ? POS_STANDING: ch->position;
-                ch->pecho( "%1$^C1 пытается вытолкнуть тебя.", actor );
-            }
-
-            actor->recho( ch, "%1$^C1 пытается вытолкнуть %2$C4.", actor, ch );
-
-            yell_panic(actor, ch, "Держите свои руки подальше!", "Держи свои руки подальше, %1$C1!");
-
-            if (ch->is_npc( ))
-                multi_hit( ch, actor , "murder" );
-        }
-        else {
-            fSuccess = true;
-        }
-
-        gsn_push->improve( actor, fSuccess, ch );
-        return fSuccess;
-    }
-
-    virtual void setWaitstate( )
-    {
-    }
-
-    virtual void msgOnMove( Character *wch, bool fLeaving )
-    {
-        if (fLeaving && wch == ch) {
-            actor->pecho( "{YТы выталкиваешь %2$C4 %3$s.{x", actor, ch, dirs[door].leave );
-            ch->pecho( "{Y%1$^C1 выталкивает тебя %3$s.{x", actor,  ch, dirs[door].leave );
-            actor->recho( ch, "{Y%1$^C1 выталкивает %2$C4 %3$s.{x", actor, ch, dirs[door].leave );
-        }
-
-        ExitsMovement::msgOnMove( wch, fLeaving );
-    }
-
-    bool checkWeb( )
-    {
-        if (CAN_DETECT(actor, ADET_WEB)) {
-            actor->pecho( "Ты в паутине!" );
-            actor->recho( ch, "Путаясь в паутине, %1$^C1 глупо пытается вытолкнуть %2$C4.", actor, ch );
-            ch->pecho( "Путаясь в паутине, %1$^C1 глупо пытается вытолкнуть тебя.", actor );
-            return false;
-        }
-
-        if (CAN_DETECT(ch, ADET_WEB)) {
-            actor->pecho( "Ты пытаешься вытолкнуть %2$C4, но паутина удерживает %2$P2 на месте.", actor, ch );
-            actor->recho( ch, "%1$^C1 пытается вытолкнуть %2$C4, но паутина удерживает %2$P2 на месте.", actor, ch );
-            ch->pecho( "%1$^C1 пытается вытолкнуть тебя, но паутина удерживает тебя на месте.", actor, ch );
-            return false;
-        }
-
-        return true;
-    }
-
-    bool checkActor( )
-    {
-        if (MOUNTED(actor)) {
-            actor->pecho( "Ты не можешь толкнуть кого-то, сидя в седле." );
-            return false;
-        }
-
-        if (RIDDEN(actor)) {
-            actor->pecho( "Ты не можешь толкнуть кого-то, пока ты оседла%1$Gно|н|на.", actor );
-            return false;
-        }
-
-        return true;
-    }
-
-    bool checkVictim( )
-    {
-        if (!ch->is_npc( ) && ch->desc == 0) {
-            actor->pecho( "Ты не можешь сделать этого." );
-            return false;
-        }
-
-        if (actor == ch) {
-            actor->pecho( "Ты пихаешь себя в бок и глупо улыбаешься." );
-            return false;
-        }
-
-        if (is_safe(actor, ch))
-            return false;
-
-        if (ch->position == POS_FIGHTING) {
-            actor->pecho( "Подожди, пока закончится сражение." );
-            return false;
-        }
-
-        return true;
-    }
-
-    Character *actor;
-    const char *arg;
-};
-
-/*
- * 'push' skill command
- */
-SKILL_RUNP( push )
-{
-    char arg1 [MAX_INPUT_LENGTH];
-    char arg2 [MAX_INPUT_LENGTH];
-    Character *victim;
-
-    argument = one_argument( argument, arg1 );
-    argument = one_argument( argument, arg2 );
-
-    if (ch->is_npc() || !gsn_push->usable( ch )) {
-        ch->pecho("Кажется, ты не умеешь толкать?");
-        return;
-    }
-
-    if (arg1[0] == '\0' || arg2[0] == '\0') {
-        ch->pecho("Вытолкнуть кого и куда?");
-        return;
-    }
-
-    if ( ( victim = get_char_room( ch, arg1 ) ) == 0 ) {
-        ch->pecho("Здесь таких нет.");
-        return;
-    }
-
-    PushMovement( victim, ch, arg2 ).move( );
-}
-
 
 
 /*
@@ -866,12 +632,6 @@ SKILL_RUNP( backstab )
     if ( MOUNTED(ch) )
     {
             ch->pecho("Ты не можешь ударить сзади, если ты верхом!");
-            return;
-    }
-
-    if (gsn_backstab->getEffective( ch ) <= 1)
-    {
-            ch->pecho("Ты не знаешь, КАК ударить сзади.");
             return;
     }
 
@@ -923,8 +683,6 @@ SKILL_RUNP( backstab )
             ch->pecho("Тебе некогда подкрадываться к противнику -- ты сражаешься!");
             return;
     }
-
-    ch->setWait( gsn_backstab->getBeats(ch)  );
 
     if ( victim->hit < (0.7 * victim->max_hit)
             && (IS_AWAKE(victim) ) )
@@ -1047,12 +805,6 @@ SKILL_RUNP( circle )
             return;
     }
 
-    if ( ch->is_npc() || !gsn_circle->usable( ch ) )
-    {
-            ch->pecho("Ты не владеешь круговым ударом.");
-            return;
-    }
-
     if ( ( victim = ch->fighting ) == 0 )
     {
             ch->pecho("Сейчас ты не сражаешься.");
@@ -1079,8 +831,6 @@ SKILL_RUNP( circle )
             }
     }
  
-    ch->setWait( gsn_circle->getBeats(ch)  );
-
     CircleOneHit circ( ch, victim );
     int circleBonus = 0;
     circleBonus += skill_level_bonus(*gsn_circle, ch);
@@ -1109,129 +859,6 @@ SKILL_RUNP( circle )
     }
 }
 
-/*
- * 'blackjack' skill command
- */
-
-SKILL_RUNP( blackjack )
-{
-        Character *victim;
-        Affect af;
-        int chance;
-
-        if ( MOUNTED(ch) )
-        {
-                ch->pecho("Только не верхом!");
-                return;
-        }
-
-        if (!gsn_blackjack->usable( ch ) )
-        {
-                ch->pecho("У тебя нет мешочка.");
-                return;
-        }
-
-        if ( (victim = get_char_room(ch,argument)) == 0 )
-        {
-                ch->pecho("Здесь таких нет.");
-                return;
-        }
-
-        if ( ch == victim )
-        {
-                ch->pecho("Не надо... можешь потерять сознание.");
-                return;
-        }
-
-        if ( victim->fighting )
-        {
-                ch->pecho("Подожди пока закончится сражение.");
-                return;
-        }
-
-        if ( IS_CHARMED(ch) )
-        {
-                ch->pecho( "Ты же не хочешь ударить по голове сво%1$Gего|его|ю любим%1$Gого|ого|ую хозя%1$Gина|ина|йку?", ch->master);
-                return;
-        }
-
-        if ( IS_AFFECTED(victim,AFF_SLEEP) )
-        {
-                oldact("$E уже спит.",ch,0,victim,TO_CHAR);
-                return;
-        }
-
-        if ( is_safe(ch,victim) )
-        {
-                return;
-        }
-
-        if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
-            return;
-
-        int k = victim->getLastFightDelay( );
-
-        if ( k >= 0 && k < FIGHT_DELAY_TIME )
-                k = k * 100 /        FIGHT_DELAY_TIME;
-        else
-                k = 100;
-
-        victim->setLastFightTime( );
-        ch->setLastFightTime( );
-
-        ch->setWait( gsn_blackjack->getBeats(ch) );
-
-        chance = ( int ) ( 0.5 * gsn_blackjack->getEffective( ch ) );
-        chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
-        chance += victim->can_see(ch) ? 0 : 5;
-	chance += skill_level_bonus(*gsn_blackjack, ch);
-	
-        if (victim->is_npc( )
-            && victim->getNPC( )->behavior
-            && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
-                chance -= 40;
-
-        if (victim->isAffected(gsn_backguard))
-            chance /= 2;
-
-        if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
-            ostringstream ostr;
-            bonus_thief_skills->reportAction(ch->getPC(), ostr);
-            ch->send_to(ostr);
-            chance += number_range(15,20);
-        }
-
-        if (Chance(ch, chance * k / 100, 100).reroll())
-        {
-                oldact_p("Ты бьешь $C4 по голове мешочком со свинцом.",
-                        ch,0,victim,TO_CHAR,POS_RESTING);
-                oldact_p("Ты чувствуешь внезапную боль в черепе!",
-               ch,0,victim,TO_VICT,POS_RESTING);
-                oldact_p("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*",
-               ch,0,victim,TO_NOTVICT,POS_RESTING);
-                gsn_blackjack->improve( ch, true, victim );
-
-                af.type = gsn_blackjack;
-                af.bitvector.setTable(&affect_flags);
-                af.level = ch->getModifyLevel();
-                af.duration = ch->getModifyLevel() / 50 + 1;
-                af.bitvector.setValue(AFF_SLEEP);
-                affect_join ( victim,&af );
-
-                set_violent( ch, victim, true );
-                if ( IS_AWAKE(victim) )
-                        victim->position = POS_SLEEPING;
-        }
-        else
-        {
-                damage(ch,victim, ch->getModifyLevel() / 2,gsn_blackjack,DAM_NONE,true, DAMF_WEAPON);
-                gsn_blackjack->improve( ch, false, victim );
-
-                yell_panic( ch, victim,
-                            "Помогите! Меня кто-то ударил по голове!",
-                            "Помогите! %1$^C1 удари%1$Gло|л|ла меня по голове!" );
-        }
-}
 
 /*
  * 'knife' skill command
@@ -1243,11 +870,6 @@ SKILL_RUNP( knife )
     Character *victim;
     Object *knife;
     int chance;
-
-    if (!gsn_knife->usable( ch )) {
-        ch->pecho("Аккуратней, смотри не порежься.");
-        return;
-    }
 
     one_argument(argument, arg);
 
@@ -1285,8 +907,6 @@ SKILL_RUNP( knife )
         return;
 
     chance = min(100, gsn_knife->getEffective( ch ) + skill_level_bonus(*gsn_knife, ch));
-	
-    ch->setWait( gsn_knife->getBeats(ch) );
 
     try {
         KnifeOneHit khit( ch, victim );
@@ -1318,11 +938,6 @@ SKILL_RUNP( forge )
     Keyhole::Pointer keyhole;
     Object *key, *blank;
 
-    if (!gsn_key_forgery->usable( ch )) {
-        ch->pecho( "Эти трюки не для тебя." );
-        return;
-    }
-
     if (( arg = args.getOneArgument( ) ).empty( )) {
         ch->pecho( "Подделать что?" );
         return;
@@ -1335,11 +950,6 @@ SKILL_RUNP( forge )
 
     if (!blank) {
         ch->pecho( "Тебе понадобится заготовка, чтобы создать дубликат или отмычку." );
-        return;
-    }
-
-    if (ch->mana < gsn_key_forgery->getMana(ch)) {
-        ch->pecho( "У тебя не хватает сил для такой тонкой работы." );
         return;
     }
 
@@ -1366,9 +976,6 @@ SKILL_RUNP( forge )
             ch->pecho( "Это ключ от замка, который невозможно взломать. Увы.." );
             return;
         }
-
-        ch->setWait( gsn_key_forgery->getBeats(ch) );
-        ch->mana -= gsn_key_forgery->getMana(ch);
 
 	int chance;
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
@@ -1419,9 +1026,6 @@ SKILL_RUNP( forge )
             ch->pecho( "Этот замок защищен от взлома." );
             return;
         }
-
-        ch->setWait( gsn_key_forgery->getBeats(ch) );
-        ch->mana -= gsn_key_forgery->getMana(ch);
 
 	int chance;
 	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 

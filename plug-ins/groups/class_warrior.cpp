@@ -48,12 +48,6 @@ SKILL_RUNP( smithing )
     Object *obj;
     Object *hammer;
 
-    if ( ch->is_npc() || !gsn_smithing->usable( ch ))
-    {
-        ch->pecho("Чего?");
-        return;
-    }
-
 
     if ( ch->fighting )
     {
@@ -92,8 +86,6 @@ SKILL_RUNP( smithing )
         ch->pecho("Тебе понадобится специальный молот -- ищи его в Королевстве Дварфов.");
         return;
     }
-
-    ch->setWaitViolence( 2 );
 
     if (ch->isAffected( gsn_creativity )) {
         ch->pecho( "%1$^O1 по%1$nет|ют под твоими руками, обретая первозданный вид.", obj );
