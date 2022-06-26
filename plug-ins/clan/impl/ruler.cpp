@@ -302,14 +302,6 @@ SKILL_RUNP( judge )
         int  value;
         Character *victim;
 
-        if ( !gsn_judge->available( ch ))
-        {
-            ch->pecho("Ась?");
-            return;
-        }
-
-        if (!gsn_judge->usable( ch ))
-                  return;
 
         if ( ch->isAffected(gsn_dismiss ) )
         {
@@ -397,14 +389,7 @@ SKILL_RUNP( manacles )
         char                        arg[MAX_INPUT_LENGTH];
         Character        *victim;
 
-        if ( !gsn_manacles->available( ch ))
-        {
-            ch->pecho("Ась?");
-            return;
-        }
-
-        if (!gsn_manacles->usable( ch )) return;
-
+   
         if ( ch->isAffected(gsn_dismiss ) )
         {
                 ch->pecho("У тебя отобрали привилегии Правителя!");
@@ -601,15 +586,7 @@ SKILL_RUNP( wanted )
         char arg2[MAX_INPUT_LENGTH];
         Character *victim;
 
-        if ( !gsn_wanted->available( ch ))
-        {
-            ch->pecho("Ась?");
-            return;
-        }
-
-        if ( !gsn_wanted->usable( ch ) )
-                return;
-
+ 
         if ( ch->isAffected(gsn_dismiss ) )
         {
                 ch->pecho("У тебя отобрали привилегии Правителя!");
@@ -712,15 +689,7 @@ SKILL_RUNP( fine )
         int                                value2;
         bool                        inroom = 0;
 
-        if ( !gsn_fine->available( ch ))
-        {
-            ch->pecho("Ась?");
-            return;
-        }
-
-        if (!gsn_fine->usable( ch ))
-                return;
-
+     
         if ( ch->isAffected(gsn_dismiss ) )
         {
                 ch->pecho("У тебя отобрали привилегии Правителя!");
@@ -1137,14 +1106,7 @@ SKILL_RUNP( jail )
         char                        arg[MAX_INPUT_LENGTH];
         Character        *victim;
 
-        if ( !gsn_jail->available( ch ))
-        {
-            ch->pecho("Ась?");
-            return;
-        }
-
-        if (!gsn_jail->usable( ch )) return;
-
+  
         if ( ch->isAffected(gsn_dismiss ) )
         {
                 ch->pecho("У тебя отобрали привилегии Правителя!");
@@ -1309,14 +1271,7 @@ SKILL_RUNP( dismiss )
         char                        arg[MAX_INPUT_LENGTH];
         Character        *victim;
 
-        if ( !gsn_dismiss->available( ch ))
-        {
-            ch->pecho("Ась?");
-            return;
-        }
-
-        if (!gsn_dismiss->usable( ch )) return;
-
+ 
         if ( ch->isAffected(gsn_dismiss ) )
         {
                 ch->pecho("У тебя отобрали привилегии Правителя!");

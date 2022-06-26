@@ -67,18 +67,13 @@ static void yell_explode( Character *ch, Character *victim )
 SKILL_RUNP( explode )
 {
     Character *victim;
-    int dam, hp_dam, dice_dam, mana;
+    int dam, hp_dam, dice_dam;
     int hpch, level;
     char arg[MAX_INPUT_LENGTH];
 
     victim = ch->fighting;
     dam = 0;
     level = skill_level(*gsn_explode, ch);
-
-    if (ch->is_npc() || !gsn_explode->usable( ch ) ) {
-        ch->pecho("Огонь? Что это?");
-        return;
-    }
 
     if (victim == 0) {
         one_argument(argument, arg);
@@ -94,20 +89,9 @@ SKILL_RUNP( explode )
         }
     }
 
-    mana= gsn_explode->getMana(ch);
-
-    if (ch->mana < mana ) {
-        ch->pecho("У тебя не хватает энергии для огня.");
-        return;
-    }
-
-    ch->mana -= mana;
-
     oldact("$c1 поджигает что-то.",ch,0,victim,TO_NOTVICT);
     oldact("$c1 поджигает что-то взрывчатое под тобой!", ch,0,victim,TO_VICT);
     oldact("Пусть все сгорит!",ch,0,0,TO_CHAR);
-
-    ch->setWait( gsn_explode->getBeats(ch) );
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch ) + skill_level_bonus(*gsn_explode, ch)) {
         damage(ch,victim,0,gsn_explode,DAM_FIRE, true, DAMF_WEAPON);
@@ -188,12 +172,6 @@ SKILL_RUNP( harakiri )
         return;
     }
 
-    if ( (chance = gsn_hara_kiri->getEffective( ch )) == 0)
-    {
-        ch->pecho("Ты пытаешься убить себя, но не можешь вынести такую боль.");
-        return;
-    }
-
     if (ch->isAffected(gsn_hara_kiri))
     {
         oldact("Если уж реши$gло|л|ла покончить с собой -- попробуй убить Тисахна.", ch, 0, 0, TO_CHAR);
@@ -216,7 +194,6 @@ SKILL_RUNP( harakiri )
 
     if (number_percent() < chance + skill_level_bonus(*gsn_hara_kiri, ch))
     {
-        ch->setWaitViolence( 1 );
 
         ch->hit = 1;
         ch->mana = 1;
@@ -236,7 +213,6 @@ SKILL_RUNP( harakiri )
 
     else
     {
-        ch->setWaitViolence( 2 );
         postaffect_to_char(ch, gsn_hara_kiri, 0);
 
         ch->pecho("Ты не можешь отрезать себе палец. Ведь это не так легко!.");
@@ -260,25 +236,12 @@ SKILL_RUNP( katana )
 
         one_argument( argument, arg );
 
-        if ( ch->is_npc() || !gsn_katana->usable( ch ) )
-        {
-                ch->pecho("Что?");
-                return;
-        }
-
         if ( ch->isAffected(gsn_katana) )
         {
                 ch->pecho("Ты совсем недавно уже изготавливал%Gо||а катану.", ch);
                 return;
         }
         
-        mana = gsn_katana->getMana(ch);
-
-        if ( ch->mana < mana )
-        {
-                ch->pecho("У тебя не хватает энергии для катаны.");
-                return;
-        }
 
         if ( arg[0] == '\0' )
         {
@@ -313,8 +276,6 @@ SKILL_RUNP( katana )
                 return;
         }
 
-        ch->setWait( gsn_katana->getBeats(ch) );
-
         if ( !ch->is_npc() && number_percent() < gsn_katana->getEffective( ch ) + skill_level_bonus(*gsn_katana, ch) )
         {
                 postaffect_to_char(ch, gsn_katana, ch->getModifyLevel());
@@ -322,8 +283,7 @@ SKILL_RUNP( katana )
                 katana = create_object( get_obj_index( OBJ_VNUM_KATANA_SWORD), ch->getModifyLevel() );
                 katana->cost  = 0;
                 katana->level = ch->getModifyLevel();
-                ch->mana -= mana;
-
+                        bbbbbbbbbbbbbbbbbbb
                 WeaponGenerator()
                     .item(katana)
                     .skill(gsn_katana)

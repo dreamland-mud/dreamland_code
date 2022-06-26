@@ -203,27 +203,12 @@ SKILL_RUNP( trophy )
     Object *part;
     char arg[MAX_INPUT_LENGTH];
     short level;
-    int mana = gsn_trophy->getMana(ch);
 
     argument = one_argument( argument, arg );
-
-    if (!gsn_trophy->available( ch )) {
-        ch->pecho( "Ась?" );
-        return;
-    }
-
-    if (!gsn_trophy->usable( ch ))
-        return;
 
     if (ch->isAffected(gsn_trophy))
     {
         ch->pecho( "Но у тебя уже есть один трофей!" );
-        return;
-    }
-
-    if (ch->mana < mana)
-    {
-        ch->pecho( "Ты слишком слаб{Sfа{Sx, чтоб сконцентрироваться." );
         return;
     }
 
@@ -274,7 +259,6 @@ SKILL_RUNP( trophy )
         return;
     }
 
-    ch->setWait( gsn_trophy->getBeats(ch) );
 
     if (!ch->is_npc() && number_percent() < gsn_trophy->getEffective( ch ))
     {
@@ -293,7 +277,6 @@ SKILL_RUNP( trophy )
 
             trophy->cost  = 0;
             trophy->level = ch->getRealLevel( );
-            ch->mana     -= mana;
 
             af.type         = gsn_trophy;
             af.level        = level;
@@ -334,7 +317,6 @@ SKILL_RUNP( trophy )
     {
         ch->pecho( "Ты разрушаешь это." );
         extract_obj(part);
-        ch->mana -= mana / 2;
         gsn_trophy->improve( ch, false );
     }
 }
@@ -403,15 +385,6 @@ SKILL_RUNP( bloodthirst )
 {
     int chance, hp_percent;
 
-    if (!gsn_bloodthirst->available( ch ))
-    {
-        ch->pecho( "Ты не знаешь что такое кровожадность." );
-        return;
-    }
-
-    if (!gsn_bloodthirst->usable( ch ))
-      return;
-
     chance = gsn_bloodthirst->getEffective( ch );
 
     if (IS_AFFECTED(ch,AFF_BLOODTHIRST) || ch->isAffected(gsn_bloodthirst) )
@@ -441,8 +414,6 @@ SKILL_RUNP( bloodthirst )
     {
         Affect af;
 
-        ch->setWaitViolence( 1 );
-
         int slevel = skill_level(*gsn_bloodthirst, ch);
         
         ch->pecho( "Ты жаждешь {rкрови!{x" );
@@ -470,8 +441,6 @@ SKILL_RUNP( bloodthirst )
 
     else
     {
-        ch->setWaitViolence( 3 );
-
         ch->pecho( "На миг ты чувствуешь себя кровожадно, но это быстро проходит." );
         gsn_bloodthirst->improve( ch, false );
     }
@@ -486,16 +455,12 @@ SKILL_RUNP( spellbane )
 {
         Affect af;
         
-        if (!gsn_spellbane->usable( ch ))
-            return;
-
         if (ch->isAffected(gsn_spellbane))
         {
                 ch->pecho( "Ты уже отражаешь заклинания." );
                 return;
         }
 
-        ch->setWait( gsn_spellbane->getBeats(ch)  );
         int slevel = skill_level(*gsn_spellbane, ch);    
 
         af.type                = gsn_spellbane;
@@ -519,30 +484,16 @@ SKILL_RUNP( spellbane )
 
 SKILL_RUNP( resistance )
 {
-        int mana = gsn_resistance->getMana(ch);
-
-        if (!gsn_resistance->usable( ch ))
-                return;
-
         if (ch->isAffected(gsn_resistance))
         {
                 ch->pecho( "Ты уже сопротивляешься физическим атакам." );
                 return;
         }
 
-        if ( ch->mana < mana )
-        {
-                ch->pecho( "У тебя недостаточно энергии для этого." );
-                return;
-        }
-
-        ch->setWait( gsn_resistance->getBeats(ch)  );
-
         if ((!ch->is_npc() && number_percent() < gsn_resistance->getEffective( ch ))
           || ch->is_npc() )
     {
         postaffect_to_char(ch, gsn_resistance, skill_level(*gsn_resistance, ch) / 6);
-      ch->mana -= mana;
 
       oldact("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR);
       oldact("$c1 выглядит покрепче.",ch,0,0,TO_ROOM);
@@ -550,7 +501,6 @@ SKILL_RUNP( resistance )
     }
   else
     {
-      ch->mana -= mana / 2;
 
      ch->pecho( "Ты напрягаешь свои мускулы, но это все впустую." );
       oldact_p("$c1 играет мускулами, пытаясь выглядеть крепче.",
@@ -567,16 +517,6 @@ SKILL_RUNP( resistance )
 
 SKILL_RUNP( truesight )
 {
-    int mana = gsn_truesight->getMana(ch);
-
-  if (!gsn_truesight->available( ch ))
-  {
-    ch->pecho( "Ась?" );
-    return;
-  }
-
-  if (!gsn_truesight->usable( ch ))
-    return;
 
   if (ch->isAffected(gsn_truesight))
     {
@@ -584,13 +524,6 @@ SKILL_RUNP( truesight )
       return;
     }
 
-  if (ch->mana < mana)
-    {
-      ch->pecho( "У тебя не хватает энергии для этого." );
-      return;
-    }
-
-  ch->setWait( gsn_truesight->getBeats(ch)  );
 
   if (!ch->is_npc() && number_percent() < gsn_truesight->getEffective( ch ))
     {
@@ -612,11 +545,6 @@ SKILL_RUNP( truesight )
       af.bitvector.setValue(DETECT_IMP_INVIS);
       affect_to_char(ch,&af);
 
-// Нечего ! Корвин.
-//      af.bitvector.setValue(ACUTE_VISION);
-//      affect_to_char(ch,&af);
-
-      ch->mana -= mana; 
 
       oldact("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR);
       oldact("$c1 смотрит более зорко.",ch,0,0,TO_ROOM);
@@ -624,7 +552,6 @@ SKILL_RUNP( truesight )
     }
   else
     {
-      ch->mana -= mana / 2;
 
      ch->pecho( "Ты зорко смотришь вокруг, но не видишь ничего нового." );
       oldact_p("$c1 зорко смотрит вокруг, но ничего нового не замечает.",
@@ -642,15 +569,6 @@ SKILL_RUNP( truesight )
 SKILL_RUNP( bandage )
 {
         int heal;
-
-        if ( !gsn_bandage->usable( ch ) )
-                return;
-
-        if ( gsn_bandage->getEffective( ch ) == 0)
-        {
-                ch->pecho( "Что?" );
-                return;
-        }
 
         if (ch->isAffected(gsn_bandage))
         {
@@ -671,7 +589,6 @@ SKILL_RUNP( bandage )
         {
                 Affect af;
 
-                ch->setWaitViolence( 1 );
                 int slevel = skill_level(*gsn_bandage, ch);
 
                 ch->pecho( "Ты накладываешь повязку на свою рану!" );
@@ -694,7 +611,6 @@ SKILL_RUNP( bandage )
         }
         else
         {
-                ch->setWaitViolence( 1 );
 
                 ch->pecho( "Ты пытаешься перевязать свои раны, но пальцы не слушаются тебя." );
                 gsn_bandage->improve( ch, false );

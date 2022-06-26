@@ -105,17 +105,6 @@ SKILL_RUNP( vanish )
     
     ///// Standard checks: TODO: turn this into a function
     
-    if ( !ch->is_npc() && !gsn_vanish->usable( ch ) )
-    {
-            ch->pecho("Ты не владеешь этим навыком.");
-            return;
-    }
-    
-    if (ch->mana < gsn_vanish->getMana(ch))
-    {
-            ch->pecho("У тебя недостаточно энергии для этого.");
-            return;
-    }
     
     /* TODO: Not sure if it needs the effect: wait_state is enough
     if (ch->isAffected(gsn_vanish)) {
@@ -187,18 +176,6 @@ SKILL_RUNP( vanish )
         // CAN vanish immortals :)
     }
 
-    if( !ch->is_npc() && !ch->move )
-    {
-            ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
-            return;
-    }
-    else
-            ch->move -= move_dec( ch );
-   
-    ch->mana -= gsn_vanish->getMana(ch);
-    ch->setWait( gsn_vanish->getBeats(ch)  );
-    UNSET_DEATH_TIME(ch);
-        
     if (number_percent() > gsn_vanish->getEffective( ch ) )
     {
             ch->pecho("Тебе не удается активировать световую гранату.");
@@ -382,12 +359,6 @@ SKILL_RUNP( nerve )
                 return;
         }
 
-        if (!gsn_nerve->usable( ch ) )
-        {
-                ch->pecho("Ты не владеешь этим навыком.");
-                return;
-        }
-
         // Needs at least one hand
         const GlobalBitvector &loc = ch->getWearloc( );
         if (!loc.isSet( wear_hands )
@@ -430,14 +401,6 @@ SKILL_RUNP( nerve )
                 oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
-
-        if( !ch->is_npc() && !ch->move )
-        {
-                ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
-                return;
-        }
-        else
-                ch->move -= move_dec( ch );
 
         ///// Custom messages: TODO: move these to XML as well
             
@@ -506,9 +469,6 @@ SKILL_RUNP( nerve )
         d.log((int)chance, "final");
         //////////////// THE ROLL ////////////////
             
-        ch->setWait( gsn_nerve->getBeats(ch)  );
-        UNSET_DEATH_TIME(ch);
-    
         if ( ch->is_npc() || number_percent() < (int) chance )
         {
                 gsn_nerve->getCommand()->apply(ch, victim);
@@ -581,12 +541,6 @@ SKILL_RUNP( endure )
         return;
   }
 
-  if ( gsn_endure->getEffective( ch ) <= 1 )
-  {
-        ch->pecho("Тебе недоступна техника выносливости.");
-        return;
-  }
-
   if (ch->isAffected(gsn_endure))
     {
       ch->pecho("Ты не можешь стать еще выносливее.");
@@ -602,7 +556,6 @@ SKILL_RUNP( endure )
     
     mod = -1 * (level/20 + skill/20 + 1); 
     
-    ch->setWait( gsn_endure->getBeats(ch)  );
     gsn_endure->getCommand()->apply(ch, ch, mod);
     gsn_endure->improve( ch, true );
 }
@@ -694,9 +647,7 @@ void AssassinateOneHit::calcDamage( )
         chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
     }
         
-    UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
-    ch->setLastFightTime( );    
     
     chance = max( (float)1, chance ); // there's always a chance
 
@@ -750,12 +701,6 @@ SKILL_RUNP( assassinate )
 
     if ( ch->master != 0 && ch->is_npc() )
             return;
-
-    if ( !ch->is_npc() && !gsn_assassinate->usable( ch ) )
-    {
-            ch->pecho("Ты не имеешь понятия, как ломать шеи.");
-            return;
-    }
 
     if ( IS_CHARMED(ch) )
     {
@@ -839,7 +784,6 @@ SKILL_RUNP( assassinate )
             return;
     }   
     
-    ch->setWait( gsn_assassinate->getBeats(ch)  );
     AssassinateOneHit ass( ch, victim );    
     
     // assassination attempt can't "miss"
@@ -910,12 +854,6 @@ SKILL_RUNP( grab )
                 return;
         }
 
-        if ( ch->is_npc() || !gsn_grab->usable( ch ) )
-        {
-                ch->pecho("Ты не владеешь этим навыком.");
-                return;
-        }
-
         // Needs at least one hand
         const GlobalBitvector &loc = ch->getWearloc( );
         if (!loc.isSet( wear_hands )
@@ -958,14 +896,6 @@ SKILL_RUNP( grab )
                 oldact("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR);
                 return;
         }
-
-        if( !ch->is_npc() && !ch->move )
-        {
-                ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
-                return;
-        }
-        else
-                ch->move -= move_dec( ch );
 
         ///// Custom messages: TODO: move these to XML as well
 
@@ -1041,9 +971,6 @@ SKILL_RUNP( grab )
 
         //////////////// THE ROLL ////////////////
     
-        ch->setWait( gsn_grab->getBeats(ch)  );
-        UNSET_DEATH_TIME(ch);
-
         if (victim->isAffected(gsn_protective_shield))
         {
                 oldact_p("{YТвоя попытка броска наталкивается на защитный щит!{x",
@@ -1137,12 +1064,6 @@ SKILL_RUNP( strangle )
         if ( MOUNTED(ch) )
         {
                 ch->pecho("Только не верхом!");
-                return;
-        }
-
-        if ( ch->is_npc() || !gsn_strangle->usable( ch ) )
-        {
-                ch->pecho("Ты не умеешь душить.");
                 return;
         }
 
@@ -1276,10 +1197,7 @@ SKILL_RUNP( strangle )
 
         //////////////// THE ROLL ////////////////
     
-        ch->setWait( gsn_strangle->getBeats(ch) );
-        UNSET_DEATH_TIME(ch);
         victim->setLastFightTime( );
-        ch->setLastFightTime( );  
 
         Chance mychance(ch, (int) chance, 100);
 
@@ -1324,25 +1242,6 @@ SKILL_RUNP( strangle )
 SKILL_RUNP( poison )
 {
 
-        if (ch->is_npc())
-                return;
-
-        if (!gsn_poison_smoke->usable( ch ))
-        {
-                ch->pecho("Ты не владеешь этим навыком.");
-                return;
-        }
-
-        if ( ch->mana < gsn_poison_smoke->getMana(ch) )
-        {
-                ch->pecho("У тебя не хватает энергии для этого.");
-                return;
-        }
-
-        ch->mana -= gsn_poison_smoke->getMana(ch);
-        ch->setWait( gsn_poison_smoke->getBeats(ch) );
-        UNSET_DEATH_TIME(ch);
-
         if ( number_percent() > gsn_poison_smoke->getEffective( ch ) )
         {
                 ch->pecho("Твоя попытка закончилась неудачей.");
@@ -1382,22 +1281,6 @@ SKILL_RUNP( blindness )
         if (ch->is_npc())
                 return;
         
-        if (!gsn_blindness_dust->usable(ch))
-        {
-                ch->pecho("Ты не владеешь этим навыком.");
-                return;
-        }
-
-        if (ch->mana < gsn_blindness_dust->getMana(ch))
-        {
-                ch->pecho("У тебя не хватает энергии для этого.");
-                return;
-        }
-
-        ch->mana -= gsn_blindness_dust->getMana(ch);
-        ch->setWait( gsn_blindness_dust->getBeats(ch) );
-        UNSET_DEATH_TIME(ch);
-
         if (number_percent() > gsn_blindness_dust->getEffective( ch ) )
         {
                 ch->pecho("Твоя попытка закончилась неудачей.");
