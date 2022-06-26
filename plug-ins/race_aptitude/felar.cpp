@@ -52,11 +52,6 @@ SKILL_RUNP( tail )
 
     chance = gsn_tail->getEffective( ch );
     
-    if (chance <= 1) {        
-        ch->pecho("Крылья, ноги.. Главное - хвост!");
-        return;
-    }
-
     if (arg[0] == '\0') {
         victim = ch->fighting;
         if (victim == 0) {
@@ -128,7 +123,6 @@ SKILL_RUNP( tail )
         gsn_tail->improve( ch, true, victim );
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );
-        ch->setWait( gsn_tail->getBeats(ch) );
 
         victim->position = POS_RESTING;
         damage_tail = ch->damroll +
@@ -146,7 +140,6 @@ SKILL_RUNP( tail )
         
         gsn_tail->improve( ch, false, victim );
         ch->position = POS_RESTING;
-        ch->setWait( gsn_tail->getBeats(ch) * 3 / 2 );
     }
     
     if (!fightingCheck)

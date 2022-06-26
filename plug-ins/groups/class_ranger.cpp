@@ -95,17 +95,11 @@ SKILL_RUNP( track )
     EXIT_DATA *pexit;
     int d;
 
-    if (gsn_track->getEffective( ch ) < 2) {
-        ch->pecho("Ты не умеешь читать следы на земле.");
-        return;
-    }
-
     if (arg.empty( )) {
         ch->pecho( "Кого ты хочешь выследить?" );
         return;
     }
 
-    ch->setWait( gsn_track->getBeats(ch) );
     oldact("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
 
     int slevel;
@@ -178,12 +172,6 @@ SKILL_RUNP( shoot )
     int master_shoots = 2;
     DLString argDoor, argVict;
     ostringstream errbuf;
-
-    if (!gsn_bow->usable( ch ))
-    {
-          ch->pecho("Ты не умеешь стрелять из лука.");
-          return;
-    }
 
     if ( ch->fighting )
     {
@@ -269,8 +257,6 @@ SKILL_RUNP( shoot )
     
     if (!arrow)
         return;
-
-    ch->setWait( gsn_bow->getBeats(ch)  );
 
     chance = skill_level_bonus(*gsn_bow, ch) + (gsn_bow->getEffective( ch ) - 50) * 2;
     if ( victim->position == POS_SLEEPING )
@@ -484,14 +470,6 @@ SKILL_RUNP( makearrow )
         wait += arrowSkill->getBeats(ch);
     }
 
-    if (ch->mana < mana) {
-        ch->pecho("У тебя не хватает энергии для изготовления стрел.");
-        return;
-    }
-
-    ch->mana -= mana;
-    ch->setWait( wait );
-
     ch->pecho("Ты сосредотачиваешься на изготовлении стрел!");
     oldact("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM);
 
@@ -527,8 +505,7 @@ SKILL_RUNP( makearrow )
 SKILL_RUNP(makebow)
 {
     Object *bow;
-    int mana, wait;
-
+ 
     if (ch->is_npc())
         return;
 
@@ -542,16 +519,6 @@ SKILL_RUNP(makebow)
         ch->pecho("В этой местности тебе не удается найти древесины для изготовления лука.");
         return;
     }
-
-    mana = gsn_make_bow->getMana(ch);
-    wait = gsn_make_bow->getBeats(ch);
-
-    if (ch->mana < mana) {
-        ch->pecho("У тебя не хватает энергии для изготовления лука.");
-        return;
-    }
-    ch->mana -= mana;
-    ch->setWait(wait);
 
     if (number_percent() > gsn_make_bow->getEffective(ch)) {
         ch->pecho("Ты пытаешься изготовить лук... но он ломается.");
@@ -630,12 +597,6 @@ SKILL_RUNP( ambush )
 
     one_argument( argument, arg );
 
-    if ( ch->is_npc() || !gsn_ambush->usable( ch ) )
-    {
-            ch->pecho("Ты не знаешь, как устроить засаду.");
-            return;
-    }
-
     if ( arg[0] == '\0' )
     {
             if ( ch->ambushing[0] == '\0' )
@@ -684,7 +645,6 @@ SKILL_RUNP( ambush )
     if ( is_safe( ch, victim ) )
             return;
 
-    ch->setWait( gsn_ambush->getBeats(ch)  );
     AmbushOneHit amb( ch, victim );
     
     try {
@@ -747,12 +707,6 @@ SKILL_APPLY( ambush )
 
 SKILL_RUNP( camouflage )
 {
-        if ( ch->is_npc() || !gsn_camouflage->usable( ch ) )
-        {
-                ch->pecho("Ты не знаешь, как замаскировать себя.");
-                return;
-        }
-
         if ( MOUNTED(ch) )
         {
                 ch->pecho("Ты не можешь замаскироваться, когда ты в седле.");
@@ -784,8 +738,6 @@ SKILL_RUNP( camouflage )
                 k = k * 100 /        FIGHT_DELAY_TIME;
         else
                 k = 100;
-
-        ch->setWait( gsn_camouflage->getBeats(ch)  );
 
         if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE) )
         {

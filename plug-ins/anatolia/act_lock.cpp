@@ -1074,7 +1074,6 @@ bool Keyhole::doPick( const DLString &arg )
 
     if (!checkLockPick( lockpick )) {
         oldact("Ты не смо$gгло|г|гла пропихнуть $o4 в эту замочную скважину.", ch, lockpick, 0, TO_CHAR );
-        ch->setWait( gsn_pick_lock->getBeats(ch) / 2 );
         return false;
     }
     
@@ -1091,14 +1090,12 @@ bool Keyhole::doPick( const DLString &arg )
             ch->pecho( "  ...но твои манипуляции ни к чему не приводят." );
 
         gsn_pick_lock->improve( ch, false );
-        ch->setWait( gsn_pick_lock->getBeats(ch) );
         return false;
     }
     
     unlock( );
 
     gsn_pick_lock->improve( ch, true );
-    ch->setWait( gsn_pick_lock->getBeats(ch) / 2 );
     record( lockpick );
     return true;
 }

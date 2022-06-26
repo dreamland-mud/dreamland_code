@@ -67,11 +67,6 @@ SKILL_RUNP( sconce )
     Affect af;
     int chance;
 
-    if (!gsn_sconce->usable( ch )) {
-        ch->pecho("Тебе незнаком карточный стиль ведения боя.");
-        return;
-    }
-
     if (MOUNTED(ch)) {
         ch->pecho("Только не верхом!");
         return;
@@ -113,9 +108,6 @@ SKILL_RUNP( sconce )
         k = 100;
     
     victim->setLastFightTime( );
-    ch->setLastFightTime( );
-
-    ch->setWait( gsn_sconce->getBeats(ch) );
 
     chance = ( int ) ( 0.5 * gsn_sconce->getEffective( ch ) );
     chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
@@ -198,11 +190,6 @@ SKILL_RUNP( joker )
 
     one_argument( argument, arg );
 
-    if (!gsn_joker->usable( ch )) {
-        ch->pecho("У тебя плохое чувство юмора.");
-        return;
-    }
-
     if (IS_CHARMED(ch)) {
         ch->pecho( "Нехорошо шутить над сво%1$Gим|им|ей хозя%1$Gином|ином|йкой.", ch->master);
         return;
@@ -244,7 +231,6 @@ SKILL_RUNP( joker )
         return;
     }
 
-    ch->setWait( gsn_joker->getBeats(ch)  );
     JokerOneHit joke( ch, victim );
     
     try {

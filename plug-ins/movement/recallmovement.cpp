@@ -206,7 +206,6 @@ bool RecallMovement::checkPumped( )
 
 bool RecallMovement::applyWaitstate( )
 {
-    ch->setWaitViolence( 1 );
     return true;
 }
 

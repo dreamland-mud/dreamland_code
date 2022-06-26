@@ -180,19 +180,7 @@ SKILL_RUNP( disarm )
 
         hth = 0;
 
-        if ( (chance = gsn_disarm->getEffective( ch )) <= 1)
-        {
-                ch->pecho("Ты не знаешь как обезоружить противника.");
-                return;
-        }
-
-        if ( !ch->is_npc() && !ch->move )
-        {
-                oldact("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR);
-                return;
-        }
-        else
-                ch->move -= move_dec( ch );
+        chance = gsn_disarm->getEffective( ch );
 
         if (SHADOW(ch))
         {
@@ -266,13 +254,11 @@ SKILL_RUNP( disarm )
         /* and now the attack */
         if (number_percent() < chance)
         {
-                ch->setWait( gsn_disarm->getBeats(ch)  );
                 disarm( ch, victim ,disarm_second);
                 gsn_disarm->improve( ch, true, victim );
         }
         else
         {
-                ch->setWait( gsn_disarm->getBeats(ch) );
                 oldact("Тебе не удалось обезоружить $C4.", ch,0,victim,TO_CHAR);
                 oldact("$c1 пытается обезоружить тебя, но не может.", ch,0,victim,TO_VICT);
                 oldact("$c1 пытается обезоружить $C4, но не может.", ch,0,victim,TO_NOTVICT);
@@ -312,12 +298,6 @@ SKILL_RUNP( shield )
         return;
     }  
 
-    if ( !gsn_shield_cleave->usable( ch ) )
-    {
-        ch->pecho("Ты не знаешь как расколоть щит противника.");
-        return;
-    }
- 
     wield = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
     weapon = 0; // Weapon that does the cleave.
@@ -410,7 +390,6 @@ SKILL_RUNP( shield )
 
     d.log(chance, "chance");
 
-    ch->setWait( gsn_shield_cleave->getBeats(ch)  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
         oldact("Ты {1{Rраскалываешь{2 щит $C2 надвое!", ch,0,victim,TO_CHAR);
@@ -459,12 +438,6 @@ SKILL_RUNP( weapon )
         ch->pecho("Этот навык можно применять только в бою.");
         return;
     }  
-
-    if ( !gsn_weapon_cleave->usable( ch ) )
-    {
-        ch->pecho("Ты не знаешь как расколоть оружие противника.");
-        return;
-    }
  
     wield = get_eq_char(ch,wear_wield);    
     dual = get_eq_char(ch,wear_second_wield); 
@@ -561,7 +534,6 @@ SKILL_RUNP( weapon )
 
     d.log(chance, "chance");
     
-    ch->setWait( gsn_weapon_cleave->getBeats(ch)  );
     if (number_percent() < URANGE( 1, (int)(chance), 95 )) // there's always a chance
     {        
         oldact("Ты {1{Rраскалываешь{2 оружие $C2 надвое!", ch,0,victim,TO_CHAR);
@@ -595,12 +567,6 @@ SKILL_RUNP( lash )
     bool wasFighting;
     int chance;
     
-    if (!gsn_lash->usable( ch )) {
-        oldact("$c1 угрощающе щелкает хлыстом.", ch, 0, 0, TO_ROOM);
-        ch->pecho( "Что?" );
-        return;
-    }
-    
     one_argument(argument, arg);
     
     whip = get_eq_char(ch, wear_wield);
@@ -630,7 +596,6 @@ SKILL_RUNP( lash )
 
     if (victim == ch || chance < 50) {
         ch->pecho("Ты запутываешься в хлысте и падаешь!");
-        ch->setWaitViolence( 5 );
         oldact("$c1 старательно опутывает свои ноги хлыстом и падает на землю.", ch, 0, 0, TO_ROOM);
         return;
     }
@@ -673,7 +638,6 @@ SKILL_RUNP( lash )
         int dam;
 
         gsn_lash->improve( ch, true, victim );
-        ch->setWaitViolence( 1 );
         victim->setWait( gsn_lash->getBeats(victim) );
 
         dam = ch->damroll;
@@ -708,7 +672,6 @@ SKILL_RUNP( lash )
         oldact("$c1 взмахом хлыста поцарапал $C4!", ch, NULL, victim, TO_NOTVICT);
         oldact("Ты уклоняешься от хлыста $c2.", ch, NULL, victim, TO_VICT);
         gsn_lash->improve( ch, false, victim );
-        ch->setWaitViolence( 1 );
     }
     
     if (!wasFighting)
@@ -733,12 +696,6 @@ SKILL_RUNP( throwspear )
 
         if ( ch->is_npc() )
                 return; /* Mobs can't shoot spears */
-
-        if ( !gsn_spear->usable( ch ) )
-        {
-                ch->pecho("Ты не знаешь как метать копье.");
-                return;
-        }
 
         if ( ch->fighting )
         {
@@ -798,7 +755,6 @@ SKILL_RUNP( throwspear )
                 return;            
         } */
 
-        ch->setWait(gsn_spear->getBeats(ch) );
 
         chance = gsn_spear->getEffective( ch );
 

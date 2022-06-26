@@ -95,9 +95,6 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
             successfulSpells++;
         }
 
-        if (ch->is_adrenalined() || ch->fighting != 0) 
-            ch->setWait(4);        
-
     } catch (const VictimDeathException &vde) {
         return;
     }
@@ -192,8 +189,6 @@ SKILL_RUNP( brandish )
         bug( "brandish: bad sn %d.", sn );
         return;
     }
-
-     ch->setWaitViolence( 2 );
 
     if (staff->value2() > 0) {
         const char *terrain = terrains[ch->in_room->getSectorType()].hit;
@@ -316,9 +311,7 @@ SKILL_RUNP( zap )
 
         return;
     }
-    
-     ch->setWaitViolence( 2 );
-    
+        
     if (target->castFar && target->door != -1) {
         ch->pecho("Твой жезл не дотягивается до соседней комнаты.");
         return;

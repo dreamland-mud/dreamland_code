@@ -95,14 +95,6 @@ SKILL_RUNP( searchstones )
 
         return;
     }
-
-    if (ch->mana < gsn_search_stones->getMana(ch)) {
-        ch->pecho( "У тебя не хватает энергии для поиска." );
-        return;
-    }
-
-    ch->mana -= gsn_search_stones->getMana(ch);
-    ch->setWait( gsn_search_stones->getBeats(ch) );
     
     mlevel = ch->getModifyLevel( );
     count = number_range( 5, 5 + mlevel / 30 );
@@ -153,11 +145,6 @@ SKILL_RUNP( throwstone )
     DLString argDoor, argVict;
     ostringstream errbuf;
 
-    if (chance <= 1) {
-        ch->pecho("Ты не умеешь швыряться камнями.");
-        return;
-    }
-    
     if (!direction_range_argument(argument, argDoor, argVict, direction)) {
         ch->pecho("Швырнуть камень куда и в кого?");
         return;
@@ -189,7 +176,6 @@ SKILL_RUNP( throwstone )
         return;
     }
 
-    ch->setWait( gsn_throw_stone->getBeats(ch) );
     set_violent( ch, victim, false );
     oldact("Ты швыряешь $o4 $T.", ch, stone, dirs[ direction ].leave, TO_CHAR );
     oldact("$c1 швыряет $o4 $T.", ch, stone, dirs[ direction ].leave, TO_ROOM );

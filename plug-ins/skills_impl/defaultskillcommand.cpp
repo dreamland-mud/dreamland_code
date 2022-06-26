@@ -4,13 +4,14 @@
  */
 #include "fenia/exceptions.h"
 #include "skill.h"
-#include "character.h"
+#include "pcharacter.h"
 #include "core/object.h"
 #include "defaultskillcommand.h"
 #include "commandflags.h"
 #include "skillsflags.h"
 #include "feniaskillaction.h"
 #include "commandmanager.h"
+#include "fight_position.h"
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
@@ -184,13 +185,28 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
         return;
     }
-    
+
+    // Apply penalties early.
+    if (mana > 0)
+        ch->mana -= mana;
+    if (moves > 0)
+        ch->move -= moves;
+
+    ch->setWait(skill->getBeats(ch));
+
     // See if there is 'run' method override in Fenia. 
-    if (FeniaSkillActionHelper::executeCommandRun(this, ch, target))
-        return;
+    bool feniaOverride = FeniaSkillActionHelper::executeCommandRun(this, ch, target);
 
     // Fall back to the old implementation.
-    DefaultCommand::run( ch, args );
+    if (!feniaOverride)
+        DefaultCommand::run( ch, args );
+
+    // Potentially aggressive command, mark player as actively fighting.
+    // Happens after 'run' because some skills (p.ex. camouflage) depend on last fight time delay.
+    if (argtype == ARG_CHAR_FIGHT) {
+        ch->setLastFightTime();
+        UNSET_DEATH_TIME(ch);
+    }
 }
 
 // Legacy method defined for most commands.

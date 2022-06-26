@@ -558,13 +558,7 @@ SKILL_RUNP( hunt )
     Road road;
     bool fArea;
     
-    if (!gsn_hunt->available( ch )) {
-        ch->pecho("Ты не умеешь охотиться.");
-        return;
-    }
-    if (!gsn_hunt->usable( ch ))
-        return;
-
+  
     one_argument( argument, arg );
 
     if( arg[0] == '\0' ) {
@@ -619,8 +613,7 @@ SKILL_RUNP( hunt )
 
     oldact("$c1 сосредоточенно осматривает местность и следы на земле.", ch, 0, 0, TO_ROOM );
 
-    ch->setWait( gsn_hunt->getBeats(ch)  );
-    
+  
     road = room_first_step( 
                     ch,
                     ch->in_room, 

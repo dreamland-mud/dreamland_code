@@ -103,7 +103,6 @@ SKILL_RUNP( sneak )
         ch->pecho("Тебе не удается скрытно передвигаться.");
     }
 
-    ch->setWait( gsn_sneak->getBeats(ch) );
 }
 
 /*
@@ -176,7 +175,6 @@ SKILL_RUNP( hide )
                 gsn_hide->improve( ch, false );
         }
 
-        ch->setWait( gsn_hide->getBeats(ch) );
 }
 
 
@@ -397,11 +395,6 @@ SKILL_RUNP( escape )
     char arg[MAX_STRING_LENGTH];
 
     argument = one_argument( argument, arg );
-
-    if (!gsn_escape->usable( ch )) {
-        ch->pecho( "Этот навык тебе недоступен, просто напиши {hc{y{leflee{lrсбежать{x." );
-        return;
-    }
 
     if (arg[0] == '\0') {
         ch->pecho( "Укажи направление." );

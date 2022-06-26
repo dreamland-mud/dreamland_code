@@ -210,11 +210,7 @@ SKILL_RUNP( grave )
 
     chance = gsn_grave->getEffective( ch );
 
-    if (chance < 2) {
-	    ch->pecho("Ты не умеешь копать могилы.");
-        return;
-    }
-
+   
     if (RoomUtils::isWater( room )) {
         ch->pecho("Ты же не хочешь промокнуть?");
         return;
@@ -245,15 +241,6 @@ SKILL_RUNP( grave )
         oldact_p("Ты слишком возбужде$gно|н|на, чтобы копать.", ch, 0, 0, TO_CHAR, POS_STANDING);
         return;
     }
-
-    if (ch->move < 100) {
-        oldact_p("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR, POS_STANDING);
-        return;
-    }
-
-    ch->move -= 100;
-    
-    ch->setWait( gsn_grave->getBeats(ch)  );
 
     if (number_percent( ) > chance) {
         oldact("$c1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM);
@@ -295,12 +282,6 @@ SKILL_RUNP( vampire )
         if ( ch->isAffected(gsn_vampire ) )
         {
 		ch->pecho( "Ты не можешь стать еще более вампир%Gом|ом|шей!", ch );
-                return;
-        }
-
-        if ( !ch->is_npc() && !gsn_vampire->usable( ch ) )
-        {
-                ch->pecho("Ты ощериваешь клыки, пытаясь превратиться в упыря, но ничего не выходит.");
                 return;
         }
 
@@ -391,9 +372,6 @@ void sucking(Character *ch, Character *victim)
         return;
     }
 
-    UNSET_DEATH_TIME(ch);
-    ch->setWait(gsn_vampiric_bite->getBeats(ch));
-
     oldact_p("Сквозь кошмарный сон ты чувствуешь, как $c1 высасывает твою {rкровь{x.", ch, 0, victim, TO_VICT, POS_DEAD);
     oldact("Ты высасываешь {rкровь{x из шеи $C2.", ch, 0, victim, TO_CHAR);
     oldact("$c1 высасывает {rкровь{x из шеи $C2.", ch, 0, victim, TO_NOTVICT);
@@ -479,12 +457,6 @@ CMDRUNP( suck )
 
     one_argument( argument, arg );
 
-    if (!gsn_vampiric_bite->usable( ch )) 
-    {
-        ch->pecho("Ты с надеждой ощупываешь свои клыки, но они не оправдывают ожиданий.");
-        return;
-    }
-
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
 	 ch->pecho( "Высасывать кровь можно, только превратившись в вампир%Gа|а|шу!", ch );
          return;
@@ -529,12 +501,6 @@ SKILL_RUNP( bite )
     if ( ch->master != 0 && ch->is_npc() )
             return;
 
-    if ( !ch->is_npc() && !gsn_vampiric_bite->usable( ch ) )
-    {
-            ch->pecho("Ты не умеешь кусаться.");
-            return;
-    }
-	
     if ( IS_CHARMED(ch) )
     {
             ch->pecho( "Ты же не хочешь укусить сво%1$Gего|его|ю любим%1$Gого|ого|ю хозя%1$Gина|ина|йку.", ch->master);
@@ -594,10 +560,7 @@ SKILL_RUNP( bite )
     }
     
 
-    UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
-    ch->setLastFightTime( );	
-    ch->setWait( gsn_vampiric_bite->getBeats(ch)  );
     
     VampiricBiteOneHit vb( ch, victim );
     
@@ -673,12 +636,6 @@ SKILL_RUNP( touch )
                 return;
         }
 	
-        if ( !gsn_vampiric_touch->usable( ch ) )
-        {
-                ch->pecho("Это умение тебе недоступно.");
-                return;
-        }	
-
     	if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
     	{
         	ch->pecho( "Чтобы усыпить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch ); 
@@ -795,11 +752,7 @@ SKILL_RUNP( touch )
 
         //////////////// THE ROLL ////////////////
 
-        UNSET_DEATH_TIME(ch);
         victim->setLastFightTime( );
-        ch->setLastFightTime( ); 
-
-    	ch->setWait( gsn_vampiric_touch->getBeats(ch) );
 
     if (Chance(ch, chance, 100).reroll())
     {
@@ -866,11 +819,6 @@ SKILL_RUNP( bloodlet )
     int dam;
     int chance = gsn_bloodlet->getEffective( ch );
     
-    if ( chance < 2 ) {
-        ch->pecho("Ты не владеешь этим!");
-        return;
-    }
-
     if (ch->isAffected(gsn_bloodlet )) {
         ch->pecho("У тебя еще не зажили старые раны.");
         return;
@@ -881,7 +829,6 @@ SKILL_RUNP( bloodlet )
         return;
     }
 
-    ch->setWait( gsn_bloodlet->getBeats(ch) );
     dam = ch->getModifyLevel( );
     
     if (number_percent( ) < chance) {
@@ -961,11 +908,6 @@ SKILL_RUNP( bonedagger )
     char arg[MAX_INPUT_LENGTH];
     int chance = gsn_bonedagger->getEffective( ch );
 
-    if (chance < 2) {
-        ch->pecho("Что?");
-        return;
-    }
-
     if (!DIGGED(ch)) {
         ch->pecho("Нападать можно только из-под земли.");
         return;
@@ -984,7 +926,6 @@ SKILL_RUNP( bonedagger )
         }
     }
 
-    ch->setWait( gsn_bonedagger->getBeats(ch)  );
     ch->ambushing = str_dup( arg );
     run( ch, str_empty );
 }
