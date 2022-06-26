@@ -24,6 +24,7 @@
 #include "object.h"
 #include "room.h"
 
+#include "xmlattributetrust.h"
 #include "fight_exception.h"
 #include "subprofession.h"
 #include "screenreader.h"
@@ -2597,6 +2598,39 @@ NMI_INVOKE(CharacterWrapper, attribute, "(name): вернуть аттрибут
 
     XMLAttribute::Pointer attr = target->getPC()->getAttributes().find(name)->second;
     return attr->toRegister();
+}
+
+NMI_INVOKE(CharacterWrapper, trustCheck, "(action, ch): выполнить проверку на траст для персонажа ch, вернет true если действие разрешено")
+{
+    checkTarget();
+    CHK_NPC
+    DLString action = argnum2string(args, 1);
+    Character *ch = argnum2character(args, 2);
+        
+    XMLAttributeTrust::Pointer trust = target->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( action );
+    if (!trust)
+        return false;
+
+    return trust->check(ch);
+}
+
+NMI_INVOKE(CharacterWrapper, trustParse, "(action, trustArgs, successMsg): задать новый тип траста для действия action, вернет true если задано успешно")
+{
+    checkTarget();
+    CHK_NPC
+    DLString action = argnum2string(args, 1);
+    DLString trustArgs = argnum2string(args, 2);
+    DLString successMsg = argnum2string(args, 3);
+    ostringstream buf;
+
+    XMLAttributeTrust::Pointer trust = target->getPC( )->getAttributes( ).getAttr<XMLAttributeTrust>( action );
+    
+    bool rc = trust->parse(trustArgs, buf);
+    if (rc)
+        target->send_to(successMsg);
+    target->pecho(buf.str());
+
+    return rc;
 }
 
 NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long,extra): установить аттрибут для рестринга результатов заклинаний")
