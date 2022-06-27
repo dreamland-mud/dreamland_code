@@ -153,7 +153,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
     // Do skill availability check early. TODO: custom message overrides.
     if (!skill->usable(ch)) {
-        if (ch->master)
+        if (IS_CHARMED(ch))
             ch->master->pecho("%^C1 не владеет навыком {y{hh%s{x.", ch, skill->getNameFor(ch->master).c_str());
         ch->pecho("Ты не владеешь навыком {y{hh%s{x.", skill->getNameFor(ch).c_str());
         return;
@@ -168,7 +168,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     // Do mana and move checks early. TODO: show skill name somehow.
     int mana = skill->getMana(ch);
     if (mana > 0 && ch->mana < mana) {
-        if (ch->is_npc() && ch->master != 0) 
+        if (ch->is_npc() && IS_CHARMED(ch)) 
             say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
             ch->pecho("У тебя не хватает энергии{lE (mana){x.");
@@ -178,7 +178,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
     int moves = skill->getMoves(ch);
     if (moves > 0 && ch->move < moves) {
-        if (ch->is_npc() && ch->master != 0)
+        if (ch->is_npc() && IS_CHARMED(ch))
             say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
         else
             ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
@@ -209,7 +209,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     }
 }
 
-// Legacy method defined for most commands.
+// Legacy method still defined for some commands.
 void DefaultSkillCommand::run( Character *ch, char *args )
 {
     DefaultCommand::run( ch, args );
