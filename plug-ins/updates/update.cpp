@@ -288,9 +288,12 @@ void mobile_update( )
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
 
-        wield_update( ch );
+        try {
+            wield_update( ch );
 
-        mprog_special( ch );
+            mprog_special( ch );
+        } catch (const VictimDeathException &) {
+        }
     }
 }
 
