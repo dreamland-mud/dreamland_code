@@ -25,6 +25,8 @@
 #include "merc.h"
 #include "def.h"
 
+#include "fleemovement.h"
+
 /*-------------------------------------------------------------------
  * GangMob
  *------------------------------------------------------------------*/
@@ -168,7 +170,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
     if (confessed || amount / 100 < number_range( b, b + 50 ) || number_percent( ) < 50) {
         switch (number_range( 1, 3 )) {
         case 1: 
-            oldact("$c1 громко вопит '{gПытаешься подкупить меня, щенок?!{x'", ch, 0, briber, TO_ROOM);
+            oldact("$c1 громко вопит '{gПытаешься подкупить меня, сопля$Gк|к|чка?!{x'", ch, 0, briber, TO_ROOM);
             interpret_raw(ch, "murder", briber->getNameC());
             break;
         case 2:
@@ -190,7 +192,7 @@ void GangMember::bribe( Character *briber, int gold, int silver )
     }
     else {
         oldact("$c1 тяжко вздыхает.", ch, 0, 0, TO_ROOM);
-        oldact("$c1 произносит '{gУговорил, красноречивый.. Я открою тебе тайну!{x'", ch, 0, 0, TO_ROOM);
+        oldact("$c1 произносит '{gУговорил$G||а, красноречив$Gый|ый|ая{x... Я открою тебе тайну!{x'", ch, 0, 0, TO_ROOM);
         oldact("$c1 что-то говорит на ухо $C3.", ch, 0, briber, TO_NOTVICT);        
         oldact_p("$c1 говорит тебе '{GВход в логово я видел около $t. Но больше мне ничего не известно.{x'",
                ch, gquest->lairHint( ).c_str( ), briber, TO_VICT, POS_RESTING);
@@ -215,7 +217,7 @@ void GangMember::greet( Character *mob )
             oldact("$c1 произносит '{g$C1, ну че ты за мной ходишь, влюбил$Gось|ся|ась?{x'", ch, 0, mob, TO_ROOM);
             break;
         case 2:
-            oldact("$c1 произносит '{gО господи, это опять ты?{x'", ch, 0, 0, TO_ROOM);
+            oldact("$c1 произносит '{gВарда милостивая, это опять ты?{x'", ch, 0, 0, TO_ROOM);
             break;
         case 3:
             oldact("$c1 рычит '{g$C1, как же ты меня доста$Gло|л|ла!{x'", ch, 0, mob, TO_ROOM);
@@ -243,10 +245,10 @@ void GangMember::greet( Character *mob )
             if (ch->can_see( mob )) {
                 switch (number_range(1, 2)) {
                 case 1:
-                    oldact("$c1 бормочет '{gОппа.. менты.. менты{x'", ch, 0, 0, TO_ROOM);
+                    oldact("$c1 бормочет '{gОпа, менты, менты...{x'", ch, 0, 0, TO_ROOM);
                     break;
                 case 2:
-                    oldact("$c1 дрожит от страха перед $C5", ch, 0, mob, TO_ROOM);
+                    oldact("$c1 дрожит от страха перед $C5.", ch, 0, mob, TO_ROOM);
                     break;
                 }
             }
@@ -330,7 +332,7 @@ void GangMember::fight( Character *victim )
         }
     }
     
-    if (ch->hit < ch->max_hit / 4) {
+    if (ch->hit < ch->max_hit / 4 && canFlee(ch)) {
         switch (number_range(1, 7)) {
         case 1: 
             oldact("$c1 вопит '{gMamma mia!{x'", ch, 0, 0, TO_ROOM); 
@@ -376,13 +378,13 @@ bool GangMember::death( Character *killer )
                     ch, 0, killer, TO_VICT, POS_RESTING );
 
             if (IS_GOOD( killer ))
-                oldact("$c1 хрипит '{gТолько сейчас я понял, как неправильно жил.. Я раскаиваюсь и перед смертью открою тебе тайну.{x'", ch, 0, killer, TO_VICT);
+                oldact("$c1 хрипит '{gТолько сейчас я понял, как неправильно жил. Я раскаиваюсь и перед смертью открою тебе тайну.{x'", ch, 0, killer, TO_VICT);
             else if (IS_EVIL( killer ))
-                oldact("$c1 хрипит '{gБратан, передай от меня привет шефу!{x'", ch, 0, killer, TO_VICT);
+                oldact("$c1 хрипит '{g$GБро|Братан|Сестра, передай от меня привет шефу!{x'", ch, 0, killer, TO_VICT);
             else 
-                oldact("$c1 хрипит '{gЭх, все равно помирать.. Так слушай же..{x'", ch, 0, killer, TO_VICT);
+                oldact("$c1 хрипит '{gЭх, все равно помирать... Так слушай же.{x'", ch, 0, killer, TO_VICT);
 
-            oldact_p("$c1 хрипит '{gВход в логово найдешь неподалеку от $t..{x'",
+            oldact_p("$c1 хрипит '{gВход в логово найдешь неподалеку от $t...{x'",
                    ch, gquest->lairHint( ).c_str( ), killer, TO_VICT, POS_RESTING );
         }
         
@@ -400,13 +402,13 @@ bool GangMember::death( Character *killer )
             switch (number_range( 1, 3 )) {
             case 1: oldact("$c1 хрипит '{gМне крышка...{x'", ch, 0, 0, TO_ROOM); break;
             case 2: oldact("$c1 хрипит '{gКонец моим мучениям...{x'", ch, 0, 0, TO_ROOM); break;
-            case 3: oldact("$c1 хрипит '{gЭта напасть доконала меня..{x'", ch, 0, 0, TO_ROOM); break;
+            case 3: oldact("$c1 хрипит '{gЭта напасть доконала меня...{x'", ch, 0, 0, TO_ROOM); break;
             }
         }                
     } else {
         switch(number_range(1, 2)) {
         case 1: oldact("$c1 хрипит '{g$C1, тебе незнакомо понятие чести...{x'", ch, 0, killer, TO_ROOM); break;
-        case 2: oldact("$c1 хрипит '{gЯ не должен был умереть от твоей руки, $C1..{x'", ch, 0, killer, TO_ROOM); break;    
+        case 2: oldact("$c1 хрипит '{gЯ не должен был умереть от твоей руки, $C1...{x'", ch, 0, killer, TO_ROOM); break;    
         }
     }
     
