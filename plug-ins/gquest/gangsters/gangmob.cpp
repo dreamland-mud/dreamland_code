@@ -332,7 +332,7 @@ void GangMember::fight( Character *victim )
         }
     }
     
-    if (ch->hit < ch->max_hit / 4 && canFlee(ch)) {
+    if (ch->hit < ch->max_hit / 4 && ::canFlee(ch)) {
         switch (number_range(1, 7)) {
         case 1: 
             oldact("$c1 вопит '{gMamma mia!{x'", ch, 0, 0, TO_ROOM); 
