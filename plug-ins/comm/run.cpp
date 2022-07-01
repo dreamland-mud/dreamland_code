@@ -59,7 +59,7 @@ CMDRUN( run )
     }
 
     if (pch->position < POS_STANDING) {
-        pch->pecho("Исходное положение для бега - стоя!");
+        pch->pecho("Исходное положение для бега -- стоя!");
         return;
     }
     
@@ -77,7 +77,7 @@ CMDRUN( run )
         
         if (isBigLetter( walk[i] )) {
             if (cnt > 0) {
-                pch->pecho("Нельзя побежать 'несколько раз до упора'.");
+                pch->pecho("До упора в одну сторону можно побежать только один раз.");
                 return;
             }
         }
@@ -153,7 +153,7 @@ public:
                 if (d0 >= 0 && d0 < DIR_SOMEWHERE) 
                     buf << dirs[d0].leave;
                 else 
-                    buf << "неизвестно куда..";
+                    buf << "неизвестно куда...";
             }
 
             buf << "." << endl;

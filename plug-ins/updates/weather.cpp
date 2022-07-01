@@ -310,7 +310,7 @@ void weather_update( )
         if ( weather_info.mmhg > 1010
                 || ( weather_info.mmhg >  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Молний больше нет." << endl;
+            buf << "Гроза понемного утихает, молний больше нет." << endl;
             weather_info.sky = SKY_RAINING;
             break;
         }
@@ -413,7 +413,7 @@ CMDRUN( time )
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
-        ch->printf( "Dream Land загружен %s\r\nСистемное время: %s\r\n",
+        ch->printf( "Мир Мечты загружен %s\r\nСистемное время: %s\r\n",
                     Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
                     Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
 }
@@ -435,7 +435,7 @@ CMDRUN( weather )
     
     if ( !RoomUtils::isOutside(ch) )
     {
-        ch->pecho("Ты не можешь видеть погоду в помещении.");
+        ch->pecho("В помещении погоду не видно -- попробуй выйти наружу!");
         return;
     }
     
@@ -457,7 +457,7 @@ CMDRUN( weather )
         else if (season == SEASON_SPRING)
             wind = "прохладный весенний";
         else
-            wind = "прохладный северный";
+            wind = "резкий северный";
     }
 
     ch->printf( "Небо %s и дует %s ветер.\n\r",
@@ -633,10 +633,11 @@ CMDRUN( calendar )
     ostringstream buf;
     Calendar calendar(ch->getPC()); 
 
-    calendar.draw(buf);
-    buf << "{WЛегенда{x: {RX{x - сегодня, {cX{x - больше опыта за убийства, {bX{x - меньше расход маны," << endl
-        << "         {GX{x - быстрее учатся умения, {DX{x - дешевые цены, {MX{x - успешные воровские умения," << endl
-        << "         {gX{x - питомцы быстрее улучшают параметры" << endl;
+    calendar.draw(buf); // TO-DO (RUFFINA): Let's find more accessible display for visually impaired and color-blind
+    buf << "{WУсловные обозначения цветом{x: " << endl
+        << "         {RX{x: сегодня, {cX{x: больше опыта за убийства, {bX{x: меньше расход маны," << endl        
+        << "         {GX{x: быстрее прокачка умений, {DX{x: низкие цены, {MX{x: удачнее воровские навыки," << endl
+        << "         {gX{x: существа быстрее улучшают параметры" << endl;
     ch->send_to(buf);
 }
 
