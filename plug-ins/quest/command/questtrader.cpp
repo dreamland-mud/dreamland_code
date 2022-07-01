@@ -109,7 +109,7 @@ void QuestTrader::msgListBefore( Character *client )
 
 void QuestTrader::msgListAfter( Character *client )
 {
-    client->pecho( "Для покупки чего-либо используйте {y{lRквест купить{lEquest buy{lx {Dвещь{x." );
+    client->pecho( "Для покупки чего-либо используй {y{lRквест купить{lEquest buy{lx {Dназвание{x." );
 }
 
 void QuestTrader::msgArticleNotFound( Character *client ) 
@@ -299,8 +299,8 @@ void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 {
     client->perm_stat[STAT_CON]++;
 
-    oldact("$C1 повышает сложение $c2.", client, 0, questman, TO_ROOM );
-    oldact("$C1 повышает твое сложение.", client, 0, questman, TO_CHAR );
+    oldact("$C1 повышает телосложение $c2.", client, 0, questman, TO_ROOM );
+    oldact("$C1 повышает твое телосложение.", client, 0, questman, TO_CHAR );
 }
     
 bool ConQuestArticle::available( Character *client, NPCharacter *questman ) const 
@@ -311,7 +311,7 @@ bool ConQuestArticle::available( Character *client, NPCharacter *questman ) cons
     if (client->perm_stat[STAT_CON] < client->getPC( )->getMaxTrain( STAT_CON ))
         return true;
     
-    say_act( client, questman, "Извини, $c1, но твое сложение на максимуме." );
+    say_act( client, questman, "Извини, $c1, но твое телосложение уже на максимуме." );
     return false;
 }
 
@@ -461,7 +461,7 @@ void OwnerPrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( )) {
         ch->getPC( )->getRemorts( ).owners++;
-        ::wiznet( WIZ_QUEST, 0, 0, "%1$^C1 приобретает owner coupon.", ch );
+        ::wiznet( WIZ_QUEST, 0, 0, "%1$^C1 приобретает купон владельца.", ch );
     }
 }
 
@@ -483,7 +483,7 @@ bool OwnerQuestArticle::available( Character *client, NPCharacter *questman ) co
     }
 
     if (!lifePrice.canAfford( client )) {
-        say_act( client, questman, "Извини, $c1, но ты уже исчерпа$gло|л|ла отведенное тебе количество этих талонов." );
+        say_act( client, questman, "Извини, $c1, но ты уже исчерпа$gло|л|ла отведенное тебе количество этих купонов." );
         return false;
     }
 
@@ -508,8 +508,8 @@ void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 {
     client->wearloc.set( wear_ears );
     
-    oldact("$C1 делает дырку в голове $c2.",client,0,tattoer,TO_ROOM);
-    oldact("$C1 делает тебе дырку в голове.",client,0,tattoer,TO_CHAR);
+    oldact("$C1 достает огромный гвоздь и молниеносно пробивает дырку в мочке уха $c2.",client,0,tattoer,TO_ROOM);
+    oldact("$C1 достает огромный гвоздь и молниеносно пробивает дырку в твоей мочке уха. АЙ!",client,0,tattoer,TO_CHAR);
 }
 
 bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) const 
@@ -523,7 +523,7 @@ bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) 
 
     if (get_eq_char( client, wear_head )) {
         interpret_raw( tattoer, "bonk", client->getNameC() );
-        say_act( client, tattoer, "Шляпу сними!" );
+        say_act( client, tattoer, "Шляпу сними! Не получается до твоего уха добраться." );
         return false;
     }
 
@@ -573,7 +573,7 @@ bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) co
         return false;
 
     if (client->getReligion( ) == god_none) {
-        say_act( client, tattoer, "$c1, ты не веришь в бога и не можешь получить знак религии." );
+        say_act( client, tattoer, "$c1, ты атеист$g||ка и не можешь получить знак религии." );
         return false;
     }
 
