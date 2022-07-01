@@ -78,3 +78,8 @@ DLString IndefiniteNoun::decline(const Case &c) const
     return ipron.decline(c, a);
 }
 
+const DLString &IndefiniteNoun::getFullForm() const
+{
+    return DLString::emptyString;
+}
+

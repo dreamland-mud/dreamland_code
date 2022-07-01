@@ -64,7 +64,7 @@ void RussianString::fillCachedForms()
     cachedForms[Case::MAX] = "";
 
     for (int c = Case::NOMINATIVE; c < Case::MAX; c++) {
-        cachedForms[c] = FlexedNoun::decline(Case(c));
+        cachedForms[c] = Noun::decline(Case(c));
         cachedForms[Case::MAX] << cachedForms[c] << " ";
     }
 }

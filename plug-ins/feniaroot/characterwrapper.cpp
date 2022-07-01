@@ -1046,6 +1046,11 @@ NMI_GET( CharacterWrapper, name, "имя" )
     checkTarget( );
     return target->getName( );
 }
+NMI_GET( CharacterWrapper, names, "имя персонажа или короткое описание моба с падежами" )
+{
+    checkTarget( );
+    return target->toNoun()->getFullForm();
+}
 
 NMI_GET( CharacterWrapper, race, "раса (структура .Race)" )
 {

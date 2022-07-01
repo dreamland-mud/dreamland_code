@@ -72,6 +72,7 @@ public:
     virtual Gender getGender() const;
     virtual Number getNumber() const;
     virtual DLString decline(const Case &c) const;
+    virtual const DLString &getFullForm() const;
 
 protected:
     IndefinitePronoun ipron;

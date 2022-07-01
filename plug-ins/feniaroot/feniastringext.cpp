@@ -5,6 +5,7 @@
 
 #include "register-impl.h"
 #include "reglist.h"
+#include "morphology.h"
 #include "char.h"
 #include "dl_strings.h"
 #include "dl_ctype.h"
@@ -38,6 +39,11 @@ NMI_INVOKE(FeniaString, trim, "(): обрезать лишние пробелы 
     DLString str = *this;
     str.stripWhiteSpace();
     return Register( str );
+}
+
+NMI_INVOKE(FeniaString, noun, "(): попытаться найти одно существительное в строке")
+{
+    return Register(Syntax::noun(*this));
 }
 
 NMI_INVOKE(FeniaString, quote, "(): вернуть строку в кавычках, если в ней есть пробелы")

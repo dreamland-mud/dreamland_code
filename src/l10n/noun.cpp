@@ -25,10 +25,7 @@ MultiGender Noun::getMultiGender() const
     return MultiGender(getGender(), getNumber());
 }
 
-/*----------------------------------------------------------------------------
- * FlexedNoun
- *--------------------------------------------------------------------------*/
-DLString FlexedNoun::decline(const Case &c) const
+DLString Noun::decline(const Case &c) const
 {
     return Flexer::flex(getFullForm(), c + 1);
 }

@@ -68,11 +68,10 @@ DLString Syntax::noun(const DLString &phrase)
     if (words.empty())
         return phrase;
 
-    // Recognize "наемник из герихельма".
-    StringSet preps("из на");
-    for (auto &w: words)
-        if (preps.count(w) > 0)
-            return words.front();
+    // In case of several words, look for the last one with gram case endings.
+    for (auto w = words.rbegin(); w != words.rend(); w++)
+        if (w->find('|') != DLString::npos)
+            return *w;
 
     // For everything else just return the last word.
     return words.back();

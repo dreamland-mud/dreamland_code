@@ -9,7 +9,7 @@
 #include "nounholder.h"
 
 class RussianString : public Grammar::NounHolder,
-                      public Grammar::FlexedNoun 
+                      public Grammar::Noun 
 {
 public:   
     typedef ::Pointer<RussianString> Pointer;
