@@ -834,9 +834,9 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
     if (IS_AFFECTED( victim, AFF_POISON ))
         str << "Отравлен%1$Gо||а." << endl;
     if (IS_AFFECTED( victim, AFF_SLOW ))
-        str << "Передвигается М Е Д Л Е Н  Н   О." << endl;
+        str << "Под воздействием З А М Е Д  Л  Е  Н   И    Я." << endl;
     if (IS_AFFECTED( victim, AFF_HASTE ))
-        str << "Передвигается очень быстро." << endl;
+        str << "Под воздействием ускорения, уииии!" << endl;
     if (IS_AFFECTED( victim, AFF_WEAKEN ))
         str << "Выглядит беспомощно и слабо." << endl;
     if (IS_AFFECTED( victim, AFF_CORRUPTION ))
