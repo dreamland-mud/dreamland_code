@@ -16,7 +16,9 @@ steps:
   - cd /home/dreamland/dreamland_code
   - git pull
   - kill -9 $SSH_AGENT_PID
+  - make -f Makefile.git
   - cd ../objs
+  - ../dreamland_code/configure --prefix=/home/dreamland/runtime
   - make -j 2
   - make install
 

@@ -16,6 +16,32 @@
 #include "merc.h"
 #include "def.h"
 
+
+/** 
+ * Someone who lives their first life, has low self-rate and haven't done enough successful quests
+ * is considered a 'total newbie'.
+ */
+bool is_total_newbie(Character *ch)
+{
+    if (ch->is_npc())
+        return false;
+
+    PCharacter *pch = ch->getPC();
+
+    if (pch->getRemorts().size() > 0)   
+        return false;
+
+    if (!rated_as_newbie(pch))
+        return false;
+
+    
+    XMLAttributeStatistic::Pointer stats = pch->getAttributes( ).findAttr<XMLAttributeStatistic>("questdata");
+    if (stats && stats->getAllVictoriesCount() > 50)
+        return false;
+    
+    return true;
+}
+
 bool rated_as_newbie( PCMemoryInterface* pcm )
 {
     return pcm->getAttributes( ).getAttr<XMLAttributeSelfRate>( "selfrate" )->rate == 0;

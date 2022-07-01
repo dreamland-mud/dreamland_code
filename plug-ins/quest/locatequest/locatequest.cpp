@@ -145,7 +145,7 @@ QuestReward::Pointer LocateQuest::reward( PCharacter *ch, NPCharacter *questman 
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint && !IS_TOTAL_NEWBIE(ch)) {
+    if (hint && !is_total_newbie(ch)) {
         r->points = number_range( 3, 9 );
         r->gold = number_fuzzy( r->points );
     } else {

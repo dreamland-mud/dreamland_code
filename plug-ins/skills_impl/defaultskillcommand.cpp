@@ -4,13 +4,14 @@
  */
 #include "fenia/exceptions.h"
 #include "skill.h"
-#include "character.h"
+#include "pcharacter.h"
 #include "core/object.h"
 #include "defaultskillcommand.h"
 #include "commandflags.h"
 #include "skillsflags.h"
 #include "feniaskillaction.h"
 #include "commandmanager.h"
+#include "fight_position.h"
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
@@ -152,7 +153,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
     // Do skill availability check early. TODO: custom message overrides.
     if (!skill->usable(ch)) {
-        if (ch->master)
+        if (IS_CHARMED(ch))
             ch->master->pecho("%^C1 не владеет навыком {y{hh%s{x.", ch, skill->getNameFor(ch->master).c_str());
         ch->pecho("Ты не владеешь навыком {y{hh%s{x.", skill->getNameFor(ch).c_str());
         return;
@@ -167,7 +168,7 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
     // Do mana and move checks early. TODO: show skill name somehow.
     int mana = skill->getMana(ch);
     if (mana > 0 && ch->mana < mana) {
-        if (ch->is_npc() && ch->master != 0) 
+        if (ch->is_npc() && IS_CHARMED(ch)) 
             say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
             ch->pecho("У тебя не хватает энергии{lE (mana){x.");
@@ -177,23 +178,38 @@ void DefaultSkillCommand::run( Character *ch, const DLString &args )
 
     int moves = skill->getMoves(ch);
     if (moves > 0 && ch->move < moves) {
-        if (ch->is_npc() && ch->master != 0)
+        if (ch->is_npc() && IS_CHARMED(ch))
             say_fmt("Хозя%2$Gин|ин|йка, я слишком устал%1$Gо||а!", ch, ch->master);
         else
             ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
 
         return;
     }
-    
+
+    // Apply penalties early.
+    if (mana > 0)
+        ch->mana -= mana;
+    if (moves > 0)
+        ch->move -= moves;
+
+    ch->setWait(skill->getBeats(ch));
+
     // See if there is 'run' method override in Fenia. 
-    if (FeniaSkillActionHelper::executeCommandRun(this, ch, target))
-        return;
+    bool feniaOverride = FeniaSkillActionHelper::executeCommandRun(this, ch, target);
 
     // Fall back to the old implementation.
-    DefaultCommand::run( ch, args );
+    if (!feniaOverride)
+        DefaultCommand::run( ch, args );
+
+    // Potentially aggressive command, mark player as actively fighting.
+    // Happens after 'run' because some skills (p.ex. camouflage) depend on last fight time delay.
+    if (argtype == ARG_CHAR_FIGHT) {
+        ch->setLastFightTime();
+        UNSET_DEATH_TIME(ch);
+    }
 }
 
-// Legacy method defined for most commands.
+// Legacy method still defined for some commands.
 void DefaultSkillCommand::run( Character *ch, char *args )
 {
     DefaultCommand::run( ch, args );

@@ -135,11 +135,7 @@ SKILL_RUNP( cleave )
     if (ch->master != 0 && ch->is_npc())
         return;
 
-    if (!ch->is_npc() && !gsn_cleave->usable( ch )) {
-        ch->pecho("Ты не умеешь рассекать пополам.");
-        return;
-    }
-
+ 
     if (arg[0] == '\0') {
         ch->pecho("Рассечь кого?");
         return;
@@ -180,7 +176,6 @@ SKILL_RUNP( cleave )
         return;
     }
 
-    ch->setWait( gsn_cleave->getBeats(ch)  );
     
     CleaveOneHit cleave_hit( ch, victim );
     

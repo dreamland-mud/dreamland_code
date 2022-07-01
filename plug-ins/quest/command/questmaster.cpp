@@ -2,6 +2,7 @@
  *
  * ruffina, 2005
  */
+#include "selfrate.h"
 #include "questmaster.h"
 
 #include "npcharacter.h"
@@ -11,8 +12,6 @@
 #include "act.h"
 #include "mercdb.h"
 #include "handler.h"
-//#include "def.h"
-#include "selfrate.h"
 
 /*--------------------------------------------------------------------------
  * QuestMaster
@@ -23,7 +22,7 @@ QuestMaster::QuestMaster( )
 
 bool QuestMaster::specIdle( ) 
 { 
-    if (chance(99) || !IS_TOTAL_NEWBIE(ch))
+    if (chance(99) || !is_total_newbie(ch))
         return false;
 
     do_say(ch, "Хочешь получить интересное задание? Напиши y{hc{lRквест попросить{lEquest request{x.");

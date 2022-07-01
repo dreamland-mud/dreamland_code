@@ -1021,9 +1021,9 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
         }
 
         ostringstream buf;
-        buf << dlprintf("{C%-20s %-4s %4s %1s %1s{x\r\n", "Имя", "Тип", "Мана", "T", "F");
+        buf << dlprintf("{C%-20s %-4s %4s %4s %4s %1s %1s{x\r\n", "Имя", "Тип", "Мана", "Шаги", "Wait", "T", "F");
         const DLString lineFormat = 
-            web_cmd(ch, "skedit $1", "%-20s") + " %-4s %4d %1s %1s{x\r\n";
+            web_cmd(ch, "skedit $1", "%-20s") + " %-4s %4d %4d %4d %1s %1s{x\r\n";
 
         for (auto &s: skills) {
             DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
@@ -1051,6 +1051,8 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                     s->getName().c_str(),
                     type.c_str(),
                     s->getMana(),
+                    s->getMoves(),
+                    s->getBeats(),
                     (spell && spell->isCasted() && spell->tier > 0 ? spell->tier.toString().c_str() :  ""),
                     (fenia ? "{g*{x" : ""));
         }

@@ -168,14 +168,6 @@ SKILL_RUNP(guard)
     PCharacter *victim, *pch, *gch;
     int cnt;
 
-    if (!gsn_guard->available(ch))
-    {
-        ch->pecho("Ась?");
-        return;
-    }
-
-    if (!gsn_guard->usable(ch))
-        return;
 
     one_argument(argument, arg);
 

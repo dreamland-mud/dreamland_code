@@ -22,7 +22,7 @@ struct SpellTemplate<tn, DefaultSpell> : public DefaultSpell, public ClassSelfRe
     virtual void run( Character *, Object *, int, int ) { }
     virtual void run( Character *, char *, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
-    virtual void apply( Character *ch, Character *victim, int level ) { }    
+    virtual bool apply( Character *ch, Character *victim, int level ) { return false; }    
 
     virtual bool spellbane( Character *ch, Character *victim ) const { 
         return DefaultSpell::spellbane( ch, victim );
@@ -58,6 +58,7 @@ PluginInitializer<SPELL(x)> dummySpell_ ##x## _init;
 
 #define TYPE_SPELL(type, x) template <> type SPELL(x)
 #define VOID_SPELL(x) TYPE_SPELL(void, x)
+#define BOOL_SPELL(x) TYPE_SPELL(bool, x)
 
 // MOC_SKIP_END
 #endif

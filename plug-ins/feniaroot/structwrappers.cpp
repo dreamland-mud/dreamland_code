@@ -1372,23 +1372,24 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить вр
     return Register(true);
 }
 
-NMI_INVOKE(SkillWrapper, apply, "(ch,vict|obj|room|arg,level): выполнить умение без проверок и сообщений")
+NMI_INVOKE(SkillWrapper, apply, "(ch,vict|obj|room|arg[,level]): выполнить умение без проверок и сообщений")
 {
     Skill *skill = getTarget();
     Character *ch = argnum2character(args, 1);
+    bool rc;
 
     if (skill->getSpell()) {
         SpellTarget::Pointer target = argnum2target(args, 2);
         int level = argnum2number(args, 3);
-        skill->getSpell()->apply(ch, target, level);
+        rc = skill->getSpell()->apply(ch, target, level);
     }
     else {
         Character *victim = args.size() > 1 ? argnum2character(args, 2) : 0;
         int level = args.size() > 2 ? argnum2number(args, 3) : 0;
-        skill->getCommand()->apply(ch, victim, level);
+        rc = skill->getCommand()->apply(ch, victim, level);
     }
 
-    return Register();
+    return Register(rc);
 }
 
 NMI_INVOKE(SkillWrapper, dressItem, "(obj,ch[,key]): рестрингнуть предмет согласно аттрибутам персонажа")

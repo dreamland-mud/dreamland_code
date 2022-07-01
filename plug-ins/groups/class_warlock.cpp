@@ -53,12 +53,6 @@ SKILL_RUNP( blink )
 
     argument = one_argument(argument , arg);
 
-    if (!ch->is_npc() && !gsn_blink->usable( ch ))
-    {
-        ch->pecho("Это умение тебе недоступно.");
-        return;
-    }
-
     if (arg[0] == '\0' )
     {
         ch->printf("Во время боя ты {W%sмерцаешь{x.\n\r",

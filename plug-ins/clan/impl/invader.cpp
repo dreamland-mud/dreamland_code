@@ -127,12 +127,7 @@ int ClanGuardInvader::getCast(Character *victim)
 
 SKILL_RUNP(fade)
 {
-    if (!gsn_fade->available(ch))
-    {
-        ch->pecho("Ась?");
-        return;
-    }
-
+   
     if (MOUNTED(ch))
     {
         ch->pecho("Ты не можешь спрятаться в тенях, когда в седле.");
@@ -151,10 +146,7 @@ SKILL_RUNP(fade)
         return;
     }
 
-    if (!gsn_fade->usable(ch))
-        return;
-
-
+ 
     int k = ch->getLastFightDelay();
 
     if (k >= 0 && k < FIGHT_DELAY_TIME)

@@ -24,6 +24,7 @@
 #include "object.h"
 #include "room.h"
 
+#include "xmlattributetrust.h"
 #include "fight_exception.h"
 #include "subprofession.h"
 #include "screenreader.h"
@@ -252,6 +253,16 @@ GETWRAP( in_room, "комната, в которой сейчас находим
 GETWRAP( was_in_room, "комната, в которой находились перед закапыванием в могилу")
 GETWRAP( mount, "на ком мы верхом или кто верхом на нас" )
     
+NMI_SET( CharacterWrapper, mount, "лидер группы или тот, кто очаровал" )
+{
+    checkTarget( );
+
+    if (arg.type == Register::NONE)
+        target->mount = NULL;
+    else
+        target->mount = arg2character( arg );
+}
+
 NMI_SET( CharacterWrapper, leader, "лидер группы или тот, кто очаровал" )
 {
     checkTarget( );
@@ -936,7 +947,7 @@ NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 �
 {
     checkTarget();
     CHK_NPC	   
-    return IS_TOTAL_NEWBIE(target->getPC());
+    return is_total_newbie(target->getPC());
 }
 
 NMI_GET( CharacterWrapper, lastAccessTime, "время последнего захода в мир" )
@@ -2587,6 +2598,39 @@ NMI_INVOKE(CharacterWrapper, attribute, "(name): вернуть аттрибут
 
     XMLAttribute::Pointer attr = target->getPC()->getAttributes().find(name)->second;
     return attr->toRegister();
+}
+
+NMI_INVOKE(CharacterWrapper, trustCheck, "(action, ch): выполнить проверку на траст для персонажа ch, вернет true если действие разрешено")
+{
+    checkTarget();
+    CHK_NPC
+    DLString action = argnum2string(args, 1);
+    Character *ch = argnum2character(args, 2);
+        
+    XMLAttributeTrust::Pointer trust = target->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( action );
+    if (!trust)
+        return false;
+
+    return trust->check(ch);
+}
+
+NMI_INVOKE(CharacterWrapper, trustParse, "(action, trustArgs, successMsg): задать новый тип траста для действия action, вернет true если задано успешно")
+{
+    checkTarget();
+    CHK_NPC
+    DLString action = argnum2string(args, 1);
+    DLString trustArgs = argnum2string(args, 2);
+    DLString successMsg = argnum2string(args, 3);
+    ostringstream buf;
+
+    XMLAttributeTrust::Pointer trust = target->getPC( )->getAttributes( ).getAttr<XMLAttributeTrust>( action );
+    
+    bool rc = trust->parse(trustArgs, buf);
+    if (rc)
+        target->send_to(successMsg);
+    target->pecho(buf.str());
+
+    return rc;
 }
 
 NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long,extra): установить аттрибут для рестринга результатов заклинаний")
