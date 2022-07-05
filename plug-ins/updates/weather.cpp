@@ -369,7 +369,7 @@ void make_date( ostringstream &buf )
     buf << hour_of_day( ) << " " << time_of_day( ) << ", " 
         << "День: " << day_name[day % 7] << ", " << day << "й, "
         << "Месяц " << calendar_month( ) << ", "
-        << "Год " << time_info.year << "." << endl;
+        << "Год " << time_info.year << ".";
 }
 
 CMDRUN( time )
