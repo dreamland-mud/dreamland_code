@@ -688,6 +688,11 @@ NMI_GET( MaterialWrapper, burns, "сколько тиков горит (-1 ес�
     return Register( material_burns( names.c_str() ) );
 }
 
+NMI_GET( MaterialWrapper, hardness, "средняя твердость материалов (-1 неразрушим, 0 жидкость/газ)" )
+{
+    return Register( material_hardness( names.c_str() ) );
+}
+
 NMI_GET( MaterialWrapper, rho, "средняя плотность материалов" )
 {
     return Register( material_rho( names.c_str() ) );
