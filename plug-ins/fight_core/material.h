@@ -27,5 +27,7 @@ int material_swims( Object * );
 int material_swims( const char *materials );
 int material_rho( Object * );
 int material_rho( const char * );
+int material_hardness( Object * );
+int material_hardness( const char * );
 
 #endif

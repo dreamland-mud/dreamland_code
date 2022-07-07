@@ -158,6 +158,32 @@ int material_rho( const char *materials )
     return rho;
 }
 
+int material_hardness( Object *obj )
+{
+    return material_hardness(obj->getMaterial());
+}
+
+int material_hardness( const char *materials )
+{
+    int hardness = 0;
+	int i = 0;
+    vector<const material_t *> result;
+
+    material_parse( materials, result );
+    
+    for (auto &mat: result) {
+		i++;
+		// can't break even partially indestructible or elastic material
+		if (mat->hardness <= 0)
+			return mat->hardness; 
+		else
+			hardness = hardness + mat->hardness;
+	}
+	if (i == 0) i++; // sanity check
+	hardness = hardness / i; // find everage hardness
+    return hardness;
+}
+
 DLString material_rname(Object *obj) 
 {
     return material_rname(obj->getMaterial());
