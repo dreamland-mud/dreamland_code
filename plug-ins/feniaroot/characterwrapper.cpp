@@ -1010,8 +1010,7 @@ NMI_SET( CharacterWrapper, hometown, "родной город (структур�
 NMI_GET( CharacterWrapper, clan, "клан (структура .Clan)" )
 {
     checkTarget( );
-    CHK_NPC
-    return ClanWrapper::wrap( target->getPC( )->getClan( )->getName( ) );
+    return ClanWrapper::wrap( target->getClan( )->getName( ) );
 }
 
 NMI_SET(CharacterWrapper, on, "объект, мебель, на которой сидим")
