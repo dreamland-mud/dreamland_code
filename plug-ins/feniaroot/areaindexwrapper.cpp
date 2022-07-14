@@ -18,6 +18,8 @@
 
 #include "def.h"
 
+#include "clanreference.h"
+
 using Scripting::NativeTraits;
 
 NMI_INIT(AreaIndexWrapper, "прототип для зоны (area index data)")
@@ -117,51 +119,57 @@ NMI_GET( AreaIndexWrapper, max_vnum , "верхняя граница диапа�
 
 NMI_GET( AreaIndexWrapper, itemVnum , "кланхоллы: vnum святыни (или 0)") 
 { 
-    checkTarget( ); 
-	if (area_is_clan(target))
-    	return target->itemVnum;
-	else return 0;
+    checkTarget( );
+	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
+    if (!clanArea)
+        return 0;	
+	else return target->itemVnum;
 }
 
 NMI_GET( AreaIndexWrapper, altarVnum , "кланхоллы: vnum алтаря (или 0)") 
 { 
     checkTarget( ); 
-	if (area_is_clan(target))
-    	return target->altarVnum;
-	else return 0;
+	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
+    if (!clanArea)
+        return 0;	
+	else return target->altarVnum;
 }
 
 NMI_GET( AreaIndexWrapper, roomVnum , "кланхоллы: vnum алтарной комнаты (или 0)") 
 { 
     checkTarget( ); 
-	if (area_is_clan(target))
-    	return target->roomVnum;
-	else return 0;
+	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
+    if (!clanArea)
+        return 0;	
+	else return target->roomVnum;
 }
 
 NMI_GET( AreaIndexWrapper, invitationVnum , "кланхоллы: vnum приглашения в клан (или 0)") 
 { 
     checkTarget( ); 
-	if (area_is_clan(target))
-    	return target->invitationVnum;
-	else return 0;
+	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
+    if (!clanArea)
+        return 0;	
+	else return target->invitationVnum;
 }
 
 
 NMI_GET( AreaIndexWrapper, keyVnum , "кланхоллы: vnum ключа от алтаря (или 0)") 
 { 
     checkTarget( ); 
-	if (area_is_clan(target))
-    	return target->keyVnum;
-	else return 0;
+	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
+    if (!clanArea)
+        return 0;	
+	else return target->keyVnum;
 }
 
 NMI_GET( AreaIndexWrapper, bookVnum , "кланхоллы: vnum секретной книги (или 0)") 
 { 
     checkTarget( ); 
-	if (area_is_clan(target))
-    	return target->bookVnum;
-	else return 0;
+	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
+    if (!clanArea)
+        return 0;	
+	else return target->bookVnum;
 }
 
 NMI_GET(AreaIndexWrapper, players, "список (List) всех игроков в экземпляре зоны по умолчанию")
