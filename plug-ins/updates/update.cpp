@@ -1369,9 +1369,9 @@ void player_update( )
             ch->PK_time_v--;
         else if( !ch->PK_time_v && IS_VIOLENT( ch ) )
         {
-            oldact_p("Лихорадочный блеск в глазах $c2 пропадает.",
+            oldact_p("Лихорадочный блеск смертоубийства в глазах $c2 пропадает.",
                    ch, 0, 0, TO_ROOM,POS_RESTING );
-            oldact_p("Ты успокаиваешься.",
+            oldact_p("Ты успокаиваешься после недавнего смертоубийства.",
                    ch, 0, 0, TO_CHAR,POS_RESTING );
             REMOVE_VIOLENT( ch );
         }
@@ -1449,8 +1449,8 @@ void idle_update( PCharacter *ch )
 {
     if (IS_VIOLENT( ch ))
     {
-        oldact("Лихорадочный блеск в глазах $c2 пропадает.", ch, 0, 0, TO_ROOM );
-        oldact("Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
+        oldact("Лихорадочный блеск смертоубийства в глазах $c2 пропадает.", ch, 0, 0, TO_ROOM );
+        oldact("Ты успокаиваешься от недавнего смертоубийства.", ch, 0, 0, TO_CHAR );
         REMOVE_VIOLENT( ch );
         ch->PK_time_v = 0;
     }
