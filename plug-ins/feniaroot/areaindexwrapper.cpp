@@ -19,6 +19,7 @@
 #include "def.h"
 
 #include "../clan/behavior/clanarea.h"
+#include "clanreference.h"
 
 using Scripting::NativeTraits;
 
