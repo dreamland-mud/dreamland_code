@@ -34,7 +34,7 @@ bool BandaMobile::death(Character *killer)
 
     if (ourHero( killer )) {
         if (chance(33)) 
-            killer->pecho("{YТы уничтожил%1$Gо||а очередную жертву, браво.{x", killer);
+            killer->pecho("{YТы уничтожил%1$Gо||а очередную цель, браво.{x", killer);
         else if (chance(50))
             killer->pecho("{YМолодец, тебе удалось избавить мир от очередной напасти.{x", killer);
         else
@@ -44,13 +44,13 @@ bool BandaMobile::death(Character *killer)
     }
 
     if (ourHeroGroup(killer)) {
-        killer->pecho("{YТы помог%1$Gло||ла согрупнику уничтожить очередную жертву, браво.{x", killer);
-        pcm->getPlayer()->pecho("{YТвой согрупник помог тебе уничтожить очередную жертву.{x");
+        killer->pecho("{YТы помог%1$Gло||ла согрупнику уничтожить очередную цель задания, браво.{x", killer);
+        pcm->getPlayer()->pecho("{YТвой согрупник помог тебе уничтожить очередную цель задания.{x");
         quest->mobKilled(pcm, killer);
         return false;
     }
 
-    pcm->getPlayer()->pecho("{YС кем-то из них что-то случилось без твоего участия.{x");
+    pcm->getPlayer()->pecho("{YКто-то из целей текущего задания погиб без твоего участия.{x");
     quest->mobDestroyed(pcm);
     return false;
 }
@@ -135,7 +135,7 @@ void BandaMobile::config(PCharacter *hero)
 void BandaMobile::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim ))
-        buf << "{R[ЦЕЛЬ] {x";
+        buf << "{1{R[ЦЕЛЬ] {2";
 }
 
 BandaItem::~BandaItem()
