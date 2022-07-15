@@ -32,6 +32,8 @@
 #include "merc.h"
 #include "def.h"
 
+#include "messengers.h"
+
 PROF(vampire);
 BONUS(experience);
 BONUS(mana);
