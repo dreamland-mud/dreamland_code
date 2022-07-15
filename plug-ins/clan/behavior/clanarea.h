@@ -19,6 +19,8 @@ public:
     
         ClanArea( );
 
+        virtual void setArea( AreaIndexData * );
+        virtual void unsetArea( );
         virtual void update( );
 
         void createAltar( );

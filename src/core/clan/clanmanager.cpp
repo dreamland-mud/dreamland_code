@@ -2,9 +2,10 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "clanmanager.h"
 #include "clan.h"
-#include "clan.h"
+#include "mercdb.h"
 
 ClanManager* clanManager = 0;
 
@@ -26,3 +27,18 @@ GlobalRegistryElement::Pointer ClanManager::getDumbElement( const DLString &name
 {
     return Clan::Pointer( NEW, name );
 }
+
+void ClanManager::addClanHall(const DLString &clanName, area_file *areaFile)
+{
+    LogStream::sendNotice() << "Clan hall for " << clanName << " is " << areaFile->file_name;
+    clanHalls[clanName] = areaFile;
+}
+
+area_file * ClanManager::findClanHall(const DLString &clanName)
+{
+    auto c = clanHalls.find(clanName);
+    if (c == clanHalls.end())
+        return 0;
+    return c->second;
+}
+

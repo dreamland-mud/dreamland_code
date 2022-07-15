@@ -18,9 +18,6 @@
 
 #include "def.h"
 
-#include "../clan/behavior/clanarea.h"
-#include "clanreference.h"
-
 using Scripting::NativeTraits;
 
 NMI_INIT(AreaIndexWrapper, "прототип для зоны (area index data)")
@@ -116,61 +113,6 @@ NMI_GET( AreaIndexWrapper, max_vnum , "верхняя граница диапа�
 { 
     checkTarget( ); 
     return target->max_vnum;
-}
-
-NMI_GET( AreaIndexWrapper, itemVnum , "кланхоллы: vnum святыни (или 0)") 
-{ 
-    checkTarget( );
-	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
-    if (!clanArea)
-        return 0;	
-	else return Register( clanArea->itemVnum );
-}
-
-NMI_GET( AreaIndexWrapper, altarVnum , "кланхоллы: vnum алтаря (или 0)") 
-{ 
-    checkTarget( ); 
-	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
-    if (!clanArea)
-        return 0;	
-	else return Register( clanArea->altarVnum );
-}
-
-NMI_GET( AreaIndexWrapper, roomVnum , "кланхоллы: vnum алтарной комнаты (или 0)") 
-{ 
-    checkTarget( ); 
-	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
-    if (!clanArea)
-        return 0;	
-	else return Register( clanArea->roomVnum );
-}
-
-NMI_GET( AreaIndexWrapper, invitationVnum , "кланхоллы: vnum приглашения в клан (или 0)") 
-{ 
-    checkTarget( ); 
-	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
-    if (!clanArea)
-        return 0;	
-	else return Register( clanArea->invitationVnum );
-}
-
-
-NMI_GET( AreaIndexWrapper, keyVnum , "кланхоллы: vnum ключа от алтаря (или 0)") 
-{ 
-    checkTarget( ); 
-	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
-    if (!clanArea)
-        return 0;	
-	else return Register( clanArea->keyVnum );
-}
-
-NMI_GET( AreaIndexWrapper, bookVnum , "кланхоллы: vnum секретной книги (или 0)") 
-{ 
-    checkTarget( ); 
-	ClanArea::Pointer clanArea = target->behavior.getDynamicPointer<ClanArea>( );
-    if (!clanArea)
-        return 0;	
-	else return Register( clanArea->bookVnum );
 }
 
 NMI_GET(AreaIndexWrapper, players, "список (List) всех игроков в экземпляре зоны по умолчанию")

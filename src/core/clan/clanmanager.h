@@ -9,6 +9,7 @@
 #include "globalregistry.h"
 
 class Clan;
+struct area_file;
 
 class ClanManager : public GlobalRegistry<Clan>, 
                     public OneAllocate
@@ -19,9 +20,14 @@ public:
     virtual ~ClanManager( );
 
     inline static ClanManager *getThis( );
+    void addClanHall(const DLString &clanName, area_file *areaFile);
+    area_file * findClanHall(const DLString &clanName);
     
 private:
     virtual GlobalRegistryElement::Pointer getDumbElement( const DLString & ) const;
+
+    // Map from clan name to corresponding clan area, populated on clan area behavior load.
+    map<DLString, area_file *> clanHalls; 
 };
 
 extern ClanManager *clanManager;

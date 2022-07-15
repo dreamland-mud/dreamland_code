@@ -70,6 +70,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/selfrate \
 -I$(top_srcdir)/plug-ins/skills_impl  \
 -I$(top_srcdir)/plug-ins/clan/core \
+-I$(top_srcdir)/plug-ins/clan/behavior \
 -I$(top_srcdir)/plug-ins/services/core \
 -I$(top_srcdir)/plug-ins/languages/core \
 -I$(top_srcdir)/plug-ins/services/petshop \
@@ -89,6 +90,7 @@ $(LIBADD_AI) \
 ../questreward/libquestreward.la \
 ../selfrate/libselfrate.la \
 ../clan/core/libclan_core.la \
+../clan/behavior/libclan_behavior.la \
 ../skills_impl/libskills_impl.la \
 ../services/core/libservices_core.la \
 ../services/petshop/libservices_petshop.la \
