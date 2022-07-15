@@ -32,6 +32,8 @@
 #include "merc.h"
 #include "def.h"
 
+#include "messengers.h"
+
 PROF(vampire);
 BONUS(experience);
 BONUS(mana);
@@ -66,23 +68,23 @@ struct month_info {
 };
 
 const struct month_info month_table [17] = {
-  { "{1{CЗимы{2",                   -12,    7, 17, SEASON_WINTER },
-  { "{1{CЗимнего Волка{2",          -14,    7, 18, SEASON_WINTER },
-  { "{1{CХолодного Гиганта{2",      -14,    7, 18, SEASON_WINTER },
-  { "{1{CДревних Воинств{2",        -12,    7, 19, SEASON_WINTER },   
-  { "{1{GВеликих Битв{2",            -8,    6, 19, SEASON_SPRING },
-  { "{1{GВесн{2ы",                   -4,    5, 19, SEASON_SPRING }, 
-  { "{1{GПрироды{2",                  0,    5, 21, SEASON_SPRING },
-  { "{1{GТщетности{2",                4,    5, 22, SEASON_SPRING },  
-  { "{1{RДракона{2",                  8,    4, 22, SEASON_SUMMER },
-  { "{1{RСолнца{2",                  12,    4, 22, SEASON_SUMMER },
-  { "{1{RЖары{2",                    16,    5, 21, SEASON_SUMMER },    
-  { "{1{RБитвы{2",                   12,    5, 20, SEASON_SUMMER },   
-  { "{1{YТемноты{2",                  8,    6, 20, SEASON_AUTUMN },
-  { "{1{YТени{2",                     4,    6, 19, SEASON_AUTUMN },
-  { "{1{YДлинных Теней{2",            0,    7, 18, SEASON_AUTUMN },         
-  { "{1{YАбсолютной Темноты{2",      -4,    8, 17, SEASON_AUTUMN },   
-  { "{1{CВеликого Зла{2",            -8,    8, 17, SEASON_WINTER },
+  { "Зимы",                   -12,    7, 17, SEASON_WINTER },
+  { "Зимнего Волка",          -14,    7, 18, SEASON_WINTER },
+  { "Холодного Гиганта",      -14,    7, 18, SEASON_WINTER },
+  { "Древних Воинств",        -12,    7, 19, SEASON_WINTER },   
+  { "Великих Битв",            -8,    6, 19, SEASON_SPRING },
+  { "Весны",                   -4,    5, 19, SEASON_SPRING }, 
+  { "Природы",                  0,    5, 21, SEASON_SPRING },
+  { "Тщетности",                4,    5, 22, SEASON_SPRING },  
+  { "Дракона",                  8,    4, 22, SEASON_SUMMER },
+  { "Солнца",                  12,    4, 22, SEASON_SUMMER },
+  { "Жары",                    16,    5, 21, SEASON_SUMMER },    
+  { "Битвы",                   12,    5, 20, SEASON_SUMMER },   
+  { "Темноты",                  8,    6, 20, SEASON_AUTUMN },
+  { "Тени",                     4,    6, 19, SEASON_AUTUMN },
+  { "Длинных Теней",            0,    7, 18, SEASON_AUTUMN },         
+  { "Абсолютной Темноты",      -4,    8, 17, SEASON_AUTUMN },   
+  { "Великого Зла",            -8,    8, 17, SEASON_WINTER },
 };
 
 const int month_table_size = sizeof(month_table) / sizeof(month_info);
@@ -520,6 +522,13 @@ void weather_init( )
     else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
     else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
     else                                  weather_info.sky = SKY_CLOUDLESS;
+	
+	// Since this is happening on the world startup, let's notify users
+	// the world is up!
+	DLString msg;
+    msg = "Мир Мечты перезапустился и готов к игре, уииииии!";
+    send_to_discord_stream(":green_circle: " + msg);
+    send_telegram(msg);	
 }
 
 /*--------------------------------------------------------------------------
