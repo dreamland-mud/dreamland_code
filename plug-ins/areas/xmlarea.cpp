@@ -80,7 +80,7 @@ XMLAreaHeader::init(AreaIndexData *a)
 }
 
 AreaIndexData *
-XMLAreaHeader::compat( )
+XMLAreaHeader::compat(area_file *areaFile)
 {
     if(!loaded)
         return 0;
@@ -88,6 +88,9 @@ XMLAreaHeader::compat( )
     AreaIndexData *a = new AreaIndexData;
     
     a->vnum                = top_area++;
+
+    areaFile->area = a;
+    a->area_file = areaFile;
 
     a->name = str_dup(name.getValue( ).c_str( ));
     a->credits = str_dup(credits.getValue( ).c_str( ));
@@ -321,16 +324,13 @@ XMLArea::load(const DLString &fname)
     fromXML(doc->getFirstNode( ));
     
     area_file *af = new_area_file(fname.c_str( ));
-    AreaIndexData *a = areadata.compat( );
+    AreaIndexData *a = areadata.compat(af);
     areaIndexes.push_back(a);
 
     try {
         if (a) {
             // Create new single area instance for this index (FIXME)
             a->create();
-
-            af->area = a;
-            a->area_file = af;
 
             load_rooms(a);
             load_mobiles(a);
