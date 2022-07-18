@@ -165,7 +165,8 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
         if (victim->master && !victim->master->is_npc() && ch != victim->master) {
             victim = victim->master;
             buf << ch->getNameC() << " атакует чармиса " << victim->getNameC();
-        } else if (victim->in_room->pIndexData->clan != clan_none && ( 
+        } else if (victim->in_room->pIndexData->clan != clan_none && 
+                   ch->getClan( ) != victim->in_room->pIndexData->clan && ( 
             IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)) ||
             IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_HEALER)) || 
             IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)) ) ) {
