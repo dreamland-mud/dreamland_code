@@ -40,7 +40,6 @@ impl_groups.cpp \
 exoticskill.cpp \
 group_beguiling.cpp \
 group_fightmaster.cpp \
-group_transportation.cpp \
 group_weaponsmaster.cpp \
 group_movement.cpp \
 group_arcane.cpp
