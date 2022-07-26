@@ -44,6 +44,9 @@ void DefaultAffectHandler::remove( Character *ch )
 {
     if (!wearoff.empty( ))
         ch->pecho( POS_DEAD, wearoff.c_str( ), ch );
+        
+    if (!wearoffDispel.empty( ))
+        ch->recho( wearoffDispel.c_str( ), ch );
 }
 
 void DefaultAffectHandler::remove( Object *obj )
@@ -66,8 +69,7 @@ void DefaultAffectHandler::remove( Room * room )
 
 void DefaultAffectHandler::dispel( Character *ch )
 {
-    if (!wearoffDispel.empty( ))
-        ch->recho( wearoffDispel.c_str( ), ch );
+
 }
 
 SkillPointer DefaultAffectHandler::getSkill( ) const
