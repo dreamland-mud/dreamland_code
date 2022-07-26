@@ -205,7 +205,8 @@ static void oprog_show(Object *obj, Character *ch, ostringstream &buf)
         obj->behavior->show(ch, buf);
 
     for (auto &paf: obj->affected.findAllWithHandler())
-        paf->type->getAffect( )->onShow(SpellTarget::Pointer(NEW, obj), paf, ch, buf);    
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onShow(SpellTarget::Pointer(NEW, obj), paf, ch, buf);    
 }
 
 /*
@@ -474,7 +475,8 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
 	ostringstream buf;
 		
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
 
     if (!buf.str().empty())
         mainBuf << endl << buf.str();
@@ -1363,7 +1365,8 @@ static void do_look_into( Character *ch, char *arg2 )
 static void afprog_look( Character *looker, Character *victim )
 {
     for (auto &paf: victim->affected.findAllWithHandler())
-        paf->type->getAffect( )->onLook(SpellTarget::Pointer(NEW, victim), paf, looker);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onLook(SpellTarget::Pointer(NEW, victim), paf, looker);
 }
 
 static void mprog_look(Character *looker, Character *victim)

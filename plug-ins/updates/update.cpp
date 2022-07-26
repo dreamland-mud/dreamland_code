@@ -508,7 +508,7 @@ static bool oprog_spec( Object *obj )
     FENIA_NDX_CALL(obj, "Spec", "O", obj);
 
     for (auto &paf: obj->affected.findAllWithHandler())
-        if (paf->type->getAffect( )->onSpec(SpellTarget::Pointer(NEW, obj), paf))
+        if (paf->type->getAffect() && paf->type->getAffect( )->onSpec(SpellTarget::Pointer(NEW, obj), paf))
             return true;
 
     return false;

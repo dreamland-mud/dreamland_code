@@ -65,7 +65,8 @@ void follower_add( Character *ch, Character *mch )
 static void afprog_stopfol( Character *ch )
 {
     for (auto &paf: ch->affected.findAllWithHandler()) {
-        paf->type->getAffect()->onStopfol(SpellTarget::Pointer(NEW, ch), paf);
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onStopfol(SpellTarget::Pointer(NEW, ch), paf);
     }
 }
 

@@ -246,7 +246,8 @@ static void oprog_pour_out( Object *obj, Character *ch, Object *out, const char 
     FENIA_NDX_VOID_CALL( obj, "PourOut", "OCOsi", obj, ch, out, liqname, amount );
 
     for (auto &paf: obj->affected.findAllWithHandler())
-        paf->type->getAffect()->onPourOut(SpellTarget::Pointer(NEW, obj), paf, ch, out, liqname, amount);
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onPourOut(SpellTarget::Pointer(NEW, obj), paf, ch, out, liqname, amount);
 }
 
 static void mprog_pour_out( Character *victim, Character *ch, Object *out, const char *liqname, int amount  )

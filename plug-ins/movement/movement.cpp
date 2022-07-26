@@ -131,13 +131,15 @@ void Movement::place( Character *wch )
 static void rafprog_leave( Room *room, Character *ch )
 {
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect()->onLeave(SpellTarget::Pointer(NEW, room), paf, ch);
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onLeave(SpellTarget::Pointer(NEW, room), paf, ch);
 }
 
 static void rafprog_entry( Room *room, Character *ch )
 {
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, room), paf, ch);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, room), paf, ch);
 }
 
 static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const char *movetype)
@@ -213,7 +215,8 @@ static void mprog_leave( Character *ch, Room *from_room, Room *to_room, const ch
 static void afprog_entry( Character *ch )
 {
     for (auto &paf: ch->affected.findAllWithHandler())
-        paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, ch), paf);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, ch), paf);
 }
 
 static bool rprog_dive( Character *wch, int danger )

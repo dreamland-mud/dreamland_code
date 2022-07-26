@@ -223,7 +223,7 @@ bool oprog_get( Object *obj, Character *ch )
     BEHAVIOR_VOID_CALL( obj, get, ch );
 
     for (auto &paf: obj->affected.findAllWithHandler())
-        if (paf->type->getAffect()->onGet(SpellTarget::Pointer(NEW, obj), paf, ch))
+        if (paf->type->getAffect() && paf->type->getAffect()->onGet(SpellTarget::Pointer(NEW, obj), paf, ch))
             return true;
 
     if (obj->extracted)

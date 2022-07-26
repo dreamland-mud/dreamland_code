@@ -140,7 +140,7 @@ bool SkillDamage::mprog_immune()
     FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str());
 
     for (auto &paf: victim->affected.findAllWithHandler())
-        if (paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str()))
+        if (paf->type->getAffect() && paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str()))
             return true;
 
     return false; 
