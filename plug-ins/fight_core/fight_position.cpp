@@ -24,7 +24,6 @@
 #include "def.h"
 
 GSN(cavalry);
-GSN(sneak);
 CLAN(none);
 
 /*
@@ -248,38 +247,17 @@ void set_thief( Character *ch )
     ch->getPC( )->PK_time_t = PK_TIME_THIEF;
 }
 
-void do_visible( Character *ch )
+void do_visible(Character *ch)
 {
-    if (IS_SET(ch->affected_by, AFF_HIDE))
-      {
-        ch->pecho( "Ты выходишь из тени." );
-        REMOVE_BIT(ch->affected_by, AFF_HIDE);
-        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
-      }
-    if (IS_SET(ch->affected_by, AFF_FADE))
-      {
-        ch->pecho( "Ты выходишь из тени." );
-        REMOVE_BIT(ch->affected_by, AFF_FADE);
-        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
-      }
-    if ( IS_AFFECTED( ch, AFF_CAMOUFLAGE ) )
+    strip_hide_and_fade(ch);
+
+    strip_invisibility(ch);
+
+    strip_camouflage(ch);
+    
+    if (IS_SET(ch->affected_by, AFF_SNEAK))
     {
-            REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
-            ch->ambushing = &str_empty[0];
-            ch->pecho("Ты выходишь из своего укрытия.");
-            oldact("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
-    }
-    if (IS_SET(ch->affected_by, AFF_INVISIBLE)) {
-        affect_bit_strip(ch, &affect_flags, AFF_INVISIBLE, true);
-        REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
-    }
-    if (IS_SET(ch->affected_by, AFF_IMP_INVIS)) {
-        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
-        REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
-    }
-    if (IS_SET(ch->affected_by, AFF_SNEAK)) {
-        affect_strip(ch, gsn_sneak, true);
+        affect_bit_strip(ch, &affect_flags, AFF_SNEAK, true);
         REMOVE_BIT(ch->affected_by, AFF_SNEAK);
     }
 }
-

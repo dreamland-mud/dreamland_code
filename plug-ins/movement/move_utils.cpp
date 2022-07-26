@@ -57,26 +57,6 @@ void transfer_char( Character *ch, Character *actor, Room *to_room,
 }
 
 
-void strip_camouflage( Character *ch )
-{
-    if ( IS_AFFECTED( ch, AFF_CAMOUFLAGE ) )
-    {
-            REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
-            ch->ambushing = &str_empty[0];
-            ch->pecho("Ты выходишь из своего укрытия.");
-            oldact("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
-    }
-}
-
-void check_camouflage( Character *ch, Room *to_room )
-{
-    if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE)
-            && !RoomUtils::isNature(to_room))
-    {
-            strip_camouflage( ch );
-    }        
-}
-
 
 /* random room generation procedure */
 Room * get_random_room( Character *ch )

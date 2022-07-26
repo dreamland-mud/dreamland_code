@@ -63,6 +63,11 @@ void        obj_from_obj        ( Object *obj );
 
 void undig_earthquake( Character *ch );
 void undig( Character *ch );
+void strip_camouflage( Character *ch );
+void check_camouflage( Character *ch, Room *to_room );
+void strip_hide_and_fade(Character *ch);
+void strip_invisibility(Character *ch);
+void strip_improved_invisibility(Character *ch);
 
 void        extract_obj        ( Object *obj, const char *message = 0 );
 void        extract_obj_nocount        ( Object *obj );

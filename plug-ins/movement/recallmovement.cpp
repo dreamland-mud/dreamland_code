@@ -3,12 +3,12 @@
  * ruffina, 2004
  */
 #include "recallmovement.h"
-#include "move_utils.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
 
+#include "loadsave.h"
 #include "affectflags.h"
 #include "skill_utils.h"
 #include "merc.h"
@@ -155,9 +155,6 @@ bool RecallMovement::checkCurse( Character *wch )
 
 bool RecallMovement::applyInvis( Character *wch )
 {
-    if (IS_AFFECTED( wch, AFF_HIDE|AFF_FADE ))
-        REMOVE_BIT(wch->affected_by, AFF_HIDE|AFF_FADE);
-
     strip_camouflage( wch );
     return true;
 }

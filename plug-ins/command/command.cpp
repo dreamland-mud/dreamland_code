@@ -224,27 +224,13 @@ int Command::dispatch( const InterpretArguments &iargs )
 
 void Command::visualize( Character *ch )
 {
-    if (ch->is_npc( )) /* ? */
-        return;
+    if (!getExtra( ).isSet( CMD_KEEP_HIDE ))
+        strip_hide_and_fade(ch);
+   
+    if (getPosition( ).getValue( ) == POS_FIGHTING)
+        strip_improved_invisibility(ch);
 
-    if (IS_AFFECTED( ch, AFF_HIDE | AFF_FADE ) && !getExtra( ).isSet( CMD_KEEP_HIDE ))
-    {
-        REMOVE_BIT( ch->affected_by, AFF_HIDE | AFF_FADE );
-        ch->pecho("Ты выходишь из тени.");
-        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
-    }
-
-    if (IS_AFFECTED( ch, AFF_IMP_INVIS ) && getPosition( ).getValue( ) == POS_FIGHTING)
-    {
-        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
-        if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-            REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
-        }
-    }
-
-    if (DIGGED(ch) && (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG )))
+    if (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG ))
         undig(ch);    
 
     // All active commands interrupt rituals.
