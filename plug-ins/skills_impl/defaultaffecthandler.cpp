@@ -42,29 +42,29 @@ void DefaultAffectHandler::unsetSkill( )
 
 void DefaultAffectHandler::remove( Character *ch )
 {
-    if (!wearoff.empty( ))
-        ch->pecho( POS_DEAD, wearoff.c_str( ), ch );
+    if (!removeCharSelf.empty( ))
+        ch->pecho( POS_DEAD, removeCharSelf.c_str( ), ch );
         
-    if (!wearoffDispel.empty( ))
-        ch->recho( wearoffDispel.c_str( ), ch );
+    if (!removeCharOthers.empty( ))
+        ch->recho( removeCharOthers.c_str( ), ch );
 }
 
 void DefaultAffectHandler::remove( Object *obj )
 {
-    if (wearoffObj.empty( ))
+    if (removeObj.empty( ))
         return;
 
     if (obj->carried_by != 0) 
-        obj->carried_by->pecho( wearoffObj.c_str( ), obj );
+        obj->carried_by->pecho( removeObj.c_str( ), obj );
 
     if (obj->in_room != 0)
-        obj->in_room->echo( POS_RESTING, wearoffObj.c_str( ), obj );
+        obj->in_room->echo( POS_RESTING, removeObj.c_str( ), obj );
 }
 
 void DefaultAffectHandler::remove( Room * room )
 {
-    if (!wearoffRoom.empty( ))
-        room->echo( POS_RESTING, wearoffRoom.c_str( ) );
+    if (!removeRoom.empty( ))
+        room->echo( POS_RESTING, removeRoom.c_str( ) );
 }
 
 void DefaultAffectHandler::dispel( Character *ch )

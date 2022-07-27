@@ -168,11 +168,13 @@ void OLCStateSkill::changed( PCharacter *ch )
     isChanged = true;
 }
 
-static void show_one_message(PCharacter *ch, const DLString &message, const char *cmd, ostringstream &buf)
+static void show_one_message(const char *prefix, PCharacter *ch, const DLString &message, const char *cmd)
 {
+    ostringstream buf;
     buf << "{G" << (message.empty() ? "-" : message)
         << " " << web_edit_button(ch, cmd, "web") << " "
-        << "{D(" << cmd << ") ";
+        << "{D(" << cmd << ")";
+    ptc(ch, "%s: %s\r\n", prefix, buf.str().c_str());
 }
 
 void OLCStateSkill::show( PCharacter *ch )
@@ -270,25 +272,10 @@ void OLCStateSkill::show( PCharacter *ch )
         ptc(ch, ".............{GАффект{x.................\r\n");
         ptc(ch, "Отменяется:  {G%s {D(cancelled){x\r\n", a->cancelled ? "yes" : "no");
         ptc(ch, "Снимается:   {G%s {D(dispelled){x\r\n", a->dispelled ? "yes" : "no");
-
-        {
-            ostringstream fmt;
-            if (!s || s->targetIsChar() || !a->wearoff.empty())
-                show_one_message(ch, a->wearoff, "wearoffChar", fmt);
-            if (!s || s->targetIsObj() || !a->wearoffObj.empty())
-                show_one_message(ch, a->wearoffObj, "wearoffObj", fmt);
-            if (!s || s->targetIsRoom() || !a->wearoffRoom.empty())
-                show_one_message(ch, a->wearoffRoom, "wearoffRoom", fmt);
-            if (!fmt.str().empty())
-                ptc(ch, "Спадание:    %s\r\n", fmt.str().c_str());
-        }
-
-        if (a->dispelled || !a->wearoffDispel.empty()) {
-            ostringstream fmt;
-            ptc(ch, "Снятие:      ");
-            show_one_message(ch, a->wearoffDispel, "wearoffDispel", fmt);
-            ch->pecho(fmt.str());
-        }
+        show_one_message("Спадает с тебя    ", ch, a->removeCharSelf, "removeCharSelf");
+        show_one_message("Спадает с соседа  ", ch, a->removeCharOthers, "removeCharOthers");
+        show_one_message("Спадает с предмета", ch, a->removeObj, "removeObj");
+        show_one_message("Спадает с комнаты ", ch, a->removeRoom, "removeRoom");
 
         ptc(ch, "Триггера:    ");
         feniaTriggers->showAvailableTriggers(ch, a);
@@ -839,30 +826,29 @@ SKEDIT(dispelled, "снимается", "можно ли сбить аффект
             && boolEdit(a->dispelled);
 }
 
-SKEDIT(wearoffChar, "", "сообщение при спадании аффекта с персонажа")
+SKEDIT(removeCharSelf, "", "сообщение персонажу при спадании аффекта с него самого")
 {
     DefaultAffectHandler *a = getAffect();
-    return checkAffect(a) && editor(argument, a->wearoff, ED_NO_NEWLINE);
+    return checkAffect(a) && editor(argument, a->removeCharSelf, ED_NO_NEWLINE);
 }
 
-SKEDIT(wearoffObj, "", "сообщение при спадании аффекта с предмета")
+SKEDIT(removeCharOthers, "", "сообщение в комнату при спадании аффекта с персонажа")
 {
     DefaultAffectHandler *a = getAffect();
-    return checkAffect(a) && editor(argument, a->wearoffObj, ED_NO_NEWLINE);
+    return checkAffect(a) && editor(argument, a->removeCharOthers, ED_NO_NEWLINE);
 }
 
-SKEDIT(wearoffRoom, "", "сообщение при спадании аффекта с комнаты")
+SKEDIT(removeRoom, "", "сообщение при спадании аффекта с комнаты")
 {
     DefaultAffectHandler *a = getAffect();
-    return checkAffect(a) && editor(argument, a->wearoffRoom, ED_NO_NEWLINE);
+    return checkAffect(a) && editor(argument, a->removeRoom, ED_NO_NEWLINE);
 }
 
-SKEDIT(wearoffDispel, "", "сообщение кастеру при успешном снятии воздействий")
+SKEDIT(removeObj, "", "сообщение при спадании аффекта с предмета")
 {
     DefaultAffectHandler *a = getAffect();
-    return checkAffect(a) && editor(argument, a->wearoffDispel, ED_NO_NEWLINE);
+    return checkAffect(a) && editor(argument, a->removeObj, ED_NO_NEWLINE);
 }
-
 
 SKEDIT(commands, "команды", "показать список встроенных команд")
 {

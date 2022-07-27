@@ -31,10 +31,10 @@ public:
     virtual bool isDispelled( ) const;
     virtual bool isCancelled( ) const;
 
-    XML_VARIABLE XMLStringNoEmpty  wearoff;
-    XML_VARIABLE XMLStringNoEmpty  wearoffObj;
-    XML_VARIABLE XMLStringNoEmpty  wearoffRoom;
-    XML_VARIABLE XMLStringNoEmpty  wearoffDispel;
+    XML_VARIABLE XMLStringNoEmpty  removeCharSelf;
+    XML_VARIABLE XMLStringNoEmpty  removeCharOthers;
+    XML_VARIABLE XMLStringNoEmpty  removeObj;
+    XML_VARIABLE XMLStringNoEmpty  removeRoom;
     XML_VARIABLE XMLBooleanNoFalse dispelled, cancelled;
     
     SkillPointer skill;
