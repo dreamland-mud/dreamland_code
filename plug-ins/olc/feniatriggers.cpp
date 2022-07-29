@@ -230,8 +230,8 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultAffectHand
         IdRef methodId(t->first);
         Register method;
         bool hasTrigger = wrapper && wrapper->triggerFunction(methodId, method);
-        buf << web_cmd(ch, "fenia $1", t->first)
-            << (hasTrigger ? "{g*" : "")
+        buf << (hasTrigger ? "{W" : "{g") 
+			<< web_cmd(ch, "fenia $1", t->first)
             << "{x ";
     }
 
@@ -254,8 +254,8 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultSkillComma
         IdRef methodId(t->first);
         Register method;
         bool hasTrigger = wrapper && wrapper->triggerFunction(methodId, method);
-        buf << web_cmd(ch, "fenia $1", t->first)
-            << (hasTrigger ? "{g*" : "")
+        buf << (hasTrigger ? "{W" : "{g") 
+			<< web_cmd(ch, "fenia $1", t->first)
             << "{x ";
     }
 
