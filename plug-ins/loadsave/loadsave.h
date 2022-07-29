@@ -39,7 +39,6 @@ void                clone_object         ( Object *parent, Object *clone );
 
 void        affect_to_obj    ( Object *, const Affect *paf );
 void        affect_remove_obj( ::Object *, Affect *paf, bool verbose = false );
-void        affect_enchant   ( Object *obj );
 void        affect_enhance   ( Object *obj, const Affect * );
 void        affect_modify    ( Character *ch, Affect *paf, bool fAdd );
 void        affect_check         ( Character *ch, Affect *old_paf);

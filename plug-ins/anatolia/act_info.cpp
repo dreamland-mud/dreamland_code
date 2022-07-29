@@ -2731,9 +2731,8 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         break;
     }
 
-    if (!obj->enchanted)
-        for (auto &paf: obj->pIndexData->affected)
-            lore_fmt_affect( obj, paf, buf );
+    for (auto &paf: obj->pIndexData->affected)
+        lore_fmt_affect( obj, paf, buf );
 
     for (auto &paf: obj->affected)
         lore_fmt_affect( obj, paf, buf );

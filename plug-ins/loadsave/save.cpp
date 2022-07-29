@@ -110,6 +110,7 @@ GSN(spell_resistance);
 GSN(magic_resistance);
 GSN(enchant_weapon);
 GSN(enchant_armor);
+GSN(katana);
 DESIRE(drunk);
 DESIRE(full);
 DESIRE(hunger);
@@ -181,7 +182,7 @@ static void convert_religion( PCharacter *pc, int number )
     pc->setReligion( religionManager->find( relig_names[number] )->getName( ) );
 }
 
-Affect * fread_Affc( FILE *fp ) 
+Affect * fread_affect( FILE *fp ) 
 {
     Affect *paf;
     int sn;
@@ -231,12 +232,13 @@ Affect * fread_Affc( FILE *fp )
     return paf;
 }
 
-void fwrite_affect( FILE *fp, Affect *paf )
+void fwrite_affect( const char *label, FILE *fp, Affect *paf )
 {
     if (paf->type == gsn_doppelganger)
         return;
 
-    fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10lld %s\n",
+    fprintf( fp, "%s '%s' %3d %3d %3d %3d %3d %10lld %s\n",
+            label, 
             paf->type->getName( ).c_str( ),
             affect_table_to_where(paf->bitvector.getTable(), paf->global.getRegistry()),
             paf->level.getValue(),
@@ -293,7 +295,7 @@ void fwrite_char( PCharacter *ch, FILE *fp )
 
         fprintf( fp, "#%s\n",  "PLAYER"        );
         for (auto &paf: ch->affected)
-            fwrite_affect( fp, paf );
+            fwrite_affect( "Affc", fp, paf );
 
         fprintf( fp, "End\n\n" );
 }
@@ -384,7 +386,7 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
                 pet->mod_stat[STAT_CON], pet->mod_stat[STAT_CHA]);
 
         for (auto &paf: pet->affected)
-            fwrite_affect( fp, paf );
+            fwrite_affect( "Affc", fp, paf );
 
         fprintf(fp,"End\n");
         return;
@@ -502,7 +504,7 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
                 mob->mod_stat[STAT_CON], mob->mod_stat[STAT_CHA]);
 
         for (auto &paf: mob->affected)
-            fwrite_affect( fp, paf );
+            fwrite_affect( "Affc", fp, paf );
 
         fprintf(fp,"End\n");
         
@@ -683,7 +685,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 }
 
                 for (auto &paf: obj->affected)
-                    fwrite_affect( fp, paf );
+                    fwrite_affect( "Affect", fp, paf );
 
                 for ( ed = obj->extra_descr; ed != 0; ed = ed->next )
                 {
@@ -801,7 +803,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
 
             if (!str_cmp(word, "Affc"))
             {
-                Affect *paf = fread_Affc( fp );
+                Affect *paf = fread_affect( fp );
                 ch->affected.push_front(paf);
                 fMatch = true;
                 break;
@@ -1169,7 +1171,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
             
             if (!str_cmp(word,"Affc"))
             {
-                Affect *paf = fread_Affc( fp );
+                Affect *paf = fread_affect( fp );
                 
                 pet->affected.push_front(paf);
                 fMatch          = true;
@@ -1436,7 +1438,7 @@ NPCharacter * fread_mob( FILE *fp )
     
                     if ( !str_cmp(word,"Affc") )
                     {
-                            Affect *af = fread_Affc( fp );
+                            Affect *af = fread_affect( fp );
                             
                             affect_to_char( mob, af );
                             ddeallocate( af );
@@ -1756,6 +1758,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
     bool fPersonal;
     int wear_loc = -1;
     int vnum = 0;
+    AffectList affectsOldStyle;
 
     fVnum = false;
     obj = 0;
@@ -1816,11 +1819,19 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     KEYSKIP( "Altar" );
                     if (!str_cmp(word,"Affc"))
                     {
-                            Affect *paf = fread_Affc( fp );
+                            Affect *paf = fread_affect( fp );
+                            affectsOldStyle.push_front(paf);
+                            fMatch          = true;
+                            break;
+                    }
+                    if (!str_cmp(word, "Affect"))
+                    {
+                            Affect *paf = fread_affect( fp );
                             obj->affected.push_front(paf);
                             fMatch          = true;
                             break;
                     }
+
                     break;
 
             case 'C':
@@ -1879,6 +1890,27 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                         }
                         else
                         {
+                            // Object affect conversion: getting rid of 'enchanted' logic when proto affects got duplicated on the instance.
+                            if (!affectsOldStyle.empty()) {
+                                // Random weapons and katanas don't have any other affects on the proto 
+                                // so it's safe to add all instance affects back as they were.
+                                bool isKatana = any_of(affectsOldStyle.begin(), affectsOldStyle.end(), 
+                                                [&](const Affect* paf){ return paf->type.getName() == gsn_katana->getName(); });
+                                bool isRandom = !obj->getProperty("tier").empty();
+
+                                if (isKatana || isRandom) {
+                                    notice("Fread_obj: retained %d proper affects for %d [%lld]", affectsOldStyle.size(), obj->pIndexData->vnum, obj->getID());
+                                    for (auto &paf: affectsOldStyle)
+                                        obj->affected.push_back(paf);
+                                } else {
+                                    // For all other items, retain only temporary affects as those are harmless 
+                                    // and may add important bits such as 'noenchant' that we want removed eventually.
+                                    for (auto &paf: affectsOldStyle)
+                                        if (paf->duration > 0)
+                                            obj->affected.push_back(paf);
+                                }
+                            }
+
                             Object *container = 0;
                             if (iNest > 0 && rgObjNest[iNest])
                                 container = rgObjNest[iNest-1];

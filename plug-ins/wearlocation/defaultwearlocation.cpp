@@ -270,11 +270,10 @@ void DefaultWearlocation::unequip( Object *obj )
 
 void DefaultWearlocation::affectsOnUnequip( Character *ch, Object *obj )
 {
-    if (!obj->enchanted)
-        for (auto &paf: obj->pIndexData->affected) {
-            affect_modify( ch, paf, false );
-            affect_check(ch, paf);
-        }
+    for (auto &paf: obj->pIndexData->affected) {
+        affect_modify( ch, paf, false );
+        affect_check(ch, paf);
+    }
 
     for (auto &paf: obj->affected) {
         affect_modify( ch, paf, false );
