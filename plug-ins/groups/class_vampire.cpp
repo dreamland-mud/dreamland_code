@@ -50,6 +50,7 @@ GSN(rear_kick);
 GSN(vampire);
 GSN(vampiric_bite);
 GSN(vampiric_touch);
+GSN(sneak);
 
 #define ROOM_VNUM_GRAVE         5
 
@@ -312,11 +313,11 @@ SKILL_RUNP( vampire )
         af.bitvector.setValue(IMM_NEGATIVE|IMM_CHARM|IMM_DISEASE);
         affect_to_char( ch, &af );
 
-        /* haste + dex, infrared, berserk, sneak */
+        /* haste + dex, infrared, berserk, fly, swim */
         af.bitvector.setTable(&affect_flags);
         af.location = APPLY_DEX;
         af.modifier  = 1 + (level /20);
-        af.bitvector.setValue(AFF_HASTE|AFF_INFRARED|AFF_BERSERK|AFF_SNEAK|AFF_FLYING|AFF_SWIM);
+        af.bitvector.setValue(AFF_HASTE|AFF_INFRARED|AFF_BERSERK|AFF_FLYING|AFF_SWIM);
         affect_to_char( ch, &af );
 
         /* size + vuln light, holy */
@@ -339,6 +340,13 @@ SKILL_RUNP( vampire )
         af.modifier  = 0;
         af.bitvector.setValue(PLR_VAMPIRE);
         affect_to_char( ch, &af );
+
+        /* sneak as a separate affect */
+        af.type = gsn_sneak;
+        af.bitvector.setTable(&affect_flags);
+        af.bitvector.setValue(AFF_SNEAK);
+        affect_to_char( ch, &af );
+
 
 	ch->pecho( "Превращаясь в кровожадн%1$Gого|ого|ую вампир%1$Gа|а|шу, ты чувствуешь прилив силы.", ch );
         oldact("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM);
@@ -804,7 +812,9 @@ CMDRUNP( unmorph )
      return;
     }
 
+   
    affect_strip(ch, gsn_vampire);
+   affect_strip(ch, gsn_sneak);
    REMOVE_BIT(ch->act,PLR_VAMPIRE);
    ch->pecho("Ты выходишь из вампирьей трансформации и принимаешь свой обычный облик.");
 }
