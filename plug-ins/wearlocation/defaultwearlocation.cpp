@@ -156,7 +156,7 @@ bool DefaultWearlocation::equip( Object *obj )
 }
 
 void DefaultWearlocation::affectsOnEquip( Character *ch, Object *obj )
-{
+{       
     if (!obj->enchanted)
         for (auto &paf: obj->pIndexData->affected)
             affect_modify( ch, paf, true );

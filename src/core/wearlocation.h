@@ -67,6 +67,9 @@ public:
 
     virtual void onFight(Character *ch, Object *obj) { };
 
+    virtual void affectsOnEquip( Character *ch, Object *obj );
+    virtual void affectsOnUnequip( Character *ch, Object *obj );
+
 protected:
     DLString name;
 };

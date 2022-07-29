@@ -70,6 +70,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
         return false;
     }
     
+
     affect_enchant( obj );
 
     af.type      = gsn_enchant_weapon;
@@ -83,10 +84,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
 
     af.location = APPLY_HITROLL;
     affect_enhance( obj, &af );
-
-    victim->hitroll += af.modifier;
-    victim->damroll += af.modifier;
-
+    
     oldact("{CСекреты кузнецов древности преображают $o4!{x", ch, obj, 0, TO_ALL );
     return true;
 }

@@ -127,6 +127,17 @@ bool Wearlocation::canWear( Character *ch, int flags )
     return false;
 }
 
+void Wearlocation::affectsOnEquip( Character *ch, Object *obj )
+{
+
+}
+
+void Wearlocation::affectsOnUnequip( Character *ch, Object *obj )
+{
+    
+}
+
+
 /*-------------------------------------------------------------------
  * WearlocationManager
  *------------------------------------------------------------------*/
