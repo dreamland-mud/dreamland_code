@@ -375,7 +375,8 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     }
 
     /* FIXME: instance or prototype triggers? */
-    feniaTriggers->showAssignedTriggers(ch, pRoom->wrapper);
+    if (pRoom->room)
+        feniaTriggers->showAssignedTriggers(ch, pRoom->room->wrapper);
     feniaTriggers->showAvailableTriggers(ch, "room");
 }
 

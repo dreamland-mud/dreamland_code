@@ -98,14 +98,14 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, const DLString &i
         return;
 
     ostringstream buf;
-    buf << "Доступные триггера (команда fenia <trig>): ";
+    buf << "Доступные триггеры:   ";
 
     const TriggerContent &triggers = i->second;
     for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
         buf <<  web_cmd(ch, "fenia $1", t->first) << " ";
     }
 
-    buf << endl;
+    buf << "{D(fenia <trig> [clear]){x" << endl;
     ch->send_to(buf);
 }
 
@@ -120,14 +120,14 @@ void FeniaTriggerLoader::showAssignedTriggers(PCharacter *ch, Scripting::Object 
 
     base->collectTriggers(triggers, misc);
     if (!triggers.empty()) {
-        buf << "{gFenia triggers{x:           ";
+        buf << "{gАктивные триггеры{x:    ";
         for (auto &t: triggers)
             buf << web_cmd(ch, "fenia $1", t) << " ";
         buf << endl;    
     }
 
     if (!misc.empty()) {
-        buf << "{gFenia fields and methods{x: ";
+        buf << "{gДругие поля и методы{x: ";
         for (auto &t: misc)
             buf << web_cmd(ch, "fenia $1", t) << " ";
         buf << endl;    
