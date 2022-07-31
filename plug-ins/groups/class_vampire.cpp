@@ -796,30 +796,6 @@ SKILL_RUNP( touch )
 }
 
 /*
- * 'unmorph' command
- */
-CMDRUNP( unmorph )
-{
-    if (ch->getProfession( ) != prof_vampire)
-    {
-     ch->pecho("Ты не владеешь вампирьей трансформацией.");
-     return;
-    }
-
-    if ( !IS_VAMPIRE(ch) )
-    {
-     ch->pecho("Ты уже выш{Smел{Sfла{Sx из вампирьей трансформации.");
-     return;
-    }
-
-   
-   affect_strip(ch, gsn_vampire);
-   affect_strip(ch, gsn_sneak);
-   REMOVE_BIT(ch->act,PLR_VAMPIRE);
-   ch->pecho("Ты выходишь из вампирьей трансформации и принимаешь свой обычный облик.");
-}
-
-/*
  * 'bloodlet' skill command
  */
 
