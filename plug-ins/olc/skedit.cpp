@@ -244,8 +244,7 @@ void OLCStateSkill::show( PCharacter *ch )
         ptc(ch, "Сообщения:   %s  %s {D(messages){x\r\n",
                s->messages.toList().join(" {Y|{x ").c_str(), web_edit_button(ch, "messages", "web").c_str());
 
-        ptc(ch, "Триггера:    ");
-        feniaTriggers->showAvailableTriggers(ch, s);
+        feniaTriggers->showTriggers(ch, s);
     }
 
     if (c) {
@@ -264,8 +263,8 @@ void OLCStateSkill::show( PCharacter *ch )
         ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
                 c->hint.c_str(),
                 web_edit_button(ch, "hint", "web").c_str());        
-        ptc(ch, "Триггера:    ");
-        feniaTriggers->showAvailableTriggers(ch, c);
+
+        feniaTriggers->showTriggers(ch, c->getWrapper(), "skillcommand");
     }
 
     if (a) {
@@ -277,8 +276,7 @@ void OLCStateSkill::show( PCharacter *ch )
         show_one_message("Спадает с предмета", ch, a->removeObj, "removeObj");
         show_one_message("Спадает с комнаты ", ch, a->removeRoom, "removeRoom");
 
-        ptc(ch, "Триггера:    ");
-        feniaTriggers->showAvailableTriggers(ch, a);
+        feniaTriggers->showTriggers(ch, a->getWrapper(), "affect");
     }
     
     ptc(ch, "\r\n{WКоманды{x: {hc{yspell{x, {hc{yaffect{x, {hc{yaction{x, {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        

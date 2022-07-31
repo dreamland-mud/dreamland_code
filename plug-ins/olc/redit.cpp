@@ -375,9 +375,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     }
 
     /* FIXME: instance or prototype triggers? */
-    if (pRoom->room)
-        feniaTriggers->showAssignedTriggers(ch, pRoom->room->wrapper);
-    feniaTriggers->showAvailableTriggers(ch, "room");
+    feniaTriggers->showTriggers(ch, pRoom->room ? pRoom->room->getWrapper() : 0, "room");
 }
 
 REDIT(behavior, "поведение", "редактирование поведения (behavior)")

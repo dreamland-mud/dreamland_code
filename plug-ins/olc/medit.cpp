@@ -406,9 +406,7 @@ MEDIT(show)
     }
 
     MOB_INDEX_DATA *original = get_mob_index(mob.vnum);
-    if (original)
-        feniaTriggers->showAssignedTriggers(ch, original->wrapper);
-    feniaTriggers->showAvailableTriggers(ch, "mob");
+    feniaTriggers->showTriggers(ch, original ? get_wrapper(original->wrapper) : 0, "mob");    
     return false;
 }
 

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "feniatriggers.h"
 #include "wrapperbase.h"
 #include "fenia/register-impl.h"
@@ -91,51 +92,6 @@ bool stringIsCapitalized(const DLString &str)
     return !str.empty() && dl_isupper(str.at(0));
 }
 
-void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, const DLString &indexType) const
-{
-    IndexTriggers::const_iterator i = indexTriggers.find(indexType);
-    if (i == indexTriggers.end())
-        return;
-
-    ostringstream buf;
-    buf << "Доступные триггеры:   ";
-
-    const TriggerContent &triggers = i->second;
-    for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
-        buf <<  web_cmd(ch, "fenia $1", t->first) << " ";
-    }
-
-    buf << "{D(fenia <trig> [clear]){x" << endl;
-    ch->send_to(buf);
-}
-
-void FeniaTriggerLoader::showAssignedTriggers(PCharacter *ch, Scripting::Object *wrapper) const
-{
-    WrapperBase *base = get_wrapper(wrapper);
-    if (!base)
-        return;
-
-    StringSet triggers, misc;
-    ostringstream buf;
-
-    base->collectTriggers(triggers, misc);
-    if (!triggers.empty()) {
-        buf << "{gАктивные триггеры{x:    ";
-        for (auto &t: triggers)
-            buf << web_cmd(ch, "fenia $1", t) << " ";
-        buf << endl;    
-    }
-
-    if (!misc.empty()) {
-        buf << "{gДругие поля и методы{x: ";
-        for (auto &t: misc)
-            buf << web_cmd(ch, "fenia $1", t) << " ";
-        buf << endl;    
-    }
-
-    ch->send_to(buf);
-}
-
 /**
  * Clear a single runtime field (aka trigger) if exists on this wrapper.
  */
@@ -184,84 +140,92 @@ bool FeniaTriggerLoader::clearTriggers(Scripting::Object *wrapper) const
     return true;
 }
 
-static void show_one_trigger(PCharacter *ch, DefaultSpell *spell, const char *trigName, bitnumber_t target_mask, ostringstream &buf)
+static void show_one_trigger(PCharacter *ch, DefaultSpell *spell, const char *trigName, bitnumber_t target_mask, ostringstream &bufActive, ostringstream &bufAvailable)
 {
     bool hasTrigger = FeniaSkillActionHelper::spellHasTrigger(spell, trigName);
     bool hasTarget = spell->target.isSet(target_mask);
+    DLString trigLink = web_cmd(ch, "fenia $1", trigName);
 
-    if (hasTarget || hasTrigger)
-    {
-        buf << "{g" << web_cmd(ch, "fenia $1", trigName) 
-            << (hasTrigger ? "{g*{x" : "{x")
-            << "  ";
-    }
+    if (hasTrigger)
+        bufActive << trigLink << " ";
+    else if (hasTarget)
+        bufAvailable << trigLink << " ";
 }
 
-void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const
+/**
+ * Show all triggers on a spell. Trigger names shown depend on the spell target type.
+ */
+void FeniaTriggerLoader::showTriggers(PCharacter *ch, DefaultSpell *spell) const
 {
-    ostringstream buf;
-
-    show_one_trigger(ch, spell, "runVict", TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD, buf);
-    show_one_trigger(ch, spell, "runObj", TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD, buf);
-    show_one_trigger(ch, spell, "runRoom", TAR_PEOPLE|TAR_ROOM, buf);
-    show_one_trigger(ch, spell, "runArg", TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ, buf);
-
-    if (buf.str().empty())
-        buf << "(укажи цель заклинания)";
-    else
-        buf << "{D(fenia <trig> [clear]){x";
+    ostringstream buf, bufActive, bufAvailable;
         
-    buf << endl;
+    show_one_trigger(ch, spell, "runVict", TAR_CHAR_ROOM|TAR_CHAR_SELF|TAR_CHAR_WORLD, bufActive, bufAvailable);
+    show_one_trigger(ch, spell, "runObj", TAR_OBJ_EQUIP|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_WORLD, bufActive, bufAvailable);
+    show_one_trigger(ch, spell, "runRoom", TAR_PEOPLE|TAR_ROOM, bufActive, bufAvailable);
+    show_one_trigger(ch, spell, "runArg", TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ, bufActive, bufAvailable);
+
+    if (bufActive.str().empty() && bufAvailable.str().empty())
+        bufAvailable << "(укажи цель заклинания)";
+    else
+        bufAvailable << "{D(fenia <trig> [clear]){x";
+    
+    buf << "{gАктивные триггеры{x:    " << bufActive.str() << endl;
+    if (!bufAvailable.str().empty())
+        buf << "Доступные триггеры:   " << bufAvailable.str() << endl;
+
     ch->send_to(buf);
 }
 
-void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultAffectHandler *ah) const
+/**
+ * Show all available and active triggers for a wrapper (skill command, mob index etc).
+ */
+void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const
 {
     ostringstream buf;
+    
+    // Collect a set of all trigger names defined in the examples.
+    StringSet availableTriggers;
+    auto myTriggers = indexTriggers.find(indexType);
+    if (myTriggers != indexTriggers.end())
+        for (auto &t: myTriggers->second)
+            availableTriggers.insert(t.first);
 
-    IndexTriggers::const_iterator i = indexTriggers.find("affect");
-    if (i == indexTriggers.end())
-        return;
+    // Collect a set of all active triggers and other methods on the wrapper.
+    StringSet activeTriggers, miscMethods;    
+    if (wrapper)
+        wrapper->collectTriggers(activeTriggers, miscMethods);
 
-    WrapperBase *wrapper = ah->getWrapper();    
-
-    const TriggerContent &triggers = i->second;
-    for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
-        IdRef methodId(t->first);
-        Register method;
-        bool hasTrigger = wrapper && wrapper->triggerFunction(methodId, method);
-        buf << (hasTrigger ? "{W" : "{g") 
-			<< web_cmd(ch, "fenia $1", t->first)
-            << "{x ";
+    // Display active ones.
+    if (!activeTriggers.empty()) {
+        buf << "{gАктивные триггеры{x:    ";
+        for (auto &t: activeTriggers)
+            buf << web_cmd(ch, "fenia $1", t) << " ";
+        buf << "{D(fenia <trig> [clear]){x" << endl;
     }
 
-    buf << "{D(fenia <trig> [clear]){x" << endl;
+     if (!miscMethods.empty()) {
+        buf << "{gАктивные методы{x:      ";
+        for (auto &t: miscMethods)
+            buf << web_cmd(ch, "fenia $1", t) << " ";
+        buf << endl;    
+    }
+    
+    // Display remaining available triggers.
+    if (!availableTriggers.empty()) {
+        ostringstream abuf;
+        
+        for (auto &t: availableTriggers)
+            if (activeTriggers.count(t) == 0 && miscMethods.count(t) == 0)
+                abuf << web_cmd(ch, "fenia $1", t) << " ";
+
+        if (!abuf.str().empty())
+            buf << "Доступные триггеры:   " << abuf.str() << "{D(fenia <trig>){x" << endl;
+    }
+
     ch->send_to(buf);
 }
 
-void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, DefaultSkillCommand *cmd) const
-{
-    ostringstream buf;
 
-    IndexTriggers::const_iterator i = indexTriggers.find("skillcommand");
-    if (i == indexTriggers.end())
-        return;
-
-    WrapperBase *wrapper = cmd->getWrapper();    
-
-    const TriggerContent &triggers = i->second;
-    for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
-        IdRef methodId(t->first);
-        Register method;
-        bool hasTrigger = wrapper && wrapper->triggerFunction(methodId, method);
-        buf << (hasTrigger ? "{W" : "{g") 
-			<< web_cmd(ch, "fenia $1", t->first)
-            << "{x ";
-    }
-
-    buf << "{D(fenia <trig> [clear]){x" << endl;
-    ch->send_to(buf);
-}
 
 static Register get_wrapper_for_index_data(int vnum, const DLString &type)
 {

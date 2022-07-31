@@ -379,9 +379,7 @@ OEDIT(show)
     }
 
     OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
-    if (original)
-        feniaTriggers->showAssignedTriggers(ch, original->wrapper);
-    feniaTriggers->showAvailableTriggers(ch, "obj");
+    feniaTriggers->showTriggers(ch, original ? get_wrapper(original->wrapper) : 0, "obj");
     return false;
 }
 
