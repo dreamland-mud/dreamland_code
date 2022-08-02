@@ -261,6 +261,8 @@ SKILL_RUNP( envenom )
         return;
     }
 
+    skill = gsn_envenom->getEffective(ch);
+    
     if (obj->item_type == ITEM_FOOD || obj->item_type == ITEM_DRINK_CON)
     {
         if (drink_is_closed( obj, ch ))
@@ -360,11 +362,9 @@ SKILL_RUNP( envenom )
 
 SKILL_RUNP( steal )
 {
-        char buf  [MAX_STRING_LENGTH];
         char arg1 [MAX_INPUT_LENGTH];
         char arg2 [MAX_INPUT_LENGTH];
         Character *victim;
-        Character *tmp_ch;
         Object *obj;
         Object *obj_inve;
         int percent, skill;
@@ -414,8 +414,6 @@ SKILL_RUNP( steal )
                 ch->pecho("Не стоит -- еще ударят больно в пылу битвы.");
                 return;
         }
-
-        tmp_ch = ch->getDoppel( );
 
         ch->setWait( gsn_steal->getBeats(ch)  );
 

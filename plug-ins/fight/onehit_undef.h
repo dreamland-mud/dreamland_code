@@ -34,14 +34,6 @@ protected:
     void damEffectSlice( );
     void damEffectVorpal();
 
-    bool defenseParry( );
-    bool defenseHandBlock( ); 
-    bool defenseBatSwarm( ); 
-    bool defenseBlink( ); 
-    bool defenseShieldBlock( ); 
-    bool defenseCrossBlock( ); 
-    bool defenseDodge( );
-
     void destroyWeapon( );
     void destroyShield( );
     int getDestroyChance( Object * );

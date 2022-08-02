@@ -77,3 +77,37 @@ SKILL_RUNP( blink )
     ch->pecho("Укажи {lRвкл или выкл{lEon или off{lx в качестве аргумента."); 
 }
 
+SKILL_APPLY(blink)
+{
+    int chance;
+    
+    if ( victim->is_npc() )
+        return false;
+
+    if (!IS_SET(victim->act, PLR_BLINK_ON) || !gsn_blink->usable( victim ))
+        return false;
+
+    chance  = gsn_blink->getEffective( victim ) / 2;
+
+    if ( ( number_percent( ) >= chance + victim->getModifyLevel() - ch->getModifyLevel() )
+        || ( number_percent( ) < 50 )
+        || ( victim->mana < max( victim->getModifyLevel() / 5, 1 ) ) )
+        return false;
+
+    victim->mana -= max( victim->getModifyLevel() / 5, 1 );
+
+    if(SHADOW(victim))
+    {
+        victim->pecho("Ты мерцаешь и попадаешь под удар.");
+        victim->recho("%2$^C1 мерцает... но тень выдает %2$P4.", ch, victim);
+        return false;
+    }
+
+    victim->pecho( "Ты мерцаешь и уклоняешься от атаки %1$C2.", ch, victim);
+    ch->pecho( "%2$^C1 мерцает и уклоняется от твоей атаки.", ch, victim);
+    ch->recho( victim, "%2$^C1 мерцает и уклоняется от атаки %1$C2.", ch, victim);
+
+    gsn_blink->improve( victim, true, ch );
+    return true;
+}
+

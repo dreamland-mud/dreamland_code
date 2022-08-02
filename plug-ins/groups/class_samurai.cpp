@@ -192,6 +192,8 @@ SKILL_RUNP( harakiri )
       return;
     }
 
+    chance = gsn_hara_kiri->getEffective(ch);
+
     if (number_percent() < chance + skill_level_bonus(*gsn_hara_kiri, ch))
     {
 
@@ -232,7 +234,6 @@ SKILL_RUNP( katana )
         Object *part;
         char arg[MAX_INPUT_LENGTH];
         char buf[MAX_STRING_LENGTH];
-        int mana;
 
         one_argument( argument, arg );
 
@@ -315,7 +316,6 @@ SKILL_RUNP( katana )
         {
                 oldact("Ты понапрасну изводишь $o4.",ch,part,0,TO_CHAR);
                 extract_obj(part);
-                ch->mana -= mana / 2;
                 gsn_katana->improve( ch, false );
         }
 }
