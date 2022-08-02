@@ -626,8 +626,9 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
-//            if (pMob->properties.count("hidden") > 0)
-//                continue;
+
+            if (pMob->properties.count("partConfirmed") > 0)
+                continue;
 
             bitstring_t raceParts = race->getParts();
             bitstring_t mobParts = pMob->parts;
@@ -674,8 +675,9 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
-//            if (pMob->properties.count("hidden") > 0)
- //               continue;
+
+            if (pMob->properties.count("formConfirmed") > 0)
+               continue;
 
             bitstring_t raceForm = race->getForm();
             bitstring_t mobForm = pMob->form;
@@ -727,9 +729,10 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
 
     if (arg == "hide") {
-        pMob->properties["hidden"] = "true";
+        DLString propName = arg2 + "Confirmed";
+        pMob->properties[propName] = "true";
         pMob->area->changed = true;
-        ch->pecho("Mob %d is now hidden from output.", vnum.getValue());
+        ch->pecho("Mob %d is now hidden from 'abc %s' output.", vnum.getValue(), arg2.c_str());
         __do_abc(ch, const_cast<char *>(arg2.c_str()));
         return;
     }
