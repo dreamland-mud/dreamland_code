@@ -62,19 +62,15 @@ bool Movement::moveRecursive( )
     if (!moveAtomic( )) 
         return false;
 
-    try {
-        callProgs( ch );
-        if (ch->in_room != to_room)
-            return false;
-            
-        callProgs( ch->mount );
-        moveFollowers( ch );
-        moveFollowers( ch->mount );
-        callProgsFinish( ch );
-        callProgsFinish( ch->mount );
-    } 
-    catch (const VictimDeathException &) {
-    }
+    callProgs( ch );
+    if (ch->in_room != to_room)
+        return false;
+        
+    callProgs( ch->mount );
+    moveFollowers( ch );
+    moveFollowers( ch->mount );
+    callProgsFinish( ch );
+    callProgsFinish( ch->mount );
 
     return true;
 }
