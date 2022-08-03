@@ -109,9 +109,9 @@ bool UndefinedOneHit::canDamage( )
         }
                 
         if (gsn_parry->getCommand()->apply(ch, victim, secondary)
-            || gsn_hand_block->getCommand()->apply(ch, victim)
-            || gsn_bat_swarm->getCommand()->apply(ch, victim) 
-            || gsn_blink->getCommand()->apply(ch, victim) 
+            || gsn_hand_block->getCommand()->apply(ch, victim, secondary)
+            || gsn_bat_swarm->getCommand()->apply(ch, victim, secondary) 
+            || gsn_blink->getCommand()->apply(ch, victim, secondary) 
             || gsn_shield_block->getCommand()->apply(ch, victim, secondary)
             || gsn_cross_block->getCommand()->apply(ch, victim, secondary)
             || gsn_dodge->getCommand()->apply(ch, victim, secondary))
