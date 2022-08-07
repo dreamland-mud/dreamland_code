@@ -708,6 +708,11 @@ NMI_GET( CharacterWrapper, alignName, "название натуры" )
     return align_name( target );
 }
 
+NMI_GET( CharacterWrapper, mod_beats, "на сколько процентов увеличены или уменьшены задержки от умений" )
+{
+    checkTarget( );
+    return target->mod_beats;
+}
 
 #define DEF_STAT(x, stat, help) \
 NMI_GET( CharacterWrapper, cur_##x, "текущий параметр: " help ) \
