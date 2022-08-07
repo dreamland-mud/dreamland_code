@@ -204,10 +204,10 @@ NMI_GET( RoomWrapper, description, "описание комнаты" )
     return Register( target->getDescription() );
 }
 
-NMI_GET( RoomWrapper, clan, "имя клана, которому принадлежит комната" )
+NMI_GET( RoomWrapper, clan, "клан, которому принадлежит комната (структура .Clan)" )
 {
     checkTarget();
-    return Register( target->pIndexData->clan->getShortName( ) );
+    return ClanWrapper::wrap( target->pIndexData->clan->getName( ) );
 }
 
 NMI_GET( RoomWrapper, guilds, "гильдии в этой комнате" )
