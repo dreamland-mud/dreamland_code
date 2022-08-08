@@ -756,6 +756,7 @@ static void reset_dead_player( PCharacter *victim )
     victim->mana    = victim->max_mana / 10;
     victim->move    = victim->max_move;
     victim->shadow = -1;
+    victim->parts = victim->getRace()->getParts();
 
     for (int i = 0; i < desireManager->size( ); i++)
         desireManager->find( i )->reset( victim );
