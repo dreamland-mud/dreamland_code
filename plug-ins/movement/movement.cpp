@@ -181,13 +181,17 @@ void Movement::callProgs( Character *wch )
     for (fch = to_room->people; fch!=0; fch = fch_next) {
         fch_next = fch->next_in_room;
 
-        /* greet progs for items carried by people in room */
-        for ( obj = fch->carrying; obj != 0; obj = obj->next_content )
-                oprog_greet( obj, wch );
+        try {
+            /* greet progs for items carried by people in room */
+            for ( obj = fch->carrying; obj != 0; obj = obj->next_content )
+                    oprog_greet( obj, wch );
 
-        /* greet programs for people */
-        if (IS_AWAKE(fch))
-            mprog_greet( fch, wch );
+            /* greet programs for people */
+            if (IS_AWAKE(fch))
+                mprog_greet( fch, wch );
+        } catch (const VictimDeathException &) {
+            // ignored
+        }
     }
 
     /* entry programs for items */
