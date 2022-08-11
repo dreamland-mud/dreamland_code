@@ -64,7 +64,6 @@ class_ranger.cpp \
 class_samurai.cpp \
 class_thief.cpp \
 class_vampire.cpp \
-class_warlock.cpp \
 class_warrior.cpp 
 
 libclass_skills_la_MOC = \
