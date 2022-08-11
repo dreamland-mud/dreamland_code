@@ -154,14 +154,14 @@ void FeniaSkillActionHelper::extractWrapper(SkillCommand *cmd)
 bool FeniaSkillActionHelper::executeSpellRun(DefaultSpell *spell, Character *ch, SpellTarget::Pointer &spellTarget, int level) 
 {
     bool rcIgnored;
-    FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
+    Scripting::Register ctx = createContext(spell, ch, spellTarget, level);
     // Figure out applicable runXXX method and call it, if defined on the spell wrapper.
     return executeMethod(spell, "run" + getMethodSuffix(spellTarget), ctx, rcIgnored);
 }
 
 bool FeniaSkillActionHelper::executeSpellApply(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level, bool &rc)
 {
-    FeniaSpellContext::Pointer ctx = createContext(spell, ch, spellTarget, level);
+    Scripting::Register ctx = createContext(spell, ch, spellTarget, level);
     // Figure out applicable applyXXX method and call it, if defined on the spell wrapper.
     return executeMethod(spell, "apply" + getMethodSuffix(spellTarget), ctx, rc);
 }
@@ -177,7 +177,7 @@ bool FeniaSkillActionHelper::executeCommandApply(DefaultSkillCommand *cmd, Chara
     return executeMethod(cmd, "apply", createContext(cmd, ch, victim, level), rc);
 }
 
-bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx, bool &rc)
+bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc)
 {
     // Find method defined on the wrapper.
     WrapperBase *wrapper = wtarget->getWrapper();
@@ -191,7 +191,7 @@ bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLStrin
 
     // Invoke the function with the provided context, save its return value for further use.
     try {
-        Register returnValue = method.toFunction()->invoke(Register(ctx->getSelf()), RegisterList());
+        Register returnValue = method.toFunction()->invoke(ctx, RegisterList());
         if (returnValue.type != Register::NONE)
             rc = returnValue.toBoolean();
 
@@ -208,7 +208,7 @@ bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLStrin
     return true;
 }
 
-FeniaSpellContext::Pointer FeniaSkillActionHelper::createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
+Scripting::Register FeniaSkillActionHelper::createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level) 
 {
     FeniaSpellContext::Pointer ctx(NEW);
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
@@ -240,10 +240,10 @@ FeniaSpellContext::Pointer FeniaSkillActionHelper::createContext(DefaultSpell *s
 
     ctx->calcDamage();
 
-    return ctx;    
+    return Register(ctx->getSelf());    
 }
 
-FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target) 
+Scripting::Register FeniaSkillActionHelper::createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target) 
 {
     FeniaCommandContext::Pointer ctx(NEW);
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
@@ -264,10 +264,10 @@ FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillC
     if (target.vict)
         ctx->vict = FeniaManager::wrapperManager->getWrapper(target.vict);
 
-    return ctx;        
+    return Register(ctx->getSelf());        
 }
 
-FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level)
+Scripting::Register FeniaSkillActionHelper::createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level)
 {
     FeniaCommandContext::Pointer ctx(NEW);
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
@@ -281,7 +281,7 @@ FeniaCommandContext::Pointer FeniaSkillActionHelper::createContext(DefaultSkillC
     if (victim)
         ctx->vict = FeniaManager::wrapperManager->getWrapper(victim);
 
-    return ctx;        
+    return Register(ctx->getSelf());        
 }
 
 bool FeniaSkillActionHelper::spellHasTrigger(Spell *spell, const DLString &trigName) 
