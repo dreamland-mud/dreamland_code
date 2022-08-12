@@ -31,6 +31,39 @@
 
 OLC_STATE(OLCStateMobile);
 
+// Remove after 'medit convert' removal
+GSN(faerie_fire);
+GSN(infravision);
+GSN(fly);
+GSN(curse);
+GSN(regeneration);
+GSN(sneak);
+GSN(pass_door);
+GSN(protection_good);
+GSN(slow);
+GSN(swim);
+GSN(sanctuary);
+GSN(haste);
+GSN(protection_evil);
+GSN(stardust);
+GSN(dark_shroud);
+GSN(corruption);
+GSN(invisibility);
+GSN(improved_invis);
+GSN(hide);
+GSN(fade);
+GSN(camouflage);
+GSN(blindness);
+GSN(poison);
+GSN(sleep);
+GSN(charm);
+GSN(calm);
+GSN(plague);
+GSN(weaken);
+GSN(berserk);
+
+
+
 OLCStateMobile::OLCStateMobile( )
 {
     /*fromXML will fill fields for us*/
@@ -1334,6 +1367,95 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         
         oldact("$c1 создает $C4!", ch, 0, mob, TO_ROOM);
         oldact("Ты создаешь $C4!", ch, 0, mob, TO_CHAR);
+        return;
+
+    } else if (!str_cmp(arg1, "convert")) {
+        // One-off conversion of affect bits. To be removed once migration is finished.
+        int cnt = 0;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            bool mobChanged = false;
+            Flags aff(pMob->affected_by, &affect_flags);
+
+            if (!pMob->affects.empty())
+                mobChanged = true;
+            
+            pMob->affects.clear();
+
+            if (aff.isSet(AFF_BLIND))
+                pMob->affects.set(gsn_blindness);
+            if (aff.isSet(AFF_INVISIBLE))
+                pMob->affects.set(gsn_invisibility);
+            if (aff.isSet(AFF_IMP_INVIS))
+                pMob->affects.set(gsn_improved_invis);
+            if (aff.isSet(AFF_FADE))
+                pMob->affects.set(gsn_fade);
+            if (aff.isSet(AFF_CORRUPTION))
+                pMob->affects.set(gsn_corruption);
+            if (aff.isSet(AFF_POISON))
+                pMob->affects.set(gsn_poison);
+            if (aff.isSet(AFF_HIDE))
+                pMob->affects.set(gsn_hide);
+            if (aff.isSet(AFF_SLEEP))
+                pMob->affects.set(gsn_sleep);
+            if (aff.isSet(AFF_CHARM))
+                pMob->affects.set(gsn_charm);
+            if (aff.isSet(AFF_CALM))
+                pMob->affects.set(gsn_calm);
+            if (aff.isSet(AFF_PLAGUE))
+                pMob->affects.set(gsn_plague);
+            if (aff.isSet(AFF_WEAKEN))
+                pMob->affects.set(gsn_weaken);
+            if (aff.isSet(AFF_BERSERK))
+                pMob->affects.set(gsn_berserk);
+            if (aff.isSet(AFF_CAMOUFLAGE))
+                pMob->affects.set(gsn_camouflage);
+            if (aff.isSet(AFF_SANCTUARY)) {
+                if (IS_EVIL(pMob))
+                    pMob->affects.set(gsn_dark_shroud);
+                else if (IS_SET(pMob->act, ACT_MAGE))
+                    pMob->affects.set(gsn_stardust);
+                else
+                    pMob->affects.set(gsn_sanctuary);                
+            }
+            if (aff.isSet(AFF_HASTE))
+                pMob->affects.set(gsn_haste);
+            if (aff.isSet(AFF_PROTECT_EVIL))
+                pMob->affects.set(gsn_protection_evil);
+            if (aff.isSet(AFF_CORRUPTION))
+                pMob->affects.set(gsn_corruption);
+            if (aff.isSet(AFF_FAERIE_FIRE))
+                pMob->affects.set(gsn_faerie_fire);
+            if (aff.isSet(AFF_INFRARED))
+                pMob->affects.set(gsn_infravision);
+            if (aff.isSet(AFF_FLYING))
+                pMob->affects.set(gsn_fly);            
+            if (aff.isSet(AFF_CURSE))
+                pMob->affects.set(gsn_curse);
+            if (aff.isSet(AFF_REGENERATION))
+                pMob->affects.set(gsn_regeneration);
+            if (aff.isSet(AFF_SNEAK))
+                pMob->affects.set(gsn_sneak);
+            if (aff.isSet(AFF_PASS_DOOR))
+                pMob->affects.set(gsn_pass_door);
+            if (aff.isSet(AFF_PROTECT_GOOD))
+                pMob->affects.set(gsn_protection_good);            
+            if (aff.isSet(AFF_SLOW))
+                pMob->affects.set(gsn_slow);
+            if (aff.isSet(AFF_SWIM))
+                pMob->affects.set(gsn_swim);
+
+            if (!pMob->affects.empty())
+                mobChanged = true;
+
+            if (mobChanged) {
+                pMob->area->changed = true;
+                cnt++;
+            }
+        }
+
+        ch->pecho("Converted aff bits for %d mobs.", cnt);
         return;
     }
     

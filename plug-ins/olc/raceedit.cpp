@@ -17,6 +17,7 @@
 #include "mercdb.h"
 #include "def.h"
 
+// Remove after 'raceedit convert' removal
 GSN(faerie_fire);
 GSN(infravision);
 GSN(fly);
@@ -498,6 +499,7 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
         return;
     }
 
+    // One-off conversion of affect bits. To be removed once migration is finished.
     if (cmd == "convert") {
         ostringstream buf;
 
