@@ -747,7 +747,6 @@ static void reset_dead_player( PCharacter *victim )
         affect_remove( victim, paf );
 
     victim->affected_by    = 0;
-    victim->add_affected_by = 0;
     victim->detection    = 0;
     victim->armor.clear( );
     victim->armor.fill( 100 );

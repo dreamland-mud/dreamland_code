@@ -97,7 +97,6 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     next             = NULL;
     
     act              = mob.act;
-    add_affected_by  = mob.add_affected_by;
     affected_by      = mob.affected_by;
     alignment        = mob.alignment;
     area             = mob.area;

@@ -82,7 +82,6 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.group            = original->group;
     mob.act              = original->act;
     mob.affected_by      = original->affected_by;
-    mob.add_affected_by  = original->add_affected_by;
     mob.detection        = original->detection;
     mob.alignment        = original->alignment;
     mob.level            = original->level;
@@ -171,9 +170,6 @@ void OLCStateMobile::commit()
             if(victim->affected_by == original->affected_by)
                 victim->affected_by = mob.affected_by;
             
-            if(victim->add_affected_by == original->add_affected_by)
-                victim->add_affected_by = mob.add_affected_by;
-            
             if(victim->detection == original->detection)
                 victim->detection = mob.detection;
             
@@ -256,7 +252,6 @@ void OLCStateMobile::commit()
     mob.smell.clear( );
     original->act              = mob.act;
     original->affected_by      = mob.affected_by;
-    original->add_affected_by  = mob.add_affected_by;
     original->detection        = mob.detection;
     original->alignment        = mob.alignment;
     original->level            = mob.level;

@@ -784,7 +784,6 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             KEY( "Act",                ch->act,                fread_flag( fp ) );
             KEY( "AffectedBy",        ch->affected_by,        fread_flag( fp ) );
             KEY( "AfBy",        ch->affected_by,        fread_flag( fp ) );
-            KEY( "AfBy_Add",        ch->add_affected_by,        fread_flag( fp ) );
             KEY( "Alignment",        ch->alignment,                fread_number( fp ) );
             KEY( "Alig",        ch->alignment,                fread_number( fp ) );
             KEY( "AntKilled",        ch->anti_killed,fread_number( fp ) );

@@ -277,7 +277,6 @@ public:
     XML_VARIABLE XMLFlags                res_flags;
     XML_VARIABLE XMLFlags                vuln_flags;
     XML_VARIABLE XMLFlags                affected_by;
-    XML_VARIABLE XMLFlags                add_affected_by;
     XML_VARIABLE XMLFlags                detection;
     XML_VARIABLE XMLEnumeration        position;
     XML_VARIABLE XMLFlags posFlags;

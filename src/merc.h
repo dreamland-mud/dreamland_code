@@ -326,7 +326,6 @@ struct        mob_index_data
     char *                description;
     int                act;
     int                affected_by;
-    int                add_affected_by;
     int                detection;
     int                alignment;
     int                level;

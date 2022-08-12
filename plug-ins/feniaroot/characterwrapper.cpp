@@ -806,7 +806,6 @@ INT_FIELD(imm_flags, "флаги иммунитета (таблица .tables.im
 INT_FIELD(res_flags, "флаги сопротивляемости (таблица .tables.res_flags)")
 INT_FIELD(vuln_flags, "флаги уязвимости (таблица .tables.res_flags)")
 INT_FIELD(affected_by, "флаги аффектов (таблица .tables.affect_flags)")
-INT_FIELD(add_affected_by, "расширение флагов аффектов (таблица .tables.affect_flags)")
 INT_FIELD(detection, "флаги детектов (таблица .tables.detect_flags)")
 INT_FIELD(position, "позиция (таблица .tables.position_table)")
 INT_FIELD(carry_weight, "вес который несет чар")
