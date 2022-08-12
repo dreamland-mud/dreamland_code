@@ -140,9 +140,8 @@ void OLCStateRace::show( PCharacter *ch )
 
     ptc(ch, "Поведение:     {Y%s{x {D(act){x\r\n", show_flag(r->act).c_str());
     ptc(ch, "{DАффекты:       {D%s{x {D(oaff){x\r\n", show_flag(r->aff).c_str());
-    ptc(ch, "Аффекты:       {Y%s{x %s{D(aff help){x\r\n", 
-            r->affects.toString().c_str(),
-            web_edit_button(ch, "aff", "").c_str());
+    ptc(ch, "Аффекты:       {Y%s{x {D(affects){x\r\n", 
+            r->affects.toString().c_str());
     ptc(ch, "Обнаружение:   {Y%s{x {D(det){x\r\n", show_flag(r->det).c_str());
     ptc(ch, "Атаки:         {Y%s{x {D(off){x\r\n", show_flag(r->off).c_str());
     ptc(ch, "Иммунитет:     {Y%s{x {D(imm){x\r\n", show_flag(r->imm).c_str());
@@ -305,7 +304,7 @@ RACEEDIT(wearloc, "слоты", "слоты экипировки (? wearloc)")
 {
     return globalBitvectorEdit<Wearlocation>(getOriginal()->wearloc);
 }
-RACEEDIT(affects, "воздействия", "список умений - воздействий на расе (? skill)")
+RACEEDIT(affects, "воздействия", "список умений - воздействий на расе (? spell)")
 {
     return globalBitvectorEdit<Skill>(getOriginal()->affects);
 }

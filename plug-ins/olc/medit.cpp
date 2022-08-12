@@ -108,6 +108,8 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.practicer.set( original->practicer );
     mob.religion.clear();
     mob.religion.set(original->religion);
+    mob.affects.clear();
+    mob.affects.set(original->affects);
 }
 
 OLCStateMobile::OLCStateMobile( int vnum )
@@ -285,6 +287,8 @@ void OLCStateMobile::commit()
     original->practicer.set( mob.practicer );
     original->religion.clear();
     original->religion.set(mob.religion);
+    original->affects.clear();
+    original->affects.set(mob.affects);
 
     for(wch = char_list; wch; wch = wch->next) {
         NPCharacter *victim = wch->getNPC();
@@ -355,7 +359,8 @@ MEDIT(show)
 
     ptc(ch, "Act: [{R%s{x] {D(? act_flags){x\n\r", act_flags.names(mob.act).c_str());
 
-    ptc(ch, "Aff: [{C%s{x] {D(? affect_flags){x\n\r", affect_flags.names(mob.affected_by).c_str());
+    ptc(ch, "Aff: [{D%s{x] {D(oaff){x\n\r", affect_flags.names(mob.affected_by).c_str());
+    ptc(ch, "Affects: [{C%s{x] {D(aff){x\n\r", mob.affects.toString().c_str());
     ptc(ch, "Det: [{M%s{x] {D(? detect_flags){x\n\r", detect_flags.names(mob.detection).c_str());
 
     ptc(ch, "Pos   : starting [{Y%s{x]  default [{Y%s{x] {D(? position_table){x\n\r",
@@ -750,7 +755,7 @@ MEDIT(act)
     return false;
 }
 
-MEDIT(affect)
+MEDIT(oaff)
 {                                
 
     return flagBitsEdit(affect_flags, mob.affected_by);
@@ -981,6 +986,11 @@ MEDIT(group)
 MEDIT(practicer)
 {
     return globalBitvectorEdit<SkillGroup>(mob.practicer);
+}
+
+MEDIT(affects)
+{
+    return globalBitvectorEdit<Skill>(mob.affects);
 }
 
 MEDIT(religion)

@@ -350,6 +350,7 @@ struct        mob_index_data
     char *                material;
     GlobalBitvector     practicer;
     GlobalBitvector religion;
+    GlobalBitvector affects;
     Grammar::Number     gram_number;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;

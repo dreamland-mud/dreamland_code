@@ -41,6 +41,7 @@ public:
     XML_VARIABLE XMLStringNoEmpty spec;
     XML_VARIABLE XMLGlobalBitvector practicer;
     XML_VARIABLE XMLGlobalBitvector religion;
+    XML_VARIABLE XMLGlobalBitvector affects;
     XML_VARIABLE XMLStringNoEmpty gram_number;
     XML_VARIABLE XMLStringNoEmpty smell;
 
