@@ -178,10 +178,10 @@ int DefaultSpell::getMaxRange( Character *ch ) const
     if (!target.isSet(TAR_CHAR_ROOM))
         return 0;
 
-    int level = ch ? ch->getModifyLevel() : 1; 
+    int level = ch ? skill_level(**skill, ch) : 1; 
         
-    // max range depends on caster level, but 6 rooms is max like old acid blast 
-    return max(1,min(level / 10,6));
+    // max range depends on skill level, but 6 rooms is max like old acid blast 
+    return URANGE(1,level / 10,6);
 }
 
 /*
