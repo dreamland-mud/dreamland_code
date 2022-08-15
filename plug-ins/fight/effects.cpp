@@ -189,7 +189,7 @@ void acid_effect(void *vo, Character *source, short level, int dam, int target, 
 
         show_effect_message(obj, msg);
 
-        if ( obj->item_type == ITEM_ARMOR && material_is_typed( obj, MAT_METAL ) )  /* etch it */
+        if ( obj->item_type == ITEM_ARMOR && (material_is_typed( obj, MAT_METAL ) || material_is_typed(obj, MAT_WOOD)) )  /* etch it */
         {
             int i;
             Affect af;
