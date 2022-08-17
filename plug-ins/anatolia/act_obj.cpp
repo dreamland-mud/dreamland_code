@@ -423,6 +423,10 @@ static bool can_get_obj( Character *ch, Object *obj )
 static bool get_obj( Character *ch, Object *obj )
 {
     oldact("Ты берешь $o4.", ch, obj, 0, TO_CHAR);
+    if (obj->item_type == ITEM_MONEY && obj->pIndexData->vnum > 5) {
+    DLString moneyArg = describe_money(obj->value1( ), obj->value0( ), 4);
+    ch->pecho("Твой кошель пополнился на: %s.", moneyArg.c_str());
+    }
     oldact("$c1 берет $o4.", ch, obj, 0, TO_ROOM);
             
     obj_from_room( obj );
@@ -438,6 +442,8 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
 {
     ostringstream toChar, toRoom;
     DLString prep;
+    char buf[MAX_STRING_LENGTH];
+
     
     switch (container->item_type) {
     case ITEM_KEYRING:
@@ -454,6 +460,11 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
             prep = "из";
         
         toChar << "Ты берешь $o4 " << prep << " $O2.";
+        if (obj->item_type == ITEM_MONEY && obj->pIndexData->vnum > 5) {
+            DLString moneyArg = describe_money(obj->value1( ), obj->value0( ), 4);
+            snprintf(buf, sizeof(buf), "\n\rТвой кошель пополнился на: %s.\n\r", moneyArg.c_str());
+            toChar << buf;
+        }
         toRoom << "$c1 берет $o4 " << prep << " $O2.";
         break;
 
