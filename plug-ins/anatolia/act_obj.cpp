@@ -470,13 +470,13 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
 
     case ITEM_CORPSE_NPC:
     case ITEM_CORPSE_PC:
-        if (DLString::emptyString != obj->from) {
+//        if (DLString::emptyString != obj->from) {
             toChar << "Ты снимаешь $o4 с $O2.";
             toRoom << "$c1 снимает $o4 с $O2.";
-        } else {
+/*        } else {
             toChar << "Ты берешь $o4 с $O2.";
             toRoom << "$c1 берет $o4 с $O2.";
-        }
+        }*/
         break;
 
     default:
