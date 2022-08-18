@@ -1827,7 +1827,7 @@ CMDRUNP( score )
     const char *CLR_FRAME = MILD(ch) ? "{Y" : "{G";
     const char *CLR_BAR   = MILD(ch) ? "{D" : "{C";
     const char *CLR_CAPT  = MILD(ch) ? "{g" : "{R";
-    
+
     if (ch->is_npc( )) {
         interpret_raw( ch, "oscore" );
         return;
@@ -1842,6 +1842,7 @@ CMDRUNP( score )
     DLString title = pch->getParsedTitle( );
     name << ch->seeName( ch, '1' ) << "{x ";
     mudtags_convert(title.c_str( ), name, TAGS_CONVERT_VIS, ch);
+
 
     // Output one piece of the score if there is an argument provided.
     DLString arg = argument;
@@ -1871,9 +1872,7 @@ CMDRUNP( score )
 "     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
 "     | %sКласс:{x  %-13s%s| %s{lRЛовк:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-6d%s |\n\r"
 "     | %sНатура:{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
-"     | %sДом  :{x  %-30s %s| {Y%-22s %s|\n\r"                
-"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r",
 
             CLR_FRAME, CLR_BAR, CLR_FRAME,
 
@@ -1938,16 +1937,22 @@ CMDRUNP( score )
                 ?  "{lRСмертей  {lEDeath    {lx" : "{lRТрусость {lEWimpy    {lx" ,
             ch->getProfession( ) == prof_samurai 
                 ? pch->death.getValue( ) : ch->wimpy.getValue( ),
-            CLR_FRAME,
+            CLR_FRAME);
 
-            CLR_CAPT,
-            room ? room->areaName().c_str() : "Потерян",
-            CLR_BAR,
-            msgtable_lookup( msg_positions, ch->position ),
-            CLR_FRAME,
+        ch->pecho(
+            fmt ( 0, "     %s| %sДом  :{x  %-30.30s %s| {Y%-22s %s|",
+                CLR_FRAME,
+                CLR_CAPT,
+                room ? room->areaName().c_str() : "Потерян",
+                CLR_BAR,
+                msgtable_lookup( msg_positions, ch->position ),
+                CLR_FRAME,
+                CLR_BAR, CLR_FRAME) );
 
-            CLR_BAR, CLR_FRAME);
-
+    ch->printf(
+"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+        CLR_BAR, CLR_FRAME);
+            
     if (pch->guarding != 0) {
         ekle = 1;
         ch->printf( 
