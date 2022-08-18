@@ -1843,7 +1843,6 @@ CMDRUNP( score )
     name << ch->seeName( ch, '1' ) << "{x ";
     mudtags_convert(title.c_str( ), name, TAGS_CONVERT_VIS, ch);
 
-
     // Output one piece of the score if there is an argument provided.
     DLString arg = argument;
     if (!arg.empty()) {
