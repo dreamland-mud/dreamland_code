@@ -1421,7 +1421,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
             if (aff.isSet(AFF_HASTE))
                 pMob->affects.set(gsn_haste);
-            if (aff.isSet(AFF_PROTECT_EVIL))
+            if (aff.isSet(AFF_PROTECT_EVIL) && !IS_EVIL(pMob))
                 pMob->affects.set(gsn_protection_evil);
             if (aff.isSet(AFF_CORRUPTION))
                 pMob->affects.set(gsn_corruption);
@@ -1439,7 +1439,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 pMob->affects.set(gsn_sneak);
             if (aff.isSet(AFF_PASS_DOOR))
                 pMob->affects.set(gsn_pass_door);
-            if (aff.isSet(AFF_PROTECT_GOOD))
+            if (aff.isSet(AFF_PROTECT_GOOD) && !IS_GOOD(pMob))
                 pMob->affects.set(gsn_protection_good);            
             if (aff.isSet(AFF_SLOW))
                 pMob->affects.set(gsn_slow);
