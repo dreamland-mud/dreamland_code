@@ -59,6 +59,7 @@ GSN(dagger);
 GSN(mace);
 GSN(spear);
 GSN(sword);
+PROF(druid);
 
 /*----------------------------------------------------------------------
  * Area
@@ -269,16 +270,19 @@ NMI_INVOKE( ProfessionWrapper, bestWeapon, "(ch): vnum лучшего нович
         throw Scripting::NotEnoughArgumentsException( );
     
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
-    if (ch->getTarget( )->getSkill( gsn_axe ) == 100)
-        return weapon_vnum( WEAPON_AXE );
-    if (ch->getTarget( )->getSkill( gsn_sword ) == 100)
-        return weapon_vnum( WEAPON_SWORD );
-    if (ch->getTarget( )->getSkill( gsn_dagger ) == 100)
-        return weapon_vnum( WEAPON_DAGGER );
-    if (ch->getTarget( )->getSkill( gsn_mace ) == 100)
-        return weapon_vnum( WEAPON_MACE );
-    if (ch->getTarget( )->getSkill( gsn_spear ) == 100)
-        return weapon_vnum( WEAPON_SPEAR );
+    
+    if(ch->getTarget( )->getProfession( ) != prof_druid)  {
+        if (ch->getTarget( )->getSkill( gsn_axe ) == 100)
+            return weapon_vnum( WEAPON_AXE );
+        if (ch->getTarget( )->getSkill( gsn_sword ) == 100)
+            return weapon_vnum( WEAPON_SWORD );
+        if (ch->getTarget( )->getSkill( gsn_dagger ) == 100)
+            return weapon_vnum( WEAPON_DAGGER );
+        if (ch->getTarget( )->getSkill( gsn_mace ) == 100)
+            return weapon_vnum( WEAPON_MACE );
+        if (ch->getTarget( )->getSkill( gsn_spear ) == 100)
+            return weapon_vnum( WEAPON_SPEAR );
+    }
 
     return professionManager->find( name )->getWeapon( );
 }

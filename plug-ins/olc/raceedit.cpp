@@ -6,6 +6,8 @@
 #include "hedit.h"
 
 #include "util/regexp.h"
+#include "skill.h"
+#include "skillreference.h"
 #include "wearlocation.h"
 #include "defaultpcrace.h"
 #include "websocketrpc.h"
@@ -14,6 +16,18 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+
+// Remove after 'raceedit convert' removal
+GSN(faerie_fire);
+GSN(infravision);
+GSN(fly);
+GSN(curse);
+GSN(regeneration);
+GSN(sneak);
+GSN(pass_door);
+GSN(protection_good);
+GSN(slow);
+GSN(swim);
 
 OLC_STATE(OLCStateRace);
 
@@ -126,7 +140,9 @@ void OLCStateRace::show( PCharacter *ch )
     }
 
     ptc(ch, "Поведение:     {Y%s{x {D(act){x\r\n", show_flag(r->act).c_str());
-    ptc(ch, "Аффекты:       {Y%s{x {D(aff){x\r\n", show_flag(r->aff).c_str());
+    ptc(ch, "{DАффекты:       {D%s{x {D(oaff){x\r\n", show_flag(r->aff).c_str());
+    ptc(ch, "Аффекты:       {Y%s{x {D(affects){x\r\n", 
+            r->affects.toString().c_str());
     ptc(ch, "Обнаружение:   {Y%s{x {D(det){x\r\n", show_flag(r->det).c_str());
     ptc(ch, "Атаки:         {Y%s{x {D(off){x\r\n", show_flag(r->off).c_str());
     ptc(ch, "Иммунитет:     {Y%s{x {D(imm){x\r\n", show_flag(r->imm).c_str());
@@ -249,7 +265,7 @@ RACEEDIT(act, "поведение", "флаги поведения (? act_flags)
 {
     return flagBitsEdit(getOriginal()->act);
 }
-RACEEDIT(aff, "аффекты", "флаги аффектов (? affect_flags)")
+RACEEDIT(oaff, "аффекты", "устаревшие флаги аффектов (? affect_flags)")
 {
     return flagBitsEdit(getOriginal()->aff);
 }
@@ -288,6 +304,10 @@ RACEEDIT(size, "размер", "размеры (? size_table)")
 RACEEDIT(wearloc, "слоты", "слоты экипировки (? wearloc)")
 {
     return globalBitvectorEdit<Wearlocation>(getOriginal()->wearloc);
+}
+RACEEDIT(affects, "воздействия", "список умений - воздействий на расе (? spell)")
+{
+    return globalBitvectorEdit<Skill>(getOriginal()->affects);
 }
 RACEEDIT(hunts, "охотится", "на какие расы охотится командой 'съесть'")
 {
@@ -476,6 +496,60 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
                     race->getMaleName().ruscase('1').c_str(),
                     ri.mobs));
         }
+        return;
+    }
+
+    // One-off conversion of affect bits. To be removed once migration is finished.
+    if (cmd == "convert") {
+        ostringstream buf;
+
+        buf << "Converting aff bits to the list of affects." << endl;
+        for (int i = 0; i < raceManager->size(); i++) {
+            DefaultRace *race = dynamic_cast<DefaultRace *>(raceManager->find(i));
+            
+            if (!race)
+                continue;
+
+            const Flags &aff = race->getAff();
+            race->affects.clear();
+
+            if (aff.isSet(AFF_FAERIE_FIRE))
+                race->affects.set(gsn_faerie_fire);
+
+            if (aff.isSet(AFF_INFRARED))
+                race->affects.set(gsn_infravision);
+
+            if (aff.isSet(AFF_FLYING))
+                race->affects.set(gsn_fly);
+            
+            if (aff.isSet(AFF_CURSE))
+                race->affects.set(gsn_curse);
+
+            if (aff.isSet(AFF_REGENERATION))
+                race->affects.set(gsn_regeneration);
+
+            if (aff.isSet(AFF_SNEAK))
+                race->affects.set(gsn_sneak);
+
+            if (aff.isSet(AFF_PASS_DOOR))
+                race->affects.set(gsn_pass_door);
+
+            if (aff.isSet(AFF_PROTECT_GOOD))
+                race->affects.set(gsn_protection_good);
+            
+            if (aff.isSet(AFF_SLOW))
+                race->affects.set(gsn_slow);
+
+            if (aff.isSet(AFF_SWIM))
+                race->affects.set(gsn_swim);
+
+            if (!race->affects.empty())
+                buf << "   " << race->getName() << ": " << race->getAff().names() << " --> " << race->affects.toString() << endl;
+                
+            race->save();
+        }
+
+        ch->send_to(buf);
         return;
     }
 

@@ -243,6 +243,7 @@ DefaultRace::DefaultRace( ) :
                 stats( &stat_table ),
                 size( SIZE_MEDIUM, &size_table ),
                 wearloc( wearlocationManager ),
+                affects( skillManager ),
                 hunts( raceManager ),
                 donates( raceManager )
 {
@@ -335,6 +336,11 @@ const EnumerationArray & DefaultRace::getStats( ) const
 const GlobalBitvector & DefaultRace::getWearloc( ) const
 {
     return wearloc;
+}
+
+const GlobalBitvector & DefaultRace::getAffects( ) const
+{
+    return affects;
 }
 
 const Enumeration & DefaultRace::getSize( ) const

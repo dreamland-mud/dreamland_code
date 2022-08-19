@@ -83,6 +83,7 @@ public:
     virtual const GlobalBitvector & getWearloc( ) const;
     virtual const Enumeration & getSize( ) const;
     virtual Flags getAttitude( const Race & ) const;
+    virtual const GlobalBitvector &getAffects() const;
 
     virtual const DLString & getMaleName( ) const;
     virtual const DLString & getNeuterName( ) const;
@@ -100,6 +101,7 @@ public:
     XML_VARIABLE XMLEnumerationArray     stats; 
     XML_VARIABLE XMLEnumerationNoEmpty   size;
     XML_VARIABLE XMLGlobalBitvector      wearloc;
+    XML_VARIABLE XMLGlobalBitvector      affects;
 
     XML_VARIABLE XMLGlobalBitvector      hunts, donates;
 

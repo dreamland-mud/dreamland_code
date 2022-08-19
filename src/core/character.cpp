@@ -82,7 +82,6 @@ Character::Character( )
                 res_flags( 0, &::res_flags ),
                 vuln_flags( 0, &::vuln_flags ),
                 affected_by( 0, &affect_flags ),
-                add_affected_by( 0, &affect_flags ),
                 detection( 0, &detect_flags ),
                 position( POS_STANDING, &position_table ),
                 posFlags( 0, &position_flags ),
@@ -174,7 +173,6 @@ void Character::init( )
     res_flags = 0;
     vuln_flags = 0;
     affected_by = 0;
-    add_affected_by = 0;
     detection = 0;
     position = POS_STANDING;
     posFlags = 0;

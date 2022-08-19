@@ -92,9 +92,13 @@ NMI_SET( CommandWrapper, name, "название команды" )
 
 NMI_SET(CommandWrapper, rname, "русское название команды")
 {
-    russian.clear();
-    russian.push_back(arg.toString());
+    // Replace first alias in the list with the rname.
+    if (!russian.empty())
+        russian.pop_front();
+
+    russian.push_front(arg.toString());
     self->changed();
+
     commandManager->unregistrate( Pointer( this ) );
     commandManager->registrate( Pointer( this ) );
 }
@@ -102,6 +106,53 @@ NMI_SET(CommandWrapper, rname, "русское название команды")
 NMI_GET(CommandWrapper, rname, "русское название команды")
 {
     return Register(russian.front());
+}
+
+NMI_SET(CommandWrapper, raliases, "список русских синонимов команды через пробел")
+{
+    // Retain first russian alias as rname and replace all remaining ones. 
+    StringList words(arg.toString());
+    DLString rname = russian.front();
+    russian.clear();
+
+    if (!rname.empty())
+        russian.push_front(rname);
+
+    for (auto &w: words)
+        russian.push_back(w);
+
+    self->changed();
+    commandManager->unregistrate( Pointer( this ) );
+    commandManager->registrate( Pointer( this ) );
+}
+
+NMI_GET(CommandWrapper, aliases, "список английских синонимов команды через пробел")
+{
+    StringList words;
+    for (auto &a: aliases)
+        words.push_back(a);
+    return words.join(" ");
+}
+
+NMI_GET(CommandWrapper, raliases, "список русских синонимов команды через пробел")
+{
+    StringList words;
+    for (auto &r: russian)
+        words.push_back(r);
+    return words.join(" ");
+}
+
+NMI_SET(CommandWrapper, aliases, "список английских синонимов команды через пробел")
+{
+    // Replace a list of all EN aliases.
+    StringList words(arg.toString());
+    aliases.clear();
+    for (auto &w: words)
+        aliases.push_back(w);
+
+    self->changed();
+    commandManager->unregistrate( Pointer( this ) );
+    commandManager->registrate( Pointer( this ) );
 }
 
 NMI_INVOKE( CommandWrapper, api, "(): печатает этот api" )

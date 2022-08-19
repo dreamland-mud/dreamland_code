@@ -89,6 +89,10 @@ const GlobalBitvector & Race::getWearloc( ) const
 {
     return GlobalBitvector::emptyBitvector;
 }
+const GlobalBitvector & Race::getAffects( ) const
+{
+    return GlobalBitvector::emptyBitvector;
+}
 const Enumeration & Race::getSize( ) const
 {
     return Enumeration::emptyEnumeration;

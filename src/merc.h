@@ -326,7 +326,6 @@ struct        mob_index_data
     char *                description;
     int                act;
     int                affected_by;
-    int                add_affected_by;
     int                detection;
     int                alignment;
     int                level;
@@ -351,6 +350,7 @@ struct        mob_index_data
     char *                material;
     GlobalBitvector     practicer;
     GlobalBitvector religion;
+    GlobalBitvector affects;
     Grammar::Number     gram_number;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;

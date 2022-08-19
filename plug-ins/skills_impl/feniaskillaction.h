@@ -96,11 +96,11 @@ public:
     static bool spellHasTrigger(Spell *spell, const DLString &trigName);
 
 private:
-    static FeniaSpellContext::Pointer createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
-    static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);    
-    static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
+    static Scripting::Register createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
+    static Scripting::Register createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);    
+    static Scripting::Register createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
     static DLString getMethodSuffix(::Pointer<SpellTarget> &spellTarget);
-    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx, bool &rc);
+    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc);
 };
 
 

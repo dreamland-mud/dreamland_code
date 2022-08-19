@@ -747,7 +747,6 @@ static void reset_dead_player( PCharacter *victim )
         affect_remove( victim, paf );
 
     victim->affected_by    = 0;
-    victim->add_affected_by = 0;
     victim->detection    = 0;
     victim->armor.clear( );
     victim->armor.fill( 100 );
@@ -756,6 +755,7 @@ static void reset_dead_player( PCharacter *victim )
     victim->mana    = victim->max_mana / 10;
     victim->move    = victim->max_move;
     victim->shadow = -1;
+    victim->parts = victim->getRace()->getParts();
 
     for (int i = 0; i < desireManager->size( ); i++)
         desireManager->find( i )->reset( victim );

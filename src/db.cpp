@@ -212,6 +212,7 @@ Area::Area()
 mob_index_data::mob_index_data( ) 
                      : practicer( skillGroupManager ), 
                        religion( religionManager ),
+                       affects(skillManager),
                        wrapper ( 0 )
 {
 }

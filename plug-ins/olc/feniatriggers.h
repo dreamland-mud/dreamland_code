@@ -2,6 +2,7 @@
 #define FENIATRIGGERS_H
 
 #include <map>
+#include <sstream>
 #include "plugin.h"
 #include "dlstring.h"
 #include "oneallocate.h"
@@ -34,11 +35,10 @@ public:
     bool openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultSkillCommand *cmd, const DLString &constArguments) const;
-    void showAvailableTriggers(PCharacter *ch, const DLString &indexType) const;
-    void showAvailableTriggers(PCharacter *ch, DefaultSpell *spell) const;
-    void showAvailableTriggers(PCharacter *ch, DefaultAffectHandler *ah) const;
-    void showAvailableTriggers(PCharacter *ch, DefaultSkillCommand *cmd) const;
-    void showAssignedTriggers(PCharacter *ch,  Scripting::Object *wrapper) const;
+
+    void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
+    void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const;
+    
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
     bool clearTriggers(Scripting::Object *wrapper) const;
 

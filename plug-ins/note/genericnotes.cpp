@@ -44,12 +44,6 @@ VOID_NOTE(story)::getUnreadMessage( int count, ostringstream &buf ) const
     buf << fmt( 0, "{W%1$d{x нов%1$Iая|ые|ых истор%1$Iия|ии|ий ожида%1$Iет|ют|ют прочтения ('{hc{y{lRистория{lEstory{x').", count ) << endl;
 }
 
-NOTE_DECL(idea);
-VOID_NOTE(idea)::getUnreadMessage( int count, ostringstream &buf ) const 
-{
-    // Example: У тебя {W1{x непрочитанная идея ('{hc{y{lRидея{lEidea{x').
-    buf << fmt( 0, "У тебя {W%1$d{x непрочитанн%1$Iая|ых|ых иде%1$Iя|и|й ('{hc{y{lRидея{lEidea{x').", count ) << endl;
-}
 
 NOTE_DECL(penalty);
 VOID_NOTE(penalty)::getUnreadMessage( int count, ostringstream &buf ) const 

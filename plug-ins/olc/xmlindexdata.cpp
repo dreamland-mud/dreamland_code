@@ -82,6 +82,7 @@ XMLMobIndexData::XMLMobIndexData()
     behavior = 0;
     practicer.setRegistry( skillGroupManager );
     religion.setRegistry(religionManager);
+    affects.setRegistry(skillManager);
     wrapper = 0;
     group = 0;
 }
@@ -97,7 +98,6 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     next             = NULL;
     
     act              = mob.act;
-    add_affected_by  = mob.add_affected_by;
     affected_by      = mob.affected_by;
     alignment        = mob.alignment;
     area             = mob.area;
@@ -119,6 +119,7 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     player_name      = str_dup(mob.player_name);
     practicer        = mob.practicer;
     religion         = mob.religion;
+    affects          = mob.affects;
     race             = str_dup(mob.race);
     res_flags        = mob.res_flags;
     sex              = mob.sex;
