@@ -1905,7 +1905,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                                     // For all other items, retain only temporary affects as those are harmless 
                                     // and may add important bits such as 'noenchant' that we want removed eventually.
                                     for (auto &paf: affectsOldStyle)
-                                        if (paf->duration > 0)
+                                        if (paf->duration >= 0)
                                             obj->affected.push_back(paf);
                                 }
                             }
