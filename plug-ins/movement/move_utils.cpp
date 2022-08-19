@@ -135,9 +135,8 @@ bool can_fly( Character *ch )
         if (!obj->affected.findAllWithBits(TO_AFFECTS, AFF_FLYING ).empty())
             return true;
         
-        if (!obj->enchanted)
-            if (!obj->pIndexData->affected.findAllWithBits(TO_AFFECTS, AFF_FLYING ).empty())
-                return true;
+        if (!obj->pIndexData->affected.findAllWithBits(TO_AFFECTS, AFF_FLYING ).empty())
+            return true;
     }
     
     return false;

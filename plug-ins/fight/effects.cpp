@@ -201,7 +201,6 @@ void acid_effect(void *vo, Character *source, short level, int dam, int target, 
             af.type     = gsn_corrosion;
             af.sources.add(source);
 
-            affect_enchant( obj );
             affect_enhance( obj, &af );
 
             return;
@@ -869,7 +868,6 @@ void sand_effect(void *vo, Character *source, short level, int dam, int target, 
             af.type     = -1;
             af.sources.add(source);
 
-            affect_enchant( obj );
             affect_enhance( obj, &af );
 
             return;

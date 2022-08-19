@@ -70,9 +70,6 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
         return false;
     }
     
-
-    affect_enchant( obj );
-
     af.type      = gsn_enchant_weapon;
     af.level     = ch->getModifyLevel( );
     af.duration  = number_range( af.level, 200 );

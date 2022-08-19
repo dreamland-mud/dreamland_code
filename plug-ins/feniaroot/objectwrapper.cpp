@@ -155,13 +155,13 @@ NMI_SET( ObjectWrapper, gender , "грамматический род и чис�
     target->updateCachedNoun();
 }
 
-NMI_GET( ObjectWrapper, enchanted, "висят ли на предмете аффекты, меняющие его свойства")
+NMI_GET( ObjectWrapper, enchanted, "висят ли на предмете аффекты, меняющие его свойства (DEPRECATED)")
 {
     checkTarget( );
     return Register( target->enchanted );
 }
 
-NMI_SET( ObjectWrapper, enchanted , "висят ли на предмете аффекты, меняющие его свойства")
+NMI_SET( ObjectWrapper, enchanted , "висят ли на предмете аффекты, меняющие его свойства (DEPRECATED)")
 {
     checkTarget( );
     target->enchanted = arg.toNumber( );
@@ -691,14 +691,13 @@ NMI_INVOKE( ObjectWrapper, isAffected, "(skill): находится ли пре�
         return false;
 }
 
-NMI_GET( ObjectWrapper, affected, "список (List) всех аффектов на предмете (структура .Affect)" )
+NMI_GET( ObjectWrapper, affected, "список (List) всех аффектов на предмете и прототипе (структура .Affect)" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
 
-    if (!target->enchanted)
-        for (auto &paf: target->pIndexData->affected) 
-            rc->push_back( AffectWrapper::wrap( *paf ) );
+    for (auto &paf: target->pIndexData->affected) 
+        rc->push_back( AffectWrapper::wrap( *paf ) );
     
     for (auto &paf: target->affected) 
         rc->push_back( AffectWrapper::wrap( *paf ) );
