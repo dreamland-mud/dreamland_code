@@ -1178,9 +1178,8 @@ static void format_affect(Affect *paf, ostringstream &buf)
     for (auto &paf: obj->affected)
         format_affect(paf, ostr);
 
-    if (!obj->enchanted)
-        for (auto &paf: obj->pIndexData->affected)
-            format_affect(paf, ostr);
+    for (auto &paf: obj->pIndexData->affected)
+        format_affect(paf, ostr);
 
     ch->send_to(ostr);
 

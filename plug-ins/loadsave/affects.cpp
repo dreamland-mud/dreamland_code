@@ -144,29 +144,6 @@ void affect_enhance( Object *obj, const Affect *newAff )
     affect_to_obj( obj, newAff );
 }
 
-/** Copy affects from prototype to the object and mark it as enchanted. Soon to be obsolete. */
-void affect_enchant( Object *obj )
-{
-    if (!obj->enchanted) {
-        Affect af;
-
-        obj->enchanted = true;
-
-        // Avoid any side-affects on the carrier done from affect_to_obj. 
-        Character *carrier = obj->carried_by;
-        obj->carried_by = 0;
-
-        for (auto &paf: obj->pIndexData->affected) {
-            af = *paf;
-            
-            af.type = paf->type;
-            affect_to_obj( obj, &af );
-        }
-
-        obj->carried_by = carrier;
-    }
-}
-
 static Flags zeroFlags;
 
 static Flags & char_flag_by_table(Character *ch, const FlagTable *table)
@@ -327,9 +304,6 @@ void affect_check(Character *ch, Affect *affect)
             continue;
 
         affectlist_reapply(obj->affected, ch, affect);
-
-        if (obj->enchanted)
-            continue;
 
         affectlist_reapply(obj->pIndexData->affected, ch, affect);
     }
