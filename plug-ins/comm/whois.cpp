@@ -39,7 +39,7 @@ COMMAND(Whois, "whois")
         return;
 
     if (args.empty( )) {
-        ch->pecho("Имя, сестра, имя!");
+        ch->pecho("Чей профиль ты хочешь посмотреть? Укажи имя персонажа.");
         return;
     }
         
