@@ -216,8 +216,8 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
         return true;
 
     msgSelfParty( wch,
-                    "Тут закрыто, попробуй {y{hcоткрыть %4$N4{x.",
-                    "Тут закрыто, попробуй {y{hcоткрыть %4$N4{x." );
+                    "Тут закрыто, попробуй написать {y{hcоткрыть %4$N1{x.",
+                    "Тут закрыто, попробуй написать {y{hcоткрыть %4$N1{x." );
     return false;
 }
 
