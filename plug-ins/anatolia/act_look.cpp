@@ -515,7 +515,7 @@ void show_char_blindness( Character *ch, Character *victim, ostringstream &buf )
 	else if (victim->fighting == ch)
 		buf << "...вслепую размахивая во все стороны.{x" << endl;
 	else	    
-        	buf << fmt( ch, "...%1$P1 выглядит слеп%1$Gым|ым|ой и дезориентированн%1$Gым|ым|ой.{x", victim ) << endl;
+        	buf << fmt( ch, "...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x", victim ) << endl;
     }
 }
 
@@ -873,19 +873,19 @@ void show_char_wounds( Character *ch, Character *victim, ostringstream &buf )
     if (percent >= 100)
         buf << "{C в прекрасном состоянии";
     else if (percent >= 90)
-        buf << "{B имеет несколько царапин";
+        buf << "{B име%1$nет|ют несколько царапин";
     else if (percent >= 75)
-        buf << "{B имеет несколько маленьких ран и синяков";
+        buf << "{B име%1$nет|ют несколько маленьких ран и синяков";
     else if (percent >= 50)
-        buf << "{G имеет довольно много ран";
+        buf << "{G име%1$nет|ют довольно много ран";
     else if (percent >=  30)
-        buf << "{Y имеет несколько больших, опасных ран и царапин";
+        buf << "{Y име%1$nет|ют несколько больших, опасных ран и царапин";
     else if (percent >= 15)
-        buf << fmt(ch, "{M выглядит сильно поврежденн%1$Gым|ым|ой", victim);
+        buf << fmt(ch, "{M выгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми", victim);
     else if (percent >= 0 )
         buf << "{R в ужасном состоянии";
     else
-        buf << "{R истекает кровью";
+        buf << "{R истека%1$nет|ют кровью";
 
     buf << ".{x" << endl;
 }
