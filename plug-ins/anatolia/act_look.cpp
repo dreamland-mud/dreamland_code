@@ -828,29 +828,29 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
         return;
 
     if (IS_AFFECTED( victim, AFF_BLIND ))
-        str << "Похоже, ничего не видит." << endl;
+        str << "Похоже, ничего не вид%1$nит|ят." << endl;
     if (IS_AFFECTED( victim, AFF_SCREAM ))
-        str << "В ужасе зажимает уши." << endl;	
+        str << "В ужасе зажима1$nет|ют уши." << endl;	
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
-        str << "Покрыт%1$Gо||а чумными язвочками." << endl;
+        str << "Покрыт%1$Gо||а|ы чумными язвочками." << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
-        str << "Отравлен%1$Gо||а." << endl;
+        str << "Отравлен%1$Gо||а|ы." << endl;
     if (IS_AFFECTED( victim, AFF_SLOW ))
         str << "Под воздействием З А М Е Д  Л  Е  Н   И    Я." << endl;
     if (IS_AFFECTED( victim, AFF_HASTE ))
         str << "Под воздействием ускорения, уииии!" << endl;
     if (IS_AFFECTED( victim, AFF_WEAKEN ))
-        str << "Выглядит беспомощно и слабо." << endl;
+        str << "Выгляд%1$nит|ят беспомощно и слабо." << endl;
     if (IS_AFFECTED( victim, AFF_CORRUPTION ))
-        str << "Гниет заживо." << endl;
+        str << "Гни%1$nет|ют заживо." << endl;
     if (CAN_DETECT( victim, ADET_FEAR ))
-        str << "Дрожит от страха." << endl;
+        str << "Дрож%1$nит|ат от страха." << endl;
     if (IS_AFFECTED( victim, AFF_CURSE ))
-        str << "Проклят%1$Gо||а." << endl;
+        str << "Проклят%1$Gо||а|ы." << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_EVIL ))
-        str << "Защищен%1$Gо||а от зла" << endl;
+        str << "Защищен%1$Gо||а|ы от зла" << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_GOOD ))
-        str << "Защищен%1$Gо||а от добра." << endl;
+        str << "Защищен%1$Gо||а|ы от добра." << endl;
 
     DLString details = str.str();
     if (!details.empty()) 
@@ -873,19 +873,19 @@ void show_char_wounds( Character *ch, Character *victim, ostringstream &buf )
     if (percent >= 100)
         buf << "{C в прекрасном состоянии";
     else if (percent >= 90)
-        buf << "{B име%1$nет|ют несколько царапин";
+        buf << fmt(ch, "{B име%1$nет|ют несколько царапин", victim);
     else if (percent >= 75)
-        buf << "{B име%1$nет|ют несколько маленьких ран и синяков";
+        buf << fmt(ch, "{B име%1$nет|ют несколько маленьких ран и синяков", victim);
     else if (percent >= 50)
-        buf << "{G име%1$nет|ют довольно много ран";
+        buf << fmt(ch, "{G име%1$nет|ют довольно много ран", victim);
     else if (percent >=  30)
-        buf << "{Y име%1$nет|ют несколько больших, опасных ран и царапин";
+        buf << fmt(ch, "{Y име%1$nет|ют несколько больших, опасных ран и царапин", victim);
     else if (percent >= 15)
         buf << fmt(ch, "{M выгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми", victim);
     else if (percent >= 0 )
         buf << "{R в ужасном состоянии";
     else
-        buf << "{R истека%1$nет|ют кровью";
+        buf << fmt(ch, "{R истека%1$nет|ют кровью", victim);
 
     buf << ".{x" << endl;
 }
