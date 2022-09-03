@@ -247,47 +247,6 @@ bool ManaHealService::available( Character *client, NPCharacter *healer ) const
     return true;
 }
 
-/*------------------------------------------------------------------------
- * 'heal' command 
- *-----------------------------------------------------------------------*/
-static void mprog_heal( Character *mob, Character *client, const DLString &args )
-{
-    FENIA_VOID_CALL(mob, "Heal", "Cs", client, args.c_str());
-    FENIA_NDX_VOID_CALL(mob->getNPC(), "Heal", "CCs", mob, client, args.c_str());
-}
-
-/*
-CMDRUN( heal )
-{
-    DLString argument = constArguments;
-    Healer::Pointer healer;
-    
-    healer = find_attracted_mob_behavior<Healer>( ch, OCC_HEALER );
-
-    if (!healer) {
-        ch->pecho("Здесь некому тебя вылечить за деньги.");
-        if (ch->getModifyLevel() < 20) {
-            if (!ch->is_npc( ) && ch->getPC( )->getHometown( ) == home_frigate)
-                ch->pecho("Доктор в лазарете вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
-            else
-                ch->pecho("Лекарь в любом храме вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
-        }
-        return;
-    }
-
-    if (ch->is_npc( ) && !ch->master) {
-        ch->pecho("Извини, тебя никто обслуживать не будет.");
-        return;
-    }
-
-    if (argument.empty( )) 
-        healer->doList( ch );
-    else
-        healer->doBuy( ch, argument );
-
-    mprog_heal(healer->getChar(), ch, argument);
-}
-*/
 
 /*------------------------------------------------------------------------
  * CustomHealPrice 

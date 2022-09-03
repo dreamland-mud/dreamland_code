@@ -44,7 +44,29 @@ static int occ_name2type( const char *name )
     return -1;
 }
 
+static const char * occ_type2name(int occType)
+{
+    if (occType < 0 || occType >= OCC_MAX)
+        return 0;
 
+    return occ_names[occType];
+}
+
+static bool check_occupation_via_property(NPCharacter *mob, int occType)
+{
+    const char *occName = occ_type2name(occType);
+
+    if (!occName)
+        return false;
+
+    return mob->pIndexData->properties.count(occName) > 0;
+}
+
+/**
+  This method checks if mob behavior class supports specified occupation.
+  Alternatively, it checks for a corresponding property on mob's prototype to exist.
+  This alternative check would allow to eventually move from C++ behaviors to Fenia-defined triggers.
+*/ 
 bool mob_has_occupation( NPCharacter *mob, const char *occName )
 {
     int occType = occ_name2type( occName );
@@ -57,6 +79,9 @@ bool mob_has_occupation( NPCharacter *mob, const char *occName )
 
 bool mob_has_occupation( NPCharacter *mob, int occType )
 {
+    if (check_occupation_via_property(mob, occType))
+        return true;
+
     return mob->behavior 
            && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
 }
