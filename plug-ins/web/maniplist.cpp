@@ -1,18 +1,23 @@
 #include <sstream>
+#include "logstream.h"
 #include "maniplist.h"
 #include "commandmanager.h"
+
 
 Manip::Manip( const DLString &cmdName, const DLString &args ) 
 {
     this->cmdName = cmdName;
     cmd = commandManager->findExact( cmdName );
-    if (cmd.isEmpty( ))
-        throw Exception( cmdName + ": manip command not found" );
     this->args = args;
 }
 
 DLString Manip::toString( ) const 
 {
+    if (cmd.isEmpty()) {
+        LogStream::sendError() << "WEB: menu item has invalid command " << cmdName << endl;
+        return DLString::emptyString;
+    }
+
     const DLString &rname = cmd->getRussianName().empty() ? cmd->getName() : cmd->getRussianName();
     return rname + " " + args;
 }
