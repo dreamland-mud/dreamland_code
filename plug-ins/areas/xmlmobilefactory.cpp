@@ -97,7 +97,9 @@ XMLMobileFactory::init(const mob_index_data *mob)
     
     if (mob->gram_number != Grammar::Number::SINGULAR)
         gram_number.setValue(mob->gram_number.toString());
-        
+
+    clan.assign(mob->clan);
+
     smell.setValue(mob->smell);
 
     if(!mob->behavior.isEmpty( ))
@@ -191,6 +193,8 @@ XMLMobileFactory::compat(mob_index_data *mob)
     if(!smell.getValue( ).empty( ))
         mob->smell = smell.getValue( );
 
+    mob->clan = clan;
+    
     if(behavior.getNode( )) {
         mob->behavior.construct( );
         XMLNode::Pointer p = behavior.getNode( );

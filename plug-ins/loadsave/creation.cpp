@@ -198,7 +198,8 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 
     mob->setReligion(god_chronos);
     mob->setProfession(prof_mobile);
-
+    mob->setClan(pMobIndex->clan);
+    
     /* link the mob to the world list */
     char_to_list(mob, &char_list);
 
@@ -324,6 +325,7 @@ void clone_mobile(NPCharacter *parent, NPCharacter *clone)
     clone->setSex(parent->getSex());
     clone->setRace(parent->getRace()->getName());
     clone->setLevel(parent->getRealLevel());
+    clone->setClan(parent->getClan());
     clone->timer = parent->timer;
     clone->wait = parent->wait;
     clone->hit = parent->hit;

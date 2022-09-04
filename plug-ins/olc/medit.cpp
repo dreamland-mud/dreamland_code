@@ -62,7 +62,7 @@ GSN(plague);
 GSN(weaken);
 GSN(berserk);
 
-
+CLAN(none);
 
 OLCStateMobile::OLCStateMobile( )
 {
@@ -143,6 +143,7 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.religion.set(original->religion);
     mob.affects.clear();
     mob.affects.set(original->affects);
+    mob.clan = original->clan;
 }
 
 OLCStateMobile::OLCStateMobile( int vnum )
@@ -322,6 +323,7 @@ void OLCStateMobile::commit()
     original->religion.set(mob.religion);
     original->affects.clear();
     original->affects.set(mob.affects);
+    original->clan = mob.clan;
 
     for(wch = char_list; wch; wch = wch->next) {
         NPCharacter *victim = wch->getNPC();
@@ -417,6 +419,8 @@ MEDIT(show)
     ptc(ch, "Group:    [%d]\n\r", mob.group);
     ptc(ch, "Practicer:[{G%s{x] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
     ptc(ch, "Religion: [{G%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
+    if (mob.clan != clan_none)
+        ptc(ch, "Clan: [{G%s{x] {D(? clan){x\n\r", mob.clan->getName().c_str());
     ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
 
     if (!mob.properties.empty( )) {
@@ -743,6 +747,11 @@ MEDIT(behavior)
 
     ptc(ch, "Поведение {G%s{x установлено.\r\n", type.c_str( ));
     return true;
+}
+
+MEDIT(clan)
+{  
+    return globalReferenceEdit<ClanManager, Clan>(mob.clan);
 }
 
 MEDIT(long)

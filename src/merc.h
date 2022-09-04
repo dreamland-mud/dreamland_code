@@ -80,6 +80,7 @@
 #include "helpmanager.h"
 #include "autoflags.h"
 #include "affectlist.h"
+#include "clanreference.h"
 
 class NPCharacter;
 class Character;
@@ -357,6 +358,7 @@ struct        mob_index_data
     AreaIndexData *                area;
     DLString smell;
     Properties properties;
+    ClanReference clan;
 
     int getSize() const;
 };

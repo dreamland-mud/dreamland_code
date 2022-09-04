@@ -131,6 +131,7 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     vnum             = mob.vnum;
     vuln_flags       = mob.vuln_flags;
     wealth           = mob.wealth;
+    clan             = mob.clan;
     
     memcpy(hit, mob.hit, sizeof(mob.hit));
     memcpy(mana, mob.mana, sizeof(mob.mana));

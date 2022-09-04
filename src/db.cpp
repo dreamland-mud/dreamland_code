@@ -113,6 +113,7 @@ AreaIndexVector areaIndexes;
 /*
  * Locals.
  */
+CLAN(none);
 MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
 RoomIndexMap roomIndexMap;
@@ -213,7 +214,9 @@ mob_index_data::mob_index_data( )
                      : practicer( skillGroupManager ), 
                        religion( religionManager ),
                        affects(skillManager),
-                       wrapper ( 0 )
+                       wrapper ( 0 ),
+                       clan(clan_none)
+
 {
 }
 
