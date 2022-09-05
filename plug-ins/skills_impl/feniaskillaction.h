@@ -78,6 +78,8 @@ public:
     XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLInteger dam;    
     XML_VARIABLE XMLString argAll, argOne, argTwo;
+    XML_VARIABLE XMLInteger door;
+    XML_VARIABLE XMLString extraExit;
 };                       
 
 class FeniaSkillActionHelper {

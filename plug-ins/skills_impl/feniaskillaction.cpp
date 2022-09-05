@@ -257,6 +257,8 @@ Scripting::Register FeniaSkillActionHelper::createContext(DefaultSkillCommand *c
     ctx->argOne = target.argOne;
     ctx->argTwo = target.argTwo;
     ctx->dam = 0;
+    ctx->door = target.door;
+    ctx->extraExit = target.extraExit;
 
     if (target.obj)
         ctx->obj = FeniaManager::wrapperManager->getWrapper(target.obj);
@@ -507,3 +509,12 @@ NMI_SET(FeniaCommandContext, dam, "расчетные повреждения")
     dam = arg.toNumber();
 }
 
+NMI_GET(FeniaCommandContext, door, "номер выхода в аргументах")
+{
+    return Register(door);
+}
+
+NMI_GET(FeniaCommandContext, extraExit, "ключевые слова экстра-выхода в аргументах")
+{
+    return Register(extraExit);
+}
