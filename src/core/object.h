@@ -49,7 +49,7 @@ public:
 protected:
     long long ID;
     char              *  name;
-    char              *  owner;
+    DLString owner;
     char              *  short_descr;
     char              *  description;
     char              *  material;
@@ -138,7 +138,7 @@ public:
     inline const char * getRealShortDescr( ) const;
     inline const char * getRealDescription( ) const;
     inline const char * getRealMaterial( ) const;
-    inline const char * getOwner( ) const;
+    inline const DLString & getOwner( ) const;
 
     inline const char * getName( ) const;
     inline const char * getShortDescr( ) const;
@@ -147,7 +147,7 @@ public:
 
     void updateCachedNoun( );
 
-    void setOwner( const char * );
+    void setOwner( const DLString & );
     void setName( const char * );
     void setShortDescr( const char * );
     void setShortDescr( const DLString & );
@@ -231,7 +231,7 @@ inline const char * Object::getRealMaterial( ) const
 {
     return material;
 }
-inline const char * Object::getOwner( ) const
+inline const DLString & Object::getOwner( ) const
 {
     return owner;
 }

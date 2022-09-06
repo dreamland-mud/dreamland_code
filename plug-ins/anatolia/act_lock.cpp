@@ -1160,7 +1160,7 @@ void Keyhole::record( Object *obj )
     char *ed_text;
     DLString edText, edEntry;
     
-    if (!obj->getOwner( ) || ch->getName( ) != obj->getOwner( ))
+    if (obj->getOwner().empty() || ch->getName( ) != obj->getOwner( ))
         return;
 
     if (!( ed_text = get_extra_descr( obj->getName( ), obj->extra_descr ) ))

@@ -314,10 +314,12 @@ static bool can_take_obj( Character *ch, Object *obj )
 {
     if (!obj->can_wear( ITEM_TAKE )) 
         return false;
+        
     // replacing NOSAC with NOPURGE restriction here	
     if (IS_OBJ_STAT(obj,ITEM_NOPURGE))
-	return false;
-    if (obj->getOwner( ))
+	    return false;
+
+    if (!obj->getOwner().empty())
         return false;
     if (obj->behavior)
         return false;

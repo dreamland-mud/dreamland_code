@@ -1159,7 +1159,7 @@ void oset( Character* ch, char* argument )
                     return;
                 }
 
-                obj->setOwner(owner->getName().c_str());
+                obj->setOwner(owner->getName());
                 SET_BIT(obj->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
                 obj->setMaterial( "platinum" );
             }

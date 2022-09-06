@@ -40,14 +40,14 @@ bool PersonalQuestReward::hourly()
     if (!obj->getProperty("keepHere").empty())
         return false;
 
-    if (!obj->getOwner())
+    if (obj->getOwner().empty())
         return false;
 
     if (!obj->can_wear(ITEM_TAKE))
         return false;
 
     notice("[cleanup] Item %d %lld of %s transferred from room [%d] [%s] to lost&found.",
-            obj->pIndexData->vnum, obj->getID(), obj->getOwner(),
+            obj->pIndexData->vnum, obj->getID(), obj->getOwner().c_str(),
             obj->in_room->vnum, obj->in_room->getName());
     obj_from_room(obj);
     obj_to_room(obj, get_room_instance(ROOM_VNUM_BUREAU_2));

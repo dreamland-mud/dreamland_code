@@ -553,7 +553,7 @@ bool spec_janitor( NPCharacter *ch )
     {
         trash_next = trash->next_content;
 
-        if (!IS_SET( trash->wear_flags, ITEM_TAKE ) || trash->getOwner( ))
+        if (!IS_SET( trash->wear_flags, ITEM_TAKE ) || !trash->getOwner().empty())
             continue;
 
         if (count_obj_list( trash->pIndexData, ch->carrying ) >= 10)

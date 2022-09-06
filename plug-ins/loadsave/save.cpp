@@ -627,8 +627,8 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                     fprintf( fp, "ShD  %s~\n",        obj->getShortDescr( ) );
                 if (obj->getRealDescription( ))
                     fprintf( fp, "Desc %s~\n",        obj->getDescription( )  );
-                if (obj->getOwner( ))
-                    fprintf( fp, "Ownr %s~\n",        obj->getOwner( ));
+                if (!obj->getOwner().empty())
+                    fprintf( fp, "Ownr %s~\n",        obj->getOwner().c_str());
 
                 if ( obj->extra_flags != obj->pIndexData->extra_flags)
                         fprintf( fp, "ExtF %d\n",        obj->extra_flags             );

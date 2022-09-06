@@ -506,8 +506,7 @@ void clone_object(Object *parent, Object *clone)
         clone->setDescription(parent->getDescription());
     if (parent->getRealMaterial())
         clone->setMaterial(parent->getMaterial());
-    if (parent->getOwner())
-        clone->setOwner(parent->getOwner());
+    clone->setOwner(parent->getOwner());
 
     clone->item_type = parent->item_type;
     clone->extra_flags = parent->extra_flags;

@@ -2078,7 +2078,7 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднят�
 
     if (!obj->can_wear( ITEM_TAKE )) 
         return false;
-    if (obj->getOwner( ))
+    if (!obj->getOwner().empty())
         return false;
     if (obj->behavior)
         return false;
