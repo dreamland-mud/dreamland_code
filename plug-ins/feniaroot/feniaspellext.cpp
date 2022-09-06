@@ -61,6 +61,17 @@ static RegisterList message_args(FeniaSpellContext *thiz, const RegisterList &ar
     return myArgs;
 }
 
+static RegisterList message_args(FeniaCommandContext *thiz, const RegisterList &args)
+{
+    RegisterList myArgs(args); 
+    Register fmt = myArgs.front();
+    myArgs.pop_front();
+
+    myArgs.push_front(thiz->ch);
+    myArgs.push_front(fmt);
+    return myArgs;
+}
+
 NMI_INVOKE(FeniaSpellContext, msgChar, "(fmt[,args]): выдать сообщение кастеру; кастер 1й аргумент, цель 2й аргумент")
 {
     Character *caster = arg2character(ch);
@@ -123,7 +134,7 @@ NMI_INVOKE(FeniaSpellContext, msgAll, "(fmt[,args]): выдать сообщен
     return Register();
 }
 
-NMI_INVOKE(FeniaSpellContext, msgArea, "(fmt[,args]): выдать сообщение всем в той же зоне, кроме кастера")
+NMI_INVOKE(FeniaSpellContext, msgArea, "(fmt[,args]): выдать сообщение всем в той же зоне, кроме комнаты кастера")
 {
     Character *caster = arg2character(ch);
     RegisterList myArgs = message_args(this, args); 
@@ -622,5 +633,14 @@ NMI_INVOKE(FeniaCommandContext, damApplyClass, "(): наложить бонус�
 
     Character *myCh = arg2character(ch);
     damapply_class(myCh, dam);
+    return Register();
+}
+
+NMI_INVOKE(FeniaCommandContext, msgArea, "(fmt[,args]): выдать сообщение всем в той же зоне, кроме комнаты ch")
+{
+    Character *caster = arg2character(ch);
+    RegisterList myArgs = message_args(this, args); 
+    DLString message = regfmt(NULL, myArgs);
+    area_message(caster, message, true);
     return Register();
 }
