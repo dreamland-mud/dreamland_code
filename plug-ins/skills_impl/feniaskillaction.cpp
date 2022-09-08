@@ -259,6 +259,7 @@ Scripting::Register FeniaSkillActionHelper::createContext(DefaultSkillCommand *c
     ctx->dam = 0;
     ctx->door = target.door;
     ctx->extraExit = target.extraExit;
+    ctx->doorOrExtraExit = target.doorOrExtraExit;
 
     if (target.obj)
         ctx->obj = FeniaManager::wrapperManager->getWrapper(target.obj);
@@ -517,4 +518,9 @@ NMI_GET(FeniaCommandContext, door, "номер выхода в аргумент�
 NMI_GET(FeniaCommandContext, extraExit, "ключевые слова экстра-выхода в аргументах")
 {
     return Register(extraExit);
+}
+
+NMI_GET(FeniaCommandContext, doorOrExtraExit, "название направления или ключевые слова экстра-выхода в аргументах")
+{
+    return Register(doorOrExtraExit);
 }

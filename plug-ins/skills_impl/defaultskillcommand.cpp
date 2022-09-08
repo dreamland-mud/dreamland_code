@@ -149,6 +149,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
 
                 if (peexit && actor->can_see(peexit)) {
                     target.extraExit = peexit->keyword;
+                    target.doorOrExtraExit = target.extraExit;
                     return true;
                 }
 
@@ -158,6 +159,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
                     return false;
                 }
 
+                target.doorOrExtraExit = dirs[target.door].name;
                 return true;
             }
      

@@ -18,6 +18,7 @@ struct CommandTarget {
     DLString argOne, argTwo;
     int door;
     DLString extraExit;
+    DLString doorOrExtraExit;
 };
 
 class DefaultSkillCommand : public DefaultCommand, public SkillCommand {
