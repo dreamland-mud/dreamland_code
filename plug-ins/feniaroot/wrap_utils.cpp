@@ -31,6 +31,7 @@
 #include "affecthandlerwrapper.h"
 #include "xmleditorinputhandler.h"
 
+#include "directions.h"
 #include "subr.h"
 #include "def.h"
 
@@ -370,4 +371,27 @@ const FlagTable * arg2table(const Register &r)
 const FlagTable * argnum2table(const RegisterList &args, int num)
 {
     return arg2table(argnum(args, num));
+}
+
+/** Resolve door argument that can be either door number or direction name, return -1 for invalid doors. */
+int args2door(const RegisterList &args)
+{
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+
+    return arg2door(args.front());
+}
+
+int arg2door(const Register &arg)
+{
+    int door;
+
+    if (arg.type == Register::STRING)
+        door = direction_lookup(arg.toString().c_str());
+    else if (arg.type == Register::NUMBER)
+        door = arg.toNumber();
+    else 
+        throw Scripting::IllegalArgumentException();
+    
+    return door;
 }
