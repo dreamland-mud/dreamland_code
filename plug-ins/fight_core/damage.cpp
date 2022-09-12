@@ -305,7 +305,7 @@ bool Damage::adjustMasterAttack( )
     if (victim == ch)
         return false;
 
-    if (victim->position <= POS_STUNNED)
+    if (!IS_AWAKE(victim))
         return false;
 
     if (ch->is_npc( )
