@@ -32,6 +32,8 @@
 #include "merc.h"
 #include "def.h"
 
+#include "messengers.h"
+
 PROF(vampire);
 BONUS(experience);
 BONUS(mana);
@@ -52,9 +54,9 @@ const char * sunlight_en [4] = {
 
 const struct season_info season_table [4] = {
     { SEASON_WINTER, "winter", "зима",  "зим|а|ы|е|у|ой|е",  "зимнего",   'C' },
-    { SEASON_SPRING, "spring", "весна", "весн|а|ы|е|у|ой|е", "весеннего", 'g' },
-    { SEASON_SUMMER, "summer", "лето",  "лет|о|а|у|о|ом|е",  "летнего",   'Y' },
-    { SEASON_AUTUMN, "autumn", "осень", "осен|ь|и|и|ь|ью|и", "осеннего",  'y' },
+    { SEASON_SPRING, "spring", "весна", "весн|а|ы|е|у|ой|е", "весеннего", 'G' },
+    { SEASON_SUMMER, "summer", "лето",  "лет|о|а|у|о|ом|е",  "летнего",   'R' },
+    { SEASON_AUTUMN, "autumn", "осень", "осен|ь|и|и|ь|ью|и", "осеннего",  'Y' },
 };
 
 struct month_info {
@@ -310,7 +312,7 @@ void weather_update( )
         if ( weather_info.mmhg > 1010
                 || ( weather_info.mmhg >  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Гроза понемного утихает, молний больше нет." << endl;
+            buf << "Гроза понемногу утихает, молний больше нет." << endl;
             weather_info.sky = SKY_RAINING;
             break;
         }
@@ -520,6 +522,13 @@ void weather_init( )
     else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
     else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
     else                                  weather_info.sky = SKY_CLOUDLESS;
+	
+	// Since this is happening on the world startup, let's notify users
+	// the world is up!
+	DLString msg;
+    msg = "Мир Мечты перезапустился и готов к игре, уииииии!";
+    send_to_discord_stream(":green_circle: " + msg);
+    send_telegram(msg);	
 }
 
 /*--------------------------------------------------------------------------

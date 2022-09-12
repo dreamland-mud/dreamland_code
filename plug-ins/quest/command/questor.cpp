@@ -74,7 +74,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         if (client->getAttributes( ).isAvailable( "quest" )) 
             tell_raw( client, ch, "Твое задание невозможно выполнить." );
         else
-            tell_fmt( "Тебе нужно сначала {yпопросить{x{le (quest request){x задание, %1$C1.", client, ch );
+            tell_fmt( "{1Тебе нужно сначала {yпопросить{le (quest request){x{2 задание, %1$C1.", client, ch );
             
         return;
     }
@@ -552,8 +552,8 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             tell_raw( client, ch, "Знаешь, что-то душа не лежит давать тебе задание." );
             delay_noquest(attr, client);        
             tell_fmt( "Приходи через {Y%3$d{G мину%3$Iту|ты|т.", client, ch, attr->getTime() );
-            hint_fmt(client, "Квестор может отказаться выдавать тебе задание, если у тебя слишком низкая {hhхаризма{x.");
-            hint_fmt(client, "Харизму, как и другие параметры, можно поднять вещами или {hh1353тренировками{x.");
+            hint_fmt(client, "Квестор может отказаться выдавать тебе задание, если у тебя слишком низкое {hhобаяние{x.");
+            hint_fmt(client, "Обаяние, как и другие параметры, можно поднять вещами или {hh1353тренировками{x.");
             return;
         }
     }
@@ -595,7 +595,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             PCharacterManager::save( client );
 
             if(!rated_as_guru(client)){
-               tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+               tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
             if(is_total_newbie(client)){
                tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка перерождение{lEhelp remort{x){G, это бесплатно!");
             }
@@ -629,7 +629,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             PCharacterManager::save(client);
 
             if (!rated_as_guru(client)) {
-                tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+                tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
                 if (is_total_newbie(client)) {
                     tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
                 }
@@ -698,10 +698,10 @@ void Questor::give( Character *victim, Object *obj )
     obj_to_char(obj, victim);
 
     if (!victim->is_npc() && obj->behavior && obj->behavior.getDynamicPointer<ObjQuestBehavior>()) {
-        tell_fmt("Нет нужды передавать %3$O4 мне в руки.", victim, ch, obj);
+        tell_fmt("Нет нужды передавать мне %3$O4.", victim, ch, obj);
         tell_fmt("Если ты закончил%1$Gо||а мое задание, просто набери {y{hc{lRзадание сдать{lEquest complete{x.", victim, ch);
     }
 
-    victim->pecho("%^C1 возвращает тебе %O4.", ch, obj);
-    victim->recho(ch, "%^C1 возвращает %O4 %C3.", ch, obj, victim);
+    victim->pecho("%1$^C1 возвраща%1$nет|ют тебе %2$O4.", ch, obj);
+    victim->recho(ch, "%1$^C1 возвраща%1$nет|ют %2$O4 %3$C3.", ch, obj, victim);
 }

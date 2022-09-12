@@ -534,7 +534,34 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    const int maxlines = 100;
+    if (arg == "healers") {
+        ostringstream buf;
+        Character *wch_next;
+
+        for (Character *wch = char_list; wch; wch = wch_next) {
+            wch_next = wch->next;
+
+            if (!wch->is_npc())
+                continue;
+
+            NPCharacter *mob = wch->getNPC();
+            if (!mob_has_occupation(mob, OCC_HEALER))
+                continue;
+
+            mob->pIndexData->properties["healer"] = "";
+            mob->pIndexData->area->changed = true;
+            mob->pIndexData->behavior.clear();
+
+            buf << fmt(0, "%^C1 [%d] from '%N1'", mob, mob->pIndexData->vnum, mob->pIndexData->area->name) << endl;
+
+            extract_char(mob, true);
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    const int maxlines = 40;
 
     // Show size info for the first 40 mobs that don't have "sizeConfirmed" attribute. 
     // [clear] button removes mob's size override, [keep] button confirms size override.
@@ -626,8 +653,9 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
-//            if (pMob->properties.count("hidden") > 0)
-//                continue;
+
+            if (pMob->properties.count("partConfirmed") > 0)
+                continue;
 
             bitstring_t raceParts = race->getParts();
             bitstring_t mobParts = pMob->parts;
@@ -662,6 +690,55 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
+    if (arg == "aff") {
+        ostringstream buf;
+        int cnt = 0;
+        buf << endl;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            Race *race = raceManager->find(pMob->race);
+            if (!race || !race->isValid()) {
+                buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
+                continue;
+            }
+
+            if (pMob->properties.count("affConfirmed") > 0)
+                continue;
+
+            bitstring_t raceAff = race->getAff();
+            bitstring_t mobAff = pMob->affected_by;
+
+            if (raceAff == mobAff)
+                continue;
+
+            DLString vnum = pMob->vnum;
+            bitstring_t adds = mobAff & ~raceAff;
+            bitstring_t dels = ~mobAff & raceAff;
+            DLString line = 
+                "[" + web_cmd(ch, "medit $1", "%5d") + "] "
+                + "%-18.18s {g" 
+                + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x "
+                + (adds ? "[{G%s{x " : "%s")
+                + (adds ? web_cmd(ch, "abc reset aff " + vnum + " add", "reset") + "]{x" : "")
+                + (dels ? "[{r%s{x " : "%s")
+                + (dels ? web_cmd(ch, "abc reset aff " + vnum + " del", "reset") + "]{x" : "")
+                + "   [" + web_cmd(ch, "abc hide aff " + vnum, "hide") + "]"
+                + "\n\r";
+
+            if (cnt <= maxlines)
+                buf << fmt(0, line.c_str(),
+                    pMob->vnum, russian_case(pMob->short_descr, '1').c_str(), pMob->race,
+                    affect_flags.names(adds).c_str(), affect_flags.names(dels).c_str());
+
+            cnt++;
+        }
+
+        buf << "Found " << cnt << " mobs." << endl;
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
     if (arg == "form") {
         ostringstream buf;
         int cnt = 0;
@@ -674,8 +751,9 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 buf << "[" << pMob->vnum << "] invalid race " << pMob->race << endl;
                 continue;
             }
-//            if (pMob->properties.count("hidden") > 0)
- //               continue;
+
+            if (pMob->properties.count("formConfirmed") > 0)
+               continue;
 
             bitstring_t raceForm = race->getForm();
             bitstring_t mobForm = pMob->form;
@@ -727,9 +805,10 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
 
     if (arg == "hide") {
-        pMob->properties["hidden"] = "true";
+        DLString propName = arg2 + "Confirmed";
+        pMob->properties[propName] = "true";
         pMob->area->changed = true;
-        ch->pecho("Mob %d is now hidden from output.", vnum.getValue());
+        ch->pecho("Mob %d is now hidden from 'abc %s' output.", vnum.getValue(), arg2.c_str());
         __do_abc(ch, const_cast<char *>(arg2.c_str()));
         return;
     }
@@ -764,6 +843,20 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
             ch->pecho("Mob %d has parts [%s].", vnum.getValue(), part_flags.names(pMob->parts).c_str());
         }
+        else if (arg2 == "aff") {
+            bitstring_t raceAff = race->getAff();
+            bitstring_t mobAff = pMob->affected_by;
+            bitstring_t dels = ~mobAff & raceAff;
+
+            if (args == "del")
+                pMob->affected_by = dels | pMob->affected_by;
+            else if (args == "add")
+                pMob->affected_by = raceAff & mobAff;
+            else
+                return;
+
+            ch->pecho("Mob %d has affect bits [%s].", vnum.getValue(), affect_flags.names(pMob->affected_by).c_str());
+        }
         else
             return;
 
@@ -771,5 +864,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         pMob->area->changed = true;
         return;
     }
+
 }
 

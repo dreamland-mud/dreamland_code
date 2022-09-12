@@ -52,6 +52,7 @@ public:
     virtual const GlobalBitvector & getWearloc( ) const;
     virtual const Enumeration & getSize( ) const;
     virtual Flags getAttitude( const Race & ) const;
+    virtual const GlobalBitvector &getAffects() const;
 
     virtual const DLString & getMaleName( ) const;
     virtual const DLString & getFemaleName( ) const;

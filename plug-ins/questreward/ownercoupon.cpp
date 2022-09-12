@@ -65,7 +65,7 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
     LogStream::sendNotice( ) 
         << ch->getName( ) << " personalizes " << item->getShortDescr( '1' ) 
         << " [vnum " << item->pIndexData->vnum << " ID " << item->getID( ) << "] "
-        << " using " << (obj->getOwner( ) ? obj->getOwner( ) : "nobody") 
+        << " using " << (obj->getOwner().empty() ? obj->getOwner().c_str() : "nobody") 
         << "'s coupon [ID " << obj->getID( ) << "]" << endl;
 
     ch->recho( POS_RESTING, "%^C1 проделывает манипуляции с %O5 и %O5.", ch, item, obj );

@@ -62,19 +62,15 @@ bool Movement::moveRecursive( )
     if (!moveAtomic( )) 
         return false;
 
-    try {
-        callProgs( ch );
-        if (ch->in_room != to_room)
-            return false;
-            
-        callProgs( ch->mount );
-        moveFollowers( ch );
-        moveFollowers( ch->mount );
-        callProgsFinish( ch );
-        callProgsFinish( ch->mount );
-    } 
-    catch (const VictimDeathException &) {
-    }
+    callProgs( ch );
+    if (ch->in_room != to_room)
+        return false;
+        
+    callProgs( ch->mount );
+    moveFollowers( ch );
+    moveFollowers( ch->mount );
+    callProgsFinish( ch );
+    callProgsFinish( ch->mount );
 
     return true;
 }
@@ -131,13 +127,15 @@ void Movement::place( Character *wch )
 static void rafprog_leave( Room *room, Character *ch )
 {
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect()->onLeave(SpellTarget::Pointer(NEW, room), paf, ch);
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onLeave(SpellTarget::Pointer(NEW, room), paf, ch);
 }
 
 static void rafprog_entry( Room *room, Character *ch )
 {
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, room), paf, ch);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, room), paf, ch);
 }
 
 static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const char *movetype)
@@ -183,13 +181,17 @@ void Movement::callProgs( Character *wch )
     for (fch = to_room->people; fch!=0; fch = fch_next) {
         fch_next = fch->next_in_room;
 
-        /* greet progs for items carried by people in room */
-        for ( obj = fch->carrying; obj != 0; obj = obj->next_content )
-                oprog_greet( obj, wch );
+        try {
+            /* greet progs for items carried by people in room */
+            for ( obj = fch->carrying; obj != 0; obj = obj->next_content )
+                    oprog_greet( obj, wch );
 
-        /* greet programs for people */
-        if (IS_AWAKE(fch))
-            mprog_greet( fch, wch );
+            /* greet programs for people */
+            if (IS_AWAKE(fch))
+                mprog_greet( fch, wch );
+        } catch (const VictimDeathException &) {
+            // ignored
+        }
     }
 
     /* entry programs for items */
@@ -213,7 +215,8 @@ static void mprog_leave( Character *ch, Room *from_room, Room *to_room, const ch
 static void afprog_entry( Character *ch )
 {
     for (auto &paf: ch->affected.findAllWithHandler())
-        paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, ch), paf);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, ch), paf);
 }
 
 static bool rprog_dive( Character *wch, int danger )

@@ -109,7 +109,7 @@ static bool afprog_smell_affected(const AffectList &affList, SpellTarget::Pointe
     bool rc = false;
     
     for (auto &paf: affList.findAllWithHandler()) 
-        if (paf->type->getAffect( )->onSmell(target, paf, sniffer))
+        if (paf->type->getAffect() && paf->type->getAffect( )->onSmell(target, paf, sniffer))
             rc = true;
 
     return rc;

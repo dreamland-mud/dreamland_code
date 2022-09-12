@@ -84,7 +84,7 @@ static bool afprog_updatehit(Character *ch)
     SpellTarget::Pointer spellTarget(NEW, ch);
 
     for (auto &paf: ch->affected.findAllWithHandler())
-        if (paf->type->getAffect( )->onUpdateHit(spellTarget, paf))
+        if (paf->type->getAffect() && paf->type->getAffect( )->onUpdateHit(spellTarget, paf))
             rc = true;
 
     return rc;

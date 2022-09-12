@@ -216,8 +216,8 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
         return true;
 
     msgSelfParty( wch,
-                    "Тут закрыто, попробуй {y{hcоткрыть %4$N4{x.",
-                    "Тут закрыто, попробуй {y{hcоткрыть %4$N4{x." );
+                    "Тут закрыто, попробуй написать {y{hcоткрыть %4$N1{x.",
+                    "Тут закрыто, попробуй написать {y{hcоткрыть %4$N1{x." );
     return false;
 }
 
@@ -348,7 +348,7 @@ int ExitsMovement::getPassDoorLevel( Character *wch )
             if (obj->affected.findAllWithBits(&affect_flags, AFF_PASS_DOOR).size() > 0)
                 eqLevel = max( eqLevel, obj->level );
 
-            if (!obj->enchanted && obj->pIndexData->affected.findAllWithBits(&affect_flags, AFF_PASS_DOOR).size() > 0)
+            if (obj->pIndexData->affected.findAllWithBits(&affect_flags, AFF_PASS_DOOR).size() > 0)
                 eqLevel = max( eqLevel, obj->level );
         }
 

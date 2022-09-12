@@ -57,13 +57,13 @@ public:
     virtual bool canRemove( Character *ch, Object *obj, int flags );
     virtual bool canRemove( Character *ch, int flags );
 
-protected:
     virtual void affectsOnEquip( Character *ch, Object *obj );
+    virtual void affectsOnUnequip( Character *ch, Object *obj );
+
+protected:
     bool canEquip( Character *ch, Object *obj );
     void triggersOnEquip( Character *ch, Object *obj );
     virtual void triggersOnWear( Character *ch, Object *obj );
-
-    virtual void affectsOnUnequip( Character *ch, Object *obj );
     void triggersOnUnequip( Character *ch, Object *obj );
     
     void saveDrops( Character *ch );

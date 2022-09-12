@@ -39,6 +39,7 @@ int args2number( const RegisterList& );
 DLString args2string( const RegisterList& );
 DLString args2word( const RegisterList &args );
 void args2buf(const RegisterList &args, char *buf, size_t bufsize);
+int args2door(const RegisterList &args);
 
 Wearlocation * arg2wearloc( const Register & );
 ::Object * arg2item( const Register & );
@@ -52,6 +53,7 @@ Skill * arg2skill( const Register & );
 Affect * args2affect(const RegisterList &);
 DefaultSpell * arg2spell( const Register &reg );
 DLString arg2string(const Register &reg);
+int arg2door(const Register &reg);
 
 const Register & argnum(const RegisterList &args, int num);
 const Register & argnum2function(const RegisterList &args, int num);

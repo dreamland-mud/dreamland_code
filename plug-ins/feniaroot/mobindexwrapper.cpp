@@ -148,6 +148,12 @@ NMI_GET( MobIndexWrapper, practicer, "какие группы умений мо�
     return target->practicer.toString( );
 }
 
+NMI_GET( MobIndexWrapper, affects, "какие аффекты вешаются при создании (olchelp spell)") 
+{
+    checkTarget( );
+    return target->affects.toString( );
+}
+
 NMI_GET( MobIndexWrapper, religion, "какие религии исповедует (reledit list)") 
 {
     checkTarget( );

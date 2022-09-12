@@ -84,6 +84,7 @@ L	    ([A-Za-z_]|{RL})
 "CHA"       return T_CHA;
 "SIZE"      return T_SIZE;
 "AFF"       return T_AFF;
+"AFFECTS"   return T_AFFECTS;
 "RES"       return T_RES;
 "IMM"       return T_IMM;
 "VULN"      return T_VULN;
@@ -174,6 +175,7 @@ void SearcherParam::init()
     spec = "";
     alignment = 0;
     race = sex = number = "";
+    affects = "";
     default_pos = start_pos = "";
 
     // Item fields.
@@ -369,6 +371,7 @@ bool searcher_parse(struct mob_index_data *pMob, const char *args)
     p.material = pMob->material;
     p.fenia = fenia_triggers(pMob->wrapper);
     p.damage = weapon_flags.name(pMob->dam_type);
+    p.affects = pMob->affects.toString();
     p.default_pos = position_table.name(pMob->default_pos);
     p.start_pos = position_table.name(pMob->start_pos);
 

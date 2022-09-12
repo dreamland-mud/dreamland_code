@@ -21,9 +21,6 @@ void transfer_char( Character *ch, Character *actor, Room *to_room,
                     const char *msgRoomEnter = NULL, const char *msgSelfEnter = NULL );
 
 
-void strip_camouflage( Character *ch );
-void check_camouflage( Character *ch, Room *to_room );
-
 Room * get_random_room( Character *ch );
 Room * get_random_room_vanish( Character *ch );
 

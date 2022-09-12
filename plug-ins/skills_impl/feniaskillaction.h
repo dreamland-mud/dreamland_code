@@ -50,6 +50,9 @@ public:
     XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLInteger dam;
     XML_VARIABLE XMLInteger tier;
+    XML_VARIABLE XMLInteger door;
+    XML_VARIABLE XMLString extraExit;
+    XML_VARIABLE XMLString doorOrExtraExit;
 };                       
 
 class FeniaCommandContext : public Scripting::NativeImpl<FeniaCommandContext>,
@@ -78,6 +81,9 @@ public:
     XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLInteger dam;    
     XML_VARIABLE XMLString argAll, argOne, argTwo;
+    XML_VARIABLE XMLInteger door;
+    XML_VARIABLE XMLString extraExit;
+    XML_VARIABLE XMLString doorOrExtraExit;
 };                       
 
 class FeniaSkillActionHelper {
@@ -96,11 +102,11 @@ public:
     static bool spellHasTrigger(Spell *spell, const DLString &trigName);
 
 private:
-    static FeniaSpellContext::Pointer createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
-    static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);    
-    static FeniaCommandContext::Pointer createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
+    static Scripting::Register createContext(DefaultSpell *spell, Character *ch, ::Pointer<SpellTarget> &spellTarget, int level);
+    static Scripting::Register createContext(DefaultSkillCommand *cmd, Character *ch, const CommandTarget &target);    
+    static Scripting::Register createContext(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level);
     static DLString getMethodSuffix(::Pointer<SpellTarget> &spellTarget);
-    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, const Scripting::Handler::Pointer &ctx, bool &rc);
+    static bool executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc);
 };
 
 

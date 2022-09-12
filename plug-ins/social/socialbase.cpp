@@ -296,18 +296,6 @@ bool SocialBase::checkPosition( Character *ch )
 
 void SocialBase::visualize( Character *ch )                                        
 {
-    if (IS_AFFECTED( ch, AFF_HIDE|AFF_FADE ))  {
-        REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
-        ch->pecho("Ты выходишь из тени.");
-        oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
-    }
-
-    if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
-        if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-            REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
-        }        
-    }
+    strip_hide_and_fade(ch);
+    strip_improved_invisibility(ch);
 }

@@ -364,13 +364,7 @@ int BasicSkill::getMana(Character *ch) const
 
 int BasicSkill::getMoves(Character *ch) const
 {
-    if (!ch)
-        return move;
-
-    if (ch->is_npc( ))
-        return 0;
-    
-    return min(max(ch->getModifyLevel() / 20, 1), (int)ch->move);
+    return move;
 }
 
 const RussianString &BasicSkill::getDammsg( ) const

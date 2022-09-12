@@ -46,6 +46,9 @@ public:
     bool onDescr(const SpellTarget::Pointer &target, Affect *paf, ostringstream &buf);
     bool onShow(const SpellTarget::Pointer &target, Affect *paf, Character *looker, ostringstream &buf);
     bool onUpdateHit(const SpellTarget::Pointer &target, Affect *paf);
+    /** Called when a character with this affect in the configuration is refreshed inside char update. */
+    bool onRefresh(const SpellTarget::Pointer &target, bool verbose);
+
 
     // Overrides for various types of triggers. Have smaller priority than Fenia overrides.
 

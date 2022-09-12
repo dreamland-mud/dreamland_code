@@ -708,6 +708,11 @@ NMI_GET( CharacterWrapper, alignName, "название натуры" )
     return align_name( target );
 }
 
+NMI_GET( CharacterWrapper, mod_beats, "на сколько процентов увеличены или уменьшены задержки от умений" )
+{
+    checkTarget( );
+    return target->mod_beats;
+}
 
 #define DEF_STAT(x, stat, help) \
 NMI_GET( CharacterWrapper, cur_##x, "текущий параметр: " help ) \
@@ -801,7 +806,6 @@ INT_FIELD(imm_flags, "флаги иммунитета (таблица .tables.im
 INT_FIELD(res_flags, "флаги сопротивляемости (таблица .tables.res_flags)")
 INT_FIELD(vuln_flags, "флаги уязвимости (таблица .tables.res_flags)")
 INT_FIELD(affected_by, "флаги аффектов (таблица .tables.affect_flags)")
-INT_FIELD(add_affected_by, "расширение флагов аффектов (таблица .tables.affect_flags)")
 INT_FIELD(detection, "флаги детектов (таблица .tables.detect_flags)")
 INT_FIELD(position, "позиция (таблица .tables.position_table)")
 INT_FIELD(carry_weight, "вес который несет чар")
@@ -2074,7 +2078,7 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднят�
 
     if (!obj->can_wear( ITEM_TAKE )) 
         return false;
-    if (obj->getOwner( ))
+    if (!obj->getOwner().empty())
         return false;
     if (obj->behavior)
         return false;

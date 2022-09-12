@@ -34,7 +34,7 @@ const DLString Object::TYPE = "Object";
 
 Object::Object( ) :
                 ID( 0 ),
-                name( 0 ), owner( 0 ), 
+                name( 0 ),
                 short_descr( 0 ), description( 0 ), material( 0 ), 
                 next( 0 ), prev( 0 ),
                 next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
@@ -71,7 +71,6 @@ void Object::extract( )
         free_string( name );
         free_string( description );
         free_string( short_descr );
-        free_string( owner );
         free_string( killer );
         free_string( from );
         
@@ -87,7 +86,7 @@ void Object::extract( )
         in_room = 0;
         enchanted = 0;
         pocket = "";
-        owner = 0;
+        owner = "";
         name = 0;
         short_descr = 0;
         description = 0;
@@ -138,7 +137,6 @@ Object::~Object( )
     free_string( description );
     free_string( short_descr );
 
-    free_string( owner );
     free_string( killer );
     free_string( from );
 }
@@ -285,12 +283,9 @@ void Object::setMaterial( const char *s )
 
     material = str_dup( s );
 }
-void Object::setOwner( const char *s )
+void Object::setOwner( const DLString &newOwner )
 {
-    if (owner)
-        free_string( owner );
-
-    owner = str_dup( s );
+    this->owner = newOwner;
 }
 
 void Object::fmtName( const char *fmt, ... )
@@ -425,13 +420,13 @@ bool Object::isAffected( int sn ) const
 
 bool Object::hasOwner( const Character *ch ) const
 {
-    if (!getOwner( ))
+    if (owner.empty())
         return false;
 
     if (ch->is_npc( ))
         return false;
 
-    return !str_cmp( getOwner( ), ch->getNameC() );
+    return ch->getNameC() == owner;
 }
 
 using namespace Grammar;

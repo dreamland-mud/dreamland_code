@@ -171,7 +171,7 @@ void ObjectBehaviorManager::save( const Object *obj, FILE *fp ) {
 /** Owned items can't be confiscated by Rulers */
 bool BasicObjectBehavior::canConfiscate() 
 {
-    if (obj->getOwner())
+    if (!obj->getOwner().empty())
         return false;
 
     return true;
@@ -180,7 +180,7 @@ bool BasicObjectBehavior::canConfiscate()
 /** Someone else's items disappear on save. */
 bool BasicObjectBehavior::save() 
 {
-    if (!obj->getOwner())
+    if (obj->getOwner().empty())
         return false;
 
     Character *ch = obj->getCarrier( );
@@ -206,7 +206,7 @@ void BasicObjectBehavior::delete_(Character *ch)
 /** Owned items can't be stolen. */
 bool BasicObjectBehavior::canSteal(Character *) 
 {
-    if (obj->getOwner())
+    if (!obj->getOwner().empty())
         return false;
     
     return true;
@@ -221,7 +221,7 @@ void BasicObjectBehavior::get( Character *ch )
 /** Owned items can't be equipped */
 bool BasicObjectBehavior::canEquip(Character *ch) 
 {
-    if (!obj->getOwner())
+    if (obj->getOwner().empty())
         return true;
 
     if (ch->is_immortal())

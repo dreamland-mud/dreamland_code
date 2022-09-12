@@ -205,7 +205,8 @@ static void oprog_show(Object *obj, Character *ch, ostringstream &buf)
         obj->behavior->show(ch, buf);
 
     for (auto &paf: obj->affected.findAllWithHandler())
-        paf->type->getAffect( )->onShow(SpellTarget::Pointer(NEW, obj), paf, ch, buf);    
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onShow(SpellTarget::Pointer(NEW, obj), paf, ch, buf);    
 }
 
 /*
@@ -474,7 +475,8 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
 	ostringstream buf;
 		
     for (auto &paf: room->affected.findAllWithHandler())
-        paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
 
     if (!buf.str().empty())
         mainBuf << endl << buf.str();
@@ -513,7 +515,7 @@ void show_char_blindness( Character *ch, Character *victim, ostringstream &buf )
 	else if (victim->fighting == ch)
 		buf << "...вслепую размахивая во все стороны.{x" << endl;
 	else	    
-        	buf << fmt( ch, "...%1$P1 выглядит слеп%1$Gым|ым|ой и дезориентированн%1$Gым|ым|ой.{x", victim ) << endl;
+        	buf << fmt( ch, "...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x", victim ) << endl;
     }
 }
 
@@ -826,29 +828,29 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
         return;
 
     if (IS_AFFECTED( victim, AFF_BLIND ))
-        str << "Похоже, ничего не видит." << endl;
+        str << "Похоже, ничего не вид%1$nит|ят." << endl;
     if (IS_AFFECTED( victim, AFF_SCREAM ))
-        str << "В ужасе зажимает уши." << endl;	
+        str << "В ужасе зажима1$nет|ют уши." << endl;	
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
-        str << "Покрыт%1$Gо||а чумными язвочками." << endl;
+        str << "Покрыт%1$Gо||а|ы чумными язвочками." << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
-        str << "Отравлен%1$Gо||а." << endl;
+        str << "Отравлен%1$Gо||а|ы." << endl;
     if (IS_AFFECTED( victim, AFF_SLOW ))
         str << "Под воздействием З А М Е Д  Л  Е  Н   И    Я." << endl;
     if (IS_AFFECTED( victim, AFF_HASTE ))
         str << "Под воздействием ускорения, уииии!" << endl;
     if (IS_AFFECTED( victim, AFF_WEAKEN ))
-        str << "Выглядит беспомощно и слабо." << endl;
+        str << "Выгляд%1$nит|ят беспомощно и слабо." << endl;
     if (IS_AFFECTED( victim, AFF_CORRUPTION ))
-        str << "Гниет заживо." << endl;
+        str << "Гни%1$nет|ют заживо." << endl;
     if (CAN_DETECT( victim, ADET_FEAR ))
-        str << "Дрожит от страха." << endl;
+        str << "Дрож%1$nит|ат от страха." << endl;
     if (IS_AFFECTED( victim, AFF_CURSE ))
-        str << "Проклят%1$Gо||а." << endl;
+        str << "Проклят%1$Gо||а|ы." << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_EVIL ))
-        str << "Защищен%1$Gо||а от зла" << endl;
+        str << "Защищен%1$Gо||а|ы от зла" << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_GOOD ))
-        str << "Защищен%1$Gо||а от добра." << endl;
+        str << "Защищен%1$Gо||а|ы от добра." << endl;
 
     DLString details = str.str();
     if (!details.empty()) 
@@ -871,19 +873,19 @@ void show_char_wounds( Character *ch, Character *victim, ostringstream &buf )
     if (percent >= 100)
         buf << "{C в прекрасном состоянии";
     else if (percent >= 90)
-        buf << "{B имеет несколько царапин";
+        buf << fmt(ch, "{B име%1$nет|ют несколько царапин", victim);
     else if (percent >= 75)
-        buf << "{B имеет несколько маленьких ран и синяков";
+        buf << fmt(ch, "{B име%1$nет|ют несколько маленьких ран и синяков", victim);
     else if (percent >= 50)
-        buf << "{G имеет довольно много ран";
+        buf << fmt(ch, "{G име%1$nет|ют довольно много ран", victim);
     else if (percent >=  30)
-        buf << "{Y имеет несколько больших, опасных ран и царапин";
+        buf << fmt(ch, "{Y име%1$nет|ют несколько больших, опасных ран и царапин", victim);
     else if (percent >= 15)
-        buf << fmt(ch, "{M выглядит сильно поврежденн%1$Gым|ым|ой", victim);
+        buf << fmt(ch, "{M выгляд%1$nит|ят сильно поврежденн%1$Gым|ым|ой|ыми", victim);
     else if (percent >= 0 )
         buf << "{R в ужасном состоянии";
     else
-        buf << "{R истекает кровью";
+        buf << fmt(ch, "{R истека%1$nет|ют кровью", victim);
 
     buf << ".{x" << endl;
 }
@@ -1363,7 +1365,8 @@ static void do_look_into( Character *ch, char *arg2 )
 static void afprog_look( Character *looker, Character *victim )
 {
     for (auto &paf: victim->affected.findAllWithHandler())
-        paf->type->getAffect( )->onLook(SpellTarget::Pointer(NEW, victim), paf, looker);
+        if (paf->type->getAffect())
+            paf->type->getAffect( )->onLook(SpellTarget::Pointer(NEW, victim), paf, looker);
 }
 
 static void mprog_look(Character *looker, Character *victim)

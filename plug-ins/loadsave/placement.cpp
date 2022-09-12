@@ -13,6 +13,7 @@
 #include "room.h"
 
 #include "dreamland.h"
+#include "roomutils.h"
 #include "act.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -521,5 +522,80 @@ void char_from_list( Character *ch, Character **list )
 
     ch->next = 0;
     ch->prev = 0;
+}
+
+void strip_camouflage( Character *ch )
+{
+    if ( IS_AFFECTED( ch, AFF_CAMOUFLAGE ) )
+    {
+            bool showMessages = ch->affected.findAllWithBits(&affect_flags, AFF_CAMOUFLAGE).empty();
+            affect_bit_strip(ch, &affect_flags, AFF_CAMOUFLAGE, true);
+            REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
+            ch->ambushing = &str_empty[0];
+
+            // TODO remove messages once camouflage is added via an affect.
+            if (showMessages) {
+                ch->pecho("Ты выходишь из своего укрытия.");
+                oldact("$c1 выходит из $s укрытия.", ch, 0, 0,TO_ROOM);
+            }
+    }
+}
+
+void strip_hide_and_fade(Character *ch)
+{
+    if (IS_AFFECTED(ch, AFF_HIDE | AFF_FADE))
+    {
+        bool showMessage = ch->affected.findAllWithBits(&affect_flags, AFF_HIDE|AFF_FADE).empty();
+        affect_bit_strip(ch, &affect_flags, AFF_HIDE, true);
+        affect_bit_strip(ch, &affect_flags, AFF_FADE, true);
+        REMOVE_BIT(ch->affected_by, AFF_HIDE | AFF_FADE);
+
+        // TODO remove messages and split this "if" block into two, once hide/fade become affects.
+        if (showMessage) {
+            ch->pecho("Ты выходишь из тени.");
+            oldact("$c1 выходит из тени.", ch, 0, 0, TO_ROOM);
+        }
+    }
+}
+
+void strip_invisibility(Character *ch)
+{
+    if (IS_AFFECTED(ch, AFF_IMP_INVIS | AFF_INVISIBLE))
+    {
+        bool showMessage = ch->affected.findAllWithBits(&affect_flags, AFF_IMP_INVIS|AFF_INVISIBLE).empty();
+        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
+        affect_bit_strip(ch, &affect_flags, AFF_INVISIBLE, true);
+        REMOVE_BIT(ch->affected_by, AFF_INVISIBLE | AFF_IMP_INVIS);
+
+        // For mobs, if invisibility is gained via a bit.
+        if (showMessage) {
+            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+        }
+    }
+}
+
+void strip_improved_invisibility(Character *ch)
+{
+   if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
+        bool showMessage = ch->affected.findAllWithBits(&affect_flags, AFF_IMP_INVIS).empty();
+        affect_bit_strip(ch, &affect_flags, AFF_IMP_INVIS, true);
+        REMOVE_BIT(ch->affected_by,  AFF_IMP_INVIS);
+
+        // For mobs, if invisibility is gained via a bit.
+        if (showMessage) {
+            oldact("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
+            oldact("$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM);
+        }        
+    }
+}
+
+void check_camouflage( Character *ch, Room *to_room )
+{
+    if ( IS_AFFECTED(ch, AFF_CAMOUFLAGE)
+            && !RoomUtils::isNature(to_room))
+    {
+            strip_camouflage( ch );
+    }        
 }
 

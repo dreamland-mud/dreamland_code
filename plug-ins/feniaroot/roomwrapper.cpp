@@ -38,6 +38,59 @@ using namespace Scripting;
 
 DLString regfmt(Character *to, const RegisterList &argv);
 
+/** Resolve door argument that can be either door number or direction name. */
+static int get_door_argument( const RegisterList &args )
+{
+    return args2door(args);
+}
+
+/** Populate either exit or extra exit data based on exit number or keyword. Return false if not found. */
+static bool resolve_exits(const RegisterList &args, Room *room, EXIT_DATA *&pExit, EXTRA_EXIT_DATA *&pExtraExit)
+{
+    pExit = 0;
+    pExtraExit = 0;
+
+    if (args.empty())
+        throw Scripting::NotEnoughArgumentsException();
+
+    Register arg = args.front();
+    int door = arg2door(arg);
+
+    if (door < 0) {
+        pExtraExit = room->extra_exits.find(arg.toString());
+    } else {
+        pExit = room->exit[door];
+    }
+
+    return pExtraExit != 0 || pExit != 0;
+}
+
+/** Find an exit and change exit flags on it. */
+static void update_door_flags( Room *room, const RegisterList &args, int flags, bool fSet )
+{
+    EXIT_DATA *pExit;
+    EXTRA_EXIT_DATA *pExtraExit;
+
+    if (!resolve_exits(args, room, pExit, pExtraExit))
+        throw Scripting::IllegalArgumentException();
+
+    int &exit_info = pExtraExit ? pExtraExit->exit_info : pExit->exit_info;
+    if (fSet)
+        SET_BIT(exit_info, flags );
+    else
+        REMOVE_BIT(exit_info, flags );
+}
+
+/** Translate door name into a room wrapper. */
+static Scripting::Register get_direction( Room *r, int dir )
+{
+    if (r->exit[dir])
+        return WrapperManager::getThis( )->getWrapper(r->exit[dir]->u1.to_room);
+    else 
+        return Scripting::Register( );
+}
+
+
 NMI_INIT(RoomWrapper, "комната")
 
 RoomWrapper::RoomWrapper( ) : target( NULL )
@@ -204,10 +257,10 @@ NMI_GET( RoomWrapper, description, "описание комнаты" )
     return Register( target->getDescription() );
 }
 
-NMI_GET( RoomWrapper, clan, "имя клана, которому принадлежит комната" )
+NMI_GET( RoomWrapper, clan, "клан, которому принадлежит комната (структура .Clan)" )
 {
     checkTarget();
-    return Register( target->pIndexData->clan->getShortName( ) );
+    return ClanWrapper::wrap( target->pIndexData->clan->getName( ) );
 }
 
 NMI_GET( RoomWrapper, guilds, "гильдии в этой комнате" )
@@ -219,31 +272,6 @@ NMI_GET( RoomWrapper, guilds, "гильдии в этой комнате" )
 		return Register("");
 }
 
-static Scripting::Register get_direction( Room *r, int dir )
-{
-    if (r->exit[dir])
-        return WrapperManager::getThis( )->getWrapper(r->exit[dir]->u1.to_room);
-    else 
-        return Scripting::Register( );
-}
-
-static int get_door_argument( const RegisterList &args )
-{
-    int door;
-    DLString doorName;
-    
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    doorName = args.front( ).toString( );
-    if (( door = direction_lookup( doorName.c_str( ) ) ) == -1)
-        door = args.front( ).toNumber( );
-
-    if (door < 0 || door >= DIR_SOMEWHERE)
-        throw Scripting::IllegalArgumentException( );
-
-    return door;
-}
 
 NMI_GET( RoomWrapper, north, "комната на север отсюда или null")
 {
@@ -430,85 +458,81 @@ NMI_INVOKE( RoomWrapper, dirMsgLeave, "(имя или номер выхода): 
     return dirs[get_door_argument( args )].leave;
 }
 
+NMI_INVOKE( RoomWrapper, dirMsgWhere, "(имя или номер выхода): где находится направление (на севере, внизу, на востоке)" )
+{
+    checkTarget( );
+    return dirs[get_door_argument( args )].where;
+}
+
 NMI_INVOKE( RoomWrapper, dirMsgEnter, "(имя или номер выхода): сообщение при заходе через этот выход (с юга, с запада)" )
 {
     checkTarget( );
     return dirs[get_door_argument( args )].enter;
 }
 
-NMI_INVOKE( RoomWrapper, getExitFlags, "(имя или номер выхода): флаги этого выхода (таблица .tables.exit_flags)" )
+NMI_INVOKE( RoomWrapper, getExitFlags, "(номер выхода, имя экстра/выхода): флаги этого выхода (таблица .tables.exit_flags)" )
 {
     EXIT_DATA *pExit;
+    EXTRA_EXIT_DATA *pExtraExit;
     
-    checkTarget( );
+    checkTarget();
+    if (!resolve_exits(args, target, pExit, pExtraExit))
+        throw Scripting::IllegalArgumentException();
 
-    pExit = target->exit[get_door_argument( args )];
-    if (pExit)
-        return Register( pExit->exit_info );
-    else
-        return Register( 0 );
+    return pExtraExit ? pExtraExit->exit_info : pExit->exit_info;
 }
 
-NMI_INVOKE( RoomWrapper, exitKeyword, "(имя или номер выхода): ключевые слова, на которые откликается эта дверь или выход" )
+NMI_INVOKE( RoomWrapper, exitKeyword, "(номер выхода, имя экстра/выхода): ключевые слова, на которые откликается эта дверь или выход" )
 {
     EXIT_DATA *pExit;
+    EXTRA_EXIT_DATA *pExtraExit;
     
-    checkTarget( );
+    checkTarget();
+    if (!resolve_exits(args, target, pExit, pExtraExit))
+        throw Scripting::IllegalArgumentException();
 
-    pExit = target->exit[get_door_argument( args )];
-    if (pExit)
-        return Register(pExit->keyword);
-    else
-        return Register("");
+    return pExtraExit ? pExtraExit->keyword : pExit->keyword;
 }
 
-NMI_INVOKE( RoomWrapper, exitShortDescr, "(имя или номер выхода): название выхода с падежами" )
+NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя экстра/выхода): название выхода с падежами" )
 {
     EXIT_DATA *pExit;
+    EXTRA_EXIT_DATA *pExtraExit;
     
-    checkTarget( );
+    checkTarget();
+    if (!resolve_exits(args, target, pExit, pExtraExit))
+        throw Scripting::IllegalArgumentException();
 
-    pExit = target->exit[get_door_argument( args )];
-    if (pExit)
-        return Register(pExit->short_descr);
-    else
-        return Register("");
+    DLString desc = pExtraExit ? pExtraExit->short_desc_from : pExit->short_descr;
+    if (desc.empty())
+        desc = "двер|ь|и|и|ь|ью|и";
+
+    return desc;
 }
 
-static void update_door_flags( Room *room, const RegisterList &args, int flags, bool fSet )
-{
-    EXIT_DATA *pExit = room->exit[get_door_argument( args )];
 
-    if (pExit) {
-        if (fSet)
-            SET_BIT(pExit->exit_info, flags );
-        else
-            REMOVE_BIT(pExit->exit_info, flags );
-    }
-}
-
-NMI_INVOKE(RoomWrapper, close, "(имя или номер выхода): закрыть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, close, "(номер выхода, имя экстра/выхода): закрыть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, open, "(имя или номер выхода): открыть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, open, "(номер выхода, имя экстра/выхода): открыть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, false ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, lock, "(имя или номер выхода): запереть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, lock, "(номер выхода, имя экстра/выхода): запереть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, unlock, "(имя или номер выхода): отпереть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, unlock, "(номер выхода, имя экстра/выхода): отпереть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_LOCKED, false ); 

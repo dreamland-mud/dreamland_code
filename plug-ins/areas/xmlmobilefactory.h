@@ -11,6 +11,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlglobalbitvector.h"
 #include "xmlitemtype.h"
+#include "clanreference.h"
 
 struct mob_index_data;
 
@@ -41,8 +42,10 @@ public:
     XML_VARIABLE XMLStringNoEmpty spec;
     XML_VARIABLE XMLGlobalBitvector practicer;
     XML_VARIABLE XMLGlobalBitvector religion;
+    XML_VARIABLE XMLGlobalBitvector affects;
     XML_VARIABLE XMLStringNoEmpty gram_number;
     XML_VARIABLE XMLStringNoEmpty smell;
+    XML_VARIABLE XMLClanReference clan;
 
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLMapBase<XMLString> properties;

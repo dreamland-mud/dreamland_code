@@ -155,13 +155,13 @@ NMI_SET( ObjectWrapper, gender , "грамматический род и чис�
     target->updateCachedNoun();
 }
 
-NMI_GET( ObjectWrapper, enchanted, "висят ли на предмете аффекты, меняющие его свойства")
+NMI_GET( ObjectWrapper, enchanted, "висят ли на предмете аффекты, меняющие его свойства (DEPRECATED)")
 {
     checkTarget( );
     return Register( target->enchanted );
 }
 
-NMI_SET( ObjectWrapper, enchanted , "висят ли на предмете аффекты, меняющие его свойства")
+NMI_SET( ObjectWrapper, enchanted , "висят ли на предмете аффекты, меняющие его свойства (DEPRECATED)")
 {
     checkTarget( );
     target->enchanted = arg.toNumber( );
@@ -318,25 +318,20 @@ NMI_GET(ObjectWrapper, from , "куда была надета вещь из тр
 NMI_GET( ObjectWrapper, owner , "имя персонажа-владельца (для трупов и личных вещей)")
 {
     checkTarget( );
-    const char *o = target->getOwner( );
-
-    if (o == NULL)
-        return Register( "" );
-    else
-        return Register( o );
+    return target->getOwner();
 }
 
 NMI_SET( ObjectWrapper, owner , "имя персонажа-владельца (для трупов и личных вещей)")
 {
     DLString d = arg.toString( );
     checkTarget( );
-    target->setOwner( d.c_str() );
+    target->setOwner( d );
 }
 
 NMI_GET( ObjectWrapper, personal, "установить или вернуть англ. имя собственника для личной вещи (или null)")
 {
     checkTarget();
-    if (target->getOwner() && target->behavior && target->behavior.getDynamicPointer<PersonalQuestReward>())
+    if (!target->getOwner().empty() && target->behavior && target->behavior.getDynamicPointer<PersonalQuestReward>())
         return Register(target->getOwner());
     return Register();
 }
@@ -346,7 +341,7 @@ NMI_SET( ObjectWrapper, personal, "установить или вернуть а
     checkTarget();
 
     if (arg.type == Register::NONE) {
-        target->setOwner(str_empty);
+        target->setOwner(DLString::emptyString);
         target->behavior.clear();
         return;
     }
@@ -355,7 +350,7 @@ NMI_SET( ObjectWrapper, personal, "установить или вернуть а
     if (!pci)
         throw Scripting::Exception("Player with this name not found");
 
-    target->setOwner(pci->getName().c_str());
+    target->setOwner(pci->getName());
     SET_BIT(target->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
     target->setMaterial( "platinum" );
 
@@ -691,14 +686,13 @@ NMI_INVOKE( ObjectWrapper, isAffected, "(skill): находится ли пре�
         return false;
 }
 
-NMI_GET( ObjectWrapper, affected, "список (List) всех аффектов на предмете (структура .Affect)" )
+NMI_GET( ObjectWrapper, affected, "список (List) всех аффектов на предмете и прототипе (структура .Affect)" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
 
-    if (!target->enchanted)
-        for (auto &paf: target->pIndexData->affected) 
-            rc->push_back( AffectWrapper::wrap( *paf ) );
+    for (auto &paf: target->pIndexData->affected) 
+        rc->push_back( AffectWrapper::wrap( *paf ) );
     
     for (auto &paf: target->affected) 
         rc->push_back( AffectWrapper::wrap( *paf ) );
@@ -845,7 +839,7 @@ NMI_INVOKE( ObjectWrapper, get_owner_here, "(): вернуть персонаж�
 {
     checkTarget();
     
-    if (!target->getOwner())
+    if (target->getOwner().empty())
         return Register();
     
     for (Character *rch = target->getRoom()->people; rch; rch = rch->next_in_room)

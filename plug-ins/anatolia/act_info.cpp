@@ -726,71 +726,6 @@ CMDRUNP( where )
     }
 }
 
-
-
-
-CMDRUNP( consider )
-{
-    char arg[MAX_INPUT_LENGTH];
-    Character *victim;
-    const char *msg;
-    const char *align;
-    int diff;
-
-    one_argument( argument, arg );
-
-    if ( arg[0] == '\0' )
-    {
-        ch->pecho("Сравнить свои силы с кем?");
-        return;
-    }
-
-    if ( ( victim = get_char_room( ch, arg ) ) == 0 )
-    {
-        ch->pecho("Его нет здесь.");
-        return;
-    }
-
-    if (is_safe(ch,victim))
-    {
-        ch->pecho("Даже не думай об этом.");
-        return;
-    }
-
-    victim = victim->getDoppel( );
-
-    diff = victim->getModifyLevel() - ch->getModifyLevel();
-
-         if ( diff <= -10 ) msg = "Ты можешь убить $C4 даже без оружия.";
-    else if ( diff <=  -5 ) msg = "$C1 не соперн$Gик|ик|ица тебе.";
-    else if ( diff <=  -2 ) msg = "Ты похоже легко убьешь $C4.";
-    else if ( diff <=   1 ) msg = "Прекрасный поединок!";
-    else if ( diff <=   4 ) msg = "$C1 говорит 'Чувствуешь удачу, шпана?'.";
-    else if ( diff <=   9 ) msg = "$C1 смеется над твоей беспомощностью.";
-    else                    msg = "Ты станешь приятным подарком СМЕРТИ!";
-
-    if (IS_EVIL(ch) && IS_EVIL(victim))
-      align = "$C1 злобно усмехается тебе.";
-    else if (IS_GOOD(victim) && IS_GOOD(ch))
-      align = "$C1 радушно приветствует тебя.";
-    else if (IS_GOOD(victim) && IS_EVIL(ch))
-      align = "$C1 улыбается тебе, надеясь привлечь тебя на путь добра.";
-    else if (IS_EVIL(victim) && IS_GOOD(ch))
-      align = "$C1 злобно смеется над тобой.";
-    else if (IS_NEUTRAL(ch) && IS_EVIL(victim))
-      align = "$C1 злобно усмехается.";
-    else if (IS_NEUTRAL(ch) && IS_GOOD(victim))
-      align = "$C1 счастливо улыбается.";
-    else if (IS_NEUTRAL(ch) && IS_NEUTRAL(victim))
-      align = "$C1 выглядит довольно непривлекательно.";
-    else
-      align = "$C1 выглядит совершенно непривлекательно.";
-
-    oldact( msg, ch, 0, victim, TO_CHAR);
-    oldact( align, ch, 0, victim, TO_CHAR);
-    return;
-}
-
 static bool fix_title( PCharacter *ch, DLString &title )
 {
     if (DLString( "{" ).strSuffix( title )
@@ -1827,7 +1762,7 @@ CMDRUNP( score )
     const char *CLR_FRAME = MILD(ch) ? "{Y" : "{G";
     const char *CLR_BAR   = MILD(ch) ? "{D" : "{C";
     const char *CLR_CAPT  = MILD(ch) ? "{g" : "{R";
-    
+
     if (ch->is_npc( )) {
         interpret_raw( ch, "oscore" );
         return;
@@ -1871,9 +1806,7 @@ CMDRUNP( score )
 "     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
 "     | %sКласс:{x  %-13s%s| %s{lRЛовк:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-6d%s |\n\r"
 "     | %sНатура:{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
-"     | %sДом  :{x  %-30s %s| {Y%-22s %s|\n\r"                
-"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r",
 
             CLR_FRAME, CLR_BAR, CLR_FRAME,
 
@@ -1938,16 +1871,22 @@ CMDRUNP( score )
                 ?  "{lRСмертей  {lEDeath    {lx" : "{lRТрусость {lEWimpy    {lx" ,
             ch->getProfession( ) == prof_samurai 
                 ? pch->death.getValue( ) : ch->wimpy.getValue( ),
-            CLR_FRAME,
+            CLR_FRAME);
 
-            CLR_CAPT,
-            room ? room->areaName().c_str() : "Потерян",
-            CLR_BAR,
-            msgtable_lookup( msg_positions, ch->position ),
-            CLR_FRAME,
+        ch->pecho(
+            fmt ( 0, "     %s| %sДом  :{x  %-30.30s %s| {Y%-22s %s|",
+                CLR_FRAME,
+                CLR_CAPT,
+                room ? room->areaName().c_str() : "Потерян",
+                CLR_BAR,
+                msgtable_lookup( msg_positions, ch->position ),
+                CLR_FRAME,
+                CLR_BAR, CLR_FRAME) );
 
-            CLR_BAR, CLR_FRAME);
-
+    ch->printf(
+"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+        CLR_BAR, CLR_FRAME);
+            
     if (pch->guarding != 0) {
         ekle = 1;
         ch->printf( 
@@ -2731,9 +2670,8 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         break;
     }
 
-    if (!obj->enchanted)
-        for (auto &paf: obj->pIndexData->affected)
-            lore_fmt_affect( obj, paf, buf );
+    for (auto &paf: obj->pIndexData->affected)
+        lore_fmt_affect( obj, paf, buf );
 
     for (auto &paf: obj->affected)
         lore_fmt_affect( obj, paf, buf );

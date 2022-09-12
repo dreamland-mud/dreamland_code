@@ -20,6 +20,7 @@
 #include "xmlareahelp.h"
 
 struct AreaIndexData;
+struct area_file;
 
 class XMLAreaHeader : public XMLVariableContainer {
 XML_OBJECT
@@ -27,7 +28,7 @@ public:
     XMLAreaHeader( );
 
     void init(AreaIndexData *);
-    AreaIndexData *compat( );
+    AreaIndexData *compat(area_file *areaFile);
         
     virtual bool toXML( XMLNode::Pointer& ) const;
     virtual void fromXML( const XMLNode::Pointer& );

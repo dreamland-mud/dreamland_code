@@ -24,6 +24,17 @@ ClanArea::ClanArea( )
 {
 }
 
+void ClanArea::setArea( AreaIndexData *areaIndex )
+{
+    // Register clan area with the manager for quick lookup later.
+    clanManager->addClanHall(clan->getName(), areaIndex->area_file);
+}
+
+void ClanArea::unsetArea( )
+{
+// Could de-register clan hall here but makes no sense; areas only loaded during startup.
+}
+
 void ClanArea::update( ) 
 {
     if (roomVnum <= 0 || altarVnum <= 0 || itemVnum <= 0)

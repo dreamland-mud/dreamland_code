@@ -16,7 +16,9 @@ struct CommandTarget {
     Object *obj;
     DLString argAll;
     DLString argOne, argTwo;
-    // TODO exits 
+    int door;
+    DLString extraExit;
+    DLString doorOrExtraExit;
 };
 
 class DefaultSkillCommand : public DefaultCommand, public SkillCommand {

@@ -121,7 +121,8 @@ static void afprog_fight(Character *ch, Character *victim)
     SpellTarget::Pointer target(NEW, ch);
 
     for (auto &paf: ch->affected.findAllWithHandler())
-        paf->type->getAffect()->onFight(target, paf, victim);
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onFight(target, paf, victim);
 }
 
 static bool mprog_fight( Character *ch, Character *victim )

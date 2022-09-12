@@ -6,18 +6,20 @@
 #include "skill.h"
 #include "pcharacter.h"
 #include "core/object.h"
+#include "room.h"
 #include "defaultskillcommand.h"
 #include "commandflags.h"
 #include "skillsflags.h"
 #include "feniaskillaction.h"
 #include "commandmanager.h"
 #include "fight_position.h"
+#include "directions.h"
 #include "loadsave.h"
 #include "act.h"
 #include "def.h"
 
 CommandTarget::CommandTarget() 
-                : vict(0), obj(0)
+                : vict(0), obj(0), door(-1)
 {    
 }
 
@@ -137,8 +139,31 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
             return target.vict != 0;
 
         case ARG_EXIT:
-            // TODO
-            return true;
+            // Find exit or extra exit visible to the character.            
+            if (argOne.empty()) {
+                errbuf << "Укажи название двери или выхода, например: {yворота{x, {yвосток{x или {yю{x.";
+                return false;
+
+            } else {                
+                EXTRA_EXIT_DATA *peexit = actor->in_room->extra_exits.find(argAll.c_str());
+
+                if (peexit && actor->can_see(peexit)) {
+                    target.extraExit = peexit->keyword;
+                    target.doorOrExtraExit = target.extraExit;
+                    return true;
+                }
+
+                target.door = find_exit(actor, argAll.c_str(), FEX_NO_INVIS | FEX_NO_EMPTY);
+                if (target.door < 0) {
+                    errbuf << "Ты не видишь здесь выхода с таким названием.";
+                    return false;
+                }
+
+                target.doorOrExtraExit = dirs[target.door].name;
+                return true;
+            }
+     
+            break;
 
         default:
             return false;                        

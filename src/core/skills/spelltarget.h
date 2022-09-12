@@ -7,6 +7,7 @@
 
 #include "dlobject.h"
 #include "pointer.h"
+#include "dlstring.h"
 
 class Character;
 class Object;
@@ -30,13 +31,17 @@ struct SpellTarget : public virtual DLObject {
     Character *victim;
     Object *obj;
     Room *room;
+    DLString doorOrExtraExit;
+    DLString extraExit;
+    int argdoor;
 
     enum {
         UNDEF,
         NONE,
         CHAR,
         OBJECT,
-        ROOM
+        ROOM,
+        EXIT
     } type;
 
     bool castFar;

@@ -30,6 +30,7 @@ XMLMobileFactory::XMLMobileFactory( ) :
                           detection(&detect_flags),
                           practicer(skillGroupManager),
                           religion(religionManager),
+                          affects(skillManager),
                           properties( false )
 {
 }
@@ -92,10 +93,13 @@ XMLMobileFactory::init(const mob_index_data *mob)
     spec.setValue(c);
     practicer.set(mob->practicer);
     religion.set(mob->religion);
+    affects.set(mob->affects);
     
     if (mob->gram_number != Grammar::Number::SINGULAR)
         gram_number.setValue(mob->gram_number.toString());
-        
+
+    clan.assign(mob->clan);
+
     smell.setValue(mob->smell);
 
     if(!mob->behavior.isEmpty( ))
@@ -181,6 +185,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
 
     mob->practicer.set(practicer);
     mob->religion.set(religion);
+    mob->affects.set(affects);
     
     if(!gram_number.getValue( ).empty( ))
         mob->gram_number = Grammar::Number(gram_number.getValue( ).c_str( ));
@@ -188,6 +193,8 @@ XMLMobileFactory::compat(mob_index_data *mob)
     if(!smell.getValue( ).empty( ))
         mob->smell = smell.getValue( );
 
+    mob->clan = clan;
+    
     if(behavior.getNode( )) {
         mob->behavior.construct( );
         XMLNode::Pointer p = behavior.getNode( );

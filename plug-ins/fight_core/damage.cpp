@@ -132,7 +132,7 @@ bool Damage::mprog_hit()
     FENIA_NDX_CALL( victim->getNPC( ), "Hit", "CCisO", victim, ch, dam, damType.c_str( ), NULL );
 
     for (auto &paf: victim->affected.findAllWithHandler())
-        if (paf->type->getAffect()->onHit(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL))
+        if (paf->type->getAffect() && paf->type->getAffect()->onHit(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL))
             return true;
 
     return false;
@@ -305,7 +305,7 @@ bool Damage::adjustMasterAttack( )
     if (victim == ch)
         return false;
 
-    if (victim->position <= POS_STUNNED)
+    if (!IS_AWAKE(victim))
         return false;
 
     if (ch->is_npc( )
@@ -395,7 +395,7 @@ bool Damage::mprog_immune()
     FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), NULL, dam_flag, "");
 
     for (auto &paf: victim->affected.findAllWithHandler())
-        if (paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL, dam_flag, ""))
+        if (paf->type->getAffect() && paf->type->getAffect()->onImmune(SpellTarget::Pointer(NEW, victim), paf, ch, dam, damType.c_str(), NULL, dam_flag, ""))
             return true;
 
     return false; 

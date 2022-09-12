@@ -117,15 +117,21 @@ Object *create_money( int gold, int silver )
     else if (silver == 0)
     {
         obj = create_object( get_obj_index( OBJ_VNUM_GOLD_SOME ), 0 );
-        obj->fmtShortDescr( obj->getShortDescr( ), gold );
+        DLString moneyArg;
+        moneyArg << gold << " золот|" << GET_COUNT( gold, "ая|ой|ой|ую|ой|ой", "ые|ых|ым|ые|ыми|ых", "ых|ых|ым|ых|ыми|ых" )
+        << " монет|" << GET_COUNT(gold, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
+        obj->fmtShortDescr( moneyArg.c_str() );
         obj->value1(gold);
-        obj->cost               = gold;
+        obj->cost               = 100 * gold;
         obj->weight                = gold/5;
     }
     else if (gold == 0)
     {
         obj = create_object( get_obj_index( OBJ_VNUM_SILVER_SOME ), 0 );
-        obj->fmtShortDescr( obj->getShortDescr( ), silver );
+        DLString moneyArg;
+        moneyArg << silver << " серебрян|" << GET_COUNT(silver, "ая|ой|ой|ую|ой|ой", "ые|ых|ым|ые|ыми|ых", "ых|ых|ым|ых|ыми|ых")
+        << " монет|" << GET_COUNT(silver, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
+        obj->fmtShortDescr( moneyArg.c_str() );
         obj->value0(silver);
         obj->cost               = silver;
         obj->weight                = silver/20;
@@ -134,7 +140,11 @@ Object *create_money( int gold, int silver )
     else
     {
         obj = create_object( get_obj_index( OBJ_VNUM_COINS ), 0 );
-        obj->fmtShortDescr( obj->getShortDescr( ), silver, gold );
+        DLString moneyArg;
+        moneyArg << gold << " золот|" << GET_COUNT( gold, "ая|ой|ой|ую|ой|ой", "ые|ых|ым|ые|ыми|ых", "ых|ых|ым|ых|ыми|ых" )
+        << " и " << silver << " серебрян|" << GET_COUNT(silver, "ая|ой|ой|ую|ой|ой", "ые|ых|ым|ые|ыми|ых", "ых|ых|ым|ых|ыми|ых")
+        << " монет|" << GET_COUNT(silver, "а|ы|е|у|ой|е", "ы||ам|ы|ами|ах", "||ам||ами|ах");
+        obj->fmtShortDescr( moneyArg.c_str() );
         obj->value0(silver);
         obj->value1(gold);
         obj->cost                = 100 * gold + silver;

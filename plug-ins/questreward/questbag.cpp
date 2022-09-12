@@ -20,7 +20,7 @@ bool QuestBag::canLock( Character *ch )
 { 
     PCMemoryInterface *pcm;
     
-    if (!obj->getOwner( ))
+    if (obj->getOwner().empty())
         return false;
 
     pcm = PCharacterManager::find( obj->getOwner( ) );
@@ -56,7 +56,7 @@ bool QuestBag::hourly()
     if (!obj->getProperty("keepHere").empty())
         return false;
 
-    if (!obj->getOwner())
+    if (obj->getOwner().empty())
         return false;
 
     PCMemoryInterface *owner = PCharacterManager::find(obj->getOwner());
@@ -65,7 +65,7 @@ bool QuestBag::hourly()
 
     obj->properties["oldRoom"] = obj->in_room->vnum;
     notice("[cleanup] Chest %d %lld of %s transferred from room [%d] [%s] to storage.",
-            obj->pIndexData->vnum, obj->getID(), obj->getOwner(),
+            obj->pIndexData->vnum, obj->getID(), obj->getOwner().c_str(),
             obj->in_room->vnum, obj->in_room->getName());
 
     obj_from_room(obj);

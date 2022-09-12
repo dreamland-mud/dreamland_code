@@ -184,14 +184,18 @@ const WeaponGenerator & WeaponGenerator::incrementHitroll() const
 {
     Affect *paf_hr = obj->affected.find( sn, APPLY_HITROLL );
     if (paf_hr) {
+        // Remove old affects from paf_hr.
+        if (obj->carried_by)
+            obj->wear_loc->affectsOnUnequip(obj->carried_by, obj);
+
         int oldMod = paf_hr->modifier;
         int min_hr = minHitroll();
         int max_hr = maxHitroll();
         paf_hr->modifier = URANGE( min_hr, oldMod + 1, max_hr );
 
-        if (obj->carried_by && (obj->wear_loc == wear_wield || obj->wear_loc == wear_second_wield)) {
-            obj->carried_by->hitroll += paf_hr->modifier - oldMod;
-        }
+        // Restore affects with updated hitroll.
+        if (obj->carried_by)
+            obj->wear_loc->affectsOnEquip(obj->carried_by, obj);
     }
 
     return *this;
@@ -201,14 +205,18 @@ const WeaponGenerator & WeaponGenerator::incrementDamroll() const
 {
     Affect *paf_dr = obj->affected.find( sn, APPLY_DAMROLL );
     if (paf_dr) {
+        // Remove old affects from paf_dr.        
+        if (obj->carried_by)
+            obj->wear_loc->affectsOnUnequip(obj->carried_by, obj);
+
         int oldMod = paf_dr->modifier;
         int min_dr = minDamroll();
         int max_dr = maxDamroll();
         paf_dr->modifier = URANGE( min_dr, oldMod + 1, max_dr );
 
-        if (obj->carried_by && (obj->wear_loc == wear_wield || obj->wear_loc == wear_second_wield)) {
-            obj->carried_by->damroll += paf_dr->modifier - oldMod;
-        }
+        // Restore affects with updated damroll.
+        if (obj->carried_by)
+            obj->wear_loc->affectsOnEquip(obj->carried_by, obj);
     }
     
     return *this;

@@ -46,13 +46,10 @@ Flags MobileProfession::getFlags( Character *ch ) const
 
     checkTarget( ch );
     
-    if (IS_SET(ch->act, ACT_CLERIC))
-        flags.setBit( PROF_DIVINE );
-    else if (IS_SET(ch->act, ACT_MAGE|ACT_NECROMANCER|ACT_UNDEAD|ACT_VAMPIRE))
-        flags.setBit( PROF_MAGIC );
-
-    if (flags.getValue( ))
-        flags.setBit( PROF_CASTER );
+    GlobalBitvector profs = toVector(ch);
+    for (int p = 0; p < professionManager->size(); p++)
+        if (profs.isSet(p))
+            flags.setBit(professionManager->find(p)->getFlags());
 
     return flags;
 }

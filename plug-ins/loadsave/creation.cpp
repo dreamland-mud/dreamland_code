@@ -11,6 +11,8 @@
 #include "feniamanager.h"
 #include "wrapperbase.h"
 
+#include "spelltarget.h"
+#include "affecthandler.h"
 #include "affect.h"
 #include "mobilebehaviormanager.h"
 #include "npcharacter.h"
@@ -53,6 +55,29 @@ static void override_description(NPCharacter *mob, const char *cProtoField, Sett
     DLString result = fmt(0, cProtoField, mob);
     if (result != protoField)
         (mob->*method)(result);
+}
+
+// Refresh race (and proto) affects on a character. Called when a character is created or periodically from char_update().
+void afprog_refresh(Character *ch, bool verbose)
+{
+    SpellTarget::Pointer spellTarget(NEW, ch);
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        bool hasAffect = ch->getRace()->getAffects().isSet(sn);
+
+        if (ch->is_npc()) {
+            hasAffect |= ch->getNPC()->pIndexData->affects.isSet(sn);
+        }
+
+        if (hasAffect) {
+            Skill *skill = skillManager->find(sn);
+            AffectHandler::Pointer ah = skill->getAffect();
+            if (ah)
+                ah->onRefresh(spellTarget, verbose);
+            else
+                warn("AFFECT %s not found for character %s", skill->getName().c_str(), ch->getNameC());
+        }
+    }
 }
 
 /*
@@ -165,17 +190,7 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     for (i = 0; i < stat_table.size; i++)
         mob->perm_stat[i] = BASE_STAT;
 
-    /*
-                TODO: review and either move to global onInit or discard
-
-                if (IS_SET(mob->off_flags,OFF_FAST))
-                        mob->perm_stat[STAT_DEX] += 2;
-
-                mob->perm_stat[STAT_STR] += mob->size - SIZE_MEDIUM;
-                mob->perm_stat[STAT_CON] += (mob->size - SIZE_MEDIUM) / 2;
-*/
-
-    /* let's get some spell action */
+    /* OBSOLETE: let's get some spell action */
     if (!IS_SET(flags, FCREATE_NOAFFECTS))
         create_mob_affects(mob);
 
@@ -183,7 +198,8 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
 
     mob->setReligion(god_chronos);
     mob->setProfession(prof_mobile);
-
+    mob->setClan(pMobIndex->clan);
+    
     /* link the mob to the world list */
     char_to_list(mob, &char_list);
 
@@ -195,6 +211,10 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
         MobileBehaviorManager::assign(mob);
     else
         MobileBehaviorManager::assignBasic(mob);
+
+    // Let each race or proto affect (silently) do its magic.
+    if (!IS_SET(flags, FCREATE_NOAFFECTS))
+        afprog_refresh(mob, false);
 
     /* Fenia initialization: call global onInit followed by specific 'init' defined for this mob index data. */
     if (!IS_SET(flags, FCREATE_NOCOUNT)) {
@@ -305,6 +325,7 @@ void clone_mobile(NPCharacter *parent, NPCharacter *clone)
     clone->setSex(parent->getSex());
     clone->setRace(parent->getRace()->getName());
     clone->setLevel(parent->getRealLevel());
+    clone->setClan(parent->getClan());
     clone->timer = parent->timer;
     clone->wait = parent->wait;
     clone->hit = parent->hit;
@@ -485,8 +506,7 @@ void clone_object(Object *parent, Object *clone)
         clone->setDescription(parent->getDescription());
     if (parent->getRealMaterial())
         clone->setMaterial(parent->getMaterial());
-    if (parent->getOwner())
-        clone->setOwner(parent->getOwner());
+    clone->setOwner(parent->getOwner());
 
     clone->item_type = parent->item_type;
     clone->extra_flags = parent->extra_flags;

@@ -96,6 +96,10 @@ void affect_remove_obj( Object *obj, Affect *paf, bool verbose )
 
 void affect_to_obj( Object *obj, const Affect *paf )
 {
+    // Remove old affects given by this object to the carrier.
+    if (obj->carried_by) 
+        obj->wear_loc->affectsOnUnequip(obj->carried_by, obj);
+
     obj->affected.push_front(paf->clone());
 
     if (paf->bitvector.getTable() == &extra_flags) {
@@ -104,6 +108,10 @@ void affect_to_obj( Object *obj, const Affect *paf )
         if (obj->item_type == ITEM_WEAPON)
             obj->value4(obj->value4() | paf->bitvector);
     }
+
+    // Reset updated affect back onto the carrier.
+    if (obj->carried_by)
+        obj->wear_loc->affectsOnEquip(obj->carried_by, obj);
 }
 
 void affect_enhance( Object *obj, const Affect *newAff )
@@ -118,30 +126,22 @@ void affect_enhance( Object *obj, const Affect *newAff )
         if(paf->type.getName() != newAff->type.getName())
             continue;
 
+        // Remove old affects given by this object to the carrier.
+        if (obj->carried_by)
+            obj->wear_loc->affectsOnUnequip(obj->carried_by, obj);
+
         paf->modifier += newAff->modifier;
         paf->level     = max( paf->level,    newAff->level );
         paf->duration  = max( paf->duration, newAff->duration );
+
+        // Reset updated affect back onto the carrier.
+        if (obj->carried_by)
+            obj->wear_loc->affectsOnEquip(obj->carried_by, obj);
 
         return;
     }
 
     affect_to_obj( obj, newAff );
-}
-
-void affect_enchant( Object *obj )
-{
-    if (!obj->enchanted) {
-        Affect af;
-
-        obj->enchanted = true;
-
-        for (auto &paf: obj->pIndexData->affected) {
-            af = *paf;
-            
-            af.type = paf->type;
-            affect_to_obj( obj, &af );
-        }
-    }
 }
 
 static Flags zeroFlags;
@@ -304,9 +304,6 @@ void affect_check(Character *ch, Affect *affect)
             continue;
 
         affectlist_reapply(obj->affected, ch, affect);
-
-        if (obj->enchanted)
-            continue;
 
         affectlist_reapply(obj->pIndexData->affected, ch, affect);
     }

@@ -163,8 +163,9 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
     
     if (ch)
         for (auto &paf: ch->affected.findAllWithHandler())
-            paf->type->getAffect( )->onSaves(
-                SpellTarget::Pointer(NEW, ch), paf, victim, save, dam_type);
+            if (paf->type->getAffect())
+                paf->type->getAffect( )->onSaves(
+                    SpellTarget::Pointer(NEW, ch), paf, victim, save, dam_type);
 
     save = URANGE( 5, save, 95 );
     return number_percent( ) < save;

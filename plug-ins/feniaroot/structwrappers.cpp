@@ -39,6 +39,7 @@
 #include "skill_utils.h"
 #include "xmlattributerestring.h"
 #include "handler.h"
+#include "clanarea.h"
 
 #include "profflags.h"
 #include "liquidflags.h"
@@ -58,6 +59,7 @@ GSN(dagger);
 GSN(mace);
 GSN(spear);
 GSN(sword);
+PROF(druid);
 
 /*----------------------------------------------------------------------
  * Area
@@ -268,16 +270,19 @@ NMI_INVOKE( ProfessionWrapper, bestWeapon, "(ch): vnum лучшего нович
         throw Scripting::NotEnoughArgumentsException( );
     
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
-    if (ch->getTarget( )->getSkill( gsn_axe ) == 100)
-        return weapon_vnum( WEAPON_AXE );
-    if (ch->getTarget( )->getSkill( gsn_sword ) == 100)
-        return weapon_vnum( WEAPON_SWORD );
-    if (ch->getTarget( )->getSkill( gsn_dagger ) == 100)
-        return weapon_vnum( WEAPON_DAGGER );
-    if (ch->getTarget( )->getSkill( gsn_mace ) == 100)
-        return weapon_vnum( WEAPON_MACE );
-    if (ch->getTarget( )->getSkill( gsn_spear ) == 100)
-        return weapon_vnum( WEAPON_SPEAR );
+    
+    if(ch->getTarget( )->getProfession( ) != prof_druid)  {
+        if (ch->getTarget( )->getSkill( gsn_axe ) == 100)
+            return weapon_vnum( WEAPON_AXE );
+        if (ch->getTarget( )->getSkill( gsn_sword ) == 100)
+            return weapon_vnum( WEAPON_SWORD );
+        if (ch->getTarget( )->getSkill( gsn_dagger ) == 100)
+            return weapon_vnum( WEAPON_DAGGER );
+        if (ch->getTarget( )->getSkill( gsn_mace ) == 100)
+            return weapon_vnum( WEAPON_MACE );
+        if (ch->getTarget( )->getSkill( gsn_spear ) == 100)
+            return weapon_vnum( WEAPON_SPEAR );
+    }
 
     return professionManager->find( name )->getWeapon( );
 }
@@ -746,6 +751,10 @@ NMI_GET( ClanWrapper, name, "английское название" )
 {
     return clanManager->find( name )->getName( );
 }
+NMI_GET( ClanWrapper, nameRus, "русское название с цветами и падежами" ) 
+{
+    return clanManager->find( name )->getRussianName( );
+}
 NMI_GET( ClanWrapper, index, "внутренний порядковый номер" ) 
 {
     return clanManager->find( name )->getIndex( );
@@ -761,6 +770,75 @@ NMI_GET( ClanWrapper, dispersed, "true для разрозненных клан�
 NMI_GET( ClanWrapper, recallVnum, "vnum комнаты для кланвозврата" ) 
 {
     return clanManager->find( name )->getRecallVnum();
+}
+
+static ClanArea::Pointer get_clan_area(const DLString &clanName)
+{
+    ClanArea::Pointer null;
+    area_file *clanHall = clanManager->findClanHall(clanName);
+
+    if (!clanHall)
+        return null;
+
+    if (!clanHall->area->behavior)
+        return null;
+
+	return clanHall->area->behavior.getDynamicPointer<ClanArea>( );
+}
+
+NMI_GET( ClanWrapper, itemVnum , "vnum святыни (или 0)") 
+{ 
+	ClanArea::Pointer clanArea = get_clan_area(name);
+    if (!clanArea)
+        return 0;	
+	else 
+        return Register( clanArea->itemVnum );
+}
+
+NMI_GET( ClanWrapper, altarVnum , "vnum алтаря (или 0)") 
+{ 
+	ClanArea::Pointer clanArea = get_clan_area(name);
+    if (!clanArea)
+        return 0;	
+	else 
+        return Register( clanArea->altarVnum );
+}
+
+NMI_GET( ClanWrapper, roomVnum , "vnum алтарной комнаты (или 0)") 
+{ 
+	ClanArea::Pointer clanArea = get_clan_area(name);
+    if (!clanArea)
+        return 0;	
+	else 
+        return Register( clanArea->roomVnum );
+}
+
+NMI_GET( ClanWrapper, invitationVnum , "vnum приглашения в клан (или 0)") 
+{ 
+	ClanArea::Pointer clanArea = get_clan_area(name);
+    if (!clanArea)
+        return 0;	
+	else 
+        return Register( clanArea->invitationVnum );
+}
+
+
+NMI_GET( ClanWrapper, keyVnum , "vnum ключа от алтаря (или 0)") 
+{ 
+	ClanArea::Pointer clanArea = get_clan_area(name);
+    if (!clanArea)
+        return 0;	
+	else 
+        return Register( clanArea->keyVnum );
+}
+
+NMI_GET( ClanWrapper, bookVnum , "vnum секретной книги (или 0)") 
+{ 
+	ClanArea::Pointer clanArea = get_clan_area(name);
+    if (!clanArea)
+        return 0;	
+	else 
+        return Register( clanArea->bookVnum );
 }
 
 static const char *diplomacy_names [] = {

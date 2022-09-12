@@ -8,6 +8,7 @@
 #include "update_areas.h"
 
 #include "areaindexwrapper.h"
+
 #include "structwrappers.h"
 #include "wrappermanager.h"
 #include "reglist.h"

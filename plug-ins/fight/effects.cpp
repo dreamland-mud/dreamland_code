@@ -201,12 +201,8 @@ void acid_effect(void *vo, Character *source, short level, int dam, int target, 
             af.type     = gsn_corrosion;
             af.sources.add(source);
 
-            affect_enchant( obj );
             affect_enhance( obj, &af );
 
-            if ( obj->carried_by != 0 && obj->wear_loc != wear_none )
-                for ( i = 0; i < 4; i++ )
-                    obj->carried_by->armor[i] += 1;
             return;
         }
 
@@ -872,12 +868,7 @@ void sand_effect(void *vo, Character *source, short level, int dam, int target, 
             af.type     = -1;
             af.sources.add(source);
 
-            affect_enchant( obj );
             affect_enhance( obj, &af );
-
-            if ( obj->carried_by != 0 && obj->wear_loc != wear_none )
-                for ( i = 0; i < 4; i++ )
-                    obj->carried_by->armor[i] += 1;
 
             return;
         }

@@ -156,10 +156,9 @@ bool DefaultWearlocation::equip( Object *obj )
 }
 
 void DefaultWearlocation::affectsOnEquip( Character *ch, Object *obj )
-{
-    if (!obj->enchanted)
-        for (auto &paf: obj->pIndexData->affected)
-            affect_modify( ch, paf, true );
+{       
+    for (auto &paf: obj->pIndexData->affected)
+        affect_modify( ch, paf, true );
 
     for (auto &paf: obj->affected)
         affect_modify( ch, paf, true );
@@ -270,11 +269,10 @@ void DefaultWearlocation::unequip( Object *obj )
 
 void DefaultWearlocation::affectsOnUnequip( Character *ch, Object *obj )
 {
-    if (!obj->enchanted)
-        for (auto &paf: obj->pIndexData->affected) {
-            affect_modify( ch, paf, false );
-            affect_check(ch, paf);
-        }
+    for (auto &paf: obj->pIndexData->affected) {
+        affect_modify( ch, paf, false );
+        affect_check(ch, paf);
+    }
 
     for (auto &paf: obj->affected) {
         affect_modify( ch, paf, false );

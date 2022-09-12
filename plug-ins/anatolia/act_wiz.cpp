@@ -1002,7 +1002,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 obj->getShortDescr( ), obj->getDescription( ) );
         ch->send_to(buf);
 
-        sprintf(buf,"Владелец: %s\n\r", obj->getOwner( ) == 0 ? "nobody" : obj->getOwner( ));
+        sprintf(buf,"Владелец: %s\n\r", obj->getOwner().empty() ? "nobody" : obj->getOwner().c_str());
         ch->send_to(buf);
 
         sprintf( buf, "Материал: %s\n\r", obj->getMaterial( ));
@@ -1178,9 +1178,8 @@ static void format_affect(Affect *paf, ostringstream &buf)
     for (auto &paf: obj->affected)
         format_affect(paf, ostr);
 
-    if (!obj->enchanted)
-        for (auto &paf: obj->pIndexData->affected)
-            format_affect(paf, ostr);
+    for (auto &paf: obj->pIndexData->affected)
+        format_affect(paf, ostr);
 
     ch->send_to(ostr);
 
@@ -3399,7 +3398,7 @@ CMDWIZP( rename )
             obj_next = obj->next;
             if (obj->hasOwner( victim ))
             {
-                    obj->setOwner( newName.c_str( ) );
+                    obj->setOwner( newName );
                     save_items_at_holder( obj );
             }
     }

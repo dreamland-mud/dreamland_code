@@ -39,7 +39,6 @@ void                clone_object         ( Object *parent, Object *clone );
 
 void        affect_to_obj    ( Object *, const Affect *paf );
 void        affect_remove_obj( ::Object *, Affect *paf, bool verbose = false );
-void        affect_enchant   ( Object *obj );
 void        affect_enhance   ( Object *obj, const Affect * );
 void        affect_modify    ( Character *ch, Affect *paf, bool fAdd );
 void        affect_check         ( Character *ch, Affect *old_paf);
@@ -63,6 +62,11 @@ void        obj_from_obj        ( Object *obj );
 
 void undig_earthquake( Character *ch );
 void undig( Character *ch );
+void strip_camouflage( Character *ch );
+void check_camouflage( Character *ch, Room *to_room );
+void strip_hide_and_fade(Character *ch);
+void strip_invisibility(Character *ch);
+void strip_improved_invisibility(Character *ch);
 
 void        extract_obj        ( Object *obj, const char *message = 0 );
 void        extract_obj_nocount        ( Object *obj );
