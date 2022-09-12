@@ -332,6 +332,10 @@ void GangMember::fight( Character *victim )
         }
     }
     
+    if (ch->detection.isSet(ADET_IMMOBILIZED)
+	|| ch->position <= POS_SITTING)
+	return;
+
     if (ch->hit < ch->max_hit / 4) {
         switch (number_range(1, 7)) {
         case 1: 
@@ -531,11 +535,6 @@ public:
     GangFleeMovement( GangMember::Pointer gang, int door )
                 : ExitsMovement( gang->getChar( ), door, MOVETYPE_RUNNING )
     {
-    }
-
-    virtual bool checkPositionWalkman( )
-    {
-        return ch->position > POS_RESTING;
     }
 };
 
