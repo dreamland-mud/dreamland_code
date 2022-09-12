@@ -48,5 +48,8 @@ void SpellTarget::init( )
     door = -1;
     range = -1;
     error = 0;
+    argdoor = -1;
+    doorOrExtraExit = "";
+    extraExit = "";
 }
 

@@ -470,6 +470,36 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
     strcpy( carg, arg.c_str( ) );
     
+    if (target.isSet(TAR_EXIT)) {
+        // Find exit or extra exit visible to the character.            
+
+        result->type = SpellTarget::EXIT;
+        result->room = ch->in_room;
+
+        if (arg.empty()) {
+            buf << "Укажи название двери или выхода, например: {yворота{x, {yвосток{x или {yю{x.";
+            return result;
+        }
+                         
+        EXTRA_EXIT_DATA *peexit = ch->in_room->extra_exits.find(arg.c_str());
+
+        if (peexit && ch->can_see(peexit)) {
+            result->extraExit = peexit->keyword;
+            result->doorOrExtraExit = result->extraExit;
+            return result;
+        }
+
+        result->argdoor = find_exit(ch, arg.c_str(), FEX_NO_INVIS | FEX_NO_EMPTY);
+        if (result->argdoor < 0) {
+            buf << "Ты не видишь здесь выхода с таким названием.";
+            result->error = TARGET_ERR_EXIT_NOT_FOUND;
+            return result;
+        }
+
+        result->doorOrExtraExit = dirs[result->argdoor].name;
+        return result;
+    }
+
     if (target.isSet( TAR_ROOM|TAR_PEOPLE )) {
         if (arg.empty( )) {
             result->type = SpellTarget::ROOM;

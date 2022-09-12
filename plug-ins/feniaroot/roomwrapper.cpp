@@ -458,6 +458,12 @@ NMI_INVOKE( RoomWrapper, dirMsgLeave, "(имя или номер выхода): 
     return dirs[get_door_argument( args )].leave;
 }
 
+NMI_INVOKE( RoomWrapper, dirMsgWhere, "(имя или номер выхода): где находится направление (на севере, внизу, на востоке)" )
+{
+    checkTarget( );
+    return dirs[get_door_argument( args )].where;
+}
+
 NMI_INVOKE( RoomWrapper, dirMsgEnter, "(имя или номер выхода): сообщение при заходе через этот выход (с юга, с запада)" )
 {
     checkTarget( );

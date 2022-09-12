@@ -50,6 +50,9 @@ public:
     XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLInteger dam;
     XML_VARIABLE XMLInteger tier;
+    XML_VARIABLE XMLInteger door;
+    XML_VARIABLE XMLString extraExit;
+    XML_VARIABLE XMLString doorOrExtraExit;
 };                       
 
 class FeniaCommandContext : public Scripting::NativeImpl<FeniaCommandContext>,

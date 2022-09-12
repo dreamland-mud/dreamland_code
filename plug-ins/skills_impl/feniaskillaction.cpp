@@ -234,6 +234,12 @@ Scripting::Register FeniaSkillActionHelper::createContext(DefaultSpell *spell, C
     case SpellTarget::ROOM:
         ctx->room = FeniaManager::wrapperManager->getWrapper(spellTarget->room);
         break;        
+    case SpellTarget::EXIT:
+        ctx->room = FeniaManager::wrapperManager->getWrapper(spellTarget->room);
+        ctx->door = spellTarget->argdoor;
+        ctx->extraExit = spellTarget->extraExit;
+        ctx->doorOrExtraExit = spellTarget->doorOrExtraExit;
+        break;
     default:
         break;
     }
@@ -389,6 +395,21 @@ NMI_SET(FeniaSpellContext, dam, "расчетные повреждения")
 NMI_GET(FeniaSpellContext, state, "структура для хранения временных переменных")
 {
     return state;
+}
+
+NMI_GET(FeniaSpellContext, door, "номер выхода в аргументах")
+{
+    return Register(door);
+}
+
+NMI_GET(FeniaSpellContext, extraExit, "ключевые слова экстра-выхода в аргументах")
+{
+    return Register(extraExit);
+}
+
+NMI_GET(FeniaSpellContext, doorOrExtraExit, "название направления или ключевые слова экстра-выхода в аргументах")
+{
+    return Register(doorOrExtraExit);
 }
 
 
