@@ -331,10 +331,10 @@ void GangMember::fight( Character *victim )
         case 1: interpret(ch, "anticipate"); break;
         }
     }
-    
-    if (ch->detection.isSet(ADET_IMMOBILIZED)
-	|| ch->position <= POS_SITTING)
-	return;
+
+    // Prevent mobs from initiating 'flee' movement when sitting or under certain spells.
+    if (ch->detection.isSet(ADET_IMMOBILIZED) || ch->position <= POS_SITTING)
+        return;
 
     if (ch->hit < ch->max_hit / 4) {
         switch (number_range(1, 7)) {
@@ -535,6 +535,12 @@ public:
     GangFleeMovement( GangMember::Pointer gang, int door )
                 : ExitsMovement( gang->getChar( ), door, MOVETYPE_RUNNING )
     {
+    }
+
+    // Override default position checks for normal walking, make them similar to flee movement.
+    virtual bool checkPositionWalkman()
+    {
+        return ch->position > POS_SITTING;
     }
 };
 
