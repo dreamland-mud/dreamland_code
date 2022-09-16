@@ -528,6 +528,25 @@ NMI_GET( RaceWrapper, wearloc, "список доступных wear locations" 
     return raceManager->find( name )->getWearloc( ).toString( );
 }
 
+NMI_GET( RaceWrapper, minAlign, "нижнее значение диапазона натуры или -1000 для неигровых рас" ) 
+{
+    Race *race = raceManager->find(name);
+    if (race->isPC())
+        return race->getPC()->getMinAlign();
+    else
+        return ALIGN_EVIL;
+}
+
+NMI_GET( RaceWrapper, maxAlign, "верхнее значение диапазона натуры или 1000 для неигровых рас" ) 
+{
+    Race *race = raceManager->find(name);
+    if (race->isPC())
+        return race->getPC()->getMaxAlign();
+    else
+        return ALIGN_GOOD;
+}
+
+
 /*----------------------------------------------------------------------
  * Liquid
  *----------------------------------------------------------------------*/
