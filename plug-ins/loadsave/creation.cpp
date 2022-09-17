@@ -411,7 +411,6 @@ Object *create_object_org(OBJ_INDEX_DATA *pObjIndex, short level, bool Count)
 
     obj->pIndexData = pObjIndex;
     obj->in_room = 0;
-    obj->enchanted = false;
     obj->updateCachedNoun();
 
     pObjIndex->instances.push_back(obj);
@@ -525,7 +524,6 @@ void clone_object(Object *parent, Object *clone)
         clone->valueByIndex(i, parent->valueByIndex(i));
 
     /* affects */
-    clone->enchanted = parent->enchanted;
 
     for (auto &paf : parent->affected)
         affect_to_obj(clone, paf);

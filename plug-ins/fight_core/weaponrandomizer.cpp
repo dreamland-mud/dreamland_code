@@ -141,7 +141,6 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
 void WeaponRandomizer::clearWeapon(Object *obj) const
 {
     obj->properties.clear();
-    obj->enchanted = false;
     obj->affected.deallocate();
     obj->timer = 0;
     obj->level = obj->pIndexData->level;

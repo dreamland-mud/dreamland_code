@@ -39,7 +39,7 @@ Object::Object( ) :
                 next( 0 ), prev( 0 ),
                 next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
                 carried_by( 0 ), extra_descr( 0 ), pIndexData( 0 ),
-                in_room( 0 ), enchanted( 0 ),
+                in_room( 0 ),
                 item_type( 0 ),
                 extra_flags( 0 ), wear_flags( 0 ), 
                 wear_loc( wear_none ),
@@ -84,7 +84,6 @@ void Object::extract( )
         extra_descr = 0;
         pIndexData = 0;
         in_room = 0;
-        enchanted = 0;
         pocket = "";
         owner = "";
         name = 0;
@@ -511,8 +510,8 @@ static bool get_value1_from_proto(const Object *obj)
         case ITEM_WEAPON: 
             // Bypass object dices and return those from proto if the weapon is not enchanted, not
             // dynamically created (ranger staff, bow, arrow, stone) and not restringed (cleric's mace).
+            // TODO: deprecated?
             return !obj->getRealShortDescr() 
-                    && !obj->enchanted 
                     && obj->level == obj->pIndexData->level
                     && obj->getProperty("tier").empty();
         default:

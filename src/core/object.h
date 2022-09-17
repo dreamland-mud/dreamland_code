@@ -69,7 +69,6 @@ public:
     AffectList  affected;
     OBJ_INDEX_DATA    *  pIndexData;
     Room              *  in_room;
-    bool                enchanted;
     
     int              item_type;
     int             extra_flags;

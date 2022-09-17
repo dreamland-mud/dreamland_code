@@ -611,8 +611,6 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 
                 fprintf( fp, "Cond %d\n",                obj->condition                        );
 
-                if (obj->enchanted)
-                        fprintf( fp,"Enchanted\n");
                 fprintf( fp, "Nest %d\n",        iNest                       );
 
                 if (!obj->pocket.empty( ))
@@ -1851,7 +1849,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             case 'E':
                     if ( !str_cmp( word, "Enchanted"))
                     {
-                            obj->enchanted = true;
+                            // Obsolete logic for working with item instance affects.
                             fMatch         = true;
                             break;
                     }

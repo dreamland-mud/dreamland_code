@@ -155,18 +155,6 @@ NMI_SET( ObjectWrapper, gender , "грамматический род и чис�
     target->updateCachedNoun();
 }
 
-NMI_GET( ObjectWrapper, enchanted, "висят ли на предмете аффекты, меняющие его свойства (DEPRECATED)")
-{
-    checkTarget( );
-    return Register( target->enchanted );
-}
-
-NMI_SET( ObjectWrapper, enchanted , "висят ли на предмете аффекты, меняющие его свойства (DEPRECATED)")
-{
-    checkTarget( );
-    target->enchanted = arg.toNumber( );
-}
-
 NMI_GET( ObjectWrapper, special, "обладает ли прототип предмета сложным поведением (через феню или код)")
 {
     checkTarget( );

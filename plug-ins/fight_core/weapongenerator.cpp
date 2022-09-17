@@ -558,7 +558,6 @@ const WeaponGenerator & WeaponGenerator::assignAffects() const
         affect_enhance(obj, &af);
     }
 
-    obj->enchanted = true;
     return *this;
 }
 
