@@ -313,19 +313,20 @@ void say_fmt( const char *msg, ... )
     va_end( ap0 );
 }
 
-void tell_raw( Character *ch, NPCharacter *talker, const char *format, ... ) 
+void tell_raw(Character *ch, NPCharacter *talker, const char *format, ...)
 {
-    char buf[MAX_STRING_LENGTH], buf0[MAX_STRING_LENGTH];
+    char buf[MAX_STRING_LENGTH];
     va_list ap;
-    
-    sprintf( buf0, "%s говорит тебе '{G%s{x'\n\r", ch->seeFullNameD( talker, '1' ).c_str( ), format );
-    
-    va_start( ap, format );
-    vsprintf( buf,  buf0, ap );
-    va_end( ap );
 
-    buf[0] = Char::upper(buf[0]);
-    ch->send_to(buf);
+    va_start(ap, format);
+    vsprintf(buf, format, ap);
+    va_end(ap);
+
+    DLString messageStart = fmt(ch, "%^C1 говорит тебе '{G", talker);
+    DLString messageMiddle = buf;
+    DLString messageEnd = "{x'\n\r";
+
+    ch->send_to(messageStart + messageMiddle + messageEnd);
 }
 
 void say_act( Character *listener, Character *teller, 

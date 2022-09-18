@@ -139,11 +139,7 @@ public:
     // name and sex formatting
     virtual const char * getNameC( ) const;
     DLString sees( const Character *whomsee, char needcase = '1' ) const;
-    DLString seesD( const Character *whomsee, char needcase = '1' ) const;
     DLString seeName( const Character *whomsee, char needcase = '1' ) const;
-    DLString seeFullNameD( const Character *whomsee, char needcase = '1' ) const;
-    DLString seeNameD( const Character *whomsee, char needcase = '1' ) const;
-    short seeSexD( const Character *ch ) const;
 
     // text output (implemented in descriptor)
     void send_to( const char * );

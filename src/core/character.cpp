@@ -323,25 +323,9 @@ DLString Character::sees( const Character *ch, char needcase ) const
 {
     return ch->toNoun( this, FMT_INVIS )->decline( needcase );
 }
-DLString Character::seesD( const Character *ch, char needcase ) const  
-{
-    return ch->toNoun( this, FMT_INVIS|FMT_DOPPEL )->decline( needcase );
-}
 DLString Character::seeName( const Character *ch, char needcase ) const
 {
     return ch->toNoun( this, FMT_PRETITLE )->decline( needcase );
-}
-DLString Character::seeNameD( const Character *ch, char needcase ) const
-{
-    return ch->toNoun( this, FMT_PRETITLE|FMT_DOPPEL )->decline( needcase );
-}
-DLString Character::seeFullNameD( const Character *ch, char needcase ) const
-{
-    return ch->toNoun( this, FMT_INVIS|FMT_PRETITLE|FMT_DOPPEL )->decline( needcase );
-}
-short Character::seeSexD( const Character *ch ) const
-{
-    return ch->getDoppel( this )->getSex( );
 }
 
 /****************************************************************************
