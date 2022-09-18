@@ -27,10 +27,14 @@ class ShalafiFaculty : public ClanOrder {
 XML_OBJECT
 public:
     ShalafiFaculty();
+    
     virtual bool canInduct( PCMemoryInterface * ) const;
+    virtual const DLString &getTitle( PCMemoryInterface * ) const;
 
     XML_VARIABLE XMLGlobalBitvector classes;
+    XML_VARIABLE ClanTitlesByLevel  titles; 
 };
+
 class ShalafiClan : public DefaultClan {
 XML_OBJECT
 public:

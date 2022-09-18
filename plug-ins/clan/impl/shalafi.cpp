@@ -126,6 +126,9 @@ int ClanGuardShalafi::getCast( Character *victim )
         return sn;
 }
 
+/*--------------------------------------------------------------------------
+ * ShalafiFaculty 
+ *-------------------------------------------------------------------------*/
 
 ShalafiFaculty::ShalafiFaculty() 
      : classes(professionManager)
@@ -136,6 +139,15 @@ bool ShalafiFaculty::canInduct(PCMemoryInterface *pci) const
 {
     return classes.isSet(pci->getProfession());
 }
+
+const DLString &ShalafiFaculty::getTitle(PCMemoryInterface *pci) const
+{
+    return titles.build(pci);
+}
+
+/*--------------------------------------------------------------------------
+ * ShalafiClan 
+ *-------------------------------------------------------------------------*/
 
 bool ShalafiClan::canInduct(PCharacter *ch) const
 {
