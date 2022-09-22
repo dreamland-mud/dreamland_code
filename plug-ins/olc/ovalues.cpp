@@ -219,11 +219,15 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch, 
             "[v0] Liquid Total: [%u]\n\r"
             "[v1] Liquid Left:  [%u]\n\r"
-            "[v2] Liquid:       %s (%s) {D(? liquid){x\n\r",
+            "[v2] Liquid:       %s (%s) {D(? liquid){x\n\r"
+            "[v3] Max people:      [%u]\n\r"
+            "[v4] Furniture Flags: %s {D(? furniture_flags){x\n\r",
             obj->value[0],
             obj->value[1],
             liquidManager->find( obj->value[2] )->getName( ).c_str( ),
-            liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( ));
+            liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( )),
+            obj->value[3],
+            furniture_flags.names(obj->value[2]).c_str();
         break;
 
     case ITEM_FOOD:

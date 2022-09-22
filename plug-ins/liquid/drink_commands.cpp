@@ -625,6 +625,10 @@ CMDRUN( drink )
             return;
 
         case ITEM_FOUNTAIN:
+            if (obj->value1() <= 0) {
+                ch->pecho("Здесь пусто.");
+                return;
+            }
             liquid = liquidManager->find( obj->value2() );
             amount = liquid->getSipSize( ) * 3;
             break;

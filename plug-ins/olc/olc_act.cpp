@@ -89,7 +89,7 @@ const struct olc_help_type help_table[] =
     {"weapon_type2", &weapon_type2, "Флаги оружия (поле value4 у оружия)."},
     {"container_flags", &container_flags, "Флаги контейнеров (поле value1 у контейнера)."},
     {"portal_flags", &portal_flags, "Флаги порталов (поле value2 у порталов)."},
-    {"furniture_flags", &furniture_flags, "Флаги мебели (поле value2 у мебели)."},
+    {"furniture_flags", &furniture_flags, "Флаги мебели (поле value2 у мебели и value4 у фонтана)."},
     {"drink_flags", &drink_flags, "Флаги емкости для жидкостей (поле value3)."},
     {"recipe_flags", &recipe_flags, "Флаги рецептов (поле value0 у рецепта)"},
     {"liquid", &liq_table, "Жидкости (поле value2 у емкостей и фонтанов)."},
