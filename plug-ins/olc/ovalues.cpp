@@ -182,8 +182,6 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         }
         break;
 
-
-
     case ITEM_CONTAINER:
         ptc(ch,
             "[v0] Вместимость:[%u кг]\n\r"
@@ -225,9 +223,9 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
             obj->value[0],
             obj->value[1],
             liquidManager->find( obj->value[2] )->getName( ).c_str( ),
-            liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( )),
+            liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( ),
             obj->value[3],
-            furniture_flags.names(obj->value[2]).c_str();
+            furniture_flags.names(obj->value[4]).c_str());
         break;
 
     case ITEM_FOOD:
@@ -675,6 +673,8 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
         break;
     case ITEM_FOUNTAIN:
         switch (value_num) {
+            int value;
+
         default:
 //            do_help(ch, "ITEM_FOUNTAIN");
             return false;
@@ -693,6 +693,19 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
             }
             pObj->value[2] = liq->getIndex( );
             stc("LIQUID TYPE SET.\n\r\n\r", ch);
+            break;
+        case 3:
+            stc("NUMBER OF PEOPLE SET.\n\r\n\r", ch);
+            pObj->value[3] = atoi(argument);
+            break;
+        case 4:
+            if ((value = furniture_flags.bitstring( argument )) != NO_FLAG)
+                TOGGLE_BIT(pObj->value[4], value);
+            else {
+                show_help(ch, "furniture");
+                return false;
+            }
+            stc("Furniture flags toggled.\n\r\n\r", ch);
             break;
         }
         break;

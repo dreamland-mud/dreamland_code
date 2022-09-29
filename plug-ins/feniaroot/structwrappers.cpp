@@ -131,7 +131,7 @@ NMI_GET( AreaWrapper, players, "список игроков из default экз�
         for (auto &rch: r.second->getPeople())
             if (!rch->is_npc())
                 rc->push_back(::wrap(rch));
-    
+
     return ::wrap(rc);
 }
 
@@ -256,8 +256,8 @@ static int weapon_vnum( int wclass )
             return 40119;
         case WEAPON_MACE:
             return 40100;
-	case WEAPON_SPEAR:
-	    return 40117;
+    case WEAPON_SPEAR:
+        return 40117;
     }
     return -1;
 }
@@ -581,7 +581,7 @@ Liquid * LiquidWrapper::getTarget() const
 NMI_INVOKE( LiquidWrapper, api, "(): печатает этот api" )
 {
     ostringstream buf;
-    
+
     Scripting::traitsAPI<LiquidWrapper>( buf );
     return Scripting::Register( buf.str( ) );
 }
@@ -802,61 +802,61 @@ static ClanArea::Pointer get_clan_area(const DLString &clanName)
     if (!clanHall->area->behavior)
         return null;
 
-	return clanHall->area->behavior.getDynamicPointer<ClanArea>( );
+    return clanHall->area->behavior.getDynamicPointer<ClanArea>( );
 }
 
 NMI_GET( ClanWrapper, itemVnum , "vnum святыни (или 0)") 
 { 
-	ClanArea::Pointer clanArea = get_clan_area(name);
+    ClanArea::Pointer clanArea = get_clan_area(name);
     if (!clanArea)
-        return 0;	
-	else 
+        return 0;
+    else 
         return Register( clanArea->itemVnum );
 }
 
 NMI_GET( ClanWrapper, altarVnum , "vnum алтаря (или 0)") 
 { 
-	ClanArea::Pointer clanArea = get_clan_area(name);
+    ClanArea::Pointer clanArea = get_clan_area(name);
     if (!clanArea)
-        return 0;	
-	else 
+        return 0;
+    else 
         return Register( clanArea->altarVnum );
 }
 
 NMI_GET( ClanWrapper, roomVnum , "vnum алтарной комнаты (или 0)") 
 { 
-	ClanArea::Pointer clanArea = get_clan_area(name);
+    ClanArea::Pointer clanArea = get_clan_area(name);
     if (!clanArea)
-        return 0;	
-	else 
+        return 0;
+    else 
         return Register( clanArea->roomVnum );
 }
 
 NMI_GET( ClanWrapper, invitationVnum , "vnum приглашения в клан (или 0)") 
 { 
-	ClanArea::Pointer clanArea = get_clan_area(name);
+    ClanArea::Pointer clanArea = get_clan_area(name);
     if (!clanArea)
-        return 0;	
-	else 
+        return 0;
+    else 
         return Register( clanArea->invitationVnum );
 }
 
 
 NMI_GET( ClanWrapper, keyVnum , "vnum ключа от алтаря (или 0)") 
 { 
-	ClanArea::Pointer clanArea = get_clan_area(name);
+    ClanArea::Pointer clanArea = get_clan_area(name);
     if (!clanArea)
-        return 0;	
-	else 
+        return 0;
+    else 
         return Register( clanArea->keyVnum );
 }
 
 NMI_GET( ClanWrapper, bookVnum , "vnum секретной книги (или 0)") 
 { 
-	ClanArea::Pointer clanArea = get_clan_area(name);
+    ClanArea::Pointer clanArea = get_clan_area(name);
     if (!clanArea)
-        return 0;	
-	else 
+        return 0;
+    else 
         return Register( clanArea->bookVnum );
 }
 
@@ -1613,7 +1613,7 @@ Register SkillGroupWrapper::wrap(const DLString &name)
     if (!group)
         throw Scripting::Exception(name + ": skill group not found");
         
-    return Register::handler<SkillGroupWrapper>(group->getName());    
+    return Register::handler<SkillGroupWrapper>(group->getName());
 }
 
 SkillGroup * SkillGroupWrapper::getTarget() const

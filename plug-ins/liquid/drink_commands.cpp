@@ -625,7 +625,7 @@ CMDRUN( drink )
             return;
 
         case ITEM_FOUNTAIN:
-            if (obj->value1() <= 0) {
+            if (obj->value0() > 0 && obj->value1() < 0) {
                 ch->pecho("Здесь пусто.");
                 return;
             }
@@ -684,7 +684,7 @@ CMDRUN( drink )
         Affect af;
 
         if ( !saves_spell(level / 2, ch, DAM_POISON) ) {
-			ch->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а.", ch);
+            ch->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а.", ch);
             ch->pecho("Тебя начинает тошнить, когда яд проникает в твое тело.");
 
             af.bitvector.setTable(&affect_flags);
@@ -693,7 +693,7 @@ CMDRUN( drink )
             af.duration  = 3 * amount;
             af.bitvector.setValue(AFF_POISON);
             affect_join( ch, &af );
-		}
+        }
     }
 
     if (obj && obj->value0() > 0)
@@ -739,11 +739,11 @@ bool oprog_smell_liquid(Liquid *liq, Character *sniffer)
         else if (liq->getIndex() != liq_water)
             msg = "Ты чувствуешь запах %1$N2.";
         else
-            return false;        
-        
+            return false;
+
         sniffer->pecho( msg.c_str( ), liq->getShortDescr( ).c_str( ) );
         return true;
-}        
+}
 
 AFFECT_DECL(PouredLiquid);
 TYPE_AFFECT(bool, PouredLiquid)::smell( Character *ch, Character *sniffer, Affect *paf ) 
@@ -756,7 +756,7 @@ TYPE_AFFECT(bool, PouredLiquid)::smell( Character *ch, Character *sniffer, Affec
         if (oprog_smell_liquid(liq, sniffer))
             rc = true;
     }
-    
+
     return rc;
 }
 
@@ -766,7 +766,7 @@ VOID_AFFECT(PouredLiquid)::saves( Character *ch, Character *victim, int &save, i
     
     if (dam_type != DAM_CHARM)
         return;
-    
+
     if (IS_SET( victim->form, FORM_FELINE )) { 
         if (paf->global.isSet( liq_valerian_tincture )) 
             hasVuln = true;

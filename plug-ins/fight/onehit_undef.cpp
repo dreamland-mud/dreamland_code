@@ -131,10 +131,10 @@ void UndefinedOneHit::protectPrayer( )
 
 bool UndefinedOneHit::checkHands( )
 {
-	//TO-DO: provide better logic later, allow blobs, beasts etc. to hit without hands
-	if (ch->is_npc( ))
-		return true;
-		
+    //TO-DO: provide better logic later, allow blobs, beasts etc. to hit without hands
+    if (ch->is_npc( ))
+        return true;
+
     if (!ch->getWearloc( ).isSet( wear_hands ))
         return false;
 
@@ -418,24 +418,24 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             msgCharBlind = "{yТы внезапной серией ударов поднимаешь вихрь листьев, ослепляя $C4!{x";
             msgVictHeart = "{R$c1 призывает силу Природы, нанося тебе мощнейший удар прямо в сердце!{x";
             msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";  
-	    
+
             stun_chance = 85;
-    }       
-    if ( ch->getProfession( ) == prof_druid ) {                    
+    }
+    if ( ch->getProfession( ) == prof_druid ) {
             if (!ch->isAffected(gsn_shapeshift))
                 return;
             msgVictBasic = "$c1 внезапно всаживает тебе когти в печень!";
-            msgCharBasic = "Ты внезапно всаживаешь $C3 когти в печень!";               
+            msgCharBasic = "Ты внезапно всаживаешь $C3 когти в печень!";
             msgVictStun = "{W$c1 разрывает когтями печень, обездвиживая тебя!{x";
             msgCharStun = "{WТы разрываешь когтями печень, обездвиживая $C4!{x";
             msgVictBlind = "{y$c1 царапает когтями глаза, ослепляя тебя!{x";
             msgCharBlind = "{yТы царапаешь когтями глаза, ослепляя $C4!{x";
             msgVictHeart = "{R$c1 всаживает острые когти тебе прямо в сердце!{x";
-            msgCharHeart = "{RТы всаживаешь острые когти прямо в сердце $C2!{x";     
-	                            
+            msgCharHeart = "{RТы всаживаешь острые когти прямо в сердце $C2!{x";
+
             stun_chance = 65;
-    }  
-	
+    }
+
     if ( ch->getProfession( ) == prof_thief ) {
             if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
                         return;                
@@ -509,29 +509,29 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     diceroll = number_percent( );
     d.log(diceroll, "diceroll");
 
-	// requires according body parts: guts (liver), eye, heart
+    // requires according body parts: guts (liver), eye, heart
     if (diceroll < stun_chance) {
-		if (IS_SET(victim->parts, PART_GUTS)) {
-        	// stun only in 15-35% chance, otherwise just damage
-        	if (diceroll >= 50) {
-            	victim->setWaitViolence( 2 );
-            	oldact( msgVictStun, ch, 0, victim, TO_VICT);
-            	oldact( msgCharStun, ch, 0, victim, TO_CHAR);                    
-        	} 
-        	else {
-            	oldact( msgVictBasic, ch, 0, victim, TO_VICT);
-            	oldact( msgCharBasic, ch, 0, victim, TO_CHAR);
-        	}
-        	dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage   
-		}
-		else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts
+        if (IS_SET(victim->parts, PART_GUTS)) {
+            // stun only in 15-35% chance, otherwise just damage
+            if (diceroll >= 50) {
+                victim->setWaitViolence( 2 );
+                oldact( msgVictStun, ch, 0, victim, TO_VICT);
+                oldact( msgCharStun, ch, 0, victim, TO_CHAR);
+            } 
+            else {
+                oldact( msgVictBasic, ch, 0, victim, TO_VICT);
+                oldact( msgCharBasic, ch, 0, victim, TO_CHAR);
+            }
+            dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage   
+        }
+        else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts
     }
     else if (diceroll < blind_chance) {
         if (!IS_AFFECTED(victim,AFF_BLIND) && IS_SET(victim->parts, PART_EYE))
         {
-        	oldact( msgVictBlind, ch, 0, victim, TO_VICT);
-        	oldact( msgCharBlind, ch, 0, victim, TO_CHAR);	
-			
+            oldact( msgVictBlind, ch, 0, victim, TO_VICT);
+            oldact( msgCharBlind, ch, 0, victim, TO_CHAR);
+
             baf.bitvector.setTable(&affect_flags);
             baf.type     = gsn_critical_strike;
             baf.level    = ch->getModifyLevel();
@@ -540,18 +540,18 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             baf.duration     = number_range(1,5);
             baf.bitvector.setValue(AFF_BLIND);
             affect_to_char( victim, &baf );
-			
-			dam += dam * number_range( 1, 2 );  // +100-200% damage 			
+
+            dam += dam * number_range( 1, 2 );  // +100-200% damage 
         }
-		else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts		
+        else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts
     }
     else {
-		if (IS_SET(victim->parts, PART_HEART)) {
-        	oldact( msgVictHeart, ch, 0, victim, TO_VICT);
-        	oldact( msgCharHeart, ch, 0, victim, TO_CHAR);
-        	dam += dam * number_range( 2, 5 ); // +200-500% damage
-		}
-		else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts		
+        if (IS_SET(victim->parts, PART_HEART)) {
+            oldact( msgVictHeart, ch, 0, victim, TO_VICT);
+            oldact( msgCharHeart, ch, 0, victim, TO_CHAR);
+            dam += dam * number_range( 2, 5 ); // +200-500% damage
+        }
+        else dam += (dam * number_range( 1, 4 )) / 10;  // +10-40% damage if no body parts
     }
 }
 
@@ -709,8 +709,8 @@ void UndefinedOneHit::damEffectMasterHand()
         chance -= quick_mod * 100;
         d.log(chance, "quick");
     }
-	// normalize chance, maxed at 15%
-	chance = (int)URANGE(1, (int)chance, 15);
+    // normalize chance, maxed at 15%
+    chance = (int)URANGE(1, (int)chance, 15);
     d.log(chance, "final");
 
     if (diceroll > chance)
@@ -863,32 +863,32 @@ void UndefinedOneHit::damEffectSlice( )
 
     if (!victim->getWearloc( ).isSet( sliced_loc ))
         return;
-	
-	// base chance: 1%
+
+    // base chance: 1%
     if (number_range( 1, 100 ) > 1)
         return;
 
-	// chance depends on both slice skill and weapon skill
+    // chance depends on both slice skill and weapon skill
     chance = (chance * ch->getSkill( weapon_sn )) / 100;
-	
+
     chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_CON ));
 
     chance += (skill_level(*gsn_slice, ch) - victim->getModifyLevel()) * 2;
-	chance += victim->size - 2; // easier to chop larger hands
-	
+    chance += victim->size - 2; // easier to chop larger hands
+
     if (!IS_WEAPON_STAT( axe, WEAPON_SHARP ))
         chance -= chance / 10;
-	
-	// samurai always get +0.1% chance, others get -0.1% if not two-handed
-	if ( ch->getProfession( ) == prof_samurai && axe->value0( ) == WEAPON_SWORD)
-		chance += chance / 10;
+
+    // samurai always get +0.1% chance, others get -0.1% if not two-handed
+    if ( ch->getProfession( ) == prof_samurai && axe->value0( ) == WEAPON_SWORD)
+        chance += chance / 10;
     else {
-		if (axe->value0( ) == WEAPON_AXE)
-			chance += chance / 10;
-		if (!IS_WEAPON_STAT( axe, WEAPON_TWO_HANDS ))
-        	chance -= chance / 10;
-	}
-    
+        if (axe->value0( ) == WEAPON_AXE)
+            chance += chance / 10;
+        if (!IS_WEAPON_STAT( axe, WEAPON_TWO_HANDS ))
+            chance -= chance / 10;
+    }
+
     if (number_percent( ) > chance) {
         oldact("Твое оружие скользит по запястью $C2.", ch, 0, victim, TO_CHAR);
         oldact("$o1 $c2 скользит по твоему запястью.", ch, axe, victim, TO_VICT);
@@ -896,7 +896,7 @@ void UndefinedOneHit::damEffectSlice( )
         gsn_slice->improve( ch, false, victim );
         return;
     }
-    
+
     ch->setWait(gsn_slice->getBeats(ch) );
     victim->setWait(2 * gsn_slice->getBeats(victim) );
 
@@ -963,7 +963,7 @@ void UndefinedOneHit::damEffectSlice( )
         sliced.push_back( wear_hands );
         sliced.push_back( wear_arms );
     }
-    
+
     for (unsigned int s = 0; s < sliced.size( ); s++) {
         Wearlocation *loc = wearlocationManager->find( sliced[s] );
         Object *obj = loc->find( victim );
@@ -1043,14 +1043,14 @@ int UndefinedOneHit::getDestroyChance( Object *destroy )
         return 0;
 
     if (material_is_typed( wield, MAT_METAL )) {
-        chance = 35; 
+        chance = 35;
 
         if (material_is_flagged( wield, MAT_TOUGH ))
-            chance += 15; 
+            chance += 15;
 
         if (material_is_typed( destroy, MAT_METAL ))  
             chance -= 20;
-        else                         
+        else
             chance += 35; 
     }
     else {
@@ -1064,10 +1064,10 @@ int UndefinedOneHit::getDestroyChance( Object *destroy )
     chance += (wield->level - destroy->level) / 2;
 
     if (IS_WEAPON_STAT(wield,WEAPON_SHARP))
-        chance += 20; 
+        chance += 20;
 
     if (weapon_sn == gsn_axe) 
-        chance += 20; 
+        chance += 20;
         
     if (IS_OBJ_STAT( destroy, ITEM_BLESS)) 
         chance -= 10;
