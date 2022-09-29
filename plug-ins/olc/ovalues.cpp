@@ -91,9 +91,9 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_WAND:
     case ITEM_STAFF:
         sprintf(buf,
-                  "[v0] Level:          [%u]\n\r"
-                  "[v1] Charges Total:  [%u]\n\r"
-                  "[v2] Charges Left:   [%u]\n\r"
+                  "[v0] Level:          [%d]\n\r"
+                  "[v1] Charges Total:  [%d]\n\r"
+                  "[v2] Charges Left:   [%d]\n\r"
                   "[v3] Spell:          %s {D(? spells){x\n\r",
                   obj->value[0],
                   obj->value[1],
@@ -104,10 +104,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_PORTAL:
         sprintf(buf,
-                  "[v0] Charges:        [%u]\n\r"
+                  "[v0] Charges:        [%d]\n\r"
                   "[v1] Exit Flags:     %s {D(? exit_flags){x\n\r"
                   "[v2] Portal Flags:   %s {D(? portal_flags){x\n\r"
-                  "[v3] Goes to (vnum): [%u]\n\r"
+                  "[v3] Goes to (vnum): [%d]\n\r"
                   "[v4] Has key(vnum):  [%d]\n\r",
                   obj->value[0],
                   exit_flags.names(obj->value[1]).c_str(),
@@ -118,11 +118,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_FURNITURE:
         sprintf(buf,
-                  "[v0] Max people:      [%u]\n\r"
-                  "[v1] Max weight:      [%u]\n\r"
+                  "[v0] Max people:      [%d]\n\r"
+                  "[v1] Max weight:      [%d]\n\r"
                   "[v2] Furniture Flags: %s {D(? furniture_flags){x\n\r"
-                  "[v3] Heal bonus:      [%u]\n\r"
-                  "[v4] Mana bonus:      [%u]\n\r",
+                  "[v3] Heal bonus:      [%d]\n\r"
+                  "[v4] Mana bonus:      [%d]\n\r",
                   obj->value[0],
                   obj->value[1],
                   furniture_flags.names(obj->value[2]).c_str(),
@@ -135,7 +135,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_POTION:
     case ITEM_PILL:
         sprintf(buf,
-                  "[v0] Level:  [%u]\n\r"
+                  "[v0] Level:  [%d]\n\r"
                   "[v1] Spell:  %s {D(? spells){x\n\r"
                   "[v2] Spell:  %s\n\r"
                   "[v3] Spell:  %s\n\r"
@@ -150,10 +150,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_ARMOR:
         sprintf(buf,
-                  "[v0] Ac pierce       [%u]\n\r"
-                  "[v1] Ac bash         [%u]\n\r"
-                  "[v2] Ac slash        [%u]\n\r"
-                  "[v3] Ac exotic       [%u]\n\r",
+                  "[v0] Ac pierce       [%d]\n\r"
+                  "[v1] Ac bash         [%d]\n\r"
+                  "[v2] Ac slash        [%d]\n\r"
+                  "[v3] Ac exotic       [%d]\n\r",
                   obj->value[0],
                   obj->value[1],
                   obj->value[2],
@@ -168,8 +168,8 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
             weapon_class.name(obj->value[0]).c_str());
             
         if (!random) {
-            ptc(ch, "[v1] Число бросков кубика: [%u]\n\r", obj->value[1]);
-            ptc(ch, "[v2] Число граней кубика : [%u] {D(повреждения %ud%u, среднее %u = (v2+1)*v1/2){x\r\n", 
+            ptc(ch, "[v1] Число бросков кубика: [%d]\n\r", obj->value[1]);
+            ptc(ch, "[v2] Число граней кубика : [%d] {D(повреждения %dd%d, среднее %d = (v2+1)*v1/2){x\r\n", 
                         obj->value[2], obj->value[1], obj->value[2], weapon_ave(obj));
         }
 
@@ -184,11 +184,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_CONTAINER:
         ptc(ch,
-            "[v0] Вместимость:[%u кг]\n\r"
+            "[v0] Вместимость:[%d кг]\n\r"
             "[v1] Флаги:      [%s] {D(? container_flags){x\n\r"
             "[v2] Ключ:        %s [%d]\n\r"
-            "[v3] Макс. вес:  [%u]\n\r"
-            "[v4] Коэф. снижения веса: [%u]\n\r",
+            "[v3] Макс. вес:  [%d]\n\r"
+            "[v4] Коэф. снижения веса: [%d]\n\r",
             obj->value[0],
             container_flags.names(obj->value[1]).c_str(),
             (obj->value[2] > 0 && get_obj_index(obj->value[2])) ? get_obj_index(obj->value[2])->short_descr
@@ -200,11 +200,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_DRINK_CON:
         ptc(ch,
-            "[v0] Всего жидкости:  [%u]\n\r"
-            "[v1] Налито жидкости: [%u]\n\r"
+            "[v0] Всего жидкости:  [%d]\n\r"
+            "[v1] Налито жидкости: [%d]\n\r"
             "[v2] Тип жидкости:     %s (%s) {D(? liquid){x\n\r"
             "[v3] Флаги:            %s {D(? drink_flags){x\n\r"
-            "[v4] Пробка:           %u\n\r",
+            "[v4] Пробка:           %d\n\r",
             obj->value[0],
             obj->value[1],
             liquidManager->find( obj->value[2] )->getName( ).c_str( ),
@@ -215,10 +215,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_FOUNTAIN:
         ptc(ch, 
-            "[v0] Liquid Total: [%u]\n\r"
-            "[v1] Liquid Left:  [%u]\n\r"
+            "[v0] Liquid Total: [%d]\n\r"
+            "[v1] Liquid Left:  [%d]\n\r"
             "[v2] Liquid:       %s (%s) {D(? liquid){x\n\r"
-            "[v3] Max people:      [%u]\n\r"
+            "[v3] Max people:      [%d]\n\r"
             "[v4] Furniture Flags: %s {D(? furniture_flags){x\n\r",
             obj->value[0],
             obj->value[1],
@@ -230,8 +230,8 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 
     case ITEM_FOOD:
         ptc(ch,
-            "[v0] Food hours: [%u]\n\r"
-            "[v1] Full hours: [%u]\n\r"
+            "[v0] Food hours: [%d]\n\r"
+            "[v1] Full hours: [%d]\n\r"
             "[v3] Poisoned:   %s\n\r",
             obj->value[0],
             obj->value[1],
@@ -239,8 +239,8 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
 
     case ITEM_MONEY:
-        ptc(ch, "[v0] Silver:   [%u]\n\r", obj->value[0]);
-        ptc(ch, "[v1] Gold:     [%u]\n\r", obj->value[1]);
+        ptc(ch, "[v0] Silver:   [%d]\n\r", obj->value[0]);
+        ptc(ch, "[v1] Gold:     [%d]\n\r", obj->value[1]);
         break;
 
     }
