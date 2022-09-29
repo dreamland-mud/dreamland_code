@@ -494,9 +494,9 @@ NMI_INVOKE( Root, eval , "(expr): выполнить феневое выраже
 NMI_INVOKE(Root, create_money, "(gold, silver): создает объект-деньги указанной стоимости")
 {
     int gold = argnum2number(args, 1);
-    int silver = argnum2number(args, 2);	
+    int silver = argnum2number(args, 2);
     return wrap(
-		create_money(gold, silver));
+        create_money(gold, silver));
 }
 
 inline bool 
@@ -704,7 +704,7 @@ NMI_INVOKE(Root, object, "(id): поиск феневого объекта по 
 NMI_INVOKE(Root, object2, "(id): поиск феневого объекта по СТРОКЕ с глобальным ID (cистемное)" )
 {
     DLString idStr = args2string(args);
-    long long id = idStr.toLongLong();    
+    long long id = idStr.toLongLong();
     WrapperManagerBase::WrapperMap::const_iterator i = WrapperManagerBase::map.find(id);
 
     if (i == WrapperManagerBase::map.end())
@@ -1149,7 +1149,7 @@ NMI_INVOKE( Root, SkillCommand , "(name): находит команду для �
 NMI_INVOKE( Root, Skill, "(name|gsn): конструктор для умения по имени или числу" )
 {
     Skill *skill = argnum2skill(args, 1);
-    return Register::handler<SkillWrapper>(skill->getName());    
+    return Register::handler<SkillWrapper>(skill->getName());
 }
 
 NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для нового умения" )
@@ -1288,7 +1288,7 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
             skills->push_back(Register(skill->getName()));
     }
 
-    return wrap(skills);    
+    return wrap(skills);
 }
 
 NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier")
@@ -1296,7 +1296,7 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить 
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
     int bestTier = argnum2number(args, 3);
-	bool stats = args.size() > 3 ? argnum2boolean(args, 4) : false;
+    bool stats = args.size() > 3 ? argnum2boolean(args, 4) : false;
     
     if (obj->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for randomize.");
@@ -1307,7 +1307,7 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить 
         WeaponGenerator()
             .item(obj)
             .alignment(ch->alignment)
-            .player(ch->getPC())            
+            .player(ch->getPC())
             .tier(bestTier)
             .randomizeStats();
     }
@@ -1317,7 +1317,7 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats]): применить 
             .alignment(ch->alignment)
             .player(ch->getPC())
             .randomTier(bestTier)
-            .randomizeAll();    
+            .randomizeAll();
     }
         
     return Register();
@@ -1327,64 +1327,64 @@ NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]
 {
     ::Object *weapon = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
-	Skill *skill = argnum2skill(args, 3);
+    Skill *skill = argnum2skill(args, 3);
     int tier = argnum2number(args, 4);
-	int hr_tier, dr_tier;
-	hr_tier = dr_tier = tier;
-	float penalty = args.size() > 4 ? argnum2number(args, 5) / 100.0 : 1; // must be specified in %
-	bool increment = args.size() > 5 ? argnum2boolean(args, 6) : false;
+    int hr_tier, dr_tier;
+    hr_tier = dr_tier = tier;
+    float penalty = args.size() > 4 ? argnum2number(args, 5) / 100.0 : 1; // must be specified in %
+    bool increment = args.size() > 5 ? argnum2boolean(args, 6) : false;
 
     if (weapon->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for generation.");
     if (tier < BEST_TIER || tier > WORST_TIER)
         throw Scripting::Exception("Invalid weapon tier.");
-	
-	if (IS_GOOD(ch)) {
-		hr_tier = min(BEST_TIER, hr_tier + 1);
-		dr_tier = max(WORST_TIER, dr_tier - 1);
-	}
-	if (IS_EVIL(ch)) {
-		dr_tier = min(BEST_TIER, dr_tier + 1);
-		hr_tier = max(WORST_TIER, hr_tier - 1);
-	}
-	
-	if (!increment) {
-		if (penalty < 1) {
-    		WeaponGenerator()
-        		.item(weapon)
-        		.skill(skill->getIndex())
-        		.valueTier(tier)
-        		.hitrollTier(hr_tier)
-        		.damrollTier(dr_tier)
-        		.hitrollMinStartValue(1)
-        		.damrollMinStartValue(1)
-        		.hitrollStartPenalty(penalty)
-        		.damrollStartPenalty(penalty)
-        		.assignValues()
-        		.assignStartingHitroll()
-        		.assignStartingDamroll();	
-		}
-		else {
-    		WeaponGenerator()
-        		.item(weapon)
-        		.skill(skill->getIndex())
-        		.valueTier(tier)
-        		.hitrollTier(hr_tier)
-        		.damrollTier(dr_tier)
-        		.assignValues()
-        		.assignHitroll()
-        		.assignDamroll();			
-		}
-	}
-	else {
-    	WeaponGenerator()
-        	.item(weapon)
-        	.skill(skill->getIndex())
-        	.hitrollTier(hr_tier)
-        	.damrollTier(dr_tier)
-        	.incrementHitroll()
-        	.incrementDamroll();		
-	}
+
+    if (IS_GOOD(ch)) {
+        hr_tier = min(BEST_TIER, hr_tier + 1);
+        dr_tier = max(WORST_TIER, dr_tier - 1);
+    }
+    if (IS_EVIL(ch)) {
+        dr_tier = min(BEST_TIER, dr_tier + 1);
+        hr_tier = max(WORST_TIER, hr_tier - 1);
+    }
+
+    if (!increment) {
+        if (penalty < 1) {
+            WeaponGenerator()
+                .item(weapon)
+                .skill(skill->getIndex())
+                .valueTier(tier)
+                .hitrollTier(hr_tier)
+                .damrollTier(dr_tier)
+                .hitrollMinStartValue(1)
+                .damrollMinStartValue(1)
+                .hitrollStartPenalty(penalty)
+                .damrollStartPenalty(penalty)
+                .assignValues()
+                .assignStartingHitroll()
+                .assignStartingDamroll();
+        }
+        else {
+            WeaponGenerator()
+                .item(weapon)
+                .skill(skill->getIndex())
+                .valueTier(tier)
+                .hitrollTier(hr_tier)
+                .damrollTier(dr_tier)
+                .assignValues()
+                .assignHitroll()
+                .assignDamroll();
+        }
+    }
+    else {
+        WeaponGenerator()
+            .item(weapon)
+            .skill(skill->getIndex())
+            .hitrollTier(hr_tier)
+            .damrollTier(dr_tier)
+            .incrementHitroll()
+            .incrementDamroll();
+    }
         
     return Register();
 }

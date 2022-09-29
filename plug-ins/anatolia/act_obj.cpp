@@ -402,7 +402,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho("Осторожно, ты уже несешь слишком много вещей.");
         else {
-			ch->pecho("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4.", ch->canCarryNumber( ), obj);
+            ch->pecho("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4.", ch->canCarryNumber( ), obj);
             return false;
         }
     }
@@ -412,7 +412,7 @@ static bool can_get_obj( Character *ch, Object *obj )
         if (ch->is_immortal())
             ch->pecho("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой.", ch);
         else {
-			ch->pecho("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4.", ch->canCarryWeight( ), obj);
+            ch->pecho("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4.", ch->canCarryWeight( ), obj);
             return false;
         }
     }

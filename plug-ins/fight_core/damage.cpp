@@ -178,47 +178,47 @@ void Damage::adjustPosition( )
 
     if (!ch->in_room || ch->in_room != victim->in_room)
         return;
-    
-	// Players take turn attacking first, then mobs: adjustPosition() is called for each strike.
-	// Character should stand up when they're attacking and have initiative.
-	// If prone mob hits player, mob should stand up immediately (if the wait is over).
-	// If prone player hits mob, player should stand up immediately (if the wait is over).	
-	if (ch->wait < 1 && ch->position > POS_STUNNED && ch->position < POS_FIGHTING) {
-		if ( (IS_AFFECTED(ch, AFF_STUN)) ||
-		     (IS_AFFECTED(ch, AFF_WEAK_STUN) && number_percent( ) < 50) ||
-			 (ch->daze > 0 && number_percent( ) < 25) )
-			return;	// Can't stand up if stunned, 50% chance if weak_stun, 75% chance if dazed
 
-    	switch (ch->in_room->getSectorType()) {
-        	case SECT_AIR: 
-    			ch->pecho("{1{CТы кувыркаешься в воздухе, поворачиваясь к противнику и готовясь к атаке.{2");
-    			ch->recho("{1{C%1$^C1 кувырка%1$nется|ются в воздухе, поворачиваясь к противнику и готовясь к атаке.{2", ch);
-				break;
-        	case SECT_WATER_SWIM: 
-    			ch->pecho("{1{BТы встаешь на мелководье и отряхиваешься, готовясь атаковать.{2");
-    			ch->recho("{1{B%1$^C1 вста%1$nет|ют на мелководье и отряхива%1$nется|ются, готовясь атаковать.{2", ch);
-				break;
-        	case SECT_WATER_NOSWIM:
-    			ch->pecho("{1{BТы всплываешь и поворачиваешься к противнику, готовясь к атаке.{2");
-    			ch->recho("{1{B%1$^C1 всплыва%1$nет|ют и поворачива%1$nется|ются к противнику, готовясь к атаке.{2", ch);
-				break;				
-        	case SECT_UNDERWATER: 
-    			ch->pecho("{1{bТы кувыркаешься под водой, поворачиваясь к противнику и готовясь к атаке.{2");
-    			ch->recho("{1{b%1$^C1 кувырка%1$nется|ются под водой, поворачиваясь к противнику и готовясь к атаке.{2", ch);
-				break;				
-        	default: 
-   				ch->pecho("{1{WТы наконец поднимаешься и встаешь, готовясь атаковать.{2");
-    			ch->recho("{1%1$^C1 {Wнаконец поднима%1$nется|ются и вста%1$nет|ют, готовясь атаковать.{2", ch);
-				break;				
-    	}
-		
-		ch->position = POS_FIGHTING;
-		return;
-	}
-	// Don't adjust position for the victim. 
-	// If player hits prone mob, mob should stand up later in this round (when mob is ch).
-	// If mob hits prone player, player should stand up only in the next round (when player is ch).
-	// If player hits prone player, prone player should not stand up.
+    // Players take turn attacking first, then mobs: adjustPosition() is called for each strike.
+    // Character should stand up when they're attacking and have initiative.
+    // If prone mob hits player, mob should stand up immediately (if the wait is over).
+    // If prone player hits mob, player should stand up immediately (if the wait is over).
+    if (ch->wait < 1 && ch->position > POS_STUNNED && ch->position < POS_FIGHTING) {
+        if ( (IS_AFFECTED(ch, AFF_STUN)) ||
+            (IS_AFFECTED(ch, AFF_WEAK_STUN) && number_percent( ) < 50) ||
+            (ch->daze > 0 && number_percent( ) < 25) )
+            return;    // Can't stand up if stunned, 50% chance if weak_stun, 75% chance if dazed
+
+        switch (ch->in_room->getSectorType()) {
+            case SECT_AIR:
+                ch->pecho("{1{CТы кувыркаешься в воздухе, поворачиваясь к противнику и готовясь к атаке.{2");
+                ch->recho("{1{C%1$^C1 кувырка%1$nется|ются в воздухе, поворачиваясь к противнику и готовясь к атаке.{2", ch);
+                break;
+            case SECT_WATER_SWIM:
+                ch->pecho("{1{BТы встаешь на мелководье и отряхиваешься, готовясь атаковать.{2");
+                ch->recho("{1{B%1$^C1 вста%1$nет|ют на мелководье и отряхива%1$nется|ются, готовясь атаковать.{2", ch);
+                break;
+            case SECT_WATER_NOSWIM:
+                ch->pecho("{1{BТы всплываешь и поворачиваешься к противнику, готовясь к атаке.{2");
+                ch->recho("{1{B%1$^C1 всплыва%1$nет|ют и поворачива%1$nется|ются к противнику, готовясь к атаке.{2", ch);
+                break;
+            case SECT_UNDERWATER:
+                ch->pecho("{1{bТы кувыркаешься под водой, поворачиваясь к противнику и готовясь к атаке.{2");
+                ch->recho("{1{b%1$^C1 кувырка%1$nется|ются под водой, поворачиваясь к противнику и готовясь к атаке.{2", ch);
+                break;
+            default:
+                ch->pecho("{1{WТы наконец поднимаешься и встаешь, готовясь атаковать.{2");
+                ch->recho("{1%1$^C1 {Wнаконец поднима%1$nется|ются и вста%1$nет|ют, готовясь атаковать.{2", ch);
+                break;
+        }
+        
+        ch->position = POS_FIGHTING;
+        return;
+    }
+    // Don't adjust position for the victim. 
+    // If player hits prone mob, mob should stand up later in this round (when mob is ch).
+    // If mob hits prone player, player should stand up only in the next round (when player is ch).
+    // If player hits prone player, prone player should not stand up.
 }
 
 

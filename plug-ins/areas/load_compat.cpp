@@ -746,10 +746,10 @@ void load_rooms( FILE *fp )
             }
         }
 
-        if ((pRoomIndex->sector_type == SECT_WATER_NOSWIM 
+        if ((pRoomIndex->sector_type == SECT_WATER_NOSWIM
             || pRoomIndex->sector_type == SECT_WATER_SWIM
             || pRoomIndex->sector_type == SECT_UNDERWATER
-            || pRoomIndex->room_flags == ROOM_NEAR_WATER) 
+            || IS_SET(pRoomIndex->room_flags, ROOM_NEAR_WATER) )
                 && pRoomIndex->liquid == liq_none)
             pRoomIndex->liquid = liq_water;
 
