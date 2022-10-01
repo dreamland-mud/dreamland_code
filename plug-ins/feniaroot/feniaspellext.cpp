@@ -23,6 +23,7 @@
 #include "damageflags.h"
 #include "fight.h"
 #include "fight_exception.h"
+#include "religionutils.h"
 #include "effects.h"
 #include "defaultspell.h"
 #include "dl_math.h"
@@ -559,21 +560,8 @@ NMI_INVOKE(FeniaSpellContext, hasParticles, "(): достаточно ли ра�
 
 NMI_GET(FeniaSpellContext, rel, "религия кастера, случайный бог для неопределившихся или строка 'бог|и|ов...' для мобов")
 {
-    static const char *gods = "бог|и|ов|ам|ов|ами|ах";
     Character *caster = arg2character(ch);
-    
-    if (caster->is_npc())
-        return gods;
-
-    if (caster->getReligion() == god_none) {
-        XMLStringAttribute::Pointer randomGodAttr = caster->getPC()->getAttributes().findAttr<XMLStringAttribute>("randomGod");
-        if (randomGodAttr && !randomGodAttr->getValue().empty())
-            return religionManager->find(randomGodAttr->getValue())->getRussianName();
-        else
-            return gods;
-    }
-    
-    return caster->getReligion()->getRussianName();
+    return ReligionUtils::godName(caster);    
 }
 
 NMI_INVOKE(FeniaSpellContext, wait, "(seconds): пауза на указанное кол-во секунд")

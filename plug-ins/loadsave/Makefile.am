@@ -37,7 +37,8 @@ fread_utils.cpp \
 itemevents.cpp \
 areautils.cpp \
 roomutils.cpp \
-itemutils.cpp
+itemutils.cpp \
+religionutils.cpp
 
 libloadsave_la_MOC = \
 objectbehaviormanager.h

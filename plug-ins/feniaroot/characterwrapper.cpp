@@ -52,6 +52,7 @@
 #include "recipeflags.h"
 #include "act.h"
 #include "selfrate.h"
+#include "religionutils.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -982,6 +983,12 @@ NMI_GET( CharacterWrapper, religion, "религия (структура .Religi
     checkTarget( );
     CHK_NPC
     return Register::handler<ReligionWrapper>( target->getPC( )->getReligion( )->getName( ) );
+}
+
+NMI_GET( CharacterWrapper, godName, "название религии, случайный бог для неопределившихся или строка 'бог|и|ов...' для мобов" )
+{
+    checkTarget( );
+    return ReligionUtils::godName(target);    
 }
 
 NMI_SET( CharacterWrapper, religion, "религия (структура .Religion)" )

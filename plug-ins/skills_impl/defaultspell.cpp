@@ -23,6 +23,7 @@
 #include "fight_exception.h"
 #include "stats_apply.h"
 #include "commonattributes.h"
+#include "religionutils.h"
 #include "act_move.h"
 #include "profflags.h"
 #include "commandflags.h"
@@ -241,20 +242,6 @@ void DefaultSpell::utterMagicSpell(Character *ch)
     }
 }
 
-static Religion * get_random_god(Character *ch)
-{
-    int cnt = 0;
-    Religion *result = 0;
-
-    for (int r = 0; r < religionManager->size(); r++) {
-        Religion *rel = religionManager->find(r);
-        if (rel->available(ch) && number_range(0, cnt++) == 0)
-            result = rel;
-    }
-
-    return result;
-}
-
 /**
  * Apply spell level penalties for prayers, return 'false' to prevent casting.
  */
@@ -284,15 +271,9 @@ bool DefaultSpell::canPray(Character *ch, int &slevel)
         return false;
     }
 
-    // Choose a random deity to fulfil the prayer and remember their name.
-    XMLStringAttribute::Pointer randomGodAttr = ch->getPC()->getAttributes().getAttr<XMLStringAttribute>("randomGod");
-    randomGodAttr->clear();
-
-    Religion *randomGod = get_random_god(ch);
-    if (randomGod) {
+    Religion *randomGod = ReligionUtils::setRandomGod(ch);
+    if (randomGod)
         ch->pecho("Твою просьбу исполняет %N1 и советует поскорее выбрать себе {hh1религию{x.", randomGod->getRussianName().c_str());
-        randomGodAttr->setValue(randomGod->getName());
-    }
 
     return true;
 }
