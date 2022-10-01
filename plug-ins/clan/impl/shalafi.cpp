@@ -162,7 +162,7 @@ bool ShalafiClan::canInduct(PCharacter *ch) const
         || ch->getReligion() == god_goktengri)
         return false;
 
-    if (ch->getCurrStat(STAT_INT) <= 23)
+    if (ch->getCurrStat(STAT_INT) <  23)
         return false;
         
     return true;
