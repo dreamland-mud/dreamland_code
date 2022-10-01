@@ -69,6 +69,7 @@
 
 #include "act.h"
 #include "../anatolia/handler.h"
+#include "itemutils.h"
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -338,9 +339,8 @@ static bool oprog_msg_furniture(Object *obj, Character *ch, const char *tagRoom,
 CMDRUNP(stand)
 {
     Object *obj = 0;
-    int value_flag;
-    int value_max_people;
-
+    int furniture_flag = 0;
+    
     if (argument[0] != '\0')
     {
         if (ch->position == POS_FIGHTING)
@@ -357,32 +357,17 @@ CMDRUNP(stand)
             return;
         }
 
-        switch (obj->item_type)
-        {
-        default:
-            value_flag = 0;
-            break;
+        furniture_flag = ItemUtils::furnitureFlags(obj);
 
-        case ITEM_FURNITURE:
-            value_flag = 2;
-            value_max_people = 0;
-            break;
-
-        case ITEM_FOUNTAIN:
-            value_flag = 4;
-            value_max_people = 3;
-            break;
-        }
-
-        if (value_flag == 0 || (!IS_SET(obj->valueByIndex(value_flag), STAND_AT) &&
-                                !IS_SET(obj->valueByIndex(value_flag), STAND_ON) &&
-                                !IS_SET(obj->valueByIndex(value_flag), STAND_IN)))
+        if (furniture_flag == 0 || (!IS_SET(furniture_flag, STAND_AT) &&
+                                !IS_SET(furniture_flag, STAND_ON) &&
+                                !IS_SET(furniture_flag, STAND_IN)))
         {
             ch->pecho("Ты не можешь стоять на этом.");
             return;
         }
 
-        if (ch->on != obj && count_users(obj) >= obj->valueByIndex(value_max_people))
+        if (ch->on != obj && count_users(obj) >= ItemUtils::furnitureMaxPeople(obj))
         {
             oldact_p("На $o6 нет свободного места.", ch, obj, 0, TO_ROOM, POS_DEAD);
             return;
@@ -408,12 +393,12 @@ CMDRUNP(stand)
         }
         else if (!oprog_msg_furniture(obj, ch, "msgWakeStandRoom", "msgWakeStandChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), STAND_AT))
+            if (IS_SET(furniture_flag, STAND_AT))
             {
                 oldact_p("Ты просыпаешься и становишься возле $o2.", ch, obj, 0, TO_CHAR, POS_DEAD);
                 oldact("$c1 просыпается и становится возле $o2.", ch, obj, 0, TO_ROOM);
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), STAND_ON))
+            else if (IS_SET(furniture_flag, STAND_ON))
             {
                 oldact_p("Ты просыпаешься и становишься на $o4.", ch, obj, 0, TO_CHAR, POS_DEAD);
                 oldact("$c1 просыпается и становится на $o4.", ch, obj, 0, TO_ROOM);
@@ -453,12 +438,12 @@ CMDRUNP(stand)
         }
         else if (!oprog_msg_furniture(obj, ch, "msgStandRoom", "msgStandChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), STAND_AT))
+            if (IS_SET(furniture_flag, STAND_AT))
             {
                 oldact("Ты становишься возле $o2.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 становится возле $o2.", ch, obj, 0, TO_ROOM);
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), STAND_ON))
+            else if (IS_SET(furniture_flag, STAND_ON))
             {
                 oldact("Ты становишься на $o4.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 становится на $o4.", ch, obj, 0, TO_ROOM);
@@ -483,8 +468,7 @@ CMDRUNP(stand)
 CMDRUNP(rest)
 {
     Object *obj = 0;
-    int value_flag;
-    int value_max_people;
+    int furniture_flag = 0;
 
     if (ch->position == POS_FIGHTING)
     {
@@ -532,31 +516,17 @@ CMDRUNP(rest)
 
     if (obj != 0)
     {
-        switch (obj->item_type)
-        {
-        default:
-            value_flag = 0;
-            break;
+        furniture_flag = ItemUtils::furnitureFlags(obj);
 
-        case ITEM_FURNITURE:
-            value_flag = 2;
-            value_max_people = 0;
-            break;
-
-        case ITEM_FOUNTAIN:
-            value_flag = 4;
-            value_max_people = 3;
-            break;
-        }
-        if (value_flag == 0 || (!IS_SET(obj->valueByIndex(value_flag), REST_AT) &&
-                                !IS_SET(obj->valueByIndex(value_flag), REST_ON) &&
-                                !IS_SET(obj->valueByIndex(value_flag), REST_IN)))
+        if (furniture_flag == 0 || (!IS_SET(furniture_flag, REST_AT) &&
+                                !IS_SET(furniture_flag, REST_ON) &&
+                                !IS_SET(furniture_flag, REST_IN)))
         {
             ch->pecho("Ты не можешь отдыхать на этом.");
             return;
         }
 
-        if (ch->on != obj && count_users(obj) >= obj->valueByIndex(value_flag))
+        if (ch->on != obj && count_users(obj) >= ItemUtils::furnitureMaxPeople(obj))
         {
             oldact_p("На $o6 нет свободного места.", ch, obj, 0, TO_CHAR, POS_DEAD);
             return;
@@ -579,13 +549,13 @@ CMDRUNP(rest)
         }
         else if (!oprog_msg_furniture(obj, ch, "msgWakeRestRoom", "msgWakeRestChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), REST_AT))
+            if (IS_SET(furniture_flag, REST_AT))
             {
                 oldact_p("Ты просыпаешься и садишься отдыхать возле $o2.",
                          ch, obj, 0, TO_CHAR, POS_SLEEPING);
                 oldact("$c1 просыпается и садится отдыхать возле $o2.", ch, obj, 0, TO_ROOM);
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), REST_ON))
+            else if (IS_SET(furniture_flag, REST_ON))
             {
                 oldact_p("Ты просыпаешься и садишься отдыхать на $o4.",
                          ch, obj, 0, TO_CHAR, POS_SLEEPING);
@@ -613,12 +583,12 @@ CMDRUNP(rest)
         }
         else if (!oprog_msg_furniture(obj, ch, "msgSitRestRoom", "msgSitRestChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), REST_AT))
+            if (IS_SET(furniture_flag, REST_AT))
             {
                 oldact("Ты садишься возле $o2 и отдыхаешь.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 садится возле $o2 и отдыхает.", ch, obj, 0, TO_ROOM);
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), REST_ON))
+            else if (IS_SET(furniture_flag, REST_ON))
             {
                 oldact("Ты садишься на $o4 и отдыхаешь.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 садится на $o4 и отдыхает.", ch, obj, 0, TO_ROOM);
@@ -640,12 +610,12 @@ CMDRUNP(rest)
         }
         else if (!oprog_msg_furniture(obj, ch, "msgRestRoom", "msgRestChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), REST_AT))
+            if (IS_SET(furniture_flag, REST_AT))
             {
                 oldact("Ты отдыхаешь возле $o2.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 отдыхает возле $o2.", ch, obj, 0, TO_ROOM);
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), REST_ON))
+            else if (IS_SET(furniture_flag, REST_ON))
             {
                 oldact("Ты отдыхаешь на $o6.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 отдыхает на $o6.", ch, obj, 0, TO_ROOM);
@@ -673,8 +643,7 @@ CMDRUNP(rest)
 CMDRUNP(sit)
 {
     Object *obj = 0;
-    int value_flag;
-    int value_max_people;
+    int furniture_flag = 0;
 
     if (ch->position == POS_FIGHTING)
     {
@@ -728,31 +697,17 @@ CMDRUNP(sit)
 
     if (obj != 0)
     {
-        switch (obj->item_type)
-        {
-        default:
-            value_flag = 0;
-            break;
+        furniture_flag = ItemUtils::furnitureFlags(obj);
 
-        case ITEM_FURNITURE:
-            value_flag = 2;
-            value_max_people = 0;
-            break;
-
-        case ITEM_FOUNTAIN:
-            value_flag = 4;
-            value_max_people = 3;
-            break;
-        }
-        if (value_flag == 0 || (!IS_SET(obj->valueByIndex(value_flag), SIT_AT) &&
-                                !IS_SET(obj->valueByIndex(value_flag), SIT_ON) &&
-                                !IS_SET(obj->valueByIndex(value_flag), SIT_IN)))
+        if (furniture_flag == 0 || (!IS_SET(furniture_flag, SIT_AT) &&
+                                !IS_SET(furniture_flag, SIT_ON) &&
+                                !IS_SET(furniture_flag, SIT_IN)))
         {
             ch->pecho("Ты не можешь сесть на это.");
             return;
         }
 
-        if (ch->on != obj && count_users(obj) >= obj->valueByIndex(value_flag))
+        if (ch->on != obj && count_users(obj) >= ItemUtils::furnitureMaxPeople(obj))
         {
             oldact_p("На $o6 нет больше свободного места.", ch, obj, 0, TO_CHAR, POS_DEAD);
             return;
@@ -771,12 +726,12 @@ CMDRUNP(sit)
         }
         else if (!oprog_msg_furniture(obj, ch, "msgWakeSitRoom", "msgWakeSitChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), SIT_AT))
+            if (IS_SET(furniture_flag, SIT_AT))
             {
                 oldact_p("Ты просыпаешься и садишься возле $o2.", ch, obj, 0, TO_CHAR, POS_DEAD);
                 oldact("$c1 просыпается и садится возле $o2.", ch, obj, 0, TO_ROOM);
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), SIT_ON))
+            else if (IS_SET(furniture_flag, SIT_ON))
             {
                 oldact_p("Ты просыпаешься и садишься на $o4.", ch, obj, 0, TO_CHAR, POS_DEAD);
                 oldact("$c1 просыпается и садится на $o4.", ch, obj, 0, TO_ROOM);
@@ -796,13 +751,12 @@ CMDRUNP(sit)
             ch->pecho("Ты прекращаешь отдых.");
         else if (!oprog_msg_furniture(obj, ch, "msgSitRoom", "msgSitChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), SIT_AT))
+            if (IS_SET(furniture_flag, SIT_AT))
             {
                 oldact("Ты садишься возле $o2.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 садится возле $o2.", ch, obj, 0, TO_ROOM);
             }
-
-            else if (IS_SET(obj->valueByIndex(value_flag), SIT_ON))
+            else if (IS_SET(furniture_flag, SIT_ON))
             {
                 oldact("Ты садишься на $o4.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 садится на $o4.", ch, obj, 0, TO_ROOM);
@@ -829,12 +783,12 @@ CMDRUNP(sit)
         }
         else if (!oprog_msg_furniture(obj, ch, "msgSitRoom", "msgSitChar"))
         {
-            if (IS_SET(obj->valueByIndex(value_flag), SIT_AT))
+            if (IS_SET(furniture_flag, SIT_AT))
             {
                 oldact("Ты садишься возле $o2.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 садится возле $o2.", ch, obj, 0, TO_ROOM);
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), SIT_ON))
+            else if (IS_SET(furniture_flag, SIT_ON))
             {
                 oldact("Ты садишься на $o4.", ch, obj, 0, TO_CHAR);
                 oldact("$c1 садится на $o4.", ch, obj, 0, TO_ROOM);
@@ -863,8 +817,7 @@ CMDRUNP(sleep)
 {
     Object *obj = 0;
     ostringstream toMe, toRoom;
-    int value_flag;
-    int value_max_people;
+    int furniture_flag = 0;
 
     if (MOUNTED(ch))
     {
@@ -923,31 +876,17 @@ CMDRUNP(sleep)
                 return;
             }
 
-            switch (obj->item_type)
-            {
-            default:
-                value_flag = 0;
-                break;
+            furniture_flag = ItemUtils::furnitureFlags(obj);
 
-            case ITEM_FURNITURE:
-                value_flag = 2;
-                value_max_people = 0;
-                break;
-
-            case ITEM_FOUNTAIN:
-                value_flag = 4;
-                value_max_people = 3;
-                break;
-            }
-            if (value_flag == 0 || (!IS_SET(obj->valueByIndex(value_flag), SLEEP_AT) &&
-                                    !IS_SET(obj->valueByIndex(value_flag), SLEEP_ON) &&
-                                    !IS_SET(obj->valueByIndex(value_flag), SLEEP_IN)))
+            if (furniture_flag == 0 || (!IS_SET(furniture_flag, SLEEP_AT) &&
+                                    !IS_SET(furniture_flag, SLEEP_ON) &&
+                                    !IS_SET(furniture_flag, SLEEP_IN)))
             {
                 ch->pecho("Ты не можешь спать на этом!");
                 return;
             }
 
-            if (ch->on != obj && count_users(obj) >= obj->valueByIndex(value_flag))
+            if (ch->on != obj && count_users(obj) >=  ItemUtils::furnitureMaxPeople(obj))
             {
                 oldact_p("На $o6 не осталось свободного места для тебя.",
                          ch, obj, 0, TO_CHAR, POS_DEAD);
@@ -963,12 +902,12 @@ CMDRUNP(sleep)
             toMe << "Ты ложишься спать ";
             toRoom << "%1$^C1 ложится спать ";
 
-            if (IS_SET(obj->valueByIndex(value_flag), SLEEP_AT))
+            if (IS_SET(furniture_flag, SLEEP_AT))
             {
                 toMe << "возле %2$O2";
                 toRoom << "возле %2$O2";
             }
-            else if (IS_SET(obj->valueByIndex(value_flag), SLEEP_ON))
+            else if (IS_SET(furniture_flag, SLEEP_ON))
             {
                 toMe << "на %2$O4";
                 toRoom << "на %2$O4";
