@@ -152,7 +152,7 @@ void char_update_affects( Character *ch );
 /* used for saving */
 
 //#define MAX_VNUM ( 0x08000 )
-#define MAX_VNUM ( 65535 )
+#define MAX_VNUM ( 110000 )
 
 static Room * saving_table[MAX_VNUM];
 static int saving_size = 655;   // because 10 savings per tick.
