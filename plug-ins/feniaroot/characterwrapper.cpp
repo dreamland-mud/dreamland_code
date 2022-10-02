@@ -1779,7 +1779,7 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype[,label]): нанес
     if (args.size() > 3)
         label = argnum2string(args, 4);
 
-    ::rawdamage(target, victim, dam_type, dam, true, label);
+    ::rawdamage_nocatch(target, victim, dam_type, dam, true, label);
 
     return Register( );
 }
@@ -1803,7 +1803,7 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype,damflags[,sho
     bitstring_t damflags = argnum2flag(args, 5, damage_flags);
     bool show = args.size() > 5 ? argnum2boolean(args, 6) : true;
 
-    return ::damage(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
+    return ::damage_nocatch(target, victim, dam, skill->getIndex( ), dam_type, show, damflags);
 }
 
 NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один удар оружием" )
