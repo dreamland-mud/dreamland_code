@@ -1024,6 +1024,13 @@ NMI_GET( BonusWrapper, color, "буква цвета в календаре" )
     return getTarget()->getColor();
 }
 
+
+NMI_INVOKE( BonusWrapper, active, "(ch): вернет true если бонус сейчас активен")
+{
+    PCharacter *ch = argnum2player(args, 1);
+    return getTarget()->isActive(ch, time_info);
+}
+
 NMI_INVOKE( BonusWrapper, give, "(ch,days): дать бонус на days дней. Вернет true, если присвоено успешно.")
 {
     PCharacter *ch = argnum2player(args, 1);
