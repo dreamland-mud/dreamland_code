@@ -555,14 +555,24 @@ NMI_INVOKE(RoomWrapper, isCommon, "(): true если комната доступ
 NMI_INVOKE( RoomWrapper, echo, "(fmt, args): выводит отформатированную строку всем неспящим в комнате" )
 {
     checkTarget( );
-    target->echo( POS_RESTING, regfmt( NULL, args ).c_str( ) );
+
+    for (Character *to = target->people; to; to = to->next_in_room) {
+        to->pecho(POS_RESTING, regfmt(to, args).c_str());
+    }
+
     return Register( );
 }
 
 NMI_INVOKE( RoomWrapper, echoAround, "(fmt, args): выводит отформатированную строку всем неспящим в прилегающие комнаты" )
 {
     checkTarget( );
-    target->echoAround( POS_RESTING, regfmt( NULL, args ).c_str( ) );
+
+    for (auto room: RoomUtils::adjancentRooms(target)) {
+        for (Character *to = room->people; to; to = to->next_in_room) {
+            to->pecho(POS_RESTING, regfmt(to, args).c_str());
+        }
+    }
+
     return Register( );
 }
 

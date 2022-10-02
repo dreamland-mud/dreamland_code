@@ -77,3 +77,31 @@ bool RoomUtils::isRandom(Room *room)
 
     return false;
 }
+
+std::list<Room *> RoomUtils::adjancentRooms(Room *source)
+{
+    map<int, bool> roomMarks;
+    list<Room *> result;
+    
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit;
+        Room *room;
+
+        if (!( pexit = source->exit[door] ))
+            continue;
+            
+        if (!( room = pexit->u1.to_room ))
+            continue;
+        
+        if (room == source)
+            continue;
+
+        if (roomMarks[room->vnum] == true)
+            continue;
+            
+        roomMarks[room->vnum] = true;
+        result.push_back(room);
+    }
+
+    return result;
+}

@@ -1,3 +1,4 @@
+
 /* $Id: objectbehavior.h,v 1.1.2.6.6.3 2007/09/11 00:00:29 rufina Exp $
  *
  * ruffina, 2003
