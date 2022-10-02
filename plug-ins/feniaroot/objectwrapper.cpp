@@ -606,8 +606,25 @@ NMI_INVOKE( ObjectWrapper, set_extra_descr , "(key, text): установить 
     return Register( );
 }
 
+NMI_INVOKE( ObjectWrapper, wear, "(wearloc): надеть в указанную локацию тому, кто несет предмет" )
+{
+    Wearlocation *loc;
+    
+    checkTarget();
+    
+    DLString wearloc = args2string(args);
+    if (!target->carried_by)
+        throw Scripting::Exception("object not in inventory");
+    if (target->wear_loc != wear_none)
+        throw Scripting::Exception("object already worn");
+    if (!( loc = wearlocationManager->findExisting(wearloc) ))
+        throw Scripting::Exception("Unknown wearlocation: " + wearloc);
 
-NMI_INVOKE( ObjectWrapper, equip, "(wearloc): надеть в указанную локацию тому, кто несет предмет" )
+    loc->wear( target, F_WEAR_VERBOSE | F_WEAR_REPLACE );
+    return Register( );
+}
+
+NMI_INVOKE( ObjectWrapper, equip, "(wearloc): надеть в указанную локацию тому, кто несет предмет, без проверок и сообщений" )
 {
     Wearlocation *loc;
     
