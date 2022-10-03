@@ -119,7 +119,7 @@ const DLString & Race::getMltName( ) const
     return DLString::emptyString;
 }
 
-DLString Race::getNameFor( Character *, Character *, const Grammar::Case & ) const
+DLString Race::getNameFor( Character *, Character * ) const
 {
     return getName( );
 }

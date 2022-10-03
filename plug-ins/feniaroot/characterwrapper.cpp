@@ -2266,24 +2266,6 @@ NMI_INVOKE( CharacterWrapper, eraseAttribute, "(attr): удаляет аттри
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, canRecall, "(): может ли прямо сейчас воспользоваться возвратом" )
-{
-    checkTarget( );
-
-    if (IS_SET(target->in_room->room_flags, ROOM_NO_RECALL))
-        return false; 
-    if (IS_ROOM_AFFECTED(target->in_room, AFF_ROOM_CURSE))
-        return false;
-    if (IS_AFFECTED(target, AFF_CURSE))
-        return false;
-    if (target->isAffected(gsn_manacles))
-        return false;
-    if (target->position <= POS_SLEEPING || target->fighting)
-        return false;
-
-    return true;
-}
-
 NMI_INVOKE( CharacterWrapper, visible, "(): проявиться из невидимости" )
 {
     checkTarget();

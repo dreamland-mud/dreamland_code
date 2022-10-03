@@ -109,7 +109,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
     for (i = races.begin( ); i != races.end( ); i++) {
         Race *race = raceManager->findExisting(i->first);
         if (race)
-            rnames.push_back(race->getNameFor(ch, ch));
+            rnames.push_back(race->getNameFor(ch, ch).ruscase('1'));
     }
 
     buf << SKILL_INFO_PAD << "Особенность ";

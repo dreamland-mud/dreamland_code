@@ -332,7 +332,7 @@ CMDRUNP( oscore )
     if (ch->getRealLevel( ) != ch->get_trust( ))
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
-    buf << "{wРаса:{W " << ch->getRace( )->getNameFor( ch, ch )
+    buf << "{wРаса:{W " << ch->getRace( )->getNameFor( ch, ch ).ruscase('1')
     << "  {wРазмер:{W " << size_table.message( ch->size )    
         << "  {wПол:{W " << sex_table.message( ch->getSex( ) )
         << "  {wКласс:{W " << ch->getProfession( )->getNameFor( ch );

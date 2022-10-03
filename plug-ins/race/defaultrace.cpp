@@ -364,15 +364,17 @@ const DLString & DefaultRace::getMltName( ) const
 {
     return nameMlt.getValue( );
 }
-DLString DefaultRace::getNameFor( Character *looker, Character *me, const Grammar::Case &c ) const
+DLString DefaultRace::getNameFor( Character *looker, Character *me ) const
 {
     if (looker && me && looker->getConfig( ).rucommands) {
+        if (me->toNoun()->getNumber() == Number::PLURAL)
+            return getMltName();
         if (me->getSex( ) == SEX_MALE)
-            return getMaleName( ).ruscase( c );
+            return getMaleName( );
         if (me->getSex( ) == SEX_FEMALE)
-            return getFemaleName( ).ruscase( c );
+            return getFemaleName( );
         if (me->getSex( ) == SEX_NEUTRAL)
-            return getNeuterName( ).ruscase( c );
+            return getNeuterName( );
     }
     
     return getName( );

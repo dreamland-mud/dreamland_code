@@ -931,7 +931,7 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
 
     if (ch->getConfig( ).rucommands) {
         buf << (IS_VAMPIRE(vict) ? GET_SEX(vict, "вампир", "вампир", "вампирша")
-                                : vict->getRace( )->getNameFor( ch, vict ));
+                                : vict->getRace( )->getNameFor( ch, vict ).ruscase('1'));
     } else {
         buf << GET_SEX(vict, "male", "sexless", "female")
             << " "

@@ -444,7 +444,7 @@ static Object * corpse_create( Character *ch )
     DLString name;
 
     if (ch->is_npc( ) && IS_SET( ch->form, FORM_INSTANT_DECAY|FORM_INTANGIBLE )) {
-        ch->in_room->echo( POS_RESTING, "%1$^C1 превращается в прах и развеивается по ветру, не оставляя после себя трупа.", ch );
+        ch->in_room->echo( POS_RESTING, "%1$^C1 превраща%1$nется|ются в прах и развеива%1$nется|ются по ветру, не оставляя после себя трупа.", ch );
         return NULL;
     }    
     

@@ -453,19 +453,21 @@ NMI_GET( RaceWrapper, nameFemale, "русское название в женск
     return raceManager->find( name )->getFemaleName( );
 }
 
-NMI_INVOKE( RaceWrapper, nameRus, "(ch): русское название в зависимости от пола персонажа ch" ) 
+NMI_INVOKE( RaceWrapper, nameRus, "(ch): русское название в зависимости от пола и числа персонажа ch, с падежами" ) 
 {
-    CharacterWrapper *ch;
-    
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    ch = wrapper_cast<CharacterWrapper>(args.front( ));
+    Character *ch = args2character(args);
+    Race *race = raceManager->find(name);
 
-    if (ch->getTarget( )->getSex( ) == SEX_FEMALE)
-        return raceManager->find( name )->getFemaleName( );
-    else
-        return raceManager->find( name )->getMaleName( );
+    if (ch->toNoun()->getNumber() == Number::PLURAL)
+        return race->getMltName();
+    if (ch->getSex( ) == SEX_MALE)
+        return race->getMaleName();
+    if (ch->getSex( ) == SEX_FEMALE)
+        return race->getFemaleName();
+    if (ch->getSex( ) == SEX_NEUTRAL)
+        return race->getNeuterName();
+
+    return race->getMaleName();
 }
 
 NMI_GET( RaceWrapper, hpBonus, "бонус на здоровья при создании персонажа этой расы" ) 

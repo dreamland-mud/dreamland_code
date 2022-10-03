@@ -453,7 +453,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         wch["name"]["en"] = victim->getName();
         wch["name"]["ru"] = victim->getRussianName().decline('1');
         wch["race"]["en"] = victim->getRace()->getName();
-        wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim);
+        wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim).ruscase('1');
 
         if (victim->getClan() != clan_none && victim->getClan()->isValid())
             wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();

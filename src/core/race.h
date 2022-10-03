@@ -58,7 +58,7 @@ public:
     virtual const DLString & getFemaleName( ) const;
     virtual const DLString & getNeuterName( ) const;
     virtual const DLString & getMltName( ) const;
-    virtual DLString getNameFor( Character *, Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
+    virtual DLString getNameFor( Character *looker, Character *me ) const;
 
 protected:
     DLString name;
