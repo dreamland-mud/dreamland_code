@@ -130,9 +130,17 @@ CMDRUN( fill )
         ch->recho("%^C1 зачерпывает %N4 и наполняет %O4.", ch, liqname, obj);
     }
 
-    if (fountain && fountain->value0() > -1) amount = obj->value0() - obj->value1();
-    obj->value2(liq->getIndex());
-    obj->value1(obj->value0());
+    if (fountain && fountain->value0() > -1) {
+        amount = obj->value0() - obj->value1();
+        amount = min(amount, fountain->value1());
+        obj->value2(liq->getIndex());
+        obj->value1(obj->value1() + amount);
+        fountain->value1(fountain->value1() - amount);
+    }
+    else {
+        obj->value2(liq->getIndex());
+        obj->value1(obj->value0());
+    }
 
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
         drink->fill( ch, fountain, amount ); // fountain can be null here
