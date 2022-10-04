@@ -22,7 +22,7 @@
 
 #include "commandtemplate.h"
 #include "summoncreaturespell.h"
-#include "spelltemplate.h"                                                 
+#include "spelltemplate.h"
 #include "skillcommandtemplate.h"
 #include "skill.h"
 

@@ -129,16 +129,16 @@ CMDRUNP( delete )
         {
             wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
                    "%1$^C1 превращает себя в помехи в проводах.", pch );
-			DLString msg;
-			msg = fmt(0, "{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир.", pch);
-        	infonet(pch, 0, "{CТихий голос из $o2: ", msg.c_str());
-        	send_to_discord_stream(":ghost: " + msg); // discord only here, explicitly asked for by players		
+            DLString msg;
+            msg = fmt(0, "{1{C%1$^C1 идет по пути Арханта и совершает суицид, навсегда покидая этот мир.", pch);
+            infonet(pch, 0, "{CТихий голос из $o2: ", msg.c_str());
+            send_to_discord_stream(":ghost: " + msg); // discord only here, explicitly asked for by players
             delete_player( pch );
             return;
         }
     }
 
-    pch->pecho("{RВНИМАНИЕ: {WЭТО НЕОБРАТИМОЕ ДЕЙСТВИЕ, ТВОЙ ПЕРСОНАЖ БУДЕТ УДАЛЕН НАСОВСЕМ!{x");	
+    pch->pecho("{RВНИМАНИЕ: {WЭТО НЕОБРАТИМОЕ ДЕЙСТВИЕ, ТВОЙ ПЕРСОНАЖ БУДЕТ УДАЛЕН НАСОВСЕМ!{x");
     pch->pecho("Введи {y{ledelete{lrудалить{lx <твой пароль>{x для подтверждения команды.");
     pch->pecho("Чтобы отменить попытку суицида, введи {y{ledelete{lrудалить{lx без пароля.");
     pch->getPC( )->confirm_delete = true;
@@ -355,7 +355,7 @@ CMDRUNP( quit )
         infonet(pch, 0, "{CТихий голос из $o2: ", "{W%1$C1 покину%1$Gло|л|ла Dream Land.{x", pch);
         send_discord_orb(fmt(0, "%1$^C1 покинул%1$Gо||а Dream Land.", pch));
     }
-	
+
     dreamland->removeOption( DL_SAVE_OBJS );
 
     for( obj = pch->carrying; obj ; obj = obj_next)

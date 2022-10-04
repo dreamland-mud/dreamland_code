@@ -380,12 +380,12 @@ bool Character::can_see( const Character *victim ) const
     if ( (!is_npc() && IS_SET(act, PLR_HOLYLIGHT)) || (is_npc() && is_immortal()))
         return true;
 
-    if ( IS_AFFECTED(this, AFF_BLIND) )
+    if (IS_AFFECTED(this, AFF_BLIND) )
         return false;
-	
-	if (position <= POS_SLEEPING)
+
+    if (position <= POS_SLEEPING)
         return false;
-	
+
     if ( !in_room )
         return false;
 

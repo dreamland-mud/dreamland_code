@@ -41,6 +41,7 @@
 #include "liquid.h"
 #include "room.h"
 #include "roomutils.h"
+#include "itemutils.h"
 #include "desire.h"
 #include "screenreader.h"
 #include "descriptor.h"
@@ -533,17 +534,20 @@ void show_char_position( Character *ch, Character *victim,
                          const char *verb, int atFlag, int onFlag,
                          ostringstream &buf )
 {
+    int furniture_flag = 0;
     if (!MOUNTED(victim)) {
         buf << verb << " ";
 
         if (victim->on != 0) {
+            furniture_flag = ItemUtils::furnitureFlags(victim->on);
+            
             DLString rc = oprog_show_where( victim->on, victim, ch );
 
             if (!rc.empty( ))
                 buf << rc;
-            else if (IS_SET(victim->on->value2(), atFlag))
+            else if (IS_SET(furniture_flag, atFlag)) 
                 buf << "возле " << victim->on->getShortDescr( '2' );
-            else if (IS_SET(victim->on->value2(), onFlag))
+            else if (IS_SET(furniture_flag, onFlag))
                 buf << "на " << victim->on->getShortDescr( '6' );
             else
                 buf << "в " << victim->on->getShortDescr( '6' );

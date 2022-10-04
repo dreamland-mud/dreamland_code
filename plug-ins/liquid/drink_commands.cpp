@@ -53,7 +53,7 @@ LIQ(valerian_tincture);
 CMDRUN( fill )
 {
     Object *obj;
-    int amount;
+    int amount = 0;
     Object *fountain = 0;
     Liquid *liq;
     DrinkContainer::Pointer drink;
@@ -130,7 +130,7 @@ CMDRUN( fill )
         ch->recho("%^C1 зачерпывает %N4 и наполняет %O4.", ch, liqname, obj);
     }
 
-    amount = obj->value0() - obj->value1();
+    if (fountain && fountain->value0() > -1) amount = obj->value0() - obj->value1();
     obj->value2(liq->getIndex());
     obj->value1(obj->value0());
 
@@ -152,16 +152,16 @@ static void create_pool( Object *out, int amount )
 {
     Object *pool;
     int time;
-	Liquid *liquid;
+    Liquid *liquid;
     DLString liqShort, liqName;
     Room *room = out->getRoom();
 
     time = amount / 15;    
     if (time == 0) return;
 
-	liquid = liquidManager->find( out->value2() );
+    liquid = liquidManager->find( out->value2() );
     liqShort = liquid->getShortDescr( );
-	liqName  = liquid->getName( );
+    liqName  = liquid->getName( );
     time = std::max( 2, time );
     pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); 
     
@@ -169,21 +169,21 @@ static void create_pool( Object *out, int amount )
         /* mix two liquids */
         if (liqName.c_str() != pool->getMaterial( )) {
             liqShort = "бурд|а|ы|е|у|ой|е";
-		}
+        }
         else { /* same liquid */ 
             pool->timer += time;
             pool->value0(max( 1, pool->timer / 10 ));
-			room->echo( POS_RESTING, "Лужа %N2 растекается еще шире.", liqShort.c_str( ) );
+            room->echo( POS_RESTING, "Лужа %N2 растекается еще шире.", liqShort.c_str( ) );
             save_items(room);
             return;
         }
     }
     else { 
-		/* new pool */
+        /* new pool */
         pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
-	}
+    }
     
-	room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
+    room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
@@ -204,7 +204,7 @@ void pour_out(Object *out)
     // Tai: updating this to include the destruction of items, not just manual pour out
 
     if (out->value1() == 0) {
-		room->echo(POS_RESTING, "Из %O4 не выливается ни капли.", out);
+        room->echo(POS_RESTING, "Из %O4 не выливается ни капли.", out);
         return;
     }
 
@@ -595,7 +595,7 @@ static bool mprog_drink_near( Character *drinker, Object *obj, const char *liq, 
 CMDRUN( drink )
 {
     Object *obj;
-    int amount;
+    int amount = 0;
     Liquid *liquid;
     DrinkContainer::Pointer drink;
     RoomIndexData *pRoom = ch->in_room->pIndexData;
@@ -625,12 +625,13 @@ CMDRUN( drink )
             return;
 
         case ITEM_FOUNTAIN:
-            if (obj->value0() > 0 && obj->value1() < 0) {
+            if (obj->value0() > -1 && obj->value1() == 0) {
                 ch->pecho("Здесь пусто.");
                 return;
             }
             liquid = liquidManager->find( obj->value2() );
             amount = liquid->getSipSize( ) * 3;
+            amount = min(amount, obj->value1());
             break;
 
         case ITEM_DRINK_CON:
@@ -677,7 +678,7 @@ CMDRUN( drink )
         for (int i = 0; i < desireManager->size( ); i++)
             desireManager->find( i )->drink( ch->getPC( ), amount, liquid );
 
-	/* The drink was poisoned ! */	
+    /* The drink was poisoned ! */
     if (obj && (IS_SET( obj->value3(), DRINK_POISONED ) || obj->isAffected(gsn_poison)))
     {
         int level = number_fuzzy(amount);
@@ -696,7 +697,7 @@ CMDRUN( drink )
         }
     }
 
-    if (obj && obj->value0() > 0)
+    if (obj && obj->value0() > -1)
         obj->value1(obj->value1() - amount);
 
     if (obj && obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
