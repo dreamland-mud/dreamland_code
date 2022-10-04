@@ -61,7 +61,7 @@ CMDADM( idelete )
 
         page_to_char(buf.str().c_str(), ch);
         return;
-    }	    	
+    }
 
 
     if (!( pci = PCharacterManager::find( name ) )) {

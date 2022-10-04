@@ -53,7 +53,7 @@ LIQ(valerian_tincture);
 CMDRUN( fill )
 {
     Object *obj;
-    int amount;
+    int amount = 0;
     Object *fountain = 0;
     Liquid *liq;
     DrinkContainer::Pointer drink;
@@ -130,7 +130,7 @@ CMDRUN( fill )
         ch->recho("%^C1 зачерпывает %N4 и наполняет %O4.", ch, liqname, obj);
     }
 
-    amount = obj->value0() - obj->value1();
+    if (fountain && fountain->value0() > -1) amount = obj->value0() - obj->value1();
     obj->value2(liq->getIndex());
     obj->value1(obj->value0());
 
@@ -595,7 +595,7 @@ static bool mprog_drink_near( Character *drinker, Object *obj, const char *liq, 
 CMDRUN( drink )
 {
     Object *obj;
-    int amount;
+    int amount = 0;
     Liquid *liquid;
     DrinkContainer::Pointer drink;
     RoomIndexData *pRoom = ch->in_room->pIndexData;
@@ -625,12 +625,13 @@ CMDRUN( drink )
             return;
 
         case ITEM_FOUNTAIN:
-            if (obj->value0() > 0 && obj->value1() < 0) {
+            if (obj->value0() > -1 && obj->value1() == 0) {
                 ch->pecho("Здесь пусто.");
                 return;
             }
             liquid = liquidManager->find( obj->value2() );
-            amount = liquid->getSipSize( ) * 3;
+            if (obj->value0() > -1) amount = liquid->getSipSize( ) * 3;
+            amount = min(amount, obj->value1());
             break;
 
         case ITEM_DRINK_CON:
@@ -696,7 +697,7 @@ CMDRUN( drink )
         }
     }
 
-    if (obj && obj->value0() > 0)
+    if (obj)
         obj->value1(obj->value1() - amount);
 
     if (obj && obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
