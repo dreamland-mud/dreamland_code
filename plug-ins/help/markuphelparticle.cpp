@@ -11,18 +11,18 @@
 // Get a list of additional keywords not mentioned in the title.
 DLString help_article_disambig(const HelpArticle *help)
 {
-	DLString ltitle = help->getTitle(DLString::emptyString);
-	ltitle.toLower();
+    DLString ltitle = help->getTitle(DLString::emptyString);
+    ltitle.toLower();
 
-	const StringSet &keywords = help->getAllKeywords();
-	StringSet disambig;
-	for (auto &kw: keywords) {
-		DLString kwLower = kw.toLower();
-		if (ltitle.find(kwLower) == DLString::npos)
-			disambig.insert(kwLower);
-	}
+    const StringSet &keywords = help->getAllKeywords();
+    StringSet disambig;
+    for (auto &kw: keywords) {
+        DLString kwLower = kw.toLower();
+        if (ltitle.find(kwLower) == DLString::npos)
+            disambig.insert(kwLower);
+    }
 
-	return disambig.toString();
+    return disambig.toString();
 }
 
 MarkupHelpArticle::~MarkupHelpArticle( )
@@ -58,8 +58,8 @@ void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
         DLString disambig = help_article_disambig(this);
 
         in << "{WСправка на тему {C" << title << "{x " << editButton(ch) << endl;
-	if (!disambig.empty())
-	    in << "{DКлючевые слова: " << disambig << "{x" << endl << endl;	
+    if (!disambig.empty())
+        in << "{DКлючевые слова: " << disambig << "{x" << endl << endl;
     }
 
     in << *this;

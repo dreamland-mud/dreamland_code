@@ -93,7 +93,7 @@ NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аф
     Character *ch = args2character(args);
 
     affect_modify(ch, &target, true);
-    return Register();	
+    return Register();
 }
 
 NMI_SET(AffectWrapper, source, "(ch|obj|room): запомнить ch, obj или room как источник этого аффекта")

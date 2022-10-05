@@ -45,45 +45,45 @@ using namespace std;
  * Note that this algorithm calculates a distance _iff_ d == a.
  */
 int levenshtein(const char *string1, const char *string2,
-		int w, int s, int a, int d)
+        int w, int s, int a, int d)
 {
-	int len1 = strlen(string1), len2 = strlen(string2);
-	vector<int> row0(len2+1, 0); 
-	vector<int> row1(len2+1, 0); 
-	vector<int> row2(len2+1, 0); 
+    int len1 = strlen(string1), len2 = strlen(string2);
+    vector<int> row0(len2+1, 0); 
+    vector<int> row1(len2+1, 0); 
+    vector<int> row2(len2+1, 0); 
     
-	int i, j;
+    int i, j;
     
 
-	for (j = 0; j <= len2; j++)
-		row1[j] = j * a;
-	for (i = 0; i < len1; i++) {
+    for (j = 0; j <= len2; j++)
+        row1[j] = j * a;
+    for (i = 0; i < len1; i++) {
         vector<int> dummy(len2+1, 0);
 
-		row2[0] = (i + 1) * d;
-		for (j = 0; j < len2; j++) {
-			/* substitution */
-			row2[j + 1] = row1[j] + s * (string1[i] != string2[j]);
-			/* swap */
-			if (i > 0 && j > 0 && string1[i - 1] == string2[j] &&
-					string1[i] == string2[j - 1] &&
-					row2[j + 1] > row0[j - 1] + w)
-				row2[j + 1] = row0[j - 1] + w;
-			/* deletion */
-			if (row2[j + 1] > row1[j + 1] + d)
-				row2[j + 1] = row1[j + 1] + d;
-			/* insertion */
-			if (row2[j + 1] > row2[j] + a)
-				row2[j + 1] = row2[j] + a;
-		}
+        row2[0] = (i + 1) * d;
+        for (j = 0; j < len2; j++) {
+            /* substitution */
+            row2[j + 1] = row1[j] + s * (string1[i] != string2[j]);
+            /* swap */
+            if (i > 0 && j > 0 && string1[i - 1] == string2[j] &&
+                    string1[i] == string2[j - 1] &&
+                    row2[j + 1] > row0[j - 1] + w)
+                row2[j + 1] = row0[j - 1] + w;
+            /* deletion */
+            if (row2[j + 1] > row1[j + 1] + d)
+                row2[j + 1] = row1[j + 1] + d;
+            /* insertion */
+            if (row2[j + 1] > row2[j] + a)
+                row2[j + 1] = row2[j] + a;
+        }
     
         dummy.swap(row0);
         row0.swap(row1);
         row1.swap(row2);
         row2.swap(dummy);
-	}
+    }
 
-	i = row1[len2];
+    i = row1[len2];
 
-	return i;
+    return i;
 }

@@ -45,7 +45,7 @@ bool Pet::area( )
 {
     Character *master = ch->master;
     
-	// Auto-extract abandoned pets, unless in pet storage
+    // Auto-extract abandoned pets, unless in pet storage
     if (master) {
         // nothing to do, still charmed
         return false;
@@ -65,18 +65,18 @@ bool Pet::area( )
     }
     
 
-	DLString msg = fmt(0, "Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и ", ch);
-	if (is_flying(ch))
-		msg = msg + fmt(0, "улета%1$nет|ют ", ch);
-	else if (RoomUtils::isWater(ch->in_room))
-		msg = msg + fmt(0, "уплыва%1$nет|ют ", ch);
-	else if (!IS_SET(ch->parts, PART_LEGS))
-		msg = msg + fmt(0, "уполза%1$nет|ют ", ch);		
-	else
-		msg = msg + fmt(0, "уход%1$nит|ят ", ch);
-	
-	msg = msg + "восвояси.";
-	ch->recho(msg.c_str());
+    DLString msg = fmt(0, "Брошенн%1$Gый|ый|ая|ые %1$C1 горько вздыха%1$nет|ют напоследок и ", ch);
+    if (is_flying(ch))
+        msg = msg + fmt(0, "улета%1$nет|ют ", ch);
+    else if (RoomUtils::isWater(ch->in_room))
+        msg = msg + fmt(0, "уплыва%1$nет|ют ", ch);
+    else if (!IS_SET(ch->parts, PART_LEGS))
+        msg = msg + fmt(0, "уполза%1$nет|ют ", ch);
+    else
+        msg = msg + fmt(0, "уход%1$nит|ят ", ch);
+
+    msg = msg + "восвояси.";
+    ch->recho(msg.c_str());
     LogStream::sendNotice() 
         << "PET_EXTRACT: Extracting " << ch->getID() << " [" << ch->getNPC()->pIndexData->vnum << "] "
         << " in room " << ch->in_room->vnum << endl;

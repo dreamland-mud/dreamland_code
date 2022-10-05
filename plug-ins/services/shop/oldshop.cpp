@@ -239,7 +239,7 @@ CMDRUN( buy )
     roll = bonus ? 100 : number_percent( );
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch) + skill_level_bonus(*gsn_haggle, ch))) )
     {
-		oldcost = cost;
+        oldcost = cost;
         cost -= cost / 2 * roll / 100;
         // can't reduce buying price to less than 25% of the original cost
         cost = URANGE(obj->cost / 4, cost, obj->cost);
@@ -254,7 +254,7 @@ CMDRUN( buy )
             gsn_haggle->improve( ch, false );            
         }
     }
-	
+
     // everyone reaps off druids
     if (ch->getProfession( ) == prof_druid)
         cost *= 2;
@@ -400,8 +400,8 @@ CMDRUN( sell )
     {
         silver = cost - (cost/100) * 100;
         gold   = cost/100;
-		oldcost = cost;
-		
+        oldcost = cost;
+
         ch->pecho("%^C1 предлагает тебе %s за %O4.", keeper, format_coins(gold, silver).c_str(), obj);
         
         // make sure this is a positive factor
@@ -575,7 +575,7 @@ static bool value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Point
     }
 
     int cost = get_cost( keeper, obj, false, trader );
-	
+
     // everyone reaps off druids
     if (ch->getProfession( ) == prof_druid)
         cost /= 2;
@@ -667,7 +667,7 @@ CMDRUN( properties )
 /*
  * Local functions
  */
-// TO-DO: (RUFFINA) Add *ch to parameters to make druid and CHA-related calculations here					  
+// TO-DO: (RUFFINA) Add *ch to parameters to make druid and CHA-related calculations here
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader ) 
 {
     int cost;
@@ -677,7 +677,7 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
 
     if( IS_OBJ_STAT( obj, ITEM_NOSELL ) ) 
         return 0;
-	
+
     if( fBuy ) {
         if (bonus_black_friday->isActive(NULL, time_info))
             cost = obj->cost / 2;

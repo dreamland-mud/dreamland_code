@@ -266,10 +266,10 @@ NMI_GET( RoomWrapper, clan, "клан, которому принадлежит �
 NMI_GET( RoomWrapper, guilds, "гильдии в этой комнате" )
 {
     checkTarget();
-	if (!target->pIndexData->guilds.empty( ))
-    	return Register( target->pIndexData->guilds.toString().c_str() );
-	else 
-		return Register("");
+    if (!target->pIndexData->guilds.empty( ))
+        return Register( target->pIndexData->guilds.toString().c_str() );
+    else 
+        return Register("");
 }
 
 
@@ -685,10 +685,10 @@ NMI_INVOKE( RoomWrapper, count_enemies, "(ch): кол-во персонажей,
     checkTarget( );
     Character *ch = args2character(args);
     int count = 0;
-	
+
     for (Character *rch = target->people; rch; rch = rch->next_in_room)
-	if (rch != ch && rch->fighting == ch)
-	    count++;
+    if (rch != ch && rch->fighting == ch)
+        count++;
 
     return Register(count);
 }

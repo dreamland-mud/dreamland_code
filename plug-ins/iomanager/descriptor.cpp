@@ -70,7 +70,7 @@ const char *lid = "\n\rЕсли слишком много раз повторя�
 const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet", "lyntin" };
 int ttype_lookup( const char *received )
 {
-    notice("telnet: checking %s as terminal type candidate", received);	
+    notice("telnet: checking %s as terminal type candidate", received);
     for (int i = 0; i < TTYPE_MAX; i++) {
         const char *ttype = TTYPE_NAMES[i]; 
         if (strncmp(received, ttype, strlen(ttype)) == 0) {

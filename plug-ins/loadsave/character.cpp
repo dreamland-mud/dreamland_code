@@ -24,8 +24,8 @@ WEARLOC(hold_leg);
 /* visibility on a room -- for entering and exits */
 bool Character::can_see( Room *pRoomIndex ) const
 {
-	if (!pRoomIndex)
-		return false;
+    if (!pRoomIndex)
+        return false;
 
         if ( IS_SET(pRoomIndex->room_flags, ROOM_IMP_ONLY)
                 && get_trust() < MAX_LEVEL )
@@ -174,19 +174,19 @@ bool Object::mustDisappear( Character *ch )
 
     if (pIndexData->limit > 0) {
         if (ch->getModifyLevel( ) > level + 20) {
-	    ch->pecho("Ты уже слишком опыт{Smен{Sfна{Sx для этого лимита.");		
+        ch->pecho("Ты уже слишком опыт{Smен{Sfна{Sx для этого лимита.");
             return true;
-	}	
+    }
             
         if (ch->getModifyLevel( ) < level - 3) {
-	    ch->pecho("Ты еще слишком неопыт{Smен{Sfна{Sx для этого лимита.");		
+        ch->pecho("Ты еще слишком неопыт{Smен{Sfна{Sx для этого лимита.");
             return true;
-	}
+    }
 
         if (!IS_SET(ch->act, PLR_CONFIRMED)) {
-	    ch->pecho("Чтобы пользоваться лимитами, надо сначала {hhподтвердить{x описание.");		
+        ch->pecho("Чтобы пользоваться лимитами, надо сначала {hhподтвердить{x описание.");
             return true;
-	}
+    }
     }
     
     if (ch->getModifyLevel( ) < level - 3 && level > ANGEL)

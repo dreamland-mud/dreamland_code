@@ -117,9 +117,9 @@ void BackstabOneHit::calcDamage( )
     damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
-	
+
     if (wield != 0) {
-	int slevel = skill_level(*gsn_backstab, ch);    
+    int slevel = skill_level(*gsn_backstab, ch);    
         dam = ( slevel / 10 + 1 ) * dam + slevel;
     }
 
@@ -156,9 +156,9 @@ void DualBackstabOneHit::calcDamage( )
     damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
-	
+
     if (wield != 0) {
-	int slevel = skill_level(*gsn_dual_backstab, ch);    
+    int slevel = skill_level(*gsn_dual_backstab, ch);    
         dam = ( slevel / 10 + 1 ) * dam + slevel;
     }
 
@@ -193,10 +193,10 @@ void CircleOneHit::calcDamage( )
     damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
-	
+
     int slevel = skill_level(*gsn_circle, ch);    
     dam = ( slevel / 40 + 1 ) * dam + slevel;
-	
+
     damApplyCounter( );
 
     WeaponOneHit::calcDamage( );
@@ -224,10 +224,10 @@ void KnifeOneHit::calcDamage( )
     damapply_class(ch, dam);
     damApplyPosition( );
     damApplyDamroll( );
-	
+
     int slevel = skill_level(*gsn_knife, ch);    
     dam = ( slevel / 30 + 1 ) * dam + slevel;
-	
+
     damApplyCounter( );
 
     WeaponOneHit::calcDamage( );
@@ -301,7 +301,7 @@ SKILL_RUNP( envenom )
         ||  IS_WEAPON_STAT(obj,WEAPON_FROST)
         ||  IS_WEAPON_STAT(obj,WEAPON_SHOCKING)
         ||  IS_WEAPON_STAT(obj,WEAPON_HOLY)
-        ||  IS_WEAPON_STAT(obj,WEAPON_FADING)	    
+        ||  IS_WEAPON_STAT(obj,WEAPON_FADING)
         ||  IS_OBJ_STAT(obj,ITEM_BLESS) )
         {
             oldact("Мощные свойства $o2 не позволяют тебе нанести яд.",ch,obj,0,TO_CHAR);
@@ -325,8 +325,8 @@ SKILL_RUNP( envenom )
         if (percent < skill)
         {
 
-	    int slevel = skill_level(*gsn_envenom, ch);
-		
+        int slevel = skill_level(*gsn_envenom, ch);
+
             af.bitvector.setTable(&weapon_type2);
             af.type      = gsn_poison;
             af.level     = slevel * percent / 100;
@@ -420,7 +420,7 @@ SKILL_RUNP( steal )
 
         percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -30 );
         percent += victim->can_see( ch ) ? 20 : 0;
-	percent -= skill_level_bonus(*gsn_steal, ch);
+    percent -= skill_level_bonus(*gsn_steal, ch);
 
         if (ch->isCoder())
             percent = 1;
@@ -438,9 +438,9 @@ SKILL_RUNP( steal )
         /*
          * Failure.
          */
-		if (victim->is_npc() && IS_SET(victim->act, ACT_NOSTEAL))
-			ch->pecho("У %C2 магическая защита от воришек.", victim);
-		
+        if (victim->is_npc() && IS_SET(victim->act, ACT_NOSTEAL))
+            ch->pecho("У %C2 магическая защита от воришек.", victim);
+
                 ch->pecho("Тебя застукали за попыткой воровства!");
                 if ( !IS_AFFECTED( victim, AFF_SLEEP ) )
                 {
@@ -702,7 +702,7 @@ SKILL_RUNP( backstab )
 
     BackstabOneHit bs( ch, victim );
     int bsBonus = 0, hasteBonus = 0, sBonus = 0;
-    sBonus += skill_level_bonus(*gsn_backstab, ch);	
+    sBonus += skill_level_bonus(*gsn_backstab, ch);
 
     if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
@@ -720,7 +720,7 @@ SKILL_RUNP( backstab )
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
-			
+
             if (IS_QUICK(ch)) {
                     int haste_chance = hasteBonus + gsn_backstab->getEffective( ch ) * 4 / 10;
 
@@ -728,7 +728,7 @@ SKILL_RUNP( backstab )
                         if (ch->fighting == victim)
                             BackstabOneHit( ch, victim ).hit( );
                     }
-					else {
+                    else {
 
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
@@ -746,11 +746,11 @@ SKILL_RUNP( backstab )
             }
             else {
                 gsn_dual_backstab->improve( ch, false, victim );
-				}
-			}
+                }
             }
-			
-			else {
+            }
+
+            else {
 
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
@@ -768,11 +768,11 @@ SKILL_RUNP( backstab )
             }
             else {
                 gsn_dual_backstab->improve( ch, false, victim );
-				}
-			}
+                }
+            }
 
 
-		}
+        }
         else
         {
             gsn_backstab->improve( ch, false, victim );
@@ -975,9 +975,9 @@ SKILL_RUNP( forge )
             return;
         }
 
-	int chance;
-	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
-	    
+    int chance;
+    chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch));    
+        
         if (number_percent( ) >= chance) {
             oldact("Тебе не удалось точно передать рисунок бороздок $o2.", ch, key, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );
@@ -1025,9 +1025,9 @@ SKILL_RUNP( forge )
             return;
         }
 
-	int chance;
-	chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 
-	    
+    int chance;
+    chance = min(100, gsn_key_forgery->getEffective( ch ) + skill_level_bonus(*gsn_key_forgery, ch)); 
+
         if (number_percent( ) >= chance) {
             oldact("Твои попытки превратить $o4 в отмычку к этому замку ни к чему не привели.", ch, blank, 0, TO_CHAR );
             gsn_key_forgery->improve( ch, false );

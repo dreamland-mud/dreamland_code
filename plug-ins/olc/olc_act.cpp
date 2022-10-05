@@ -356,8 +356,8 @@ bool show_help(Character * ch, const char *cargument)
                     buf << fmt( 0, "{g%-15s{x: %-20s (%-15s)",
                                 rel->getShortDescr().c_str(),
                                 rel->getRussianName().ruscase('1').c_str(),
-				rel->getName().c_str());
-		    buf << endl;
+                rel->getName().c_str());
+            buf << endl;
                 }
                 buf << endl;
                 ch->send_to(buf);

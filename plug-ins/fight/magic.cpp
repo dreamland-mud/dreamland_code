@@ -116,32 +116,32 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
         case RESIST_IMMUNE:
             if (ch) {
                 if (ch != victim)
-                	ch->pecho("%^N1, похоже, никак не сможет навредить %C3.", damage_table.message(dam_type).c_str(), victim);
-				else
-					ch->pecho("%^N1, похоже, никак не сможет навредить тебе.", damage_table.message(dam_type).c_str());
+                    ch->pecho("%^N1, похоже, никак не сможет навредить %C3.", damage_table.message(dam_type).c_str(), victim);
+                else
+                    ch->pecho("%^N1, похоже, никак не сможет навредить тебе.", damage_table.message(dam_type).c_str());
             }
             return true;
         case RESIST_RESISTANT:
             save += mlevel / 5;
             if (ch && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
-				if (ch != victim)
-                	ch->pecho("%^N1 {1{Gочень слабо{2 влияет на %C4.", 
-                    	damage_table.message(dam_type).c_str(), victim);
-				else 
-                	ch->pecho("%^N1 {1{Gочень слабо{2 влияет на тебя.", 
-                    	damage_table.message(dam_type).c_str());					
-			}
+                if (ch != victim)
+                    ch->pecho("%^N1 {1{Gочень слабо{2 влияет на %C4.", 
+                        damage_table.message(dam_type).c_str(), victim);
+                else 
+                    ch->pecho("%^N1 {1{Gочень слабо{2 влияет на тебя.", 
+                        damage_table.message(dam_type).c_str());
+            }
             break;
         case RESIST_VULNERABLE:
             save -= mlevel / 5;
             if (ch && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
-				if (ch != victim)
-                	ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на %C4.", 
-                    	damage_table.message(dam_type).c_str(), victim);
-				else
-                	ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на тебя.", 
-                    	damage_table.message(dam_type).c_str());					
-			}
+                if (ch != victim)
+                    ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на %C4.", 
+                        damage_table.message(dam_type).c_str(), victim);
+                else
+                    ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на тебя.", 
+                        damage_table.message(dam_type).c_str());
+            }
             break;
     }
     

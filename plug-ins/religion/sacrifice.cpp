@@ -470,29 +470,29 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
 
 static bool can_sacrifice( Character *ch, Object *obj, bool needSpam ) 
 {
-	if (!ch->can_see( obj ))
-		return false;
+    if (!ch->can_see( obj ))
+        return false;
 
-	if (obj->item_type == ITEM_CORPSE_PC) {
-		if (needSpam)
-			ch->pecho("Трупы игроков жертвовать запрещено.");
-		return false;
-	}
+    if (obj->item_type == ITEM_CORPSE_PC) {
+        if (needSpam)
+            ch->pecho("Трупы игроков жертвовать запрещено.");
+        return false;
+    }
 
-	if (!obj->can_wear(ITEM_TAKE) || obj->can_wear(ITEM_NO_SAC) ||
-		IS_SET(obj->extra_flags, ITEM_NOSAC)) {
-		if (needSpam) 
-			ch->pecho( "%1$^O1 не подлеж%1$nит|ат жертвоприношению.", obj );
-		return false;
-	}
+    if (!obj->can_wear(ITEM_TAKE) || obj->can_wear(ITEM_NO_SAC) ||
+        IS_SET(obj->extra_flags, ITEM_NOSAC)) {
+        if (needSpam) 
+            ch->pecho( "%1$^O1 не подлеж%1$nит|ат жертвоприношению.", obj );
+        return false;
+    }
 
-	if ( IS_SET(obj->item_type,ITEM_FURNITURE) && count_users(obj) > 0 ) {
-		if (needSpam) 
-			ch->pecho( "%1$^O1 в данный момент использу%1$nется|ются.", obj );
-		return false;
-	}
+    if ( IS_SET(obj->item_type,ITEM_FURNITURE) && count_users(obj) > 0 ) {
+        if (needSpam) 
+            ch->pecho( "%1$^O1 в данный момент использу%1$nется|ются.", obj );
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 
@@ -529,38 +529,38 @@ static bool oprog_sac( Object *obj, Character *ch )
 
 int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 {
-	PCharacter *pch = ch->getPC();
-	const Religion &religion = *(pch->getReligion());
-	const char *rname = religion.getRussianName().c_str();
+    PCharacter *pch = ch->getPC();
+    const Religion &religion = *(pch->getReligion());
+    const char *rname = religion.getRussianName().c_str();
 
-	if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
-		rname = "бог|и|ов|ам|ов|ами|ах";
-		
-	int silver = -1;
+    if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
+        rname = "бог|и|ов|ам|ов|ами|ах";
 
-	if ( !can_sacrifice(ch, obj, needSpam) )
-		return -1;
+    int silver = -1;
 
-	// sac can't yield more $$ than obj->cost
-	silver = ::min(number_range(1, obj->level), obj->cost);
+    if ( !can_sacrifice(ch, obj, needSpam) )
+        return -1;
 
-	if (needSpam) {
-		ch->recho("%^C1 приносит %O4 в жертву %N3.", ch, obj, rname);
-		wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит %O4 в жертву %N3.", ch, obj, rname );		
-	}
+    // sac can't yield more $$ than obj->cost
+    silver = ::min(number_range(1, obj->level), obj->cost);
 
-	if (oprog_sac( obj, ch ))
-		return silver;
+    if (needSpam) {
+        ch->recho("%^C1 приносит %O4 в жертву %N3.", ch, obj, rname);
+        wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит %O4 в жертву %N3.", ch, obj, rname );
+    }
 
-	if (rescue_nosac_items(obj, ch->in_room)) {
-		if (needSpam) {
-			const char *fall = terrains[ch->in_room->getSectorType()].fall;
-			ch->recho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
-			ch->pecho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
-		}
-	}
-	extract_obj( obj );
-	return silver;
+    if (oprog_sac( obj, ch ))
+        return silver;
+
+    if (rescue_nosac_items(obj, ch->in_room)) {
+        if (needSpam) {
+            const char *fall = terrains[ch->in_room->getSectorType()].fall;
+            ch->recho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
+            ch->pecho("Некоторые вещи внутри %O2 не могут быть принесены в жертву и падают %s.", obj, fall);
+        }
+    }
+    extract_obj( obj );
+    return silver;
 }
 
 /*
@@ -570,102 +570,102 @@ int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
  */
 CMDRUNP( sacrifice )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Object *obj, *next_obj;
-	int silver = 0;
-	int mana_gain = -1;
-	PCharacter *pch = ch->getPC();
-	const Religion &religion = *(pch->getReligion());
-	const char *rname = religion.getRussianName().c_str();
+    char arg[MAX_INPUT_LENGTH];
+    Object *obj, *next_obj;
+    int silver = 0;
+    int mana_gain = -1;
+    PCharacter *pch = ch->getPC();
+    const Religion &religion = *(pch->getReligion());
+    const char *rname = religion.getRussianName().c_str();
 
-	if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
-		rname = "бог|и|ов|ам|ов|ами|ах";
+    if (ch->is_npc() || ch->getPC()->getReligion() == god_none)
+        rname = "бог|и|ов|ам|ов|ами|ах";
 
-	argument = one_argument( argument, arg );
+    argument = one_argument( argument, arg );
         
-	if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) ) {
-		ch->recho("%^C1 предлагает себя в жертву %N3, но слышит в ответ тактичное молчание.", ch, rname);
-		ch->pecho("Ты предлагаешь себя в жертву %N3, но слышишь в ответ лишь тактичное молчание.", rname);
-		return;
-	}
+    if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) ) {
+        ch->recho("%^C1 предлагает себя в жертву %N3, но слышит в ответ тактичное молчание.", ch, rname);
+        ch->pecho("Ты предлагаешь себя в жертву %N3, но слышишь в ответ лишь тактичное молчание.", rname);
+        return;
+    }
 
-	if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
-		ch->pecho("В этой местности %N3 не удастся принять твою жертву.", rname);
-		return;
-	}
+    if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
+        ch->pecho("В этой местности %N3 не удастся принять твою жертву.", rname);
+        return;
+    }
 
-	if (arg_is_all( arg )) {
-		int count = 0;
-		obj = ch->in_room->contents;
-		
-		dreamland->removeOption( DL_SAVE_OBJS );
-		while( obj !=0 ) {
-			if (can_sacrifice( ch, obj, false)) {
-				next_obj = obj->next_content;
-				silver += sacrifice_obj( ch, obj, false);
-				count++;
-				obj = next_obj;
-			}
-			else obj = obj->next_content;
-		}
-		dreamland->resetOption( DL_SAVE_OBJS );
-		save_items( ch->in_room );
+    if (arg_is_all( arg )) {
+        int count = 0;
+        obj = ch->in_room->contents;
+
+        dreamland->removeOption( DL_SAVE_OBJS );
+        while( obj !=0 ) {
+            if (can_sacrifice( ch, obj, false)) {
+                next_obj = obj->next_content;
+                silver += sacrifice_obj( ch, obj, false);
+                count++;
+                obj = next_obj;
+            }
+            else obj = obj->next_content;
+        }
+        dreamland->resetOption( DL_SAVE_OBJS );
+        save_items( ch->in_room );
                 
-		if (count == 0) {
-			ch->pecho("Ты не находишь ничего подходящего для жертвоприношения.");
-			return;
-		}
-                
-		const char *where = terrains[ch->in_room->getSectorType()].where;
-		ch->recho("%^C1 приносит в жертву %N3 все, что находится %s.", ch, rname, where);
-		ch->pecho("Ты приносишь в жертву %N3 все, что находится %s.", rname, where);
-		wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит в жертву %N3 все, что находится %s в %s.", ch, rname, where, ch->in_room->getName() );
-	} // end sac all
-	else {
-		obj = get_obj_list( ch, arg, ch->in_room->contents );
-		if ( obj == 0 ) {
-			ch->pecho("Ты не находишь этого.");
-			return;
-		}
+        if (count == 0) {
+            ch->pecho("Ты не находишь ничего подходящего для жертвоприношения.");
+            return;
+        }
 
-		if (obj->pIndexData->vnum == OBJ_VNUM_ALTAR) {
-			sacrifice_at_altar(ch, obj, argument);
-			return;
-		}
+        const char *where = terrains[ch->in_room->getSectorType()].where;
+        ch->recho("%^C1 приносит в жертву %N3 все, что находится %s.", ch, rname, where);
+        ch->pecho("Ты приносишь в жертву %N3 все, что находится %s.", rname, where);
+        wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит в жертву %N3 все, что находится %s в %s.", ch, rname, where, ch->in_room->getName() );
+    } // end sac all
+    else {
+        obj = get_obj_list( ch, arg, ch->in_room->contents );
+        if ( obj == 0 ) {
+            ch->pecho("Ты не находишь этого.");
+            return;
+        }
 
-		if (obj->item_type == ITEM_CORPSE_NPC) {
-			// Some of us among forces are the same that burn crosses
-			if (number_percent() < gsn_crusify->getEffective( ch )) {
-				mana_gain = skill_level(*gsn_crusify, ch);
-				gsn_crusify->improve( ch, true );
-			}
-			else gsn_crusify->improve( ch, false );
-		} 
-		
-		if ( (silver = sacrifice_obj(ch, obj, true)) < 0 )
-			return;
-	}
+        if (obj->pIndexData->vnum == OBJ_VNUM_ALTAR) {
+            sacrifice_at_altar(ch, obj, argument);
+            return;
+        }
 
-	if (mana_gain != -1 ) {
-		ch->mana += mana_gain;
-		ch->pecho("Ты устраиваешь торжественное сожжение во славу %1$N3, восстанавливая %2$d очк%2$Iо|а|ов энергии.", rname, mana_gain);
-		ch->recho("%^C1 устраивает торжественное сожжение во славу %N3, восстанавливая энергию.", ch, rname);
-	}
-		
-	if (silver > 0) {
-		ch->pecho("Ты получаешь %1$d серебрян%1$Iую|ые|ых монет%1$Iу|ы| от %2$N2 за свое жертвоприношение.", silver, rname);
-		ch->silver += silver;
-		if (ch->getReligion() == god_fili && get_eq_char(ch, wear_tattoo)) {
-			int bonus = silver * 2;
-			ch->pecho("{Y%1^N1{x скупо кряхтит и добавляет тебе еще %2$d монет%2$Iу|ы|.", rname, bonus);
-			ch->silver += bonus;
-		}
-	}
-	else ch->pecho("Твое скудное жертвоприношение остается без награды от %N2.", rname);
-	
-	if (IS_SET(ch->act,PLR_AUTOSPLIT))
-		if (silver > 1)
-			if (party_members_room( ch ).size( ) > 1)
-				interpret_raw( ch, "split", "%d", silver );
+        if (obj->item_type == ITEM_CORPSE_NPC) {
+            // Some of us among forces are the same that burn crosses
+            if (number_percent() < gsn_crusify->getEffective( ch )) {
+                mana_gain = skill_level(*gsn_crusify, ch);
+                gsn_crusify->improve( ch, true );
+            }
+            else gsn_crusify->improve( ch, false );
+        } 
+
+        if ( (silver = sacrifice_obj(ch, obj, true)) < 0 )
+            return;
+    }
+
+    if (mana_gain != -1 ) {
+        ch->mana += mana_gain;
+        ch->pecho("Ты устраиваешь торжественное сожжение во славу %1$N3, восстанавливая %2$d очк%2$Iо|а|ов энергии.", rname, mana_gain);
+        ch->recho("%^C1 устраивает торжественное сожжение во славу %N3, восстанавливая энергию.", ch, rname);
+    }
+
+    if (silver > 0) {
+        ch->pecho("Ты получаешь %1$d серебрян%1$Iую|ые|ых монет%1$Iу|ы| от %2$N2 за свое жертвоприношение.", silver, rname);
+        ch->silver += silver;
+        if (ch->getReligion() == god_fili && get_eq_char(ch, wear_tattoo)) {
+            int bonus = silver * 2;
+            ch->pecho("{Y%1^N1{x скупо кряхтит и добавляет тебе еще %2$d монет%2$Iу|ы|.", rname, bonus);
+            ch->silver += bonus;
+        }
+    }
+    else ch->pecho("Твое скудное жертвоприношение остается без награды от %N2.", rname);
+
+    if (IS_SET(ch->act,PLR_AUTOSPLIT))
+        if (silver > 1)
+            if (party_members_room( ch ).size( ) > 1)
+                interpret_raw( ch, "split", "%d", silver );
 }
 
