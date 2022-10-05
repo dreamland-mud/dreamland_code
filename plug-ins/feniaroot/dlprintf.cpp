@@ -108,7 +108,7 @@ regfmt(Character *to, const RegisterList &args)
     // Workaround for situations when act/recho is invoked from 
     // obj progs on player load, while the player is still not in a room.
     if (to && to->in_room == NULL)
-	return DLString::emptyString;
+    return DLString::emptyString;
 
     RegFormatter formatter(to);
     return formatter.regfmt(args);

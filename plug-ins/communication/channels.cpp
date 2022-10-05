@@ -183,8 +183,8 @@ static bool mprog_speech( Character *rch, Character *talker, const char *msg )
 {
     if (IS_AWAKE(rch)) {
         FENIA_CALL( rch, "Speech", "Cs", talker, msg );
-	    FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
-	    BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );
+        FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
+        BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );
     }
     return false;
 }

@@ -93,12 +93,12 @@ void VampiricBiteOneHit::damBase( )
     int ave, level = skill_level(*gsn_vampiric_bite, ch);
     
          if (level >= 100) ave = level - 27; // as Tier 1 weapons, sigma distribution TODO: refactor
-    else if (level >= 90)  ave = level - 18;	
+    else if (level >= 90)  ave = level - 18;
     else if (level >= 80)  ave = level - 12;
-    else if (level >= 70)  ave = level - 5;	
-    else if (level >= 60)  ave = level - 1;	
+    else if (level >= 70)  ave = level - 5;
+    else if (level >= 60)  ave = level - 1;
     else if (level >= 50)  ave = level + 3;
-    else if (level >= 45)  ave = level + 4;	
+    else if (level >= 45)  ave = level + 4;
     else if (level >= 40)  ave = level + 9;
     else if (level >= 30)  ave = level + 10;
     else if (level >= 20)  ave = level + 11;
@@ -138,46 +138,46 @@ void VampiricBiteOneHit::calcTHAC0( )
 }
 
 void VampiricBiteOneHit::postDamageEffects( )
-{	
+{
 
     if(!IS_BLOODLESS (victim)){
 
     // vampiric bite gives hp/mana to ch from victim
     int hit_ga, mana_ga;
-	
+
     if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) {
-    	hit_ga = min( (orig_dam / 2 ), (int)victim->max_hit );
-    	mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
-	ch->pecho("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника.");
+        hit_ga = min( (orig_dam / 2 ), (int)victim->max_hit );
+        mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
+    ch->pecho("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника.");
     }
     else {
-    	hit_ga = min( (orig_dam / 10 ), (int)victim->max_hit );
-    	mana_ga = min( (orig_dam / 10 ), (int)victim->max_mana );
-	ch->pecho("Ты с отвращением высасываешь кровь, {cхолодную{x как сердца разработчиков.");	    
+        hit_ga = min( (orig_dam / 10 ), (int)victim->max_hit );
+        mana_ga = min( (orig_dam / 10 ), (int)victim->max_mana );
+    ch->pecho("Ты с отвращением высасываешь кровь, {cхолодную{x как сердца разработчиков.");
     }
-	
+
     ch->hit   += hit_ga;
     ch->hit   =  min( ch->hit , ch->max_hit);
     ch->mana  += mana_ga;
-    ch->mana  =  min( ch->mana , ch->max_mana);	
+    ch->mana  =  min( ch->mana , ch->max_mana);
     update_pos( ch );
 
-    // corrupt victim	
+    // corrupt victim
     Affect af;
     int level = skill_level(*gsn_vampiric_bite, ch);
-    if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
-    	af.bitvector.setTable(&affect_flags);
+    if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {
+        af.bitvector.setTable(&affect_flags);
         af.sources.add(ch);
-    	af.type      = gsn_corruption;
-   	    af.level     = level;
-    	af.duration  = level / 10;
-    	af.location = APPLY_HITROLL;
-    	af.modifier  = - (level / 10);
-    	af.bitvector.setValue(AFF_CORRUPTION);
-        affect_join( victim, &af );	
-	    
-    	oldact_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
-    	oldact("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR);	    
+        af.type      = gsn_corruption;
+        af.level     = level;
+        af.duration  = level / 10;
+        af.location = APPLY_HITROLL;
+        af.modifier  = - (level / 10);
+        af.bitvector.setValue(AFF_CORRUPTION);
+        affect_join( victim, &af );
+
+        oldact_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
+        oldact("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR);
     }
     }
 
@@ -282,7 +282,7 @@ SKILL_RUNP( vampire )
 
         if ( ch->isAffected(gsn_vampire ) )
         {
-		ch->pecho( "Ты не можешь стать еще более вампир%Gом|ом|шей!", ch );
+        ch->pecho( "Ты не можешь стать еще более вампир%Gом|ом|шей!", ch );
                 return;
         }
 
@@ -295,7 +295,7 @@ SKILL_RUNP( vampire )
         if ( weather_info.sunlight == SUN_LIGHT
                 || weather_info.sunlight == SUN_RISE )
         {
-		ch->pecho( "Помни, тебе нужно остерегаться солнечных лучей!", ch );
+        ch->pecho( "Помни, тебе нужно остерегаться солнечных лучей!", ch );
         }
 
         level = skill_level(*gsn_vampire, ch);
@@ -348,7 +348,7 @@ SKILL_RUNP( vampire )
         affect_to_char( ch, &af );
 
 
-	ch->pecho( "Превращаясь в кровожадн%1$Gого|ого|ую вампир%1$Gа|а|шу, ты чувствуешь прилив силы.", ch );
+    ch->pecho( "Превращаясь в кровожадн%1$Gого|ого|ую вампир%1$Gа|а|шу, ты чувствуешь прилив силы.", ch );
         oldact("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM);
 }
 
@@ -466,7 +466,7 @@ CMDRUNP( suck )
     one_argument( argument, arg );
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	 ch->pecho( "Высасывать кровь можно, только превратившись в вампир%Gа|а|шу!", ch );
+     ch->pecho( "Высасывать кровь можно, только превратившись в вампир%Gа|а|шу!", ch );
          return;
     }
 
@@ -503,7 +503,7 @@ SKILL_RUNP( bite )
             ch->pecho("Только не верхом!");
             return;
     }
-	
+
     one_argument( argument, arg );
 
     if ( ch->master != 0 && ch->is_npc() )
@@ -516,7 +516,7 @@ SKILL_RUNP( bite )
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-  	    ch->pecho( "Чтобы укусить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch );    
+          ch->pecho( "Чтобы укусить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch );    
         return;
     }
 
@@ -551,14 +551,14 @@ SKILL_RUNP( bite )
     
     if ( is_safe( ch, victim ) )
       return;
-	
+
     if (IS_SET(victim->imm_flags, IMM_WEAPON))
     {
             oldact_p("$C1 имеет слишком крепкую шею, чтобы ее можно было прокусить.", ch, 0,
                     victim, TO_CHAR,POS_RESTING);
             return;
     }
-	
+
     if(SHADOW(ch))
     {
             ch->pecho("Твои клыки проходят сквозь тень!");
@@ -576,8 +576,8 @@ SKILL_RUNP( bite )
         if (!IS_AWAKE(victim)
             && Chance(ch, gsn_vampiric_bite->getEffective( ch )-1, 100).reroll())
         {
-    	    int slevel = skill_level(*gsn_vampiric_bite, ch);	
-		
+            int slevel = skill_level(*gsn_vampiric_bite, ch);
+
             af.type     = gsn_vampiric_bite;
             af.level    = slevel;
             af.duration = slevel / 40 + 1;
@@ -619,11 +619,11 @@ SKILL_RUNP( bite )
 
 SKILL_RUNP( touch )
 {
-	Character *victim;
+    Character *victim;
         Affect af;    
         float chance, skill_mod, stat_mod, level_mod, quick_mod, sleep_mod, vis_mod, time_mod;
         char arg[MAX_INPUT_LENGTH];
-	int slevel = skill_level(*gsn_vampiric_touch, ch);
+    int slevel = skill_level(*gsn_vampiric_touch, ch);
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
         skill_mod   = 0.5;
@@ -643,19 +643,19 @@ SKILL_RUNP( touch )
                 ch->pecho("Только не верхом!");
                 return;
         }
-	
-    	if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
-    	{
-        	ch->pecho( "Чтобы усыпить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch ); 
-        	return;
-    	}
 
-    	if ( IS_CHARMED(ch) )
-    	{
-        	ch->pecho("Ты же не хочешь усыпить сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
-        	return;
-    	}
-	
+        if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
+        {
+            ch->pecho( "Чтобы усыпить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch ); 
+            return;
+        }
+
+        if ( IS_CHARMED(ch) )
+        {
+            ch->pecho("Ты же не хочешь усыпить сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
+            return;
+        }
+
         // Needs at least one hand
         const GlobalBitvector &loc = ch->getWearloc( );
         if (!loc.isSet( wear_hands )
@@ -664,54 +664,54 @@ SKILL_RUNP( touch )
                 ch->pecho("Тебе нужна хотя бы одна рука для прикосновения.");
                 return;
         }
-	
+
         argument = one_argument(argument,arg);
-	
+
         if ( arg[0] == '\0' )
         {
             ch->pecho("Усыпить кого?");
             return;
         }
-	
-    	if ( (victim = get_char_room(ch,arg)) == 0 )
-    	{
-        	ch->pecho("Тут таких нет.");
-        	return;
-    	}
 
-    	if ( ch == victim )
-    	{
-        	ch->pecho("Может стоит просто заснуть?");
-        	return;
-    	}
+        if ( (victim = get_char_room(ch,arg)) == 0 )
+        {
+            ch->pecho("Тут таких нет.");
+            return;
+        }
 
-    	if ( victim->isAffected(gsn_vampiric_touch) )
-    	{
-        	ch->pecho("Твоя жертва еще не отошла от прикосновения.");
-        	return;
-    	}
-	
+        if ( ch == victim )
+        {
+            ch->pecho("Может стоит просто заснуть?");
+            return;
+        }
+
+        if ( victim->isAffected(gsn_vampiric_touch) )
+        {
+            ch->pecho("Твоя жертва еще не отошла от прикосновения.");
+            return;
+        }
+
         if ( victim->fighting != 0 )
         {
                 ch->pecho("Подожди, пока закончится сражение.");
                 return;
         }
-	
+
         if ( is_safe(ch,victim) )
         {
                 return;
         }
-	
+
         if (IS_SET(victim->imm_flags, IMM_NEGATIVE))
         {
                 oldact_p("$C1 имеет иммунитет к темной магии.", ch, 0,
                         victim, TO_CHAR,POS_RESTING);
                 return;
         }
-	
+
         if (gsn_rear_kick->getCommand( )->apply( ch, victim ))
             return;
-	
+
         if(SHADOW(ch))
         {
                 ch->pecho("Твое прикосновение проходит сквозь тень!");
@@ -719,11 +719,11 @@ SKILL_RUNP( touch )
                     ch, 0, 0, TO_ROOM,POS_RESTING);
                 return;
         }
-	
+
         //////////////// PROBABILITY CHECKS ////////////////
             
         chance = 0;
-	
+
         chance += gsn_vampiric_touch->getEffective( ch ) * skill_mod;
         chance += ( ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
         chance += ( slevel - victim->getModifyLevel() ) * level_mod * 100;
@@ -999,7 +999,7 @@ SKILL_APPLY( bonedagger )
 bool VampireGuildmaster::social( Character *actor, Character *victim, const DLString &socialName )
 {
     if (actor->is_npc( ))
-	    return false;
+        return false;
 
     if (actor->getProfession( ) != prof_vampire) {
         if (chance(20)) {
@@ -1008,27 +1008,27 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
         }
         return false;
     }
-	    
+
     if ( socialName != "bow" ) {
-	if ( victim != ch ) {
-		return false;
-	}
-	else  {
-        	oldact("$c1 с отвращением смотрит на ужимки $C2.", ch, 0, actor, TO_NOTVICT );
-        	oldact("$c1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
-        	say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );	    
-        	return false;		
-	}
+    if ( victim != ch ) {
+        return false;
+    }
+    else  {
+            oldact("$c1 с отвращением смотрит на ужимки $C2.", ch, 0, actor, TO_NOTVICT );
+            oldact("$c1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
+            say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );
+            return false;
+    }
     }
     else {
-    	if (!victim || victim != ch) {
+        if (!victim || victim != ch) {
             actor->pecho("%1$^C1 смотрит на тебя как на полн%2$Gого|ого|ую идиот%2$Gа|а|ку.", ch, actor);
             actor->recho("%1$^C1 смотрит на %2$C4 как на полн%2$Gого|ого|ую идиот%2$Gа|а|ку.", ch, actor);
-        	say_act( actor, ch, "Кому ты кланяешься? Стенке?" );	    
-        	return false;
-	    }
-    }	
-	
+            say_act( actor, ch, "Кому ты кланяешься? Стенке?" );        
+            return false;
+        }
+    }
+
     PCharacter *pActor = actor->getPC( );
     PCSkillData &data = pActor->getSkillData( gsn_vampire );
 
@@ -1036,7 +1036,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
         say_act( actor, ch, "Ты уже ста$gло|л|ла одн$gим|им|ой из нас, $c1." );
         return false;
     }
-	
+
     if (pActor->getQuestPoints() < 50) {
         say_act( actor, ch, "Тебе потребуется 50 квестовых очков для обряда инициации." );
         return false;

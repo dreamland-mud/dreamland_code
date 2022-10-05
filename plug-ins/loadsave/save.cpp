@@ -200,7 +200,7 @@ Affect * fread_affect( FILE *fp )
         where        = fread_number(fp); 
         paf->level        = fread_number(fp);
         paf->duration        = fread_number(fp);
-        paf->modifier        = fread_number(fp);        
+        paf->modifier        = fread_number(fp);
         paf->location.setTable(&apply_flags);
         paf->location        = fread_number(fp);
         paf->bitvector.setTable(affect_where_to_table(where));
@@ -208,8 +208,8 @@ Affect * fread_affect( FILE *fp )
 
         globalString    = fread_dlstring_to_eol(fp);
         globalString.substitute('\r', ' ').substitute('\n', ' ');
-        globalString.stripWhiteSpace( );        
-        
+        globalString.stripWhiteSpace( );
+
         if (where == TO_LOCATIONS) {
             paf->global.setRegistry( wearlocationManager );
             paf->global.fromString( globalString );
@@ -565,7 +565,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 //        if ( obj->next_content != 0 )
 //                fwrite_obj( ch, obj->next_content, fp, iNest );
 
-            
+
     if (IS_SET(obj->pIndexData->area->area_flag, AREA_NOSAVEDROP))
         return;
 
@@ -1123,7 +1123,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
     if (!str_cmp(word,"Vnum"))
     {
             int vnum;
-            
+
             vnum = fread_number(fp);
             if (get_mob_index(vnum) == 0)
         {
@@ -1143,29 +1143,29 @@ void fread_pet( PCharacter *ch, FILE *fp )
     {
             word         = feof(fp) ? "End" : fread_word(fp);
             fMatch = false;
-            
+
             switch (Char::upper(word[0]))
             {
             case '*':
                 fMatch = true;
                 fread_to_eol(fp);
                 break;
-                    
+
             case 'A':
                 KEY( "Act",                pet->act,                fread_flag(fp));
                 KEY( "AfBy",        pet->affected_by,        fread_flag(fp));
                 KEY( "Alig",        pet->alignment,                fread_number(fp));
-            
+
                 if (!str_cmp(word,"ACs"))
                 {
                         int i;
-                        
+
                         for (i = 0; i < 4; i++)
                             pet->armor[i] = fread_number(fp);
                         fMatch = true;
                         break;
                 }
-            
+
             if (!str_cmp(word,"Affc"))
             {
                 Affect *paf = fread_affect( fp );
@@ -1174,28 +1174,28 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 fMatch          = true;
                 break;
             }
-            
+
                 if (!str_cmp(word,"AMod"))
                 {
                          int stat;
-                         
+
                          for (stat = 0; stat < stat_table.size; stat++)
                              pet->mod_stat[stat] = fread_number(fp);
                          fMatch = true;
                          break;
                 }
-            
+
                 if (!str_cmp(word,"Attr"))
                 {
                      int stat;
-            
+
                      for (stat = 0; stat < stat_table.size; stat++)
                          pet->perm_stat[stat] = fread_number(fp);
                      fMatch = true;
                      break;
                 }
                 break;
-            
+
              case 'C':
                  KEY( "Comm",        pet->comm,                fread_flag(fp));
 
@@ -1211,7 +1211,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 }
 
                  break;
-            
+
              case 'D':
                  KEY( "Dam",        pet->damroll,                fread_number(fp));
                  KEY( "DamT",       pet->damage[DICE_TYPE],      fread_number(fp));
@@ -1257,7 +1257,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
             
              case 'H':
                  KEY( "Hit",        pet->hitroll,                fread_number(fp));
-            
+
                  if (!str_cmp(word,"HMV"))
                  {
                          pet->hit        = fread_number(fp);
@@ -1270,14 +1270,14 @@ void fread_pet( PCharacter *ch, FILE *fp )
                          break;
                  }
                  break;
-            
+
         case 'I':
             if (!str_cmp( word, "Id" )) {
                 pet->setID( fread_number64( fp ) );
                 fMatch = true;
                 break;
             }
-            
+
             break;
 
              case 'L':
@@ -1296,7 +1296,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                 break;
             }
                 break;
-            
+
             case 'N':
                                 if ( !str_cmp( word, "Name" ) )
                                 {
@@ -1308,11 +1308,11 @@ void fread_pet( PCharacter *ch, FILE *fp )
                                     break;
                                 }
                  break;
-            
+
             case 'P':
                  KEYV( "Pos",        pet->position,                fread_number(fp));
                  break;
-            
+
         case 'R':
             if ( !str_cmp( word, "Race" ) )
             {
@@ -1331,7 +1331,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                     break;
             }
                 break;
-         
+
             case 'S' :
                 KEY( "Save",        pet->saving_throw,        fread_number(fp));
             KEY( "Silv",        pet->silver,            fread_number( fp ) );
@@ -1359,7 +1359,7 @@ void fread_pet( PCharacter *ch, FILE *fp )
                     fMatch = true;
                     break;
                 }
-                break;            
+                break;
             }
 
             if ( !fMatch )
@@ -1400,7 +1400,7 @@ NPCharacter * fread_mob( FILE *fp )
             bug("Fread_mob: no vnum in file.",0);
             mob = create_mobile_org(get_mob_index(MOB_VNUM_FIDO), create_flags);
     }
-    
+
     mob->pIndexData->count++;
     mob->affected.deallocate();
 
@@ -1410,29 +1410,29 @@ NPCharacter * fread_mob( FILE *fp )
             word         = feof(fp) ? "End" : fread_word(fp);
 
             fMatch = false;
-    
+
             switch (Char::upper(word[0]))
             {
             case '*':
                     fMatch = true;
                     fread_to_eol(fp);
                     break;
-            
+
             case 'A':
                     KEY( "Act",                mob->act,                fread_flag(fp));
                     KEY( "AfBy",        mob->affected_by,        fread_flag(fp));
                     KEY( "Alig",        mob->alignment,                fread_number(fp));
-    
+
                     if ( !str_cmp(word,"ACs") )
                     {
                             int i;
-            
+
                             for ( i = 0; i < 4; i++ )
                                     mob->armor[i] = fread_number(fp);
                             fMatch = true;
                             break;
                     }
-    
+
                     if ( !str_cmp(word,"Affc") )
                     {
                             Affect *af = fread_affect( fp );
@@ -1442,28 +1442,28 @@ NPCharacter * fread_mob( FILE *fp )
                             fMatch          = true;
                             break;
                     }
-    
+
                     if (!str_cmp(word,"AMod"))
                     {
                             int stat;
-            
+
                             for (stat = 0; stat < stat_table.size; stat++)
                                     mob->mod_stat[stat] = fread_number(fp);
                             fMatch = true;
                             break;
                     }
-    
+
                     if (!str_cmp(word,"Attr"))
                     {
                             int stat;
-    
+
                             for (stat = 0; stat < stat_table.size; stat++)
                                     mob->perm_stat[stat] = fread_number(fp);
                             fMatch = true;
                             break;
                     }
                     break;
-    
+
             case 'C':
                     KEY( "Comm",        mob->comm,                fread_flag(fp));
 
@@ -1485,13 +1485,13 @@ NPCharacter * fread_mob( FILE *fp )
                     }
 
                     break;
-    
+
             case 'D':
                     KEY( "Dam",        mob->damroll,                fread_number(fp));
                     KEY( "DamT",       mob->damage[DICE_TYPE],      fread_number(fp));
                     KEY( "DamN",       mob->damage[DICE_NUMBER],    fread_number(fp));
                     KEY( "Detect",        mob->detection,                fread_flag(fp));
-                    
+
                     if (!str_cmp( word, "Desc" )) {
                         char *word = fread_string( fp );
                         mob->setDescription( word );
@@ -1500,7 +1500,7 @@ NPCharacter * fread_mob( FILE *fp )
                         break;
                     }
                     break;
-    
+
             case 'E':
                     if (!str_cmp(word,"End"))
                     {
@@ -1515,14 +1515,14 @@ NPCharacter * fread_mob( FILE *fp )
 
                     KEY( "Exp",        mob->exp,                fread_number(fp));
                     break;
-    
+
             case 'G':
                     KEY( "Gold",        mob->gold,                fread_number(fp));
                     break;
-    
+
             case 'H':
                     KEY( "Hit",        mob->hitroll,                fread_number(fp));
-    
+
                     if (!str_cmp(word,"HMV"))
                     {
                             mob->hit        = fread_number(fp);
@@ -1535,16 +1535,16 @@ NPCharacter * fread_mob( FILE *fp )
                             break;
                     }
                     break;
-                    
+
             case 'I':
                     if (!str_cmp( word, "Id" )) {
                         mob->setID( fread_number64( fp ) );
                         fMatch = true;
                         break;
                     }
-                    
+
                     break;
-    
+
             case 'L':
                     if ( !str_cmp( word, "Levl" ) )
                     {
@@ -1561,7 +1561,7 @@ NPCharacter * fread_mob( FILE *fp )
                         break;
                     }
                     break;
-    
+
             case 'N':
                     if ( !str_cmp( word, "Name" ) )
                     {
@@ -1577,18 +1577,18 @@ NPCharacter * fread_mob( FILE *fp )
                             break;
                     }
                     break;
-    
+
             case 'P':
                     KEYV( "Pos",        mob->position,                fread_number(fp));
                     break;
-    
+
             case 'R':
                     if (!str_cmp( word, "Room" )) {
                         mob->in_room = get_room_instance( fread_number( fp ) );
                         fMatch = true;
                         break;
                     }
-                    
+
                     if ( !str_cmp( word, "Race" ) )
                     {
                             char *rnm = fread_string(fp);
@@ -1614,13 +1614,13 @@ NPCharacter * fread_mob( FILE *fp )
 
                     KEY("RRoom", mob->reset_room, fread_number(fp));
                     break;
-    
+
             case 'S' :
                     KEY( "Save",        mob->saving_throw,        fread_number(fp));
                     KEY( "Silv",        mob->silver,            fread_number( fp ) );
 
                     if( !str_cmp( word, "Sex" ) )
-                    {        
+                    {
                             int sex = fread_number( fp );
 
                             if (sex_table.name( sex ).empty( ))
@@ -1655,7 +1655,7 @@ NPCharacter * fread_mob( FILE *fp )
                     fMatch = true;
                     break;
                 }
-                break;            
+                break;
 
             }
             
@@ -1684,7 +1684,7 @@ void fread_mlt( PCharacter *ch, FILE *fp ) {
     fread_to_eol( fp );
     return;
   }
-  
+
   fread_number( fp );
   i = -1;
 
@@ -1923,7 +1923,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             
                             if (FeniaManager::wrapperManager)
                                 FeniaManager::wrapperManager->linkWrapper( obj );
-                            
+
                             // Notify item load listeners such as weapon randomizer.
                             eventBus->publish(ItemReadEvent(obj));
 
@@ -2138,7 +2138,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                         fMatch = true;
                         break;
                     }
-                    
+
                     break;
             case 'X':
                     if (!str_cmp(word, "X")) {
@@ -2157,7 +2157,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     fread_to_eol( fp );
             }
         }
-    
+
     } catch (const FileFormatException &e) {
         extract_obj( obj );
         throw e;

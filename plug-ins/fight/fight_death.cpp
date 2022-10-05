@@ -366,7 +366,7 @@ public:
         const CharDeathEvent &evt = static_cast<const CharDeathEvent &>(event);
         Character *victim = evt.victim;
         Character *killer = evt.killer;
-	    int bodypart = evt.bodypart;
+        int bodypart = evt.bodypart;
         DLString label = evt.label;
         int damtype = evt.damtype;
 
@@ -867,7 +867,7 @@ void raw_kill( Character* victim, int part, Character* ch, const DLString &label
         return;
     
     if (ch)
-    	mprog_kill( ch, victim );
+        mprog_kill( ch, victim );
 
     // onDeath mob trigger can interrupt normal death handling.
     if (mprog_death( victim, ch ))
@@ -888,8 +888,8 @@ void raw_kill( Character* victim, int part, Character* ch, const DLString &label
     // MOB is killed.
     if (victim->is_npc( )) {
         killed_npc_gain( victim->getNPC( ) );
-    	victim->setDead( );
-	    DeathAutoCommands( ch, victim ).run( );   
+        victim->setDead( );
+        DeathAutoCommands( ch, victim ).run( );   
         return;
     }
 

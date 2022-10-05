@@ -29,7 +29,7 @@ bool FleeMovement::canFlee( Character *wch )
     if (IS_SET(exit_info, EX_NOFLEE))
         return false;
     if (wch->detection.isSet(ADET_IMMOBILIZED))
-	return false;
+    return false;
       
     if (wch->is_npc( ) 
             && !RIDDEN(wch) 

@@ -218,8 +218,8 @@ NMI_GET( CharacterWrapper, inventory, "список всех предметов 
     checkTarget( );
     
     for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
-	if (obj->wear_loc == wear_none)
-	    rc->push_back(wrap(obj));
+    if (obj->wear_loc == wear_none)
+        rc->push_back(wrap(obj));
 
     return wrap(rc);
 }
@@ -230,7 +230,7 @@ NMI_GET( CharacterWrapper, equipment, "список всех предметов 
     checkTarget( );
     
     for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
-	if (obj->wear_loc != wear_none)
+    if (obj->wear_loc != wear_none)
             rc->push_back(wrap(obj));
 
     return wrap(rc);
@@ -951,7 +951,7 @@ NMI_SET( CharacterWrapper, level, "настоящий уровень" )
 NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 квестов и самооценка новичок")
 {
     checkTarget();
-    CHK_NPC	   
+    CHK_NPC
     return is_total_newbie(target->getPC());
 }
 
@@ -1788,7 +1788,7 @@ NMI_INVOKE( CharacterWrapper, setViolent, "(vict): установить VIOLENT 
 {
     checkTarget();
     CHK_NPC
-	Character *victim = args2character(args);
+    Character *victim = args2character(args);
     ::set_violent( target, victim, true );
     return Register();
 }
@@ -1822,9 +1822,9 @@ NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag]): 
     int dam_type = argnum2flag(args, 3, damage_table);
     int dam_flag = DAMF_OTHER;
     if (args.size() > 3)
-	dam_flag = argnum2flag(args, 4, damage_flags);
+    dam_flag = argnum2flag(args, 4, damage_flags);
 
-    return Register(saves_spell(level, target, dam_type, caster, dam_flag));	
+    return Register(saves_spell(level, target, dam_type, caster, dam_flag));
 }
 
 NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от пилюли или зелья")

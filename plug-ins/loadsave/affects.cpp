@@ -283,7 +283,7 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
         if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
             charFlag.setBit(paf->bitvector);
         else if (paf->global.getRegistry() == registry) {
-            if (registry == wearlocationManager)		
+            if (registry == wearlocationManager)
                 ch->wearloc.remove(paf->global);
         }
 }

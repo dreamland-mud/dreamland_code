@@ -253,7 +253,7 @@ COMMAND(CQuest, "quest")
 
 void CQuest::autoQuestInfo(PCharacter *ch, ostringstream &buf)
 {
-    // Output questor's quest info to buf.	
+    // Output questor's quest info to buf.
     int time;
     Quest::Pointer quest;
     
@@ -284,12 +284,12 @@ void CQuest::doInfo( PCharacter *ch )
 
 void CQuest::doSummary( PCharacter *ch, const DLString &arguments ) 
 {    
-    // Output questor's quest info to buf.	
+    // Output questor's quest info to buf.
     ostringstream buf;
     autoQuestInfo(ch, buf);
     bool autoquest = !buf.str().empty();
 
-    // Output Fenia quest list directly to char.	
+    // Output Fenia quest list directly to char.
     bool feniaquest = gprog_quest(ch, "newinfo", arguments);
 
     // 'q <number>' command is fully handled in Fenia.

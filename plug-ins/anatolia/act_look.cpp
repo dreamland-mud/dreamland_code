@@ -473,8 +473,8 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
 
 void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf)
 {
-	ostringstream buf;
-		
+    ostringstream buf;
+
     for (auto &paf: room->affected.findAllWithHandler())
         if (paf->type->getAffect())
             paf->type->getAffect( )->onDescr(SpellTarget::Pointer(NEW, ch), paf, buf);
@@ -511,12 +511,12 @@ void show_char_pk_flags( PCharacter *ch, ostringstream &buf )
 void show_char_blindness( Character *ch, Character *victim, ostringstream &buf )
 {
     if (IS_AFFECTED(victim, AFF_BLIND)) {
-	if (victim->position <= POS_SLEEPING)
-		buf << endl;	
-	else if (victim->fighting == ch)
-		buf << "...вслепую размахивая во все стороны.{x" << endl;
-	else	    
-        	buf << fmt( ch, "...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x", victim ) << endl;
+    if (victim->position <= POS_SLEEPING)
+        buf << endl;
+    else if (victim->fighting == ch)
+        buf << "...вслепую размахивая во все стороны.{x" << endl;
+    else
+            buf << fmt( ch, "...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x", victim ) << endl;
     }
 }
 
@@ -680,9 +680,9 @@ void show_char_to_char_0( Character *victim, Character *ch )
         bool npcUndead = victim->is_npc() && 
             (IS_SET(victim->act, ACT_UNDEAD) || IS_SET(victim->form, FORM_UNDEAD));
     
-		if (npcUndead || IS_VAMPIRE(victim))
-			buf << "({1{rНежить{2)";
-	}      
+        if (npcUndead || IS_VAMPIRE(victim))
+            buf << "({1{rНежить{2)";
+    }
 
     if (IS_AFFECTED(victim, AFF_PASS_DOOR))
         buf << fmt(ch, "({1{wПр{Dо{wзр{Dа{wч%Gно|ен|на{2)", victim);
@@ -834,7 +834,7 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
     if (IS_AFFECTED( victim, AFF_BLIND ))
         str << "Похоже, ничего не вид%1$nит|ят." << endl;
     if (IS_AFFECTED( victim, AFF_SCREAM ))
-        str << "В ужасе зажима1$nет|ют уши." << endl;	
+        str << "В ужасе зажима1$nет|ют уши." << endl;
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
         str << "Покрыт%1$Gо||а|ы чумными язвочками." << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
@@ -901,7 +901,7 @@ static void show_char_description( Character *ch, Character *vict )
         buf << "Монстр в своем ужасающем обличии. Нечисть и порождение тьмы." << endl
             << "Пара ярко-красных глаз и ослепительно острых клыков сверкают на фоне обсидиановой, почти черной, как ночь, кожи." << endl
             << fmt(0,"Огромное и мускулистое тело ночно%1$Gго|го|й хищни%1$Gка|ка|цы, обрамленное крыльями, какие есть у летучих мышей, замерло в ожидании.\n\r",vict);
-    	ch->send_to(buf);
+        ch->send_to(buf);
         return;  
     }
 
@@ -941,7 +941,7 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
             << " "
             << (IS_VAMPIRE(vict) ? "vampire" : vict->getRace( )->getName( ));
     }
-	buf << ", " << size_table.message( vict->size, '2' ) << " размера";
+    buf << ", " << size_table.message( vict->size, '2' ) << " размера";
     buf << ") ";
 }
 
@@ -995,7 +995,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
         ch->pecho("\r\nБоевая трансформация скрывает экипировку от твоего взора.");
         return;
     }
-	
+
     if (!naked) {
         oldact("\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
         ch->send_to( buf );

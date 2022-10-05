@@ -19,6 +19,6 @@ KidnapQuestRegistrator::~KidnapQuestRegistrator( )
 
 bool KidnapQuestRegistrator::applicable( PCharacter *pch, bool fAuto ) const
 {
-	return QuestRegistratorBase::applicable(pch, fAuto);
+    return QuestRegistratorBase::applicable(pch, fAuto);
 }
 

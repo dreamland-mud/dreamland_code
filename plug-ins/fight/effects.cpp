@@ -378,10 +378,10 @@ void fire_effect(void *vo, Character *source, short level, int dam, int target, 
         dam_ratio = (100 * dam) / max(1, (int)victim->max_hit);
         effect_level = level * (20 + 5 * dam_ratio) / 100; // adds 5% to effective level per each 1% damage dealt
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
-		
+
         /* chance of blindness */
         if (!IS_AFFECTED(victim,AFF_BLIND) && IS_SET(victim->parts, PART_EYE) &&
-       		!saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
+            !saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
         {
             Affect af;
             oldact_p("$c1 ничего не видит из-за дыма, попавшего в глаза!",

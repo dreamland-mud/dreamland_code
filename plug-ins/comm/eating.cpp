@@ -144,14 +144,14 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
         desire_full->eat( pch, cFull );
     }
 
-	/* The food was poisoned! */
+    /* The food was poisoned! */
     if (cPoison != 0)
     {
         int level = number_fuzzy( cFull / 2 );
         Affect af;
 
         if ( !saves_spell(level / 2, ch, DAM_POISON) ) {
-			ch->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а.", ch);
+            ch->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$Gего|его|ее|их тел%1$nо|а.", ch);
             ch->pecho("Тебя начинает тошнить, когда яд проникает в твое тело.");
 
             af.bitvector.setTable(&affect_flags);
@@ -160,7 +160,7 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
             af.duration  = cFull;
             af.bitvector.setValue(AFF_POISON);
             affect_join( ch, &af );
-		}
+        }
     }
 }
 

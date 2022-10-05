@@ -144,17 +144,17 @@ int material_rho( Object *obj )
 int material_rho( const char *materials )
 {
     int rho = 0;
-	int i = 0;
+    int i = 0;
     vector<const material_t *> result;
 
     material_parse( materials, result );
     
     for (auto &mat: result) {
-		i++;
-		rho = rho + mat->rho;
-	}
-	if (i == 0) i++; // sanity check
-	rho = rho / i; // find everage density
+        i++;
+        rho = rho + mat->rho;
+    }
+    if (i == 0) i++; // sanity check
+    rho = rho / i; // find everage density
     return rho;
 }
 
@@ -166,21 +166,21 @@ int material_hardness( Object *obj )
 int material_hardness( const char *materials )
 {
     int hardness = 0;
-	int i = 0;
+    int i = 0;
     vector<const material_t *> result;
 
     material_parse( materials, result );
     
     for (auto &mat: result) {
-		i++;
-		// can't break even partially indestructible or elastic material
-		if (mat->hardness <= 0)
-			return mat->hardness; 
-		else
-			hardness = hardness + mat->hardness;
-	}
-	if (i == 0) i++; // sanity check
-	hardness = hardness / i; // find everage hardness
+        i++;
+        // can't break even partially indestructible or elastic material
+        if (mat->hardness <= 0)
+            return mat->hardness; 
+        else
+            hardness = hardness + mat->hardness;
+    }
+    if (i == 0) i++; // sanity check
+    hardness = hardness / i; // find everage hardness
     return hardness;
 }
 

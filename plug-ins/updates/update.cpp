@@ -392,7 +392,7 @@ void char_update( )
         }
         
         // FENIA: onUpdateChar for 'stuck item' affect (or existing spear, arrow affects). Remove effects from extracted arrows.
-		// TO-DO (RUFFINA): Needs actual stuck_item effect and some missile refactoring
+        // TO-DO (RUFFINA): Needs actual stuck_item effect and some missile refactoring
         if (get_eq_char(ch, wear_stuck_in) == 0) {
             room_to_save( ch );
             if (ch->isAffected(gsn_arrow))

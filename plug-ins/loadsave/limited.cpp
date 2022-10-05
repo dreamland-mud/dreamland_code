@@ -63,7 +63,7 @@ static bool item_is_home(Object *obj)
 
     // Don't decay auction items.
     if (obj == auction->item)
-	return true;
+    return true;
 
     if (obj->in_room) {
         if (obj->reset_room == obj->in_room->vnum)
@@ -177,7 +177,7 @@ bool limit_purge( Object *obj )
     if (obj->timestamp > dreamland->getCurrentTime( ))
         return false;
 
-    // Don't destory item while on auction.	
+    // Don't destory item while on auction.
     if (obj == auction->item)
         return false;
 

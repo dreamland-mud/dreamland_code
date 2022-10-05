@@ -34,13 +34,13 @@ bool RoomUtils::isOutside(Character *ch)
 
 bool RoomUtils::hasWaterParticles(Room *target)
 {
-	if ( (isWater(target)) ||
-		 (IS_SET(target->room_flags, ROOM_NEAR_WATER)) ||
-		 (isOutside(target) && weather_info.sky >= SKY_RAINING) ||
-		 (get_obj_room_type(target, ITEM_FOUNTAIN) != 0) ) {
-		return true;
-	}
-	return false;
+    if ( (isWater(target)) ||
+         (IS_SET(target->room_flags, ROOM_NEAR_WATER)) ||
+         (isOutside(target) && weather_info.sky >= SKY_RAINING) ||
+         (get_obj_room_type(target, ITEM_FOUNTAIN) != 0) ) {
+        return true;
+    }
+    return false;
 }
 
 bool RoomUtils::isNature(Room *target)

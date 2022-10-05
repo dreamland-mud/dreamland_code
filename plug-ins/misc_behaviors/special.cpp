@@ -366,18 +366,18 @@ bool spec_breath_lightning( NPCharacter *ch )
 bool spec_breath_any( NPCharacter *ch )
 {
     if ( ch->position != POS_FIGHTING )
-		return false;
+        return false;
 
     if ( number_percent() < 50 )
         return false;
 
     switch (number_range(0,6))
     {
-    	case 0: return spec_breath_fire( ch );
-    	case 1: return spec_breath_frost( ch );
-    	case 2: return spec_breath_lightning( ch );
-    	case 3: return spec_breath_gas( ch );
-    	case 4: return spec_breath_acid( ch );
+        case 0: return spec_breath_fire( ch );
+        case 1: return spec_breath_frost( ch );
+        case 2: return spec_breath_lightning( ch );
+        case 3: return spec_breath_gas( ch );
+        case 4: return spec_breath_acid( ch );
     }
 
     return false;
