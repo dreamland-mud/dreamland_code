@@ -112,7 +112,7 @@ CMDRUN( fill )
 
 	// Source is empty or frozen
     if (source && source->value0() == 0) {
-		if (source->isAffected(gsn_chill_touch)))
+		if (source->isAffected(gsn_chill_touch))
 			ch->pecho("Жидкость в %1$O6, похоже, заморожена.", source);
 		else ch->pecho("В %1$O6, похоже, пусто.", source);
         return;
@@ -402,7 +402,7 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 	
 	// Source is empty or frozen
     if (out->value1() == 0) {
-		if (out->isAffected(gsn_chill_touch)))
+		if (out->isAffected(gsn_chill_touch))
 			ch->pecho("Жидкость в %1$O6, похоже, заморожена.", out);
 		else ch->pecho("В %1$O6, похоже, пусто.", out);
         return;
@@ -425,8 +425,10 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
     }
 	
 	// Check if closed (fountains can't be closed)
-    if (in->item_type == ITEM_DRINK_CON && drink_is_closed( in, ch ))
-        return;
+    if (in->item_type == ITEM_DRINK_CON) {
+		if (drink_is_closed( in, ch ))
+			return;
+	}
 	
 	// Check if target is frozen
 	if (in->isAffected(gsn_chill_touch)) {
@@ -674,7 +676,7 @@ CMDRUN( drink )
         case ITEM_FOUNTAIN:
 			// Source is empty or frozen
     		if (obj->value0() > -1 && obj->value1() == 0) {
-				if (obj->isAffected(gsn_chill_touch)))
+				if (obj->isAffected(gsn_chill_touch))
 					ch->pecho("Жидкость в %1$O6, похоже, заморожена.", obj);
 				else ch->pecho("В %1$O6, похоже, пусто.", obj);
         		return;
@@ -691,7 +693,7 @@ CMDRUN( drink )
 
 			// Source is empty or frozen
     		if (obj->value1() <= 0) {
-				if (obj->isAffected(gsn_chill_touch)))
+				if (obj->isAffected(gsn_chill_touch))
 					ch->pecho("Жидкость в %1$O6, похоже, заморожена.", obj);
 				else ch->pecho("В %1$O6, похоже, пусто.", obj);
         		return;
