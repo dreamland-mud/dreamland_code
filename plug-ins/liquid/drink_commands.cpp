@@ -40,6 +40,7 @@ WEARLOC(hold);
 PROF(vampire);
 GSN(none);
 GSN(poison);
+GSN(chill_touch);
 GSN(poured_liquid);
 RACE(satyr);
 LIQ(none);
@@ -54,7 +55,7 @@ CMDRUN( fill )
 {
     Object *obj;
     int amount = 0;
-    Object *fountain = 0;
+    Object *source = 0;
     Liquid *liq;
     DrinkContainer::Pointer drink;
     Room *room = ch->in_room;
@@ -73,28 +74,35 @@ CMDRUN( fill )
         return;
     }
 
+    if (obj->item_type == ITEM_FOUNTAIN) {
+        ch->pecho("Чтобы наполнить фонтан, попробуй вылить туда емкость с жидкостью.", obj);
+        return;
+    }
+	
     if (obj->item_type != ITEM_DRINK_CON) {
         ch->pecho( "Ты не можешь наполнить %O4 -- это не емкость для жидкости.", obj );
         return;
     }
 
     if (arg1.empty( )) {
-        fountain = get_obj_room_type( ch, ITEM_FOUNTAIN );
-        if (!fountain && room->getLiquid() == liq_none)
+        source = get_obj_room_type( ch, ITEM_FOUNTAIN );
+		if (!source) source = get_obj_room_type( ch, ITEM_DRINK_CON );
+        if (!source && room->getLiquid() == liq_none)
             if (!IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER)) {
                 ch->pecho("Здесь нет источника!");
                 return;
             }
     }
     else {
-        fountain = get_obj_here( ch, arg1.c_str( ) );
-        if (!fountain) {
+        source = get_obj_here( ch, arg1.c_str( ) );
+        if (!source) {
             ch->pecho("Здесь нет такого источника.");
             return;
         }
 
-        if (fountain->item_type != ITEM_FOUNTAIN) {
-            ch->pecho("%^O1 -- не источник жидкости.", fountain);
+        if (source->item_type != ITEM_FOUNTAIN &&
+		   	source->item_type != ITEM_DRINK_CON) {
+            ch->pecho("%1$^O1 -- не фонтан и не емкость для жидкости.", source);
             return;
         } 
     }
@@ -102,8 +110,16 @@ CMDRUN( fill )
     if (drink_is_closed( obj, ch ))
         return;
 
-    if (fountain)
-        liq = liquidManager->find( fountain->value2() );
+	// Source is empty or frozen
+    if (source && source->value0() == 0) {
+		if (source->isAffected(gsn_chill_touch)))
+			ch->pecho("Жидкость в %1$O6, похоже, заморожена.", source);
+		else ch->pecho("В %1$O6, похоже, пусто.", source);
+        return;
+    }
+	
+    if (source)
+        liq = liquidManager->find( source->value2() );
     else if (room->getLiquid() != liq_none)
         liq = room->getLiquid().getElement();
     else
@@ -111,10 +127,11 @@ CMDRUN( fill )
 
     const char *liqname = liq->getShortDescr().c_str();
 
-    if (obj->value1() != 0 && obj->value2() != liq->getIndex()) {
+    if (obj->value1() > 0 && obj->value2() != liq->getIndex()) {
         ch->pecho("Ты пытаешься наполнить %O4 %N5, но туда уже налита другая жидкость.", 
                   obj, liqname);
-        return;
+        ch->pecho("Ее придется сначала вылить.", obj);
+		return;
     }
 
     if (obj->value1() >= obj->value0()) {
@@ -122,28 +139,32 @@ CMDRUN( fill )
         return;
     }    
     
-    if (fountain) {
-        ch->pecho( "Ты наполняешь %O4 %N5 из %O2.", obj, liqname, fountain );
-        ch->recho( "%^C1 наполняет %O4 %N5 из %O2.",ch, obj, liqname, fountain );
+    if (source) {
+        ch->pecho( "Ты наполняешь %O4 %N5 из %O2.", obj, liqname, source );
+        ch->recho( "%^C1 наполняет %O4 %N5 из %O2.",ch, obj, liqname, source );
     } else {
         ch->pecho("Ты зачерпываешь %N4 и наполняешь %O4.", liqname, obj);
         ch->recho("%^C1 зачерпывает %N4 и наполняет %O4.", ch, liqname, obj);
     }
 
-    if (fountain && fountain->value0() > -1) {
+    if (source && source->value0() > -1) {
         amount = obj->value0() - obj->value1();
-        amount = min(amount, fountain->value1());
+        amount = min(amount, source->value1());
         obj->value2(liq->getIndex());
         obj->value1(obj->value1() + amount);
-        fountain->value1(fountain->value1() - amount);
+        source->value1(source->value1() - amount);
     }
     else {
         obj->value2(liq->getIndex());
         obj->value1(obj->value0());
     }
 
+    // If the source was poisoned, poison the drink container as well
+    if (source && (IS_SET( source->value3(), DRINK_POISONED ) || source->isAffected(gsn_poison)))
+    	obj->value3(obj->value3() | DRINK_POISONED);
+	
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
-        drink->fill( ch, fountain, amount ); // fountain can be null here
+        drink->fill( ch, source, amount ); // source can be null here
 }
 
 /*
@@ -195,7 +216,9 @@ static void create_pool( Object *out, int amount )
     
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
-    pool->setMaterial( liqName.c_str() );        
+	// Don't set material to liquid name -- those don't exist in the materials list
+	// Use "drink" material for unspecified liquid types (set by default in OBJ_VNUM_POOL, vnum 75)
+    // pool->setMaterial( liqName.c_str() );        
         
     pool->timer += time;
     pool->value0(max( 1, pool->timer / 10 ));
@@ -375,40 +398,56 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 {
     DrinkContainer::Pointer drink;
 
-    if (in->item_type != ITEM_DRINK_CON) {
+	////// Check the source (out) eligibility first
+	
+	// Source is empty or frozen
+    if (out->value1() == 0) {
+		if (out->isAffected(gsn_chill_touch)))
+			ch->pecho("Жидкость в %1$O6, похоже, заморожена.", out);
+		else ch->pecho("В %1$O6, похоже, пусто.", out);
+        return;
+    }
+	
+	////// Now check the target (in) eligibility
+	
+	// Check for correct item type 
+    if (in->item_type != ITEM_DRINK_CON && in->item_type != ITEM_FOUNTAIN) {
         if (!vch || vch == ch)
-            ch->pecho("Ты пытаешься налить что-то в %O4, а это не емкость для жидкости.", in);
+            ch->pecho("Ты пытаешься налить что-то в %O4, а это не фонтан и не емкость для жидкости.", in);
         else
             ch->pecho("В руках у %C2 зажата совсем не емкость для жидкости.", vch);
         return;
     }
-
-    if (drink_is_closed( in, ch ))
-        return;
-
+	
     if (in == out) {
         ch->pecho("Ты не можешь перелить из %1$O2 в сам%1$Gое|ого|у|их себя!", in);
         return;
     }
-
-    if (in->value1() != 0 && in->value2() != out->value2()) {
-        if (!vch || vch == ch)
-            ch->pecho("В %O4 налита другая жидкость.", in);
-        else
-            ch->pecho("В %O4 в руках у %C2 налита другая жидкость.", in, vch);
+	
+	// Check if closed (fountains can't be closed)
+    if (in->item_type == ITEM_DRINK_CON && drink_is_closed( in, ch ))
         return;
-    }
-
-    if (out->value1() == 0) {
-        oldact("В $o6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR);
-        return;
-    }
+	
+	// Check if target is frozen
+	if (in->isAffected(gsn_chill_touch)) {
+		ch->pecho("Жидкость в %1$O6, похоже, заморожена -- придется сначала разморозить.", in);
+		return;
+	}
 
     if (in->value1() >= in->value0()) {
         if (!vch || vch == ch)
             ch->pecho( "%1$^O1 уже полностью заполне%1$Gно|н|на|ны.", in );
         else
             ch->pecho( "%1$^O1 в руках у %2$C2 уже полностью заполне%1$Gно|н|на|ны.", in, vch );
+        return;
+    }
+	
+	// Can't mix liquids (yet!)
+    if (in->value1() != 0 && in->value2() != out->value2()) {
+        if (!vch || vch == ch)
+            ch->pecho("В %O4 налита другая жидкость.", in);
+        else
+            ch->pecho("В %O4 в руках у %C2 налита другая жидкость.", in, vch);
         return;
     }
 
@@ -505,8 +544,8 @@ CMDRUN( pour )
     Character *vch = 0;
     
     arg1 = arguments.getOneArgument( ); // drink1
-    arg2 = arguments.getOneArgument( ); // drink2 or victim or out or empty
-    arg3 = arguments.getOneArgument( ); // victim or empty
+    arg2 = arguments.getOneArgument( ); // drink2/fountain or victim or "out" or empty
+    arg3 = arguments.getOneArgument( ); // victim (holding drink2) or empty
 
     if (arg1.empty( )) {
         ch->pecho("Вылить что и куда?");
@@ -633,10 +672,14 @@ CMDRUN( drink )
             return;
 
         case ITEM_FOUNTAIN:
-            if (obj->value0() > -1 && obj->value1() == 0) {
-                ch->pecho("Здесь пусто.");
-                return;
-            }
+			// Source is empty or frozen
+    		if (obj->value0() > -1 && obj->value1() == 0) {
+				if (obj->isAffected(gsn_chill_touch)))
+					ch->pecho("Жидкость в %1$O6, похоже, заморожена.", obj);
+				else ch->pecho("В %1$O6, похоже, пусто.", obj);
+        		return;
+    		}			
+
             liquid = liquidManager->find( obj->value2() );
             amount = liquid->getSipSize( ) * 3;
             amount = min(amount, obj->value1());
@@ -646,10 +689,13 @@ CMDRUN( drink )
             if (drink_is_closed( obj, ch ))
                 return;
 
-            if (obj->value1() <= 0) {
-                ch->pecho("Здесь пусто.");
-                return;
-            }
+			// Source is empty or frozen
+    		if (obj->value1() <= 0) {
+				if (obj->isAffected(gsn_chill_touch)))
+					ch->pecho("Жидкость в %1$O6, похоже, заморожена.", obj);
+				else ch->pecho("В %1$O6, похоже, пусто.", obj);
+        		return;
+    		}
 
             liquid = liquidManager->find( obj->value2() );
             amount = liquid->getSipSize( );
