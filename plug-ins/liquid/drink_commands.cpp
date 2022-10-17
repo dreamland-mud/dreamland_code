@@ -46,7 +46,7 @@ RACE(satyr);
 LIQ(none);
 LIQ(water);
 LIQ(valerian_tincture);
-
+LIQ(swill);
 
 /*
  * 'fill' command
@@ -187,33 +187,31 @@ static void create_pool( Object *out, int amount )
 
     time = amount / 15;    
     if (time == 0) return;
-
-    liquid = liquidManager->find( out->value2() );
+    else time = std::max( 2, time ); // puddles exist at least 2 ticks 
+	
+    pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); // 75
+	liquid = liquidManager->find( out->value2() );	
     liqShort = liquid->getShortDescr( );
     liqName  = liquid->getName( );
-    time = std::max( 2, time );
-    pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); 
-    
-    if (pool) {
-        /* mix two liquids */
-        if (liqName.c_str() != pool->getMaterial( )) {
-            liqShort = "бурд|а|ы|е|у|ой|е";
-        }
-        else { /* same liquid */ 
-            pool->timer += time;
-            pool->value0(max( 1, pool->timer / 10 ));
-            room->echo( POS_RESTING, "Лужа %N2 растекается еще шире.", liqShort.c_str( ) );
-            save_items(room);
-            return;
-        }
-    }
-    else { 
-        /* new pool */
-        pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
-    }
-    
-    room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
-    
+	
+	if (pool) {
+		amount = pool->value1() + amount;
+		if (out->value2() != pool->value2()) {
+			liquid = liquidManager->find(liq_swill); // When liquids mix, make "swill"
+    		liqShort = liquid->getShortDescr( ); // reassign names to swill
+    		liqName  = liquid->getName( );			
+			room->echo( POS_RESTING, "%^N1 и %N1 смешиваются, образуя лужу %N2.",
+					   liquidManager->find(out->value2())->getShortDescr( ).c_str( ),
+					   liquidManager->find(pool->value2())->getShortDescr( ).c_str( ),
+					   liqShort.c_str( ) );
+		}
+		else room->echo( POS_RESTING, "Лужа %N2 растекается еще шире.", liqShort.c_str( ) );
+	}
+    else {
+		pool = create_object(get_obj_index(OBJ_VNUM_POOL), 0);
+		room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
+	}
+	
     pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
     pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
 	// Don't set material to liquid name -- those don't exist in the materials list
@@ -221,7 +219,9 @@ static void create_pool( Object *out, int amount )
     // pool->setMaterial( liqName.c_str() );        
         
     pool->timer += time;
-    pool->value0(max( 1, pool->timer / 10 ));
+    pool->value0(max( 1, amount )); // Puddle can't be "broader" than its contents
+	pool->value1(max( 1, amount ));
+	pool->value2(liquid->getIndex( ));
 
     if (!pool->in_room) obj_to_room(pool, room);
     else save_items(room);
