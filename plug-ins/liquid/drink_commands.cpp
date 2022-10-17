@@ -435,8 +435,14 @@ static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 		ch->pecho("Жидкость в %1$O6, похоже, заморожена -- придется сначала разморозить.", in);
 		return;
 	}
-
-    if (in->value1() >= in->value0()) {
+	
+	// Don't fill infinite fountains
+    if (in->value0() < 0) {
+		ch->pecho("%1$^O1 бездон%1$Gно|н|на|ны и не нужда%1$nется|ются в заполнении.", in);
+        return;
+    }
+	
+    if (in->value1() > 0 && in->value1() == in->value0()) {
         if (!vch || vch == ch)
             ch->pecho( "%1$^O1 уже полностью заполне%1$Gно|н|на|ны.", in );
         else
