@@ -1197,8 +1197,8 @@ static int drop_obj( Character *ch, Object *obj )
              && material_is_flagged( obj, MAT_FRAGILE )
              && chance( 40 ))
     {
-        ch->recho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
-        ch->pecho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
+        ch->recho( "%1$^O1 пада%1$nет|ют и разбива%1$nется|ются на мелкие осколки.", obj );
+        ch->pecho( "%1$^O1 пада%1$nет|ют и разбива%1$nется|ются на мелкие осколки.", obj );
     }
     else
         return DROP_OBJ_NORMAL;
@@ -1380,26 +1380,26 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
 
     if ( victim->carry_number + obj->getNumber( ) > victim->canCarryNumber( ) )
     {
-        oldact("$C1 не может нести столько вещей.", ch, 0, victim, TO_CHAR);
+		ch->pecho( "%1$^C1 не мо%1$nжет|гут нести столько вещей.", victim );
         return;
     }
 
     if (victim->getCarryWeight( ) + obj->getWeight( ) > victim->canCarryWeight( ) )
     {
-        oldact("$C1 не может нести такую тяжесть.", ch, 0, victim, TO_CHAR);
+		ch->pecho( "%1$^C1 не мо%1$nжет|гут нести такую тяжесть.", victim );
         return;
     }
 
     if ( !victim->can_see( obj ) )
     {
-        oldact("$C1 не видит этого.", ch, 0, victim, TO_CHAR);
+		ch->pecho( "%1$^C1 не вид%1$nит|ят этого.", victim );
         return;
     }
 
     if (obj->pIndexData->limit != -1)
     {
         if (obj->isAntiAligned( victim )) {
-            ch->pecho("%1$^C1 не сможет владеть этой вещью.", victim);
+            ch->pecho("%1$^C1 не смо%1$nжет|гут владеть этой вещью.", victim);
             return;
         }
     }
@@ -1454,7 +1454,7 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 
     if( ( victim->getCarryWeight( ) + gold + silver / 10 ) > victim->canCarryWeight( ) )
     {
-            oldact("$c1 не может нести такой вес.", victim, 0, ch, TO_VICT);
+            ch->pecho( "%1$^C1 не мо%1$nжет|гут нести такую тяжесть.", victim );
             return;
     }
 
@@ -1605,7 +1605,7 @@ CMDRUNP( vomit )
 {
     if (!ch->is_npc( )) {
         if (desire_bloodlust->applicable( ch->getPC( ) )) {
-            ch->pecho("Ты ведь вампир, не так ли?");
+            ch->pecho("Вампирам это, увы, недоступно.");
             return;
         }
         
@@ -1614,8 +1614,8 @@ CMDRUNP( vomit )
         desire_thirst->vomit( ch->getPC( ) );
     }
 
-    oldact("$c1 засовывает два пальца в рот и начинает блевать.",ch,0,0,TO_ROOM);
-    ch->pecho("Ты прочищаешь свой желудок двухпальцевым методом.");
+    ch->recho("%1$^C1 засовыва%1$nет|ют пальцы в рот и начина%1$nет|ют блевать.", ch);
+	ch->pecho("Ты прочищаешь свой желудок двухпальцевым методом.");
 
     mprog_vomit( ch );
 }
