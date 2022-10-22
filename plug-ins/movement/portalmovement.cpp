@@ -187,10 +187,8 @@ bool PortalMovement::checkCurse( Character *wch )
     if (wch->get_trust( ) >= ANGEL)
         return true;
     
-    if (IS_SET(portal->value2(), GATE_NOCURSE))
-        return true;
-    
-    if (IS_AFFECTED(wch, AFF_CURSE)) {
+    if (IS_AFFECTED(wch, AFF_CURSE) && !IS_SET(portal->value2(), GATE_NOCURSE))
+    {
         msgSelfParty( wch, 
                       "Твое проклятье мешает тебе войти в %4$O4.",
                       "Проклятье %2$C2 мешает %2$P3 войти в %4$O4." );
