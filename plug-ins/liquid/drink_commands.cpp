@@ -111,7 +111,7 @@ CMDRUN( fill )
         return;
 
 	// Source is empty or frozen
-    if (source && source->value0() == 0) {
+    if (source && source->value1() == 0) {
 		if (source->isAffected(gsn_chill_touch))
 			ch->pecho("Жидкость в %1$O6, похоже, заморожена.", source);
 		else ch->pecho("В %1$O6, похоже, пусто.", source);
