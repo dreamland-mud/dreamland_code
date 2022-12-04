@@ -2087,8 +2087,8 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднят�
         return false;
     if (!obj->getOwner().empty())
         return false;
-    if (obj->behavior)
-        return false;
+//     if (obj->behavior)
+//         return false;
     if (!target->can_see( obj ))
         return false;
     if (obj->isAntiAligned( target ))
