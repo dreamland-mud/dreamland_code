@@ -195,8 +195,8 @@ bool PortalMovement::checkCurse( Character *wch )
         return false;
     }
     
-    if (IS_SET(from_room->room_flags, ROOM_NO_RECALL)
-         || IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE))
+    if ((IS_SET(from_room->room_flags, ROOM_NO_RECALL)
+         || IS_ROOM_AFFECTED(from_room, AFF_ROOM_CURSE)) && !IS_SET(portal->value2(), GATE_FROM_NO_RECALL))
     {
         msgSelfParty( wch,
                       "Проклятье этого места мешает тебе его покинуть.",
