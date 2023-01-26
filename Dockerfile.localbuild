@@ -19,7 +19,7 @@ USER root
 
 # Install common build tools and DL-specific libs, configure locales.
 RUN apt-get update \
-    && apt-get install -yq g++ gcc ccache make automake libtool bison flex db-util bzip2 \
+    && apt-get install -yq git g++ gcc ccache make automake libtool bison flex db-util bzip2 \
     && apt-get install -yq libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev libfl-dev
 
 # Wrap all compilers with compiler cache:
