@@ -1,0 +1,28 @@
+#
+# This image allows to run DreamLand MUD server in a container with all the required libs
+# and locales installed. It assumes that the executables have been built and installed under
+# /home/dreamland/runtime, where /home/dreamland is mounted as a volume. 
+# 
+# To build the image:
+# docker build -f Dockerfile.localrun -t dreamland/localrun:latest .
+#
+# To launch the MUD server for the first time:
+# docker run  -v /opt/projects/dreamland:/home/dreamland -p 9000:9000 -p 9001:9001 -p 1234:1234 --name dlrun -it dreamland/localrun:latest
+#
+# To restart, using standard output for logs:
+# docker start dlrun -i
+#
+
+FROM ubuntu:focal as dreamland
+
+RUN apt-get update \
+    && apt-get install -yq db-util bzip2 libdb5.3 libdb5.3++ zlib1g libssl-dev libfl-dev libcrypto++ libjsoncpp-dev \
+    && apt-get install -yq locales \
+    && locale-gen ru_RU ru_RU.KOI8-R ru_RU.UTF-8 en_US.UTF-8 \
+    && update-locale
+
+EXPOSE 9000
+EXPOSE 9001
+EXPOSE 1234
+
+CMD cd /home/dreamland/runtime && ./bin/dreamland
