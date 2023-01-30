@@ -497,8 +497,12 @@ void char_update( )
 void diving_update( )
 {
     for (auto &r: roomInstances) {
-        FENIA_VOID_CALL(r, "DiveUpdate", "");
-        FENIA_VOID_CALL(r, "Spec", "");
+        try {
+            FENIA_VOID_CALL(r, "DiveUpdate", "");
+            FENIA_VOID_CALL(r, "Spec", "");
+        } catch (const VictimDeathException &ex) {
+            // DO NOTHING
+        }
     }
 }
 
