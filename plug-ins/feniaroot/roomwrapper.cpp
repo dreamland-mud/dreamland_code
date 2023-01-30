@@ -376,31 +376,43 @@ NMI_INVOKE(RoomWrapper, doorTo, "(room): номер двери, ведущей �
     return -1;
 }
 
-NMI_INVOKE( RoomWrapper, getRoom, "(имя или номер выхода): комната по этому направлению" )
+NMI_INVOKE( RoomWrapper, getRoom, "(имя или номер выхода): комната по этому направлению или null" )
 {
-    int door;
-    
     checkTarget( );
-    door = get_door_argument( args );
+
+    int door = get_door_argument( args );
+    if (door == -1)
+        return Register();
+
     return get_direction( target, door );
 }
 
 NMI_INVOKE( RoomWrapper, getRevDoor, "(имя или номер выхода): вернет номер противоположного направления" )
 {
     checkTarget( );
-    return dirs[get_door_argument( args )].rev;
+
+    int door = get_door_argument(args);
+    if (door == -1)
+        return Register();
+
+    return dirs[door].rev;
 }
 
-NMI_INVOKE( RoomWrapper, doorNumber, "(имя выхода): вернет номер выхода" )
+NMI_INVOKE( RoomWrapper, doorNumber, "(имя выхода): вернет номер выхода или -1" )
 {
     checkTarget( );
     return get_door_argument( args );
 }
 
-NMI_INVOKE( RoomWrapper, doorName, "(номер выхода): вернет имя выхода" )
+NMI_INVOKE( RoomWrapper, doorName, "(номер выхода): вернет имя выхода или null" )
 {
     checkTarget( );
-    return dirs[get_door_argument( args )].name;
+
+    int door = get_door_argument( args );
+    if (door == -1)
+        return Register();
+
+    return dirs[door].name;
 }
 
 Room *check_place(Character *ch, Room *start_room, const DLString &cArg)
@@ -455,19 +467,34 @@ NMI_INVOKE(RoomWrapper, roomAt, "(ch,arg): доступная ch комната 
 NMI_INVOKE( RoomWrapper, dirMsgLeave, "(имя или номер выхода): сообщение при уходе через этот выход (на север, на восток)" )
 {
     checkTarget( );
-    return dirs[get_door_argument( args )].leave;
+
+    int door = get_door_argument( args );
+    if (door == -1)
+        return Register();
+
+    return dirs[door].leave;
 }
 
 NMI_INVOKE( RoomWrapper, dirMsgWhere, "(имя или номер выхода): где находится направление (на севере, внизу, на востоке)" )
 {
     checkTarget( );
-    return dirs[get_door_argument( args )].where;
+
+    int door = get_door_argument( args );
+    if (door == -1)
+        return Register();
+
+    return dirs[door].where;
 }
 
 NMI_INVOKE( RoomWrapper, dirMsgEnter, "(имя или номер выхода): сообщение при заходе через этот выход (с юга, с запада)" )
 {
     checkTarget( );
-    return dirs[get_door_argument( args )].enter;
+
+    int door = get_door_argument( args );
+    if (door == -1)
+        return Register();
+
+    return dirs[door].enter;
 }
 
 NMI_INVOKE( RoomWrapper, getExitFlags, "(номер выхода, имя экстра/выхода): флаги этого выхода (таблица .tables.exit_flags)" )
