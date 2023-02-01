@@ -1,3 +1,4 @@
+#include "lex.h"
 #include "wrapperbase.h"
 #include "feniamanager.h"
 #include "reglist.h"
@@ -58,6 +59,51 @@ bool gprog(const DLString &trigName, const char *fmt, ...)
     }
 }
 
+/** 
+ * Call a trigger with given name and args on an instance (mob, item, room) or its prototype (mob index data etc). 
+ * Return 'true' if one of the triggers also returns true.
+ */
+bool fenia_trigger(const DLString &trigName, const Scripting::RegisterList &args, WrapperBase *instance, WrapperBase *proto)
+{
+    // From "Death" trigger name form "onDeath" and "postDeath" names.
+    Scripting::IdRef onTrigName("on" + trigName);
+    Scripting::IdRef postTrigName("post" + trigName);
+
+    // Collect arguments for the instance trigger call: everything but trigName.
+    // Collect arguments for the index data call: 'this' then everything but trigName.
+    RegisterList trigArgs = args, protoTrigArgs = args;
+    trigArgs.pop_front();
+    protoTrigArgs.pop_front();
+    protoTrigArgs.push_front(Register(instance->getSelf()));
+
+    // Keep trigger functions here.
+    Register onProg, postProg;
+
+    // Execute postXXX trigger on the instance, if defined.
+    if (instance->triggerFunction(postTrigName, postProg)) {
+        instance->postpone(postProg, trigArgs);
+    }
+
+    // Execute postXXX trigger on index data, if defined.
+    if (proto && proto->triggerFunction(postTrigName, postProg)) {
+        proto->postpone(postProg, protoTrigArgs);
+    }
+
+    // Execute onXXX trigger on the instance and return if it returns true.
+    if (instance->triggerFunction(onTrigName, onProg)) {
+        if (onProg.toFunction()->invoke(Register(instance->getSelf()), trigArgs).toBoolean())
+            return true;
+    } 
+
+    // Execute onXXX trigger on index data and return if it returns true.
+    if (proto && proto->triggerFunction(onTrigName, onProg)) {
+        if (onProg.toFunction()->invoke(Register(proto->getSelf()), protoTrigArgs).toBoolean())
+            return true;
+    }
+
+    return false;
+
+}
 
     
 

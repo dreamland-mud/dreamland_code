@@ -30,7 +30,7 @@
 #include "nativeext.h"
 #include "wrap_utils.h"
 #include "subr.h"
-
+#include "fenia_utils.h"
 #include "drink_utils.h"
 #include "material.h"
 #include "damageflags.h"
@@ -809,6 +809,36 @@ NMI_INVOKE(ObjectWrapper, hasWeaponFlag, "(flags): выставлен ли хо�
     
     return Register(IS_WEAPON_STAT(target, flags) != 0);
 }
+
+NMI_INVOKE(ObjectWrapper, getProperty, "(name): вернет значение property с экземпляра или прототипа, либо пустую строку")
+{
+    checkTarget();
+    DLString propName = args2string(args);
+    DLString propValue = target->getProperty(propName);
+    return propValue;
+}
+
+NMI_INVOKE(ObjectWrapper, setProperty, "(name,value): установить значение property с данным именем на экземпляре")
+{
+    checkTarget();
+    DLString propName = argnum2string(args, 1);
+    DLString propValue = argnum2string(args, 2);
+    target->addProperty(propName, propValue);
+    return Register();
+}
+
+NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать триггер у предмета или прототипа")
+{
+    checkTarget();
+
+    // Get trig name such as "Death" or "Get".
+    DLString trigName = argnum2string(args, 1);
+    // Get obj index data wrapper.
+    WrapperBase *proto = get_wrapper(target->pIndexData->wrapper);
+    // Helper function will invoke onDeath, postDeath triggers on item and proto.
+    return fenia_trigger(trigName, args, this, proto);
+}
+
 
 NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "(vnum): поиск объекта внутри этого по внуму" )
 {

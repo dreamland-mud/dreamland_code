@@ -66,7 +66,7 @@
 #include "regcontainer.h"
 #include "nativeext.h"
 #include "idcontainer.h"
-
+#include "fenia_utils.h"
 #include "wrap_utils.h"
 #include "subr.h"
 #include "def.h"
@@ -911,6 +911,18 @@ NMI_GET( CharacterWrapper, wearloc, "названия всех слотов эк
 {
     checkTarget( );
     return target->wearloc.toString();
+}
+
+NMI_GET( CharacterWrapper, max_carry_weight, "макс вес, который может нести персонаж, 0 для петов, 100500 для богов")
+{
+    checkTarget( );
+    return target->canCarryWeight();
+}
+
+NMI_GET( CharacterWrapper, max_carry_number, "макс кол-во вещей, которое может нести персонаж, 0 для петов, 1000 для богов")
+{
+    checkTarget( );
+    return target->canCarryNumber();
 }
 
 NMI_GET( CharacterWrapper, expToLevel, "сколько опыта осталось набрать до след уровня")
@@ -2664,47 +2676,12 @@ NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать �
 {
     checkTarget();
 
-    // From trigName argument (such as 'Heal') get 'onHeal' and 'postHeal' trigger names.
+    // Get trig name such as "Death" or "Get".
     DLString trigName = argnum2string(args, 1);
-    IdRef onTrigName("on" + trigName);
-    IdRef postTrigName("post" + trigName);
-
-    // Collect arguments for character trigger call: everything but trigName.
-    // Collect arguments for mob index data call: 'this' then everything but trigName.
-    RegisterList trigArgs = args, protoTrigArgs = args;
-    trigArgs.pop_front();
-    protoTrigArgs.pop_front();
-    protoTrigArgs.push_front(Register(self));
-
-    // Keep trigger functions here.
-    Register onProg, postProg;
-
     // If it's a mob, access its mob index data wrapper.
     WrapperBase *proto = target->is_npc() ? get_wrapper(target->getNPC()->pIndexData->wrapper) : 0;
-
-    // Execute postXXX trigger on character, if defined.
-    if (triggerFunction(postTrigName, postProg)) {
-        postpone(postProg, trigArgs);
-    }
-
-    // Execute postXXX trigger on mob index data, if defined.
-    if (proto && proto->triggerFunction(postTrigName, postProg)) {
-        proto->postpone(postProg, protoTrigArgs);
-    }
-
-    // Execute onXXX trigger on character and return if it returns true.
-    if (triggerFunction(onTrigName, onProg)) {
-        if (onProg.toFunction()->invoke(Register(self), trigArgs).toBoolean())
-            return true;
-    } 
-
-    // Execute onXXX trigger on mob index data and return if it returns true.
-    if (proto && triggerFunction(onTrigName, onProg)) {
-        if (onProg.toFunction()->invoke(Register(proto->getSelf()), protoTrigArgs).toBoolean())
-            return true;
-    }
-
-    return false;
+    // Helper function will invoke onDeath, postDeath triggers on character and proto.
+    return fenia_trigger(trigName, args, this, proto);
 }
 
 NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить меню или установить пункт number с действием action")
