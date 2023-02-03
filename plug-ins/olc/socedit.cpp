@@ -85,9 +85,9 @@ void OLCStateSocial::show( PCharacter *ch )
 
     ptc(ch, "charNoArgument:   %s  %s\r\n", web_edit_button(ch, "charNoArgument", "web").c_str(), s->msgCharNoArgument.c_str());
     ptc(ch, "othersNoArgument: %s  %s\r\n", web_edit_button(ch, "othersNoArgument", "web").c_str(), s->msgOthersNoArgument.c_str());
-    ptc(ch, "charFound:        %s  %s\r\n", web_edit_button(ch, "charFound", "web").c_str(), s->msgCharFound.c_str());
-    ptc(ch, "othersFound:      %s  %s\r\n", web_edit_button(ch, "othersFound", "web").c_str(), s->msgOthersFound.c_str());
-    ptc(ch, "victimFound:      %s  %s\r\n", web_edit_button(ch, "victimFound", "web").c_str(), s->msgVictimFound.c_str());
+    ptc(ch, "charFound1:        %s  %s\r\n", web_edit_button(ch, "charFound1", "web").c_str(), s->msgCharFound.c_str());
+    ptc(ch, "othersFound1:      %s  %s\r\n", web_edit_button(ch, "othersFound1", "web").c_str(), s->msgOthersFound.c_str());
+    ptc(ch, "victimFound1:      %s  %s\r\n", web_edit_button(ch, "victimFound1", "web").c_str(), s->msgVictimFound.c_str());
     ptc(ch, "charNotFound:     %s  %s\r\n", web_edit_button(ch, "charNotFound", "web").c_str(), s->msgCharNotFound.c_str());
     ptc(ch, "othersAuto:       %s  %s\r\n", web_edit_button(ch, "othersAuto", "web").c_str(), s->msgOthersAuto.c_str());
     ptc(ch, "charFound2:       %s  %s\r\n", web_edit_button(ch, "charFound2", "web").c_str(), s->msgCharFound2.c_str());
@@ -139,17 +139,17 @@ SOCEDIT(othersNoArgument, "", "поле msgOthersNoArgument")
     return editor(argument, getOriginal()->msgOthersNoArgument, ED_NO_NEWLINE);
 }
 
-SOCEDIT(charFound, "", "поле msgCharFound")
+SOCEDIT(charFound1, "", "поле msgCharFound")
 {
     return editor(argument, getOriginal()->msgCharFound, ED_NO_NEWLINE);
 }
 
-SOCEDIT(othersFound, "", "поле msgOthersFound")
+SOCEDIT(othersFound1, "", "поле msgOthersFound")
 {
     return editor(argument, getOriginal()->msgOthersFound, ED_NO_NEWLINE);
 }
 
-SOCEDIT(victimFound, "", "поле msgVictimFound")
+SOCEDIT(victimFound1, "", "поле msgVictimFound")
 {
     return editor(argument, getOriginal()->msgVictimFound, ED_NO_NEWLINE);
 }
