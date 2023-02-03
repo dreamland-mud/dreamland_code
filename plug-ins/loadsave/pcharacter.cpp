@@ -167,8 +167,6 @@ static void clear_fenia_skills( PCharacter *ch )
 
 void PCharacter::updateSkills( )
 {
-    int availCounter = 0;
-
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );
         PCSkillData &data = getSkillData(sn);
@@ -186,13 +184,7 @@ void PCharacter::updateSkills( )
             data.temporary = false;
             data.origin.setValue(SKILL_DREAM);
         }
-
-        // Count and store total number of skills available at this level.
-        if (data.origin == SKILL_PRACTICE && skill->available(this))
-            availCounter++;
     }
-
-    getAttributes().getAttr<XMLIntegerAttribute>("skillCount")->setValue(availCounter);
 }                        
 
 /*-------------------------------------------------------------------------

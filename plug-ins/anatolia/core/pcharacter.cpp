@@ -7,6 +7,8 @@
 #include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "pcrace.h"
+#include "skill.h"
+#include "skillmanager.h"
 #include "room.h"
 #include "commonattributes.h"
 #include "hometown.h"
@@ -22,6 +24,22 @@
 CLAN(none);
 PROF(samurai);
 HOMETOWN(frigate);
+
+ // Count total number of skills available at this level.
+static int count_available_skills(PCharacter *ch)
+{
+    int availCounter = 0;
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        PCSkillData &data = ch->getSkillData(sn);
+
+        if (data.origin == SKILL_PRACTICE && skill->available(ch))
+            availCounter++;
+    }
+
+    return availCounter;
+}
 
 /*
  *  Experience
@@ -61,6 +79,9 @@ void PCharacter::gainExp( int gain )
     while (level < LEVEL_HERO - 1 && getExpToLevel( ) <= 0) {
         
         oldact_p("{CТы дости$gгло|г|гла следующего уровня!!!{x", this, 0, 0, TO_CHAR, POS_DEAD);
+
+        int lastLevelSkillCount = count_available_skills(this);
+
         setLevel( level + 1 );
 
         /* added for samurais by chronos */
@@ -75,6 +96,13 @@ void PCharacter::gainExp( int gain )
         send_discord_level(this);
 
         advanceLevel( );
+
+        // Notify about any new skills gained due to the level advancement.
+        int thisLevelSkillCount = count_available_skills(this);
+        int skillsDiff = thisLevelSkillCount - lastLevelSkillCount;
+        if (skillsDiff > 0)
+            pecho("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x", skillsDiff);
+
         save( );
     }
 }
@@ -135,15 +163,6 @@ void PCharacter::advanceLevel( )
     buf << ".{x";
     pecho( buf.str( ).c_str( ) );
 
-    // Display how many new skills became available after level up.
-    XMLIntegerAttribute::Pointer skillCount 
-        =  getAttributes().getAttr<XMLIntegerAttribute>("skillCount");
-    int skillsLastLevel = skillCount->getValue();
-
     updateSkills( );
-
-    int skillsDiff = skillCount->getValue() - skillsLastLevel;
-    if (skillsDiff > 0)
-        pecho("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x", skillsDiff);
 }
 
