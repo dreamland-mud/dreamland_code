@@ -120,8 +120,11 @@ CMDADM( codesource )
         if (ch->isCoder( ))
             buf << endl
             << "Только для кодеров: " << endl
-            << "     {Wfile{x <файл>          - прочитать текст cs из файла в каталоге share/DL/fenia" << endl
-            << "     {Wfile all{x [<каталог>] - рекурсивно прочитать все сценарии из [под]каталога" << endl;
+            << "     {Wload{x <файл>          - загрузить сценарий из файла в каталоге share/DL/fenia" << endl
+            << "     {Wload all{x [<каталог>] - рекурсивно загрузить все сценарии из [под]каталога" << endl
+            << "     {Wsave{x <номер>|<имя>   - сохранить сценарий на диск" << endl
+            << "     {Wsave all{x             - сохранить все сценарии на диск" << endl;
+
         ch->send_to( buf );
         return;
     }
@@ -221,7 +224,7 @@ CMDADM( codesource )
         return;
     }
     
-    if(cmd.strPrefix("write") || cmd.strPrefix("save")) {
+    if(cmd.strPrefix("save")) {
         if (!pch->isCoder( )) {
             ch->pecho("Check your privilege.");
             return;
@@ -318,7 +321,7 @@ CMDADM( codesource )
         return;
     }
 
-    if(cmd.strPrefix("file")) {
+    if(cmd.strPrefix("load")) {
         if (!pch->isCoder( )) {
             ch->pecho("This is not for you.");
             return;
