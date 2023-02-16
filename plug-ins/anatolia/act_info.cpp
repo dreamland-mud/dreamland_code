@@ -104,7 +104,7 @@
 #include "occupations.h"
 #include "raceflags.h"
 #include "recipeflags.h"
-
+#include "profflags.h"
 #include "screenreader.h"
 #include "def.h"
 #include "act_move.h"
@@ -1067,7 +1067,7 @@ CMDRUNP(report)
         shown = true;
     }
 
-    if (!spells.empty()) {
+    if (!spells.empty() && pet->getProfession()->getFlags().isSet(PROF_CASTER)) {
         ostringstream buf;
         sortSkillsFor(spells, pet->master);
         for (auto it = spells.begin(); it != spells.end();) {
