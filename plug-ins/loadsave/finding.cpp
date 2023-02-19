@@ -771,29 +771,31 @@ int count_obj_in_obj( Object *container, int itype )
 }
 
 
-Object * get_obj_wear_carry( Character *ch, const DLString &cArgument )
+Object * get_obj_wear_carry( Character *ch, const DLString &cArgument, Character *looker )
 {
     char arg[MAX_INPUT_LENGTH], argument[MAX_INPUT_LENGTH];
     Object *obj;
     int count = 0;
     int number;
     long long id = get_arg_id( cArgument );
+    Character *whoCarries = ch;
+    Character *whoSees = looker ? looker : ch;
 
     strcpy( argument, cArgument.c_str( ) );
     number = number_argument( argument, arg );
 
-    for (obj = ch->carrying; obj != 0; obj = obj->next_content)
+    for (obj = whoCarries->carrying; obj != 0; obj = obj->next_content)
         if (obj->wear_loc != wear_none
-            && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
+            && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, whoSees ))) )
         {
             if (id || ++count == number)
                 return obj;
         }
 
-    for (obj = ch->carrying; obj != 0; obj = obj->next_content)
+    for (obj = whoCarries->carrying; obj != 0; obj = obj->next_content)
         if (obj->wear_loc == wear_none
-                && (ch->can_see( obj ) || ch->can_hear( obj ))
-                && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
+                && (whoSees->can_see( obj ) || whoSees->can_hear( obj ))
+                && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, whoSees ))) )
         {
             if (id || ++count == number)
                 return obj;
