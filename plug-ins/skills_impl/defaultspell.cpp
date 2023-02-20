@@ -688,7 +688,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         }
         
         if (target.isSet( TAR_OBJ_EQUIP ) && target.isSet( TAR_OBJ_INV ))
-            obj = get_obj_wear_carry( ch, carg );
+            obj = get_obj_wear_carry( ch, carg, 0 );
         if (!obj && target.isSet( TAR_OBJ_EQUIP ))
             obj = get_obj_wear( ch, carg );
         if (!obj && target.isSet( TAR_OBJ_INV )) 

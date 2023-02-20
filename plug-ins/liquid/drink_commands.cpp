@@ -69,7 +69,7 @@ CMDRUN( fill )
         return;
     }
 
-    if (( obj = get_obj_wear_carry( ch, arg.c_str( ) ) ) == 0) {
+    if (( obj = get_obj_wear_carry( ch, arg.c_str( ), 0 ) ) == 0) {
         ch->pecho("У тебя нет этого.");
         return;
     }

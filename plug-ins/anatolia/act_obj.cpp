@@ -1678,7 +1678,7 @@ CMDRUNP( use )
 
     // First try to use items in your own inventory/eq,
     // then items on the floor, as it often causes confusion.
-    obj = get_obj_wear_carry(ch, arg);
+    obj = get_obj_wear_carry(ch, arg, 0);
     if (!obj)
         obj = get_obj_here(ch, arg);
 

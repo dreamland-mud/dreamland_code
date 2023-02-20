@@ -48,7 +48,7 @@ CMDRUNP( listen )
         return;
     }
 
-    if ( ( obj = get_obj_wear_carry( ch, arg ) ) 
+    if ( ( obj = get_obj_wear_carry( ch, arg, 0 ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
     {
         if (obj->carried_by == ch) {
@@ -209,7 +209,7 @@ CMDRUNP( smell )
      * - liquid smell is shown next
      * - smells from all affects are shown next (onSmellObj)
      */
-    if ( ( obj = get_obj_wear_carry( ch, arg ) ) 
+    if ( ( obj = get_obj_wear_carry( ch, arg, 0 ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
     {
         bool rc = false;

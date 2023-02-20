@@ -120,7 +120,7 @@ Object *        get_obj_list_type( Character *ch, int type, Object *list );
 Object *        get_obj_list_type( Character *ch, const DLString &cArg, int type, Object *list );
 int                count_obj_in_obj( Object *container );
 int                count_obj_in_obj( Object *container, int itype );
-Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument );
+Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument, Character *looker = 0 );
 bool can_see_god(Character *ch, Character *god);
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
 long long get_arg_id( const DLString &cArgument );
