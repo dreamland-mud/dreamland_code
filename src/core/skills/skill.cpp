@@ -81,6 +81,18 @@ int Skill::getMoves(Character *ch) const
 {
     return 0;
 }
+int Skill::getHealthPenalty() const
+{
+    return 0;
+}
+int Skill::getMovesPenalty() const
+{
+    return 0;
+}
+int Skill::getManaPenalty() const
+{
+    return 0;
+}
 const RussianString &Skill::getDammsg( ) const
 {
     static RussianString dammsg("тупость");

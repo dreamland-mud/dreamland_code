@@ -425,6 +425,21 @@ NMI_INVOKE(FeniaSpellContext, effectCurse, "(): применить на жерт
     return Register();
 }
 
+NMI_INVOKE(FeniaSpellContext, applyPenalty, "(): отнять здоровье/ману/шаги при успехе")
+{
+    Character *myCh = arg2character(ch);
+    DefaultSpell *mySpell = arg2spell(spell);
+    int mana = mySpell->getSkill()->getManaPenalty();
+    int hp = mySpell->getSkill()->getHealthPenalty();
+    int moves = mySpell->getSkill()->getMovesPenalty();
+
+    myCh->hit = max(1, myCh->hit - myCh->max_hit * hp / 100);
+    myCh->mana = max(1, myCh->mana - myCh->max_mana * mana / 100);
+    myCh->move = max(1, myCh->move - myCh->max_move * moves / 100);
+
+    return Register();
+}
+
 NMI_GET(FeniaSpellContext, skill, "прототип умения для этого заклинания (.Skill())")
 {
     return Register::handler<SkillWrapper>(name);    

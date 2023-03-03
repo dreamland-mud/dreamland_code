@@ -51,6 +51,9 @@ public:
     virtual int getBeats(Character *ch = 0) const;
     virtual int getMana(Character *ch = 0) const;
     virtual int getMoves(Character *ch = 0) const;
+    virtual int getHealthPenalty() const;
+    virtual int getMovesPenalty() const;
+    virtual int getManaPenalty() const;
     virtual const RussianString &getDammsg( ) const;
     virtual bool isPassive() const;
 

@@ -191,7 +191,9 @@ void OLCStateSkill::show( PCharacter *ch )
             web_edit_button(ch, "russian", "web").c_str());
     ptc(ch, "Группы:      {C%s {D(group){x\r\n", r->getGroups().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
-    ptc(ch, "Мана и шаги: {C%d {D(mana) {C%d {D(move){x \r\n", r->getMana(), r->move.getValue());
+    ptc(ch, "Цена, очки:  {C%d мана {D(mana) {C%d шаги {D(move){x \r\n", r->getMana(), r->move.getValue());
+    ptc(ch, "Цена, %%:     {C%d%% мана {Dpmana) {C%d%% шаги {D(pmove) {C%d%% здоровье {D(phealth){x\r\n",
+        r->manaPenalty.getValue(), r->movesPenalty.getValue(), r->healthPenalty.getValue());
     ptc(ch, "Характер:    {C%s {D(align) {C%s {D(ethos){x\r\n",
         r->align.getValue() != 0 ? r->align.names().c_str() : "-",
         r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
@@ -614,17 +616,36 @@ SKEDIT(beats, "задержка", "wait state в пульсах (секунды 
     return numberEdit(0, 60, r->beats);
 }
 
-SKEDIT(mana, "мана", "расход маны")
+SKEDIT(mana, "мана", "расход маны, очки")
 {
     BasicSkill *r = getOriginal();
     return numberEdit(0, 500, r->mana);
 }
 
-SKEDIT(move, "шаги", "расход шагов")
+SKEDIT(move, "шаги", "расход шагов, очки")
 {
     BasicSkill *r = getOriginal();
     return numberEdit(0, 500, r->move);
 }
+
+SKEDIT(pmana, "пмана", "расход маны, проценты")
+{
+    BasicSkill *r = getOriginal();
+    return numberEdit(0, 100, r->manaPenalty);
+}
+
+SKEDIT(pmove, "пшаги", "расход шагов, проценты")
+{
+    BasicSkill *r = getOriginal();
+    return numberEdit(0, 100, r->movesPenalty);
+}
+
+SKEDIT(phealth, "пздоровье", "расход здоровья, проценты")
+{
+    BasicSkill *r = getOriginal();
+    return numberEdit(0, 100, r->healthPenalty);
+}
+
 
 SKEDIT(group, "группа", "группа умений (? practicer)")
 {

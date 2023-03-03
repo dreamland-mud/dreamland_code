@@ -367,6 +367,19 @@ int BasicSkill::getMoves(Character *ch) const
     return move;
 }
 
+int BasicSkill::getHealthPenalty() const
+{
+    return healthPenalty;
+}
+int BasicSkill::getMovesPenalty() const
+{
+    return movesPenalty;
+}
+int BasicSkill::getManaPenalty() const
+{
+    return manaPenalty;
+}
+
 const RussianString &BasicSkill::getDammsg( ) const
 {
     return dammsg;
@@ -507,27 +520,60 @@ DLString BasicSkill::printPracticers(PCharacter *ch) const
 DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
 {
     const char *pad = SKILL_INFO_PAD;
-    bool empty = true; // Contains any meaningful output besides padding and new lines?
-    ostringstream buf;
-
-    buf << pad;
+    StringList outputLines;
 
     int beat = getBeats(ch) / dreamland->getPulsePerSecond();
     if (beat > 0) {
-        buf << fmt(0, "Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. ", beat);
-        empty = false;
+         outputLines.push_back(fmt(0, "Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. ", beat));
     }
     
-    int mana = getMana(ch);
-    int moves = getMoves(ch);
-    if (mana > 0 || moves > 0) {
-        buf << "Расход ";
-        if (mana > 0)
-            buf << "маны {W" << mana << "{x";
-        if (moves > 0) 
-            buf << (mana > 0 ? ", " : "") << "шагов {W" << moves << "{x";
-        buf << ". ";
-        empty = false;
+    // Collect move/mana/health costs and penalties into a string.
+    {
+        ostringstream buf;
+        StringList cost, penalty; 
+        
+        int mana = getMana(ch);
+        if (mana > 0) {
+            DLString m = "маны {W";
+            m << mana << "{x";
+            cost.push_back(m);
+        }
+
+        int moves = getMoves(ch);
+        if (moves > 0) {
+            DLString m = "шагов {W";
+            m << moves << "{x";
+            cost.push_back(m);
+        }
+
+        if (manaPenalty > 0) {
+            DLString m = "маны {C";
+            m << manaPenalty << "%{x";
+            penalty.push_back(m);
+        }
+
+        if (movesPenalty > 0) {
+            DLString m = "шагов {C";
+            m << movesPenalty << "%{x";
+            penalty.push_back(m);
+        }
+
+        if (healthPenalty > 0) {
+            DLString m = "здоровья {C";
+            m << healthPenalty << "%{x";
+            penalty.push_back(m);
+        }
+
+        if (!cost.empty()) {
+            buf << "Расход " << cost.join(", ") << ". ";
+        }
+
+        if (!penalty.empty()) {
+            buf << "Дополнительный расход " << penalty.join(", ") << ". ";
+        }
+
+        if (!buf.str().empty())
+            outputLines.push_back(buf.str());
     }
 
     DefaultSpell::Pointer dspell = spell.getDynamicPointer<DefaultSpell>();
@@ -542,34 +588,32 @@ DLString BasicSkill::printWaitAndMana(PCharacter *ch) const
         else if (dspell->flags.isSet(SPELL_MAGIC))
             force_type = " магия";
         
-        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << force_type << "{x.";
-        empty = false;
+        ostringstream buf;
+        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << force_type << "{x. ";
+        outputLines.push_back(buf.str());
     }
 
-    if (!empty)
-        buf << endl;
-    
     if (dspell && spell->isCasted() && spell->getTarget() != 0) {
-        buf << pad << "Целью служит {W" << target_table.messages(spell->getTarget(), true);
+        ostringstream buf;
+        buf << "Целью служит {W" << target_table.messages(spell->getTarget(), true);
         if (dspell->getMaxRange(ch) > 0)
             buf << " или по направлению (дальнобойное)";
-        buf << "{x. " << endl;
-        empty = false;
+        buf << "{x. ";
+        outputLines.push_back(buf.str());
     }
 
     if (isPassive()) {
-        if (!empty)
-            buf << pad;
-        buf << "Это {Cпассивное умение{x, работает автоматически." << endl;
-        empty = false;
+        outputLines.push_back("Это {Cпассивное умение{x, работает автоматически.");
     }
 
     // TODO: expose spell position and show it here.
 
-    if (empty) 
-        return DLString::emptyString;
+    ostringstream output;
+    for (auto &line: outputLines) {
+        output << pad << line << endl;
+    }
 
-    return buf.str();
+    return output.str();
 }
 
 

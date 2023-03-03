@@ -46,6 +46,9 @@ public:
     virtual int getBeats(Character *ch = 0) const;
     virtual int getMana(Character *ch = 0) const;
     virtual int getMoves(Character *ch = 0) const;
+    virtual int getHealthPenalty() const;
+    virtual int getMovesPenalty() const;
+    virtual int getManaPenalty() const;
     virtual const RussianString &getDammsg( ) const;
     virtual int getRating( PCharacter * ) const;
     virtual bool isPassive() const;
@@ -85,6 +88,7 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty beats;
     XML_VARIABLE XMLIntegerNoEmpty mana;
     XML_VARIABLE XMLIntegerNoEmpty move;
+    XML_VARIABLE XMLIntegerNoEmpty manaPenalty, movesPenalty, healthPenalty;
     XML_VARIABLE XMLIntegerNoEmpty hard;
     XML_VARIABLE XMLFlagsNoEmpty   align, ethos;
 
