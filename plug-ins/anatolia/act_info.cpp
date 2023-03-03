@@ -987,14 +987,14 @@ CMDRUNP(report)
             bool canOrderFight = cmd->properOrder(pet) == RC_ORDER_OK;
             pet->fighting = 0;
 
-            if(sn == gsn_second_weapon && !skill_is_invalid(sn, noCarry)){
+            if(skill_is_invalid(sn, noCarry))
+                continue;
+            
+            if (sn == gsn_second_weapon && pet->wearloc.isSet(wear_second_wield)) {
                 passives.push_back(skill);
                 continue;
             }
 
-            if(skill_is_invalid(sn, noCarry))
-                continue;
-            
             if (canOrder && showAll) {
                 skills.push_back(skill);
             }
