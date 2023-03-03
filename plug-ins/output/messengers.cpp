@@ -29,6 +29,7 @@ static DLString telegram_string(const DLString &source)
     dest.replaces("*", "\\*");
     dest.replaces("`", "\\`");
     dest.replaces("[", "\\[");
+
     return dest;
 }
 
@@ -53,18 +54,52 @@ static void send_to_telegram(const DLString &content)
 }
 
 /** Paste news or note to Telegram. */
-void send_telegram_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
+void send_telegram_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &text)
 {
-    ostringstream content;
+    const int max_content_size = 4096; // Message limit imposed by Telegram API.
+    const int text_chunk_size = 2000; // How to split the text block (in koi8-r) if message exceeds the max.
 
-    content 
+    ostringstream header_koi;
+    header_koi  
         << "*" << telegram_string(thread).upperFirstCharacter() << "* " << endl
         << "*Автор*: " << telegram_string(author) << endl
-        << "*Тема*: " << telegram_string(title) << endl
-        << endl
-        << telegram_string(description);
+        << "*Тема*: " << telegram_string(title);
 
-    return send_to_telegram(koi2utf(content.str()));
+    DLString header_utf = koi2utf(header_koi.str());
+    DLString text_koi = telegram_string(text);
+    DLString text_utf = koi2utf(text_koi);
+    DLString content_utf = header_utf + "\n\n" + text_utf;
+
+    // Message will go through as a whole, just send it.    
+    if (content_utf.size() <= max_content_size) {
+        send_to_telegram(content_utf);
+        return;
+    }
+
+    // Split the text into 2k chunks, add "[part 1]" remark to the header.
+    // Standard string operations don't work well with utf strings, so will split koi8 original instead.
+
+    size_t current_size = 0;
+    int part_num = 1;
+    size_t last_pos = text_koi.size() - 1;
+    
+    while (current_size < last_pos) {
+        size_t part_begins = current_size;
+        size_t part_could_end = part_begins + text_chunk_size;
+        // Unless it's the last part, don't cut mid-word, but look for the nearest space.
+        size_t part_ends = part_could_end >= last_pos ? part_could_end : text.find_last_of(' ', part_could_end);
+        DLString part_koi = text.substr(part_begins, part_ends - part_begins);
+        
+        DLString header_ext_koi = " [часть ";
+        header_ext_koi << part_num << "]\n\n";
+        
+        DLString chunk_koi = header_koi.str() + header_ext_koi + part_koi;
+        DLString chunk_utf = koi2utf(chunk_koi);
+        send_to_telegram(chunk_utf);
+
+        part_num++;
+        current_size = part_ends;
+    }
 }
 
 /** Send arbitrary string as Telegram message. */
