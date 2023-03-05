@@ -360,6 +360,7 @@ void nuke_pets( PCharacter *ch, int flags )
 void notify_referers( Character *ch, int flags )
 {
     Character *wch;
+    AffectSource chSource(ch);
 
     for (wch = char_list; wch != 0; wch = wch->next) {
         if (IS_SET(flags, FEXTRACT_TOTAL) && wch->reply == ch)
@@ -375,6 +376,10 @@ void notify_referers( Character *ch, int flags )
             affect_strip(wch,gsn_doppelganger);
         }
 
+        // All affects on others that ch created are no longer associated with this char.
+        for (auto &paf: wch->affected)
+            paf->sources.remove(chSource);
+
         if (wch->is_npc( ) && wch->getNPC( )->behavior) 
             wch->getNPC( )->behavior->extractNotify( ch, IS_SET(flags, FEXTRACT_TOTAL), IS_SET(flags, FEXTRACT_COUNT) );
         
@@ -382,6 +387,12 @@ void notify_referers( Character *ch, int flags )
             wch->last_fought = 0;
     }
     
+    // All room affects that ch created are no longer associated with this char,
+    // meaning no damage will be done on behalf of ch after their death.
+    for (auto &room: roomAffected)
+        for (auto &paf: room->affected)
+            paf->sources.remove(chSource);
+
     guarding_clear( ch );
 }
 

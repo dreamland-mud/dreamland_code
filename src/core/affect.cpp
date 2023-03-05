@@ -100,6 +100,14 @@ bool AffectSourceList::contains(const AffectSource &src) const
     return false;
 }
 
+void AffectSourceList::remove(const AffectSource &toRemove)
+{
+    auto source_equals = [&](const AffectSource &source) -> bool {
+        return toRemove.type == source.type && toRemove.ownerID.getValue() == source.ownerID.getValue();
+    };
+    remove_if(source_equals);
+}
+
 void AffectSourceList::add(Character *ch) 
 {
     AffectSource src(ch);

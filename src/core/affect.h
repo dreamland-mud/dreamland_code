@@ -49,6 +49,7 @@ public:
     void add(Object *obj);
     void add(Room *room);
     bool contains(const AffectSource &src) const;
+    void remove(const AffectSource &src);
 
     Character *getOwner() const;
 };
