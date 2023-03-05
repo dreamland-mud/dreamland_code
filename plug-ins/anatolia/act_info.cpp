@@ -1067,7 +1067,7 @@ CMDRUNP(report)
         shown = true;
     }
 
-    if (!spells.empty() && pet->getProfession()->getFlags().isSet(PROF_CASTER)) {
+    if (!spells.empty() && pet->getProfession()->getFlags(pet).isSet(PROF_CASTER)) {
         ostringstream buf;
         sortSkillsFor(spells, pet->master);
         for (auto it = spells.begin(); it != spells.end();) {
