@@ -7,6 +7,7 @@
 #include "xmlvector.h"
 #include "xmlinteger.h"
 #include "exceptionskipvariable.h"
+#include "logstream.h"
 
 /*
  * XMLEnumeration
@@ -21,9 +22,12 @@ void XMLEnumeration::fromXML( const XMLNode::Pointer& parent )
     int value;
     XMLNode::Pointer node = parent->getFirstNode( );
 
-    if (node) 
-        if (( value = table->value( node->getCData( ) ) ) != NO_FLAG)
+    if (node) {
+        if (!table) 
+		LogStream::sendError() << "XMLEnumeration::fromXML NULL table!" << endl;
+        else if (( value = table->value( node->getCData( ) ) ) != NO_FLAG)
             setValue( value );
+    }
 }
 
 bool XMLEnumeration::toXML( XMLNode::Pointer& parent ) const
