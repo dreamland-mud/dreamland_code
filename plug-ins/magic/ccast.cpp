@@ -115,36 +115,6 @@ CMDRUN( cast )
         return;
     }
 
-    if (ch->isAffected( gsn_shielding ) && number_percent( ) > 50) {
-        ch->pecho("Ты пытаешься сотворить заклинание, но изолирующий экран блокирует тебя.");
-        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но изолирующий экран блокирует %1$P2.", ch);
-        return;
-    }
-
-    if (ch->isAffected( gsn_garble ) && number_percent( ) > 50) {
-        ch->pecho("Твой язык заплетается, и ты не можешь как следует произнести заклинание.");
-        ch->recho("Язык %1$C2 заплетается, и %1$P1 не мо%1$nжет|гут как следует произнести заклинание.", ch);        
-        return;
-    }
-    
-    if (ch->isAffected( gsn_deafen ) && number_percent( ) > 50) {
-        ch->pecho("Глухота мешает тебе как следует произнести заклинание.");
-        ch->recho("Глухота мешает %1$C3 как следует произнести заклинание.", ch);        
-        return;
-    }    
-
-    if (HALF_SHADOW(ch)) {
-        ch->pecho("Твоя тень поглощает всякую попытку сотворить заклинание.");
-        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но тень не дает %1$P3 сосредоточиться.", ch);
-        return;
-    }
-
-    if (ch->death_ground_delay > 0 && ch->trap.isSet( TF_NO_CAST )) {
-        ch->pecho("Ловушка, в которой ты оказал%1$Gось|ся|ась, препятствует сотворению заклинаний.", ch);
-        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но ловушка мешает %1$P3 сосредоточиться.", ch);
-        return;
-    }
-
     // Split user input into spell name (potentially in quotes) and spell args (rest of the string).
     fullArguments = constArguments;
     fullArguments.stripWhiteSpace();
@@ -234,9 +204,40 @@ CMDRUN( cast )
         return;
     }
 
-    spell->utter( ch );
     ch->setWait(spell->getBeats(ch) );
+
+    if (ch->isAffected( gsn_shielding ) && number_percent( ) > 50) {
+        ch->pecho("Ты пытаешься сотворить заклинание, но изолирующий экран блокирует тебя.");
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но изолирующий экран блокирует %1$P2.", ch);
+        return;
+    }
+
+    if (ch->isAffected( gsn_garble ) && number_percent( ) > 50) {
+        ch->pecho("Твой язык заплетается, и ты не можешь как следует произнести заклинание.");
+        ch->recho("Язык %1$C2 заплетается, и %1$P1 не мо%1$nжет|гут как следует произнести заклинание.", ch);        
+        return;
+    }
     
+    if (ch->isAffected( gsn_deafen ) && number_percent( ) > 50) {
+        ch->pecho("Глухота мешает тебе как следует произнести заклинание.");
+        ch->recho("Глухота мешает %1$C3 как следует произнести заклинание.", ch);        
+        return;
+    }    
+
+    if (HALF_SHADOW(ch)) {
+        ch->pecho("Твоя тень поглощает всякую попытку сотворить заклинание.");
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но тень не дает %1$P3 сосредоточиться.", ch);
+        return;
+    }
+
+    if (ch->death_ground_delay > 0 && ch->trap.isSet( TF_NO_CAST )) {
+        ch->pecho("Ловушка, в которой ты оказал%1$Gось|ся|ась, препятствует сотворению заклинаний.", ch);
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но ловушка мешает %1$P3 сосредоточиться.", ch);
+        return;
+    }
+
+    spell->utter( ch );
+
     if (offensive) {
         UNSET_DEATH_TIME(ch);
 
