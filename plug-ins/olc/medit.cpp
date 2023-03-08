@@ -56,7 +56,7 @@ GSN(camouflage);
 GSN(blindness);
 GSN(poison);
 GSN(sleep);
-GSN(charm);
+GSN(charm_person);
 GSN(calm);
 GSN(plague);
 GSN(weaken);
@@ -1409,7 +1409,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             if (aff.isSet(AFF_SLEEP))
                 pMob->affects.set(gsn_sleep);
             if (aff.isSet(AFF_CHARM))
-                pMob->affects.set(gsn_charm);
+                pMob->affects.set(gsn_charm_person);
             if (aff.isSet(AFF_CALM))
                 pMob->affects.set(gsn_calm);
             if (aff.isSet(AFF_PLAGUE))
