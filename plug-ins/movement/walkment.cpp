@@ -360,8 +360,18 @@ bool Walkment::checkGuild( Character *wch )
 {
     if (wch->is_immortal( )) 
         return true;
-    
-    if (to_room->pIndexData->guilds.empty( ))
+
+    // Should be able to move around foreign guild and leave it. 
+    // Same for violent checks, otherwise people may get stuck there.
+    // Only forbid entering a guild from a non-guild room.
+
+    bool guildSourceRoom = !wch->in_room->pIndexData->guilds.empty();
+    bool guildTargetRoom = !to_room->pIndexData->guilds.empty();
+
+    if (!guildTargetRoom)
+        return true;
+
+    if (guildSourceRoom)
         return true;
 
     if (wch->is_npc( )) {
