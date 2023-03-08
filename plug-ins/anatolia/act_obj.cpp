@@ -207,6 +207,11 @@ static bool oprog_get_money( Character *ch, Object *obj )
     ch->silver += obj->value0();
     ch->gold += obj->value1();
 
+    if (obj->item_type == ITEM_MONEY && obj->pIndexData->vnum > 5) {
+        DLString moneyArg = describe_money(obj->value1( ), obj->value0( ), 4);
+        ch->pecho("Твой кошель пополнился на: %s.", moneyArg.c_str());
+    }
+
     if (IS_SET(ch->act,PLR_AUTOSPLIT))
         if (obj->value0() > 1 || obj->value1())
             if (party_members_room( ch ).size( ) > 1)
@@ -370,15 +375,19 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
     }
 }
 
-static bool can_get_obj( Character *ch, Object *obj )
+#define GET_OBJ_STOP     -1
+#define GET_OBJ_ERR       0
+#define GET_OBJ_OK        1
+
+static int can_get_obj( Character *ch, Object *obj )
 {
     if (!oprog_can_get( ch, obj ))
-        return false;
+        return GET_OBJ_ERR;
 
     if ( (!obj->can_wear( ITEM_TAKE )) && (!ch->is_immortal()) )
     {
         ch->pecho("Ты не можешь взять %1$O4.", obj );
-        return false;
+        return GET_OBJ_ERR;
     }
 
     if (obj->pIndexData->limit != -1)
@@ -387,12 +396,12 @@ static bool can_get_obj( Character *ch, Object *obj )
             if (ch->is_immortal()) 
                 ch->pecho("Осторожно, ты не смог%1$Gло||ла бы владеть этой вещью, будучи смертн%1$Gым|ым|ой.", ch);
             else {
-                ch->pecho("%2$^s не позволяют тебе владеть %1$O5, и ты роняешь %1$P2.",
+                ch->pecho("%2$^s не позволят тебе владеть %1$O5.",
                           obj,
                           IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
                 
-                ch->recho("%1$^C1 обжигается и роняет %2$O4.", ch, obj );
-                return false;
+                ch->recho("%1$^C1 обжигается о %2$O4.", ch, obj );
+                return GET_OBJ_ERR;
             }
         }
     }
@@ -403,7 +412,7 @@ static bool can_get_obj( Character *ch, Object *obj )
             ch->pecho("Осторожно, ты уже несешь слишком много вещей.");
         else {
             ch->pecho("Ты не можешь унести больше %d вещей и поэтому не сможешь поднять %O4.", ch->canCarryNumber( ), obj);
-            return false;
+            return GET_OBJ_STOP;
         }
     }
 
@@ -413,20 +422,16 @@ static bool can_get_obj( Character *ch, Object *obj )
             ch->pecho("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой.", ch);
         else {
             ch->pecho("Ты не можешь нести вес больше %d фунтов и поэтому не сможешь поднять %O4.", ch->canCarryWeight( ), obj);
-            return false;
+            return GET_OBJ_STOP;
         }
     }
 
-    return true;
+    return GET_OBJ_OK;
 }
 
 static bool get_obj( Character *ch, Object *obj )
 {
     oldact("Ты берешь $o4.", ch, obj, 0, TO_CHAR);
-    if (obj->item_type == ITEM_MONEY && obj->pIndexData->vnum > 5) {
-    DLString moneyArg = describe_money(obj->value1( ), obj->value0( ), 4);
-    ch->pecho("Твой кошель пополнился на: %s.", moneyArg.c_str());
-    }
     oldact("$c1 берет $o4.", ch, obj, 0, TO_ROOM);
             
     obj_from_room( obj );
@@ -442,8 +447,6 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
 {
     ostringstream toChar, toRoom;
     DLString prep;
-    char buf[MAX_STRING_LENGTH];
-
     
     switch (container->item_type) {
     case ITEM_KEYRING:
@@ -460,11 +463,6 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
             prep = "из";
         
         toChar << "Ты берешь $o4 " << prep << " $O2.";
-        if (obj->item_type == ITEM_MONEY && obj->pIndexData->vnum > 5) {
-            DLString moneyArg = describe_money(obj->value1( ), obj->value0( ), 4);
-            snprintf(buf, sizeof(buf), "\n\rТвой кошель пополнился на: %s.\n\r", moneyArg.c_str());
-            toChar << buf;
-        }
         toRoom << "$c1 берет $o4 " << prep << " $O2.";
         break;
 
@@ -501,7 +499,7 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
 
 void do_get_raw( Character *ch, Object *obj )
 {
-    if (can_get_obj( ch, obj ))
+    if (can_get_obj( ch, obj ) == GET_OBJ_OK)
         get_obj( ch, obj );
 }
 
@@ -512,7 +510,7 @@ bool do_get_raw( Character *ch, Object *obj, Object *container )
     if (!oprog_can_fetch( ch, container, obj, pocket ))
         return true;
     
-    if (can_get_obj( ch, obj ))
+    if (can_get_obj( ch, obj ) == GET_OBJ_OK)
         get_obj_container( ch, obj, container );
 
     return false;
@@ -622,7 +620,14 @@ CMDRUNP( get )
                         && ch->can_see( obj ) )
                 {
                     found = true;
-                    do_get_raw( ch, obj );
+                    
+                    int rc = can_get_obj( ch, obj );
+                    if (rc == GET_OBJ_ERR)
+                        continue;
+                    if (rc == GET_OBJ_STOP)
+                        break;
+
+                    get_obj( ch, obj );
                 }
             }
 
@@ -693,7 +698,7 @@ CMDRUNP( get )
             if (!oprog_can_fetch( ch, container, obj, pocket ))
                 return;
 
-            if (can_get_obj( ch, obj ))
+            if (can_get_obj( ch, obj ) == GET_OBJ_OK)
                 get_obj_container( ch, obj, container );
         }
         else {
@@ -731,10 +736,15 @@ CMDRUNP( get )
                 found = true;
 
                 if (!oprog_can_fetch( ch, container, obj, pocket ))
-                    return;
+                    continue;
                 
-                if (can_get_obj( ch, obj ))
-                    get_obj_container( ch, obj, container );
+                int rc = can_get_obj( ch, obj );
+                if (rc == GET_OBJ_STOP)
+                    return;
+                if (rc == GET_OBJ_ERR)
+                    continue;
+
+                get_obj_container( ch, obj, container );
             }
 
             if (!found) {
