@@ -930,9 +930,17 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
             return;
         }
 
-        if (skillManager->findExisting(args)) {
-            stc("Умение с таким названием уже существует.\r\n", ch);
-            return;
+        Skill *oldSkill = skillManager->findExisting(args);
+        if (oldSkill) {
+            if (oldSkill->isValid()) {
+                ptc(ch, "Умение '%s' уже существует.\r\n", oldSkill->getName().c_str());
+                return;
+
+            } 
+
+            // Repopulate invalid skill.
+            ptc(ch, "Умение '%s' существовало в виде 'затычки', уничтожаем ее.\r\n", oldSkill->getName().c_str());
+            skillManager->unregistrate(Skill::Pointer(oldSkill));
         }
 
         try {
