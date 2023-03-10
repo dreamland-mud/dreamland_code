@@ -631,9 +631,6 @@ NMI_INVOKE(FeniaCommandContext, cooldown, "(duration): наложить пост
 
 NMI_INVOKE(FeniaCommandContext, damApplyClass, "(): наложить бонусы от класса атакующего на размер повреждений")
 {
-    if (dam == 0)
-        throw Scripting::Exception("Method damApplyClass called for zero dam.");
-
     Character *myCh = arg2character(ch);
     damapply_class(myCh, dam);
     return Register();
