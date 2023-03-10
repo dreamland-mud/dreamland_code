@@ -778,7 +778,7 @@ CMDRUN( drink )
     if (mprog_drink_near( ch, obj, liquid->getName( ).c_str( ), amount ))
         return;
 
-    if (obj && IS_OBJ_STAT(obj, ITEM_BLESS) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
+    if (obj && IS_OBJ_STAT(obj, ITEM_BLESS) && IS_EVIL(ch) && immune_check(ch, DAM_HOLY, DAMF_OTHER) == RESIST_VULNERABLE) {
         ch->pecho("Святость %O2 обжигает твои внутренности!", obj);
         ch->recho("Лицо %^C2 искажается гримасой боли.", ch);
         rawdamage(ch, ch, DAM_HOLY, ch->hit / 100 + 1, true, "holywater");
