@@ -294,6 +294,8 @@ SKILL_RUNP( vanish )
             oldact("$c1 пытается взять тебя в охапку!", ch, 0, victim, TO_VICT);
 
             if ( number_percent() < kidnap_chance ) {
+                    victim->dismount();
+
                     // kidnapping success
                     transfer_char( ch, ch, pRoomIndex,
                         0,
