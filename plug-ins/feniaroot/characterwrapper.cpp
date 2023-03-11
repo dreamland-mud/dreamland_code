@@ -2065,6 +2065,13 @@ NMI_INVOKE( CharacterWrapper, move_char, "(door[,movetype]): перемести�
     return Register( rc == RC_MOVE_OK );
 }
 
+NMI_INVOKE( CharacterWrapper, dismount, "(): спешиться или сбросить всадника")
+{
+    checkTarget();
+    target->dismount();
+    return Register();
+}
+
 NMI_INVOKE( CharacterWrapper, addDarkShroud, "(): повесить темную ауру")
 {
     Affect af;

@@ -4,6 +4,7 @@
  */
 
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 #include "npcharacter.h"
 #include "room.h"
 #include "merc.h"
@@ -131,6 +132,16 @@ NMI_SET( MobIndexWrapper, group, "к какой группе принадлеж�
 { 
     checkTarget( ); 
     target->group = arg.toNumber( );
+}
+NMI_GET( MobIndexWrapper, sex, "пол прототипа (.tables.sex_table)") 
+{ 
+    checkTarget( ); 
+    return target->sex;
+}
+NMI_GET( MobIndexWrapper, gram_number, "грамматическое число, s или p") 
+{ 
+    checkTarget( ); 
+    return target->gram_number.toString();
 }
 
 NMI_GET( MobIndexWrapper, spec_fun, "спец-процедура") 
