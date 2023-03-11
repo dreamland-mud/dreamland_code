@@ -984,24 +984,22 @@ CMDRUNP(report)
         if (cmd && !cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
             bool canOrder = cmd->properOrder(pet) == RC_ORDER_OK;
             pet->fighting = ch;
-            bool canOrderFight = cmd->properOrder(pet) == RC_ORDER_OK;
+            bool canOrderFight = cmd->properOrder(pet) == RC_ORDER_OK && !skill_is_invalid_in_fight(sn);
             pet->fighting = 0;
 
             if(skill_is_invalid(sn, noCarry))
                 continue;
             
-            if (sn == gsn_second_weapon && pet->wearloc.isSet(wear_second_wield)) {
-                passives.push_back(skill);
+            if (sn == gsn_second_weapon) {
+                if (canOrder && pet->wearloc.isSet(wear_second_wield))
+                    skills.push_back(skill);
                 continue;
             }
 
-            if (canOrder && showAll) {
-                skills.push_back(skill);
-            }
-
-            else if (canOrderFight && !skill_is_invalid_in_fight(sn)) {
+            if (canOrderFight)
                 skillsFight.push_back(skill);
-            }
+            else if (canOrder && showAll)
+                skills.push_back(skill);
 
             continue;
         }
