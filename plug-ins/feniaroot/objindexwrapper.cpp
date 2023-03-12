@@ -4,6 +4,7 @@
  */
 
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 #include "object.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -167,6 +168,14 @@ NMI_GET( ObjIndexWrapper, item_type, "тип предмета (таблица .t
 {
     checkTarget( );
     return Register( target->item_type);
+}
+
+NMI_GET( ObjIndexWrapper, gender, "грамматический род и число (n, m, f, p или null)")
+{
+    checkTarget( );
+    if (target->gram_gender == MultiGender::UNDEF)
+        return Register();
+    return Register( target->gram_gender.toString() );
 }
 
 NMI_GET( ObjIndexWrapper, instances, "список (List) всех предметов с этим прототипом" )
