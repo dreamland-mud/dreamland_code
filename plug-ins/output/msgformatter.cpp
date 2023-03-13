@@ -294,7 +294,7 @@ again:
             switch(cvt) {
                 int cs, sx, nounFlags;
             case 'C':
-                nounFlags = (!alternative && to) ? FMT_PRETITLE|FMT_INVIS|FMT_DOPPEL : 0;
+                nounFlags = (!alternative && to) ? FMT_INVIS|FMT_DOPPEL : 0;
                 s += argNoun(nounFlags)->decline(*f);
                 break;
             case 'O':
