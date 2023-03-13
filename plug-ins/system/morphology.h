@@ -9,6 +9,9 @@ struct Morphology {
     // Substitute ending placeholder "смертельн(ое,ый,ая2,ые)" for
     // given gender with 6 grammar cases, based on grammar/rules.json file.
     static DLString adjective(const DLString &normalForm, const MultiGender &gender);
+
+    // Decide which form of "с/со" preposition to use in front of this noun.
+    static DLString preposition_with(const DLString &noun);
 };
 
 struct Syntax {

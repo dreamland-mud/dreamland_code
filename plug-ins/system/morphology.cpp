@@ -62,6 +62,37 @@ DLString Morphology::adjective(const DLString &form, const MultiGender &gender)
     return stem + cases;
 }
 
+static bool is_consonant(char c)
+{
+    return c == 'б' || c == 'в' || c == 'г' || c == 'д' || c == 'ж' || c == 'з' || c == 'й' || 
+    c == 'к' || c == 'л' || c == 'м' || c == 'н' || c == 'п' || c == 'р' || c == 'с' || 
+    c == 'т' || c == 'ф' || c == 'х' || c == 'ц' || c == 'ч' || c == 'ш' || c == 'щ' ||
+    c == 'ь' || c == 'ъ';
+}
+
+DLString Morphology::preposition_with(const DLString &noun)
+{
+    DLString s = "с", so = "со";
+    DLString n = noun.toLower();
+
+    if (n.empty())
+        return s;
+    
+    char firstLetter = n.at(0);
+    if (firstLetter == 'щ')
+        return so;
+
+    if (n.size() <= 1)
+        return s;
+
+    char nextLetter = n.at(1);
+    if (firstLetter == 'с' || firstLetter == 'ж' || firstLetter == 'ш' || firstLetter == 'з')
+        if (is_consonant(nextLetter))
+            return so;
+
+    return s;
+}
+
 DLString Syntax::noun(const DLString &phrase) 
 {
     StringList words(phrase.colourStrip().toLower());

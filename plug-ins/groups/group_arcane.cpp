@@ -34,6 +34,7 @@
 #include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
+#include "morphology.h"
 #include "def.h"
 #include "skill_utils.h"
 
@@ -56,13 +57,15 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
+    DLString so = Morphology::preposition_with(scroll->getShortDescr());
+    
     if (t->error != 0) {
         switch (t->error) {
         case TARGET_ERR_CAST_ON_WHOM:
-            ch->pecho("Ты зачитываешь одно из заклинаний с %O2, но оно не находит, на кого подействовать.", scroll);
+            ch->pecho("Ты зачитываешь одно из заклинаний %s %O2, но оно не находит, на кого подействовать.", so.c_str(), scroll);
             break;
         case TARGET_ERR_CAST_ON_WHAT:
-            ch->pecho("Ты зачитываешь одно из заклинаний с %O2, но оно не находит, на что подействовать.", scroll);
+            ch->pecho("Ты зачитываешь одно из заклинаний %s %O2, но оно не находит, на что подействовать.", so.c_str(), scroll);
             break;
         default:
             ch->pecho(errBuf.str());
@@ -72,8 +75,8 @@ static void recite_one_spell(Character *ch, Object *scroll, Spell::Pointer &spel
         return;
     }
 
-    oldact("$c1 зачитывает заклинание с $o2.", ch, scroll, 0, TO_ROOM);
-    oldact("Ты зачитываешь одно из заклинаний с $o2.", ch, scroll, 0, TO_CHAR);
+    ch->recho("%^C1 зачитывает заклинание %s %O2.", ch, so.c_str(), scroll);
+    ch->pecho("Ты зачитываешь одно из заклинаний %s %O2.", so.c_str(), scroll);
 
     successfulTargets++;
 
