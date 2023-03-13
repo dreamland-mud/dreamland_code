@@ -56,7 +56,7 @@ struct PlayerManipList : public ManipList {
     }
 
     virtual DLString getID( ) const {
-        return victim->getName( );
+        return victim->getNameP('1');
     }
 };
 
