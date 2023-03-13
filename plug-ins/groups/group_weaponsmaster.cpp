@@ -588,7 +588,7 @@ SKILL_RUNP( lash )
         }
     }
     else if ((victim = get_char_room(ch, arg)) == NULL) {
-        ch->pecho("Tут таких нет.");
+        ch->pecho("Тут таких нет.");
         return;
     }
     

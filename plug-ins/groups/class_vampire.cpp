@@ -764,12 +764,9 @@ SKILL_RUNP( touch )
 
     if (Chance(ch, chance, 100).reroll())
     {
-        oldact_p("Ты прикасаешься к шее $C2 и $E забывается в ужасном кошмаре.",
-                                ch,0,victim,TO_CHAR,POS_RESTING);
-        oldact_p("$c1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.",
-                                ch,0,victim,TO_VICT,POS_RESTING);
-        oldact_p("$c1 прикасается к шее $C2 и $E забывается в ужасном кошмаре.",
-                                ch,0,victim,TO_NOTVICT,POS_RESTING);
+        ch->pecho("Ты прикасаешься к шее %1$C2 и %1$P1 забыва%1$nется|ются в ужасном кошмаре.", victim);
+        victim->pecho("%^C1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.", ch);
+        ch->recho(victim, "%1$^C1 прикасается к шее %1$C2 и %1$P1 забыва%1$nется|ются в ужасном кошмаре.", ch, victim);
         gsn_vampiric_touch->improve( ch, true, victim );
 
         af.type = gsn_vampiric_touch;

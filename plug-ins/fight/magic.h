@@ -91,6 +91,4 @@ bool checkDispel( int dis_level, Character *victim, int sn);
 
 bool         is_safe_spell( Character *ch, Character *victim, bool area );
 
-bool        overcharmed( Character *ch );
-
 #endif

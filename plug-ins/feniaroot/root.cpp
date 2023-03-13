@@ -400,7 +400,7 @@ NMI_INVOKE( Root, number_percent , "(): произвольное число от
     return Register( ::number_percent( ) );
 }
 
-NMI_INVOKE( Root, chance , "(x): true если x < .number_percent()") 
+NMI_INVOKE( Root, chance , "(x): true если x >= .number_percent()") 
 {
     int a;
 

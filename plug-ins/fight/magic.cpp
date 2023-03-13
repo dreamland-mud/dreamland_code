@@ -496,37 +496,3 @@ bool is_safe_spell(Character *ch, Character *victim, bool area )
 
     return is_safe(ch,victim);
 }
-
-
-bool overcharmed( Character *ch )        
-{
-    int max_charm;
-
-    max_charm  = ch->getCurrStat( STAT_INT ) / 4 + ch->getRealLevel( ) / 30;
-    max_charm -= 25 - min( 25, ch->getCurrStat( STAT_CHA ) );
-
-    if (max_charm <= 0) {
-        ch->pecho("Твоего обаяния, интеллекта и опыта недостаточно, чтобы контролировать кого-либо.");
-        return true;
-    }
-
-    int count = 0;
-    for (Character *gch = char_list; gch != 0; gch = gch->next) {
-        if (IS_CHARMED(gch) && gch->master == ch)
-            count++;
-    }
-
-    if (count == max_charm) {
-        ch->pecho("Ты уже контролируешь максимально допустимое число последователей ({c%d{x).",
-                    count);        
-        return true;
-    }
-
-    if (count > max_charm) {
-        ch->pecho("Ты уже контролируешь {C%1$d{x последовател%1$Iя|ей|ей из {c%2$d{x возможн%2$Iого|ых|ых.",
-                    count, max_charm );        
-        return true;
-    }
-
-    return false;
-}

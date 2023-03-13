@@ -1343,7 +1343,7 @@ CMDRUNP( request )
                     do_say(victim, "У тебя нечистая душа, я ничего тебе не дам!");
                 } else
                 {
-                    do_say(victim, "Я не дам тебе ничего!!");
+                    do_say(victim, "Я не дам тебе ничего!");
                 }
                 if (ch->getModifyLevel( ) > 30 && number_percent() > 75) 
                 {

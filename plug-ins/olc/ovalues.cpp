@@ -641,11 +641,11 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_DRINK");
             return false;
         case 0:
-            stc("MAXIMUM AMOUT OF LIQUID HOURS SET.\n\r\n\r", ch);
+            stc("Установлено максимальное количество жидкости.\r\n", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("CURRENT AMOUNT OF LIQUID HOURS SET.\n\r\n\r", ch);
+            stc("Установлено текущее количество жидкости.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 2:
@@ -679,11 +679,11 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
 //            do_help(ch, "ITEM_FOUNTAIN");
             return false;
         case 0:
-            stc("MAXIMUM AMOUT OF LIQUID HOURS SET.\n\r\n\r", ch);
+            stc("Установлено максимальное количество жидкости.\r\n", ch);
             pObj->value[0] = atoi(argument);
             break;
         case 1:
-            stc("CURRENT AMOUNT OF LIQUID HOURS SET.\n\r\n\r", ch);
+            stc("Установлено текущее количество жидкости.\n\r", ch);
             pObj->value[1] = atoi(argument);
             break;
         case 2:
