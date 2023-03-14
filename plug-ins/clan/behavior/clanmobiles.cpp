@@ -442,6 +442,9 @@ bool ClanGuard::specFight( )
 {
     Character *victim;
 
+    if (ch->wait > 0)
+        return false;
+
     if (!( victim = getVictim( ) ))
         return true;
     
