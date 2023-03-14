@@ -110,8 +110,11 @@ void ClanOrgs::doMembers( PCharacter *pch, const DLString &cargs ) const
     org = findOrder(cargs);
     bool recruiter = pch->getClan()->isRecruiter(pch);
 
-    if (!myOrg && !org && recruiter) {
-        pch->pecho("Укажи правильное название %O2.", &name);
+    if (!myOrg && !org) {
+        if (recruiter)
+            pch->pecho("Укажи правильное название %O2.", &name);
+        else
+            pch->pecho( "Ты не состоишь в %O6.", &name );
         return;
     }
 
