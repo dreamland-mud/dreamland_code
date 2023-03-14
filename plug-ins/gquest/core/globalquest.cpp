@@ -172,68 +172,73 @@ Character * GlobalQuest::getActor( Character *ch ) const
     return ch;
 }
 
-void GlobalQuest::exorcism( Character *ch ) const
+void GlobalQuest::exorcism(Character *ch) const
 {
     int recall_vnum;
     Room *recall;
-    Character *actor = getActor( ch );
-    
+    Character *actor = getActor(ch);
+
     oldact("$c1 улетучивается.", ch, 0, 0, TO_ROOM);
     oldact("Ты исчезаешь отсюда.", ch, 0, 0, TO_CHAR);
-    
-    //lonely npc with no current master
-    if (ch->is_npc( ) && (ch == actor || actor->is_npc())){
 
-        //check if it's a summoned creature like a golem or something
-        if(ch->getNPC( )->behavior && ch->getNPC()->behavior.getDynamicPointer<SummonedCreature>()){
-        
-        //it's summoned creature - try to find the player it belongs to
-        PCMemoryInterface *player = PCharacterManager::find(ch->getNPC()->behavior.getDynamicPointer<SummonedCreature>()->creatorName);
+    // lonely npc with no current master
+    if (ch->is_npc() && (ch == actor || actor->is_npc()))
+    {
 
-        //player found - check player's clan or hometown recall spot and transfer the creature there
-        if(player){
-            
-        recall_vnum = player->getClan( )->getRecallVnum( );
+        // check if it's a summoned creature like a golem or something
+        if (ch->getNPC()->behavior && ch->getNPC()->behavior.getDynamicPointer<SummonedCreature>())
+        {
 
-        if (recall_vnum <= 0)
-        recall = get_room_instance( player->getHometown( )->getRecall( ) );
-        else 
-        recall = get_room_instance( recall_vnum );
-   
-        if (!recall)
-        recall = get_room_instance( ROOM_VNUM_TEMPLE );
+            // it's summoned creature - try to find the player it belongs to
+            PCMemoryInterface *player = PCharacterManager::find(ch->getNPC()->behavior.getDynamicPointer<SummonedCreature>()->creatorName);
 
-        transfer_char( ch, ch, recall,
-                   NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате." );
-        return;
+            // player found - check player's clan or hometown recall spot and transfer the creature there
+            if (player)
+            {
+
+                recall_vnum = player->getClan()->getRecallVnum();
+
+                if (recall_vnum <= 0)
+                    recall = get_room_instance(player->getHometown()->getRecall());
+                else
+                    recall = get_room_instance(recall_vnum);
+
+                if (!recall)
+                    recall = get_room_instance(ROOM_VNUM_TEMPLE);
+
+                transfer_char(ch, ch, recall,
+                              NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате.");
+                return;
+            }
+
+            // player not found - extract summoned creature
+            else
+            {
+                extract_char(ch, true);
+                return;
+            }
         }
 
-        //player not found - extract summoned creature
-        else{
+        // not a summoned creature - extract it
+        else
+        {
             extract_char(ch, true);
             return;
         }
-        }
-        
-    //not a summoned creature - extract it
-    else {
-    extract_char(ch, true);
-    return;
-    }  
-    }  
+    }
 
-    recall_vnum = actor->getClan( )->getRecallVnum( );
+    recall_vnum = actor->getClan()->getRecallVnum();
 
     if (recall_vnum <= 0)
-        recall = get_room_instance( actor->getPC( )->getHometown( )->getRecall( ) );
-    else 
-        recall = get_room_instance( recall_vnum );
-   
-    if (!recall)
-        recall = get_room_instance( ROOM_VNUM_TEMPLE );
+        recall = get_room_instance(actor->getPC()->getHometown()->getRecall());
+    else
+        recall = get_room_instance(recall_vnum);
 
-    transfer_char( ch, ch, recall,
-                   NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате." );
+    if (!recall)
+        recall = get_room_instance(ROOM_VNUM_TEMPLE);
+
+    transfer_char(ch, ch, recall,
+                  NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате.");
 }
 
 void GlobalQuest::wipeRoom( Room *room ) const
@@ -245,11 +250,15 @@ void GlobalQuest::wipeRoom( Room *room ) const
     if (!room)
         return;
 
-    for (Character *ch = room->people; ch; ch = ch_next) {
-        ch_next = ch->next_in_room;
-        exorcism( ch );
+    // Move every person in the room to an altar, extract unclaimed mobs.
+    // Can't do the usual next_in_room cycle, because mounted chars and mounts
+    // are transferred together, breaking the loop.
+    list<Character *> people = room->getPeople();
+    for (auto &rch: people) {
+        exorcism( rch );
     }
     
+    // Move every item on the floor to the owner's pit or to Lost Property office.
     pit = find_pit_in_room(ROOM_VNUM_ALTAR);
     office = get_room_instance( ROOM_VNUM_BUREAU_2 );
     
