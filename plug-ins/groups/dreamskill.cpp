@@ -207,7 +207,7 @@ void DreamSkillManager::run( PCharacter *ch )
     // Find suitable candidate.
     Skill *skill = findRandomProfSkill(ch);
     if (!skill) {
-        wiznet(WIZ_SKILLS, 0, 0, "Для %^C2 нету умений, которые могли бы присниться.", ch);
+//        wiznet(WIZ_SKILLS, 0, 0, "Для %^C2 нету умений, которые могли бы присниться.", ch);
         return;
     }
 
