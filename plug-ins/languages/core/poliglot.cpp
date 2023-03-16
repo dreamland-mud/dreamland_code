@@ -21,10 +21,18 @@ Poliglot::Poliglot( )
 {
 }
 
+static bool room_has_exits(Room *room)
+{
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        if (direction_target(room, door) != NULL)
+            return true;
+
+    return false;
+}
 
 bool Poliglot::specIdle( ) 
 {
-    if (number_range( 0, 900 ) == 0) {
+    if (number_range( 0, 900 ) == 0 || !room_has_exits(ch->in_room)) {
         Room *room = get_random_room( ch );
 
         if (!room)
