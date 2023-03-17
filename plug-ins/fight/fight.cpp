@@ -499,6 +499,7 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
 
     if (worn->condition < 1) {
         oldact("$O1 разлетается на мелкие части.", ch, wield, worn, TO_ROOM);
+        obj_dump_content(worn);
         extract_obj( worn );
         return;
     }

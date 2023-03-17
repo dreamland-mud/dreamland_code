@@ -122,7 +122,6 @@ void acid_effect(void *vo, Character *source, short level, int dam, int target, 
     if ( target == TARGET_OBJ ) /* toast an object */
     {
         Object *obj = (Object *) vo;
-        Object *t_obj,*n_obj;
         Character *victim = obj->carried_by;
         int chance;
         const char *msg;
@@ -191,7 +190,6 @@ void acid_effect(void *vo, Character *source, short level, int dam, int target, 
 
         if ( obj->item_type == ITEM_ARMOR )  /* etch it */
         {
-            int i;
             Affect af;
 
             af.location = APPLY_AC;
@@ -207,35 +205,7 @@ void acid_effect(void *vo, Character *source, short level, int dam, int target, 
         }
 
         /* get rid of the object */
-        if ( obj->contains )  /* dump contents */
-        {
-            dreamland->removeOption( DL_SAVE_OBJS );
-
-            for ( t_obj = obj->contains; t_obj != 0; t_obj = n_obj )
-            {
-                n_obj = t_obj->next_content;
-                obj_from_obj(t_obj);
-                if ( obj->in_room != 0 )
-                    obj_to_room(t_obj,obj->in_room);
-                else if ( obj->carried_by != 0 )
-                    obj_to_room(t_obj,obj->carried_by->in_room);
-                else {
-                    extract_obj(t_obj);
-                    continue;
-                }
-
-                acid_effect(t_obj,source, level/2,dam/2,TARGET_OBJ, dam_flag);
-                dreamland->removeOption( DL_SAVE_OBJS );
-            }
-
-            dreamland->resetOption( DL_SAVE_OBJS );
-
-            if ( obj->in_room != 0 )
-                save_items( obj->in_room );
-            else if ( obj->carried_by != 0 )
-                save_items( obj->carried_by->in_room );
-        }
-
+        obj_dump_content(obj);
         extract_obj(obj);
         return;
     }
@@ -422,7 +392,6 @@ void fire_effect(void *vo, Character *source, short level, int dam, int target, 
     if (target == TARGET_OBJ)  /* toast an object */
     {
         Object *obj = (Object *) vo;
-        Object *t_obj,*n_obj;
         Character *victim = obj->carried_by;        
         int chance;
         const char *msg;
@@ -498,39 +467,7 @@ void fire_effect(void *vo, Character *source, short level, int dam, int target, 
             return;
 
         show_effect_message(obj, msg);
-
-        if (obj->contains)
-        {
-            /* dump the contents */
-
-            dreamland->removeOption( DL_SAVE_OBJS );
-
-            for (t_obj = obj->contains; t_obj != 0; t_obj = n_obj)
-            {
-                n_obj = t_obj->next_content;
-                obj_from_obj(t_obj);
-
-                if (obj->in_room != 0)
-                    obj_to_room(t_obj,obj->in_room);
-                else if (obj->carried_by != 0)
-                    obj_to_room(t_obj,obj->carried_by->in_room);
-                else {
-                    extract_obj(t_obj);
-                    continue;
-                }
-
-                fire_effect(t_obj,source, level/2,dam/2,TARGET_OBJ, dam_flag);
-                dreamland->removeOption( DL_SAVE_OBJS );
-            }
-
-            dreamland->resetOption( DL_SAVE_OBJS );
-
-            if ( obj->in_room != 0 )
-                save_items( obj->in_room );
-            else if ( obj->carried_by != 0 )
-                save_items( obj->carried_by->in_room );
-        }
-
+        obj_dump_content(obj);
         extract_obj( obj );
         return;
     }
@@ -789,7 +726,6 @@ void sand_effect(void *vo, Character *source, short level, int dam, int target, 
     if ( target == TARGET_OBJ ) /* toast an object */
     {
         Object *obj = (Object *) vo;
-        Object *t_obj,*n_obj;
         Character *victim = obj->carried_by;        
         int chance;
         const char *msg;
@@ -858,7 +794,6 @@ void sand_effect(void *vo, Character *source, short level, int dam, int target, 
 
         if ( obj->item_type == ITEM_ARMOR )  /* etch it */
         {
-            int i;
             Affect af;
 
             af.location = APPLY_AC;
@@ -873,36 +808,7 @@ void sand_effect(void *vo, Character *source, short level, int dam, int target, 
             return;
         }
 
-        /* get rid of the object */
-        if ( obj->contains )  /* dump contents */
-        {
-            dreamland->removeOption( DL_SAVE_OBJS );
-
-            for ( t_obj = obj->contains; t_obj != 0; t_obj = n_obj ) 
-            {
-                n_obj = t_obj->next_content;
-                obj_from_obj(t_obj);
-                if ( obj->in_room != 0 )
-                    obj_to_room(t_obj,obj->in_room);
-                else if (obj->carried_by != 0)
-                    obj_to_room(t_obj,obj->carried_by->in_room);
-                else {
-                    extract_obj(t_obj);
-                    continue;
-                }
-
-                sand_effect(t_obj,source, level/2,dam/2,TARGET_OBJ, dam_flag);
-                dreamland->removeOption( DL_SAVE_OBJS );
-            }
-
-            dreamland->resetOption( DL_SAVE_OBJS );
-
-            if ( obj->in_room != 0 )
-                save_items( obj->in_room );
-            else if ( obj->carried_by != 0 )
-                save_items( obj->carried_by->in_room );
-        }
-
+        obj_dump_content(obj);
         extract_obj(obj);
         return;
     }
@@ -978,7 +884,6 @@ void scream_effect(void *vo, Character *source, short level, int dam, int target
     if (target == TARGET_OBJ)  /* toast an object */
     {
         Object *obj = (Object *) vo;
-        Object *t_obj,*n_obj;
         Character *victim = obj->carried_by;        
         int chance;
         const char *msg;
@@ -1043,37 +948,7 @@ void scream_effect(void *vo, Character *source, short level, int dam, int target
             return;
 
         show_effect_message(obj, msg);
-
-        if (obj->contains)
-        {
-            /* dump the contents */
-            dreamland->removeOption( DL_SAVE_OBJS );
-
-            for (t_obj = obj->contains; t_obj != 0; t_obj = n_obj)
-            {
-                n_obj = t_obj->next_content;
-                obj_from_obj(t_obj);
-                if (obj->in_room != 0)
-                    obj_to_room(t_obj,obj->in_room);
-                else if (obj->carried_by != 0)
-                    obj_to_room(t_obj,obj->carried_by->in_room);
-                else {
-                    extract_obj(t_obj);
-                    continue;
-                }
-
-                scream_effect(t_obj, source, level/2,dam/2,TARGET_OBJ, dam_flag);
-                dreamland->removeOption( DL_SAVE_OBJS );
-            }
-
-            dreamland->resetOption( DL_SAVE_OBJS );
-
-            if ( obj->in_room != 0 )
-                save_items( obj->in_room );
-            else if ( obj->carried_by != 0 )
-                save_items( obj->carried_by->in_room );
-            }
- 
+        obj_dump_content(obj); 
         extract_obj( obj );
         return;
     }

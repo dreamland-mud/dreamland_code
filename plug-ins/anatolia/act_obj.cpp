@@ -1213,6 +1213,7 @@ static int drop_obj( Character *ch, Object *obj )
     else
         return DROP_OBJ_NORMAL;
 
+    obj_dump_content(obj);
     extract_obj( obj );
     return DROP_OBJ_EXTRACT;
 }

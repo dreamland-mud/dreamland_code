@@ -505,8 +505,6 @@ bool spec_fido( NPCharacter *ch )
 {
     Object *corpse;
     Object *c_next;
-    Object *obj;
-    Object *obj_next;
 
     if ( !IS_AWAKE(ch) )
         return false;
@@ -521,16 +519,7 @@ bool spec_fido( NPCharacter *ch )
         oldact_p("$c1 с жадностью раздирает труп на куски.",
                 ch, 0, 0, TO_ROOM,POS_RESTING);
 
-        dreamland->removeOption( DL_SAVE_OBJS );
-        
-        for ( obj = corpse->contains; obj; obj = obj_next )
-        {
-            obj_next = obj->next_content;
-            obj_from_obj( obj );
-            obj_to_room( obj, ch->in_room );
-        }
-
-        dreamland->resetOption( DL_SAVE_OBJS );
+        obj_dump_content(corpse);
 
         extract_obj( corpse );
 

@@ -59,6 +59,7 @@ void        obj_to_room        ( Object *obj, Room *pRoomIndex );
 void        obj_to_obj        ( Object *obj, Object *obj_to );
 void        obj_to_obj_random( Object *item, Object *obj_to );
 void        obj_from_obj        ( Object *obj );
+void obj_dump_content(Object *obj);
 
 void undig_earthquake( Character *ch );
 void undig( Character *ch );

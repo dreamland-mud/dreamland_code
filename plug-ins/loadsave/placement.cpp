@@ -599,3 +599,33 @@ void check_camouflage( Character *ch, Room *to_room )
     }        
 }
 
+// Move object content to the same level as obj used to be (e.g. inventory or floor or another container).
+// Usually called before obj destruction.
+void obj_dump_content(Object *obj)
+{
+    Object *next_obj, *t_obj;
+
+    if (!obj->contains)
+        return;
+
+    dreamland->removeOption(DL_SAVE_OBJS);
+
+    for (t_obj = obj->contains; t_obj != 0; t_obj = next_obj) {
+        next_obj = t_obj->next_content;
+
+        obj_from_obj(t_obj);
+
+        if (obj->in_room != 0)
+            obj_to_room(t_obj, obj->in_room);
+        else if (obj->carried_by != 0)
+            obj_to_char(t_obj, obj->carried_by);
+        else if (obj->in_obj)
+            obj_to_obj(t_obj, obj->in_obj);
+        else
+            extract_obj(t_obj);
+    }
+
+    dreamland->resetOption(DL_SAVE_OBJS);
+
+    save_items(obj->getRoom());
+}
