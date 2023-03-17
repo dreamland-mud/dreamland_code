@@ -25,4 +25,4 @@ EXPOSE 9000
 EXPOSE 9001
 EXPOSE 1234
 
-CMD cd /home/dreamland/runtime && ./bin/dreamland
+CMD cd /home/dreamland/runtime && ulimit -c unlimited && ./bin/dreamland
