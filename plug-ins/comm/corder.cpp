@@ -66,15 +66,24 @@ COMMAND(COrder, "order")
     victim = get_char_room(ch, argTarget, FFIND_FOR_ORDER|FFIND_INVISIBLE);
 
     if (!victim) {
-        Character *follower = get_char_world(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE);
-        if (follower) {
+        // Check if it's an order for non-charmed mob that follows you, e.g. a knight horse.
+        Character *followerSameRoom = get_char_room(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE); 
+        if (followerSameRoom) {
+            ch->pecho("%1$^C1 следу%1$nет|ют за тобой, но не подчиня%1$nется|ются твоим приказам.", followerSameRoom);
+            return;
+        }
+
+        // See if we have a group member elsewhere in the world.
+        Character *followerWorld = get_char_world(ch, argTarget, FFIND_FOLLOWER | FFIND_INVISIBLE);
+        if (followerWorld) {
             ch->pecho("Твой последователь должен быть рядом с тобой.");
-            if (ch->getPC()->pet && follower->getNPC() && ch->getPC()->pet == follower->getNPC()) {
+            if (ch->getPC()->pet && followerWorld->getNPC() && ch->getPC()->pet == followerWorld->getNPC()) {
                 interpret_raw(ch, "gtell", "где ты?");
             }
         } else {
             ch->pecho("Среди твоих последователей такого нет.");
         }
+
         return;
     }
 
