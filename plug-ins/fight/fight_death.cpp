@@ -595,7 +595,6 @@ static void corpse_place( Object *corpse, Character *ch )
 static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
 {
     Object *obj, *obj_next;
-    Wearlocation *wearloc;
     DLString worn;
 
     for (obj = ch->carrying; obj; obj = obj_next) {
@@ -626,9 +625,6 @@ static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
             break;
 
         case LOOT_WEAR:
-            wearloc = &*obj->wear_loc;
-            wearloc->unequip( obj );
-            obj->wear_loc.assign( wearloc );
             break;
         }
 
