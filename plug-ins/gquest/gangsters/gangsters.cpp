@@ -226,7 +226,7 @@ void Gangsters::resume( )
 {
     int rtime = getTaskTime( );
     
-    if (rtime <= 0) 
+    if (rtime < 0) 
         scheduleDestroy( );
     else {
         DLScheduler::getThis( )->putTaskInSecond( rtime * 60, Gangsters::Pointer( this ) );

@@ -48,7 +48,7 @@ void GlobalQuest::resume( )
 {
     int time = getTaskTime( );
 
-    if (time <= 0) 
+    if (time < 0) 
         scheduleDestroy( );
     else {
         DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
@@ -96,7 +96,7 @@ void GlobalQuest::after( )
 {
     int time = getTaskTime( );
 
-    if (time <= 0) 
+    if (time < 0) 
         scheduleDestroy( );
     else {
         DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
@@ -243,7 +243,6 @@ void GlobalQuest::exorcism(Character *ch) const
 
 void GlobalQuest::wipeRoom( Room *room ) const
 {
-    Character *ch_next;
     Object *obj_next, *pit;
     Room *office;
     
