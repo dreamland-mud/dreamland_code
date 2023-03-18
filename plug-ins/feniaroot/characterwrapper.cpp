@@ -50,6 +50,7 @@
 #include "commonattributes.h"
 #include "pet.h"
 #include "recipeflags.h"
+#include "damageflags.h"
 #include "act.h"
 #include "selfrate.h"
 #include "religionutils.h"
@@ -1898,18 +1899,19 @@ NMI_INVOKE( CharacterWrapper, multi_hit, "(vict): нанести один рау
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label[,damtype]]]]): убить. часть тела из таблицы .tables.part_flags или -1" )
+NMI_INVOKE( CharacterWrapper, raw_kill, "([flags[,killer[,label[,damtype]]]]): убить. флаги из таблицы .tables.death_flags" )
 {
     RegisterList::const_iterator i;
     Character *killer = NULL;
-    int part = -1;
     DLString label;
     int damtype = -1; 
+    bitstring_t flags = 0;
 
     checkTarget();
     
     if (args.size() > 0)
-        part = argnum2number(args, 1);
+        flags = argnum2flag(args, 1, death_flags);
+    flags = std::max(0LL, flags);
     if (args.size() > 1)
         killer = argnum2character(args, 2);
     if (args.size() > 2)
@@ -1917,7 +1919,7 @@ NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer[,label[,damtype]]]])
     if (args.size() > 3)
         damtype = argnum2flag(args, 4, damage_table);
     
-    raw_kill( target, part, killer, label, damtype );
+    raw_kill( target, flags, killer, label, damtype );
     throw VictimDeathException();
 }
 

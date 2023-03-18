@@ -366,11 +366,11 @@ public:
         const CharDeathEvent &evt = static_cast<const CharDeathEvent &>(event);
         Character *victim = evt.victim;
         Character *killer = evt.killer;
-        int bodypart = evt.bodypart;
+        bitstring_t flags = evt.flags;
         DLString label = evt.label;
         int damtype = evt.damtype;
 
-        raw_kill( victim, bodypart, killer, label, damtype );
+        raw_kill( victim, flags, killer, label, damtype );
     }
 };
 
@@ -851,7 +851,7 @@ static bool mprog_kill( Character *killer, Character *victim )
 /*
  * Main death handler.
  */ 
-void raw_kill( Character* victim, int part, Character* ch, const DLString &label, int damtype )
+void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLString &label, int damtype )
 {
     Character *realKiller = ch;
 
@@ -875,7 +875,7 @@ void raw_kill( Character* victim, int part, Character* ch, const DLString &label
 
     // From this point on the death has certainly happened.
 
-    gprog("onDeath", "CCisi", victim, ch, part, label.c_str(), damtype);
+    gprog("onDeath", "CCisi", victim, ch, -1, label.c_str(), damtype);
 
     DeathPenalties(ch, victim).run();
 
@@ -883,11 +883,18 @@ void raw_kill( Character* victim, int part, Character* ch, const DLString &label
     if (ch)
         group_gain(ch, victim, realKiller);
 
-    make_corpse( ch, victim ); // TO-DO: move this to fenia too
+    if (!IS_SET(flags, DEATH_MOB_EXTRACT))
+        make_corpse( ch, victim ); // TO-DO: move this to fenia too
 
     // MOB is killed.
     if (victim->is_npc( )) {
         killed_npc_gain( victim->getNPC( ) );
+
+        if (IS_SET(flags, DEATH_MOB_EXTRACT)) { // full extract w/o trace, e.g. disintegrate
+            extract_char(victim, true);
+            return;
+        }
+
         victim->setDead( );
         DeathAutoCommands( ch, victim ).run( );   
         return;

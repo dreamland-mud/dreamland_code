@@ -50,11 +50,11 @@ PROF(warrior);
 
 void do_visible( Character * );
 
-CharDeathEvent::CharDeathEvent(Character *victim, Character *killer, int bodypart, const DLString &label, int damtype) 
+CharDeathEvent::CharDeathEvent(Character *victim, Character *killer, bitstring_t flags, const DLString &label, int damtype) 
 {
     this->victim = victim;
     this->killer = killer;    
-    this->bodypart = bodypart;
+    this->flags = flags;
     this->label = label;
     this->damtype = damtype;
 }
@@ -559,7 +559,7 @@ void Damage::handleDeath( )
     oldact("$c1 уже {RТРУП{x!!", victim, 0, 0, TO_ROOM);
     victim->pecho("Тебя {RУБИЛИ{x!!\n\r");
     
-    eventBus->publish(CharDeathEvent(victim, killer, -1, deathReason, dam_type));
+    eventBus->publish(CharDeathEvent(victim, killer, 0, deathReason, dam_type));
 }
 
 

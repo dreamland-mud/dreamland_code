@@ -288,7 +288,7 @@ void UndefinedOneHit::damEffectVorpal()
     victim->recho("%^C1 уже ТРУП!!", victim);
     victim->pecho("Тебя УБИЛИ!");
 
-    eventBus->publish(CharDeathEvent(victim, ch, 3, "vorpal", dam_type));
+    eventBus->publish(CharDeathEvent(victim, ch, 0, "vorpal", dam_type));
     throw VictimDeathException( );
 }
 

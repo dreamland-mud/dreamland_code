@@ -47,7 +47,7 @@ void yell_panic( Character *ch, Character *victim, const char *msgBlind , const 
 void        group_gain( Character *ch, Character *victim, Character *realKiller = 0 );
 
 /* death handling routines (fight_death.cpp) */
-void        raw_kill( Character* victim, int part, Character* ch, const DLString &label, int damtype );
+void        raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLString &label, int damtype );
 Object * bodypart_create( int vnum, Character *ch, Object *corpse );
 
 /* subroutines (fight_subr.cpp) */

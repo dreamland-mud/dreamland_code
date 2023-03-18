@@ -84,10 +84,10 @@ protected:
 };
 
 struct CharDeathEvent : public Event {
-    CharDeathEvent(Character *victim, Character *killer, int bodypart, const DLString &label, int damtype);
+    CharDeathEvent(Character *victim, Character *killer, bitstring_t flags, const DLString &label, int damtype);
     Character *victim;
     Character *killer;
-    int bodypart;
+    bitstring_t flags;
     DLString label;
     int damtype;
 };
