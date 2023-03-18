@@ -88,7 +88,7 @@ void PCharacter::gainExp( int gain )
         if (getProfession( ) == prof_samurai && level == 10)
             wimpy = 0;
 
-        infonet(this, 0, "{CРадостный голос из $o2: ", "{W%1$C1 дости%1$Gгло|г|гла следующей ступени мастерства.{x", this);
+        infonet(this, 0, "{CРадостный голос из $o2: ", "{W%1$#C1 дости%1$G#гло|г|гла следующей ступени мастерства.{x", this);
 
         ::wiznet( WIZ_LEVELS, 0, 0, 
                   "%1$^C1 дости%1$Gгло|г|гла %2$d уровня!", this, getRealLevel( ) );
