@@ -275,7 +275,7 @@ void reboot_anatolia( void )
         for ( d = descriptor_list; d != 0; d = d_next )
         {
                 d_next = d->next;
-                d->send("Dream Land is going down for rebooting NOW!\n");
+                d->send("Мир Мечты уходит на перезагрузку ПРЯМО СЕЙЧАС!\n");
 
                 if (d->character && d->connected == CON_PLAYING)
                         d->character->getPC( )->save();

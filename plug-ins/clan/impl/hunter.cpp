@@ -680,7 +680,7 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
     }
 
     if ( !found )
-        ch->pecho("В Dream Land нет ничего похожего на это.");
+        ch->pecho("В Мире Мечты нет ничего похожего на это.");
     else
         page_to_char( buffer.str( ).c_str( ), ch );
 }

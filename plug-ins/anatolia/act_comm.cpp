@@ -351,9 +351,9 @@ CMDRUNP( quit )
     oldact_p("$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
 
     if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
-        wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 покину%1$Gло|л|ла этот мир.", pch );
-        infonet(pch, 0, "{CТихий голос из $o2: ", "{W%1$C1 покину%1$Gло|л|ла Dream Land.{x", pch);
-        send_discord_orb(fmt(0, "%1$^C1 покинул%1$Gо||а Dream Land.", pch));
+        wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$#C1 покину%1$#Gло|л|ла этот мир.", pch );
+        infonet(pch, 0, "{CТихий голос из $o2: ", "{W%1$#C1 покину%1$#Gло|л|ла Мир Мечты.{x", pch);
+        send_discord_orb(fmt(0, "%1$#C1 покинул%1$#Gо||а Мир Мечты.", pch));
     }
 
     dreamland->removeOption( DL_SAVE_OBJS );
