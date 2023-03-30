@@ -212,7 +212,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     }
     
     if (!raceApt.empty( )) {
-        in << "{WУникальные cпособности{x: " << raceApt << endl;
+        in << "{WУникальные способности{x: " << raceApt << endl;
     }
     if (!prof100.empty( )) {
         in << "{WБонусы на классовые умения{x: " << prof100 << endl;
