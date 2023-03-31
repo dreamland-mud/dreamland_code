@@ -289,3 +289,42 @@ short get_wear_level( Character *ch, Object *obj )
             
     return max( 1, obj->level - wear_mod - level_diff - itemtype_bonus );
 }
+
+int skill_lookup(const DLString &constName, Character *ch)
+{
+    int i;
+    const Skill *skill;
+    DLString name = constName.toLower().quote().getOneArgument(); // support skill name like 'cure p' with explicit quotes
+
+    if (name.empty( ))
+        return -1;
+    
+    // Strict lookup: always return an exact match available for ch.
+    for (i = 0; i < skillManager->size(); i++) {
+        skill = skillManager->find(i);
+        if (skill->getName() == name || skill->getRussianName() == name) {
+            if (!ch || skill->available(ch))
+                return i;
+        }
+    }
+
+    // Unstrict lookup by partial name , e.g. 'cur po' for 'cure poison'.
+    StringList argList(name);
+
+    for (i = 0; i < skillManager->size(); i++) {
+        skill = skillManager->find(i);
+
+        if (StringList(skill->getName()).superListOf(argList)
+             || StringList(skill->getRussianName()).superListOf(argList))
+        {
+            if (!ch || skill->available(ch))
+                return i;
+        }
+    }
+
+    // Nothing found for ch, try again without specifying target character.
+    if (ch)
+        return skill_lookup(constName, 0);
+
+    return -1;
+}

@@ -77,4 +77,6 @@ extern const char *SKILL_INFO_PAD;
 // TODO: find a better header.
 short get_wear_level( Character *ch, Object *obj );
 
+int skill_lookup(const DLString &constName, Character *ch);
+
 #endif

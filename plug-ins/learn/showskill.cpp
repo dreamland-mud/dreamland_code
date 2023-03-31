@@ -34,7 +34,7 @@ CMDRUN( showskill )
         return;
     }
 
-    sn = SkillManager::getThis( )->unstrictLookup( argument );
+    sn = SkillManager::getThis( )->unstrictLookup( argument, ch );
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill) {

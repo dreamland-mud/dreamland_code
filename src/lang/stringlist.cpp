@@ -15,27 +15,45 @@ StringList::StringList(const DLString &constStr)
         push_back(arg);
 }
 
-bool StringList::superListOf(const StringList& smallerList) const
+// Check that 'b c' or 'a b c d' or 'a d' matches 'aa bb cc dd'.
+// Order is preserved: 'c b' or 'dd cc bb aa' would not match.
+bool StringList::superListOf(const StringList& smallList) const
 {
-    if (smallerList.size() > this->size())
+    const StringList &bigList = *this;
+
+    // Quick sanity check.
+    if (smallList.size() > bigList.size())
         return false;
     
-    int matchesFound = 0;
+    size_t smallIndex;
+    int lastBigIndex = -1;
 
-    // Make sure that all words in the smaller list have a match in the bigger list (this).
-    // Order needs to be preserved,  i.e. 'a b' doesn't match 'bbb aaa', but 'a b' matches 'aaa xxx bbb'.
-    for (size_t i = 0, j = 0; i < this->size() && j < smallerList.size(); i++) {
-        if (smallerList[j].strPrefix(at(i))) {
-            matchesFound++;
-            j++;
+    for (smallIndex = 0; smallIndex < smallList.size(); smallIndex++) {
+        // Look for the current small list entry inside big list,
+        // starting from the last matched position (to preserve overall order).
+        bool matchFound = false;
+
+        // If we reached the end of the big list but there are still entries
+        // left in the smaller one - it's a fail.
+        if (lastBigIndex >= (int)bigList.size())
+            return false;
+
+        for (size_t i = lastBigIndex + 1; i < bigList.size(); i++) {
+            if (smallList[smallIndex].strPrefix(bigList.at(i))) {
+                // A match!
+                matchFound = true;
+                lastBigIndex = i;
+                break;
+            }
         }
 
-        // First words in both lists need to match.
-        if (i == 0 && j == 0)
+        // Every entry in the small list must have a match in the bigger list,
+        // otherwise it's a fail.
+        if (!matchFound)
             return false;
     }
 
-    return (int)smallerList.size() == matchesFound;
+    return true;
 }
 
 DLString StringList::join(const DLString &delim) const

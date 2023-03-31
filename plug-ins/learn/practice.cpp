@@ -22,6 +22,7 @@
 
 #include "attract.h"
 #include "occupations.h"
+#include "skill_utils.h"
 #include "comm.h"
 #include "loadsave.h"
 #include "mercdb.h"
@@ -159,7 +160,7 @@ void CPractice::pracShow( PCharacter *ch )
         buf << endl;
     }
     
-    buf << dlprintf( "У тебя %d сесси%s практики (practice).\n\r",
+    buf << dlprintf( "У тебя %d сесси%s практики.\n\r",
                  ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
 
     page_to_char( buf.str( ).c_str( ), ch );
@@ -179,6 +180,7 @@ void CPractice::pracHere( PCharacter *ch )
 
     buf << fmt( ch, "%1$^C1 может помочь тебе практиковаться в таких умениях:", teacher ) << endl;
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
+        int help_id;
         ostringstream errbuf;
         Skill *skill = SkillManager::getThis( )->find( sn );
 
@@ -194,8 +196,20 @@ void CPractice::pracHere( PCharacter *ch )
         if (!teacher->is_npc( ) && skill->getEffective( teacher ) < 100)
             continue;
 
+        if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+            help_id = skill->getSkillHelp()->getID();
+        else
+            help_id = 0;
+
         DLString sname = skill->getNameFor( ch ).c_str( );
-        buf << "     " << sname << endl;
+
+        buf << "     ";
+
+        if (help_id > 0)
+            buf << "{hh" << help_id << sname << "{hx" << endl;
+        else 
+            buf << sname << endl;
+
         found = true;
     }
     
@@ -224,7 +238,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
     }
 
-    sn = skillManager->unstrictLookup( arg, ch );
+    sn = skill_lookup(arg, ch);
     skill = skillManager->find( sn );
 
     if (!skill) {
@@ -253,7 +267,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
 
     if (ch->practice <= 0) {
-        ch->pecho("У тебя сейчас нет сессий практики (practice).");
+        ch->pecho("У тебя сейчас нет сессий практики.");
         return;
     }
 
