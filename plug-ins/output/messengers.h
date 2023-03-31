@@ -22,6 +22,7 @@ void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg
 void send_discord_ic(Character *ch, const DLString &format, const DLString &msg);
 
 void send_telegram_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description);
+void send_telegram_gquest(const DLString &gqName, const DLString &msg);
 void send_telegram(const DLString &content);
 
 #endif
