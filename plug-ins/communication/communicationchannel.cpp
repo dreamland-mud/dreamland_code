@@ -53,7 +53,7 @@ bool CommunicationChannel::checkIgnore( Character *ch, Character *victim ) const
     return twit->isAvailable( ch->getNameC() );
 }
 
-void CommunicationChannel::applyGarble( Character *ch, DLString &msg, Character *victim ) const
+void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const
 {
     ostringstream srcStream;
     char result[MAX_INPUT_LENGTH];
@@ -66,7 +66,7 @@ void CommunicationChannel::applyGarble( Character *ch, DLString &msg, Character 
     if (!ch->isAffected( gsn_garble ))
         return;
     
-    mudtags_convert( msg.c_str( ), srcStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, victim );
+    mudtags_convert( msg.c_str( ), srcStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, 0 );
     DLString srcString = srcStream.str( );
     src = srcString.c_str( );
     dst = result;

@@ -155,13 +155,13 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     bool fAuto = (ch == victim && !msgAuto.empty( ));
     const DLString &fmtChar = fAuto ? msgAuto : msgChar;
     DLString outChar = msg;
-    applyGarble( ch, outChar, ch );
+    applyGarble( ch, outChar );
     DLString messageChar = outputChar( ch, victim, fmtChar, outChar );
 
     // Format message to the victim.
     const DLString &fmtVict = msgVict;
     DLString outVict = msg;
-    applyGarble( ch, outVict, victim );
+    applyGarble( ch, outVict );
     DLString messageVict = outputVict( ch, victim, fmtVict, outVict );
 
     if (checkAFK( ch, victim, msg )) {

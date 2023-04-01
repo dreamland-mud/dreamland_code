@@ -88,15 +88,16 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
     REMOVE_BIT(ch->comm, off);
 
     findListeners( ch, listeners );
+
+    DLString argGarbled = arg;
+    applyGarble(ch, argGarbled);
     
     if (needOutputSelf( ch )) {
         bool fMild = (IS_SET(ch->comm, COMM_MILDCOLOR) && !msgSelfMild.empty( ));
         bool fEmpty = (!msgListEmpty.empty( ) && listeners.size( ) == 0);
         const DLString &fmtSelf = fEmpty ? msgListEmpty : fMild ? msgSelfMild : msgSelf;
 
-        DLString outSelf = arg;
-        applyGarble( ch, outSelf, ch );
-
+        DLString outSelf = argGarbled;
         DLString message = outputSelf( ch, fmtSelf, outSelf );
         ch->pecho(message);
         postOutput(ch, message);
@@ -111,8 +112,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             bool fMild = (IS_SET((*i)->comm, COMM_MILDCOLOR) && !msgOtherMild.empty( ));
             const DLString &fmtVict = fNoarg ? msgOtherNoarg : fMild ? msgOtherMild : msgOther;
             
-            DLString outVict = arg;
-            applyGarble( ch, outVict, victim );
+            DLString outVict = argGarbled;
             applyTranslation( ch, outVict, victim );
 
             DLString message = outputVict( ch, victim, fmtVict, outVict );
@@ -121,7 +121,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         }
     }
 
-    triggers( ch, arg );
+    triggers( ch, argGarbled );
 }
 
 bool GlobalChannel::canTalkGlobally( Character *ch ) const
