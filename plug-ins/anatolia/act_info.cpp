@@ -971,6 +971,7 @@ CMDRUNP(report)
     bool showAll = arg_oneof(arg, "all", "все", "full", "полный");
     bool shown = false;
     bool noCarry = pet->canCarryNumber( ) == 0;
+    noCarry |= !pet->wearloc.isSet(wear_wield);
 
     for (int sn = 0; sn < SkillManager::getThis()->size(); sn++) {
         Skill::Pointer skill = SkillManager::getThis()->find(sn);
