@@ -24,7 +24,7 @@ protected:
     virtual bool checkIgnore( Character *, Character * ) const;
     virtual bool checkIsolator( Character *, Character * ) const;
 
-    virtual void applyGarble( Character *, DLString &, Character * ) const;
+    virtual void applyGarble( Character *, DLString & ) const;
 
     virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual DLString outputChar( Character *, Character *, const DLString &, const DLString & ) const;
