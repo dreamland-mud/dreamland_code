@@ -475,10 +475,17 @@ bool Walkment::checkWater( Character *wch )
             if (boat_types != BOAT_NONE) 
                return true;
             
-            rc = RC_MOVE_WATER;    
-            msgSelfParty( wch, 
-                  "Чтоб идти дальше тебе нужна лодка, способность плавать или полет.",
-                  "%2$^C1 не умеет перемещаться по воде." );
+            rc = RC_MOVE_WATER;
+
+            if (can_fly(wch))
+                msgSelfParty(wch,
+                    "Чтобы идти дальше, тебе необходимо {y{hcвзлететь{x или найти лодку.",
+                    "%2$^C3 необходимо {y{hcвзлететь{x или найти лодку, чтобы идти дальше.");
+            else
+                msgSelfParty( wch, 
+                    "Чтоб идти дальше тебе нужна лодка, способность плавать или полет.",
+                    "%2$^C1 не умеет перемещаться по воде." );
+
             return false;                
     }
  

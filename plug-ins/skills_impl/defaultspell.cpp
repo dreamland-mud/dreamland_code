@@ -721,7 +721,8 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
-        ch->pecho("Это заклинание нельзя использовать во время сражения.");
+        const Skill *theSkill = skill.getPointer();
+        ch->pecho("Заклинание '%K' нельзя использовать во время сражения.", theSkill);
         return false;
     }
     
