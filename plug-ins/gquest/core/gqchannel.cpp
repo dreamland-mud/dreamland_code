@@ -78,6 +78,7 @@ void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pc
                 d->character->send_to( buf );
 
     send_discord_gquest(name, msg);
+    send_telegram_gquest(name, msg);
 }
 
 void GQChannel::gecho( const DLString& msg ) 

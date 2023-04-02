@@ -102,6 +102,14 @@ void send_telegram_note(const DLString &thread, const DLString &author, const DL
     }
 }
 
+void send_telegram_gquest(const DLString &gqName, const DLString &msg)
+{
+    DLString gqName_koi = telegram_string(gqName);
+    DLString msg_koi = telegram_string(msg);
+    
+    send_to_telegram("*" + koi2utf(gqName_koi) + ":* " + koi2utf(msg_koi));
+}
+
 /** Send arbitrary string as Telegram message. */
 void send_telegram(const DLString &content)
 {
