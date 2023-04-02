@@ -62,7 +62,7 @@ DLString GlobalBitvector::toString( char joiner ) const
     return result.join(joiner);
 }
 
-DLString GlobalBitvector::toRussianString( char gcase, char joiner ) const
+DLString GlobalBitvector::toRussianString( char gcase, const char *cjoiner ) const
 {
     if (!registry)
         return DLString::emptyString;
@@ -76,6 +76,7 @@ DLString GlobalBitvector::toRussianString( char gcase, char joiner ) const
                 result.push_back(e->getRussianName().ruscase(gcase).quote());
         }
 
+    DLString joiner = cjoiner ? cjoiner : " ";
     return result.join(joiner);
 }
 

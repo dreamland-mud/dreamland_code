@@ -200,7 +200,7 @@ DLString AffectOutput::format_affect_global( Affect *paf )
                 << " {m" << paf->global.toRussianString().quote() 
                 << "{y на {m" << (int)abs(mod) << "{y";
         } else if (registry == liquidManager) {
-            buf << "добавляет запах {m" << paf->global.toRussianString('2', ',').colourStrip() << "{x";
+            buf << "добавляет запах {m" << paf->global.toRussianString('2', ",").colourStrip() << "{x";
         } else if (registry == wearlocationManager) {
             if (paf->global.isSet( wear_wrist_r ))
                 buf << "отрезанная правая рука";

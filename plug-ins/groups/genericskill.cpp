@@ -32,8 +32,7 @@ const DLString GenericSkill::CATEGORY = "Классовые умения";
 
 GenericSkill::GenericSkill( ) 
                 : group(skillGroupManager),
-                  raceAffect( 0, &affect_flags ),
-                  raceBonuses( false ),
+                  raceBonuses(raceManager),
                   classes( false ),
                   hidden( false )
 
@@ -93,7 +92,6 @@ bool GenericSkill::checkAlignEthos(Character *ch) const
  */
 bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
 {
-    const SkillRaceBonus *rb; 
     const SkillClassInfo *ci;
     Character *ch = 0;
     
@@ -118,8 +116,7 @@ bool GenericSkill::visible( CharacterMemoryInterface *mem ) const
     if (!checkAlignEthos(ch))
         return false;
 
-    rb = getRaceBonus( mem );
-    if (rb && rb->visible( ))
+    if (hasRaceBonus(mem))
         return true;
     
     ci = getClassInfo( mem );
@@ -145,8 +142,6 @@ bool GenericSkill::available( Character *ch ) const
  */
 bool GenericSkill::usable( Character *ch, bool message = false ) const
 {
-    const SkillRaceBonus *rb; 
-
     if (!available( ch ))
         return false;
     
@@ -164,8 +159,7 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
         return true;
 
     // Race bonuses are always accessible.
-    rb = getRaceBonus( ch );
-    if (rb && !rb->isProfessional( ))
+    if (hasRaceBonus(ch))
         return true;
 
     // Dreamt or bonus skills area always accessible.
@@ -199,7 +193,6 @@ bool GenericSkill::availableForAll( ) const
  */
 int GenericSkill::getLevel( Character *ch ) const
 {
-    const SkillRaceBonus *rb; 
     const SkillClassInfo *ci;
 
     if (!visible( ch ))
@@ -214,18 +207,16 @@ int GenericSkill::getLevel( Character *ch ) const
     if (temporary_skill_active(this, ch))
         return ch->getRealLevel();
  
-    rb = getRaceBonus( ch );
-    // Race bonuses that are independent on profession are available immediately,
-    // e.g. rockseers get wands from level 1.
-    if (rb && !rb->isProfessional( ))
-        return rb->getLevel( );
+    // Race bonuses are available immediately.
+    if (hasRaceBonus(ch))
+        return 1;
 
     // Return class level or non-zero race bonus level, whatever is lower,
     // e.g. urukhai get spears from level 1.
     ci = getClassInfo( ch );
     if (ci && ci->visible()) {
         int classLevel = ci->getLevel();
-        int raceLevel = rb ? rb->getLevel() : 0;
+        int raceLevel = hasRaceBonus(ch) ? 1 : 0;
 
         if (raceLevel == 0)
             return classLevel;
@@ -252,15 +243,11 @@ int GenericSkill::getLearned( Character *ch ) const
     PCharacter *pch = ch->getPC( );
     int percent = pch->getSkillData( getIndex( ) ).learned;
 
-    if (isRaceAffect( pch ))
-        return percent;
-    
     if (temporary_skill_active(this, ch))
         return percent;
    
-    const SkillRaceBonus *rb = getRaceBonus( pch );
-    if (rb) 
-        percent = std::max( percent, rb->getBonus( ) );
+    if (hasRaceBonus(pch))
+        percent = 100;
     
     return URANGE( 1, percent, 100 );
 }
@@ -416,55 +403,17 @@ GenericSkill::getClassInfo( CharacterMemoryInterface *ch ) const
 }
 
 
-/*
- * возвращает инфо о расовом бонусе для чара (if any)
- */
-const SkillRaceBonus *
-GenericSkill::getRaceBonus( CharacterMemoryInterface *ch ) const
+bool GenericSkill::hasRaceBonus( CharacterMemoryInterface *ch ) const
 {
-    RaceBonuses::const_iterator i = raceBonuses.find( ch->getRace( )->getName( ) );
-
-    return (i == raceBonuses.end( ) ? NULL : &(i->second));
-}
-
-/*
- * соответствует ли этот скил какому-либо расовому аффекту для чара?
- * (пример: sneak - AFF_SNEAK)
- */
-bool GenericSkill::isRaceAffect( CharacterMemoryInterface *ch ) const
-{
-    return ch->getRace( )->getAff( ).isSet( raceAffect.getValue( ) );
-}
-
-/*--------------------------------------------------------------------------
- * SkillRaceBonus
- *--------------------------------------------------------------------------*/
-bool SkillRaceBonus::visible( ) const
-{
-    return !isProfessional( ) 
-           && getLevel( ) < LEVEL_IMMORTAL;
+    return raceBonuses.isSet(ch->getRace());
 }
 
 /*--------------------------------------------------------------------------
  * SkillClassInfo
  *--------------------------------------------------------------------------*/
 SkillClassInfo::SkillClassInfo( )
-                 : rating(1), maximum( 100 ), always( false ), clanAntiBonuses( false )
+                 : rating(1), maximum( 100 )
 {
-}
-
-/*
- * возвращает инфо о клановых запретах на использования скила 
- * для данного класса
- */
-const SkillClanAntiBonus *
-SkillClassInfo::getClanAntiBonus( CharacterMemoryInterface *ch ) const
-{
-    ClanAntiBonuses::const_iterator i;
-
-    i = clanAntiBonuses.find( ch->getClan( )->getName( ) );
-
-    return (i == clanAntiBonuses.end( ) ? NULL : &(i->second));
 }
 
 bool SkillClassInfo::visible( ) const
@@ -479,15 +428,29 @@ bool SkillClassInfo::visible( ) const
 
 bool GenericSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
 {
-    // Assume only class restrictions are passed here for now.
+    StringList values;
+    values.split(newValue, ";");
+    DLString classValues = values.front().stripWhiteSpace();
+    DLString raceBonusValues = values.size() > 1 ? values.back().stripWhiteSpace() : DLString::emptyString;
 
-    map<DLString, int> newClasses = parseAccessTokens(newValue, professionManager, errBuf);
+    map<DLString, int> newClasses = parseAccessTokens(classValues, professionManager, errBuf);
+    if (!errBuf.str().empty())
+        return false;
 
-    if (newClasses.empty() && errBuf.str().empty()) {
+    if (newClasses.empty()) {
         // Valid empty input, flush all class info from this skill.
+        if (!classes.empty())
+            errBuf << "Все классовые ограничения очищены." << endl;
         classes.clear();
-        errBuf << "Все классовые ограничения очищены." << endl;
-        return true;
+    } 
+
+    if (raceBonusValues.empty()) {
+        // Valid empty race bonus input.
+        if (!raceBonuses.empty())
+            errBuf << "Все расовые бонусы очищены." << endl;
+        raceBonuses.clear();
+    } else {
+        raceBonuses.fromString(raceBonusValues);
     }
 
     // Adjust existing class levels or create new elements.
@@ -508,19 +471,19 @@ bool GenericSkill::accessFromString(const DLString &newValue, ostringstream &err
             c++;
     }
 
-    errBuf << "Новые классовые ограничения: " << accessToString() << endl;
+    errBuf << "Новые классовые ограничения и расовые бонусы: " << accessToString() << endl;
     return true;
 }
 
 DLString GenericSkill::accessToString() const
 {
-    StringList result;
+    StringList classBuf;
 
     for (auto &c: classes) {
-        result.push_back(c.first + " " + DLString(c.second.getLevel()));
+        classBuf.push_back(c.first + " " + DLString(c.second.getLevel()));
     }
 
-    return result.join(", ");
+    return classBuf.join(", ") +  ";" + raceBonuses.toString(' ');
 }
 
 DLString GenericSkill::skillClassesList() const
@@ -538,8 +501,8 @@ DLString GenericSkill::skillRacesList() const
 {
     StringList result;
 
-    for (auto &r: raceBonuses) {
-        result.push_back(raceManager->find(r.first)->getMltName().ruscase('1'));
+    for (auto &r: raceBonuses.toArray()) {
+        result.push_back(raceManager->find(r)->getMltName().ruscase('1'));
     }
 
     return result.join("{x, {D");

@@ -762,7 +762,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 << " " << paf->global.toRussianString().quote() 
                 << " на " << (int)abs(mod);
         } else if (registry == liquidManager) {
-            buf << "добавляет запах " << paf->global.toRussianString('2', ',').colourStrip();
+            buf << "добавляет запах " << paf->global.toRussianString('2', ",").colourStrip();
         } else if (registry == wearlocationManager) {
             buf << "отнимает конечность " << paf->global.toString(',');
         } else {

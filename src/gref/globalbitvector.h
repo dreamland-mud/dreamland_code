@@ -117,7 +117,7 @@ public:
 
     void fromString( const DLString &source );
     DLString toString( char joiner = ' ' ) const;
-    DLString toRussianString( char gcase = '1', char joiner = ' ' ) const;
+    DLString toRussianString( char gcase = '1', const char *joiner = 0 ) const;
     vector<int> toArray( ) const;
 
 protected:

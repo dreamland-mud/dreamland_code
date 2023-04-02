@@ -23,8 +23,6 @@ using namespace std;
 class PCharacter;
 class NPCharacter;
 class SkillClassInfo;
-class SkillRaceBonus;
-class SkillClanAntiBonus;
 class XMLSkillParents;
 
 class GenericSkill : public BasicSkill 
@@ -34,7 +32,6 @@ friend class XMLSkillParents;
 public:
     typedef ::Pointer<GenericSkill> Pointer;
     typedef XMLMapBase<SkillClassInfo> Classes;
-    typedef XMLMapBase<SkillRaceBonus> RaceBonuses;
     
     GenericSkill( );
     virtual ~GenericSkill( );
@@ -74,14 +71,12 @@ protected:
     
     bool availableForAll( ) const;
     const SkillClassInfo * getClassInfo( CharacterMemoryInterface * ) const;
-    const SkillRaceBonus *getRaceBonus( CharacterMemoryInterface * ) const;
-    bool isRaceAffect( CharacterMemoryInterface * ) const;
+    bool hasRaceBonus( CharacterMemoryInterface * ) const;
 
     XML_VARIABLE XMLGlobalBitvector group;
-    XML_VARIABLE XMLFlagsNoEmpty   raceAffect;
     XML_VARIABLE MobProfSkillData mob;
 
-    XML_VARIABLE RaceBonuses raceBonuses;
+    XML_VARIABLE XMLGlobalBitvector raceBonuses;
     XML_VARIABLE Classes classes;
 
     XML_VARIABLE XMLBooleanNoFalse hidden;
@@ -93,15 +88,9 @@ XML_OBJECT
 friend class GenericSkill;
 public:
     typedef ::Pointer<SkillClassInfo> Pointer;
-    typedef XMLMapBase<SkillClanAntiBonus> ClanAntiBonuses;
     
     SkillClassInfo( );
 
-    const SkillClanAntiBonus *getClanAntiBonus( CharacterMemoryInterface * ) const;
-
-    inline bool isAlwaysAvailable( ) const {
-        return always;
-    }
     inline int getLevel( ) const {
         return level.getValue( );
     }
@@ -117,42 +106,6 @@ protected:
     XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLInteger rating;
     XML_VARIABLE XMLInteger maximum;
-    XML_VARIABLE XMLIntegerNoEmpty weight;
-    XML_VARIABLE XMLBooleanNoFalse always;
-    XML_VARIABLE ClanAntiBonuses clanAntiBonuses;
-};
-
-class SkillRaceBonus : public XMLVariableContainer {
-XML_OBJECT
-public:
-    typedef ::Pointer<SkillRaceBonus> Pointer;
-    
-    inline int getLevel( ) const {
-        return level.getValue( );
-    }
-    inline int getBonus( ) const {
-        return bonus.getValue( );
-    }
-    inline bool isProfessional( ) const {
-        return professional.getValue( );
-    }
-    bool visible( ) const;
-protected:
-    XML_VARIABLE XMLInteger level;
-    XML_VARIABLE XMLIntegerNoEmpty bonus;
-    XML_VARIABLE XMLBoolean professional;
-};
-
-class SkillClanAntiBonus : public XMLVariableContainer {
-XML_OBJECT
-public:
-    typedef ::Pointer<SkillClanAntiBonus> Pointer;
-    
-    inline const DLString & getClanName( ) const {
-        return clanName.getValue( );
-    }
-protected:
-    XML_VARIABLE XMLString clanName;
 };
 
 #endif
