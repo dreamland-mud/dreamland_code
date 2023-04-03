@@ -307,7 +307,7 @@ CMDRUN( cast )
             victim->setLastFightTime( );
 
             if (victim->is_npc( ) && victim->getNPC( )->behavior)
-                victim->getNPC( )->behavior->shooted( ch, target->door );
+                victim->getNPC( )->behavior->shot( ch, target->door );
         }
         else
             attack_caster( ch, victim );

@@ -292,5 +292,5 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     victim->setLastFightTime( );
 
     if (victim->is_npc( ) && victim->getNPC( )->behavior)
-        victim->getNPC( )->behavior->shooted( ch, door );
+        victim->getNPC( )->behavior->shot( ch, door );
 }

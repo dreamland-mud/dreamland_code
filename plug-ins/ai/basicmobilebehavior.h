@@ -143,7 +143,7 @@ private:
  * tracking
  */
 public:
-    virtual void shooted( Character *, int );
+    virtual void shot( Character *, int );
     virtual bool track( );
     virtual void flee( );
 protected:    

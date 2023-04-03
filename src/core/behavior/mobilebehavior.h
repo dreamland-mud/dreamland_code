@@ -53,7 +53,7 @@ public:
     virtual bool social( Character *, Character *, const DLString & ) { return false; }
     virtual bool aggress( ) { return false; }
     virtual bool track( ) { return false; }
-    virtual void shooted( Character *, int ) { }
+    virtual void shot( Character *, int ) { }
     virtual void flee( ) { }
     virtual void save( ) { }
     virtual void load( DLString ) { }

@@ -165,7 +165,7 @@ void BasicMobileBehavior::flee( )
     clearLastFought( );
 }
 
-void BasicMobileBehavior::shooted( Character *attacker, int door )
+void BasicMobileBehavior::shot( Character *attacker, int door )
 {
     Room *temp;
     EXIT_DATA *pExit;
