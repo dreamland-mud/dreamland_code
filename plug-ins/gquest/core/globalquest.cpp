@@ -99,7 +99,8 @@ void GlobalQuest::after( )
     if (time < 0) 
         scheduleDestroy( );
     else {
-        DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
+        int offset = max(time * 60, Date::SECOND_IN_MINUTE - 1);
+        DLScheduler::getThis( )->putTaskInSecond( offset, GlobalQuest::Pointer( this ) );
         GlobalQuestManager::getThis( )->saveRT( this );
     }
 }
@@ -128,7 +129,7 @@ void GlobalQuest::clearAttributes( ) const
 
 void GlobalQuest::printRemainedTime( ostringstream &buf ) const
 {
-    int t = getRemainedTime( );
+    int t = getRemainingTime( );
 
     if (t > 0)
         buf << GQChannel::BOLD << t << GQChannel::NORMAL

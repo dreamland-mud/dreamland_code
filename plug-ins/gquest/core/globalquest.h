@@ -57,7 +57,7 @@ public:
     virtual void getQuestStartMessage( std::ostringstream & ) const = 0;
 
     inline int getElapsedTime( ) const;
-    inline int getRemainedTime( ) const;
+    inline int getRemainingTime( ) const;
     inline void setTotalTime( int );
     inline int getTotalTime( ) const;
     inline void setStartTime( );
@@ -98,7 +98,7 @@ inline int GlobalQuest::getElapsedTime( ) const
     return (dreamland->getCurrentTime( ) - startTime.getValue( )) / 60;
 }
 
-inline int GlobalQuest::getRemainedTime( ) const
+inline int GlobalQuest::getRemainingTime( ) const
 {
     return getTotalTime( ) - getElapsedTime( );
 }
@@ -125,7 +125,7 @@ int GlobalQuest::getStartTime( ) const
 
 int GlobalQuest::getTaskTime( ) const
 {
-    return getRemainedTime( );
+    return getRemainingTime( );
 }
 
 inline bool GlobalQuest::hasLevels( ) const 

@@ -264,8 +264,8 @@ void Gangsters::after( )
 
 int Gangsters::getTaskTime( ) const
 {
-    int r = getRemainedTime( ) / (3 - hintCount.getValue( ));
-    log("::getTaskTime: remained " << getRemainedTime( ) << ", task " << r);
+    int r = getRemainingTime( ) / (3 - hintCount.getValue( ));
+    log("::getTaskTime: time left " << getRemainingTime( ) << ", task time " << r);
     return r;
 }
 

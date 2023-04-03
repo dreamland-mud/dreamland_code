@@ -309,7 +309,7 @@ void CGQuest::doList( PCharacter *ch )
         GlobalQuestInfo::Pointer gqip = i->second;
         GlobalQuest::Pointer gq = GlobalQuestManager::getThis( )->findGlobalQuest( gqip->getQuestID( ) );
 
-        sprintf( buf, "%s%-10s %-10s ",
+        sprintf( buf, "%s%-10.10s %-10s ",
                 GQChannel::NORMAL,
                 gqip->getQuestName( ).c_str( ),
                 gqip->getQuestID( ).c_str( ));
@@ -424,7 +424,7 @@ void CGQuest::doTime( PCharacter *ch, DLString& arguments )
         gq->setTotalTime( newTotalTime );
         gq->resume( );
         ch->printf( "Новое время квеста %d минут, до конца остается %d минут.\r\n",
-                gq->getTotalTime( ), gq->getRemainedTime( ) );
+                gq->getTotalTime( ), gq->getRemainingTime( ) );
     }  catch (const Exception &e) {
         ch->send_to( e.what( ) );
         return;

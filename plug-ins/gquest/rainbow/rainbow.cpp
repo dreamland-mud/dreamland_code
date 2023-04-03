@@ -204,7 +204,7 @@ int RainbowGQuest::getTaskTime( ) const
     case ST_INIT:
         return itime;
     case ST_RUNNING:
-        return getRemainedTime( ) - itime;
+        return getRemainingTime( ) - itime;
     default:
         return 0;
     }
@@ -267,7 +267,7 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
 {
     Character *ch;
     NPCharacter *mob;
-    int t = getRemainedTime( );
+    int t = getRemainingTime( );
     
     if (isHidden( ))
         return;
