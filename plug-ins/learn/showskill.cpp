@@ -7,6 +7,7 @@
 #include "skillmanager.h"
 #include "pcharacter.h"
 #include "interp.h"
+#include "skill_utils.h"
 #include "skillgroup.h"
 
 GROUP(none);
@@ -34,9 +35,9 @@ CMDRUN( showskill )
         return;
     }
 
-    sn = SkillManager::getThis( )->unstrictLookup( argument, ch );
-    skill = SkillManager::getThis( )->find( sn );
-    
+    sn = skill_lookup(argument, ch);
+    skill = skillManager->find( sn );
+
     if (!skill) {
         ch->pecho("Такого умения нет.");
         return;
