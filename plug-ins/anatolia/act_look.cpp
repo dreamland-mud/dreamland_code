@@ -1833,12 +1833,28 @@ bool oprog_examine( Object *obj, Character *ch, const DLString &arg )
 /*---------------------------------------------------------------------------
  * 'exits' command 
  *--------------------------------------------------------------------------*/
+static DLString cmd_exit(Character *ch, int door, EXIT_DATA *pexit)
+{
+    DLString cmd;
+    PlayerConfig cfg = ch->getConfig();
+    DLString ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
+
+    if (IS_SET(pexit->exit_info, EX_LOCKED))
+        return (cfg.rucommands? "отпереть " : "unlock ") + ename;
+
+    if (IS_SET(pexit->exit_info, EX_CLOSED))
+        return (cfg.rucommands ? "открыть " : "open ") + ename;
+
+    return ename;
+}
+
 static void show_exits_to_char( Character *ch, Room *targetRoom )
 {
     ostringstream buf;
     EXIT_DATA *pexit;
     DLString ename;
     DLString cmd;
+    DLString star;
     PlayerConfig cfg;
     Room *room;
     bool found;
@@ -1859,18 +1875,11 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
             continue;
 
         ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
-        found = true;
+        cmd = cmd_exit(ch, door, pexit);
+        star = IS_SET(pexit->exit_info, EX_CLOSED|EX_LOCKED) ? "*" : "";
 
-        if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
-            cmd = ename;
-            buf << " " << web_cmd(ch, cmd, ename);
-        } else if (!IS_SET(pexit->exit_info, EX_LOCKED)) {
-            cmd = (cfg.rucommands ? "открыть " : "open ") + ename;
-            buf << " *" << web_cmd(ch, cmd, ename) << "*";
-        } else {
-            cmd = (cfg.rucommands? "отпереть " : "unlock ") + ename;
-            buf << " *" << web_cmd(ch, cmd, ename) << "*";
-        }
+        buf << " " << star << web_cmd(ch, cmd, ename) << star;
+        found = true;
     }
     
     if (!found)
@@ -1885,6 +1894,7 @@ CMDRUNP( exits )
     ostringstream buf;
     EXIT_DATA *pexit;
     DLString ename;
+    DLString cmd;
     Room *room;
     PlayerConfig cfg;
     bool found;
@@ -1895,7 +1905,7 @@ CMDRUNP( exits )
         return;
     }
 
-    if (ch->is_immortal())
+    if (cfg.holy)
         buf << "Видимые выходы из комнаты " << ch->in_room->vnum << ":" << endl;
     else
         buf << "Видимые выходы:" << endl;
@@ -1914,27 +1924,28 @@ CMDRUNP( exits )
 
         found = true;   
         ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
+        cmd = cmd_exit(ch, door, pexit);
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED))
         {
-            buf << fmt(0, "    {C%-8s{x", ename.c_str()) << " - ";
+            buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - ";
 
             if (room->isDark( ) && !cfg.holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << "Дорога ведет в темноту и неизвестность...";
             else
                 buf << room->getName();
 
-            if (ch->is_immortal())
+            if (cfg.holy)
                 buf << " (room " << room->vnum << ")";
             
             buf << endl;
         }
         else {
             ename = "*" + ename + "*";
-            buf << fmt( ch, "    {C%-8s{x", ename.c_str() ) 
-                << " - " << russian_case(direction_doorname(pexit), '1') << " (закрыто)";
+            buf << "    {C" << fmt(0, web_cmd(ch, cmd, "%-8s").c_str(), ename.c_str()) << "{x - "
+                << russian_case(direction_doorname(pexit), '1') << " (закрыто)";
 
-            if (ch->is_immortal())
+            if (cfg.holy)
                 buf << " (room " << room->vnum << ")";
             
             buf << endl;
