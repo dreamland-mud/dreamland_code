@@ -1846,7 +1846,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
     if (eyes_blinded( ch )) 
         return;
 
-    buf << "{" << CLR_AEXIT(ch) << "[Выходы:";
+    buf << "{" << CLR_AEXIT(ch) << "[" << web_cmd(ch, "выходы", "Выходы") << ":";
     found = false;
     cfg = ch->getConfig( );
 
