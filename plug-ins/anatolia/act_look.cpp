@@ -1953,10 +1953,11 @@ CMDRUNP( exits )
         if (ch->can_see(eexit)) {
             DLString name = Syntax::label_en(eexit->keyword);
             DLString nameRus = russian_case(eexit->short_desc_from, '1');
+            DLString cmd = (cfg.rucommands ? "войти $1" : "enter $1");
 
             buf <<  "    ";
             if (!nameRus.empty())
-                buf << "{C" << nameRus << "{x ";
+                buf << "{C" << web_cmd(ch, cmd, nameRus) << "{x ";
             if (!name.empty())
                 buf << "(" << name << ")";
             buf << endl;
