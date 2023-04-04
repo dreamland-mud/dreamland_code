@@ -14,6 +14,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
+#include "commonattributes.h"
 #include "interp.h"
 #include "follow_utils.h"
 #include "arg_utils.h"
@@ -48,6 +49,11 @@ COMMAND(COrder, "order")
     argTarget = argument.getOneArgument( );
     argOrder = argument;
     
+    if (!ch->getPC()) {
+        ch->pecho("Эта команда не для тебя.");
+        return;
+    }
+
     if (argTarget.empty( ) || argOrder.empty( )) {
         ch->pecho( "Приказать кому и что?" );
         return;
@@ -166,8 +172,11 @@ COMMAND(COrder, "order")
         return;
     }
 
-    // Run the command without further error feedback.
+    // Run the command without further error feedback. Mark the master, to use later in echoMaster checks.
+    ch->getPC()->getAttributes().getAttr<XMLEmptyAttribute>("ordering");
     iargs.pCommand->run( victim, iargs.cmdArgs );
+    ch->getPC()->getAttributes().eraseAttribute("ordering");
+    
     ch->setWaitViolence( 1 );
     ch->pecho( "Ok.");
 

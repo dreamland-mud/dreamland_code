@@ -1435,11 +1435,15 @@ NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отф�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строку хозяину, если он есть" )
+NMI_INVOKE( CharacterWrapper, echoMaster, "(fmt, args): выдать строку хозяину, если он есть и отдал этот приказ" )
 {
     checkTarget();
 
-    if (target->master && target->is_npc()) {
+    bool needsOutput = IS_CHARMED(target) 
+            && target->master->getPC() 
+            && target->master->getPC()->getAttributes().isAvailable("ordering");
+
+    if (needsOutput) {
         DLString msg = fmt(0, "{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x\r\n  {W*{x ", target);
         target->master->pecho( msg + regfmt(target->master, args) );
         return true;

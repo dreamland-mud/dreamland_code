@@ -380,16 +380,18 @@ void hint_fmt(Character *ch, const char *format, ...)
 
 void echo_master(Character *ch, const char *format, ...)
 {
-    bool isCharmed = (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL);
     va_list av;
     va_start(av, format);
 
-    if (isCharmed)
+    bool isCharmed = (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL);
+    bool needsOutput = isCharmed && ch->master->getPC() && ch->master->getPC()->getAttributes().isAvailable("ordering");
+
+    if (needsOutput)
         ch->master->pecho("{W%#^C1 {Wне может выполнить твой приказ, потому что видит следующее:{x", ch);
 
     ch->vpecho(format, av);
 
-    if (isCharmed)
+    if (needsOutput)
         ch->master->vpecho(format, av);
 
     va_end(av);
