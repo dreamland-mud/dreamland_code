@@ -508,15 +508,13 @@ void show_char_pk_flags( PCharacter *ch, ostringstream &buf )
                 << pk_flag_table[i].descr << "{x]";
 }
 
-void show_char_blindness( Character *ch, Character *victim, ostringstream &buf )
+void show_char_blindness(Character* ch, Character* victim, ostringstream& buf)
 {
-    if (IS_AFFECTED(victim, AFF_BLIND)) {
-    if (victim->position <= POS_SLEEPING)
-        buf << endl;
-    else if (victim->fighting == ch)
-        buf << "...вслепую размахивая во все стороны.{x" << endl;
-    else
-            buf << fmt( ch, "...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x", victim ) << endl;
+    if (IS_AFFECTED(victim, AFF_BLIND) && IS_AWAKE(victim)) {
+        if (victim->fighting == ch)
+            buf << "{x...вслепую размахивая во все стороны.{x" << endl;
+        else
+            buf << fmt(ch, "{x...%1$P1 выгляд%1$nит|ят слеп%1$Gым|ым|ой|ыми и дезориентированн%1$Gым|ым|ой|ыми.{x", victim) << endl;
     }
 }
 
