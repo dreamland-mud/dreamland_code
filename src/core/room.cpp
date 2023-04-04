@@ -23,9 +23,14 @@ LIQ(none);
 
 extra_exit_data *ExtraExitList::find(const DLString &keyword) const
 {
-    for (auto &eexit: *this)
+    for (auto &eexit: *this) {
         if (is_name(keyword.c_str(), eexit->keyword))
             return eexit;
+
+        DLString short_descr = russian_case(eexit->short_desc_from, '4');
+        if (is_name(keyword.c_str(), short_descr.c_str()))
+            return eexit;
+    }
 
     return 0;
 }

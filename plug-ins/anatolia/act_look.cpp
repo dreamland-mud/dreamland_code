@@ -1952,7 +1952,7 @@ CMDRUNP( exits )
     for (auto &eexit: ch->in_room->extra_exits) {
         if (ch->can_see(eexit)) {
             DLString name = Syntax::label_en(eexit->keyword);
-            DLString nameRus = Syntax::label_ru(eexit->keyword);
+            DLString nameRus = russian_case(eexit->short_desc_from, '1');
 
             buf <<  "    ";
             if (!nameRus.empty())
