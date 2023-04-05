@@ -28,6 +28,7 @@ GROUP(benedictions);
 GROUP(illusion);
 GROUP(transportation);
 GROUP(enchantment);
+GROUP(vampiric);
 
 bitnumber_t get_weapon_for_skill(Skill *skill);
 DreamSkillManager *dreamSkillManager = 0;
@@ -139,7 +140,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
                 << "Ты пользуешься невесть откуда взявшимся навыком {c" << sname << "{x," << endl
                 << "завершая битву еще быстрее и эффектнее, чем это было на самом деле." << endl;
     }
-    else if (skill->hasGroup(group_necromancy)) {
+    else if (skill->hasGroup(group_necromancy) || skill->hasGroup(group_vampiric)) {
         buf << "В леденящем душу замогильном шепоте к тебе приходит тайна " << skill_what(skill).ruscase('2') << " {c" << sname << "{x." << endl;
     }
     else if (skill->hasGroup(group_fightmaster)) {
