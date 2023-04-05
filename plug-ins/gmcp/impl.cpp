@@ -84,9 +84,6 @@ GMCPCOMMAND_RUN(charToRoom)
     if (!ch || !ch->in_room)
         return;
 
-    if (eyes_blinded( ch )) 
-        return;
-
     Json::Value data;
     data["num"] = ch->in_room->vnum;
     data["name"] = DLString(ch->in_room->getName()).colourStrip();
