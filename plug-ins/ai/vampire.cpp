@@ -244,6 +244,7 @@ struct BasicMobileBehavior::KillVictims : public BasicMobileBehavior::VampVictim
     virtual bool hit( Character *wch )
     {
         NPCharacter *ch = vamp->getChar( );
+        Character *victim = wch;
         int myHit = HEALTH(ch);
         int hisHit = HEALTH(wch);
         int sn = -1, snAttack = -1, snMalad = -1;
@@ -280,6 +281,7 @@ struct BasicMobileBehavior::KillVictims : public BasicMobileBehavior::VampVictim
                 && number_percent( ) < 80 && myHit < 50)
         {
             sn = gsn_bat_swarm;
+            victim = ch;
         }
         else if (snMalad != -1 && myHit > 50 && number_percent( ) < 30)
         {
@@ -291,7 +293,7 @@ struct BasicMobileBehavior::KillVictims : public BasicMobileBehavior::VampVictim
         if (sn == -1)
             return false;
         
-        cast( sn, wch );
+        cast( sn, victim );
         return true;
     }
 };
