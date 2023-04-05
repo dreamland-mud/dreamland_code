@@ -425,16 +425,12 @@ CMDRUNP( close )
 static void lock_door( Character *ch, int door )
 {
     // 'lock door'
+    Object *key;
     EXIT_DATA *pexit;
     EXIT_DATA *pexit_rev = 0;
     Room *room = ch->in_room;
 
     pexit        = ch->in_room->exit[door];
-    if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
-    {
-            ch->pecho( "Здесь не закрыто." );
-            return;
-    }
 
     if ( IS_SET(pexit->exit_info, EX_NOLOCK) ) 
     {
@@ -448,7 +444,7 @@ static void lock_door( Character *ch, int door )
             return;
     }
 
-    if (!get_key_carry( ch, pexit->key))
+    if (!(key = get_key_carry( ch, pexit->key)))
     {
             ch->pecho( "У тебя нет ключа." );
             return;
@@ -460,14 +456,22 @@ static void lock_door( Character *ch, int door )
             return;
     }
 
-    SET_BIT(pexit->exit_info, EX_LOCKED);
-    ch->pecho( "*Щелк*" );
-    oldact("$c1 запирает $N4 на ключ.", ch, 0, direction_doorname(pexit), TO_ROOM);
+    const char *doorname = direction_doorname(pexit);
+
+    if (IS_SET(pexit->exit_info, EX_CLOSED)) {
+        ch->pecho("Ты запираешь %N4 %O5.", doorname, key);
+        ch->recho("%^C1 запирает %N4 %O5.", ch, doorname, key);
+    } else {
+        ch->pecho("Ты закрываешь %N4 и запираешь %O5.", doorname, key);
+        ch->recho("%^C1 закрывает %N4 и запирает %O5.", ch, doorname, key);
+    }
+
+    SET_BIT(pexit->exit_info, EX_LOCKED | EX_CLOSED);
 
     /* lock the other side */
     if ((pexit_rev = direction_reverse(room, door)))
     {
-            SET_BIT( pexit_rev->exit_info, EX_LOCKED );
+            SET_BIT( pexit_rev->exit_info, EX_LOCKED | EX_CLOSED);
             direction_target(room, door)->echo(POS_RESTING, "%^N1 защелкивается.", direction_doorname(pexit_rev));
     }
 }
@@ -476,6 +480,7 @@ CMDRUNP( lock )
 {
     char arg[MAX_INPUT_LENGTH];
     Object *obj;
+    Object *key;
     EXTRA_EXIT_DATA *peexit;
     int door;
 
@@ -501,78 +506,81 @@ CMDRUNP( lock )
         if (obj->item_type == ITEM_PORTAL)
         {
                 if ( !IS_SET(obj->value1(),EX_ISDOOR)
-                        || IS_SET(obj->value1(),EX_NOCLOSE) )
+                        || IS_SET(obj->value1(),EX_NOCLOSE|EX_NOLOCK) )
                 {
-                        ch->pecho( "Ты не можешь сделать этого." );
-                        return;
-                }
-
-                if (!IS_SET(obj->value1(),EX_CLOSED))
-                {
-                        ch->pecho( "Здесь не закрыто." );
-                        return;
-                }
-
-                    if (IS_SET(obj->value1(),EX_NOLOCK))
-                {
-                        ch->pecho( "Это невозможно запереть." );
+                        ch->pecho("%^O4 невозможно запереть.", obj);
                         return;
                 }
 
                 if (obj->value4() <= 0) 
                 {
-                    ch->pecho( "Здесь нет замочной скважины -- просто закрой." );
+                    ch->pecho("В %O6 нет замочной скважины -- просто закрой.", obj);
                     return;
                 }
 
-                if (!get_key_carry(ch,obj->value4()))
+                if (!(key = get_key_carry(ch, obj->value4())))
                 {
-                        ch->pecho( "У тебя нет ключа." );
+                        ch->pecho("У тебя нет ключа.");
                         return;
                 }
 
-                if (IS_SET(obj->value1(),EX_LOCKED))
+                if (IS_SET(obj->value1(), EX_LOCKED))
                 {
-                        ch->pecho( "Здесь уже заперто." );
+                        ch->pecho( "%1$^O1 уже заперт%1$Gо||а.", obj );
                         return;
                 }
 
-                obj->value1(obj->value1() | EX_LOCKED);
-                oldact("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR);
-                oldact("$c1 закрывает $o4 на ключ.",ch,obj,0,TO_ROOM);
+                if (IS_SET(obj->value1(), EX_CLOSED)) {
+                    ch->pecho("Ты запираешь %O4 %O5.", obj, key);
+                    ch->recho("%^C1 запирает %O4 %O5.", ch, obj, key);
+                } else {
+                    ch->pecho("Ты закрываешь %O4 и запираешь %O5.", obj, key);
+                    ch->recho("%^C1 закрывает %O4 и запирает %O5.", ch, obj, key);
+                }
+                
+                obj->value1(obj->value1() | EX_LOCKED | EX_CLOSED);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
             // 'lock object'
-            if ( !IS_SET(obj->value1(), CONT_CLOSED) )
-            {
-                    ch->pecho( "Это не закрыто." );
-                    return;
-            }
-
             if ( obj->value2() < 0 )
             {
-                    ch->pecho( "Здесь нет замочной скважины -- просто закрой." );
+                    ch->pecho("В %O6 нет замочной скважины -- просто закрой.", obj);
                     return;
             }
             
             if ( IS_SET(obj->value1(), CONT_LOCKED) )
             {
-                    ch->pecho( "Это уже заперто." );
+                    ch->pecho( "%1$^O1 уже заперт%1$Gо||а.", obj );
                     return;
             }
 
-            if ((obj->behavior && obj->behavior->canLock( ch ))
-                || get_key_carry( ch, obj->value2())) 
-            {
-                obj->value1(obj->value1() | CONT_LOCKED);
-                oldact("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR);
-                oldact("$c1 закрывает $o4 на ключ.", ch, obj, 0, TO_ROOM);
-                
-            } else {
-                ch->pecho( "У тебя нет ключа." );
-                return;
+            key = get_key_carry(ch, obj->value2());
+            if (!key && (!obj->behavior || !obj->behavior->canLock(ch))) {
+                    ch->pecho("У тебя нет ключа.");
+                    return;
             }
+
+            if (key) {
+                if (IS_SET(obj->value1(), CONT_CLOSED)) {
+                    ch->pecho("Ты запираешь %O4 %O5.", obj, key);
+                    ch->recho("%^C1 запирает %O4 %O5.", ch, obj, key);
+                } else {
+                    ch->pecho("Ты закрываешь %O4 и запираешь %O5.", obj, key);
+                    ch->recho("%^C1 закрывает %O4 и запирает %O5.", ch, obj, key);
+                }
+            } else {
+                if (IS_SET(obj->value1(), CONT_CLOSED)) {
+                    ch->pecho("Ты запираешь %O4 на ключ.", obj);
+                    ch->recho("%^C1 запираешь %O4 на ключ.", ch, obj);
+                } else {
+                    ch->pecho("Ты закрываешь %O4 и запираешь на ключ.", obj);
+                    ch->recho("%^C1 закрывает %O4 и запирает на ключ.", ch, obj);
+                }
+            }
+
+            obj->value1(obj->value1() | CONT_LOCKED | CONT_CLOSED);
+
         }
         else if (obj->item_type == ITEM_DRINK_CON) {
             // lock drink containers
@@ -611,12 +619,6 @@ CMDRUNP( lock )
                 return;
         }
 
-        if ( !IS_SET(peexit->exit_info, EX_CLOSED) )
-        {
-                ch->pecho( "Здесь не закрыто." );
-                return;
-        }
-
         if ( IS_SET(peexit->exit_info, EX_NOLOCK) ) 
         {
             ch->pecho( "Это невозможно запереть." );
@@ -629,7 +631,7 @@ CMDRUNP( lock )
                 return;
         }
 
-        if (!get_key_carry( ch, peexit->key))
+        if (!(key = get_key_carry( ch, peexit->key)))
         {
                 ch->pecho( "У тебя нет ключа." );
                 return;
@@ -641,10 +643,15 @@ CMDRUNP( lock )
                 return;
         }
 
-        SET_BIT(peexit->exit_info, EX_LOCKED);
-        ch->pecho( "*Щелк*" );
-        oldact("$c1 запирает $N4 на ключ.", ch, 0, peexit->short_desc_from, TO_ROOM);
+        if (IS_SET(peexit->exit_info, EX_CLOSED)) {
+            ch->pecho("Ты запираешь %N4 %O5.", peexit->short_desc_from, key);
+            ch->recho("%^C1 запирает %N4 %O5.", ch, peexit->short_desc_from, key);
+        } else {
+            ch->pecho("Ты закрываешь %N4 и запираешь %O5.", peexit->short_desc_from, key);
+            ch->recho("%^C1 закрывает %N4 и запирает %O5.", ch, peexit->short_desc_from, key);
+        }
 
+        SET_BIT(peexit->exit_info, EX_LOCKED | EX_CLOSED);
         return;
     }
 
@@ -660,16 +667,12 @@ CMDRUNP( lock )
 static void unlock_door( Character *ch, int door )
 {
     // 'unlock door'
+    Object *key;
     EXIT_DATA *pexit;
     EXIT_DATA *pexit_rev = 0;
     Room *room = ch->in_room;
 
     pexit = ch->in_room->exit[door];
-    if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
-    {
-            ch->pecho( "Здесь не закрыто." );
-            return;
-    }
 
     if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
     {
@@ -683,20 +686,23 @@ static void unlock_door( Character *ch, int door )
             return;
     }
 
-    if (!get_key_carry( ch, pexit->key))
+    if (!(key = get_key_carry( ch, pexit->key)))
     {
             ch->pecho( "У тебя нет ключа." );
             return;
     }
 
-    REMOVE_BIT(pexit->exit_info, EX_LOCKED);
-    ch->pecho( "*Щелк*" );
-    oldact("$c1 открывает ключом $N4.", ch, 0, direction_doorname(pexit), TO_ROOM);
+    const char *doorname = direction_doorname(pexit);
+
+    ch->pecho("Ты отпираешь %O5 и открываешь %N4.", key, doorname);
+    ch->recho("%^C1 отпирает %O5 и открывает %N4.", ch, key, doorname);
+
+    REMOVE_BIT(pexit->exit_info, EX_LOCKED | EX_CLOSED);
 
     // unlock the other side
     if ((pexit_rev = direction_reverse(room, door)))
     {
-            REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
+            REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED | EX_CLOSED );
             direction_target(room, door)->echo(POS_RESTING, "%^N1 щелкает.", direction_doorname(pexit_rev));
     }
 }
@@ -705,6 +711,7 @@ CMDRUNP( unlock )
 {
     char arg[MAX_INPUT_LENGTH];
     Object *obj;
+    Object *key;
     int door;
     EXTRA_EXIT_DATA *peexit;
 
@@ -729,21 +736,15 @@ CMDRUNP( unlock )
         // portal stuff
         if ( obj->item_type == ITEM_PORTAL )
         {
-            if (!IS_SET(obj->value1(),EX_ISDOOR))
-            {
-                    ch->pecho( "Ты не можешь этого сделать." );
-                    return;
-            }
-
-            if (!IS_SET(obj->value1(),EX_CLOSED))
-            {
-                    ch->pecho( "Здесь не закрыто." );
-                    return;
-            }
-
             if (!IS_SET(obj->value1(),EX_LOCKED))
             {
                     ch->pecho( "Здесь уже не заперто." );
+                    return;
+            }
+
+            if (!IS_SET(obj->value1(),EX_ISDOOR))
+            {
+                    ch->pecho("%^O4 невозможно отпереть.", obj);
                     return;
             }
 
@@ -753,26 +754,21 @@ CMDRUNP( unlock )
                 return;
             }
 
-            if (!get_key_carry(ch,obj->value4()))
+            if (!(key = get_key_carry(ch,obj->value4())))
             {
                     ch->pecho( "У тебя нет ключа." );
                     return;
             }
 
+            ch->pecho("Ты отпираешь %1$O4 %2$O5 и открываешь %1$P2.", obj, key);
+            ch->recho("%1$^C1 отпирает %2$O4 %3$O5 и открывает %2$P2.", ch, obj, key);
+
             obj->value1(obj->value1() & ~EX_LOCKED);
-            oldact("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR);
-            oldact("$c1 открывает ключом $o4.",ch,obj,0,TO_ROOM);
+            obj->value1(obj->value1() & ~EX_CLOSED);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
             // 'unlock object'
-
-            if ( !IS_SET(obj->value1(), CONT_CLOSED) )
-            {
-                    ch->pecho( "Здесь не закрыто." );
-                    return;
-            }
-
             if ( !IS_SET(obj->value1(), CONT_LOCKED) )
             {
                     ch->pecho( "Здесь уже не заперто." );
@@ -786,12 +782,21 @@ CMDRUNP( unlock )
             }
 
             bool canLock = obj->behavior && obj->behavior->canLock( ch );
+            key = get_key_carry( ch, obj->value2());
 
-            if (canLock || get_key_carry( ch, obj->value2())) 
+            if (canLock || key) 
             {
+                if (key) {
+                    ch->pecho("Ты отпираешь %1$O4 %2$O5 и открываешь %1$P2.", obj, key);
+                    ch->recho("%1$^C1 отпирает %2$O4 %3$O5 и открывает %2$P2.", ch, obj, key);
+                } else {
+                    ch->pecho("Ты отпираешь ключом %1$O4 и открываешь %1$P2.", obj);
+                    ch->recho("%1$^C1 отпирает ключом %2$O4 и открывает %1$P2.", ch, obj);
+                }
+
                 obj->value1(obj->value1() & ~CONT_LOCKED);
-                oldact("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR);
-                oldact("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM);
+                obj->value1(obj->value1() & ~CONT_CLOSED);
+
             } else if (!canLock && obj->value2() <= 0) {
                 ch->pecho("%^O1 -- чья-то личная собственность, ключ есть только у хозяина или хозяйки.", obj);
                 return;
@@ -801,8 +806,6 @@ CMDRUNP( unlock )
             }
         }
         else if ( obj->item_type == ITEM_DRINK_CON ) {
-            Object *key;
-            
             // uncork a bottle
             if (!IS_SET(obj->value3(), DRINK_LOCKED)) {
                 ch->pecho( "Тут не заперто и не закупорено." );
@@ -836,6 +839,7 @@ CMDRUNP( unlock )
             }
 
             obj->value3(obj->value3() & ~DRINK_LOCKED);
+            obj->value3(obj->value3() & ~DRINK_CLOSED);
                 
         }
         else
@@ -859,12 +863,6 @@ CMDRUNP( unlock )
                 return;
         }
 
-        if ( !IS_SET(peexit->exit_info, EX_CLOSED) )
-        {
-                ch->pecho( "Здесь не закрыто." );
-                return;
-        }
-
         if ( !IS_SET(peexit->exit_info, EX_LOCKED) )
         {
                 ch->pecho( "Здесь уже не заперто." );
@@ -877,15 +875,16 @@ CMDRUNP( unlock )
                 return;
         }
 
-        if (!get_key_carry( ch, peexit->key))
+        if (!(key = get_key_carry( ch, peexit->key)))
         {
                 ch->pecho( "У тебя нет ключа." );
                 return;
         }
 
-        REMOVE_BIT(peexit->exit_info, EX_LOCKED);
-        ch->pecho( "*Щелк*" );
-        oldact("$c1 открывает ключом $N4.", ch, 0, peexit->short_desc_from, TO_ROOM);
+        ch->pecho("Ты отпираешь %O5 и открываешь %N4.", key, peexit->short_desc_from);
+        ch->recho("%^C1 отпирает %O5 и открывает %N4.", ch, key, peexit->short_desc_from);
+
+        REMOVE_BIT(peexit->exit_info, EX_LOCKED | EX_CLOSED);
 
         return;
     }

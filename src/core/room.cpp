@@ -27,7 +27,7 @@ extra_exit_data *ExtraExitList::find(const DLString &keyword) const
         if (is_name(keyword.c_str(), eexit->keyword))
             return eexit;
 
-        DLString short_descr = russian_case(eexit->short_desc_from, '4');
+        DLString short_descr = russian_case_all_forms(eexit->short_desc_from);
         if (is_name(keyword.c_str(), short_descr.c_str()))
             return eexit;
     }
