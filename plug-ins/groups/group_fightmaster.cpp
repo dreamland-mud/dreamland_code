@@ -196,9 +196,12 @@ SKILL_APPLY(parry)
             ch->pecho( "%3$^O1 проходит сквозь оружие %2$C2!", ch, victim, wield );
             ch->recho( victim, "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!", ch, victim, wield );
         }
-        else {
+        else if (victim->getWearloc().isSet(wear_hands)) {
             ch->pecho( "%3$^O1 проходит сквозь руки %2$C2!", ch, victim, wield );
             ch->recho( victim, "%3$^O1 %1$C2 проходит сквозь руки %2$C2!", ch, victim, wield );
+        } else {
+            ch->pecho( "%3$^O1 проходит сквозь %2$C4!", ch, victim, wield );
+            ch->recho( victim, "%3$^O1 %1$C2 проходит сквозь %2$C4!", ch, victim, wield );
         }
 
         return false;
