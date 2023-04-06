@@ -30,6 +30,10 @@ public:
     XML_VARIABLE XMLInteger moving_mode_to, max_size_pass;
     XML_VARIABLE XMLString keyword, short_desc_from, short_desc_to;
     XML_VARIABLE XMLString description, room_description;
+    XML_VARIABLE XMLString msgLeaveRoom, msgLeaveSelf;
+    XML_VARIABLE XMLString msgEntryRoom, msgEntrySelf;
+    XML_VARIABLE XMLString gender_from, gender_to;
+
     
     template <typename T>
     bool cmd( PCharacter *, char * );

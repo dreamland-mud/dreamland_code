@@ -13,6 +13,7 @@
 
 #include <config.h>
 
+#include "grammar_entities_impl.h"
 #include <character.h>
 #include <pcharacter.h>
 #include <commandmanager.h>
@@ -52,11 +53,14 @@ OLCStateExtraExit::OLCStateExtraExit( RoomIndexData *pRoom, const DLString &name
     
     info.setValue( eexit->exit_info_default );
     key.setValue( eexit->key );
-    moving_from.setValue( eexit->moving_from );
-    moving_mode_from.setValue( eexit->moving_mode_from );
-    moving_to.setValue( eexit->moving_to );
-    moving_mode_to.setValue( eexit->moving_mode_to );
+
     max_size_pass.setValue( eexit->max_size_pass );
+    gender_from.setValue(eexit->gender_from.toString());
+    gender_to.setValue(eexit->gender_to.toString());
+    msgLeaveRoom.setValue(eexit->msgLeaveRoom);
+    msgLeaveSelf.setValue(eexit->msgLeaveSelf);
+    msgEntryRoom.setValue(eexit->msgEntryRoom);
+    msgEntrySelf.setValue(eexit->msgEntrySelf);
     
     if(eexit->keyword)
         keyword.setValue( eexit->keyword );
@@ -96,10 +100,6 @@ OLCStateExtraExit::commit( )
     eexit->exit_info ^= info.getValue( ) ^ eexit->exit_info_default;
     eexit->exit_info_default = info.getValue( );
     eexit->key = key.getValue( );
-    eexit->moving_from = moving_from.getValue( );
-    eexit->moving_mode_from = moving_mode_from.getValue( );
-    eexit->moving_to = moving_to.getValue( );
-    eexit->moving_mode_to = moving_mode_to.getValue( );
     eexit->max_size_pass = max_size_pass.getValue( );
 
     free_string(eexit->keyword);
@@ -113,6 +113,12 @@ OLCStateExtraExit::commit( )
     eexit->short_desc_to = str_dup( short_desc_to.getValue( ).c_str( ) );
     eexit->description = str_dup( description.getValue( ).c_str( ) );
     eexit->room_description = str_dup( room_description.getValue( ).c_str( ) );
+    eexit->msgEntryRoom = msgEntryRoom;
+    eexit->msgEntrySelf = msgEntrySelf;
+    eexit->msgLeaveRoom = msgLeaveRoom;
+    eexit->msgLeaveSelf = msgLeaveSelf;
+    eexit->gender_from = Grammar::MultiGender(gender_from.getValue().c_str());
+    eexit->gender_to = Grammar::MultiGender(gender_to.getValue().c_str());
 
     // FIXME: need to update all instances
     pRoom->room->extra_exits.findAndDestroy(keyword);
@@ -154,11 +160,6 @@ EEEDIT(size)
     return false;
 }
 
-extern const char * extra_move_ru [];
-extern const char * extra_move_rp [];
-extern const char * extra_move_rt [];
-
-
 EEEDIT(show)
 {
     show(ch);
@@ -191,23 +192,30 @@ void OLCStateExtraExit::show(PCharacter *ch)
                 r->vnum, r->name);
     else
         ptc(ch, "Target:     none\n");
-    
+
     ptc(ch, "Size:       [{W%s{x] {D(? size){x\n", 
             size_table.name(max_size_pass.getValue( )).c_str());
 
-    ptc(ch, "From:       Type: [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x) {W%s{x\n", 
-            moving_from.getValue( ), extra_move_ru[moving_from.getValue( )],
-            moving_mode_from.getValue( ), extra_move_rt[moving_mode_from.getValue( )],
-            short_desc_from.c_str( )
-            );
-    ptc(ch, "{D            (from <0..11> <0..11> <short descr>)\n");
-    
-    ptc(ch, "To:         Type: [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x) {W%s{x\n", 
-            moving_to.getValue( ), extra_move_rp[moving_to.getValue( )],
-            moving_mode_to.getValue( ), extra_move_rt[moving_mode_to.getValue( )],
-            short_desc_to.c_str()
-            );
-    ptc(ch, "{D            (to <0..11> <0..11> <short descr>)\n");            
+    ptc(ch, "Short desc leave: %s  %s{D(shortleave help){x Gender: %s {D(genderleave){x\n",
+              short_desc_from.c_str(), web_edit_button(ch, "shortleave", "web").c_str(),
+              gender_from.c_str());
+
+    ptc(ch, "Short desc entry: %s  %s{D(shortentry help){x Gender: %s {D(genderentry){x\n",
+              short_desc_to.c_str(), web_edit_button(ch, "shortentry", "web").c_str(),
+              gender_to.c_str());
+
+    ptc(ch, "{GLeave room:{x %s  %s{D(leaveroom help){x\n", 
+            msgLeaveRoom.c_str(), web_edit_button(ch, "leaveroom", "web").c_str());
+
+    ptc(ch, "{GLeave self:{x %s  %s{D(leaveself help){x\n", 
+            msgLeaveSelf.c_str(), web_edit_button(ch, "leaveself", "web").c_str());
+
+    ptc(ch, "{GEntry room:{x %s  %s{D(entryroom help){x\n", 
+            msgEntryRoom.c_str(), web_edit_button(ch, "entryroom", "web").c_str());
+
+    ptc(ch, "{GEntry self:{x %s  %s{D(entryself help){x\n", 
+            msgEntrySelf.c_str(), web_edit_button(ch, "entryself", "web").c_str());
+
 }
 
 EEEDIT(desc)
@@ -225,6 +233,46 @@ EEEDIT(name)
     keyword = argument;
     stc("Keyword set.\n\r", ch);
     return true;
+}
+
+EEEDIT(shortleave)
+{
+    return editor(argument, short_desc_from);      
+}
+
+EEEDIT(shortentry)
+{
+    return editor(argument, short_desc_to);      
+}
+
+EEEDIT(leaveroom)
+{
+    return editor(argument, msgLeaveRoom);      
+}
+
+EEEDIT(leaveself)
+{
+    return editor(argument, msgLeaveSelf);      
+}
+
+EEEDIT(entryroom)
+{
+    return editor(argument, msgEntryRoom);      
+}
+
+EEEDIT(entryself)
+{
+    return editor(argument, msgEntrySelf);      
+}
+
+EEEDIT(genderleave)
+{
+    return genderEdit(gender_from);
+}
+
+EEEDIT(genderentry)
+{
+    return genderEdit(gender_to);
 }
 
 EEEDIT(key)
@@ -256,95 +304,6 @@ EEEDIT(target)
     to_room = r->vnum;
 
     stc("Target room set.\n\r", ch);
-    return true;
-}
-
-static bool
-eeedit_dir_usage(PCharacter *ch) 
-{
-    stc("Usage: from|to <#type> <#mode> <short>\n\r", ch);
-    return false;
-}
-
-EEEDIT(from)
-{
-    char buf[MAX_STRING_LENGTH];
-    int type, mode;
-
-    if(!*argument)
-        return eeedit_dir_usage(ch);
-
-    argument = one_argument(argument, buf);
-    if(!*buf || !is_number(buf)) 
-        return eeedit_dir_usage(ch);
-    type = atoi(buf);
-    
-    argument = one_argument(argument, buf);
-    if(!*buf || !is_number(buf)) 
-        return eeedit_dir_usage(ch);
-    
-    mode = atoi(buf);
-
-    if(!*argument)
-        return eeedit_dir_usage(ch);
-    
-    if(type < 0 || type > 11) {
-        stc("Type must be in range 0..11\n\r", ch);
-        return eeedit_dir_usage(ch);
-    }
-    
-    if(mode < 0 || mode > 11) {
-        stc("Mode must be in range 0..11\n\r", ch);
-        return eeedit_dir_usage(ch);
-    }
-    
-    moving_from = type;
-    moving_mode_from = mode;
-    
-    short_desc_from = argument;
-    
-    stc("From message set.\n\r", ch);
-    return true;
-}
-
-EEEDIT(to)
-{
-    char buf[MAX_STRING_LENGTH];
-    int type, mode;
-
-    if(!*argument)
-        return eeedit_dir_usage(ch);
-
-    argument = one_argument(argument, buf);
-    if(!*buf || !is_number(buf)) 
-        return eeedit_dir_usage(ch);
-    type = atoi(buf);
-    
-    argument = one_argument(argument, buf);
-    if(!*buf || !is_number(buf)) 
-        return eeedit_dir_usage(ch);
-    
-    mode = atoi(buf);
-
-    if(!*argument)
-        return eeedit_dir_usage(ch);
-    
-    if(type < 0 || type > 11) {
-        stc("Type must be in range 0..11\n\r", ch);
-        return eeedit_dir_usage(ch);
-    }
-    
-    if(mode < 0 || mode > 11) {
-        stc("Mode must be in range 0..11\n\r", ch);
-        return eeedit_dir_usage(ch);
-    }
-    
-    moving_to = type;
-    moving_mode_to = mode;
-    
-    short_desc_to = argument;
-
-    stc("To message set.\n\r", ch);
     return true;
 }
 

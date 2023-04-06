@@ -399,15 +399,9 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
     
     if (peexit) {
         if (fLeaving)
-            buf << "%1$^C1 " << extra_move_ru[peexit->moving_from] << " "
-                << extra_move_rt[peexit->moving_mode_from] << " "
-                << russian_case( peexit->short_desc_from,
-                                 extra_move_rtum[peexit->moving_mode_from] );
+            buf << peexit->msgLeaveRoom;
         else
-            buf << "%1$^C1 " << extra_move_rp[peexit->moving_to] << " сюда " 
-                << extra_move_rt[peexit->moving_mode_to] << " "
-                << russian_case( peexit->short_desc_to,
-                                 extra_move_rtpm[peexit->moving_mode_to] );
+            buf << peexit->msgEntryRoom;
     }
     else {
         int mt = adjustMovetype( wch );
@@ -501,6 +495,7 @@ void ExitsMovement::place( Character *wch )
 
 void ExitsMovement::msgEcho( Character *victim, Character *wch, const char *msg )
 {
+    // TODO: Need to use peexit->short_desc_to for entry messages in the target room.
     if (canHear( victim, wch ))
         victim->pecho( msg, 
                        (RIDDEN(wch) ? wch->mount : wch),

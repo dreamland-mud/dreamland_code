@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "xmlmisc.h"
+#include "grammar_entities_impl.h"
 #include "affectmanager.h"
 #include "autoflags.h"
 #include "affectflags.h"
@@ -14,6 +15,7 @@
 #include "skillgroup.h"
 #include "wearlocation.h"
 #include "room.h"
+#include "directions.h"
 #include "merc.h"
 #include "mercdb.h"
 
@@ -321,8 +323,7 @@ XMLExtraExit::init(const extra_exit_data *ex)
 {
     description.setValue(ex->description);
     flags.setValue(ex->exit_info_default);
-    //if(ex->key > 0)
-        key.setValue(ex->key);
+    key.setValue(ex->key);
 
     Room *to_room = get_room_instance(ex->u1.vnum);
     target.setValue(to_room ? to_room->vnum : -1);
@@ -331,6 +332,14 @@ XMLExtraExit::init(const extra_exit_data *ex)
     short_desc_to.setValue(ex->short_desc_to);
     room_description.setValue(ex->room_description);
     max_size_pass.setValue(ex->max_size_pass);
+    gender_from.setValue(ex->gender_from.toString());
+    gender_to.setValue(ex->gender_to.toString());
+    msgLeaveRoom.setValue(ex->msgLeaveRoom);
+    msgLeaveSelf.setValue(ex->msgLeaveSelf);
+    msgEntryRoom.setValue(ex->msgEntryRoom);
+    msgEntrySelf.setValue(ex->msgEntrySelf);
+
+    // OBSOLETE
     moving_from.setValue(ex->moving_from);
     moving_mode_from.setValue(ex->moving_mode_from);
     moving_to.setValue(ex->moving_to);
@@ -351,12 +360,37 @@ XMLExtraExit::compat( )
     peexit->short_desc_to = str_dup( short_desc_to.getValue( ).c_str( ));
     peexit->room_description = str_dup( room_description.getValue( ).c_str( ));
     peexit->max_size_pass = max_size_pass.getValue( );
+    peexit->gender_from = Grammar::MultiGender(gender_from.getValue().c_str());
+    peexit->gender_to = Grammar::MultiGender(gender_to.getValue().c_str());
+    peexit->msgEntryRoom = msgEntryRoom.getValue();
+    peexit->msgEntrySelf = msgEntrySelf.getValue();
+    peexit->msgLeaveRoom = msgLeaveRoom.getValue();
+    peexit->msgLeaveSelf = msgLeaveSelf.getValue();
 
+    // OBSOLETE
     peexit->moving_from = moving_from.getValue( );
     peexit->moving_mode_from = moving_mode_from.getValue( );
     peexit->moving_to = moving_to.getValue( );
     peexit->moving_mode_to = moving_mode_to.getValue( );
     
+    // ONE-OFF CONVERSION
+    if (msgEntryRoom.empty() && msgLeaveRoom.empty()) {
+        ostringstream leaveBuf, entryBuf;
+
+        leaveBuf << "%1$^C1 " << extra_move_ru[peexit->moving_from] << " "
+                << extra_move_rt[peexit->moving_mode_from] << " "
+                << "%4$N" << extra_move_rtum[peexit->moving_mode_from];
+
+        entryBuf << "%1$^C1 " << extra_move_rp[peexit->moving_to] << " сюда " 
+                << extra_move_rt[peexit->moving_mode_to] << " "
+                << "%4$N" << extra_move_rtpm[peexit->moving_mode_to];
+
+        peexit->msgLeaveRoom = leaveBuf.str();
+        peexit->msgEntryRoom = entryBuf.str();
+
+        peexit->moving_from = peexit->moving_to = peexit->moving_mode_from = peexit->moving_mode_to = 0;
+    }
+
     return peexit;
 }
 

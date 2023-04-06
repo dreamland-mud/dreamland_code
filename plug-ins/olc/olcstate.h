@@ -11,6 +11,7 @@
 using namespace std;
 
 #include "logstream.h"
+#include "grammar_entities.h"
 #include "commandbase.h"
 #include "interprethandler.h"
 #include "staticlist.h"
@@ -115,6 +116,8 @@ protected:
     bool rangeEdit(int minValue, int maxValue, int &field1, int &field2);
     bool boolEdit(bool &field);
     bool diceEdit(int *field);
+    bool genderEdit(Grammar::MultiGender &field);
+    bool genderEdit(XMLString &field);
     bool stringListEdit(XMLStringList &values);
     bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
     bool editorCopy(const DLString &original);

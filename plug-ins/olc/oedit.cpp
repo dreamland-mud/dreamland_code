@@ -875,15 +875,7 @@ OEDIT(gender)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0') {
-        stc("Syntax:  gender m|f|n|p\n\r", ch);
-        return false;
-    }
-
-    pObj->gram_gender = Grammar::MultiGender(argument);
-
-    ptc(ch, "Grammatical gender set to '%s'.\n\r", pObj->gram_gender.toString());
-    return true;
+    return genderEdit(pObj->gram_gender);
 }
 
 OEDIT(condition)

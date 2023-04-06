@@ -4,6 +4,7 @@
  */
 
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 #include "olcstate.h"
 #include "olc.h"
 #include "sedit.h"
@@ -477,6 +478,38 @@ bool OLCState::flagValueEdit(const FlagTable &table, int &field)
 
     field = value;
     ptc(ch, "Новое значение поля {g%s{x: %s (%s)\r\n", cmd, table.name(field).c_str(), table.message(field).c_str());
+    return true;
+}
+
+bool OLCState::genderEdit(XMLString &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        stc("Syntax:  gender m|f|n|p\n\r", ch);
+        return false;
+    }
+
+    field = Grammar::MultiGender(args.getOneArgument().c_str()).toString();
+
+    ptc(ch, "Grammatical gender set to '%s'.\n\r", field.c_str());
+    return true;
+}
+
+bool OLCState::genderEdit(Grammar::MultiGender &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        stc("Syntax:  gender m|f|n|p\n\r", ch);
+        return false;
+    }
+
+    field = Grammar::MultiGender(args.getOneArgument().c_str());
+
+    ptc(ch, "Grammatical gender set to '%s'.\n\r", field.toString());
     return true;
 }
 

@@ -36,6 +36,14 @@ extra_exit_data * extra_exit_data::create()
     peexit->room_description = str_dup(room_description);
     peexit->max_size_pass = max_size_pass;
 
+    peexit->msgEntryRoom = msgEntryRoom;
+    peexit->msgLeaveRoom = msgLeaveRoom;
+    peexit->msgEntrySelf = msgEntrySelf;
+    peexit->msgLeaveSelf = msgLeaveSelf;
+    peexit->gender_from = gender_from;
+    peexit->gender_to = gender_to;
+    
+    // OBSOLETE
     peexit->moving_from = moving_from;
     peexit->moving_mode_from = moving_mode_from;
     peexit->moving_to = moving_to;

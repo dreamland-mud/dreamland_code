@@ -466,6 +466,13 @@ struct        extra_exit_data
         char *                room_description;
         int                level;
 
+        DLString msgLeaveRoom;
+        DLString msgLeaveSelf;
+        DLString msgEntryRoom;
+        DLString msgEntrySelf;
+        Grammar::MultiGender gender_from;
+        Grammar::MultiGender gender_to;
+
         /** Resolve u1 from a virtual number to the real room. */
         void resolve(); 
 
