@@ -903,7 +903,9 @@ void UndefinedOneHit::damEffectSlice( )
         timer /= 2;
 
     /* drop sliced arm */
-    arm = create_object( get_obj_index( OBJ_VNUM_SLICED_ARM ), victim->getRealLevel( ) );
+    bool paw = !victim->form.isSet(FORM_SENTIENT) || victim->form.isSet(FORM_DRAGON);
+    const char *partName = paw ? "лап|а|ы|е|у|ой|е" : "рук|а|и|е|у|ой|е";
+    arm = create_object( get_obj_index( paw ? OBJ_VNUM_SLICED_PAW : OBJ_VNUM_SLICED_ARM ), victim->getRealLevel( ) );
     
     name = victim->getNameP( '2' );
     // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
@@ -929,12 +931,12 @@ void UndefinedOneHit::damEffectSlice( )
     }
 
     obj_to_room( arm, victim->in_room );
-    oldact("{R$c1 отруби$gло|л|ла тебе $t руку!{x", ch, sideName.c_str( ), victim, TO_VICT );
-    oldact("$c1 отруби$gло|л|ла $C3 $t руку!", ch, sideName.c_str( ), victim, TO_NOTVICT );
-    oldact("{RТы отрубаешь $t руку $C3!{x", ch, sideName.c_str( ), victim, TO_CHAR );
+    victim->pecho("{R%1$^C1 отруби%1$Gло|л|ла тебе %2$s %3$N4!{x", ch, sideName.c_str(), partName);
+    victim->recho(ch, "%1$^C1 отруби%1$Gло|л|ла %4$C3 %2$s %3$N4!", ch, sideName.c_str(), partName, victim);
+    ch->pecho("{RТы отрубаешь %2$s %3$N4 %1$C3!{x", victim, sideName.c_str(), partName);
     gsn_slice->improve( ch, true, victim );
-    oldact("Отрубленная рука $c2 падает на землю.", victim, 0, 0, TO_ROOM );
-    oldact("Твоя отрубленная рука падает на землю.", victim, 0, 0, TO_CHAR );
+    victim->recho("Отрубленная %2$N1 %1$C2 падает на землю.", victim, partName);
+    victim->pecho("Твоя отрубленная %1$N1 падает на землю.", partName);
 
     /* affect */
     af.type  = gsn_slice;

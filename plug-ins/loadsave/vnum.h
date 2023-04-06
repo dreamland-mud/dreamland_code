@@ -25,6 +25,7 @@
 #define OBJ_VNUM_SEVERED_HEAD             12
 #define OBJ_VNUM_TORN_HEART             13
 #define OBJ_VNUM_SLICED_ARM             14
+#define OBJ_VNUM_SLICED_PAW             191
 #define OBJ_VNUM_SLICED_LEG             15
 #define OBJ_VNUM_GUTS                     16
 #define OBJ_VNUM_BRAINS                     17
