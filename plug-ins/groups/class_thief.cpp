@@ -542,7 +542,7 @@ SKILL_RUNP( steal )
                 return;
         }
 
-        if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
+        if ( ch->getCarryWeight() + obj->getWeight( ) > ch->canCarryWeight( ) )
         {
                 ch->pecho("Ты не можешь нести такую тяжесть.");
                 return;

@@ -228,7 +228,7 @@ CMDRUN( buy )
         return;
     }
 
-    if ( ch->carry_weight + number * obj->getWeight( ) > ch->canCarryWeight( ) )
+    if (ch->getCarryWeight() + number * obj->getWeight() > ch->canCarryWeight())
     {
         ch->pecho("Ты не можешь нести такую тяжесть.");
         return;

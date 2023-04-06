@@ -1317,13 +1317,6 @@ CMDRUNP( request )
                 return;
         }
 
-        if (victim->getNPC()->behavior 
-            && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
-        {
-                ch->pecho("Хочешь -- купи!");
-                return;
-        }
-
         if (ch->move < (50 + ch->getRealLevel( )))
         {
                 do_say(victim, "Ты выглядишь устало, может, отдохнешь сначала?");
@@ -1365,12 +1358,21 @@ CMDRUNP( request )
         }
 
         if ( ( ( obj = get_obj_carry(victim , arg1 ) ) == 0
-                        && (obj = get_obj_wear(victim, arg1)) == 0)
-                || IS_SET(obj->extra_flags, ITEM_INVENTORY))
+                        && (obj = get_obj_wear(victim, arg1)) == 0))
         {
                 do_say(victim, "Извини, у меня нет этого.");
                 return;
         }
+
+        if (IS_SET(obj->extra_flags, ITEM_INVENTORY)
+            && victim->getNPC()->behavior 
+            && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
+        {
+            say_fmt("Если тебе нравится %3$O1, ты можешь у меня %3$P2 купить.", victim, ch, obj);
+            return;
+        }
+
+
 
     if ( !can_drop_obj( ch, obj )
     || ( obj_is_worn(obj) && IS_OBJ_STAT(obj, ITEM_NOREMOVE)  ))
@@ -1386,7 +1388,7 @@ CMDRUNP( request )
                 return;
         }
 
-        if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
+        if ( ch->getCarryWeight() + obj->getWeight( ) > ch->canCarryWeight( ) )
         {
                 ch->pecho("Ты не можешь нести такой вес.");
                 return;
@@ -1545,7 +1547,7 @@ CMDRUNP( demand )
       return;
     }
 
-  if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
+  if ( ch->getCarryWeight() + obj->getWeight( ) > ch->canCarryWeight( ) )
     {
       ch->pecho("Ты не сможешь нести такую тяжесть.");
       return;
