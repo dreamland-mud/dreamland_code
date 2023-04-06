@@ -790,9 +790,7 @@ CMDRUNP( title )
 
     pch->setTitle( arg );
 
-    pch->printf( "Теперь ты {W%s{x%s{x\n\r", 
-                 pch->getName( ).c_str( ), 
-                 pch->getParsedTitle( ).c_str( ) );
+    pch->pecho("Теперь ты {W%C1{x%s{x", pch, pch->getParsedTitle().c_str());
 }
 
 static bool fix_pretitle( PCharacter *ch, DLString &title )
