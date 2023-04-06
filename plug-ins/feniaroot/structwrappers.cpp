@@ -1458,7 +1458,7 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
     data.end = end;
     data.learned = learned;
 
-    return Register(true);
+    return skill->available(ch); // check again if became available, as align restrictions may prevent it
 }
 
 NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить временное умение у персонажа, помеченное как origin (.tables.skill_origin_table). Вернет true, если было что очищать.")
@@ -1478,9 +1478,10 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить вр
     if (data.origin != origin)
         return Register(false);
 
+    bool rc = skill->available(ch); // only return true if the skill was available in the first place
     data.clear();
 
-    return Register(true);
+    return rc;
 }
 
 NMI_INVOKE(SkillWrapper, apply, "(ch,vict|obj|room|arg[,level]): выполнить умение без проверок и сообщений")
