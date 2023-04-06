@@ -526,6 +526,7 @@ CMDRUNP( auction )
                 case ITEM_CORPSE_PC:
                 case ITEM_CORPSE_NPC:
                 case ITEM_TATTOO:
+                case ITEM_CRAFT_TATTOO:
                         oldact_p("Ты не можешь выставить на аукцион $T.",
                                 ch, 0, item_table.message(obj->item_type).c_str( ),TO_CHAR,POS_SLEEPING);
                         return;

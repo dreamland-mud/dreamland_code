@@ -916,7 +916,7 @@ SKILL_RUNP( confiscate )
                 if (IS_SET(obj->extra_flags, ITEM_NODROP))
                     continue;
                 
-                if (obj->item_type == ITEM_TATTOO)
+                if (obj->item_type == ITEM_TATTOO || obj->item_type == ITEM_CRAFT_TATTOO)
                     continue;
 
                 if (obj->wear_loc != wear_none && IS_SET(obj->extra_flags, ITEM_NOREMOVE))

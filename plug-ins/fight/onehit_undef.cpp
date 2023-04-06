@@ -971,7 +971,7 @@ void UndefinedOneHit::damEffectSlice( )
         if (obj) {
             loc->unequip( obj );
 
-            if (obj->item_type == ITEM_TATTOO) {
+            if (obj->item_type == ITEM_CRAFT_TATTOO) {
                 oldact("$o1 медленно исчезает.", victim, obj, 0, TO_CHAR);
                 extract_obj(obj);
             }

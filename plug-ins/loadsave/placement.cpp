@@ -323,7 +323,6 @@ void obj_to_obj( Object *obj, Object *obj_to )
         {
                 if ( obj_to->carried_by != 0 )
                 {
-                        // obj_to->carried_by->carry_number += obj->getNumber( );
                         obj_to->carried_by->carry_weight += obj->getWeight( )
                                                 * obj_to->getWeightMultiplier() / 100;
                 }
@@ -398,7 +397,6 @@ void obj_from_obj( Object *obj )
         {
                 if ( obj_from->carried_by != 0 )
                 {
-                        // obj_from->carried_by->carry_number -= obj->getNumber( );
                         obj_from->carried_by->carry_weight -= obj->getWeight( )
                                         * obj_from->getWeightMultiplier() / 100;
                 }
