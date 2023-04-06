@@ -839,6 +839,13 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
     return fenia_trigger(trigName, args, this, proto);
 }
 
+NMI_INVOKE(ObjectWrapper, clone, "(): создать полную копию этого объекта")
+{
+    checkTarget();
+    ::Object *cloned = create_object(target->pIndexData, 0);
+    clone_object(target, cloned);
+    return wrap(cloned);
+}
 
 NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "(vnum): поиск объекта внутри этого по внуму" )
 {
