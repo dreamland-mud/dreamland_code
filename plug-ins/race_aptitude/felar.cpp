@@ -124,7 +124,9 @@ SKILL_RUNP( tail )
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );
 
-        victim->position = POS_RESTING;
+        if (IS_SET(victim->parts, PART_LEGS))
+            victim->position = POS_RESTING;
+            
         damage_tail = ch->damroll +
                 ( 2 * number_range(4, 4 + 10 * ch->size + chance/10) );
 

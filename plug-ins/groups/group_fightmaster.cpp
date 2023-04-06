@@ -214,7 +214,7 @@ SKILL_APPLY(parry)
     // TODO: damage_to_obj is called here with a chance
     // destroyWeapon( );
 
-    if ( number_percent() >  gsn_parry->getEffective( victim ) )
+    if ( number_percent() >  gsn_parry->getEffective( victim ) && IS_SET(victim->parts, PART_LEGS|PART_TWO_HOOVES))
     {
         /* size  and weight */
         chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
@@ -537,7 +537,7 @@ SKILL_APPLY(crossblock)
     // TODO call damage_to_obj for the wield
     // destroyWeapon( );
 
-    if ( number_percent() >  gsn_cross_block->getEffective( victim ) )
+    if ( number_percent() >  gsn_cross_block->getEffective( victim ) && IS_SET(victim->parts, PART_LEGS))
     {
         /* size  and weight */
         chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
@@ -584,115 +584,3 @@ SKILL_APPLY(crossblock)
  * 'dodge' skill command
  */
 SKILL_DECL(dodge);
-SKILL_APPLY(dodge)
-{
-    int chance, prof;
-    Object *wield;
-    bool secondary = !!level;
-
-    if ( !IS_AWAKE(victim) )
-        return false;
-
-    if ( MOUNTED(victim) )
-        return false;
-    
-    if ( IS_AFFECTED(victim,AFF_STUN) )
-        return false;
-
-    wield = get_wield(ch, secondary);
-    chance  = gsn_dodge->getEffective( victim ) / 2;
-
-    /* chance for high dex. */
-    chance += 2 * (victim->getCurrStat(STAT_DEX) - 20);
-    prof = victim->getProfession( );
-
-    if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
-        chance += chance / 5;
-    else if (prof == prof_thief || prof == prof_ninja)
-        chance += chance / 10;
-    else if (prof == prof_anti_paladin)
-        chance -= chance / 10;
-
-    if ( !victim->can_see( ch ) )
-    {
-        if (number_percent( ) < gsn_blind_fighting->getEffective( victim ))
-        {
-            gsn_blind_fighting->improve( victim, true, ch );
-            chance = ( int )( chance / 1.5 );
-        }
-        else
-            chance = ( int )( chance / 4 );
-    }
-
-    if ( IS_AFFECTED(victim,AFF_WEAK_STUN) )
-    {
-        chance = ( int )( chance * 0.5 );
-    }
-
-    if (RoomUtils::isNature(victim->in_room) 
-        && gsn_forest_fighting->usable(victim)
-        && (gsn_forest_fighting->getEffective( victim ) > number_percent( ))) 
-    {
-        chance = ( int )( chance * 1.2 );
-        gsn_forest_fighting->improve( victim, true, ch );
-    }
-
-    if (wield && (wield->value0() == WEAPON_FLAIL || wield->value0() == WEAPON_WHIP))
-        chance = ( int )( chance * 1.2 );
-        
-    if (number_percent( ) >= chance + ( skill_level(*gsn_dodge, victim) - ch->getModifyLevel() ) / 2
-        || ( !victim->is_npc() && !victim->move ) )
-        return false;
-
-    victim->move -= move_dec( victim );
-
-    if (SHADOW(victim))
-    {
-        victim->pecho( "Ты скачешь вокруг своей тени, пытаясь от нее увернуться." );
-        victim->recho( "%2$^C1 забавно прыгает вокруг своей тени.", ch, victim );
-        return false;
-    }
-
-    victim->pecho( "Ты уворачиваешься от атаки %1$C2.", ch, victim );
-    ch->pecho( "%2$^C1 уворачивается от твоей атаки.", ch, victim );
-    ch->recho( victim, "%2$^C1 уворачивается от атаки %1$C2.", ch, victim );
-
-    if ( number_percent() < (gsn_dodge->getEffective( victim ) / 20 )
-        && !(is_flying( ch ) || ch->position < POS_FIGHTING) )
-    {
-        /* size */
-        if (victim->size < ch->size)
-            chance += (victim->size - ch->size) * 10;  /* bigger = harder to trip */
-
-        /* dex */
-        chance += victim->getCurrStat(STAT_DEX);
-        chance -= ch->getCurrStat(STAT_DEX) * 3 / 2;
-
-        if (is_flying( victim ) )
-            chance -= 10;
-
-        /* speed */
-        if (IS_QUICK(victim))
-            chance += 10;
-
-        if (IS_QUICK(ch))
-            chance -= 20;
-
-        /* level */
-            chance += ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
-
-        /* now the attack */
-        if ( number_percent() < (chance / 20) )
-        {
-            oldact("$c1 теряет равновесие и падает вниз!", ch,0,victim,TO_VICT);
-            oldact("$C1 уворачивается от твоей атаки, ты теряешь равновесие, и падаешь вниз!", ch,0,victim,TO_CHAR);
-            oldact("$C1 уворачивается от атаки $c2, $c1 теряет равновесие и падает вниз.", ch,0,victim,TO_NOTVICT);
-
-            ch->setWait(gsn_trip->getBeats(ch));
-            ch->position = POS_RESTING;
-        }
-    }
-
-    gsn_dodge->improve( victim, true, ch );
-    return true;
-}

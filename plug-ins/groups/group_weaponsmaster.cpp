@@ -614,6 +614,11 @@ SKILL_RUNP( lash )
         return;
     }
 
+    if (!IS_SET(victim->parts, PART_LEGS)) {
+        ch->pecho("Но у %C2 нету ног!", victim);
+        return;
+    }
+
     wasFighting = (ch->fighting != NULL);
     
     chance += ch->getCurrStat(STAT_DEX) * 2;
