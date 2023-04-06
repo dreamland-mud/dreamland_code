@@ -13,6 +13,7 @@
 #include "pcharacter.h"
 #include "object.h"
 
+#include "attract.h"
 #include "act.h"
 #include "interp.h"
 #include "../../anatolia/handler.h"
@@ -69,6 +70,11 @@ void ShopTrader::give( Character *from, Object *obj )
 
 void ShopTrader::speech( Character *victim, const char *speech )
 {
+    // React only if we would have reacted to the 'properties' command.
+    ShopTrader::Pointer trader = find_attracted_mob_behavior<ShopTrader>(victim, OCC_SHOPPER);
+    if (trader->getChar() != ch)
+        return;
+
     describeGoods( victim, speech, false );
 }
 
