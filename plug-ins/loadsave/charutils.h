@@ -18,7 +18,7 @@ namespace CharUtils {
     bool hasEyes(Character *ch);
 
     /** True if char used to have e.g. left arm but it got chopped off. */
-    bool lostRaceWearloc(Character *ch, WearlocationReference &wearloc);
+    bool lostWearloc(Character *ch, WearlocationReference &wearloc);
 }
 
 #endif

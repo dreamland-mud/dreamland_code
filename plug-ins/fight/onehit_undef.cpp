@@ -133,11 +133,11 @@ void UndefinedOneHit::protectPrayer( )
 bool UndefinedOneHit::checkHands( )
 {
     //TO-DO: provide better logic later, allow blobs, beasts etc. to hit without hands
-    if (CharUtils::lostRaceWearloc(ch, wear_hands))
+    if (CharUtils::lostWearloc(ch, wear_hands))
         return false;
 
     WearlocationReference &attackingHand = secondary ? wear_wrist_l : wear_wrist_r;
-    if (CharUtils::lostRaceWearloc(ch, attackingHand))
+    if (CharUtils::lostWearloc(ch, attackingHand))
         return false;
 
     return true;

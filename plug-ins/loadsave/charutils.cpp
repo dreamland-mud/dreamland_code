@@ -3,6 +3,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "wearlocation.h"
+#include "affect.h"
 #include "merc.h"
 #include "def.h"
 
@@ -26,13 +27,19 @@ bool CharUtils::hasEyes(Character *ch)
     return IS_SET(ch->parts, PART_EYE);
 }
 
-bool CharUtils::lostRaceWearloc(Character *ch, WearlocationReference &wearloc)
+bool CharUtils::lostWearloc(Character *ch, WearlocationReference &wearloc)
 {
-    // Never had this wearloc - nothing to lose.
-    if (!ch->getRace()->getWearloc().isSet(wearloc))
-        return false; 
-
     // Still has it?
-    return !ch->getWearloc().isSet(wearloc);
+    if (ch->getWearloc().isSet(wearloc))
+        return false;
+
+    // Check if char has affect that removes this particular wearloc.
+    for (auto &paf: ch->affected) {
+        if (paf->global.getRegistry() == wearlocationManager)
+            if (paf->global.isSet(wearloc))
+                return true;
+    }
+
+    return false;
 }
 
