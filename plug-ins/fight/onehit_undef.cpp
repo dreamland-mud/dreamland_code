@@ -33,7 +33,7 @@
 #include "../anatolia/handler.h"
 #include "skill_utils.h"
 #include "move_utils.h"
-
+#include "charutils.h"
 #include "profflags.h"
 #include "act.h"
 #include "mercdb.h"
@@ -129,13 +129,15 @@ void UndefinedOneHit::protectPrayer( )
         dam -= dam * (3 + victim->getModifyLevel( ) / 10) / 100;
 }
 
+/** Prevent attacks with chopped upper limbs. */
 bool UndefinedOneHit::checkHands( )
 {
     //TO-DO: provide better logic later, allow blobs, beasts etc. to hit without hands
-    if (!ch->getWearloc( ).isSet( wear_hands ))
+    if (CharUtils::lostRaceWearloc(ch, wear_hands))
         return false;
 
-    if (!ch->getWearloc( ).isSet( secondary ? wear_wrist_l : wear_wrist_r ))
+    WearlocationReference &attackingHand = secondary ? wear_wrist_l : wear_wrist_r;
+    if (CharUtils::lostRaceWearloc(ch, attackingHand))
         return false;
 
     return true;
@@ -903,7 +905,7 @@ void UndefinedOneHit::damEffectSlice( )
         timer /= 2;
 
     /* drop sliced arm */
-    bool paw = !victim->form.isSet(FORM_SENTIENT) || victim->form.isSet(FORM_DRAGON);
+    bool paw = CharUtils::hasPaws(victim);
     const char *partName = paw ? "лап|а|ы|е|у|ой|е" : "рук|а|и|е|у|ой|е";
     arm = create_object( get_obj_index( paw ? OBJ_VNUM_SLICED_PAW : OBJ_VNUM_SLICED_ARM ), victim->getRealLevel( ) );
     

@@ -21,6 +21,7 @@
 #include "npcharacter.h"
 #include "dreamland.h"
 #include "fight.h"
+#include "charutils.h"
 #include "move_utils.h"
 #include "skill_utils.h"
 #include "merc.h"
@@ -124,7 +125,7 @@ SKILL_RUNP( tail )
     
         victim->setWaitViolence( number_bits( 2 ) + 1 );
 
-        if (IS_SET(victim->parts, PART_LEGS))
+        if (CharUtils::hasLegs(victim))
             victim->position = POS_RESTING;
             
         damage_tail = ch->damroll +

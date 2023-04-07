@@ -38,6 +38,7 @@ itemevents.cpp \
 areautils.cpp \
 roomutils.cpp \
 itemutils.cpp \
+charutils.cpp \
 religionutils.cpp
 
 libloadsave_la_MOC = \

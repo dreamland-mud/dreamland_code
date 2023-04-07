@@ -21,6 +21,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+#include "charutils.h"
 #include "skill_utils.h"
 #include "roomutils.h"
 #include "move_utils.h"
@@ -70,7 +71,7 @@ bool Pet::area( )
         msg = msg + fmt(0, "улета%1$nет|ют ", ch);
     else if (RoomUtils::isWater(ch->in_room))
         msg = msg + fmt(0, "уплыва%1$nет|ют ", ch);
-    else if (!IS_SET(ch->parts, PART_LEGS))
+    else if (!CharUtils::hasLegs(ch))
         msg = msg + fmt(0, "уполза%1$nет|ют ", ch);
     else
         msg = msg + fmt(0, "уход%1$nит|ят ", ch);

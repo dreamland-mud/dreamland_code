@@ -63,6 +63,7 @@
 #include "desire.h"
 #include "act.h"
 
+#include "charutils.h"
 #include "fight.h"
 #include "handler.h"
 #include "material.h"
@@ -350,8 +351,9 @@ void fire_effect(void *vo, Character *source, short level, int dam, int target, 
         effect_level = URANGE(level * 25 / 100, effect_level, level * 90 / 100);
 
         /* chance of blindness */
-        if (!IS_AFFECTED(victim,AFF_BLIND) && IS_SET(victim->parts, PART_EYE) &&
-            !saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
+        if (!IS_AFFECTED(victim,AFF_BLIND) 
+            && CharUtils::hasEyes(victim)
+            && !saves_spell(effect_level, victim, DAM_FIRE, 0, dam_flag))
         {
             Affect af;
             oldact_p("$c1 ничего не видит из-за дыма, попавшего в глаза!",

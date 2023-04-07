@@ -22,6 +22,7 @@
 #include "core/object.h"
 #include "wearlocation.h"
 
+#include "charutils.h"
 #include "affectflags.h"
 #include "itemflags.h"
 #include "act.h"
@@ -467,9 +468,9 @@ int ExitsMovement::adjustMovetype( Character *wch )
     case MOVETYPE_FLEE:
         if (is_flying( wch ))
             return MOVETYPE_FLYING;
-        else if (IS_SET(wch->parts, PART_FOUR_HOOVES | PART_TWO_HOOVES))
+        else if (CharUtils::hasHooves(wch))
             return MOVETYPE_RIDING;
-        else if (!IS_SET(wch->parts, PART_LEGS))
+        else if (!CharUtils::hasLegs(wch))
             return MOVETYPE_SLINK;
         break;
     }

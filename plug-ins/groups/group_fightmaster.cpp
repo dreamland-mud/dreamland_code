@@ -44,6 +44,7 @@
 #include "morphology.h"
 #include "onehit.h"
 #include "onehit_weapon.h"
+#include "charutils.h"
 #include "skill_utils.h"
 #include "roomutils.h"
 #include "vnum.h"
@@ -214,7 +215,7 @@ SKILL_APPLY(parry)
     // TODO: damage_to_obj is called here with a chance
     // destroyWeapon( );
 
-    if ( number_percent() >  gsn_parry->getEffective( victim ) && IS_SET(victim->parts, PART_LEGS|PART_TWO_HOOVES))
+    if ( number_percent() >  gsn_parry->getEffective( victim ) && CharUtils::hasLegs(victim))
     {
         /* size  and weight */
         chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
@@ -537,7 +538,7 @@ SKILL_APPLY(crossblock)
     // TODO call damage_to_obj for the wield
     // destroyWeapon( );
 
-    if ( number_percent() >  gsn_cross_block->getEffective( victim ) && IS_SET(victim->parts, PART_LEGS))
+    if ( number_percent() >  gsn_cross_block->getEffective( victim ) && CharUtils::hasLegs(victim))
     {
         /* size  and weight */
         chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;

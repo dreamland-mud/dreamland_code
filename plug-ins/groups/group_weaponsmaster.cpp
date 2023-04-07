@@ -35,6 +35,7 @@
 #include "material.h"
 #include "fight.h"
 #include "vnum.h"
+#include "charutils.h"
 #include "stats_apply.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -614,7 +615,7 @@ SKILL_RUNP( lash )
         return;
     }
 
-    if (!IS_SET(victim->parts, PART_LEGS)) {
+    if (!CharUtils::hasLegs(victim)) {
         ch->pecho("Но у %C2 нету ног!", victim);
         return;
     }
