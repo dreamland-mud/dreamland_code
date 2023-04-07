@@ -810,7 +810,6 @@ INT_FIELD(vuln_flags, "флаги уязвимости (таблица .tables.r
 INT_FIELD(affected_by, "флаги аффектов (таблица .tables.affect_flags)")
 INT_FIELD(detection, "флаги детектов (таблица .tables.detect_flags)")
 INT_FIELD(position, "позиция (таблица .tables.position_table)")
-INT_FIELD(carry_weight, "вес который несет чар без учета денег")
 INT_FIELD(carry_number, "количество вещей которое несет чар")
 INT_FIELD(saving_throw, "савесы")
 INT_FIELD(alignment, "натура, от -1000 до 1000")
@@ -925,6 +924,13 @@ NMI_GET( CharacterWrapper, max_carry_number, "макс кол-во вещей, �
     checkTarget( );
     return target->canCarryNumber();
 }
+
+NMI_GET(CharacterWrapper, carry_weight, "вес, который несет персонаж")
+{
+    checkTarget();
+    return target->getCarryWeight();
+}
+
 
 NMI_GET( CharacterWrapper, expToLevel, "сколько опыта осталось набрать до след уровня")
 {
