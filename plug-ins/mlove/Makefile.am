@@ -6,6 +6,7 @@ include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/command  \
+-I$(top_srcdir)/plug-ins/communication \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/loadsave \
@@ -20,6 +21,7 @@ libmlove_la_LIBADD = \
 ../iomanager/libiomanager.la \
 ../interpret/libinterpret.la \
 ../command/libcommand.la \
+../communication/libcommunication.la \
 ../help/libhelp.la \
 ../loadsave/libloadsave.la 
 

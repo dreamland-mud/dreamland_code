@@ -4,6 +4,7 @@
  */
 #include "commandtemplate.h"
 #include "xmlattributemarriage.h"
+#include "replay.h"
 
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -52,7 +53,9 @@ CMDRUN( mtalk )
         buf0 << "Ты говоришь жене '{G";
     }
 
-    buf << constArguments << "{x'" << endl;
+    buf << constArguments << "{x'";
+    remember_history_private(victim, buf.str());
+    buf << endl;
     buf0 << constArguments << "{x'" << endl;
 
     victim->send_to( buf );
