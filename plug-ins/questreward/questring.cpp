@@ -22,7 +22,7 @@ void QuestRing::wear( Character *ch )
 
 void QuestRing::equip( Character *ch ) 
 {
-    obj->level = ch->getRealLevel( );
+    obj->level = ch->getModifyLevel();
     
     if (!obj->affected.empty()) {
         // Updated existing affects to match player level.

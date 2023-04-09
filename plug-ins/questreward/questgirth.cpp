@@ -23,7 +23,7 @@ void QuestGirth::wear( Character *ch )
 
 void QuestGirth::equip( Character *ch ) 
 {
-    obj->level = ch->getRealLevel( );
+    obj->level = ch->getModifyLevel();
     
     if (!obj->affected.empty()) {
         // Updated existing affects to match player level.
