@@ -29,7 +29,7 @@ void BloodlustDesire::damage( PCharacter *ch )
 {
     int dam;
 
-    if (ch->in_room->people && !ch->fighting) {
+    if (ch->in_room->people && !ch->fighting && !IS_AFFECTED(ch, AFF_SLEEP)) {
         Character *vch, *vch_next;
 
         if (!IS_AWAKE(ch))
@@ -50,6 +50,7 @@ void BloodlustDesire::damage( PCharacter *ch )
             
             if (ch != vch 
                 && ch->can_see(vch) 
+                && !IS_BLOODLESS(vch)
                 && !is_safe_nomessage(ch, vch))
             {
                 interpret_raw( ch, "yell", "КРОВИ! Я ЖАЖДУ КРОВИ!");
