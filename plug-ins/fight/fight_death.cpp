@@ -233,10 +233,11 @@ public:
         pvict->pecho("Ты превращаешься в призрак в последний раз и навсегда покидаешь этот мир.");
         oldact("$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
         
-        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
-        infonet(pvict, 0, "{CТихий голос из $o2: ", msgWiznet.c_str());
-        send_to_discord_stream(":ghost: " + msgWiznet);
-        send_telegram(msgWiznet);
+        DLString msg = fmt(0, msgWiznet.c_str(), pvict, killer);
+        wiznet( 0, 0, 0, msg.c_str());
+        infonet(pvict, 0, "{CТихий голос из $o2: ", msg.c_str());
+        send_to_discord_stream(":ghost: " + msg);
+        send_telegram(msg.c_str());
         delete_player( pvict );
     }
     virtual int getPriority( ) const
