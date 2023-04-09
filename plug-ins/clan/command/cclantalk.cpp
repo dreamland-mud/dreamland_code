@@ -119,10 +119,13 @@ COMMAND(CClanTalk, "cb")
             << ch->getName( ) << ": " << argument << endl;
 
     if (!ch->isAffected(gsn_deafen)) {
-        DLString message = fmt( ch, act_str.c_str( ), ch, argument.c_str( ) );
-        ch->pecho( message );
-        if (ch->getPC( )) {
-            remember_history_public( ch->getPC( ), message );
+        ostringstream msgBuf;
+
+        msgBuf << fmt(ch, act_str.c_str(), ch) << argument << "{x";
+        ch->pecho(msgBuf.str());
+
+        if (ch->getPC()) {
+            remember_history_public(ch->getPC(), msgBuf.str());
         }
     }
 
@@ -144,11 +147,12 @@ COMMAND(CClanTalk, "cb")
             else
                 strcpy( msg_str, argument.c_str( ) );
 
-            DLString message = fmt( d->character, act_str.c_str( ), ch, msg_str ); 
-            d->character->pecho( message.c_str( ) );
+            ostringstream msgBuf;
+            msgBuf << fmt(d->character, act_str.c_str(), ch) << msg_str << "{x";
+            d->character->pecho(msgBuf.str());
 
-            if (d->character->getPC( ))
-                remember_history_public( d->character->getPC( ), message );
+            if (d->character->getPC())
+                remember_history_public(d->character->getPC(), msgBuf.str());
         }
 }
 
