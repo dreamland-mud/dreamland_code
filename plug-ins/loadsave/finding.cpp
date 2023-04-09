@@ -140,26 +140,23 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
             continue;
 
         if (ugly) {
-            if (!IS_VAMPIRE(rch) && !IS_MOB_VAMPIRE(rch))
-                continue; 
-
-            if (++count == *number)
-                return rch;
+            // All vampires react to vampiric keywords by default.
+            if (IS_VAMPIRE(rch) || IS_MOB_VAMPIRE(rch))
+                if (++count == *number)
+                    return rch;
         }
-        else {
 
-            Character *tch;
-            
-            tch = rch->getDoppel( ch ); // FIXME doppel logic here is different from get_char_world
+        Character *tch;
+        
+        tch = rch->getDoppel( ch ); // FIXME doppel logic here is different from get_char_world
 
-            if (id && tch->getID( ) == id)
-                return rch;
-            if (id || !char_has_name(tch, argument))
-                continue;
+        if (id && tch->getID( ) == id)
+            return rch;
+        if (id || !char_has_name(tch, argument))
+            continue;
 
-            if (++count == *number)
-                return rch;
-        }
+        if (++count == *number)
+            return rch;
     }
 
     *number -= count;
