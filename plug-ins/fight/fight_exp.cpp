@@ -369,56 +369,55 @@ bool xp_align_coeff(Character *gch, Character *victim, int &align_mult, int &ali
 /*
  * Compute xp for a kill.
  */
-int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus )
+int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Character* leader, int base_exp_bonus)
 {
-  char buf[MAX_STRING_LENGTH];
-  int xp;
-  int base_exp;
-  short level_range;
-  int neg_cha=0, pos_cha=0;
+    int xp;
+    int base_exp;
+    short level_range;
+    int neg_cha = 0, pos_cha = 0;
     int align_mult, align_div;
     bool align_bonus;
 
-  level_range = victim->getModifyLevel() - gch->getModifyLevel();
+    level_range = victim->getModifyLevel() - gch->getModifyLevel();
 
-  switch (level_range)  {
-  default :     base_exp =   0;     break;
-  case -9 :     base_exp =   1;     break;
-  case -8 :     base_exp =   2;     break;
-  case -7 :     base_exp =   5;     break;
-  case -6 :     base_exp =   9;     break;
-  case -5 :     base_exp =  11;     break;
-  case -4 :     base_exp =  22;     break;
-  case -3 :     base_exp =  33;     break;
-  case -2 :     base_exp =  43;     break;
-  case -1 :     base_exp =  60;     break;
-  case  0 :     base_exp =  74;     break;
-  case  1 :     base_exp =  84;     break;
-  case  2 :     base_exp =  99;     break;
-  case  3 :     base_exp = 121;     break;
-  case  4 :     base_exp = 143;     break;
-  }
+    switch (level_range) {
+    default:     base_exp = 0;     break;
+    case -9:     base_exp = 1;     break;
+    case -8:     base_exp = 2;     break;
+    case -7:     base_exp = 5;     break;
+    case -6:     base_exp = 9;     break;
+    case -5:     base_exp = 11;     break;
+    case -4:     base_exp = 22;     break;
+    case -3:     base_exp = 33;     break;
+    case -2:     base_exp = 43;     break;
+    case -1:     base_exp = 60;     break;
+    case  0:     base_exp = 74;     break;
+    case  1:     base_exp = 84;     break;
+    case  2:     base_exp = 99;     break;
+    case  3:     base_exp = 121;     break;
+    case  4:     base_exp = 143;     break;
+    }
 
-  if (level_range > 4)
-    base_exp = 140 + 20 * (level_range - 4);
-    
-  base_exp += base_exp_bonus;
+    if (level_range > 4)
+        base_exp = 140 + 20 * (level_range - 4);
+
+    base_exp += base_exp_bonus;
 
 
     // calculate and apply exp multiplier 
     align_bonus = xp_align_coeff(gch, victim, align_mult, align_div);
     xp = (int)((base_exp * align_mult) / align_div);
-   
+
 
     // more exp at the low levels 
-    if ( gch->getModifyLevel() < 6)
+    if (gch->getModifyLevel() < 6)
         xp += 50 / gch->getModifyLevel();
 
     //limit 
-    xp = std::min( xp, 200 );
-    
+    xp = std::min(xp, 200);
+
     // randomize the rewards 
-    xp = number_range (xp * 3/4, xp * 5/4);
+    xp = number_range(xp * 3 / 4, xp * 5 / 4);
 
     // adjust for NPC
     xp = (int)(xp - xp / 20 * npccount);
@@ -427,29 +426,29 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
     int surpluspc = pccount > 5 ? pccount - 5 : 0;
     xp = xp - xp / 10 * surpluspc;
 
-    xp = std::max( xp, 0 );
+    xp = std::max(xp, 0);
 
     // Leadership skill.
-    if (leader && !leader->is_npc( ) 
+    if (leader && !leader->is_npc()
         && leader->in_room == gch->in_room
-        && xp > 10 
-        && pccount > 1) 
+        && xp > 10
+        && pccount > 1)
     {
-        int skill = gsn_leadership->getEffective( leader );
+        int skill = gsn_leadership->getEffective(leader);
         int bonus = skill_level_bonus(*gsn_leadership, leader);
-        
-         if (number_percent( ) < (skill + bonus * 2) / 2) {
+
+        if (number_percent() < (skill + bonus * 2) / 2) {
             xp += (xp * skill / 2) / 100;
             xp += bonus * 10;
             if (gch != leader)
                 gch->pecho("{cБлагодаря умелому руководству %C2 ты получаешь больше опыта.{x", leader);
             else
                 leader->pecho("{cБлагодаря твоему умелому руководству группа получает больше опыта.{x");
-             
-            gsn_leadership->improve( leader, true );        
+
+            gsn_leadership->improve(leader, true);
         }
-        else 
-            gsn_leadership->improve( leader, false );
+        else
+            gsn_leadership->improve(leader, false);
     }
 
     // Calendar bonuses: for now simply increase exp on 13th of each month.
@@ -459,81 +458,79 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
         bonus_experience->reportAction(gch, ostr);
         gch->send_to(ostr);
     }
-   
+
 
     // Kill counters and charisma update. 
-    if (IS_GOOD(gch))
+    if (xp > 0) 
     {
-     if (IS_GOOD(victim)) { gch->getPC( )->anti_killed++; neg_cha = 1; }
-     else if (IS_NEUTRAL(victim)) {gch->getPC( )->has_killed++; pos_cha =1;}
-     else if (IS_EVIL(victim)) {gch->getPC( )->has_killed++; pos_cha = 1;}
+        if (IS_GOOD(gch))
+        {
+            if (IS_GOOD(victim)) { gch->getPC()->anti_killed++; neg_cha = 1; }
+            else if (IS_NEUTRAL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
+            else if (IS_EVIL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
+        }
+
+        if (IS_NEUTRAL(gch))
+        {
+            if (IS_GOOD(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
+            else if (IS_NEUTRAL(victim)) { gch->getPC()->anti_killed++; neg_cha = 1; }
+            else if (IS_EVIL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
+        }
+
+        if (IS_EVIL(gch))
+        {
+            if (IS_GOOD(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
+            else if (IS_NEUTRAL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
+            else if (IS_EVIL(victim)) { gch->getPC()->anti_killed++; neg_cha = 1; }
+        }
     }
 
-    if (IS_NEUTRAL(gch))
+
+    if (neg_cha)
     {
-     if (xp > 0)
-     {
-      if (IS_GOOD(victim)) {gch->getPC( )->has_killed++; pos_cha = 1;}
-      else if (IS_NEUTRAL(victim)) {gch->getPC( )->anti_killed++; neg_cha = 1;}
-      else if (IS_EVIL(victim)) {gch->getPC( )->has_killed++; pos_cha =1;}
-     }
+        if ((gch->getPC()->anti_killed % 100) == 99)
+        {
+            gch->pecho("На твоем счету %1$d труп%1$I|а|ов %s персонажей.", 
+                gch->getPC()->anti_killed.getValue(),
+                IS_GOOD(gch) ? "хороших" :
+                IS_NEUTRAL(gch) ? "нейтральных" :
+                IS_EVIL(gch) ? "злых" : "");
+
+            if (gch->perm_stat[STAT_CHA] > 3 && IS_GOOD(gch))
+            {
+                gch->pecho("Твое обаяние понизилось на единицу.");
+                gch->perm_stat[STAT_CHA] -= 1;
+            }
+        }
+    }
+    else if (pos_cha)
+    {
+        if ((gch->getPC()->has_killed % 200) == 199)
+        {
+            gch->pecho("На твоем счету %1$d труп%1$I|а|ов %s персонажей.",
+                gch->getPC()->has_killed.getValue(),
+                IS_GOOD(gch) ? "недобрых" :
+                IS_NEUTRAL(gch) ? "добрых и злых" :
+                IS_EVIL(gch) ? "незлых" : "");
+
+            if (gch->perm_stat[STAT_CHA] < gch->getPC()->getMaxTrain(STAT_CHA)
+                && IS_GOOD(gch))
+            {
+                gch->pecho("Твое обаяние повысилось на единицу.");
+                gch->perm_stat[STAT_CHA] += 1;
+            }
+        }
     }
 
-    if (IS_EVIL(gch))
+    if (gch->getProfession() == prof_samurai && gch == leader
+        && gch->perm_stat[STAT_CHA] < gch->getPC()->getMaxTrain(STAT_CHA)
+        && victim->getModifyLevel() - gch->getModifyLevel() >= 20
+        && chance(10))
     {
-     if (xp > 0)
-     {
-      if (IS_GOOD(victim)) {gch->getPC( )->has_killed++; pos_cha = 1;}
-      else if (IS_NEUTRAL(victim)) {gch->getPC( )->has_killed++; pos_cha = 1;}
-      else if (IS_EVIL(victim)) {gch->getPC( )->anti_killed++; neg_cha = 1;}
-     }
-    }
-
- if ( neg_cha )
-  {
-    if ( (gch->getPC( )->anti_killed % 100) == 99 )
-    {
-     sprintf(buf,"На твоем счету %d ТРУПОВ %s.\n\r",
-            gch->getPC( )->anti_killed.getValue( ),
-        IS_GOOD(gch) ? "goods" :
-        IS_NEUTRAL(gch) ? "neutrals" :
-        IS_EVIL(gch) ? "evils" : "nones" );
-     gch->send_to(buf);
-     if (gch->perm_stat[STAT_CHA] > 3 && IS_GOOD(gch) )
-     {
-      gch->pecho("Твое обаяние (charisma) понизилось на единицу.");
-      gch->perm_stat[STAT_CHA] -= 1;
-     }
-    }
-   }
-  else if ( pos_cha )
-   {
-    if ( (gch->getPC( )->has_killed % 200) == 199 )
-    {
-     sprintf(buf,"На твоем счету %d ТРУПОВ %s.\n\r",
-            gch->getPC( )->has_killed.getValue( ),
-        IS_GOOD(gch) ? "anti-goods" :
-        IS_NEUTRAL(gch) ? "anti-neutrals" :
-        IS_EVIL(gch) ? "anti-evils" : "nones" );
-      gch->send_to(buf);
-      if (gch->perm_stat[STAT_CHA] < gch->getPC( )->getMaxTrain( STAT_CHA )
-        && IS_GOOD(gch) )
-      {
-       gch->pecho("Твое обаяние{le (charisma){x повысилось на единицу.");
-       gch->perm_stat[STAT_CHA] += 1;
-      }
-     }
-   }
-
-    if (gch->getProfession( ) == prof_samurai && gch == leader 
-        && gch->perm_stat[STAT_CHA] < gch->getPC( )->getMaxTrain( STAT_CHA )
-        && victim->getModifyLevel( ) - gch->getModifyLevel( ) >= 20 
-        && chance( 10 ))
-    {
-        oldact("Ты уби$gло|л|ла достойного противника, и твое обаяние{le (charisma){x повысилось на единицу.", gch, 0, 0, TO_CHAR);
+        oldact("Ты уби$gло|л|ла достойного противника, и твое обаяние повысилось на единицу.", gch, 0, 0, TO_CHAR);
         gch->perm_stat[STAT_CHA] += 1;
     }
-    
+
     return xp;
 }
 
