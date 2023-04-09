@@ -185,6 +185,11 @@ bool KillQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if (!VictimQuestModel::checkMobileVictim( pch, mob ))
         return false;
 
+    // Exclude guards from territories protected by law.
+    if (IS_SET(mob->in_room->area->area_flag, AREA_HOMETOWN))
+        if (mob->spec_fun.name == "spec_guard")
+            return false;
+
     level_diff = mob->getRealLevel( ) - pch->getModifyLevel( );
      
     if (( mode == 0 && ( level_diff < -3 || level_diff > 0  ) )
