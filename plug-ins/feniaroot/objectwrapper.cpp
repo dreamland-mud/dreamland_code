@@ -30,6 +30,7 @@
 #include "nativeext.h"
 #include "wrap_utils.h"
 #include "subr.h"
+#include "../anatolia/handler.h"
 #include "fenia_utils.h"
 #include "drink_utils.h"
 #include "material.h"
@@ -833,6 +834,15 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
 
     // Get trig name such as "Death" or "Get".
     DLString trigName = argnum2string(args, 1);
+
+    // "Get" triggers get special handling as there are item-type specific things to do,
+    // plus affect progs and behavior progs.
+    if (trigName == "Get") {
+        if (!target->carried_by)
+            throw Scripting::Exception("Call obj_to_char before invoking onGet triggers");
+        return oprog_get(target, target->carried_by); 
+    }
+
     // Get obj index data wrapper.
     WrapperBase *proto = get_wrapper(target->pIndexData->wrapper);
     // Helper function will invoke onDeath, postDeath triggers on item and proto.
