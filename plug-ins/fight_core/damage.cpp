@@ -308,11 +308,22 @@ bool Damage::adjustMasterAttack( )
     if (!IS_AWAKE(victim))
         return false;
 
-    if (ch->is_npc( )
-        && victim->is_npc( )
-        && IS_CHARMED(victim)
-        && victim->master->in_room == ch->in_room
-        && number_bits( 3 ) == 0)
+    if (!ch->is_npc() || !victim->is_npc())
+        return false;
+
+    if (!IS_CHARMED(victim))
+        return false;
+
+    if (victim->master->in_room != ch->in_room)
+        return false;
+
+    int roll;
+    if (ch->can_see(victim->master))
+        roll = number_bits(3); // 1 in 8
+    else
+        roll = number_bits(4); // 1 in 16
+    
+    if (roll == 0)
     {
         stop_fighting( ch, false );
         set_fighting( ch, victim->master );
