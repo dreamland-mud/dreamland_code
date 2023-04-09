@@ -55,7 +55,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
     vch->gold += a_gold;
     vch->silver += a_silver;
         
-    if (vch->getCarryWeight( ) + a_gold + a_silver / 10 > vch->canCarryWeight( ))
+    if (vch->getCarryWeight() > vch->canCarryWeight())
     {
         vch->gold = o_gold;
         vch->silver = o_silver;

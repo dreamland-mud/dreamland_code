@@ -1463,16 +1463,19 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
             return;
     }
 
-    if( ( victim->getCarryWeight( ) + gold + silver / 10 ) > victim->canCarryWeight( ) )
+    victim->silver  += silver;
+    victim->gold    += gold;
+
+    if (victim->getCarryWeight()  > victim->canCarryWeight())
     {
+            victim->silver  -= silver;
+            victim->gold    -= gold;
             ch->pecho( "%1$^C1 не мо%1$nжет|гут нести такую тяжесть.", victim );
             return;
     }
 
-    ch->silver        -= silver;
+    ch->silver      -= silver;
     ch->gold        -= gold;
-    victim->silver         += silver;
-    victim->gold        += gold;
     
     if (silver > 0) {
         DLString slv( silver );
