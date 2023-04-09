@@ -87,7 +87,7 @@ CMDRUNP( wear )
         Object *obj_next;
         
         if (victim != ch) {
-            ch->pecho("Ты не можешь сделать этого.");
+            echo_master(ch, "Ты не можешь 'надеть всё' на %C2 -- только на себя.", victim);
             return;
         }
         
@@ -105,13 +105,13 @@ CMDRUNP( wear )
     }
     
     if (( obj = get_obj_carry( ch, argObj ) ) == 0) {
-        ch->pecho("У тебя нет этого.");
+        echo_master(ch, "У тебя нет этого.");
         return;
     }
 
     if (ch == victim && fHair) {
         if (obj->getWeight( ) / 10 > 3) {
-            ch->pecho( "%1$^O1 слишком тяжел%1$Gое|ый|ая|ые, чтобы удержаться в твоих волосах.", obj );
+            echo_master(ch, "%1$^O1 слишком тяжел%1$Gое|ый|ая|ые, чтобы удержаться в твоих волосах.", obj);
             return;
         }
 
@@ -121,7 +121,7 @@ CMDRUNP( wear )
         
     if (ch == victim && fTail) {
         if (obj->getWeight( ) / 10 > 4) {
-            ch->pecho( "%1$^O1 слишком тяжел%1$Gое|ый|ая|ые, чтобы удержаться на твоем хвосте.", obj );
+            echo_master(ch, "%1$^O1 слишком тяжел%1$Gое|ый|ая|ые, чтобы удержаться на твоем хвосте.", obj);
             return;
         }
 
@@ -131,12 +131,12 @@ CMDRUNP( wear )
 
     if (ch == victim) {
         if (wear_obj( ch, obj, F_WEAR_VERBOSE | F_WEAR_REPLACE) == RC_WEAR_NOMATCH)
-            ch->pecho("Ты не можешь надеть, вооружиться или держать это в руках.");
+            echo_master(ch, "Ты не можешь надеть, вооружиться или держать в руках %O4.", obj);
         return;
     }
     
     if (!oprog_can_dress(obj, ch, victim)) {
-        oldact("Ты не сможешь надеть $o4 на $C4.", ch, obj, victim, TO_CHAR);
+        echo_master(ch, "Ты не сможешь надеть %O4 на %C4.", obj, victim);
         return;
     }
 
@@ -186,12 +186,12 @@ CMDRUNP( remove )
 
     if (arg_is_from( argFrom )) {
         if (( victim = get_char_room( ch, argVict ) ) == 0) {
-            ch->pecho("С кого ты хочешь это снять?");
+            echo_master(ch, "С кого ты хочешь это снять?");
             return;
         }
         
         if (victim != ch && !victim->is_npc( )) {
-            oldact("$C1 в состоянии раздеться са$Gмо|м|ма!", ch, 0, victim, TO_CHAR);
+            echo_master(ch, "%1$^C1 в состоянии раздеться са%1$Gмо|м|ма!", victim);
             return;
         }
     }
@@ -202,7 +202,7 @@ CMDRUNP( remove )
         Object *obj_next;
 
         if (victim != ch) {
-            ch->pecho("Ты не можешь сделать этого.");
+            echo_master(ch, "Ты не можешь 'снять всё' с %C2 -- только с себя.", victim);
             return;
         }
 
@@ -218,7 +218,7 @@ CMDRUNP( remove )
     
     if (ch == victim) {
         if (( obj = get_obj_wear( ch, argObj ) ) == 0) {
-            ch->pecho("У тебя нет этого.");
+            echo_master(ch, "У тебя нет этого.");
             return;
         }
 
@@ -227,12 +227,12 @@ CMDRUNP( remove )
     }
     
     if (( obj = get_obj_wear_victim( victim, argObj, ch ) ) == 0) {
-        oldact("У $C2 нет этого.", ch, 0, victim, TO_CHAR);
+        echo_master(ch, "У %C2 нет этого.", victim);
         return;
     }
 
     if (!obj->behavior || !obj->behavior->canDress( ch, victim )) {
-        oldact("Ты не сможешь снять $o4 с $C2.", ch, obj, victim, TO_CHAR);
+        echo_master(ch, "Ты не сможешь снять %O4 с %C2.", obj, victim);
         return;
     }
     

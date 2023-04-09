@@ -198,16 +198,14 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     if (obj->isAntiAligned( ch )) {
-        oldact("Твоя натура не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
-        oldact("$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-        oldact("$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+        echo_master(ch, "Твоя натура не позволяет тебе носить %O4.", obj);
+        ch->recho("%1$^C1 безуспешно пытается надеть %2$O4.", ch, obj);
         return false;
     }
     
     if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
-        oldact("Твоя натура все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
-        oldact("$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-        oldact("$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+        echo_master(ch, "Твоя натура все еще не позволяет тебе носить %O4, сперва нужно изменить внешний вид этой вещи.", obj);
+        ch->recho("%1$^C1 безуспешно пытается надеть %2$O4.", ch, obj);
         return false;
     }
 
@@ -221,7 +219,8 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
     }
 
     if (ch->getProfession( ) == prof_druid && material_is_typed( obj, MAT_METAL )) {
-        ch->pecho("Друиды не носят ничего металлического.");
+        echo_master(ch, "Ты не сможешь надеть %O4: друиды не носят ничего металлического.", obj);
+        ch->recho("%1$^C1 безуспешно пытается надеть %2$O4.", ch, obj);
         return false;    
     }
   
@@ -360,8 +359,9 @@ bool DefaultWearlocation::remove( Character *ch, int flags )
 bool DefaultWearlocation::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(obj->extra_flags, ITEM_NOREMOVE)) {
-        if (IS_SET(flags, F_WEAR_VERBOSE)) 
-            oldact("Ты не можешь снять $o4, на этой вещи проклятие.", ch, obj, 0, TO_CHAR);
+        if (IS_SET(flags, F_WEAR_VERBOSE)) {
+            echo_master(ch, "Ты не можешь снять %O4, на этой вещи проклятие.", obj);
+        }
         return false;
     }
     
@@ -445,7 +445,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if (wear_level > ch->getRealLevel( )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho( "Тебе необходимо достичь %d уровня, чтобы использовать %O4.", wear_level, obj );
+            echo_master(ch, "Тебе необходимо достичь %d уровня, чтобы использовать %O4.", wear_level, obj);
             ch->recho( "%1$^C3 не хватает опыта, чтобы использовать %2$O4.", ch, obj );
         }
         return RC_WEAR_YOUNG;
@@ -453,7 +453,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if(obj->pIndexData->limit >= 0 && ch->getModifyLevel( ) > obj->level + 20){
          if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho( "Твой уровень слишком велик, чтобы использовать %1$O4.", obj );
+            echo_master(ch,"Твой уровень слишком велик, чтобы использовать %1$O4.", obj );
             ch->recho( "Уровень %1$^C2 слишком велик, чтобы использовать %2$O4.", ch, obj );
          }
         return RC_WEAR_YOUNG;
@@ -461,8 +461,11 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if (!matches( ch ) && !pair->matches( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->recho( msgRoomNoRib.c_str( ), ch, obj );
             ch->pecho( msgSelfNoRib.c_str( ), ch, obj );
+            if (!msgRoomNoRib.empty())
+                ch->recho( msgRoomNoRib.c_str( ), ch, obj );
+            else
+                ch->recho("%^C1 пытается надеть %O4 на несуществующую часть тела.", ch, obj);
         }
         return RC_WEAR_NORIB;
     }
