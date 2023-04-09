@@ -454,9 +454,9 @@ SKILL_RUNP( manacles )
 
                         if ( paf->duration >= 0 )
                         {
-                                sprintf (buf,"$C1 закован на %d час%s."
-                                        ,paf->duration.getValue()
-                                        ,GET_COUNT(paf->duration, "","а","ов"));
+                                sprintf (buf,"$C1 закован менее чем на %d час%s."
+                                        ,paf->duration.getValue() + 1
+                                        ,GET_COUNT(paf->duration+1, "","а","ов"));
                         }
                         else
                         {
@@ -1025,9 +1025,9 @@ SKILL_RUNP( suspect )
 
                 if ( paf != 0 )   
                 {
-                        sprintf (buf,"Повестка $C2 действительна в течение %d час%s."
-                                ,paf->duration.getValue()
-                                ,GET_COUNT(paf->duration, "а","ов","ов"));
+                        sprintf (buf,"Повестка $C2 действительна менее %d час%s."
+                                ,paf->duration.getValue() + 1
+                                ,GET_COUNT(paf->duration + 1, "а","ов","ов"));
 
                         victim->pecho("Ты чувствуешь - тебя ждут в Суде.");
                 }
@@ -1171,9 +1171,9 @@ SKILL_RUNP( jail )
 
                         if ( paf->duration >= 0 )
                         {
-                                sprintf (buf,"$C1 в тюряге на %d час%s."
-                                        ,paf->duration.getValue()
-                                        ,GET_COUNT(paf->duration, "","а","ов"));
+                                sprintf (buf,"$C1 в тюряге менее чем на %d час%s."
+                                        ,paf->duration.getValue() + 1
+                                        ,GET_COUNT(paf->duration + 1, "","а","ов"));
                         }
                         else
                         {
@@ -1341,9 +1341,9 @@ SKILL_RUNP( dismiss )
 
                         if ( paf->duration >= 0 )
                         {
-                                sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя на %d час%s."
-                                        ,paf->duration.getValue()
-                                        ,GET_COUNT(paf->duration, "","а","ов"));
+                                sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя менее чем на %d час%s."
+                                        ,paf->duration.getValue() + 1
+                                        ,GET_COUNT(paf->duration+1, "","а","ов"));
                         }
                         else
                         {
@@ -1840,10 +1840,11 @@ VOID_AFFECT(Jail)::update( Character *ch, Affect *paf )
     DefaultAffectHandler::update( ch, paf );
 
     if ( paf->duration < 3) {
+        int hours = paf->duration + 1; // Affects are removed when duration reaches below zero.
         clantalk(*clan_ruler, "%s выйдет на свободу через %d час%s",
                 ch->getNameP( '1' ).c_str(),
-                paf->duration.getValue(),
-                GET_COUNT(paf->duration, "","а","ов"));
+                hours,
+                GET_COUNT(hours, "","а","ов"));
     }
 }
 
@@ -1860,10 +1861,11 @@ VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf )
     DefaultAffectHandler::update( ch, paf );
 
     if ( paf->duration < 3) {
+        int hours = paf->duration + 1;
         clantalk(*clan_ruler, "С %s спадут кандалы через %d час%s",
                 ch->getNameP( '2' ).c_str(),
-                paf->duration,
-                GET_COUNT(paf->duration, "","а","ов"));
+                hours,
+                GET_COUNT(hours, "","а","ов"));
     }
 }
 
@@ -1880,10 +1882,11 @@ VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf )
     DefaultAffectHandler::update( ch, paf );
 
     if ( paf->duration < 3) {
+        int hours = paf->duration + 1;
         clantalk(*clan_ruler, "Повестка в суд для %s истекает через %d час%s",
                 ch->getNameP( '2' ).c_str(),
-                paf->duration.getValue(),
-                GET_COUNT(paf->duration, "","а","ов"));
+                hours,
+                GET_COUNT(hours, "","а","ов"));
     }
 }
 
