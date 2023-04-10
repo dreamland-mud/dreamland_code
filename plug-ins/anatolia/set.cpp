@@ -149,17 +149,45 @@ T_SET_MOB tab_set_mob[] = {
   { NULL,        NULL,                false, S_NONE,                NULL                                }
 };
 
-Character* get_CHAR( Character* ch, char** argument ) {
+static Character* get_CHAR(Character* ch, char** argument) {
   char buf[MAX_STRING_LENGTH];
   Character* victim;
 
-  *argument = one_argument( *argument, buf );
+  *argument = one_argument(*argument, buf);
 
-  if( !buf[0] || !( victim = get_char_world( ch, buf ) ) ) {
-    ch->pecho("Игрок(моб) с таким названием не найден.");
+  if (!buf[0] || !(victim = get_char_world(ch, buf))) {
+    ch->pecho("Персонаж с таким именем не найден.");
     return NULL;
   }
   return victim;
+}
+
+static NPCharacter *get_mob(Character *ch, char **argument)
+{
+  char buf[MAX_STRING_LENGTH];
+  Character* victim;
+
+  *argument = one_argument(*argument, buf);
+
+  if (!buf[0] || !(victim = get_char_world(ch, buf, FFIND_MOB_ONLY))) {
+    ch->pecho("Моб с таким именем не найден.");
+    return NULL;
+  }
+  return victim->getNPC();
+}
+
+static PCharacter *get_player(Character *ch, char **argument)
+{
+  char buf[MAX_STRING_LENGTH];
+  Character* victim;
+
+  *argument = one_argument(*argument, buf);
+
+  if (!buf[0] || !(victim = get_char_world(ch, buf, FFIND_PLR_ONLY))) {
+    ch->pecho("Игрок с таким именем не найден.");
+    return NULL;
+  }
+  return victim->getPC();
 }
 
 void modif_STAT( Character* ch, Character* victim, char *argument, int st ) {
@@ -202,11 +230,6 @@ CMDWIZP( set )
   char arg[MAX_INPUT_LENGTH];
   int i = 0;
     
-  if (ch->getPC( ) && ch->getPC( )->getAttributes( ).isAvailable( "noset" )) {
-      ch->pecho( "It's not a good idea." );
-      return;
-  }
-
   argument = one_argument( argument, arg );
   if( arg[0] ) {
     while( tab_set[i].name ) {
@@ -436,14 +459,8 @@ void chg_mob_act( Character* ch, char* argument )
         int add_value;
         int sub_value;
 
-        if( ( victim = get_CHAR( ch, &argument ) ) )
+        if( ( victim = get_mob( ch, &argument ) ) )
         {
-                if ( !victim->is_npc() )
-                {
-                        ch->pecho("Это не для игроков!");
-                        return;
-                }
-
                 value = decode_flags( argument, &add_value, &sub_value );
 
                 if ( value == 0
@@ -457,10 +474,6 @@ void chg_mob_act( Character* ch, char* argument )
                         victim->act.setValue(value);
                 }
         }
-        else
-        {
-                ch->pecho("Такого NPC в Мире нет.");
-        }
 }
 
 void chg_mob_off( Character* ch, char* argument )
@@ -470,14 +483,8 @@ void chg_mob_off( Character* ch, char* argument )
         int add_value;
         int sub_value;
 
-        if( ( victim = get_CHAR( ch, &argument ) ) )
+        if( ( victim = get_mob( ch, &argument ) ) )
         {
-                if ( !victim->is_npc() )
-                {
-                        ch->pecho("Это не для игроков!");
-                        return;
-                }
-
                 value = decode_flags( argument, &add_value, &sub_value );
 
                 if ( value == 0
@@ -491,10 +498,6 @@ void chg_mob_off( Character* ch, char* argument )
                         victim->getNPC()->off_flags=value;
                 }
         }
-        else
-        {
-                ch->pecho("Такого NPC в Мире нет.");
-        }
 }
 
 void chg_mob_imm( Character* ch, char* argument )
@@ -504,14 +507,8 @@ void chg_mob_imm( Character* ch, char* argument )
         int add_value;
         int sub_value;
 
-        if( ( victim = get_CHAR( ch, &argument ) ) )
+        if( ( victim = get_mob( ch, &argument ) ) )
         {
-                if ( !victim->is_npc() )
-                {
-                        ch->pecho("Это не для игроков!");
-                        return;
-                }
-
                 value = decode_flags( argument, &add_value, &sub_value );
 
                 if ( value == 0
@@ -525,10 +522,6 @@ void chg_mob_imm( Character* ch, char* argument )
                         victim->imm_flags.setValue(value);
                 }
         }
-        else
-        {
-                ch->pecho("Такого NPC в Мире нет.");
-        }
 }
 
 void chg_mob_res( Character* ch, char* argument )
@@ -538,14 +531,8 @@ void chg_mob_res( Character* ch, char* argument )
         int add_value;
         int sub_value;
 
-        if( ( victim = get_CHAR( ch, &argument ) ) )
+        if( ( victim = get_mob( ch, &argument ) ) )
         {
-                if ( !victim->is_npc() )
-                {
-                        ch->pecho("Это не для игроков!");
-                        return;
-                }
-
                 value = decode_flags( argument, &add_value, &sub_value );
 
                 if ( value == 0
@@ -559,10 +546,6 @@ void chg_mob_res( Character* ch, char* argument )
                         victim->res_flags.setValue(value);
                 }
         }
-        else
-        {
-                ch->pecho("Такого NPC в Мире нет.");
-        }
 }
 
 void chg_mob_vuln( Character* ch, char* argument )
@@ -572,14 +555,8 @@ void chg_mob_vuln( Character* ch, char* argument )
         int add_value;
         int sub_value;
 
-        if( ( victim = get_CHAR( ch, &argument ) ) )
+        if( ( victim = get_mob( ch, &argument ) ) )
         {
-                if ( !victim->is_npc() )
-                {
-                        ch->pecho("Это не для игроков!");
-                        return;
-                }
-
                 value = decode_flags( argument, &add_value, &sub_value );
 
                 if ( value == 0
@@ -592,10 +569,6 @@ void chg_mob_vuln( Character* ch, char* argument )
                 {
                         victim->vuln_flags.setValue(value);
                 }
-        }
-        else
-        {
-                ch->pecho("Такого NPC в Мире нет.");
         }
 }
 
@@ -634,12 +607,7 @@ void chg_mob_relig( Character* ch, char* argument ) {
   Character* victim;
   Religion *god;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-      if (victim->is_npc()) {
-          ch->pecho("Not for NPC!");
-          return;
-      }
-
+  if( ( victim = get_player( ch, &argument ) ) ) {
       if (!( god = religionManager->findUnstrict( argument ) )) {
           ch->pecho("Религия не найдена.");
           return;
@@ -676,11 +644,7 @@ void chg_mob_questp( Character* ch, char* argument ) {
   int value;
   int adv_value;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( victim->is_npc() ) {
-      ch->pecho("Данный параметр можно изменить только игрокам.");
-      return;
-    }
+  if( ( victim = get_player( ch, &argument ) ) ) {
     if( is_number( argument ) ) {
       value = atoi( argument );
 
@@ -712,12 +676,7 @@ void chg_mob_questt( Character* ch, char* argument ) {
   int value;
   int adv_value;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( victim->is_npc() ) {
-      ch->pecho("Данный параметр можно изменить только игрокам.");
-      return;
-    }
-    
+  if( ( victim = get_player( ch, &argument ) ) ) {
     XMLAttributeTimer::Pointer qd = victim->getPC( )->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );        
     if (!qd) {
         ch->pecho("Это сейчас невозможно.");
@@ -795,11 +754,7 @@ void chg_mob_level( Character* ch, char* argument ) {
   int value;
   int adv_value;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( !victim->is_npc() ) {
-      ch->pecho("Данный параметр можно изменить только мобам.\n\rИспользуйте advance <char> level.");
-      return;
-    }
+  if( ( victim = get_mob( ch, &argument ) ) ) {
     if( is_number( argument ) ) {
       value = atoi( argument );
 
@@ -830,12 +785,7 @@ void chg_mob_train( Character* ch, char* argument ) {
   int value;
   int adv_value;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-      if (victim->is_npc()) {
-          ch->pecho("Not for NPC!");
-          return;
-      }
-
+  if( ( victim = get_player( ch, &argument ) ) ) {
     if( is_number( argument ) ) {
       value = atoi( argument );
 
@@ -866,12 +816,7 @@ void chg_mob_practice( Character* ch, char* argument ) {
   int value;
   int adv_value;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-      if (victim->is_npc()) {
-          ch->pecho("Not for NPC!");
-          return;
-      }
-
+  if( ( victim = get_player( ch, &argument ) ) ) {
     if( is_number( argument ) ) {
       value = atoi( argument );
 
@@ -920,11 +865,7 @@ void chg_mob_help(Character *ch, char *argument)
 void chg_mob_killer( Character* ch, char* argument ) {
   Character* victim;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( victim->is_npc() ) {
-      ch->pecho("Это не игрок!");
-      return;
-    }
+  if( ( victim = get_player( ch, &argument ) ) ) {
     if( IS_KILLER( victim )) {
       REMOVE_KILLER( victim );
       ch->pecho("Флаг {RKILLER{x убран.");
@@ -938,11 +879,7 @@ void chg_mob_killer( Character* ch, char* argument ) {
 void chg_mob_violent( Character* ch, char* argument ) {
   Character* victim;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( victim->is_npc() ) {
-      ch->pecho("Это не игрок!");
-      return;
-    }
+  if( ( victim = get_player( ch, &argument ) ) ) {
     if( IS_VIOLENT( victim ) ) {
       REMOVE_VIOLENT( victim );
       ch->pecho("Флаг {BVIOLENT{x убран.");
@@ -956,11 +893,7 @@ void chg_mob_violent( Character* ch, char* argument ) {
 void chg_mob_slain( Character* ch, char* argument ) {
   Character* victim;
 
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( victim->is_npc() ) {
-      ch->pecho("Это не игрок!");
-      return;
-    }
+  if( ( victim = get_player( ch, &argument ) ) ) {
     if( IS_SLAIN( victim )) {
       REMOVE_SLAIN( victim );
       ch->pecho("Флаг {DSLAIN{x убран.");

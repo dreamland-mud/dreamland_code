@@ -85,6 +85,8 @@ bool        mprog_extract( Character *ch, bool count );
 #define FFIND_FOLLOWER    (C) // only find those who follow you
 #define FFIND_SAME_AREA   (D) // restrict world search to the same area you're in
 #define FFIND_DOPPEL      (E) // consider doppelganger when looking
+#define FFIND_MOB_ONLY    (F) // ignore players when searching
+#define FFIND_PLR_ONLY    (G) // ignore mobs when searching
 
 int                count_obj_list        ( obj_index_data *obj, Object *list );
 Character *        get_char_room        ( Character *ch, const DLString &, int flags = 0 );

@@ -139,6 +139,12 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
         if (IS_SET(flags, FFIND_FOLLOWER) && rch->leader != ch)
             continue;
 
+        if (IS_SET(flags, FFIND_MOB_ONLY) && !rch->is_npc())
+            continue;
+
+        if (IS_SET(flags, FFIND_PLR_ONLY) && rch->is_npc())
+            continue;
+
         if (ugly) {
             // All vampires react to vampiric keywords by default.
             if (IS_VAMPIRE(rch) || IS_MOB_VAMPIRE(rch))
@@ -207,6 +213,10 @@ Character *get_char_world( Character *ch, const char *cArgument, int flags )
                 if (id && dch->getID( ) != id)
                      continue;
                 if (!id && !char_has_name(dch, arg))
+                    continue;
+                if (IS_SET(flags, FFIND_MOB_ONLY) && !dch->is_npc())
+                    continue;
+                if (IS_SET(flags, FFIND_PLR_ONLY) && dch->is_npc())
                     continue;
 
                 if (++count >= number)
