@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ROOT=/home/travis/build/dreamland-mud
-RUNTIME=$ROOT/runtime
+# Set up shorter builddir path, to reduce log length.
+RUNTIME=/home/dreamland/runtime
 SRC=$TRAVIS_BUILD_DIR
 
 run_build() {
