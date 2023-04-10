@@ -687,7 +687,9 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
             return result;
         }
         
-        if (target.isSet( TAR_OBJ_EQUIP ) && target.isSet( TAR_OBJ_INV ))
+        if (target.isSet(TAR_OBJ_ROOM) && target.isSet(TAR_OBJ_INV|TAR_OBJ_EQUIP))
+            obj = get_obj_here(ch, carg);
+        if (!obj && !target.isSet(TAR_OBJ_ROOM) && target.isSet( TAR_OBJ_EQUIP ) && target.isSet( TAR_OBJ_INV ))
             obj = get_obj_wear_carry( ch, carg, 0 );
         if (!obj && target.isSet( TAR_OBJ_EQUIP ))
             obj = get_obj_wear( ch, carg );
@@ -704,7 +706,9 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
             return result;
         }
 
-        if (target.isSet( TAR_OBJ_INV|TAR_OBJ_EQUIP ))
+        if (target.isSet(TAR_OBJ_ROOM) && target.isSet(TAR_OBJ_INV|TAR_OBJ_EQUIP))
+            buf << "Увы, нигде рядом с тобой такого предмета нет.";
+        else if (target.isSet( TAR_OBJ_INV|TAR_OBJ_EQUIP ))
             buf << "Увы, в инвентаре или экипировке такого предмета найти не удается.";
         else if (target.isSet( TAR_OBJ_ROOM ))
             buf << "Увы, в этой местности такого предмета найти не удается.";
