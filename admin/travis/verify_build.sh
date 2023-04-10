@@ -10,7 +10,7 @@ run_build() {
     set && \
     mkdir -p $OBJS && \
     cd $OBJS && \
-    $SRC/configure --prefix=$RUNTIME --disable-dependency-tracking && \
+    ../dreamland_code/configure --prefix=$RUNTIME --disable-dependency-tracking && \
     find $ROOT && \
     make -j 2 && make install
 }
