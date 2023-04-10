@@ -7,6 +7,8 @@ run_build() {
 
     mkdir -p objs && \
     make -f Makefile.git && \
+    find /home/travis && \
+    set && \
     cd objs && \
     ../configure --prefix=$ROOT --disable-dependency-tracking && \
     cd src && \
