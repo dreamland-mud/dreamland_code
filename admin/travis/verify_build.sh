@@ -1,29 +1,23 @@
 #!/bin/bash
 
-ROOT=$TRAVIS_BUILD_DIR
+ROOT=/home/travis/build/dreamland-mud
+RUNTIME=$ROOT/runtime
+OBJS=$ROOT/objs
+SRC = $TRAVIS_BUILD_DIR
 
 run_build() {
-    ccache -s # display ccache usage stats
-
-    mkdir -p objs && \
     make -f Makefile.git && \
-    find /home/travis/build && \
-    ls -l /home/travis/build/dreamland-mud/dreamland_code/admin && \
     set && \
-    cd objs && \
-    ../configure --prefix=$ROOT --disable-dependency-tracking && \
-    cd src && \
-    time (make -j 2 && make install) && \
-    cd ../plug-ins && \
+    mkdir -p $OBJS && \
+    cd $OBJS && \
+    $SRC/configure --prefix=$RUNTIME --disable-dependency-tracking && \
     time (make -j 2 && make install)
-
-    ccache -s
 }
 
 run_smoke_test() {
-    cd $ROOT && \
+    cd $RUNTIME && \
     git clone https://github.com/dreamland-mud/dreamland_world.git share/DL && \
-    ./bin/dreamland admin/travis/dreamland.xml 
+    ./bin/dreamland $SRC/admin/travis/dreamland.xml 
 }
 
 travis_script() {
