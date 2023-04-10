@@ -80,6 +80,9 @@ struct Offering {
 protected:
     void estimateItem(Object *obj)
     {
+        if (IS_SET(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE))
+            return;
+
         if (is_name("book", obj->getName())) {
             bookNoItemType(obj);
             return;
@@ -346,9 +349,22 @@ protected:
 static void altar_clear(Object *altar)
 {
     Object *obj, *obj_next;
+    const char *fall = terrains[altar->in_room->getSectorType()].fall;
+
     for (obj = altar->contains; obj; obj = obj_next) {
         obj_next = obj->next_content;
-        rescue_nosac_items(obj, altar->in_room);
+
+        if (IS_SET(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE)) {
+            obj_from_obj(obj);
+            obj_to_room(obj, altar->in_room);
+            altar->in_room->echo(POS_RESTING, "%^O1 выпадает из %O2 %s.", obj, altar, fall);
+            continue;
+        }
+
+        if (rescue_nosac_items(obj, altar->in_room) != 0) {
+            altar->in_room->echo(POS_RESTING, "Содержимое %O2 падает %s.", obj, fall);
+        }
+
         extract_obj(obj); 
     }
 }
@@ -479,8 +495,7 @@ static bool can_sacrifice( Character *ch, Object *obj, bool needSpam )
         return false;
     }
 
-    if (!obj->can_wear(ITEM_TAKE) || obj->can_wear(ITEM_NO_SAC) ||
-        IS_SET(obj->extra_flags, ITEM_NOSAC)) {
+    if (!obj->can_wear(ITEM_TAKE) || IS_SET(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE)) {
         if (needSpam) 
             ch->pecho( "%1$^O1 не подлеж%1$nит|ат жертвоприношению.", obj );
         return false;
@@ -508,7 +523,7 @@ int rescue_nosac_items ( Object *container, Room *room )
         if (item->contains) 
             count += rescue_nosac_items(item, room);
 
-        if (item->can_wear(ITEM_NO_SAC) || IS_SET(item->extra_flags, ITEM_NOSAC)) {
+        if (IS_SET(item->extra_flags, ITEM_NOSAC|ITEM_NOPURGE)) {
             obj_from_obj(item);
             obj_to_room(item, room);        
             count++;

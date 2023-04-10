@@ -267,7 +267,7 @@ public:
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
             bitstring_t wear = pObj->wear_flags;
-            REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
+            REMOVE_BIT(wear, ITEM_TAKE);
             DLString wearloc;
             
             // Limit obj level by 100.
@@ -437,7 +437,7 @@ public:
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
             bitstring_t wear = pObj->wear_flags;
-            REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
+            REMOVE_BIT(wear, ITEM_TAKE);
             DLString wearloc;
             
             // Limit obj level by 100.
