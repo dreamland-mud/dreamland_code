@@ -7,7 +7,8 @@ run_build() {
 
     mkdir -p objs && \
     make -f Makefile.git && \
-    find /home/travis && \
+    find /home/travis/build && \
+    ls -l /home/travis/build/dreamland-mud/dreamland_code/admin && \
     set && \
     cd objs && \
     ../configure --prefix=$ROOT --disable-dependency-tracking && \
