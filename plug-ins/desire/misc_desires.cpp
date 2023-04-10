@@ -117,7 +117,7 @@ bool FullDesire::applicable( PCharacter *ch )
 bool FullDesire::canDrink( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-        ch->pecho( "Ты больше не можешь выпить ни капли." );
+        ch->pecho( "Твой желудок полон, ты больше не можешь выпить ни капли." );
         return false;
     }
 
@@ -127,7 +127,7 @@ bool FullDesire::canDrink( PCharacter *ch )
 bool FullDesire::canEat( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-        ch->pecho( "Ты больше не можешь съесть ни кусочка." );
+        ch->pecho( "Твой желудок полон, ты больше не можешь съесть ни кусочка." );
         return false;
     }
 
