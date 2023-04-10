@@ -6,11 +6,9 @@ SRC=$TRAVIS_BUILD_DIR
 
 run_build() {
     make -f Makefile.git && \
-    set && \
     mkdir -p $RUNTIME && \
     cd $RUNTIME && \
     $SRC/configure --prefix=$RUNTIME --disable-dependency-tracking && \
-    find $ROOT && \
     make -j 2 && make install
 }
 
@@ -24,7 +22,6 @@ travis_script() {
     run_build && run_smoke_test
 }
 
-set -e # stop on a non-zero exit code
 set -x # display expanded commands
 
 $1;
