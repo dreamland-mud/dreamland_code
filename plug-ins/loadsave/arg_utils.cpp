@@ -217,5 +217,5 @@ bool arg_is_clear( const DLString &arg )
 /** Remove surrounding quotes from an argument. */
 DLString arg_unquote(const DLString &arg)
 {
-    return DLString(arg).substitute('\'', ' ').stripWhiteSpace();
+    return DLString(arg).substitute('\'', ' ').substitute('\"', ' ').stripWhiteSpace();
 }

@@ -2261,7 +2261,7 @@ private:
     }
 
     void parseArgs(const char *argument) {
-        args = argument;
+        args = arg_unquote(argument);
         argRest = args;
         arg1 = argRest.getOneArgument();
 
@@ -2296,7 +2296,7 @@ private:
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
-    DLString origArgument = DLString(argument).stripWhiteSpace().substitute('\'', "");
+    DLString origArgument = arg_unquote(argument);
 
     if (!ch->getPC())
         return;
@@ -2360,8 +2360,7 @@ CMDRUNP( help )
         // Create a line with help ID, title and disambiguation keywords (unless turned off).
         DLString line = title;
         if (!disambig.empty()) {
-            if (!uses_screenreader(ch)
-                && !ch->getPC()->getAttributes().isAvailable("newhelp"))
+            if (!uses_screenreader(ch))
             {
                 line += " ({D" + disambig + "{x)"; 
             }
