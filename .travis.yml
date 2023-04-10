@@ -8,6 +8,7 @@ addons:
        - libfl-dev
        - libcrypto++-dev 
        - libjsoncpp-dev 
+       - libdb5.3 
        - libdb5.3-dev 
        - libdb5.3++ 
        - libdb5.3++-dev  
