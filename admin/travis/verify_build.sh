@@ -2,13 +2,12 @@
 
 ROOT=/home/travis/build/dreamland-mud
 RUNTIME=$ROOT/runtime
-OBJS=$ROOT/objs
 SRC=$TRAVIS_BUILD_DIR
 
 run_build() {
     make -f Makefile.git && \
     set && \
-    mkdir -p $OBJS && \
+    mkdir -p $RUNTIME && \
     cd $RUNTIME && \
     $SRC/configure --prefix=$RUNTIME --disable-dependency-tracking && \
     find $ROOT && \
