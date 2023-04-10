@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set up shorter builddir path, to reduce log length.
-RUNTIME=/home/dreamland/runtime
+RUNTIME=/home/travis/runtime
 SRC=$TRAVIS_BUILD_DIR
 
 run_build() {
