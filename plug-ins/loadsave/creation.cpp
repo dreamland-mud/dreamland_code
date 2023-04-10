@@ -69,7 +69,7 @@ void afprog_refresh(Character *ch, bool verbose)
             hasAffect |= ch->getNPC()->pIndexData->affects.isSet(sn);
         }
 
-        if (hasAffect) {
+        if (hasAffect && !ch->isAffected(sn)) {
             Skill *skill = skillManager->find(sn);
             AffectHandler::Pointer ah = skill->getAffect();
             if (ah)
@@ -191,9 +191,11 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
         mob->perm_stat[i] = BASE_STAT;
 
     /* OBSOLETE: let's get some spell action */
+    /*
     if (!IS_SET(flags, FCREATE_NOAFFECTS))
         create_mob_affects(mob);
-
+    */
+   
     mob->position = mob->start_pos;
 
     mob->setReligion(god_chronos);

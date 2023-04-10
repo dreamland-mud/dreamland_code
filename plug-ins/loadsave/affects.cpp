@@ -288,7 +288,11 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
         }
 }
 
-/* fix object affects when removing one */
+/**
+ * Fix character affects when removing one. Refresh bits from affects already existing
+ * on a character or provided by their equipment, in case an affect that was just 
+ * removed had stripped a bit or two.
+ */
 void affect_check(Character *ch, Affect *affect)
 {
     const FlagTable *table = affect->bitvector.getTable();
@@ -297,8 +301,10 @@ void affect_check(Character *ch, Affect *affect)
     if (!table && registry != wearlocationManager)
         return;
 
+    // Refresh bits from already existing affects, including race and proto affects.
     affectlist_reapply(ch->affected, ch, affect);
 
+    // Refresh bits from equipment.
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content) {
         if (!obj->wear_loc->givesAffects())
             continue;
@@ -308,15 +314,16 @@ void affect_check(Character *ch, Affect *affect)
         affectlist_reapply(obj->pIndexData->affected, ch, affect);
     }
 
-    if (table) {    
+    // Reset native race bits, except for the obsolete 'aff' field.
+    if (table && table != &affect_flags) {        
         const Flags &raceFlag = race_flag_by_table(ch->getRace().getElement(), table);
         Flags &charFlag = char_flag_by_table(ch, table);
         charFlag.setBit(raceFlag.getValue());
-
-        if (table == &affect_flags && affect->bitvector.isSet(AFF_FLYING))
-            if (!ch->affected_by.isSet(AFF_FLYING))
-                ch->posFlags.removeBit(POS_FLY_DOWN);
     }
+    // Reset fly position
+    if (table && table == &affect_flags && affect->bitvector.isSet(AFF_FLYING))
+        if (!ch->affected_by.isSet(AFF_FLYING))
+            ch->posFlags.removeBit(POS_FLY_DOWN);
 }
 
 /*

@@ -325,6 +325,7 @@ bool BasicMobileBehavior::isHomesick( )
         return false;
 
     // Prevent cursed mobs from recalling, but ignore 'native' curse set in mob index data.
+    // TODO: this check won't work anymore after race affects revamp
     if (ch->affected.findAllWithBits(&affect_flags, AFF_CURSE).size() > 0)
         return false;
 

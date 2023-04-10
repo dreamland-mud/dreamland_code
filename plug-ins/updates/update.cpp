@@ -126,6 +126,7 @@ GSN(spellbane);
 #define PULSE_AREA                  (110 * dreamland->getPulsePerSecond( )) /* 97 saniye */
 #define PULSE_TRACK                  ( 6 * dreamland->getPulsePerSecond( ))
 
+void afprog_refresh(Character *ch, bool verbose);
 
 // A set of update settings defined in config/update.json.
 Json::Value config;
@@ -365,7 +366,8 @@ void char_update( )
             }
         }
 
-        // Reset native sneak outside of battle.
+        // OBSOLETE: Reset native sneak outside of battle. 
+/*        
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
@@ -373,18 +375,21 @@ void char_update( )
             SET_BIT(ch->affected_by ,AFF_SNEAK);
             room_to_save( ch );
         }
+*/
 
-        // Reset native hide outside of battle.
+        // OBSOLETE: Reset native hide outside of battle.
+/*        
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
         {
             ch->pecho("Ты прячешься обратно в тень.");
             room_to_save( ch );
         }
-
-        // Reset race affect bits. 
+*/
+        // OBSOLETE: Reset race affect bits. TODO: onRefresh
+/*        
         SET_BIT(ch->affected_by, ch->getRace( )->getAff( ) );
-
+*/
         // Recover from 'stunned' state if HP is ok.
         if (ch->position == POS_STUNNED && !noupdate) {
             update_pos( ch );
@@ -445,6 +450,8 @@ void char_update( )
         {
             if (!noupdate) {
                 room_to_save( ch );
+                ch->pecho("Ты умираешь от неизлечимых ран.");
+                ch->recho("%^C1 умирает от неизлечимых ран.");
                 rawdamage( ch, ch, DAM_NONE, 1, false, "wounds" );
             }
         }
@@ -526,9 +533,13 @@ void water_float_update( )
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
 
-        if (oprog_spec( obj ))
-            continue;
-
+        try {
+            if (oprog_spec( obj ))
+                continue;
+        } catch (const VictimDeathException &) {
+            // DO NOTHING
+        }
+        
         if (!obj->in_room)
             continue;
         
@@ -882,6 +893,7 @@ void obj_update( void )
             break;
         case ITEM_FURNITURE:
         case ITEM_TATTOO:
+        case ITEM_CRAFT_TATTOO:
             message = "%1$^O1 исчеза%1$nет|ют.";
             break;
         case ITEM_CONTAINER:
@@ -1500,6 +1512,9 @@ void char_update_affects( Character *ch )
                 affect_remove( ch, paf );
             }
         }
+
+        // Re-apply missing race and proto affects.
+        afprog_refresh(ch, true);
     }
     catch (const VictimDeathException &) {
     }
