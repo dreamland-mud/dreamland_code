@@ -60,7 +60,7 @@ DLString DefaultDesire::showDots(PCharacter *ch) const
     int maxDots = 10;
     int current = ch->desires[getIndex( )];
     int progress = current * maxDots / maxValue;
-    progress = URANGE(1, progress, maxDots);
+    progress = URANGE(0, progress, maxDots);
 
     char color = progress <= 4 ? 'R' : progress <= 7 ? 'Y' : 'G';
     dots << "{" << color;
@@ -82,7 +82,7 @@ DLString DefaultDesire::showPercent(PCharacter *ch) const
     ostringstream buf;
     int current = ch->desires[getIndex( )];
     int progress = current * 100 / maxValue;
-    progress = URANGE(1, progress, 100);
+    progress = URANGE(0, progress, 100);
 
     char color = progress <= 40 ? 'R' : progress <= 70 ? 'Y' : 'G';
 
