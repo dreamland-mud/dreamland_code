@@ -12,6 +12,7 @@ addons:
        - libdb5.3-dev 
        - libdb5.3++ 
        - libdb5.3++-dev  
+       - db-util
        - g++-9
 
 env:
