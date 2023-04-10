@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# Set up shorter builddir path, to reduce log length.
-RUNTIME=/home/travis/runtime
+RUNTIME=$TRAVIS_BUILD_DIR/runtime
 SRC=$TRAVIS_BUILD_DIR
 
 run_build() {
     make -f Makefile.git && \
     mkdir -p $RUNTIME && \
     cd $RUNTIME && \
-    $SRC/configure --prefix=$RUNTIME --disable-dependency-tracking && \
+    ../configure --prefix=$RUNTIME --disable-dependency-tracking && \
     make -j 2 && make install
 }
 
