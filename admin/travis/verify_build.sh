@@ -11,7 +11,8 @@ run_build() {
     mkdir -p $OBJS && \
     cd $OBJS && \
     $SRC/configure --prefix=$RUNTIME --disable-dependency-tracking && \
-    time (make -j 2 && make install)
+    pwd && \
+    make -j 2 && make install
 }
 
 run_smoke_test() {
