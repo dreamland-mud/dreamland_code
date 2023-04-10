@@ -9,8 +9,8 @@ run_build() {
     make -f Makefile.git && \
     set && \
     mkdir -p $OBJS && \
-    cd $OBJS && \
-    ../dreamland_code/configure --prefix=$RUNTIME --disable-dependency-tracking && \
+    cd $RUNTIME && \
+    $SRC/configure --prefix=$RUNTIME --disable-dependency-tracking && \
     find $ROOT && \
     make -j 2 && make install
 }
