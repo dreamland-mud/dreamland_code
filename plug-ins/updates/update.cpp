@@ -445,6 +445,8 @@ void char_update( )
         {
             if (!noupdate) {
                 room_to_save( ch );
+                ch->pecho("Ты умираешь от неизлечимых ран.");
+                ch->recho("%^C1 умирает от неизлечимых ран.");
                 rawdamage( ch, ch, DAM_NONE, 1, false, "wounds" );
             }
         }
@@ -526,9 +528,13 @@ void water_float_update( )
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
 
-        if (oprog_spec( obj ))
-            continue;
-
+        try {
+            if (oprog_spec( obj ))
+                continue;
+        } catch (const VictimDeathException &) {
+            // DO NOTHING
+        }
+        
         if (!obj->in_room)
             continue;
         
@@ -882,6 +888,7 @@ void obj_update( void )
             break;
         case ITEM_FURNITURE:
         case ITEM_TATTOO:
+        case ITEM_CRAFT_TATTOO:
             message = "%1$^O1 исчеза%1$nет|ют.";
             break;
         case ITEM_CONTAINER:
