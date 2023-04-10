@@ -325,7 +325,7 @@ WEBMANIP_RUN(decorateItem)
 
     ItemManipList manips( item, descr );
     bitstring_t wear = item->wear_flags;
-    REMOVE_BIT(wear, ITEM_TAKE);
+    REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
 
     if (ch->is_immortal())  {
         manips.addLocal("stat", "obj $");

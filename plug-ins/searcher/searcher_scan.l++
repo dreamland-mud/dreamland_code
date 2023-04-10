@@ -219,7 +219,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     p.extra = extra_flags.names(pObj->extra_flags);
 
     bitstring_t wear = pObj->wear_flags;
-    REMOVE_BIT(wear, ITEM_TAKE);
+    REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
     p.wear = wear_flags.names(wear).replaces("wear_", "");
 
     p.itemtype = item_table.name(pObj->item_type);

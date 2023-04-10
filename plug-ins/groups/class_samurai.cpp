@@ -441,6 +441,7 @@ void SamuraiGuildmaster::doOwner( Character *victim, Object *katana )
     katana->behavior->setObj( katana );
     katana->setOwner( victim->getNameC() );
     SET_BIT(katana->extra_flags, ITEM_NOSAC|ITEM_NOPURGE);
+    SET_BIT(katana->wear_flags, ITEM_NO_SAC);
 
     say_act( victim, ch, "Катана стала твоей личной собственностью. " 
                          "Отныне никто не посмеет прикоснуться к ней." );
