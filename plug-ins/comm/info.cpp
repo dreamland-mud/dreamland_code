@@ -5,6 +5,7 @@
 #include "commonattributes.h"
 #include "commandtemplate.h"
 
+#include "stringlist.h"
 #include "pcharacter.h"
 
 #include "merc.h"
@@ -16,6 +17,31 @@
 #include "vnum.h"
 #include "mercdb.h"
 #include "def.h"
+
+static list<DLString> desc_to_list(const char *text)
+{
+    char buf[MAX_STRING_LENGTH];
+    list<DLString> result;
+
+    if (!text || !text[0])
+        return result;
+
+    istringstream is(text);
+    while (is.getline(buf, sizeof(buf)))
+        result.push_back(buf);
+
+    return result;
+}
+
+static DLString desc_from_list(list<DLString> &lines)
+{
+    ostringstream buf;
+
+    for (auto &l: lines)
+        buf << l << endl;
+
+    return buf.str();
+}
 
 static void desc_show( Character *ch )
 {
@@ -43,7 +69,6 @@ CMDRUNP( description )
 {
     DLString args = argument;
     DLString arg = args.getOneArgument();
-    char buf[MAX_STRING_LENGTH];
 
     if (arg_oneof( arg, "show", "показать" )) {
         desc_show( ch );
@@ -96,74 +121,52 @@ CMDRUNP( description )
         return;
     }
 
+    if (argument[0] == '-')
     {
-        buf[0] = '\0';
+        int len;
+        bool found = false;
 
-            if (argument[0] == '-')
-            {
-            int len;
-            bool found = false;
-            
-            if (!ch->getDescription( ) || !ch->getDescription( )[0])
-            {
-                ch->pecho("Нет ничего для удаления.");
-                return;
-            }
-        
-              strcpy(buf,ch->getDescription( ));
-
-            for (len = strlen(buf); len > 0; len--)
-            {
-                if (buf[len] == '\r')
-                {
-                    if (!found)  /* back it up */
-                    {
-                        if (len > 0)
-                            len--;
-                        found = true;
-                    }
-                    else /* found the second one */
-                    {
-                        buf[len + 1] = '\0';
-                        ch->setDescription( buf );
-
-                        if (ch->desc) {
-                            ch->pecho("Твое описание:");
-                            ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
-                        }
-                        return;
-                    }
-                }
-            }
-            buf[0] = '\0';
-            ch->setDescription( buf );
-            ch->pecho("Описание удалено.");
+        if (!ch->getDescription() || !ch->getDescription()[0])
+        {
+            ch->pecho("Нет ничего для удаления.");
             return;
         }
-        else if ( argument[0] == '+' )
-        {
-            if (ch->getDescription( ))
-                strcat( buf, ch->getDescription( ) );
+
+        list<DLString> lines = desc_to_list(ch->getDescription());
+        if (lines.empty()) {
+            ch->pecho("Нет ничего для удаления.");
+            return;
+        }
+
+        lines.pop_back();
+
+        ch->setDescription(desc_from_list(lines));
+        desc_show(ch);
+        return;
+    }
+
+    if (argument[0] == '+')
+    {
+        list<DLString> lines = desc_to_list(ch->getDescription());
+
+        argument++;
+        while (dl_isspace(*argument))
             argument++;
-            while ( dl_isspace(*argument) )
-                argument++;
-        } else {
-            desc_usage( ch );
-            return;
-        }
 
-        if ( strlen(buf) + strlen(argument) >= MAX_STRING_LENGTH - 2 )
-        {
+        lines.push_back(argument);
+
+        DLString text = desc_from_list(lines);
+        if (text.size() > MAX_STRING_LENGTH) {
             ch->pecho("Слишком длинное описание.");
             return;
         }
 
-        strcat( buf, argument );
-        strcat( buf, "\n\r" );
-        ch->setDescription( buf );
+        ch->setDescription(text);
+        desc_show(ch);
+        return;
     }
-   
-    desc_show( ch ); 
+
+    desc_usage(ch);
 }
 
 
