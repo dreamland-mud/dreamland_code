@@ -175,13 +175,13 @@ void Movement::callProgs( Character *wch )
     if (!wch)
         return;
     
-    rafprog_leave( from_room, wch );
-    rprog_leave( from_room, wch, to_room, movetypes[movetype].name );
+    try {
+        rafprog_leave( from_room, wch );
+        rprog_leave( from_room, wch, to_room, movetypes[movetype].name );
         
-    for (fch = to_room->people; fch!=0; fch = fch_next) {
-        fch_next = fch->next_in_room;
+        for (fch = to_room->people; fch!=0; fch = fch_next) {
+            fch_next = fch->next_in_room;
 
-        try {
             /* greet progs for items carried by people in room */
             for ( obj = fch->carrying; obj != 0; obj = obj->next_content )
                     oprog_greet( obj, wch );
@@ -189,14 +189,15 @@ void Movement::callProgs( Character *wch )
             /* greet programs for people */
             if (IS_AWAKE(fch))
                 mprog_greet( fch, wch );
-        } catch (const VictimDeathException &) {
-            // ignored
         }
-    }
 
-    /* entry programs for items */
-    for (obj = wch->carrying; obj; obj=obj->next_content)
+        /* entry programs for items */
+        for (obj = wch->carrying; obj; obj=obj->next_content)
             oprog_entry( obj );
+
+    } catch (const VictimDeathException &ex) {
+        // ignore
+    }
 }
 
 static void rprog_greet( Room *to_room, Character *ch, Room *from_room, const char *movetype )
@@ -240,18 +241,23 @@ void Movement::callProgsFinish( Character *wch )
     if (!wch)
         return;
 
-    mprog_leave( wch, from_room, to_room, movetypes[movetype].name );
+    try {
+        mprog_leave( wch, from_room, to_room, movetypes[movetype].name );
 
-    for (obj = to_room->contents; obj; obj = obj_next) {
-        obj_next = obj->next_content;
-        oprog_greet( obj, wch );
+        for (obj = to_room->contents; obj; obj = obj_next) {
+            obj_next = obj->next_content;
+            oprog_greet( obj, wch );
+        }
+
+        mprog_entry( wch );
+        rprog_greet( to_room, wch, from_room, movetypes[movetype].name );
+        rafprog_entry( to_room, wch );
+        afprog_entry( wch );
+        rprog_dive( wch, movetypes[movetype].danger );
+
+    } catch (const VictimDeathException &ex) {
+        // ignore
     }
-
-    mprog_entry( wch );
-    rprog_greet( to_room, wch, from_room, movetypes[movetype].name );
-    rafprog_entry( to_room, wch );
-    afprog_entry( wch );
-    rprog_dive( wch, movetypes[movetype].danger );
 }
 
 void Movement::msgSelfParty( Character *wch, const char *msgSelf, const char *msgParty )
