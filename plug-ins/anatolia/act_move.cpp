@@ -468,6 +468,7 @@ CMDRUNP(stand)
 CMDRUNP(rest)
 {
     Object *obj = 0;
+    Object *obj_current = ch->on;
     int furniture_flag = 0;
 
     if (ch->position == POS_FIGHTING)
@@ -572,7 +573,31 @@ CMDRUNP(rest)
         break;
 
     case POS_RESTING:
-        ch->pecho("Ты уже отдыхаешь.");
+        if (obj != 0 && obj != obj_current)
+        {
+            if (!oprog_msg_furniture(obj, ch, "msgSitRestRoom", "msgSitRestChar"))
+            {
+                if (IS_SET(furniture_flag, REST_AT))
+                {
+                    oldact("Ты пересаживаешься возле $o2 и отдыхаешь.", ch, obj, 0, TO_CHAR);
+                    oldact("$c1 пересаживается возле $o2 и отдыхает.", ch, obj, 0, TO_ROOM);
+                }
+                else if (IS_SET(furniture_flag, REST_ON))
+                {
+                    oldact("Ты пересаживаешься на $o4 и отдыхаешь.", ch, obj, 0, TO_CHAR);
+                    oldact("$c1 пересаживается на $o4 и отдыхает.", ch, obj, 0, TO_ROOM);
+                }
+                else
+                {
+                    oldact("Ты пересаживаешься отдыхать в $o4.", ch, obj, 0, TO_CHAR);
+                    oldact("$c1 пересаживается отдыхать в $o4.", ch, obj, 0, TO_ROOM);
+                }
+            }
+        }
+        else
+        {
+            ch->pecho("Ты уже отдыхаешь.");
+        }
         break;
 
     case POS_STANDING:
@@ -643,6 +668,7 @@ CMDRUNP(rest)
 CMDRUNP(sit)
 {
     Object *obj = 0;
+    Object *obj_current = ch->on;
     int furniture_flag = 0;
 
     if (ch->position == POS_FIGHTING)
@@ -772,7 +798,31 @@ CMDRUNP(sit)
         break;
 
     case POS_SITTING:
-        ch->pecho("Ты уже сидишь.");
+        if (obj != 0 && obj != obj_current)
+        {
+            if (!oprog_msg_furniture(obj, ch, "msgSitRoom", "msgSitChar"))
+            {
+                if (IS_SET(furniture_flag, SIT_AT))
+                {
+                    oldact("Ты пересаживаешься возле $o2.", ch, obj, 0, TO_CHAR);
+                    oldact("$c1 пересаживаешься возле $o2.", ch, obj, 0, TO_ROOM);
+                }
+                else if (IS_SET(furniture_flag, SIT_ON))
+                {
+                    oldact("Ты пересаживаешься на $o4.", ch, obj, 0, TO_CHAR);
+                    oldact("$c1 пересаживаешься на $o4.", ch, obj, 0, TO_ROOM);
+                }
+                else
+                {
+                    oldact("Ты пересаживаешься в $o4.", ch, obj, 0, TO_CHAR);
+                    oldact("$c1 пересаживаешься в $o4.", ch, obj, 0, TO_ROOM);
+                }
+            }
+        }
+        else
+        {
+            ch->pecho("Ты уже сидишь.");
+        }
         break;
 
     case POS_STANDING:
