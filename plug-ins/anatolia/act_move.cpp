@@ -805,17 +805,17 @@ CMDRUNP(sit)
                 if (IS_SET(furniture_flag, SIT_AT))
                 {
                     oldact("Ты пересаживаешься возле $o2.", ch, obj, 0, TO_CHAR);
-                    oldact("$c1 пересаживаешься возле $o2.", ch, obj, 0, TO_ROOM);
+                    oldact("$c1 пересаживается возле $o2.", ch, obj, 0, TO_ROOM);
                 }
                 else if (IS_SET(furniture_flag, SIT_ON))
                 {
                     oldact("Ты пересаживаешься на $o4.", ch, obj, 0, TO_CHAR);
-                    oldact("$c1 пересаживаешься на $o4.", ch, obj, 0, TO_ROOM);
+                    oldact("$c1 пересаживается на $o4.", ch, obj, 0, TO_ROOM);
                 }
                 else
                 {
                     oldact("Ты пересаживаешься в $o4.", ch, obj, 0, TO_CHAR);
-                    oldact("$c1 пересаживаешься в $o4.", ch, obj, 0, TO_ROOM);
+                    oldact("$c1 пересаживается в $o4.", ch, obj, 0, TO_ROOM);
                 }
             }
         }
