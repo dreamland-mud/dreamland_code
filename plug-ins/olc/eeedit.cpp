@@ -237,32 +237,32 @@ EEEDIT(name)
 
 EEEDIT(shortleave)
 {
-    return editor(argument, short_desc_from);      
+    return editor(argument, short_desc_from, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(shortentry)
 {
-    return editor(argument, short_desc_to);      
+    return editor(argument, short_desc_to, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(leaveroom)
 {
-    return editor(argument, msgLeaveRoom);      
+    return editor(argument, msgLeaveRoom, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(leaveself)
 {
-    return editor(argument, msgLeaveSelf);      
+    return editor(argument, msgLeaveSelf, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(entryroom)
 {
-    return editor(argument, msgEntryRoom);      
+    return editor(argument, msgEntryRoom, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(entryself)
 {
-    return editor(argument, msgEntrySelf);      
+    return editor(argument, msgEntrySelf, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
 }
 
 EEEDIT(genderleave)
