@@ -28,14 +28,10 @@ script:
   - bash $TRAVIS_BUILD_DIR/admin/travis/verify_build.sh travis_script
 
 after_success:
-  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh success $WEBHOOK_URL
+  - "[[ $TRAVIS_TEST_RESULT = 0 ]] && echo wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x send.sh && ./send.sh success $WEBHOOK_URL"
 
 after_failure:
-  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh failure $WEBHOOK_URL
+  - "[[ $TRAVIS_TEST_RESULT = 1 ]] && echo wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x send.sh && ./send.sh failure $WEBHOOK_URL"
 
 notifications:
   email:
