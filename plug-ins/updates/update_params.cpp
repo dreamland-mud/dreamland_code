@@ -310,9 +310,12 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
     if ( IS_AFFECTED(ch, AFF_PLAGUE) )
         gain /= 8;
 
-    if ( IS_AFFECTED(ch,AFF_HASTE) || IS_AFFECTED(ch,AFF_SLOW) )
+    if (IS_AFFECTED(ch,AFF_HASTE)) 
         gain /=2 ;
 
+    if (IS_AFFECTED(ch, AFF_SLOW))
+        gain *= 2;
+    
     if ( ch->getCurrStat(STAT_DEX) > 20 )
         gain *= (14 /10);
 
