@@ -99,24 +99,30 @@ void CMlt::doShowSelf( PCharacter *ch )
     std::basic_ostringstream<char> str;
 
     XMLAttributeStatistic::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" );
-    int victories = attr ? attr->getAllVictoriesCount( ) : 0;
-    int vasted = attr ? attr->getVasted( ) : 0;
+    int victoriesTotal = attr ? attr->getAllVictoriesCount() : 0;
+    int victoriesBonus = attr ? attr->getBonusVictoriesCount() : 0;
+    int wasted = attr ? attr->getWasted( ) : 0;
     
-    if (victories > 0) {
-        str << fmt( ch, 
-                    "Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов",
-                    ch, victories );
-        
-        if (vasted)
-            str << ", обменяв {W" << vasted << "{x из этих побед на плюшки";
-        else if (victories >= VictoryPrice::COUNT_PER_LIFE)  
-            str << ", пока не обменяв ни одну победу на плюшки";
+    if (victoriesTotal > 0) {
+        str << fmt(ch, "Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов, ", ch, victoriesTotal);
 
-        str << "." << endl;
+        if (victoriesTotal == victoriesBonus)
+            str << "{Wвсе{x из которых дают право на бонусы." << endl;
+        else if (victoriesBonus > 0)
+            str << "{W" << victoriesBonus << "{x из которых " << (victoriesBonus > 1 ? "дают" : "дает") << " право на бонусы." << endl;
+        else
+            str << "ни один из которых не дает право на бонусы." << endl;
+
+        if (victoriesBonus > 0) {
+            if (wasted == 0)
+                str << fmt(ch, "Ты пока не обменя%1$Gло|л|ла ни одну победу на плюшки.", ch) << endl;
+            else
+                str << fmt(ch, "Ты обменя%1$Gло|л|ла {W%2$d{x побед%2$Iу|ы| на плюшки.", ch, wasted) << endl;
+        }
+
+    } else {
+        str << fmt(ch, "Ты пока не выполни%1$Gло|л|ла ни одного персонального квеста.", ch) << endl;
     }
-    else
-        str << fmt( ch, "Ты пока не выполни%1$Gло|л|ла ни одного персонального квеста.", ch )
-            << endl;
     
     Remorts &r = ch->getRemorts( );
     int r_cnt = r.size( ), b_cnt = r.countBonusLifes( );
@@ -157,9 +163,9 @@ void CMlt::doShowSelf( PCharacter *ch )
     else
         str << "Ты живешь первую жизнь." << endl;
     
-    if (r_cnt > 0 || vasted > 0) {
+    if (r_cnt > 0 || wasted > 0) {
         str << endl
-            << fmt( ch, "Ты выкупи%1$Gло|л|ла {W%2$d{x owner купо%2$Iн|на|нов и выбра%1$Gло|л|ла в качестве бонусов:", 
+            << fmt( ch, "Ты выкупи%1$Gло|л|ла {W%2$d{x купо%2$Iн|на|нов владельца и выбра%1$Gло|л|ла в качестве бонусов:", 
                         ch, r.owners.getValue( ) ) 
             << endl;
 

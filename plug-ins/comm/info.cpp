@@ -123,9 +123,6 @@ CMDRUNP( description )
 
     if (argument[0] == '-')
     {
-        int len;
-        bool found = false;
-
         if (!ch->getDescription() || !ch->getDescription()[0])
         {
             ch->pecho("Нет ничего для удаления.");

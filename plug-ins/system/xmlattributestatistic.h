@@ -36,19 +36,31 @@ public:
         virtual bool handle( const RemortArguments & ); 
 
         void rememberVictory( const DLString& );
+        void rememberPenalty(const DLString &);
         int getVictories( const DLString& ) const;
         const Victories & getVictories( ) const;
         void setVictories( const DLString&, int );
-        int getAllVictoriesCount( ) const;
-        int getVasted( ) const;
-        void setVasted( int );
+        // Get total victories without penalties.
+        int getAllVictoriesCount() const;
+        // Get only victories that can give a bonus, i.e. don't have a penalty associated with them.
+        int getBonusVictoriesCount() const;
+        int getWasted( ) const;
+        void setWasted( int );
     
         void gather( PCMemoryInterface *, Statistic & ) const;
         static Statistic gatherAll( const DLString& );
 
 protected:
+        // Record quest name / victory count pairs.
         XML_VARIABLE Victories victories;
+
+        // Mark victories that cannot affect total victories count, e.g. personal quests gained while in a nopk clan.
+        XML_VARIABLE Victories penalties;
+        
+        // Hide this player from 'q stat', 'gq stat'.
         XML_VARIABLE XMLBoolean shy;
+        
+        // How many of those victory bonuses are already used up (yes, spelling - but can't change as it's part of player profiles now).
         XML_VARIABLE XMLIntegerNoEmpty vasted;
 };
 

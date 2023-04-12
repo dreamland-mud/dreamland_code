@@ -37,6 +37,7 @@
 
 RELIG(fili);
 BONUS(experience);
+CLAN(flowers);
 
 /*--------------------------------------------------------------------------
  * Questor
@@ -120,6 +121,8 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     qdata = attributes->getAttr<XMLAttributeQuestData>( "questdata" );
     qdata->setTime( time );
     qdata->rememberVictory( quest->getName( ) );
+    if (client->getClan() == clan_flowers)
+        qdata->rememberPenalty(quest->getName());
     qdata->rememberLastQuest(quest->getName());
     
     attributes->eraseAttribute( "quest" );

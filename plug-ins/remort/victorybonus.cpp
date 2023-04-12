@@ -113,11 +113,13 @@ bool VictoryPrice::canAfford( Character *ch ) const
     if (!attr)
         return false;
 
-    avail = min( (int)(Remorts::MAX_BONUS_LIFES
-                           - ch->getPC( )->getRemorts( ).size( )) * COUNT_PER_LIFE,
-                 attr->getAllVictoriesCount( ) );
+    int bonusLifes = ch->getPC()->getRemorts().countBonusLifes();
+    int bonusLifesLeft = Remorts::MAX_BONUS_LIFES - bonusLifes;
+    int questVictories = attr->getBonusVictoriesCount();
+    // Ensure that bonuses from victories plus bonuses from remorts never exceed MAX_BONUS_LIFES.
+    avail = min(bonusLifesLeft * COUNT_PER_LIFE, questVictories);
 
-    return avail - attr->getVasted( ) >= count.getValue( );
+    return avail - attr->getWasted( ) >= count.getValue( );
 }
 
 void VictoryPrice::deduct( Character *ch ) const
@@ -126,7 +128,7 @@ void VictoryPrice::deduct( Character *ch ) const
         XMLAttributeStatistic::Pointer attr;
         
         attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeStatistic>( "questdata" );
-        attr->setVasted( attr->getVasted( ) + count.getValue( ) );
+        attr->setWasted( attr->getWasted( ) + count.getValue( ) );
     }
 }
 

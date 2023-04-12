@@ -23,6 +23,11 @@ void XMLAttributeStatistic::rememberVictory( const DLString &id )
     victories[id]++;
 }
 
+void XMLAttributeStatistic::rememberPenalty( const DLString &id )
+{
+    penalties[id]++;
+}
+
 int XMLAttributeStatistic::getVictories( const DLString &id ) const
 {
     Victories::const_iterator i = victories.find( id );
@@ -44,14 +49,32 @@ void XMLAttributeStatistic::setVictories( const DLString &id, int count )
     victories[id] = count;
 }
 
-int XMLAttributeStatistic::getVasted( ) const 
+int XMLAttributeStatistic::getWasted( ) const 
 {
     return vasted.getValue( );
 }
 
-void XMLAttributeStatistic::setVasted( int value ) 
+void XMLAttributeStatistic::setWasted( int value ) 
 {
     vasted.setValue( value );
+}
+
+int XMLAttributeStatistic::getBonusVictoriesCount( ) const 
+{   
+    Victories::const_iterator i;
+    int cnt = 0;
+
+    for (i = victories.begin( ); i != victories.end( ); i++) {
+        const DLString &victoryType = i->first;
+        int victoryCount = i->second.getValue();
+
+        auto p = penalties.find(victoryType);
+        int victoryPenalty = p == penalties.end() ? 0 : p->second.getValue();
+        
+        cnt += victoryCount - victoryPenalty;
+    }
+
+    return cnt;
 }
 
 int XMLAttributeStatistic::getAllVictoriesCount( ) const 
@@ -59,8 +82,10 @@ int XMLAttributeStatistic::getAllVictoriesCount( ) const
     Victories::const_iterator i;
     int cnt = 0;
 
-    for (i = victories.begin( ); i != victories.end( ); i++)
-        cnt += i->second.getValue( );
+    for (i = victories.begin( ); i != victories.end( ); i++) {
+        int victoryCount = i->second.getValue();
+        cnt += victoryCount;
+    }
 
     return cnt;
 }

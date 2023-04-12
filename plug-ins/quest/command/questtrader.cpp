@@ -446,8 +446,8 @@ int OwnerPrice::getValue( PCharacter *ch ) const
 {
     int my_victories, my_lifes, total;
     
-    my_victories = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getAllVictoriesCount( );
-    my_lifes = ch->getPC( )->getRemorts( ).size( );
+    my_victories = ch->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getBonusVictoriesCount();
+    my_lifes = ch->getRemorts( ).countBonusLifes();
     total = my_victories / victories + my_lifes / lifes;
     
     return total / 2;
