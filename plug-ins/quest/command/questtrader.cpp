@@ -561,10 +561,10 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
     obj->fmtShortDescr( obj->getShortDescr( ), leader );
 
     obj_to_char( obj, client );
-    equip_char( client, obj, wear_tattoo );
-    
     oldact("$C1 наносит тебе $o4!", client, obj, tattoer, TO_CHAR );
     oldact("$C1 наносит $c3 $o4!", client, obj, tattoer, TO_ROOM );
+
+    equip_char( client, obj, wear_tattoo );    
 }
 
 bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) const 
