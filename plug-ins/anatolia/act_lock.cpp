@@ -572,7 +572,7 @@ CMDRUNP( lock )
             } else {
                 if (IS_SET(obj->value1(), CONT_CLOSED)) {
                     ch->pecho("Ты запираешь %O4 на ключ.", obj);
-                    ch->recho("%^C1 запираешь %O4 на ключ.", ch, obj);
+                    ch->recho("%^C1 запирает %O4 на ключ.", ch, obj);
                 } else {
                     ch->pecho("Ты закрываешь %O4 и запираешь на ключ.", obj);
                     ch->recho("%^C1 закрывает %O4 и запирает на ключ.", ch, obj);
@@ -791,7 +791,7 @@ CMDRUNP( unlock )
                     ch->recho("%1$^C1 отпирает %2$O4 %3$O5 и открывает %2$P2.", ch, obj, key);
                 } else {
                     ch->pecho("Ты отпираешь ключом %1$O4 и открываешь %1$P2.", obj);
-                    ch->recho("%1$^C1 отпирает ключом %2$O4 и открывает %1$P2.", ch, obj);
+                    ch->recho("%1$^C1 отпирает ключом %2$O4 и открывает %2$P2.", ch, obj);
                 }
 
                 obj->value1(obj->value1() & ~CONT_LOCKED);
