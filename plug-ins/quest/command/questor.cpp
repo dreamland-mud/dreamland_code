@@ -124,6 +124,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     
     attributes->eraseAttribute( "quest" );
     PCharacterManager::save( client );
+	tell_fmt( "Через {Y%3$d{G мину%3$Iту|ты|т ты сможешь получить новое задание.", client, ch, time );
 }
 
 void Questor::giveReward(PCharacter *client, Quest::Pointer &quest, QuestReward::Pointer &r)
@@ -184,6 +185,7 @@ void Questor::giveReward(PCharacter *client, Quest::Pointer &quest, QuestReward:
    
     if (chance( r->scrollChance ))
         rewardScroll( client );
+	tell_fmt("Теперь у тебя {Y%3$d{G квестов%3$Iая|ые|ых едини%3$Iца|цы|ц.", client, ch, client->getQuestPoints());
 }
 
 void Questor::doCancel( PCharacter *client )  
@@ -226,6 +228,7 @@ void Questor::doCancel( PCharacter *client )
     PCharacterManager::save( client );
 
     tell_raw( client, ch,  "Ты теряешь {Y3{G квестовые единицы.");
+	tell_fmt("Теперь у тебя {Y%3$d{G квестов%3$Iая|ые|ых едини%3$Iца|цы|ц.", client, ch, client->getQuestPoints());
     tell_fmt( "Через {Y%3$d{G мину%3$Iту|ты|т ты сможешь получить новое задание.",
               client, ch, time );
 }
