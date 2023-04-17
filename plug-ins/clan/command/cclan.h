@@ -69,6 +69,7 @@ private:
         
         void clanDiplomacy( PCharacter *pc, DLString& argument );
         void clanDiplomacyShow( PCharacter *pc );
+        void clanDiplomacyForBlindShow( PCharacter *pc );
         void clanDiplomacyProp( PCharacter *pc );
         void clanDiplomacySet( PCharacter *pc, DLString& argument );
         void clanDiplomacyList( PCharacter *pc );
