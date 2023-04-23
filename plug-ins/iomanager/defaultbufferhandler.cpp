@@ -247,9 +247,23 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
     */
     size = length;
     if(to && !d->noTelnet() && !d->noIAC())
-        for(i = 0; i < length; i++)
+        for(i = 0; i < length; i++) {
             if(to[(unsigned char)txt[i]] == IAC)
                 size++;
+
+            if( to == koi8_tran ) {
+                switch( txt[i] ) {
+                case 'я': case 'Я': case 'ю': case 'Ю': 
+                case 'ч': case 'Ч': case 'ж': case 'Ж': 
+                case 'ш': case 'Ш': 
+                    size++; 
+                    break;
+                case 'щ': case 'Щ': 
+                    size+=2; 
+                    break;
+                }
+            }                
+        }
 
     /*
     * Initial \n\r if needed.
