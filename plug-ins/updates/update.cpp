@@ -446,7 +446,7 @@ void char_update( )
             if (!noupdate) {
                 room_to_save( ch );
                 ch->pecho("Ты умираешь от неизлечимых ран.");
-                ch->recho("%^C1 умирает от неизлечимых ран.");
+                ch->recho("%^C1 умирает от неизлечимых ран.", ch);
                 rawdamage( ch, ch, DAM_NONE, 1, false, "wounds" );
             }
         }
