@@ -26,6 +26,7 @@
 #include "messengers.h"
 #include "act.h"
 #include "mercdb.h"
+#include "screenreader.h"
 
 #include "clantypes.h"
 #include "clantitles.h"
@@ -58,18 +59,20 @@ struct clan_diplomacy_names {
   const char *abbr;
   const char *color;
   const char *long_name;
+  const char *state_name;
+  const char *state_ruscase;
 };
 
 struct clan_diplomacy_names clan_diplomacy_names_table[] =
 {
-  {"alliance",            "аль.", "{W",    "альянс"            },
-  {"peace",            "мир ", "{G",    "мир"            },
-  {"truce",            "пер.", "{Y",    "перемирие"    },
-  {"distrust",            "нед.", "{B",    "недоверие"    },
-  {"aggression",            "агр.", "{r",    "агрессия"            },
-  {"war",            "вой.", "{R",    "война"            },
-  {"subordination", "под.", "{Y",    "подчинение"   },
-  {"oppression",            "угн.", "{Y",    "угнетение"    },
+  {"alliance",      "аль.", "{W", "альянс",     "В альянсе с",   "5" },
+  {"peace",         "мир ", "{G", "мир",        "В мире с",      "5" },
+  {"truce",         "пер.", "{Y", "перемирие",  "В перемирии с", "5" },
+  {"distrust",      "нед.", "{B", "недоверие",  "Не доверяет",   "3" },
+  {"aggression",    "агр.", "{r", "агрессия",   "В агрессии с",  "5" },
+  {"war",           "вой.", "{R", "война",      "Враждует с",    "5" },
+  {"subordination", "под.", "{Y", "подчинение", "Подчиняется",   "3" },
+  {"oppression",    "угн.", "{Y", "угнетение",  "Угнетает",      "4" },
 };
 
 const int clan_diplomacy_max = 5;
@@ -1417,6 +1420,11 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
     ClanData *data;
     ClanManager *cm = ClanManager::getThis( );
 
+    if (uses_screenreader(pc)) {
+        clanDiplomacyForBlindShow(pc);
+        return;
+    }
+
     pc->pecho("Клановая дипломатия :");
     buf << "********** ";
     
@@ -1469,6 +1477,74 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
     buf << endl;
     pc->send_to( buf );
 }            
+
+/*
+ * clan diplomacy for the blind
+ */
+void CClan::clanDiplomacyForBlindShow( PCharacter *pc )
+{
+    ostringstream buf;
+    Clan *clan;
+    ClanData *data;
+    ClanManager *cm = ClanManager::getThis( );
+
+    pc->pecho("Клановая дипломатия :");
+    buf << "********** " << endl;
+
+    for (int i = 0; i < cm->size( ); i++) {
+        clan = cm->find( i );
+        data = clan->getData( );
+
+        if (clan->getData( ) && clan->hasDiplomacy( )) {
+            buf << clan->getRussianName( ).ruscase('1').c_str() << " : ";
+        } else {
+            continue;
+        }
+
+        for (int j = clan_diplomacy_max; j >= 0; j--) {
+            int itemCount = 0;
+
+            for (int k = 0; k < cm->size( ); k++) {
+                if (i == k)
+                    continue;
+
+                Clan *c = cm->find( k );
+
+                if (c->getData( ) && c->hasDiplomacy( ) && j == data->getDiplomacy( c )) {
+                    itemCount++;
+                }
+
+            }
+            if (itemCount > 0) {
+                 buf << clan_diplomacy_names_table[j].color
+                     << clan_diplomacy_names_table[j].state_name << "{x ";
+                char rusCase = *clan_diplomacy_names_table[j].state_ruscase;
+                for (int k = 0; k < cm->size( ); k++) {
+                    if (i == k)
+                        continue;
+
+                    Clan *c = cm->find( k );
+
+                    if (c->getData( ) && c->hasDiplomacy( ) && j == data->getDiplomacy( c )) {
+                        itemCount--;
+                        buf << c->getRussianName( ).ruscase( rusCase ).c_str();
+                        if (itemCount > 1) {
+                            buf << ", ";
+                        } else if (itemCount == 1) {
+                            buf << " и ";
+                        } else {
+                            buf << ". ";
+                        }
+                    }
+                }
+            }
+
+        }
+        buf << endl;
+
+    }
+    pc->send_to( buf );
+}
 
 /* 
  * clan diplomacy prop
