@@ -10,7 +10,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/output \
--I$(top_srcdir)/plug-ins/ban \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/communication \
@@ -30,7 +29,6 @@ libadmin_la_LIBADD = \
 ../iomanager/libiomanager.la \
 ../system/libsystem.la \
 ../anatolia/core/libanatoliacore.la \
-../ban/libban.la \
 ../communication/libcommunication.la \
 $(WSOCK)
 

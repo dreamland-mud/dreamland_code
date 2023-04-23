@@ -9,8 +9,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
--I$(top_srcdir)/plug-ins/alignment \
--I$(top_srcdir)/plug-ins/ban
+-I$(top_srcdir)/plug-ins/alignment
 
 libiomanager_la_SOURCES = \
 iomanager.cpp \
@@ -34,6 +33,8 @@ base64.cpp \
 rpccommandmanager.cpp \
 webmanip.cpp \
 lasthost.cpp \
+banflags.cpp \
+ban.cpp \
 impl.cpp
 
 libiomanager_la_MOC = \
@@ -47,7 +48,8 @@ serversocket.h \
 serversocketcontainer.h \
 backdoorhandler.h \
 lasthost.h \
-badnames.h
+badnames.h \
+ban.h
 
 if WITH_MINGW
 WSOCK = -lwsock32
@@ -61,11 +63,15 @@ libiomanager_la_LIBADD = \
 ../output/liboutput.la \
 ../interpret/libinterpret.la \
 ../alignment/libalignment.la \
-../ban/libban.la \
 -lcrypto \
 $(WSOCK) \
 -ljsoncpp
 
+banflags.h: banflags.conf
+banflags.cpp: banflags.conf banflags.h
+libiomanager_la_moc_xml.cpp: banflags.h
+
+CLEANFILES = banflags.cpp $(top_builddir)/src/banflags.h 
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 AM_CPPFLAGS += $(plugin_INCLUDES)

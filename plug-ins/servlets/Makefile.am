@@ -5,7 +5,6 @@ plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/command  \
--I$(top_srcdir)/plug-ins/ban \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
@@ -16,7 +15,6 @@ libservlets_la_LIBADD = \
 ../interpret/libinterpret.la \
 ../descriptor/libdescriptor.la \
 ../output/liboutput.la \
-../ban/libban.la \
 ../command/libcommand.la \
 -ljsoncpp
 

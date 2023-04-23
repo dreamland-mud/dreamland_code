@@ -30,7 +30,9 @@ eating.cpp \
 communication.cpp \
 info.cpp \
 senses.cpp \
-affects.cpp
+affects.cpp \
+groupchannel.cpp \
+following.cpp 
 
 libcomm_la_MOC = \
 banking.h \
@@ -39,6 +41,7 @@ corder.h \
 run.h \
 whois.h \
 writing.h \
+groupchannel.h \
 eating.h
 
 include $(top_srcdir)/src/Makefile.inc

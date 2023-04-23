@@ -16,6 +16,7 @@
 #include "wrongcommand.h"
 #include "commandtemplate.h"
 
+#include "groupchannel.h"
 #include "banking.h"
 #include "corder.h"
 #include "configs.h"
@@ -49,6 +50,7 @@ extern "C"
                 
                 Plugin::registerPlugin<CEat>( ppl );
 
+        	Plugin::registerPlugin<GroupChannel>( ppl );
                 return ppl;
         }
 }

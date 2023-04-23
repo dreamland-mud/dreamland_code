@@ -10,7 +10,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/occupations \
--I$(top_srcdir)/plug-ins/follow/core \
 -I$(top_srcdir)/plug-ins/interpret \
 -I/usr/include/jsoncpp
 
@@ -33,6 +32,7 @@ weaponrandomizer.cpp \
 material.cpp \
 fight_safe.cpp \
 immunity.cpp \
+follow_utils.cpp \
 skill_utils.cpp 
 
 libfight_core_la_LIBADD = \
@@ -40,7 +40,6 @@ libfight_core_la_LIBADD = \
 ../descriptor/libdescriptor.la \
 ../iomanager/libiomanager.la \
 ../loadsave/libloadsave.la \
-../follow/core/libfollow_core.la \
 ../system/libsystem.la \
 ../alignment/libalignment.la \
 ../occupations/liboccupations.la \

@@ -12,7 +12,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/fight_core \
--I$(top_srcdir)/plug-ins/follow/core \
 -I$(top_srcdir)/plug-ins/movement 
 
 libtraverse_la_LIBADD = \
@@ -26,8 +25,7 @@ libtraverse_la_LIBADD = \
 ../anatolia/core/libanatoliacore.la \
 ../anatolia/libanatolia.la \
 ../movement/libmovement.la \
-../fight_core/libfight_core.la \
-../follow/core/libfollow_core.la
+../fight_core/libfight_core.la 
 
 libtraverse_la_SOURCES = \
 roomtraverse.cpp \

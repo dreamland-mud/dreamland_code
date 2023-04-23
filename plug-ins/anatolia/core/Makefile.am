@@ -7,7 +7,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/fight_core \
--I$(top_srcdir)/plug-ins/follow/core \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/loadsave 
 
@@ -24,8 +23,7 @@ libanatoliacore_la_LIBADD = \
 ../../interpret/libinterpret.la \
 ../../system/libscheduler_task_round.la \
 ../../iomanager/libiomanager.la \
-../../fight_core/libfight_core.la \
-../../follow/core/libfollow_core.la
+../../fight_core/libfight_core.la
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 AM_CPPFLAGS += $(plugin_INCLUDES)

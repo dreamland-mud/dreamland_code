@@ -226,9 +226,9 @@ void KidnapBandit::princeAttach( )
     behavior->state = STAT_KIDNAPPED;
 
     if (prince->master)
-        prince->stop_follower( );
+        follower_stop(prince);
 
-    prince->add_follower( ch );
+    follower_add( prince, ch );
 
     state = BSTAT_KIDNAP;
     
@@ -247,7 +247,7 @@ void KidnapBandit::princeDetach( )
     behavior->state = STAT_LOST;
 
     if (prince->master)
-        prince->stop_follower( );
+        follower_stop(prince);
 }
 
 /*

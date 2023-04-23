@@ -30,6 +30,7 @@
 #include "mercdb.h"
 #include "merc.h"
 #include "vnum.h"
+#include "follow_utils.h"
 #include "fight_safe.h"
 #include "fight_position.h"
 #include "fight_exception.h"
@@ -267,10 +268,10 @@ void Damage::adjustFollowers( )
         return;
 
     if (victim->master == ch)
-        victim->stop_follower( );
+        follower_stop(victim);
 
     if (ch->master == victim)
-        ch->stop_follower( );
+        follower_stop(ch);
 
     if (victim->mount == ch) 
         victim->dismount( );

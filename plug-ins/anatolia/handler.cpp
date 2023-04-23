@@ -338,7 +338,7 @@ void nuke_pets( PCharacter *ch, int flags )
     if (!pet)
         return;
 
-    pet->stop_follower( );
+    follower_stop(pet);
    
     
     
@@ -419,7 +419,7 @@ void extract_char( Character *ch, bool count )
     if (!npc)
         nuke_pets( pc, flags );
         
-    ch->die_follower( );
+    follower_die(ch);
 
     stop_fighting( ch, true );
 

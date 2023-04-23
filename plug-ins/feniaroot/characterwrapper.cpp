@@ -1687,7 +1687,7 @@ NMI_INVOKE( CharacterWrapper, extract, "(bool): уничтожить полно�
 NMI_INVOKE( CharacterWrapper, add_follower, "(master): делает нас последователем master-а" )
 {
     checkTarget( );
-    target->add_follower( arg2character( get_unique_arg( args ) ) );
+    follower_add(target, arg2character( get_unique_arg( args ) ) );
     return Register();
 }
 
@@ -2338,9 +2338,9 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
     duration = (i == args.end( ) ? -1 : i->toNumber( ));
 
     if (victim->master)
-        victim->stop_follower( );
+        follower_stop(victim);
 
-    victim->add_follower( target );
+    follower_add(victim, target);
     victim->leader = target;
 
     af.bitvector.setTable(&affect_flags);
@@ -2381,11 +2381,11 @@ NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам 
     }
 
     if (pet->master)
-        pet->stop_follower();
+        follower_stop(pet);
 
     SET_BIT( pet->affected_by, AFF_CHARM );
     target->getPC( )->pet = pet->getNPC( );
-    pet->add_follower( target );
+    follower_add( pet, target );
     pet->leader = target;
 
     // Ensure that when charm is off, default mobile AI won't be active for a while.

@@ -46,7 +46,6 @@ INCLUDES_ANATOLIA= \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system \
--I$(top_srcdir)/plug-ins/ban \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/iomanager \
@@ -54,7 +53,6 @@ INCLUDES_ANATOLIA= \
 -I$(top_srcdir)/plug-ins/command \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/fight_core \
--I$(top_srcdir)/plug-ins/follow/core \
 -I$(top_srcdir)/plug-ins/wearlocation \
 -I$(top_srcdir)/plug-ins/race \
 -I$(top_srcdir)/plug-ins/movement \
@@ -84,7 +82,6 @@ $(top_builddir)/plug-ins/loadsave/libloadsave.la \
 $(top_builddir)/plug-ins/iomanager/libiomanager.la \
 $(top_builddir)/plug-ins/movement/libmovement.la \
 $(top_builddir)/plug-ins/wearlocation/libwearlocation.la \
-$(top_builddir)/plug-ins/follow/core/libfollow_core.la \
 $(top_builddir)/plug-ins/fight_core/libfight_core.la \
 $(top_builddir)/plug-ins/anatolia/core/libanatoliacore.la 
 

@@ -164,11 +164,6 @@ public:
     bool can_see( struct extra_exit_data *peexit ) const;
     bool can_see( struct exit_data *pexit ) const;
     bool can_sense( const Character * ) const;
-
-    // followers (implemented in anatolia_core)
-    void die_follower( );
-    void add_follower( Character * );
-    void stop_follower( );
     
     // object manipulations
     short getWearLevel( Object * );

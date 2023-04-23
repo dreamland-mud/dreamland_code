@@ -91,7 +91,7 @@ CMDRUN( follow )
             ch->pecho("Ты уже следуешь за собой.");
             return;
         }
-        ch->stop_follower();
+        follower_stop(ch);
         return;
     }
     
@@ -112,9 +112,9 @@ CMDRUN( follow )
     REMOVE_BIT(ch->act,PLR_NOFOLLOW);
 
     if (ch->master != 0)
-        ch->stop_follower();
+        follower_stop(ch);
 
-    ch->add_follower( victim );
+    follower_add( ch, victim );
 }
 
 CMDRUN( group )
@@ -288,7 +288,7 @@ CMDRUN( nuke )
     oldact("$c1 исключает $C4 из числа $s последователей.",ch,0,victim,TO_NOTVICT);
     oldact_p("$c1 исключает тебя из числа $s последователей.",ch,0,victim,TO_VICT,POS_SLEEPING);
     oldact_p("Ты исключаешь $C4 из числа твоих последователей.",ch,0,victim,TO_CHAR,POS_SLEEPING);
-    victim->stop_follower( );
+    follower_stop(victim);
 }
 
 
@@ -443,7 +443,7 @@ CMDRUN( nofollow )
     {
       ch->pecho("Теперь ты не разрешаешь следовать за собой.");
       SET_BIT(ch->act,PLR_NOFOLLOW);
-      ch->die_follower( );
+      follower_die(ch);
     }
 }
 

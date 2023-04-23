@@ -4,7 +4,6 @@ include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
--I$(top_srcdir)/plug-ins/ban \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/iomanager \
@@ -27,7 +26,6 @@ libnotes_la_LIBADD = \
 ../iomanager/libiomanager.la \
 ../system/libscheduler_task_round.la \
 ../loadsave/libloadsave.la \
-../ban/libban.la \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la 
 

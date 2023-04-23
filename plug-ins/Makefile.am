@@ -3,7 +3,6 @@ descriptor \
 output \
 system \
 help \
-ban \
 interpret \
 loadsave \
 command \
@@ -17,7 +16,6 @@ hometown \
 bonus \
 occupations \
 communication \
-follow \
 fight_core \
 movement \
 wearlocation \

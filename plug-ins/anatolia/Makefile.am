@@ -24,7 +24,6 @@ $(INCLUDES_SRC)
 
 libanatolia_la_LIBADD = \
 $(LIBADD_ANATOLIA_CORE) \
-$(top_builddir)/plug-ins/ban/libban.la \
 $(top_builddir)/plug-ins/help/libhelp.la \
 $(top_builddir)/plug-ins/alignment/libalignment.la \
 $(top_builddir)/plug-ins/occupations/liboccupations.la 

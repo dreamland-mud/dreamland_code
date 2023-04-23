@@ -267,7 +267,7 @@ CMDRUNP( quit )
             return;
         }
 
-        pch->stop_follower( );
+        follower_stop(pch);
     }
 
     if (!fForced 

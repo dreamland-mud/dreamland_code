@@ -20,6 +20,7 @@
 #include "backdoorhandler.h"
 #include "badnames.h"
 #include "lasthost.h"
+#include "ban.h"
 
 extern "C" {
     
@@ -47,6 +48,7 @@ extern "C" {
         Plugin::registerPlugin<BadNames>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLastHost> >(ppl);
         Plugin::registerPlugin<XMLAttributeLastHostListenerPlugin>( ppl );
+        Plugin::registerPlugin<BanManager>( ppl );
         
         return ppl;
     }

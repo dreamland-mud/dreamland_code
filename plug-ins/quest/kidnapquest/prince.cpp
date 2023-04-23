@@ -217,7 +217,7 @@ void KidnapPrince::heroAttach( PCharacter *hero )
     if (!getQuest( ))
         return;
 
-    ch->add_follower( hero );
+    follower_add( ch, hero );
     
     quest->state.setValue( QSTAT_KID_FOUND );
     quest->wiznet( "", "kid attached" );
@@ -242,7 +242,7 @@ void KidnapPrince::heroReattach( PCharacter *hero )
     if (!getQuest( ))
         return;
 
-    ch->add_follower( hero );
+    follower_add( ch, hero );
     state = STAT_FOLLOW;
     quest->wiznet( "", "kid reattached" );
 }

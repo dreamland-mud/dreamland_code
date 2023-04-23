@@ -766,7 +766,7 @@ static void extract_dead_player( PCharacter *ch, int flags )
     Room *altar;
     
     nuke_pets( ch, flags );
-    ch->die_follower( );
+    follower_die(ch);
 
     undig( ch );
     ch->dismount( );

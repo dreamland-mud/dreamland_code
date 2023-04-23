@@ -507,7 +507,7 @@ VOID_AFFECT(Doppelganger)::remove( Character *victim )
     DefaultAffectHandler::remove( victim );                                     
 
     if (victim->is_mirror( ))
-        victim->stop_follower( );
+        follower_stop(victim);
 
     victim->doppel = NULL;
 }

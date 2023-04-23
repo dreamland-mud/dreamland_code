@@ -5,12 +5,12 @@ plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/command  \
--I$(top_srcdir)/plug-ins/ban \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/loadsave \
+-I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/servlets \
 -I/usr/include/jsoncpp
 
@@ -19,8 +19,8 @@ libcommunication_la_LIBADD = \
 ../interpret/libinterpret.la \
 ../descriptor/libdescriptor.la \
 ../output/liboutput.la \
+../iomanager/libiomanager.la \
 ../loadsave/libloadsave.la \
-../ban/libban.la \
 ../help/libhelp.la \
 ../command/libcommand.la \
 ../servlets/libservlets.la \

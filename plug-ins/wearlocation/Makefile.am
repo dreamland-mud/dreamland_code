@@ -10,7 +10,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/iomanager \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/fight_core \
--I$(top_srcdir)/plug-ins/follow/core \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/command
@@ -25,8 +24,7 @@ libwearlocation_la_LIBADD = \
 ../interpret/libinterpret.la \
 ../help/libhelp.la \
 ../command/libcommand.la \
-../fight_core/libfight_core.la \
-../follow/core/libfollow_core.la
+../fight_core/libfight_core.la 
 
 libwearlocation_la_SOURCES = \
 impl.cpp \

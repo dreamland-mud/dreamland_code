@@ -189,7 +189,7 @@ NPCharacter * Pet::create( PCharacter *client ) const
     char_to_room( pet, client->in_room );
     
     client->pet = pet;
-    pet->add_follower( client );
+    follower_add( pet, client );
     pet->leader = client;
 
     return pet;
@@ -277,7 +277,7 @@ NPCharacter * RideablePet::create( PCharacter *client ) const
 
     char_to_room( horse, client->in_room );
 
-    horse->add_follower( client );
+    follower_add( horse, client );
     horse->leader = client;
     
     return horse;

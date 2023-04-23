@@ -49,7 +49,6 @@
 	<node>services_misc</node>
 	<node>services_petshop</node>
 	<node>services_shop</node>
-	<node>follow_command</node>
 	<node>web</node>
 	<node>craft</node>
 	<node>gmcp</node>

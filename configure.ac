@@ -243,14 +243,10 @@ plug-ins/liquid/Makefile \
 plug-ins/religion/Makefile \
 plug-ins/desire/Makefile \
 plug-ins/alignment/Makefile \
-plug-ins/ban/Makefile \
 plug-ins/fight/Makefile \
 plug-ins/updates/Makefile \
 plug-ins/occupations/Makefile \
 plug-ins/output/Makefile \
-plug-ins/follow/Makefile \
-plug-ins/follow/core/Makefile \
-plug-ins/follow/command/Makefile \
 plug-ins/help/Makefile \
 plug-ins/craft/Makefile \
 plug-ins/gmcp/Makefile \
