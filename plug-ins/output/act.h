@@ -64,4 +64,10 @@ void hint_fmt(Character *ch, const char *format, ...);
 
 /** Output message to mob's master. */
 void echo_master(Character *ch, const char *format, ...);
+
+/** Output messages only if target character satisfies a condition. */
+void echo_char(Character *ch, bool (Character *), const char *format, ...);
+void echo_room(Character *ch, bool (Character *), const char *format, ...);
+void echo_notvict(Character *ch, Character *victim, bool (Character *), const char *format, ...);
+
 #endif

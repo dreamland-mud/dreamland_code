@@ -41,6 +41,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_DLSIZE_T
 AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
+CXXFLAGS="$CXXFLAGS -fconcepts"
 
 AC_CHECK_TIME_T
 

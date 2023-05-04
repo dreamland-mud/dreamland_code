@@ -75,6 +75,11 @@ PROF(paladin);
 PROF(ninja);
 PROF(thief);
 
+static auto needsSpam = [](Character *target) {
+    return target->getPC() 
+            && IS_SET(target->getPC()->config, CONFIG_FIGHTSPAM);
+};
+
 
 /*
  * 'area attack' skill command
@@ -179,10 +184,9 @@ SKILL_APPLY(parry)
 
     if(SHADOW(victim))
     {
-        // TODO: add a method to output messages with CONFIG_FIGHTSPAM check to Fenia skill commands
-        victim->pecho( "Ты пытаешься парировать атаку, но путаешься в своей тени." );
-        ch->pecho( "%2$^C1 постоянно путается в своей тени.", ch, victim );
-        ch->recho( victim, "%2$^C1 постоянно путается в своей тени.", ch, victim );
+        echo_char(victim, needsSpam, "Ты пытаешься парировать атаку, но путаешься в своей тени.");
+        echo_char(ch, needsSpam, "%2$^C1 постоянно путается в своей тени.", ch, victim );
+        echo_notvict( ch, victim, needsSpam, "%2$^C1 постоянно путается в своей тени.", ch, victim );
         return false;
     }
     
@@ -191,26 +195,26 @@ SKILL_APPLY(parry)
         && (!defending_weapon 
             || !IS_WEAPON_STAT(defending_weapon, WEAPON_HOLY))) 
     {
-        victim->pecho( "%3$^O1 проходит насквозь через твою попытку спарировать!", ch, victim, wield );
+        echo_char(victim, needsSpam, "%3$^O1 проходит насквозь через твою попытку спарировать!", ch, victim, wield );
         
         if (defending_weapon) {
-            ch->pecho( "%3$^O1 проходит сквозь оружие %2$C2!", ch, victim, wield );
-            ch->recho( victim, "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!", ch, victim, wield );
+            echo_char(ch, needsSpam, "%3$^O1 проходит сквозь оружие %2$C2!", ch, victim, wield );
+            echo_notvict( ch, victim, needsSpam, "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!", ch, victim, wield );
         }
         else if (victim->getWearloc().isSet(wear_hands)) {
-            ch->pecho( "%3$^O1 проходит сквозь руки %2$C2!", ch, victim, wield );
-            ch->recho( victim, "%3$^O1 %1$C2 проходит сквозь руки %2$C2!", ch, victim, wield );
+            echo_char(ch, needsSpam, "%3$^O1 проходит сквозь руки %2$C2!", ch, victim, wield );
+            echo_notvict( ch, victim, needsSpam, "%3$^O1 %1$C2 проходит сквозь руки %2$C2!", ch, victim, wield );
         } else {
-            ch->pecho( "%3$^O1 проходит сквозь %2$C4!", ch, victim, wield );
-            ch->recho( victim, "%3$^O1 %1$C2 проходит сквозь %2$C4!", ch, victim, wield );
+            echo_char(ch, needsSpam, "%3$^O1 проходит сквозь %2$C4!", ch, victim, wield );
+            echo_notvict( ch, victim, needsSpam, "%3$^O1 %1$C2 проходит сквозь %2$C4!", ch, victim, wield );
         }
 
         return false;
     }
 
-    victim->pecho( "Ты парируешь атаку %1$C2.", ch, victim );
-    ch->pecho( "%2$^C1 парирует твою атаку.", ch, victim );
-    ch->recho( victim, "%2$^C1 парирует атаку %1$C2.", ch, victim );
+    echo_char(victim, needsSpam, "Ты парируешь атаку %1$C2.", ch, victim);
+    echo_char(ch, needsSpam, "%2$^C1 парирует твою атаку.", ch, victim);
+    echo_notvict(ch, victim, needsSpam, "%2$^C1 парирует атаку %1$C2.", ch, victim);
 
     // TODO: damage_to_obj is called here with a chance
     // destroyWeapon( );
@@ -315,15 +319,15 @@ SKILL_APPLY(handblock)
 
     if(SHADOW(victim))
     {
-        victim->pecho( "Тень пинает тебя." );
-        ch->pecho( "Тень и %2$C1 играют в кунг-фу.", ch, victim );
-        ch->recho( victim, "Тень и %2$C1 играют в кунг-фу.", ch, victim );
+        echo_char(victim, needsSpam, "Тень пинает тебя." );
+        echo_char(ch, needsSpam, "Тень и %2$C1 играют в кунг-фу.", ch, victim );
+        echo_notvict( ch, victim, needsSpam, "Тень и %2$C1 играют в кунг-фу.", ch, victim );
         return false;
     }
 
-    victim->pecho( "Ты отражаешь руками атаку %1$C2.", ch, victim );
-    ch->pecho( "%2$^C1 отражает руками твою атаку.", ch, victim );
-    ch->recho( victim, "%2$^C1 отражает руками атаку %1$C2.", ch, victim );
+    echo_char(victim, needsSpam, "Ты отражаешь руками атаку %1$C2.", ch, victim);
+    echo_char(ch, needsSpam, "%2$^C1 отражает руками твою атаку.", ch, victim);
+    echo_notvict(ch, victim, needsSpam, "%2$^C1 отражает руками атаку %1$C2.", ch, victim);
 
     gsn_hand_block->improve( victim, true, ch );
     return true;}
@@ -345,15 +349,15 @@ SKILL_APPLY(batswarm)
         return false;
 
     if (SHADOW(victim)) {
-        victim->pecho( "Стая летучих мышей вокруг тебя сбита с толку твоей тенью." );
-        ch->pecho( "Стая летучих мышей вокруг %2$C2 сбита с толку тенью.", ch, victim );
-        ch->recho( victim, "Стая летучих мышей вокруг %2$C2 сбита с толку тенью.", ch, victim );
+        echo_char(victim, needsSpam, "Стая летучих мышей вокруг тебя сбита с толку твоей тенью." );
+        echo_char(ch, needsSpam, "Стая летучих мышей вокруг %2$C2 сбита с толку тенью.", ch, victim );
+        echo_notvict( ch, victim, needsSpam, "Стая летучих мышей вокруг %2$C2 сбита с толку тенью.", ch, victim );
         return false;
     }
     
-    ch->pecho( "Ты не смо%1$Gгло|г|гла пробиться сквозь стаю летучих мышей, кружащихся вокруг %2$C2.", ch, victim);
-    victim->pecho( "Стая летучих мышей не позволяет %1$C3 повредить тебе.", ch, victim );
-    ch->recho( victim, "%1$^C1 пытается разогнать стаю летучих мышей вокруг %2$C2.", ch, victim );
+    echo_char(ch, needsSpam, "Ты не смо%1$Gгло|г|гла пробиться сквозь стаю летучих мышей, кружащихся вокруг %2$C2.", ch, victim);
+    echo_char(victim, needsSpam, "Стая летучих мышей не позволяет %1$C3 повредить тебе.", ch, victim );
+    echo_notvict( ch, victim, needsSpam, "%1$^C1 пытается разогнать стаю летучих мышей вокруг %2$C2.", ch, victim );
 
     return true;
 }
@@ -428,14 +432,14 @@ SKILL_APPLY(shieldblock)
 
     if (SHADOW(victim))
     {
-        victim->pecho( "Ты впустую машешь щитом перед твоей тенью." );
-        victim->recho( "%2$^C1 впустую размахивает щитом перед своей тенью.", ch, victim);
+        echo_char(victim, needsSpam, "Ты впустую машешь щитом перед твоей тенью." );
+        echo_room(victim, needsSpam, "%2$^C1 впустую размахивает щитом перед своей тенью.", ch, victim);
         return false;
     }
 
-    victim->pecho( "Ты отражаешь щитом атаку %1$C2.", ch, victim );
-    ch->pecho( "%2$^C1 отражает твою атаку %2$P2 щитом.", ch, victim );
-    ch->recho( victim, "%2$^C1 отражает атаку %1$C2 своим щитом.", ch, victim );
+    echo_char(victim, needsSpam, "Ты отражаешь щитом атаку %1$C2.", ch, victim );
+    echo_char(ch, needsSpam, "%2$^C1 отражает твою атаку %2$P2 щитом.", ch, victim );
+    echo_notvict( ch, victim, needsSpam, "%2$^C1 отражает атаку %1$C2 своим щитом.", ch, victim );
 
     // TODO damage_to_obj called here for the shield
     // destroyShield( );
@@ -514,8 +518,8 @@ SKILL_APPLY(crossblock)
 
     if (SHADOW(victim))
     {
-        victim->pecho( "Тень запутывает тебя." );
-        victim->recho( "Тень %2$C2 лезет со своими советам.", ch, victim );
+        echo_char(victim, needsSpam, "Тень запутывает тебя." );
+        echo_room(victim, needsSpam, "Тень %2$C2 лезет со своими советам.", ch, victim );
         return false;
     }
 
@@ -524,16 +528,16 @@ SKILL_APPLY(crossblock)
         && !IS_WEAPON_STAT(def1, WEAPON_HOLY) 
         && !IS_WEAPON_STAT(def2, WEAPON_HOLY)) 
     {
-        victim->pecho( "%3$^O1 проходит насквозь через твою попытку кросс-блокировать!", ch, victim, wield );
-        ch->pecho( "%3$^O1 проходит сквозь оружие %2$C2!", ch, victim, wield );
-        ch->recho( victim, "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!", ch, victim, wield );
+        echo_char(victim, needsSpam,"%3$^O1 проходит насквозь через твою попытку кросс-блокировать!", ch, victim, wield );
+        echo_char(ch, needsSpam, "%3$^O1 проходит сквозь оружие %2$C2!", ch, victim, wield );
+        echo_notvict(ch, victim, needsSpam, "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!", ch, victim, wield );
 
         return false;
     }
     
-    victim->pecho( "Ты кросс-блокируешь атаку %1$C2.", ch, victim );
-    ch->pecho( "%2$^C1 кросс-блокирует твою атаку.", ch, victim );
-    ch->recho( victim, "%2$^C1 кросс-блокирует атаку %1$C2.", ch, victim );
+    echo_char(victim, needsSpam, "Ты кросс-блокируешь атаку %1$C2.", ch, victim );
+    echo_char(ch, needsSpam, "%2$^C1 кросс-блокирует твою атаку.", ch, victim );
+    echo_notvict(ch, victim, needsSpam, "%2$^C1 кросс-блокирует атаку %1$C2.", ch, victim );
 
     // TODO call damage_to_obj for the wield
     // destroyWeapon( );

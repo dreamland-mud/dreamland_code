@@ -133,6 +133,12 @@ void Character::echo( int pos, int type, Character *vch, const char *f, ... )
 
 void Character::vecho( int pos, int type, Character *vch, const char *f, va_list av )
 {
+    vecho(pos, type, vch, f, av, [](Character *target){ return true; });
+}
+
+void Character::vecho( int pos, int type, Character *vch, const char *f, va_list av, bool (needsOutput)(Character *) )
+{
+
     Character *to;
     typedef map<Character *, DLString> Targets;
     Targets targets;
@@ -173,6 +179,9 @@ void Character::vecho( int pos, int type, Character *vch, const char *f, va_list
             if (!to->can_sense( this ) || (vch && !to->can_sense( vch )))
                 continue;
         
+        if (!needsOutput(to))
+            continue;
+
         if (( r = vfmt(to, f, av) ).empty( ))
             continue;
         

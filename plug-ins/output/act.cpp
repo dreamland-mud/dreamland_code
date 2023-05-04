@@ -396,3 +396,32 @@ void echo_master(Character *ch, const char *format, ...)
 
     va_end(av);
 }
+
+
+
+void echo_char(Character *ch, bool (needsOutput)(Character *), const char *format, ...)
+{
+    va_list av;
+    
+    va_start(av, format);
+    ch->vecho( POS_RESTING, TO_CHAR, 0, format, av, needsOutput ); 
+    va_end(av);
+}
+
+void echo_room(Character *ch, bool (needsOutput)(Character *), const char *format, ...)
+{
+    va_list av;
+    
+    va_start(av, format);
+    ch->vecho( POS_RESTING, TO_ROOM, 0, format, av, needsOutput ); 
+    va_end(av);
+}
+
+void echo_notvict(Character *ch, Character *victim, bool (needsOutput)(Character *), const char *format, ...)
+{
+    va_list av;
+    
+    va_start(av, format);
+    ch->vecho( POS_RESTING, TO_NOTVICT, victim, format, av, needsOutput ); 
+    va_end(av);
+}

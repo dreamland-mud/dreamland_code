@@ -155,6 +155,7 @@ public:
     void recho( Character *, const char *, ... );
     void echo( int pos, int type, Character *vch, const char *f, ... );
     void vecho( int pos, int type, Character *, const char *, va_list );
+    void vecho( int pos, int type, Character *, const char *, va_list, bool (needsOutput)(Character *));
     
     // visibility of things 
     bool can_see( const Character *victim ) const;
