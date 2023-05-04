@@ -1190,6 +1190,8 @@ static int drop_obj( Character *ch, Object *obj )
     
     if (RoomUtils::isWater( ch->in_room ) 
         && !obj->may_float( ) 
+        && !IS_SET(obj->extra_flags, ITEM_NOPURGE)
+        && obj->pIndexData->limit <= 0
         && material_swims( obj ) == SWIM_NEVER)
     {
         ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->getLiquid()->getShortDescr( ).c_str( ) );
