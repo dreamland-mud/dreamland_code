@@ -90,8 +90,8 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
  * DefaultReligion 
  *---------------------------------------------------------------------*/
 DefaultReligion::DefaultReligion( )
-                : align( 0, &align_table ),
-                  ethos( 0, &ethos_table ),
+                : align( 0, &align_flags ),
+                  ethos( 0, &ethos_flags ),
                   races( raceManager ),
                   classes( professionManager ),
                   sex( SEX_MALE, &sex_table ),
