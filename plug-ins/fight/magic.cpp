@@ -254,11 +254,23 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
     Skill::Pointer skill = spell->getSkill();
 
     if (IS_SET(flags, FSPELL_OBSTACLES)) {
-        if ((ch->isAffected( gsn_garble ) || ch->isAffected( gsn_deafen )) && chance( 50 ))
+        if (ch->isAffected( gsn_shielding ) && number_percent( ) > 50) {
+            ch->pecho("Ты пытаешься сотворить заклинание, но изолирующий экран блокирует тебя.");
+            ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но изолирующий экран блокирует %1$P2.", ch);
             return false;
+        }
+
+        if (ch->isAffected( gsn_garble ) && number_percent( ) > 50) {
+            ch->pecho("Твой язык заплетается, и ты не можешь как следует произнести заклинание.");
+            ch->recho("Язык %1$C2 заплетается, и %1$P1 не мо%1$nжет|гут как следует произнести заклинание.", ch);        
+            return false;
+        }
         
-        if (ch->isAffected( gsn_shielding ) && chance( 50 ))
+        if (ch->isAffected( gsn_deafen ) && number_percent( ) > 50) {
+            ch->pecho("Глухота мешает тебе как следует произнести заклинание.");
+            ch->recho("Глухота мешает %1$C3 как следует произнести заклинание.", ch);        
             return false;
+        }    
 
         if (target->type == SpellTarget::CHAR
              && target->victim->in_room != ch->in_room
@@ -270,10 +282,8 @@ bool spell_nocatch( Spell::Pointer &spell, int level, Character *ch, SpellTarget
     }
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_CAST)) {
-        if (RoomUtils::isOutside(ch))
-            ch->pecho("Местность вокруг тебя блокирует все заклинания.");
-        else
-            ch->pecho("Стены этой комнаты поглощают заклинание.");
+        ch->pecho("Эта местность поглощает и блокирует твое заклинание.");
+        ch->recho("%1$^C1 пыта%1$nется|ются сотворить заклинание, но что-то в этой местности блокирует %1$P2.", ch);
         return false;
     }
 
