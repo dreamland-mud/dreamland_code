@@ -81,7 +81,7 @@ void StaffQuest::info( std::ostream &buf, PCharacter *ch )
             << "Вернись за вознаграждением, до того как выйдет время!" << endl;
     else 
         buf << "У тебя задание - вернуть " << russian_case( objName.getValue( ), '4' ) << "." << endl
-            << "Место, где он спрятан, называется " << roomName << "." << endl
+            << "Место, где спрятано сокровище, называется " << roomName << "." << endl
             << "И находится это место в районе под названием {hh" << areaName << "{hx." << endl;
 }
 

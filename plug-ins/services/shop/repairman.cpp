@@ -127,7 +127,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     deduct_cost(client, cost * 100);
     ch->gold += cost;
 
-    oldact("$C1 берет $o4 y $c2, восстанавливает и возвращает $c3.",client,obj,ch,TO_ROOM);
+    oldact("$C1 берет $o4 у $c2, восстанавливает и возвращает $c3.",client,obj,ch,TO_ROOM);
     oldact("$C1 берет $o4, восстанавливает и возвращает тебе.",client,obj,ch,TO_CHAR);
 
     if (cost) 

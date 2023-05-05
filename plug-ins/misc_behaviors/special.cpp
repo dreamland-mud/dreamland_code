@@ -276,7 +276,7 @@ bool spec_patrolman(NPCharacter *ch)
                 break;
         case 1: do_say( ch, "Виновато, конечно, общество, но что уж тут поделаешь?");
                 break;
-        case 2: do_say( ch, "Чертова шпана нас вcех в гроб загонит.");
+        case 2: do_say( ch, "Чертова шпана нас всех в гроб загонит.");
                 break;
         case 3: do_yell( ch, "Сержант Петренко. Предъявите ваши документы!");
                 break;
