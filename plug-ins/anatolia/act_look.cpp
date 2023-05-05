@@ -109,7 +109,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom );
 DLString get_obj_name_hint(Object *obj)
 {
     ostringstream buf;    
-    buf << " {x(" << Syntax::label_en(obj->getName()) << "{x)";
+    buf << " (" << Syntax::label_en(obj->getName()) << ")";
     return buf.str();
 }
 
