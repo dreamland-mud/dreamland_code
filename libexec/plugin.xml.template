@@ -23,7 +23,6 @@
 	<node>learn</node>
 	<node>race_skills</node>
 	<node>race_aptitude</node>
-	<node>magic</node>
 	<node>clan_skill</node>
 	<node>clan_command</node>
 	<node>clan_impl</node>

@@ -198,7 +198,6 @@ plug-ins/quest/locatequest/Makefile \
 plug-ins/quest/bigquest/Makefile \
 plug-ins/questreward/Makefile \
 plug-ins/misc_behaviors/Makefile \
-plug-ins/magic/Makefile \
 plug-ins/race/Makefile \
 plug-ins/race_aptitude/Makefile \
 plug-ins/other_skills/Makefile \

@@ -44,7 +44,6 @@ craft \
 feniaroot \
 groups \
 learn \
-magic \
 mansion \
 mlove \
 note \

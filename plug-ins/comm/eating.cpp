@@ -15,6 +15,7 @@
 #include "skillreference.h"
 #include "desire.h"
 #include "affect.h"
+#include "commandtemplate.h"
 
 #include "raceflags.h"
 #include "../anatolia/handler.h"
@@ -23,11 +24,13 @@
 #include "skill_utils.h"
 #include "fight.h"
 #include "act.h"
+#include "vnum.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
 CLAN(battlerager);
+GSN(none);
 GSN(manacles);
 GSN(poison);
 DESIRE(full);
@@ -36,11 +39,19 @@ RACE(fish);
 RACE(mouse);
 RACE(rat);
 RACE(rodent);
+PROF(druid);
 
 static bool oprog_eat( Object *obj, Character *ch )
 {
     FENIA_CALL( obj, "Eat", "C", ch );
     FENIA_NDX_CALL( obj, "Eat", "OC", obj, ch );
+    return false;
+}
+
+static bool oprog_quaff( Object *obj, Character *ch )
+{
+    FENIA_CALL( obj, "Quaff", "C", ch );
+    FENIA_NDX_CALL( obj, "Quaff", "OC", obj, ch );
     return false;
 }
 
@@ -259,4 +270,61 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
             multi_hit( mob, ch );
     }
 }
+
+/*
+ * 'quaff' skill command
+ */
+CMDRUNP( quaff )
+{
+    char arg[MAX_INPUT_LENGTH];
+    Object *obj;
+
+    one_argument( argument, arg );
+
+    if(!ch->is_npc( ) && ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
+        ch->pecho("Ты же воин клана Ярости, а не презренный МАГ!");
+        return;
+    }
+
+    if (arg[0] == '\0') {
+        ch->pecho("Осушить что?");
+        return;
+    }
+
+    if (( obj = get_obj_carry( ch, arg ) ) == 0) {
+        ch->pecho("У тебя нет такого снадобья.");
+        return;
+    }
+
+    if (obj->item_type != ITEM_POTION) {
+        ch->pecho("Осушать можно только снадобья.");
+        return;
+    }
+
+    if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+        ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
+        return;
+    }
+    
+    if (ch->getProfession( ) == prof_druid) {
+        ch->pecho("Ты не хочешь осквернять свое тело синтетикой.");
+        return;        
+    }
+    
+    oldact("$c1 осушает $o4.", ch, obj, 0, TO_ROOM);
+    oldact("Ты осушаешь $o4.", ch, obj, 0 ,TO_CHAR);
+    
+    if (oprog_quaff( obj, ch ))
+        return;
+
+    spell_by_item( ch, obj );
+
+    if (ch->is_adrenalined( ) || ch->fighting)
+         ch->setWaitViolence( 2 );
+    
+    extract_obj( obj );
+    obj_to_char( create_object(get_obj_index(OBJ_VNUM_POTION_VIAL),0),ch);
+}
+
+
 

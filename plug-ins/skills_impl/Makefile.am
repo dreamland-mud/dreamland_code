@@ -17,7 +17,8 @@ sleepaffecthandler.cpp \
 skillhelp.cpp \
 skillgrouphelp.cpp \
 xmlattributerestring.cpp \
-feniaskillaction.cpp
+feniaskillaction.cpp \
+ccast.cpp
 
 libskills_impl_la_MOC = \
 basicskill.h \
