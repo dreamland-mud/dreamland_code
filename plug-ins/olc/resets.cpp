@@ -361,6 +361,27 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
 
+    // Randomize exits.
+    if (arg_oneof(arg1, "void", "пустота")) {
+        RoomIndexData *pRoom = ch->in_room->pIndexData;
+
+        for (auto &reset: pRoom->resets) {
+            if (reset->command == 'R') {
+                stc("Exits in this room are already randomized.\n\r", ch);
+                return;
+            }
+        }
+
+        pReset = new reset_data();
+        pReset->command = 'R';
+        pReset->arg1 = pRoom->vnum;
+
+        add_reset(pRoom, pReset, -1);
+        pRoom->areaIndex->changed = true;
+        stc("Room exits will be randomized.\n\r", ch);
+        return;
+    }
+
     // Syntax: search <vnum>, search rand_stat, search <vnum> rand_stat
     if (arg_oneof(arg1, "search", "поиск")) {
         ostringstream buf;
@@ -639,4 +660,5 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     stc("        RESET SEARCH <vnum>\n\r", ch);
     stc("        RESET SEARCH <vnum> normal|rand_stat|rand_all \n\r", ch);
     stc("        RESET SEARCH rand_stat|rand_all \n\r", ch);
+    stc("        RESET VOID -- randomized room exits \n\r", ch);
 }
