@@ -96,7 +96,7 @@ GSN(spell_craft);
  * Compute a saving throw.
  * Negative apply's make saving throw better.
  */
-bool saves_spell( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag )
+bool saves_spell( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag, bool verbose )
 {
     int save;
     int mlevel = victim->getModifyLevel( );
@@ -114,7 +114,7 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
     
     switch(immune_check(victim, dam_type, dam_flag)) {
         case RESIST_IMMUNE:
-            if (ch) {
+            if (ch && verbose) {
                 if (ch != victim)
                     ch->pecho("%^N1, похоже, никак не сможет навредить %C3.", damage_table.message(dam_type).c_str(), victim);
                 else
@@ -123,7 +123,7 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             return true;
         case RESIST_RESISTANT:
             save += mlevel / 5;
-            if (ch && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
+            if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
                 if (ch != victim)
                     ch->pecho("%^N1 {1{Gочень слабо{2 влияет на %C4.", 
                         damage_table.message(dam_type).c_str(), victim);
@@ -134,7 +134,7 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
             break;
         case RESIST_VULNERABLE:
             save -= mlevel / 5;
-            if (ch && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
+            if (ch && verbose && number_percent( ) < gsn_spell_craft->getEffective( ch )) {
                 if (ch != victim)
                     ch->pecho("%^N1 {1{Rособо пагубно{2 влияет на %C4.", 
                         damage_table.message(dam_type).c_str(), victim);

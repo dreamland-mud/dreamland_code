@@ -61,7 +61,7 @@ class Room;
 class SpellTarget;
 class Spell;
 
-bool saves_spell( short level, Character *victim, int dam_type, Character *ch = NULL, bitstring_t dam_flag = 0 );
+bool saves_spell( short level, Character *victim, int dam_type, Character *ch = NULL, bitstring_t dam_flag = 0, bool verbose = true );
 void attack_caster( Character *caster, Character *victim );
 void area_message( Character *ch, const DLString &msg, bool everywhere );
 

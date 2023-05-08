@@ -512,3 +512,4 @@ VOID_AFFECT(Doppelganger)::remove( Character *victim )
     victim->doppel = NULL;
 }
 
+

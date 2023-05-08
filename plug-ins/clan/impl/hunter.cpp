@@ -1530,3 +1530,4 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
     oldact("Взгляд $c2 становится более внимательным.", ch, 0, 0, TO_ROOM);
 }
 
+

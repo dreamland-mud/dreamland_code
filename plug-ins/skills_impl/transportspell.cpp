@@ -287,3 +287,4 @@ void GateSpell::run( Character *ch, Character *victim, int sn, int level )
 
 
 
+

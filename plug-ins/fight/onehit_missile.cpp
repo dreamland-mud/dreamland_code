@@ -456,3 +456,4 @@ bool ThrowerOneHit::mprog_immune()
 
     return false; 
 }
+

@@ -526,3 +526,4 @@ void RingOfRa::speech( Character *ch, const char *speech )
 }
 
 
+

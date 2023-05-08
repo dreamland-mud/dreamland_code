@@ -1841,7 +1841,7 @@ NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один у�
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag]): спас-бросок против типа повреждения (.tables.damage_table) с флагом повреждения (.tables.damage_flags)")
+NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag[,verbose]]): спас-бросок против типа повреждения (.tables.damage_table) с флагом повреждения (.tables.damage_flags)")
 {
     checkTarget();
     Character *caster = argnum2character(args, 1);
@@ -1849,9 +1849,14 @@ NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag]): 
     int dam_type = argnum2flag(args, 3, damage_table);
     int dam_flag = DAMF_OTHER;
     if (args.size() > 3)
-    dam_flag = argnum2flag(args, 4, damage_flags);
+        dam_flag = argnum2flag(args, 4, damage_flags);
 
-    return Register(saves_spell(level, target, dam_type, caster, dam_flag));
+    bool verbose = true;
+    if (args.size() > 4)
+        verbose = argnum2boolean(args, 5);
+        
+
+    return Register(saves_spell(level, target, dam_type, caster, dam_flag, verbose));
 }
 
 NMI_INVOKE(CharacterWrapper, quaff, "(obj): получить эффекты от пилюли или зелья")

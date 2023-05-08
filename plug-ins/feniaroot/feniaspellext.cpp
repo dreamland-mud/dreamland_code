@@ -644,3 +644,4 @@ NMI_INVOKE(FeniaCommandContext, msgArea, "(fmt[,args]): выдать сообщ�
     area_message(caster, message, true);
     return Register();
 }
+

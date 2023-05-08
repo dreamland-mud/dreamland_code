@@ -425,3 +425,4 @@ bool SkillWeaponOneHit::mprog_immune()
             
     return false; 
 }
+

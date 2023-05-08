@@ -169,3 +169,4 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     oldact("$c1 {Rзаточил твой дух в сосуде.{x", ch, 0, victim, TO_VICT);
 }
 
+

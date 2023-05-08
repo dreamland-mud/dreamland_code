@@ -294,3 +294,4 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     if (victim->is_npc( ) && victim->getNPC( )->behavior)
         victim->getNPC( )->behavior->shot( ch, door );
 }
+
