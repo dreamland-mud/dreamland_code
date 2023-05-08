@@ -241,7 +241,7 @@ void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
     pet->damage[DICE_TYPE]   = pet->damage[DICE_NUMBER];
     pet->damroll = number_fuzzy( level / 2 );
     
-    pet->saving_throw = -level;
+    pet->saving_throw = -level / 2;
     
     for (int i = 0; i < 4; i++)
         pet->armor[i] = - 5 * number_fuzzy( level );
