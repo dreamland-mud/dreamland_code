@@ -1115,8 +1115,8 @@ CMDRUNP(report)
     if (shown) {
 
         if (!showAll) {
-            DLString petName = Syntax::noun(pet->getNameP('1'));
-            result << fmt(0, "Напиши {y{hc{lRприказать %1$s рапорт все{lEorder %1$s report all{x, и я расскажу, что ещё я умею делать.", 
+            DLString petName = Syntax::noun(pet->getShortDescr());
+            result << fmt(0, "Напиши {y{hc{lRприказать %1$N3 рапорт все{lEorder %1$N3 report all{x, и я расскажу, что ещё я умею делать.", 
                              petName.c_str())
                    << endl;
         }

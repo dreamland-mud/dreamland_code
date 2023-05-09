@@ -552,8 +552,8 @@ CMDRUN( list )
     }
 
     if(counter>1){
-        DLString mobName = Syntax::noun(lastShopper->getNameP('1'));
-        hint_fmt(ch, "Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hc{lRпривлечь %1$s{x{y{hc{lEattract %1$s{x", mobName.c_str());
+        DLString mobName = Syntax::noun(lastShopper->getShortDescr());
+        hint_fmt(ch, "Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hc{lRпривлечь %1$N4{x{y{hc{lEattract %1$N4{x", mobName.c_str());
     }
 }
 

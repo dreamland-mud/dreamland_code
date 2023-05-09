@@ -126,6 +126,10 @@ COMMAND(COrder, "order")
     // Check if victim can perform the command. Display verbose failure message to the master.
     rc = iargs.pCommand->dispatchOrder(iargs);
     if (rc != RC_DISPATCH_OK) {        
+        DLString victName = victim->is_npc() ? 
+              Syntax::noun(victim->getNPC()->getShortDescr()) 
+            : victim->getNameP('1');
+
         switch (rc) {
             case RC_DISPATCH_AFK:
                 victim->master->pecho("%1$^C1 не сможет выполнить эту команду, находясь в режиме AFK ('отошел').", victim);
@@ -149,9 +153,9 @@ COMMAND(COrder, "order")
 
             case RC_DISPATCH_POSITION:
                 victim->master->pecho(
-                    "%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$s встать{lEorder %2$s stand{x.",
+                    "%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$N3 встать{lEorder %2$sN3stand{x.",
                     victim, 
-                    Syntax::noun(victim->getNameP('1')).c_str(), 
+                    victName.c_str(), 
                     victim->position == POS_SLEEPING ? "спит и " : (victim->position == POS_RESTING || victim->position == POS_SITTING) ? "сидит и " : "");
                 break;
 

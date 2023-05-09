@@ -67,6 +67,7 @@ public:
     virtual bool canCancel( Character * ) { return false; }
     virtual bool isAfterCharm( ) const { return false; }
     virtual long long getLastCharmTime() const { return 0; }
+    virtual bool hasSpecialName() const { return false; }
 
 protected:
     NPCharacter *ch;

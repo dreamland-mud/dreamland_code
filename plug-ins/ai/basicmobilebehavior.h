@@ -288,6 +288,7 @@ public:
     virtual void save( );
     virtual bool extract( bool );
     virtual void stopfol( Character * );
+    virtual bool hasSpecialName() const { return true; }
 
 protected:
     XML_VARIABLE XMLBoolean saved;

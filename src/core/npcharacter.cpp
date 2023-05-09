@@ -212,27 +212,40 @@ Noun::Pointer NPCharacter::toNoun( const DLObject *forWhom, int flags ) const
 
 void NPCharacter::updateCachedNoun( )
 {
+    DLString fullForm = getShortDescr();
+
     if (!cachedNoun) {
         cachedNoun = RussianString::Pointer( 
                         NEW, 
-                        getShortDescr( ), 
+                        fullForm, 
                         MultiGender( getSex( ), pIndexData->gram_number) );
     }
     else {
-        cachedNoun->setFullForm( getShortDescr( ) );
+        cachedNoun->setFullForm(fullForm);
         cachedNoun->setGender( MultiGender( getSex( ), pIndexData->gram_number ) );
     }
 }
 
 DLString NPCharacter::getNameP( char gram_case ) const
 {   
-    DLString shortname = toNoun( )->decline( gram_case );
-
     // Special case when we want to see all names at once, to search among them.
-    if (gram_case == '7')
-        return shortname.colourStrip() + " " + getName();
+    if (gram_case == '7') {
+        DLString fullForm;
 
-    return shortname;
+        // Summoned creatures may contain master's name in their short descr, hence
+        // their name is handled differently, with the last part of the short descr removed.
+        if (behavior && behavior->hasSpecialName()) {
+            StringList names(getShortDescr());
+            names.pop_back();
+            fullForm = russian_case_all_forms(names.toString());
+        } else {
+            fullForm = toNoun()->decline(gram_case).colourStrip();
+        }
+ 
+        return fullForm + " " + getName();
+    }
+
+    return toNoun()->decline(gram_case);
 }
 
 /****************************************************************************
