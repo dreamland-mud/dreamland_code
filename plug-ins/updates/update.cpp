@@ -892,11 +892,8 @@ void obj_update( void )
             message = "%1$^O1 исчеза%1$nет|ют.";
             break;
         case ITEM_CONTAINER:
-            if (obj->can_wear(ITEM_WEAR_FLOAT))
-                if (obj->contains)
-                    message = "%1$^O1 вспыхива%1$nет|ют и исчеза%1$nет|ют, рассыпая все содержимое по земле.";
-                else
-                    message = "%1$^O1 вспыхива%1$nет|ют и исчеза%1$nет|ют.";
+            if (obj->contains)
+                message = "%1$^O1 исчеза%1$nет|ют, рассыпая все содержимое.";
             else
                 message = "%1$^O1 обраща%1$nется|ются в прах.";
             break;
@@ -930,15 +927,7 @@ void obj_update( void )
                 if (obj->in_obj) { /* in another object */
                     obj_to_obj(t_obj, obj->in_obj);
                 } else if (obj->carried_by) { /* carried */
-                    if (obj->wear_loc == wear_float) {
-                        if (obj->carried_by->in_room == 0)
-                            extracted.push_back(t_obj);
-                        else
-                            obj_to_room(t_obj, obj->carried_by->in_room);
-                    } else {
-                        obj_to_char(t_obj, obj->carried_by);
-                    }
-
+                    obj_to_char(t_obj, obj->carried_by);
                 } else if (obj->in_room == 0) { /* destroy it */
                     extracted.push_back(t_obj);
                 } else { /* to the pit */

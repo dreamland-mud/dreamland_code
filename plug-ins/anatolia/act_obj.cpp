@@ -865,7 +865,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
     if (obj->getWeightMultiplier() != 100 && !IS_SET(container->value1(), CONT_NESTED)) {
         if (verbose)
-            ch->pecho("Наверное это была плохая идея.");
+            ch->pecho("Ты не можешь положить %O4 в другой контейнер.", obj);
         return PUT_OBJ_ERR;
     }
 
