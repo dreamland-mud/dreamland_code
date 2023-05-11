@@ -85,7 +85,7 @@ void GangChef::greet( Character *mob )
     multi_hit( mob, ch , "murder" );
 }
 
-void GangChef::fight( Character *victim ) 
+void GangChef::fight( Character *victim, string command ) 
 {
     Character *mob, *ch_next;
     
@@ -108,10 +108,10 @@ void GangChef::fight( Character *victim )
         if (mob->fighting)
             continue;
 
-        multi_hit( mob, victim );
+        multi_hit( mob, victim, command );
     }
     
-    GangMob::fight( victim );
+    GangMob::fight( victim, command );
 }
 
 bool GangChef::spec( ) 

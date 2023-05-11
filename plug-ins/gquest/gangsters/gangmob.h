@@ -46,7 +46,7 @@ public:
 
     virtual bool spec( );
     virtual void bribe( Character *, int, int );
-    virtual void fight( Character * );
+    virtual void fight( Character *, string command = "" );
     virtual bool death( Character * );
     virtual void greet( Character * );
 

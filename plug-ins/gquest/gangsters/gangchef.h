@@ -14,7 +14,7 @@ public:
     typedef ::Pointer<GangChef> Pointer;
 
     virtual bool spec( );
-    virtual void fight( Character * );
+    virtual void fight( Character *, string command = "" );
     virtual bool death( Character * );
     virtual void greet( Character * );
 

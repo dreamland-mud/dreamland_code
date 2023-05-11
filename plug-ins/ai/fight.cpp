@@ -65,7 +65,7 @@ void BasicMobileBehavior::attackSmart( Character *victim )
 /*
  * Battle-round. Called from multi_hit and every 4 seconds from violence_update
  */
-void BasicMobileBehavior::fight( Character *victim )
+void BasicMobileBehavior::fight( Character *victim, string command )
 {
     if (doWimpy( ))
         return;
@@ -79,7 +79,7 @@ void BasicMobileBehavior::fight( Character *victim )
 
     setLastFought( victim );
 
-    one_hit( ch, victim );
+    one_hit( ch, victim, false, command );
 
     if (ch->fighting != victim)
         return;

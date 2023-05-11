@@ -36,7 +36,7 @@ public:
     virtual void entry(        ) { }
     virtual void greet( Character *victim ) { }
     virtual void give( Character *victim, Object *obj ) { }
-    virtual void fight( Character *victim ) { }
+    virtual void fight( Character *victim, string command = "" ) { }
     virtual bool assist( Character *, Character * ) { return false; }
     virtual bool death( Character *killer ) { return false; }
     virtual bool kill( Character * ) { return false; }

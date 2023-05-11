@@ -178,13 +178,15 @@ void WeaponOneHit::damApplyHoly( )
 
 void WeaponOneHit::damApplyCounter( )
 {
-    int chance;
-    Object *ch_wield, *victim_wield;
+    int chance, victimWeaponSn, victimWeaponSkill;
 
     if (command != "murder")
         return;
 
     if (victim->fighting)
+        return;
+
+    if (!gsn_counter->usable(victim))
         return;
     
     if (victim->is_npc( ) 
@@ -195,29 +197,23 @@ void WeaponOneHit::damApplyCounter( )
     if (is_safe_nomessage(victim, ch) || is_safe_nomessage(ch,victim))
         return;
         
-    if (victim->position != POS_SITTING && victim->position != POS_STANDING)
+    if (victim->position <= POS_RESTING)
         return;
 
-    ch_wield = get_eq_char(ch,wear_wield);
-    victim_wield = get_eq_char(victim,wear_wield);
+    // TODO: once 'counter' is moved to Fenia, need to add more detailed checks for ch, victim and their weapons.
 
-    if (!victim_wield)
-        return;
-
-    if (ch_wield && IS_WEAPON_STAT(ch_wield, WEAPON_TWO_HANDS) != IS_WEAPON_STAT(victim_wield, WEAPON_TWO_HANDS))
-        return;
-
-    if (!ch_wield && ((ch->size - victim->size)>1 || (attack_table[ch->dam_type].damage != DAM_SLASH && attack_table[ch->dam_type].damage != DAM_BASH && attack_table[ch->dam_type].damage != DAM_PIERCE)))
-       return;
-
-    chance = number_percent();
-
-    if (ch->is_adrenalined())
-        chance += 25;
+    chance = gsn_counter->getEffective(victim);
     
-    chance *= 2;
+    if (victim->is_adrenalined())
+        chance += chance / 5;
 
-    if (chance <= gsn_counter->getEffective( victim ))
+    victimWeaponSn = get_weapon_sn(victim, false);
+    victimWeaponSkill = skillManager->find(victimWeaponSn)->getEffective(victim);
+    chance = chance * victimWeaponSkill / 100;
+
+    chance = URANGE(5, chance, 95);    
+
+    if (number_percent() <= chance)
     {
         gsn_counter->improve( victim, true, ch );
         oldact("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR);

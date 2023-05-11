@@ -156,7 +156,7 @@ bool KidnapBandit::spec( )
 /*
  * mobprogs
  */
-void KidnapBandit::fight( Character *victim ) 
+void KidnapBandit::fight( Character *victim, string command ) 
 {
     debug( "Я сражаюсь." );
 
@@ -165,7 +165,7 @@ void KidnapBandit::fight( Character *victim )
 
     state = BSTAT_FIGHT;
 
-    KidnapMobile::fight( victim );
+    KidnapMobile::fight( victim, command );
 }
 
 void KidnapBandit::greet( Character *victim ) 

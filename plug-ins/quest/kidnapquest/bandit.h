@@ -29,7 +29,7 @@ public:
     
         KidnapBandit( );
 
-        virtual void fight( Character *victim );
+        virtual void fight( Character *victim, string command = "" );
         virtual void greet( Character *victim );
         virtual bool extractNotify( Character *, bool, bool );
         virtual bool spec( );

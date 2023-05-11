@@ -157,7 +157,7 @@ protected:
  * fighting
  */
 public:
-    virtual void fight( Character * );
+    virtual void fight( Character *, string command = "" );
 protected:    
     virtual void attack( Character * );;
     virtual void attackSmart( Character * );

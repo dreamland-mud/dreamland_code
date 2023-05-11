@@ -125,11 +125,11 @@ static void afprog_fight(Character *ch, Character *victim)
             paf->type->getAffect()->onFight(target, paf, victim);
 }
 
-static bool mprog_fight( Character *ch, Character *victim )
+static bool mprog_fight( Character *ch, Character *victim, string command )
 {
     FENIA_CALL( ch, "Fight", "C", victim );
     FENIA_NDX_CALL( ch->getNPC( ), "Fight", "CC", ch, victim );
-    BEHAVIOR_VOID_CALL( ch->getNPC( ), fight, victim );
+    BEHAVIOR_VOID_CALL( ch->getNPC( ), fight, victim, command );
     return false;
 }
 
@@ -393,7 +393,7 @@ void multi_hit_nocatch( Character *ch, Character *victim, string command )
     if (check_stun( ch, victim ))
         return;
     
-    mprog_fight( ch, victim );
+    mprog_fight( ch, victim, command );
 
     if (ch->is_npc( ))
         return;

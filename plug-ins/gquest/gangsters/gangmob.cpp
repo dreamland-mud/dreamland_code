@@ -311,14 +311,14 @@ void GangMember::greet( Character *mob )
     }
 }
 
-void GangMember::fight( Character *victim ) 
+void GangMember::fight( Character *victim, string command ) 
 {
     path.clear( );
     meetCnt = 0;
     state = STAT_FIGHTING;
     fighting = lastFought;
 
-    BasicMobileDestiny::fight( victim );
+    BasicMobileDestiny::fight( victim, command );
 
     if (victim->hit < victim->max_hit / 4) {
         switch (number_range(1, 3)) {
