@@ -26,8 +26,7 @@ public:
     void show(PCharacter *ch);
 
     XML_VARIABLE XMLInteger room, to_room, info, key;
-    XML_VARIABLE XMLInteger moving_from, moving_mode_from, moving_to;
-    XML_VARIABLE XMLInteger moving_mode_to, max_size_pass;
+    XML_VARIABLE XMLInteger max_size_pass;
     XML_VARIABLE XMLString keyword, short_desc_from, short_desc_to;
     XML_VARIABLE XMLString description, room_description;
     XML_VARIABLE XMLString msgLeaveRoom, msgLeaveSelf;

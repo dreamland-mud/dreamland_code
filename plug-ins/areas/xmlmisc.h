@@ -128,8 +128,6 @@ public:
     
     XML_VARIABLE XMLStringNoEmpty short_desc_from, short_desc_to, room_description;
     XML_VARIABLE XMLEnumeration max_size_pass;
-    XML_VARIABLE XMLIntegerNoEmpty moving_from, moving_mode_from; // OBSOLETE
-    XML_VARIABLE XMLIntegerNoEmpty moving_to, moving_mode_to; // OBSOLETE
     XML_VARIABLE XMLStringNoEmpty msgLeaveRoom, msgLeaveSelf;
     XML_VARIABLE XMLStringNoEmpty msgEntryRoom, msgEntrySelf;
     XML_VARIABLE XMLStringNoEmpty gender_from, gender_to;

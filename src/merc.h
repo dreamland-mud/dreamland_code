@@ -454,10 +454,6 @@ struct        extra_exit_data
         int                                exit_info;
         int                                exit_info_default;
         int                key;
-        int                                moving_from;
-        int                                moving_mode_from;
-        int                                moving_to;
-        int                                moving_mode_to;
         int                                max_size_pass;
         char *                keyword;
         char *                short_desc_from;

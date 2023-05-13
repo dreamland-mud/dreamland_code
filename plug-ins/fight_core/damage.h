@@ -52,6 +52,9 @@ public:
     void handleDeath( );
 
     virtual void message( ) = 0;
+
+    inline int getDamage() const { return dam; }
+    
 protected:
     void msgVict( const char *fmt, ... );
     void msgRoom( const char *fmt, ... );

@@ -233,10 +233,6 @@ XMLRoom::compat(int vnum)
         EXTRA_EXIT_DATA *peexit = eeit->second.compat( );
         peexit->keyword = str_dup(eeit->first.c_str( ));
         room->extra_exits.push_front(peexit);
-
-        LogStream::sendNotice() << "areas: extra exit (" << peexit->keyword << ") room [" << room->vnum << "] converted: " << endl 
-                                << peexit->msgLeaveRoom << endl
-                                << peexit->msgEntryRoom << endl;
     }
 
     XMLListBase<XMLExtraDescr>::reverse_iterator edit;

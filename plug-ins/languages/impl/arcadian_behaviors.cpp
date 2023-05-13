@@ -159,7 +159,7 @@ bool BeerElementalBehavior::specFight( )
 
 bool BeerElementalBehavior::area( )
 {                               
-    ch->max_hit -= ch->max_hit / 10;
+    ch->max_hit -= ch->max_hit / 100;
 
     if (ch->max_hit < ch->getModifyLevel( )) {
         oldact("$c1 окончательно усыхает и исчезает.", ch, 0, 0, TO_ROOM );

@@ -43,12 +43,6 @@ extra_exit_data * extra_exit_data::create()
     peexit->gender_from = gender_from;
     peexit->gender_to = gender_to;
     
-    // OBSOLETE
-    peexit->moving_from = moving_from;
-    peexit->moving_mode_from = moving_mode_from;
-    peexit->moving_to = moving_to;
-    peexit->moving_mode_to = moving_mode_to;
-
     return peexit;
 }        
 

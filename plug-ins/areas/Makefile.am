@@ -15,8 +15,7 @@ plugin_INCLUDES = $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/movement
 
 libareas_la_SOURCES = \
-db2.cpp \
-load_compat.cpp \
+fixarea.cpp \
 load_xml.cpp \
 xmlareahelp.cpp \
 xmlitemtype.cpp \

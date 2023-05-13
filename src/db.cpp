@@ -259,7 +259,7 @@ void exit_data::reset()
 
 extra_exit_data::extra_exit_data()
     : exit_info(0), exit_info_default(0),
-      key(0), moving_mode_from(0), moving_mode_to(0),
+      key(0),
       max_size_pass(0), level(0)
 {
     u1.to_room = 0;

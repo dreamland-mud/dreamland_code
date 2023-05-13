@@ -1252,19 +1252,7 @@ CMDRUNP( password )
         return;
     }
 
-    /*
-     * No tilde allowed because of player file format.
-     * TODO: obsolete restriction, remove.
-     */
     pwdnew = arg2;
-    for ( p = pwdnew; *p != '\0'; p++ )
-    {
-        if ( *p == '~' )
-        {
-            ch->pecho("Новый пароль неприемлем, попробуй еще раз.");
-            return;
-        }
-    }
    
     password_set( ch->getPC( ), pwdnew );
     ch->getPC( )->save( );

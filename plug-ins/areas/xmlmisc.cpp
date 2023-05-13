@@ -338,12 +338,6 @@ XMLExtraExit::init(const extra_exit_data *ex)
     msgLeaveSelf.setValue(ex->msgLeaveSelf);
     msgEntryRoom.setValue(ex->msgEntryRoom);
     msgEntrySelf.setValue(ex->msgEntrySelf);
-
-    // OBSOLETE
-    moving_from.setValue(ex->moving_from);
-    moving_mode_from.setValue(ex->moving_mode_from);
-    moving_to.setValue(ex->moving_to);
-    moving_mode_to.setValue(ex->moving_mode_to);
 }
 
 extra_exit_data *
@@ -366,30 +360,6 @@ XMLExtraExit::compat( )
     peexit->msgEntrySelf = msgEntrySelf.getValue();
     peexit->msgLeaveRoom = msgLeaveRoom.getValue();
     peexit->msgLeaveSelf = msgLeaveSelf.getValue();
-
-    // OBSOLETE
-    peexit->moving_from = moving_from.getValue( );
-    peexit->moving_mode_from = moving_mode_from.getValue( );
-    peexit->moving_to = moving_to.getValue( );
-    peexit->moving_mode_to = moving_mode_to.getValue( );
-    
-    // ONE-OFF CONVERSION
-    if (msgEntryRoom.empty() && msgLeaveRoom.empty()) {
-        ostringstream leaveBuf, entryBuf;
-
-        leaveBuf << "%1$^C1 " << extra_move_ru[peexit->moving_from] << " "
-                << extra_move_rt[peexit->moving_mode_from] << " "
-                << "%4$N" << extra_move_rtum[peexit->moving_mode_from];
-
-        entryBuf << "%1$^C1 " << extra_move_rp[peexit->moving_to] << " сюда " 
-                << extra_move_rt[peexit->moving_mode_to] << " "
-                << "%4$N" << extra_move_rtpm[peexit->moving_mode_to];
-
-        peexit->msgLeaveRoom = leaveBuf.str();
-        peexit->msgEntryRoom = entryBuf.str();
-
-        peexit->moving_from = peexit->moving_to = peexit->moving_mode_from = peexit->moving_mode_to = 0;
-    }
 
     return peexit;
 }
