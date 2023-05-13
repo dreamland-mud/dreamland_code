@@ -21,6 +21,7 @@
 #include "religion.h"
 #include "magic.h"
 #include "damageflags.h"
+#include "damage_impl.h"
 #include "fight.h"
 #include "fight_exception.h"
 #include "religionutils.h"
@@ -644,10 +645,12 @@ NMI_INVOKE(FeniaCommandContext, msgArea, "(fmt[,args]): выдать сообщ�
     area_message(caster, message, true);
     return Register();
 }
-#if 0
+
 NMI_INVOKE(FeniaCommandContext, damage, "(damtype,damflags): нанести жертве урон с указанным типом и флагами") {
+    bool rc = false;
+
     if (vict.type == Register::NONE)
-        return Register();
+        return rc;
  
     Character *myCh = arg2character(ch);
     Character *myVict = arg2character(vict);
@@ -659,12 +662,12 @@ NMI_INVOKE(FeniaCommandContext, damage, "(damtype,damflags): нанести же
         // Call SkillDamage explicitly and store resulting dam value in the 'dam' context variable.
         // This way Fenia script can check if, for example, resulting dam was zero.
         SkillDamage skillDamage(myCh, myVict, skill->getIndex(), damtype, dam, damflags);
-        skillDamage.hit(true);
+        rc = skillDamage.hit(true);
+        dam.setValue(skillDamage.getDamage());
 
     } catch (const VictimDeathException &e) {
         throw Scripting::CustomException("victim is dead");
     }
 
-    return Register(false);
+    return rc;
 }
-#endif
