@@ -237,12 +237,12 @@ EEEDIT(name)
 
 EEEDIT(shortleave)
 {
-    return editor(argument, short_desc_from, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+    return editor(argument, short_desc_from, (editor_flags)(ED_NO_NEWLINE));      
 }
 
 EEEDIT(shortentry)
 {
-    return editor(argument, short_desc_to, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));      
+    return editor(argument, short_desc_to, (editor_flags)(ED_NO_NEWLINE));      
 }
 
 EEEDIT(leaveroom)
