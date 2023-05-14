@@ -171,6 +171,8 @@ void CPractice::pracHere( PCharacter *ch )
     std::basic_ostringstream<char> buf;
     Character *teacher;
     bool found = false;
+    const char *patternNoHelp = "%-27s %3d%%{x";
+    const char *patternHelp = "{hh%d%-27s{hx %3d%%{x";
 
     if (!( teacher = findTeacher( ch ) ))
         if (!( teacher = findPracticer( ch ) )) {
@@ -201,14 +203,20 @@ void CPractice::pracHere( PCharacter *ch )
         else
             help_id = 0;
 
+        int learned_lvl = ch->getSkillData( sn ).learned;
         DLString sname = skill->getNameFor( ch ).c_str( );
 
         buf << "     ";
 
         if (help_id > 0)
-            buf << "{hh" << help_id << sname << "{hx" << endl;
+            buf << dlprintf( patternHelp,
+                             help_id,
+                             sname.c_str( ),
+                             learned_lvl ) << endl;
         else 
-            buf << sname << endl;
+            buf << dlprintf( patternNoHelp,
+                             sname.c_str( ),
+                             learned_lvl ) << endl;
 
         found = true;
     }
