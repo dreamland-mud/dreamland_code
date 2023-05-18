@@ -1340,12 +1340,12 @@ NMI_INVOKE(Root, generateWeapon, "(weapon, ch, skill, tier[, penalty, increment]
         throw Scripting::Exception("Invalid weapon tier.");
 
     if (IS_GOOD(ch)) {
-        hr_tier = min(BEST_TIER, hr_tier + 1);
-        dr_tier = max(WORST_TIER, dr_tier - 1);
+        hr_tier = max(BEST_TIER, hr_tier - 1);
+        dr_tier = min(WORST_TIER, dr_tier + 1);
     }
     if (IS_EVIL(ch)) {
-        dr_tier = min(BEST_TIER, dr_tier + 1);
-        hr_tier = max(WORST_TIER, hr_tier - 1);
+        dr_tier = max(BEST_TIER, dr_tier - 1);
+        hr_tier = min(WORST_TIER, hr_tier + 1);
     }
 
     if (!increment) {
