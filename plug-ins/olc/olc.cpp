@@ -39,6 +39,7 @@
 #include "damageflags.h"
 #include "commandflags.h"
 #include "occupations.h"
+#include "weather.h"
 #include "update_areas.h"
 #include "websocketrpc.h"
 #include "interp.h"
@@ -485,6 +486,12 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     if (arg == "char_update") {
         char_update();
         ch->pecho("Forced char update.");
+        return;
+    }
+
+    if (arg == "weather_init") {
+        weather_init();
+        ch->pecho("Forced weather initialization.");
         return;
     }
 

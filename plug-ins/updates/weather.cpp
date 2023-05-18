@@ -23,6 +23,7 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "roomutils.h"
+#include "dlscheduler.h"
 #include "dreamland.h"
 #include "descriptor.h"
 #include "mercdb.h"
@@ -523,12 +524,14 @@ void weather_init( )
     else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
     else                                  weather_info.sky = SKY_CLOUDLESS;
 	
+    if(DLScheduler::getThis()->getCurrentTick( ) == 0) {
 	// Since this is happening on the world startup, let's notify users
 	// the world is up!
 	DLString msg;
-    msg = "Мир Мечты перезапустился и готов к игре, уииииии!";
-    send_to_discord_stream(":green_circle: " + msg);
-    send_telegram(msg);	
+    	msg = "Мир Мечты перезапустился и готов к игре, уииииии!";
+    	send_to_discord_stream(":green_circle: " + msg);
+    	send_telegram(msg);	
+    }
 }
 
 /*--------------------------------------------------------------------------

@@ -143,6 +143,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<ObjIndexWrapper>( );
     Class::regMoc<AreaIndexWrapper>( );
     Class::regMoc<SpellWrapper>( );
+    Class::regMoc<MaterialWrapper>( );
     Class::regMoc<AffectHandlerWrapper>( );
     Class::regMoc<AffectWrapper>( );
     Class::regMoc<SkillCommandWrapper>( );
@@ -238,6 +239,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<AffectWrapper>( );
     Class::unregMoc<AreaIndexWrapper>( );
     Class::unregMoc<SpellWrapper>( );
+    Class::unregMoc<MaterialWrapper>( );
     Class::unregMoc<AffectHandlerWrapper>( );
     Class::unregMoc<ObjIndexWrapper>( );
     Class::unregMoc<MobIndexWrapper>( );
