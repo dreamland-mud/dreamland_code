@@ -142,6 +142,12 @@ NMI_GET( ObjIndexWrapper, cost , "цена в серебре")
     return target->cost;
 }
 
+NMI_SET( ObjIndexWrapper, cost , "цена в серебре") 
+{ 
+    checkTarget( ); 
+    target->cost = arg.toNumber();
+}
+
 #define GETVALUE(x) \
     NMI_GET( ObjIndexWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
         checkTarget( ); \
@@ -168,6 +174,12 @@ NMI_GET( ObjIndexWrapper, item_type, "тип предмета (таблица .t
 {
     checkTarget( );
     return Register( target->item_type);
+}
+
+NMI_GET( ObjIndexWrapper, wear_flags, "куда надевается предмет (таблица .tables.wear_flags)")
+{
+    checkTarget( );
+    return Register( target->wear_flags);
 }
 
 NMI_GET( ObjIndexWrapper, gender, "грамматический род и число (n, m, f, p или null)")

@@ -645,29 +645,3 @@ NMI_INVOKE(FeniaCommandContext, msgArea, "(fmt[,args]): выдать сообщ�
     area_message(caster, message, true);
     return Register();
 }
-
-NMI_INVOKE(FeniaCommandContext, damage, "(damtype,damflags): нанести жертве урон с указанным типом и флагами") {
-    bool rc = false;
-
-    if (vict.type == Register::NONE)
-        return rc;
- 
-    Character *myCh = arg2character(ch);
-    Character *myVict = arg2character(vict);
-    Skill *skill = arg2skill(name);
-    bitnumber_t damtype = argnum2flag(args, 1, damage_table);
-    bitstring_t damflags = argnum2flag(args, 2, damage_flags);
-
-    try {
-        // Call SkillDamage explicitly and store resulting dam value in the 'dam' context variable.
-        // This way Fenia script can check if, for example, resulting dam was zero.
-        SkillDamage skillDamage(myCh, myVict, skill->getIndex(), damtype, dam, damflags);
-        rc = skillDamage.hit(true);
-        dam.setValue(skillDamage.getDamage());
-
-    } catch (const VictimDeathException &e) {
-        throw Scripting::CustomException("victim is dead");
-    }
-
-    return rc;
-}
