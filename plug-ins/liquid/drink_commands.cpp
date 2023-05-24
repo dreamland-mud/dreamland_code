@@ -186,9 +186,11 @@ static void create_pool( Object *out, int amount )
     Room *room = out->getRoom();
 
     time = amount / 15;    
-    if (time == 0) return;
-    else time = std::max( 2, time ); // puddles exist at least 2 ticks 
-	
+    if (time == 0) 
+        time = 1;
+    else 
+        time = std::max( 2, time ); 
+
     pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); // 75
 	liquid = liquidManager->find( out->value2() );	
     liqShort = liquid->getShortDescr( );
@@ -223,8 +225,10 @@ static void create_pool( Object *out, int amount )
 	pool->value1(max( 1, amount ));
 	pool->value2(liquid->getIndex( ));
 
-    if (!pool->in_room) obj_to_room(pool, room);
-    else save_items(room);
+    if (!pool->in_room) 
+        obj_to_room(pool, room);
+    else 
+        save_items(room);
 }
 
 void pour_out(Object *out)
