@@ -144,6 +144,15 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
             limit_count_on_boot( pObjIndex, ts, playerName );
             return;
         }
+
+        if (!strcmp(word, "ExDe")) {
+            char *buf = fread_string(pfile); // extra keyword
+            free_string(buf);
+            buf = fread_string(pfile); // extra description
+            free_string(buf);
+            break;
+        }
+        
         break;
 
       case 'T':
