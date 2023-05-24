@@ -153,7 +153,7 @@ COMMAND(COrder, "order")
 
             case RC_DISPATCH_POSITION:
                 victim->master->pecho(
-                    "%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$N3 встать{lEorder %2$sN3stand{x.",
+                    "%1$#^C1 %3$sне может ходить и выполнять некоторые команды. Напиши {y{hc{lRприказать %2$N3 встать{lEorder %2$N3 stand{x.",
                     victim, 
                     victName.c_str(), 
                     victim->position == POS_SLEEPING ? "спит и " : (victim->position == POS_RESTING || victim->position == POS_SITTING) ? "сидит и " : "");
