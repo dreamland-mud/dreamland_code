@@ -113,7 +113,6 @@ GSN(bonedagger);
 GSN(caltraps);
 GSN(chill_touch);
 GSN(dark_shroud);
-GSN(doppelganger);
 GSN(path_find);
 GSN(protection_heat);
 GSN(spear);

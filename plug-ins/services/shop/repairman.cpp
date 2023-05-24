@@ -183,6 +183,11 @@ int Repairman::getRepairCost( Object *obj )
 
 bool Repairman::canRepair( Object *obj, Character *client )
 {
+    if (!ch->can_see(obj)) {
+        say_fmt("Я не вижу, что ты мне там протягиваешь, %2$C1.", ch, client);
+        return false;
+    }
+
     if (!repairs.isSetBitNumber( obj->item_type )) {
         say_act( client, ch, 
                  "Я не сумею отремонтировать $t.", 
