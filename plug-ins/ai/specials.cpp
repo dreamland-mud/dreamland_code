@@ -569,6 +569,10 @@ bool BasicMobileBehavior::doWander( )
     if (IS_SET(ch->form, FORM_FISH) && !RoomUtils::isWater(room))
         return false;
 
+    // Avoid entering solitary and private rooms and getting stuck there.
+    if (room->getCapacity() != -1)
+        return false;
+
     return move_char( ch, door );
 }
 
