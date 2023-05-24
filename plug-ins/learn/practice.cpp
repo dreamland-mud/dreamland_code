@@ -171,8 +171,10 @@ void CPractice::pracHere( PCharacter *ch )
     std::basic_ostringstream<char> buf;
     Character *teacher;
     bool found = false;
-    const char *patternNoHelp = "%-27s %3d%%{x";
-    const char *patternHelp = "{hh%d%-27s{hx %3d%%{x";
+    const char *patternNoHelp = "%-27s ";
+    const char *patternHelp = "{hh%d%-27s{hx ";
+    const char *patternLearned = "изучено на %s%d%%{x";
+    PracInfo info;
 
     if (!( teacher = findTeacher( ch ) ))
         if (!( teacher = findPracticer( ch ) )) {
@@ -181,8 +183,8 @@ void CPractice::pracHere( PCharacter *ch )
         }
 
     buf << fmt( ch, "%1$^C1 может помочь тебе практиковаться в таких умениях:", teacher ) << endl;
+
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-        int help_id;
         ostringstream errbuf;
         Skill *skill = SkillManager::getThis( )->find( sn );
 
@@ -199,24 +201,31 @@ void CPractice::pracHere( PCharacter *ch )
             continue;
 
         if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
-            help_id = skill->getSkillHelp()->getID();
+            info.help_id = skill->getSkillHelp()->getID();
         else
-            help_id = 0;
+            info.help_id = 0;
 
-        int learned_lvl = ch->getSkillData( sn ).learned;
-        DLString sname = skill->getNameFor( ch ).c_str( );
+        info.percent = ch->getSkillData( sn ).learned;
+        info.name = skill->getNameFor( ch );
+        info.adept = skill->getAdept( ch );
+        info.maximum = skill->getMaximum( ch );
 
         buf << "     ";
 
-        if (help_id > 0)
+        if (info.help_id > 0)
             buf << dlprintf( patternHelp,
-                             help_id,
-                             sname.c_str( ),
-                             learned_lvl ) << endl;
-        else 
+                             info.help_id,
+                             info.name.c_str( ) );
+        else
             buf << dlprintf( patternNoHelp,
-                             sname.c_str( ),
-                             learned_lvl ) << endl;
+                             info.name.c_str( ) );
+
+        if (info.percent > 1)
+            buf << dlprintf( patternLearned,
+                             info.getPercentColor( ),
+                             info.percent ) << endl;
+        else
+            buf << "{rне изучено{x" << endl;
 
         found = true;
     }
