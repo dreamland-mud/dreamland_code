@@ -224,13 +224,14 @@ void WineRefreshWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch
 void WineRefreshWE::onDrink( ArcadianDrinkBehavior::Pointer bhv, Character *ch, int amount ) const
 {
     int level = ch->getModifyLevel( ) * bhv->getQuality( ) / 100;
-
-    ch->hit += level * 5 + number_range( 60, 100 ); 
+    int gain = level * 5 + number_range( 60, 100 ); 
+    
+    ch->hit += gain;
     ch->hit = min( ch->hit, ch->max_hit );
     update_pos( ch );
 
-    oldact("$c1 выглядит посвежевш$gим|им|ей.", ch, 0, 0, TO_ROOM );
-    oldact("Напиток освежает тебя.", ch, 0, 0, TO_CHAR );
+    ch->recho("%1$^C1 выглядит посвежевш%1$Gим|им|ей.", ch);
+    ch->pecho("Напиток освежает тебя. {D[{G%d{D]{x", gain);
 }
 
 /*
