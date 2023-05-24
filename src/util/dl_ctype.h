@@ -41,7 +41,7 @@ inline char dl_tolower( char c )
 
 inline bool dl_is_arg_separator(char c)
 {
-    return c == '\'' || c == '"' || c == '!';
+    return c == '\'' || c == '"';
 }
 
 #ifdef __cplusplus

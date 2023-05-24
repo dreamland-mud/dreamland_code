@@ -116,8 +116,10 @@ CMDRUN( cast )
     }
 
     // Split user input into spell name (potentially in quotes) and spell args (rest of the string).
+    // Symbol '!' can act as a spell name separator, but replace it with quotes first.
     fullArguments = constArguments;
     fullArguments.stripWhiteSpace();
+    fullArguments = fullArguments.replaces("!", "'");
     spellArgs = fullArguments;
     spellName = spellArgs.getOneArgument();
     
