@@ -138,7 +138,8 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
         break;
     }
 
-    if (!ch->is_npc( )) 
+    // Don't restore normal health when hungry or thirsty, but allow to recover from negative hp (stunned, incap position).
+    if (!ch->is_npc( ) && ch->hit > 0)
         if (desire_hunger->isActive( ch->getPC( ) )
             || desire_thirst->isActive( ch->getPC( ) )
             || desire_bloodlust->isActive( ch->getPC( ) ))
@@ -224,7 +225,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
         break;
     }
 
-    if (!ch->is_npc( )) 
+    if (!ch->is_npc( ) && ch->mana > 0)
         if (desire_hunger->isActive( ch->getPC( ) )
             || desire_thirst->isActive( ch->getPC( ) )
             || desire_bloodlust->isActive( ch->getPC( ) ))
