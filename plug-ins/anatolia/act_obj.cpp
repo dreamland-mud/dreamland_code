@@ -207,7 +207,7 @@ static bool oprog_get_money( Character *ch, Object *obj )
     ch->silver += obj->value0();
     ch->gold += obj->value1();
 
-    if (obj->item_type == ITEM_MONEY && obj->pIndexData->vnum > 5) {
+    if (obj->pIndexData->vnum > 5 && (obj->value0() > 0 || obj->value1() > 0)) {
         DLString moneyArg = describe_money(obj->value1( ), obj->value0( ), 4);
         ch->pecho("Твой кошель пополнился на: %s.", moneyArg.c_str());
     }

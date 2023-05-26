@@ -62,7 +62,7 @@ bool check_stun(Character *ch, Character *victim)
             if (roll <= (int)chance / 2) {
                 affect_strip(ch, gsn_paralysis);
                 ch->pecho("{1{GТвой паралич проходит, и ты снова можешь двигаться!{2");
-                ch->recho("{1{GПаралич %1$C2 проходит, и %1$P1 снова начинает двигаться!{2", ch);
+                ch->recho("{1{GПаралич %1$C2 проходит, и %1$P1 снова начина%1$nет|ют двигаться!{2", ch);
                 REMOVE_BIT(ch->affected_by, AFF_STUN);
                 return false; // can attack
             }
@@ -70,23 +70,20 @@ bool check_stun(Character *ch, Character *victim)
             else if (roll <= (int)chance) {
                 affect_strip(ch, gsn_paralysis);
                 ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
-                ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
+                ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!{2", ch);
                 REMOVE_BIT(ch->affected_by, AFF_STUN);
                 SET_BIT(ch->affected_by, AFF_WEAK_STUN);
             } else {
-                oldact_p("{WТы парализова$gно|н|на и не можешь реагировать на атаки $C2.{x",
-                         ch, 0, victim, TO_CHAR, POS_FIGHTING);
-                oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на твои атаки.{x",
-                         ch, 0, victim, TO_VICT, POS_FIGHTING);
-                oldact_p("{W$c1 парализова$gно|н|на и не может реагировать на атаки.{x",
-                         ch, 0, victim, TO_NOTVICT, POS_FIGHTING);
+                ch->pecho("{WТы парализова%1$Gно|н|на|ны и не можешь реагировать на атаки %2$C2.{x", ch, victim);
+                victim->pecho("{W%1$^C1 парализова%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на твои атаки.{x", ch);
+                ch->recho(victim, "{W%1$^C1 парализова%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на атаки.{x", ch);
             }
             return true;
         }
         // other stuns -- not AP's paralysis
         else {
             ch->pecho("{1{MТвой паралич проходит, но ты все еще оглуше%1$Gно|н|на|ны!{2", ch);
-            ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!!{2", ch);
+            ch->recho("{1{MПаралич %1$C2 проходит, но %1$P1, похоже, все еще оглуше%1$Gно|н|на|ны!{2", ch);
             REMOVE_BIT(ch->affected_by, AFF_STUN);
             SET_BIT(ch->affected_by, AFF_WEAK_STUN);
             return true;
@@ -94,12 +91,9 @@ bool check_stun(Character *ch, Character *victim)
     }
 
     if (IS_AFFECTED(ch, AFF_WEAK_STUN)) {
-        oldact_p("{MТы оглуше$gно|н|на и не можешь реагировать на атаки $C2.{x",
-                 ch, 0, victim, TO_CHAR, POS_FIGHTING);
-        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на твои атаки.{x",
-                 ch, 0, victim, TO_VICT, POS_FIGHTING);
-        oldact_p("{M$c1 оглуше$gно|н|на и не может реагировать на атаки.{x",
-                 ch, 0, victim, TO_NOTVICT, POS_FIGHTING);
+        ch->pecho("{WТы оглуше%1$Gно|н|на|ны и не можешь реагировать на атаки %2$C2.{x", ch, victim);
+        victim->pecho("{W%1$^C1 оглуше%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на твои атаки.{x", ch);
+        ch->recho(victim, "{W%1$^C1 оглуше%1$Gно|н|на|ны и не мо%1$nжет|гут реагировать на атаки.{x", ch);
 
         REMOVE_BIT(ch->affected_by, AFF_WEAK_STUN);
 

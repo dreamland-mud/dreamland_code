@@ -506,7 +506,7 @@ void poison_effect(void *vo, Character *source, short level, int dam, int target
             Affect af;
 
             victim->pecho("{gТебя начинает тошнить, когда яд проникает в твое тело.{x");
-            victim->recho("%1$^C2 начинает тошнить, когда яд проникает в %1$P2 тело.", victim);
+            victim->recho("%1$^C4 начинает тошнить, когда яд проникает в %1$P2 тело.", victim);
 
             af.bitvector.setTable(&affect_flags);
             af.type      = gsn_poison;

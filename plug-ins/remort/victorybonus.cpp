@@ -62,7 +62,7 @@ void Koschey::msgListEmpty( Character *client )
 void Koschey::msgListAfter( Character *client )
 {
     tell_dim( client, ch, "Это все. Бери то, за чем приш$gло|ел|ла, и чтоб духу твоего здесь не было!" );
-    oldact("$C1 что-то монотонно цедит сквозь зубы, обращаясь к $c4.", client, 0, ch, TO_NOTVICT );
+    oldact("$C1 что-то монотонно цедит сквозь зубы, обращаясь к $c3.", client, 0, ch, TO_NOTVICT );
 }
 
 void Koschey::msgListBefore( Character *client )
