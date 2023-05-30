@@ -366,6 +366,23 @@ protected:
     bool invis_tag_work( );
     long long st_invis, my_invis;
 
+    enum {
+        SKY_NONE = -1,
+    };
+    enum {
+        SEASON_NONE = -1,
+        SEASON_WINTER = 0,
+        SEASON_SPRING = 1,
+        SEASON_SUMMER = 2,
+        SEASON_AUTUMN = 3,
+    };
+    void sky_season_tag_parse( ostringstream & );
+    bool sky_season_tag_work( );
+    int st_sky, my_sky;
+    bool invert_sky;
+    int st_season, my_season;
+    bool invert_season;
+
     void hyper_tag_start( ostringstream & );
     void hyper_tag_end( ostringstream & );
     bool hyper_tag_work();
@@ -404,6 +421,19 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
     my_invis = INVIS_NONE;
 
     my_web = is_websock(ch);
+
+    my_sky = weather_info.sky;
+    if (time_info.month < 4) {
+        my_season = SEASON_WINTER;
+    } else if (time_info.month < 8) {
+        my_season = SEASON_SPRING;
+    } else if (time_info.month < 12) {
+        my_season = SEASON_SUMMER;
+    } else if (time_info.month < 16) {
+        my_season = SEASON_AUTUMN;
+    } else {
+        my_season = SEASON_WINTER;
+    }
 
     if (ch) {
         if (ch->is_immortal( ))
@@ -446,6 +476,10 @@ void VisibilityTags::reset( )
     invert_align = false;
     st_invis = INVIS_NONE;
     my_hyper_tag = 0;
+    st_sky = SKY_NONE;
+    invert_sky = false;
+    st_season = SEASON_NONE;
+    invert_season = false;
 }
 
 
@@ -555,7 +589,8 @@ void VisibilityTags::run( ostringstream &out )
                     || !sex_tag_work( )
                     || !time_tag_work( )
                     || !hyper_tag_work( )
-                    || !invis_tag_work( ))
+                    || !invis_tag_work( )
+                    || !sky_season_tag_work( ))
             continue;
            
             html_escape( out );
@@ -587,6 +622,9 @@ void VisibilityTags::run( ostringstream &out )
             break;
         case 'I':
             invis_tag_parse( out );
+            break;
+        case 'F':
+            sky_season_tag_parse( out );
             break;
         case 'h':
             hyper_tag_start( out );
@@ -886,6 +924,54 @@ void VisibilityTags::invis_tag_parse( ostringstream &out )
                   out << "\037";
               st_invis = INVIS_NONE; 
               break;
+    }
+}
+
+// {F
+// end sky: x X
+// sky type: t (thunderstorm), r (rain), c (cloudy), s (sunny)
+//           T (not thunderstorm), R (not rain), C (not cloudy), S (not sunny)
+// end season: y Y
+// sky type: w (winter), p (spring), u (summer), a (autumn)
+//           W (not winter), P (not spring), U (not summer), A (not autumn)
+bool VisibilityTags::sky_season_tag_work( )
+{
+    return (
+               st_sky == SKY_NONE ||
+               (!invert_sky && st_sky == my_sky) ||
+               (invert_sky && st_sky != my_sky)
+           ) &&
+           (
+               st_season == SEASON_NONE ||
+               (!invert_season && st_season == my_season) ||
+               (invert_season && st_season != my_season)
+           );
+}
+
+void VisibilityTags::sky_season_tag_parse( ostringstream &out )
+{
+    switch (*++p) {
+    case 't': st_sky = SKY_LIGHTNING; invert_sky = false; break;
+    case 'r': st_sky = SKY_RAINING; invert_sky = false; break;
+    case 'c': st_sky = SKY_CLOUDY; invert_sky = false; break;
+    case 's': st_sky = SKY_CLOUDLESS; invert_sky = false; break;
+    case 'T': st_sky = SKY_LIGHTNING; invert_sky = true; break;
+    case 'R': st_sky = SKY_RAINING; invert_sky = true; break;
+    case 'C': st_sky = SKY_CLOUDY; invert_sky = true; break;
+    case 'S': st_sky = SKY_CLOUDLESS; invert_sky = true; break;
+    case 'w': st_season = SEASON_WINTER; invert_season = false; break;
+    case 'p': st_season = SEASON_SPRING; invert_season = false; break;
+    case 'u': st_season = SEASON_SUMMER; invert_season = false; break;
+    case 'a': st_season = SEASON_AUTUMN; invert_season = false; break;
+    case 'W': st_season = SEASON_WINTER; invert_season = true; break;
+    case 'P': st_season = SEASON_SPRING; invert_season = true; break;
+    case 'U': st_season = SEASON_SUMMER; invert_season = true; break;
+    case 'A': st_season = SEASON_AUTUMN; invert_season = true; break;
+    default:  --p; /* FALLTHROUGH */
+    case 'x':
+    case 'X': st_sky = SKY_NONE; invert_sky = false; break;
+    case 'y':
+    case 'Y': st_season = SEASON_NONE; invert_season = false; break;
     }
 }
 
