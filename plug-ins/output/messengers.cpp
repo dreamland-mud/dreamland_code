@@ -102,6 +102,12 @@ void send_telegram_note(const DLString &thread, const DLString &author, const DL
     }
 }
 
+void send_telegram_level(PCharacter *ch)
+{   
+    if (ch->getLevel() == LEVEL_MORTAL)
+        send_to_telegram( fmt(0, "%1$^C1 достиг%1$Gло||ла уровня героя!", ch) );
+}
+
 void send_telegram_gquest(const DLString &gqName, const DLString &msg)
 {
     DLString gqName_koi = telegram_string(gqName);
