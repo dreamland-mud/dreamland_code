@@ -94,6 +94,7 @@ void PCharacter::gainExp( int gain )
                   "%1$^C1 дости%1$Gгло|г|гла %2$d уровня!", this, getRealLevel( ) );
 
         send_discord_level(this);
+        send_telegram_level(this);
 
         advanceLevel( );
 
