@@ -766,7 +766,7 @@ SKILL_RUNP( touch )
     {
         ch->pecho("Ты прикасаешься к шее %1$C2 и %1$P1 забыва%1$nется|ются в ужасном кошмаре.", victim);
         victim->pecho("%^C1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.", ch);
-        ch->recho(victim, "%1$^C1 прикасается к шее %1$C2 и %1$P1 забыва%1$nется|ются в ужасном кошмаре.", ch, victim);
+        ch->recho(victim, "%1$^C1 прикасается к шее %2$C2 и %2$P1 забыва%1$nется|ются в ужасном кошмаре.", ch, victim);
         gsn_vampiric_touch->improve( ch, true, victim );
 
         af.type = gsn_vampiric_touch;
