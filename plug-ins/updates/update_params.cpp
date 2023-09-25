@@ -164,7 +164,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     if (IS_AFFECTED(ch, AFF_SLOW))
         gain *= 2 ;
 
-    if ( IS_HARA_KIRI(ch) )
+    if ( IS_HARA_KIRI(ch) || IS_MISOGI(ch) )
         gain *= 3;
 
     if (IS_AFFECTED(ch, AFF_REGENERATION)) {
@@ -259,7 +259,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     if ( ch->getCurrStat(STAT_WIS) > 20 )
         gain = ( gain * 11) / 10;
 
-    if ( IS_HARA_KIRI(ch) )
+    if ( IS_HARA_KIRI(ch) || IS_MISOGI(ch) )
         gain *= 3;
 
     gain += gain * ch->mana_gain / 100;
@@ -320,7 +320,7 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
     if ( ch->getCurrStat(STAT_DEX) > 20 )
         gain *= (14 /10);
 
-    if ( IS_HARA_KIRI(ch) )
+    if ( IS_HARA_KIRI(ch) || IS_MISOGI(ch) )
         gain *= 3;
 
     if( ch->isAffected(gsn_bandage ) )
