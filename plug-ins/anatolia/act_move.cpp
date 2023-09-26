@@ -410,12 +410,6 @@ CMDRUNP(stand)
             }
         }
 
-        if (IS_HARA_KIRI(ch))
-        {
-            ch->pecho("Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает.");
-            REMOVE_BIT(ch->act, PLR_HARA_KIRI);
-        }
-
         ch->position = POS_STANDING;
         interpret_raw(ch, "look", "auto");
         break;
@@ -463,6 +457,19 @@ CMDRUNP(stand)
         ch->on = 0;
         break;
     }
+
+    if (IS_MISOGI(ch))
+    {
+        ch->pecho("Ты выходишь из транса и чувствуешь, как силы наполняют твоё тело.");
+        REMOVE_BIT(ch->act, PLR_MISOGI);
+    }
+
+    if (IS_HARA_KIRI(ch))
+    {
+        ch->pecho("Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает.");
+        REMOVE_BIT(ch->act, PLR_HARA_KIRI);
+    }
+
 }
 
 CMDRUNP(rest)
@@ -653,13 +660,19 @@ CMDRUNP(rest)
         }
         ch->position = POS_RESTING;
 
-        if (IS_HARA_KIRI(ch))
-        {
-            ch->pecho("Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает.");
-            REMOVE_BIT(ch->act, PLR_HARA_KIRI);
-        }
-
         break;
+    }
+
+    if (IS_MISOGI(ch))
+    {
+        ch->pecho("Ты выходишь из транса и чувствуешь, как силы наполняют твоё тело.");
+        REMOVE_BIT(ch->act, PLR_MISOGI);
+    }
+
+    if (IS_HARA_KIRI(ch))
+    {
+        ch->pecho("Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает.");
+        REMOVE_BIT(ch->act, PLR_HARA_KIRI);
     }
 
     return;
@@ -853,11 +866,18 @@ CMDRUNP(sit)
         break;
     }
 
+    if (IS_MISOGI(ch))
+    {
+        ch->pecho("Ты выходишь из транса и чувствуешь, как силы наполняют твоё тело.");
+        REMOVE_BIT(ch->act, PLR_MISOGI);
+    }
+
     if (IS_HARA_KIRI(ch))
     {
         ch->pecho("Ты чувствуешь, как рана от харакири затягивается, и твое тело заживает.");
         REMOVE_BIT(ch->act, PLR_HARA_KIRI);
     }
+
     return;
 }
 

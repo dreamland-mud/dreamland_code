@@ -591,6 +591,7 @@ struct Area {
 #define DIGGED( ch )            (!ch->is_npc( ) && IS_SET(ch->act, PLR_DIGGED))
 #define IS_VAMPIRE(ch)        (!ch->is_npc() && IS_SET((ch)->act , PLR_VAMPIRE))
 #define IS_HARA_KIRI(ch) (IS_SET((ch)->act , PLR_HARA_KIRI))
+#define IS_MISOGI(ch) (IS_SET((ch)->act , PLR_MISOGI))
 
 #define HEALTH(ch) ((ch)->hit * 100 / max(1, (ch)->max_hit.getValue( )))
 
