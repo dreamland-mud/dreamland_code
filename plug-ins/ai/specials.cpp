@@ -321,7 +321,7 @@ static bool can_take_obj( Character *ch, Object *obj )
 
     if (!obj->getOwner().empty())
         return false;
-    if (obj->behavior)
+    if (obj->behavior && obj->behavior->getType() != "BasicObjectBehavior")
         return false;
     if (!ch->can_see( obj ))
         return false;
