@@ -182,7 +182,7 @@ bool limit_purge( Object *obj )
         return false;
 
     if (obj->getRoom( ))
-        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
+        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпа%1$nется|ются трухой!", obj );
 
     DLString where;
     if (obj->carried_by)
