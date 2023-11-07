@@ -239,7 +239,7 @@ void pour_out(Object *out)
     // Tai: updating this to include the destruction of items, not just manual pour out
 
     if (out->value1() == 0) {
-        room->echo(POS_RESTING, "Из %O4 не выливается ни капли.", out);
+        room->echo(POS_RESTING, "Из %O2 не выливается ни капли.", out);
         return;
     }
 
