@@ -21,6 +21,7 @@ class NPCharacter;
 class Object;
 class Skill;
 class Affect;
+class Profession;
 
 /* fight.cpp */
 void        violence_update( );
