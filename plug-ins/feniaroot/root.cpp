@@ -1416,7 +1416,6 @@ NMI_INVOKE(Root, get_str_app, "(ch): доступ до json-таблицi str_ap
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
-    return Register( obj );
-    
-
+    return Register( obj );    
 }
+

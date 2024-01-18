@@ -272,9 +272,26 @@ const struct second_weapon_t second_weapon_table [] = {
 { prof_none,        { 0,                                                    } },
 };
 
+int second_weapon_chance(Profession *prof, Object *weapon)
+{
+    int chance_modifier = 18;
+    int index = 0; /* hand to hand */
+
+    if (weapon && weapon->item_type == ITEM_WEAPON)
+        index = weapon->value0() + 1;
+
+    for (int i = 0; second_weapon_table[i].prof != prof_none; i++) {
+        if (prof->getIndex() == second_weapon_table[i].prof) {
+            chance_modifier = second_weapon_table[i].percents[index];
+            break;
+        }
+    }
+
+    return chance_modifier;
+}
+
 void second_weapon_hit( Character *ch, Character *victim, int chance )
 {
-    int index = 0; /* hand to hand */
     Object *weapon;
 
     // can't dual wield without either of hands/wrists/arms
@@ -294,18 +311,9 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
         return;
     
     weapon = get_eq_char(ch, wear_second_wield);
-    if (weapon && weapon->item_type == ITEM_WEAPON)
-        index = weapon->value0() + 1;
-  
-    int chance_modifier = 18;
  
-    for (int i = 0; second_weapon_table[i].prof != prof_none; i++) {
-        if (ch->getProfession( ) == second_weapon_table[i].prof) {
-            chance_modifier = second_weapon_table[i].percents[index];
-            break;
-        }
-    }
-    
+    int chance_modifier = second_weapon_chance(ch->getProfession().getElement(), weapon);
+     
     chance = chance * chance_modifier / 100;
 
     if (number_percent( ) < gsn_second_weapon->getEffective( ch ) * chance / 100) {

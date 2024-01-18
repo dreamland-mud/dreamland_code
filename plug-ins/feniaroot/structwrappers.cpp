@@ -25,6 +25,7 @@
 #include "spelltarget.h"
 #include "material-table.h"
 #include "material.h"
+#include "fight.h"
 
 #include "nativeext.h"
 #include "regcontainer.h"
@@ -398,11 +399,25 @@ NMI_INVOKE( ProfessionWrapper, goodPersonality, "(ch): проверить огр
     
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
     Profession *prof = professionManager->find( name );
+    
     if (!prof->getEthos( ).isSetBitNumber( ch->getTarget( )->ethos ))
         return false;
     if (!prof->getAlign( ).isSetBitNumber( ALIGNMENT(ch->getTarget( )) ))
         return false;
     return true;
+}
+
+NMI_INVOKE(ProfessionWrapper, secondWeaponChance, "([weapon]): модифiкатор шансу атаки weapon у лiвiй руцi або null для hand to hand")
+{
+    ::Object *weapon;
+
+    if (args.empty() || args.front().type == Register::NONE)
+        weapon = 0;
+    else
+        weapon = argnum2item(args, 1);
+
+    Profession *prof = professionManager->find( name );
+    return Register(second_weapon_chance(prof, weapon));
 }
 
 /*----------------------------------------------------------------------
