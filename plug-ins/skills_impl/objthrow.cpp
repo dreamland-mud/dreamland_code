@@ -47,6 +47,7 @@ PROF(ninja);
 GSN(accuracy);
 GSN(dodge);
 GSN(poison);
+GSN(stuck_item);
 
 static void arrow_damage( Object *arrow, Character *ch, Character *victim, int damroll, int door );
 
@@ -272,7 +273,7 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
         Affect af;
 
         af.bitvector.setTable(&affect_flags);
-        af.type      = sn;
+        af.type      = gsn_stuck_item;
         af.level     = ch->getModifyLevel();
         af.duration  = -1;
         af.location = APPLY_HITROLL;
