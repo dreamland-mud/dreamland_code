@@ -53,9 +53,18 @@ void CodeSourceRepo::save(Scripting::CodeSource &cs)
 {
     DLString folderName;
     DLString fileName;
+    DLString pubPrefix("public/");
+    bool pubFolder = false;
+    DLString csName(cs.name);
+
+    // Scripts beginning with "public/" going to be saved to "fenia.public" folder
+    if (pubPrefix.strPrefix(csName)) {
+        csName = csName.replace(0, pubPrefix.size(), "");
+        pubFolder = true;
+    }
 
     for (auto &pattern: subjPatterns) {
-        RegExp::MatchVector matches = pattern->subexpr(cs.name.c_str());
+        RegExp::MatchVector matches = pattern->subexpr(csName.c_str());
         if (!matches.empty()) {
             folderName = matches.at(0);
             fileName = matches.at(1);
@@ -68,7 +77,14 @@ void CodeSourceRepo::save(Scripting::CodeSource &cs)
         return;
     }
 
-    fs::path path = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
+    fs::path path;
+
+    if (pubFolder) {
+        path = dreamland->getFeniaPublicScriptDir().getAbsolutePath().c_str();
+    } else {
+        path = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
+    }
+
     path /= folderName.c_str();
     fs::create_directories(path);
 
