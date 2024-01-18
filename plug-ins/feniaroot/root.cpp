@@ -33,6 +33,7 @@
 #include "../anatolia/handler.h"
 #include "calendar_utils.h"
 #include "material-table.h"
+#include "stats_apply.h"
 
 #include "root.h"
 #include "nannyhandler.h"
@@ -1398,4 +1399,24 @@ NMI_INVOKE(Root, interpolate, "(x, x1, x2, y1, y2): линейно интерп�
     int y2 = argnum2number(args, 5);
 
     return Register((int)linear_interpolation(x, x1, x2, y1, y2));
+}
+
+NMI_INVOKE(Root, get_str_app, "(ch): доступ до json-таблицi str_app для персонажа")
+{
+    Character *ch = argnum2character(args, 1);
+    const str_app_type &entry = get_str_app(ch);
+
+    ::Pointer<RegContainer> rc(NEW);
+    (*rc)->map["hit"] = Register(entry.hit);
+    (*rc)->map["missile"] = Register(entry.missile);
+    (*rc)->map["carry"] = Register(entry.carry);
+    (*rc)->map["wield"] = Register(entry.wield);
+    (*rc)->map["web"] = Register(entry.web);
+    (*rc)->map["damage"] = Register(entry.damage);
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(rc);
+    return Register( obj );
+    
+
 }

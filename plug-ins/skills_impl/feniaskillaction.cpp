@@ -174,7 +174,8 @@ bool FeniaSkillActionHelper::executeCommandRun(DefaultSkillCommand *cmd, Charact
 
 bool FeniaSkillActionHelper::executeCommandApply(DefaultSkillCommand *cmd, Character *ch, Character *victim, int level, bool &rc)
 {
-    return executeMethod(cmd, "apply", createContext(cmd, ch, victim, level), rc);
+    Scripting::Register ctx =  createContext(cmd, ch, victim, level);
+    return executeMethod(cmd, "apply", ctx, rc);
 }
 
 bool FeniaSkillActionHelper::executeMethod(WrapperTarget *wtarget, const DLString &methodName, Scripting::Register ctx, bool &rc)
