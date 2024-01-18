@@ -11,7 +11,6 @@ magic.cpp \
 onehit.cpp \
 onehit_undef.cpp \
 onehit_weapon.cpp \
-onehit_missile.cpp \
 impl.cpp
 
 

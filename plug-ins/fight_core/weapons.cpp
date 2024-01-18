@@ -19,7 +19,7 @@ WEARLOC(second_wield);
 GSN(none);  GSN(exotic);      GSN(sword);        GSN(dagger);
 GSN(spear); GSN(mace);        GSN(axe);          GSN(flail);
 GSN(whip);  GSN(polearm);     GSN(bow);          GSN(arrow);
-GSN(lance); GSN(throw_stone); GSN(hand_to_hand);
+GSN(lance); GSN(throwing_weapon); GSN(hand_to_hand);
 
 Skill * get_weapon_skill( Object *wield )
 {
@@ -35,10 +35,10 @@ Skill * get_weapon_skill( Object *wield )
         case(WEAPON_FLAIL):     return &*gsn_flail;
         case(WEAPON_WHIP):      return &*gsn_whip;
         case(WEAPON_POLEARM):   return &*gsn_polearm;
-        case(WEAPON_BOW):           return &*gsn_bow;
-        case(WEAPON_ARROW):           return &*gsn_arrow;
-        case(WEAPON_LANCE):           return &*gsn_lance;
-        case(WEAPON_STONE):         return &*gsn_throw_stone;                                
+        case(WEAPON_BOW):       return &*gsn_bow;
+        case(WEAPON_ARROW):     return &*gsn_arrow;
+        case(WEAPON_LANCE):     return &*gsn_lance;
+        case(WEAPON_STONE):     return &*gsn_throwing_weapon;                                
    }
 }
 

@@ -71,7 +71,6 @@ GSN(tame);
 GSN(soothe);
 GSN(digging);
 GSN(grave);
-GSN(throw);
 GSN(grab);
 GSN(make_shield);
 GSN(broom_ritual);

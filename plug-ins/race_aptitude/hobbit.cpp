@@ -2,7 +2,6 @@
  *
  * ruffina, 2004
  */
-#include "objthrow.h"
 #include "skillreference.h"
 #include "skillcommandtemplate.h"
 #include "skillmanager.h"

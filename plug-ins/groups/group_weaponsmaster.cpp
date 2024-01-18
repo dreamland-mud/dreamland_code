@@ -14,7 +14,6 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 
-#include "objthrow.h"
 #include "skill.h"
 #include "skillcommandtemplate.h"
 #include "skillmanager.h"
