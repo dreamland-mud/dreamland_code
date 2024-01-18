@@ -1419,3 +1419,14 @@ NMI_INVOKE(Root, get_str_app, "(ch): доступ до json-таблицi str_ap
     return Register( obj );    
 }
 
+NMI_INVOKE(Root, help, "(id): вернуть сырой текст статьи справки по id или исключение")
+{
+    int id = argnum2number(args, 1);
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+
+    if (article.isEmpty())
+        throw Scripting::Exception("Help article with this ID not found");
+
+    DLString text = article->getText();
+    return Register(text); 
+}

@@ -11,6 +11,7 @@
 #include "dl_ctype.h"
 #include "stringlist.h"
 #include "format.h"
+#include "mudtags.h"
 #include "regexp.h"
 #include "nativeext.h"
 #include "fenia/exceptions.h"
@@ -19,6 +20,7 @@
 #include "idcontainer.h"
 #include "regcontainer.h"
 #include "reglist.h"
+#include "def.h"
 
 namespace Scripting {
 
@@ -255,6 +257,12 @@ NMI_INVOKE(FeniaString, stripColour, "(): удаляет все символы �
     return rc;
 }
 
+NMI_INVOKE(FeniaString, stripTags, "(): удаляет все специальные теги и цвета")
+{
+    ostringstream buf;
+    mudtags_convert(c_str(), buf, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR);
+    return buf.str();
+}
 
 NMI_INVOKE(FeniaString, contains, "(words): true если эта строка содержит одно из слов из строки words")
 {
