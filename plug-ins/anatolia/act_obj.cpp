@@ -1753,24 +1753,3 @@ CMDRUNP( search )
     ch->pecho("Ты можешь искать только камни{le (stones){x.");
 }
 
-CMDRUNP( throw )
-{
-    DLString args = argument, arg = args.getOneArgument( );
-
-    if (!arg.empty( )) {
-        if (arg.strPrefix( "spear" ) || arg.strPrefix( "копье" )) {
-            interpret_cmd( ch, "throwspear", args.c_str( ) );
-            return;
-        }
-
-        if (arg.strPrefix( "stone" ) || arg.strPrefix( "камень" )) {
-            interpret_cmd( ch, "throwstone", args.c_str( ) );
-            return;
-        }
-    }
-
-    ch->pecho("Метнуть что?");
-}
-
-
-
