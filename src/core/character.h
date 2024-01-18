@@ -295,7 +295,7 @@ public:
 
     // parts stuff 
     XMLFlags   form;
-    int        parts;
+    XMLFlags        parts;
     int        size;
     char*        material;
     

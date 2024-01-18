@@ -90,6 +90,7 @@ Character::Character( )
                 perm_stat( &stat_table ), 
                 mod_stat( &stat_table ),
                 form(0, &form_flags),
+                parts(0, &part_flags),
                 material( &str_empty[0] ),
                 language( lang_common ),
                 ambushing( &str_empty[0] ),
