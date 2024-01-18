@@ -209,6 +209,14 @@ PCharacter *argnum2player(const RegisterList &args, int num)
     return ch->getPC();
 }
 
+NPCharacter *argnum2mobile(const RegisterList &args, int num)
+{
+    Character *ch = argnum2character(args, num);
+    if (!ch->is_npc())
+        throw Scripting::Exception("PC found when mobile expected.");
+    return ch->getNPC();
+}
+
 PCMemoryInterface * argnum2memory(const RegisterList &args, int num)
 {
     DLString playerName = argnum2string(args, num);

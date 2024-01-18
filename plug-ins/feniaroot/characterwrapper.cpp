@@ -2700,6 +2700,23 @@ NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long,extra): ус
     return Register( );
 }
 
+NMI_INVOKE(CharacterWrapper, behaviorMethod, "(methodName, args...): вызвать метод MobileBehavior с аргументами")
+{
+    checkTarget();
+    CHK_PC
+    DLString methodName = argnum2string(args, 1);
+
+    if (methodName == "shot") {
+        Character *attacker = argnum2character(args, 2);
+        int door = argnum2number(args, 3);
+        if (target->getNPC()->behavior)
+            target->getNPC()->behavior->shot(attacker, door);
+        return Register();
+    }
+
+    throw Scripting::Exception(methodName + " behavior method not supported yet");
+}
+
 NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать триггер у персонажа или прототипа")
 {
     checkTarget();
