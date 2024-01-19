@@ -553,6 +553,23 @@ NMI_INVOKE( NannyHandler, alignAllowed, "" )
     return buf.str( );
 }
 
+NMI_INVOKE( NannyHandler, alignMin, "" )
+{
+    int a_min = ALIGN_EVIL;
+    int a_max = ALIGN_GOOD;
+    align_get_ranges(getPlayer(args), a_min, a_max);
+    return a_min;
+}
+
+NMI_INVOKE( NannyHandler, alignMax, "" )
+{
+    int a_min = ALIGN_EVIL;
+    int a_max = ALIGN_GOOD;
+    align_get_ranges(getPlayer(args), a_min, a_max);
+    return a_max;
+}
+
+
 NMI_INVOKE( NannyHandler, alignChoose, "" )
 {
     DLString a;

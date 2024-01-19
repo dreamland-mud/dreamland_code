@@ -29,6 +29,7 @@ DLString align_name( Character * );
 DLString align_max( PCharacter * );
 DLString align_min( PCharacter * );
 const char *align_name_short(Character *ch, const Grammar::MultiGender &g);
+void align_get_ranges( PCharacter *ch, int &a_min, int &a_max );
 
 #define ALIGN_ERROR 0xffff
 

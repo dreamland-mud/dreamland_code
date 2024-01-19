@@ -330,6 +330,20 @@ NMI_GET( ProfessionWrapper, alignName, "русское имя подходяще
     return "любая";
 }
 
+NMI_GET( ProfessionWrapper, minAlign, "нижнее значение диапазона натуры" ) 
+{
+    Profession *prof = professionManager->find( name );
+    return prof->getMinAlign();
+}
+
+NMI_GET( ProfessionWrapper, maxAlign, "верхнее значение диапазона натуры" ) 
+{
+    Profession *prof = professionManager->find( name );
+    return prof->getMaxAlign();
+}
+
+
+
 NMI_INVOKE(ProfessionWrapper, wearModifier, "(type): бонус на уровень владения этим типом предмета (.tables.item_table)")
 {
     int itype = argnum2flag(args, 1, item_table);
