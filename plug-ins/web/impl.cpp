@@ -775,8 +775,6 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
 
         if (paf->type == gsn_stardust) 
            m = 'z';
-        else if (paf->type == gsn_sanctuary)
-           m = 's';
         else if (paf->type == gsn_dark_shroud)
            m = 'd';
         else if (paf->type == gsn_protective_shield)
@@ -833,6 +831,7 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
             zero += m;
     }
 
+    mark_affect( ch, active, AFF_SANCTUARY, 's' );
     mark_affect( ch, active, AFF_PROTECT_EVIL, 'e' );
     mark_affect( ch, active, AFF_PROTECT_GOOD, 'g' );
 

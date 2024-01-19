@@ -135,7 +135,11 @@ DLString AffectOutput::format_affect_location( Affect *paf )
                                apply_flags.message( paf->location ).c_str( ),
                                100 - paf->modifier );
             break;
-            
+
+        case APPLY_BITVECTOR:
+            /* do nothing */
+            break;
+
         default:
             if (paf->global.empty()) {
                 buf << "изменяет {m" << apply_flags.message( paf->location ) << "{y "
@@ -152,6 +156,7 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
     ostringstream buf;
     const FlagTable *table = paf->bitvector.getTable();
     bitstring_t b = paf->bitvector;
+    bool removes = paf->location == APPLY_BITVECTOR && paf->modifier < 0;
 
     if (table && b) {
         const char *word = 0;
@@ -159,20 +164,24 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
         DLString ending;
 
         if (table == &affect_flags) {
-            word = "добавляет";
+            word = removes ? "{1{Rотнимает{2" : "добавляет";
             gcase = '4';
         } else if (table == &imm_flags) {
-            word = "иммунитет к";
+            word = removes ? "{1{Rотнимает{2 иммунитет к" : "иммунитет к";
         } else if (table == &res_flags) {
-            word = "сопротивляемость к";
+            word = removes ? "{1{Rотнимает{2 сопротивляемость к" : "сопротивляемость к";
         } else if (table == &vuln_flags) {
-            word = "уязвимость к";
+            word = removes ? "отнимает уязвимость к" : "уязвимость к";
         } else if (table == &detect_flags) {
-            word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  "добавляет" : "обнаружение");
+            word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  
+                    (removes ? "отнимает" : "добавляет") : 
+                    (removes ? "отнимает обнаружение" : "обнаружение"));
             gcase = (IS_SET(b, ADET_WEB|ADET_FEAR) ? '4': '2');
+            
         } else if (table == &form_flags) {
-            word = "добавляет форму";
-            //ending = " форму тела";
+            word = removes ? "отнимает форму" : "добавляет форму";
+        } else if (table == &part_flags) {
+            word = removes ? "отнимает часть тела" : "добавляет часть тела";
         }
         
         if (word)

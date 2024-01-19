@@ -168,8 +168,12 @@ static Flags & char_flag_by_table(Character *ch, const FlagTable *table)
     return zeroFlags;
 }
 
-static const Flags & race_flag_by_table(const Race *race, const FlagTable *table)
+static bitstring_t race_flag_by_table(const Race *race, const FlagTable *table, Character *ch)
 {
+    // Mobs: when created, ignore act, off_flags, form, parts from race.
+
+    bool npc = ch->is_npc();
+
     if (table == &affect_flags)
         return race->getAff();
     else if (table == &imm_flags)
@@ -177,17 +181,44 @@ static const Flags & race_flag_by_table(const Race *race, const FlagTable *table
     else if (table == &res_flags)
         return race->getRes();
     else if (table == &plr_flags || table == &act_flags)
-        return race->getAct();
+        return npc ? 0 : race->getAct();
     else if (table == &vuln_flags)
         return race->getVuln();
     else if (table == &detect_flags)
         return race->getDet();
     else if (table == &form_flags)
-        return race->getForm();
+        return npc ? 0 : race->getForm();
     else if (table == &part_flags)
-        return race->getParts();    
+        return npc ? 0 : race->getParts();    
 
-    return Flags::emptyFlags;
+    return 0;
+}
+
+static bitstring_t proto_flags_by_table(Character *ch, const FlagTable *table)
+{
+    if (!ch->is_npc())
+        return 0;
+
+    MOB_INDEX_DATA *pMob = ch->getNPC()->pIndexData;
+
+    if (table == &affect_flags)
+        return pMob->affected_by;        
+    else if (table == &imm_flags)
+        return pMob->imm_flags;
+    else if (table == &res_flags)
+        return pMob->res_flags;
+    else if (table == &act_flags)
+        return pMob->act;
+    else if (table == &vuln_flags)
+        return pMob->vuln_flags;
+    else if (table == &detect_flags)
+        return pMob->detection;
+    else if (table == &form_flags)
+        return pMob->form;
+    else if (table == &part_flags)
+        return pMob->parts;
+
+    return 0;
 }
 
 /*
@@ -199,7 +230,18 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     const FlagTable *table = paf->bitvector.getTable();
 
     if (table) {
-        char_flag_by_table(ch, table).changeBit(paf->bitvector, fAdd);
+        bool action = fAdd;
+
+        // Special handling for affects that can not only add bits when applied,
+        // but also remove (chopped body parts etc). Whether to add or remove is 
+        // specified in 'modifier' field. Positive modifier behaves as normal,
+        // negative modifier inverts fAdd behavior.
+        if (paf->location == APPLY_BITVECTOR) {
+            if (paf->modifier < 0)
+                action = !fAdd;
+        }
+        
+        char_flag_by_table(ch, table).changeBit(paf->bitvector, action);
     }
 
     if (paf->global.getRegistry() == wearlocationManager) {
@@ -272,6 +314,9 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
             ch->getPC()->mod_level_spell += mod;
         }
         break;
+    case APPLY_BITVECTOR:
+        /* no action */
+        break;
     }
 }
 
@@ -283,13 +328,23 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
     Flags &charFlag = char_flag_by_table(ch, table);
     int bits = affect->bitvector.getValue();
 
-    for (auto &paf : afflist)
-        if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
-            charFlag.setBit(paf->bitvector);
-        else if (paf->global.getRegistry() == registry) {
+    for (auto &paf : afflist) {
+        if (paf->bitvector.getTable() == table) {
+            // Careful when re-applying affects that strip bits off 
+            bool pafStripsBits = paf->location == APPLY_BITVECTOR && paf->modifier < 0;
+            if (pafStripsBits)
+                charFlag.removeBit(paf->bitvector);
+            else
+                charFlag.setBit(paf->bitvector);
+
+            continue;
+        }
+
+        if (paf->global.getRegistry() == registry) {
             if (registry == wearlocationManager)
                 ch->wearloc.remove(paf->global);
         }
+    }
 }
 
 /* fix object affects when removing one */
@@ -300,6 +355,14 @@ void affect_check(Character *ch, Affect *affect)
 
     if (!table && registry != wearlocationManager)
         return;
+
+    if (table) {
+        // Hard reset for race flags
+        bitstring_t raceBits = race_flag_by_table(ch->getRace().getElement(), table, ch);
+        bitstring_t protoBits = proto_flags_by_table(ch, table);
+        Flags &charFlag = char_flag_by_table(ch, table);
+        charFlag.setValue(raceBits | protoBits);
+    }
 
     affectlist_reapply(ch->affected, ch, affect);
 
@@ -313,10 +376,7 @@ void affect_check(Character *ch, Affect *affect)
     }
 
     if (table) {    
-        const Flags &raceFlag = race_flag_by_table(ch->getRace().getElement(), table);
-        Flags &charFlag = char_flag_by_table(ch, table);
-        charFlag.setBit(raceFlag.getValue());
-
+        // Sanity check for position flags for non-flying races.
         if (table == &affect_flags && affect->bitvector.isSet(AFF_FLYING))
             if (!ch->affected_by.isSet(AFF_FLYING))
                 ch->posFlags.removeBit(POS_FLY_DOWN);

@@ -776,7 +776,11 @@ static void format_affect(Affect *paf, ostringstream &buf)
     }
 
     if (table && b != 0) {
-        buf << "добавляет ";
+        if (paf->location == APPLY_BITVECTOR && paf->modifier < 0)
+            buf << "отнимает ";
+        else
+            buf << "добавляет ";
+
         if (table == &affect_flags)
             buf << "аффект ";
         else if (table == &imm_flags)
@@ -799,6 +803,8 @@ static void format_affect(Affect *paf, ostringstream &buf)
             buf << "флаги персонажа ";
         else if (table == &form_flags)
             buf << "форму тела ";
+        else if (table == &part_flags)
+            buf << "часть тела ";
         else
             buf << "не пойми что ";
 
@@ -810,7 +816,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         empty = false;
     }
 
-    if (paf->modifier != 0 && paf->location != APPLY_NONE) {
+    if (paf->modifier != 0 && paf->location != APPLY_NONE && paf->location != APPLY_BITVECTOR) {
         if (!empty)
             buf << "        ";
         buf << "изменяет " << paf->location.message()
