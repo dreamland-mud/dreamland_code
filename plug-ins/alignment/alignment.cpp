@@ -43,47 +43,6 @@ DLString align_name_for_range( int min, int max )
     return "любая";
 }
 
-int align_choose_range( int min, int max, int n )
-{
-    int cnt = 0;
-    
-    for (int i = 0; alignment_table[i].rname; i++)
-        if (min <= alignment_table[i].minValue
-            && max >= alignment_table[i].maxValue)
-            if (++cnt == n)
-                return alignment_table[i].aveValue;
-    
-    return ALIGN_ERROR;
-}
-
-int align_choose_range( int min, int max, const DLString &arg )
-{
-    if (arg.empty( ))
-        return ALIGN_ERROR;
-
-    for (int i = 0; alignment_table[i].rname; i++)
-        if (min <= alignment_table[i].minValue
-            && max >= alignment_table[i].maxValue)
-            if (arg.strPrefix( russian_case( alignment_table[i].rname, '1' ) ))
-                return alignment_table[i].aveValue;
-    
-    return ALIGN_ERROR;
-}
-
-void align_print_range( int min, int max, ostringstream &buf )
-{
-    int cnt = 0;
-    
-    for (int i = 0; alignment_table[i].rname; i++)
-        if (min <= alignment_table[i].minValue
-            && max >= alignment_table[i].maxValue)
-        {
-            buf << dlprintf( "%2d) %s\r\n", 
-                             ++cnt, 
-                             russian_case( alignment_table[i].rname, '1' ).c_str( ) );
-        }
-}
-
 void align_get_ranges( PCharacter *ch, int &a_min, int &a_max )
 {
     int p_min = ch->getProfession( )->getMinAlign( ),
@@ -108,30 +67,6 @@ void align_get_ranges( PCharacter *ch, int &a_min, int &a_max )
     return;
 }
 
-
-int align_choose_allowed( PCharacter *ch, const DLString &arg )
-{
-    int a_min, a_max;
-
-    align_get_ranges( ch, a_min, a_max );
-    return align_choose_range( a_min, a_max, arg );
-}
-
-int align_choose_allowed( PCharacter *ch, int n )
-{
-    int a_min, a_max;
-
-    align_get_ranges( ch, a_min, a_max );
-    return align_choose_range( a_min, a_max, n );
-}
-
-void align_print_allowed( PCharacter *ch, ostringstream &buf )
-{
-    int a_min, a_max;
-
-    align_get_ranges( ch, a_min, a_max );
-    align_print_range( a_min, a_max, buf );
-}
 
 DLString align_name( int a )
 {

@@ -700,20 +700,6 @@ NMI_GET( CharacterWrapper, good, "true если персонаж добрый" )
     return IS_GOOD(target);
 }
 
-NMI_GET( CharacterWrapper, alignMin, "название самой злой натуры для расы и класса персонажа" )
-{
-    checkTarget( );
-    CHK_NPC
-    return align_min( target->getPC( ) );
-}
-
-NMI_GET( CharacterWrapper, alignMax, "название самой доброй натуры для расы и класса персонажа" )
-{
-    checkTarget( );
-    CHK_NPC
-    return align_max( target->getPC( ) );
-}
-
 NMI_GET( CharacterWrapper, alignName, "название натуры" )
 {
     checkTarget( );
