@@ -54,6 +54,7 @@
 #include "act.h"
 #include "selfrate.h"
 #include "religionutils.h"
+#include "websocketrpc.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -328,6 +329,15 @@ NMI_GET( CharacterWrapper, terminal_type, "тип терминала у mud-кл
     if (!target->desc)
         return "";
     return ttype_name( target->desc->telnet.ttype );
+}
+
+NMI_GET( CharacterWrapper, webclient, "true если использует вебклиент" )
+{
+    checkTarget( );
+    CHK_NPC
+    if (!target->desc)
+        return false;
+    return is_websock(target);
 }
 
 NMI_GET( CharacterWrapper, attack_name, "англ название типа атаки (таблица в коде attack_table)")
