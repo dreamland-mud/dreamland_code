@@ -8,7 +8,7 @@
   <dbPath>var/db</dbPath>
   <feniaDbDir>var/db/fenia</feniaDbDir>
   <feniaScriptDir>share/DL/fenia.local</feniaScriptDir>
-  <feniaPublicScriptDir>share/DL/fenia.public</feniaPublicScriptDir>
+  <feniaPublicScriptDir>share/DL/fenia/public</feniaPublicScriptDir>
   <immLogFile>var/log/immortals.log</immLogFile>
   <libexecPath>libexec</libexecPath>
   <merchantBank>10000</merchantBank>

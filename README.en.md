@@ -54,8 +54,9 @@ make -j 8 && make install
 
 ## Download configuration and areas
 ```bash
-git clone https://github.com/dreamland-mud/dreamland_world.git
-ln -s /path/to/dreamland_world /path/to/runtime/share/DL
+cd /path/to/runtime
+git clone https://github.com/dreamland-mud/dreamland_world.git share/DL
+git clone https://github.com/dreamland-mud/dreamland_fenia_public.git share/DL/fenia/public
 ```
 
 ## Start the game
