@@ -8,6 +8,7 @@
 #include "dlfilestream.h"
 #include "codesource.h"
 #include "fenia/register-impl.h"
+#include "dl_ctype.h"
 #include "dreamland.h"
 
 using namespace Scripting;
@@ -48,19 +49,21 @@ CodeSourceRepo::~CodeSourceRepo()
     thisClass = 0;    
 }
 
-void CodeSourceRepo::save(Scripting::CodeSource &cs) 
+/** 
+ * Check file name against allowed patterns and fill in corresponding sub-paths (folder and file name). 
+ */
+bool CodeSourceRepo::applySubjPatterns(const DLString &csNameConst, DLString &folderName, DLString &fileName, bool &isPublic) const
 {
-    DLString folderName;
-    DLString fileName;
     DLString pubPrefix("public/");
-    bool pubFolder = false;
-    DLString csName(cs.name);
+    DLString csName(csNameConst);
+
+    isPublic = false;
 
     // Scripts beginning with "public/" going to be published to dreamland_fenia_public repo
     if (pubPrefix.strPrefix(csName)) {
         // Strip "public/" part to check the rest of the pathname against the patterns
-        csName = csName.replace(0, pubPrefix.size(), "");
-        pubFolder = true;
+        csName.replace(0, pubPrefix.size(), "");
+        isPublic = true;
     }
 
     for (auto &pattern: subjPatterns) {
@@ -68,20 +71,29 @@ void CodeSourceRepo::save(Scripting::CodeSource &cs)
         if (!matches.empty()) {
             folderName = matches.at(0);
             fileName = matches.at(1);
-            break;
+            return true;
         }
     }
 
-    if (folderName.empty() || fileName.empty()) {
+    return false;
+}
+
+void CodeSourceRepo::save(Scripting::CodeSource &cs) 
+{
+    DLString folderName;
+    DLString fileName;
+    bool isPublic;
+
+    if (!applySubjPatterns(cs.name, folderName, fileName, isPublic)) {
         LogStream::sendWarning() << "CS repo: unknown pattern for " << cs.name << endl;
         return;
     }
 
     fs::path path = dreamland->getFeniaScriptDir().getAbsolutePath().c_str();
 
-    if (pubFolder) {
-        // Re-add "public" folder part
-        path /= pubPrefix.substr(0, pubPrefix.size() - 1).c_str();
+    if (isPublic) {
+        // Re-add "public" folder part as folderName won't have it
+        path /= "public";
     } 
 
     path /= folderName.c_str();
@@ -117,12 +129,18 @@ bool CodeSourceRepo::readAll(const DLString &folderName)
             path /= folderName.c_str();
 
         for (const auto& dirEntry : fs::recursive_directory_iterator(path)) {
+            DLString stubFileName, stubFolderName;
+            bool isPublic;
+
             if (!dirEntry.is_regular_file())
                 continue;
 
             DLString csName = fs::relative(dirEntry.path(), base).generic_string();
-            if (csName.empty() || csName.at(0) == '.')
+
+            if (!applySubjPatterns(csName, stubFolderName, stubFileName, isPublic))
                 continue;
+
+            LogStream::sendNotice() << "CS repo: loading " << csName << endl;
 
             if (read(csName))
                 success++;

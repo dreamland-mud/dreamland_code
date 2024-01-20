@@ -28,6 +28,7 @@ public:
 private:
     static CodeSourceRepo *thisClass;
     std::list<RegExp::Pointer> subjPatterns;
+    bool applySubjPatterns(const DLString &csName, DLString &folderName, DLString &fileName, bool &isPublic) const;
 };
 
 #endif // __CODESOURCEREPO_H__
