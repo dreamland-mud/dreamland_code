@@ -21,6 +21,8 @@ class Spell;
 class AffectHandler;
 class Affect;
 class SkillCommand;
+class Command;
+
 class WrapperManagerBase : public virtual DLObject {
 public:
     typedef ::Pointer<WrapperManagerBase> Pointer;
@@ -36,6 +38,7 @@ public:
     virtual Scripting::Register getWrapper( AffectHandler * ) = 0;
     virtual Scripting::Register getWrapper( Affect * ) = 0;
     virtual Scripting::Register getWrapper( SkillCommand * ) = 0;
+    virtual Scripting::Register getWrapper( Command * ) = 0;
 
     virtual void linkWrapper( Character * ) = 0;
     virtual void linkWrapper( ::Object * ) = 0;
@@ -47,6 +50,7 @@ public:
     virtual void linkWrapper( AffectHandler * ) = 0;
     virtual void linkWrapper( Affect * ) = 0;
     virtual void linkWrapper( SkillCommand * ) = 0;
+    virtual void linkWrapper( Command * ) = 0;
     
     virtual void getTarget( const Scripting::Register &, Character *& ) = 0;
     void markAlive(long long id);

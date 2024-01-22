@@ -13,6 +13,7 @@
 #include "affecthandlerwrapper.h"
 #include "affectwrapper.h"
 #include "skillcommandwrapper.h"
+#include "commandwrapper.h"
 #include "subr.h"
 #include "fenia/register-impl.h"
 
@@ -128,6 +129,15 @@ Scripting::Register WrapperManager::getWrapper(SkillCommand *cmd)
     return wrapperAux<SkillCommandWrapper>(cmd->getID(), cmd);
 }
 
+Scripting::Register WrapperManager::getWrapper(Command *cmd) 
+{
+    if (!cmd)
+        return Scripting::Register();
+    
+    return wrapperAux<CommandWrapper>(cmd->getID(), cmd);
+}
+
+
 template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
 {
@@ -189,6 +199,11 @@ void WrapperManager::linkWrapper(Affect *paf)
 void WrapperManager::linkWrapper(SkillCommand *cmd) 
 {
     linkAux<SkillCommandWrapper>(cmd->getID(), cmd);
+}
+
+void WrapperManager::linkWrapper(Command *cmd) 
+{
+    linkAux<CommandWrapper>(cmd->getID(), cmd);
 }
 
 

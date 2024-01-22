@@ -8,6 +8,7 @@
 #include "commandhelp.h"
 #include "commandmanager.h"
 #include "commandflags.h"
+#include "fenia/exceptions.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -39,6 +40,20 @@ Command::~Command( )
 {
     
 }
+
+long long Command::getID() const
+{
+    int myId = 0;
+
+    if (getHelp())
+        myId =getHelp()->getID();
+
+    if (myId <= 0)
+        throw Scripting::Exception(getName() + ": command ID not found or zero");
+
+    return (myId << 4) | 8;
+}
+
 
 CommandHelp::Pointer Command::getHelp( ) const
 {

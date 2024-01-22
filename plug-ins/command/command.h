@@ -11,16 +11,19 @@
 #include "enumeration.h"
 #include "xmlstringlist.h"
 #include "xmlpolymorphvariable.h"
+#include "wrappertarget.h"
 
 class CommandHelp;
 class CommandLoader;
 
-class Command : public CommandBase {
+class Command : public CommandBase, public virtual WrapperTarget {
 public:
         typedef ::Pointer<Command> Pointer;
 
         Command( );
         virtual ~Command( );
+
+        virtual long long getID() const;
         
         virtual const DLString & getRussianName( ) const;
         virtual const XMLStringList &getAliases( ) const;

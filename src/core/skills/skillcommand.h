@@ -11,7 +11,7 @@
 
 class Character;
 
-class SkillCommand: public virtual SkillAction, public WrapperTarget, public virtual XMLPolymorphVariable {
+class SkillCommand: public virtual SkillAction, public virtual WrapperTarget, public virtual XMLPolymorphVariable {
 public:
     typedef ::Pointer<SkillCommand> Pointer;
     
