@@ -1153,20 +1153,6 @@ NMI_INVOKE( Root, Skill, "(name|gsn): конструктор для умения
     return Register::handler<SkillWrapper>(skill->getName());
 }
 
-NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для нового умения" )
-{
-    DLString name = args2string(args);
-    Skill *skill = skillManager->findExisting(name);
-
-    if (skill && skill->isValid())
-        throw Scripting::Exception(name + ": skill already exists.");
-
-    if (!normalize_skill_name(name))
-        throw Scripting::Exception("Skill name can only consist of letters and spaces");
-
-    return FeniaSkill::wrap(name);
-}
-
 NMI_INVOKE( Root, SkillGroup, "(name): конструктор для группы умений по имени" )
 {
     DLString name = args2string(args);

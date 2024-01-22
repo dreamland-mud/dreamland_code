@@ -162,7 +162,6 @@ WrappersPlugin::initialization( )
     Class::regMoc<LiquidWrapper>( );
     Class::regMoc<SkillWrapper>( );
     Class::regMoc<SkillGroupWrapper>( );
-    Class::regMoc<FeniaSkill>( );
     
     FeniaManager::getThis( )->recover( );
     
@@ -197,7 +196,6 @@ WrappersPlugin::initialization( )
     traitsAPIJson<MaterialWrapper>("material", apiDump, false);
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
     traitsAPIJson<SkillGroupWrapper>("skillgroup", apiDump, false);     
-    traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);
     traitsAPIJson<SpellWrapper>("spell", apiDump, false);
     traitsAPIJson<AffectHandlerWrapper>("affecthandler", apiDump, false);
     traitsAPIJson<SkillCommandWrapper>("skillcommand", apiDump, false);
@@ -220,7 +218,6 @@ void WrappersPlugin::destruction( ) {
     FeniaManager::getThis( )->backup( );
 
     Class::unregMoc<LiquidWrapper>( );
-    Class::unregMoc<FeniaSkill>( );
     Class::unregMoc<SkillGroupWrapper>( );
     Class::unregMoc<SkillWrapper>( );
     Class::unregMoc<HometownWrapper>( );

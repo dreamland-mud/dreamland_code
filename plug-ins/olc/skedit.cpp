@@ -977,7 +977,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
     // skedit list [all|active|passive|magic|prayer|<group>]
     if (arg_is_list(cmd)) {
         bool all = false, active = false, passive = false, magic = false, 
-             prayer = false, invalid = false, fenia = false;
+             prayer = false, invalid = false;
         SkillGroup *group = 0;
 
         if (!args.empty()) {
@@ -991,8 +991,6 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                 magic = true;
             else if (arg_oneof(args, "prayer", "молитвы"))
                 prayer = true;
-            else if (arg_oneof(args, "fenia", "феня"))
-                fenia = true;
             else if (arg_oneof(args, "invalid"))
                 invalid = true;
             else {
@@ -1003,7 +1001,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                 }
             }
         } else {
-            stc("Использование: skedit list [all|active|passive|magic|prayer|fenia|invalid|<group>]\r\n", ch);
+            stc("Использование: skedit list [all|active|passive|magic|prayer|invalid|<group>]\r\n", ch);
             return;
         }
 
@@ -1024,7 +1022,6 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
             if (   (active && !s->isPassive() && !isSpell)
                 || (passive && s->isPassive())
-                || (fenia && dynamic_cast<FeniaSkill *>(s))
                 || (magic && isSpell && spell->flags.isSet(SPELL_MAGIC))
                 || (prayer && isSpell && spell->flags.isSet(SPELL_PRAYER))
                 || (group && skill->hasGroup(group->getIndex())))

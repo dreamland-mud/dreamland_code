@@ -2343,7 +2343,7 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать vi
 
     follower_add(victim, target);
     victim->leader = target;
-
+    
     af.bitvector.setTable(&affect_flags);
     af.type      = gsn_charm_person;
     af.level     = target->getRealLevel( );
@@ -2384,7 +2384,8 @@ NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам 
     if (pet->master)
         follower_stop(pet);
 
-    SET_BIT( pet->affected_by, AFF_CHARM );
+    affect_add_charm(pet);
+
     target->getPC( )->pet = pet->getNPC( );
     follower_add( pet, target );
     pet->leader = target;

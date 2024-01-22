@@ -340,25 +340,4 @@ protected:
     XML_VARIABLE XMLString name;
 };
 
-class FeniaSkill : public PluginNativeImpl<FeniaSkill>, 
-                       public NativeHandler,
-                       public BasicSkill
-{
-XML_OBJECT
-NMI_OBJECT
-public:
-    typedef ::Pointer<FeniaSkill> Pointer;
-
-    FeniaSkill() { }
-    FeniaSkill(const DLString &);
-
-    virtual void setSelf(Scripting::Object *);
-    virtual Scripting::Object *getSelf() const { return self; }
-    static Scripting::Register wrap( const DLString & );
-    virtual void backup();
-private:
-    Scripting::Object *self;
-    XML_VARIABLE XMLString myname;
-};
-
 #endif
