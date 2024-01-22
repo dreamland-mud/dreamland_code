@@ -167,7 +167,7 @@ void Pet::toStream( Character *client, ostringstream &buf ) const
 
 void Pet::config( PCharacter *client, NPCharacter *pet ) const
 {
-    SET_BIT( pet->affected_by, AFF_CHARM );
+    affect_add_charm(pet);
     pet->comm = COMM_NOTELL;
     
     if (IS_SET( pet->act, ACT_NOALIGN ))

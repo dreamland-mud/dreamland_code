@@ -78,6 +78,18 @@ static bool mprog_stopfol( Character *ch, Character *master )
     return false;
 }
 
+void affect_add_charm(Character *victim)
+{
+    Affect af;
+    af.type      = gsn_charm_person;
+    af.level     = victim->getModifyLevel();
+    af.duration  = -2;
+    af.bitvector.setTable(&affect_flags);
+    af.bitvector.setValue(AFF_CHARM);
+    affect_to_char( victim, &af );        
+}
+
+
 
 void follower_stop( Character *ch, bool verbose )
 {
@@ -88,12 +100,9 @@ void follower_stop( Character *ch, bool verbose )
 
     if (IS_CHARMED(ch)) {
         REMOVE_BIT( ch->affected_by, AFF_CHARM );
+        affect_bit_strip(ch, &affect_flags, AFF_CHARM);
     }
 
-    if (ch->isAffected(gsn_charm_person)) {
-        affect_strip( ch, gsn_charm_person );
-    } 
-    
     follower_clear(ch, verbose);
 }
 

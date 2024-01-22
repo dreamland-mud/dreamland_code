@@ -26,7 +26,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
-#include "handler.h"
+#include "anatolia/handler.h"
 #include "interp.h"
 #include "save.h"
 #include "vnum.h"
@@ -185,6 +185,7 @@ void check_bloodthirst( Character *ch )
         {
             ch->pecho( "{RБОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ! БОЛЬШЕ КРОВИ!!!{x" );
             REMOVE_BIT(ch->affected_by, AFF_CHARM);
+            affect_bit_strip(ch, &affect_flags, AFF_CHARM);
 
             if (ch->is_npc( ) && ch->in_room) 
                 save_mobs( ch->in_room );
