@@ -18,6 +18,7 @@
 #include "defaultspell.h"
 #include "defaultaffecthandler.h"
 #include "spelltarget.h"
+#include "commandmanager.h"
 
 #include "tableswrapper.h"
 #include "objectwrapper.h"
@@ -158,9 +159,13 @@ DefaultAffectHandler * arg2affecthandler( const Register &reg )
 
 Command * arg2command(const Register &arg) 
 {
-    return dynamic_cast<Command *>(
-        wrapper_cast<FeniaCommandWrapper>(arg)->getTarget()
-    );
+    DLString cmdName = arg2string(arg);
+    Command::Pointer cmd = commandManager->findExact(cmdName);
+
+    if (!cmd)
+        throw Scripting::Exception(cmdName + ": no registered command found");
+
+    return *cmd;
 }
 
 Command * argnum2command(const RegisterList &args, int num)

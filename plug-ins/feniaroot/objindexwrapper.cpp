@@ -142,6 +142,12 @@ NMI_GET( ObjIndexWrapper, weight , "вес предмета")
     return target->weight;
 }
 
+NMI_GET( ObjIndexWrapper, level, "уровень предмета") 
+{ 
+    checkTarget( ); 
+    return target->level;
+}
+
 NMI_GET( ObjIndexWrapper, cost , "цена в серебре") 
 { 
     checkTarget( ); 

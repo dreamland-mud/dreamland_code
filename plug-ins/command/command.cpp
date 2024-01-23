@@ -334,7 +334,7 @@ bool Command::feniaOverride(Character *ch, const DLString &constArgs)
     if (!wrapperBase)
         return false;
 
-    IdRef methodId("run");
+    IdRef methodId("runFunc");
     Register method;
     if (!wrapperBase->triggerFunction(methodId, method))
         return false;
