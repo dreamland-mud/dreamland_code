@@ -47,7 +47,7 @@ public:
     virtual int properOrder( Character * ) const;
     virtual int dispatch( const InterpretArguments & );
     virtual int dispatchOrder( const InterpretArguments & );
-    virtual void run( Character *, const DLString & );
+    virtual void entryPoint( Character *, const DLString & );
 
 private:
     virtual void run( PCharacter *, char * ) = 0;

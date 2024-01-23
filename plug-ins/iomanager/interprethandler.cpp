@@ -170,7 +170,7 @@ InterpretHandler::handle(Descriptor *d, char *arg)
     if (omprog_command( iargs.ch, iargs.cmdName, iargs.cmdArgs ))
         return 0;
 
-    iargs.pCommand->run( iargs.ch, iargs.cmdArgs );
+    iargs.pCommand->entryPoint( iargs.ch, iargs.cmdArgs );
     return 0;
 }
 

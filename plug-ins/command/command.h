@@ -24,6 +24,11 @@ public:
         virtual ~Command( );
 
         virtual long long getID() const;
+
+        // Main entry point for command interpreter
+        virtual void entryPoint( Character *, const DLString & );
+        // Legacy run methods overridden by child classes
+        virtual void run( Character *, const DLString & ) = 0;
         
         virtual const DLString & getRussianName( ) const;
         virtual const XMLStringList &getAliases( ) const;
@@ -50,6 +55,7 @@ public:
 protected:        
         void visualize( Character * );
         bool checkPosition( Character * );
+        bool feniaOverride(Character *, const DLString &);
 
         static const Flags defaultOrder;
         static const Enumeration defaultPosition;

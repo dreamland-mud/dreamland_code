@@ -1297,7 +1297,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateMobile::Pointer me(NEW, pMob);
         me->attach(ch);
-        me->findCommand(ch, "show")->run(ch, "");
+        me->findCommand(ch, "show")->entryPoint(ch, "");
         return;
     }
     else if (!str_cmp(arg1, "create")) {
@@ -1352,7 +1352,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->run(ch, "noweb");
+        OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->entryPoint(ch, "noweb");
         return;
     } else if (!str_cmp(arg1, "load")) {
         if(!*argument || !is_number(argument)) {

@@ -307,7 +307,7 @@ AEDIT(create, "создать", "создать новую арию")
 {
     OLCStateArea::Pointer ae(NEW, (AreaIndexData *)NULL);
     ae->attach(ch);
-    ae->findCommand(ch, "show")->run(ch, "");
+    ae->findCommand(ch, "show")->entryPoint(ch, "");
 
     stc("Aрия создана.\n\r", ch);
     return false;
@@ -706,7 +706,7 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
             OLCStateArea::Pointer ae(NEW, (AreaIndexData *)NULL);
             ae->attach(ch);
-            ae->findCommand(ch, "show")->run(ch, "");
+            ae->findCommand(ch, "show")->entryPoint(ch, "");
             stc("Ария создана.\r\n", ch);
             return;
         }
@@ -719,6 +719,6 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     OLCStateArea::Pointer ae(NEW, pArea);
     ae->attach(ch);
-    ae->findCommand(ch, "show")->run(ch, "");
+    ae->findCommand(ch, "show")->entryPoint(ch, "");
 }
 

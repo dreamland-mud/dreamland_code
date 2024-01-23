@@ -36,7 +36,7 @@ bool interpret( Character *ch, const char *line )
         return false;
 
     if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK)
-        iargs.pCommand->run( ch, iargs.cmdArgs );
+        iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
 
     return true;
 }
@@ -77,7 +77,7 @@ bool interpret_cmd( Character *ch, const char *cmd, const char *argsFormat, ... 
 
     if (iargs.pCommand)
         if (iargs.pCommand->dispatch( iargs ) == RC_DISPATCH_OK) {
-            iargs.pCommand->run( ch, iargs.cmdArgs );
+            iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
             return true;
         }
 
@@ -107,7 +107,7 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
     CommandInterpreter::getThis( )->run( iargs );
 
     if (iargs.pCommand)
-        iargs.pCommand->run( ch, iargs.cmdArgs );
+        iargs.pCommand->entryPoint( ch, iargs.cmdArgs );
 //    else
 //        LogStream::sendWarning( ) << "No command '" << cmd << "' for raw interpret!" << endl;
 }

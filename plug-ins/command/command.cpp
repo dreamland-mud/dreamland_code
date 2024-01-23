@@ -9,6 +9,10 @@
 #include "commandmanager.h"
 #include "commandflags.h"
 #include "fenia/exceptions.h"
+#include "feniamanager.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "idcontainer.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -23,6 +27,8 @@
 #include "def.h"
 
 GSN(manacles);
+
+using namespace Scripting;
 
 /*--------------------------------------------------------------------------
  * Command
@@ -310,6 +316,45 @@ const DLString & Command::getHint( ) const
 {
     return DLString::emptyString;
 }
+
+void Command::entryPoint( Character *ch, const DLString &constArgs )
+{
+    // See if there is 'run' method override in Fenia. 
+    bool rc = feniaOverride(ch, constArgs);
+
+    // Fall back to the old implementation.
+    if (!rc)
+        run(ch, constArgs);
+}
+
+bool Command::feniaOverride(Character *ch, const DLString &constArgs) 
+{
+    // Find method defined on the wrapper.
+    WrapperBase *wrapperBase = getWrapper();
+    if (!wrapperBase)
+        return false;
+
+    IdRef methodId("run");
+    Register method;
+    if (!wrapperBase->triggerFunction(methodId, method))
+        return false;
+
+    // Invoke the 'run' function
+    try {
+        RegisterList args;
+        args.push_back(FeniaManager::wrapperManager->getWrapper(ch));
+        args.push_back(constArgs);
+
+        method.toFunction()->invoke(Register(wrapperBase->getSelf()), args);
+
+    } catch (const ::Exception &e) {
+        // On error, complain to the logs and to all immortals in the game.
+        FeniaManager::getThis()->croak(0, methodId, e);
+    }
+
+    return true;
+}
+
 
 /*--------------------------------------------------------------------------
  * XMLCommand

@@ -53,8 +53,10 @@ int OLCCommand::dispatchOrder( const InterpretArguments &iargs )
     return RC_DISPATCH_NOT_HERE;
 }
 
-void OLCCommand::run( Character *ch, const DLString &cArguments )
+void OLCCommand::entryPoint( Character *ch, const DLString &cArguments )
 {
+    // Main method called from command interpreter
+    
     char args[MAX_STRING_LENGTH];
 
     strcpy( args, cArguments.c_str( ) );
@@ -325,7 +327,7 @@ OLCState::seditDone( )
         return;
     }
     
-    cmd->run(pch, lastArgs.getValue( ).c_str( ));
+    cmd->entryPoint(pch, lastArgs.getValue( ).c_str( ));
 
     if(inSedit.getValue( )) {
         LogStream::sendError() << "olc: seditDone: still in sedit after command repeat" << endl;
@@ -1034,7 +1036,7 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
         return true;
     }
 
-    findCommand(ch, cmd)->run(ch, "");
+    findCommand(ch, cmd)->entryPoint(ch, "");
     return false;
 }
 

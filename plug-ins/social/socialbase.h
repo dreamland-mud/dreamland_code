@@ -25,6 +25,7 @@ public:
     virtual int properOrder( Character * ) const;
     virtual int dispatch( const InterpretArguments & );
     virtual int dispatchOrder( const InterpretArguments & );
+    virtual void entryPoint( Character *, const DLString & );
     virtual void run( Character *, const DLString & );
     
     virtual const DLString & getNoargOther( ) const = 0;

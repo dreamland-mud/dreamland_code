@@ -161,6 +161,12 @@ static int parseArguments(Character *ch, const DLString &arg1, const DLString &a
         return RC_VICT2_NOT_FOUND;
 }
 
+void SocialBase::entryPoint( Character *ch, const DLString &constArguments )
+{
+    // Main method called from interpret handler. Can add here a Fenia override for socials.
+    run(ch, constArguments);
+}
+
 /**
  * Parse arguments and execute the social. Accepted combination of arguments:
  *

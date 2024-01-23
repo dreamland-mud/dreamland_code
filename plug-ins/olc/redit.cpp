@@ -1001,7 +1001,7 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
         return true;
     }
 
-    findCommand(ch, "eexit")->run(ch, "");
+    findCommand(ch, "eexit")->entryPoint(ch, "");
     return false;
 }
 

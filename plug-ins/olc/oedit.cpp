@@ -1066,7 +1066,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateObject::Pointer oe(NEW, pObj);
         oe->attach(ch);
-        oe->findCommand(ch, "show")->run(ch, "");
+        oe->findCommand(ch, "show")->entryPoint(ch, "");
         return;
     } else if (!str_cmp(arg1, "create")) {
         if (!str_cmp(argument, "next")) {
@@ -1152,7 +1152,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        OLCStateObject::Pointer(NEW, pObj)->findCommand(ch, "show")->run(ch, "noweb");
+        OLCStateObject::Pointer(NEW, pObj)->findCommand(ch, "show")->entryPoint(ch, "noweb");
         return;
     } else if (!str_cmp(arg1, "load")) {
         if(!*argument || !is_number(argument)) {
