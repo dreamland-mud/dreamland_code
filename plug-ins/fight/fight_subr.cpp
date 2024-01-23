@@ -26,7 +26,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
-#include "anatolia/handler.h"
+#include "handler.h"
 #include "interp.h"
 #include "save.h"
 #include "vnum.h"

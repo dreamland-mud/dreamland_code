@@ -30,6 +30,7 @@
 #include "spellwrapper.h"
 #include "affecthandlerwrapper.h"
 #include "xmleditorinputhandler.h"
+#include "commandwrapper.h"
 
 #include "directions.h"
 #include "subr.h"
@@ -153,6 +154,19 @@ DefaultAffectHandler * arg2affecthandler( const Register &reg )
 {
     return dynamic_cast<DefaultAffectHandler *>(
                 wrapper_cast<AffectHandlerWrapper>(reg)->getTarget());;
+}
+
+Command * arg2command(const Register &arg) 
+{
+    return dynamic_cast<Command *>(
+        wrapper_cast<FeniaCommandWrapper>(arg)->getTarget()
+    );
+}
+
+Command * argnum2command(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return arg2command(reg);
 }
 
 void args2buf(const RegisterList &args, char *buf, size_t bufsize)

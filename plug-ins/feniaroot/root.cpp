@@ -1171,9 +1171,15 @@ NMI_INVOKE( Root, Clan, "(name): конструктор для клана по �
     return ClanWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, Command, "(): конструктор для команды" )
+NMI_INVOKE( Root, Command, "(): конструктор для команды, OBSOLETE" )
 {
     return Register::handler<CommandWrapper>();
+}
+
+NMI_INVOKE( Root, FeniaCommand, "(name): конструктор для команды по заданному имени" )
+{
+    Command *cmd = argnum2command(args, 1);
+    return WrapperManager::getThis( )->getWrapper(cmd);
 }
 
 NMI_GET( Root, players, "список (List) всех игроков") 

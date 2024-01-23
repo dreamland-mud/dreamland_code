@@ -26,6 +26,7 @@
 #include "validatetask.h"
 #include "structwrappers.h"
 #include "feniaskillaction.h"
+#include "commandmanager.h"
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"
@@ -79,6 +80,7 @@ WrappersPlugin::linkTargets()
         if (pArea->wrapper)
             wrapper_cast<AreaIndexWrapper>(pArea->wrapper)->setTarget( pArea );
 
+
     for (int sn = 0; sn < skillManager->size(); sn++) {
         Skill *skill = skillManager->find(sn);
         Spell::Pointer spell = skill->getSpell();
@@ -99,6 +101,13 @@ WrappersPlugin::linkTargets()
             LogStream::sendNotice() << "Fenia skill command: setting target for " << skill->getName() << endl;
             wrapper_cast<SkillCommandWrapper>(cmd->wrapper)->setTarget(*cmd);
         }
+    }
+
+    for (auto &cmd: commandManager->getCommands().getCommands()) {
+        if (cmd->wrapper && cmd->wrapper->getHandler().getDynamicPointer<FeniaCommandWrapper>()) {
+            LogStream::sendNotice() << "Fenia command: setting target for " << cmd->getName() << endl;
+            wrapper_cast<FeniaCommandWrapper>(cmd->wrapper)->setTarget(const_cast<Command *>(*cmd));
+        }            
     }
 }
 
@@ -162,6 +171,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<LiquidWrapper>( );
     Class::regMoc<SkillWrapper>( );
     Class::regMoc<SkillGroupWrapper>( );
+    Class::regMoc<FeniaCommandWrapper>( );
     
     FeniaManager::getThis( )->recover( );
     
@@ -202,6 +212,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaSpellContext>("spellcontext", apiDump, false);
     traitsAPIJson<FeniaCommandContext>("commandcontext", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
+    traitsAPIJson<FeniaCommandWrapper>("command", apiDump, false);     
     dumpTables(apiDump);
 
     Json::FastWriter writer;
@@ -233,6 +244,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<TableWrapper>( );
     Class::unregMoc<CommandWrapper>( );
     Class::unregMoc<SkillCommandWrapper>( );
+    Class::unregMoc<FeniaCommandWrapper>( );
     Class::unregMoc<AffectWrapper>( );
     Class::unregMoc<AreaIndexWrapper>( );
     Class::unregMoc<SpellWrapper>( );

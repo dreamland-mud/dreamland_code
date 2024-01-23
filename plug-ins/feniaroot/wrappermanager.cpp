@@ -134,7 +134,7 @@ Scripting::Register WrapperManager::getWrapper(Command *cmd)
     if (!cmd)
         return Scripting::Register();
     
-    return wrapperAux<CommandWrapper>(cmd->getID(), cmd);
+    return wrapperAux<FeniaCommandWrapper>(cmd->getID(), cmd);
 }
 
 
@@ -203,7 +203,7 @@ void WrapperManager::linkWrapper(SkillCommand *cmd)
 
 void WrapperManager::linkWrapper(Command *cmd) 
 {
-    linkAux<CommandWrapper>(cmd->getID(), cmd);
+    linkAux<FeniaCommandWrapper>(cmd->getID(), cmd);
 }
 
 

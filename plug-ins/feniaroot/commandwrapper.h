@@ -24,6 +24,9 @@
 using Scripting::XMLRegister;
 using Scripting::NativeHandler;
 
+// NOTE: class names in this file should be the other way around. Had to call actual Command wrapper
+// something else because 'CommandWrapper' was taken earlier, for a fenia-based command implementatino.
+
 class CommandWrapper : public PluginNativeImpl<CommandWrapper>, 
                        public NativeHandler,
                        public DefaultCommand, 
@@ -42,6 +45,25 @@ public:
 private:
     XML_VARIABLE XMLRegister func;
     Scripting::Object *self;
+};
+
+class FeniaCommandWrapper : public PluginWrapperImpl<FeniaCommandWrapper>
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<FeniaCommandWrapper> Pointer;
+    
+    FeniaCommandWrapper();
+
+    virtual void setSelf( Scripting::Object * );
+    void setTarget( Command* );
+    void checkTarget( ) const ;
+    virtual void extract( bool );
+    Command *getTarget( ) const;
+
+private:        
+    Command *target;
 };
 
 #endif
