@@ -201,21 +201,6 @@ void CommandManager::destruction( )
     InterpretLayer::destruction( );
 }
 
-void CommandManager::load( CommandPlugin::Pointer command )
-{
-    CommandLoader *loader = command->getLoader( );
-    if (loader == NULL) {
-        LogStream::sendError( ) << "No loader for command " << command->getName( ) << endl;
-        return;
-    }
-    command->getLoader( )->loadCommand( command );
-}
-
-void CommandManager::save( CommandPlugin::Pointer command )
-{
-    command->getLoader( )->saveCommand( command );
-}
-
 void CommandManager::registrate( Command::Pointer command )
 {
     commands.add( command );

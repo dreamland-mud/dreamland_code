@@ -10,7 +10,7 @@
 
 void CommandPlugin::initialization( )
 {
-    commandManager->load( Pointer( this ) );
+    getLoader()->loadCommand( Pointer( this ) );
     commandManager->registrate( Pointer( this ) );
 
     if (FeniaManager::wrapperManager) {
@@ -26,7 +26,7 @@ void CommandPlugin::destruction( )
         if (wrapper && wrapper->getHandler()->getType() == "FeniaCommandWrapper")
             extractWrapper(false);
     
-//    commandManager->save( Pointer( this ) );
+//    getLoader()->saveCommand( Pointer( this ) );
     commandManager->unregistrate( Pointer( this ) );
 }
 

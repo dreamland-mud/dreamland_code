@@ -69,9 +69,6 @@ public:
         CommandManager( );
         virtual ~CommandManager( );
         
-        void load( CommandPlugin::Pointer );
-        void save( CommandPlugin::Pointer );
-
         void registrate( Command::Pointer );
         void unregistrate( Command::Pointer );
         
