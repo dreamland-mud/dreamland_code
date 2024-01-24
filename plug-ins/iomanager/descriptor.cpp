@@ -348,7 +348,7 @@ RPCRUN(editor_save)
 
     if(pch) {
         pch->getAttributes().handleEvent(WebEditorSaveArguments(pch, text));
-        LogStream::sendError() << "editor_save: " << text << endl;
+        LogStream::sendNotice() << "editor_save: " << text << endl;
         mprog_editorsave(pch, text);
     }
 }
