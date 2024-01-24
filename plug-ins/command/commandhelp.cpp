@@ -81,6 +81,8 @@ void CommandHelp::setCommand( Command::Pointer command )
    
     if (!empty( ))
         helpManager->registrate( Pointer( this ) );
+    else
+        LogStream::sendWarning() << "Empty command help for " << command->getName() << ", ID " << getID() << endl;
 }
 
 void CommandHelp::unsetCommand( )
