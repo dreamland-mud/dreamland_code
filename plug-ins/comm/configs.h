@@ -13,25 +13,23 @@
 
 class PCharacter;
 
-class ConfigElement : public DefaultCommand, public XMLCommand {
+class ConfigElement : public XMLVariableContainer {
 XML_OBJECT
-friend class ConfigCommand;
 public:
     typedef ::Pointer<ConfigElement> Pointer;
     typedef ::XMLPointer<ConfigElement> XMLPointer;
     
-    virtual const DLString & getRussianName( ) const;
-    virtual void run( Character *, const DLString & );
-
-protected:    
+    const DLString & getName() const;
+    const DLString & getRussianName( ) const;
     bool handleArgument( PCharacter *, const DLString & ) const;
 
     bool printText( PCharacter * ) const;
     void printRow( PCharacter * ) const;
     void printLine( PCharacter * ) const;
 
+protected:    
     XML_VARIABLE XMLFlagsWithTable   bit;
-    XML_VARIABLE XMLString  rname;
+    XML_VARIABLE XMLString  name, rname;
     XML_VARIABLE XMLString  msgOn, msgOff;
 
 private:

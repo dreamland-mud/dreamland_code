@@ -43,13 +43,14 @@ list<PCMemoryInterface *> who_find_offline(PCharacter *looker);
 /*-------------------------------------------------------------------------
  * ConfigElement
  *------------------------------------------------------------------------*/
+const DLString & ConfigElement::getName( ) const
+{
+    return name;
+}
+
 const DLString & ConfigElement::getRussianName( ) const
 {
     return rname;
-}
-
-void ConfigElement::run( Character *ch, const DLString & )
-{
 }
 
 bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
@@ -206,8 +207,7 @@ COMMAND(ConfigCommand, "config")
             g->printHeader( pch );
             
             for (c = g->begin( ); c != g->end( ); c++) 
-                if ((*c)->available( pch ))
-                    (*c)->printLine( pch );
+                (*c)->printLine( pch );
         }
 
         config_scroll_print(pch);
@@ -234,8 +234,7 @@ COMMAND(ConfigCommand, "config")
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
         for (c = g->begin( ); c != g->end( ); c++) 
-            if ((*c)->available( pch ) 
-                    && ((*c)->matches( arg1 ) || (*c)->matchesAlias( arg1 ))) 
+            if (arg1.strPrefix((*c)->getName()) || arg1.strPrefix((*c)->getRussianName()))
             {
                 if (!(*c)->handleArgument( pch, arg2 ))
                     pch->pecho("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
