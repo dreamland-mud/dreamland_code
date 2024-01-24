@@ -199,7 +199,15 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     const FlagTable *table = paf->bitvector.getTable();
 
     if (table) {
-        char_flag_by_table(ch, table).changeBit(paf->bitvector, fAdd);
+        bool action = fAdd;
+
+        if (table == &part_flags && paf->location == APPLY_BITVECTOR) {
+            // allow affects that remove a bit, but only for one table for now
+            if (paf->modifier < 0)
+                action = !fAdd;
+        }
+
+        char_flag_by_table(ch, table).changeBit(paf->bitvector, action);
     }
 
     if (paf->global.getRegistry() == wearlocationManager) {
@@ -287,8 +295,12 @@ static void affectlist_reapply(AffectList &afflist, Character *ch, Affect *affec
     int bits = affect->bitvector.getValue();
 
     for (auto &paf : afflist)
-        if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits))
-            charFlag.setBit(paf->bitvector);
+        if (paf->bitvector.getTable() == table && paf->bitvector.isSet(bits)) {
+            if (table == &part_flags && paf->location == APPLY_BITVECTOR && paf->modifier < 0)
+                charFlag.removeBit(paf->bitvector);
+            else
+                charFlag.setBit(paf->bitvector);
+        }
         else if (paf->global.getRegistry() == registry) {
             if (registry == wearlocationManager)
                 ch->wearloc.remove(paf->global);
@@ -315,7 +327,7 @@ void affect_check(Character *ch, Affect *affect)
         affectlist_reapply(obj->pIndexData->affected, ch, affect);
     }
 
-    if (table) {    
+    if (table && table != &part_flags) {    
         const Flags &raceFlag = race_flag_by_table(ch->getRace().getElement(), table);
         Flags &charFlag = char_flag_by_table(ch, table);
         charFlag.setBit(raceFlag.getValue());
