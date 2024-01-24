@@ -356,19 +356,3 @@ bool Command::feniaOverride(Character *ch, const DLString &constArgs)
 }
 
 
-/*--------------------------------------------------------------------------
- * XMLCommand
- *-------------------------------------------------------------------------*/
-XMLCommand::XMLCommand( ) 
-{
-}
-
-XMLCommand::~XMLCommand( ) 
-{
-}
-
-CommandLoader * XMLCommand::getLoader( ) const 
-{
-    return commandManager;
-}
-

@@ -4,7 +4,7 @@
  */
 #include "logstream.h"
 #include "commandhelp.h"
-#include "command.h"
+#include "commandplugin.h"
 #include "commandmanager.h"
 #include "character.h"
 
@@ -25,9 +25,9 @@ bool CommandHelp::visible( Character *ch ) const
 void CommandHelp::save() const
 {
     if (command) {
-        const XMLCommand *cmd = command.getDynamicPointer<XMLCommand>();
+        const CommandPlugin *cmd = command.getDynamicPointer<CommandPlugin>();
         if (cmd)
-            commandManager->save(cmd);
+            cmd->getLoader()->saveCommand(cmd);
         else
             LogStream::sendError() << "Failed to save command help on command " << command->getName() << endl;
     }

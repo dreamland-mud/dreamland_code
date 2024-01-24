@@ -30,3 +30,7 @@ void CommandPlugin::destruction( )
     commandManager->unregistrate( Pointer( this ) );
 }
 
+CommandLoader * CommandPlugin::getLoader( ) const
+{
+    return commandManager;
+}

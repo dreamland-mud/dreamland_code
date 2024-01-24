@@ -63,14 +63,7 @@ protected:
         static const Flags defaultCategory;
 };
 
-class XMLCommand : public virtual Command, public virtual XMLPolymorphVariable {
-public:
-        typedef ::Pointer<XMLCommand> Pointer;
 
-        XMLCommand( );
-        virtual ~XMLCommand( );
 
-        virtual CommandLoader * getLoader( ) const;
-};
 
 #endif

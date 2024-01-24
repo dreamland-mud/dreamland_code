@@ -9,12 +9,17 @@
 #include "plugin.h"
 #include "command.h"
 
-class CommandPlugin : public virtual XMLCommand, public virtual Plugin {
+class CommandLoader;
+
+class CommandPlugin : public virtual Command, 
+                      public virtual XMLPolymorphVariable, 
+                      public virtual Plugin {
 public:
         typedef ::Pointer<CommandPlugin> Pointer;
 
         virtual void initialization( );
         virtual void destruction( );
+        virtual CommandLoader * getLoader( ) const;
 };
 
 #define COMMAND(C, cmdname)              \

@@ -201,7 +201,7 @@ void CommandManager::destruction( )
     InterpretLayer::destruction( );
 }
 
-void CommandManager::load( XMLCommand::Pointer command )
+void CommandManager::load( CommandPlugin::Pointer command )
 {
     CommandLoader *loader = command->getLoader( );
     if (loader == NULL) {
@@ -211,7 +211,7 @@ void CommandManager::load( XMLCommand::Pointer command )
     command->getLoader( )->loadCommand( command );
 }
 
-void CommandManager::save( XMLCommand::Pointer command )
+void CommandManager::save( CommandPlugin::Pointer command )
 {
     command->getLoader( )->saveCommand( command );
 }
@@ -313,12 +313,12 @@ bool CommandManager::compare( const Command &a, const Command &b, bool fRussian 
  *-----------------------------------------------------------------------*/
 const DLString CommandLoader::NODE_NAME = "Command";
 
-void CommandLoader::loadCommand( XMLCommand::Pointer command )
+void CommandLoader::loadCommand( CommandPlugin::Pointer command )
 {
     loadXML( *command, command->getName( ) );
 }
 
-void CommandLoader::saveCommand( XMLCommand::Pointer command )
+void CommandLoader::saveCommand( CommandPlugin::Pointer command )
 {
     saveXML( *command, command->getName( ) );
 }

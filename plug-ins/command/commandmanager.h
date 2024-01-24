@@ -13,7 +13,7 @@
 #include "oneallocate.h"
 #include "dlxmlloader.h"
 #include "interpretlayer.h"
-#include "command.h"
+#include "commandplugin.h"
 
 class Character;
 
@@ -45,8 +45,8 @@ inline const list<Command::Pointer> &CommandList::getCommandsRU( ) const
 
 class CommandLoader : public virtual Plugin, public DLXMLLoader {
 public:    
-        virtual void loadCommand( XMLCommand::Pointer );
-        virtual void saveCommand( XMLCommand::Pointer );
+        virtual void loadCommand( CommandPlugin::Pointer );
+        virtual void saveCommand( CommandPlugin::Pointer );
 
         virtual DLString getNodeName( ) const;
 protected:        
@@ -69,8 +69,8 @@ public:
         CommandManager( );
         virtual ~CommandManager( );
         
-        void load( XMLCommand::Pointer );
-        void save( XMLCommand::Pointer );
+        void load( CommandPlugin::Pointer );
+        void save( CommandPlugin::Pointer );
 
         void registrate( Command::Pointer );
         void unregistrate( Command::Pointer );
