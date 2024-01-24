@@ -22,6 +22,7 @@ public:
     const DLString & getName() const;
     const DLString & getRussianName( ) const;
     bool handleArgument( PCharacter *, const DLString & ) const;
+    bool available(PCharacter *) const;
 
     bool printText( PCharacter * ) const;
     void printRow( PCharacter * ) const;
@@ -31,6 +32,8 @@ protected:
     XML_VARIABLE XMLFlagsWithTable   bit;
     XML_VARIABLE XMLString  name, rname;
     XML_VARIABLE XMLString  msgOn, msgOff;
+    XML_VARIABLE XMLString  hint;
+    XML_VARIABLE XMLIntegerNoEmpty level;
 
 private:
     Flags & getField( PCharacter * ) const;

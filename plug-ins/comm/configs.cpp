@@ -53,6 +53,14 @@ const DLString & ConfigElement::getRussianName( ) const
     return rname;
 }
 
+bool ConfigElement::available(PCharacter *ch) const
+{
+    if (level > ch->get_trust())
+        return false;
+
+    return true;
+}
+
 bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
 {
     if (arg.empty( )) {
@@ -207,7 +215,8 @@ COMMAND(ConfigCommand, "config")
             g->printHeader( pch );
             
             for (c = g->begin( ); c != g->end( ); c++) 
-                (*c)->printLine( pch );
+                if ((*c)->available(pch))
+                    (*c)->printLine( pch );
         }
 
         config_scroll_print(pch);
@@ -234,13 +243,14 @@ COMMAND(ConfigCommand, "config")
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
         for (c = g->begin( ); c != g->end( ); c++) 
-            if (arg1.strPrefix((*c)->getName()) || arg1.strPrefix((*c)->getRussianName()))
-            {
-                if (!(*c)->handleArgument( pch, arg2 ))
-                    pch->pecho("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
+            if ((*c)->available(pch))
+                if (arg1.strPrefix((*c)->getName()) || arg1.strPrefix((*c)->getRussianName()))
+                {
+                    if (!(*c)->handleArgument( pch, arg2 ))
+                        pch->pecho("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
 
-                return;
-            }
+                    return;
+                }
 
     
     pch->pecho("Опция не найдена. Используй {hc{y{lRрежим{lEconfig{x для списка.");
