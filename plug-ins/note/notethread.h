@@ -14,8 +14,7 @@
 #include "xmlenumeration.h"
 #include "xmlshort.h"
 
-#include "command.h"
-#include "commandhelp.h"
+#include "defaultcommand.h"
 #include "so.h"
 #include "dlxmlloader.h"
 
@@ -24,6 +23,7 @@
 class PCharacter;
 class XMLNoteData;
 class XMLAttributeNoteData;
+class NoteThread;
 
 class NoteHelp : public CommandHelp {
 public:
@@ -39,15 +39,52 @@ inline const DLString & NoteHelp::getType( ) const
     return TYPE;
 }
 
+class NoteCommand : public DefaultCommand {
+XML_OBJECT
+public:
+    typedef ::Pointer<NoteCommand> Pointer;
+    typedef ::Pointer<XMLAttributeNoteData> Attribute;    
+
+    virtual void run( Character *, const DLString & );
+
+    void setThread(::Pointer<NoteThread> thread);
+    void unsetThread();
+    ::Pointer<NoteThread> getThread() const;
+
+protected:    
+    void doFlag(PCharacter *, DLString & );
+    bool doShow( PCharacter *, Attribute ) const;
+    bool doClear( PCharacter *, Attribute ) const;
+    void doSubject( PCharacter *, Attribute, const DLString & ) const;
+    void doTo( PCharacter *, Attribute, const DLString & ) const;
+    void doLinePlus( PCharacter *, Attribute, const DLString & ) const;
+    void doLineMinus( PCharacter *, Attribute ) const;
+    void doPaste( PCharacter *, Attribute ) const;
+    void doCatchup( PCharacter *ch ) const;
+    void doCopy( PCharacter *, DLString & ) const;
+    void doRead( PCharacter *, DLString & ) const;
+    void doList( PCharacter *, DLString &argument ) const;
+    void doRemove( PCharacter *, DLString & );
+    void doUncatchup( PCharacter *, DLString & ) const;
+    bool doPost( PCharacter *, Attribute );
+    bool doFrom( PCharacter *, Attribute, const DLString & ) const;
+    void doForward( PCharacter *, Attribute, DLString & ) const;
+
+    void echo( PCharacter *, const DLString &, const DLString &, const DLString & = "" ) const;
+
+    ::Pointer<NoteThread> thread;
+};
+
+ 
 /*
  * NoteThread
  */
-class NoteThread : public Command, 
-                   public virtual Plugin, 
+class NoteThread : public virtual Plugin, 
                    public DLXMLRuntimeLoader, 
                    public XMLVariableContainer 
 {
 XML_OBJECT    
+friend class NoteCommand;
 public:
     class NoteBucket : public XMLListBase<Note> {
     public:
@@ -68,22 +105,13 @@ public:
     typedef vector<NoteBucket> NoteHash;
     typedef ::Pointer<XMLAttributeNoteData> Attribute;
 
-    NoteThread( );
     NoteThread( const DLString & );
     
     virtual void initialization( );
     virtual void destruction( );
-    
-    virtual const DLString & getName( ) const;
-    virtual const DLString & getRussianName( ) const;
-    virtual const DLString & getHint( ) const;
-    virtual CommandHelp::Pointer getHelp( ) const;
-    virtual short getLevel( ) const;
-    virtual const Flags & getExtra( ) const;
-    virtual const Flags & getCommandCategory( ) const;
-    virtual void run( Character *, const DLString & );
-    virtual int properOrder( Character * ) const;
 
+    virtual const DLString &getName() const;
+    
     virtual DLString getTableName( ) const;
     virtual DLString getNodeName( ) const;
     
@@ -110,27 +138,6 @@ protected:
     time_t getStamp( PCharacter * ) const;
 
 protected:
-    void doFlag(PCharacter *, DLString & );
-    bool doShow( PCharacter *, Attribute ) const;
-    bool doClear( PCharacter *, Attribute ) const;
-    void doSubject( PCharacter *, Attribute, const DLString & ) const;
-    void doTo( PCharacter *, Attribute, const DLString & ) const;
-    void doLinePlus( PCharacter *, Attribute, const DLString & ) const;
-    void doLineMinus( PCharacter *, Attribute ) const;
-    void doPaste( PCharacter *, Attribute ) const;
-    void doCatchup( PCharacter *ch ) const;
-    void doCopy( PCharacter *, DLString & ) const;
-    void doRead( PCharacter *, DLString & ) const;
-    void doList( PCharacter *, DLString &argument ) const;
-    void doRemove( PCharacter *, DLString & );
-    void doUncatchup( PCharacter *, DLString & ) const;
-    bool doPost( PCharacter *, Attribute );
-    bool doFrom( PCharacter *, Attribute, const DLString & ) const;
-    void doForward( PCharacter *, Attribute, DLString & ) const;
-    
-    void echo( PCharacter *, const DLString &, const DLString &, const DLString & = "" ) const;
-
-protected:
     void loadAllBuckets( );
     void saveAllBuckets( ) const;
     void saveBucket( time_t ) const;
@@ -139,15 +146,11 @@ protected:
     void remove( const Note * );
     void dump( ) const;
     
+    XML_VARIABLE XMLPointerNoEmpty<NoteCommand> command;
     XML_VARIABLE XMLString name;
     XML_VARIABLE XMLString nameMlt;
     XML_VARIABLE XMLString rusName;
     XML_VARIABLE XMLString rusNameMlt;
-    XML_VARIABLE XMLString rusCommand;
-    XML_VARIABLE XMLString hint;
-    XML_VARIABLE XMLFlagsNoEmpty extra;
-    XML_VARIABLE XMLPointerNoEmpty<NoteHelp> help;
-    XML_VARIABLE XMLFlags cat;
     XML_VARIABLE XMLEnumeration gender;
     XML_VARIABLE XMLInteger keepDays;
     XML_VARIABLE XMLShort readLevel;
@@ -183,17 +186,6 @@ inline const DLString &NoteThread::getRussianThreadName( ) const
 inline const DLString &NoteThread::getRussianMltName( ) const
 {
     return rusNameMlt;
-}
-
-
-inline CommandHelp::Pointer NoteThread::getHelp( ) const
-{
-    return help;
-}
-
-inline const Flags & NoteThread::getCommandCategory( ) const
-{
-    return cat;
 }
 
 inline const Enumeration &NoteThread::getGender() const

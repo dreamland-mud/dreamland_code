@@ -2,6 +2,7 @@
  *
  * ruffina, 2005
  */
+#include "logstream.h"
 #include "notemanager.h"
 #include "notethread.h"
 
@@ -37,8 +38,9 @@ DLString NoteManager::getNodeName( ) const
 }
 
 void NoteManager::load( NoteThread *thread )
-{
+{    
     DLString name = thread->getName( );
+    LogStream::sendNotice() << "Loading note thread " << name << "..." << endl;
 
     loadXML( thread, name );
     threads[name] = NoteThread::Pointer( thread );

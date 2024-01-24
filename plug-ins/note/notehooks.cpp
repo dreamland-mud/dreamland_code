@@ -114,13 +114,13 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
 
 void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
 {        
-    const DLString threadName = thread.getRussianName().ruscase('1');        
+    const DLString threadName = thread.getRussianThreadName().ruscase('1');        
     send_telegram_note(threadName, note.getFrom(), note.getSubject(), note.getText());
 }
 
 void NoteHooks::hookDiscord(const NoteThread &thread, const Note &note)
 {
-    const DLString threadName = thread.getRussianName().ruscase('1');
+    const DLString threadName = thread.getRussianThreadName().ruscase('1');
 
     if (thread.getName() == "news" || thread.getName() == "change")
         send_discord_news(threadName, note.getFrom(), note.getSubject(), note.getText());

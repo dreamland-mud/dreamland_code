@@ -9,6 +9,7 @@
 #include "unread.h"
 #include "notehooks.h"
 #include "xmlvariableregistrator.h"
+#include "mocregistrator.h"
 
 
 extern "C"
@@ -17,6 +18,7 @@ extern "C"
         SO::PluginList ppl;
                 
         Plugin::registerPlugin<NoteManager>( ppl );
+        Plugin::registerPlugin<MocRegistrator<NoteCommand> >( ppl );                
         Plugin::registerPlugin<XMLVariableRegistrator<NoteHelp> >( ppl );
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeNoteData> >( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLastRead> >( ppl );

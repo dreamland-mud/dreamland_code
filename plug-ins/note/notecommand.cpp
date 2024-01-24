@@ -18,6 +18,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "xmlpcstringeditor.h"
+#include "commandmanager.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -29,49 +30,52 @@
 #include "act.h"
 #include "def.h"
 
-const DLString & NoteThread::getRussianName( ) const
+void NoteCommand::setThread(NoteThread::Pointer thread)
 {
-    return rusCommand;
+    this->thread = thread;
+
+    commandManager->registrate( Pointer( this ) );
 }
 
-short NoteThread::getLevel( ) const
+NoteThread::Pointer NoteCommand::getThread() const
 {
-    return min( readLevel.getValue( ), writeLevel.getValue( ) );
+    return thread;
 }
 
-int NoteThread::properOrder( Character *ch ) const
+void NoteCommand::unsetThread()
 {
-    return RC_ORDER_ERROR;
-}    
-
-const DLString& NoteThread::getHint( ) const
-{
-    return hint;
+    commandManager->unregistrate( Pointer( this ) );
+    
+    thread.clear();
 }
 
-void NoteThread::run( Character* cch, const DLString& constArguments ) 
+
+void NoteCommand::run( Character* cch, const DLString& constArguments ) 
 {
     XMLAttributeNoteData::Pointer attr;
     PCharacter *ch;
     DLString arguments = constArguments;
     DLString cmd = arguments.getOneArgument( );
     
+    if (!thread)
+        throw Exception("Note command not connected to a thread");
+
     if (cch->is_npc( ))
         return;
 
     ch = cch->getPC( );
 
     if (cmd.empty( )) {
-        if (canRead( ch ))
+        if (thread->canRead( ch ))
             cmd = "read";
         else {
-            ch->pecho( "Ты не можешь читать {W%N4{x.", rusNameMlt.c_str( ) );
+            ch->pecho( "Ты не можешь читать {W%N4{x.", thread->getRussianMltName().c_str( ) );
             return;
         }
     }
     
     if (cmd.strPrefix( "dump" ) && ch->isCoder( )) {
-        dump( );
+        thread->dump( );
         ch->pecho( "Ok." );
         return;
     }
@@ -82,12 +86,12 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
     }
 
     if (arg_oneof_strict(cmd, "save", "сохранить") && ch->isCoder()) {
-        saveAllBuckets();
+        thread->saveAllBuckets();
         ch->pecho("Ok.");
         return;
     }
 
-    if (canRead( ch )) {
+    if (thread->canRead( ch )) {
         if (arg_oneof( cmd, "read", "читать" )) {
             doRead( ch, arguments );
             return;
@@ -110,8 +114,8 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
         }
     }
 
-    if (!canWrite( ch )) {
-        ch->pecho( "У тебя недостаточно привилегий для написания {W%N2{x.", rusNameMlt.c_str( ) );
+    if (!thread->canWrite( ch )) {
+        ch->pecho( "У тебя недостаточно привилегий для написания {W%N2{x.", thread->getRussianMltName().c_str( ) );
         return;
     }
 
@@ -120,12 +124,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
         return;
     }
 
-    if (ch->getRealLevel( ) < 3 && ch->getRemorts( ).size( ) == 0) {
-        ch->pecho("Тебе нужно достичь 3 уровня, чтобы отправлять письма.");
-        return;
-    }
-
-    if (canRead( ch )) {
+    if (thread->canRead( ch )) {
         if (arg_oneof( cmd, "remove", "delete", "удалить" )) {
             doRemove( ch, arguments );
             return;
@@ -140,7 +139,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
 
     attr = ch->getAttributes( ).getAttr<XMLAttributeNoteData>( "notedata" );
     
-    if (canRead( ch ) && arg_oneof( cmd, "forward", "перенаправить" )) {
+    if (thread->canRead( ch ) && arg_oneof( cmd, "forward", "перенаправить" )) {
         doForward( ch, attr, arguments );
         return;
     }
@@ -185,7 +184,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
         return;
     }
     
-    echo( ch, msgNoCurrent, "Ты не пишешь никакого письма." );
+    echo( ch, thread->msgNoCurrent, "Ты не пишешь никакого письма." );
 }
 
 /**
@@ -193,7 +192,7 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
  * '<note> flag <id> <flags>' - sets specified flag on a note with given number.
  * Note bucket is not saved, run '<note> save' to do so.
  */
-void NoteThread::doFlag(PCharacter *ch, DLString &arguments )
+void NoteCommand::doFlag(PCharacter *ch, DLString &arguments )
 {
     Integer noteId;
     DLString arg = arguments.getOneArgument( );
@@ -203,17 +202,17 @@ void NoteThread::doFlag(PCharacter *ch, DLString &arguments )
             ch->pecho("Укажите номер письма.");
         else
             ch->pecho("Неправильный номер письма.");
-        ch->printf( "Использование: %s flag <number> <flags to set|none>\r\n", getName( ).c_str( ) );
+        ch->printf( "Использование: %s flag <number> <flags to set|none>\r\n", thread->getName( ).c_str( ) );
         return;
     }
 
-    const Note *cnote = getNoteAtPosition( ch, noteId );
+    const Note *cnote = thread->getNoteAtPosition( ch, noteId );
     if (!cnote) {
-        ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+        ch->pecho( "Так много %N2 еще не написали.", thread->getRussianMltName().c_str( ) );
         return;
     }
         
-    Note *note = findNote(cnote->getID());
+    Note *note = thread->findNote(cnote->getID());
     if (!note) {
         ch->pecho("Что-то пошло не так, письмо не найдено.");
         return;
@@ -227,15 +226,15 @@ void NoteThread::doFlag(PCharacter *ch, DLString &arguments )
 
     note->setFlags(flags);
     ch->pecho("%^N3 номер %d установлены флаги %s.", 
-            rusName.c_str(), noteId.getValue(), note->getFlags().names().c_str());
+            thread->getRussianThreadName().c_str(), noteId.getValue(), note->getFlags().names().c_str());
     ch->pecho("Используйте команду '%s save' для сохранения изменений на диск.", getName().c_str());
 }
 
-bool NoteThread::doShow( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
+bool NoteCommand::doShow( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
 {
     XMLNoteData *note;
 
-    if (( note = attr->findNote( this ) )) {
+    if (( note = attr->findNote( *thread ) )) {
         ostringstream buf;
         note->toStream( buf );
         page_to_char( buf.str( ).c_str( ), ch );
@@ -245,12 +244,12 @@ bool NoteThread::doShow( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) co
     return false;
 }
 
-bool NoteThread::doClear( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
+bool NoteCommand::doClear( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
 {
     XMLNoteData *note;
 
-    if (( note = attr->findNote( this ) )) {
-        attr->clearNote( this );
+    if (( note = attr->findNote( *thread ) )) {
+        attr->clearNote( *thread );
         ch->pecho( "Ok." );
         return true;
     }
@@ -258,41 +257,41 @@ bool NoteThread::doClear( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) c
     return false;
 }
 
-void NoteThread::doSubject( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
+void NoteCommand::doSubject( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
 {
-    XMLNoteData *note = attr->makeNote( ch, this );
+    XMLNoteData *note = attr->makeNote( ch, *thread );
     note->setSubject( arguments );
     ch->pecho( "Ok." );
 }
 
-void NoteThread::doTo( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
+void NoteCommand::doTo( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
 {
     ostringstream buf;
 
-    XMLNoteData *note = attr->makeNote( ch, this );
+    XMLNoteData *note = attr->makeNote( ch, *thread );
     note->setRecipient( arguments );
     
     if (!Note::parseRecipient( ch, arguments, buf ))
-        echo( ch, msgToError, "{RТвое сообщение никто не получит!{x" );
+        echo( ch, thread->msgToError, "{RТвое сообщение никто не получит!{x" );
     else
-        echo( ch, msgToOk, "Твое сообщение получат:\r\n", buf.str( ) );
+        echo( ch, thread->msgToOk, "Твое сообщение получат:\r\n", buf.str( ) );
 }
 
-void NoteThread::doLinePlus( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
+void NoteCommand::doLinePlus( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
 {
-    XMLNoteData *note = attr->makeNote( ch, this );
+    XMLNoteData *note = attr->makeNote( ch, *thread );
 
     if (!ch->isCoder( ) && note->getBodySize( ) > 4096) 
-        echo( ch, msgTooLong, "Слишком длинное сообщение." );
+        echo( ch, thread->msgTooLong, "Слишком длинное сообщение." );
     else {
         note->addLine( arguments );
         ch->pecho( "Ok." );
     }
 }
 
-void NoteThread::doLineMinus( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
+void NoteCommand::doLineMinus( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
 {
-    XMLNoteData *note = attr->makeNote( ch, this );
+    XMLNoteData *note = attr->makeNote( ch, *thread );
 
     if (note->isBodyEmpty( )) 
         ch->pecho( "Больше нечего удалять." );
@@ -302,9 +301,9 @@ void NoteThread::doLineMinus( PCharacter *ch, XMLAttributeNoteData::Pointer attr
     }
 }
 
-void NoteThread::doPaste( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
+void NoteCommand::doPaste( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
 {
-    XMLNoteData *note = attr->makeNote( ch, this );
+    XMLNoteData *note = attr->makeNote( ch, *thread );
 
     const Editor::reg_t &reg = ch->getAttributes()
         .getAttr<XMLAttributeEditorState>("edstate")->regs[0];
@@ -317,20 +316,20 @@ void NoteThread::doPaste( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) c
     ch->pecho( "Ok." );
 }
 
-void NoteThread::doCatchup( PCharacter *ch ) const
+void NoteCommand::doCatchup( PCharacter *ch ) const
 {
-    ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" )->updateStamp( this );
+    ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" )->updateStamp( *thread );
     ch->pecho( "Ok." );
 }
 
-void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
+void NoteCommand::doCopy( PCharacter *ch, DLString &arguments ) const
 {
     const Note *note;
     DLString arg = arguments.getOneArgument( );
    
     if (arg.empty( )) {
         XMLAttributeNoteData::Pointer attr = ch->getAttributes( ).getAttr<XMLAttributeNoteData>( "notedata" );
-        XMLNoteData *note = attr->findNote( this );
+        XMLNoteData *note = attr->findNote( *thread );
             if (!note) {
                 ch->pecho("Ты не редактируешь сообщение, копировать нечего.");
                 return;
@@ -346,7 +345,7 @@ void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
  
     if (arg.isNumber( )) {
         try {
-            note = getNoteAtPosition( ch, arg.toInt( ) );
+            note = thread->getNoteAtPosition( ch, arg.toInt( ) );
 
             if (note) {
                 ostringstream ostr;
@@ -355,7 +354,7 @@ void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
                     ->regs[0].split(ostr.str( ));
                 ch->pecho( "Ok." );
             } else
-                ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+                ch->pecho( "Так много %N2 еще не написали.", thread->getRussianMltName().c_str( ) );
                 
         } catch (const ExceptionBadType& e) {
             ch->pecho( "Неправильный номер письма." );
@@ -366,27 +365,27 @@ void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
     }
 }
 
-void NoteThread::doRead( PCharacter *ch, DLString &arguments ) const
+void NoteCommand::doRead( PCharacter *ch, DLString &arguments ) const
 {
     const Note *note;
     DLString arg = arguments.getOneArgument( );
     
     if (arg.empty( ) || arg_oneof( arg, "next", "следующий", "дальше" )) {
-        note = getNextUnreadNote( ch );
+        note = thread->getNextUnreadNote( ch );
         
         if (note) 
-            showNoteToChar( ch, note );
+            thread->showNoteToChar( ch, note );
         else
-            ch->pecho( "У тебя нет непрочитанных %N2.", rusNameMlt.c_str( ) );
+            ch->pecho( "У тебя нет непрочитанных %N2.", thread->getRussianMltName().c_str( ) );
     }
     else if (arg.isNumber( )) {
         try {
-            note = getNoteAtPosition( ch, arg.toInt( ) );
+            note = thread->getNoteAtPosition( ch, arg.toInt( ) );
 
             if (note)
-                showNoteToChar( ch, note );
+                thread->showNoteToChar( ch, note );
             else
-                ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+                ch->pecho( "Так много %N2 еще не написали.", thread->getRussianMltName().c_str( ) );
                 
         } catch (const ExceptionBadType& e) {
             ch->pecho( "Неправильный номер письма." );
@@ -397,14 +396,14 @@ void NoteThread::doRead( PCharacter *ch, DLString &arguments ) const
     }
 }
 
-void NoteThread::doList( PCharacter *ch, DLString &argument ) const
+void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
 {
     ostringstream buf;
-    NoteList mynotes;
-    NoteList::const_iterator i;
-    time_t stamp = getStamp( ch );
+    NoteThread::NoteList mynotes;
+    NoteThread::NoteList::const_iterator i;
+    time_t stamp = thread->getStamp( ch );
     
-    for (i = xnotes.begin( ); i != xnotes.end( ); i++)
+    for (i = thread->xnotes.begin( ); i != thread->xnotes.end( ); i++)
         if ((*i)->isNoteTo( ch ) || (*i)->isNoteFrom( ch ))
             mynotes.push_back( *i );
 
@@ -412,7 +411,7 @@ void NoteThread::doList( PCharacter *ch, DLString &argument ) const
         int cnt, last = mynotes.size( ) - 1;
         
         for (cnt = 0, i = mynotes.begin( ); i != mynotes.end( ); i++, cnt++) {
-            bool hidden = isNoteHidden( *i, ch, stamp );
+            bool hidden = thread->isNoteHidden( *i, ch, stamp );
 
             if (listfilter_parse( ch, cnt, last, *i, hidden, argument.c_str( ) )) {
                 buf << "[" << cnt 
@@ -435,7 +434,7 @@ void NoteThread::doList( PCharacter *ch, DLString &argument ) const
         page_to_char( buf.str( ).c_str( ), ch );
 }
 
-void NoteThread::doRemove( PCharacter *ch, DLString &arguments )
+void NoteCommand::doRemove( PCharacter *ch, DLString &arguments )
 {
     const Note *note;
     DLString arg = arguments.getOneArgument( );
@@ -446,7 +445,7 @@ void NoteThread::doRemove( PCharacter *ch, DLString &arguments )
     }
 
     try {
-        note = getNoteAtPosition( ch, arg.toInt( ) );
+        note = thread->getNoteAtPosition( ch, arg.toInt( ) );
 
         if (note) {
             if (ch->get_trust( ) < CREATOR && note->getAuthor( ) != ch->getName( ))
@@ -455,19 +454,19 @@ void NoteThread::doRemove( PCharacter *ch, DLString &arguments )
                 LogStream::sendNotice( ) 
                     << getName( ) << " remove: " 
                     << ch->getName( ) << ", id " << note->getID( ) << endl;
-                remove( note );
+                thread->remove( note );
                 ch->pecho( "Ok." );
             }
         }
         else
-            ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+            ch->pecho( "Так много %N2 еще не написали.", thread->getRussianMltName().c_str( ) );
     } 
     catch (const ExceptionBadType& e) {
         ch->pecho( "Неправильный номер письма." );
     }
 }
 
-void NoteThread::doUncatchup( PCharacter *ch, DLString &arguments ) const
+void NoteCommand::doUncatchup( PCharacter *ch, DLString &arguments ) const
 {
     XMLAttributeLastRead::Pointer attr;
     DLString arg = arguments.getOneArgument( );
@@ -475,59 +474,59 @@ void NoteThread::doUncatchup( PCharacter *ch, DLString &arguments ) const
     attr = ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" );
 
     if (!arg.isNumber( )) {
-        attr->setStamp( this, 0 );
-        ch->printf( "Все %s помечены как непрочитанные.\r\n", nameMlt.getValue( ).c_str( ) );
+        attr->setStamp( *thread, 0 );
+        ch->printf( "Все %N1 помечены как непрочитанные.\r\n", thread->getRussianMltName().c_str( ) );
         return;
     }
 
     try {
         int vnum = arg.toInt( );
-        const Note *note = getNoteAtPosition( ch, vnum );
+        const Note *note = thread->getNoteAtPosition( ch, vnum );
         
         if (note) {
-            attr->setStamp( this, note->getID( ) );
-            ch->printf( "Все %s, начиная с номера %d, помечены как непрочитанные.\r\n", 
-                        nameMlt.getValue( ).c_str( ), vnum );
+            attr->setStamp( *thread, note->getID( ) );
+            ch->printf( "Все %N2, начиная с номера %d, помечены как непрочитанные.\r\n", 
+                        thread->getRussianMltName().c_str( ), vnum );
         }
         else
-            ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+            ch->pecho( "Так много %N2 еще не написали.", thread->getRussianMltName().c_str( ) );
     }
     catch (const ExceptionBadType& e) {
         ch->pecho( "Неправильный номер письма." );
     }
 }
 
-bool NoteThread::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
+bool NoteCommand::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
 {
     XMLNoteData *notedata;
 
-    if (!( notedata = attr->findNote( this ) ))
+    if (!( notedata = attr->findNote( *thread ) ))
         return false;
 
     if (notedata->getRecipient( ).empty( )) {
-        echo( ch, msgNoRecepient, "Укажите адресата письма." );
+        echo( ch, thread->msgNoRecepient, "Укажите адресата письма." );
         return false;
     }
 
     Note note;
     notedata->commit( &note );
-    note.godsSeeAlways = godsSeeAlways;
-    attach( &note );
+    note.godsSeeAlways = thread->godsSeeAlways;
+    thread->attach( &note );
 
-    echo( ch, msgSent, "Письмо отправлено." );
+    echo( ch, thread->msgSent, "Письмо отправлено." );
     LogStream::sendNotice( ) 
         << getName( ) << " post: " 
         << ch->getName( ) << ", id " << note.getID( ) << endl;
 
-    NoteHooks::processNoteMessage( *this, note );
-    attr->clearNote( this );
+    NoteHooks::processNoteMessage( **thread, note );
+    attr->clearNote( *thread );
     return true;
 }
 
-bool NoteThread::doFrom( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
+bool NoteCommand::doFrom( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
 {
     if (ch->get_trust( ) >= GOD) {
-        XMLNoteData *note = attr->makeNote( ch, this );
+        XMLNoteData *note = attr->makeNote( ch, *thread );
         DLString arg = arguments;
         
         arg = arg.getOneArgument( );
@@ -547,7 +546,7 @@ bool NoteThread::doFrom( PCharacter *ch, XMLAttributeNoteData::Pointer attr, con
     return false;
 }
 
-void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, DLString &arguments ) const
+void NoteCommand::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, DLString &arguments ) const
 {
     const Note *orig;
     XMLNoteData *note;
@@ -560,7 +559,7 @@ void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
     }
 
     try {
-        orig = getNoteAtPosition( ch, arg.toInt( ) );
+        orig = thread->getNoteAtPosition( ch, arg.toInt( ) );
     } 
     catch (const ExceptionBadType& e) {
         ch->pecho( "Неправильный номер письма." );
@@ -568,24 +567,20 @@ void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
     }
 
     if (!orig) {
-        ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+        ch->pecho( "Так много %N2 еще не написали.", thread->getRussianMltName().c_str( ) );
         return;
     }
 
-    note = attr->makeNote( ch, this );
+    note = attr->makeNote( ch, *thread );
     orig->toForwardStream( buf );
     note->addLine( buf.str( ) );
     ch->pecho( "Ok." );
 }
 
-void NoteThread::echo( PCharacter *ch, const DLString &msg, const DLString &defaultMsg, const DLString &arg ) const
+void NoteCommand::echo( PCharacter *ch, const DLString &msg, const DLString &defaultMsg, const DLString &arg ) const
 {
     ostringstream buf;
     buf << (msg.empty( ) ? defaultMsg : msg) << arg << endl;
     ch->send_to( buf );
 }
 
-const Flags & NoteThread::getExtra( ) const
-{
-    return extra;
-}

@@ -21,12 +21,14 @@ const DLString NoteHelp::TYPE = "NoteHelp";
 void NoteHelp::save() const
 {
    if (command) {
-        const NoteThread *note = command.getDynamicPointer<NoteThread>();
-        if (note)
-            NoteManager::getThis()->saveXML(note, note->getName());
-        else
-            LogStream::sendNotice() << "Failed to save command " << command->getName() << endl;
+        NoteThread::Pointer thread = command.getDynamicPointer<NoteCommand>()->getThread();
+        if (thread) {
+            NoteManager::getThis()->saveXML(*thread, thread->getName());
+            return;
+        }
    }
+
+   LogStream::sendNotice() << "Failed to save command " << (command ? command->getName() : "") << endl;
 }
 
 NoteThread::NoteBucket::NoteBucket( )
@@ -51,18 +53,8 @@ bool NoteThread::NoteBucket::nodeFromXML( const XMLNode::Pointer& child )
 const DLString NoteThread::NODE_NAME = "NoteBucket";
 const int NoteThread::HASH_LEN = 16;
 
-NoteThread::NoteThread( ) 
-    : extra( CMD_KEEP_HIDE|CMD_GHOST, defaultExtra.getTable( ) ), 
-      cat(defaultCategory.getValue(), defaultCategory.getTable()),
-      gender( 0, &sex_table ), 
-      godsSeeAlways( false )
-{
-    hash.resize( HASH_LEN );
-}
 NoteThread::NoteThread( const DLString &n ) 
     : name( n ),
-      extra( CMD_KEEP_HIDE|CMD_GHOST, defaultExtra.getTable( ) ), 
-      cat(defaultCategory.getValue(), defaultCategory.getTable()),
       gender( 0, &sex_table ), 
       godsSeeAlways( false )
 {
@@ -72,7 +64,10 @@ NoteThread::NoteThread( const DLString &n )
 void NoteThread::initialization( )
 {
     NoteManager::getThis( )->load( this );
-    commandManager->registrate( Pointer( this ) );
+
+    if (command)
+        command->setThread(Pointer(this));
+
     loadAllBuckets( );
 }
 
@@ -80,7 +75,9 @@ void NoteThread::destruction( )
 {
 //  saveAllBuckets( );
     NoteManager::getThis( )->unLoad( this );
-    commandManager->unregistrate( Pointer( this ) );
+
+    if (command)
+        command->unsetThread();
 }
 
 DLString NoteThread::getTableName( ) const
