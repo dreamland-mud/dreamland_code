@@ -7,6 +7,7 @@
 #include "xmlattributeplugin.h"
 #include "mobilebehaviorplugin.h"
 #include "xmlvariableregistrator.h"
+#include "mocregistrator.h"
 
 #include "language.h"
 #include "languagemanager.h"
@@ -21,6 +22,7 @@ extern "C"
         SO::PluginList ppl;
                 
         Plugin::registerPlugin<LanguageManager>( ppl );
+        Plugin::registerPlugin<MocRegistrator<LanguageCommand> >( ppl );                
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguage> >( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguageHints> >( ppl );
         Plugin::registerPlugin<XMLVariableRegistrator<LanguageHelp> >( ppl );

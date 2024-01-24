@@ -32,15 +32,19 @@ GlobalBitvector & Language::getGroups( )
 
 HelpArticlePointer Language::getSkillHelp( ) const
 {
-    return help;
+    return command->getHelp();
 }
 
+const DLString & Language::getRussianName( ) const
+{
+    if (!nameRusNoCase.empty( ))
+        return nameRusNoCase;
+    else
+        return nameRus;
+}
 
 bool Language::visible( CharacterMemoryInterface * ch ) const
 {
-    if (Command::getLevel() > ch->get_trust())
-        return false;
-
     if (ch->getPCM() && ch->getLevel( ) >= LEVEL_IMMORTAL)
         return true;
     
@@ -245,20 +249,6 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
 
     data.learned++;
     ch->pecho( "Ты совершенствуешь свои познания в %^N6.", nameRus.getValue( ).c_str( ) );
-}
-
-const DLString & Language::getName( ) const
-{
-    return Skill::getName( );
-}
-const DLString & Language::getHint( ) const
-{
-    return hint;
-}
-
-const Enumeration & Language::getPosition( ) const
-{
-    return Language::defaultPosition;
 }
 
 AffectHandler::Pointer Language::getAffect( ) 

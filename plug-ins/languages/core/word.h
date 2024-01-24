@@ -15,6 +15,8 @@ class Character;
 class Language;
 class WordEffect;
 
+typedef ::Pointer<Language> LanguagePointer;
+
 class Word : public XMLVariableContainer {
 XML_OBJECT
 public:
@@ -39,11 +41,11 @@ public:
     typedef ::Pointer<WordContainer> Pointer;
     typedef XMLMapBase<Word> Words;
 
-    bool findWord( Word &, const Language &, const DLString & ) const;
+    bool findWord( Word &, LanguagePointer, const DLString & ) const;
     bool findWord( Word &, const DLString & ) const;
     bool addWord( const Word & );
-    void eraseWords( const Language & );
-    int getPower( const Language & ) const;
+    void eraseWords( LanguagePointer );
+    int getPower( LanguagePointer ) const;
 
     virtual void wordUsed( const Word &, PCharacter * ) = 0;
 

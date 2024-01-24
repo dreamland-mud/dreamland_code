@@ -17,8 +17,7 @@
 #include "skill.h"
 #include "affecthandler.h"
 #include "spell.h"
-#include "command.h"
-#include "commandhelp.h"
+#include "defaultcommand.h"
 #include "plugin.h"
 
 class LangInfo;
@@ -52,9 +51,35 @@ inline const DLString & LanguageHelp::getType( ) const
     return TYPE;
 }
 
-class Language : public Skill, public Command, public virtual Plugin, public XMLVariableContainer {
+class LanguageCommand : public DefaultCommand {
+XML_OBJECT
+public:
+    typedef ::Pointer<LanguageCommand> Pointer;
+
+    virtual void run( Character *, const DLString & );
+
+    void setLanguage(::Pointer<Language> language);
+    void unsetLanguage();
+    ::Pointer<Language> getLanguage() const;
+
+protected:    
+    void doUtter( PCharacter *, DLString &, DLString & ) const;
+    void doInit( PCharacter *, DLString & ) const;
+    void doList( PCharacter * ) const;
+    void doKnown( PCharacter * ) const;
+    bool showDreams( PCharacter * ) const;
+    bool showRewards( PCharacter * ) const;
+    void doIdent( PCharacter *, DLString & ) const;
+    void doForget( PCharacter *, const DLString & ) const;
+    void doRemember( PCharacter *, const DLString & ) const;
+
+    ::Pointer<Language> language;
+};
+
+class Language : public virtual Skill, public virtual Plugin, public XMLVariableContainer {
 XML_OBJECT
 friend class LanguageManager;
+friend class LanguageCommand;
 public:
     typedef ::Pointer<Language> Pointer;
     typedef ::Pointer<WordEffect> WordEffectPointer;
@@ -64,22 +89,15 @@ public:
     typedef XMLMapBase<XMLString> WordMap;
     typedef XMLMapBase<XMLPointer<WordEffect> > Effects;
     
-    Language( );
     Language( const DLString & );
 
     virtual void initialization( );
     virtual void destruction( );
     
     virtual const DLString & getName( ) const;
-    virtual const Enumeration & getPosition( ) const;
-    virtual const Flags & getCommandCategory( ) const;
     virtual const DLString & getRussianName( ) const;
-    virtual const DLString & getHint( ) const;
-    virtual void run( Character *, const DLString & );
-    
     virtual AffectHandler::Pointer getAffect( );
     virtual Spell::Pointer getSpell( ) const;
-    virtual CommandHelp::Pointer getHelp( ) const;
     virtual HelpArticlePointer getSkillHelp( ) const;
     virtual int getBeats(Character *ch = 0) const;
     virtual int getMana( ) const;
@@ -110,17 +128,6 @@ public:
     bool isNative( PCharacter * ) const;
     virtual DLString createDictum( ) const = 0;
     
-protected:    
-    void doUtter( PCharacter *, DLString &, DLString & ) const;
-    void doInit( PCharacter *, DLString & ) const;
-    void doList( PCharacter * ) const;
-    void doKnown( PCharacter * ) const;
-    bool showDreams( PCharacter * ) const;
-    bool showRewards( PCharacter * ) const;
-    void doIdent( PCharacter *, DLString & ) const;
-    void doForget( PCharacter *, const DLString & ) const;
-    void doRemember( PCharacter *, const DLString & ) const;
-
 protected:
     Word createGlobalWord( ) const;
     Word createPersonalWord( ) const;
@@ -132,16 +139,14 @@ protected:
 
     static const DLString CATEGORY;
 
+    XML_VARIABLE XMLPointerNoEmpty<LanguageCommand> command;
     XML_VARIABLE XMLString  nameRus;
     XML_VARIABLE XMLStringNoEmpty nameRusNoCase;
-    XML_VARIABLE XMLString  hint;
-    XML_VARIABLE XMLPointerNoEmpty<LanguageHelp> help;
     XML_VARIABLE XMLInteger beats;
     XML_VARIABLE XMLInteger minAlign, maxAlign;
     XML_VARIABLE Races    races;
     XML_VARIABLE Classes  classes;
     XML_VARIABLE Effects  effects;
-    XML_VARIABLE XMLFlags cat;
 
     static const int SKILL_ADEPT;
     static const int SKILL_SENSE;

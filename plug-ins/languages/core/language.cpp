@@ -27,12 +27,14 @@ const DLString LanguageHelp::TYPE = "LanguageHelp";
 void LanguageHelp::save() const
 {
    if (command) {
-        const Language *lang = command.getDynamicPointer<Language>();
-        if (lang)
-            languageManager->saveXML(lang, lang->getName());
-        else
-            LogStream::sendNotice() << "Failed to save language " << command->getName() << endl;
+        Language::Pointer lang = command.getDynamicPointer<LanguageCommand>()->getLanguage();
+        if (lang) {
+            languageManager->saveXML(*lang, lang->getName());
+            return;
+        }
    }
+    
+    LogStream::sendError() << "Failed to save language " << (command ? command->getName() : "") << endl;
 }
 
 DLString LanguageHelp::getTitle(const DLString &label) const
@@ -51,9 +53,7 @@ DLString LanguageHelp::getTitle(const DLString &label) const
 
 void LanguageHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    const Language *lang = command ? command.getDynamicPointer<Language>() : 0;
-    if (!lang)
-        return;
+    Language::Pointer lang = command.getDynamicPointer<LanguageCommand>()->getLanguage();
 
     in << "%PAUSE%";
     lang->show(ch->getPC(), in);
@@ -74,13 +74,14 @@ LanguageException::LanguageException( const Language &lang, const DLString &msg 
 {
 }
 
-Language::Language( ) : cat(defaultCategory.getValue(), defaultCategory.getTable())
+Language::Language( const DLString &n ) : Skill( n )
 {
+    this->name = n;
 }
 
-Language::Language( const DLString &n ) : Skill( n ),
-        cat(defaultCategory.getValue(), defaultCategory.getTable())
+const DLString & Language::getName( ) const
 {
+    return Skill::getName( );
 }
 
 void Language::initialization( )
@@ -88,21 +89,19 @@ void Language::initialization( )
     languageManager->load( this );
 
     skillManager->registrate( Pointer( this ) );
-    commandManager->registrate( Pointer( this ) );
+
+    if (command)
+        command->setLanguage(Pointer(this));
 }
 
 void Language::destruction( )
 {
+    if (command)
+        command->unsetLanguage();
+
     skillManager->unregistrate( Pointer( this ) );
-    commandManager->unregistrate( Pointer( this ) );
-
+        
     languageManager->unload( this );
-}
-
-CommandHelp::Pointer Language::getHelp( ) const
-{
-
-    return help;
 }
 
 const RaceLangInfo * Language::getRaceInfo( CharacterMemoryInterface *ch ) const
@@ -226,7 +225,7 @@ bool Language::isNative( PCharacter *ch ) const
 
 WordContainer * Language::locateWord( Word &word, PCharacter *ch, const DLString &arg ) const
 {
-    if (languageManager->findWord( word, *this, arg )) {
+    if (languageManager->findWord( word, this, arg )) {
         return languageManager;
     }
     else {
@@ -234,7 +233,7 @@ WordContainer * Language::locateWord( Word &word, PCharacter *ch, const DLString
 
         attr = ch->getAttributes( ).findAttr<XMLAttributeLanguage>( "language" );
         
-        if (attr && attr->findWord( word, *this, arg ))
+        if (attr && attr->findWord( word, this, arg ))
             return *attr;
     }
 

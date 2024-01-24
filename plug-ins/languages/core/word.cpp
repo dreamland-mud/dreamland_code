@@ -65,26 +65,26 @@ bool WordContainer::addWord( const Word &word )
     return true;
 }
 
-void WordContainer::eraseWords( const Language &lang )
+void WordContainer::eraseWords( LanguagePointer lang )
 {
     Words::iterator w;
     Words newWords;
     
     for (w = words.begin( ); w != words.end( ); w++)
-        if (w->second.lang.getValue( ) != lang.getName( ))
+        if (w->second.lang.getValue( ) != lang->getName( ))
             newWords[w->first] = w->second;
     
     words = newWords;
 }
 
-bool WordContainer::findWord( Word &word, const Language &lang, const DLString &arg ) const
+bool WordContainer::findWord( Word &word, LanguagePointer lang, const DLString &arg ) const
 {
     Words::const_iterator w = words.find( arg );
 
     if (w == words.end( ))
         return false;
     
-    if (w->second.lang.getValue( ) != lang.getName( ))
+    if (w->second.lang.getValue( ) != lang->getName( ))
         return false;
 
     word = w->second;
@@ -102,13 +102,13 @@ bool WordContainer::findWord( Word &word, const DLString &arg ) const
     return true;
 }
 
-int WordContainer::getPower( const Language &lang ) const
+int WordContainer::getPower( LanguagePointer lang ) const
 {
     Words::const_iterator w;
     int power = 0;
 
     for (w = words.begin( ); w != words.end( ); w++)
-        if (w->second.lang.getValue( ) == lang.getName( ))
+        if (w->second.lang.getValue( ) == lang->getName( ))
             power += w->second.getPower( );
         
     return power;

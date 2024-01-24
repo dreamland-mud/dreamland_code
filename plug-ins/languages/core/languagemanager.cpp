@@ -67,7 +67,7 @@ void LanguageManager::before( )
         Words::iterator w;
         int cur_power, max_power;
 
-        cur_power  = getPower( **l->second );
+        cur_power  = getPower( *l->second );
         max_power  = Language::MAX_POWER_WORLD; 
 
         try {
@@ -108,7 +108,7 @@ void LanguageManager::run( PCharacter *ch )
     if (now - attr->lastDreamTime < 24 * 60 * 60) 
         return;
     
-    if (attr->getPower( **lang ) >= Language::MAX_POWER_DREAM)
+    if (attr->getPower( *lang ) >= Language::MAX_POWER_DREAM)
         return;
 
     if (IS_AFFECTED( ch, AFF_SLEEP))
@@ -153,6 +153,7 @@ DLString LanguageManager::getNodeName( ) const
 void LanguageManager::load( LanguagePointer lang )
 {
     DLString name = lang->getName( );
+    LogStream::sendNotice() << "Loading language " << name << "..." << endl;
 
     loadXML( *lang, name );
     langs[name] = lang;
