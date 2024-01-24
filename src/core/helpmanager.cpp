@@ -194,9 +194,11 @@ void HelpManager::registrate( HelpArticle::Pointer art )
     articles.push_back( art );
 
     if (art->getID() > 0) {
-        if (articlesById.count(art->getID()) > 0)
+        if (articlesById.count(art->getID()) > 0) {
             LogStream::sendError() << "Duplicate help ID " << art->getID() << " for "
                 << art->getAllKeywordsString() << " and " << articlesById[art->getID()]->getAllKeywordsString() << endl;
+            throw Exception("Duplicate help ID");
+        }
 
         articlesById[art->getID()] = art;
     }
