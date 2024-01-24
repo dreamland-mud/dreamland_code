@@ -10,7 +10,7 @@
 
 class NPCharacter;
 
-class CEat : public CommandPlugin, public DefaultCommand {
+class CEat : public CommandPlugin {
 XML_OBJECT
 public:
     typedef ::Pointer<CEat> Pointer;

@@ -7,12 +7,11 @@
 #define        COMMANDPLUGIN_H
 
 #include "plugin.h"
-#include "command.h"
+#include "defaultcommand.h"
 
 class CommandLoader;
 
-class CommandPlugin : public virtual Command, 
-                      public virtual XMLPolymorphVariable, 
+class CommandPlugin : public virtual DefaultCommand, 
                       public virtual Plugin {
 public:
         typedef ::Pointer<CommandPlugin> Pointer;

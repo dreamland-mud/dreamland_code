@@ -12,7 +12,7 @@
 
 void clantalk( Clan &, const char *, ... );
 
-class CClanTalk : public CommandPlugin, public DefaultCommand {
+class CClanTalk : public CommandPlugin {
 public:
     typedef ::Pointer<CClanTalk> Pointer;
 

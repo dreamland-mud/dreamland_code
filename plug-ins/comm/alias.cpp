@@ -52,7 +52,7 @@ const DLString XMLAttributeAliases::TYPE = "XMLAttributeAliases";
 /*-----------------------------------------------------------------------------
  * SkippingCommand
  *----------------------------------------------------------------------------*/
-class SkippingCommand : public InterpretLayer, public CommandPlugin, public DefaultCommand 
+class SkippingCommand : public InterpretLayer, public CommandPlugin
 {
 public:
 

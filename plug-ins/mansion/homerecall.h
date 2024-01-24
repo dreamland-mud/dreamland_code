@@ -17,7 +17,7 @@
 
 class PCharacter;
 
-class HomeRecall : public CommandPlugin, public DefaultCommand {
+class HomeRecall : public CommandPlugin {
 XML_OBJECT
 public:
         typedef ::Pointer<HomeRecall> Pointer;

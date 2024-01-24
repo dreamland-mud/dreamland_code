@@ -23,7 +23,7 @@ class Clan;
 /**
  * @author Igor S. Petrenko
  */
-class CClan : public CommandPlugin, public DefaultCommand
+class CClan : public CommandPlugin
 {
 XML_OBJECT;
 public:

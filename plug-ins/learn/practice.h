@@ -13,7 +13,7 @@ class PCharacter;
 class NPCharacter;
 class Skill;
 
-class CPractice : public CommandPlugin, public DefaultCommand {
+class CPractice : public CommandPlugin {
 public:
         typedef ::Pointer<CPractice> Pointer;
     

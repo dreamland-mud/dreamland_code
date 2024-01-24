@@ -34,7 +34,7 @@ public:
 };
 
 
-class CTwit : public CommandPlugin, public DefaultCommand {
+class CTwit : public CommandPlugin {
 public:
     typedef ::Pointer<CTwit> Pointer;
 

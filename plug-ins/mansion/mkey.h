@@ -19,7 +19,7 @@
 #include "trader.h"
 #include "price.h"
 
-class MKey : public CommandPlugin, public DefaultCommand {
+class MKey : public CommandPlugin {
 XML_OBJECT
 public:
     typedef ::Pointer<MKey> Pointer;

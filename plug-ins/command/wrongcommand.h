@@ -8,7 +8,7 @@
 #include "defaultcommand.h"
 #include "commandplugin.h"
 
-class WrongCommand : public DefaultCommand, public CommandPlugin {
+class WrongCommand : public CommandPlugin {
 XML_OBJECT
 public:
     typedef ::Pointer<WrongCommand> Pointer;

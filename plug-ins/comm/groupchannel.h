@@ -9,7 +9,7 @@
 #include "commandplugin.h"
 #include "globalchannel.h"
 
-class GroupChannel : public GlobalChannel, public CommandPlugin {
+class GroupChannel : public GlobalChannel, public virtual CommandPlugin {
 XML_OBJECT    
 public:
     typedef ::Pointer<GroupChannel> Pointer;

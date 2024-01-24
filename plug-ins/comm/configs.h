@@ -52,7 +52,7 @@ public:
     XML_VARIABLE XMLString name;
 };
 
-class ConfigCommand : public CommandPlugin, public DefaultCommand {
+class ConfigCommand : public CommandPlugin {
 XML_OBJECT
 public:
     typedef ::Pointer<ConfigCommand> Pointer;

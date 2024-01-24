@@ -11,7 +11,7 @@
 
 class PCharacter;
 
-class Marry : public CommandPlugin, public DefaultCommand {
+class Marry : public CommandPlugin {
 public:
         typedef ::Pointer<Marry> Pointer;
     

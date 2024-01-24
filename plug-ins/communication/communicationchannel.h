@@ -9,7 +9,7 @@
 #include "xmlenumeration.h"
 #include "defaultcommand.h"
 
-class CommunicationChannel : public DefaultCommand {
+class CommunicationChannel : public virtual DefaultCommand {
 XML_OBJECT
 public:
     typedef ::Pointer<CommunicationChannel> Pointer;

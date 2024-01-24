@@ -19,7 +19,7 @@ typedef void do_fn_t (PCharacter *, char *);
 struct cmd_info;
 
 
-class OnlineCreation : public CommandPlugin, public DefaultCommand
+class OnlineCreation : public CommandPlugin
 {
 public:
         typedef ::Pointer<OnlineCreation> Pointer;

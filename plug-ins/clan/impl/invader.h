@@ -21,7 +21,7 @@ protected:
         virtual int getCast( Character * );
 };
 
-class CDarkLeague : public CommandPlugin, public DefaultCommand {
+class CDarkLeague : public CommandPlugin {
 public:
     typedef ::Pointer<CDarkLeague> Pointer;
 

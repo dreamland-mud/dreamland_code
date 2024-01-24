@@ -12,7 +12,7 @@
 class Object;
 struct extra_descr_data;
 
-class CWrite : public CommandPlugin, public DefaultCommand {
+class CWrite : public CommandPlugin {
 XML_OBJECT
 public:
     typedef ::Pointer<CWrite> Pointer;

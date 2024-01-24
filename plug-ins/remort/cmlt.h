@@ -12,7 +12,7 @@
 class PCMemoryInterface;
 class PCharacter;
 
-class CMlt : public CommandPlugin, public DefaultCommand {
+class CMlt : public CommandPlugin {
 public:
         typedef ::Pointer<CMlt> Pointer;
     

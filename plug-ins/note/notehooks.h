@@ -10,7 +10,7 @@
 #include "defaultcommand.h"
 #include "notethread.h"
 
-class NoteHooks : public CommandPlugin, public DefaultCommand {
+class NoteHooks : public CommandPlugin {
 public:        
     typedef ::Pointer<NoteHooks> Pointer;
     

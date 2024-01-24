@@ -8,7 +8,7 @@
 #include "commandtemplate.h"
 #include "commandmanager.h"
 
-class AdminCommand : public CommandPlugin, public DefaultCommand {
+class AdminCommand : public CommandPlugin {
 public:
         virtual CommandLoader * getLoader( ) const;
 };

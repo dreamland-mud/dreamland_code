@@ -63,7 +63,7 @@ protected:
 };
 
 
-class COrden : public CommandPlugin, public DefaultCommand {
+class COrden : public CommandPlugin {
 public:
     typedef ::Pointer<COrden> Pointer;
 

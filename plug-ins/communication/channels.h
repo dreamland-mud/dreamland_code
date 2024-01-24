@@ -77,7 +77,7 @@ protected:
     virtual bool parseArguments( Character *, const DLString &, DLString &, DLString & ) const;
 };
 
-class ChannelsCommand : public CommandPlugin, public DefaultCommand {
+class ChannelsCommand : public CommandPlugin {
 XML_OBJECT    
 public:
     typedef ::Pointer<ChannelsCommand> Pointer;

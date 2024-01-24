@@ -12,7 +12,7 @@
 
 class PCharacter;
 
-class Unread : public CommandPlugin, public DefaultCommand {
+class Unread : public CommandPlugin {
 XML_OBJECT
 public:
         typedef ::Pointer<Unread> Pointer;

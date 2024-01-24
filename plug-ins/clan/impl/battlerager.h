@@ -57,7 +57,7 @@ protected:
         XML_VARIABLE XMLBoolean healPets;
 };
 
-class CChop : public CommandPlugin, public DefaultCommand {
+class CChop : public CommandPlugin {
 public:
     typedef ::Pointer<CChop> Pointer;
 

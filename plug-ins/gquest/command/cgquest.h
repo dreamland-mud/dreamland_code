@@ -14,7 +14,7 @@ namespace Scripting {
 class IdRef;
 };
 
-class CGQuest : public CommandPlugin, public DefaultCommand {
+class CGQuest : public CommandPlugin {
 public:
         typedef ::Pointer<CGQuest> Pointer;
 

@@ -13,7 +13,7 @@
 #define INITPRIO_COMMANDS 51
 
 template <const char *&tn>
-class CommandTemplate : public DefaultCommand, public CommandPlugin, public ClassSelfRegistratorPlugin<tn> {
+class CommandTemplate : public CommandPlugin, public ClassSelfRegistratorPlugin<tn> {
 public:
     typedef ::Pointer<CommandTemplate> Pointer;
     
@@ -22,13 +22,13 @@ public:
     }
 
     virtual void run( Character * ch, const DLString & constArguments ) {
-        DefaultCommand::run( ch, constArguments );
+        CommandPlugin::run( ch, constArguments );
     }
     virtual void run( Character * ch, char *argument ) { 
-        DefaultCommand::run( ch, argument );
+        CommandPlugin::run( ch, argument );
     }
     virtual bool visible(Character *ch) const {
-        return DefaultCommand::visible(ch);
+        return CommandPlugin::visible(ch);
     }
 
     virtual const DLString &getType( ) const {

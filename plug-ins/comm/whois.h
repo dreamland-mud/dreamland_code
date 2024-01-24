@@ -13,7 +13,7 @@
 
 using std::endl;
 
-class Whois : public CommandPlugin, public DefaultCommand {
+class Whois : public CommandPlugin {
 XML_OBJECT
 public:
         class LinesList : public std::vector<DLString> {

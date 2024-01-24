@@ -11,7 +11,7 @@
 
 class PCharacter;
 
-class Divorce : public CommandPlugin, public DefaultCommand {
+class Divorce : public CommandPlugin {
 public:
         typedef ::Pointer<Divorce> Pointer;
     

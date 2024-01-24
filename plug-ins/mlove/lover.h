@@ -9,7 +9,7 @@
 #include "defaultcommand.h"
 
 
-class Lover : public CommandPlugin, public DefaultCommand
+class Lover : public CommandPlugin
 {
 public:
         typedef ::Pointer<Lover> Pointer;

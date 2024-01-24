@@ -11,7 +11,7 @@
 class PCharacter;
 class NPCharacter;
 
-class CQuest : public CommandPlugin, public DefaultCommand {
+class CQuest : public CommandPlugin {
 XML_OBJECT;
 public:
         typedef ::Pointer<CQuest> Pointer;
