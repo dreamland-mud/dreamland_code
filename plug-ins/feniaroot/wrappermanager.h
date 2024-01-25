@@ -27,7 +27,7 @@ public:
     virtual Scripting::Register getWrapper( AffectHandler * );
     virtual Scripting::Register getWrapper( Affect * );
     virtual Scripting::Register getWrapper( SkillCommand * );
-    virtual Scripting::Register getWrapper( Command * );
+    virtual Scripting::Register getWrapper( CommandPlugin * );
     
     virtual void linkWrapper( Character * );
     virtual void linkWrapper( ::Object * );
@@ -39,7 +39,7 @@ public:
     virtual void linkWrapper( AffectHandler * );
     virtual void linkWrapper( Affect * );
     virtual void linkWrapper( SkillCommand * );
-    virtual void linkWrapper( Command * );
+    virtual void linkWrapper( CommandPlugin * );
 
     virtual void getTarget( const Scripting::Register &, Character *& );
     

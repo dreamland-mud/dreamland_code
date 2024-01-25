@@ -17,20 +17,17 @@
 
 #include "commandbase.h"
 #include "commandhelp.h"
-#include "wrappertarget.h"
 
 class CommandHelp;
 class CommandLoader;
 
-class Command : public CommandBase, public virtual WrapperTarget, public virtual XMLVariableContainer  {
+class Command : public CommandBase, public virtual XMLVariableContainer  {
 XML_OBJECT
 public:
         typedef ::Pointer<Command> Pointer;
 
         Command( );
         virtual ~Command( );
-
-        virtual long long getID() const;
 
         // Main entry point for command interpreter
         virtual void entryPoint( Character *, const DLString & );
@@ -75,7 +72,6 @@ public:
 protected:        
         void visualize( Character * );
         bool checkPosition( Character * );
-        bool feniaOverride(Character *, const DLString &);
 };
 
 

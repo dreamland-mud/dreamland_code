@@ -50,6 +50,39 @@ Command::Pointer CommandList::findExact( const DLString& name ) const
     return Command::Pointer( );
 }
 
+
+Command::Pointer CommandList::findUnstrict(const DLString& name) const
+{
+    if (name.empty())
+        return Command::Pointer();
+
+    if (name.isRussian( )) {
+        for (auto &cmd: commands_ru) {
+            if (name.strPrefix(cmd->getRussianName()))
+                return *cmd;
+
+            for (auto &alias: cmd->getRussianAliases())
+                if (name.strPrefix(alias))
+                    return cmd;
+        }
+
+        return Command::Pointer();
+    }
+
+    for (auto &cmd: commands) {
+        if (name.strPrefix(cmd->getName()))
+            return *cmd;
+
+        for (auto &alias: cmd->getAliases())
+            if (name.strPrefix(alias))
+                return cmd;
+    }
+
+    return Command::Pointer();
+
+
+}
+
 static void record_distance(const DLString &cmd, const DLString &kuzdn, const DLString &candidate, InterpretArguments &iargs)
 {
     DLString string2;
@@ -262,9 +295,23 @@ bool CommandManager::process( InterpretArguments &iargs )
     return true;
 }
 
+Command::Pointer CommandManager::find(const DLString &cmdName) const
+{
+    for (auto &c: commands.getCommands())
+        if (c->getName() == cmdName)
+            return *c;
+            
+    return Command::Pointer();
+}
+
 Command::Pointer CommandManager::findExact( const DLString &cmdName ) const
 {
     return commands.findExact( cmdName );
+}
+
+Command::Pointer CommandManager::findUnstrict( const DLString &cmdName ) const
+{
+    return commands.findUnstrict( cmdName );
 }
 
 CommandManager::CategoryMap CommandManager::getCategorizedCommands( ) const

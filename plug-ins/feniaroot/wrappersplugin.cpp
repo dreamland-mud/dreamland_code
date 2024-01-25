@@ -104,9 +104,10 @@ WrappersPlugin::linkTargets()
     }
 
     for (auto &cmd: commandManager->getCommands().getCommands()) {
-        if (cmd->wrapper && cmd->wrapper->getHandler().getDynamicPointer<FeniaCommandWrapper>()) {
+        const CommandPlugin *cmdPlugin = cmd.getDynamicPointer<CommandPlugin>();
+        if (cmdPlugin && cmdPlugin->wrapper) {
             LogStream::sendNotice() << "Fenia command: setting target for " << cmd->getName() << endl;
-            wrapper_cast<FeniaCommandWrapper>(cmd->wrapper)->setTarget(const_cast<Command *>(*cmd));
+            wrapper_cast<FeniaCommandWrapper>(cmdPlugin->wrapper)->setTarget(const_cast<CommandPlugin *>(cmdPlugin));
         }            
     }
 }

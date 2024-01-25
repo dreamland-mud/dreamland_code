@@ -8,11 +8,6 @@
 #include "commandhelp.h"
 #include "commandmanager.h"
 #include "commandflags.h"
-#include "fenia/exceptions.h"
-#include "feniamanager.h"
-#include "wrapperbase.h"
-#include "register-impl.h"
-#include "idcontainer.h"
 
 #include "dl_ctype.h"
 #include "pcharacter.h"
@@ -28,8 +23,6 @@
 #include "def.h"
 
 GSN(manacles);
-
-using namespace Scripting;
 
 /*--------------------------------------------------------------------------
  * Command
@@ -101,19 +94,6 @@ const XMLStringList & Command::getAliases( ) const
 const XMLStringList & Command::getRussianAliases( ) const
 {
     return russian;
-}
-
-long long Command::getID() const
-{
-    int myId = 0;
-
-    if (getHelp())
-        myId =getHelp()->getID();
-
-    if (myId <= 0)
-        throw Scripting::Exception(getName() + ": command ID not found or zero");
-
-    return (myId << 4) | 8;
 }
 
 bool Command::available( Character *ch ) const 
@@ -345,42 +325,8 @@ bool Command::checkPosition( Character *ch )
 
 void Command::entryPoint( Character *ch, const DLString &constArgs )
 {
-    // See if there is 'run' method override in Fenia. 
-    bool rc = feniaOverride(ch, constArgs);
-
-    // Fall back to the old implementation.
-    if (!rc)
-        run(ch, constArgs);
+    run(ch, constArgs);
 }
-
-bool Command::feniaOverride(Character *ch, const DLString &constArgs) 
-{
-    // Find method defined on the wrapper.
-    WrapperBase *wrapperBase = getWrapper();
-    if (!wrapperBase)
-        return false;
-
-    IdRef methodId("runFunc");
-    Register method;
-    if (!wrapperBase->triggerFunction(methodId, method))
-        return false;
-
-    // Invoke the 'run' function
-    try {
-        RegisterList args;
-        args.push_back(FeniaManager::wrapperManager->getWrapper(ch));
-        args.push_back(constArgs);
-
-        method.toFunction()->invoke(Register(wrapperBase->getSelf()), args);
-
-    } catch (const ::Exception &e) {
-        // On error, complain to the logs and to all immortals in the game.
-        FeniaManager::getThis()->croak(0, methodId, e);
-    }
-
-    return true;
-}
-
 
 void Command::run( Character * ch, const DLString & constArguments ) 
 {

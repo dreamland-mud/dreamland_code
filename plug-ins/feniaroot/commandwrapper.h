@@ -11,7 +11,7 @@
 #include "xmlglobalbitvector.h"
 #include "xmlregister.h"
 #include "skillreference.h"
-#include "command.h"
+#include "commandplugin.h"
 
 // MOC_SKIP_BEGIN
 #include "lex.h"
@@ -24,9 +24,10 @@
 using Scripting::XMLRegister;
 using Scripting::NativeHandler;
 
-// NOTE: class names in this file should be the other way around. Had to call actual Command wrapper
-// something else because 'CommandWrapper' was taken earlier, for a fenia-based command implementatino.
-
+/**
+ * A way to add new command purely via Fenia. The command will be registered in setSelf.
+ * Doesn't read any XML profile at the moment.
+ */
 class CommandWrapper : public PluginNativeImpl<CommandWrapper>, 
                        public NativeHandler,
                        public Command
@@ -46,6 +47,10 @@ private:
     Scripting::Object *self;
 };
 
+/**
+ * A wrapper around CommandPlugin that covers most of the commands in the world.
+ * One can override 'run' method of a command from Fenia.
+ */
 class FeniaCommandWrapper : public PluginWrapperImpl<FeniaCommandWrapper>
 {
 XML_OBJECT
@@ -56,13 +61,13 @@ public:
     FeniaCommandWrapper();
 
     virtual void setSelf( Scripting::Object * );
-    void setTarget( Command* );
+    void setTarget( CommandPlugin * );
     void checkTarget( ) const ;
     virtual void extract( bool );
-    Command *getTarget( ) const;
+    CommandPlugin *getTarget( ) const;
 
 private:        
-    Command *target;
+    CommandPlugin *target;
 };
 
 #endif

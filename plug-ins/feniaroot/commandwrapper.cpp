@@ -196,7 +196,7 @@ void FeniaCommandWrapper::setSelf(Scripting::Object *s)
     }
 }
 
-void FeniaCommandWrapper::setTarget(Command * cmd)
+void FeniaCommandWrapper::setTarget(CommandPlugin * cmd)
 {
     target = cmd;
     id = cmd->getID();
@@ -211,7 +211,7 @@ void FeniaCommandWrapper::checkTarget() const
         throw Scripting::Exception( "Command is offline");
 }
 
-Command * FeniaCommandWrapper::getTarget() const
+CommandPlugin * FeniaCommandWrapper::getTarget() const
 {
     checkTarget();
     return target;

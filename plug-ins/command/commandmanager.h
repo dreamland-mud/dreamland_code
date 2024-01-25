@@ -20,6 +20,7 @@ class Character;
 class CommandList {
 public:
         Command::Pointer findExact( const DLString & ) const;
+        Command::Pointer findUnstrict( const DLString & ) const;
         Command::Pointer chooseCommand( Character *, const DLString & ) const;
         void gatherHints(InterpretArguments &iargs) const;
 
@@ -73,6 +74,8 @@ public:
         void unregistrate( Command::Pointer );
         
         Command::Pointer findExact( const DLString & ) const;
+        Command::Pointer findUnstrict( const DLString & ) const;
+        Command::Pointer find(const DLString &cmdName) const;
         inline const Priorities & getPriorities( ) const;
         inline const Priorities & getPrioritiesRU( ) const;
         inline CommandList & getCommands( );

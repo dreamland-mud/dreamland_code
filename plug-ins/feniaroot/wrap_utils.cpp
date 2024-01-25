@@ -157,7 +157,7 @@ DefaultAffectHandler * arg2affecthandler( const Register &reg )
                 wrapper_cast<AffectHandlerWrapper>(reg)->getTarget());;
 }
 
-Command * arg2command(const Register &arg) 
+CommandPlugin * arg2command(const Register &arg) 
 {
     DLString cmdName = arg2string(arg);
     Command::Pointer cmd = commandManager->findExact(cmdName);
@@ -165,10 +165,14 @@ Command * arg2command(const Register &arg)
     if (!cmd)
         throw Scripting::Exception(cmdName + ": no registered command found");
 
-    return *cmd;
+    CommandPlugin *cmdPlugin = cmd.getDynamicPointer<CommandPlugin>();
+    if (!cmdPlugin)
+        throw Scripting::Exception(cmdName + ": this command is not accessible via Fenia");
+
+    return cmdPlugin;
 }
 
-Command * argnum2command(const RegisterList &args, int num)
+CommandPlugin * argnum2command(const RegisterList &args, int num)
 {
     const Register &reg = argnum(args, num);
     return arg2command(reg);

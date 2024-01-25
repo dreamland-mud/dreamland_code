@@ -26,7 +26,7 @@ class FlagTable;
 class DefaultSpell;
 class SpellTarget;
 class Affect;
-class Command;
+class CommandPlugin;
 
 Register wrap( ::Object * );
 Register wrap( struct obj_index_data * );
@@ -57,8 +57,8 @@ Affect * args2affect(const RegisterList &);
 DefaultSpell * arg2spell( const Register &reg );
 DLString arg2string(const Register &reg);
 int arg2door(const Register &reg);
-Command * arg2command(const Register &arg);
-Command * argnum2command(const RegisterList &args, int num);
+CommandPlugin * arg2command(const Register &arg);
+CommandPlugin * argnum2command(const RegisterList &args, int num);
 
 const Register & argnum(const RegisterList &args, int num);
 const Register & argnum2function(const RegisterList &args, int num);
