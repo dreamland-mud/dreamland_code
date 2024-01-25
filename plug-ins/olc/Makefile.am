@@ -11,6 +11,7 @@ aedit.cpp \
 hedit.cpp \
 reledit.cpp \
 skedit.cpp \
+cmdedit.cpp \
 medit.cpp \
 oedit.cpp \
 eeedit.cpp \
@@ -37,6 +38,7 @@ aedit.h \
 hedit.h \
 reledit.h \
 skedit.h \
+cmdedit.h \
 medit.h \
 sedit.h \
 socedit.h \

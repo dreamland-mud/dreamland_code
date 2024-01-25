@@ -17,6 +17,7 @@ class SkillAction;
 class DefaultSpell;
 class DefaultAffectHandler;
 class DefaultSkillCommand;
+class CommandPlugin;
 
 bool stringIsCapitalized(const DLString &str);
 DLString triggerType(const DLString &name);
@@ -35,6 +36,7 @@ public:
     bool openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultSkillCommand *cmd, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, CommandPlugin *cmd, const DLString &constArguments) const;
 
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
     void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const;
@@ -67,6 +69,9 @@ protected:
 
     vector<DLString> createSkillActionParams(
         Character *ch, const DLString &actionType, SkillAction *action, const DLString &methodName) const;
+
+    vector<DLString> createCommandParams(
+        Character *ch, CommandPlugin *cmd, const DLString &methodName) const;
 
     IndexTriggers indexTriggers;
 };

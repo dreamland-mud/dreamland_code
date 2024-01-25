@@ -10,6 +10,7 @@
 #include "defaultaffecthandler.h"
 #include "defaultskillcommand.h"
 #include "feniaskillaction.h"
+#include "commandplugin.h"
 #include "websocketrpc.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
@@ -47,6 +48,7 @@ void FeniaTriggerLoader::initialization()
     loadFolder("spell");
     loadFolder("affect");
     loadFolder("skillcommand");
+    loadFolder("command");
 }
 
 void FeniaTriggerLoader::destruction()
@@ -375,6 +377,33 @@ vector<DLString> FeniaTriggerLoader::createSkillActionParams(
     return parms;
 }
 
+vector<DLString> FeniaTriggerLoader::createCommandParams(
+    Character *ch, CommandPlugin *cmd, const DLString &methodName) const
+{
+    std::vector<DLString> parms;
+    const DLString indexType = "command";
+
+    // Create codesource body with example code.
+    DLString tmpl;
+    if (!findExample(ch, methodName, indexType, tmpl))
+        return parms;
+
+    parms.resize(2);
+    tmpl.replaces("@name@", DLString("\"") + cmd->getName() + "\"");
+    tmpl.replaces("@trig@", methodName);
+    parms[1] = tmpl;
+
+    // Create codesource subject.
+    parms[0] = dlprintf("%s/%s/%s",
+                    indexType.c_str(),
+                    cmd->getName().c_str(),
+                    methodName.c_str());   
+
+    return parms;
+}
+
+
+
 
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const
 {
@@ -448,5 +477,31 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSkillCommand *cmd, co
     return editExisting(ch, retval);
 }
     
+
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, CommandPlugin *cmd, const DLString &constArguments) const
+{
+    if (!checkWebsock(ch))
+        return false;
+
+    DLString args = constArguments;
+    DLString methodName = args.getOneArgument();
+    Register retval = getMethodForName<CommandPlugin>(cmd, methodName);
+
+    // Fenia field not found, try to open the editor with trigger example.
+    if (retval.type == Register::NONE) {
+        vector<DLString> parms = createCommandParams(ch, cmd, methodName);
+        if (parms.empty())
+            return false;
+
+        // Open the editor.
+        ch->desc->writeWSCommand("cs_edit", parms);
+        ch->printf("Запускаю веб-редактор для команды, триггер %s.\r\n", methodName.c_str());
+        return true;
+    }
+
+    return editExisting(ch, retval);
+}
+    
+
 
 PluginInitializer<FeniaTriggerLoader> initFeniaTriggerLoader;
