@@ -33,7 +33,8 @@ private:
 
     CommandPlugin *original;
     CommandPlugin *getOriginal();
-    bool commandUpdate(CommandPlugin *cmd);
+    bool commandUpdate(CommandPlugin *);
+    CommandHelp::Pointer resolveHelp(CommandPlugin *);
 
     XML_VARIABLE XMLBoolean isChanged;
 };

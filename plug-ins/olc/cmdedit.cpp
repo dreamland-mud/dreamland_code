@@ -80,6 +80,21 @@ bool OLCStateCommand::commandUpdate(CommandPlugin *c)
     return true;
 }
 
+// Some command help articles are empty and contain 'refby' keyword
+// pointing to a help article with the info about this command.
+CommandHelp::Pointer OLCStateCommand::resolveHelp(CommandPlugin *c)
+{
+    if (!c->help)
+        return CommandHelp::Pointer();
+    
+    CommandHelp::Pointer refBy = c->help->getReferencedBy();
+    if (refBy)
+        return refBy;
+
+    return c->help;
+}
+
+
 void OLCStateCommand::statePrompt(Descriptor *d) 
 {
     d->send( "Command> " );
@@ -112,10 +127,17 @@ void OLCStateCommand::show( PCharacter *ch )
 
     feniaTriggers->showTriggers(ch, c->getWrapper(), "command");
 
-    if (c->help)
-        ptc(ch, "Справка: %s {D(hedit %d){x\r\n",
-            web_edit_button(ch, "hedit", c->help->getID()).c_str(),
-            c->help->getID());
+    CommandHelp::Pointer help = resolveHelp(c);
+    if (help) {
+        ptc(ch, "Справка: %s {D(hedit %d",
+            web_edit_button(ch, "hedit", help->getID()).c_str(),
+            help->getID());
+
+        if (c->help != help)
+            ptc(ch, "{D, %s", help->getCommand()->getName().c_str());
+
+        ptc(ch, "){x\r\n");
+    }
 
     ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
 }
@@ -157,7 +179,7 @@ CMDEDIT(help, "справка", "создать или посмотреть сп
             return false;
         }
 
-        OLCStateHelp::Pointer hedit(NEW, c->help.getPointer());
+        OLCStateHelp::Pointer hedit(NEW, *resolveHelp(c));
         hedit->attach(ch);
         hedit->show(ch);
         return true;
