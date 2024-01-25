@@ -6,7 +6,6 @@
 #define __MYSOCIAL_H__
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "customsocial.h"
 
 class MySocial : public CommandPlugin {

@@ -7,7 +7,6 @@
 
 #include "logstream.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "notethread.h"
 
 class NoteHooks : public CommandPlugin {

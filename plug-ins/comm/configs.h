@@ -6,7 +6,6 @@
 #define __CONFIGS_H__
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "xmllist.h"
 #include "xmlinteger.h"
 #include "xmlpointer.h"

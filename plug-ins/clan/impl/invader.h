@@ -8,7 +8,6 @@
 
 #include "clanmobiles.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 class ClanGuardInvader: public ClanGuard {
 XML_OBJECT

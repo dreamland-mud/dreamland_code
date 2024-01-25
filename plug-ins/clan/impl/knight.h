@@ -12,7 +12,6 @@
 
 #include "xmlglobalbitvector.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 class KnightOrder : public ClanOrder {
 XML_OBJECT

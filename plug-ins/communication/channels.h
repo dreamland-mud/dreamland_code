@@ -8,7 +8,6 @@
 #include "xmllist.h"
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "roomchannel.h"
 #include "personalchannel.h"
 #include "worldchannel.h"

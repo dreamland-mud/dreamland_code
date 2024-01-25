@@ -7,7 +7,6 @@
 #define WRITING_H
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 class Object;
 struct extra_descr_data;

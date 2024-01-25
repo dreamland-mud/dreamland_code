@@ -6,8 +6,9 @@
 #define COMMANDHELP_H
 
 #include "markuphelparticle.h"
-#include "command.h"
 #include "helpformatter.h"
+
+class Command;
 
 class CommandHelp : public MarkupHelpArticle {
 public:
@@ -30,7 +31,7 @@ protected:
     CommandPointer command;
 };
 
-inline Command::Pointer CommandHelp::getCommand( ) const
+inline ::Pointer<Command> CommandHelp::getCommand( ) const
 {
     return command;
 }
@@ -42,7 +43,7 @@ inline const DLString & CommandHelp::getType( ) const
 
 class CommandHelpFormatter : public HelpFormatter {
 public:
-    CommandHelpFormatter( const char *, Command::Pointer );
+    CommandHelpFormatter( const char *, ::Pointer<Command> );
     virtual ~CommandHelpFormatter( );
 
 protected:
@@ -50,7 +51,7 @@ protected:
     virtual void setup( Character * );
     virtual bool handleKeyword( const DLString &, ostringstream & );
 
-    Command::Pointer cmd;
+    ::Pointer<Command> cmd;
     bool fRusCmd;
 };
 

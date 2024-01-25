@@ -6,7 +6,6 @@
 #define LOVER_H
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 
 class Lover : public CommandPlugin

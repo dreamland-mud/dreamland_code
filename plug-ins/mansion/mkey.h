@@ -14,7 +14,6 @@
 #include "playerattributes.h"
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 #include "trader.h"
 #include "price.h"

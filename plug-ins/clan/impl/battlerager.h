@@ -10,7 +10,6 @@
 #include "objectbehaviormanager.h"
 #include "personalquestreward.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "clanmobiles.h"
 
 class Object;

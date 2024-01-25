@@ -11,6 +11,7 @@
 #include "xmlglobalbitvector.h"
 #include "xmlregister.h"
 #include "skillreference.h"
+#include "command.h"
 
 // MOC_SKIP_BEGIN
 #include "lex.h"
@@ -19,7 +20,6 @@
 // MOC_SKIP_END
 #include "fenia/handler.h"
 #include "pluginwrapperimpl.h"
-#include "defaultcommand.h"
 
 using Scripting::XMLRegister;
 using Scripting::NativeHandler;
@@ -29,7 +29,7 @@ using Scripting::NativeHandler;
 
 class CommandWrapper : public PluginNativeImpl<CommandWrapper>, 
                        public NativeHandler,
-                       public DefaultCommand
+                       public Command
 {
 XML_OBJECT
 NMI_OBJECT

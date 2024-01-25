@@ -7,7 +7,6 @@
 #define DIVORCE_H
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 class PCharacter;
 

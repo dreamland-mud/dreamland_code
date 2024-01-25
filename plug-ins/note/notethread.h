@@ -14,7 +14,7 @@
 #include "xmlenumeration.h"
 #include "xmlshort.h"
 
-#include "defaultcommand.h"
+#include "command.h"
 #include "so.h"
 #include "dlxmlloader.h"
 
@@ -39,7 +39,7 @@ inline const DLString & NoteHelp::getType( ) const
     return TYPE;
 }
 
-class NoteCommand : public DefaultCommand {
+class NoteCommand : public Command {
 XML_OBJECT
 public:
     typedef ::Pointer<NoteCommand> Pointer;

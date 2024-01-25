@@ -14,6 +14,7 @@
 #include "register-impl.h"
 #include "idcontainer.h"
 
+#include "dl_ctype.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "helpmanager.h"
@@ -33,18 +34,73 @@ using namespace Scripting;
 /*--------------------------------------------------------------------------
  * Command
  *-------------------------------------------------------------------------*/
-const Flags Command::defaultOrder( 0, &order_flags );
-const Flags Command::defaultExtra( 0, &command_flags );
-const Enumeration Command::defaultPosition( POS_DEAD, &position_table );
-const Flags Command::defaultCategory( 0, &command_category_flags );
-
 Command::Command( ) 
+    : extra(0, &command_flags), 
+      position(POS_DEAD, &position_table),
+      order(ORDER_NEVER, &order_flags),
+      cat(CMD_CAT_MISC, &command_category_flags)
 {
 }
 
 Command::~Command( ) 
 {
     
+}
+
+const DLString& Command::getName( ) const
+{
+    return name.getValue( );
+}
+const Flags & Command::getExtra( ) const
+{
+    return extra;
+}
+short Command::getLevel( ) const
+{
+    return level.getValue( );
+}
+short Command::getLog( ) const
+{
+    return log.getValue( );
+}
+const Enumeration & Command::getPosition( ) const
+{
+    return position;
+}
+const Flags & Command::getCommandCategory( ) const
+{
+    return cat;
+}
+const Flags & Command::getOrder( ) const
+{
+    return order;
+}
+const DLString& Command::getHint( ) const
+{
+    return hint.getValue( );
+}
+
+::Pointer<CommandHelp> Command::getHelp( ) const
+{
+    return help;
+}
+
+const DLString & Command::getRussianName( ) const
+{
+    if (russian.empty( ))
+        return DLString::emptyString;
+    else 
+        return russian.front( );
+}
+
+const XMLStringList & Command::getAliases( ) const
+{
+    return aliases;
+}
+
+const XMLStringList & Command::getRussianAliases( ) const
+{
+    return russian;
 }
 
 long long Command::getID() const
@@ -58,12 +114,6 @@ long long Command::getID() const
         throw Scripting::Exception(getName() + ": command ID not found or zero");
 
     return (myId << 4) | 8;
-}
-
-
-CommandHelp::Pointer Command::getHelp( ) const
-{
-    return CommandHelp::Pointer( );
 }
 
 bool Command::available( Character *ch ) const 
@@ -88,44 +138,23 @@ bool Command::visible( Character *ch ) const
     return true;
 }
 
-const DLString & Command::getRussianName( ) const
-{
-    return DLString::emptyString;
-}
-
-short Command::getLog( ) const
-{
-    return LOG_NORMAL;
-}
-
-const Flags & Command::getExtra( ) const
-{
-    return defaultExtra;
-}
-
-short Command::getLevel( ) const
-{
-    return 0;
-}
-
-const Enumeration & Command::getPosition( ) const
-{
-    return defaultPosition;
-}
-
-const Flags & Command::getOrder( ) const
-{
-    return defaultOrder;
-}
-
-const Flags & Command::getCommandCategory( ) const
-{
-    return defaultCategory;
-}
 
 bool Command::matchesExactly( const DLString &cmdName ) const
 {
-    return getName( ) == cmdName || getRussianName( ) == cmdName;
+    if (getName( ) == cmdName || getRussianName( ) == cmdName)
+        return true;
+
+    if (dl_isrusalpha( cmdName.at( 0 ) )) {
+        for (XMLStringList::const_iterator i = russian.begin( ); i != russian.end( ); i++) 
+            if (*i == cmdName) 
+                return true;
+    } else {
+        for (XMLStringList::const_iterator i = aliases.begin( ); i != aliases.end( ); i++) 
+            if (*i == cmdName) 
+                return true;
+    }
+
+    return false;
 }
 
 bool Command::matches( const DLString& command ) const
@@ -144,6 +173,20 @@ bool Command::matches( const DLString& command ) const
 
 bool Command::matchesAlias( const DLString& command ) const
 {
+    if (command.empty( ))
+        return false;
+    
+    if (dl_isrusalpha( command.at( 0 ) )) {
+        for (XMLStringList::const_iterator r = russian.begin( ); r != russian.end( ); r++) 
+            if (command.strPrefix( *r )) 
+                return true;
+    }
+    else {
+        for (XMLStringList::const_iterator a = aliases.begin( ); a != aliases.end( ); a++) 
+            if (command.strPrefix( *a )) 
+                return true;
+    }
+
     return false;
 }
 
@@ -300,23 +343,6 @@ bool Command::checkPosition( Character *ch )
     return false;
 }
 
-static const XMLStringList emptyList;
-
-const XMLStringList &Command::getAliases( ) const
-{
-    return emptyList;
-}
-
-const XMLStringList &Command::getRussianAliases( ) const
-{
-    return emptyList;
-}
-
-const DLString & Command::getHint( ) const
-{
-    return DLString::emptyString;
-}
-
 void Command::entryPoint( Character *ch, const DLString &constArgs )
 {
     // See if there is 'run' method override in Fenia. 
@@ -355,4 +381,16 @@ bool Command::feniaOverride(Character *ch, const DLString &constArgs)
     return true;
 }
 
+
+void Command::run( Character * ch, const DLString & constArguments ) 
+{
+    char argument[MAX_STRING_LENGTH];
+
+    strcpy( argument, constArguments.c_str( ) );
+    run( ch, argument );
+}
+
+void Command::run( Character *, char * ) 
+{ 
+}
 

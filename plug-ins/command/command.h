@@ -6,17 +6,24 @@
 #ifndef        COMMAND_H
 #define        COMMAND_H
 
-#include "commandbase.h"
-#include "flags.h"
-#include "enumeration.h"
+#include "xmlvariablecontainer.h"
+#include "xmlshort.h"
+#include "xmlboolean.h"
+#include "xmlvector.h"
+#include "xmlflags.h"
 #include "xmlstringlist.h"
-#include "xmlpolymorphvariable.h"
+#include "xmlenumeration.h"
+#include "xmlpointer.h"
+
+#include "commandbase.h"
+#include "commandhelp.h"
 #include "wrappertarget.h"
 
 class CommandHelp;
 class CommandLoader;
 
-class Command : public CommandBase, public virtual WrapperTarget {
+class Command : public CommandBase, public virtual WrapperTarget, public virtual XMLVariableContainer  {
+XML_OBJECT
 public:
         typedef ::Pointer<Command> Pointer;
 
@@ -29,7 +36,9 @@ public:
         virtual void entryPoint( Character *, const DLString & );
         // Legacy run methods overridden by child classes
         virtual void run( Character *, const DLString & ) = 0;
-        
+        virtual void run( Character *, char * );
+
+        virtual const DLString& getName( ) const;
         virtual const DLString & getRussianName( ) const;
         virtual const XMLStringList &getAliases( ) const;
         virtual const XMLStringList &getRussianAliases( ) const;
@@ -52,15 +61,21 @@ public:
         virtual bool available( Character * ) const;
         virtual bool visible( Character * ) const;
 
+        XML_VARIABLE XMLString name;
+        XML_VARIABLE XMLStringList aliases, russian;
+        XML_VARIABLE XMLFlagsNoEmpty extra;
+        XML_VARIABLE XMLShortNoEmpty level;
+        XML_VARIABLE XMLShortNoEmpty log;
+        XML_VARIABLE XMLEnumeration position;
+        XML_VARIABLE XMLFlagsNoEmpty order; 
+        XML_VARIABLE XMLStringNoEmpty hint;
+        XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
+        XML_VARIABLE XMLFlags cat;
+
 protected:        
         void visualize( Character * );
         bool checkPosition( Character * );
         bool feniaOverride(Character *, const DLString &);
-
-        static const Flags defaultOrder;
-        static const Enumeration defaultPosition;
-        static const Flags defaultExtra;
-        static const Flags defaultCategory;
 };
 
 

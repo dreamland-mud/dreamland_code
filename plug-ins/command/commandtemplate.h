@@ -7,7 +7,6 @@
 
 #include "commandplugin.h"
 #include "plugininitializer.h"
-#include "defaultcommand.h"
 #include "classselfregistratorplugin.h"
 
 #define INITPRIO_COMMANDS 51

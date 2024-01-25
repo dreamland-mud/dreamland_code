@@ -6,7 +6,6 @@
 #define CQUEST_H
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 class PCharacter;
 class NPCharacter;

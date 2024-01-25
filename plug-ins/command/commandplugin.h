@@ -7,11 +7,12 @@
 #define        COMMANDPLUGIN_H
 
 #include "plugin.h"
-#include "defaultcommand.h"
+#include "command.h"
+#include "commandhelp.h"
 
 class CommandLoader;
 
-class CommandPlugin : public virtual DefaultCommand, 
+class CommandPlugin : public virtual Command, 
                       public virtual Plugin {
 public:
         typedef ::Pointer<CommandPlugin> Pointer;

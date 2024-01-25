@@ -7,7 +7,6 @@
 #define _ONLINECREATION_H_
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "pointer.h"
 #include "so.h"
 

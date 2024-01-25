@@ -8,7 +8,6 @@
 
 #include "clan.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 void clantalk( Clan &, const char *, ... );
 

@@ -5,8 +5,8 @@
 #ifndef __WRONGCOMMAND_H__
 #define __WRONGCOMMAND_H__
 
-#include "defaultcommand.h"
 #include "commandplugin.h"
+
 
 class WrongCommand : public CommandPlugin {
 XML_OBJECT

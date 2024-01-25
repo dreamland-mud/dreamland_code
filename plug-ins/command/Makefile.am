@@ -24,7 +24,6 @@ libcommand_la_SOURCES = \
 commandflags.cpp \
 commandmanager.cpp \
 command.cpp \
-defaultcommand.cpp \
 commandplugin.cpp \
 commandhelp.cpp \
 admincommand.cpp \
@@ -33,7 +32,7 @@ levenshtein.cpp \
 impl.cpp 
 
 libcommand_la_MOC = \
-defaultcommand.h \
+command.h \
 wrongcommand.h
 
 commandflags.cpp: commandflags.conf commandflags.h

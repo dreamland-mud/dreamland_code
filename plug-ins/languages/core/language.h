@@ -17,7 +17,7 @@
 #include "skill.h"
 #include "affecthandler.h"
 #include "spell.h"
-#include "defaultcommand.h"
+#include "command.h"
 #include "plugin.h"
 
 class LangInfo;
@@ -51,7 +51,7 @@ inline const DLString & LanguageHelp::getType( ) const
     return TYPE;
 }
 
-class LanguageCommand : public DefaultCommand {
+class LanguageCommand : public Command {
 XML_OBJECT
 public:
     typedef ::Pointer<LanguageCommand> Pointer;

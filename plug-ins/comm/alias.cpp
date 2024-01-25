@@ -15,7 +15,6 @@
 #include "interpretlayer.h"
 #include "commandinterpreter.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 #include "xmlattribute.h"
 #include "xmlattributeplugin.h"

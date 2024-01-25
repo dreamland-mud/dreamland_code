@@ -7,7 +7,6 @@
 #define CORDER_H
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 class InterpretArguments;
 

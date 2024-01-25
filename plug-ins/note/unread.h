@@ -7,7 +7,6 @@
 #define UNREAD_H
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "descriptorstatelistener.h"
 
 class PCharacter;

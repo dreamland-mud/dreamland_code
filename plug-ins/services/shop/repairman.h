@@ -7,7 +7,6 @@
 
 #include "xmlflags.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "basicmobilebehavior.h"
 
 class Character;

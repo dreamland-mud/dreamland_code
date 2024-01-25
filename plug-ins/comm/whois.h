@@ -9,7 +9,6 @@
 #include <sstream>
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 using std::endl;
 

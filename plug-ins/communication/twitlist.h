@@ -8,7 +8,6 @@
 #define __TWITLIST_H__ 
 
 #include "commandplugin.h"
-#include "defaultcommand.h"
 #include "xmlattribute.h"
 #include "xmllist.h"
 #include "xmlstring.h"

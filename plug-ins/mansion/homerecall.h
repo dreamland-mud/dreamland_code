@@ -13,7 +13,6 @@
 
 #include "playerattributes.h"
 #include "commandplugin.h"
-#include "defaultcommand.h"
 
 class PCharacter;
 
