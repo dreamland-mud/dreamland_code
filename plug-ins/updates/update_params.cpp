@@ -164,9 +164,6 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     if (IS_AFFECTED(ch, AFF_SLOW))
         gain *= 2 ;
 
-    if ( IS_HARA_KIRI(ch) || IS_MISOGI(ch) )
-        gain *= 3;
-
     if (IS_AFFECTED(ch, AFF_REGENERATION)) {
         // extra gain for "native" regen, e.g. trolls/mawgs -- but not mobs
         if (ch->getRace()->getAff().isSet(AFF_REGENERATION) && !ch->is_npc())
@@ -259,9 +256,6 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     if ( ch->getCurrStat(STAT_WIS) > 20 )
         gain = ( gain * 11) / 10;
 
-    if ( IS_HARA_KIRI(ch) || IS_MISOGI(ch) )
-        gain *= 3;
-
     gain += gain * ch->mana_gain / 100;
 
     gain = std::max ( (int)(number_percent( ) < gain * 100 / 16), gain / 16 );
@@ -319,9 +313,6 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
     
     if ( ch->getCurrStat(STAT_DEX) > 20 )
         gain *= (14 /10);
-
-    if ( IS_HARA_KIRI(ch) || IS_MISOGI(ch) )
-        gain *= 3;
 
     if( ch->isAffected(gsn_bandage ) )
         gain += ch->getRealLevel( ) / 20;
