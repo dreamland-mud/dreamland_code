@@ -62,7 +62,6 @@ void CommandHelp::setCommand( Command::Pointer command )
         command->getCommandCategory().names());
     labels.addTransient(LABEL_COMMAND);
 
-    // TODO: get rid of ref/reby malarky, each command should have its own help.
     for (r = ref.begin( ); r != ref.end( ); r++) {
         Command::Pointer cmd = commandManager->findExact( *r );
 
@@ -75,20 +74,33 @@ void CommandHelp::setCommand( Command::Pointer command )
     for (r = refby.begin( ); r != refby.end( ); r++) {
         Command::Pointer cmd = commandManager->findExact( *r );
 
-        if (cmd && cmd->getHelp( ))
+        if (cmd && cmd->getHelp( )) {
             cmd->getHelp( )->addAutoKeyword(getAllKeywords());
+        }
     }
    
-    if (!empty( ))
-        helpManager->registrate( Pointer( this ) );
-    else
-        LogStream::sendWarning() << "Empty command help for " << command->getName() << ", ID " << getID() << endl;
+    helpManager->registrate( Pointer( this ) );
 }
+
+CommandHelp::Pointer CommandHelp::getReferencedBy()
+{
+    CommandHelp::Pointer refHelp;
+
+    if (!refby.empty()) {
+        DLString cmdName = *(refby.begin());
+        Command::Pointer cmd = commandManager->findExact(cmdName);
+        if (cmd && cmd->getHelp()) {
+            refHelp = cmd->getHelp();
+        }
+    }
+    
+    return refHelp;
+}
+
 
 void CommandHelp::unsetCommand( )
 {
-    if (!empty( ))
-        helpManager->unregistrate( Pointer( this ) );
+    helpManager->unregistrate( Pointer( this ) );
     
     command.clear( );
     keywordsAuto.clear();

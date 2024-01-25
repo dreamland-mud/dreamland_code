@@ -25,6 +25,9 @@ public:
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
 
+    // Find help article referenced by 'refby' field
+    CommandHelp::Pointer getReferencedBy();
+    
 protected:
     virtual void applyFormatter( Character *, ostringstream &, ostringstream & ) const;
 

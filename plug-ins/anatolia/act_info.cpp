@@ -2058,7 +2058,7 @@ struct FuzzySearch {
 
         // Collect all matching articles.
         for (auto &a : helpManager->getArticles()) {
-            if ((*a)->visible(ch))
+            if (!(*a)->empty() && (*a)->visible(ch))
                 searchArticle(a);
         }
     }
@@ -2214,6 +2214,9 @@ private:
         HelpArticles::const_iterator a;
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if ((*a)->empty())
+                continue;
+                
             if (!(*a)->visible( ch ))
                 continue;
 
