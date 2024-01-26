@@ -315,8 +315,8 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
             "{C%-15s %-17s %-6s %s{x\r\n", "Название", "Русское имя", "VNUM", "Описание"));        
 
         const DLString lineFormat = 
-            web_cmd(ch, "reledit $1", "%-15s") 
-                + " %-17s {W"
+           "{W" + web_cmd(ch, "reledit $1", "%-15s") 
+                + "{w %-17s {W"
                 + web_cmd(ch, "oedit $1", "%-6d")
                 + "{x %s"
                 + "{x\r\n";         
@@ -352,7 +352,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         ch->send_to(dlprintf("{C%-15s %-17s %-3s {Y%-3s   %-3s %1s %1s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH", "R", "C"));
 
         const DLString lineFormat = 
-            web_cmd(ch, "reledit $1", "%-15s") + " %-17s %-3s %1s%1s%1s   %1s%1s%1s %1s %1s{x\r\n";
+            "{W" + web_cmd(ch, "reledit $1", "%-15s") + "{w %-17s %-3s %1s%1s%1s   %1s%1s%1s %1s %1s{x\r\n";
 
         for (int r = 0; r < religionManager->size(); r++) {
             DefaultReligion *rel = dynamic_cast<DefaultReligion *>(religionManager->find(r));

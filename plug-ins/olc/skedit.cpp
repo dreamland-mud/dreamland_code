@@ -1033,7 +1033,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
         ostringstream buf;
         buf << dlprintf("{C%-20s %-4s %4s %4s %4s %1s %1s{x\r\n", "Имя", "Тип", "Мана", "Шаги", "Wait", "T", "F");
         const DLString lineFormat = 
-            web_cmd(ch, "skedit $1", "%-20s") + " %-4s %4d %4d %4d %1s %1s{x\r\n";
+            "{W" + web_cmd(ch, "skedit $1", "%-20s") + "{w %-4s %4d %4d %4d %1s %1s{x\r\n";
 
         for (auto &s: skills) {
             DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();

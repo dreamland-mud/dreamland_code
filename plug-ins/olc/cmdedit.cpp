@@ -118,10 +118,12 @@ void OLCStateCommand::show( PCharacter *ch )
     ptc(ch, "РуСинонимы:  {Y%s{x %s {D(rualiases help){x\r\n",
             c->russian.toList().toString().c_str(),
             web_edit_button(ch, "rualiases", "").c_str());
+    ptc(ch, "Уровень:     {Y%d {D(level){x\r\n", c->level.getValue());
     ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
     ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
     ptc(ch, "Приказ:      {Y%s {D(order){x\r\n", 
             c->order == 0 ? "-" : c->order.names().c_str());
+    ptc(ch, "Категории:   {Y%s {D(category){x\r\n", c->cat.names().c_str());
     ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
             c->hint.c_str(),
             web_edit_button(ch, "hint", "web").c_str());        
@@ -228,9 +230,20 @@ CMDEDIT(rualiases, "русинонимы", "список русских сино
     return stringListEdit(c->russian) && commandUpdate(c);
 }
 
-CMDEDIT(flags, "флаги", "флаги команды (? extra_flags)")
+CMDEDIT(level, "уровень", "уровень, с которого доступна команда")
+{
+    CommandPlugin *c = getOriginal();
+    return numberEdit(-1, MAX_LEVEL, (int &)c->level);
+}
+
+CMDEDIT(flags, "флаги", "флаги команды (? command_flags)")
 {
     return flagBitsEdit(getOriginal()->extra);
+}
+
+CMDEDIT(category, "категории", "флаги категорий (? command_category_flags)")
+{
+    return flagBitsEdit(getOriginal()->cat);
 }
 
 CMDEDIT(order, "приказ", "кому можно приказать выполнять команду (? order_flags)")

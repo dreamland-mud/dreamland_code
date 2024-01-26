@@ -134,7 +134,8 @@ const struct olc_help_type help_table[] =
     {"order_flags", &order_flags, "Флаги приказов (поле order)."},
     {"damage_table", &damage_table, "Виды повреждений (поле damtype)."},
     {"damage_flags", &damage_flags, "Флаги урона (поле damflags)."},
-    {"command_flags", &command_flags, "Флаги для команды."},
+    {"command_flags", &command_flags, "Флаги для команды (поле extra)."},
+    {"command_category_flags", &command_category_flags, "Категории команды (поле cat)"},
     {"argtype_table", &argtype_table, "Тип аргумента для команды умения (поле argtype)."},
 
     {NULL, NULL, NULL, NULL}
