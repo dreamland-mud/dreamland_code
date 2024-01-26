@@ -30,7 +30,7 @@ GSN(manacles);
 Command::Command( ) 
     : extra(0, &command_flags), 
       position(POS_DEAD, &position_table),
-      order(ORDER_NEVER, &order_flags),
+      order(0, &order_flags),
       cat(CMD_CAT_MISC, &command_category_flags)
 {
 }
