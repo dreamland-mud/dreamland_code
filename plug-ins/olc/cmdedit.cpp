@@ -14,6 +14,7 @@
 #include "feniatriggers.h"
 #include "hedit.h"
 
+#include "defaultskillcommand.h"
 #include "commandflags.h"
 #include "merc.h"
 #include "update_areas.h"
@@ -275,17 +276,32 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
     if (arg_is_list(cmd)) {
         ch->send_to(dlprintf("{C%-15s %-17s{x\r\n", "Команда", "Русское имя"));
 
-        const DLString lineFormat = 
-            web_cmd(ch, "cmdedit $1", "%-15s") + " %-17s{x\r\n";
+        const DLString lineFormatCmdEdit = 
+            "{W" + web_cmd(ch, "cmdedit $1", "%-15s") + "{w %-17s{x\r\n";
+
+        const DLString lineFormatSkillEdit = 
+            "{C" + web_cmd(ch, "skedit $1", "%-15s") + "{w (умение %s){x\r\n";
+
+        const DLString lineFormatNoEdit = 
+            "{w%-15s (не редактируется)\r\n";
 
         for (auto &c: commandManager->getCommands().getCommands()) {
-            const CommandPlugin *cmd = c.getDynamicPointer<CommandPlugin>();
-            if (!cmd)
-                continue;
+            const DefaultSkillCommand *skillCmd = c.getDynamicPointer<DefaultSkillCommand>();
+            const CommandPlugin *cmdPlugin = c.getDynamicPointer<CommandPlugin>();
 
-            ch->send_to(dlprintf(lineFormat.c_str(),
-                    cmd->getName().c_str(),
-                    cmd->getRussianName().c_str()));
+            if (cmdPlugin)
+                ch->send_to(dlprintf(lineFormatCmdEdit.c_str(),
+                        cmdPlugin->getName().c_str(),
+                        cmdPlugin->getRussianName().c_str()));
+            else if (skillCmd)
+                ch->send_to(dlprintf(lineFormatSkillEdit.c_str(),
+                        skillCmd->getName().c_str(),
+                        skillCmd->getSkill()->getName().c_str()));
+            else
+                ch->send_to(dlprintf(lineFormatNoEdit.c_str(),
+                        c->getName().c_str()));
+                
+
         }
         return;
     }
