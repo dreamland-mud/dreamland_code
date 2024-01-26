@@ -11,9 +11,9 @@
 #include <list>
 
 #include "oneallocate.h"
-#include "dlxmlloader.h"
 #include "interpretlayer.h"
-#include "commandplugin.h"
+#include "commandloader.h"
+#include "command.h"
 
 class Character;
 
@@ -44,21 +44,9 @@ inline const list<Command::Pointer> &CommandList::getCommandsRU( ) const
     return commands_ru;
 }
 
-class CommandLoader : public virtual Plugin, public DLXMLLoader {
-public:    
-        virtual void loadCommand( CommandPlugin::Pointer );
-        virtual void saveCommand( CommandPlugin::Pointer );
-
-        virtual DLString getNodeName( ) const;
-protected:        
-        virtual void initialization( ) { }
-        virtual void destruction( ) { }
-        static const DLString NODE_NAME;
-};
-
+/** Keeps track of all the interpretable commands in the world, processes user input. */
 class CommandManager : public InterpretLayer,
-                       public OneAllocate, 
-                       public CommandLoader 
+                       public OneAllocate 
 {
 public:
         typedef ::Pointer<CommandManager> Pointer;
@@ -76,16 +64,12 @@ public:
         Command::Pointer findExact( const DLString & ) const;
         Command::Pointer findUnstrict( const DLString & ) const;
         Command::Pointer find(const DLString &cmdName) const;
-        inline const Priorities & getPriorities( ) const;
-        inline const Priorities & getPrioritiesRU( ) const;
         inline CommandList & getCommands( );
         inline const CommandList & getCommands( ) const;
         CategoryMap getCategorizedCommands() const;
         bool compare( const Command &, const Command &, bool fRussian ) const;
 
         virtual bool process( InterpretArguments & );
-
-        virtual DLString getTableName( ) const;
 
 protected:
         virtual void initialization( );
@@ -94,13 +78,12 @@ protected:
         
 private:
         void loadPriorities( );
-        void savePrioritiesRU( );
+        DLString getPrioritiesFolder() const;
 
-        static const DLString TABLE_NAME;
-        static const DLString PRIO_FILE;
+        static const DLString PRIO_FILE_EN;
         static const DLString PRIO_FILE_RU;
 
-        Priorities priorities;
+        Priorities priorities_en;
         Priorities priorities_ru;
         CommandList commands;
 };
@@ -115,54 +98,8 @@ inline const CommandList & CommandManager::getCommands( ) const
     return commands;
 }
 
-inline const CommandManager::Priorities & CommandManager::getPriorities( ) const
-{
-    return priorities;
-}
-
-inline const CommandManager::Priorities & CommandManager::getPrioritiesRU( ) const
-{
-    return priorities_ru;
-}
 
 extern CommandManager *commandManager;
-
-#define INITPRIO_CMDLOADERS 49
-
-template <const char *&tn>
-class CommandLoaderTemplate : public CommandLoader {
-public:
-    typedef ::Pointer<CommandLoaderTemplate> Pointer;
-    
-    CommandLoaderTemplate( ) {
-        thisClass = this;
-    }
-    virtual ~CommandLoaderTemplate( ) {
-        thisClass = NULL;
-    }
-    
-    virtual DLString getTableName( ) const { 
-        return tableName;
-    }
-    static inline CommandLoaderTemplate * getThis( ) { 
-        return thisClass;
-    }
-private:
-    static const char *tableName;
-    static CommandLoaderTemplate * thisClass;
-};
-
-#define CMDLOADER_DUMMY(x)         dummyCmdLoader_ ##x## _TypeName
-#define CMDLOADER(x) CommandLoaderTemplate<CMDLOADER_DUMMY(x)>
-
-#define CMDLOADER_EXTERN(x) \
-extern const char *CMDLOADER_DUMMY(x);
-
-#define CMDLOADER_DECL(x) \
-const char *CMDLOADER_DUMMY(x) = "CMDLOADER(" #x ")"; \
-template<> const char *CMDLOADER(x)::tableName = "commands/" #x; \
-template<> CMDLOADER(x) * CMDLOADER(x)::thisClass = NULL; \
-PluginInitializer<CMDLOADER(x)> dummyCmdLoader_ ##x## _init(INITPRIO_CMDLOADERS);
 
 
 #endif 

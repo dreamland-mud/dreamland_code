@@ -4,6 +4,7 @@
  */
 
 #include "logstream.h"
+#include "plugininitializer.h"
 #include "commandplugin.h"
 #include "commandmanager.h"
 #include "feniamanager.h"
@@ -52,7 +53,7 @@ long long CommandPlugin::getID() const
 
 CommandLoader * CommandPlugin::getLoader( ) const
 {
-    return commandManager;
+    return commandPluginLoader;
 }
 
 void CommandPlugin::entryPoint( Character *ch, const DLString &constArgs )
@@ -92,3 +93,26 @@ bool CommandPlugin::feniaOverride(Character *ch, const DLString &constArgs)
 
     return true;
 }
+
+
+CommandPluginLoader * commandPluginLoader = 0;
+
+const DLString CommandPluginLoader::TABLE_NAME = "commands";
+
+CommandPluginLoader::CommandPluginLoader( ) 
+{
+    commandPluginLoader = this;
+}
+
+CommandPluginLoader::~CommandPluginLoader( ) 
+{
+    commandPluginLoader = NULL;
+}
+
+DLString CommandPluginLoader::getTableName( ) const
+{
+    return TABLE_NAME;
+}
+
+
+PluginInitializer<CommandPluginLoader> commandPluginLoader_init(INITPRIO_CMDLOADERS);

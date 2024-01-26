@@ -22,6 +22,7 @@ libcommand_la_LIBADD = \
 
 libcommand_la_SOURCES = \
 commandflags.cpp \
+commandloader.cpp \
 commandmanager.cpp \
 command.cpp \
 commandplugin.cpp \

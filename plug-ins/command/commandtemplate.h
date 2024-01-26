@@ -9,6 +9,9 @@
 #include "plugininitializer.h"
 #include "classselfregistratorplugin.h"
 
+/** Sets priority inside SharedObject::initializers at which a plugin will be instantiated (and initialized). 
+ * Slightly more than for command loaders.
+ */
 #define INITPRIO_COMMANDS 51
 
 template <const char *&tn>

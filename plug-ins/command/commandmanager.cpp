@@ -4,18 +4,19 @@
  * based on CommandManager by NoFate
  */
 #include <algorithm>
-#include "levenshtein.h"
-#include "translit.h"
-#include "dl_ctype.h"
 
 #include "commandmanager.h"
 #include "commandinterpreter.h"
 #include "commandhelp.h"
 
+#include "levenshtein.h"
+#include "translit.h"
+#include "dl_ctype.h"
+#include "xmlfile.h"
 #include "logstream.h"
 #include "xmlvector.h"
 #include "dbio.h"
-
+#include "dreamland.h"
 #include "character.h"
 
 /*-----------------------------------------------------------------------
@@ -176,9 +177,8 @@ void CommandList::remove( Command::Pointer &cmd )
 /*-----------------------------------------------------------------------
  * CommandManager
  *-----------------------------------------------------------------------*/
-const DLString CommandManager::TABLE_NAME = "commands";
-const DLString CommandManager::PRIO_FILE = "cmdpriority";
-const DLString CommandManager::PRIO_FILE_RU = "cmdpriority_ru";
+const DLString CommandManager::PRIO_FILE_EN = "cmdpriority.xml";
+const DLString CommandManager::PRIO_FILE_RU = "cmdpriority_ru.xml";
 CommandManager* commandManager = NULL;
 
 CommandManager::CommandManager( ) 
@@ -198,35 +198,9 @@ void CommandManager::initialization( )
     InterpretLayer::initialization( );
 }
 
-// Do a one-off save of Russian command priorities, if the file doesn't yet exist.
-void CommandManager::savePrioritiesRU( )
+DLString CommandManager::getPrioritiesFolder() const
 {
-    // Do nothing if the file is already there.
-    DBIO dbio( getTablePath( ), getTableName( ) );
-    dbio.open( );
-    if (dbio.getEntryAsFile( PRIO_FILE_RU ).exist( )) {
-        return;
-    }
-
-    // Collect all Russian aliases in the order they exist now.
-    XMLVectorBase<XMLString> prio;                                                 
-    list<Command::Pointer>::const_iterator cmd;
-    for (cmd = commands.getCommandsRU( ).begin( ); cmd != commands.getCommandsRU( ).end( ); cmd++) {
-        const DLString &rname = (*cmd)->getRussianName( );
-        if (!rname.empty( ))
-            prio.push_back( rname );
-
-        for (XMLStringList::const_iterator a = (*cmd)->getRussianAliases( ).begin( ); 
-                a != (*cmd)->getRussianAliases( ).end( ); 
-                a++)
-            if (*a != rname)
-                prio.push_back( *a );
-    }
-
-
-    LogStream::sendNotice( ) << "Saving " << prio.size( ) << " Russian aliases in priority order." << endl;
-    // Save the file to disc.
-    saveXML( &prio, PRIO_FILE_RU, true );
+    return dreamland->getTablePath() + "/commands";
 }
 
 void CommandManager::destruction( )
@@ -253,35 +227,30 @@ void CommandManager::unregistrate( Command::Pointer command )
 void CommandManager::loadPriorities( )
 {
     XMLVectorBase<XMLString> v, rv;                                                 
+    DLFile prioFileEN(getPrioritiesFolder(), PRIO_FILE_EN);
+    DLFile prioFileRU(getPrioritiesFolder(), PRIO_FILE_RU);
 
-    if (!loadXML( &v, PRIO_FILE )) {
+    if (!XMLFile(prioFileEN, "", &v).load()) {
         LogStream::sendError( ) << "Command priorities file not found!" << endl;
         return;
     }
 
-    loadXML( &rv, PRIO_FILE_RU );
+    XMLFile(prioFileRU, "", &rv).load();
 
     for (unsigned int i = 0; i < v.size( ); i++)
-        priorities[v[i].getValue( )] = i;
+        priorities_en[v[i].getValue( )] = i;
 
     for (unsigned int i = 0; i < rv.size( ); i++)
         priorities_ru[rv[i].getValue( )] = i;
 
     LogStream::sendNotice( ) 
-        << "Loaded " << priorities.size( ) << " command priorities" << endl;
+        << "Loaded " << priorities_en.size( ) << " command priorities" << endl;
 }
-
-DLString CommandManager::getTableName( ) const
-{
-    return TABLE_NAME;
-}
-
 
 void CommandManager::putInto( )
 {
     interp->put( this, CMDP_FIND, 10 );        
 }
-
 
 bool CommandManager::process( InterpretArguments &iargs )
 {
@@ -328,7 +297,7 @@ CommandManager::CategoryMap CommandManager::getCategorizedCommands( ) const
 bool CommandManager::compare( const Command &a, const Command &b, bool fRussian ) const
 {       
     Priorities::const_iterator i_a, i_b, i_end;
-    const Priorities &prio = fRussian ? priorities_ru : priorities;
+    const Priorities &prio = fRussian ? priorities_ru : priorities_en;
 
     i_a = prio.find( fRussian ? a.getRussianName( ) : a.getName( ) );
     i_b = prio.find( fRussian ? b.getRussianName( ) : b.getName( ) );
@@ -339,24 +308,3 @@ bool CommandManager::compare( const Command &a, const Command &b, bool fRussian 
 
     return (i_a != i_end);  
 }
-
-/*-----------------------------------------------------------------------
- * CommandLoader
- *-----------------------------------------------------------------------*/
-const DLString CommandLoader::NODE_NAME = "Command";
-
-void CommandLoader::loadCommand( CommandPlugin::Pointer command )
-{
-    loadXML( *command, command->getName( ) );
-}
-
-void CommandLoader::saveCommand( CommandPlugin::Pointer command )
-{
-    saveXML( *command, command->getName( ) );
-}
-
-DLString CommandLoader::getNodeName( ) const
-{
-    return NODE_NAME;
-}
-
