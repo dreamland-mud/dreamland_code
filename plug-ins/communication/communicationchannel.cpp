@@ -5,6 +5,7 @@
 #include "communicationchannel.h"
 #include "twitlist.h"
 
+#include "commandmanager.h"
 #include "skillreference.h"
 #include "pcharacter.h"
 
@@ -29,6 +30,17 @@ CommunicationChannel::CommunicationChannel( )
 CommunicationChannel::~CommunicationChannel( ) 
 {
 }
+
+bool CommunicationChannel::saveCommand() const
+{
+    // TODO: make a separate XML profile for each channel, rather than keeping all in channels.xml
+    Command::Pointer channelsCommand = commandManager->findExact("channels");
+    if (channelsCommand)
+        return channelsCommand->saveCommand();
+
+    return false;
+}
+
 
 bool CommunicationChannel::canHear( Character *ch ) const
 {

@@ -1178,7 +1178,7 @@ NMI_INVOKE( Root, Command, "(): конструктор для команды, OB
 
 NMI_INVOKE( Root, FeniaCommand, "(name): конструктор для команды по заданному имени" )
 {
-    CommandPlugin *cmd = argnum2command(args, 1);
+    WrappedCommand *cmd = argnum2command(args, 1);
     return WrapperManager::getThis( )->getWrapper(cmd);
 }
 

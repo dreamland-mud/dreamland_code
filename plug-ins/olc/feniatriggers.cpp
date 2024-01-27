@@ -10,7 +10,7 @@
 #include "defaultaffecthandler.h"
 #include "defaultskillcommand.h"
 #include "feniaskillaction.h"
-#include "commandplugin.h"
+#include "wrappedcommand.h"
 #include "websocketrpc.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
@@ -378,7 +378,7 @@ vector<DLString> FeniaTriggerLoader::createSkillActionParams(
 }
 
 vector<DLString> FeniaTriggerLoader::createCommandParams(
-    Character *ch, CommandPlugin *cmd, const DLString &methodName) const
+    Character *ch, WrappedCommand *cmd, const DLString &methodName) const
 {
     std::vector<DLString> parms;
     const DLString indexType = "command";
@@ -478,14 +478,14 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSkillCommand *cmd, co
 }
     
 
-bool FeniaTriggerLoader::openEditor(PCharacter *ch, CommandPlugin *cmd, const DLString &constArguments) const
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, WrappedCommand *cmd, const DLString &constArguments) const
 {
     if (!checkWebsock(ch))
         return false;
 
     DLString args = constArguments;
     DLString methodName = args.getOneArgument();
-    Register retval = getMethodForName<CommandPlugin>(cmd, methodName);
+    Register retval = getMethodForName<WrappedCommand>(cmd, methodName);
 
     // Fenia field not found, try to open the editor with trigger example.
     if (retval.type == Register::NONE) {

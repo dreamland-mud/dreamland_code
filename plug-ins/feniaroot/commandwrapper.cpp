@@ -40,6 +40,12 @@ CommandWrapper::backup()
     commandManager->unregistrate( Pointer( this ) );
 }
 
+bool CommandWrapper::saveCommand() const
+{
+    self->changed();
+    return true;
+}
+
 void 
 CommandWrapper::run( Character * ch, const DLString &arg )
 {
@@ -196,7 +202,7 @@ void FeniaCommandWrapper::setSelf(Scripting::Object *s)
     }
 }
 
-void FeniaCommandWrapper::setTarget(CommandPlugin * cmd)
+void FeniaCommandWrapper::setTarget(WrappedCommand * cmd)
 {
     target = cmd;
     id = cmd->getID();
@@ -211,7 +217,7 @@ void FeniaCommandWrapper::checkTarget() const
         throw Scripting::Exception( "Command is offline");
 }
 
-CommandPlugin * FeniaCommandWrapper::getTarget() const
+WrappedCommand * FeniaCommandWrapper::getTarget() const
 {
     checkTarget();
     return target;

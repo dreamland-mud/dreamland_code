@@ -49,6 +49,14 @@ void NoteCommand::unsetThread()
     thread.clear();
 }
 
+bool NoteCommand::saveCommand() const
+{
+    if (thread)
+        return NoteManager::getThis()->saveXML(*thread, thread->getName());
+
+    return false;
+}
+
 
 void NoteCommand::run( Character* cch, const DLString& constArguments ) 
 {

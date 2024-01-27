@@ -43,6 +43,14 @@ void LanguageCommand::unsetLanguage()
     language.clear();
 }
 
+bool LanguageCommand::saveCommand() const
+{
+    if (language)
+        return languageManager->saveXML(*language, language->getName());
+
+    return false;
+}
+
 void LanguageCommand::run( Character *ach, const DLString &constArguments )
 {
     DLString arguments( constArguments );

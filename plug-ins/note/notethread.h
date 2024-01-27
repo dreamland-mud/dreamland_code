@@ -29,7 +29,6 @@ class NoteHelp : public CommandHelp {
 public:
     typedef ::Pointer<NoteHelp> Pointer;
 
-    virtual void save() const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
 };
@@ -45,6 +44,7 @@ public:
     typedef ::Pointer<NoteCommand> Pointer;
     typedef ::Pointer<XMLAttributeNoteData> Attribute;    
 
+    virtual bool saveCommand() const;
     virtual void run( Character *, const DLString & );
 
     void setThread(::Pointer<NoteThread> thread);

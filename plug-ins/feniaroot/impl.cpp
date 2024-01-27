@@ -7,6 +7,7 @@
 #include "wrappersplugin.h"
 #include "feniacroaker.h"
 #include "xmlattributecodesource.h"
+#include "commandtableloader.h"
 #include "so.h"
 
 extern "C"
@@ -19,6 +20,7 @@ extern "C"
         Plugin::registerPlugin<WrappersPlugin>( ppl );
         Plugin::registerPlugin<FeniaCroaker>(ppl);
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCodeSource> >( ppl );
+        Plugin::registerPlugin<CommandTableLoader>(ppl);
         
         return ppl;
     }

@@ -35,6 +35,9 @@ public:
         virtual void run( Character *, const DLString & ) = 0;
         virtual void run( Character *, char * );
 
+        // Saves command XML profile (or enclosing XML profile) to disk
+        virtual bool saveCommand() const = 0;
+
         virtual const DLString& getName( ) const;
         virtual const DLString & getRussianName( ) const;
         virtual const XMLStringList &getAliases( ) const;

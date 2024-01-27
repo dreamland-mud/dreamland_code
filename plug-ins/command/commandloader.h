@@ -3,16 +3,15 @@
 
 #include "dlxmlloader.h"
 #include "plugin.h"
-
-class CommandPlugin;
+#include "command.h"
 
 /** Class responsible for loading/saving a single command's profile from disk. 
  *
  */
 class CommandLoader : public virtual Plugin, public DLXMLLoader {
 public:    
-        virtual void loadCommand( ::Pointer<CommandPlugin> );
-        virtual void saveCommand( ::Pointer<CommandPlugin> );
+        virtual bool loadCommand( Command::Pointer );
+        virtual bool saveCommand( Command::Pointer );
 
         virtual DLString getNodeName( ) const;
 protected:        

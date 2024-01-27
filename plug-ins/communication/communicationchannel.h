@@ -17,6 +17,8 @@ public:
     CommunicationChannel( );
     virtual ~CommunicationChannel( );
 
+    virtual bool saveCommand() const;
+
     inline long long getOff( ) const;
     bool canHear( Character * ) const;
 

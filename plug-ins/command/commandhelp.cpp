@@ -15,6 +15,9 @@ bool CommandHelp::visible( Character *ch ) const
 {
     if (!HelpArticle::visible( ch ))
         return false;
+
+    if (empty())
+        return false;
     
     if (getLevel( ) <= 0)
         return true;
@@ -24,13 +27,10 @@ bool CommandHelp::visible( Character *ch ) const
 
 void CommandHelp::save() const
 {
-    if (command) {
-        const CommandPlugin *cmd = command.getDynamicPointer<CommandPlugin>();
-        if (cmd)
-            cmd->getLoader()->saveCommand(cmd);
-        else
-            LogStream::sendError() << "Failed to save command help on command " << command->getName() << endl;
-    }
+    if (command && command->saveCommand())
+        return;
+
+    LogStream::sendError() << "Failed to save command help on command " << command->getName() << endl;
 }
 
 DLString CommandHelp::getTitle(const DLString &label) const

@@ -37,7 +37,6 @@ class LanguageHelp : public CommandHelp {
 public:
     typedef ::Pointer<LanguageHelp> Pointer;
 
-    virtual void save() const;
     virtual DLString getTitle(const DLString &label) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
@@ -57,6 +56,7 @@ public:
     typedef ::Pointer<LanguageCommand> Pointer;
 
     virtual void run( Character *, const DLString & );
+    virtual bool saveCommand() const;
 
     void setLanguage(::Pointer<Language> language);
     void unsetLanguage();

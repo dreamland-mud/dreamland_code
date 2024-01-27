@@ -13,7 +13,10 @@
 #include "security.h"
 #include "feniatriggers.h"
 #include "hedit.h"
+#include "skedit.h"
 
+#include "commandelement.h"
+#include "commandtableloader.h"
 #include "defaultskillcommand.h"
 #include "commandflags.h"
 #include "merc.h"
@@ -31,7 +34,7 @@ OLCStateCommand::OLCStateCommand() : isChanged(false)
 {
 }
 
-OLCStateCommand::OLCStateCommand(CommandPlugin *cmdPlugin) 
+OLCStateCommand::OLCStateCommand(::Command *cmdPlugin) 
     : isChanged(false)
 {
     if (!cmdPlugin)
@@ -49,41 +52,41 @@ void OLCStateCommand::commit()
     if (!isChanged)
         return;
 
-    CommandPlugin *original = getOriginal();
+    ::Command *original = getOriginal();
     if (!original)
         return;
     
-    original->getLoader()->saveCommand(original);
+    bool success = original->saveCommand();
 
-    if (owner)
-        owner->character->pecho("Изменения сохранены на диск.");
+    if (owner) {
+        if (success)
+            owner->character->pecho("Изменения сохранены на диск.");
+        else
+            owner->character->pecho("{RИзменения по команде не сохранились, проверь логи!{x");
+    }
 }
 
-CommandPlugin * OLCStateCommand::getOriginal()
+::Command * OLCStateCommand::getOriginal()
 {
     ::Command::Pointer c = commandManager->find(cmdName);
 
     if (!c)
         throw Exception("Attached command doesn't exist");
-
-    CommandPlugin *cmdPlugin = c.getDynamicPointer<CommandPlugin>();
-    if (!cmdPlugin)
-        throw Exception("Attached command is not editable");
     
-    return cmdPlugin;
+    return *c;
 }
 
 // Re-add command to the command manager, when a name or an alias is changing.
-bool OLCStateCommand::commandUpdate(CommandPlugin *c)
+bool OLCStateCommand::commandUpdate(::Command *c)
 {
-    commandManager->unregistrate(CommandPlugin::Pointer(c));
-    commandManager->registrate(CommandPlugin::Pointer(c));
+    commandManager->unregistrate(::Command::Pointer(c));
+    commandManager->registrate(::Command::Pointer(c));
     return true;
 }
 
 // Some command help articles are empty and contain 'refby' keyword
 // pointing to a help article with the info about this command.
-CommandHelp::Pointer OLCStateCommand::resolveHelp(CommandPlugin *c)
+CommandHelp::Pointer OLCStateCommand::resolveHelp(::Command *c)
 {
     if (!c->help)
         return CommandHelp::Pointer();
@@ -108,7 +111,8 @@ void OLCStateCommand::changed( PCharacter *ch )
 
 void OLCStateCommand::show( PCharacter *ch )
 {
-    CommandPlugin *c = getOriginal();
+    ::Command *c = getOriginal();
+    WrappedCommand *wcmd = dynamic_cast<WrappedCommand *>(c);
 
     ptc(ch, "Команда {W%s{x {x\r\n", c->getName().c_str());
 
@@ -128,7 +132,9 @@ void OLCStateCommand::show( PCharacter *ch )
             c->hint.c_str(),
             web_edit_button(ch, "hint", "web").c_str());        
 
-    feniaTriggers->showTriggers(ch, c->getWrapper(), "command");
+    // Can edit all commands but allow to override 'runFunc' only for CommandElement and CommandPlugin.
+    if (wcmd)
+        feniaTriggers->showTriggers(ch, wcmd->getWrapper(), "command");
 
     CommandHelp::Pointer help = resolveHelp(c);
     if (help) {
@@ -148,7 +154,13 @@ void OLCStateCommand::show( PCharacter *ch )
 CMDEDIT(fenia, "феня", "редактировать тригера")
 {
     DLString args = argument;
-    CommandPlugin *c = getOriginal();
+    ::Command *c = getOriginal();
+    WrappedCommand *wcmd = dynamic_cast<WrappedCommand *>(c);
+
+    if (!wcmd) {
+        stc("На этот тип команды невозможно присвоить феневый триггер.\r\n", ch);
+        return false;
+    }
 
     DLString trigName = args.getOneArgument();
     bool clear = arg_is_clear(args);
@@ -160,12 +172,12 @@ CMDEDIT(fenia, "феня", "редактировать тригера")
     }
     
     if (clear) {
-        if (feniaTriggers->clearTrigger(c->wrapper, trigName))
+        if (feniaTriggers->clearTrigger(wcmd->wrapper, trigName))
             ptc(ch, "Триггер %s успешно удален.\r\n", trigName.c_str());
         else
             ptc(ch, "Триггер %s не найден.\r\n", trigName.c_str());        
     } else {
-        feniaTriggers->openEditor(ch, c, trigName);
+        feniaTriggers->openEditor(ch, wcmd, trigName);
     }
     
     return false;
@@ -174,7 +186,7 @@ CMDEDIT(fenia, "феня", "редактировать тригера")
 CMDEDIT(help, "справка", "создать или посмотреть справку по команде")
 {
     DLString arg = argument;
-    CommandPlugin *c = getOriginal();
+    ::Command *c = getOriginal();
 
     if (arg.empty()) {
         if (!c->help || c->help->getID() < 1) {
@@ -199,7 +211,7 @@ CMDEDIT(help, "справка", "создать или посмотреть сп
         c->help->setID(
             help_next_free_id()
         );
-        c->help->setCommand(CommandPlugin::Pointer(c));
+        c->help->setCommand(::Command::Pointer(c));
 
         OLCStateHelp::Pointer hedit(NEW, c->help.getPointer());
         hedit->attach(ch);
@@ -213,26 +225,26 @@ CMDEDIT(help, "справка", "создать или посмотреть сп
 
 CMDEDIT(hint, "подсказка", "краткое описание команды")
 {
-    CommandPlugin *c = getOriginal();
+    ::Command *c = getOriginal();
     return editor(argument, c->hint, ED_NO_NEWLINE);
 }
 
 CMDEDIT(aliases, "синонимы", "список англ синонимов для команды")
 {
-    CommandPlugin *c = getOriginal();
+    ::Command  *c = getOriginal();
     return stringListEdit(c->aliases) && commandUpdate(c);
 }
 
 // Edit Russian aliases for the command, re-register with CommandManager if changed
 CMDEDIT(rualiases, "русинонимы", "список русских синонимов для команды")
 {
-    CommandPlugin *c = getOriginal();
+    ::Command  *c = getOriginal();
     return stringListEdit(c->russian) && commandUpdate(c);
 }
 
 CMDEDIT(level, "уровень", "уровень, с которого доступна команда")
 {
-    CommandPlugin *c = getOriginal();
+    ::Command  *c = getOriginal();
     return numberEdit(-1, MAX_LEVEL, (int &)c->level);
 }
 
@@ -283,6 +295,44 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
     if (cmd.empty()) {
         stc("Формат:  cmdedit название\r\n", ch);
         stc("         cmdedit list\r\n", ch);
+        stc("         cmdedit create название\r\n", ch);
+        return;
+    }
+
+    // Creating new command
+    if (arg_oneof(cmd, "create", "создать")) {
+        DLString name = args.getOneArgument().toLower();
+        CommandElement::Pointer newCommand;        
+
+        static RegExp namePattern("^[a-z]{2,}$", true);
+        if (name.empty() || !namePattern.match(name)) {
+            stc("В названии команды могут быть только маленькие англ буквы.\r\n", ch);
+            return;
+        }
+
+        Command::Pointer oldCommand = commandManager->findExact(name);
+        if (oldCommand) {
+            ptc(ch, "Команда '%s' уже существует.\r\n", oldCommand->getName().c_str());
+            return;
+        } 
+
+        newCommand.construct();
+
+        newCommand->setName(name);
+        newCommand->help.construct();
+        newCommand->help->setID(
+            help_next_free_id()
+        );
+
+        CommandTableLoader::getThis()->loadElement(newCommand);
+        CommandTableLoader::getThis()->saveElement(newCommand);
+
+        ptc(ch, "Создана новая команда %s.\r\n", newCommand->getName().c_str());
+
+        OLCStateCommand::Pointer cmdedit(NEW, *newCommand);
+        cmdedit->attach(ch);
+        cmdedit->show(ch);
+
         return;
     }
 
@@ -295,25 +345,17 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         const DLString lineFormatSkillEdit = 
             "{C" + web_cmd(ch, "skedit $1", "%-15s") + "{w (умение %s){x\r\n";
 
-        const DLString lineFormatNoEdit = 
-            "{w%-15s (не редактируется)\r\n";
-
         for (auto &c: commandManager->getCommands().getCommands()) {
             const DefaultSkillCommand *skillCmd = c.getDynamicPointer<DefaultSkillCommand>();
-            const CommandPlugin *cmdPlugin = c.getDynamicPointer<CommandPlugin>();
 
-            if (cmdPlugin)
-                ch->send_to(dlprintf(lineFormatCmdEdit.c_str(),
-                        cmdPlugin->getName().c_str(),
-                        cmdPlugin->getRussianName().c_str()));
-            else if (skillCmd)
+            if (skillCmd)
                 ch->send_to(dlprintf(lineFormatSkillEdit.c_str(),
                         skillCmd->getName().c_str(),
                         skillCmd->getSkill()->getName().c_str()));
             else
-                ch->send_to(dlprintf(lineFormatNoEdit.c_str(),
-                        c->getName().c_str()));
-                
+                ch->send_to(dlprintf(lineFormatCmdEdit.c_str(),
+                        c->getName().c_str(),
+                        c->getRussianName().c_str()));
 
         }
         return;
@@ -321,24 +363,29 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
 
     DLString arg = DLString(argument).toLower().stripWhiteSpace();    
     Command::Pointer c = commandManager->findExact(arg);
-    CommandPlugin *cmdPlugin = 0;
 
-    if (!c || !c.getDynamicPointer<CommandPlugin>()) {
+    if (!c) {
         c = commandManager->findUnstrict(arg);
     }
 
-    if (c)
-        cmdPlugin = c.getDynamicPointer<CommandPlugin>();
-    
-    if (!cmdPlugin) {
-        if (c)
-            ptc(ch, "Команду '%s' невозможно отредактировать с помощью cmdedit.\r\n", c->getName().c_str());
-        else
-            ptc(ch, "Команда '%s' не найдена.\r\n", arg.c_str());
+    if (!c) {
+        ptc(ch, "Команда '%s' не найдена.\r\n", arg.c_str());
         return;
     }
 
-    OLCStateCommand::Pointer ce(NEW, cmdPlugin);
+    DefaultSkillCommand *skillCmd = c.getDynamicPointer<DefaultSkillCommand>();
+    if (skillCmd) {
+        ptc(ch, "Запускаю 'skedit' для команды %s умения %s.", 
+                 c->getName().c_str(),
+                 skillCmd->getSkill()->getName().c_str());
+
+        OLCStateSkill::Pointer ske(NEW, skillCmd->getSkill().getPointer());
+        ske->attach(ch);
+        ske->show(ch);
+        return;
+    }
+
+    OLCStateCommand::Pointer ce(NEW, *c);
     ce->attach(ch);
     ce->show(ch);
 }

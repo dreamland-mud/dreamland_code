@@ -17,7 +17,7 @@
 #include "subr.h"
 #include "fenia/register-impl.h"
 
-#include "commandplugin.h"
+#include "wrappedcommand.h"
 #include "class.h"
 #include "spell.h"
 #include "affecthandler.h"
@@ -130,7 +130,7 @@ Scripting::Register WrapperManager::getWrapper(SkillCommand *cmd)
     return wrapperAux<SkillCommandWrapper>(cmd->getID(), cmd);
 }
 
-Scripting::Register WrapperManager::getWrapper(CommandPlugin *cmd) 
+Scripting::Register WrapperManager::getWrapper(WrappedCommand *cmd) 
 {
     if (!cmd)
         return Scripting::Register();
@@ -202,7 +202,7 @@ void WrapperManager::linkWrapper(SkillCommand *cmd)
     linkAux<SkillCommandWrapper>(cmd->getID(), cmd);
 }
 
-void WrapperManager::linkWrapper(CommandPlugin *cmd) 
+void WrapperManager::linkWrapper(WrappedCommand *cmd) 
 {
     linkAux<FeniaCommandWrapper>(cmd->getID(), cmd);
 }

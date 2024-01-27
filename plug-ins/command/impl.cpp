@@ -4,8 +4,10 @@
  */
 #include "so.h"
 #include "xmlvariableregistrator.h"
+#include "mocregistrator.h"
 #include "commandmanager.h"
 #include "commandhelp.h"
+#include "commandelement.h"
 
 extern "C"
 {
@@ -14,8 +16,8 @@ extern "C"
                 SO::PluginList ppl;
                 
                 Plugin::registerPlugin<XMLVariableRegistrator<CommandHelp> >( ppl );
+                Plugin::registerPlugin<MocRegistrator<CommandElement> >( ppl );
                 Plugin::registerPlugin<CommandManager>( ppl );
-
                 return ppl;
         }
 }

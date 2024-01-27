@@ -27,6 +27,7 @@
 #include "structwrappers.h"
 #include "feniaskillaction.h"
 #include "commandmanager.h"
+#include "wrappedcommand.h"
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"
@@ -104,10 +105,10 @@ WrappersPlugin::linkTargets()
     }
 
     for (auto &cmd: commandManager->getCommands().getCommands()) {
-        const CommandPlugin *cmdPlugin = cmd.getDynamicPointer<CommandPlugin>();
-        if (cmdPlugin && cmdPlugin->wrapper) {
+        const WrappedCommand *wcmd = cmd.getDynamicPointer<WrappedCommand>();
+        if (wcmd && wcmd->wrapper) {
             LogStream::sendNotice() << "Fenia command: setting target for " << cmd->getName() << endl;
-            wrapper_cast<FeniaCommandWrapper>(cmdPlugin->wrapper)->setTarget(const_cast<CommandPlugin *>(cmdPlugin));
+            wrapper_cast<FeniaCommandWrapper>(wcmd->wrapper)->setTarget(const_cast<WrappedCommand *>(wcmd));
         }            
     }
 }

@@ -29,6 +29,16 @@ GroupChannel::~GroupChannel( )
 {
 }
 
+void GroupChannel::run( Character *ch, const DLString &args )
+{
+    GlobalChannel::run(ch, args);
+}
+
+bool GroupChannel::saveCommand() const
+{
+    return GlobalChannel::saveCommand();
+}
+
 bool GroupChannel::isGlobalListener( Character *ch, Character *victim ) const
 {
     if (!is_same_group( victim, ch ))

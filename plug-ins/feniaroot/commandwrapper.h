@@ -11,7 +11,7 @@
 #include "xmlglobalbitvector.h"
 #include "xmlregister.h"
 #include "skillreference.h"
-#include "commandplugin.h"
+#include "wrappedcommand.h"
 
 // MOC_SKIP_BEGIN
 #include "lex.h"
@@ -41,6 +41,8 @@ public:
     virtual Scripting::Object *getSelf() const { return self; }
     virtual void run( Character * ch, const DLString & );
 
+    virtual bool saveCommand() const;
+    
     virtual void backup();
 private:
     XML_VARIABLE XMLRegister func;
@@ -48,7 +50,7 @@ private:
 };
 
 /**
- * A wrapper around CommandPlugin that covers most of the commands in the world.
+ * A wrapper around WrappedCommand that covers most of the commands in the world.
  * One can override 'run' method of a command from Fenia.
  */
 class FeniaCommandWrapper : public PluginWrapperImpl<FeniaCommandWrapper>
@@ -61,13 +63,13 @@ public:
     FeniaCommandWrapper();
 
     virtual void setSelf( Scripting::Object * );
-    void setTarget( CommandPlugin * );
+    void setTarget( WrappedCommand * );
     void checkTarget( ) const ;
     virtual void extract( bool );
-    CommandPlugin *getTarget( ) const;
+    WrappedCommand *getTarget( ) const;
 
 private:        
-    CommandPlugin *target;
+    WrappedCommand *target;
 };
 
 #endif

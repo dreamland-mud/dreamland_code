@@ -9,13 +9,16 @@
 #include "commandplugin.h"
 #include "globalchannel.h"
 
-class GroupChannel : public GlobalChannel, public virtual CommandPlugin {
+class GroupChannel : public virtual GlobalChannel, public virtual CommandPlugin {
 XML_OBJECT    
 public:
     typedef ::Pointer<GroupChannel> Pointer;
 
     GroupChannel( );
     virtual ~GroupChannel( );
+
+    virtual void run( Character *, const DLString & );
+    virtual bool saveCommand() const;
 
 protected:
     virtual void postOutput( Character *outputTo, const DLString &message ) const;

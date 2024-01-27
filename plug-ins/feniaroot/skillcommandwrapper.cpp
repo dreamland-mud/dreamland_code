@@ -87,7 +87,6 @@ NMI_GET( SkillCommandWrapper, skill, "навык, внутри которого 
     return Register::handler<SkillWrapper>(target->getSkill()->getName());
 }
 
-
 NMI_INVOKE( SkillCommandWrapper, api, "(): печатает этот API" )
 {
     ostringstream buf;

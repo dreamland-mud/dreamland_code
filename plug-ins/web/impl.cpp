@@ -1269,7 +1269,7 @@ public:
         HelpArticles::const_iterator a;
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            if (!(*a)->empty() && (*a)->visible(&dummy) && (*a)->getID() > 0) {
+            if ((*a)->visible(&dummy) && (*a)->getID() > 0) {
                 Json::Value h;
 
                 h["id"] = (*a)->getID();

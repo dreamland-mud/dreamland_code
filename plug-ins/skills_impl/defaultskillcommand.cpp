@@ -41,6 +41,19 @@ long long DefaultSkillCommand::getID() const
     return (myId << 4) | 7;
 }
 
+bool DefaultSkillCommand::saveCommand() const
+{
+    if (skill) {
+        const XMLTableElement *element = skill.getDynamicPointer<XMLTableElement>();
+        if (element) {
+            element->save();
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 void DefaultSkillCommand::setSkill( SkillPointer skill )
 {

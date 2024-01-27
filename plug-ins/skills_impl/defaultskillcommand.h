@@ -29,6 +29,8 @@ public:
     DefaultSkillCommand( );
 
     virtual long long getID() const;
+        
+    virtual bool saveCommand() const;
 
     virtual void setSkill( SkillPointer );
     virtual void unsetSkill( );

@@ -26,7 +26,7 @@ public:
     void saveAll( bool fVerbose = false );
     void loadAll( );
     void unloadAll( );
-    void saveElement(XMLTableElement::Pointer element);
+    bool saveElement(XMLTableElement::Pointer element) const;
     void loadElement(XMLTableElement::Pointer element);
 
     inline const LoadedList & getElements( ) const

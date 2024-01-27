@@ -6,7 +6,7 @@
 #include "xmlstring.h"
 #include "xmlflags.h"
 #include "xmlstringlist.h"
-#include "commandplugin.h"
+#include "command.h"
 
 class OLCStateCommand : public OLCStateTemplate<OLCStateCommand>,
                         public virtual OLCState
@@ -16,7 +16,7 @@ public:
     typedef ::Pointer<OLCStateCommand> Pointer;
 
     OLCStateCommand();
-    OLCStateCommand(CommandPlugin *cmd);
+    OLCStateCommand(::Command *cmd);
     virtual ~OLCStateCommand();
     
     virtual void commit();
@@ -31,10 +31,10 @@ public:
 private:
     virtual void statePrompt( Descriptor * );
 
-    CommandPlugin *original;
-    CommandPlugin *getOriginal();
-    bool commandUpdate(CommandPlugin *);
-    CommandHelp::Pointer resolveHelp(CommandPlugin *);
+    ::Command *original;
+    ::Command *getOriginal();
+    bool commandUpdate(::Command *);
+    CommandHelp::Pointer resolveHelp(::Command *);
 
     XML_VARIABLE XMLBoolean isChanged;
 };

@@ -25,7 +25,10 @@ commandflags.cpp \
 commandloader.cpp \
 commandmanager.cpp \
 command.cpp \
+wrappedcommand.cpp \
+commandelement.cpp \
 commandplugin.cpp \
+commandpluginloader.cpp \
 commandhelp.cpp \
 admincommand.cpp \
 wrongcommand.cpp \
@@ -34,6 +37,7 @@ impl.cpp
 
 libcommand_la_MOC = \
 command.h \
+commandelement.h \
 wrongcommand.h
 
 commandflags.cpp: commandflags.conf commandflags.h

@@ -98,7 +98,7 @@ void XMLTableLoader::readAll( bool fVerbose )
 }
 
 
-void XMLTableLoader::saveElement(XMLTableElement::Pointer element)
+bool XMLTableLoader::saveElement(XMLTableElement::Pointer element) const
 {
     DBIO dir( getTablePath( ), getTableName( ) );    
     LogStream::sendNotice( ) << "Saving " << getTableName( ) << "/" << element->getName() << "..." << endl;
@@ -115,7 +115,10 @@ void XMLTableLoader::saveElement(XMLTableElement::Pointer element)
     catch (const Exception& ex) {
         LogStream::sendError( ) 
             << "Error while saving " << element->getName( ) << ": " << ex << endl;
+        return false;
     }
+
+    return true;
 }
 
 void XMLTableLoader::loadElement(XMLTableElement::Pointer element)

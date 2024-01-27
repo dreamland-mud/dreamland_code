@@ -18,19 +18,6 @@
 
 const DLString NoteHelp::TYPE = "NoteHelp";
 
-void NoteHelp::save() const
-{
-   if (command) {
-        NoteThread::Pointer thread = command.getDynamicPointer<NoteCommand>()->getThread();
-        if (thread) {
-            NoteManager::getThis()->saveXML(*thread, thread->getName());
-            return;
-        }
-   }
-
-   LogStream::sendNotice() << "Failed to save command " << (command ? command->getName() : "") << endl;
-}
-
 NoteThread::NoteBucket::NoteBucket( )
                           : NoteThread::NoteBucket::Base( true )
 {

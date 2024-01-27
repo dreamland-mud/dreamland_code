@@ -24,19 +24,6 @@
  *-------------------------------------------------------------------*/
 const DLString LanguageHelp::TYPE = "LanguageHelp";
 
-void LanguageHelp::save() const
-{
-   if (command) {
-        Language::Pointer lang = command.getDynamicPointer<LanguageCommand>()->getLanguage();
-        if (lang) {
-            languageManager->saveXML(*lang, lang->getName());
-            return;
-        }
-   }
-    
-    LogStream::sendError() << "Failed to save language " << (command ? command->getName() : "") << endl;
-}
-
 DLString LanguageHelp::getTitle(const DLString &label) const
 {
     ostringstream buf;
