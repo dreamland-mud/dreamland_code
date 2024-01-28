@@ -7,6 +7,7 @@
 #include "areahelp.h"
 #include "so.h"
 #include "plugininitializer.h"
+#include "mocregistrator.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -126,6 +127,8 @@ extern "C" {
     {
         SO::PluginList ppl;
         
+        Plugin::registerPlugin<MocRegistrator<QuestStep>>(ppl);
+        Plugin::registerPlugin<MocRegistrator<AreaQuest>>(ppl);
         Plugin::registerPlugin<AreaHelpLifetimePlugin>( ppl );
         return ppl;
     }

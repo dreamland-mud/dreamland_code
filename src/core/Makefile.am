@@ -43,7 +43,8 @@ mobilespecial.cpp \
 dlfileloader.cpp \
 dlpluginmanager.cpp \
 bonus.cpp \
-eventbus.cpp
+eventbus.cpp \
+areaquest.cpp
 
 libcore_la_MOC = \
 affect.h \
@@ -55,6 +56,7 @@ pcharactermemory.h \
 pcskilldata.h \
 remortdata.h \
 xmlattributes.h \
-bonus.h
+bonus.h \
+areaquest.h
 
 AM_CPPFLAGS += $(src_INCLUDES)

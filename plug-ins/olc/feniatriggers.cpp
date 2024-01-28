@@ -49,6 +49,8 @@ void FeniaTriggerLoader::initialization()
     loadFolder("affect");
     loadFolder("skillcommand");
     loadFolder("command");
+    loadFolder("queststep");
+    loadFolder("areaquest");
 }
 
 void FeniaTriggerLoader::destruction()
@@ -56,6 +58,12 @@ void FeniaTriggerLoader::destruction()
 
 }
 
+// Populate index trigger map based of a content of fenia.examples subfolder.
+// Folder 'mob' with 'onGive', 'onGreet', 'onSpeech' triggers becomes
+// indexTriggers["mob"] = map of
+//     ["onGive"] = <file content>
+//     ["onGreet"] = <file content>
+//     ["onSpeech"] = <file content>
 void FeniaTriggerLoader::loadFolder(const DLString &indexType)
 {
     DLFileLoader loader(EXAMPLE_FOLDER + "/" + indexType, "");
@@ -71,6 +79,28 @@ void FeniaTriggerLoader::loadFolder(const DLString &indexType)
     }
 
     indexTriggers[indexType] = triggers;
+
+    LogStream::sendNotice() << "OLC Fenia loaded " << triggers.size() << " triggers of type " << indexType << endl;
+}
+
+// For given step type (mob/obj/room) return a list of all triggers that begin with this
+// prefix, e.g. 'mob:onGreet', 'mob:onSpeech', with "mob:" prefix removed.
+StringSet FeniaTriggerLoader::getQuestTriggers(const DLString &stepType) const
+{
+    StringSet stepTriggers;
+    DLString trigPrefix = stepType + ":";
+
+    auto t = indexTriggers.find("queststep");
+    if (t == indexTriggers.end())
+        return stepTriggers;
+
+    for (auto &trig: t->second) {
+        const DLString &trigName = trig.first;
+        if (trigPrefix.strPrefix(trigName))
+            stepTriggers.insert(trigName.substr(trigPrefix.length()));
+    }
+
+    return stepTriggers;
 }
 
 // Return 'Use' for 'onUse' or 'postUse'.
@@ -229,16 +259,26 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, cons
 
 
 
-static Register get_wrapper_for_index_data(int vnum, const DLString &type)
+Register get_wrapper_for_index_data(int vnum, const DLString &type)
 {
     Register w;
+    
     if (type == "obj") {
-        w = WrapperManager::getThis()->getWrapper(get_obj_index(vnum));
+        OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
+        if (pObj)
+            w = WrapperManager::getThis()->getWrapper(pObj);
+
     } else if (type == "room") {
-        w = WrapperManager::getThis()->getWrapper(get_room_instance(vnum));
+        Room *pRoom = get_room_instance(vnum);
+        if (pRoom)
+            w = WrapperManager::getThis()->getWrapper(pRoom);
+
     } else if (type == "mob") {
-        w = WrapperManager::getThis()->getWrapper(get_mob_index(vnum));
+        MOB_INDEX_DATA *pMob = get_mob_index(vnum);
+        if (pMob)
+            w = WrapperManager::getThis()->getWrapper(pMob);
     }
+
     return w;
 }
 

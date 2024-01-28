@@ -1,5 +1,4 @@
 
-#include <character.h>
 #include <pcharacter.h>
 #include <commandmanager.h>
 #include <object.h>
@@ -287,7 +286,7 @@ CMDEDIT(done, "готово", "выйти из редактора")
     return false;
 }
 
-CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
+CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
 {
     DLString args = argument;
     DLString cmd = args.getOneArgument();

@@ -157,6 +157,9 @@ XMLArea::init(area_file *af)
 
     areadata.init(area);
 
+    for (auto &q: area->quests)
+        quests.push_back(*q);
+
     MOB_INDEX_DATA *pMobIndex;
     for (int v = area->min_vnum; v <= area->max_vnum; v++) {
         pMobIndex = get_mob_index(v);
@@ -307,6 +310,17 @@ XMLArea::load_objects(AreaIndexData *a)
     }
 }
 
+void XMLArea::load_quests(AreaIndexData *a)
+{
+    for (auto &q: quests) {
+        a->quests.push_back(*q);
+        a->questMap[q->vnum.getValue()] = *q;
+        q->pAreaIndex = a;
+
+        areaQuests[q->vnum] = *q;
+    }
+}
+
 void
 XMLArea::load(const DLString &fname)
 {
@@ -336,6 +350,7 @@ XMLArea::load(const DLString &fname)
             load_mobiles(a);
             load_objects(a);
             load_helps(a);
+            load_quests(a);
         }
     } catch (const Exception &ex) {
         LogStream::sendFatal() << ex.what() << endl;

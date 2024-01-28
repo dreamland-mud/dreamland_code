@@ -81,6 +81,7 @@
 #include "autoflags.h"
 #include "affectlist.h"
 #include "clanreference.h"
+#include "areaquest.h"
 
 class NPCharacter;
 class Character;
@@ -91,6 +92,7 @@ class XMLDocument;
 class AreaBehavior;
 typedef ::Pointer<XMLDocument> XMLDocumentPointer;
 typedef map<DLString, DLString> Properties;
+class AreaQuest;
 
 
 /* RT ASCII conversions -- used so we can have letters in this file */
@@ -547,9 +549,13 @@ struct AreaIndexData {
 
     Scripting::Object *wrapper;
 
+    list<XMLPointer<AreaQuest>> quests;
+    map<int, AreaQuest *> questMap;
+
     // FIXME: support multiple named instances.
     Area *area;
 };
+
 struct Area {
     Area();
 

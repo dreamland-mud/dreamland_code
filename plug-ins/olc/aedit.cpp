@@ -17,6 +17,7 @@
 #include "arg_utils.h"
 #include "update_areas.h"
 #include "interp.h"
+#include "act.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -209,12 +210,116 @@ AEDIT(show, "показать", "показать все поля")
             ch->pecho("Helps:\r\n" + buf);
         else
             ch->pecho("Helps:      (none) ({y{hchelp create{hx {Dto add area help{w)");
+
     } else {
         ptc(ch, "Helps:      {Dno helps for the new area, save and use {yhelp create{x\r\n");
     }
 
+    if (original) {
+        ostringstream buf;
+
+        const DLString lineFormatQuestEdit = 
+            "{W[" + web_cmd(ch, "qedit $1", "%6d") + "{W] {c%s{x, {C%d{x шаг%I|а|ов, уровни {C%d{x-{C%d{x\r\n";
+
+        for (auto &q: original->quests) {
+            buf << fmt(0, lineFormatQuestEdit.c_str(), 
+                    q->vnum.getValue(), 
+                    q->title.c_str(),
+                    q->steps.size(), q->steps.size(),
+                    q->minLevel.getValue(), q->maxLevel.getValue());
+        }
+
+        if (!buf.str().empty())
+            ch->pecho("Quests:\r\n" + buf.str());
+        else
+            ch->pecho("Quests:     (none) {D({y{hcquest create{x{D){x\r\n");
+
+    } else {
+        ptc(ch, "Quests:     {Dno quests for the new area, save and use {yquest create{x\r\n");
+    }
+
     return false;
 }
+
+AEDIT(quest, "квест", "редактировать квесты в зоне")
+{
+    AreaIndexData *original = get_area_data(vnum);
+    DLString args = argument;
+    DLString arg = args.getOneArgument();
+    Integer questId;
+
+    if (!original) {
+        ptc(ch, "No quests for the new area, save and use {yquest create{x\r\n");
+        return false;
+    }
+
+    if (arg.isNumber() && Integer::tryParse(questId, arg)) {
+        auto q = original->questMap.find(questId);
+
+        if (q == original->questMap.end()) {
+            ptc(ch, "Квест по номеру %d не определен.\r\n", questId.getValue());
+            return false;
+        }
+/*
+        OLCStateAreaQuest::Pointer qedit(NEW, *q);
+        qedit->attach(ch);
+        qedit->show(ch);
+*/        
+        return true;
+    }
+
+    if (arg_oneof(arg, "create", "создать")) {
+        DLString argVnum = args.getOneArgument();
+        Integer vnum;
+
+        // 'quest create' - assign next free vnum
+        if (argVnum.empty()) {
+            for (vnum = original->min_vnum; vnum <= original->max_vnum; vnum++) {
+                if (original->questMap.find(vnum) == original->questMap.end())
+                    break;
+            }
+
+            if (vnum > original->max_vnum) {
+                ptc(ch, "В зоне не осталось свободного внума для квеста.\r\n");
+                return false;
+            }
+
+        } // 'quest create <vnum>' - check if vnum is valid
+        else if (!argVnum.isNumber() || !Integer::tryParse(vnum, argVnum)) {
+            ptc(ch, "Формат: quest create [номер]\r\n");
+            return false;
+        }
+
+        if (vnum < original->min_vnum || vnum > original->max_vnum) {
+            ptc(ch, "Номер квеста должен лежать в диапазоне от %d до %d.\r\n",
+                original->min_vnum, original->max_vnum);
+            return false;
+        }
+
+        AreaQuest::XMLPointer newQuest(NEW);
+        newQuest->vnum.setValue(vnum);
+        newQuest->pAreaIndex = original;
+
+        original->questMap[vnum] = *newQuest;
+        original->quests.push_back(newQuest);
+
+/*
+        OLCStateHelp::Pointer qedit(NEW, *newQuest);
+        qedit->attach(ch);
+        qedit->show(ch);
+*/        
+        return true;
+    }   
+
+    if (arg_oneof(arg, "delete", "удалить")) {
+        return true;
+    }
+
+    ptc(ch, "Формат: quest <vnum>, quest create [<vnum>], quest delete <vnum>\r\n");
+    return false;
+
+}
+
 
 AEDIT(helps, "справка", "создать или посмотреть справку по зоне")
 {

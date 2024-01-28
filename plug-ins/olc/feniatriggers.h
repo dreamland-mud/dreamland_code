@@ -21,6 +21,7 @@ class WrappedCommand;
 
 bool stringIsCapitalized(const DLString &str);
 DLString triggerType(const DLString &name);
+Register get_wrapper_for_index_data(int vnum, const DLString &type);
 
 class FeniaTriggerLoader : public Plugin, public OneAllocate {
 public:
@@ -43,6 +44,8 @@ public:
     
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
     bool clearTriggers(Scripting::Object *wrapper) const;
+
+    StringSet getQuestTriggers(const DLString &stepType) const;
 
 protected:
     bool editExisting(Character *ch, Scripting::Register &retval) const;
