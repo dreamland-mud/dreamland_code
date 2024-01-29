@@ -11,6 +11,10 @@
 
 class AreaIndexData;
 
+/** This structure represents one step inside an area quest.
+ * Consists of two blocks: step beginning and step ending. Each block
+ * describes which trigger is executed for the step.
+*/
 class QuestStep : public XMLVariableContainer {
 XML_OBJECT
 public:
@@ -20,15 +24,29 @@ public:
     QuestStep();
     virtual ~QuestStep();
 
-    XML_VARIABLE XMLString beginType; // mob, item
-    XML_VARIABLE XMLString beginValue; // vnum of mob, item
-    XML_VARIABLE XMLString beginTrigger; // onGreet, onGive, onTell...
-    
+    // What starts the step: mob/item/room.
+    XML_VARIABLE XMLString beginType;
+    // Vnum of mob/item/room that starts the step.
+    XML_VARIABLE XMLString beginValue; 
+    // Name of the step's trigger (onGreet, onGive, etc).
+    XML_VARIABLE XMLString beginTrigger; 
+
+    // What ends the step: mob/item/room.
     XML_VARIABLE XMLString endType;
+    // Vnum of mob/item/room that ends the step.
     XML_VARIABLE XMLString endValue;
+    // Name of the step's trigger (onGreet, onGive, etc).
     XML_VARIABLE XMLString endTrigger;
+
+    // 'quest info' output for this step
+    XML_VARIABLE XMLString info; 
 };
 
+/**
+ * This class describes a single area quest for an area. Contains a list of steps.
+ * Can have its own fields and triggers assigned from Fenia, e.g. onInfo, for more
+ * complex non-default behavior. Registered and initialized in 'areas' plugin.
+*/
 class AreaQuest : public XMLVariableContainer, public WrapperTarget {
 XML_OBJECT
 public:

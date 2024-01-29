@@ -11,6 +11,7 @@
 #include "security.h"
 #include "olc.h"
 #include "areahelp.h"
+#include "qedit.h"
 
 #include "websocketrpc.h"
 #include "merc.h"
@@ -241,33 +242,31 @@ AEDIT(show, "показать", "показать все поля")
     return false;
 }
 
+static AreaQuest * arg_areaquest(const DLString &arg, AreaIndexData *pArea)
+{
+    Integer questId;
+
+    if (arg.isNumber() && Integer::tryParse(questId, arg)) {
+        auto q = pArea->questMap.find(questId);
+        if (q != pArea->questMap.end())        
+            return q->second;
+    }
+
+    return 0;
+}
+
 AEDIT(quest, "квест", "редактировать квесты в зоне")
 {
     AreaIndexData *original = get_area_data(vnum);
     DLString args = argument;
     DLString arg = args.getOneArgument();
-    Integer questId;
 
     if (!original) {
         ptc(ch, "No quests for the new area, save and use {yquest create{x\r\n");
         return false;
     }
 
-    if (arg.isNumber() && Integer::tryParse(questId, arg)) {
-        auto q = original->questMap.find(questId);
-
-        if (q == original->questMap.end()) {
-            ptc(ch, "Квест по номеру %d не определен.\r\n", questId.getValue());
-            return false;
-        }
-/*
-        OLCStateAreaQuest::Pointer qedit(NEW, *q);
-        qedit->attach(ch);
-        qedit->show(ch);
-*/        
-        return true;
-    }
-
+    // 'quest create' 'quest create 2300'
     if (arg_oneof(arg, "create", "создать")) {
         DLString argVnum = args.getOneArgument();
         Integer vnum;
@@ -302,22 +301,49 @@ AEDIT(quest, "квест", "редактировать квесты в зоне"
 
         original->questMap[vnum] = *newQuest;
         original->quests.push_back(newQuest);
+        areaQuests[vnum] = *newQuest;
 
-/*
-        OLCStateHelp::Pointer qedit(NEW, *newQuest);
+        OLCStateAreaQuest::Pointer qedit(NEW, *newQuest);
         qedit->attach(ch);
         qedit->show(ch);
-*/        
         return true;
     }   
 
+    // 'quest delete 2300'
     if (arg_oneof(arg, "delete", "удалить")) {
+        arg = args.getOneArgument();
+        AreaQuest *q = arg_areaquest(arg, original);
+
+        if (!q) {
+            ptc(ch, "Квест по номеру %s не определен.\r\n", arg.c_str());
+            return false;
+        }
+
+        original->questMap.erase(q->vnum.getValue());
+        areaQuests.erase(q->vnum.getValue());
+        original->quests.remove(q);
+
+        ptc(ch, "Квест удален!\r\n");
+        return true;
+    }
+
+    // 'quest 2300'
+    if (arg.isNumber()) {
+        AreaQuest *q = arg_areaquest(arg, original);
+
+        if (!q) {
+            ptc(ch, "Квест по номеру %s не определен.\r\n", arg.c_str());
+            return false;
+        }
+
+        OLCStateAreaQuest::Pointer qedit(NEW, q);
+        qedit->attach(ch);
+        qedit->show(ch);
         return true;
     }
 
     ptc(ch, "Формат: quest <vnum>, quest create [<vnum>], quest delete <vnum>\r\n");
     return false;
-
 }
 
 

@@ -22,6 +22,7 @@ class AffectHandler;
 class Affect;
 class SkillCommand;
 class WrappedCommand;
+class AreaQuest;
 
 class WrapperManagerBase : public virtual DLObject {
 public:
@@ -39,6 +40,7 @@ public:
     virtual Scripting::Register getWrapper( Affect * ) = 0;
     virtual Scripting::Register getWrapper( SkillCommand * ) = 0;
     virtual Scripting::Register getWrapper( WrappedCommand * ) = 0;
+    virtual Scripting::Register getWrapper( AreaQuest * ) = 0;
 
     virtual void linkWrapper( Character * ) = 0;
     virtual void linkWrapper( ::Object * ) = 0;
@@ -51,6 +53,7 @@ public:
     virtual void linkWrapper( Affect * ) = 0;
     virtual void linkWrapper( SkillCommand * ) = 0;
     virtual void linkWrapper( WrappedCommand * ) = 0;
+    virtual void linkWrapper( AreaQuest * ) = 0;
     
     virtual void getTarget( const Scripting::Register &, Character *& ) = 0;
     void markAlive(long long id);

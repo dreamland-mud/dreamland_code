@@ -34,6 +34,7 @@ spellwrapper.cpp \
 affecthandlerwrapper.cpp \
 feniaspellext.cpp \
 skillcommandwrapper.cpp \
+areaquestwrapper.cpp \
 wrap_utils.cpp \
 feniacroaker.cpp \
 commandtableloader.cpp \
@@ -55,6 +56,7 @@ areaindexwrapper.h \
 spellwrapper.h \
 affecthandlerwrapper.h \
 skillcommandwrapper.h \
+areaquestwrapper.h \
 characterwrapper.h
 
 plugin_INCLUDES = \

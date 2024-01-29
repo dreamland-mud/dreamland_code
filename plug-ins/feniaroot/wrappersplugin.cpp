@@ -28,6 +28,7 @@
 #include "feniaskillaction.h"
 #include "commandmanager.h"
 #include "wrappedcommand.h"
+#include "areaquestwrapper.h"
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"
@@ -81,6 +82,10 @@ WrappersPlugin::linkTargets()
         if (pArea->wrapper)
             wrapper_cast<AreaIndexWrapper>(pArea->wrapper)->setTarget( pArea );
 
+    for (auto &q: areaQuests) {
+        if (q.second->wrapper)
+            wrapper_cast<AreaQuestWrapper>(q.second->wrapper)->setTarget(q.second);
+    }
 
     for (int sn = 0; sn < skillManager->size(); sn++) {
         Skill *skill = skillManager->find(sn);
@@ -174,6 +179,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<SkillWrapper>( );
     Class::regMoc<SkillGroupWrapper>( );
     Class::regMoc<FeniaCommandWrapper>( );
+    Class::regMoc<AreaQuestWrapper>( );
     
     FeniaManager::getThis( )->recover( );
     
@@ -215,6 +221,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaCommandContext>("commandcontext", apiDump, false);
     traitsAPIJson<FeniaString>("string", apiDump, false);
     traitsAPIJson<FeniaCommandWrapper>("command", apiDump, false);     
+    traitsAPIJson<AreaQuestWrapper>("areaquest", apiDump, false);     
     dumpTables(apiDump);
 
     Json::FastWriter writer;
@@ -230,6 +237,7 @@ void WrappersPlugin::destruction( ) {
     Scripting::gc = false;
     FeniaManager::getThis( )->backup( );
 
+    Class::unregMoc<AreaQuestWrapper>( );
     Class::unregMoc<LiquidWrapper>( );
     Class::unregMoc<SkillGroupWrapper>( );
     Class::unregMoc<SkillWrapper>( );
