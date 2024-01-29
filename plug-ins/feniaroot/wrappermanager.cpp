@@ -14,6 +14,7 @@
 #include "affectwrapper.h"
 #include "skillcommandwrapper.h"
 #include "commandwrapper.h"
+#include "areaquestwrapper.h"
 #include "subr.h"
 #include "fenia/register-impl.h"
 
@@ -138,6 +139,14 @@ Scripting::Register WrapperManager::getWrapper(WrappedCommand *cmd)
     return wrapperAux<FeniaCommandWrapper>(cmd->getID(), cmd);
 }
 
+Scripting::Register WrapperManager::getWrapper(AreaQuest *q) 
+{
+    if (!q)
+        return Scripting::Register();
+    
+    return wrapperAux<AreaQuestWrapper>(q->getID(), q);
+}
+
 
 template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
@@ -205,6 +214,11 @@ void WrapperManager::linkWrapper(SkillCommand *cmd)
 void WrapperManager::linkWrapper(WrappedCommand *cmd) 
 {
     linkAux<FeniaCommandWrapper>(cmd->getID(), cmd);
+}
+
+void WrapperManager::linkWrapper(AreaQuest *q) 
+{
+    linkAux<AreaQuestWrapper>(q->getID(), q);
 }
 
 

@@ -28,6 +28,7 @@ public:
     virtual Scripting::Register getWrapper( Affect * );
     virtual Scripting::Register getWrapper( SkillCommand * );
     virtual Scripting::Register getWrapper( WrappedCommand * );
+    virtual Scripting::Register getWrapper( AreaQuest * );
     
     virtual void linkWrapper( Character * );
     virtual void linkWrapper( ::Object * );
@@ -40,6 +41,7 @@ public:
     virtual void linkWrapper( Affect * );
     virtual void linkWrapper( SkillCommand * );
     virtual void linkWrapper( WrappedCommand * );
+    virtual void linkWrapper( AreaQuest * );
 
     virtual void getTarget( const Scripting::Register &, Character *& );
     

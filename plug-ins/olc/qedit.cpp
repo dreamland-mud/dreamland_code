@@ -241,16 +241,18 @@ void OLCStateAreaQuest::show( PCharacter *ch )
     for (unsigned int s = 0; s < q->steps.size(); s++) {
         ostringstream buf;
         auto &step = q->steps[s];
+        DLString stepNum(s);
 
         buf << endl
             << "{CШаг " << s << "{x   ";
             
         if (s > 0)
-            buf << "{D[" << web_cmd(ch, "step up $1", "вверх") << "]{w ";
+            buf << "{D[" << web_cmd(ch, "step " + stepNum + " up", "вверх") << "]{w ";
         if (s != q->steps.size() - 1)
-            buf << "{D[" << web_cmd(ch, "step down $1", "вниз") << "]{w ";
+            buf << "{D[" << web_cmd(ch, "step  " + stepNum + " down", "вниз") << "]{w ";
 
         buf << endl
+            << "{WИнфо{w:   " << step->info << " " << web_edit_button(ch, "step " + stepNum + " info", "web") << endl
             << "{WНачало{w: тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
             << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
             << show_step_target(ch, step->beginType, step->beginValue)
@@ -293,9 +295,10 @@ static void qedit_step_usage(PCharacter *ch)
     ch->pecho("step <num> begin|end vnum <vnum> - задать vnum для начала или завершения шага");
     ch->pecho("step <num> begin|end trigger <onXXX> - задать название тригера для начала или завершения шага");
     ch->pecho("step <num> begin|end fenia - открыть редактор феневого сценария");
-    ch->pecho("step del <num>  - удалить шаг");
-    ch->pecho("step up <num>   - передвинуть шаг выше");
-    ch->pecho("step down <num> - передвинуть шаг ниже");
+    ch->pecho("step <num> info <строка> - установить описание шага, видное по 'квест инфо'");
+    ch->pecho("step <num> up  - передвинуть шаг выше");
+    ch->pecho("step <num> down - передвинуть шаг ниже");
+    ch->pecho("step <num> del - удалить шаг");
 }
 
 bool OLCStateAreaQuest::parseQuestVnum(PCharacter *ch, const DLString &arg, Integer &vnum)
@@ -356,24 +359,23 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         return true;
     }
 
-    // 'step del 3'
-    if (arg_oneof(cmd, "delete", "удалить")) {
-        stepArg = args.getOneArgument();
-        if (!parseStepNumber(ch, stepArg, step))
-            return false;
+    stepArg = cmd;
+    if (!parseStepNumber(ch, stepArg, step))
+        return false;
 
+    auto &thisStep = q->steps[step];   
+    cmd = args.getOneArgument();     
+
+    // 'step 3 del'
+    if (arg_oneof(cmd, "delete", "удалить")) {
         q->steps.erase(q->steps.begin() + step);
         ch->pecho("Шаг %d удален. Не забудь почистить старые тригера ({y{hccs search %d{x).", 
                   step.getValue(), q->vnum.getValue());
         return true;
     }
 
-    // 'step up 3'
+    // 'step 3 up'
     if (arg_oneof(cmd, "up", "вверх")) {
-        stepArg = args.getOneArgument();
-        if (!parseStepNumber(ch, stepArg, step))
-            return false;
-
         if (step == 0) {
             ch->pecho("Шаг %d и так самый первый в списке.", step.getValue());
             return false;
@@ -384,12 +386,8 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         return true;
     }
 
-    // 'step down 3'
+    // 'step 3 down'
     if (arg_oneof(cmd, "down", "вниз")) {
-        stepArg = args.getOneArgument();
-        if (!parseStepNumber(ch, stepArg, step))
-            return false;
-
         if (step == q->steps.size() - 1) {
             ch->pecho("Шаг %d и так самый последний в списке.", step.getValue());
             return false;
@@ -400,14 +398,27 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         return true;
     }
 
+    // 'step 3 info <string>'
+    if (arg_oneof(cmd, "info", "инфо")) {
+        if (args.empty()) {
+            ch->pecho("Какое описание ты хочешь присвоить?");
+            return false;
+        }
+
+        // Execute 'step 3 paste' rather than 'step paste' when web editor returns
+        lastCmd << " " << stepArg;
+        return editor(args.c_str(), thisStep->info, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+    }
+
+    // 'step 3 paste'
+    if (arg_is_paste(cmd)) {
+        editorPaste(thisStep->info, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+        return true;
+    }
+
     // 'step 3 begin|end type|vnum|trigger <value>'
-    stepArg = cmd;
-    if (!parseStepNumber(ch, stepArg, step))
-        return false;
 
-    auto &thisStep = q->steps[step];        
-
-    DLString beginOrEnd = args.getOneArgument();
+    DLString beginOrEnd = cmd;
     bool isBegin;
     if (arg_oneof(beginOrEnd, "begin", "начало")) {
         isBegin = true;

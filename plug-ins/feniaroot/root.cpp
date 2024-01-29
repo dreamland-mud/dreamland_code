@@ -55,6 +55,7 @@
 #include "tableswrapper.h"
 #include "schedulerwrapper.h"
 #include "commandwrapper.h"
+#include "areaquestwrapper.h"
 #include "codesource.h"
 #include "subr.h"
 #include "fenia/handler.h"
@@ -1180,6 +1181,17 @@ NMI_INVOKE( Root, FeniaCommand, "(name): конструктор для кома�
 {
     WrappedCommand *cmd = argnum2command(args, 1);
     return WrapperManager::getThis( )->getWrapper(cmd);
+}
+
+NMI_INVOKE( Root, AreaQuest, "(vnum): конструктор для арийного квеста по его внуму" )
+{
+    int vnum = argnum2number(args, 1);
+    auto q = areaQuests.find(vnum);
+
+    if (q == areaQuests.end())
+        throw Scripting::Exception("Unknown area quest vnum");
+
+    return WrapperManager::getThis()->getWrapper(q->second);
 }
 
 NMI_GET( Root, players, "список (List) всех игроков") 
