@@ -38,6 +38,7 @@ public:
     bool openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultSkillCommand *cmd, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, WrappedCommand *cmd, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin);
 
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
     void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const;
@@ -75,6 +76,9 @@ protected:
 
     vector<DLString> createCommandParams(
         Character *ch, WrappedCommand *cmd, const DLString &methodName) const;
+
+    vector<DLString> createQuestStepParams(
+        Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s) const;
 
     IndexTriggers indexTriggers;
 };

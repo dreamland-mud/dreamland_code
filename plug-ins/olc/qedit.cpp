@@ -76,50 +76,55 @@ void OLCStateAreaQuest::changed( PCharacter *ch )
 }
 
 // Output step target's name with a clickable link to OLC editor.
-static void show_step_target(PCharacter *ch, ostringstream &buf, const DLString &type, const Integer &vnum)
+static DLString show_step_target(PCharacter *ch, const DLString &type, const Integer &vnum)
 {
+    ostringstream buf;
+
     if (type == "mob") {
         MOB_INDEX_DATA *pMob = get_mob_index(vnum);
         if (!pMob) {
-            buf << "{Rнеизвестный моб{x";
-            return;
+            buf << "{Rнеизвестный моб " << vnum << "{x";
+            return buf.str();
         }
 
         buf << "{w[{W" << web_cmd(ch, "medit $1", vnum.toString()) << "{w] "
             << russian_case(pMob->short_descr, '1');
-        return;
+        return buf.str();
     }
 
     if (type == "obj") {
         OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
         if (!pObj) {
-            buf << "{Rнеизвестный предмет{x";
-            return;
+            buf << "{Rнеизвестный предмет " << vnum << "{x";
+            return buf.str();
         }
 
         buf << "{w[{W" << web_cmd(ch, "oedit $1", vnum.toString()) << "{w] "
             << russian_case(pObj->short_descr, '1');
-        return;
+        return buf.str();
     }
 
     if (type == "room") {
         RoomIndexData *pRoom = get_room_index(vnum);
         if (!pRoom) {
-            buf << "{Rнеизвестная комната{x";
-            return;
+            buf << "{Rнеизвестная комната " << vnum << "{x";
+            return buf.str();
         }
 
         buf << "{w[{W" << web_cmd(ch, "redit $1", vnum.toString()) << "{w] "
             << pRoom->name;
 
-        return;
+        return buf.str();
     }
 
     buf << "{Rнеизвестный тип{x";
+    return buf.str();
 }
 
-static void menu_step_type(ostringstream &buf, Integer step, const DLString &stepType, DLString beginOrEnd)
+static DLString menu_step_type(Integer step, const DLString &stepType, DLString beginOrEnd)
 {
+    ostringstream buf;
+
     DLString id = "step " + step.toString() + " " + beginOrEnd + " type" ;
     StringList commands;
     commands.push_back("$ mob");
@@ -128,10 +133,13 @@ static void menu_step_type(ostringstream &buf, Integer step, const DLString &ste
     DLString label = stepType;
 
     buf << "{w[{y" << web_menu(commands, id, label) << "{w]";
+    return buf.str();
 }
 
-static void menu_step_trigger(ostringstream &buf, Integer step, const DLString &stepType, const DLString &stepTrig, DLString beginOrEnd)
+static DLString menu_step_trigger(Integer step, const DLString &stepType, const DLString &stepTrig, DLString beginOrEnd)
 {
+    ostringstream buf;
+
     DLString id = "step " + step.toString() + " " + beginOrEnd + " trigger" ;
     StringList commands;
     for (auto trig: feniaTriggers->getQuestTriggers(stepType))
@@ -139,6 +147,7 @@ static void menu_step_trigger(ostringstream &buf, Integer step, const DLString &
     DLString label = stepTrig;
 
     buf << "{w[{y" << web_menu(commands, id, label) << "{w]";
+    return buf.str();
 }
 
 Register find_function(const DLString &type, const Integer &vnum, const DLString &trigName)
@@ -160,18 +169,25 @@ Register find_function(const DLString &type, const Integer &vnum, const DLString
     return retval;
 }
 
+// Checks method body for quoted quest ID - as a hint that it's a quest trigger
 bool trigger_is_active(Register method, AreaQuest *q)
 {
     if (method.type == Register::NONE)
         return false;
 
     DLString methodBody = method.repr();
-    if (methodBody.find(q->vnum.toString()) == DLString::npos)
+    if (methodBody.find("\"" + q->vnum.toString() + "\"") == DLString::npos)
         return false;
 
     return true;
 }
-void show_active_triggers(PCharacter *ch, ostringstream& buf, AreaQuest *q, const DLString &type, const Integer &vnum, const DLString &trigName)
+
+static DLString cs_label(const DLString &type, const Integer &vnum, const DLString &trigName) 
+{
+    return type + "/" + vnum.toString() + "/" + trigName;
+}
+
+static void show_active_triggers(PCharacter *ch, ostringstream& buf, AreaQuest *q, const DLString &type, const Integer &vnum, const DLString &trigName)
 {
     Register method = find_function(type, vnum, trigName);
 
@@ -180,32 +196,23 @@ void show_active_triggers(PCharacter *ch, ostringstream& buf, AreaQuest *q, cons
 
     const CodeSource::Pointer &cs = method.toFunction()->getFunction()->source.source;
 
-    buf << "[{G" << web_cmd(ch, "cs web $1", DLString(cs->getId())) << "{w] " 
-        << type << "/" << vnum << "/" << trigName << "  ";
+    DLString cmd = "cs web " + DLString(cs->getId());
+    DLString seeFmt = cs_label(type, vnum, trigName);
+    buf << "{g" << web_cmd(ch, cmd, seeFmt) << "{w ";
 }
 
-void show_available_triggers(PCharacter *ch, ostringstream& buf, AreaQuest *q, const DLString &type, const Integer &vnum, const DLString &trigName)
+static void show_available_triggers(PCharacter *ch, ostringstream& buf, AreaQuest *q, const DLString &type, 
+                                    const Integer &vnum, const DLString &trigName, const Integer &step, bool isBegin)
 {
     Register method = find_function(type, vnum, trigName);
 
     if (trigger_is_active(method, q))
         return;
 
-    buf << "  ";
-
-    if (method.type == Register::NONE) {
-        buf << "{W" << web_cmd(ch, 
-                    "fenia create " + type + " " + vnum.toString() + " " + trigName, 
-                    type + "/" + vnum.toString() + "/" + trigName) 
-            << "{x  ";
-
-    }  else {
-        const CodeSource::Pointer &cs = method.toFunction()->getFunction()->source.source;
-        buf << "[{W" << web_cmd(ch, "cs web $1", DLString(cs->getId())) << "{w] " 
-            <<  type << "/" << vnum << "/" << trigName << "  "<< "  ";
-    }
+    DLString cmd = "step " + step.toString() + " " + (isBegin ? "begin" : "end") + " fenia";
+    DLString seeFmt = cs_label(type, vnum, trigName);
+    buf << "{W" << web_cmd(ch, cmd, seeFmt) << "{w ";
 }
-
 
 void OLCStateAreaQuest::show( PCharacter *ch )
 {
@@ -227,7 +234,7 @@ void OLCStateAreaQuest::show( PCharacter *ch )
 
     {
         ostringstream buf;
-        buf <<  "Шаги:          [{y" << web_cmd(ch, "step add", "добавить") << "{w] {D(step help){x" << endl;
+        buf <<  "{CШаги{w:          [{y" << web_cmd(ch, "step add", "добавить") << "{w] {D(step help){x" << endl;
         ch->send_to(buf);
     }
 
@@ -236,31 +243,23 @@ void OLCStateAreaQuest::show( PCharacter *ch )
         auto &step = q->steps[s];
 
         buf << endl
-            << "Шаг [{C" << s << "{x]   ";
+            << "{CШаг " << s << "{x   ";
             
         if (s > 0)
-            buf << "[{y" << web_cmd(ch, "step up $1", "вверх") << "{w] ";
+            buf << "{D[" << web_cmd(ch, "step up $1", "вверх") << "]{w ";
         if (s != q->steps.size() - 1)
-            buf << "[{y" << web_cmd(ch, "step down $1", "вниз") << "{w] ";
+            buf << "{D[" << web_cmd(ch, "step down $1", "вниз") << "]{w ";
 
         buf << endl
-            << "Начало: "
-            << "триггер ";
-        menu_step_trigger(buf, s, step->beginType, step->beginTrigger, "begin");
-        buf << "{w, тип ";
-        menu_step_type(buf, s, step->beginType, "begin");
-        buf << "{w, внум {c" << step->beginValue << " ";
-        show_step_target(ch, buf, step->beginType, step->beginValue);
-        buf << endl;
+            << "{WНачало{w: тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
+            << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
+            << show_step_target(ch, step->beginType, step->beginValue)
+            << endl;
 
-        buf << "Конец: "
-            << "триггер ";
-        menu_step_trigger(buf, s, step->endType, step->endTrigger, "end");
-        buf << "{w, тип ";
-        menu_step_type(buf, s, step->endType, "end");
-        buf << "{w, внум {c" << step->endValue << " ";
-        show_step_target(ch, buf, step->endType, step->endValue);
-        buf << endl;
+        buf << "{WКонец{w:  тип " << menu_step_type(s, step->endType, "end") << "{w, "
+            << "триггер " << menu_step_trigger(s, step->endType, step->endTrigger, "end") << "{w, "
+            << show_step_target(ch, step->endType, step->endValue)
+            << endl;
 
         {
             ostringstream trigBuf;            
@@ -273,17 +272,17 @@ void OLCStateAreaQuest::show( PCharacter *ch )
 
         {
             ostringstream trigBuf;            
-            show_available_triggers(ch, trigBuf, q, step->beginType, step->beginValue, step->beginTrigger);
-            show_available_triggers(ch, trigBuf, q, step->endType, step->endValue, step->endTrigger);
+            show_available_triggers(ch, trigBuf, q, step->beginType, step->beginValue, step->beginTrigger, s, true);
+            show_available_triggers(ch, trigBuf, q, step->endType, step->endValue, step->endTrigger, s, false);
 
             if (!trigBuf.str().empty())
-                buf << "{WДоступны{x: " << trigBuf.str() << endl;
+                buf << "{WДоступны{x:    " << trigBuf.str() << endl;
         }
 
         ch->send_to(buf);
     }
 
-    ptc(ch, "\r\nКоманды: {y{hcstep add{x, {y{hcstep help{x, {y{hccommands{x, {y{hcdone{x\r\n");
+    ptc(ch, "\r\nКоманды: {y{hcstep help{x, {y{hccommands{x, {y{hcshow{x, {y{hcdone{x\r\n");
 }
 
 static void qedit_step_usage(PCharacter *ch)
@@ -293,6 +292,7 @@ static void qedit_step_usage(PCharacter *ch)
     ch->pecho("step <num> begin|end type mob|obj|room - задать тип начала или завершения шага");
     ch->pecho("step <num> begin|end vnum <vnum> - задать vnum для начала или завершения шага");
     ch->pecho("step <num> begin|end trigger <onXXX> - задать название тригера для начала или завершения шага");
+    ch->pecho("step <num> begin|end fenia - открыть редактор феневого сценария");
     ch->pecho("step del <num>  - удалить шаг");
     ch->pecho("step up <num>   - передвинуть шаг выше");
     ch->pecho("step down <num> - передвинуть шаг ниже");
@@ -409,11 +409,13 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 
     DLString beginOrEnd = args.getOneArgument();
     bool isBegin;
-    if (arg_oneof(beginOrEnd, "begin", "начало"))
+    if (arg_oneof(beginOrEnd, "begin", "начало")) {
         isBegin = true;
-    else if (arg_oneof(beginOrEnd, "end", "конец"))
+        beginOrEnd = "begin";
+    } else if (arg_oneof(beginOrEnd, "end", "конец")) {
         isBegin = false;
-    else {
+        beginOrEnd = "end";
+    } else {
         ch->pecho("Укажи, начало это или конец шага (begin, end).");
         return false;        
     }
@@ -424,7 +426,13 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     if (arg_oneof(action, "type", "тип")) {
         DLString type = args.getOneArgument();
 
-        if (!arg_oneof(type, "mob", "obj", "room")) {
+        if (arg_oneof(type, "mob", "моб"))
+            type = "mob";
+        else if (arg_oneof(type, "obj", "обж", "предмет"))
+            type = "obj";
+        else if (arg_oneof(type, "room", "комната"))
+            type = "room";
+        else {
             ch->pecho("Допустимые значения для типа шага: mob, obj, room.");
             return false;
         }
@@ -477,8 +485,14 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             thisStep->endTrigger = trigName;
             ch->pecho("Концу шага %d присвоен триггер %s.", step.getValue(), trigName.c_str());
         }
-        // XXX 
+         
         return true;
+    }
+
+    // 'step 3 begin|end fenia'
+    if (arg_oneof(action, "fenia", "феня")) {
+        feniaTriggers->openEditor(ch, q, step, isBegin);
+        return false;
     }
 
     qedit_step_usage(ch);
