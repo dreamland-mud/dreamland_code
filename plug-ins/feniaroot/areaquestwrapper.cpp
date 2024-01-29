@@ -5,7 +5,7 @@
 #include "mercdb.h"
 #include "loadsave.h"
 
-#include "AreaQuestWrapper.h"
+#include "areaquestwrapper.h"
 #include "structwrappers.h"
 #include "wrappermanager.h"
 #include "reglist.h"
