@@ -13,7 +13,7 @@
 #include "xmlmap.h"
 #include "xmllist.h"
 #include "xmlvariablecontainer.h"
-
+#include "areaquest.h"
 #include "xmlmobilefactory.h"
 #include "xmlobjectfactory.h"
 #include "xmlroom.h"
@@ -59,8 +59,10 @@ public:
     void load_objects(AreaIndexData *);
     void load_mobiles(AreaIndexData *);
     void load_rooms(AreaIndexData *);
+    void load_quests(AreaIndexData *);
 
     XML_VARIABLE XMLAreaHeader areadata;
+    XML_VARIABLE XMLListBase<XMLPointer<AreaQuest>> quests;
     XML_VARIABLE XMLListBase<XMLAreaHelp> helps;
     XML_VARIABLE XMLMapBase<XMLMobileFactory> mobiles;
     XML_VARIABLE XMLMapBase<XMLObjectFactory> objects;

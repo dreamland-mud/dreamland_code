@@ -31,7 +31,6 @@ public:
 private:
     virtual void statePrompt( Descriptor * );
 
-    ::Command *original;
     ::Command *getOriginal();
     bool commandUpdate(::Command *);
     CommandHelp::Pointer resolveHelp(::Command *);

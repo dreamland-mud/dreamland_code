@@ -71,6 +71,14 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
     if (!empty())
        in << *this << endl;
 
+    if (!area->quests.empty()) {
+        in << "{yЗадания{x:" << endl;
+        for (auto &q: area->quests) {
+            in << "%A% " << q->description << endl;
+            in << endl;
+        }
+    }
+
     if (str_cmp(area->speedwalk, "")) {
         in << "{yКак добраться{x: ";
 

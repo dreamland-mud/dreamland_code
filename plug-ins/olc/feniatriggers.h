@@ -21,6 +21,7 @@ class WrappedCommand;
 
 bool stringIsCapitalized(const DLString &str);
 DLString triggerType(const DLString &name);
+Register get_wrapper_for_index_data(int vnum, const DLString &type);
 
 class FeniaTriggerLoader : public Plugin, public OneAllocate {
 public:
@@ -37,12 +38,15 @@ public:
     bool openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultSkillCommand *cmd, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, WrappedCommand *cmd, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin);
 
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
     void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const;
     
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
     bool clearTriggers(Scripting::Object *wrapper) const;
+
+    StringSet getQuestTriggers(const DLString &stepType) const;
 
 protected:
     bool editExisting(Character *ch, Scripting::Register &retval) const;
@@ -72,6 +76,9 @@ protected:
 
     vector<DLString> createCommandParams(
         Character *ch, WrappedCommand *cmd, const DLString &methodName) const;
+
+    vector<DLString> createQuestStepParams(
+        Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s) const;
 
     IndexTriggers indexTriggers;
 };
