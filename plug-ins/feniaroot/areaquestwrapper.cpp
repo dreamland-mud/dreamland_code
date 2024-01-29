@@ -76,10 +76,40 @@ NMI_GET( AreaQuestWrapper, title, "название квеста")
     return Register( target->title );
 }
 
+NMI_GET( AreaQuestWrapper, description, "описание квеста") 
+{ 
+    checkTarget( ); 
+    return Register( target->description );
+}
+
 NMI_GET( AreaQuestWrapper, vnum, "номер квеста") 
 { 
     checkTarget( ); 
     return Register( target->vnum );
+}
+
+NMI_GET( AreaQuestWrapper, minLevel, "мин. уровень, на котором выдают квест") 
+{ 
+    checkTarget( ); 
+    return Register( target->minLevel );
+}
+
+NMI_GET( AreaQuestWrapper, maxLevel, "макс. уровень, на котором выдают квест") 
+{ 
+    checkTarget( ); 
+    return Register( target->maxLevel );
+}
+
+NMI_GET( AreaQuestWrapper, limitPerLife, "сколько раз за реморт можно выполнить") 
+{ 
+    checkTarget( ); 
+    return Register( target->limitPerLife );
+}
+
+NMI_GET( AreaQuestWrapper, flags, "флаги квеста (таблица .tables.areaquest_flags)" ) 
+{
+    checkTarget();
+    return Register((int)target->flags);
 }
 
 

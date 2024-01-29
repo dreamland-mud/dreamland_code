@@ -72,6 +72,7 @@ const struct olc_help_type help_table[] =
 {
     {"{YАрии{x", NULL, NULL, NULL },
     {"area_flags", &area_flags, "Флаги арий (поле area_flag)"},
+    {"areaquest_flags", &areaquest_flags, "Флаги арийных квестов (поле flags)"},
 
     {"{YКомнаты{x", NULL, NULL, NULL},
     {"room_flags", &room_flags, "Флаги комнат (поле room_flags)."},
@@ -125,7 +126,7 @@ const struct olc_help_type help_table[] =
     {"affwhere_flags", &affwhere_flags, "Поле where у аффекта (на что влияет его bitvector)"},
     {"wearloc", &wearloc_table, "Куда мобы одевают предметы."},
 
-    {"{YУмения и заклинания{x", NULL, NULL, NULL}, 
+    {"{YУмения и команды{x", NULL, NULL, NULL}, 
     {"spells", &skill_table, "Имена всех заклинаний."},
     {"practicer", &group_table, "Все группы умений (для поля practicer)."},
     {"target_table", &target_table, "Цели для заклинаний (поле target)."},
