@@ -211,12 +211,14 @@ DLString AffectOutput::format_affect_global( Affect *paf )
         } else if (registry == liquidManager) {
             buf << "добавляет запах {m" << paf->global.toRussianString('2', ",").colourStrip() << "{x";
         } else if (registry == wearlocationManager) {
-            if (paf->global.isSet( wear_wrist_r ))
-                buf << "отрезанная правая рука";
-            else if (paf->global.isSet( wear_wrist_l ))
-                buf << "отрезанная левая рука";
-            else
-                buf << "отрезанная конечность";
+            StringList cut;
+
+            for (auto wearlocIndex: paf->global.toArray()) {
+                Wearlocation *wearloc = wearlocationManager->find(wearlocIndex);
+                cut.push_back(wearloc->getRibName().ruscase('2'));
+            }
+
+            buf << "лишает {1{m" << cut.join("{2, {1{m");
         } else {
             buf << "неизвестный вектор";
         }
