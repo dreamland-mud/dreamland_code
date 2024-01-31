@@ -6,6 +6,7 @@
 #include "xmlstring.h"
 #include "xmllist.h"
 #include "xmlvector.h"
+#include "xmlflags.h"
 #include "wrappertarget.h"
 #include "xmlpointer.h"
 
@@ -64,6 +65,7 @@ public:
     XML_VARIABLE XMLInteger minLevel, maxLevel;
     XML_VARIABLE XMLInteger limitPerLife;
     XML_VARIABLE XMLVectorBase<QuestStep::XMLPointer> steps;
+    XML_VARIABLE XMLFlagsNoEmpty flags;
 
     AreaIndexData *pAreaIndex;
 };

@@ -6,7 +6,8 @@
 map<int, AreaQuest *> areaQuests;
 
 AreaQuest::AreaQuest()
-    : pAreaIndex(0)
+    : flags(0, &areaquest_flags), 
+      pAreaIndex(0)
 {
 
 }

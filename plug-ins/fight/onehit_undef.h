@@ -31,7 +31,6 @@ protected:
     void damEffectMasterSword( );
     void damEffectDestroyEquipment( );
     void damEffectCriticalStrike( );
-    void damEffectSlice( );
     void damEffectVorpal();
 
     void destroyWeapon( );

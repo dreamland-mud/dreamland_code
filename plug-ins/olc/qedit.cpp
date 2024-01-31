@@ -231,6 +231,7 @@ void OLCStateAreaQuest::show( PCharacter *ch )
     ptc(ch, "Мин. уровень:  {c%d {D(minlevel){x\r\n", q->minLevel.getValue());
     ptc(ch, "Макс. уровень: {c%d {D(maxlevel){x\r\n", q->maxLevel.getValue());
     ptc(ch, "Раз за жизнь:  {c%d {D(perlife){x\r\n", q->limitPerLife.getValue());
+    ptc(ch, "Флаги:         {c%s {D(flags){x\r\n", q->flags.names().c_str());
 
     {
         ostringstream buf;
@@ -539,6 +540,11 @@ AQEDIT(desc, "описание", "редактор описания квеста
     AreaQuest *q = getOriginal();
 
     return editor(argument, q->description);
+}
+
+AQEDIT(flags, "флаги", "флаги квеста (? areaquest_flags)")
+{
+    return flagBitsEdit(getOriginal()->flags);
 }
 
 
