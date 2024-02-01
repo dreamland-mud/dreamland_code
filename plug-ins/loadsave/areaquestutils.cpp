@@ -1,0 +1,336 @@
+#include "areaquestutils.h"
+#include "logstream.h"
+#include "util/regexp.h"
+#include "xmlmap.h"
+#include "fenia/register-impl.h"
+#include "idcontainer.h"
+#include "regcontainer.h"
+#include "wrapperbase.h"
+#include "wrappertarget.h"
+#include "pcharacter.h"
+#include "npcharacter.h"
+#include "object.h"
+#include "room.h"
+#include "areaquest.h"
+#include "xmlattributeareaquest.h"
+#include "fenia_utils.h"
+#include "dreamland.h"
+
+using namespace Scripting;
+using namespace std;
+
+/** Contains result of a method name like 'q3001_step2_begin_onGive' split into fields. */
+struct MethodLabel {
+    MethodLabel() : questId(0), step(-1), methodId("unknown") { 
+    }
+    MethodLabel(const DLString &method) : methodId(method) {
+        this->methodName = method;
+    }
+
+    IdRef methodId;
+    DLString methodName; // 'q2300_step1_end_onSpeech'
+    DLString stage;    // 'end'
+    int questId;       // 2300
+    int step;          // 1
+    DLString trigName; // 'onSpeech'
+    DLString trigType; // 'Speech'
+    DLString trigPrefix; // 'on'
+};
+
+/** maps stage name to a corresponding method label */
+typedef map<DLString, MethodLabel> MethodsByStage;
+
+/** maps step number to methods defined on this mob/obj/room for this step (grouped by stage) */
+typedef map<int, MethodsByStage> MethodsByStep;
+
+/** maps quest id to methods defined on this mob/obj/room for this quest (grouped by steps) */
+typedef map<int, MethodsByStep> MethodsByQuest;
+
+/** Finds all methods on a target for given trigger name. Will return both _onGive and _postGive for 'Give' trigType. */
+static MethodsByQuest aquest_find_methods(Scripting::Object *wrapper, const DLString &trigType)
+{
+    MethodsByQuest result;
+
+    WrapperBase *wrapperBase = get_wrapper(wrapper);
+    if (!wrapperBase)
+        return result;
+
+    StringSet onAndPostTriggers, miscMethods;
+    wrapperBase->collectTriggers(onAndPostTriggers, miscMethods);
+
+    // Regexp: q<number> _ step<number> _ begin|end _ on|post Give|Use|Get|...  
+    // Matches:    0              1           2         3          4
+    RegExp methodIdRE("^q([0-9]+)_step([0-9]+)_(begin|end)_([a-z]+)([A-Z][A-Za-z]+)$", true);
+
+    for (auto method: miscMethods) {
+        RegExp::MatchVector matches = methodIdRE.subexpr(method.c_str());
+        if (matches.empty())
+            continue;
+
+        DLString matchedTrigType = matches.at(4);
+        if (matchedTrigType != trigType)
+            continue;
+
+        MethodLabel label(method);
+        label.questId = matches.at(0).toInt();
+        label.step = matches.at(1).toInt();
+        label.stage = matches.at(2);
+        label.trigName = matches.at(3) + matches.at(4);
+        label.trigType = matches.at(4);
+        label.trigPrefix = matches.at(3);
+
+        result[label.questId][label.step][label.stage] = label;
+    }
+
+    return result;
+}
+
+// Grab (create if needed) quest info for this quest from player attributes
+static AreaQuestData & aquest_data(PCharacter *ch, const DLString &questId)
+{
+    auto areaQuestAttr = ch->getAttributes().getAttr<XMLAttributeAreaQuest>("areaquest");
+    auto q = areaQuestAttr->find(questId);
+
+    if (q == areaQuestAttr->end())
+        (**areaQuestAttr)[questId] = AreaQuestData();
+
+    return (**areaQuestAttr)[questId];
+}
+
+AreaQuest *get_area_quest(const DLString &questId)
+{
+    Integer vnum;
+
+    if (!Integer::tryParse(vnum, questId))
+        return 0;
+
+    return get_area_quest(vnum);
+}
+
+AreaQuest *get_area_quest(int vnum)
+{
+    auto q = areaQuests.find(vnum);
+    if (q == areaQuests.end())
+        return 0;
+
+    return q->second;
+
+}
+AreaQuest *get_area_quest(const Integer &vnum)
+{
+    return get_area_quest(vnum.getValue());
+}
+
+// Return true if ch passes all requirements to participate in this quest
+static bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuestData &qdata) 
+{
+    // Too old?
+    if (q->maxLevel < LEVEL_MORTAL && ch->getRealLevel() > q->maxLevel)
+        return false;
+
+    // Too young?
+    if (q->minLevel > 0 && ch->getRealLevel() < q->minLevel)
+        return false;
+
+    // Have done too many times?
+    if (q->limitPerLife > 0 && qdata.thisLife >= q->limitPerLife)
+        return false;
+
+    // See if prerequisite quest was completed by ch at least once in this life
+    if (q->prereq > 0) {
+        AreaQuestData &prereqQuestData = aquest_data(ch, q->prereq.toString());
+        if (prereqQuestData.thisLife <= 0)
+            return false;
+    }
+        
+    return true;
+}
+
+// Return true only if synchronous onXXX trigger exists and returned true -- meaning we can advance to next step
+static bool aquest_method_call(Scripting::Object *wrapper, MethodLabel &method, const char *fmt, va_list ap)
+{
+    WrapperBase *wrapperBase = get_wrapper(wrapper);
+
+    if (!wrapperBase)
+        return false;
+
+    if (method.trigPrefix == "on") {
+        Register rc;
+
+        if (!wrapperBase->vcall(rc, method.methodId, fmt, ap))
+            return false;
+
+        return rc.type != Register::NONE && rc.toBoolean();
+    }
+
+    if (method.trigPrefix == "post") {
+        wrapperBase->vpostpone(method.methodId, fmt, ap);
+    }
+
+    return false;
+}
+
+// Locate a MethodLabel structure for given step and stage (gotta love c++).
+static MethodLabel * aquest_method_for_step_and_stage(MethodsByStep &methodsByStep, int step, const DLString &stage)
+{
+    auto ms = methodsByStep.find(step);
+
+    if (ms != methodsByStep.end()) {
+        auto &methodsByStage = ms->second;
+        auto ss = methodsByStage.find(stage);
+        if (ss != methodsByStage.end())
+            return &ss->second;
+    }
+
+    return 0;
+}
+
+/** Main 'brains' for running Fenia triggers for area quests. Return true if at least one trigger on this mob/obj/room
+ * was successful.
+ */
+static bool aquest_trigger(Scripting::Object *wrapper, PCharacter *ch, const DLString &trigType, const char *fmt, va_list ap)
+{
+    bool calledOnce = false;
+    MethodsByQuest methodsForQuest = aquest_find_methods(wrapper, trigType);
+
+    // Handle all quests this player participates or can start participating in
+    for (auto mq: methodsForQuest) {
+        int questId = mq.first;
+        MethodsByStep &methodsByStep = mq.second;
+
+        // Find corresponding area quest structure.
+        AreaQuest *q = get_area_quest(questId);
+        if (!q) {
+            LogStream::sendError() << "AreaQuest: unknown quest id " << questId << " on " << wrapper->getId() << endl;
+            continue;
+        }
+
+        // Find (or create) quest info structure from player attributes, for this quest.
+        AreaQuestData &qdata = aquest_data(ch, questId);
+        int myStep = qdata.step;
+
+        // Check if this inactive quest can be started
+        if (!qdata.questActive()) {
+            // only limit participation on quest start - otherwise ch can grow out of quest between steps
+            if (!aquest_can_participate(ch, q, qdata)) 
+                continue;
+
+            myStep = 0;
+        }
+
+        // Anything happens for this mob/obj/room on our step?
+        MethodLabel *beginMethod = aquest_method_for_step_and_stage(methodsByStep, myStep, "begin");
+        MethodLabel *endMethod = aquest_method_for_step_and_stage(methodsByStep, myStep, "end");
+
+        // Only run begin trigger for new quest participants
+        if (beginMethod && !qdata.questActive()) {
+            aquest_method_call(wrapper, *beginMethod, fmt, ap);
+
+            qdata.start();
+
+            // Call global Fenia trigger to show hints about quest commands
+            gprog("onQuestStart", "CQ", ch, q);           
+            
+            calledOnce = true;
+            continue;
+        }
+
+        if (endMethod) {
+            // Call the end trigger to see if player has done what's needed to finish the step
+            bool stepEnded = aquest_method_call(wrapper, *endMethod, fmt, ap);
+
+			if (!stepEnded)
+				continue;
+
+            calledOnce = true;
+
+            // Call global Fenia trigger to distribute rewards
+            gprog("onQuestStepEnd", "CQi", ch, q, qdata.step); 
+
+			qdata.advance();
+
+			if (qdata.step >= q->steps.size()) {
+				qdata.complete();
+                // Call global Fenia trigger to say congrats etc
+                gprog("onQuestComplete", "CQ", ch, q);           
+                continue;
+            }
+
+            // Call matching post trigger type from the next step
+            MethodLabel *nextBeginMethod = aquest_method_for_step_and_stage(methodsByStep, qdata.step, "begin");
+            if (nextBeginMethod)
+                if (nextBeginMethod->trigType == trigType && nextBeginMethod->trigPrefix == "post")
+                    aquest_method_call(wrapper, *nextBeginMethod, fmt, ap);
+
+            // TODO add wiznet for all misfires and player progression throughout the quest
+
+            continue;
+        }
+
+        // Done with this quest for this player
+    }
+
+    return calledOnce;
+}
+
+
+/** Call all area quest triggers defined on mob for this trigType. */
+bool aquest_trigger(Character *mob, Character *ch, const DLString &trigType, const char *fmt, ...)
+{
+    // Call quest triggers on mobs, for players
+    if (!mob->is_npc() || ch->is_npc())
+        return false;
+
+    if (mob->getNPC()->pIndexData->wrapper == 0)
+        return false;
+
+    bool rc = false;
+    va_list ap;    
+
+    va_start(ap, fmt);
+    rc = aquest_trigger(mob->getNPC()->pIndexData->wrapper, ch->getPC(), trigType, fmt, ap);
+    va_end(ap);
+
+    return rc;
+}
+
+/** Call all area quest triggers defined on obj for this trigType. */
+bool aquest_trigger(::Object *obj, Character *ch, const DLString &trigType, const char *fmt, ...)
+{
+    // Call quest triggers for players
+    if (ch->is_npc())
+        return false;
+
+    if (obj->pIndexData->wrapper == 0)
+        return false;
+
+    bool rc = false;
+    va_list ap;    
+    
+    va_start(ap, fmt);
+    rc = aquest_trigger(obj->pIndexData->wrapper, ch->getPC(), trigType, fmt, ap);
+    va_end(ap);
+
+    return rc;
+}
+
+/** Call all area quest triggers defined on room for this trigType. */
+bool aquest_trigger(Room *room, Character *ch, const DLString &trigType, const char *fmt, ...)
+{
+    // Call quest triggers for players
+    if (ch->is_npc())
+        return false;
+
+    if (room->wrapper == 0)
+        return false;
+
+    bool rc = false;
+    va_list ap;    
+    
+    va_start(ap, fmt);
+    rc = aquest_trigger(room->wrapper, ch->getPC(), trigType, fmt, ap);
+    va_end(ap);
+
+    return rc;
+}
+

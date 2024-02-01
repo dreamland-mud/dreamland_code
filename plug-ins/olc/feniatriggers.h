@@ -78,7 +78,7 @@ protected:
         Character *ch, WrappedCommand *cmd, const DLString &methodName) const;
 
     vector<DLString> createQuestStepParams(
-        Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s) const;
+        Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s, const DLString &methodId) const;
 
     IndexTriggers indexTriggers;
 };

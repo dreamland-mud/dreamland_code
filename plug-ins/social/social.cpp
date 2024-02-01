@@ -18,7 +18,7 @@
 #include "object.h"
 #include "behavior_utils.h"
 #include "room.h"
-
+#include "areaquestutils.h"
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
@@ -229,6 +229,7 @@ bool Social::matches( const DLString& argument ) const
 
 static bool mprog_social( Character *ch, Character *actor, Character *victim, const char *social )
 {
+    aquest_trigger(ch, actor, "Social", "CCCs", ch, actor, victim, social);
     FENIA_CALL( ch, "Social", "CCs", actor, victim, social );
     FENIA_NDX_CALL( ch->getNPC( ), "Social", "CCCs", ch, actor, victim, social );
     BEHAVIOR_CALL( ch->getNPC( ), social, actor, victim, social );

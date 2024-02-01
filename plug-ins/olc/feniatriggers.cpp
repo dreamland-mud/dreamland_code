@@ -540,10 +540,11 @@ StringSet FeniaTriggerLoader::getQuestTriggers(const DLString &stepType) const
 }
 
 Register find_function(const DLString &type, const Integer &vnum, const DLString &trigName);
-bool trigger_is_active(Register method, AreaQuest *q);
+DLString aquest_method_id(AreaQuest *q, int step, bool isBegin, const DLString &trigName);
+
 
 vector<DLString> FeniaTriggerLoader::createQuestStepParams(
-    Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s) const
+    Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s, const DLString &methodId) const
 {
     std::vector<DLString> parms;
     const DLString indexType = "queststep";
@@ -556,7 +557,7 @@ vector<DLString> FeniaTriggerLoader::createQuestStepParams(
 
     parms.resize(2);
     tmpl.replaces("@vnum@", vnum);
-    tmpl.replaces("@trig@", trigName);
+    tmpl.replaces("@trig@", methodId);
     tmpl.replaces("@quest.vnum@", q->vnum.toString());
     tmpl.replaces("@quest.step@", s.toString());
     parms[1] = tmpl;
@@ -576,34 +577,9 @@ vector<DLString> FeniaTriggerLoader::createQuestStepParams(
                     pArea->area_file->file_name, 
                     type.c_str(),
                     vnum.c_str(),
-                    trigName.c_str());   
+                    methodId.c_str());   
 
     return parms;
-}
-
-// Strip first line and last non-empty lines, wrap in comments
-static DLString wrap_method_body_in_comments(const DLString &methodBody, const DLString &comment)
-{
-    StringList tmplLines;
-    ostringstream tbuf;
-
-    tmplLines.split(methodBody, "\n");
-
-    while (!tmplLines.empty() && tmplLines.back().stripWhiteSpace().empty()) {
-        tmplLines.pop_back();
-    }
-
-    if (tmplLines.size() <= 2)
-        return DLString::emptyString;
-
-    tbuf << endl << "/* " << endl << "// " << comment << endl;
-
-    for (unsigned int l = 1; l < tmplLines.size() - 1; l++)
-        tbuf << tmplLines[l] << endl;
-
-    tbuf << "*/" << endl;
-
-    return tbuf.str();
 }
 
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin)
@@ -613,40 +589,14 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer 
     DLString vnum = isBegin ? thisStep->beginValue : thisStep->endValue;
     DLString trigName = isBegin ? thisStep->beginTrigger : thisStep->endTrigger;
 
+    DLString methodId = aquest_method_id(q, s, isBegin, trigName);
     Register method = find_function(type, vnum, trigName);
 
     if (method.type == Register::NONE) {
         // No trigger defined yet, create new from a template
-        vector<DLString> parms = createQuestStepParams(ch, q, type, vnum, trigName, s);
+        vector<DLString> parms = createQuestStepParams(ch, q, type, vnum, trigName, s, methodId);
         if (parms.empty())
             return false;
-
-        // Open the editor.
-        ch->desc->writeWSCommand("cs_edit", parms);
-        ch->pecho("Запускаю веб-редактор для шага %d квеста %d, триггер %s.\r\n", 
-                    s.getValue(), q->vnum.getValue(), trigName.c_str());
-        return true;
-
-    } else if (!trigger_is_active(method, q)) {
-        // Some other trigger already exists, add template as a coment at the end and open
-        DLString tmpl;
-        DLString comment = "Template for step " + s.toString() + " of quest " + q->vnum.toString();
-
-        Scripting::CodeSourceRef csRef = method.toFunction()->getFunction()->source;
-
-        // Only add new section once.
-        if (csRef.source->content.find(comment) == DLString::npos) {
-            vector<DLString> newParams = createQuestStepParams(ch, q, type, vnum, trigName, s);
-            if (!newParams.empty()) {
-                tmpl = wrap_method_body_in_comments(newParams[1], comment);
-            }
-        }
-
-        // Construct cs_edit arguments: subject, editor content (plus the template) and line number.
-        std::vector<DLString> parms(3);
-        parms[0] = csRef.source->name;
-        parms[1] = csRef.source->content + tmpl;
-        parms[2] = csRef.line; 
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);

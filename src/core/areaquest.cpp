@@ -1,9 +1,12 @@
 #include "areaquest.h"
 #include "fenia/exceptions.h"
+#include "idcontainer.h"
 #include "merc.h"
 #include "def.h"
 
 map<int, AreaQuest *> areaQuests;
+
+using namespace Scripting;
 
 AreaQuest::AreaQuest()
     : flags(0, &areaquest_flags), 
@@ -33,4 +36,17 @@ QuestStep::QuestStep()
 QuestStep::~QuestStep()
 {
     
+}
+
+Scripting::Register QuestStep::toRegister() const
+{
+    Register stepReg = Register::handler<IdContainer>();
+    IdContainer *step = stepReg.toHandler().getDynamicPointer<IdContainer>();
+    step->setField(IdRef("rewardQp"), (int)rewardQp);
+    step->setField(IdRef("rewardGold"), (int)rewardGold);
+    step->setField(IdRef("rewardExp"), (int)rewardExp);
+    step->setField(IdRef("rewardVnum"), (int)rewardVnum);
+    step->setField(IdRef("info"), info);
+    return stepReg;    
+
 }
