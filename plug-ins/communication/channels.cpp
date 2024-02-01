@@ -17,7 +17,7 @@
 #include "object.h"
 #include "room.h"
 #include "commandmanager.h"
-
+#include "areaquestutils.h"
 #include "act.h"
 #include "mercdb.h"
 #include "infonet.h"
@@ -182,6 +182,7 @@ static void rprog_speech( Room *room, Character *ch, const char *msg )
 static bool mprog_speech( Character *rch, Character *talker, const char *msg )
 {
     if (IS_AWAKE(rch)) {
+        aquest_trigger(rch, talker, "Speech", "CCs", rch, talker, msg);
         FENIA_CALL( rch, "Speech", "Cs", talker, msg );
         FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
         BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );
@@ -191,6 +192,7 @@ static bool mprog_speech( Character *rch, Character *talker, const char *msg )
 
 static bool oprog_speech( Object *obj, Character *talker, const char *msg )
 {
+    aquest_trigger(obj, talker, "Speech", "OCs", obj, talker, msg);
     FENIA_CALL( obj, "Speech", "Cs", talker, msg );
     FENIA_NDX_CALL( obj, "Speech", "OCs", obj, talker, msg );
     BEHAVIOR_VOID_CALL( obj, speech, talker, msg );

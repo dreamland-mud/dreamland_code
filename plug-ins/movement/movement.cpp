@@ -11,6 +11,7 @@
 #include "register-impl.h"
 #include "lex.h"
 
+#include "areaquestutils.h"
 #include "behavior_utils.h"
 #include "affecthandler.h"
 #include "skillmanager.h"
@@ -145,6 +146,7 @@ static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const
 
 static bool mprog_greet( Character *rch, Character *walker )
 {
+    aquest_trigger(rch, walker, "Greet", "CC", rch, walker);
     FENIA_CALL( rch, "Greet", "C", walker );
     FENIA_NDX_CALL( rch->getNPC( ), "Greet", "CC", rch, walker );
     BEHAVIOR_VOID_CALL( rch->getNPC( ), greet, walker );
@@ -153,6 +155,7 @@ static bool mprog_greet( Character *rch, Character *walker )
 
 static bool oprog_greet( Object *obj, Character *walker )
 {
+    aquest_trigger(obj, walker, "Greet", "OC", obj, walker);
     FENIA_CALL( obj, "Greet", "C", walker );
     FENIA_NDX_CALL( obj, "Greet", "OC", obj, walker );
     BEHAVIOR_VOID_CALL( obj, greet, walker );
@@ -160,7 +163,7 @@ static bool oprog_greet( Object *obj, Character *walker )
 }
 
 static bool oprog_entry( Object *obj )
-{
+{    
     FENIA_CALL( obj, "Entry", "" );
     FENIA_NDX_CALL( obj, "Entry", "O", obj );
     BEHAVIOR_VOID_CALL( obj, entry );
@@ -202,6 +205,7 @@ void Movement::callProgs( Character *wch )
 
 static void rprog_greet( Room *to_room, Character *ch, Room *from_room, const char *movetype )
 {
+    aquest_trigger(to_room, ch, "Greet", "CRs", ch, from_room, movetype );
     FENIA_VOID_CALL( to_room, "Greet", "CRs", ch, from_room, movetype );
 }
 

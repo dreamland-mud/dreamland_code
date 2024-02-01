@@ -42,6 +42,9 @@ DLString Integer::toString( ) const
 
 bool Integer::tryParse(Integer &target, const DLString &value)
 {
+    if (!value.isNumber())
+        return false;
+        
     try {
         target.fromString(value);
     } catch (const ExceptionBadType &ex) {

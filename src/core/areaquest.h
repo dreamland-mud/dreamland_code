@@ -25,6 +25,8 @@ public:
     QuestStep();
     virtual ~QuestStep();
 
+    Scripting::Register toRegister() const;
+
     // What starts the step: mob/item/room.
     XML_VARIABLE XMLString beginType;
     // Vnum of mob/item/room that starts the step.
@@ -41,6 +43,9 @@ public:
 
     // 'quest info' output for this step
     XML_VARIABLE XMLString info; 
+
+    // step rewards or 0
+    XML_VARIABLE XMLInteger rewardGold, rewardQp, rewardExp, rewardVnum;
 };
 
 /**
@@ -66,6 +71,8 @@ public:
     XML_VARIABLE XMLInteger limitPerLife;
     XML_VARIABLE XMLVectorBase<QuestStep::XMLPointer> steps;
     XML_VARIABLE XMLFlagsNoEmpty flags;
+    // Which quest needs to be done before this one
+    XML_VARIABLE XMLInteger prereq;
 
     AreaIndexData *pAreaIndex;
 };
