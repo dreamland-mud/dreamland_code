@@ -39,10 +39,13 @@ areautils.cpp \
 roomutils.cpp \
 itemutils.cpp \
 charutils.cpp \
-religionutils.cpp
+religionutils.cpp \
+areaquestutils.cpp \
+xmlattributeareaquest.cpp
 
 libloadsave_la_MOC = \
-objectbehaviormanager.h
+objectbehaviormanager.h \
+xmlattributeareaquest.h
 
 libloadsave_la_LIBADD = \
 ../descriptor/libdescriptor.la \

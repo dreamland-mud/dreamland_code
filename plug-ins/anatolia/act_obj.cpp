@@ -78,6 +78,7 @@
 #include "mercdb.h"
 #include "act.h"
 #include "interp.h"
+#include "areaquestutils.h"
 
 #include "stats_apply.h"
 #include "damageflags.h"
@@ -223,6 +224,7 @@ static bool oprog_get_money( Character *ch, Object *obj )
 
 bool oprog_get( Object *obj, Character *ch )
 {
+    aquest_trigger(obj, ch, "Get", "OC", obj, ch);
     FENIA_CALL( obj, "Get", "C", ch );
     FENIA_NDX_CALL( obj, "Get", "OC", obj, ch );
     BEHAVIOR_VOID_CALL( obj, get, ch );
@@ -1338,6 +1340,14 @@ CMDRUNP( drop )
 #define GIVE_MODE_PRESENT 1
 bool omprog_give( Object *obj, Character *ch, Character *victim )
 {
+    aquest_trigger(obj, ch, "Give", "OCC", obj, ch, victim);
+    if (obj->carried_by != victim)
+        return true;
+
+    aquest_trigger(victim, ch, "Give", "CCO", victim, ch, obj);
+    if (obj->carried_by != victim)
+        return true;
+
     FENIA_CALL( obj, "Give", "CC", ch, victim )
     if (obj->carried_by != victim)
         return true;
@@ -1641,6 +1651,7 @@ CMDRUNP( vomit )
  */
 static bool oprog_use( Object *obj, Character *ch, const char *argument )
 {
+    aquest_trigger(obj, ch, "Use", "OCs", obj, ch, argument);
     FENIA_CALL( obj, "Use", "Cs", ch, argument );
     FENIA_NDX_CALL( obj, "Use", "OCs", obj, ch, argument );
     BEHAVIOR_CALL( obj, use, ch, argument );

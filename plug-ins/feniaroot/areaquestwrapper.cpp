@@ -112,6 +112,20 @@ NMI_GET( AreaQuestWrapper, flags, "флаги квеста (таблица .tabl
     return Register((int)target->flags);
 }
 
+static int args2queststep(AreaQuest *q, const RegisterList &args)
+{
+    int step = argnum2number(args, 1);
+    if (step < 0 || step > q->steps.size())
+        throw Scripting::IndexOutOfBoundsException();
+    return step;
+}
+
+NMI_INVOKE( AreaQuestWrapper, step, "(num): структура шага квеста по номеру" ) 
+{
+    checkTarget();
+    int step = args2queststep(target, args);
+    return target->steps[step]->toRegister();
+}
 
 NMI_INVOKE( AreaQuestWrapper, api, "(): печатает этот API" )
 {

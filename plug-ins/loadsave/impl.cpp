@@ -9,6 +9,8 @@
 #include "mobilebehaviorplugin.h"
 #include "pcharactermanager.h"
 #include "objectbehaviormanager.h"
+#include "xmlattributeareaquest.h"
+#include "xmlattributeplugin.h"
 
 #include "save.h"
 #include "merc.h"
@@ -80,7 +82,8 @@ extern "C" {
         Plugin::registerPlugin<DropsLoadTask>( ppl );
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<BasicObjectBehavior> >(ppl);
-        
+        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeAreaQuest> >( ppl );
+
         return ppl;
     }
 }

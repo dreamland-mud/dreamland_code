@@ -73,19 +73,27 @@ get_wrapper(Scripting::Object *obj)
 
 void WrapperBase::postpone( Register id, const char *fmt, ... )
 {
-    RegisterList progArgs;
-    Register progFun;
     va_list ap;
 
-    if (!triggerFunction(id, progFun))
-        return;
-    
     va_start(ap, fmt);
-    triggerArgs(progArgs, fmt, ap);
+    vpostpone(id, fmt, ap);
     va_end(ap);
+}
+
+bool WrapperBase::vpostpone( Register id, const char *fmt, va_list ap)
+{
+    RegisterList progArgs;
+    Register progFun;
+
+    if (!triggerFunction(id, progFun))
+        return false;
+    
+    triggerArgs(progArgs, fmt, ap);
 
     postpone(progFun, progArgs);
+    return true;
 }
+
 
 void WrapperBase::postpone(const Register &progFun, const RegisterList &progArgs)
 {
@@ -142,6 +150,12 @@ void WrapperBase::triggerArgs( RegisterList &regList, const char *fmt, va_list a
                     FeniaManager::wrapperManager->getWrapper( 
                             va_arg( ap, Affect* ) ) );
             break;
+
+        case 'Q':
+            regList.push_back(
+                    FeniaManager::wrapperManager->getWrapper(
+                            va_arg(ap, AreaQuest *) ) );
+            break;                    
 
         case 's':
             regList.push_back( Register( va_arg( ap, char * ) ) );

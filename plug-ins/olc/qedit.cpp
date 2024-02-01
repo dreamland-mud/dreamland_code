@@ -10,6 +10,7 @@
 #include "pcharacter.h"
 #include "room.h"
 
+#include "areaquestutils.h"
 #include "websocketrpc.h"
 #include "arg_utils.h"
 #include "interp.h"
@@ -169,49 +170,75 @@ Register find_function(const DLString &type, const Integer &vnum, const DLString
     return retval;
 }
 
-// Checks method body for quoted quest ID - as a hint that it's a quest trigger
-bool trigger_is_active(Register method, AreaQuest *q)
+DLString aquest_method_id(AreaQuest *q, int step, bool isBegin, const DLString &trigName)
 {
+    ostringstream buf;
+
+    buf << "q" << q->vnum << "_step" << step << "_" << (isBegin ? "begin" : "end") << "_" << trigName;
+    return buf.str();
+}
+
+static void show_active_triggers(PCharacter *ch, ostringstream& buf, const Integer &s, const DLString &methodId,
+                                    const DLString &type, const DLString &vnum, bool isBegin)
+{
+    Register method = find_function(type, vnum, methodId);
+
     if (method.type == Register::NONE)
-        return false;
-
-    DLString methodBody = method.repr();
-    if (methodBody.find("\"" + q->vnum.toString() + "\"") == DLString::npos)
-        return false;
-
-    return true;
-}
-
-static DLString cs_label(const DLString &type, const Integer &vnum, const DLString &trigName) 
-{
-    return type + "/" + vnum.toString() + "/" + trigName;
-}
-
-static void show_active_triggers(PCharacter *ch, ostringstream& buf, AreaQuest *q, const DLString &type, const Integer &vnum, const DLString &trigName)
-{
-    Register method = find_function(type, vnum, trigName);
-
-    if (!trigger_is_active(method, q))
         return;
 
     const CodeSource::Pointer &cs = method.toFunction()->getFunction()->source.source;
 
     DLString cmd = "cs web " + DLString(cs->getId());
-    DLString seeFmt = cs_label(type, vnum, trigName);
+    DLString seeFmt = methodId;
     buf << "{g" << web_cmd(ch, cmd, seeFmt) << "{w ";
 }
 
-static void show_available_triggers(PCharacter *ch, ostringstream& buf, AreaQuest *q, const DLString &type, 
-                                    const Integer &vnum, const DLString &trigName, const Integer &step, bool isBegin)
-{
-    Register method = find_function(type, vnum, trigName);
 
-    if (trigger_is_active(method, q))
+static void show_available_triggers(PCharacter *ch, ostringstream& buf, const Integer &s, const DLString &methodId,
+                                    const DLString &type, const DLString &vnum, bool isBegin)
+{
+    Register method = find_function(type, vnum, methodId);
+
+    if (method.type == Register::FUNCTION)
         return;
 
-    DLString cmd = "step " + step.toString() + " " + (isBegin ? "begin" : "end") + " fenia";
-    DLString seeFmt = cs_label(type, vnum, trigName);
+    DLString cmd = "step " + s.toString() + " " + (isBegin ? "begin" : "end") + " fenia";
+    DLString seeFmt = methodId;
     buf << "{W" << web_cmd(ch, cmd, seeFmt) << "{w ";
+}
+
+static DLString aquest_title(const Integer &questId)
+{
+    if (questId == 0)
+        return DLString::emptyString;
+
+    AreaQuest *q = get_area_quest(questId.toString());
+    if (q)
+        return q->title;
+
+    return "{Rне найден{x";
+}
+
+static DLString show_step_reward(PCharacter *ch, const QuestStep::Pointer &step)
+{
+    ostringstream buf;
+
+    buf << step->rewardExp << " опыта, " << step->rewardGold << " золота, " 
+        << step->rewardQp << " кп, предмет ";
+
+    if (step->rewardVnum == 0) {
+        buf << step->rewardVnum;
+
+    } else if (step->rewardVnum > 0) {
+        OBJ_INDEX_DATA *pObj = get_obj_index(step->rewardVnum);
+        if (!pObj)
+            buf << step->rewardVnum << " {Rне найден{x";
+        else
+            buf << "{w[{W" << web_cmd(ch, "oedit $1", step->rewardVnum.toString()) << "{w] "
+                << russian_case(pObj->short_descr, '1');
+    }
+
+    return buf.str();
 }
 
 void OLCStateAreaQuest::show( PCharacter *ch )
@@ -232,6 +259,8 @@ void OLCStateAreaQuest::show( PCharacter *ch )
     ptc(ch, "Макс. уровень: {c%d {D(maxlevel){x\r\n", q->maxLevel.getValue());
     ptc(ch, "Раз за жизнь:  {c%d {D(perlife){x\r\n", q->limitPerLife.getValue());
     ptc(ch, "Флаги:         {c%s {D(flags){x\r\n", q->flags.names().c_str());
+    ptc(ch, "Предыдущий:    {c%d{x %s {D(prereq){x\r\n", 
+             q->prereq.getValue(), aquest_title(q->prereq).c_str());
 
     {
         ostringstream buf;
@@ -253,21 +282,25 @@ void OLCStateAreaQuest::show( PCharacter *ch )
             buf << "{D[" << web_cmd(ch, "step  " + stepNum + " down", "вниз") << "]{w ";
 
         buf << endl
-            << "{WИнфо{w:   " << step->info << " " << web_edit_button(ch, "step " + stepNum + " info", "web") << endl
-            << "{WНачало{w: тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
+            << "{WИнфо{w:    " << step->info << " " << web_edit_button(ch, "step " + stepNum + " info", "web") << endl
+            << "{WНаграда{w: " << show_step_reward(ch, step) << endl
+            << "{WНачало{w:  тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
             << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
             << show_step_target(ch, step->beginType, step->beginValue)
             << endl;
 
-        buf << "{WКонец{w:  тип " << menu_step_type(s, step->endType, "end") << "{w, "
+        buf << "{WКонец{w:   тип " << menu_step_type(s, step->endType, "end") << "{w, "
             << "триггер " << menu_step_trigger(s, step->endType, step->endTrigger, "end") << "{w, "
             << show_step_target(ch, step->endType, step->endValue)
             << endl;
 
+        DLString beginMethodId = aquest_method_id(q, s, true, step->beginTrigger);
+        DLString endMethodId = aquest_method_id(q, s, false, step->endTrigger);
+
         {
             ostringstream trigBuf;            
-            show_active_triggers(ch, trigBuf, q, step->beginType, step->beginValue, step->beginTrigger);
-            show_active_triggers(ch, trigBuf, q, step->endType, step->endValue, step->endTrigger);
+            show_active_triggers(ch, trigBuf, s, beginMethodId, step->beginType, step->beginValue, true);
+            show_active_triggers(ch, trigBuf, s, endMethodId, step->endType, step->endValue, false);
 
             if (!trigBuf.str().empty())
                 buf << "{gУстановлены{x: " << trigBuf.str() << endl;
@@ -275,8 +308,8 @@ void OLCStateAreaQuest::show( PCharacter *ch )
 
         {
             ostringstream trigBuf;            
-            show_available_triggers(ch, trigBuf, q, step->beginType, step->beginValue, step->beginTrigger, s, true);
-            show_available_triggers(ch, trigBuf, q, step->endType, step->endValue, step->endTrigger, s, false);
+            show_available_triggers(ch, trigBuf, s, beginMethodId, step->beginType, step->beginValue, true);
+            show_available_triggers(ch, trigBuf, s, endMethodId, step->endType, step->endValue, false);
 
             if (!trigBuf.str().empty())
                 buf << "{WДоступны{x:    " << trigBuf.str() << endl;
@@ -297,6 +330,7 @@ static void qedit_step_usage(PCharacter *ch)
     ch->pecho("step <num> begin|end trigger <onXXX> - задать название тригера для начала или завершения шага");
     ch->pecho("step <num> begin|end fenia - открыть редактор феневого сценария");
     ch->pecho("step <num> info <строка> - установить описание шага, видное по 'квест инфо'");
+    ch->pecho("step <num> qp|gold|exp|item <число> - награда за выполнение шага в кп/золоте/экспе или внум предмета");
     ch->pecho("step <num> up  - передвинуть шаг выше");
     ch->pecho("step <num> down - передвинуть шаг ниже");
     ch->pecho("step <num> del - удалить шаг");
@@ -414,6 +448,38 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     // 'step 3 paste'
     if (arg_is_paste(cmd)) {
         editorPaste(thisStep->info, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+        return true;
+    }
+
+    // 'step 3 qp <num>'
+    if (arg_oneof(cmd, "qp", "кп")) {
+        Integer::tryParse(thisStep->rewardQp, args);
+        ch->pecho("Награда за шаг %d установлена в %d qp.", 
+                   step.getValue(), thisStep->rewardQp.getValue());
+        return true;
+    }
+
+    // 'step 3 gold <num>'
+    if (arg_oneof(cmd, "gold", "золото")) {
+        Integer::tryParse(thisStep->rewardGold, args);
+        ch->pecho("Награда за шаг %d установлена в %d золота.", 
+                   step.getValue(), thisStep->rewardGold.getValue());
+        return true;
+    }
+
+    // 'step 3 exp <num>'
+    if (arg_oneof(cmd, "exp", "экспа", "опыт")) {
+        Integer::tryParse(thisStep->rewardExp, args);
+        ch->pecho("Награда за шаг %d установлена в %d опыта.", 
+                   step.getValue(), thisStep->rewardExp.getValue());
+        return true;
+    }
+
+    // 'step 3 vnum <num>'
+    if (arg_oneof(cmd, "item", "vnum", "предмет", "внум")) {
+        Integer::tryParse(thisStep->rewardVnum, args);
+        ch->pecho("Награда за шаг %d установлена в предмет %d.", 
+                   step.getValue(), thisStep->rewardVnum.getValue());
         return true;
     }
 
@@ -547,6 +613,31 @@ AQEDIT(flags, "флаги", "флаги квеста (? areaquest_flags)")
     return flagBitsEdit(getOriginal()->flags);
 }
 
+AQEDIT(prereq, "предыдущий", "номер предыдущего квест в цепочке")
+{
+    AreaQuest *q = getOriginal();
+    Integer prereqId;
+
+    numberEdit(0, 900000, prereqId);
+
+    if (prereqId == 0) {
+        ch->pecho("Предыдущий квест очищен.");
+        q->prereq.setValue(prereqId);
+        return true;
+    }
+
+    AreaQuest *prereq = get_area_quest(prereqId);
+
+    if (!prereq) {
+        ch->pecho("Квест с номером %d не существует.", prereqId.getValue());
+        return false;
+    }
+    
+    ch->pecho("Предыдущий квест в цепочке теперь [%d] %s.", prereqId.getValue(), prereq->title.c_str());
+    q->prereq.setValue(prereqId);
+    return true;
+}
+
 
 AQEDIT(show, "показать", "показать все поля")
 {
@@ -609,9 +700,9 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
             return;
         }
 
-        OLCStateAreaQuest::Pointer ce(NEW, q->second);
-        ce->attach(ch);
-        ce->show(ch);
+        OLCStateAreaQuest::Pointer qe(NEW, q->second);
+        qe->attach(ch);
+        qe->show(ch);
         return;
     }
 
