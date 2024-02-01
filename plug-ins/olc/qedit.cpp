@@ -241,6 +241,67 @@ static DLString show_step_reward(PCharacter *ch, const QuestStep::Pointer &step)
     return buf.str();
 }
 
+static void show_step(PCharacter *ch, AreaQuest *q, int s)
+{
+    ostringstream buf;
+    auto &step = q->steps[s];
+    DLString stepNum(s);
+
+    buf << endl
+        << "{CШаг " << s << "{x   ";
+        
+    if (s > 0)
+        buf << "{D[" << web_cmd(ch, "step " + stepNum + " up", "вверх") << "]{w ";
+    if (s != q->steps.size() - 1)
+        buf << "{D[" << web_cmd(ch, "step  " + stepNum + " down", "вниз") << "]{w ";
+
+    buf << endl
+        << "{WИнфо{w:    " << step->info << " " << web_edit_button(ch, "step " + stepNum + " info", "web") << endl
+        << "{WНаграда{w: " << show_step_reward(ch, step) << endl
+        << "{WНачало{w:  тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
+        << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
+        << show_step_target(ch, step->beginType, step->beginValue)
+        << endl;
+
+    buf << "{WКонец{w:   тип " << menu_step_type(s, step->endType, "end") << "{w, "
+        << "триггер " << menu_step_trigger(s, step->endType, step->endTrigger, "end") << "{w, "
+        << show_step_target(ch, step->endType, step->endValue)
+        << endl;
+
+    DLString beginMethodId = aquest_method_id(q, s, true, step->beginTrigger);
+    DLString endMethodId = aquest_method_id(q, s, false, step->endTrigger);
+
+    {
+        ostringstream trigBuf;            
+        show_active_triggers(ch, trigBuf, s, beginMethodId, step->beginType, step->beginValue, true);
+        show_active_triggers(ch, trigBuf, s, endMethodId, step->endType, step->endValue, false);
+
+        if (!trigBuf.str().empty())
+            buf << "{gУстановлены{x: " << trigBuf.str() << endl;
+    }
+
+    {
+        ostringstream trigBuf;            
+        show_available_triggers(ch, trigBuf, s, beginMethodId, step->beginType, step->beginValue, true);
+        show_available_triggers(ch, trigBuf, s, endMethodId, step->endType, step->endValue, false);
+
+        if (!trigBuf.str().empty())
+            buf << "{WДоступны{x:    " << trigBuf.str() << endl;
+    }
+
+    ch->send_to(buf);
+}
+
+static void show_steps(PCharacter *ch, AreaQuest *q)
+{
+    ostringstream buf;
+    buf <<  "{CШаги{w:          [{y" << web_cmd(ch, "step add", "добавить") << "{w] {D(step help){x" << endl;
+    ch->send_to(buf);
+
+    for (unsigned int s = 0; s < q->steps.size(); s++)
+        show_step(ch, q, s);
+}
+
 void OLCStateAreaQuest::show( PCharacter *ch )
 {
     AreaQuest *q = getOriginal();
@@ -262,61 +323,7 @@ void OLCStateAreaQuest::show( PCharacter *ch )
     ptc(ch, "Предыдущий:    {c%d{x %s {D(prereq){x\r\n", 
              q->prereq.getValue(), aquest_title(q->prereq).c_str());
 
-    {
-        ostringstream buf;
-        buf <<  "{CШаги{w:          [{y" << web_cmd(ch, "step add", "добавить") << "{w] {D(step help){x" << endl;
-        ch->send_to(buf);
-    }
-
-    for (unsigned int s = 0; s < q->steps.size(); s++) {
-        ostringstream buf;
-        auto &step = q->steps[s];
-        DLString stepNum(s);
-
-        buf << endl
-            << "{CШаг " << s << "{x   ";
-            
-        if (s > 0)
-            buf << "{D[" << web_cmd(ch, "step " + stepNum + " up", "вверх") << "]{w ";
-        if (s != q->steps.size() - 1)
-            buf << "{D[" << web_cmd(ch, "step  " + stepNum + " down", "вниз") << "]{w ";
-
-        buf << endl
-            << "{WИнфо{w:    " << step->info << " " << web_edit_button(ch, "step " + stepNum + " info", "web") << endl
-            << "{WНаграда{w: " << show_step_reward(ch, step) << endl
-            << "{WНачало{w:  тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
-            << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
-            << show_step_target(ch, step->beginType, step->beginValue)
-            << endl;
-
-        buf << "{WКонец{w:   тип " << menu_step_type(s, step->endType, "end") << "{w, "
-            << "триггер " << menu_step_trigger(s, step->endType, step->endTrigger, "end") << "{w, "
-            << show_step_target(ch, step->endType, step->endValue)
-            << endl;
-
-        DLString beginMethodId = aquest_method_id(q, s, true, step->beginTrigger);
-        DLString endMethodId = aquest_method_id(q, s, false, step->endTrigger);
-
-        {
-            ostringstream trigBuf;            
-            show_active_triggers(ch, trigBuf, s, beginMethodId, step->beginType, step->beginValue, true);
-            show_active_triggers(ch, trigBuf, s, endMethodId, step->endType, step->endValue, false);
-
-            if (!trigBuf.str().empty())
-                buf << "{gУстановлены{x: " << trigBuf.str() << endl;
-        }
-
-        {
-            ostringstream trigBuf;            
-            show_available_triggers(ch, trigBuf, s, beginMethodId, step->beginType, step->beginValue, true);
-            show_available_triggers(ch, trigBuf, s, endMethodId, step->endType, step->endValue, false);
-
-            if (!trigBuf.str().empty())
-                buf << "{WДоступны{x:    " << trigBuf.str() << endl;
-        }
-
-        ch->send_to(buf);
-    }
+    show_steps(ch, q);
 
     ptc(ch, "\r\nКоманды: {y{hcstep help{x, {y{hccommands{x, {y{hcshow{x, {y{hcdone{x\r\n");
 }
@@ -334,12 +341,6 @@ static void qedit_step_usage(PCharacter *ch)
     ch->pecho("step <num> up  - передвинуть шаг выше");
     ch->pecho("step <num> down - передвинуть шаг ниже");
     ch->pecho("step <num> del - удалить шаг");
-}
-
-bool OLCStateAreaQuest::parseQuestVnum(PCharacter *ch, const DLString &arg, Integer &vnum)
-{
-    return false;
-
 }
 
 bool OLCStateAreaQuest::parseStepNumber(PCharacter *ch, const DLString &arg, Integer &step)
@@ -391,6 +392,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 
         q->steps.push_back(newStep);
         ch->pecho("Добавлен новый шаг с настройками по умолчанию.");
+        show_steps(ch, q);
         return true;
     }
 
@@ -406,6 +408,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         q->steps.erase(q->steps.begin() + step);
         ch->pecho("Шаг %d удален. Не забудь почистить старые тригера ({y{hccs search %d{x).", 
                   step.getValue(), q->vnum.getValue());
+        show_steps(ch, q);
         return true;
     }
 
@@ -418,6 +421,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 
         std::swap(q->steps[step-1], q->steps[step]);
         ch->pecho("Шаги %d и %d поменялись местами.", step.getValue(), (int)step-1);
+        show_steps(ch, q);
         return true;
     }
 
@@ -430,6 +434,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 
         std::swap(q->steps[step], q->steps[step+1]);
         ch->pecho("Шаги %d и %d поменялись местами.", step.getValue(), (int)step+1);
+        show_steps(ch, q);
         return true;
     }
 
@@ -448,6 +453,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     // 'step 3 paste'
     if (arg_is_paste(cmd)) {
         editorPaste(thisStep->info, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+        show_step(ch, q, step);
         return true;
     }
 
@@ -456,6 +462,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         Integer::tryParse(thisStep->rewardQp, args);
         ch->pecho("Награда за шаг %d установлена в %d qp.", 
                    step.getValue(), thisStep->rewardQp.getValue());
+        show_step(ch, q, step);
         return true;
     }
 
@@ -464,6 +471,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         Integer::tryParse(thisStep->rewardGold, args);
         ch->pecho("Награда за шаг %d установлена в %d золота.", 
                    step.getValue(), thisStep->rewardGold.getValue());
+        show_step(ch, q, step);
         return true;
     }
 
@@ -472,6 +480,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         Integer::tryParse(thisStep->rewardExp, args);
         ch->pecho("Награда за шаг %d установлена в %d опыта.", 
                    step.getValue(), thisStep->rewardExp.getValue());
+        show_step(ch, q, step);
         return true;
     }
 
@@ -480,6 +489,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         Integer::tryParse(thisStep->rewardVnum, args);
         ch->pecho("Награда за шаг %d установлена в предмет %d.", 
                    step.getValue(), thisStep->rewardVnum.getValue());
+        show_step(ch, q, step);
         return true;
     }
 
@@ -523,6 +533,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             ch->pecho("Концу шага %d присвоен тип %s.", step.getValue(), type.c_str());
         }
 
+        show_step(ch, q, step);
         return true;
     }
 
@@ -542,6 +553,8 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             thisStep->endValue = vnum.toString();
             ch->pecho("Концу шага %d присвоен vnum %d.", step.getValue(), vnum.getValue());
         }
+
+        show_step(ch, q, step);
         return true;
     }
 
@@ -563,7 +576,8 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             thisStep->endTrigger = trigName;
             ch->pecho("Концу шага %d присвоен триггер %s.", step.getValue(), trigName.c_str());
         }
-         
+        
+        show_step(ch, q, step);         
         return true;
     }
 

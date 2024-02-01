@@ -30,9 +30,8 @@ private:
     virtual void statePrompt( Descriptor * );
 
     AreaQuest *getOriginal();
-    bool parseQuestVnum(PCharacter *ch, const DLString &arg, Integer &vnum);
     bool parseStepNumber(PCharacter *ch, const DLString &arg, Integer &step);
-
+    
     XML_VARIABLE XMLBoolean isChanged;
 };
 
