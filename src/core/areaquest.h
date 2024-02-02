@@ -7,6 +7,8 @@
 #include "xmllist.h"
 #include "xmlvector.h"
 #include "xmlflags.h"
+#include "xmlboolean.h"
+#include "xmlglobalbitvector.h"
 #include "wrappertarget.h"
 #include "xmlpointer.h"
 
@@ -69,10 +71,17 @@ public:
     XML_VARIABLE XMLString description;
     XML_VARIABLE XMLInteger minLevel, maxLevel;
     XML_VARIABLE XMLInteger limitPerLife;
+    XML_VARIABLE XMLBoolean oncePerDay;
     XML_VARIABLE XMLVectorBase<QuestStep::XMLPointer> steps;
     XML_VARIABLE XMLFlagsNoEmpty flags;
     // Which quest needs to be done before this one
     XML_VARIABLE XMLInteger prereq;
+    // Align restrictions for player
+    XML_VARIABLE XMLFlags align;
+    // Hometown restrictions for player
+    XML_VARIABLE XMLGlobalBitvector hometowns;
+    // Class restrictions for player
+    XML_VARIABLE XMLGlobalBitvector classes;
 
     AreaIndexData *pAreaIndex;
 };

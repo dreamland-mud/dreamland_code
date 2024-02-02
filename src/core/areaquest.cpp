@@ -1,6 +1,8 @@
 #include "areaquest.h"
 #include "fenia/exceptions.h"
 #include "idcontainer.h"
+#include "hometown.h"
+#include "profession.h"
 #include "merc.h"
 #include "def.h"
 
@@ -10,6 +12,9 @@ using namespace Scripting;
 
 AreaQuest::AreaQuest()
     : flags(0, &areaquest_flags), 
+      align(0, &align_flags),
+      hometowns(hometownManager),
+      classes(professionManager),
       pAreaIndex(0)
 {
 

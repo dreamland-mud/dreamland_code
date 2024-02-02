@@ -1162,12 +1162,12 @@ NMI_GET( ReligionWrapper, flags, "флаги религий (таблица .tab
     return Register((int)getTarget()->flags.getValue());
 }
 
-NMI_GET( ReligionWrapper, align, "разрешенные натуры или пустая строка (таблица .tables.align_table)" ) 
+NMI_GET( ReligionWrapper, align, "разрешенные натуры или 0 (таблица .tables.align_flags)" ) 
 {
     return Register((int)getTarget()->align.getValue());
 }
 
-NMI_GET( ReligionWrapper, ethos, "разрешенные этосы или пустая строка (таблица .tables.ethos_table)" ) 
+NMI_GET( ReligionWrapper, ethos, "разрешенные этосы или 0 (таблица .tables.ethos_table)" ) 
 {
     return Register((int)getTarget()->ethos.getValue());
 }

@@ -318,7 +318,14 @@ void OLCStateAreaQuest::show( PCharacter *ch )
             q->description.c_str());
     ptc(ch, "Мин. уровень:  {c%d {D(minlevel){x\r\n", q->minLevel.getValue());
     ptc(ch, "Макс. уровень: {c%d {D(maxlevel){x\r\n", q->maxLevel.getValue());
+    ptc(ch, "Натура:        {c%s{x {D(? align){x\r\n",
+        q->align.getValue() != 0 ? q->align.names().c_str() : "-");
+    ptc(ch, "Классы:        {c%s{x {D(? classes){x\r\n",
+            q->classes.empty() ? "-": q->classes.toString().c_str());
+    ptc(ch, "Города:        {c%s{x {D(? hometowns){x\r\n",
+            q->hometowns.empty() ? "-": q->hometowns.toString().c_str());
     ptc(ch, "Раз за жизнь:  {c%d {D(perlife){x\r\n", q->limitPerLife.getValue());
+    ptc(ch, "Раз в день:    {c%s {D(perday){x\r\n", (q->oncePerDay ? "да" : "нет"));
     ptc(ch, "Флаги:         {c%s {D(flags){x\r\n", q->flags.names().c_str());
     ptc(ch, "Предыдущий:    {c%d{x %s {D(prereq){x\r\n", 
              q->prereq.getValue(), aquest_title(q->prereq).c_str());
@@ -609,10 +616,31 @@ AQEDIT(maxlevel, "максуровень", "верхний уровень игр
     return numberEdit(-1, MAX_LEVEL, (int &)q->maxLevel);
 }
 
+AQEDIT(align, "натура", "ограничить по натуре")
+{
+    return flagBitsEdit(getOriginal()->align);
+}
+
+AQEDIT(classes, "классы", "ограничить по классам")
+{
+    return globalBitvectorEdit<Profession>(getOriginal()->classes);
+}
+
+AQEDIT(hometowns, "города", "ограничить по домашним городам")
+{
+    return globalBitvectorEdit<Hometown>(getOriginal()->hometowns);
+}
+
 AQEDIT(perlife, "зажизнь", "ограничить выполнение за один реморт, -1 без ограничений")
 {
     AreaQuest *q = getOriginal();
     return numberEdit(-1, 100, (int &)q->limitPerLife);
+}
+
+AQEDIT(perday, "задень", "ограничить выполнение одним разом за сутки")
+{
+    AreaQuest *q = getOriginal();
+    return boolEdit(q->oncePerDay);
 }
 
 AQEDIT(desc, "описание", "редактор описания квеста (desc help)")

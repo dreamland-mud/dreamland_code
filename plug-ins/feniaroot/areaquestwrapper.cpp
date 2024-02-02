@@ -106,6 +106,31 @@ NMI_GET( AreaQuestWrapper, limitPerLife, "сколько раз за ремор�
     return Register( target->limitPerLife );
 }
 
+NMI_GET( AreaQuestWrapper, oncePerDay, "есть ли ограничение не чаще раза в сутки") 
+{ 
+    checkTarget( ); 
+    return Register( target->oncePerDay );
+}
+
+NMI_GET( AreaQuestWrapper, align, "разрешенные натуры или 0 (таблица .tables.align_flags)" ) 
+{
+    checkTarget( ); 
+    return Register((int)target->align.getValue());
+}
+
+NMI_GET( AreaQuestWrapper, classes, "разрешенные классы или пустая строка (olchelp class)" ) 
+{
+    checkTarget();
+    return Register(target->classes.toString());
+}
+
+NMI_GET( AreaQuestWrapper, hometowns, "разрешенные домашние города или пустая строка" ) 
+{
+    checkTarget();
+    return Register(target->hometowns.toString());
+}
+
+
 NMI_GET( AreaQuestWrapper, flags, "флаги квеста (таблица .tables.areaquest_flags)" ) 
 {
     checkTarget();

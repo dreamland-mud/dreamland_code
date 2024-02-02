@@ -132,6 +132,24 @@ static bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuest
     if (q->limitPerLife > 0 && qdata.thisLife >= q->limitPerLife)
         return false;
 
+    // A day hasn't passed yet?
+    if (q->oncePerDay) {
+        if (qdata.timeend > 0 && (dreamland->getCurrentTime() - qdata.timeend < Date::SECOND_IN_DAY))
+            return false;
+    }
+
+    // Wrong align?
+    if (q->align != 0 && !q->align.isSetBitNumber(ALIGNMENT(ch)))
+        return false;
+
+    // Wrong hometown?
+    if (!q->hometowns.empty() && !q->hometowns.isSet(ch->getHometown()))
+        return false;
+
+    // Wrong player class?
+    if (!q->classes.empty() && !q->classes.isSet(ch->getProfession()))
+        return false;
+
     // See if prerequisite quest was completed by ch at least once in this life
     if (q->prereq > 0) {
         AreaQuestData &prereqQuestData = aquest_data(ch, q->prereq.toString());
