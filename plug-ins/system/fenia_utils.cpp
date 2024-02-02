@@ -81,12 +81,12 @@ bool fenia_trigger(const DLString &trigName, const Scripting::RegisterList &args
 
     // Execute postXXX trigger on the instance, if defined.
     if (instance->triggerFunction(postTrigName, postProg)) {
-        instance->postpone(postProg, trigArgs);
+        instance->postpone(postTrigName, postProg, trigArgs);
     }
 
     // Execute postXXX trigger on index data, if defined.
     if (proto && proto->triggerFunction(postTrigName, postProg)) {
-        proto->postpone(postProg, protoTrigArgs);
+        proto->postpone(postTrigName, postProg, protoTrigArgs);
     }
 
     // Execute onXXX trigger on the instance and return if it returns true.

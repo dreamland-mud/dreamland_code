@@ -47,15 +47,11 @@ typedef map<int, MethodsByStage> MethodsByStep;
 typedef map<int, MethodsByStep> MethodsByQuest;
 
 /** Finds all methods on a target for given trigger name. Will return both _onGive and _postGive for 'Give' trigType. */
-static MethodsByQuest aquest_find_methods(Scripting::Object *wrapper, const DLString &trigType)
+static MethodsByQuest aquest_find_methods(WrapperBase *wrapperBase, const DLString &trigType)
 {
     MethodsByQuest result;
-
-    WrapperBase *wrapperBase = get_wrapper(wrapper);
-    if (!wrapperBase)
-        return result;
-
     StringSet onAndPostTriggers, miscMethods;
+
     wrapperBase->collectTriggers(onAndPostTriggers, miscMethods);
 
     // Regexp: q<number> _ step<number> _ begin|end _ on|post Give|Use|Get|...  
@@ -147,24 +143,24 @@ static bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuest
 }
 
 // Return true only if synchronous onXXX trigger exists and returned true -- meaning we can advance to next step
-static bool aquest_method_call(Scripting::Object *wrapper, MethodLabel &method, const char *fmt, va_list ap)
+static bool aquest_method_call(WrapperBase *wrapperBase, MethodLabel &method, const RegisterList &progArgs)
 {
-    WrapperBase *wrapperBase = get_wrapper(wrapper);
+    Register progFun;
 
-    if (!wrapperBase)
+    if (!wrapperBase->triggerFunction(method.methodId, progFun))
         return false;
 
     if (method.trigPrefix == "on") {
         Register rc;
 
-        if (!wrapperBase->vcall(rc, method.methodId, fmt, ap))
+        if (!wrapperBase->call(rc, method.methodId, progFun, progArgs))
             return false;
 
         return rc.type != Register::NONE && rc.toBoolean();
     }
 
     if (method.trigPrefix == "post") {
-        wrapperBase->vpostpone(method.methodId, fmt, ap);
+        wrapperBase->postpone(method.methodId, progFun, progArgs);
     }
 
     return false;
@@ -188,10 +184,10 @@ static MethodLabel * aquest_method_for_step_and_stage(MethodsByStep &methodsBySt
 /** Main 'brains' for running Fenia triggers for area quests. Return true if at least one trigger on this mob/obj/room
  * was successful.
  */
-static bool aquest_trigger(Scripting::Object *wrapper, PCharacter *ch, const DLString &trigType, const char *fmt, va_list ap)
+static bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLString &trigType, const RegisterList &progArgs)
 {
     bool calledOnce = false;
-    MethodsByQuest methodsForQuest = aquest_find_methods(wrapper, trigType);
+    MethodsByQuest methodsForQuest = aquest_find_methods(wrapperBase, trigType);
 
     // Handle all quests this player participates or can start participating in
     for (auto mq: methodsForQuest) {
@@ -201,7 +197,7 @@ static bool aquest_trigger(Scripting::Object *wrapper, PCharacter *ch, const DLS
         // Find corresponding area quest structure.
         AreaQuest *q = get_area_quest(questId);
         if (!q) {
-            LogStream::sendError() << "AreaQuest: unknown quest id " << questId << " on " << wrapper->getId() << endl;
+            LogStream::sendError() << "AreaQuest: unknown quest id " << questId << endl;
             continue;
         }
 
@@ -224,7 +220,7 @@ static bool aquest_trigger(Scripting::Object *wrapper, PCharacter *ch, const DLS
 
         // Only run begin trigger for new quest participants
         if (beginMethod && !qdata.questActive()) {
-            aquest_method_call(wrapper, *beginMethod, fmt, ap);
+            aquest_method_call(wrapperBase, *beginMethod, progArgs);
 
             qdata.start();
 
@@ -237,7 +233,7 @@ static bool aquest_trigger(Scripting::Object *wrapper, PCharacter *ch, const DLS
 
         if (endMethod) {
             // Call the end trigger to see if player has done what's needed to finish the step
-            bool stepEnded = aquest_method_call(wrapper, *endMethod, fmt, ap);
+            bool stepEnded = aquest_method_call(wrapperBase, *endMethod, progArgs);
 
 			if (!stepEnded)
 				continue;
@@ -260,7 +256,7 @@ static bool aquest_trigger(Scripting::Object *wrapper, PCharacter *ch, const DLS
             MethodLabel *nextBeginMethod = aquest_method_for_step_and_stage(methodsByStep, qdata.step, "begin");
             if (nextBeginMethod)
                 if (nextBeginMethod->trigType == trigType && nextBeginMethod->trigPrefix == "post")
-                    aquest_method_call(wrapper, *nextBeginMethod, fmt, ap);
+                    aquest_method_call(wrapperBase, *nextBeginMethod, progArgs);
 
             // TODO add wiznet for all misfires and player progression throughout the quest
 
@@ -281,14 +277,17 @@ bool aquest_trigger(Character *mob, Character *ch, const DLString &trigType, con
     if (!mob->is_npc() || ch->is_npc())
         return false;
 
-    if (mob->getNPC()->pIndexData->wrapper == 0)
+    WrapperBase *wrapperBase = get_wrapper(mob->getNPC()->pIndexData->wrapper);
+    if (wrapperBase == 0)
         return false;
 
     bool rc = false;
     va_list ap;    
+    RegisterList progArgs;
 
     va_start(ap, fmt);
-    rc = aquest_trigger(mob->getNPC()->pIndexData->wrapper, ch->getPC(), trigType, fmt, ap);
+    wrapperBase->triggerArgs(progArgs, fmt, ap);
+    rc = aquest_trigger(wrapperBase, ch->getPC(), trigType, progArgs);
     va_end(ap);
 
     return rc;
@@ -301,14 +300,17 @@ bool aquest_trigger(::Object *obj, Character *ch, const DLString &trigType, cons
     if (ch->is_npc())
         return false;
 
-    if (obj->pIndexData->wrapper == 0)
+    WrapperBase *wrapperBase = get_wrapper(obj->pIndexData->wrapper);
+    if (wrapperBase == 0)
         return false;
 
     bool rc = false;
     va_list ap;    
+    RegisterList progArgs;
     
     va_start(ap, fmt);
-    rc = aquest_trigger(obj->pIndexData->wrapper, ch->getPC(), trigType, fmt, ap);
+    wrapperBase->triggerArgs(progArgs, fmt, ap);
+    rc = aquest_trigger(wrapperBase, ch->getPC(), trigType, progArgs);
     va_end(ap);
 
     return rc;
@@ -321,14 +323,17 @@ bool aquest_trigger(Room *room, Character *ch, const DLString &trigType, const c
     if (ch->is_npc())
         return false;
 
-    if (room->wrapper == 0)
+    WrapperBase *wrapperBase = get_wrapper(room->wrapper);
+    if (wrapperBase == 0)
         return false;
 
     bool rc = false;
     va_list ap;    
+    RegisterList progArgs;
     
     va_start(ap, fmt);
-    rc = aquest_trigger(room->wrapper, ch->getPC(), trigType, fmt, ap);
+    wrapperBase->triggerArgs(progArgs, fmt, ap);
+    rc = aquest_trigger(wrapperBase, ch->getPC(), trigType, progArgs);
     va_end(ap);
 
     return rc;

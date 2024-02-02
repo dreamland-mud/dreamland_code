@@ -42,9 +42,10 @@ public:
 
     bool call( Register id, const char *fmt, ... );
     bool vcall( Register &rc, const Register &key, const char *fmt, va_list ap);
+    bool call( Register &rc, const Register &progName, const Register &progFun, const RegisterList &progArgs);
     void postpone( Register id, const char *fmt, ... );
     bool vpostpone( Register id, const char *fmt, va_list ap);
-    void postpone(const Register &progFun, const RegisterList &progArgs);
+    void postpone(const Register &progName, const Register &progFun, const RegisterList &progArgs);
     DLString stringCall( Register id, const char *fmt, ... );
     bool numberCall( Register id, int &result, const char *fmt, ... );
 
