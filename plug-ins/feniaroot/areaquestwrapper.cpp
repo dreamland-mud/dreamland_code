@@ -137,6 +137,12 @@ NMI_GET( AreaQuestWrapper, flags, "флаги квеста (таблица .tabl
     return Register((int)target->flags);
 }
 
+NMI_GET( AreaQuestWrapper, area, "зона (AreaIndex), в которой объявлен квест" ) 
+{
+    checkTarget();
+    return WrapperManager::getThis()->getWrapper(target->pAreaIndex);
+}
+
 static int args2queststep(AreaQuest *q, const RegisterList &args)
 {
     int step = argnum2number(args, 1);

@@ -201,7 +201,6 @@ WrappersPlugin::initialization( )
     traitsAPIJson<AreaIndexWrapper>("area_index", apiDump, false);    
     traitsAPIJson<Root>("root", apiDump, true);     
     traitsAPIJson<AffectWrapper>("affect", apiDump, false);     
-    traitsAPIJson<CommandWrapper>("command", apiDump, false);     
     traitsAPIJson<AreaWrapper>("area", apiDump, false);     
     traitsAPIJson<HometownWrapper>("hometown", apiDump, false);     
     traitsAPIJson<ProfessionWrapper>("profession", apiDump, false);     
