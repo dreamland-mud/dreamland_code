@@ -17,6 +17,7 @@
 #include "room.h"
 #include "descriptor.h"
 #include "damageflags.h"
+#include "arg_utils.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
@@ -291,6 +292,16 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
     DLString methodName = args.getOneArgument();
     Scripting::IdRef methodId(methodName);
     Register retval = base->getField(methodId);
+
+    // fenia <trigName> clear
+    if (arg_is_clear(args)) {
+        if (feniaTriggers->clearTrigger(w.toObject(), methodName))
+            ch->pecho("Триггер %s успешно удален.\r\n", methodName.c_str());
+        else
+            ch->pecho("Триггер %s не найден.\r\n", methodName.c_str());        
+
+        return true;
+    }
 
     // Fenia field not found, try to open the editor with trigger example.
     if (retval.type == Register::NONE) {
