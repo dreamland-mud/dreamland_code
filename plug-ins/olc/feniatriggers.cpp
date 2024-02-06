@@ -601,7 +601,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer 
     DLString trigName = isBegin ? thisStep->beginTrigger : thisStep->endTrigger;
 
     DLString methodId = aquest_method_id(q, s, isBegin, trigName);
-    Register method = find_function(type, vnum, trigName);
+    Register method = find_function(type, vnum, methodId);
 
     if (method.type == Register::NONE) {
         // No trigger defined yet, create new from a template
