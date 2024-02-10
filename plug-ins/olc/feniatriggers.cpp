@@ -18,6 +18,7 @@
 #include "descriptor.h"
 #include "damageflags.h"
 #include "arg_utils.h"
+#include "areaquestutils.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
@@ -239,7 +240,6 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, cons
 }
 
 
-
 Register get_wrapper_for_index_data(int vnum, const DLString &type)
 {
     Register w;
@@ -261,6 +261,21 @@ Register get_wrapper_for_index_data(int vnum, const DLString &type)
     }
 
     return w;
+}
+
+Scripting::Register FeniaTriggerLoader::findMethodOnWrapper(Scripting::Register w, const DLString &methodName) const
+{
+    Scripting::Register retval;
+    if (w.type == Scripting::Register::NONE)
+        return retval;
+        
+    WrapperBase *base = get_wrapper(w.toObject());
+    if (!base)
+        return retval;
+
+    Scripting::IdRef methodId(methodName);
+    retval = base->getField(methodId);
+    return retval;
 }
 
 bool FeniaTriggerLoader::checkWebsock(Character *ch) const
@@ -433,6 +448,31 @@ vector<DLString> FeniaTriggerLoader::createCommandParams(
     return parms;
 }
 
+vector<DLString> FeniaTriggerLoader::createAreaQuestParams(
+        Character *ch, AreaQuest *q, const DLString &methodName) const
+{
+    std::vector<DLString> parms;
+    const DLString indexType = "areaquest";
+
+    // Create codesource body with example code.
+    DLString tmpl;
+    if (!findExample(ch, methodName, indexType, tmpl))
+        return parms;
+
+    parms.resize(2);
+    tmpl.replaces("@vnum@", q->vnum.toString());
+    tmpl.replaces("@trig@", methodName);
+    parms[1] = tmpl;
+
+    // Create codesource subject.
+    parms[0] = dlprintf("%s/%s/%s",
+                    indexType.c_str(),
+                    q->vnum.toString().c_str(),
+                    methodName.c_str());   
+
+    return parms;
+}
+
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const DLString &constArguments) const
 {
     if (!checkWebsock(ch))
@@ -529,7 +569,31 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, WrappedCommand *cmd, const D
 
     return editExisting(ch, retval);
 }
-    
+
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const DLString &constArguments) const
+{
+    if (!checkWebsock(ch))
+        return false;
+
+    DLString args = constArguments;
+    DLString methodName = args.getOneArgument();
+    Register retval = getMethodForName<AreaQuest>(q, methodName);
+
+    // Fenia field not found, try to open the editor with trigger example.
+    if (retval.type == Register::NONE) {
+        vector<DLString> parms = createAreaQuestParams(ch, q, methodName);
+        if (parms.empty())
+            return false;
+
+        // Open the editor.
+        ch->desc->writeWSCommand("cs_edit", parms);
+        ch->printf("Запускаю веб-редактор для квеста, триггер %s.\r\n", methodName.c_str());
+        return true;
+    }
+
+    return editExisting(ch, retval);
+}
+
 // For given step type (mob/obj/room) return a list of all triggers that begin with this
 // prefix, e.g. 'mob:onGreet', 'mob:onSpeech', with "mob:" prefix removed.
 StringSet FeniaTriggerLoader::getQuestTriggers(const DLString &stepType) const
@@ -549,10 +613,6 @@ StringSet FeniaTriggerLoader::getQuestTriggers(const DLString &stepType) const
 
     return stepTriggers;
 }
-
-Register find_function(const DLString &type, const Integer &vnum, const DLString &trigName);
-DLString aquest_method_id(AreaQuest *q, int step, bool isBegin, const DLString &trigName);
-
 
 vector<DLString> FeniaTriggerLoader::createQuestStepParams(
     Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s, const DLString &methodId) const
@@ -593,7 +653,7 @@ vector<DLString> FeniaTriggerLoader::createQuestStepParams(
     return parms;
 }
 
-bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin)
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin) const
 {
     const QuestStep::XMLPointer &thisStep = q->steps[s];
     DLString type = isBegin ? thisStep->beginType : thisStep->endType;
@@ -601,7 +661,8 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer 
     DLString trigName = isBegin ? thisStep->beginTrigger : thisStep->endTrigger;
 
     DLString methodId = aquest_method_id(q, s, isBegin, trigName);
-    Register method = find_function(type, vnum, methodId);
+    Register wrapper = get_wrapper_for_index_data(vnum.toInt(), type);
+    Register method = findMethodOnWrapper(wrapper, methodId);
 
     if (method.type == Register::NONE) {
         // No trigger defined yet, create new from a template

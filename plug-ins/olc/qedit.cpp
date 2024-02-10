@@ -151,37 +151,11 @@ static DLString menu_step_trigger(Integer step, const DLString &stepType, const 
     return buf.str();
 }
 
-Register find_function(const DLString &type, const Integer &vnum, const DLString &trigName)
-{
-    Register wrapper = get_wrapper_for_index_data(vnum, type);
-
-    if (wrapper.type == Register::NONE)
-        return Register();
-
-    WrapperBase *wbase = get_wrapper(wrapper.toObject());
-    if (!wbase)
-        return Register();
-
-    Scripting::IdRef methodId(trigName);
-    Register retval = wbase->getField(methodId);
-    if (retval.type != Register::FUNCTION)
-        return Register();
-
-    return retval;
-}
-
-DLString aquest_method_id(AreaQuest *q, int step, bool isBegin, const DLString &trigName)
-{
-    ostringstream buf;
-
-    buf << "q" << q->vnum << "_step" << step << "_" << (isBegin ? "begin" : "end") << "_" << trigName;
-    return buf.str();
-}
-
 static void show_active_triggers(PCharacter *ch, ostringstream& buf, const Integer &s, const DLString &methodId,
                                     const DLString &type, const DLString &vnum, bool isBegin)
 {
-    Register method = find_function(type, vnum, methodId);
+    Register wrapper = get_wrapper_for_index_data(vnum.toInt(), type);
+    Register method = feniaTriggers->findMethodOnWrapper(wrapper, methodId);
 
     if (method.type == Register::NONE)
         return;
@@ -197,7 +171,8 @@ static void show_active_triggers(PCharacter *ch, ostringstream& buf, const Integ
 static void show_available_triggers(PCharacter *ch, ostringstream& buf, const Integer &s, const DLString &methodId,
                                     const DLString &type, const DLString &vnum, bool isBegin)
 {
-    Register method = find_function(type, vnum, methodId);
+    Register wrapper = get_wrapper_for_index_data(vnum.toInt(), type);
+    Register method = feniaTriggers->findMethodOnWrapper(wrapper, methodId);
 
     if (method.type == Register::FUNCTION)
         return;
@@ -329,6 +304,8 @@ void OLCStateAreaQuest::show( PCharacter *ch )
     ptc(ch, "Флаги:         {c%s {D(flags){x\r\n", q->flags.names().c_str());
     ptc(ch, "Предыдущий:    {c%d{x %s {D(prereq){x\r\n", 
              q->prereq.getValue(), aquest_title(q->prereq).c_str());
+    
+    feniaTriggers->showTriggers(ch, q->getWrapper(), "areaquest");    
 
     show_steps(ch, q);
 
@@ -372,6 +349,11 @@ bool OLCStateAreaQuest::parseStepNumber(PCharacter *ch, const DLString &arg, Int
     return false;
 }
 
+AQEDIT(fenia, "феня", "редактировать тригера")
+{
+    feniaTriggers->openEditor(ch, getOriginal(), argument);
+    return false;
+}
 
 AQEDIT(step, "шаг", "редактор шагов квеста")
 {

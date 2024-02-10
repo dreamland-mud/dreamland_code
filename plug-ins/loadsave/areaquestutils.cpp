@@ -93,6 +93,15 @@ static AreaQuestData & aquest_data(PCharacter *ch, const DLString &questId)
     return (**areaQuestAttr)[questId];
 }
 
+// Construct method name for given quest & step & stage and trigger name
+DLString aquest_method_id(AreaQuest *q, int step, bool isBegin, const DLString &trigName)
+{
+    ostringstream buf;
+
+    buf << "q" << q->vnum << "_step" << step << "_" << (isBegin ? "begin" : "end") << "_" << trigName;
+    return buf.str();
+}
+
 AreaQuest *get_area_quest(const DLString &questId)
 {
     Integer vnum;
@@ -115,6 +124,13 @@ AreaQuest *get_area_quest(int vnum)
 AreaQuest *get_area_quest(const Integer &vnum)
 {
     return get_area_quest(vnum.getValue());
+}
+
+/** If ch cannot take part in a quest - return non-empty string with a reason; otherwise - empty string. */
+static DLString aqprog_canstart(PCharacter *ch, AreaQuest *q)
+{
+    FENIA_STR_CALL(q, "CanStart", "C", ch);
+    return DLString::emptyString;
 }
 
 // Return true if ch passes all requirements to participate in this quest
@@ -157,7 +173,8 @@ static bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuest
             return false;
     }
         
-    return true;
+    // Launch quest's onCanStart trigger if defined
+    return aqprog_canstart(ch, q) == DLString::emptyString;
 }
 
 // Return true only if synchronous onXXX trigger exists and returned true -- meaning we can advance to next step

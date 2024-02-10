@@ -38,7 +38,8 @@ public:
     bool openEditor(PCharacter *ch, DefaultAffectHandler *ah, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, DefaultSkillCommand *cmd, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, WrappedCommand *cmd, const DLString &constArguments) const;
-    bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin);
+    bool openEditor(PCharacter *ch, AreaQuest *q, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin) const;
 
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
     void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const;
@@ -46,6 +47,7 @@ public:
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
     bool clearTriggers(Scripting::Object *wrapper) const;
 
+    Scripting::Register findMethodOnWrapper(Scripting::Register w, const DLString &methodName) const;
     StringSet getQuestTriggers(const DLString &stepType) const;
 
 protected:
@@ -57,18 +59,8 @@ protected:
     template <typename WT>
     Scripting::Register getMethodForName(WT *target, const DLString &methodName) const
     {
-        Scripting::Register retval;
         Scripting::Register w = WrapperManager::getThis()->getWrapper(target);
-        if (w.type == Scripting::Register::NONE)
-            return retval;
-            
-        WrapperBase *base = get_wrapper(w.toObject());
-        if (!base)
-            return retval;
-
-        Scripting::IdRef methodId(methodName);
-        retval = base->getField(methodId);
-        return retval;
+        return findMethodOnWrapper(w, methodName);
     }
 
     vector<DLString> createSkillActionParams(
@@ -76,6 +68,9 @@ protected:
 
     vector<DLString> createCommandParams(
         Character *ch, WrappedCommand *cmd, const DLString &methodName) const;
+
+    vector<DLString> createAreaQuestParams(
+        Character *ch, AreaQuest *q, const DLString &methodName) const;
 
     vector<DLString> createQuestStepParams(
         Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s, const DLString &methodId) const;
