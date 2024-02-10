@@ -177,6 +177,14 @@ NMI_INVOKE( AreaQuestWrapper, cancel, "(ch): отменить этот квес�
     return Register();
 }
 
+NMI_INVOKE( AreaQuestWrapper, canParticipate, "(ch): персонаж ch удовлетряет всем условиям для начала квеста" ) 
+{
+    checkTarget();
+    PCharacter *ch = argnum2player(args, 1);
+    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
+    return Register(aquest_can_participate(ch, target, qdata));
+}
+
 NMI_INVOKE( AreaQuestWrapper, api, "(): печатает этот API" )
 {
     ostringstream buf;

@@ -134,7 +134,7 @@ static DLString aqprog_canstart(PCharacter *ch, AreaQuest *q)
 }
 
 // Return true if ch passes all requirements to participate in this quest
-static bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuestData &qdata) 
+bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuestData &qdata) 
 {
     // Too old?
     if (q->maxLevel < LEVEL_MORTAL && ch->getRealLevel() > q->maxLevel)
@@ -172,9 +172,8 @@ static bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuest
         if (prereqQuestData.thisLife <= 0)
             return false;
     }
-        
-    // Launch quest's onCanStart trigger if defined
-    return aqprog_canstart(ch, q) == DLString::emptyString;
+
+    return true;        
 }
 
 // Return true only if synchronous onXXX trigger exists and returned true -- meaning we can advance to next step
@@ -244,6 +243,10 @@ static bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLStr
         if (!qdata.questActive()) {
             // only limit participation on quest start - otherwise ch can grow out of quest between steps
             if (!aquest_can_participate(ch, q, qdata)) 
+                continue;
+
+            // Launch quest's onCanStart trigger if defined
+            if (aqprog_canstart(ch, q) != DLString::emptyString)
                 continue;
 
             myStep = 0;

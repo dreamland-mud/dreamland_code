@@ -25,5 +25,9 @@ AreaQuest *get_area_quest(const DLString &questId);
 AreaQuest *get_area_quest(const Integer& questId);
 AreaQuest *get_area_quest(int questId);
 
+bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuestData &qdata);
+
+
+
 
 #endif
