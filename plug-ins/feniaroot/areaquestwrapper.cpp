@@ -1,4 +1,3 @@
-#include "areaquestwrapper.h"
 #include "logstream.h"
 #include "object.h"
 #include "merc.h"
@@ -6,12 +5,15 @@
 #include "loadsave.h"
 
 #include "areaquestwrapper.h"
+#include "areaquestutils.h"
+#include "xmlattributeareaquest.h"
 #include "structwrappers.h"
 #include "wrappermanager.h"
 #include "reglist.h"
 #include "register-impl.h"
 #include "nativeext.h"
 #include "wrap_utils.h"
+#include "pcharacter.h"
 
 #include "def.h"
 
@@ -156,6 +158,23 @@ NMI_INVOKE( AreaQuestWrapper, step, "(num): структура шага квес
     checkTarget();
     int step = args2queststep(target, args);
     return target->steps[step]->toRegister();
+}
+
+NMI_INVOKE( AreaQuestWrapper, data, "(ch): статус этого квеста для ch (из аттрибута areaquest)" ) 
+{
+    checkTarget();
+    PCharacter *ch = argnum2player(args, 1);
+    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
+    return qdata.toRegister();
+}
+
+NMI_INVOKE( AreaQuestWrapper, cancel, "(ch): отменить этот квест для ch" ) 
+{
+    checkTarget();
+    PCharacter *ch = argnum2player(args, 1);
+    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
+    qdata.cancel();
+    return Register();
 }
 
 NMI_INVOKE( AreaQuestWrapper, api, "(): печатает этот API" )

@@ -82,7 +82,7 @@ static MethodsByQuest aquest_find_methods(WrapperBase *wrapperBase, const DLStri
 }
 
 // Grab (create if needed) quest info for this quest from player attributes
-static AreaQuestData & aquest_data(PCharacter *ch, const DLString &questId)
+AreaQuestData & aquest_data(PCharacter *ch, const DLString &questId)
 {
     auto areaQuestAttr = ch->getAttributes().getAttr<XMLAttributeAreaQuest>("areaquest");
     auto q = areaQuestAttr->find(questId);
