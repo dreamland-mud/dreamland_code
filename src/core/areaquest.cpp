@@ -52,6 +52,8 @@ Scripting::Register QuestStep::toRegister() const
     step->setField(IdRef("rewardExp"), (int)rewardExp);
     step->setField(IdRef("rewardVnum"), (int)rewardVnum);
     step->setField(IdRef("info"), info);
+    step->setField(IdRef("beginTrigger"), beginTrigger); 
+    step->setField(IdRef("endTrigger"), endTrigger); 
     return stepReg;    
 
 }

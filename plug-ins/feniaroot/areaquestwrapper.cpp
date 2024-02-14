@@ -177,6 +177,15 @@ NMI_INVOKE( AreaQuestWrapper, cancel, "(ch): отменить этот квес�
     return Register();
 }
 
+NMI_INVOKE( AreaQuestWrapper, rollback, "(ch): откатить этот квест на предыдущий шаг для ch, вернет новый номер шага" ) 
+{
+    checkTarget();
+    PCharacter *ch = argnum2player(args, 1);
+    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
+    qdata.rollback();
+    return Register(qdata.step);
+}
+
 NMI_INVOKE( AreaQuestWrapper, canParticipate, "(ch): персонаж ch удовлетряет всем условиям для начала квеста" ) 
 {
     checkTarget();

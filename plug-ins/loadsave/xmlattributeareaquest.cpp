@@ -69,6 +69,13 @@ void AreaQuestData::advance()
     step++;
 }		
 
+void AreaQuestData::rollback() 
+{
+    if (step == 0)
+        cancel();
+    else
+        step--;
+}		
 
 Scripting::Register AreaQuestData::toRegister() const
 {

@@ -29,6 +29,7 @@ public:
 	void complete();
     void cancel();
 	void advance();
+    void rollback();
 };
 
 class XMLAttributeAreaQuest : public RemortAttribute, public XMLMapContainer<AreaQuestData> {

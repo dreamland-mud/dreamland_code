@@ -292,9 +292,13 @@ static bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLStr
 
             // Call matching post trigger type from the next step
             MethodLabel *nextBeginMethod = aquest_method_for_step_and_stage(methodsByStep, qdata.step, "begin");
-            if (nextBeginMethod)
+            if (nextBeginMethod) {
                 if (nextBeginMethod->trigType == trigType && nextBeginMethod->trigPrefix == "post")
                     aquest_method_call(wrapperBase, *nextBeginMethod, progArgs);
+                else
+                    LogStream::sendError() << "aquest: begin/end trigger type mismatch " 
+                        << q->vnum << ", " << endMethod->methodName << ", " << nextBeginMethod->methodName << endl;
+            }
 
             // TODO add wiznet for all misfires and player progression throughout the quest
 
