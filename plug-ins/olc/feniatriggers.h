@@ -39,7 +39,7 @@ public:
     bool openEditor(PCharacter *ch, DefaultSkillCommand *cmd, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, WrappedCommand *cmd, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, AreaQuest *q, const DLString &constArguments) const;
-    bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin) const;
+    bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin, const DLString &constArguments) const;
 
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
     void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const;

@@ -365,6 +365,7 @@ static void qedit_step_usage(PCharacter *ch)
     ch->pecho("step <num> begin|end type mob|obj|room - задать тип начала или завершения шага");
     ch->pecho("step <num> begin|end vnum <vnum> - задать vnum для начала или завершения шага");
     ch->pecho("step <num> begin|end trigger <onXXX> - задать название тригера для начала или завершения шага");
+    ch->pecho("step <num> begin|end trigger <onXXX> clear - удалить тригер для начала или завершения шага");
     ch->pecho("step <num> begin|end fenia - открыть редактор феневого сценария");
     ch->pecho("step <num> info <строка> - установить описание шага, видное по 'квест инфо'");
     ch->pecho("step <num> qp|gold|exp|item <число> - награда за выполнение шага в кп/золоте/экспе или внум предмета");
@@ -604,6 +605,9 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             return false;
         }
 
+        // Clears existing trigger before assigning new one.
+        feniaTriggers->openEditor(ch, q, step, isBegin, "clear");
+
         if (isBegin) {
             thisStep->beginTrigger = trigName;
             ch->pecho("Началу шага %d присвоен триггер %s.", step.getValue(), trigName.c_str());
@@ -616,9 +620,9 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         return true;
     }
 
-    // 'step 3 begin|end fenia'
+    // 'step 3 begin|end fenia [clear]'
     if (arg_oneof(action, "fenia", "феня")) {
-        feniaTriggers->openEditor(ch, q, step, isBegin);
+        feniaTriggers->openEditor(ch, q, step, isBegin, args);
         return false;
     }
 

@@ -653,7 +653,7 @@ vector<DLString> FeniaTriggerLoader::createQuestStepParams(
     return parms;
 }
 
-bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin) const
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin, const DLString &constArguments) const
 {
     const QuestStep::XMLPointer &thisStep = q->steps[s];
     DLString type = isBegin ? thisStep->beginType : thisStep->endType;
@@ -663,6 +663,16 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer 
     DLString methodId = aquest_method_id(q, s, isBegin, trigName);
     Register wrapper = get_wrapper_for_index_data(vnum.toInt(), type);
     Register method = findMethodOnWrapper(wrapper, methodId);
+    DLString args = constArguments;
+
+    if (arg_is_clear(args)) {
+        if (feniaTriggers->clearTrigger(wrapper.toObject(), methodId))
+            ch->pecho("Триггер %s успешно удален.\r\n", methodId.c_str());
+        else
+            ch->pecho("Триггер %s не найден для удаления.\r\n", methodId.c_str());        
+
+        return true;
+    }
 
     if (method.type == Register::NONE) {
         // No trigger defined yet, create new from a template
