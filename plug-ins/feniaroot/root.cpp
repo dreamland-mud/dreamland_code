@@ -1088,6 +1088,12 @@ NMI_INVOKE( Root, Liquid, "(name): конструктор для жидкост�
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
 }
 
+NMI_INVOKE( Root, Wearloc, "(name): конструктор для слота экипировки по имени" )
+{
+    DLString name = args2string(args);
+    return WearlocWrapper::wrap(name);
+}
+
 NMI_GET( Root, materials, "список всех материалов") 
 {
     RegList::Pointer list(NEW);

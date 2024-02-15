@@ -22,6 +22,7 @@
 #include "desire.h"
 #include "clan.h"
 #include "clantypes.h"
+#include "wearlocation.h"
 #include "spelltarget.h"
 #include "material-table.h"
 #include "material.h"
@@ -658,6 +659,56 @@ NMI_INVOKE( LiquidWrapper, isBooze, "алкоголь ли это" )
 {
     return getTarget()->getFlags().isSet(LIQF_BEER|LIQF_LIQUOR|LIQF_WINE);
 }
+
+/*----------------------------------------------------------------------
+ * Liquid
+ *----------------------------------------------------------------------*/
+NMI_INIT(WearlocWrapper, "wearlocation, слот экипировки");
+
+WearlocWrapper::WearlocWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Scripting::Register WearlocWrapper::wrap( const DLString &name )
+{
+    if (!wearlocationManager->findExisting(name))
+        throw Scripting::Exception("Wearloc not found");
+
+    WearlocWrapper::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+Wearlocation * WearlocWrapper::getTarget() const
+{
+    Wearlocation *wl = wearlocationManager->find(name);
+    if (!wl)
+        throw Scripting::Exception("Wearloc not found");
+    return wl;
+}
+
+NMI_INVOKE( WearlocWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+
+    Scripting::traitsAPI<WearlocWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( WearlocWrapper, name, "английское название" ) 
+{
+    return getTarget()->getName( );
+}
+
+NMI_GET( WearlocWrapper, ribName, "название слота с падежами" ) 
+{
+    return getTarget()->getRibName();
+}
+
 
 /*----------------------------------------------------------------------
  * Material
