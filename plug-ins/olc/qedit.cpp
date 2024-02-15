@@ -140,11 +140,32 @@ static DLString menu_step_type(Integer step, const DLString &stepType, DLString 
 static DLString menu_step_trigger(Integer step, const DLString &stepType, const DLString &stepTrig, DLString beginOrEnd)
 {
     ostringstream buf;
+    static const DLString ON("on");
+    static const DLString POST("post");
 
     DLString id = "step " + step.toString() + " " + beginOrEnd + " trigger" ;
+
     StringList commands;
-    for (auto trig: feniaTriggers->getQuestTriggers(stepType))
-        commands.push_back("$ " + trig);
+    for (auto trig: feniaTriggers->getQuestTriggers(stepType)) {
+        // Show all triggers for 'begin' stage of the step 0
+        if (step == 0 && beginOrEnd == "begin") {
+            commands.push_back("$ " + trig);
+            continue;
+        }
+
+        // Only show async triggers for 'begin' stage starting from the 1st step
+        if (beginOrEnd == "begin" && step > 0 && POST.strPrefix(trig)) {
+            commands.push_back("$ " + trig);
+            continue;
+        }
+
+        // Only show sync triggers for 'end' stages
+        if (beginOrEnd == "end" && ON.strPrefix(trig)) {
+            commands.push_back("$ " + trig);
+            continue;
+        }
+    }
+        
     DLString label = stepTrig;
 
     buf << "{w[{y" << web_menu(commands, id, label) << "{w]";
@@ -216,6 +237,29 @@ static DLString show_step_reward(PCharacter *ch, const QuestStep::Pointer &step)
     return buf.str();
 }
 
+// Display any warnings for this step, such as mismatched begin/end triggers
+static DLString show_step_errors(PCharacter *ch, AreaQuest *q, int s)
+{ 
+    ostringstream buf;
+    auto &step = q->steps[s];
+
+    if (s == q->steps.size() - 1)
+        return DLString::emptyString;
+
+    auto &nextStep = q->steps[s+1];
+
+    // Check that triggers are on the same mob/obj
+    if (step->endType != nextStep->beginType || step->endValue != nextStep->beginValue)
+        buf << "{RОшибка: не совпадает цель у тригеров конца этого шага и начала следующего." << endl;
+
+    // Check for onSpeech/postSpeech pairs
+    if (step->endTrigger.substr(2) != nextStep->beginTrigger.substr(4))
+        buf << "{RОшибка: не совпадает тип тригеров конца этого шага (" << step->endTrigger << ") " 
+            << "и начала следующего (" << nextStep->beginTrigger << ")." << endl;
+
+    return buf.str();
+}
+
 static void show_step(PCharacter *ch, AreaQuest *q, int s)
 {
     ostringstream buf;
@@ -263,6 +307,8 @@ static void show_step(PCharacter *ch, AreaQuest *q, int s)
         if (!trigBuf.str().empty())
             buf << "{WДоступны{x:    " << trigBuf.str() << endl;
     }
+
+    buf << show_step_errors(ch, q, s);
 
     ch->send_to(buf);
 }
@@ -478,7 +524,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         Integer::tryParse(thisStep->rewardVnum, args);
         ch->pecho("Награда за шаг %d установлена в предмет %d.", 
                    step.getValue(), thisStep->rewardVnum.getValue());
-        show_step(ch, q, step);
+        show_steps(ch, q);
         return true;
     }
 
@@ -522,7 +568,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             ch->pecho("Концу шага %d присвоен тип %s.", step.getValue(), type.c_str());
         }
 
-        show_step(ch, q, step);
+        show_steps(ch, q);
         return true;
     }
 
@@ -543,7 +589,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             ch->pecho("Концу шага %d присвоен vnum %d.", step.getValue(), vnum.getValue());
         }
 
-        show_step(ch, q, step);
+        show_steps(ch, q);
         return true;
     }
 
@@ -566,7 +612,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             ch->pecho("Концу шага %d присвоен триггер %s.", step.getValue(), trigName.c_str());
         }
         
-        show_step(ch, q, step);         
+        show_steps(ch, q);
         return true;
     }
 
