@@ -176,6 +176,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<LanguageWrapper>( );
     Class::regMoc<RaceWrapper>( );
     Class::regMoc<LiquidWrapper>( );
+    Class::regMoc<WearlocWrapper>( );
     Class::regMoc<SkillWrapper>( );
     Class::regMoc<SkillGroupWrapper>( );
     Class::regMoc<FeniaCommandWrapper>( );
@@ -210,6 +211,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<BonusWrapper>("bonus", apiDump, false);     
     traitsAPIJson<ReligionWrapper>("religion", apiDump, false);     
     traitsAPIJson<LiquidWrapper>("liquid", apiDump, false);     
+    traitsAPIJson<WearlocWrapper>("wearloc", apiDump, false);     
     traitsAPIJson<MaterialWrapper>("material", apiDump, false);
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
     traitsAPIJson<SkillGroupWrapper>("skillgroup", apiDump, false);     
@@ -237,6 +239,7 @@ void WrappersPlugin::destruction( ) {
     FeniaManager::getThis( )->backup( );
 
     Class::unregMoc<AreaQuestWrapper>( );
+    Class::unregMoc<WearlocWrapper>( );
     Class::unregMoc<LiquidWrapper>( );
     Class::unregMoc<SkillGroupWrapper>( );
     Class::unregMoc<SkillWrapper>( );
