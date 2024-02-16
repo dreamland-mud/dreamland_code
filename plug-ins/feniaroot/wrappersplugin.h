@@ -18,6 +18,7 @@ public:
         virtual void destruction( );
         
         static void linkTargets();
+        static void unlinkTargets();
 };
 
 #endif

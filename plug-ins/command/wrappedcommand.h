@@ -16,13 +16,12 @@ public:
         /** Main entry point for command interpreter, with fenia override */
         virtual void entryPoint( Character *, const DLString & );
 
-protected:
-        bool feniaOverride(Character *, const DLString &);
-
         void linkWrapper();
 
         void unlinkWrapper();
 
+protected:
+        bool feniaOverride(Character *, const DLString &);
 };
 
 

@@ -110,11 +110,9 @@ WrappersPlugin::linkTargets()
     }
 
     for (auto &cmd: commandManager->getCommands().getCommands()) {
-        const WrappedCommand *wcmd = cmd.getDynamicPointer<WrappedCommand>();
-        if (wcmd && wcmd->wrapper) {
-            LogStream::sendNotice() << "Fenia command: setting target for " << cmd->getName() << endl;
-            wrapper_cast<FeniaCommandWrapper>(wcmd->wrapper)->setTarget(const_cast<WrappedCommand *>(wcmd));
-        }            
+        WrappedCommand *wcmd = const_cast<WrappedCommand *>(cmd.getDynamicPointer<WrappedCommand>());
+        if (wcmd && wcmd->getHelp() && wcmd->getHelp()->getID() > 0)
+            wcmd->linkWrapper();
     }
 }
 
@@ -232,8 +230,19 @@ WrappersPlugin::initialization( )
     );
 }
 
+void WrappersPlugin::unlinkTargets()
+{
+    for (auto &cmd: commandManager->getCommands().getCommands()) {
+        WrappedCommand *wcmd = const_cast<WrappedCommand *>(cmd.getDynamicPointer<WrappedCommand>());
+        if (wcmd)
+            wcmd->unlinkWrapper();   
+    }
+}
+
 void WrappersPlugin::destruction( ) {
     DLScheduler::getThis()->slay( ValidateTask::Pointer(NEW) );
+
+    unlinkTargets();
 
     Scripting::gc = false;
     FeniaManager::getThis( )->backup( );
