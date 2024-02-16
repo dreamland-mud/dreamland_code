@@ -26,6 +26,11 @@ const DLString &Wearlocation::getName( ) const
     return name;
 }
 
+const DLString &Wearlocation::getRussianName( ) const
+{
+    return getRibName();
+}
+
 bool Wearlocation::isValid( ) const
 {
     return false;

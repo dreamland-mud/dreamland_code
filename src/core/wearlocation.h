@@ -31,6 +31,7 @@ public:
     virtual ~Wearlocation( );
 
     virtual const DLString &getName( ) const;
+    virtual const DLString &getRussianName( ) const;
     virtual bool isValid( ) const;
     virtual bool givesAffects() const;
     

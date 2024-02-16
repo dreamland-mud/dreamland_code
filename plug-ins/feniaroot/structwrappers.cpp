@@ -709,6 +709,17 @@ NMI_GET( WearlocWrapper, ribName, "название слота с падежам
     return getTarget()->getRibName();
 }
 
+NMI_GET( WearlocWrapper, nameRus, "название слота с падежами (то же что ribName)" ) 
+{
+    return getTarget()->getRussianName();
+}
+
+NMI_GET( WearlocWrapper, purpose, "описание Надевается на..." ) 
+{
+    return getTarget()->getPurpose();
+}
+
+
 
 /*----------------------------------------------------------------------
  * Material
