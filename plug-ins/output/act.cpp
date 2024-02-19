@@ -9,7 +9,7 @@
 #include "msgformatter.h"
 #include "mudtags.h"
 
-#include "char.h"
+
 #include "logstream.h"
 #include "profiler.h"
 #include "noun.h"

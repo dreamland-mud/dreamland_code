@@ -12,7 +12,6 @@
 #include "flexer.h"
 #include "grammar_entities_impl.h"
 #include "dlstring.h"
-#include "char.h"
 
 using std::basic_ostringstream;
 using std::basic_istringstream;
@@ -481,11 +480,11 @@ bool DLString::isName( const DLString &msg ) const {
     if (pos < 0 || pos >= s.length( ))
         return false;
     
-    if (pos == 0 || Char( s.at(pos - 1) ).isDelimiter( )) {
+    if (pos == 0 || dl_isdelim( s.at(pos - 1) )) {
         if (pos + m.length( ) == s.length( ))
             return true;
         
-        if (pos + m.length( ) < s.length( ) && Char( s.at(pos + m.length( )) ).isDelimiter( ))
+        if (pos + m.length( ) < s.length( ) && dl_isdelim( s.at(pos + m.length( )) ))
             return true;
 
         return false;

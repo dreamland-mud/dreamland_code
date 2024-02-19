@@ -6,7 +6,7 @@
 
 #include "medit.h"
 
-#include "char.h"
+
 #include "grammar_entities_impl.h"
 #include <pcharacter.h>
 #include <npcharacter.h>

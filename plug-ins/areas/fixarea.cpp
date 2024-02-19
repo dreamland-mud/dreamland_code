@@ -14,7 +14,7 @@
 #include "fileformatexception.h"
 #include "logstream.h"
 #include "class.h"
-#include "char.h"
+
 #include "plugininitializer.h"
 #include "dlfileop.h"
 

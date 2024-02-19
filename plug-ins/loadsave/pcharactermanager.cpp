@@ -13,7 +13,7 @@
 #include <sstream>
 #include <string.h>
 
-#include "char.h"
+
 #include "logstream.h"
 #include "dbio.h"
 #include "dlfile.h"
@@ -61,7 +61,7 @@ static void load_PET( FILE *pfile )
     
     for ( ; ; ) {
         word = feof( pfile ) ? "End" : fread_word( pfile );
-        switch( Char::upper( word[0] ) ) {
+        switch( dl_toupper( word[0] ) ) {
         case '*':
             fread_to_eol( pfile );
             break;
@@ -79,7 +79,7 @@ static void load_MLT( FILE *pfile )
 
   for ( ; ; ) {
     word = feof( pfile ) ? "End" : fread_word( pfile );
-    switch( Char::upper( word[0] ) ) {
+    switch( dl_toupper( word[0] ) ) {
       case '*':
         fread_to_eol( pfile );
         break;
@@ -108,7 +108,7 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
       bVnum = true;
     }
     
-    switch( Char::upper( word[0] ) ) {
+    switch( dl_toupper( word[0] ) ) {
       case '*':
         fread_to_eol( pfile );
         break;
@@ -199,7 +199,7 @@ static void load_PLAYER( PCharacter *pc, FILE *pfile )
             while( !exit )
             {
                 const char *word0 = feof( pfile ) ? "End" : fread_word( pfile );
-                switch( Char::upper( word0[0] ) )
+                switch( dl_toupper( word0[0] ) )
                 {
                 case '*':
                     fread_to_eol( pfile );

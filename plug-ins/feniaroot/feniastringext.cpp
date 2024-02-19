@@ -7,7 +7,7 @@
 #include "register-impl.h"
 #include "reglist.h"
 #include "morphology.h"
-#include "char.h"
+
 #include "dl_strings.h"
 #include "dl_ctype.h"
 #include "stringlist.h"
@@ -379,7 +379,7 @@ NMI_INVOKE(FeniaString, toLower, "(): переводит всю строку в 
     for( DLString::size_type pos = 0; pos < s.length( ); pos++ )
     {
             char& ch = s.at( pos );
-            ch = Char::lower( ch );
+            ch = dl_tolower( ch );
     }
     return s;
 }
@@ -390,7 +390,7 @@ NMI_INVOKE(FeniaString, toUpper, "(): переводит всю строку в 
     for( DLString::size_type pos = 0; pos < s.length( ); pos++ )
     {
             char& ch = s.at( pos );
-            ch = Char::upper( ch );
+            ch = dl_toupper( ch );
     }
     return s;
 }

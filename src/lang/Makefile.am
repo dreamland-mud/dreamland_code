@@ -13,8 +13,6 @@ AM_CPPFLAGS =  -Wall
 
 liblang_la_SOURCES = \
 boolean.cpp \
-byte.cpp \
-char.cpp \
 dlobject.cpp \
 dlstring.cpp \
 exception.cpp \

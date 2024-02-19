@@ -17,7 +17,7 @@
 #include "cclantalk.h"
 
 #include "commonattributes.h"
-#include "char.h"
+
 #include "util/regexp.h"
 
 #include "commandtemplate.h"
@@ -672,7 +672,7 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
                         ? "somewhere" : in_obj->in_room->getName() );
         }
 
-        buf[0] = Char::upper(buf[0]);
+        buf[0] = dl_toupper(buf[0]);
         buffer << buf;
 
         if (number >= max_found)

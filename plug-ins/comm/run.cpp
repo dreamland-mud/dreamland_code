@@ -9,7 +9,7 @@
 #include "movetypes.h"
 #include "door_utils.h"
 
-#include "char.h"
+
 #include "commandtemplate.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -309,6 +309,6 @@ void XMLAttributeSpeedWalk::clearFirstCommand( )
 int XMLAttributeSpeedWalk::getFirstDoor( ) const
 {
     char c = getFirstCommand( );
-    return direction_lookup( Char::lower(c) );
+    return direction_lookup( dl_tolower(c) );
 }
 

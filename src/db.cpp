@@ -61,7 +61,6 @@ using namespace std;
 #include "fileformatexception.h"
 #include "logstream.h"
 #include "class.h"
-#include "char.h"
 #include "grammar_entities_impl.h"
 
 #include "dlscheduler.h"

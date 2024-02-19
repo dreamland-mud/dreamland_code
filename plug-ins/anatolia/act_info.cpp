@@ -59,7 +59,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
-#include "char.h"
+
 #include "logstream.h"
 #include "grammar_entities_impl.h"
 #include "morphology.h"

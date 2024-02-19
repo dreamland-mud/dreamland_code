@@ -13,7 +13,7 @@
 
 #include <config.h>
 
-#include "char.h"
+
 #include "grammar_entities_impl.h"
 #include <skillmanager.h>
 #include <character.h>

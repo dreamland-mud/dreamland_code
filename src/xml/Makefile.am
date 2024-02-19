@@ -20,8 +20,6 @@ AM_LFLAGS = -olex.yy.c
 libxml_la_SOURCES = \
 exceptions.cpp \
 xmlboolean.cpp \
-xmlbyte.cpp \
-xmlchar.cpp \
 xmlclause.cpp \
 xmlcontainer.cpp \
 xmldate.cpp \

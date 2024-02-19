@@ -7,7 +7,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
-#include "char.h"
+
 
 #include "ban.h"
 #include "colour.h"

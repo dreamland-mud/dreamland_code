@@ -61,7 +61,7 @@
 #include "skill.h"
 #include "spell.h"
 
-#include "char.h"
+
 #include "commandtemplate.h"
 #include "affect.h"
 #include "room.h"

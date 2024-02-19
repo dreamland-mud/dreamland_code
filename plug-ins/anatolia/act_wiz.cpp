@@ -53,7 +53,7 @@
 
 #include "so.h"
 #include "plugin.h"
-#include "char.h"
+
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -190,7 +190,7 @@ CMDWIZP( limited )
                         obj_index->vnum,
                         obj_index->limit,
                         obj_index->count );
-                buf[0] = Char::upper( buf[0] );
+                buf[0] = dl_toupper( buf[0] );
                 ch->send_to(buf);
                 ingameCount = obj_index->instances.size();
                 for (Object* obj=object_list; obj != 0; obj=obj->next )
@@ -1662,7 +1662,7 @@ CMDWIZP( owhere )
                         number,
                         obj->getShortDescr( '1' ).c_str( ) );
 
-        buf[0] = Char::upper(buf[0]);
+        buf[0] = dl_toupper(buf[0]);
         buffer << buf;
 
         if ( number >= max_found )
@@ -3563,7 +3563,7 @@ CMDWIZP( olevel )
         else
             sprintf( buf, "%3d) [%d]%s is somewhere\n\r",number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ));
 
-        buf[0] = Char::upper(buf[0]);
+        buf[0] = dl_toupper(buf[0]);
         buffer << buf;
 
         if (number >= max_found)

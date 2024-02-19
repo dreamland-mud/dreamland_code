@@ -20,7 +20,7 @@
 #include "comm.h"
 
 #include "logstream.h"
-#include "char.h"
+
 #include "dreamland.h"
 #include "ban.h"
 #include "descriptor.h"

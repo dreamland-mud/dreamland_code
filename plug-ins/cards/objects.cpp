@@ -7,7 +7,7 @@
 #include "xmlattributecards.h"
 
 #include "class.h"
-#include "char.h"
+
 
 #include "skill.h"
 #include "skillreference.h"

@@ -3,7 +3,7 @@
  * ruffina, 2004
  */
 
-#include "char.h"
+
 #include "logstream.h"
 #include "descriptor.h"
 #include "pcharacter.h"
@@ -55,7 +55,7 @@ long wiznet_lookup (const char *name)
 
     for (flag = 0; wiznet_table[flag].name != 0; flag++)
     {
-        if (Char::lower(name[0]) == Char::lower(wiznet_table[flag].name[0])
+        if (dl_tolower(name[0]) == dl_tolower(wiznet_table[flag].name[0])
               && !str_prefix(name,wiznet_table[flag].name))
             return flag;
     }

@@ -26,7 +26,7 @@
 #include "outofband.h"
 #include "backdoorhandler.h"
 
-#include "char.h"
+
 #include "dreamland.h"
 #include "ban.h"
 #include "descriptor.h"
