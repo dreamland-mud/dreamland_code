@@ -22,7 +22,7 @@
 #include "cardskill.h"
 
 #include "save.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(none);

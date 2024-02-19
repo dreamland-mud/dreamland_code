@@ -16,7 +16,7 @@
 #include "move_utils.h"
 #include "save.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "def.h"
 

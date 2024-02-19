@@ -99,7 +99,7 @@
 #include "act.h"
 #include "material.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 #include "messengers.h"

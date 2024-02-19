@@ -15,7 +15,7 @@
 #include "comm.h"
 #include "update_areas.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 WEARLOC(sheath);

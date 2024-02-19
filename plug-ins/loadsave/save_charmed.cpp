@@ -18,7 +18,7 @@
 #include "save.h"
 #include "fread_utils.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 const char * DIR_SAVED_CHARMED = "charmed";

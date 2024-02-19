@@ -16,7 +16,7 @@
 #include "room.h"
 #include "object.h"
 #include "npcharacter.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 void

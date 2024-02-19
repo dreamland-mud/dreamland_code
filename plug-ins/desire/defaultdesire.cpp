@@ -11,7 +11,7 @@
 #include "screenreader.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 #define HUNGER_MIN_LEVEL (PK_MIN_LEVEL + 5)

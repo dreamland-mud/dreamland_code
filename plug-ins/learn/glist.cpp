@@ -11,7 +11,7 @@
 #include "comm.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 
 GROUP(clan);
 

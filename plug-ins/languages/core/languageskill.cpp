@@ -12,7 +12,7 @@
 #include "pcharacter.h"
 #include "pcrace.h"
 
-#include "mercdb.h"
+
 #include "math_utils.h"
 #include "poliglot.h"
 

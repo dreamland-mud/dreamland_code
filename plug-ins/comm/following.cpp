@@ -24,7 +24,7 @@
 
 #include "follow_utils.h"
 #include "loadsave.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "merc.h"
 #include "def.h"

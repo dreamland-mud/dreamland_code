@@ -8,7 +8,7 @@
 #include "affect.h"
 #include "grammar_entities_impl.h"
 #include "merc.h"
-#include "mercdb.h"
+
 
 XMLObjectFactory::XMLObjectFactory( ) : extra_flags(0, &::extra_flags), wear_flags(0, &::wear_flags), properties( false )
 {

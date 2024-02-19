@@ -22,7 +22,7 @@
 #include "act.h"
 #include "../../anatolia/handler.h"
 #include "effects.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

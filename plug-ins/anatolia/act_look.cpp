@@ -58,7 +58,7 @@
 #include "../anatolia/handler.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))

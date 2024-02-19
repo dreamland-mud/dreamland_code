@@ -26,7 +26,7 @@
 #include "interp.h"
 #include "wiznet.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 #define OBJ_VNUM_ALTAR 88

@@ -3,7 +3,7 @@
 #include "areautils.h"
 #include "pcharacter.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 #define SANDBOX_VNUM_START 100000

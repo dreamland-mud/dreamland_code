@@ -13,7 +13,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "interp.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "move_utils.h"
 #include "vnum.h"

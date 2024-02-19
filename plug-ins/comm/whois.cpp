@@ -17,7 +17,7 @@
 #include "act.h"
 #include "mudtags.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "descriptor.h"
 #include "loadsave.h"
 #include "skillreference.h"

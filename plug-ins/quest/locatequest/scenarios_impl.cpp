@@ -10,7 +10,7 @@
 #include "object.h"
 
 #include "interp.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "merc.h"
 #include "def.h"

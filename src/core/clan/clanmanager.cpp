@@ -5,7 +5,7 @@
 #include "logstream.h"
 #include "clanmanager.h"
 #include "clan.h"
-#include "mercdb.h"
+#include "merc.h"
 
 ClanManager* clanManager = 0;
 

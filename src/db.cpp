@@ -85,7 +85,7 @@ using namespace std;
 
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+#include "dl_strings.h"
 #include "def.h"
 #include <string.h>
 
@@ -111,9 +111,6 @@ AreaVector areaInstances;
 
 AreaIndexVector areaIndexes;
 
-/*
- * Locals.
- */
 CLAN(none);
 MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
 OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
@@ -122,46 +119,15 @@ char *                        string_hash                [MAX_KEY_HASH];
 
 char                        str_empty        [1];
 
-int                        top_affect;
 int                        top_area;
-int                        top_ed;
-int                        top_exit;
-int                        top_mob_index;
-int                        top_obj_index;
-
-int                        top_vnum_room;
-int                        top_vnum_mob;
-int                        top_vnum_obj;
-
-int mobile_count = 0;
-int newobjs = 0;
-int newmobs = 0;
-
-/*
- * Memory management.
- * Increase MAX_STRING if you have too.        
- * Tune the others only if you understand what you're doing.
- */
-
-void *                        rgFreeList        [MAX_MEM_LIST];
-const int                rgSizeList        [MAX_MEM_LIST]        =
-{
-    16, 32, 64, 128, 256, 1024, 2048, 4096, 8192, 16384, 32768-64
-};
-
-int                        nAllocPerm;
-int                        sAllocPerm;
 
 
-/*
- * Local booting procedures.
- */
 struct area_file * area_file_list;
 
 struct area_file *
 new_area_file(const char *name)
 {
-    struct area_file *rc = (struct area_file *)alloc_perm(sizeof (struct area_file));
+    struct area_file *rc = new area_file;
 
     rc->file_name = str_dup(name);
         
@@ -396,14 +362,13 @@ AreaIndexData * get_area_index(const DLString &filename)
 /*
  * Free a string.
  * Null is legal here to simplify callers.
- * Read-only shared strings are not touched.
  */
 void free_string( char *pstr )
 {
     if (pstr == 0 || pstr == str_empty)
         return;
 
-    free_mem( pstr, strlen(pstr) + 1 );
+    free(pstr);
     return;
 }
 
@@ -411,7 +376,7 @@ void free_string( char *pstr )
 
 /*
  * Duplicate a string into dynamic memory.
- * Fread_strings are read-only and shared.
+ * Null is legal here to simplify callers.
  */
 char *str_dup( const char *str )
 {
@@ -420,137 +385,11 @@ char *str_dup( const char *str )
     if ( !str || !*str )
         return &str_empty[0];
 
-    str_new = ( char* )alloc_mem( strlen(str) + 1 );
+    str_new = (char *)malloc(strlen(str) + 1);
     strcpy( str_new, str );
     return str_new;
 }
 
 
-
-int memAllocCount = 0, memAllocSize = 0;
-/*
- * Allocate some ordinary memory,
- *   with the expectation of freeing it someday.
- */
-void *alloc_mem( int sMem )
-{
-    void *pMem;
-    int *magic;
-    int iList;
-
-    memAllocSize += sMem;
-    memAllocCount++;
-
-    sMem += sizeof(*magic);
-
-    for ( iList = 0; iList < MAX_MEM_LIST; iList++ )
-    {
-        if ( sMem <= rgSizeList[iList] )
-            break;
-    }
-
-    if ( iList == MAX_MEM_LIST )
-    {
-        bug( "Alloc_mem: size %d too large.", sMem );
-        exit( 1 );
-    }
-
-    if ( rgFreeList[iList] == 0 )
-    {
-        pMem              = alloc_perm( rgSizeList[iList] );
-    }
-    else
-    {
-        pMem              = rgFreeList[iList];
-        rgFreeList[iList] = * ((void **) rgFreeList[iList]);
-    }
-
-    magic = (int *) pMem;
-    *magic = MAGIC_NUM;
-/*  ( char* )pMem += sizeof( *magic );
-
-    return pMem;*/ return (void *)( (char *)pMem+sizeof(*magic) );
-}
-
-/*
- * Free some memory.
- * Recycle it back onto the free list for blocks of that size.
- */
-void free_mem( void *pMem, int sMem )
-{
-    int iList;
-    int *magic;
-
-    memAllocSize -= sMem;
-    memAllocCount--;
-
-    pMem = (void*)( (char *)pMem-sizeof(*magic));
-    magic = (int *) pMem;
-
-    if (*magic != MAGIC_NUM)
-    {
-            bug("Attempt to recyle invalid memory of size %d.",sMem);
-            bug((char*) pMem + sizeof(*magic),0);
-            abort( );
-            return;
-    }
-
-    *magic = 0;
-    sMem += sizeof(*magic);
-
-    for ( iList = 0; iList < MAX_MEM_LIST; iList++ )
-    {
-            if ( sMem <= rgSizeList[iList] )
-                    break;
-    }
-
-    if ( iList == MAX_MEM_LIST )
-    {
-            bug( "Free_mem: size %d too large.", sMem );
-            exit( 1 );
-    }
-
-    * ((void **) pMem) = rgFreeList[iList];
-    rgFreeList[iList]  = pMem;
-}
-
-
-/*
- * Allocate some permanent memory.
- * Permanent memory is never freed,
- *   pointers into it may be copied safely.
- */
-void *alloc_perm( int sMem )
-{
-        static char *pMemPerm;
-        static int iMemPerm;
-        void *pMem;
-
-        while ( sMem % sizeof(long) != 0 )
-                sMem++;
-
-        if ( sMem > MAX_PERM_BLOCK )
-        {
-                bug( "Alloc_perm: %d too large.", sMem );
-                exit( 1 );
-        }
-
-        if ( pMemPerm == 0 || iMemPerm + sMem > MAX_PERM_BLOCK )
-        {
-                iMemPerm = 0;
-
-                if ( ( pMemPerm = ( char* )calloc( 1, MAX_PERM_BLOCK ) ) == 0 )
-                {
-                        perror( "Alloc_perm" );
-                        exit( 1 );
-                }
-        }
-
-        pMem        = pMemPerm + iMemPerm;
-        iMemPerm   += sMem;
-        nAllocPerm += 1;
-        sAllocPerm += sMem;
-        return pMem;
-}
 
 

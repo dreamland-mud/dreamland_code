@@ -10,7 +10,7 @@
 #include "interp.h"
 #include "arg_utils.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "handler.h"
 
 /*--------------------------------------------------------------------------

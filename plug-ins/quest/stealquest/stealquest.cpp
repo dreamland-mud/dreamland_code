@@ -16,7 +16,7 @@
 #include "room.h"
 #include "roomutils.h"
 #include "object.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "save.h"
 #include "act.h"

@@ -34,7 +34,7 @@
 #include "interp.h"
 #include "comm.h"
 #include "save.h"
-#include "mercdb.h"
+
 #include "fight.h"
 #include "skill_utils.h"
 #include "immunity.h"

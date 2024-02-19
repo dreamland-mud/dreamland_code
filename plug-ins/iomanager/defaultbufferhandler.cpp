@@ -14,7 +14,7 @@
 #include "wiznet.h"
 #include "telnet.h"
 #include "codepage.h"
-#include "mercdb.h"
+
 #include "colour.h"
 #include "def.h"
 

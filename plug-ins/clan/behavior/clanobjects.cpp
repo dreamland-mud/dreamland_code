@@ -14,7 +14,7 @@
 #include "merc.h"
 #include "fight.h"
 #include "descriptor.h"
-#include "mercdb.h"
+
 #include "interp.h"
 #include "handler.h"
 #include "infonet.h"

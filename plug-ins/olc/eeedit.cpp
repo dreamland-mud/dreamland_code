@@ -25,7 +25,7 @@
 #include "merc.h"
 #include "interp.h"
 #include "websocketrpc.h"
-#include "mercdb.h"
+
 
 #include "olc.h"
 #include "security.h"

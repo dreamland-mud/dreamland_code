@@ -34,7 +34,7 @@
 
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(none);

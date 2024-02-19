@@ -114,7 +114,7 @@
 #include "stats_apply.h"
 #include "arg_utils.h"
 #include "vnum.h"
-#include "mercdb.h"
+
 #include "commandflags.h"
 #include "damageflags.h"
 #include "autoflags.h"

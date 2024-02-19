@@ -10,7 +10,7 @@
 #include "pcharacter.h"
 
 #include "mudtags.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "act.h"
 #include "def.h"

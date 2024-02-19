@@ -18,7 +18,7 @@
 #include "magic.h"
 #include "handler.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(none);

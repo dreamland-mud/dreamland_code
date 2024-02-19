@@ -8,7 +8,7 @@
 #include "xmldocument.h"
 #include "logstream.h"
 #include "fread_utils.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

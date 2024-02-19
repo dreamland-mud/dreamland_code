@@ -11,7 +11,7 @@
 #include "fileformatexception.h"
 #include "room.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "dreamland.h"
 #include "def.h"
 
@@ -244,8 +244,6 @@ XMLArea::load_rooms(AreaIndexData *a)
         if(3000 <= vnum && vnum < 3400)
             SET_BIT(room->room_flags, ROOM_LAW);
 
-        top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
-
         roomIndexMap[vnum] = room;
         room->areaIndex->roomIndexes[vnum] = room;
 
@@ -276,9 +274,6 @@ XMLArea::load_mobiles(AreaIndexData *a)
         if (FeniaManager::wrapperManager)
             FeniaManager::wrapperManager->linkWrapper( pMobIndex );
 
-        newmobs++;
-        top_mob_index++;
-        top_vnum_mob = top_vnum_mob < vnum ? vnum : top_vnum_mob;
         kill_table[URANGE(0, pMobIndex->level, MAX_LEVEL-1)].number++;
     }
 }
@@ -303,10 +298,6 @@ XMLArea::load_objects(AreaIndexData *a)
         
         if (FeniaManager::wrapperManager)
             FeniaManager::wrapperManager->linkWrapper( pObjIndex );
-
-        newobjs++;
-        top_obj_index++;
-        top_vnum_obj = top_vnum_obj < vnum ? vnum : top_vnum_obj;       /* OLC */
     }
 }
 

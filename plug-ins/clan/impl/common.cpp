@@ -16,7 +16,7 @@
 #include "act.h"
 #include "handler.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(clanrecall);

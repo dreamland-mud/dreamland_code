@@ -25,7 +25,7 @@
 #include "infonet.h"
 #include "messengers.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "screenreader.h"
 
 #include "clantypes.h"

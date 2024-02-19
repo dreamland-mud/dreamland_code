@@ -25,7 +25,7 @@
 #include "skill_utils.h"
 #include "comm.h"
 #include "loadsave.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "act.h"
 #include "def.h"

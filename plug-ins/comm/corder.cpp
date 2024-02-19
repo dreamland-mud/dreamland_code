@@ -20,7 +20,7 @@
 #include "arg_utils.h"
 #include "loadsave.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 #include "morphology.h"

@@ -13,7 +13,7 @@
 #include "vnum.h"
 #include "handler.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 void SteakCustomer::greet( Character *victim ) 

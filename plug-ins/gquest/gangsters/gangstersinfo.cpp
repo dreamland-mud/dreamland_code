@@ -11,7 +11,7 @@
 #include "pcharacter.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GangstersInfo* GangstersInfo::thisClass = NULL;

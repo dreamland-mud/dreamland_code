@@ -26,7 +26,7 @@
 #include "skill_utils.h"
 #include "merc.h"
 #include "handler.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "interp.h"
 #include "def.h"

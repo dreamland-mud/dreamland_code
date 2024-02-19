@@ -8,7 +8,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "commandmanager.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "merc.h"
 #include "interp.h"

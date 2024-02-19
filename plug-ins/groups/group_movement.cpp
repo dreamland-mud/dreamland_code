@@ -42,7 +42,7 @@
 
 #include "stats_apply.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "effects.h"
 #include "act.h"

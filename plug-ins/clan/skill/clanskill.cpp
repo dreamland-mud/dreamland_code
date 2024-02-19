@@ -15,7 +15,7 @@
 #include "dreamland.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 const DLString ClanSkill::CATEGORY = "Клановые умения";

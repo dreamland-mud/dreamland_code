@@ -18,7 +18,7 @@
 #include "exitsmovement.h"
 #include "interp.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(pass_door);

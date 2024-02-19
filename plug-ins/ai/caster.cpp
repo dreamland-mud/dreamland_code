@@ -18,7 +18,7 @@
 #include "interp.h"
 #include "act_move.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 PROF(warlock);

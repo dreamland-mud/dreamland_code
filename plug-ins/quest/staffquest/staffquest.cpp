@@ -15,7 +15,7 @@
 #include "roomutils.h"
 #include "handler.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "def.h"
 

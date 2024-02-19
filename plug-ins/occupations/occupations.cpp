@@ -15,7 +15,7 @@
 #include "interp.h"
 #include "loadsave.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 static const char * occ_names [] = 

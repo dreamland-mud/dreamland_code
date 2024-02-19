@@ -31,7 +31,7 @@
 
 
 #include "act_move.h"
-#include "mercdb.h"
+
 #include "magic.h"
 #include "skill_utils.h"
 #include "fight.h"

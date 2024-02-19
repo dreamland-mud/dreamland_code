@@ -10,7 +10,7 @@
 #include "act.h"
 #include "comm.h"
 #include "websocketrpc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 extern void help_save_ids();

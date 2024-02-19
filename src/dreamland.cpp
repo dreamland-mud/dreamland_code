@@ -51,7 +51,7 @@
 #include "bonus.h"
 #include "eventbus.h"
 
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

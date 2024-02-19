@@ -16,7 +16,7 @@
 #include "wearloc_utils.h"
 #include "weapons.h"
 #include "occupations.h"
-#include "mercdb.h"
+
 #include "grammar_entities_impl.h"
 #include "personalquestreward.h"
 #include "objectwrapper.h"

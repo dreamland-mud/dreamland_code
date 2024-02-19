@@ -40,7 +40,7 @@
 #include "chance.h"
 #include "exitsmovement.h"
 #include "act_lock.h"
-#include "mercdb.h"
+
 #include "save.h"
 
 #include "magic.h"

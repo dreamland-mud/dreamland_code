@@ -13,7 +13,7 @@
 #include "act_move.h"
 #include "itemflags.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 struct Road {

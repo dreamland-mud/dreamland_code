@@ -23,7 +23,7 @@
 #include "affect.h"
 #include "commonattributes.h"
 
-#include "mercdb.h"
+
 #include "npcharacter.h"
 #include "object.h"
 #include "pcharacter.h"
@@ -40,7 +40,7 @@
 #include "magic.h"
 #include "material.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "morphology.h"
 #include "onehit.h"
 #include "onehit_weapon.h"

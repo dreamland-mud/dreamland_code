@@ -53,7 +53,7 @@
 #include "weapontier.h"
 #include "../anatolia/handler.h"
 #include "vnum.h"
-#include "mercdb.h"
+
 #include "comm.h"
 #include "def.h"
 

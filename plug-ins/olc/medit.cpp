@@ -22,7 +22,7 @@
 #include "interp.h"
 #include "../anatolia/handler.h"
 #include "act.h"
-#include "mercdb.h"
+
 
 #include "olc.h"
 #include "security.h"
@@ -172,14 +172,10 @@ void OLCStateMobile::commit()
         original->vnum = mob.vnum;
         original->area = mob.area;
 
-        if (mob.vnum > top_vnum_mob)
-            top_vnum_mob = mob.vnum;
-
         mob.act |= ACT_IS_NPC;
         iHash = (int) mob.vnum % MAX_KEY_HASH;
         original->next = mob_index_hash[iHash];
         mob_index_hash[iHash] = original;
-        top_mob_index++;
     }
 
 

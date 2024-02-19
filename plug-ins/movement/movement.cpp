@@ -27,7 +27,7 @@
 #include "fight_exception.h"
 #include "loadsave.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 Movement::Movement( Character *ch ) 

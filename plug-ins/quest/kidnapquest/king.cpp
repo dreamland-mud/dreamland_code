@@ -15,7 +15,7 @@
 #include "pcharactermanager.h"
 #include "object.h"
 
-#include "mercdb.h"
+
 #include "handler.h"
 #include "act.h"
 #include "def.h"

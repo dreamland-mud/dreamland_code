@@ -6,7 +6,7 @@
 
 #include "pcharacter.h"
 
-#include "mercdb.h"
+#include "merc.h"
 #include "def.h"
 
 const char * movedanger_names [] = {

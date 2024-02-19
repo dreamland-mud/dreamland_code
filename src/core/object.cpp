@@ -25,7 +25,7 @@
 #include "object.h"
 #include "affect.h"
 #include "character.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 WEARLOC(none);

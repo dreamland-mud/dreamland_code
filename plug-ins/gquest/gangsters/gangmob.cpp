@@ -21,7 +21,7 @@
 #include "fight.h"
 #include "act.h"
 #include "vnum.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

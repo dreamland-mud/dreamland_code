@@ -11,7 +11,7 @@
 #include "class.h"
 #include "pcharacter.h"
 
-#include "mercdb.h"
+#include "merc.h"
 #include "def.h"
 
 const DLString ArcadianLanguage::LANG_NAME = "arcadian";

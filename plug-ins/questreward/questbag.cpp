@@ -12,7 +12,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "core/object.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

@@ -12,7 +12,7 @@
 #include "fight_safe.h"
 #include "wearloc_utils.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 RELIG(karmina);

@@ -13,7 +13,7 @@
 #include "object.h"
 #include "room.h"
 #include "handler.h"
-#include "mercdb.h"
+
 
 /*--------------------------------------------------------------------
  * ItemQuestModel 

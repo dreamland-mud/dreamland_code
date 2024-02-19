@@ -4,8 +4,9 @@
  */
 #include "liquid.h"
 #include "flags.h"
+#include "merc.h"
+#include "def.h"
 
-#include "mercdb.h"
 
 LIQ(water);
 

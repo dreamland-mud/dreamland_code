@@ -14,7 +14,7 @@
 #include "arg_utils.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 // Remove after 'raceedit convert' removal

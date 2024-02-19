@@ -22,7 +22,7 @@
 #include "interp.h"
 #include "../../anatolia/handler.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 #include "skill_utils.h"

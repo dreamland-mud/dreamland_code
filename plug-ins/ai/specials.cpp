@@ -24,7 +24,7 @@
 #include "interp.h"
 #include "magic.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

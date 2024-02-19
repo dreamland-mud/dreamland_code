@@ -24,7 +24,7 @@
 #include "handler.h"
 #include "wiznet.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 Quest::Quest( ) 

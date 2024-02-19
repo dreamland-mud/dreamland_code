@@ -5,7 +5,7 @@
 #include "alignment.h"
 #include "pcharacter.h"
 #include "pcrace.h"
-#include "mercdb.h"
+
 #include "grammar_entities_impl.h"
 #include "act.h"
 

@@ -18,7 +18,7 @@
 #include "act.h"
 #include "loadsave.h"
 #include "wiznet.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(garble);

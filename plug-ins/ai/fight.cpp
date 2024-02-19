@@ -18,7 +18,7 @@
 #include "handler.h"
 #include "magic.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(none);

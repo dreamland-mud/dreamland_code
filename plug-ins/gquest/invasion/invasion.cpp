@@ -22,7 +22,7 @@
 #include "object.h"
 
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "handler.h"
 #include "descriptor.h"

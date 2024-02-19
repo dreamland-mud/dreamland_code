@@ -17,7 +17,7 @@
 #include "save.h"
 #include "loadsave.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

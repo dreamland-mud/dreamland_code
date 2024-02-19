@@ -17,7 +17,7 @@
 #include "act.h"
 #include "loadsave.h"
 #include "wearloc_utils.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(bless);

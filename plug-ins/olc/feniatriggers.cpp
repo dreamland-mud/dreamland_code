@@ -20,7 +20,7 @@
 #include "arg_utils.h"
 #include "areaquestutils.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "def.h"
 

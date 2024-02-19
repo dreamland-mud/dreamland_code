@@ -24,7 +24,7 @@
 
 #include "dreamland.h"
 #include "act_move.h"
-#include "mercdb.h"
+
 #include "magic.h"
 #include "fight.h"
 #include "fight_exception.h"

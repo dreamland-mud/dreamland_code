@@ -5,7 +5,7 @@
 #include "stringlist.h"
 #include "core/object.h"
 #include "character.h"
-#include "mercdb.h"
+
 #include "merc.h"
 
 #include "immunity.h"

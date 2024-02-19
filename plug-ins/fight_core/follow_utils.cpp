@@ -22,7 +22,7 @@
 #include "loadsave.h"
 #include "interp.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(charm_person);

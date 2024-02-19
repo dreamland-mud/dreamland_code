@@ -13,7 +13,7 @@
 #include "arg_utils.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 
 /*----------------------------------------------------------------------
  * 'mysocial' command

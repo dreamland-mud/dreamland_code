@@ -28,7 +28,7 @@
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 using namespace Grammar;

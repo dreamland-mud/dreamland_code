@@ -7,7 +7,7 @@
 #include "character.h"
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 void AreaBehaviorPlugin::initialization( ) {

@@ -40,7 +40,7 @@
 #include "wiznet.h"
 #include "messengers.h"
 #include "infonet.h"
-#include "mercdb.h"
+
 #include "desire.h"
 #include "act.h"
 #include "../anatolia/handler.h"

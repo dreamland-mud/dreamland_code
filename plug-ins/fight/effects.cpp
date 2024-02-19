@@ -59,7 +59,7 @@
 #include "dreamland.h"
 #include "save.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "desire.h"
 #include "act.h"
 

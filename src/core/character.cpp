@@ -42,7 +42,7 @@
 #include "dreamland.h"
 #include "def.h"
 
-#include "mercdb.h"
+
 
 using Scripting::Register;
 using Scripting::RegisterList;
@@ -94,7 +94,6 @@ Character::Character( )
                 ambushing( &str_empty[0] ),
                 trap( 0, &trap_flags )
 {
-    mobile_count++;
 }
 
 Character::~Character(void)

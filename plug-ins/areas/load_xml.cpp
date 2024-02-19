@@ -26,7 +26,7 @@
 #include "xmlmobilefactory.h"
 #include "room.h"
 #include "dreamland.h"
-#include "mercdb.h"
+
 
 using namespace std;
 

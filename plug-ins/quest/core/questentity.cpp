@@ -11,7 +11,7 @@
 #include "pcharactermanager.h"
 #include "object.h"
 
-#include "mercdb.h"
+
 #include "follow_utils.h"
 #include "merc.h"
 #include "descriptor.h"

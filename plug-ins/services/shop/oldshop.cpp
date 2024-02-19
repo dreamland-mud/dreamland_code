@@ -41,7 +41,7 @@
 #include "arg_utils.h"
 #include "skill_utils.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "../../anatolia/handler.h"
 #include "interp.h"

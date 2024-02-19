@@ -32,7 +32,7 @@
 #include "update_areas.h"
 #include "websocketrpc.h"
 
-#include "mercdb.h"
+
 
 #include "redit.h"
 #include "eeedit.h"
@@ -862,9 +862,6 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
     pRoom = new RoomIndexData;
     pRoom->vnum = value;
     pRoom->areaIndex = get_vnum_area(value);
-
-    if (value > top_vnum_room)
-        top_vnum_room = value;
 
     roomIndexMap[value] = pRoom;
     pRoom->areaIndex->roomIndexes[value] = pRoom;

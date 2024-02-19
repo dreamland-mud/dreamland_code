@@ -13,7 +13,7 @@
 #include "damage.h"
 #include "loadsave.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "def.h"
 

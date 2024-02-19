@@ -29,7 +29,7 @@
 #include "descriptor.h"
 #include "mudtags.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

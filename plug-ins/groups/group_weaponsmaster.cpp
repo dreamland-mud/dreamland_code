@@ -25,7 +25,7 @@
 #include "object.h"
 
 #include "act_move.h"
-#include "mercdb.h"
+
 
 #include "magic.h"
 #include "skill_utils.h"
@@ -37,7 +37,7 @@
 #include "charutils.h"
 #include "stats_apply.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "act.h"
 #include "interp.h"

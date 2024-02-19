@@ -13,7 +13,6 @@
 #include "affect.h"
 #include "object.h"
 #include "character.h"
-#include "mercdb.h"
 #include "merc.h"
 #include "def.h"
 

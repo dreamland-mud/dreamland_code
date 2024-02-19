@@ -36,7 +36,7 @@
 #include "handler.h"
 #include "merc.h"
 #include "vnum.h"
-#include "mercdb.h"
+
 #include "fight.h"
 #include "magic.h"
 #include "def.h"

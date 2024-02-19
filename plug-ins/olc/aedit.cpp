@@ -20,7 +20,7 @@
 #include "update_areas.h"
 #include "interp.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 OLC_STATE(OLCStateArea);

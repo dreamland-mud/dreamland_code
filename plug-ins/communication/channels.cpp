@@ -19,7 +19,7 @@
 #include "commandmanager.h"
 #include "areaquestutils.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "infonet.h"
 #include "descriptor.h"
 #include "loadsave.h"

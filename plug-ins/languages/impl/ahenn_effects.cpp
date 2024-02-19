@@ -15,7 +15,7 @@
 #include "fight.h"
 #include "act.h"
 #include "loadsave.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

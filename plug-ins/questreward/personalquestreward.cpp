@@ -11,7 +11,7 @@
 #include "room.h"
 #include "act.h"
 #include "loadsave.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

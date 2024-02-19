@@ -11,7 +11,7 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

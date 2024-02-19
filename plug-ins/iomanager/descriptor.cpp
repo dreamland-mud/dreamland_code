@@ -34,7 +34,7 @@
 #include "objectbehavior.h"
 #include "room.h"
 #include "object.h"
-#include "mercdb.h"
+
 #include "loadsave.h"
 #include "interp.h"
 #include "telnet.h"

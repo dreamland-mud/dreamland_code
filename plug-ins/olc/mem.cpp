@@ -20,15 +20,13 @@
 #include "olc.h"
 #include "clanreference.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(none);
 
 // Globals
 extern int top_area;
-extern int top_exit;
-extern int top_ed;
 
 EXIT_DATA *exit_free;
 void free_extra_descr(EXTRA_DESCR_DATA * pExtra);
@@ -38,8 +36,7 @@ EXIT_DATA *new_exit(void)
     EXIT_DATA *pExit;
 
     if (!exit_free) {
-        pExit = (EXIT_DATA*)alloc_perm(sizeof(*pExit));
-        top_exit++;
+        pExit = new EXIT_DATA;
     }
     else {
         pExit = exit_free;
@@ -106,7 +103,6 @@ MOB_INDEX_DATA *new_mob_index(void)
     MOB_INDEX_DATA *pMob;
 
     pMob = new MOB_INDEX_DATA;
-//        top_mob_index++;
 
     pMob->next = NULL;
     pMob->spec_fun = NULL;

@@ -13,7 +13,7 @@
 
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 FleeMovement::FleeMovement( Character *ch )

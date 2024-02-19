@@ -15,7 +15,7 @@
 #include "pcharacter.h"
 #include "clanreference.h"
 
-#include "mercdb.h"
+
 #include "act.h"
 #include "merc.h"
 #include "descriptor.h"

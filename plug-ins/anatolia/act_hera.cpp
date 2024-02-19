@@ -72,7 +72,7 @@
 #include "ban.h"
 #include "act.h"
 
-#include "mercdb.h"
+
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "race.h"

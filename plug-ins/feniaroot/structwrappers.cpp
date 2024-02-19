@@ -47,7 +47,7 @@
 #include "liquidflags.h"
 #include "damageflags.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 using namespace std;

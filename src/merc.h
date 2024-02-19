@@ -78,17 +78,60 @@
 #include "affectlist.h"
 #include "clanreference.h"
 #include "areaquest.h"
+#include "dl_strings.h"
+#include "dl_math.h"
+#include "dl_ctype.h"
+#include "logstream.h"
 
 class NPCharacter;
 class Character;
 class Object;
 class Room;
 class RoomIndexData;
+class AreaIndexData;
 class XMLDocument;
 class AreaBehavior;
 typedef ::Pointer<XMLDocument> XMLDocumentPointer;
 typedef map<DLString, DLString> Properties;
 class AreaQuest;
+struct extra_exit_data;
+struct mob_index_data;
+struct obj_index_data;
+struct extra_descr_data;
+
+#define        MAX_KEY_HASH                 1024
+
+extern char str_empty[1];
+
+extern mob_index_data         * mob_index_hash          [MAX_KEY_HASH];
+extern obj_index_data         * obj_index_hash          [MAX_KEY_HASH];
+
+extern int        top_area; // Keep tracks of all areas loaded; used to assign area's vnum field.
+
+// MOC_SKIP_BEGIN
+struct area_file {
+    struct area_file *next;
+    struct AreaIndexData *area;
+    char *file_name;
+};
+
+extern struct area_file * area_file_list;
+struct area_file * new_area_file(const char *name);
+// MOC_SKIP_END
+
+
+mob_index_data *        get_mob_index        ( int vnum );
+obj_index_data *        get_obj_index        ( int vnum );
+RoomIndexData *        get_room_index        ( int vnum );
+Room * get_room_instance(int vnum);
+AreaIndexData * get_area_index(const DLString &filename);
+
+char *        get_extra_descr        ( const char *name, extra_descr_data *ed );
+extra_descr_data *new_extra_descr( );
+void free_extra_descr( extra_descr_data * );
+
+char *        str_dup                ( const char *str );
+void        free_string        ( char *pstr );
 
 
 /* RT ASCII conversions -- used so we can have letters in this file */
@@ -636,13 +679,5 @@ extern AreaVector areaInstances;
 
 typedef vector<AreaIndexData *> AreaIndexVector;
 extern AreaIndexVector areaIndexes;
-
-extern                int                        top_vnum_room;
-extern                int                        top_vnum_mob;
-extern                int                        top_vnum_obj;
-extern                int                        top_obj_index;
-extern                int                        top_mob_index;
-
-
 
 #endif

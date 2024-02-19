@@ -17,7 +17,7 @@
 #include "loadsave.h"
 #include "telnet.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "so.h"
 #include "def.h"
 

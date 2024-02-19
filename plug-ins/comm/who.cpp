@@ -24,7 +24,7 @@
 #include "fight.h"
 #include "act.h"
 #include "skillreference.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "merc.h"
 #include "descriptor.h"

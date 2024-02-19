@@ -31,7 +31,7 @@
 #include "merc.h"
 #include "handler.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(spellbane);

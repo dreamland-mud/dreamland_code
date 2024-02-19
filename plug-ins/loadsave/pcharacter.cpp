@@ -23,7 +23,7 @@
 #include "room.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

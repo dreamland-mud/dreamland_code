@@ -1,7 +1,7 @@
 #include "logstream.h"
 #include "object.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "loadsave.h"
 
 #include "spellwrapper.h"

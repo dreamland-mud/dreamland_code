@@ -24,7 +24,7 @@
 #include "act.h"
 #include "loadsave.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(battlerager);

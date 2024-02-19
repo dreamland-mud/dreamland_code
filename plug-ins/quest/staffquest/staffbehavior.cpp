@@ -13,7 +13,7 @@
 #include "merc.h"
 #include "act.h"
 #include "handler.h"
-#include "mercdb.h"
+
 #include "magic.h"
 #include "def.h"
 

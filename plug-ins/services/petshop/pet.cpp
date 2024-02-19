@@ -19,7 +19,7 @@
 #include "act.h"
 #include "../../anatolia/handler.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 #include "charutils.h"
 #include "skill_utils.h"

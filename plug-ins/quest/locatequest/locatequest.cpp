@@ -21,7 +21,7 @@
 #include "handler.h"
 #include "act.h"
 #include "save.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(battlerager);

@@ -17,7 +17,7 @@
 #include "pcharacter.h"
 #include "affect.h"
 
-#include "mercdb.h"
+
 #include "act.h"
 #include "handler.h"
 #include "act_move.h"

@@ -25,7 +25,7 @@
 #include "occupations.h"
 #include "act.h"
 #include "interp.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

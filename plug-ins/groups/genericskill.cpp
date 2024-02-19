@@ -18,7 +18,7 @@
 #include "npcharacter.h"
 #include "hometown.h"
 #include "profflags.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "clan.h"
 #include "merc.h"

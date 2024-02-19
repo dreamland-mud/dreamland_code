@@ -12,7 +12,7 @@
 #include "pcharacter.h"
 #include "merc.h"
 #include "descriptor.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CMDRUNP( webedit )

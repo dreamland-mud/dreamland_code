@@ -23,7 +23,7 @@
 
 #include "act.h"
 #include "move_utils.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "merc.h"
 #include "vnum.h"

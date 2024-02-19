@@ -18,7 +18,7 @@
 #include "structwrappers.h"
 
 #include "msgformatter.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 using namespace Scripting;

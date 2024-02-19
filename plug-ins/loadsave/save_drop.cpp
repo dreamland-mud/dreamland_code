@@ -26,7 +26,7 @@
 #include "loadsave.h"
 #include "fread_utils.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(doppelganger);

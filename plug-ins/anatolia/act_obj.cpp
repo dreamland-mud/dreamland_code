@@ -75,7 +75,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "wiznet.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "interp.h"
 #include "areaquestutils.h"

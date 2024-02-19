@@ -36,7 +36,7 @@
 #include "move_utils.h"
 #include "vnum.h"
 #include "clanreference.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "fight.h"
 #include "magic.h"

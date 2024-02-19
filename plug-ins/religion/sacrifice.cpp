@@ -28,7 +28,7 @@
 #include "itemflags.h"
 #include "loadsave.h"
 #include "wearloc_utils.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "save.h"
 #include "terrains.h"

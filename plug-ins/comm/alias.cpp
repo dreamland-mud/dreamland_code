@@ -27,7 +27,7 @@
 #include "descriptor.h"
 #include "loadsave.h"
 #include "comm.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 /*-----------------------------------------------------------------------------

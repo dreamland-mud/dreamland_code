@@ -11,7 +11,7 @@
 #include "room.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 PocketWatch::PocketWatch( ) : broken( false )

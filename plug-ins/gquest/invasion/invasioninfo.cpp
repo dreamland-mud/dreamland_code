@@ -10,7 +10,7 @@
 
 #include "room.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 InvasionGQuestInfo* InvasionGQuestInfo::thisClass = NULL;

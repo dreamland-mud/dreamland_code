@@ -15,7 +15,7 @@
 #include "merc.h"
 #include "../../anatolia/handler.h"
 #include "act.h"
-#include "mercdb.h"
+
 
 #include "clan.h"
 #include "clantypes.h"

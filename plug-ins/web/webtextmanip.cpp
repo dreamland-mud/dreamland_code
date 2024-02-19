@@ -10,7 +10,7 @@
 #include "pcharacter.h"
 #include "descriptor.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 

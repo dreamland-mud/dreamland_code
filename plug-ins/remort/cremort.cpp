@@ -29,7 +29,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "nannyhandler.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "act.h"
 #include "vnum.h"

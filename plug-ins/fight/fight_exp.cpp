@@ -23,7 +23,7 @@
 
 #include "wiznet.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "bonus.h"
 #include "fight.h"

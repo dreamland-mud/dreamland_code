@@ -38,7 +38,7 @@
 #include "charutils.h"
 #include "profflags.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"

@@ -13,7 +13,7 @@
 #include "pcharacter.h"
 #include "dlfilestream.h"
 
-#include "mercdb.h"
+#include "merc.h"
 #include "def.h"
 
 static IconvMap utf2koi("utf-8", "koi8-r");

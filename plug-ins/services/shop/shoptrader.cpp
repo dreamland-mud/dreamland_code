@@ -18,7 +18,7 @@
 #include "interp.h"
 #include "../../anatolia/handler.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 /*

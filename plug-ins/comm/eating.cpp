@@ -26,7 +26,7 @@
 #include "act.h"
 #include "vnum.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(battlerager);

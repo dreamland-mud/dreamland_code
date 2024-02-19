@@ -21,7 +21,7 @@
 
 
 #include "act_move.h"
-#include "mercdb.h"
+
 #include "save.h"
 #include "magic.h"
 #include "fight.h"

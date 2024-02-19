@@ -32,7 +32,7 @@
 #include "magic.h"
 #include "merc.h"
 
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "handler.h"
 #include "save.h"

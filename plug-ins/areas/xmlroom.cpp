@@ -9,7 +9,7 @@
 #include "clanreference.h"
 #include "wearlocation.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(none);

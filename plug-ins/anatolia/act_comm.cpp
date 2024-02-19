@@ -76,7 +76,7 @@
 #include "save.h"
 #include "merc.h"
 #include "descriptor.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "interp.h"
 #include "object.h"

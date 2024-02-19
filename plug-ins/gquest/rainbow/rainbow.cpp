@@ -29,7 +29,7 @@
 #include "pcharactermanager.h"
 
 #include "act.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "save.h"
 #include "merc.h"

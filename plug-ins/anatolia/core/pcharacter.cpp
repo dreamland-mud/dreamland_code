@@ -17,7 +17,7 @@
 #include "messengers.h"
 #include "act.h"
 #include "stats_apply.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

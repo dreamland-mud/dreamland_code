@@ -26,7 +26,7 @@
 #include "descriptor.h"
 #include "colour.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 /*--------------------------------------------------------------------------

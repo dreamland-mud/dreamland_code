@@ -19,7 +19,7 @@
 #include "arg_utils.h"
 #include "interp.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 OLC_STATE(OLCStateReligion);

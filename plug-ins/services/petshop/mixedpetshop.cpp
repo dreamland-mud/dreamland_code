@@ -14,10 +14,10 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
-
+#include "merc.h"
 #include "interp.h"
 #include "act.h"
-#include "mercdb.h"
+#include "def.h"
 
 WEARLOC(none);
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );

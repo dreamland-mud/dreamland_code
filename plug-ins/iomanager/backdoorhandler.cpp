@@ -20,7 +20,7 @@
 #include "loadsave.h"
 #include "interp.h"
 #include "wiznet.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

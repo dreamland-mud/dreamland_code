@@ -45,7 +45,7 @@
 #include "itemflags.h"
 #include "fread_utils.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 using namespace std;
@@ -281,7 +281,7 @@ void fix_resets()
                 }
             }
 
-            free_mem(pReset, sizeof(*pReset));
+            delete pReset;
 
             break;
 

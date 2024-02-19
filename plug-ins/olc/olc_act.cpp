@@ -32,7 +32,7 @@
 #include "act.h"
 #include "interp.h"
 
-#include "mercdb.h"
+
 
 #include "olc.h"
 #include "loadsave.h"

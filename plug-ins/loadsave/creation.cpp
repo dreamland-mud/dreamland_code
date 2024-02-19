@@ -28,7 +28,7 @@
 #include "def.h"
 #include "itemevents.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 
 GSN(sanctuary);

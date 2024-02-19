@@ -8,7 +8,7 @@
 #include "interp.h"
 #include "dlstring.h"
 #include "pcharacter.h"
-#include "mercdb.h"
+
 #include "olcstate.h"
 
 OLCStringEditor::OLCStringEditor(OLCState &s) : olc(s)

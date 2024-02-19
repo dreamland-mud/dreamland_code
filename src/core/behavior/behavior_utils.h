@@ -9,7 +9,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "merc.h"
-#include "mercdb.h"
+
 
 #define BEHAVIOR_CALL( var, method, args...) \
         if (var && var->behavior) { \

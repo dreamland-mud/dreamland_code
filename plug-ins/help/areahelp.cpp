@@ -7,7 +7,7 @@
 #include "areabehaviorplugin.h"
 #include "regexp.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "dl_strings.h"
 #include "act.h"
 #include "def.h"

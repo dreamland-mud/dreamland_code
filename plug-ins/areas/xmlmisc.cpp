@@ -17,7 +17,7 @@
 #include "room.h"
 #include "directions.h"
 #include "merc.h"
-#include "mercdb.h"
+
 
 using namespace std;
 
@@ -301,7 +301,7 @@ XMLExitDir::init(const exit_data *ex)
 exit_data *
 XMLExitDir::compat( )
 {
-    EXIT_DATA *pexit = (EXIT_DATA*)alloc_perm(sizeof(EXIT_DATA));
+    EXIT_DATA *pexit = new EXIT_DATA;
     
     pexit->keyword = str_dup(keyword.getValue( ).c_str( ));
     pexit->short_descr = str_dup(short_descr.c_str());

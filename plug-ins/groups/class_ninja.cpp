@@ -23,7 +23,7 @@
 #include "object.h"
 
 #include "act_move.h"
-#include "mercdb.h"
+
 #include "skill_utils.h"
 
 #include "magic.h"

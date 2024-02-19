@@ -16,7 +16,7 @@
 #include "quest.h"
 #include "questregistrator.h"
 
-#include "mercdb.h"
+
 
 using namespace std;
 

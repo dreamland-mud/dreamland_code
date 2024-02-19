@@ -12,7 +12,7 @@
 #include "room.h"
 #include "save.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "interp.h"
 #include "handler.h"

@@ -16,7 +16,7 @@
 #include "roomutils.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

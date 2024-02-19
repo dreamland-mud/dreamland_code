@@ -11,7 +11,7 @@
 #include "ban.h"
 #include "comm.h"
 
-#include "mercdb.h"
+
 #include "def.h"
 
 void WrapperHandler::init( Descriptor *d ) 

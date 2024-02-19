@@ -11,7 +11,7 @@
 #include "genericskill.h"
 #include "wiznet.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "itemflags.h"
 #include "def.h"
 

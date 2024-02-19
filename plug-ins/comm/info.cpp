@@ -15,7 +15,7 @@
 
 #include "handler.h"
 #include "vnum.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 static list<DLString> desc_to_list(const char *text)

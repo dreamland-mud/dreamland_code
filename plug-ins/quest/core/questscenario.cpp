@@ -11,7 +11,7 @@
 #include "pcharacter.h"
 
 #include "../../anatolia/handler.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

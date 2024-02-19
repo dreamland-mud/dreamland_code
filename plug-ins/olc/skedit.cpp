@@ -32,7 +32,7 @@
 #include "commandflags.h"
 #include "act.h"
 #include "comm.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(garble);

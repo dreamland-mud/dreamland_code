@@ -13,7 +13,7 @@
 #include "loadsave.h"
 #include "fread_utils.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 void ObjectBehaviorManager::assign( Object *obj ) {

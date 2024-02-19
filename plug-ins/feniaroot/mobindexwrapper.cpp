@@ -8,7 +8,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "loadsave.h"
 #include "pet.h"
 

@@ -11,7 +11,7 @@
 
 #include "npcharacter.h"
 #include "fread_utils.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 /**

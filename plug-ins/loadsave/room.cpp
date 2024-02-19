@@ -13,7 +13,7 @@
 #include "dreamland.h"
 #include "roombehaviormanager.h"
 #include "loadsave.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 
@@ -48,7 +48,7 @@ extra_exit_data * extra_exit_data::create()
 
 exit_data *exit_data::create()
 {
-    EXIT_DATA *pexit = (EXIT_DATA*)alloc_perm(sizeof(EXIT_DATA));
+    EXIT_DATA *pexit = new EXIT_DATA;
 
     pexit->keyword = str_dup(keyword);
     pexit->short_descr = str_dup(short_descr);

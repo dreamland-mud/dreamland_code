@@ -36,7 +36,7 @@
 #include "weapontier.h"
 #include "websocketrpc.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "../anatolia/handler.h"
 
 #include "olc.h"
@@ -141,13 +141,9 @@ void OLCStateObject::commit()
         original->vnum = obj.vnum;
         original->area = obj.area;
 
-        if (obj.vnum > top_vnum_obj)
-            top_vnum_obj = obj.vnum;
-
         iHash = (int) obj.vnum % MAX_KEY_HASH;
         original->next = obj_index_hash[iHash];
         obj_index_hash[iHash] = original;
-        top_obj_index++;
     }
     
     EXTRA_DESCR_DATA *ed, *ed_next;

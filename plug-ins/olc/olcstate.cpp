@@ -14,7 +14,7 @@
 #include "interp.h"
 #include "arg_utils.h"
 #include "websocketrpc.h"
-#include "mercdb.h"
+
 
 /*--------------------------------------------------------------------------
  * OLCCommand

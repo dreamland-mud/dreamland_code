@@ -21,7 +21,7 @@
 #include "act.h"
 
 #include "handler.h"
-#include "mercdb.h"
+
 #include "magic.h"
 #include "merc.h"
 #include "def.h"

@@ -29,7 +29,7 @@
 #include "object.h"
 #include "affect.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 using namespace Scripting;

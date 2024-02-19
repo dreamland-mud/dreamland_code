@@ -17,7 +17,7 @@
 #include "loadsave.h"
 #include "merc.h"
 #include "occupations.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 

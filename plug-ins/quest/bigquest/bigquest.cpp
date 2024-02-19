@@ -10,7 +10,7 @@
 #include "room.h"
 #include "roomutils.h"
 #include "../../anatolia/handler.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "act.h"
 #include "save.h"

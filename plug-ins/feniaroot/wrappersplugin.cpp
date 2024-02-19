@@ -40,7 +40,7 @@
 #include "room.h"
 #include "object.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 #include "subr.h"

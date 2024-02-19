@@ -15,7 +15,7 @@
 #include "dreamland.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 
 const char SKILL_HEADER_BG = 'W';
 const char SKILL_HEADER_FG = 'Y';

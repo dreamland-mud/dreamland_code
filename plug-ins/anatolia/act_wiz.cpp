@@ -85,7 +85,7 @@
 #include "weapons.h"
 #include "badnames.h"
 #include "wiznet.h"
-#include "mercdb.h"
+
 #include "interp.h"
 #include "clan.h"
 #include "liquid.h"
@@ -1476,11 +1476,9 @@ CMDWIZP( vnum )
 
 /* NOTCOMMAND */ void do_mfind( Character *ch, char *argument )
 {
-    extern int top_mob_index;
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
     MOB_INDEX_DATA *pMobIndex;
-    int vnum;
     int nMatch;
     bool fAll;
     bool found;
@@ -1496,27 +1494,19 @@ CMDWIZP( vnum )
     found        = false;
     nMatch        = 0;
 
-    /*
-     * Yeah, so iterating over all vnum's takes 10,000 loops.
-     * Get_mob_index is fast, and I don't feel like threading another link.
-     * Do you?
-     * -- Furey
-     */
-    for ( vnum = 0; nMatch < top_mob_index; vnum++ )
-    {
-        if ( ( pMobIndex = get_mob_index( vnum ) ) != 0 )
+    for (int i=0; i < MAX_KEY_HASH; i++)
+        for(MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) 
         {
             nMatch++;
-            if ( fAll || is_name( argument, pMobIndex->player_name ) )
+            if ( fAll || is_name( argument, pMob->player_name ) )
             {
                 found = true;
                 sprintf( buf, "[%5d] %s\n\r",
-                    pMobIndex->vnum, 
-                    russian_case( pMobIndex->short_descr, '1' ).c_str( ) );
+                    pMob->vnum, 
+                    russian_case( pMob->short_descr, '1' ).c_str( ) );
                 ch->send_to(buf);
             }
-        }
-    }
+        }   
 
     if ( !found )
         ch->pecho("Мобы с таким именем не найдены.");
@@ -1528,11 +1518,9 @@ CMDWIZP( vnum )
 
 /* NOTCOMMAND */ void do_ofind( Character *ch, char *argument )
 {
-    extern int top_obj_index;
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
     OBJ_INDEX_DATA *pObjIndex;
-    int vnum;
     int nMatch;
     bool fAll;
     bool found;
@@ -1548,27 +1536,19 @@ CMDWIZP( vnum )
     found        = false;
     nMatch        = 0;
 
-    /*
-     * Yeah, so iterating over all vnum's takes 10,000 loops.
-     * Get_obj_index is fast, and I don't feel like threading another link.
-     * Do you?
-     * -- Furey
-     */
-    for ( vnum = 0; nMatch < top_obj_index; vnum++ )
-    {
-        if ( ( pObjIndex = get_obj_index( vnum ) ) != 0 )
+    for (int i=0; i<MAX_KEY_HASH; i++)
+        for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) 
         {
             nMatch++;
-            if ( fAll || is_name( argument, pObjIndex->name ) )
+            if ( fAll || is_name( argument, pObj->name ) )
             {
                 found = true;
                 sprintf( buf, "[%5d] %s\n\r",
-                    pObjIndex->vnum, 
-                    russian_case( pObjIndex->short_descr, '1' ).c_str( ) );
+                    pObj->vnum, 
+                    russian_case( pObj->short_descr, '1' ).c_str( ) );
                 ch->send_to(buf);
             }
         }
-    }
 
     if ( !found )
         ch->pecho("Объекты с таким именем не найдены.");

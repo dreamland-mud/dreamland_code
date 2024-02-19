@@ -22,7 +22,7 @@
 
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "arg_utils.h"
 #include "comm.h"
 #include "ban.h"

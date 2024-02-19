@@ -36,7 +36,7 @@
 #include "clanreference.h"
 #include "arg_utils.h"
 #include "save.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "character.h"
 

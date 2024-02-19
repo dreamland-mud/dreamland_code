@@ -29,7 +29,7 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "damageflags.h"
 #include "../anatolia/handler.h"

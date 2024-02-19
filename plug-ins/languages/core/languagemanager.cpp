@@ -15,7 +15,7 @@
 #include "dreamland.h"
 #include "wiznet.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 const DLString LanguageManager::TABLE_NAME = "languages";

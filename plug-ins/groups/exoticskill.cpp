@@ -23,7 +23,7 @@
 #include "damage.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "act.h"
 #include "def.h"

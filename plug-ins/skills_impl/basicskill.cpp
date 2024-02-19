@@ -34,7 +34,7 @@
 #include "math_utils.h"
 #include "act.h"
 #include "dreamland.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "material.h"
 #include "immunity.h"

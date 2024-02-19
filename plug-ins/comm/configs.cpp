@@ -15,7 +15,7 @@
 #include "pcharactermanager.h"
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "interp.h"
 #include "comm.h"
 #include "descriptor.h"

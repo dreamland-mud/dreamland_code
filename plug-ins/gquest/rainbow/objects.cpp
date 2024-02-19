@@ -12,7 +12,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "merc.h"
 #include "def.h"

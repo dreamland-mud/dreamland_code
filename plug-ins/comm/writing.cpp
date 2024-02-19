@@ -16,7 +16,7 @@
 #include "fight.h"
 #include "merc.h"
 #include "handler.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 #define log(x) LogStream::sendNotice() << x << endl

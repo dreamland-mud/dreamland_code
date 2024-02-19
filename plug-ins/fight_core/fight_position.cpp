@@ -19,7 +19,7 @@
 #include "loadsave.h"
 #include "act.h"
 #include "occupations.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

@@ -20,7 +20,7 @@
 #include "stats_apply.h"
 
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 #include "debug_utils.h"

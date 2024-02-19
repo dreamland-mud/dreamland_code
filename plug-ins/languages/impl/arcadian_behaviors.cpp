@@ -20,7 +20,7 @@
 #include "act.h"
 #include "handler.h"
 #include "effects.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

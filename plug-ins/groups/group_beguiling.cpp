@@ -30,7 +30,7 @@
 
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "occupations.h"
 #include "handler.h"
 #include "act.h"

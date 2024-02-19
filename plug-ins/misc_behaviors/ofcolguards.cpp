@@ -12,7 +12,7 @@
 #include "interp.h"
 #include "fight.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "def.h"
 

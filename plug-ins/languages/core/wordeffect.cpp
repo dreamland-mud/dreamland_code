@@ -8,7 +8,7 @@
 #include "languagemanager.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 WordEffect::WordEffect( )

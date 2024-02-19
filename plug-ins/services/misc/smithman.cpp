@@ -16,7 +16,7 @@
 #include "npcharacter.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "interp.h"
 #include "handler.h"
 #include "arg_utils.h"

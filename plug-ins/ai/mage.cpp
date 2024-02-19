@@ -16,7 +16,7 @@
 #include "fight.h"
 #include "magic.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 

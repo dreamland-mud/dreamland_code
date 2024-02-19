@@ -32,7 +32,7 @@
 #include "dreamland.h"
 #include "damage_impl.h"
 #include "damageflags.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 #include "skill_utils.h"

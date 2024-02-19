@@ -27,7 +27,7 @@
 #include "behavior_utils.h"
 
 #include "act_move.h"
-#include "mercdb.h"
+
 
 #include "magic.h"
 #include "fight.h"

@@ -21,7 +21,7 @@
 #include "merc.h"
 #include "handler.h"
 #include "move_utils.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "def.h"
 

@@ -18,7 +18,7 @@
 #include "npcharacter.h"
 #include "stats_apply.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "def.h"
 

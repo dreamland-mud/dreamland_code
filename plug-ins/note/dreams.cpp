@@ -9,7 +9,7 @@
 #include "pcharactermanager.h"
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "def.h"
 

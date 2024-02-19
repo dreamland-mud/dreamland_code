@@ -19,7 +19,7 @@
 #include "handler.h"
 #include "move_utils.h"
 #include "vnum.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 

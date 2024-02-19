@@ -5,7 +5,7 @@
 
 #include "olc.h"
 
-#include "mercdb.h"
+
 
 #include "character.h"
 #include "merc.h"

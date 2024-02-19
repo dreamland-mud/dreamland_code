@@ -25,7 +25,7 @@
 #include "act.h"
 #include "act_move.h"
 #include "merc.h"
-#include "mercdb.h"
+
 
 #include "roomtraverse.h"
 

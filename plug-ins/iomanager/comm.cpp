@@ -29,7 +29,7 @@
 #include "room.h"
 #include "helpmanager.h"
 #include "object.h"
-#include "mercdb.h"
+
 #include "loadsave.h"
 #include "interp.h"
 #include "telnet.h"

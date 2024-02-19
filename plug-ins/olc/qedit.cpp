@@ -15,7 +15,7 @@
 #include "arg_utils.h"
 #include "interp.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

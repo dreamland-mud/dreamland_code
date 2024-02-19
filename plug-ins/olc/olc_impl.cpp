@@ -32,7 +32,7 @@
 #include "mocregistrator.h"
 #include "stringset.h"
 #include "wiznet.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

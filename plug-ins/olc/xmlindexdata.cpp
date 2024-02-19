@@ -20,7 +20,7 @@
 #include "olcstate.h"
 #include "olc.h"
 #include "affect.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 void load_mobile(FILE *, MOB_INDEX_DATA *);

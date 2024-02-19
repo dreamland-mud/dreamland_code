@@ -25,7 +25,7 @@
 #include "act.h"
 #include "merc.h"
 #include "../../anatolia/handler.h"
-#include "mercdb.h"
+
 
 #include "cquest.h"
 #include "quest.h"

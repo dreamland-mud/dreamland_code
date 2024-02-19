@@ -10,7 +10,7 @@
 #include "npcharacter.h"
 #include "room.h"
 
-#include "mercdb.h"
+
 
 /*----------------------------------------------------------------------
  * PetShopRoom

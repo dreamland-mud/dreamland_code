@@ -11,7 +11,7 @@
 #include "object.h"
 #include "act.h"
 #include "interp.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "merc.h"
 #include "def.h"

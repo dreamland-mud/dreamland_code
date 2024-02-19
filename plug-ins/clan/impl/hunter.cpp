@@ -42,7 +42,7 @@
 #include "merc.h"
 
 #include "comm.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "interp.h"
 #include "vnum.h"

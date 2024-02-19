@@ -23,7 +23,7 @@
 #include "act_move.h"
 #include "fight.h"
 #include "handler.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

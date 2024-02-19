@@ -16,7 +16,7 @@
 #include "core/object.h"
 #include "npcharacter.h"
 
-#include "mercdb.h"
+
 #include "merc.h"
 #include "def.h"
 

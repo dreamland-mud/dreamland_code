@@ -8,7 +8,7 @@
 #include "room.h"
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 void RoomBehaviorPlugin::initialization( ) 

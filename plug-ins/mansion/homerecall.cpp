@@ -18,7 +18,7 @@
 #include "hometown.h"
 #include "merc.h"
 #include "arg_utils.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 HOMETOWN(frigate);

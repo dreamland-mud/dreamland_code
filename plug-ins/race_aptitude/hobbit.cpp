@@ -23,7 +23,7 @@
 #include "handler.h"
 #include "act.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 GSN(search_stones);

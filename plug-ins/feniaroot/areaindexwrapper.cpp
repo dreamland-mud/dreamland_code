@@ -3,7 +3,7 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "loadsave.h"
 #include "update_areas.h"
 

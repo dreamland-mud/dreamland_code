@@ -15,7 +15,7 @@
 #include "room.h"
 #include "roomutils.h"
 #include "race.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "act.h"
 #include "handler.h"

@@ -10,7 +10,7 @@
 #include "religion.h"
 #include "race.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 XMLMobileFactory::XMLMobileFactory( ) : 

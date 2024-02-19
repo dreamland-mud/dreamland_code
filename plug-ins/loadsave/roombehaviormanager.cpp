@@ -10,7 +10,8 @@
 #include "room.h"
 
 #include "fread_utils.h"
-#include "mercdb.h"
+#include "merc.h"
+#include "def.h"
 
 void RoomBehaviorManager::parse( RoomIndexData * pRoom, FILE *fp ) 
 {

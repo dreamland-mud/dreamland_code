@@ -28,7 +28,7 @@
 #include "magic.h"
 #include "occupations.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"

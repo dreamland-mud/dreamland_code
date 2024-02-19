@@ -25,7 +25,7 @@
 
 #include "magic.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 CLAN(battlerager);

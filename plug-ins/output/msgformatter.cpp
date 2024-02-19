@@ -10,7 +10,7 @@
 #include "character.h"
 #include "skill.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 MsgFormatter::MsgFormatter(Character *to)

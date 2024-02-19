@@ -10,7 +10,7 @@
 
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "magic.h"
 #include "interp.h"

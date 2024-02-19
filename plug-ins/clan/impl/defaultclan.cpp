@@ -13,7 +13,7 @@
 #include "act.h"
 #include "merc.h"
 #include "handler.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

@@ -26,9 +26,8 @@
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "race.h"
-
+#include "merc.h"
 #include "dreamland.h"
-#include "mercdb.h"
 #include "def.h"
 
 GSN(mirror);
@@ -47,7 +46,6 @@ NPCharacter::NPCharacter( ) :
 
 NPCharacter::~NPCharacter( )
 {
-    mobile_count--;
 }
 
 /****************************************************************************

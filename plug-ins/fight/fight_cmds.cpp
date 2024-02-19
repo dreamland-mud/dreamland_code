@@ -27,7 +27,7 @@
 
 #include "merc.h"
 #include "stats_apply.h"
-#include "mercdb.h"
+
 #include "handler.h"
 #include "fight.h"
 #include "act.h"

@@ -20,7 +20,7 @@
 #include "descriptor.h"
 #include "telnet.h"
 
-#include "mercdb.h"
+
 #include "def.h"
 
 #include "iconvmap.h"

@@ -13,7 +13,7 @@
 
 #include "commandflags.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 OLC_STATE(OLCStateSocial);

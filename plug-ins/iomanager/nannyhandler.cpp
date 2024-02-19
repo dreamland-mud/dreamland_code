@@ -26,7 +26,7 @@
 #include "alignment.h"
 #include "loadsave.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "websocketrpc.h"
 #include "nannyhandler.h"
 #include "feniamanager.h"

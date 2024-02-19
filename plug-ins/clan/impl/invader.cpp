@@ -32,7 +32,7 @@
 #include "act.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "fight.h"
 #include "handler.h"
 #include "vnum.h"

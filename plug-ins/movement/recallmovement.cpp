@@ -12,7 +12,7 @@
 #include "affectflags.h"
 #include "skill_utils.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 RecallMovement::RecallMovement( Character *ch )

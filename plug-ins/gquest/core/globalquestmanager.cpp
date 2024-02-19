@@ -18,7 +18,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "dreamland.h"
-#include "mercdb.h"
+
 
 using namespace std;
 

@@ -7,7 +7,7 @@
 #include "grammar_entities_impl.h"
 #include "object.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "loadsave.h"
 
 #include "objindexwrapper.h"

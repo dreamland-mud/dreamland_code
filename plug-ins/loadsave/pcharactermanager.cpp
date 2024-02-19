@@ -29,7 +29,7 @@
 #include "fread_utils.h"
 #include "dreamland.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "vnum.h"
 #include "def.h"
 

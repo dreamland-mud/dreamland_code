@@ -10,7 +10,7 @@
 
 #include "core/object.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "loadsave.h"
 #include "def.h"
 

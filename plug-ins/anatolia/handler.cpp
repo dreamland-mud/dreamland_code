@@ -39,7 +39,7 @@
 
 #include "act.h"
 #include "act_move.h"
-#include "mercdb.h"
+
 
 #include "handler.h"
 #include "def.h"

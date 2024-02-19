@@ -11,7 +11,7 @@
 #include "act.h"
 #include "mudtags.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 static IconvMap koi2utf("koi8-r", "utf-8");

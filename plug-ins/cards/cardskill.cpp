@@ -14,7 +14,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "merc.h"
-#include "mercdb.h"
+
 #include "act.h"
 #include "def.h"
 

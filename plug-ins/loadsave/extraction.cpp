@@ -17,7 +17,7 @@
 #include "room.h"
 
 #include "merc.h"
-#include "mercdb.h"
+
 #include "def.h"
 
 WEARLOC(float);

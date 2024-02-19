@@ -22,7 +22,7 @@
 #include "merc.h"
 #include "fight.h"
 #include "act.h"
-#include "mercdb.h"
+
 #include "save.h"
 
 #include "roomtraverse.h"
