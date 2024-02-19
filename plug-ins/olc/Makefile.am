@@ -26,8 +26,6 @@ ovalues.cpp \
 security.cpp \
 socedit.cpp \
 webedit.cpp \
-orandom.cpp \
-argparser.cpp \
 feniatriggers.cpp \
 fedit.cpp \
 raceedit.cpp \
