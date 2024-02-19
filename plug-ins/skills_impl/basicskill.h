@@ -19,7 +19,6 @@
 #include "spell.h"
 #include "skillcommand.h"
 #include "skillhelp.h"
-#include "skilleventhandler.h"
 
 class MobSkillData;
 
@@ -96,7 +95,6 @@ public:
     XML_VARIABLE XMLPointerNoEmpty<Spell> spell;
     XML_VARIABLE XMLPointerNoEmpty<SkillCommand> command;
     XML_VARIABLE XMLPointerNoEmpty<SkillHelp> help;
-    XML_VARIABLE XMLPointerNoEmpty<SkillEventHandler> eventHandler;
 };
 
 #endif

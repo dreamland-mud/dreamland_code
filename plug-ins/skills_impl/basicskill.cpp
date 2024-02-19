@@ -70,9 +70,6 @@ void BasicSkill::loaded( )
     if (help) 
         help->setSkill( Pointer( this ) );
 
-    if (eventHandler)
-        eventHandler->setSkill( Pointer( this ) );
-
     if (spell)
         FeniaSkillActionHelper::linkWrapper(*spell);
 
@@ -105,9 +102,6 @@ void BasicSkill::unloaded( )
 
     if (help) 
         help->unsetSkill( );
-
-    if (eventHandler)
-        eventHandler->unsetSkill( );
 
     skillManager->unregistrate( Pointer( this ) );
 }

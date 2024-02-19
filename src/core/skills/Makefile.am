@@ -14,7 +14,6 @@ skillmanager.cpp \
 skillreference.cpp \
 skillgroup.cpp \
 spell.cpp \
-spelltarget.cpp \
-skilleventhandler.cpp
+spelltarget.cpp
 
 AM_CPPFLAGS += $(src_INCLUDES)

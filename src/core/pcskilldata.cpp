@@ -47,27 +47,3 @@ PCSkills::PCSkills()
 {
 }
 
-bool PCSkills::forEachLearned( SkillEventHandler::Method method, ... )
-{
-    for (unsigned int sn = 0; sn < size( ); sn++) { 
-        if (at( sn ).learned <= 1)
-            continue;
-
-        SkillEventHandlerPointer handler = skillManager->find( sn )->getEventHandler( );
-        
-        if (!handler)
-            continue;
-
-        va_list args;
-
-        va_start( args, method );
-        bool rc = (*handler->*method)( args );
-        va_end( args );
-        
-        if (rc)
-            return true; 
-    }
-
-    return false;
-}
-

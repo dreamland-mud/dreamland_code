@@ -249,7 +249,6 @@ static bool oprog_fetch( Character *ch, Object *obj, Object *container )
     FENIA_CALL( container, "Fetch", "CO", ch, obj );
     FENIA_NDX_CALL( container, "Fetch", "OCO", container, ch, obj );
     BEHAVIOR_CALL( container, fetch, ch, obj );
-    SKILLEVENT_CALL( ch, fetchItem, ch, obj, container );
 
     return false;
 }
@@ -915,8 +914,6 @@ static bool oprog_put(Object *obj, Character *ch, Object *container)
     FENIA_NDX_CALL( obj, "Put", "OCOO", obj, ch, obj, container );
     FENIA_NDX_CALL( container, "Put", "OCOO", container, ch, obj, container );
     
-    SKILLEVENT_CALL( ch, putItem, ch, obj, container );
-
     return false;
 }
 
@@ -1171,7 +1168,6 @@ static bool oprog_drop( Object *obj, Character *ch )
     FENIA_CALL( obj, "Drop", "C", ch )
     FENIA_NDX_CALL( obj, "Drop", "OC", obj, ch )
     BEHAVIOR_CALL( obj, drop, ch )
-    SKILLEVENT_CALL( ch, dropItem, ch, obj );
 
     return false;
 }
@@ -1655,7 +1651,6 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
     FENIA_CALL( obj, "Use", "Cs", ch, argument );
     FENIA_NDX_CALL( obj, "Use", "OCs", obj, ch, argument );
     BEHAVIOR_CALL( obj, use, ch, argument );
-    SKILLEVENT_CALL( ch, useItem, ch, obj, argument );
 
     switch(obj->item_type) {
         case ITEM_POTION:

@@ -7,7 +7,6 @@
 #include "spell.h"
 #include "affecthandler.h"
 #include "skillcommand.h"
-#include "skilleventhandler.h"
 #include "skillgroup.h"
 #include "character.h"
 #include "helpmanager.h"
@@ -60,10 +59,6 @@ Spell::Pointer Skill::getSpell( ) const
 AffectHandler::Pointer Skill::getAffect( ) const
 {
     return AffectHandler::Pointer( );
-}
-SkillEventHandlerPointer Skill::getEventHandler( ) const
-{
-    return SkillEventHandler::Pointer( );
 }
 HelpArticlePointer Skill::getSkillHelp() const
 {

@@ -13,7 +13,6 @@
 #include "xmllong.h"
 #include "xmlmap.h"
 #include "xmlenumeration.h"
-#include "skilleventhandler.h"
 #include "globalprofilearray.h"
 
 class PCSkillData : public XMLVariableContainer {
@@ -46,12 +45,6 @@ public:
         typedef GlobalProfileArray<PCSkillData> Base;
 
         PCSkills();
-        bool forEachLearned( SkillEventHandler::Method, ... );
 };
-
-#define SKILLEVENT_CALL(ch, method...) \
-    if (!(ch)->is_npc( )) \
-        if ((ch)->getPC( )->getSkills( ).forEachLearned( &SkillEventHandler::method )) \
-            return true;
 
 #endif
