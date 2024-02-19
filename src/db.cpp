@@ -87,6 +87,7 @@ using namespace std;
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+#include <string.h>
 
 using namespace std;
 

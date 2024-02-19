@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <string.h>
 #include "areahelp.h"
 #include "areabehaviorplugin.h"
 #include "regexp.h"

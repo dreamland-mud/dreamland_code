@@ -5,6 +5,7 @@
 
 #include <sstream>
 #include <errno.h>
+#include <string.h>
 
 #include "wrappermanager.h"
 #include "wrapperbase.h"

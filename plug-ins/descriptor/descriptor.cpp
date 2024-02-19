@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <byteswap.h>
 #include <iconv.h>
+#include <string.h>
 
 #ifndef __MINGW32__
 #include <sys/socket.h>

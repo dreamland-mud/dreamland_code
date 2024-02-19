@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <string.h>
 
 #include "register-impl.h"
 #include "reglist.h"

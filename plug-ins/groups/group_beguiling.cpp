@@ -12,7 +12,8 @@
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
- 
+#include <string.h>
+
 #include "group_beguiling.h"
 #include "spelltemplate.h"
 #include "affecthandlertemplate.h"

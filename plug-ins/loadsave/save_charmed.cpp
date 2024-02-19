@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <set>
+#include <string.h>
 
 #include "fileformatexception.h"
 #include "logstream.h"

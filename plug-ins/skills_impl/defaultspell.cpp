@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include <math.h>
+#include <string.h>
 
 #include "defaultspell.h"
 #include "skillreference.h"

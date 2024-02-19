@@ -11,6 +11,7 @@
 
 #include "pluginmanager.h"
 #include "plugin.h"
+#include <string.h>
 
 /*--------------------------------------------------------------------------
  * Plugin

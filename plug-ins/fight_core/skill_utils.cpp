@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "skill_utils.h"
 #include "skillreference.h"
 #include "skillgroup.h"

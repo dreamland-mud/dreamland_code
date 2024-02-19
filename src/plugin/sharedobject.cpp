@@ -18,6 +18,7 @@
 #include "sharedobject.h"
 #include "plugin.h"
 #include "pluginmanager.h"
+#include <string.h>
 
 //#define LD_VERBOSE 1
 

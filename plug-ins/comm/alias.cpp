@@ -4,6 +4,7 @@
  */
 
 #include <sstream>
+#include <string.h>
 
 #include "logstream.h"
 

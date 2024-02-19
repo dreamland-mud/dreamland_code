@@ -16,8 +16,6 @@
 #include <map>
 #include <vector>
 
-#include "pstream.h"
-
 #include "dlobject.h"
 #include "dlstring.h"
 #include "pointer.h"
@@ -175,9 +173,5 @@ protected:
         NodeType type;
         XMLNode* parent;
 };
-
-opstream &operator << (opstream &, const XMLNode &);
-ipstream &operator >> (ipstream &, XMLNode &);
-
 
 #endif

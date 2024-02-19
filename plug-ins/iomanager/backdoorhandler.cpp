@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <string.h>
+
 #include "backdoorhandler.h"
 #include "interprethandler.h"
 #include "descriptor.h"

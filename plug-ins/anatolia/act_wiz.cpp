@@ -49,6 +49,8 @@
 *        By using this code, you have agreed to follow the terms of the           *
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
+#include <string.h>
+
 #include "so.h"
 #include "plugin.h"
 #include "char.h"

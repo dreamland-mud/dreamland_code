@@ -5,6 +5,7 @@
 
 #include <sys/time.h>
 #include <iostream>
+#include <string.h>
 
 #include "logstream.h"
 #include "skillmanager.h"

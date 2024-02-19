@@ -19,6 +19,7 @@
 #define yyFlexLexer feniaFlexLexer
 #include <FlexLexer.h>
 #include "feniaparser.h"
+#include <string.h>
 
 namespace Scripting {
 

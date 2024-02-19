@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include <iconv.h>
+#include <string.h>
 
 #include "defaultbufferhandler.h"
 #include "logstream.h"

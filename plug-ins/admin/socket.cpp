@@ -10,6 +10,8 @@
     email                : nofate@europe.com
  ***************************************************************************/
 
+#include <string.h>
+
 #ifndef __MINGW32__
 #include <arpa/inet.h>
 #else

@@ -54,6 +54,7 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
+#include <string.h>
 
 #include "wrapperbase.h"
 #include "register-impl.h"

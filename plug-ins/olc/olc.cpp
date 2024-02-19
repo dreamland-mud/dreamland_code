@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 #include <algorithm>
+#include <string.h>
+
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
 #include "util/regexp.h"

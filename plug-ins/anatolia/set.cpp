@@ -14,6 +14,7 @@
  ***************************************************************************/
 
 #include <limits.h>
+#include <string.h>
 
 #include "logstream.h"
 #include "skill.h"

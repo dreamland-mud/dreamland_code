@@ -4,6 +4,7 @@
  */
 
 #include <stdarg.h>
+#include <string.h>
 
 #include "quest.h"
 #include "questexceptions.h"

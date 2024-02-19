@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 #include <math.h>
+#include <string.h>
+
 #include "logstream.h"
 #include "core/object.h"
 #include "npcharacter.h"

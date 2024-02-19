@@ -3,7 +3,7 @@
  * ruffina, 2004
  * logic based on interpret() from DreamLand 2.0
  */
-
+#include <string.h>
 #include "command.h"
 #include "commandhelp.h"
 #include "commandmanager.h"

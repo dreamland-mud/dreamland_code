@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <string.h>
+
 #include "wearloc_utils.h"
 #include "commandtemplate.h"
 

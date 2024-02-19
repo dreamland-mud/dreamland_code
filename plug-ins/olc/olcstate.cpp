@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <string.h>
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"

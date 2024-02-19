@@ -4,6 +4,7 @@
  */
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include <algorithm>
 #include <openssl/sha.h>

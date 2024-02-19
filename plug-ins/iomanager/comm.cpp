@@ -5,6 +5,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 
 #ifndef __MINGW32__
 #include <arpa/inet.h>

@@ -2,6 +2,7 @@
  *
  * ruffina, 2003
  */
+#include <string.h>
 
 #include "logstream.h"
 #include "cgquest.h"

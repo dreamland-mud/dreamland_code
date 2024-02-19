@@ -4,8 +4,9 @@
  */
 #include <pcharacter.h>
 #include <object.h>
-#include "room.h"
+#include <string.h>
 
+#include "room.h"
 #include "aedit.h"
 #include "hedit.h"
 #include "security.h"

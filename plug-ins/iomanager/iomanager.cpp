@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #include "so.h"
 #include "lastlogstream.h"

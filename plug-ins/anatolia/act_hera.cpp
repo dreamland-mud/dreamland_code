@@ -56,6 +56,7 @@
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
+#include <string.h>
 
 #include "skill.h"
 #include "spell.h"

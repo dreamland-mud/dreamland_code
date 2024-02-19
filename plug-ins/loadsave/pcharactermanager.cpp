@@ -11,6 +11,7 @@
  ***************************************************************************/
 
 #include <sstream>
+#include <string.h>
 
 #include "char.h"
 #include "logstream.h"

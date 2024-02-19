@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include <sstream>
+#include <string.h>
 #include "mudtags.h"
 #include "colour.h"
 #include "dl_ctype.h"

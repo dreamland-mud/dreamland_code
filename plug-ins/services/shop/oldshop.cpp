@@ -13,6 +13,7 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 #include <math.h>
+#include <string.h>
 
 #include "commandtemplate.h"
 #include "shoptrader.h"

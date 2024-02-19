@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include <list>
+#include <string.h>
 #include "loadsave.h"
 #include "save.h"
 

@@ -12,8 +12,9 @@
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
-#include "class_samurai.h"
+#include <string.h>
 
+#include "class_samurai.h"
 
 #include "skill.h"
 #include "spelltemplate.h"

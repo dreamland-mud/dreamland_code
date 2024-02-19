@@ -5,6 +5,7 @@
  */
 
 #include <map>
+#include <string.h>
 
 #include "scenarios.h"
 
