@@ -51,10 +51,6 @@ lasthost.h \
 badnames.h \
 ban.h
 
-if WITH_MINGW
-WSOCK = -lwsock32
-endif
-
 libiomanager_la_LIBADD = \
 ../system/libscheduler_task_round.la \
 ../system/libsystem.la \
@@ -64,7 +60,6 @@ libiomanager_la_LIBADD = \
 ../interpret/libinterpret.la \
 ../alignment/libalignment.la \
 -lcrypto \
-$(WSOCK) \
 -ljsoncpp
 
 banflags.h: banflags.conf

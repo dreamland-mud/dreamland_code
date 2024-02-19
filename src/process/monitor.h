@@ -19,11 +19,7 @@ public:
     void notify();
     void notifyAll();
     
-#ifndef __MINGW32__
     pthread_cond_t cnd;
-#else
-    HANDLE evt;
-#endif
     Mutex *mux;
 };
 

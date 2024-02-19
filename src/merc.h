@@ -56,11 +56,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-#ifndef __MINGW32__
 #include <netinet/in.h>
-#endif
-
 #include <string>
 
 #ifdef HAVE_CONFIG_H

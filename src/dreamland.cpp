@@ -274,7 +274,6 @@ void DreamLand::setBootTime( )
 
 void DreamLand::setSignals( )
 {
-#ifndef __MINGW32__
     signal( SIGTERM, &signalHandler );
     signal( SIGSTOP, &signalHandler );
     signal( SIGINT, &signalHandler );
@@ -282,7 +281,6 @@ void DreamLand::setSignals( )
     signal( SIGXFSZ, &signalHandler );
 
     signal( SIGPIPE, SIG_IGN );
-#endif
 }
 
 void DreamLand::signalHandler( int signo )

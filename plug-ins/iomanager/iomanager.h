@@ -6,11 +6,7 @@
 #ifndef __IOMANAGER_H__
 #define __IOMANAGER_H__
 
-#ifndef __MINGW32__
 #include <sys/select.h>
-#else
-#include <winsock.h>
-#endif
 
 #include "plugin.h"
 #include "schedulertask.h"

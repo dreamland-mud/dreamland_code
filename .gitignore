@@ -68,7 +68,5 @@ src/moc/moc
 src/*flags.h
 src/version
 src/version.cpp
-src/xml/xmlreftest
-src/xml/xmltest
 stamp-h1
 

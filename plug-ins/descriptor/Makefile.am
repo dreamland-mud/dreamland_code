@@ -2,9 +2,6 @@ lib_LTLIBRARIES = libdescriptor.la
 
 
 libdescriptor_la_LIBADD = -lz -ljsoncpp
-if WITH_MINGW
-libdescriptor_la_LIBADD += -lwsock32
-endif
 
 libdescriptor_la_SOURCES = \
 descriptor.cpp \

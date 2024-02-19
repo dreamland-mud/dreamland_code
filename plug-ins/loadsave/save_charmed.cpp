@@ -62,11 +62,7 @@ static DLString make_dirname( int dirnum )
 int
 mymkdir(const char *path, int perm) 
 {
-#ifdef __MINGW32__
-    return mkdir(path);
-#else
     return mkdir(path, perm);
-#endif
 }
 
 void save_creature( NPCharacter *ch )

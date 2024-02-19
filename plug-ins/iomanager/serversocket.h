@@ -9,9 +9,7 @@
 #ifndef SERVERSOCKET_H
 #define SERVERSOCKET_H
 
-#ifndef __MINGW32__
 #include <sys/socket.h>
-#endif
 
 #include "xmlvariablecontainer.h"
 #include "xmlinteger.h"

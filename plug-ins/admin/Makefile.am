@@ -15,10 +15,6 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/communication \
 -I$(top_srcdir)/plug-ins/iomanager
 
-if WITH_MINGW
-WSOCK = -lwsock32
-endif
-
 libadmin_la_LIBADD = \
 ../descriptor/libdescriptor.la \
 ../output/liboutput.la \
@@ -29,8 +25,7 @@ libadmin_la_LIBADD = \
 ../iomanager/libiomanager.la \
 ../system/libsystem.la \
 ../anatolia/core/libanatoliacore.la \
-../communication/libcommunication.la \
-$(WSOCK)
+../communication/libcommunication.la
 
 libadmin_la_SOURCES = \
 impl.cpp \

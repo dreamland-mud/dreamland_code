@@ -19,10 +19,6 @@
 #include "logstream.h"
 #include "date.h"
 
-#ifdef __MINGW32__
-#include <windows.h>
-#endif
-
 LogStream *LogStream::thiz = new ConsoleLogStream( );
 
 LogStream::~LogStream( )
@@ -32,41 +28,16 @@ LogStream::~LogStream( )
 ostream&
 LogStream::send( char level )
 {
-#ifndef __MINGW32__
     int error = errno;
-#else
-    DWORD dw = GetLastError(); 
-#endif
     DLString date = Date::getCurrentTimeAsString( "[%b %d %H:%M:%S]:" );
     ostream &stream = thiz->getStream(level);
 
     stream << date << level << ": ";
 
     if (level == LSP_SYSTEM) {
-#ifndef __MINGW32__
         if (error > 0) {
             stream << "(" << strerror( error ) << ") ";
         }
-#else
-        if(dw) { 
-            LPVOID lpMsgBuf = 0;
-
-            FormatMessage(
-                FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-                FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
-                dw,
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPTSTR)&lpMsgBuf,
-                0, NULL );
-
-            if(lpMsgBuf) {
-                stream << "(" << (char *)lpMsgBuf << ") ";
-                LocalFree(lpMsgBuf);
-            }
-        }
-#endif
     }
 
     return stream;

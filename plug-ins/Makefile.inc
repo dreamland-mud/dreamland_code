@@ -1,19 +1,8 @@
 
-if WITH_MINGW
-#no libstdc++.a!
-MY_CXXLD = $(CC)
-LD_DLLGLUE = -Wl,--enable-runtime-pseudo-reloc -Wl,--script,$(top_srcdir)/admin/i386pe.x-no-rdata --Wl,--image-base,0x10000000 -Wl,-S
-CC_DLLGLUE = -fdata-sections
-else
-MY_CXXLD = $(CXX)
-LD_DLLGLUE = 
-CC_DLLGLUE =
-endif
+AM_CPPFLAGS =  -Wall
+AM_LDFLAGS = -Wl,--no-undefined
 
-AM_CPPFLAGS =  -Wall $(CC_DLLGLUE) 
-AM_LDFLAGS = -Wl,--no-undefined $(LD_DLLGLUE)
-
-CXXLD = $(MY_CXXLD)
+CXXLD = $(CXX)
 
 LIBS = $(top_builddir)/src/libdreamland_impl.la $(top_builddir)/src/libdreamland.la -lm 
 

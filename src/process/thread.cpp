@@ -8,58 +8,29 @@
 
 Thread::Thread( ) : thread( 0 )
 {
-#ifndef __MINGW32__
-
-#else
-    thread = CreateThread( 
-        NULL,              // default security attributes
-        0,                 // use default stack size  
-        (LPTHREAD_START_ROUTINE)loop_pthread,      // thread function 
-        this,              // argument to thread function 
-        CREATE_SUSPENDED,  // use default creation flags 
-        &threadId);           // returns the thread identifier 
-#endif
 }
 
 Thread::~Thread( )
 {
-#ifndef __MINGW32__
-
-#else
-    CloseHandle(thread);
-#endif
 }
 
 void Thread::join( )
 {
-#ifndef __MINGW32__
     pthread_join( thread, 0 );
-#else
-#warning no Thread::join
-#endif
 }
 
 void Thread::cancel( )
 {
-#ifndef __MINGW32__
     pthread_cancel( thread );
-#else
-    TerminateThread(thread, 1);
-#endif
 }
 
 void Thread::detach( )
 {
-#ifndef __MINGW32__
     pthread_detach( thread );
-#else
-#warning no Thread::detach
-#endif
 }
 
 void Thread::run( )
 {
-#ifndef __MINGW32__
     size_t ssize;
     pthread_attr_t attr;
 
@@ -68,9 +39,6 @@ void Thread::run( )
     pthread_attr_setstacksize( &attr, ssize * 2 );
 
     pthread_create( &thread, &attr, &loop_pthread, this );
-#else
-    ResumeThread(thread);
-#endif
 }
 
 void* Thread::loop_pthread( void* voidThreadClass )

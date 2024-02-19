@@ -26,16 +26,12 @@ Timer::~Timer()
 
 void Timer::sleep() 
 {
-#ifdef __MINGW32__
-    Sleep(value.tv_sec * 1000 + value.tv_usec / 1000);
-#else
     if (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, &value) < 0) {
         if (errno != EINTR) {
             logsystem("select sleep");
             throw Exception();
         }
     }
-#endif                                    
 }
 
 bool Timer::elapsed() const
@@ -45,13 +41,7 @@ bool Timer::elapsed() const
 
 void Timer::update()
 {
-#ifdef __MINGW32__
-    DWORD millies = GetTickCount();
-    value.tv_sec = (long) (millies / 1000);
-    value.tv_usec = (millies % 1000) * 1000;
-#else
     gettimeofday(&value, NULL);
-#endif
 }
 
 Timer Timer::operator + (const Timer &tb) const

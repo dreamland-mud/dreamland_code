@@ -18,11 +18,7 @@
 
 #include "config.h"
 
-#ifndef __MINGW32__
 #include <netinet/in.h>
-#else
-#include <winsock.h>
-#endif
 
 #ifdef MCCP
 #include <zlib.h>

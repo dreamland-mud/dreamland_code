@@ -5,18 +5,10 @@
 
 #include <fstream>
 #include <algorithm>
+#include <arpa/inet.h>
 
 #include "dl_match.h"
-#ifndef __MINGW32__
-#include <arpa/inet.h>
-#else
-#include <winsock.h>
-#endif
-
-#include <algorithm>
-
 #include "ban.h"
-
 #include "logstream.h"
 #include "dlscheduler.h"
 

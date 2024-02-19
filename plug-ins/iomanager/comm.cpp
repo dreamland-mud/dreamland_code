@@ -6,17 +6,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
-
-#ifndef __MINGW32__
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#else
-#include <winsock.h>
-
-#ifndef EWOULDBLOCK
-#define EWOULDBLOCK WSAEWOULDBLOCK
-#endif
-#endif
 
 #include "serversocketcontainer.h"
 #include "wrapperhandler.h"
@@ -91,11 +82,7 @@ void init_descriptor( int control )
     Descriptor *dnew;
     struct sockaddr_in sock;
     int desc, x;
-#ifdef __MINGW32__
-    int size;
-#else
     socklen_t size;
-#endif
 
     size = sizeof(sock);
     getsockname( control, (struct sockaddr *) &sock, &size );
@@ -109,7 +96,6 @@ void init_descriptor( int control )
 #define FNDELAY O_NDELAY
 #endif
 
-#ifndef __MINGW32__
     if ( fcntl( desc, F_SETFL, FNDELAY ) < 0 ) {
         LogStream::sendError( ) << "New_descriptor: fcntl: FNDELAY::" << strerror( errno ) << endl;
         return;
@@ -121,7 +107,6 @@ void init_descriptor( int control )
         close( desc );
         return;
     }
-#endif
 
     if (!ServerSocketContainer::isAllowed(control, sock)) {
         close( desc );

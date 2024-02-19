@@ -13,11 +13,7 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#ifndef __MINGW32__
 #include <pthread.h>
-#else
-#include <windows.h>
-#endif
 
 #include "dlobject.h"
 
@@ -48,12 +44,7 @@ protected:
     void detach( );
 
 private:
-#ifndef __MINGW32__
     pthread_t thread;
-#else
-    DWORD threadId;
-    HANDLE thread;
-#endif
 
     static void* loop_pthread( void* voidThreadClass );
 };

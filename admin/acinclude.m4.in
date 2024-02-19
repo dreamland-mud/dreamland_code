@@ -298,21 +298,6 @@ AC_DEFUN([AC_FAKE_CLOSEDIR_VOID],
     ])
 ])
     
-AC_DEFUN([AC_CHECK_MINGW],
-[
-    AC_MSG_CHECKING([for mingw32])
-    AC_CACHE_VAL(ac_cv_mingw32,
-      AC_EGREP_CPP(yes,[
-#ifdef __MINGW32__
-yes
-#endif
-      ], ac_cv_mingw32=yes, ac_cv_mingw32=no))
-    
-    AC_MSG_RESULT($ac_cv_mingw32)
-    AM_CONDITIONAL(WITH_MINGW, test $ac_cv_mingw32 = yes)
-])
-
-
 AC_DEFUN([AC_CHECK_BITNESS],
 [
     case $host_cpu in

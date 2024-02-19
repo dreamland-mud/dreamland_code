@@ -2,10 +2,7 @@
  * 
  * ruffina, Dream Land, 2005
  */
-#ifndef __MINGW32__
 #include <dlfcn.h>
-#endif
-
 #include <sys/stat.h>
 #include <time.h>
 #include <stdio.h>
@@ -83,11 +80,7 @@ DLString SharedObject::getFileName( ) const
     return PluginManager::getThis( )->getTablePath( ) + '/' +
            PluginManager::getThis( )->getTableName( ) + "/lib" +
            getName( ) +
-#ifndef __MINGW32__
            ".so";
-#else
-           "-0.dll";
-#endif
 }
 
     
@@ -108,7 +101,6 @@ void SharedObject::loadSO( )
 
     current = this;
     
-#ifndef __MINGW32__
     handle = dlopen( getFileName( ).c_str( ), RTLD_NOW /*| RTLD_GLOBAL */);
     
     if (!handle) {
@@ -117,32 +109,6 @@ void SharedObject::loadSO( )
     }
     
     InitType* functionInit = (InitType*)dlsym( handle, initName.c_str( ) );
-#else
-    handle = LoadLibrary(getFileName( ).c_str( ));
-    
-    if (!handle) {
-        LPVOID lpMsgBuf;
-        DWORD dw = GetLastError(); 
-
-        LogStream::sendNotice( ) << "load failed: " << dw << endl;
-
-        FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-            FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            dw,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR) &lpMsgBuf,
-            0, NULL );
-
-        current = 0;
-        throw PluginException( name, (LPTSTR)lpMsgBuf);
-    }
-
-    InitType* functionInit = (InitType*)GetProcAddress( handle, initName.c_str( ) );
-#endif
-
     if(!current)
         abort();
 
@@ -187,11 +153,7 @@ void SharedObject::unloadSO( )
     current = this;
     
     if (handle) {
-#ifndef __MINGW32__
         dlclose( handle );
-#else
-        FreeLibrary(handle);
-#endif
         handle = NULL;
     }
 

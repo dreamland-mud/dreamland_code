@@ -193,10 +193,6 @@ bool DLFile::rename( const DLString &newPath ) const
 {
     static const char * METHOD = "DLFile::rename";
 
-#ifdef __MINGW32__
-    ::remove( newPath.c_str( ) );
-#endif
-
     if (::rename( path.c_str( ), newPath.c_str( ) ) < 0) {
         LogStream::sendSystem( ) << METHOD << " " << path << " " << newPath << endl;
         return false;

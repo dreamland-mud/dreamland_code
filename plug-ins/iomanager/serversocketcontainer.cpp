@@ -8,9 +8,7 @@
 
 #include <algorithm>
 #include <sstream>
-#ifndef __MINGW32__
 #include <arpa/inet.h>
-#endif
 #include <fcntl.h>
 
 #include "class.h"

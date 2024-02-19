@@ -10,12 +10,6 @@
 
 #include "dl_math.h"
 
-#ifndef __MINGW32__
-
-#else
-#define OLD_RAND
-#endif
-
 using std::max;
 
 /**

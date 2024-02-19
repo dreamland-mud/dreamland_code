@@ -6,11 +6,7 @@
 #ifndef __MUTEX_H__
 #define __MUTEX_H__
 
-#ifndef __MINGW32__
 #include <pthread.h>
-#else
-#include <windows.h>
-#endif
 
 
 #include "dlobject.h"
@@ -26,11 +22,7 @@ public:
     void unlock();
 
 private:
-#ifndef __MINGW32__
     pthread_mutex_t mux;
-#else
-    HANDLE mux;
-#endif
 };
 
 #endif /* __MUTEX_H__ */

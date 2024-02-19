@@ -7,10 +7,7 @@
 #include <byteswap.h>
 #include <iconv.h>
 #include <string.h>
-
-#ifndef __MINGW32__
 #include <sys/socket.h>
-#endif
 
 #include "json/json.h"
 
@@ -101,11 +98,7 @@ Descriptor::slay( )
     stopMccp( );
 #endif
 
-#ifndef __MINGW32__
     ::close( descriptor );
-#else
-    ::closesocket( descriptor );
-#endif
 
     if ( descriptor_list == this )
         descriptor_list = next;

@@ -28,11 +28,6 @@ extern "C" {
     {
         SO::PluginList ppl;
 
-#ifdef __MINGW32__
-        WSADATA wsaData;
-        WSAStartup(MAKEWORD(1,1), &wsaData); /*is this a right place? ;)*/
-#endif  
-
         Plugin::registerPlugin<InputHandlerRegistrator<InterpretHandler> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<WrapperHandler> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<NannyHandler> >( ppl );

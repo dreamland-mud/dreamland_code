@@ -12,12 +12,6 @@
 #include "xmllist.h"
 #include "xmlstring.h"
 
-#ifndef __MINGW32__
-
-#else
-#include <windows.h>
-#endif
-
 class Plugin;
 class Initializer;
 
@@ -59,11 +53,7 @@ protected:
     DLString name;
     time_t loadTime;
 
-#ifndef __MINGW32__
     void* handle;
-#else
-    HMODULE handle;
-#endif
 };
 
 class XMLSharedObject : public XMLVariableContainer, public SharedObject {

@@ -5,20 +5,10 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
-
 #include <algorithm>
 #include <openssl/sha.h>
-
-#ifndef __MINGW32__
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#else
-#include <winsock.h>
-
-#ifndef EWOULDBLOCK
-#define EWOULDBLOCK WSAEWOULDBLOCK
-#endif
-#endif
 
 #include "json/json.h"
 #include "math_utils.h"
@@ -291,19 +281,6 @@ int Descriptor::inputTelnet( unsigned char i )
 }
 
 
-#ifdef __MINGW32__
-static int
-hasmore(int fd)
-{ 
-    fd_set fds;
-    timeval tv = { 0, 0 };
-
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
-
-    return select(fd+1, &fds, 0, 0, &tv);
-}
-#endif
 
 bool 
 Descriptor::wsHandlePassThrough(unsigned char *buf, int rc)
@@ -590,14 +567,7 @@ bool Descriptor::readInput( )
     for(;;) {
         int rc;
 
-#ifdef __MINGW32__
-        if(hasmore(descriptor) == 0)
-            break;
-        
-        rc = ::recv(descriptor, (char *)buf, sizeof(buf), 0);
-#else
         rc = read(descriptor, (char *)buf, sizeof(buf));
-#endif
 
         if ( rc > 0 ) {
             switch(websock.state) {

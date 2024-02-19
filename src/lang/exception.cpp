@@ -5,9 +5,7 @@
 /*
  * NoFate, 2001
  */
-#ifndef __MINGW32__ 
 #include <execinfo.h>
-#endif
 #include <stdio.h>
 
 #include "exception.h"
@@ -37,14 +35,12 @@ Exception::setStr( const string& str )
 
 void Exception::fillStackFrames( void *a )
 {
-#ifndef __MINGW32__
     void *stack[50];
     size_t size;
 
     size = backtrace(stack, 50);
 
     callstack.insert(callstack.end(), stack, stack+size);
-#endif
 }
 
 void Exception::printStackTrace( std::ostream &os ) const

@@ -8,15 +8,9 @@
 
 #include <cerrno>
 #include <cstring>
-
 #include <unistd.h>
-
-#ifndef __MINGW32__
 #include <sys/socket.h>
 #include <netinet/in.h>
-#else
-#include <winsock.h>
-#endif
 
 #include "logstream.h"
 
@@ -53,12 +47,10 @@ void ServerSocket::initialize( )
         throw ExceptionServerSocket( "socket", strerror( errno ), getPort( ), getListen( ) );
     }
 
-#ifndef __MINGW32__
     if( setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, &x, sizeof( x ) ) < 0 ) {
         destroy( );
         throw ExceptionServerSocket( "SO_REUSEADDR", strerror( errno ), getPort( ), getListen( ) );
     }
-#endif
 
     memset( &sa, 0, sizeof( sa ) );
     sa.sin_family = AF_INET;
@@ -78,11 +70,7 @@ void ServerSocket::initialize( )
 void ServerSocket::destroy( )
 {
     if(fd >= 0) {
-#ifndef __MINGW32__
         close(fd);
-#else
-        closesocket(fd);
-#endif
     }
     fd = -1;
 }
