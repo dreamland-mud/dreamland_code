@@ -135,11 +135,7 @@ CMDADM( socket )
                         state,
                         logon,
                         idle,
-#ifdef MCCP
                         d->out_compress ? '*' : ' ',
-#else
-                        'X',
-#endif
                         p.c_str( ),
                         name.c_str( ),
                         (ip || !*myHost) ? myIP : myHost,

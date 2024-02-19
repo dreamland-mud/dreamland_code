@@ -17,12 +17,8 @@
 #define _DESCRIPTOR_H_
 
 #include "config.h"
-
 #include <netinet/in.h>
-
-#ifdef MCCP
 #include <zlib.h>
-#endif
 
 #include "inputhandler.h"
 #include "bufferhandler.h"
@@ -114,12 +110,11 @@ public:
     int writeRaw(const unsigned char *txt, int len);
     /** Write text directly to descriptor but after codepage conversion. */
     int writeConverted(const char *txt);
-#ifdef MCCP
     int writeMccp(const unsigned char *buf, int len);
     int processMccp( );
     bool startMccp(unsigned char telopt);
     bool stopMccp( );
-#endif
+
     const char * getRealHost( ) const;
 
     void echoOn( );
@@ -156,12 +151,10 @@ public:
     int                        outtop;
     int                 oob_proto;
 
-#ifdef MCCP
     unsigned char       compressing;
     z_stream *          out_compress;
 #define COMPRESS_BUF_SIZE 1024
     unsigned char *     out_compress_buf;
-#endif
 
     handle_input_t handle_input;
     XMLPersistent<BufferHandler> buffer_handler;

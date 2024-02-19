@@ -41,10 +41,8 @@
 
 
 const unsigned char eor_on_str[] = { IAC, WILL, TELOPT_EOR };
-#ifdef MCCP
 const unsigned char compress_on_str[] = { IAC, WILL, TELOPT_COMPRESS };
 const unsigned char compress2_on_str[] = { IAC, WILL, TELOPT_COMPRESS2 };
-#endif
 const unsigned char via_qry_str[]  = { IAC, WILL, TELOPT_VIA };
 const unsigned char ttype_do_str[] = { IAC, DO, TELOPT_TTYPE };
 const unsigned char gmcp_on_str[] = { IAC, WILL, GMCP };
@@ -160,10 +158,8 @@ void init_descriptor( int control )
 
     if(dnew->websock.state != WS_NEGOTIATING) {
         dnew->writeFd(eor_on_str, sizeof(eor_on_str));
-#ifdef MCCP
         dnew->writeFd(compress2_on_str, sizeof(compress2_on_str));
         dnew->writeFd(compress_on_str, sizeof(compress_on_str));
-#endif
         dnew->writeFd(via_qry_str, sizeof(via_qry_str));
         dnew->writeFd(ttype_do_str, sizeof(ttype_do_str));
         dnew->writeFd(gmcp_on_str, sizeof(gmcp_on_str));

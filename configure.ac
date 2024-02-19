@@ -57,9 +57,9 @@ AC_CHECK_FUNCS( accept )
 dnl Checks for libraries.
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(dl, dlopen)
+AC_CHECK_LIB(z, deflate)
 
 AC_CHECK_THREADS
-AC_CHECK_MCCP
 AC_CHECK_GC
 AC_CONVERT_CHARSET
 
@@ -255,9 +255,5 @@ plug-ins/skills_loader/Makefile \
 
 echo ""
 echo ""
-
-if test "$WITH_MCCP" = "no"; then
-    echo "Warning: MCCP support is disabled!"
-fi
 
 

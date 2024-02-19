@@ -94,9 +94,7 @@ Descriptor::close( )
 void
 Descriptor::slay( )
 {
-#ifdef MCCP
     stopMccp( );
-#endif
 
     ::close( descriptor );
 
@@ -242,7 +240,6 @@ Descriptor::writeFd(const unsigned char *txt, int length)
     return iStart;
 }
 
-#ifdef MCCP
 int
 Descriptor::processMccp( )
 {
@@ -381,14 +378,6 @@ Descriptor::writeRaw(const unsigned char *txt, int length)
 {
     return writeMccp(txt, length);
 }
-#else
-
-int
-Descriptor::writeRaw(const unsigned char *txt, int length)
-{
-    return writeSock(txt, length);
-}
-#endif
 
 const char * Descriptor::getRealHost( ) const
 {

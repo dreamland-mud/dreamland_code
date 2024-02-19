@@ -235,12 +235,10 @@ int Descriptor::inputTelnet( unsigned char i )
             
         case DO:
             switch (i) {
-#ifdef MCCP
                 case TELOPT_COMPRESS:
                 case TELOPT_COMPRESS2:
                     startMccp(i);
                     break;
-#endif
                 case GMCP:
                     outOfBandManager->run("protoInit", ProtoInitArgs(this, "GMCP"));
                     break;
@@ -261,13 +259,11 @@ int Descriptor::inputTelnet( unsigned char i )
 
         case DONT:
             switch (i) {
-#ifdef MCCP
                 case TELOPT_COMPRESS:
                 case TELOPT_COMPRESS2:
                     if (compressing == i)
                         stopMccp();
                     break;
-#endif
             }
             telnet.state = TNS_NORMAL;
             break;

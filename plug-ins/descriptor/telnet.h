@@ -95,10 +95,8 @@ char *telcmds[] = {
 #define        TELOPT_TTYPE        24        /* terminal type */
 #define        TELOPT_EOR        25        /* end or record */
 
-#ifdef MCCP
 #define TELOPT_COMPRESS 85
 #define TELOPT_COMPRESS2 86
-#endif
 #define TELOPT_VIA 123
 
 #define TELOPT_EXOPL        255        /* extended-options-list */

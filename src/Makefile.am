@@ -56,7 +56,7 @@ alloc/liballoc.la \
 gref/libgref.la \
 flags/libflags.la \
 process/libprocess.la \
-@BDB_LIBS@ @MCCP_LIBS@ @GC_LIBS@ -lcrypto++
+@BDB_LIBS@ -lz @GC_LIBS@ -lcrypto++
 
 #####################################################
 # dreamland implementation library

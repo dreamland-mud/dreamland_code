@@ -234,25 +234,6 @@ dnl
   fi
 ])
 
-AC_DEFUN([AC_CHECK_MCCP],
-[
-    AC_MSG_CHECKING(whether to enable MCCP support)
-
-    MCCP_LIBS=""
-	WITH_MCCP="no"
-
-	AC_CHECK_LIB(z, deflate, MCCP_LIBS="-lz")
-	if test -n "$MCCP_LIBS"; then
-	    AC_CHECK_HEADER(zlib.h, 
-		[WITH_MCCP="yes"
-		 AC_DEFINE(MCCP, 1, [use mccp])	    
-		])
-	fi
-
-    AC_SUBST(MCCP_LIBS)
-	
-])
-
 AC_DEFUN([AC_CHECK_GC],
 [
     AC_MSG_CHECKING(whether to enable GC support (memory leakage detecting))
