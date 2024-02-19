@@ -3,22 +3,24 @@ dnl AC_CHECK_BDB
 
 AC_DEFUN([AC_CHECK_BDB],
 [
-    AC_CACHE_CHECK([for DbEnv::DbEnv], [ac_cv_bdb],
-    [
-	ac_cv_bdb_safelibs=$LIBS
-	LIBS="-ldb_cxx $LIBS"
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <db_cxx.h>]],
+  AC_CACHE_CHECK([for DbEnv::DbEnv], [ac_cv_bdb],
+  [
+	    ac_cv_bdb_safelibs=$LIBS
+	    LIBS="-ldb_cxx $LIBS"
+	    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <db_cxx.h>]],
 				        [[DbEnv db( 0 );]])],
 		[ac_cv_bdb=yes],
 		[ac_cv_bdb=no])
-	LIBS=$ac_cv_bdb_safelibs
-    ])
+	  LIBS=$ac_cv_bdb_safelibs
+  ])
 
-    if test $ac_cv_bdb = yes; then
-	BDB_LIBS=" -ldb_cxx"
-	AC_SUBST(BDB_LIBS)
-	AC_DEFINE(HAS_BDB, 1, [use berkley db])
-    fi
+  if test $ac_cv_bdb = yes; then
+	  BDB_LIBS=" -ldb_cxx"
+	  AC_SUBST(BDB_LIBS)
+  fi
+  if test $ac_cv_bdb = no; then
+    AC_MSG_ERROR(BDB support is needed.)
+  fi
 ])
 
 dnl Check for the type of the third argument of getsockname
