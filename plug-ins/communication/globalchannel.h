@@ -28,8 +28,6 @@ protected:
     virtual bool checkConfirmed( Character * ) const;
     virtual bool checkSoap( Character * ) const;
 
-    virtual void applyTranslation( Character *, DLString &, Character * ) const;
-
     virtual bool needOutputSelf( Character * ) const;
     virtual bool needOutputOther( Character * ) const;
 

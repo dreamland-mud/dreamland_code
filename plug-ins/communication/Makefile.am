@@ -27,7 +27,6 @@ libcommunication_la_LIBADD = \
 -ljsoncpp
 
 libcommunication_la_SOURCES = \
-languages.cpp \
 twitlist.cpp \
 areachannel.cpp \
 communicationchannel.cpp \

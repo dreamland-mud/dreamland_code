@@ -35,7 +35,6 @@
 #include "clanreference.h"
 #include "profession.h"
 #include "race.h"
-#include "racelanguage.h"
 #include "religion.h"
 #include "affectlist.h"
 
@@ -306,7 +305,6 @@ public:
     bool        riding;        
     Character *        mount;
 
-    RaceLanguageReference language;
     char        *ambushing;
     
     // traps

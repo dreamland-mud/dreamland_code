@@ -27,7 +27,6 @@ pcrace.cpp \
 pcskilldata.cpp \
 profession.cpp \
 race.cpp \
-racelanguage.cpp \
 remortdata.cpp \
 room.cpp \
 xmlattribute.cpp \

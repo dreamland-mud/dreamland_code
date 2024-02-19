@@ -16,10 +16,6 @@
 #include "merc.h"
 #include "def.h"
 
-LANG(common);   LANG(human);   LANG(dwarvish);
-LANG(elvish);   LANG(gnomish); LANG(giant);
-LANG(trollish); LANG(cat);
-
 /*------------------------------------------------------------------------------------
  * ColorTags
  *------------------------------------------------------------------------------------*/
@@ -317,10 +313,6 @@ protected:
 
     bool my_web;
 
-    void rlang_tag_parse( );
-    bool rlang_tag_work( );
-    RaceLanguage *st_rlang;
-
     enum {
         LANG_NONE,
         LANG_ENGLISH,
@@ -466,7 +458,6 @@ void VisibilityTags::setWeb(bool web)
 
 void VisibilityTags::reset( )
 {
-    st_rlang = &*lang_common;
     st_clang = LANG_NONE;
     st_nlang = LANG_NONE;
     st_slang = LANG_NONE;
@@ -581,8 +572,7 @@ void VisibilityTags::run( ostringstream &out )
         if (*p != '{') {
             c = *p;
 
-            if (!rlang_tag_work( )
-                    || !clang_tag_work( )
+            if (!clang_tag_work( )
                     || !nlang_tag_work( )
                     || !slang_tag_work( )
                     || !align_tag_work( )
@@ -599,9 +589,6 @@ void VisibilityTags::run( ostringstream &out )
         
         switch (*++p) {
         // composite two-letter tags
-        case 'L':
-            rlang_tag_parse( );
-            break;
         case 'l':
             clang_tag_parse( );
             break;
@@ -738,39 +725,6 @@ bool VisibilityTags::hyper_tag_work()
     return true;
 }
 
-// {L 
-// close race lang: x
-// race lang: x(common), h(uman), e(lvish), d(warvish), n(gnomish), g(iant), t(rollish), c(at)
-bool VisibilityTags::rlang_tag_work( )
-{
-    if (st_rlang != &*lang_common) {
-        DLString cstr;
-
-        cstr.assign( c );
-        cstr = st_rlang->translate( cstr, NULL, ch );
-        
-        if (!cstr.empty( ))
-            c = cstr.at( 0 );
-    }
-
-    return true;
-}
-
-void VisibilityTags::rlang_tag_parse( )
-{
-    switch (*++p) {
-    case 'h': st_rlang = &*lang_human;            break;
-    case 'e': st_rlang = &*lang_elvish;            break;
-    case 'd': st_rlang = &*lang_dwarvish;   break;
-    case 'n': st_rlang = &*lang_gnomish;    break;
-    case 'g': st_rlang = &*lang_giant;            break;
-    case 't': st_rlang = &*lang_trollish;   break;
-    case 'c': st_rlang = &*lang_cat;            break;
-    default:  --p; /* FALLTHROUGH */
-    case 'X':
-    case 'x': st_rlang = &*lang_common;            break;
-    }
-}
 
 // {l
 // close config lang: x

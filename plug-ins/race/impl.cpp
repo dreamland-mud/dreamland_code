@@ -10,10 +10,8 @@
 #include "xmltableloaderplugin.h"
 #include "defaultrace.h"
 #include "defaultpcrace.h"
-#include "defaultracelanguage.h"
 
 TABLE_LOADER_IMPL(RaceLoader, "races", "Race");
-TABLE_LOADER(RaceLanguageLoader, "race-languages", "RaceLanguage");
 
 extern "C"
 {
@@ -25,8 +23,6 @@ extern "C"
             Plugin::registerPlugin<MocRegistrator<DefaultRace> >( ppl );
             Plugin::registerPlugin<MocRegistrator<DefaultPCRace> >( ppl );
             Plugin::registerPlugin<RaceLoader>( ppl );
-            Plugin::registerPlugin<MocRegistrator<DefaultRaceLanguage> >( ppl );
-            Plugin::registerPlugin<RaceLanguageLoader>( ppl );
 
             return ppl;
         }

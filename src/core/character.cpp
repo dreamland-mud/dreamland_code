@@ -53,7 +53,6 @@ RACE(none);
 GSN(deafen);
 GSN(doppelganger);
 RELIG(none);
-LANG(common);
 
 PlayerConfig::PlayerConfig( )
 {
@@ -92,7 +91,6 @@ Character::Character( )
                 form(0, &form_flags),
                 parts(0, &part_flags),
                 material( &str_empty[0] ),
-                language( lang_common ),
                 ambushing( &str_empty[0] ),
                 trap( 0, &trap_flags )
 {
@@ -208,7 +206,6 @@ void Character::init( )
     riding = false;
     mount =  0;
 
-    language.assign( lang_common );
     free_string(ambushing);
     ambushing = &str_empty[0];
 

@@ -18,14 +18,11 @@ librace_la_SOURCES = \
 raceflags.cpp \
 defaultrace.cpp \
 defaultpcrace.cpp \
-defaultracelanguage.cpp \
 impl.cpp
 
 librace_la_MOC = \
 defaultrace.h \
-defaultpcrace.h \
-defaultracelanguage.h 
-
+defaultpcrace.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 

@@ -34,7 +34,6 @@
 #include "npcharactermanager.h"
 #include "pcharactermanager.h"
 #include "race.h"
-#include "racelanguage.h"
 #include "skillmanager.h"
 #include "clanmanager.h"
 #include "profession.h"
@@ -87,7 +86,6 @@ DreamLand::DreamLand( )
         npcharacterManager.construct( );
         pcharacterManager.construct( );
         raceManager.construct( );
-        raceLanguageManager.construct( );
         skillManager.construct( );
         clanManager.construct( );
         professionManager.construct( );
@@ -120,7 +118,6 @@ DreamLand::~DreamLand( )
         objectManager.clear( );
         scheduler.clear( );
         raceManager.clear( );
-        raceLanguageManager.clear( );
         skillManager.clear( );
         clanManager.clear( );
         professionManager.clear( );

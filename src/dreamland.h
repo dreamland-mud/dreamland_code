@@ -43,7 +43,6 @@ class NPCharacterManager;
 class ObjectManager;
 class DLScheduler;
 class RaceManager;
-class RaceLanguageManager;
 class SkillManager;
 class ClanManager;
 class ProfessionManager;
@@ -191,7 +190,6 @@ private:
         ::Pointer<PCharacterManager> pcharacterManager;
         ::Pointer<NPCharacterManager> npcharacterManager;
         ::Pointer<RaceManager> raceManager;
-        ::Pointer<RaceLanguageManager> raceLanguageManager;
         ::Pointer<SkillManager> skillManager;
         ::Pointer<ClanManager> clanManager;
         ::Pointer<ProfessionManager> professionManager;
