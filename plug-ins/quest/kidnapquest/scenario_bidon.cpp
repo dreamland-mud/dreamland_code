@@ -27,7 +27,7 @@ bool KS::applicable( PCharacter *hero ) const
 void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const
 {
     oldact("$c1 с громким ревом бросается на шею $C3. Как гадко...", kid, 0, king, TO_ROOM);
-    hero->printf( "%s и %s уже встретились.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
+    hero->pecho( "%s и %s уже встретились.", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
     oldact("Приди к $C3 за благодарностью!", hero, 0, king, TO_CHAR);
 }
 void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) const

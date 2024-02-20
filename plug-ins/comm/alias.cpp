@@ -142,7 +142,7 @@ public:
             i = aliases->find( arg );
             
             if (i != aliases->end( ))
-                pch->printf( "%s означает '%s{x'.\r\n", arg.c_str( ), i->second.getValue( ).c_str( ) );
+                pch->pecho( "%s означает '%s{x'.", arg.c_str( ), i->second.getValue( ).c_str( ) );
             else
                 pch->pecho("Этот синоним не задан.");
 
@@ -162,20 +162,20 @@ public:
         if (i != aliases->end( )) // redefine an alias
         {
             i->second.setValue( argument );
-            pch->printf( "%s меняет свое значение на '%s{x'.\r\n", arg.c_str( ), argument.c_str( ) );
+            pch->pecho( "%s меняет свое значение на '%s{x'.", arg.c_str( ), argument.c_str( ) );
             return;
         }
 
         if (aliases->size( ) >= MAX_ALIASES)
         {
-            pch->printf( "Извините, Вы превысили лимит синонимов (%d).\n\r", MAX_ALIASES );
+            pch->pecho( "Извините, Вы превысили лимит синонимов (%d).", MAX_ALIASES );
             return;
         }
 
         // make a new alias
         (**aliases) [arg] = argument;
 
-        pch->printf( "%s теперь будет означать '%s{x'.\r\n", arg.c_str( ), argument.c_str( ) );
+        pch->pecho( "%s теперь будет означать '%s{x'.", arg.c_str( ), argument.c_str( ) );
     }
 
 protected:
@@ -434,7 +434,7 @@ public:
         iargs.splitLine();
 
         if (ch->isCoder())
-            ch->printf("Отладка: результат замены %s (%s).\r\n", iargs.cmdName.c_str(), iargs.cmdArgs.c_str());
+            ch->pecho("Отладка: результат замены %s (%s).", iargs.cmdName.c_str(), iargs.cmdArgs.c_str());
         
         return true;
     }

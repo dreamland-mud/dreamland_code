@@ -261,37 +261,6 @@ bool DLString::toBoolean() const
 
 }
 
-char DLString::toChar() const 
-{
-        if( ( this->length( ) == 0 ) || ( this->length( ) > 1 ) )
-        {
-                throw ExceptionBadType( "DLString::toChar", *this );
-        }
-        else
-        {
-                return this->c_str()[0];
-        }
-
-}
-
-unsigned char DLString::toByte() const 
-{
-        basic_istringstream<char> s( this->c_str( ) );
-        unsigned char i;
-    
-        s >> i;
-    
-        if( s )
-        {
-                return i;
-        }
-        else
-        {
-                throw ExceptionBadType( "DLString::toByte", *this );
-        }
-
-}
-
 
 DLString::size_type DLString::colorLength( ) const
 {

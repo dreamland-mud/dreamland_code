@@ -519,11 +519,11 @@ CMDRUN( list )
         const StockInfo &si = stock.at( i );
         
         if (IS_OBJ_STAT( si.obj, ITEM_INVENTORY ))
-            buf << dlprintf( "[ {Y%3d{x |%3d %5d   --   ] ",
+            buf << fmt(0, "[ {Y%3d{x |%3d %5d   --   ] ",
                     i+1, si.obj->level, si.cost );
 
         else 
-            buf << dlprintf( "[ {Y%3d{x |%3d %5d %6d ] ",
+            buf << fmt(0, "[ {Y%3d{x |%3d %5d %6d ] ",
                     i+1, si.obj->level, si.cost, si.count );
 
         webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1' ), si.obj, ch );

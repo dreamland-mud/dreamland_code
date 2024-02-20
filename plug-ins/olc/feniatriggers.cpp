@@ -333,7 +333,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
 
         std::vector<DLString> parms(2);
         // Create codesource subject.
-        parms[0] = dlprintf("areas/%s/%s/%d.%s", 
+        parms[0] = fmt(0, "areas/%s/%s/%d.%s", 
                         indexData.getArea()->area_file->file_name, 
                         indexData.getIndexType(),
                         indexData.getVnum(),
@@ -350,7 +350,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
-        ch->printf("Запускаю веб-редактор для нового сценария, триггер %s.\r\n", methodName.c_str());
+        ch->pecho("Запускаю веб-редактор для нового сценария, триггер %s.", methodName.c_str());
         return true;
     }
 
@@ -368,7 +368,7 @@ bool FeniaTriggerLoader::findExample(Character *ch, const DLString &methodName, 
 
     TriggerContent::const_iterator t = i->second.find(methodName);
     if (t == i->second.end()) {
-        ch->printf("Триггер %s не найден, проверьте написание или попросите богов добавить его.\r\n", methodName.c_str());
+        ch->pecho("Триггер %s не найден, проверьте написание или попросите богов добавить его.", methodName.c_str());
         return false;
     }
 
@@ -395,7 +395,7 @@ bool FeniaTriggerLoader::editExisting(Character *ch, Register &retval) const
 
     // Open the editor.
     ch->desc->writeWSCommand("cs_edit", parms);
-    ch->printf("Запускаю веб-редактор для сценария %s, строка %d.\r\n", csRef.source->name.c_str(), csRef.line);
+    ch->pecho("Запускаю веб-редактор для сценария %s, строка %d.", csRef.source->name.c_str(), csRef.line);
     return true;
 }
 
@@ -415,7 +415,7 @@ vector<DLString> FeniaTriggerLoader::createSkillActionParams(
     parms[1] = tmpl;
 
     // Create codesource subject.
-    parms[0] = dlprintf("%s/%s/%s",
+    parms[0] = fmt(0, "%s/%s/%s",
                     actionType.c_str(),
                     action->getSkill()->getName().c_str(),
                     methodName.c_str());   
@@ -440,7 +440,7 @@ vector<DLString> FeniaTriggerLoader::createCommandParams(
     parms[1] = tmpl;
 
     // Create codesource subject.
-    parms[0] = dlprintf("%s/%s/%s",
+    parms[0] = fmt(0, "%s/%s/%s",
                     indexType.c_str(),
                     cmd->getName().c_str(),
                     methodName.c_str());   
@@ -465,7 +465,7 @@ vector<DLString> FeniaTriggerLoader::createAreaQuestParams(
     parms[1] = tmpl;
 
     // Create codesource subject.
-    parms[0] = dlprintf("%s/%s/%s",
+    parms[0] = fmt(0, "%s/%s/%s",
                     indexType.c_str(),
                     q->vnum.toString().c_str(),
                     methodName.c_str());   
@@ -490,7 +490,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSpell *spell, const D
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
-        ch->printf("Запускаю веб-редактор для заклинания, триггер %s.\r\n", methodName.c_str());
+        ch->pecho("Запускаю веб-редактор для заклинания, триггер %s.", methodName.c_str());
         return true;
     }
 
@@ -514,7 +514,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultAffectHandler *ah, co
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
-        ch->printf("Запускаю веб-редактор для аффекта, триггер %s.\r\n", methodName.c_str());
+        ch->pecho("Запускаю веб-редактор для аффекта, триггер %s.", methodName.c_str());
         return true;
     }
 
@@ -538,7 +538,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultSkillCommand *cmd, co
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
-        ch->printf("Запускаю веб-редактор для команды, триггер %s.\r\n", methodName.c_str());
+        ch->pecho("Запускаю веб-редактор для команды, триггер %s.", methodName.c_str());
         return true;
     }
 
@@ -563,7 +563,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, WrappedCommand *cmd, const D
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
-        ch->printf("Запускаю веб-редактор для команды, триггер %s.\r\n", methodName.c_str());
+        ch->pecho("Запускаю веб-редактор для команды, триггер %s.", methodName.c_str());
         return true;
     }
 
@@ -587,7 +587,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const DLString
 
         // Open the editor.
         ch->desc->writeWSCommand("cs_edit", parms);
-        ch->printf("Запускаю веб-редактор для квеста, триггер %s.\r\n", methodName.c_str());
+        ch->pecho("Запускаю веб-редактор для квеста, триггер %s.", methodName.c_str());
         return true;
     }
 
@@ -644,7 +644,7 @@ vector<DLString> FeniaTriggerLoader::createQuestStepParams(
         return parms;
 
     // Create codesource subject.
-    parms[0] = dlprintf("areas/%s/%s/%s.%s", 
+    parms[0] = fmt(0, "areas/%s/%s/%s.%s", 
                     pArea->area_file->file_name, 
                     type.c_str(),
                     vnum.c_str(),

@@ -301,11 +301,11 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             return;
         }
 
-        ch->printf("Cписок всех статей с меткой {c%s{x:\r\n", arg2.c_str());
-        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s\r\n";
+        ch->pecho("Cписок всех статей с меткой {c%s{x:", arg2.c_str());
+        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s";
         for (auto &id: labeledIds) {
             HelpArticle::Pointer a = helpManager->getArticle(id);
-            ch->printf(lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str());
+            ch->pecho(lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str());
         }
         return;
 

@@ -200,10 +200,10 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
     PCharacterManager::saveMemory( pci );
 
     if (label.empty( ))
-        ch->printf( "Персонажу %s установлен основной дом в комнате [%d] %s.\r\n", 
+        ch->pecho( "Персонажу %s установлен основной дом в комнате [%d] %s.", 
                 pci->getName( ).c_str( ), vnum, target->getName()  );
     else
-        ch->printf( "Персонажу %s установлен дом с меткой %s в комнате [%d] %s.\r\n", 
+        ch->pecho( "Персонажу %s установлен дом с меткой %s в комнате [%d] %s.", 
                 pci->getName( ).c_str( ), label.c_str( ), vnum, target->getName()  );
 }
 
@@ -232,7 +232,7 @@ void HomeRecall::doShow( PCharacter * ch, DLString &arg )
     
     attr = pci->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
     if (!attr) {
-        ch->printf( "%s бездомное..\r\n", pci->getName( ).c_str( ) );
+        ch->pecho( "%s бездомное..", pci->getName( ).c_str( ) );
         return;
     }
     
@@ -261,7 +261,7 @@ void HomeRecall::doRemove( PCharacter * ch, DLString &arg )
     
     attr = pci->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
     if (!attr) {
-        ch->printf( "%s бездомное..\r\n", pci->getName( ).c_str( ) );
+        ch->pecho( "%s бездомное..", pci->getName( ).c_str( ) );
         return;
     }
 

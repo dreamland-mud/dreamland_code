@@ -98,7 +98,7 @@ void RemortBonus::toStream( Character *client, ostringstream &buf ) const
         n << " ";
     n << getShortDescr( );
 
-    buf << dlprintf( "     %-27s     {D(%d за ", 
+    buf << fmt(0, "     %-27s     {D(%d за ", 
                      n.ruscase( '1' ).c_str( ), getQuantity( ) );
     price->toStream( client, buf );
     buf << "){x" << endl;

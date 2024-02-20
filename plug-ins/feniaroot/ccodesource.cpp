@@ -206,7 +206,7 @@ CMDADM( codesource )
             return;
 
         CodeSource &cs = CodeSource::manager->at(csid);        
-        ch->printf( "[%u] {g%s{x: %s\r\n", 
+        ch->pecho( "[%u] {g%s{x: %s", 
                     cs.getId(), 
                     cs.author.c_str( ),
                     cs.name.c_str( ));
@@ -254,10 +254,10 @@ CMDADM( codesource )
         try {
             DLDirectory dir( dreamland->getTableDir( ), "fenia.local" );
             DLFileStream( dir, cs.name, ".f++" ).fromString( filecontent );
-            ch->printf("Codesource %d is saved as  %s/%s.f++.\r\n",  
+            ch->pecho("Codesource %d is saved as  %s/%s.f++.",  
                         cs.getId(), dir.getAbsolutePath().c_str(), cs.name.c_str());
         } catch (const ::Exception &ex) {
-            ch->printf("Error saving codesource: %s\r\n", ex.what());
+            ch->pecho("Error saving codesource: %s", ex.what());
         }
 
         return;
@@ -338,9 +338,9 @@ CMDADM( codesource )
         }
 
         if (CodeSourceRepo::getThis()->read(constArgs))
-            ch->printf("Codesource '%s' loaded from disk.\r\n", constArgs.c_str());
+            ch->pecho("Codesource '%s' loaded from disk.", constArgs.c_str());
         else
-            ch->printf("Error loading codesource '%s', check logs for details.\r\n", constArgs.c_str());
+            ch->pecho("Error loading codesource '%s', check logs for details.", constArgs.c_str());
 
         return;
     }

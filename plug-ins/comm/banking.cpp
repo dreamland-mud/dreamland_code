@@ -57,16 +57,16 @@ void BankAction::doBalance( PCharacter *ch )
     bank_s = ch->getPC( )->bank_s;
 
     if  (bank_g!=0 && bank_s!=0)
-        ch->printf( "У тебя %ld золот%s и %ld серебрян%s в банке.\n\r",
+        ch->pecho( "У тебя %ld золот%s и %ld серебрян%s в банке.",
          bank_g,GET_COUNT(bank_g,"ая","ые","ых"),
          bank_s,GET_COUNT(bank_s,"ая монета","ые монеты","ых монет"));
 
     if  (bank_g!=0 && bank_s == 0)
-        ch->printf( "У тебя %ld золот%s в банке.\n\r",
+        ch->pecho( "У тебя %ld золот%s в банке.",
          bank_g,GET_COUNT(bank_g,"ая монета","ые монеты","ых монет"));
 
     if  (bank_g == 0 && bank_s!= 0)
-        ch->printf( "У тебя %ld серебрян%s в банке.\n\r",
+        ch->pecho( "У тебя %ld серебрян%s в банке.",
          bank_s,GET_COUNT(bank_s,"ая монета","ые монеты","ых монет"));
 }
 
@@ -309,7 +309,7 @@ void TaxesListener::run( int oldState, int newState, Descriptor *d )
         return;
     
     if (ch->gold > 6000) {
-        ch->printf("С тебя взыскали %d золотых налога на оплату адвокатов мэрии.\n\r",
+        ch->pecho("С тебя взыскали %d золотых налога на оплату адвокатов мэрии.",
                    (ch->gold - 6000) / 2);
         ch->gold -= (ch->gold - 6000) / 2;
     }
@@ -320,7 +320,7 @@ void TaxesListener::run( int oldState, int newState, Descriptor *d )
         
         silver = ch->bank_g + ch->bank_s / 100 - 20000;
         
-        ch->printf( "С тебя взыскали %ld золотых налога на оплату военных расходов Султана.\n\r", silver );
+        ch->pecho( "С тебя взыскали %ld золотых налога на оплату военных расходов Султана.", silver );
     
         if( silver < ch->bank_s / 100 ) {
             ch->bank_s -= ( silver * 100 );

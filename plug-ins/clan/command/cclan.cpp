@@ -310,11 +310,11 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
             if (!bank || (pc->getClan( ) != clan && !fAll))
                 continue;
 
-            pc->printf( "{%s%-16s{x|%16ld|%13ld|",
-                    clan->getColor( ).c_str( ), clan->getShortName( ).c_str( ),
+            pc->pecho( "{%s%-16s{x|%16ld|%13ld|%16ld|%11ld|",
+                    clan->getColor( ).c_str( ), 
+                    clan->getShortName( ).c_str( ),
                     bank->questpoints.getValue( ),
-                    bank->gold.getValue( ));
-            pc->printf( "%16ld|%11ld|\n",
+                    bank->gold.getValue( ),
                     bank->silver.getValue( ),
                     bank->diamonds.getValue( ) );
         }
@@ -765,7 +765,7 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
         }
 
         if (victim->getClan( ) != pc->getClan( )) {
-            pc->printf( "%s не в твоем клане.\r\n", victim->getName( ).c_str( ) );
+            pc->pecho( "%s не в твоем клане.", victim->getName( ).c_str( ) );
             return;
         }
 
@@ -886,11 +886,11 @@ void CClan::clanLevelShow( PCharacter *pc, PCMemoryInterface *victim )
     }
     else {
         if (victim == pc)
-            pc->printf( "Твой ранг [{%s%s{x].\r\n", 
+            pc->pecho( "Твой ранг [{%s%s{x].", 
                         clan->getColor( ).c_str( ), 
                         clan->getTitle( pc ).c_str( ) );
         else
-            pc->printf( "%s имеет ранг [{%s%s{x].\r\n", 
+            pc->pecho( "%s имеет ранг [{%s%s{x].", 
                         victim->getName( ).c_str( ),
                         clan->getColor( ).c_str( ), 
                         clan->getTitle( victim ).c_str( ) );
@@ -938,7 +938,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     }
 
     if (i < 0 || i >= size) {
-        pc->printf( "Можно использовать только цифры от 0 до %d\r\n", size - 1 );
+        pc->pecho( "Можно использовать только цифры от 0 до %d", size - 1 );
         return;
     }
 
@@ -1074,7 +1074,7 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
     
     for (MemberList::iterator i = members.begin( ); i != members.end( ); i++) {
         PCMemoryInterface *pcm = *i;
-        buf << dlprintf("%-10s %-10s %-12s %2d %3d  %-15s %s\r\n",
+        buf << fmt(0, "%-10s %-10s %-12s %2d %3d  %-15s %s\r\n",
                    pcm->getName().c_str(),
                    pcm->getRace()->getName().c_str(),
                    pcm->getProfession( )->getNameFor(pc).c_str(),
@@ -1199,7 +1199,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
     }
 
     if (pc->getRealLevel( ) < member->minLevel) {
-        pc->printf( "В этот клан можно вступить только с %d-го уровня.\r\n",
+        pc->pecho( "В этот клан можно вступить только с %d-го уровня.",
                     member->minLevel.getValue( ) );
         return;
     }
@@ -1261,7 +1261,7 @@ void CClan::clanPetitionList( PCharacter *pc )
         PCMemoryInterface *pcm = pos->second;
 
         if (pcm->getPetition( ) == pc->getClan( ))
-            buf << dlprintf("%-10s %-10s %-12s %2d %3d\r\n",
+            buf << fmt(0, "%-10s %-10s %-12s %2d %3d\r\n",
                     pcm->getName().c_str(),
                     pcm->getRace()->getName().c_str(),
                     pcm->getProfession( )->getNameFor(pc).c_str(),
@@ -1290,12 +1290,12 @@ void CClan::clanPetitionAccept( PCharacter *pc, DLString& argument )
     }
     
     if (victim->getPetition( ) != pc->getClan( )) {
-        pc->printf("%s не собирается вступать в твой клан.\r\n", victim->getName( ).c_str( ) ); 
+        pc->pecho("%s не собирается вступать в твой клан.", victim->getName( ).c_str( ) ); 
         return;
     }
 
     if (victim->getClan( ) == victim->getPetition( )) {
-        pc->printf("Но %s и так состоит в твоем клане.\r\n", victim->getName( ).c_str( ) ); 
+        pc->pecho("Но %s и так состоит в твоем клане.", victim->getName( ).c_str( ) ); 
         victim->setPetition( clan_none );
         return;
     }
@@ -1352,7 +1352,7 @@ void CClan::clanPetitionReject( PCharacter *pc, DLString& argument )
     }
 
     if (victim->getPetition( ) != pc->getClan( )) {
-        pc->printf("%s не собирается вступать в твой клан.\r\n", victim->getName( ).c_str( ) ); 
+        pc->pecho("%s не собирается вступать в твой клан.", victim->getName( ).c_str( ) ); 
         return;
     }
 

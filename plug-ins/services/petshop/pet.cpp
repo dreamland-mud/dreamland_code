@@ -152,7 +152,7 @@ int Pet::haggle( Character *client ) const
 
     if (bonus || (roll < gsn_haggle->getEffective( client ) + skill_level_bonus(*gsn_haggle, ch))) {
         cost -= cost / 2 * roll / 100;
-        client->printf( "Ты торгуешься и цена снижается до %d монет.\r\n", cost );
+        client->pecho( "Ты торгуешься и цена снижается до %d монет.", cost );
         gsn_haggle->improve( client, true );
     }
     
@@ -173,7 +173,7 @@ void Pet::config( PCharacter *client, NPCharacter *pet ) const
     if (IS_SET( pet->act, ACT_NOALIGN ))
         pet->alignment = client->alignment;
     
-    pet->setDescription( dlprintf( 
+    pet->setDescription( fmt(0, 
              "%s\r\nТы понимаешь, что %s будет защищать и следовать за {C%s{x до самой смерти.\n\r",     
              pet->getNPC( )->pIndexData->description, 
              pet->getNameP( '1' ).c_str( ), client->getNameP( '5' ).c_str( ) ) );

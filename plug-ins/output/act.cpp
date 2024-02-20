@@ -120,7 +120,7 @@ void oldact_p( const char *format, Character *ch, const void *arg1,
 /*--------------------------------------------------------------------------
  * fmt and vfmt (new format concept)
  *--------------------------------------------------------------------------*/
-#define MAXARGS 60
+#define MAXARGS 256
 
 struct VarArgFormatter : public MsgFormatter {
     VarArgFormatter(Character *to) : MsgFormatter(to) {
@@ -202,79 +202,6 @@ DLString vfmt(Character *to, const char *format, va_list av)
 {
     VarArgFormatter formatter(to);
     return formatter.vfmt(format, av);
-}
-
-/*---------------------------------------------------------------------
- * simplified printf, understands color length in formatting
- *--------------------------------------------------------------------*/
-DLString dlprintf( const char *fmt, ... ) 
-{
-    DLString result; 
-    va_list arglist;
-    const char *p = fmt;
-    
-    va_start(arglist, fmt);
-    
-    while (*p) {
-        DLString word;
-        bool left = false;
-        int width = 0;
-
-        if (*p != '%') {
-            result += *p++;
-            continue;
-        }
-        
-        ++p;
-        
-        if (*p == '%') {
-            result += '%';
-            p++;
-            continue;
-        }
-
-        if (*p == '-') {
-            left = true;
-            ++p;
-        }         
-
-        while (isdigit( *p )) {
-            width += width * 10 + *p - '0';
-            p++;
-        }
-       
-        switch( *p ) {
-        case 's':
-            word += va_arg( arglist, char * );
-            break;
-        case 'd':
-        case 'i':
-        case 'l':
-            word += (int) va_arg( arglist, int ); /* XXX */
-            break;
-        case 'c':
-            word += (char) va_arg( arglist, int );
-            break;
-        default:
-            word += va_arg( arglist, int );
-            break;
-        }
-
-        if (left)
-            result += word;
-    
-        for (int i = 0; i < width - (int) word.colorLength( ); i++)
-            result += ' ';
-
-        if (!left)
-            result += word;
-        
-        if (*p)
-            p++;
-    }
-
-    va_end( arglist );
-    return result;
 }
 
 

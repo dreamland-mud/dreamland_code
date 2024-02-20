@@ -210,7 +210,7 @@ void NoteCommand::doFlag(PCharacter *ch, DLString &arguments )
             ch->pecho("Укажите номер письма.");
         else
             ch->pecho("Неправильный номер письма.");
-        ch->printf( "Использование: %s flag <number> <flags to set|none>\r\n", thread->getName( ).c_str( ) );
+        ch->pecho( "Использование: %s flag <number> <flags to set|none>", thread->getName( ).c_str( ) );
         return;
     }
 
@@ -483,7 +483,7 @@ void NoteCommand::doUncatchup( PCharacter *ch, DLString &arguments ) const
 
     if (!arg.isNumber( )) {
         attr->setStamp( *thread, 0 );
-        ch->printf( "Все %N1 помечены как непрочитанные.\r\n", thread->getRussianMltName().c_str( ) );
+        ch->pecho( "Все %N1 помечены как непрочитанные.", thread->getRussianMltName().c_str( ) );
         return;
     }
 
@@ -493,7 +493,7 @@ void NoteCommand::doUncatchup( PCharacter *ch, DLString &arguments ) const
         
         if (note) {
             attr->setStamp( *thread, note->getID( ) );
-            ch->printf( "Все %N2, начиная с номера %d, помечены как непрочитанные.\r\n", 
+            ch->pecho( "Все %N2, начиная с номера %d, помечены как непрочитанные.", 
                         thread->getRussianMltName().c_str( ), vnum );
         }
         else

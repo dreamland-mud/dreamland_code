@@ -295,7 +295,7 @@ bool LanguageCommand::showDreams( PCharacter *ch ) const
         bool fShowEffect = (wordLang->getLearned( ch ) == Language::SKILL_NATIVE);
         bool hasHint = attrHints && attrHints->hasHint( w->second );
 
-        buf << dlprintf( "        {c%-30s{x", w->second.dictum.getValue( ).c_str( ) );
+        buf << fmt(0, "        {c%-30s{x", w->second.dictum.getValue( ).c_str( ) );
         
         ef = w->second.getEffect( );
 
@@ -348,7 +348,7 @@ bool LanguageCommand::showRewards( PCharacter *ch ) const
         // Resolve the word. Remember expired ones for further deletion.
         Word rewardWord;
         if (!languageManager->findWord( rewardWord, dictum )) {
-            buf << dlprintf( "        {D%-30s{x\r\n", dictum.c_str( ) );
+            buf << fmt(0, "        {D%-30s{x\r\n", dictum.c_str( ) );
             expiredWords.push_back( dictum );
             continue;
         }
@@ -360,7 +360,7 @@ bool LanguageCommand::showRewards( PCharacter *ch ) const
         bool fShowEffect = hasHint || (lang->getLearned( ch ) == Language::SKILL_NATIVE);
         WordEffect::Pointer ef = rewardWord.getEffect( );
 
-        buf << dlprintf( "        {c%-30s{x", dictum.c_str( ) );
+        buf << fmt(0, "        {c%-30s{x", dictum.c_str( ) );
 
         if (ef && (fShowEffect || hasHint )) 
             buf << fmt( 0, "    (%N1)", ef->getMeaning( ).c_str( ) );

@@ -78,7 +78,7 @@ CMDRUN( selfrate )
     attr = pch->getAttributes( ).getAttr<XMLAttributeSelfRate>( "selfrate" );
 
     if (arg.empty( )) {
-        pch->printf( "Твой уровень опытности: {W%s{x.\r\n", attr->getRateAlias( ).c_str( ) );
+        pch->pecho( "Твой уровень опытности: {W%s{x.", attr->getRateAlias( ).c_str( ) );
         return;
     }
 
@@ -90,18 +90,18 @@ CMDRUN( selfrate )
     else if (arg_oneof_strict(arg, "guru", "гуру"))
         rate = 2;
     else {
-        pch->printf( "Выбери, кто ты: {lRньюби, эксперт или гуру{lEnewbie, expert или guru{x.\r\n" );
+        pch->pecho( "Выбери, кто ты: {lRньюби, эксперт или гуру{lEnewbie, expert или guru{x." );
         return;
     }
 
     if (rate == attr->rate) 
-        pch->printf( "Но ты и так %s!\r\n", attr->getRateAlias( ).c_str( ));
+        pch->pecho( "Но ты и так %s!", attr->getRateAlias( ).c_str( ));
     else if (rate < attr->rate) 
         pch->pecho("Ты не можешь понизить оценку своего уровня опытности.");
     else {
         attr->rate = rate;
         DLString alias = attr->getRateAlias();
-        pch->printf( "Поздравляем! Теперь ты {W%s{x.\r\n", alias.c_str( ));
+        pch->pecho( "Поздравляем! Теперь ты {W%s{x.", alias.c_str( ));
 
         DLString what = fmt(0, "%#^C1 теперь %s!", pch, attr->getRateAlias(pch).c_str());
         infonet(0, 0, "{CТоржественный голос из $o2: ", what.c_str());

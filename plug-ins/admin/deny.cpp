@@ -34,7 +34,7 @@ COMMAND(Deny, "deny")
     pcm = PCharacterManager::find( name );
     
     if (!pcm) {
-        ch->printf( "Victim '%s' not found, misspelled name?\r\n", name.c_str( ) );
+        ch->pecho( "Victim '%s' not found, misspelled name?", name.c_str( ) );
         return;
     }
     
@@ -47,7 +47,7 @@ COMMAND(Deny, "deny")
             doPlace( ch, pcm, argument );
             
     } catch (Exception e) {
-        ch->printf( "%s\r\n", e.what( ) );
+        ch->pecho( "%s", e.what( ) );
     }
 }
 
@@ -58,12 +58,12 @@ void Deny::doShow( Character *ch, PCMemoryInterface *pcm )
     attr = pcm->getAttributes( ).findAttr<XMLAttributeDeny>( "deny" );
     
     if (attr) 
-        ch->printf( "Access for {W%s{x is denied {W%s{x by {W%s{x.\r\n",
+        ch->pecho( "Access for {W%s{x is denied {W%s{x by {W%s{x.",
                     pcm->getName( ).c_str( ),
                     attr->getUntilString( false ).c_str( ),
                     attr->getResponsible( ).c_str( ) );
     else
-        ch->printf( "Access for {W%s{x is NOT denied.\r\n", pcm->getName( ).c_str( ) );
+        ch->pecho( "Access for {W%s{x is NOT denied.", pcm->getName( ).c_str( ) );
 }
 
 void Deny::doRemove( Character *ch, PCMemoryInterface *pcm )
@@ -80,7 +80,7 @@ void Deny::doRemove( Character *ch, PCMemoryInterface *pcm )
         ch->pecho("Ok.");
     }
     else
-        ch->printf( "Access for {W%s{x is NOT denied.\r\n", pcm->getName( ).c_str( ) );
+        ch->pecho( "Access for {W%s{x is NOT denied.", pcm->getName( ).c_str( ) );
 }
 
 void Deny::doPlace( Character *ch, PCMemoryInterface *pcm, const DLString & argument )

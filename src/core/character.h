@@ -144,7 +144,6 @@ public:
     void send_to( const char * );
     void send_to( const DLString& );
     void send_to( ostringstream& );
-    void printf( const char *format, ... );
     void vpecho( const char *, va_list );
     void pecho( const DLString &line );
     void pecho( const char *, ... );

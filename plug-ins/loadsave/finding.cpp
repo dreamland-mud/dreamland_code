@@ -900,7 +900,7 @@ bool text_match_with_highlight(const DLString &text, const DLString &args, ostri
         num++;
         if (line.find(args) != string::npos) {
             line.replaces(args, highlight + args + "{w");
-            matchBuf << dlprintf("{D%3d{x ", num) << line << "\r\n";
+            matchBuf << fmt(0, "{D%3d{x ", num) << line << "\r\n";
             found = true;
         }
     }

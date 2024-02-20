@@ -43,18 +43,6 @@ void Character::send_to( const char *txt )
     desc->send( out.str( ).c_str( ) );
 }
 
-void Character::printf( const char *format, ... ) 
-{
-    char buf[MAX_STRING_LENGTH];
-    va_list ap;
-
-    va_start( ap, format );
-    vsprintf( buf, format, ap );
-    va_end( ap );
-    
-    send_to( buf );
-}
-
 void Character::vpecho( const char *f, va_list av)
 {
     DLString r;

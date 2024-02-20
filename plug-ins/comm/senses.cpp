@@ -180,7 +180,7 @@ CMDRUNP( smell )
 
         if (!argument[0]) {
             if (attr && !attr->getValue( ).empty( ))
-                ch->printf("Ты пахнешь:\n\r%s\n\r", attr->getValue( ).c_str( ) ); 
+                ch->pecho("Ты пахнешь:\n\r%s", attr->getValue( ).c_str( ) ); 
             else
                 ch->pecho("Ты ничем особенным не пахнешь.");
             return;
@@ -199,7 +199,7 @@ CMDRUNP( smell )
         }
         
         attr->setValue( argument );
-        ch->printf("Теперь ты будешь пахнуть так:\n\r%s\n\r", argument );
+        ch->pecho("Теперь ты будешь пахнуть так:\n\r%s", argument );
         return;
     }
 

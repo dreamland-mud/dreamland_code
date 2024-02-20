@@ -353,7 +353,7 @@ CMDRUNP( auction )
                         }
 
                         if  (obj->item_type == ITEM_WEAPON) {
-                                ch->printf("Тип оружия: %s (%s), среднее повреждение %d.\r\n",
+                                ch->pecho("Тип оружия: %s (%s), среднее повреждение %d.",
                                            weapon_class.message(obj->value0() ).c_str( ),
                                            weapon_class.name( obj->value0() ).c_str( ),
                                            weapon_ave(obj));

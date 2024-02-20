@@ -57,17 +57,6 @@ Descriptor::send(const char *buf)
         buffer_handler->write(this, buf);
 }
 
-void Descriptor::printf( const char *format, ... ) 
-{
-    char buf[MAX_STRING_LENGTH];
-    va_list ap;
-
-    va_start( ap, format );
-    vsprintf( buf, format, ap );
-    va_end( ap );
-    
-    send( buf );
-}
 
 void
 Descriptor::close( )

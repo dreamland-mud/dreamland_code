@@ -53,7 +53,7 @@ CMDADM( socket )
             }
             
             if(arg.strPrefix(name) || arg == DLString(d->descriptor)) {
-                ch->printf( "Connected from: %s(%s)\r\n", d->realip, d->host );
+                ch->pecho( "Connected from: %s(%s)", d->realip, d->host );
 
                 if(d->via.empty())
                     ch->pecho("No via records for this descriptor.");
@@ -61,7 +61,7 @@ CMDADM( socket )
                     ViaVector::iterator it;
 
                     for(it = d->via.begin(); it != d->via.end(); it++)
-                        ch->printf("Via: %s(%s)\r\n", 
+                        ch->pecho("Via: %s(%s)", 
                                 it->second.c_str(), 
                                 inet_ntoa(it->first));
 
@@ -130,7 +130,7 @@ CMDADM( socket )
             p = (ServerSocketContainer::isWrapped(d->control) ? "*" : " "); 
         }
         
-        ch->printf( "[%3d %10s %-5s %s %c %s] %-12s %-15s %s\n\r",
+        ch->pecho( "[%3d %10s %-5s %s %c %s] %-12s %-15s %s",
                         d->descriptor,
                         state,
                         logon,
@@ -142,6 +142,6 @@ CMDADM( socket )
                         (d->character && d->character->is_npc() ? "switched" : "") );
     }
 
-    ch->printf( "\n\r%d user%s\n\r", count, count == 1 ? "" : "s" );
+    ch->pecho( "\n\r%d user%s", count, count == 1 ? "" : "s" );
 }
 

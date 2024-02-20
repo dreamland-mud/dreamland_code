@@ -28,12 +28,12 @@ ClanLevelNames::~ClanLevelNames( )
 
 void ClanLevelNames::toStream( ostringstream &buf ) const
 {
-    buf << dlprintf( "%24s (%24s)  ", 
+    buf << fmt(0, "%24s (%24s)  ", 
             male.getValue( ).c_str( ), 
             female.getValue( ).c_str( ) );
 
     if (!abbr.getValue( ).empty( ))
-        buf << dlprintf( "[%2s]  ", abbr.getValue( ).c_str( ) );
+        buf << fmt(0, "[%2s]  ", abbr.getValue( ).c_str( ) );
     
     buf << english;
 }
@@ -68,7 +68,7 @@ void ClanTitlesByClass::toStream( ostringstream &buf ) const
             buf << "{WДля класса " << i->first << ":{x" << endl;
         
         for (int j = 0; j < (int) i->second.size( ); j++) {
-            buf << dlprintf( "%-3d", j );
+            buf << fmt(0, "%-3d", j );
             i->second[j].toStream( buf );
             buf << endl;
         }
@@ -108,7 +108,7 @@ const DLString & ClanTitlesByLevel::build( PCMemoryInterface *pcm ) const
 void ClanTitlesByLevel::toStream( ostringstream &buf ) const
 {
     for (int j = 0; j < (int) size( ); j++) {
-        buf << dlprintf( "%-3d", j );
+        buf << fmt(0, "%-3d", j );
         (*this)[j].toStream( buf );
         buf << endl;
     }

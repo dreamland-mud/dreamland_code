@@ -1381,13 +1381,13 @@ static bool oprog_present( Object *obj, Character *ch, Character *victim )
 static void give_obj_char( Character *ch, Object *obj, Character *victim, int mode = GIVE_MODE_USUAL )
 {
     if (ch == victim) {
-        ch->printf("%s себе?\n\r", (mode ? "Подарить" : "Дать"));
+        ch->pecho("%s себе?", (mode ? "Подарить" : "Дать"));
         return;
     }
 
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
-        ch->printf("Разве можно что-то %s призраку?\n\r", (mode ? "подарить" : "дать"));
+        ch->pecho("Разве можно что-то %s призраку?", (mode ? "подарить" : "дать"));
         return;
     }
 

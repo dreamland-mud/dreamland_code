@@ -190,16 +190,16 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
         tmp << vict->getLevel() << "{x";
     }
 
-    buf << dlprintf( "%3s", tmp.str( ).c_str( ) );
+    buf << fmt(0, "%3s", tmp.str( ).c_str( ) );
     tmp.str( "" );
     
     /* Race */
     tmp << vict->getRace( )->getPC( )->getWhoNameFor( ch );
 
     if (tmp.str( ).size( ) < 4)
-        buf << "  " << dlprintf( "%-4s", tmp.str( ).c_str( ) );
+        buf << "  " << fmt(0, "%-4s", tmp.str( ).c_str( ) );
     else 
-        buf << " " << dlprintf( "%-5s", tmp.str( ).c_str( ) );
+        buf << " " << fmt(0, "%-5s", tmp.str( ).c_str( ) );
 
     tmp.str( "" );
 
@@ -207,7 +207,7 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
     if (can_see_profession(ch, vict))
         tmp << "{Y" << vict->getProfession( )->getWhoNameFor( ch );
 
-    buf << " " << dlprintf( "%3s", tmp.str( ).c_str( ) );
+    buf << " " << fmt(0, "%3s", tmp.str( ).c_str( ) );
     return buf.str( );
 }
 
@@ -278,7 +278,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
 
 
 
-    buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
+    buf << fmt(0, "%4s", tmp.str( ).c_str( ) );
     tmp.str( "" );
 
     /* Clan, (R) (L) */
@@ -295,7 +295,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
             tmp << "   ";
     } 
     
-    buf << dlprintf( "%6s", tmp.str( ).c_str( ) );
+    buf << fmt(0, "%6s", tmp.str( ).c_str( ) );
     tmp.str( "" );
    
     /* Remorts */
@@ -307,11 +307,11 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
                 tmp << "{W({M" + DLString(remorts) + "{W)";
     }
     
-    buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
+    buf << fmt(0, "%4s", tmp.str( ).c_str( ) );
     tmp.str( "" );
 
     /* Flags */
-    buf << dlprintf( "%9s", who_cmd_flags(victim).c_str( ) );
+    buf << fmt(0, "%9s", who_cmd_flags(victim).c_str( ) );
 
     /* Pretitle, Name, Title */
     bool coder = victim->getAttributes().isAvailable("coder");

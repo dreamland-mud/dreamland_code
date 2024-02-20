@@ -78,7 +78,7 @@ CMDADM( nochannel )
             attr = attributes->findAttr<XMLAttributeNoChannel>( "nochannel" );
 
             if (attr) 
-                ch->printf( "%s\r\n", attr->getUntilString( false ).c_str( ) );
+                ch->pecho( "%s", attr->getUntilString( false ).c_str( ) );
             else
                 ch->pecho("none");
         }
@@ -102,7 +102,7 @@ CMDADM( nochannel )
     }
     catch( const ExceptionBadDateString& ex )
     {
-        ch->printf( "%s\r\n", ex.what( ) );
+        ch->pecho( "%s", ex.what( ) );
     }
 }
 

@@ -291,7 +291,7 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         const char *colorAreaVnums = IS_SET(pArea->area_flag, AREA_SYSTEM) ? "D" : "w";
 
         ch->send_to(
-            dlprintf(lineFormat.c_str(), 
+            fmt(0, lineFormat.c_str(), 
                 pArea->vnum, 
                 colorAreaName,
                 pArea->getName().colourStrip().cutSize(29).c_str(),
@@ -334,7 +334,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             else
                 buf = &abuf;
             for (auto &eexit: room->extra_exits) {
-                (*buf) << dlprintf(lineFormat.c_str(), room->vnum, room->getName(), eexit->keyword) << endl;
+                (*buf) << fmt(0, lineFormat.c_str(), room->vnum, room->getName(), eexit->keyword) << endl;
             }
         }
         
@@ -387,7 +387,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                     
                     DLString hint = matches.front( );
                     if (!is_name( hint.c_str( ), pObj->name )) {
-                        hbuf << dlprintf( "%6d : [%35s] hint [{G%10s{x] [{W%s{x]\r\n",
+                        hbuf << fmt(0, "%6d : [%35s] hint [{G%10s{x] [{W%s{x]\r\n",
                                 pObj->vnum, longd.c_str( ), hint.c_str( ), pObj->name );
                         hcnt++;
                     }
@@ -395,11 +395,11 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             }
         }
 
-//        ch->printf("Найдено %d длинных имен предметов без подсказок (пустых).\r\n", cnt);
+//        ch->pecho("Найдено %d длинных имен предметов без подсказок (пустых).", cnt);
 //        page_to_char( buf.str( ).c_str( ), ch );
-//        ch->printf("Найдено %d несоответствий подсказок в длинном имени предметов.\r\n", hcnt);
+//        ch->pecho("Найдено %d несоответствий подсказок в длинном имени предметов.", hcnt);
 //        page_to_char( hbuf.str( ).c_str( ), ch );
-        ch->printf("Найдено %d предметов где в short descr не встречаются имена.\r\n", rcnt);
+        ch->pecho("Найдено %d предметов где в short descr не встречаются имена.", rcnt);
         page_to_char( rbuf.str( ).c_str( ), ch );
         return;
     }
@@ -440,20 +440,20 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 
                 DLString hint = matches.front( );
                 if (!is_name(hint.c_str(), names.c_str())) {
-                    hbuf << dlprintf( "%6d : [%35s] hint [{G%10s{x] [{W%s{x]\r\n",
+                    hbuf << fmt(0, "%6d : [%35s] hint [{G%10s{x] [{W%s{x]\r\n",
                             pMob->vnum, longd.c_str( ), hint.c_str( ), pMob->player_name );
                     hcnt++;
                 }
             }
         }
 
-        ch->printf("\r\n{RНайдено %d несоответствий подсказок в длинном имени моба.{x\r\n", hcnt);
+        ch->pecho("\r\n{RНайдено %d несоответствий подсказок в длинном имени моба.{x", hcnt);
         page_to_char( hbuf.str( ).c_str( ), ch );
         return;
     }
 
     if (arg == "maxhelp") {
-        ch->printf("Max help ID is %d, next free id is %d.\r\n", 
+        ch->pecho("Max help ID is %d, next free id is %d.", 
                     helpManager->getLastID(), help_next_free_id());
         return;
     }
@@ -469,11 +469,11 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
         room = get_room_instance(vnum);
         if (!room) {
-            ch->printf("Room vnum [%d] not found.\r\n", vnum.getValue());
+            ch->pecho("Room vnum [%d] not found.", vnum.getValue());
             return;
         }
         
-        ch->printf("Loading room objects for '%s' [%d], check logs for details.\r\n", 
+        ch->pecho("Loading room objects for '%s' [%d], check logs for details.", 
                     room->getName(), room->vnum);
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;

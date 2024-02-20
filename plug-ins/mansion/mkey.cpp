@@ -175,7 +175,7 @@ void MKey::doShow( Character *ch, DLString &arguments )
         return;
     }
 
-    ch->printf( "%s владеет такими ключами: \r\n", pci->getName( ).c_str( ) );
+    ch->pecho( "%s владеет такими ключами: ", pci->getName( ).c_str( ) );
 
     for (i = attr->keys.begin( ); i != attr->keys.end( ); i++) {
         int vnum = i->getValue( );
@@ -186,7 +186,7 @@ void MKey::doShow( Character *ch, DLString &arguments )
             continue;
         }
         
-        ch->printf( "[%-4d] %-25s [%s]\r\n", 
+        ch->pecho( "[%-4d] %-25s [%s]", 
                     vnum, 
                     russian_case( pKeyIndex->short_descr, '1' ).c_str( ),
                     pKeyIndex->name );

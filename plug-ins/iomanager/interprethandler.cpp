@@ -192,8 +192,8 @@ void InterpretHandler::normalPrompt( Character *ch )
         str = ch->prompt.c_str( );
 
     if ( !str || !*str ) {
-        ch->printf( "<%dhp %dm %dmv> %s",
-                ch->hit.getValue( ), ch->mana.getValue( ), ch->move.getValue( ), ch->prefix );
+        ch->send_to( fmt(0, "<%dhp %dm %dmv> %s",
+                ch->hit.getValue( ), ch->mana.getValue( ), ch->move.getValue( ), ch->prefix) );
         return;
     }
 

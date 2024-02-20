@@ -60,12 +60,12 @@ void CTwit::doAdd( PCharacter *ch, DLString &arg )
     attr = ch->getAttributes( ).getAttr<XMLAttributeTwitList>( "twit" );
 
     if (attr->isAvailable( name )) {
-        ch->printf( "Имя \"%s\" уже в списке.\r\n", name.c_str( ) );
+        ch->pecho( "Имя \"%s\" уже в списке.", name.c_str( ) );
         return;
     }
     
     attr->push_back( name );
-    ch->printf( "Имя \"%s\" добавлено в список.\r\n", name.c_str( ) );
+    ch->pecho( "Имя \"%s\" добавлено в список.", name.c_str( ) );
 }
 
 void CTwit::doRemove( PCharacter *ch, DLString &arg )
@@ -87,12 +87,12 @@ void CTwit::doRemove( PCharacter *ch, DLString &arg )
     
     for (iter = attr->begin( ); iter != attr->end( ); iter++)
         if (arg ^ iter->getValue( )) {
-            ch->printf( "Имя %s удалено из списка.\r\n", iter->getValue( ).c_str( ) );
+            ch->pecho( "Имя %s удалено из списка.", iter->getValue( ).c_str( ) );
             attr->erase( iter );
             return;
         }
             
-    ch->printf( "Но имени \"%s\" нет в списке.\r\n", arg.c_str( ) );
+    ch->pecho( "Но имени \"%s\" нет в списке.", arg.c_str( ) );
 }
 
 void CTwit::doList( PCharacter *ch ) 

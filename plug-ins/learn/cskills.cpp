@@ -306,11 +306,11 @@ void AllSkillsList::display( std::ostream & buf )
     buf << "{W=========================================================="
         << (bool_long_name ? "{x" : "====================={x")
         << endl
-        << dlprintf( (bool_long_name ? 
+        << fmt(0, (bool_long_name ? 
                        "%7s| %-30s| %-7s |%4s{W|{x " :
                        "%7s| %-18s| %-7s |%4s{W|{x "),
                       "Уровень", "Умение", "Изучено", "Мана" )
-        << dlprintf( (bool_long_name ? 
+        << fmt(0, (bool_long_name ? 
                        "" : "%-18s| %-7s |%4s"),
                      "Умение", "Изучено", "Мана")
         << endl
@@ -329,7 +329,7 @@ void AllSkillsList::display( std::ostream & buf )
                 buf << "                    |         |" << endl;
             }
 
-            buf << dlprintf( "  %3d  |", info.level );
+            buf << fmt(0, "  %3d  |", info.level );
         }
         else if (firstColumn)
             buf << "       |";
@@ -340,19 +340,19 @@ void AllSkillsList::display( std::ostream & buf )
             buf << " ";
             
         if (bool_long_name)
-            buf << dlprintf( "{c%-30s{x|", info.name.c_str( ) );
+            buf << fmt(0, "{c%-30s{x|", info.name.c_str( ) );
         else
-            buf << dlprintf( "{c%-18s{x|", info.name.c_str( ) );
+            buf << fmt(0, "{c%-18s{x|", info.name.c_str( ) );
 
         if (info.available)
-            buf << dlprintf( " %s%3d{x(%s%3d{x)|", 
+            buf << fmt(0, " %s%3d{x(%s%3d{x)|", 
                               info.colorLearned( ), info.learned, 
                               info.colorReal( ), info.real );
         else
             buf << "   n/a   |";
 
         if (info.mana > 0 && info.available)
-            buf << dlprintf( bool_long_name ? " %3d" : " %-3d", info.mana );
+            buf << fmt(0, bool_long_name ? " %3d" : " %-3d", info.mana );
         else
             buf << "    ";
 

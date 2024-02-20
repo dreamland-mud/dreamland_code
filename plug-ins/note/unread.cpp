@@ -102,7 +102,7 @@ void Unread::doNext( PCharacter *ch )
     if (!oldest) 
         ch->pecho("У тебя нет непрочитанных сообщений.");
     else {
-        ch->printf( "{W%s{x:\r\n", oldest->getName( ).c_str( ) );
+        ch->pecho( "{W%s{x:", oldest->getName( ).c_str( ) );
         oldest->showNoteToChar( ch, onote );
     }
 }

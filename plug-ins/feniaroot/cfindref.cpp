@@ -96,12 +96,12 @@ CMDADM(findrefs)
                 ids.push_back(oi->getId());
             }
         }
-        ch->printf("Found %d context objects.\r\n", cnt);
+        ch->pecho("Found %d context objects.", cnt);
         for (auto &r : refcnt)
-            ch->printf("    %d refs: %d\r\n", r.first, r.second);
+            ch->pecho("    %d refs: %d", r.first, r.second);
 
         if (cnt > 0)
-            ch->printf("Example: %lld\r\n", ids.front());
+            ch->pecho("Example: %lld", ids.front());
         return;
     }
 

@@ -68,11 +68,11 @@ COMMAND(CPlugin, "plugin")
     else if(arg.strPrefix( "load" )) {
         PluginManager *manager = PluginManager::getThis( );
         manager->setReloadOneRequest(arguments, 1);
-        ch->printf( "Requesting load for plugin [%s].\r\n", arg.c_str( ) );
+        ch->pecho( "Requesting load for plugin [%s].", arg.c_str( ) );
     } else if(arg.strPrefix( "unload" )) {
         PluginManager *manager = PluginManager::getThis( );
         manager->setReloadOneRequest(arguments, 2);
-        ch->printf( "Requesting unload for plugin [%s].\r\n", arg.c_str( ) );
+        ch->pecho( "Requesting unload for plugin [%s].", arg.c_str( ) );
     } else
         usage( ch );
 }
@@ -96,7 +96,7 @@ void CPlugin::doList( Character *ch )
     buf << "{W  # | name                   | new | load time{x" << endl;
 
     for (i = manager->begin( ); i != manager->end( ); i++)
-        buf << dlprintf( " %2d | %-20s |  %s  | %s \r\n", 
+        buf << fmt(0, " %2d | %-20s |  %s  | %s \r\n", 
                         ++cnt, 
                         i->second.getName( ).c_str( ),
                         (i->second.isChanged( ) ? "*" : " "),
@@ -126,7 +126,7 @@ void CPlugin::doReload( Character *ch, DLString arg )
 
     } else if (manager->isAvailable( arg )) {
         manager->setReloadOneRequest( arg );
-        ch->printf( "Requesting reload for plugin [%s].\r\n", arg.c_str( ) );
+        ch->pecho( "Requesting reload for plugin [%s].", arg.c_str( ) );
 
     } else
         ch->pecho("Plugin not found.");

@@ -279,7 +279,7 @@ void CGQuest::doStat( PCharacter *ch )
         for (r = records.begin( ); r != records.end( ) && cnt < 10; cnt++) {
             last = r->second;
             buf << pad << GQChannel::BOLD 
-                << dlprintf( "%4d", last ) << GQChannel::NORMAL << " ";
+                << fmt(0, "%4d", last ) << GQChannel::NORMAL << " ";
 
             for ( ; r != records.end( ) && r->second == last; r++)
                 buf << r->first << " ";
@@ -417,14 +417,14 @@ void CGQuest::doTime( PCharacter *ch, DLString& arguments )
         int newTotalTime = arguments.getOneArgument( ).toInt( );
         int minTotalTime = gq->getElapsedTime( ) + 1;
         if (newTotalTime < minTotalTime) {
-            ch->printf( "Неверное время, минимум %d минут.\r\n", minTotalTime );
+            ch->pecho( "Неверное время, минимум %d минут.", minTotalTime );
             return;
         }
 
         gq->suspend( );
         gq->setTotalTime( newTotalTime );
         gq->resume( );
-        ch->printf( "Новое время квеста %d минут, до конца остается %d минут.\r\n",
+        ch->pecho( "Новое время квеста %d минут, до конца остается %d минут.",
                 gq->getTotalTime( ), gq->getRemainingTime( ) );
     }  catch (const Exception &e) {
         ch->send_to( e.what( ) );

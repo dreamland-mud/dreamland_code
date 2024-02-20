@@ -479,7 +479,7 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
         else if (arg_has_oneof(args, "rname", "russina", "русское"))
             sort(races.begin(), races.end(), RaceInfo::compareRusName);
 
-        ch->send_to(dlprintf("{C%-15s %-19s {Y%s{x\r\n", "Название", "По-русски", "Мобов"));
+        ch->send_to(fmt(0, "{C%-15s %-19s {Y%s{x\r\n", "Название", "По-русски", "Мобов"));
 
         for (auto &ri: races) {
             Race *race = ri.race;
@@ -490,7 +490,7 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
                     + web_cmd(ch, searchFormat, "{Y%4d") 
                     + "{x\r\n";
 
-            ch->send_to(dlprintf(lineFormat.c_str(),
+            ch->send_to(fmt(0, lineFormat.c_str(),
                     race->getName().c_str(),
                     (race->isPC() ? "g" : "w"),
                     race->getMaleName().ruscase('1').c_str(),

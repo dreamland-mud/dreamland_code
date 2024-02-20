@@ -162,7 +162,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
         } 
         
         if (!ch->isCoder( )) {
-            ch->printf( "От %s не было заявки на подтверждение персонажа.\n\r", pci->getName( ).c_str( ) );
+            ch->pecho( "От %s не было заявки на подтверждение персонажа.", pci->getName( ).c_str( ) );
             return;
         }
 
@@ -310,7 +310,7 @@ void Confirm::doList( Character *ch, bool newOnly )
         if (newOnly && !rp.empty())
             continue;
 
-        buf << dlprintf(lineFormat.c_str(), 
+        buf << fmt(0, lineFormat.c_str(), 
                 i->second->getName( ).c_str( ),
                 attr->date.getTimeAsString("%H:%M %b %d" ).c_str( ),
                 rp == "" ? "" :  (attr->accepted.getValue( ) ? "accepted" : "rejected"),
@@ -318,7 +318,7 @@ void Confirm::doList( Character *ch, bool newOnly )
     }
 
     if (!buf.str().empty()) {
-        ch->printf( "{W%-15s  %-15s %-9s %s{x\r\n", "Name", "Date", "State", "Responsible" );
+        ch->pecho( "{W%-15s  %-15s %-9s %s{x", "Name", "Date", "State", "Responsible" );
         ch->send_to(buf);
     }
 

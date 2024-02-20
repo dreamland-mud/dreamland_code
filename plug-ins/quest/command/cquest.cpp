@@ -411,7 +411,7 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-        ch->printf("%s: имя не найдено.\r\n", name.c_str( ));
+        ch->pecho("%s: имя не найдено.", name.c_str( ));
         return;
     }
     
@@ -472,7 +472,7 @@ void CQuest::doStat( PCharacter *ch )
         // Print top 5 achievers for the current quest type.
         for (r = records.begin( ); r != records.end( ) && cnt < 5; cnt++) {
             last = r->second;
-            buf << dlprintf( "          {W%4d{w ", last ); 
+            buf << fmt(0, "          {W%4d{w ", last ); 
 
             for ( ; r != records.end( ) && r->second == last; r++) {
                 buf << r->first << " ";
@@ -489,7 +489,7 @@ void CQuest::doStat( PCharacter *ch )
             for (; r != records.end(); r++, cnt++)
                 if (r->first == ch->getName()) {
                     buf << "               {W....{w " << endl;
-                    buf << dlprintf( "          {W%4d{w %s (%dе место)\r\n", 
+                    buf << fmt(0, "          {W%4d{w %s (%dе место)\r\n", 
                                      r->second, r->first.c_str(), cnt+1);
                     break;
                 }

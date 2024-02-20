@@ -336,7 +336,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
     }
 
     if (arg_is_list(cmd)) {
-        ch->send_to(dlprintf("{C%-15s %-17s{x\r\n", "Команда", "Русское имя"));
+        ch->send_to(fmt(0, "{C%-15s %-17s{x\r\n", "Команда", "Русское имя"));
 
         const DLString lineFormatCmdEdit = 
             "{W" + web_cmd(ch, "cmdedit $1", "%-15s") + "{w %-17s{x\r\n";
@@ -348,11 +348,11 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
             const DefaultSkillCommand *skillCmd = c.getDynamicPointer<DefaultSkillCommand>();
 
             if (skillCmd)
-                ch->send_to(dlprintf(lineFormatSkillEdit.c_str(),
+                ch->send_to(fmt(0, lineFormatSkillEdit.c_str(),
                         skillCmd->getName().c_str(),
                         skillCmd->getSkill()->getName().c_str()));
             else
-                ch->send_to(dlprintf(lineFormatCmdEdit.c_str(),
+                ch->send_to(fmt(0, lineFormatCmdEdit.c_str(),
                         c->getName().c_str(),
                         c->getRussianName().c_str()));
 

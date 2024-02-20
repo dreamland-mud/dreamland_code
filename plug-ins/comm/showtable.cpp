@@ -109,7 +109,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
     if (found)
         page_to_char( buf.str( ).c_str( ), ch );
     else
-        ch->printf("Не найдено ни одной команды, начинающейся с '%s'.\r\n", arg.c_str( ));
+        ch->pecho("Не найдено ни одной команды, начинающейся с '%s'.", arg.c_str( ));
 }
 
 typedef map<DLString, StringList> Categories;

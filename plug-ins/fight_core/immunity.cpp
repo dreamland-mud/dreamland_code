@@ -84,7 +84,7 @@ int immune_check(Character *ch, int dam_type, bitstring_t dam_flag)
     int result =  immune_resolve( res );
 #ifdef DEBUG    
     if (ch->isCoder())
-        ch->printf("damage %s, flags %s, result %s\r\n",
+        ch->pecho("damage %s, flags %s, result %s",
                 damage_table.name(dam_type).c_str(),
                 damage_flags.names(dam_flag).c_str(),
                 (res == RESIST_IMMUNE ? "immune" : res == RESIST_RESISTANT ? "resist" : res == RESIST_VULNERABLE ? "vuln" : "normal"));

@@ -100,7 +100,7 @@ bool XMLAttributeCards::handle( const DeathArguments &args )
         level--;
 
         if (level >= 0)
-            args.pch->printf( "{cТы становишься %s.{x\r\n", getFace( '5' ).c_str( ) );
+            args.pch->pecho( "{cТы становишься %s.{x", getFace( '5' ).c_str( ) );
         else {
             args.pch->pecho("{cТы выбываешь из колоды!{x");
             args.pch->getAttributes( ).eraseAttribute( "cards" );

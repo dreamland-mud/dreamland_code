@@ -77,17 +77,19 @@ void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
     for (unsigned int i = 0; i < r.size( ); i++) {
         LifeData &life = r[i];
 
-        ch->printf( " %-12s %-12s     %5ld      %s\r\n", 
+        ch->pecho( " %-12s %-12s     %5ld      %s", 
                     life.race.getValue( ).c_str( ),
                     life.classCh.getValue( ).c_str( ),
                     life.time.getValue( ),
                     (life.bonus ? "*" : ""));
     }
     
-    for (int i = 0; i < stat_table.size; i++)
-        ch->printf("%d %s ", r.stats[i].getValue( ), stat_table.name( i ).c_str( ) );
+    for (int i = 0; i < stat_table.size; i++) {
+        ch->send_to(r.stats[i].getValue( ));
+        ch->send_to(stat_table.name( i ).c_str( ));
+    }
 
-    ch->printf("\n%d lvl, %d hp, %d mana, %s, %d owners\n",
+    ch->pecho("\n%d lvl, %d hp, %d mana, %s, %d owners",
                 r.level.getValue( ),
                 r.hp.getValue( ), r.mana.getValue( ),
                 (r.pretitle ? "pretitle" : ""),
@@ -204,7 +206,7 @@ void CMlt::doCount( Character* ch, int n )
     }
     
     if (cnt > 80)
-        ch->printf( "Их слишком много. %d тел.\r\n", cnt );
+        ch->pecho( "Их слишком много. %d тел.", cnt );
     else if (!buf.str( ).empty( )) {
         buf << "Count: " << cnt << endl;
         ch->send_to( buf );

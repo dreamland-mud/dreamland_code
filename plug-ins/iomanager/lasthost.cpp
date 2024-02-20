@@ -46,7 +46,7 @@ void XMLAttributeLastHost::showHosts(ostringstream &buf) const
     Hosts::ValueList list = hosts.toSortedList();
 
     for (Hosts::ValueList::const_iterator v = list.begin(); v != list.end(); v++) 
-        buf << dlprintf("%16s %4d", v->first.c_str(), v->second) << endl;
+        buf << fmt(0, "%16s %4d", v->first.c_str(), v->second) << endl;
 }
 
 void XMLAttributeLastHostListenerPlugin::run(int oldState, int newState, Descriptor *d)

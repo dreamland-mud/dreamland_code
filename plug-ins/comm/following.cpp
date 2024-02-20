@@ -128,7 +128,7 @@ CMDRUN( group )
         Character *leader;
 
         leader = (ch->leader != 0) ? ch->leader : ch;
-        ch->printf( "Группа %s:\n\r", ch->sees(leader,'2').c_str( ) );
+        ch->pecho( "Группа %s:", ch->sees(leader,'2').c_str( ) );
 
         for (Character *gch = char_list; gch != 0; gch = gch->next )
             if (is_same_group( gch, ch )) {

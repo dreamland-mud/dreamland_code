@@ -127,7 +127,7 @@ void HealService::toStream( Character *client, ostringstream &buf ) const
 {
     DLString myname = client->getConfig().rucommands && !rname.empty() ? rname : name;
     DLString myprice = price->toString(client);
-    buf << dlprintf("  {c%-11s{x: %-30s  %17s\r\n",
+    buf << fmt(0, "  {c%-11s{x: %-30s  %17s\r\n",
            myname.c_str(), descr.c_str(), myprice.c_str());
 }
 

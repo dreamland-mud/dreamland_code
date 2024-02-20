@@ -94,7 +94,7 @@ void ClanOrgs::doList( PCharacter *pch ) const
     ostringstream buf;
 
     for (const_iterator i = begin( ); i != end( ); i++)
-        buf << dlprintf("   %-15s (%s)\n\r",
+        buf << fmt(0, "   %-15s (%s)\n\r",
                         i->second->shortDescr.c_str( ),
                         i->first.c_str( ) );
 
@@ -141,7 +141,7 @@ void ClanOrgs::doMembers( PCharacter *pch, const DLString &cargs ) const
             || getAttr( pcm ) != targetOrg->name)
             continue;
 
-        buf << dlprintf("%-10s %-10s %-12s %2d %3d    %-15s\r\n",
+        buf << fmt(0, "%-10s %-10s %-12s %2d %3d    %-15s\r\n",
                    pcm->getName().c_str(),
                    pcm->getRace()->getName().c_str(),
                    pcm->getProfession( )->getNameFor(pch).c_str(),

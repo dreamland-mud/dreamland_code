@@ -68,7 +68,7 @@ void CCard::doMob( PCharacter *ch, DLString& arguments )
     mob->getNPC( )->behavior.setPointer( *bhv );
     save_mobs( mob->in_room );
 
-    ch->printf( "%s из комнаты [%d] стал(о) шестеркой.\r\n",
+    ch->pecho( "%s из комнаты [%d] стал(о) шестеркой.",
                 mob->getNameP( '1' ).c_str( ), mob->in_room->vnum );
 }
 
@@ -92,9 +92,9 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     card = attributes->findAttr<XMLAttributeCards>( "cards" );
     
     if (!card)
-        ch->printf( "%s не состоит в Колоде.\r\n", pci->getName( ).c_str( ) );
+        ch->pecho( "%s не состоит в Колоде.", pci->getName( ).c_str( ) );
     else
-        ch->printf( "%s - это %s из Колоды.\r\n", 
+        ch->pecho( "%s - это %s из Колоды.", 
                     pci->getName( ).c_str( ), card->getFace( '1' ).c_str( ) );
 
 
@@ -128,7 +128,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
         card->setSuit( card->getRandomSuit( ) );
 
     PCharacterManager::saveMemory( pci );
-    ch->printf( "%s становится %s.\r\n", 
+    ch->pecho( "%s становится %s.", 
                 pci->getName( ).c_str( ), card->getFace( '5' ).c_str( ) );
      
 }
@@ -151,7 +151,7 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
         card = pci->getAttributes( ).findAttr<XMLAttributeCards>( "cards" ); 
 
         if (card) {
-            ch->printf( "%20s %s\r\n", 
+            ch->pecho( "%20s %s", 
                         pci->getName( ).c_str( ),
                         card->getFace( '1' ).c_str( ) );
             cnt++;
@@ -159,9 +159,9 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     }
     
     if (cnt > 0)
-        ch->printf( "Итого: %d тел\r\n", cnt );
+        ch->pecho( "Итого: %d тел", cnt );
 
-    ch->printf( "\r\nМобы-шестерки:\r\n", cnt );
+    ch->pecho( "\r\nМобы-шестерки:", cnt );
     cnt = 0;
         
     for (wch = char_list; wch; wch = wch->next) {
@@ -180,14 +180,14 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
             continue;
         
         
-        ch->printf( "[%5d] %-28s [%5d] %s\r\n",
+        ch->pecho( "[%5d] %-28s [%5d] %s",
                     mob->pIndexData->vnum, mob->getNameP( '1' ).c_str( ),
                     mob->in_room->vnum, mob->in_room->getName() );
         cnt++;
     }
     
     if (cnt > 0)
-        ch->printf( "Итого: %d тел\r\n", cnt );
+        ch->pecho( "Итого: %d тел", cnt );
 }
 
 void CCard::usage( PCharacter *ch )

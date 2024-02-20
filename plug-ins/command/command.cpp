@@ -217,7 +217,7 @@ int Command::dispatchOrder( const InterpretArguments &iargs )
     }
 
     if (getExtra( ).isSet( CMD_SPELLOUT ) && !matchesExactly( iargs.cmdName.toLower( ) )) {
-        ch->printf("Команду '%s' необходимо ввести полностью.\n\r", getName( ).c_str( ) );
+        ch->pecho("Команду '%s' необходимо ввести полностью.", getName( ).c_str( ) );
         return RC_DISPATCH_SPELLOUT;
     }
                     

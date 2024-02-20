@@ -127,7 +127,7 @@ void MixedPetShopRoom::doList( Character *client )
     buf << "[ Ном.| Ур.  Цена ] Товар" << endl;
     
     for (i = list.begin( ); i != list.end( ); i++)
-        buf << dlprintf( "[ {Y%3d{x |%3d %5d ] %s\n\r",
+        buf << fmt(0, "[ {Y%3d{x |%3d %5d ] %s\n\r",
                          ++cnt, i->level, i->cost, i->short_descr.ruscase( '1' ).c_str( ) );
 
     client->send_to( buf );

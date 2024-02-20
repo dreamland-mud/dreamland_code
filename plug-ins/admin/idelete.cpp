@@ -110,7 +110,7 @@ CMDADM( ipassword )
             }
         }
 
-        ch->printf( "Захешированы пароли %d персонажей из %d.\r\n", cnt, pcm.size( ) );
+        ch->pecho( "Захешированы пароли %d персонажей из %d.", cnt, pcm.size( ) );
         return;
     }
 

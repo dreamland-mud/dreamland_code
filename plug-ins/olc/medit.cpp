@@ -1159,7 +1159,7 @@ MEDIT(copy)
         return false;
     }
     
-    ch->printf("All %s copied from vnum %d (%s).\r\n",
+    ch->pecho("All %s copied from vnum %d (%s).",
                 report.c_str( ),
                 original->vnum, 
                 russian_case( original->short_descr, '1' ).c_str( ) );
@@ -1215,7 +1215,7 @@ MEDIT(average)
         }
     
     if (total == 0) {
-        ch->printf("No mobiles found in level range %d-%d.\r\n", minLevel, maxLevel);
+        ch->pecho("No mobiles found in level range %d-%d.", minLevel, maxLevel);
         return false;
     }
      

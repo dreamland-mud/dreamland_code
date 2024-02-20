@@ -242,7 +242,7 @@ CMDWIZP( limited )
                     l->count,
                     l->inGame );
         
-        ch->printf( "\n\rВсего лимитов: %d из %d.\n\r", limits.size(), nMatch );
+        ch->pecho( "\n\rВсего лимитов: %d из %d.", limits.size(), nMatch );
 }
 
 CMDWIZP( wiznet )
@@ -337,14 +337,14 @@ CMDWIZP( wiznet )
 
         if ( IS_SET(ch->getPC( )->wiznet,wiznet_table[flag].flag) )
         {
-                ch->printf("Ты больше не следишь за %s через Визнет.\n\r",
+                ch->pecho("Ты больше не следишь за %s через Визнет.",
                            wiznet_table[flag].name);
                 REMOVE_BIT(ch->getPC( )->wiznet,wiznet_table[flag].flag);
                 return;
         }
         else
         {
-                ch->printf("Ты теперь отслеживаешь %s через Визнет.\n\r",
+                ch->pecho("Ты теперь отслеживаешь %s через Визнет.",
                            wiznet_table[flag].name);
                 SET_BIT(ch->getPC( )->wiznet,wiznet_table[flag].flag);
                 return;
@@ -360,7 +360,7 @@ CMDWIZP( poofin )
 
     if (argument[0] == '\0')
     {
-            ch->printf("Твое сообщение poofin: %s\n\r",ch->getPC( )->bamfin.c_str( ));
+            ch->pecho("Твое сообщение poofin: %s",ch->getPC( )->bamfin.c_str( ));
             return;
     }
 
@@ -377,7 +377,7 @@ CMDWIZP( poofin )
     }
 
     ch->getPC( )->bamfin = argument;
-    ch->printf("Твое сообщение poofin теперь: %s\n\r",ch->getPC( )->bamfin.c_str( ));
+    ch->pecho("Твое сообщение poofin теперь: %s",ch->getPC( )->bamfin.c_str( ));
 }
 
 
@@ -389,7 +389,7 @@ CMDWIZP( poofout )
 
     if (argument[0] == '\0')
     {
-            ch->printf("Твое сообщение poofout: %s\n\r",ch->getPC( )->bamfout.c_str( ));
+            ch->pecho("Твое сообщение poofout: %s",ch->getPC( )->bamfout.c_str( ));
             return;
     }
 
@@ -407,7 +407,7 @@ CMDWIZP( poofout )
 
     ch->getPC( )->bamfout = argument;
 
-    ch->printf("Твое сообщение poofout теперь %s\n\r",ch->getPC( )->bamfout.c_str( ));
+    ch->pecho("Твое сообщение poofout теперь %s",ch->getPC( )->bamfout.c_str( ));
 }
 
 CMDWIZP( disconnect )
@@ -617,7 +617,7 @@ CMDWIZP( goto )
 
     if ( ( location = find_location( ch, argument ) ) == 0 )
     {
-        ch->printf("Цель не найдена: %s.\n\r", argument );
+        ch->pecho("Цель не найдена: %s.", argument );
         return;
     }
 
@@ -918,7 +918,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         Room *to_room = pexit->u1.to_room;
 
-        b << dlprintf("{G%-6s{x [{W%5u{x] [{W%-10s{x]",
+        b << fmt(0, "{G%-6s{x [{W%5u{x] [{W%-10s{x]",
                       dirs[door].rname,
                       to_room ? to_room->vnum : 0,
                       to_room ? to_room->getName() : "");
@@ -926,19 +926,19 @@ static void format_affect(Affect *paf, ostringstream &buf)
         b << endl;
 
         if (pexit->key > 0)
-            b << dlprintf("Ключ: [{W%7u{x]  ", pexit->key) << endl;
+            b << fmt(0, "Ключ: [{W%7u{x]  ", pexit->key) << endl;
             
         if (pexit->exit_info)
-            b << dlprintf("Флаги: [{W%s{x]", exit_flags.names(pexit->exit_info).c_str()) << endl;
+            b << fmt(0, "Флаги: [{W%s{x]", exit_flags.names(pexit->exit_info).c_str()) << endl;
 
         {
             ostringstream tbuf;
 
             if (pexit->keyword && pexit->keyword[0] != '\0')
-                tbuf << dlprintf("Имена: [{W%s{x]  ", pexit->keyword);
+                tbuf << fmt(0, "Имена: [{W%s{x]  ", pexit->keyword);
 
             if (pexit->short_descr && pexit->short_descr[0] != '\0')
-                tbuf << dlprintf("Краткое: [{W%s{x]  ", russian_case(pexit->short_descr, '1').c_str());
+                tbuf << fmt(0, "Краткое: [{W%s{x]  ", russian_case(pexit->short_descr, '1').c_str());
 
             if (pexit->description && pexit->description[0] != '\0')
                 tbuf << "Описание: " << pexit->description;
@@ -958,7 +958,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
             h != r->history.end( );
             h++)
         {
-            b << dlprintf( "%s проходит через дверь %d.\r\n", h->name.c_str( ), h->went );
+            b << fmt(0, "%s проходит через дверь %d.\r\n", h->name.c_str( ), h->went );
         }
     }
 
@@ -1003,7 +1003,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
         if (obj->timestamp > 0) {
             DLString d = Date( obj->timestamp ).getTimeAsString( );
-            ch->printf("Лимит исчезнет в %s.\r\n", d.c_str( ) );
+            ch->pecho("Лимит исчезнет в %s.", d.c_str( ) );
         }
 
         sprintf( buf, "Шорт: %s\n\rДлинное описание: %s\n\r",
@@ -1144,7 +1144,7 @@ static void format_affect(Affect *paf, ostringstream &buf)
         
         case ITEM_CORPSE_PC:
         case ITEM_CORPSE_NPC:
-                ch->printf( "Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d\n\r",
+                ch->pecho( "Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d",
                             obj->value0(), obj->value1(), 
                             part_flags.messages( obj->value2() ).c_str( ), obj->value3() );
                 break;
@@ -1569,7 +1569,7 @@ CMDWIZP( vnum )
     for (int i=0; i<MAX_KEY_HASH; i++)
         for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) 
             if (pObj->item_type == type) {
-                buf << dlprintf( "[%5d] %s\n",
+                buf << fmt(0, "[%5d] %s\n",
                                  pObj->vnum,
                                  russian_case( pObj->short_descr, '1' ).c_str( ) );
             }
@@ -1592,7 +1592,7 @@ CMDWIZP( rwhere )
 
     for (auto &r: roomInstances)
         if (is_name(argument, r->getName())) {
-            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->areaName().c_str());
+            buf << fmt(0, "[%6d] %-30s %s\r\n", r->vnum, r->getName(), r->areaName().c_str());
             found = true;
         }
 
@@ -2935,7 +2935,7 @@ int decode_flags(char * arg, int * value_add, int * value_sub)
  */
 CMDWIZP( force )
 {
-    const char *msg = "%s вежливо принуждает тебя выполнить команду '%s'.\r\n";
+    const char *msg = "%s вежливо принуждает тебя выполнить команду '%s'.";
     char arg[MAX_INPUT_LENGTH];
 
     argument = one_argument( argument, arg );
@@ -2963,7 +2963,7 @@ CMDWIZP( force )
 
             if ( !vch->is_npc() && vch->get_trust() < ch->get_trust() )
             {
-                vch->printf(msg, vch->sees(ch, '1').c_str(), argument);
+                vch->pecho(msg, vch->sees(ch, '1').c_str(), argument);
                 interpret( vch, argument );
             }
         }
@@ -2986,7 +2986,7 @@ CMDWIZP( force )
             if ( !vch->is_npc() && vch->get_trust() < ch->get_trust()
             &&         vch->getRealLevel( ) < LEVEL_HERO)
             {
-                vch->printf(msg, vch->sees(ch, '1').c_str(), argument);
+                vch->pecho(msg, vch->sees(ch, '1').c_str(), argument);
                 interpret( vch, argument );
             }
         }
@@ -3009,7 +3009,7 @@ CMDWIZP( force )
             if ( !vch->is_npc() && vch->get_trust() < ch->get_trust()
             &&   vch->getRealLevel( ) >= LEVEL_HERO)
             {
-                vch->printf(msg, vch->sees(ch, '1').c_str(), argument);
+                vch->pecho(msg, vch->sees(ch, '1').c_str(), argument);
                 interpret( vch, argument );
             }
         }
@@ -3050,7 +3050,7 @@ CMDWIZP( force )
             return;
         }
 
-        victim->printf(msg, victim->sees(ch, '1').c_str(), argument);
+        victim->pecho(msg, victim->sees(ch, '1').c_str(), argument);
         interpret( victim, argument );
     }
 
@@ -3369,7 +3369,7 @@ CMDWIZP( rename )
     
     DLString rc;
     if (!(rc = badNames->checkName(newName)).empty()) {
-        ch->printf( "New name failed sanity checks, reason: %s.\n\r", rc.c_str() );
+        ch->pecho( "New name failed sanity checks, reason: %s.", rc.c_str() );
         return;
     }
     

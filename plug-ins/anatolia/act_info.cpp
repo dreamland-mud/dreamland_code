@@ -199,7 +199,7 @@ CMDRUNP( prompt )
             ch->desc->send(  old.c_str( ) );   
                ch->pecho("");
     }
-    ch->printf("Новая строка состояния: %s\n\r",ch->prompt.c_str( ) );
+    ch->pecho("Новая строка состояния: %s",ch->prompt.c_str( ) );
 }
 
 CMDRUNP( battleprompt )
@@ -232,7 +232,7 @@ CMDRUNP( battleprompt )
             ch->desc->send(  old.c_str( ) );   
                ch->pecho("");
     }
-    ch->printf("Новая строка состояния в бою: %s\n\r",ch->batle_prompt.c_str( ) );
+    ch->pecho("Новая строка состояния в бою: %s",ch->batle_prompt.c_str( ) );
 }
 
 static DLString show_money( int g, int s )
@@ -344,7 +344,7 @@ CMDRUNP( oscore )
         room = get_room_instance( ROOM_VNUM_TEMPLE );
     
     buf << "  {wДом:{W " << (room ? room->areaName().c_str() : "Потерян" ) << "{x" << endl
-        << dlprintf( "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
+        << fmt(0, "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
                     ch->move.getValue( ), ch->max_move.getValue( ));
@@ -354,12 +354,12 @@ CMDRUNP( oscore )
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-    buf << dlprintf( "Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r",
+    buf << fmt(0, "Ты несешь {W%d/%d{x вещей с весом {W%d/%d{x фунтов.\n\r",
                 ch->carry_number, ch->canCarryNumber( ),
                 ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
     if (ch->is_npc( )) {
-        buf << dlprintf( 
+        buf << fmt(0, 
             "Твои параметры: исходные, (текущие)\n\r"
             "      Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
             "  Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
@@ -372,7 +372,7 @@ CMDRUNP( oscore )
             ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA) );
 
     } else {
-        buf << dlprintf( 
+        buf << fmt(0, 
             "Твои параметры: исходные, {c({Wтекущие{c){x, [{Cмаксимальные{x]\n\r"
             "      Сила(Str): %d{c({W%d{c){x [{C%d{x] Интеллект(Int): %d{c({W%d{c){x [{C%d{x]\n\r"
             "  Мудрость(Wis): %d{c({W%d{c){x [{C%d{x]  Ловкость(Dex): %d{c({W%d{c){x [{C%d{x]\n\r"
@@ -386,13 +386,13 @@ CMDRUNP( oscore )
 
     }
 
-    buf << dlprintf( "У тебя {W%d{x очков опыта, и %s\n\r",
+    buf << fmt(0, "У тебя {W%d{x очков опыта, и %s\n\r",
                   ch->exp.getValue( ),
                   show_money( ch->gold, ch->silver ).c_str( ) );
 
     /* KIO shows exp to level */
     if (!ch->is_npc() && ch->getRealLevel( ) < LEVEL_HERO - 1)
-        buf << dlprintf( "Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r",
+        buf << fmt(0, "Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r",
                     ch->getPC()->getExpToLevel( ) );
 
     if (!ch->is_npc( )) {
@@ -415,7 +415,7 @@ CMDRUNP( oscore )
 
         if (ch->getProfession( ) != prof_samurai) {
             if (ch->wimpy > 0) {
-                buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
+                buf << fmt(0, "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
                 newline = true;
             }
         } else {
@@ -427,12 +427,12 @@ CMDRUNP( oscore )
         }
         
         if (ch->getPC()->guarding != 0) {
-            buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+            buf << fmt(0, "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
             newline = true;
         }
 
         if (ch->getPC()->guarded_by != 0) {
-            buf << dlprintf( "Ты охраняешься: %s.", ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
+            buf << fmt(0, "Ты охраняешься: %s.", ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
             newline = true;
         }
         
@@ -465,15 +465,15 @@ CMDRUNP( oscore )
     buf << endl;
 
     /* print AC values */
-    buf << dlprintf( "Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r",
+    buf << fmt(0, "Защита от укола {W%d{x, от удара {W%d{x, от разрезания {W%d{x, от экзотики {W%d{x.\n\r",
             GET_AC(ch,AC_PIERCE),
             GET_AC(ch,AC_BASH),
             GET_AC(ch,AC_SLASH),
             GET_AC(ch,AC_EXOTIC));
-    buf << dlprintf( "{lRТочность{lEHitroll{lx: {C%d{x  {lRУрон{lEDamroll{lx: {C%d{x  {lRЗащита от заклинаний{lESaves vs Spell{lx: {C%d{x\n\r",
+    buf << fmt(0, "{lRТочность{lEHitroll{lx: {C%d{x  {lRУрон{lEDamroll{lx: {C%d{x  {lRЗащита от заклинаний{lESaves vs Spell{lx: {C%d{x\n\r",
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
-    buf << dlprintf( "У тебя %s натура.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
+    buf << fmt(0, "У тебя %s натура.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
@@ -497,14 +497,14 @@ CMDRUNP( oscore )
         if (ch->getReligion( ) == god_none)
             buf << fmt(0, "Ты не определил%Gось|ся|ась с выбором религии.  ", ch);
         else
-            buf << dlprintf( "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
+            buf << fmt(0, "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
-        buf << dlprintf("Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
+        buf << fmt(0, "Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
     }
     
     /* RT wizinvis and holy light */
     if (ch->is_immortal( )) 
-        buf << dlprintf( "Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня.",
+        buf << fmt(0, "Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня.",
                    (IS_SET(ch->act, PLR_HOLYLIGHT) ? "включен" : "выключен"),
                    ch->getPC( )->invis_level.getValue( ),
                    ch->getPC( )->incog_level.getValue( ) )
@@ -676,7 +676,7 @@ CMDRUNP( where )
 
     if (arg.empty( ) || fPKonly)
     {
-        ch->printf( "Ты находишься в местности {W{hh%s{x. Недалеко от тебя:\r\n",
+        ch->pecho( "Ты находишься в местности {W{hh%s{x. Недалеко от тебя:",
                      ch->in_room->areaName().c_str() );
         found = false;
 
@@ -851,7 +851,7 @@ CMDRUNP( pretitle )
         DLString eng = pch->getPretitle( );
         DLString rus = pch->getRussianPretitle( );
 
-        pch->printf( "Твой претитул: %s\r\nРусский претитул: %s\r\n",
+        pch->pecho( "Твой претитул: %s\r\nРусский претитул: %s",
                      (eng.empty( ) ? "(нет)" : eng.c_str( )),
                      (rus.empty( ) ? "(нет)" : rus.c_str( )) );
         return;
@@ -871,7 +871,7 @@ CMDRUNP( pretitle )
             return;
 
         pch->setRussianPretitle( arg );
-        pch->printf( "Русский претитул: %s\r\n", arg.c_str( ) );
+        pch->pecho( "Русский претитул: %s", arg.c_str( ) );
     }
     else { 
         arg = argument;
@@ -880,7 +880,7 @@ CMDRUNP( pretitle )
             return;
 
         pch->setPretitle( arg );
-        pch->printf( "Твой претитул: %s\r\n", arg.c_str( ) );
+        pch->pecho( "Твой претитул: %s", arg.c_str( ) );
     }
 }
 
@@ -1773,9 +1773,9 @@ CMDRUNP( score )
         return;
     }
 
-    ch->printf( 
+    ch->pecho( 
 "%s\n\r"
-"      /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/~~\\\n\r", 
+"      /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/~~\\", 
              CLR_FRAME);
     ch->pecho(
         fmt ( 0, "     %s|   %s%-50.50s {y%3d{x %4s   %s|____|",
@@ -1787,14 +1787,14 @@ CMDRUNP( score )
                 CLR_FRAME ) );
                 
         
-    ch->printf(
+    ch->pecho(
 "     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r" 
 "     | %sУровень:{x  %3d        %s|%s {lRСила:{lE Str:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sРелигия:{x %-14.14s%s|\n\r"
 "     | %sРаса :{x  %-12s %s| %s{lRУм  :{lE Int:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
 "     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
 "     | %sКласс:{x  %-13s%s| %s{lRЛовк:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-6d%s |\n\r"
 "     | %sНатура:{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r",
+"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|",
 
             CLR_FRAME, CLR_BAR, CLR_FRAME,
 
@@ -1871,14 +1871,14 @@ CMDRUNP( score )
                 CLR_FRAME,
                 CLR_BAR, CLR_FRAME) );
 
-    ch->printf(
-"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+    ch->pecho(
+"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|",
         CLR_BAR, CLR_FRAME);
             
     if (pch->guarding != 0) {
         ekle = 1;
-        ch->printf( 
-"     %s| {wТы охраняешь    :{Y %-10s                                    %s|\n\r",
+        ch->pecho( 
+"     %s| {wТы охраняешь    :{Y %-10s                                    %s|",
             CLR_FRAME,
             ch->seeName( pch->guarding, '4' ).c_str(),
             CLR_FRAME);
@@ -1886,8 +1886,8 @@ CMDRUNP( score )
 
     if (pch->guarded_by != 0) {
         ekle = 1;
-        ch->printf( 
-"     %s| {wТебя охраняет     :{Y %-10s                                  %s|\n\r",
+        ch->pecho( 
+"     %s| {wТебя охраняет     :{Y %-10s                                  %s|",
         CLR_FRAME,
         ch->seeName( pch->guarded_by, '1' ).c_str(),
         CLR_FRAME);
@@ -1903,7 +1903,7 @@ CMDRUNP( score )
 
             if (!buf.str( ).empty( )) {
                 ekle = 1;
-                ch->printf( "     %s| {w%-64s%s|\r\n", 
+                ch->pecho( "     %s| {w%-64s%s|", 
                             CLR_FRAME,
                             buf.str( ).c_str( ),
                             CLR_FRAME );
@@ -1913,8 +1913,8 @@ CMDRUNP( score )
 
     if (ch->is_adrenalined()) {
         ekle = 1;
-        ch->printf( 
-"     %s| {yАдреналин кипит в твоих венах!                                  %s|\n\r",
+        ch->pecho( 
+"     %s| {yАдреналин кипит в твоих венах!                                  %s|",
                  CLR_FRAME,
                  CLR_FRAME );
     }
@@ -1930,9 +1930,9 @@ CMDRUNP( score )
 
     if (ch->is_immortal()) {
         ekle = 1;
-        ch->printf( 
+        ch->pecho( 
 "     %s| {w{lRНевидимость:{lEInvisible:  {lx {lRуровня{lElevel{lx %3d   "
-         "{lRИнкогнито{lEIncognito  {lx: {lRуровня{lElevel{lx %3d                 %s|\n\r",
+         "{lRИнкогнито{lEIncognito  {lx: {lRуровня{lElevel{lx %3d                 %s|",
               CLR_FRAME,
               pch->invis_level.getValue( ),
               pch->incog_level.getValue( ),
@@ -1943,7 +1943,7 @@ CMDRUNP( score )
     if (ch->getPC()->getAttributes( ).handleEvent( ScoreArguments( ch->getPC(), attrLines ) )) {
         ekle = 1;
         for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
-            ch->printf("     %s| {w%-64s%s|\r\n", 
+            ch->pecho("     %s| {w%-64s%s|", 
                         CLR_FRAME,
                         l->c_str(),
                         CLR_FRAME);
@@ -1951,20 +1951,20 @@ CMDRUNP( score )
     }
 
     if (ekle) {
-        ch->printf( 
-"     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+        ch->pecho( 
+"     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|",
                 CLR_FRAME,
                 CLR_BAR,
                 CLR_FRAME);
     }
 
 
-    ch->printf( 
+    ch->pecho( 
 "     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от уколов:{x   %-5d   %s|\n\r"
 "     | %sВес           :{x  %6d/%-8d    %sЗащита от ударов:{x   %-5d   %s|\n\r"
 "     | %sЗолото        :{Y %-10d          %sЗащита от разрезов:{x %-5d   %s|\n\r"
 "     | %sСеребро       :{W %-10d          %sЗащита от экзотики:{x %-5d   %s|\n\r"
-"     | %sЕдиниц опыта  :{x %-6d              %s{lRЗащита от заклинаний{lESaves vs Spell      {lx:{x %4d  %s|\n\r",
+"     | %sЕдиниц опыта  :{x %-6d              %s{lRЗащита от заклинаний{lESaves vs Spell      {lx:{x %4d  %s|",
         CLR_FRAME,
         CLR_CAPT,
         ch->carry_number, ch->canCarryNumber( ),
@@ -1996,9 +1996,9 @@ CMDRUNP( score )
         ch->saving_throw.getValue( ),
         CLR_FRAME);
 
-    ch->printf( 
+    ch->pecho( 
 "     %s| %sОпыта до уровня:{x %-6d                                         %s|\n\r"
-"     |                                    %sЖизни:{x %5d / %5d         %s|\n\r",
+"     |                                    %sЖизни:{x %5d / %5d         %s|",
         CLR_FRAME,
         CLR_CAPT,
         pch->getExpToLevel( ),
@@ -2008,9 +2008,9 @@ CMDRUNP( score )
         ch->hit.getValue( ), ch->max_hit.getValue( ),
         CLR_FRAME);
 
-    ch->printf( 
+    ch->pecho( 
 "     %s| %s{lRТочность{lEHitroll {lx      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
-"     | %s{lRУрон   {lEDamroll{lx       :{x   %-3d           %sДвижения:{x %5d / %5d         %s|\n\r",
+"     | %s{lRУрон   {lEDamroll{lx       :{x   %-3d           %sДвижения:{x %5d / %5d         %s|",
         CLR_FRAME,
         CLR_CAPT,
         ch->hitroll.getValue( ),
@@ -2025,9 +2025,9 @@ CMDRUNP( score )
         CLR_FRAME);
 
 
-    ch->printf( 
+    ch->pecho( 
 "  %s/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/   |\n\r"
-"  \\________________________________________________________________\\__/{x\n\r",
+"  \\________________________________________________________________\\__/{x",
         CLR_FRAME);
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))

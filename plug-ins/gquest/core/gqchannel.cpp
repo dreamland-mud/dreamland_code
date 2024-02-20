@@ -108,6 +108,6 @@ void GQChannel::pecho( Character *ch, const DLString& msg )
     if (dreamland->isShutdown( ))
         return;
 
-    ch->printf( "%s%s{x\r\n", NORMAL, msg.c_str( ) );
+    ch->pecho( "%s%s{x", NORMAL, msg.c_str( ) );
 }
 

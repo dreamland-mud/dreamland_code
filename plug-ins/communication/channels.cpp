@@ -303,7 +303,7 @@ COMMAND(ChannelsCommand, "channels")
     
     for (c = channels.begin( ); c != channels.end( ); c++) 
         if ((*c)->getOff( ) && (*c)->canHear( ch ))
-            buf << dlprintf( "%-12s %s.", 
+            buf << fmt(0, "%-12s %s.", 
                              rus ? (*c)->getRussianName( ).c_str( )
                                  : (*c)->getName( ).c_str( ),
                              (IS_SET(ch->comm, (*c)->getOff( )) 

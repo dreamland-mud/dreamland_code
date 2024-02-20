@@ -300,8 +300,8 @@ void Gangsters::progress( std::ostringstream &buf ) const
             continue;
         
         buf << GQChannel::NORMAL
-            << dlprintf( "%-15s", i->second->getName( ).c_str( ) ) << " "
-            << GQChannel::BOLD << dlprintf( "%-4d", attr->getKilled( ) )
+            << fmt(0, "%-15s", i->second->getName( ).c_str( ) ) << " "
+            << GQChannel::BOLD << fmt(0, "%-4d", attr->getKilled( ) )
             << GQChannel::NORMAL << endl;
     }
 }

@@ -67,13 +67,13 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 
         if (!IS_SET(ch->comm, off)) {
             if (msgOn.empty( ))
-                ch->printf( "Канал %s теперь включен.\r\n", getName( ).c_str( ) );
+                ch->pecho( "Канал %s теперь включен.", getName( ).c_str( ) );
             else
                 ch->pecho( msgOn );
         }
         else {
             if (msgOff.empty( ))
-                ch->printf( "Канал %s теперь выключен.\r\n", getName( ).c_str( ) );
+                ch->pecho( "Канал %s теперь выключен.", getName( ).c_str( ) );
             else
                 ch->pecho( msgOff );
         }

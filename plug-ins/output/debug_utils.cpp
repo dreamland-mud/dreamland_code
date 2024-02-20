@@ -14,7 +14,7 @@ Debug::~Debug()
             && !ch->is_npc() 
             && ch->getPC()->getAttributes().isAvailable(attr)) 
     {
-        ch->printf("{C[{cDebug{C]{W %s: {C%s\r\n", label, result.c_str());
+        ch->pecho("{C[{cDebug{C]{W %s: {C%s", label, result.c_str());
     }
 }        
 

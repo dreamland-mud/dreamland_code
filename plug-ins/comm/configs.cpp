@@ -66,7 +66,7 @@ bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
     if (arg.empty( )) {
         bool yes = isSetBit(ch);
         printLine( ch );
-        ch->printf("\nИспользуй команду {hc{y{lRрежим %s %s{lEconfig %s %s{x для изменения.\r\n",
+        ch->pecho("\nИспользуй команду {hc{y{lRрежим %s %s{lEconfig %s %s{x для изменения.",
                       rname.c_str(), yes ? "нет" : "да", name.c_str(), yes ? "no" : "yes");
         return true;
     }
@@ -110,7 +110,7 @@ void ConfigElement::printRow( PCharacter *ch ) const
     bool yes = isSetBit( ch );
     bool rus = ch->getConfig( ).rucommands;
 
-    ch->printf( "| {%s%-14s {x|  {%s%-7s {x|\r\n", 
+    ch->pecho( "| {%s%-14s {x|  {%s%-7s {x|", 
                       CLR_NAME(ch), 
                       rus ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ), 
                       yes ? CLR_YES(ch) : CLR_NO(ch),
@@ -120,14 +120,14 @@ void ConfigElement::printRow( PCharacter *ch ) const
 static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, bool yes, const DLString &msgYes, const DLString &msgNo)
 {
     if (ch->getConfig( ).rucommands)
-        ch->printf( "  {%s%-14s {%s%5s {x%s\r\n",
+        ch->pecho( "  {%s%-14s {%s%5s {x%s",
                         CLR_NAME(ch),
                         rname.c_str(),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
                         yes ? "ДА" : "НЕТ",
                         yes ? msgYes.c_str() : msgNo.c_str() );
     else
-        ch->printf( "  {%s%-12s {%s%5s {x%s\r\n",
+        ch->pecho( "  {%s%-12s {%s%5s {x%s",
                         CLR_NAME(ch),
                         name.c_str( ),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
@@ -166,7 +166,7 @@ Flags & ConfigElement::getField( PCharacter *ch ) const
  *------------------------------------------------------------------------*/
 void ConfigGroup::printHeader( PCharacter *ch ) const
 {
-    ch->printf( "\r\n{%s%s{x\r\n", 
+    ch->pecho( "\r\n{%s%s{x", 
                     CLR_HEADER(ch),
                     name.getValue( ).c_str( ) );
 }
@@ -265,7 +265,7 @@ static void config_scroll_print(PCharacter *ch)
     DLString lines(ch->lines);
     bool yes = ch->lines > 0;
     DLString msgNo = "Ты получаешь длинные сообщения без буферизации.";
-    DLString msgYes = dlprintf("Тебе непрерывно выводится %d лин%s текста.",
+    DLString msgYes = fmt(0, "Тебе непрерывно выводится %d лин%s текста.",
                        ch->lines.getValue( ), GET_COUNT(ch->lines.getValue( ), "ия","ии","ий") );
 
     print_line(ch, "scroll", "буфер", yes, msgYes, msgNo);
@@ -313,7 +313,7 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
     }
 
     ch->lines = lines;
-    ch->printf( "Вывод установлен на %d лин%s.\n\r", lines,
+    ch->pecho( "Вывод установлен на %d лин%s.", lines,
                 GET_COUNT(lines, "ию","ии","ий") );
 }
 
@@ -324,7 +324,7 @@ static void config_telegram_print(PCharacter *ch)
 {
     const DLString &user = get_string_attribute(ch, "telegram");
     bool yes = !user.empty();
-    DLString msgYes = dlprintf("Пользователь Telegram {C%s{x.", user.c_str());
+    DLString msgYes = fmt(0, "Пользователь Telegram {C%s{x.", user.c_str());
     DLString msgNo = "Твой персонаж не связан с пользователями Telegram, набери {y{hc{lEconfig telegram{lRрежим телеграм{x.";
     print_line(ch, "telegram", "телеграм", yes, msgYes, msgNo);
 }
@@ -339,7 +339,7 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
 
     if (arg.empty()) {
         if (!user->empty())
-            ch->printf("Твой персонаж связан с пользователем Telegram {C%s{x.\r\n"
+            ch->pecho("Твой персонаж связан с пользователем Telegram {C%s{x."
                        "Используй {hc{y{lRрежим телеграм очистить{lEconfig telegram clear{x для очистки.\r\n", 
                        user->getValue().c_str());
         else
@@ -352,7 +352,7 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
         if (user->empty()) 
             ch->pecho("Нечего очищать.");
         else {
-            ch->printf("Связь с пользователем {C%s{x очищена.\r\n", user->getValue().c_str());
+            ch->pecho("Связь с пользователем {C%s{x очищена.", user->getValue().c_str());
             user->clear();
             PCharacterManager::save(ch);
         }
@@ -366,7 +366,7 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
 
     user->setValue(arg);
     PCharacterManager::save(ch);
-    ch->printf("Теперь {C%s{x привязан к твоему персонажу.\r\n", arg.c_str());
+    ch->pecho("Теперь {C%s{x привязан к твоему персонажу.", arg.c_str());
 }
 
 /**
@@ -407,7 +407,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
         if (linked)
             ch->pecho("Связь с пользователем Discord очищена. ");
 
-        ch->printf("Новое секретное слово: {W%s{x.\r\n",
+        ch->pecho("Новое секретное слово: {W%s{x.",
                    discord["token"].asString().c_str());
         return;
     }

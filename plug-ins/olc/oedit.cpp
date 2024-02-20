@@ -932,7 +932,7 @@ OEDIT(copy)
         return false;
     }
     
-    ch->printf("All %s copied from vnum %d (%s).\r\n",
+    ch->pecho("All %s copied from vnum %d (%s).",
                 report.c_str( ),
                 original->vnum, 
                 russian_case( original->short_descr, '1' ).c_str( ) );

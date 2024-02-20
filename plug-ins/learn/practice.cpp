@@ -135,14 +135,14 @@ void CPractice::pracShow( PCharacter *ch )
             info = cm_iter->second[i];
             
             if (info.help_id > 0)
-                buf << dlprintf( patternHelp,
+                buf << fmt(0, patternHelp,
                                 info.getNameColor( ), 
                                 info.help_id,
                                 info.name.c_str( ),
                                 info.getPercentColor( ),
                                 info.percent );
             else
-                buf << dlprintf( patternNoHelp,
+                buf << fmt(0, patternNoHelp,
                                 info.getNameColor( ), 
                                 info.name.c_str( ),
                                 info.getPercentColor( ),
@@ -160,7 +160,7 @@ void CPractice::pracShow( PCharacter *ch )
         buf << endl;
     }
     
-    buf << dlprintf( "У тебя %d сесси%s практики.\n\r",
+    buf << fmt(0, "У тебя %d сесси%s практики.\n\r",
                  ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
 
     page_to_char( buf.str( ).c_str( ), ch );
@@ -213,15 +213,15 @@ void CPractice::pracHere( PCharacter *ch )
         buf << "     ";
 
         if (info.help_id > 0)
-            buf << dlprintf( patternHelp,
+            buf << fmt(0, patternHelp,
                              info.help_id,
                              info.name.c_str( ) );
         else
-            buf << dlprintf( patternNoHelp,
+            buf << fmt(0, patternNoHelp,
                              info.name.c_str( ) );
 
         if (info.percent > 1)
-            buf << dlprintf( patternLearned,
+            buf << fmt(0, patternLearned,
                              info.getPercentColor( ),
                              info.percent ) << endl;
         else
@@ -259,12 +259,12 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     skill = skillManager->find( sn );
 
     if (!skill) {
-        ch->printf("Умение {W%s{x не существует или еще тебе не доступно.\r\n", arg.c_str());
+        ch->pecho("Умение {W%s{x не существует или еще тебе не доступно.", arg.c_str());
         return;
     }
 
     if (!skill->available(ch)) {
-        ch->printf("Умение {W%s{x тебе не доступно.\r\n", skill->getNameFor(ch).c_str());
+        ch->pecho("Умение {W%s{x тебе не доступно.", skill->getNameFor(ch).c_str());
         return;
     }
 

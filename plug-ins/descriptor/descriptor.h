@@ -96,7 +96,6 @@ public:
     virtual ~Descriptor();
     
     void send(const char *); 
-    void printf( const char *, ... );
     void close( );             
     void slay( );
     void associate( Character * );

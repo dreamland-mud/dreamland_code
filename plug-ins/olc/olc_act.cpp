@@ -164,7 +164,7 @@ void show_flag_cmds(Character * ch, const FlagTable *table)
    
     const FlagTable::Field * f = table->fields; 
     for (int i = 0; i < table->size; i++)
-        buf << dlprintf("{g%-15s{x: %s", 
+        buf << fmt(0, "{g%-15s{x: %s", 
                         f[i].name, 
                        (f[i].message ? russian_case(f[i].message, '1').c_str() : ""))
             << endl;
@@ -235,15 +235,15 @@ void show_liq_cmds(Character * ch)
     for (int l = 0; l < liquidManager->size( ); l++) {
         liq = liquidManager->find( l );
         
-        buf << dlprintf( "%-18s %-18s %-14s ",
+        buf << fmt(0, "%-18s %-18s %-14s ",
                   liq->getName( ).c_str( ),
                   liq->getShortDescr( ).ruscase( '1' ).c_str( ),
                   liq->getColor( ).ruscase( '1' ).c_str( ) );
 
         for (int i = 0; i < desireManager->size( ); i++)
-            buf << dlprintf("%3d ", liq->getDesires( )[i] );
+            buf << fmt(0, "%3d ", liq->getDesires( )[i] );
                             
-        buf << dlprintf( "%3d\r\n", liq->getSipSize( ) );
+        buf << fmt(0, "%3d\r\n", liq->getSipSize( ) );
     }
 
     page_to_char(buf.str( ).c_str( ), ch);
@@ -267,7 +267,7 @@ bool show_help(Character * ch, const char *cargument)
         buf << "Таблица             : Пояснение" << endl;
         for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
             if (help_table[cnt].desc)
-                buf << dlprintf("{g%-19s{x: %s", help_table[cnt].command, help_table[cnt].desc) << endl;
+                buf << fmt(0, "{g%-19s{x: %s", help_table[cnt].command, help_table[cnt].desc) << endl;
             else
                 buf << help_table[cnt].command << endl;
         }
@@ -290,7 +290,7 @@ bool show_help(Character * ch, const char *cargument)
             else if (help_table[cnt].structure == &wearloc_table) {
                 for (int i = 0; i < wearlocationManager->size( ); i++) {
                     Wearlocation *w = wearlocationManager->find( i );
-                    ch->printf( "{g%-14s{x: %s\r\n", 
+                    ch->pecho( "{g%-14s{x: %s", 
                                 w->getName().c_str(), w->getPurpose().c_str() );
                 }
                 return false;

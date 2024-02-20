@@ -138,10 +138,10 @@ void BigQuest::mobKilled(PCMemoryInterface *hero, Character *killer)
 
     if (hero->isOnline()) {
         if (hasPartialRewards()) 
-            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d, или же сообщить квестору о частичном выполнении задания.{x\r\n", 
+            hero->getPlayer()->pecho("{YТебе осталось уничтожить %d из %d, или же сообщить квестору о частичном выполнении задания.{x", 
                                        mobsLeft, mobsTotal.getValue());
         else
-            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
+            hero->getPlayer()->pecho("{YТебе осталось уничтожить %d из %d.{x", mobsLeft, mobsTotal.getValue());
     }
 }
 

@@ -139,7 +139,7 @@ CMDADM( ireward )
     }
 
     attr->addReward(qp, arguments);
-    ch->printf("Установлена награда в %d qp, причина: %s.\r\n", qp, arguments.c_str());
+    ch->pecho("Установлена награда в %d qp, причина: %s.", qp, arguments.c_str());
 
     if (pci->isOnline()) {      
         PCharacter *vict = pci->getPlayer();

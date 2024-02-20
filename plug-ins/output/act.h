@@ -47,8 +47,6 @@ void oldact_p( const char *format, Character *ch,
 DLString fmt(Character *to, const char *fmt, ...);
 DLString vfmt(Character *to, const char *format, va_list av);
 
-DLString dlprintf( const char *, ... );
-
 /*--------------------------------------------------------------------------
  * tell-like output 
  *--------------------------------------------------------------------------*/

@@ -48,7 +48,7 @@ void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero
     interpret_raw( king, "grin" );
     oldact("$c1 глядя на $C4 произносит: '{gО, вот и обед подоспел{x'.", king, 0, kid, TO_ROOM);
     oldact("$c1 хватает дите за руку.", king, 0, 0, TO_ROOM);
-    hero->printf( "%s и %s уже встретились.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
+    hero->pecho( "%s и %s уже встретились.", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
     oldact("Сходи, проведай $C4.", hero, 0, king, TO_CHAR);
 }
 void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) const

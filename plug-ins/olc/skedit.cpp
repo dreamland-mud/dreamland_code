@@ -1031,7 +1031,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
         }
 
         ostringstream buf;
-        buf << dlprintf("{C%-20s %-4s %4s %4s %4s %1s %1s{x\r\n", "Имя", "Тип", "Мана", "Шаги", "Wait", "T", "F");
+        buf << fmt(0, "{C%-20s %-4s %4s %4s %4s %1s %1s{x\r\n", "Имя", "Тип", "Мана", "Шаги", "Wait", "T", "F");
         const DLString lineFormat = 
             "{W" + web_cmd(ch, "skedit $1", "%-20s") + "{w %-4s %4d %4d %4d %1s %1s{x\r\n";
 
@@ -1056,7 +1056,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
                     fenia = true;
             }
             
-            buf << dlprintf(
+            buf << fmt(0, 
                     lineFormat.c_str(),
                     s->getName().c_str(),
                     type.c_str(),
@@ -1076,13 +1076,13 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
     int sn = skillManager->unstrictLookup(arg, 0);        
     if (sn < 0) {
-        ch->printf("Умение '%s' не найдено.\r\n", arg.c_str());
+        ch->pecho("Умение '%s' не найдено.", arg.c_str());
         return;
     }
 
     Skill *skill = skillManager->find(sn);
     if (!dynamic_cast<BasicSkill *>(skill)) {
-        ch->printf("Умение '%s' невозможно отредактировать.\r\n", skill->getName().c_str());
+        ch->pecho("Умение '%s' невозможно отредактировать.", skill->getName().c_str());
         return;
     }
     
@@ -1105,12 +1105,12 @@ CMD(gredit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill group editor.")
 
     SkillGroup *group = skillGroupManager->findUnstrict(arg);
     if (!group) {
-        ch->printf("Группа умений '%s' не найдена.\r\n", arg.c_str());
+        ch->pecho("Группа умений '%s' не найдена.", arg.c_str());
         return;
     }
 
     if (!dynamic_cast<DefaultSkillGroup *>(group)) {
-        ch->printf("Группу '%s' невозможно отредактировать.\r\n", group->getName().c_str());
+        ch->pecho("Группу '%s' невозможно отредактировать.", group->getName().c_str());
         return;
     }
     

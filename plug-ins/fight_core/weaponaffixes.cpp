@@ -83,11 +83,11 @@ affix_generator::affix_generator(int t) : tier(weapon_tier_table[t-1])
 string affix_generator::dump() const
 {
     ostringstream buf;
-    buf << dlprintf("Tier %d, align %d, prices %d-%d (%d), requirements %s, ", 
+    buf << fmt(0, "Tier %d, align %d, prices %d-%d (%d), requirements %s, ", 
                 tier.num, align, 
                 minPrice, maxPrice, worstPenalty,
                 requirements.to_string().c_str());
-    buf << dlprintf("%d affixes, %d requires, %d forbids, %d preferences, ", 
+    buf << fmt(0, "%d affixes, %d requires, %d forbids, %d preferences, ", 
                      affixes.size(), required.size(), forbidden.size(), preferences.size()) << endl;
     buf << "Affixes: ";
     for (auto const &pi: affixes)

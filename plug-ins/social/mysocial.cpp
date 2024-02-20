@@ -193,30 +193,30 @@ void MySocial::doList( Character *ch, XMLAttributeCustomSocials::Pointer attr )
     for (i = attr->begin( ); i != attr->end( ); i++) {
         CustomSocial::Pointer c = i->second;
         
-        buf << dlprintf( "{c%-14s{x | %-11s ",
+        buf << fmt(0, "{c%-14s{x | %-11s ",
                           c->getName( ).c_str( ),
                           c->getRussianName( ).c_str( ) ) << endl;
 
         if (!c->getNoargMe( ).empty( ))
-            buf << dlprintf( "%-14s | ", fRus ? "безцели_я" : "noarg_me" )
+            buf << fmt(0, "%-14s | ", fRus ? "безцели_я" : "noarg_me" )
                 << c->getNoargMe( ) << endl;
         if (!c->getNoargOther( ).empty( ))
-            buf << dlprintf( "%-14s | ", fRus ? "безцели_другие" : "noarg_other" )
+            buf << fmt(0, "%-14s | ", fRus ? "безцели_другие" : "noarg_other" )
                 << c->getNoargOther( ) << endl;
         if (!c->getArgOther( ).empty( ))
-            buf << dlprintf( "%-14s | ", fRus ? "нацель_другие" : "arg_other" )
+            buf << fmt(0, "%-14s | ", fRus ? "нацель_другие" : "arg_other" )
                 << c->getArgOther( ) << endl;
         if (!c->getArgMe( ).empty( ))
-            buf << dlprintf( "%-14s | ", fRus ? "нацель_я" : "arg_me" )
+            buf << fmt(0, "%-14s | ", fRus ? "нацель_я" : "arg_me" )
                 << c->getArgMe( ) << endl;
         if (!c->getArgVictim( ).empty( ))
-            buf << dlprintf( "%-14s | ", fRus ? "нацель_жертва" : "arg_victim" )
+            buf << fmt(0, "%-14s | ", fRus ? "нацель_жертва" : "arg_victim" )
                 << c->getArgVictim( ) << endl;
         if (!c->getAutoMe( ).empty( ))
-            buf << dlprintf( "%-14s | ", fRus ? "насебя_я" : "auto_me" )
+            buf << fmt(0, "%-14s | ", fRus ? "насебя_я" : "auto_me" )
                 << c->getAutoMe( ) << endl;
         if (!c->getAutoOther( ).empty( ))
-            buf << dlprintf( "%-14s | ", fRus ? "насебя_другие" : "auto_other" )
+            buf << fmt(0, "%-14s | ", fRus ? "насебя_другие" : "auto_other" )
                 << c->getAutoOther( ) << endl;
 
         buf << "{W----------------+--------------------------------------------------------------{x" << endl;

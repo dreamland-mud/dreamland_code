@@ -29,12 +29,12 @@ void CBan::doShow( Character* ch, const Ban & rec)
     
     int flag = rec.flags.getValue();
     
-    ch->printf(
+    ch->pecho(
             "Host: %s\r\n"
             "Created by: %s\r\n"
             "Flag: %s\r\n"
             "Expires: %s\r\n"
-            "Comment: %s\r\n",
+            "Comment: %s",
                 rec.pattern.getValue().c_str(),
                 rec.responsible.getValue().c_str(),
                 ban_flags.names( flag ).c_str( ),
@@ -125,7 +125,7 @@ void CBan::doBan( Character* ch, const DLString & constArguments)
             rec.comment.setValue(arguments.getOneArgument());
             changed = true;
         } else {
-            ch->printf("unknown option %s\r\n", arg.c_str( ));
+            ch->pecho("unknown option %s", arg.c_str( ));
             doUsage( ch );
             return;
         }
@@ -196,7 +196,7 @@ void CBan::doKick( Character *ch )
         }
     }
     
-    ch->printf( "%d descriptors kicked.\r\n", cnt );
+    ch->pecho( "%d descriptors kicked.", cnt );
 }
 
 void CBan::doList( Character *ch )
@@ -222,7 +222,7 @@ void CBan::doList( Character *ch )
         
         int flag = it->flags.getValue();
         
-        ch->printf("%2d | %-30s | %-8s | %-14s | %-10.10s\r\n", i,
+        ch->pecho("%2d | %-30s | %-8s | %-14s | %-10.10s", i,
                 it->pattern.getValue().c_str(), 
                 ban_flags.names( flag ).c_str( ),
                 untmsg.c_str(),

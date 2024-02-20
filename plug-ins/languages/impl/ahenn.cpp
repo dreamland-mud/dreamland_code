@@ -67,7 +67,7 @@ DLString AhennLanguage::createDictum( ) const
 
 void AhennLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "Из звуков мелодии, древней, как сам мир, рождается слово {c%s{x.\r\n",
+    ch->pecho( "Из звуков мелодии, древней, как сам мир, рождается слово {c%s{x.",
                 word.toStr( ) );
 }
 

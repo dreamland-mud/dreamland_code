@@ -1541,7 +1541,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
                         repops.push_back( r.second );
             
             if (repops.size( ) == 1) {
-                ch->printf( "%s обитает в местности под названием %s (%s).\r\n",
+                ch->pecho( "%s обитает в местности под названием %s (%s).",
                             mob->getNameP( '1' ).c_str( ), 
                             repops.front( )->name, repops.front( )->areaIndex->getName().c_str() );
             }
@@ -1549,7 +1549,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
                 oldact("$C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
 
                 for (auto &r: repops)
-                    ch->printf( "    %s  (%s)\r\n", r->name, r->areaIndex->getName().c_str());
+                    ch->pecho( "    %s  (%s)", r->name, r->areaIndex->getName().c_str());
             }
         }
     }

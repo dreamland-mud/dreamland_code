@@ -256,7 +256,7 @@ void hset(Character *ch, char *)
 
     buf << "Синтаксис:" << endl;
     while (tab_set[i].name) {
-        buf << dlprintf("  {Cset {y%-5s{x help   {C[{x %s {C]{x\n\r", tab_set[i].name, tab_set[i].help);
+        buf << fmt(0, "  {Cset {y%-5s{x help   {C[{x %s {C]{x\n\r", tab_set[i].name, tab_set[i].help);
         i++;
     }
     ch->send_to(buf);
@@ -615,7 +615,7 @@ void chg_mob_relig( Character* ch, char* argument ) {
       }
 
       victim->setReligion( god->getName( ) );
-      ch->printf("Текущее значение: %s.\r\n", god->getName( ).c_str( ));
+      ch->pecho("Текущее значение: %s.", god->getName( ).c_str( ));
   }
 }
 
@@ -627,14 +627,14 @@ void chg_mob_ethos( Character* ch, char* argument ) {
     if( is_number( argument ) ) {
       value = atoi( argument );
       if( value < 1 || value > 3 ) {
-        ch->printf( "Значение должно лежать в пределах %d...%d.\n\r", 1, 3 );
+        ch->pecho( "Значение должно лежать в пределах %d...%d.", 1, 3 );
         return;
       }
       victim->ethos.setValue(value);
     } else {
       victim->ethos = ethos_table.value( argument, false );
     }
-    ch->printf( "Текущее значение %s.\r\n", 
+    ch->pecho( "Текущее значение %s.", 
                 ethos_table.name( victim->ethos ).c_str( ) );
   }
 }
@@ -849,7 +849,7 @@ void chg_mob_help(Character *ch, char *argument)
 
     buf << "Синтаксис:" << endl;
     while (tab_set_mob[i].name) {
-        buf << dlprintf("  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r",
+        buf << fmt(0, "  {Cset{x mob {y%-8s{x {C<{xназвание{C>{x %s%s {C[{x %s {C]{x\n\r",
                 tab_set_mob[i].name,
                 tab_set_mob[i].inc_dec ? "[+/-]" : "     ",
                 IS_SET(tab_set_mob[i].DS, S_V) &&
@@ -932,7 +932,7 @@ void chg_mob_qp( Character* ch, char* argument )
       if (Integer::tryParse(qpDelta, qpArg)) {
           pcm->setQuestPoints(qpNow + qpDelta);
           PCharacterManager::saveMemory( pcm );
-          ch->printf("Персонажу %s изменено кол-во квестовых единиц с %d на %d, разница %d.\r\n",
+          ch->pecho("Персонажу %s изменено кол-во квестовых единиц с %d на %d, разница %d.",
                      pcm->getName().c_str(), qpNow, pcm->getQuestPoints(), qpDelta);
           return;
       }
@@ -941,7 +941,7 @@ void chg_mob_qp( Character* ch, char* argument )
       if (Integer::tryParse(qpValue, qpArg)) {
           pcm->setQuestPoints(qpValue);
           PCharacterManager::saveMemory( pcm );
-          ch->printf("Персонажу %s изменено кол-во квестовых единиц с %d на %d.\r\n",
+          ch->pecho("Персонажу %s изменено кол-во квестовых единиц с %d на %d.",
                       pcm->getName().c_str(), qpNow, pcm->getQuestPoints());
           return;
       }
@@ -979,26 +979,26 @@ void chg_mob_attr( Character* ch, char* argument )
 
     if (attrs->isAvailable( attrName )) {
         if (!iAttr && !sAttr && !eAttr) {
-            ch->printf( "Аттрибут '%s' нельзя удалить этой командой.\r\n", attrName.c_str( ) );
+            ch->pecho( "Аттрибут '%s' нельзя удалить этой командой.", attrName.c_str( ) );
             return;
         }
         else {
             attrs->eraseAttribute( attrName );
-            ch->printf("Аттрибут '%s' удален.\r\n", attrName.c_str( ));
+            ch->pecho("Аттрибут '%s' удален.", attrName.c_str( ));
         }
     }
     else if (attrValue.empty( )) {
         attrs->getAttr<XMLEmptyAttribute>( attrName );
-        ch->printf("Аттрибут '%s' установлен.\r\n", attrName.c_str( ));
+        ch->pecho("Аттрибут '%s' установлен.", attrName.c_str( ));
     }
     else if (attrValue.isNumber( )) {
         attrs->getAttr<XMLIntegerAttribute>( attrName )->setValue( attrValue.toInt( ) );
-        ch->printf("Численный аттрибут '%s' со значением '%s' установлен.\r\n", 
+        ch->pecho("Численный аттрибут '%s' со значением '%s' установлен.", 
                 attrName.c_str( ), attrValue.c_str( ));
     }
     else {
         attrs->getAttr<XMLStringAttribute>( attrName )->setValue( attrValue );
-        ch->printf("Строковый аттрибут '%s' со значением '%s' установлен.\r\n", 
+        ch->pecho("Строковый аттрибут '%s' со значением '%s' установлен.", 
                 attrName.c_str( ), attrValue.c_str( ));
     }
 

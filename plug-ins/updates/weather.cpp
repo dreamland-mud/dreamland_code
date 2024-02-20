@@ -416,7 +416,7 @@ CMDRUN( time )
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
-        ch->printf( "Мир Мечты загружен %s\r\nСистемное время: %s\r\n",
+        ch->pecho( "Мир Мечты загружен %s\r\nСистемное время: %s",
                     Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
                     Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
 }
@@ -463,7 +463,7 @@ CMDRUN( weather )
             wind = "резкий северный";
     }
 
-    ch->printf( "Небо %s и дует %s ветер.\n\r",
+    ch->pecho( "Небо %s и дует %s ветер.",
         sky_look[weather_info.sky],
         wind
     );
@@ -601,7 +601,7 @@ protected:
         if (color != 'x')
             buf << "{" << color;
 
-        buf << dlprintf("%2d", day+1);
+        buf << fmt(0, "%2d", day+1);
 
         if (color != 'x')
             buf << "{x";
@@ -625,7 +625,7 @@ protected:
     void draw_month_name(int m)
     {
         const month_info &month = month_table[m];
-        buf << " {" << season_table[month.season].color << dlprintf("%-18s", month.name);
+        buf << " {" << season_table[month.season].color << fmt(0, "%-18s", month.name);
 
         if ((m+1)%4 != 0)
             buf << "{D|{x";

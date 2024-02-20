@@ -282,8 +282,6 @@ public:
         long long toLongLong( ) const ;
         long int toLongInt( ) const ;
         bool toBoolean( ) const ;
-        char toChar( ) const ;
-        unsigned char toByte( ) const ;
         
         /*
          * Compare strings, case insensitive, for prefix matching.
