@@ -69,113 +69,37 @@ struct S_SET_MOB {
   const char*                const        help;
 };
 
-int decode_flags(char * arg, int * value_add, int * value_sub);
-
 void mset( Character*, char* );
 void oset( Character*, char* );
-void rset( Character*, char* );
 void sset( Character*, char* );
 void hset( Character*, char* );
 
 T_SET tab_set[] = {
   { "char",        mset,        "Изменить характеристики игрока"        },
-  { "mob",        mset,        "Изменить характеристики монстра"        },
   { "obj",        oset,        "Изменить характеристики предмета"        },
-  { "room",        rset,        "Изменить характеристики комнаты"        },
   { "skill",        sset,        "Изменить skills/spells"                },
   { "help",        hset,        "Это то, что на экране"                        },
   { NULL,        NULL,        NULL,                                        }
 };
 
-void chg_mob_str( Character*, char* );
-void chg_mob_int( Character*, char* );
-void chg_mob_wis( Character*, char* );
-void chg_mob_dex( Character*, char* );
-void chg_mob_con( Character*, char* );
-void chg_mob_cha( Character*, char* );
-void chg_mob_hp( Character*, char* );
-void chg_mob_mana( Character*, char* );
-void chg_mob_move( Character*, char* );
-void chg_mob_align( Character*, char* );
-void chg_mob_relig( Character*, char* );
-void chg_mob_questp( Character*, char* );
 void chg_mob_questt( Character*, char* );
-void chg_mob_ethos( Character*, char* );
-void chg_mob_level( Character*, char* );
-void chg_mob_train( Character*, char* );
-void chg_mob_practice( Character*, char* );
-void chg_mob_gold( Character*, char* );
 void chg_mob_killer( Character*, char* );
 void chg_mob_violent( Character*, char* );
 void chg_mob_slain( Character*, char* );
 void chg_mob_help( Character*, char* );
-void chg_mob_act( Character*, char* );
-void chg_mob_off( Character*, char* );
-void chg_mob_imm( Character*, char* );
-void chg_mob_res( Character*, char* );
-void chg_mob_vuln( Character*, char* );
-void chg_mob_class( Character*, char* );
 void chg_mob_attr( Character*, char* );
 void chg_mob_qp( Character*, char* );
 
 T_SET_MOB tab_set_mob[] = {
-  { "strength",        chg_mob_str,        true,  S_V,                "Сила(str)"                        },
-  { "int",        chg_mob_int,        true,  S_V,                "Интеллект(int)"                },
-  { "wis",        chg_mob_wis,        true,  S_V,                "Мудрость(wis)"                 },
-  { "dex",        chg_mob_dex,        true,  S_V,                "Проворность(dex)"                },
-  { "con",        chg_mob_con,        true,  S_V,                "Сложение(con)"                        },
-  { "cha",        chg_mob_cha,        true,  S_V,                "Обаяние(cha)"                        },
-  { "hp",        chg_mob_hp,        true,  S_V,                "Кол-во жизни(hp)"                },
-  { "mana",        chg_mob_mana,        true,  S_V,                "Кол-во маг-ой энергии(mana)"        },
-  { "move",        chg_mob_move,        true,  S_V,                "Кол-во физ-ой энергии(move)"        },
-  { "align",        chg_mob_align,        true,  S_V,                "Злой/нейтральный/добрый"        },
-  { "religion",        chg_mob_relig,        false, S_V + S_S,        "Религия"                        },
-  { "ethos",        chg_mob_ethos,        false, S_V + S_S,        "Законопослушность"                },
   { "questp",        chg_mob_qp,        true,  S_V,                "Кол-во quest points"                },
   { "questt",        chg_mob_questt,        true,  S_V,                "Квестовое время"                   },
-  { "level",        chg_mob_level,        true,  S_V,                "Уровень моба"                        },
-  { "train",        chg_mob_train,        true,  S_V,                "Количество тренировок"                },
-  { "prac",        chg_mob_practice,        true,  S_V,                "Количество практик"                },
-  { "gold",        chg_mob_gold,        true,  S_V,                "Количество золотых монет"        },
   { "killer",        chg_mob_killer,        false, S_S,                "Флаг {RKILLER{x"                },
-  { "violent",        chg_mob_violent,false, S_S,                "Флаг {BVIOLENT{x"                },
-  { "slain",        chg_mob_slain,        false, S_S,                "Флаг {DSLAIN{x"                },
-        { "act",                chg_mob_act, false, S_NONE, "Флаги поведения NPC (help actflags)" },
-        { "off",                chg_mob_off, false, S_NONE, "Умения NPC (help offflags)" },
-        { "imm",                chg_mob_imm, false, S_NONE, "Иммуны NPC (help immflags)" },
-        { "res",                chg_mob_res, false, S_NONE, "Резисты NPC (help immflags)" },
-        { "vuln",                chg_mob_vuln, false, S_NONE, "Вульны NPC (help immflags)" },
-        { "attr",                chg_mob_attr, false, S_NONE, "Установка аттрибута" },
-  { "help",        chg_mob_help,        false, S_NONE,                "Это то что на экране"                },
+  { "violent",       chg_mob_violent,false, S_S,                "Флаг {BVIOLENT{x"                },
+  { "slain",         chg_mob_slain,        false, S_S,                "Флаг {DSLAIN{x"                },
+  { "attr",          chg_mob_attr, false, S_NONE, "Установка аттрибута" },
+  { "help",          chg_mob_help,        false, S_NONE,                "Это то что на экране"                },
   { NULL,        NULL,                false, S_NONE,                NULL                                }
 };
-
-static Character* get_CHAR(Character* ch, char** argument) {
-  char buf[MAX_STRING_LENGTH];
-  Character* victim;
-
-  *argument = one_argument(*argument, buf);
-
-  if (!buf[0] || !(victim = get_char_world(ch, buf))) {
-    ch->pecho("Персонаж с таким именем не найден.");
-    return NULL;
-  }
-  return victim;
-}
-
-static NPCharacter *get_mob(Character *ch, char **argument)
-{
-  char buf[MAX_STRING_LENGTH];
-  Character* victim;
-
-  *argument = one_argument(*argument, buf);
-
-  if (!buf[0] || !(victim = get_char_world(ch, buf, FFIND_MOB_ONLY))) {
-    ch->pecho("Моб с таким именем не найден.");
-    return NULL;
-  }
-  return victim->getNPC();
-}
 
 static PCharacter *get_player(Character *ch, char **argument)
 {
@@ -190,41 +114,6 @@ static PCharacter *get_player(Character *ch, char **argument)
   }
   return victim->getPC();
 }
-
-void modif_STAT( Character* ch, Character* victim, char *argument, int st ) {
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value, min_value, max_value;
-
-  if( is_number( argument ) ) {
-    value = atoi( argument );
-
-    if( argument[0] == '-' || argument[0] == '+' ) {
-      adv_value = victim->perm_stat[st] + value;
-    } else {
-      adv_value = value;
-    }
-    
-    min_value = MIN_STAT;
-    max_value = (victim->is_npc( ) ? MAX_STAT : victim->getPC( )->getMaxTrain( st ));
-
-    if( adv_value < min_value || adv_value > max_value ) {
-      sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 
-                    min_value, max_value );
-      ch->send_to(buf);
-      return;
-    }
-
-    victim->perm_stat[st]  = adv_value;
-    sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                adv_value );
-    ch->send_to(buf);
-    return;
-  } else {
-    ch->pecho("Ошибочные данные.");
-  }
-}
-
 
 CMDWIZP( set )
 {
@@ -285,392 +174,6 @@ void mset(Character *ch, char *argument)
     chg_mob_help(ch, NULL);
 }
 
-void chg_mob_str( Character* ch, char* argument ) {
-  Character *victim;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    modif_STAT( ch, victim, argument, STAT_STR );
-  }
-  return;
-}
-
-void chg_mob_int( Character* ch, char* argument ) {
-  Character *victim;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    modif_STAT( ch, victim, argument, STAT_INT );
-  }
-  return;
-}
-
-void chg_mob_wis( Character* ch, char* argument ) {
-  Character *victim;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    modif_STAT( ch, victim, argument, STAT_WIS );
-  }
-  return;
-}
-
-void chg_mob_dex( Character* ch, char* argument ) {
-  Character *victim;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    modif_STAT( ch, victim, argument, STAT_DEX );
-  }
-  return;
-}
-
-void chg_mob_con( Character* ch, char* argument ) {
-  Character *victim;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    modif_STAT( ch, victim, argument, STAT_CON );
-  }
-  return;
-}
-
-void chg_mob_cha( Character* ch, char* argument ) {
-  Character *victim;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    modif_STAT( ch, victim, argument, STAT_CHA );
-  }
-  return;
-}
-
-void chg_mob_hp( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = !victim->is_npc() ? victim->getPC( )->perm_hit + value :
-                                        (int)victim->max_hit;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value <= 0 || adv_value > 30000 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 30000 );
-        ch->send_to(buf);
-        return;
-      }
-
-      if( victim->is_npc() ) {
-        victim->max_hit  = adv_value;
-      } else {
-        victim->max_hit  += ( adv_value - victim->getPC( )->perm_hit );
-        victim->getPC( )->perm_hit = adv_value;
-      }
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-void chg_mob_mana( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = !victim->is_npc() ? victim->getPC( )->perm_mana + value :
-                                        (int)victim->max_mana;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value <= 0 || adv_value > 60000 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 60000 );
-        ch->send_to(buf);
-        return;
-      }
-
-      if( victim->is_npc() ) {
-        victim->max_mana  = adv_value;
-      } else {
-        victim->max_mana  += ( adv_value - victim->getPC( )->perm_mana );
-        victim->getPC( )->perm_mana = adv_value;
-      }
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-void chg_mob_move( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = !victim->is_npc() ? victim->getPC( )->perm_move + value :
-                                        (int)victim->max_move;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value <= 0 || adv_value > 60000 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 60000 );
-        ch->send_to(buf);
-        return;
-      }
-
-      if( victim->is_npc() ) {
-        victim->max_move  = adv_value;
-      } else {
-        victim->max_move  += ( adv_value - victim->getPC( )->perm_move );
-        victim->getPC( )->perm_move = adv_value;
-      }
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-void chg_mob_act( Character* ch, char* argument )
-{
-        Character* victim;
-        int value;
-        int add_value;
-        int sub_value;
-
-        if( ( victim = get_mob( ch, &argument ) ) )
-        {
-                value = decode_flags( argument, &add_value, &sub_value );
-
-                if ( value == 0
-                        && ( add_value || sub_value ) )
-                {
-                        victim->act.setBit( add_value );
-                        victim->act.removeBit( sub_value );
-                }
-                else
-                {
-                        victim->act.setValue(value);
-                }
-        }
-}
-
-void chg_mob_off( Character* ch, char* argument )
-{
-        Character* victim;
-        int value;
-        int add_value;
-        int sub_value;
-
-        if( ( victim = get_mob( ch, &argument ) ) )
-        {
-                value = decode_flags( argument, &add_value, &sub_value );
-
-                if ( value == 0
-                        && ( add_value || sub_value ) )
-                {
-                        SET_BIT( victim->getNPC()->off_flags, add_value );
-                        REMOVE_BIT( victim->getNPC()->off_flags, sub_value );
-                }
-                else
-                {
-                        victim->getNPC()->off_flags=value;
-                }
-        }
-}
-
-void chg_mob_imm( Character* ch, char* argument )
-{
-        Character* victim;
-        int value;
-        int add_value;
-        int sub_value;
-
-        if( ( victim = get_mob( ch, &argument ) ) )
-        {
-                value = decode_flags( argument, &add_value, &sub_value );
-
-                if ( value == 0
-                        && ( add_value || sub_value ) )
-                {
-                        victim->imm_flags.setBit( add_value );
-                        victim->imm_flags.removeBit( sub_value );
-                }
-                else
-                {
-                        victim->imm_flags.setValue(value);
-                }
-        }
-}
-
-void chg_mob_res( Character* ch, char* argument )
-{
-        Character* victim;
-        int value;
-        int add_value;
-        int sub_value;
-
-        if( ( victim = get_mob( ch, &argument ) ) )
-        {
-                value = decode_flags( argument, &add_value, &sub_value );
-
-                if ( value == 0
-                        && ( add_value || sub_value ) )
-                {
-                        victim->res_flags.setBit( add_value );
-                        victim->res_flags.removeBit( sub_value );
-                }
-                else
-                {
-                        victim->res_flags.setValue(value);
-                }
-        }
-}
-
-void chg_mob_vuln( Character* ch, char* argument )
-{
-        Character* victim;
-        int value;
-        int add_value;
-        int sub_value;
-
-        if( ( victim = get_mob( ch, &argument ) ) )
-        {
-                value = decode_flags( argument, &add_value, &sub_value );
-
-                if ( value == 0
-                        && ( add_value || sub_value ) )
-                {
-                        victim->vuln_flags.setBit( add_value );
-                        victim->vuln_flags.removeBit( sub_value );
-                }
-                else
-                {
-                        victim->vuln_flags.setValue(value);
-                }
-        }
-}
-
-void chg_mob_align( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = victim->alignment + value;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value < -1000 || adv_value > 1000 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", -1000, 1000 );
-        ch->send_to(buf);
-        return;
-      }
-      victim->alignment = adv_value;
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-void chg_mob_relig( Character* ch, char* argument ) {
-  Character* victim;
-  Religion *god;
-
-  if( ( victim = get_player( ch, &argument ) ) ) {
-      if (!( god = religionManager->findUnstrict( argument ) )) {
-          ch->pecho("Религия не найдена.");
-          return;
-      }
-
-      victim->setReligion( god->getName( ) );
-      ch->pecho("Текущее значение: %s.", god->getName( ).c_str( ));
-  }
-}
-
-void chg_mob_ethos( Character* ch, char* argument ) {
-  Character* victim;
-  int value;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-      if( value < 1 || value > 3 ) {
-        ch->pecho( "Значение должно лежать в пределах %d...%d.", 1, 3 );
-        return;
-      }
-      victim->ethos.setValue(value);
-    } else {
-      victim->ethos = ethos_table.value( argument, false );
-    }
-    ch->pecho( "Текущее значение %s.", 
-                ethos_table.name( victim->ethos ).c_str( ) );
-  }
-}
-
-void chg_mob_questp( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_player( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = victim->getPC( )->addQuestPoints(value);
-      } else {
-        adv_value = value;
-      }
-      if( adv_value < 0 || adv_value > INT_MAX ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, INT_MAX );
-        ch->send_to(buf);
-        return;
-      }
-      victim->getPC( )->setQuestPoints(adv_value);
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-
 void chg_mob_questt( Character* ch, char* argument ) {
   Character* victim;
   char buf[MAX_INPUT_LENGTH];
@@ -710,132 +213,6 @@ void chg_mob_questt( Character* ch, char* argument ) {
         sprintf( buf, "%s %d.\n\r", "Текущее значение:",  adv_value );
         ch->send_to(buf);
         return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-void chg_mob_gold( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = victim->gold + value;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value < 0 || adv_value > 6000 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 6000 );
-        ch->send_to(buf);
-        return;
-      }
-      victim->gold = adv_value;
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-
-
-void chg_mob_level( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_mob( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = victim->getRealLevel( ) + value;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value <= 0 || adv_value > 110 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 110 );
-        ch->send_to(buf);
-        return;
-      }
-      victim->setLevel( adv_value );
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-void chg_mob_train( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_player( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = victim->getPC()->train + value;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value < 0 || adv_value > 110 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 110 );
-        ch->send_to(buf);
-        return;
-      }
-      victim->getPC()->train = adv_value;
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
-    } else {
-      ch->pecho("Ошибочные данные.");
-    }
-  }
-}
-
-void chg_mob_practice( Character* ch, char* argument ) {
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_player( ch, &argument ) ) ) {
-    if( is_number( argument ) ) {
-      value = atoi( argument );
-
-      if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = victim->getPC()->practice + value;
-      } else {
-        adv_value = value;
-      }
-      if( adv_value < 0 || adv_value > 800 ) {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 800 );
-        ch->send_to(buf);
-        return;
-      }
-      victim->getPC()->practice = adv_value;
-      sprintf( buf, "%s %d.\n\r", "Текущее значение:",
-                                  adv_value );
-      ch->send_to(buf);
-      return;
     } else {
       ch->pecho("Ошибочные данные.");
     }
@@ -904,8 +281,6 @@ void chg_mob_slain( Character* ch, char* argument ) {
     }
   }
 }
-
-
 
 void chg_mob_qp( Character* ch, char* argument ) 
 {
@@ -1022,8 +397,7 @@ void oset( Character* ch, char* argument )
                 ch->pecho("Syntax:");
                 ch->pecho("  set obj <object> <field> <value> [<value>]");
                 ch->pecho("  Field being one of:");
-                ch->pecho("    value0 value1 value2 value3 value4 (v1-v4) ");
-                ch->pecho("    cost extra level material owner timer wear");
+                ch->pecho("    cost level material owner timer timestamp");
                 ch->pecho("    weight gender personal property");
                 return;
         }
@@ -1103,98 +477,8 @@ void oset( Character* ch, char* argument )
         }
         else
         {
-                if ( !str_cmp( arg2, "extra" )
-                        || !str_cmp( arg2, "wear" )
-                        || !str_cmp( arg2, "value0" ) || !str_cmp( arg2, "v0" )
-                        || !str_cmp( arg2, "value1" ) || !str_cmp( arg2, "v1" )
-                        || !str_cmp( arg2, "value2" ) || !str_cmp( arg2, "v2" )
-                        || !str_cmp( arg2, "value3" ) || !str_cmp( arg2, "v3" )
-                        || !str_cmp( arg2, "value4" ) || !str_cmp( arg2, "v4" ) )
-                {
-                        value = decode_flags( arg3, &value_add, &value_sub);
-                }
-                else
-                        value = atoi( arg3 );
+                value = atoi( arg3 );
 
-                if ( !str_cmp( arg2, "value0" ) || !str_cmp( arg2, "v0" ) )
-                {
-                        if ( value == 0 && ( value_add || value_sub ) )
-                        {
-                                obj->value0(obj->value0() | value_add );
-                                obj->value0(obj->value0() & ~value_sub );
-                        }
-                        else
-                                obj->value0(value);
-
-                        obj->value0(min(101,obj->value0()));
-                }
-                else
-                if ( !str_cmp( arg2, "value1" ) || !str_cmp( arg2, "v1" ) )
-                {
-                        if ( value == 0 && ( value_add || value_sub ) )
-                        {
-                                obj->value1(obj->value1() | value_add );
-                                obj->value1(obj->value1() & ~value_sub );
-                        }
-                        else
-                                obj->value1(value);
-                }
-                else
-                if ( !str_cmp( arg2, "value2" ) || !str_cmp( arg2, "v2" ) )
-                {
-                        if ( value == 0 && ( value_add || value_sub ) )
-                        {
-                                obj->value2(obj->value2() | value_add );
-                                obj->value2(obj->value2() & ~value_sub );
-                        }
-                        else
-                                obj->value2(value);
-                }
-                else
-                if ( !str_cmp( arg2, "value3" ) || !str_cmp( arg2, "v3" ) )
-                {
-                        if ( value == 0 && ( value_add || value_sub ) )
-                        {
-                                obj->value3(obj->value3() | value_add );
-                                obj->value3(obj->value3() & ~value_sub );
-                        }
-                        else
-                                obj->value3(value);
-                }
-                else
-                if ( !str_cmp( arg2, "value4" ) || !str_cmp( arg2, "v4" ) )
-                {
-                        if ( value == 0 && ( value_add || value_sub ) )
-                        {
-                                obj->value4(obj->value4() | value_add );
-                                obj->value4(obj->value4() & ~value_sub );
-                        }
-                        else
-                                obj->value4(value);
-                }
-                else
-                if ( !str_prefix( arg2, "extra" ) )
-                {
-                        if ( value == 0 && ( value_add || value_sub ) )
-                        {
-                                SET_BIT( obj->extra_flags, value_add );
-                                REMOVE_BIT( obj->extra_flags, value_sub );
-                        }
-                        else
-                                obj->extra_flags = value;
-                }
-                else
-                if ( !str_prefix( arg2, "wear" ) )
-                {
-                        if ( value == 0 && ( value_add || value_sub ) )
-                        {
-                                SET_BIT( obj->wear_flags, value_add );
-                                REMOVE_BIT( obj->wear_flags, value_sub );
-                        }
-                        else
-                                obj->wear_flags = value;
-                }
-                else
                 if ( !str_prefix( arg2, "level" ) )
                 {
                         obj->level = value;
@@ -1223,10 +507,6 @@ void oset( Character* ch, char* argument )
         }
 
         save_items_at_holder( obj );
-}
-
-void rset( Character* ch, char* argument ) 
-{
 }
 
 void sset( Character *ch, char *argument )
