@@ -963,11 +963,8 @@ MEDIT(race)
     }
     
     stc("Available races are:", ch);
-    
-    ostringstream out;
-    raceManager->outputAll( out, 16, 3 );
-    stc(out.str( ).c_str( ), ch );
-    stc("\n\r", ch);
+    auto raceNames = raceManager->nameList();
+    ch->pecho(print_columns(raceNames, 16, 3));
     return false;
 }
 

@@ -31,7 +31,7 @@ public:
     const DLString & getName( int ) const;
     inline bool goodIndex( int ) const;
     inline int size( ) const;
-    void outputAll( ostringstream &, int, int ) const;
+    list<DLString> nameList() const;
     GlobalRegistryElement * find( int ndx );
     list<GlobalRegistryElement *> findAll(const DLString &arguments);    
     bool hasElement(const DLString &name) const;

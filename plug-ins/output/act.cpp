@@ -352,3 +352,24 @@ void echo_notvict(Character *ch, Character *victim, bool (needsOutput)(Character
     ch->vecho( POS_RESTING, TO_NOTVICT, victim, format, av, needsOutput ); 
     va_end(av);
 }
+
+DLString print_columns(const list<DLString> &names, int width, int columns)
+{
+    int col = 0;
+    DLString pattern;
+    ostringstream out;
+
+    pattern << "%-" << width << "s";
+
+    for (auto &name: names) {
+        out << fmt(0, pattern.c_str(), name.c_str());
+
+        if (++col % columns == 0)
+            out << endl;
+    }
+
+    if (col % columns != 0)
+        out << endl;
+
+    return out.str();
+}

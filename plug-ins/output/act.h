@@ -68,4 +68,8 @@ void echo_char(Character *ch, bool (Character *), const char *format, ...);
 void echo_room(Character *ch, bool (Character *), const char *format, ...);
 void echo_notvict(Character *ch, Character *victim, bool (Character *), const char *format, ...);
 
+
+/** Output given list of values in N columns of particular width. */
+DLString print_columns(const list<DLString> &names, int width, int columns);
+
 #endif

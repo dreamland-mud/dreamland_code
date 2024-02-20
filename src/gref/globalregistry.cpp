@@ -97,25 +97,16 @@ void GlobalRegistryBase::replace( int ndx, GlobalRegistryElement::Pointer elem )
     elem->setIndex( ndx );
 }
 
-void GlobalRegistryBase::outputAll( ostringstream &out, int width, int columns ) const
+list<DLString> GlobalRegistryBase::nameList() const
 {
-    char buf[256];
-    int col = 0;
-    DLString pattern;
+    list<DLString> result;
 
-    pattern << "%-" << width << "s";
+    for (unsigned int i = 0; i < table.size(); i++)
+        result.push_back(table[i]->getName());
 
-    for (unsigned int i = 0; i < table.size( ); i++) {
-        sprintf( buf, pattern.c_str( ), table[i]->getName( ).c_str( ) );
-        out << buf;
-
-        if (++col % columns == 0)
-            out << endl;
-    }
-
-    if (col % columns != 0)
-        out << endl;
+    return result;
 }
+
 
 list<GlobalRegistryElement *> GlobalRegistryBase::findAll(const DLString &arguments)
 {
