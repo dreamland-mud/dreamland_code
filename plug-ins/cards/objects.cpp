@@ -137,8 +137,8 @@ bool CardPackBehavior::use( Character *user, const char *args )
     
         card = create_object( pCardIndex, 0 );
         card->timer = (1 + myAttr->getLevel( )) * 3 * 60 * 60;
-        card->fmtShortDescr( card->getShortDescr( ), victim->getNameP( '2' ).c_str( ) );
-        card->fmtName( card->getName( ), victim->getName( ).c_str( ) );
+        card->setShortDescr( fmt(0, card->getShortDescr( ), victim->getNameP( '2' ).c_str( )) );
+        card->setName( fmt(0, card->getName( ), victim->getName( ).c_str( )).c_str() );
         
         CardBehavior::Pointer bhv( NEW );
         bhv->setObj( card );

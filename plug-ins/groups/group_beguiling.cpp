@@ -151,9 +151,9 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     jar->from = str_dup(ch->getNameC());
     jar->level = ch->getRealLevel( );
 
-    jar->fmtName( jar->getName( ), victim->getNameC());
-    jar->fmtShortDescr( jar->getShortDescr( ), victim->getNameC());
-    jar->fmtDescription( jar->getDescription( ), victim->getNameC());
+    jar->setName( fmt(0, jar->getName( ), victim->getNameC()).c_str());
+    jar->setShortDescr( fmt(0, jar->getShortDescr( ), victim->getNameC()));
+    jar->setDescription( fmt(0, jar->getDescription( ), victim->getNameC()));
 
     sprintf( buf,jar->pIndexData->extra_descr->description, victim->getNameC() );
     jar->extra_descr = new_extra_descr();

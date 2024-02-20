@@ -214,8 +214,8 @@ static void create_pool( Object *out, int amount )
 		room->echo( POS_RESTING, "На земле образуется лужа %N2.", liqShort.c_str( ) );
 	}
 	
-    pool->fmtShortDescr( pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( ) );
-    pool->fmtDescription( pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( ) );
+    pool->setShortDescr( fmt(0, pool->pIndexData->short_descr, liqShort.ruscase( '2' ).c_str( )) );
+    pool->setDescription( fmt(0, pool->pIndexData->description, liqShort.ruscase( '2' ).c_str( )) );
 	// Don't set material to liquid name -- those don't exist in the materials list
 	// Use "drink" material for unspecified liquid types (set by default in OBJ_VNUM_POOL, vnum 75)
     // pool->setMaterial( liqName.c_str() );        

@@ -2,6 +2,7 @@
 #define CHARUTILS_H
 
 class Character;
+class NPCharacter;
 class WearlocationReference;
 
 namespace CharUtils {

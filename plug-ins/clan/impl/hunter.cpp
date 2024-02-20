@@ -250,7 +250,7 @@ HunterEquip::HunterEquip( )
 
 void HunterEquip::config( PCharacter *wch )
 {
-    obj->fmtShortDescr( obj->getShortDescr( ), wch->getNameP('2').c_str() );
+    obj->setShortDescr( fmt(0, obj->getShortDescr( ), wch->getNameP('2').c_str()));
     obj->setOwner( wch->getNameC() );
     obj->from = str_dup( wch->getNameC() );
     obj->level = wch->getRealLevel( );
@@ -1082,7 +1082,7 @@ void HunterSnareTrap::greet( Character *victim )
     obj_to_char( obj, victim );
     equip_char( victim, obj, wear_hold_leg );
     SET_BIT(obj->wear_flags, ITEM_TAKE);
-    obj->fmtDescription( "Разломанный %s лежит тут.", obj->getShortDescr( '1' ).c_str( ) );
+    obj->setDescription( fmt(0, "Разломанный %s лежит тут.", obj->getShortDescr( '1' ).c_str( )) );
     obj->timer = 24;
     activated = false;
     
@@ -1503,9 +1503,9 @@ bool HunterPitTrap::isFresh( ) const
 
 void HunterPitTrap::setDescription( )
 {
-    obj->fmtDescription( 
-            "В земле вырыта яма %s размера.", 
-            size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2' ).c_str( ) );
+    obj->setDescription( 
+            fmt(0, "В земле вырыта яма %s размера.", 
+            size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2' ).c_str( )) );
 }
 
 /*

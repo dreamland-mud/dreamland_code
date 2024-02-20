@@ -172,7 +172,7 @@ void RainbowDefaultScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) c
 void RainbowDefaultScenario::dressItem( Object *obj, int number ) const
 {
     DLString name = pieces[number].getValue( );
-    obj->fmtShortDescr( "%s %s", name.c_str( ), obj->getShortDescr( ) );
+    obj->setShortDescr( fmt(0, "%s %s", name.c_str( ), obj->getShortDescr( ) ));
 }
 
 /*--------------------------------------------------------------------------

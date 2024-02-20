@@ -154,11 +154,6 @@ public:
     void setDescription( const DLString & );
     void setMaterial( const char * );
     
-    void fmtName( const char *, ... );
-    void fmtShortDescr( const char *, ... );
-    void fmtDescription( const char *, ... );
-    void fmtMaterial( const char *, ... );
-    
     DLString getFirstName( ) const;
     DLString getShortDescr( char );
     bool hasOwner( const Character * ) const;

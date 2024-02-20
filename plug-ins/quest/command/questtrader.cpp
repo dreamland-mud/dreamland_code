@@ -214,25 +214,25 @@ void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharact
     switch (gender.getValue( )) {
     default:
     case SEX_NEUTRAL:
-        obj->fmtShortDescr( obj->getShortDescr( ),
+        obj->setShortDescr( fmt(0, obj->getShortDescr( ),
             IS_GOOD(client)    ? "Священн|ое|ого|ому|ое|ым|ом" :
             IS_NEUTRAL(client) ? "Мерцающ|ее|его|ему|ее|им|ем" :
                                       "Дьявольск|ое|ого|ому|ое|им|ом", 
-            client->getNameP( '2' ).c_str());
+            client->getNameP( '2' ).c_str()));
         break;
     case SEX_MALE:
-        obj->fmtShortDescr( obj->getShortDescr( ),
+        obj->setShortDescr( fmt(0, obj->getShortDescr( ),
             IS_GOOD(client)    ? "Священн|ый|ого|ому|ый|ым|ом" :
             IS_NEUTRAL(client) ? "Мерцающ|ий|его|ему|ий|им|ем" :
                                  "Дьявольск|ий|ого|ому|ий|им|ом", 
-            client->getNameP( '2' ).c_str());
+            client->getNameP( '2' ).c_str()));
         break;
     case SEX_FEMALE:
-        obj->fmtShortDescr( obj->getShortDescr( ),
+        obj->setShortDescr( fmt(0, obj->getShortDescr( ),
             IS_GOOD(client)    ? "Священн|ая|ой|ой|ую|ой|ой" :
             IS_NEUTRAL(client) ? "Мерцающ|ая|ей|ей|ую|ей|ей" :
                                  "Дьявольск|ая|ой|ой|ую|ой|ой", 
-            client->getNameP( '2' ).c_str());
+            client->getNameP( '2' ).c_str()));
         break;
     }
 
@@ -557,8 +557,8 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
         tattooVnum = OBJ_VNUM_TATTOO;
 
     obj = create_object( get_obj_index( tattooVnum ), 0 );
-    obj->fmtName( obj->getName( ), leader );
-    obj->fmtShortDescr( obj->getShortDescr( ), leader );
+    obj->setName( fmt(0, obj->getName( ), leader).c_str() );
+    obj->setShortDescr( fmt(0, obj->getShortDescr( ), leader) );
 
     obj_to_char( obj, client );
     oldact("$C1 наносит тебе $o4!", client, obj, tattoer, TO_CHAR );

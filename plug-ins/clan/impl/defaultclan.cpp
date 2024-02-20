@@ -109,12 +109,12 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
             fmt( NULL, monument.getValue( ).c_str( ), ch, killer ).c_str( ) );
 
     DLString nameFormat = monumentName + " " + obj->getName();
-    obj->fmtName( 
-            nameFormat.c_str(), ch->getNameC(), killer->getNameC() );
+    DLString monumentName = fmt(0, nameFormat.c_str(), ch->getNameC(), killer->getNameC());
+    obj->setName(monumentName.c_str());
 
-    obj->fmtShortDescr( 
-            obj->getShortDescr( ), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );
-
+    DLString monumentDescr = fmt(0, obj->getShortDescr( ), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );
+    obj->setShortDescr(monumentDescr);
+            
     obj_to_room( obj, ch->in_room );
 }
 

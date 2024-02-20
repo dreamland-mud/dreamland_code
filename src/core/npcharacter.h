@@ -46,9 +46,6 @@ public:
     void setLongDescr( const char * );
     void setLongDescr( const DLString& );
     inline const char * getLongDescr( ) const;
-    void fmtName( const char *, ... );
-    void fmtShortDescr( const char *, ... );
-    void fmtLongDescr( const char *, ... );
     
     inline const char * getRealShortDescr( ) const;
     inline const char * getRealLongDescr( ) const;

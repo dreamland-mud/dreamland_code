@@ -408,9 +408,9 @@ static Object * create_arrow( int color, int level )
         arrow->value2(4 + level / 10);
     }
 
-    arrow->fmtName( arrow->getName( ), str_name );
-    arrow->fmtShortDescr( arrow->getShortDescr( ), str_short );        
-    arrow->fmtDescription( arrow->getDescription( ), str_long );        
+    arrow->setName( fmt(0, arrow->getName( ), str_name ).c_str());
+    arrow->setShortDescr( fmt(0, arrow->getShortDescr( ), str_short ));        
+    arrow->setDescription( fmt(0, arrow->getDescription( ), str_long ));        
     
     return arrow;
 }

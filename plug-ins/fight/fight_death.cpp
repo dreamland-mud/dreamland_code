@@ -465,8 +465,8 @@ static Object * corpse_create( Character *ch )
     corpse->from = str_dup( name.c_str( ) );
     corpse->cost = 0;
     corpse->level = ch->getRealLevel( );
-    corpse->fmtShortDescr( corpse->getShortDescr( ), name.c_str( ) ); 
-    corpse->fmtDescription( corpse->getDescription( ), name.c_str( ) ); 
+    corpse->setShortDescr( fmt(0, corpse->getShortDescr( ), name.c_str( )) ); 
+    corpse->setDescription( fmt(0, corpse->getDescription( ), name.c_str( ) )); 
 
     if (IS_SET(ch->form, FORM_EDIBLE))
         corpse->value0((1 << ch->size) - 1);
@@ -713,12 +713,12 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     // Format body part name, adding owner name to its description, e.g. "отрезанная рука Керрада"
     // If there're no format symbols in the body part names, just concatenate owner name to it.
     if (str_str(obj->getShortDescr(), "%"))
-        obj->fmtShortDescr( obj->getShortDescr(), body_name.c_str());
+        obj->setShortDescr( fmt(0, obj->getShortDescr(), body_name.c_str()));
     else
         obj->setShortDescr(obj->getShortDescr() + DLString::SPACE + body_name);
 
     if (str_str(obj->getDescription(), "%"))
-        obj->fmtDescription(obj->getDescription(), body_name.c_str());
+        obj->setDescription(fmt(0, obj->getDescription(), body_name.c_str()));
     else
         obj->setDescription(obj->getDescription() + DLString::SPACE + body_name);
 

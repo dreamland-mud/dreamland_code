@@ -287,50 +287,6 @@ void Object::setOwner( const DLString &newOwner )
     this->owner = newOwner;
 }
 
-void Object::fmtName( const char *fmt, ... )
-{
-    char buf[MAX_STRING_LENGTH];
-    va_list ap;
-
-    va_start( ap, fmt );
-    vsprintf( buf, fmt, ap );
-    va_end( ap );
-
-    setName( buf );
-}
-void Object::fmtShortDescr( const char *fmt, ... )
-{
-    char buf[MAX_STRING_LENGTH];
-    va_list ap;
-
-    va_start( ap, fmt );
-    vsprintf( buf, fmt, ap );
-    va_end( ap );
-
-    setShortDescr( buf );
-}
-void Object::fmtDescription( const char *fmt, ... )
-{
-    char buf[MAX_STRING_LENGTH];
-    va_list ap;
-
-    va_start( ap, fmt );
-    vsprintf( buf, fmt, ap );
-    va_end( ap );
-
-    setDescription( buf );
-}
-void Object::fmtMaterial( const char *fmt, ... )
-{
-    char buf[MAX_STRING_LENGTH];
-    va_list ap;
-
-    va_start( ap, fmt );
-    vsprintf( buf, fmt, ap );
-    va_end( ap );
-
-    setMaterial( buf );
-}
 DLString Object::getFirstName( ) const
 {
     return DLString( getName( ) ).getOneArgument( );
