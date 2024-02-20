@@ -705,22 +705,18 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
         }
         catch(const Exception &e)
         {
-                char buf[MAX_STRING_LENGTH];
-
                 if ( obj != 0 && obj->pIndexData != 0 )
                 {
-                        sprintf (buf,"{RSave_object: filling {Cvnum %d %s{R FAILED!!!!!!!!", obj->pIndexData->vnum, obj->getName( ));
+                        bug("{RSave_object: filling {Cvnum %d %s{R FAILED!!!!!!!!", obj->pIndexData->vnum, obj->getName( ));
                 }
                 else if ( obj !=0 && obj->getName( ) != 0 )
                 {
-                        sprintf (buf,"{RSave_object: filling {C%s{R FAILED!!!!!!!!", obj->getName( ) );
+                       bug("{RSave_object: filling {C%s{R FAILED!!!!!!!!", obj->getName( ) );
                 }
                 else
                 {
-                        sprintf (buf,"{RSave_object: filling{R FAILED!!!!!!!!" );
+                        bug("{RSave_object: filling{R FAILED!!!!!!!!" );
                 }
-
-                bug( buf, 0 );
         }
 
         return;

@@ -324,12 +324,10 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
 
 void CQuest::doPoints( PCharacter *ch )  
 {
-    char buf [MAX_STRING_LENGTH];
     int points = ch->getQuestPoints();
 
-    sprintf( buf, "У тебя {Y%d{x квестов%s единиц%s.\n\r", 
+    ch->pecho("У тебя {Y%d{x квестов%s единиц%s.", 
              points, GET_COUNT(points, "ая", "ых", "ых"), GET_COUNT(points, "а", "ы", ""));
-    ch->send_to(buf);
 }
 
 void CQuest::doTime( PCharacter *ch ) 

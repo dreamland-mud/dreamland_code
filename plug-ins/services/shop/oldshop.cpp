@@ -158,7 +158,7 @@ CMDRUN( buy )
         return;
     }
 
-    char buf[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
+    char arg[MAX_STRING_LENGTH];
     char argument[MAX_INPUT_LENGTH];
     int cost, oldcost, roll;
     NPCharacter*  keeper;
@@ -262,19 +262,19 @@ CMDRUN( buy )
 
     if ( number > 1 )
     {
-        sprintf( buf, "$c1 покупает $o4[%d].", number );
-        oldact( buf, ch, obj, 0, TO_ROOM);
-        sprintf( buf, "Ты покупаешь $o4[%d] за %d серебрян%s.",
+        DLString toRoom = fmt(0, "$c1 покупает $o4[%d].", number );
+        oldact( toRoom.c_str(), ch, obj, 0, TO_ROOM);
+        DLString toChar = fmt(0, "Ты покупаешь $o4[%d] за %d серебрян%s.",
                         number, cost * number,
                         GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
-        oldact( buf, ch, obj, 0, TO_CHAR);
+        oldact( toChar.c_str(), ch, obj, 0, TO_CHAR);
     }
     else
     {
         oldact("$c1 покупает $o4.", ch, obj, 0, TO_ROOM);
-        sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
+        DLString toChar = fmt( 0, "Ты покупаешь $o4 за %d серебрян%s.",
                         cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
-        oldact( buf, ch, obj, 0, TO_CHAR);
+        oldact( toChar.c_str(), ch, obj, 0, TO_CHAR);
     }
 
     int wlevel = get_wear_level( ch, obj );

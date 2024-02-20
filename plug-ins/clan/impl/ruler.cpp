@@ -216,7 +216,6 @@ void ClanGuardRulerJailer::speech( Character *, const char * )
 
 bool ClanGuardRulerJailer::specFight( )
 {
-    char buf[MAX_STRING_LENGTH];
     Character *victim;
     Character *v_next;
     Character *ech;
@@ -259,16 +258,16 @@ bool ClanGuardRulerJailer::specFight( )
             if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
                     && !is_safe_nomessage ( ch, victim ) )
             {
-                    sprintf( buf, "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+                    DLString msg = fmt(0, "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
                             victim->getNameC(), crime );
-                    do_yell( ch, buf );
+                    do_yell( ch, msg.c_str() );
                     multi_hit( ch, victim , "murder" );
             }
             else
             {
-                    sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
+                     DLString msg = fmt(0, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
                             victim->getNameC());
-                    oldact( buf, ch, 0, 0, TO_ROOM);
+                    oldact( msg.c_str(), ch, 0, 0, TO_ROOM);
             }
             return true;
     }
@@ -297,7 +296,6 @@ bool ClanGuardRulerJailer::specFight( )
 
 SKILL_RUNP( judge )
 {
-        char buf[MAX_STRING_LENGTH];
         char arg[MAX_INPUT_LENGTH];
         int  value;
         Character *victim;
@@ -373,8 +371,7 @@ SKILL_RUNP( judge )
 
                 victim->getPC( )->loyalty=value;
 
-                sprintf(buf,"Установлено в %d.\n\r",value);
-                ch->send_to(buf);
+                ch->pecho("Установлено в %d.",value);
 
                 return;
         }
@@ -450,23 +447,23 @@ SKILL_RUNP( manacles )
 
                 if (paf)
                 {
-                        char buf[MAX_STRING_LENGTH];
+                        DLString msg;
 
                         if ( paf->duration >= 0 )
                         {
-                                sprintf (buf,"$C1 закован менее чем на %d час%s."
+                                msg = fmt(0, "$C1 закован менее чем на %d час%s."
                                         ,paf->duration.getValue() + 1
                                         ,GET_COUNT(paf->duration+1, "","а","ов"));
                         }
                         else
                         {
-                                sprintf (buf,"$C1 закован навсегда.");
+                                msg = "$C1 закован навсегда.";
                         }
 
                         oldact_p("Руки $C4 закованы в кандалы!",
                                                 ch,0,victim,TO_CHAR,POS_RESTING);
 
-                        oldact(buf, ch, 0, victim, TO_CHAR);
+                        oldact(msg.c_str(), ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
@@ -960,7 +957,6 @@ SKILL_RUNP( confiscate )
 
 SKILL_RUNP( suspect )
 {
-        char buf[MAX_STRING_LENGTH];
         char arg[MAX_INPUT_LENGTH];
         int  value;
         Character *victim;
@@ -1022,19 +1018,20 @@ SKILL_RUNP( suspect )
                 || arg[0] == '\0' )
         {
                 Affect *paf = victim->affected.find (gsn_suspect);
+                DLString msg;
 
                 if ( paf != 0 )   
                 {
-                        sprintf (buf,"Повестка $C2 действительна менее %d час%s."
+                        msg = fmt(0, "Повестка $C2 действительна менее %d час%s."
                                 ,paf->duration.getValue() + 1
                                 ,GET_COUNT(paf->duration + 1, "а","ов","ов"));
 
                         victim->pecho("Ты чувствуешь - тебя ждут в Суде.");
                 }
                 else
-                        sprintf (buf,"$C1 не выдавалась повестка в Суд.");
+                        msg = "$C1 не выдавалась повестка в Суд.";
 
-                oldact(buf, ch, 0, victim, TO_CHAR);
+                oldact(msg.c_str(), ch, 0, victim, TO_CHAR);
 
                 return;
         }
@@ -1166,24 +1163,24 @@ SKILL_RUNP( jail )
                 Affect *paf = victim->affected.find (gsn_jail);
                 if (paf)
                 {
-                        char buf[MAX_STRING_LENGTH];
+                        DLString msg;
                         
 
                         if ( paf->duration >= 0 )
                         {
-                                sprintf (buf,"$C1 в тюряге менее чем на %d час%s."
+                                msg = fmt(0, "$C1 в тюряге менее чем на %d час%s."
                                         ,paf->duration.getValue() + 1
                                         ,GET_COUNT(paf->duration + 1, "","а","ов"));
                         }
                         else
                         {
-                                sprintf (buf,"$C1 в тюряге ПОЖИЗНЕННО.");
+                               msg = "$C1 в тюряге ПОЖИЗНЕННО.";
                         }
 
                         if ( victim->isAffected(gsn_manacles) )
                                 oldact("Руки $C4 закованы в кандалы!",ch,0,victim,TO_CHAR);
 
-                        oldact(buf, ch, 0, victim, TO_CHAR);
+                        oldact(msg.c_str(), ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
@@ -1337,20 +1334,20 @@ SKILL_RUNP( dismiss )
 
                 if (paf)
                 {
-                        char buf[MAX_STRING_LENGTH];
+                        DLString msg;
 
                         if ( paf->duration >= 0 )
                         {
-                                sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя менее чем на %d час%s."
+                                msg = fmt(0, "$C1 лише$Gно|н|на своих привилегий Правителя менее чем на %d час%s."
                                         ,paf->duration.getValue() + 1
                                         ,GET_COUNT(paf->duration+1, "","а","ов"));
                         }
                         else
                         {
-                                sprintf (buf,"$C1 лише$Gно|н|на своих привилегий Правителя НАВСЕГДА.");
+                                msg = "$C1 лише$Gно|н|на своих привилегий Правителя НАВСЕГДА.";
                         }
 
-                        oldact(buf, ch, 0, victim, TO_CHAR);
+                        oldact(msg.c_str(), ch, 0, victim, TO_CHAR);
                 }
                 else
                 {
@@ -1479,7 +1476,6 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
  */
 bool RulerSpecialGuard::specFight( )
 {
-    char buf[MAX_STRING_LENGTH];
     Character *victim;
 
     for (victim = ch->in_room->people; victim != 0; victim = victim->next_in_room)
@@ -1502,16 +1498,16 @@ bool RulerSpecialGuard::specFight( )
     if ( ( ch->getModifyLevel() + 20 > victim->getModifyLevel() )
             && !is_safe_nomessage ( ch, victim ) )
     {
-        sprintf( buf, "%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+        DLString msg = fmt(0, "%s БАНДИТ! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
                 victim->getNameC() );
-        do_yell( ch, buf );
+        do_yell( ch, msg.c_str() );
         multi_hit( ch, victim , "murder" );
     }
     else
     {
-        sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
+        DLString msg = fmt(0, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
                  victim->getNameC());
-        oldact( buf, ch, 0, 0, TO_ROOM);
+        oldact( msg.c_str(), ch, 0, 0, TO_ROOM);
     }
 
     return true;
@@ -1809,7 +1805,7 @@ VOID_AFFECT(Jail)::remove( Character *victim )
 
     DefaultAffectHandler::remove( victim );
 
-    clantalk( *clan_ruler, "С этого момента %s снова на свободе!", victim->getNameP( '1' ).c_str() );
+    clantalk( *clan_ruler, fmt(0, "С этого момента %s снова на свободе!", victim->getNameP( '1' ).c_str()) );
 
     if (victim->isAffected(gsn_manacles ))
         affect_strip( victim, gsn_manacles );
@@ -1841,10 +1837,10 @@ VOID_AFFECT(Jail)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1; // Affects are removed when duration reaches below zero.
-        clantalk(*clan_ruler, "%s выйдет на свободу через %d час%s",
+        clantalk(*clan_ruler, fmt(0, "%s выйдет на свободу через %d час%s",
                 ch->getNameP( '1' ).c_str(),
                 hours,
-                GET_COUNT(hours, "","а","ов"));
+                GET_COUNT(hours, "","а","ов")));
     }
 }
 
@@ -1853,7 +1849,7 @@ VOID_AFFECT(Manacles)::remove( Character *ch )
 {
     DefaultAffectHandler::remove( ch );
 
-    clantalk(*clan_ruler, "С %s спали кандалы!", ch->getNameP( '2' ).c_str() );
+    clantalk(*clan_ruler, fmt(0, "С %s спали кандалы!", ch->getNameP( '2' ).c_str()) );
 }
 
 VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf ) 
@@ -1862,10 +1858,10 @@ VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1;
-        clantalk(*clan_ruler, "С %s спадут кандалы через %d час%s",
+        clantalk(*clan_ruler, fmt(0, "С %s спадут кандалы через %d час%s",
                 ch->getNameP( '2' ).c_str(),
                 hours,
-                GET_COUNT(hours, "","а","ов"));
+                GET_COUNT(hours, "","а","ов")));
     }
 }
 
@@ -1874,7 +1870,7 @@ AFFECT_DECL(Suspect);
 VOID_AFFECT(Suspect)::remove( Character *ch ) 
 { 
     DefaultAffectHandler::remove( ch );
-    clantalk(*clan_ruler, "Повестка в суд для %s истекла!", ch->getNameP( '2' ).c_str() );
+    clantalk(*clan_ruler, fmt(0, "Повестка в суд для %s истекла!", ch->getNameP( '2' ).c_str()) );
 }
 
 VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf ) 
@@ -1883,10 +1879,10 @@ VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf )
 
     if ( paf->duration < 3) {
         int hours = paf->duration + 1;
-        clantalk(*clan_ruler, "Повестка в суд для %s истекает через %d час%s",
+        clantalk(*clan_ruler, fmt(0, "Повестка в суд для %s истекает через %d час%s",
                 ch->getNameP( '2' ).c_str(),
                 hours,
-                GET_COUNT(hours, "","а","ов"));
+                GET_COUNT(hours, "","а","ов")));
     }
 }
 

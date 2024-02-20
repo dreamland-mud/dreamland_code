@@ -319,8 +319,6 @@ public:
 
     virtual void run( Character *ch, const DLString &argument )
     {
-        char buf[MAX_INPUT_LENGTH];
-        
         if (argument.empty( ))
         {
             if (ch->prefix[0] == '\0')
@@ -337,16 +335,15 @@ public:
 
         if (ch->prefix[0] != '\0')
         {
-            sprintf(buf,"Prefix changed to %s.\r\n",argument.c_str( ));
+            ch->pecho("Prefix changed to %s.",argument.c_str( ));
             free_string(ch->prefix);
         }
         else
         {
-            sprintf(buf,"Prefix set to %s.\r\n",argument.c_str( ));
+            ch->pecho("Prefix set to %s.",argument.c_str( ));
         }
 
         ch->prefix = str_dup(argument.c_str( ));
-        ch->send_to( buf );
     }
 
 protected:

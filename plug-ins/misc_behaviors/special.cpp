@@ -462,7 +462,6 @@ bool spec_cast_judge( NPCharacter *ch )
 
 bool spec_executioner( NPCharacter *ch )
 {
-        char buf[MAX_STRING_LENGTH];
         Character *victim;
         Character *v_next;
         const char *crime;
@@ -489,10 +488,10 @@ bool spec_executioner( NPCharacter *ch )
         if ( victim == 0 )
                 return false;
 
-        sprintf( buf, "%s -- %s!  ЗАЩИЩАЙ НЕВИННЫХ! БОЛЬШЕ КРОВИ!!!",
+        DLString msg = fmt(0, "%s -- %s!  ЗАЩИЩАЙ НЕВИННЫХ! БОЛЬШЕ КРОВИ!!!",
                 victim->getNameC(), crime );
 
-        do_yell( ch, buf );
+        do_yell( ch, msg.c_str() );
 
         multi_hit( ch, victim , "murder" );
 
@@ -834,7 +833,7 @@ bool spec_nasty( NPCharacter *ch )
 
 bool spec_assassinater( NPCharacter *ch )
 {
-        char buf[MAX_STRING_LENGTH];
+        DLString msg;
         Character *victim;
         int rnd_say;
 
@@ -865,28 +864,28 @@ bool spec_assassinater( NPCharacter *ch )
         switch (rnd_say)
         {
         case  5:
-                sprintf( buf, "Смерть -- вот верное завершение твоего пути...");
+                msg = "Смерть -- вот верное завершение твоего пути...";
                 break;
         case  6:
-                sprintf( buf, "Настало время умирать....");
+                msg = "Настало время умирать....";
                 break;
         case  7:
-                sprintf( buf, "Подонок...");
+                msg = "Подонок...";
                 break;
         case  8:
-                sprintf( buf, "Настало время встретить свой рок...");
+                msg = "Настало время встретить свой рок...";
                 break;
         case  9:
-                sprintf( buf, "Жертвоприношение Богам... ");
+                msg = "Жертвоприношение Богам... ";
                 break;
         case 10:
-                sprintf( buf, "Случалось ли тебе танцевать с дьяволом?");
+                msg = "Случалось ли тебе танцевать с дьяволом?";
                 break;
         default:
                 return false;
         }
 
-        do_say( ch, buf );
+        do_say( ch, msg.c_str() );
         interpret_raw( ch, "assassinate", victim->getName( ).c_str( ) );
         return true;
 }

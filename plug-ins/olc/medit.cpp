@@ -1043,13 +1043,11 @@ MEDIT(list)
 {
     int cnt;
     RoomIndexData *pRoom;
-    char buf[MAX_STRING_LENGTH];
     ostringstream buffer;
     
-    snprintf(buf, sizeof(buf), "Resets for mobile [{W%d{x] ({g%s{x):\n\r",
+    buffer << fmt(0, "Resets for mobile [{W%d{x] ({g%s{x):\n\r",
             mob.vnum, 
             russian_case(mob.short_descr, '1').c_str( ));
-    buffer << buf;
     
     cnt = 0;
     for (auto &r: roomIndexMap) {
@@ -1058,16 +1056,14 @@ MEDIT(list)
             switch(pReset->command) {
                 case 'M':
                     if(pReset->arg1 == mob.vnum) {
-                        snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
+                        buffer << fmt(0, "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
                                 pReset->command, pRoom->vnum, pRoom->name);
-                        buffer << buf;
                         cnt++;
                     }
             }
     }
 
-    snprintf(buf, sizeof(buf), "Total {W%d{x resets found.\n\r", cnt);
-    buffer << buf;
+    buffer << fmt(0, "Total {W%d{x resets found.\n\r", cnt);
     
     page_to_char(buffer.str( ).c_str( ), ch);
 

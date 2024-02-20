@@ -108,7 +108,6 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
 { 
     Object *vial;
     Object *jar;
-    char buf[MAX_STRING_LENGTH];
 
     if (victim == ch)
         {
@@ -155,10 +154,10 @@ VOID_SPELL(MagicJar)::run( Character *ch, Character *victim, int sn, int level )
     jar->setShortDescr( fmt(0, jar->getShortDescr( ), victim->getNameC()));
     jar->setDescription( fmt(0, jar->getDescription( ), victim->getNameC()));
 
-    sprintf( buf,jar->pIndexData->extra_descr->description, victim->getNameC() );
+    DLString descr = fmt(0, jar->pIndexData->extra_descr->description, victim->getNameC() );
     jar->extra_descr = new_extra_descr();
     jar->extra_descr->keyword = str_dup( jar->pIndexData->extra_descr->keyword );
-    jar->extra_descr->description = str_dup( buf );
+    jar->extra_descr->description = str_dup( descr.c_str() );
     jar->extra_descr->next = 0;
 
     jar->level = ch->getRealLevel( );

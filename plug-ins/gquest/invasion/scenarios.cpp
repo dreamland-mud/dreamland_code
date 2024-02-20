@@ -136,16 +136,16 @@ void InvasionBubblesMob::actDeath( Character *killer )
 {
     Descriptor *d;
     DLString s;
-    char buf[256];
+    ostringstream buf;
 
     s = ch->getNPC( )->getShortDescr( );
     
     if (s.length( ) >= 2 && s.at( 0 ) == '{')
-        sprintf(buf, "{%c", s.at( 1 ));
+        buf << fmt(0, "{%c", s.at( 1 ));
     else
-        sprintf(buf, "{x");
+        buf << "{x";
    
-    strcat(buf+strlen(buf), "(*)!(*)!(*) ЧПОК !!! (*)!(*)!(*){x\r\n");
+    buf << "(*)!(*)!(*) ЧПОК !!! (*)!(*)!(*){x\r\n";
     
     for (d = descriptor_list; d != 0; d = d->next) 
         if (d->connected == CON_PLAYING && d->character)

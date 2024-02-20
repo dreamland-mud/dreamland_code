@@ -24,7 +24,7 @@
 #include "handler.h"
 #include "wiznet.h"
 #include "merc.h"
-
+#include "act.h"
 #include "def.h"
 
 Quest::Quest( ) 
@@ -52,7 +52,6 @@ void Quest::shortInfo( std::ostream &, PCharacter * )
 
 void Quest::wiznet( const char *status, const char *format, ... ) 
 {
-    char buf0[MAX_STRING_LENGTH];
     std::basic_ostringstream<char> buf;
 
     buf << getName( ) << " " << status << ": " << charName;
@@ -61,15 +60,11 @@ void Quest::wiznet( const char *status, const char *format, ... )
         va_list ap;
     
         va_start( ap, format );
-        vsprintf( buf0, format, ap );
+        buf << ": " << vfmt(0, format, ap);
         va_end( ap );
-
-        buf << ": " << buf0;
     }
 
-    strcpy( buf0, buf.str( ).c_str( ) );
-    ::wiznet( WIZ_QUEST, 0, 0, buf0 );
-//    LogStream::sendNotice( ) << buf.str( ) << endl;
+    ::wiznet( WIZ_QUEST, 0, 0, buf.str().c_str() );
 }
 
 int Quest::getAccidentTime( PCMemoryInterface *pci )

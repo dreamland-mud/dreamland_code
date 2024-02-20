@@ -171,7 +171,6 @@ CMDWIZP( limited )
 
         if ( argument[0] != '\0' )
         {
-                char buf[1000];
                 int ingameCount;
                 OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
@@ -185,32 +184,28 @@ CMDWIZP( limited )
                         return;
                 }
                 nMatch = 0;
-                sprintf( buf, "%-35s [%5d]  Лимит: %3d  Собрано: %3d\n\r",
+                ch->pecho( "%-35s [%5d]  Лимит: %3d  Собрано: %3d",
                         obj_index->short_descr,
                         obj_index->vnum,
                         obj_index->limit,
                         obj_index->count );
-                buf[0] = dl_toupper( buf[0] );
-                ch->send_to(buf);
                 ingameCount = obj_index->instances.size();
                 for (Object* obj=object_list; obj != 0; obj=obj->next )
                         if ( obj->pIndexData->vnum == obj_index->vnum )
                         {
                                 if ( obj->carried_by != 0 && ch->can_see( obj->carried_by ) )
-                                        sprintf(buf, "У %-30s\n\r",
+                                        ch->pecho( "У %-30s",
                                                 obj->carried_by->getNameC());
                                 if ( obj->in_room != 0 )
-                                        sprintf(buf, "В комнате %-20s [%d]\n\r",
+                                        ch->pecho("В комнате %-20s [%d]",
                                                 obj->in_room->getName(), obj->in_room->vnum);
                                 if ( obj->in_obj != 0 )
-                                        sprintf(buf, "Внутри %-20s [%d] \n\r",
+                                        ch->pecho( "Внутри %-20s [%d]",
                                                 obj->in_obj->getShortDescr( '1' ).c_str( ),
                                                 obj->in_obj->pIndexData->vnum);
-                                ch->send_to(buf);
                         }
-                sprintf(buf, "  %d сейчас в игре, а еще %d в профилях игроков.\n\r",
+                ch->pecho("  %d сейчас в игре, а еще %d в профилях игроков.",
                         ingameCount, obj_index->count-ingameCount);
-                ch->send_to(buf);
                 return;
         }
 
@@ -437,9 +432,8 @@ CMDWIZP( transfer )
             &&   d->character != ch
             &&   ch->can_see( d->character ) )
             {
-                char buf[MAX_STRING_LENGTH];
-                sprintf( buf, "%s %s", d->character->getNameC(), arg2 );
-                run( ch, buf );
+                DLString cmd = d->character->getName() + " " + arg2;
+                run( ch, cmd.c_str() );
             }
         }
         return;
@@ -917,10 +911,10 @@ static void format_affect(Affect *paf, ostringstream &buf)
 
 /* NOTCOMMAND */ void do_ostat( Character *ch, char *argument )
 {
-        char buf[MAX_STRING_LENGTH];
         char arg[MAX_INPUT_LENGTH];
         Object *obj;
         Liquid *liquid;
+        ostringstream buf;
 
         one_argument( argument, arg );
 
@@ -936,54 +930,44 @@ static void format_affect(Affect *paf, ostringstream &buf)
                 return;
         }
 
-        sprintf( buf, "Name(s): %s\n\r", obj->getName( ) );
-        ch->send_to(buf);
+        buf << fmt(0, "Name(s): %s\n\r", obj->getName( ) );
 
-        sprintf( buf, "Vnum: %d  Лимит: %d  Тип: %s  Ресеты: %d\n\r",
+        buf << fmt(0, "Vnum: %d  Лимит: %d  Тип: %s  Ресеты: %d\n\r",
                 obj->pIndexData->vnum, obj->pIndexData->limit,
                 item_table.message(obj->item_type).c_str( ),
                 obj->pIndexData->reset_num );
-        ch->send_to(buf);
 
         if (obj->timestamp > 0) {
             DLString d = Date( obj->timestamp ).getTimeAsString( );
-            ch->pecho("Лимит исчезнет в %s.", d.c_str( ) );
+            buf << fmt(0, "Лимит исчезнет в %s.\r\n", d.c_str( ) );
         }
 
-        sprintf( buf, "Шорт: %s\n\rДлинное описание: %s\n\r",
+        buf << fmt(0, "Шорт: %s\n\rДлинное описание: %s\n\r",
                 obj->getShortDescr( ), obj->getDescription( ) );
-        ch->send_to(buf);
 
-        sprintf(buf,"Владелец: %s\n\r", obj->getOwner().empty() ? "nobody" : obj->getOwner().c_str());
-        ch->send_to(buf);
+        buf << fmt(0, "Владелец: %s\n\r", obj->getOwner().empty() ? "nobody" : obj->getOwner().c_str());
 
-        sprintf( buf, "Материал: %s\n\r", obj->getMaterial( ));
-        ch->send_to(buf);
+        buf << fmt(0, "Материал: %s\n\r", obj->getMaterial( ));
 
-        sprintf( buf, "Берется в: %s\n\rЭкстра флаги: %s\n\r",
+        buf << fmt(0, "Берется в: %s\n\rЭкстра флаги: %s\n\r",
                 wear_flags.messages(obj->wear_flags, true).c_str( ), 
                 extra_flags.messages(obj->extra_flags, true).c_str( ) );
-        ch->send_to(buf);
 
-        sprintf( buf, "Число: %d/%d  Вес: %d/%d/%d (десятые доли фунта)\n\r",1,
+        buf << fmt(0, "Число: %d/%d  Вес: %d/%d/%d (десятые доли фунта)\n\r",1,
                 obj->getNumber( ), obj->weight, obj->getWeight( ), obj->getTrueWeight( ) );
-        ch->send_to(buf);
 
-        sprintf( buf, "Уровень: %d  Цена: %d  Состояние: %d  Таймер: %d По счету: %d\n\r",
+        buf << fmt(0, "Уровень: %d  Цена: %d  Состояние: %d  Таймер: %d По счету: %d\n\r",
                 obj->level, obj->cost, obj->condition, obj->timer, obj->pIndexData->count );
-        ch->send_to(buf);
 
-        sprintf( buf,        "В комнате: %d  Внутри: %s  В руках у: %s  Надето на: %s\n\r",
+        buf << fmt(0, "В комнате: %d  Внутри: %s  В руках у: %s  Надето на: %s\n\r",
                 obj->in_room == 0 ? 0 : obj->in_room->vnum,
                 obj->in_obj  == 0 ? "(none)" : obj->in_obj->getShortDescr( '1' ).c_str( ),
                 obj->carried_by == 0 ? "(none)" :
                         ch->can_see(obj->carried_by) ? obj->carried_by->getNameC() : "someone",
                 obj->wear_loc->getName( ).c_str( ) );
-        ch->send_to(buf);
 
-        sprintf( buf, "Значения: %d %d %d %d %d\n\r",
+        buf << fmt(0, "Значения: %d %d %d %d %d\n\r",
                 obj->value0(), obj->value1(), obj->value2(), obj->value3(),        obj->value4() );
-        ch->send_to(buf);
 
         // now give out vital statistics as per identify
 
@@ -992,103 +976,93 @@ static void format_affect(Affect *paf, ostringstream &buf)
         case ITEM_SCROLL:
         case ITEM_POTION:
         case ITEM_PILL:
-                sprintf( buf, "Заклинания %d уровня:", obj->value0() );
+                buf << fmt(0,  "Заклинания %d уровня:", obj->value0() );
                 ch->send_to(buf);
 
                 if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
                 {
-                        ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value1())->getName().c_str());
-                        ch->send_to("'");
+                    buf << " '"
+                        << SkillManager::getThis( )->find(obj->value1())->getName()
+                        << "'";
                 }
 
                 if ( obj->value2() >= 0 && obj->value2() < SkillManager::getThis( )->size() )
                 {
-                        ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value2())->getName().c_str());
-                        ch->send_to("'");
+                    buf << " '"
+                        << SkillManager::getThis( )->find(obj->value2())->getName()
+                        << "'";
                 }
 
                 if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
                 {
-                        ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value3())->getName().c_str());
-                        ch->send_to("'");
+                    buf << " '"
+                        << SkillManager::getThis( )->find(obj->value3())->getName()
+                        << "'";
                 }
 
                 if (obj->value4() >= 0 && obj->value4() < SkillManager::getThis( )->size())
                 {
-                        ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value4())->getName().c_str());
-                        ch->send_to("'");
+                    buf << " '"
+                        << SkillManager::getThis( )->find(obj->value4())->getName()
+                        << "'";
                 }
 
-                ch->pecho(".");
+                buf << "." << endl;
                 break;
 
         case ITEM_WAND:
         case ITEM_STAFF:
-                sprintf( buf, "Имеет %d(%d) зарядов уровня %d",
+                buf << fmt(0, "Имеет %d(%d) зарядов уровня %d",
                         obj->value1(), obj->value2(), obj->value0() );
-                ch->send_to(buf);
 
                 if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
                 {
-                        ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value3())->getName().c_str());
-                        ch->send_to("'");
+                    buf << " '"
+                        << SkillManager::getThis( )->find(obj->value3())->getName()
+                        << "'";
                 }
 
-                ch->pecho(".");
+                buf << "." << endl;
                 break;
 
         case ITEM_DRINK_CON:
                 liquid = liquidManager->find( obj->value2() );
-                sprintf(buf,"Содержит жидкость %s цвета, %s.\n",
+                buf << fmt(0, "Содержит жидкость %s цвета, %s.\n",
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
-                ch->send_to(buf);
                 break;
                 
         case ITEM_WEAPON:
-                ch->send_to("Тип оружия: ");
-                ch->send_to(weapon_class.name(obj->value0()).c_str( ));
-                ch->send_to("\n");
+                buf << "Тип оружия: " << weapon_class.name(obj->value0()) << endl;
                 
-                sprintf(buf,"Урон %dd%d (среднее %d)\n\r",
+                buf << fmt(0, "Урон %dd%d (среднее %d)\n\r",
                         obj->value1(),obj->value2(),weapon_ave(obj));
-                ch->send_to(buf);
 
-                sprintf(buf,"Тип удара: %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
-                ch->send_to(buf);
+                buf << fmt(0, "Тип удара: %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
         
                 if (obj->value4())  /* weapon flags */
                 {
-                        sprintf(buf,"Флаги оружия: %s\n\r",weapon_type2.messages(obj->value4()).c_str( ));
-                        ch->send_to(buf);
+                        buf << fmt(0, "Флаги оружия: %s\n\r",weapon_type2.messages(obj->value4()).c_str( ));
                 }
                 break;
 
         case ITEM_ARMOR:
-                sprintf( buf,"Класс брони: %d колющее, %d удар, %d режущее, %d экзотика\n\r",
+                buf << fmt(0, "Класс брони: %d колющее, %d удар, %d режущее, %d экзотика\n\r",
                         obj->value0(), obj->value1(), obj->value2(), obj->value3() );
-                ch->send_to(buf);
                 break;
 
         case ITEM_CONTAINER:
-                sprintf(buf,"Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n\r",
+                buf << fmt(0, "Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n\r",
                         obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
-                ch->send_to(buf);
                 if (obj->value4() != 100)
                 {
-                        sprintf(buf,"Уменьшение веса: %d%%\n\r",obj->value4());
-                        ch->send_to(buf);
+                        buf << fmt(0, "Уменьшение веса: %d%%\n\r",obj->value4());
                 }
                 break;
         
         case ITEM_CORPSE_PC:
         case ITEM_CORPSE_NPC:
-                ch->pecho( "Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d",
+                buf << fmt(0, "Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d\r\n",
                             obj->value0(), obj->value1(), 
                             part_flags.messages( obj->value2() ).c_str( ), obj->value3() );
                 break;
@@ -1098,68 +1072,59 @@ static void format_affect(Affect *paf, ostringstream &buf)
         {
                 EXTRA_DESCR_DATA *ed;
 
-                ch->send_to("Ключевые слова экстра-описаний: '");
+                buf << "Ключевые слова экстра-описаний: '";
 
                 for ( ed = obj->extra_descr; ed != 0; ed = ed->next )
                 {
-                        ch->send_to(ed->keyword);
+                       buf << ed->keyword;
                         if ( ed->next != 0 )
-                                ch->send_to(" ");
+                                buf << " ";
                 }
 
-                ch->pecho("'");
+                buf << endl;
         }
 
         if ( obj->pIndexData->extra_descr != 0 )
         {
                 EXTRA_DESCR_DATA *ed;
 
-                ch->send_to("Оригинал экстра-описания: '");
+                buf << "Оригинал экстра-описания: '";
 
                 for ( ed = obj->pIndexData->extra_descr; ed != 0; ed = ed->next )
                 {
-                        ch->send_to(ed->keyword);
+                       buf << ed->keyword;
                         if ( ed->next != 0 )
-                                ch->send_to(" ");
+                            buf << " ";
                 }
 
-                ch->pecho("'");
+                buf << endl;
         }
 
-    ostringstream ostr;
     for (auto &paf: obj->affected)
-        format_affect(paf, ostr);
+        format_affect(paf, buf);
 
     for (auto &paf: obj->pIndexData->affected)
-        format_affect(paf, ostr);
+        format_affect(paf, buf);
 
-    ch->send_to(ostr);
 
-    sprintf(buf,"Состояние : %d (%s) ", obj->condition, obj->get_cond_alias() );        
-    ch->send_to(buf);
+    buf << fmt(0, "Состояние : %d (%s) ", obj->condition, obj->get_cond_alias() );        
     
-    if (obj->behavior) {
-        ostringstream ostr;
-        
-        sprintf(buf, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
-        ch->send_to(buf);
+    if (obj->behavior) {        
+        buf << fmt(0, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
+        obj->behavior.toStream( buf );
 
-        obj->behavior.toStream( ostr );
-        ch->send_to( ostr );
     } else {
-        ch->send_to("\r\n");
+       buf << endl;
     }
 
     if (!obj->properties.empty()) {
-        ostringstream ostr;
-
-        ostr << "Свойства: ";
+        buf << "Свойства: ";
         for (auto &prop: obj->properties)
-            ostr << "{g" << prop.first << "{x: \"" << prop.second << "\"  ";
-        ostr << endl;
-
-        ch->send_to(ostr);
+            buf << "{g" << prop.first << "{x: \"" << prop.second << "\"  ";
+        buf << endl;
     }
+
+    ch->send_to(buf);
 }
 
 
@@ -1420,7 +1385,6 @@ CMDWIZP( vnum )
 
 /* NOTCOMMAND */ void do_mfind( Character *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
     MOB_INDEX_DATA *pMobIndex;
     int nMatch;
@@ -1445,10 +1409,9 @@ CMDWIZP( vnum )
             if ( fAll || is_name( argument, pMob->player_name ) )
             {
                 found = true;
-                sprintf( buf, "[%5d] %s\n\r",
+                ch->pecho("[%5d] %s",
                     pMob->vnum, 
                     russian_case( pMob->short_descr, '1' ).c_str( ) );
-                ch->send_to(buf);
             }
         }   
 
@@ -1462,7 +1425,6 @@ CMDWIZP( vnum )
 
 /* NOTCOMMAND */ void do_ofind( Character *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
     OBJ_INDEX_DATA *pObjIndex;
     int nMatch;
@@ -1487,10 +1449,9 @@ CMDWIZP( vnum )
             if ( fAll || is_name( argument, pObj->name ) )
             {
                 found = true;
-                sprintf( buf, "[%5d] %s\n\r",
+                ch->pecho("[%5d] %s",
                     pObj->vnum, 
                     russian_case( pObj->short_descr, '1' ).c_str( ) );
-                ch->send_to(buf);
             }
         }
 
@@ -1548,7 +1509,6 @@ CMDWIZP( rwhere )
 
 CMDWIZP( owhere )
 {
-    char buf[MAX_INPUT_LENGTH];
     ostringstream buffer;
     Object *obj;
     Object *in_obj;
@@ -1590,25 +1550,23 @@ CMDWIZP( owhere )
 
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by)
                 && in_obj->carried_by->in_room != 0 )
-                sprintf( buf, "%3d) %s в руках у %s [Комната %d]\n\r",
+                buffer << fmt(0, "%3d) %s в руках у %s [Комната %d]\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ),
                         ch->sees(in_obj->carried_by, '2').c_str(),
                         in_obj->carried_by->in_room->vnum );
         else if ( in_obj->in_room != 0 && ch->can_see(in_obj->in_room) )
-                sprintf( buf, "%3d) %s на полу в %s [Комната %d]\n\r",
+                buffer << fmt(0, "%3d) %s на полу в %s [Комната %d]\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ),
                         in_obj->in_room->getName(),
                         in_obj->in_room->vnum );
         else
-                sprintf( buf, "%3d) %s черт его знает где.\n\r",
+               buffer << fmt(0, "%3d) %s черт его знает где.\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ) );
 
-        buf[0] = dl_toupper(buf[0]);
-        buffer << buf;
-
+    
         if ( number >= max_found )
             break;
     }
@@ -1622,7 +1580,6 @@ CMDWIZP( owhere )
 
 CMDWIZP( mwhere )
 {
-    char buf[MAX_STRING_LENGTH];
     ostringstream buffer;
     Character *victim;
     bool found;
@@ -1656,18 +1613,17 @@ CMDWIZP( mwhere )
                 count++;
 
                 if (victim->is_npc( ))
-                    sprintf(buf,"%3d) %s (в теле %s) находится в %s [%d]\n\r",
+                    buffer << fmt(0, "%3d) %s (в теле %s) находится в %s [%d]\n\r",
                             count, 
                             victim->getPC( )->getNameC(),
                             victim->getNameP('1').c_str( ),
                             victim->in_room->getName(), victim->in_room->vnum);
                 else
-                    sprintf(buf,"%3d) %s находится в %s [%d]\n\r",
+                    buffer << fmt(0, "%3d) %s находится в %s [%d]\n\r",
                             count, 
                             victim->getNameC(),
                             victim->in_room->getName(), victim->in_room->vnum);
 
-                buffer << buf;
             }
 
             page_to_char(buffer.str( ).c_str( ), ch);
@@ -1694,12 +1650,11 @@ CMDWIZP( mwhere )
 
         found = true;
         count++;
-        sprintf( buf, "%3d) [%5d] %-28s [%5d] %s\n\r", count,
+        buffer << fmt(0, "%3d) [%5d] %-28s [%5d] %s\n\r", count,
                 victim->is_npc() ? victim->getNPC()->pIndexData->vnum : 0,
                 victim->is_npc() ? victim->getNameP( '1' ).c_str( ) : victim->getNameC(),
                 victim->in_room->vnum,
                 victim->in_room->getName() );
-        buffer << buf;
     }
 
     if (!found)
@@ -2752,7 +2707,6 @@ CMDWIZP( noaffect )
 CMDWIZP( reboot )
 {
   char arg[MAX_INPUT_LENGTH];
-  char buf[MAX_STRING_LENGTH];
 
   argument = one_argument(argument,arg);
 
@@ -2781,18 +2735,16 @@ CMDWIZP( reboot )
     if (is_name(arg, "status"))
     {
       if (dreamland->getRebootCounter( ) == -1)
-        sprintf(buf, "Automatic rebooting is inactive.\n\r");
+        ch->pecho("Automatic rebooting is inactive.");
       else
-        sprintf(buf,"Reboot in %i minutes.\n\r", dreamland->getRebootCounter( ));
-      ch->send_to(buf);
+        ch->pecho("Reboot in %i minutes.", dreamland->getRebootCounter( ));
       return;
     }
 
     if (is_number(arg))
     {
      dreamland->setRebootCounter( atoi(arg) );
-     sprintf(buf,"Мир Мечты будет ПЕРЕЗАГРУЖЕН через %i тиков!\n\r",dreamland->getRebootCounter( ));
-     ch->send_to(buf);
+     ch->pecho("Мир Мечты будет ПЕРЕЗАГРУЖЕН через %i тиков!",dreamland->getRebootCounter( ));
      return;
     }
 
@@ -2802,7 +2754,6 @@ CMDWIZP( reboot )
 
 CMDWIZP( olevel )
 {
-    char buf[MAX_INPUT_LENGTH];
     char level[MAX_INPUT_LENGTH];
     char name[MAX_INPUT_LENGTH];
     ostringstream buffer;
@@ -2839,18 +2790,15 @@ CMDWIZP( olevel )
 
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by)
         &&   in_obj->carried_by->in_room != 0)
-            sprintf( buf, "%3d) [%d] %s is carried by %s [Room %d]\n\r",
+            buffer << fmt(0, "%3d) [%d] %s is carried by %s [Room %d]\n\r",
                 number, obj->pIndexData->vnum, obj->getShortDescr('1').c_str( ),ch->sees(in_obj->carried_by, '5').c_str(),
                 in_obj->carried_by->in_room->vnum );
         else if (in_obj->in_room != 0 && ch->can_see(in_obj->in_room))
-            sprintf( buf, "%3d) [%d] %s is in %s [Room %d]\n\r",
+            buffer << fmt(0, "%3d) [%d] %s is in %s [Room %d]\n\r",
                 number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ),in_obj->in_room->getName(),
                 in_obj->in_room->vnum);
         else
-            sprintf( buf, "%3d) [%d]%s is somewhere\n\r",number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ));
-
-        buf[0] = dl_toupper(buf[0]);
-        buffer << buf;
+            buffer << fmt(0, "%3d) [%d]%s is somewhere\n\r",number, obj->pIndexData->vnum,obj->getShortDescr( '1' ).c_str( ));
 
         if (number >= max_found)
             break;
@@ -2864,7 +2812,6 @@ CMDWIZP( olevel )
 
 CMDWIZP( mlevel )
 {
-    char buf[MAX_INPUT_LENGTH];
     ostringstream buffer;
     Character *victim;
     bool found;
@@ -2885,12 +2832,11 @@ CMDWIZP( mlevel )
         {
             found = true;
             count++;
-            sprintf( buf, "%3d) [%5d] %-28s [%5d] %s\n\r", count,
+            buffer << fmt(0, "%3d) [%5d] %-28s [%5d] %s\n\r", count,
                 victim->is_npc() ? victim->getNPC()->pIndexData->vnum : 0,
                 victim->getNameP( '1' ).c_str(),
                 victim->in_room->vnum,
                 victim->in_room->getName() );
-            buffer << buf;
         }
     }
 

@@ -273,7 +273,6 @@ void HomeRecall::doRemove( PCharacter * ch, DLString &arg )
 
 void HomeRecall::doList( PCharacter *ch ) 
 {
-    char buf[MAX_STRING_LENGTH];
     int point;
     Room * room;
     PCharacterMemoryList::const_iterator i;
@@ -291,12 +290,10 @@ void HomeRecall::doList( PCharacter *ch )
         point = attr->getPoint( );
         room = get_room_instance( point );
         
-        sprintf( buf, "%-15s [%-5d] %-25.25s (%s)\r\n", 
+        ch->pecho("%-15s [%-5d] %-25.25s (%s)", 
                  i->second->getName( ).c_str( ), point, 
                  (room ? room->getName() : "{Rnull!{x"),
                  (room ? room->areaName().c_str() : "") );
-
-        ch->send_to( buf );
     }
 }
 

@@ -587,7 +587,6 @@ SKILL_RUNP( ambush )
 {
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
-    char buf[MAX_STRING_LENGTH];
 
     if ( MOUNTED(ch) )
     {
@@ -606,8 +605,7 @@ SKILL_RUNP( ambush )
             }
             else
             {
-                    sprintf(buf, "Ты сидишь в засаде на %s.\n\r", ch->ambushing);
-                    ch->send_to(buf);
+                    ch->pecho("Ты сидишь в засаде на %s.", ch->ambushing);
                     return;
             }
     }

@@ -176,7 +176,6 @@ void mset(Character *ch, char *argument)
 
 void chg_mob_questt( Character* ch, char* argument ) {
   Character* victim;
-  char buf[MAX_INPUT_LENGTH];
   int value;
   int adv_value;
 
@@ -210,8 +209,7 @@ void chg_mob_questt( Character* ch, char* argument ) {
         }
 
         qd->setTime( adv_value );
-        sprintf( buf, "%s %d.\n\r", "Текущее значение:",  adv_value );
-        ch->send_to(buf);
+        ch->pecho("Текущее значение: %d",  adv_value );
         return;
     } else {
       ch->pecho("Ошибочные данные.");
@@ -514,7 +512,6 @@ void sset( Character *ch, char *argument )
     char arg1 [MAX_INPUT_LENGTH];
     char arg2 [MAX_INPUT_LENGTH];
     char arg3 [MAX_INPUT_LENGTH];
-    char buf[MAX_STRING_LENGTH];
 
     Character *victim;
     int value;
@@ -564,8 +561,7 @@ void sset( Character *ch, char *argument )
      */
     if ( !str_cmp(arg3,"?") && !fAll )
     {
-       sprintf( buf, "%s %d.\n\r", "Текущее значение:", victim->getPC( )->getSkillData( sn ).learned.getValue( ) );
-       ch->send_to(buf);
+       ch->pecho("Текущее значение: %d", victim->getPC( )->getSkillData( sn ).learned.getValue( ) );
        return;
     }
 
@@ -591,8 +587,7 @@ void sset( Character *ch, char *argument )
     value = atoi( arg3 );
     if ( value < 0 || value > 100 )
     {
-        sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 100 );
-        ch->send_to(buf);
+        ch->pecho("Значение должно лежать в пределах %d...%d.", 0, 100 );
         return;
     }
 
@@ -606,8 +601,7 @@ void sset( Character *ch, char *argument )
     else
     {
         victim->getPC( )->getSkillData( sn ).learned = value;
-        sprintf( buf, "%s %d.\n\r", "Текущее значение:", value );
-        ch->send_to(buf);
+        ch->pecho("Текущее значение: %d", value );
     }
     
     victim->getPC( )->updateSkills( );

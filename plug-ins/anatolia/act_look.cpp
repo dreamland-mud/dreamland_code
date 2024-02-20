@@ -363,7 +363,6 @@ void show_pockets_to_char( Object *container, Character *ch, ostringstream &buf 
  */
 void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNothing, DLString pocket, Object *container )
 {
-    char buf[MAX_STRING_LENGTH];
     ostringstream output;
     bool fCombine, fConfigCombine;
     map<DLString, int> dups;
@@ -457,8 +456,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
             d = dups.find( *sd );
 
             if (fConfigCombine && d->second != 1) {
-                sprintf( buf, "(%2d) ", d->second );
-                output << buf;
+                output << fmt(0, "(%2d) ", d->second);
             }
             else
                 output << "     ";

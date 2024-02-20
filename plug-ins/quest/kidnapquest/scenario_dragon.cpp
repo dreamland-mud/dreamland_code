@@ -96,15 +96,15 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {
-    char buf[MAX_STRING_LENGTH];
+    DLString msg;
     
     oldact("$c1 вручает тебе $o4.", king, mark, hero, TO_VICT);
     oldact("$c1 вручает $C3 $o4.", king, mark, hero, TO_NOTVICT);
 
     oldact("$c1 говорит тебе '{GПередай эту игрушку моему малышу, чтобы он знал, что тебе можно доверять.{x'", king, 0, hero, TO_VICT);
-    sprintf( buf, "$c1 говорит тебе '{GПоторопись! У тебя будет всего {Y%d{G минут%s, чтобы вернуть его в целости и сохранности.{x'",
+    msg = fmt(0, "$c1 говорит тебе '{GПоторопись! У тебя будет всего {Y%d{G минут%s, чтобы вернуть его в целости и сохранности.{x'",
              time, GET_COUNT(time, "а", "ы", "") );
-    oldact(buf, king, 0, hero, TO_VICT);
+    oldact(msg.c_str(), king, 0, hero, TO_VICT);
 }
 void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const 
 {

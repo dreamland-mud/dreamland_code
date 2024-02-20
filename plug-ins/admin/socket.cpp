@@ -21,6 +21,7 @@
 #include "pcharactermanager.h"
 #include "merc.h"
 #include "descriptor.h"
+#include "act.h"
 
 CMDADM( socket )
 {
@@ -78,8 +79,8 @@ CMDADM( socket )
         const char *myHost, *myIP;
         DLString p;
         const char * state;
-        char logon[100];
-        char idle[10];
+        DLString logon;
+        DLString idle;
 
         if (d->character) {
             PCharacter *player;
@@ -102,12 +103,12 @@ CMDADM( socket )
         }
         
         if (d->character && d->connected == CON_PLAYING) {
-            strncpy( logon, d->character->getPC( )->age.getLogon( ).getTimeAsString( "%H:%M" ).c_str( ), 100 );
-            sprintf( idle, "%3d", d->character->timer );
+            logon = d->character->getPC( )->age.getLogon( ).getTimeAsString( "%H:%M" );
+            idle = fmt(0, "%3d", d->character->timer);
         }
         else {
-            sprintf( logon, "-----" );
-            sprintf( idle, "   " );
+            logon = "-----";
+            idle = "   ";
         }
         
         switch (d->connected) {
@@ -133,8 +134,8 @@ CMDADM( socket )
         ch->pecho( "[%3d %10s %-5s %s %c %s] %-12s %-15s %s",
                         d->descriptor,
                         state,
-                        logon,
-                        idle,
+                        logon.c_str(),
+                        idle.c_str(),
                         d->out_compress ? '*' : ' ',
                         p.c_str( ),
                         name.c_str( ),

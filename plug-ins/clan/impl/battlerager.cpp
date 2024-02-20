@@ -611,3 +611,4 @@ void ClanGuardBattlerager::actPush( PCharacter *wch )
 }
 
 
+SKILL_DECL(trophy);

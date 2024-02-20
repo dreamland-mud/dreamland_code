@@ -242,15 +242,13 @@ void say_fmt( const char *msg, ... )
 
 void tell_raw(Character *ch, NPCharacter *talker, const char *format, ...)
 {
-    char buf[MAX_STRING_LENGTH];
     va_list ap;
 
     va_start(ap, format);
-    vsprintf(buf, format, ap);
+    DLString messageMiddle = vfmt(0, format, ap);
     va_end(ap);
 
     DLString messageStart = fmt(ch, "%^C1 говорит тебе '{G", talker);
-    DLString messageMiddle = buf;
     DLString messageEnd = "{x'\n\r";
 
     ch->send_to(messageStart + messageMiddle + messageEnd);

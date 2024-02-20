@@ -259,8 +259,8 @@ void HunterEquip::config( PCharacter *wch )
     if (obj->pIndexData->extra_descr) {
         char buf[MAX_STRING_LENGTH];
 
-        sprintf( buf, obj->pIndexData->extra_descr->description, wch->getNameP('1').c_str() );
-        obj->addExtraDescr( obj->pIndexData->extra_descr->keyword, buf );
+        DLString ed = fmt(0, obj->pIndexData->extra_descr->description, wch->getNameP('1').c_str());
+        obj->addExtraDescr( obj->pIndexData->extra_descr->keyword, ed );
     }
 }   
 
@@ -629,7 +629,6 @@ SKILL_RUNP( hunt )
 SPELL_DECL(FindObject);
 VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level ) 
 { 
-    char buf[MAX_INPUT_LENGTH];
     ostringstream buffer;
     Object *obj;
     Object *in_obj;
@@ -656,24 +655,25 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
         for ( in_obj = obj; in_obj->in_obj != 0; in_obj = in_obj->in_obj )
             ;
 
+        DLString where;
+
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by))
         {
-            sprintf( buf, "имеется у %s\n\r",
+            where = fmt(0, "имеется у %s\n\r",
                 ch->sees(in_obj->carried_by,'2').c_str() );
         }
         else
         {
             if (ch->is_immortal() && in_obj->in_room != 0)
-                sprintf( buf, "находится в %s [Комната %d]\n\r",
+                where = fmt(0, "находится в %s [Комната %d]\n\r",
                     in_obj->in_room->getName(), in_obj->in_room->vnum);
             else
-                sprintf( buf, "находится в %s\n\r",
+                where = fmt(0, "находится в %s\n\r",
                     in_obj->in_room == 0
                         ? "somewhere" : in_obj->in_room->getName() );
         }
 
-        buf[0] = dl_toupper(buf[0]);
-        buffer << buf;
+        buffer << where.upperFirstCharacter();
 
         if (number >= max_found)
             break;
@@ -921,8 +921,8 @@ void HunterBeaconTrap::greet( Character *victim )
 //    oldact("Рядом с тобой раздается щелчок.", victim, 0, 0, TO_ALL );
 
     clantalk( *clan_hunter, 
-              "Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s.",
-              obj->in_room->getName(), victim->getNameP( '2' ).c_str( ) );
+              fmt(0, "Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s.",
+              obj->in_room->getName(), victim->getNameP( '2' ).c_str( )) );
     
     log( victim, "активизирует" );
 

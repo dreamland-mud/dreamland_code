@@ -204,25 +204,22 @@ void show_skills(Character *ch, int target)
 
 void show_spec_cmds(Character * ch)
 {
-    char buf[MAX_STRING_LENGTH];
-    char buf1[MAX_STRING_LENGTH];
+    ostringstream buf;
     int spec;
     int col;
 
-    buf1[0] = '\0';
     col = 0;
     stc("Все специальные функции начинаются с 'spec_'\n\r\n\r", ch);
     for (spec = 0; spec_table[spec].function != NULL; spec++) {
-        sprintf(buf, "%-19s", &spec_table[spec].name[5]);
-        strcat(buf1, buf);
+        buf << fmt(0, "%-19s", &spec_table[spec].name[5]);
         if (++col % 4 == 0)
-            strcat(buf1, "\n\r");
+            buf << endl;
     }
 
     if (col % 4 != 0)
-        strcat(buf1, "\n\r");
+        buf << endl;
 
-    stc(buf1, ch);
+    ch->send_to(buf);
 }
 
 void show_liq_cmds(Character * ch)

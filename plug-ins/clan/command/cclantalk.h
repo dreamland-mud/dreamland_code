@@ -9,7 +9,7 @@
 #include "clan.h"
 #include "commandplugin.h"
 
-void clantalk( Clan &, const char *, ... );
+void clantalk( Clan &, const DLString &message );
 
 class CClanTalk : public CommandPlugin {
 public:

@@ -91,7 +91,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const
 {
-    char buf[MAX_STRING_LENGTH];
+    DLString msg;
     
     oldact("$c1 вручает тебе $o4.", king, mark, hero, TO_VICT);
     oldact("$c1 вручает $C3 $o4.", king, mark, hero, TO_NOTVICT);
@@ -99,16 +99,16 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
     oldact("$c1 говорит тебе '{GВозьми этот бидончик и передай ей...{x'", king, 0, hero, TO_VICT);
     if(number_percent() < 10) {
         oldact("$c1 пронзительно кричит '{YЧТОБ БЕЗ МОЛОКА НЕ ВОЗВРАЩАЛАСЬ!...{x'", king, 0, hero, TO_VICT);
-        sprintf( buf, "$c1 говорит тебе '{GИ учти, что через {Y%d{G минут%s мое терпение лопнет!{x'",
+        msg = fmt(0, "$c1 говорит тебе '{GИ учти, что через {Y%d{G минут%s мое терпение лопнет!{x'",
                  time, GET_COUNT(time, "у", "ы", "") );
     } else {
-        sprintf( buf, "$c1 говорит тебе '{GПоторопись! Материнское сердце подсказывает мне, "
+        msg = fmt(0, "$c1 говорит тебе '{GПоторопись! Материнское сердце подсказывает мне, "
                       "что если ты не приведешь ее ко мне через {Y%d{G минут%s, "
                       "с ней случится что-то непоправимое.{x'",
                  time, GET_COUNT(time, "у", "ы", "") );
     }
 
-    oldact(buf, king, 0, hero, TO_VICT);
+    oldact(msg.c_str(), king, 0, hero, TO_VICT);
 }
 void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const
 {

@@ -297,13 +297,13 @@ CMDRUN( nuke )
  */
 CMDRUN( split )
 {
-    char buf[MAX_STRING_LENGTH];
     DLString arg1, arg2;
     Character *gch;
     int members;
     int amount_gold = 0, amount_silver = 0;
     int share_gold, share_silver;
     int extra_gold, extra_silver;
+    DLString msgGroup;
     DLString argument = constArguments;
     
     arg1 = argument.getOneArgument( );
@@ -378,37 +378,35 @@ CMDRUN( split )
 
     if (share_silver > 0)
     {
-        sprintf(buf,
-            "Ты делишь %d серебрянн%s. Ты получаешь %d серебра.\n\r",
+        ch->pecho(
+            "Ты делишь %d серебрянн%s. Ты получаешь %d серебра.",
              amount_silver,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
             share_silver + extra_silver);
-        ch->send_to(buf);
     }
 
     if (share_gold > 0)
     {
-        sprintf(buf,
-            "Ты делишь %d золот%s. Ты получаешь %d золота.\n\r",
+        ch->pecho(
+            "Ты делишь %d золот%s. Ты получаешь %d золота.",
              amount_gold,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
              share_gold + extra_gold);
-        ch->send_to(buf);
     }
 
     if (share_gold == 0)
     {
-        sprintf(buf,"$c1 делит %d серебрянн%s. Ты получаешь %d серебра.",
+        msgGroup = fmt(0, "$c1 делит %d серебрянн%s. Ты получаешь %d серебра.",
                 amount_silver,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
                 share_silver);
     }
     else if (share_silver == 0)
     {
-        sprintf(buf,"$c1 делит %d золот%s. Ты получаешь %d золота.",
+       msgGroup = fmt(0, "$c1 делит %d золот%s. Ты получаешь %d золота.",
                 amount_gold,GET_COUNT(amount_silver,"ую монету","ые монеты","ых монет"),
                 share_gold);
     }
     else
     {
-        sprintf(buf,"$c1 делит %d серебра и %d золота, дает тебе %d серебра и %d золота.\n\r",
+        msgGroup = fmt(0, "$c1 делит %d серебра и %d золота, дает тебе %d серебра и %d золота.",
          amount_silver,amount_gold,share_silver,share_gold);
     }
 
@@ -416,7 +414,7 @@ CMDRUN( split )
     {
         if ( gch != ch && is_same_group(gch,ch) && !IS_CHARMED(gch))
         {
-            oldact( buf, ch, 0, gch, TO_VICT);
+            oldact( msgGroup.c_str(), ch, 0, gch, TO_VICT);
             gch->gold += share_gold;
             gch->silver += share_silver;
         }

@@ -31,7 +31,6 @@ static int skill_lookup( const DLString &name )
 // Object Editor Functions.
 void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 {
-    char buf[MAX_STRING_LENGTH];
     bool random;
 
     switch (obj->item_type) {
@@ -84,13 +83,12 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
 
     case ITEM_LIGHT:
-        sprintf(buf, "[v2] Light:  [%d]\n\r", obj->value[2]);
-        stc(buf, ch);
+        ptc(ch, "[v2] Light:  [%d]\n\r", obj->value[2]);
         break;
 
     case ITEM_WAND:
     case ITEM_STAFF:
-        sprintf(buf,
+        ptc(ch, 
                   "[v0] Level:          [%d]\n\r"
                   "[v1] Charges Total:  [%d]\n\r"
                   "[v2] Charges Left:   [%d]\n\r"
@@ -99,11 +97,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
                   obj->value[1],
                   obj->value[2],
                   get_skill_name( obj->value[3] ));
-        stc(buf, ch);
         break;
 
     case ITEM_PORTAL:
-        sprintf(buf,
+        ptc(ch, 
                   "[v0] Charges:        [%d]\n\r"
                   "[v1] Exit Flags:     %s {D(? exit_flags){x\n\r"
                   "[v2] Portal Flags:   %s {D(? portal_flags){x\n\r"
@@ -113,11 +110,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
                   exit_flags.names(obj->value[1]).c_str(),
                   portal_flags.names(obj->value[2]).c_str(),
                   obj->value[3], obj->value[4]);
-        stc(buf, ch);
         break;
 
     case ITEM_FURNITURE:
-        sprintf(buf,
+        ptc(ch, 
                   "[v0] Max people:      [%d]\n\r"
                   "[v1] Max weight:      [%d]\n\r"
                   "[v2] Furniture Flags: %s {D(? furniture_flags){x\n\r"
@@ -128,13 +124,12 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
                   furniture_flags.names(obj->value[2]).c_str(),
                   obj->value[3],
                   obj->value[4]);
-        stc(buf, ch);
         break;
 
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-        sprintf(buf,
+        ptc(ch, 
                   "[v0] Level:  [%d]\n\r"
                   "[v1] Spell:  %s {D(? spells){x\n\r"
                   "[v2] Spell:  %s\n\r"
@@ -145,11 +140,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
                   get_skill_name( obj->value[2] ),
                   get_skill_name( obj->value[3] ),
                   get_skill_name( obj->value[4] ) );
-        stc(buf, ch);
         break;
 
     case ITEM_ARMOR:
-        sprintf(buf,
+        ptc(ch, 
                   "[v0] Ac pierce       [%d]\n\r"
                   "[v1] Ac bash         [%d]\n\r"
                   "[v2] Ac slash        [%d]\n\r"
@@ -158,7 +152,6 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
                   obj->value[1],
                   obj->value[2],
                   obj->value[3]);
-        stc(buf, ch);
         break;
 
     case ITEM_WEAPON:

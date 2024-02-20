@@ -951,13 +951,10 @@ CMDRUNP(report)
     DLString arg = args.getOneArgument();
 
     if (!ch->is_npc() || !IS_CHARMED(ch)) {
-        char buf[MAX_INPUT_LENGTH];
-        sprintf(buf,
-                "У меня %d/%d жизни (hp) %d/%d энергии (mana) %d/%d движения (mv).",
+        say_fmt("У меня %3d/%4d жизни (hp) %5d/%6d энергии (mana) %7d/%8d движения (mv).", ch, 0,
                 ch->hit.getValue(), ch->max_hit.getValue(),
                 ch->mana.getValue(), ch->max_mana.getValue(),
                 ch->move.getValue(), ch->max_move.getValue());
-        do_say(ch, buf);
         return;
     }
 
@@ -1140,19 +1137,18 @@ CMDRUNP(report)
  */
 CMDRUNP( wimpy )
 {
-    char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
     int wimpy;
 
     one_argument( argument, arg );
 
-    if ((ch->getProfession( ) == prof_samurai) && (ch->getRealLevel( ) >=10))
-        {
-         sprintf(buf,"Стыдись! Это будет слишком большим позором для самурая.\n\r");
-         ch->send_to(buf);
-         if (ch->wimpy != 0) ch->wimpy = 0;
-         return;
-        }
+    if ((ch->getProfession() == prof_samurai) && (ch->getRealLevel() >= 10))
+    {
+        ch->pecho("Стыдись! Это будет слишком большим позором для самурая.");
+        if (ch->wimpy != 0) 
+            ch->wimpy = 0;
+        return;
+    }
 
     if ( arg[0] == '\0' )
         wimpy = ch->max_hit / 5;
@@ -1172,8 +1168,7 @@ CMDRUNP( wimpy )
 
     ch->wimpy        = wimpy;
 
-    sprintf( buf, "Ты попытаешься убежать при %d очков жизни{le (hit points){x.\n\r", wimpy );
-    ch->send_to( buf);
+    ch->pecho("Ты попытаешься убежать при %d очков жизни{le (hit points){x.", wimpy );
     return;
 }
 

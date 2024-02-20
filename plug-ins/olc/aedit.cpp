@@ -544,7 +544,6 @@ AEDIT(file, "файл", "установить имя файла, в которы
 AEDIT(security, "права", "установить уровень доступа к арии, 0..9")
 {
     char sec[MAX_STRING_LENGTH];
-    char buf[MAX_STRING_LENGTH];
     int value;
 
     one_argument(argument, sec);
@@ -558,8 +557,7 @@ AEDIT(security, "права", "установить уровень доступ�
 
     if (value > ch->getSecurity( ) || value < 0) {
         if (ch->getSecurity() != 0) {
-            sprintf(buf, "Security is 0-%d.\n\r", ch->getSecurity());
-            stc(buf, ch);
+            ch->pecho("Security is 0-%d.", ch->getSecurity());
         }
         else
             stc("Security is 0 only.\n\r", ch);

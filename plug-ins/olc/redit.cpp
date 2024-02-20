@@ -650,8 +650,6 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
     }
 
     if (!str_cmp(command, "dig")) {
-        char buf[MAX_STRING_LENGTH];
-
         if (arg[0] == '\0') {
             stc("Syntax: [direction] dig (<vnum> | next)\n\r", ch);
             return false;
@@ -661,8 +659,8 @@ OLCStateRoom::change_exit(PCharacter * ch, const char *cargument, int door)
         if(!newRoom)
             return false;
     
-        sprintf(buf, "link %d", newRoom->vnum);
-        change_exit(ch, buf, door);
+        DLString cmd = fmt(0, "link %d", newRoom->vnum);
+        change_exit(ch, cmd.c_str(), door);
         return true;
     }
 

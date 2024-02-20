@@ -272,11 +272,9 @@ CMDADM( codesource )
             return;
         } 
         
-        char buf[MAX_STRING_LENGTH];
-        sprintf( buf, "%s: %s\r\n", 
+        ch->pecho("%s: %s", 
                         pch->getNameC(), 
                         csa->name.getValue( ).c_str( ));
-        page_to_char(buf, ch);
         
         XMLVectorBase<XMLString>::iterator i;
         

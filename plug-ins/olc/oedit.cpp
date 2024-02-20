@@ -243,40 +243,32 @@ void OLCStateObject::statePrompt(Descriptor *d)
 OEDIT(show)
 {
     OBJ_INDEX_DATA *pObj;
-    char buf[MAX_STRING_LENGTH];
     int cnt = 0;
     bool showWeb = !arg_oneof_strict(argument, "noweb");
 
     EDIT_OBJ(ch, pObj);
 
-    sprintf(buf, "Name:        [%s] %s\n\rArea:        [%5d] %s\n\r",
+    ptc(ch, "Name:        [%s] %s\n\rArea:        [%5d] %s\n\r",
               pObj->name,
               web_edit_button(showWeb, ch, "name", "web").c_str(),
               !pObj->area ? -1 : pObj->area->vnum,
               !pObj->area ? "No Area" : pObj->area->getName().c_str());
-    stc(buf, ch);
 
 
-    sprintf(buf, "Vnum:        [%7d]\n\r", pObj->vnum);
-    stc(buf, ch);
+    ptc(ch, "Vnum:        [%7d]\n\r", pObj->vnum);
 
-    sprintf(buf, "Type:        [%s] {D(? item_table){x\n\r",
+    ptc(ch, "Type:        [%s] {D(? item_table){x\n\r",
               item_table.name(pObj->item_type).c_str());
-    stc(buf, ch);
 
-    sprintf(buf, "Level:       [%5d]\n\r", pObj->level);
-    stc(buf, ch);
+    ptc(ch, "Level:       [%5d]\n\r", pObj->level);
     
-    sprintf(buf, "Limit:       [%5d]\n\r", pObj->limit);
-    stc(buf, ch);
+    ptc(ch, "Limit:       [%5d]\n\r", pObj->limit);
 
-    sprintf(buf, "Wear flags:  [%s] {D(? wear_flags){x\n\r",
+    ptc(ch, "Wear flags:  [%s] {D(? wear_flags){x\n\r",
               wear_flags.names(pObj->wear_flags).c_str());
-    stc(buf, ch);
 
-    sprintf(buf, "Extra flags: [%s] {D(? extra_flags){x\n\r",
+    ptc(ch, "Extra flags: [%s] {D(? extra_flags){x\n\r",
               extra_flags.names(pObj->extra_flags).c_str());
-    stc(buf, ch);
 
     ptc(ch, "Material:    [%s] {D(? material){x\n\r", pObj->material);
 
@@ -311,10 +303,9 @@ OEDIT(show)
         stc(" {D(ed help){x\n\r", ch);
     }
 
-    sprintf(buf, "Short desc:  %s %s\n\rLong desc: %s\n\r     %s\n\r",
+    ptc(ch, "Short desc:  %s %s\n\rLong desc: %s\n\r     %s\n\r",
               pObj->short_descr, web_edit_button(showWeb, ch, "short", "web").c_str(),
               web_edit_button(showWeb, ch, "long", "web").c_str(), pObj->description);
-    stc(buf, ch);
 
     for (auto &paf: pObj->affected) {
         if (cnt == 0) {
@@ -322,7 +313,7 @@ OEDIT(show)
             stc("------  --------  --------  --------------  ---------------------------\n\r", ch);
         }
 
-        sprintf(buf, "[%4d]  %-8.8s  %8d", cnt,
+        ptc(ch, "[%4d]  %-8.8s  %8d", cnt,
                   paf->location.name().c_str(),
                   paf->modifier.getValue());
        
@@ -330,32 +321,31 @@ OEDIT(show)
         const GlobalRegistryBase *registry = paf->global.getRegistry();
 
         if ((table && paf->bitvector.getValue()) || registry) { 
-            sprintf(buf+strlen(buf), "  %-14.14s  ",
+            ptc(ch, "  %-14.14s  ",
                       registry ? registry->getRegistryName().c_str() : paf->bitvector.getTableName().c_str());
 
             if (registry) {
-                sprintf(buf+strlen(buf), "%s", paf->global.toString().c_str());
+                ptc(ch, "%s", paf->global.toString().c_str());
 
                 if (registry == liquidManager) {
-                    strcat(buf, " {D(? liquid){x");
+                    ptc(ch, " {D(? liquid){x");
                 } else if (registry == skillManager) {
                                         
                 } else if (registry == skillGroupManager) {
-                    strcat(buf, " {D(? practicer){x");
+                    ptc(ch, " {D(? practicer){x");
                 } else if (registry == wearlocationManager) {
-                    strcat(buf, " {D(? wearloc){x");
+                    ptc(ch, " {D(? wearloc){x");
                 } else {
-                    strcat(buf, "<unknown registry>");
+                    ptc(ch, "<unknown registry>");
                 }
 
             } else {
-                strcat(buf, paf->bitvector.names().c_str());
-                sprintf(buf+strlen(buf), " {D(? %s){x", paf->bitvector.getTableName().c_str());
+                ptc(ch, paf->bitvector.names().c_str());
+                ptc(ch, " {D(? %s){x", paf->bitvector.getTableName().c_str());
             }
         }
 
-        strcat(buf, "\n\r");
-        stc(buf, ch);
+        ptc(ch, "\n\r");
         cnt++;
     }
     if (!pObj->affected.empty())
@@ -944,15 +934,13 @@ OEDIT(list)
     int cnt;
     RoomIndexData *pRoom;
     OBJ_INDEX_DATA *pObj;
-    char buf[MAX_STRING_LENGTH];
     ostringstream buffer;
     
     EDIT_OBJ(ch, pObj);
     
-    snprintf(buf, sizeof(buf), "Resets for object [{W%d{x] ({g%s{x):\n\r",
+    buffer << fmt(0, "Resets for object [{W%d{x] ({g%s{x):\n\r",
             pObj->vnum, 
             russian_case(pObj->short_descr, '1').c_str( ));
-    buffer << buf;
     
     cnt = 0;
     for (auto &r: roomIndexMap) {
@@ -964,16 +952,14 @@ OEDIT(list)
                 case 'O':
                 case 'P':
                     if(pReset->arg1 == pObj->vnum) {
-                        snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
+                        buffer << fmt(0, "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
                                 pReset->command, pRoom->vnum, pRoom->name);
-                        buffer << buf;
                         cnt++;
                     }
             }
     }
 
-    snprintf(buf, sizeof(buf), "Total {W%d{x resets found.\n\r", cnt);
-    buffer << buf;
+    buffer << fmt(0, "Total {W%d{x resets found.\n\r", cnt);
     
     page_to_char( buffer.str( ).c_str( ), ch );
     return false;

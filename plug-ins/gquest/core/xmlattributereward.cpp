@@ -14,6 +14,7 @@
 #include "class.h"
 #include "pcharacter.h"
 #include "descriptor.h"
+#include "act.h"
 
 XMLReward::XMLReward( )
 {
@@ -41,7 +42,7 @@ void XMLAttributeReward::addReward( const XMLReward &r )
 void XMLAttributeReward::reward( PCharacter *ch ) 
 {
     XMLVectorBase<XMLReward>::iterator r;
-    char buf[MAX_STRING_LENGTH];
+    ostringstream buf;
     const char *offset = "            ";
     int c;
 
@@ -51,12 +52,12 @@ void XMLAttributeReward::reward( PCharacter *ch )
             continue;
         }
 
-        sprintf( buf, "%s\r\n", r->reason.c_str( ) );
+        buf << r->reason << endl;
             
         c = r->gold;
         if (c > 0) {
             ch->gold += c;
-            sprintf( buf + strlen(buf), "%s%s%4d %sзолот%s\r\n",
+            buf << fmt(0, "%s%s%4d %sзолот%s\r\n",
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "ую монету", "ые монеты", "ых монет") );
         }
@@ -64,7 +65,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         c = r->qpoints;
         if (c > 0) {
             ch->addQuestPoints(c);
-            sprintf( buf + strlen(buf), "%s%s%4d %sквестов%s\r\n",
+            buf << fmt(0, "%s%s%4d %sквестов%s\r\n",
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "ую единицу", "ые единицы", "ых единиц") );
         }
@@ -72,7 +73,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         c = r->practice;
         if (c > 0) {
             ch->practice += c;
-            sprintf( buf + strlen(buf), "%s%s%4d %sпрактик%s\r\n",
+            buf << fmt(0, "%s%s%4d %sпрактик%s\r\n",
                       offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                       GET_COUNT(c, "у", "и", "") );
         }
@@ -80,7 +81,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
         c = r->experience;
         if (c > 0) {
             ch->gainExp( c );
-            sprintf( buf + strlen(buf), "%s%s%4d %sочк%s опыта\r\n",
+            buf << fmt(0, "%s%s%4d %sочк%s опыта\r\n",
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "о", "а", "ов"));
         }

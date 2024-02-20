@@ -207,7 +207,6 @@ void InvasionGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
 
 void InvasionGQuest::progress( std::ostringstream &ostr ) const
 {
-    char buf[MAX_STRING_LENGTH];
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
 
@@ -219,11 +218,11 @@ void InvasionGQuest::progress( std::ostringstream &ostr ) const
         if (!attr || attr->getKilled( ) <= 0)
             continue;
 
-        sprintf(buf, "%s%-15s %s%-4d%s",
+        ostr << fmt(0, "%s%-15s %s%-4d%s",
                      GQChannel::NORMAL, i->second->getName( ).c_str( ),         
                      GQChannel::BOLD, attr->getKilled( ), GQChannel::NORMAL);
 
-        ostr << buf << endl;
+        ostr << endl;
     }
 }
 

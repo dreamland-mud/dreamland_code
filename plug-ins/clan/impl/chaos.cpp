@@ -357,8 +357,8 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         Affect af;
         int mirrors,new_mirrors;
         Character *tmp_vict, *gch;
-        char long_buf[MAX_STRING_LENGTH];
-        char short_buf[20];
+        DLString long_buf;
+        DLString short_buf;
 
         if (victim->is_npc())
         {
@@ -392,9 +392,9 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         
         tmp_vict = victim->getDoppel( );
 
-        sprintf(long_buf, "{W%s{x%s здесь.\n\r",
+        long_buf = fmt(0, "{W%s{x%s здесь.\n\r",
                 tmp_vict->getNameP( '1' ).c_str(), tmp_vict->getPC( )->getParsedTitle( ).c_str( ));
-        strcpy(short_buf, tmp_vict->getNameC() );
+        short_buf = tmp_vict->getNameC();
 
         if ( ch == victim )
         {
