@@ -216,7 +216,7 @@ SKILL_RUNP( brandish )
 
             try {
                 if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ )) {
-                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, str_empty), 0);
+                    ::spell_nocatch(spell, level, ch, SpellTarget::Pointer(NEW, DLString::emptyString), 0);
                     gsn_staves->improve( ch, true );
                 }
                 else if (IS_SET( t, TAR_ROOM|TAR_PEOPLE )) {

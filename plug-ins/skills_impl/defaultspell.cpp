@@ -112,8 +112,7 @@ void DefaultSpell::run( Character *ch, SpellTarget::Pointer spt, int level )
 
     switch (spt->type) {
     case SpellTarget::NONE:
-        strcpy( arg, spt->arg );
-        run( ch, arg, sn, level );
+        run( ch, spt->arg, sn, level );
         break;
     case SpellTarget::CHAR:
         run( ch, spt->victim, sn, level );
@@ -142,8 +141,7 @@ bool DefaultSpell::apply( Character *ch, SpellTargetPointer spt, int level )
         
     switch (spt->type) {
     case SpellTarget::NONE:
-        strcpy( arg, spt->arg );
-        rc = apply( ch, arg, level );
+        rc = apply( ch, spt->arg, level );
         break;
     case SpellTarget::CHAR:
         rc = apply( ch, spt->victim, level );
@@ -628,7 +626,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
     if (target.isSet( TAR_IGNORE|TAR_CREATE_OBJ )) {
         result->type = SpellTarget::NONE;
-        result->arg = arg.c_str( );
+        result->arg = arg;
         return result;
     }
 
@@ -646,7 +644,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         }
         else {
             result->type = SpellTarget::NONE;
-            result->arg = arg.c_str( );
+            result->arg = arg;
         }
 
         return result;

@@ -20,14 +20,14 @@ struct SpellTarget : public virtual DLObject {
     SpellTarget( Character *victim ); 
     SpellTarget( Object *obj );
     SpellTarget( Room *room ); 
-    SpellTarget( const char *arg );
+    SpellTarget( const DLString &arg);
 
     virtual ~SpellTarget( );
     
     void init( );
     inline bool isValid( ) const;
 
-    const char *arg;
+    DLString arg;
     Character *victim;
     Object *obj;
     Room *room;

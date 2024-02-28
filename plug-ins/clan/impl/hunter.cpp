@@ -627,14 +627,14 @@ SKILL_RUNP( hunt )
 }
 
 SPELL_DECL(FindObject);
-VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level ) 
+VOID_SPELL(FindObject)::run( Character *ch, const DLString &constArgs, int sn, int level ) 
 { 
     ostringstream buffer;
     Object *obj;
     Object *in_obj;
     bool found;
     int number = 0, max_found;
-    DLString args = arg_unquote(target_name);
+    DLString args = arg_unquote(constArgs);
     
     found = false;
     number = 0;
@@ -689,7 +689,7 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
 
 
 SPELL_DECL(TakeRevenge);
-VOID_SPELL(TakeRevenge)::run( Character *ch, char *target_name, int sn, int level ) 
+VOID_SPELL(TakeRevenge)::run( Character *ch, const DLString &, int sn, int level ) 
 { 
     Object *obj;
     Room *room;

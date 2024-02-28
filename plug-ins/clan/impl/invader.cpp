@@ -168,11 +168,11 @@ SKILL_RUNP(fade)
 }
 
 SPELL_DECL(EyesOfIntrigue);
-VOID_SPELL(EyesOfIntrigue)::run(Character *ch, char *target_name, int sn, int level)
+VOID_SPELL(EyesOfIntrigue)::run(Character *ch, const DLString &args, int sn, int level)
 {
     Character *victim;
 
-    if ((victim = get_char_world(ch, target_name, FFIND_DOPPEL)) == 0 || DIGGED(victim))
+    if ((victim = get_char_world(ch, args, FFIND_DOPPEL)) == 0 || DIGGED(victim))
     {
         ch->pecho("Тьма не может обнаружить это существо.");
         return;

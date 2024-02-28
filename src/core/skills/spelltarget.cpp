@@ -26,7 +26,7 @@ SpellTarget::SpellTarget( Room *room )
     this->room = room;
     type = ROOM;
 }
-SpellTarget::SpellTarget( const char *arg )
+SpellTarget::SpellTarget( const DLString &arg )
 {
     init( );
     this->arg = arg;

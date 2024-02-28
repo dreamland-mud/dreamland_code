@@ -49,13 +49,13 @@ public:
     virtual void run( Character *, SpellTargetPointer, int );             
     virtual void run( Character *, Character *, int, int ) { }
     virtual void run( Character *, ::Object *, int, int ) { }
-    virtual void run( Character *, char *, int, int ) { }
+    virtual void run( Character *, const DLString &arg, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
 
     virtual bool apply( Character *ch, SpellTargetPointer target, int level );
     virtual bool apply( Character *ch, Character *victim, int level) { return false; }
     virtual bool apply( Character *ch, ::Object *obj, int level) { return false; }
-    virtual bool apply( Character *ch, char *arg, int level) { return false; }
+    virtual bool apply( Character *ch, const DLString &arg, int level) { return false; }
     virtual bool apply( Character *ch, Room *room, int level) { return false; }
 
     virtual int getMaxRange( Character * ) const;                

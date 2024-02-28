@@ -327,7 +327,7 @@ SpellTarget::Pointer arg2target(const Register &a)
     case Register::STRING:
     case Register::NUMBER:
         target->type = SpellTarget::NONE;
-        target->arg = a.toString().c_str();
+        target->arg = a.toString();
         return target;
 
     case Register::OBJECT:

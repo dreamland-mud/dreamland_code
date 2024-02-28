@@ -403,7 +403,7 @@ void spell_by_item( Character *ch, Object *obj )
 
         if (IS_SET(target, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB)) {
             result->type = SpellTarget::NONE;
-            result->arg = "";
+            result->arg = DLString::emptyString;
         }
         else if (IS_SET(target, TAR_ROOM|TAR_PEOPLE)) {
             result->type = SpellTarget::ROOM;

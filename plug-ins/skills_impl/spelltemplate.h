@@ -20,7 +20,7 @@ struct SpellTemplate<tn, DefaultSpell> : public DefaultSpell, public ClassSelfRe
     
     virtual void run( Character *, Character *, int, int ) { }
     virtual void run( Character *, Object *, int, int ) { }
-    virtual void run( Character *, char *, int, int ) { }
+    virtual void run( Character *, const DLString &, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
     virtual bool apply( Character *ch, Character *victim, int level ) { return false; }    
 

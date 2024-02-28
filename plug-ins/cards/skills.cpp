@@ -36,7 +36,7 @@ GSN(joker);
  * 'ace in sleeves' spell 
  */
 SPELL_DECL(AceInSleeves);
-VOID_SPELL(AceInSleeves)::run( Character *ch, char *, int sn, int level ) 
+VOID_SPELL(AceInSleeves)::run( Character *ch, const DLString &, int sn, int level ) 
 {
     OBJ_INDEX_DATA *pSleevesIndex;
     Object *sleeves;

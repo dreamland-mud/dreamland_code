@@ -1660,7 +1660,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
 
 SPELL_DECL(ShieldOfRuler);
-VOID_SPELL(ShieldOfRuler)::run( Character *ch, char *target_name, int sn, int level ) 
+VOID_SPELL(ShieldOfRuler)::run( Character *ch, const DLString&, int sn, int level ) 
 { 
   int shield_vnum;
   Object *shield;
