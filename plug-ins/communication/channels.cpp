@@ -37,7 +37,7 @@ TellChannel::TellChannel( )
 
 Character * TellChannel::findListener( Character *ch, const DLString &name ) const
 {
-    Character *victim = get_char_room(ch, name.c_str());
+    Character *victim = get_char_room(ch, name);
     if (!victim) 
         victim = get_player_world(ch, name.c_str(), false);
 

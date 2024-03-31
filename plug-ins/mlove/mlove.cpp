@@ -57,7 +57,7 @@ CMDRUN( mlove )
         
         arg = arguments.getOneArgument( );
 
-        if ( (victim = get_char_room(ch, arg.c_str())) == 0 ) {
+        if ( (victim = get_char_room(ch, arg)) == 0 ) {
             ch->pecho("Объект твоей страсти куда-то подевался.");
             return;
         }

@@ -89,14 +89,12 @@ bool        mprog_extract( Character *ch, bool count );
 #define FFIND_PLR_ONLY    (G) // ignore mobs when searching
 
 int                count_obj_list        ( obj_index_data *obj, Object *list );
-Character *        get_char_room        ( Character *ch, const DLString &, int flags = 0 );
-Character *        get_char_room        ( Character *ch, char *argument, int flags = 0 );
+Character *        get_char_room        ( Character *ch, const DLString &arg, int flags = 0 );
 Character *        get_char_room        ( Character *ch, Room *room, const DLString &arg, int flags = 0 );
-Character *        get_char_room        ( Character *ch, Room *room, const char *argument, int *number, int flags = 0 );
+Character *        get_char_room        ( Character *ch, Room *room, const DLString &arg, int *number, int flags = 0 );
 Character *        get_char_world        ( Character *ch, const char *argument, int flags = 0 );
 Character *        get_char_world        ( Character *ch, const DLString &arg, int flags = 0 );
 PCharacter *        get_player_world( Character *ch, const char *arg, bool fSeenOnly = true );
-bool char_has_name(Character *target, const char *arg);
 Object *        get_obj_list        ( Character *ch, const DLString &cArg, Object *list, DLString pocket = "" );
 Object *        get_obj_carry        ( Character *ch, const DLString & );
 Object *        get_obj_carry        ( Character *ch, char *argument );

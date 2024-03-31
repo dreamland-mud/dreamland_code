@@ -174,6 +174,12 @@ static void aqprog_cancel(PCharacter *ch, AreaQuest *q)
     FENIA_VOID_CALL(q, "Cancel", "C", ch);
 }
 
+static DLString aqprog_info(PCharacter *ch, AreaQuest *q)
+{
+    FENIA_STR_CALL(q, "Info", "C", ch);
+    return DLString::emptyString;
+}
+
 NMI_INVOKE( AreaQuestWrapper, cancel, "(ch): отменить этот квест для ch, вернет true если квест был запущен" ) 
 {
     checkTarget();
@@ -189,6 +195,23 @@ NMI_INVOKE( AreaQuestWrapper, cancel, "(ch): отменить этот квес�
     qdata.cancel();
 
     return Register(true);
+}
+
+NMI_INVOKE( AreaQuestWrapper, info, "(ch): вернет строку с подсказкой для текущего шага" ) 
+{
+    checkTarget();
+    PCharacter *ch = argnum2player(args, 1);
+    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
+    
+    if (!qdata.questActive())
+        return DLString::emptyString;
+
+    DLString info = aqprog_info(ch, target);
+    
+    if (!info.empty())
+        info;
+
+    return target->steps[qdata.step]->info;
 }
 
 NMI_INVOKE( AreaQuestWrapper, rollback, "(ch): откатить этот квест на предыдущий шаг для ch, вернет новый номер шага" ) 

@@ -196,7 +196,7 @@ DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, 
         return find_char(ch, argVict.c_str(), *door, range, errbuf);
     }
     
-    return get_char_room(ch, argVict.c_str());
+    return get_char_room(ch, argVict);
 }
 
 /*
@@ -435,7 +435,7 @@ static bool is_self_name( const DLString &arg, Character *ch )
     if (is_name( arg.c_str( ), ch->getNameP( '7' ).c_str( ) ))
         return true;
 
-    if (get_char_room( ch, arg.c_str( ) ) == ch)
+    if (get_char_room( ch, arg ) == ch)
         return true;
 
     return false;
@@ -632,7 +632,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 
     if (target.isSet( TAR_CREATE_MOB )) {
         if (!arg.empty( )) {
-            if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
+            if (!( victim = get_char_room( ch, arg ) )) {
                 buf.str("");
                 buf << "Увы, никого с таким именем перепризвать не удается.";
                 result->error = TARGET_ERR_SUMMON_WHO; 

@@ -533,7 +533,7 @@ CMDRUN( pourout )
         return;
     }
 
-    if (( vch = get_char_room(ch, arg2.c_str( ) ) ) == 0) {
+    if (( vch = get_char_room(ch, arg2 ) ) == 0) {
         ch->pecho( "Вылить на кого?" );
         return;
     }
@@ -579,7 +579,7 @@ CMDRUN( pour )
     
     if (arg2 == "out" || arg2.empty( )) {
         if (!arg3.empty( )) {
-            if (( vch = get_char_room(ch, arg3.c_str( ) ) ) == 0) {
+            if (( vch = get_char_room(ch, arg3 ) ) == 0) {
                 ch->pecho( "Вылить на кого?" );
                 return;
             }
@@ -592,8 +592,8 @@ CMDRUN( pour )
         return;
     }
 
-    if ((in = get_obj_here(ch,arg2.c_str( ))) == 0) {
-        vch = get_char_room(ch,arg2.c_str( ));
+    if ((in = get_obj_here(ch, arg2)) == 0) {
+        vch = get_char_room(ch, arg2);
 
         if (vch == 0) {
             ch->pecho("Вылить во что?");

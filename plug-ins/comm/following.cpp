@@ -74,7 +74,7 @@ CMDRUN( follow )
         return;
     }
 
-    if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 ) {
+    if ( ( victim = get_char_room( ch, arg ) ) == 0 ) {
         ch->pecho("Ты не находишь этого здесь.");
         return;
     }
@@ -153,7 +153,7 @@ CMDRUN( group )
         return;
     }
 
-    if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 )
+    if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
         ch->pecho("Этого нет здесь.");
         return;

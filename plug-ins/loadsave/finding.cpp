@@ -78,19 +78,7 @@ static bool char_can_order( Character *ch, Character *victim )
  */
 Character *get_char_room( Character *ch, const DLString & constArgument, int flags )
 {
-    char argument[MAX_INPUT_LENGTH];
-
-    strcpy( argument, constArgument.c_str( ) );
-    return get_char_room( ch, argument, flags );
-}
-
-Character *get_char_room( Character *ch, char *argument, int flags )
-{
-    char arg[MAX_INPUT_LENGTH];
-    int number;
-
-    number = number_argument( argument, arg );
-    return get_char_room( ch, ch->in_room, arg, &number, flags );
+    return get_char_room( ch, ch->in_room, constArgument, flags );
 }
 
 Character * get_char_room( Character *ch, Room *room, const DLString &constArgument, int flags )
@@ -106,11 +94,12 @@ Character * get_char_room( Character *ch, Room *room, const DLString &constArgum
 /*
  * Find a char in the room.
  */
-Character *get_char_room( Character *ch, Room *room, const char *argument, int *number, int flags )
+Character *get_char_room( Character *ch, Room *room, const DLString &constArgs, int *number, int flags )
 {
     Character *rch;
     int count;
     int ugly;
+    DLString argument = constArgs;
     long long id = get_arg_id( argument );
 
     if (room == 0)
@@ -851,9 +840,9 @@ bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
 
 // Return true if arg matches one of the character names or short descriptions.
 // Doppel is already applied.
-bool char_has_name(Character *target, const char *arg)
+static bool char_has_name(Character *target, const DLString &arg)
 {
-    return is_name(arg, target->getNameP('7').c_str());
+    return is_name(arg.c_str(), target->getNameP('7').c_str());
 }
 
 bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id )

@@ -71,7 +71,7 @@ CMD(olcdump, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
 
-    const Character *c = get_char_room(ch, constArguments.c_str( ));
+    const Character *c = get_char_room(ch, constArguments);
     if(c && c->is_npc( )) {
         dump_mob(ch, c->getNPC( )->pIndexData);
         return;

@@ -122,7 +122,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
             return target.obj != 0;
 
         case ARG_CHAR_ROOM:
-            target.vict = get_char_room(actor, argOne.c_str());
+            target.vict = get_char_room(actor, argOne);
             errbuf << "Рядом с тобой нет никого с таким именем.";
             return target.vict != 0;
 
@@ -138,7 +138,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
                 }
             }
 
-            target.vict = get_char_room(actor, argOne.c_str());
+            target.vict = get_char_room(actor, argOne);
             errbuf << "Рядом с тобой нет никого с таким именем.";
             return target.vict != 0;
 
@@ -146,7 +146,7 @@ bool DefaultSkillCommand::parseArguments(Character *actor, const DLString &const
             if (argOne.empty())
                 target.vict = actor;
             else {
-                target.vict = get_char_room(actor, argOne.c_str());
+                target.vict = get_char_room(actor, argOne);
                 errbuf << "Рядом с тобой нет никого с таким именем.";
             }
             return target.vict != 0;
