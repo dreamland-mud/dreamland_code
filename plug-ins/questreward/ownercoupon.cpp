@@ -58,7 +58,7 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
         
     item->setOwner( ch->getNameC() );
     SET_BIT(item->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF);
-    item->setMaterial( "platinum" );
+    // item->setMaterial( "platinum" );
     item->behavior.setPointer( new PersonalQuestReward );
     item->behavior->setObj( item );
         
