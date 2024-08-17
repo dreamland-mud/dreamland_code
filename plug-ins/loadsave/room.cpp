@@ -57,6 +57,7 @@ exit_data *exit_data::create()
     pexit->key = key;
     pexit->u1.vnum = u1.vnum; 
     pexit->level = 0;
+    pexit->orig_door = orig_door;
 
     return pexit;
 }

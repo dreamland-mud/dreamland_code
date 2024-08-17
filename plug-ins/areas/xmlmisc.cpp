@@ -310,6 +310,7 @@ XMLExitDir::compat( )
     pexit->key = key.getValue( );
     pexit->u1.vnum = target.getValue( );
     pexit->level = 0;
+    pexit->orig_door = -1;
     
     return pexit;
 }

@@ -52,6 +52,7 @@ EXIT_DATA *new_exit(void)
     pExit->description = &str_empty[0];
     pExit->exit_info_default = 0;
     pExit->level = 0;
+    pExit->orig_door = -1;
     return pExit;
 }
 

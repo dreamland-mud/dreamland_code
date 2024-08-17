@@ -340,11 +340,19 @@ struct DoorFunc {
     bool operator () ( Room *const room, EXIT_DATA *exit ) const {
         EXIT_DATA *pExitRev;
         Room *toRoom;
+        int thisDoor = exit->orig_door;
 
         if (!( toRoom = exit->u1.to_room ))
             return false;
 
-        if (!( pExitRev = toRoom->exit[dirs[exit->orig_door].rev] ))
+        if (thisDoor < 0 || thisDoor >= DIR_SOMEWHERE) {
+            LogStream::sendWarning() << "Traverse: invalid orig_door on exit from [" << room->vnum << "] to [" << toRoom->vnum << "]" << endl;
+            return false;
+        }
+
+        int reverseDoor = dirs[thisDoor].rev;
+
+        if (!( pExitRev = toRoom->exit[reverseDoor] ))
             return false;
 
         if (pExitRev->u1.to_room != room)
