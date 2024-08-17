@@ -162,6 +162,11 @@ inline long DreamLand::getBalanceMerchantBank() const
     return merchantBank.getValue();
 }
 
+inline void DreamLand::setBalanceMerchantBank(long gold)
+{
+    merchantBank.setValue(gold);
+}
+
 inline long long DreamLand::genID( )
 {
     long long ver = ((long long)getBootVersion( )) << 32;

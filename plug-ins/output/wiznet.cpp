@@ -110,8 +110,7 @@ wiznet( long flag, long flag_skip, int min_level, const char *fmt, ... )
         if (pch->get_trust( ) < min_level)
             continue;
 
-        if (IS_SET(pch->wiznet, WIZ_PREFIX))
-            pch->send_to( "--> " );
+        pch->send_to( "--> " );
 
         va_list av;
 

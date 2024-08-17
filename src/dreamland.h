@@ -117,6 +117,7 @@ public:
         inline bool getFromMerchantBank( long gold );
         inline void putToMerchantBank( long gold );
         inline long getBalanceMerchantBank( ) const;
+        inline void setBalanceMerchantBank(long gold);
         
         inline void setConfigFileName( const DLString& );
         inline long long genID( );

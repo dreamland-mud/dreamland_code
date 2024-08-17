@@ -132,6 +132,16 @@ NMI_INVOKE( Root, print , "(msg): вывести строку msg в систе�
     return Register();
 }
 
+NMI_GET( Root, merchant_bank, "золото в мировом банке") 
+{
+    return Register((int)dreamland->getBalanceMerchantBank());
+}
+
+NMI_SET( Root, merchant_bank, "золото в мировом банке") 
+{
+    dreamland->setBalanceMerchantBank(arg.toNumber());
+}
+
 NMI_GET( Root, current_time, "текущее время в секундах") 
 {
     return Register((int)dreamland->getCurrentTime( ));
@@ -1112,19 +1122,6 @@ NMI_INVOKE( Root, Material, "(names): конструктор для матери
     DLString names = args2string(args);
 
     return MaterialWrapper::wrap(names);
-}
-
-static bool normalize_skill_name(DLString &arg)
-{
-    arg.toLower().stripWhiteSpace();
-    if (arg.empty())
-        return false;
-
-    for (DLString::size_type s = 0; s < arg.length(); s++)
-        if (!isalpha(arg.at(s)) && arg.at(s) != ' ')
-            return false;
-
-    return true;
 }
 
 NMI_INVOKE( Root, Spell , "(name): находит заклинание с заданным именем")

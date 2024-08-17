@@ -26,7 +26,6 @@
 #define WIZ_RESTORE             (P)
 #define WIZ_LOAD                (Q)
 #define WIZ_NEWBIE              (R)
-#define WIZ_PREFIX              (S)
 #define WIZ_SPAM                (T)
 #define WIZ_DAMAGES             (U)
 #define WIZ_RNAMES              (V)
