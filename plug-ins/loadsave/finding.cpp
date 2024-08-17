@@ -46,6 +46,13 @@ long long get_arg_id( const DLString &cArgument )
     return id;
 }    
 
+// Return true if arg matches one of the character names or short descriptions.
+// Doppel is already applied.
+static bool char_has_name(Character *target, const DLString &arg)
+{
+    return is_name(arg.c_str(), target->getNameP('7').c_str());
+}
+
 /** Return true if ch can give orders to the victim. */
 static bool char_can_order( Character *ch, Character *victim )
 {
@@ -836,13 +843,6 @@ bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
         
     // No match.
     return false;
-}
-
-// Return true if arg matches one of the character names or short descriptions.
-// Doppel is already applied.
-static bool char_has_name(Character *target, const DLString &arg)
-{
-    return is_name(arg.c_str(), target->getNameP('7').c_str());
 }
 
 bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id )
