@@ -19,7 +19,7 @@ steps:
   - make -f Makefile.git
   - cd ../objs
   - ../dreamland_code/configure --prefix=/home/dreamland/runtime
-  - rm plug-ins/*/lib*cpp plug-ins/*/*/lib*cpp
+  - rm -f plug-ins/*/lib*cpp plug-ins/*/*/lib*cpp
   - make -j 2
   - make install
 
