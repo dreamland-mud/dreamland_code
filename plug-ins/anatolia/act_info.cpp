@@ -1174,83 +1174,32 @@ CMDRUNP( wimpy )
 
 
 
-CMDRUNP( password )
+CMDRUN( password )
 {
-    char arg1[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
-    char *pArg;
-    char *pwdnew;
-    char *p;
-    char cEnd;
-
-    if ( ch->is_npc() )
-        return;
-
-    /*
-     * Can't use one_argument here because it smashes case.
-     * So we just steal all its code.  Bleagh.
-     */
-    /* TODO: rework with DLString */
-    pArg = arg1;
-    while ( dl_isspace(*argument) )
-        argument++;
-
-    cEnd = ' ';
-    if ( *argument == '\'' || *argument == '"' )
-        cEnd = *argument++;
-
-    while ( *argument != '\0' )
-    {
-        if ( *argument == cEnd )
-        {
-            argument++;
-            break;
-        }
-        *pArg++ = *argument++;
-    }
-    *pArg = '\0';
-
-    pArg = arg2;
-    while ( dl_isspace(*argument) )
-        argument++;
-
-    cEnd = ' ';
-    if ( *argument == '\'' || *argument == '"' )
-        cEnd = *argument++;
-
-    while ( *argument != '\0' )
-    {
-        if ( *argument == cEnd )
-        {
-            argument++;
-            break;
-        }
-        *pArg++ = *argument++;
-    }
-    *pArg = '\0';
+    DLString args(constArguments);
+    DLString argOld = args.getOneArgument();
+    DLString argNew = args.getOneArgument();
     
-    if ( arg1[0] == '\0' || arg2[0] == '\0' )
+    if (argOld.empty() || argNew.empty())
     {
         ch->pecho("Синтаксис: {lRпароль{lEpassword{lx <старый> <новый>.");
         return;
     }
     
-    if (!password_check( ch->getPC( ), arg1 ))
+    if (!password_check( ch->getPC( ), argOld ))
     {
         ch->setWait(40 );
         ch->pecho("Неверный пароль. Подожди 10 секунд.");
         return;
     }
 
-    if ( strlen(arg2) < 5 )
+    if (argNew.length() < 5)
     {
         ch->pecho("Новый пароль должен содержать более пяти символов.");
         return;
     }
 
-    pwdnew = arg2;
-   
-    password_set( ch->getPC( ), pwdnew );
+    password_set( ch->getPC( ), argNew );
     ch->getPC( )->save( );
     ch->pecho("Ok.");
     return;
@@ -2150,7 +2099,7 @@ private:
         if (arg.length() > 3 && arg.length() < kw.length())
             kw.cutSize(arg.length());
 
-        return levenshtein(arg.c_str(), kw.c_str(), 1, 1, 1, 1);
+        return levenshtein(arg, kw, 1, 1, 1, 1);
     }
 
     DLString arg;

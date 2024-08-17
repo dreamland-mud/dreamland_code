@@ -150,7 +150,6 @@ public:
         }
 
         if (argument == "delete"
-                || argument == "prefix"
                 || argument == "alias")
         {
             pch->pecho("Этим командам нельзя присвоить синоним!");
@@ -305,85 +304,6 @@ public:
 };
 
 
-/*-----------------------------------------------------------------------------
- * 'prefix' command 
- *----------------------------------------------------------------------------*/
-class CPrefix : public SkippingCommand {
-public:
-    typedef ::Pointer<CPrefix> Pointer;
-    
-    CPrefix( ) 
-    {
-        this->name = COMMAND_NAME;
-    }
-
-    virtual void run( Character *ch, const DLString &argument )
-    {
-        if (argument.empty( ))
-        {
-            if (ch->prefix[0] == '\0')
-            {
-                ch->pecho("You have no prefix to clear.");
-                return;
-            }
-
-            ch->pecho("Prefix removed.");
-            free_string(ch->prefix);
-            ch->prefix = str_dup("");
-            return;
-        }
-
-        if (ch->prefix[0] != '\0')
-        {
-            ch->pecho("Prefix changed to %s.",argument.c_str( ));
-            free_string(ch->prefix);
-        }
-        else
-        {
-            ch->pecho("Prefix set to %s.",argument.c_str( ));
-        }
-
-        ch->prefix = str_dup(argument.c_str( ));
-    }
-
-protected:
-    virtual void putInto( )
-    {
-        interp->put( this, CMDP_PREFIX, 1 );
-        interp->put( this, CMDP_SUBST_ALIAS, 3 );
-    }
-        
-private:
-    static const DLString COMMAND_NAME;
-};
-
-const DLString CPrefix::COMMAND_NAME = "prefix";
-
-/*-----------------------------------------------------------------------------
- * PrefixInterpretLayer 
- *----------------------------------------------------------------------------*/
-class PrefixInterpretLayer : public InterpretLayer {
-public:
-
-    virtual void putInto( )
-    {
-        interp->put( this, CMDP_PREFIX, 10 );
-    }
-
-    virtual bool process( InterpretArguments &iargs )
-    {
-        Character *ch = iargs.d->character;
-        
-        if (ch->prefix[0] != 0) {
-            if (strlen( ch->prefix ) + iargs.line.size( ) > MAX_INPUT_LENGTH)
-                iargs.ch->pecho("Line to long, prefix not processed.");
-            else
-                iargs.line = DLString( ch->prefix ) + " " + iargs.line;
-        }
-
-        return true;
-    }
-};
 
 /*-----------------------------------------------------------------------------
  * ChoicesInterpretLayer 
@@ -446,14 +366,12 @@ extern "C"
     {
         SO::PluginList ppl;
 
-        Plugin::registerPlugin<PrefixInterpretLayer>( ppl );
         Plugin::registerPlugin<SubstituteAliasInterpretLayer>( ppl );
         Plugin::registerPlugin<ChoicesInterpretLayer>( ppl );
         
         Plugin::registerPlugin<CAlias>( ppl );
         Plugin::registerPlugin<CUnalias>( ppl );
-        Plugin::registerPlugin<CPrefix>( ppl );
-        
+            
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeAliases> >( ppl );
                 
         return ppl;

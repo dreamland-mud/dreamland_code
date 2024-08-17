@@ -151,38 +151,39 @@ void talk_auction(const char *argument)
 
 */
 
-int parsebet (const int currentbet, const char *argument)
+static int parsebet (const int currentbet, const DLString &constArgument)
 {
-        int newbet = 0;                /* a variable to temporarily hold the new bet */
-        char string[MAX_INPUT_LENGTH]; /* a buffer to modify the bet string */
-        char *stringptr = string;      /* a pointer we can move around */
+    int newbet = 0;          
+    DLString args(constArgument);
 
-        strcpy (string,argument);      /* make a work copy of argument */
+    try {
+        if (args.size() > 0) {
+            if (isdigit(args.at(0))) {
+                newbet = args.stripWhiteSpace().toInt();       
 
-        if (*stringptr)               /* check for an empty string */
-        {
-                if (isdigit (*stringptr)) /* first char is a digit assume e.g. 433k */
-                        newbet = atoi(stringptr); /* parse and set newbet to that value */
-                else if (*stringptr == '+') /* add ?? percent */
-                {
-                        if (strlen (stringptr) == 1) /* only + specified, assume default */
-                                newbet = (currentbet * 125) / 100; /* default: add 25% */
-                        else
-                                newbet = (currentbet * (100 + atoi (++stringptr))) / 100; /* cut off the first char */
+            } else if (args.at(0) == '+') {
+                if (args.size() == 1) {
+                    newbet = (currentbet * 125) / 100; 
+                } else {
+                    DLString percentString = args.substr(1);                    
+                    newbet = (currentbet * (100 + percentString.stripWhiteSpace().toInt())) / 100; 
                 }
-                else
-                {
-                        if ((*stringptr == '*') || (*stringptr == 'x')) /* multiply */
-                        {
-                                if (strlen (stringptr) == 1) /* only x specified, assume default */
-                                        newbet = currentbet * 2 ; /* default: twice */
-                                else /* user specified a number */
-                                        newbet = currentbet * atoi (++stringptr); /* cut off the first char */
-                        }
+
+            } else if (args.at(0) == '*' || args.at(0) == 'x') {
+                if (args.size() == 1) {
+                    newbet = currentbet * 2;
+                } else {
+                    DLString percentString = args.substr(1);                    
+                    newbet = currentbet * percentString.stripWhiteSpace().toInt();
                 }
+            }
         }
+        
+    } catch (const ExceptionBadType &e) {
+        newbet = 0;
+    }
 
-        return newbet;        /* return the calculated bet */
+    return newbet;    
 }
 
 void auction_update (void)

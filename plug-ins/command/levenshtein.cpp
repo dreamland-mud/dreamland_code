@@ -2,8 +2,7 @@
  * (c) https://github.com/git/git/blob/master/levenshtein.c
  */
 #include "levenshtein.h"
-#include <string.h>
-
+#include "dlstring.h"
 #include <vector>
 using namespace std;
 
@@ -44,10 +43,10 @@ using namespace std;
  *
  * Note that this algorithm calculates a distance _iff_ d == a.
  */
-int levenshtein(const char *string1, const char *string2,
+int levenshtein(const DLString &string1, const DLString &string2,
         int w, int s, int a, int d)
 {
-    int len1 = strlen(string1), len2 = strlen(string2);
+    int len1 = string1.length(), len2 = string2.length();
     vector<int> row0(len2+1, 0); 
     vector<int> row1(len2+1, 0); 
     vector<int> row2(len2+1, 0); 

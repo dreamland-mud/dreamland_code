@@ -73,7 +73,6 @@ PlayerConfig::PlayerConfig( const PCharacter *ch )
 
 Character::Character( )
         :       ethos( ETHOS_NULL, &ethos_table ),
-                prefix( &str_empty[0] ),
                 act( 0, &plr_flags ),
                 comm( 0, &comm_flags ),   
                 add_comm( 0, &add_comm_flags ),
@@ -104,7 +103,6 @@ Character::~Character(void)
     if (!affected.empty())
         LogStream::sendFatal() << "~Character: affected not empty" << endl;
 
-    free_string(prefix);
     free_string(material);
     free_string(ambushing);
 }
@@ -160,8 +158,6 @@ void Character::init( )
     
     prompt.clear( );
     batle_prompt.clear( );
-    free_string(prefix);
-    prefix = &str_empty[0];
     lines = 0;
 
     act = 0;

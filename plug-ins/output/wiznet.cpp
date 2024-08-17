@@ -19,7 +19,6 @@
 const struct wiznet_type wiznet_table [] =
 {
     { "on",                      WIZ_ON,                        AVATAR },
-    { "prefix",                  WIZ_PREFIX,                AVATAR },
     { "ticks",                   WIZ_TICKS,                AVATAR },
     { "logins",                  WIZ_LOGINS,                AVATAR },
     { "sites",                   WIZ_SITES,                GOD },

@@ -257,7 +257,6 @@ public:
     // text output
     XML_VARIABLE XMLString                prompt;
     XML_VARIABLE XMLString                batle_prompt;
-    char *                prefix;
     XML_VARIABLE XMLInteger                lines;  // for the pager
 
     XML_VARIABLE XMLFlags                act;

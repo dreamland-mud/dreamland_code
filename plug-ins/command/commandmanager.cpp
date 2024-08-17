@@ -93,7 +93,7 @@ static void record_distance(const DLString &cmd, const DLString &kuzdn, const DL
     else
         string2 = candidate;
 
-    int distance = levenshtein(cmd.c_str(), string2.c_str(), 1, 2, 1, 1);
+    int distance = levenshtein(cmd, string2, 1, 2, 1, 1);
     if (distance <= 1)
         iargs.hints1.push_back(candidate);
     else if (distance == 2)
