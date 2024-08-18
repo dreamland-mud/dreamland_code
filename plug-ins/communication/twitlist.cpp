@@ -4,12 +4,16 @@
  */
 
 #include <ostream>
+#include <algorithm>
 
 #include "twitlist.h"
+#include "commonattributes.h"
 
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "arg_utils.h"
+
+static const DLString TWIT_ATTR_NAME = "twit";
 
 COMMAND(CTwit, "twit")
 {
@@ -41,12 +45,11 @@ COMMAND(CTwit, "twit")
 
 void CTwit::doAdd( PCharacter *ch, DLString &arg )
 {
-    XMLAttributeTwitList::Pointer attr;
     DLString name;
     PCMemoryInterface *pci;
 
     if (arg.empty( )) {
-        ch->pecho("Использование: {lRжаба добавить{lEtwit add{lx <имя>");
+        ch->pecho("Использование: {lRигнор добавить{lEtwit add{lx <имя>");
         return;
     }
 
@@ -57,40 +60,42 @@ void CTwit::doAdd( PCharacter *ch, DLString &arg )
         return;
     }
     
-    attr = ch->getAttributes( ).getAttr<XMLAttributeTwitList>( "twit" );
+    auto twitAttr = ch->getAttributes( ).getAttr<XMLStringListAttribute>( TWIT_ATTR_NAME );
 
-    if (attr->isAvailable( name )) {
-        ch->pecho( "Имя \"%s\" уже в списке.", name.c_str( ) );
+    if (std::find(twitAttr->begin(), twitAttr->end(), name) != twitAttr->end()) {
+        ch->pecho( "Это имя уже в списке.");
         return;
     }
     
-    attr->push_back( name );
-    ch->pecho( "Имя \"%s\" добавлено в список.", name.c_str( ) );
+    twitAttr->push_back( name );
+    ch->pecho( "Имя добавлено в список." );
 }
 
 void CTwit::doRemove( PCharacter *ch, DLString &arg )
 {
-    XMLAttributeTwitList::Pointer attr;
-    XMLAttributeTwitList::iterator iter;
-
     if (arg.empty( )) {
-        ch->pecho("Использование: {lRжаба удалить{lEtwit rem{lx <имя> ");
+        ch->pecho("Использование: {lRигнор удалить{lEtwit rem{lx <имя> ");
         return;
     }
     
-    attr = ch->getAttributes( ).findAttr<XMLAttributeTwitList>( "twit" );
+    auto twitAttr = ch->getAttributes( ).findAttr<XMLStringListAttribute>( TWIT_ATTR_NAME );
 
-    if (!attr || attr->size( ) == 0) {
-        ch->pecho("Список жаб и так пуст.");
+    if (!twitAttr || twitAttr->size( ) == 0) {
+        ch->pecho("Список и так пуст.");
         return;
     }
     
-    for (iter = attr->begin( ); iter != attr->end( ); iter++)
-        if (arg ^ iter->getValue( )) {
-            ch->pecho( "Имя %s удалено из списка.", iter->getValue( ).c_str( ) );
-            attr->erase( iter );
+    for (auto iter = twitAttr->begin( ); iter != twitAttr->end( ); iter++) {
+        auto blockedPerson = PCharacterManager::find(iter->getValue());
+
+        if (arg.equalLess(iter->getValue( )) 
+            || (blockedPerson && blockedPerson->getNameP('1').equalLess(arg))) {
+
+            ch->pecho( "Имя удалено из списка.", iter->getValue( ).c_str( ) );
+            twitAttr->erase( iter );
             return;
         }
+    }
             
     ch->pecho( "Но имени \"%s\" нет в списке.", arg.c_str( ) );
 }
@@ -98,18 +103,22 @@ void CTwit::doRemove( PCharacter *ch, DLString &arg )
 void CTwit::doList( PCharacter *ch ) 
 {
     std::basic_ostringstream<char> buf;
-    XMLAttributeTwitList::Pointer attr;
-    XMLAttributeTwitList::iterator iter;
 
-    attr = ch->getAttributes( ).findAttr<XMLAttributeTwitList>( "twit" );
+    auto twitAttr = ch->getAttributes( ).findAttr<XMLStringListAttribute>( TWIT_ATTR_NAME );
     
-    if (!attr || attr->size( ) == 0)
+    if (!twitAttr || twitAttr->size( ) == 0) {
         buf << "Список пуст." << endl;
-    else {
-        buf << "Список людей, которых Вы не желаете слышать: " << endl;
+    } else {
+        buf << "Список персонажей, которых вы не желаете слышать: " << endl;
         
-        for (iter = attr->begin( ); iter != attr->end( ); iter++)
-            buf << *iter << endl;
+        for (auto blockedName: **twitAttr) {
+            auto blockedPerson = PCharacterManager::find(blockedName);
+
+            if (blockedPerson)
+                buf << blockedPerson->getNameP('1') << endl;
+            else
+                buf << blockedName << " (персонаж не найден)" << endl;
+        }
     }
 
     ch->send_to( buf );
@@ -117,29 +126,20 @@ void CTwit::doList( PCharacter *ch )
 
 void CTwit::doUsage( PCharacter *ch )
 {
-    ch->pecho( "twit add <имя> \r\n"
-                 "twit rem <имя> \r\n"
-                 "twit list" );
+    ch->pecho( "{lRигнор добавить{lEtwit add{lx <имя> \r\n"
+                 "{lRигнор удалить{lEtwit rem{lx <имя> \r\n"
+                 "{lRигнор список{lEtwit list{x" );
 }
 
-const DLString XMLAttributeTwitList::TYPE= "XMLAttributeTwitList";
-
-XMLAttributeTwitList::XMLAttributeTwitList( )
+bool talker_is_ignored( PCharacter *ch, PCharacter *talker )
 {
-}
+    auto twitAttr = ch->getAttributes( ).findAttr<XMLStringListAttribute>( TWIT_ATTR_NAME );
 
-XMLAttributeTwitList::~XMLAttributeTwitList( )
-{
-}
+    if (!twitAttr)
+        return false;
 
-bool XMLAttributeTwitList::isAvailable( const DLString &arg ) const
-{
-    const_iterator iter;
-    
-    for (iter = begin( ); iter != end( ); iter++)
-        if (arg ^ iter->getValue( ))
-            return true;
+    auto talkerName = talker->getName();
 
-    return false;
+    return std::find(twitAttr->begin(), twitAttr->end(), talkerName) != twitAttr->end();
 }
 

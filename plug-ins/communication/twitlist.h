@@ -8,30 +8,8 @@
 #define __TWITLIST_H__ 
 
 #include "commandplugin.h"
-#include "xmlattribute.h"
-#include "xmllist.h"
-#include "xmlstring.h"
 
 class PCharacter;
-class DLString;
-
-class XMLAttributeTwitList : public XMLAttribute, public XMLListBase<XMLString> {
-public:
-    typedef ::Pointer<XMLAttributeTwitList> Pointer;
-
-    XMLAttributeTwitList( );
-    virtual ~XMLAttributeTwitList( );
-
-    virtual const DLString &getType( ) const 
-    {
-        return TYPE;
-    }
-    
-    static const DLString TYPE;                                             
-
-    bool isAvailable( const DLString & ) const;
-};
-
 
 class CTwit : public CommandPlugin {
 public:
@@ -49,6 +27,10 @@ private:
 
     static const DLString COMMAND_NAME;
 };
+
+
+/** Returns true if player ch doesn't want to hear from this person. */
+bool talker_is_ignored( PCharacter *ch, PCharacter *talker );
 
 #endif
 

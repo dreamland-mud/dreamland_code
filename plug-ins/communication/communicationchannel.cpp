@@ -49,20 +49,13 @@ bool CommunicationChannel::canHear( Character *ch ) const
 
 bool CommunicationChannel::checkIgnore( Character *ch, Character *victim ) const
 {
-    XMLAttributeTwitList::Pointer twit;
-    
     if (!ignore)
         return false;
         
-    if (victim->is_npc( ))
+    if (victim->is_npc( ) || ch->is_npc())
         return false;
 
-    twit = victim->getPC( )->getAttributes( ).findAttr<XMLAttributeTwitList>( "twit" );
-
-    if (!twit)
-        return false;
-
-    return twit->isAvailable( ch->getNameC() );
+    return talker_is_ignored(victim->getPC(), ch->getPC());
 }
 
 void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const

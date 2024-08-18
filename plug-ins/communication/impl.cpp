@@ -46,7 +46,6 @@ extern "C"
     
         Plugin::registerPlugin<RegMocPlugin>( ppl );
         Plugin::registerPlugin<CTwit>( ppl );
-        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeTwitList> >( ppl );
         Plugin::registerPlugin<ChannelsCommand>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<ReplayAttribute> >( ppl );
         
