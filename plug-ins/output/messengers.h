@@ -25,5 +25,6 @@ void send_telegram_note(const DLString &thread, const DLString &author, const DL
 void send_telegram_gquest(const DLString &gqName, const DLString &msg);
 void send_telegram_level(PCharacter *ch);
 void send_telegram(const DLString &content);
+void send_telegram_no_escape(const DLString &content);
 
 #endif

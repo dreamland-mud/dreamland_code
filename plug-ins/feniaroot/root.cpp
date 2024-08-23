@@ -646,10 +646,10 @@ NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Di
     return Register( );
 }
 
-NMI_INVOKE(Root, telegram, "(msg): послать сообщение в Telegram")
+NMI_INVOKE(Root, telegram, "(msg): послать сырое сообщение в Telegram")
 {
     DLString msg = args2string(args);
-    send_telegram(msg);
+    send_telegram_no_escape(msg);
     return Register( );
 }
 

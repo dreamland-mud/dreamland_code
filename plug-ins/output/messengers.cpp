@@ -116,11 +116,17 @@ void send_telegram_gquest(const DLString &gqName, const DLString &msg)
     send_to_telegram("*" + koi2utf(gqName_koi) + ":* " + koi2utf(msg_koi));
 }
 
-/** Send arbitrary string as Telegram message. */
+/** Send arbitrary string as Telegram message. Convert to UTF8 and escape. */
 void send_telegram(const DLString &content)
 {
     DLString escaped = telegram_string(content);
     send_to_telegram(koi2utf(escaped));
+}
+
+/** Send arbitrary string as Telegram message. Convert to UTF8, no escaping for special characters. */
+void send_telegram_no_escape(const DLString &content)
+{
+    send_to_telegram(koi2utf(content));
 }
 
 /** Prepare string to use inside Discord JSON field. Strip tags and colors and trim to size. */
