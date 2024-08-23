@@ -41,6 +41,34 @@ DLString AreaHelp::getTitle(const DLString &label) const
     return buf.str();
 }
 
+static void format_area_quest(AreaQuest *q, ostringstream &qbuf)
+{
+    qbuf << "{Y%A%{x " << q->description
+            << "  " << "Уровни: ";
+
+    // Restrictions by level and align
+    if (q->minLevel > 0 && q->maxLevel < LEVEL_MORTAL)
+        qbuf << "с " << q->minLevel << " по " << q->maxLevel << ". ";
+    else if (q->maxLevel < LEVEL_MORTAL)
+        qbuf << "до " << q->maxLevel << ". ";
+    else if (q->minLevel > 0)
+        qbuf << "с " << q->minLevel << ". ";
+    else
+        qbuf << "любые. ";
+
+    if (q->align.getValue() != 0)
+        qbuf << "Натура: " << q->align.messages(true, '1') << ". ";
+
+    // Quest frequency
+    qbuf << "Как часто: ";
+    if (q->limitPerLife > 0)
+        qbuf << fmt(0, "%1$d раз%1$I|а| за жизнь", q->limitPerLife.getValue());
+    else // TODO support for 'once per hour' etc
+        qbuf << "сколько угодно раз";
+
+    qbuf << "." << endl;
+}
+
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     AreaIndexData *area = areafile->area;
@@ -76,29 +104,9 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
     if (!area->quests.empty()) {
         ostringstream qbuf;
 
-        for (auto &q: area->quests) {
-            if (!q->flags.isSet(AQUEST_HIDDEN)) {
-                qbuf << "{Y%A%{x " << q->description
-                     << "  " << "Ограничения: ";
-
-                if (q->minLevel > 0 && q->maxLevel < LEVEL_MORTAL)
-                    qbuf << "уровни " << q->minLevel << "-" << q->maxLevel;
-                else if (q->maxLevel < LEVEL_MORTAL)
-                    qbuf << "до уровня " << q->maxLevel;
-                else if (q->minLevel > 0)
-                    qbuf << "с уровня " << q->minLevel;
-                else // TODO support for alignment restrictions
-                    qbuf << "нет";
-                
-                qbuf << ". Как часто: ";
-                if (q->limitPerLife > 0)
-                    qbuf << fmt(0, "%1$d раз%1$I|а| за жизнь", q->limitPerLife.getValue());
-                else // TODO support for 'once per hour' etc
-                    qbuf << "сколько угодно раз";
-
-                qbuf << "." << endl;
-            }
-        }
+        for (auto &q: area->quests)
+            if (!q->flags.isSet(AQUEST_HIDDEN))
+                format_area_quest(*q, qbuf);
 
         if (!qbuf.str().empty())
             in << "{yЗадания{x:" << endl << qbuf.str() << endl;

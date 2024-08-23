@@ -751,10 +751,10 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
     }
 
     if (arg_is_list(cmd)) {
-        ch->send_to(fmt(0, "{C%-6s %-15s %s{x\r\n", "Номер", "Квест", "Зона"));
+        ch->send_to(fmt(0, "{C%-6s %s (%s){x\r\n", "Номер", "Квест", "Зона"));
 
         const DLString lineFormat = 
-            "{C" + web_cmd(ch, "qedit $1", "%-6d") + "{w %-15s %s{x";
+            "{C" + web_cmd(ch, "qedit $1", "%-6d") + "{w %s {W({x%s{W){x";
 
         for (auto q: areaQuests) {
             ch->pecho(lineFormat.c_str(),
