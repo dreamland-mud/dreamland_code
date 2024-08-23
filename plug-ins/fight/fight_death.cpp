@@ -40,7 +40,7 @@
 #include "wiznet.h"
 #include "messengers.h"
 #include "infonet.h"
-
+#include "areaquestutils.h"
 #include "desire.h"
 #include "act.h"
 #include "../anatolia/handler.h"
@@ -830,6 +830,7 @@ static void loyalty_gain( Character *ch, Character *victim )
 
 static bool mprog_death( Character *victim, Character *killer )
 {
+    aquest_trigger(victim, killer, "Death", "CC", victim, killer);
     FENIA_CALL( victim, "Death", "C", killer );
     FENIA_NDX_CALL( victim->getNPC( ), "Death", "CC", victim, killer );
     BEHAVIOR_CALL( victim->getNPC( ), death, killer );
