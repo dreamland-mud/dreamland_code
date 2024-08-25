@@ -751,16 +751,27 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
     }
 
     if (arg_is_list(cmd)) {
-        ch->send_to(fmt(0, "{C%-6s %s (%s){x\r\n", "Номер", "Квест", "Зона"));
+        ch->send_to(fmt(0, "{C%-6s %-7s %s (%s){x\r\n", "Номер", "Уровни", "Квест", "Зона"));
 
         const DLString lineFormat = 
-            "{C" + web_cmd(ch, "qedit $1", "%-6d") + "{w %s {W({x%s{W){x";
+            "{C" + web_cmd(ch, "qedit $1", "%-6d") + "{w %-7s %s%s {W({x%s{W){x";
 
         for (auto q: areaQuests) {
+            AreaQuest *aq = q.second;
+            DLString levels;
+
+            if (aq->maxLevel > 0 || aq->minLevel > 0)
+                levels << aq->minLevel << "-" << aq->maxLevel;
+
+            DLString qnameColour = aq->flags.isSet(AQUEST_HIDDEN) ? "{D" : "{w";
+            DLString qname =  aq->flags.isSet(AQUEST_HIDDEN) ? aq->title.colourStrip() : aq->title;
+
             ch->pecho(lineFormat.c_str(),
                        q.first,
-                       q.second->title.c_str(),
-                       q.second->pAreaIndex->getName().c_str());
+                       levels.c_str(),
+                       qnameColour.c_str(),
+                       qname.c_str(),
+                       aq->pAreaIndex->getName().c_str());
         }
 
         return;
