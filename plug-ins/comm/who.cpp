@@ -486,8 +486,8 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         body["total"] = (int)(online.size() + offline.size());
     }
     // 'whois <name>' syntax, lookup player details
-    else {
-        PCMemoryInterface *player = PCharacterManager::findPlayer(playerName);
+    else {        
+        PCMemoryInterface *player = PCharacterManager::find(playerName);
 
         if (!player) {
             body["error"] = "player not found";
