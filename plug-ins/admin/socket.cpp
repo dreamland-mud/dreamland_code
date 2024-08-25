@@ -21,6 +21,7 @@
 #include "pcharactermanager.h"
 #include "merc.h"
 #include "descriptor.h"
+#include "screenreader.h"
 #include "websocketrpc.h"
 #include "act.h"
 
@@ -44,6 +45,7 @@ CMDADM( socket )
         DLString logon;
         DLString idle;
         DLString client;
+        DLString extraInfo;
 
         if (d->character) {
             PCharacter *player;
@@ -98,6 +100,11 @@ CMDADM( socket )
             client = ttype_name(d->telnet.ttype);
         else
             client = "Telnet";
+
+        if (d->character && d->character->is_npc())
+            extraInfo = "switched";
+        else if (uses_screenreader(d))
+            extraInfo = "sreader";
         
         ch->pecho( "[%3d %10s %-5s %3s %6s] %-12s %-15s %s",
                         d->descriptor,
@@ -107,7 +114,7 @@ CMDADM( socket )
                         client.c_str(),
                         name.c_str( ),
                         (!*myHost) ? myIP : myHost,
-                        (d->character && d->character->is_npc() ? "switched" : "") );
+                        extraInfo.c_str());
     }
 
     ch->pecho( "\n\r%d user%s", count, count == 1 ? "" : "s" );
