@@ -23,6 +23,7 @@
 #include "affect.h"
 #include "skillreference.h"
 
+#include "areaquestutils.h"
 #include "loadsave.h"
 #include "immunity.h"
 #include "damageflags.h"
@@ -287,6 +288,7 @@ static void oprog_pour_out( Object *obj, Character *ch, Object *out, const char 
 
 static void mprog_pour_out( Character *victim, Character *ch, Object *out, const char *liqname, int amount  )
 {
+    aquest_trigger(victim, ch, "PourOut", "CCOsi", victim, ch, out, liqname, amount);
     FENIA_VOID_CALL( victim, "PourOut", "COsi", ch, out, liqname, amount );
     FENIA_NDX_VOID_CALL( victim->getNPC( ), "PourOut", "CCOsi", victim, ch, out, liqname, amount );
 }
