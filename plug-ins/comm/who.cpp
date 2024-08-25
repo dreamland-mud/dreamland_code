@@ -437,46 +437,81 @@ Json::Value WhoWebPromptListener::jsonWho( PCharacter *ch )
 PluginInitializer<WhoWebPromptListener> initWhoWebPromptListener;
 
 /*-------------------------------------------------------------------------
- * /who public servlet
+ * /who and '/who <name>' public servlet
  *------------------------------------------------------------------------*/
 JSONSERVLET_HANDLE(cmd_who, "/who")
 {
     PCharacter dummy;
     dummy.config.setBit(CONFIG_RUCOMMANDS);
+    DLString playerName;
     
-    list<PCharacter *> online = who_find_online(0);
-    list<PCMemoryInterface *> offline = who_find_offline(0);
+    servlet_get_arg(params, "message", playerName);
 
-    for (const auto &victim: online) {
-        Json::Value wch;
+    // 'who' syntax, show all players
+    if (playerName.empty()) {
+        list<PCharacter *> online = who_find_online(0);
+        list<PCMemoryInterface *> offline = who_find_offline(0);
 
-        wch["name"]["en"] = victim->getName();
-        wch["name"]["ru"] = victim->getRussianName().decline('1');
-        wch["race"]["en"] = victim->getRace()->getName();
-        wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim).ruscase('1');
+        for (const auto &victim: online) {
+            Json::Value wch;
 
-        if (victim->getClan() != clan_none && victim->getClan()->isValid())
-            wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();
+            wch["name"]["en"] = victim->getName();
+            wch["name"]["ru"] = victim->getRussianName().decline('1');
+            wch["race"]["en"] = victim->getRace()->getName();
+            wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim).ruscase('1');
 
-        if (!victim->getPretitle().empty())
-            wch["pretitle"]["en"] = victim->getPretitle().colourStrip();
+            if (victim->getClan() != clan_none && victim->getClan()->isValid())
+                wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();
 
-        if (!victim->getRussianPretitle().empty())
-            wch["pretitle"]["ru"] = victim->getRussianPretitle().colourStrip();
+            if (!victim->getPretitle().empty())
+                wch["pretitle"]["en"] = victim->getPretitle().colourStrip();
 
-        wch["title"] = victim->getParsedTitle().colourStrip();
-        wch["remorts"] = DLString(victim->getRemorts().size());
+            if (!victim->getRussianPretitle().empty())
+                wch["pretitle"]["ru"] = victim->getRussianPretitle().colourStrip();
 
-        body["people"].append(wch);
+            wch["title"] = victim->getParsedTitle().colourStrip();
+            wch["remorts"] = DLString(victim->getRemorts().size());
+
+            body["people"].append(wch);
+        }
+
+        for (const auto &victim: offline) {
+            Json::Value wch;
+
+            wch["name"]["en"] = victim->getName();
+            wch["name"]["ru"] = victim->getRussianName().decline('1');
+            body["discord"].append(wch);
+        }
+
+        body["total"] = (int)(online.size() + offline.size());
     }
+    // 'whois <name>' syntax, lookup player details
+    else {
+        PCMemoryInterface *player = PCharacterManager::findPlayer(playerName);
 
-    for (const auto &victim: offline) {
-        Json::Value wch;
+        if (!player) {
+            body["error"] = "player not found";
+            return;
+        }
 
-        wch["name"]["en"] = victim->getName();
-        wch["name"]["ru"] = victim->getRussianName().decline('1');
-        body["discord"].append(wch);
+        body["name"]["en"] = player->getName();
+        body["name"]["ru"] = player->getRussianName().decline('1');
+        
+        const Race &race = *player->getRace();
+        DLString raceName = player->getSex() == SEX_FEMALE ? race.getFemaleName() : race.getMaleName();
+        body["race"] =raceName.ruscase('1');
+
+        if (!player->getClan( )->isHidden()) {
+            const Clan &clan = *player->getClan( );
+
+            body["clan"]["name"] = clan.getShortName().toLower().upperFirstCharacter();
+            body["clan"]["level"] = player->getClanLevel();
+            body["clan"]["title"] = clan.getTitle(player);
+            body["clan"]["leader"] = clan.isLeader(player) ? "true" : "false";
+            body["clan"]["recruiter"] = clan.isRecruiter(player) ? "true" : "false";
+        }
+
+        body["remorts"] = DLString(player->getRemorts().size());
     }
-
-    body["total"] = (int)(online.size() + offline.size());
 }
+
