@@ -751,17 +751,30 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
     }
 
     if (arg_is_list(cmd)) {
-        ch->send_to(fmt(0, "{C%-6s %-7s %s (%s){x\r\n", "Номер", "Уровни", "Квест", "Зона"));
+        ch->send_to(fmt(0, "{C%-6s %-7s %-3s %1s %s (%s){x\r\n", "Номер", "Уровни", "Нат", "!", "Квест", "Зона"));
 
         const DLString lineFormat = 
-            "{C" + web_cmd(ch, "qedit $1", "%-6d") + "{w %-7s %s%s {W({x%s{W){x";
+            "{C" + web_cmd(ch, "qedit $1", "%-6d") + "{w %-7s %-3s{x %1s %s%s {W({x%s{W){x";
 
         for (auto q: areaQuests) {
             AreaQuest *aq = q.second;
-            DLString levels;
 
+            DLString levels;
             if (aq->maxLevel > 0 || aq->minLevel > 0)
                 levels << aq->minLevel << "-" << aq->maxLevel;
+
+            DLString align;
+            if (aq->align != 0) {
+                align << (aq->align.isSet(F_ALIGN_GOOD) ? "{YG" : " ");
+                align << (aq->align.isSet(F_ALIGN_NEUTRAL) ? "{wN" : " ");
+                align << (aq->align.isSet(F_ALIGN_EVIL) ? "{RE" : " ");
+            }
+
+            DLString limits;
+            if (!aq->classes.empty() || !aq->hometowns.empty())
+                limits = "*";
+            if (aq->getWrapper() && aq->getWrapper()->hasTrigger("CanStart"))
+                limits = "*";
 
             DLString qnameColour = aq->flags.isSet(AQUEST_HIDDEN) ? "{D" : "{w";
             DLString qname =  aq->flags.isSet(AQUEST_HIDDEN) ? aq->title.colourStrip() : aq->title;
@@ -769,6 +782,8 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
             ch->pecho(lineFormat.c_str(),
                        q.first,
                        levels.c_str(),
+                       align.c_str(),
+                       limits.c_str(),
                        qnameColour.c_str(),
                        qname.c_str(),
                        aq->pAreaIndex->getName().c_str());
