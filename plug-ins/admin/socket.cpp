@@ -21,7 +21,10 @@
 #include "pcharactermanager.h"
 #include "merc.h"
 #include "descriptor.h"
+#include "websocketrpc.h"
 #include "act.h"
+
+const char *ttype_name( int ttype );
 
 CMDADM( socket )
 {
@@ -30,57 +33,17 @@ CMDADM( socket )
     Descriptor *d;
     DLString name;
     int             count;
-    bool            ip;
 
-    ip = (arg == "ip");
-
-    if (!ip && !arg.empty())
-        for (d = descriptor_list; d; d = d->next) {
-            if (d->character) {
-                name = d->character->getName( );
-                pcm = PCharacterManager::find( name );
-                
-                if (pcm) {
-                    if (!ch->can_see( d->character ))
-                        continue;
-
-                    // hide wizard login attempt
-                    if (pcm->get_trust( ) > ch->get_trust( ))
-                        continue;
-                }
-            }
-            else {
-                name = "Unknown";
-            }
-            
-            if(arg.strPrefix(name) || arg == DLString(d->descriptor)) {
-                ch->pecho( "Connected from: %s(%s)", d->realip, d->host );
-
-                if(d->via.empty())
-                    ch->pecho("No via records for this descriptor.");
-                else {
-                    ViaVector::iterator it;
-
-                    for(it = d->via.begin(); it != d->via.end(); it++)
-                        ch->pecho("Via: %s(%s)", 
-                                it->second.c_str(), 
-                                inet_ntoa(it->first));
-
-                }
-                return;
-            }
-        }
-
-    ch->pecho("\n\r[Num Connected  Login Idl C P] Player Name  Host            ");
+    ch->pecho("\n\r[Num Connected  Login Idl Client] Player Name  Host            ");
     ch->pecho("--------------------------------------------------------------------------");
     count = 0;
 
     for (d = descriptor_list; d; d = d->next) {
         const char *myHost, *myIP;
-        DLString p;
         const char * state;
         DLString logon;
         DLString idle;
+        DLString client;
 
         if (d->character) {
             PCharacter *player;
@@ -114,8 +77,8 @@ CMDADM( socket )
         switch (d->connected) {
         case CON_PLAYING:   state = " PLAYING  ";        break;
         case CON_CODEPAGE:  state = " Codepage ";        break;
-        case CON_NANNY:            state = "  Nanny   ";        break;
-        default:            state = " UNKNOWN! ";         break;
+        case CON_NANNY:     state = "  Nanny   ";        break;
+        default:            state = " UNKNOWN! ";        break;
         }
         
         count++;
@@ -123,23 +86,27 @@ CMDADM( socket )
         if (!d->via.empty( )) {
             myHost = d->via.back( ).second.c_str( );
             myIP = inet_ntoa(d->via.back( ).first);
-            p = d->via.size( );
         }
         else {
             myHost = d->host;
             myIP = d->realip;
-            p = (ServerSocketContainer::isWrapped(d->control) ? "*" : " "); 
         }
         
-        ch->pecho( "[%3d %10s %-5s %s %c %s] %-12s %-15s %s",
+        if (is_websock(d))
+            client = "MudJS";
+        else if (d->telnet.ttype != TTYPE_NONE)
+            client = ttype_name(d->telnet.ttype);
+        else
+            client = "Telnet";
+        
+        ch->pecho( "[%3d %10s %-5s %3s %6s] %-12s %-15s %s",
                         d->descriptor,
                         state,
                         logon.c_str(),
                         idle.c_str(),
-                        d->out_compress ? '*' : ' ',
-                        p.c_str( ),
+                        client.c_str(),
                         name.c_str( ),
-                        (ip || !*myHost) ? myIP : myHost,
+                        (!*myHost) ? myIP : myHost,
                         (d->character && d->character->is_npc() ? "switched" : "") );
     }
 
