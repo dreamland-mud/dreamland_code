@@ -316,7 +316,7 @@ static bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLStr
 bool aquest_trigger(Character *mob, Character *ch, const DLString &trigType, const char *fmt, ...)
 {
     // Call quest triggers on mobs, for players
-    if (!mob->is_npc() || ch->is_npc())
+    if (!ch || !mob->is_npc() || ch->is_npc())
         return false;
 
     WrapperBase *wrapperBase = get_wrapper(mob->getNPC()->pIndexData->wrapper);
@@ -339,7 +339,7 @@ bool aquest_trigger(Character *mob, Character *ch, const DLString &trigType, con
 bool aquest_trigger(::Object *obj, Character *ch, const DLString &trigType, const char *fmt, ...)
 {
     // Call quest triggers for players
-    if (ch->is_npc())
+    if (!ch || ch->is_npc())
         return false;
 
     WrapperBase *wrapperBase = get_wrapper(obj->pIndexData->wrapper);
@@ -362,7 +362,7 @@ bool aquest_trigger(::Object *obj, Character *ch, const DLString &trigType, cons
 bool aquest_trigger(Room *room, Character *ch, const DLString &trigType, const char *fmt, ...)
 {
     // Call quest triggers for players
-    if (ch->is_npc())
+    if (!ch || ch->is_npc())
         return false;
 
     WrapperBase *wrapperBase = get_wrapper(room->wrapper);
