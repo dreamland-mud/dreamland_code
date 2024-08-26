@@ -72,17 +72,17 @@ CMDRUNP( iidea )
 static void bugtracker_servlet(HttpRequest &request, HttpResponse &response)
 {
     Json::Value params;
-    DLString authorName, message;
+    DLString message;
 
     if (!servlet_parse_params(request, response, params))
         return;
 
-    if (!servlet_auth_bot(params, response)) 
-        return;
+//    if (!servlet_auth_bot(params, response)) 
+//        return;
 
-    // Grab player name or just use the provided Telegram id.
-    authorName = servlet_find_username(params, response);
-    if (authorName.empty())
+    // Ensure the TG/Discord user is linked to a real player.
+    PCMemoryInterface *player = servlet_find_player(params, response);
+    if (!player)
         return;
 
     // Grab the message.
@@ -90,7 +90,7 @@ static void bugtracker_servlet(HttpRequest &request, HttpResponse &response)
         return;
 
     // Log bug/typo the usual way, using URI to determine message type.
-    bugTracker->reportMessage(request.uri.substr(1), authorName, message);
+    bugTracker->reportMessage(request.uri.substr(1), player->getName(), message);
 
     servlet_response_200(response, "Message logged");
 }

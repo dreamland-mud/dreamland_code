@@ -504,7 +504,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         if (!player->getClan( )->isHidden()) {
             const Clan &clan = *player->getClan( );
 
-            body["clan"]["name"] = clan.getShortName().toLower().upperFirstCharacter();
+            body["clan"]["name"] = clan.getRussianName().colourStrip().ruscase('1');
             body["clan"]["level"] = player->getClanLevel();
             body["clan"]["title"] = clan.getTitle(player);
             body["clan"]["leader"] = clan.isLeader(player) ? "true" : "false";
