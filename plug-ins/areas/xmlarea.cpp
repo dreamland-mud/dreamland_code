@@ -309,6 +309,9 @@ void XMLArea::load_quests(AreaIndexData *a)
         q->pAreaIndex = a;
 
         areaQuests[q->vnum] = *q;
+
+        if (FeniaManager::wrapperManager)
+            FeniaManager::wrapperManager->linkWrapper(*q);
     }
 }
 

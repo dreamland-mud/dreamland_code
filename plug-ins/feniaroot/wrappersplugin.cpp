@@ -83,8 +83,10 @@ WrappersPlugin::linkTargets()
             wrapper_cast<AreaIndexWrapper>(pArea->wrapper)->setTarget( pArea );
 
     for (auto &q: areaQuests) {
-        if (q.second->wrapper)
+        if (q.second->wrapper) {
+            LogStream::sendNotice() << "Area quest: setting target for " << q.first << endl;
             wrapper_cast<AreaQuestWrapper>(q.second->wrapper)->setTarget(q.second);
+        }
     }
 
     for (int sn = 0; sn < skillManager->size(); sn++) {
