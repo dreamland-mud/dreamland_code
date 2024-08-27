@@ -906,6 +906,8 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 
 static bool oprog_put(Object *obj, Character *ch, Object *container)
 {
+    aquest_trigger(container, ch, "Put", "OCO", container, ch, obj);
+
     FENIA_CALL( ch, "Put", "COO", ch, obj, container );
     FENIA_CALL( obj, "Put", "COO", ch, obj, container );
     FENIA_CALL( container, "Put", "COO", ch, obj, container );
