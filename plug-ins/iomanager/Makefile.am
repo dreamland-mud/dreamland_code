@@ -18,8 +18,6 @@ serversocket.cpp \
 serversocketcontainer.cpp \
 codepage.cpp \
 webprompt.cpp \
-descriptorstatelistener.cpp \
-descriptorstatemanager.cpp \
 pagerhandler.cpp \
 interprethandler.cpp \
 commonlayers.cpp \

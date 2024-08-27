@@ -19,6 +19,7 @@
 #include "xmlpcpredicates.h"
 #include "xmlattributecoder.h"
 #include "xmlattributetrust.h"
+#include "descriptorstatemanager.h"
 
 extern "C"
 {
@@ -43,6 +44,8 @@ extern "C"
 
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCoder> >( ppl );
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeTrust> >( ppl );
+
+        	Plugin::registerPlugin<DescriptorStateManager>( ppl );
 
                 return ppl;
         }

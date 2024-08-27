@@ -14,7 +14,6 @@
 #include "serversocketcontainer.h"
 #include "iomanager.h"
 #include "defaultbufferhandler.h"
-#include "descriptorstatemanager.h"
 #include "webprompt.h"
 #include "webmanip.h"
 #include "backdoorhandler.h"
@@ -37,7 +36,6 @@ extern "C" {
         Plugin::registerPlugin<ServerSocketContainer>( ppl );
         Plugin::registerPlugin<DefaultBufferHandlerPlugin>( ppl );
         Plugin::registerPlugin<IOManager>( ppl );
-        Plugin::registerPlugin<DescriptorStateManager>( ppl );
         Plugin::registerPlugin<WebPromptManager>( ppl );
         Plugin::registerPlugin<WebManipManager>( ppl );
         Plugin::registerPlugin<BadNames>( ppl );

@@ -4,7 +4,9 @@
 #include "xmlmap.h"
 #include "xmlinteger.h"
 #include "playerattributes.h"
+#include "descriptorstatelistener.h"
 
+/** Info about each area quest, as kept in player's attribute. Contains success counts and current quest info. */
 class AreaQuestData : public XMLVariableContainer {
 XML_OBJECT
 public:
@@ -32,6 +34,9 @@ public:
     void rollback();
 };
 
+/** A permanent attribute (persisted after remort) that keeps track of all area quests ever done by this player,
+ * as a map from quest ID to corresponding quest data.
+ */
 class XMLAttributeAreaQuest : public RemortAttribute, public XMLMapContainer<AreaQuestData> {
 XML_OBJECT    
 public:
@@ -46,6 +51,15 @@ public:
 
     static const DLString TYPE;
 };
+
+/** Auto-cancel stale area quests on player logon. */
+class AreaQuestCleanupPlugin : public DescriptorStateListener {
+public:
+        typedef ::Pointer<AreaQuestCleanupPlugin> Pointer;
+
+        virtual void run( int, int, Descriptor * );        
+};
+
 
 
 #endif

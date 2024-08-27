@@ -1,4 +1,7 @@
+#include <jsoncpp/json/json.h>
+
 #include "xmlattributeareaquest.h"
+#include "commonattributes.h"
 #include "logstream.h"
 #include "util/regexp.h"
 #include "xmlmap.h"
@@ -7,16 +10,31 @@
 #include "regcontainer.h"
 #include "wrapperbase.h"
 #include "wrappertarget.h"
+#include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "schedulertaskroundplugin.h"
+#include "plugininitializer.h"
 #include "object.h"
 #include "room.h"
 #include "areaquest.h"
-#include "playerattributes.h"
 #include "fenia_utils.h"
+#include "areaquestutils.h"
+#include "wiznet.h"
+#include "configurable.h"
+#include "descriptor.h"
+#include "dlscheduler.h"
 #include "dreamland.h"
+#include "def.h"
 
 using namespace Scripting;
+
+// A set of area quest settings defined in config/areaquest.json.
+Json::Value aquestConfig;
+CONFIGURABLE_LOADED(config, areaquest)
+{
+    aquestConfig = value;
+}
 
 const DLString XMLAttributeAreaQuest::TYPE = "XMLAttributeAreaQuest";
 
@@ -106,4 +124,46 @@ bool XMLAttributeAreaQuest::handle(const RemortArguments &args)
     }
 
     return RemortAttribute::handle(args);
+}
+
+void AreaQuestCleanupPlugin::run( int oldState, int newState, Descriptor *d )
+{
+    Character *ch = d->character;
+
+    if (!ch)
+        return;
+    
+    if (newState != CON_PLAYING) 
+        return;
+   
+    PCharacter *pch = ch->getPC(); 
+    auto areaQuestAttr = pch->getAttributes().findAttr<XMLAttributeAreaQuest>("areaquest");
+    
+    if (!areaQuestAttr)
+        return;
+
+    int lifetime = aquestConfig["lifetime"].asInt();
+    int cutoffTime = dreamland->getCurrentTime() - lifetime * Date::SECOND_IN_DAY;
+    bool changed = false;
+
+    for (auto &aquestDataPair: **areaQuestAttr) {
+        const DLString &questId = aquestDataPair.first;
+        AreaQuestData &aquestData = aquestDataPair.second;
+
+        if (aquestData.questActive() && aquestData.timestart < cutoffTime) {
+            aquestData.cancel();
+
+            AreaQuest *aquest = get_area_quest(questId);
+
+            pch->pecho("\r\n{yЗадание {Y%s{y отменено из-за неактивности.{x",
+                        (aquest ? aquest->title.c_str() : questId.c_str()));
+
+            changed = true;
+
+            wiznet(WIZ_QUEST, 0, 0, "Auto-cancelled area quest %s for %s", questId.c_str(), pch->getNameC());
+        }
+    }
+
+    if (changed)
+        pch->save();
 }

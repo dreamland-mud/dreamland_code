@@ -39,6 +39,8 @@ mobilebehaviorplugin.cpp \
 objectbehaviorplugin.cpp \
 areabehaviorplugin.cpp \
 roombehaviorplugin.cpp \
+descriptorstatelistener.cpp \
+descriptorstatemanager.cpp \
 fenia_utils.cpp \
 math_utils.cpp \
 calendar_utils.cpp \
