@@ -57,8 +57,7 @@ void AreaQuestCleanupPlugin::run( int oldState, int newState, Descriptor *d )
 
             } else {
                 // Make the player type 'quest cancel <num>', to allow onCancel triggers to run.
-                pch->pecho("\r\n{yЗадание {Y%s{y будет отменено из-за неактивности.{x",
-                            (aquest ? aquest->title.c_str() : questId.c_str()));
+                pch->pecho("\r\n{yЗадание {Y%s{y будет отменено из-за неактивности.{x", aquest->title.c_str());
 
                 interpret_raw(ch, "quest", "cancel %d", aquest->vnum.getValue());
 

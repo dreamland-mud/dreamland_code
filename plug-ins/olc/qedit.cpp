@@ -402,6 +402,26 @@ AQEDIT(fenia, "феня", "редактировать тригера")
     return false;
 }
 
+// Clears existing trigger begin before assigning new one or changing target type/vnum.
+static void clear_step_begin_trigger(PCharacter *ch, AreaQuest *q, int step)
+{
+    feniaTriggers->openEditor(ch, q, step, true, "kill");
+}
+
+// Clears existing trigger end before assigning new one or changing target type/vnum.
+static void clear_step_end_trigger(PCharacter *ch, AreaQuest *q, int step)
+{
+    feniaTriggers->openEditor(ch, q, step, false, "kill");
+}
+
+// Clears all triggers for this step, when the steps are swapped.
+static void clear_step_triggers(PCharacter *ch, AreaQuest *q, int step)
+{
+    clear_step_begin_trigger(ch, q, step);
+    clear_step_end_trigger(ch, q, step);
+}
+
+
 AQEDIT(step, "шаг", "редактор шагов квеста")
 {
     AreaQuest *q = getOriginal();
@@ -455,6 +475,9 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             return false;
         }
 
+        clear_step_triggers(ch, q, step-1);
+        clear_step_triggers(ch, q, step);
+
         std::swap(q->steps[step-1], q->steps[step]);
         ch->pecho("Шаги %d и %d поменялись местами.", step.getValue(), (int)step-1);
         show_steps(ch, q);
@@ -467,6 +490,9 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             ch->pecho("Шаг %d и так самый последний в списке.", step.getValue());
             return false;
         }
+
+        clear_step_triggers(ch, q, step);
+        clear_step_triggers(ch, q, step+1);
 
         std::swap(q->steps[step], q->steps[step+1]);
         ch->pecho("Шаги %d и %d поменялись местами.", step.getValue(), (int)step+1);
@@ -562,9 +588,16 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         }
 
         if (isBegin) {
+            if (thisStep->beginType != type)
+                clear_step_begin_trigger(ch, q, step);
+
             thisStep->beginType = type;
             ch->pecho("Началу шага %d присвоен тип %s.", step.getValue(), type.c_str());
+
         } else {
+            if (thisStep->endType != type)
+                clear_step_end_trigger(ch, q, step);
+
             thisStep->endType = type;
             ch->pecho("Концу шага %d присвоен тип %s.", step.getValue(), type.c_str());
         }
@@ -583,9 +616,16 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
         }
 
         if (isBegin) {
+            if (thisStep->beginValue != vnum.toString())
+                clear_step_begin_trigger(ch, q, step);
+
             thisStep->beginValue = vnum.toString();
             ch->pecho("Началу шага %d присвоен vnum %d.", step.getValue(), vnum.getValue());
+
         } else {
+            if (thisStep->endValue != vnum.toString())
+                clear_step_end_trigger(ch, q, step);
+
             thisStep->endValue = vnum.toString();
             ch->pecho("Концу шага %d присвоен vnum %d.", step.getValue(), vnum.getValue());
         }
@@ -605,13 +645,17 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
             return false;
         }
 
-        // Clears existing trigger before assigning new one.
-        feniaTriggers->openEditor(ch, q, step, isBegin, "clear");
-
         if (isBegin) {
+            if (thisStep->beginTrigger != trigName)
+                clear_step_begin_trigger(ch, q, step);
+
             thisStep->beginTrigger = trigName;
             ch->pecho("Началу шага %d присвоен триггер %s.", step.getValue(), trigName.c_str());
+
         } else {
+            if (thisStep->endTrigger != trigName)
+                clear_step_end_trigger(ch, q, step);
+
             thisStep->endTrigger = trigName;
             ch->pecho("Концу шага %d присвоен триггер %s.", step.getValue(), trigName.c_str());
         }

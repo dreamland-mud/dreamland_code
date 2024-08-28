@@ -665,11 +665,20 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const Integer 
     Register method = findMethodOnWrapper(wrapper, methodId);
     DLString args = constArguments;
 
+    // User typed 'fenia ... clear' 
     if (arg_is_clear(args)) {
         if (feniaTriggers->clearTrigger(wrapper.toObject(), methodId))
             ch->pecho("Триггер %s успешно удален.\r\n", methodId.c_str());
         else
             ch->pecho("Триггер %s не найден для удаления.\r\n", methodId.c_str());        
+
+        return true;
+    }
+
+    // Trigger type or step order has changed, clean up existing triggers.
+    if (args == "kill") {
+        if (feniaTriggers->clearTrigger(wrapper.toObject(), methodId))
+            ch->pecho("{RТриггер %s удален как неактуальный{x. Старый сценарий есть в логах и в каталоге share/DL/fenia/areas на хостинге.\r\n", methodId.c_str());
 
         return true;
     }
