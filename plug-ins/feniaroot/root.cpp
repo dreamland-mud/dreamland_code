@@ -36,6 +36,7 @@
 #include "calendar_utils.h"
 #include "material-table.h"
 #include "stats_apply.h"
+#include "mudtags.h"
 
 #include "root.h"
 #include "nannyhandler.h"
@@ -648,8 +649,12 @@ NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Di
 
 NMI_INVOKE(Root, telegram, "(msg): послать сырое сообщение в Telegram")
 {
+    ostringstream buf;
     DLString msg = args2string(args);
-    send_telegram_no_escape(msg);
+    mudtags_convert(msg.c_str(), buf, 
+        TAGS_CONVERT_VIS|TAGS_ENFORCE_RAW|
+        TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR);
+    send_telegram_no_escape(buf.str());
     return Register( );
 }
 

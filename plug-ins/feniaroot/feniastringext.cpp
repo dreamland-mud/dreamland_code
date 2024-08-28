@@ -261,7 +261,10 @@ NMI_INVOKE(FeniaString, stripColour, "(): удаляет все символы �
 NMI_INVOKE(FeniaString, stripTags, "(): удаляет все специальные теги и цвета")
 {
     ostringstream buf;
-    mudtags_convert(c_str(), buf, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR);
+    mudtags_convert(c_str(), buf, 
+        TAGS_CONVERT_VIS|TAGS_ENFORCE_RAW|
+        TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR);
+
     return buf.str();
 }
 
