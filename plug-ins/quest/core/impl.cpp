@@ -6,6 +6,7 @@
 #include "so.h"
 #include "questmanager.h"
 #include "xmlattributequestdata.h"
+#include "areaquestcleanupplugin.h"
 
 extern "C"
 {
@@ -15,7 +16,8 @@ extern "C"
                 
                 Plugin::registerPlugin<QuestManager>( ppl );
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeQuestData> >( ppl );
-                
+                Plugin::registerPlugin<AreaQuestCleanupPlugin>(ppl);
+
                 return ppl;
         }
         

@@ -83,7 +83,6 @@ extern "C" {
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<BasicObjectBehavior> >(ppl);
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeAreaQuest> >( ppl );
-        Plugin::registerPlugin<AreaQuestCleanupPlugin>(ppl);
 
         return ppl;
     }

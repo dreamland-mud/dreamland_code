@@ -10,7 +10,8 @@ $(INCLUDES_SRC)
 
 libquest_core_la_LIBADD = \
 ../../selfrate/libselfrate.la \
-$(LIBADD_AI)
+$(LIBADD_AI) \
+-ljsoncpp
 
 libquest_core_la_SOURCES = \
 impl.cpp \
@@ -23,7 +24,8 @@ questentity.cpp \
 questscenario.cpp \
 mobquestbehavior.cpp \
 objquestbehavior.cpp \
-xmlattributequestdata.cpp 
+xmlattributequestdata.cpp \
+areaquestcleanupplugin.cpp
 
 libquest_core_la_MOC = \
 questmanager.h \
