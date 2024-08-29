@@ -37,7 +37,18 @@ DLString CommandHelp::getTitle(const DLString &label) const
 {
     ostringstream buf;
 
-    if (!label.empty() || !titleAttribute.empty() || !command)
+    // Website: right-hand side table of contents
+    if (label == "toc") {
+        buf << "Команда '" << command->getRussianName() << "'";
+        return buf.str();
+    }
+
+    // Website: article title
+    if (label == "title") {
+        return DLString::emptyString;
+    }
+
+    if (!titleAttribute.empty() || !command)
         return MarkupHelpArticle::getTitle(label);
 
     buf << "Команда {c";

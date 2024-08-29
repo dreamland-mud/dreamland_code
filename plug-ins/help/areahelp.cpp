@@ -28,7 +28,21 @@ DLString AreaHelp::getTitle(const DLString &label) const
     ostringstream buf;
     AreaIndexData *area = areafile->area;
 
-    if (!label.empty() || !titleAttribute.empty() || !selfHelp)
+    // Website: right-hand side table of contents
+    if (label == "toc") {
+        if (!titleAttribute.empty())
+            return titleAttribute;
+            
+        buf << "Зона '" << area->getName() << "'";
+        return buf.str();
+    }
+
+    // Website: article title
+    if (label == "title") {
+        return titleAttribute;
+    }
+
+    if (!titleAttribute.empty() || !selfHelp)
         return MarkupHelpArticle::getTitle(label);
 
     buf << "Зона {c" << area->getName() << "{x";

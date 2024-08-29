@@ -1290,6 +1290,9 @@ public:
                     h["titles"][l] = (*a)->getTitle(l).colourStrip();
                 }
 
+                h["toc"] = (*a)->getTitle("toc").colourStrip();       
+                h["title"] = (*a)->getTitle("title").colourStrip();           
+
                 ostringstream textStream;
                 DLString text = (*a)->getText(&dummy);
                 mudtags_convert(text.c_str(), textStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_WEB, &dummy);

@@ -119,16 +119,20 @@ void SkillHelp::applyFormatter( Character *ch, ostringstream &in, ostringstream 
  */
 DLString SkillHelp::getTitle(const DLString &label) const
 {
+    ostringstream buf;
+
     if (!skill)
         return HelpArticle::getTitle(label);
 
-    // For help json dump.
-    if (!label.empty()) {
-        if (label == "cmd" && skill->getCommand()) 
-            return skill->getCommand()->getName() + ", "
-                    + skill->getCommand()->getRussianName();
+    // Website: right-hand side table of contents
+    if (label == "toc") {
+        buf << skill_what(*skill).ruscase('1').upperFirstCharacter() << " '" << skill->getRussianName() << "'";
+        return buf.str();
+    }
 
-        return skill->getName() + ", " + skill->getRussianName();
+    // Website: article title
+    if (label == "title") {
+        return DLString::emptyString;
     }
 
     // Default title if not set explicitly.

@@ -68,8 +68,8 @@ bool DefaultSkillGroup::available( Character *ch ) const
 void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 {
     buf << "Группа "
-        << "{Y" << getName( ) << "{w, "
-        << "{Y" << getRussianName( ) << "{w ";
+        << "{Y" << getRussianName( ) << "{w, "
+        << "{Y" << getName( ) << "{w ";
         
     if (help)
         buf << web_edit_button(ch, "hedit", help->getID());

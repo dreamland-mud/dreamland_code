@@ -65,12 +65,22 @@ void RaceHelp::save() const
 
 DLString RaceHelp::getTitle(const DLString &label) const
 {
-    // For help json dump.
-    if (!label.empty() && race)
-        return race->getMltName().ruscase('1') + ", " + race->getName();
+    ostringstream buf;
+
+    // Website: right-hand side table of contents
+    if (label == "toc") {
+        if (race)
+            buf << "Раса '" << race->getMaleName().ruscase('1') << "'";
+        return buf.str();
+    }
+
+    // Website: article title
+    if (label == "title") {
+        return DLString::emptyString;
+    }
 
     // Default title if not set explicitly.
-    if (label.empty() && titleAttribute.empty() && race)
+    if (titleAttribute.empty() && race)
         return "Раса {c" + race->getMltName().ruscase('1') + "{x, {c" + race->getName() + "{x";
 
     return HelpArticle::getTitle(label);

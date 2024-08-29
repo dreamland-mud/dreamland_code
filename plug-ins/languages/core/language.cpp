@@ -28,7 +28,19 @@ DLString LanguageHelp::getTitle(const DLString &label) const
 {
     ostringstream buf;
 
-    if (!label.empty() || !titleAttribute.empty() || !command)
+    // Website: right-hand side table of contents
+    if (label == "toc") {
+        if (command)
+            buf << "Древний язык '" << command->getRussianName() << "'";
+        return buf.str();
+    }
+
+    // Website: article title
+    if (label == "title") {
+        return DLString::emptyString;
+    }
+
+    if (!titleAttribute.empty() || !command)
         return MarkupHelpArticle::getTitle(label);
 
     buf << "Древний язык {c";

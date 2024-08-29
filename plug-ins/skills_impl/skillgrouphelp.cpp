@@ -24,7 +24,21 @@ void SkillGroupHelp::save() const
 
 DLString SkillGroupHelp::getTitle(const DLString &label) const
 {
-    if (!label.empty() || !group || !titleAttribute.empty())
+    ostringstream buf;
+
+    // Website: right-hand side table of contents
+    if (label == "toc") {
+        if (group)
+            buf << "Группа умений '" << group->getRussianName()  << "'";
+        return buf.str();
+    }
+
+    // Website: article title
+    if (label == "title") {
+        return DLString::emptyString;
+    }
+    
+    if (!group || !titleAttribute.empty())
         return MarkupHelpArticle::getTitle(label);
 
     return "Группа умений {c" + group->getRussianName() + "{x, {c" + group->getName() + "{x";
