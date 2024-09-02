@@ -50,6 +50,8 @@ DLString ClassSkillHelp::getTitle(const DLString &label) const
 
 void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
+    static const DLString PROF_SKILL_TYPE = "GenericSkill";
+
     // True if it's a help json dump and not a player requesting the article.
     bool autodump = ch->desc == 0;
 
@@ -73,9 +75,9 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
         if (mylevel > LEVEL_MORTAL)
             continue;
         
-        if (skill->hasGroup(group_ancient_languages)
-            || skill->hasGroup(group_card_pack)
-            || skill->hasGroup(group_tattoo_master))
+        // Exclude craft and other non-class skills.
+        XMLVariableContainer *xmlVar = dynamic_cast<XMLVariableContainer *>(skill);
+        if (xmlVar && xmlVar->getType() != PROF_SKILL_TYPE)
             continue;
 
         DLString skillName;
@@ -260,7 +262,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     }
 
     in << endl;
-    in << endl << "Подробнее обо всех параметрах читай в %H% [(class stats,таблица классов)]. ";
+    in << endl << "Подробнее обо всех параметрах читай в %H% {hh28таблица классов{x. ";
     if (prof->skillHelp && prof->skillHelp->getID() > 0)
         in << "%SA% %H% [(" << prof->getName() << " skills,умения " 
            << prof->getRusName().ruscase('2') << ")].";

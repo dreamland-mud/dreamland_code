@@ -1287,7 +1287,6 @@ public:
 
                 for (auto &l: (*a)->labels.all) {
                     h["labels"].append(l);
-                    h["titles"][l] = (*a)->getTitle(l).colourStrip();
                 }
 
                 h["toc"] = (*a)->getTitle("toc").colourStrip();       

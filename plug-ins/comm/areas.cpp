@@ -91,8 +91,7 @@ CMDRUNP( areas )
         const char *nameFmt = (isMansion || isClan) ? "%-40.40s " : "%-23.23s ";
 
         // Make area name a clickable link to area help, if present.
-        AreaHelp *ahelp = area_selfhelp(pArea);
-        int hid = ahelp && !help_is_empty(*ahelp) ? ahelp->getID() : 0;
+        int hid = area_helpid(pArea);
         if (hid > 0) {
             DLString aname = pArea->getName();
             str << fmt(ch, web_cmd(ch, "help " + DLString(hid), nameFmt).c_str(), aname.colourStrip().c_str());

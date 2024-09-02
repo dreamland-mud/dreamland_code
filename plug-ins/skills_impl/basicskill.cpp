@@ -506,7 +506,7 @@ DLString BasicSkill::printPracticers(PCharacter *ch) const
     if (ch->getHometown() == home_frigate)
         buf << pad << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
     else if (ch->getModifyLevel() < 20)
-        buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
+        buf << pad << "Ты все еще можешь учиться у {gадепта{x ({g{hh1433Старая Школа Новичков{x)." << endl;
 
     return buf.str();
 }

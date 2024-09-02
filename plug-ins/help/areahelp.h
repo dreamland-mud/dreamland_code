@@ -32,6 +32,9 @@ struct AreaIndexData;
 /** Get self-help article for this area, either a real one or automatically created. */
 AreaHelp * area_selfhelp(struct AreaIndexData *area);
 
+/** Get self-help ID for this area, or -1. */
+int area_helpid(struct AreaIndexData *area);
+
 /** Return true if this article is empty or consists only of spaces. */
 bool help_is_empty(const HelpArticle &help);
 

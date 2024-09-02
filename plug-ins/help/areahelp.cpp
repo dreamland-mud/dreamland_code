@@ -156,6 +156,14 @@ AreaHelp * area_selfhelp(AreaIndexData *area)
     return 0;
 }
 
+int area_helpid(struct AreaIndexData *area)
+{
+    AreaHelp *ahelp = area_selfhelp(area);
+    int hid = ahelp && !help_is_empty(*ahelp) ? ahelp->getID() : -1;
+    return hid;
+}
+
+
 /** Return true if this article is empty or consists only of spaces. */
 bool help_is_empty(const HelpArticle &help)
 {

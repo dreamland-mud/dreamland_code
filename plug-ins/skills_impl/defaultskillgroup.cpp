@@ -14,6 +14,7 @@
 #include "websocketrpc.h"
 #include "act.h"
 #include "loadsave.h"
+#include "areahelp.h"
 #include "merc.h"
 
 #include "def.h"
@@ -108,9 +109,11 @@ void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) con
         else
             buf << "Учитель";
 
+        int helpID = area_helpid(pMob->area);
+
         buf << " - {g" 
             << russian_case( pMob->short_descr, '1' ) << "{x "
-            << "({g{hh" << pMob->area->getName() << "{x).";
+            << "({g{hh" << (helpID > 0 ? DLString(helpID) : "") << pMob->area->getName() << "{x).";
     }
 
     buf << endl;
