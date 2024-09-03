@@ -120,7 +120,6 @@ GSN(spellbane);
 
 #define PULSE_SAVING                  ( 6 * dreamland->getPulsePerSecond( ))
 #define PULSE_WATER_FLOAT          ( 4 * dreamland->getPulsePerSecond( ))
-#define PULSE_MUSIC                  ( 6 * dreamland->getPulsePerSecond( ))
 #define PULSE_RAFFECT                  ( 3 * PULSE_MOBILE)
 #define PULSE_AREA                  (110 * dreamland->getPulsePerSecond( )) /* 97 saniye */
 #define PULSE_TRACK                  ( 6 * dreamland->getPulsePerSecond( ))
@@ -952,7 +951,6 @@ void update_handler( void )
     static  int     pulse_mobile;
     static  int     pulse_violence;
     static  int     pulse_point;
-    static  int            pulse_music;
     static  int            pulse_water_float;
     static  int            pulse_raffect;
     static  int     pulse_saving;
@@ -982,12 +980,6 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Area update"  << endl;
         area_update        ( );
-    }
-
-    if ( --pulse_music          <= 0 )
-    {
-        pulse_music        = PULSE_MUSIC;
-        /*        song_update(); */
     }
 
     if ( --pulse_mobile   <= 0 )

@@ -339,40 +339,6 @@ Object *get_obj_carry( Character *ch, char *argument )
 }
 
 /*
- * See obj in player's equipment
- *
- * Change get_obj_here if correct this function
- *
- */
-Object *see_obj_carry( Character *stealer, Character *ch, char *argument )
-{
-        char arg[MAX_INPUT_LENGTH];
-        Object *obj;
-        int number;
-        int count;
-        long long id = get_arg_id( argument );
-
-        number = number_argument( argument, arg );
-        count  = 0;
-
-        for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
-        {
-                if ( obj->wear_loc == wear_none
-                        && ( stealer->can_see( obj ) )
-                        && ((id && obj->getID( ) == id) 
-                             || (!id && obj_has_name( obj, arg, stealer  ))))
-                {
-                        if (id || ++count == number )
-                                return obj;
-                }
-        }
-
-        return 0;
-}
-
-
-
-/*
  * Find an obj in player's equipment.
  *
  * Change get_obj_here if correct this function

@@ -98,7 +98,6 @@ PCharacter *        get_player_world( Character *ch, const char *arg, bool fSeen
 Object *        get_obj_list        ( Character *ch, const DLString &cArg, Object *list, DLString pocket = "" );
 Object *        get_obj_carry        ( Character *ch, const DLString & );
 Object *        get_obj_carry        ( Character *ch, char *argument );
-Object *        see_obj_carry        ( Character *stealer, Character *ch, char *argument );
 Object *        get_obj_wear        ( Character *ch, const char *argument );
 Object *        get_obj_wear        ( Character *ch, const DLString & );
 Object *        get_obj_here        ( Character *ch, const DLString & );
