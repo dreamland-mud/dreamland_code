@@ -253,6 +253,8 @@ void LevelAdaptivePet::config( PCharacter *client, NPCharacter *pet ) const
         pet->max_mana += level * 10;
         pet->mana = pet->max_mana;
     }
+
+    pet->move = pet->max_move = max(100, level * 10);
 }
 
 /*----------------------------------------------------------------------
