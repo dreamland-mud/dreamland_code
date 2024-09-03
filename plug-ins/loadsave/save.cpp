@@ -467,6 +467,13 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
         if (mob->detection != mob->pIndexData->detection)
                 fprintf(fp, "Detect %s\n", print_flags(mob->detection));
 
+        fprintf(fp, "Part %s\n", print_flags(mob->parts));
+        fprintf(fp, "Form %s\n", print_flags(mob->form));
+        fprintf(fp, "Size %d\n", mob->size);
+        fprintf(fp, "Imm %s\n", print_flags(mob->imm_flags));
+        fprintf(fp, "Res %s\n", print_flags(mob->res_flags));
+        fprintf(fp, "Vuln %s\n", print_flags(mob->res_flags));        
+
         if (mob->comm != 0)
                 fprintf(fp, "Comm %s\n", print_flags(mob->comm));
 
@@ -1511,7 +1518,10 @@ NPCharacter * fread_mob( FILE *fp )
 
                     KEY( "Exp",        mob->exp,                fread_number(fp));
                     break;
+            case 'F':
+                    KEY("Form", mob->form, fread_flag(fp));
 
+                    break;
             case 'G':
                     KEY( "Gold",        mob->gold,                fread_number(fp));
                     break;
@@ -1533,6 +1543,8 @@ NPCharacter * fread_mob( FILE *fp )
                     break;
 
             case 'I':
+                    KEY("Imm", mob->imm_flags, fread_flag(fp));
+
                     if (!str_cmp( word, "Id" )) {
                         mob->setID( fread_number64( fp ) );
                         fMatch = true;
@@ -1576,9 +1588,13 @@ NPCharacter * fread_mob( FILE *fp )
 
             case 'P':
                     KEYV( "Pos",        mob->position,                fread_number(fp));
+                    KEY("Part", mob->parts, fread_flag(fp));
+
                     break;
 
             case 'R':
+                    KEY("Res", mob->res_flags, fread_flag(fp));
+
                     if (!str_cmp( word, "Room" )) {
                         mob->in_room = get_room_instance( fread_number( fp ) );
                         fMatch = true;
@@ -1614,6 +1630,7 @@ NPCharacter * fread_mob( FILE *fp )
             case 'S' :
                     KEY( "Save",        mob->saving_throw,        fread_number(fp));
                     KEY( "Silv",        mob->silver,            fread_number( fp ) );
+                    KEY("Size", mob->size, fread_number(fp));
 
                     if( !str_cmp( word, "Sex" ) )
                     {
@@ -1641,6 +1658,10 @@ NPCharacter * fread_mob( FILE *fp )
 
             case 'T':
                     KEY( "Timer",        mob->timer,                fread_number( fp ) );
+                    break;
+
+            case 'V':
+                    KEY("Vuln", mob->vuln_flags, fread_flag(fp));
                     break;
 
             case 'W':

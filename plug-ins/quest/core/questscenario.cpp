@@ -131,6 +131,7 @@ void QuestMobileAppearence::dress( NPCharacter *mob ) const
 
     if (race.getName() != "none") {
         mob->setRace( race.getName( ) );
+        mob->size = mob->getRace()->getSize();
         SET_BIT(mob->form, mob->getRace()->getForm());
         SET_BIT(mob->parts, mob->getRace()->getParts());
         SET_BIT(mob->vuln_flags, mob->getRace()->getVuln());
