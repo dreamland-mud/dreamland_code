@@ -32,7 +32,7 @@ public:
     virtual void destruction( ) {}
 
     virtual DLString getTableName( ) const {
-        return "behaviors";
+        return "legacy-behaviors";
     }
     virtual DLString getNodeName( ) const {
         return MobileBehavior::NODE_NAME;
