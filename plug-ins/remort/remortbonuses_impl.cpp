@@ -18,7 +18,7 @@ StatRemortBonus::StatRemortBonus( )
 DLString StatRemortBonus::getShortDescr( ) const
 {
     if (shortDescr.empty( ))
-        return stat_table.message( stat );
+        return stat_table.message( stat, '7' );
     else
         return RemortBonus::getShortDescr( );
 }

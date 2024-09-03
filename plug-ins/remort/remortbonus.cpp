@@ -49,6 +49,7 @@ bool RemortBonus::purchase( Character *client, NPCharacter *keeper, const DLStri
     }
     
     bonusBuy( client->getPC( ) );
+    
     price->deduct( client );
     
     client->pecho( "%^C1 вручает тебе %N4 в обмен на %N4.",
