@@ -6,6 +6,7 @@
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
+#include "xmljsonvalue.h"
 #include "olcstate.h"
 #include "olc.h"
 #include "sedit.h"
@@ -14,6 +15,7 @@
 #include "interp.h"
 #include "arg_utils.h"
 #include "websocketrpc.h"
+#include "configurable.h"
 
 
 /*--------------------------------------------------------------------------
@@ -859,6 +861,30 @@ bool OLCState::editor(const char *argument, XMLStringList &values, editor_flags 
     values.clear();
     for (auto &line: newLines)
         values.push_back(line);
+
+    return true;
+}
+
+bool OLCState::editor(const char *argument, XMLJsonValue &value, editor_flags flags)
+{
+    Json::FastWriter writer;
+    DLString text = writer.write(value);
+    PCharacter *ch = owner->character->getPC();
+
+    if (!editor(argument, text, flags))
+        return false;
+
+    ostringstream errbuf;
+
+    if (!json_validate_text(text, errbuf)) {
+        ch->pecho("Ошибка парсинга JSON:");
+        ch->pecho(errbuf.str());
+        ch->pecho("Отредактируйте текст еще раз ({y{hc%s web{x).", lastCmd.c_str());
+        return false;
+    }
+
+    Json::Reader reader;
+    reader.parse(text, value);
 
     return true;
 }

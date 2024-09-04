@@ -29,7 +29,8 @@ webedit.cpp \
 feniatriggers.cpp \
 fedit.cpp \
 raceedit.cpp \
-qedit.cpp 
+qedit.cpp \
+bedit.cpp
 
 libolc_la_MOC = \
 redit.h \
@@ -47,7 +48,8 @@ security.h \
 olcstate.h \
 fedit.h \
 raceedit.h \
-qedit.h
+qedit.h \
+bedit.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc
@@ -75,7 +77,8 @@ $(LIBADD_FIGHT) \
 ../religion/libreligion.la \
 ../skills_impl/libskills_impl.la \
 ../updates/libupdates.la \
-../social/libsocial.la
+../social/libsocial.la \
+-ljsoncpp
 
 olcflags.cpp: olcflags.conf olcflags.h
 olcflags.h: olcflags.conf

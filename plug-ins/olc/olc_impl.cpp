@@ -18,6 +18,7 @@
 #include "socedit.h"
 #include "cmdedit.h"
 #include "qedit.h"
+#include "bedit.h"
 #include "olcstate.h"
 #include "onlinecreation.h"
 #include "security.h"
@@ -78,6 +79,7 @@ extern "C"
         
         OnlineCreation::registerPlugin(ppl);
         Plugin::registerPlugin<OLCInterpretLayer>( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateBehavior> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateAreaQuest> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateSkillGroup> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateCommand> >( ppl );

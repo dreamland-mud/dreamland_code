@@ -370,10 +370,33 @@ OEDIT(show)
         }
     }
 
+    // Display all assigned behaviors and active behavior triggers.
+    ptc(ch, "\r\n{cПоведение{x:            ");
+    for (int &bhvIndex: pObj->behaviors.toArray()) {
+		Behavior *bhv = behaviorManager->find(bhvIndex);
+        ptc(ch, "{C%s{x ", web_cmd(ch, "bedit $1", bhv->getName()).c_str());
+    }
+    ptc(ch, " {D(behaviors){x\n\r");
+
+    ptc(ch,     "{cТригеры поведения{x:    ");
+
+    for (int &bhvIndex: pObj->behaviors.toArray()) {
+		Behavior *bhv = behaviorManager->find(bhvIndex);
+		WrapperBase *bhvWrapper = bhv->getWrapper();
+        if (!bhvWrapper)
+            continue;
+
+        StringSet activeTriggers, miscMethods;    
+        bhvWrapper->collectTriggers(activeTriggers, miscMethods);
+
+        for (auto &trig: activeTriggers)
+            ptc(ch, "{C%s{w.{C%s{x ", bhv->getName().c_str(), trig.c_str());
+    }
+    ptc(ch, "\r\n");
+
+    // Display Fenia triggers and methods on this object.
     OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
     feniaTriggers->showTriggers(ch, original ? get_wrapper(original->wrapper) : 0, "obj");
-
-    ptc(ch, "Behaviors: [{G%s{x] {D(behaviors){x\n\r", pObj->behaviors.toString().c_str());
 
     return false;
 }

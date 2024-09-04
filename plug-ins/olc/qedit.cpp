@@ -146,7 +146,7 @@ static DLString menu_step_trigger(Integer step, const DLString &stepType, const 
     DLString id = "step " + step.toString() + " " + beginOrEnd + " trigger" ;
 
     StringList commands;
-    for (auto trig: feniaTriggers->getQuestTriggers(stepType)) {
+    for (auto trig: feniaTriggers->getTriggersForTarget(stepType, "queststep")) {
         // Show all triggers for 'begin' stage of the step 0
         if (step == 0 && beginOrEnd == "begin") {
             commands.push_back("$ " + trig);
@@ -637,7 +637,7 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     // 'step 3 begin|end trigger onSpeech'
     if (arg_oneof(action, "triger", "trigger", "тригер", "триггер")) {
         DLString trigName = args.getOneArgument();        
-        auto allTriggers = feniaTriggers->getQuestTriggers(isBegin ? thisStep->beginType : thisStep->endType);
+        auto allTriggers = feniaTriggers->getTriggersForTarget(isBegin ? thisStep->beginType : thisStep->endType, "queststep");
 
         if (allTriggers.count(trigName) == 0) {
             ch->pecho("Триггер %s не найден в списке допустимых тригеров: %s", 
@@ -763,7 +763,7 @@ AQEDIT(show, "показать", "показать все поля")
     return false;
 }
 
-AQEDIT(commands, "команды", "показать список встроенных команд cmdedit")
+AQEDIT(commands, "команды", "показать список встроенных команд qedit")
 {
     do_commands(ch);
     return false;

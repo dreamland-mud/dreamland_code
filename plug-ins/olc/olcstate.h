@@ -25,6 +25,7 @@ using namespace std;
 class Descriptor;
 struct AreaIndexData;
 class GlobalBitvector;
+class XMLJsonValue;
 
 typedef enum {
     ED_NO_FLAG=0,
@@ -129,6 +130,7 @@ protected:
     bool editor(const char *argument, char *&field, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, RussianString &original, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, XMLStringList &values, editor_flags flags = ED_NO_FLAG);
+    bool editor(const char *argument, XMLJsonValue &value, editor_flags flags = ED_NO_FLAG);
     
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;

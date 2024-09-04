@@ -18,7 +18,7 @@
 #include <spell.h>
 #include "skillgroup.h"
 #include "affecthandler.h"
-
+#include "behavior.h"
 #include <character.h>
 #include <pcharacter.h>
 #include <commandmanager.h>
@@ -66,6 +66,7 @@ int class_table;
 int clan_table;
 int religion_table;
 int mat_table;
+int behavior_table;
 
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
@@ -138,6 +139,7 @@ const struct olc_help_type help_table[] =
     {"command_flags", &command_flags, "Флаги для команды (поле extra)."},
     {"command_category_flags", &command_category_flags, "Категории команды (поле cat)"},
     {"argtype_table", &argtype_table, "Тип аргумента для команды умения (поле argtype)."},
+    {"behaviors", &behavior_table, "Поведение комнаты, моба, предмета."},
 
     {NULL, NULL, NULL, NULL}
 };
@@ -359,6 +361,18 @@ bool show_help(Character * ch, const char *cargument)
             buf << endl;
                 }
                 buf << endl;
+                ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &behavior_table) {
+                ostringstream buf;
+                for (int i = 0; i < behaviorManager->size(); i++) {
+                    Behavior *bhv = behaviorManager->find(i);
+                    buf << fmt(0, "{g%-15s{x: %-17N1 %s\r\n",
+                            bhv->getName().c_str(),
+                            bhv->getRussianName().c_str(),
+                            bhv->target.c_str());
+                }
                 ch->send_to(buf);
                 return false;
             }

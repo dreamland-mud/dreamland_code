@@ -62,7 +62,7 @@
 #include "fenia_utils.h"
 
 #include "commonattributes.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "mobilebehavior.h"
 #include "affecthandler.h"
 #include "skill.h"
@@ -511,7 +511,7 @@ void diving_update( )
     for (auto &r: roomInstances) {
         try {
             FENIA_VOID_CALL(r, "DiveUpdate", "");
-            rafprog_spec(room);
+            rafprog_spec(r);
             FENIA_VOID_CALL(r, "Spec", "");
         } catch (const VictimDeathException &ex) {
             // DO NOTHING

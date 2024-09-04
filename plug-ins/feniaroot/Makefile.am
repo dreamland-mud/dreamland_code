@@ -39,7 +39,8 @@ wrap_utils.cpp \
 feniacroaker.cpp \
 commandtableloader.cpp \
 codesourcerepo.cpp \
-behaviorwrapper.cpp
+behaviorwrapper.cpp \
+behaviorloader.cpp
 
 libfeniaroot_la_MOC = \
 root.h \

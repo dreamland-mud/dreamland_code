@@ -18,6 +18,7 @@ class DefaultSpell;
 class DefaultAffectHandler;
 class DefaultSkillCommand;
 class WrappedCommand;
+class DefaultBehavior;
 
 bool stringIsCapitalized(const DLString &str);
 DLString triggerType(const DLString &name);
@@ -40,15 +41,16 @@ public:
     bool openEditor(PCharacter *ch, WrappedCommand *cmd, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, AreaQuest *q, const DLString &constArguments) const;
     bool openEditor(PCharacter *ch, AreaQuest *q, const Integer &s, bool isBegin, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, DefaultBehavior *bhv, const DLString &constArguments) const;
 
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
-    void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const;
+    void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType, const DLString &target = DLString::emptyString) const;
     
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
     bool clearTriggers(Scripting::Object *wrapper) const;
 
     Scripting::Register findMethodOnWrapper(Scripting::Register w, const DLString &methodName) const;
-    StringSet getQuestTriggers(const DLString &stepType) const;
+    StringSet getTriggersForTarget(const DLString &target, const DLString &indexType) const;
 
 protected:
     bool editExisting(Character *ch, Scripting::Register &retval) const;
@@ -74,6 +76,9 @@ protected:
 
     vector<DLString> createQuestStepParams(
         Character *ch, AreaQuest *q, const DLString &type, const DLString &vnum, const DLString &trigName, const Integer &s, const DLString &methodId) const;
+
+    vector<DLString> createBehaviorParams(
+        PCharacter *ch, DefaultBehavior *bhv, const DLString &trigName) const;
 
     IndexTriggers indexTriggers;
 };

@@ -19,6 +19,7 @@
 #include "damageflags.h"
 #include "arg_utils.h"
 #include "areaquestutils.h"
+#include "defaultbehavior.h"
 #include "merc.h"
 
 #include "act.h"
@@ -53,6 +54,7 @@ void FeniaTriggerLoader::initialization()
     loadFolder("command");
     loadFolder("queststep");
     loadFolder("areaquest");
+    loadFolder("behavior");
 }
 
 void FeniaTriggerLoader::destruction()
@@ -193,7 +195,7 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, DefaultSpell *spell) const
 /**
  * Show all available and active triggers for a wrapper (skill command, mob index etc).
  */
-void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType) const
+void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType, const DLString &target) const
 {
     ostringstream buf;
     
@@ -227,10 +229,22 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, cons
     // Display remaining available triggers.
     if (!availableTriggers.empty()) {
         ostringstream abuf;
+        DLString trigPrefix = target + ":";
+        DLString trigName;
         
-        for (auto &t: availableTriggers)
-            if (activeTriggers.count(t) == 0 && miscMethods.count(t) == 0)
-                abuf << web_cmd(ch, "fenia $1", t) << " ";
+        for (auto &t: availableTriggers) {            
+            // Remove "mob:" prefix from trigger name example; hide non-matching triggers.
+            if (target.empty())
+                trigName = t;
+            else if (trigPrefix.strPrefix(t))
+                trigName = t.substr(trigPrefix.length());
+            else
+                continue;
+
+            if (activeTriggers.count(trigName) == 0 && miscMethods.count(trigName) == 0) {
+                abuf << web_cmd(ch, "fenia $1", trigName) << " ";
+            }
+        }
 
         if (!abuf.str().empty())
             buf << "Доступные триггеры:   " << abuf.str() << "{D(fenia <trig>){x" << endl;
@@ -594,24 +608,73 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, AreaQuest *q, const DLString
     return editExisting(ch, retval);
 }
 
-// For given step type (mob/obj/room) return a list of all triggers that begin with this
-// prefix, e.g. 'mob:onGreet', 'mob:onSpeech', with "mob:" prefix removed.
-StringSet FeniaTriggerLoader::getQuestTriggers(const DLString &stepType) const
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, DefaultBehavior *bhv, const DLString &constArguments) const
 {
-    StringSet stepTriggers;
-    DLString trigPrefix = stepType + ":";
+    if (!checkWebsock(ch))
+        return false;
 
-    auto t = indexTriggers.find("queststep");
+    DLString args = constArguments;
+    DLString methodName = args.getOneArgument();
+    Register retval = getMethodForName<DefaultBehavior>(bhv, methodName);
+
+    // Fenia field not found, try to open the editor with trigger example.
+    if (retval.type == Register::NONE) {
+        vector<DLString> parms = createBehaviorParams(ch, bhv, methodName);
+        if (parms.empty())
+            return false;
+
+        // Open the editor.
+        ch->desc->writeWSCommand("cs_edit", parms);
+        ch->pecho("Запускаю веб-редактор для поведения, триггер %s.", methodName.c_str());
+        return true;
+    }
+
+    return editExisting(ch, retval);
+}
+
+vector<DLString> FeniaTriggerLoader::createBehaviorParams(PCharacter *ch, DefaultBehavior *bhv, const DLString &trigName) const
+{    
+    std::vector<DLString> parms;
+    const DLString indexType = "behavior";
+    DLString methodName = bhv->target + ":" + trigName;
+
+    // Create codesource body with example code.
+    DLString tmpl;
+    if (!findExample(ch, methodName, indexType, tmpl))
+        return parms;
+
+    parms.resize(2);
+    tmpl.replaces("@name@", DLString("\"") + bhv->getName() + "\"");
+    tmpl.replaces("@trig@", trigName);
+    parms[1] = tmpl;
+
+    parms[0] = fmt(0, "behaviors/%s/%s", 
+        bhv->getName().c_str(), 
+        trigName.c_str());
+
+    return parms;
+}
+
+
+
+// For given target (mob/obj/room) return a list of all triggers that begin with this
+// prefix, e.g. 'mob:onGreet', 'mob:onSpeech', with "mob:" prefix removed.
+StringSet FeniaTriggerLoader::getTriggersForTarget(const DLString &target, const DLString &indexType) const
+{
+    StringSet triggers;
+    DLString trigPrefix = target + ":";
+
+    auto t = indexTriggers.find(indexType);
     if (t == indexTriggers.end())
-        return stepTriggers;
+        return triggers;
 
     for (auto &trig: t->second) {
         const DLString &trigName = trig.first;
         if (trigPrefix.strPrefix(trigName))
-            stepTriggers.insert(trigName.substr(trigPrefix.length()));
+            triggers.insert(trigName.substr(trigPrefix.length()));
     }
 
-    return stepTriggers;
+    return triggers;
 }
 
 vector<DLString> FeniaTriggerLoader::createQuestStepParams(
