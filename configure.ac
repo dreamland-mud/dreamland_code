@@ -58,6 +58,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(z, deflate)
+LIBS="-ljsoncpp $LIBS"
 
 AC_CHECK_THREADS
 AC_CHECK_GC
