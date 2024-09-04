@@ -258,11 +258,26 @@ void remove_room_saving( Room * room )
     saving_table[room->vnum] = 0;
 }
 
+static bool afprog_spec(Character *ch)
+{
+    bool rc = false;
+
+    for (auto &paf: ch->affected.findAllWithHandler())
+        if (paf->type->getAffect())
+            if (paf->type->getAffect( )->onSpec(SpellTarget::Pointer(NEW, ch), paf))
+                rc = true;
+
+    return rc;
+}
+
 static bool mprog_special( Character *ch )
 {
     FENIA_CALL( ch, "Spec", "" );
     FENIA_NDX_CALL( ch->getNPC( ), "Spec", "C", ch );
     BEHAVIOR_CALL( ch->getNPC( ), spec );
+
+    if (afprog_spec(ch))
+        return true;
     
     if (ch->is_npc( ) && !IS_CHARMED(ch)) {
         if (*(ch->getNPC( )->spec_fun) != 0 
@@ -484,11 +499,19 @@ void char_update( )
     }
 }
 
+static void rafprog_spec(Room *room)
+{
+    for (auto &paf: room->affected.findAllWithHandler())
+        if (paf->type->getAffect())
+            paf->type->getAffect()->onSpec(SpellTarget::Pointer(NEW, room), paf);
+}
+
 void diving_update( )
 {
     for (auto &r: roomInstances) {
         try {
             FENIA_VOID_CALL(r, "DiveUpdate", "");
+            rafprog_spec(room);
             FENIA_VOID_CALL(r, "Spec", "");
         } catch (const VictimDeathException &ex) {
             // DO NOTHING
