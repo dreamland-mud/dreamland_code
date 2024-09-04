@@ -50,7 +50,7 @@
 #include "skillgroup.h"
 #include "bonus.h"
 #include "eventbus.h"
-
+#include "behavior.h"
 
 #include "merc.h"
 #include "def.h"
@@ -102,6 +102,7 @@ DreamLand::DreamLand( )
         socketManager.construct( );
         servletManager.construct( );
         eventBus.construct();
+        behaviorManager.construct();
 
         basic_ostringstream<char> buf;
         buf << resetiosflags( ios::left );
@@ -133,6 +134,7 @@ DreamLand::~DreamLand( )
         servletManager.clear( );
         socketManager.clear( );
         eventBus.clear();
+        behaviorManager.clear();
 
         getFeniaDbEnv( )->close( );
         

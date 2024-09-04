@@ -72,8 +72,6 @@ bool fenia_trigger(const DLString &trigName, const Scripting::RegisterList &args
     // Collect arguments for the instance trigger call: everything but trigName.
     // Collect arguments for the index data call: 'this' then everything but trigName.
     RegisterList trigArgs = args, protoTrigArgs = args;
-    trigArgs.pop_front();
-    protoTrigArgs.pop_front();
     protoTrigArgs.push_front(Register(instance->getSelf()));
 
     // Keep trigger functions here.

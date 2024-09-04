@@ -393,6 +393,7 @@ struct        mob_index_data
     GlobalBitvector     practicer;
     GlobalBitvector religion;
     GlobalBitvector affects;
+    GlobalBitvector behaviors;
     Grammar::Number     gram_number;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;
@@ -423,6 +424,8 @@ typedef list<Object *> ObjectList;
  */
 struct        obj_index_data
 {
+    obj_index_data();
+    
     OBJ_INDEX_DATA *        next;
     EXTRA_DESCR_DATA *        extra_descr;
     AffectList        affected;
@@ -450,6 +453,7 @@ struct        obj_index_data
     DLString sound;
     Properties properties;
     ObjectList instances;
+    GlobalBitvector behaviors;
 };
 
 

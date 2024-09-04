@@ -36,6 +36,7 @@
 #include "weapontier.h"
 #include "websocketrpc.h"
 #include "act.h"
+#include "behavior.h"
 
 #include "../anatolia/handler.h"
 
@@ -93,6 +94,8 @@ void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
     obj.cost         = original->cost;
     obj.limit        = original->limit;
     memcpy(obj.value, original->value, sizeof(obj.value));
+    obj.behaviors.clear();
+    obj.behaviors.set(original->behaviors);
 }
 
 void OLCStateObject::copyDescriptions( OBJ_INDEX_DATA *original )
@@ -227,6 +230,9 @@ void OLCStateObject::commit()
         original->properties.insert( *p );
     obj.properties.clear( );
 
+    original->behaviors.clear();
+    original->behaviors.set(obj.behaviors);
+
     for(o = object_list; o; o = o->next)
         if(o->pIndexData == original) {
             o->updateCachedNoun( );
@@ -357,15 +363,18 @@ OEDIT(show)
         try {
             std::basic_ostringstream<char> ostr;
             pObj->behavior->save( ostr );
-            ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
+            ptc(ch, "Legacy behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
-            ptc(ch, "Behavior is BUGGY.\r\n");
+            ptc(ch, "Legacy behavior is BUGGY.\r\n");
         }
     }
 
     OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
     feniaTriggers->showTriggers(ch, original ? get_wrapper(original->wrapper) : 0, "obj");
+
+    ptc(ch, "Behaviors: [{G%s{x] {D(behaviors){x\n\r", pObj->behaviors.toString().c_str());
+
     return false;
 }
 
@@ -965,24 +974,30 @@ OEDIT(list)
     return false;
 }
 
-OEDIT(behavior)
+OEDIT(behaviors)
+{
+    return globalBitvectorEdit<Behavior>(obj.behaviors);
+}
+
+
+OEDIT(oldbehavior)
 {
     if (argument[0] == '\0') {
         if(!xmledit(obj.behavior))
             return false;
 
-        stc("Behavior set.\r\n", ch);
+        stc("Legacy behavior set.\r\n", ch);
         return true;
     }
 
     if (!str_cmp( argument, "clear" )) {        
         obj.behavior.clear( );
-        stc("Поведение очищено.\r\n", ch);
+        stc("Старое поведение очищено.\r\n", ch);
         return true;
     }
 
-    stc("Syntax:  behavior       - line edit\n\r", ch);
-    stc("Syntax:  behavior clear\n\r", ch);
+    stc("Syntax:  oldbehavior       - line edit\n\r", ch);
+    stc("Syntax:  oldbehavior clear\n\r", ch);
     return false;
 }
 

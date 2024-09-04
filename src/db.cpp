@@ -81,6 +81,7 @@ using namespace std;
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
+#include "behavior.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -176,10 +177,17 @@ Area::Area()
 {
 }
 
+obj_index_data::obj_index_data()
+                : behaviors(behaviorManager)
+{
+}
+
+
 mob_index_data::mob_index_data( ) 
                      : practicer( skillGroupManager ), 
                        religion( religionManager ),
                        affects(skillManager),
+                       behaviors(behaviorManager),
                        wrapper ( 0 ),
                        clan(clan_none)
 

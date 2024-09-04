@@ -9,6 +9,7 @@
 #include "character.h"
 #include "core/object.h"
 #include "feniamanager.h"
+#include "behavior.h"
 
 #include "dreamland.h"
 #include "roombehaviormanager.h"

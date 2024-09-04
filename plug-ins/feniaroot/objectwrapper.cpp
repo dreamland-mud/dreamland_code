@@ -855,8 +855,10 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
 {
     checkTarget();
 
-    // Get trig name such as "Death" or "Get".
+    // Get trig name such as "Death" or "Get", and trig arguments (all but first one)
     DLString trigName = argnum2string(args, 1);
+    RegisterList trigArgs = args;
+    trigArgs.pop_front();
 
     // "Get" triggers get special handling as there are item-type specific things to do,
     // plus affect progs and behavior progs.
@@ -869,7 +871,7 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
     // Get obj index data wrapper.
     WrapperBase *proto = get_wrapper(target->pIndexData->wrapper);
     // Helper function will invoke onDeath, postDeath triggers on item and proto.
-    return fenia_trigger(trigName, args, this, proto);
+    return fenia_trigger(trigName, trigArgs, this, proto);
 }
 
 NMI_INVOKE(ObjectWrapper, clone, "(): создать полную копию этого объекта")

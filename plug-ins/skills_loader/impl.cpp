@@ -8,6 +8,7 @@
 #include "cardskill.h"
 #include "craftskill.h"
 #include "genericskill.h"
+#include "defaultbehavior.h"
 
 TABLE_LOADER(ClanSkillLoader, "clan-skills", "skill");
 
@@ -21,6 +22,8 @@ TABLE_LOADER(ClassSkillLoader, "generic-skills", "skill");
 
 TABLE_LOADER(OtherSkillsLoader, "other-skills", "skill");
 
+TABLE_LOADER(BehaviorLoader, "behaviors", "behavior");
+
 extern "C"
 {
         SO::PluginList initialize_skills_loader( )
@@ -32,6 +35,7 @@ extern "C"
                 Plugin::registerPlugin<ClanSkillLoader>( ppl );
                 Plugin::registerPlugin<RaceAptitudeLoader>( ppl );
                 Plugin::registerPlugin<OtherSkillsLoader>( ppl );
+                Plugin::registerPlugin<BehaviorLoader>(ppl);
                 return ppl;
         }
         

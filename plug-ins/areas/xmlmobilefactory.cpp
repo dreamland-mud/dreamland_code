@@ -8,6 +8,7 @@
 #include "grammar_entities_impl.h"
 #include "skillgroup.h"
 #include "religion.h"
+#include "behavior.h"
 #include "race.h"
 #include "merc.h"
 
@@ -31,6 +32,7 @@ XMLMobileFactory::XMLMobileFactory( ) :
                           practicer(skillGroupManager),
                           religion(religionManager),
                           affects(skillManager),
+                          behaviors(behaviorManager),
                           properties( false )
 {
 }
@@ -94,6 +96,7 @@ XMLMobileFactory::init(const mob_index_data *mob)
     practicer.set(mob->practicer);
     religion.set(mob->religion);
     affects.set(mob->affects);
+    behaviors.set(mob->behaviors);
     
     if (mob->gram_number != Grammar::Number::SINGULAR)
         gram_number.setValue(mob->gram_number.toString());
@@ -186,6 +189,7 @@ XMLMobileFactory::compat(mob_index_data *mob)
     mob->practicer.set(practicer);
     mob->religion.set(religion);
     mob->affects.set(affects);
+    mob->behaviors.set(behaviors);
     
     if(!gram_number.getValue( ).empty( ))
         mob->gram_number = Grammar::Number(gram_number.getValue( ).c_str( ));

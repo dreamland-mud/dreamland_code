@@ -29,6 +29,7 @@
 #include "commandmanager.h"
 #include "wrappedcommand.h"
 #include "areaquestwrapper.h"
+#include "behaviorwrapper.h"
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"
@@ -39,6 +40,7 @@
 #include "character.h"
 #include "room.h"
 #include "object.h"
+#include "behavior.h"
 #include "merc.h"
 
 #include "def.h"
@@ -113,8 +115,18 @@ WrappersPlugin::linkTargets()
 
     for (auto &cmd: commandManager->getCommands().getCommands()) {
         WrappedCommand *wcmd = const_cast<WrappedCommand *>(cmd.getDynamicPointer<WrappedCommand>());
-        if (wcmd && wcmd->getHelp() && wcmd->getHelp()->getID() > 0)
-            wcmd->linkWrapper();
+        if (wcmd && wcmd->wrapper) {
+            LogStream::sendNotice() << "Fenia command: setting target for " << wcmd->getName() << endl;
+            wrapper_cast<FeniaCommandWrapper>(wcmd->wrapper)->setTarget(wcmd);
+        }            
+    }
+
+    for (int i = 0; i < behaviorManager->size(); i++) {
+        Behavior *bhv = behaviorManager->find(i);
+        if (bhv->wrapper) {
+            LogStream::sendNotice() << "Behavior: setting target for " << bhv->getName() << endl;
+            wrapper_cast<BehaviorWrapper>(bhv->wrapper)->setTarget(bhv);
+        }
     }
 }
 
@@ -181,6 +193,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<SkillGroupWrapper>( );
     Class::regMoc<FeniaCommandWrapper>( );
     Class::regMoc<AreaQuestWrapper>( );
+    Class::regMoc<BehaviorWrapper>();
     
     FeniaManager::getThis( )->recover( );
     
@@ -223,6 +236,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<FeniaString>("string", apiDump, false);
     traitsAPIJson<FeniaCommandWrapper>("command", apiDump, false);     
     traitsAPIJson<AreaQuestWrapper>("areaquest", apiDump, false);     
+    traitsAPIJson<BehaviorWrapper>("behavior", apiDump, false);  
     dumpTables(apiDump);
 
     Json::FastWriter writer;
@@ -234,11 +248,6 @@ WrappersPlugin::initialization( )
 
 void WrappersPlugin::unlinkTargets()
 {
-    for (auto &cmd: commandManager->getCommands().getCommands()) {
-        WrappedCommand *wcmd = const_cast<WrappedCommand *>(cmd.getDynamicPointer<WrappedCommand>());
-        if (wcmd)
-            wcmd->unlinkWrapper();   
-    }
 }
 
 void WrappersPlugin::destruction( ) {
@@ -249,6 +258,7 @@ void WrappersPlugin::destruction( ) {
     Scripting::gc = false;
     FeniaManager::getThis( )->backup( );
 
+    Class::unregMoc<BehaviorWrapper>();
     Class::unregMoc<AreaQuestWrapper>( );
     Class::unregMoc<WearlocWrapper>( );
     Class::unregMoc<LiquidWrapper>( );

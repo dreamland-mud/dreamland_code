@@ -10,6 +10,7 @@
 #include "xmlmap.h"
 #include "xmlvariablecontainer.h"
 #include "xmlitemtype.h"
+#include "xmlglobalbitvector.h"
 
 struct obj_index_data;
 
@@ -33,6 +34,7 @@ public:
     XML_VARIABLE XMLIntegerNoDef<-1> limit;
     XML_VARIABLE XMLStringNoEmpty sound, smell;
     XML_VARIABLE XMLStringNode behavior;
+    XML_VARIABLE XMLGlobalBitvector behaviors;
     XML_VARIABLE XMLMapBase<XMLString> properties;
 };
 

@@ -10,7 +10,7 @@
 #include "register-impl.h"
 #include "lex.h"
 
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "skillreference.h"
 #include "room.h"
 #include "affect.h"
@@ -20,6 +20,7 @@
 #include "damage_impl.h"
 #include "damageflags.h"
 #include "skill_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "interp.h"
 #include "save.h"
 #include "loadsave.h"
@@ -173,6 +174,8 @@ static bool oprog_cant_equip( Object *obj, Character *ch )
 
 static bool oprog_equip( Object *obj, Character *ch )
 {
+    behavior_trigger(obj, "Equip", "OC", obj, ch);
+
     FENIA_CALL( obj, "Equip", "C", ch )
     FENIA_NDX_CALL( obj, "Equip", "OC", obj, ch )
     BEHAVIOR_VOID_CALL( obj, equip, ch )
@@ -189,6 +192,8 @@ static bool oprog_wear( Object *obj, Character *ch )
 
 static bool oprog_remove( Object *obj, Character *ch )
 {
+    behavior_trigger(obj, "Remove", "OC", obj, ch);
+
     FENIA_CALL( obj, "Remove", "C", ch )
     FENIA_NDX_CALL( obj, "Remove", "OC", obj, ch )
     BEHAVIOR_VOID_CALL( obj, remove, ch )

@@ -43,6 +43,7 @@ public:
     XML_VARIABLE XMLGlobalBitvector practicer;
     XML_VARIABLE XMLGlobalBitvector religion;
     XML_VARIABLE XMLGlobalBitvector affects;
+    XML_VARIABLE XMLGlobalBitvector behaviors;
     XML_VARIABLE XMLStringNoEmpty gram_number;
     XML_VARIABLE XMLStringNoEmpty smell;
     XML_VARIABLE XMLClanReference clan;

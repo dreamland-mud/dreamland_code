@@ -43,7 +43,8 @@ dlfileloader.cpp \
 dlpluginmanager.cpp \
 bonus.cpp \
 eventbus.cpp \
-areaquest.cpp
+areaquest.cpp \
+behavior.cpp
 
 libcore_la_MOC = \
 affect.h \
@@ -56,6 +57,7 @@ pcskilldata.h \
 remortdata.h \
 xmlattributes.h \
 bonus.h \
-areaquest.h
+areaquest.h \
+behavior.h
 
 AM_CPPFLAGS += $(src_INCLUDES)

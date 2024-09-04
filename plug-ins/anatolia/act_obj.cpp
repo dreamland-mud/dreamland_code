@@ -55,7 +55,7 @@
 
 #include "grammar_entities_impl.h"
 #include "commandtemplate.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "skill.h"
 #include "clanreference.h"
 #include "core/object.h"
@@ -79,6 +79,7 @@
 #include "act.h"
 #include "interp.h"
 #include "areaquestutils.h"
+#include "../loadsave/behavior_utils.h"
 
 #include "stats_apply.h"
 #include "damageflags.h"
@@ -1649,7 +1650,12 @@ CMDRUNP( vomit )
  */
 static bool oprog_use( Object *obj, Character *ch, const char *argument )
 {
-    aquest_trigger(obj, ch, "Use", "OCs", obj, ch, argument);
+    if (aquest_trigger(obj, ch, "Use", "OCs", obj, ch, argument))
+        return true;
+
+    if (behavior_trigger(obj, "Use", "OCs", obj, ch, argument))
+        return true;
+
     FENIA_CALL( obj, "Use", "Cs", ch, argument );
     FENIA_NDX_CALL( obj, "Use", "OCs", obj, ch, argument );
     BEHAVIOR_CALL( obj, use, ch, argument );

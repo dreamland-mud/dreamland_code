@@ -2719,12 +2719,15 @@ NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать �
 {
     checkTarget();
 
-    // Get trig name such as "Death" or "Get".
+    // Get trig name such as "Death" or "Get", and trig arguments (all but first one)
     DLString trigName = argnum2string(args, 1);
+    RegisterList trigArgs = args;
+    trigArgs.pop_front();
+
     // If it's a mob, access its mob index data wrapper.
     WrapperBase *proto = target->is_npc() ? get_wrapper(target->getNPC()->pIndexData->wrapper) : 0;
     // Helper function will invoke onDeath, postDeath triggers on character and proto.
-    return fenia_trigger(trigName, args, this, proto);
+    return fenia_trigger(trigName, trigArgs, this, proto);
 }
 
 NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить меню или установить пункт number с действием action")

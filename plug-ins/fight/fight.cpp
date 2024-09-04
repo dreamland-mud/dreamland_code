@@ -65,7 +65,7 @@
 #include "register-impl.h"
 #include "lex.h"
 
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "dreamland.h"
 #include "affect.h"
 #include "affecthandler.h"
@@ -93,6 +93,7 @@
 #include "profflags.h"
 #include "skill_utils.h"
 #include "fenia_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "onehit_undef.h"
 #include "damage_impl.h"
 #include "fight.h"
@@ -135,6 +136,8 @@ static bool mprog_fight( Character *ch, Character *victim, string command )
 
 static bool oprog_fight( Object *obj, Character *ch )
 {
+    behavior_trigger(obj, "Fight", "OC", obj, ch);
+    
     FENIA_CALL( obj, "Fight", "C", ch );
     FENIA_NDX_CALL( obj, "Fight", "OC", obj, ch );
     BEHAVIOR_VOID_CALL( obj, fight, ch );

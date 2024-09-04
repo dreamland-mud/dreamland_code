@@ -38,7 +38,8 @@ areaquestwrapper.cpp \
 wrap_utils.cpp \
 feniacroaker.cpp \
 commandtableloader.cpp \
-codesourcerepo.cpp 
+codesourcerepo.cpp \
+behaviorwrapper.cpp
 
 libfeniaroot_la_MOC = \
 root.h \
@@ -57,7 +58,8 @@ spellwrapper.h \
 affecthandlerwrapper.h \
 skillcommandwrapper.h \
 areaquestwrapper.h \
-characterwrapper.h
+characterwrapper.h \
+behaviorwrapper.h
 
 plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/ed \

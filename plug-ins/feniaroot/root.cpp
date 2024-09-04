@@ -59,6 +59,7 @@
 #include "schedulerwrapper.h"
 #include "commandwrapper.h"
 #include "areaquestwrapper.h"
+#include "behaviorwrapper.h"
 #include "codesource.h"
 #include "subr.h"
 #include "fenia/handler.h"
@@ -1202,6 +1203,12 @@ NMI_INVOKE( Root, AreaQuest, "(vnum): конструктор для арийно
         throw Scripting::Exception("Unknown area quest vnum");
 
     return WrapperManager::getThis()->getWrapper(q->second);
+}
+
+NMI_INVOKE( Root, Behavior, "(name): конструктор для поведения по имени" )
+{
+    DLString name = args2string(args);
+    return BehaviorWrapper::wrap(name);
 }
 
 NMI_GET( Root, players, "список (List) всех игроков") 

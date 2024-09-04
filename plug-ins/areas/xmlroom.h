@@ -13,6 +13,7 @@
 #include "xmlinteger.h"
 #include "xmlmap.h"
 #include "xmllist.h"
+#include "xmlglobalbitvector.h"
 #include "xmlmisc.h"
 #include "merc.h"
 
@@ -51,6 +52,7 @@ public:
     XML_VARIABLE XMLStringNoEmpty liquid;
     XML_VARIABLE XMLResetList resets;
     XML_VARIABLE XMLStringNode behavior;
+    XML_VARIABLE XMLGlobalBitvector behaviors;
     XML_VARIABLE XMLMapBase<XMLString> properties;
 };
 

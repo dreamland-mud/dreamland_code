@@ -84,6 +84,7 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     LiquidReference liquid;
     Properties properties;
     ::Pointer<XMLDocument> behavior;
+    GlobalBitvector behaviors;
 
     Scripting::Register init;
 

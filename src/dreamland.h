@@ -59,6 +59,7 @@ class BonusManager;
 class SocketManager;
 class ServletManager;
 class EventBus;
+class BehaviorManager;
 
 extern DreamLand * dreamland;
 
@@ -207,6 +208,7 @@ private:
         ::Pointer<SocketManager> socketManager;
         ::Pointer<ServletManager> servletManager;
         ::Pointer<EventBus> eventBus;
+        ::Pointer<BehaviorManager> behaviorManager;
 
         DbEnvContext *feniaDbEnv;
 };

@@ -8,6 +8,7 @@
 #include "room.h"
 #include "clanreference.h"
 #include "wearlocation.h"
+#include "behavior.h"
 #include "merc.h"
 
 #include "def.h"
@@ -142,6 +143,7 @@ XMLRoom::XMLRoom() :
     exits(false),
     extraExits(false),
     extraDescr(false),
+    behaviors(behaviorManager),
     properties( false )
 
 {
@@ -160,6 +162,8 @@ XMLRoom::init(RoomIndexData *room)
 
     if(!room->guilds.empty( ))
         guilds.setValue(room->guilds.toString( ));
+
+    behaviors.set(room->behaviors);
     
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         EXIT_DATA *pExit = room->exit[door];
@@ -216,6 +220,8 @@ XMLRoom::compat(int vnum)
 
     if(!guilds.getValue( ).empty( ))
         room->guilds.fromString(guilds.getValue( ));
+
+    room->behaviors.set(behaviors);
     
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         XMLMapBase<XMLExitDir>::iterator it = exits.find(dirs[door].name);
