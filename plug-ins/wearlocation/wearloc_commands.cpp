@@ -11,7 +11,7 @@
 #include "register-impl.h"
 #include "lex.h"
 
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"

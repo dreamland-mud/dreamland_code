@@ -53,7 +53,7 @@
 #include "register-impl.h"
 #include "lex.h"
 
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "logstream.h"
 #include "spell.h"
 #include "spelltarget.h"

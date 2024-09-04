@@ -21,7 +21,7 @@
 #include "lex.h"
 #include "fenia_utils.h"
 
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "schedulertask.h"
 #include "dlscheduler.h"
 #include "pcharacter.h"

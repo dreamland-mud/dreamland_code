@@ -22,7 +22,7 @@
 #include "commandbase.h"
 #include "playerattributes.h"
 #include "objectbehavior.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "room.h"
 #include "skillreference.h"
 #include "door_utils.h"

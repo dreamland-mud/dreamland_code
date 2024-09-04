@@ -16,7 +16,7 @@
 #include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "object.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "room.h"
 #include "areaquestutils.h"
 #include "wrapperbase.h"

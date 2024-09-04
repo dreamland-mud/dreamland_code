@@ -28,7 +28,7 @@
 #include "command.h"
 #include "commandmanager.h"
 #include "mobilebehavior.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "skill.h"
 #include "affecthandler.h"
 #include "spelltarget.h"

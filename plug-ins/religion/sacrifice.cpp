@@ -5,7 +5,7 @@
 #include "logstream.h"
 #include "calendar_utils.h"
 
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
