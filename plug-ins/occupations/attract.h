@@ -8,7 +8,7 @@
 #include "xmlvector.h"
 #include "xmllonglong.h"
 #include "xmlattribute.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 
 class NPCharacter;
 class PCharacter;

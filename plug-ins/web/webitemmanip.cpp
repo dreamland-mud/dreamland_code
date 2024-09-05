@@ -17,7 +17,7 @@
 #include "command.h"
 #include "commandmanager.h"
 #include "mobilebehavior.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "skillreference.h"
 #include "object.h"
 #include "pcharacter.h"

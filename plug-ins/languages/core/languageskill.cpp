@@ -8,7 +8,7 @@
 
 #include "skillgroup.h"
 #include "skill_utils.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
 #include "pcrace.h"
 

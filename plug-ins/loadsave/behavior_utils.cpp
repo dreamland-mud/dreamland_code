@@ -1,4 +1,4 @@
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "fenia_utils.h"
 #include "behavior.h"
 #include "lex.h"

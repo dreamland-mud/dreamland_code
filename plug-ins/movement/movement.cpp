@@ -12,7 +12,7 @@
 #include "lex.h"
 
 #include "areaquestutils.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "affecthandler.h"
 #include "skillmanager.h"
 #include "skill.h"

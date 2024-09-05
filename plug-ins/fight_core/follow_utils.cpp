@@ -11,7 +11,7 @@
 #include "skillreference.h"
 #include "affecthandler.h"
 #include "affect.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "room.h"

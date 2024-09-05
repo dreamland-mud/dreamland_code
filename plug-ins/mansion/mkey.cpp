@@ -10,7 +10,7 @@
 #include "class.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "pcharactermanager.h"
 #include "arg_utils.h"
 #include "act.h"

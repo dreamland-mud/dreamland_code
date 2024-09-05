@@ -5,7 +5,7 @@
 #include <iomanip>
 
 #include "smithman.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "attract.h"
 #include "occupations.h"
 #include "commandtemplate.h"

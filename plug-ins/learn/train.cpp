@@ -14,7 +14,7 @@
 #include "hometown.h"
 #include "attract.h"
 #include "occupations.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"

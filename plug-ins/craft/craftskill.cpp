@@ -12,7 +12,7 @@
 #include "skillmanager.h"                                                       
 #include "skillgroup.h"                                                       
 #include "skillreference.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "npcharacter.h"

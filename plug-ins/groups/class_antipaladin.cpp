@@ -24,7 +24,7 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "object.h"
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 
 #include "act_move.h"
 

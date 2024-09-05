@@ -11,7 +11,7 @@
 #include "lex.h"
 #include "fenia_utils.h"
 
-#include "behavior_utils.h"
+#include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
