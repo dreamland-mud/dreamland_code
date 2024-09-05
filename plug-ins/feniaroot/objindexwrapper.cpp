@@ -7,7 +7,7 @@
 #include "grammar_entities_impl.h"
 #include "object.h"
 #include "merc.h"
-
+#include "json_utils.h"
 #include "loadsave.h"
 
 #include "objindexwrapper.h"
@@ -18,10 +18,13 @@
 #include "register-impl.h"
 #include "nativeext.h"
 #include "wrap_utils.h"
+#include "idcontainer.h"
+#include "lex.h"
 
 #include "def.h"
 
 using Scripting::NativeTraits;
+using namespace Scripting;
 
 NMI_INIT(ObjIndexWrapper, "прототип для предметов (obj index data)")
 
@@ -174,7 +177,7 @@ GETVALUE(4)
 
 NMI_INVOKE(ObjIndexWrapper, create, "(): создать экземпляр предмета")
 {
-    Object *obj;
+    ::Object *obj;
 
     checkTarget( );
     obj = ::create_object( target , target->level );
@@ -241,6 +244,32 @@ NMI_GET( ObjIndexWrapper, affected, "список (List) всех аффекто
     sobj->setHandler(rc);
 
     return Register( sobj );
+}
+
+NMI_GET(ObjIndexWrapper, props, "Map (структура) из свойств поведения") 
+{
+    checkTarget();
+
+    Register propsReg = Register::handler<IdContainer>();
+    IdContainer *propsMap = propsReg.toHandler().getDynamicPointer<IdContainer>();
+
+    for (auto bhv = target->props.begin(); bhv != target->props.end(); bhv++) {
+        const Json::Value &bhvProps = target->props[bhv.key().asString()];
+        Register bhvReg = Register::handler<IdContainer>();
+        IdContainer *bhvMap = bhvReg.toHandler().getDynamicPointer<IdContainer>();
+
+        for (auto prop = bhvProps.begin(); prop != bhvProps.end(); prop++) {
+            bhvMap->setField(
+                IdRef(prop.key().asString()), 
+                JsonUtils::toRegister(*prop));
+        }
+
+        propsMap->setField(
+            IdRef(bhv.key().asString()),
+            bhvReg);
+    }
+
+    return propsReg;    
 }
 
 NMI_INVOKE( ObjIndexWrapper, api, "(): печатает этот API" )

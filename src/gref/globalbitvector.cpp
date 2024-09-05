@@ -92,3 +92,15 @@ vector<int> GlobalBitvector::toArray( ) const
     return array;
 }
 
+std::set<int> GlobalBitvector::toSet() const
+{
+    std::set<int> result;
+
+    if (registry)
+        for (unsigned int b = 0; b < bits.size(); b++) 
+            if (bits[b])
+                result.insert(b);
+
+    return result;
+}
+

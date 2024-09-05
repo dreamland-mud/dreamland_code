@@ -6,6 +6,7 @@
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
+#include "json_utils.h"
 #include "xmljsonvalue.h"
 #include "olcstate.h"
 #include "olc.h"
@@ -15,7 +16,6 @@
 #include "interp.h"
 #include "arg_utils.h"
 #include "websocketrpc.h"
-#include "configurable.h"
 
 
 /*--------------------------------------------------------------------------
@@ -867,8 +867,7 @@ bool OLCState::editor(const char *argument, XMLStringList &values, editor_flags 
 
 bool OLCState::editor(const char *argument, XMLJsonValue &value, editor_flags flags)
 {
-    Json::FastWriter writer;
-    DLString text = writer.write(value);
+    DLString text = JsonUtils::toString(value);
     PCharacter *ch = owner->character->getPC();
 
     if (!editor(argument, text, flags))
@@ -876,15 +875,14 @@ bool OLCState::editor(const char *argument, XMLJsonValue &value, editor_flags fl
 
     ostringstream errbuf;
 
-    if (!json_validate_text(text, errbuf)) {
+    if (!JsonUtils::validate(text, errbuf)) {
         ch->pecho("Ошибка парсинга JSON:");
         ch->pecho(errbuf.str());
         ch->pecho("Отредактируйте текст еще раз ({y{hc%s web{x).", lastCmd.c_str());
         return false;
     }
 
-    Json::Reader reader;
-    reader.parse(text, value);
+    JsonUtils::fromString(text, value);
 
     return true;
 }

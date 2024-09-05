@@ -2,7 +2,7 @@
 #include "fedit.h"
 #include "olc.h"
 #include "security.h"
-#include <jsoncpp/json/json.h>
+#include "json_utils.h"
 
 #include "configurable.h"
 #include "merc.h"
@@ -67,7 +67,7 @@ bool OLCStateFile::validate(PCharacter *ch) const
 {
     ostringstream errbuf;
 
-    if (!json_validate_text(text, errbuf)) {
+    if (!JsonUtils::validate(text, errbuf)) {
         ch->pecho("Ошибка парсинга JSON:");
         ch->pecho(errbuf.str());
         ch->pecho("Отредактируйте текст еще раз ({y{hctext web{x) или отмените изменения ({y{hccancel{x).");

@@ -1,5 +1,6 @@
 #include "behaviorwrapper.h"
 #include "behavior.h"
+#include "json_utils.h"
 
 #include "wrappermanager.h"
 #include "reglist.h"
@@ -96,29 +97,15 @@ NMI_GET(BehaviorWrapper, target, "чье поведение: obj, mob, room")
     return Register(target->target);
 }
 
-static Register json_to_register(const Json::Value jv)
-{
-    if (jv.isNull())
-        return Register();
-
-    if (jv.isBool())
-        return Register(jv.asBool());
-
-    if (jv.isInt())
-        return Register(jv.asInt());
-
-    return Register(jv.asString());        
-}
-
 NMI_GET(BehaviorWrapper, props, "Map (структура) из свойств поведения") 
 {
     Register propsReg = Register::handler<IdContainer>();
     IdContainer *propsMap = propsReg.toHandler().getDynamicPointer<IdContainer>();
 
-    for (Json::Value::const_iterator p = target->props.begin(); p != target->props.end(); p++) {
+    for (auto p = target->props.begin(); p != target->props.end(); p++) {
         propsMap->setField(
             IdRef(p.key().asString()), 
-            json_to_register(*p));
+            JsonUtils::toRegister(*p));
     }
 
     return propsReg;    

@@ -11,6 +11,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlitemtype.h"
 #include "xmlglobalbitvector.h"
+#include "xmljsonvalue.h"
 
 struct obj_index_data;
 
@@ -36,6 +37,7 @@ public:
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLGlobalBitvector behaviors;
     XML_VARIABLE XMLMapBase<XMLString> properties;
+    XML_VARIABLE XMLJsonValue props;
 };
 
 #endif

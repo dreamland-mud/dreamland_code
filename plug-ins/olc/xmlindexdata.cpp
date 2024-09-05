@@ -188,33 +188,6 @@ XMLMobIndexData::toXML( XMLNode::Pointer& parent ) const
  *-----------------------------------*/
 XMLObjIndexData::XMLObjIndexData()
 {
-    static OBJ_INDEX_DATA zObj;
-    *(OBJ_INDEX_DATA*)this = zObj;
-
-    next = NULL;
-    extra_descr = NULL;
-    area = NULL;
-    name = str_dup("no name");
-    short_descr = str_dup("(no short description)");
-    description = str_dup("(no description)");
-    vnum = 0;
-    item_type = ITEM_TRASH;
-    extra_flags = 0;
-    wear_flags = 0;
-    count = 0;
-    weight = 0;
-    cost = 0;
-    material = str_dup("none");
-    condition = 100;
-    
-    int v;
-    for (v = 0; v < 5; v++)
-        value[v] = 0;
-
-    behavior = 0; 
-    wrapper = 0;
-    limit = -1;
-    level = 0;
 }
 
 XMLObjIndexData::XMLObjIndexData(const obj_index_data &original)
@@ -263,9 +236,6 @@ XMLObjIndexData::clear()
         pExtraNext = pExtra->next;
         free_extra_descr(pExtra);
     }
-    
-    static OBJ_INDEX_DATA zObj;
-    *(OBJ_INDEX_DATA*)this = zObj;
 }
 
 void

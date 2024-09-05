@@ -14,11 +14,6 @@
 
 namespace Json { class Value; }
 
-/** Attempt to parse JSON contained within a string, recording error messages in the buffer.
- *  Return true if parsing is successful.
- */
-bool json_validate_text(const DLString &text, ostringstream &errbuf);
-
 class Configurable: public virtual Plugin {
 public:
     typedef ::Pointer<Configurable> Pointer;

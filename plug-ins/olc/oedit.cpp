@@ -26,6 +26,7 @@
 #include "skillgroup.h"
 #include "eventbus.h"
 
+#include "json_utils.h"
 #include "itemevents.h"
 #include "oedit.h"
 #include "feniatriggers.h"
@@ -67,7 +68,7 @@ OLCStateObject::OLCStateObject( OBJ_INDEX_DATA *original )
 
     copyParameters( original );
     copyDescriptions( original );
-
+    copyBehaviors(original);
 }
 
 OLCStateObject::OLCStateObject( int vnum )
@@ -78,6 +79,14 @@ OLCStateObject::OLCStateObject( int vnum )
 
 OLCStateObject::~OLCStateObject( )
 {
+}
+
+void OLCStateObject::copyBehaviors(OBJ_INDEX_DATA *original)
+{
+    obj.behaviors.clear();
+    obj.behaviors.set(original->behaviors);
+    obj.props.clear();
+    JsonUtils::copy(obj.props, original->props);
 }
 
 void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
@@ -94,8 +103,6 @@ void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
     obj.cost         = original->cost;
     obj.limit        = original->limit;
     memcpy(obj.value, original->value, sizeof(obj.value));
-    obj.behaviors.clear();
-    obj.behaviors.set(original->behaviors);
 }
 
 void OLCStateObject::copyDescriptions( OBJ_INDEX_DATA *original )
@@ -139,7 +146,7 @@ void OLCStateObject::commit()
     if(!original) {
         int iHash;
         
-        original = new_obj_index();
+        original = new OBJ_INDEX_DATA;
 
         original->vnum = obj.vnum;
         original->area = obj.area;
@@ -232,6 +239,8 @@ void OLCStateObject::commit()
 
     original->behaviors.clear();
     original->behaviors.set(obj.behaviors);
+    original->props.clear();
+    JsonUtils::copy(original->props, obj.props);
 
     for(o = object_list; o; o = o->next)
         if(o->pIndexData == original) {
@@ -393,6 +402,19 @@ OEDIT(show)
             ptc(ch, "{C%s{w.{C%s{x ", bhv->getName().c_str(), trig.c_str());
     }
     ptc(ch, "\r\n");
+
+    ptc(ch,     "{cСвойства поведения{x:  {D(prop){x  \r\n");
+    for(auto p = pObj->props.begin(); p != pObj->props.end(); p++) {
+        const DLString &bhvName = p.key().asString();
+        const Json::Value &bhvProps = *p;
+
+        for (auto bp = bhvProps.begin(); bp != bhvProps.end(); bp++) {
+            ptc(ch, "       prop %s %s %s\r\n", 
+                bhvName.c_str(), 
+                bp.key().asString().c_str(),
+                JsonUtils::asString(*bp).c_str());
+        }
+    }
 
     // Display Fenia triggers and methods on this object.
     OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
@@ -670,7 +692,54 @@ OEDIT(smell)
     return false;
 }
 
-OEDIT(property)
+OEDIT(props)
+{
+    DLString args = argument;
+    DLString bhvName = args.getOneArgument();
+    DLString propName = args.getOneArgument();
+    DLString propValue = args;
+
+    if (bhvName.empty() || propName.empty() || propValue.empty()) {
+        ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>\r\n");
+        return false;
+    }
+
+    Behavior *bhv = behaviorManager->findExisting(bhvName);
+    if (!bhv) {
+        ptc(ch, "Поведение '%s' не существует, смотри {y{hc? behaviors{x для списка.\r\n", bhvName.c_str());
+        return false;
+    }
+
+    if (!obj.behaviors.isSet(bhv->getIndex())) {
+        ptc(ch, "Поведение '%s' не установлено на этом предмете.\r\n", bhvName.c_str());
+        return false;
+    }
+
+    if (!obj.props[bhvName].isMember(propName)) {
+        ptc(ch, "У поведения '%s' нету свойства под названием '%s'.\r\n", bhvName.c_str(), propName.c_str());
+        return false;
+    }
+
+    Json::Value &target = obj.props[bhvName][propName];
+
+    if (target.isNull())
+        target = propValue;
+    else if (target.isNumeric() || target.isBool()) {
+        if (!propValue.isNumber()) {
+            ptc(ch, "Свойство '%s' должно быть числом, а не строкой.\r\n", propName.c_str());
+            return false;
+        }
+
+        target = propValue.toInt();
+    } else {
+        target = propValue;
+    }
+
+    ptc(ch, "Свойству %s.%s установлено значение %s.\r\n", bhvName.c_str(), propName.c_str(), propValue.c_str());
+    return true;
+}
+
+OEDIT(oldproperty)
 {
     DLString args = DLString( argument );
     return mapEdit( obj.properties, args );
@@ -917,6 +986,7 @@ OEDIT(copy)
     enum {
         COPY_DESC,
         COPY_PARAM,
+        COPY_BHV,
         COPY_ERROR
     } mode;
     
@@ -924,12 +994,15 @@ OEDIT(copy)
         mode = COPY_DESC;
     else if (arg1.strPrefix("param"))
         mode = COPY_PARAM;
+    else if (arg1.strPrefix("behaviors"))
+        mode = COPY_BHV;
     else 
         mode = COPY_ERROR;
             
     if (mode == COPY_ERROR || !arg2.isNumber()) {
         ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy affects, level, flags and other parameters from <vnum> obj index.\r\n"
+                    "  copy behav <vnum> -- copy behaviors and props.\r\n"
                     "  copy desc <vnum>  -- copy name, short, long and extra descriptions from <vnum> obj index.\r\n" );
         return false;
     }
@@ -949,6 +1022,10 @@ OEDIT(copy)
     case COPY_DESC:
         copyDescriptions( original );
         report = "descriptions";
+        break;
+    case COPY_BHV:
+        copyBehaviors(original);
+        report = "behaviors";
         break;
     default:
         return false;
@@ -999,7 +1076,34 @@ OEDIT(list)
 
 OEDIT(behaviors)
 {
-    return globalBitvectorEdit<Behavior>(obj.behaviors);
+    // Remember old behavior.
+    std::set<int> oldBehaviors = obj.behaviors.toSet();
+    
+    bool rc = globalBitvectorEdit<Behavior>(obj.behaviors);
+
+    if (!rc)
+        return false;
+
+    // For all entries that used to be available but no longer there,
+    // clean the entry in the props map.
+    for (auto b: oldBehaviors) {
+        if (!obj.behaviors.isSet(b)) {
+            Behavior *bhv = behaviorManager->find(b);
+            obj.props.removeMember(bhv->getName().c_str());
+        }
+    }
+
+    // For all entries that are new, create a value in the props map
+    // and copy the defaults.
+    std::set<int> newBehaviors = obj.behaviors.toSet();
+    for (auto b: newBehaviors) {
+        if (oldBehaviors.count(b) == 0) {
+            Behavior *bhv = behaviorManager->find(b);
+            obj.props[bhv->getName()] = bhv->props;
+        }
+    }
+
+    return true;
 }
 
 

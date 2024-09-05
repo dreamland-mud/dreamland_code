@@ -105,7 +105,7 @@ BEDIT(fenia, "феня", "редактировать тригера")
     return false;
 }
 
-BEDIT(nameRus, "название", "установить названиес падежами")
+BEDIT(nameRus, "название", "установить название с падежами")
 {
     return editor(argument, getOriginal()->nameRus, (editor_flags)(ED_NO_NEWLINE));
 }
@@ -183,7 +183,7 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
     }
 
     if (arg_oneof(cmd, "create", "создать")) {
-        static RegExp namePattern("^[a-z ]{2,}$", true);
+        static RegExp namePattern("^[a-z_]{2,}$", true);
         if (args.empty() || !namePattern.match(args)) {
             stc("Укажите английское название поведения маленькими буквами.\r\n", ch);
             return;
@@ -240,7 +240,7 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
     DefaultBehavior *defaultBhv;
 
     if (!bhv || (defaultBhv = dynamic_cast<DefaultBehavior *>(bhv)) == NULL) {
-        stc("Поведение с таким названием не найдено, используйте bedit list для списка.\r\n", ch);
+        stc("Поведение с таким названием не найдено, используйте {y{hcbedit list{x для списка.\r\n", ch);
         return;
     }
 

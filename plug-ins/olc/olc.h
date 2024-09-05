@@ -33,7 +33,6 @@ EXIT_DATA *new_exit();
 void free_exit(EXIT_DATA * pExit);
 EXTRA_DESCR_DATA *new_extra_descr();
 void free_extra_descr(EXTRA_DESCR_DATA * pExtra);
-OBJ_INDEX_DATA *new_obj_index();
 MOB_INDEX_DATA *new_mob_index();
 
 #define stc(t, c) (c)->send_to((t))

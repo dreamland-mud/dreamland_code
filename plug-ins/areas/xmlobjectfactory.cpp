@@ -9,6 +9,7 @@
 #include "behavior.h"
 #include "grammar_entities_impl.h"
 #include "merc.h"
+#include "json_utils.h"
 
 
 XMLObjectFactory::XMLObjectFactory( ) : 
@@ -59,16 +60,15 @@ XMLObjectFactory::init(const obj_index_data *obj)
 
     for (Properties::const_iterator p = obj->properties.begin( ); p != obj->properties.end( ); p++)
         properties.insert( *p );
+
+    JsonUtils::copy(props, obj->props);    
 }
 
 obj_index_data *
 XMLObjectFactory::compat( )
 {
-    static OBJ_INDEX_DATA zeroObjIndex;
     OBJ_INDEX_DATA *obj = new OBJ_INDEX_DATA;
     
-    *obj = zeroObjIndex;
-
     compat(obj);
 
     return obj;
@@ -122,5 +122,7 @@ XMLObjectFactory::compat(obj_index_data *obj)
 
     for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
         obj->properties.insert( *p );
+
+    JsonUtils::copy(obj->props, props);
 }
 

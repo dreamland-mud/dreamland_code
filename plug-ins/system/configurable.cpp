@@ -1,6 +1,6 @@
 #include <fstream>
-#include <jsoncpp/json/json.h>
 #include <sstream>
+#include "json_utils.h"
 #include "logstream.h"
 #include "configurable.h"
 #include "dreamland.h"
@@ -22,8 +22,7 @@ void Configurable::initialization()
         DLString text = getText();
         
         Json::Value value;
-        Json::Reader reader;
-        reader.parse(text, value);
+        JsonUtils::fromString(text, value);
 
         loaded(value);
         LogStream::sendNotice() << "Configurable " << getPath() << " loaded with " << value.size() << " entries." << endl;
@@ -42,8 +41,7 @@ void Configurable::refresh(const DLString &text)
         ofs << koi2utf(text);
         
         Json::Value value;
-        Json::Reader reader;
-        reader.parse(text, value);
+        JsonUtils::fromString(text, value);
 
         loaded(value);
 
@@ -142,22 +140,3 @@ void ConfigurableRegistry::destruction()
 }
 
 PluginInitializer<ConfigurableRegistry> initConfigurableRegistry;
-
-
-bool json_validate_text(const DLString &text, ostringstream &errbuf)
-{
-    try {
-        Json::Value value;
-        Json::Reader reader;
-
-        if (reader.parse(text, value))
-            return true;
-
-        errbuf << reader.getFormattedErrorMessages();
-
-    } catch (const std::exception &ex) {
-        errbuf << ex.what();
-    }
-
-    return false;  
-}

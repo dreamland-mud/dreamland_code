@@ -45,7 +45,8 @@ fenia_utils.cpp \
 math_utils.cpp \
 calendar_utils.cpp \
 morphology.cpp \
-configurable.cpp
+configurable.cpp \
+json_utils.cpp
 
 libsystem_la_MOC = \
 schedulertaskattributemanager.h \

@@ -26,13 +26,15 @@ xmlobjectfactory.cpp \
 xmlmobilefactory.cpp
 
 libareas_la_LIBADD = \
+../system/libsystem.la \
 ../loadsave/libloadsave.la \
 ../output/liboutput.la \
 ../command/libcommand.la \
 ../help/libhelp.la \
 ../system/libscheduler_task_round.la \
 ../movement/libmovement.la \
-../iomanager/libiomanager.la
+../iomanager/libiomanager.la \
+-ljsoncpp
 
 libareas_la_MOC = \
 xmlitemtype.h \

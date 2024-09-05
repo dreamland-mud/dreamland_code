@@ -6,6 +6,7 @@
 #define GLOBALBITVECTOR_H
 
 #include <vector>
+#include <set>
 #include "dlstring.h"
 #include "globalregistry.h"
 
@@ -119,6 +120,7 @@ public:
     DLString toString( char joiner = ' ' ) const;
     DLString toRussianString( char gcase = '1', const char *joiner = 0 ) const;
     vector<int> toArray( ) const;
+    std::set<int> toSet() const;
 
 protected:
     vector<bool> bits;

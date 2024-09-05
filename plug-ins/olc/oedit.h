@@ -35,6 +35,7 @@ private:
 
     void copyParameters( OBJ_INDEX_DATA * );
     void copyDescriptions( OBJ_INDEX_DATA * );
+    void copyBehaviors(OBJ_INDEX_DATA *);
 };
 
 #define OEDIT(Cmd) OLC_CMD(OLCStateObject, Cmd, "", "")

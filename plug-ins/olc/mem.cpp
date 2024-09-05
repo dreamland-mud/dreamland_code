@@ -67,38 +67,6 @@ void free_exit(EXIT_DATA * pExit)
     return;
 }
 
-OBJ_INDEX_DATA *new_obj_index(void)
-{
-    static OBJ_INDEX_DATA zeroObjIndex;
-    OBJ_INDEX_DATA *pObj;
-    int value;
-
-    pObj = new OBJ_INDEX_DATA;
-    *pObj = zeroObjIndex;
-
-    pObj->next = NULL;
-    pObj->extra_descr = NULL;
-    pObj->area = NULL;
-    pObj->name = str_dup("no name");
-    pObj->short_descr = str_dup("(no short description)");
-    pObj->description = str_dup("(no description)");
-    pObj->vnum = 0;
-    pObj->item_type = ITEM_TRASH;
-    pObj->extra_flags = 0;
-    pObj->wear_flags = 0;
-    pObj->count = 0;
-    pObj->weight = 0;
-    pObj->cost = 0;
-    pObj->material = str_dup("none");
-    pObj->condition = 100;
-    for (value = 0; value < 5; value++)
-        pObj->value[value] = 0;
-    pObj->behavior = 0; 
-    pObj->limit = -1;
-    pObj->level = 0;
-    return pObj;
-}
-
 MOB_INDEX_DATA *new_mob_index(void)
 {
     MOB_INDEX_DATA *pMob;

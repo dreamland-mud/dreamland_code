@@ -180,8 +180,36 @@ Area::Area()
 obj_index_data::obj_index_data()
                 : behaviors(behaviorManager)
 {
+    next = NULL;
+    extra_descr = NULL;
+    area = NULL;
+    name = str_dup("no name");
+    short_descr = str_dup("(no short description)");
+    description = str_dup("(no description)");
+    vnum = 0;
+    reset_num = 0;
+    material = str_dup("none");
+    item_type = ITEM_TRASH;
+    extra_flags = 0;
+    wear_flags = 0;
+    level = 0;
+    condition = 100;
+    count = 0;
+    weight = 0;
+    cost = 0;
+
+    for (int i = 0; i < 5; i++)
+        value[i] = 0;
+        
+    limit = -1;
+    wrapper = 0;
+    area = 0;
 }
 
+obj_index_data::~obj_index_data()
+{
+    
+}
 
 mob_index_data::mob_index_data( ) 
                      : practicer( skillGroupManager ), 
