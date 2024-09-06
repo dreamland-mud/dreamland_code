@@ -32,7 +32,7 @@
 
 #include "def.h"
 
-static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 bool is_empty_descr( const char *arg );
 

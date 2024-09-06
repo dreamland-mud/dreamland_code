@@ -50,7 +50,7 @@ using namespace Scripting;
 
 template class AttributeEventHandler<WebEditorSaveArguments>;
 
-static IconvMap utf2koi("utf-8", "koi8-r//IGNORE");
+static IconvMap utf2koi("utf-8", "koi8-u//IGNORE");
 
 static const char *MSG_FLUSH_BUF = "Входящие команды очищены.\r\n";
 const char *lid = "\n\rЕсли слишком много раз повторять одно и то же, тебя выкинет из игры. Не надо так.\n\r";

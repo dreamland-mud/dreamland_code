@@ -161,7 +161,7 @@ GSN(weaken);
 GSN(web);
 
 extern void help_save_ids();
-static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 static string json_to_string( const Json::Value &value )
 {

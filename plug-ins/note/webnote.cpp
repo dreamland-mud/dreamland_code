@@ -57,7 +57,7 @@ void WebNoteList::importThread(const DLString &threadName, NoteToInclude predica
         return;
     
     // Make sure timestamps are already in Russian when getTimeAsString is invoked.
-    setlocale(LC_TIME, "ru_RU.KOI8-R");
+    setlocale(LC_TIME, "uk_UA.KOI8-U");
 
     for (i = thread->getNoteList( ).begin( ); i != thread->getNoteList( ).end( ); i++) 
         if (predicate(*i))

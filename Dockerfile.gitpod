@@ -6,6 +6,6 @@ RUN apt-get update \
     && apt-get install -yq git g++-9 make automake libtool bison flex db-util bzip2 \
     && apt-get install -yq libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev libfl-dev \
     && apt-get install -yq locales \
-    && locale-gen ru_RU ru_RU.KOI8-R ru_RU.UTF-8 en_US.UTF-8 \
+    && locale-gen uk_UA uk_UA.UTF-8 en_US.UTF-8 \
     && update-locale
 

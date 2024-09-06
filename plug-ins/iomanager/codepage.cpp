@@ -400,7 +400,7 @@ unsigned char koi8_tran[256] = {
 };
 
 codepage_t russian_codepages[] = {
-  { "koi8-r",           koi8_koi8,      koi8_koi8 },
+  { "koi8-u",           koi8_koi8,      koi8_koi8 },
   { "alt (cp866)",      alt_koi8,       koi8_alt  },
   { "win (cp1251)",     win_koi8,       koi8_win  },
   { "iso (ISO-8859-5)", iso_koi8,       koi8_iso  },

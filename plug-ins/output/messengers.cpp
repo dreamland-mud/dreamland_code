@@ -14,7 +14,7 @@
 
 #include "def.h"
 
-static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 /** Strip mud-tags from the string. Escape characters that are part of Markdown syntax. */
 static DLString telegram_string(const DLString &source)
@@ -57,7 +57,7 @@ static void send_to_telegram(const DLString &content)
 void send_telegram_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &text)
 {
     const int max_content_size = 4096; // Message limit imposed by Telegram API.
-    const int text_chunk_size = 2000; // How to split the text block (in koi8-r) if message exceeds the max.
+    const int text_chunk_size = 2000; // How to split the text block (in koi8-u) if message exceeds the max.
 
     ostringstream header_koi;
     header_koi  

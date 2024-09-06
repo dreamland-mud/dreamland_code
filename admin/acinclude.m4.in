@@ -294,5 +294,5 @@ AC_DEFUN([AC_CHECK_BITNESS],
 
 AC_DEFUN([AC_CONVERT_CHARSET],
 [
-    CXXFLAGS="$CXXFLAGS -finput-charset=UTF-8 -fexec-charset=KOI8-R"
+    CXXFLAGS="$CXXFLAGS -finput-charset=UTF-8 -fexec-charset=KOI8-U"
 ])

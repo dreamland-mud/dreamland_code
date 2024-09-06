@@ -49,7 +49,7 @@
 
 using namespace Scripting;
 
-static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 void 
 WrappersPlugin::linkTargets()
