@@ -14,7 +14,7 @@
 #include "skillmanager.h"
 #include "spelltarget.h"
 #include "clan.h"
-
+#include "behavior.h"
 #include "affect.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -2696,6 +2696,21 @@ NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long,extra): ус
 
     target->getPC( )->save( );
     return Register( );
+}
+
+NMI_INVOKE(CharacterWrapper, hasBehavior, "(bhvName): true если среди поведений моба есть указанное")
+{
+    checkTarget();
+
+    if (!target->is_npc())
+        return false;
+
+    DLString bhvName = args2string(args);
+    Behavior *bhv = behaviorManager->findExisting(bhvName);
+    if (!bhv)
+        throw IllegalArgumentException();
+
+    return Register(target->getNPC()->pIndexData->behaviors.isSet(bhv->getIndex()));
 }
 
 NMI_INVOKE(CharacterWrapper, behaviorMethod, "(methodName, args...): вызвать метод MobileBehavior с аргументами")

@@ -3,6 +3,7 @@
 #include "logstream.h"
 
 DefaultBehavior::DefaultBehavior()
+                    : Behavior()
 {
 
 }

@@ -12,6 +12,7 @@
 #include "xmlstring.h"
 #include "xmlinteger.h"
 #include "xmljsonvalue.h"
+#include "xmlenumeration.h"
 
 /**
  * A representation of 'behavior' - collection of triggers and properties - describing how an item,
@@ -41,11 +42,15 @@ public:
 
     // Internal ID to use as unique ID for Fenia.
     XML_VARIABLE XMLInteger id;
+
     XML_VARIABLE XMLString nameRus;
+
     // Where is it assigned: mob/obj/room.
-    XML_VARIABLE XMLString target;
+    XML_VARIABLE XMLEnumeration target;
+
     // Command alternative to 'use': e.g. zap, fire, snare.
     XML_VARIABLE XMLString cmd;
+    
     // Json string of properties. Can have default values, otherwise 
     // each index data overrides properties values for each behavior it has.
     XML_VARIABLE XMLJsonValue props;

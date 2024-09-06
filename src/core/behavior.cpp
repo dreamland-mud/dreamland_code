@@ -1,11 +1,14 @@
 #include "behavior.h"
 #include "fenia/exceptions.h"
+#include "autoflags.h"
 
 Behavior::Behavior()
+            : target(INDEX_NONE, &index_data_table)
 {
 }
 
-Behavior::Behavior(const DLString &n) : name(n)
+Behavior::Behavior(const DLString &n) 
+        : target(INDEX_NONE, &index_data_table), name(n)
 {
 }
 

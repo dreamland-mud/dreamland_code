@@ -18,6 +18,7 @@
 #include "loadsave.h"                                                               
 #include "merc.h"
 #include "profiler.h"
+#include "behavior.h"
 
 #include "structwrappers.h"
 #include "areaindexwrapper.h"
@@ -1027,3 +1028,14 @@ NMI_INVOKE( RoomWrapper, affectFind, "(skill,ch): найти аффект с д�
     return Register();
 }
 
+NMI_INVOKE(RoomWrapper, hasBehavior, "(bhvName): true если среди поведений комнаты есть указанное")
+{
+    checkTarget();
+
+    DLString bhvName = args2string(args);
+    Behavior *bhv = behaviorManager->findExisting(bhvName);
+    if (!bhv)
+        throw IllegalArgumentException();
+
+    return Register(target->pIndexData->behaviors.isSet(bhv->getIndex()));
+}

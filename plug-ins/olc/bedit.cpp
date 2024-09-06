@@ -83,7 +83,7 @@ void OLCStateBehavior::show( PCharacter *ch )
     ptc(ch, "Название:        {C%s{x %s {D(nameRus help){x\r\n",
             bhv->getRussianName().c_str(),
             web_edit_button(ch, "nameRus", "web").c_str());
-    ptc(ch, "Цель:            {c%s {D(target){x\r\n", bhv->target.c_str());
+    ptc(ch, "Цель:            {c%s {D(target){x\r\n", bhv->target.name().c_str());
     ptc(ch, "Подкоманды:      {c%s {D(subcommand){x\r\n", bhv->cmd.c_str());
 
     Json::FastWriter writer;
@@ -93,7 +93,7 @@ void OLCStateBehavior::show( PCharacter *ch )
             web_edit_button(ch, "props", "web").c_str());
     ch->desc->send(propsString.c_str());
 
-    feniaTriggers->showTriggers(ch, bhv->getWrapper(), "behavior", bhv->target);    
+    feniaTriggers->showTriggers(ch, bhv->getWrapper(), "behavior", bhv->target.name());    
 
     ptc(ch, "\r\nКоманды: {y{hccommands{x, {y{hcshow{x, {y{hcdone{x\r\n");
 }
@@ -112,25 +112,7 @@ BEDIT(nameRus, "название", "установить название с п�
 
 BEDIT(target, "цель", "установить цель поведения")
 {
-    DLString args = argument;
-    DLString target = args.getOneArgument();
-    DefaultBehavior *bhv = getOriginal();
-
-    if (arg_oneof(target, "room", "комната")) {
-        ptc(ch, "Цель поведения теперь {Wкомната{x.\r\n");
-        bhv->target = "room";
-    } else if (arg_oneof(target, "mob", "моб")) {
-        ptc(ch, "Цель поведения теперь {Wмоб{x.\r\n");
-        bhv->target = "mob";
-    } else if (arg_oneof(target, "obj", "item", "предмет")) {
-        ptc(ch, "Цель поведения теперь {Wпредмет{x.\r\n");
-        bhv->target = "obj";
-    } else {
-        ptc(ch, "Использование: target mob|room|obj\r\n");
-        return false;
-    }
-
-    return true;
+    return flagValueEdit(getOriginal()->target);
 }
 
 BEDIT(props, "свойства", "json свойства поведения")
@@ -197,7 +179,7 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
         DefaultBehavior::Pointer bhv(NEW);
         bhv->setName(args);
         bhv->id = behaviorManager->getNextId();
-        bhv->target = "obj";
+        bhv->target = INDEX_OBJ;
 
         BehaviorLoader::getThis()->loadElement(bhv);
         BehaviorLoader::getThis()->saveElement(bhv);
@@ -225,7 +207,7 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
             ch->send_to(fmt(0, lineFormat.c_str(),
                     bhv->getName().c_str(),
                     bhv->getRussianName().ruscase('1').c_str(),
-                    bhv->target.c_str()));
+                    bhv->target.name().c_str()));
         }
 
         return;

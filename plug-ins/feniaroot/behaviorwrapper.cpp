@@ -94,21 +94,13 @@ NMI_GET(BehaviorWrapper, cmd, "имена команд, привязанных �
 NMI_GET(BehaviorWrapper, target, "чье поведение: obj, mob, room") 
 { 
     checkTarget(); 
-    return Register(target->target);
+    return Register(target->target.name());
 }
 
 NMI_GET(BehaviorWrapper, props, "Map (структура) из свойств поведения") 
 {
-    Register propsReg = Register::handler<IdContainer>();
-    IdContainer *propsMap = propsReg.toHandler().getDynamicPointer<IdContainer>();
-
-    for (auto p = target->props.begin(); p != target->props.end(); p++) {
-        propsMap->setField(
-            IdRef(p.key().asString()), 
-            JsonUtils::toRegister(*p));
-    }
-
-    return propsReg;    
+    checkTarget();
+    return JsonUtils::toIdContainer(target->props);
 }
 
 NMI_INVOKE(BehaviorWrapper, api, "(): печатает этот API")

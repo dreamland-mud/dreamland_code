@@ -255,18 +255,10 @@ NMI_GET(ObjIndexWrapper, props, "Map (структура) из свойств п
 
     for (auto bhv = target->props.begin(); bhv != target->props.end(); bhv++) {
         const Json::Value &bhvProps = target->props[bhv.key().asString()];
-        Register bhvReg = Register::handler<IdContainer>();
-        IdContainer *bhvMap = bhvReg.toHandler().getDynamicPointer<IdContainer>();
-
-        for (auto prop = bhvProps.begin(); prop != bhvProps.end(); prop++) {
-            bhvMap->setField(
-                IdRef(prop.key().asString()), 
-                JsonUtils::toRegister(*prop));
-        }
 
         propsMap->setField(
             IdRef(bhv.key().asString()),
-            bhvReg);
+            JsonUtils::toIdContainer(bhvProps));
     }
 
     return propsReg;    
