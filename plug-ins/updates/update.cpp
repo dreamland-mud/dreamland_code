@@ -63,6 +63,7 @@
 
 #include "commonattributes.h"
 #include "core/behavior/behavior_utils.h"
+#include "../loadsave/behavior_utils.h"
 #include "mobilebehavior.h"
 #include "affecthandler.h"
 #include "skill.h"
@@ -521,6 +522,9 @@ void diving_update( )
 
 static bool oprog_spec( Object *obj )
 {
+    if (behavior_trigger(obj, "Spec", "O", obj))
+        return true;
+        
     FENIA_CALL(obj, "Spec", "");
     FENIA_NDX_CALL(obj, "Spec", "O", obj);
 
@@ -728,6 +732,9 @@ static bool oprog_update_key( Object *obj )
 
 static bool oprog_area( Object *obj )
 {
+    if (behavior_trigger(obj, "Area", "O", obj))
+        return true;
+
     FENIA_CALL( obj, "Area", "" )
     FENIA_NDX_CALL( obj, "Area", "O", obj )
     BEHAVIOR_CALL( obj, area )

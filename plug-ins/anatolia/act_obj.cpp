@@ -247,6 +247,9 @@ bool oprog_get( Object *obj, Character *ch )
 
 static bool oprog_fetch( Character *ch, Object *obj, Object *container )
 {
+    if (behavior_trigger(container, "Fetch", "OCO", container, ch, obj))
+        return true;
+
     FENIA_CALL( container, "Fetch", "CO", ch, obj );
     FENIA_NDX_CALL( container, "Fetch", "OCO", container, ch, obj );
     BEHAVIOR_CALL( container, fetch, ch, obj );
@@ -340,6 +343,9 @@ bool oprog_can_fetch_corpse_pc( Character *ch, Object *container, Object *obj, b
 
 static bool oprog_cant_fetch( Object *container, Character *ch, Object *obj, const DLString &pocket )
 {
+    if (behavior_trigger(container, "CantFetch", "OCOs", container, ch, obj, pocket.c_str()))
+        return true;
+
     FENIA_CALL( container, "CantFetch", "COs", ch, obj, pocket.c_str( ) );
     FENIA_NDX_CALL( container, "CantFetch", "OCOs", container, ch, obj, pocket.c_str( ) );
     return false;
@@ -771,6 +777,9 @@ CMDRUNP( get )
 static bool oprog_cant_put( Character *ch, Object *obj, Object *container,
                             const char *pocket, bool verbose )
 {
+    if (behavior_trigger(container, "CantPut", "OCOsi", container, ch, obj, pocket, verbose))
+        return true;
+
     FENIA_CALL( container, "CantPut", "COsi", ch, obj, pocket, verbose );
     FENIA_NDX_CALL( container, "CantPut", "OCOsi", container, ch, obj, pocket, verbose );
     return false;
@@ -908,6 +917,9 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
 static bool oprog_put(Object *obj, Character *ch, Object *container)
 {
     aquest_trigger(container, ch, "Put", "OCO", container, ch, obj);
+
+    if (behavior_trigger(container, "Put", "OCO", container, ch, obj))
+        return true;
 
     FENIA_CALL( ch, "Put", "COO", ch, obj, container );
     FENIA_CALL( obj, "Put", "COO", ch, obj, container );
@@ -1168,6 +1180,9 @@ bool can_drop_obj( Character *ch, Object *obj, bool verbose )
 
 static bool oprog_drop( Object *obj, Character *ch )
 {
+    if (behavior_trigger(obj, "Drop", "OC", obj, ch))
+        return true;
+
     FENIA_CALL( obj, "Drop", "C", ch )
     FENIA_NDX_CALL( obj, "Drop", "OC", obj, ch )
     BEHAVIOR_CALL( obj, drop, ch )
