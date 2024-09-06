@@ -29,6 +29,8 @@ namespace JsonUtils {
 
     /** Get a Register with string/numeric or boolean value of this JSON. */
     Scripting::Register toRegister(const Json::Value &jv);
+
+    Scripting::Register toIdContainer(const Json::Value &jv);
 }
 
 #endif
