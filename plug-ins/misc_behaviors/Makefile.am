@@ -21,7 +21,6 @@ $(LIBADD_AI)
 libmisc_behaviors_la_SOURCES = \
 anatolia_limits.cpp \
 midgaardfountain.cpp \
-hierophant.cpp \
 pocketwatch.cpp \
 masquerade.cpp \
 ofcolguards.cpp \
@@ -29,7 +28,6 @@ rats.cpp \
 special.cpp \
 moneychanger.cpp \
 petquestor.cpp \
-equipsets.cpp \
 impl.cpp 
 
 libmisc_behaviors_la_MOC = \
@@ -40,9 +38,7 @@ masquerade.h \
 ofcolguards.h \
 rats.h \
 moneychanger.h \
-petquestor.h \
-equipsets.h \
-hierophant.h 
+petquestor.h 
 
 
 AM_CPPFLAGS += $(plugin_INCLUDES)
