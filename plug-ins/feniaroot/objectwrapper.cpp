@@ -16,6 +16,7 @@
 #include "wearloc_utils.h"
 #include "weapons.h"
 #include "occupations.h"
+#include "behavior.h"
 
 #include "grammar_entities_impl.h"
 #include "personalquestreward.h"
@@ -924,6 +925,18 @@ NMI_INVOKE( ObjectWrapper, get_owner_here, "(): вернуть персонаж�
             return wrap(rch);
 
     return Register();    
+}
+
+NMI_INVOKE( ObjectWrapper, hasBehavior, "(bhvName): true если среди поведений предмета есть указанное" )
+{
+    checkTarget();
+    DLString bhvName = args2string(args);
+
+    Behavior *bhv = behaviorManager->findExisting(bhvName);
+    if (!bhv)
+        throw IllegalArgumentException();
+
+    return Register(target->pIndexData->behaviors.isSet(bhv->getIndex()));
 }
 
 NMI_GET( ObjectWrapper, items, "список (List) всех предметов внутри этого" )
