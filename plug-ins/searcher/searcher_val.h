@@ -38,6 +38,7 @@ struct SearcherParam {
     int heal_gain, mana_gain, beats;
     DLString aff, vuln, res, imm, det;
     DLString material;
+    DLString behavior;
     // Names of all attached triggers.
     DLString fenia;
     // Weapon or mobile damage noun (DAMW_BITE, weapon_flags enum).

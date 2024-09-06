@@ -103,6 +103,7 @@ L	    ([A-Za-z_]|{RL})
 "AVE"       return T_AVE;
 "DAMAGE"    return T_DAMAGE;
 "FENIA"     return T_FENIA;
+"BEHAVIOR"  return T_BEHAVIOR;
 "LEARNED"   return T_LEARNED;
 "MATERIAL"  return T_MATERIAL;
 "DEFAULT_POS" return T_DEFAULT_POS;
@@ -165,6 +166,7 @@ void SearcherParam::init()
     det = aff = imm = res = vuln = "";
     material = "";
     fenia = "";
+    behavior = "";
     damage = "";
 
     // Mobile fields.
@@ -226,6 +228,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
 
     p.material = pObj->material;
     p.fenia = fenia_triggers(pObj->wrapper);
+    p.behavior = pObj->behaviors.toString();
 
     for (auto &paf: pObj->affected) {
         int m = paf->modifier;
@@ -370,6 +373,7 @@ bool searcher_parse(struct mob_index_data *pMob, const char *args)
     p.det = detect_flags.names(pMob->detection);
     p.material = pMob->material;
     p.fenia = fenia_triggers(pMob->wrapper);
+    p.behavior = pMob->behaviors.toString();
     p.damage = weapon_flags.name(pMob->dam_type);
     p.affects = pMob->affects.toString();
     p.default_pos = position_table.name(pMob->default_pos);
