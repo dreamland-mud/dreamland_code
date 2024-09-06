@@ -174,7 +174,8 @@ static bool oprog_cant_equip( Object *obj, Character *ch )
 
 static bool oprog_equip( Object *obj, Character *ch )
 {
-    behavior_trigger(obj, "Equip", "OC", obj, ch);
+    if (behavior_trigger(obj, "Equip", "OC", obj, ch))
+        return true;
 
     FENIA_CALL( obj, "Equip", "C", ch )
     FENIA_NDX_CALL( obj, "Equip", "OC", obj, ch )
@@ -192,7 +193,8 @@ static bool oprog_wear( Object *obj, Character *ch )
 
 static bool oprog_remove( Object *obj, Character *ch )
 {
-    behavior_trigger(obj, "Remove", "OC", obj, ch);
+    if (behavior_trigger(obj, "Remove", "OC", obj, ch))
+        return true;
 
     FENIA_CALL( obj, "Remove", "C", ch )
     FENIA_NDX_CALL( obj, "Remove", "OC", obj, ch )
