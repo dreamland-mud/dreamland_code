@@ -29,6 +29,8 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "act.h"
+#include "configurable.h"
+#include "json_utils.h"
 
 #include "merc.h"
 #include "damageflags.h"
@@ -1422,7 +1424,7 @@ NMI_INVOKE(Root, interpolate, "(x, x1, x2, y1, y2): линейно интерп�
     return Register((int)linear_interpolation(x, x1, x2, y1, y2));
 }
 
-NMI_INVOKE(Root, get_str_app, "(ch): доступ до json-таблицi str_app для персонажа")
+NMI_INVOKE(Root, get_str_app, "(ch): доступ до json-таблицы str_app для персонажа")
 {
     Character *ch = argnum2character(args, 1);
     const str_app_type &entry = get_str_app(ch);
@@ -1439,6 +1441,18 @@ NMI_INVOKE(Root, get_str_app, "(ch): доступ до json-таблицi str_ap
     obj->setHandler(rc);
     return Register( obj );    
 }
+
+NMI_INVOKE(Root, config, "(name): read-only доступ до конфигурационного json-файла (fedit list)")
+{
+    DLString fileName = args2string(args);
+    Configurable::Pointer cfg = configReg->get(fileName);
+    
+    if (!cfg)
+        throw Scripting::Exception("Configurable not found");
+
+    return JsonUtils::toRegister(cfg->getValue());
+}
+
 
 NMI_INVOKE(Root, help, "(id): вернуть сырой текст статьи справки по id или исключение")
 {

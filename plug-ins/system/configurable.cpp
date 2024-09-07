@@ -21,7 +21,6 @@ void Configurable::initialization()
     try {
         DLString text = getText();
         
-        Json::Value value;
         JsonUtils::fromString(text, value);
 
         loaded(value);
@@ -40,7 +39,6 @@ void Configurable::refresh(const DLString &text)
         ofstream ofs(getAbsolutePath());
         ofs << koi2utf(text);
         
-        Json::Value value;
         JsonUtils::fromString(text, value);
 
         loaded(value);

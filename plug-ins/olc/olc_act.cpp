@@ -371,7 +371,7 @@ bool show_help(Character * ch, const char *cargument)
                     buf << fmt(0, "{g%-15s{x: %-17N1 %s\r\n",
                             bhv->getName().c_str(),
                             bhv->getRussianName().c_str(),
-                            bhv->target.c_str());
+                            bhv->target.name().c_str());
                 }
                 ch->send_to(buf);
                 return false;

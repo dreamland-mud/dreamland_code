@@ -27,10 +27,14 @@ namespace JsonUtils {
     /** Return string representation of the value (with quotes for actual strings). */
     DLString asString(const Json::Value &value);
 
-    /** Get a Register with string/numeric or boolean value of this JSON. */
-    Scripting::Register toRegister(const Json::Value &jv);
+    /** Get a Register with string/numeric/array/struct or boolean value of this JSON. */
+    Scripting::Register toRegister(const Json::Value &value);
 
-    Scripting::Register toIdContainer(const Json::Value &jv);
+    /** Get a representation of a JSON object as a Fenia structure with fields. */
+    Scripting::Register toIdContainer(const Json::Value &jsonObj);
+
+    /** Get a representation of a JSON array as a Fenia array. */
+    Scripting::Register toRegContainer(const Json::Value &jsonArray);
 }
 
 #endif

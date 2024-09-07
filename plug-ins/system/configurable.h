@@ -3,6 +3,7 @@
 
 #include <map>
 #include <list>
+#include "jsoncpp/json/value.h"
 #include "plugin.h"
 #include "oneallocate.h"
 #include "xmlpolymorphvariable.h"
@@ -11,8 +12,6 @@
 #include "plugininitializer.h"
 #include "flags.h"
 #include "dlfile.h"
-
-namespace Json { class Value; }
 
 class Configurable: public virtual Plugin {
 public:
@@ -27,9 +26,11 @@ public:
     DLString getText() const;
     DLString getAbsolutePath() const;
     const DLString & getPath() const { return path; }
+    const Json::Value &getValue() const { return value; }
 
 protected:
     DLString path;
+    Json::Value value;
 };
 
 class ConfigurableRegistry: public OneAllocate, public Plugin {
