@@ -14,7 +14,7 @@ datadir=$(libexecdir)/plugins
 
 .la.xml:
 	@echo "Generating $@ from $<"
-	@echo '<?xml version="1.0" encoding="KOI8-R"?>' > $@
+	@echo '<?xml version="1.0" encoding="KOI8-U"?>' > $@
 	@echo '<so>' >> $@
 	@echo '    <depends>' >> $@
 	@. $<; for i in $$dependency_libs; do \

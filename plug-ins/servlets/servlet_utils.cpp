@@ -9,8 +9,8 @@
 #include "dreamland.h"
 #include "commonattributes.h"
 
-static IconvMap utf2koi("utf-8", "koi8-r");
-static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap utf2koi("utf-8", "koi8-u");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 bool servlet_parse_params(HttpRequest &request, HttpResponse &response, Json::Value &params)
 {

@@ -2,7 +2,7 @@
 #include "json/json.h"
 #include "iconvmap.h"
 
-static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 void JsonServletBase::handleRequest(HttpRequest &request, HttpResponse &response)
 {

@@ -20,7 +20,7 @@
 #include "xmldocument.h"
 #include "iconvmap.h"
 
-IconvMap utf2koi("utf-8", "koi8-r");
+IconvMap utf2koi("utf-8", "koi8-u");
 
 using namespace std;
 

@@ -34,7 +34,7 @@ update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bi
 ```bash
 sudo apt-get update
 sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util
-sudo apt-get install -y locales && locale-gen ru_RU.KOI8-R && update-locale
+sudo apt-get install -y locales && locale-gen uk_UA && update-locale
 ```
 
 ## Install dependency libraries

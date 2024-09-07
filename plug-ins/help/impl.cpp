@@ -21,7 +21,7 @@
 
 TABLE_LOADER_IMPL(HelpLoader, "helps", "Help");
 
-static IconvMap koi2utf("koi8-r", "utf-8");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 
 /**

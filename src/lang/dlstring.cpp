@@ -663,7 +663,7 @@ int DLString::compareRussian(const DLString &other) const
 locale DLString::initLocale()
 {
     try {
-        return locale("ru_RU.koi8r");
+        return locale("uk_UA.koi8u");
     } catch (const exception &ex) {
         return locale();
     }

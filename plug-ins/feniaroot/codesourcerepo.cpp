@@ -14,8 +14,8 @@
 using namespace Scripting;
 namespace fs = std::filesystem;
 
-static IconvMap koi2utf("koi8-r", "utf-8");
-static IconvMap utf2koi("utf-8", "koi8-r");
+static IconvMap koi2utf("koi8-u", "utf-8");
+static IconvMap utf2koi("utf-8", "koi8-u");
 
 PluginInitializer<CodeSourceRepo> initCSRepo;
 

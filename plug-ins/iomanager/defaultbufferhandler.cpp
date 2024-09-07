@@ -72,7 +72,7 @@ DefaultBufferHandler::convertCodepage(char *from, size_t from_length, char *to, 
         return from_length;
     } else {
         static const char *fromcode = "utf-8";
-        static const char *tocode = "koi8-r";
+        static const char *tocode = "koi8-u";
         iconv_t icnv_desc = iconv_open(tocode, fromcode);
 
         if (icnv_desc == (iconv_t)(-1)) {
@@ -300,7 +300,7 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
      */
     if (!to) {
         static const char *tocode = "utf-8";
-        static const char *fromcode = "koi8-r";
+        static const char *fromcode = "koi8-u";
         iconv_t icnv_desc = iconv_open(tocode, fromcode);
 
         if (icnv_desc == (iconv_t)(-1)) {
@@ -374,7 +374,7 @@ DLString DefaultBufferHandler::convert(const char *txt)
     if (!to) {
         DLString result;
         static const char *tocode = "utf-8";
-        static const char *fromcode = "koi8-r";
+        static const char *fromcode = "koi8-u";
         iconv_t icnv_desc = iconv_open(tocode, fromcode);
 
         if (icnv_desc == (iconv_t)(-1)) {

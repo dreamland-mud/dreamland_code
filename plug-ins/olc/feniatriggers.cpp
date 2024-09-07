@@ -25,7 +25,7 @@
 #include "act.h"
 #include "def.h"
 
-static IconvMap utf2koi("utf-8", "koi8-r");
+static IconvMap utf2koi("utf-8", "koi8-u");
 
 static const DLString EXAMPLE_FOLDER = "fenia.examples";
 

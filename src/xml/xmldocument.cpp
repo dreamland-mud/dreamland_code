@@ -22,7 +22,7 @@
 #include "logstream.h"
 #include "iconvmap.h"
 
-IconvMap koi2utf("koi8-r", "utf-8");
+IconvMap koi2utf("koi8-u", "utf-8");
 
 XMLDocument::XMLDocument( )
         : encoding( DEFAULT_ENCODING ),

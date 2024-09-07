@@ -18,7 +18,7 @@ FROM ubuntu:focal as dreamland
 RUN apt-get update \
     && apt-get install -yq db-util bzip2 libdb5.3 libdb5.3++ zlib1g libssl-dev libfl-dev libcrypto++ libjsoncpp-dev \
     && apt-get install -yq locales \
-    && locale-gen ru_RU ru_RU.KOI8-R ru_RU.UTF-8 en_US.UTF-8 \
+    && locale-gen uk_UA uk_UA.UTF-8 en_US.UTF-8 \
     && update-locale
 
 EXPOSE 9000
