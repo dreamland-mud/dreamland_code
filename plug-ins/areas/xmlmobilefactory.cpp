@@ -6,6 +6,7 @@
 #include "logstream.h"
 #include "xmlmobilefactory.h"
 #include "grammar_entities_impl.h"
+#include "json_utils.h"
 #include "skillgroup.h"
 #include "religion.h"
 #include "behavior.h"
@@ -110,14 +111,14 @@ XMLMobileFactory::init(const mob_index_data *mob)
 
     for (Properties::const_iterator p = mob->properties.begin( ); p != mob->properties.end( ); p++)
         properties.insert( *p );
+
+    JsonUtils::copy(props, mob->props);
 }
 
 mob_index_data *
 XMLMobileFactory::compat( )
 {
-    static MOB_INDEX_DATA zeroMobIndex;
     MOB_INDEX_DATA *mob = new MOB_INDEX_DATA;
-    *mob = zeroMobIndex;
 
     compat(mob);
 
@@ -207,4 +208,6 @@ XMLMobileFactory::compat(mob_index_data *mob)
 
     for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
         mob->properties.insert( *p );
+
+    JsonUtils::copy(mob->props, props);
 }

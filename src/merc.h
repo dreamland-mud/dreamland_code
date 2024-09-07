@@ -356,6 +356,7 @@ struct  auction_data
 struct        mob_index_data
 {
     mob_index_data( );
+    virtual ~mob_index_data();
 
     MOB_INDEX_DATA *        next;
     ProgWrapper<SPEC_FUN> spec_fun;
@@ -395,6 +396,7 @@ struct        mob_index_data
     GlobalBitvector religion;
     GlobalBitvector affects;
     GlobalBitvector behaviors;
+    Json::Value props;
     Grammar::Number     gram_number;
     XMLDocumentPointer behavior;
     Scripting::Object *wrapper;

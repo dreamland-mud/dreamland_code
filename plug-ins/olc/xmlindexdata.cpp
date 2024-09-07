@@ -37,67 +37,11 @@ using namespace std;
  *-----------------------------------*/
 XMLMobIndexData::XMLMobIndexData()
 {
-    next = NULL;
-    spec_fun = NULL;
-    area = NULL;
-    player_name = str_dup("no name");
-    short_descr = str_dup("(no short description)");
-    long_descr = str_dup("(no long description)\n\r");
-    description = str_empty;
-    vnum = 0;
-    count = 0;
-    killed = 0;
-    sex = 0;
-    level = 0;
-    act = ACT_IS_NPC;
-    affected_by = 0;
-    detection = 0;
-    dam_type = 0;
-    alignment = 0;
-    hitroll = 0;
-    race = str_dup("human");
-    form = 0;
-    parts = 0;
-    imm_flags = 0;
-    res_flags = 0;
-    vuln_flags = 0;
-    material = str_dup("none");
-    off_flags = 0;
-    size = SIZE_MEDIUM;
-    ac[AC_PIERCE] = 0;
-    ac[AC_BASH] = 0;
-    ac[AC_SLASH] = 0;
-    ac[AC_EXOTIC] = 0;
-    hit[DICE_NUMBER] = 0;
-    hit[DICE_TYPE] = 0;
-    hit[DICE_BONUS] = 0;
-    mana[DICE_NUMBER] = 0;
-    mana[DICE_TYPE] = 0;
-    mana[DICE_BONUS] = 0;
-    damage[DICE_NUMBER] = 0;
-    damage[DICE_TYPE] = 0;
-    damage[DICE_BONUS] = 0;
-    start_pos = POS_STANDING;
-    default_pos = POS_STANDING;
-    wealth = 0;
-    behavior = 0;
-    practicer.setRegistry( skillGroupManager );
-    religion.setRegistry(religionManager);
-    affects.setRegistry(skillManager);
-    wrapper = 0;
-    group = 0;
 }
 
 XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
+                    : XMLMobIndexData()
 {
-    static MOB_INDEX_DATA zeroMobIndex;
-    
-    *(MOB_INDEX_DATA*)this = zeroMobIndex;
-
-    behavior         = 0;
-    wrapper          = 0;
-    next             = NULL;
-    
     act              = mob.act;
     affected_by      = mob.affected_by;
     alignment        = mob.alignment;
@@ -154,9 +98,6 @@ XMLMobIndexData::clear()
     free_string(description);
     free_string(material);
     free_string(race);
-
-    static MOB_INDEX_DATA zMob;
-    *(MOB_INDEX_DATA*)this = zMob;
 }
 
 

@@ -58,6 +58,11 @@ RoomIndexData::RoomIndexData()
         exit[i] = 0;
 }
 
+RoomIndexData::~RoomIndexData()
+{
+    
+}
+
 Room::Room( ) : 
                 position( -1 ),
                 people( 0 ), contents( 0 ),

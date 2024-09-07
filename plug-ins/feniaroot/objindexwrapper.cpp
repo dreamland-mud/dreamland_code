@@ -246,22 +246,10 @@ NMI_GET( ObjIndexWrapper, affected, "список (List) всех аффекто
     return Register( sobj );
 }
 
-NMI_GET(ObjIndexWrapper, props, "Map (структура) из свойств поведения") 
+NMI_GET(ObjIndexWrapper, props, "Map (структура) из свойств поведения, ключ - имя поведения") 
 {
     checkTarget();
-
-    Register propsReg = Register::handler<IdContainer>();
-    IdContainer *propsMap = propsReg.toHandler().getDynamicPointer<IdContainer>();
-
-    for (auto bhv = target->props.begin(); bhv != target->props.end(); bhv++) {
-        const Json::Value &bhvProps = target->props[bhv.key().asString()];
-
-        propsMap->setField(
-            IdRef(bhv.key().asString()),
-            JsonUtils::toIdContainer(bhvProps));
-    }
-
-    return propsReg;    
+    return JsonUtils::toRegister(target->props);
 }
 
 NMI_INVOKE( ObjIndexWrapper, api, "(): печатает этот API" )

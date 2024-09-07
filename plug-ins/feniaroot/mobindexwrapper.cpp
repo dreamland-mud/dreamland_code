@@ -8,7 +8,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "merc.h"
-
+#include "json_utils.h"
 #include "loadsave.h"
 #include "pet.h"
 
@@ -250,6 +250,12 @@ NMI_INVOKE(MobIndexWrapper, createFor, "(ch): создать экземпляр 
         pet->config(client, pet->getChar());
         
     return WrapperManager::getThis( )->getWrapper( mob ); 
+}
+
+NMI_GET(MobIndexWrapper, props, "Map (структура) из свойств поведения, ключ - имя поведения") 
+{
+    checkTarget();
+    return JsonUtils::toRegister(target->props);
 }
 
 NMI_INVOKE( MobIndexWrapper, api, "(): печатает этот API" )

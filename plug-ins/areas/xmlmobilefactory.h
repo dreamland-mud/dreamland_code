@@ -9,6 +9,7 @@
 #include "xmllist.h"
 #include "xmlmap.h"
 #include "xmlvariablecontainer.h"
+#include "xmljsonvalue.h"
 #include "xmlglobalbitvector.h"
 #include "xmlitemtype.h"
 #include "clanreference.h"
@@ -50,6 +51,7 @@ public:
 
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLMapBase<XMLString> properties;
+    XML_VARIABLE XMLJsonValue props;
 };
 
 #endif

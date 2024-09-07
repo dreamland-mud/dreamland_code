@@ -12,6 +12,7 @@
 #include "olc.h"
 #include "sedit.h"
 #include "pcharacter.h"
+#include "behavior.h"
 #include "security.h"
 #include "interp.h"
 #include "arg_utils.h"
@@ -1063,6 +1064,86 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
 
     findCommand(ch, cmd)->entryPoint(ch, "");
     return false;
+}
+
+bool OLCState::editBehaviors(GlobalBitvector &behaviors, Json::Value &props)
+{
+    // Remember old behavior.
+    std::set<int> oldBehaviors = behaviors.toSet();
+    
+    bool rc = globalBitvectorEdit<Behavior>(behaviors);
+
+    if (!rc)
+        return false;
+
+    // For all entries that used to be available but no longer there,
+    // clean the entry in the props map.
+    for (auto b: oldBehaviors) {
+        if (!behaviors.isSet(b)) {
+            Behavior *bhv = behaviorManager->find(b);
+            props.removeMember(bhv->getName().c_str());
+        }
+    }
+
+    // For all entries that are new, create a value in the props map
+    // and copy the defaults.
+    std::set<int> newBehaviors = behaviors.toSet();
+    for (auto b: newBehaviors) {
+        if (oldBehaviors.count(b) == 0) {
+            Behavior *bhv = behaviorManager->find(b);
+            props[bhv->getName()] = bhv->props;
+        }
+    }
+
+    return true;
+}
+
+bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const DLString &arguments)
+{
+    DLString args = arguments;
+    DLString bhvName = args.getOneArgument();
+    DLString propName = args.getOneArgument();
+    DLString propValue = args;
+    Character *ch = owner->character;
+
+    if (bhvName.empty() || propName.empty() || propValue.empty()) {
+        ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>\r\n");
+        return false;
+    }
+
+    Behavior *bhv = behaviorManager->findExisting(bhvName);
+    if (!bhv) {
+        ptc(ch, "Поведение '%s' не существует, смотри {y{hc? behaviors{x для списка.\r\n", bhvName.c_str());
+        return false;
+    }
+
+    if (!behaviors.isSet(bhv->getIndex())) {
+        ptc(ch, "Поведение '%s' не установлено на этом предмете.\r\n", bhvName.c_str());
+        return false;
+    }
+
+    if (!props[bhvName].isMember(propName)) {
+        ptc(ch, "У поведения '%s' нету свойства под названием '%s'.\r\n", bhvName.c_str(), propName.c_str());
+        return false;
+    }
+
+    Json::Value &target = props[bhvName][propName];
+
+    if (target.isNull())
+        target = propValue;
+    else if (target.isNumeric() || target.isBool()) {
+        if (!propValue.isNumber()) {
+            ptc(ch, "Свойство '%s' должно быть числом, а не строкой.\r\n", propName.c_str());
+            return false;
+        }
+
+        target = propValue.toInt();
+    } else {
+        target = propValue;
+    }
+
+    ptc(ch, "Свойству %s.%s установлено значение %s.\r\n", bhvName.c_str(), propName.c_str(), propValue.c_str());
+    return true;
 }
 
 DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args)

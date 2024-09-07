@@ -13,6 +13,7 @@
 #include "xmlinteger.h"
 #include "xmlmap.h"
 #include "xmllist.h"
+#include "xmljsonvalue.h"
 #include "xmlglobalbitvector.h"
 #include "xmlmisc.h"
 #include "merc.h"
@@ -54,6 +55,7 @@ public:
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLGlobalBitvector behaviors;
     XML_VARIABLE XMLMapBase<XMLString> properties;
+    XML_VARIABLE XMLJsonValue props;
 };
 
 #endif

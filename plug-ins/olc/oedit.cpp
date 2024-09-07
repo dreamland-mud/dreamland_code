@@ -292,7 +292,7 @@ OEDIT(show)
     ptc(ch, "Sound: [%s]\n\r", pObj->sound.c_str( ));
 
     if (!pObj->properties.empty( )) {
-        ptc(ch, "Properties:\n\r");
+        ptc(ch, "Properties: {D(oldprop){x\n\r");
         for (Properties::const_iterator p = pObj->properties.begin( ); p != pObj->properties.end( ); p++)
             ptc(ch, "{g%20s{x: %s\n\r", p->first.c_str( ), p->second.c_str( ));
     }
@@ -372,49 +372,14 @@ OEDIT(show)
         try {
             std::basic_ostringstream<char> ostr;
             pObj->behavior->save( ostr );
-            ptc(ch, "Legacy behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
+            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n%s\r\n", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
             ptc(ch, "Legacy behavior is BUGGY.\r\n");
         }
     }
 
-    // Display all assigned behaviors and active behavior triggers.
-    ptc(ch, "\r\n{cПоведение{x:            ");
-    for (int &bhvIndex: pObj->behaviors.toArray()) {
-		Behavior *bhv = behaviorManager->find(bhvIndex);
-        ptc(ch, "{C%s{x ", web_cmd(ch, "bedit $1", bhv->getName()).c_str());
-    }
-    ptc(ch, " {D(behaviors){x\n\r");
-
-    ptc(ch,     "{cТригеры поведения{x:    ");
-
-    for (int &bhvIndex: pObj->behaviors.toArray()) {
-		Behavior *bhv = behaviorManager->find(bhvIndex);
-		WrapperBase *bhvWrapper = bhv->getWrapper();
-        if (!bhvWrapper)
-            continue;
-
-        StringSet activeTriggers, miscMethods;    
-        bhvWrapper->collectTriggers(activeTriggers, miscMethods);
-
-        for (auto &trig: activeTriggers)
-            ptc(ch, "{C%s{w.{C%s{x ", bhv->getName().c_str(), trig.c_str());
-    }
-    ptc(ch, "\r\n");
-
-    ptc(ch,     "{cСвойства поведения{x:  {D(prop){x  \r\n");
-    for(auto p = pObj->props.begin(); p != pObj->props.end(); p++) {
-        const DLString &bhvName = p.key().asString();
-        const Json::Value &bhvProps = *p;
-
-        for (auto bp = bhvProps.begin(); bp != bhvProps.end(); bp++) {
-            ptc(ch, "       prop %s %s %s\r\n", 
-                bhvName.c_str(), 
-                bp.key().asString().c_str(),
-                JsonUtils::asString(*bp).c_str());
-        }
-    }
+    show_behaviors(ch, pObj->behaviors, pObj->props);
 
     // Display Fenia triggers and methods on this object.
     OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
@@ -694,49 +659,7 @@ OEDIT(smell)
 
 OEDIT(props)
 {
-    DLString args = argument;
-    DLString bhvName = args.getOneArgument();
-    DLString propName = args.getOneArgument();
-    DLString propValue = args;
-
-    if (bhvName.empty() || propName.empty() || propValue.empty()) {
-        ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>\r\n");
-        return false;
-    }
-
-    Behavior *bhv = behaviorManager->findExisting(bhvName);
-    if (!bhv) {
-        ptc(ch, "Поведение '%s' не существует, смотри {y{hc? behaviors{x для списка.\r\n", bhvName.c_str());
-        return false;
-    }
-
-    if (!obj.behaviors.isSet(bhv->getIndex())) {
-        ptc(ch, "Поведение '%s' не установлено на этом предмете.\r\n", bhvName.c_str());
-        return false;
-    }
-
-    if (!obj.props[bhvName].isMember(propName)) {
-        ptc(ch, "У поведения '%s' нету свойства под названием '%s'.\r\n", bhvName.c_str(), propName.c_str());
-        return false;
-    }
-
-    Json::Value &target = obj.props[bhvName][propName];
-
-    if (target.isNull())
-        target = propValue;
-    else if (target.isNumeric() || target.isBool()) {
-        if (!propValue.isNumber()) {
-            ptc(ch, "Свойство '%s' должно быть числом, а не строкой.\r\n", propName.c_str());
-            return false;
-        }
-
-        target = propValue.toInt();
-    } else {
-        target = propValue;
-    }
-
-    ptc(ch, "Свойству %s.%s установлено значение %s.\r\n", bhvName.c_str(), propName.c_str(), propValue.c_str());
-    return true;
+    return editProps(obj.behaviors, obj.props, argument);
 }
 
 OEDIT(oldproperty)
@@ -1076,36 +999,8 @@ OEDIT(list)
 
 OEDIT(behaviors)
 {
-    // Remember old behavior.
-    std::set<int> oldBehaviors = obj.behaviors.toSet();
-    
-    bool rc = globalBitvectorEdit<Behavior>(obj.behaviors);
-
-    if (!rc)
-        return false;
-
-    // For all entries that used to be available but no longer there,
-    // clean the entry in the props map.
-    for (auto b: oldBehaviors) {
-        if (!obj.behaviors.isSet(b)) {
-            Behavior *bhv = behaviorManager->find(b);
-            obj.props.removeMember(bhv->getName().c_str());
-        }
-    }
-
-    // For all entries that are new, create a value in the props map
-    // and copy the defaults.
-    std::set<int> newBehaviors = obj.behaviors.toSet();
-    for (auto b: newBehaviors) {
-        if (oldBehaviors.count(b) == 0) {
-            Behavior *bhv = behaviorManager->find(b);
-            obj.props[bhv->getName()] = bhv->props;
-        }
-    }
-
-    return true;
+    return editBehaviors(obj.behaviors, obj.props);
 }
-
 
 OEDIT(oldbehavior)
 {

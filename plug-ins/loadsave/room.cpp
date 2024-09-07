@@ -66,7 +66,7 @@ exit_data *exit_data::create()
 Room * RoomIndexData::create()
 {
     if (room) // FIXME allow multiple instances
-        throw Exception("Attempt to create second instance of a room.");
+        throw Exception("Attempt to create second instance of room " + DLString(room->vnum));
 
     room = new Room;
     

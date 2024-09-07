@@ -22,7 +22,7 @@
 #include "interp.h"
 #include "../anatolia/handler.h"
 #include "act.h"
-
+#include "json_utils.h"
 
 #include "olc.h"
 #include "security.h"
@@ -95,6 +95,15 @@ OLCStateMobile::OLCStateMobile( MOB_INDEX_DATA *original )
 
     copyParameters( original );
     copyDescriptions( original );
+    copyBehaviors(original);
+}
+
+void OLCStateMobile::copyBehaviors(MOB_INDEX_DATA *original)
+{
+    mob.behaviors.clear();
+    mob.behaviors.set(original->behaviors);
+    mob.props.clear();
+    JsonUtils::copy(mob.props, original->props);
 }
 
 void OLCStateMobile::copyDescriptions( MOB_INDEX_DATA *original )
@@ -329,11 +338,15 @@ void OLCStateMobile::commit()
             victim->updateCachedNoun( );
     }
 
-
     original->properties.clear( );
     for (Properties::const_iterator p = mob.properties.begin( ); p != mob.properties.end( ); p++)
         original->properties.insert( *p );
     mob.properties.clear( );
+
+    original->behaviors.clear();
+    original->behaviors.set(mob.behaviors);
+    original->props.clear();
+    JsonUtils::copy(original->props, mob.props);
 }
 
 void OLCStateMobile::statePrompt(Descriptor *d)
@@ -421,7 +434,7 @@ MEDIT(show)
     ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
 
     if (!mob.properties.empty( )) {
-        ptc(ch, "Properties:\n\r");
+        ptc(ch, "Properties: {D(oldprop){x\n\r");
         for (Properties::const_iterator p = mob.properties.begin( ); p != mob.properties.end( ); p++)
             ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
     }
@@ -432,22 +445,34 @@ MEDIT(show)
         try {
             std::basic_ostringstream<char> ostr;
             mob.behavior->save( ostr );
-            ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
+            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n%s\r\n", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
-            ptc(ch, "Behavior is BUGGY.\r\n");
+            ptc(ch, "Legacy behavior is BUGGY.\r\n");
         }
     }
+
+    show_behaviors(ch, mob.behaviors, mob.props);
 
     MOB_INDEX_DATA *original = get_mob_index(mob.vnum);
     feniaTriggers->showTriggers(ch, original ? get_wrapper(original->wrapper) : 0, "mob");    
     return false;
 }
 
+MEDIT(behaviors)
+{
+    return editBehaviors(mob.behaviors, mob.props);
+}
+
 MEDIT(fenia)
 {
     feniaTriggers->openEditor(ch, mob, argument);
     return false;
+}
+
+MEDIT(props)
+{
+    return editProps(mob.behaviors, mob.props, argument);
 }
 
 MEDIT(create)
@@ -534,7 +559,7 @@ MEDIT(shop)
     }
 
     if (!mob.behavior) {
-        stc("Поведение продавца не задано, используйте 'behavior shopper'.\r\n", ch);
+        stc("Поведение продавца не задано, используйте 'oldbehavior shopper'.\r\n", ch);
         return false;
     }
 
@@ -681,13 +706,13 @@ MEDIT(smell)
     return false;
 }
 
-MEDIT(property)
+MEDIT(oldproperty)
 {
     DLString args = DLString( argument );
     return mapEdit( mob.properties, args );
 }
 
-MEDIT(behavior)
+MEDIT(oldbehavior)
 {
     DLString type;
 
@@ -706,7 +731,7 @@ MEDIT(behavior)
             return true;
         }
 
-        stc("Поведение уже задано, используйте 'behavior' для редактирования или 'behavior clear' для очистки.\r\n", ch);
+        stc("Поведение уже задано, используйте 'oldbehavior' для редактирования или 'oldbehavior clear' для очистки.\r\n", ch);
         return false;
     }
 
@@ -1115,6 +1140,7 @@ MEDIT(copy)
     enum {
         COPY_DESC,
         COPY_PARAM,
+        COPY_BHV,
         COPY_ERROR
     } mode;
     
@@ -1122,12 +1148,15 @@ MEDIT(copy)
         mode = COPY_DESC;
     else if (arg1.strPrefix("param"))
         mode = COPY_PARAM;
+    else if (arg1.strPrefix("behaviors"))
+        mode = COPY_BHV;
     else 
         mode = COPY_ERROR;
             
     if (mode == COPY_ERROR || !arg2.isNumber()) {
         ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy race, hit, damage and other parameters from <vnum> mob index.\r\n"
+                    "  copy behav <vnum> -- copy behaviors and props.\r\n"
                     "  copy desc <vnum>  -- copy name, description, short and long description from <vnum> mob index.\r\n" );
         return false;
     }
@@ -1147,6 +1176,10 @@ MEDIT(copy)
     case COPY_DESC:
         copyDescriptions( original );
         report = "descriptions";
+        break;
+    case COPY_BHV:
+        copyBehaviors(original);
+        report = "behaviors";
         break;
     default:
         return false;

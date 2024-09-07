@@ -32,8 +32,6 @@
 #include "update_areas.h"
 #include "websocketrpc.h"
 
-
-
 #include "redit.h"
 #include "eeedit.h"
 #include "olc.h"
@@ -279,7 +277,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
               pRoom->heal_rate, pRoom->mana_rate);
     
     if (!pRoom->properties.empty( )) {
-        ptc(ch, "Properties: {D(property){x\n\r");
+        ptc(ch, "Properties: {D(oldprop){x\n\r");
         for (Properties::const_iterator p = pRoom->properties.begin( ); p != pRoom->properties.end( ); p++)
             ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
     }
@@ -367,18 +365,20 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
         try {
             std::basic_ostringstream<char> ostr;
             pRoom->behavior->save( ostr );
-            ptc(ch, "Behavior:\r\n{W%s{x\r\n", ostr.str( ).c_str( ));
+            ptc(ch, "Legacy behavior: {D(oldbehavior{x)\r\n{W%s{x\r\n", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
-            ptc(ch, "Behavior is BUGGY.\r\n");
+            ptc(ch, "Legacy behavior is BUGGY.\r\n");
         }
     }
+
+    show_behaviors(ch, pRoom->behaviors, pRoom->props);
 
     /* FIXME: instance or prototype triggers? */
     feniaTriggers->showTriggers(ch, pRoom->room ? pRoom->room->getWrapper() : 0, "room");
 }
 
-REDIT(behavior, "поведение", "редактирование поведения (behavior)")
+REDIT(oldbehavior, "старповедение", "редактирование поведения (behavior)")
 {
     RoomIndexData *pRoom;
     EDIT_ROOM(ch, pRoom);
@@ -397,8 +397,8 @@ REDIT(behavior, "поведение", "редактирование поведе
         return true;
     }
 
-    stc("Syntax:  behavior       - line edit\n\r", ch);
-    stc("Syntax:  behavior clear\n\r", ch);
+    stc("Syntax:  oldbehavior       - line edit\n\r", ch);
+    stc("Syntax:  oldbehavior clear\n\r", ch);
     return false;
 }
 
@@ -420,6 +420,22 @@ REDIT(fenia, "феня", "редактирование триггеров")
 
     feniaTriggers->openEditor(ch, room, argument);
     return false;
+}
+
+REDIT(behaviors, "поведение", "редактирование поведений")
+{
+    RoomIndexData *pRoom;
+    EDIT_ROOM(ch, pRoom);
+
+    return editBehaviors(pRoom->behaviors, pRoom->props);
+}
+
+REDIT(props, "свойства", "редактирование свойств поведения")
+{
+    RoomIndexData *pRoom;
+    EDIT_ROOM(ch, pRoom);
+
+    return editProps(pRoom->behaviors, pRoom->props, argument);
 }
 
 void OLCStateRoom::delete_exit(RoomIndexData *pRoom, int door)
@@ -1043,7 +1059,7 @@ REDIT(mana, "мана", "установить скорость восстано�
     return false;
 }
 
-REDIT(property, "свойства", "редактор свойств комнаты")
+REDIT(oldproperty, "старсвойства", "редактор свойств комнаты")
 {
     RoomIndexData *pRoom;
 

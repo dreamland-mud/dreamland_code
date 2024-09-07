@@ -26,13 +26,15 @@
 #include <affect.h>
 #include "liquid.h"
 #include "desire.h"
+#include "behavior.h"
+#include "wrapperbase.h"
 
 #include "comm.h"
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
-
-
+#include "json_utils.h"
+#include "websocketrpc.h"
 
 #include "olc.h"
 #include "loadsave.h"
@@ -457,3 +459,43 @@ DLString show_enum_array_web(const EnumerationArray &array)
 
     return values.join(",");
 }
+
+// Display all assigned behaviors, their properties and active behavior triggers.
+void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json::Value &props)
+{
+    ptc(ch, "\r\n{cПоведение{x:            ");
+    for (int &bhvIndex: behaviors.toArray()) {
+		Behavior *bhv = behaviorManager->find(bhvIndex);
+        ptc(ch, "{C%s{x ", web_cmd(ch, "bedit $1", bhv->getName()).c_str());
+    }
+    ptc(ch, " {D(behaviors){x\n\r");
+
+    ptc(ch,     "{cТригеры поведения{x:    ");
+    for (int &bhvIndex: behaviors.toArray()) {
+		Behavior *bhv = behaviorManager->find(bhvIndex);
+		WrapperBase *bhvWrapper = bhv->getWrapper();
+        if (!bhvWrapper)
+            continue;
+
+        StringSet activeTriggers, miscMethods;    
+        bhvWrapper->collectTriggers(activeTriggers, miscMethods);
+
+        for (auto &trig: activeTriggers)
+            ptc(ch, "{C%s{w.{C%s{x ", bhv->getName().c_str(), trig.c_str());
+    }
+    ptc(ch, "\r\n");
+
+    ptc(ch,     "{cСвойства поведения{x:  {D(prop){x  \r\n");
+    for(auto p = props.begin(); p != props.end(); p++) {
+        const DLString &bhvName = p.key().asString();
+        const Json::Value &bhvProps = *p;
+
+        for (auto bp = bhvProps.begin(); bp != bhvProps.end(); bp++) {
+            ptc(ch, "       prop %s %s %s\r\n", 
+                bhvName.c_str(), 
+                bp.key().asString().c_str(),
+                JsonUtils::asString(*bp).c_str());
+        }
+    }
+}
+

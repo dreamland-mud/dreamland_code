@@ -19,6 +19,7 @@
 #include "merc.h"
 #include "profiler.h"
 #include "behavior.h"
+#include "json_utils.h"
 
 #include "structwrappers.h"
 #include "areaindexwrapper.h"
@@ -1038,4 +1039,10 @@ NMI_INVOKE(RoomWrapper, hasBehavior, "(bhvName): true если среди пов
         throw IllegalArgumentException();
 
     return Register(target->pIndexData->behaviors.isSet(bhv->getIndex()));
+}
+
+NMI_GET(RoomWrapper, props, "Map (структура) из свойств поведения, ключ - имя поведения") 
+{
+    checkTarget();
+    return JsonUtils::toRegister(target->pIndexData->props);
 }

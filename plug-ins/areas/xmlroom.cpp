@@ -9,6 +9,7 @@
 #include "clanreference.h"
 #include "wearlocation.h"
 #include "behavior.h"
+#include "json_utils.h"
 #include "merc.h"
 
 #include "def.h"
@@ -196,6 +197,8 @@ XMLRoom::init(RoomIndexData *room)
 
     for (Properties::const_iterator p = room->properties.begin( ); p != room->properties.end( ); p++)
         properties.insert( *p );
+
+    JsonUtils::copy(props, room->props);
 }
 
 RoomIndexData *
@@ -288,6 +291,8 @@ XMLRoom::compat(int vnum)
 
     for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
         room->properties.insert( *p );
+    
+    JsonUtils::copy(room->props, props);
     
     return room;
 }

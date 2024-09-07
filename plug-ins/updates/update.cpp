@@ -512,6 +512,10 @@ void diving_update( )
     for (auto &r: roomInstances) {
         try {
             FENIA_VOID_CALL(r, "DiveUpdate", "");
+
+            if (behavior_trigger(r, "Spec", "R", r))
+                continue;
+
             rafprog_spec(r);
             FENIA_VOID_CALL(r, "Spec", "");
         } catch (const VictimDeathException &ex) {

@@ -220,6 +220,54 @@ mob_index_data::mob_index_data( )
                        clan(clan_none)
 
 {
+    next = NULL;
+    vnum = 0;
+    group = 0;
+    count = 0;
+    killed = 0;
+    player_name = str_dup("no name");
+    short_descr = str_dup("(no short description)");
+    long_descr = str_dup("(no long description)\n\r");
+    description = str_empty;
+    act = ACT_IS_NPC;
+    affected_by = 0;
+    detection = 0;
+    alignment = 0;
+    level = 0;
+    hitroll = 0;
+    hit[DICE_NUMBER] = 0;
+    hit[DICE_TYPE] = 0;
+    hit[DICE_BONUS] = 0;
+    mana[DICE_NUMBER] = 0;
+    mana[DICE_TYPE] = 0;
+    mana[DICE_BONUS] = 0;
+    damage[DICE_NUMBER] = 0;
+    damage[DICE_TYPE] = 0;
+    damage[DICE_BONUS] = 0;
+    ac[AC_PIERCE] = 0;
+    ac[AC_BASH] = 0;
+    ac[AC_SLASH] = 0;
+    ac[AC_EXOTIC] = 0;
+    dam_type = 0;
+    off_flags = 0;
+    imm_flags = 0;
+    res_flags = 0;
+    vuln_flags = 0;
+    start_pos = POS_STANDING;
+    default_pos = POS_STANDING;
+    sex = 0;
+    race = str_dup("human");
+    wealth = 0;
+    form = 0;
+    parts = 0;
+    size = SIZE_MEDIUM;
+    material = str_dup("none");
+    area = NULL;
+}
+
+mob_index_data::~mob_index_data()
+{
+    
 }
 
 int mob_index_data::getSize() const

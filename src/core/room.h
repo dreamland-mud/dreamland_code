@@ -5,12 +5,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 
-#include <list>
-#include <map>
-#include <stdarg.h>
-
-#include <stdarg.h>
-
+#include "jsoncpp/json/value.h"
 #include "xmlmap.h"
 #include "xmlboolean.h"
 #include "globalbitvector.h"
@@ -65,6 +60,7 @@ typedef vector<reset_data *> ResetList;
 
 struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     RoomIndexData();
+    virtual ~RoomIndexData();
 
     Room * create(); // Implemented in loadsave plugin.
 
@@ -85,6 +81,7 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     Properties properties;
     ::Pointer<XMLDocument> behavior;
     GlobalBitvector behaviors;
+    Json::Value props;
 
     Scripting::Register init;
 

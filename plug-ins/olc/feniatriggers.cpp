@@ -636,7 +636,7 @@ vector<DLString> FeniaTriggerLoader::createBehaviorParams(PCharacter *ch, Defaul
 {    
     std::vector<DLString> parms;
     const DLString indexType = "behavior";
-    DLString methodName = bhv->target + ":" + trigName;
+    DLString methodName = bhv->target.name() + ":" + trigName;
 
     // Create codesource body with example code.
     DLString tmpl;

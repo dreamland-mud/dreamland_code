@@ -6,29 +6,25 @@
 #include "feniamanager.h"
 #include "reglist.h"
 #include "object.h"
-#include "character.h"
+#include "npcharacter.h"
 #include "room.h"
 
-bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...) 
+
+static bool behavior_trigger(GlobalBitvector &behaviors, const DLString &trigType, const char *fmt, va_list ap)
 {
     bool rc = false;
 
-	if (obj->pIndexData->behaviors.empty())
+	if (behaviors.empty())
 		return rc;
 
 	try {
 		RegisterList trigArgs;
 
 		// Collect all arguments
-		{
-			va_list ap;    
-			va_start(ap, fmt);
-			WrapperBase::triggerArgs(trigArgs, fmt, ap);
-			va_end(ap);
-		}
+		WrapperBase::triggerArgs(trigArgs, fmt, ap);
 
 		// Execute onXXX, postXXX triggers fro all behaviors associated with this item.
-		for (int &bhvIndex: obj->pIndexData->behaviors.toArray()) {
+		for (int &bhvIndex: behaviors.toArray()) {
 			Behavior *bhv = behaviorManager->find(bhvIndex);
 			WrapperBase *bhvWrapper = bhv->getWrapper();
 			
@@ -47,3 +43,32 @@ bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ..
 }
 
 	
+bool behavior_trigger(Room *room, const DLString &trigType, const char *fmt, ...) 
+{
+	va_list ap;    
+	va_start(ap, fmt);
+	bool rc = behavior_trigger(room->pIndexData->behaviors, trigType, fmt, ap);
+	va_end(ap);
+	return rc;
+}
+
+bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, ...) 
+{
+	if (!ch->is_npc())
+		return false;
+
+	va_list ap;    
+	va_start(ap, fmt);
+	bool rc = behavior_trigger(ch->getNPC()->pIndexData->behaviors, trigType, fmt, ap);
+	va_end(ap);
+	return rc;
+}
+
+bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...) 
+{
+	va_list ap;    
+	va_start(ap, fmt);
+	bool rc = behavior_trigger(obj->pIndexData->behaviors, trigType, fmt, ap);
+	va_end(ap);
+	return rc;
+}

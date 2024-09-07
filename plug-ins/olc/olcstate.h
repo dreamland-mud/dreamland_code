@@ -131,6 +131,8 @@ protected:
     bool editor(const char *argument, RussianString &original, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, XMLStringList &values, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, XMLJsonValue &value, editor_flags flags = ED_NO_FLAG);
+    bool editBehaviors(GlobalBitvector &behaviors, Json::Value &props);
+    bool editProps(GlobalBitvector &behaviors, Json::Value &props, const DLString &arguments);
     
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;
