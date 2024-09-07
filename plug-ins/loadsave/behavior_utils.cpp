@@ -33,7 +33,7 @@ bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ..
 			WrapperBase *bhvWrapper = bhv->getWrapper();
 			
 			// TODO: handle multiple onUse and Behavior::cmd.
-			if (fenia_trigger(trigType, trigArgs, bhvWrapper, 0))
+			if (bhvWrapper && fenia_trigger(trigType, trigArgs, bhvWrapper, 0))
 				rc = true;
 		}
 

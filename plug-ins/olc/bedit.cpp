@@ -6,6 +6,7 @@
 #include "olc.h"
 #include "feniatriggers.h"
 #include "pcharacter.h"
+#include "room.h"
 #include "defaultbehavior.h"
 #include "websocketrpc.h"
 #include "arg_utils.h"
@@ -95,7 +96,7 @@ void OLCStateBehavior::show( PCharacter *ch )
 
     feniaTriggers->showTriggers(ch, bhv->getWrapper(), "behavior", bhv->target.name());    
 
-    ptc(ch, "\r\nКоманды: {y{hccommands{x, {y{hcshow{x, {y{hcdone{x\r\n");
+    ptc(ch, "\r\nКоманды: {y{hccommands{x, {y{hcshow{x, {y{hclist{x, {y{hcdone{x\r\n");
 }
 
 
@@ -129,6 +130,63 @@ BEDIT(subcommands, "подкоманды", "установить подкома�
     bhv->cmd = args.stripWhiteSpace();
     ptc(ch, "Подкоманды установлены в %s\r\n", bhv->cmd.c_str());
     // TODO: command name lookup and validation
+    return true;
+}
+
+// Return a map from behavior name to the list of obj/mob/room vnums that use it.
+static map<DLString, set<int> > behavior_usage()
+{
+    map<DLString, set<int> > usage;
+
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (auto *pObj = obj_index_hash[i]; pObj; pObj = pObj->next)
+            for (auto b: pObj->behaviors.toArray())
+                usage[behaviorManager->find(b)->getName()].insert(pObj->vnum);
+
+    for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (auto *pMob = mob_index_hash[i]; pMob; pMob = pMob->next)
+            for (auto b: pMob->behaviors.toArray())
+                usage[behaviorManager->find(b)->getName()].insert(pMob->vnum);
+
+    for (auto r: roomIndexMap)
+        for (auto b: r.second->behaviors.toArray())
+            usage[behaviorManager->find(b)->getName()].insert(r.first);
+
+    return usage;
+}
+
+
+BEDIT(list, "список", "показать все сущности с этим поведением")
+{
+    ostringstream buf;
+    DefaultBehavior *bhv = getOriginal();
+    auto usage = behavior_usage();
+    auto myVnums = usage[bhv->getName()];
+    auto target = bhv->target.getValue();
+    DLString cmd = (target == INDEX_MOB ? "medit" : (target == INDEX_ROOM ? "redit" : "oedit"));
+    DLString lineFormat = "[" + web_cmd(ch, cmd + " $1", "%6d") + "] %-18.18N1   ";
+    int lineCount = 0;
+
+    for (auto vnum: myVnums) {
+        DLString name = (target == INDEX_MOB ? get_mob_index(vnum)->short_descr 
+            : (target == INDEX_ROOM ? get_room_index(vnum)->name 
+                : get_obj_index(vnum)->short_descr));
+
+        buf << fmt(0, lineFormat.c_str(), vnum, name.c_str());
+
+        if (++lineCount % 2 == 0)
+            buf << endl;
+    }
+
+    buf << endl;
+
+    ptc(ch, "Это поведение присвоено: \r\n");
+
+    if (lineCount == 0)
+        ptc(ch, "   (пока ничему)\r\n");
+    else 
+        ch->send_to(buf);
+
     return true;
 }
 
@@ -193,11 +251,13 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
     }
 
     if (arg_is_list(cmd)) {
+        auto usage = behavior_usage();
+
         ch->send_to(
-            fmt(0, "{C%-15s %-17s %-4s{x\r\n", "Название", "", "Цель"));
+            fmt(0, "{C%-15s %-20s %4s %5s{x\r\n", "Название", "", "Тип", "Всего"));
 
         const DLString lineFormat = 
-            "{W" + web_cmd(ch, "bedit $1", "%-15s") + "{w %-17s %-4s{x\r\n";
+            "{W" + web_cmd(ch, "bedit $1", "%-15s") + "{w %-20.20s %4s %5d{x\r\n";
 
         for (int r = 0; r < behaviorManager->size(); r++) {
             DefaultBehavior *bhv = dynamic_cast<DefaultBehavior *>(behaviorManager->find(r));
@@ -207,7 +267,8 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
             ch->send_to(fmt(0, lineFormat.c_str(),
                     bhv->getName().c_str(),
                     bhv->getRussianName().ruscase('1').c_str(),
-                    bhv->target.name().c_str()));
+                    bhv->target.name().c_str(),
+                    usage[bhv->getName()].size()));
         }
 
         return;
