@@ -48,9 +48,6 @@ public:
             static Scripting::IdRef onId( "on" id ); \
             rc = base->stringCall( onId, fmt ); \
             \
-            static Scripting::IdRef postId( "post" id ); \
-            base->postpone( postId, fmt ); \
-            \
             if (!rc.empty()) return rc; \
         }
 

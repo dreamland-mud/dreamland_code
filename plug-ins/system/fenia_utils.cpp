@@ -61,9 +61,9 @@ bool gprog(const DLString &trigName, const char *fmt, ...)
 
 /** 
  * Call a trigger with given name and args on an instance (mob, item, room) or its prototype (mob index data etc). 
- * Return 'true' if one of the triggers also returns true.
+ * Return 'true' if one of the triggers also returns true. Invokation result is saved in 'rc' register.
  */
-bool fenia_trigger(const DLString &trigName, const Scripting::RegisterList &args, WrapperBase *instance, WrapperBase *proto)
+bool fenia_trigger(Register &rc, const DLString &trigName, const Scripting::RegisterList &args, WrapperBase *instance, WrapperBase *proto)
 {
     // From "Death" trigger name form "onDeath" and "postDeath" names.
     Scripting::IdRef onTrigName("on" + trigName);
@@ -89,13 +89,17 @@ bool fenia_trigger(const DLString &trigName, const Scripting::RegisterList &args
 
     // Execute onXXX trigger on the instance and return if it returns true.
     if (instance->triggerFunction(onTrigName, onProg)) {
-        if (onProg.toFunction()->invoke(Register(instance->getSelf()), trigArgs).toBoolean())
+        rc = onProg.toFunction()->invoke(Register(instance->getSelf()), trigArgs);    
+
+        if (rc.type != Register::NONE && rc.type != Register::STRING && rc.toBoolean())
             return true;
     } 
 
     // Execute onXXX trigger on index data and return if it returns true.
     if (proto && proto->triggerFunction(onTrigName, onProg)) {
-        if (onProg.toFunction()->invoke(Register(proto->getSelf()), protoTrigArgs).toBoolean())
+        rc = onProg.toFunction()->invoke(Register(proto->getSelf()), protoTrigArgs);    
+
+        if (rc.type != Register::NONE && rc.type != Register::STRING && rc.toBoolean())
             return true;
     }
 

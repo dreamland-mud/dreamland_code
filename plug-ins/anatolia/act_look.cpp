@@ -56,6 +56,7 @@
 #include "move_utils.h"
 #include "act_lock.h"
 #include "../anatolia/handler.h"
+#include "../loadsave/behavior_utils.h"
 #include "act.h"
 #include "merc.h"
 
@@ -572,6 +573,10 @@ static DLString oprog_show_end( Object *furniture, Character *ch, Character *loo
 
 static DLString rprog_show_end( Room *room, Character *ch, Character *looker )
 {
+    DLString rc = behavior_trigger_str(room, "ShowEnd", "RCC", room, ch, looker);
+    if (!rc.empty())
+        return rc;
+        
     FENIA_STR_CALL( room, "ShowEnd", "CC", ch, looker ) 
     return DLString::emptyString;
 }

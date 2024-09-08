@@ -871,8 +871,11 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
 
     // Get obj index data wrapper.
     WrapperBase *proto = get_wrapper(target->pIndexData->wrapper);
+
     // Helper function will invoke onDeath, postDeath triggers on item and proto.
-    return fenia_trigger(trigName, trigArgs, this, proto);
+    Register result;
+    fenia_trigger(result, trigName, trigArgs, this, proto);
+    return result;
 }
 
 NMI_INVOKE(ObjectWrapper, clone, "(): создать полную копию этого объекта")

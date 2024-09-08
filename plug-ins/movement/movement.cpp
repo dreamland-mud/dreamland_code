@@ -22,6 +22,7 @@
 #include "core/object.h"
 #include "affect.h"
 
+#include "../loadsave/behavior_utils.h"
 #include "interp.h"
 #include "fight_position.h"
 #include "fight_exception.h"
@@ -224,9 +225,14 @@ static void afprog_entry( Character *ch )
             paf->type->getAffect( )->onEntry(SpellTarget::Pointer(NEW, ch), paf);
 }
 
-static bool rprog_dive( Character *wch, int danger )
+bool rprog_dive(Character *wch, int danger)
 {
-    FENIA_CALL( wch->in_room, "Dive", "Ci", wch, danger );
+    Room *room = wch->in_room;
+
+    if (behavior_trigger(room, "Dive", "RCi", room, wch, danger))
+        return true;
+
+    FENIA_CALL( room, "Dive", "Ci", wch, danger );
     return false;
 }
 

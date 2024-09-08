@@ -513,11 +513,15 @@ void diving_update( )
         try {
             FENIA_VOID_CALL(r, "DiveUpdate", "");
 
+            behavior_trigger(r, "DiveUpdate", "R", r);
+
             if (behavior_trigger(r, "Spec", "R", r))
                 continue;
 
             rafprog_spec(r);
+            
             FENIA_VOID_CALL(r, "Spec", "");
+
         } catch (const VictimDeathException &ex) {
             // DO NOTHING
         }

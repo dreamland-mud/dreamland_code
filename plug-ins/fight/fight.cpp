@@ -117,6 +117,8 @@ PROF(ninja);
 PROF(ranger);
 PROF(samurai);
 
+bool rprog_dive(Character *wch, int danger);
+
 static void afprog_fight(Character *ch, Character *victim)
 {
     SpellTarget::Pointer target(NEW, ch);
@@ -156,7 +158,6 @@ static void wlprog_fight( Object *obj, Character *ch)
     obj->wear_loc->onFight(ch, obj);
 }
 
-
 /*
  * Control the fights going on.
  * Called periodically by update_handler.
@@ -189,7 +190,7 @@ void violence_update()
 
             if (IS_AWAKE(ch) && ch->in_room == victim->in_room)
             {
-                FENIA_VOID_CALL(ch->in_room, "Dive", "Ci", ch, MOVETYPE_DANGEROUS);
+                rprog_dive(ch, MOVETYPE_DANGEROUS);
 
                 if (ch->fighting != 0)
                     multi_hit_nocatch(ch, victim);

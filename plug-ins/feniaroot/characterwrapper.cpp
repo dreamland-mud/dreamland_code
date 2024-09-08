@@ -2741,8 +2741,11 @@ NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать �
 
     // If it's a mob, access its mob index data wrapper.
     WrapperBase *proto = target->is_npc() ? get_wrapper(target->getNPC()->pIndexData->wrapper) : 0;
+
     // Helper function will invoke onDeath, postDeath triggers on character and proto.
-    return fenia_trigger(trigName, trigArgs, this, proto);
+    Register result;
+    fenia_trigger(result, trigName, trigArgs, this, proto);
+    return result;
 }
 
 NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить меню или установить пункт number с действием action")

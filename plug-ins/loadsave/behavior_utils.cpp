@@ -9,13 +9,18 @@
 #include "npcharacter.h"
 #include "room.h"
 
-
-static bool behavior_trigger(GlobalBitvector &behaviors, const DLString &trigType, const char *fmt, va_list ap)
+// Invoke 'trigType' trigger on all elements of 'behaviors' array, with args passed in the 'ap' var args.
+// Returns a list of all non-null result registers.
+static list<Register> behavior_trigger_with_result(
+	GlobalBitvector &behaviors, 
+	const DLString &trigType, 
+	const char *fmt, 
+	va_list ap)
 {
-    bool rc = false;
+	list<Scripting::Register> regList;
 
 	if (behaviors.empty())
-		return rc;
+		return regList;
 
 	try {
 		RegisterList trigArgs;
@@ -27,29 +32,69 @@ static bool behavior_trigger(GlobalBitvector &behaviors, const DLString &trigTyp
 		for (int &bhvIndex: behaviors.toArray()) {
 			Behavior *bhv = behaviorManager->find(bhvIndex);
 			WrapperBase *bhvWrapper = bhv->getWrapper();
-			
+
 			// TODO: handle multiple onUse and Behavior::cmd.
-			if (bhvWrapper && fenia_trigger(trigType, trigArgs, bhvWrapper, 0))
-				rc = true;
+			if (bhvWrapper) {
+				Scripting::Register result;
+
+				fenia_trigger(result, trigType, trigArgs, bhvWrapper, 0);
+
+				if (result.type != Register::NONE)
+					regList.push_back(result);
+			}
 		}
 
 	} catch (const Scripting::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
 		DLString methodId = "behavior on" + trigType;
         FeniaManager::getThis()->croak(0, Scripting::Register(methodId), e);
-        return false;
     }
-    return rc;
+
+	return regList;
 }
 
+static bool reglist_to_bool(list<Register> &regList)
+{
+	for (auto &reg: regList)
+		if (reg.toBoolean())
+			return true;
+
+	return false;
+}
+
+static DLString reglist_to_str(list<Register> &regList)
+{
+	ostringstream buf;
+
+	for (auto &reg: regList)
+		if (reg.type == Register::STRING)
+			buf << reg.toString();
+
+	return buf.str();
+}
+
+DLString behavior_trigger_str(Room *room, const DLString &trigType, const char *fmt, ...) 
+{
+	va_list ap;    
+	va_start(ap, fmt);
+
+	auto regList = behavior_trigger_with_result(room->pIndexData->behaviors, trigType, fmt, ap);
 	
+	va_end(ap);
+	
+	return reglist_to_str(regList);
+}
+
 bool behavior_trigger(Room *room, const DLString &trigType, const char *fmt, ...) 
 {
 	va_list ap;    
 	va_start(ap, fmt);
-	bool rc = behavior_trigger(room->pIndexData->behaviors, trigType, fmt, ap);
+
+	auto regList = behavior_trigger_with_result(room->pIndexData->behaviors, trigType, fmt, ap);
+	
 	va_end(ap);
-	return rc;
+	
+	return reglist_to_bool(regList);
 }
 
 bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, ...) 
@@ -59,16 +104,20 @@ bool behavior_trigger(Character *ch, const DLString &trigType, const char *fmt, 
 
 	va_list ap;    
 	va_start(ap, fmt);
-	bool rc = behavior_trigger(ch->getNPC()->pIndexData->behaviors, trigType, fmt, ap);
+
+	auto regList = behavior_trigger_with_result(ch->getNPC()->pIndexData->behaviors, trigType, fmt, ap);
+
 	va_end(ap);
-	return rc;
+	return reglist_to_bool(regList);
 }
 
 bool behavior_trigger(Object *obj, const DLString &trigType, const char *fmt, ...) 
 {
 	va_list ap;    
 	va_start(ap, fmt);
-	bool rc = behavior_trigger(obj->pIndexData->behaviors, trigType, fmt, ap);
+
+	auto regList = behavior_trigger_with_result(obj->pIndexData->behaviors, trigType, fmt, ap);
+
 	va_end(ap);
-	return rc;
+	return reglist_to_bool(regList);
 }
