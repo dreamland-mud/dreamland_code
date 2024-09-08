@@ -491,10 +491,13 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
         const Json::Value &bhvProps = *p;
 
         for (auto bp = bhvProps.begin(); bp != bhvProps.end(); bp++) {
-            ptc(ch, "       prop %s %s %s\r\n", 
+            DLString editCmd = "prop " + bhvName + " " + bp.key().asString();
+
+            ptc(ch, "       prop %s %s %s  %s\r\n", 
                 bhvName.c_str(), 
                 bp.key().asString().c_str(),
-                JsonUtils::asString(*bp).c_str());
+                JsonUtils::asString(*bp).c_str(),
+                web_edit_button(ch, editCmd, "web").c_str());
         }
     }
 }

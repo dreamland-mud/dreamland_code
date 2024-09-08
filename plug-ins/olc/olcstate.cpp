@@ -1107,7 +1107,7 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     Character *ch = owner->character;
 
     if (bhvName.empty() || propName.empty() || propValue.empty()) {
-        ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>\r\n");
+        ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>|web\r\n");
         return false;
     }
 
@@ -1129,20 +1129,36 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
 
     Json::Value &target = props[bhvName][propName];
 
-    if (target.isNull())
-        target = propValue;
-    else if (target.isNumeric() || target.isBool()) {
-        if (!propValue.isNumber()) {
+    if (arg_is_web(propValue)) {
+        return editorWeb(JsonUtils::asString(target), lastCmd + " " + bhvName + " " + propName + " paste", ED_NO_NEWLINE);
+    }
+
+    DLString newValue;
+
+    if (arg_is_paste(propValue)) {
+        // Grab value from the editor buffer.
+        editorPaste(newValue, ED_NO_NEWLINE);
+    } else {
+        // Grab value from command argument.
+        newValue = propValue;
+    }
+
+    if (target.isNull()) {
+        target = newValue;
+
+    } else if (target.isNumeric() || target.isBool()) {
+        if (!newValue.isNumber()) {
             ptc(ch, "Свойство '%s' должно быть числом, а не строкой.\r\n", propName.c_str());
             return false;
         }
 
-        target = propValue.toInt();
+        target = newValue.toInt();
+
     } else {
-        target = propValue;
+        target = newValue;
     }
 
-    ptc(ch, "Свойству %s.%s установлено значение %s.\r\n", bhvName.c_str(), propName.c_str(), propValue.c_str());
+    ptc(ch, "Свойству %s.%s установлено значение %s\r\n", bhvName.c_str(), propName.c_str(), newValue.c_str());
     return true;
 }
 
