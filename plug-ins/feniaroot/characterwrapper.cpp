@@ -1108,7 +1108,7 @@ NMI_GET( CharacterWrapper, vampire, "true если персонаж в форм�
         return IS_MOB_VAMPIRE(target);
 }
 
-NMI_GET(CharacterWrapper, followers, "список существ, у которых персонаж master" )
+NMI_GET(CharacterWrapper, followers, "список существ под очарованием, у которых персонаж master" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
@@ -1203,10 +1203,13 @@ NMI_INVOKE( CharacterWrapper, interpret_cmd, "(cmd, args): выполняет к
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, get_char_world, "(name): видимый для нас чар с именем name в мире" )
+NMI_INVOKE( CharacterWrapper, get_char_world, "(name[,flags]): найти персонажа в мире по имени name, с флагоми поиска (таблица .tables.find_flags)" )
 {
     checkTarget( );
-    return wrap( ::get_char_world( target, args2string( args ) ) );
+    DLString name = argnum2string(args, 1);
+    bitstring_t flags = args.size() > 1 ? argnum2flag(args, 2, find_flags) : 0;
+
+    return wrap(::get_char_world(target, name, flags));
 }
 
 NMI_INVOKE( CharacterWrapper, get_obj_here, "(name): видимый нам объект в комнате, инвентаре или equipment" )
