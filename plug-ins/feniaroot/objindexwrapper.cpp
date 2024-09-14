@@ -9,6 +9,7 @@
 #include "merc.h"
 #include "json_utils.h"
 #include "loadsave.h"
+#include "behavior.h"
 
 #include "objindexwrapper.h"
 #include "affectwrapper.h"
@@ -251,6 +252,47 @@ NMI_GET(ObjIndexWrapper, props, "Map (структура) из свойств п
     checkTarget();
     return JsonUtils::toRegister(target->props);
 }
+
+NMI_GET(ObjIndexWrapper, behaviors, "список (.List) имен всех поведений")
+{
+    checkTarget();
+
+    RegList::Pointer rc(NEW);
+
+    for (auto &b: target->behaviors.toSet()) 
+        rc->push_back(
+            Register(
+                behaviorManager->find(b)->getName()));
+
+    return ::wrap(rc);
+}
+
+NMI_GET(ObjIndexWrapper, triggers, "список (.List) названий всех тригеров")
+{
+    checkTarget();
+
+    StringSet triggers, misc;
+
+    // Collect all onXXX, postXXX triggers defined on index data.
+    WrapperBase *ndxWrapper = get_wrapper(target->wrapper);
+    if (ndxWrapper)
+        ndxWrapper->collectTriggers(triggers, misc);
+
+    // Collect all triggers defined on each of the behaviors.
+    for (auto &b: target->behaviors.toSet()) {
+        WrapperBase *bhvWrapper = behaviorManager->find(b)->getWrapper();
+        if (bhvWrapper)
+            bhvWrapper->collectTriggers(triggers, misc);
+    }
+
+    // Transform triggers set into a Fenia list.
+    RegList::Pointer rc(NEW);
+    for (auto &trig: triggers)
+        rc->push_back(Register(trig));
+    return ::wrap(rc);
+}
+
+
 
 NMI_INVOKE( ObjIndexWrapper, api, "(): печатает этот API" )
 {
