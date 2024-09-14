@@ -7,6 +7,8 @@
 #include "xmlflags.h"
 #include "xmlstringlist.h"
 #include "helpmanager.h"
+#include "markuphelparticle.h"
+#include "olc.h"
 
 class OLCStateHelp : public OLCStateTemplate<OLCStateHelp>,
                      public virtual OLCState
@@ -38,5 +40,48 @@ private:
 };
 
 #define HEDIT(C, rname, help) OLC_CMD(OLCStateHelp, C, rname, help)
+
+
+template <typename Func, typename HelpPointer>
+bool help_subcommand(PCharacter *ch, const DLString &argument, HelpPointer &help, Func &postCreateAction)
+{
+    DLString arg = argument;
+
+    if (arg.empty()) {
+        if (!help || help->getID() < 1) {
+            ptc(ch, "Справка не задана, используй {y{hchelp create{x для создания новой.");
+            return false;
+        }
+
+        OLCStateHelp::Pointer hedit(NEW, help.getPointer());
+        hedit->attach(ch);
+        hedit->show(ch);
+        return true;
+    }
+
+    if (arg_oneof(arg, "create", "создать")) {
+        if (help && help->getID() > 0) {
+            ptc(ch, "Справка уже существует, используй команду {y{hchelp{x для редактирования.");
+            return false;
+        }
+
+        if (!help)
+            help.construct();
+
+        help->setID(
+            help_next_free_id()
+        );
+
+        postCreateAction(help);
+
+        OLCStateHelp::Pointer hedit(NEW, help.getPointer());
+        hedit->attach(ch);
+        hedit->show(ch);
+        return true;
+    }   
+
+    ptc(ch, "Использование: {y{hchelp{x, {y{hchelp create{x\r\n");
+    return false;
+}
 
 #endif

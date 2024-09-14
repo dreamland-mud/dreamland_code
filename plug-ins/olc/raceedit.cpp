@@ -185,42 +185,13 @@ RACEEDIT(show, "показать", "показать все поля")
 
 RACEEDIT(help, "справка", "создать или посмотреть справку")
 {
-    DLString arg = argument;
-    DefaultRace *r = getOriginal();
+    DefaultRace *race = getOriginal();
 
-    if (arg.empty()) {
-        if (!r->help || r->help->getID() < 1) {
-            ptc(ch, "Справка не задана, используй help create для создания новой.");
-            return false;
-        }
+    auto postCreateAction = [race](XMLPointerNoEmpty<RaceHelp> &help) {
+        help->setRace(race);
+    };
 
-        OLCStateHelp::Pointer hedit(NEW, r->help.getPointer());
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }
-
-    if (arg_oneof(arg, "create", "создать")) {
-        if (r->help && r->help->getID() > 0) {
-            ptc(ch, "Справка уже существует, используй команду help для редактирования.");
-            return false;
-        }
-
-        if (!r->help)
-            r->help.construct();
-        r->help->setID(
-            help_next_free_id()
-        );
-        r->help->setRace(r);
-
-        OLCStateHelp::Pointer hedit(NEW, r->help.getPointer());
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }   
-
-    ptc(ch, "Использование: help, help create\r\n");
-    return false;
+    return help_subcommand(ch, argument, race->help, postCreateAction);
 }
 
 

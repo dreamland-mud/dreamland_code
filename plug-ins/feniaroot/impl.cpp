@@ -7,8 +7,10 @@
 #include "wrappersplugin.h"
 #include "feniacroaker.h"
 #include "xmlattributecodesource.h"
+#include "xmlvariableregistrator.h"
 #include "commandtableloader.h"
 #include "behaviorloader.h"
+#include "mocregistrator.h"
 #include "so.h"
 
 extern "C"
@@ -22,6 +24,8 @@ extern "C"
         Plugin::registerPlugin<FeniaCroaker>(ppl);
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCodeSource> >( ppl );
         Plugin::registerPlugin<CommandTableLoader>(ppl);
+        Plugin::registerPlugin<XMLVariableRegistrator<BehaviorHelp> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<DefaultBehavior> >(ppl);
         Plugin::registerPlugin<BehaviorLoader>(ppl);
         
         return ppl;

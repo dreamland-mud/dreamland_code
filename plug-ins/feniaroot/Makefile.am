@@ -60,7 +60,8 @@ affecthandlerwrapper.h \
 skillcommandwrapper.h \
 areaquestwrapper.h \
 characterwrapper.h \
-behaviorwrapper.h
+behaviorwrapper.h \
+behaviorloader.h
 
 plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/ed \

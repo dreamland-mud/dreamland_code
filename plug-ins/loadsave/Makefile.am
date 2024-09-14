@@ -42,13 +42,11 @@ charutils.cpp \
 religionutils.cpp \
 areaquestutils.cpp \
 xmlattributeareaquest.cpp \
-defaultbehavior.cpp \
 behavior_utils.cpp
 
 libloadsave_la_MOC = \
 objectbehaviormanager.h \
-xmlattributeareaquest.h \
-defaultbehavior.h
+xmlattributeareaquest.h
 
 libloadsave_la_LIBADD = \
 ../descriptor/libdescriptor.la \

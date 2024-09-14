@@ -12,7 +12,6 @@
 #include "objectbehaviormanager.h"
 #include "xmlattributeareaquest.h"
 #include "xmlattributeplugin.h"
-#include "defaultbehavior.h"
 
 #include "save.h"
 #include "merc.h"
@@ -85,7 +84,6 @@ extern "C" {
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<BasicObjectBehavior> >(ppl);
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeAreaQuest> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<DefaultBehavior> >(ppl);
 
         return ppl;
     }

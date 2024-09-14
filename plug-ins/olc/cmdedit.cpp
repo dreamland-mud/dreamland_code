@@ -184,42 +184,13 @@ CMDEDIT(fenia, "феня", "редактировать тригера")
 
 CMDEDIT(help, "справка", "создать или посмотреть справку по команде")
 {
-    DLString arg = argument;
-    ::Command *c = getOriginal();
+    ::Command *cmd = getOriginal();
 
-    if (arg.empty()) {
-        if (!c->help || c->help->getID() < 1) {
-            ptc(ch, "Справка не задана, используй help create для создания новой.");
-            return false;
-        }
+    auto postCreateAction = [cmd](XMLPointerNoEmpty<CommandHelp> &help) {
+        help->setCommand(::Command::Pointer(cmd));
+    };
 
-        OLCStateHelp::Pointer hedit(NEW, *resolveHelp(c));
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }
-
-    if (arg_oneof(arg, "create", "создать")) {
-        if (c->help && c->help->getID() > 0) {
-            ptc(ch, "Справка уже существует, используй команду help для редактирования.");
-            return false;
-        }
-
-        if (!c->help)
-            c->help.construct();
-        c->help->setID(
-            help_next_free_id()
-        );
-        c->help->setCommand(::Command::Pointer(c));
-
-        OLCStateHelp::Pointer hedit(NEW, c->help.getPointer());
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }   
-
-    ptc(ch, "Использование: help, help create\r\n");
-    return false;
+    return help_subcommand(ch, argument, cmd->help, postCreateAction);
 }
 
 CMDEDIT(hint, "подсказка", "краткое описание команды")

@@ -45,6 +45,8 @@ public:
 
     XML_VARIABLE XMLString nameRus;
 
+    XML_VARIABLE XMLString description;
+
     // Where is it assigned: mob/obj/room.
     XML_VARIABLE XMLEnumeration target;
 

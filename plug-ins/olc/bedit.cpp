@@ -4,10 +4,12 @@
 
 #include "util/regexp.h"
 #include "olc.h"
+#include "hedit.h"
 #include "feniatriggers.h"
 #include "pcharacter.h"
 #include "room.h"
-#include "defaultbehavior.h"
+#include "behaviorloader.h"
+#include "json_utils.h"
 #include "websocketrpc.h"
 #include "arg_utils.h"
 #include "interp.h"
@@ -84,21 +86,29 @@ void OLCStateBehavior::show( PCharacter *ch )
     ptc(ch, "Название:        {C%s{x %s {D(nameRus help){x\r\n",
             bhv->getRussianName().c_str(),
             web_edit_button(ch, "nameRus", "web").c_str());
+    ptc(ch, "Описание:        %s {D(desc help){x\r\n{c%s{x\r\n",
+            web_edit_button(ch, "desc", "web").c_str(),
+            bhv->description.c_str());
     ptc(ch, "Цель:            {c%s {D(target){x\r\n", bhv->target.name().c_str());
     ptc(ch, "Подкоманды:      {c%s {D(subcommand){x\r\n", bhv->cmd.c_str());
 
-    Json::FastWriter writer;
-    DLString propsString = writer.write(bhv->props);
+    if (bhv->help) {
+        ptc(ch, "Справка:         %s {D(help или hedit %d){x\r\n",
+            web_edit_button(ch, "hedit", bhv->help->getID()).c_str(),
+            bhv->help->getID());
+    } else {
+        ptc(ch, "Справка:         нет {D({hchelp create{x)\r\n");
+    }
 
-    ptc(ch, "Свойства:         %s {D(props help){x\r\n",
+    ptc(ch, "Свойства:        %s {D(props help){x\r\n",
             web_edit_button(ch, "props", "web").c_str());
+    DLString propsString = JsonUtils::toString(bhv->props);
     ch->desc->send(propsString.c_str());
 
     feniaTriggers->showTriggers(ch, bhv->getWrapper(), "behavior", bhv->target.name());    
 
     ptc(ch, "\r\nКоманды: {y{hccommands{x, {y{hcshow{x, {y{hclist{x, {y{hcdone{x\r\n");
 }
-
 
 BEDIT(fenia, "феня", "редактировать тригера")
 {
@@ -109,6 +119,11 @@ BEDIT(fenia, "феня", "редактировать тригера")
 BEDIT(nameRus, "название", "установить название с падежами")
 {
     return editor(argument, getOriginal()->nameRus, (editor_flags)(ED_NO_NEWLINE));
+}
+
+BEDIT(description, "описание", "установить описание")
+{
+    return editor(argument, getOriginal()->description, (editor_flags)(ED_NO_NEWLINE));
 }
 
 BEDIT(target, "цель", "установить цель поведения")
@@ -131,6 +146,17 @@ BEDIT(subcommands, "подкоманды", "установить подкома�
     ptc(ch, "Подкоманды установлены в %s\r\n", bhv->cmd.c_str());
     // TODO: command name lookup and validation
     return true;
+}
+
+BEDIT(help, "справка", "создать или посмотреть справку")
+{
+    DefaultBehavior *bhv = getOriginal();
+
+    auto postCreateAction = [bhv](XMLPointerNoEmpty<BehaviorHelp> &help) {
+        help->setBehavior(DefaultBehavior::Pointer(bhv));
+    };
+
+    return help_subcommand(ch, argument, bhv->help, postCreateAction);
 }
 
 // Return a map from behavior name to the list of obj/mob/room vnums that use it.
@@ -209,6 +235,11 @@ BEDIT(done, "готово", "выйти из редактора")
     return false;
 }
 
+static bool bhv_cmp_name(DefaultBehavior *a, DefaultBehavior *b)
+{
+    return a->getName().compare(b->getName()) < 0;
+}
+
 CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
 {
     DLString args = argument;
@@ -238,6 +269,10 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
         bhv->setName(args);
         bhv->id = behaviorManager->getNextId();
         bhv->target = INDEX_OBJ;
+        bhv->help.construct();
+        bhv->help->setID(
+            help_next_free_id()
+        );
 
         BehaviorLoader::getThis()->loadElement(bhv);
         BehaviorLoader::getThis()->saveElement(bhv);
@@ -254,16 +289,22 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
         auto usage = behavior_usage();
 
         ch->send_to(
-            fmt(0, "{C%-15s %-20s %4s %5s{x\r\n", "Название", "", "Тип", "Всего"));
+            fmt(0, "{C%-20s %-25s %4s %5s{x\r\n", "Название", "", "Тип", "Всего"));
 
         const DLString lineFormat = 
-            "{W" + web_cmd(ch, "bedit $1", "%-15s") + "{w %-20.20s %4s %5d{x\r\n";
+            "{W" + web_cmd(ch, "bedit $1", "%-20s") + "{w %-25.25s %4s %5d{x\r\n";
+
+        list<DefaultBehavior *> output;
 
         for (int r = 0; r < behaviorManager->size(); r++) {
             DefaultBehavior *bhv = dynamic_cast<DefaultBehavior *>(behaviorManager->find(r));
-            if (!bhv)
-                continue;
+            if (bhv)
+                output.push_back(bhv);
+        }
 
+        output.sort(bhv_cmp_name);
+
+        for (auto *bhv: output) {
             ch->send_to(fmt(0, lineFormat.c_str(),
                     bhv->getName().c_str(),
                     bhv->getRussianName().ruscase('1').c_str(),

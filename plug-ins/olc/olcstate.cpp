@@ -1122,10 +1122,14 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
         return false;
     }
 
-    if (!props[bhvName].isMember(propName)) {
+    if (!props[bhvName].isMember(propName) && !bhv->props.isMember(propName)) {
         ptc(ch, "У поведения '%s' нету свойства под названием '%s'.\r\n", bhvName.c_str(), propName.c_str());
         return false;
     }
+
+    // Set the default for props that were added to behavior after this behavior got assigned here.
+    if (!props[bhvName].isMember(propName))
+        JsonUtils::copy(props[bhvName][propName], bhv->props[propName]);
 
     Json::Value &target = props[bhvName][propName];
 

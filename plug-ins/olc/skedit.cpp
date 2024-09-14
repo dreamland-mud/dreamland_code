@@ -572,42 +572,13 @@ SKEDIT(fenia, "феня", "редактировать тригера закли�
 
 SKEDIT(help, "справка", "создать или посмотреть справку по умению")
 {
-    DLString arg = argument;
-    BasicSkill *r = getOriginal();
+    BasicSkill *skill = getOriginal();
 
-    if (arg.empty()) {
-        if (!r->help || r->help->getID() < 1) {
-            ptc(ch, "Справка не задана, используй help create для создания новой.");
-            return false;
-        }
+    auto postCreateAction = [skill](XMLPointerNoEmpty<SkillHelp> &help) {
+        help->setSkill(BasicSkill::Pointer(skill));
+    };
 
-        OLCStateHelp::Pointer hedit(NEW, r->help.getPointer());
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }
-
-    if (arg_oneof(arg, "create", "создать")) {
-        if (r->help && r->help->getID() > 0) {
-            ptc(ch, "Справка уже существует, используй команду help для редактирования.");
-            return false;
-        }
-
-        if (!r->help)
-            r->help.construct();
-        r->help->setID(
-            help_next_free_id()
-        );
-        r->help->setSkill(BasicSkill::Pointer(r));
-
-        OLCStateHelp::Pointer hedit(NEW, r->help.getPointer());
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }   
-
-    ptc(ch, "Использование: help, help create\r\n");
-    return false;
+    return help_subcommand(ch, argument, skill->help, postCreateAction);
 }
 
 SKEDIT(beats, "задержка", "wait state в пульсах (секунды * 4)")
@@ -1230,45 +1201,15 @@ GREDIT(show, "показать", "показать все поля")
     return false;
 }
 
-// TODO remove boilerplate
 GREDIT(help, "справка", "создать или посмотреть справку по группе")
 {
-    DLString arg = argument;
-    DefaultSkillGroup *g = getOriginal();
+    DefaultSkillGroup *group = getOriginal();
 
-    if (arg.empty()) {
-        if (!g->help || g->help->getID() < 1) {
-            ptc(ch, "Справка не задана, используй help create для создания новой.");
-            return false;
-        }
+    auto postCreateAction = [group](XMLPointer<SkillGroupHelp> &help) {
+        help->setSkillGroup(DefaultSkillGroup::Pointer(group));
+    };
 
-        OLCStateHelp::Pointer hedit(NEW, g->help.getPointer());
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }
-
-    if (arg_oneof(arg, "create", "создать")) {
-        if (g->help && g->help->getID() > 0) {
-            ptc(ch, "Справка уже существует, используй команду help для редактирования.");
-            return false;
-        }
-
-        if (!g->help)
-            g->help.construct();
-        g->help->setID(
-            help_next_free_id()
-        );
-        g->help->setSkillGroup(DefaultSkillGroup::Pointer(g));
-
-        OLCStateHelp::Pointer hedit(NEW, g->help.getPointer());
-        hedit->attach(ch);
-        hedit->show(ch);
-        return true;
-    }   
-
-    ptc(ch, "Использование: help, help create\r\n");
-    return false;
+    return help_subcommand(ch, argument, group->help, postCreateAction);
 }
 
 GREDIT(russian, "русское", "русское название группы")

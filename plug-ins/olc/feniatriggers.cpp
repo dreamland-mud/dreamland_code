@@ -19,7 +19,7 @@
 #include "damageflags.h"
 #include "arg_utils.h"
 #include "areaquestutils.h"
-#include "defaultbehavior.h"
+#include "behaviorloader.h"
 #include "merc.h"
 
 #include "act.h"
