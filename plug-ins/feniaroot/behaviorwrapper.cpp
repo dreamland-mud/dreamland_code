@@ -85,6 +85,12 @@ NMI_GET(BehaviorWrapper, nameRus, "русское название поведе�
     return Register(target->nameRus);
 }
 
+NMI_GET(BehaviorWrapper, description, "описание поведения") 
+{ 
+    checkTarget(); 
+    return Register(target->description);
+}
+
 NMI_GET(BehaviorWrapper, cmd, "имена команд, привязанных к поведению") 
 { 
     checkTarget(); 
