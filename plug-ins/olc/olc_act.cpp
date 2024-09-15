@@ -466,7 +466,7 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
     ptc(ch, "\r\n{cПоведение{x:            ");
     for (int &bhvIndex: behaviors.toArray()) {
 		Behavior *bhv = behaviorManager->find(bhvIndex);
-        ptc(ch, "{C%s{x ", web_cmd(ch, "bedit $1", bhv->getName()).c_str());
+        ptc(ch, "[{C%s{x] ", web_cmd(ch, "bedit $1", bhv->getName()).c_str());
     }
     ptc(ch, " {D(behaviors){x\n\r");
 
@@ -480,8 +480,11 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
         StringSet activeTriggers, miscMethods;    
         bhvWrapper->collectTriggers(activeTriggers, miscMethods);
 
-        for (auto &trig: activeTriggers)
-            ptc(ch, "{C%s{w.{C%s{x ", bhv->getName().c_str(), trig.c_str());
+        for (auto &trig: activeTriggers) {
+            DLString cmd = "cs web behaviors/" + bhv->getName() + "/" + trig;
+            DLString seeFmt = bhv->getName() + "." + trig;
+            ptc(ch, "[{C%s{x] ", web_cmd(ch, cmd, seeFmt).c_str());
+        }
     }
     ptc(ch, "\r\n");
 

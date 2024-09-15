@@ -41,9 +41,7 @@ CodeSourceRepo::CodeSourceRepo()
     subjPatterns.push_back(
         RegExp::Pointer(NEW, "^([a-z]+)/([-0-9.a-zA-Z_ :]+)$", true));
     subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(global/on[A-Z][a-zA-Z]+)/([-_a-zA-Z ]+)$", true));
-    subjPatterns.push_back(
-        RegExp::Pointer(NEW, "^(global/post[A-Z][a-zA-Z]+)/([-_a-zA-Z ]+)$", true));
+        RegExp::Pointer(NEW, "^([a-z]+)/([-0-9.a-zA-Z_ :]+)/([-0-9.a-zA-Z_ :]+)$", true));
 }
 
 CodeSourceRepo::~CodeSourceRepo() 

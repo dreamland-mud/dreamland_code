@@ -249,12 +249,12 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
     if (cmd.empty()) {
         stc("Формат:  bedit имя\r\n", ch);
         stc("         bedit list\r\n", ch);
-        stc("         bedit create новое_имя\r\n", ch);
+        stc("         bedit create новое имя\r\n", ch);
         return;
     }
 
     if (arg_oneof(cmd, "create", "создать")) {
-        static RegExp namePattern("^[a-z_]{2,}$", true);
+        static RegExp namePattern("^[a-z_ ]{2,}$", true);
         if (args.empty() || !namePattern.match(args)) {
             stc("Укажите английское название поведения маленькими буквами.\r\n", ch);
             return;
