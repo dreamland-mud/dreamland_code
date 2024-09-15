@@ -490,7 +490,8 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
 
     ptc(ch,     "{cСвойства поведения{x:  {D(prop){x  \r\n");
     for(auto p = props.begin(); p != props.end(); p++) {
-        const DLString &bhvName = p.key().asString();
+        // Replace spaces with _ to make typing OLC commands easier
+        DLString bhvName = DLString(p.key().asString()).substitute(' ', "_");
         const Json::Value &bhvProps = *p;
 
         for (auto bp = bhvProps.begin(); bp != bhvProps.end(); bp++) {

@@ -1101,16 +1101,18 @@ bool OLCState::editBehaviors(GlobalBitvector &behaviors, Json::Value &props)
 bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const DLString &arguments)
 {
     DLString args = arguments;
-    DLString bhvName = args.getOneArgument();
+    DLString bhvNameWithUnderscore = args.getOneArgument();
     DLString propName = args.getOneArgument();
     DLString propValue = args;
     Character *ch = owner->character;
 
-    if (bhvName.empty() || propName.empty() || propValue.empty()) {
+    if (bhvNameWithUnderscore.empty() || propName.empty() || propValue.empty()) {
         ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>|web\r\n");
         return false;
     }
 
+    // Replace _ back with spaces.
+    DLString bhvName = bhvNameWithUnderscore.substitute('_', " ");
     Behavior *bhv = behaviorManager->findExisting(bhvName);
     if (!bhv) {
         ptc(ch, "Поведение '%s' не существует, смотри {y{hc? behaviors{x для списка.\r\n", bhvName.c_str());
@@ -1134,7 +1136,7 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     Json::Value &target = props[bhvName][propName];
 
     if (arg_is_web(propValue)) {
-        return editorWeb(JsonUtils::asString(target), lastCmd + " " + bhvName + " " + propName + " paste", ED_NO_NEWLINE);
+        return editorWeb(JsonUtils::asString(target), lastCmd + " " + bhvNameWithUnderscore + " " + propName + " paste", ED_NO_NEWLINE);
     }
 
     DLString newValue;
