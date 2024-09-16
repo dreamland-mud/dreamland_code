@@ -21,7 +21,7 @@
 #include "def.h"
 
 GSN(bless);
-GSN(secret_of_sidhe);
+GSN(sidhe_armor);
 
 bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
 {
@@ -37,7 +37,8 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     }
  
     af.bitvector.setTable(&res_flags);
-    af.type      = gsn_secret_of_sidhe;
+    af.type      = gsn_sidhe_armor;
+    
     af.level     = ch->getModifyLevel( );
     af.duration  = af.level / 6;
     af.bitvector.setValue(RES_IRON);
