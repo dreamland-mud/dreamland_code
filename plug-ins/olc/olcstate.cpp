@@ -1107,7 +1107,7 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     Character *ch = owner->character;
 
     if (bhvNameWithUnderscore.empty() || propName.empty() || propValue.empty()) {
-        ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>|web\r\n");
+        ptc(ch, "Использование: prop <имя поведения> <свойство> <значение>|web|delete\r\n");
         return false;
     }
 
@@ -1137,6 +1137,12 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
 
     if (arg_is_web(propValue)) {
         return editorWeb(JsonUtils::asString(target), lastCmd + " " + bhvNameWithUnderscore + " " + propName + " paste", ED_NO_NEWLINE);
+    }
+
+    if (arg_oneof(propValue, "delete", "удалить")) {
+        props[bhvName].removeMember(propName);
+        ptc(ch, "Свойство %s поведения %s удалено.\r\n", propName.c_str(), bhvName.c_str());
+        return true;
     }
 
     DLString newValue;
