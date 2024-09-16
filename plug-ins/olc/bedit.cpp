@@ -5,9 +5,13 @@
 #include "util/regexp.h"
 #include "olc.h"
 #include "hedit.h"
+#include "skedit.h"
 #include "feniatriggers.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "basicskill.h"
+#include "skillmanager.h"
+#include "defaultaffecthandler.h"
 #include "behaviorloader.h"
 #include "json_utils.h"
 #include "websocketrpc.h"
@@ -17,6 +21,8 @@
 #include "act.h"
 #include "merc.h"
 #include "def.h"
+
+GSN(kassandra);
 
 using namespace Scripting;
 
@@ -107,7 +113,7 @@ void OLCStateBehavior::show( PCharacter *ch )
 
     feniaTriggers->showTriggers(ch, bhv->getWrapper(), "behavior", bhv->target.name());    
 
-    ptc(ch, "\r\nКоманды: {y{hccommands{x, {y{hcshow{x, {y{hclist{x, {y{hcdone{x\r\n");
+    ptc(ch, "\r\nКоманды: {y{hccommands{x, {y{hcshow{x, {y{hclist{x, {y{hcaffect{x, {y{hcdone{x\r\n");
 }
 
 BEDIT(fenia, "феня", "редактировать тригера")
@@ -115,6 +121,63 @@ BEDIT(fenia, "феня", "редактировать тригера")
     feniaTriggers->openEditor(ch, getOriginal(), argument);
     return false;
 }
+
+BEDIT(affect, "аффект", "создать или редактировать аффект")
+{
+    DefaultBehavior *bhv = getOriginal();
+    DLString args = argument;
+    Skill *existingSkill = skillManager->findExisting(bhv->getName());
+    BasicSkill::Pointer skill = existingSkill ? dynamic_cast<BasicSkill *>(existingSkill) : 0;
+
+    if (arg_oneof(args, "create", "создать")) {
+        if (skill) {
+            ptc(ch, "Умение '%s' уже существует, используй команду {y{hcaffect{x для редактирования.\r\n", skill->getName().c_str());
+            return false;
+        } 
+
+        XMLTableLoader *loader = dynamic_cast<BasicSkill *>(gsn_kassandra.getElement())->getLoader();
+
+        try {
+            AllocateClass::Pointer alloc = Class::allocateClass("BasicSkill");
+            skill = alloc.getDynamicPointer<BasicSkill>();
+        }
+        catch (const ExceptionClassNotFound &e) {
+            LogStream::sendError() << "skedit create: " << e.what() << endl;
+        }
+
+        if (!skill || !loader) {
+            stc("Не могу создать новое умение, проверьте логи.\r\n", ch);
+            return false;
+        }
+
+        skill->setName(bhv->getName());
+        skill->nameRus.setValue(bhv->getRussianName().ruscase('1'));
+
+        skill->help.construct();
+        skill->help->setID(
+            help_next_free_id()
+        );
+        skill->help->setLevel(MAX_LEVEL);
+
+        DefaultAffectHandler::Pointer ah(NEW);
+        skill->affect.setPointer(ah);
+        skill->affect->setSkill(BasicSkill::Pointer(skill));
+
+        loader->loadElement(skill);
+        loader->saveElement(skill);
+    }
+
+    if (!skill) {
+        ptc(ch, "Умение еще не задано, используй {y{hcaffect create{x.\r\n");
+        return false;
+    }
+
+    OLCStateSkill::Pointer ske(NEW, *skill);
+    ske->attach(ch);
+    ske->show(ch);
+    return false;
+}
+
 
 BEDIT(nameRus, "название", "установить название с падежами")
 {
