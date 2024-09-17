@@ -182,7 +182,7 @@ int help_next_free_id()
         latest = id;
     }
 
-    return helpManager->getLastID();
+    return helpManager->getLastID() + 1;
 }
 
 

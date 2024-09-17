@@ -15,14 +15,13 @@
 #include "behaviorloader.h"
 #include "json_utils.h"
 #include "websocketrpc.h"
+#include "skill_alloc.h"
 #include "arg_utils.h"
 #include "interp.h"
 #include "behaviorloader.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
-
-GSN(kassandra);
 
 using namespace Scripting;
 
@@ -135,36 +134,19 @@ BEDIT(affect, "аффект", "создать или редактировать 
             return false;
         } 
 
-        XMLTableLoader *loader = dynamic_cast<BasicSkill *>(gsn_kassandra.getElement())->getLoader();
+        skill = SkillAlloc::newOtherSkill(bhv->getName());
 
-        try {
-            AllocateClass::Pointer alloc = Class::allocateClass("BasicSkill");
-            skill = alloc.getDynamicPointer<BasicSkill>();
-        }
-        catch (const ExceptionClassNotFound &e) {
-            LogStream::sendError() << "skedit create: " << e.what() << endl;
-        }
-
-        if (!skill || !loader) {
+        if (!skill) {
             stc("Не могу создать новое умение, проверьте логи.\r\n", ch);
             return false;
         }
 
-        skill->setName(bhv->getName());
         skill->nameRus.setValue(bhv->getRussianName().ruscase('1'));
-
-        skill->help.construct();
-        skill->help->setID(
-            help_next_free_id()
-        );
         skill->help->setLevel(MAX_LEVEL);
 
         DefaultAffectHandler::Pointer ah(NEW);
         skill->affect.setPointer(ah);
         skill->affect->setSkill(BasicSkill::Pointer(skill));
-
-        loader->loadElement(skill);
-        loader->saveElement(skill);
     }
 
     if (!skill) {

@@ -18,7 +18,8 @@ skillhelp.cpp \
 skillgrouphelp.cpp \
 xmlattributerestring.cpp \
 feniaskillaction.cpp \
-ccast.cpp
+ccast.cpp \
+skill_alloc.cpp
 
 libskills_impl_la_MOC = \
 basicskill.h \

@@ -16,6 +16,7 @@
 #include "commandmanager.h"
 #include "xmltableloader.h"
 #include "religion.h"
+#include "skill_alloc.h"
 
 #include "skedit.h"
 #include "hedit.h"
@@ -34,11 +35,6 @@
 #include "comm.h"
 
 #include "def.h"
-
-GSN(garble);
-GSN(kassandra);
-GSN(rear_kick);
-GSN(sanctuary);
 
 OLC_STATE(OLCStateSkill);
 OLC_STATE(OLCStateSkillGroup);
@@ -869,31 +865,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
     // Creating new skill.
     if (arg_oneof(cmd, "create", "создать")) {
         DLString type = args.getOneArgument();
-        DLString className;
         BasicSkill::Pointer newSkill;
-        XMLTableLoader *loader = 0;
-
-        // Figure out class name via 'reflection', without depending on corresponding plugin directly.
-        // Figure out who loads that type of skills, by looking at a typical example.
-        if (arg_oneof(type, "class", "класс")) {
-            className = "GenericSkill";
-            loader = dynamic_cast<BasicSkill *>(gsn_sanctuary.getElement())->getLoader();
-        } else if (arg_oneof(type, "clan", "клан")) {
-            className = "ClanSkill";
-            loader = dynamic_cast<BasicSkill *>(gsn_garble.getElement())->getLoader();
-        } else if (arg_oneof(type, "orden", "орден")) {
-            className = "ClanOrgSkill";
-            loader = dynamic_cast<BasicSkill *>(gsn_garble.getElement())->getLoader();
-        } else if (arg_oneof(type, "race", "раса")) {
-            className = "RaceAptitude";
-            loader = dynamic_cast<BasicSkill *>(gsn_rear_kick.getElement())->getLoader();
-        } else if (arg_oneof(type, "other", "другое", "разное")) {
-            className = "BasicSkill";
-            loader = dynamic_cast<BasicSkill *>(gsn_kassandra.getElement())->getLoader();
-        } else {
-            stc("Укажи вид нового умения: class, clan, race или other.\r\n", ch);
-            return;
-        }
 
         static RegExp namePattern("^[a-z ]{2,}[a-z]$", true);
         if (args.empty() || !namePattern.match(args)) {
@@ -914,27 +886,25 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
             skillManager->unregistrate(Skill::Pointer(oldSkill));
         }
 
-        try {
-            AllocateClass::Pointer alloc = Class::allocateClass(className);
-            newSkill = alloc.getDynamicPointer<BasicSkill>();
-        }
-        catch (const ExceptionClassNotFound &e) {
-            LogStream::sendError() << "skedit create: " << e.what() << endl;
-        }
-
-        if (!newSkill || !loader) {
-            stc("Не могу создать новое умение, проверьте логи.\r\n", ch);
+        if (arg_oneof(type, "class", "класс")) {
+            newSkill = SkillAlloc::newClassSkill(args);
+        } else if (arg_oneof(type, "clan", "клан")) {
+            newSkill = SkillAlloc::newClanSkill(args);
+        } else if (arg_oneof(type, "orden", "орден")) {
+            newSkill = SkillAlloc::newOrdenSkill(args);
+        } else if (arg_oneof(type, "race", "раса")) {
+            newSkill = SkillAlloc::newRaceSkill(args);
+        } else if (arg_oneof(type, "other", "другое", "разное")) {
+            newSkill = SkillAlloc::newOtherSkill(args);
+        } else {
+            stc("Укажи вид нового умения: class, clan, race или other.\r\n", ch);
             return;
         }
 
-        newSkill->setName(args);
-        newSkill->help.construct();
-        newSkill->help->setID(
-            help_next_free_id()
-        );
-
-        loader->loadElement(newSkill);
-        loader->saveElement(newSkill);
+        if (!newSkill) {
+            stc("Не могу создать новое умение, проверьте логи.\r\n", ch);
+            return;
+        }
 
         ptc(ch, "Создано новое умение под именем %s.\r\n", newSkill->getName().c_str());
 

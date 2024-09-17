@@ -49,7 +49,7 @@ bool help_subcommand(PCharacter *ch, const DLString &argument, HelpPointer &help
 
     if (arg.empty()) {
         if (!help || help->getID() < 1) {
-            ptc(ch, "Справка не задана, используй {y{hchelp create{x для создания новой.");
+            ptc(ch, "Справка не задана, используй {y{hchelp create{x для создания новой.\r\n");
             return false;
         }
 
@@ -61,7 +61,7 @@ bool help_subcommand(PCharacter *ch, const DLString &argument, HelpPointer &help
 
     if (arg_oneof(arg, "create", "создать")) {
         if (help && help->getID() > 0) {
-            ptc(ch, "Справка уже существует, используй команду {y{hchelp{x для редактирования.");
+            ptc(ch, "Справка уже существует, используй команду {y{hchelp{x для редактирования.\r\n");
             return false;
         }
 
