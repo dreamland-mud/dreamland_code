@@ -253,11 +253,6 @@ DLString obj_index_data::getProperty(const DLString &key) const
     if (json_find_value(props, key, value))
         return value;
 
-    // Then look in legacy properties on index data
-    auto p = properties.find(key);
-    if (p != properties.end())
-        return p->second;
-    
     return DLString::emptyString;
 }
 
@@ -327,11 +322,6 @@ DLString mob_index_data::getProperty(const DLString &key) const
     
     if (json_find_value(props, key, value))
         return value;
-
-    // Then look in legacy properties on index data
-    auto p = properties.find(key);
-    if (p != properties.end())
-        return p->second;
     
     return DLString::emptyString;
 }

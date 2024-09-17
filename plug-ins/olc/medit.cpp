@@ -114,10 +114,6 @@ void OLCStateMobile::copyDescriptions( MOB_INDEX_DATA *original )
     mob.description      = str_dup(original->description);
     mob.material         = str_dup(original->material);
     mob.smell            = original->smell;
-
-    mob.properties.clear( );
-    for (Properties::const_iterator p = original->properties.begin( ); p != original->properties.end( ); p++)
-        mob.properties.insert( *p );
 }
 
 void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
@@ -338,11 +334,6 @@ void OLCStateMobile::commit()
             victim->updateCachedNoun( );
     }
 
-    original->properties.clear( );
-    for (Properties::const_iterator p = mob.properties.begin( ); p != mob.properties.end( ); p++)
-        original->properties.insert( *p );
-    mob.properties.clear( );
-
     original->behaviors.clear();
     original->behaviors.set(mob.behaviors);
     original->props.clear();
@@ -432,12 +423,6 @@ MEDIT(show)
     if (mob.clan != clan_none)
         ptc(ch, "Clan: [{G%s{x] {D(? clan){x\n\r", mob.clan->getName().c_str());
     ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
-
-    if (!mob.properties.empty( )) {
-        ptc(ch, "Properties: {D(oldprop){x\n\r");
-        for (Properties::const_iterator p = mob.properties.begin( ); p != mob.properties.end( ); p++)
-            ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
-    }
 
     ptc(ch, "Description: %s\n\r%s", web_edit_button(showWeb, ch, "desc", "web").c_str(), mob.description);
 
@@ -704,12 +689,6 @@ MEDIT(smell)
     mob.smell = argument;
     stc("Smell set\n\r", ch);
     return false;
-}
-
-MEDIT(oldproperty)
-{
-    DLString args = DLString( argument );
-    return mapEdit( mob.properties, args );
 }
 
 MEDIT(oldbehavior)

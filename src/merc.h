@@ -402,12 +402,11 @@ struct        mob_index_data
     Scripting::Object *wrapper;
     AreaIndexData *                area;
     DLString smell;
-    Properties properties;
     ClanReference clan;
 
     int getSize() const;
 
-    /** Return props value for the key (props[key] or props["xxx"][key]) or legacy property. */
+    /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;
 };
 
@@ -458,13 +457,12 @@ struct        obj_index_data
     AreaIndexData *                area;
     DLString smell;
     DLString sound;
-    Properties properties;
     ObjectList instances;
 
     GlobalBitvector behaviors;
     Json::Value props;
 
-    /** Return props value for the key (props[key] or props["xxx"][key]) or legacy property. */
+    /** Return props value for the key (props[key] or props["xxx"][key]). */
     DLString getProperty(const DLString &key) const;
 };
 

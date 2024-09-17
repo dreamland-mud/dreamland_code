@@ -185,20 +185,14 @@ NMI_INVOKE( MobIndexWrapper, property, "(name, defaultValue): свойство �
     DLString name = args2string(args);
     Register defaultValue = args.size() > 1 ? args.back() : Register();
 
-    // Look in JSON props first
     DLString jsonValue = JsonUtils::findValue(target->props, name);
     if (jsonValue != "ERROR") 
         return jsonValue;
 
-    // Then in legacy properties
-    Properties::const_iterator p = target->properties.find(name);
-    if (p != target->properties.end())
-        return Register(p->second);
-
     return defaultValue;
 }
 
-NMI_INVOKE(MobIndexWrapper, setProp, "(key,subkey,value): установить значение props[key][subkey] в value")
+NMI_INVOKE(MobIndexWrapper, setProperty, "(key,subkey,value): установить значение props[key][subkey] в value")
 {
     checkTarget();
     DLString key = argnum2string(args, 1);
@@ -213,28 +207,6 @@ NMI_INVOKE(MobIndexWrapper, setProp, "(key,subkey,value): установить �
 
     target->area->changed = true;
     
-    return Register();
-}
-
-NMI_GET(MobIndexWrapper, properties, "Array (массив) из legacy свойств прототипа") 
-{
-    checkTarget();
-
-    Scripting::Register result = Register::handler<RegContainer>();
-    RegContainer *array = result.toHandler().getDynamicPointer<RegContainer>();
-
-    for (auto p: target->properties) {
-        array->setField(p.first, p.second);
-    }
-
-    return result;    
-}
-
-NMI_INVOKE(MobIndexWrapper, clearProperties, "(): очистка всех legacy свойств прототипа")
-{
-    checkTarget();
-    target->properties.clear();
-    target->area->changed = true;
     return Register();
 }
 

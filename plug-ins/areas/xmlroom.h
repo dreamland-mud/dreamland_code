@@ -56,7 +56,6 @@ public:
     XML_VARIABLE XMLResetList resets;
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLGlobalBitvector behaviors;
-    XML_VARIABLE XMLMapBase<XMLString> properties;
     XML_VARIABLE XMLJsonValue props;
 };
 

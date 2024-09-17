@@ -23,7 +23,6 @@ struct extra_descr_data;
 struct exit_data;
 struct extra_exit_data;
 struct reset_data;
-typedef map<DLString, DLString> Properties;
 
 struct RoomHistoryEntry {
     RoomHistoryEntry( DLString n, DLString rn, int w )
@@ -80,7 +79,6 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     LiquidReference liquid;
     DLString smell;
     DLString sound;
-    Properties properties;
     ::Pointer<XMLDocument> behavior;
     GlobalBitvector behaviors;
     Json::Value props;

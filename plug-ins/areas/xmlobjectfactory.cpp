@@ -14,8 +14,7 @@
 
 XMLObjectFactory::XMLObjectFactory( ) : 
     extra_flags(0, &::extra_flags), wear_flags(0, &::wear_flags), 
-    behaviors(behaviorManager),
-    properties( false )
+    behaviors(behaviorManager)
 {
 }
 
@@ -57,9 +56,6 @@ XMLObjectFactory::init(const obj_index_data *obj)
         behavior.setNode(obj->behavior->getFirstNode( ));
 
     behaviors.set(obj->behaviors);
-
-    for (Properties::const_iterator p = obj->properties.begin( ); p != obj->properties.end( ); p++)
-        properties.insert( *p );
 
     JsonUtils::copy(props, obj->props);    
 }
@@ -119,9 +115,6 @@ XMLObjectFactory::compat(obj_index_data *obj)
     }
 
     obj->behaviors.set(behaviors);
-
-    for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
-        obj->properties.insert( *p );
 
     JsonUtils::copy(obj->props, props);
 }

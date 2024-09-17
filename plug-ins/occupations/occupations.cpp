@@ -75,10 +75,6 @@ bool mob_has_occupation( NPCharacter *mob, int occType )
     if (!occName)
         return false;
 
-    // Old-style 'healer' property, to be removed
-    if (mob->pIndexData->properties.count(occName) > 0)
-        return true;
-
     // Mob behaviors: try to find existing behavior called occName and see if it's assigned
     Behavior *bhv = behaviorManager->findExisting(occName);
     if (bhv && mob->pIndexData->behaviors.isSet(bhv))

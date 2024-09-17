@@ -33,8 +33,7 @@ XMLMobileFactory::XMLMobileFactory( ) :
                           practicer(skillGroupManager),
                           religion(religionManager),
                           affects(skillManager),
-                          behaviors(behaviorManager),
-                          properties( false )
+                          behaviors(behaviorManager)
 {
 }
 
@@ -108,9 +107,6 @@ XMLMobileFactory::init(const mob_index_data *mob)
 
     if(!mob->behavior.isEmpty( ))
         behavior.setNode(mob->behavior->getFirstNode( ));
-
-    for (Properties::const_iterator p = mob->properties.begin( ); p != mob->properties.end( ); p++)
-        properties.insert( *p );
 
     JsonUtils::copy(props, mob->props);
 }
@@ -205,9 +201,6 @@ XMLMobileFactory::compat(mob_index_data *mob)
         XMLNode::Pointer p = behavior.getNode( );
         mob->behavior->appendChild(p);
     }
-
-    for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
-        mob->properties.insert( *p );
 
     JsonUtils::copy(mob->props, props);
 }

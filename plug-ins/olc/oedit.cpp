@@ -132,10 +132,6 @@ void OLCStateObject::copyDescriptions( OBJ_INDEX_DATA *original )
     obj.sound        = original->sound;
     obj.material     = str_dup(original->material);
     obj.gram_gender  = original->gram_gender;
-
-    obj.properties.clear( );
-    for (Properties::const_iterator p = original->properties.begin( ); p != original->properties.end( ); p++)
-        obj.properties.insert( *p );
 }
 
 void OLCStateObject::commit()
@@ -234,11 +230,6 @@ void OLCStateObject::commit()
     memcpy(original->value, obj.value, sizeof(obj.value));
     original->limit        = obj.limit;
 
-    original->properties.clear( );
-    for (Properties::const_iterator p = obj.properties.begin( ); p != obj.properties.end( ); p++)
-        original->properties.insert( *p );
-    obj.properties.clear( );
-
     original->behaviors.clear();
     original->behaviors.set(obj.behaviors);
     original->props.clear();
@@ -292,12 +283,6 @@ OEDIT(show)
     ptc(ch, "Smell: [%s]\n\r", pObj->smell.c_str( ));
 
     ptc(ch, "Sound: [%s]\n\r", pObj->sound.c_str( ));
-
-    if (!pObj->properties.empty( )) {
-        ptc(ch, "Properties: {D(oldprop){x\n\r");
-        for (Properties::const_iterator p = pObj->properties.begin( ); p != pObj->properties.end( ); p++)
-            ptc(ch, "{g%20s{x: %s\n\r", p->first.c_str( ), p->second.c_str( ));
-    }
 
     ptc(ch, "Condition:   [%5d]\n\r", pObj->condition);
 
@@ -659,12 +644,6 @@ OEDIT(smell)
 OEDIT(props)
 {
     return editProps(obj.behaviors, obj.props, argument);
-}
-
-OEDIT(oldproperty)
-{
-    DLString args = DLString( argument );
-    return mapEdit( obj.properties, args );
 }
 
 bool set_value(Character * ch, OBJ_INDEX_DATA * pObj, char *argument, int value)

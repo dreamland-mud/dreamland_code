@@ -99,7 +99,6 @@ protected:
 
     void seditDone( );
 
-    bool mapEdit( Properties &map, DLString &args );
     bool flagBitsEdit(Flags &field);
     bool flagBitsEdit(const FlagTable &table, int &field);
     bool flagBitsEdit(const FlagTable &table, Flags &field);

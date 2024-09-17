@@ -430,6 +430,7 @@ DLString Object::getProperty(const DLString &key) const
     if (p != properties.end())
         return p->second;
     
+    // Look in index data props 
     return pIndexData->getProperty(key);
 }
 

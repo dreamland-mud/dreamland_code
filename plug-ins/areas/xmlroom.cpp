@@ -144,8 +144,7 @@ XMLRoom::XMLRoom() :
     exits(false),
     extraExits(false),
     extraDescr(false),
-    behaviors(behaviorManager),
-    properties( false )
+    behaviors(behaviorManager)
 
 {
 }
@@ -194,9 +193,6 @@ XMLRoom::init(RoomIndexData *room)
 
     if(!room->behavior.isEmpty( ))
         behavior.setNode(room->behavior->getFirstNode( ));
-
-    for (Properties::const_iterator p = room->properties.begin( ); p != room->properties.end( ); p++)
-        properties.insert( *p );
 
     JsonUtils::copy(props, room->props);
 }
@@ -289,9 +285,6 @@ XMLRoom::compat(int vnum)
         room->behavior->appendChild(p);
     }
 
-    for (XMLMapBase<XMLString>::iterator p = properties.begin( ); p != properties.end( ); p++)
-        room->properties.insert( *p );
-    
     JsonUtils::copy(room->props, props);
     
     return room;

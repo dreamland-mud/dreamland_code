@@ -50,7 +50,6 @@ public:
     XML_VARIABLE XMLClanReference clan;
 
     XML_VARIABLE XMLStringNode behavior;
-    XML_VARIABLE XMLMapBase<XMLString> properties;
     XML_VARIABLE XMLJsonValue props;
 };
 

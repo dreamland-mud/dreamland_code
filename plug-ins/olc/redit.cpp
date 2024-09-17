@@ -282,12 +282,6 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     ptc(ch, "Health:     [{W%d{x]%%\n\rMana:       [{W%d{x]%%\n\r",
               pRoom->heal_rate, pRoom->mana_rate);
     
-    if (!pRoom->properties.empty( )) {
-        ptc(ch, "Properties: {D(oldprop){x\n\r");
-        for (Properties::const_iterator p = pRoom->properties.begin( ); p != pRoom->properties.end( ); p++)
-            ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
-    }
-
     if (pRoom->extra_descr) {
         EXTRA_DESCR_DATA *ed;
 
@@ -1081,15 +1075,6 @@ REDIT(mana, "мана", "установить скорость восстано�
 
     stc("Syntax : mana <#xnumber>\n\r", ch);
     return false;
-}
-
-REDIT(oldproperty, "старсвойства", "редактор свойств комнаты")
-{
-    RoomIndexData *pRoom;
-
-    EDIT_ROOM(ch, pRoom);
-    DLString args = DLString( argument );
-    return mapEdit( pRoom->properties, args );
 }
 
 static bool redit_purge_obj(PCharacter *ch, Object *obj) 

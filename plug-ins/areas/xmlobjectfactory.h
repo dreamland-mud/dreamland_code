@@ -36,7 +36,6 @@ public:
     XML_VARIABLE XMLStringNoEmpty sound, smell;
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLGlobalBitvector behaviors;
-    XML_VARIABLE XMLMapBase<XMLString> properties;
     XML_VARIABLE XMLJsonValue props;
 };
 

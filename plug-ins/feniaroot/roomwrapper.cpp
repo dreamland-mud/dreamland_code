@@ -1074,25 +1074,3 @@ NMI_GET(RoomWrapper, props, "Map (структура) из свойств пов
     checkTarget();
     return JsonUtils::toRegister(target->pIndexData->props);
 }
-
-NMI_GET(RoomWrapper, properties, "Array (массив) из legacy свойств комнаты") 
-{
-    checkTarget();
-
-    Scripting::Register result = Register::handler<RegContainer>();
-    RegContainer *array = result.toHandler().getDynamicPointer<RegContainer>();
-
-    for (auto p: target->pIndexData->properties) {
-        array->setField(p.first, p.second);
-    }
-
-    return result;    
-}
-
-NMI_INVOKE(RoomWrapper, clearProperties, "(): очистка всех legacy свойств комнаты")
-{
-    checkTarget();
-    target->pIndexData->properties.clear();
-    target->areaIndex()->changed = true;
-    return Register();
-}

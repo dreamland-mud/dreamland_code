@@ -341,52 +341,6 @@ OLCState::seditDone( )
     strEditor.clear( );
 }
 
-
-bool OLCState::mapEdit( Properties &map, DLString &args )
-{
-    DLString arg1 = args.getOneArgument();
-    DLString arg2 = args;
-
-    Character *ch = owner->character;
-    if(!ch) {
-        LogStream::sendError() << "olc: mapEdit: no character" << endl;
-        return false;
-    }
-
-    if (arg1.empty( )) {
-        stc("Syntax: property <name> <value>\n\r"
-            "        property <name>\n\r"
-            "        property <name> clear\n\r", ch);
-        return false;
-    }
-
-    if (arg2 == "clear") {
-        Properties::iterator p = map.find( arg1 );
-        if (p == map.end( )) {
-            ptc(ch, "Property '%s' not found.\n\r", arg1.c_str( ));
-        } else {
-            map.erase( p );
-            stc("Property cleared.\n\r", ch);
-        }
-
-        return false;
-    }
-
-    DLString &property = map[arg1];
-
-    if (arg2.empty( )) {
-        if (sedit(property)) {
-            stc("Property set.\n\r", ch);
-            return true;
-        } else
-            return false;
-    }
-
-    map[arg1] = arg2;
-    stc("Property set.\n\r", ch);
-    return false;
-}
-
 bool OLCState::enumerationArrayEdit(EnumerationArray &field)
 {
     PCharacter *ch = owner->character->getPC();
