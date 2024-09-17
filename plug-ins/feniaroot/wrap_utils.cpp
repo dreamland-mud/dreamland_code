@@ -257,10 +257,8 @@ PCMemoryInterface * argnum2memory(const RegisterList &args, int num)
     return arg2item(reg);
 }
 
-
-int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
+int arg2flag(const Register &a, const FlagTable &table);
 {
-    Register a = argnum(args, num);
     if (a.type == Register::STRING) {
         if (table.enumerated)
             return table.value( a.toString().c_str(), true );
@@ -268,6 +266,12 @@ int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
             return table.bitstring( a.toString().c_str(), true );
     }
     return a.toNumber();
+}
+
+int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
+{
+    Register a = argnum(args, num);
+    return arg2flag(a, table);
 }
 
 int argnum2number(const RegisterList &args, int num)

@@ -128,6 +128,7 @@ public:
         inline void setOption( int );
         inline void removeOption( int );
         inline void resetOption( int );
+        inline Flags & getOptions();
         void setCurrentTime( );
 
 private:

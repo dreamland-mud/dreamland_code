@@ -186,6 +186,19 @@ NMI_INVOKE( Root, loadConfig, "(): считать конфигурацию Dream
     return Register();
 }
 
+NMI_GET( Root, options, "глобальные флаги (.tables.dreamland_flags)") 
+{
+    return (int)dreamland->getOptions().getValue();
+}
+
+NMI_SET( Root, options, "глобальные флаги (.tables.dreamland_flags)") 
+{
+    dreamland->getOptions().setValue(
+        arg2flag(arg, dreamland_flags));
+}
+
+
+
 NMI_INVOKE( Root, player_exists, "(name): существует ли в мире игрок с данным именем")
 {
     return Register( PCharacterManager::find( args2string( args ) ) != NULL );

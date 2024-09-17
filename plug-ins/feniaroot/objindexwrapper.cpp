@@ -309,6 +309,12 @@ NMI_GET(ObjIndexWrapper, behaviors, "список имен всех поведе
     return ::wrap(rc);
 }
 
+NMI_GET(ObjIndexWrapper, props, "Map (структура) из свойств поведения, ключ - имя поведения")
+{
+    checkTarget();
+    return JsonUtils::toRegister(target->props);
+}
+
 NMI_SET(ObjIndexWrapper, behaviors, "список имен всех поведений")
 {
     checkTarget();

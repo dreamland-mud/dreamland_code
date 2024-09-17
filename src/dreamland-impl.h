@@ -194,6 +194,11 @@ inline DbEnvContext * DreamLand::getFeniaDbEnv( ) const
     return feniaDbEnv;
 }
 
+inline Flags & DreamLand::getOptions()
+{
+    return workingOptions;
+}
+
 inline bool DreamLand::hasOption( int opt ) const
 {
     return workingOptions.isSet( opt );
