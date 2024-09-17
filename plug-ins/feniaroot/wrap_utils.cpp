@@ -257,7 +257,7 @@ PCMemoryInterface * argnum2memory(const RegisterList &args, int num)
     return arg2item(reg);
 }
 
-int arg2flag(const Register &a, const FlagTable &table);
+int arg2flag(const Register &a, const FlagTable &table)
 {
     if (a.type == Register::STRING) {
         if (table.enumerated)

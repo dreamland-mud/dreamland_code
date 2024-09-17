@@ -148,7 +148,7 @@ NMI_GET( AreaQuestWrapper, area, "зона (AreaIndex), в которой объ
 static int args2queststep(AreaQuest *q, const RegisterList &args)
 {
     int step = argnum2number(args, 1);
-    if (step < 0 || step > q->steps.size())
+    if (step < 0 || step > (int)q->steps.size())
         throw Scripting::IndexOutOfBoundsException();
     return step;
 }
@@ -209,7 +209,7 @@ NMI_INVOKE( AreaQuestWrapper, info, "(ch): вернет строку с подс
     DLString info = aqprog_info(ch, target);
     
     if (!info.empty())
-        info;
+        return info;
 
     return target->steps[qdata.step]->info;
 }
