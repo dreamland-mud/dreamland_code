@@ -167,6 +167,7 @@ void obj_to_char( Object *obj, Character *ch )
 
         if ( ch->is_npc( )
                 && !IS_CHARMED(ch)
+                && !IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)
                 && ch->in_room != 0 )
         {
                 save_mobs( ch->in_room );
@@ -219,6 +220,7 @@ void obj_from_char( Object *obj )
 
         if ( ch->is_npc( )
                 && !IS_CHARMED(ch)
+                && !IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)
                 && ch->in_room != 0 )
         {
                 save_mobs( ch->in_room );
@@ -279,7 +281,8 @@ void obj_from_room( Object *obj )
         if (obj->item_type == ITEM_LIGHT)
             pRoomIndex->updateLight();
 
-        save_items( pRoomIndex );
+        if (!IS_SET(obj->extra_flags, ITEM_NOSAVEDROP))
+            save_items( pRoomIndex );
 
         return;
 }
@@ -300,7 +303,8 @@ void obj_to_room( Object *obj, Room *pRoomIndex )
         if (obj->item_type == ITEM_LIGHT)
             pRoomIndex->updateLight();
 
-        save_items( pRoomIndex );
+        if (!IS_SET(obj->extra_flags, ITEM_NOSAVEDROP))
+            save_items( pRoomIndex );
 }
 
 
@@ -328,7 +332,8 @@ void obj_to_obj( Object *obj, Object *obj_to )
                 }
         }
 
-        save_items_at_holder( obj );
+        if (!IS_SET(obj->extra_flags, ITEM_NOSAVEDROP) && !IS_SET(obj_to->extra_flags, ITEM_NOSAVEDROP))
+            save_items_at_holder( obj );
 
         return;
 }
@@ -402,7 +407,8 @@ void obj_from_obj( Object *obj )
                 }
         }
 
-        save_items_at_holder( u_obj );
+        if (!IS_SET(obj->extra_flags, ITEM_NOSAVEDROP) && !IS_SET(u_obj->extra_flags, ITEM_NOSAVEDROP))
+            save_items_at_holder( u_obj );
 
         return;
 }
