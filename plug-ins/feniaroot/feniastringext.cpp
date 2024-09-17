@@ -110,35 +110,6 @@ NMI_INVOKE(FeniaString, upperFirstChar, "(): возвращает ту же ст
     return Register( str );
 }
 
-NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str): заменяет в данной строке все вхождения $1..$9 на соответствующие совпадения") 
-{
-    if (args.size() != 2)
-        throw NotEnoughArgumentsException();
-
-    DLString pattern = args.front().toString();
-    DLString str = args.back().toString();
-    DLString result = *this;
-    
-    try {
-        RegExp re( pattern.c_str() );
-        RegExp::MatchVector mv;
-        
-        mv = re.subexpr( str.c_str() );
-        if (mv.size() == 0)
-            return result;
-
-        for (int i = mv.size() - 1; i >= 0; i--) {
-            DLString num;
-            num << "$" << i + 1;
-            result.replaces(num, mv[i]);            
-        }
-        
-    } catch( const std::exception &e ) {
-        throw Exception(e.what());
-    }
-
-    return result;
-}
 
 NMI_INVOKE(FeniaString, matchGroups, "(pattern): возвращает список (List) из всех групп шаблона") 
 {
@@ -270,23 +241,15 @@ NMI_INVOKE(FeniaString, stripTags, "(): удаляет все специальн
 
 NMI_INVOKE(FeniaString, contains, "(words): true если эта строка содержит одно из слов из строки words")
 {
-    char strbuf[size( )];
-    char *p_strbuf = strbuf;
-    char *s_tok;
-    
-    if (args.empty())
-        throw NotEnoughArgumentsException();
-        
-    const char *arg = args.front( ).toString( ).c_str( );
-    strcpy(strbuf, c_str( ));
+    DLString words = args2string(args);
 
-    while (( s_tok = strtok( p_strbuf, " " ) ) != NULL) {
-        p_strbuf = NULL;
+    StringList thisList(*this);
 
-        if (::is_name( s_tok, arg ))
+    for (auto &thiz: thisList) {
+        if (::is_name(thiz.c_str(), words.c_str()))
             return true;
     }
-    
+
     return false;
 }
 
