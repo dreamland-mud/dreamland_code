@@ -164,7 +164,6 @@ bool CClanTalk::visible( Character *ch ) const
 
 void clantalk( Clan &clan, const DLString &message )
 {
-    va_list ap;
     ostringstream buf;
     
     buf << "{" << clan.getColor( ) 

@@ -92,5 +92,6 @@ GLOBALREF_DECL(Behavior)
 XMLGLOBALREF_DECL(Behavior)
 
 
+#define BHV(var) static BehaviorReference bhv_##var( #var )
 
 #endif

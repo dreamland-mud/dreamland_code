@@ -8,9 +8,13 @@
 #include "wrapperbase.h"
 #include "xmlregister.h"
 #include "register-decl.h"
+#include "globalbitvector.h"
+#include "stringset.h"
+#include "reglist.h"
 
 using Scripting::Register;
 using Scripting::RegisterList;
+
 class RegList;
 class Object;
 class Character;
@@ -27,6 +31,7 @@ class DefaultSpell;
 class SpellTarget;
 class Affect;
 class WrappedCommand;
+class GlobalBitvector;
 
 Register wrap( ::Object * );
 Register wrap( struct obj_index_data * );
@@ -76,6 +81,44 @@ const FlagTable * arg2table(const Register &);
 const FlagTable * argnum2table(const RegisterList &args, int num);
 ::Pointer<SpellTarget> arg2target(const Register &arg);
 ::Pointer<SpellTarget> argnum2target(const RegisterList &args, int num);
+RegList * arg2reglist(const Register &arg);
+
+template<typename Elem> inline
+void arg2globalBitvector(const Register &arg, GlobalBitvector &field)
+{
+    GlobalRegistry<Elem> *registry = static_cast<GlobalRegistry<Elem>*>(field.getRegistry());
+    GlobalBitvector newField(registry);
+    
+    StringSet values;
+
+    if (arg.type == Register::OBJECT) {
+        RegList *regList = arg2reglist(arg);
+        for (auto &reg: *regList)
+            values.insert(reg.toString());
+
+    } else if (arg.type == Register::STRING) {
+        values.fromString(arg.toString());
+
+    } else if (arg.type == Register::NONE) {
+        field.clear();
+        return;
+
+    } else {
+        throw Scripting::Exception("Invalid value for global bitvector");
+    }
+
+    for (auto &v: values) {
+        Elem *elem = registry->findExisting(v);
+        if (!elem)
+           throw Scripting::Exception("Global element not found for " + v);
+
+        newField.set(elem->getIndex());
+    }
+
+    field.clear();
+    field.set(newField);
+}
+
 
 #endif
 

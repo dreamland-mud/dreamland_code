@@ -35,6 +35,10 @@ namespace JsonUtils {
 
     /** Get a representation of a JSON array as a Fenia array. */
     Scripting::Register toRegContainer(const Json::Value &jsonArray);
+
+    /** Find string value with given key in the object or in a obj within this object. */
+    DLString findValue(const Json::Value &jsonObj, const DLString &key);
+
 }
 
 #endif

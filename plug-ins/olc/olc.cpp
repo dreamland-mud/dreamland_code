@@ -543,33 +543,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "healers") {
-        ostringstream buf;
-        Character *wch_next;
-
-        for (Character *wch = char_list; wch; wch = wch_next) {
-            wch_next = wch->next;
-
-            if (!wch->is_npc())
-                continue;
-
-            NPCharacter *mob = wch->getNPC();
-            if (!mob_has_occupation(mob, OCC_HEALER))
-                continue;
-
-            mob->pIndexData->properties["healer"] = "";
-            mob->pIndexData->area->changed = true;
-            mob->pIndexData->behavior.clear();
-
-            buf << fmt(0, "%^C1 [%d] from '%N1'", mob, mob->pIndexData->vnum, mob->pIndexData->area->name) << endl;
-
-            extract_char(mob, true);
-        }
-
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
     const int maxlines = 40;
 
     // Show size info for the first 40 mobs that don't have "sizeConfirmed" attribute. 
@@ -603,7 +576,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 return;
             }
 
-            pMob->properties["sizeConfirmed"] = "true";
+            pMob->props["olc"]["sizeConfirmed"] = "true";
             pMob->area->changed = true;
             ch->pecho("Mob %d size is %s. Mob hidden from output.", vnum.getValue(), verb.c_str());
             __do_abc(ch, const_cast<char *>(arg.c_str()));
@@ -624,7 +597,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 continue;
             }
 
-            if (pMob->properties.count("sizeConfirmed") > 0)
+            if (!pMob->getProperty("sizeConfirmed").empty())
                 continue;
 
             bitnumber_t raceSize = race->getSize();
@@ -663,7 +636,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 continue;
             }
 
-            if (pMob->properties.count("partConfirmed") > 0)
+            if (!pMob->getProperty("partConfirmed").empty())
                 continue;
 
             bitstring_t raceParts = race->getParts();
@@ -712,7 +685,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 continue;
             }
 
-            if (pMob->properties.count("affConfirmed") > 0)
+            if (!pMob->getProperty("affConfirmed").empty())
                 continue;
 
             bitstring_t raceAff = race->getAff();
@@ -761,7 +734,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
                 continue;
             }
 
-            if (pMob->properties.count("formConfirmed") > 0)
+            if (!pMob->getProperty("formConfirmed").empty())
                continue;
 
             bitstring_t raceForm = race->getForm();
@@ -815,7 +788,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
     if (arg == "hide") {
         DLString propName = arg2 + "Confirmed";
-        pMob->properties[propName] = "true";
+        pMob->props["olc"][propName] = "true";
         pMob->area->changed = true;
         ch->pecho("Mob %d is now hidden from 'abc %s' output.", vnum.getValue(), arg2.c_str());
         __do_abc(ch, const_cast<char *>(arg2.c_str()));

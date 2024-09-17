@@ -16,6 +16,7 @@
 #include "act_lock.h"
 #include "weapons.h"
 #include "liquid.h"
+#include "weapontier.h"
 #include "def.h"
 
 static int skill_lookup( const DLString &name )
@@ -155,7 +156,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
 
     case ITEM_WEAPON:
-        random = obj->properties.count("random");
+        random = item_is_random(obj);
 
         ptc(ch, "[v0] Вид оружия:   %s {D(? weapon_class){x\n\r",
             weapon_class.name(obj->value[0]).c_str());

@@ -406,6 +406,9 @@ struct        mob_index_data
     ClanReference clan;
 
     int getSize() const;
+
+    /** Return props value for the key (props[key] or props["xxx"][key]) or legacy property. */
+    DLString getProperty(const DLString &key) const;
 };
 
 
@@ -460,6 +463,9 @@ struct        obj_index_data
 
     GlobalBitvector behaviors;
     Json::Value props;
+
+    /** Return props value for the key (props[key] or props["xxx"][key]) or legacy property. */
+    DLString getProperty(const DLString &key) const;
 };
 
 

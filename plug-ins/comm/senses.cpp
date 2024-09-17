@@ -43,10 +43,25 @@ CMDRUNP( listen )
 
     argument = one_argument( argument, arg );
 
-    if (!arg[0]) {
-        ch->pecho("Послушать что?");
+    if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
+        bool rc = false;
+
+        oldact("Ты прислушиваешься.", ch, 0, 0, TO_CHAR);
+        oldact("$c1 прислушивается.", ch, 0, 0, TO_ROOM);
+
+        // Can add onListen triggers here for room and all affects on it.
+
+        if (!ch->in_room->pIndexData->sound.empty()) {
+            ch->pecho(ch->in_room->pIndexData->sound);
+            rc = true;
+        }
+
+        if (!rc)
+            ch->pecho("Ты не слышишь ничего особенного вокруг.");
+
         return;
     }
+
 
     if ( ( obj = get_obj_wear_carry( ch, arg, 0 ) ) 
          || ( obj = get_obj_room( ch, arg ) ))
@@ -157,9 +172,9 @@ CMDRUNP( smell )
             rc = true;
 
         if (!rc) {
-            Properties::const_iterator p = ch->in_room->pIndexData->properties.find( "smell" );
-            if (p != ch->in_room->pIndexData->properties.end( )) {
-                ch->pecho(p->second);
+            DLString smell = ch->in_room->pIndexData->smell;
+            if (!smell.empty()) {
+                ch->pecho(smell);
                 rc = true;
             }
         }

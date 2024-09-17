@@ -11,12 +11,14 @@
 #include "json_utils.h"
 #include "loadsave.h"
 #include "pet.h"
+#include "behavior.h"
 
 #include "mobindexwrapper.h"
 #include "wrappermanager.h"
 #include "structwrappers.h"
 #include "reglist.h"
 #include "nativeext.h"
+#include "regcontainer.h"
 #include "register-impl.h"
 #include "wrap_utils.h"
 
@@ -183,11 +185,57 @@ NMI_INVOKE( MobIndexWrapper, property, "(name, defaultValue): свойство �
     DLString name = args2string(args);
     Register defaultValue = args.size() > 1 ? args.back() : Register();
 
+    // Look in JSON props first
+    DLString jsonValue = JsonUtils::findValue(target->props, name);
+    if (jsonValue != "ERROR") 
+        return jsonValue;
+
+    // Then in legacy properties
     Properties::const_iterator p = target->properties.find(name);
-    if (p == target->properties.end())
-        return defaultValue;
-    else
+    if (p != target->properties.end())
         return Register(p->second);
+
+    return defaultValue;
+}
+
+NMI_INVOKE(MobIndexWrapper, setProp, "(key,subkey,value): установить значение props[key][subkey] в value")
+{
+    checkTarget();
+    DLString key = argnum2string(args, 1);
+    DLString subkey = argnum2string(args, 2);
+    DLString value = argnum2string(args, 3);
+
+    if (value.isNumber()) {
+        target->props[key][subkey] = value.toInt();
+    } else {
+        target->props[key][subkey] = value;
+    }
+
+    target->area->changed = true;
+    
+    return Register();
+}
+
+NMI_GET(MobIndexWrapper, properties, "Array (массив) из legacy свойств прототипа") 
+{
+    checkTarget();
+
+    Scripting::Register result = Register::handler<RegContainer>();
+    RegContainer *array = result.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto p: target->properties) {
+        array->setField(p.first, p.second);
+    }
+
+    return result;    
+}
+
+NMI_INVOKE(MobIndexWrapper, clearProperties, "(): очистка всех legacy свойств прототипа")
+{
+    checkTarget();
+    target->properties.clear();
+    target->area->changed = true;
+    return Register();
 }
 
 NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 
@@ -250,6 +298,27 @@ NMI_INVOKE(MobIndexWrapper, createFor, "(ch): создать экземпляр 
         pet->config(client, pet->getChar());
         
     return WrapperManager::getThis( )->getWrapper( mob ); 
+}
+
+NMI_GET(MobIndexWrapper, behaviors, "список имен всех поведений")
+{
+    checkTarget();
+
+    RegList::Pointer rc(NEW);
+
+    for (auto &b: target->behaviors.toSet()) 
+        rc->push_back(
+            Register(
+                behaviorManager->find(b)->getName()));
+
+    return ::wrap(rc);
+}
+
+NMI_SET(MobIndexWrapper, behaviors, "список имен всех поведений")
+{
+    checkTarget();
+    arg2globalBitvector<Behavior>(arg, target->behaviors);
+    target->area->changed = true;
 }
 
 NMI_GET(MobIndexWrapper, props, "Map (структура) из свойств поведения, ключ - имя поведения") 

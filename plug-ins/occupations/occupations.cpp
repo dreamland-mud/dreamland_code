@@ -7,6 +7,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "object.h"
+#include "behavior.h"
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
@@ -52,16 +53,6 @@ static const char * occ_type2name(int occType)
     return occ_names[occType];
 }
 
-static bool check_occupation_via_property(NPCharacter *mob, int occType)
-{
-    const char *occName = occ_type2name(occType);
-
-    if (!occName)
-        return false;
-
-    return mob->pIndexData->properties.count(occName) > 0;
-}
-
 /**
   This method checks if mob behavior class supports specified occupation.
   Alternatively, it checks for a corresponding property on mob's prototype to exist.
@@ -79,9 +70,21 @@ bool mob_has_occupation( NPCharacter *mob, const char *occName )
 
 bool mob_has_occupation( NPCharacter *mob, int occType )
 {
-    if (check_occupation_via_property(mob, occType))
+    const char *occName = occ_type2name(occType);
+
+    if (!occName)
+        return false;
+
+    // Old-style 'healer' property, to be removed
+    if (mob->pIndexData->properties.count(occName) > 0)
         return true;
 
+    // Mob behaviors: try to find existing behavior called occName and see if it's assigned
+    Behavior *bhv = behaviorManager->findExisting(occName);
+    if (bhv && mob->pIndexData->behaviors.isSet(bhv))
+        return true;
+
+    // Old-style behavior
     return mob->behavior 
            && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
 }

@@ -428,3 +428,19 @@ int arg2door(const Register &arg)
     
     return door;
 }
+
+RegList * arg2reglist(const Register &arg)
+{
+    if (arg.type != Register::OBJECT)
+        throw Scripting::Exception("Argument is not an object");
+
+    Scripting::Object *obj = arg.toObject();
+    if (!obj || !obj->hasHandler())
+        throw Scripting::Exception("Argument is not a valid object");
+
+    RegList *list = obj->getHandler().getDynamicPointer<RegList>();
+    if (!list)
+        throw Scripting::Exception("Argument is not a valid List");
+
+    return list;
+}

@@ -1,7 +1,10 @@
 #include "weapontier.h"
 #include "core/object.h"
+#include "behavior.h"
 #include "merc.h"
 #include "def.h"
+
+BHV(random_weapon);
 
 /*-----------------------------------------------------------------------------
  * Weapon tiers
@@ -46,11 +49,12 @@ int get_item_tier(Object *obj)
 
 int get_item_tier(OBJ_INDEX_DATA *pObj)
 {
-    Properties::const_iterator p = pObj->properties.find("bestTier");
-    if (p == pObj->properties.end())
+    DLString tierName = pObj->getProperty("bestTier");
+
+    if (tierName.empty())
         return 0;
 
-    return valid_tier(p->second);
+    return valid_tier(tierName);
 }
 
 DLString get_tier_aura(Object *obj)
@@ -66,6 +70,6 @@ DLString get_tier_aura(Object *obj)
 
 bool item_is_random(obj_index_data *pObj) 
 {
-    return pObj->properties.count("random") > 0;
+    return pObj->behaviors.isSet(bhv_random_weapon);
 }
 

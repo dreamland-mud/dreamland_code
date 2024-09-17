@@ -835,14 +835,6 @@ NMI_INVOKE(ObjectWrapper, hasWeaponFlag, "(flags): выставлен ли хо�
     return Register(IS_WEAPON_STAT(target, flags) != 0);
 }
 
-NMI_INVOKE(ObjectWrapper, getProperty, "(name): вернет значение property с экземпляра или прототипа, либо пустую строку")
-{
-    checkTarget();
-    DLString propName = args2string(args);
-    DLString propValue = target->getProperty(propName);
-    return propValue;
-}
-
 NMI_INVOKE(ObjectWrapper, setProperty, "(name,value): установить значение property с данным именем на экземпляре")
 {
     checkTarget();

@@ -124,6 +124,27 @@ Scripting::Register JsonUtils::toRegContainer(const Json::Value &jsonArray)
     return result;
 }
 
+DLString JsonUtils::findValue(const Json::Value &jsonObj, const DLString &key)
+{
+    if (!jsonObj.isObject())
+        return JSON_ERROR;
+
+    // Look for string values in obj["key"] as well as in obj["blah"]["key"].
+    for (auto p1 = jsonObj.begin(); p1 != jsonObj.end(); p1++) {
+        if (p1->isObject()) {
+            for (auto p2 = p1->begin(); p2 != p1->end(); p2++) {
+                if (p2->isString() && p2.key().asString() == key)
+                    return p2->asString();
+            }
+        } else if (p1->isString()) {
+            if (p1.key().asString() == key)
+                return p1->asString();
+        }
+    }
+
+    return JSON_ERROR;
+}
+
 Scripting::Register JsonUtils::toIdContainer(const Json::Value &jsonObj)
 {
     if (!jsonObj.isObject())

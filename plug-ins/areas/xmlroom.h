@@ -51,6 +51,8 @@ public:
     XML_VARIABLE XMLListBase<XMLExtraDescr> extraDescr;
     XML_VARIABLE XMLIntegerNoDef<100> manaRate, healRate;
     XML_VARIABLE XMLStringNoEmpty liquid;
+    XML_VARIABLE XMLStringNoEmpty smell;
+    XML_VARIABLE XMLStringNoEmpty sound;
     XML_VARIABLE XMLResetList resets;
     XML_VARIABLE XMLStringNode behavior;
     XML_VARIABLE XMLGlobalBitvector behaviors;

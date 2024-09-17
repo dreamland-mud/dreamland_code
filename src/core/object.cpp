@@ -425,15 +425,12 @@ int Object::getWeightMultiplier( ) const
 
 DLString Object::getProperty(const DLString &key) const
 {
+    // Find legacy property on the item itself
     Properties::const_iterator p = properties.find(key);
     if (p != properties.end())
         return p->second;
     
-    p = pIndexData->properties.find(key);
-    if (p != pIndexData->properties.end())
-        return p->second;
-    
-    return DLString::emptyString;
+    return pIndexData->getProperty(key);
 }
 
 void Object::removeProperty(const DLString &key)

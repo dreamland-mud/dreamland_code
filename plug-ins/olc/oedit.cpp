@@ -50,6 +50,8 @@
 
 OLC_STATE(OLCStateObject);
 
+BHV(random_weapon);
+
 OLCStateObject::OLCStateObject( )
 {
     /*fromXML will fill fields for us*/
@@ -303,7 +305,7 @@ OEDIT(show)
 
     ptc(ch, "Weight:      [%5d]\n\r", pObj->weight);
     
-    if (!pObj->properties.count("random"))
+    if (!pObj->behaviors.isSet(bhv_random_weapon))
         ptc(ch, "Cost:        [%5d]\n\r", pObj->cost);
 
     if (pObj->extra_descr) {
@@ -574,21 +576,16 @@ OEDIT(random)
     }
 
     if (arg_is_clear(arg)) {
-        Properties::iterator p = pObj->properties.find("random");
-        if (p == pObj->properties.end()) {
+
+        if (!pObj->behaviors.isSet(bhv_random_weapon)) {
             stc("This weapon is not random.\r\n", ch);
             return false;
         }
 
-        pObj->properties.erase(p);
+        pObj->behaviors.remove(bhv_random_weapon);
+        pObj->props.removeMember(bhv_random_weapon->getName());
+
         stc("This weapon is no longer random.\r\n", ch);
-
-        p = pObj->properties.find("bestTier");
-        if (p != pObj->properties.end()) {
-            pObj->properties.erase(p);
-            stc("bestTier property is removed.\r\n", ch);
-        }
-
         return true;
     }
 
@@ -598,8 +595,10 @@ OEDIT(random)
     }
 
     pObj->affected.deallocate();
-    pObj->properties["random"] = "true";
-    pObj->properties["bestTier"] = bestTier.toString();
+    pObj->behaviors.set(bhv_random_weapon);
+    pObj->props[bhv_random_weapon->getName()]["random"] = "true";
+    pObj->props[bhv_random_weapon->getName()]["bestTier"] = bestTier.toString();
+    
     ptc(ch, "This weapon is now random, bestTier set to %d, affects removed.\r\n", bestTier.getValue());
     return true;
 }

@@ -270,6 +270,12 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     ptc(ch, "Sector:     [{W%s{x] {D(? sector_table){x ",
               sector_table.name(pRoom->sector_type).c_str());
     ptc(ch, "Liquid: [{W%s{x] {D(? liquid){x\n\r", pRoom->liquid->getName( ).c_str( ));
+    ptc(ch, "Smell:      [{W%s{x] %s {D(smell){x\n\r", 
+            pRoom->smell.c_str(),
+            web_edit_button(showWeb, ch, "smell", "web").c_str());
+    ptc(ch, "Sound:      [{W%s{x] %s {D(sound){x\n\r", 
+            pRoom->sound.c_str(),
+            web_edit_button(showWeb, ch, "sound", "web").c_str());
         
     ptc(ch, "Flags:      [{W%s{x] {D(? room_flags){x\n\r",
               room_flags.names(pRoom->room_flags).c_str());
@@ -1023,6 +1029,24 @@ REDIT(desc, "описание", "войти в редактор описания
     EDIT_ROOM(ch, pRoom);
 
     return editor(argument, pRoom->description);
+}
+
+REDIT(sound, "звук", "войти в редактор звука комнаты (sound help)")
+{
+    RoomIndexData *pRoom;
+
+    EDIT_ROOM(ch, pRoom);
+
+    return editor(argument, pRoom->sound);
+}
+
+REDIT(smell, "запах", "войти в редактор запаха комнаты (smell help)")
+{
+    RoomIndexData *pRoom;
+
+    EDIT_ROOM(ch, pRoom);
+
+    return editor(argument, pRoom->smell);
 }
 
 REDIT(heal, "здоровье", "установить скорость восстановления здоровья и шагов в комнате (100-400)")

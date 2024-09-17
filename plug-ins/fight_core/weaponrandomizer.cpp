@@ -129,7 +129,7 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
     adjustTimer(obj);
 
     if (obj->getProperty("random").empty())
-        return;
+        return; 
 
     if (!obj->getProperty("tier").empty())
         return;

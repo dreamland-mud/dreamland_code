@@ -78,6 +78,8 @@ struct RoomIndexData : public virtual DLObject, public WrapperTarget {
     ClanReference clan;
     GlobalBitvector guilds;
     LiquidReference liquid;
+    DLString smell;
+    DLString sound;
     Properties properties;
     ::Pointer<XMLDocument> behavior;
     GlobalBitvector behaviors;

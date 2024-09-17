@@ -75,7 +75,7 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
         buf << web_menu(commands, id, label) << " ";
     }
 
-    if (pReset->rand != RAND_NONE || pObjIndex->properties.count("random") > 0) {
+    if (pReset->rand != RAND_NONE || item_is_random(pObjIndex)) {
         DLString id = "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset) + " tier";
 
         StringList commands;

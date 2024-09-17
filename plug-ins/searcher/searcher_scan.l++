@@ -305,7 +305,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         p.d2 = pObj->value[2];
         p.ave = (1 + p.d2) * p.d1 / 2; 
         p.damage = weapon_flags.name(pObj->value[3]);
-        p.random = pObj->properties.count("random") > 0;
+        p.random = item_is_random(pObj);
         p.tier = get_item_tier(pObj);
     }
 
