@@ -196,10 +196,12 @@ WrappersPlugin::initialization( )
     Class::regMoc<BehaviorWrapper>();
     
     FeniaManager::getThis( )->recover( );
-    
+        
     DLScheduler::getThis()->putTaskNOW( ValidateTask::Pointer(NEW) );
 
     linkTargets();
+
+    Scripting::gc = true;
 
     if (dreamland->hasOption(DL_BUILDPLOT))
         return;

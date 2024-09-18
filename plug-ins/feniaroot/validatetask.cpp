@@ -35,8 +35,6 @@ ValidateTask::run( )
     Scripting::FunctionManager::iterator fi;
     Scripting::CodeSource::Manager::iterator si;
 
-    Scripting::gc = true;
-
     for(oi = Scripting::Object::manager->begin(); oi != Scripting::Object::manager->end(); oi++)
         if (oi->refcnt <= 0 && oi->hasHandler( )) {
             ostream &os = LogStream::sendWarning( ) 
