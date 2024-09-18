@@ -273,7 +273,7 @@ static bool afprog_spec(Character *ch)
 
 static bool mprog_special( Character *ch )
 {
-    if (behavior_trigger(ch, "Spec", ""))
+    if (behavior_trigger(ch, "Spec", "C", ch))
         return true;
 
     FENIA_CALL( ch, "Spec", "" );
