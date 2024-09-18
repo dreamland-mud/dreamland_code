@@ -11,25 +11,6 @@
 #include "russianstring.h"
 
 /*
- * Compare strings, case insensitive.
- * Return true if different
- *   (compatibility with historical functions).
- */
-bool str_not_equal( const char *astr, const char *bstr )
-{
-    if (!astr || !bstr)
-        return true;
-
-    for ( ; *astr || *bstr; astr++, bstr++ )
-    {
-        if (dl_tolower(*astr) != dl_tolower(*bstr))
-            return true;
-    }
-
-    return false;
-}
-
-/*
  * str_cmp: a case-insensitive version of strcmp().
  * Returns: 0 if equal, > 0 if arg1 > arg2, or < 0 if arg1 < arg2.
  *
@@ -50,26 +31,6 @@ int str_cmp( const char *astr, const char *bstr )
 
     return 0;
 }
-
-/*
- * strn_cmp: a case-insensitive version of strncmp().
- * Returns: 0 if equal, > 0 if arg1 > arg2, or < 0 if arg1 < arg2.
- *
- * Scan until strings are found different, the end of both, or n is reached.
- */
-int strn_cmp(const char *arg1, const char *arg2, int n) {
-    int chk, i;
-
-    if (arg1 == NULL || arg2 == NULL) 
-        return 0;
-
-    for (i = 0; (arg1[i] || arg2[i]) && (n > 0); i++, n--)
-        if ((chk = dl_tolower(arg1[i]) - dl_tolower(arg2[i])) != 0)
-            return chk; /* not equal */
-
-    return 0;
-}
-
 
 /*
  * Compare strings, case insensitive, for prefix matching.
@@ -110,19 +71,6 @@ bool is_number( const char *arg )
 
     return true;
 }
-
-bool is_positive_number( const char *arg )
-{
-    if (!is_number( arg ))
-        return false;
-    
-    if (*arg == '-')
-        return false;
-    
-    return true;
-}
-
-
 
 
 /*
