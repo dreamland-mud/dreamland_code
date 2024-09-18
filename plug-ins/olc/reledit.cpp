@@ -138,6 +138,11 @@ void OLCStateReligion::show( PCharacter *ch )
         r->minage > 0 ? DLString(r->minage).c_str() : "0",
         r->maxage > 0 ? DLString(r->maxage).c_str() : "");
 
+    ptc(ch, "Покровительство:   расы {Y%s {D(prace){x классы {Y%s {D(pclass){x кланы {Y%s {D(pclan){x\r\n",
+         r->patronsRaces.empty() ? "-": r->patronsRaces.toString().c_str(),
+         r->patronsClasses.empty() ? "-": r->patronsClasses.toString().c_str(),
+         r->patronsClans.empty() ? "-": r->patronsClans.toString().c_str());
+         
     ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");        
 }
 
@@ -245,6 +250,22 @@ RELEDIT(age, "возраст", "ограничить по возрасту")
     DefaultReligion *r = getOriginal();
     return rangeEdit(0, 10000, r->minage, r->maxage);
 }
+
+RELEDIT(praces, "прасы", "покровительство расам")
+{
+    return globalBitvectorEdit<Race>(getOriginal()->patronsRaces);
+}
+
+RELEDIT(pclasses, "пклассы", "покровительство классам")
+{
+    return globalBitvectorEdit<Profession>(getOriginal()->patronsClasses);
+}
+
+RELEDIT(pclans, "пкланы", "покровительство кланам")
+{
+    return globalBitvectorEdit<Clan>(getOriginal()->patronsClans);
+}
+
 
 RELEDIT(commands, "команды", "показать список встроенных команд edit")
 {

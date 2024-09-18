@@ -111,6 +111,9 @@ public:
     XML_VARIABLE XMLGlobalBitvector clans;
     XML_VARIABLE XMLIntegerNoEmpty minage, maxage;
     XML_VARIABLE XMLIntegerNoEmpty tattooVnum;
+    XML_VARIABLE XMLGlobalBitvector patronsRaces;
+    XML_VARIABLE XMLGlobalBitvector patronsClasses;
+    XML_VARIABLE XMLGlobalBitvector patronsClans;
 };
 
 inline const Flags & DefaultReligion::getAlign() const

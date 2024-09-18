@@ -107,7 +107,10 @@ DefaultReligion::DefaultReligion( )
                   sex( SEX_MALE, &sex_table ),
                   flags( 0, &religion_flags ),
                   minstat(&stat_table), maxstat(&stat_table),
-                  clans(clanManager)
+                  clans(clanManager),
+                  patronsRaces(raceManager),
+                  patronsClasses(professionManager),
+                  patronsClans(clanManager)
 
 {
 }

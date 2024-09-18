@@ -720,7 +720,6 @@ NMI_GET( WearlocWrapper, purpose, "описание Надевается на...
 }
 
 
-
 /*----------------------------------------------------------------------
  * Material
  *----------------------------------------------------------------------*/
@@ -1272,6 +1271,17 @@ NMI_INVOKE( ReligionWrapper, reasonWhy, "(ch): НОВАЯ ЛОГИКА - при�
     Character *ch = args2character(args);
     return getTarget()->reasonWhy(ch);
 }
+
+NMI_INVOKE(ReligionWrapper, patrons, "(ch): true если покровительствует расе, классу или клану персонажа")
+{
+    Character *ch = args2character(args);
+    DefaultReligion *rel = getTarget();
+    return rel->patronsRaces.isSet(ch->getRace()) 
+            || rel->patronsClasses.isSet(ch->getProfession())
+            || rel->patronsClans.isSet(ch->getClan());
+}
+
+
 
 /*----------------------------------------------------------------------
  * Language
