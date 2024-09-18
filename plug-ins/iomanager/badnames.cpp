@@ -121,7 +121,7 @@ bool BadNames::nameRussian( const DLString &name ) const
 {
     DLString::const_iterator n;
     for (n = name.begin( ); n != name.end( ); n++)
-        if (!dl_isrusalpha( *n ))
+        if (!dl_is_cyrillic( *n ))
             return false;
 
     return true;

@@ -327,16 +327,14 @@ NMI_INVOKE(FeniaString, replace, "(s1,s2): заменяет все вхожде�
     return r;
 }
 
-NMI_INVOKE(FeniaString, isRussian, "(): возвращает true если строка не пуста и содержит только русские буквы")
+NMI_INVOKE(FeniaString, isRussian, "(): DEPRECATED")
 {
-    if (empty( ))
-        return false;
+    return this->isCyrillic();
+}
 
-    for (iterator i = begin(); i != end(); i++) 
-        if (!dl_isrusalpha( *i ) && !dl_isspace( *i ))
-            return false;
-
-    return true;
+NMI_INVOKE(FeniaString, isCyrillic, "(): возвращает true если строка не пуста и содержит только кириллицу")
+{
+    return this->isCyrillic();
 }
 
 NMI_INVOKE(FeniaString, toLower, "(): переводит всю строку в нижний регистр")

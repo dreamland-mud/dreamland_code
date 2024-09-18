@@ -124,7 +124,7 @@ bool Command::matchesExactly( const DLString &cmdName ) const
     if (getName( ) == cmdName || getRussianName( ) == cmdName)
         return true;
 
-    if (dl_isrusalpha( cmdName.at( 0 ) )) {
+    if (dl_is_cyrillic( cmdName.at( 0 ) )) {
         for (XMLStringList::const_iterator i = russian.begin( ); i != russian.end( ); i++) 
             if (*i == cmdName) 
                 return true;
@@ -156,7 +156,7 @@ bool Command::matchesAlias( const DLString& command ) const
     if (command.empty( ))
         return false;
     
-    if (dl_isrusalpha( command.at( 0 ) )) {
+    if (dl_is_cyrillic( command.at( 0 ) )) {
         for (XMLStringList::const_iterator r = russian.begin( ); r != russian.end( ); r++) 
             if (command.strPrefix( *r )) 
                 return true;

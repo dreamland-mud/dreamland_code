@@ -27,31 +27,58 @@ bool dl_isspace( char ch )
     }
 }
 
-bool dl_isrusalpha( char c )
+// Lower case cyrillic letters in koi8-u encoding
+static bool is_cyrillic_lower(char c)
 {
-    return (c >= 'Ю' && c < 'Ъ') 
-           || (c >= 'ю' && c <= 'ъ') 
-           || c == 'ё' 
-           || c == 'Ё';
+    if (c >= 'ю' && c <= 'ъ') 
+        return true;
+
+    switch (c) {
+        case 'і': case 'ґ': case 'ї': case 'є':
+            return true;
+        case 'ё':
+            return true; 
+    }
+
+    return false;
+}
+
+// Upper case cyrillic letters in koi8-u encoding
+static bool is_cyrillic_upper(char c)
+{
+    if (c >= 'Ю' && c < 'Ъ')
+        return true;
+
+    switch (c) {
+        case 'І': case 'Ґ': case 'Ї': case 'Є':
+            return true;
+        case 'Ё':
+            return true;
+    }
+
+    return false;
+}
+
+bool dl_is_cyrillic( char c )
+{
+    return is_cyrillic_lower(c) || is_cyrillic_upper(c);
 }
 
 bool dl_isalpha( char c )
 {
-    return isalpha(c) || dl_isrusalpha( c );
+    return isalpha(c) || dl_is_cyrillic( c );
 }
 
 bool dl_isupper( char c )
 {
     return isupper( c ) 
-            || (c >= 'Ю' && c < 'Ъ') 
-            || c == 'Ё';
+            || is_cyrillic_upper(c);
 }
 
 bool dl_islower( char c )
 {
     return islower( c )
-           || (c >= 'ю' && c <= 'ъ') 
-           || c == 'ё';
+           || is_cyrillic_lower(c);
 }
 
 bool dl_isalnum( char c )

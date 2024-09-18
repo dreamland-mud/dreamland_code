@@ -45,7 +45,7 @@ int RoomHistory::went( Character *ch ) const
 
 int RoomHistory::went( DLString &arg, bool fStrict ) const
 {
-    bool rus = arg.isRussian();
+    bool rus = arg.isCyrillic();
 
     for (const_iterator h = begin( ); h != end( ); h++) {
         DLString name = rus ? h->rname.ruscase('1') : h->name;

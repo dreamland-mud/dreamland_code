@@ -11,7 +11,7 @@ extern "C" {
 #endif
 bool dl_isspace( char );
 bool dl_isalpha( char );
-bool dl_isrusalpha( char );
+bool dl_is_cyrillic( char );
 bool dl_isupper( char );
 bool dl_islower( char );
 bool dl_isdelim( char );

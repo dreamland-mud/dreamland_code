@@ -310,7 +310,7 @@ public:
         bool lessCase( const DLString& str ) const;
         
         bool isNumber( ) const;
-        bool isRussian( ) const;
+        bool isCyrillic( ) const;
         
         /** убирает пробелы в начале и конце строки */
         inline DLString& stripWhiteSpace( )

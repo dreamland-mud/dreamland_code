@@ -77,7 +77,7 @@ extern "C" {
 /* === dl_ctype.h === */
 int dl_isspace( char );
 int dl_isalpha( char );
-int dl_isrusalpha( char );
+int dl_is_cyrillic( char );
 int dl_isupper( char );
 int dl_islower( char );
 int dl_isdelim( char );

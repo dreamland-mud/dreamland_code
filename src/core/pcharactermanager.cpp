@@ -64,7 +64,7 @@ PCMemoryInterface* PCharacterManager::find( const DLString& name )
     if (name.empty( ))
         return NULL;
 
-    if (name.isRussian( )) {
+    if (name.isCyrillic( )) {
         for (ipos = allList.begin( ); ipos != allList.end( ); ipos++)
             if (ipos->second->getRussianName( ).decline('7').isName( name ))
                 break;

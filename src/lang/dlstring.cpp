@@ -368,13 +368,13 @@ bool DLString::isNumber( ) const
     return true;
 }
 
-bool DLString::isRussian( ) const
+bool DLString::isCyrillic( ) const
 {
     if (empty( ))
         return false;
 
     for (size_type i = 0; i < length( ); i++) 
-        if (!dl_isrusalpha(at(i)) && !dl_isspace(at(i)))
+        if (!dl_is_cyrillic(at(i)) && !dl_isspace(at(i)))
             return false;
 
     return true;

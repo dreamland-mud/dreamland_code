@@ -126,7 +126,7 @@ DLString Syntax::label(const DLString &names)
 static bool name_is_en(const DLString &name)
 {
     for (unsigned int i = 0; i < name.size(); i++)
-        if (dl_isrusalpha(name.at(i)))
+        if (dl_is_cyrillic(name.at(i)))
             return false;
     return true;
 }
@@ -147,7 +147,7 @@ DLString Syntax::label_ru(const DLString &names)
     StringList labels(names.colourStrip());
 
     for (auto &l: labels)
-        if (l.isRussian())
+        if (l.isCyrillic())
             return l;
 
     return DLString::emptyString;

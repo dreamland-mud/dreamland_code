@@ -26,7 +26,7 @@ Command::Pointer CommandList::findExact( const DLString& name ) const
 {
     list<Command::Pointer>::const_iterator ipos;
 
-    if (name.isRussian( )) {
+    if (name.isCyrillic( )) {
         for (ipos = commands_ru.begin( ); ipos != commands_ru.end( ); ipos++) {
             if ((*ipos)->getRussianName( ) == name) 
                 return *ipos;
@@ -57,7 +57,7 @@ Command::Pointer CommandList::findUnstrict(const DLString& name) const
     if (name.empty())
         return Command::Pointer();
 
-    if (name.isRussian( )) {
+    if (name.isCyrillic( )) {
         for (auto &cmd: commands_ru) {
             if (name.strPrefix(cmd->getRussianName()))
                 return *cmd;
@@ -126,7 +126,7 @@ void CommandList::gatherHints(InterpretArguments &iargs) const
 Command::Pointer CommandList::chooseCommand( Character *ch, const DLString &name ) const
 {
     list<Command::Pointer>::const_iterator i;
-    const list<Command::Pointer> &mylist = name.isRussian( ) ? commands_ru : commands;
+    const list<Command::Pointer> &mylist = name.isCyrillic( ) ? commands_ru : commands;
 
     for (i = mylist.begin( ); i != mylist.end( ); i++) {
         Command::Pointer pCommand = *i;
