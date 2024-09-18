@@ -62,28 +62,4 @@ IdRef::operator Register ()
     return Register(id);
 }
 
-void
-XMLIdentifier::fromXML( const XMLNode::Pointer& parent )  
-{
-    XMLNode::Pointer node = parent->getFirstNode( );
-
-    if( node && (node->getType( ) == XMLNode::XML_CDATA || 
-                 node->getType( ) == XMLNode::XML_TEXT) )
-    {
-        value = Lex::getThis()->resolve(node->getCData( ));
-    }
-}
-
-bool
-XMLIdentifier::toXML( XMLNode::Pointer& parent ) const 
-{
-    XMLNode::Pointer node( NEW );
-    
-    node->setType( XMLNode::XML_TEXT );
-    node->setCData( Lex::getThis()->getName(value) );
-    
-    parent->appendChild( node );
-    return true;
-}
-
 }

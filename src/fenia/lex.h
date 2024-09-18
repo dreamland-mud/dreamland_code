@@ -12,10 +12,8 @@
 #define __LEX_H__
 
 #include <map>
-
 #include <dlstring.h>
-#include <oneallocate.h>
-#include <xmlvariable.h>
+#include "dlobject.h"
 
 using namespace std;
 
@@ -26,7 +24,7 @@ namespace Scripting {
 #define ID_ORIGIN   2 // parser's "this"
 #define ID_AUTO            100
 
-class Lex : virtual public DLObject, public OneAllocate {
+class Lex : public virtual DLObject {
 public:
     typedef unsigned long int id_t;
 
@@ -62,23 +60,6 @@ public:
     Lex::id_t id;
 };
 
-class XMLIdentifier : public XMLVariable {
-public:
-    XMLIdentifier() : value(0) { }
-    XMLIdentifier(Lex::id_t id) : value(id) { }
-
-    virtual void fromXML( const XMLNode::Pointer& parent ) ;
-    virtual bool toXML( XMLNode::Pointer& node ) const;
-
-    Lex::id_t getValue() const {
-        return value;
-    }
-    void setValue(Lex::id_t id) {
-        value = id;
-    }
-private:
-    Lex::id_t value;
-};
 
 }
 
