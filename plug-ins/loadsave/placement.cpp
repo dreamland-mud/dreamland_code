@@ -167,7 +167,6 @@ void obj_to_char( Object *obj, Character *ch )
 
         if ( ch->is_npc( )
                 && !IS_CHARMED(ch)
-                && !IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)
                 && ch->in_room != 0 )
         {
                 save_mobs( ch->in_room );
@@ -220,7 +219,6 @@ void obj_from_char( Object *obj )
 
         if ( ch->is_npc( )
                 && !IS_CHARMED(ch)
-                && !IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)
                 && ch->in_room != 0 )
         {
                 save_mobs( ch->in_room );
@@ -332,8 +330,7 @@ void obj_to_obj( Object *obj, Object *obj_to )
                 }
         }
 
-        if (!IS_SET(obj->extra_flags, ITEM_NOSAVEDROP) && !IS_SET(obj_to->extra_flags, ITEM_NOSAVEDROP))
-            save_items_at_holder( obj );
+        save_items_at_holder( obj );
 
         return;
 }
@@ -407,8 +404,7 @@ void obj_from_obj( Object *obj )
                 }
         }
 
-        if (!IS_SET(obj->extra_flags, ITEM_NOSAVEDROP) && !IS_SET(u_obj->extra_flags, ITEM_NOSAVEDROP))
-            save_items_at_holder( u_obj );
+        save_items_at_holder( u_obj );
 
         return;
 }
