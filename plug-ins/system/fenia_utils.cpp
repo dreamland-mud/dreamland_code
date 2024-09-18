@@ -52,7 +52,7 @@ bool gprog(const DLString &trigName, const char *fmt, ...)
         trigger_handler.toFunction()->invoke(tmp, args);
         return true;
     }
-    catch (const Scripting::Exception &e) {
+    catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
         FeniaManager::getThis()->croak(0, Scripting::Register(trigName), e);
         return false;

@@ -131,7 +131,7 @@ bool WrapperBase::call(Register &rc, const Register &progName, const Register &p
         rc = progFun.toFunction()->invoke(Register(self), progArgs);
         return true;
 
-    } catch (const Scripting::Exception &e) {
+    } catch (const ::Exception &e) {
         FeniaManager::getThis()->croak(this, progName, e);
     }
 

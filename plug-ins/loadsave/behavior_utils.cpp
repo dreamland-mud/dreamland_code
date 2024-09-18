@@ -44,7 +44,7 @@ static list<Register> behavior_trigger_with_result(
 			}
 		}
 
-	} catch (const Scripting::Exception &e) {
+	} catch (const ::Exception &e) {
         // On error, complain to the logs and to all immortals in the game.
 		DLString methodId = "behavior on" + trigType;
         FeniaManager::getThis()->croak(0, Scripting::Register(methodId), e);
