@@ -19,9 +19,7 @@ libmisc_behaviors_la_LIBADD = \
 $(LIBADD_AI)
 
 libmisc_behaviors_la_SOURCES = \
-anatolia_limits.cpp \
 midgaardfountain.cpp \
-pocketwatch.cpp \
 masquerade.cpp \
 ofcolguards.cpp \
 rats.cpp \
@@ -31,9 +29,7 @@ petquestor.cpp \
 impl.cpp 
 
 libmisc_behaviors_la_MOC = \
-anatolia_limits.h \
 midgaardfountain.h \
-pocketwatch.h \
 masquerade.h \
 ofcolguards.h \
 rats.h \

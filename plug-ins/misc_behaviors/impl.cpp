@@ -12,11 +12,9 @@
 #include "npcharacter.h"
 
 #include "midgaardfountain.h"
-#include "pocketwatch.h"
 #include "masquerade.h"
 #include "rats.h"
 #include "ofcolguards.h"
-#include "anatolia_limits.h"
 #include "moneychanger.h"
 #include "petquestor.h"
 
@@ -74,7 +72,6 @@ extern "C"
         Plugin::registerPlugin<SpecialProgsPlugin>( ppl );
 
         Plugin::registerPlugin<ObjectBehaviorRegistrator<MidgaardFountain> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<PocketWatch> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<MoneyChanger> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<PetQuestor> >( ppl );
         
@@ -88,20 +85,6 @@ extern "C"
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<OfcolMarshal> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<OfcolGuard> >( ppl );
-
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<Excalibur> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<HasteBracers> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<SubissueWeapon> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<TwoSnakeWhip> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<Thunderbolt> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<FireGauntlets> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<VolcanoeArmbands> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<DemonfireShield> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<FlyingBoots> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<GiantStrengthArmor> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<RoseShield> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<LionClaw> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<RingOfRa> >( ppl );
 
         return ppl;
     }

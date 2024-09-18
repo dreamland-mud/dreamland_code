@@ -117,10 +117,6 @@ bool ObjectBehavior::save( ) {
     return false;
 }
 
-bool ObjectBehavior::prompt( Character *ch, char letter, ostringstream &buf ) {
-    return false;
-}
-
 bool ObjectBehavior::command( Character *, const DLString &, const DLString & ) {
     return false;
 }

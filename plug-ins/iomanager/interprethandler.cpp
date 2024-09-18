@@ -224,16 +224,6 @@ void InterpretHandler::normalPrompt( Character *ch )
             handled = true;
         }
 
-        /*
-         * prompt-handling object behaviors
-         */
-        if (!handled)
-            for (Object *obj = ch->carrying; obj; obj = obj->next_content)
-                if (obj->behavior && obj->behavior->prompt( ch, *str, out )) {
-                    handled = true;
-                    break;
-                }
-
         if (handled) {
             ++str;
             continue;
@@ -308,6 +298,23 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'M' :
             out << ch->max_mana;
+            break;
+
+        case 'T':
+            if (!IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
+                int hour = time_info.hour;
+
+                out << ((hour % 12 == 0) ? 12 : hour % 12) << " ";
+
+                if ((hour > 16) && (hour < 24)) 
+                    out << "вечера";
+                if (hour < 4) 
+                    out << "ночи";
+                if ((hour > 3) && (hour < 12)) 
+                    out << "утра";
+                if ((hour > 11) && (hour < 17)) 
+                    out << "дня";
+            }
             break;
 
         case 'v' :

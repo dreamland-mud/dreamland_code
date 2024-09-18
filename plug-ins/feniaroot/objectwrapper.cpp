@@ -17,7 +17,7 @@
 #include "weapons.h"
 #include "occupations.h"
 #include "behavior.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 
 #include "grammar_entities_impl.h"
 #include "personalquestreward.h"
@@ -834,6 +834,12 @@ NMI_INVOKE(ObjectWrapper, hasWeaponFlag, "(flags): выставлен ли хо�
     }
     
     return Register(IS_WEAPON_STAT(target, flags) != 0);
+}
+
+NMI_GET(ObjectWrapper, props, "Map (структура) из свойств поведения, ключ - имя поведения")
+{
+    checkTarget();
+    return JsonUtils::toRegister(target->props);
 }
 
 NMI_INVOKE(ObjectWrapper, property, "(name, defaultValue): свойство предмета с именем name или значение по умолчанию")

@@ -51,7 +51,6 @@ public:
     virtual bool quit( Character *, bool ); 
     virtual bool examine( Character *victim );
     virtual bool use( Character *user, const char * );
-    virtual bool prompt( Character *ch, char letter, ostringstream &buf );
     virtual bool command( Character *, const DLString &, const DLString & );
     virtual DLString extraDescription( Character *ch, const DLString & );
     virtual bool visible( const Character * );
