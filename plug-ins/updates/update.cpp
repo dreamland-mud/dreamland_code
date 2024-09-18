@@ -273,6 +273,9 @@ static bool afprog_spec(Character *ch)
 
 static bool mprog_special( Character *ch )
 {
+    if (behavior_trigger(ch, "Spec", ""))
+        return true;
+
     FENIA_CALL( ch, "Spec", "" );
     FENIA_NDX_CALL( ch->getNPC( ), "Spec", "C", ch );
     BEHAVIOR_CALL( ch->getNPC( ), spec );
@@ -313,6 +316,9 @@ void mobile_update( )
 
 static bool mprog_area( Character *ch )
 {
+    if (behavior_trigger(ch, "Area", "C", ch))
+        return true;
+        
     FENIA_CALL( ch, "Area", "" );
     FENIA_NDX_CALL( ch->getNPC( ), "Area", "C", ch );
     BEHAVIOR_CALL( ch->getNPC( ), area );

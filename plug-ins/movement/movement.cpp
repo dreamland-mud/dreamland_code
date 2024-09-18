@@ -148,6 +148,10 @@ static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const
 static bool mprog_greet( Character *rch, Character *walker )
 {
     aquest_trigger(rch, walker, "Greet", "CC", rch, walker);
+
+    if (behavior_trigger(rch, "Greet", "CC", rch, walker))
+        return true;
+
     FENIA_CALL( rch, "Greet", "C", walker );
     FENIA_NDX_CALL( rch->getNPC( ), "Greet", "CC", rch, walker );
     BEHAVIOR_VOID_CALL( rch->getNPC( ), greet, walker );

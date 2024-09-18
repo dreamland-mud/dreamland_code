@@ -10,7 +10,7 @@
 #include "register-impl.h"
 #include "lex.h"
 #include "fenia_utils.h"
-
+#include "../loadsave/behavior_utils.h"
 #include "core/behavior/behavior_utils.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -183,6 +183,10 @@ static bool mprog_speech( Character *rch, Character *talker, const char *msg )
 {
     if (IS_AWAKE(rch)) {
         aquest_trigger(rch, talker, "Speech", "CCs", rch, talker, msg);
+
+        if (behavior_trigger(rch, "Speech", "CCs", rch, talker, msg))
+            return true;
+            
         FENIA_CALL( rch, "Speech", "Cs", talker, msg );
         FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
         BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );

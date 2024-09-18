@@ -1362,6 +1362,11 @@ bool omprog_give( Object *obj, Character *ch, Character *victim )
     if (obj->carried_by != victim)
         return true;
 
+    if (behavior_trigger(victim, "Give", "CCO", victim, ch, obj))
+        return true;
+    if (obj->carried_by != victim)
+        return true;
+
     FENIA_CALL( obj, "Give", "CC", ch, victim )
     if (obj->carried_by != victim)
         return true;
@@ -1468,6 +1473,9 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
 
 static bool mprog_bribe( Character *victim, Character *giver, int gold, int silver )
 {
+    if (behavior_trigger(victim, "Bribe", "CCii", victim, giver, gold, silver))
+        return true;
+        
     FENIA_CALL( victim, "Bribe", "Cii", giver, gold, silver );
     FENIA_NDX_CALL( victim->getNPC( ), "Bribe", "CCii", victim, giver, gold, silver );
     BEHAVIOR_VOID_CALL( victim->getNPC( ), bribe, giver, gold, silver );

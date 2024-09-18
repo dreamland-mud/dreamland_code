@@ -130,6 +130,9 @@ static void afprog_fight(Character *ch, Character *victim)
 
 static bool mprog_fight( Character *ch, Character *victim, string command )
 {
+    if (behavior_trigger(ch, "Fight", "CC", ch, victim))
+        return true;
+
     FENIA_CALL( ch, "Fight", "C", victim );
     FENIA_NDX_CALL( ch->getNPC( ), "Fight", "CC", ch, victim );
     BEHAVIOR_VOID_CALL( ch->getNPC( ), fight, victim, command );
@@ -138,7 +141,8 @@ static bool mprog_fight( Character *ch, Character *victim, string command )
 
 static bool oprog_fight( Object *obj, Character *ch )
 {
-    behavior_trigger(obj, "Fight", "OC", obj, ch);
+    if (behavior_trigger(obj, "Fight", "OC", obj, ch))
+        return true;
     
     FENIA_CALL( obj, "Fight", "C", ch );
     FENIA_NDX_CALL( obj, "Fight", "OC", obj, ch );
