@@ -97,6 +97,22 @@ Spell::Pointer SpellManager::lookup( const DLString &name, Character *ch )
 {
     StringList argList(name);
 
+    // First do basic lookup by string prefix, so that 'c word' matches 'c word of recall' first,
+    // and not 'holy word' (as per priority file).
+    for (SpellList::iterator i = spells.begin( ); i != spells.end( ); i++) {
+        Skill::Pointer skill = (*i)->getSkill( );
+        
+        if (!(*i)->isCasted( ))
+            continue;
+        if (!name.strPrefix(skill->getName()) && !name.strPrefix(skill->getRussianName()))
+            continue;
+        if (!skill->available(ch))
+            continue;
+
+        return *i;
+    }
+
+    // Do more complicated matching: 'c sup he' matches 'c superior heal'.
     for (SpellList::iterator i = spells.begin( ); i != spells.end( ); i++) {
         Skill::Pointer skill = (*i)->getSkill( );
         
