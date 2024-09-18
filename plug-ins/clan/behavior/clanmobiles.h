@@ -26,19 +26,6 @@ protected:
         XML_VARIABLE XMLClanReference clan;
 };
 
-class ClanHealer : public ClanMobile, public Healer {
-XML_OBJECT
-public:
-        typedef ::Pointer<ClanHealer> Pointer;
-    
-        ClanHealer( );
-
-        virtual int  getOccupation( );
-protected:
-        virtual bool specIdle( );
-        virtual bool canServeClient( Character * );
-};
-
 class ClanGuard : public ClanMobile, public BasicMobileDestiny {
 public:
         typedef ::Pointer<ClanGuard> Pointer;

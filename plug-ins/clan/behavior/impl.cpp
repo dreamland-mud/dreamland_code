@@ -29,7 +29,6 @@ extern "C"
         Plugin::registerPlugin<RoomBehaviorRegistrator<ClanPetShopStorage> >( ppl );
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuard> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanHealer> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanSummonedCreature> >( ppl );
 
         return ppl;

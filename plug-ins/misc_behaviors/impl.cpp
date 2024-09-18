@@ -12,10 +12,8 @@
 #include "npcharacter.h"
 
 #include "midgaardfountain.h"
-#include "masquerade.h"
 #include "rats.h"
 #include "ofcolguards.h"
-#include "moneychanger.h"
 #include "petquestor.h"
 
 extern struct spec_type local_spec_table[];
@@ -72,13 +70,8 @@ extern "C"
         Plugin::registerPlugin<SpecialProgsPlugin>( ppl );
 
         Plugin::registerPlugin<ObjectBehaviorRegistrator<MidgaardFountain> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<MoneyChanger> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<PetQuestor> >( ppl );
         
-        Plugin::registerPlugin<MobileBehaviorRegistrator<Masquer> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<RoamingPortal> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<CatsEye> >( ppl );
-                
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeRats> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<Rat> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<RatGod> >( ppl );

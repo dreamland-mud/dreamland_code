@@ -79,93 +79,6 @@ CLAN(lion);
 CLAN(flowers);
 
 /*--------------------------------------------------------------------------
- * Hunter's Cleric 
- *-------------------------------------------------------------------------*/
-void ClanHealerHunter::tell( Character *ach, const char *msg )
-{
-    speech(ach, msg);
-}
-
-void ClanHealerHunter::speech( Character *ach, const char *speech )
-{
-    PCharacter *wch;
-    Character *carrier;
-    Object *obj;
-    int vnum = 0;
-    ClanAreaHunter::Weapons::iterator i;
-    ClanAreaHunter::Pointer clanArea;
-    RegExp trouble("^(trouble|потеряла?) *(.*)$");
-    
-    if (!( wch = ach->getPC( ) ))
-        return;
-    if (!getClanArea( ))
-        return;
-    if (!( clanArea = getClanArea( ).getDynamicPointer<ClanAreaHunter>( ) ))
-        return;
-
-    RegExp::MatchVector matches = trouble.subexpr(speech);
-    if (matches.empty())
-        return;
-
-    DLString itemName = matches.at(1);
-    if (!( vnum = clanArea->vnumByString( itemName ) )) {
-        do_say(ch, "Я не понимаю, что именно ты хочешь вернуть?");
-        return;
-    }
-   
-    if (wch->getClan( ) != clanArea->getClan( )) {
-        do_say(ch, "Тебе придется сильно постараться!");
-        return;
-    }
-
-    if (!wch->getAttributes( ).isAvailable( "hunterarmor" )) {
-        do_say(ch, "Что ты имеешь в виду?");
-        return;
-    }
-    
-    obj = get_obj_world_unique( vnum, wch );
-    
-    if (!obj) {
-        do_say( ch, "Ты уже не сможешь найти свое оружие!" );
-    
-        if (vnum == clanArea->armorVnum) 
-            obj = clanArea->createArmor( wch );
-        else
-            obj = clanArea->createWeapon( wch, vnum );
-
-        obj_to_char( obj, wch );
-        
-        ch->recho("%^C1 создает %O4.", ch, obj);        
-        say_fmt("Я дам тебе друг%3$Gое|ой|ую %3$#O4.", ch, wch, obj);        
-        oldact("$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
-        oldact("$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
-        do_say( ch, "Будь внимательней! Не потеряй снова!" );
-        return;
-    }
-
-    if (( carrier = obj->getCarrier( ) )) {
-        if (carrier == wch) {
-            do_say( ch, "Это шутка такая? Давай посмеемся вместе!" );
-        }
-        else {
-            interpret_raw( ch, "say", "{1%s{2 находится у %s!",
-                            obj->getShortDescr( '1' ).c_str( ),
-                            wch->sees( carrier, '2' ).c_str( ) );
-            interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
-                            wch->sees( carrier, '1' ).c_str( ),
-                            carrier->in_room->areaName().c_str(),
-                            carrier->in_room->getName() );
-        }
-    }
-    else {
-        interpret_raw( ch, "say", "{1%s{2 находится в зоне %s около %s!",
-                        obj->getShortDescr( '1' ).c_str( ),
-                        obj->getRoom( )->areaName().c_str(), 
-                        obj->getRoom()->getName() );
-    }
-}
-
-/*--------------------------------------------------------------------------
  * Hunter's Clan Guard 
  *-------------------------------------------------------------------------*/
 void ClanGuardHunter::actPush( PCharacter *wch )
@@ -257,8 +170,6 @@ void HunterEquip::config( PCharacter *wch )
     obj->cost = 0;
     
     if (obj->pIndexData->extra_descr) {
-        char buf[MAX_STRING_LENGTH];
-
         DLString ed = fmt(0, obj->pIndexData->extra_descr->description, wch->getNameP('1').c_str());
         obj->addExtraDescr( obj->pIndexData->extra_descr->keyword, ed );
     }

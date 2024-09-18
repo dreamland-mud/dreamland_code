@@ -31,18 +31,8 @@ protected:
         void createEquipment( PCharacter * );
 };
 
-class ClanHealerHunter: public ClanHealer {
-XML_OBJECT
-public:
-        typedef ::Pointer<ClanHealerHunter> Pointer;
-    
-        void speech( Character *wch, const char *speech );
-        void tell( Character *wch, const char *speech );
-};
-
 class ClanAreaHunter: public ClanArea {
 XML_OBJECT
-friend class ClanHealerHunter;
 friend class ClanGuardHunter;
 public:
         typedef ::Pointer<ClanAreaHunter> Pointer;

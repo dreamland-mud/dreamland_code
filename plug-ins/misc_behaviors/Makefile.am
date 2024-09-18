@@ -20,20 +20,16 @@ $(LIBADD_AI)
 
 libmisc_behaviors_la_SOURCES = \
 midgaardfountain.cpp \
-masquerade.cpp \
 ofcolguards.cpp \
 rats.cpp \
 special.cpp \
-moneychanger.cpp \
 petquestor.cpp \
 impl.cpp 
 
 libmisc_behaviors_la_MOC = \
 midgaardfountain.h \
-masquerade.h \
 ofcolguards.h \
 rats.h \
-moneychanger.h \
 petquestor.h 
 
 
