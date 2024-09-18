@@ -51,6 +51,9 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
 
 static bool mprog_tell( Character *listener, Character *talker, const char *msg )
 {
+    if (behavior_trigger(listener, "Speech", "CCs", listener, talker, msg))
+        return true;
+
     FENIA_CALL( listener, "Tell", "Cs", talker, msg );
     FENIA_NDX_CALL( listener->getNPC( ), "Tell", "CCs", listener, talker, msg );
     BEHAVIOR_VOID_CALL( listener->getNPC( ), tell, talker, msg );
