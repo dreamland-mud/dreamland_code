@@ -19,7 +19,7 @@
 #include "merc.h"
 #include "profiler.h"
 #include "behavior.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 
 #include "structwrappers.h"
 #include "areaindexwrapper.h"
@@ -338,14 +338,14 @@ NMI_GET( RoomWrapper, down, "комната вниз отсюда или null")
 /*
  * METHODS
  */
-NMI_INVOKE(RoomWrapper, saveItems, "сохраняет все предметы на полу в комнате на диск")
+NMI_INVOKE(RoomWrapper, saveItems, "(): сохраняет все предметы на полу в комнате на диск")
 {
     checkTarget();
     save_mobs(target);
     return Register();
 }
 
-NMI_INVOKE(RoomWrapper, saveMobs, "сохраняет всех мобов в комнате на диск")
+NMI_INVOKE(RoomWrapper, saveMobs, "(): сохраняет всех мобов в комнате на диск")
 {
     checkTarget();
     save_items(target);

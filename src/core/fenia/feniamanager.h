@@ -5,6 +5,8 @@
 #ifndef __FENIAMANAGER_H__
 #define __FENIAMANAGER_H__
 
+#include "dlobject.h"
+#include "oneallocate.h"
 #include "fenia/object.h"
 #include "fenia/codesource.h"
 #include "fenia/context.h"

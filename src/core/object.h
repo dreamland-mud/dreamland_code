@@ -87,7 +87,10 @@ public:
     char              *  killer;  // for corpse
     int                  count;
     Grammar::MultiGender gram_gender;
-    Properties           properties;
+
+    // Contains overrides for index data 'behavior' props and custom values.
+    Json::Value props;
+    
     XMLPersistentStreamable<ObjectBehavior> behavior;
 
     /** ID of a container where this item was reset. */
@@ -165,7 +168,8 @@ public:
     void removeProperty(const DLString &key);
 
     /** Add property to the instance. */
-    void addProperty(const DLString &key, const DLString &value);
+    void setProperty(const DLString &key, const DLString &value);
+    void setProperty(const DLString &key, const DLString &subkey, const DLString &value);
 
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
 

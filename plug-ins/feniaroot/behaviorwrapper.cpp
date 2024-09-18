@@ -1,6 +1,6 @@
 #include "behaviorwrapper.h"
 #include "behavior.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 
 #include "wrappermanager.h"
 #include "reglist.h"

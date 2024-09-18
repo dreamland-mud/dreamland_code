@@ -787,7 +787,7 @@ void obj_update( void )
             && obj->pIndexData->limit != -1) 
         {
 
-            obj->addProperty("extract", "Внезапно появляется злобная домоуправительница и подметает %1$O4 на совок!");
+            obj->setProperty("extract", "Внезапно появляется злобная домоуправительница и подметает %1$O4 на совок!");
             extracted.push_back(obj);
             continue;
         }
@@ -836,14 +836,14 @@ void obj_update( void )
             
             if (carrier) {
                 if (chance( 40 )) {
-                    obj->addProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
+                    obj->setProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
                     extracted.push_back(obj);
                     continue;
                 }
             }
             else {
                 if (chance( 50 )) {
-                    obj->addProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
+                    obj->setProperty("extract", "%1$^O1 та%1$nет|ют от жара.");
                     extracted.push_back(obj);
                     continue;
                 }
@@ -860,14 +860,14 @@ void obj_update( void )
             
             if (carrier) {
                 if (!carrier->is_npc( ) && chance( 20 )) {
-                    obj->addProperty("extract", "%1$^O1 лопа%1$nется|ются от жары.");
+                    obj->setProperty("extract", "%1$^O1 лопа%1$nется|ются от жары.");
                     extracted.push_back(obj);
                     continue;
                 }
             }
             else {
                 if (chance( 30 )) {
-                    obj->addProperty("extract", "%1$^O1 разбива%1$nется|ются на мелкие осколки.");
+                    obj->setProperty("extract", "%1$^O1 разбива%1$nется|ются на мелкие осколки.");
                     extracted.push_back(obj);
                     continue;
                 }
@@ -965,7 +965,7 @@ void obj_update( void )
             }
         }
 
-        obj->addProperty("extract", message);
+        obj->setProperty("extract", message);
         extracted.push_back(obj);
     }
 

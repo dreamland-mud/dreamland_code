@@ -8,7 +8,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "merc.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 #include "loadsave.h"
 #include "pet.h"
 #include "behavior.h"
@@ -185,8 +185,8 @@ NMI_INVOKE( MobIndexWrapper, property, "(name, defaultValue): свойство �
     DLString name = args2string(args);
     Register defaultValue = args.size() > 1 ? args.back() : Register();
 
-    DLString jsonValue = JsonUtils::findValue(target->props, name);
-    if (jsonValue != "ERROR") 
+    DLString jsonValue;
+    if (JsonUtils::findValue(target->props, name, jsonValue))
         return jsonValue;
 
     return defaultValue;

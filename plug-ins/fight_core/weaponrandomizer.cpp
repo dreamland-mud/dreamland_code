@@ -11,6 +11,7 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "merc.h"
+#include "json_utils_ext.h"
 
 #include "vnum.h"
 #include "def.h"
@@ -140,7 +141,7 @@ void WeaponRandomizer::eventItemRead(const ItemReadEvent &event) const
 // Remove 'randomness' from a weapon.
 void WeaponRandomizer::clearWeapon(Object *obj) const
 {
-    obj->properties.clear();
+    obj->props.clear();
     obj->affected.deallocate();
     obj->timer = 0;
     obj->level = obj->pIndexData->level;

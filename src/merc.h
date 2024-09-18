@@ -93,7 +93,6 @@ class AreaIndexData;
 class XMLDocument;
 class AreaBehavior;
 typedef ::Pointer<XMLDocument> XMLDocumentPointer;
-typedef map<DLString, DLString> Properties;
 class AreaQuest;
 struct extra_exit_data;
 struct mob_index_data;

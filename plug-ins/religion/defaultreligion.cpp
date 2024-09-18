@@ -292,7 +292,7 @@ bool DefaultReligion::likesStolen(Object *obj) const
     if (!likes.stolen)
         return false;
 
-    return obj->properties.count("stolen") != 0;
+    return obj->getProperty("stolen") != "";
 }
 
 GodLikes::GodLikes()

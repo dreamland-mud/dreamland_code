@@ -63,7 +63,7 @@ bool QuestBag::hourly()
     if (owner && owner->getLastAccessTime().getTime() >= 1529205799) // been here since 2018
         return false;
 
-    obj->properties["oldRoom"] = obj->in_room->vnum;
+    obj->setProperty("oldRoom", DLString(obj->in_room->vnum));
     notice("[cleanup] Chest %d %lld of %s transferred from room [%d] [%s] to storage.",
             obj->pIndexData->vnum, obj->getID(), obj->getOwner().c_str(),
             obj->in_room->vnum, obj->in_room->getName());

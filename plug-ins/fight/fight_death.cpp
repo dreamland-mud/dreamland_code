@@ -540,22 +540,22 @@ static void corpse_looting( Object *corpse, Character *ch, Character *killer )
         obj->removeProperty(mark);
 
         if (obj->item_type == ITEM_MONEY)
-            obj->addProperty(mark, loot["money"].asString());
+            obj->setProperty(mark, loot["money"].asString());
         else if (obj->pIndexData->limit > 0)
-            obj->addProperty(mark, loot["limits"].asString());
+            obj->setProperty(mark, loot["limits"].asString());
         else if (!obj->getProperty("tier").empty())
-            obj->addProperty(mark, loot["randoms"].asString());
+            obj->setProperty(mark, loot["randoms"].asString());
         else if (obj->item_type == ITEM_PILL 
                 || obj->item_type == ITEM_SCROLL
                 || obj->item_type == ITEM_POTION
                 || obj->item_type == ITEM_WAND
                 || obj->item_type == ITEM_STAFF
                 || obj->item_type == ITEM_WARP_STONE)
-            obj->addProperty(mark, loot["magic"].asString());
+            obj->setProperty(mark, loot["magic"].asString());
         else if (obj->item_type == ITEM_RECIPE)
-            obj->addProperty(mark, loot["recipes"].asString());
+            obj->setProperty(mark, loot["recipes"].asString());
         else
-            obj->addProperty(mark, loot["other"].asString());
+            obj->setProperty(mark, loot["other"].asString());
     }
 }
 

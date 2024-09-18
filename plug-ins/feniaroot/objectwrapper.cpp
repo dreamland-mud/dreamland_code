@@ -17,6 +17,7 @@
 #include "weapons.h"
 #include "occupations.h"
 #include "behavior.h"
+#include "json_utils.h"
 
 #include "grammar_entities_impl.h"
 #include "personalquestreward.h"
@@ -835,12 +836,25 @@ NMI_INVOKE(ObjectWrapper, hasWeaponFlag, "(flags): выставлен ли хо�
     return Register(IS_WEAPON_STAT(target, flags) != 0);
 }
 
+NMI_INVOKE(ObjectWrapper, property, "(name, defaultValue): свойство предмета с именем name или значение по умолчанию")
+{
+    checkTarget();
+    DLString name = args2string(args);
+    Register defaultValue = args.size() > 1 ? args.back() : Register();
+
+    DLString jsonValue;
+    if (JsonUtils::findValue(target->props, name, jsonValue))
+        return jsonValue;
+
+    return defaultValue;
+}
+
 NMI_INVOKE(ObjectWrapper, setProperty, "(name,value): установить значение property с данным именем на экземпляре")
 {
     checkTarget();
     DLString propName = argnum2string(args, 1);
     DLString propValue = argnum2string(args, 2);
-    target->addProperty(propName, propValue);
+    target->setProperty(propName, propValue);
     return Register();
 }
 

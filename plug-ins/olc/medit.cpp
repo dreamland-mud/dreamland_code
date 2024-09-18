@@ -22,7 +22,7 @@
 #include "interp.h"
 #include "../anatolia/handler.h"
 #include "act.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 
 #include "olc.h"
 #include "security.h"

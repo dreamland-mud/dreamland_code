@@ -6,7 +6,7 @@
 
 #include "logstream.h"
 #include "grammar_entities_impl.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 #include "xmljsonvalue.h"
 #include "olcstate.h"
 #include "olc.h"

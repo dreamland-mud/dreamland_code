@@ -9,7 +9,7 @@
 #include "clanreference.h"
 #include "wearlocation.h"
 #include "behavior.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 #include "merc.h"
 
 #include "def.h"

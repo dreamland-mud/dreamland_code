@@ -1,6 +1,6 @@
 #include <fstream>
 #include <sstream>
-#include "json_utils.h"
+#include "json_utils_ext.h"
 #include "logstream.h"
 #include "configurable.h"
 #include "dreamland.h"

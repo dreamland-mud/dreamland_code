@@ -33,7 +33,7 @@
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 #include "websocketrpc.h"
 
 #include "olc.h"
@@ -500,7 +500,7 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
             ptc(ch, "       prop %s %s %s  %s\r\n", 
                 bhvName.c_str(), 
                 bp.key().asString().c_str(),
-                JsonUtils::asString(*bp).c_str(),
+                JsonUtils::asQuotedString(*bp).c_str(),
                 web_edit_button(ch, editCmd, "web").c_str());
         }
     }

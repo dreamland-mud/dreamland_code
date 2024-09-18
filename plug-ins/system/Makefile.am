@@ -46,7 +46,7 @@ math_utils.cpp \
 calendar_utils.cpp \
 morphology.cpp \
 configurable.cpp \
-json_utils.cpp
+json_utils_ext.cpp
 
 libsystem_la_MOC = \
 schedulertaskattributemanager.h \

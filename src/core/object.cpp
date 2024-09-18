@@ -15,7 +15,7 @@
 #include "noun.h"
 #include "grammar_entities_impl.h"
 #include "ru_pronouns.h"
-
+#include "json_utils.h"
 #include "fenia/register-impl.h"
 
 #include "wrapperbase.h"
@@ -107,7 +107,7 @@ void Object::extract( )
         killer = &str_empty[0];
         count = 0;
         gram_gender = MultiGender::UNDEF;
-        properties.clear();
+        props.clear();
 
         wrapper = 0;
         behavior.clear( );
@@ -425,27 +425,29 @@ int Object::getWeightMultiplier( ) const
 
 DLString Object::getProperty(const DLString &key) const
 {
-    // Find legacy property on the item itself
-    Properties::const_iterator p = properties.find(key);
-    if (p != properties.end())
-        return p->second;
-    
+    // Find property on the item itself
+    DLString jsonValue;
+    if (JsonUtils::findValue(props, key, jsonValue))
+        return jsonValue;
+
     // Look in index data props 
     return pIndexData->getProperty(key);
 }
 
 void Object::removeProperty(const DLString &key)
 {
-    Properties::iterator p = properties.find(key);
-    if (p != properties.end())
-        properties.erase(p);
+    props.removeMember(key);
 }
 
-void Object::addProperty(const DLString &key, const DLString &value)
+void Object::setProperty(const DLString &key, const DLString &value)
 {
-    properties[key] = value;
+    props[key] = value;
 }
 
+void Object::setProperty(const DLString &key, const DLString &subkey, const DLString &value)
+{
+    props[key][subkey] = value;
+}
 
 static bool get_value0_from_proto(const Object *obj)
 {

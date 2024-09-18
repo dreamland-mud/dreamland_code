@@ -85,6 +85,7 @@
 #include "weapons.h"
 #include "badnames.h"
 #include "wiznet.h"
+#include "json_utils_ext.h"
 
 #include "interp.h"
 #include "clan.h"
@@ -1117,14 +1118,11 @@ static void format_affect(Affect *paf, ostringstream &buf)
        buf << endl;
     }
 
-    if (!obj->properties.empty()) {
-        buf << "Свойства: ";
-        for (auto &prop: obj->properties)
-            buf << "{g" << prop.first << "{x: \"" << prop.second << "\"  ";
-        buf << endl;
-    }
-
+    buf << "Свойства: ";
+    
     ch->send_to(buf);
+
+    ch->desc->send(JsonUtils::toString(obj->props).c_str());
 }
 
 

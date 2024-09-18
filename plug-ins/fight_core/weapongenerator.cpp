@@ -412,7 +412,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
         aveIndexBonus++;
 
     // Remember affixes choice on the item.
-    obj->properties["affixes"] = affixNames.toString();
+    obj->setProperty("affixes", affixNames.toString());
 
     return *this;
 }
@@ -521,7 +521,7 @@ void WeaponGenerator::setShortDescr() const
 
     obj->setShortDescr(myshort.c_str());
 
-    obj->properties["eqName"] = nameConfig["short"].asString(); // 'буздыган' in sheath wearloc
+    obj->setProperty("eqName", nameConfig["short"].asString()); // 'буздыган' in sheath wearloc
 }
 
 const WeaponGenerator & WeaponGenerator::assignNames() const
@@ -542,7 +542,7 @@ const WeaponGenerator & WeaponGenerator::assignColours() const
 
     DLString myshort = obj->getShortDescr();
     if (obj->getProperty("eqName").empty())
-        obj->properties["eqName"] = myshort;
+        obj->setProperty("eqName", myshort);
 
     if (!colour.empty()) {
         myshort = "{" + colour + myshort.colourStrip() + "{x";
@@ -585,7 +585,7 @@ const WeaponGenerator & WeaponGenerator::assignFlags() const
     // Set standardized cost in silver.
     obj->cost = 5 * (WORST_TIER + 1 - valTier) * obj->level;
 
-    obj->properties["tier"] = valTier;
+    obj->setProperty("tier", valTier);
     return *this;
 }
 

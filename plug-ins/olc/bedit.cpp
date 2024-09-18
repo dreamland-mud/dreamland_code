@@ -13,7 +13,7 @@
 #include "skillmanager.h"
 #include "defaultaffecthandler.h"
 #include "behaviorloader.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 #include "websocketrpc.h"
 #include "skill_alloc.h"
 #include "arg_utils.h"

@@ -26,7 +26,7 @@
 #include "skillgroup.h"
 #include "eventbus.h"
 
-#include "json_utils.h"
+#include "json_utils_ext.h"
 #include "itemevents.h"
 #include "oedit.h"
 #include "feniatriggers.h"

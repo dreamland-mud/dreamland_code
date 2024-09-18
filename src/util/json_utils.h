@@ -4,7 +4,6 @@
 #include <sstream>
 #include <jsoncpp/json/json.h>
 #include "dlstring.h"
-#include "register-decl.h"
 
 namespace JsonUtils {
     /** Convert JSON object into one-line presentation. */
@@ -13,7 +12,6 @@ namespace JsonUtils {
     /** Populate JSON object from a string representation. */
     void fromString(const DLString &text, Json::Value &value);
 
-    
     /** Attempt to parse JSON contained within a string, recording error messages in the buffer.
     *  Return true if parsing is successful.
     */
@@ -24,21 +22,16 @@ namespace JsonUtils {
      */
     void copy(Json::Value &dest, const Json::Value &source);
 
-    /** Return string representation of the value (with quotes for actual strings). */
+    /** Return string representation of the value. */
     DLString asString(const Json::Value &value);
 
-    /** Get a Register with string/numeric/array/struct or boolean value of this JSON. */
-    Scripting::Register toRegister(const Json::Value &value);
+    /** Return string representation of the value (with quotes for actual strings). */
+    DLString asQuotedString(const Json::Value &value);
 
-    /** Get a representation of a JSON object as a Fenia structure with fields. */
-    Scripting::Register toIdContainer(const Json::Value &jsonObj);
+    /** Find string value with given key in the object or in a obj within this object. Return true if found. */
+    bool findValue(const Json::Value &jsonObj, const DLString &key, DLString &value);
 
-    /** Get a representation of a JSON array as a Fenia array. */
-    Scripting::Register toRegContainer(const Json::Value &jsonArray);
-
-    /** Find string value with given key in the object or in a obj within this object. */
-    DLString findValue(const Json::Value &jsonObj, const DLString &key);
-
+    extern const DLString JSON_ERROR;
 }
 
 #endif

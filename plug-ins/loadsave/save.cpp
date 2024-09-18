@@ -78,6 +78,7 @@
 
 #include "feniamanager.h"
 
+#include "json_utils_ext.h"
 #include "pcharactermanager.h"
 #include "pcharactermemory.h"
 #include "affectmanager.h"
@@ -697,8 +698,10 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                         fprintf( fp, "ExDe %s~ %s~\n", ed->keyword, ed->description );
                 }
 
-                for (Properties::const_iterator p = obj->properties.begin(); p != obj->properties.end(); p++)
-                    fprintf(fp, "X %s %s~\n", p->first.c_str(), p->second.c_str());
+                if (!obj->props.empty()) {
+                    DLString jsonString = JsonUtils::toString(obj->props);
+                    fprintf(fp, "Props %s", jsonString.c_str());
+                }
 
                 if (obj->gram_gender != Grammar::MultiGender::UNDEF)
                         fprintf(fp, "Gender %s\n", obj->gram_gender.toString());
@@ -2048,6 +2051,20 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             case 'P':
                     KEY( "Pocket", obj->pocket, fread_string( fp ) );
                     KEYSKIP( "Pit" );
+
+                    if (!str_cmp(word, "Props")) {
+                        DLString jsonString = fread_dlstring_to_eol(fp);
+
+                        ostringstream errbuf;
+                        if (!JsonUtils::validate(jsonString, errbuf)) {
+                            throw Exception("fread_obj: invalid JSON for object " + DLString(obj->pIndexData->vnum));   
+                        }
+
+                        JsonUtils::fromString(jsonString, obj->props);
+                        fMatch = true;
+                        break;
+                    }
+
                     break;
             
             case 'Q':
@@ -2160,7 +2177,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             case 'X':
                     if (!str_cmp(word, "X")) {
                         DLString key = fread_word(fp);
-                        obj->properties[key] = fread_dlstring(fp);
+                        obj->setProperty(key, fread_dlstring(fp));
                         fMatch = true;
                         break;
                     }

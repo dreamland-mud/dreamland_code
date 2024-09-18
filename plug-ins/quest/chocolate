@@ -1,0 +1,1095 @@
+.apply(function() {
+	
+	if (.tmp.chocolate == null)
+		.tmp.chocolate = .Map();
+
+	this = .tmp.chocolate;
+
+	SpyQuestGiver = function(ndx) {
+		return null;
+	};
+	
+	/*
+	 * Quest: chieftain asks to setup a flag in some area. Anarchists attack
+	 * and try to steal the flag.
+	 * stage: 0 - proposed by secretary
+	 *        1 - chieftain told the details
+	 *        2 - guide told the details
+	 *        3 - flag dropped correctly
+	 */
+	.tmp.quest.initializers["flag"] = function(ch) {
+		this = .tmp.quest.Quest(ch);
+		room = null;
+		flag = null;
+		anarchy = null;
+		ambush = 0;
+		return this;
+	};
+	
+	.tmp.quest.cancel_array["flag"] = function(ch, arg) {
+		var q;
+
+		q = .tmp.quest.q(ch, "flag");
+		if (q.stage < 0 || q.stage > 3)
+			return false;
+
+		.get_mob_index(50029).flagQuestClean(ch);
+		return true;	    
+	};
+
+	.tmp.quest.newinfo_array["flag"] = function(ch, arg) {
+		var q;
+
+		q = .tmp.quest.q(ch, "flag");
+		if (q.stage < 0 || q.stage > 3)
+			return "";
+			
+		if (arg == "") {
+			return .fmt(.tmp.quest.header,
+					21, "Выполнить поручение вождя", "Шоколадная Фабрика", "-");
+		}
+		
+		if (arg == "21" || arg.match("вожд")) {
+			var s;
+			
+			s = .fmt(.tmp.quest.title1, 21, "Выполнить поручение вождя умпа-лумпов")
+					+ .fmt(.tmp.quest.title2, "Шоколадная Фабрика");
+
+			if (q.stage == 0) {
+				s = s + "У вождя умпа-лумпов есть для тебя поручение.\n"
+					  + "Зайди и спроси 'что нужно сделать?'.\n";
+			}
+			else if (q.stage == 3) {
+				s = s + "Флаг умпа-лумпов успешно водружен! Вернись к вождю за наградой.\n";
+			}
+			else if (q.stage >= 1) {
+				s = s + "Тебе необходимо водрузить флаг умпа-лумпов в местности {Y" + q.room.name + "{x.\n"
+					  + "Это находится в районе под названием {Y" + q.room.areaname + "{x.\n";
+				
+				if (q.stage == 2) {
+					s = s + "От гида тебе стало известно, что лучшая защита от кражи флага - это липкий ирисковый раствор.\n"
+						  + "Для приготовления раствора потребуется специальная тара.\n";
+				}
+	
+			}
+			return s;
+		}
+		
+		return "";
+	};
+	
+	.tmp.quest.numbers["flag"] = 21;
+	
+	
+	FlagCharList = function() {
+		this = .Map();
+		
+		chars = .List();
+
+		add = function(ch) {
+			chars.add(ch);
+			chars.unique();
+		};
+
+		sub = function(ch) {
+			chars.sub(ch);
+		};
+		
+		poll = function(ndx) {
+			chars.forEach(function(ndx) {
+				if (!dead && ndx.fqelapsed(this, ndx.c.flagQuestTime))
+					ndx.flagQuestClean(this);
+			}, ndx);
+		};
+
+		return this;
+	};
+	
+	flagProposals = FlagCharList();
+	flagQuestors = FlagCharList();
+	flagQuestDelay = 60 * 60 * 24 * 7;
+	flagQuestTime = 60 * 60;
+	flagMedal = 11;
+	.get_obj_index(flagMedal).onGet = function(obj, ch) {
+		if (ch.is_npc() || ch.name != obj.owner) {
+			ch.act("Ты роняешь %O4.", obj);
+			ch.in_room.ppl.sub(ch).call.act("%^C1 роняет %O4.", ch, obj);
+			obj.obj_to_room(ch.in_room);
+			return true;
+		}
+		return false;
+	};
+	
+	flagSummitOk = function(r) {
+		if (!r.isCommon())
+			return false;
+		if (r.up != null)
+			return false;
+		if (.isset_bit(r.room_flags, .tables.room_flags.indoors))
+			return false;
+		if (r.sector_type != .tables.sector_table.mountain)
+			return false;
+			
+		return true;
+	};
+
+	flagSummitsCreate = function() {
+		var lst;
+
+		lst = .List();
+		for (r in .rooms)
+			if (flagSummitOk(r))
+				lst.add(r);
+
+		return lst;
+	};
+
+	flagSummits = flagSummitsCreate();
+	
+	FlagQuestor = function(ndx) {
+		this = .tmp.quest.QuestEntity(ndx, "flag");
+		
+		c = .tmp.chocolate;
+
+		flagQuestAvailable = function(ch) {
+			if (ch.is_npc())
+				return false;
+
+			if (!fqdelay(ch, c.flagQuestDelay))
+				return false;
+				
+			if (ch.name == "Ruffina" || ch.name == "Myrriti")
+				return true;
+
+			if (.tmp.quest.hasVictory(fq(ch)))
+				return false;
+			
+			return true;
+		};
+
+		flagQuestInit = function(ch) {
+			c.flagProposals.add(ch);
+
+			this = fq(ch);
+			stage = 0;
+			time = .current_time;
+		};
+
+		flagQuestClean = function(ch) {
+			c.flagProposals.sub(ch);
+			c.flagQuestors.sub(ch);
+
+			this = fq(ch);
+			time = -1;
+			stage = -1;
+			lasttime = .current_time;
+			room = null;
+
+			if (flag != null && flag.online && !flag.dead) {
+				.tmp.system.trueExtract(flag);
+				flag = null;
+			}
+
+			if (anarchy != null)            
+				anarchy.forEach(function() {
+					.tmp.system.trueExtract(this);
+				});
+			anarchy = .List();
+		};
+		
+		flagQuestCreate = function(ch) {
+			var flag, room;
+
+			c.flagProposals.sub(ch);
+			c.flagQuestors.add(ch);
+
+			room = c.flagSummits.random();
+			flag = .get_obj_index(50109).create();
+			flag.obj_to_char(ch);
+			flag.flagQuestor = ch;
+
+			this = fq(ch);
+			this.room = room;
+			this.flag = flag;
+			stage = 1;
+			time = .current_time;
+			anarchy = .List();
+
+			.tmp.quest.wiznet("flag", ch.name + " получает флаг у вождя.");
+		};
+
+		flagQuestReward = function(ch) {
+			var gold, qp, medal;
+
+			gold = ch.level * .number_range(2, 3);
+			qp = .number_range(50, 75) + fq(ch).ambush * .number_range(100, 125);
+
+			ch.questpoints = ch.questpoints + qp;
+			ch.gold = ch.gold + gold;
+
+			ch.gainExp(300 + fq(ch).ambush * 700);
+
+			medal = .get_obj_index(c.flagMedal).create();
+			medal.owner = ch.name;
+			medal.obj_to_char(ch);
+
+			.tmp.quest.wiznet("flag", ch.name + " получает награду за воткнутый флаг.");
+			.tmp.quest.rememberVictory(fq(ch));
+		};
+		
+		flagQuestUnleash = function(ch) {
+			var num, anaList;
+			
+			if (!anarchistCanUnleash(ch.in_room))
+				return;
+			
+			ch.act("Тебя атакует шайка умпа-лумпийских антимонархистов!");
+
+			for (num = 1 + ch.level / 30; num > 0; num = num - 1)
+				fq(ch).anarchy.add(.get_mob_index(50055).create());
+			
+			fq(ch).anarchy.forEach(function(ch) {
+				level = ch.level;
+				hitroll = level * 2;
+				damroll = level * 3 / 2;
+				max_mana = mana = 100;
+				max_move = move = 100;
+				armor0 = armor1 = armor2 = armor3 = -6 * level;
+				saving_throw = -level / 2;
+
+				if (level < 30)
+					max_hit = hit = level * 20;
+				else if (level < 60)
+					max_hit = hit = level * 60;
+				else
+					max_hit = hit = level * 120;
+
+				char_to_room(ch.in_room);
+				flagQuestor = ch;
+
+				pIndexData.onSpec(this);
+
+			}, ch);
+			
+			fq(ch).ambush = 1;
+			.tmp.quest.wiznet("flag", ch.name + " атакуют антимонархисты.");
+		};
+
+		anarchistCanEnter = function(room) {
+			return room.sector_type != .tables.sector_table.water_noswim
+				   && room.sector_type != .tables.sector_table.air
+				   && room.isCommon();
+		};
+		
+		anarchistCanUnleash = function(room) {
+			if (room.vnum >= 50000 && room.vnum <= 51000)
+				return false;
+
+			return anarchistCanEnter(room);
+		};
+
+		return this;
+	};
+
+	/* 
+	 * Secretary makes an interesting proposal.
+	 */
+	Secretary = function(ndx) {
+		this = FlagQuestor(ndx);
+		
+		onArea = function(mob) {
+			c.flagProposals.poll(this);
+			return false;
+		};
+		
+		onGreet = function(mob, ch) {
+			if (!flagQuestAvailable(ch))
+				return;
+			
+			flagQuestInit(ch);
+
+			fqtalk(function() {
+				tell("У шефа есть для тебя поручение.", 0);
+				tell("Зайди и спроси 'что нужно сделать?'", 0);
+			}, mob, ch);
+		};
+
+		return this;
+	};
+	
+	/*
+	 * Chieftain fills in with details and rewards upon completion. 
+	 */
+	Chieftain = function(ndx) {
+		this = FlagQuestor(ndx);
+
+		onArea = function(mob) {
+			c.flagQuestors.poll(this);
+			return false;
+		};
+		
+		onSpeech = function(mob, ch, msg) {
+			if (fq(ch).stage != 0)
+				return;
+			
+			if (!msg.match("что нужно сделать"))
+				return;
+			
+			flagQuestCreate(ch);
+
+			fqtalk(function() {
+				tell("Тут вот какое дело..Скоро у нас очередной юбилей города.", 0);
+				tell("Хотя может быть я напутал, и это не у города юбилей, а у меня?..", 0);
+				tell("Ну, неважно. По случаю праздника я задумал водрузить умпа-лумпийский флаг в местности " + q().room.name + ".", 0);
+				tell("Но умпа-лумпы, к несчастью, все поголовно боятся высоты.", 0);
+				tell("Одна надежда на тебя: если справишься с этой задачей, я тебя щедро отблагодарю.", 0);
+				tell("Но имей в виду, мои недоброжелатели будут пытаться помешать тебе.", 0);
+				tell("Думаю, наш Гид поможет тебе ценным советом.", 1);
+				tell("Просто упомяни в разговоре с ним, что тебе нужна помощь с флагом.", 1);
+				vrecho("%1$^C1 вручает тебе флаг умпа-лумпов.", 
+					   "%1$^C1 вручает %2$C3 флаг умпа-умпов.", 0);
+			}, mob, ch);
+		};
+		
+		onTell = function(mob, ch, msg) {
+			onSpeech(mob, ch, msg);
+		};
+
+		onGreet = function(mob, ch) {
+			if (ch.is_npc())
+				return;
+				
+			if (fq(ch).stage != 3)
+				return;
+
+			.tmp.quest.tell("Молодец! Тебе это удалось!", mob, ch);
+			ch.act("%1$^C1 дает тебе в награду горсть золотых монет, опыт и славу.", mob);
+			ch.act("%1$^C1 торжественно вручает тебе медаль умпа-лумпов.", mob);
+
+			flagQuestReward(ch);
+			flagQuestClean(ch);
+		};
+		
+		return this;
+	};
+
+	/*
+	 * Oompa-guide tells about sticky flag
+	 */
+	Guide = function(ndx) {
+		this = FlagQuestor(ndx);
+
+		onGive = function(mob, ch, obj) {
+			if(obj.pIndexData!=.get_obj_index(50109))
+				return;
+
+			if (fq(ch).stage == 1) {
+				obj.obj_to_char(ch);
+				fqtalk(function() {
+					tell("О, я вижу, вам доверили такое ответственное поручение!", 0);
+					tell("Но я не могу выполнить его за вас!", 0);
+					vrecho("%1$^C1 вручает тебе флаг умпа-лумпов.", 
+					   "%1$^C1 вручает %2$C3 флаг умпа-умпов.", 0);
+					tell("Но хочу вас предупредить: у вождя много недоброжелателей, и они будут пытаться отнять у вас флаг.", 1);
+					tell("Но есть одно верное средство! Я поделюсь с вами за скромную плату.", 1);
+					mob.interpret_raw("wink", ch.name);
+				}, mob, ch);
+			} else if(fq(ch).stage == 2) {
+				obj.obj_to_char(ch);
+				fqtalk(function() {
+					tell("Я не могу выполнить поручение за вас!", 0);
+					vrecho("%1$^C1 вручает тебе флаг умпа-лумпов.", 
+					   "%1$^C1 вручает %2$C3 флаг умпа-умпов.", 0);
+					tell("Всё чем я мог помочь, я вам уже сообщил.", 1);
+				}, mob, ch);
+			}
+
+		};
+
+		onSpeech = function(mob, ch, msg) {
+			if (fq(ch).stage != 1)
+				return;
+
+			if (!msg.contains(mob.name))
+				return;
+
+			onTell(mob, ch, msg);
+		};
+		
+		onBribe = function(mob, ch, gold, silver) {
+			if (fq(ch).stage != 1)
+				return;
+
+			if(mob.bribesArray==null)
+				mob.bribesArray = .Array();
+
+			if(mob.bribesArray[ch.id]!=null)
+				silver = silver + mob.bribesArray[ch.id];
+
+			var summ; 
+			summ = gold * 100 + silver;
+			if (summ < 50 * 100) {
+				if(mob.bribesArray[ch.id]==null) {
+					fqtalk(function() {
+						tell("Боюсь этого будет недостаточно!", 0);
+					}, mob, ch);
+				} else {
+					fqtalk(function() {
+						tell("Всё ещё маловато!", 0);
+					}, mob, ch);
+				}
+				mob.bribesArray[ch.id] = summ;
+				return;
+			} else {
+				mob.bribesArray[ch.id] = null;
+			}
+
+			fqtalk(function() {
+				tell("Флаг, покрытый ирисковым раствором, крепко прилипнет к вашему телу, и вы без труда доставите его к месту назначения!", 1);
+				tell("А приготовить раствор очень просто, главное найти подходящую тару.", 0);
+			}, mob, ch);
+
+			fq(ch).stage = 2;
+		};
+
+		onTell = function(mob, ch, msg) {
+			if (fq(ch).stage != 1)
+				return;
+
+			if (msg.match("флаг|flag|совет|advice|help|помощь|помоги")) {
+				fqtalk(function() {
+					tell("О, я вижу, вам доверили такое ответственное поручение!", 0);		
+					tell("Но хочу вас предупредить: у вождя много недоброжелателей, и они будут пытаться отнять у вас флаг.", 1);
+					tell("Но есть одно верное средство! Я поделюсь с вами за скромную плату.", 1);
+					mob.interpret_raw("wink", ch.name);
+				}, mob, ch);
+			}
+		};
+		
+		return this;
+	};
+	
+	/*
+	 * flag item
+	 */ 
+	Flag = function(ndx) {
+		this = FlagQuestor(ndx);
+		
+		init = function(obj) {
+			obj.flagSticky = 0;
+		};
+
+		onExtract = function(obj, fCount) {
+			if (fCount && obj.flagQuestor != null) {
+				fq(obj.flagQuestor).flag = null;
+				flagQuestClean(obj.flagQuestor);
+			}
+		};
+
+		onPourOut = function(obj, ch, out, liq, amount) {
+			if (obj.flagSticky == 0)
+				return;
+				
+			if (liq != "water")
+				return;
+
+			if (amount < 50) {
+				ch.act("%1$^O1 становится чуть влажным.", obj);
+			}
+			else {
+				ch.act("Ты полностью отстирываешь %1$O4 от ирисковых пятен!", obj);
+				obj.flagSticky = 0;
+			}
+		};
+
+		onDrop = function(obj, ch) {
+			if (ch.is_npc())
+				return;
+
+			if (obj != fq(ch).flag)
+				return;
+			
+			if (obj.flagSticky == 1) {
+				obj.in_room.ppl.call.act("%^O1 неопрятной грудой тряпья намертво прилипает к земле.", obj);
+				obj.wear_flags = .unset_bit(obj.wear_flags, .tables.wear_flags.take);
+				return;
+			}
+			
+			if (obj.in_room != fq(ch).room) {
+				obj.in_room.ppl.call.act("%^O1 неуклюже заваливается набок.", obj);
+				return;
+			}
+
+			obj.in_room.ppl.call.act("%^O1 втыкается и стоит абсолютно ровно.", obj);
+			ch.act("Твое задание выполнено! Можешь забрать у предводителя награду.");
+
+			fq(ch).stage = 3;
+			obj.wear_flags = .unset_bit(obj.wear_flags, .tables.wear_flags.take);
+			obj.description = "Флаг (flag) умпа-лумпов гордо реет на ветру.";
+			.tmp.quest.wiznet("flag", ch.name + " втыкает флаг в нужном месте.");
+		};
+
+		onSpec = function(obj) {
+			// TO-DO (RUFFINA) FIX THIS DAMN QUEST PLEASE
+			return false;
+			
+			var ch;
+			
+			if (( ch = obj.carried_by ) == null)
+				return false;
+
+			if (ch.is_npc())
+				return false;
+				
+			if (obj != fq(ch).flag)
+				return false;
+			
+			if (fq(ch).stage != 1 && fq(ch).stage != 2)
+				return false;
+
+			if (fq(ch).ambush > 0)
+				return;
+
+			flagQuestUnleash(ch);
+			return true;
+		};
+
+		return this;
+	};
+
+	/*
+	 * Vat to melt toffies
+	 */
+	Vat = function(ndx) {
+		this = ndx;
+		
+		vnumToffy = 50032;
+		vnumMelt = 50110;
+		vnumFlag = 50109;
+		
+		init = function(vat) {
+			vat.temperature = 20;
+			vat.meltedToffies = 0;
+		};
+		
+		putToffy = function(vat, obj) {
+			if (obj.temperature == null)
+				obj.temperature = 20;
+		};
+
+		putFlag = function(vat, obj) {
+			var melt;
+
+			melt = vat.get_obj_content_vnum(vnumMelt);
+			if (melt == null)
+				return;
+			
+			if (melt.toffySize < 10) {
+				if (obj.flagSticky == 0)
+					obj.getRoom().ppl.call.act("На %1$O6 остается едва заметное ирисковое пятнышко.", obj);
+				return;
+			}
+			
+			if (obj.flagSticky == 0) 
+				obj.getRoom().ppl.call.act("%1$^O1 пропитывается ирисковым раствором.", obj);
+			else 
+				obj.getRoom().ppl.call.act("%1$^O1 еще сильнее пропитывается ирисковым раствором.", obj);
+			
+			obj.flagSticky = 1;
+		};
+
+		fetchToffy = function(vat, ch, obj) {
+			obj.temperature = null;
+		};
+
+		fetchFlag = function(vat, ch, obj) {
+			if (obj.flagSticky != 0)
+				ch.act("%1$^O1 отяжелел и липнет к рукам.", obj);
+		};
+
+		onPut = function(vat, ch, item, container) {
+			if (vat == container) {
+				if (item.vnum == vnumToffy)
+					putToffy(vat, item);
+				else if (item.vnum == vnumFlag)
+					putFlag(vat, item);
+			}
+			else if (vat == item) {
+				if (vat.timer <= 0)
+					vat.timer = 60;
+			}
+
+			return false;
+		};
+
+
+		onFetch = function(vat, ch, item) {
+			if (item.vnum == vnumToffy)
+				fetchToffy(vat, ch, item);
+			else if (item.vnum == vnumFlag)
+				fetchFlag(vat, ch, item);
+		};
+
+		onSpec = function(vat) {
+			// TO-DO (RUFFINA) FIX THIS PLEASE!!!
+			return false;
+			
+			if (vat.in_obj == null || vat.in_obj.fire_time == null) {
+				vat.temperature = .max(vat.temperature - 4, 20);
+
+				vat.list_obj_content_vnum(vnumToffy).forEach(function() {
+					temperature = .max(temperature - in_obj.temperature / 20, 20);
+				});
+
+				return false;
+			}
+
+			vat.temperature = .min(vat.temperature + 2, 100);
+			vat.meltedToffies = 0;
+
+			vat.list_obj_content_vnum(vnumToffy).forEach(function() {
+				temperature = .min(temperature + in_obj.temperature / 20, 100);
+
+				if (temperature >= .number_range(90, 100)) {
+					in_obj.meltedToffies = in_obj.meltedToffies + 1;
+					getRoom().ppl.call.act("%1$^O1 та%1$nет|ют.", this);
+					extract(true);
+				}
+			});
+			
+			if (vat.meltedToffies > 0) {
+				var melt;
+
+				melt = vat.get_obj_content_vnum(vnumMelt);
+				
+				if (melt == null) {
+					melt = .get_obj_index(vnumMelt).create();
+					melt.obj_to_obj(vat);
+					melt.toffySize = vat.meltedToffies;
+					melt.timer = 15;
+					vat.getRoom().ppl.call.act("Внутри %O2 образуется %O4.", vat, melt);
+				}
+				else {
+					vat.getRoom().ppl.call.act("%1$^O1 внутри %O2 увеличивается в объеме.", melt, vat);
+					melt.toffySize = melt.toffySize + vat.meltedToffies;
+				}
+			}
+
+			vat.list_obj_content_vnum(vnumFlag).forEach(function() {
+				in_obj.pIndexData.putFlag(in_obj, this);
+			});
+
+			return false;
+		};
+		
+		return this;
+	};
+	
+	/*
+	 * Oompa-Anarchist, flag stealer.
+	 */
+	Anarchist = function(ndx) {
+		this = .tmp.quest.QuestEntity(ndx, "flag");
+		
+		if (.tmp.chocolate == null) .tmp.chocolate = .Map();
+		
+		onDeath = function(mob, killer) {
+			var q;
+
+			q = fq(mob.flagQuestor);
+			if (q.flag.carried_by == mob && .chance(10)) {
+				mob.interpret_raw("say", "Даже моя смерть не помешает мне бороться с монархией!");
+				mob.interpret_raw("emote", "разрывает флаг на клочки.");
+				q.flag.extract(true);
+			}
+			
+			return false;
+		};
+
+		onSpec = function(mob) {
+			// TO-DO (RUFFINA) FIX THIS PLEASE!!!
+			return false;
+			
+			var fowner, froom, q;
+			
+			if (mob.flagQuestor == null)
+				return false;
+
+			if (mob.fleePath == null) {
+				mob.fleePath = .Map();
+				mob.fleePath = .tmp.chocolate.RoomList();
+			}
+			if (mob.trackPath == null) {
+				mob.trackPath = .Map();
+				mob.trackPath = .tmp.chocolate.RoomList();
+			}
+		
+			if (mob.position != .tables.position_table.stand || mob.fighting != null) {
+				if (mob.fleePath != null)//mob.fleePath.clear();
+					mob.fleePath = null;
+				if (mob.trackPath != null) //mob.trackPath.clear();
+					mob.trackPath = null;
+				return false;
+			}
+			
+			q = fq(mob.flagQuestor);
+			if(!q.flag.online) return false;
+			
+			fowner = q.flag.getCarrier();
+			froom = q.flag.getRoom();
+
+			if (fowner != null && fowner.is_npc() && fowner.pIndexData == this) {
+				if (mob.fleePath != null && mob.fleePath.pathWithDepth != null) {
+					mob.fleePath.pathWithDepth(mob, 10);
+					mob.fleePath.run(mob);
+				}
+				return true;
+			}
+
+			if (froom != mob.in_room) {
+				if (mob.trackPath != null && mob.trackPath.pathToTarget != null) {
+					mob.trackPath.pathToTarget(mob, froom);
+					mob.trackPath.walk(mob);
+				}
+				return true;
+			}
+
+			if (fowner == null) {
+				mob.in_room.ppl.call.act("%^C1 хватает %O4.", mob, q.flag);
+				q.flag.obj_to_char(mob);
+				return true;
+			}
+				
+			if (!mob.is_safe(fowner)) {
+				mob.interpret("say А ну отдай этот проклятый флаг, я разорву его на лоскуты!");
+				mob.interpret("dirt " + fowner.name);
+				if (mob.fighting == null) {
+					mob.multi_hit(fowner);
+				}
+			}
+
+			return true;
+		};
+
+		onFight = function(mob, ch) {
+			var fowner, q;
+
+			if (mob.flagQuestor == null)
+				return false;
+				
+			if (mob.fleePath == null) {
+				mob.fleePath = .Map();
+				mob.fleePath = .tmp.chocolate.RoomList();
+			}
+			if (mob.trackPath == null) {
+				mob.trackPath = .Map();
+				mob.trackPath = .tmp.chocolate.RoomList();
+			}
+			mob.fleePath.clear();
+			mob.trackPath.clear();
+
+			q = fq(mob.flagQuestor);
+			fowner = q.flag.getCarrier();
+
+			if (fowner != ch) {
+				if (fowner == mob)
+					mob.interpret("tease " + ch.name);
+				mob.interpret("flee");
+				return;
+			}
+
+			if (!.tmp.mob.isBlind(ch)) {
+				mob.interpret("dirt " + ch.name);
+				return;
+			}
+
+			if (q.flag.flagSticky != 0) {
+				if (.chance(10))
+					ch.act("%1$^C1 тщетно пытается отлепить от твоего тела флаг.", mob);
+			}
+			else {
+				ch.act("%1$^C1 выхватывает у тебя из рук флаг!", mob);
+				ch.in_room.ppl.sub(ch).call.act("%1$^C1 выхватывает флаг из рук %2$C2.", mob, ch);
+				q.flag.obj_to_char(mob);
+			}
+		};
+
+		return this;
+	};
+	
+	/*
+	 * RoomList
+	 */
+	RoomList = function() {
+		this = .Map();
+		
+		rooms = .List();
+		
+		run = function(mob) {
+			if (.number_range(1, 10) > rooms.size())
+				return;
+			return oneStep(mob, "running");
+		};
+
+		walk = function(mob) {
+			return oneStep(mob, "normal");
+		};
+
+		oneStep = function(mob, movetype) {
+			var door;
+			
+			if (rooms.size() == 0) 
+				return false;
+			
+			if (mob.in_room == rooms.front()) {
+				rooms.pop_front();
+				return true;
+			}
+
+			door = mob.in_room.doorTo(rooms.front());
+			if (mob.move_char(door, movetype)) {
+				rooms.pop_front();
+				return true;
+			}
+			
+			rooms = .List();
+			return false;
+		};
+
+		pathWithDepth = function(mob, depth) {
+			if (rooms.size() != 0) 
+				return;
+
+			rooms = mob.in_room.traverse(depth, mob);
+		};
+
+		pathToTarget = function(mob, target) {
+			if (rooms.size() != 0 && rooms.back() == target)
+				return;
+			
+			rooms = mob.in_room.traverseTo(target, mob);
+		};
+		
+		return this;
+	};
+
+	/*
+	 * Quest: insects with parts of a machine or with nuts
+	 * stage: 0 - ask about help and wait for confirm
+	 *        1 - confirmation received, quest given
+	 *        
+	 */
+	.tmp.quest.initializers["debug"] = function(ch) {
+		this = .tmp.quest.Quest(ch);
+		questor = null;   // oompa that gave the quest
+		gold = 0;         // reward
+		total = 0;        // number of bugs questor needs to find
+		found = 0;        // number of bugs found so far
+		unleashed = 0;    // number of bugs unleashed by the baits
+		nutVnum = 0;      // vnum of the nut to take from a killed bug
+		return this;
+	};
+	
+	DebugQuestor = function(ndx) {
+		this = .tmp.quest.QuestEntity(ndx, "debug");
+		return this;
+	};
+	
+	DebugVictim = function(ndx) {
+		this = DebugQuestor(ndx);
+
+		onSpec = function(mob) {
+			// TO-DO (RUFFINA) FIX THIS PLEASE!!!
+			return false;
+			var bait;
+
+			bait = mob.in_room.get_obj_vnum(baitVnum);
+			if (bait == null)
+				return false;
+
+			mob.in_room.ppl.call.act("%^C1 съедает %O4.", mob, bait);
+			bait.extract(true);
+			return true;
+		};
+
+		return this;
+	};
+	
+	DebugBait = function(ndx) {
+		this = DebugQuestor(ndx);
+
+		onSpec = function(obj) {
+			// TO-DO (RUFFINA) FIX THIS PLEASE!!!
+			return false;
+			
+			var q, bug;
+			
+			if (obj.debugQuestor == null)
+				return false;
+			if (obj.in_room == null)
+				return false;
+			if (obj.debugQuestor.in_room == obj.in_room)
+				return false;
+			if (.chance(75))
+				return false;
+			
+			q = fq(obj.debugQuestor);
+			if (q.unleashed >= q.total)
+				return false;
+
+			q.unleashed = q.unleashed + 1;
+			bug = .get_mob_index(bugVnum).create();
+			bug.char_to_room(obj.in_room);
+
+			obj.in_room.ppl.call.act("%^C1 выползает из какой-то щели в полу.", bug);
+			return false;
+		};
+
+		return this;
+	};
+	
+	DebugQuestGiver = function(ndx) {
+		this = DebugQuestor(ndx);
+		
+		debugQuestTime = 60;
+
+		/*
+		 * insector triggers
+		 */
+		onArea = function(mob) {
+			var ch;
+
+			if ((ch = mob.debugQuestor) == null)
+				return false;
+
+			if (!fqelapsed(ch, debugQuestTime))
+				return false;
+
+			if (ch.online && fq(ch).stage > 0) 
+				.tmp.quest.pemote("больше не нуждается в твоей помощи.", mob, ch);
+			
+			debugQuestClean(ch);
+			return false; 
+		};
+
+		onExtract = function(mob, fCount) {
+			debugQuestClean(mob.debugQuestor);
+		};
+
+		onGreet = function(mob, ch) {
+			if (mob.debugQuestor != null)
+				return;
+
+			if (.number_range(1, count) != 1)
+				return;
+
+			if (!debugQuestAvailable(ch))
+				return;
+			
+			debugQuestInit(ch, mob);
+
+			fqtalk(function() {
+			}, mob, ch);
+		};
+
+		onSpeech = function(mob, ch, msg) {
+			if (mob != fq(ch).questor 
+				|| fq(ch).stage != 0)
+			{
+				return;
+			}
+			
+			if (msg.match("^нет$|^не$|^не-а$|^no$")) {
+				debugQuestClean(ch);
+				return;
+			}
+
+			if (!msg.match("^yes$|^да$|^ага$|помогу|хорошо|^ok"))
+				return;
+			
+			debugQuestCreate(ch, mob);
+
+			fqtalk(function() {
+			}, mob, ch);
+		};
+		
+		onTell = function(mob, ch, msg) {
+			onSpeech(mob, ch, msg);
+		};
+
+		onGive = function(debug, ch, obj) {
+			if (debug != fq(ch).questor
+				|| fq(ch).stage != 1
+				|| obj.vnum != fq(ch).nutVnum)
+			{
+				.tmp.quest.giveBack(mob, ch, obj);
+				return true;
+			}
+			
+			debugQuestReward(ch);
+			debugQuestClean(ch);
+
+			fqtalk(function() {
+			}, mob, ch);
+
+			return false;
+		};
+
+		return true;
+	};
+
+
+	/*
+	 * init spy quest
+	 */
+	SpyQuestGiver(.get_mob_index(50000));
+
+	/*
+	 * init flag quest
+	 */
+	Secretary(.get_mob_index(50029));
+	Chieftain(.get_mob_index(50030));
+	Guide(.get_mob_index(50028));
+	Flag(.get_obj_index(50109));
+	Anarchist(.get_mob_index(50055));
+	Vat(.get_obj_index(50112)); 
+
+	/*
+	 * init insect quest
+	 */
+//    DebugQuestGiver(.get_mob_index(50002));
+})
+
+/*
+  
+ + Растопка ирисок:
+	- купить ирисок (обдумать вариант с добычей ирисок на скале лопатой или киркой)
+	- зажечь любой костер
+	- найти чан
+	- положить ириски в чан, поставить чан на костер
+	- подождать минуту-другую, пока они будут плавится. если долго держать - испарятся
+	- когда растопятся, забрать чан с костра (можно обжечься, потому в перчатках)
+	- положить флаг в чан, он намокнет и станет липким (nodrop nouncurse).
+	  можно сразу класть в чан ириски и флаг
+
+ + анти-монархисты не могуgт оторвать липкий флаг от тела
+ + а-м при смерти разрывает флаг на куски
+ + при доставке флага на место, надо вылить на себя бочку воды (trigger onPourOut
+   должен вызываться для всего инвентори)
+ + липкий флаг намертво прилипает к земле в любом месте
+ 
+ + мэр должен подсказывать что рекламщик может оказать помощь
+ + bribe рекламщику
+ + рекламщику реакцию на слова о помощи, рассказывает что а-м охотятся, вырывают, но
+   можно избежать с помощью топленых в чане ирисок
+ + дополнить список комнат, либо искать любую гору/холм на открытом воздухе без выхода на up
+ - бросить чан(ы) в Цеху Изобретений [50045]
+ + разработать медаль на грудь
+ + запрет на повтор до конца жизни
+ + в случае провала посылать на одну-две рл-сутки
+
+ + доделать quest info
+*/
+
+
+

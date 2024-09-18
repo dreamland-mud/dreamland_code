@@ -2,7 +2,7 @@
 #include "fedit.h"
 #include "olc.h"
 #include "security.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 
 #include "configurable.h"
 #include "merc.h"

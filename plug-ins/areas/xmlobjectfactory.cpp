@@ -9,7 +9,7 @@
 #include "behavior.h"
 #include "grammar_entities_impl.h"
 #include "merc.h"
-#include "json_utils.h"
+#include "json_utils_ext.h"
 
 
 XMLObjectFactory::XMLObjectFactory( ) : 

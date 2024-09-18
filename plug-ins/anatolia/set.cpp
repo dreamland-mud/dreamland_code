@@ -420,7 +420,7 @@ void oset( Character* ch, char* argument )
                 return;
             }
 
-            obj->properties[key] = value;
+            obj->setProperty(key, value);
         }
         else
         if ( !str_cmp( arg2, "owner") )

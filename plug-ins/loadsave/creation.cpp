@@ -24,6 +24,7 @@
 #include "race.h"
 #include "skillreference.h"
 
+#include "json_utils_ext.h"
 #include "act.h"
 #include "def.h"
 #include "itemevents.h"
@@ -537,6 +538,5 @@ void clone_object(Object *parent, Object *clone)
         clone->extra_descr = ed_new;
     }
 
-    for (auto &p : parent->properties)
-        clone->properties[p.first] = p.second;
+    JsonUtils::copy(clone->props, parent->props);
 }

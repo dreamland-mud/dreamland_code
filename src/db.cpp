@@ -62,7 +62,7 @@ using namespace std;
 #include "logstream.h"
 #include "class.h"
 #include "grammar_entities_impl.h"
-
+#include "json_utils.h"
 #include "dlscheduler.h"
 
 #include "skillreference.h"
@@ -211,49 +211,12 @@ obj_index_data::~obj_index_data()
     
 }
 
-static DLString json_as_string(const Json::Value &value)
-{
-    if (value.isString())
-       return value.asString();
-
-    if (value.isNumeric())
-        return DLString(value.asInt());
-
-    if (value.isBool())
-        return DLString(value.asBool());
-
-    return DLString::emptyString;
-}
-
-static bool json_find_value(const Json::Value &props, const DLString &key, DLString &value)
-{
-    for (auto p1 = props.begin(); p1 != props.end(); p1++) {
-        if (p1->isObject()) {
-            for (auto p2 = p1->begin(); p2 != p1->end(); p2++) {
-                if (p2.key().asString() == key) {
-                    value = json_as_string(*p2);
-                    return true;
-                }
-            }
-        } 
-        else if (p1.key().asString() == key) {
-            value = json_as_string(*p1);
-            return true;
-        }
-    }
-
-    return false;
-}
-
 DLString obj_index_data::getProperty(const DLString &key) const
 {
     // Look in props on index data: props[key] or props["blablah"][key]
-    DLString value;
-    
-    if (json_find_value(props, key, value))
-        return value;
-
-    return DLString::emptyString;
+    DLString jsonValue;
+    JsonUtils::findValue(props, key, jsonValue);
+    return jsonValue;
 }
 
 mob_index_data::mob_index_data( ) 
@@ -318,12 +281,9 @@ mob_index_data::~mob_index_data()
 DLString mob_index_data::getProperty(const DLString &key) const
 {
     // Look in props on index data: props[key] or props["blablah"][key]
-    DLString value;
-    
-    if (json_find_value(props, key, value))
-        return value;
-    
-    return DLString::emptyString;
+    DLString jsonValue;
+    JsonUtils::findValue(props, key, jsonValue);
+    return jsonValue;
 }
 
 int mob_index_data::getSize() const
