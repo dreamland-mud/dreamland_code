@@ -1,5 +1,6 @@
 #include "json/json.h"
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 #include "messengers.h"
 #include "iconvmap.h"
 #include "dlfileop.h"
@@ -177,6 +178,12 @@ void send_to_discord_stream(const DLString &content)
     send_to_discord(body, "discord-stream");
 }
 
+/** Send one message to the SCREAM Discord private channel. */
+static void send_to_discord_scream(Json::Value &body)
+{
+    send_to_discord(body, "discord-scream");
+}
+
 /**
  * Send out-of-character channel messages with real usernames.
  */
@@ -251,6 +258,43 @@ static const DLString COLOR_GOLDEN = "16640598";
 static const DLString COLOR_GREEN = "4485139";
 static const DLString COLOR_CRIMSON = "14824462";
 static const DLString COLOR_BLUE = "4514034";
+
+/** Send Fenia exception notifications, similar to 'Fenia orb'. */
+void send_discord_fenia(const DLString &header, const DLString &exception)
+{
+    Json::Value body;
+    body["username"] = koi2utf("Хрустальный Шар Фенера");
+    body["embeds"][0]["title"] = discord_string(header);
+    body["embeds"][0]["description"] = discord_string(exception);
+    body["embeds"][0]["color"] = COLOR_CRIMSON;
+
+    send_to_discord_scream(body);
+}
+
+/** Notify imms about character description changes. */
+void send_discord_confirm(PCharacter *ch)
+{
+    ostringstream d;
+
+    d << ch->getName( ) << ", " << ch->getRussianName().decline('1') << endl
+        << "level " << ch->getLevel( ) << ", "
+        << sex_table.name( ch->getSex( ) ) << " "
+        << ch->getRace( )->getName( ) << " "
+        << ch->getProfession( )->getName( )
+        << ", clan " << ch->getClan( )->getShortName( )
+        << endl
+        << ch->getDescription() << endl;
+
+    Json::Value body;
+    body["username"] = koi2utf("Всевидящее Око Руфины");
+    body["embeds"][0]["title"] = discord_string("Описание изменилось");
+    body["embeds"][0]["description"] = discord_string(d.str());
+    body["embeds"][0]["color"] = COLOR_GREEN;
+    body["embeds"][0]["author"]["name"] = discord_string(ch->getName());
+
+    send_to_discord_scream(body);
+}
+
 
 void send_discord_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
 {

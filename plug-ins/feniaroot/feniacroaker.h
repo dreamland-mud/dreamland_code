@@ -19,7 +19,11 @@ public:
 
 private:
     static void wiznet(const DLString &message);
+    static void discord(const DLString &header, const DLString &exception);
     static bool isFiltered(const ::Exception &e);
+
+    static DLString lastHeader;
+    static DLString lastException;
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include "codesource.h"
 #include "websocketrpc.h"
 #include "descriptor.h"
+#include "messengers.h"
 #include "act.h"
 
 using namespace Scripting;
@@ -13,6 +14,9 @@ using namespace Scripting;
 DLString NONCE_PLACEHOLDER = "NONCE";
 
 bool has_fenia_security( PCMemoryInterface *pch );
+
+DLString FeniaCroaker::lastHeader;
+DLString FeniaCroaker::lastException;
 
 void FeniaCroaker::initialization() 
 {
@@ -26,16 +30,18 @@ void FeniaCroaker::destruction()
 
 void FeniaCroaker::croak(const FeniaProcess *process, const ::Exception &e) const
 {
-    DLString message = 
-        fmt(0, "Исключение в потоке %s:{x\n%s\n", process->name.c_str(), e.what());
+    DLString header = "Исключение в потоке " + process->name;
+    DLString message = header + ":{x\n" + e.what() + "\n";
 
     wiznet(message);
+    discord(header, e.what());
 }
 
 void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const ::Exception &e) const
 {
     Register prog;
     DLString message;
+    DLString header;
 
     if (isFiltered(e))
         return;
@@ -43,6 +49,10 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
     // Try our best to guess the codesource where the buggy code is originating from.
     if (wrapper && wrapper->triggerFunction(key, prog)) {
         const CodeSource::Pointer &codeSource = prog.toFunction()->getFunction()->source.source;    
+
+        header = "Исключение при вызове [" + DLString(codeSource->getId()) + "] " 
+                + codeSource->name + " " + key.toString();
+
         ostringstream messageFormat;
         messageFormat 
             << "Исключение при вызове ["
@@ -52,10 +62,23 @@ void FeniaCroaker::croak(const WrapperBase *wrapper, const Register &key, const 
                        codeSource->getId(), codeSource->name.c_str(), key.toString().c_str(), e.what());
 
     } else {
-        message = fmt(0, "Исключение при вызове %s:{x\n%s\n", key.toString().c_str(), e.what());
+        header = "Исключение при вызове " + key.toString();
+        message = header + ":{x\n" + e.what() + "\n";
     }
     
     wiznet(message);
+    discord(header, e.what());
+}
+
+void FeniaCroaker::discord(const DLString &header, const DLString &exception)
+{
+    // Prevent spamming to Discord too much when the same exception is thrown every few seconds
+    if (lastHeader == header && lastException == exception)
+        return;
+
+    send_discord_fenia(header, exception);
+    lastHeader = header;
+    lastException = exception;
 }
 
 void FeniaCroaker::wiznet(const DLString &exceptionMessage)
