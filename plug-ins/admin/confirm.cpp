@@ -139,7 +139,7 @@ void Confirm::doReview( Character *ch )
 
     attr = get_confirm_attr(ch->getPC());
     
-    ch->pecho( "Твое новое описание отправлено Бессмертным на рассмотрение." );
+    ch->pecho( "\n{RТвое новое описание отправлено Бессмертным на рассмотрение.{x" );
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 редактирует описание персонажа ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
 
