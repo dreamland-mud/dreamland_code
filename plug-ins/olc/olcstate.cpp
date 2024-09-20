@@ -1069,23 +1069,26 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     DLString bhvName = bhvNameWithUnderscore.substitute('_', " ");
     Behavior *bhv = behaviorManager->findExisting(bhvName);
     if (!bhv) {
-        ptc(ch, "Поведение '%s' не существует, смотри {y{hc? behaviors{x для списка.\r\n", bhvName.c_str());
+        // Random property on obj index data
+        ptc(ch, "{RВнимание: поведение '%s' не существует, устанавливаю props с произвольным именем.{x\r\n", bhvName.c_str());
         return false;
     }
+    else {
+        // Configure existing behavior
+        if (!behaviors.isSet(bhv->getIndex())) {
+            ptc(ch, "Поведение '%s' не установлено на этом предмете.\r\n", bhvName.c_str());
+            return false;
+        }
 
-    if (!behaviors.isSet(bhv->getIndex())) {
-        ptc(ch, "Поведение '%s' не установлено на этом предмете.\r\n", bhvName.c_str());
-        return false;
+        if (!props[bhvName].isMember(propName) && !bhv->props.isMember(propName)) {
+            ptc(ch, "У поведения '%s' нету свойства под названием '%s'.\r\n", bhvName.c_str(), propName.c_str());
+            return false;
+        }
+
+        // Set the default for props that were added to behavior after this behavior got assigned here.
+        if (!props[bhvName].isMember(propName))
+            JsonUtils::copy(props[bhvName][propName], bhv->props[propName]);
     }
-
-    if (!props[bhvName].isMember(propName) && !bhv->props.isMember(propName)) {
-        ptc(ch, "У поведения '%s' нету свойства под названием '%s'.\r\n", bhvName.c_str(), propName.c_str());
-        return false;
-    }
-
-    // Set the default for props that were added to behavior after this behavior got assigned here.
-    if (!props[bhvName].isMember(propName))
-        JsonUtils::copy(props[bhvName][propName], bhv->props[propName]);
 
     Json::Value &target = props[bhvName][propName];
 

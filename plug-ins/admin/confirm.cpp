@@ -170,11 +170,6 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
 
     victim = pci->getPlayer( );
 
-    if (victim && IS_SET(victim->act, PLR_CONFIRMED)) {
-        ch->pecho("Этот персонаж уже подтвержден.");
-        return;
-    }
-            
     attr = find_confirm_attr(pci);
 
     if (!attr) { 
