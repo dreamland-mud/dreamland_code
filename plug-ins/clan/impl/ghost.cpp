@@ -17,7 +17,7 @@
 
 #include "pcharacter.h"
 #include "npcharacter.h"
-
+#include "skillreference.h"
 #include "act.h"
 
 #include "handler.h"

@@ -4,9 +4,8 @@
  */
 #include "clanmobiles.h"
 #include "clanreference.h"
-
+#include "skillreference.h"
 #include "occupations.h"
-
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"

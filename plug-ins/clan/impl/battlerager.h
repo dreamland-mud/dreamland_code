@@ -56,15 +56,4 @@ protected:
         XML_VARIABLE XMLBoolean healPets;
 };
 
-class CChop : public CommandPlugin {
-public:
-    typedef ::Pointer<CChop> Pointer;
-
-    CChop( );
-    virtual void run( Character *, const DLString & );
-    virtual bool visible( Character * ) const;
-private:
-    static const DLString COMMAND_NAME;
-};
-
 #endif

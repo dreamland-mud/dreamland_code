@@ -1,12 +1,10 @@
 lib_LTLIBRARIES = libservices_misc.la 
 
 libservices_misc_la_SOURCES = \
-healer.cpp \
 smithman.cpp \
 impl.cpp
 
 libservices_misc_la_MOC = \
-healer.h \
 smithman.h
 
 include $(top_srcdir)/src/Makefile.inc

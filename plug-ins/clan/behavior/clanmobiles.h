@@ -6,7 +6,6 @@
 #define CLANMOBILES_H
 
 #include "basicmobilebehavior.h"
-#include "healer.h"
 #include "clanobjects.h"
 #include "summoncreaturespell.h"
 

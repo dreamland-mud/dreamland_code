@@ -9,7 +9,6 @@
 #include "commandtemplate.h"
 
 #include "smithman.h"
-#include "healer.h"
 
 extern "C"
 {
@@ -23,11 +22,6 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<SharpSmithService> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<Smithman> >( ppl );
 
-        Plugin::registerPlugin<MocRegistrator<SpellHealService> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<ManaHealService> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<CustomHealPrice> >( ppl );
-        Plugin::registerPlugin<MobileBehaviorRegistrator<Healer> >( ppl );
-        
         return ppl;
     }
 }
