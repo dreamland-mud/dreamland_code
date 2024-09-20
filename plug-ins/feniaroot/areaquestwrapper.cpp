@@ -148,8 +148,8 @@ NMI_GET( AreaQuestWrapper, area, "зона (AreaIndex), в которой объ
 static int args2queststep(AreaQuest *q, const RegisterList &args)
 {
     int step = argnum2number(args, 1);
-    if (step < 0 || step > (int)q->steps.size())
-        throw Scripting::IndexOutOfBoundsException();
+    if (step < 0 || step >= (int)q->steps.size())
+        throw Scripting::Exception("Step index out of bounds: " + DLString(step) + ", quest " + q->vnum.toString());
     return step;
 }
 
