@@ -2746,7 +2746,7 @@ NMI_INVOKE(CharacterWrapper, trigger, "(trigName, trigArgs...): вызвать �
     WrapperBase *proto = target->is_npc() ? get_wrapper(target->getNPC()->pIndexData->wrapper) : 0;
 
     // Helper function will invoke onDeath, postDeath triggers on character and proto.
-    Register result;
+    Register result(false);
     fenia_trigger(result, trigName, trigArgs, this, proto);
     return result;
 }

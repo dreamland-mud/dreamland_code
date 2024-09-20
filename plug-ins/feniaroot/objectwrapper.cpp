@@ -304,6 +304,18 @@ NMI_SET( ObjectWrapper, timer, "через сколько тиков исчез�
     target->timer = arg.toNumber( );
 }
 
+NMI_GET( ObjectWrapper, water_float, "время плавания")
+{
+    checkTarget( );
+    return Register( target->water_float );
+}
+
+NMI_SET( ObjectWrapper, water_float, "время плавания")
+{
+    checkTarget( );
+    target->water_float = arg.toNumber( );
+}
+
 NMI_GET(ObjectWrapper, killer , "имя убийцы для трупов или строка '!anybody!'")
 {
     checkTarget();
@@ -388,6 +400,20 @@ NMI_GET( ObjectWrapper, wearloc, "локация (.Wearloc), куда надет
 {
     checkTarget();
     return WearlocWrapper::wrap(target->wear_loc->getName());
+}
+
+NMI_GET( ObjectWrapper, wearlocs, "список локаций (.Wearloc), куда надевается")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (int w = 0; w < wearlocationManager->size(); w++) {
+        Wearlocation *wearloc = wearlocationManager->find(w);
+        if (wearloc->matches(target))
+            rc->push_back(WearlocWrapper::wrap(wearloc->getName()));
+    }
+
+    return wrap(rc);
 }
 
 
@@ -885,7 +911,7 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
     WrapperBase *proto = get_wrapper(target->pIndexData->wrapper);
 
     // Helper function will invoke onDeath, postDeath triggers on item and proto.
-    Register result;
+    Register result(false);
     fenia_trigger(result, trigName, trigArgs, this, proto);
     return result;
 }
