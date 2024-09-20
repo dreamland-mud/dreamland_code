@@ -396,12 +396,6 @@ NMI_GET( ObjectWrapper, wear_loc, "имя локации, куда надет с
     return Register( target->wear_loc->getName( ) );
 }
 
-NMI_GET( ObjectWrapper, wearloc, "локация (.Wearloc), куда надет сейчас")
-{
-    checkTarget();
-    return WearlocWrapper::wrap(target->wear_loc->getName());
-}
-
 NMI_GET( ObjectWrapper, wearlocs, "список локаций (.Wearloc), куда надевается")
 {
     checkTarget();
