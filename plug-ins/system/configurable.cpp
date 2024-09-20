@@ -7,8 +7,12 @@
 #include "dlfilestream.h"
 #include "iconvmap.h"
 
-static IconvMap utf2koi("utf-8", "koi8-u");
+static IconvMap utf2koi("utf-8", "koi8-u//IGNORE");
 static IconvMap koi2utf("koi8-u", "utf-8");
+
+Configurable::~Configurable()
+{
+}
 
 DLString Configurable::getAbsolutePath() const
 {
@@ -16,14 +20,18 @@ DLString Configurable::getAbsolutePath() const
     return file.getAbsolutePath();
 }
 
-void Configurable::initialization()
+void Configurable::load()
 {
     try {
-        DLString text = getText();
+        ifstream ifs(getAbsolutePath());
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
         
-        JsonUtils::fromString(text, value);
+        setText(
+            utf2koi(buffer.str()));
+        
+        loaded();
 
-        loaded(value);
         LogStream::sendNotice() << "Configurable " << getPath() << " loaded with " << value.size() << " entries." << endl;
 
         configReg->add(Pointer(this));
@@ -33,15 +41,25 @@ void Configurable::initialization()
     }
 }
 
-void Configurable::refresh(const DLString &text)
+void Configurable::setText(const DLString &text)
+{
+    this->text = text;
+    JsonUtils::fromString(text, value);
+}
+
+void Configurable::unload()
+{
+    unloaded();
+    configReg->remove(Pointer(this));
+}
+
+void Configurable::save()
 {
     try {
         ofstream ofs(getAbsolutePath());
         ofs << koi2utf(text);
         
-        JsonUtils::fromString(text, value);
-
-        loaded(value);
+        loaded();
 
         LogStream::sendNotice() << "Configurable " << getPath() << " updated with " << value.size() << " entries." << endl;
 
@@ -50,24 +68,14 @@ void Configurable::refresh(const DLString &text)
     }
 }
 
-DLString Configurable::getText() const
+void ConfigurablePlugin::initialization()
 {
-    try {
-        ifstream ifs(getAbsolutePath());
-        std::stringstream buffer;
-        buffer << ifs.rdbuf();
-        return utf2koi(buffer.str());
-
-    } catch (const std::exception &ex) {
-        LogStream::sendError() << getPath() << ":" << ex.what() << endl;
-        return "ERROR";
-    }
+    load();
 }
 
-void Configurable::destruction()
+void ConfigurablePlugin::destruction()
 {
-    unloaded();
-    configReg->remove(Pointer(this));
+    unload();
 }
 
 ConfigurableRegistry* configReg = NULL;

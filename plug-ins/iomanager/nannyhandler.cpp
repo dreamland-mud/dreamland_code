@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "logstream.h"
+#include "plugininitializer.h"
 #include "descriptor.h"
 #include "colour.h"
 #include "mudtags.h"
@@ -15,13 +16,14 @@
 #include "badnames.h"
 #include "xmlattributecoder.h"
 #include "serversocketcontainer.h"
+#include "dlfileloader.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "room.h"
 #include "object.h"
-
+#include "configurable.h"
 #include "dreamland.h"
 #include "alignment.h"
 #include "loadsave.h"
@@ -271,6 +273,22 @@ PCharacter * NannyHandler::getPlayer( const Register &arg )
         throw Scripting::Exception("nanny invoked on npc");
 
     return ch->getPC( );
+}
+
+NMI_INVOKE( NannyHandler, generateDescription, "" )
+{
+    PCharacter *ch = getPlayer(args);
+    DLString race = ch->getRace()->getName();
+    DLString prof = ch->getProfession()->getName();
+    DLString sex = sex_table.name(ch->getSex());
+    
+    Configurable::Pointer cfg = configReg->get("descriptions/" + race);
+    if (!cfg) {
+        LogStream::sendWarning() << "Nanny: auto-descr not found for " << ch->getName() << " race " << race << endl;
+        return DLString::emptyString;
+    }
+
+    return cfg->getValue()[prof][sex].asString() + "\n";
 }
 
 NMI_INVOKE( NannyHandler, checkPassword, "" )
@@ -575,4 +593,41 @@ NMI_INVOKE( NannyHandler, help, "" )
     do_help( target, a.c_str( ) );
     return Register( );
 }
+
+class DescriptionLoaderPlugin : public virtual Plugin {
+public:
+    typedef ::Pointer<DescriptionLoaderPlugin> Pointer;
+
+    DescriptionLoaderPlugin() : loader("descriptions", ".json") {
+
+    }
+
+    virtual void initialization() 
+    {
+        loader.loadAll();
+
+        for (auto &file: loader.getAll()) {
+            DLString cfgName = loader.getTableDirName() + "/" + file.first;
+            Configurable::Pointer cfg(NEW);
+            cfg->setPath(cfgName);
+            cfg->load();
+        }
+
+    }
+
+    virtual void destruction() 
+    {
+        for (auto &file: loader.getAll()) {
+            DLString cfgName = loader.getTableDirName() + "/" + file.first;
+            Configurable::Pointer cfg = configReg->get(cfgName);
+            if (cfg)
+                cfg->unload();
+        }
+    }
+
+    DLFileLoader loader;
+
+};
+
+PluginInitializer<DescriptionLoaderPlugin> intDescLoader;
 

@@ -38,7 +38,8 @@ OLCStateFile::~OLCStateFile()
 void OLCStateFile::commit() 
 {
     Configurable::Pointer original = configReg->get(path);
-    original->refresh(text);
+    original->setText(text);
+    original->save();
 
     if (owner)
         owner->character->pecho("Изменения сохранены на диск.");

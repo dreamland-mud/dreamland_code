@@ -4,6 +4,7 @@
 #include <map>
 #include <list>
 #include "jsoncpp/json/value.h"
+#include "logstream.h"
 #include "plugin.h"
 #include "oneallocate.h"
 #include "xmlpolymorphvariable.h"
@@ -12,25 +13,42 @@
 #include "plugininitializer.h"
 #include "flags.h"
 #include "dlfile.h"
+#include "dldirectory.h"
+#include "dreamland.h"
 
-class Configurable: public virtual Plugin {
+class Configurable: public virtual DLObject {
 public:
     typedef ::Pointer<Configurable> Pointer;
 
-    virtual void initialization();
-    virtual void destruction();
-    virtual void loaded(Json::Value &) { }
-    virtual void unloaded() { }
+    virtual ~Configurable();
+    
+    void load();
+    void save();
+    void unload();
 
-    void refresh(const DLString &text);
-    DLString getText() const;
-    DLString getAbsolutePath() const;
+    void setPath(const DLString &path) { this->path = path; }
     const DLString & getPath() const { return path; }
+    const DLString & getText() const { return text; }
+    void setText(const DLString &text);
     const Json::Value &getValue() const { return value; }
 
 protected:
+    virtual void loaded() { }
+    virtual void unloaded() { }
+
+    DLString getAbsolutePath() const;
+
     DLString path;
+    DLString text;
     Json::Value value;
+};
+
+class ConfigurablePlugin: public virtual Plugin, public Configurable {
+public:
+    typedef ::Pointer<ConfigurablePlugin> Pointer;
+
+    virtual void initialization();
+    virtual void destruction();
 };
 
 class ConfigurableRegistry: public OneAllocate, public Plugin {
@@ -54,7 +72,7 @@ protected:
 extern ConfigurableRegistry *configReg;
 
 template <const char *&tn>
-class ConfigurableTemplate : public Configurable, public ClassSelfRegistratorPlugin<tn> {
+class ConfigurableTemplate : public ConfigurablePlugin, public ClassSelfRegistratorPlugin<tn> {
 public:
     typedef ::Pointer<ConfigurableTemplate> Pointer;
     
@@ -62,17 +80,19 @@ public:
         path = DLFile(folder,file).getPath();
     }
 
-    virtual void loaded(Json::Value &) {  }
 
 protected:
+    virtual void loaded() {  
+    }
+
     virtual void initialization( ) 
     {
         ClassSelfRegistratorPlugin<tn>::initialization( );
-        Configurable::initialization( );
+        ConfigurablePlugin::initialization( );
     }
     virtual void destruction( ) 
     {
-        Configurable::destruction( );
+        ConfigurablePlugin::destruction( );
         ClassSelfRegistratorPlugin<tn>::destruction( );
     }
     virtual void fromXML( const XMLNode::Pointer& node )  { }
@@ -94,7 +114,7 @@ PluginInitializer<CONFIGURABLE(x)> config_ ##x## _init(INITPRIO_NORMAL);
 
 #define CONFIGURABLE_LOADED(collection,x) \
 CONFIGURABLE_DECL(collection,x) \
-template <> void CONFIGURABLE(x)::loaded( Json::Value &value )
+template <> void CONFIGURABLE(x)::loaded()
 
 template <typename S>
 struct json_vector : public vector<S> {

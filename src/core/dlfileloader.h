@@ -25,6 +25,7 @@ public:
     const DLString & get(const DLString &key) const;
     time_t getModifyTime(const DLString &key) const;
     const Files &getAll() const;
+    const DLString &getTableDirName() const { return tableDirName; }
     
 protected:
     void addEntry(const DLFile &entry);
