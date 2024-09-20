@@ -63,6 +63,11 @@ COMMAND(Confirm, "confirm")
     {
         doRequest( ch );
     }
+    else if (cmd.strPrefix( "review" ) 
+             || cmd.strPrefix( "обновить" )) 
+    {
+        doReview( ch );
+    }
     else if ((cmd.strPrefix( "accept" ) 
               || cmd.strPrefix( "принять" )) && ch->is_immortal( ))
     {
@@ -120,10 +125,27 @@ void Confirm::doRequest( Character *ch )
     
     ch->pecho( "Твое описание отправлено Бессмертным на рассмотрение." );
     wiznet( WIZ_CONFIRM, 0, 0,
-            "%^C1 просит подтверждения своему персонажу ({y{hcconfirm list new{x).", ch );    
+            "%^C1 просит подтверждения своему персонажу ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
     send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
 
-    attr->update( ch ); 
+    attr->update( ch->getPC() ); 
+    PCharacterManager::saveMemory( ch->getPC( ) );
+}
+
+void Confirm::doReview( Character *ch ) 
+{
+    XMLAttributeConfirm::Pointer attr;
+    DLString descr;    
+
+    attr = get_confirm_attr(ch->getPC());
+    
+    ch->pecho( "Твое новое описание отправлено Бессмертным на рассмотрение." );
+    wiznet( WIZ_CONFIRM, 0, 0,
+            "%^C1 редактирует описание персонажа ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
+
+    send_discord_confirm(ch->getPC());
+
+    attr->update( ch->getPC() ); 
     PCharacterManager::saveMemory( ch->getPC( ) );
 }
 
@@ -156,18 +178,13 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
     attr = find_confirm_attr(pci);
 
     if (!attr) { 
-        if (!victim) {
-            ch->pecho("Может, хотя бы взглянешь на него?");
-            return;
-        } 
-        
         if (!ch->isCoder( )) {
             ch->pecho( "От %s не было заявки на подтверждение персонажа.", pci->getName( ).c_str( ) );
             return;
         }
 
         attr = get_confirm_attr(pci);
-        attr->update( victim );        
+        attr->update( pci );        
     } 
 
     attr->responsible.setValue( ch->getNameC() );
@@ -213,13 +230,8 @@ void Confirm::doReject( Character *ch, DLString& arguments )
     victim = pci->getPlayer( );
     
     if (!attr) { 
-        if (!victim) { 
-            ch->pecho("Может, хотя бы взглянешь на него?");
-            return;
-        } else { 
-            attr = get_confirm_attr(pci);
-            attr->update( victim );        
-        }
+        attr = get_confirm_attr(pci);
+        attr->update( pci );        
     }
 
     attr->responsible.setValue( ch->getNameC() );
@@ -292,6 +304,7 @@ void Confirm::doList( Character *ch, bool newOnly )
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
     ostringstream buf;
     int totalRequests = 0, newRequests = 0;
+    static time_t cutoff = 1726804482; // 20/09/2024
     
     const DLString lineFormat = web_cmd(ch, "confirm show $1", "%-15s") + " %-13s  %-9s %s\r\n";
      
@@ -299,6 +312,9 @@ void Confirm::doList( Character *ch, bool newOnly )
         attr = find_confirm_attr(i->second);
         
         if (!attr)
+            continue;
+
+        if (attr->date.getTime() < cutoff)
             continue;
 
         DLString rp = attr->responsible.getValue( );
@@ -438,7 +454,7 @@ void XMLAttributeConfirm::run( Character *ch )
     ch->getPC( )->getAttributes( ).eraseAttribute( "confirm" );
 }
 
-void XMLAttributeConfirm::update( Character *ch ) 
+void XMLAttributeConfirm::update( PCMemoryInterface *ch ) 
 {
     date.setTime( Date::getCurrentTime( ) );
     responsible.setValue( "" );

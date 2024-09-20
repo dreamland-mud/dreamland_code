@@ -12,7 +12,7 @@
 #include "descriptor.h"
 #include "xmlpcstringeditor.h"
 #include "websocketrpc.h"
-
+#include "interp.h"
 #include "handler.h"
 #include "vnum.h"
 
@@ -112,6 +112,7 @@ CMDRUNP( description )
         ch->setDescription( str.c_str( ));
         ch->pecho( "Новое описание вставлено из буфера редактора." );
         desc_show( ch );
+        interpret_raw(ch, "confirm", "review");
         return;
     }
 
@@ -139,6 +140,7 @@ CMDRUNP( description )
 
         ch->setDescription(desc_from_list(lines));
         desc_show(ch);
+        interpret_raw(ch, "confirm", "review");
         return;
     }
 
@@ -160,6 +162,7 @@ CMDRUNP( description )
 
         ch->setDescription(text);
         desc_show(ch);
+        interpret_raw(ch, "confirm", "review");
         return;
     }
 
