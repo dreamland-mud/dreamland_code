@@ -353,7 +353,7 @@ static void debug_player_age(PCharacter *ch)
  */
 void char_update( )
 {
-//    ProfilerBlock be("char_update");
+    ProfilerBlock profiler("char_update", 200);
     Character *ch;
     Character *ch_next;
 
@@ -761,7 +761,7 @@ static bool oprog_area( Object *obj )
  */
 void obj_update( void )
 {
-//    ProfilerBlock be("obj_update");
+    ProfilerBlock profiler("obj_update", 200);
     Object *obj;
     Object *obj_next;
     Room *room;
@@ -1254,6 +1254,7 @@ void light_update( PCharacter *ch )
 
 void room_update( void )
 {
+    ProfilerBlock profiler("room_update", 100);
     RoomSet tempAffected;
 
     // Create temporary set to avoid removing set elements from inside the loop.
