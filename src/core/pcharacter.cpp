@@ -395,6 +395,7 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setDescription(getDescription());
         mem->setSkills(getSkills());
         mem->setBonuses(getBonuses());
+        mem->setStartRoom(getStartRoom());
 
         return mem;
 }
@@ -423,6 +424,7 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setDescription(pcm->getDescription());
         setSkills(pcm->getSkills());
         setBonuses(pcm->getBonuses());
+        setStartRoom(pcm->getStartRoom());
 }
 
 /**************************************************************************
