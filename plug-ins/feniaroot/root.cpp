@@ -31,6 +31,7 @@
 #include "act.h"
 #include "configurable.h"
 #include "json_utils_ext.h"
+#include "lasthost.h"
 
 #include "merc.h"
 #include "damageflags.h"
@@ -49,6 +50,7 @@
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
+#include "playerwrapper.h"
 #include "mobindexwrapper.h"
 #include "structwrappers.h"
 #include "objindexwrapper.h"
@@ -948,6 +950,12 @@ NMI_INVOKE( Root, Hometown, "(name): конструктор для хомета�
     return HometownWrapper::wrap( name );
 }
 
+NMI_INVOKE(Root, Player, "(name): конструктор для игрока по имени" )
+{
+    DLString name = args2string(args);        
+    return PlayerWrapper::wrap(name);
+}
+
 NMI_INVOKE( Root, Area, "(filename): конструктор для зоны по имени файла" )
 {
     DLString name;
@@ -1459,4 +1467,19 @@ NMI_INVOKE(Root, help, "(id): вернуть сырой текст статьи 
 
     DLString text = article->getText();
     return Register(text); 
+}
+
+NMI_INVOKE(Root, finger, "(ip): список (.List) имен персонажей, заходивших с этого IP адреса")
+{
+    DLString ipAddress = args2string(args);
+    const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
+    RegList::Pointer players(NEW);
+
+    for (auto p = pcm.begin( ); p != pcm.end( ); p++) {
+        XMLAttributeLastHost::Pointer attr = p->second->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");
+        if (attr && attr->hasHost(ipAddress))
+            players->push_back(Register(p->first));
+    }
+
+    return ::wrap(players);
 }

@@ -61,6 +61,7 @@ Skill * arg2skill( const Register & );
 Affect * args2affect(const RegisterList &);
 DefaultSpell * arg2spell( const Register &reg );
 DLString arg2string(const Register &reg);
+int arg2number(const Register &reg, int lower = 0, int upper = 0);
 int arg2door(const Register &reg);
 WrappedCommand * arg2command(const Register &arg);
 WrappedCommand * argnum2command(const RegisterList &args, int num);

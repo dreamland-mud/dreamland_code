@@ -1003,7 +1003,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
         case 'R':
             if ( !str_cmp( word, "Room" ) )
             {
-                ch->start_room = fread_number( fp );
+                ch->setStartRoom(fread_number( fp ));
                 fMatch = true;
                 break;
             }

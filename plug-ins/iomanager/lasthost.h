@@ -23,6 +23,7 @@ public:
         void addHost(const DLString &host);
         bool hasHost(const DLString &host) const;
         void showHosts(ostringstream &buf) const;
+        const Hosts & getHosts() const { return hosts; }
         const DLString &getMatchingHost(const DLString &hostPrefix) const;
 
         /** Check if this player has a unique ip address */

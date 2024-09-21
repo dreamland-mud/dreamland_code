@@ -856,7 +856,6 @@ INT_FIELD(bank_s, "серебра в банке")
 INT_FIELD(bank_g, "золота в банке")
 INT_FIELD(config, "настройки чара (таблица .tables.config_flags)")
 INT_FIELD(shadow, "сколько висеть тени (shadowlife) в секундах")
-INT_FIELD(start_room, "в какой комнате вошли в мир")
     
 #undef INT_FIELD
 
@@ -896,7 +895,12 @@ NMI_GET(CharacterWrapper, afterCharm, "очарован или недавно р
         return IS_CHARMED(target);
 }
 
-
+NMI_GET(CharacterWrapper, start_room, "в какой комнате зашли в мир")
+{
+    checkTarget();
+    CHK_NPC
+    return target->getPC()->getStartRoom();
+}
 
 NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {

@@ -598,6 +598,14 @@ void PCharacter::setRussianName( const DLString& name )
     russianName.setFullForm( name );
     updateCachedNoun( );
 }
+int PCharacter::getStartRoom() const
+{
+    return start_room;
+}
+void PCharacter::setStartRoom(int vnum)
+{
+    this->start_room = vnum;        
+}
 
 /**************************************************************************
  * set-get methods inherited from Character

@@ -40,7 +40,8 @@ feniacroaker.cpp \
 commandtableloader.cpp \
 codesourcerepo.cpp \
 behaviorwrapper.cpp \
-behaviorloader.cpp
+behaviorloader.cpp \
+playerwrapper.cpp
 
 libfeniaroot_la_MOC = \
 root.h \
@@ -61,7 +62,8 @@ skillcommandwrapper.h \
 areaquestwrapper.h \
 characterwrapper.h \
 behaviorwrapper.h \
-behaviorloader.h
+behaviorloader.h \
+playerwrapper.h
 
 plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/ed \

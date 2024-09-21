@@ -177,6 +177,9 @@ public:
     virtual const DLString& getPretitle( ) const ;
     virtual void setPretitle( const DLString& ) ;
 
+    virtual int getStartRoom() const;
+    virtual void setStartRoom(int vnum);
+
     // set-get methods inherited from Character
     virtual void setDescription( const DLString& );
     virtual const char * getDescription( ) const;
@@ -253,6 +256,7 @@ private:
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger security;
     XML_VARIABLE XMLIntegerNoEmpty     questpoints;        
+    XML_VARIABLE XMLInteger start_room;
 
     CachedNoun cachedNoun;
 
@@ -321,8 +325,6 @@ public:
 
     // switch
     NPCharacter                *switchedTo;
-
-    XML_VARIABLE XMLInteger start_room;
 };
 
 #endif

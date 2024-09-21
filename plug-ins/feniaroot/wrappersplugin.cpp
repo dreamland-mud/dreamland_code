@@ -30,6 +30,7 @@
 #include "wrappedcommand.h"
 #include "areaquestwrapper.h"
 #include "behaviorwrapper.h"
+#include "playerwrapper.h"
 
 #include "class.h"
 #include "core/fenia/feniamanager.h"
@@ -194,6 +195,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<FeniaCommandWrapper>( );
     Class::regMoc<AreaQuestWrapper>( );
     Class::regMoc<BehaviorWrapper>();
+    Class::regMoc<PlayerWrapper>();
     
     FeniaManager::getThis( )->recover( );
         
@@ -210,6 +212,7 @@ WrappersPlugin::initialization( )
 
     Json::Value apiDump;
     traitsAPIJson<CharacterWrapper>("char", apiDump, true);     
+    traitsAPIJson<PlayerWrapper>("player", apiDump, true);     
     traitsAPIJson<ObjectWrapper>("obj", apiDump, true);     
     traitsAPIJson<RoomWrapper>("room", apiDump, true);     
     traitsAPIJson<MobIndexWrapper>("mob_index", apiDump, false);     
@@ -260,6 +263,7 @@ void WrappersPlugin::destruction( ) {
     Scripting::gc = false;
     FeniaManager::getThis( )->backup( );
 
+    Class::unregMoc<PlayerWrapper>();
     Class::unregMoc<BehaviorWrapper>();
     Class::unregMoc<AreaQuestWrapper>( );
     Class::unregMoc<WearlocWrapper>( );

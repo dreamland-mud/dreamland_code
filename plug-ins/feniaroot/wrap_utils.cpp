@@ -153,6 +153,20 @@ DLString arg2string(const Register &reg)
     return reg.toString();
 }
 
+int arg2number(const Register &reg, int lower, int upper)
+{
+    int result = reg.toNumber();
+
+    if (lower != 0 && upper != 0) {
+        if (result < lower)
+            throw Scripting::Exception("Number value must be higher than " + DLString(lower));
+        if (result > upper)
+            throw Scripting::Exception("Number value must be lower than " + DLString(upper));
+    }
+
+    return result;
+}
+
 DefaultAffectHandler * arg2affecthandler( const Register &reg )
 {
     return dynamic_cast<DefaultAffectHandler *>(

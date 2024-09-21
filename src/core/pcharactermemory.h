@@ -122,6 +122,9 @@ public:
     virtual PCBonuses & getBonuses();
     virtual void setBonuses(const PCBonuses &);
 
+    virtual int getStartRoom() const;
+    virtual void setStartRoom(int vnum);
+
 private:
     XML_VARIABLE XMLString name;
     XML_VARIABLE XMLString password;
@@ -145,6 +148,7 @@ private:
     XML_VARIABLE XMLRussianString russianName;
     XML_VARIABLE PCSkills skills;
     XML_VARIABLE PCBonuses bonuses;
+    XML_VARIABLE XMLInteger start_room;
 };
 
 #endif

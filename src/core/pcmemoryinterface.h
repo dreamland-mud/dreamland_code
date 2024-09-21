@@ -117,6 +117,9 @@ public:
 
     virtual PCBonuses & getBonuses() = 0;
     virtual void setBonuses(const PCBonuses &) = 0;
+
+    virtual int getStartRoom() const = 0;
+    virtual void setStartRoom(int vnum) = 0;
 };
 
 

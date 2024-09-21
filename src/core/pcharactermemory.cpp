@@ -282,3 +282,13 @@ void PCharacterMemory::setBonuses(const PCBonuses &bonuses)
 {
     this->bonuses = bonuses;        
 }
+
+int PCharacterMemory::getStartRoom() const
+{
+    return start_room;
+}
+
+void PCharacterMemory::setStartRoom(int vnum)
+{
+    this->start_room = vnum;        
+}

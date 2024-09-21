@@ -87,7 +87,7 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
         
         char_to_list( pch, &char_list );
 
-        Room *start_room = get_room_instance( pch->start_room  );
+        Room *start_room = get_room_instance( pch->getStartRoom()  );
         if (!start_room)
             start_room = get_room_instance( ROOM_VNUM_TEMPLE );
         char_to_room( pch, start_room );
