@@ -1178,7 +1178,7 @@ bool can_drop_obj( Character *ch, Object *obj, bool verbose )
     return false;
 }
 
-static bool oprog_drop( Object *obj, Character *ch )
+bool oprog_drop( Object *obj, Character *ch )
 {
     if (behavior_trigger(obj, "Drop", "OC", obj, ch))
         return true;

@@ -44,6 +44,7 @@ using namespace Scripting;
 
 NMI_INIT(ObjectWrapper, "предмет")
 
+bool oprog_drop(::Object *obj, Character *ch);
 
 ObjectWrapper::ObjectWrapper( ) : target( NULL )
 {
@@ -899,6 +900,15 @@ NMI_INVOKE(ObjectWrapper, trigger, "(trigName, trigArgs...): вызвать тр
         if (!target->carried_by)
             throw Scripting::Exception("Call obj_to_char before invoking onGet triggers");
         return oprog_get(target, target->carried_by); 
+    }
+
+    // Handle "Drop" trigger here until we figure out how to unify all calls.
+    if (trigName == "Drop") {
+        if (!target->in_room)
+            throw Scripting::Exception("Call obj_to_room before invoking onDrop triggers");
+
+        Character *ch = argnum2character(trigArgs, 2);
+        return oprog_drop(target, ch);
     }
 
     // Get obj index data wrapper.
