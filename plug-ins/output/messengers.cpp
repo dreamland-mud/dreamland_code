@@ -88,8 +88,8 @@ void send_telegram_note(const DLString &thread, const DLString &author, const DL
         size_t part_begins = current_size;
         size_t part_could_end = part_begins + text_chunk_size;
         // Unless it's the last part, don't cut mid-word, but look for the nearest space.
-        size_t part_ends = part_could_end >= last_pos ? part_could_end : text.find_last_of(' ', part_could_end);
-        DLString part_koi = text.substr(part_begins, part_ends - part_begins);
+        size_t part_ends = part_could_end >= last_pos ? part_could_end : text_koi.find_last_of(' ', part_could_end);
+        DLString part_koi = text_koi.substr(part_begins, part_ends - part_begins);
         
         DLString header_ext_koi = " [часть ";
         header_ext_koi << part_num << "]\n\n";
