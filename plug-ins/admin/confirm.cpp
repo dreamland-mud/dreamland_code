@@ -139,7 +139,8 @@ void Confirm::doReview( Character *ch )
 
     attr = get_confirm_attr(ch->getPC());
     
-    ch->pecho( "\n{RТвое новое описание отправлено Бессмертным на рассмотрение.{x" );
+    // Messaging player here only created confusion.
+    // ch->pecho( "\n{RТвое новое описание отправлено Бессмертным на рассмотрение.{x" );
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 редактирует описание персонажа ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
 
@@ -431,7 +432,7 @@ void XMLAttributeConfirm::run( Character *ch )
         return;
     
     if (accepted.getValue( )) {
-        buf << "{WТвой персонаж подтвержден Богами.{x" << endl;
+        buf << "{WБогам понравилось твое новое описание.{x" << endl;
         SET_BIT( ch->act, PLR_CONFIRMED );
     }
     else {
