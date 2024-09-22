@@ -30,7 +30,7 @@ Register PlayerWrapper::wrap(const DLString &name)
 {
     PCMemoryInterface *player = PCharacterManager::find(name);
     if (!player)
-        throw Scripting::Exception(name + ": player not found");
+        return Register();
         
     return Register::handler<PlayerWrapper>(player->getName());
 }

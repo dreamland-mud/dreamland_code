@@ -902,6 +902,14 @@ NMI_GET(CharacterWrapper, start_room, "в какой комнате зашли �
     return target->getPC()->getStartRoom();
 }
 
+NMI_SET(CharacterWrapper, start_room, "в какой комнате зашли в мир")
+{
+    checkTarget();
+    CHK_NPC
+    target->getPC()->setStartRoom(arg2number(arg));
+}
+
+
 NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
