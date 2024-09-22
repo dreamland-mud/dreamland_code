@@ -1519,7 +1519,11 @@ NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться 
 
 NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): присвоить временное умение персонажу, разученное на learned % (или на 75%), работающее days дней (или вечно), помеченное как origin (или fenia). Вернет true, если присвоено успешно.")
 {
-    PCharacter *ch = argnum2player(args, 1);
+    Character *ach = argnum2character(args, 1);
+    if (ach->is_npc())
+        return false;
+
+    PCharacter *ch = ach->getPC();
     int learned = args.size() > 1 ? argnum2number(args, 2) : ch->getProfession()->getSkillAdept();
     long today = day_of_epoch(time_info);
     long end;
@@ -1564,7 +1568,11 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
 
 NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить временное умение у персонажа, помеченное как origin (.tables.skill_origin_table). Вернет true, если было что очищать.")
 {
-    PCharacter *ch = argnum2player(args, 1);
+    Character *ach = argnum2character(args, 1);
+    if (ach->is_npc())
+        return false;
+
+    PCharacter *ch = ach->getPC();
     Skill *skill = getTarget();
     PCSkillData &data = ch->getSkillData(skill->getIndex());
     int origin;
