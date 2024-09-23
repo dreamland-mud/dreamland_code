@@ -184,6 +184,13 @@ static void send_to_discord_scream(Json::Value &body)
     send_to_discord(body, "discord-scream");
 }
 
+void send_discord_wiznet(const DLString &content)
+{
+    Json::Value body;
+    body["content"] = discord_string(content);
+    send_to_discord_scream(body);
+}
+
 /**
  * Send out-of-character channel messages with real usernames.
  */

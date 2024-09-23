@@ -20,6 +20,7 @@ void send_discord_gquest(const DLString &gqName, const DLString &msg);
 void send_discord_bonus(const DLString &msg);
 void send_discord_fenia(const DLString &header, const DLString &exception);
 void send_discord_confirm(PCharacter *ch);
+void send_discord_wiznet(const DLString &message);
 void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg);
 void send_discord_ic(Character *ch, const DLString &format, const DLString &msg);
 

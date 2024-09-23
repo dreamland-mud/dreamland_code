@@ -665,6 +665,13 @@ NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Di
     return Register( );
 }
 
+NMI_INVOKE(Root, discord_wiznet, "(msg): послать сообщение в приватный Discord #дрім-скрім")
+{
+    DLString msg = args2string(args);
+    send_discord_wiznet(msg);
+    return Register( );
+}
+
 NMI_INVOKE(Root, telegram, "(msg): послать сырое сообщение в Telegram")
 {
     ostringstream buf;
