@@ -300,6 +300,7 @@ static bool mprog_special( Character *ch )
  */
 void mobile_update( ) 
 {
+    ProfilerBlock("mobile_update", 50);
     Character *ch, *ch_next;
 
     for (ch = char_list; ch; ch = ch_next) {
@@ -353,13 +354,9 @@ static void debug_player_age(PCharacter *ch)
  */
 void char_update( )
 {
-    ProfilerBlock profiler("char_update", 200);
+    ProfilerBlock profiler("char_update", 100);
     Character *ch;
     Character *ch_next;
-
-    static time_t last_save_time = -1;
-    int autoquit_timer = config["autoquit"].asInt();
-    int lostlink_timer = config["lostlink"].asInt();
 
     for ( ch = char_list; ch != 0; ch = ch_next )
     {
@@ -466,18 +463,45 @@ void char_update( )
             room_to_save( ch );
             update_pos( ch );
         }
+    }
+}
+
+void char_update_prog( )
+{
+    ProfilerBlock profiler("char_update_prog", 100);
+    Character *ch;
+    Character *ch_next;
+
+    for ( ch = char_list; ch != 0; ch = ch_next )
+    {
+        ch_next = ch->next;
+
+        if (ch->in_room == 0)
+            continue;
 
         if (mprog_area( ch ))
             continue;
     }
+}
 
+void char_update_autosave()
+{
     /*
      * Autosave and autoquit.
      * Check that these chars still exist.
      */
+    ProfilerBlock("char_update_autosave", 20);
+
+    static time_t last_save_time = -1;
+    int autoquit_timer = config["autoquit"].asInt();
+    int lostlink_timer = config["lostlink"].asInt();
+
     if (last_save_time == -1 || dreamland->getCurrentTime( ) - last_save_time > 60)
     {
+        Character *ch, *ch_next;
+
         last_save_time = dreamland->getCurrentTime( );
+
         for (ch = char_list; ch != 0; ch = ch_next)
         {
             ch_next = ch->next;
@@ -551,6 +575,7 @@ static bool oprog_spec( Object *obj )
 
 void water_float_update( )
 {
+    ProfilerBlock("water_float_update", 50);
     Object *obj_next;
     Object *obj;
 
@@ -1126,6 +1151,8 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Char update"  << endl;
         char_update        ( );
+        char_update_prog();
+        char_update_autosave();
 
         LastLogStream::send( ) <<  "Objects update"  << endl;
         obj_update        ( );
