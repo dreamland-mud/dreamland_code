@@ -60,6 +60,7 @@
 #include "skill.h"
 #include "skillcommand.h"
 #include "commonattributes.h"
+#include "profiler.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
