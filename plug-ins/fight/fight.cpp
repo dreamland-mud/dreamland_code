@@ -168,6 +168,7 @@ static void wlprog_fight( Object *obj, Character *ch)
  */
 void violence_update()
 {
+    ProfilerBlock("violence_update", 10);
     Character *ch;
     Character *victim;
     Object *obj, *obj_next;
