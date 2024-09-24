@@ -275,11 +275,15 @@ NMI_INVOKE(PlayerWrapper, attribute, "(name): вернуть аттрибут с
 NMI_GET(PlayerWrapper, ips, "массив (.Array), ключ - IP адес, значение - количество заходов")
 {
     PCMemoryInterface *player = getTarget();
-    auto lastHostAttr = player->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");  
-    auto hosts = lastHostAttr->getHosts();  
 
     Register ipsReg = Register::handler<RegContainer>();
     RegContainer *ips = ipsReg.toHandler().getDynamicPointer<RegContainer>();
+
+    auto lastHostAttr = player->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");  
+    if (!lastHostAttr)
+        return ipsReg;
+        
+    auto hosts = lastHostAttr->getHosts();  
 
     for (auto h: hosts)
         ips->setField(h.first, h.second.getValue());

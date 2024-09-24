@@ -193,6 +193,8 @@ void room_to_save( Object *obj )
 
 void room_saving( void )
 {
+    ProfilerBlock("room_saving", 10);
+
     if ( saving_position >= MAX_VNUM )
         saving_position = 0;
 
@@ -300,7 +302,7 @@ static bool mprog_special( Character *ch )
  */
 void mobile_update( ) 
 {
-    ProfilerBlock("mobile_update", 50);
+    ProfilerBlock("mobile_update", 10);
     Character *ch, *ch_next;
 
     for (ch = char_list; ch; ch = ch_next) {
@@ -354,7 +356,7 @@ static void debug_player_age(PCharacter *ch)
  */
 void char_update( )
 {
-    ProfilerBlock profiler("char_update", 100);
+    ProfilerBlock profiler("char_update", 10);
     Character *ch;
     Character *ch_next;
 
@@ -468,7 +470,7 @@ void char_update( )
 
 void char_update_prog( )
 {
-    ProfilerBlock profiler("char_update_prog", 100);
+    ProfilerBlock profiler("char_update_prog", 10);
     Character *ch;
     Character *ch_next;
 
@@ -490,7 +492,7 @@ void char_update_autosave()
      * Autosave and autoquit.
      * Check that these chars still exist.
      */
-    ProfilerBlock("char_update_autosave", 20);
+    ProfilerBlock("char_update_autosave", 10);
 
     static time_t last_save_time = -1;
     int autoquit_timer = config["autoquit"].asInt();
@@ -539,6 +541,8 @@ static void rafprog_spec(Room *room)
 
 void diving_update( )
 {
+    ProfilerBlock("diving_update", 10);
+   
     for (auto &r: roomInstances) {
         try {
             FENIA_VOID_CALL(r, "DiveUpdate", "");
@@ -575,7 +579,7 @@ static bool oprog_spec( Object *obj )
 
 void water_float_update( )
 {
-    ProfilerBlock("water_float_update", 50);
+    ProfilerBlock("water_float_update", 10);
     Object *obj_next;
     Object *obj;
 
@@ -786,7 +790,7 @@ static bool oprog_area( Object *obj )
  */
 void obj_update( void )
 {
-    ProfilerBlock profiler("obj_update", 100);
+    ProfilerBlock profiler("obj_update", 10);
     Object *obj;
     Object *obj_next;
     Room *room;
@@ -976,7 +980,7 @@ void obj_update( void )
 
 void obj_update_prog( void )
 {
-    ProfilerBlock profiler("obj_update_prog", 100);
+    ProfilerBlock profiler("obj_update_prog", 10);
     Object *obj;
     Object *obj_next;
     Room *room;
@@ -1002,7 +1006,7 @@ void obj_update_prog( void )
 
 void obj_update_affects( void )
 {
-    ProfilerBlock profiler("obj_update_affects", 100);
+    ProfilerBlock profiler("obj_update_affects", 10);
     Object *obj;
     Object *obj_next;
     Room *room;
@@ -1204,6 +1208,8 @@ void update_handler( void )
  */
 void aggr_update( )
 {
+    ProfilerBlock profiler("aggr_update", 20);
+    
     Character *ch, *ch_next;
     NPCharacter *mob;
 
@@ -1332,7 +1338,7 @@ void light_update( PCharacter *ch )
 
 void room_update( void )
 {
-    ProfilerBlock profiler("room_update", 100);
+    ProfilerBlock profiler("room_update", 10);
     RoomSet tempAffected;
 
     // Create temporary set to avoid removing set elements from inside the loop.
