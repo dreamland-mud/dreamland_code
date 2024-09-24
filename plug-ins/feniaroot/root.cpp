@@ -153,6 +153,14 @@ NMI_GET( Root, current_time, "текущее время в секундах")
     return Register((int)dreamland->getCurrentTime( ));
 }
 
+NMI_GET(Root, current_time_millis, "текущее время в миллисекундах") 
+{
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    int millis = now.tv_sec*1000 + now.tv_usec/1000;
+    return millis;
+}
+
 NMI_INVOKE( Root, getCurrentTime , "(): текущее время в секундах") 
 {
     return Register((int)dreamland->getCurrentTime( ));
@@ -801,6 +809,17 @@ NMI_GET( Root, rooms , "список всех комнат")
 
     for (auto &r: roomIndexMap) {
         list->push_back(wrap(r.second->room));
+    }
+
+    return wrap(list);
+}
+
+NMI_GET( Root, areaIndexes , "список всех прототипов зон") 
+{
+    RegList::Pointer list(NEW);
+
+    for (auto &areaIndex: areaIndexes) {
+        list->push_back(WrapperManager::getThis()->getWrapper(areaIndex));
     }
 
     return wrap(list);

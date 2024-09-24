@@ -128,6 +128,17 @@ NMI_GET(AreaIndexWrapper, players, "список (List) всех игроков 
     return wrap(rc);
 }
 
+NMI_GET(AreaIndexWrapper, rooms, "список (List) всех комнат в зоне")
+{
+    checkTarget();
+    RegList::Pointer rc(NEW);
+
+    for (auto &r: target->roomIndexes)
+        rc->push_back(WrapperManager::getThis()->getWrapper(r.second->room));
+    
+    return wrap(rc);
+}
+
 NMI_INVOKE( AreaIndexWrapper, reset, "(): обновить экземпляр(ы) этой зоны" )
 {
     checkTarget();
