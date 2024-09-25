@@ -12,6 +12,7 @@ class Room;
 
 void reset_area( Area *pArea, int flags = 0 );
 void area_update( int flags = 0 );
+void area_update_next();
 void reset_room( Room *pRoom, int flags = 0 );
 
 #endif

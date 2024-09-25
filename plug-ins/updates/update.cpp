@@ -1055,6 +1055,8 @@ void update_handler( void )
         area_update        ( );
     }
 
+    area_update_next();
+
     if ( --pulse_mobile   <= 0 )
     {
         pulse_mobile        = PULSE_MOBILE;

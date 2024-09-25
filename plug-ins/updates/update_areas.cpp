@@ -47,8 +47,24 @@ static void aprog_update( Area *area )
     FENIA_NDX_VOID_CALL( area, "Update", "" );
 }
 
+// A queue of areas that are waiting to be reset at the next opportunity.
+struct AreaResetEvent {
+    AreaResetEvent(Area *pArea, int flags) {
+        this->pArea = pArea;
+        this->flags = flags;
+    }
+
+    Area *pArea;
+    int flags;
+};
+
+std::list<AreaResetEvent> areasToReset;
+
 /*
- * Repopulate areas periodically.
+ * Repopulate areas periodically. Decides whether to reset given area based on passed flags,
+ * area age and popularity. If reset is required, area (alongside the flags requested) is placed
+ * at the top of the waiting queue. The queue is processed at the rate of one area per pulse, to
+ * prevent multiple area resets per pulse, taking more than the pulse itself.
  */
 void area_update( int flags )
 {
@@ -60,7 +76,7 @@ void area_update( int flags )
             continue;
 
         /*
-         * If a reset is forced (e.g. after world startup): reset immediately.
+         * If a reset is forced (e.g. after world startup): mark for reset immediately.
          * Popular areas (newbie ones): reset every 3 minutes.
          * Areas with some recent activity (empty == false): reset every 15 minutes or once all players are out.
          * All other areas: reset every 30 minutes.
@@ -68,17 +84,42 @@ void area_update( int flags )
         if ((!pArea->empty && (pArea->nplayer == 0 || pArea->age >= 15))
                 || pArea->age >= 31
                 || IS_SET(flags, FRESET_ALWAYS))
-        {
-            reset_area( pArea, flags );
-            wiznet( WIZ_RESETS, 0, 0, "%s has just been reset.", pArea->pIndexData->getName().c_str() );
+        {            
+            // Re-put the area into the waiting queue, to be reset in the next pulse.
+            areasToReset.remove_if([&pArea] (auto &event) {
+                return event.pArea == pArea;
+            });
 
-            pArea->age = number_range( 0, 3 );
-            if (IS_SET(pArea->area_flag, AREA_POPULAR))
-                pArea->age = 15 - 2;
-            else if (pArea->nplayer == 0)
-                pArea->empty = true;
+            areasToReset.push_front(AreaResetEvent(pArea, flags));
+
+            wiznet( WIZ_RESETS, 0, 0, "%s has been market for reset.", pArea->pIndexData->getName().c_str() );
         }
     }
+}
+
+/** Resets top area from the waiting queue. */
+void area_update_next()
+{
+    ProfilerBlock("area_update_next", 10);
+
+    if (areasToReset.empty())
+        return;
+
+    // Take first area out of the queue and reset it. 
+    AreaResetEvent event = areasToReset.front();
+    areasToReset.pop_front();
+
+    reset_area(event.pArea, event.flags);
+
+    wiznet( WIZ_RESETS, 0, 0, "%s has just been reset.", event.pArea->pIndexData->getName().c_str() );
+
+    // Update area age according to its popularity.
+    event.pArea->age = number_range( 0, 3 );
+
+    if (IS_SET(event.pArea->area_flag, AREA_POPULAR))
+        event.pArea->age = 15 - 2;
+    else if (event.pArea->nplayer == 0)
+        event.pArea->empty = true;
 }
 
 static Object * get_obj_list_vnum( Object *list, int vnum )
