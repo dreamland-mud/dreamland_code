@@ -299,6 +299,31 @@ NMI_GET(MobIndexWrapper, props, "Map (структура) из свойств п
     return JsonUtils::toRegister(target->props);
 }
 
+NMI_GET(MobIndexWrapper, triggers, "список (.List) названий всех тригеров")
+{
+    checkTarget();
+
+    StringSet triggers, misc;
+
+    // Collect all onXXX, postXXX triggers defined on index data.
+    WrapperBase *ndxWrapper = get_wrapper(target->wrapper);
+    if (ndxWrapper)
+        ndxWrapper->collectTriggers(triggers, misc);
+
+    // Collect all triggers defined on each of the behaviors.
+    for (auto &b: target->behaviors.toSet()) {
+        WrapperBase *bhvWrapper = behaviorManager->find(b)->getWrapper();
+        if (bhvWrapper)
+            bhvWrapper->collectTriggers(triggers, misc);
+    }
+
+    // Transform triggers set into a Fenia list.
+    RegList::Pointer rc(NEW);
+    for (auto &trig: triggers)
+        rc->push_back(Register(trig));
+    return ::wrap(rc);
+}
+
 NMI_INVOKE( MobIndexWrapper, api, "(): печатает этот API" )
 {
     ostringstream buf;
