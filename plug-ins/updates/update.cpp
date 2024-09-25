@@ -827,6 +827,41 @@ void obj_update( void )
             continue;
         }
 
+        if (oprog_area( obj ))
+            continue;        
+
+        /* go through affects and decrement */
+        AffectList affects = obj->affected.clone();
+        for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
+            Affect *paf = *paf_iter;
+
+            if ( paf->duration > 0 )
+            {
+                paf->duration--;
+                if (number_range(0,4) == 0 && paf->level > 0)
+                    paf->level--;  /* spell strength fades with time */
+
+                // Issue periodic message or action.
+                if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
+                    paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, obj), paf );
+
+                room_to_save( obj );
+            }
+            else if ( paf->duration < 0 )
+                ;
+            else
+            {
+                room_to_save( obj );
+
+                if (!affects.hasNext(paf_iter))
+                    if (paf->type->getAffect())
+                        paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf );
+
+
+                affect_remove_obj( obj, paf, false );
+            }
+        }
+
         if (!obj->in_obj 
             && room->getSectorType() == SECT_DESERT
             && material_is_flagged( obj, MAT_MELTING ))
@@ -978,90 +1013,6 @@ void obj_update( void )
 }
 
 
-void obj_update_prog( void )
-{
-    ProfilerBlock profiler("obj_update_prog", 10);
-    Object *obj;
-    Object *obj_next;
-    Room *room;
-
-    for ( obj = object_list; obj != 0; obj = obj_next )
-    {
-        if(!obj->pIndexData) {
-            LogStream::sendError() << "obj_update aborted" << endl;
-            return;
-        }
-            
-        obj_next = obj->next;
-        room = obj->getRoom( );
-        
-        if (!room)
-            continue;
-
-        if (oprog_area( obj ))
-            continue;        
-    }
-
-}
-
-void obj_update_affects( void )
-{
-    ProfilerBlock profiler("obj_update_affects", 10);
-    Object *obj;
-    Object *obj_next;
-    Room *room;
-
-    for ( obj = object_list; obj != 0; obj = obj_next )
-    {
-
-        if(!obj->pIndexData) {
-            LogStream::sendError() << "obj_update aborted" << endl;
-            return;
-        }
-            
-        obj_next = obj->next;
-        room = obj->getRoom( );
-        
-        if (!room)
-            continue;
-
-        /* go through affects and decrement */
-        AffectList affects = obj->affected.clone();
-        for (auto paf_iter = affects.cbegin( ); paf_iter != affects.cend( ); paf_iter++) {
-            Affect *paf = *paf_iter;
-
-            if ( paf->duration > 0 )
-            {
-                paf->duration--;
-                if (number_range(0,4) == 0 && paf->level > 0)
-                    paf->level--;  /* spell strength fades with time */
-
-                // Issue periodic message or action.
-                if (!affects.hasNext(paf_iter) && paf->type->getAffect( )) 
-                    paf->type->getAffect()->onUpdate(SpellTarget::Pointer(NEW, obj), paf );
-
-                room_to_save( obj );
-            }
-            else if ( paf->duration < 0 )
-                ;
-            else
-            {
-                room_to_save( obj );
-
-                if (!affects.hasNext(paf_iter))
-                    if (paf->type->getAffect())
-                        paf->type->getAffect()->onRemove(SpellTarget::Pointer(NEW, obj), paf );
-
-
-                affect_remove_obj( obj, paf, false );
-            }
-        }
-
-    }
-}
-
-
-
 /*
  * Handle all kinds of updates.
  * Called once per pulse from game loop.
@@ -1160,8 +1111,6 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Objects update"  << endl;
         obj_update        ( );
-        obj_update_prog        ( );
-        obj_update_affects     ( );
 
         LastLogStream::send( ) <<  "Room update"  << endl;
         room_update        ( );
