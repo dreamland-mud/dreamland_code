@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 #include <sstream>
+#include <functional>
+#include <array>
 
 #include "reglist.h"
 #include "register-impl.h"
@@ -194,20 +196,6 @@ NMI_INVOKE( RegList, size , "(): размер списка")
     return (int)size( );
 }
 
-struct RegisterWeakOrder {
-    bool operator () ( const Register &k1, const Register &k2 ) {
-        return (k1 < k2).toBoolean( );
-    }
-};
-
-NMI_INVOKE( RegList, sort , "(): сортирует список по возрастанию")
-{
-    sort( RegisterWeakOrder( ) );
-    self->changed();
-
-    return Register( self );
-}
-
 struct RegisterBinPred {
     bool operator () ( const Register &k1, const Register &k2 ) {
         return (k1 == k2).toBoolean( );
@@ -242,17 +230,41 @@ NMI_INVOKE( RegList, api, "(): печатает этот api")
     return Register( buf.str( ) );
 }
 
+struct RegisterWeakOrder {
+    bool operator () ( const Register &k1, const Register &k2 ) {
+        return (k1 < k2).toBoolean( );
+    }
+};
+
+NMI_INVOKE( RegList, sort, "([func]): сортирует список по возрастанию, используя func для сравнения элементов. func принимает два аргумента")
+{
+    if (args.empty()) {
+        sort(RegisterWeakOrder());
+
+    } else {
+        Closure *fun = argnum2closure(args, 1);   
+
+        sort([&](auto &a, auto &b) { 
+            RegisterList av;
+            av.push_back(a);
+            av.push_back(b);
+            return fun->invoke(self, av).toBoolean();
+        });
+    }
+
+    self->changed();
+
+    return Register( self );
+}
+
+
 NMI_INVOKE( RegList, filter, "(func[,args]): возвращает новый список из элементов, для которых функция func вернула true")
 {
-    RegisterList::const_iterator ai = args.begin();
-    if(ai == args.end())
-        throw Scripting::NotEnoughArgumentsException( );
-
-    Register rfun = *ai++;
-    Closure *fun = rfun.toFunction( );
+    Closure *fun = argnum2closure(args, 1);    
     
     RegisterList av;
-    av.assign(ai, args.end( ));
+    if (args.size() > 1)
+        av = argnum2registerList(args, 2);
     
     RegList::Pointer rc( NEW );
 
@@ -263,10 +275,7 @@ NMI_INVOKE( RegList, filter, "(func[,args]): возвращает новый с�
             rc->push_back( *i );
     }
 
-    Scripting::Object *obj = &Scripting::Object::manager->allocate();
-    obj->setHandler(rc); 
-
-    return Register( obj );
+    return wrap(rc);
 }
 
 NMI_INVOKE( RegList, clear, "(): очистка списка" )

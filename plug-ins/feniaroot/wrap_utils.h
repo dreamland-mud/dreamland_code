@@ -84,6 +84,8 @@ const FlagTable * argnum2table(const RegisterList &args, int num);
 ::Pointer<SpellTarget> arg2target(const Register &arg);
 ::Pointer<SpellTarget> argnum2target(const RegisterList &args, int num);
 RegList * arg2reglist(const Register &arg);
+Scripting::Closure * argnum2closure(const RegisterList &args, int num);
+RegisterList argnum2registerList(const RegisterList &args, int num);
 
 template<typename Elem> inline
 void arg2globalBitvector(const Register &arg, GlobalBitvector &field)

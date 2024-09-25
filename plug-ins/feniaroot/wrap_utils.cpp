@@ -462,3 +462,26 @@ RegList * arg2reglist(const Register &arg)
 
     return list;
 }
+
+Scripting::Closure * argnum2closure(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return reg.toFunction();
+}
+
+RegisterList argnum2registerList(const RegisterList &args, int num)
+{
+    RegisterList::const_iterator ai = args.begin();
+
+    for (int counter = num; counter > 1 && ai != args.end(); counter--) {
+        ai++;
+    }
+
+    if (ai == args.end())
+        throw Scripting::NotEnoughArgumentsException();
+
+    RegisterList av;
+    av.assign(ai, args.end());
+
+    return av;
+}
