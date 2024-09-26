@@ -60,7 +60,7 @@ bool QuestBag::hourly()
         return false;
 
     PCMemoryInterface *owner = PCharacterManager::find(obj->getOwner());
-    if (owner && owner->getLastAccessTime().getTime() >= 1529205799) // been here since 2018
+    if (owner && owner->getLastAccessTime().getTime() >= 1645679207) // been here since 2022
         return false;
 
     obj->setProperty("oldRoom", DLString(obj->in_room->vnum));
