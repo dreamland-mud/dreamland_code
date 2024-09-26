@@ -17,6 +17,7 @@
 #include "dlscheduler.h"
 #include "schedulertaskroundcharacter.h"
 #include "schedulerlist.h"
+#include "profiler.h"
 #include "character.h"
 #include "merc.h"
 
@@ -27,6 +28,8 @@ int SchedulerTaskRoundCharacter::getPriority( ) const
 
 void SchedulerTaskRoundCharacter::run( )
 {
+    ProfilerBlock("SchedulerTaskRoundCharacter", 10);
+    
     Character *ch, *ch_next;
     
     for (ch = char_list; ch != 0 ; ch = ch_next) {

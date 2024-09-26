@@ -9,7 +9,7 @@
 #include "update_areas.h"
 #include "update.h"
 #include "weather.h"
-
+#include "profiler.h"
 #include "schedulertaskroundplugin.h"
 #include "dlscheduler.h"
 #include "so.h"
@@ -26,6 +26,8 @@ public:
     
     virtual void run( )
     {
+        ProfilerBlock("AnatoliaUpdate", 50);
+        
         update_handler( );
         DLScheduler::getThis( )->putTaskInitiate( Pointer( this ) );
     }
@@ -59,6 +61,8 @@ public:
 
     virtual void run()
     {
+        ProfilerBlock("hourly", 10);
+
         Object *obj, *obj_next;
         for (obj = object_list; obj; obj = obj_next) {
             obj_next = obj->next;

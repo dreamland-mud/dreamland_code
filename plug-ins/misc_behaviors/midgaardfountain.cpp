@@ -7,6 +7,7 @@
 
 #include "class.h"
 
+#include "profiler.h"
 #include "room.h"
 #include "object.h"
 #include "liquid.h"
@@ -19,6 +20,8 @@
 LIQ(blood);
 
 bool MidgaardFountain::area( ) { 
+    ProfilerBlock("MidgaardFountain::area", 5);
+    
     Character *wch;
     Object *o;
     int count = 0;
