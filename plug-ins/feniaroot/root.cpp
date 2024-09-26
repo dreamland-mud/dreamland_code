@@ -1260,7 +1260,7 @@ NMI_INVOKE( Root, Behavior, "(name): конструктор для поведе�
     return BehaviorWrapper::wrap(name);
 }
 
-NMI_GET( Root, players, "список (List) всех игроков") 
+NMI_GET( Root, players, "список (List) всех игроков онлайн") 
 {
     Descriptor *d;
     RegList::Pointer list(NEW);
@@ -1268,6 +1268,18 @@ NMI_GET( Root, players, "список (List) всех игроков")
     for (d = descriptor_list; d != 0; d = d->next)
         if (d->connected == CON_PLAYING && d->character)
             list->push_back( wrap( d->character->getPC( ) ) );
+
+    return wrap(list);
+}
+
+NMI_GET( Root, playerNames, "список (List) имен всех игроков") 
+{
+    RegList::Pointer list(NEW);
+    const PCharacterMemoryList &players = PCharacterManager::getPCM( );    
+
+    for (auto &player : players) {
+        list->push_back(Register(player.first));
+    }
 
     return wrap(list);
 }
