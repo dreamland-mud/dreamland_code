@@ -37,6 +37,7 @@ static Object * create_stone( int level )
 
     stone = create_object( get_obj_index( OBJ_VNUM_THROWING_STONE ), 0 );
     stone->level = level;
+    stone->timer = Date::SECOND_IN_MONTH;
     stone->value1(4 + level / 15);
     stone->value2(4 + level / 30);
 
