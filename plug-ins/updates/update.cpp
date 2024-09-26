@@ -119,11 +119,11 @@ GSN(protection_heat);
 GSN(spear);
 GSN(spellbane);
 
-#define PULSE_SAVING                  ( 6 * dreamland->getPulsePerSecond( ))
+#define PULSE_SAVING                  ( 5 * dreamland->getPulsePerSecond( ))
 #define PULSE_WATER_FLOAT          ( 4 * dreamland->getPulsePerSecond( ))
-#define PULSE_RAFFECT                  ( 3 * PULSE_MOBILE)
+#define PULSE_RAFFECT                  ( 3 * PULSE_MOBILE + 1)
 #define PULSE_AREA                  (110 * dreamland->getPulsePerSecond( )) /* 97 saniye */
-#define PULSE_TRACK                  ( 6 * dreamland->getPulsePerSecond( ))
+#define PULSE_TRACK                  ( 7 * dreamland->getPulsePerSecond( ))
 
 
 // A set of update settings defined in config/update.json.
@@ -1020,20 +1020,21 @@ void obj_update( void )
  */
 void update_handler( void )
 {
-    static  int     pulse_area;
-    static  int     pulse_mobile;
-    static  int     pulse_violence;
-    static  int     pulse_point;
-    static  int            pulse_water_float;
-    static  int            pulse_raffect;
-    static  int     pulse_saving;
-    static  int     pulse_track;
+    static  int     pulse_area;           // 110 sec
+    static  int     pulse_mobile;         // 4 sec
+    static  int     pulse_violence;       // 3 sec
+    static  int     pulse_point;          // 60 sec
+    static  int     pulse_water_float;    // 4 sec
+    static  int     pulse_raffect;        // 13 sec
+    static  int     pulse_saving;         // 5 sec
+    static  int     pulse_track;          // 7 sec
+
+    bool heavy = false; // Did we have a time-consuming update this pulse?
 
     LastLogStream::send( ) <<  "Start handler"  << endl;
 
     LastLogStream::send( ) <<  "Erase dead NPC handler"  << endl;
 
-    if (char_list != 0)
     {
         Character *ch_next;
 
@@ -1045,17 +1046,6 @@ void update_handler( void )
                 extract_char( ch );
         }
     }
-
-    if ( --pulse_area     <= 0 )
-    {
-        wiznet( WIZ_TICKS, 0, 0, "AREA & ROOM TICK!" );
-        pulse_area        = PULSE_AREA;
-
-        LastLogStream::send( ) <<  "Area update"  << endl;
-        area_update        ( );
-    }
-
-    area_update_next();
 
     if ( --pulse_mobile   <= 0 )
     {
@@ -1069,6 +1059,8 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Diving update"  << endl;
         diving_update( );        
+
+        heavy = true;
     }
 
     if ( --pulse_violence <= 0 )
@@ -1095,27 +1087,18 @@ void update_handler( void )
         room_affect_update( );
     }
 
-    if ( --pulse_point    <= 0 )
+    // Stagger tick updates across 4 pulses, just before the current tick ends.
+    if (--pulse_point    <= 0)
     {
         LastLogStream::clear( );
 
         wiznet( WIZ_TICKS, 0, 0, "CHAR TICK!" );
         pulse_point     = PULSE_TICK;
 
-        LastLogStream::send( ) <<  "Weather/Sunlight update"  << endl;
-        weather_update( );
-        sunlight_update( );
-
         LastLogStream::send( ) <<  "Char update"  << endl;
         char_update        ( );
         char_update_prog();
         char_update_autosave();
-
-        LastLogStream::send( ) <<  "Objects update"  << endl;
-        obj_update        ( );
-
-        LastLogStream::send( ) <<  "Room update"  << endl;
-        room_update        ( );
 
         LastLogStream::send( ) <<  "Reboot update"  << endl;
         check_reboot        ( );
@@ -1129,6 +1112,23 @@ void update_handler( void )
                     ch->in_room->areaIndex()->count =
                         min(ch->in_room->areaIndex()->count+1,5000000UL);
         }
+
+        heavy = true;
+
+    } else if (pulse_point == 1) {
+        LastLogStream::send( ) <<  "Room update"  << endl;
+        room_update        ( );
+        heavy = true;
+
+    } else if (pulse_point == 2) {
+        LastLogStream::send( ) <<  "Objects update"  << endl;
+        obj_update        ( );
+        heavy = true;
+
+    } else if (pulse_point == 3) {
+        LastLogStream::send( ) <<  "Weather/Sunlight update"  << endl;
+        weather_update( );
+        sunlight_update( );
     }
     
     if (--pulse_track <= 0) 
@@ -1137,21 +1137,41 @@ void update_handler( void )
 
         LastLogStream::send( ) <<  "Track update"  << endl;
         track_update( );
+
+        heavy = true;
     }
     
     LastLogStream::send( ) <<  "Aggressive update"  << endl;
     aggr_update( );
 
-    if ( --pulse_saving <= 0 )
+    if (--pulse_saving <= 0)
     {
         pulse_saving = PULSE_SAVING;
 
         LastLogStream::send( ) <<  "Room saving update"  << endl;
         room_saving();
+
+        heavy = true;
     }
 
     LastLogStream::send( ) <<  "Auction update"  << endl;
     auction_update( );
+
+    if (--pulse_area <= 0)
+    {
+        if (!heavy) {
+            wiznet( WIZ_TICKS, 0, 0, "AREA & ROOM TICK!" );
+            pulse_area        = PULSE_AREA;
+
+            LastLogStream::send( ) <<  "Area update"  << endl;
+            area_update        ( ); // Run onUpdate, mark areas for update
+
+            heavy = true;
+        }
+    } 
+
+    if (!heavy)
+        area_update_next(); // Update one of the marked areas
 }
 
 /*
