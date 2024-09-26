@@ -1307,6 +1307,15 @@ NMI_INVOKE( CharacterWrapper, get_char_room, "(name[,room]): поиск по и�
     return wrap( ::get_char_room( target, room, name ) );
 }
 
+NMI_INVOKE( CharacterWrapper, get_obj_inventory, "(name): поиск объекта в инвентаре, по имени или ID" )
+{
+    checkTarget( );
+
+    DLString objname = argnum2string(args, 1);
+    
+    return wrap( ::get_obj_carry( target, objname ) );
+}
+
 NMI_INVOKE( CharacterWrapper, get_obj_carry, "(name[,looker]): поиск объекта в экипировке или видимого (себе или персонажу looker) объекта в инвентаре, по имени или ID" )
 {
     checkTarget( );
