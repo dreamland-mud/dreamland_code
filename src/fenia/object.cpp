@@ -14,6 +14,7 @@
 #include <logstream.h>
 #include <integer.h>
 #include <xmldocument.h>
+#include "profiler.h"
 
 #include "register-impl.h"
 #include "object.h"
@@ -295,6 +296,8 @@ Object::Manager::syncDel(struct timeval * finishAt)
 bool
 Object::Manager::sync(struct timeval *tickEnd)
 {
+    ProfilerBlock("Fenia::sync", 100);
+    
     struct timeval withGap, gap = { 0, 40*1000 };
     if(tickEnd) {
         timersub(tickEnd, &gap, &withGap); // 40ms gap for sure
