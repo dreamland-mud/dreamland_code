@@ -22,6 +22,7 @@
 #include "loadsave.h"
 #include "wiznet.h"
 #include "weapontier.h"
+#include "../loadsave/behavior_utils.h"
 
 #include "descriptor.h"
 #include "occupations.h"
@@ -37,6 +38,9 @@ GSN(track);
 
 static void rprog_reset( Room *room )
 {
+    if (behavior_trigger(room, "Reset", "R", room))
+        return;
+        
     FENIA_VOID_CALL( room, "Reset", "" );
 }
 
