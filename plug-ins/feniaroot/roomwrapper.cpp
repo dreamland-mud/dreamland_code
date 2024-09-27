@@ -1057,6 +1057,27 @@ NMI_INVOKE( RoomWrapper, affectFind, "(skill,ch): найти аффект с д�
     return Register();
 }
 
+NMI_GET(RoomWrapper, behaviors, "список имен всех поведений")
+{
+    checkTarget();
+
+    RegList::Pointer rc(NEW);
+
+    for (auto &b: target->pIndexData->behaviors.toSet()) 
+        rc->push_back(
+            Register(
+                behaviorManager->find(b)->getName()));
+
+    return ::wrap(rc);
+}
+
+NMI_SET(RoomWrapper, behaviors, "список имен всех поведений")
+{
+    checkTarget();
+    arg2globalBitvector<Behavior>(arg, target->pIndexData->behaviors);
+    target->pIndexData->areaIndex->changed = true;
+}
+
 NMI_INVOKE(RoomWrapper, hasBehavior, "(bhvName): true если среди поведений комнаты есть указанное")
 {
     checkTarget();

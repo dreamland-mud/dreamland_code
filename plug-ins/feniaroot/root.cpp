@@ -32,7 +32,7 @@
 #include "configurable.h"
 #include "json_utils_ext.h"
 #include "lasthost.h"
-
+#include "roomutils.h"
 #include "merc.h"
 #include "damageflags.h"
 #include "../anatolia/handler.h"
@@ -803,12 +803,34 @@ NMI_GET( Root, obj_index_list, "список (List) всех прототипо�
     return wrap(list);
 }
 
-NMI_GET( Root, rooms , "список всех комнат") 
+NMI_GET( Root, rooms, "список всех комнат") 
 {
     RegList::Pointer list(NEW);
 
     for (auto &r: roomIndexMap) {
         list->push_back(wrap(r.second->room));
+    }
+
+    return wrap(list);
+}
+
+NMI_GET( Root, rooms_rain, "список всех комнат, где может идти дождь или снег") 
+{
+    RegList::Pointer list(NEW);
+
+    for (auto &r: roomInstances) {
+        if (!RoomUtils::isOutside(r))
+            continue;
+
+        if (RoomUtils::isWater(r))
+            continue;
+
+        if (r->getSectorType() == SECT_INSIDE ||
+            r->getSectorType() == SECT_AIR ||
+            r->getSectorType() == SECT_DESERT) 
+            continue;
+
+        list->push_back(wrap(r));
     }
 
     return wrap(list);
