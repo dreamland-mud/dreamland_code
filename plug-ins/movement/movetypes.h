@@ -13,6 +13,7 @@ struct movetype_t {
     int wait;
     bool sneak;
     const char * name;
+    const char * rname;
     const char * enter;
     const char * leave;
 };
