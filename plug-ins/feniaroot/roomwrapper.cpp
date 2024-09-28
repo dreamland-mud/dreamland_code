@@ -1095,3 +1095,23 @@ NMI_GET(RoomWrapper, props, "Map (структура) из свойств пов
     checkTarget();
     return JsonUtils::toRegister(target->pIndexData->props);
 }
+
+NMI_INVOKE(RoomWrapper, setProperty, "(key,subkey,value): установить значение props[key][subkey] в value")
+{
+    checkTarget();
+    DLString key = argnum2string(args, 1);
+    DLString subkey = argnum2string(args, 2);
+    DLString value = argnum2string(args, 3);
+
+    if (value.isNumber()) {
+        target->pIndexData->props[key][subkey] = value.toInt();
+    } else {
+        target->pIndexData->props[key][subkey] = value;
+    }
+
+    target->area->pIndexData->changed = true;
+
+    return Register();
+}
+
+

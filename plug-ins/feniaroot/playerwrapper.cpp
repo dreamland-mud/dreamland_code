@@ -291,6 +291,64 @@ NMI_GET(PlayerWrapper, ips, "массив (.Array), ключ - IP адес, зн
     return ipsReg;
 }
 
+
+NMI_GET(PlayerWrapper, alts, "массив (.Array), ключ - IP, значение - Array из имен альтов и количества их заходов с этого IP")
+{
+    PCMemoryInterface *player = getTarget();
+    Register altsReg = Register::handler<RegContainer>();
+    RegContainer *alts = altsReg.toHandler().getDynamicPointer<RegContainer>();
+
+    auto myLastHostAttr = player->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");  
+    if (!myLastHostAttr)
+        return altsReg;
+    auto myHosts = myLastHostAttr->getHosts();  
+    
+    std::map<DLString, std::map<DLString, int> > loginsByHostByPlayer;
+
+    // Collect stats about matching IPs for all players
+    const PCharacterMemoryList &players = PCharacterManager::getPCM();    
+    for (auto p: players) {
+        PCMemoryInterface *alt = p.second;
+        DLString altName = p.first;
+
+        if (altName == player->getName())
+            continue;
+
+        auto altLastHostAttr = alt->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");  
+        if (!altLastHostAttr)
+            continue;
+
+        // For each player, count how many times they logged in from the same IP addresses as the target player
+        for (auto h: altLastHostAttr->getHosts()) {
+            DLString altHost = h.first;
+            int altLogins = h.second.getValue();
+
+            if (myHosts.find(altHost) != myHosts.end())
+                loginsByHostByPlayer[altHost][altName] += altLogins;
+        }
+    }
+
+    // Populate Fenia array
+    for (auto &lhp: loginsByHostByPlayer) {
+        Register loginsByPlayerReg = Register::handler<RegContainer>();
+        RegContainer *loginsByPlayerContainer = loginsByPlayerReg.toHandler().getDynamicPointer<RegContainer>();
+        
+        DLString altHost = lhp.first;
+        auto &loginsByPlayer = lhp.second;
+
+        for (auto &lp: loginsByPlayer) {
+            DLString altName = lp.first;
+            int altLogins = lp.second;
+            loginsByPlayerContainer->setField(altName, altLogins);
+        }
+
+        alts->setField(altHost, loginsByPlayerReg);
+    }
+
+    return altsReg;
+}
+
+
 NMI_GET(PlayerWrapper, start_room, "vnum комнаты, в которой зайдут в мир")
 {
     return getTarget()->getStartRoom();
