@@ -1071,7 +1071,7 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     if (!bhv) {
         // Random property on obj index data
         ptc(ch, "{RВнимание: поведение '%s' не существует, устанавливаю props с произвольным именем.{x\r\n", bhvName.c_str());
-        return false;
+
     }
     else {
         // Configure existing behavior
