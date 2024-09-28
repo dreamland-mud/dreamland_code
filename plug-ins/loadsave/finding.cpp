@@ -804,8 +804,9 @@ bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
         return true;
 
     // Then try to match by short descr, all grammatical cases, no colours.
-    if (is_name( arg.c_str( ), obj->getShortDescr( '7' ).c_str( ) ))
-        return true;
+    for (int gcase = Grammar::Case::NONE; gcase < Grammar::Case::MAX; gcase++)    
+        if (is_name( arg.c_str( ), obj->getShortDescr( gcase ).c_str( ) ))
+            return true;
         
     // No match.
     return false;

@@ -2,6 +2,7 @@
 #include <functional>
 #include "areautils.h"
 #include "pcharacter.h"
+#include "room.h"
 #include "merc.h"
 
 #include "def.h"
@@ -53,3 +54,21 @@ AreaIndexData * AreaUtils::createFor(PCMemoryInterface *player)
     return a;
 }
 
+mob_index_data* AreaUtils::findFirstMob(AreaIndexData *pArea)
+{
+    for (int i = pArea->min_vnum; i <= pArea->max_vnum; i++) {
+        mob_index_data *pMob = get_mob_index(i);
+        if (pMob)
+            return pMob;
+    }
+
+    return 0;
+}
+
+RoomIndexData * AreaUtils::findFirstRoom(AreaIndexData *pArea)
+{
+    if (pArea->roomIndexes.empty())
+        return 0;
+        
+    return pArea->roomIndexes.begin()->second;    
+}

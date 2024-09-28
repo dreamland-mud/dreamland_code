@@ -10,6 +10,7 @@
 #include "pcharacter.h"
 #include "room.h"
 
+#include "areautils.h"
 #include "areaquestutils.h"
 #include "websocketrpc.h"
 #include "arg_utils.h"
@@ -438,13 +439,27 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
     // 'step add'
     if (arg_oneof(cmd, "add", "добавить")) {
         QuestStep::XMLPointer newStep(NEW);
+        MOB_INDEX_DATA *pMob = AreaUtils::findFirstMob(q->pAreaIndex);
+        RoomIndexData *pRoom = AreaUtils::findFirstRoom(q->pAreaIndex);
 
-        newStep->beginType = "mob";
-        newStep->beginValue = DLString(q->pAreaIndex->min_vnum);
-        newStep->beginTrigger = "onGive";
+        if (q->steps.empty()) {
+            // Setup defaults for the first step
+            newStep->beginType = pMob ? "mob" : pRoom ? "room" : "";
+            newStep->beginValue = DLString(pMob ? pMob->vnum : pRoom ? pRoom->vnum : 0);
+            newStep->beginTrigger = "postGreet";
+
+        } else {
+            // Previous step's settings affect this step defaults.
+            auto lastStep = q->steps.back();
+
+            newStep->beginType = lastStep->endType;
+            newStep->beginValue = lastStep->endValue;
+            newStep->beginTrigger = DLString(lastStep->endTrigger).replaces("on", "post");
+        }
+
         newStep->endType = newStep->beginType;
         newStep->endValue = newStep->beginValue;
-        newStep->endTrigger = newStep->beginTrigger;
+        newStep->endTrigger = "onSpeech";
 
         q->steps.push_back(newStep);
         ch->pecho("Добавлен новый шаг с настройками по умолчанию.");
