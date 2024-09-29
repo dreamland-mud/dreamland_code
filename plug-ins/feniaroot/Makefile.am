@@ -88,7 +88,6 @@ $(INCLUDES_SRC)
 
 libfeniaroot_la_LIBADD = \
 $(LIBADD_AI) \
-../alignment/libalignment.la \
 ../liquid/libliquid.la \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la \

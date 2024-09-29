@@ -242,7 +242,6 @@ plug-ins/selfrate/Makefile \
 plug-ins/liquid/Makefile \
 plug-ins/religion/Makefile \
 plug-ins/desire/Makefile \
-plug-ins/alignment/Makefile \
 plug-ins/fight/Makefile \
 plug-ins/updates/Makefile \
 plug-ins/occupations/Makefile \

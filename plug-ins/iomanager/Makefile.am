@@ -56,7 +56,6 @@ libiomanager_la_LIBADD = \
 ../descriptor/libdescriptor.la \
 ../output/liboutput.la \
 ../interpret/libinterpret.la \
-../alignment/libalignment.la \
 -lcrypto \
 -ljsoncpp
 

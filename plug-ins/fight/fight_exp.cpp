@@ -21,9 +21,10 @@
 #include "object.h"
 #include "bonus.h"
 
+#include "alignment.h"
 #include "wiznet.h"
 #include "merc.h"
-
+#include "xmlkillingattribute.h"
 #include "handler.h"
 #include "bonus.h"
 #include "fight.h"
@@ -313,7 +314,7 @@ void group_gain( Character *ch, Character *victim, Character *realKiller )
         PCharacter *gch = *i;
         
         xp = xp_compute( gch, victim, mobcount, players.size( ), leader, base_exp_bonus );
-        gch->pecho( "Ты получаешь %1$d очк%1$Iо|а|ов опыта за убийство %2$#C2.", xp, victim );
+        gch->pecho( "Ты получаешь {C%1$d{x очк%1$Iо|а|ов опыта за убийство %2$#C2.", xp, victim );
         gch->gainExp( xp );
         
         apply_align_changes( gch );
@@ -374,7 +375,6 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
     int xp;
     int base_exp;
     short level_range;
-    int neg_cha = 0, pos_cha = 0;
     int align_mult, align_div;
     bool align_bonus;
 
@@ -459,42 +459,37 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
         gch->send_to(ostr);
     }
 
-
-    // Kill counters and charisma update. 
-    if (xp > 0) 
+    // Samurai charisma bonus for a good kill
+    if (gch->getProfession() == prof_samurai && gch == leader
+        && gch->perm_stat[STAT_CHA] < gch->getMaxTrain(STAT_CHA)
+        && victim->getModifyLevel() - gch->getModifyLevel() >= 20
+        && chance(10))
     {
-        if (IS_GOOD(gch))
-        {
-            if (IS_GOOD(victim)) { gch->getPC()->anti_killed++; neg_cha = 1; }
-            else if (IS_NEUTRAL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
-            else if (IS_EVIL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
-        }
-
-        if (IS_NEUTRAL(gch))
-        {
-            if (IS_GOOD(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
-            else if (IS_NEUTRAL(victim)) { gch->getPC()->anti_killed++; neg_cha = 1; }
-            else if (IS_EVIL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
-        }
-
-        if (IS_EVIL(gch))
-        {
-            if (IS_GOOD(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
-            else if (IS_NEUTRAL(victim)) { gch->getPC()->has_killed++; pos_cha = 1; }
-            else if (IS_EVIL(victim)) { gch->getPC()->anti_killed++; neg_cha = 1; }
-        }
+        oldact("Ты уби$gло|л|ла достойного противника, и твое обаяние повысилось на единицу.", gch, 0, 0, TO_CHAR);
+        gch->perm_stat[STAT_CHA] += 1;
     }
 
+    if (xp <= 0)
+        return xp;
 
-    if (neg_cha)
+    // Kill counters and charisma update. 
+    auto killed = gch->getAttributes().getAttr<XMLKillingAttribute>("killed");
+    int victAlign =  IS_SET(victim->act,ACT_NOALIGN) ? N_ALIGN_NULL : ALIGN_NUMBER(victim->alignment);
+    int myAlign = ALIGN_NUMBER(gch->alignment);
+
+    killed->align[victAlign]++;
+    killed->vnum[victim->getNPC()->pIndexData->vnum]++;
+
+    if (myAlign == victAlign)
     {
-        if ((gch->getPC()->anti_killed % 100) == 99)
+        int sameAlignKills = killed->align[myAlign];
+
+        if ((sameAlignKills % 100) == 99)
         {
-            gch->pecho("На твоем счету %1$d труп%1$I|а|ов %s персонажей.", 
-                gch->getPC()->anti_killed.getValue(),
-                IS_GOOD(gch) ? "хороших" :
-                IS_NEUTRAL(gch) ? "нейтральных" :
-                IS_EVIL(gch) ? "злых" : "");
+            gch->pecho("На твоем счету {%2$s%1$d{x труп%1$I|а|ов {%2$s%3$s{x персонажей.", 
+                sameAlignKills,
+                IS_GOOD(gch) ? "Y" : IS_NEUTRAL(gch) ? "W" : IS_EVIL(gch) ? "r" : "w",
+                IS_GOOD(gch) ? "хороших" : IS_NEUTRAL(gch) ? "нейтральных" : IS_EVIL(gch) ? "злых" : "");
 
             if (gch->perm_stat[STAT_CHA] > 3 && IS_GOOD(gch))
             {
@@ -503,32 +498,29 @@ int xp_compute(PCharacter* gch, Character* victim, int npccount, int pccount, Ch
             }
         }
     }
-    else if (pos_cha)
+    else if (victAlign != N_ALIGN_NULL)
     {
-        if ((gch->getPC()->has_killed % 200) == 199)
+        int otherAlignKills = 0;
+
+        for (int a = 0; a < align_table.size; a++)
+            if (a != myAlign)
+                otherAlignKills += killed->align[a];
+
+        if ((otherAlignKills % 200) == 199)
         {
-            gch->pecho("На твоем счету %1$d труп%1$I|а|ов %s персонажей.",
-                gch->getPC()->has_killed.getValue(),
+            gch->pecho("На твоем счету {W%1$d{x труп%1$I|а|ов {W%s{x персонажей.",
+                otherAlignKills,
                 IS_GOOD(gch) ? "недобрых" :
                 IS_NEUTRAL(gch) ? "добрых и злых" :
                 IS_EVIL(gch) ? "незлых" : "");
 
-            if (gch->perm_stat[STAT_CHA] < gch->getPC()->getMaxTrain(STAT_CHA)
+            if (gch->perm_stat[STAT_CHA] < gch->getMaxTrain(STAT_CHA)
                 && IS_GOOD(gch))
             {
                 gch->pecho("Твое обаяние повысилось на единицу.");
                 gch->perm_stat[STAT_CHA] += 1;
             }
         }
-    }
-
-    if (gch->getProfession() == prof_samurai && gch == leader
-        && gch->perm_stat[STAT_CHA] < gch->getPC()->getMaxTrain(STAT_CHA)
-        && victim->getModifyLevel() - gch->getModifyLevel() >= 20
-        && chance(10))
-    {
-        oldact("Ты уби$gло|л|ла достойного противника, и твое обаяние повысилось на единицу.", gch, 0, 0, TO_CHAR);
-        gch->perm_stat[STAT_CHA] += 1;
     }
 
     return xp;

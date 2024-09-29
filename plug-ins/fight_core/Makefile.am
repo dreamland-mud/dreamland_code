@@ -41,7 +41,6 @@ libfight_core_la_LIBADD = \
 ../iomanager/libiomanager.la \
 ../loadsave/libloadsave.la \
 ../system/libsystem.la \
-../alignment/libalignment.la \
 ../occupations/liboccupations.la \
 ../system/libscheduler_task_round.la \
 ../interpret/libinterpret.la \

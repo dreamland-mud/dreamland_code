@@ -25,6 +25,7 @@
 #include "room.h"
 
 #include "xmlattributetrust.h"
+#include "xmlkillingattribute.h"
 #include "fight_exception.h"
 #include "subprofession.h"
 #include "screenreader.h"
@@ -844,8 +845,8 @@ INT_FIELD(PK_time_sk, "сколько висит slain и killer")
 INT_FIELD(PK_time_t, "сколько висит thief")
 INT_FIELD(PK_flag, "KILLER, SLAIN, VIOLENT, GHOST, THIEF")
 INT_FIELD(death, "сколько раз умирал")
-INT_FIELD(anti_killed, "сколько жертв моего характера убито")
-INT_FIELD(has_killed, "сколько жертв не моего характера убито")
+INT_FIELD(anti_killed, "OBSOLETE: сколько жертв моего характера убито")
+INT_FIELD(has_killed, "OBSOLETE: сколько жертв не моего характера убито")
 INT_FIELD(perm_hit, "max hp без шмота")
 INT_FIELD(perm_mana, "max mana без шмота")
 INT_FIELD(perm_move, "max move без шмота")
@@ -2816,3 +2817,10 @@ NMI_INVOKE( CharacterWrapper, clear, "(): очистка всех runtime пол
     return Register( );
 }
 
+NMI_GET(CharacterWrapper, killed, "статистика убийств мобов")
+{
+    checkTarget();
+    CHK_NPC
+    auto killingAttr = target->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
+    return killingAttr->toRegister();
+}

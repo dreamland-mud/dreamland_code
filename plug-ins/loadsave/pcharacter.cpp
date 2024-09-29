@@ -9,7 +9,8 @@
 #include "dlfile.h"
 #include "dlfileop.h"
 #include "commonattributes.h"
-
+#include "xmlkillingattribute.h"
+#include "alignment.h"
 #include "logstream.h"
 #include "profiler.h"
 #include "dreamland.h"
@@ -152,6 +153,32 @@ static void update_stats( PCharacter *ch )
             ch->train += diff;
             ch->perm_stat[i] = max_stat;
         }
+    }
+}
+
+/** Move old mob kill statistics to the new fields */
+static void update_killed(PCharacter *pc)
+{
+    // Work with PCharacterMemory attributes rather than pc ones,
+    // because any attr we set on the pc will be overriden by PCharacterMemory attribtes
+    // during PCharacterManager::update() call from nanny.
+    PCMemoryInterface *mem = PCharacterManager::find(pc->getName());
+    auto killingAttr = mem->getAttributes().getAttr<XMLKillingAttribute>("killed");
+    int myAlign = ALIGN_NUMBER(pc->alignment);
+
+    if (pc->has_killed > 0) {
+        // Opposite align
+        int oppAlign = myAlign == N_ALIGN_EVIL ? N_ALIGN_GOOD : N_ALIGN_EVIL;
+        killingAttr->align[oppAlign] = pc->has_killed;
+        notice("Converted %d has_killed for player %s", pc->has_killed.getValue(), pc->getNameC());
+        pc->has_killed = 0;
+    }
+
+    if (pc->anti_killed) {
+        // Same align
+        killingAttr->align[myAlign] = pc->anti_killed;
+        notice("Converted %d anti_killed for player %s", pc->anti_killed.getValue(), pc->getNameC());
+        pc->anti_killed = 0;
     }
 }
 
@@ -300,6 +327,7 @@ bool PCharacter::load( )
     update_stats(this);
     updateSkills( );
     update_exp( this );
+    update_killed(this);
 
     /* fix renamed skills */
     skill_exchange( this, gsn_sanctuary, gsn_stardust );

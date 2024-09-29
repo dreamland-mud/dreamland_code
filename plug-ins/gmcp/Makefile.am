@@ -19,7 +19,6 @@ $(INCLUDES_SRC)
 
 libgmcp_la_LIBADD = \
 $(LIBADD_AI) \
-../alignment/libalignment.la \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la \
 -ljsoncpp

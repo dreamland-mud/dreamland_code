@@ -40,7 +40,8 @@ xmlstringlist.cpp \
 xmltimestamp.cpp \
 xmlvariable.cpp \
 xmlvariablecontainer.cpp \
-xmljsonvalue.cpp
+xmljsonvalue.cpp \
+xmlcounter.cpp
 
 CLEANFILES = xmlmatchpattern.c++ xmlparser.c++
 AM_CPPFLAGS += $(src_INCLUDES)

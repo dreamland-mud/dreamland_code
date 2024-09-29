@@ -11,8 +11,7 @@ $(INCLUDES_SRC) \
 
 librace_la_LIBADD = ../system/libsystem.la \
 ../descriptor/libdescriptor.la \
-../help/libhelp.la \
-../alignment/libalignment.la
+../help/libhelp.la
 
 librace_la_SOURCES = \
 raceflags.cpp \

@@ -46,15 +46,17 @@ math_utils.cpp \
 calendar_utils.cpp \
 morphology.cpp \
 configurable.cpp \
-json_utils_ext.cpp
+json_utils_ext.cpp \
+xmlkillingattribute.cpp \
+alignment.cpp
 
 libsystem_la_MOC = \
 schedulertaskattributemanager.h \
 xmlattributestatistic.h \
 xmlattributeticker.h \
 xmlattributecoder.h \
-xmlattributetrust.h 
-
+xmlattributetrust.h \
+xmlkillingattribute.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

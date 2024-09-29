@@ -6,7 +6,6 @@ help \
 interpret \
 loadsave \
 command \
-alignment \
 iomanager \
 servlets \
 ed \

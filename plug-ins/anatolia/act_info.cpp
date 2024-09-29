@@ -75,7 +75,7 @@
 #include "commonattributes.h"
 #include "commandtemplate.h"
 #include "playerattributes.h"
-
+#include "xmlkillingattribute.h"
 #include "affect.h"
 #include "core/object.h"
 #include "pcharacter.h"
@@ -269,12 +269,13 @@ CMDRUNP( worth )
 
     ch->pecho( show_experience( ch->getPC( ) ) );
 
-    ch->pecho("Ты уби%Gло|л|ла %3d %s и %3d %s персонажей.",
+    auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
+
+    ch->pecho("Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.",
             ch, 
-            ch->getPC( )->has_killed.getValue( ),
-            IS_GOOD(ch) ? "не добрых" : IS_EVIL(ch) ? "не злых" : "не нейтральных",
-            ch->getPC( )->anti_killed.getValue( ),
-            IS_GOOD(ch) ? "добрых" : IS_EVIL(ch) ? "злых" : "нейтральных" );
+            killed->align[N_ALIGN_GOOD], "добрых",
+            killed->align[N_ALIGN_NEUTRAL], "нейтральных",
+            killed->align[N_ALIGN_EVIL], "злых");
 }
 
 
@@ -500,6 +501,14 @@ CMDRUNP( oscore )
             buf << fmt(0, "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
         buf << fmt(0, "Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
+
+        auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
+
+       buf << fmt(0, "Ты уби%Gло|л|ла {Y%d{x %s, {W%d{x %s и {r%d{x %s персонажей.\n\r",
+                        ch, 
+                        killed->align[N_ALIGN_GOOD], "добрых",
+                        killed->align[N_ALIGN_NEUTRAL], "нейтральных",
+                        killed->align[N_ALIGN_EVIL], "злых");
     }
     
     /* RT wizinvis and holy light */

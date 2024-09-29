@@ -46,7 +46,6 @@ flowers.h
 libclan_impl_la_LIBADD = \
 $(LIBADD_AI) \
 ../../skills_impl/libskills_impl.la \
-../../alignment/libalignment.la \
 ../../services/core/libservices_core.la \
 ../../services/misc/libservices_misc.la \
 ../../services/petshop/libservices_petshop.la \

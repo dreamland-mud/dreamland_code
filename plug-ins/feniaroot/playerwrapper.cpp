@@ -1,6 +1,7 @@
 #include "playerwrapper.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
+#include "xmlkillingattribute.h"
 
 #include "nativeext.h"
 #include "regcontainer.h"
@@ -358,4 +359,11 @@ NMI_SET(PlayerWrapper, start_room, "vnum комнаты, в которой за�
 {
     getTarget()->setStartRoom(arg2number(arg, 1, 1000000));
     save();
+}
+
+NMI_GET(PlayerWrapper, killed, "статистика убийств мобов")
+{
+    PCMemoryInterface *player = getTarget();
+    auto killingAttr = player->getAttributes().getAttr<XMLKillingAttribute>("killed");
+    return killingAttr->toRegister();
 }

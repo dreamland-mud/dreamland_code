@@ -10,8 +10,7 @@ $(INCLUDES_SRC) \
 
 
 libprofession_la_LIBADD = ../system/libsystem.la \
-../help/libhelp.la \
-../alignment/libalignment.la
+../help/libhelp.la
 
 libprofession_la_SOURCES = \
 profflags.cpp \
