@@ -49,6 +49,7 @@ public:
     
         void gather( PCMemoryInterface *, Statistic & ) const;
         static Statistic gatherAll( const DLString& );
+        Scripting::Register toRegister() const;
 
 protected:
         // Record quest name / victory count pairs.

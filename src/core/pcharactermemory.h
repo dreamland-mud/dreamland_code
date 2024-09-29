@@ -125,6 +125,9 @@ public:
     virtual int getStartRoom() const;
     virtual void setStartRoom(int vnum);
 
+    virtual int getLoyalty() const;
+    virtual void setLoyalty(int value);
+
 private:
     XML_VARIABLE XMLString name;
     XML_VARIABLE XMLString password;
@@ -149,6 +152,7 @@ private:
     XML_VARIABLE PCSkills skills;
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger start_room;
+    XML_VARIABLE XMLInteger loyalty;
 };
 
 #endif

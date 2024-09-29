@@ -292,3 +292,13 @@ void PCharacterMemory::setStartRoom(int vnum)
 {
     this->start_room = vnum;        
 }
+
+int PCharacterMemory::getLoyalty() const
+{
+    return loyalty;
+}
+
+void PCharacterMemory::setLoyalty(int value)
+{
+    this->loyalty = value;        
+}

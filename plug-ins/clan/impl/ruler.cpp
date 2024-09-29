@@ -343,7 +343,7 @@ SKILL_RUNP( judge )
                           victim, 
                           ethos_table.message( victim->ethos, '1' ).c_str( ),
                           align_name( victim ).ruscase( '1' ).c_str( ),
-                          victim->getPC( )->loyalty.getValue( ));
+                          victim->getPC( )->getLoyalty());
 
                 return;
         }
@@ -363,13 +363,13 @@ SKILL_RUNP( judge )
                         return;
                 }
 
-                value=victim->getPC( )->loyalty+value;
+                value=victim->getPC( )->getLoyalty()+value;
                 if ( value>1000 )
                         value=1000;
                 if ( value<-1000 )
                         value=-1000;
 
-                victim->getPC( )->loyalty=value;
+                victim->getPC( )->setLoyalty(value);
 
                 ch->pecho("Установлено в %d.",value);
 
@@ -649,7 +649,7 @@ SKILL_RUNP( wanted )
                                 oldact("$c1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT);
                                 victim->pecho("Ты теперь в РОЗЫСКЕ!!!");
                                 if ( !victim->is_npc() )
-                                        victim->getPC( )->loyalty = max ( victim->getPC( )->loyalty - 50, -1000);
+                                        victim->getPC( )->setLoyalty( max ( victim->getPC( )->getLoyalty() - 50, -1000));
                                 ch->pecho("Ok.");
                         }
                         break;

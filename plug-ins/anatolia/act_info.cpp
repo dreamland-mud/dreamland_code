@@ -500,7 +500,7 @@ CMDRUNP( oscore )
         else
             buf << fmt(0, "Твоя религия: {C%s{x.  ", ch->getReligion( )->getNameFor( ch ).ruscase( '1' ).c_str( ));
         
-        buf << fmt(0, "Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
+        buf << fmt(0, "Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->getLoyalty());
 
         auto killed = ch->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
 

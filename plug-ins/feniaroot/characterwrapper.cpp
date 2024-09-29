@@ -852,7 +852,6 @@ INT_FIELD(perm_mana, "max mana без шмота")
 INT_FIELD(perm_move, "max move без шмота")
 INT_FIELD(practice, "сколько практик")
 INT_FIELD(train, "сколько тренировок")
-INT_FIELD(loyalty, "лояльность по отношению к закону (рулеровскому)")
 INT_FIELD(bank_s, "серебра в банке")
 INT_FIELD(bank_g, "золота в банке")
 INT_FIELD(config, "настройки чара (таблица .tables.config_flags)")
@@ -908,6 +907,20 @@ NMI_SET(CharacterWrapper, start_room, "в какой комнате зашли �
     checkTarget();
     CHK_NPC
     target->getPC()->setStartRoom(arg2number(arg));
+}
+
+NMI_GET(CharacterWrapper, loyalty, "лояльность по отношению к закону")
+{
+    checkTarget();
+    CHK_NPC
+    return target->getPC()->getLoyalty();
+}
+
+NMI_SET(CharacterWrapper, loyalty, "лояльность по отношению к закону")
+{
+    checkTarget();
+    CHK_NPC
+    target->getPC()->setLoyalty(arg2number(arg));
 }
 
 
@@ -2824,3 +2837,21 @@ NMI_GET(CharacterWrapper, killed, "статистика убийств мобо�
     auto killingAttr = target->getPC()->getAttributes().getAttr<XMLKillingAttribute>("killed");
     return killingAttr->toRegister();
 }
+
+NMI_GET(CharacterWrapper, gquest, "статистика побед в глобальных квестах")
+{
+    checkTarget();
+    CHK_NPC
+    auto statAttr = target->getPC()->getAttributes().getAttr<XMLAttributeStatistic>("gquest");
+    return statAttr->toRegister();
+}
+
+NMI_GET(CharacterWrapper, quest, "статистика побед в авто квестах")
+{
+    checkTarget();
+    CHK_NPC
+    auto statAttr = target->getPC()->getAttributes().getAttr<XMLAttributeStatistic>("questdata");
+    return statAttr->toRegister();
+}
+
+

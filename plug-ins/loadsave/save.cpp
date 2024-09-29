@@ -963,7 +963,6 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             break;
 
         case 'P':
-            KEY( "PCethos",        ch->loyalty,        fread_number( fp ) );
             KEY( "PKFlag",        ch->PK_flag,        fread_number( fp ) );
             KEY( "PKTimeV",        ch->PK_time_v,        fread_number( fp ) );
             KEY( "PKTimeSK",        ch->PK_time_sk,        fread_number( fp ) );

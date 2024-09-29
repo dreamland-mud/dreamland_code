@@ -822,9 +822,9 @@ static void loyalty_gain( Character *ch, Character *victim )
         return;
     
     if (!ch->is_npc( ))
-        ch->getPC( )->loyalty = min ( ch->getPC( )->loyalty+25, 1000 );
+        ch->getPC( )->setLoyalty(min ( ch->getPC( )->getLoyalty()+25, 1000 ));
     
-    if (victim->getPC( )->loyalty > -900)
+    if (victim->getPC( )->getLoyalty() > -900)
         REMOVE_BIT(victim->act, PLR_WANTED);
 }
 

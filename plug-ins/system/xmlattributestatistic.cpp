@@ -4,11 +4,16 @@
  */
 
 #include "xmlattributestatistic.h"
-
+#include "fenia/register-impl.h"
+#include "idcontainer.h"
+#include "lex.h"
+#include "regcontainer.h"
 #include "date.h"
 #include "xmlattributes.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
+
+using namespace Scripting;
 
 XMLAttributeStatistic::XMLAttributeStatistic( ) : shy( false )
 {
@@ -145,3 +150,14 @@ bool XMLAttributeStatistic::handle( const RemortArguments &args )
     return RemortAttribute::handle( args );
 }
 
+Scripting::Register XMLAttributeStatistic::toRegister() const
+{
+    Register statReg = Register::handler<RegContainer>();
+    RegContainer *statContainer = statReg.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto victory: victories) {
+        statContainer->setField(victory.first, victory.second.getValue());
+    }
+        
+    return statReg;
+}

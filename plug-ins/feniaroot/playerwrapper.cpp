@@ -2,7 +2,7 @@
 #include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "xmlkillingattribute.h"
-
+#include "xmlattributestatistic.h"
 #include "nativeext.h"
 #include "regcontainer.h"
 #include "reglist.h"
@@ -367,3 +367,30 @@ NMI_GET(PlayerWrapper, killed, "статистика убийств мобов")
     auto killingAttr = player->getAttributes().getAttr<XMLKillingAttribute>("killed");
     return killingAttr->toRegister();
 }
+
+NMI_GET(PlayerWrapper, loyalty, "лояльность по отношению к закону")
+{
+    return getTarget()->getLoyalty();
+}
+
+NMI_SET(PlayerWrapper, loyalty, "лояльность по отношению к закону")
+{
+    getTarget()->setLoyalty(arg2number(arg));
+    save();
+}
+
+NMI_GET(PlayerWrapper, gquest, "статистика побед в глобальных квестах")
+{
+    PCMemoryInterface *player = getTarget();
+    auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>("gquest");
+    return statAttr->toRegister();
+}
+
+NMI_GET(PlayerWrapper, quest, "статистика побед в авто квестах")
+{
+    PCMemoryInterface *player = getTarget();
+    auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>("questdata");
+    return statAttr->toRegister();
+}
+
+

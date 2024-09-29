@@ -396,6 +396,7 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setSkills(getSkills());
         mem->setBonuses(getBonuses());
         mem->setStartRoom(getStartRoom());
+        mem->setLoyalty(getLoyalty());
 
         return mem;
 }
@@ -425,6 +426,7 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setSkills(pcm->getSkills());
         setBonuses(pcm->getBonuses());
         setStartRoom(pcm->getStartRoom());
+        setLoyalty(pcm->getLoyalty());
 }
 
 /**************************************************************************
@@ -607,6 +609,14 @@ int PCharacter::getStartRoom() const
 void PCharacter::setStartRoom(int vnum)
 {
     this->start_room = vnum;        
+}
+int PCharacter::getLoyalty() const
+{
+    return loyalty;
+}
+void PCharacter::setLoyalty(int value)
+{
+    this->loyalty = value;        
 }
 
 /**************************************************************************

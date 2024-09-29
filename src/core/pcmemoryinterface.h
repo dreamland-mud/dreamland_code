@@ -120,6 +120,9 @@ public:
 
     virtual int getStartRoom() const = 0;
     virtual void setStartRoom(int vnum) = 0;
+
+    virtual int getLoyalty() const = 0;
+    virtual void setLoyalty(int value) = 0;
 };
 
 

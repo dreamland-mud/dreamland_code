@@ -180,6 +180,9 @@ public:
     virtual int getStartRoom() const;
     virtual void setStartRoom(int vnum);
 
+    virtual int getLoyalty() const;
+    virtual void setLoyalty(int value);
+
     // set-get methods inherited from Character
     virtual void setDescription( const DLString& );
     virtual const char * getDescription( ) const;
@@ -257,6 +260,7 @@ private:
     XML_VARIABLE XMLInteger security;
     XML_VARIABLE XMLIntegerNoEmpty     questpoints;        
     XML_VARIABLE XMLInteger start_room;
+    XML_VARIABLE XMLIntegerNoEmpty        loyalty;          // real ethos - dynamic
 
     CachedNoun cachedNoun;
 
@@ -290,7 +294,6 @@ public:
     XML_VARIABLE XMLInteger                perm_move;
     XML_VARIABLE XMLIntegerNoEmpty        practice;
     XML_VARIABLE XMLIntegerNoEmpty        train;
-    XML_VARIABLE XMLIntegerNoEmpty        loyalty;          // real ethos - dynamic
 
     /** Bonus to skill knowledge through affects. */
     GlobalArray            mod_skills;
