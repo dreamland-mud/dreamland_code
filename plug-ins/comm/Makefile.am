@@ -32,7 +32,9 @@ info.cpp \
 senses.cpp \
 affects.cpp \
 groupchannel.cpp \
-following.cpp 
+following.cpp \
+drop.cpp \
+fly.cpp
 
 libcomm_la_MOC = \
 banking.h \
