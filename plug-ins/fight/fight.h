@@ -65,4 +65,10 @@ void        check_bloodthirst( Character *ch );
 #define IS_SLOW(ch) (IS_AFFECTED((ch),AFF_SLOW) && !(((ch)->is_npc() && IS_SET((ch)->getNPC()->off_flags,OFF_FAST)) \
                       || IS_AFFECTED((ch),AFF_HASTE)))
 
+// Temporary kill statistics.
+typedef pair<int, time_t> kill_stat_t; // store total kills and last kill timestamp
+typedef map<int, kill_stat_t> vnum_stat_t; // maps mob vnum to its kill data (total counter and last kill timestamp)
+typedef map<DLString, vnum_stat_t> player_kill_stat_t; // maps player name to kill statistics for each mob vnum
+extern player_kill_stat_t player_kill_stat;
+
 #endif

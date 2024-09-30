@@ -28,6 +28,7 @@ class IdContainer : public Scripting::Handler,
 NMI_OBJECT
     typedef NativeTraits<IdContainer> Traits;
     typedef map<Scripting::Lex::id_t, XMLRegister> Idmap;
+public:    
     Idmap idmap;
 public:
     IdContainer() { }

@@ -50,6 +50,11 @@
 #include "vnum.h"
 #include "def.h"
 
+using namespace std;
+
+// Temporary kill statistics.
+player_kill_stat_t player_kill_stat;
+
 
 void nuke_pets( PCharacter *ch, int flags );
 void notify_referers( Character *ch, int flags );
@@ -779,10 +784,18 @@ static void extract_dead_player( PCharacter *ch, int flags )
     notify_referers( ch, flags );
 }
 
-static void killed_npc_gain( NPCharacter *victim )
+static void killed_npc_gain( Character *killer, NPCharacter *victim )
 {
     victim->getNPC( )->pIndexData->killed++;
-    kill_table[URANGE(0, victim->getRealLevel( ), MAX_LEVEL-1)].killed++;
+
+    if (killer && !killer->is_npc()) {
+        int vnum = victim->getNPC()->pIndexData->vnum;
+        DLString playerName = killer->getName();
+
+        auto &kill_stat = player_kill_stat[playerName][vnum];
+        kill_stat.first++; // total counter
+        kill_stat.second = dreamland->getCurrentTime(); // last kill time
+    }
 }
 
 static void ghost_gain( Character *victim )
@@ -886,7 +899,7 @@ void raw_kill( Character* victim, bitstring_t flags, Character* ch, const DLStri
 
     // MOB is killed.
     if (victim->is_npc( )) {
-        killed_npc_gain( victim->getNPC( ) );
+        killed_npc_gain( ch, victim->getNPC( ) );
 
         if (IS_SET(flags, DEATH_MOB_EXTRACT)) { // full extract w/o trace, e.g. disintegrate
             extract_char(victim, true);

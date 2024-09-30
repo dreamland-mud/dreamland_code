@@ -41,6 +41,7 @@ NMI_OBJECT
     };
     typedef NativeTraits<RegContainer> Traits;
     typedef std::map<Register, XMLRegister, RegComp> Map;
+public:    
     Map map;
 public:
     RegContainer() { }

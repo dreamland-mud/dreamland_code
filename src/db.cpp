@@ -96,7 +96,6 @@ using namespace std;
  */
 Character *                char_list;
 Character * newbie_list = 0;
-KILL_DATA                kill_table        [MAX_LEVEL];
 Object *                object_list;
 TIME_INFO_DATA                time_info;
 WEATHER_DATA                weather_info;

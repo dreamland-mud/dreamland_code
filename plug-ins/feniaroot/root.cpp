@@ -29,6 +29,7 @@
 #include "weapongenerator.h"
 #include "weapontier.h"
 #include "act.h"
+#include "fight.h"
 #include "configurable.h"
 #include "json_utils_ext.h"
 #include "lasthost.h"
@@ -1542,4 +1543,34 @@ NMI_INVOKE(Root, finger, "(ip): список (.List) имен персонаже
     }
 
     return ::wrap(players);
+}
+
+NMI_GET(Root, player_kills, "статистика убийств мобов. Array ключ имя персонажа, значение - Array где ключ vnum моба, значение - структура с полями total, last_time")
+{
+    Register playerKillsReg = Register::handler<RegContainer>();
+    RegContainer *playerKillsContainer = playerKillsReg.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto p: player_kill_stat) {
+        Register vnumStatReg = Register::handler<RegContainer>();
+        RegContainer *vnumStatContainer = vnumStatReg.toHandler().getDynamicPointer<RegContainer>();
+        
+        DLString playerName = p.first;
+        auto &vnumStats = p.second;
+
+        for (auto v: vnumStats) {
+            int vnum = v.first;
+            auto &killStat = v.second;
+
+            Register killStatReg = Register::handler<IdContainer>();
+            IdContainer *killStatContainer = killStatReg.toHandler().getDynamicPointer<IdContainer>();
+            killStatContainer->setField(IdRef("total"), killStat.first);
+            killStatContainer->setField(IdRef("last_time"), (int)killStat.second);
+
+            vnumStatContainer->setField(vnum, killStatReg);
+        }
+
+        playerKillsContainer->setField(playerName, vnumStatReg);
+    }
+
+    return playerKillsReg;
 }

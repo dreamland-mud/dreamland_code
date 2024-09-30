@@ -273,8 +273,6 @@ XMLArea::load_mobiles(AreaIndexData *a)
 
         if (FeniaManager::wrapperManager)
             FeniaManager::wrapperManager->linkWrapper( pMobIndex );
-
-        kill_table[URANGE(0, pMobIndex->level, MAX_LEVEL-1)].number++;
     }
 }
 
