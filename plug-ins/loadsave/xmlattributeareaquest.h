@@ -17,6 +17,7 @@ public:
 	XML_VARIABLE XMLInteger step;
 	XML_VARIABLE XMLIntegerNoEmpty timestart;
 	XML_VARIABLE XMLIntegerNoEmpty timeend;
+    XML_VARIABLE XMLIntegerNoEmpty timecancel;
 	XML_VARIABLE XMLIntegerNoEmpty thisLife;
     XML_VARIABLE XMLIntegerNoEmpty total;
 

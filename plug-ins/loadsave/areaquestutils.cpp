@@ -154,6 +154,12 @@ bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuestData &q
             return false;
     }
 
+    // Standard 1 hour delay after 'q cancel'
+    if (qdata.timecancel > 0) {
+        if (dreamland->getCurrentTime() - qdata.timecancel < Date::SECOND_IN_HOUR)
+            return false;
+    }
+
     // Wrong align?
     if (q->align != 0 && !q->align.isSetBitNumber(ALIGNMENT(ch)))
         return false;
