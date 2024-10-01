@@ -31,14 +31,12 @@ commandplugin.cpp \
 commandpluginloader.cpp \
 commandhelp.cpp \
 admincommand.cpp \
-wrongcommand.cpp \
 levenshtein.cpp \
 impl.cpp 
 
 libcommand_la_MOC = \
 command.h \
-commandelement.h \
-wrongcommand.h
+commandelement.h
 
 commandflags.cpp: commandflags.conf commandflags.h
 commandflags.h: commandflags.conf

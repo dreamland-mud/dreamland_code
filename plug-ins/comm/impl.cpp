@@ -13,11 +13,9 @@
 #include "xmlattributeplugin.h"
 #include "objectbehaviorplugin.h"
 #include "roombehaviorplugin.h"
-#include "wrongcommand.h"
 #include "commandtemplate.h"
 
 #include "groupchannel.h"
-#include "banking.h"
 #include "corder.h"
 #include "configs.h"
 #include "run.h"
@@ -32,13 +30,6 @@ extern "C"
         {
                 SO::PluginList ppl;
             
-                Plugin::registerPlugin<RoomBehaviorRegistrator<BankRoom> >( ppl );
-                Plugin::registerPlugin<ObjectBehaviorRegistrator<CreditCard> >( ppl );
-                ppl.push_back( WrongCommand::Pointer( NEW, "balance" ) );
-                ppl.push_back( WrongCommand::Pointer( NEW, "deposit" ) );
-                ppl.push_back( WrongCommand::Pointer( NEW, "withdraw" ) );
-                Plugin::registerPlugin<TaxesListener>( ppl );
-
                 Plugin::registerPlugin<ConfigCommand>( ppl );
 
                 Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
