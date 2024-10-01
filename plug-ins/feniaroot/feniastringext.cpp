@@ -44,6 +44,11 @@ NMI_INVOKE(FeniaString, trim, "(): обрезать лишние пробелы 
     return Register( str );
 }
 
+NMI_INVOKE(FeniaString, empty, "(): true если строка пустая")
+{
+    return this->empty();
+}
+
 NMI_INVOKE(FeniaString, noun, "(): попытаться найти одно существительное в строке")
 {
     return Register(Syntax::noun(*this));
@@ -336,6 +341,12 @@ NMI_INVOKE(FeniaString, isCyrillic, "(): возвращает true если ст
 {
     return this->isCyrillic();
 }
+
+NMI_INVOKE(FeniaString, isNumber, "(): возвращает true если строка не пуста и содержит только цифры")
+{
+    return this->isNumber();
+}
+
 
 NMI_INVOKE(FeniaString, toLower, "(): переводит всю строку в нижний регистр")
 {

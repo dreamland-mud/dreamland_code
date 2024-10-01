@@ -1085,7 +1085,7 @@ NMI_INVOKE(RoomWrapper, hasBehavior, "(bhvName): true если среди пов
     DLString bhvName = args2string(args);
     Behavior *bhv = behaviorManager->findExisting(bhvName);
     if (!bhv)
-        throw IllegalArgumentException();
+        throw Scripting::Exception("Behavior " + bhvName + " doesnt exist");
 
     return Register(target->pIndexData->behaviors.isSet(bhv->getIndex()));
 }

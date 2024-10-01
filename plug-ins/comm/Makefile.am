@@ -15,7 +15,6 @@ libalias_la_SOURCES = alias.cpp
 
 libcomm_la_SOURCES = \
 areas.cpp \
-banking.cpp \
 bugs.cpp \
 configs.cpp \
 corder.cpp \
@@ -36,7 +35,6 @@ drop.cpp \
 fly.cpp
 
 libcomm_la_MOC = \
-banking.h \
 configs.h \
 corder.h \
 run.h \

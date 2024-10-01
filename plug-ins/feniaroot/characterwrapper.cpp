@@ -2745,7 +2745,7 @@ NMI_INVOKE(CharacterWrapper, hasBehavior, "(bhvName): true если среди �
     DLString bhvName = args2string(args);
     Behavior *bhv = behaviorManager->findExisting(bhvName);
     if (!bhv)
-        throw IllegalArgumentException();
+        throw Scripting::Exception("Behavior " + bhvName + " doesnt exist");
 
     return Register(target->getNPC()->pIndexData->behaviors.isSet(bhv->getIndex()));
 }
