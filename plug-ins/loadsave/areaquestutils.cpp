@@ -275,7 +275,8 @@ static bool aquest_trigger(WrapperBase *wrapperBase, PCharacter *ch, const DLStr
             continue;
         }
 
-        if (endMethod) {
+        // Only run end trigger for active quests
+        if (endMethod && qdata.questActive()) {
             // Call the end trigger to see if player has done what's needed to finish the step
             bool stepEnded = aquest_method_call(wrapperBase, *endMethod, progArgs);
 
