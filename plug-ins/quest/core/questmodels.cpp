@@ -11,7 +11,7 @@
 #include "mobilebehaviormanager.h"
 #include "objectbehaviormanager.h"
 #include "occupations.h"
-#include "selfrate.h"
+#include "player_utils.h"
 #include "pcharacter.h"
 #include "save.h"
 #include "merc.h"
@@ -106,7 +106,7 @@ bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *
                 break;
             }
         
-        if (hasOtherAggrs && rated_as_newbie(pch))
+        if (hasOtherAggrs && PlayerUtils::isNewbie(pch))
             return false;
     }
  
@@ -306,7 +306,7 @@ struct FindPathComplete {
  */
 bool RoomQuestModel::targetRoomAccessible(PCharacter *pch, Room *target)
 {
-    if (pch->getRemorts().size() > 0 || !rated_as_newbie(pch))
+    if (!PlayerUtils::isNewbie(pch))
         return true;
 
     std::vector<Room *> rooms;

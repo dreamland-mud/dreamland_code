@@ -4,12 +4,10 @@ include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
 plugin_INCLUDES = \
--I$(top_srcdir)/plug-ins/selfrate \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
 libquest_core_la_LIBADD = \
-../../selfrate/libselfrate.la \
 $(LIBADD_AI) \
 -ljsoncpp
 

@@ -3,7 +3,7 @@
 #include "questexceptions.h"
 #include "profflags.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"

@@ -7,7 +7,7 @@
 #include "questmanager.h"
 #include "questexceptions.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 #include "skillreference.h"
 
 #include "pcharacter.h"
@@ -39,10 +39,10 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     raceRusName = pGameIndex->short_descr;
     areaName    = pGameIndex->area->getName();
     
-    if (rated_as_guru( pch ))
-        ordered = URANGE( 5, games[pGameIndex].size( ) * 3 / 2, 12 );
-    else
-        ordered = URANGE( 1, games[pGameIndex].size( ) * 3 / 2, 10 );
+    if (PlayerUtils::isNewbie(pch))
+        ordered = URANGE( 1, games[pGameIndex].size( ) * 3 / 2, 6 );
+    else 
+        ordered = URANGE( 4, games[pGameIndex].size( ) * 3 / 2, 12 );
         
     customer = getRandomClient( pch );
     customerName = customer->getNameP( '1' );

@@ -17,7 +17,6 @@ libcomm_la_SOURCES = \
 areas.cpp \
 banking.cpp \
 bugs.cpp \
-helpservlet.cpp \
 configs.cpp \
 corder.cpp \
 impl.cpp \

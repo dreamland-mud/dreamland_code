@@ -51,7 +51,7 @@
 #include "vnum.h"
 #include "occupations.h"
 #include "skill_utils.h"
-#include "selfrate.h"
+#include "player_utils.h"
 #include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"

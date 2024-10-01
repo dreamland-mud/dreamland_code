@@ -5,12 +5,10 @@ include $(top_srcdir)/src/Makefile.inc
 
 plugin_INCLUDES = \
 -I$(srcdir)/../core \
--I$(top_srcdir)/plug-ins/selfrate \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
 libquest_big_la_LIBADD = \
-../../selfrate/libselfrate.la \
 ../core/libquest_core.la \
 $(LIBADD_AI)
 

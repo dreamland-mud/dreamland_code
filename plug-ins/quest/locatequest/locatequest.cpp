@@ -16,7 +16,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "handler.h"
 #include "act.h"
@@ -68,7 +68,7 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
 
     time = number_range( 5, 10 ); 
 
-    if (rated_as_newbie( pch ))
+    if (PlayerUtils::isNewbie( pch ))
         time *= 2;
 
     setTime( pch, time );
@@ -145,7 +145,7 @@ QuestReward::Pointer LocateQuest::reward( PCharacter *ch, NPCharacter *questman 
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint && !is_total_newbie(ch)) {
+    if (hint && !PlayerUtils::isNewbie(ch)) {
         r->points = number_range( 3, 9 );
         r->gold = number_fuzzy( r->points );
     } else {

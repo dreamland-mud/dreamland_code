@@ -238,7 +238,6 @@ plug-ins/fight_core/Makefile \
 plug-ins/profession/Makefile \
 plug-ins/hometown/Makefile \
 plug-ins/wearlocation/Makefile \
-plug-ins/selfrate/Makefile \
 plug-ins/liquid/Makefile \
 plug-ins/religion/Makefile \
 plug-ins/desire/Makefile \

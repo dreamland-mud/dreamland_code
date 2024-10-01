@@ -24,6 +24,7 @@
 #include "object.h"
 #include "room.h"
 
+#include "xmlattributestatistic.h"
 #include "xmlattributetrust.h"
 #include "xmlkillingattribute.h"
 #include "fight_exception.h"
@@ -53,7 +54,7 @@
 #include "recipeflags.h"
 #include "damageflags.h"
 #include "act.h"
-#include "selfrate.h"
+#include "player_utils.h"
 #include "religionutils.h"
 #include "websocketrpc.h"
 
@@ -992,7 +993,7 @@ NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 �
 {
     checkTarget();
     CHK_NPC
-    return is_total_newbie(target->getPC());
+    return PlayerUtils::isNewbie(target->getPC());
 }
 
 NMI_GET( CharacterWrapper, lastAccessTime, "время последнего захода в мир" )

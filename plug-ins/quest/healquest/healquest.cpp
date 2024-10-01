@@ -8,7 +8,7 @@
 #include "scenarios.h"
 #include "questexceptions.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -39,20 +39,15 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
     time = number_range( 15, 25 );
     mlevel = pch->getModifyLevel( );
     
-    if (rated_as_guru( pch )) {
-        minLevel = mlevel + 10;
-        maxLevel = mlevel + 15;
-        count = 1 + chance( 10 ) + chance( 3 );
-    }
-    else if (rated_as_expert( pch )) {
-        minLevel = max( 1, (int)(mlevel - 5) );
-        maxLevel = mlevel + 15;
-        count = 1 + chance( 10 ) + chance( 3 );
-    }
-    else {
+    if (PlayerUtils::isNewbie(pch)) {
         minLevel = max( 1, (int)(mlevel - 5) );
         maxLevel = mlevel + 5;
         count = 1;
+
+    } else {
+        minLevel = number_range(max(1, (int)mlevel-5), mlevel + 10);
+        maxLevel = mlevel + 15;
+        count = 1 + chance( 10 ) + chance( 3 );
     }
 
     if (scenarios.size( ) < count)
@@ -120,7 +115,7 @@ QuestReward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint > 0 && !is_total_newbie(ch)) {
+    if (hint > 0 && !PlayerUtils::isNewbie(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
 

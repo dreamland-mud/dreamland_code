@@ -118,7 +118,7 @@ COMMAND(Whois, "whois")
         lines.add( buf );
     }
     
-    /* gather info from attributes (selfrate, marriage etc) */
+    /* gather info from attributes (marriage etc) */
     list<DLString> attrLines;
     
     if (pch->getAttributes( ).handleEvent( WhoisArguments( pch, ch->getPC(), attrLines ) ))

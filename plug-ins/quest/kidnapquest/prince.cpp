@@ -13,7 +13,7 @@
 #include "handler.h"
 #include "fight.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "questexceptions.h"
 #include "kidnapquest.h"
@@ -331,7 +331,7 @@ void KidnapPrince::banditsUnleash( PCharacter *hero )
     if (!getQuest( ))
         return;
     
-    if ((rated_as_newbie( hero ) && quest->ambushes >= 1) 
+    if ((PlayerUtils::isNewbie( hero ) && quest->ambushes >= 1) 
             || quest->ambushes >= 3)
         return;
     
