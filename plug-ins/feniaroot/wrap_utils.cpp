@@ -485,3 +485,26 @@ RegisterList argnum2registerList(const RegisterList &args, int num)
 
     return av;
 }
+
+float arg2float(const Register &reg)
+{
+    if (reg.type == Register::NONE)
+        return 0;
+
+    if (reg.type == Register::NUMBER)
+        return reg.toNumber();
+
+    DLString strValue = reg.toString();
+    try {
+        return std::stof(strValue);
+
+    } catch (const std::exception &e) {
+        throw Scripting::Exception("Invalid float value " + DLString(e.what()));
+    }
+}
+
+float argnum2float(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return arg2float(reg);
+}

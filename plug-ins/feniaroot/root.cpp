@@ -335,32 +335,87 @@ NMI_INVOKE( Root, sqrt, "(n): квадратный корень положите
 
 NMI_INVOKE( Root, dice, "(x, y): x раз кинуть кубик с y гранями") 
 {
-    RegisterList::const_iterator i;
-    int a, b;
-
-    if (args.size( ) < 2)
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    i = args.begin( );
-    a = i->toNumber( );
-    i++;
-    b = i->toNumber( );
+    int a = argnum2number(args, 1);
+    int b = argnum2number(args, 2);
 
     return Register( ::dice( a, b ) );
 }
 
+NMI_INVOKE(Root, power, "(A, B): возвращает строку с A в степени B, A и B рациональные числа (в т.ч. в виде строки)")
+{
+    float a = argnum2float(args, 1);
+    float b = argnum2float(args, 2);
+    int a_int = (int)a;
+    int b_int = (int)b;
+
+    if (a == a_int && b == b_int)
+        return (int)pow(a_int, b_int);
+
+    try {
+        float result = powf(a, b);
+        return std::to_string(result);
+
+    } catch (const std::exception &e) {
+        throw Scripting::Exception("Invalid power operands: " + DLString(e.what()));
+    }
+}
+
+NMI_INVOKE(Root, add, "(A, B): A+B, A и B рациональные числа (в т.ч. в виде строки)")
+{
+    float a = argnum2float(args, 1);
+    float b = argnum2float(args, 2);
+    int a_int = (int)a;
+    int b_int = (int)b;
+
+    if (a == a_int && b == b_int)
+        return a_int + b_int;
+
+    try {
+        return std::to_string(a+b);
+    } catch (const std::exception &e) {
+        throw Scripting::Exception("Invalid add operands: " + DLString(e.what()));
+    }
+}
+
+NMI_INVOKE(Root, sub, "(A, B): A-B, A и B рациональные числа (в т.ч. в виде строки)")
+{
+    float a = argnum2float(args, 1);
+    float b = argnum2float(args, 2);
+    int a_int = (int)a;
+    int b_int = (int)b;
+
+    if (a == a_int && b == b_int)
+        return a_int - b_int;
+
+    try {
+        return std::to_string(a-b);
+    } catch (const std::exception &e) {
+        throw Scripting::Exception("Invalid add operands: " + DLString(e.what()));
+    }
+}
+
+NMI_INVOKE(Root, mult, "(A, B): A*B, A и B рациональные числа (в т.ч. в виде строки)")
+{
+    float a = argnum2float(args, 1);
+    float b = argnum2float(args, 2);
+    int a_int = (int)a;
+    int b_int = (int)b;
+
+    if (a == a_int && b == b_int)
+        return a_int * b_int;
+
+    try {
+        return std::to_string(a*b);
+    } catch (const std::exception &e) {
+        throw Scripting::Exception("Invalid add operands: " + DLString(e.what()));
+    }
+}
+
+
 NMI_INVOKE( Root, number_range , "(x, y): произвольное число в промежутке от x до y") 
 {
-    RegisterList::const_iterator i;
-    int a, b;
-
-    if (args.size( ) < 2)
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    i = args.begin( );
-    a = i->toNumber( );
-    i++;
-    b = i->toNumber( );
+    int a = argnum2number(args, 1);
+    int b = argnum2number(args, 2);
 
     return Register( ::number_range( a, b ) );
 }
@@ -372,12 +427,8 @@ NMI_INVOKE( Root, number_percent , "(): произвольное число от
 
 NMI_INVOKE( Root, chance , "(x): true если x >= .number_percent()") 
 {
-    int a;
+    int a = argnum2number(args, 1);
 
-    if (args.size( ) < 1)
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    a = args.front( ).toNumber( );
     return Register( ::chance( a ) );
 }
 
