@@ -208,78 +208,6 @@ NMI_SET( Root, options, "глобальные флаги (.tables.dreamland_flag
         arg2flag(arg, dreamland_flags));
 }
 
-
-
-NMI_INVOKE( Root, player_exists, "(name): существует ли в мире игрок с данным именем")
-{
-    return Register( PCharacterManager::find( args2string( args ) ) != NULL );
-}
-
-NMI_INVOKE( Root, player_name, "(name): английское имя игрока по его русскому/английскому имени")
-{
-    PCMemoryInterface *pci = PCharacterManager::find( args2string( args ) );
-    
-    if (pci)
-        return pci->getName( );
-    else
-        return DLString::emptyString;
-}
-
-NMI_INVOKE( Root, player_russian_name, "(name): русское имя игрока с падежами по его русскому/английскому имени")
-{
-    PCMemoryInterface *pci = PCharacterManager::find( args2string( args ) );
-    
-    if (pci)
-        return pci->getRussianName( ).getFullForm( );
-    else
-        return DLString::emptyString;
-}
-
-
-NMI_INVOKE( Root, player_clan, "(name): название клана игрока по его имени")
-{
-    PCMemoryInterface *pci = PCharacterManager::find( args2string( args ) );
-    
-    if (pci)
-        return pci->getClan( )->getName( );
-    else
-        return DLString::emptyString;
-}
-
-NMI_INVOKE( Root, player_attribute, "(playerName, attrName): значение данного аттрибута игрока")
-{
-    if (args.size( ) != 2)
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    PCMemoryInterface *pci = PCharacterManager::find( args2string( args ) );
-    DLString attrName = args.back( ).toString( );
-
-    if (!pci)
-        throw Scripting::Exception( "Player not found: " + arg2string(args) );
-
-    XMLStringAttribute::Pointer sAttr = pci->getAttributes( ).findAttr<XMLStringAttribute>( attrName );
-
-    if (sAttr)
-        return sAttr->getValue( );
-    else
-        return DLString::emptyString;
-}
-
-NMI_INVOKE(Root, player_description, "(playerName[, descr]): вернуть или установить описание персонажа в оффлайне")
-{
-    PCMemoryInterface *pci = argnum2memory(args, 1);
-
-    if (args.size() > 1) {
-        DLString newDescription = argnum2string(args, 2);
-        DLString oldDescription = pci->getDescription();
-        pci->setDescription(newDescription);
-        PCharacterManager::saveMemory(pci);
-        LogStream::sendNotice() << "Changing description for " << pci->getName() << ": old " << oldDescription << " new " << newDescription << endl;
-    }
-
-    return Register(pci->getDescription());
-}
-
 NMI_INVOKE( Root, get_obj_world , "(name): ищет в мире предмет с указанным именем")
 {
     ::Object *obj;
@@ -1573,4 +1501,14 @@ NMI_GET(Root, player_kills, "статистика убийств мобов. Arr
     }
 
     return playerKillsReg;
+}
+
+NMI_INVOKE(Root, arg_is_gold, "(arg): true если аргумент это gold, золото, золота, золотых")
+{
+    return arg_is_gold(args2string(args));
+}
+
+NMI_INVOKE(Root, arg_is_silver, "(arg): true если аргумент это coin, silver, серебра, монет")
+{
+    return arg_is_silver(args2string(args));
 }
