@@ -390,7 +390,7 @@ NMI_INVOKE(Root, sub, "(A, B): A-B, A и B рациональные числа (
     try {
         return std::to_string(a-b);
     } catch (const std::exception &e) {
-        throw Scripting::Exception("Invalid add operands: " + DLString(e.what()));
+        throw Scripting::Exception("Invalid sub operands: " + DLString(e.what()));
     }
 }
 
@@ -407,7 +407,27 @@ NMI_INVOKE(Root, mult, "(A, B): A*B, A и B рациональные числа 
     try {
         return std::to_string(a*b);
     } catch (const std::exception &e) {
-        throw Scripting::Exception("Invalid add operands: " + DLString(e.what()));
+        throw Scripting::Exception("Invalid mult operands: " + DLString(e.what()));
+    }
+}
+
+NMI_INVOKE(Root, div, "(A, B): A/B, A и B рациональные числа (в т.ч. в виде строки)")
+{
+    float a = argnum2float(args, 1);
+    float b = argnum2float(args, 2);
+    int a_int = (int)a;
+    int b_int = (int)b;
+
+    if (b == 0.0)
+        throw Scripting::Exception("Division by zero");
+
+    if (a == a_int && b == b_int)
+        return a_int / b_int;
+
+    try {
+        return std::to_string(a/b);
+    } catch (const std::exception &e) {
+        throw Scripting::Exception("Invalid div operands: " + DLString(e.what()));
     }
 }
 
