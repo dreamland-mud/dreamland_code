@@ -9,7 +9,7 @@
 
 #include "questexceptions.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 #include "weapongenerator.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -43,19 +43,15 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     
     mode = number_range( -1, 3 );
 
-    if (rated_as_newbie( pch ))
+    if (PlayerUtils::isNewbie( pch ))
         mode = std::min( mode.getValue( ), 1 );
-    else if (rated_as_guru( pch ))
-        mode = std::max( mode.getValue( ), 1 );
 
     try {
         item = getRandomItem( pch );
         victim = item->carried_by->getNPC( );
         thief = getRandomVictim( pch );
     
-        if (rated_as_newbie( pch )
-            || (rated_as_expert( pch ) && chance( 50 ))
-            || (rated_as_guru( pch ) && chance( 20 )))
+        if (PlayerUtils::isNewbie( pch ) || chance(20))
         {
             key = chest = NULL;
             hideaway = NULL;
@@ -73,8 +69,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
         if (!isItemVisible( item, pch ))
             mode++;
         
-        if ((rated_as_guru( pch ) && mode < 2) 
-                || (rated_as_newbie( pch ) && mode > 1))
+        if (PlayerUtils::isNewbie( pch ) && mode > 1)
             throw QuestCannotStartException( );
 
         MobileQuestModel::assign<Robber>( thief );
@@ -186,9 +181,11 @@ QuestReward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman )
         r->points += number_fuzzy( 10 );
     else    
         r->points += number_fuzzy( 3 );
-    if(!is_total_newbie(ch)){
-    r->points -= hint * 5;
+
+    if (!PlayerUtils::isNewbie(ch)) {
+        r->points -= hint * 5;
     }
+    
     r->gold = number_fuzzy( r->points );
     r->wordChance = r->points;
     r->scrollChance = number_range( 5, mode * 4 );

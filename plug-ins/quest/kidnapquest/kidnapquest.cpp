@@ -11,7 +11,7 @@
 #include "objects.h"
 #include "questexceptions.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 #include "roomutils.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -62,7 +62,7 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
     
     time = std::max( 6, range / 10 );
 
-    if (rated_as_newbie( pch ))
+    if (PlayerUtils::isNewbie( pch ))
         time *= 2;
 
     setTime( pch, time );
@@ -94,9 +94,11 @@ QuestReward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questman 
     
     r->points = number_range( 18, 25 );
     r->points += ambushes * 25;
-    if(!is_total_newbie(ch)){
-    r->points -= hint * 10;
+
+    if (!PlayerUtils::isNewbie(ch)) {
+        r->points -= hint * 10;
     }
+
     r->points = std::max( 10, r->points );
 
     r->gold = number_fuzzy( r->points );
@@ -199,7 +201,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         return true;
     }
 
-    if (hint.getValue( ) > 5 && !is_total_newbie(ch)) {
+    if (hint.getValue( ) > 5 && !PlayerUtils::isNewbie(ch)) {
         if (number_percent( ) < 30)
             tell_fmt( "%1$^C1, тебе необходимо следовать по такому пути: eeeennnwwnewseesennnnnnnnwwnnn.", ch, questman ); 
         else
@@ -208,19 +210,14 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         wiznet( "find", "failure" );
         return true;
     }
-    if(!is_total_newbie(ch))
-    tell_raw( ch, questman,  "Я помогу тебе, но награда будет не так велика.");
 
-    if (rated_as_guru( ch ))
-        tell_raw( ch, questman, 
-             "Последний раз {W%s{G видели неподалеку от {W%s{G.", 
-             russian_case( princeName, '4' ).c_str( ),
-             room->getName() );
-    else
-        tell_raw( ch, questman, 
-             "Последний раз {W%s{G видели в местности {W{hh%s{hx{G.", 
-             russian_case( princeName, '4' ).c_str( ),
-             room->areaName().c_str() );
+    if (!PlayerUtils::isNewbie(ch))
+        tell_raw( ch, questman,  "Я помогу тебе, но награда будет не так велика.");
+
+    tell_raw( ch, questman, 
+            "Последний раз {W%s{G видели в местности {W{hh%s{hx{G.", 
+            russian_case( princeName, '4' ).c_str( ),
+            room->areaName().c_str() );
      
     hint++;
     wiznet( "find", "success, attempt #%d", hint.getValue( ) );

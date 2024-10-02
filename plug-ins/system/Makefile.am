@@ -48,7 +48,8 @@ morphology.cpp \
 configurable.cpp \
 json_utils_ext.cpp \
 xmlkillingattribute.cpp \
-alignment.cpp
+alignment.cpp \
+player_utils.cpp
 
 libsystem_la_MOC = \
 schedulertaskattributemanager.h \

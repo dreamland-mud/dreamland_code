@@ -51,7 +51,7 @@ CMDRUN( identify )
     }
    
     int remorts = ch->getPC()->getRemorts( ).size( );
-    //add guru checks?
+    
     if ( remorts == 0) {
         cost = round ((ch->getRealLevel( ) - cost) * 0.66);
         cost = URANGE (0, cost, 20);

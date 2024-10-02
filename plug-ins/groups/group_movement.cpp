@@ -19,7 +19,7 @@
 #include "recallmovement.h"
 #include "fleemovement.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "so.h"
 
@@ -168,7 +168,7 @@ protected:
         
         return true;                             
     }
-    bool checkSelfrate( )
+    bool checkNewbie( )
     {
         if (ch->is_npc( ))
             return true;
@@ -176,15 +176,10 @@ protected:
         if (!ch->desc)
             return true;
 
-        if (rated_as_expert( ch->getPC( ) ))
-            return checkPumped( );
-        
-        if (rated_as_guru( ch->getPC( ) )) {
-            ch->pecho( "Гуру не ищут легких путей." );
-            return false;
-        }
+        if (PlayerUtils::isNewbie(ch->getPC()))
+            return true;
 
-        return true;
+        return checkPumped( );
     }
     virtual bool canMove( Character *wch )
     {
@@ -194,7 +189,7 @@ protected:
             return checkMount( )
                    && checkShadow( )
                    && checkBloody( wch )
-                   && checkSelfrate( )
+                   && checkNewbie( )
                    && checkSameRoom( )
                    && checkForsaken( wch );
     }

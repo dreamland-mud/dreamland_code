@@ -9,7 +9,6 @@ include $(top_srcdir)/plug-ins/Makefile.inc
 plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/liquid \
--I$(top_srcdir)/plug-ins/selfrate \
 -I$(top_srcdir)/plug-ins/services/core \
 -I$(top_srcdir)/plug-ins/services/shop \
 $(INCLUDES_AI) \
@@ -52,7 +51,6 @@ exoticskill.h
 libgroup_skills_la_LIBADD = \
 $(LIBADD_AI) \
 ../skills_impl/libskills_impl.la \
-../selfrate/libselfrate.la \
 ../liquid/libliquid.la \
 libgenericskill.la
 
@@ -73,7 +71,6 @@ class_vampire.h
 libclass_skills_la_LIBADD = \
 $(libgroup_skills_la_LIBADD) \
 ../services/core/libservices_core.la \
-../selfrate/libselfrate.la \
 ../services/shop/libservices_shop.la 
 
 

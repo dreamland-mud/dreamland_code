@@ -10,7 +10,7 @@
 #include "questexceptions.h"
 #include "xmlattributequestdata.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "schedulertask.h"
 
@@ -69,55 +69,42 @@ void Quest::wiznet( const char *status, const char *format, ... )
 
 int Quest::getAccidentTime( PCMemoryInterface *pci )
 {
-    if (rated_as_guru( pci ))
-        return number_range( 2, 5 );
-    else
-        return number_range( 5, 10 );
+    return number_range( 2, 5 );
 }
 
 int Quest::getPunishTime( PCMemoryInterface *pci )
 {
-    if (rated_as_newbie( pci ))
+    if (PlayerUtils::isNewbie( pci ))
         return number_range( 15, 20 );
-    else if (rated_as_guru( pci ))
-        return number_range( 60, 65 );
     else
         return number_range( 20, 30 );
 }
         
 int Quest::getDeathTime( PCMemoryInterface *pci )
 {
-    if (rated_as_newbie( pci ))
+    if (PlayerUtils::isNewbie( pci ))
         return number_range( 15, 20 );
-    else if (rated_as_guru( pci ))
-        return number_range( 40, 60 );
-    else
+    else 
         return number_range( 20, 30 );
 }            
 
 int Quest::getFailTime( PCMemoryInterface *pci )
 {
-    if (rated_as_newbie( pci ))
+    if (PlayerUtils::isNewbie( pci ))
         return number_range( 15, 20 );
-    else if (rated_as_guru( pci ))
-        return number_range( 55, 65 );
-    else
+    else 
         return number_range( 25, 35 );
 }
 
 int Quest::getNextTime( PCMemoryInterface *pci )
 {
-    if (rated_as_guru( pci ))
-        return 1;
-    else
-        return number_range( 5, 10 );
+    return number_range( 1, 3 );
 }
 
 int Quest::getCancelTime( PCMemoryInterface *pci )
 {
     return number_range( 2, 5 );
 }
-
 
 void Quest::setTime( PCMemoryInterface *pcm, int time )
 {

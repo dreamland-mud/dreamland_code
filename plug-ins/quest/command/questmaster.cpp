@@ -2,7 +2,7 @@
  *
  * ruffina, 2005
  */
-#include "selfrate.h"
+#include "player_utils.h"
 #include "questmaster.h"
 
 #include "npcharacter.h"
@@ -22,7 +22,7 @@ QuestMaster::QuestMaster( )
 
 bool QuestMaster::specIdle( ) 
 { 
-    if (chance(99) || !is_total_newbie(ch))
+    if (chance(99))
         return false;
 
     do_say(ch, "Хочешь получить интересное задание? Напиши y{hc{lRквест попросить{lEquest request{x.");

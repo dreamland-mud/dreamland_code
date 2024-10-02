@@ -7,7 +7,7 @@
 #include "questexceptions.h"
 #include "profflags.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -41,10 +41,8 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     case 5: mode = 3; break;
     }
     
-    if (rated_as_guru( pch )) 
-        mode = 3;
-    else if (rated_as_newbie( pch ) && mode > 1)
-        mode = 0;
+    if (PlayerUtils::isNewbie(pch))
+        mode = min((int)mode, 1);
 
     victim = getRandomVictim( pch );
     
@@ -104,7 +102,7 @@ QuestReward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint.getValue( ) > 0 && !is_total_newbie(ch)) {
+    if (hint.getValue( ) > 0 && !PlayerUtils::isNewbie(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
         r->prac = 0;

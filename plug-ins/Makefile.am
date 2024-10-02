@@ -34,7 +34,6 @@ skills_impl \
 liquid \
 comm \
 clan \
-selfrate \
 gquest \
 languages \
 religion \

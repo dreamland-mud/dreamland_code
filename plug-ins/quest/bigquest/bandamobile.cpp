@@ -1,6 +1,6 @@
 #include "bandamobile.h"
 #include "bigquest.h"
-#include "selfrate.h"
+#include "player_utils.h"
 #include "weapongenerator.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
@@ -92,7 +92,7 @@ void BandaMobile::config(PCharacter *hero)
     else
         ch->alignment = -hero->alignment;
 
-    if (!rated_as_newbie(hero)) {
+    if (!PlayerUtils::isNewbie(hero)) {
         // Here we go...
         if (chance(50))
             SET_BIT(ch->off_flags, ASSIST_VNUM);
