@@ -59,7 +59,7 @@ public:
 
     virtual void run()
     {
-        ProfilerBlock profiler("hourly", 10);
+        ProfilerBlock profiler("hourly", 20);
 
         Object *obj, *obj_next;
         for (obj = object_list; obj; obj = obj_next) {
