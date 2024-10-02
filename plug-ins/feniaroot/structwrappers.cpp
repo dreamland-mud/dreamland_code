@@ -994,6 +994,12 @@ NMI_INVOKE( ClanWrapper, diplomacy, "(clan): англ название дипл�
               ];
 }
 
+NMI_INVOKE( ClanWrapper, title, "(ch): клановый титул для онлайн или офлайн персонажа" ) 
+{
+    PCMemoryInterface *pci = argnum2memory(args, 1);
+    return clanManager->find(name)->getTitle(pci);
+}
+
 /*----------------------------------------------------------------------
  * CraftProfession
  *----------------------------------------------------------------------*/

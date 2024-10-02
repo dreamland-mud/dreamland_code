@@ -22,6 +22,7 @@
 #include "spelltarget.h"
 #include "commandmanager.h"
 
+#include "playerwrapper.h"
 #include "tableswrapper.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -258,11 +259,30 @@ NPCharacter *argnum2mobile(const RegisterList &args, int num)
 
 PCMemoryInterface * argnum2memory(const RegisterList &args, int num)
 {
-    DLString playerName = argnum2string(args, num);
-    PCMemoryInterface *pci = PCharacterManager::find(playerName);
-    if (!pci)
-        throw Scripting::Exception("Player not found.");
-    return pci;
+    const Register &reg = argnum(args, num);
+
+    if (reg.type == Register::STRING) {
+        DLString playerName = argnum2string(args, num);
+        PCMemoryInterface *pci = PCharacterManager::find(playerName);
+        if (!pci)
+            throw Scripting::Exception("Player not found.");
+        return pci;
+    }
+
+    if (reg.type == Register::OBJECT) {
+        auto *chWrap = reg.toHandler().getDynamicPointer<CharacterWrapper>();
+        if (chWrap) {
+            if (chWrap->getTarget()->is_npc())
+                throw Scripting::Exception("Mobile found when PC expected.");
+            return chWrap->getTarget()->getPC();
+        }
+
+        auto *playerWrap = reg.toHandler().getDynamicPointer<PlayerWrapper>();
+        if (playerWrap)
+            return playerWrap->getTarget();
+    }
+
+    throw Scripting::Exception("Invalid player reference");
 }
 
 ::Object *argnum2item(const RegisterList &args, int num)
