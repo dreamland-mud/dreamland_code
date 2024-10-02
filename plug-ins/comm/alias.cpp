@@ -33,7 +33,7 @@
 /*-----------------------------------------------------------------------------
  * XMLAttributeAliases
  *----------------------------------------------------------------------------*/
-class XMLAttributeAliases : public XMLMapBase<XMLString>, public RemortAttribute
+class XMLAttributeAliases : public XMLStringMapAttribute, public RemortAttribute
 {
 public:        
         typedef ::Pointer<XMLAttributeAliases> Pointer;

@@ -69,6 +69,7 @@ public:
 
     XMLStringListAttribute( );
     virtual ~XMLStringListAttribute( );
+    virtual Scripting::Register toRegister() const;
 
     virtual const DLString & getType( ) const
     {
@@ -86,6 +87,7 @@ public:
 
         XMLStringMapAttribute( );
         virtual ~XMLStringMapAttribute( );
+        virtual Scripting::Register toRegister() const;
 
         static const DLString TYPE;
 

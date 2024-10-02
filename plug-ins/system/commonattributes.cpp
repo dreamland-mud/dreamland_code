@@ -4,12 +4,16 @@
  */
 #include "json/json.h"
 #include "register-impl.h"
+#include "reglist.h"
+#include "regcontainer.h"
 #include "commonattributes.h"
 #include "pcmemoryinterface.h"
 #include "pcharactermemorylist.h"
 #include "pcharactermanager.h"
 #include "xmlattributes.h"
 #include "logstream.h"
+
+using namespace Scripting;
 
 const DLString XMLEmptyAttribute::TYPE = "XMLEmptyAttribute";
 
@@ -45,9 +49,9 @@ XMLStringAttribute::~XMLStringAttribute( )
 {
 }
 
-Scripting::Register XMLStringAttribute::toRegister() const
+Register XMLStringAttribute::toRegister() const
 {
-    return Scripting::Register(getValue());
+    return Register(getValue());
 }
 
 XMLIntegerAttribute::XMLIntegerAttribute( )
@@ -58,9 +62,9 @@ XMLIntegerAttribute::~XMLIntegerAttribute( )
 {
 }
 
-Scripting::Register XMLIntegerAttribute::toRegister() const
+Register XMLIntegerAttribute::toRegister() const
 {
-    return Scripting::Register(getValue());
+    return Register(getValue());
 }
 
 XMLStringListAttribute::XMLStringListAttribute( )
@@ -71,12 +75,34 @@ XMLStringListAttribute::~XMLStringListAttribute( )
 {
 }
 
+Register XMLStringListAttribute::toRegister() const
+{
+    Register attrReg = Register::handler<RegList>();
+    RegList *attrList = attrReg.toHandler().getDynamicPointer<RegList>();
+    
+    for (auto &e: *this)
+        attrList->push_back(Register(e));
+
+    return attrReg;
+}
+
 XMLStringMapAttribute::XMLStringMapAttribute( )
 {
 }
 
 XMLStringMapAttribute::~XMLStringMapAttribute( )
 {
+}
+
+Register XMLStringMapAttribute::toRegister() const
+{
+    Register attrReg = Register::handler<RegContainer>();
+    RegContainer *attrMap = attrReg.toHandler().getDynamicPointer<RegContainer>();
+    
+    for (auto &e: *this)
+        attrMap->setField(e.first, e.second);
+
+    return attrReg;
 }
 
 const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName)
