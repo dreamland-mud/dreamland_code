@@ -421,9 +421,6 @@ NMI_INVOKE(Root, div, "(A, B): A/B, A и B рациональные числа (
     if (b == 0.0)
         throw Scripting::Exception("Division by zero");
 
-    if (a == a_int && b == b_int)
-        return a_int / b_int;
-
     try {
         return std::to_string(a/b);
     } catch (const std::exception &e) {
