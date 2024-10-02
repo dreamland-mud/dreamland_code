@@ -41,7 +41,8 @@ xmltimestamp.cpp \
 xmlvariable.cpp \
 xmlvariablecontainer.cpp \
 xmljsonvalue.cpp \
-xmlcounter.cpp
+xmlcounter.cpp \
+xmlmultistring.cpp
 
 CLEANFILES = xmlmatchpattern.c++ xmlparser.c++
 AM_CPPFLAGS += $(src_INCLUDES)

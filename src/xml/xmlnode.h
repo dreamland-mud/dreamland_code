@@ -91,6 +91,10 @@ public:
         }
 
         void appendChild( Pointer& node );
+        
+        /** Remove latest node from node list. */
+        void popChild();
+
         inline Pointer getFirstNode( )
         {
                 if( nodes.empty( ) )

@@ -51,6 +51,14 @@ void XMLNode::appendChild( XMLNode::Pointer& node )
         node->parent = this;
 }
 
+void XMLNode::popChild()
+{
+        if (!nodes.empty()) {
+                nodes.back()->parent = 0;
+                nodes.pop_back();
+        }
+}
+
 XMLNode::Pointer XMLNode::clone( bool recursive ) const
 {
         XMLNode::Pointer node( NEW, getName( ) );

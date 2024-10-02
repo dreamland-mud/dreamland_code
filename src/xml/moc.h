@@ -54,15 +54,18 @@ bool Class::mocToXML( XMLNode::Pointer &parent ) const \
          i++)  \
     { \
         XMLNode::Pointer child( NEW ); \
+        parent->appendChild( child ); \
          \
         try { \
+            child->setName( i->first ); \
             if (i->second.toXML( this, child )) { \
-                child->setName( i->first ); \
-                parent->appendChild( child ); \
+                continue; \
             } \
         }  \
         catch (const ExceptionSkipVariable &) { \
         } \
+        \
+        parent->popChild(); \
     } \
     return true; \
 }
