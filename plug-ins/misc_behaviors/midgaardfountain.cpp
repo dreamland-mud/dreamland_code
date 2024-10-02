@@ -20,7 +20,7 @@
 LIQ(blood);
 
 bool MidgaardFountain::area( ) { 
-    ProfilerBlock("MidgaardFountain::area", 5);
+    ProfilerBlock profiler("MidgaardFountain::area", 5);
     
     Character *wch;
     Object *o;

@@ -296,7 +296,7 @@ Object::Manager::syncDel(struct timeval * finishAt)
 bool
 Object::Manager::sync(struct timeval *tickEnd)
 {
-    ProfilerBlock("Fenia::sync", 100);
+    ProfilerBlock profiler("Fenia::sync", 100);
     
     struct timeval withGap, gap = { 0, 40*1000 };
     if(tickEnd) {

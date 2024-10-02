@@ -26,8 +26,6 @@ public:
     
     virtual void run( )
     {
-        ProfilerBlock("AnatoliaUpdate", 50);
-        
         update_handler( );
         DLScheduler::getThis( )->putTaskInitiate( Pointer( this ) );
     }
@@ -61,7 +59,7 @@ public:
 
     virtual void run()
     {
-        ProfilerBlock("hourly", 10);
+        ProfilerBlock profiler("hourly", 10);
 
         Object *obj, *obj_next;
         for (obj = object_list; obj; obj = obj_next) {

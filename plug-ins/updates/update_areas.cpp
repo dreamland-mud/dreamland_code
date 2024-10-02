@@ -104,7 +104,7 @@ void area_update( int flags )
 /** Resets top area from the waiting queue. */
 void area_update_next()
 {
-    ProfilerBlock("area_update_next", 10);
+    ProfilerBlock profiler("area_update_next", 10);
 
     if (areasToReset.empty())
         return;
