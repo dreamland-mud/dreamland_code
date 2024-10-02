@@ -393,4 +393,9 @@ NMI_GET(PlayerWrapper, quest, "статистика побед в авто кв�
     return statAttr->toRegister();
 }
 
+NMI_GET(PlayerWrapper, attributes, "Array всех аттрибутов, ключ - имя аттрибута, значение - Map с полями аттрибута либо пустая строка")
+{
+    PCMemoryInterface *player = getTarget();
+    return player->getAttributes().toRegister();
+}
 

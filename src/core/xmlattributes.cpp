@@ -7,6 +7,12 @@
 #include "class.h"
 #include "logstream.h"
 #include "xmlattributes.h"
+#include "fenia/exceptions.h"
+#include "idcontainer.h"
+#include "regcontainer.h"
+#include "lex.h"
+
+using namespace Scripting;
 
 void XMLAttributes::eraseAttribute( const DLString &name )
 {
@@ -44,4 +50,24 @@ bool XMLAttributes::nodeFromXML( const XMLNode::Pointer & child )
     }
     
     return true;
+}
+
+Register XMLAttributes::toRegister() const
+{
+    Register attrsReg = Register::handler<RegContainer>();
+    RegContainer *attrsContainer = attrsReg.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto &a: *this) {
+        const DLString &attrName = a.first;
+        Register attrReg = a.second->toRegister();
+
+        if (attrReg.type == Register::NONE) 
+            // Still need to put something for attrs that don't handle toRegister() call yet.
+            // Putting a null reg will just erase this entry from RegContainer.
+            attrsContainer->setField(attrName, DLString::emptyString);
+        else
+            attrsContainer->setField(attrName, attrReg);
+    }
+
+    return attrsReg;
 }

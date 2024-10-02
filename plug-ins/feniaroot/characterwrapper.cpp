@@ -2852,4 +2852,11 @@ NMI_GET(CharacterWrapper, quest, "статистика побед в авто к
     return statAttr->toRegister();
 }
 
+NMI_GET(CharacterWrapper, attributes, "Array всех аттрибутов, ключ - имя аттрибута, значение - Map с полями аттрибута либо пустая строка")
+{
+    checkTarget();
+    CHK_NPC
+    return target->getPC()->getAttributes().toRegister();
+}
+
 

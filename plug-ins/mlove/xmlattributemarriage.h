@@ -25,6 +25,7 @@ public:
         XMLAttributeMarriage( );
 
         virtual bool handle( const WhoisArguments & );
+        virtual Scripting::Register toRegister() const;
 
         XML_VARIABLE XMLString spouse;
         XML_VARIABLE XMLBoolean wife;

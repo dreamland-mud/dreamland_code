@@ -52,6 +52,7 @@ public:
         
         virtual bool handle( const ScoreArguments &args ); 
         virtual bool handle( const WhoisArguments &args ); 
+        virtual Scripting::Register toRegister() const;
 
         int proficiencyLevel(const DLString &profName) const;
         int exp(const DLString &profName) const;

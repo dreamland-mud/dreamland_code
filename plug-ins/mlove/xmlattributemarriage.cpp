@@ -5,10 +5,15 @@
 
 #include "xmlattributemarriage.h"
 
+#include "idcontainer.h"
+#include "lex.h"
+#include "reglist.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "merc.h"
 #include "def.h"
+
+using namespace Scripting;
 
 XMLAttributeMarriage::XMLAttributeMarriage( )
 {
@@ -52,5 +57,25 @@ bool XMLAttributeMarriage::handle( const WhoisArguments &args )
 
     return false;
 }
+
+Register XMLAttributeMarriage::toRegister() const
+{
+    Register attrReg = Register::handler<IdContainer>();
+    IdContainer *attrContainer = attrReg.toHandler().getDynamicPointer<IdContainer>();
+
+    attrContainer->setField(IdRef("spouse"), spouse);
+    attrContainer->setField(IdRef("wife"), wife.getValue());
+
+    Register historyReg = Register::handler<RegList>();
+    RegList *historyList = historyReg.toHandler().getDynamicPointer<RegList>();
+
+    for (auto &h: history)
+        historyList->push_back(Register(h));
+
+    attrContainer->setField(IdRef("history"), historyReg);
+
+    return attrReg;
+}
+
 
 

@@ -72,6 +72,7 @@ public:
         void eraseAttribute( const DLString & );
         void addAttribute( XMLAttribute::Pointer , const DLString & );
         bool isAvailable( const DLString& ) const;
+        Scripting::Register toRegister() const;
 
         virtual bool nodeFromXML( const XMLNode::Pointer & );
 };

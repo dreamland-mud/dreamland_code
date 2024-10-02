@@ -1,8 +1,13 @@
 #include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "craftattribute.h"
+#include "idcontainer.h"
+#include "lex.h"
+#include "regcontainer.h"
 #include "subprofession.h"
 #include "pcharacter.h"
+
+using namespace Scripting;
 
 XMLAttributeCraft::XMLAttributeCraft( )
 {
@@ -103,3 +108,24 @@ int XMLAttributeCraft::gainExp(const DLString &profName, int xp)
     return p->second.exp;
 }
 
+Register XMLAttributeCraft::toRegister() const
+{
+    Register attrReg = Register::handler<IdContainer>();
+    IdContainer *attrContainer = attrReg.toHandler().getDynamicPointer<IdContainer>();
+
+    Register profReg = Register::handler<RegContainer>();
+    RegContainer *profContainer = profReg.toHandler().getDynamicPointer<RegContainer>();
+
+    for (auto &p: proficiency) {
+        Register pReg = Register::handler<IdContainer>();
+        IdContainer *pContainer = pReg.toHandler().getDynamicPointer<IdContainer>();
+        pContainer->setField(IdRef("level"), p.second.level.getValue());
+        pContainer->setField(IdRef("exp"), p.second.exp.getValue());
+
+        profContainer->setField(p.first, pReg);
+    }
+
+    attrContainer->setField(IdRef("proficiency"), profReg);
+
+    return attrReg;
+}
