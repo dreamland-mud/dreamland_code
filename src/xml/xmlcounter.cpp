@@ -20,12 +20,8 @@ void XMLCounter::fromString(const DLString &value)
 {
     this->clear();
 
-    StringList pairs;
-    pairs.split(value, " ");
-
-    for (auto pair: pairs) {
-        StringList keyValue;
-        keyValue.split(pair, ":");
+    for (auto pair: value.split(" ")) {
+        auto keyValue = pair.split(":");
 
         if (keyValue.size() != 2)
             throw ExceptionBadType("XMLCounter bad pair " + pair);

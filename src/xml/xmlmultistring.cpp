@@ -5,9 +5,6 @@ const DLString ATTR_LANG = "l";
 
 static lang_t attr2lang(const DLString langAttr)
 {
-    if (langAttr.empty())
-        return EN;
-
     if (langAttr == "en")
         return EN;
 
@@ -52,13 +49,17 @@ const DLString &XMLMultiString::get(lang_t lang) const
 void XMLMultiString::fromXML(const XMLNode::Pointer& parent)
 {
     XMLNode::Pointer node = parent->getFirstNode();
+    DLString cdata = node ? node->getCData() : DLString::emptyString;
     DLString langAttr = parent->getAttribute(ATTR_LANG);
-    lang_t lang = attr2lang(langAttr);
-
-    if (node.isEmpty())
-        (*this)[lang] = DLString::emptyString;
+    lang_t lang; 
+    
+    // For legacy nodes w/o 'l' attribute, guess the lang from the node content.
+    if (langAttr.empty())
+        lang = cdata.hasCyrillic() ? RU : EN;
     else
-        (*this)[lang] = node->getCData();
+        lang = attr2lang(langAttr);
+
+    (*this)[lang] = cdata;
 }
 
 // Append 3 <names l="en"> etc nodes to this parent's parent.
