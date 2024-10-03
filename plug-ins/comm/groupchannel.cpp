@@ -22,7 +22,7 @@ const DLString GroupChannel::COMMAND_NAME = "gtell";
 
 GroupChannel::GroupChannel( ) 
 {
-    name = COMMAND_NAME;
+    name[EN] = COMMAND_NAME;
 }
 
 GroupChannel::~GroupChannel( )
@@ -36,7 +36,7 @@ void GroupChannel::run( Character *ch, const DLString &args )
 
 bool GroupChannel::saveCommand() const
 {
-    return GlobalChannel::saveCommand();
+    return CommandPlugin::saveCommand();
 }
 
 bool GroupChannel::isGlobalListener( Character *ch, Character *victim ) const

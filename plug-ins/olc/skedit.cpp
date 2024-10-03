@@ -246,7 +246,7 @@ void OLCStateSkill::show( PCharacter *ch )
     }
 
     if (c) {
-        ptc(ch, ".............{YКоманда %s{x..........\r\n", c->name.c_str());
+        ptc(ch, ".............{YКоманда %s{x..........\r\n", c->getName().c_str());
         ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
                 c->aliases.toList().toString().c_str(),
                 web_edit_button(ch, "aliases", "").c_str());
@@ -349,7 +349,7 @@ SKEDIT(action, "действие", "создать команду для это�
         DefaultSkillCommand::Pointer cmd(NEW);
         BasicSkill *skill = getOriginal();
 
-        cmd->name = args;
+        cmd->name[EN] = args;
         skill->command.setPointer(cmd);
         skill->command->setSkill(BasicSkill::Pointer(skill));
 

@@ -235,7 +235,7 @@ void LanguageCommand::doList( PCharacter *ch ) const
     for (i = words.begin( ); i != words.end( ); i++) {
         const Word & w = i->second;
 
-        if (w.lang.getValue( ) == name)
+        if (w.lang.getValue( ) == getName())
             ch->pecho( "   %-20s   [%1d]  [%2d]  %N1",
                              w.dictum.getValue( ).c_str( ),
                              w.count.getValue( ),

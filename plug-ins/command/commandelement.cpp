@@ -30,7 +30,7 @@ const DLString & CommandElement::getName() const
 
 void CommandElement::setName(const DLString&value)
 {
-    name.setValue(value);
+    name[EN] = value;
 }
 
 bool CommandElement::saveCommand() const

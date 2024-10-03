@@ -38,7 +38,7 @@ void AreaChannel::triggers( Character *ch, const DLString &msg ) const
 {
     const char *str = msg.c_str( );
 
-    DLString chanID( name );
+    DLString chanID( getName() );
     chanID.upperFirstCharacter( );
         
     for (Character *wch = char_list; wch; wch = wch->next) {

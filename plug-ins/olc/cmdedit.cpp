@@ -23,6 +23,7 @@
 #include "websocketrpc.h"
 #include "arg_utils.h"
 #include "interp.h"
+#include "comm.h"
 #include "act.h"
 
 #include "def.h"
@@ -114,7 +115,6 @@ void OLCStateCommand::show( PCharacter *ch )
     WrappedCommand *wcmd = dynamic_cast<WrappedCommand *>(c);
 
     ptc(ch, "Команда {W%s{x {x\r\n", c->getName().c_str());
-
     ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
             c->aliases.toList().toString().c_str(),
             web_edit_button(ch, "aliases", "").c_str());
@@ -269,6 +269,35 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
         return;
     }
 
+    if (arg_oneof(cmd, "convert")) {
+        ostringstream buf;
+        list<DLString> cmdNames;
+
+        for (auto &c: commandManager->getCommands().getCommands())
+            cmdNames.push_back(c->getName());
+
+        for (auto name: cmdNames) {
+            Command::Pointer cmd = commandManager->findExact(name);            
+            cmd->name[RU] = cmd->russian.empty() ? DLString::emptyString : cmd->russian.front();
+
+            commandManager->unregistrate(::Command::Pointer(cmd));
+            commandManager->registrate(::Command::Pointer(cmd));
+            
+            cmd->saveCommand();
+
+            if (cmd->getHelp())
+                buf << fmt(0, "%20.20s %20.20s %d\r\n", 
+                        cmd->name[EN].c_str(), cmd->name[RU].c_str(), cmd->getHelp()->getID());
+            else {
+                buf << fmt(0, "%20.20s %20.20s no help, type %s\r\n", 
+                        cmd->name[EN].c_str(), cmd->name[RU].c_str(), cmd->getType().c_str());
+            }
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
     // Creating new command
     if (arg_oneof(cmd, "create", "создать")) {
         DLString name = args.getOneArgument().toLower();
@@ -345,7 +374,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
 
     DefaultSkillCommand *skillCmd = c.getDynamicPointer<DefaultSkillCommand>();
     if (skillCmd) {
-        ptc(ch, "Запускаю 'skedit' для команды %s умения %s.", 
+        ptc(ch, "Запускаю 'skedit' для команды '%s' умения '%s'.\r\n", 
                  c->getName().c_str(),
                  skillCmd->getSkill()->getName().c_str());
 

@@ -201,7 +201,7 @@ public:
         Chain *cmd;
 
         for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
-            if (name.strPrefix( cmd->getKey( ) ))
+            if (name.strPrefix( cmd->getKey( ) ) || name.strPrefix(cmd->getVal().rname))
                 return typename Command::Pointer( NEW, 
                                          (T *)this, 
                                          cmd->getKey( ), 

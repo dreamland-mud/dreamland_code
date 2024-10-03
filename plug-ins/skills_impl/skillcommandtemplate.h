@@ -15,7 +15,7 @@ struct SkillCommandTemplate : public DefaultSkillCommand, public ClassSelfRegist
     typedef ::Pointer<SkillCommandTemplate> Pointer;
 
     SkillCommandTemplate( ) {
-        name = cmdName;
+        name[EN] = cmdName;
     }
 
     virtual void run( Character * ch, char *argument ) { 

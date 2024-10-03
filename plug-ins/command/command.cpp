@@ -42,7 +42,7 @@ Command::~Command( )
 
 const DLString& Command::getName( ) const
 {
-    return name.getValue( );
+    return name.get(EN);
 }
 const Flags & Command::getExtra( ) const
 {

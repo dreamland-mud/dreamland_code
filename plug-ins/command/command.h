@@ -14,6 +14,7 @@
 #include "xmlstringlist.h"
 #include "xmlenumeration.h"
 #include "xmlpointer.h"
+#include "xmlmultistring.h"
 
 #include "commandbase.h"
 #include "commandhelp.h"
@@ -61,7 +62,6 @@ public:
         virtual bool available( Character * ) const;
         virtual bool visible( Character * ) const;
 
-        XML_VARIABLE XMLString name;
         XML_VARIABLE XMLStringList aliases, russian;
         XML_VARIABLE XMLFlagsNoEmpty extra;
         XML_VARIABLE XMLShortNoEmpty level;
@@ -71,6 +71,8 @@ public:
         XML_VARIABLE XMLStringNoEmpty hint;
         XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
         XML_VARIABLE XMLFlags cat;
+
+        XML_VARIABLE XMLMultiString name;
 
 protected:        
         void visualize( Character * );

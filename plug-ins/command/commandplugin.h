@@ -28,7 +28,7 @@ public:
 const DLString C::COMMAND_NAME = cmdname; \
 C::C( )                                  \
 {                                        \
-    this->name = COMMAND_NAME;           \
+    this->name[EN] = COMMAND_NAME;           \
 }                                        \
 void C::run( Character* ch, const DLString& constArguments ) 
 

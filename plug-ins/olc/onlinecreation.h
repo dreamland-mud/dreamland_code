@@ -27,11 +27,6 @@ public:
         OnlineCreation(struct cmd_info *);
         virtual ~OnlineCreation( );
         
-        inline virtual const DLString& getName( ) const
-        {
-                return ocName;
-        }
-        
         static inline void registerPlugin( SO::PluginList& ppl )
         {
             OnlineCreation *oc;
@@ -44,7 +39,6 @@ public:
         virtual CommandLoader * getLoader( ) const;
 
 private:
-        DLString ocName;
         OnlineCreation *next;
         do_fn_t *go;
         static OnlineCreation *ocList;
@@ -53,7 +47,7 @@ private:
 struct cmd_info {
     const char *name; 
     do_fn_t *go; 
-    const char *shortName;
+    const char *rname;
     int position; 
     int level;
     int log;

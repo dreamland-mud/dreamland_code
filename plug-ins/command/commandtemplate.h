@@ -20,7 +20,7 @@ public:
     typedef ::Pointer<CommandTemplate> Pointer;
     
     CommandTemplate( ) {
-        name = cmdName;
+        name[EN] = cmdName;
     }
 
     virtual void run( Character * ch, const DLString & constArguments ) {

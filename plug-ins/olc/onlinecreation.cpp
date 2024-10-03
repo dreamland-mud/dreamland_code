@@ -19,13 +19,15 @@ using std::endl;
 OnlineCreation *OnlineCreation::ocList =  0;
 
 OnlineCreation::OnlineCreation(struct cmd_info *ci)
-                         : ocName(ci->name), go(ci->go)
+                         : go(ci->go)
 {
         next = ocList;
         ocList = this;
         
-        if (ci->shortName && ci->shortName[0])
-            aliases.push_back(ci->shortName);
+        name[EN] = ci->name;
+
+        if (ci->rname && ci->rname[0])
+            russian.push_back(ci->rname);
 
         position.setValue(ci->position);
         level.setValue(0/*ci->level*/);

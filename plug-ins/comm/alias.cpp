@@ -89,7 +89,7 @@ public:
 
     CAlias( ) 
     {
-        this->name = COMMAND_NAME;
+        this->name[EN] = COMMAND_NAME;
     }
 
     virtual int properOrder( Character *ch ) const
@@ -201,7 +201,7 @@ public:
     
     CUnalias( ) 
     {
-        this->name = COMMAND_NAME;
+        this->name[EN] = COMMAND_NAME;
     }
 
     virtual void run( Character* ch, const DLString& cArgument ) 
