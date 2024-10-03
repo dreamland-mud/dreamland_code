@@ -7,7 +7,7 @@
 #include "questexceptions.h"
 #include "staffbehavior.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "pcharacter.h"
 #include "object.h"
@@ -98,7 +98,7 @@ QuestReward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     QuestReward::Pointer r( NEW );
 
-    if (hint.getValue( ) && !is_total_newbie(ch)) {
+    if (hint.getValue( ) && !PlayerUtils::isNewbie(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
     }
@@ -190,13 +190,5 @@ StaffQuestRegistrator::StaffQuestRegistrator( )
 StaffQuestRegistrator::~StaffQuestRegistrator( )
 {
     thisClass = NULL;
-}
-
-bool StaffQuestRegistrator::applicable( PCharacter *pch, bool fAuto ) const
-{
-    if (!QuestRegistratorBase::applicable(pch, fAuto))
-        return false;
-
-    return !rated_as_guru( pch );
 }
 

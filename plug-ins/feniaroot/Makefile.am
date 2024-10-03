@@ -74,7 +74,6 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/craft \
 -I$(top_srcdir)/plug-ins/religion \
 -I$(top_srcdir)/plug-ins/liquid \
--I$(top_srcdir)/plug-ins/selfrate \
 -I$(top_srcdir)/plug-ins/skills_impl  \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/clan/behavior \
@@ -94,7 +93,6 @@ $(LIBADD_AI) \
 ../craft/libcraft.la \
 ../religion/libreligion.la \
 ../questreward/libquestreward.la \
-../selfrate/libselfrate.la \
 ../clan/core/libclan_core.la \
 ../clan/behavior/libclan_behavior.la \
 ../skills_impl/libskills_impl.la \

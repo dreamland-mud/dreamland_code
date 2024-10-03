@@ -6,7 +6,7 @@
 #include "locatequest.h"
 #include "questexceptions.h"
 
-#include "selfrate.h"
+#include "player_utils.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -28,9 +28,7 @@ bool LocateScenario::applicable( PCharacter * ) const
 
 int LocateScenario::getCount( PCharacter *pch ) const
 {
-    if (rated_as_guru( pch ))
-        return number_range( 6, 10 );
-    else if (rated_as_newbie( pch ))
+    if (PlayerUtils::isNewbie( pch ))
         return number_range( 2, 4 );
     else
         return number_range( 2, 10 );
