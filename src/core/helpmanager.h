@@ -41,6 +41,7 @@ public:
     /** Add new automatic keyword and refresh all keywords. */
     void addAutoKeyword(const DLString &keyword);
     /** Add new automatic keyword and refresh all keywords. */
+    void addAutoKeyword(const std::list<DLString> &keywords);
     void addAutoKeyword(const StringSet &keywords);
     /** Return all automatic, non-editable keywords. */
     inline const StringSet & getAutoKeywords() const;

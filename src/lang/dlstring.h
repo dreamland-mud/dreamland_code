@@ -6,6 +6,7 @@
 #define DLSTRING_H
 
 #include <string>
+#include <list>
 
 #include "exceptionbadtype.h"
 
@@ -310,7 +311,12 @@ public:
         bool lessCase( const DLString& str ) const;
         
         bool isNumber( ) const;
+
+        /** True if only has Cyrillic characters and spaces. */
         bool isCyrillic( ) const;
+
+        /** True if has at least one Cyrillic character. */
+        bool hasCyrillic() const;
         
         /** убирает пробелы в начале и конце строки */
         inline DLString& stripWhiteSpace( )
@@ -344,6 +350,9 @@ public:
         DLString ruscase( char gram_case ) const;
         DLString quote( ) const;
         DLString &cutSize( size_t );
+        
+        /** Split this string into a list of strings by delimiter. */
+        std::list<DLString> split(const DLString &delim) const;
 
         /** Compares strings using facets of the default locale. */
         int compareRussian(const DLString &other) const;

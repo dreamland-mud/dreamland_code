@@ -32,9 +32,6 @@ public:
 
     /** Adds new element unless already there. */
     void addUnique(const DLString &elem);
-
-    /** Populate this list from splitting a string on delimiter. */
-    void split(const DLString &string, const DLString &delim);
 };
 
 #endif

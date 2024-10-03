@@ -6,6 +6,7 @@
  * NoFate, 2001
  */
 #include <sstream>
+#include <list>
 
 #include "logstream.h"
 #include "dl_ctype.h"
@@ -380,6 +381,18 @@ bool DLString::isCyrillic( ) const
     return true;
 }
 
+bool DLString::hasCyrillic( ) const
+{
+    if (empty( ))
+        return false;
+
+    for (size_type i = 0; i < length( ); i++) 
+        if (dl_is_cyrillic(at(i)))
+            return true;
+
+    return false;
+}
+
 DLString & DLString::stripLeftWhiteSpace( )
 {
         erase( 0, find_first_not_of( ' ' ) );
@@ -647,6 +660,34 @@ DLString &DLString::cutSize( size_t s )
         erase( s );
 
     return *this;
+}
+
+std::list<DLString> DLString::split(const DLString &delim) const
+{    
+    std::list<DLString> tokens;
+    size_type pos1, pos2;
+       
+    // Keep track of beginning and end of the token. 
+    pos1 = 0;
+    pos2 = 0;    
+
+    // Parse all tokens, allowing for delimiters to repeat themselves
+    // several times, e.g. "x   y  z".
+    do {
+        // Remember where a token starts.
+        pos1 = find_first_not_of(delim, pos2);
+        if (pos1 == DLString::npos)
+            break;
+
+        // Remember where a token ends.
+        pos2 = find(delim, pos1);
+
+        // Cut off a substring with this token.
+        tokens.push_back(substr(pos1, pos2 - pos1));
+    }
+    while (pos1 < size() && pos2 < size());
+
+    return tokens;
 }
 
 int DLString::compareRussian(const DLString &other) const

@@ -98,28 +98,3 @@ void StringList::addUnique(const DLString &elem)
     if (find(begin(), end(), elem) == end())
         push_back(elem);
 }
-
-void StringList::split(const DLString &string, const DLString &delim)
-{
-    size_type pos1, pos2;
-       
-    // Keep track of beginning and end of the token. 
-    pos1 = 0;
-    pos2 = 0;    
-
-    // Parse all tokens, allowing for delimiters to repeat themselves
-    // several times, e.g. "x   y  z".
-    do {
-        // Remember where a token starts.
-        pos1 = string.find_first_not_of(delim, pos2);
-        if (pos1 == DLString::npos)
-            break;
-
-        // Remember where a token ends.
-        pos2 = string.find(delim, pos1);
-
-        // Cut off a substring with this token.
-        this->push_back(string.substr(pos1, pos2 - pos1));
-    }
-    while (pos1 < string.size() && pos2 < string.size());
-}

@@ -95,10 +95,18 @@ void HelpArticle::addAutoKeyword(const DLString &keyword)
     refreshKeywords();
 }
 
+void HelpArticle::addAutoKeyword(const std::list<DLString> &keywords)
+{
+    for (auto &k: keywords)
+        keywordsAuto.insert(k.toUpper());
+
+    refreshKeywords();
+}
+
 void HelpArticle::addAutoKeyword(const StringSet &keywords)
 {
-    for (StringSet::const_iterator k = keywords.begin(); k != keywords.end(); k++)
-        keywordsAuto.insert(k->toUpper());
+    for (auto &k: keywords)
+        keywordsAuto.insert(k.toUpper());
 
     refreshKeywords();
 }
