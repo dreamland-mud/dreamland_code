@@ -114,13 +114,22 @@ void OLCStateCommand::show( PCharacter *ch )
     ::Command *c = getOriginal();
     WrappedCommand *wcmd = dynamic_cast<WrappedCommand *>(c);
 
-    ptc(ch, "Команда {W%s{x {x\r\n", c->getName().c_str());
+    ptc(ch, "Команда {C%s{x {x\r\n", c->getName().c_str());
+    ptc(ch, "УкрИмя:      {Y%s{x %s {D(ukrname help){x\r\n",
+            c->name[UA].c_str(),
+            web_edit_button(ch, "ukrname", "web").c_str());
+    ptc(ch, "РуИмя:       {Y%s{x %s {D(runame help){x\r\n",
+            c->name[RU].c_str(),
+            web_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
-            c->aliases.toList().toString().c_str(),
-            web_edit_button(ch, "aliases", "").c_str());
+            c->aliases[EN].c_str(),
+            web_edit_button(ch, "aliases", "web").c_str());
+    ptc(ch, "УкрСинонимы: {Y%s{x %s {D(ukraliases help){x\r\n",
+            c->aliases[UA].c_str(),
+            web_edit_button(ch, "ukraliases", "web").c_str());
     ptc(ch, "РуСинонимы:  {Y%s{x %s {D(rualiases help){x\r\n",
-            c->russian.toList().toString().c_str(),
-            web_edit_button(ch, "rualiases", "").c_str());
+            c->aliases[RU].c_str(),
+            web_edit_button(ch, "rualiases", "web").c_str());
     ptc(ch, "Уровень:     {Y%d {D(level){x\r\n", c->level.getValue());
     ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
     ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
@@ -128,7 +137,7 @@ void OLCStateCommand::show( PCharacter *ch )
             c->order == 0 ? "-" : c->order.names().c_str());
     ptc(ch, "Категории:   {Y%s {D(category){x\r\n", c->cat.names().c_str());
     ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
-            c->hint.c_str(),
+            c->hint[RU].c_str(),
             web_edit_button(ch, "hint", "web").c_str());        
 
     // Can edit all commands but allow to override 'runFunc' only for CommandElement and CommandPlugin.
@@ -196,20 +205,38 @@ CMDEDIT(help, "справка", "создать или посмотреть сп
 CMDEDIT(hint, "подсказка", "краткое описание команды")
 {
     ::Command *c = getOriginal();
-    return editor(argument, c->hint, ED_NO_NEWLINE);
+    return editor(argument, c->hint[RU], ED_NO_NEWLINE);
+}
+
+CMDEDIT(ukrname, "укримя", "украинское имя команды")
+{
+    ::Command  *c = getOriginal();
+    return editor(argument, c->name[UA], ED_NO_NEWLINE) && commandUpdate(c);
+}
+
+CMDEDIT(runame, "руимя", "русское имя команды")
+{
+    ::Command  *c = getOriginal();
+    return editor(argument, c->name[RU], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
 CMDEDIT(aliases, "синонимы", "список англ синонимов для команды")
 {
     ::Command  *c = getOriginal();
-    return stringListEdit(c->aliases) && commandUpdate(c);
+    return editor(argument, c->aliases[EN], ED_NO_NEWLINE) && commandUpdate(c);
+}
+
+CMDEDIT(ukraliases, "укрсинонимы", "список украинских синонимов для команды")
+{
+    ::Command  *c = getOriginal();
+    return editor(argument, c->aliases[UA], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
 // Edit Russian aliases for the command, re-register with CommandManager if changed
 CMDEDIT(rualiases, "русинонимы", "список русских синонимов для команды")
 {
     ::Command  *c = getOriginal();
-    return stringListEdit(c->russian) && commandUpdate(c);
+    return editor(argument, c->aliases[RU], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
 CMDEDIT(level, "уровень", "уровень, с которого доступна команда")
@@ -265,36 +292,33 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
     if (cmd.empty()) {
         stc("Формат:  cmdedit название\r\n", ch);
         stc("         cmdedit list\r\n", ch);
+        stc("         cmdedit ua\r\n", ch);
         stc("         cmdedit create название\r\n", ch);
         return;
     }
 
-    if (arg_oneof(cmd, "convert")) {
+    if (arg_oneof(cmd, "ua")) {
         ostringstream buf;
-        list<DLString> cmdNames;
 
-        for (auto &c: commandManager->getCommands().getCommands())
-            cmdNames.push_back(c->getName());
+        for (auto &c: commandManager->getCommands().getCommands()) {
+            Command::Pointer cmd = commandManager->findExact(c->getName());
 
-        for (auto name: cmdNames) {
-            Command::Pointer cmd = commandManager->findExact(name);            
-            cmd->name[RU] = cmd->russian.empty() ? DLString::emptyString : cmd->russian.front();
+            if (cmd->name[RU].empty())
+                continue;
 
-            commandManager->unregistrate(::Command::Pointer(cmd));
-            commandManager->registrate(::Command::Pointer(cmd));
-            
-            cmd->saveCommand();
-
-            if (cmd->getHelp())
-                buf << fmt(0, "%20.20s %20.20s %d\r\n", 
-                        cmd->name[EN].c_str(), cmd->name[RU].c_str(), cmd->getHelp()->getID());
-            else {
-                buf << fmt(0, "%20.20s %20.20s no help, type %s\r\n", 
-                        cmd->name[EN].c_str(), cmd->name[RU].c_str(), cmd->getType().c_str());
-            }
+//            cmd->saveCommand();
+            DLString format = DLString("{Y") + web_cmd(ch, "cmdedit $1", "%-13.13s") + " {G%-13.13s{x {R%-13.13s{x [{y%-15.15s{x] [{g%-15.15s{x] [{r%-15.15s{x]\r\n";
+            buf << fmt(0, format.c_str(), 
+                    cmd->name[EN].c_str(), 
+                    cmd->name[RU].c_str(), 
+                    cmd->name[UA].c_str(), 
+                    cmd->aliases[EN].c_str(), 
+                    cmd->aliases[RU].c_str(),
+                    cmd->aliases[UA].c_str());
         }
 
         page_to_char(buf.str().c_str(), ch);
+
         return;
     }
 

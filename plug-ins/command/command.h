@@ -41,8 +41,6 @@ public:
 
         virtual const DLString& getName( ) const;
         virtual const DLString & getRussianName( ) const;
-        virtual const XMLStringList &getAliases( ) const;
-        virtual const XMLStringList &getRussianAliases( ) const;
         virtual const DLString & getHint( ) const;
         virtual ::Pointer<CommandHelp> getHelp( ) const;
         virtual short getLog( ) const;
@@ -62,17 +60,17 @@ public:
         virtual bool available( Character * ) const;
         virtual bool visible( Character * ) const;
 
-        XML_VARIABLE XMLStringList aliases, russian;
         XML_VARIABLE XMLFlagsNoEmpty extra;
         XML_VARIABLE XMLShortNoEmpty level;
         XML_VARIABLE XMLShortNoEmpty log;
         XML_VARIABLE XMLEnumeration position;
         XML_VARIABLE XMLFlagsNoEmpty order; 
-        XML_VARIABLE XMLStringNoEmpty hint;
         XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
         XML_VARIABLE XMLFlags cat;
 
         XML_VARIABLE XMLMultiString name;
+        XML_VARIABLE XMLMultiString aliases;
+        XML_VARIABLE XMLMultiString hint;
 
 protected:        
         void visualize( Character * );

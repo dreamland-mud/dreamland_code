@@ -30,22 +30,11 @@ enum {
 
 static void show_aliases( Command::Pointer cmd, ostringstream &buf, int flags = 0 )
 {
-    XMLStringList::const_iterator a, r;
+    auto &aliases = cmd->aliases.get(EN); 
+    buf << aliases << " ";
 
-    const XMLStringList &aliases = cmd->getAliases( ); 
-    for (a = aliases.begin( ); a != aliases.end( ); a++) 
-        buf << *a << " ";
-
-    const XMLStringList &russian = cmd->getRussianAliases( );
-    if (!russian.empty( )) {
-        r = russian.begin( );
-
-        if (!IS_SET(flags, FCMD_SHOW_FIRST_RUS))
-            r++;
-        
-        for ( ; r != russian.end( ); r++) 
-            buf << *r << " ";
-    }
+    auto &russian = cmd->aliases.get(RU);
+    buf << russian << " ";
 }
 
 static void show_matched_commands( Character *ch, const DLString &arg )

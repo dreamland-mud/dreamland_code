@@ -70,7 +70,7 @@ const Flags & Command::getOrder( ) const
 }
 const DLString& Command::getHint( ) const
 {
-    return hint.getValue( );
+    return hint.get(RU);
 }
 
 ::Pointer<CommandHelp> Command::getHelp( ) const
@@ -80,20 +80,7 @@ const DLString& Command::getHint( ) const
 
 const DLString & Command::getRussianName( ) const
 {
-    if (russian.empty( ))
-        return DLString::emptyString;
-    else 
-        return russian.front( );
-}
-
-const XMLStringList & Command::getAliases( ) const
-{
-    return aliases;
-}
-
-const XMLStringList & Command::getRussianAliases( ) const
-{
-    return russian;
+    return name.get(RU);
 }
 
 bool Command::available( Character *ch ) const 
@@ -125,12 +112,12 @@ bool Command::matchesExactly( const DLString &cmdName ) const
         return true;
 
     if (dl_is_cyrillic( cmdName.at( 0 ) )) {
-        for (XMLStringList::const_iterator i = russian.begin( ); i != russian.end( ); i++) 
-            if (*i == cmdName) 
+        for (auto &alias: aliases.get(RU).split(" "))
+            if (alias == cmdName) 
                 return true;
     } else {
-        for (XMLStringList::const_iterator i = aliases.begin( ); i != aliases.end( ); i++) 
-            if (*i == cmdName) 
+        for (auto &alias: aliases.get(EN).split(" "))
+            if (alias == cmdName) 
                 return true;
     }
 
@@ -157,13 +144,13 @@ bool Command::matchesAlias( const DLString& command ) const
         return false;
     
     if (dl_is_cyrillic( command.at( 0 ) )) {
-        for (XMLStringList::const_iterator r = russian.begin( ); r != russian.end( ); r++) 
-            if (command.strPrefix( *r )) 
+        for (auto &alias: aliases.get(RU).split(" "))
+            if (command.strPrefix(alias)) 
                 return true;
     }
     else {
-        for (XMLStringList::const_iterator a = aliases.begin( ); a != aliases.end( ); a++) 
-            if (command.strPrefix( *a )) 
+        for (auto &alias: aliases.get(EN).split(" "))
+            if (command.strPrefix(alias)) 
                 return true;
     }
 

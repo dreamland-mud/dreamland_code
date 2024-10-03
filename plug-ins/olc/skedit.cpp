@@ -247,19 +247,28 @@ void OLCStateSkill::show( PCharacter *ch )
 
     if (c) {
         ptc(ch, ".............{YКоманда %s{x..........\r\n", c->getName().c_str());
+        ptc(ch, "УкрИмя:      {Y%s{x %s {D(ukrname help){x\r\n",
+                c->name[UA].c_str(),
+                web_edit_button(ch, "ukrname", "web").c_str());
+        ptc(ch, "РуИмя:       {Y%s{x %s {D(runame help){x\r\n",
+                c->name[RU].c_str(),
+                web_edit_button(ch, "runame", "web").c_str());
         ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
-                c->aliases.toList().toString().c_str(),
-                web_edit_button(ch, "aliases", "").c_str());
+                c->aliases[EN].c_str(),
+                web_edit_button(ch, "aliases", "web").c_str());
+        ptc(ch, "УкрСинонимы: {Y%s{x %s {D(ukraliases help){x\r\n",
+                c->aliases[UA].c_str(),
+                web_edit_button(ch, "ukraliases", "web").c_str());
         ptc(ch, "РуСинонимы:  {Y%s{x %s {D(rualiases help){x\r\n",
-                c->russian.toList().toString().c_str(),
-                web_edit_button(ch, "rualiases", "").c_str());
+                c->aliases[RU].c_str(),
+                web_edit_button(ch, "rualiases", "web").c_str());
         ptc(ch, "Аргумент:    {Y%s {D(argtype){x\r\n", c->argtype.name().c_str());
         ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
         ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
         ptc(ch, "Приказ:      {Y%s {D(order){x\r\n", 
                 c->order == 0 ? "-" : c->order.names().c_str());
         ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
-                c->hint.c_str(),
+                c->hint[RU].c_str(),
                 web_edit_button(ch, "hint", "web").c_str());        
 
         feniaTriggers->showTriggers(ch, c->getWrapper(), "skillcommand");
@@ -620,29 +629,46 @@ SKEDIT(group, "группа", "группа умений (? practicer)")
     return globalBitvectorEdit<SkillGroup>(r->getGroups());
 }
 
-SKEDIT(russian, "русское", "русское имя умения")
-{
-    BasicSkill *r = getOriginal();
-    return editor(argument, r->nameRus, ED_NO_NEWLINE);
-}
-
-SKEDIT(hint, "подсказка", "краткое описание команды")
+SKEDIT(ukrname, "укримя", "украинское имя команды")
 {
     DefaultSkillCommand *c = getCommand();
-    return checkCommand(c) && editor(argument, c->hint, ED_NO_NEWLINE);
+    return checkCommand(c) && editor(argument, c->name[UA], ED_NO_NEWLINE) && commandUpdate(c);
+}
+
+SKEDIT(runame, "руимя", "русское имя команды")
+{
+    DefaultSkillCommand *c = getCommand();
+    return checkCommand(c) && editor(argument, c->name[RU], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
 SKEDIT(aliases, "синонимы", "список англ синонимов для команды")
 {
     DefaultSkillCommand *c = getCommand();
-    return checkCommand(c) && stringListEdit(c->aliases);
+    return checkCommand(c) && editor(argument, c->aliases[EN], ED_NO_NEWLINE) && commandUpdate(c);
 }
 
-// Edit Russian aliases for the command, re-register with CommandManager if Russian name (first alias) has changed.
+SKEDIT(ukraliases, "укрсинонимы", "список украинских синонимов для команды")
+{
+    DefaultSkillCommand *c = getCommand();
+    return checkCommand(c) && editor(argument, c->aliases[UA], ED_NO_NEWLINE) && commandUpdate(c);
+}
+
 SKEDIT(rualiases, "русинонимы", "список русских синонимов для команды")
 {
     DefaultSkillCommand *c = getCommand();
-    return checkCommand(c) && stringListEdit(c->russian) && commandUpdate(c);
+    return checkCommand(c) && editor(argument, c->aliases[RU], ED_NO_NEWLINE) && commandUpdate(c);
+}
+
+SKEDIT(hint, "подсказка", "краткое описание команды")
+{
+    DefaultSkillCommand *c = getCommand();
+    return checkCommand(c) && editor(argument, c->hint[RU], ED_NO_NEWLINE);
+}
+
+SKEDIT(russian, "русское", "русское имя умения")
+{
+    BasicSkill *r = getOriginal();
+    return editor(argument, r->nameRus, ED_NO_NEWLINE);
 }
 
 SKEDIT(allow, "доступно", "ограничения по классу, клану, расе")

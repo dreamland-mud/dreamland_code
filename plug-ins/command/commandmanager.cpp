@@ -31,9 +31,9 @@ Command::Pointer CommandList::findExact( const DLString& name ) const
             if ((*ipos)->getRussianName( ) == name) 
                 return *ipos;
 
-            const XMLStringList &aliases = (*ipos)->getRussianAliases( );
-            if (find(aliases.begin( ), aliases.end( ), name) != aliases.end( ))
-                return *ipos;
+            for (auto &alias: (*ipos)->aliases.get(RU).split(" "))
+                if (name == alias)
+                    return *ipos;
         }
 
         return Command::Pointer( );
@@ -43,9 +43,9 @@ Command::Pointer CommandList::findExact( const DLString& name ) const
         if ((*ipos)->getName( ) == name) 
             return *ipos;
 
-        const XMLStringList &aliases = (*ipos)->getAliases( );
-        if (find(aliases.begin( ), aliases.end( ), name) != aliases.end( ))
-            return *ipos;
+        for (auto &alias: (*ipos)->aliases.get(EN).split(" "))
+            if (name == alias)
+                return *ipos;
     }
 
     return Command::Pointer( );
@@ -62,7 +62,7 @@ Command::Pointer CommandList::findUnstrict(const DLString& name) const
             if (name.strPrefix(cmd->getRussianName()))
                 return *cmd;
 
-            for (auto &alias: cmd->getRussianAliases())
+            for (auto &alias: cmd->aliases.get(RU).split(" "))
                 if (name.strPrefix(alias))
                     return cmd;
         }
@@ -74,7 +74,7 @@ Command::Pointer CommandList::findUnstrict(const DLString& name) const
         if (name.strPrefix(cmd->getName()))
             return *cmd;
 
-        for (auto &alias: cmd->getAliases())
+        for (auto &alias: cmd->aliases.get(EN).split(" "))
             if (name.strPrefix(alias))
                 return cmd;
     }
@@ -106,7 +106,6 @@ static void record_distance(const DLString &cmd, const DLString &kuzdn, const DL
 void CommandList::gatherHints(InterpretArguments &iargs) const
 {
     list<Command::Pointer>::const_iterator c;
-    XMLStringList::const_iterator a;
     const DLString &cmd = iargs.cmdName;
     DLString kuzdn = translit(cmd);
 
@@ -114,11 +113,13 @@ void CommandList::gatherHints(InterpretArguments &iargs) const
         if ((*c)->visible(iargs.ch)) {
             record_distance(cmd, kuzdn, (*c)->getName(), iargs);
 
-            for (a = (*c)->getAliases().begin(); a != (*c)->getAliases().end(); a++) 
-                record_distance(cmd, kuzdn, *a, iargs);
-            
-            for (a = (*c)->getRussianAliases().begin(); a != (*c)->getRussianAliases().end(); a++) 
-                record_distance(cmd, kuzdn, *a, iargs);
+            for (auto &a: (*c)->aliases.get(EN).split(" ")) 
+                record_distance(cmd, kuzdn, a, iargs);
+
+            record_distance(cmd, kuzdn, (*c)->getRussianName(), iargs);
+
+            for (auto &a: (*c)->aliases.get(RU).split(" ")) 
+                record_distance(cmd, kuzdn, a, iargs);
         }
     }
 }

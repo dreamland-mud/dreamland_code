@@ -661,8 +661,7 @@ bool OLCState::enumerationArrayWebEdit(EnumerationArray &values)
     }
 
     // Split values string by comma, receiving name+value pairs
-    StringList pairs;
-    pairs.split(newValue, ",");
+    auto pairs = newValue.split(",");
     for (auto &pair: pairs) {
         DLString name = pair.getOneArgument();
         DLString value = pair.getOneArgument();        
@@ -811,8 +810,7 @@ bool OLCState::editor(const char *argument, XMLStringList &values, editor_flags 
     if (!editor(argument, original, flags))
         return false;
 
-    StringList newLines;
-    newLines.split(original, "\n");
+    auto newLines = original.split("\n");
     values.clear();
     for (auto &line: newLines)
         values.push_back(line);

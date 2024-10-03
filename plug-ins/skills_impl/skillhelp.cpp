@@ -162,9 +162,9 @@ void SkillHelp::setSkill( Skill::Pointer skill )
         Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
         
         if (cmd) {
-            addAutoKeyword( cmd->getName( ) );
-            addAutoKeyword(cmd->getAliases().toSet());
-            addAutoKeyword(cmd->getRussianAliases().toSet());
+            addAutoKeyword(cmd->getName());
+            addAutoKeyword(cmd->aliases.get(EN).split(" "));
+            addAutoKeyword(cmd->aliases.get(RU).split(" "));
             if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
                 labels.addTransient("cmd");
             }

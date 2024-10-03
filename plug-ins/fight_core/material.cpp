@@ -40,8 +40,7 @@ material_parse( const char *materials,  vector<const material_t *> &result )
     if (!materials)
         return;
 
-    StringList tokens;
-    tokens.split(materials, ", ");
+    auto tokens = DLString(materials).split(", ");
 
     for (auto &token: tokens) {
         const material_t *mat = material_by_name(token);

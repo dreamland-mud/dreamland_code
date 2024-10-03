@@ -74,8 +74,7 @@ ClanOrgSkill::getOrgInfo( PCMemoryInterface *pch ) const
 // Parse a string of clan and orden restrictions, separated by a semicolon.
 bool ClanOrgSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
 {
-    StringList values;
-    values.split(newValue, ";");
+    auto values = newValue.split(";");
     DLString clanValues = values.front().stripWhiteSpace();
     DLString orgValues = values.size() > 1 ? values.back().stripWhiteSpace() : DLString::emptyString;
 

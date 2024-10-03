@@ -27,7 +27,7 @@ OnlineCreation::OnlineCreation(struct cmd_info *ci)
         name[EN] = ci->name;
 
         if (ci->rname && ci->rname[0])
-            russian.push_back(ci->rname);
+            name[RU] = ci->rname;
 
         position.setValue(ci->position);
         level.setValue(0/*ci->level*/);

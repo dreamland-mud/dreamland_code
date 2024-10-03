@@ -415,8 +415,7 @@ DLString BasicSkill::accessToString() const
 map<DLString, int> BasicSkill::parseAccessTokens(const DLString &newValue, const GlobalRegistryBase *registry, ostringstream &errBuf) const
 {
     // Split string "cleric 10, warrior 33, witch 15" by comma, into a list of tokens.
-    StringList tokens;
-    tokens.split(newValue, ", ");
+    auto tokens = newValue.split(", ");
     map<DLString, int> entriesWithLevels, empty;
 
     // Empty restrictions: all entries will be flushed in the calling method.

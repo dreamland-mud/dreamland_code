@@ -428,8 +428,7 @@ bool SkillClassInfo::visible( ) const
 
 bool GenericSkill::accessFromString(const DLString &newValue, ostringstream &errBuf)
 {
-    StringList values;
-    values.split(newValue, ";");
+    auto values = newValue.split(";");
     DLString classValues = values.front().stripWhiteSpace();
     DLString raceBonusValues = values.size() > 1 ? values.back().stripWhiteSpace() : DLString::emptyString;
 

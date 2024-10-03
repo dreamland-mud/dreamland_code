@@ -268,9 +268,7 @@ NMI_INVOKE(FeniaString, split, "(sep): возвращает List из подст
     else
         delim = args.front().toString();
        
-    StringList tokens;
-    tokens.split(*this, delim);
-    for (auto &token: tokens)
+    for (auto &token: this->split(delim))
         list->push_back(Register(token));
 
     Object *obj = &Object::manager->allocate();
