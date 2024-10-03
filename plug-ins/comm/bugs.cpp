@@ -47,7 +47,7 @@ CMDRUNP( typo )
     ch->pecho( "Опечатка записана.");
 }
 
-CMDRUNP( iidea )
+CMDRUNP( idea )
 {
     DLString txt = argument;
     txt.stripWhiteSpace( );

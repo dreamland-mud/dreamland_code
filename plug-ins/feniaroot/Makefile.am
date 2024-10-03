@@ -8,7 +8,6 @@ ceval.cpp \
 cfindref.cpp \
 characterwrapper.cpp \
 commandwrapper.cpp \
-feniasync.cpp \
 impl.cpp \
 mobindexwrapper.cpp \
 objectwrapper.cpp \

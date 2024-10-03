@@ -176,7 +176,6 @@ WrappersPlugin::initialization( )
     Class::regMoc<AffectHandlerWrapper>( );
     Class::regMoc<AffectWrapper>( );
     Class::regMoc<SkillCommandWrapper>( );
-    Class::regMoc<CommandWrapper>( );
     Class::regMoc<TablesWrapper>( );
     Class::regMoc<TableWrapper>( );
     Class::regMoc<HometownWrapper>( );
@@ -281,7 +280,6 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<RaceWrapper>( );
     Class::unregMoc<TablesWrapper>( );
     Class::unregMoc<TableWrapper>( );
-    Class::unregMoc<CommandWrapper>( );
     Class::unregMoc<SkillCommandWrapper>( );
     Class::unregMoc<FeniaCommandWrapper>( );
     Class::unregMoc<AffectWrapper>( );
