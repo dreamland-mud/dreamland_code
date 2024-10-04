@@ -150,19 +150,14 @@ bool MixedPetShopRoom::lookupMixedList( MixedList &list, MixedEntry &e, Characte
         return true;
     }
     else {
-        int number = arg.getNumberArgument( );
-        int count = 0;
-
         for (i = list.begin( ); i != list.end( ); i++) {
             DLString allnames = russian_case_all_forms(i->short_descr) + " " + i->name;
 
             if (!is_name( arg.c_str( ), allnames.c_str()))
                 continue;
 
-            if (++count == number) {
-                e = *i;
-                return true;
-            }
+            e = *i;
+            return true;
         }
 
         return false;
@@ -180,7 +175,7 @@ void MixedPetShopRoom::doBuy( Character *client, const DLString &constArguments 
     createMixedList( list, client );
 
     arguments = constArguments;
-    quantity = arguments.getMultArgument( );
+    quantity = 1;
     
     if (lookupMixedList( list, e, client, arguments )) {
         DLString newArg;

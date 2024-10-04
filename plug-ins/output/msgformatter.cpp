@@ -84,7 +84,7 @@ DLString MsgFormatter::pad(bool left, int width, int limit, int upcase, const DL
         }
     }
 
-    len = tmp.colorLength();
+    len = tmp.colourStrip().size();
     
     if(!width)
         width = len;

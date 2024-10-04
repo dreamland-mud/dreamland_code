@@ -271,8 +271,6 @@ public:
          * case-less, colour-less comparision
          */
         bool operator ^ ( const DLString & ) const;
-        /** caseless comparision */
-        bool equalLess( const DLString & ) const;
 
         /*
         * Набор функций для конвертации содержимого строк в другие типы
@@ -297,27 +295,15 @@ public:
 
         /** откусывает первый аргумент и возвращает его */
         DLString getOneArgument( );
-        /** откусывает <число><астерикс> от начала и возвращает его */
-        int getMultArgument( );
-        /** откусывает <число><точка> от начала и возвращает его */
-        int getNumberArgument( );
-        /** вспомогательная кусалка */
-        int splitFirstNumber( char );
 
         void colourstrip( );
         DLString colourStrip( ) const;
-        size_type colorLength( ) const;
 
-        bool lessCase( const DLString& str ) const;
-        
         bool isNumber( ) const;
 
         /** True if only has Cyrillic characters and spaces. */
         bool isCyrillic( ) const;
 
-        /** True if has at least one Cyrillic character. */
-        bool hasCyrillic() const;
-        
         /** убирает пробелы в начале и конце строки */
         inline DLString& stripWhiteSpace( )
         {
@@ -342,14 +328,13 @@ public:
 
         /** case-insensitive, full-word-match search of subword */
         bool isName( const DLString & msg) const;
-        DLString &substitute( char, char );
 
+        DLString &substitute( char, char );
         DLString substitute( char, const char *) const;
         DLString &replaces( const DLString &, const DLString & );
 
         DLString ruscase( char gram_case ) const;
         DLString quote( ) const;
-        DLString &cutSize( size_t );
         
         /** Split this string into a list of strings by delimiter. */
         std::list<DLString> split(const DLString &delim) const;

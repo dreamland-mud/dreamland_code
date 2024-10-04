@@ -18,6 +18,9 @@ bool dl_isdelim( char );
 bool dl_isalnum( char c );
 bool dl_is_arg_separator(char c);
 
+bool dl_is_ukr_specific(char c);
+bool dl_is_rus_specific(char c);
+
 inline char dl_toupper( char c )
 {
     return (c >= 'a' && c <= 'z') 

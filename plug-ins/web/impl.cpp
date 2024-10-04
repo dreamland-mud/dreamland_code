@@ -34,6 +34,7 @@
 #include "roomutils.h"
 #include "pcharacter.h"
 #include "follow_utils.h"
+#include "string_utils.h"
 
 #include "directions.h"
 #include "handler.h"
@@ -205,7 +206,7 @@ Json::Value GroupWebPromptListener::jsonGroupMember( Character *ch, Character *g
     else  hit_clr = "1";
 
     DLString sees = ch->sees( gch, '1' ).colourStrip( );
-    sees.cutSize( 10 );
+    String::truncate(sees, 10);
     json["sees"] = sees;
     json["hit"] = gch->hit.getValue( );
     json["max_hit"] = gch->max_hit.getValue( );

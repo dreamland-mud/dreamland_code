@@ -17,6 +17,36 @@
 
 class Character;
 
+// A command storage with support for multi-language input.
+struct MultiCommandList {
+        // Picks an available command for this character's input.
+        Command::Pointer chooseCommand(Character *ch, const DLString &input);
+
+        // Guess what the player wanted to type from existing input.
+        void gatherHints(InterpretArguments &iargs);
+
+        // Put a new command into storage, populate maps, re-sort the name lists.
+        void addCommand(Command::Pointer &cmd);
+
+        // Remove entries for a command from everywhere.
+        void removeCommand(Command::Pointer &cmd);
+
+        // Main command storage. Maps command name (EN) to the command instance.
+        map<DLString, Command::Pointer> masterMap;        
+
+        // For each lang, maps from a command name or alias to corresponding EN command name inside masterMap.
+        map<lang_t, map<DLString, DLString> > names;
+
+        // For each lang, keeps a sorted list of names&aliases from the 'names' maps. Sorting is done based on priorities files.
+        map<lang_t, list<DLString> > sortedNames;
+
+        // Look through sorted list of command and aliases names for the given language.
+        Command::Pointer sortedLookup(Character *ch, const DLString &input, lang_t lang);
+
+        // Re-populate sorted list of names and aliases for this lang.
+        void refreshSorted(lang_t lang);
+};
+
 class CommandList {
 public:
         Command::Pointer findExact( const DLString & ) const;
@@ -86,6 +116,9 @@ private:
         Priorities priorities_en;
         Priorities priorities_ru;
         CommandList commands;
+
+public:
+        MultiCommandList multiCommands;
 };
 
 inline CommandList & CommandManager::getCommands( )

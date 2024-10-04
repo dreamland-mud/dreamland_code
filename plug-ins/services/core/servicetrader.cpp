@@ -24,17 +24,13 @@ ServiceTrader::findArticle( Character *client, DLString &arg )
 {
     Article::Pointer null;
     ServiceList::iterator s;
-    int number, n;
     
-    number = arg.getNumberArgument( );    
-
     if (arg.empty( ))
         return null;
 
-    for (n = 0, s = services.begin( ); s != services.end( ); s++) 
+    for (s = services.begin( ); s != services.end( ); s++) 
         if ((*s)->matches( arg )) 
-            if (++n >= number) 
-                return *s;
+            return *s;
     
     return null;
 }   

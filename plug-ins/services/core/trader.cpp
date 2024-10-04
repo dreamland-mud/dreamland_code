@@ -43,7 +43,7 @@ void Trader::doBuy( Character *client, const DLString &constArguments )
 
     arguments = constArguments;
     arg = arguments.getOneArgument( );
-    quantity = arg.getMultArgument( );
+    quantity = 1;
     article = findArticle( client, arg );
 
     if (!article) {

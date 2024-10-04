@@ -7,7 +7,7 @@
 #include "badnames.h"
 #include "logstream.h"
 #include "dl_ctype.h"
-
+#include "string_utils.h"
 #include "merc.h"
 #include "loadsave.h"
 #include "religion.h"
@@ -90,7 +90,7 @@ bool BadNames::nameReligion(const DLString &name, bool fRussian) const
         Religion *rel = religionManager->find(i);
         DLString godName = fRussian ? rel->getRussianName() : rel->getName();
 
-        if (name.equalLess(godName))
+        if (String::equalLess(name, godName))
             return false;
     }
 
@@ -160,7 +160,7 @@ bool BadNames::nameReserved( const DLString &name ) const
 {
     NameList::const_iterator n;
     for (n = names.begin( ); n != names.end( ); n++)
-        if (name.equalLess( *n ))
+        if (String::equalLess( name, *n ))
             return false;
     
     RegexpList::const_iterator r;

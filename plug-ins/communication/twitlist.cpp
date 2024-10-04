@@ -8,7 +8,7 @@
 
 #include "twitlist.h"
 #include "commonattributes.h"
-
+#include "string_utils.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "arg_utils.h"
@@ -88,8 +88,8 @@ void CTwit::doRemove( PCharacter *ch, DLString &arg )
     for (auto iter = twitAttr->begin( ); iter != twitAttr->end( ); iter++) {
         auto blockedPerson = PCharacterManager::find(iter->getValue());
 
-        if (arg.equalLess(iter->getValue( )) 
-            || (blockedPerson && blockedPerson->getNameP('1').equalLess(arg))) {
+        if (String::equalLess(arg, iter->getValue( )) 
+            || (blockedPerson && String::equalLess(arg, blockedPerson->getNameP('1')))) {
 
             ch->pecho( "Имя удалено из списка.", iter->getValue( ).c_str( ) );
             twitAttr->erase( iter );

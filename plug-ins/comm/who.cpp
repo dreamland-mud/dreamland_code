@@ -12,6 +12,7 @@
 #include "pcharactermanager.h"
 #include "object.h"
 #include "pcrace.h"
+#include "string_utils.h"
 
 #include "commandtemplate.h"
 #include "plugininitializer.h"
@@ -400,7 +401,8 @@ Json::Value WhoWebPromptListener::jsonPlayer( PCharacter *ch, PCharacter *wch )
     Json::Value player;
     
     // Player name and sex.
-    player["n"] = wch->toNoun(ch)->decline('1').cutSize(10);
+    DLString name = wch->toNoun(ch)->decline('1');
+    player["n"] = String::truncate(name, 10);
     player["s"] = wch->getSex( ) == SEX_MALE ? "m" : "f";
 
     // First 2 letters of player race.

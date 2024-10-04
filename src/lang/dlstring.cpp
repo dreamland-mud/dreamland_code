@@ -262,36 +262,6 @@ bool DLString::toBoolean() const
 
 }
 
-
-DLString::size_type DLString::colorLength( ) const
-{
-        size_type len_colour = 0;
-        size_type len_s = 0;
-        size_type pos = find( '{' );
-        while( pos != npos )
-        {
-                if( pos + 1 < length( ) )
-                {
-                        if( at( pos + 1 ) == '{' )
-                        {
-                                len_s++;
-                        }
-                        else
-                        {
-                                len_colour++;
-                        }
-                        pos++;
-                }
-                if( pos == length( ) )
-                {
-                        break;
-                }
-                pos = find( '{', pos + 1 );
-        }
-        
-        return length( ) - len_colour * 2 - len_s;
-}
-
 DLString DLString::getOneArgument( )
 {
     char cEnd;
@@ -326,29 +296,6 @@ DLString DLString::getOneArgument( )
     return ret;
 }
 
-bool DLString::lessCase( const DLString& str ) const
-{
-        size_type len = length( ) < str.length( ) ? length( ) : str.length( );
-        for( size_type i = 0; i < len; i++ )
-        {
-                char ch1 = dl_toupper( at( i ) );
-                char ch2 = dl_toupper( str[i] );
-                if( ch1 < ch2 )
-                {
-                        return true;
-                }
-                else if( ch1 > ch2 )
-                {
-                        return false;
-                }
-        }
-        if( length( ) < str.length( ) )
-        {
-                return true;
-        }
-        return false;
-}
-
 bool DLString::isNumber( ) const
 {
     char ch;
@@ -379,18 +326,6 @@ bool DLString::isCyrillic( ) const
             return false;
 
     return true;
-}
-
-bool DLString::hasCyrillic( ) const
-{
-    if (empty( ))
-        return false;
-
-    for (size_type i = 0; i < length( ); i++) 
-        if (dl_is_cyrillic(at(i)))
-            return true;
-
-    return false;
 }
 
 DLString & DLString::stripLeftWhiteSpace( )
@@ -549,41 +484,6 @@ bool DLString::operator ^ ( const DLString &that ) const
     return !(*b);
 }
 
-int DLString::splitFirstNumber( char separator )
-{
-    int number = 0;
-    iterator i = begin( );
-
-    if (find( separator ) == npos)
-        return 1;
-
-    while (i != end( ) && dl_isspace( *i ))
-        i++;
-
-    if (i == end( ) || !isdigit( *i ))
-        return 1;
-    
-    while (i != end( ) && isdigit( *i )) {
-        number += number * 10 + *i - '0';
-        i++;
-    }
-
-    if (i != end( )) 
-        erase( 0, find_first_not_of( separator, i - begin( ) ) );
-
-    return number;
-}
-
-int DLString::getMultArgument( )
-{
-    return splitFirstNumber( '*' );
-}
-
-int DLString::getNumberArgument( )
-{
-    return splitFirstNumber( '.' );
-}
-
 DLString & DLString::capitalize( )
 {
     for( size_type pos = 0; pos < length( ); pos++ )
@@ -640,26 +540,6 @@ DLString DLString::upperFirstCharacter( ) const
         rc << at(pos);
 
     return rc;
-}
-
-bool DLString::equalLess( const DLString &str ) const
-{
-    if (length( ) != str.length( ))
-        return false;
-
-    for( size_type pos = 0; pos < length( ); pos++ ) 
-        if( dl_tolower( at( pos ) ) != dl_tolower( str.at( pos ) ) )
-                return false;
-
-    return true;
-}
-
-DLString &DLString::cutSize( size_t s )
-{
-    if (length( ) > s)
-        erase( s );
-
-    return *this;
 }
 
 std::list<DLString> DLString::split(const DLString &delim) const

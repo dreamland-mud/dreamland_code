@@ -160,7 +160,7 @@ COMMAND(Whois, "whois")
         buf << "флаги:";
 
     for (std::vector<const char *>::iterator i = flags.begin( ); i != flags.end( ); i++) {
-        if (DLString(buf.str()).colorLength() + DLString(*i).colorLength() > 70) {
+        if (DLString(buf.str()).colourStrip().size() + DLString(*i).colourStrip().size() > 70) {
             lines.add( buf );
             buf << "      ";
         }
@@ -206,7 +206,7 @@ void Whois::LinesList::add( std::basic_ostringstream<char> &buf, bool fCR ) {
     if (buf.str( ).empty( ))
         return;
         
-    int length = DLString( buf.str( ) ).colorLength( );
+    int length = DLString( buf.str( ) ).colourStrip().size();
 
     str << "{w| " << buf.str( );
 

@@ -3,6 +3,7 @@ lib_LTLIBRARIES = libcommand.la
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 plugin_INCLUDES = \
+-I/usr/include/jsoncpp \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/descriptor \
@@ -17,7 +18,8 @@ libcommand_la_LIBADD = \
 ../descriptor/libdescriptor.la \
 ../output/liboutput.la \
 ../help/libhelp.la \
-../loadsave/libloadsave.la
+../loadsave/libloadsave.la \
+-ljsoncpp
 
 
 libcommand_la_SOURCES = \

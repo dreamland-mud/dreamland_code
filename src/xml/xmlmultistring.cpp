@@ -1,5 +1,6 @@
 #include "xmlmultistring.h"
 #include "exception.h"
+#include "string_utils.h"
 
 const DLString ATTR_LANG = "l";
 
@@ -55,7 +56,7 @@ void XMLMultiString::fromXML(const XMLNode::Pointer& parent)
     
     // For legacy nodes w/o 'l' attribute, guess the lang from the node content.
     if (langAttr.empty())
-        lang = cdata.hasCyrillic() ? RU : EN;
+        lang = String::hasCyrillic(cdata) ? RU : EN;
     else
         lang = attr2lang(langAttr);
 

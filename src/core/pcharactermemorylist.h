@@ -22,7 +22,7 @@ struct MapCompareIgnoreCase : public std::binary_function<DLString, DLString, bo
 {
         inline result_type operator( ) ( const first_argument_type& str1, const second_argument_type& str2 ) const
         {
-                return str1.lessCase( str2 );
+                return str1.toLower().compare(str2.toLower());
         }
 };
 

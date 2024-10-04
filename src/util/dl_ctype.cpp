@@ -27,6 +27,27 @@ bool dl_isspace( char ch )
     }
 }
 
+bool dl_is_ukr_specific(char c)
+{
+    switch (c) {
+        case 'і': case 'ґ': case 'ї': case 'є':
+        case 'І': case 'Ґ': case 'Ї': case 'Є':
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool dl_is_rus_specific(char c)
+{
+    switch (c) {
+        case 'ё': case 'ы': case 'э':
+        case 'Ё': case 'Ы': case 'Э':
+        default:
+            return false;
+    }
+}
+
 // Lower case cyrillic letters in koi8-u encoding
 static bool is_cyrillic_lower(char c)
 {

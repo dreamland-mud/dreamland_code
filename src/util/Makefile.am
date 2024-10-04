@@ -28,7 +28,8 @@ dl_strings.cpp \
 dl_ctype.cpp \
 profiler.cpp \
 timer.cpp \
-json_utils.cpp
+json_utils.cpp \
+string_utils.cpp
 
 
 CLEANFILES = parsedate.c++

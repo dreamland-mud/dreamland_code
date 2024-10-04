@@ -94,7 +94,7 @@ Formatter::printline(unsigned int tab, unsigned int width)
         os << setw(tab) << "";
     
     for(i = words.begin( ); i != words.end( ); i++) 
-        spaces -= i->colorLength( );
+        spaces -= i->colourStrip().size();
 
     for(i = words.begin( ); i != words.end( ); i++) {
         if(i != words.begin( )) {
@@ -118,7 +118,7 @@ Formatter::format(unsigned int tab, unsigned int width)
 
         skipspaces( ) && getword(word);
 
-        if(len + word.colorLength( ) > width) {
+        if(len + word.colourStrip().size() > width) {
             if(!word.empty( ) && words.empty( )) {
                 words.push_back(word);
                 word.clear( );
@@ -130,7 +130,7 @@ Formatter::format(unsigned int tab, unsigned int width)
         }
         
         if(!word.empty( )) {
-            len += word.colorLength( );
+            len += word.colourStrip().size();
             words.push_back( word );
         }
     }

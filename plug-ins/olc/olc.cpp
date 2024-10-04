@@ -11,6 +11,7 @@
 #include <xmldocument.h>
 #include "stringset.h"
 #include "wrapperbase.h"
+#include "string_utils.h"
 
 #include <skill.h>
 #include <spell.h>
@@ -289,12 +290,13 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         // System areas are shown in grey colors.           
         const char *colorAreaName = IS_SET(pArea->area_flag, AREA_SYSTEM) ? "D" : "W";
         const char *colorAreaVnums = IS_SET(pArea->area_flag, AREA_SYSTEM) ? "D" : "w";
+        DLString areaName = pArea->getName().colourStrip();
 
         ch->send_to(
             fmt(0, lineFormat.c_str(), 
                 pArea->vnum, 
                 colorAreaName,
-                pArea->getName().colourStrip().cutSize(29).c_str(),
+                String::truncate(areaName, 29).c_str(),
                 colorAreaVnums,
                 pArea->min_vnum, pArea->max_vnum,
                 pArea->area_file->file_name,

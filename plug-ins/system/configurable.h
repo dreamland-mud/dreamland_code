@@ -3,7 +3,7 @@
 
 #include <map>
 #include <list>
-#include "jsoncpp/json/value.h"
+
 #include "logstream.h"
 #include "plugin.h"
 #include "oneallocate.h"

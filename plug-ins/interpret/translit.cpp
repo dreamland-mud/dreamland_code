@@ -87,6 +87,7 @@ char translit(char c0)
     return c;
 }
 
+// TODO add UA characters
 DLString translit(const DLString &s)
 {
     ostringstream buf;

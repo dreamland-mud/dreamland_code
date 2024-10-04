@@ -198,11 +198,11 @@ void CachedNoun::update( PCharacter *ch )
     DLString prt, rprt;
     bool colored = ch->getRemorts( ).pretitle;
     
-    if (ch->getPretitle( ).colorLength( ) > 0) {
+    if (!ch->getPretitle( ).empty()) {
         prt << (colored ? ch->getPretitle( ) : ch->getPretitle( ).colourStrip( )) << " ";
     }
 
-    if (ch->getRussianPretitle( ).colorLength( ) > 0) {
+    if (!ch->getRussianPretitle( ).empty()) {
         rprt << (colored ? ch->getRussianPretitle( ) : ch->getRussianPretitle( ).colourStrip( )) << " "; 
     } else {
         rprt << prt;

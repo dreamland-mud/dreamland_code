@@ -63,7 +63,7 @@
 #include "logstream.h"
 #include "grammar_entities_impl.h"
 #include "morphology.h"
-
+#include "string_utils.h"
 #include "skill.h"
 #include "skillmanager.h"
 #include "skillgroup.h"
@@ -741,14 +741,14 @@ static bool fix_title( PCharacter *ch, DLString &title )
     if (DLString( "{" ).strSuffix( title )
         && !DLString( "{{" ).strSuffix( title ))
     {
-        title.cutSize( title.length( ) - 1 );
+        String::truncate(title, title.length( ) - 1 );
     }
 
     title.replaces( "{/", "" );
     title.replaces( "{*", "" );
     title.replaces( "{+", "" );
 
-    if (title.colorLength( ) > 50) {
+    if (title.colourStrip().size() > 50) {
         ch->pecho( "Слишком длинный титул." );
         return false;
     }
@@ -1719,6 +1719,8 @@ CMDRUNP( score )
     name << ch->seeName( ch, '1' ) << "{x ";
     mudtags_convert(title.c_str( ), name, TAGS_CONVERT_VIS, ch);
 
+    DLString ethos = ethos_table.message( ch->ethos, '1' );
+
     // Output one piece of the score if there is an argument provided.
     DLString arg = argument;
     if (!arg.empty()) {
@@ -1802,7 +1804,7 @@ CMDRUNP( score )
             CLR_FRAME,
 
             CLR_CAPT,
-            ethos_table.message( ch->ethos, '1' ).cutSize( 12 ).c_str( ),
+            String::truncate(ethos, 12).c_str( ),
             CLR_BAR,
             CLR_CAPT,
             ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA), pch->getMaxStat(STAT_CHA),
@@ -2106,7 +2108,7 @@ private:
         DLString kw = keyword;
 
         if (arg.length() > 3 && arg.length() < kw.length())
-            kw.cutSize(arg.length());
+            String::truncate(kw, arg.length());
 
         return levenshtein(arg, kw, 1, 1, 1, 1);
     }
