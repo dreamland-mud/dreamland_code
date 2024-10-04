@@ -106,52 +106,44 @@ bool Command::visible( Character *ch ) const
 }
 
 
-bool Command::matchesExactly( const DLString &cmdName ) const
+bool Command::matchesExactly( const DLString &input ) const
 {
-    if (getName( ) == cmdName || getRussianName( ) == cmdName)
-        return true;
+    if (input.empty( ))
+        return false;
 
-    if (dl_is_cyrillic( cmdName.at( 0 ) )) {
-        for (auto &alias: aliases.get(RU).split(" "))
-            if (alias == cmdName) 
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        const DLString &cmdName = name.get(lang);
+
+        if (!cmdName.empty())
+            if (input == cmdName)
                 return true;
-    } else {
-        for (auto &alias: aliases.get(EN).split(" "))
-            if (alias == cmdName) 
+
+        for (auto &alias: aliases.get(lang).split(" "))
+            if (input == alias)
                 return true;
     }
 
     return false;
 }
 
-bool Command::matches( const DLString& command ) const
+bool Command::matches( const DLString& input ) const
 {
-    if (command.empty( ))
+    if (input.empty( ))
         return false;
 
-    if (command.strPrefix( getName( ) ))
-        return true;
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
+        const DLString &cmdName = name.get(lang);
 
-    if (command.strPrefix( getRussianName( ) ))
-        return true;
-    
-    return false;
-}
+        if (!cmdName.empty())
+            if (input.strPrefix(cmdName))
+                return true;
 
-bool Command::matchesAlias( const DLString& command ) const
-{
-    if (command.empty( ))
-        return false;
-    
-    if (dl_is_cyrillic( command.at( 0 ) )) {
-        for (auto &alias: aliases.get(RU).split(" "))
-            if (command.strPrefix(alias)) 
+        for (auto &alias: aliases.get(lang).split(" "))
+            if (input.strPrefix(alias))
                 return true;
-    }
-    else {
-        for (auto &alias: aliases.get(EN).split(" "))
-            if (command.strPrefix(alias)) 
-                return true;
+
     }
 
     return false;

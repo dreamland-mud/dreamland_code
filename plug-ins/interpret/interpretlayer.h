@@ -42,7 +42,8 @@ struct InterpretArguments
     ::Pointer<CommandBase> pCommand;
     int index;
     int * phases;
-    StringList hints1, hints2, translit;
+    StringList hints1, hints2, translitCmd;
+    DLString translitArgs;
 };
 
 class InterpretLayer : public virtual Plugin {

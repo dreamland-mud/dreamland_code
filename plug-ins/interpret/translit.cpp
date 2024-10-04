@@ -1,12 +1,44 @@
 #include <sstream>
 #include "dl_ctype.h"
 #include "dlstring.h"
+#include "xmlmultistring.h"
 
-char translit(char c0)
+static char en2ua(char c0)
 {
-    char c = dl_tolower(c0);
+    switch(c0) {
+    case 's':   return 'і';
+    case ']':   return 'ї';
+    case '}':   return 'ї';
+    case '\'':   return 'є';
+    case '"':   return 'є';
+    case '`':   return 'ґ';
+    case '~':   return 'ґ';
+    default: return c0;
+    }
+}
 
-    switch(c) {
+static char en2ru(char c0)
+{
+    switch(c0) {
+    case 's':   return 'ы';
+    case ']':   return 'ъ';
+    case '}':   return 'ъ';
+    case '\'':   return 'э';
+    case '"':   return 'э';
+    case '`':   return 'ё';
+    case '~':   return 'ё';
+    default: return c0;
+    }
+}
+
+char translit(lang_t lang, char c)
+{
+    char c0 = dl_tolower(c);
+    char c1 = lang == UA ? en2ua(c0) : en2ru(c0);
+    if (c0 != c1)
+        return c1;
+
+    switch(c0) {
     case 'a':   return 'ф';
     case 'b':   return 'и';   
     case 'c':   return 'с';
@@ -25,7 +57,6 @@ char translit(char c0)
     case 'p':   return 'з';
     case 'q':   return 'й';
     case 'r':   return 'к';
-    case 's':   return 'ы';
     case 't':   return 'е';
     case 'u':   return 'г';
     case 'v':   return 'м';
@@ -35,20 +66,14 @@ char translit(char c0)
     case 'z':   return 'я';
     case '[':   return 'х';
     case '{':   return 'х';
-    case ']':   return 'ъ';
-    case '}':   return 'ъ';
     case ';':   return 'ж';
     case ':':   return 'ж';
-    case '\'':   return 'э';
-    case '"':   return 'э';
     case ',':   return 'б';
     case '<':   return 'б';
     case '.':   return 'ю';
     case '>':   return 'ю';
     case '/':   return '.';
     case '?':   return '.';
-    case '`':   return 'ё';
-    case '~':   return 'ё';
 
     case 'й':    return 'q';
     case 'ц':    return 'w';
@@ -72,6 +97,10 @@ char translit(char c0)
     case 'л':    return 'k';
     case 'д':    return 'l';
     case 'ж':    return ';';
+    case 'є':    return '\'';
+    case 'ґ':    return '`';
+    case 'ї':    return ']';
+    case 'і':    return 's';
     case 'э':    return '\'';
     case 'ё':    return '`';
     case 'я':    return 'я';
@@ -87,12 +116,11 @@ char translit(char c0)
     return c;
 }
 
-// TODO add UA characters
-DLString translit(const DLString &s)
+DLString translit(lang_t lang, const DLString &s)
 {
     ostringstream buf;
     for (size_t i = 0; i < s.size(); i++)
-        buf << translit(s.at(i));
+        buf << translit(lang, s.at(i));
     return buf.str();
 }
 

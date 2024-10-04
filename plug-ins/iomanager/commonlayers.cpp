@@ -6,7 +6,6 @@
 #include "interpretlayer.h"
 #include "commandinterpreter.h"
 #include "commandbase.h"
-#include "translit.h"
 #include "json/json.h"
 #include "lasthost.h"
 #include "websocketrpc.h"
@@ -196,7 +195,7 @@ public:
             return false;
             
         ostringstream buf; 
-        int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translit.size();
+        int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translitCmd.size();
 
         if (total_hints == 0) {
             iargs.ch->pecho("Что? Для справки наберите {y{hc{lRкоманды{lEcommands{x или {y{hc{lRсправка{lEhelp{x.");
@@ -207,13 +206,12 @@ public:
        
         if (total_hints <= 3) {
             const DLString &args = iargs.cmdArgs;
-            DLString kuzdnArgs = translit(args);
-            show_hint_and_argument(buf, iargs.translit, kuzdnArgs);
+            show_hint_and_argument(buf, iargs.translitCmd, iargs.translitArgs);
             show_hint_and_argument(buf, iargs.hints1, args);
             show_hint_and_argument(buf, iargs.hints2, args);
         } else {
             int hint_cnt = 0; 
-            show_hint_columns(hint_cnt, buf, iargs.translit);
+            show_hint_columns(hint_cnt, buf, iargs.translitCmd);
             show_hint_columns(hint_cnt, buf, iargs.hints1);
             show_hint_columns(hint_cnt, buf, iargs.hints2);
             if (hint_cnt % 2 != 0)

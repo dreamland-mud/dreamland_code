@@ -31,6 +31,14 @@ struct MultiCommandList {
         // Remove entries for a command from everywhere.
         void removeCommand(Command::Pointer &cmd);
 
+        // Find a command by its exact name or alias, in any lang.
+        Command::Pointer findExact(const DLString &cmdName);
+
+        // Find a command by its name or alias prefix, in any lang.
+        Command::Pointer findUnstrict( const DLString &cmdName);
+
+        list<Command::Pointer> getSortedCommands();
+
         // Main command storage. Maps command name (EN) to the command instance.
         map<DLString, Command::Pointer> masterMap;        
 
@@ -47,40 +55,12 @@ struct MultiCommandList {
         void refreshSorted(lang_t lang);
 };
 
-class CommandList {
-public:
-        Command::Pointer findExact( const DLString & ) const;
-        Command::Pointer findUnstrict( const DLString & ) const;
-        Command::Pointer chooseCommand( Character *, const DLString & ) const;
-        void gatherHints(InterpretArguments &iargs) const;
-
-        void add( Command::Pointer & );
-        void remove( Command::Pointer & );
-        inline const list<Command::Pointer> &getCommands( ) const;
-        inline const list<Command::Pointer> &getCommandsRU( ) const;
-
-protected:        
-        list<Command::Pointer> commands;
-        list<Command::Pointer> commands_ru;
-};
-
-inline const list<Command::Pointer> &CommandList::getCommands( ) const
-{
-    return commands;
-}
-
-inline const list<Command::Pointer> &CommandList::getCommandsRU( ) const
-{
-    return commands_ru;
-}
-
 /** Keeps track of all the interpretable commands in the world, processes user input. */
 class CommandManager : public InterpretLayer,
                        public OneAllocate 
 {
 public:
         typedef ::Pointer<CommandManager> Pointer;
-        typedef std::map<DLString, int> Priorities;
         typedef std::list<Command::Pointer> CategoryCommands;
         typedef std::map<bitnumber_t, CategoryCommands> CategoryMap;
 
@@ -91,45 +71,19 @@ public:
         void registrate( Command::Pointer );
         void unregistrate( Command::Pointer );
         
-        Command::Pointer findExact( const DLString & ) const;
-        Command::Pointer findUnstrict( const DLString & ) const;
-        Command::Pointer find(const DLString &cmdName) const;
-        inline CommandList & getCommands( );
-        inline const CommandList & getCommands( ) const;
+        Command::Pointer findExact( const DLString & );
+        Command::Pointer findUnstrict( const DLString & );
+        void refresh(lang_t lang);        
+        list<Command::Pointer> getCommands();
         CategoryMap getCategorizedCommands() const;
-        bool compare( const Command &, const Command &, bool fRussian ) const;
 
         virtual bool process( InterpretArguments & );
 
 protected:
-        virtual void initialization( );
-        virtual void destruction( );
         virtual void putInto( );
         
-private:
-        void loadPriorities( );
-        DLString getPrioritiesFolder() const;
-
-        static const DLString PRIO_FILE_EN;
-        static const DLString PRIO_FILE_RU;
-
-        Priorities priorities_en;
-        Priorities priorities_ru;
-        CommandList commands;
-
-public:
         MultiCommandList multiCommands;
 };
-
-inline CommandList & CommandManager::getCommands( )
-{
-    return commands;
-}
-
-inline const CommandList & CommandManager::getCommands( ) const
-{
-    return commands;
-}
 
 
 extern CommandManager *commandManager;

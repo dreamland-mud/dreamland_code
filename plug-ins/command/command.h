@@ -51,7 +51,6 @@ public:
         virtual const Flags & getCommandCategory( ) const;
 
         virtual bool matches( const DLString & ) const;
-        virtual bool matchesAlias( const DLString & ) const;
         virtual bool matchesExactly( const DLString & ) const;
         virtual int properOrder( Character * ) const;
         virtual int dispatchOrder( const InterpretArguments & );

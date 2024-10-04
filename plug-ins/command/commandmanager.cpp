@@ -43,21 +43,34 @@ CONFIGURABLE_LOADED(prio, commands_en)
 {
     priorities[EN].fromJson(value);
 
-    commandManager->multiCommands.refreshSorted(EN);
+    commandManager->refresh(EN);
 }
 
 CONFIGURABLE_LOADED(prio, commands_ua)
 {
     priorities[UA].fromJson(value);
 
-    commandManager->multiCommands.refreshSorted(UA);
+    commandManager->refresh(UA);
 }
 
 CONFIGURABLE_LOADED(prio, commands_ru)
 {
     priorities[RU].fromJson(value);
 
-    commandManager->multiCommands.refreshSorted(RU);
+    commandManager->refresh(RU);
+}
+
+list<Command::Pointer> MultiCommandList::getSortedCommands()
+{
+    list<Command::Pointer> cmds;
+
+    for (auto &alias: sortedNames[EN]) {
+        const DLString &cmdName = names[EN][alias];
+        if (alias == cmdName)        
+            cmds.push_back(masterMap[cmdName]);
+    }
+
+    return cmds;
 }
 
 void MultiCommandList::refreshSorted(lang_t lang)
@@ -173,10 +186,8 @@ Command::Pointer MultiCommandList::sortedLookup(Character *ch, const DLString &i
     return Command::Pointer();
 }
 
-Command::Pointer MultiCommandList::chooseCommand(Character *ch, const DLString &input)
+static void guess_command_lang(Character *ch, const DLString &input, lang_t &guess_1, lang_t &guess_2)
 {
-    lang_t guess_1, guess_2;
-
     if (!String::hasCyrillic(input)) {
         // No cyrillic letters - look for EN command, regardless of config.
         guess_1 = guess_2 = EN;
@@ -192,6 +203,13 @@ Command::Pointer MultiCommandList::chooseCommand(Character *ch, const DLString &
         else if (String::hasRuSymbol(input))
             guess_1 = guess_2 = RU;
     }
+}
+
+Command::Pointer MultiCommandList::chooseCommand(Character *ch, const DLString &input)
+{
+    lang_t guess_1, guess_2;
+
+    guess_command_lang(ch, input, guess_1, guess_2);
 
     // Do a command lookup for both guessed languages.
     Command::Pointer cmd = sortedLookup(ch, input, guess_1);
@@ -220,14 +238,18 @@ static void record_distance(const DLString &cmd, const DLString &kuzdn, const DL
         iargs.hints2.push_back(candidate);
 
     if (kuzdn.strPrefix(candidate))
-        iargs.translit.push_back(candidate);
+        iargs.translitCmd.push_back(candidate);
 }
 
 
 void MultiCommandList::gatherHints(InterpretArguments &iargs)
 {
     const DLString &cmdName = iargs.cmdName;
-    DLString kuzdn = translit(cmdName);
+
+    lang_t guess_1, guess_2;
+    guess_command_lang(iargs.ch, cmdName, guess_1, guess_2);
+    DLString kuzdn = translit(guess_1, cmdName);
+    iargs.translitArgs = translit(guess_1, iargs.cmdArgs);
 
     for (auto &it: masterMap) {
         Command::Pointer cmd = it.second;
@@ -249,181 +271,40 @@ void MultiCommandList::gatherHints(InterpretArguments &iargs)
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*-----------------------------------------------------------------------
- * CommandList
- *-----------------------------------------------------------------------*/
-Command::Pointer CommandList::findExact( const DLString& name ) const
+Command::Pointer MultiCommandList::findExact(const DLString &cmdName)
 {
-    list<Command::Pointer>::const_iterator ipos;
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
 
-    if (name.isCyrillic( )) {
-        for (ipos = commands_ru.begin( ); ipos != commands_ru.end( ); ipos++) {
-            if ((*ipos)->getRussianName( ) == name) 
-                return *ipos;
-
-            for (auto &alias: (*ipos)->aliases.get(RU).split(" "))
-                if (name == alias)
-                    return *ipos;
+        auto it = names[lang].find(cmdName);
+        if (it != names[lang].end()) {
+            return masterMap[it->second];
         }
-
-        return Command::Pointer( );
-    }
-
-    for (ipos = commands.begin( ); ipos != commands.end( ); ipos++) {
-        if ((*ipos)->getName( ) == name) 
-            return *ipos;
-
-        for (auto &alias: (*ipos)->aliases.get(EN).split(" "))
-            if (name == alias)
-                return *ipos;
-    }
-
-    return Command::Pointer( );
-}
-
-
-Command::Pointer CommandList::findUnstrict(const DLString& name) const
-{
-    if (name.empty())
-        return Command::Pointer();
-
-    if (name.isCyrillic( )) {
-        for (auto &cmd: commands_ru) {
-            if (name.strPrefix(cmd->getRussianName()))
-                return *cmd;
-
-            for (auto &alias: cmd->aliases.get(RU).split(" "))
-                if (name.strPrefix(alias))
-                    return cmd;
-        }
-
-        return Command::Pointer();
-    }
-
-    for (auto &cmd: commands) {
-        if (name.strPrefix(cmd->getName()))
-            return *cmd;
-
-        for (auto &alias: cmd->aliases.get(EN).split(" "))
-            if (name.strPrefix(alias))
-                return cmd;
     }
 
     return Command::Pointer();
-
-
 }
 
-void CommandList::gatherHints(InterpretArguments &iargs) const
+Command::Pointer MultiCommandList::findUnstrict( const DLString &cmdName)
 {
-    list<Command::Pointer>::const_iterator c;
-    const DLString &cmd = iargs.cmdName;
-    DLString kuzdn = translit(cmd);
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t lang = (lang_t)i;
 
-    for (c = commands.begin(); c != commands.end(); c++) {
-        if ((*c)->visible(iargs.ch)) {
-            record_distance(cmd, kuzdn, (*c)->getName(), iargs);
+        for (auto &alias2name: names[lang]) {
+            const DLString &alias = alias2name.first;
+            const DLString &name = alias2name.second;
 
-            for (auto &a: (*c)->aliases.get(EN).split(" ")) 
-                record_distance(cmd, kuzdn, a, iargs);
-
-            record_distance(cmd, kuzdn, (*c)->getRussianName(), iargs);
-
-            for (auto &a: (*c)->aliases.get(RU).split(" ")) 
-                record_distance(cmd, kuzdn, a, iargs);
-        }
-    }
-}
-
-Command::Pointer CommandList::chooseCommand( Character *ch, const DLString &name ) const
-{
-    list<Command::Pointer>::const_iterator i;
-    const list<Command::Pointer> &mylist = name.isCyrillic( ) ? commands_ru : commands;
-
-    for (i = mylist.begin( ); i != mylist.end( ); i++) {
-        Command::Pointer pCommand = *i;
-
-        if (pCommand->available( ch ) && pCommand->matches( name ))  {
-            return pCommand;
+            if (cmdName.strPrefix(alias))
+                return masterMap[name];
         }
     }
 
-    for (i = mylist.begin( ); i != mylist.end( ); i++) {
-        Command::Pointer pCommand = *i;
-
-        if (pCommand->available( ch ) && pCommand->matchesAlias( name ))  {
-            return pCommand;
-        }
-    }
-
-    return Command::Pointer( );
-}
-
-static bool compare( Command::Pointer a, Command::Pointer b )
-{
-    return commandManager->compare( **a, **b, false );
-}
-
-static bool compare_ru( Command::Pointer a, Command::Pointer b )
-{
-    return commandManager->compare( **a, **b, true );
-}
-
-void CommandList::add( Command::Pointer &cmd )
-{
-    commands.push_back( cmd ); 
-    commands.sort( compare );
-    
-    if (!cmd->getRussianName( ).empty( )) {
-        commands_ru.push_back( cmd );
-        commands_ru.sort( compare_ru );
-    }
-}
-
-void CommandList::remove( Command::Pointer &cmd )
-{
-    commands.remove( cmd );
-    commands_ru.remove( cmd );
+    return Command::Pointer();
 }
 
 /*-----------------------------------------------------------------------
  * CommandManager
  *-----------------------------------------------------------------------*/
-const DLString CommandManager::PRIO_FILE_EN = "cmdpriority.xml";
-const DLString CommandManager::PRIO_FILE_RU = "cmdpriority_ru.xml";
 CommandManager* commandManager = NULL;
 
 CommandManager::CommandManager( ) 
@@ -437,25 +318,8 @@ CommandManager::~CommandManager( )
     commandManager = NULL;
 }
 
-void CommandManager::initialization( )
-{
-    loadPriorities( );
-    InterpretLayer::initialization( );
-}
-
-DLString CommandManager::getPrioritiesFolder() const
-{
-    return dreamland->getTablePath() + "/commands";
-}
-
-void CommandManager::destruction( )
-{
-    InterpretLayer::destruction( );
-}
-
 void CommandManager::registrate( Command::Pointer command )
 {
-    commands.add( command );
     multiCommands.addCommand(command);
 
     if (command->getHelp( ))
@@ -467,31 +331,7 @@ void CommandManager::unregistrate( Command::Pointer command )
     if (command->getHelp( ))
         command->getHelp( )->unsetCommand( );
     
-    commands.remove( command );
     multiCommands.removeCommand(command);
-}
-
-void CommandManager::loadPriorities( )
-{
-    XMLVectorBase<XMLString> v, rv;                                                 
-    DLFile prioFileEN(getPrioritiesFolder(), PRIO_FILE_EN);
-    DLFile prioFileRU(getPrioritiesFolder(), PRIO_FILE_RU);
-
-    if (!XMLFile(prioFileEN, "", &v).load()) {
-        LogStream::sendError( ) << "Command priorities file not found!" << endl;
-        return;
-    }
-
-    XMLFile(prioFileRU, "", &rv).load();
-
-    for (unsigned int i = 0; i < v.size( ); i++)
-        priorities_en[v[i].getValue( )] = i;
-
-    for (unsigned int i = 0; i < rv.size( ); i++)
-        priorities_ru[rv[i].getValue( )] = i;
-
-    LogStream::sendNotice( ) 
-        << "Loaded " << priorities_en.size( ) << " command priorities" << endl;
 }
 
 void CommandManager::putInto( )
@@ -511,47 +351,34 @@ bool CommandManager::process( InterpretArguments &iargs )
     return true;
 }
 
-Command::Pointer CommandManager::find(const DLString &cmdName) const
+Command::Pointer CommandManager::findExact( const DLString &cmdName )
 {
-    for (auto &c: commands.getCommands())
-        if (c->getName() == cmdName)
-            return *c;
-            
-    return Command::Pointer();
+    return multiCommands.findExact(cmdName);
 }
 
-Command::Pointer CommandManager::findExact( const DLString &cmdName ) const
+Command::Pointer CommandManager::findUnstrict( const DLString &cmdName )
 {
-    return commands.findExact( cmdName );
+    return multiCommands.findUnstrict(cmdName);
 }
 
-Command::Pointer CommandManager::findUnstrict( const DLString &cmdName ) const
+list<Command::Pointer> CommandManager::getCommands()
 {
-    return commands.findUnstrict( cmdName );
+    return multiCommands.getSortedCommands();
 }
 
 CommandManager::CategoryMap CommandManager::getCategorizedCommands( ) const
 {
     CategoryMap cats;
 
-    list<Command::Pointer>::const_iterator cmd;
-    for (cmd = commands.getCommands( ).begin( ); cmd != commands.getCommands( ).end( ); cmd++) 
-        cats[(*cmd)->getCommandCategory()].push_back(*cmd);
+    for (auto &it: multiCommands.masterMap) {
+        auto &cmd = it.second;
+        cats[cmd->getCommandCategory()].push_back(cmd);
+    }
 
     return cats;
 }
 
-bool CommandManager::compare( const Command &a, const Command &b, bool fRussian ) const
-{       
-    Priorities::const_iterator i_a, i_b, i_end;
-    const Priorities &prio = fRussian ? priorities_ru : priorities_en;
-
-    i_a = prio.find( fRussian ? a.getRussianName( ) : a.getName( ) );
-    i_b = prio.find( fRussian ? b.getRussianName( ) : b.getName( ) );
-    i_end = prio.end( );
-
-    if (i_a != i_end && i_b != i_end)
-        return (i_a->second < i_b->second);
-
-    return (i_a != i_end);  
+void CommandManager::refresh(lang_t lang)
+{
+    multiCommands.refreshSorted(lang);
 }

@@ -114,8 +114,8 @@ WrappersPlugin::linkTargets()
         }
     }
 
-    for (auto &cmd: commandManager->getCommands().getCommands()) {
-        WrappedCommand *wcmd = const_cast<WrappedCommand *>(cmd.getDynamicPointer<WrappedCommand>());
+    for (auto &cmd: commandManager->getCommands()) {
+        WrappedCommand *wcmd = cmd.getDynamicPointer<WrappedCommand>();
         if (wcmd && wcmd->wrapper) {
             LogStream::sendNotice() << "Fenia command: setting target for " << wcmd->getName() << endl;
             wrapper_cast<FeniaCommandWrapper>(wcmd->wrapper)->setTarget(wcmd);

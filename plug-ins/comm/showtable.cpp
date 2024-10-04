@@ -40,8 +40,6 @@ static void show_aliases( Command::Pointer cmd, ostringstream &buf, int flags = 
 static void show_matched_commands( Character *ch, const DLString &arg )
 {
     ostringstream buf;
-    list<Command::Pointer>::const_iterator c;
-    const CommandList &commands = commandManager->getCommands( );
     bool found = false;
 
     if (arg.empty( )) {
@@ -51,14 +49,14 @@ static void show_matched_commands( Character *ch, const DLString &arg )
 
     buf << "Найдены такие команды:" << endl << endl;
 
-    for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
+    for (auto &c: commandManager->getCommands()) {
         ostringstream aliases;
         Command::Pointer cmd = *c;
 
         if (cmd->getLevel( ) >= LEVEL_HERO && !ch->is_immortal())
             continue;
         
-        if (!cmd->matches( arg ) && !cmd->matchesAlias( arg ))
+        if (!cmd->matches( arg ))
             continue;
         
         found = true;
@@ -106,13 +104,11 @@ typedef map<DLString, StringList> Categories;
 static Categories group_by_categories(Character *ch, int flags)
 {
     Categories categories;
-    list<Command::Pointer>::const_iterator c;
-    const CommandList &commands = commandManager->getCommands( );
     bool fRus = ch->getConfig( ).rucommands;
 
     categories["info"].push_back("?");
 
-    for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
+    for (auto &c: commandManager->getCommands()) {
         Command::Pointer cmd = *c;
 
         if (!cmd->visible( ch ))
@@ -160,8 +156,6 @@ static void show_commands_by_categories( Character *ch, int flags )
 static void show_commands( Character *ch, int flags )
 {
     ostringstream buf;
-    list<Command::Pointer>::const_iterator c;
-    const CommandList &commands = commandManager->getCommands( );
 
     if (IS_SET(flags, FCMD_ALIASES|FCMD_HINTS)) {
         buf << fmt( 0, "%-12s | %-17s| %s", 
@@ -171,7 +165,7 @@ static void show_commands( Character *ch, int flags )
             << "-------------+------------------+--------------------------------------------" 
             << endl;
 
-        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
+        for (auto &c: commandManager->getCommands()) {
             ostringstream other;
             Command::Pointer cmd = *c;
             
@@ -205,7 +199,7 @@ static void show_commands( Character *ch, int flags )
             << endl
             << "-------------+-----------------------------------------------+---------------" 
             << endl;
-        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
+        for (auto &c: commandManager->getCommands()) {
             ostringstream aliases;
             Command::Pointer cmd = *c;
 

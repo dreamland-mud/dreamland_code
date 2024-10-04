@@ -4,6 +4,6 @@
 class DLString;
 
 char translit(char c0);
-DLString translit(const DLString &s);
+DLString translit(lang_t lang, const DLString &s);
 
 #endif

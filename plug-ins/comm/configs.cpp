@@ -222,6 +222,7 @@ COMMAND(ConfigCommand, "config")
         config_scroll_print(pch);
         config_telegram_print(pch);
         config_discord_print(pch);
+        
         ch->pecho("\r\nПодробнее смотри по команде {lR{yрежим {Dнастройка{w{lE{yconfig {Dнастройка{x.");
         return;
     }

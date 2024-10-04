@@ -1152,8 +1152,7 @@ public:
         dummy.setLevel(1);
 
         // Output commands sorted according to their priorities in English.
-        auto &commands = commandManager->getCommands().getCommands();
-        for (auto &cmd: commands) {
+        for (auto &cmd: commandManager->getCommands()) {
             if (cmd->available(&dummy)) {
                 buf << cmd->getName() << ","
                     << cmd->getRussianName() << ","

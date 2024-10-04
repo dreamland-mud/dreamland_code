@@ -68,7 +68,7 @@ void OLCStateCommand::commit()
 
 ::Command * OLCStateCommand::getOriginal()
 {
-    ::Command::Pointer c = commandManager->find(cmdName);
+    ::Command::Pointer c = commandManager->findExact(cmdName);
 
     if (!c)
         throw Exception("Attached command doesn't exist");
@@ -300,13 +300,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
     if (arg_oneof(cmd, "ua")) {
         ostringstream buf;
 
-//        for (auto &c: commandManager->getCommands().getCommands()) {
-        for (auto &c: commandManager->multiCommands.sortedNames[RU]) {
-            DLString cmdName = commandManager->multiCommands.names[RU][c];
-            Command::Pointer cmd = commandManager->find(cmdName);
-            if (!cmd)
-                continue;
-
+        for (auto &cmd: commandManager->getCommands()) {
             if (cmd->name[RU].empty())
                 continue;
 
@@ -371,7 +365,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
         const DLString lineFormatSkillEdit = 
             "{C" + web_cmd(ch, "skedit $1", "%-15s") + "{w (умение %s){x\r\n";
 
-        for (auto &c: commandManager->getCommands().getCommands()) {
+        for (auto &c: commandManager->getCommands()) {
             const DefaultSkillCommand *skillCmd = c.getDynamicPointer<DefaultSkillCommand>();
 
             if (skillCmd)
