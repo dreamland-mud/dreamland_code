@@ -106,7 +106,7 @@ bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *
                 break;
             }
         
-        if (hasOtherAggrs && PlayerUtils::isNewbie(pch))
+        if (hasOtherAggrs && Player::isNewbie(pch))
             return false;
     }
  
@@ -306,7 +306,7 @@ struct FindPathComplete {
  */
 bool RoomQuestModel::targetRoomAccessible(PCharacter *pch, Room *target)
 {
-    if (!PlayerUtils::isNewbie(pch))
+    if (!Player::isNewbie(pch))
         return true;
 
     std::vector<Room *> rooms;

@@ -993,7 +993,7 @@ NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 �
 {
     checkTarget();
     CHK_NPC
-    return PlayerUtils::isNewbie(target->getPC());
+    return Player::isNewbie(target->getPC());
 }
 
 NMI_GET( CharacterWrapper, lastAccessTime, "время последнего захода в мир" )

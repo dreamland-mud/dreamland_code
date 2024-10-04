@@ -43,7 +43,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     
     mode = number_range( -1, 3 );
 
-    if (PlayerUtils::isNewbie( pch ))
+    if (Player::isNewbie( pch ))
         mode = std::min( mode.getValue( ), 1 );
 
     try {
@@ -51,7 +51,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
         victim = item->carried_by->getNPC( );
         thief = getRandomVictim( pch );
     
-        if (PlayerUtils::isNewbie( pch ) || chance(20))
+        if (Player::isNewbie( pch ) || chance(20))
         {
             key = chest = NULL;
             hideaway = NULL;
@@ -69,7 +69,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
         if (!isItemVisible( item, pch ))
             mode++;
         
-        if (PlayerUtils::isNewbie( pch ) && mode > 1)
+        if (Player::isNewbie( pch ) && mode > 1)
             throw QuestCannotStartException( );
 
         MobileQuestModel::assign<Robber>( thief );
@@ -182,7 +182,7 @@ QuestReward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman )
     else    
         r->points += number_fuzzy( 3 );
 
-    if (!PlayerUtils::isNewbie(ch)) {
+    if (!Player::isNewbie(ch)) {
         r->points -= hint * 5;
     }
     

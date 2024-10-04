@@ -68,7 +68,7 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
 
     time = number_range( 5, 10 ); 
 
-    if (PlayerUtils::isNewbie( pch ))
+    if (Player::isNewbie( pch ))
         time *= 2;
 
     setTime( pch, time );
@@ -145,7 +145,7 @@ QuestReward::Pointer LocateQuest::reward( PCharacter *ch, NPCharacter *questman 
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint && !PlayerUtils::isNewbie(ch)) {
+    if (hint && !Player::isNewbie(ch)) {
         r->points = number_range( 3, 9 );
         r->gold = number_fuzzy( r->points );
     } else {

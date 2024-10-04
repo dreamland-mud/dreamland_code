@@ -176,7 +176,7 @@ protected:
         if (!ch->desc)
             return true;
 
-        if (PlayerUtils::isNewbie(ch->getPC()))
+        if (Player::isNewbie(ch->getPC()))
             return true;
 
         return checkPumped( );

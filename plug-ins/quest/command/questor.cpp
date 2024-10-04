@@ -134,7 +134,7 @@ void Questor::giveReward(PCharacter *client, Quest::Pointer &quest, QuestReward:
 {
     ostringstream msg;
 
-    if (quest->hint.getValue( ) > 0 && !PlayerUtils::isNewbie(client)) {
+    if (quest->hint.getValue( ) > 0 && !Player::isNewbie(client)) {
         tell_raw( client, ch,  "Я припоминаю, что мне пришлось подсказать тебе путь.");
         msg << "Но за настойчивость я даю тебе";
     }
@@ -254,7 +254,7 @@ void Questor::doFind( PCharacter *client )
     if (quest->help( client, ch )) 
         return;
 
-    if (quest->hint >= 3 && !PlayerUtils::isNewbie(client)) {
+    if (quest->hint >= 3 && !Player::isNewbie(client)) {
         tell_fmt( "Извини, %1$C1, но теперь тебе придется искать путь самостоятельно.", client, ch );
         quest->wiznet( "find", "failure, too many hints" );
         return;
@@ -269,7 +269,7 @@ void Questor::doFind( PCharacter *client )
         return;
     }
 
-    if (!PlayerUtils::isNewbie(client))
+    if (!Player::isNewbie(client))
         tell_raw( client, ch, "Я помогу тебе, но награда будет не так велика.");
 
     tell_raw( client, ch, buf.str( ).c_str( ) );
@@ -590,7 +590,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
 
             tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
 
-            if (PlayerUtils::isNewbie(client))
+            if (Player::isNewbie(client))
                tell_raw(client, ch, "Для новичков, живущих первую жизнь, это бесплатно!");
             
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
@@ -621,7 +621,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             PCharacterManager::save(client);
 
             tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
-            if (PlayerUtils::isNewbie(client))
+            if (Player::isNewbie(client))
                 tell_raw(client, ch, "Для новичков, живущих первую жизнь, это бесплатно!");
 
             tell_raw(client, ch, "Пусть удача сопутствует тебе!");            

@@ -331,7 +331,7 @@ void KidnapPrince::banditsUnleash( PCharacter *hero )
     if (!getQuest( ))
         return;
     
-    if ((PlayerUtils::isNewbie( hero ) && quest->ambushes >= 1) 
+    if ((Player::isNewbie( hero ) && quest->ambushes >= 1) 
             || quest->ambushes >= 3)
         return;
     

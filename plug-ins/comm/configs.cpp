@@ -7,6 +7,7 @@
 #include "configs.h"
 #include "jsoncpp/json/json.h"
 
+#include "player_utils.h"
 #include "servlet.h"
 #include "commandmanager.h"
 #include "commandtemplate.h"
@@ -38,6 +39,9 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments);
 static void config_telegram_print(PCharacter *ch);
 static void config_discord(PCharacter *ch, const DLString &constArguments);
 static void config_discord_print(PCharacter *ch);
+static void config_lang(PCharacter *ch, const DLString &constArguments);
+static void config_lang_print(PCharacter *ch);
+
 list<PCMemoryInterface *> who_find_offline(PCharacter *looker);
 
 /*-------------------------------------------------------------------------
@@ -116,6 +120,7 @@ void ConfigElement::printRow( PCharacter *ch ) const
                       yes ? CLR_YES(ch) : CLR_NO(ch),
                       yes ? "ВКЛ." : "ВЫКЛ." );
 }
+
 
 static void print_line(PCharacter *ch, const DLString &name, const DLString &rname, bool yes, const DLString &msgYes, const DLString &msgNo)
 {
@@ -222,9 +227,15 @@ COMMAND(ConfigCommand, "config")
         config_scroll_print(pch);
         config_telegram_print(pch);
         config_discord_print(pch);
-        
+        config_lang_print(pch);
+
         ch->pecho("\r\nПодробнее смотри по команде {lR{yрежим {Dнастройка{w{lE{yconfig {Dнастройка{x.");
         return;
+    }
+
+    if (arg_oneof(arg1, "lang", "язык")) {
+        config_lang(pch, arg2);
+        return; 
     }
 
     if (arg_oneof(arg1, "scroll", "экран", "буфер")) {
@@ -261,6 +272,41 @@ COMMAND(ConfigCommand, "config")
 /*-------------------------------------------------------------------------
  * 'scroll' command 
  *------------------------------------------------------------------------*/
+static void config_lang(PCharacter *ch, const DLString &constArguments)
+{
+    DLString args = constArguments;
+    DLString arg = args.getOneArgument();
+    DLString lang; 
+
+    // TODO improve
+    if (arg_oneof(arg, "english", "английский"))
+        lang = "en";
+    else if (arg_oneof(arg, "ukrainian", "украинский"))
+        lang = "ua";
+    else if (arg_oneof(arg, "russian", "русский"))
+        lang = "ru";
+    else {
+        ch->pecho("Укажи язык: англ, укр или рус.");
+        return;
+    }
+
+    ch->getAttributes().getAttr<XMLStringAttribute>("lang")->setValue(lang);
+    ch->pecho("Ок.");
+}
+
+static void config_lang_print(PCharacter *ch)
+{
+    lang_t lang = Player::lang(ch);
+    // TODO move to a func
+    DLString langname = lang == EN ? "англ" : lang == UA ? "укр" : "рус";
+
+    ch->pecho( "  {%s%-14s {%s%5s {xнабери {y{hcрежим язык{x для установки",
+                    CLR_NAME(ch),
+                    "язык команд",
+                    CLR_YES(ch),
+                    langname.c_str());
+}
+
 static void config_scroll_print(PCharacter *ch)
 {
     DLString lines(ch->lines);

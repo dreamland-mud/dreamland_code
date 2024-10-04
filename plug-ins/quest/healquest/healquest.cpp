@@ -39,7 +39,7 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
     time = number_range( 15, 25 );
     mlevel = pch->getModifyLevel( );
     
-    if (PlayerUtils::isNewbie(pch)) {
+    if (Player::isNewbie(pch)) {
         minLevel = max( 1, (int)(mlevel - 5) );
         maxLevel = mlevel + 5;
         count = 1;
@@ -115,7 +115,7 @@ QuestReward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint > 0 && !PlayerUtils::isNewbie(ch)) {
+    if (hint > 0 && !Player::isNewbie(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
 

@@ -62,7 +62,7 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
     
     time = std::max( 6, range / 10 );
 
-    if (PlayerUtils::isNewbie( pch ))
+    if (Player::isNewbie( pch ))
         time *= 2;
 
     setTime( pch, time );
@@ -95,7 +95,7 @@ QuestReward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questman 
     r->points = number_range( 18, 25 );
     r->points += ambushes * 25;
 
-    if (!PlayerUtils::isNewbie(ch)) {
+    if (!Player::isNewbie(ch)) {
         r->points -= hint * 10;
     }
 
@@ -201,7 +201,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         return true;
     }
 
-    if (hint.getValue( ) > 5 && !PlayerUtils::isNewbie(ch)) {
+    if (hint.getValue( ) > 5 && !Player::isNewbie(ch)) {
         if (number_percent( ) < 30)
             tell_fmt( "%1$^C1, тебе необходимо следовать по такому пути: eeeennnwwnewseesennnnnnnnwwnnn.", ch, questman ); 
         else
@@ -211,7 +211,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         return true;
     }
 
-    if (!PlayerUtils::isNewbie(ch))
+    if (!Player::isNewbie(ch))
         tell_raw( ch, questman,  "Я помогу тебе, но награда будет не так велика.");
 
     tell_raw( ch, questman, 

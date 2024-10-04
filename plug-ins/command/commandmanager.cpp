@@ -9,6 +9,7 @@
 #include "commandinterpreter.h"
 #include "commandhelp.h"
 
+#include "player_utils.h"
 #include "string_utils.h"
 #include "configurable.h"
 #include "levenshtein.h"
@@ -19,7 +20,7 @@
 #include "xmlvector.h"
 #include "dbio.h"
 #include "dreamland.h"
-#include "character.h"
+#include "pcharacter.h"
 
 // Maps a command or alias name to its position inside priority JSON file.
 // Used for sorting commands in a list.
@@ -193,9 +194,15 @@ static void guess_command_lang(Character *ch, const DLString &input, lang_t &gue
         guess_1 = guess_2 = EN;
 
     } else {
-        // TODO override default order according to config.lang settings
-        guess_1 = RU;
-        guess_2 = UA;
+        // TODO account for switchedTo for mobs
+        if (!ch->is_npc() && Player::lang(ch->getPC()) == LANG_UA) {
+            guess_1 = UA;
+            guess_2 = RU;
+
+        } else {
+            guess_1 = RU;
+            guess_2 = UA;
+        }
 
         // If a language-specific symbol gives the lang away, only look for commands in this language.
         if (String::hasUaSymbol(input))

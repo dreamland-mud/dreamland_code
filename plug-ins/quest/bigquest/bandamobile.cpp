@@ -92,7 +92,7 @@ void BandaMobile::config(PCharacter *hero)
     else
         ch->alignment = -hero->alignment;
 
-    if (!PlayerUtils::isNewbie(hero)) {
+    if (!Player::isNewbie(hero)) {
         // Here we go...
         if (chance(50))
             SET_BIT(ch->off_flags, ASSIST_VNUM);

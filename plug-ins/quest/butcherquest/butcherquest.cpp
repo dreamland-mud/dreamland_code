@@ -39,7 +39,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     raceRusName = pGameIndex->short_descr;
     areaName    = pGameIndex->area->getName();
     
-    if (PlayerUtils::isNewbie(pch))
+    if (Player::isNewbie(pch))
         ordered = URANGE( 1, games[pGameIndex].size( ) * 3 / 2, 6 );
     else 
         ordered = URANGE( 4, games[pGameIndex].size( ) * 3 / 2, 12 );

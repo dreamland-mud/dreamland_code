@@ -41,7 +41,7 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     case 5: mode = 3; break;
     }
     
-    if (PlayerUtils::isNewbie(pch))
+    if (Player::isNewbie(pch))
         mode = min((int)mode, 1);
 
     victim = getRandomVictim( pch );
@@ -102,7 +102,7 @@ QuestReward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     QuestReward::Pointer r( NEW );
     
-    if (hint.getValue( ) > 0 && !PlayerUtils::isNewbie(ch)) {
+    if (hint.getValue( ) > 0 && !Player::isNewbie(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
         r->prac = 0;

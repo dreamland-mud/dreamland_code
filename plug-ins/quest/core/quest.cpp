@@ -74,7 +74,7 @@ int Quest::getAccidentTime( PCMemoryInterface *pci )
 
 int Quest::getPunishTime( PCMemoryInterface *pci )
 {
-    if (PlayerUtils::isNewbie( pci ))
+    if (Player::isNewbie( pci ))
         return number_range( 15, 20 );
     else
         return number_range( 20, 30 );
@@ -82,7 +82,7 @@ int Quest::getPunishTime( PCMemoryInterface *pci )
         
 int Quest::getDeathTime( PCMemoryInterface *pci )
 {
-    if (PlayerUtils::isNewbie( pci ))
+    if (Player::isNewbie( pci ))
         return number_range( 15, 20 );
     else 
         return number_range( 20, 30 );
@@ -90,7 +90,7 @@ int Quest::getDeathTime( PCMemoryInterface *pci )
 
 int Quest::getFailTime( PCMemoryInterface *pci )
 {
-    if (PlayerUtils::isNewbie( pci ))
+    if (Player::isNewbie( pci ))
         return number_range( 15, 20 );
     else 
         return number_range( 25, 35 );

@@ -28,7 +28,7 @@ bool LocateScenario::applicable( PCharacter * ) const
 
 int LocateScenario::getCount( PCharacter *pch ) const
 {
-    if (PlayerUtils::isNewbie( pch ))
+    if (Player::isNewbie( pch ))
         return number_range( 2, 4 );
     else
         return number_range( 2, 10 );
