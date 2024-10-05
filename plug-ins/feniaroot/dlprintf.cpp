@@ -10,13 +10,14 @@
 
 #include "noun.h"
 #include "grammar_entities_impl.h"
-#include "character.h"
+#include "pcharacter.h"
+#include "pcharactermemory.h"
 #include "object.h"
 
 #include "characterwrapper.h"
 #include "objectwrapper.h"
 #include "structwrappers.h"
-
+#include "playerwrapper.h"
 #include "msgformatter.h"
 
 #include "def.h"
@@ -91,6 +92,15 @@ protected:
         ObjectWrapper *objWrap = d.toHandler().getDynamicPointer<ObjectWrapper>(); 
         if (objWrap != 0)
             return objWrap->getTarget()->toNoun(to, nounFlags);
+
+        PlayerWrapper *playerWrap = d.toHandler().getDynamicPointer<PlayerWrapper>();
+        if (playerWrap) {
+            PCMemoryInterface *pci = playerWrap->getTarget();
+            if (pci->getPlayer())
+                return pci->getPlayer()->toNoun(to, nounFlags);
+            else
+                return dynamic_cast<PCharacterMemory *>(pci)->toNoun(to, nounFlags);
+        }
         
         throw Scripting::IllegalArgumentException();
     }

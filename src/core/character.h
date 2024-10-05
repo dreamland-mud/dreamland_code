@@ -113,6 +113,12 @@ public:
     virtual short getSex( ) const ;
     virtual void setSex( short ) ;
 
+    virtual int getAlignment( ) const;
+    virtual void setAlignment( int );
+
+    virtual int getEthos( ) const;
+    virtual void setEthos( int );
+
     virtual RaceReference &getRace( ) ;
     virtual void setRace( const RaceReference & ) ;
 

@@ -1423,7 +1423,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             if (aff.isSet(AFF_CAMOUFLAGE))
                 pMob->affects.set(gsn_camouflage);
             if (aff.isSet(AFF_SANCTUARY)) {
-                if (IS_EVIL(pMob))
+                if (pMob->alignment <= -350)
                     pMob->affects.set(gsn_dark_shroud);
                 else if (IS_SET(pMob->act, ACT_MAGE))
                     pMob->affects.set(gsn_stardust);
@@ -1432,7 +1432,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
             if (aff.isSet(AFF_HASTE))
                 pMob->affects.set(gsn_haste);
-            if (aff.isSet(AFF_PROTECT_EVIL) && !IS_EVIL(pMob))
+            if (aff.isSet(AFF_PROTECT_EVIL) && pMob->alignment > -350)
                 pMob->affects.set(gsn_protection_evil);
             if (aff.isSet(AFF_CORRUPTION))
                 pMob->affects.set(gsn_corruption);
@@ -1450,7 +1450,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
                 pMob->affects.set(gsn_sneak);
             if (aff.isSet(AFF_PASS_DOOR))
                 pMob->affects.set(gsn_pass_door);
-            if (aff.isSet(AFF_PROTECT_GOOD) && !IS_GOOD(pMob))
+            if (aff.isSet(AFF_PROTECT_GOOD) && pMob->alignment < 350)
                 pMob->affects.set(gsn_protection_good);            
             if (aff.isSet(AFF_SLOW))
                 pMob->affects.set(gsn_slow);

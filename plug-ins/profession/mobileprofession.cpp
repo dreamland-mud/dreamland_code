@@ -37,7 +37,7 @@ int  MobileProfession::getThac32( Character *ch ) const
         return DefaultProfession::getThac32( ch );
 }
 
-Flags MobileProfession::getFlags( Character *ch ) const
+Flags MobileProfession::getFlags( CharacterMemoryInterface *ch ) const
 {
     Flags flags( 0, &prof_flags );
     

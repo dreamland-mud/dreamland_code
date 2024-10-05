@@ -289,6 +289,26 @@ void Character::setSex( short sex )
     updateCachedNoun( );
 }
 
+int Character::getAlignment( ) const
+{
+        return alignment;
+}
+
+void Character::setAlignment( int value )
+{
+        alignment = value;
+}
+
+int Character::getEthos( ) const
+{
+        return ethos;
+}
+
+void Character::setEthos( int value )
+{
+        ethos = value;
+}
+
 PCharacter * Character::getPlayer( )
 {
     return getPC();

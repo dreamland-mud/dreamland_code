@@ -32,7 +32,7 @@
 #include "act_move.h"
 #include "interp.h"
 #include "weapongenerator.h"
-
+#include "player_utils.h"
 #include "handler.h"
 #include "merc.h"
 #include "vnum.h"
@@ -393,7 +393,7 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
         tmp_vict = victim->getDoppel( );
 
         long_buf = fmt(0, "{W%s{x%s здесь.\n\r",
-                tmp_vict->getNameP( '1' ).c_str(), tmp_vict->getPC( )->getParsedTitle( ).c_str( ));
+                tmp_vict->getNameP( '1' ).c_str(), Player::title(tmp_vict->getPC( )).c_str( ));
         short_buf = tmp_vict->getNameC();
 
         if ( ch == victim )

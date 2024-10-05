@@ -7,6 +7,7 @@
 
 class Character;
 class PCharacter;
+class PCMemoryInterface;
 class Object;
 class Room;
 class AreaQuest;
@@ -19,14 +20,14 @@ bool aquest_trigger(Room *room, Character *ch, const DLString &trigType, const c
 
 DLString aquest_method_id(AreaQuest *q, int step, bool isBegin, const DLString &trigName);
 
-AreaQuestData & aquest_data(PCharacter *ch, const DLString &questId);
+AreaQuestData & aquest_data(PCMemoryInterface *ch, const DLString &questId);
 
 AreaQuest *get_area_quest(const DLString &questId);
 AreaQuest *get_area_quest(const Integer& questId);
 AreaQuest *get_area_quest(int questId);
 
-bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuestData &qdata);
-
+bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata);
+bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q);
 
 
 

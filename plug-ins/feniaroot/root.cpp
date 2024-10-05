@@ -41,6 +41,7 @@
 #include "material-table.h"
 #include "stats_apply.h"
 #include "mudtags.h"
+#include "behavior.h"
 
 #include "root.h"
 #include "nannyhandler.h"
@@ -1266,6 +1267,28 @@ NMI_INVOKE( Root, AreaQuest, "(vnum): конструктор для арийно
         throw Scripting::Exception("Unknown area quest vnum");
 
     return WrapperManager::getThis()->getWrapper(q->second);
+}
+
+NMI_GET( Root, areaQuests, "список (List) всех арийных квестов") 
+{
+    RegList::Pointer list(NEW);
+
+    for (auto &q: areaQuests)
+        list->push_back(WrapperManager::getThis()->getWrapper(q.second));
+
+    return ::wrap(list);
+}
+
+NMI_GET( Root, behaviors, "список (List) всех поведений") 
+{
+    RegList::Pointer list(NEW);
+
+    for (int i = 0; i < behaviorManager->size(); i++) {
+        const DLString &name = behaviorManager->find(i)->getName();
+        list->push_back(BehaviorWrapper::wrap(name));
+    }
+
+    return ::wrap(list);
 }
 
 NMI_INVOKE( Root, Behavior, "(name): конструктор для поведения по имени" )

@@ -51,6 +51,7 @@
 #include "weapontier.h"
 #include "directions.h"
 #include "attract.h"
+#include "player_utils.h"
 #include "occupations.h"
 #include "terrains.h"
 #include "move_utils.h"
@@ -741,7 +742,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
             && victim->position == POS_STANDING 
             && ch->on == 0)
         {
-            buf << pVict->getParsedTitle( );
+            buf << Player::title(pVict);
         }
     }
 

@@ -160,7 +160,7 @@ public:
     virtual int  getWearModifier( int ) const;
     virtual const DLString & getTitle( const PCMemoryInterface * ) const;
     virtual GlobalBitvector toVector( CharacterMemoryInterface * = NULL ) const;
-    virtual Flags getFlags( Character * = NULL ) const;
+    virtual Flags getFlags( CharacterMemoryInterface * = NULL ) const;
     
     virtual bool isPlayed( ) const;
     virtual const Flags & getSex( ) const;

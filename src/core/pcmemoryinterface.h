@@ -51,6 +51,12 @@ public:
     virtual short getSex( ) const  = 0;
     virtual void setSex( short )  = 0;
 
+    virtual int getAlignment( ) const  = 0;
+    virtual void setAlignment( int )  = 0;
+
+    virtual int getEthos( ) const  = 0;
+    virtual void setEthos( int )  = 0;
+
     virtual RaceReference &getRace( )  = 0;
     virtual void setRace( const RaceReference & )  = 0;
     
@@ -80,6 +86,15 @@ public:
 
     virtual const DLString& getLastAccessHost( ) const  = 0;
     virtual void setLastAccessHost( const DLString& )  = 0; 
+
+    virtual const DLString& getRussianPretitle( ) const = 0;
+    virtual void setRussianPretitle( const DLString& ) = 0;
+    
+    virtual const DLString& getPretitle( ) const = 0;
+    virtual void setPretitle( const DLString& ) = 0;
+
+    virtual void setTitle( const DLString& ) = 0;
+    virtual const DLString & getTitle( ) const = 0;
 
     virtual int getTrust( ) const  = 0;
     virtual void setTrust( int )  = 0;

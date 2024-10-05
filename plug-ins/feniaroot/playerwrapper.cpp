@@ -1,8 +1,10 @@
+#include <algorithm>
 #include "playerwrapper.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "xmlkillingattribute.h"
 #include "xmlattributestatistic.h"
+#include "player_utils.h"
 #include "nativeext.h"
 #include "regcontainer.h"
 #include "reglist.h"
@@ -207,6 +209,28 @@ NMI_SET(PlayerWrapper, sex, "пол (таблица .tables.sex_table)")
     save();
 }
 
+NMI_GET(PlayerWrapper, alignment, "натура, от -1000 до 1000")
+{
+    return getTarget()->getAlignment();
+}
+
+NMI_SET(PlayerWrapper, alignment, "натура, от -1000 до 1000")
+{
+    getTarget()->setAlignment(arg2number(arg, ALIGN_EVIL, ALIGN_GOOD));
+    save();
+}
+
+NMI_GET(PlayerWrapper, ethos, "этос")
+{
+    return getTarget()->getEthos();
+}
+
+NMI_SET(PlayerWrapper, ethos, "этос")
+{
+    getTarget()->setEthos(arg2flag(arg, ethos_table));
+    save();
+}
+
 NMI_GET(PlayerWrapper, description, "описание персонажа")
 {
     return getTarget()->getDescription();
@@ -216,6 +240,44 @@ NMI_SET(PlayerWrapper, description, "описание персонажа")
 {
     getTarget()->setDescription(arg2string(arg));
     save();
+}
+
+NMI_GET(PlayerWrapper, title, "титул персонажа")
+{
+    return getTarget()->getTitle();
+}
+
+NMI_SET(PlayerWrapper, title, "титул персонажа")
+{
+    getTarget()->setTitle(arg2string(arg));
+    save();
+}
+
+NMI_GET(PlayerWrapper, pretitle, "предтитул персонажа")
+{
+    return getTarget()->getPretitle();
+}
+
+NMI_SET(PlayerWrapper, pretitle, "предтитул персонажа")
+{
+    getTarget()->setPretitle(arg2string(arg));
+    save();
+}
+
+NMI_GET(PlayerWrapper, russianPretitle, "русский предтитул персонажа")
+{
+    return getTarget()->getRussianPretitle();
+}
+
+NMI_SET(PlayerWrapper, russianPretitle, "русский предтитул персонажа")
+{
+    getTarget()->setRussianPretitle(arg2string(arg));
+    save();
+}
+
+NMI_GET(PlayerWrapper, parsedTitle, "титул персонажа как мы его видим")
+{
+    return Player::title(getTarget());
 }
 
 NMI_GET(PlayerWrapper, questpoints, "квестовые очки")
@@ -383,14 +445,14 @@ NMI_GET(PlayerWrapper, gquest, "статистика побед в глобал�
 {
     PCMemoryInterface *player = getTarget();
     auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>("gquest");
-    return statAttr->toRegister();
+    return statAttr->toRegister(player, "gquest");
 }
 
 NMI_GET(PlayerWrapper, quest, "статистика побед в авто квестах")
 {
     PCMemoryInterface *player = getTarget();
     auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>("questdata");
-    return statAttr->toRegister();
+    return statAttr->toRegister(player, "questdata");
 }
 
 NMI_GET(PlayerWrapper, attributes, "Array всех аттрибутов, ключ - имя аттрибута, значение - Map с полями аттрибута либо пустая строка")

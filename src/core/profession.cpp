@@ -93,7 +93,7 @@ int Profession::getManaRate( ) const
 {
     return 70;
 }
-Flags Profession::getFlags( Character * ) const
+Flags Profession::getFlags( CharacterMemoryInterface * ) const
 {
     return Flags::emptyFlags;
 }

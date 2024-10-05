@@ -16,7 +16,7 @@ public:
     XMLKillingAttribute();
     virtual ~XMLKillingAttribute();
 
-    Scripting::Register toRegister() const;
+    virtual Scripting::Register toRegister() const;
 
     static const DLString TYPE;
 

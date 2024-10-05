@@ -19,6 +19,7 @@
 #include "xmllong.h"
 #include "xmlvariablecontainer.h"
 #include "xmlrussianstring.h"
+#include "nounholder.h"
 
 #include "xmlattributes.h"
 #include "pcmemoryinterface.h"
@@ -34,7 +35,8 @@
 /**
  * @author Igor S. Petrenko
  */
-class PCharacterMemory : public XMLVariableContainer,  
+class PCharacterMemory : public Grammar::NounHolder,
+                         public XMLVariableContainer,  
                          public PCMemoryInterface
 {
 XML_OBJECT
@@ -50,6 +52,8 @@ public:
     virtual const char * getNameC( ) const;
     virtual void setName( const DLString& name ) ;
 
+    virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
+
     virtual short getLevel( ) const ;
     virtual void setLevel( short level ) ;
 
@@ -60,6 +64,12 @@ public:
     
     virtual short getSex( ) const ;
     virtual void setSex( short sex ) ;
+
+    virtual int getAlignment( ) const;
+    virtual void setAlignment( int );
+
+    virtual int getEthos( ) const;
+    virtual void setEthos( int );
 
     virtual RaceReference &getRace( ) ;
     virtual void setRace( const RaceReference & ) ;
@@ -81,6 +91,15 @@ public:
 
     virtual const char * getDescription( ) const;
     virtual void setDescription( const DLString& ); 
+
+    virtual const DLString& getRussianPretitle( ) const ;
+    virtual void setRussianPretitle( const DLString& ) ;
+    
+    virtual const DLString& getPretitle( ) const ;
+    virtual void setPretitle( const DLString& ) ;
+
+    virtual void setTitle( const DLString& );
+    virtual const DLString & getTitle( ) const;
 
     virtual int getTrust( ) const ;
     virtual void setTrust( int trust ) ;
@@ -128,17 +147,23 @@ public:
     virtual int getLoyalty() const;
     virtual void setLoyalty(int value);
 
+
 private:
     XML_VARIABLE XMLString name;
     XML_VARIABLE XMLString password;
     XML_VARIABLE XMLDate lastAccessTime;
     XML_VARIABLE XMLString lastAccessHost;
+    XML_VARIABLE XMLStringNoEmpty title;
+    XML_VARIABLE XMLStringNoEmpty pretitle;
+    XML_VARIABLE XMLStringNoEmpty russianPretitle;
     XML_VARIABLE XMLString description;
     XML_VARIABLE XMLShort level;
     XML_VARIABLE XMLClanReference petition;
     XML_VARIABLE XMLClanReference clan;
     XML_VARIABLE XMLShort clanLevel;
     XML_VARIABLE XMLShort sex;
+    XML_VARIABLE XMLInteger alignment;
+    XML_VARIABLE XMLEnumeration ethos;
     XML_VARIABLE XMLAttributes attributes;
     XML_VARIABLE XMLHometownReference hometown;
     XML_VARIABLE XMLProfessionReference profession;

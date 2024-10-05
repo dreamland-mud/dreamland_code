@@ -86,7 +86,7 @@
 #include "helpmanager.h"
 #include "attacks.h"
 #include "areahelp.h"
-
+#include "player_utils.h"
 #include "dreamland.h"
 #include "merc.h"
 #include "descriptor.h"
@@ -322,7 +322,7 @@ CMDRUNP( oscore )
 
     buf << fmt( 0, "Ты {W%1$s%2$s{x, уровень {C%3$d{w",
                    ch->seeName( ch, '1' ).c_str( ),
-                   ch->is_npc( ) ? "" : ch->getPC( )->getParsedTitle( ).c_str( ),
+                   ch->is_npc( ) ? "" : Player::title(ch->getPC( )).c_str( ),
                    ch->getRealLevel( ));
     
     if (!ch->is_npc( ))
@@ -772,7 +772,7 @@ CMDRUNP( title )
     if (arg.empty( ) || arg_is_show( arg )) {
         ostringstream buf;
         const DLString &title = pch->getTitle( );
-        DLString parsed = pch->getParsedTitle( );
+        DLString parsed = Player::title(pch);
         parsed.stripWhiteSpace( );
         
         if (parsed.empty( )) {
@@ -800,7 +800,7 @@ CMDRUNP( title )
 
     pch->setTitle( arg );
 
-    pch->pecho("Теперь ты {W%C1{x%s{x", pch, pch->getParsedTitle().c_str());
+    pch->pecho("Теперь ты {W%C1{x%s{x", pch, Player::title(pch).c_str());
 }
 
 static bool fix_pretitle( PCharacter *ch, DLString &title )
@@ -1715,7 +1715,7 @@ CMDRUNP( score )
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
     ostringstream name;
-    DLString title = pch->getParsedTitle( );
+    DLString title = Player::title(pch);
     name << ch->seeName( ch, '1' ) << "{x ";
     mudtags_convert(title.c_str( ), name, TAGS_CONVERT_VIS, ch);
 

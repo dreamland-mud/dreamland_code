@@ -784,7 +784,7 @@ NMI_SET( CharacterWrapper, x, help) \
     target->x.setValue( arg.toNumber() ); \
 }
 
-INT_FIELD(ethos, "добропорядочность")
+INT_FIELD(ethos, "этос")
 INT_FIELD(timer, "сколько минут прошло с последней команды")
 INT_FIELD(daze, "daze state (в пульсах, 1 пульс = четверть секунды)")
 INT_FIELD(hit, "текущее здоровье (hit points)")
@@ -1418,11 +1418,18 @@ NMI_INVOKE( CharacterWrapper, seeName, "(ch[, case]): как мы видим и�
     return Register( target->seeName(ch, '0' + cse ) );
 }
 
-NMI_INVOKE( CharacterWrapper, getParsedTitle, "(): титул персонажа как мы его видим" )
+NMI_INVOKE( CharacterWrapper, getParsedTitle, "DEPRECATED" )
 {
     checkTarget();
     CHK_NPC
-    return Register( target->getPC()->getParsedTitle() );
+    return Player::title(target->getPC());
+}
+
+NMI_GET( CharacterWrapper, parsedTitle, "титул персонажа как мы его видим" )
+{
+    checkTarget();
+    CHK_NPC
+    return Player::title(target->getPC());
 }
 
 NMI_INVOKE( CharacterWrapper, can_see_mob, "(ch): видим ли персонажа ch" )
@@ -2842,7 +2849,7 @@ NMI_GET(CharacterWrapper, gquest, "статистика побед в глоба
     checkTarget();
     CHK_NPC
     auto statAttr = target->getPC()->getAttributes().getAttr<XMLAttributeStatistic>("gquest");
-    return statAttr->toRegister();
+    return statAttr->toRegister(target->getPC(), "gquest");
 }
 
 NMI_GET(CharacterWrapper, quest, "статистика побед в авто квестах")
@@ -2850,7 +2857,7 @@ NMI_GET(CharacterWrapper, quest, "статистика побед в авто к
     checkTarget();
     CHK_NPC
     auto statAttr = target->getPC()->getAttributes().getAttr<XMLAttributeStatistic>("questdata");
-    return statAttr->toRegister();
+    return statAttr->toRegister(target->getPC(), "questdata");
 }
 
 NMI_GET(CharacterWrapper, attributes, "Array всех аттрибутов, ключ - имя аттрибута, значение - Map с полями аттрибута либо пустая строка")

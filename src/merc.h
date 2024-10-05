@@ -624,8 +624,8 @@ struct Area {
 #define IS_AFFECTED(ch, sn)        (IS_SET((ch)->affected_by, (sn)))
 #define CAN_DETECT(ch, sn)        (IS_SET((ch)->detection, (sn)))
 
-#define IS_GOOD(ch)                ((ch)->alignment >= 350)
-#define IS_EVIL(ch)                ((ch)->alignment <= -350)
+#define IS_GOOD(ch)                ((ch)->getAlignment() >= 350)
+#define IS_EVIL(ch)                ((ch)->getAlignment() <= -350)
 #define IS_NEUTRAL(ch)                (!IS_GOOD(ch) && !IS_EVIL(ch))
 #define ALIGNMENT(ch)           (IS_GOOD(ch) ? N_ALIGN_GOOD : IS_EVIL(ch) ? N_ALIGN_EVIL : N_ALIGN_NEUTRAL)
 

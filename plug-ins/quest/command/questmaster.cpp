@@ -25,7 +25,7 @@ bool QuestMaster::specIdle( )
     if (chance(99))
         return false;
 
-    do_say(ch, "Хочешь получить интересное задание? Напиши y{hc{lRквест попросить{lEquest request{x.");
+    do_say(ch, "Хочешь получить интересное задание? Напиши {y{hc{lRквест попросить{lEquest request{x.");
     return true;
 }
 

@@ -387,12 +387,17 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setRace( getRace( ) );
         mem->setClanLevel( getClanLevel( ) );
         mem->setSex( getSex( ) );
+        mem->setEthos(getEthos());
+        mem->setAlignment(getAlignment());
         mem->setHometown( getHometown( ) );
         mem->setAttributes( getAttributes( ) );
         mem->setRemorts( getRemorts( ) );
         mem->setRussianName( getRussianName( ).getFullForm( ) );
         mem->setReligion( getReligion( ) );
         mem->setDescription(getDescription());
+        mem->setPretitle(getPretitle());
+        mem->setRussianPretitle(getRussianPretitle());
+        mem->setTitle(getTitle());
         mem->setSkills(getSkills());
         mem->setBonuses(getBonuses());
         mem->setStartRoom(getStartRoom());
@@ -417,12 +422,17 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setRace( pcm->getRace( ) );
         setClanLevel( pcm->getClanLevel( ) );
         setSex( pcm->getSex( ) );
+        setEthos(pcm->getEthos());
+        setAlignment(pcm->getAlignment());
         setHometown( pcm->getHometown( ) );
         setAttributes( pcm->getAttributes( ) );
         setRemorts( pcm->getRemorts( ) );
         setRussianName( pcm->getRussianName( ).getFullForm( ) );
         setReligion( pcm->getReligion( ) );
         setDescription(pcm->getDescription());
+        setPretitle(pcm->getPretitle());
+        setRussianPretitle(pcm->getRussianPretitle());
+        setTitle(pcm->getTitle());
         setSkills(pcm->getSkills());
         setBonuses(pcm->getBonuses());
         setStartRoom(pcm->getStartRoom());
@@ -563,24 +573,6 @@ void PCharacter::setAttributes( const XMLAttributes& attributes )
 {
     this->attributes = attributes;
 }
-const DLString& PCharacter::getPretitle( ) const 
-{
-    return pretitle.getValue( );
-}
-void PCharacter::setPretitle( const DLString& pretitle ) 
-{
-    this->pretitle.setValue( pretitle );
-    updateCachedNoun( );
-}
-const DLString& PCharacter::getRussianPretitle( ) const 
-{
-    return russianPretitle.getValue( );
-}
-void PCharacter::setRussianPretitle( const DLString& pretitle ) 
-{
-    this->russianPretitle.setValue( pretitle );
-    updateCachedNoun( );
-}
 Remorts& PCharacter::getRemorts( ) 
 {
     return remorts;
@@ -619,9 +611,6 @@ void PCharacter::setLoyalty(int value)
     this->loyalty = value;        
 }
 
-/**************************************************************************
- * set-get methods inherited from Character
- **************************************************************************/
 void PCharacter::setDescription( const DLString& d )
 {
     description = d;
@@ -630,10 +619,24 @@ const char * PCharacter::getDescription( ) const
 {
     return description.c_str( );
 }
-
-/**************************************************************************
- * title 
- **************************************************************************/
+const DLString& PCharacter::getPretitle( ) const 
+{
+    return pretitle.getValue( );
+}
+void PCharacter::setPretitle( const DLString& pretitle ) 
+{
+    this->pretitle.setValue( pretitle );
+    updateCachedNoun( );
+}
+const DLString& PCharacter::getRussianPretitle( ) const 
+{
+    return russianPretitle.getValue( );
+}
+void PCharacter::setRussianPretitle( const DLString& pretitle ) 
+{
+    this->russianPretitle.setValue( pretitle );
+    updateCachedNoun( );
+}
 void PCharacter::setTitle( const DLString &title )
 {
     this->title = title;
@@ -644,56 +647,6 @@ const DLString & PCharacter::getTitle( ) const
     return title.getValue( );
 }
 
-DLString PCharacter::getParsedTitle( )
-{
-    ostringstream out;
-    const char *str = getTitle( ).c_str( );
-    
-    switch (str[0]) {
-    case '.': case ',': case '!': case '?':
-        break;
-    default:
-        out << " ";
-        break;
-    }
-
-    for (; *str; str++) {
-        if (*str == '%') {
-            DLString cl;
-            
-            if (*++str == '\0')
-                break;
-
-            switch (*str) {
-            default:
-                out << *str;
-                break;
-            
-            case 'c':
-                cl = clan->getTitle(this);
-                if (!cl.empty())
-                    out << "{C[" << "{" << clan->getColor( ) << clan->getTitle( this ) << "{C]{x";
-                break;
-                
-            case 'C':
-                cl = clan->getTitle( this );
-                if (!cl.empty( )) {
-                    cl.upperFirstCharacter( );
-                    out << "{C[" << "{" << clan->getColor( ) << cl << "{C]{x";
-                }
-                break;
-                
-            case 'a':
-                out << getProfession( )->getTitle( this );
-                break;
-            }
-        }
-        else
-            out << *str;
-    }
-
-    return out.str( );
-}
 
 /*****************************************************************************
  * name and sex formatting

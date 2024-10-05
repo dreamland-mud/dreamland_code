@@ -161,3 +161,47 @@ Scripting::Register XMLAttributeStatistic::toRegister() const
         
     return statReg;
 }
+
+Scripting::Register XMLAttributeStatistic::toRankRegister(PCMemoryInterface *pci, const DLString &attrName)
+{
+    Register rankReg = Register::handler<RegContainer>();
+    RegContainer *rankContainer = rankReg.toHandler().getDynamicPointer<RegContainer>();
+
+    auto allStat = gatherAll( attrName );
+
+    for (auto &s: allStat) {
+        const DLString &gqName = s.first;
+        auto &records = s.second;
+        int myplace = 1;
+        bool found = false;
+
+        for (auto &r: records) {
+            const DLString &playerName = r.first;
+
+            if (playerName == pci->getName()) {
+                found = true;
+                break;
+            }
+
+            myplace++;
+        }
+
+        if (found)
+            rankContainer->setField(gqName, myplace);
+    }
+
+    return rankReg;
+}
+
+Scripting::Register XMLAttributeStatistic::toRegister(PCMemoryInterface *player, const DLString &attrName)
+{
+    Register statReg = Register::handler<IdContainer>();
+    IdContainer *statContainer = statReg.toHandler().getDynamicPointer<IdContainer>();
+    auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>(attrName);
+
+    statContainer->setField(IdRef("victories"), statAttr->toRegister());
+    statContainer->setField(IdRef("rank"), toRankRegister(player, attrName));
+
+    return statReg;
+
+}

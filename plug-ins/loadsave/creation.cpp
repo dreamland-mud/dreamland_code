@@ -181,6 +181,8 @@ NPCharacter *create_mobile_org(MOB_INDEX_DATA *pMobIndex, int flags)
     mob->material = str_dup(pMobIndex->material);
     mob->extracted = false;
 
+    mob->updateCachedNoun();
+
     override_description(mob, pMobIndex->player_name, &NPCharacter::setName);
     override_description(mob, pMobIndex->short_descr, &NPCharacter::setShortDescr);
     override_description(mob, pMobIndex->long_descr, &NPCharacter::setLongDescr);

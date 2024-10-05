@@ -12,8 +12,12 @@
 
 #include "pcharactermemory.h"
 #include "grammar_entities_impl.h"
+#include "character.h"
+#include "merc.h"
+#include "def.h"
 
 PCharacterMemory::PCharacterMemory( )
+                   : ethos( ETHOS_NULL, &ethos_table )
 {
 }
 
@@ -81,6 +85,36 @@ const char * PCharacterMemory::getDescription( ) const
 void PCharacterMemory::setDescription( const DLString &description )
 {
     this->description = description; 
+}
+
+const DLString& PCharacterMemory::getPretitle( ) const 
+{
+    return pretitle.getValue( );
+}
+
+void PCharacterMemory::setPretitle( const DLString& pretitle ) 
+{
+    this->pretitle.setValue( pretitle );
+}
+
+const DLString& PCharacterMemory::getRussianPretitle( ) const 
+{
+    return russianPretitle.getValue( );
+}
+
+void PCharacterMemory::setRussianPretitle( const DLString& pretitle ) 
+{
+    this->russianPretitle.setValue( pretitle );
+}
+
+void PCharacterMemory::setTitle( const DLString &title )
+{
+    this->title = title;
+}
+
+const DLString & PCharacterMemory::getTitle( ) const 
+{
+    return title.getValue( );
 }
 
 short PCharacterMemory::getLevel( ) const 
@@ -192,6 +226,27 @@ void PCharacterMemory::setSex( short sex )
         this->sex.setValue( sex );
 }
 
+int PCharacterMemory::getAlignment( ) const
+{
+        return alignment;
+}
+
+void PCharacterMemory::setAlignment( int value )
+{
+        alignment = value;
+}
+
+int PCharacterMemory::getEthos( ) const
+{
+        return ethos;
+}
+
+void PCharacterMemory::setEthos( int value )
+{
+        ethos = value;
+}
+
+
 XMLAttributes& PCharacterMemory::getAttributes( ) 
 {
         return attributes;
@@ -301,4 +356,22 @@ int PCharacterMemory::getLoyalty() const
 void PCharacterMemory::setLoyalty(int value)
 {
     this->loyalty = value;        
+}
+
+using namespace Grammar;
+
+Noun::Pointer PCharacterMemory::toNoun( const DLObject *forWhom, int flags ) const
+{
+    const Character *wch = dynamic_cast<const Character *>(forWhom);
+    PlayerConfig cfg = wch ? wch->getConfig( ) : PlayerConfig();
+    MultiGender mg( getSex( ), Number::SINGULAR );
+    
+    DLString rname = getRussianName( ).getFullForm( );
+    if (rname.empty( ))
+        rname = getName( );
+        
+    if (wch && !cfg.runames)
+        return RussianString::Pointer( NEW, getName( ), mg );
+    else
+        return RussianString::Pointer( NEW, rname, mg );
 }

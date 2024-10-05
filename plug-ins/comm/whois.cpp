@@ -17,7 +17,7 @@
 #include "act.h"
 #include "mudtags.h"
 #include "merc.h"
-
+#include "player_utils.h"
 #include "descriptor.h"
 #include "loadsave.h"
 #include "skillreference.h"
@@ -62,7 +62,7 @@ COMMAND(Whois, "whois")
     
     /* Pretitle Name Title */
     buf << "{W" << ch->seeName(pch) << "{w ";    
-    mudtags_convert( pch->getParsedTitle().c_str(), buf, TAGS_CONVERT_VIS, ch );
+    mudtags_convert( Player::title(pch).c_str(), buf, TAGS_CONVERT_VIS, ch );
     buf << "{w";
     lines.add( buf );
 

@@ -13,7 +13,7 @@
 #include "object.h"
 #include "pcrace.h"
 #include "string_utils.h"
-
+#include "player_utils.h"
 #include "commandtemplate.h"
 #include "plugininitializer.h"
 #include "jsonservlet.h"
@@ -327,7 +327,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim, DLStrin
         descr = victim->toNoun( ch )->decline('1');
 
     webManipManager->decorateCharacter( buf, descr, victim, ch );
-    buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
+    buf << "{x " << Player::title(victim) << "{x" << endl;
 
     return buf.str( );
 }
@@ -471,7 +471,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
             if (!victim->getRussianPretitle().empty())
                 wch["pretitle"]["ru"] = victim->getRussianPretitle().colourStrip();
 
-            wch["title"] = victim->getParsedTitle().colourStrip();
+            wch["title"] = Player::title(victim).colourStrip();
             wch["remorts"] = DLString(victim->getRemorts().size());
 
             body["people"].append(wch);

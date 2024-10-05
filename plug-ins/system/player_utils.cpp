@@ -35,3 +35,54 @@ lang_t Player::lang(PCMemoryInterface *pcm)
 
     return LANG_DEFAULT;
 }
+
+DLString Player::title(PCMemoryInterface *pcm)
+{
+    ostringstream out;
+    const char *str = pcm->getTitle( ).c_str( );
+    
+    switch (str[0]) {
+    case '.': case ',': case '!': case '?':
+        break;
+    default:
+        out << " ";
+        break;
+    }
+
+    for (; *str; str++) {
+        if (*str == '%') {
+            DLString cl;
+            
+            if (*++str == '\0')
+                break;
+
+            switch (*str) {
+            default:
+                out << *str;
+                break;
+            
+            case 'c':
+                cl = pcm->getClan()->getTitle(pcm);
+                if (!cl.empty())
+                    out << "{C[" << "{" << pcm->getClan()->getColor( ) << cl << "{C]{x";
+                break;
+                
+            case 'C':
+                cl = pcm->getClan()->getTitle(pcm);
+                if (!cl.empty( )) {
+                    cl.upperFirstCharacter( );
+                    out << "{C[" << "{" << pcm->getClan()->getColor( ) << cl << "{C]{x";
+                }
+                break;
+                
+            case 'a':
+                out << pcm->getProfession( )->getTitle(pcm);
+                break;
+            }
+        }
+        else
+            out << *str;
+    }
+
+    return out.str( );
+}

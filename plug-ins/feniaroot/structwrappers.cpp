@@ -28,6 +28,7 @@
 #include "material.h"
 #include "fight.h"
 
+#include "fenia/exceptions.h"
 #include "nativeext.h"
 #include "regcontainer.h"
 #include "reglist.h"
@@ -306,9 +307,14 @@ NMI_GET( ProfessionWrapper, nameMlt, "русское название во мн�
 
 NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги класса для этого персонажа (таблица .tables.prof_flags)" ) 
 {
-    Character *ch = args2character(args);
+    CharacterMemoryInterface *ch;
+    try { 
+        ch = args2character(args);
+    } catch (const Scripting::InvalidCastException &e) {
+        ch = argnum2memory(args, 1);
+    }
     Profession *prof = professionManager->find( name );
-    return Register((int)prof->getFlags(ch).getValue());
+    return (int)prof->getFlags(ch).getValue();
 }
 
 

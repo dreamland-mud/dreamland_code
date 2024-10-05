@@ -82,7 +82,7 @@ static MethodsByQuest aquest_find_methods(WrapperBase *wrapperBase, const DLStri
 }
 
 // Grab (create if needed) quest info for this quest from player attributes
-AreaQuestData & aquest_data(PCharacter *ch, const DLString &questId)
+AreaQuestData & aquest_data(PCMemoryInterface *ch, const DLString &questId)
 {
     auto areaQuestAttr = ch->getAttributes().getAttr<XMLAttributeAreaQuest>("areaquest");
     auto q = areaQuestAttr->find(questId);
@@ -133,15 +133,42 @@ static DLString aqprog_canstart(PCharacter *ch, AreaQuest *q)
     return DLString::emptyString;
 }
 
+// Return true if player can satisfy all requirements at some point in life
+bool aquest_can_participate_ever(PCMemoryInterface *pci, AreaQuest *q) 
+{
+    // Wrong align?
+    if (q->align != 0 && !q->align.isSetBitNumber(ALIGNMENT(pci)))
+        return false;
+
+    // Wrong hometown?
+    if (!q->hometowns.empty() && !q->hometowns.isSet(pci->getHometown()))
+        return false;
+
+    // Wrong player class?
+    if (!q->classes.empty() && !q->classes.isSet(pci->getProfession()))
+        return false;
+
+    // See if prerequisite quest would be available too 
+    if (q->prereq > 0) {
+        AreaQuest *prereq = get_area_quest(q->prereq);
+        if (!prereq)
+            return false;
+        if (!aquest_can_participate_ever(pci, prereq))
+            return false;
+    }
+
+    return true;        
+}
+
 // Return true if ch passes all requirements to participate in this quest
-bool aquest_can_participate(PCharacter *ch, AreaQuest *q, const AreaQuestData &qdata) 
+bool aquest_can_participate(PCMemoryInterface *ch, AreaQuest *q, const AreaQuestData &qdata) 
 {
     // Too old?
-    if (q->maxLevel < LEVEL_MORTAL && ch->getRealLevel() > q->maxLevel)
+    if (q->maxLevel < LEVEL_MORTAL && ch->getLevel() > q->maxLevel)
         return false;
 
     // Too young?
-    if (q->minLevel > 0 && ch->getRealLevel() < q->minLevel)
+    if (q->minLevel > 0 && ch->getLevel() < q->minLevel)
         return false;
 
     // Have done too many times?

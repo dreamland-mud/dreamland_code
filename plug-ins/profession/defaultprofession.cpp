@@ -360,7 +360,7 @@ int DefaultProfession::getManaRate( ) const
 {
     return manaRate.getValue( );
 }
-Flags DefaultProfession::getFlags( Character * ) const
+Flags DefaultProfession::getFlags( CharacterMemoryInterface * ) const
 {
     return flags;
 }

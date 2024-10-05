@@ -183,14 +183,11 @@ public:
     virtual int getLoyalty() const;
     virtual void setLoyalty(int value);
 
-    // set-get methods inherited from Character
+    virtual void setTitle( const DLString& );
+    virtual const DLString & getTitle( ) const;
+    
     virtual void setDescription( const DLString& );
     virtual const char * getDescription( ) const;
-    
-    // title
-    void setTitle( const DLString& );
-    const DLString & getTitle( ) const;
-    DLString getParsedTitle( );
     
     // name and sex formatting
     virtual DLString getNameP( char gram_case ) const;

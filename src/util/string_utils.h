@@ -7,6 +7,7 @@ namespace String {
     /** Caseless comparison of two strings. */
     bool equalLess(const DLString &a, const DLString &b);
 
+
     /** Truncates the string to give size. */
     DLString &truncate(DLString &str, size_t size);
 
@@ -18,6 +19,8 @@ namespace String {
 
     /** True if has at least one Cyrillic character. */
     bool hasCyrillic(const DLString &str);
+
+    bool lessCase( const DLString &a, const DLString& b );
 }
 
 #endif

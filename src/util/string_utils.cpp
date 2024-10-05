@@ -51,5 +51,28 @@ bool String::hasCyrillic(const DLString &str)
     return false;
 }
 
+bool String::lessCase( const DLString &a, const DLString& b )
+{
+        DLString::size_type len = a.length( ) < b.length( ) ? a.length( ) : b.length( );
+        for( DLString::size_type i = 0; i < len; i++ )
+        {
+                char ch1 = dl_toupper( a.at( i ) );
+                char ch2 = dl_toupper( b.at(i) );
+                if( ch1 < ch2 )
+                {
+                        return true;
+                }
+                else if( ch1 > ch2 )
+                {
+                        return false;
+                }
+        }
+        if( a.length( ) < b.length( ) )
+        {
+                return true;
+        }
+        return false;
+}
+
 
 

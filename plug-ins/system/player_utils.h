@@ -10,6 +10,8 @@ namespace Player {
     bool isNewbie(PCMemoryInterface *pcm);
 
     lang_t lang(PCMemoryInterface *pcm);
+
+    DLString title(PCMemoryInterface *pcm);
 }
 
 #endif

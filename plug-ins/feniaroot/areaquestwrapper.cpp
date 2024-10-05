@@ -163,8 +163,8 @@ NMI_INVOKE( AreaQuestWrapper, step, "(num): структура шага квес
 NMI_INVOKE( AreaQuestWrapper, data, "(ch): статус этого квеста для ch (из аттрибута areaquest)" ) 
 {
     checkTarget();
-    PCharacter *ch = argnum2player(args, 1);
-    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
+    PCMemoryInterface *pci = argnum2memory(args, 1);
+    AreaQuestData &qdata = aquest_data(pci, target->vnum.toString());
     return qdata.toRegister();
 }
 
@@ -214,21 +214,19 @@ NMI_INVOKE( AreaQuestWrapper, info, "(ch): вернет строку с подс
     return target->steps[qdata.step]->info;
 }
 
-NMI_INVOKE( AreaQuestWrapper, rollback, "(ch): откатить этот квест на предыдущий шаг для ch, вернет новый номер шага" ) 
-{
-    checkTarget();
-    PCharacter *ch = argnum2player(args, 1);
-    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
-    qdata.rollback();
-    return Register(qdata.step);
-}
-
 NMI_INVOKE( AreaQuestWrapper, canParticipate, "(ch): персонаж ch удовлетряет всем условиям для начала квеста" ) 
 {
     checkTarget();
-    PCharacter *ch = argnum2player(args, 1);
-    AreaQuestData &qdata = aquest_data(ch, target->vnum.toString());
-    return Register(aquest_can_participate(ch, target, qdata));
+    PCMemoryInterface *pci = argnum2memory(args, 1);
+    AreaQuestData &qdata = aquest_data(pci, target->vnum.toString());
+    return Register(aquest_can_participate(pci, target, qdata));
+}
+
+NMI_INVOKE( AreaQuestWrapper, canParticipateEver, "(ch): персонаж ch на каком-то из уровней удовлетрит условиям квеста" ) 
+{
+    checkTarget();
+    PCMemoryInterface *pci = argnum2memory(args, 1);
+    return Register(aquest_can_participate_ever(pci, target));
 }
 
 NMI_INVOKE( AreaQuestWrapper, api, "(): печатает этот API" )
