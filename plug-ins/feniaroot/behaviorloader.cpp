@@ -2,6 +2,12 @@
 #include "dreamland.h"
 #include "feniamanager.h"
 #include "logstream.h"
+#include "configurable.h"
+
+CONFIGURABLE_LOADED(behaviors, services)
+{
+}
+
 
 const DLString BehaviorHelp::TYPE = "BehaviorHelp";
 
