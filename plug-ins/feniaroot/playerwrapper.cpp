@@ -200,12 +200,12 @@ NMI_GET(PlayerWrapper, remorts, "структура с ремортами")
 
 NMI_GET(PlayerWrapper, sex, "пол (таблица .tables.sex_table)")
 {
-    return stat_table.name(getTarget()->getSex());
+    return getTarget()->getSex();
 }
 
 NMI_SET(PlayerWrapper, sex, "пол (таблица .tables.sex_table)")
 {
-    getTarget()->setSex(arg2flag(arg, stat_table));
+    getTarget()->setSex(arg2flag(arg, sex_table));
     save();
 }
 
