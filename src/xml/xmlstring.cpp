@@ -57,10 +57,21 @@ XMLStringNode::XMLStringNode( )
 
 bool XMLStringNode::toXML( XMLNode::Pointer& parent ) const
 {
-    if (empty( )) 
+    if (empty( )) {
         return false;
+    }
+
+    XMLNode::Pointer grandma = parent->getParent();
+    if (grandma) {
+        grandma->popChild();
+    }
 
     parent = node;
+
+    if (grandma) {
+        grandma->appendChild(parent);
+    }
+
     return true;
 }
 

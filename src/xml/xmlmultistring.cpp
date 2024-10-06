@@ -4,6 +4,7 @@
 
 const DLString ATTR_LANG = "l";
 
+// TODO move to separate utils file
 static lang_t attr2lang(const DLString langAttr)
 {
     if (langAttr == "en")
@@ -72,6 +73,16 @@ void XMLMultiString::fromXML(const XMLNode::Pointer& parent)
 // </Skill>
 bool XMLMultiString::toXML(XMLNode::Pointer& parent) const
 {
+    // Quick check to skip totally empty values
+    bool empty = true;
+    for (auto &lv: *this) {
+        if (!lv.second.empty())
+            empty = false;
+    }
+
+    if (empty)
+        return false;
+        
     XMLNode::Pointer grandma = parent->getParent();
     if (grandma.isEmpty())
         throw Exception("Nowhere to append a multi-string");
