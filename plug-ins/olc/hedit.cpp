@@ -8,8 +8,7 @@
 #include "hedit.h"
 #include "olc.h"
 #include "security.h"
-
-#include "merc.h"
+#include "string_utils.h"
 #include "arg_utils.h"
 #include "act.h"
 #include "comm.h"
@@ -34,12 +33,12 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
 
     this->id = original->getID();
     this->level = original->getLevel();
-    this->text = original->c_str();
-    this->keywords = original->getKeywordAttribute();
-    this->aka = original->aka.toString();
+    this->text = original->text;
+    this->keyword = original->keyword;
+    this->extra = original->extra;
     this->labels = original->labels.persistent.toString();
     this->labelsAuto = original->labels.transient.toString();
-    this->title = original->getTitleAttribute();
+    this->title = original->title;
     this->autotitle = original->getTitle(DLString::emptyString);
 }
 
@@ -65,14 +64,14 @@ void OLCStateHelp::commit()
 {
     HelpArticle::Pointer original = helpManager->getArticle(id);
 
-    original->setKeywordAttribute(keywords);
+    original->keyword = keyword;
     original->setLevel(level);
-    original->setText(text);
-    original->setTitleAttribute(title);
+    original->text = text;
+    original->title = title;
     original->labels.persistent.clear();
     original->labels.addPersistent(labels);
-    original->aka.clear();
-    original->aka.fromString(aka);
+    original->extra = extra;
+    original->refreshKeywords();
     original->save();
 
     help_save_ids();
@@ -100,7 +99,8 @@ StringSet OLCStateHelp::allKeywords() const
     const StringSet &autoKeywords = article->getAutoKeywords();
     kw.insert(autoKeywords.begin(), autoKeywords.end());
 
-    kw.fromString(keywords);
+    kw.fromString(keyword.get(EN));
+    kw.fromString(keyword.get(RU));
     return kw;
 }
 
@@ -111,14 +111,25 @@ void OLCStateHelp::show( PCharacter *ch ) const
         labels.empty() ? "-" : labels.c_str(), 
         labelsAuto.empty() ? "-" : labelsAuto.c_str());     
     ptc(ch, "{DВсе ключевые слова:   [%s]\r\n", allKeywords().toString().c_str());
-    ptc(ch, "{WКлючевые слова{x:       [{C%s{x] %s\r\n", keywords.c_str(), web_edit_button(ch, "keywords", "web").c_str());
-    ptc(ch, "{WСкрытые алиасы (aka){x: [{C%s{x] %s\r\n", aka.c_str(), web_edit_button(ch, "aka", "web").c_str());
+    ptc(ch, "{WКлючевые слова, EN{x:   [{C%s{x] %s\r\n", keyword.get(EN).c_str(), web_edit_button(ch, "keywords", "web").c_str());
+    ptc(ch, "{WКлючевые слова, UA{x:   [{C%s{x] %s\r\n", keyword.get(UA).c_str(), web_edit_button(ch, "uakeywords", "web").c_str());
+    ptc(ch, "{WКлючевые слова, RU{x:   [{C%s{x] %s\r\n", keyword.get(RU).c_str(), web_edit_button(ch, "rukeywords", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, EN{x:   [{C%s{x] %s\r\n", extra.get(EN).c_str(), web_edit_button(ch, "aka", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, UA{x:   [{C%s{x] %s\r\n", extra.get(UA).c_str(), web_edit_button(ch, "uaaka", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, RU{x:   [{C%s{x] %s\r\n", extra.get(RU).c_str(), web_edit_button(ch, "ruaka", "web").c_str());
     ptc(ch, "{WУровень{x:              [{C%d{x]\r\n", level.getValue());
-    ptc(ch, "{WЗаголовок{x:            [{C%s{x]\r\n", title.c_str());
+    ptc(ch, "{WЗаголовок, EN{x:        [{C%s{x] %s\r\n", title.get(EN).c_str(), web_edit_button(ch, "title", "web").c_str());
+    ptc(ch, "{WЗаголовок, UA{x:        [{C%s{x] %s\r\n", title.get(UA).c_str(), web_edit_button(ch, "uatitle", "web").c_str());
+    ptc(ch, "{WЗаголовок, RU{x:        [{C%s{x] %s\r\n", title.get(RU).c_str(), web_edit_button(ch, "rutitle", "web").c_str());
     ptc(ch, "{DАвтозаголовок:        [%s]\r\n", autotitle.c_str());
-    ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
-        web_edit_button(ch, "text", "web").c_str(),
-        text.c_str());
+
+    DLString entext = text.get(EN);
+    DLString uatext = text.get(UA);
+    DLString rutext = text.get(RU);
+    ptc(ch, "{WТекст, EN{x: %s{W...{x\r\n%s\r\n", web_edit_button(ch, "entext", "web").c_str(), String::truncate(entext, 200).c_str());
+    ptc(ch, "{WТекст, UA{x: %s{W...{x\r\n%s\r\n", web_edit_button(ch, "uatext", "web").c_str(), String::truncate(uatext, 200).c_str());
+    ptc(ch, "{WТекст, RU{x: %s{W...{x\r\n%s\r\n", web_edit_button(ch, "rutext", "web").c_str(), String::truncate(rutext, 200).c_str());
+
     ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ycancel{x, {hc{ydone{x\r\n");
 }
 
@@ -130,31 +141,47 @@ HEDIT(show, "показать", "показать все поля")
 
 HEDIT(keywords, "ключевые", "установить или очистить дополнительные ключевые слова")
 {
-    return editor(argument, keywords, (editor_flags)(ED_HELP_HINTS|ED_UPPERCASE|ED_NO_NEWLINE));
+    return editor(argument, keyword[EN], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
+}
+
+HEDIT(uakeywords, "укключевые", "установить или очистить дополнительные ключевые слова")
+{
+    return editor(argument, keyword[UA], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
+}
+
+HEDIT(rukeywords, "руключевые", "установить или очистить дополнительные ключевые слова")
+{
+    return editor(argument, keyword[RU], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
 }
 
 HEDIT(aka, "скрытые", "установить или очистить скрытые алиасы")
 {
-    return editor(argument, aka, (editor_flags)(ED_HELP_HINTS|ED_UPPERCASE|ED_NO_NEWLINE));
+    return editor(argument, extra[EN], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
+}
+
+HEDIT(uaaka, "укскрытые", "установить или очистить скрытые алиасы")
+{
+    return editor(argument, extra[UA], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
+}
+
+HEDIT(ruaka, "рускрытые", "установить или очистить скрытые алиасы")
+{
+    return editor(argument, extra[RU], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
 }
 
 HEDIT(title, "заголовок", "установить или очистить заголовок вместо автоматического")
 {
-    if (!*argument) {
-        stc("Синтаксис:   title <new value>\n\r", ch);
-        stc("             title clear\n\r", ch);
-        return false;
-    }
+    return editor(argument, title[EN], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
+}
 
-    if (arg_oneof_strict(argument, "clear", "очистить")) {
-        title.clear();
-        stc("Заголовок очищен.\r\n", ch);
-        return true;
-    }
+HEDIT(uatitle, "укзаголовок", "установить или очистить заголовок вместо автоматического")
+{
+    return editor(argument, title[UA], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
+}
 
-    title = argument;
-    ptc(ch, "Новый заголовок: %s\n\r", title.c_str());
-    return true;
+HEDIT(rutitle, "рузаголовок", "установить или очистить заголовок вместо автоматического")
+{
+    return editor(argument, title[RU], (editor_flags)(ED_HELP_HINTS|ED_NO_NEWLINE));
 }
 
 
@@ -178,7 +205,17 @@ HEDIT(level, "уровень", "установить уровень, с кото
 
 HEDIT(text, "текст", "редактировать текст справки")
 {
-    return editor(argument, text, ED_HELP_HINTS);
+    return editor(argument, text[EN], ED_HELP_HINTS);
+}
+
+HEDIT(uatext, "уктекст", "редактировать текст справки")
+{
+    return editor(argument, text[UA], ED_HELP_HINTS);
+}
+
+HEDIT(rutext, "рутекст", "редактировать текст справки")
+{
+    return editor(argument, text[RU], ED_HELP_HINTS);
 }
 
 HEDIT(commands, "команды", "показать список встроенных команд edit")
@@ -211,12 +248,13 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
     if (args.empty()) {
         stc("Формат:  hedit ключевые слова\r\n", ch);
         stc("         hedit <id>\r\n", ch);
+        stc("         hedit list           - список всех статей\r\n", ch);
         stc("         hedit create         - создать новую пустую статью справки\r\n", ch);
         stc("         hedit search <text>  - поиск в тексте статей, включая ссылки (hh123)\r\n", ch);
+        stc("         hedit save           - сохранить все статьи справки на диск\r\n", ch);
         stc("         hedit label          - список всех меток\r\n", ch);
         stc("         hedit label <name>   - список всех статей у этой метки\r\n", ch);
         stc("         hedit label none     - список всех статей без единой метки\r\n", ch);
-        stc("         hedit id <id>        - список всех статей, чье ID на 10 меньше или больше указаного\r\n", ch);
         return;
     }
 
@@ -226,25 +264,23 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             stc("Справка с таким ID не найдена.\r\n", ch);
             return;
         }
-    } else if (arg_oneof_strict(arg1, "id", "ид")) {
-        ostringstream buf;
-        if (!Integer::tryParse(id, arg2)) {
-            stc("Формат: hedit id <номер>\r\n", ch);
-            return;
+    } else if (arg_oneof(arg1, "save")) {        
+        for (auto &ai: helpManager->getArticles()) {
+            HelpArticle *a = const_cast<HelpArticle *>(*ai);
+            LogStream::sendNotice() << "Saving help " << a->getID() << " " << a->getAllKeywordsString() << endl;
+            a->save();
         }
 
-        int minId = id - 10, maxId = id + 10;
-        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
-
-        buf << "Статьи справки с номерами между " << minId << " и " << maxId << ":" << endl;
+        return;
+    } else if (arg_is_list(arg1)) {
+        ostringstream buf;
         for (auto &a: helpManager->getArticles()) {
-            if (a->getID() >= minId && a->getID() <= maxId)
-                buf << fmt(0, lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str());
+            buf << fmt(0, "[%6d] [%-30.30s{x] {D%-30.30s{x\r\n", 
+                a->getID(), a->getTitle("").c_str(), a->getAllKeywordsString().c_str());
         }
 
         page_to_char(buf.str().c_str(), ch);
         return;
-
     } else if (arg_oneof_strict(arg1, "search")) {
         ostringstream buf;
         const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
@@ -258,7 +294,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         for (auto &a: helpManager->getArticles()) {
             ostringstream matchBuf;
 
-            if (text_match_with_highlight(a->c_str(), arg2, matchBuf)) {
+            if (text_match_with_highlight(a->text.get(RU).c_str(), arg2, matchBuf)) {
                 buf << fmt( 0, lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str())
                     << matchBuf.str()
                     << endl;

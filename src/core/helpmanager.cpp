@@ -8,14 +8,11 @@
 
 template class XMLStub<HelpArticle>;
 
-const DLString HelpArticle::ATTRIBUTE_KEYWORD = "keyword";
 const DLString HelpArticle::ATTRIBUTE_LEVEL = "level";
 const DLString HelpArticle::ATTRIBUTE_REF = "ref";
 const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
 const DLString HelpArticle::ATTRIBUTE_ID = "id";
-const DLString HelpArticle::ATTRIBUTE_TITLE = "title";
-const DLString HelpArticle::ATTRIBUTE_AKA = "aka";
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
@@ -26,7 +23,7 @@ HelpArticle::HelpArticle( )
 
 DLString HelpArticle::getText( Character * ) const
 {
-    return *this;
+    return text.get(RU);
 }
 
 int HelpArticle::getLevel( ) const
@@ -51,42 +48,17 @@ int HelpArticle::getID() const
 
 DLString HelpArticle::getTitle(const DLString &label) const 
 {
-    if (!titleAttribute.empty())
-        return titleAttribute;
+    const DLString &t = title.get(RU);
+
+    if (!t.empty())
+        return t;
     else
         return getAllKeywordsString();
-}
-
-
-void HelpArticle::setText( const DLString &text )
-{
-    assign( text );
 }
 
 void HelpArticle::save() const
 {
     // Empty default impelemntation.
-}
-
-const DLString &HelpArticle::getTitleAttribute() const
-{
-    return titleAttribute;
-}
-
-void HelpArticle::setTitleAttribute(const DLString &title)
-{
-    this->titleAttribute = title;
-}
-
-const DLString &HelpArticle::getKeywordAttribute() const
-{
-    return keywordAttribute;
-}
-
-void HelpArticle::setKeywordAttribute(const DLString &keywordAttribute)
-{
-    this->keywordAttribute = keywordAttribute.toUpper();
-    refreshKeywords();
 }
 
 void HelpArticle::addAutoKeyword(const DLString &keyword)
@@ -115,9 +87,13 @@ void HelpArticle::refreshKeywords()
 {
     keywordsAll.clear();
     keywordsAll.insert(keywordsAuto.begin(), keywordsAuto.end());
-    keywordsAll.fromString(keywordAttribute);
+    keywordsAll.fromString(keyword[EN]);
+    keywordsAll.fromString(keyword[RU]);
 
     keywordsAllString = keywordsAll.toString().toUpper();
+
+    aka.fromString(extra[EN]);
+    aka.fromString(extra[RU]);
 }
 
 bool HelpArticle::visible( Character *ch ) const
@@ -127,17 +103,7 @@ bool HelpArticle::visible( Character *ch ) const
 
 bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
 {
-    XMLStringNoEmpty xmlString( *this );
-
-    if (!xmlString.toXML( parent ))
-        if (keywordAttribute.empty( ) && ref.empty( ) && refby.empty( ) && id <= 0)
-            return false;
-    
-    if (!keywordAttribute.empty( ))
-        parent->insertAttribute( ATTRIBUTE_KEYWORD, keywordAttribute );
-
-    if (!titleAttribute.empty())
-        parent->insertAttribute(ATTRIBUTE_TITLE, titleAttribute);
+    XMLVariableContainer::toXML(parent);
 
     if (level >= -1)
         parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
@@ -147,9 +113,6 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
 
     if (!refby.empty( ))
         parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
-
-    if (!aka.empty())
-        parent->insertAttribute(ATTRIBUTE_AKA, aka.toString());
 
     if (!labels.persistent.empty())
         parent->insertAttribute(ATTRIBUTE_LABELS, labels.persistent.toString());
@@ -162,22 +125,16 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
 
 void HelpArticle::fromXML( const XMLNode::Pointer &parent ) 
 {
-    XMLStringNoEmpty xmlString;
+    XMLVariableContainer::fromXML(parent);
     
-    xmlString.fromXML( parent );
-    assign( xmlString );
-
-    setKeywordAttribute(
-        parent->getAttribute( ATTRIBUTE_KEYWORD ));
-
-    titleAttribute = parent->getAttribute(ATTRIBUTE_TITLE);
     parent->getAttribute( ATTRIBUTE_LEVEL, level);
     parent->getAttribute(ATTRIBUTE_ID, id);
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
     labels.persistent.clear();
     labels.addPersistent(parent->getAttribute(ATTRIBUTE_LABELS));
-    aka.fromString(parent->getAttribute(ATTRIBUTE_AKA));
+
+    refreshKeywords();
 }
 
 /*-----------------------------------------------------------------------

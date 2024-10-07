@@ -28,7 +28,7 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "%RESUME%";
 
     in << endl
-       << *this;
+       << text.get(RU);
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )
@@ -136,7 +136,7 @@ DLString SkillHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (titleAttribute.empty()) {
+    if (title.get(RU).empty()) {
         DLString title = (skill_is_spell(*skill) ? "Заклинание {c" : "Умение {c")
             + skill->getRussianName() + "{x, {c" + skill->getName() + "{x";
 
@@ -148,7 +148,7 @@ DLString SkillHelp::getTitle(const DLString &label) const
         return title;
     }
 
-    return titleAttribute;
+    return title.get(RU);
 }
 
 void SkillHelp::setSkill( Skill::Pointer skill )

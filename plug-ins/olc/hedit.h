@@ -26,8 +26,8 @@ public:
     void show( PCharacter * ) const;
 
     XML_VARIABLE XMLInteger id, level;
-    XML_VARIABLE XMLString keywords, labels, labelsAuto, title, autotitle, aka;
-    XML_VARIABLE XMLString text;
+    XML_VARIABLE XMLString labels, labelsAuto, autotitle;
+    XML_VARIABLE XMLMultiString text, keyword, title, extra;
 
     template <typename T>
     bool cmd(PCharacter *ch, char *argument);

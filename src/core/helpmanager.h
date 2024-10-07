@@ -12,11 +12,14 @@
 #include "xmlstringlist.h"
 #include "xmlstring.h"
 #include "xmlpersistent.h"
+#include "xmlmultistring.h"
+#include "xmlvariablecontainer.h"
 
 class Character;
 struct area_file;
 
-class HelpArticle : public DLString, public virtual DLObject, public virtual  XMLPolymorphVariable {
+class HelpArticle : public XMLVariableContainer {
+XML_OBJECT    
 public:
     typedef ::Pointer<HelpArticle> Pointer;
     
@@ -26,17 +29,10 @@ public:
     virtual void fromXML( const XMLNode::Pointer& ) ;
     /** Return help article formatted for this char. */
     virtual DLString getText( Character * = NULL ) const;
-    /** Assign text for the article. */
-    void setText( const DLString & );
     /** True if help article is visible (e.g. via level restrictions). */
     virtual bool visible( Character * ) const;
     /** Persist an XML file containing this article to disk. */
     virtual void save() const;
-
-    /** Return keywords configured as XML attribute. */
-    const DLString &getKeywordAttribute() const;
-    /** Set keywords XML attribute and refresh all keywords. */
-    void setKeywordAttribute(const DLString &);
 
     /** Add new automatic keyword and refresh all keywords. */
     void addAutoKeyword(const DLString &keyword);
@@ -59,17 +55,15 @@ public:
 
     /** Construct article title depending on implementation. */
     virtual DLString getTitle(const DLString &label) const;
-    /** Return title configured as XML attribute. */
-    const DLString &getTitleAttribute() const;
-    /** Set title attribute that overrides auto-generated title. */
-    void setTitleAttribute(const DLString &);
+
+    /** Regenerate keywordsAll* fields. */
+    void refreshKeywords();
 
     struct area_file * areafile;
 
     StringStorage labels;
 
-    /** XML attribute value for a list of normally hidden keywords, A.K.A., for odd spelling choices.
-     * Can be edited in OLC. */
+    /** Values from 'extra' fields stored as a set for easy access. */
     StringSet aka;
 
     static const DLString ATTRIBUTE_KEYWORD;
@@ -78,15 +72,19 @@ public:
     static const DLString ATTRIBUTE_REFBY;
     static const DLString ATTRIBUTE_LABELS;
     static const DLString ATTRIBUTE_ID;
-    static const DLString ATTRIBUTE_TITLE;
-    static const DLString ATTRIBUTE_AKA;
+    
+    /** Additional keywords, can be edited in OLC. */
+    XML_VARIABLE XMLMultiString keyword;
+
+    /** Overridden article title. */
+    XML_VARIABLE XMLMultiString title;
+
+    /** Hidden keywords, A.K.A., for odd spelling choices. Can be edited in OLC. */
+    XML_VARIABLE XMLMultiString extra;
+    
+    XML_VARIABLE XMLMultiString text;
    
 protected:
-    /** (Extra) keywords specified as an XML attribute for this help article. 
-     *  Can be changed from OLC.
-     */
-    DLString keywordAttribute;
-
     /** A set of auto-generated keywords (coming from area name, skill name etc.) 
      *  Immutable after help is loaded.
      */
@@ -100,9 +98,6 @@ protected:
         inside single quotes. */
     DLString keywordsAllString;
 
-    /** Overridden article title. */
-    DLString titleAttribute;
-
     /** List of help articles this one refers to, specified as an XML attribute. */
     StringSet ref;
 
@@ -115,8 +110,6 @@ protected:
     /** Unique ID. */
     int id;
 
-    /** Regenerate keywordsAll* fields. */
-    void refreshKeywords();
 };
 
 inline const DLString &HelpArticle::getAllKeywordsString() const

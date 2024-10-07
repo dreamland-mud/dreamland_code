@@ -7,22 +7,25 @@
 
 #include "xmlstring.h"
 #include "xmlvariablecontainer.h"
+#include "xmlmultistring.h"
 
-class XMLAreaHelp : public XMLString {
+class XMLAreaHelp : public DLString, public XMLVariableContainer {
 XML_OBJECT
 public:
     typedef ::Pointer<XMLAreaHelp> Pointer;
 
     XMLAreaHelp();
-    bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& );
+    virtual bool toXML( XMLNode::Pointer& ) const;
+    virtual void fromXML( const XMLNode::Pointer& ) ;
 
-    DLString keywordAttribute;
-    DLString aka;
+    XML_VARIABLE XMLMultiString keyword;
+    XML_VARIABLE XMLMultiString title;
+    XML_VARIABLE XMLMultiString extra;
+    XML_VARIABLE XMLMultiString text;
+
     int level;
     DLString labels;
     int id;
-    DLString titleAttribute;
 };
 
 #endif

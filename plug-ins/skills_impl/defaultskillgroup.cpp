@@ -78,7 +78,7 @@ void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
     buf << endl;
 
     if (help)
-        buf << help->c_str( );
+        buf << help->text.get(RU);
 
     if (autoHelp) {
         buf << endl;

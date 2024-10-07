@@ -13,7 +13,7 @@
 #include "olc.h"
 #include "areahelp.h"
 #include "qedit.h"
-
+#include "string_utils.h"
 #include "websocketrpc.h"
 #include "merc.h"
 #include "arg_utils.h"
@@ -397,10 +397,23 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
             ch->pecho("Превращаю автоматическую справку по зоне в постоянную.");
             ahelp->persistent = true;
 
-            StringSet kwd;
-            kwd.fromString(DLString(original->name).colourStrip().quote());
-            kwd.fromString(DLString(original->credits).colourStrip().quote());
-            ahelp->setKeywordAttribute(kwd.toString());
+            DLString aname = DLString(original->name).colourStrip().quote();
+            DLString acredits = DLString(original->credits).colourStrip().quote();
+            StringSet kwd_en, kwd_ru;
+
+            if (String::hasCyrillic(aname))
+                kwd_ru.fromString(aname);
+            else
+                kwd_en.fromString(aname);
+
+            if (String::hasCyrillic(acredits))
+                kwd_ru.fromString(acredits);
+            else
+                kwd_en.fromString(acredits);
+
+            ahelp->keyword[RU] = kwd_ru.toString();
+            ahelp->keyword[EN] = kwd_en.toString();
+            ahelp->refreshKeywords();
 
             ahelp->setID(
                 help_next_free_id()

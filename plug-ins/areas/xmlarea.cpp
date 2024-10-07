@@ -144,13 +144,16 @@ XMLArea::init(area_file *af)
         AreaHelp *ahelp = h->getDynamicPointer<AreaHelp>();
         if (ahelp && ahelp->persistent) {
             XMLAreaHelp help;
-            help.setValue((DLString)(*ahelp));
-            help.keywordAttribute = ahelp->getKeywordAttribute();
-            help.aka = ahelp->aka.toString();
-            help.titleAttribute = ahelp->getTitleAttribute();
+
             help.level = ahelp->getLevel();
             help.id = ahelp->getID();
             help.labels = ahelp->labels.persistent.toString();
+
+            help.title = ahelp->title;
+            help.extra = ahelp->extra;
+            help.keyword = ahelp->keyword;
+            help.text = ahelp->text;
+
             helps.push_back(help); 
         }
     }
@@ -194,14 +197,16 @@ XMLArea::load_helps(AreaIndexData *a)
         aname.colourstrip();
 
         help->areafile = a->area_file;
-        help->selfHelp = is_name(aname.c_str(), h->keywordAttribute.c_str());
+        help->selfHelp = is_name(aname.c_str(), h->keyword.get(RU).c_str()) || is_name(aname.c_str(), h->keyword.get(EN).c_str());
         help->persistent = true;
-        help->setKeywordAttribute(h->keywordAttribute);
-        help->aka.fromString(h->aka);
-        help->setTitleAttribute(h->titleAttribute);
+        help->keyword = h->keyword;
+        help->title = h->title;
+        help->extra = h->extra;
+        help->text = h->text;
+        help->refreshKeywords();
+
         help->setLevel(h->level);
         help->setID(h->id);
-        help->setText(h->getValue());
         help->labels.addPersistent(h->labels);
         helpManager->registrate(help);
         if (help->selfHelp) {
@@ -219,7 +224,7 @@ XMLArea::load_helps(AreaIndexData *a)
         help->persistent = false;
         help->addAutoKeyword(a->getName().colourStrip().quote());
         help->addAutoKeyword(DLString(a->credits).colourStrip().quote());
-        help->setText("     ");
+        help->text[RU] = "    ";
         help->labels.addTransient("area");
         helpManager->registrate(help);
 

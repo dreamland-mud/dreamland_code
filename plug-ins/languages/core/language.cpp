@@ -40,7 +40,7 @@ DLString LanguageHelp::getTitle(const DLString &label) const
         return DLString::emptyString;
     }
 
-    if (!titleAttribute.empty() || !command)
+    if (!title.get(RU).empty() || !command)
         return MarkupHelpArticle::getTitle(label);
 
     buf << "Древний язык {c";
@@ -59,7 +59,7 @@ void LanguageHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "%RESUME%";
 
     in << endl
-       << *this;
+       << text.get(RU);
 }
 
 /*--------------------------------------------------------------------

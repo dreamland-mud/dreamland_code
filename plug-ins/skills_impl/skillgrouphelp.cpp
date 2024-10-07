@@ -38,7 +38,7 @@ DLString SkillGroupHelp::getTitle(const DLString &label) const
         return DLString::emptyString;
     }
     
-    if (!group || !titleAttribute.empty())
+    if (!group || !title.get(RU).empty())
         return MarkupHelpArticle::getTitle(label);
 
     return "Группа умений {c" + group->getRussianName() + "{x, {c" + group->getName() + "{x";

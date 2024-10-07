@@ -80,7 +80,7 @@ DLString RaceHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (titleAttribute.empty() && race)
+    if (title.get(RU).empty() && race)
         return "Раса {c" + race->getMltName().ruscase('1') + "{x, {c" + race->getName() + "{x";
 
     return HelpArticle::getTitle(label);
@@ -114,7 +114,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     in << " или {C" << race->getName( ) << "{x " 
        << editButton(ch) << endl;
     
-    in << endl << *this << endl;
+    in << endl << text.get(RU) << endl;
 
     const PCRace *r = race.getConstPointer<DefaultRace>()->getPC( );
     if (!r || !r->isValid())

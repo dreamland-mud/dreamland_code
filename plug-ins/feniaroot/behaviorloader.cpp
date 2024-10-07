@@ -32,7 +32,7 @@ DLString BehaviorHelp::getTitle(const DLString &label) const
         return DLString::emptyString;
     }
 
-    if (!titleAttribute.empty() || !bhv)
+    if (!title.get(RU).empty() || !bhv)
         return MarkupHelpArticle::getTitle(label);
 
     buf << "Поведение {c" << bhv->getRussianName().ruscase('1') << "{x";

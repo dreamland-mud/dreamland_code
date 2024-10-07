@@ -24,16 +24,7 @@ XMLAreaHelp::XMLAreaHelp()
 
 bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
 {
-    XMLString::toXML(parent);
-
-    if (!keywordAttribute.empty( ))
-        parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keywordAttribute );
-
-    if (!aka.empty())
-        parent->insertAttribute(HelpArticle::ATTRIBUTE_AKA, aka);
-
-    if (!titleAttribute.empty())
-        parent->insertAttribute(HelpArticle::ATTRIBUTE_TITLE, titleAttribute);
+    XMLVariableContainer::toXML(parent);
 
     if (level >= -1)
         parent->insertAttribute( HelpArticle::ATTRIBUTE_LEVEL, DLString( level ) );
@@ -49,10 +40,8 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
 
 void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
 {
-    XMLString::fromXML(parent);
-    keywordAttribute = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
-    aka = parent->getAttribute( HelpArticle::ATTRIBUTE_AKA );
-    titleAttribute = parent->getAttribute(HelpArticle::ATTRIBUTE_TITLE);
+    XMLVariableContainer::fromXML(parent);    
+
     labels = parent->getAttribute(HelpArticle::ATTRIBUTE_LABELS);
     parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL, level );
     parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
@@ -75,7 +64,7 @@ public:
                 a->recover();
                 AreaHelp *help = a->getDynamicPointer<AreaHelp>();
                 help->areafile = area->area_file;
-                if (help->getKeywordAttribute().empty()) {
+                if (help->keyword.get(RU).empty()) {
                     help->persistent = false;
                     help->selfHelp = true;
                     help->addAutoKeyword(aname.quote());

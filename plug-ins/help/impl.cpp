@@ -35,7 +35,7 @@ void help_save_ids()
     Json::Value typeahead;
 
     for (auto &a: helpManager->getArticles()) {
-        if (a->empty())
+        if (a->text.get(RU).empty())
             continue;
 
         if (a->labels.all.count("social") > 0)

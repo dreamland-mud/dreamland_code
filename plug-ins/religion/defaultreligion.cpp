@@ -74,7 +74,7 @@ DLString ReligionHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (titleAttribute.empty() && religion)
+    if (title.get(RU).empty() && religion)
         return "Религия {c" + religion->getRussianName().ruscase('1') + "{x, {c" + religion->getName().upperFirstCharacter() + "{x";
 
     return HelpArticle::getTitle(label);
@@ -93,7 +93,7 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
     }
 
     in << " " << "%PAUSE% " << web_edit_button(ch, "reledit", religion->getName()) << "%RESUME%" << endl << endl
-       << *this;
+       << text.get(RU);
 }
 
 /*----------------------------------------------------------------------

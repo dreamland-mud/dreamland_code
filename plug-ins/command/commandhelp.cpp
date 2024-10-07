@@ -16,7 +16,7 @@ bool CommandHelp::visible( Character *ch ) const
     if (!HelpArticle::visible( ch ))
         return false;
 
-    if (empty())
+    if (text.get(RU).empty())
         return false;
     
     if (getLevel( ) <= 0)
@@ -48,7 +48,7 @@ DLString CommandHelp::getTitle(const DLString &label) const
         return DLString::emptyString;
     }
 
-    if (!titleAttribute.empty() || !command)
+    if (!title.get(RU).empty() || !command)
         return MarkupHelpArticle::getTitle(label);
 
     buf << "Команда {c";

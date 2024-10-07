@@ -58,11 +58,11 @@ void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
         DLString disambig = help_article_disambig(this);
 
         in << "{WСправка на тему {C" << title << "{x " << editButton(ch) << endl;
-    if (!disambig.empty())
-        in << "{DКлючевые слова: " << disambig << "{x" << endl << endl;
+        if (!disambig.empty())
+            in << "{DКлючевые слова: " << disambig << "{x" << endl << endl;
     }
 
-    in << *this;
+    in << text.get(RU);
 }
 
 void MarkupHelpArticle::applyFormatter( Character *ch, ostringstream &in, ostringstream &out ) const

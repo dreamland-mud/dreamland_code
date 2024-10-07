@@ -83,7 +83,7 @@ DLString SocialHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (titleAttribute.empty() && social)
+    if (title.get(RU).empty() && social)
         return "Социал {c" + social->getRussianName() + "{x, {c" + social->getName() + "{x";
         
     return HelpArticle::getTitle(label);
@@ -145,8 +145,8 @@ void SocialHelp::getRawText( Character *ch, ostringstream &buf ) const
     if (ch->is_npc())
         return;
 
-    buf << "Социал {c" << social->getName() << "{x, {c"
-        << social->getRussianName() << "{x: " 
+    buf << "%PAUSE%Социал {c" << social->getRussianName() << "{x, {c"
+        << social->getName() << "{x: " 
         << social->getShortDesc() << endl << endl
         << "Вот как этот социал виден тебе и окружающим, когда он применен..." << endl;
 

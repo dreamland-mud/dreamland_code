@@ -58,6 +58,7 @@ remortdata.h \
 xmlattributes.h \
 bonus.h \
 areaquest.h \
-behavior.h
+behavior.h \
+helpmanager.h
 
 AM_CPPFLAGS += $(src_INCLUDES)

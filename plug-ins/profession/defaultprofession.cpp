@@ -42,7 +42,7 @@ DLString ClassSkillHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (titleAttribute.empty() && prof)
+    if (title.get(RU).empty() && prof)
         return "Умения " + prof->getRusName().ruscase('2');
 
     return HelpArticle::getTitle(label);
@@ -58,7 +58,7 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "Навыки и заклинания класса {C" << prof->getRusName( ).ruscase('1') << "{x, {C"
        << prof->getName( ) << "{x: " << editButton(ch) << endl << endl;
         
-    in << *this;
+    in << text.get(RU);
 
     PCharacter dummy;
     dummy.setLevel(100);
@@ -186,7 +186,7 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (titleAttribute.empty() && prof)
+    if (title.get(RU).empty() && prof)
         return "Класс {c" + prof->getRusName().ruscase('1') + "{x, {c" + prof->getName() + "{x";
 
     return HelpArticle::getTitle(label);
@@ -198,7 +198,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
        << prof->getName( ) << "{x" 
        << editButton(ch) << endl << endl;
         
-    in << *this << endl;
+    in << text.get(RU) << endl;
 
     in << "{cНатура{x    : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
 

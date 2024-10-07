@@ -27,11 +27,12 @@ DLString AreaHelp::getTitle(const DLString &label) const
 {
     ostringstream buf;
     AreaIndexData *area = areafile->area;
+    DLString t = title.get(RU);
 
     // Website: right-hand side table of contents
     if (label == "toc") {
-        if (!titleAttribute.empty())
-            return titleAttribute;
+        if (!t.empty())
+            return t;
             
         buf << "Зона '" << area->getName() << "'";
         return buf.str();
@@ -39,10 +40,10 @@ DLString AreaHelp::getTitle(const DLString &label) const
 
     // Website: article title
     if (label == "title") {
-        return titleAttribute;
+        return t;
     }
 
-    if (!titleAttribute.empty() || !selfHelp)
+    if (!t.empty() || !selfHelp)
         return MarkupHelpArticle::getTitle(label);
 
     buf << "Зона {c" << area->getName() << "{x";
@@ -112,8 +113,8 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 
     in << endl;
 
-    if (!empty())
-       in << *this << endl;
+    if (!text.get(RU).empty())
+       in << text.get(RU) << endl;
 
     if (!area->quests.empty()) {
         ostringstream qbuf;
@@ -167,5 +168,5 @@ int area_helpid(struct AreaIndexData *area)
 /** Return true if this article is empty or consists only of spaces. */
 bool help_is_empty(const HelpArticle &help)
 {
-    return help.find_first_not_of(' ') == DLString::npos;
+    return help.text.get(RU).find_first_not_of(' ') == DLString::npos;
 }

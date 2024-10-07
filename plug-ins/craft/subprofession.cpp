@@ -45,7 +45,7 @@ DLString CraftProfessionHelp::getTitle(const DLString &label) const
     }
 
     // Default title if not set explicitly.
-    if (titleAttribute.empty() && prof)
+    if (title.get(RU).empty() && prof)
         return "Профессия {c" + prof->getRusName().ruscase('1') + "{x, {c" + prof->getName() + "{x";    
     
     return HelpArticle::getTitle(label);
@@ -78,7 +78,7 @@ void CraftProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "Дополнительная профессия {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
        << prof->getName( ) << "{x" << endl << endl;
         
-    in << *this << endl;
+    in << text.get(RU) << endl;
 }
 
 /*-------------------------------------------------------------------
