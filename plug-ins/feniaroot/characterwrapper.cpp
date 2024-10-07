@@ -989,7 +989,7 @@ NMI_SET( CharacterWrapper, level, "настоящий уровень" )
     return target->setLevel( arg.toNumber( ) );
 }
 
-NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 квестов и самооценка новичок")
+NMI_GET( CharacterWrapper, newbie, "true если нет ремортов, <50 квестов")
 {
     checkTarget();
     CHK_NPC
@@ -2848,7 +2848,9 @@ NMI_GET(CharacterWrapper, gquest, "статистика побед в глоба
 {
     checkTarget();
     CHK_NPC
-    auto statAttr = target->getPC()->getAttributes().getAttr<XMLAttributeStatistic>("gquest");
+    auto statAttr = target->getPC()->getAttributes().findAttr<XMLAttributeStatistic>("gquest");
+    if (!statAttr)
+        return Register();
     return statAttr->toRegister(target->getPC(), "gquest");
 }
 
@@ -2856,7 +2858,9 @@ NMI_GET(CharacterWrapper, quest, "статистика побед в авто к
 {
     checkTarget();
     CHK_NPC
-    auto statAttr = target->getPC()->getAttributes().getAttr<XMLAttributeStatistic>("questdata");
+    auto statAttr = target->getPC()->getAttributes().findAttr<XMLAttributeStatistic>("questdata");
+    if (!statAttr)
+        return Register();
     return statAttr->toRegister(target->getPC(), "questdata");
 }
 

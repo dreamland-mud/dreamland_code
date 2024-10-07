@@ -444,14 +444,18 @@ NMI_SET(PlayerWrapper, loyalty, "лояльность по отношению к
 NMI_GET(PlayerWrapper, gquest, "статистика побед в глобальных квестах")
 {
     PCMemoryInterface *player = getTarget();
-    auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>("gquest");
+    auto statAttr = player->getAttributes().findAttr<XMLAttributeStatistic>("gquest");
+    if (!statAttr)
+        return Register();
     return statAttr->toRegister(player, "gquest");
 }
 
 NMI_GET(PlayerWrapper, quest, "статистика побед в авто квестах")
 {
     PCMemoryInterface *player = getTarget();
-    auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>("questdata");
+    auto statAttr = player->getAttributes().findAttr<XMLAttributeStatistic>("questdata");
+    if (!statAttr)
+        return Register();
     return statAttr->toRegister(player, "questdata");
 }
 
@@ -461,3 +465,18 @@ NMI_GET(PlayerWrapper, attributes, "Array всех аттрибутов, клю�
     return player->getAttributes().toRegister();
 }
 
+NMI_GET(PlayerWrapper, newbie, "true если нет ремортов, <50 квестов")
+{
+    PCMemoryInterface *player = getTarget();
+    return Player::isNewbie(player);
+}
+
+NMI_GET(PlayerWrapper, player, "экземпляр персонажа, если online, иначе null")
+{
+    PCMemoryInterface *pci = getTarget();
+    PCharacter *player = pci->getPlayer();
+    if (player)
+        return ::wrap(player);
+    else
+        return Register();
+}
