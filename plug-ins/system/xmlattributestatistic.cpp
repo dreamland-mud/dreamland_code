@@ -197,7 +197,10 @@ Scripting::Register XMLAttributeStatistic::toRegister(PCMemoryInterface *player,
 {
     Register statReg = Register::handler<IdContainer>();
     IdContainer *statContainer = statReg.toHandler().getDynamicPointer<IdContainer>();
-    auto statAttr = player->getAttributes().getAttr<XMLAttributeStatistic>(attrName);
+    
+    auto statAttr = player->getAttributes().findAttr<XMLAttributeStatistic>(attrName);
+    if (!statAttr)
+        return statReg;
 
     statContainer->setField(IdRef("victories"), statAttr->toRegister());
     statContainer->setField(IdRef("rank"), toRankRegister(player, attrName));
