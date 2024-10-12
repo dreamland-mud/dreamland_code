@@ -14,6 +14,7 @@
 #include "comm.h"
 #include "act.h"
 #include "loadsave.h"
+#include "player_utils.h"
 #include "merc.h"
 
 #include "def.h"
@@ -21,29 +22,33 @@
 /*
  * 'commands'
  */
-enum {
-    FCMD_ALIASES = (B),
-    FCMD_HINTS = (C),
-    FCMD_WIZARD = (D),
-    FCMD_SHOW_FIRST_RUS = (E)
-};
 
-static void show_aliases( Command::Pointer cmd, ostringstream &buf, int flags = 0 )
+// Output all command aliases and command names in all languages except for 'lang'
+static DLString show_aliases(Command::Pointer &cmd, lang_t lang)
 {
-    auto &aliases = cmd->aliases.get(EN); 
-    buf << aliases << " ";
+    StringSet aliases;
 
-    auto &russian = cmd->aliases.get(RU);
-    buf << russian << " ";
+    for (int i = LANG_MIN; i < LANG_MAX; i++) {
+        lang_t l = (lang_t)i;
+
+        if (l != lang)
+            aliases.insert(cmd->name.get(l));
+
+        for (auto &alias: cmd->aliases.get(l).split(" "))
+            aliases.insert(alias);
+    }
+
+    return aliases.toString();
 }
 
 static void show_matched_commands( Character *ch, const DLString &arg )
 {
     ostringstream buf;
     bool found = false;
+    lang_t lang = Player::lang(ch);
 
     if (arg.empty( )) {
-        ch->pecho("Использование: {y{lRкоманды показ{lEcommand show{lx{D название{x.");
+        ch->pecho("Использование: {yкоманды показ{D название{x.");
         return;
     }
 
@@ -60,13 +65,14 @@ static void show_matched_commands( Character *ch, const DLString &arg )
             continue;
         
         found = true;
-        show_aliases( cmd, aliases );
-        buf << "Команда {c" << cmd->getName() << "{x, {c" << cmd->getRussianName() << "{x: "
-            << cmd->getHint() << endl;
 
-        if (!aliases.str().empty())
-            buf << "Синонимы: {D" << aliases.str() << "{x" << endl;
+        // Header: name, hint in player's target lang
+        buf << "Команда {c" << cmd->name.get(lang) << "{x: " << cmd->hint.get(lang) << endl;
 
+        // Output names and aliases in all languages
+        buf << "Синонимы: {D" << show_aliases(cmd, lang) << "{x" << endl;
+
+        // Category, position
         DLString cat = cmd->getCommandCategory().messages().toLower();
         if (cat.empty())
             cat = "(нет)";
@@ -86,6 +92,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         
         buf << ".{x" << endl;
 
+        // Command flags and order flags
         buf << "Эта команда {W" << (extra > 0 ? command_flags.messages(extra, true) : "без особенностей") << "{x";
         if (cmd->getOrder().getValue() != 0)
             buf << ", приказы примут {W" << cmd->getOrder().messages(true) << "{x";
@@ -101,10 +108,10 @@ static void show_matched_commands( Character *ch, const DLString &arg )
 
 typedef map<DLString, StringList> Categories;
 
-static Categories group_by_categories(Character *ch, int flags)
+static Categories group_by_categories(Character *ch)
 {
     Categories categories;
-    bool fRus = ch->getConfig( ).rucommands;
+    lang_t lang = Player::lang(ch);
 
     categories["info"].push_back("?");
 
@@ -117,7 +124,7 @@ static Categories group_by_categories(Character *ch, int flags)
         if (cmd->getLevel( ) >= LEVEL_HERO)
             continue;
 
-        DLString name = (fRus && !cmd->getRussianName().empty()) ? cmd->getRussianName() : cmd->getName();
+        DLString name = cmd->name.get(lang);
  
         if (cmd->getCommandCategory().getValue() == 0) {
             categories["misc"].push_back(name);
@@ -134,10 +141,10 @@ static Categories group_by_categories(Character *ch, int flags)
     return categories;
 }
 
-static void show_commands_by_categories( Character *ch, int flags )
+static void show_commands_by_categories( Character *ch)
 {
     ostringstream buf;
-    Categories categories = group_by_categories(ch, flags);
+    Categories categories = group_by_categories(ch);
     
     for (int i = 0; i < command_category_flags.size; i++) {
         DLString name = command_category_flags.fields[i].name;
@@ -149,82 +156,51 @@ static void show_commands_by_categories( Character *ch, int flags )
             buf << setiosflags(ios::right) << setw(21) << msg << resetiosflags(ios::right)
                 << categories[name].join(" ") << endl;
     }
-    buf << "Также смотри {y{lRкоманды список{lEcommand list{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+
+    buf << "Также смотри {y{hcкоманды список{x и {yкоманды показать{D слово{x." << endl;
     ch->send_to(buf);
 }
 
-static void show_commands( Character *ch, int flags )
+static void show_commands_list( Character *ch )
 {
     ostringstream buf;
+    lang_t lang = Player::lang(ch);
 
-    if (IS_SET(flags, FCMD_ALIASES|FCMD_HINTS)) {
-        buf << fmt( 0, "%-12s | %-17s| %s", 
-                    "По-английски", "По-русски", 
-                    IS_SET(flags, FCMD_ALIASES) ? "Синонимы" : "Справка" ) 
-            << endl
-            << "-------------+------------------+--------------------------------------------" 
+
+    buf << fmt( 0, "%-12s | %-45s| %s", 
+                "Название", "Справка", "Синонимы")
+        << endl
+        << "-------------+------------------+--------------------------------------------" 
+        << endl;
+
+    for (auto &c: commandManager->getCommands()) {
+        Command::Pointer cmd = *c;
+        
+        if (!cmd->visible( ch ))
+            continue;
+        
+        if (cmd->getLevel( ) >= LEVEL_HERO)
+            continue;
+
+        DLString name = cmd->name.get(lang);
+        DLString hint = cmd->hint.get(lang);
+        DLString aliases = show_aliases(cmd, lang);
+                
+        buf << fmt( 0, "{c%-12s {x: %-45s: %s",
+                        name.c_str(),
+                        hint.c_str(),
+                        aliases.c_str() )
             << endl;
-
-        for (auto &c: commandManager->getCommands()) {
-            ostringstream other;
-            Command::Pointer cmd = *c;
-            
-            if (!cmd->visible( ch ))
-                continue;
-            
-            if (cmd->getLevel( ) >= LEVEL_HERO)
-                continue;
-            
-            if (IS_SET(flags, FCMD_ALIASES)) 
-                show_aliases( cmd, other );
-            else 
-                other << cmd->getHint( );
-
-            buf << fmt( 0, "{c%-12s {x: %-17s: %s",
-                           cmd->getName( ).c_str( ),
-                           cmd->getRussianName( ).c_str( ),
-                           other.str( ).c_str( ) )
-                << endl;
-        }
-
-        buf << endl;
-        if (IS_SET(flags, FCMD_ALIASES)) 
-            buf << "Также смотри {y{lRкоманды{lEcommand{x, {y{lRкоманды список{lEcommand list{x и {y{lRкоманды показ{lEcommand show{x." << endl;
-        else
-            buf << "Также смотри {y{lRкоманды{lEcommad{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
-
     }
-    else if (IS_SET(flags, FCMD_WIZARD)) {
-        buf << fmt( 0, "%-12s | %-45s | %s", "По-английски", "Справка", "Синонимы" )
-            << endl
-            << "-------------+-----------------------------------------------+---------------" 
-            << endl;
-        for (auto &c: commandManager->getCommands()) {
-            ostringstream aliases;
-            Command::Pointer cmd = *c;
 
-            if (!cmd->visible( ch ))
-                continue;
-            
-            if (cmd->getLevel( ) <  LEVEL_HERO)
-                continue;
-
-            show_aliases( cmd, aliases, FCMD_SHOW_FIRST_RUS );
-
-            buf << fmt( 0, "{c%-12s {x: %-45s : %s",
-                           cmd->getName( ).c_str( ),
-                           cmd->getHint( ).c_str( ),
-                           aliases.str( ).c_str( ) )
-                << endl;
-        }
-    }
+    buf << endl;
+    buf << "Также смотри {y{hcкоманды{x и {yкоманды показ {Dслово{x." << endl;
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
 
 CMDRUN( commands )
 {
-    int flags = 0;
     DLString arg, args = constArguments; 
     
     arg = args.getOneArgument( );
@@ -235,26 +211,19 @@ CMDRUN( commands )
     }
 
     if (arg.empty( )) {
-        show_commands_by_categories(ch, flags);
+        show_commands_by_categories(ch);
         return;
     }
  
-    if (arg_is_list(arg))
-        SET_BIT(flags, FCMD_HINTS);
-
-    if (arg_oneof( arg, "aliases", "синонимы" ))
-        SET_BIT(flags, FCMD_ALIASES);
-    
-    if (!flags) {
-        ch->pecho("Использование:\n"
-        "{lRкоманды{lEcommands{x - таблица всех команд\n"
-        "{lRкоманды список{lEcommands list{x - список команд с краткой справкой\n"
-        "{lRкоманды синонимы{lEcommands aliases{x - список команд и их синонимов\n"
-        "{lRкоманды показ{lEcommands show{x слово - показать синонимы и справку по команде.\n");
+    if (arg_is_list(arg)) {
+        show_commands_list(ch);
         return;
     }
-    
-    show_commands( ch, flags );
+
+    ch->pecho("Использование:\n"
+    "{y{hcкоманды{x        - таблица всех команд\n"
+    "{y{hcкоманды список{x - список команд с краткой справкой\n"
+    "{yкоманды показ{x слово - показать синонимы и справку по команде.\n");
 }
 
 /*
@@ -262,5 +231,22 @@ CMDRUN( commands )
  */
 CMDRUN( wizhelp )
 {
-    show_commands( ch, FCMD_WIZARD );
+    ostringstream buf;
+
+    // TODO rework when most wizhelp commands have UA, RU aliases
+    for (auto &c: commandManager->getCommands()) {
+        Command::Pointer cmd = *c;
+
+        if (!cmd->visible( ch ))
+            continue;
+        
+        if (cmd->getLevel( ) <  LEVEL_HERO)
+            continue;
+
+        buf << fmt( 0, "{c%-12s {x: %-45s ",
+                        cmd->getName( ).c_str( ),
+                        cmd->getHint( ).c_str( ));        
+    }
+
+    page_to_char( buf.str( ).c_str( ), ch );
 }

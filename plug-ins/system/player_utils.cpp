@@ -1,6 +1,7 @@
 #include "player_utils.h"
 #include "xmlattributestatistic.h"
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "commonattributes.h"
 
 /** 
@@ -19,9 +20,16 @@ bool Player::isNewbie(PCMemoryInterface *pcm)
     return true;
 }
 
-lang_t Player::lang(PCMemoryInterface *pcm)
+lang_t Player::lang(Character *ch)
 {
-    auto langAttr = pcm->getAttributes().findAttr<XMLStringAttribute>("lang");
+    if (ch->is_npc()) {
+        if (ch->getNPC()->switchedFrom)
+            return lang(ch->getNPC()->switchedFrom);
+        else
+            return LANG_DEFAULT;
+    }
+
+    auto langAttr = ch->getPC()->getAttributes().findAttr<XMLStringAttribute>("lang");
     if (!langAttr)
         return LANG_DEFAULT;
 

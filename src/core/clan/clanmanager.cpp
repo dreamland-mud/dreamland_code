@@ -30,7 +30,7 @@ GlobalRegistryElement::Pointer ClanManager::getDumbElement( const DLString &name
 
 void ClanManager::addClanHall(const DLString &clanName, area_file *areaFile)
 {
-    LogStream::sendNotice() << "Clan hall for " << clanName << " is " << areaFile->file_name;
+    LogStream::sendNotice() << "Clan hall for " << clanName << " is " << areaFile->file_name << endl;
     clanHalls[clanName] = areaFile;
 }
 

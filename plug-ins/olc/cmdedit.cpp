@@ -301,9 +301,6 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
         ostringstream buf;
 
         for (auto &cmd: commandManager->getCommands()) {
-            if (cmd->name[RU].empty())
-                continue;
-
             DLString format = DLString("{Y") + web_cmd(ch, "cmdedit $1", "%-13.13s") + " {G%-13.13s{x {R%-13.13s{x [{y%-15.15s{x] [{g%-15.15s{x] [{r%-15.15s{x]\r\n";
             buf << fmt(0, format.c_str(), 
                     cmd->name[EN].c_str(), 

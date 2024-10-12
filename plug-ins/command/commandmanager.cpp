@@ -194,8 +194,7 @@ static void guess_command_lang(Character *ch, const DLString &input, lang_t &gue
         guess_1 = guess_2 = EN;
 
     } else {
-        // TODO account for switchedTo for mobs
-        if (!ch->is_npc() && Player::lang(ch->getPC()) == LANG_UA) {
+        if (Player::lang(ch) == LANG_UA) {
             guess_1 = UA;
             guess_2 = RU;
 

@@ -362,9 +362,9 @@ CMDRUNP( oscore )
     if (ch->is_npc( )) {
         buf << fmt(0, 
             "Твои параметры: исходные, (текущие)\n\r"
-            "      Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
-            "  Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
-            "  Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
+            "      Сила : %d(%d)    Интеллект : %d(%d)\n\r"
+            "  Мудрость : %d(%d)     Ловкость : %d(%d)\n\r"
+            "  Сложение : %d(%d)      Обаяние : %d(%d)\n\r",
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS),
@@ -375,9 +375,9 @@ CMDRUNP( oscore )
     } else {
         buf << fmt(0, 
             "Твои параметры: исходные, {c({Wтекущие{c){x, [{Cмаксимальные{x]\n\r"
-            "      Сила(Str): %d{c({W%d{c){x [{C%d{x] Интеллект(Int): %d{c({W%d{c){x [{C%d{x]\n\r"
-            "  Мудрость(Wis): %d{c({W%d{c){x [{C%d{x]  Ловкость(Dex): %d{c({W%d{c){x [{C%d{x]\n\r"
-            "  Сложение(Con): %d{c({W%d{c){x [{C%d{x]   Обаяние(Cha): %d{c({W%d{c){x [{C%d{x]\n\r",
+            "      Сила: %d{c({W%d{c){x [{C%d{x]   Интеллект: %d{c({W%d{c){x [{C%d{x]\n\r"
+            "  Мудрость: %d{c({W%d{c){x [{C%d{x]    Ловкость: %d{c({W%d{c){x [{C%d{x]\n\r"
+            "  Сложение: %d{c({W%d{c){x [{C%d{x]     Обаяние: %d{c({W%d{c){x [{C%d{x]\n\r",
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT), pch->getMaxStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
