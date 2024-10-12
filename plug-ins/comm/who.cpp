@@ -120,62 +120,62 @@ static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict)
 
     if (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO) {
         /* visible only to each other, like vampires >8) */
-        buf << GET_SEX( vict, "{le{C    CODER    {lr{C    КОДЕР    {x",
-                              "{le{C    CODER    {lr{C    КОДЕР    {x",
-                              "{le{C    CODER    {lr{C   КОДЕРША   {x" );         
+        buf << GET_SEX( vict, "{C    КОДЕР    {x",
+                              "{C    КОДЕР    {x",
+                              "{C   КОДЕРША   {x" );         
         return buf.str( );
     }
     
     switch (vict->getLevel( )) {
 
-    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{le{W IMPLEMENTOR {lr{W   ДЕМИУРГ   {x",
-                                              "{le{W IMPLEMENTOR {lr{W   ДЕМИУРГ   {x",
-                                              "{le{WIMPLEMENTRESS{lr{W  ДЕМИУРГИНЯ {x" );            
+    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{W   ДЕМИУРГ   {x",
+                                              "{W   ДЕМИУРГ   {x",
+                                              "{W  ДЕМИУРГИНЯ {x" );            
                         break;
 
-    case MAX_LEVEL - 1: buf << GET_SEX( vict, "{le{С   СREATOR   {lr{С  ТВОРЯЩИЙ   {x",
-                                              "{le{С   СREATOR   {lr{С  ТВОРЯЩИЙ   {x",
-                                              "{le{С   СREATOR   {lr{С  ТВОРЯЩАЯ   {x" );            
+    case MAX_LEVEL - 1: buf << GET_SEX( vict, "{С  ТВОРЯЩИЙ   {x",
+                                              "{С  ТВОРЯЩИЙ   {x",
+                                              "{С  ТВОРЯЩАЯ   {x" );            
                         break;            
 
-    case MAX_LEVEL - 2: buf << GET_SEX( vict, "{le{C  SUPREMACY  {lr{С  ТВОРЯЩИЙ   {x",
-                                              "{le{C  SUPREMACY  {lr{С  ТВОРЯЩИЙ   {x",
-                                              "{le{C  SUPREMACY  {lr{С  ТВОРЯЩАЯ   {x" );            
+    case MAX_LEVEL - 2: buf << GET_SEX( vict, "{С  ТВОРЯЩИЙ   {x",
+                                              "{С  ТВОРЯЩИЙ   {x",
+                                              "{С  ТВОРЯЩАЯ   {x" );            
                         break;
                                        
-    case MAX_LEVEL - 3: buf << GET_SEX( vict, "{le{C    DEITY    {lr{С  ТВОРЯЩИЙ   {x",
-                                              "{le{C    DEITY    {lr{С  ТВОРЯЩИЙ   {x",
-                                              "{le{C    DEITY    {lr{С  ТВОРЯЩАЯ   {x" );            
+    case MAX_LEVEL - 3: buf << GET_SEX( vict, "{С  ТВОРЯЩИЙ   {x",
+                                              "{С  ТВОРЯЩИЙ   {x",
+                                              "{С  ТВОРЯЩАЯ   {x" );            
                         break;
             
-    case MAX_LEVEL - 4: buf << GET_SEX( vict, "{le{C     GOD     {lr{С     БОГ     {x",
-                                              "{le{C     GOD     {lr{С     БОГ     {x",
-                                              "{le{C   GODDESS   {lr{С   БОГИНЯ    {x" );            
+    case MAX_LEVEL - 4: buf << GET_SEX( vict, "{С     БОГ     {x",
+                                              "{С     БОГ     {x",
+                                              "{С   БОГИНЯ    {x" );            
                         break;
             
-    case MAX_LEVEL - 5: buf << GET_SEX( vict, "{le{G   IMMORTAL  {lr{G БЕССМЕРТНЫЙ {x",
-                                              "{le{G   IMMORTAL  {lr{G БЕССМЕРТНЫЙ {x",
-                                              "{le{G   IMMORTAL  {lr{G БЕССМЕРТНАЯ {x" );            
+    case MAX_LEVEL - 5: buf << GET_SEX( vict, "{G БЕССМЕРТНЫЙ {x",
+                                              "{G БЕССМЕРТНЫЙ {x",
+                                              "{G БЕССМЕРТНАЯ {x" );            
                         break;
             
-    case MAX_LEVEL - 6: buf << GET_SEX( vict, "{le{G   DEMIGOD   {lr{G   ПОЛУБОГ   {x",
-                                              "{le{G   DEMIGOD   {lr{G   ПОЛУБОГ   {x",
-                                              "{le{G DEMIGODDESS {lr{G ПОЛУБОГИНЯ  {x" );            
+    case MAX_LEVEL - 6: buf << GET_SEX( vict, "{G   ПОЛУБОГ   {x",
+                                              "{G   ПОЛУБОГ   {x",
+                                              "{G ПОЛУБОГИНЯ  {x" );            
                         break;
 
-    case MAX_LEVEL - 7: buf << GET_SEX( vict, "{le{G    ANGEL    {lr{G    АНГЕЛ    {x",
-                                              "{le{G    ANGEL    {lr{G    АНГЕЛ    {x",
-                                              "{le{G    ANGEL    {lr{G    АНГЕЛ    {x" );            
+    case MAX_LEVEL - 7: buf << GET_SEX( vict, "{G    АНГЕЛ    {x",
+                                              "{G    АНГЕЛ    {x",
+                                              "{G    АНГЕЛ    {x" );            
                         break;
 
-    case MAX_LEVEL - 8: buf << GET_SEX( vict, "{le{G   AVATAR    {lr{G   АВАТАР    {x",
-                                              "{le{G   AVATAR    {lr{G   АВАТАР    {x",
-                                              "{le{G   AVATAR    {lr{G   АВАТАР    {x" );            
+    case MAX_LEVEL - 8: buf << GET_SEX( vict, "{G   АВАТАР    {x",
+                                              "{G   АВАТАР    {x",
+                                              "{G   АВАТАР    {x" );            
                         break;
                         
-    case MAX_LEVEL - 9: buf << GET_SEX( vict, "{le{y  LEGENDARY  {lr{G ЛЕГЕНДАРНЫЙ {x",
-                                              "{le{y  LEGENDARY  {lr{G ЛЕГЕНДАРНЫЙ {x",
-                                              "{le{y  LEGENDARY  {lr{y ЛЕГЕНДАРНАЯ {x" );            
+    case MAX_LEVEL - 9: buf << GET_SEX( vict, "{G ЛЕГЕНДАРНЫЙ {x",
+                                              "{G ЛЕГЕНДАРНЫЙ {x",
+                                              "{y ЛЕГЕНДАРНАЯ {x" );            
                         break;
             
     }

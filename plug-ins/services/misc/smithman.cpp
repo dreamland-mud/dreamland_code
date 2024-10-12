@@ -91,7 +91,7 @@ void Smithman::msgListEmpty( Character *client )
 void Smithman::msgArticleNotFound( Character *client ) 
 {
     interpret_raw( getKeeper( ), "eyebrow", client->getNameC() );
-    say_act(client, getKeeper(), "Я не понимаю, чего ты хочешь. Используй {y{lEsmith list{lRкузница список{lx{g для списка услуг.");
+    say_act(client, getKeeper(), "Я не понимаю, чего ты хочешь. Используй {yкузница список{g для списка услуг.");
 }
 
 void Smithman::msgArticleTooFew( Character *client, Article::Pointer )

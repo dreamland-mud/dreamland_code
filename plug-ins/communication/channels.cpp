@@ -339,7 +339,7 @@ COMMAND(ChannelsCommand, "channels")
         buf << "Ты защищен от подслушивания." << endl;
 
     if (IS_SET(ch->comm, COMM_NOTELL))
-        buf << "Ты не можешь использовать {lRкоманду 'говорить'{Etell{lx." << endl;
+        buf << "Ты не можешь использовать команду 'говорить'." << endl;
 
     if (has_nochannel( ch ))
         buf << "Ты не можешь использовать каналы общения." << endl;

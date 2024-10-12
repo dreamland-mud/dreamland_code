@@ -15,7 +15,7 @@ GROUP(none);
 static void print_see_also(Skill *skill, PCharacter *ch, ostream &buf) 
 {
     // 'См. также справка|help травы|herbs' - с гипер-ссылкой на справку.
-    buf << endl << "См. также {W{lRсправка{lEhelp{lx {hh" << skill->getNameFor(ch) << "{x." << endl;
+    buf << endl << "См. также {Wсправка {hh" << skill->getNameFor(ch) << "{x." << endl;
 }
   
 
@@ -31,7 +31,7 @@ CMDRUN( showskill )
         return;
     
     if (argument.empty( )) {
-        ch->pecho("Использование: {y{lRумение{lEslook{x <умение или заклинание>");
+        ch->pecho("Использование: {yумение{x <умение или заклинание>");
         return;
     }
 

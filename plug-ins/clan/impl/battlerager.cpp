@@ -421,7 +421,7 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
         if (is_name("wiseman", speech) || is_name("aid", speech) || is_name("help", speech)
         || is_name("помоги", speech) || is_name("лекарь", speech))
     {
-        do_say(ch, "Скажи {1{y{leaid me wiseman{lrпомоги мне{2, если тебе нужна помощь.");
+        do_say(ch, "Скажи {1{yпомоги мне{2, если тебе нужна помощь.");
     }
         return;
     }

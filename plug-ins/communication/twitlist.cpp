@@ -49,7 +49,7 @@ void CTwit::doAdd( PCharacter *ch, DLString &arg )
     PCMemoryInterface *pci;
 
     if (arg.empty( )) {
-        ch->pecho("Использование: {lRигнор добавить{lEtwit add{lx <имя>");
+        ch->pecho("Использование: игнор добавить <имя>");
         return;
     }
 
@@ -74,7 +74,7 @@ void CTwit::doAdd( PCharacter *ch, DLString &arg )
 void CTwit::doRemove( PCharacter *ch, DLString &arg )
 {
     if (arg.empty( )) {
-        ch->pecho("Использование: {lRигнор удалить{lEtwit rem{lx <имя> ");
+        ch->pecho("Использование: игнор удалить <имя> ");
         return;
     }
     
@@ -126,9 +126,9 @@ void CTwit::doList( PCharacter *ch )
 
 void CTwit::doUsage( PCharacter *ch )
 {
-    ch->pecho( "{lRигнор добавить{lEtwit add{lx <имя> \r\n"
-                 "{lRигнор удалить{lEtwit rem{lx <имя> \r\n"
-                 "{lRигнор список{lEtwit list{x" );
+    ch->pecho( "игнор добавить <имя> \r\n"
+                 "игнор удалить <имя> \r\n"
+                 "игнор список{x" );
 }
 
 bool talker_is_ignored( PCharacter *ch, PCharacter *talker )

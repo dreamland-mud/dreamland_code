@@ -86,7 +86,7 @@ static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &ar
 
 static void see_also( PCharacter *pch )
 {
-    pch->pecho( "Смотри также {y{lRквест ?{lEquest ?{x для списка всех возможных действий." );
+    pch->pecho( "Смотри также {yквест ?{x для списка всех возможных действий." );
 }
 
 COMMAND(CQuest, "quest")
@@ -221,7 +221,7 @@ COMMAND(CQuest, "quest")
             case QCMD_FIND:
             case QCMD_COMPLETE:
                 pch->pecho("Эта команда недоступна пока ты на корабле.");
-                pch->pecho("Список текущих квестов показывает команда {y{lRквест{lEquest{x.");
+                pch->pecho("Список текущих квестов показывает команда {yквест{x.");
                 break;
         }
         return;
@@ -277,7 +277,7 @@ void CQuest::doInfo( PCharacter *ch )
     autoQuestInfo(ch, buf);
     
     if (buf.str().empty())
-        ch->pecho("У тебя сейчас нет задания от квестора. См. также команду {y{hc{lEquest{lRквест{x.");
+        ch->pecho("У тебя сейчас нет задания от квестора. См. также команду {y{hcквест{x.");
     else
         ch->send_to(buf);
 }
@@ -298,7 +298,7 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
 
     // No active Fenia quest or questor's quest. 
     if (!feniaquest && !autoquest) {
-        ch->pecho("У тебя сейчас нет задания. Подробности читай по команде {y{hc{lEhelp quests{lRсправка квесты{x.");
+        ch->pecho("У тебя сейчас нет задания. Подробности читай по команде {y{hcсправка квесты{x.");
         return;
     }
 
@@ -308,7 +308,7 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
 
     // Fenia quest list footer:
     if (feniaquest)
-        ch->pecho("{WКоманды{x: '{lEquest{lRквест{lx {Dномер{x' для подробностей, '{lEq cancel{lRквест отмен{lx {Dномер{x' для отмены задания.");
+        ch->pecho("{WКоманды{x: 'квест {Dномер{x' для подробностей, 'квест отмен {Dномер{x' для отмены задания.");
 
     // Space between fenia quests and questor's quest:
     if (feniaquest && autoquest)
@@ -318,7 +318,7 @@ void CQuest::doSummary( PCharacter *ch, const DLString &arguments )
     if (autoquest) {
         ch->pecho("{YЗадание квестора{x");
         ch->send_to(buf);
-        ch->pecho("{WКоманды{x: '{lEq complete{lRквест сдать{lx', '{lEq find{lRквест найти{lx', '{lEq cancel{lRквест отменить{lx'.");
+        ch->pecho("{WКоманды{x: 'квест сдать', 'квест найти', 'квест отменить'.");
     }
 }
 
@@ -503,9 +503,9 @@ void CQuest::usage( PCharacter *ch )
     ostringstream buf;
 
     buf << "Укажи одну из квестовых команд:" << endl << "    "
-        << "{lRочки инфо время попросить сдать список купить вернуть найти отменить стат{lEpoints info time request complete list buy trouble find cancel stat{lx." 
+        << "очки инфо время попросить сдать список купить вернуть найти отменить стат." 
         << endl
-        << "Также смотри {W{lR? квесты{lE? quests{x." << endl;
+        << "Также смотри {W? квесты{x." << endl;
     ch->send_to( buf );
 }
 

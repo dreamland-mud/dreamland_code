@@ -57,7 +57,7 @@ CMDRUNP(fly)
     }
     else
     {
-        ch->pecho("Напиши {y{hc{lefly up{lrвзлететь{x или {y{hc{lefly down{lrнелетать{x.");
+        ch->pecho("Напиши {y{hcвзлететь{x или {y{hcнелетать{x.");
         return;
     }
 

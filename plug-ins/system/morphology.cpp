@@ -119,7 +119,7 @@ DLString Syntax::label(const DLString &names)
     if (eng.empty() && rus.empty()) 
         return DLString::emptyString;
 
-    return "{lE" + eng + "{lR" + rus + "{lx";
+    return "" + rus + "";
 }
 
 /** Return true if string doesn't contain any RU characters. */

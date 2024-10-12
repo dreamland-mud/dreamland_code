@@ -95,7 +95,7 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
 
     if (!obj) {
         if (verbose)
-            tell_dim( client, ch, "Я не продаю этого - используй '{lRсписок{lElist{x'." );
+            tell_dim( client, ch, "Я не продаю этого - используй 'список{x'." );
         return;
     }
 

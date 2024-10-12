@@ -47,7 +47,7 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
         } 
 
         if (!path.empty()) {
-            commands.push_back("{IW{lRбег{lErun{lx {x{hs" + collate_speedwalk(path));
+            commands.push_back("{IWбег {x{hs" + collate_speedwalk(path));
             path.clear();
         }
 
@@ -57,11 +57,11 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
         else if (road.type == Road::EEXIT)
             kw = Syntax::label(road.value.eexit->keyword);
 
-        commands.push_back("{hc{lRвойти{lEenter{lx " + kw);
+        commands.push_back("{hcвойти " + kw);
     }
 
     if (!path.empty())
-        commands.push_back("{IW{lRбег{lErun{lx {x{hs" + collate_speedwalk(path));
+        commands.push_back("{IWбег {x{hs" + collate_speedwalk(path));
 
     buf << commands.wrap("{y", "{x").join(" | ");
 }

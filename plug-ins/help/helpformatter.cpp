@@ -26,7 +26,7 @@ void HelpFormatter::setup( Character * )
 // *...*     ->  {y...{w                      (bold text)
 // _..._     ->  {D<{w...{D>{w                (italic with <>)
 // =...=     ->  {c...{w                      (header text)
-// (eng,рус) ->  {lEeng{lRрус{lx              (language choice)
+// (eng,рус) ->  рус              (language choice)
 // [...]     ->  {W...{w                      (reference)
 // %KEYWORD%
 void HelpFormatter::run( Character *ch, ostringstream &out )
@@ -134,7 +134,7 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
 }
 
 // %KEYWORD%:
-// H, HELP     ->  {W{lEhelp{lRсправка{lx{w
+// H, HELP     ->  {Wсправка{w
 // SA, SEEALSO ->  См. также
 // U, USAGE    ->  Использование
 // FMT         ->  {wФормат:{w
@@ -142,22 +142,22 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
 // PAUSE       ->  stops help tag parsing
 // RESUME      ->  resumes help tag parsing
 // A           ->  * 
-// CAST        ->  {lEcast{lRколдовать{lx
+// CAST        ->  колдовать
 // OBJ         ->  предмет
 // CHAR        ->  персонаж
 // PLR         ->  игрок
 // MOB         ->  монстр
 // VICT        ->  жертва
 // DIR         ->  направление
-// YES, NO     ->  {lRда{lEyes{lx, {lRнет{lEno{lx
-// ALL         ->  {lRвсе{lEall{lx
-// SHOW        ->  {lRпоказ{lEshow{lx
-// ON          ->  {lRвкл{lEon{lx
-// OFF         ->  {lRвыкл{lEoff{lx
+// YES, NO     ->  да, нет
+// ALL         ->  все
+// SHOW        ->  показ
+// ON          ->  вкл
+// OFF         ->  выкл
 bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (kw == "H" || kw == "HELP") {
-        out << "{W{lEhelp{lRсправка{lx{w";
+        out << "{Wсправка{w";
         return true;
     }
 
@@ -187,7 +187,7 @@ bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     }
 
     if (kw == "CAST") {
-        out << "{lEcast{lRколдовать{lx";
+        out << "колдовать";
         return true;
     }
 
@@ -223,32 +223,32 @@ bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     }
 
     if (kw == "YES") {
-        out << "{lRда{lEyes{lx";
+        out << "да";
         return true;
     }
 
     if (kw == "NO") {
-        out << "{lRнет{lEno{lx";
+        out << "нет";
         return true;
     }
 
     if (kw == "ALL") {
-        out << "{lRвсе{lEall{lx";
+        out << "все";
         return true;
     }
 
     if (kw == "SHOW") {
-        out << "{lRпоказ{lEshow{lx";
+        out << "показ";
         return true;
     }
 
     if (kw == "ON") {
-        out << "{lRвкл{lEon{lx";
+        out << "вкл";
         return true;
     }
 
     if (kw == "OFF") {
-        out << "{lRвыкл{lEoff{lx";
+        out << "выкл";
         return true;
     }
 

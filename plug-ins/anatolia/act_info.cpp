@@ -168,12 +168,12 @@ CMDRUNP( prompt )
     {
         if (IS_SET(ch->comm,COMM_PROMPT))
         {
-            ch->pecho("Вывод строки состояния {le(prompt) {xвыключен.");
+            ch->pecho("Вывод строки состояния выключен.");
             REMOVE_BIT(ch->comm,COMM_PROMPT);
         }
         else
         {
-            ch->pecho("Вывод строки состояния {le(prompt) {xвключен.");
+            ch->pecho("Вывод строки состояния включен.");
             SET_BIT(ch->comm,COMM_PROMPT);
         }
         return;
@@ -208,7 +208,7 @@ CMDRUNP( battleprompt )
 
    if ( argument[0] == '\0' )
    {
-      ch->pecho("Необходимо указать вид строки состояния.\nДля получения более подробной информации напиши {y{hc{lehelp prompt{lrсправка строка состояния{x'");
+      ch->pecho("Необходимо указать вид строки состояния.\nДля получения более подробной информации напиши {y{hcсправка строка состояния{x'");
       return;
    }
 
@@ -471,7 +471,7 @@ CMDRUNP( oscore )
             GET_AC(ch,AC_BASH),
             GET_AC(ch,AC_SLASH),
             GET_AC(ch,AC_EXOTIC));
-    buf << fmt(0, "{lRТочность{lEHitroll{lx: {C%d{x  {lRУрон{lEDamroll{lx: {C%d{x  {lRЗащита от заклинаний{lESaves vs Spell{lx: {C%d{x\n\r",
+    buf << fmt(0, "Точность: {C%d{x  Урон: {C%d{x  Защита от заклинаний: {C%d{x\n\r",
                 ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
     buf << fmt(0, "У тебя %s натура.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
@@ -1123,12 +1123,12 @@ CMDRUNP(report)
 
         if (!showAll) {
             DLString petName = Syntax::noun(pet->getShortDescr());
-            result << fmt(0, "Напиши {y{hc{lRприказать %1$N3 рапорт все{lEorder %1$N3 report all{x, и я расскажу, что ещё я умею делать.", 
+            result << fmt(0, "Напиши {y{hcприказать %1$N3 рапорт все{x, и я расскажу, что ещё я умею делать.", 
                              petName.c_str())
                    << endl;
         }
 
-        result << endl << "См. также {y{hh1091{lR? приказать{lE? order{x и {y{hh1005{lR? рапорт{lE? report{x" 
+        result << endl << "См. также {y{hh1091? приказать{x и {y{hh1005? рапорт{x" 
                << endl;
 
         page_to_char(result.str().c_str(), pet->master);
@@ -1177,7 +1177,7 @@ CMDRUNP( wimpy )
 
     ch->wimpy        = wimpy;
 
-    ch->pecho("Ты попытаешься убежать при %d очков жизни{le (hit points){x.", wimpy );
+    ch->pecho("Ты попытаешься убежать при %d очков жизни.", wimpy );
     return;
 }
 
@@ -1191,7 +1191,7 @@ CMDRUN( password )
     
     if (argOld.empty() || argNew.empty())
     {
-        ch->pecho("Синтаксис: {lRпароль{lEpassword{lx <старый> <новый>.");
+        ch->pecho("Синтаксис: пароль <старый> <новый>.");
         return;
     }
     
@@ -1744,12 +1744,12 @@ CMDRUNP( score )
         
     ch->pecho(
 "     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r" 
-"     | %sУровень:{x  %3d        %s|%s {lRСила:{lE Str:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sРелигия:{x %-14.14s%s|\n\r"
-"     | %sРаса :{x  %-12s %s| %s{lRУм  :{lE Int:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
-"     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
-"     | %sКласс:{x  %-13s%s| %s{lRЛовк:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-6d%s |\n\r"
-"     | %sНатура:{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|",
+"     | %sУровень:{x  %3d        %s|%s Сила:{x %2d{c({x%2d{c){x {C%2d{x %s| %sРелигия:{x %-14.14s%s|\n\r"
+"     | %sРаса :{x  %-12s %s| %sУм  :{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
+"     | %sПол  :{x  %-11s  %s| %sМудр:{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
+"     | %sКласс:{x  %-13s%s| %sЛовк:{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-6d%s |\n\r"
+"     | %sНатура:{x %-11s  %s| %sСлож:{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
+"     | %sЭтос :{x  %-12s %s| %sОбая:{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|",
 
             CLR_FRAME, CLR_BAR, CLR_FRAME,
 
@@ -1811,7 +1811,7 @@ CMDRUNP( score )
             CLR_BAR,
             CLR_CAPT,
             ch->getProfession( ) == prof_samurai 
-                ?  "{lRСмертей  {lEDeath    {lx" : "{lRТрусость {lEWimpy    {lx" ,
+                ?  "Смертей  " : "Трусость " ,
             ch->getProfession( ) == prof_samurai 
                 ? pch->death.getValue( ) : ch->wimpy.getValue( ),
             CLR_FRAME);
@@ -1886,8 +1886,8 @@ CMDRUNP( score )
     if (ch->is_immortal()) {
         ekle = 1;
         ch->pecho( 
-"     %s| {w{lRНевидимость:{lEInvisible:  {lx {lRуровня{lElevel{lx %3d   "
-         "{lRИнкогнито{lEIncognito  {lx: {lRуровня{lElevel{lx %3d                 %s|",
+"     %s| {wНевидимость: уровня %3d   "
+         "Инкогнито: уровня %3d                 %s|",
               CLR_FRAME,
               pch->invis_level.getValue( ),
               pch->incog_level.getValue( ),
@@ -1919,7 +1919,7 @@ CMDRUNP( score )
 "     | %sВес           :{x  %6d/%-8d    %sЗащита от ударов:{x   %-5d   %s|\n\r"
 "     | %sЗолото        :{Y %-10d          %sЗащита от разрезов:{x %-5d   %s|\n\r"
 "     | %sСеребро       :{W %-10d          %sЗащита от экзотики:{x %-5d   %s|\n\r"
-"     | %sЕдиниц опыта  :{x %-6d              %s{lRЗащита от заклинаний{lESaves vs Spell      {lx:{x %4d  %s|",
+"     | %sЕдиниц опыта  :{x %-6d              %sЗащита от заклинаний:{x %4d  %s|",
         CLR_FRAME,
         CLR_CAPT,
         ch->carry_number, ch->canCarryNumber( ),
@@ -1964,8 +1964,8 @@ CMDRUNP( score )
         CLR_FRAME);
 
     ch->pecho( 
-"     %s| %s{lRТочность{lEHitroll {lx      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
-"     | %s{lRУрон   {lEDamroll{lx       :{x   %-3d           %sДвижения:{x %5d / %5d         %s|",
+"     %s| %sТочность      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
+"     | %sУрон          :{x   %-3d           %sДвижения:{x %5d / %5d         %s|",
         CLR_FRAME,
         CLR_CAPT,
         ch->hitroll.getValue( ),

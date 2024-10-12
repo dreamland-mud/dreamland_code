@@ -51,13 +51,13 @@ void PCharacter::gainExp( int gain )
 
     if (level > 19  && !IS_SET( act, PLR_CONFIRMED )) {
         pecho("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
-                "Прочитай '{lRсправка подтверждение{lEhelp confirm{lx'.");
+                "Прочитай 'справка подтверждение'.");
         return;
     }
 
     if (level > 19  && this->getPC( )->getHometown( ) == home_frigate ) {
         pecho("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
-                "Прочитай '{lRсправка родной город{lEhelp hometown{lx'.");
+                "Прочитай 'справка родной город'.");
         return;
     }
 
@@ -152,14 +152,14 @@ void PCharacter::advanceLevel( )
     perm_move        += add_move;
     
     buf << "{CТы получаешь: "
-        << "{Y" << add_hp << "{C/" << max_hit << " {lRздоровья{lEhp{lx, "
-        << "{Y" << add_mana << "{C/" << max_mana << " {lRманы{lEmana{lx, "
-        << "{Y" << add_move << "{C/" << max_move << " {lRдвижения{lEmove{lx, "
+        << "{Y" << add_hp << "{C/" << max_hit << " здоровья, "
+        << "{Y" << add_mana << "{C/" << max_mana << " маны, "
+        << "{Y" << add_move << "{C/" << max_move << " движения, "
         <<  endl <<  "              " 
-        << "{Y" << add_prac << "{C/" << practice << " {lRпрактики{lEprac{lx";
+        << "{Y" << add_prac << "{C/" << practice << " практики";
 
     if (add_train > 0)
-        buf << ", {Y" << add_train << "{C/" << train << " {lRтренировку{lEtrain{lx";
+        buf << ", {Y" << add_train << "{C/" << train << " тренировку";
     
     buf << ".{x";
     pecho( buf.str( ).c_str( ) );

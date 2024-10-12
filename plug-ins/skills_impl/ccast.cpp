@@ -170,7 +170,7 @@ CMDRUN( cast )
         if (ch->is_npc( ) && IS_CHARMED(ch)) 
             say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
-            ch->pecho("У тебя не хватает энергии{lE (mana){x.");
+            ch->pecho("У тебя не хватает энергии.");
 
         return;
     }

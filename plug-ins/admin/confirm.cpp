@@ -117,7 +117,7 @@ void Confirm::doRequest( Character *ch )
     }
     
     if (descr.empty( )) {
-        ch->pecho("Прочитай внимательно '{lRсправка подтверждение{lEhelp confirm{lx' и '{lRсправка описание{lEhelp description{lx'.");
+        ch->pecho("Прочитай внимательно 'справка подтверждение' и 'справка описание'.");
         return;
     }
 
@@ -402,7 +402,7 @@ void Confirm::usage( Character *ch )
     std::basic_ostringstream<char> buf;
    
     buf << "Формат:" << endl
-        << "{lEconfirm{lRподтверждение{lx {lErequest{lRпопросить{x  - послать заявку на подтверждение персонажа" << endl;
+        << "подтверждение попросить{x  - послать заявку на подтверждение персонажа" << endl;
 
     if (!ch->is_immortal( )) {
         ch->send_to( buf );

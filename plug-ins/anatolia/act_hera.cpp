@@ -278,13 +278,13 @@ CMDRUNP( auction )
         {
                 if (arg_is_switch_on( arg1 ))
                 {
-                        ch->pecho("Канал Аукциона{le (Auction){x теперь {Rвключен{x.");
+                        ch->pecho("Канал Аукциона теперь {Rвключен{x.");
                         REMOVE_BIT(ch->comm,COMM_NOAUCTION);
                         return;
                 }
                 else
                 {
-                        ch->pecho("Канал Аукциона{le (Auction){x теперь {Rвыключен{x.");
+                        ch->pecho("Канал Аукциона теперь {Rвыключен{x.");
                         ch->pecho("Для получения информации по этому каналу включи его.");
                         return;
                 }
@@ -366,7 +366,7 @@ CMDRUNP( auction )
 
         if (arg_is_switch_off( arg1 ))
         {
-                ch->pecho("Канал Аукциона{le (Auction){x теперь {Rвыключен{x.");
+                ch->pecho("Канал Аукциона теперь {Rвыключен{x.");
                 SET_BIT(ch->comm,COMM_NOAUCTION);
                 return;
         }

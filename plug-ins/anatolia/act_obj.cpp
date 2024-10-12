@@ -133,14 +133,14 @@ bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gol
 {
     if ((!arg_is_silver( arg ) && !arg_is_gold( arg ) )) {
         if (!str_prefix( arg, "серебр" ) || !str_prefix( arg, "silver" )) {
-            ch->pecho( "Укажи название монеты полностью: {lrсеребро{lesilver{x." );
+            ch->pecho( "Укажи название монеты полностью: серебро{x." );
             return false;
         }
         if (!str_prefix( arg, "золот" ) || !str_prefix( arg, "gold" )) {
-            ch->pecho( "Укажи название монеты полностью: {lrзолото{legold{x." );
+            ch->pecho( "Укажи название монеты полностью: золото{x." );
             return false;
         }
-        ch->pecho( "Ты можешь указать количество денег в серебре {le(silver) {xили золоте {le(gold){x." );
+        ch->pecho( "Ты можешь указать количество денег в серебре или золоте ." );
         return false;
     }
     if (amount < 0) {
@@ -1617,7 +1617,7 @@ CMDRUNP( make )
         }
     }
 
-    ch->pecho("Ты можешь изготовить только лук {le(bow) {xили стрелы{le (arrow){x.");
+    ch->pecho("Ты можешь изготовить только лук или стрелы.");
 }
 
 CMDRUNP( search )
@@ -1631,6 +1631,6 @@ CMDRUNP( search )
         }
     }
 
-    ch->pecho("Ты можешь искать только камни{le (stones){x.");
+    ch->pecho("Ты можешь искать только камни.");
 }
 

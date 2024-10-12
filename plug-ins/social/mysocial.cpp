@@ -47,7 +47,7 @@ COMMAND(MySocial, "mysocial")
     else if (arg_is_show( cmd ))
         doShow( ch, attr, name );
     else if (arg.empty( )) 
-        ch->pecho( "Укажи, какой вид сообщения изменить и как. Смотри '{lRмойсоц ?{lEmysoc help{lx'." );
+        ch->pecho( "Укажи, какой вид сообщения изменить и как. Смотри 'мойсоц ?'." );
     else {
         CustomSocial::Pointer social;
         XMLAttributeCustomSocials::iterator i = attr->find( name );
@@ -115,7 +115,7 @@ COMMAND(MySocial, "mysocial")
                 return;
         }
         else {
-            ch->pecho("Нет такого вида сообщений. Смотри '{lRмойсоц ?{lEmysoc help{lx'.");
+            ch->pecho("Нет такого вида сообщений. Смотри 'мойсоц ?'.");
             return;
         }
 
@@ -260,17 +260,17 @@ void MySocial::doShow( Character *ch, XMLAttributeCustomSocials::Pointer attr, c
     buf << endl;
 
     buf << "{cПри использовании без аргумента{x: " << endl
-        << "Ты увидишь ({lRбезцели_я{lEnoarg_me{lx):  " << c->getNoargMe( ) << endl  
-        << "Окружающие увидят ({lRбезцели_другие{lEnoarg_other{lx):  " << c->getNoargOther( ) << endl 
+        << "Ты увидишь (безцели_я):  " << c->getNoargMe( ) << endl  
+        << "Окружающие увидят (безцели_другие):  " << c->getNoargOther( ) << endl 
         << endl
         << "{cПри использовании на кого-то{x: " << endl
-        << "Ты увидишь ({lRнацель_я{lEarg_me{lx):  " << c->getArgMe( ) << endl
-        << "Жертва увидит ({lRнацель_жертва{lEarg_victim{lx):  " << c->getArgVictim( ) << endl 
-        << "Все остальные увидят ({lRнацель_другие{lEarg_other{lx):  " << c->getArgOther( ) << endl 
+        << "Ты увидишь (нацель_я):  " << c->getArgMe( ) << endl
+        << "Жертва увидит (нацель_жертва):  " << c->getArgVictim( ) << endl 
+        << "Все остальные увидят (нацель_другие):  " << c->getArgOther( ) << endl 
         << endl
         << "{cПри использовании на самого себя{x: " << endl
-        << "Ты увидишь ({lRнасебя_я{lEauto_me{lx):  " << c->getAutoMe( ) << endl 
-        << "Окружающие увидят ({lRнасебя_другие{lEauto_other{lx):  " << c->getAutoOther( ) << endl;
+        << "Ты увидишь (насебя_я):  " << c->getAutoMe( ) << endl 
+        << "Окружающие увидят (насебя_другие):  " << c->getAutoOther( ) << endl;
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -280,22 +280,22 @@ void MySocial::usage( Character *ch )
 {
     ostringstream buf;
     
-    buf << "{W{lRмойсоциал список{lEmysocial list{lx{w" << endl
+    buf << "{Wмойсоциал список{w" << endl
         << "      - показать список социалов" << endl
-        << "{W{lRмойсоциал показать{lEmysocial show{lx{w <название>" << endl
+        << "{Wмойсоциал показать{w <название>" << endl
         << "      - показать подробности социала" << endl
-        << "{W{lRмойсоциал удалить{lEmysocial del{lx{w <название>" << endl
+        << "{Wмойсоциал удалить{w <название>" << endl
         << "      - удалить социал" << endl
-        << "{W{lRмойсоциал рус{lEmysocial rus{lx{w <название> <синоним>" << endl
+        << "{Wмойсоциал рус{w <название> <синоним>" << endl
         << "      - присвоить русский синоним" << endl
-        << "{W{lRмойсоциал безцели_другие|безцели_я{lEmysocial noarg_other|noarg_me{lx{w <название> <строка>" << endl
+        << "{Wмойсоциал безцели_другие|безцели_я{w <название> <строка>" << endl
         << "      - задать социал, который используется без указания цели" << endl
-        << "{W{lRмойсоциал насебя_другие|насебя_я{lEmysocial auto_other|auto_me{lx{w <название> <строка>" << endl
+        << "{Wмойсоциал насебя_другие|насебя_я{w <название> <строка>" << endl
         << "      - задать социал, который используется на самого себя" << endl
-        << "{W{lRмойсоциал нацель_другие|нацель_я|нацель_жертва{lEmysocial arg_other|arg_me|arg_victim{lx{w <название> <строка>" << endl
+        << "{Wмойсоциал нацель_другие|нацель_я|нацель_жертва{w <название> <строка>" << endl
         << "      - задать социал, который используется на кого-то другого" << endl
         << endl
-        << "Подробности смотри в '{lR? мойсоциал{lEhelp mysocial{lx'." << endl;
+        << "Подробности смотри в '? мойсоциал'." << endl;
 
     ch->send_to( buf );
 }

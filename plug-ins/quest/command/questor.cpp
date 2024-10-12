@@ -75,7 +75,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         if (client->getAttributes( ).isAvailable( "quest" )) 
             tell_raw( client, ch, "Твое задание невозможно выполнить." );
         else
-            tell_fmt( "{1Тебе нужно сначала {yпопросить{le (quest request){x{2 задание, %1$C1.", client, ch );
+            tell_fmt( "{1Тебе нужно сначала {yпопросить{2 задание, %1$C1.", client, ch );
             
         return;
     }
@@ -530,7 +530,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     if (!IS_SET( client->act, PLR_CONFIRMED )) {
         if (attr->getAllVictoriesCount() > 20) {
             tell_raw( client, ch, "Попроси у богов подтверждения своему персонажу, чтобы продолжить выполнять задания.");
-            tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {y{hc{lRсправка подтверждение{lEhelp confirm{x." );
+            tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {y{hcсправка подтверждение{x." );
             return;
         }
     } else if (descr.empty( )) {
@@ -577,8 +577,8 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         client->send_to(buf);
 
         tell_raw(client, ch, "Подробнее о каждом из них ты можешь прочитать в справке по теме '{W{hhвиды заданий{hx{G'.");
-        tell_raw(client, ch, "Выбери поручение и укажи его номер, например {y{lRзадание просить 3{lEquest request 3{x.");
-        tell_raw(client, ch, "Или же попроси у меня задание на мое усмотрение: {y{lRзадание просить любое{lEquest request any{x.");
+        tell_raw(client, ch, "Выбери поручение и укажи его номер, например {yзадание просить 3{x.");
+        tell_raw(client, ch, "Или же попроси у меня задание на мое усмотрение: {yзадание просить любое{x.");
         return;
     }
 
@@ -588,7 +588,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             attr->setStartTime();
             PCharacterManager::save( client );
 
-            tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hcзадание найти{x.");
 
             if (Player::isNewbie(client))
                tell_raw(client, ch, "Для новичков, живущих первую жизнь, это бесплатно!");
@@ -620,7 +620,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             attr->setStartTime();
             PCharacterManager::save(client);
 
-            tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            tell_raw(client, ch, "Если не сможешь справиться -- попроси у меня подсказку командой {y{hcзадание найти{x.");
             if (Player::isNewbie(client))
                 tell_raw(client, ch, "Для новичков, живущих первую жизнь, это бесплатно!");
 
@@ -676,7 +676,7 @@ QuestRegistratorBase::Pointer Questor::parseQuestArgument(PCharacter *client, co
     }
 
     if (!result)
-        tell_fmt("Я не умею читать мысли, %1$C1. Укажи номер задания, название или {1{Y{lRлюбое{lEany{lx{2.", client, ch);
+        tell_fmt("Я не умею читать мысли, %1$C1. Укажи номер задания, название или {1{Yлюбое{2.", client, ch);
 
     return result;
 }
@@ -688,7 +688,7 @@ void Questor::give( Character *victim, Object *obj )
 
     if (!victim->is_npc() && obj->behavior && obj->behavior.getDynamicPointer<ObjQuestBehavior>()) {
         tell_fmt("Нет нужды передавать мне %3$O4.", victim, ch, obj);
-        tell_fmt("Если ты закончил%1$Gо||а мое задание, просто набери {y{hc{lRзадание сдать{lEquest complete{x.", victim, ch);
+        tell_fmt("Если ты закончил%1$Gо||а мое задание, просто набери {y{hcзадание сдать{x.", victim, ch);
     }
 
     victim->pecho("%1$^C1 возвраща%1$nет|ют тебе %2$O4.", ch, obj);

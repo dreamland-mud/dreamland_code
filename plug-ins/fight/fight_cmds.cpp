@@ -67,7 +67,7 @@ CMDRUN( kill )
 
     if ( !victim->is_npc() )
     {
-        ch->pecho("Чтобы напасть на игрока используй команду {y{hh{lemurder{lrпорешить{x.");
+        ch->pecho("Чтобы напасть на игрока используй команду {y{hhпорешить{x.");
         return;
     }
 

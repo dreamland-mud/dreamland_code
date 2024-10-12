@@ -19,45 +19,45 @@ NoteThreadRegistrator * NoteThreadRegistrator::first = 0;
 NOTE_DECL(note);
 VOID_NOTE(note)::getUnreadMessage( int count, ostringstream &buf ) const 
 {
-    // Example: У тебя {W8{x непрочитанных писем ('{hc{y{lRписьмо{lEnote{x').
-    buf << fmt( 0, "У тебя {W%1$d{x непрочитан%1$Iное|ных|ных пис%1$Iьмо|ьма|ем ('{hc{y{lRписьмо{lEnote{x').", count ) << endl;
+    // Example: У тебя {W8{x непрочитанных писем ('{hc{yписьмо{x').
+    buf << fmt( 0, "У тебя {W%1$d{x непрочитан%1$Iное|ных|ных пис%1$Iьмо|ьма|ем ('{hc{yписьмо{x').", count ) << endl;
 }
 
 NOTE_DECL(news);
 VOID_NOTE(news)::getUnreadMessage( int count, ostringstream &buf ) const 
 {
-    // Example: {W5{x новостей ожидают тебя ('{hc{y{lRновость{lEnews{x').
-    buf << fmt( 0, "{W%1$d{x новост%1$Iь|и|ей ожида%1$Iет|ют|ют тебя ('{hc{y{lRновость{lEnews{x').", count ) << endl;
+    // Example: {W5{x новостей ожидают тебя ('{hc{yновость{x').
+    buf << fmt( 0, "{W%1$d{x новост%1$Iь|и|ей ожида%1$Iет|ют|ют тебя ('{hc{yновость{x').", count ) << endl;
 }
 
 NOTE_DECL(change);
 VOID_NOTE(change)::getUnreadMessage( int count, ostringstream &buf ) const 
 {
-    // Example: За последнее время произошли {W2{x изменения ('{hc{y{lRизменение{lEchange{x').
-    buf << fmt( 0, "За последнее время произошл%1$Iо|и|и {W%1$d{x изменен%1$Iие|ия|ий ('{hc{y{lRизменение{lEchange{x').", count ) << endl;
+    // Example: За последнее время произошли {W2{x изменения ('{hc{yизменение{x').
+    buf << fmt( 0, "За последнее время произошл%1$Iо|и|и {W%1$d{x изменен%1$Iие|ия|ий ('{hc{yизменение{x').", count ) << endl;
 }
 
 NOTE_DECL(story);
 VOID_NOTE(story)::getUnreadMessage( int count, ostringstream &buf ) const 
 {
-    // Example: {W10{x новых историй ожидают прочтения ('{hc{y{lRистория{lEstory{x').
-    buf << fmt( 0, "{W%1$d{x нов%1$Iая|ые|ых истор%1$Iия|ии|ий ожида%1$Iет|ют|ют прочтения ('{hc{y{lRистория{lEstory{x').", count ) << endl;
+    // Example: {W10{x новых историй ожидают прочтения ('{hc{yистория{x').
+    buf << fmt( 0, "{W%1$d{x нов%1$Iая|ые|ых истор%1$Iия|ии|ий ожида%1$Iет|ют|ют прочтения ('{hc{yистория{x').", count ) << endl;
 }
 
 
 NOTE_DECL(penalty);
 VOID_NOTE(penalty)::getUnreadMessage( int count, ostringstream &buf ) const 
 {
-    // Example: Опубликованы {W8{x сообщений о Каре Небесной ('{hc{y{lRнаказание{lEpenalty{x').
-    buf << fmt( 0, "Опубликован%1$Iо|ы|ы {W%1$d{x сообщен%1$Iие|ия|ий о Каре Небесной ('{hc{y{lRнаказание{lEpenalty{x').", count ) << endl;
+    // Example: Опубликованы {W8{x сообщений о Каре Небесной ('{hc{yнаказание{x').
+    buf << fmt( 0, "Опубликован%1$Iо|ы|ы {W%1$d{x сообщен%1$Iие|ия|ий о Каре Небесной ('{hc{yнаказание{x').", count ) << endl;
 }
 
 
 NOTE_DECL(crime);
 VOID_NOTE(crime)::getUnreadMessage( int count, ostringstream &buf ) const 
 {
-    // Example: Тебя ожидает {W1{x сообщение о преступлениях ('{hc{y{lRпреступление{lEcrime{x').
-    buf << fmt( 0, "Тебя ожида%1$Iет|ют|ют {W%1$d{x сообщен%1$Iие|ия|ий о преступлени%1$Iи|ях|ях ('{hc{y{lRпреступление{lEcrime{x').", count ) << endl;
+    // Example: Тебя ожидает {W1{x сообщение о преступлениях ('{hc{yпреступление{x').
+    buf << fmt( 0, "Тебя ожида%1$Iет|ют|ют {W%1$d{x сообщен%1$Iие|ия|ий о преступлени%1$Iи|ях|ях ('{hc{yпреступление{x').", count ) << endl;
 }
 TYPE_NOTE(bool, crime)::canWrite( const PCharacter *ch ) const 
 {
@@ -70,8 +70,8 @@ TYPE_NOTE(bool, crime)::canWrite( const PCharacter *ch ) const
 NOTE_DECL(qnote);
 VOID_NOTE(qnote)::getUnreadMessage( int count, ostringstream &buf ) const 
 {
-    // Example: Тебя ожидает {W2{x сообщения о глобальных квестах ('{hc{y{lRквестнота{lEqnote{x').
-    buf << fmt( 0, "Тебя ожида%1$Iет|ют|ют {W%1$d{x сообщен%1$Iие|ия|ий о глобальн%1$Iом|ых|ых квест%1$Iе|ах|ах ('{hc{y{lRквестнота{lEqnote{x').", count ) << endl;
+    // Example: Тебя ожидает {W2{x сообщения о глобальных квестах ('{hc{yквестнота{x').
+    buf << fmt( 0, "Тебя ожида%1$Iет|ют|ют {W%1$d{x сообщен%1$Iие|ия|ий о глобальн%1$Iом|ых|ых квест%1$Iе|ах|ах ('{hc{yквестнота{x').", count ) << endl;
 }
 
 extern "C"

@@ -162,7 +162,7 @@ static void scan_people(Room *room, Character *ch, int depth, int door,
         buf << "    {" << CLR_SCAN_MOB(ch) << ch->sees(orig, '1') << ".{x";
 
         if (IS_SET(orig->comm, COMM_AFK))
-            buf << " {w[{C{leAFK{lrАФК{x{w]{x";
+            buf << " {w[{CАФК{x{w]{x";
 
         buf << endl;
     }

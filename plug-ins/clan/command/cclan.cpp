@@ -136,20 +136,20 @@ void CClan::usage( PCharacter *pc )
 {    
     basic_ostringstream<char> buf;
 
-    buf << "{W{lRклан список{lEclan list  {lx{x     показать список всех кланов" << endl
-        << "{W{lRклан счет {lEclan count{lx{x      показать количество игроков в кланах" << endl
-        << "{W{lRклан банк{lEclan bank{lx{x       операции с клановым банком (подробнее см. {W{lRклан банк помощь{lEclan bank help{lx{x)" << endl
-        << "{W{lRклан выгнать{lEclan remove {lx{x    выйти (выгнать кого-либо) из клана (см. {W{lRклан выгнать помощь{lEclan remove help{lx{x)" << endl
-        << "{W{lRклан уровень{lEclan level  {lx{x    посмотреть/установить клановый уровень (см. {W{lRклан уровень помощь{lEclan level help{lx{x)" << endl
-        << "{W{lRклан состав{lEclan member{lx{x     показывает лидеру список членов клана (см. {W{lRклан состав помощь{lEclan member help{lx{x)" << endl
-        << "{W{lRклан петиция {lEclan petition{lx{x   написать/принять/отклонить петицию на вступление в клан" << endl
-        << "                (см. {W{lRклан петиция помощь{lEclan petition help{lx{x)" << endl           
-        << "{W{lRклан дипломатия{lEclan diplomacy {lx{x посмотреть/установить клановую дипломатию (см. {W{lRклан дипломатия помощь{lEclan dipl help{lx{x)" << endl;
+    buf << "{Wклан список{x     показать список всех кланов" << endl
+        << "{Wклан счет {x      показать количество игроков в кланах" << endl
+        << "{Wклан банк{x       операции с клановым банком (подробнее см. {Wклан банк помощь{x)" << endl
+        << "{Wклан выгнать{x    выйти (выгнать кого-либо) из клана (см. {Wклан выгнать помощь{x)" << endl
+        << "{Wклан уровень{x    посмотреть/установить клановый уровень (см. {Wклан уровень помощь{x)" << endl
+        << "{Wклан состав{x     показывает лидеру список членов клана (см. {Wклан состав помощь{x)" << endl
+        << "{Wклан петиция {x   написать/принять/отклонить петицию на вступление в клан" << endl
+        << "                (см. {Wклан петиция помощь{x)" << endl           
+        << "{Wклан дипломатия{x посмотреть/установить клановую дипломатию (см. {Wклан дипломатия помощь{x)" << endl;
 
     if (pc->is_immortal( ))
-        buf << "{W{lRклан принять{lEclan induct {lx{x    принять кого-то в клан" << endl
-            << "{W{lRклан рейтинг{lEclan rating {lx{x    рейтинг клана согласно статистике побед/поражений" << endl
-            << "{W{lRклан статус{lEclan status{lx{x     показать статистику побед/поражений по уровням" << endl;        
+        buf << "{Wклан принять{x    принять кого-то в клан" << endl
+            << "{Wклан рейтинг{x    рейтинг клана согласно статистике побед/поражений" << endl
+            << "{Wклан статус{x     показать статистику побед/поражений по уровням" << endl;        
     
     pc->send_to( buf );
 }
@@ -174,7 +174,7 @@ void CClan::clanList( PCharacter* pc )
         }
     }
 
-    pc->pecho("\n\rПодробнее смотри команду {lRклан ?{lEclan ?{lx{x.");                              
+    pc->pecho("\n\rПодробнее смотри команду клан ?{x.");                              
 }
 
 /*
@@ -350,7 +350,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     else if (arg_oneof( argumentOne, "withdraw", "сосчета", "снять" )) 
         mode = CB_MODE_WITHDRAW;
     else {
-        pc->pecho("Можно задать только режим {lR'положить'{lEdeposit{lx или {lR'снять'{lEwithdraw{lx.");
+        pc->pecho("Можно задать только режим 'положить' или 'снять'.");
         return;
     }
 
@@ -376,7 +376,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( )) {
-        pc->pecho("Укажи единицу расчета ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).");
+        pc->pecho("Укажи единицу расчета (кп, золото, серебро, бриллианты).");
         return;
     }
     
@@ -390,7 +390,7 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
         currency = CB_CURR_DIAMOND;
     else
     {
-        pc->pecho("Кланбанк оперирует только с {lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx.");
+        pc->pecho("Кланбанк оперирует только с кп, золото, серебро, бриллианты.");
         return;
     }
 
@@ -694,21 +694,21 @@ void CClan::clanBankHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf << "{W{lRклан банк положить{lEclan bank deposit{lx{x <кол-во> {W{lRкп{lEqp{lx{x|{W{lRзолото{lEgold{lx{x|{W{lRсеребро{lEsilver{lx{x|{W{lRбриллианты{lEdiamonds{lx{x" << endl
+    buf << "{Wклан банк положить{x <кол-во> {Wкп{x|{Wзолото{x|{Wсеребро{x|{Wбриллианты{x" << endl
         << "          - положить деньги(qp, бриллианты..) в свой кланбанк" << endl
         << endl
         << "Для лидеров:" << endl
-        << "{W{lRклан банк снять{lEclan bank withdraw{lx {x<кол-во> {W{lRкп{lEqp{lx{x|{W{lRзолото{lEgold{lx{x|{W{lRсеребро{lEsilver{lx{x|{W{lRбриллианты{lEdiamonds{lx{x" << endl
+        << "{Wклан банк снять {x<кол-во> {Wкп{x|{Wзолото{x|{Wсеребро{x|{Wбриллианты{x" << endl
         << "          - снять деньги(qp) со счета своего кланбанка" << endl
-        << "{W{lRклан банк снять{lEclan bank withdraw{lx {x<кол-во> {W{lRкп{lEqp{lx {lRклану{lEclan{lx {x<клан>" << endl
+        << "{Wклан банк снять {x<кол-во> {Wкп клану {x<клан>" << endl
         << "          - перевести qp на кланбанк другого клана" << endl
-        << "{W{lRклан банк снять{lEclan bank withdraw{lx {x<кол-во> {W{lRкп{lEqp{lx {lRперсонажу{lEchar{lx {x<имя>" << endl
+        << "{Wклан банк снять {x<кол-во> {Wкп персонажу {x<имя>" << endl
         << "          - отдать qp с кланбанка соклановику" << endl;
     
     if (pc->is_immortal( ))
         buf << endl
             << "Для Бессмертных: обязательно указывать имя клана, т.е." << endl
-            << "{W{lRклан банк{lEclan bank{lx {x<клан> {W{lRположить{lEdeposit{lx{x|{W{lRснять{lEwithdraw{lx{x ..." << endl;
+            << "{Wклан банк {x<клан> {Wположить{x|{Wснять{x ..." << endl;
 
     pc->send_to( buf );
 }
@@ -807,10 +807,10 @@ void CClan::clanRemoveHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf   << "{W{lRклан выгнать себя{lEclan remove self{lx{x - уйти из клана" << endl
+    buf   << "{Wклан выгнать себя{x - уйти из клана" << endl
           << endl
           << "Для лидеров:" << endl
-          << "{W{lRклан выгнать{lEclan remove{lx{x <имя> - выгнать кого-то из клана" << endl;
+          << "{Wклан выгнать{x <имя> - выгнать кого-то из клана" << endl;
 
     pc->send_to( buf );
 }
@@ -997,12 +997,12 @@ void CClan::clanLevelHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf << "{W{lRклан уровень{lEclan level  {lx{x                  - показывает твой клановый ранг" << endl
-        << "{W{lRклан уровень список{lEclan level list    {lx{x           - показывает список рангов для твоего клана" << endl
-        << "{W{lRклан уровень {lEclan level{lx {x<имя|{W{lRя{lEself{lx{x>         - показывает клановый ранг соклановика" << endl
+    buf << "{Wклан уровень{x                  - показывает твой клановый ранг" << endl
+        << "{Wклан уровень список{x           - показывает список рангов для твоего клана" << endl
+        << "{Wклан уровень  {x<имя|{Wя{x>         - показывает клановый ранг соклановика" << endl
         << endl
         << "Для лидеров:" << endl
-        << "{W{lRклан уровень{lEclan level{lx {x<имя|{W{lRсебе{lEself{lx{x> <число> - устанавливает новый клановый ранг" << endl;
+        << "{Wклан уровень {x<имя|{Wсебе{x> <число> - устанавливает новый клановый ранг" << endl;
 
     pc->send_to( buf );
 }
@@ -1095,10 +1095,10 @@ void CClan::clanMemberHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf   << "{W{lRклан состав{lEclan member{lx{x           - показывает список всех членов клана, в алфавитном порядке" << endl
-          << "{W{lRклан состав дата{lEclan member date{lx{x      - сортирует список по дате последнего захода в мир" << endl
-          << "{W{lRклан состав уровень{lEclan member level{lx{x     - сортирует список по рангу" << endl
-          << "{W{lRклан состав клануровень{lEclan member clanlevel{lx{x - сортирует список по клановому рангу" << endl;
+    buf   << "{Wклан состав{x           - показывает список всех членов клана, в алфавитном порядке" << endl
+          << "{Wклан состав дата{x      - сортирует список по дате последнего захода в мир" << endl
+          << "{Wклан состав уровень{x     - сортирует список по рангу" << endl
+          << "{Wклан состав клануровень{x - сортирует список по клановому рангу" << endl;
 
     pc->send_to( buf );
 }
@@ -1380,13 +1380,13 @@ void CClan::clanPetitionHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
    
-   buf    << "{W{lRклан петиция{lEclan petition{lx{x              - показать, в какой клан была написана петиция на вступление" << endl
-          << "{W{lRклан петиция{lEclan petition{lx{x <клан>       - подать петицию на вступление в клан" << endl
+   buf    << "{Wклан петиция{x              - показать, в какой клан была написана петиция на вступление" << endl
+          << "{Wклан петиция{x <клан>       - подать петицию на вступление в клан" << endl
           << endl
           << "Для руководителей клана:" << endl
-          << "{W{lRклан петиция список  {lEclan petition list{lx{x         - показать список всех заявок на поступление" << endl
-          << "{W{lRклан петиция принять {lEclan petition accept{lx {x<имя> - принять персонажа, написавшего петицию, в свой клан" << endl
-          << "{W{lRклан петиция отклонить{lEclan petition reject{lx {x<имя> - отклонить прошение на прием в клан" << endl;
+          << "{Wклан петиция список  {x         - показать список всех заявок на поступление" << endl
+          << "{Wклан петиция принять  {x<имя> - принять персонажа, написавшего петицию, в свой клан" << endl
+          << "{Wклан петиция отклонить {x<имя> - отклонить прошение на прием в клан" << endl;
 
     pc->send_to( buf );
 }
@@ -1739,12 +1739,12 @@ void CClan::clanDiplomacyHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
    
-    buf << "{W{lRклан дипломатия{lEclan diplomacy{lx{x             - показать клановую дипломатию" << endl
-        << "{W{lRклан дипломатия предложения{lEclan diplomacy prop       {lx{x - показать предложения по изменению дипломатии" << endl
-        << "{W{lRклан дипломатия список{lEclan diplomacy list  {lx{x      - список всех возможных дипломатий" << endl
+    buf << "{Wклан дипломатия{x             - показать клановую дипломатию" << endl
+        << "{Wклан дипломатия предложения{x - показать предложения по изменению дипломатии" << endl
+        << "{Wклан дипломатия список{x      - список всех возможных дипломатий" << endl
         << endl
         << "Для лидеров:" << endl
-        << "{W{lRклан дипломатия установить{lEclan diplomacy set{lx {x<клан> <номер>" << endl
+        << "{Wклан дипломатия установить {x<клан> <номер>" << endl
         << "   - изменить политику по отношению к какому-либо клану" << endl;
 
     pc->send_to( buf );

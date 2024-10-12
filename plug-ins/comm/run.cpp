@@ -49,7 +49,7 @@ CMDRUN( run )
     walk.stripWhiteSpace( );
 
     if (pch->fighting) {
-        pch->pecho("Но ты же сражаешься! Используй команду {y{lRсбежать{lEflee{x для побега из боя.");
+        pch->pecho("Но ты же сражаешься! Используй команду {yсбежать{x для побега из боя.");
         return;
     }
 

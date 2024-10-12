@@ -24,8 +24,7 @@ CMDRUNP( areas )
     
     if (!arg1.empty( ) && !arg2.empty( ) && arg1.isNumber( ) != arg2.isNumber( )) {
         ch->pecho( "Использование: \r\n"
-                     "{lEareas [<level> | <min level> <max level> | <string>]"
-                     "{lRзоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]{lx" );
+                     "зоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]" );
         return;
     }
     
@@ -125,7 +124,7 @@ CMDRUNP( areas )
         else if (maxLevel != -1 && minLevel != -1)
             errbuf << " для диапазона уровней " << minLevel << "-" << maxLevel;
         errbuf << "." << endl 
-               << "Используй команду {hc{y{lEareas{lRзоны{x для полного списка." << endl;
+               << "Используй команду {hc{yзоны{x для полного списка." << endl;
                
         ch->send_to(errbuf);
         return;

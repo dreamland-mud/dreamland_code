@@ -134,7 +134,7 @@ void ReplayAttribute::notify(PCharacter *ch) const
 {
     if (tells.size() > 0)
         ch->pecho(
-            "Тебя ожидает {R%1$d{x сообщен%1$Iие|ия|ий, используй команду {hc{y{lRпрослушать{lEreplay{x для просмотра.",
+            "Тебя ожидает {R%1$d{x сообщен%1$Iие|ия|ий, используй команду {hc{yпрослушать{x для просмотра.",
             tells.size());    
 }
 

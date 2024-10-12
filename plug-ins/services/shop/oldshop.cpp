@@ -177,7 +177,7 @@ CMDRUN( buy )
     
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-        oldact("$c1 говорит тебе '{gЯ не продаю этого -- используй команду {lelist{lrсписок{x'.", keeper, 0, ch, TO_VICT);
+        oldact("$c1 говорит тебе '{gЯ не продаю этого -- используй команду список{x'.", keeper, 0, ch, TO_VICT);
         ch->reply = keeper;
         return;
     }
@@ -554,7 +554,7 @@ CMDRUN( list )
 
     if(counter>1){
         DLString mobName = Syntax::noun(lastShopper->getShortDescr());
-        hint_fmt(ch, "Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hc{lRпривлечь %1$N4{x{y{hc{lEattract %1$N4{x", mobName.c_str());
+        hint_fmt(ch, "Внимание остальных продавцов в этом месте можно привлечь. Например, {y{hcпривлечь %1$N4{x", mobName.c_str());
     }
 }
 

@@ -86,8 +86,8 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     
     if (arg.empty( )) {
         say_act( client, ch, "Я отремонтирую тебе что-нибудь за деньги.");
-        client->pecho("Напиши {y{lrчинить{lerepair{x <название предмета>, чтоб восстановить его.");
-        client->pecho("Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
+        client->pecho("Напиши {yчинить{x <название предмета>, чтоб восстановить его.");
+        client->pecho("Напиши {yоценить{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
         return;
     }
 
@@ -147,7 +147,7 @@ void Repairman::doEstimate( Character *client, const DLString &cArgs )
     arg = args.getOneArgument( );
     
     if (arg.empty( )) {
-        say_act( client, ch, "Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
+        say_act( client, ch, "Напиши {yоценить{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
            return;
     }
 

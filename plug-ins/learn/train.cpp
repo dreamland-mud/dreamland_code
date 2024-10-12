@@ -99,7 +99,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
     if (!argQP.empty( )) {
         if (argQP != "qp" && argQP != "кп") {
-            tell_raw( client, ch, "Чтобы тренироваться за квестовые единицы, напиши {hc{lRтренировать тело кп{lEtrain con qp{lx{x." );
+            tell_raw( client, ch, "Чтобы тренироваться за квестовые единицы, напиши {hcтренировать тело кп{x." );
             return;
         }
         else
@@ -190,7 +190,7 @@ void Trainer::showTrain(PCharacter *client)
                             && client->getQuestPoints() < conPriceQP;
         
         if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ) && !hideQpPrice)
-            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {hc{lEtrain con qp{lRтренировать сложение кп{x.", conPriceQP );
+            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {hcтренировать сложение кп{x.", conPriceQP );
     }            
     else {
         /*
@@ -204,10 +204,10 @@ void Trainer::showTrain(PCharacter *client)
 void Trainer::showGain(PCharacter *client)
 {
     if (client->practice >= 10)
-        tell_act( client, ch, "Можно обменять {Y10{G практик на {Y1{G тренировочную сессию: {hc{lRтренировки купить{lEgain convert{lx{x." );
+        tell_act( client, ch, "Можно обменять {Y10{G практик на {Y1{G тренировочную сессию: {hcтренировки купить{x." );
     
     if (client->train >= 1)
-        tell_act( client, ch, "Можно обменять {Y1{G тренировку на {Y10{G практик: {hc{lRтренировки продать{lEgain revert{lx{x" );  
+        tell_act( client, ch, "Можно обменять {Y1{G тренировку на {Y10{G практик: {hcтренировки продать{x" );  
 }
 
 CMDRUN( train )

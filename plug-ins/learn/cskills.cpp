@@ -101,7 +101,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         // May be <level> or one of <level1> <level2>?
         if (t.isNumber()) {
             if (fAll) {
-                buf << "Диапазон уровней нельзя задать одновременно со словом {lEall{lRвсе{lx." << endl;
+                buf << "Диапазон уровней нельзя задать одновременно со словом все." << endl;
                 return false;
             }
 
@@ -121,7 +121,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         // 'all' argument cannot be mixed with levels. 
         if (arg_is_all(t)) {
             if (num1 || num2) {
-                buf << "Диапазон уровней нельзя задать одновременно со словом {y{lEall{lRвсе{x." << endl;
+                buf << "Диапазон уровней нельзя задать одновременно со словом {yвсе{x." << endl;
                 return false;                        
             }
             fAll = true;
@@ -145,7 +145,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
                 else if (arg_oneof( nextToken, "learned", "изучено" ))
                     criteria = SkillInfo::cmp_by_learned;
                 else {
-                    buf << "Неправильный критерий сортировки '" << nextToken << "', допустимые значения: '{lEname{lRимя{lx', '{lElevel{lRуровень{lx' или '{lElearned{lRизучено{lx'" << endl;
+                    buf << "Неправильный критерий сортировки '" << nextToken << "', допустимые значения: 'имя', 'уровень' или 'изучено'" << endl;
                     return false;
                 }
 
@@ -153,7 +153,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
                 continue;
             }
 
-            buf << "Укажите критерий сортировки ('{lEname{lRимя{lx', '{lElevel{lRуровень{lx' или '{lElearned{lRизучено{lx')." << endl;
+            buf << "Укажите критерий сортировки ('имя', 'уровень' или 'изучено')." << endl;
             return false;
         }
 
@@ -188,8 +188,8 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         // Unknown garbage.
         buf << fmt(0, 
             "Неверный параметр '%1$s', подходящие фильтры: "
-            "{lRзаклинания{lEspells{lx, {lRнавыки{lEskills{lx, {lRпассивные{lEpassive{lx, "
-            "{lRактивные{lEactive{lx, название группы умений, диапазон уровней.\r\n", t.c_str());
+            "заклинания, навыки, пассивные, "
+            "активные, название группы умений, диапазон уровней.\r\n", t.c_str());
         return false;
     }
 
@@ -374,8 +374,8 @@ void AllSkillsList::display( std::ostream & buf )
 
     buf << fmt(0, 
         "Также используй фильтры "
-        "{y{hc%1$s {lRзаклинания{lEspells{x, {y{hc%1$s {lRнавыки{lEskills{x, {y{hc%1$s {lRпассивные{lEpassive{x, "
-        "{y{hc%1$s {lRактивные{lEactive{x, группа умений и диапазон уровней (например, 10 или 10 42)\r\n", mycmd.c_str());
+        "{y{hc%1$s заклинания{x, {y{hc%1$s навыки{x, {y{hc%1$s пассивные{x, "
+        "{y{hc%1$s активные{x, группа умений и диапазон уровней (например, 10 или 10 42)\r\n", mycmd.c_str());
 
     buf << endl << "См. также {y{hc" << mycmd << " ?{x." << endl;
 }
@@ -409,7 +409,7 @@ CMDRUN( skills )
     AllSkillsList slist;
     std::basic_ostringstream<char> buf;
     
-    slist.mycmd = "{lR" + getRussianName() + "{lE" + getName() + "{lx";
+    slist.mycmd = "" + getRussianName() + "";
 
     if (!slist.parse( argument, buf, ch )) {
         ch->send_to( buf );

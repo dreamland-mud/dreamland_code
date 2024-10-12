@@ -65,9 +65,9 @@ void SkillHelpFormatter::setup( Character *ch )
 
 
 /*
- * CMD      ->  {lEeng_name{lRрусское_имя{lx
- * SKILL    ->  {lEeng_name{lRрусское_имя{lx
- * SPELL    ->  {lEc 'spell name'{lRк 'название заклинания'{lx
+ * CMD      ->  русское_имя
+ * SKILL    ->  русское_имя
+ * SPELL    ->  к 'название заклинания'
  */
 bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {

@@ -198,17 +198,17 @@ void MKey::usage( Character *ch )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "{W{lRключи список{lEmkey list{lx{w" << endl
+    buf << "{Wключи список{w" << endl
         << "     - показать список твоих ключей" << endl
-        << "{W{lRключи купить{lEmkey buy{lx{w <имя ключа>" << endl
+        << "{Wключи купить{w <имя ключа>" << endl
         << "     - приобрести ключ" << endl;
     
     if (ch->is_immortal( )) 
-        buf << "{W{lRключи показать{lEmkey show{lx{w <victim>" << endl
+        buf << "{Wключи показать{w <victim>" << endl
             << "     - показать список ключей жертвы" << endl
-            << "{W{lRключи дать{lEmkey give{lx{w <victim> <key vnum>" << endl
+            << "{Wключи дать{w <victim> <key vnum>" << endl
             << "     - дать ключ с заданным внумом жертве" << endl
-            << "{W{lRключи забрать{lEmkey remove{lx{w <victim> <key vnum>" << endl
+            << "{Wключи забрать{w <victim> <key vnum>" << endl
             << "     - забрать ключ" << endl;
 
     ch->send_to( buf );

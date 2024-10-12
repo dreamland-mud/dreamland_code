@@ -64,7 +64,7 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
     Clan *clan;
     
     if (cmd.empty( )) {
-        buf << "Укажи одно из действий: {lRсписок, разрешить или запретить{lElist, allow или deny{lx.";
+        buf << "Укажи одно из действий: список, разрешить или запретить.";
         return false;
     }
     
@@ -96,7 +96,7 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
     else if (cmd.strPrefix( "deny" ) || cmd.strPrefix( "запретить" ))
         fAllow = false;
     else {
-        buf << "Укажи одно из действий: {lRсписок, разрешить или запретить{lElist, allow или deny{lx.";
+        buf << "Укажи одно из действий: список, разрешить или запретить.";
         return false;
     }
 

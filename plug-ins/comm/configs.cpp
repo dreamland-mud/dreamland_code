@@ -70,7 +70,7 @@ bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
     if (arg.empty( )) {
         bool yes = isSetBit(ch);
         printLine( ch );
-        ch->pecho("\nИспользуй команду {hc{y{lRрежим %s %s{lEconfig %s %s{x для изменения.",
+        ch->pecho("\nИспользуй команду {hc{yрежим %s %s{x для изменения.",
                       rname.c_str(), yes ? "нет" : "да", name.c_str(), yes ? "no" : "yes");
         return true;
     }
@@ -229,7 +229,7 @@ COMMAND(ConfigCommand, "config")
         config_discord_print(pch);
         config_lang_print(pch);
 
-        ch->pecho("\r\nПодробнее смотри по команде {lR{yрежим {Dнастройка{w{lE{yconfig {Dнастройка{x.");
+        ch->pecho("\r\nПодробнее смотри по команде {yрежим {Dнастройка{w.");
         return;
     }
 
@@ -259,13 +259,13 @@ COMMAND(ConfigCommand, "config")
                 if (arg1.strPrefix((*c)->getName()) || arg1.strPrefix((*c)->getRussianName()))
                 {
                     if (!(*c)->handleArgument( pch, arg2 ))
-                        pch->pecho("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
+                        pch->pecho("Неправильный переключатель. См. {W? режим{x.");
 
                     return;
                 }
 
     
-    pch->pecho("Опция не найдена. Используй {hc{y{lRрежим{lEconfig{x для списка.");
+    pch->pecho("Опция не найдена. Используй {hc{yрежим{x для списка.");
 }
 
 
@@ -332,7 +332,7 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
     if (arg.empty( ))
     {
         config_scroll_print(ch);
-        ch->pecho("Для изменения используй {y{lRрежим буфер{lEconfig scroll{x число.");
+        ch->pecho("Для изменения используй {yрежим буфер{x число.");
         return;
     }
 
@@ -375,7 +375,7 @@ static void config_telegram_print(PCharacter *ch)
     const DLString &user = get_string_attribute(ch, "telegram");
     bool yes = !user.empty();
     DLString msgYes = fmt(0, "Пользователь Telegram {C%s{x.", user.c_str());
-    DLString msgNo = "Твой персонаж не связан с пользователями Telegram, набери {y{hc{lEconfig telegram{lRрежим телеграм{x.";
+    DLString msgNo = "Твой персонаж не связан с пользователями Telegram, набери {y{hcрежим телеграм{x.";
     print_line(ch, "telegram", "телеграм", yes, msgYes, msgNo);
 }
 
@@ -390,11 +390,11 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments)
     if (arg.empty()) {
         if (!user->empty())
             ch->pecho("Твой персонаж связан с пользователем Telegram {C%s{x."
-                       "Используй {hc{y{lRрежим телеграм очистить{lEconfig telegram clear{x для очистки.\r\n", 
+                       "Используй {hc{yрежим телеграм очистить{x для очистки.\r\n", 
                        user->getValue().c_str());
         else
             ch->pecho("Твой персонаж не связан с пользователями Telegram.\r\n"
-                        "Используй {y{lRрежим телеграм @имя{lEconfig telegram @username{x для установки.");        
+                        "Используй {yрежим телеграм @имя{x для установки.");        
         return;
     }
 
@@ -432,7 +432,7 @@ static void config_discord_print(PCharacter *ch)
     msgYes << "Пользователь Discord {C" << discord["username"].asString() 
            << "{w ({C" << discord["id"].asString() << "{w), статус " << discord["status"];            
 
-    DLString msgNo = "Твой персонаж не связан с пользователем Discord, набери {y{hc{lRрежим дискорд{lEconfig discord{x";
+    DLString msgNo = "Твой персонаж не связан с пользователем Discord, набери {y{hcрежим дискорд{x";
     print_line(ch, "discord", "дискорд", yes, msgYes.str(), msgNo);
 }
 
@@ -474,12 +474,12 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
             << "  {W*{x зайди на сервер {hlhttps://discord.gg/fVtaeePyey{x" << endl
             << "  {W*{x зайди на канал {W#дрим-чат{x или открой приват с ботом {WВалькирия{x" << endl
             << "  {W*{x набери {W/link " << discord["token"].asString() << "{x" << endl
-            << "Для смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x." << endl;
+            << "Для смены секретного слова набери {hc{yрежим дискорд очистить{x." << endl;
     } else {
         buf << "Твой персонаж связан с пользователем {C" << discord["username"].asString() << "{w ({C" 
             << discord["id"].asString() << "{w), статус " << discord["status"].asString() << endl;
         buf << "Для повторной линковки набери {W/link " << discord["token"].asString() <<"{x в привате с ботом {WВалькирия{x" << endl
-            << "Для очистки и смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x."
+            << "Для очистки и смены секретного слова набери {hc{yрежим дискорд очистить{x."
             << endl;
     }
 

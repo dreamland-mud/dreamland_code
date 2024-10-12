@@ -155,7 +155,7 @@ void CommandHelpFormatter::setup( Character *ch )
 }
 
 /*
- * CMD    ->  {lEeng_name{lRрусское_имя{lx
+ * CMD    ->  русское_имя
  */
 bool CommandHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {

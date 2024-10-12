@@ -332,8 +332,8 @@ void HomeRecall::doUsage( PCharacter * ch )
     std::basic_ostringstream<char> buf;
 
     buf << "Синтаксис: " << endl
-        << "{W{lEhomerecall{lRдомой     {x             - переносит в дом" << endl
-        << "{W{lEhomerecall метка{lRдомой метка     {x       - переносит в дом с указанной меткой" << endl;
+        << "{Wдомой     {x             - переносит в дом" << endl
+        << "{Wдомой метка     {x       - переносит в дом с указанной меткой" << endl;
     if (ch->is_immortal( ))
         buf << "{Whomerecall set{x <name> <room vnum>   - установить игроку комнату для homerecall" << endl
             << "в идеале это комната снаружи дома, от которого он может купить ключ" << endl
@@ -343,7 +343,7 @@ void HomeRecall::doUsage( PCharacter * ch )
             << "{Whomerecall remove{x <name>            - отобрать возможность рекаллиться домой" << endl
             << "{Whomerecall list{x                     - список всех игроков, имеющих homerecall" << endl;
     else 
-        buf << "{W{lEhomerecall list{lRдомой список   {x        - показать список твоих домов и меток" << endl;
+        buf << "{Wдомой список   {x        - показать список твоих домов и меток" << endl;
 
     
     ch->send_to( buf );

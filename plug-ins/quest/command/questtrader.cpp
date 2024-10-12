@@ -109,7 +109,7 @@ void QuestTrader::msgListBefore( Character *client )
 
 void QuestTrader::msgListAfter( Character *client )
 {
-    client->pecho( "Для покупки чего-либо используй {y{lRквест купить{lEquest buy{lx {Dназвание{x." );
+    client->pecho( "Для покупки чего-либо используй {yквест купить {Dназвание{x." );
 }
 
 void QuestTrader::msgArticleNotFound( Character *client ) 

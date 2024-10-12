@@ -188,7 +188,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
             return;
     }
     else {
-        ch->pecho("Неверная команда, смотри {W? {lRписьмо синтаксис{lEnote syntax{x.");
+        ch->pecho("Неверная команда, смотри {W? письмо синтаксис{x.");
         return;
     }
     
@@ -432,7 +432,7 @@ void NoteCommand::doList( PCharacter *ch, DLString &argument ) const
         }
     }
     catch (const Exception &e) {
-        ch->pecho("Неверный формат, смотри {y{hc{lRсправка письмо список{lEhelp note list{x." );
+        ch->pecho("Неверный формат, смотри {y{hcсправка письмо список{x." );
         return;
     }
     

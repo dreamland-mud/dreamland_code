@@ -206,7 +206,7 @@ void CGQuest::doNoExp( PCharacter *ch, DLString& arguments )
         } else if (arg_is_no( arguments )) {
             attribute->setNoExp( false );
         } else {
-            ch->pecho("Используй '{lEgquest noexp yes{lRгквест безопыта да{lx' или '{lEgquest noexp no{lRгквест безопыта нет{lx'.");
+            ch->pecho("Используй 'гквест безопыта да' или 'гквест безопыта нет'.");
             return;
         }
 
@@ -488,7 +488,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
         else if (arg_is_no( on ) || arg_is_switch_off( on ))
             autostart = false;
         else {
-            ch->pecho( "Неправильный параметр: пишите {lRвкл{lEon{lx или {lRвыкл{lEoff{lx, {lRда{lEyes{lx или {lRнет{lEno{lx." );
+            ch->pecho( "Неправильный параметр: пишите вкл или выкл, да или нет." );
             return;
         }
 
@@ -599,31 +599,31 @@ void CGQuest::usage( PCharacter *ch )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "{W{lEgquest{lRгквест{lx {lEinfo{lRинфо {lx       {w - информация о текущих глобальных квестах" << endl
-        << "{W{lEgquest{lRгквест{lx {lEprogress{lRпрогресс {lx   {w - прогресс каждого участника глобальных квестов" << endl
-        << "{W{lEgquest{lRгквест{lx {lEstat{lRстат {lx       {w - показать статистику побед" << endl
-        << "{W{lEgquest{lRгквест{lx {lEvictory{lRпобеды  {lx    {w - показать твои победы" << endl
-        << "{W{lEgquest{lRгквест{lx {lEnoexp{lRбезопыта{lx {lEyes  {lRда {lx{w - не получать опыт в награду" << endl
-        << "{W{lEgquest{lRгквест{lx {lEnoexp{lRбезопыта{lx {lEno   {lRнет{lx{w - получать опыт в награду" << endl;
+    buf << "{Wгквест инфо        {w - информация о текущих глобальных квестах" << endl
+        << "{Wгквест прогресс    {w - прогресс каждого участника глобальных квестов" << endl
+        << "{Wгквест стат        {w - показать статистику побед" << endl
+        << "{Wгквест победы      {w - показать твои победы" << endl
+        << "{Wгквест безопыта да {w - не получать опыт в награду" << endl
+        << "{Wгквест безопыта нет{w - получать опыт в награду" << endl;
 
     if (!ch->is_immortal( )) {
         ch->send_to( buf );
         return;
     }
 
-    buf << "{W{lEgquest{lRгквест{lx {lElist{lRсписок{lx       {w - список всех существующих глобалов" << endl
-        << "{W{lEgquest{lRгквест{lx {lEstart{lRстарт{lx <id> [<min_level> <max_level>] [<time>] [<arg>] [<playerCnt>]" << endl
+    buf << "{Wгквест список       {w - список всех существующих глобалов" << endl
+        << "{Wгквест старт <id> [<min_level> <max_level>] [<time>] [<arg>] [<playerCnt>]" << endl
         << "                  {w - запуск глобала:" << endl
-        << "                  {w - <id> имя глобала, список см. по {lEgquest list{lRгквест список{lx" << endl
+        << "                  {w - <id> имя глобала, список см. по гквест список" << endl
         << "                  {w - <levels> указывают диапазн уровней для квестов типа gangsters" << endl
         << "                  {w - <time> указывает длительность в минутах, по умолчанию 30" << endl
         << "                  {w - <arg> указывает имя сценария, если они поддерживаются квестом" << endl
         << "                  {w - <playerCnt> имитирует запуск квеста как будто онлайн такое кол-во игроков" << endl
-        << "{W{lEgquest{lRгквест{lx {lEstop{lRстоп{lx <id>  {w - завершение уже запущенного квеста" << endl
-        << "{W{lEgquest{lRгквест{lx {lEtime{lRвремя{lx <id> <time>{w - установить время запущенного квеста в <time> минут" << endl
-        << "{W{lEgquest{lRгквест{lx {lEtalk{lRговорить{lx <text>{w - посылка сообщения в канал [Global Quest]" << endl
-        << "{W{lEgquest{lRгквест{lx {lEtalk{lRговорить{lx <id> <text>{w - сообщение в канал [Global Quest: <имя квеста>]" << endl
-        << "{W{lEgquest{lRгквест{lx {lEauto{lRавто{lx <id> [{lEon|off{lRвкл|выкл{lx] [<time>]" << endl
+        << "{Wгквест стоп <id>  {w - завершение уже запущенного квеста" << endl
+        << "{Wгквест время <id> <time>{w - установить время запущенного квеста в <time> минут" << endl
+        << "{Wгквест говорить <text>{w - посылка сообщения в канал [Global Quest]" << endl
+        << "{Wгквест говорить <id> <text>{w - сообщение в канал [Global Quest: <имя квеста>]" << endl
+        << "{Wгквест авто <id> [вкл|выкл] [<time>]" << endl
         << "                  {w - вкл./выкл. автозапуск с интервалом в <time> минут" << endl;
 
     if (!ch->isCoder( )) {
@@ -631,9 +631,9 @@ void CGQuest::usage( PCharacter *ch )
         return;
     }
     
-    buf << "{W{lEgquest{lRгквест{lx {lEset{lRустановить{lx <player> <id> [+]<count>" << endl
+    buf << "{Wгквест установить <player> <id> [+]<count>" << endl
         << "                  {w - установить чару статистику побед по этому виду квеста." << endl
-        << "{W{lEgquest{lRгквест{lx {lEread{lRпрочесть{lx <id>  {w - обновить конфигурацию квеста (перечитать профайл)" << endl;
+        << "{Wгквест прочесть <id>  {w - обновить конфигурацию квеста (перечитать профайл)" << endl;
     ch->send_to( buf );
 }
 

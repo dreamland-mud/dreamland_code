@@ -494,11 +494,11 @@ void show_char_pk_flags( PCharacter *ch, ostringstream &buf )
         const char *descr;
     };
     static const struct PKFlag pk_flag_table [] = {
-        { PK_VIOLENT, 'B', "{leVIOLENT{lrАДРЕНАЛИН{lx" },
-        { PK_KILLER,  'R', "{leKILLER{lrУБИЙЦА{lx"  },
-        { PK_THIEF,   'R', "{leTHIEF{lrВОРЮГА{lx"   },
-        { PK_SLAIN,   'D', "{leSLAIN{lrЖЕРТВА{lx"   },
-        { PK_GHOST,   'D', "{leGHOST{lrПРИЗРАК{lx"   },
+        { PK_VIOLENT, 'B', "АДРЕНАЛИН" },
+        { PK_KILLER,  'R', "УБИЙЦА"  },
+        { PK_THIEF,   'R', "ВОРЮГА"   },
+        { PK_SLAIN,   'D', "ЖЕРТВА"   },
+        { PK_GHOST,   'D', "ПРИЗРАК"   },
     };
     static const int size = sizeof(pk_flag_table) / sizeof(*pk_flag_table);
 
@@ -639,7 +639,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
             buf << "[{DБез связи{x]";
 
         if (IS_SET(pVict->comm, COMM_AFK ))
-            buf << "[{C{leAFK{lrАФК{lx{x]";
+            buf << "[{CАФК{x]";
 
         if (pVict->act.isSet(PLR_RITUAL))
             buf << "({bРитуал{x)";

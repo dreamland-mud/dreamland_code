@@ -198,7 +198,7 @@ public:
         int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translitCmd.size();
 
         if (total_hints == 0) {
-            iargs.ch->pecho("Что? Для справки наберите {y{hc{lRкоманды{lEcommands{x или {y{hc{lRсправка{lEhelp{x.");
+            iargs.ch->pecho("Что? Для справки наберите {y{hcкоманды{x или {y{hcсправка{x.");
             return false;
         }
 
@@ -218,7 +218,7 @@ public:
                 buf << endl;
         }
 
-        buf << "Для справки наберите {y{hc{lRкоманды{lEcommands{x или {y{hc{lRсправка{lEhelp{x." << endl;
+        buf << "Для справки наберите {y{hcкоманды{x или {y{hcсправка{x." << endl;
         iargs.ch->send_to(buf);
         return false;
     }
