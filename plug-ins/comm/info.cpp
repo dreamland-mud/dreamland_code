@@ -15,6 +15,7 @@
 #include "interp.h"
 #include "handler.h"
 #include "vnum.h"
+#include "arg_utils.h"
 
 #include "def.h"
 
@@ -70,12 +71,12 @@ CMDRUNP( description )
     DLString args = argument;
     DLString arg = args.getOneArgument();
 
-    if (arg_oneof( arg, "show", "показать" )) {
+    if (arg_is_show(arg)) {
         desc_show( ch );
         return;
     }
 
-    if (arg_oneof( arg, "copy", "копировать" )) {
+    if (arg_is_copy(arg)) {
         if (!ch->getPC( )) 
             return;
 

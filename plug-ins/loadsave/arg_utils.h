@@ -7,6 +7,10 @@
 
 class DLString;
 
+bool arg_is(const DLString &arg, const DLString &keyword);
+bool arg_is_strict(const DLString &arg, const DLString &keyword);
+
+
 bool        arg_contains_someof( const DLString &arg, const char *namesList );
 bool        arg_oneof( const DLString &arg, const char *var1 = NULL, const char *var2 = NULL, const char *var3 = NULL, const char *var4 = NULL );
 bool        arg_oneof_strict( const DLString &arg, const char *var1 = NULL, const char *var2 = NULL, const char *var3 = NULL, const char *var4 = NULL );

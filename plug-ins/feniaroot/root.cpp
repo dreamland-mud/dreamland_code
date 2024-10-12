@@ -1598,3 +1598,14 @@ NMI_INVOKE(Root, arg_is_silver, "(arg): true если аргумент это co
 {
     return arg_is_silver(args2string(args));
 }
+
+NMI_INVOKE(Root, arg_is, "(arg,kw): true если для kw='help' arg это одно из 'he', 'довід' (fedit grammar/synonyms)")
+{
+    return arg_is(argnum2string(args, 1), argnum2string(args, 2));
+}
+
+NMI_INVOKE(Root, arg_is_strict, "(arg,kw): true если для kw='help' arg это одно из 'help', 'довідка' (fedit grammar/synonyms)")
+{
+    return arg_is_strict(argnum2string(args, 1), argnum2string(args, 2));
+}
+

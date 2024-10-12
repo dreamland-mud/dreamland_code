@@ -205,7 +205,7 @@ CMDRUN( commands )
     
     arg = args.getOneArgument( );
     
-    if (arg_oneof( arg, "show", "показать" )) {
+    if (arg_is_show(arg)) {
         show_matched_commands( ch, args );
         return;
     }

@@ -155,7 +155,7 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
         doLinePlus( ch, attr, arguments );
         return;
     }
-    else if (arg_oneof( cmd, "paste", "вставить" )) {
+    else if (arg_is_paste(cmd)) {
         doPaste( ch, attr );
         return;
     }
@@ -175,11 +175,11 @@ void NoteCommand::run( Character* cch, const DLString& constArguments )
         if (doFrom( ch, attr, arguments ))
             return;
     }
-    else if (arg_oneof( cmd, "clear", "cancel", "очистить", "отменить" )) {
+    else if (arg_is_clear(cmd)) {
         if (doClear( ch, attr ))
             return;
     }
-    else if (arg_oneof( cmd, "show", "показать" )) {
+    else if (arg_is_show(cmd)) {
         if (doShow( ch, attr ))
             return;
     }

@@ -4,11 +4,56 @@
  */
 #include "dlstring.h"
 #include "dl_strings.h"
+#include "jsoncpp/json/value.h"
 #include "arg_utils.h"
+#include "configurable.h"
+
+
+Json::Value synonyms;
+CONFIGURABLE_LOADED(grammar, synonyms)
+{
+    synonyms = value;
+}
+
 
 /*--------------------------------------------------------------------------
  * command arguments parsing 
  *--------------------------------------------------------------------------*/
+
+// Synonyms lookup by keyword. True if for keyword "help" arg is one of "?", "help", "h", "довідка" etc.
+bool arg_is(const DLString &arg, const DLString &keyword)
+{
+    if (arg.strPrefix(keyword))
+        return true;
+
+    if (!synonyms.isMember(keyword))
+        return false;
+
+    for (auto &synon: synonyms[keyword]) {
+        if (arg.strPrefix(synon.asString()))
+            return true;
+    }
+
+    return false;
+}
+
+// Exact synonym lookup.
+bool arg_is_strict(const DLString &arg, const DLString &keyword)
+{
+    if (arg == keyword)
+        return true;
+
+    if (!synonyms.isMember(keyword))
+        return false;
+
+    for (auto &synon: synonyms[keyword]) {
+        if (arg == synon.asString())
+            return true;
+    }
+
+    return false;
+}
+
 bool arg_contains_someof( const DLString &arg, const char *namesList )
 {
     DLString names = namesList, n;
@@ -82,136 +127,135 @@ bool arg_oneof( const DLString &arg, const char *var1, const char *var2, const c
 
 bool arg_is_help( const DLString &arg )
 {
-    return arg_oneof( arg, "help", "?", "помощь", "справка" );
+    return arg_is(arg, "help");
 }
 
 bool arg_is_list( const DLString &arg )
 {
-    return arg_oneof( arg, "list", "список" );
+    return arg_is(arg, "list");
 }
 
 bool arg_is_info( const DLString &arg )
 {
-    return arg_oneof( arg, "info", "информация" );
+    return arg_is(arg, "info");
 }
 
 bool arg_is_time( const DLString &arg )
 {
-    return arg_oneof( arg, "time", "время" );
+    return arg_is(arg, "time");
 }
 
 bool arg_is_pk( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "pk", "пк" );
+    return arg_is_strict(arg, "pk");
 }
 
 bool arg_is_show( const DLString &arg )
 {
-    return arg_oneof( arg, "show", "показ", "показать" );
+    return arg_is(arg, "show");
 }
 
 bool arg_is_in( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "i", "in", "в" );
+    return arg_is_strict(arg, "in");
 }
 
 bool arg_is_on( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "on", "на" );
+    return arg_is_strict(arg, "on");
 }
 
 bool arg_is_from( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "from", "из", "с", "со" );
+    return arg_is_strict(arg, "from");
 }
 
 bool arg_is_to( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "to", "на" );
+    return arg_is_strict(arg, "to");
 }
 
 bool arg_is_yes( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "yes", "y", "да", "д" );
+    return arg_is_strict(arg, "yes");
 }
 
 bool arg_is_no( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "no", "n", "нет", "н" );
+    return arg_is_strict(arg, "no");
 }
 
 bool arg_is_switch_off( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "off", "офф", "выкл" );
+    return arg_is_strict(arg, "switchoff");
 }
 
 bool arg_is_switch_on( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "on", "вкл" );
+    return arg_is_strict(arg, "switchon");
 }
 
 bool arg_is_self( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "self", "я", "себе", "себя" );
+     return arg_is_strict(arg, "self");
 }
 
 bool arg_is_ugly( const DLString &arg )
 {
-    return arg_oneof( arg, "vampire", "вампир", "creature", "создание ночи" );
+    return arg_is(arg, "vampire");
 }
 
 bool arg_is_silver( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "coin", "coins", "silver" )
-           || arg_oneof_strict( arg, "серебро", "серебра", "монет" );
+    return arg_is_strict(arg, "silver");
 }
 
 bool arg_is_gold( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "gold", "золото", "золота", "золотых" );
+    return arg_is_strict(arg, "gold");
 }
 
 bool arg_is_copy( const DLString &arg )
 {
-    return arg_oneof(arg, "copy", "копировать");
+    return arg_is(arg, "copy");
 }
 
 bool arg_is_paste( const DLString &arg )
 {
-    return arg_oneof(arg, "paste", "вставить");
+    return arg_is(arg, "paste");
 }
 
 bool arg_is_web( const DLString &arg )
 {
-    return arg_oneof_strict(arg, "web", "веб");
+    return arg_is_strict(arg, "web");
 }
 
 bool arg_is_money( const DLString &arg )
 {
-    return arg_oneof( arg, "coin", "coins", "silver" )
-           || arg_oneof( arg, "серебро", "серебра", "монет" )
-           || arg_oneof( arg, "gold", "золото", "золота", "золотых" );
+    return arg_is(arg, "silver") || arg_is(arg, "gold");
 }
 
 bool arg_is_alldot( const DLString &arg )
 {
-    DLString larg = arg.toLower();
-    return arg ^ "all" 
-           || arg ^ "все" 
-           || arg ^ "всё" 
-           || !str_prefix( "all.", larg.c_str( ) )
-           || !str_prefix( "все.", larg.c_str( ) )
-           || !str_prefix( "всё.", larg.c_str( ) );
+    if (arg_is_all(arg))
+        return true;
+
+    list<DLString> splitByDot = arg.split(".");
+    if (splitByDot.size() == 1)
+        return false;
+    
+    DLString argBeforeDot = splitByDot.front();
+    return arg_is_all(argBeforeDot);
 }
 
 bool arg_is_all( const DLString &arg )
 {
-    return arg ^ "all" || arg ^ "все" || arg ^ "всё"; 
+    return arg_is_strict(arg, "all");
 }
 
 bool arg_is_clear( const DLString &arg )
 {
-    return arg_oneof(arg, "clear", "очистить");
+    return arg_is(arg, "clear");
 }
 
 /** Remove surrounding quotes from an argument. */
